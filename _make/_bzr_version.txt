@@ -1,5 +1,0 @@
-revision-id: hartmutschorrig-20120823065614-lhhn4501ejf5xfsl
-date: 2012-08-23 08:56:14 +0200
-build-date: 2012-08-26 20:03:37 +0200
-revno: 292
-branch-nick: srcJava_vishiaGUI

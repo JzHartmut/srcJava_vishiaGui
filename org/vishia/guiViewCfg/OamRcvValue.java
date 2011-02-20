@@ -37,9 +37,9 @@ public class OamRcvValue implements Runnable
 	
 	private final Map<String, String> indexUnknownVariable = new TreeMap<String, String>();
 	
-	InspcDataExchangeAccess.InspcDatagram datagramRcv = new InspcDataExchangeAccess.InspcDatagram();
+	InspcDataExchangeAccess.Datagram datagramRcv = new InspcDataExchangeAccess.Datagram();
 	
-	InspcDataExchangeAccess.Inspcitem infoEntity = new InspcDataExchangeAccess.Inspcitem();
+	InspcDataExchangeAccess.Info infoEntity = new InspcDataExchangeAccess.Info();
 	
 	final Report log;
 
@@ -103,7 +103,7 @@ public class OamRcvValue implements Runnable
 	
 	private void evalTelg(byte[] recvData, int nrofBytes) throws ParseException
 	{ 
-		datagramRcv.assign(recvData, nrofBytes);
+		datagramRcv.assignData(recvData, nrofBytes);
 		datagramRcv.setBigEndian(true);
 		int nrofBytesInfoHead = infoEntity.getLengthHead();
 		int catastrophicalCount = 1000;
@@ -122,12 +122,7 @@ public class OamRcvValue implements Runnable
 	
 	
 	public void sendRequest()
-	{    
-	  try{ Thread.sleep(300);} 
-    catch (InterruptedException e)
-    { //dialogZbnfConfigurator.terminate();
-    }
-
+	{
 		ipc.send(sendData, 10, targetAddr);
 	}
 	

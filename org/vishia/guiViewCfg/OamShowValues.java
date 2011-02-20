@@ -2,88 +2,51 @@ package org.vishia.guiViewCfg;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.vishia.byteData.ByteDataSymbolicAccessReadConfig;
+import org.vishia.byteData.RawDataAccess;
 import org.vishia.mainCmd.Report;
+import org.vishia.mainGui.GuiPanelMngWorkingIfc;
+import org.vishia.mainGui.GuiSetValueIfc;
+import org.vishia.mainGui.PanelActivatedGui;
+import org.vishia.mainGui.UserActionGui;
+import org.vishia.mainGui.ValueBar;
+import org.vishia.mainGui.WidgetDescriptor;
 
 import org.vishia.byteData.ByteDataSymbolicAccess;
-import org.vishia.gral.base.GralCurveView;
-import org.vishia.gral.base.GralPanelActivated_ifc;
-import org.vishia.gral.base.GralValueBar;
-import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralMng_ifc;
-import org.vishia.gral.ifc.GralSetValue_ifc;
-import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
-import org.vishia.gral.ifc.GralWidget_ifc;
-
 
 public class OamShowValues
 {
 
-  
-  /**Version and history
-   * <ul>
-   * <li>2012-02-25 Hartmut new: OamShowValues: with time, grayed if old
-   * <li>2012-02-25 Hartmut new: CurveView: All data have a short timestamp. 
-   * <li>2012-02-21 Hartmut chg Now a curve view can be accessed symbolically.
-   * <li>2010-06-00 Hartmut created
-   * </ul>
-   * 
-   */
-  public static final int version = 0x20120222;
-  
 	final Report log;
 
 	/**Index (fast access) of all variable which are sent from the automation device (contained in the cfg-file). */
-	protected final ByteDataSymbolicAccessReadConfig accessOamVariable;
+	protected final ByteDataSymbolicAccess accessOamVariable;
 
 	boolean dataValid = false;
 	
-	List<GralWidget> widgetsInTab;
+	List<WidgetDescriptor<?>> widgetsInTab;
 	
 	/**The access to the gui, to change data to show. */
-	protected final GralMng_ifc guiAccess;
+	protected final GuiPanelMngWorkingIfc guiAccess;
 	
-	Set<Map.Entry<String, GralWidget>> fieldsToShow;
-	
-	/**The access to received data for the timestamp as milliseconds after a base year.
-	 * It is not null if that variable is contained in the received data description
-	 * See {@link #readVariableCfg()}.
-	 */
-	ByteDataSymbolicAccess.Variable varTimeMilliSecFromBaseyear;
+	Set<Map.Entry<String, WidgetDescriptor<?>>> fieldsToShow;
 	
 	
-  GralColor colorBackValueOk = GralColor.getColor("wh");
-  
-  GralColor colorBackValueOld = GralColor.getColor("lgr");
-  
-	long timeMilliSecFromBaseyear;
-	
-	/**Set in {@link #writeValuesOfTab()} to check newless. */
-	private long timeNow;
-	
-	/**Time for valid values. */
-	private final long milliSecondsOk = 3000; 
-	
-	//private final float[] valueUserCurves = new float[6];  
+	private final float[] valueUserCurves = new float[6];  
 
 	public OamShowValues(
 		Report log
-	, GralMng_ifc guiAccess
+	, GuiPanelMngWorkingIfc guiAccess
 	)
 	{
 		this.log = log;
 		this.guiAccess = guiAccess;
-		accessOamVariable = new ByteDataSymbolicAccessReadConfig(log);
+		accessOamVariable = new ByteDataSymbolicAccess(log);
 		//assign an empty array, it is necessary for local test or without data receive.
 		//elsewhere a null-pointer-exception is thrown if the tab-pane is shown.
 		//If data are received, this empty array isn't referenced any more.
-		accessOamVariable.assignData(new byte[1500], System.currentTimeMillis());
+		accessOamVariable.assignData(new byte[1500]);
 		dataValid = true;   //it can be set because empty data are present, see above, use to test.
 	}
 	
@@ -94,11 +57,10 @@ public class OamShowValues
 	  } else {
 	  	log.writeError(" variables not access-able from file \"exe/SES_oamVar.cfg\".");
 	  }
-	  varTimeMilliSecFromBaseyear = accessOamVariable.getVariable("time_milliseconds1970");
 	  return nrofVariable >0;
 	}
 	
-	public void setFieldsToShow(Set<Map.Entry<String, GralWidget>> fields)
+	public void setFieldsToShow(Set<Map.Entry<String, WidgetDescriptor<?>>> fields)
 	{
 		fieldsToShow = fields;
 	}
@@ -116,25 +78,18 @@ public class OamShowValues
 	 */
 	public void show(byte[] binData, int nrofBytes, int from)
 	{
-		accessOamVariable.assignData(binData, nrofBytes, from, System.currentTimeMillis());
+		accessOamVariable.assignData(binData, nrofBytes, from);
 		dataValid = true;
-		if(varTimeMilliSecFromBaseyear !=null){
-		  //read the time stamp from the record:
-		  timeMilliSecFromBaseyear = varTimeMilliSecFromBaseyear.bytes.getInt(varTimeMilliSecFromBaseyear, 0);
-		} else {
-		  timeMilliSecFromBaseyear = System.currentTimeMillis();
-		}
 		writeValuesOfTab();   //write the values in the current tab, most of them will be received here newly.
 		//TEST TODO:
 		//accessOamVariable.setFloat("ctrl/energyLoadCapac2Diff", checkWithoutNewdata);
 		//current panel:
-		List<GralWidget> listWidgets = guiAccess.getListCurrWidgets();
-		for(GralWidget widgetInfo : listWidgets){
-			@SuppressWarnings("unused")
-      String sName = widgetInfo.name;
+		List<WidgetDescriptor<?>> listWidgets = guiAccess.getListCurrWidgets();
+		for(WidgetDescriptor<?> widgetInfo : listWidgets){
+			String sName = widgetInfo.name;
 		}
 		//read all variables which are necessary to show.
-		//writeCurveValues();   //write values for curve scoping
+		writeCurveValues();   //write values for curve scoping
 
 	}
 
@@ -144,20 +99,20 @@ public class OamShowValues
 		redrawCurveValues();
 	}
 	
-	private void writeField(GralWidget widgetInfo)
+	private void writeField(WidgetDescriptor<?> widgetInfo)
 	{ String sName = widgetInfo.name;
-		//String sInfo = widgetInfo.sDataPath;
+		String sInfo = widgetInfo.sDataPath;
 		String sValue;
 		/*int posFormat = sInfo.indexOf('%');
 		final String sPathValue = posFormat <0 ? sInfo : sInfo.substring(0, posFormat);
 		*/
-		String sFormat = widgetInfo.getFormat();
+		String sFormat = widgetInfo.sFormat;
 		ByteDataSymbolicAccess.Variable variable = getVariableFromContentInfo(widgetInfo);
 		//DBbyteMap.Variable variable = accessOamVariable.getVariable(sPathVariable);
 		if(variable == null){
 			sValue = "XXXXX";
 		} else {
-		  char varType = variable.getTypeChar();
+  		char varType = variable.getTypeChar();
   		if(varType == 'F'){
     		float value= variable.bytes.getFloat(variable, widgetInfo.getDataIx());
     		if(sFormat ==null){
@@ -179,15 +134,7 @@ public class OamShowValues
     		//other format
     		sValue = "?type=" + varType;
     	}
-  	  GralWidget widg = guiAccess.getWidget(sName);	
-      widg.setText(sValue);
-  	  //guiAccess.setText(sName, sValue);
-      long timeLastRefresh = variable.getLastRefreshTime();
-      if( (timeNow - timeLastRefresh) < milliSecondsOk){
-        widg.setBackColor(colorBackValueOk, 0);
-      } else {
-        widg.setBackColor(colorBackValueOld, 0);
-      }
+		guiAccess.insertInfo(sName, 0, sValue);
 		}
 		
 	}
@@ -196,56 +143,12 @@ public class OamShowValues
 	
 	
 
-	/**
-	 * 
-	 */
-	@Deprecated void writeValuesOfTab()
+	private void writeValuesOfTab()
 	{ if(dataValid){
-	    timeNow = System.currentTimeMillis();
-  	  ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = guiAccess.getVisiblePanels();
-      //GralWidget widgdRemove = null;
-      try{
-        for(GralVisibleWidgets_ifc panel: listPanels){
-          List<GralWidget> widgetsVisible = panel.getWidgetsVisible();
-          if(widgetsVisible !=null) for(GralWidget widget: widgetsVisible){
-            if(widget instanceof GralCurveView){
-              GralCurveView curve = (GralCurveView)widget;
-              List<GralSetValue_ifc> listLines = curve.getTracks();
-              float[] values = new float[listLines.size()];
-              int ixValues = -1;
-              for(GralSetValue_ifc line: listLines){
-                ByteDataSymbolicAccess.Variable variable = getVariableFromContentInfo(line);
-                float value;
-                if(variable !=null){
-                  value= variable.bytes.getFloat(variable, line.getDataIx());
-                } else {
-                  value = 0;
-                }
-                line.setValue(value);
-                values[++ixValues] = value;
-              }
-              curve.setSample(values, (int)timeMilliSecFromBaseyear);
-            } else {
-              String sContentInfo = widget.getDataPath();
-              if(sContentInfo !=null && sContentInfo.length() >0 && widget !=null){
-                stop();
-                if(!callMethod(widget)){
-                  //show value direct
-                  writeField(widget);
-                }
-                //log.reportln(3, "TAB: " + sContentInfo);
-              }
-            }
-          }
-        }
-      } catch(Exception exc){ 
-      }
-      
-	  }
-    if(widgetsInTab != null){
-			for(GralWidget widgetInfo: widgetsInTab){
-				String sContentInfo = widgetInfo.getDataPath();
-				if(sContentInfo !=null && sContentInfo.length() >0 && widgetInfo !=null){
+			if(widgetsInTab != null)
+			for(WidgetDescriptor<?> widgetInfo: widgetsInTab){
+				String sContentInfo = widgetInfo.sDataPath;
+				if(sContentInfo !=null && sContentInfo.length() >0 && widgetInfo.widget !=null){
 					stop();
 					if(!callMethod(widgetInfo)){
 						//show value direct
@@ -258,7 +161,7 @@ public class OamShowValues
 	}
 	
 	
-	ByteDataSymbolicAccess.Variable getVariableFromContentInfo(GralSetValue_ifc widgetInfo)
+	ByteDataSymbolicAccess.Variable getVariableFromContentInfo(WidgetDescriptor<?> widgetInfo)
 	{
 		ByteDataSymbolicAccess.Variable variable;
 		Object oContentInfo = widgetInfo.getContentInfo();
@@ -286,9 +189,9 @@ public class OamShowValues
 	}
 	
 	
-	boolean callMethod(GralWidget widgetInfo)
+	boolean callMethod(WidgetDescriptor<?> widgetInfo)
 	{ String sName = widgetInfo.name;
-		String sInfo = widgetInfo.getDataPath();
+		String sInfo = widgetInfo.sDataPath;
 		final String sMethodName;
 		final String sVariablePath;
 		final String[] sParam;
@@ -317,7 +220,7 @@ public class OamShowValues
     			guiAccess.setBackColor(sName, 0, 0xffffff);
       	}
     		String sValue = "" + value;
-    		guiAccess.setText(sName, sValue);
+    		guiAccess.insertInfo(sName, 0, sValue);
     	} 
 		  else if(sMethodName.equals("showBinManValue")){
 		  	int value= accessOamVariable.getInt(sVariablePath);
@@ -400,7 +303,7 @@ public class OamShowValues
 		
 		Element[] data;
 		
-		ValueColorAssignment(String[] sParams, GralMng_ifc guiAccess){
+		ValueColorAssignment(String[] sParams, GuiPanelMngWorkingIfc guiAccess){
 			data = new Element[sParams.length-1];
 			int state = 0;
 			for(int ii = 1; ii < sParams.length; ++ii){
@@ -460,7 +363,7 @@ public class OamShowValues
 		
 	
 	
-	void widgetSetColor(String sName, String[] sParam, GralWidget widgetInfo)
+	void widgetSetColor(String sName, String[] sParam, WidgetDescriptor<?> widgetInfo)
 	{ ColoredWidget userData;
 	  Object oUserData = widgetInfo.getContentInfo();
 		if(oUserData == null){
@@ -484,7 +387,7 @@ public class OamShowValues
 	}
 	
 	
-	void showBinFromByte(GralWidget widgetInfo)
+	void showBinFromByte(WidgetDescriptor<?> widgetInfo)
 	{ ByteDataSymbolicAccess.Variable variable;
 	  Object oUserData = widgetInfo.getContentInfo();
 		if(oUserData == null){
@@ -510,7 +413,7 @@ public class OamShowValues
 	}
 	
 	
-	void setValue(GralWidget widgetInfo)
+	void setValue(WidgetDescriptor<?> widgetInfo)
 	{ ByteDataSymbolicAccess.Variable variable;
 	  Object oUserData = widgetInfo.getContentInfo();
 		if(oUserData == null){
@@ -521,24 +424,24 @@ public class OamShowValues
 			variable = (ByteDataSymbolicAccess.Variable)oUserData;
 		}
 		float value = variable.bytes.getFloat(variable, -1);
-		GralWidget_ifc oWidget = widgetInfo;
-		if(oWidget instanceof GralSetValue_ifc){
-			GralSetValue_ifc widget = (GralSetValue_ifc) oWidget;
+		Object oWidget = widgetInfo.widget;
+		if(oWidget instanceof GuiSetValueIfc){
+			GuiSetValueIfc widget = (GuiSetValueIfc) oWidget;
 			widget.setValue(value);
 		}
 	}
 	
 	
-	void setBar(GralWidget widgetInfo)
+	void setBar(WidgetDescriptor<?> widgetInfo)
 	{ ByteDataSymbolicAccess.Variable variable = getVariableFromContentInfo(widgetInfo);
 	  if(variable == null){
 			debugStop();
 		} else {
 			float value = variable.bytes.getFloat(variable, -1);
 			
-			GralWidget_ifc oWidget = widgetInfo;
-			if(oWidget instanceof GralValueBar){
-				GralValueBar widget = (GralValueBar) oWidget;
+			Object oWidget = widgetInfo.widget;
+			if(oWidget instanceof ValueBar){
+				ValueBar widget = (ValueBar) oWidget;
 				String[] sParam;
 				if( (sParam = widgetInfo.getShowParam()) != null){
 					widget.setBorderAndColors(sParam);
@@ -550,15 +453,44 @@ public class OamShowValues
 	}
 	
 	
+	/**Only for test. This class isn't a thread's run but the run of this class.
+	 * It is called direct, it is the only one routine of the class.
+	 */
+	private Runnable writeCurveRoutine = new Runnable(){
+		float y1,y2,y3 = 0.02F;
+		final float[] valuesCurve = new float[7];
+		
+		@Override public void run()
+  	{
+			for(int ii=0; ii<1; ii++){
+				//create curve points.
+				
+				y1 += y2/20;
+				y2 += y3;
+				if(y2 >=1){y3 = -0.02F;}
+				else if(y2 <=-1){y3 = 0.02F;}
+				valuesCurve[0] = 220 + 5*y2;
+				valuesCurve[1] = 200 + 10*y2;
+				valuesCurve[2] = 205 + y2;
+				valuesCurve[3] = 180 + y2;
+				valuesCurve[4] = y3;
+				valuesCurve[5] = y3;
+				valuesCurve[6] = y3;
+				guiAccess.setSampleCurveViewY("curves", valuesCurve);
+			}
+  	}
+		
+	};
+
 	
 
 
 
 	/**Agent instance to offer the interface for updating the tab in the main TabPanel
 	 */
-	public final GralPanelActivated_ifc tabActivatedImpl = new GralPanelActivated_ifc()
+	public final PanelActivatedGui tabActivatedImpl = new PanelActivatedGui()
 	{
-		@Override	public void panelActivatedGui(List<GralWidget> widgets)
+		@Override	public void panelActivatedGui(List<WidgetDescriptor<?>> widgets)
 		{
 			widgetsInTab = widgets;
 			writeValuesOfTab();
@@ -568,23 +500,31 @@ public class OamShowValues
 	
 
 	
-	final GralUserAction actionSetValueTestInInput = new GralUserAction("actionSetValueTestInInput")
-  { @Override
-  public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+	final UserActionGui actionSetValueTestInInput = new UserActionGui()
+  { public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
     { 
   		final int[] ixArrayA = new int[1];
-  		ByteDataSymbolicAccess.Variable variable = getVariable(widgetInfos.getDataPath(), ixArrayA);
+  		ByteDataSymbolicAccess.Variable variable = getVariable(widgetInfos.sDataPath, ixArrayA);
   		int value = 0; //TODO Integer.parseInt(sParam);
   		if(variable.bytes.lengthData() == 0){
-  			variable.bytes.assignData(new byte[1500], System.currentTimeMillis());
+  			variable.bytes.assignData(new byte[1500]);
   		}
   		variable.bytes.setFloat(variable, -1, 2.5F* value -120);
   		dataValid = true;
   		writeValuesOfTab();  //to show
-  		return true;
     }
   };
 
+	private void writeCurveValues()
+	{
+		valueUserCurves[0] = accessOamVariable.getFloat("way");
+		valueUserCurves[1] = accessOamVariable.getFloat("wway");
+		valueUserCurves[2] = accessOamVariable.getFloat("targetWay");
+		valueUserCurves[3] = accessOamVariable.getFloat("dway");
+		valueUserCurves[4] = accessOamVariable.getFloat("output");
+		guiAccess.setSampleCurveViewY("userCurves", valueUserCurves);
+		
+	}
 	
 	private void redrawCurveValues()
 	{

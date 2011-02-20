@@ -1,0 +1,60 @@
+2011-02-21 17:22:28  x     _bzr_srcJava_GUI.bat                     ::           . 32  0669602046 
+2016-08-22 22:40:14  x     _filelist.lst                            ::           .  0  0000000000 
+
+2016-08-22 22:40:14 Dx     === org/ ===============================================================
+
+2016-08-22 22:40:14 Dx     === org/vishia/ =========================================================
+
+2016-08-22 22:40:14 Dx     === org/vishia/guiViewCfg/ ==============================================
+2011-02-21 17:22:28  x     MsgConfig.java                           ::          1.538  0233366049 
+2011-02-21 17:22:28  x     MsgItems_h.java                          ::          6.295  1143461183 
+2011-02-21 17:22:28  x     MsgReceiver.java                         ::          9.511  0875217467 
+2011-02-21 17:22:28  x     MsgRecvComm.java                         ::          3.416  1892119087 
+2011-02-21 17:22:28  x     OamOutFileReader.java                    ::          3.981 -0859661122 
+2011-02-21 17:22:28  x     OamRcvValue.java                         ::          4.135  0548685038 
+2011-02-21 17:22:28  x     OamShowValues.java                       ::         17.263  0351662813 
+2011-02-21 17:22:28  x     ViewCfg.java                             ::         17.066 -2107224858 
+
+2016-08-22 22:40:14 Dx     === org/vishia/mainGui/ =================================================
+2011-02-21 17:22:28  x     CanvasStorage.java                       ::          1.881  0819123710 
+2011-02-21 17:22:28  x     FileDialogIfc.java                       ::           .120 -1062131462 
+2011-02-21 17:22:28  x     FileViewer.java                          ::          3.063  1111339537 
+2011-02-21 17:22:28  x     GuiDialogZbnfControlled.java             ::         23.440 -1197542855 
+2011-02-21 17:22:28  x     GuiDispatchCallbackWorker.java           ::          2.119  1161457070 
+2011-02-21 17:22:28  x     GuiPanelMngBase.java                     ::          5.890 -0823541776 
+2011-02-21 17:22:28  x     GuiPanelMngBuildIfc.java                 ::         14.258 -1366726723 
+2011-02-21 17:22:28  x     GuiPanelMngWorkingIfc.java               ::          4.010  1079607009 
+2011-02-21 17:22:28  x     GuiSetValueIfc.java                      ::           .379  0875065701 
+2011-02-21 17:22:28  x     GuiShellMngBuildIfc.java                 ::           .121  2129647574 
+2011-02-21 17:22:28  x     GuiShellMngIfc.java                      ::           .998  0326293271 
+2011-02-21 17:22:28  x     PanelActivatedGui.java                   ::           .671 -0133936402 
+2011-02-21 17:22:28  x     PanelContent.java                        ::           .846  0789949008 
+2011-02-21 17:22:28  x     PropertiesGui.java                       ::          7.104  0744056112 
+2011-02-21 17:22:28  x     TabPanel.java                            ::          1.306 -1040146815 
+2011-02-21 17:22:28  x     UserActionGui.java                       ::          1.976  0683898467 
+2011-02-21 17:22:28  x     ValueBar.java                            ::          2.989 -1047359060 
+2011-02-21 17:22:28  x     WidgetDescriptor.java                    ::          5.850  0025591590 
+2011-02-21 17:22:28  x     disk.png                                 ::          1.269  2053274348 
+
+2016-08-22 22:40:14 Dx     === org/vishia/mainGuiSwt/ ==============================================
+2011-02-21 17:22:28  x     ButtonSwt.java                           ::          3.475 -1752555517 
+2011-02-21 17:22:28  x     CanvasStorePanelSwt.java                 ::          2.699 -1214654556 
+2011-02-21 17:22:28  x     CurveView.java                           ::         19.304 -0190472083 
+2011-02-21 17:22:28  x     FileDialogSwt.java                       ::           .891  0266115832 
+2011-02-21 17:22:28  x     FocusActionForUserActionSwt.java         ::          2.135  1303718904 
+2011-02-21 17:22:28  x     GridPanelSwt.java                        ::          2.508  1865052201 
+2011-02-21 17:22:28  x     GuiPanelMngSwt.java                      ::         62.060 -0432953799 
+2011-02-21 17:22:28  x     GuiShellMngSwt.java                      ::          2.999  0340340785 
+2011-02-21 17:22:28  x     InfoBox.java                             ::          2.751  1896606290 
+2011-02-21 17:22:28  x     LedSwt.java                              ::          2.274  1515924853 
+2011-02-21 17:22:28  x     MainCmdSwt.java                          ::         44.222  0028943151 
+2011-02-21 17:22:28  x     MouseClickActionForUserActionSwt.java    ::          6.495 -0781736761 
+2011-02-21 17:22:28  x     MouseClickInfo.java                      ::          1.261 -0048701512 
+2011-02-21 17:22:28  x     PropertiesGuiSwt.java                    ::          3.790  1239894078 
+2011-02-21 17:22:28  x     SampleGuiSwtButtonInput.java             ::          7.810 -1492692137 
+2011-02-21 17:22:28  x     SwitchButtonSwt.java                     ::          2.809  1915725257 
+2011-02-21 17:22:28  x     TabPanelSwt.java                         ::          3.360 -0467279584 
+2011-02-21 17:22:28  x     ValueBarSwt.java                         ::          4.293  1588368139 
+
+2016-08-22 22:40:14 Dx     === org/vishia/windows/ =================================================
+2011-02-21 17:22:28  x     WindowMng.java                           ::          2.375 -0171731328 
