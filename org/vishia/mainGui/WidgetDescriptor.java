@@ -208,5 +208,13 @@ public class WidgetDescriptor<WidgetTYPE>
 	{ return mng.getValueFromWidget(this);
 	}
 	
+	/**Especially for test and debug, short info about widget.
+	 * @see java.lang.Object#toString()
+	 */
+	@Override public String toString()
+	{
+		return name + ":" + sDataPath;
+	}
+	
 }
 

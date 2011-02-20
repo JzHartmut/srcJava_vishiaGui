@@ -387,6 +387,9 @@ public class GuiDialogZbnfControlled
 	          widgetInfo.setShowMethod(sShowMethod);
 	          widgetInfo.sToolTip = null;
 	          
+	          if(widgetInfo.name == null){
+	          	widgetInfo.name = sInfo;    //use sInfo
+	          }
 	          if(semantic.equals("Button"))
 		        { WidgetDescriptor<?> widgetDescr = 
 		        	dialog.addButton(sName, action, sCmd, sShowMethod, sInfo, sText);
