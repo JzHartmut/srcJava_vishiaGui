@@ -22,7 +22,7 @@ import org.vishia.mainGuiSwt.MainCmdSwt;
 import org.vishia.mainGuiSwt.PropertiesGuiSwt;
 import org.vishia.msgDispatch.LogMessage;
 
-
+/**Class contains main, it is able to use for a GUI without any programming in Java.*/
 public class ViewCfg 
 {
   
