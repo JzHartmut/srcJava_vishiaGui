@@ -6,7 +6,7 @@ import java.io.File;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.communication.InterProcessCommFactorySocket;
-//TODO next version: import org.vishia.inspector.Inspector;
+import org.vishia.inspector.Inspector;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
 import org.vishia.mainGui.GuiDialogZbnfControlled;
@@ -26,8 +26,9 @@ import org.vishia.msgDispatch.LogMessage;
 public class ViewCfg 
 {
   
-	//private final Inspector inspector;
-  /**To Output log informations. The ouput will be done in the output area of the graphic. */
+	private final Inspector inspector;
+  
+	/**To Output log informations. The ouput will be done in the output area of the graphic. */
   private final Report console;
 
   private boolean fullScreen;
@@ -322,10 +323,9 @@ public class ViewCfg
   	boolean bOk = true;
     this.callingArguments = cargs;
     this.console = gui;  
-    /*TODO, next version
+    
     inspector = new Inspector("UDP:127.0.0.1:60088");
     inspector.start(this);
-    */
     
     //Creates a panel manager to work with grid units and symbolic access.
 	  //Its properties:  //##
