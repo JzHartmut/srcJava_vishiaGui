@@ -3,12 +3,42 @@ package org.vishia.mainGui;
 import java.util.List;
 import java.util.Map;
 
+import org.vishia.byteData.VariableContainer_ifc;
+
 /**This is a unique interface for the GUI-panel-manager to work with it.
  * To build the graphical application see {@link GuiPanelMngBuildIfc}. 
  * @author Hartmut Schorrig
  *
  */
-public interface GuiPanelMngWorkingIfc {
+public interface GuiPanelMngWorkingIfc 
+{
+
+  /**The version history of this interface:
+   * <ul>
+   * <li>2011-05-01 Hartmut new: {@link #cmdInsert} etc now here. 
+   * <li>2011-05-01 Hartmut new: {@link #setInfo(WidgetDescriptor, int, int, Object)} as adequate method
+   *     to {@link #insertInfo(String, int, String) but without symbolic addressing of the widget.
+   *     It calls the internal method to insert an information in a queue for the graphical thread. 
+   *     It is thread-safe.
+   * <li>All other changes in 2010
+   * </ul>
+   */
+  final static int version = 0x20110502;
+
+  final static int cmdInsert = 0xadd;     //add
+  
+  final static int cmdSet = 0x5ed;     //add
+  
+  final static int cmdBackColor = 0xbacc0103;     //add
+  
+  final static int cmdColor = 0xc0103;
+  
+  final static int cmdRedraw = 0x3ed3a2;  //redraw
+  
+  final static int cmdRedrawPart = 0x3ed3a201;  //redraw
+  
+  final static int cmdRemove = 0xde1e7e;  //delete
+  
 
 	/**Returns the list of all widgets with its informations. 
 	 * The graphical representation of the widgets is unknown here.
@@ -39,6 +69,17 @@ public interface GuiPanelMngWorkingIfc {
    */
   String insertInfo(String name, int ident, String content);
 
+  
+  /**Adequate {@link #insertInfo(String, int, String)}, but not symbolic but direct.
+   * @param widgd The widget
+   * @param cmd See {@link #cmdBackColor} etc.
+   * @param ident A value, widget-specific.
+   * @param value The value to insert, usual a String
+   * @return 
+   */
+  String setInfo(WidgetDescriptor widgd, int cmd, int ident, Object value);
+  
+  
   /**Sets the color of background of the widget, if possible.
    * @param name The name of the widget, which was given by the add...()-Operation
    * @ix may be a line number of table or an position identifier. 0 if unused for the kind of widget. 

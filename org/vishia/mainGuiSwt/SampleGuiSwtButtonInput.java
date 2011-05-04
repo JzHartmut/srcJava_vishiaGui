@@ -68,7 +68,7 @@ public class SampleGuiSwtButtonInput
 		
   }
 	
-	Table testTable;
+	//Table testTable;
 	
 	
   /**This thread takes action in another thread to the SWT-GUI. 
@@ -179,7 +179,7 @@ public class SampleGuiSwtButtonInput
 		Color colorBackground = propertiesGui.color(0xeeeeee);
 	  
 		Composite dlgContainer = new GridPanelSwt(mainCmd.getContentPane(), 0, colorBackground, propertiesGui.xPixelUnit(), propertiesGui.yPixelUnit(), 10,10);
-	  dlg = new GuiPanelMngSwt(mainCmd.getContentPane(), 300,200, propertiesGui, null, mainCmd.getLogMessageOutputConsole());
+	  dlg = new GuiPanelMngSwt(null, mainCmd.getContentPane(), 300,200, propertiesGui, null, mainCmd.getLogMessageOutputConsole());
 	  dlg.registerPanel("test", dlgContainer);
 	  dlg.setPosition(10,0,3,3,'d');
 	  //An action is registered until now independent from any button or menu item,
@@ -192,7 +192,7 @@ public class SampleGuiSwtButtonInput
 	  dlg.setSize(-3,0,8,0);
 	  dlg.addButton("Curve", buttonTestCurveAction, "cmd", null, null, "actionCurve");
 	  dlg.setPosition(0,15,3,8,'r');
-	  testTable = dlg.addTable("testTable", 8, new int[]{15,25,10});
+	  dlg.addTable("testTable", 8, new int[]{15,25,10});
 	  dlg.setPosition(25, 0,-2,20,'r');
 	  WidgetDescriptor<?> widgetInfo = new WidgetDescriptor("edit", 'T');
 	  widgetInfo.setDataPath("info");

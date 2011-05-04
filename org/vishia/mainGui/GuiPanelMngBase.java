@@ -28,12 +28,19 @@ import org.vishia.msgDispatch.LogMessage;
  * 
  * @author Hartmut Schorrig
  *
- * @param <WidgetTYPE> The special base type of the widgets in the underlying graphic adapter specialization.
- *                     (SWT: Control)
+ * @param <WidgetTYPE> The special base type of the composed widgets in the underlying graphic adapter specialization.
+ *                     (SWT: Composite)
  */
 public abstract class GuiPanelMngBase<WidgetTYPE> implements GuiPanelMngBuildIfc, GuiPanelMngWorkingIfc
 {
 	
+  final GuiPanelMngBase<?> parent;
+  
+  /**Base class for managing all panels and related windows.
+   * This base class contains all common resources to manage panels and windows.
+   */
+  final protected GuiMngBase mngBase;
+  
   protected final LogMessage log;
   
 	protected final VariableContainer_ifc variableContainer;
@@ -101,8 +108,13 @@ public abstract class GuiPanelMngBase<WidgetTYPE> implements GuiPanelMngBuildIfc
   
 	
 	
-  public GuiPanelMngBase(VariableContainer_ifc variableContainer, LogMessage log)
-	{
+  public GuiPanelMngBase(GuiPanelMngBase<?> parent, VariableContainer_ifc variableContainer, LogMessage log)
+	{ this.parent = parent;
+	  if(parent == null){
+	    mngBase = new GuiMngBase();
+	  } else {
+	    mngBase = parent.mngBase;
+	  }
 		this.log = log;
 		this.variableContainer = variableContainer;
 		userActions.put("showWidgetInfos", this.actionShowWidgetInfos);

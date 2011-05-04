@@ -20,6 +20,7 @@ import org.vishia.mainGui.WidgetDescriptor;
 
 public class ButtonSwt extends Canvas
 {
+  final WidgetDescriptor widgd;
 
 	String sButtonText;
 	
@@ -39,9 +40,10 @@ public class ButtonSwt extends Canvas
 	 * @param mng The Gui-panel-manager contains information about the graphic frame and properties.
 	 * @param size The size of text in button, use 'A' or 'B' for small - bold
 	 */
-	public ButtonSwt(GuiPanelMngSwt mng, char size)
+	public ButtonSwt(GuiPanelMngSwt mng, WidgetDescriptor widgd, char size)
 	{
 		super((Composite)mng.currPanel.panelComposite, 0);
+		this.widgd = widgd;
 		//super((Composite)mng.currPanel.panelComposite, 0);  //Canvas
 		switch(size){ 
 		case 'A': fontText = mng.propertiesGui.stdInputFont; break;

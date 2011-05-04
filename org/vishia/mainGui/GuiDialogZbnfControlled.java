@@ -506,13 +506,20 @@ public class GuiDialogZbnfControlled
 		          }
 		        }
 		        else if(semantic.equals("ShowField"))
-		        { widgetInfo.whatIs = 'S';
-	          	dialog.addTextField(widgetInfo, false, (noPrompt? null : sPromptText), promptPosition);
-		          if(action != null){
-		          		dialog.addMouseButtonAction(widgetInfo.name, action, "P", "r", "d");
-		          }
-		        }
-		        else if(semantic.equals("InputTextline"))
+            { widgetInfo.whatIs = 'S';
+            dialog.addTextField(widgetInfo, false, (noPrompt? null : sPromptText), promptPosition);
+              if(action != null){
+                    dialog.addMouseButtonAction(widgetInfo.name, action, "P", "r", "d");
+              }
+            }
+		        else if(semantic.equals("ShowTextBox")){ 
+		          widgetInfo.whatIs = 'S';
+		          dialog.addTextBox(widgetInfo, false, (noPrompt? null : sPromptText), promptPosition);
+              if(action != null){
+                dialog.addMouseButtonAction(widgetInfo.name, action, "P", "r", "d");
+              }
+            }
+            else if(semantic.equals("InputTextline"))
 		        { widgetInfo.whatIs = 'T';
 		          dialog.addTextField(widgetInfo, true, sPromptText, 't');
 		          if(action != null){

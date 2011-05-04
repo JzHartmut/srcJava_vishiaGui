@@ -30,7 +30,7 @@ public class GuiShellMngSwt extends GuiPanelMngSwt implements GuiShellMngBuildIf
   	, LogMessage log
 	)
 	{
-		super(graphicFrame, width, height, propertiesGui, variableContainer, log);
+		super(null, graphicFrame, width, height, propertiesGui, variableContainer, log);
 	  guiDevice = graphicFrame.getDisplay();
 		graphicFrame.addShellListener(shellListener);
 	}

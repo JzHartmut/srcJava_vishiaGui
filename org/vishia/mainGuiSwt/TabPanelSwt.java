@@ -6,6 +6,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -53,7 +54,7 @@ public class TabPanelSwt extends TabPanel
 		} else {
 	  	panel = new GridPanelSwt(tabMng, 0, colorBackground, mng.propertiesGui.xPixelUnit(), mng.propertiesGui.yPixelUnit(), 5, 5);
 		}
-		PanelContent<Control> panelContent = mng.registerPanel(sName, panel);
+		PanelContent<Composite> panelContent = mng.registerPanel(sName, panel);
 	  tabItemOperation.setControl(panel);
 	  panel.setData(panelContent);
 	  return panel;
@@ -65,7 +66,7 @@ public class TabPanelSwt extends TabPanel
 		tabItemOperation.setText(sLabel);
 		Color colorBackground = mng.propertiesGui.color(0xeeeeee);
 	  CanvasStorePanelSwt panel = new CanvasStorePanelSwt(tabMng, 0, colorBackground);
-	  PanelContent<Control> panelContent = mng.registerPanel(sName, panel);
+	  PanelContent<Composite> panelContent = mng.registerPanel(sName, panel);
 	  tabItemOperation.setControl(panel);
 	  panel.setData(panelContent);
 	  return panel;
@@ -92,7 +93,7 @@ public class TabPanelSwt extends TabPanel
 			if(container != null){
 			//TabFolder tabFolder = tab.getParent();
 				Object data = container.getData();
-				if(data != null){
+				if(data != null && notifyingUserInstanceWhileSelectingTab !=null){
 					@SuppressWarnings("unchecked")
 					PanelContent<Control> panelContent = (PanelContent<Control>)(data);
 					List<WidgetDescriptor<?>> widgetInfos = panelContent.widgetList; 

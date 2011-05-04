@@ -60,6 +60,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainGui.GuiDispatchCallbackWorker;
+import org.vishia.mainGui.GuiMainAreaifc;
 import org.vishia.util.MinMaxTime;
 import org.vishia.windows.WindowMng;
 
@@ -71,16 +72,16 @@ import org.vishia.windows.WindowMng;
 /**
 <h1>class MainCmdSwt - Description</h1>
 <font color="0x00ffff">
-  Diese abstrakte Klasse dient als Basisklasse für alle grafischen Applikationen (GUI = Graphical User Interface),
-  die über eine cmdLine gestartet werden. Diese Klasse basiert wiederum auf MainCmd.
-  Diese Klasse enthält neben MainCmd folgende Leistungseigenschaften:
+  Diese abstrakte Klasse dient als Basisklasse fï¿½r alle grafischen Applikationen (GUI = Graphical User Interface),
+  die ï¿½ber eine cmdLine gestartet werden. Diese Klasse basiert wiederum auf MainCmd.
+  Diese Klasse enthï¿½lt neben MainCmd folgende Leistungseigenschaften:
   <ul>
-  <li>Bereitstellen eines JFrame, Rahmen für das Gesamtfenster.</li>
+  <li>Bereitstellen eines JFrame, Rahmen fï¿½r das Gesamtfenster.</li>
   <li>Bereitstellen eines Output-Textbereiches, der anstelle Konsolenausgaben verwendet werden kann.
       Die Methoden writeInfo() und writeInfoln() aus MainCmd werden hierher geleitet.
       Dieser Outputbereich muss vom Anwender initialisiert werden, auf seine Verwendung kann auch verzichtet
       werden, falls das nicht notwendig ist.</li>
-  <li>Bereitstellen eines leeren Menüs mit einem FileMenü mit Exit und einem Hilfemenü mit "about"</li>
+  <li>Bereitstellen eines leeren Menï¿½s mit einem FileMenï¿½ mit Exit und einem Hilfemenï¿½ mit "about"</li>
   <li>Bereitstellen eines leeren Dialog-Containers</li>
   </ul>
 </font>
@@ -95,8 +96,20 @@ date       who      change
 
 */
 
-public abstract class MainCmdSwt extends MainCmd
+public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
 {
+  
+  
+  /**Version history:
+   * <ul>
+   * <li>2011-05-01 Hartmut chg: The method switchToWindowOrStartCmdLine(...) is a poor windows-based method
+   *     and doesn't run under Linux. It is removed here, instead add in org.vishia.windows.WindowMng.java 
+   * <li>All other changes from 2010 and in the past
+   * </ul>
+   * 
+   */
+  final static int version = 0x20110502;
+
   
 	public interface GuiBuild
 	{
@@ -1236,36 +1249,6 @@ public abstract class MainCmdSwt extends MainCmd
   }
   
 
-	/**Searches the window for the already running process 
-	 * or starts the process with command invocation for a independent window.
-	 * This command does not have any input or output. The command will be started,
-	 * the finishing isn't await. This command line invocation is proper for commands,
-	 * which create a new window in the operation system. The new window has its own live cycle then,
-	 * independent of the invocation.
-	 * @param cmd The command and some arguments.
-	 * @param processBuilder The processBuilder.
-	 * @param sWindowTitle The title or the start of the window if the process is running already.
-	 *                     Note: The title is depending from the application.
-	 *                     Sometimes the title starts with the associated file, forex calling windows-notepad. 
-	 * @return 0 on success, 255 if any start error.
-	 */
-	@Override public int switchToWindowOrStartCmdline(ProcessBuilder processBuilder, String sCmd, String sWindowTitle)
-	{
-		int ok = 0;
-		int hWnd = WindowMng.getWindowsHandler(sWindowTitle);
-		if(hWnd != 0){
-			org.eclipse.swt.internal.win32.OS.SetForegroundWindow(hWnd);
-		} else {
-			
-			//The sDataPath contains the filename, sCmd is the calling command.
-			try{ startCmdLine(processBuilder, sCmd); }
-			catch(Exception exc){
-				ok = -1;
-			}
-			
-		}
-		return ok;
-	}
 
 
 

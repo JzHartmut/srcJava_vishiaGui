@@ -13,6 +13,8 @@ import org.vishia.byteData.VariableContainer_ifc;
  */
 public class WidgetDescriptor<WidgetTYPE>
 {
+  GuiPanelMngWorkingIfc itsPanel;
+  
 	/**Name of the widget in the panel. */
 	public String name;
 	
@@ -65,7 +67,7 @@ public class WidgetDescriptor<WidgetTYPE>
 	int[] indices;
 	
 	/**Action method on activating, changing or release the widget-focus. */
-	public Object action;
+	public UserActionGui action;
 
 	/**command string given by the action as parameter. */
 	public String sCmd;
@@ -105,6 +107,8 @@ public class WidgetDescriptor<WidgetTYPE>
   
   public String getDataPath(){ return sDataPath; }
 	
+  public void setAction(UserActionGui action){ this.action = action; }
+  
 	public String getsToolTip()
 	{
 		return sToolTip;
@@ -180,6 +184,11 @@ public class WidgetDescriptor<WidgetTYPE>
 		this.sFormat = sFormat;
 	}
 
+	public void setPanelMng(GuiPanelMngWorkingIfc panel)
+	{ this.itsPanel = panel; 
+	}
+	
+	
 	//DBbyteMap.Variable 
 	public VariableAccess_ifc getVariableFromContentInfo(VariableContainer_ifc container)
 	{
@@ -200,14 +209,22 @@ public class WidgetDescriptor<WidgetTYPE>
 	  return variable; 
 	}
 	
-	/**Gets the current value of the content of the widget in the given context.
-	 * @param mng The context.
-	 * @return The value in String representation, null if the widget has no possibility of input.
-	 */
-	public String getCurrentValue(GuiPanelMngWorkingIfc mng)
-	{ return mng.getValueFromWidget(this);
-	}
-	
+  /**Gets the current value of the content of the widget in the given context.
+   * @param mng The context.
+   * @return The value in String representation, null if the widget has no possibility of input.
+   */
+  public String getValue()
+  { return itsPanel.getValueFromWidget(this);
+  }
+  
+  /**Gets the current value of the content of the widget in the given context.
+   * @param mng The context.
+   * @return The value in String representation, null if the widget has no possibility of input.
+   */
+  public void setValue(int cmd, int ident, Object value)
+  { itsPanel.setInfo(this, cmd, ident, value);
+  }
+  
 	/**Especially for test and debug, short info about widget.
 	 * @see java.lang.Object#toString()
 	 */

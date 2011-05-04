@@ -26,7 +26,7 @@ import org.vishia.msgDispatch.LogMessage;
 public class ViewCfg 
 {
   
-	private final Inspector inspector;
+  private final Inspector inspector;
   
 	/**To Output log informations. The ouput will be done in the output area of the graphic. */
   private final Report console;
@@ -343,7 +343,7 @@ public class ViewCfg
     }
     PropertiesGuiSwt propertiesGui = new PropertiesGuiSwt(gui.getDisplay(), sizePixel);
 		LogMessage log = gui.getLogMessageOutputConsole();
-    panelMng = new GuiPanelMngSwt(gui.getContentPane(), 120,80, propertiesGui, null, log);
+    panelMng = new GuiPanelMngSwt(null, gui.getContentPane(), 120,80, propertiesGui, null, log);
     panelBuildIfc = panelMng;
     dlgAccess = panelMng;
     
@@ -443,11 +443,14 @@ public class ViewCfg
       //gui.exit();
       bOk = false;  //not exiting, show error in GUI
     }
+    
     //String ipcFactory = "org.vishia.communication.InterProcessComm_Socket";
   	//try{ ClassLoader.getSystemClassLoader().loadClass(ipcFactory, true);
   	//}catch(ClassNotFoundException exc){
   	//	System.out.println("class not found: " + "org.vishia.communication.InterProcessComm_Socket");
   	//}
+    //Loads the named class, and its base class InterProcessCommFactory. 
+    //In that kind the calling of factory methods are regarded to socket.
   	new InterProcessCommFactorySocket();
   	
     ViewCfg main = new ViewCfg(cargs, gui);

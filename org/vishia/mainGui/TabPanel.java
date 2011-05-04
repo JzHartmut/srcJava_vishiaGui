@@ -24,7 +24,8 @@ public abstract class TabPanel
 	/**Adds a grid-panel in the TabPanel. The panel will be registered in the GuiPanelMng,
 	 * so the access to the panel can be done with its name.
 	 * @param sName The name, used in 
-	 * @param sLabel to designate the tab.
+	 * @param sLabel to designate the tab for view. A "&" left from a character determines the hot-key
+	 *               to select the tab.
 	 * @param yGrid   number of units per grid line vertical. It may be 1. 
 	 * @param xGrid   number of units per grid line horizontal. It may be 1. 
 	 * @param yGrid2  Number of grid lines vertical per wider ranges for lines

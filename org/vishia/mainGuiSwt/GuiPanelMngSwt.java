@@ -32,6 +32,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -63,6 +65,7 @@ import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.mainGui.FileDialogIfc;
 import org.vishia.mainGui.GuiDispatchCallbackWorker;
+import org.vishia.mainGui.GuiMngBase;
 import org.vishia.mainGui.GuiPanelMngBase;
 import org.vishia.mainGui.GuiPanelMngBuildIfc;
 import org.vishia.mainGui.GuiPanelMngWorkingIfc;
@@ -110,7 +113,7 @@ import org.vishia.msgDispatch.LogMessage;
  * @author Hartmut Schorrig
  *
  */
-public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanelMngBuildIfc, GuiPanelMngWorkingIfc
+public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPanelMngBuildIfc, GuiPanelMngWorkingIfc
 //GuiShellMngIfc<Control>   
 {
   private static final long serialVersionUID = -2547814076794969689L;
@@ -124,7 +127,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
 	 * <li>2010-12-02 Hartmut: Up to now this version variable, its description contains the version history.
 	 * </ul>
 	 */
-	public final static int version = 0x20101202;
+	public final static int version = 0x20110502;
 
 	/**The GUI may be determined by a external user file. Not all planned fields, buttons etc. 
    * may be placed in the GUI, a user can desire about the elements. 
@@ -194,18 +197,6 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
   	
   	/**The command which should be done to change. It is one of the static definitions cmd... of this class. */
   	final int cmd;
-  	
-  	final static int cmdInsert = 0xadd;     //add
-  	
-  	final static int cmdBackColor = 0xbacc0103;     //add
-  	
-  	final static int cmdColor = 0xc0103;
-  	
-  	final static int cmdRedraw = 0x3ed3a2;  //redraw
-  	
-  	final static int cmdRedrawPart = 0x3ed3a201;  //redraw
-  	
-  	final static int cmdRemove = 0xde1e7e;  //delete
   	
   	/**Numeric value describes the position of widget where the change should be done.
   	 * For example, if the widget is a table, it is either the table line or it is
@@ -313,8 +304,6 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
   } 
 	TestHelp testHelp = new TestHelp(); 
   
-  private ConcurrentLinkedQueue<GuiChangeReq> guiChangeRequests = new ConcurrentLinkedQueue<GuiChangeReq>();
-  
 
   /**Creates an instance.
    * @param guiContainer The container where the elements are stored in.
@@ -327,7 +316,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
   , int width, int height, char displaySize, VariableContainer_ifc variableContainer
 	, LogMessage log)
   { //super(sTitle); 
-  	this(graphicFrame, width, height, new PropertiesGuiSwt(device, displaySize), variableContainer, log);
+  	this(null, graphicFrame, width, height, new PropertiesGuiSwt(device, displaySize), variableContainer, log);
   	
   }
 
@@ -338,11 +327,11 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public GuiPanelMngSwt(Composite graphicFrame, int width, int height, PropertiesGuiSwt propertiesGui
+  public GuiPanelMngSwt(GuiPanelMngBase<?> parent, Composite graphicFrame, int width, int height, PropertiesGuiSwt propertiesGui
   	, VariableContainer_ifc variableContainer
   	, LogMessage log
   	)
-  { super(variableContainer, log); 
+  { super(parent, variableContainer, log); 
   	this.graphicFrame = graphicFrame;
   	Composite shell = graphicFrame;
   	if(!(shell instanceof Shell)){
@@ -355,7 +344,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
     	//guiContainer.setSize(width * propertiesGui.xPixelUnit(), height * propertiesGui.yPixelUnit());
     }
     
-    PanelContent<Control> panelContent = new PanelContent<Control>(graphicFrame);
+    PanelContent<Composite> panelContent = new PanelContent<Composite>(graphicFrame);
   	panels.put("$", panelContent);
   	currPanel = panelContent;
   	sCurrPanel = "$";
@@ -369,6 +358,33 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
 
   }
 
+  
+  
+  @Override public GuiPanelMngBuildIfc createCompositeBox()
+  {
+    //Composite box = new Composite(graphicFrame, 0);
+    Composite box = new Composite(currPanel.panelComposite, 0);
+    setPosAndSize_(box);
+    Point size = box.getSize();
+    GuiPanelMngSwt mng = new GuiPanelMngSwt(this, box, size.y, size.x, propertiesGui, variableContainer, log);
+    return mng;
+  }
+
+  
+  @Override public boolean remove(GuiPanelMngBuildIfc compositeBox)
+  { 
+    ((GuiPanelMngSwt)compositeBox).graphicFrame.dispose();
+    return true;
+  }
+  
+  @Override public boolean remove(WidgetDescriptor widget)
+  {
+    ((Widget)widget.widget).dispose();
+    return true;
+    
+  }
+
+  
   
 	/**Creates a new window additional to a given window with Panel Manager.
 	 * @param left
@@ -404,15 +420,32 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
 	 * @param height
 	 * @return
 	 */
-	public GuiShellMngBuildIfc createModalWindow(String title)
+	public GuiShellMngBuildIfc createWindow(String title, boolean exclusive)
 	{
 		//Display display = new Display();
-		Shell shell = new Shell(SWT.APPLICATION_MODAL|SWT.TITLE);
+	  int props = 0;
+	  if(exclusive){ props |= SWT.PRIMARY_MODAL; }
+	  if(title !=null){ props |= SWT.TITLE; }
+		Shell shell = new Shell(graphicFrame.getShell(), props);
+		
 		//TODO
 		//Shell shell = (Shell)graphicFrame; //new Shell(display);
-		setPosAndSize_(shell); //, line,0, column,0, dy,0, dx,0);
+		//setPosAndSize_(shell); //, line,0, column,0, dy,0, dx,0);
 		//shell.setBounds(left,top, width, height);
-		shell.setText(title);
+    int xPixelUnit = propertiesGui.xPixelUnit();
+    int yPixelUnit = propertiesGui.yPixelUnit();
+    //calculate pixel
+    int xPixelSize, yPixelSize;  
+    xPixelSize = xPixelUnit * xIncr + propertiesGui.xPixelFrac(yPosFrac) -2;
+    yPixelSize = yPixelUnit * yIncr + propertiesGui.xPixelFrac(yPosFrac) -2;
+    int xPixel = (int)(xPos * xPixelUnit) + propertiesGui.xPixelFrac(yPosFrac) +1;
+    int yPixel = (int)(yPos * yPixelUnit) + propertiesGui.yPixelFrac(yPosFrac) +1;
+    Rectangle rectShell = graphicFrame.getBounds();
+    Rectangle rectPanel = currPanel.panelComposite.getBounds();
+    shell.setBounds(xPixel + rectShell.x + rectPanel.x, yPixel + rectShell.y + rectPanel.y, xPixelSize, yPixelSize);    
+    
+    
+		if(title !=null){ shell.setText(title); }
 		GuiShellMngBuildIfc mng = new GuiShellMngSwt(shell, 0, 0, propertiesGui, variableContainer, log);
 		//mng.setWindowVisible(true);
 		
@@ -429,9 +462,9 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
    * @param name Name of the panel.
    * @param panel The panel.
    */
-  public PanelContent<Control> registerPanel(String name, Object panelP){
+  public PanelContent<Composite> registerPanel(String name, Object panelP){
   	Composite panel = (Composite)panelP;
-  	PanelContent<Control> panelContent = new PanelContent<Control>(panel);
+  	PanelContent<Composite> panelContent = new PanelContent<Composite>(panel);
   	panels.put(name, panelContent);
   	panel.setLayout(null);
   	currPanel = panelContent;
@@ -718,7 +751,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
   }
 
   
-  /** Adds a edit field for editing a number value.
+  /** Adds a text field for showing or editing a text value.
    * 
    * @param sName The registering name
    * @param width Number of grid units for length
@@ -730,7 +763,8 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
    * @return
    */
   public Text addTextField(WidgetDescriptor<?> widgetInfo, boolean editable, String prompt, char promptStylePosition)
-  { Text widget = new Text((Composite)currPanel.panelComposite, 0);
+  { Text widget = new Text((Composite)currPanel.panelComposite, SWT.SINGLE);
+    widgetInfo.setPanelMng(this);
     widget.setFont(propertiesGui.stdInputFont);
     widget.setEditable(editable);
     if(editable)
@@ -800,6 +834,85 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
   
   }
   
+
+  
+  
+/** Adds a text box for showing or editing a text in multi lines.
+ * 
+ * @param sName The registering name
+ * @param width Number of grid units for length
+ * @param editable true than edit-able, false to show content 
+ * @param prompt If not null, than a description label is shown
+ * @param promptStylePosition Position and size of description label:
+ *   upper case letter: normal font, lower case letter: small font
+ *   'l' left, 't' top (above field) 
+ * @return
+ */
+public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String prompt, char promptStylePosition)
+{ widgetInfo.setPanelMng(this);
+  Text widget = new Text((Composite)currPanel.panelComposite, SWT.MULTI);
+  widget.setFont(propertiesGui.stdInputFont);
+  widget.setEditable(editable);
+  if(editable)
+    stop();
+  widget.setBackground(propertiesGui.color(0xFFFFFF));
+  widget.addMouseListener(mouseClickForInfo);
+  setPosAndSize_(widget);
+  if(prompt != null && promptStylePosition == 't'){
+    final int yPixelField;
+    final Font promptFont;
+    switch(yIncr){
+    case 3:  promptFont = propertiesGui.smallPromptFont;
+             yPixelField = propertiesGui.yPixelUnit() * 2 -3;
+             break;
+    case 2:  promptFont = propertiesGui.smallPromptFont;
+             yPixelField = (int)(1.5F * propertiesGui.yPixelUnit());
+             break;
+    default: promptFont = propertiesGui.smallPromptFont;
+             yPixelField = propertiesGui.yPixelUnit() * 2 -3;
+    }//switch
+    Rectangle boundsField = widget.getBounds();
+    Rectangle boundsPrompt = new Rectangle(boundsField.x, boundsField.y-3  //occupy part of field above, only above the normal letters
+      , boundsField.width, boundsField.height );
+    
+    if(promptStylePosition == 't'){ 
+      boundsPrompt.height -= (yPixelField -4);
+      boundsPrompt.y -= 1;
+      
+      boundsField.y += (boundsField.height - yPixelField );
+      boundsField.height = yPixelField;
+    }
+    Label wgPrompt = new Label((Composite)currPanel.panelComposite, 0);
+    wgPrompt.setFont(promptFont);
+    wgPrompt.setText(prompt);
+    Point promptSize = wgPrompt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+    if(promptSize.x > boundsPrompt.width){
+      boundsPrompt.width = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
+    }
+    widget.setBounds(boundsField);
+    wgPrompt.setBounds(boundsPrompt);
+  } 
+  //
+  if(widgetInfo.name !=null && widgetInfo.name.charAt(0) == '$'){
+    widgetInfo.name = sCurrPanel + widgetInfo.name.substring(1);
+  }
+  //link the widget with is information together.
+  widgetInfo.widget = widget;
+  widget.setData(widgetInfo);
+  if(widgetInfo.name !=null){
+    indexNameWidgets.put(widgetInfo.name, widgetInfo);
+    if(!editable){
+      showFields.put(widgetInfo.name, widgetInfo);
+    }
+  }
+  currPanel.widgetList.add(widgetInfo);
+  return widget; 
+
+}
+
+  
+  
+  
   /**Adds a line.
    * <br><br>To adding a line is only possible if the current panel is of type 
    * {@link CanvasStorePanelSwt}. This class stores the line coordinates and conditions 
@@ -850,7 +963,9 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
     if(sCmd != null){
       widget.setData(sCmd);
     } 
-    indexNameWidgets.put(sName, new WidgetDescriptor<Control>(sName, widget, 'i', sName, null));
+    WidgetDescriptor widgd = new WidgetDescriptor<Control>(sName, widget, 'i', sName, null);
+    indexNameWidgets.put(sName, widgd);
+    widgd.setPanelMng(this);
     return widget;
   }
 
@@ -865,7 +980,8 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
   	ValueBarSwt widget = new ValueBarSwt(this);
   	setPosAndSize_(widget.widget);
   	WidgetDescriptor<Control> widgetInfos = new WidgetDescriptor<Control>(sName, widget, 'U');
-  	widgetInfos.setShowMethod(sShowMethod);
+  	widgetInfos.setPanelMng(this);
+    widgetInfos.setShowMethod(sShowMethod);
   	widgetInfos.setDataPath(sDataPath);
     widget.widget.setData(widgetInfos);
     widget.widget.addMouseListener(mouseClickForInfo);
@@ -888,6 +1004,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
   	control.setBackground(propertiesGui.colorBackground);
   	setPosAndSize_(control);
    	WidgetDescriptor<Control> widgetInfos = new WidgetDescriptor<Control>(sName, control, 'V');
+   	widgetInfos.setPanelMng(this);
     if(action != null){
   		SelectionListenerForSlider actionSlider = new SelectionListenerForSlider(widgetInfos, action);
   		control.addSelectionListener(actionSlider);
@@ -915,7 +1032,10 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
   )
   {
   	char size = yIncr > 3? 'B' : 'A';
-    ButtonSwt button = new ButtonSwt(this, size);
+  	WidgetDescriptor<Control> widgetInfos = new WidgetDescriptor<Control>(sName, 'B');
+    widgetInfos.setPanelMng(this);
+    ButtonSwt button = new ButtonSwt(this, widgetInfos, size);
+    widgetInfos.widget = button;
     button.setBackground(propertiesGui.colorBackground);
   	
     button.setText(sButtonText);
@@ -923,7 +1043,6 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
     button.setSize(propertiesGui.xPixelUnit() * xIncr -2, propertiesGui.yPixelUnit() * yIncr -2);
     setBounds_(button);
     if(sName == null){ sName = sButtonText; }
-    WidgetDescriptor<Control> widgetInfos = new WidgetDescriptor<Control>(sName, button, 'B');
     widgetInfos.sCmd = sCmd;
     widgetInfos.setShowMethod(sShowMethod);
     widgetInfos.sDataPath = sDataPath;
@@ -962,7 +1081,13 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
   	char size = yIncr > 3? 'B' : 'A';
   	if(sColor0 == null || sColor1 == null) throw new IllegalArgumentException("SwitchButton " + sName + ": color0 and color1 should be given.");
   	
-  	SwitchButtonSwt button = new SwitchButtonSwt(this, size);
+  	WidgetDescriptor<Control> widgetInfos = new WidgetDescriptor<Control>(sName, 'B');
+    widgetInfos.setPanelMng(this);
+    widgetInfos.sCmd = sCmd;
+    widgetInfos.setShowMethod(sShowMethod);
+    widgetInfos.sDataPath = sDataPath;
+    SwitchButtonSwt button = new SwitchButtonSwt(this, widgetInfos, size);
+    widgetInfos.widget = button;
   	button.setBackground(propertiesGui.colorBackground);
   	button.setColorPressed(propertiesGui.getColorValue(sColor1));  
     button.setColorReleased(propertiesGui.getColorValue(sColor0));  
@@ -971,10 +1096,6 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
     button.setSize(propertiesGui.xPixelUnit() * xIncr -2, propertiesGui.yPixelUnit() * yIncr -2);
     setBounds_(button);
     if(sName == null){ sName = sButtonText; }
-    WidgetDescriptor<Control> widgetInfos = new WidgetDescriptor<Control>(sName, button, 'B');
-    widgetInfos.sCmd = sCmd;
-    widgetInfos.setShowMethod(sShowMethod);
-    widgetInfos.sDataPath = sDataPath;
     button.setData(widgetInfos);
     //currPanel.widgetIndex.put(sName, widgetInfos);
     currPanel.widgetList.add(widgetInfos);
@@ -997,6 +1118,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
     widget.setSize(propertiesGui.xPixelUnit() * xIncr -2, propertiesGui.yPixelUnit() * yIncr -2);
     setBounds_(widget);
     WidgetDescriptor<Control> widgetInfos = new WidgetDescriptor<Control>(sName, widget, 'D');
+    widgetInfos.setPanelMng(this);
     widgetInfos.sDataPath = sDataPath;
     widgetInfos.setShowMethod(sShowMethod);
     widget.setData(widgetInfos);
@@ -1019,7 +1141,9 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
 		curveView.setGridVertical(10, 5);   //10 data-points per grid line, 50 data-points per strong line.
 		curveView.setGridHorizontal(50.0F, 5);  //10%-divisions, with 5 sub-divisions
 		curveView.setGridColor(propertiesGui.colorGrid, propertiesGui.colorGridStrong);
-		indexNameWidgets.put(sName, new WidgetDescriptor<Control>(sName, curveView, 'c', sName, null));
+		WidgetDescriptor widgd = new WidgetDescriptor<Control>(sName, curveView, 'c', sName, null);
+		widgd.setPanelMng(this);
+    indexNameWidgets.put(sName, widgd);
 		return curveView;
 	}
 
@@ -1079,12 +1203,13 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
 	
 	Table testTable;
   
-  @Override public Table addTable(String sName, int height, int[] columnWidths)
+  @Override public WidgetDescriptor addTable(String sName, int height, int[] columnWidths)
   {
   	boolean TEST = false;
   	final Table table;
   	table = new Table((Composite)currPanel.panelComposite, SWT.FULL_SELECTION);
   	testTable = table;
+  	table.addKeyListener(new TableKeyListerner(null));
   	table.setFont(this.propertiesGui.stdInputFont);
   	//table.setColumnSelectionAllowed(true);
   	//table.setRowHeight(2 * this.propertiesGui.xPixelUnit());
@@ -1136,9 +1261,78 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
    	guiContent.add(widget);
    */
   	setBounds_(table);
-  	indexNameWidgets.put(sName, new WidgetDescriptor<Control>(sName, table, 'L', sName, null));
-  	return table;
+  	WidgetDescriptor widgd = new WidgetDescriptor<Control>(sName, table, 'L', sName, null);
+  	widgd.setPanelMng(this);
+  	table.setData(widgd);
+  	indexNameWidgets.put(sName, widgd);
+  	return widgd;
   }
+  
+  
+  /**A Table is completed with a special key listener. On some keys and situation 
+   * the {@link UserActionGui} given in the WidgetDescriptor is called. 
+   * The following keys are detected:
+   * <ul><li>Enter: "ok" Selection of a line or cell in the table
+   * <li>KeyUp on the first line: "upleave": Leave the table.
+   * <ul>
+   * The 
+   *
+   */
+  class TableKeyListerner implements KeyListener
+  {
+    final KeyListener basicListener;
+
+    
+    
+    public TableKeyListerner(KeyListener basicListener)
+    {
+      this.basicListener = basicListener;
+    }
+
+    @Override
+    public void keyPressed(KeyEvent keyEv)
+    {
+      final WidgetDescriptor widgetDescr;
+      final UserActionGui action;
+      final Object source = keyEv.getSource();
+      if(source instanceof Control){
+        Object oData = ((Control)source).getData();
+        if(oData instanceof WidgetDescriptor){
+          widgetDescr = (WidgetDescriptor)oData;
+          action = widgetDescr.action;
+        } else { widgetDescr = null; action = null; }
+        } else { widgetDescr = null; action = null;
+      }
+      if(action !=null){
+        Table table = (Table)source;
+        int select  = table.getSelectionIndex();
+        TableItem[] tableItem = table.getSelection();
+        int zColumns = tableItem.length;
+        String[] content = new String[zColumns];
+        for(int ii=0; ii < zColumns; ++ii){
+          content[ii] = tableItem[ii].toString();  //content of the table item
+        }
+        if(keyEv.keyCode == 0x0d){ //Enter-key pressed:
+          action.userActionGui("ok", widgetDescr, content);    
+        } else if(keyEv.keyCode == SWT.KeyUp 
+                 && source instanceof Table && select == 0){
+          action.userActionGui("upleave", widgetDescr, (Object)null);    
+        }
+      }
+      stop();
+      //basicListener.keyPressed(arg0);
+      
+    }
+
+    @Override
+    public void keyReleased(KeyEvent arg0)
+    {
+      //basicListener.keyReleased(arg0);
+      
+    }
+    
+  };
+  
   
   
   public void repaint()
@@ -1204,27 +1398,27 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
   
   public String insertInfo(WidgetDescriptor<?> descr, int ident, String content)
   {
-  	return insertInfo(descr, GuiChangeReq.cmdInsert, ident, content);
+  	return setInfo(descr, GuiPanelMngWorkingIfc.cmdInsert, ident, content);
   }
   
   
   
   public String insertInfo(WidgetDescriptor<?> descr, int ident, Object value)
   {
-  	return insertInfo(descr, GuiChangeReq.cmdInsert, ident, value);
+  	return setInfo(descr, GuiPanelMngWorkingIfc.cmdInsert, ident, value);
   }
   
-  
-  public String insertInfo(WidgetDescriptor<?> descr, int cmd, int ident, Object value)
+  //past: insertInfo
+  @Override public String setInfo(WidgetDescriptor descr, int cmd, int ident, Object value)
   {
-  	if(descr.name !=null && descr.name.equals("writerEnergy1Sec") && cmd == GuiChangeReq.cmdInsert) ////)
+  	if(descr.name !=null && descr.name.equals("writerEnergy1Sec") && cmd == GuiPanelMngWorkingIfc.cmdInsert) ////)
   		stop();
   	//check the admissibility:
   	switch(cmd){
-  	case GuiChangeReq.cmdInsert: checkAdmissibility(value != null && value instanceof String); break;
+  	case GuiPanelMngWorkingIfc.cmdInsert: checkAdmissibility(value != null && value instanceof String); break;
   	}
-    guiChangeRequests.add(new GuiChangeReq(descr, cmd, ident, value));
-	  synchronized(guiChangeRequests){ guiChangeRequests.notify(); }  //to wake up waiting on guiChangeRequests.
+    mngBase.guiChangeRequests.add(new GuiChangeReq(descr, cmd, ident, value));
+	  synchronized(mngBase.guiChangeRequests){ mngBase.guiChangeRequests.notify(); }  //to wake up waiting on guiChangeRequests.
 	  graphicFrame.getDisplay().wake(); //wake-up the GUI-thread, it may sleep elsewhere.
 	  //((Composite)currPanel.panelComposite).getDisplay().wake();  //wake-up the GUI-thread, it may sleep elsewhere. 
 	  return "";
@@ -1288,7 +1482,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
   public void setBackColor(WidgetDescriptor<?> descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
   	WidgetDescriptor<Control> descr = (WidgetDescriptor<Control>) descr1;
-  	insertInfo(descr, GuiChangeReq.cmdBackColor, ix, color);
+  	setInfo(descr, GuiPanelMngWorkingIfc.cmdBackColor, ix, color);
   } 
   
   
@@ -1296,7 +1490,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
   {
   	@SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
   	WidgetDescriptor<Control> descr = (WidgetDescriptor<Control>) widgetDescr;
-  	insertInfo(descr, GuiChangeReq.cmdColor, colorBorder, colorInner);
+  	setInfo(descr, GuiPanelMngWorkingIfc.cmdColor, colorBorder, colorInner);
   	
   }
   
@@ -1382,42 +1576,42 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
 		  	item.setText(contentTest);
   	  }
   	  GuiChangeReq changeReq;
-  	  while( (changeReq = guiChangeRequests.poll()) != null){
+  	  while( (changeReq = mngBase.guiChangeRequests.poll()) != null){
   	  	WidgetDescriptor<?> descr = changeReq.widgetDescr;
   	  	Object oWidget = descr.widget;
   	  	int colorValue;
   	  	switch(changeReq.cmd){
-	  		case GuiChangeReq.cmdBackColor: 
+	  		case GuiPanelMngWorkingIfc.cmdBackColor: 
 	  			colorValue = ((Integer)(changeReq.info)).intValue();
 	  			Color color = propertiesGui.color(colorValue & 0xffffff);
 	  			((Control)(oWidget)).setBackground(color); 
 	  			break;
-	  		case GuiChangeReq.cmdRedraw: ((Control)(oWidget)).redraw(); break;
-	  		case GuiChangeReq.cmdRedrawPart: 
+	  		case GuiPanelMngWorkingIfc.cmdRedraw: ((Control)(oWidget)).redraw(); break;
+	  		case GuiPanelMngWorkingIfc.cmdRedrawPart: 
 	  			assert(oWidget instanceof CurveView);
 	  			((CurveView)(oWidget)).redrawData(); break; //causes a partial redraw
 	  		default: 
 	  	  	if(oWidget instanceof Table){ 
 	  	  		Table table = (Table)oWidget;
 	  	  		switch(changeReq.cmd){
-	  	  		case GuiChangeReq.cmdInsert: changeTable(table, changeReq.ident, (String)changeReq.info); break;
+	  	  		case GuiPanelMngWorkingIfc.cmdInsert: changeTable(table, changeReq.ident, (String)changeReq.info); break;
 	  	  		default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", changeReq.cmd, descr.name);
 	  	  		}
 	  	  	} else if(oWidget instanceof Text){ 
 	  	  		Text field = (Text)oWidget;
 	  	  		switch(changeReq.cmd){
-	  	  		case GuiChangeReq.cmdInsert: field.setText((String)changeReq.info); break;
+	  	  		case GuiPanelMngWorkingIfc.cmdInsert: field.setText((String)changeReq.info); break;
 	  	  		default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", changeReq.cmd, descr.name);
 	  	  		}
 	  	  	} else if(oWidget instanceof LedSwt){ 
 	  	  		LedSwt field = (LedSwt)oWidget;
 	  	  		switch(changeReq.cmd){
-	  	  		case GuiChangeReq.cmdColor: field.setColor(changeReq.ident, (Integer)changeReq.info); break;
+	  	  		case GuiPanelMngWorkingIfc.cmdColor: field.setColor(changeReq.ident, (Integer)changeReq.info); break;
 	  	  		default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", changeReq.cmd, descr.name);
 	  	  		}
 	  	  	} else if(oWidget instanceof SwitchButtonSwt){ 
 	  	  		SwitchButtonSwt widget = (SwitchButtonSwt)oWidget;
-	  	  	  widget.setState((String)changeReq.info);
+	  	  	  widget.setState(changeReq.info);
 	  	  	} else {
 	  	      //all other widgets:		
 	  	  		switch(changeReq.cmd){  ////
@@ -1493,7 +1687,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Control> implements GuiPanel
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sName);
   	} else if((descr.widget instanceof CurveView)) {
   		//sends a redraw information.
-  		guiChangeRequests.add(new GuiChangeReq(descr, GuiChangeReq.cmdRedrawPart, 0, null));
+  	  mngBase.guiChangeRequests.add(new GuiChangeReq(descr, GuiPanelMngWorkingIfc.cmdRedrawPart, 0, null));
   		((Composite)currPanel.panelComposite).getDisplay().wake();  //wake-up the GUI-thread, it may sleep elsewhere. 
   	} else {
   	}

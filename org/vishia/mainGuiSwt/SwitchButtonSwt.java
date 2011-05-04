@@ -20,13 +20,13 @@ public class SwitchButtonSwt extends ButtonSwt
 	
 	private boolean isSwitchedDown;
 	
-	private final UserActionGui userActionOnSwitch;
+	//private final UserActionGui userActionOnSwitch;
 
 	
-	public SwitchButtonSwt(GuiPanelMngSwt mng, char size)
+	public SwitchButtonSwt(GuiPanelMngSwt mng, WidgetDescriptor widgd, char size)
 	{
-		super(mng, size);
-		this.userActionOnSwitch = null;
+		super(mng, widgd, size);
+		//this.userActionOnSwitch = null;
 		this.isSwitchedDown = false;
 		MouseClickSwitchButtonAction action = new MouseClickSwitchButtonAction(mng, null);
 		addMouseListener( new MouseClickActionForUserActionSwt(mng, action, null, "SwitchButton", null));
@@ -48,12 +48,16 @@ public class SwitchButtonSwt extends ButtonSwt
 	public boolean isOn(){ return isSwitchedDown; }
 	
   
-	public void setState(String val)
+	public void setState(Object val)
 	{
-		if(val.equals("1") || val.equals("true") || val.equals("on")){
+	  String sVal = (val instanceof String) ? (String)val : null;
+	  int nVal = val instanceof Integer ? ((Integer)val).intValue(): -1;
+		if(sVal !=null && (sVal.equals("1") || sVal.equals("true") || sVal.equals("on"))
+		  || sVal == null && nVal !=0){
 			isSwitchedDown = true;
 			setBackground(colorPressed); 
-		} else if(val.equals("0") || val.equals("false") || val.equals("off")){
+		} else if(sVal !=null && (sVal.equals("0") || sVal.equals("false") || sVal.equals("off"))
+		    || nVal == 0){
 			isSwitchedDown = false;
 			setBackground(colorReleased); 
 		}
@@ -84,8 +88,8 @@ public class SwitchButtonSwt extends ButtonSwt
 			isSwitchedDown = ! isSwitchedDown;
       if(isSwitchedDown){ setBackground(colorPressed); }
       else {  setBackground(colorReleased); }
-			if(userActionOnSwitch != null){
-				userActionOnSwitch.userActionGui(sCmd + (isSwitchedDown? "1" : "0"), infos);
+			if(widgd.action != null){
+			  widgd.action.userActionGui(sCmd + (isSwitchedDown? "1" : "0"), infos);
 			}
 			
 		}

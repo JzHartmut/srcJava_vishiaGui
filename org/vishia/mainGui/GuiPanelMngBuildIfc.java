@@ -36,6 +36,24 @@ public interface GuiPanelMngBuildIfc
 {
 	
   
+  /**The version of this interface:
+   * <ul>
+   * <li>2011-05-01 Hartmut new: {@link #addTextBox(WidgetDescriptor, boolean, String, char)}: 
+   *     A Text box with more as one line. The TextField has only one line.
+   * <li>2011-05-01 Hartmut new: {@link #createCompositeBox()}. It is a box with its own PanelMng
+   *     which is located in an area of another panel. (Composite)
+   * <li>2011-05-01 Hartmut new: {@link #remove(GuiPanelMngBuildIfc)} and {@link #remove(WidgetDescriptor)}
+   *     to remove widgets, for dynamic views.
+   * <li>2011-05-01 Hartmut new: {@link #createWindow(String, boolean)} instead createModalWindow(String).
+   *     This method should be used for any sub-windows in the application. The window position is determined
+   *     inside the current window with the known {@link #setPosition(int, int, int, int, char)} functionality.
+   *     The {@link #createWindow(int, int, int, int, VariableContainer_ifc)} with absolute coordinates
+   *     may be deprecated. (Is it necessary to create a window outside the own borders? )             
+   * <li>All other changes in 2010
+   * </ul>
+   */
+  final static int version = 0x20110502;
+  
 	/**Returns the width (number of grid step horizontal) of the last element.
    * @return Difference between current auto-position and last pos.
    */
@@ -90,6 +108,17 @@ public interface GuiPanelMngBuildIfc
   public void setPosition(int line, int column, int height, int length, char direction);
   
   
+  /**Same as {@link #setPosition(int, int, int, int, char)}, but the positions can be in a fine division.
+   * @param line
+   * @param lineFrac Number betwenn 0..9 for fine positioning in the grid step.
+   * @param column
+   * @param columnFrac
+   * @param height
+   * @param heigthFrac
+   * @param width
+   * @param widthFrac
+   * @param direction
+   */
   public void setFinePosition(int line, int lineFrac, int column, int columnFrac, int height, int heigthFrac, int width, int widthFrac, char direction);
   
   public void setSize(int ySize, int ySizeFrac, int xSize, int xSizeFrac);
@@ -178,7 +207,7 @@ public interface GuiPanelMngBuildIfc
    *        adequate to the possibilities of the used graphic base system. 
    * @return
    */
-  Object addTable(String sName, int height, int[] columnWidths);
+  WidgetDescriptor addTable(String sName, int height, int[] columnWidths);
 
   /**Adds a simple text at the current position.
    * 
@@ -207,7 +236,34 @@ public interface GuiPanelMngBuildIfc
   void addLine(int colorValue, float xa, float ya, float xe, float ye);
     
   
-  /** Adds a edit field for editing a number value.
+  /** Adds a field for editing or showing a text. This text can be prepared especially as number value too.
+   * The field has one line. The number of chars are not limited. 
+   * <br><br>
+   * The current content of the edit field is able to get any time calling {@link GuiPanelMngWorkingIfc#getValue(String)}
+   * with the given registering name.
+   * <br><br>
+   * To force a set of content or an action while getting focus of this field the method {@link #addActionFocused(String, UserActionGui, String)}
+   * can be called after invoking this method (any time, able to change). The {@link UserActionGui#userActionGui(String, String, WidgetDescriptor, Map)}
+   * is called in the GUI-thread before the field gets the focus.
+   * <br><br>
+   * To force a check of content or an action while finish editing the method {@link #addActionFocusRelease(String, UserActionGui, String)}
+   * can be called after invoking this method (any time, able to change). The adequate userActionGui is called after editing the field.
+   * <br><br>
+   * If the {@link WidgetDescriptor#action} refers an instance of type {@link UserActionGui}, than it is the action on finish editing.
+   * 
+   * @param sName The registering name
+   * @param widgetInfo The informations about the textfield.
+   * @param editable true than edit-able, false to show content 
+   * @param prompt If not null, than a description label is shown
+   * @param promptStylePosition Position and size of description label:
+   *   upper case letter: normal font, lower case letter: small font
+   *   'l' left, 't' top (above field) 
+   * @return
+   */
+  Object addTextField(WidgetDescriptor<?> widgetInfo, boolean editable, String prompt, char promptStylePosition);
+  
+  
+  /** Adds a box for editing or showing a text.
    * <br><br>
    * The current content of the edit field is able to get anytime calling {@link GuiPanelMngWorkingIfc#getValue(String)}
    * with the given registering name.
@@ -230,7 +286,7 @@ public interface GuiPanelMngBuildIfc
    *   'l' left, 't' top (above field) 
    * @return
    */
-  Object addTextField(WidgetDescriptor<?> widgetInfo, boolean editable, String prompt, char promptStylePosition);
+  Object addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String prompt, char promptStylePosition);
   
   /**Adds a curve view for displaying values with ordinary x-coordinate.
    * The scaling of the curve view is set to -100..100 per default. 
@@ -321,6 +377,22 @@ public interface GuiPanelMngBuildIfc
   public GuiDispatchCallbackWorker getTheGuiChangeWorker();
   
   
+  /**Creates a box inside the current panel to hold some widgets.
+   * 
+   * @return
+   * @since 2010-05-01
+   */
+  GuiPanelMngBuildIfc createCompositeBox();
+  
+  
+  /**Removes a composite box from the graphic representation.
+   * @param compositeBox
+   * @return true if removed.
+   */
+  boolean remove(GuiPanelMngBuildIfc compositeBox);
+  
+  boolean remove(WidgetDescriptor widget);
+  
 	/**Creates a new window additional to a given window with Panel Manager.
 	 * @param left
 	 * @param top
@@ -328,17 +400,23 @@ public interface GuiPanelMngBuildIfc
 	 * @param height
 	 * @param variableContainer A Container for variables
 	 * @return
+	 * @deprecated
 	 */
 	GuiShellMngBuildIfc createWindow(int left, int top, int width, int height, VariableContainer_ifc variableContainer);
 	
-	/**Creates a Window for a modal dialog. The window is described by the returned interface. 
+	/**Creates a Window for a modal or non modal dialog. The window is described by the returned interface. 
 	 * It can be filled with elements. The dialog is able to show and hide calling 
 	 * {@link GuiShellMngIfc#setWindowVisible(boolean)}. The interface therefore can be get calling
 	 * {@link GuiShellMngBuildIfc#getShellMngIfc()}.
-	 * @param title
+	 * The position and size of the window is set with the adequate strategy like all other widget: 
+	 * using {@link #setPosition(int, int, int, int, char)}. 
+	 * @param title Title of the window, may be null, then without title bar.
+	 * @param exclusive true then non-modal.
 	 * @return
 	 */
-	GuiShellMngBuildIfc createModalWindow(String title);
+	GuiShellMngBuildIfc createWindow(String title, boolean exclusive);
+  
+	
 	
 	
 	FileDialogIfc createFileDialog();
