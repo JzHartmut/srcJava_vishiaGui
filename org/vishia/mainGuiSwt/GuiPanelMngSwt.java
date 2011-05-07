@@ -1083,6 +1083,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   	
   	WidgetDescriptor<Control> widgetInfos = new WidgetDescriptor<Control>(sName, 'B');
     widgetInfos.setPanelMng(this);
+    widgetInfos.action = action;
     widgetInfos.sCmd = sCmd;
     widgetInfos.setShowMethod(sShowMethod);
     widgetInfos.sDataPath = sDataPath;

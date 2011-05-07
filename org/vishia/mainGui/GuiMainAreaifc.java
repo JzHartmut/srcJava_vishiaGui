@@ -1,5 +1,7 @@
 package org.vishia.mainGui;
 
+import org.eclipse.swt.widgets.Shell;
+
 
 /**This interface supports the usage of a window which is divide into 9 areas. 
  * The 2 horizontal and 2 vertical separation lines may able to move in the implementation class.
@@ -35,6 +37,10 @@ package org.vishia.mainGui;
  * @author Hartmut Schorrig
  *
  */
+/**
+ * @author hartmut
+ *
+ */
 public interface GuiMainAreaifc
 {
   /**Version history:
@@ -54,6 +60,13 @@ public interface GuiMainAreaifc
    * @param listener
    */
   public void removeDispatchListener(GuiDispatchCallbackWorker listener);
+  
+  
+  /**Returns the Frame class of the underlying graphic.
+   * SWT: Shell, swing: TODO
+   * @return
+   */
+  Shell getitsGraphicFrame();
   
 
 }

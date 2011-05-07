@@ -32,7 +32,7 @@ public class BzrGui
   /**To Output log informations. The ouput will be done in the output area of the graphic. */
   private final Report console;
 
-
+  final MainData mainData;
 
 
   /**The command-line-arguments may be stored in an extra class, which can arranged in any other class too. 
@@ -71,41 +71,27 @@ public class BzrGui
 
 
 
-
-
-
-
-
-
-
-
-
   /**The GUI. */
   private final CmdLineAndGui gui;
 
-  private final GuiMainAreaifc guifc;
-  
-  private GuiPanelMngSwt panelMng;
 
   /**Panel-Management-interface for the panels. */
-  private GuiPanelMngBuildIfc panelBuildifc;
+  GuiPanelMngBuildIfc panelBuildifc;
 
-  private GuiPanelMngWorkingIfc panelAccess;
-  
-  WidgetDescriptor widgdProjektpath = new WidgetDescriptor("projectPath", 'E'); 
-  
-  
-  private final BzrGetStatus getterStatus;
-  
-  private InfoBox testDialogBox;
 
-  /**A Panel which contains the table to select some projectPaths. */
-  private GuiShellMngBuildIfc selectorProjectPath;
+
+
+
+
+
+
+
+  private GuiPanelMngSwt panelMng;
+
   
-  /**The table (list) which contains the selectable project paths. */
-  private WidgetDescriptor selectorProjectPathTable;
-  
-  private GuiPanelMngBuildIfc[] bzrComponentBox = new GuiPanelMngBuildIfc[10]; 
+  GuiStatusPanel guiStatusPanel;
+
+  GuiCommitPanel guiCommitPanel;
   
   /**ctor for the main class of the application. 
    * The main class can be created in some other kinds as done in static main too.
@@ -120,16 +106,11 @@ public class BzrGui
    * @param gui The GUI-organization.
    */
   BzrGui(CallingArguments cargs, CmdLineAndGui gui) 
-  { this.guifc = this.gui = gui;
-    boolean bOk = true;
+  { boolean bOk = true;
     this.callingArguments = cargs;
     this.console = gui;  
     
-    inspector = new Inspector("UDP:127.0.0.1:60088");
-    inspector.start(this);
-  
-    getterStatus = new BzrGetStatus(gui);
-    //Creates a panel manager to work with grid units and symbolic access.
+      //Creates a panel manager to work with grid units and symbolic access.
     //Its properties:  //##
     final char sizePixel;
     char sizeArg = callingArguments.sSize == null ? 'A' : callingArguments.sSize.charAt(0);
@@ -146,10 +127,21 @@ public class BzrGui
     PropertiesGuiSwt propertiesGui = new PropertiesGuiSwt(gui.getDisplay(), sizePixel);
     LogMessage log = gui.getLogMessageOutputConsole();
     panelMng = new GuiPanelMngSwt(null, gui.getContentPane(), 120,80, propertiesGui, null, log);
+    
+    mainData = new MainData(gui);
+    
+    inspector = new Inspector("UDP:127.0.0.1:60088");
+    inspector.start(this);
+  
     panelBuildifc = panelMng;
-    panelAccess = panelMng;
+    mainData.panelAccess = panelMng;
   
-  
+    mainData.guifc = this.gui = gui;
+    
+    //creates the panel classes in constructor, don't initialize the GUI yet.
+    guiStatusPanel = new GuiStatusPanel(mainData, panelBuildifc);
+    guiCommitPanel = new GuiCommitPanel(mainData, panelBuildifc);
+    
     //create the basic appearance of the GUI. The execution sets dlgAccess:
     gui.addDispatchListener(initGuiDialog);
     if(!initGuiDialog.awaitExecution(1, 10000)) throw new RuntimeException("unexpected fail of execution initGuiDialog");
@@ -256,34 +248,8 @@ public class BzrGui
         //File fileGui = new File(callingArguments.sFileGui);
         //xxx
         //dialogZbnfConfigurator.configureWithZbnf("Sample Gui", fileGui, panelBuildIfc);
-        int xposProjectPath = 0, yposProjectPath=5; 
-        panelBuildifc.selectPanel("Select");
-        panelBuildifc.setPosition(yposProjectPath, xposProjectPath, -2, 70, 'r');
-        panelBuildifc.addTextField(widgdProjektpath, true, "Project path", 't');
-        widgdProjektpath.setValue(GuiPanelMngWorkingIfc.cmdInsert, 0,"/home/hartmut/vishia/GUI");
-        panelBuildifc.setPosition(-1, -1, -2, 2, 'r');
-        panelBuildifc.addButton("selectProjectPath", selectProjectPath, "c", "s", "d", "?");
-        ///
-        //WidgetDescriptor widgdRefresh = new WidgetDescriptor("refresh", 'B');
-        //widgdRefresh.setAction(refreshProjectBzrComponents);
-        panelBuildifc.setPosition(-1, -1, -3, 10, 'r');
-        panelBuildifc.addButton("Brefresh", refreshProjectBzrComponents, "c", "s", "d", "Get/Refresh");
-
-        String[] lines = {"1", "2"};
-        
-        testDialogBox = new InfoBox(gui.getitsGraphicFrame(), "Title", lines, true);
-
-        panelBuildifc.setPosition(yposProjectPath, xposProjectPath, 20, 60, 'r');
-        selectorProjectPath = panelBuildifc.createWindow(null, false);
-        int[] columnWidths = {40, 10};
-        selectorProjectPath.setPosition(0, 0, 10, 60, 'd');
-        selectorProjectPathTable = selectorProjectPath.addTable("selectProjectPath", 20, columnWidths);
-        selectorProjectPathTable.setAction(actionSelectorProjectPathTable);
-        selectorProjectPath.setPosition(20, 0, -3, 10, 'r');
-        selectorProjectPath.addButton("closeProjectBzrComponents", actionCloseProjectBzrComponents, "","","","ok");
-        
-        panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0,"/home/hartmut/vishia/GUI");
-        panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, Integer.MAX_VALUE,"line2");
+        guiStatusPanel.initGui();
+        guiCommitPanel.initGui();
         
       }  
       catch(Exception exception)
@@ -308,8 +274,6 @@ public class BzrGui
 
   void execute()
   {
-    panelAccess.insertInfo("msgOfDay", Integer.MAX_VALUE, "Test\tMsg");
-    //msgReceiver.start();
     while(gui.isRunning())
     { try{ Thread.sleep(100);} 
     catch (InterruptedException e)
@@ -337,7 +301,7 @@ public class BzrGui
         error.setLength(0);
         gui.executeCmdLine(processBuilder, widgetInfos.sCmd, null, Report.info, output, error);
         stop();
-        panelAccess.insertInfo("output", 0, output.toString());
+        mainData.panelAccess.insertInfo("output", 0, output.toString());
         //gui.executeCmdLine(widgetInfos.sCmd, 0, null, null);
       }
     }
@@ -345,94 +309,6 @@ public class BzrGui
 
 
   
-  private final UserActionGui selectProjectPath = new UserActionGui()
-  { 
-    public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
-    {
-      //testDialogBox.open();
-      selectorProjectPath.setWindowVisible(true);
-    }
-  };
-  
-  
-  
-  private final UserActionGui actionSelectorProjectPathTable = new UserActionGui()
-  { 
-    public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
-    {
-      if(sCmd.equals("ok")){
-        String sPath = (String)values[0];
-        widgdProjektpath.setValue(GuiPanelMngWorkingIfc.cmdInsert, 0, sPath);
-      }
-      selectorProjectPath.setWindowVisible(false);
-    }
-  };
-  
-  
-  private final UserActionGui actionCloseProjectBzrComponents = new UserActionGui()
-  { 
-    public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
-    {
-      selectorProjectPath.setWindowVisible(false);
-    }
-  };
-
-  
-  private final UserActionGui refreshProjectBzrComponents = new UserActionGui()
-  { 
-    public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
-    {
-      //String sProjectPath = dlgAccess.getValue("projectPath");
-      String sProjectPath = widgdProjektpath.getValue();
-      panelBuildifc.selectPanel("Select");
-      for(int ii=0; ii< bzrComponentBox.length; ++ii){
-        GuiPanelMngBuildIfc item = bzrComponentBox[ii]; 
-        if(item !=null){ 
-          bzrComponentBox[ii] = null;
-          panelBuildifc.remove(item); 
-        }
-      }
-      getterStatus.getBzrLocations(sProjectPath);
-      int yPosComponents = 10;
-      int iComponent = 0;
-      //Only one of the switch buttons are checked. If another button is pressed, it should be deselect.
-      //The switchExcluder helps to do so. 
-      //It contains a special method, which captures the text of the last pressed switch button. 
-      SwitchExclusiveButtonMng switchExcluder = new SwitchExclusiveButtonMng();
-      WidgetDescriptor switchButton;
-      for(BzrGetStatus.Data data: getterStatus.data){
-        String sName = data.getBzrLocationDir().getName();
-        panelBuildifc.selectPanel("Select");
-        panelBuildifc.setPosition(yPosComponents, 1, 2, 70, 'r');
-        GuiPanelMngBuildIfc box;
-        bzrComponentBox[iComponent] = box = panelBuildifc.createCompositeBox();
-        box.selectPanel("$");
-        box.setPosition(0, 0, 2, 2, 'r');
-        switchButton = box.addSwitchButton("selectMain", switchExcluder.switchAction, "", null, null, "", "wh", "rd");
-        switchExcluder.add(switchButton);
-        box.setPosition(0, 3, 2, 2, 'r');
-        switchButton = box.addSwitchButton("select", null, "", null, null, "", "wh", "rd");
-        switchExcluder.add(switchButton);
-        box.setPosition(0, 6, 2, 30, 'r');
-        box.addText(sName, 'B', 0);
-        String sBzrStatus = data.uBzrStatusOutput.toString();
-        boolean isModified = sBzrStatus.indexOf("modified:") >=0;
-        boolean hasNew = sBzrStatus.indexOf("non-versioned:") >=0;
-        if(isModified){
-          //bzrComponentBox[iComponent].setPosition(0, 40, 2, 10, 'r');
-          box.addText("- modified", 'B', 0xff0000);
-        } else if(hasNew){
-          //bzrComponentBox[iComponent].setPosition(0, 40, 2, 10, 'r');
-          box.addText("- new Files", 'B', 0xff0000);
-        } else {
-          box.addText("- no changes", 'B', 0x00ff00);
-        }
-        yPosComponents +=2;
-        iComponent +=1;
-      }
-    }
-  };
-
   void stop(){} //debug helper
 
 
