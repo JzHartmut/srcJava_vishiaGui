@@ -15,6 +15,7 @@ public interface GuiPanelMngWorkingIfc
 
   /**The version history of this interface:
    * <ul>
+   * <li>2011-05-08 Hartmut new; {@link #cmdClear} used to clear a whole swt.Table, commonly using: clear a content of widget.
    * <li>2011-05-01 Hartmut new: {@link #cmdInsert} etc now here. 
    * <li>2011-05-01 Hartmut new: {@link #setInfo(WidgetDescriptor, int, int, Object)} as adequate method
    *     to {@link #insertInfo(String, int, String) but without symbolic addressing of the widget.
@@ -28,6 +29,8 @@ public interface GuiPanelMngWorkingIfc
   final static int cmdInsert = 0xadd;     //add
   
   final static int cmdSet = 0x5ed;     //add
+  
+  final static int cmdClear = 0xc1ea3;     //add
   
   final static int cmdBackColor = 0xbacc0103;     //add
   

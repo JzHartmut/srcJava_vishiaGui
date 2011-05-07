@@ -121,7 +121,8 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
 	/**Version, able to read as hex yyyymmdd.
 	 * Changes:
 	 * <ul>
-	 * <li>2010-12-02 Hartmut: in method insertInfo((): call of checkAdmissibility() for some input parameter, 
+	 * <li>2011-05-08 Hartmut new; {@link GuiPanelMngWorkingIfc#cmdClear} used to clear a whole swt.Table, commonly using: clear a content of widget.
+   * <li>2010-12-02 Hartmut: in method insertInfo((): call of checkAdmissibility() for some input parameter, 
 	 *     elsewhere exceptions may be possible on evaluating the inserted info in doBeforeDispatching().
 	 *     There the causer isn't found quickly while debugging.
 	 * <li>2010-12-02 Hartmut: Up to now this version variable, its description contains the version history.
@@ -1307,13 +1308,15 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
       if(action !=null){
         Table table = (Table)source;
         int select  = table.getSelectionIndex();
-        TableItem[] tableItem = table.getSelection();
-        int zColumns = tableItem.length;
-        String[] content = new String[zColumns];
-        for(int ii=0; ii < zColumns; ++ii){
-          content[ii] = tableItem[ii].toString();  //content of the table item
-        }
         if(keyEv.keyCode == 0x0d){ //Enter-key pressed:
+          TableItem[] tableItem = table.getSelection();
+          int zColumns = tableItem.length;
+          String[] content = new String[zColumns];
+          for(int ii=0; ii < zColumns; ++ii){
+            String text= tableItem[ii].getText();  //first column? TODO
+            String text2= tableItem[ii].getText(0);
+            content[ii] = text;  //content of the table item
+          }
           action.userActionGui("ok", widgetDescr, content);    
         } else if(keyEv.keyCode == SWT.KeyUp 
                  && source instanceof Table && select == 0){
@@ -1545,23 +1548,34 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
    */
   private final GuiDispatchCallbackWorker dispatchListener = new GuiDispatchCallbackWorker()
   {
-  	void changeTable(Table table, int ident, String content)
-  	{
-  		String[] sLine = content.split("\t");
-			TableItem item = new TableItem(table, SWT.NONE);
-	  	item.setText(sLine);
+    void changeTable(Table table, int ident, String content)
+    {
+      String[] sLine = content.split("\t");
+      TableItem item = new TableItem(table, SWT.NONE);
+      item.setText(sLine);
       table.showItem(item);
-	  	ScrollBar scroll = table.getVerticalBar();
+      //set the scrollbar downward
+      ScrollBar scroll = table.getVerticalBar();
       if(scroll !=null){
-	      int maxScroll = scroll.getMaximum();
-	      log.sendMsg(0, "TEST scroll=%d", maxScroll);
-	      //scroll.setSelection(maxScroll);
+        int maxScroll = scroll.getMaximum();
+        log.sendMsg(0, "TEST scroll=%d", maxScroll);
+        //scroll.setSelection(maxScroll);
       }  
       //table.set
       table.redraw(); //update();
-  	 
-  	}
-  	
+     
+    }
+    
+    
+    void clearTable(Table table, int ident)
+    {
+      if(ident <0){ table.removeAll();}
+      else { table.remove(ident); }
+      table.redraw(); //update();
+    }
+    
+    
+    
   	
   	boolean done = true;
 
@@ -1596,7 +1610,9 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
 	  	  		Table table = (Table)oWidget;
 	  	  		switch(changeReq.cmd){
 	  	  		case GuiPanelMngWorkingIfc.cmdInsert: changeTable(table, changeReq.ident, (String)changeReq.info); break;
-	  	  		default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", changeReq.cmd, descr.name);
+	  	  		case GuiPanelMngWorkingIfc.cmdSet: changeTable(table, changeReq.ident, (String)changeReq.info); break;
+	  	  		case GuiPanelMngWorkingIfc.cmdClear: clearTable(table, changeReq.ident); break;
+            default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", changeReq.cmd, descr.name);
 	  	  		}
 	  	  	} else if(oWidget instanceof Text){ 
 	  	  		Text field = (Text)oWidget;

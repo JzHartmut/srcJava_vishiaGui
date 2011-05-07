@@ -4,7 +4,6 @@ import java.io.File;
 
 import org.vishia.mainCmd.Report;
 import org.vishia.mainGui.GuiPanelMngBuildIfc;
-import org.vishia.mainGui.SwitchExclusiveButtonMng;
 import org.vishia.mainGui.UserActionGui;
 import org.vishia.mainGui.WidgetDescriptor;
 import org.vishia.util.FileSystem;
@@ -32,9 +31,7 @@ public class GuiCommitPanel
    * It will be called in the GUI-Thread.
    */
   void initGui()
-  { int xposProjectPath = 0, yposProjectPath=5; 
-  
-    panelBuildifc.selectPanel("Commit");
+  { panelBuildifc.selectPanel("Commit");
     panelBuildifc.setPosition(2,0, 30, 70, 'r');
     panelBuildifc.addTextBox(widgdCommitText, true, null, ' '); // "commit Text", 't');
     

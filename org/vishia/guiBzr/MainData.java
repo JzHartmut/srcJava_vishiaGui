@@ -1,5 +1,7 @@
 package org.vishia.guiBzr;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainGui.GuiMainAreaifc;
 import org.vishia.mainGui.GuiPanelMngBuildIfc;
@@ -10,6 +12,8 @@ public class MainData
   
   final MainCmd_ifc mainCmdifc;
 
+  MainAction mainAction;
+  
   GuiPanelMngWorkingIfc panelAccess;
   
   GuiMainAreaifc guifc;
@@ -25,7 +29,7 @@ public class MainData
   /**Only one command invocation should be active in one time. */
   final ProcessBuilder cmdMng = new ProcessBuilder("");
   
-  
+  private final ConcurrentLinkedQueue<Runnable> ordersBackground =new ConcurrentLinkedQueue<Runnable>();
 
   /**Data of the currently selected component.
    * 
@@ -38,6 +42,37 @@ public class MainData
     this.mainCmdifc = mainCmd;
     getterStatus = new BzrGetStatus(mainCmd, this);
 
+  }
+  
+  
+  void addOrderBackground(Runnable order)
+  {
+    ordersBackground.add(order);
+    synchronized(ordersBackground){
+      ordersBackground.notify();
+    }
+  }
+  
+  
+  /**Gets a order. Waits a defined time, then returns also if no order is given.
+   * @return
+   */
+  Runnable awaitOrderBackground(int timeout)
+  {
+    Runnable order;
+    if(ordersBackground.isEmpty()){
+      try{ 
+        synchronized(ordersBackground)
+        { ordersBackground.wait(timeout); }
+      } 
+      catch (InterruptedException e){}
+    }
+    if(!ordersBackground.isEmpty()){
+      order = ordersBackground.poll();
+    } else {
+      order = null;
+    }
+    return order;
   }
   
   

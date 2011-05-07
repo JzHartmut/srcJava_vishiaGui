@@ -1,6 +1,7 @@
 package org.vishia.guiBzr;
 
 import java.io.File;
+import java.util.List;
 
 /**This class contains all data from the Source-Archive of one component. 
  * @author Hartmut Schorrig
@@ -35,6 +36,14 @@ public class DataCmpn
   StringBuilder uBzrLastVersion = new StringBuilder();
   /**General error output of all commands. */
   StringBuilder uBzrError = new StringBuilder();
+  
+  List<File> listModifiedFiles;
+  
+  List<File> listRemovedFiles;
+  
+  List<File> listNewFiles;
+  
+  List<File> listAddFiles;
   
   public File getBzrLocationDir(){ return fileBzrLocation; }
   

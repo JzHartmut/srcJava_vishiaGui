@@ -34,6 +34,7 @@ public class BzrGui
 
   final MainData mainData;
 
+  //final MainAction mainAction;
 
   /**The command-line-arguments may be stored in an extra class, which can arranged in any other class too. 
    * The separation of command line argument helps to invoke the functionality with different calls, 
@@ -89,9 +90,11 @@ public class BzrGui
   private GuiPanelMngSwt panelMng;
 
   
-  GuiStatusPanel guiStatusPanel;
+  final GuiStatusPanel guiStatusPanel;
 
-  GuiCommitPanel guiCommitPanel;
+  final GuiCommitPanel guiCommitPanel;
+  
+  final GuiFilesDiffPanel guiFilesDiffPanel;
   
   /**ctor for the main class of the application. 
    * The main class can be created in some other kinds as done in static main too.
@@ -141,6 +144,10 @@ public class BzrGui
     //creates the panel classes in constructor, don't initialize the GUI yet.
     guiStatusPanel = new GuiStatusPanel(mainData, panelBuildifc);
     guiCommitPanel = new GuiCommitPanel(mainData, panelBuildifc);
+    guiFilesDiffPanel = new GuiFilesDiffPanel(mainData, panelBuildifc);
+    
+    mainData.mainAction = new MainAction(mainData, guiStatusPanel, guiCommitPanel, guiFilesDiffPanel);
+    
     
     //create the basic appearance of the GUI. The execution sets dlgAccess:
     gui.addDispatchListener(initGuiDialog);
@@ -226,6 +233,8 @@ public class BzrGui
   };
 
 
+  
+ 
   /**Code snippet to run the ZBNF-configurator (text controlled GUI)
    * 
    */
@@ -250,7 +259,8 @@ public class BzrGui
         //dialogZbnfConfigurator.configureWithZbnf("Sample Gui", fileGui, panelBuildIfc);
         guiStatusPanel.initGui();
         guiCommitPanel.initGui();
-        
+        guiFilesDiffPanel.initGui();
+          
       }  
       catch(Exception exception)
       { //catch the last level of error. No error is reported direct on command line!
@@ -268,17 +278,15 @@ public class BzrGui
 
 
 
-
-  
   
 
   void execute()
   {
     while(gui.isRunning())
-    { try{ Thread.sleep(100);} 
-    catch (InterruptedException e)
-    { //dialogZbnfConfigurator.terminate();
-    }
+    { Runnable order = mainData.awaitOrderBackground(1000);
+      if(order !=null){
+        order.run();
+      }
     }
 
   }

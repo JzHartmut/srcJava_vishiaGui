@@ -37,7 +37,9 @@ public class GuiStatusPanel
   private WidgetDescriptor selectorProjectPathTable;
   
   
-  private GuiPanelMngBuildIfc[] bzrComponentBox = new GuiPanelMngBuildIfc[10]; 
+  /**Any component has its PanelManager. It is one line with some widgets.
+   */
+  private GuiPanelMngBuildIfc[] bzrComponentBox = new GuiPanelMngBuildIfc[100]; 
 
   private InfoBox testDialogBox;
 
@@ -46,7 +48,7 @@ public class GuiStatusPanel
    * GUI-concept: This is an alternative to TODO
    * 
    */
-  private SwitchExclusiveButtonMng switchExcluder = new SwitchExclusiveButtonMng();
+  private SwitchExclusiveButtonMng switchExcluder;
   
 
   public GuiStatusPanel(MainData mainData, GuiPanelMngBuildIfc panelBuildifc)
@@ -91,7 +93,9 @@ public class GuiStatusPanel
     selectorProjectPath.addButton("closeProjectBzrComponents", actionCloseProjectBzrComponents, "","","","ok");
     
     mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0,"/home/hartmut/vishia/GUI");
-    mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, Integer.MAX_VALUE,"line2");
+    mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0,"/home/hartmut/vishia/bazaarGui");
+    mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0,"/home/hartmut/vishia/Java2C/sf/Java2C");
+    mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0,"/home/hartmut/vishia/ZBNF/sf/ZBNF");
     
   }
   
@@ -107,6 +111,11 @@ public class GuiStatusPanel
   
   
   
+  /**Action if a line is confirmed or up command on top line is invoked.
+   * If a line is confirmed, the path is set to {@link #widgdProjektpath}.
+   * If the top line is leaved, the table will be closed.
+   * 
+   */
   private final UserActionGui actionSelectorProjectPathTable = new UserActionGui()
   { 
     public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
@@ -143,6 +152,7 @@ public class GuiStatusPanel
           panelBuildifc.remove(item); 
         }
       }
+      switchExcluder = new SwitchExclusiveButtonMng();
       mainData.getterStatus.getBzrLocations(sProjectPath);
       int yPosComponents = 10;
       int iComponent = 0;
@@ -192,7 +202,8 @@ public class GuiStatusPanel
     public void userActionGui(String sCmd, WidgetDescriptor<?> widgd, Object... values)
     {
       mainData.currCmpn = mainData.currPrj.selectComponent(widgd.sDataPath);
-      stop();
+      mainData.addOrderBackground(mainData.mainAction.initNewComponent);
+      
       //call the exclusion of the other button:
       switchExcluder.switchAction.userActionGui(sCmd, widgd, values);
     }
