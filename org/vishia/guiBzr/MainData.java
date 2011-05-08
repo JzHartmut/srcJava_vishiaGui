@@ -1,5 +1,8 @@
 package org.vishia.guiBzr;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.mainCmd.MainCmd_ifc;
@@ -25,6 +28,9 @@ public class MainData
   DataCmpn currCmpn;
   
   final BzrGetStatus getterStatus;
+  
+  final DateFormat dateFormatShowingFull =      new SimpleDateFormat("yy-MM-dd  HH:mm");
+  final DateFormat dateFormatShowingHour =     new SimpleDateFormat("HH:mm");
   
   /**Only one command invocation should be active in one time. */
   final ProcessBuilder cmdMng = new ProcessBuilder("");
@@ -73,6 +79,26 @@ public class MainData
       order = null;
     }
     return order;
+  }
+  
+  
+  /**Formats the given date into a String using 'yesterday' and 'today' if possible
+   * @param date 
+   * @return 
+   */
+  String formatTimestampYesterday(long date)
+  { String ret;
+    Date date1 = new Date(date);
+    long millisecPerday = 24*3600*1000;
+    long dateToday = System.currentTimeMillis() / millisecPerday * millisecPerday;
+    if(date >= dateToday && date < dateToday + millisecPerday){
+      ret = "   today  " + dateFormatShowingHour.format(date1);
+    } else if(date >= dateToday - millisecPerday && date < dateToday){
+      ret = "yesterday " + dateFormatShowingHour.format(date1);
+    } else {
+      ret = dateFormatShowingFull.format(date1);
+    }
+    return ret;
   }
   
   

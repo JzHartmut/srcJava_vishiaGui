@@ -37,13 +37,13 @@ public class DataCmpn
   /**General error output of all commands. */
   StringBuilder uBzrError = new StringBuilder();
   
-  List<File> listModifiedFiles;
+  List<DataFile> listModifiedFiles;
   
-  List<File> listRemovedFiles;
+  List<DataFile> listRemovedFiles;
   
-  List<File> listNewFiles;
+  List<DataFile> listNewFiles;
   
-  List<File> listAddFiles;
+  List<DataFile> listAddFiles;
   
   public File getBzrLocationDir(){ return fileBzrLocation; }
   

@@ -27,7 +27,7 @@ public class BzrGetStatus
   private final DateFormat logDateFormat= new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
   
   
-  private List<File> listUnknownFiles = new LinkedList<File>();
+  private List<DataFile> listUnknownFiles = new LinkedList<DataFile>();
   
   public BzrGetStatus(MainCmd_ifc mainCmdifc, MainData mainData)
   { this.mainCmdifc = mainCmdifc;
@@ -90,19 +90,24 @@ public class BzrGetStatus
     StringBuilder uStatus = data.uBzrStatusOutput;
     String sLine;
     listUnknownFiles.clear();
-    List<File> listFiles = listUnknownFiles;
+    List<DataFile> listFiles = listUnknownFiles;
     int posLine = 0, posLineEnd;
     int pos;
     while( (posLineEnd = uStatus.indexOf("\n", posLine))>=0){
       sLine = uStatus.substring(posLine, posLineEnd);
       if( (pos = sLine.indexOf("modified:"))>=0){
-        listFiles = data.listModifiedFiles = new LinkedList<File>();
+        listFiles = data.listModifiedFiles = new LinkedList<DataFile>();
       } else if( (pos = sLine.indexOf("unknown:"))>=0){
-        listFiles = data.listNewFiles = new LinkedList<File>();
+        listFiles = data.listNewFiles = new LinkedList<DataFile>();
       } else {
         //line with a file path
-        File file = new File(sLine.trim());
-        listFiles.add(file);
+        String sFilePath = sLine.trim();
+        if(sFilePath.endsWith("*")){
+          sFilePath = sFilePath.substring(0, sFilePath.length()-1).trim();
+        }
+        File file = new File(mainData.currCmpn.fileBzrLocation, sFilePath);
+        DataFile fileData = new DataFile(file, sFilePath);
+        listFiles.add(fileData);
       }
       posLine = posLineEnd +1;    
     }
