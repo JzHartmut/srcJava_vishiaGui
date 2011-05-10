@@ -55,7 +55,6 @@ import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
@@ -288,11 +287,11 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
   
   
   /**Index of all input fields to access symbolic for all panels. */
-  private final Map<String, WidgetDescriptor<?>> indexNameWidgets = new TreeMap<String, WidgetDescriptor<?>>();
+  final Map<String, WidgetDescriptor<?>> indexNameWidgets = new TreeMap<String, WidgetDescriptor<?>>();
 
   /**Index of all input fields to access symbolic. NOTE: The generic type of WidgetDescriptor is unknown,
    * because the set is used independently from the graphic system. */
-  private final Map<String, WidgetDescriptor<?>> showFields = new TreeMap<String, WidgetDescriptor<?>>();
+  final Map<String, WidgetDescriptor<?>> showFields = new TreeMap<String, WidgetDescriptor<?>>();
 
   //private final IndexMultiTable showFieldsM;
 
@@ -587,7 +586,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
   /**Places a current component with knowledge of the current positions and the spreads of the component on graphic.
    * @param component The component to place.
    */
-  private void setBounds_(Control component)
+  void setBounds_(Control component)
   { setPosAndSize_(component);
   	//setBounds_(component, 0,0, 0, 0);
   }
@@ -1203,141 +1202,15 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   }
 
 	
-	Table testTable;
-  
   @Override public WidgetDescriptor addTable(String sName, int height, int[] columnWidths)
   {
-  	boolean TEST = false;
-  	final Table table;
-  	table = new Table((Composite)currPanel.panelComposite, SWT.FULL_SELECTION);
-  	testTable = table;
-  	table.addKeyListener(new TableKeyListerner(null));
-  	table.setFont(this.propertiesGui.stdInputFont);
-  	//table.setColumnSelectionAllowed(true);
-  	//table.setRowHeight(2 * this.propertiesGui.xPixelUnit());
-  	//Container widget = new Container();
-  	int width=0;
-  	int xPixel = propertiesGui.xPixelUnit();
-  	for(int ixw=0; ixw<columnWidths.length; ++ixw){
-  		int columnWidth = columnWidths[ixw];
-  		width += columnWidth;
-  		int columnWidthPixel = columnWidth * xPixel;
-  		TableColumn tColumn = new TableColumn(table, 0, ixw);
-  		tColumn.setWidth(columnWidthPixel);
-  		//tColumn.setHeaderValue("Test"+ixw);
-  		tColumn.setWidth(columnWidthPixel);
-  	}
-  	int widthPixel = width * xPixel;
-  	int heightPixel = height * propertiesGui.yPixelUnit();
-  	table.setSize(widthPixel, heightPixel);
-  	if(TEST){
-  		String[] sColumnTitle = { "A", "B", "C"};
-    	String[][] contentTest = {{ "a", "b", "c"}, { "0", "1", "2"}, { "ikkkkkkkk", "j", "k"}, { "r", "s", "t"}, { "x", "y", "z"}};
-    	for (int i = 0; i < contentTest.length; i++) {
-    		TableItem item = new TableItem(table, SWT.NONE);
-    		item.setText(contentTest[i]);
-    	}
-    }
-  	
-  	/*
-  	for (int i = 0; i < tableInfo.length; i++) {
-  		TableItem item = new TableItem(table, SWT.NONE);
-  		item.setText(tableInfo[i]);
-  	}
-  	*/
-  	
-  	/*
-    	JTableHeader header= table.getTableHeader();
-  	Dimension dimHeader = header.getPreferredSize();
-  	header.setBounds(0,0, dimHeader.width, dimHeader.height);
-  	widget.add(header);
-  	//Rectangle boundsHeader = header.getBounds();
-  	Dimension size = table.getPreferredSize();
-    //not sensitive: table.setBounds(0,dimHeader.height, size.width, size.height + 200);
-  	JScrollPane tablePane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-  	tablePane.setBounds(0,dimHeader.height, widthPixel, heightPixel - dimHeader.height);
-    widget.add(tablePane);
-  	setBounds_(widget);
-  	//Point diff = new Point(0, boundsHeader.height);
-  	//setBounds_(table, diff);
-   	guiContent.add(widget);
-   */
-  	setBounds_(table);
-  	WidgetDescriptor widgd = new WidgetDescriptor<Control>(sName, table, 'L', sName, null);
-  	widgd.setPanelMng(this);
-  	table.setData(widgd);
-  	indexNameWidgets.put(sName, widgd);
-  	return widgd;
+    return TableSwt.addTable(this, sName, height, columnWidths, -1, null);
   }
   
-  
-  /**A Table is completed with a special key listener. On some keys and situation 
-   * the {@link UserActionGui} given in the WidgetDescriptor is called. 
-   * The following keys are detected:
-   * <ul><li>Enter: "ok" Selection of a line or cell in the table
-   * <li>KeyUp on the first line: "upleave": Leave the table.
-   * <ul>
-   * The 
-   *
-   */
-  class TableKeyListerner implements KeyListener
+  @Override public WidgetDescriptor addTable(String sName, int height, int[] columnWidths, int selectionColumn, CharSequence selectionText)
   {
-    final KeyListener basicListener;
-
-    
-    
-    public TableKeyListerner(KeyListener basicListener)
-    {
-      this.basicListener = basicListener;
-    }
-
-    @Override
-    public void keyPressed(KeyEvent keyEv)
-    {
-      final WidgetDescriptor widgetDescr;
-      final UserActionGui action;
-      final Object source = keyEv.getSource();
-      if(source instanceof Control){
-        Object oData = ((Control)source).getData();
-        if(oData instanceof WidgetDescriptor){
-          widgetDescr = (WidgetDescriptor)oData;
-          action = widgetDescr.action;
-        } else { widgetDescr = null; action = null; }
-        } else { widgetDescr = null; action = null;
-      }
-      if(action !=null){
-        Table table = (Table)source;
-        int select  = table.getSelectionIndex();
-        if(keyEv.keyCode == 0x0d){ //Enter-key pressed:
-          TableItem[] tableItem = table.getSelection();
-          int zColumns = tableItem.length;
-          String[] content = new String[zColumns];
-          for(int ii=0; ii < zColumns; ++ii){
-            String text= tableItem[ii].getText();  //first column? TODO
-            String text2= tableItem[ii].getText(0);
-            content[ii] = text;  //content of the table item
-          }
-          action.userActionGui("ok", widgetDescr, content);    
-        } else if(keyEv.keyCode == SWT.KeyUp 
-                 && source instanceof Table && select == 0){
-          action.userActionGui("upleave", widgetDescr, (Object)null);    
-        }
-      }
-      stop();
-      //basicListener.keyPressed(arg0);
-      
-    }
-
-    @Override
-    public void keyReleased(KeyEvent arg0)
-    {
-      //basicListener.keyReleased(arg0);
-      
-    }
-    
-  };
-  
-  
+    return TableSwt.addTable(this, sName, height, columnWidths, selectionColumn, selectionText);
+  }
   
   public void repaint()
   {
@@ -1586,10 +1459,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   	@Override public void doBeforeDispatching(boolean onlyWakeup)
   	{ if(!done){
   		  done=true;
-				String[] contentTest = { "test", "b", "c"};
-				TableItem item = new TableItem(testTable, SWT.NONE);
-		  	item.setText(contentTest);
-  	  }
+			}
   	  GuiChangeReq changeReq;
   	  while( (changeReq = mngBase.guiChangeRequests.poll()) != null){
   	  	WidgetDescriptor<?> descr = changeReq.widgetDescr;

@@ -209,6 +209,22 @@ public interface GuiPanelMngBuildIfc
    */
   WidgetDescriptor addTable(String sName, int height, int[] columnWidths);
 
+  /**Adds a table which supports selection of some lines.
+   * Parameter see {@link #addTable(String, int, int[])}.
+   * Additional parameter:
+   * @param selectionColumn Column in which the selection is written. 
+   * @param selectionText Text which is written in the selection-column cell. 
+   *        If the selection alternates, the text is replaced by an empty String.
+   *        The String can be changed outside if this parameter refers to a StringBuilder-buffer
+   *        and thats content is changed. The currently text will be used. 
+   * @return
+   * TODO it may be better to use a derived WidgetDescriptorSelection, which contain a method
+   *      setSelectionAction(UserActionGui) or maybe using setAction() for a standard action...
+   *      The action may receive the line and sends back an information to change.
+   *      It should be able to applicate to a tree-leafe too! See {@link WidgetGui_ifc}.
+   */
+  WidgetDescriptor addTable(String sName, int height, int[] columnWidths, int selectionColumn, CharSequence selectionText);
+
   /**Adds a simple text at the current position.
    * 
    * @param sText The text

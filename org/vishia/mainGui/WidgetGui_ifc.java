@@ -1,0 +1,20 @@
+package org.vishia.mainGui;
+
+
+/**This interface should support changing of widget of the underlying GUI.
+ * It can be implemented by GUI-special classes, especially for Lines of tables or nodes of a tree.
+ * @author Hartmut Schorrig
+ *
+ */
+public interface WidgetGui_ifc
+{
+
+  void setBackgroundColor(ColorGui_ifc color);
+  
+  void setForegroundColor(ColorGui_ifc color);
+  
+  String getText();
+  
+  String setText(String text);
+  
+}

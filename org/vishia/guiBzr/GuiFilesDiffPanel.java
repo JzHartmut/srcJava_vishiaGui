@@ -35,14 +35,14 @@ public class GuiFilesDiffPanel
   void initGui()
   { panelBuildifc.selectPanel("FilesDiff");
     panelBuildifc.setPosition(2,0, 30, 60, 'r');
-    int[] columnWidths = {40, 10, 10};
+    int[] columnWidths = {40, 10, 2,8};
     
-    widgdTableFilesCmpn = panelBuildifc.addTable("selectProjectPath", 20, columnWidths);
-    //selectorProjectPathTable.setAction(actionSelectFile);
+    widgdTableFilesCmpn = panelBuildifc.addTable("selectProjectPath", 20, columnWidths, 2, "*");
+    widgdTableFilesCmpn.setAction(actionTableLineFile);
     panelBuildifc.setPosition(2, 61, 3, 9, 'd');
-    panelBuildifc.addButton("closeProjectBzrComponents", actionViewFile, "","","","view");
-    panelBuildifc.addButton("closeProjectBzrComponents", actionViewFile, "","","","diff");
-    panelBuildifc.addButton("closeProjectBzrComponents", actionViewFile, "","","","add");
+    panelBuildifc.addButton("closeProjectBzrComponents", actionTableLineFile, "","","","view");
+    panelBuildifc.addButton("closeProjectBzrComponents", actionTableLineFile, "","","","diff");
+    panelBuildifc.addButton("closeProjectBzrComponents", actionTableLineFile, "","","","add");
     
   }
     
@@ -66,13 +66,17 @@ public class GuiFilesDiffPanel
   
   
   
-  private final UserActionGui actionViewFile = new UserActionGui()
+  private final UserActionGui actionTableLineFile = new UserActionGui()
   { 
     public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
     {
-      
+      stop();
     }
   };
 
 
+  
+  void stop(){}
+  
+  
 }

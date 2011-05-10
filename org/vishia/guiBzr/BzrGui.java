@@ -443,7 +443,8 @@ public class BzrGui
     //gui.exit();
     bOk = false;  //not exiting, show error in GUI
     }
-  
+    try{ Thread.sleep(100);} catch(InterruptedException exc){}
+    
     //String ipcFactory = "org.vishia.communication.InterProcessComm_Socket";
     //try{ ClassLoader.getSystemClassLoader().loadClass(ipcFactory, true);
     //}catch(ClassNotFoundException exc){
