@@ -2,8 +2,10 @@ package org.vishia.guiBzr;
 
 import java.io.File;
 
+import org.vishia.mainGui.ColorGui;
 import org.vishia.mainGui.GuiPanelMngBuildIfc;
 import org.vishia.mainGui.GuiPanelMngWorkingIfc;
+import org.vishia.mainGui.TableLineGui_ifc;
 import org.vishia.mainGui.UserActionGui;
 import org.vishia.mainGui.WidgetDescriptor;
 
@@ -21,7 +23,11 @@ public class GuiFilesDiffPanel
   private WidgetDescriptor widgdTableFilesCmpn;
   
 
+  private static final int columnMark = 2;
   
+  private static final ColorGui colorMarked = new ColorGui(128,255, 128);  //light green
+  
+  private static final ColorGui colorNonMarked = new ColorGui(255,255, 255);  //white
   
   public GuiFilesDiffPanel(MainData mainData, GuiPanelMngBuildIfc panelBuildifc)
   {
@@ -37,7 +43,7 @@ public class GuiFilesDiffPanel
     panelBuildifc.setPosition(2,0, 30, 60, 'r');
     int[] columnWidths = {40, 10, 2,8};
     
-    widgdTableFilesCmpn = panelBuildifc.addTable("selectProjectPath", 20, columnWidths, 2, "*");
+    widgdTableFilesCmpn = panelBuildifc.addTable("selectProjectPath", 20, columnWidths);
     widgdTableFilesCmpn.setAction(actionTableLineFile);
     panelBuildifc.setPosition(2, 61, 3, 9, 'd');
     panelBuildifc.addButton("closeProjectBzrComponents", actionTableLineFile, "","","","view");
@@ -70,6 +76,17 @@ public class GuiFilesDiffPanel
   { 
     public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
     {
+      if(sCmd.equals("mark")){
+        TableLineGui_ifc line = (TableLineGui_ifc) values[0];
+        String isMarked = line.getCellText(columnMark);
+        if(isMarked.length() >0) {
+          line.setCellText("", columnMark);
+          line.setBackgroundColor(colorNonMarked);
+        } else {
+          line.setCellText("*", columnMark);
+          line.setBackgroundColor(colorMarked);
+        } 
+      }
       stop();
     }
   };

@@ -1204,13 +1204,9 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
 	
   @Override public WidgetDescriptor addTable(String sName, int height, int[] columnWidths)
   {
-    return TableSwt.addTable(this, sName, height, columnWidths, -1, null);
+    return TableSwt.addTable(this, sName, height, columnWidths);
   }
   
-  @Override public WidgetDescriptor addTable(String sName, int height, int[] columnWidths, int selectionColumn, CharSequence selectionText)
-  {
-    return TableSwt.addTable(this, sName, height, columnWidths, selectionColumn, selectionText);
-  }
   
   public void repaint()
   {

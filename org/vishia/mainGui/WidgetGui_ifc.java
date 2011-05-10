@@ -9,9 +9,9 @@ package org.vishia.mainGui;
 public interface WidgetGui_ifc
 {
 
-  void setBackgroundColor(ColorGui_ifc color);
+  ColorGui setBackgroundColor(ColorGui color);
   
-  void setForegroundColor(ColorGui_ifc color);
+  ColorGui setForegroundColor(ColorGui color);
   
   String getText();
   

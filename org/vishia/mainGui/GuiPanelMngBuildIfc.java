@@ -223,7 +223,7 @@ public interface GuiPanelMngBuildIfc
    *      The action may receive the line and sends back an information to change.
    *      It should be able to applicate to a tree-leafe too! See {@link WidgetGui_ifc}.
    */
-  WidgetDescriptor addTable(String sName, int height, int[] columnWidths, int selectionColumn, CharSequence selectionText);
+  //WidgetDescriptor addTable(String sName, int height, int[] columnWidths, int selectionColumn, CharSequence selectionText);
 
   /**Adds a simple text at the current position.
    * 

@@ -5,13 +5,16 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.vishia.mainGui.ColorGui_ifc;
+import org.vishia.mainGui.ColorGui;
+import org.vishia.mainGui.TableLineGui_ifc;
 import org.vishia.mainGui.UserActionGui;
 import org.vishia.mainGui.WidgetDescriptor;
 import org.vishia.mainGui.WidgetGui_ifc;
@@ -23,15 +26,15 @@ public class TableSwt
   
   private final GuiPanelMngSwt mng;
   
-  private final int selectionColumn;
-  private final CharSequence selectionText;
+  //private final int selectionColumn;
+  //private final CharSequence selectionText;
   
   public TableSwt(GuiPanelMngSwt mng, Composite parent,  int height
-      , int[] columnWidths, int selectionColumn, CharSequence selectionText)
+      , int[] columnWidths) //, int selectionColumn, CharSequence selectionText)
   {
     this.mng = mng;
-    this.selectionColumn = selectionColumn;
-    this.selectionText = selectionText;
+    //this.selectionColumn = selectionColumn;
+    //this.selectionText = selectionText;
     this.table = new Table(parent, 0) ; //, SWT.FULL_SELECTION); //| SWT.CHECK);
     //Note: the SWT.CHECK produces a checkbox at left side of any table line. It is not usual.
     //A line would be checked by pressing space-key. But it is pressed twice, an exception is thrown (?)
@@ -98,14 +101,14 @@ public class TableSwt
   
   
   public static WidgetDescriptor addTable(GuiPanelMngSwt mng, String sName, int height, int[] columnWidths
-  , int selectionColumn, CharSequence selectionText    
+  //, int selectionColumn, CharSequence selectionText    
   )
   {
     
     boolean TEST = false;
     final TableSwt table;
     Composite parent = (Composite)mng.currPanel.panelComposite;
-    table = new TableSwt(mng, parent, height, columnWidths, selectionColumn, selectionText);
+    table = new TableSwt(mng, parent, height, columnWidths); //, selectionColumn, selectionText);
     WidgetDescriptor widgd = new WidgetDescriptor<Control>(sName, table.table, 'L', sName, null);
     widgd.setPanelMng(mng);
     table.table.setData(widgd);
@@ -183,10 +186,10 @@ public class TableSwt
         Table table = (Table)source;
         int ixRow  = table.getSelectionIndex();
         TableItem line = table.getItem(ixRow);
-        WidgetGui_ifc widgetifc = (WidgetGui_ifc)line.getData();
-        if(widgetifc == null){
-          widgetifc = new TableItemWidget(line);
-          line.setData(widgetifc);
+        TableLineGui_ifc lineGui = (TableLineGui_ifc)line.getData();
+        if(lineGui == null){
+          lineGui = new TableItemWidget(line);
+          line.setData(lineGui);
         }
         if(keyEv.keyCode == 0x0d){ //Enter-key pressed:
           TableItem[] tableItem = table.getSelection();
@@ -201,7 +204,11 @@ public class TableSwt
         } else if(keyEv.keyCode == SWT.KeyUp 
                  && source instanceof Table && ixRow == 0){
           action.userActionGui("upleave", widgetDescr, (Object)null);    
-        } else if(keyEv.character == ' ' && selectionColumn >=0){
+        } else if(keyEv.character == ' '){
+          action.userActionGui("mark", widgetDescr, lineGui);    
+            
+          /*
+          && selectionColumn >=0){
           String selected = line.getText(selectionColumn);
           if(selected.length() >0) {
             line.setText(selectionColumn, "");
@@ -213,6 +220,7 @@ public class TableSwt
           }
           //table.setSelection(select);
           stop();
+          */
         }
         //if(table.)
       }
@@ -231,25 +239,36 @@ public class TableSwt
   };
   
   
-  static class TableItemWidget implements WidgetGui_ifc
+  /**An instance of this class is assigned to any TableItem.
+   * It supports the access to the TableItem (it is a table line) via the SWT-independent interface.
+   * The instance knows its TableSwt and therefore the supports the access to the whole table.
+   *
+   */
+  class TableItemWidget implements TableLineGui_ifc
   {
     final TableItem item;
     public TableItemWidget(TableItem item)
     { this.item = item;
     }
     
+    
     @Override
-    public void setBackgroundColor(ColorGui_ifc color)
-    {
-      // TODO Auto-generated method stub
-      
+    public ColorGui setBackgroundColor(ColorGui color)
+    { ColorGui oldColor = PropertiesGuiSwt.createColorGui(item.getBackground());
+      Color colorSwt = mng.propertiesGui.color(color.getColorValue());
+      item.setBackground(colorSwt);
+      return oldColor;
     }
+    
     @Override
-    public void setForegroundColor(ColorGui_ifc color)
-    {
-      // TODO Auto-generated method stub
-      
+    public ColorGui setForegroundColor(ColorGui color)
+    { ColorGui oldColor = PropertiesGuiSwt.createColorGui(item.getForeground());
+      Color colorSwt = mng.propertiesGui.color(color.getColorValue());
+      item.setForeground(colorSwt);
+      return oldColor;
     }
+    
+    
     @Override
     public String getText()
     {
@@ -261,6 +280,20 @@ public class TableSwt
     {
       // TODO Auto-generated method stub
       return null;
+    }
+
+    @Override
+    public String getCellText(int column)
+    {
+      return item.getText(column);
+    }
+
+    @Override
+    public String setCellText(String text, int column)
+    {
+      String sOldtext = item.getText(column);
+      item.setText(column, text);
+      return sOldtext;
     }
     
   }

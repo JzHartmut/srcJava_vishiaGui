@@ -7,6 +7,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.RGB;
+import org.vishia.mainGui.ColorGui;
 import org.vishia.mainGui.PropertiesGui;
 
 
@@ -57,6 +59,25 @@ public class PropertiesGuiSwt extends PropertiesGui
     this.textFont[9] = new Font(device, "Arial", stdTextFontSize[9][size], SWT.NORMAL);
   }
   
+  /**Returns a color with given Gui-independent color.
+   * The SWT-Color instance is taken from a pool if the color is used already.
+   * Elsewhere it is created newly and put into the pool.
+   * @param color The given color in system-indpending form.
+   * @return An instance of SWT-color
+   */
+  public Color color(ColorGui color)
+  {
+    int colorValue = color.getColorValue();
+    return color(colorValue);
+  }
+  
+  
+  /**Returns a color with given numeric color value.
+   * The SWT-Color instance is taken from a pool if the color is used already.
+   * Elsewhere it is created newly and put into the pool.
+   * @param colorValue red, green and blue
+   * @return An instance of SWT-color
+   */
   public Color color(int colorValue){
   	Color color;
   	if(colorValue >=0 && colorValue < 0x1000000){
@@ -71,10 +92,30 @@ public class PropertiesGuiSwt extends PropertiesGui
   	return color;
   }
   
+  /**Returns a color with given Gui-independent color name.
+   * The SWT-Color instance is taken from a pool if the color is used already.
+   * Elsewhere it is created newly and put into the pool.
+   * @param sColorName One of the registered color names.
+   * @return An instance of SWT-color
+   */
+  
   public Color color(String sColorname)
   { int nColor = getColorValue(sColorname);
     return color(nColor);
   }
+  
+  
+  /**Creates an instance of a GUI-system independent color with given SWT color.
+   * @param color The SWT-color
+   * @return a new instance.
+   */
+  public static ColorGui createColorGui(Color color)
+  { RGB rgb = color.getRGB();
+    ColorGui ret = new ColorGui(rgb.red, rgb.green, rgb.blue);
+    return ret;
+  }
+  
+
   
   public Font getTextFont(int ySize, int ySizeFrac)
   {
