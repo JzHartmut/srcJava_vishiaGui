@@ -21,6 +21,12 @@ public class SwitchExclusiveButtonMng implements VariableAccess_ifc
     }
   }
   
+  public void remove(WidgetDescriptor widgd)
+  {
+    listSwitchButtons.remove(widgd);
+  }
+  
+  
   public SwitchExclusiveButtonMng() //GuiPanelMngWorkingIfc mng)
   { //this.mng = mng;
   }

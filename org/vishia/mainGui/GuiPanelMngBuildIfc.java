@@ -232,7 +232,7 @@ public interface GuiPanelMngBuildIfc
    * @param color The color as RGB-value in 3 Byte. 0xffffff is white, 0xff0000 is red.
    * @return
    */
-  Object addText(String sText, char size, int color);
+  WidgetDescriptor addText(String sText, char size, int color);
   
   Object addImage(String sName, InputStream imageStream, int height, int width, String sCmd);
 
@@ -367,7 +367,8 @@ public interface GuiPanelMngBuildIfc
 	int getColorValue(String sName);
 	
 
-  
+  /**Forces a newly paint of the GUI-container. 
+   * This method should only be called in the graphic thread (SWT).*/
   void repaint();
   
   /**Registered a user action for a button. The register of the action should be done

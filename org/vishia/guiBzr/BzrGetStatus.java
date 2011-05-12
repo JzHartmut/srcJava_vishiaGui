@@ -38,7 +38,7 @@ public class BzrGetStatus
 
   /**Searches all locations of source-archives in the current project folder and all sub folders.
    * A project means a software project with some sources consisting of some Components with its own archives.
-   * @calls {@link #captureStatus(int)} for all found software-archives.
+   * @calls {@link #captureStatus(DataCmpn)} for all found software-archives.
    * @param sProjectPath Path to the project folder.
    * 
    */
@@ -53,7 +53,6 @@ public class BzrGetStatus
     for(File fileBzr: listBzrDirs){
       File bzrLocation = fileBzr.getParentFile();
       int ixCmpn = mainData.currPrj.createComponentsData(bzrLocation);
-      captureStatus(ixCmpn);
       ixCmpn +=1;
     }
   }
@@ -68,9 +67,9 @@ public class BzrGetStatus
    * It fills the indexed instance of {@link DataCmpn}
    * @param ixData The index of the component, index in {@link #data}
    */
-  void captureStatus(int ixData)
+  void captureStatus(DataCmpn data)
   {
-    DataCmpn data = mainData.currPrj.data[ixData];    
+    //DataCmpn data = mainData.currPrj.data[ixData];    
     mainData.cmdMng.directory(data.fileBzrLocation);      
     mainCmdifc.executeCmdLine(mainData.cmdMng, "bzr status", null, Report.info, data.uBzrStatusOutput, data.uBzrError);
     mainCmdifc.executeCmdLine(mainData.cmdMng, "bzr log -l 1", null, Report.info, data.uBzrLastVersion, data.uBzrError);

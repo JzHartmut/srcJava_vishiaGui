@@ -15,6 +15,17 @@ import org.vishia.mainGuiSwt.InfoBox;
  */
 public class GuiStatusPanel
 {
+  
+  private static class SelectInfoBoxWidgds
+  {
+    final GuiPanelMngBuildIfc box;
+    final DataCmpn data;
+    WidgetDescriptor widgdTextRevision, widgdTextStatus;
+    
+    SelectInfoBoxWidgds(GuiPanelMngBuildIfc box, DataCmpn data)
+    { this.box = box; this.data = data; }
+    
+  }
 
   /**Aggregation to the main data of the GUI. */
   final MainData mainData;
@@ -49,6 +60,9 @@ public class GuiStatusPanel
    * 
    */
   private SwitchExclusiveButtonMng switchExcluder;
+  
+  /**Save the switchButtons to remove it when the widget is removed. */ 
+  private WidgetDescriptor[] switchButtons;
   
 
   public GuiStatusPanel(MainData mainData, GuiPanelMngBuildIfc panelBuildifc)
@@ -100,6 +114,106 @@ public class GuiStatusPanel
   }
   
   
+  /**Removes all existing GUI-container for selection and info of the components.
+   * It is called if a new project is selected. 
+   */
+  private void cleanComponentsInfoSelectBoxes()
+  {
+    if(bzrComponentBox !=null){
+      panelBuildifc.selectPanel("Select");
+      for(int ii=0; ii< bzrComponentBox.length; ++ii){
+        GuiPanelMngBuildIfc item = bzrComponentBox[ii]; 
+        if(item !=null){ 
+          bzrComponentBox[ii] = null;
+          panelBuildifc.remove(item); 
+        }
+      }
+    }
+  }
+  
+  
+  /**Builds all select and info GUI-components for all source-components of the given project.
+   * 
+   */
+  private void buildComponentsInfoSelectBoxes()
+  {
+    String sProjectPath = widgdProjektpath.getValue();
+    //
+    mainData.getterStatus.getBzrLocations(sProjectPath);
+    //
+    cleanComponentsInfoSelectBoxes();
+    switchExcluder = new SwitchExclusiveButtonMng();
+    switchButtons = new WidgetDescriptor[mainData.currPrj.data.length];
+    //
+    //Only one of the switch buttons are checked. If another button is pressed, it should be deselect.
+    //The switchExcluder helps to do so. 
+    //It contains a special method, which captures the text of the last pressed switch button. 
+    for(int ixCmpn = 0; ixCmpn < mainData.currPrj.data.length; ++ixCmpn){
+      createComponentsInfoSelectBox(ixCmpn);
+    }
+  }
+  
+  
+  
+  private void createComponentsInfoSelectBox(int iComponent)
+  { int yPosComponents = 10 + 2* iComponent;
+    if(bzrComponentBox[iComponent]!=null){
+      panelBuildifc.remove(bzrComponentBox[iComponent]);
+    }
+    DataCmpn data = mainData.currPrj.data[iComponent]; 
+    String sName = data.getBzrLocationDir().getName();
+    panelBuildifc.selectPanel("Select");
+    panelBuildifc.setPosition(yPosComponents, 1, 2, 70, 'r');
+    GuiPanelMngBuildIfc box;
+    bzrComponentBox[iComponent] = box = panelBuildifc.createCompositeBox();
+    SelectInfoBoxWidgds widgds = new SelectInfoBoxWidgds(box,data);
+    box.selectPanel("$");
+    box.setPosition(0, 0, 2, 2, 'r');
+    if(switchButtons[iComponent] !=null){
+      switchExcluder.remove(switchButtons[iComponent]);
+    }
+    WidgetDescriptor widgdButton = box.addSwitchButton("selectMain", actionSelectCmpn, "", null, data.sNameCmpn, "", "wh", "rd");
+    switchExcluder.add(widgdButton);
+    widgdButton.setContentInfo(widgds);
+    switchButtons[iComponent] = widgdButton;
+    box.setPosition(0, 6, 2, 15, 'r');
+    box.addText(sName, 'B', 0);
+    widgds.widgdTextRevision = box.addText("Rev. unknown", 'B', 0x808080);
+    widgds.widgdTextStatus = box.addText("- select it", 'B', 0x808080);
+    
+  }
+  
+  
+  private void setInfoWidgetsInSelectBox(SelectInfoBoxWidgds widgds)
+  {
+    widgds.box.remove(widgds.widgdTextRevision);
+    widgds.box.remove(widgds.widgdTextStatus);
+    widgds.box.selectPanel("$");
+    widgds.box.setPosition(0, 21, 2, 15, 'r');
+    String sRev = "Rev. ";
+    if(widgds.data.nrTopRev == widgds.data.nrSboxRev){
+      sRev = "Rev. " + widgds.data.nrSboxRev + " uptodate ";
+    } else {
+      sRev = "Rev. " + widgds.data.nrSboxRev + " / "+ widgds.data.nrTopRev;
+    }
+    widgds.widgdTextRevision = widgds.box.addText(sRev, 'B', 0x0);
+    String sBzrStatus = widgds.data.uBzrStatusOutput.toString();
+    boolean isModified = sBzrStatus.indexOf("modified:") >=0;
+    boolean hasNew = sBzrStatus.indexOf("non-versioned:") >=0;
+    if(isModified){
+      //bzrComponentBox[iComponent].setPosition(0, 40, 2, 10, 'r');
+      widgds.widgdTextStatus = widgds.box.addText("- modified", 'B', 0xff0000);
+    } else if(hasNew){
+      //bzrComponentBox[iComponent].setPosition(0, 40, 2, 10, 'r');
+      widgds.widgdTextStatus = widgds.box.addText("- new Files", 'B', 0xff0000);
+    } else {
+      widgds.widgdTextStatus = widgds.box.addText("- no changes", 'B', 0x00ff00);
+    }
+    widgds.box.repaint();
+  }
+  
+  
+  
   private final UserActionGui selectProjectPath = new UserActionGui()
   { 
     public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
@@ -123,6 +237,7 @@ public class GuiStatusPanel
       if(sCmd.equals("ok")){
         String sPath = (String)values[0];
         widgdProjektpath.setValue(GuiPanelMngWorkingIfc.cmdInsert, 0, sPath);
+        buildComponentsInfoSelectBoxes();
       }
       selectorProjectPath.setWindowVisible(false);
     }
@@ -141,67 +256,30 @@ public class GuiStatusPanel
   private final UserActionGui refreshProjectBzrComponents = new UserActionGui()
   { 
     public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
-    {
-      //String sProjectPath = dlgAccess.getValue("projectPath");
-      String sProjectPath = widgdProjektpath.getValue();
-      panelBuildifc.selectPanel("Select");
-      for(int ii=0; ii< bzrComponentBox.length; ++ii){
-        GuiPanelMngBuildIfc item = bzrComponentBox[ii]; 
-        if(item !=null){ 
-          bzrComponentBox[ii] = null;
-          panelBuildifc.remove(item); 
-        }
-      }
-      switchExcluder = new SwitchExclusiveButtonMng();
-      mainData.getterStatus.getBzrLocations(sProjectPath);
-      int yPosComponents = 10;
-      int iComponent = 0;
-      //Only one of the switch buttons are checked. If another button is pressed, it should be deselect.
-      //The switchExcluder helps to do so. 
-      //It contains a special method, which captures the text of the last pressed switch button. 
-      WidgetDescriptor switchButton;
-      for(DataCmpn data: mainData.currPrj.data){
-        String sName = data.getBzrLocationDir().getName();
-        panelBuildifc.selectPanel("Select");
-        panelBuildifc.setPosition(yPosComponents, 1, 2, 70, 'r');
-        GuiPanelMngBuildIfc box;
-        bzrComponentBox[iComponent] = box = panelBuildifc.createCompositeBox();
-        box.selectPanel("$");
-        box.setPosition(0, 0, 2, 2, 'r');
-        switchButton = box.addSwitchButton("selectMain", actionSelectCmpn, "", null, data.sNameCmpn, "", "wh", "rd");
-        switchExcluder.add(switchButton);
-        box.setPosition(0, 6, 2, 15, 'r');
-        box.addText(sName, 'B', 0);
-        String sRev = "Rev. ";
-        if(data.nrTopRev == data.nrSboxRev){
-          sRev = "Rev. " + data.nrSboxRev + " uptodate ";
-        } else {
-          sRev = "Rev. " + data.nrSboxRev + " / "+ data.nrTopRev;
-        }
-        box.addText(sRev, 'B', 0x0);
-        String sBzrStatus = data.uBzrStatusOutput.toString();
-        boolean isModified = sBzrStatus.indexOf("modified:") >=0;
-        boolean hasNew = sBzrStatus.indexOf("non-versioned:") >=0;
-        if(isModified){
-          //bzrComponentBox[iComponent].setPosition(0, 40, 2, 10, 'r');
-          box.addText("- modified", 'B', 0xff0000);
-        } else if(hasNew){
-          //bzrComponentBox[iComponent].setPosition(0, 40, 2, 10, 'r');
-          box.addText("- new Files", 'B', 0xff0000);
-        } else {
-          box.addText("- no changes", 'B', 0x00ff00);
-        }
-        yPosComponents +=2;
-        iComponent +=1;
-      }
+    { buildComponentsInfoSelectBoxes();
     }
   };
 
+  
+  
   private final UserActionGui actionSelectCmpn = new UserActionGui()
   { 
     public void userActionGui(String sCmd, WidgetDescriptor<?> widgd, Object... values)
     {
       mainData.currCmpn = mainData.currPrj.selectComponent(widgd.sDataPath);
+      //
+      //gets the status of the components archive in the GUI-action,
+      //because the appearance of the GUI should be updated:
+      mainData.getterStatus.captureStatus(mainData.currCmpn);
+      //
+      //Build the GUI widgets for this project new:
+      //it is an example for dynamic GUI appearance. 
+      //Here it may be possible too to set only other information to the given widgets.
+      SelectInfoBoxWidgds widgds = (SelectInfoBoxWidgds)widgd.getContentInfo();
+      setInfoWidgetsInSelectBox(widgds);
+      //
+      //Gets all information about files in background.
+      //It is necessary in another panel (Files & Diff).
       mainData.addOrderBackground(mainData.mainAction.initNewComponent);
       
       //call the exclusion of the other button:

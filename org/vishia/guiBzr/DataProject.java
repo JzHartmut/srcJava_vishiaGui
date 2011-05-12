@@ -4,9 +4,13 @@ import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.vishia.mainGui.UserActionGui;
+
 /**This class contains or refers all data of a project.
  * A project is a software project which contains one or more archives of sources.
- * Each source-file-bundle with its archive presents a component.
+ * Each source-file-bundle with its archive presents a component and 
+ * it is arranged in a sub directory of the project folder.
+ * 
  * @author Hartmut Schorrig
  *
  */
@@ -15,12 +19,21 @@ public class DataProject
 
   String sPrjPath;
   
+  /**The project path in the current file system. */
   File filePrjPath;
   
-  Map<String, DataCmpn> indexCmpn = new TreeMap<String, DataCmpn>();
+  /**All components in this project. The key is the local path from the project folder
+   * to the folder, where the source archive (.bzr or .git) is arranged.
+   * The key is the same like {@link DataCmpn#sNameCmpn}.
+   */
+  private Map<String, DataCmpn> indexCmpn = new TreeMap<String, DataCmpn>();
   
+  /**All source components in this project. It will be ascertained while [refresh] button is pressed
+   * on the select panel. See {@link GuiStatusPanel#refreshProjectBzrComponents}
+   */
   DataCmpn[] data;
   
+  /**ix while initialize the data. At last number of data -1 (last index). */
   private int ixDataInit;
 
   DataProject(String sPrjPath)
@@ -29,6 +42,9 @@ public class DataProject
     assert(filePrjPath.exists() && filePrjPath.isDirectory());
   }
   
+  /**Initializes newly. It is called on refresh.
+   * @param nrofSwArchives
+   */
   void init(int nrofSwArchives)
   {
     data = new DataCmpn[nrofSwArchives];
@@ -36,6 +52,10 @@ public class DataProject
     ixDataInit = -1;
   }
   
+  /**Creates one component.
+   * @param dirComponent The folder where the source archive (.bzr, .git file) is found.
+   * @return index of current component in {@link #data}
+   */
   int createComponentsData(File dirComponent)
   {
     DataCmpn data1 = new DataCmpn(dirComponent);
@@ -46,6 +66,10 @@ public class DataProject
   
   
   
+  /**Searches a component.
+   * @param sName The local folder path inside the software project to the components folder.
+   * @return null if it isn't found.
+   */
   DataCmpn selectComponent(String sName)
   {
     DataCmpn data = indexCmpn.get(sName);

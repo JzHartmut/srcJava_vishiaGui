@@ -725,7 +725,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
   
   
   
-  public Label addText(String sText, char size, int color)
+  public WidgetDescriptor addText(String sText, char size, int color)
   {
   	Label widget = new Label((Composite)currPanel.panelComposite, 0);
   	widget.setForeground(propertiesGui.color(color));
@@ -747,7 +747,8 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
   	}
   	widget.setSize(textSize);
   	//guiContent.add(widget);
-  	return widget;
+  	WidgetDescriptor widgd = new WidgetDescriptor(sText, widget, 'S');
+  	return widgd;
   }
 
   
@@ -1212,7 +1213,8 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   {
   	//Point size = graphicFrame.getSize();
   	//graphicFrame.redraw(0,0,size.x, size.y, true);
-  	graphicFrame.update();
+  	graphicFrame.redraw();
+    graphicFrame.update();
   	
   	//((Composite)currPanel.panelComposite).update();
   	//((Composite)currPanel.panelComposite).redraw();

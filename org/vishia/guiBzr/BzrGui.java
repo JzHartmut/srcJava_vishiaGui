@@ -129,7 +129,7 @@ public class BzrGui
     }
     PropertiesGuiSwt propertiesGui = new PropertiesGuiSwt(gui.getDisplay(), sizePixel);
     LogMessage log = gui.getLogMessageOutputConsole();
-    //try{ Thread.sleep(100);} catch(InterruptedException exc){}
+    try{ Thread.sleep(500);} catch(InterruptedException exc){}
     panelMng = new GuiPanelMngSwt(null, gui.getContentPane(), 120,80, propertiesGui, null, log);
     
     mainData = new MainData(gui);
