@@ -43,7 +43,7 @@ public class PropertiesGuiSwt extends PropertiesGui
     this.colorBlack = new Color(guiDevice, 0,0,0);
     this.colorGrid = colorSwt(0xe0e0e0);
     this.colorGridStrong = colorSwt(0xc0c0c0);
-    this.colorBackground = colorSwt(0xeeeeee);
+    this.colorBackground = colorSwt(colorBackground_);
     this.smallPromptFont = new Font(device, "Arial", smallPromptFontSize[size], SWT.ITALIC);
     this.stdInputFont = new Font(device, "Arial", stdInputFontSize[size], SWT.NORMAL);
     this.stdButtonFont = new Font(device, "Arial", stdButtonFontSize[size], SWT.NORMAL);
@@ -109,6 +109,7 @@ public class PropertiesGuiSwt extends PropertiesGui
     return colorSwt(nColor);
   }
   
+  public Color colorBackgroundSwt(){ return colorSwt(colorBackground_); }
   
   /**Creates an instance of a GUI-system independent color with given SWT color.
    * @param color The SWT-color

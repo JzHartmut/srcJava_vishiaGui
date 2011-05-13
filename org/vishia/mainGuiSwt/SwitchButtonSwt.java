@@ -36,12 +36,12 @@ public class SwitchButtonSwt extends ButtonSwt
 	
 	public void setColorPressed(int colorPressed)
 	{
-		this.colorPressed = mng.propertiesGui.colorSwt(colorPressed);
+		this.colorPressed = mng.propertiesGuiSwt.colorSwt(colorPressed);
 	}
 	
 	public void setColorReleased(int colorReleased)
 	{
-		this.colorReleased = mng.propertiesGui.colorSwt(colorReleased);
+		this.colorReleased = mng.propertiesGuiSwt.colorSwt(colorReleased);
 	}
 	
 	

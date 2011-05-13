@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-//import org.eclipse.swt.widgets.Composite;
 
 /**This class describes the one panel with its content for managing. */
 public class PanelContent

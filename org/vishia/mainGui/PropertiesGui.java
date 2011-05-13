@@ -3,7 +3,6 @@ package org.vishia.mainGui;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.eclipse.swt.graphics.Color;
 import org.vishia.bridgeC.IllegalArgumentExceptionJc;
 
 public class PropertiesGui
@@ -81,6 +80,10 @@ public class PropertiesGui
 
   Map<Integer, ColorGui> colors = new TreeMap<Integer, ColorGui>();
 
+  /**A common background color for all widgets which are paint at the background. */
+  public ColorGui colorBackground_;
+
+  
   /**The size of this propety set.*/
   protected final int size;
 
@@ -91,6 +94,7 @@ public class PropertiesGui
   	this.size = size; 
     this.xPixelUnit = xPixelUnit_[size];
     setColorNames();
+    colorBackground_ = color(0xeeeeee);
 	}
   
 

@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainGui.GuiPanelMngWorkingIfc;
 import org.vishia.mainGui.UserActionGui;
+import org.vishia.mainGui.WidgetCmpnifc;
 import org.vishia.mainGui.WidgetDescriptor;
 
 public class SampleGuiSwtButtonInput 
@@ -177,7 +178,11 @@ public class SampleGuiSwtButtonInput
     
 		//Composite dlgContainer = new Composite(mainCmd.getContentPane(), 0);
 		Color colorBackground = propertiesGui.colorSwt(0xeeeeee);
-	  
+		
+		WidgetCmpnifc dlgContainer = mainCmd.createGridPanel(  
+        propertiesGui.colorBackground_
+        , propertiesGui.xPixelUnit(), propertiesGui.yPixelUnit(), 5, 5);
+    
 		Composite dlgContainer = new GridPanelSwt(mainCmd.getContentPane(), 0, colorBackground, propertiesGui.xPixelUnit(), propertiesGui.yPixelUnit(), 10,10);
 	  dlg = new GuiPanelMngSwt(null, mainCmd.getContentPane(), 300,200, propertiesGui, null, mainCmd.getLogMessageOutputConsole());
 	  dlg.registerPanel("test", dlgContainer);

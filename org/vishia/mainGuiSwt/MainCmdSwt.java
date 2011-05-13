@@ -61,6 +61,9 @@ import org.eclipse.swt.widgets.Text;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainGui.GuiDispatchCallbackWorker;
 import org.vishia.mainGui.GuiMainAreaifc;
+import org.vishia.mainGui.TextBoxGuifc;
+import org.vishia.mainGui.WidgetCmpnifc;
+import org.vishia.mainGui.Widgetifc;
 import org.vishia.util.MinMaxTime;
 import org.vishia.windows.WindowMng;
 
@@ -172,7 +175,7 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
   };
 	
   /**All main components of the Display in each FrameArea. */
-  private Control[][] componentFrameArea = new Control[3][3];
+  private Widgetifc[][] componentFrameArea = new Widgetifc[3][3];
 
   /**A little control to capture the mouse position for movement of area borders. */
   private Control[] yAreaMover = new Control[2];
@@ -226,7 +229,7 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
   final protected StringBuffer sbWriteInfo = new StringBuffer(1000);  //max. 1 line!
   
   /** If it is set, the writeInfo is redirected to this.*/
-  protected Text textAreaOutput = null;
+  protected TextBoxGuifc textAreaOutput = null;
   
   /**The file menuBar is extendable. */
   private Menu menuBar;
@@ -571,7 +574,7 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
    * @param y1p percent from left for first horizontal divide line.
    * @param y2p percent from left for first horizontal divide line.
    */
-  public void setFrameAreaBorders(int x1p, int x2p, int y1p, int y2p)
+  @Override public void setFrameAreaBorders(int x1p, int x2p, int y1p, int y2p)
   { xpFrameArea[0] = 0;
     xpFrameArea[1] = (byte)x1p;
     xpFrameArea[2] = (byte)x2p;
@@ -625,7 +628,7 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
 	 * @param component The component.
 	 * @throws IndexOutOfBoundsException if the arguments are false or the area is occupied already.
 	 */
-	public final Control addFrameArea(int xArea, int yArea, int dxArea, int dyArea, Control component)
+	@Override public final void addFrameArea(int xArea, int yArea, int dxArea, int dyArea, Widgetifc component)
 	throws IndexOutOfBoundsException
 	{ //int idxArea = (x -1) + 3 * (y -1);
 	  //Composite component = new Composite(graphicFrame, SWT.NONE);
@@ -664,8 +667,8 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
 	  if(bStarted)
 	  { validateFrameAreas();
 	  }
-	  component.addMouseListener(mouseListener);
-	  return component;
+	  ((Control)component.getWidget()).addMouseListener(mouseListener);
+	  //return component;
 	}
 
 	
@@ -773,7 +776,7 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
   /**Adds a listener, which will be called in the dispatch loop.
    * @param listener
    */
-  public void addDispatchListener(GuiDispatchCallbackWorker listener)
+  @Override public void addDispatchListener(GuiDispatchCallbackWorker listener)
   { dispatchListeners.add(listener);
 		//it is possible that the GUI is busy with dispatching and doesn't sleep yet.
     //therefore:
@@ -952,12 +955,12 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
    */
   protected void addOutputFrameArea(int xArea, int yArea, int dxArea, int dyArea)
   { int widgetStyle = SWT.H_SCROLL | SWT.V_SCROLL;
-  	textAreaOutput = new Text(graphicFrame, widgetStyle);
+  	textAreaOutput = new WidgetsSwt.TextBoxSwt(graphicFrame, widgetStyle);
     //textAreaPos = new Position(textAreaOutput);
     //textAreaPos.x = x; textAreaPos.y = y; textAreaPos.dx = dx; textAreaPos.dy = dy; 
     //textAreaOutput.setSize(350,100); //graphicFrame.get)
     //textAreaOutput.setBounds(x, y, dx,dy);
-    textAreaOutput.setFont(new Font(guiDevice, "Monospaced",11, SWT.NORMAL));
+    ((WidgetsSwt.TextBoxSwt)textAreaOutput).text.setFont(new Font(guiDevice, "Monospaced",11, SWT.NORMAL));
     textAreaOutput.append("output...\n");
     //textAreaOutputPane = new JScrollPane(textAreaOutput, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
     //pane.setSize(800,300);
@@ -1013,11 +1016,12 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
 
     for(int idxArea = 0; idxArea <= 2; idxArea++)
     { for(int idyArea = 0; idyArea <= 2; idyArea++)
-      { Control component = componentFrameArea[idyArea][idxArea];
+      { Widgetifc component = componentFrameArea[idyArea][idxArea];
         if(component !=null)
-        { setBoundsForFrameArea(idxArea, idyArea);
-          component.update();
-          component.redraw();
+        { Control control = (Control)component.getWidget();
+          setBoundsForFrameArea(idxArea, idyArea);
+          control.update();
+          control.redraw();
     } } }
     for(int ixMover = 0; ixMover < yAreaMover.length; ++ixMover){
     	if(yAreaMover[ixMover] != null){
@@ -1143,7 +1147,7 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
     int yp = (int)(yf1  * pixelPerYpercent);
     int dxp = (int) ((xf2-xf1) * pixelPerXpercent);
     int dyp = (int) ((yf2-yf1) * pixelPerYpercent);
-    Control component = componentFrameArea[idyArea][idxArea];
+    Control component = (Control)componentFrameArea[idyArea][idxArea].getWidget();
     component.setBounds(xp,yp,dxp,dyp-6);
   }
   
@@ -1159,13 +1163,9 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
 	      { textAreaOutput.append("\n");
 	      }
 	      textAreaOutput.append(sInfo);
-	      int nrofLines = textAreaOutput.getLineCount();
+	      int nrofLines = textAreaOutput.getNrofLines();
+	      textAreaOutput.viewTrail();
 	      //textAreaOutput.setCaretPosition(nrofLines-1);
-	      ScrollBar scroll = textAreaOutput.getVerticalBar();
-	      if(scroll !=null){
-		      int maxScroll = scroll.getMaximum();
-		      scroll.setSelection(maxScroll);
-	      }  
 	      graphicFrame.update();
       } else {  
         //queue the text
@@ -1188,11 +1188,8 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
   protected void writeErrorDirectly(String sInfo, Exception exception)
   { if(textAreaOutput != null)
     { textAreaOutput.append("\nEXCEPTION: " + sInfo + exception.getMessage());
-    	//textAreaOutput.setCaretPosition(textAreaOutput.getLineCount());
-    ScrollBar scroll = textAreaOutput.getVerticalBar();
-    int maxScroll = scroll.getMaximum();
-    scroll.setSelection(maxScroll);
-    graphicFrame.update();
+      textAreaOutput.viewTrail();
+      graphicFrame.update();  //update in TextBox...
     }
     else super.writeErrorDirectly(sInfo, exception);     
   }

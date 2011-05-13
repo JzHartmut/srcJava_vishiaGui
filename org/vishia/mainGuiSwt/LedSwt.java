@@ -36,8 +36,8 @@ public class LedSwt extends Canvas
 		case 'q': round = false; break;
 		default: throw new IllegalArgumentException("param size must be r or q");
 		}
-		borderColor = mng.propertiesGui.color("yellow");
-		innerColor = mng.propertiesGui.color("green");
+		borderColor = mng.propertiesGuiSwt.color("yellow");
+		innerColor = mng.propertiesGuiSwt.color("green");
 		this.mng = mng;
 		
 	  addPaintListener(paintListener);	
@@ -61,21 +61,21 @@ public class LedSwt extends Canvas
 	
 	void setColor(int color)
 	{
-		borderColor = innerColor = mng.propertiesGui.colorSwt(color);
+		borderColor = innerColor = mng.propertiesGuiSwt.colorSwt(color);
 		redraw();
 	}
 	
 	void setColor(String sColor)
 	{
-		borderColor = innerColor = mng.propertiesGui.color(sColor);
+		borderColor = innerColor = mng.propertiesGuiSwt.color(sColor);
 		redraw();
 	}
 	
 	
 	void setColor(int nBorderColor, int nInnerColor)
 	{
-		borderColor = mng.propertiesGui.colorSwt(nBorderColor);
-		innerColor = mng.propertiesGui.colorSwt(nInnerColor);
+		borderColor = mng.propertiesGuiSwt.colorSwt(nBorderColor);
+		innerColor = mng.propertiesGuiSwt.colorSwt(nInnerColor);
 		redraw();
 	}
 	

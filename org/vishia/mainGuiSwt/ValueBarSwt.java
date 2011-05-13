@@ -36,15 +36,15 @@ public class ValueBarSwt extends ValueBar implements GuiSetValueIfc
     super(mng);
     this.mng = mng;
 		this.widget = this.new BarWidget();		
-		this.widget.setBackground(mng.propertiesGui.colorBackground);
+		this.widget.setBackground(mng.propertiesGuiSwt.colorBackgroundSwt());
   	//Control xx = mng.currPanel.panelComposite;
-		black = mng.propertiesGui.colorSwt(0);
+		black = mng.propertiesGuiSwt.colorSwt(0);
 		//white = mng.propertiesGui.color(0xffffff);
 		//colorValueOk = mng.propertiesGui.color(0xff4000);
 		//colorValueMinLimit = mng.propertiesGui.color(0xff4000);
 		//colorValueMaxLimit = mng.propertiesGui.color(0xff4000);
 		colorBorder = new Color[1];  //at least 1 color, if not parametrized
-		colorBorder[0] = mng.propertiesGui.color("red");
+		colorBorder[0] = mng.propertiesGuiSwt.color("red");
 	}
 
   @Override public void redraw()
@@ -59,7 +59,7 @@ public class ValueBarSwt extends ValueBar implements GuiSetValueIfc
   	colorBorder = new Color[sColorBorder.length];
   	int ix = -1;
   	for(String sColor: sColorBorder){
-  		colorBorder[++ix] = mng.propertiesGui.color(sColor);
+  		colorBorder[++ix] = mng.propertiesGuiSwt.color(sColor);
   	}
   }
 	

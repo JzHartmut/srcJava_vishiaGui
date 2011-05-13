@@ -6,7 +6,7 @@ package org.vishia.mainGui;
  * @author Hartmut Schorrig
  *
  */
-public interface WidgetGui_ifc
+public interface WidgetGui_ifc extends Widgetifc
 {
 
   ColorGui setBackgroundColor(ColorGui color);

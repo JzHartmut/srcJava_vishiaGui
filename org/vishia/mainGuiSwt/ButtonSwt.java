@@ -46,14 +46,14 @@ public class ButtonSwt extends Canvas
 		this.widgd = widgd;
 		//super((Composite)mng.currPanel.panelComposite, 0);  //Canvas
 		switch(size){ 
-		case 'A': fontText = mng.propertiesGui.stdInputFont; break;
-		case 'B': fontText = mng.propertiesGui.stdButtonFont; break;
+		case 'A': fontText = mng.propertiesGuiSwt.stdInputFont; break;
+		case 'B': fontText = mng.propertiesGuiSwt.stdButtonFont; break;
 		default: throw new IllegalArgumentException("param size must be A or B");
 		}
 		//Control xx = mng.currPanel.panelComposite;
 		this.mng = mng;
-		black = mng.propertiesGui.colorSwt(0);
-		white = mng.propertiesGui.colorSwt(0xffffff);
+		black = mng.propertiesGuiSwt.colorSwt(0);
+		white = mng.propertiesGuiSwt.colorSwt(0xffffff);
 		
 	  addPaintListener(paintListener);	
 	}

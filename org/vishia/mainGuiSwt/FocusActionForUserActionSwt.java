@@ -37,7 +37,7 @@ implements FocusListener
   , String sCmdRelease
   )
   { this.guiMng = guiMng;
-  	this.propertiesGui = guiMng.propertiesGui;
+  	this.propertiesGui = guiMng.propertiesGuiSwt;
   	this.sCmdEnter = sCmdEnter;
     this.sCmdRelease = sCmdRelease;
     this.userAction = userCmdGui;

@@ -8,6 +8,7 @@ import java.util.TreeMap;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.mainCmd.Report;
+import org.vishia.mainGuiSwt.PropertiesGuiSwt;
 import org.vishia.msgDispatch.LogMessage;
 
 /**This is the base class of the GuiPanelMng for several Graphic-Adapters (Swing, SWT etc.). 
@@ -35,6 +36,10 @@ public abstract class GuiPanelMngBase<WidgetTYPE> implements GuiPanelMngBuildIfc
    * This base class contains all common resources to manage panels and windows.
    */
   final protected GuiMngBase mngBase;
+  
+  /**Properties of this Dialog Window. */
+  public  final PropertiesGui propertiesGui;
+
   
   protected final LogMessage log;
   
@@ -101,13 +106,16 @@ public abstract class GuiPanelMngBase<WidgetTYPE> implements GuiPanelMngBuildIfc
   
 	
 	
-  public GuiPanelMngBase(GuiPanelMngBase<?> parent, VariableContainer_ifc variableContainer, LogMessage log)
+  public GuiPanelMngBase(GuiPanelMngBase<?> parent
+      , PropertiesGui props
+      , VariableContainer_ifc variableContainer, LogMessage log)
 	{ this.parent = parent;
 	  if(parent == null){
 	    mngBase = new GuiMngBase();
 	  } else {
 	    mngBase = parent.mngBase;
 	  }
+	  this.propertiesGui = props;
 		this.log = log;
 		this.variableContainer = variableContainer;
 		userActions.put("showWidgetInfos", this.actionShowWidgetInfos);

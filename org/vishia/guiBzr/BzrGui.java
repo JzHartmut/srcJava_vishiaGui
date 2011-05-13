@@ -4,23 +4,21 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.swt.widgets.Control;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.inspector.Inspector;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
+import org.vishia.mainGui.ColorGui;
 import org.vishia.mainGui.GuiDispatchCallbackWorker;
 import org.vishia.mainGui.GuiMainAreaifc;
+import org.vishia.mainGui.GuiPanelMngBase;
 import org.vishia.mainGui.GuiPanelMngBuildIfc;
-import org.vishia.mainGui.GuiPanelMngWorkingIfc;
-import org.vishia.mainGui.GuiShellMngBuildIfc;
-import org.vishia.mainGui.SwitchExclusiveButtonMng;
+import org.vishia.mainGui.PropertiesGui;
 import org.vishia.mainGui.TabPanel;
 import org.vishia.mainGui.UserActionGui;
+import org.vishia.mainGui.WidgetCmpnifc;
 import org.vishia.mainGui.WidgetDescriptor;
-import org.vishia.mainGuiSwt.GridPanelSwt;
 import org.vishia.mainGuiSwt.GuiPanelMngSwt;
-import org.vishia.mainGuiSwt.InfoBox;
 import org.vishia.mainGuiSwt.MainCmdSwt;
 import org.vishia.mainGuiSwt.PropertiesGuiSwt;
 import org.vishia.msgDispatch.LogMessage;
@@ -73,8 +71,8 @@ public class BzrGui
 
 
   /**The GUI. */
-  private final CmdLineAndGui gui;
-
+  private final CmdLineAndGui guix;
+  private final GuiMainAreaifc gui;
 
   /**Panel-Management-interface for the panels. */
   GuiPanelMngBuildIfc panelBuildifc;
@@ -87,7 +85,7 @@ public class BzrGui
 
 
 
-  private GuiPanelMngSwt panelMng;
+  private GuiPanelMngBase panelMng;
 
   
   final GuiStatusPanel guiStatusPanel;
@@ -127,10 +125,10 @@ public class BzrGui
     case 'E': sizePixel = 'E'; break;
     default: sizePixel = 'D'; break;
     }
-    PropertiesGuiSwt propertiesGui = new PropertiesGuiSwt(gui.getDisplay(), sizePixel);
+    PropertiesGui propertiesGui = new PropertiesGuiSwt(gui.getDisplay(), sizePixel);
     LogMessage log = gui.getLogMessageOutputConsole();
-    try{ Thread.sleep(500);} catch(InterruptedException exc){}
-    panelMng = new GuiPanelMngSwt(null, gui.getContentPane(), 120,80, propertiesGui, null, log);
+    try{ Thread.sleep(1000);} catch(InterruptedException exc){}
+    panelMng = new GuiPanelMngSwt(null, gui.getContentPane(), 120,80, (PropertiesGuiSwt)propertiesGui, null, log);
     
     mainData = new MainData(gui);
     
@@ -140,7 +138,7 @@ public class BzrGui
     panelBuildifc = panelMng;
     mainData.panelAccess = panelMng;
   
-    mainData.guifc = this.gui = gui;
+    mainData.guifc = this.gui = this.guix = gui;
     
     //creates the panel classes in constructor, don't initialize the GUI yet.
     guiStatusPanel = new GuiStatusPanel(mainData, panelBuildifc);
@@ -197,7 +195,7 @@ public class BzrGui
    */
   void initGuiWidgets()
   {
-    gui.initGraphic();
+    guix.initGraphic();
     gui.setFrameAreaBorders(20, 80, 60, 85);
 
 
@@ -208,10 +206,10 @@ public class BzrGui
     tabPanel.addGridPanel("Log", "&Log",1,1,10,10);
     tabPanel.addGridPanel("FilesDiff", "&Files && Dif",1,1,10,10);
 
-    gui.addFrameArea(1,1,3,1, (Control)tabPanel.getGuiComponent()); //dialogPanel);
+    gui.addFrameArea(1,1,3,1, tabPanel.getGuiComponent()); //dialogPanel);
     //##
-    GridPanelSwt msgPanel = new GridPanelSwt(gui.getContentPane(), 0
-        , panelMng.propertiesGui.colorBackground
+    WidgetCmpnifc msgPanel = panelMng.createGridPanel(  
+        panelMng.propertiesGui.colorBackground_
         , panelMng.propertiesGui.xPixelUnit(), panelMng.propertiesGui.yPixelUnit(), 5, 5);
     panelMng.registerPanel("msg", msgPanel);
     gui.addFrameArea(1,2,3,1, msgPanel); //dialogPanel);
@@ -245,14 +243,14 @@ public class BzrGui
     @Override public void doBeforeDispatching(boolean onlyWakeup){
       char sizeArg = callingArguments.sSize == null ? 'A' : callingArguments.sSize.charAt(0);
       switch(sizeArg){
-      case 'F':   gui.setTitleAndSize("GUI", 0, 0, -1, -1); break;
-      case 'A': gui.setTitleAndSize("GUI", 500, 100, 800, 600); break;
-      case 'a': gui.setTitleAndSize("GUI", 50, 100, 512, 396); break;
-      case 'b': gui.setTitleAndSize("GUI", 50, 100, 640, 480); break;
-      case 'c': gui.setTitleAndSize("GUI", 50, 100, 800, 600); break;
-      case 'D': gui.setTitleAndSize("GUI", 50, 100, 1024, 768); break;
-      case 'E': gui.setTitleAndSize("GUI", 50, 100, 1200, 1050); break;
-      default: gui.setTitleAndSize("GUI", 500, 100, -1, 800); break;
+      case 'F':   guix.setTitleAndSize("GUI", 0, 0, -1, -1); break;
+      case 'A': guix.setTitleAndSize("GUI", 500, 100, 800, 600); break;
+      case 'a': guix.setTitleAndSize("GUI", 50, 100, 512, 396); break;
+      case 'b': guix.setTitleAndSize("GUI", 50, 100, 640, 480); break;
+      case 'c': guix.setTitleAndSize("GUI", 50, 100, 800, 600); break;
+      case 'D': guix.setTitleAndSize("GUI", 50, 100, 1024, 768); break;
+      case 'E': guix.setTitleAndSize("GUI", 50, 100, 1200, 1050); break;
+      default: guix.setTitleAndSize("GUI", 500, 100, -1, 800); break;
       }
       try { 
         //File fileGui = new File(callingArguments.sFileGui);
@@ -265,9 +263,9 @@ public class BzrGui
       }  
       catch(Exception exception)
       { //catch the last level of error. No error is reported direct on command line!
-        gui.writeError("Uncatched Exception on main level:", exception);
-        gui.writeStackTrace(exception);
-        gui.setExitErrorLevel(MainCmd_ifc.exitWithErrors);
+        guix.writeError("Uncatched Exception on main level:", exception);
+        guix.writeStackTrace(exception);
+        guix.setExitErrorLevel(MainCmd_ifc.exitWithErrors);
       }
       gui.removeDispatchListener(this);    
 
@@ -283,7 +281,7 @@ public class BzrGui
 
   void execute()
   {
-    while(gui.isRunning())
+    while(guix.isRunning())
     { Runnable order = mainData.awaitOrderBackground(1000);
       if(order !=null){
         order.run();
@@ -308,7 +306,7 @@ public class BzrGui
       if(sCmd != null){
         output.setLength(0);
         error.setLength(0);
-        gui.executeCmdLine(processBuilder, widgetInfos.sCmd, null, Report.info, output, error);
+        guix.executeCmdLine(processBuilder, widgetInfos.sCmd, null, Report.info, output, error);
         stop();
         mainData.panelAccess.insertInfo("output", 0, output.toString());
         //gui.executeCmdLine(widgetInfos.sCmd, 0, null, null);

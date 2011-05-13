@@ -52,7 +52,7 @@ implements MouseListener
   , String sCmdDoubleClick
   )
   { super(guiMng);
-  	this.propertiesGui = guiMng.propertiesGui;
+  	this.propertiesGui = guiMng.propertiesGuiSwt;
   	this.sCmdPress = sCmdPress;
     this.sCmdRelease = sCmdRelease;
     this.sCmdDoubleClick = sCmdDoubleClick;

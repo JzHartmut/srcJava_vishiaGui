@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Widget;
 import org.vishia.mainGui.ColorGui;
 import org.vishia.mainGui.TableLineGui_ifc;
 import org.vishia.mainGui.UserActionGui;
@@ -46,7 +47,7 @@ public class TableSwt
     }
     table.addKeyListener(new TableKeyListerner(null));
     table.addSelectionListener(selectionListener);
-    table.setFont(mng.propertiesGui.stdInputFont);
+    table.setFont(mng.propertiesGuiSwt.stdInputFont);
     //table.setColumnSelectionAllowed(true);
     //table.setRowHeight(2 * this.propertiesGui.xPixelUnit());
     //Container widget = new Container();
@@ -251,11 +252,13 @@ public class TableSwt
     { this.item = item;
     }
     
+    @Override public Widget getWidget(){ return item; } 
     
+
     @Override
     public ColorGui setBackgroundColor(ColorGui color)
     { ColorGui oldColor = PropertiesGuiSwt.createColorGui(item.getBackground());
-      Color colorSwt = mng.propertiesGui.colorSwt(color.getColorValue());
+      Color colorSwt = mng.propertiesGuiSwt.colorSwt(color.getColorValue());
       item.setBackground(colorSwt);
       return oldColor;
     }
@@ -263,7 +266,7 @@ public class TableSwt
     @Override
     public ColorGui setForegroundColor(ColorGui color)
     { ColorGui oldColor = PropertiesGuiSwt.createColorGui(item.getForeground());
-      Color colorSwt = mng.propertiesGui.colorSwt(color.getColorValue());
+      Color colorSwt = mng.propertiesGuiSwt.colorSwt(color.getColorValue());
       item.setForeground(colorSwt);
       return oldColor;
     }

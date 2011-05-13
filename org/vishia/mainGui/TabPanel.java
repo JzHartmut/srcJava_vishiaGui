@@ -37,6 +37,6 @@ public abstract class TabPanel
 	abstract public Object addCanvasPanel(String sName, String sLabel);
 	
 	
-	abstract public Object getGuiComponent();
+	abstract public WidgetCmpnifc getGuiComponent();
 	
 }

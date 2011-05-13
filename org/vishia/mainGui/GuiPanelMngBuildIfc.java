@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.swt.graphics.Color;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.mainGui.PanelContent;
 
@@ -400,6 +401,8 @@ public interface GuiPanelMngBuildIfc
    */
   GuiPanelMngBuildIfc createCompositeBox();
   
+  
+  WidgetCmpnifc createGridPanel(ColorGui backGround, int xG, int yG, int xS, int yS);
   
   /**Removes a composite box from the graphic representation.
    * @param compositeBox

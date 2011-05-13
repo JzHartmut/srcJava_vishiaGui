@@ -1,6 +1,7 @@
 package org.vishia.mainGui;
 
-//import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Control;
+
 
 
 /**This interface supports the usage of a window which is divide into 9 areas. 
@@ -55,6 +56,46 @@ public interface GuiMainAreaifc
    */
   final static int version = 0x20110502;
 
+  /**Sets the divisions of the frame. The frame is divide into 9 parts,
+   * where two horizontal and two vertical lines built them:
+   * <pre>
+   * +=======+===============+===========+
+   * |       |               |           | 
+   * +-------+---------------+-----------+ 
+   * |       |               |           | 
+   * |       |               |           | 
+   * +-------+---------------+-----------+ 
+   * |       |               |           | 
+   * |       |               |           | 
+   * +=======+===============+===========+
+   * </pre>
+   * 
+   * @param x1p percent from left for first vertical divide line.
+   * @param x2p percent from left for second vertical divide line.
+   * @param y1p percent from left for first horizontal divide line.
+   * @param y2p percent from left for first horizontal divide line.
+   */
+  void setFrameAreaBorders(int x1p, int x2p, int y1p, int y2p);
+  
+  
+  /**Sets a Component into a defined area. See {@link #setFrameAreaBorders(int, int, int, int)}.
+   * It should be called only in the GUI-Thread.
+   * @param xArea 1 to 3 for left, middle, right
+   * @param yArea 1 to 3 for top, middle, bottom
+   * @param dxArea 1 to 3 for 1 field to 3 fields to right.
+   * @param dyArea 1 to 3 for 1 field to 3 field to bottom
+   * @param component The component.
+   * @throws IndexOutOfBoundsException if the arguments are false or the area is occupied already.
+   */
+  void addFrameArea(int xArea, int yArea, int dxArea, int dyArea, Widgetifc component)
+  throws IndexOutOfBoundsException;
+  
+  
+  /**Adds a listener, which will be called in the dispatch loop.
+   * @param listener
+   */
+  void addDispatchListener(GuiDispatchCallbackWorker listener);
+  
   
   /**Removes a listener, which was called in the dispatch loop.
    * @param listener

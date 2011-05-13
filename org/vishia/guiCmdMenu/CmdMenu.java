@@ -14,6 +14,7 @@ import org.vishia.mainGui.GuiPanelMngBuildIfc;
 import org.vishia.mainGui.GuiPanelMngWorkingIfc;
 import org.vishia.mainGui.TabPanel;
 import org.vishia.mainGui.UserActionGui;
+import org.vishia.mainGui.WidgetCmpnifc;
 import org.vishia.mainGui.WidgetDescriptor;
 import org.vishia.mainGuiSwt.GridPanelSwt;
 import org.vishia.mainGuiSwt.GuiPanelMngSwt;
@@ -211,10 +212,10 @@ GuiDispatchCallbackWorker initGuiDialog = new GuiDispatchCallbackWorker()
     tabPanel.addGridPanel("panel2", "&Panel_" +
             "2",1,1,10,10);
       
-    gui.addFrameArea(1,1,3,1, (Control)tabPanel.getGuiComponent()); //dialogPanel);
+    gui.addFrameArea(1,1,3,1, tabPanel.getGuiComponent()); //dialogPanel);
     //##
-    GridPanelSwt msgPanel = new GridPanelSwt(gui.getContentPane(), 0
-        , panelMng.propertiesGui.colorBackground
+    WidgetCmpnifc msgPanel = panelMng.createGridPanel(  
+        panelMng.propertiesGui.colorBackground_
         , panelMng.propertiesGui.xPixelUnit(), panelMng.propertiesGui.yPixelUnit(), 5, 5);
     panelMng.registerPanel("msg", msgPanel);
     gui.addFrameArea(1,2,3,1, msgPanel); //dialogPanel);

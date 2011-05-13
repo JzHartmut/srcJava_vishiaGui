@@ -6,6 +6,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.mainGui.CanvasStorage;
 import org.vishia.mainGui.ColorGui;
+import org.vishia.mainGui.WidgetCmpnifc;
+import org.vishia.mainGui.Widgetifc;
 
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -14,6 +16,7 @@ import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
 
 /**Class to store some graphical figures to draw it in its {@link #drawBackground(GC, int, int, int, int)}-routine.
@@ -26,7 +29,7 @@ import org.eclipse.swt.widgets.Widget;
  * @author Hartmut Schorrig
  *
  */
-public class CanvasStorePanelSwt extends Canvas // implements CanvasStorePanel //
+public class CanvasStorePanelSwt extends Canvas implements WidgetCmpnifc  //CanvasStorePanel //
 {
 	
 	
@@ -110,6 +113,8 @@ public class CanvasStorePanelSwt extends Canvas // implements CanvasStorePanel /
   }	
 	//};
 	
+  @Override public Control getWidget(){ return this; } 
+  
   void stop(){} //debug
   
 }
