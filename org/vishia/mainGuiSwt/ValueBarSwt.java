@@ -38,7 +38,7 @@ public class ValueBarSwt extends ValueBar implements GuiSetValueIfc
 		this.widget = this.new BarWidget();		
 		this.widget.setBackground(mng.propertiesGui.colorBackground);
   	//Control xx = mng.currPanel.panelComposite;
-		black = mng.propertiesGui.color(0);
+		black = mng.propertiesGui.colorSwt(0);
 		//white = mng.propertiesGui.color(0xffffff);
 		//colorValueOk = mng.propertiesGui.color(0xff4000);
 		//colorValueMinLimit = mng.propertiesGui.color(0xff4000);

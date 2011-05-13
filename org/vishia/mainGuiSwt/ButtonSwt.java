@@ -52,8 +52,8 @@ public class ButtonSwt extends Canvas
 		}
 		//Control xx = mng.currPanel.panelComposite;
 		this.mng = mng;
-		black = mng.propertiesGui.color(0);
-		white = mng.propertiesGui.color(0xffffff);
+		black = mng.propertiesGui.colorSwt(0);
+		white = mng.propertiesGui.colorSwt(0xffffff);
 		
 	  addPaintListener(paintListener);	
 	}

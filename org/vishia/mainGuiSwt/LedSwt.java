@@ -61,7 +61,7 @@ public class LedSwt extends Canvas
 	
 	void setColor(int color)
 	{
-		borderColor = innerColor = mng.propertiesGui.color(color);
+		borderColor = innerColor = mng.propertiesGui.colorSwt(color);
 		redraw();
 	}
 	
@@ -74,8 +74,8 @@ public class LedSwt extends Canvas
 	
 	void setColor(int nBorderColor, int nInnerColor)
 	{
-		borderColor = mng.propertiesGui.color(nBorderColor);
-		innerColor = mng.propertiesGui.color(nInnerColor);
+		borderColor = mng.propertiesGui.colorSwt(nBorderColor);
+		innerColor = mng.propertiesGui.colorSwt(nInnerColor);
 		redraw();
 	}
 	

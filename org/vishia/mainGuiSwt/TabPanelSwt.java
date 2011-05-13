@@ -48,7 +48,7 @@ public class TabPanelSwt extends TabPanel
 	{ TabItem tabItemOperation = new TabItem(tabMng, SWT.None);
 		tabItemOperation.setText(sLabel);
 		CanvasStorePanelSwt panel;
-		Color colorBackground = mng.propertiesGui.color(0xeeeeee);
+		Color colorBackground = mng.propertiesGui.colorSwt(0xeeeeee);
 	  if(yGrid <0 || xGrid <0){
 			panel = new CanvasStorePanelSwt(tabMng, 0, colorBackground);
 		} else {
@@ -64,7 +64,7 @@ public class TabPanelSwt extends TabPanel
 	@Override public Object addCanvasPanel(String sName, String sLabel)
 	{ TabItem tabItemOperation = new TabItem(tabMng, SWT.None);
 		tabItemOperation.setText(sLabel);
-		Color colorBackground = mng.propertiesGui.color(0xeeeeee);
+		Color colorBackground = mng.propertiesGui.colorSwt(0xeeeeee);
 	  CanvasStorePanelSwt panel = new CanvasStorePanelSwt(tabMng, 0, colorBackground);
 	  PanelContent panelContent = mng.registerPanel(sName, panel);
 	  tabItemOperation.setControl(panel);

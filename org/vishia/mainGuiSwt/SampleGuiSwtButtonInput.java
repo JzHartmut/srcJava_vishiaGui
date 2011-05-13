@@ -176,7 +176,7 @@ public class SampleGuiSwtButtonInput
 		PropertiesGuiSwt propertiesGui = new PropertiesGuiSwt(mainCmd.guiDevice, 'C');
     
 		//Composite dlgContainer = new Composite(mainCmd.getContentPane(), 0);
-		Color colorBackground = propertiesGui.color(0xeeeeee);
+		Color colorBackground = propertiesGui.colorSwt(0xeeeeee);
 	  
 		Composite dlgContainer = new GridPanelSwt(mainCmd.getContentPane(), 0, colorBackground, propertiesGui.xPixelUnit(), propertiesGui.yPixelUnit(), 10,10);
 	  dlg = new GuiPanelMngSwt(null, mainCmd.getContentPane(), 300,200, propertiesGui, null, mainCmd.getLogMessageOutputConsole());

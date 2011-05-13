@@ -1,6 +1,6 @@
 package org.vishia.mainGui;
 
-import org.eclipse.swt.widgets.Shell;
+//import org.eclipse.swt.widgets.Shell;
 
 
 /**This interface supports the usage of a window which is divide into 9 areas. 
@@ -66,7 +66,8 @@ public interface GuiMainAreaifc
    * SWT: Shell, swing: TODO
    * @return
    */
-  Shell getitsGraphicFrame();
+  Object getitsGraphicFrame();
+  
   
 
 }

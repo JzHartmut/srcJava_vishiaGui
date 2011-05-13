@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.mainGui.CanvasStorage;
+import org.vishia.mainGui.ColorGui;
 
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -40,6 +41,16 @@ public class CanvasStorePanelSwt extends Canvas // implements CanvasStorePanel /
 		
 	};
 	
+	
+	Color colorSwt(ColorGui colorGui)
+	{
+	  if(colorGui.colorGuimpl == null){
+	    colorGui.colorGuimpl = new Color(getDisplay(), colorGui.red, colorGui.green, colorGui.blue);
+	  } else if(!(colorGui.colorGuimpl instanceof Color)){
+	    throw new IllegalArgumentException("unauthorized change");
+	  };
+	  return (Color)colorGui.colorGuimpl;  
+	}
 	
 	//@Override 
 	public Composite xxxgetGuiContainer(){
@@ -90,7 +101,7 @@ public class CanvasStorePanelSwt extends Canvas // implements CanvasStorePanel /
   	for(CanvasStorage.PaintOrder order: store.paintOrders){
   		switch(order.paintWhat){
   		case CanvasStorage.paintLine:{
-  			g.setForeground(order.color);
+  			g.setForeground(colorSwt(order.color));
   	  	g.drawLine(order.x1, order.y1, order.x2, order.y2);
   	  } break;
   		default: throw new IllegalArgumentException("unknown order");

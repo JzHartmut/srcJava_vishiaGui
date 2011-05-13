@@ -85,7 +85,7 @@ implements MouseListener
     }
     else {
       backgroundWhilePressed = widget.getBackground();
-      widget.setBackground(propertiesGui.color(0x800080));
+      widget.setBackground(propertiesGui.colorSwt(0x800080));
     }
     if(sCmdPress != null){
     	@SuppressWarnings("unchecked")

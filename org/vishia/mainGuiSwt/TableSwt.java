@@ -255,7 +255,7 @@ public class TableSwt
     @Override
     public ColorGui setBackgroundColor(ColorGui color)
     { ColorGui oldColor = PropertiesGuiSwt.createColorGui(item.getBackground());
-      Color colorSwt = mng.propertiesGui.color(color.getColorValue());
+      Color colorSwt = mng.propertiesGui.colorSwt(color.getColorValue());
       item.setBackground(colorSwt);
       return oldColor;
     }
@@ -263,7 +263,7 @@ public class TableSwt
     @Override
     public ColorGui setForegroundColor(ColorGui color)
     { ColorGui oldColor = PropertiesGuiSwt.createColorGui(item.getForeground());
-      Color colorSwt = mng.propertiesGui.color(color.getColorValue());
+      Color colorSwt = mng.propertiesGui.colorSwt(color.getColorValue());
       item.setForeground(colorSwt);
       return oldColor;
     }

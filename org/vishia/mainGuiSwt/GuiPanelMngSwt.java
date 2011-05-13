@@ -62,6 +62,7 @@ import org.eclipse.swt.widgets.Widget;
 
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.mainGui.ColorGui;
 import org.vishia.mainGui.FileDialogIfc;
 import org.vishia.mainGui.GuiDispatchCallbackWorker;
 import org.vishia.mainGui.GuiMngBase;
@@ -70,6 +71,7 @@ import org.vishia.mainGui.GuiPanelMngBuildIfc;
 import org.vishia.mainGui.GuiPanelMngWorkingIfc;
 import org.vishia.mainGui.GuiShellMngBuildIfc;
 import org.vishia.mainGui.GuiShellMngIfc;
+import org.vishia.mainGui.GuiWindowMng_ifc;
 import org.vishia.mainGui.PanelActivatedGui;
 import org.vishia.mainGui.PanelContent;
 import org.vishia.mainGui.TabPanel;
@@ -149,7 +151,9 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
   
   public final Shell theShellOfWindow;
   
+  protected Rectangle currPanelPos;
   
+
   /**Properties of this Dialog Window. */
   public  final PropertiesGuiSwt propertiesGui;
   
@@ -363,7 +367,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
   @Override public GuiPanelMngBuildIfc createCompositeBox()
   {
     //Composite box = new Composite(graphicFrame, 0);
-    Composite box = new Composite(currPanel.panelComposite, 0);
+    Composite box = new Composite((Composite)currPanel.panelComposite, 0);
     setPosAndSize_(box);
     Point size = box.getSize();
     GuiPanelMngSwt mng = new GuiPanelMngSwt(this, box, size.y, size.x, propertiesGui, variableContainer, log);
@@ -441,7 +445,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
     int xPixel = (int)(xPos * xPixelUnit) + propertiesGui.xPixelFrac(yPosFrac) +1;
     int yPixel = (int)(yPos * yPixelUnit) + propertiesGui.yPixelFrac(yPosFrac) +1;
     Rectangle rectShell = graphicFrame.getBounds();
-    Rectangle rectPanel = currPanel.panelComposite.getBounds();
+    Rectangle rectPanel = ((Composite)currPanel.panelComposite).getBounds();
     shell.setBounds(xPixel + rectShell.x + rectPanel.x, yPixel + rectShell.y + rectPanel.y, xPixelSize, yPixelSize);    
     
     
@@ -490,12 +494,12 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
   	  //Note: because the currPanel is null, not placement will be done.
   	} else {
   		
-  		Control parent = currPanel.panelComposite;
+  		Control parent = (Composite)currPanel.panelComposite;
   		do
   		{ //Rectangle bounds = parent.getBounds();
   			parent = parent.getParent();
   		} while(!(parent instanceof Shell)); 
-  		currPanelPos = currPanel.panelComposite.getBounds();
+  		currPanelPos = ((Composite)currPanel.panelComposite).getBounds();
   		
   	}
   }
@@ -728,7 +732,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
   public WidgetDescriptor addText(String sText, char size, int color)
   {
   	Label widget = new Label((Composite)currPanel.panelComposite, 0);
-  	widget.setForeground(propertiesGui.color(color));
+  	widget.setForeground(propertiesGui.colorSwt(color));
   	widget.setBackground(propertiesGui.colorBackground);
   	widget.setText(sText);
   	//Font font = propertiesGui.stdInputFont;
@@ -770,7 +774,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
     widget.setEditable(editable);
     if(editable)
     	stop();
-    widget.setBackground(propertiesGui.color(0xFFFFFF));
+    widget.setBackground(propertiesGui.colorSwt(0xFFFFFF));
     widget.addMouseListener(mouseClickForInfo);
     if(widgetInfo.sDataPath != null && widgetInfo.sDataPath.startsWith("showBinEnable("))
     	stop();
@@ -856,7 +860,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   widget.setEditable(editable);
   if(editable)
     stop();
-  widget.setBackground(propertiesGui.color(0xFFFFFF));
+  widget.setBackground(propertiesGui.colorSwt(0xFFFFFF));
   widget.addMouseListener(mouseClickForInfo);
   setPosAndSize_(widget);
   if(prompt != null && promptStylePosition == 't'){
@@ -928,7 +932,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
    */
   public void addLine(int colorValue, float xa, float ya, float xe, float ye){
   	if(currPanel.panelComposite instanceof CanvasStorePanelSwt){
-  		Color color = propertiesGui.color(colorValue);
+  		ColorGui color = propertiesGui.color(colorValue);
   		int xgrid = propertiesGui.xPixelUnit();
   		int ygrid = propertiesGui.yPixelUnit();
   		int x1 = (int)((xPos + xa) * xgrid);
@@ -1040,7 +1044,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     button.setBackground(propertiesGui.colorBackground);
   	
     button.setText(sButtonText);
-    button.setForeground(propertiesGui.color(0xff00));
+    button.setForeground(propertiesGui.colorSwt(0xff00));
     button.setSize(propertiesGui.xPixelUnit() * xIncr -2, propertiesGui.yPixelUnit() * yIncr -2);
     setBounds_(button);
     if(sName == null){ sName = sButtonText; }
@@ -1094,7 +1098,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	button.setColorPressed(propertiesGui.getColorValue(sColor1));  
     button.setColorReleased(propertiesGui.getColorValue(sColor0));  
     button.setText(sButtonText);
-    button.setForeground(propertiesGui.color(0xff00));
+    button.setForeground(propertiesGui.colorSwt(0xff00));
     button.setSize(propertiesGui.xPixelUnit() * xIncr -2, propertiesGui.yPixelUnit() * yIncr -2);
     setBounds_(button);
     if(sName == null){ sName = sButtonText; }
@@ -1116,7 +1120,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	LedSwt widget = new LedSwt(this, 'r');
   	widget.setBackground(propertiesGui.colorBackground);
   	
-    widget.setForeground(propertiesGui.color(0xff00));
+    widget.setForeground(propertiesGui.colorSwt(0xff00));
     widget.setSize(propertiesGui.xPixelUnit() * xIncr -2, propertiesGui.yPixelUnit() * yIncr -2);
     setBounds_(widget);
     WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, widget, 'D');
@@ -1466,7 +1470,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	  	switch(changeReq.cmd){
 	  		case GuiPanelMngWorkingIfc.cmdBackColor: 
 	  			colorValue = ((Integer)(changeReq.info)).intValue();
-	  			Color color = propertiesGui.color(colorValue & 0xffffff);
+	  			Color color = propertiesGui.colorSwt(colorValue & 0xffffff);
 	  			((Control)(oWidget)).setBackground(color); 
 	  			break;
 	  		case GuiPanelMngWorkingIfc.cmdRedraw: ((Control)(oWidget)).redraw(); break;
@@ -1673,6 +1677,11 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
 	};
 	
 	
+  @Override public GuiWindowMng_ifc createInfoBox(String title, String[] lines, boolean todo)
+  {
+    return new InfoBox(graphicFrame.getShell(), title, lines, todo);
+  }
+
 	
 
 	void stop(){}  //debug helper

@@ -2,17 +2,12 @@ package org.vishia.mainGui;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Table;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.mainCmd.Report;
-import org.vishia.mainGuiSwt.GuiPanelMngSwt;
 import org.vishia.msgDispatch.LogMessage;
 
 /**This is the base class of the GuiPanelMng for several Graphic-Adapters (Swing, SWT etc.). 
@@ -87,8 +82,6 @@ public abstract class GuiPanelMngBase<WidgetTYPE> implements GuiPanelMngBuildIfc
   
   public PanelContent currPanel;
   
-  protected Rectangle currPanelPos;
-  
   protected String sCurrPanel;
   
   protected WidgetDescriptor lastClickedWidgetInfo;
@@ -141,13 +134,6 @@ public abstract class GuiPanelMngBase<WidgetTYPE> implements GuiPanelMngBuildIfc
   }
   
   
-  
-  /**Registers all Tables, which are representable. */
-  public void xxxregisterTableAccess(String name, Table table)
-  {
-    //userTableAccesses.put(name, table);
-  }
-    
   
 
 	UserActionGui actionShowWidgetInfos = new UserActionGui()

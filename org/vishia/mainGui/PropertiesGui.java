@@ -3,6 +3,9 @@ package org.vishia.mainGui;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.swt.graphics.Color;
+import org.vishia.bridgeC.IllegalArgumentExceptionJc;
+
 public class PropertiesGui
 {
   protected final static int[] smallPromptFontSize = {5,6,8,9,11,12};
@@ -75,7 +78,9 @@ public class PropertiesGui
   protected final int xPixelUnit;
 
   private final Map<String, Integer> colorNames = new TreeMap<String, Integer>();
-  
+
+  Map<Integer, ColorGui> colors = new TreeMap<Integer, ColorGui>();
+
   /**The size of this propety set.*/
   protected final int size;
 
@@ -155,6 +160,29 @@ public class PropertiesGui
 	}
 	
   
+  /**Returns a color with given numeric color value.
+   * The color instance is taken from a pool if the color is used already.
+   * Elsewhere it is created newly and put into the pool.
+   * @param colorValue red, green and blue
+   * @return An instance of color
+   */
+  public ColorGui color(int colorValue){
+    ColorGui color;
+    if(colorValue >=0 && colorValue < 0x1000000){
+      color = colors.get(colorValue);
+      if(color==null){
+        color = new ColorGui((colorValue >>16)&0xff, (colorValue >>8)&0xff, (colorValue)&0xff );
+        colors.put(colorValue, color);  //store it to reuse.
+      }
+    } else {
+      throw new IllegalArgumentExceptionJc("color value fault", colorValue);
+    }
+    return color;
+  }
+  
+
+	
+	
   public int yPixelUnit(){ return yPixelUnit_[size]; }
 
   public int yPixelFrac(int frac){ return yPixelFrac[size][frac]; }

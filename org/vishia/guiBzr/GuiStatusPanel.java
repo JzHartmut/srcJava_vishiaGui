@@ -3,6 +3,7 @@ package org.vishia.guiBzr;
 import org.vishia.mainGui.GuiPanelMngBuildIfc;
 import org.vishia.mainGui.GuiPanelMngWorkingIfc;
 import org.vishia.mainGui.GuiShellMngBuildIfc;
+import org.vishia.mainGui.GuiWindowMng_ifc;
 import org.vishia.mainGui.SwitchExclusiveButtonMng;
 import org.vishia.mainGui.UserActionGui;
 import org.vishia.mainGui.WidgetDescriptor;
@@ -52,7 +53,7 @@ public class GuiStatusPanel
    */
   private GuiPanelMngBuildIfc[] bzrComponentBox = new GuiPanelMngBuildIfc[100]; 
 
-  private InfoBox testDialogBox;
+  private GuiWindowMng_ifc testDialogBox;
 
   
   /**Instance for some buttons to exclude switch on only for one button.
@@ -95,7 +96,8 @@ public class GuiStatusPanel
 
     String[] lines = {"1", "2"};
     
-    testDialogBox = new InfoBox(mainData.guifc.getitsGraphicFrame(), "Title", lines, true);
+    testDialogBox = panelBuildifc.createInfoBox( "Title", lines, true);
+    //testDialogBox = new InfoBox(mainData.guifc.getitsGraphicFrame(), "Title", lines, true);
 
     panelBuildifc.setPosition(yposProjectPath, xposProjectPath, 20, 60, 'r');
     selectorProjectPath = panelBuildifc.createWindow(null, false);

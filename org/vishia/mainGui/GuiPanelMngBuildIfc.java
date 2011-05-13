@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.swt.widgets.Button;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.mainGui.PanelContent;
 
@@ -434,7 +433,9 @@ public interface GuiPanelMngBuildIfc
 	GuiShellMngBuildIfc createWindow(String title, boolean exclusive);
   
 	
-	
+  GuiWindowMng_ifc createInfoBox(String title, String[] lines, boolean todo);
+
+
 	
 	FileDialogIfc createFileDialog();
 	

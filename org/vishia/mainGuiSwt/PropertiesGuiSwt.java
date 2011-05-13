@@ -24,7 +24,7 @@ public class PropertiesGuiSwt extends PropertiesGui
   
   public final Font stdButtonFont;
   
-  Map<Integer, Color> colors = new TreeMap<Integer, Color>();
+  Map<Integer, Color> colorsSwt = new TreeMap<Integer, Color>();
   
   private final Color colorBlack;
   
@@ -41,9 +41,9 @@ public class PropertiesGuiSwt extends PropertiesGui
   { super(sizeC);
   	this.guiDevice = device;
     this.colorBlack = new Color(guiDevice, 0,0,0);
-    this.colorGrid = color(0xe0e0e0);
-    this.colorGridStrong = color(0xc0c0c0);
-    this.colorBackground = color(0xeeeeee);
+    this.colorGrid = colorSwt(0xe0e0e0);
+    this.colorGridStrong = colorSwt(0xc0c0c0);
+    this.colorBackground = colorSwt(0xeeeeee);
     this.smallPromptFont = new Font(device, "Arial", smallPromptFontSize[size], SWT.ITALIC);
     this.stdInputFont = new Font(device, "Arial", stdInputFontSize[size], SWT.NORMAL);
     this.stdButtonFont = new Font(device, "Arial", stdButtonFontSize[size], SWT.NORMAL);
@@ -65,10 +65,15 @@ public class PropertiesGuiSwt extends PropertiesGui
    * @param color The given color in system-indpending form.
    * @return An instance of SWT-color
    */
-  public Color color(ColorGui color)
+  public Color colorSwt(ColorGui color)
   {
     int colorValue = color.getColorValue();
-    return color(colorValue);
+    if(color.colorGuimpl == null){
+      color.colorGuimpl = colorSwt(colorValue);
+    } else if(!(color.colorGuimpl instanceof Color)){
+      throw new IllegalArgumentException("unauthorized color setting");
+    }
+    return (Color)color.colorGuimpl;
   }
   
   
@@ -78,13 +83,13 @@ public class PropertiesGuiSwt extends PropertiesGui
    * @param colorValue red, green and blue
    * @return An instance of SWT-color
    */
-  public Color color(int colorValue){
+  public Color colorSwt(int colorValue){
   	Color color;
   	if(colorValue >=0 && colorValue < 0x1000000){
-  		color = colors.get(colorValue);
+  		color = colorsSwt.get(colorValue);
 	  	if(color==null){
 	  		color = new Color(guiDevice, (colorValue >>16)&0xff, (colorValue >>8)&0xff, (colorValue)&0xff );
-	      colors.put(colorValue, color);  //store it to reuse.
+	      colorsSwt.put(colorValue, color);  //store it to reuse.
 	  	}
   	} else {
   		color = colorBlack;  //The values -1... may be used for palettes.
@@ -101,7 +106,7 @@ public class PropertiesGuiSwt extends PropertiesGui
   
   public Color color(String sColorname)
   { int nColor = getColorValue(sColorname);
-    return color(nColor);
+    return colorSwt(nColor);
   }
   
   

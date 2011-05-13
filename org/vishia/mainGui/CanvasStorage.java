@@ -2,8 +2,6 @@ package org.vishia.mainGui;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
 
 /**The canvas storage is a storage, which stores orders to paint. This orders are painted
  * if the paint-routine from the windows-system is invoked. An application can call
@@ -19,7 +17,7 @@ public abstract class CanvasStorage
 	 */
 	public static class PaintOrder
 	{
-		PaintOrder(int paintWhat, int x1, int y1, int x2, int y2, Color color) {
+		PaintOrder(int paintWhat, int x1, int y1, int x2, int y2, ColorGui color) {
 			super();
 			this.paintWhat = paintWhat;
 			this.x1 = x1;
@@ -35,7 +33,7 @@ public abstract class CanvasStorage
 		/**Coordinates. */
 		public final int x1,y1,x2,y2;
 		
-		public final Color color;
+		public final ColorGui color;
 	}
 
 	public final static int paintLine = 0xee;
@@ -55,7 +53,7 @@ public abstract class CanvasStorage
 	 * @param x2
 	 * @param y2
 	 */
-	public void drawLine(Color color, int x1, int y1, int x2, int y2){
+	public void drawLine(ColorGui color, int x1, int y1, int x2, int y2){
 		PaintOrder order = new PaintOrder(paintLine, x1,y1,x2,y2, color);
 		paintOrders.add(order);  //paint it when drawBackground is invoked.
 	}
