@@ -193,7 +193,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
   public static class GuiChangeReq
   {
   	/**The widget where the change should be done. */
-  	final WidgetDescriptor<?> widgetDescr;
+  	final WidgetDescriptor widgetDescr;
   	
   	/**The command which should be done to change. It is one of the static definitions cmd... of this class. */
   	final int cmd;
@@ -207,7 +207,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
   	/**The textual information which were to be changed or add. */
   	final Object info;
 		
-  	GuiChangeReq(WidgetDescriptor<?> widgetDescr, int cmd, int indent, Object info) 
+  	GuiChangeReq(WidgetDescriptor widgetDescr, int cmd, int indent, Object info) 
 		{ this.widgetDescr = widgetDescr;
 		  this.cmd = cmd;
 			this.ident = indent;
@@ -262,7 +262,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
 			Widget src = e.widget;
 			Object widgetData = src.getData();
 			@SuppressWarnings("unchecked")
-			WidgetDescriptor<Control> infos = widgetData instanceof WidgetDescriptor<?> ? (WidgetDescriptor<Control>)widgetData : null; 
+			WidgetDescriptor infos = widgetData instanceof WidgetDescriptor ? (WidgetDescriptor)widgetData : null; 
 			if(src instanceof Button){
 				Button button = (Button)src;
 				data = button.getData();
@@ -287,11 +287,11 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
   
   
   /**Index of all input fields to access symbolic for all panels. */
-  final Map<String, WidgetDescriptor<?>> indexNameWidgets = new TreeMap<String, WidgetDescriptor<?>>();
+  final Map<String, WidgetDescriptor> indexNameWidgets = new TreeMap<String, WidgetDescriptor>();
 
   /**Index of all input fields to access symbolic. NOTE: The generic type of WidgetDescriptor is unknown,
    * because the set is used independently from the graphic system. */
-  final Map<String, WidgetDescriptor<?>> showFields = new TreeMap<String, WidgetDescriptor<?>>();
+  final Map<String, WidgetDescriptor> showFields = new TreeMap<String, WidgetDescriptor>();
 
   //private final IndexMultiTable showFieldsM;
 
@@ -344,7 +344,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
     	//guiContainer.setSize(width * propertiesGui.xPixelUnit(), height * propertiesGui.yPixelUnit());
     }
     
-    PanelContent<Composite> panelContent = new PanelContent<Composite>(graphicFrame);
+    PanelContent panelContent = new PanelContent(graphicFrame);
   	panels.put("$", panelContent);
   	currPanel = panelContent;
   	sCurrPanel = "$";
@@ -462,9 +462,9 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
    * @param name Name of the panel.
    * @param panel The panel.
    */
-  public PanelContent<Composite> registerPanel(String name, Object panelP){
+  public PanelContent registerPanel(String name, Object panelP){
   	Composite panel = (Composite)panelP;
-  	PanelContent<Composite> panelContent = new PanelContent<Composite>(panel);
+  	PanelContent panelContent = new PanelContent(panel);
   	panels.put(name, panelContent);
   	panel.setLayout(null);
   	currPanel = panelContent;
@@ -763,7 +763,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
    *   'l' left, 't' top (above field) 
    * @return
    */
-  public Text addTextField(WidgetDescriptor<?> widgetInfo, boolean editable, String prompt, char promptStylePosition)
+  public Text addTextField(WidgetDescriptor widgetInfo, boolean editable, String prompt, char promptStylePosition)
   { Text widget = new Text((Composite)currPanel.panelComposite, SWT.SINGLE);
     widgetInfo.setPanelMng(this);
     widget.setFont(propertiesGui.stdInputFont);
@@ -849,7 +849,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
  *   'l' left, 't' top (above field) 
  * @return
  */
-public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String prompt, char promptStylePosition)
+public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String prompt, char promptStylePosition)
 { widgetInfo.setPanelMng(this);
   Text widget = new Text((Composite)currPanel.panelComposite, SWT.MULTI);
   widget.setFont(propertiesGui.stdInputFont);
@@ -964,7 +964,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
     if(sCmd != null){
       widget.setData(sCmd);
     } 
-    WidgetDescriptor widgd = new WidgetDescriptor<Control>(sName, widget, 'i', sName, null);
+    WidgetDescriptor widgd = new WidgetDescriptor(sName, widget, 'i', sName, null);
     indexNameWidgets.put(sName, widgd);
     widgd.setPanelMng(this);
     return widget;
@@ -972,7 +972,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
 
   
   
-  @Override public WidgetDescriptor<?> addValueBar(
+  @Override public WidgetDescriptor addValueBar(
   	String sName
   , String sShowMethod
   , String sDataPath
@@ -980,7 +980,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   {
   	ValueBarSwt widget = new ValueBarSwt(this);
   	setPosAndSize_(widget.widget);
-  	WidgetDescriptor<Control> widgetInfos = new WidgetDescriptor<Control>(sName, widget, 'U');
+  	WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, widget, 'U');
   	widgetInfos.setPanelMng(this);
     widgetInfos.setShowMethod(sShowMethod);
   	widgetInfos.setDataPath(sDataPath);
@@ -994,7 +994,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   }
   
   
-  @Override public WidgetDescriptor<?> addSlider(
+  @Override public WidgetDescriptor addSlider(
   	String sName
   , UserActionGui action
   , String sShowMethod
@@ -1004,7 +1004,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   	Slider control = new Slider((Composite)this.currPanel.panelComposite, SWT.VERTICAL);
   	control.setBackground(propertiesGui.colorBackground);
   	setPosAndSize_(control);
-   	WidgetDescriptor<Control> widgetInfos = new WidgetDescriptor<Control>(sName, control, 'V');
+   	WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, control, 'V');
    	widgetInfos.setPanelMng(this);
     if(action != null){
   		SelectionListenerForSlider actionSlider = new SelectionListenerForSlider(widgetInfos, action);
@@ -1021,7 +1021,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   
   
   
-  @Override public WidgetDescriptor<?> addButton(
+  @Override public WidgetDescriptor addButton(
   	String sName
   , UserActionGui action
   , String sCmd
@@ -1033,7 +1033,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   )
   {
   	char size = yIncr > 3? 'B' : 'A';
-  	WidgetDescriptor<Control> widgetInfos = new WidgetDescriptor<Control>(sName, 'B');
+  	WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, 'B');
     widgetInfos.setPanelMng(this);
     ButtonSwt button = new ButtonSwt(this, widgetInfos, size);
     widgetInfos.widget = button;
@@ -1066,7 +1066,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   
 
   
-  @Override public WidgetDescriptor<?> addSwitchButton(
+  @Override public WidgetDescriptor addSwitchButton(
   	String sName
   , UserActionGui action
   , String sCmd
@@ -1082,7 +1082,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   	char size = yIncr > 3? 'B' : 'A';
   	if(sColor0 == null || sColor1 == null) throw new IllegalArgumentException("SwitchButton " + sName + ": color0 and color1 should be given.");
   	
-  	WidgetDescriptor<Control> widgetInfos = new WidgetDescriptor<Control>(sName, 'B');
+  	WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, 'B');
     widgetInfos.setPanelMng(this);
     widgetInfos.action = action;
     widgetInfos.sCmd = sCmd;
@@ -1107,7 +1107,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
     return widgetInfos;
   }
   
-  @Override public WidgetDescriptor<?> addLed(
+  @Override public WidgetDescriptor addLed(
   	String sName
   , String sShowMethod
   , String sDataPath
@@ -1119,7 +1119,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
     widget.setForeground(propertiesGui.color(0xff00));
     widget.setSize(propertiesGui.xPixelUnit() * xIncr -2, propertiesGui.yPixelUnit() * yIncr -2);
     setBounds_(widget);
-    WidgetDescriptor<Control> widgetInfos = new WidgetDescriptor<Control>(sName, widget, 'D');
+    WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, widget, 'D');
     widgetInfos.setPanelMng(this);
     widgetInfos.sDataPath = sDataPath;
     widgetInfos.setShowMethod(sShowMethod);
@@ -1143,7 +1143,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
 		curveView.setGridVertical(10, 5);   //10 data-points per grid line, 50 data-points per strong line.
 		curveView.setGridHorizontal(50.0F, 5);  //10%-divisions, with 5 sub-divisions
 		curveView.setGridColor(propertiesGui.colorGrid, propertiesGui.colorGridStrong);
-		WidgetDescriptor widgd = new WidgetDescriptor<Control>(sName, curveView, 'c', sName, null);
+		WidgetDescriptor widgd = new WidgetDescriptor(sName, curveView, 'c', sName, null);
 		widgd.setPanelMng(this);
     indexNameWidgets.put(sName, widgd);
 		return curveView;
@@ -1172,7 +1172,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   @Override public Object addMouseButtonAction(String sName, UserActionGui action, String sCmdPress, String sCmdRelease, String sCmdDoubleClick)
   {
   	String sNameUsed = sName.charAt(0) == '$' ? sCurrPanel + sName.substring(1) : sName;
-    WidgetDescriptor<?> widget = indexNameWidgets.get(sNameUsed);
+    WidgetDescriptor widget = indexNameWidgets.get(sNameUsed);
   	if(widget == null || !(widget.widget instanceof Control)){
   		log.sendMsg(0, "GuiMainDialog:addClickAction: unknown widget %s", sName);
   	} else {
@@ -1183,9 +1183,9 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   	return widget.widget;
   }
 	
-	@Override public WidgetDescriptor<?> addFocusAction(String sName, UserActionGui action, String sCmdEnter, String sCmdRelease)
+	@Override public WidgetDescriptor addFocusAction(String sName, UserActionGui action, String sCmdEnter, String sCmdRelease)
 	{
-    WidgetDescriptor<?> widget = indexNameWidgets.get(sName);
+    WidgetDescriptor widget = indexNameWidgets.get(sName);
   	if(widget == null || !(widget.widget instanceof Control)){
   		log.sendMsg(0, "GuiMainDialog:addClickAction: unknown widget %s", sName);
   	} else {
@@ -1197,7 +1197,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
 	}
 
 	
-	@Override public void addFocusAction(WidgetDescriptor<?> widgetInfo, UserActionGui action, String sCmdEnter, String sCmdRelease)
+	@Override public void addFocusAction(WidgetDescriptor widgetInfo, UserActionGui action, String sCmdEnter, String sCmdRelease)
 	{
     ((Control)(widgetInfo.widget)).addFocusListener( new FocusActionForUserActionSwt(this, action, sCmdEnter, sCmdRelease));
   }
@@ -1231,7 +1231,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   public String setFieldContent(String name, String content)
   throws NotExistException
   {
-    WidgetDescriptor<?> descr = indexNameWidgets.get(name);
+    WidgetDescriptor descr = indexNameWidgets.get(name);
     if(descr == null) throw new NotExistException(name);
     assert(descr.widget instanceof Text);
     Text field = (Text)descr.widget;
@@ -1262,7 +1262,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
    */
   public String insertInfo(String name, int ident, String content)
   {
-  	WidgetDescriptor<?> descr = indexNameWidgets.get(name);
+  	WidgetDescriptor descr = indexNameWidgets.get(name);
   	if(descr == null){
   		log.sendMsg(0, "GuiMainDialog:insertInfo: unknown widget %s", name);
   	} else {
@@ -1271,14 +1271,14 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   	return "";
   } 
   
-  public String insertInfo(WidgetDescriptor<?> descr, int ident, String content)
+  public String insertInfo(WidgetDescriptor descr, int ident, String content)
   {
   	return setInfo(descr, GuiPanelMngWorkingIfc.cmdInsert, ident, content);
   }
   
   
   
-  public String insertInfo(WidgetDescriptor<?> descr, int ident, Object value)
+  public String insertInfo(WidgetDescriptor descr, int ident, Object value)
   {
   	return setInfo(descr, GuiPanelMngWorkingIfc.cmdInsert, ident, value);
   }
@@ -1327,7 +1327,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
    */
   public void setBackColor(String name, int ix, int color)
   {
-  	WidgetDescriptor<?> descr = indexNameWidgets.get(name);
+  	WidgetDescriptor descr = indexNameWidgets.get(name);
   	if(descr == null){
   		log.sendMsg(0, "GuiMainDialog:setBackColor: unknown widget %s", name);
   	} else {
@@ -1354,17 +1354,17 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
    * @param content The content to insert.
    * @return
    */
-  public void setBackColor(WidgetDescriptor<?> descr1, int ix, int color)
+  public void setBackColor(WidgetDescriptor descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
-  	WidgetDescriptor<Control> descr = (WidgetDescriptor<Control>) descr1;
+  	WidgetDescriptor descr = (WidgetDescriptor) descr1;
   	setInfo(descr, GuiPanelMngWorkingIfc.cmdBackColor, ix, color);
   } 
   
   
-  @Override public void setLed(WidgetDescriptor<?> widgetDescr, int colorBorder, int colorInner)
+  @Override public void setLed(WidgetDescriptor widgetDescr, int colorBorder, int colorInner)
   {
   	@SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
-  	WidgetDescriptor<Control> descr = (WidgetDescriptor<Control>) widgetDescr;
+  	WidgetDescriptor descr = (WidgetDescriptor) widgetDescr;
   	setInfo(descr, GuiPanelMngWorkingIfc.cmdColor, colorBorder, colorInner);
   	
   }
@@ -1381,7 +1381,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   public String getFieldContent(String name)
   throws NotExistException
   {
-    WidgetDescriptor<?> descr = indexNameWidgets.get(name);
+    WidgetDescriptor descr = indexNameWidgets.get(name);
     if(descr == null) throw new NotExistException(name);
     Text field = (Text)descr.widget;
     String content = field.getText();
@@ -1392,10 +1392,10 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   /**Returns a Set of all fields, which are created to show.
    * @return the set, never null, possible an empty set.
    */
-  public Set<Entry<String, WidgetDescriptor<?>>> getShowFields()
+  public Set<Entry<String, WidgetDescriptor>> getShowFields()
   {
-  	Set<Entry<String, WidgetDescriptor<?>>> set = showFields.entrySet();
-  	return set; //(Set<Entry<String, WidgetDescriptor<?>>>)set;
+  	Set<Entry<String, WidgetDescriptor>> set = showFields.entrySet();
+  	return set; //(Set<Entry<String, WidgetDescriptor>>)set;
   }
 
   
@@ -1460,7 +1460,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
 			}
   	  GuiChangeReq changeReq;
   	  while( (changeReq = mngBase.guiChangeRequests.poll()) != null){
-  	  	WidgetDescriptor<?> descr = changeReq.widgetDescr;
+  	  	WidgetDescriptor descr = changeReq.widgetDescr;
   	  	Object oWidget = descr.widget;
   	  	int colorValue;
   	  	switch(changeReq.cmd){
@@ -1514,11 +1514,11 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
   {
   	private final UserActionGui userAction; 
 
-  	private final WidgetDescriptor<Control> widgetInfo;
+  	private final WidgetDescriptor widgetInfo;
   	
   	
   	
-  	public SelectionListenerForSlider(WidgetDescriptor<Control> widgetInfo, UserActionGui userAction)
+  	public SelectionListenerForSlider(WidgetDescriptor widgetInfo, UserActionGui userAction)
 		{
 			this.userAction = userAction;
   		this.widgetInfo = widgetInfo;
@@ -1552,7 +1552,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
 
 	@Override
 	public void setSampleCurveViewY(String sName, float[] values) {
-		WidgetDescriptor<?> descr = indexNameWidgets.get(sName);
+		WidgetDescriptor descr = indexNameWidgets.get(sName);
 		if(descr == null){
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sName);
   	} else if(!(descr.widget instanceof CurveView)) {
@@ -1567,7 +1567,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
 	
 	@Override public void redrawWidget(String sName)
 	{
-		WidgetDescriptor<?> descr = indexNameWidgets.get(sName);
+		WidgetDescriptor descr = indexNameWidgets.get(sName);
 		if(descr == null){
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sName);
   	} else if((descr.widget instanceof CurveView)) {
@@ -1588,7 +1588,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
 	@Override
   public void setLineCurveView(String sNameView, int trackNr, String sNameLine, String sVariable, int colorValue, int style, int nullLine, float yScale, float yOffset)
 	{
-		WidgetDescriptor<?> descr = indexNameWidgets.get(sNameView);
+		WidgetDescriptor descr = indexNameWidgets.get(sNameView);
 		if(descr == null){
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sNameView);
   	} else if(!(descr.widget instanceof CurveView)) {
@@ -1605,7 +1605,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
 
 
 	
-	@Override public String getValueFromWidget(WidgetDescriptor<?> widgetDescr)
+	@Override public String getValueFromWidget(WidgetDescriptor widgetDescr)
 	{ final String sValue;
   	Object widget = widgetDescr.widget;
 		if(widget instanceof Text){
@@ -1626,7 +1626,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
 	public Map<String, String> getAllValues()
 	{
 		Map<String, String> values = new TreeMap<String, String>();
-    for(WidgetDescriptor<?> input: indexNameWidgets.values()){
+    for(WidgetDescriptor input: indexNameWidgets.values()){
     	String sValue = getValueFromWidget(input);
       values.put(input.name, sValue);
     }
@@ -1635,7 +1635,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
 
 	@Override public String getValue(String sName)
 	{ final String sValue;
-		WidgetDescriptor<?> widgetDescr = indexNameWidgets.get(sName);
+		WidgetDescriptor widgetDescr = indexNameWidgets.get(sName);
 		if(widgetDescr !=null){
 			sValue = getValueFromWidget(widgetDescr);
 		} else {
@@ -1654,7 +1654,7 @@ public Text addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String 
 		 * The name of the variable is contained in the {@link WidgetDescriptor}.
 		 * @see org.vishia.mainGui.UserActionGui#userActionGui(java.lang.String, org.vishia.mainGui.WidgetDescriptor, java.lang.Object[])
 		 */
-		@Override public void userActionGui(String sIntension, WidgetDescriptor<?> infos, Object... params)
+		@Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
 		{
 			Object oWidget = infos.widget;
 			final VariableAccess_ifc variable = infos.getVariableFromContentInfo(variableContainer);

@@ -28,8 +28,8 @@ public class MouseClickInfo implements MouseListener
 	{
 		Widget widget = ev.widget;
 		Object oInfo = widget.getData();
-		if(oInfo instanceof WidgetDescriptor<?>){
-			WidgetDescriptor<?> widgetInfo = (WidgetDescriptor<?>)oInfo;
+		if(oInfo instanceof WidgetDescriptor){
+			WidgetDescriptor widgetInfo = (WidgetDescriptor)oInfo;
 			if(widgetInfo ==null || widgetInfo.sDataPath ==null || !widgetInfo.sDataPath.equals("widgetInfo")){
 			  guiMng.setLastClickedWidgetInfo(widgetInfo );
 			}

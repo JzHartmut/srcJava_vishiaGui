@@ -25,12 +25,12 @@ public class OamShowValues
 
 	boolean dataValid = false;
 	
-	List<WidgetDescriptor<?>> widgetsInTab;
+	List<WidgetDescriptor> widgetsInTab;
 	
 	/**The access to the gui, to change data to show. */
 	protected final GuiPanelMngWorkingIfc guiAccess;
 	
-	Set<Map.Entry<String, WidgetDescriptor<?>>> fieldsToShow;
+	Set<Map.Entry<String, WidgetDescriptor>> fieldsToShow;
 	
 	
 	private final float[] valueUserCurves = new float[6];  
@@ -60,7 +60,7 @@ public class OamShowValues
 	  return nrofVariable >0;
 	}
 	
-	public void setFieldsToShow(Set<Map.Entry<String, WidgetDescriptor<?>>> fields)
+	public void setFieldsToShow(Set<Map.Entry<String, WidgetDescriptor>> fields)
 	{
 		fieldsToShow = fields;
 	}
@@ -84,8 +84,8 @@ public class OamShowValues
 		//TEST TODO:
 		//accessOamVariable.setFloat("ctrl/energyLoadCapac2Diff", checkWithoutNewdata);
 		//current panel:
-		List<WidgetDescriptor<?>> listWidgets = guiAccess.getListCurrWidgets();
-		for(WidgetDescriptor<?> widgetInfo : listWidgets){
+		List<WidgetDescriptor> listWidgets = guiAccess.getListCurrWidgets();
+		for(WidgetDescriptor widgetInfo : listWidgets){
 			String sName = widgetInfo.name;
 		}
 		//read all variables which are necessary to show.
@@ -99,7 +99,7 @@ public class OamShowValues
 		redrawCurveValues();
 	}
 	
-	private void writeField(WidgetDescriptor<?> widgetInfo)
+	private void writeField(WidgetDescriptor widgetInfo)
 	{ String sName = widgetInfo.name;
 		String sInfo = widgetInfo.sDataPath;
 		String sValue;
@@ -146,7 +146,7 @@ public class OamShowValues
 	private void writeValuesOfTab()
 	{ if(dataValid){
 			if(widgetsInTab != null)
-			for(WidgetDescriptor<?> widgetInfo: widgetsInTab){
+			for(WidgetDescriptor widgetInfo: widgetsInTab){
 				String sContentInfo = widgetInfo.sDataPath;
 				if(sContentInfo !=null && sContentInfo.length() >0 && widgetInfo.widget !=null){
 					stop();
@@ -161,7 +161,7 @@ public class OamShowValues
 	}
 	
 	
-	ByteDataSymbolicAccess.Variable getVariableFromContentInfo(WidgetDescriptor<?> widgetInfo)
+	ByteDataSymbolicAccess.Variable getVariableFromContentInfo(WidgetDescriptor widgetInfo)
 	{
 		ByteDataSymbolicAccess.Variable variable;
 		Object oContentInfo = widgetInfo.getContentInfo();
@@ -189,7 +189,7 @@ public class OamShowValues
 	}
 	
 	
-	boolean callMethod(WidgetDescriptor<?> widgetInfo)
+	boolean callMethod(WidgetDescriptor widgetInfo)
 	{ String sName = widgetInfo.name;
 		String sInfo = widgetInfo.sDataPath;
 		final String sMethodName;
@@ -363,7 +363,7 @@ public class OamShowValues
 		
 	
 	
-	void widgetSetColor(String sName, String[] sParam, WidgetDescriptor<?> widgetInfo)
+	void widgetSetColor(String sName, String[] sParam, WidgetDescriptor widgetInfo)
 	{ ColoredWidget userData;
 	  Object oUserData = widgetInfo.getContentInfo();
 		if(oUserData == null){
@@ -387,7 +387,7 @@ public class OamShowValues
 	}
 	
 	
-	void showBinFromByte(WidgetDescriptor<?> widgetInfo)
+	void showBinFromByte(WidgetDescriptor widgetInfo)
 	{ ByteDataSymbolicAccess.Variable variable;
 	  Object oUserData = widgetInfo.getContentInfo();
 		if(oUserData == null){
@@ -413,7 +413,7 @@ public class OamShowValues
 	}
 	
 	
-	void setValue(WidgetDescriptor<?> widgetInfo)
+	void setValue(WidgetDescriptor widgetInfo)
 	{ ByteDataSymbolicAccess.Variable variable;
 	  Object oUserData = widgetInfo.getContentInfo();
 		if(oUserData == null){
@@ -432,7 +432,7 @@ public class OamShowValues
 	}
 	
 	
-	void setBar(WidgetDescriptor<?> widgetInfo)
+	void setBar(WidgetDescriptor widgetInfo)
 	{ ByteDataSymbolicAccess.Variable variable = getVariableFromContentInfo(widgetInfo);
 	  if(variable == null){
 			debugStop();
@@ -490,7 +490,7 @@ public class OamShowValues
 	 */
 	public final PanelActivatedGui tabActivatedImpl = new PanelActivatedGui()
 	{
-		@Override	public void panelActivatedGui(List<WidgetDescriptor<?>> widgets)
+		@Override	public void panelActivatedGui(List<WidgetDescriptor> widgets)
 		{
 			widgetsInTab = widgets;
 			writeValuesOfTab();
@@ -501,7 +501,7 @@ public class OamShowValues
 
 	
 	final UserActionGui actionSetValueTestInInput = new UserActionGui()
-  { public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
+  { public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
     { 
   		final int[] ixArrayA = new int[1];
   		ByteDataSymbolicAccess.Variable variable = getVariable(widgetInfos.sDataPath, ixArrayA);

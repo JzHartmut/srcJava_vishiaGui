@@ -66,12 +66,12 @@ implements FocusListener
 	{
 		final Widget widget = ev.widget;
 		final Object oInfo = widget.getData();
-		final WidgetDescriptor<?> widgetInfo;
+		final WidgetDescriptor widgetInfo;
 		final String sContent;
 		if(widget instanceof Text){ sContent = ((Text)widget).getText(); }
 		else { sContent = null; }
-		if(oInfo instanceof WidgetDescriptor<?>){
-			widgetInfo = (WidgetDescriptor<?>)oInfo;
+		if(oInfo instanceof WidgetDescriptor){
+			widgetInfo = (WidgetDescriptor)oInfo;
 		} else { widgetInfo = null; }
   	userAction.userActionGui(sCmd, widgetInfo, sContent);
 	}

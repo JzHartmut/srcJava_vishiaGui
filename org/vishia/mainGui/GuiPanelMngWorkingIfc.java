@@ -48,7 +48,7 @@ public interface GuiPanelMngWorkingIfc
 	 * If it should be used, the graphic implementation should be known
 	 * and a adequate instanceof-test and cast is necessary. 
 	 */
-	List<WidgetDescriptor<?>> getListCurrWidgets();
+	List<WidgetDescriptor> getListCurrWidgets();
 	
   /**Inserts a textual information at any widget. The widget may be for example:
    * <ul>
@@ -97,10 +97,10 @@ public interface GuiPanelMngWorkingIfc
    * @param colorValue blue, green and red in the bits 23..16, 15..8 and 7..0. 
    *        opaque in bits 31..24 if possible. 
    */
-  void setBackColor(WidgetDescriptor<?> widgetDescr, int ix, int colorValue);
+  void setBackColor(WidgetDescriptor widgetDescr, int ix, int colorValue);
   
   
-  void setLed(WidgetDescriptor<?> widgetDescr, int colorBorder, int colorInner);
+  void setLed(WidgetDescriptor widgetDescr, int colorBorder, int colorInner);
   
   /**Adds a sampling value set.
    * @param sName The registered name
@@ -129,5 +129,5 @@ public interface GuiPanelMngWorkingIfc
 	 * @param widgetDescr The widget.
 	 * @return null if the widget isn't able to input.
 	 */
-	String getValueFromWidget(WidgetDescriptor<?> widgetDescr);
+	String getValueFromWidget(WidgetDescriptor widgetDescr);
 }

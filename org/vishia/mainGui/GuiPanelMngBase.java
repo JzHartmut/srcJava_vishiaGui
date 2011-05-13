@@ -83,18 +83,18 @@ public abstract class GuiPanelMngBase<WidgetTYPE> implements GuiPanelMngBuildIfc
 	
 	
   /**Map of all panels. A panel may be a dialog box etc. */
-  protected final Map<String,PanelContent<WidgetTYPE>> panels = new TreeMap<String,PanelContent<WidgetTYPE>>();
+  protected final Map<String,PanelContent> panels = new TreeMap<String,PanelContent>();
   
-  public PanelContent<WidgetTYPE> currPanel;
+  public PanelContent currPanel;
   
   protected Rectangle currPanelPos;
   
   protected String sCurrPanel;
   
-  protected WidgetDescriptor<?> lastClickedWidgetInfo;
+  protected WidgetDescriptor lastClickedWidgetInfo;
   
 
-	public List<WidgetDescriptor<?>> getListCurrWidgets(){ return currPanel.widgetList; }
+	public List<WidgetDescriptor> getListCurrWidgets(){ return currPanel.widgetList; }
 	
   /**Index of all user actions, which are able to use in Button etc. 
    * The user action "showWidgetInfos" defined here is added initially.
@@ -121,7 +121,7 @@ public abstract class GuiPanelMngBase<WidgetTYPE> implements GuiPanelMngBuildIfc
 	}
 
 
-	public void setLastClickedWidgetInfo(WidgetDescriptor<?> lastClickedWidgetInfo)
+	public void setLastClickedWidgetInfo(WidgetDescriptor lastClickedWidgetInfo)
 	{
 		this.lastClickedWidgetInfo = lastClickedWidgetInfo;
 	}
@@ -155,7 +155,7 @@ public abstract class GuiPanelMngBase<WidgetTYPE> implements GuiPanelMngBuildIfc
 
 		@Override public void userActionGui(
 			String sCmd
-		, WidgetDescriptor<?> infos, Object... params
+		, WidgetDescriptor infos, Object... params
 		)
 		{ 
 			if(lastClickedWidgetInfo !=null){

@@ -83,7 +83,7 @@ public class SwitchButtonSwt extends ButtonSwt
 			setUserAction(this);  //set this action primary, it calls the user action.
 		}
   	
-		@Override	public void userActionGui(String sCmd, WidgetDescriptor<?> infos, Object... params)
+		@Override	public void userActionGui(String sCmd, WidgetDescriptor infos, Object... params)
 		{
 			isSwitchedDown = ! isSwitchedDown;
       if(isSwitchedDown){ setBackground(colorPressed); }

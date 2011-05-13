@@ -70,7 +70,7 @@ public interface GuiPanelMngBuildIfc
    *              If it the instance is fault, a ClassCastException is thrown.
    *         
    */
-  public PanelContent<?> registerPanel(String name, Object panel);
+  public PanelContent registerPanel(String name, Object panel);
   
   
   /**Creates a panel for tabs and registers it in the GUI.
@@ -138,7 +138,7 @@ public interface GuiPanelMngBuildIfc
    * @return
    */
   //Object addButton(String sButtonText, int height, int width, String sCmd, String sUserAction, String sName);
-  public WidgetDescriptor<?> addButton(
+  public WidgetDescriptor addButton(
   	String sName
   , UserActionGui action
   , String sCmd
@@ -158,7 +158,7 @@ public interface GuiPanelMngBuildIfc
    * @param sButtonText
    * @return
    */
-  public WidgetDescriptor<?> addSwitchButton(
+  public WidgetDescriptor addSwitchButton(
   	String sName
   , UserActionGui action
   , String sCmd
@@ -177,20 +177,20 @@ public interface GuiPanelMngBuildIfc
    * @return
    */
   //Object addButton(String sButtonText, int height, int width, String sCmd, String sUserAction, String sName);
-  WidgetDescriptor<?> addLed(
+  WidgetDescriptor addLed(
   	String sName
   , String sShowMethod
   , String sDataPath
   );
   
-  WidgetDescriptor<?> addValueBar(
+  WidgetDescriptor addValueBar(
   	String sName
   , String sShowMethod
   , String sDataPath
   );
   
   
-  WidgetDescriptor<?> addSlider(
+  WidgetDescriptor addSlider(
   	String sName
   , UserActionGui action
   , String sShowMethod
@@ -276,7 +276,7 @@ public interface GuiPanelMngBuildIfc
    *   'l' left, 't' top (above field) 
    * @return
    */
-  Object addTextField(WidgetDescriptor<?> widgetInfo, boolean editable, String prompt, char promptStylePosition);
+  Object addTextField(WidgetDescriptor widgetInfo, boolean editable, String prompt, char promptStylePosition);
   
   
   /** Adds a box for editing or showing a text.
@@ -302,7 +302,7 @@ public interface GuiPanelMngBuildIfc
    *   'l' left, 't' top (above field) 
    * @return
    */
-  Object addTextBox(WidgetDescriptor<?> widgetInfo, boolean editable, String prompt, char promptStylePosition);
+  Object addTextBox(WidgetDescriptor widgetInfo, boolean editable, String prompt, char promptStylePosition);
   
   /**Adds a curve view for displaying values with ordinary x-coordinate.
    * The scaling of the curve view is set to -100..100 per default. 
@@ -326,7 +326,7 @@ public interface GuiPanelMngBuildIfc
    * @param sCmdRelease
    * @return
    */
-  WidgetDescriptor<?> addFocusAction(String sName, UserActionGui action, String sCmdEnter, String sCmdRelease);
+  WidgetDescriptor addFocusAction(String sName, UserActionGui action, String sCmdEnter, String sCmdRelease);
 
   /**Adds the given Focus action to the known widget.
    * @param widgetInfo
@@ -334,7 +334,7 @@ public interface GuiPanelMngBuildIfc
    * @param sCmdEnter
    * @param sCmdRelease
    */
-  void addFocusAction(WidgetDescriptor<?> widgetInfo, UserActionGui action, String sCmdEnter, String sCmdRelease);
+  void addFocusAction(WidgetDescriptor widgetInfo, UserActionGui action, String sCmdEnter, String sCmdRelease);
 
   
   /**Sets the values for a line
@@ -384,7 +384,7 @@ public interface GuiPanelMngBuildIfc
   /**Returns a Set of all fields, which are created to show.
    * @return the set, never null, possible an empty set.
    */
-  public Set<Map.Entry<String, WidgetDescriptor<?>>> getShowFields();
+  public Set<Map.Entry<String, WidgetDescriptor>> getShowFields();
 
   
   /**The GUI-change-listener should be called in the dispatch-loop of the GUI-(SWT)-Thread.

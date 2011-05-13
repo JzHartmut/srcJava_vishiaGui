@@ -19,7 +19,7 @@ public class GuiCommitPanel
   
   final StringBuilder uCommitOut =  new StringBuilder();
   
-  final WidgetDescriptor<?> widgdCommitText = new WidgetDescriptor("commitText", 'T');
+  final WidgetDescriptor widgdCommitText = new WidgetDescriptor("commitText", 'T');
   
   public GuiCommitPanel(MainData mainData, GuiPanelMngBuildIfc panelBuildifc)
   {
@@ -45,7 +45,7 @@ public class GuiCommitPanel
   
   private final UserActionGui actionCommit = new UserActionGui()
   { 
-    public void userActionGui(String sCmdGui, WidgetDescriptor<?> widgetInfos, Object... values)
+    public void userActionGui(String sCmdGui, WidgetDescriptor widgetInfos, Object... values)
     {
       String sCommitText = widgdCommitText.getValue();
       File fileCommitText = new File(mainData.currCmpn.fileBzrLocation, "_bzrCommit.txt");

@@ -61,7 +61,7 @@ public class GuiDialogZbnfControlled
   
   
   /**Types saves commonly properties for more as one widget. */
-  private final Map<String,WidgetDescriptor<Object>> types = new TreeMap<String,WidgetDescriptor<Object>>();
+  private final Map<String,WidgetDescriptor> types = new TreeMap<String,WidgetDescriptor>();
   
   
 
@@ -354,7 +354,7 @@ public class GuiDialogZbnfControlled
           */
 					if(sType != null){
           	//if a type is given, use that widgetDescriptor and copy it.
-          	WidgetDescriptor<Object> type = types.get(sType);
+          	WidgetDescriptor type = types.get(sType);
           	if(type == null) throw new IllegalArgumentException("type is unknown: " + sType + " for Element " + sName + "/" + sInfo);
             //take not defined informations from the type:
           	if(sCmd == null){ sCmd = type.sCmd; }
@@ -369,7 +369,7 @@ public class GuiDialogZbnfControlled
           //Check type of element and create it.
           if(semantic.equals("Type"))
 	        { String sTypeName = item.getChildString("typeName");
-	        	WidgetDescriptor<Object> widgetDescr = new WidgetDescriptor<Object>(sTypeName, '@');
+	        	WidgetDescriptor widgetDescr = new WidgetDescriptor(sTypeName, '@');
 	          widgetDescr.action = action;
 	          widgetDescr.sCmd = sCmd;
 	          widgetDescr.sDataPath = sInfo;
@@ -379,7 +379,7 @@ public class GuiDialogZbnfControlled
 	          types.put(sTypeName, widgetDescr);
 	        } else {
 	        	//create a widget description with the given data, it should be used by all elements except some.
-	        	WidgetDescriptor<Object> widgetInfo = new WidgetDescriptor<Object>(sName, '.');
+	        	WidgetDescriptor widgetInfo = new WidgetDescriptor(sName, '.');
 	          widgetInfo.action = action;
 	          widgetInfo.sCmd = sCmd;
 	          widgetInfo.sDataPath = sInfo;
@@ -391,7 +391,7 @@ public class GuiDialogZbnfControlled
 	          	widgetInfo.name = sInfo;    //use sInfo
 	          }
 	          if(semantic.equals("Button"))
-		        { WidgetDescriptor<?> widgetDescr = 
+		        { WidgetDescriptor widgetDescr = 
 		        	dialog.addButton(sName, action, sCmd, sShowMethod, sInfo, sText);
 		        }
 	          else if(semantic.equals("ValueBar"))
@@ -401,10 +401,10 @@ public class GuiDialogZbnfControlled
 		        { dialog.addSlider(sName, action, sShowMethod, sInfo);
 		        }
 	          else if(semantic.equals("SwitchButton"))
-		        { WidgetDescriptor<?> widgetDescr = dialog.addSwitchButton(sName, action, sCmd, sShowMethod, sInfo, sText, sColor0, sColor1);
+		        { WidgetDescriptor widgetDescr = dialog.addSwitchButton(sName, action, sCmd, sShowMethod, sInfo, sText, sColor0, sColor1);
 		        }
 	          else if(semantic.equals("Led"))
-		        { WidgetDescriptor<?> widgetDescr = dialog.addLed(sName, sShowMethod, sInfo);
+		        { WidgetDescriptor widgetDescr = dialog.addLed(sName, sShowMethod, sInfo);
 		          //widgetDescr.setsShowMethod(sShowMethod);
 		        }
 		        else if(semantic.equals("Table"))

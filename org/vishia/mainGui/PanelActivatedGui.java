@@ -17,6 +17,6 @@ public interface PanelActivatedGui
 	 * @param widgets Information about all widgets in this panel, which should be updated 
 	 *        with correct values for example with data of a running process.
 	 * */
-	void panelActivatedGui(List<WidgetDescriptor<?>> widgets);
+	void panelActivatedGui(List<WidgetDescriptor> widgets);
 	
 }

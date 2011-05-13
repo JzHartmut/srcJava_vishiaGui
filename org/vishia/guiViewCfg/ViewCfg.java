@@ -100,7 +100,7 @@ public class ViewCfg
   
   
   private final UserActionGui actionWindowSys = new UserActionGui()
-  { public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
+  { public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
     {
   		if(sCmd != null){  
   			 Shell graphicFrame = gui.getitsGraphicFrame();
@@ -112,7 +112,7 @@ public class ViewCfg
   
   
   private final UserActionGui actionKeyboard = new UserActionGui()
-  { public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
+  { public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
     {
   		if(sCmd != null){  
   			//String sCmd1 = "TouchInputPc.exe";

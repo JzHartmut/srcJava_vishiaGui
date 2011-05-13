@@ -216,7 +216,7 @@ public class GuiStatusPanel
   
   private final UserActionGui selectProjectPath = new UserActionGui()
   { 
-    public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
+    public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
     {
       //testDialogBox.open();
       selectorProjectPath.setWindowVisible(true);
@@ -232,7 +232,7 @@ public class GuiStatusPanel
    */
   private final UserActionGui actionSelectorProjectPathTable = new UserActionGui()
   { 
-    public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
+    public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
     {
       if(sCmd.equals("ok")){
         String sPath = (String)values[0];
@@ -246,7 +246,7 @@ public class GuiStatusPanel
   
   private final UserActionGui actionCloseProjectBzrComponents = new UserActionGui()
   { 
-    public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
+    public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
     {
       selectorProjectPath.setWindowVisible(false);
     }
@@ -255,7 +255,7 @@ public class GuiStatusPanel
   
   private final UserActionGui refreshProjectBzrComponents = new UserActionGui()
   { 
-    public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
+    public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
     { buildComponentsInfoSelectBoxes();
     }
   };
@@ -264,7 +264,7 @@ public class GuiStatusPanel
   
   private final UserActionGui actionSelectCmpn = new UserActionGui()
   { 
-    public void userActionGui(String sCmd, WidgetDescriptor<?> widgd, Object... values)
+    public void userActionGui(String sCmd, WidgetDescriptor widgd, Object... values)
     {
       mainData.currCmpn = mainData.currPrj.selectComponent(widgd.sDataPath);
       //

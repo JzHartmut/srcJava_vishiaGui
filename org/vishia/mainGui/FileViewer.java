@@ -35,7 +35,7 @@ public class FileViewer
 	private UserActionGui actionFileButton = new UserActionGui(){
 
 		@Override
-		public void userActionGui(String sCmd, WidgetDescriptor<?> infos, Object... params)
+		public void userActionGui(String sCmd, WidgetDescriptor infos, Object... params)
 		{
 		  bActiv = true;
 		  bActivate = true;

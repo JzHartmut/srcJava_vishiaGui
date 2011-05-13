@@ -35,7 +35,7 @@ public class SwitchExclusiveButtonMng implements VariableAccess_ifc
   {
     
     @Override
-    public void userActionGui(String sIntension, WidgetDescriptor<?> infos, Object... params)
+    public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
     {
       // TODO Auto-generated method stub
       currentButtonText = infos.sCmd;

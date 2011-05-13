@@ -132,7 +132,7 @@ public class SampleGuiSwtButtonInput
 	
 	UserActionGui buttonTest1Action = new UserActionGui()
 	{	@Override
-		public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... params) 
+		public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... params) 
 		{
       console.writeInfoln("Button pressed, Test1Action.");		  
 			testThread.nrofInsert = 3;
@@ -142,7 +142,7 @@ public class SampleGuiSwtButtonInput
 	
 	UserActionGui buttonTestCurveAction = new UserActionGui()
 	{	@Override
-		public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... params) 
+		public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... params) 
 		{
       if(sCmd != null && sCmd.charAt(0)!='-'){
       	console.writeInfoln("Button curveAction.");		  
@@ -194,7 +194,7 @@ public class SampleGuiSwtButtonInput
 	  dlg.setPosition(0,15,3,8,'r');
 	  dlg.addTable("testTable", 8, new int[]{15,25,10});
 	  dlg.setPosition(25, 0,-2,20,'r');
-	  WidgetDescriptor<?> widgetInfo = new WidgetDescriptor("edit", 'T');
+	  WidgetDescriptor widgetInfo = new WidgetDescriptor("edit", 'T');
 	  widgetInfo.setDataPath("info");
 	  dlg.addTextField(widgetInfo, false, null, '\0');
 	  dlg.setPosition(30, 20,20,40,'r');  //foot line!

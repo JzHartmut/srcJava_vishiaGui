@@ -89,7 +89,7 @@ implements MouseListener
     }
     if(sCmdPress != null){
     	@SuppressWarnings("unchecked")
-    	WidgetDescriptor<Control> infos = (WidgetDescriptor<Control>)widget.getData();
+    	WidgetDescriptor infos = (WidgetDescriptor)widget.getData();
       userAction.userActionGui(sCmdPress,infos);
     }
 	}
@@ -113,10 +113,10 @@ implements MouseListener
 			Object data = e.widget.getData();
 			final String sNameWidget, sInfoWidget;
 	    @SuppressWarnings("unchecked")
-	  	WidgetDescriptor<Control> infos = (WidgetDescriptor<Control>)widget.getData();
-			if(data instanceof WidgetDescriptor<?>){
+	  	WidgetDescriptor infos = (WidgetDescriptor)widget.getData();
+			if(data instanceof WidgetDescriptor){
 				@SuppressWarnings("unchecked")
-				WidgetDescriptor<Control> descr = (WidgetDescriptor<Control>)data;
+				WidgetDescriptor descr = (WidgetDescriptor)data;
 				sNameWidget = descr.name;
 				sInfoWidget = descr.sDataPath;
 			} else {
@@ -158,9 +158,9 @@ implements MouseListener
   	//
 		Object data = e.widget.getData();
 		final String sNameWidget, sInfoWidget;
-		final WidgetDescriptor<?> descr;
-		if(data instanceof WidgetDescriptor<?>){
-			descr = (WidgetDescriptor<?>)data;
+		final WidgetDescriptor descr;
+		if(data instanceof WidgetDescriptor){
+			descr = (WidgetDescriptor)data;
 			sNameWidget = descr.name;
 			sInfoWidget = descr.sDataPath;
 		} else {

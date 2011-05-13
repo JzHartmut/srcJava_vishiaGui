@@ -109,7 +109,7 @@ public class TableSwt
     final TableSwt table;
     Composite parent = (Composite)mng.currPanel.panelComposite;
     table = new TableSwt(mng, parent, height, columnWidths); //, selectionColumn, selectionText);
-    WidgetDescriptor widgd = new WidgetDescriptor<Control>(sName, table.table, 'L', sName, null);
+    WidgetDescriptor widgd = new WidgetDescriptor(sName, table.table, 'L', sName, null);
     widgd.setPanelMng(mng);
     table.table.setData(widgd);
     mng.indexNameWidgets.put(sName, widgd);

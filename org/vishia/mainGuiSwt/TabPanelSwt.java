@@ -54,7 +54,7 @@ public class TabPanelSwt extends TabPanel
 		} else {
 	  	panel = new GridPanelSwt(tabMng, 0, colorBackground, mng.propertiesGui.xPixelUnit(), mng.propertiesGui.yPixelUnit(), 5, 5);
 		}
-		PanelContent<Composite> panelContent = mng.registerPanel(sName, panel);
+		PanelContent panelContent = mng.registerPanel(sName, panel);
 	  tabItemOperation.setControl(panel);
 	  panel.setData(panelContent);
 	  return panel;
@@ -66,7 +66,7 @@ public class TabPanelSwt extends TabPanel
 		tabItemOperation.setText(sLabel);
 		Color colorBackground = mng.propertiesGui.color(0xeeeeee);
 	  CanvasStorePanelSwt panel = new CanvasStorePanelSwt(tabMng, 0, colorBackground);
-	  PanelContent<Composite> panelContent = mng.registerPanel(sName, panel);
+	  PanelContent panelContent = mng.registerPanel(sName, panel);
 	  tabItemOperation.setControl(panel);
 	  panel.setData(panelContent);
 	  return panel;
@@ -95,8 +95,8 @@ public class TabPanelSwt extends TabPanel
 				Object data = container.getData();
 				if(data != null && notifyingUserInstanceWhileSelectingTab !=null){
 					@SuppressWarnings("unchecked")
-					PanelContent<Control> panelContent = (PanelContent<Control>)(data);
-					List<WidgetDescriptor<?>> widgetInfos = panelContent.widgetList; 
+					PanelContent panelContent = (PanelContent)(data);
+					List<WidgetDescriptor> widgetInfos = panelContent.widgetList; 
 					notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);
 				}
 			}

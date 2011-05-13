@@ -11,7 +11,7 @@ import org.vishia.byteData.VariableContainer_ifc;
  *
  * @param <WidgetTYPE>
  */
-public class WidgetDescriptor<WidgetTYPE>
+public class WidgetDescriptor
 {
   GuiPanelMngWorkingIfc itsPanel;
   

@@ -406,7 +406,7 @@ private final UserActionGui cmdInvoke = new UserActionGui()
   StringBuilder output = new StringBuilder();
   StringBuilder error = new StringBuilder();
    
-  public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
+  public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
   {
     if(sCmd != null){
       output.setLength(0);

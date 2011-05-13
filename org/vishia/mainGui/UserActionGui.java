@@ -30,5 +30,5 @@ public interface UserActionGui
    *        With this information the same action method can be used for more as one action type. 
    * @param params Some optional params, depending on the implementation and the sIntension.
    */
-  void userActionGui(String sIntension, WidgetDescriptor<?> infos, Object... params);
+  void userActionGui(String sIntension, WidgetDescriptor infos, Object... params);
 }

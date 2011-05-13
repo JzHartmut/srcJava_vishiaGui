@@ -74,7 +74,7 @@ public class GuiFilesDiffPanel
   
   private final UserActionGui actionTableLineFile = new UserActionGui()
   { 
-    public void userActionGui(String sCmd, WidgetDescriptor<?> widgetInfos, Object... values)
+    public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
     {
       if(sCmd.equals("mark")){
         TableLineGui_ifc line = (TableLineGui_ifc) values[0];
