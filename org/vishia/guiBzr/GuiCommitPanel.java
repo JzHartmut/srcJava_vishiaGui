@@ -47,9 +47,7 @@ public class GuiCommitPanel
   { 
     public void userActionGui(String sCmdGui, WidgetDescriptor widgetInfos, Object... values)
     {
-      String sCommitText = widgdCommitText.getValue();
-      File fileCommitText = new File(mainData.currCmpn.fileBzrLocation, "_bzrCommit.txt");
-      FileSystem.writeFile(sCommitText, fileCommitText);
+      File fileCommitText = mainData.mainAction.getContentofCommitText();
       String sCmd = "bzr commit -F " + fileCommitText.getAbsolutePath();
       mainData.cmdMng.directory(mainData.currCmpn.fileBzrLocation);
       mainData.mainCmdifc.executeCmdLine(mainData.cmdMng, "bzr status", null, Report.info, uCommitOut, uCommitOut);

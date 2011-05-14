@@ -17,6 +17,9 @@ import org.vishia.util.FileSystem;
 public class BzrGetStatus
 {
 
+  /**TODO only private local using here, it should be a part of DataProject.
+   * 
+   */
   List<File> listBzrDirs = new LinkedList<File>();
   
   final MainData mainData;
@@ -70,6 +73,9 @@ public class BzrGetStatus
   void captureStatus(DataCmpn data)
   {
     //DataCmpn data = mainData.currPrj.data[ixData];    
+    data.uBzrError.setLength(0);
+    data.uBzrLastVersion.setLength(0);
+    data.uBzrStatusOutput.setLength(0);
     mainData.cmdMng.directory(data.fileBzrLocation);      
     mainCmdifc.executeCmdLine(mainData.cmdMng, "bzr status", null, Report.info, data.uBzrStatusOutput, data.uBzrError);
     mainCmdifc.executeCmdLine(mainData.cmdMng, "bzr log -l 1", null, Report.info, data.uBzrLastVersion, data.uBzrError);
@@ -83,6 +89,11 @@ public class BzrGetStatus
   }
   
   
+  /**Reads the status output and fills the {@link #listUnknownFiles},
+   * {@link DataCmpn#listModifiedFiles}, {@link DataCmpn#listNewFiles}, 
+   * {@link DataCmpn#listAddFiles}, {@link DataCmpn#listRemovedFiles}, 
+   * 
+   */
   void initListFiles()
   {
     DataCmpn data = mainData.currCmpn;
@@ -98,11 +109,21 @@ public class BzrGetStatus
         listFiles = data.listModifiedFiles = new LinkedList<DataFile>();
       } else if( (pos = sLine.indexOf("unknown:"))>=0){
         listFiles = data.listNewFiles = new LinkedList<DataFile>();
+      } else if( (pos = sLine.indexOf("removed:"))>=0){
+        listFiles = data.listRemovedFiles = new LinkedList<DataFile>();
+      } else if( (pos = sLine.indexOf("added:"))>=0){
+        listFiles = data.listAddFiles = new LinkedList<DataFile>();
+      } else if( (pos = sLine.indexOf("renamed:"))>=0){
+        listFiles = data.listRenamedFiles = new LinkedList<DataFile>();
       } else {
         //line with a file path
         String sFilePath = sLine.trim();
         if(sFilePath.endsWith("*")){
           sFilePath = sFilePath.substring(0, sFilePath.length()-1).trim();
+        }
+        int posSep = sFilePath.indexOf("=>");
+        if( posSep >=0){
+          sFilePath = sFilePath.substring(posSep+2).trim();
         }
         File file = new File(mainData.currCmpn.fileBzrLocation, sFilePath);
         DataFile fileData = new DataFile(file, sFilePath);

@@ -45,6 +45,10 @@ public class DataCmpn
   
   List<DataFile> listAddFiles;
   
+  List<DataFile> listRenamedFiles;
+  
+  
+  
   public File getBzrLocationDir(){ return fileBzrLocation; }
   
 
