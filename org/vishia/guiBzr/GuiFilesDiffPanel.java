@@ -68,7 +68,6 @@ public class GuiFilesDiffPanel
   void fillFileTable(DataCmpn cmpn)
   {
     widgdTableFilesCmpn.setValue(GuiPanelMngWorkingIfc.cmdClear, -1, null);  //clear the whole table
-    StringBuilder uLine = new StringBuilder(200); 
     String sLastDirectory = "";
     List<DataFile> listDataFileInDirectory = new LinkedList<DataFile>();
     boolean bLastWasDirectoryBlock = false;
@@ -77,36 +76,52 @@ public class GuiFilesDiffPanel
     	int pos =	dataFile.sLocalpath.lastIndexOf('/');
     	String sDirectory = dataFile.sLocalpath.substring(0, pos+1);
       if(!sDirectory.equals(sLastDirectory)){
-      	if(listDataFileInDirectory.size() >=3){ //if at least 3 files, write directory line above
-      	  uLine.setLength(0);
-      		uLine.append(sLastDirectory).append("\t------------\t \tdir");
-          widgdTableFilesCmpn.setValue(GuiPanelMngWorkingIfc.cmdInsert, 99999, uLine.toString());
-          bLastWasDirectoryBlock = true;
-      	} else {
-      		if(bLastWasDirectoryBlock){
-      			uLine.setLength(0);
-        		uLine.append("----------------------------\t------------\t \tdir");
-            widgdTableFilesCmpn.setValue(GuiPanelMngWorkingIfc.cmdInsert, 99999, uLine.toString());
-          }
-      		bLastWasDirectoryBlock = false;
-      	}
-      	for(DataFile file: listDataFileInDirectory){
-      	  uLine.setLength(0);
-      		uLine.append(file.sLocalpath).append("\t");
-          if(file.dateFile !=0){
-            uLine.append(mainData.formatTimestampYesterday(file.dateFile));
-          } else {
-            uLine.append("unknown"); 
-          }
-          uLine.append("\t \t").append(file.sType);
-          widgdTableFilesCmpn.setValue(GuiPanelMngWorkingIfc.cmdInsert, 99999, uLine.toString());
-      	}
+      	//write the last appendix of a directory block or file.
+        bLastWasDirectoryBlock = writeAppendixInFileTable(listDataFileInDirectory, sLastDirectory
+      		, bLastWasDirectoryBlock);
+        //clear and init:
       	listDataFileInDirectory.clear();
       	sLastDirectory = sDirectory;
       }
       listDataFileInDirectory.add(dataFile);
     }
+    //write the last appendix:
+    writeAppendixInFileTable(listDataFileInDirectory, sLastDirectory, bLastWasDirectoryBlock);
   }
+
+  
+  private boolean writeAppendixInFileTable(List<DataFile> listDataFileInDirectory, String sLastDirectory
+  	, boolean bLastWasDirectoryBlock)
+  { StringBuilder uLine = new StringBuilder(200); 
+	  if(listDataFileInDirectory.size() >=3){ //if at least 3 files, write directory line above
+		  uLine.setLength(0);
+			uLine.append(sLastDirectory).append("\t------------\t \tdir");
+	    widgdTableFilesCmpn.setValue(GuiPanelMngWorkingIfc.cmdInsert, 99999, uLine.toString());
+	    bLastWasDirectoryBlock = true;
+		} else {
+			if(bLastWasDirectoryBlock){
+				uLine.setLength(0);
+	  		uLine.append("----------------------------\t------------\t \tdir");
+	      widgdTableFilesCmpn.setValue(GuiPanelMngWorkingIfc.cmdInsert, 99999, uLine.toString());
+	    }
+			bLastWasDirectoryBlock = false;
+		}
+		//TODO add at last!!!
+		for(DataFile file: listDataFileInDirectory){
+		  uLine.setLength(0);
+			uLine.append(file.sLocalpath).append("\t");
+	    if(file.dateFile !=0){
+	      uLine.append(mainData.formatTimestampYesterday(file.dateFile));
+	    } else {
+	      uLine.append("unknown"); 
+	    }
+	    uLine.append("\t \t").append(file.sType);
+	    widgdTableFilesCmpn.setValue(GuiPanelMngWorkingIfc.cmdInsert, 99999, uLine.toString());
+		}
+		return bLastWasDirectoryBlock;
+  }
+  
+  
   
   
   void xxxfillFileTable(DataCmpn cmpn)
