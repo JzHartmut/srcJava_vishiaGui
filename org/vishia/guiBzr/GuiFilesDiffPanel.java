@@ -1,6 +1,8 @@
 package org.vishia.guiBzr;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -64,6 +66,50 @@ public class GuiFilesDiffPanel
     
 
   void fillFileTable(DataCmpn cmpn)
+  {
+    widgdTableFilesCmpn.setValue(GuiPanelMngWorkingIfc.cmdClear, -1, null);  //clear the whole table
+    StringBuilder uLine = new StringBuilder(200); 
+    String sLastDirectory = "";
+    List<DataFile> listDataFileInDirectory = new LinkedList<DataFile>();
+    boolean bLastWasDirectoryBlock = false;
+    for(Map.Entry<String, DataFile> entry: cmpn.indexFiles.entrySet()){
+    	DataFile dataFile = entry.getValue();
+    	int pos =	dataFile.sLocalpath.lastIndexOf('/');
+    	String sDirectory = dataFile.sLocalpath.substring(0, pos+1);
+      if(!sDirectory.equals(sLastDirectory)){
+      	if(listDataFileInDirectory.size() >=3){ //if at least 3 files, write directory line above
+      	  uLine.setLength(0);
+      		uLine.append(sLastDirectory).append("\t------------\t \tdir");
+          widgdTableFilesCmpn.setValue(GuiPanelMngWorkingIfc.cmdInsert, 99999, uLine.toString());
+          bLastWasDirectoryBlock = true;
+      	} else {
+      		if(bLastWasDirectoryBlock){
+      			uLine.setLength(0);
+        		uLine.append("----------------------------\t------------\t \tdir");
+            widgdTableFilesCmpn.setValue(GuiPanelMngWorkingIfc.cmdInsert, 99999, uLine.toString());
+          }
+      		bLastWasDirectoryBlock = false;
+      	}
+      	for(DataFile file: listDataFileInDirectory){
+      	  uLine.setLength(0);
+      		uLine.append(file.sLocalpath).append("\t");
+          if(file.dateFile !=0){
+            uLine.append(mainData.formatTimestampYesterday(file.dateFile));
+          } else {
+            uLine.append("unknown"); 
+          }
+          uLine.append("\t \t").append(file.sType);
+          widgdTableFilesCmpn.setValue(GuiPanelMngWorkingIfc.cmdInsert, 99999, uLine.toString());
+      	}
+      	listDataFileInDirectory.clear();
+      	sLastDirectory = sDirectory;
+      }
+      listDataFileInDirectory.add(dataFile);
+    }
+  }
+  
+  
+  void xxxfillFileTable(DataCmpn cmpn)
   {
     widgdTableFilesCmpn.setValue(GuiPanelMngWorkingIfc.cmdClear, -1, null);  //clear the whole table
     if(cmpn.listModifiedFiles !=null) for(DataFile file: cmpn.listModifiedFiles){
@@ -227,75 +273,88 @@ public class GuiFilesDiffPanel
   
   
   
+  void commitSelectedFiles()
+  {
+  	File fileCommitText = mainData.mainAction.getContentofCommitText();
+    if(fileCommitText == null){
+      mainData.mainCmdifc.writeError("The commit text is empty. Please write there: Commit-Tab");
+    } else {
+      //String sCmd = "bzr commit -F " + fileCommitText.getAbsolutePath();
+      
+    	StringBuilder uFilesAdd = new StringBuilder(1000);
+    	//
+      String sCmdAdd = mainData.cfg.indexCmds.get("add");
+      StringBuilder uCmdAdd = new StringBuilder(1000);
+    	uCmdAdd.append(sCmdAdd);
+    	int posFile = uCmdAdd.indexOf("$Files");
+      if(posFile >=0){
+      	uCmdAdd.replace(posFile, posFile + 6, "");  //idea: $Files<-F $$> prescript to replace
+      } else {
+      	//what todo
+      }
+      //
+      String sCmdCommit = mainData.cfg.indexCmds.get("commit");
+      StringBuilder uCmdCommit = new StringBuilder(1000);
+      uCmdCommit.append(sCmdCommit);
+      posFile = uCmdCommit.indexOf("$CommitDescrFile");
+      if(posFile >=0){
+      	uCmdCommit.replace(posFile, posFile + 16, fileCommitText.getAbsolutePath());
+      } else {
+      	//what todo
+      }
+      posFile = uCmdCommit.indexOf("$Files");
+      if(posFile >=0){
+      	uCmdCommit.replace(posFile, posFile + 6, "");  //idea: $Files<-F $$> prescript to replace
+      } else {
+      	//what todo
+      }
+      //
+      //assemble the files to add and to commit:
+      boolean bAdd = false;
+      boolean bCommitSel = false;
+      for(Map.Entry<String, TableLineGui_ifc> entry: indexMarkedFiles.entrySet()){
+        TableLineGui_ifc line = entry.getValue();
+        String sType = line.getCellText(3);
+        String sFile = entry.getKey();
+        if(sType.equals("new")){
+          bAdd = true;
+          uFilesAdd.append(" ").append(sFile);
+        }
+        else if(sType.equals("chg") || sType.equals("add") || sType.equals("mov") || sType.equals("dir")){
+          bCommitSel = true;
+          uCmdCommit.append(" ").append(sFile);
+        }
+      }
+      mainData.cmdMng.directory(mainData.currCmpn.fileBzrLocation);
+      if(bAdd){
+        //mainData.log 
+      	uCmdAdd.append(uFilesAdd);
+        mainData.mainCmdifc.executeCmdLine(mainData.cmdMng, uCmdAdd.toString(), null, Report.info, uRenameOut, uRenameOut);
+        mainData.mainCmdifc.writeInfoln(uCmdAdd + "\n" + uRenameOut);
+      }
+      if(bCommitSel && bAdd){
+        uCmdCommit.append(uFilesAdd);
+      }
+      if(bCommitSel || bAdd){
+        uRenameOut.setLength(0);
+        mainData.mainCmdifc.executeCmdLine(mainData.cmdMng, uCmdCommit.toString(), null, Report.info, uRenameOut, uRenameOut);
+        mainData.mainCmdifc.writeInfoln(uCmdAdd + "\n" + uRenameOut);
+      } else {
+        mainData.mainCmdifc.writeError("Nothing to commit - Please select files with space-bar");
+      }
+      //TODO read status
+      refreshFiles();
+    }
+  
+  }
+  
+  
   
   private final UserActionGui actionCommit = new UserActionGui()
   { 
     public void userActionGui(String sActionCmd, WidgetDescriptor widgetInfos, Object... values)
     { if(sActionCmd.equals("Button-up")){
-        
-        File fileCommitText = mainData.mainAction.getContentofCommitText();
-        if(fileCommitText == null){
-          mainData.mainCmdifc.writeError("The commit text is empty. Please write there: Commit-Tab");
-        } else {
-          //String sCmd = "bzr commit -F " + fileCommitText.getAbsolutePath();
-          
-        	StringBuilder uFilesAdd = new StringBuilder(1000);
-        	StringBuilder uCmdAdd = new StringBuilder(1000);
-          StringBuilder uCmdCommit = new StringBuilder(1000);
-          String sCmdAdd = mainData.cfg.indexCmds.get("add");
-          sCmdAdd = "d:/Progs/Bazaar/bzr add ";
-          String sCmdCommit = mainData.cfg.indexCmds.get("commit");
-          uCmdCommit.append(sCmdCommit);
-          uCmdAdd.append(sCmdAdd);
-          int posFile = uCmdCommit.indexOf("$CommitDescrFile");
-          if(posFile >=0){
-          	uCmdCommit.replace(posFile, posFile + 16, fileCommitText.getAbsolutePath());
-          } else {
-          	//what todo
-          }
-          posFile = uCmdCommit.indexOf("$Files");
-          if(posFile >=0){
-          	uCmdCommit.replace(posFile, posFile + 6, "");  //idea: $Files<-F $$> prescript to replace
-          } else {
-          	//what todo
-          }
-          //uCmdCommit.append("bzr commit -F ");
-          //uCmdCommit.append(fileCommitText.getAbsolutePath());
-          boolean bAdd = false;
-          boolean bCommitSel = false;
-          for(Map.Entry<String, TableLineGui_ifc> entry: indexMarkedFiles.entrySet()){
-            TableLineGui_ifc line = entry.getValue();
-            String sType = line.getCellText(3);
-            String sFile = entry.getKey();
-            if(sType.equals("new")){
-              bAdd = true;
-              uFilesAdd.append(" ").append(sFile);
-            }
-            else if(sType.equals("chg") || sType.equals("add") || sType.equals("move")){
-              bCommitSel = true;
-              uCmdCommit.append(" ").append(sFile);
-            }
-          }
-          mainData.cmdMng.directory(mainData.currCmpn.fileBzrLocation);
-          if(bAdd){
-            //mainData.log 
-          	uCmdAdd.append(uFilesAdd);
-            mainData.mainCmdifc.executeCmdLine(mainData.cmdMng, uCmdAdd.toString(), null, Report.info, uRenameOut, uRenameOut);
-            mainData.mainCmdifc.writeInfoln(uCmdAdd + "\n" + uRenameOut);
-          }
-          if(bCommitSel && bAdd){
-            uCmdCommit.append(uFilesAdd);
-          }
-          if(bCommitSel || bAdd){
-            uRenameOut.setLength(0);
-            mainData.mainCmdifc.executeCmdLine(mainData.cmdMng, uCmdCommit.toString(), null, Report.info, uRenameOut, uRenameOut);
-            mainData.mainCmdifc.writeInfoln(uCmdAdd + "\n" + uRenameOut);
-          } else {
-            mainData.mainCmdifc.writeError("Nothing to commit - Please select files with space-bar");
-          }
-          //TODO read status
-          refreshFiles();
-        }
+        commitSelectedFiles();     
       }
     }
   };

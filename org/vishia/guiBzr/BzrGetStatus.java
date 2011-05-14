@@ -103,6 +103,7 @@ public class BzrGetStatus
     String sLine;
     listUnknownFiles.clear();
     List<DataFile> listFiles = listUnknownFiles;
+    String sType = "?";
     int posLine = 0, posLineEnd;
     int pos;
     data.listAddFiles = null;
@@ -110,19 +111,25 @@ public class BzrGetStatus
     data.listNewFiles = null;
     data.listRemovedFiles = null;
     data.listRenamedFiles = null;
+    data.indexFiles.clear();
     
     while( (posLineEnd = uStatus.indexOf("\n", posLine))>=0){
       sLine = uStatus.substring(posLine, posLineEnd);
       if( (pos = sLine.indexOf("modified:"))>=0){
         listFiles = data.listModifiedFiles = new LinkedList<DataFile>();
+        sType = "chg";
       } else if( (pos = sLine.indexOf("unknown:"))>=0){
         listFiles = data.listNewFiles = new LinkedList<DataFile>();
+        sType = "new";
       } else if( (pos = sLine.indexOf("removed:"))>=0){
         listFiles = data.listRemovedFiles = new LinkedList<DataFile>();
+        sType = "del";
       } else if( (pos = sLine.indexOf("added:"))>=0){
         listFiles = data.listAddFiles = new LinkedList<DataFile>();
+        sType = "add";
       } else if( (pos = sLine.indexOf("renamed:"))>=0){
         listFiles = data.listRenamedFiles = new LinkedList<DataFile>();
+        sType = "mov";
       } else {
         //line with a file path
         String sFilePath = sLine.trim();
@@ -133,9 +140,11 @@ public class BzrGetStatus
         if( posSep >=0){
           sFilePath = sFilePath.substring(posSep+2).trim();
         }
+        sFilePath = sFilePath.replace('\\', '/');
         File file = new File(mainData.currCmpn.fileBzrLocation, sFilePath);
-        DataFile fileData = new DataFile(file, sFilePath);
+        DataFile fileData = new DataFile(file, sFilePath, sType);
         listFiles.add(fileData);
+        data.indexFiles.put(sFilePath, fileData);
       }
       posLine = posLineEnd +1;    
     }

@@ -18,10 +18,22 @@ public class DataFile
    */
   long dateInArchive, dateFile;
   
-  DataFile(File file, String sLocalpath)
+  /**Type of file:
+   * <ul>
+   * <li>chg: modified, changed
+   * <li>new: not archived yet
+   * <li>add: added to archive, but not commited yet
+   * <li>del: removed, not found
+   * <li>mov: moved or renamed in archive
+   * 
+   */
+  String sType;
+  
+  DataFile(File file, String sLocalpath, String sType)
   {
     this.file = file;
     this.sLocalpath = sLocalpath;
+    this.sType = sType;
     dateFile = file.lastModified();
   }
 }

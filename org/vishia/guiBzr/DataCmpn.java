@@ -2,6 +2,8 @@ package org.vishia.guiBzr;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**This class contains all data from the Source-Archive of one component. 
  * @author Hartmut Schorrig
@@ -47,7 +49,7 @@ public class DataCmpn
   
   List<DataFile> listRenamedFiles;
   
-  
+  final Map<String, DataFile> indexFiles = new TreeMap<String, DataFile>();
   
   public File getBzrLocationDir(){ return fileBzrLocation; }
   
