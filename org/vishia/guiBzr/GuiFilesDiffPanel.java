@@ -52,12 +52,13 @@ public class GuiFilesDiffPanel
     widgdTableFilesCmpn = panelBuildifc.addTable("selectFile", 20, columnWidths);
     widgdTableFilesCmpn.setAction(actionTableLineFile);
     panelBuildifc.setPosition(2, 61, 3, 9, 'd');
+    panelBuildifc.addButton("refresh", actionRefresh, "","","","&refresh");
     panelBuildifc.addButton("view", actionView, "","","","&view");
     panelBuildifc.addButton("diff", actionViewdiff, "","","","view &diff");
     //panelBuildifc.addButton("add", actionAdd, "","","","&add");
-    panelBuildifc.setPosition(10, 61, 3, 9, 'd');
+    panelBuildifc.setPosition(13, 61, 3, 9, 'd');
     panelBuildifc.addButton("rename", actionRename, "","","","&rename");
-    panelBuildifc.addButton("commit", actionCommit, "","","","&rename");
+    panelBuildifc.addButton("commit", actionCommit, "","","","&commit");
     
   }
     
@@ -264,6 +265,17 @@ public class GuiFilesDiffPanel
     }
   };
   
+  
+  
+  
+  private final UserActionGui actionRefresh = new UserActionGui()
+  { 
+    public void userActionGui(String sActionCmd, WidgetDescriptor widgetInfos, Object... values)
+    { if(sActionCmd.equals("Button-up")){
+        refreshFiles();
+      }
+    }
+  };
   
   
   

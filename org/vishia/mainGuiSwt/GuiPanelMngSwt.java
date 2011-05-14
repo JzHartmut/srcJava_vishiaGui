@@ -1447,7 +1447,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
       ScrollBar scroll = table.getVerticalBar();
       if(scroll !=null){
         int maxScroll = scroll.getMaximum();
-        log.sendMsg(0, "TEST scroll=%d", maxScroll);
+        //log.sendMsg(0, "TEST scroll=%d", maxScroll);
         //scroll.setSelection(maxScroll);
       }  
       //table.set

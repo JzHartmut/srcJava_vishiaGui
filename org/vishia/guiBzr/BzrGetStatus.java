@@ -103,6 +103,12 @@ public class BzrGetStatus
     List<DataFile> listFiles = listUnknownFiles;
     int posLine = 0, posLineEnd;
     int pos;
+    data.listAddFiles = null;
+    data.listModifiedFiles = null;
+    data.listNewFiles = null;
+    data.listRemovedFiles = null;
+    data.listRenamedFiles = null;
+    
     while( (posLineEnd = uStatus.indexOf("\n", posLine))>=0){
       sLine = uStatus.substring(posLine, posLineEnd);
       if( (pos = sLine.indexOf("modified:"))>=0){
