@@ -81,11 +81,6 @@ public class GuiStatusPanel
     panelBuildifc.selectPanel("Select");
     panelBuildifc.setPosition(yposProjectPath, xposProjectPath, -2, 70, 'r');
     panelBuildifc.addTextField(widgdProjektpath, true, "Project path", 't');
-    //Test only in one Project
-    String sPrjPath = "/home/hartmut/vishia/Java2C/sf/Java2C";
-    widgdProjektpath.setValue(GuiPanelMngWorkingIfc.cmdInsert, 0,sPrjPath);
-    mainData.currPrj = new DataProject(sPrjPath);
-    
     panelBuildifc.setPosition(-1, -1, -2, 2, 'r');
     panelBuildifc.addButton("selectProjectPath", selectProjectPath, "c", "s", "d", "?");
     ///
@@ -107,11 +102,20 @@ public class GuiStatusPanel
     selectorProjectPathTable.setAction(actionSelectorProjectPathTable);
     selectorProjectPath.setPosition(20, 0, -3, 10, 'r');
     selectorProjectPath.addButton("closeProjectBzrComponents", actionCloseProjectBzrComponents, "","","","ok");
-    
+    String sPrjPath = null;
+    for(String sPrjPath1: mainData.cfg.listSwPrjs){
+      if(sPrjPath ==null){ sPrjPath = sPrjPath1; } //The first is offered.
+    	mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0,sPrjPath1);
+    }
+    /*
     mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0,"/home/hartmut/vishia/GUI");
     mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0,"/home/hartmut/vishia/bazaarGui");
     mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0,"/home/hartmut/vishia/Java2C/sf/Java2C");
     mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0,"/home/hartmut/vishia/ZBNF/sf/ZBNF");
+    */
+    //Test only in one Project
+    widgdProjektpath.setValue(GuiPanelMngWorkingIfc.cmdInsert, 0,sPrjPath);
+    mainData.currPrj = new DataProject(sPrjPath);
     
   }
   

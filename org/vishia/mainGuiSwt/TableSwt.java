@@ -184,46 +184,51 @@ public class TableSwt
         } else { widgetDescr = null; action = null;
       }
       if(action !=null){
-        Table table = (Table)source;
-        int ixRow  = table.getSelectionIndex();
-        TableItem line = table.getItem(ixRow);
-        TableLineGui_ifc lineGui = (TableLineGui_ifc)line.getData();
-        if(lineGui == null){
-          lineGui = new TableItemWidget(line);
-          line.setData(lineGui);
-        }
-        if(keyEv.keyCode == 0x0d){ //Enter-key pressed:
-          TableItem[] tableItem = table.getSelection();
-          int zColumns = tableItem.length;
-          String[] content = new String[zColumns];
-          for(int ii=0; ii < zColumns; ++ii){
-            String text= tableItem[ii].getText();  //first column? TODO
-            String text2= tableItem[ii].getText(0);
-            content[ii] = text;  //content of the table item
-          }
-          action.userActionGui("ok", widgetDescr, content);    
-        } else if(keyEv.keyCode == SWT.KeyUp 
-                 && source instanceof Table && ixRow == 0){
-          action.userActionGui("upleave", widgetDescr, (Object)null);    
-        } else if(keyEv.character == ' '){
-          action.userActionGui("mark", widgetDescr, lineGui);    
-            
-          /*
-          && selectionColumn >=0){
-          String selected = line.getText(selectionColumn);
-          if(selected.length() >0) {
-            line.setText(selectionColumn, "");
-            line.setBackground(mng.propertiesGui.color(0xffffff));
-          }
-          else { 
-            line.setText(selectionColumn, selectionText.toString());
-            line.setBackground(mng.propertiesGui.color(0x00ff00));
-          }
-          //table.setSelection(select);
-          stop();
-          */
-        }
-        //if(table.)
+      	int ixRow = -99999;
+      	try{
+	      	Table table = (Table)source;
+	        ixRow  = table.getSelectionIndex();
+	        TableItem line = table.getItem(ixRow);
+	        TableLineGui_ifc lineGui = (TableLineGui_ifc)line.getData();
+	        if(lineGui == null){
+	          lineGui = new TableItemWidget(line);
+	          line.setData(lineGui);
+	        }
+	        if(keyEv.keyCode == 0x0d){ //Enter-key pressed:
+	          TableItem[] tableItem = table.getSelection();
+	          int zColumns = tableItem.length;
+	          String[] content = new String[zColumns];
+	          for(int ii=0; ii < zColumns; ++ii){
+	            String text= tableItem[ii].getText();  //first column? TODO
+	            String text2= tableItem[ii].getText(0);
+	            content[ii] = text;  //content of the table item
+	          }
+	          action.userActionGui("ok", widgetDescr, content);    
+	        } else if(keyEv.keyCode == SWT.KeyUp 
+	                 && source instanceof Table && ixRow == 0){
+	          action.userActionGui("upleave", widgetDescr, (Object)null);    
+	        } else if(keyEv.character == ' '){
+	          action.userActionGui("mark", widgetDescr, lineGui);    
+	            
+	          /*
+	          && selectionColumn >=0){
+	          String selected = line.getText(selectionColumn);
+	          if(selected.length() >0) {
+	            line.setText(selectionColumn, "");
+	            line.setBackground(mng.propertiesGui.color(0xffffff));
+	          }
+	          else { 
+	            line.setText(selectionColumn, selectionText.toString());
+	            line.setBackground(mng.propertiesGui.color(0x00ff00));
+	          }
+	          //table.setSelection(select);
+	          stop();
+	          */
+	        }
+	        //if(table.)
+      	} catch(Exception exc){
+      		stop();  //ignore it
+      	}
       }
       stop();
       //basicListener.keyPressed(arg0);

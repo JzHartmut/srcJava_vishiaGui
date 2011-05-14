@@ -132,6 +132,11 @@ public class BzrGui
     
     mainData = new MainData(gui);
     
+    File fileCfg = new File("D:/Bzr/bzrGui.cfg");
+    String sError = mainData.cfg.readConfig(fileCfg);
+    if(sError !=null){
+    	gui.writeError(sError);
+    }
     inspector = new Inspector("UDP:127.0.0.1:60088");
     inspector.start(this);
   
@@ -165,13 +170,13 @@ public class BzrGui
   
     //dialogVellMng.re
     boolean bConfigDone = false;
-    if(cargs.sFileGui != null){
+    //if(cargs.sFileGui != null){
       //configGuiWithZbnf.ctDone(0);  //counter for done initialized.
-      File fileSyntax = new File(cargs.sPathZbnf + "/dialog.zbnf");
+      //File fileSyntax = new File(cargs.sPathZbnf + "/dialog.zbnf");
       //dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
       gui.addDispatchListener(configGui);
       bConfigDone = configGui.awaitExecution(1, 10000);
-    }    
+    //}    
     //assigns the fields which are visible to the oamOutValues-Manager to fill it with the values.
     if(!bConfigDone){
       console.writeError("No configuration");

@@ -48,11 +48,19 @@ public class GuiCommitPanel
     public void userActionGui(String sCmdGui, WidgetDescriptor widgetInfos, Object... values)
     {
       File fileCommitText = mainData.mainAction.getContentofCommitText();
-      String sCmd = "bzr commit -F " + fileCommitText.getAbsolutePath();
+      StringBuilder sCmdCommit = new StringBuilder(mainData.cfg.indexCmds.get("commit"));
+      int posFile = sCmdCommit.indexOf("$CommitDescrFile");
+      if(posFile >=0){
+      	sCmdCommit.replace(posFile, 16, fileCommitText.getAbsolutePath());
+      } else {
+      	//what todo
+      }
+      //String sCmd = "bzr commit -F " + fileCommitText.getAbsolutePath();
       mainData.cmdMng.directory(mainData.currCmpn.fileBzrLocation);
-      mainData.mainCmdifc.executeCmdLine(mainData.cmdMng, "bzr status", null, Report.info, uCommitOut, uCommitOut);
+      String sCmdStatus = mainData.cfg.indexCmds.get("status");
+      mainData.mainCmdifc.executeCmdLine(mainData.cmdMng, sCmdStatus, null, Report.info, uCommitOut, uCommitOut);
       uCommitOut.setLength(0);
-      mainData.mainCmdifc.executeCmdLine(mainData.cmdMng, sCmd, null, Report.info, uCommitOut, uCommitOut);
+      mainData.mainCmdifc.executeCmdLine(mainData.cmdMng, sCmdCommit.toString(), null, Report.info, uCommitOut, uCommitOut);
       stop();
     }
   };

@@ -21,6 +21,8 @@ public class MainData
   
   GuiMainAreaifc guifc;
   
+  final DataConfig cfg = new DataConfig();
+  
   /**The current selected software project. */
   DataProject currPrj;
   
