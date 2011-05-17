@@ -255,19 +255,20 @@ public class GuiFilesDiffPanel
           uCmd.append(sCmd);
           int pos = uCmd.indexOf("$Oldfile");
           if(pos >=0){
-          	uCmd.replace(pos, 8, sFileOld);
+          	uCmd.replace(pos, pos + 8, sFileOld);
           } else {
           	//what todo
           }
           pos = uCmd.indexOf("$Newfile");
           if(pos >=0){
-          	uCmd.replace(pos, 8, sFileNew);
+          	uCmd.replace(pos, pos + 8, sFileNew);
           } else {
           	//what todo
           }
           mainData.mainCmdifc.executeCmdLine(mainData.cmdMng, uCmd.toString(), null, Report.error, uRenameOut, uRenameOut);
           mainData.mainCmdifc.writeInfoln(sCmd + "\n" + uRenameOut);
         }
+        refreshFiles();
       }
     }
   };
@@ -357,7 +358,6 @@ public class GuiFilesDiffPanel
       } else {
         mainData.mainCmdifc.writeError("Nothing to commit - Please select files with space-bar");
       }
-      //TODO read status
       refreshFiles();
     }
   

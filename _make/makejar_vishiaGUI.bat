@@ -8,14 +8,15 @@ REM The TMP_JAVAC is a directory, which contains only this compiling results. It
 set TMP_JAVAC=..\..\..\tmp_javac
 
 REM Output jar-file with path and filename relative from current dir. It is beside the srcJava-directory:
-set OUTPUTFILE_JAVAC=..\..\exe\ViewCfg.jar
+set OUTPUTFILE_JAVAC=..\..\exe\vishiaGUI.jar
 if not exist ..\..\exe mkdir ..\..\exe
 
 REM Manifest-file for jar building relativ path from current dir:
-set MANIFEST_JAVAC=ViewCfg.manifest
+set MANIFEST_JAVAC=vishiaGUI.manifest
 
 REM Input for javac, only choice of primary sources, relativ path from current (make)-directory:
 set INPUT_JAVAC=../org/vishia/guiViewCfg/ViewCfg.java
+set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/guiBzr/*.java
 
 REM Sets the CLASSPATH variable for compilation (used jar-libraries).
 REM This component based on the ZBNF and the vishiaRun.
