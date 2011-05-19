@@ -116,7 +116,7 @@ import org.vishia.msgDispatch.LogMessage;
  * @author Hartmut Schorrig
  *
  */
-public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPanelMngBuildIfc, GuiPanelMngWorkingIfc
+public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMngWorkingIfc
 //GuiShellMngIfc<Control>   
 {
   private static final long serialVersionUID = -2547814076794969689L;
@@ -336,7 +336,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase<Composite> implements GuiPan
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public GuiPanelMngSwt(GuiPanelMngBase<?> parent, Composite graphicFrame, int width, int height, PropertiesGuiSwt propertiesGui
+  public GuiPanelMngSwt(GuiPanelMngBase parent, Composite graphicFrame, int width, int height, PropertiesGuiSwt propertiesGui
   	, VariableContainer_ifc variableContainer
   	, LogMessage log
   	)

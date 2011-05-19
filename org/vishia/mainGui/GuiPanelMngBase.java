@@ -27,10 +27,10 @@ import org.vishia.msgDispatch.LogMessage;
  * @param <WidgetTYPE> The special base type of the composed widgets in the underlying graphic adapter specialization.
  *                     (SWT: Composite)
  */
-public abstract class GuiPanelMngBase<WidgetTYPE> implements GuiPanelMngBuildIfc, GuiPanelMngWorkingIfc
+public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMngWorkingIfc
 {
 	
-  final GuiPanelMngBase<?> parent;
+  final GuiPanelMngBase parent;
   
   /**Base class for managing all panels and related windows.
    * This base class contains all common resources to manage panels and windows.
@@ -51,17 +51,17 @@ public abstract class GuiPanelMngBase<WidgetTYPE> implements GuiPanelMngBuildIfc
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static GuiPanelMngBase<?> createWindow(String graphicBaseSystem)
-	{ Class<GuiPanelMngBase<?>> mngClass;
-		GuiPanelMngBase<?> mng = null;
+	public static GuiPanelMngBase createWindow(String graphicBaseSystem)
+	{ Class<GuiPanelMngBase> mngClass;
+		GuiPanelMngBase mng = null;
 		String sGraphicBaseSystem = "org.vishia.mainGuiSwt.GuiPanelMngSwt";
 		try{ 
-			mngClass = (Class<GuiPanelMngBase<?>>) Class.forName(sGraphicBaseSystem);
+			mngClass = (Class<GuiPanelMngBase>) Class.forName(sGraphicBaseSystem);
 		} catch(ClassNotFoundException exc){ mngClass = null; }
 		
 		if(mngClass == null) throw new IllegalArgumentException("Graphic base system not found: " + sGraphicBaseSystem);
 		try{ 
-			Constructor<GuiPanelMngBase<?>> ctor = mngClass.getConstructor();
+			Constructor<GuiPanelMngBase> ctor = mngClass.getConstructor();
 			mng = ctor.newInstance();
 			//mng = mngClass.newInstance();
 		
@@ -106,7 +106,7 @@ public abstract class GuiPanelMngBase<WidgetTYPE> implements GuiPanelMngBuildIfc
   
 	
 	
-  public GuiPanelMngBase(GuiPanelMngBase<?> parent
+  public GuiPanelMngBase(GuiPanelMngBase parent
       , PropertiesGui props
       , VariableContainer_ifc variableContainer, LogMessage log)
 	{ this.parent = parent;
