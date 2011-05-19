@@ -96,17 +96,37 @@ public class WidgetDescriptor
 		this.sDataPath = sContentInfo;
 		this.oContentInfo = oContentInfo;
 	}
-
+  
+	/**Sets a application specific info. It should help to present the content. 
+   * This info can be set and changed anytime after registration. */
   public void setContentInfo(Object content){	oContentInfo = content;}
   
+  /**Gets the application specific info. See {@link #setContentInfo(Object)}. */
   public Object getContentInfo(){ return oContentInfo; }
 	
+  /**Sets the data path. It is a String in application context.
+   * @param sDataPath
+   */
   public void setDataPath(String sDataPath){	this.sDataPath = sDataPath;}
   
-  public String getDataPath(String sDataPath){	return this.sDataPath;}
+  /**Changes the data path
+   * @param sDataPath the new one
+   * @return the last one.
+   */
+  public String getDataPath(String sDataPath)
+  {	String sDataPathLast = this.sDataPath;
+    this.sDataPath = sDataPath;
+    return sDataPathLast;
+  }
   
+  /**Gets the data path. It is a String in application context.
+   */
   public String getDataPath(){ return sDataPath; }
 	
+  /**Sets the action for application context.
+   * @param action any instance. Its action method is invoked depending of the type of widget
+   *        usual if the user takes an action on sceen, press button etc.
+   */
   public void setAction(UserActionGui action){ this.action = action; }
   
 	public String getsToolTip()
@@ -217,9 +237,10 @@ public class WidgetDescriptor
   { return itsPanel.getValueFromWidget(this);
   }
   
-  /**Gets the current value of the content of the widget in the given context.
-   * @param mng The context.
-   * @return The value in String representation, null if the widget has no possibility of input.
+  /**Sets the current value of the content of the widget in the given context.
+   * @param cmd see {@link GuiPanelMngWorkingIfc#cmdSet} etc. It is possible to set the color etc.
+   * @param ident Any number to specifiy set, maybe 0
+   * @param value The value in the necessary representation.
    */
   public void setValue(int cmd, int ident, Object value)
   { itsPanel.setInfo(this, cmd, ident, value);

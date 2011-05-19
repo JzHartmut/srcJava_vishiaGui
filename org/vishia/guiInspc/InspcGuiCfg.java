@@ -1,6 +1,8 @@
 package org.vishia.guiInspc;
 
 import java.io.File;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.guiViewCfg.OamRcvValue;
@@ -23,6 +25,8 @@ import org.vishia.msgDispatch.LogMessage;
 
 public class InspcGuiCfg
 {
+  /**Composition of a Inspector-Target instance. This is only to visit this application for debugging.
+   * Not necessary for functionality. */
   private final Inspector inspector;
   
   /**To Output log informations. The ouput will be done in the output area of the graphic. */
@@ -47,6 +51,19 @@ public class InspcGuiCfg
     
     /**Size, either A,B or F for 800x600, 1024x768 or full screen. */
     String sSize;
+    
+    /**The own ipc-address for Interprocess-Communication with the target.
+     * It is a string, which determines the kind of communication.
+     * For example "UDP:0.0.0.0:60099" to create a socket port for UDP-communication.
+     */
+    String sOwnIpcAddr;
+    
+    /**The target ipc-address for Interprocess-Communication with the target.
+     * It is a string, which determines the kind of communication.
+     * For example "UDP:0.0.0.0:60099" to create a socket port for UDP-communication.
+     */
+    Map<String, String> indexTargetIpcAddr = new TreeMap<String, String>();
+    
   } //class CallingArguments
   
   
@@ -109,6 +126,21 @@ public class InspcGuiCfg
       try {
         if(arg.startsWith("-gui="))      
         { cargs.sFileGui = getArgument(5);  //the graphic GUI-appearance 
+        }
+        else if(arg.startsWith("-targetIpc=")) 
+        { String sArg = getArgument(11);
+          int posSep = sArg.indexOf('@');
+          if(posSep < 0){
+            writeError("argument -targetIpc=KEY@ADDR: The '@' is missed.");
+            bOk = false;
+          } else {
+            String sKey = sArg.substring(0, posSep);
+            String sValue = sArg.substring(posSep+1);
+            cargs.indexTargetIpcAddr.put(sKey, sValue);
+          }
+        }
+        else if(arg.startsWith("-ownIpc=")) 
+        { cargs.sOwnIpcAddr = getArgument(8);   //an example for default output
         }
         else if(arg.startsWith("-oambin=")) 
         { cargs.sFileOamValues = getArgument(8);   //an example for default output
@@ -329,17 +361,19 @@ public class InspcGuiCfg
   
   void execute()
   {
+    inspcComm.openComm(callingArguments.sOwnIpcAddr);
     //msgReceiver.start();
     //oamRcvUdpValue.start();
     while(gui.isRunning())
     { try{
-        //oamRcvUdpValue.sendRequest();
+        inspcComm.procComm();  
+      //oamRcvUdpValue.sendRequest();
       } catch(Exception exc){
         //tread-Problem: console.writeError("unexpected Exception", exc);
         System.out.println("unexpected Exception: " + exc.getMessage());
         exc.printStackTrace();
       }
-      try{ Thread.sleep(100);} 
+      try{ Thread.sleep(200);} 
       catch (InterruptedException e)
       { dialogZbnfConfigurator.terminate();
       }

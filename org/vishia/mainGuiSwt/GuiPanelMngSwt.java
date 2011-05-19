@@ -1503,8 +1503,9 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
 	  	  	} else if(oWidget instanceof Text){ 
 	  	  		Text field = (Text)oWidget;
 	  	  		switch(changeReq.cmd){
-	  	  		case GuiPanelMngWorkingIfc.cmdInsert: field.setText((String)changeReq.info); break;
-	  	  		default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", changeReq.cmd, descr.name);
+	  	  		  case GuiPanelMngWorkingIfc.cmdInsert: 
+	  	  		  case GuiPanelMngWorkingIfc.cmdSet: field.setText((String)changeReq.info); break;
+	  	  		default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %x on widget %s", changeReq.cmd, descr.name);
 	  	  		}
 	  	  	} else if(oWidget instanceof LedSwt){ 
 	  	  		LedSwt field = (LedSwt)oWidget;
