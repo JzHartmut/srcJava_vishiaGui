@@ -63,6 +63,8 @@ public class GuiDialogZbnfControlled
   /**Types saves commonly properties for more as one widget. */
   private final Map<String,WidgetDescriptor> types = new TreeMap<String,WidgetDescriptor>();
   
+  private final Map<String, String> nameReplace = new TreeMap<String,String>();
+  
   
 
   public GuiDialogZbnfControlled(MainCmd_ifc cmdLineIfc, File fileSyntax)
@@ -210,12 +212,12 @@ public class GuiDialogZbnfControlled
       mdata.parserCfg.reportStore(console, Report.debug);
     }
     if(bOk) { //parsing of cfg is OK
-      ZbnfParseResultItem item = mdata.parserCfg.getFirstParseResult();
+      ZbnfParseResultItem zbnfTop = mdata.parserCfg.getFirstParseResult();
       int xSize22, ySize22;
-      ZbnfParseResultItem zbnfsize = item.getChild("xSize");
+      ZbnfParseResultItem zbnfsize = zbnfTop.getChild("xSize");
       if(zbnfsize != null){
         xSize22 = (int)zbnfsize.getParsedInteger();
-        ySize22 = (int)item.getChild("ySize").getParsedInteger();
+        ySize22 = (int)zbnfTop.getChild("ySize").getParsedInteger();
       }
       else {
       	xSize22 = 300;
@@ -231,10 +233,20 @@ public class GuiDialogZbnfControlled
         console.writeError("panel not found: ");      	
       }
       else 
-      { Iterator<ZbnfParseResultItem> iter = item.iterChildren("Element");
+      { Iterator<ZbnfParseResultItem> iter;
+        //get all NameReplace
+        iter = zbnfTop.iterChildren("DataReplace");
+        while(iter.hasNext()){
+          ZbnfParseResultItem item = iter.next();  //<?Element>
+          String sKey = item.getChildString("key");
+          String sValue = item.getChildString("string");
+          nameReplace.put(sKey, sValue);
+        }
+        //get all GUI elements
+        iter = zbnfTop.iterChildren("Element");
         String selectedPanel = "";  //The panel which is used.
       	while(iter.hasNext())
-	      { item = iter.next();  //<?Element>
+	      { ZbnfParseResultItem item = iter.next();  //<?Element>
 	        String sHelp = item.getChildString("help");
 	        Iterator<ZbnfParseResultItem> iterElement = item.iterChildren();
 	        item = iterElement.next();  //first child of <Element>
@@ -365,6 +377,21 @@ public class GuiDialogZbnfControlled
           if(sUserAction != null){
           	action = dialog.getRegisteredUserAction(sUserAction);
           }
+          //check whether sInfo starts with any sequence in nameReplace
+          if(sInfo !=null){
+            int posSep = sInfo.indexOf(':');
+            if(posSep > 0){
+              String sPre = nameReplace.get(sInfo.substring(0, posSep));
+              if(sPre !=null){
+                sInfo = sPre + sInfo.substring(posSep+1);
+              }
+            } else {
+              String sReplace = nameReplace.get(sInfo);
+              if(sReplace !=null){
+                sInfo = sReplace;
+              }
+            }
+          }//sInfo !=null
           
           //Check type of element and create it.
           if(semantic.equals("Type"))

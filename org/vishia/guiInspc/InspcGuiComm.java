@@ -104,8 +104,8 @@ public class InspcGuiComm
       }
       if(panel.widgets !=null) for(WidgetDescriptor widget: panel.widgets){
         
-        String sDataPath = widget.getDataPath();
-        sDataPath = "workingThread.data.yCos.";
+        String sDataPath = widget.getDataPath() + ".";
+        //sDataPath = "workingThread.data.yCos.";
         //
         //check whether the widget has an comm action already. 
         //First time a widgets gets its WidgetCommAction. Then for ever the action is kept.
