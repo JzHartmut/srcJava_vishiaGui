@@ -2,7 +2,8 @@
 
 GuiDialogZbnfControlled::=
 [ size( <#?ySize> , <#?xSize> ) ;]
-{<?Element> 
+{ DataReplace: <DataReplace>
+|<?Element> 
  [<?position> @ [<$?panel> ,] 
                 [<?yPosRelative> &+]
                 [<#?yPos>][\.<#?yPosFrac>] 
@@ -25,6 +26,8 @@ GuiDialogZbnfControlled::=
 } \e.
 
 
+DataReplace::= <$?key> = <$-/\.?string> ;.
+
 param::=<?>
 { cmd =  [<""?cmd>|\[<*\]?cmd>\]] 
 | text = [<""?text>|<$-/?text>] 
@@ -38,7 +41,7 @@ param::=<?>
 ##| prompt = [<""?prompt>|<* ,);?prompt>]
 | color = <colorName?color0> [ / <colorName?color1> ] 
 | <""?text>
-| <$-/\.?text>
+| <$-/\.:?text>
 ? , 
 }.
 
