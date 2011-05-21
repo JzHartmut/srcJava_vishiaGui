@@ -34,9 +34,21 @@ public abstract class CanvasStorage
 		public final int x1,y1,x2,y2;
 		
 		public final ColorGui color;
-	}
+	}//class PaintOrder
 
-	public final static int paintLine = 0xee;
+	
+	public static class PaintOrderImage extends PaintOrder
+	{
+	  public final GuiImageBase image;
+	  public final float zoom;
+	  PaintOrderImage(GuiImageBase image, int line, int column, int heigth, int width, float zoom)
+	  { super(paintImage, line, column, heigth, width, null);
+	    this.image = image;
+	    this.zoom = zoom;
+	  }
+	}//class PaintOrderImage
+	
+	public final static int paintLine = 0xee, paintImage = 0x1ae;
 	
 	/**List of all orders to paint in {@link #drawBackground(GC, int, int, int, int)}.
 	 * 
@@ -59,6 +71,13 @@ public abstract class CanvasStorage
 	}
 	
 
+	public void drawImage(GuiImageBase image, int line, int column, int heigth, int width, float zoom)
+	{
+    PaintOrder order = new PaintOrderImage(image, line, column, heigth, width, zoom);
+    paintOrders.add(order);  //paint it when drawBackground is invoked.
+	}
+	
+	
 	public abstract void redraw();
 	
 }

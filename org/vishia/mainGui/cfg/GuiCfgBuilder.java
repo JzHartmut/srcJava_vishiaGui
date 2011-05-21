@@ -1,5 +1,10 @@
 package org.vishia.mainGui.cfg;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -14,11 +19,16 @@ public class GuiCfgBuilder
   
   private final GuiPanelMngBuildIfc gui;
   
+  /**The current directory is that directory, where the config file is located. 
+   * It is used if other files are given with relative path.*/
+  private final File currentDir;
+
   
-  public GuiCfgBuilder(GuiCfgData cfgData, GuiPanelMngBuildIfc gui)
+  public GuiCfgBuilder(GuiCfgData cfgData, GuiPanelMngBuildIfc gui, File currentDir)
   {
     this.cfgData = cfgData;
     this.gui = gui;
+    this.currentDir = currentDir;
   }
   
   public String buildGui()
@@ -51,11 +61,15 @@ public class GuiCfgBuilder
     String sError = null;
     GuiCfgData.GuiCfgPosition prevPos = cfge.previous !=null ? cfge.previous.position : cfge.positionInput;
     GuiCfgData.GuiCfgPosition pos = cfge.position;
+    GuiCfgData.GuiCfgPosition inp = cfge.positionInput;
+    if(cfge.widgetType.text !=null && cfge.widgetType.text.equals("wd:yCos"))
+      stop();
+
     //yPos
-    if(cfge.positionInput.yPos >=0){
-      pos.yPos = cfge.positionInput.yPos;
-      pos.yPosFrac = cfge.positionInput.yPosFrac;
-    } else if(prevPos.yIncr){ //position = previous + heigth/width
+    if(inp.yPos >=0){
+      pos.yPos = inp.yPos;
+      pos.yPosFrac = inp.yPosFrac;
+    } else if(prevPos.yIncr_){ //position = previous + heigth/width
       int yPosAdd = 0;  
       if(prevPos.ySizeDown >=0){ //positive if yPos is on top of widget.
         pos.yPosFrac = prevPos.yPosFrac + prevPos.ySizeFrac;
@@ -70,10 +84,10 @@ public class GuiCfgBuilder
       pos.yPosFrac = prevPos.yPosFrac;
     }
     //xPos
-    if(cfge.positionInput.xPos >=0){
-      pos.xPos = cfge.positionInput.xPos;
-      pos.xPosFrac = cfge.positionInput.xPosFrac;
-    } else if(prevPos.xIncr){ //position = previous + heigth/width
+    if(inp.xPos >=0){
+      pos.xPos = inp.xPos;
+      pos.xPosFrac = inp.xPosFrac;
+    } else if(prevPos.xIncr_){ //position = previous + heigth/width
       int xPosAdd = 0;  
       if(prevPos.xWidth >=0){ //positive if yPos is on top of widget.
         pos.xPosFrac = prevPos.xPosFrac + prevPos.xSizeFrac;
@@ -88,20 +102,23 @@ public class GuiCfgBuilder
       pos.xPosFrac = prevPos.xPosFrac;
     }
     //ySizeDown, xWidth
-    if(cfge.positionInput.ySizeDown !=0){ //ySize is given here.
-      pos.ySizeDown = cfge.positionInput.ySizeDown;
-      pos.ySizeFrac = cfge.positionInput.ySizeFrac;
+    if(inp.ySizeDown !=0){ //ySize is given here.
+      pos.ySizeDown = inp.ySizeDown;
+      pos.ySizeFrac = inp.ySizeFrac;
     } else { //use ySize from previous.
       pos.ySizeDown = prevPos.ySizeDown;
       pos.ySizeFrac = prevPos.ySizeFrac;
     }
-    if(cfge.positionInput.xWidth !=0){ //xWidth is given here
-      pos.xWidth = cfge.positionInput.xWidth;
-      pos.xSizeFrac = cfge.positionInput.xSizeFrac;
+    if(inp.xWidth !=0){ //xWidth is given here
+      pos.xWidth = inp.xWidth;
+      pos.xSizeFrac = inp.xSizeFrac;
     } else { //use xWidth from previous
       pos.xWidth = prevPos.xWidth;
       pos.xSizeFrac = prevPos.xSizeFrac;
     }
+    //
+    pos.xIncr_ = inp.xIncr_ || (!inp.yIncr_ && prevPos.xIncr_);  //inherit xIncr but not if yIncr. 
+    pos.yIncr_ = inp.yIncr_ || (!inp.xIncr_ && prevPos.yIncr_);
     //
     gui.setFinePosition(pos.yPos, pos.yPosFrac, pos.xPos, pos.xPosFrac
       , pos.ySizeDown, pos.ySizeFrac, pos.xWidth, pos.xSizeFrac, 'r');
@@ -109,7 +126,23 @@ public class GuiCfgBuilder
     WidgetDescriptor widgd;
     String sName = cfge.widgetType.name;
     if(sName ==null){ sName = cfge.widgetType.text; }
-    
+    //
+    String sDataPath = cfge.widgetType.info != null ? cfge.widgetType.info : sName;
+    if(sDataPath !=null){
+      int posSep = sDataPath.indexOf(':');
+      if(posSep > 0){
+        String sPre = cfge.itsCfgData.dataReplace.get(sDataPath.substring(0, posSep));
+        if(sPre !=null){
+          sDataPath = sPre + sDataPath.substring(posSep+1);
+        }
+      } else {
+        String sReplace = cfge.itsCfgData.dataReplace.get(sDataPath);
+        if(sReplace !=null){
+          sDataPath = sReplace;
+        }
+      }
+    }
+    //
     if(cfge.widgetType instanceof GuiCfgData.GuiCfgButton){
       widgd = gui.addButton(cfge.widgetType.name, null, cfge.widgetType.cmd, null, cfge.widgetType.info, cfge.widgetType.text);
     } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgText){
@@ -119,9 +152,21 @@ public class GuiCfgBuilder
       else if(wText.colorName !=null){ colorValue = gui.getColorValue(wText.colorName.color);}
       else{ colorValue = 0; } //black
       widgd = gui.addText(cfge.widgetType.text, wText.size.charAt(0), colorValue);
+    } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgImage){
+      GuiCfgData.GuiCfgImage wImage = (GuiCfgData.GuiCfgImage)cfge.widgetType;
+      File fileImage = new File(currentDir, wImage.file_);
+      if(fileImage.exists()){
+        try{ InputStream imageStream = new FileInputStream(fileImage); 
+          gui.addImage(sName, imageStream, 10, 20, "?cmd");
+          imageStream.close();
+        } catch(IOException exc){ }
+          
+      }
+      
     } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgShowField){
       GuiCfgData.GuiCfgShowField wShow = (GuiCfgData.GuiCfgShowField)cfge.widgetType;
       widgd = gui.addTextField(sName, false, null, '.');
+      widgd.setDataPath(sDataPath);
     }
     return sError;
   }
@@ -152,4 +197,5 @@ public class GuiCfgBuilder
   }
   
   
+  void stop(){}
 }

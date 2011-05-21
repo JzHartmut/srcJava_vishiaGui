@@ -65,10 +65,12 @@ import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.mainGui.ColorGui;
 import org.vishia.mainGui.FileDialogIfc;
 import org.vishia.mainGui.GuiDispatchCallbackWorker;
+import org.vishia.mainGui.GuiImageBase;
 import org.vishia.mainGui.GuiMngBase;
 import org.vishia.mainGui.GuiPanelMngBase;
 import org.vishia.mainGui.GuiPanelMngBuildIfc;
 import org.vishia.mainGui.GuiPanelMngWorkingIfc;
+import org.vishia.mainGui.GuiRectangle;
 import org.vishia.mainGui.GuiShellMngBuildIfc;
 import org.vishia.mainGui.GuiShellMngIfc;
 import org.vishia.mainGui.GuiWindowMng_ifc;
@@ -161,34 +163,6 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
    * Swt-capabilities in the derived type.
    */
   public  final PropertiesGuiSwt propertiesGuiSwt;
-  
-  /**Position of the next widget to add. If some widgets are added one after another, 
-   * it is similar like a flow-layout.
-   * But the position can be set.
-   */
-  protected int xPos, xPosFrac =0, yPos, yPosFrac =0;
-  
-  /**Saved last use position. After calling {@link #setPosAndSize_(Control, int, int, int, int)}
-   * the xPos and yPos are setted to the next planned position.
-   * But, if a new position regarded to the last given one is selected, the previous one is need.
-   */
-  protected int xPosPrev, xPosPrevFrac, yPosPrev, yPosPrevFrac;
-  
-  /**width and height for the next element. */
-  protected int xIncr, xSizeFrac, yIncr, ySizeFrac;
-  
-  /**'l' - left 'r'-right, 't' top 'b' bottom. */ 
-  private  char xOrigin = 'l', yOrigin = 'b';
-  
-  char directionOfNextElement = 'r';
-  
-  /**The width of the last placed element. 
-   * It is used to determine a next xPos in horizontal direction. */
-  //int xWidth;
-  
-  /**True if the next element should be placed below the last. */
-  boolean bBelow, bRigth;
-
   
   /**This mouse-click-implementor is added to any widget,
    * which is associated to a {@link WidgetDescriptor} in its data.
@@ -614,7 +588,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
    * @param diff movement of the placement in dedicated pixel units, usefull for example to place a table head and body.
    *             It may be null.
    */
-  private void setBounds_(Control component, int pyGrid, int pxGrid, int dyGrid, int dxGrid)
+  private void xxxsetBounds_(Control component, int pyGrid, int pxGrid, int dyGrid, int dxGrid)
   { int xPixelUnit = propertiesGui.xPixelUnit();
   	int yPixelUnit = propertiesGui.yPixelUnit();
   	
@@ -659,6 +633,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   }
   
   
+  
   protected void setSize_(Control component, int dy, int ySizeFrac, int dx, int xSizeFrac)
   {
   	if(dy <=0){ dy = this.yIncr; }
@@ -669,54 +644,22 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     //furtherSetPosition(dx, dy);
   }
   
-  
+
   protected void setPosAndSize_(Control component, int line, int yPosFrac, int column, int xPosFrac, int dy, int ySizeFrac, int dx, int xSizeFrac)
   {
-  	Control parentComp = component.getParent();
-  	//Rectangle pos;
-  	if(parentComp != graphicFrame){
-  		//it is not a widget in this panel:
-  		stop();
-  		//pos = currPanel.panelComposite.getBounds(); 
-  	} else {
-  		//pos =null;
-  	}
-  	if(line == 19 && yPosFrac == 5)
-  		stop();
-  	//use values from class if parameter are non-valid.
-  	if(line <=0){ line = this.yPos; yPosFrac = this.yPosFrac; }
-  	if(column <=0){ column = this.xPos; xPosFrac = this.xPosFrac; }
-  	if(dy <=0){ dy = this.yIncr; ySizeFrac = this.ySizeFrac; }
-  	if(dx <=0){ dx = this.xIncr; xSizeFrac = this.xSizeFrac; }
-  	//
-  	int xPixelUnit = propertiesGui.xPixelUnit();
-  	int yPixelUnit = propertiesGui.yPixelUnit();
-  	//calculate pixel
-  	int xPixelSize, yPixelSize;  
-  	xPixelSize = xPixelUnit * dx + propertiesGui.xPixelFrac(xSizeFrac) -2 ;
-  	yPixelSize = yPixelUnit * dy + propertiesGui.yPixelFrac(ySizeFrac) -2;
-	  int xPixel = (int)(column * xPixelUnit) + propertiesGui.xPixelFrac(xPosFrac) +1;
-    int yPixel = (int)(line * yPixelUnit) + propertiesGui.yPixelFrac(yPosFrac) +1;
-    if(yOrigin == 'b'){
-      yPixel -= yPixelSize +1; //line is left bottom, yPixel is left top.
+    Control parentComp = component.getParent();
+    //Rectangle pos;
+    if(parentComp != graphicFrame){
+      //it is not a widget in this panel:
+      stop();
+      //pos = currPanel.panelComposite.getBounds(); 
+    } else {
+      //pos =null;
     }
-    if(xOrigin == 'r'){
-      xPixel -= xPixelSize +1; //yPos is left bottom, yPixel is left top.
-    }
-    if(yPixel < 1){ yPixel = 1; }
-    if(xPixel < 1){ xPixel = 1; }
-    component.setBounds(xPixel, yPixel, xPixelSize, yPixelSize);
-    xPosPrev = xPos;    //save to support access to the last positions.
-    yPosPrev = yPos;
-    //set the next planned position:
-    switch(directionOfNextElement){
-    case 'r': xPos += xIncr; break;
-    case 'l': xPos -= xIncr; break;
-    case 'u': yPos -= yIncr; break;
-    case 'd': yPos += yIncr; break;
-    }
+    GuiRectangle rectangle = calcPosAndSize(line, yPosFrac, column, xPosFrac, dy, ySizeFrac, dx,xSizeFrac);
+    component.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
+    
   }
-  
   
 
 
@@ -1007,18 +950,38 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   public Object addImage(String sName, InputStream imageStream, int height, int width, String sCmd)
   {
     ////
-  	ImageData imageData = new ImageData(imageStream);
-  	byte[] data = imageData.data;
-  	Label widget = new Label((Composite)currPanel.panelComposite, 0);
-  	Image image = new Image(((Composite)currPanel.panelComposite).getDisplay(), imageData); 
-  	widget.setImage(image);
+    ImageData imageData = new ImageData(imageStream);
+    byte[] data = imageData.data;
+    Image image = new Image(((Composite)currPanel.panelComposite).getDisplay(), imageData); 
+    GuiImageBase imageGui = new GuiImageBase(image);
+    GuiRectangle rr = getRectangleBounds();
+    if(currPanel.panelComposite instanceof CanvasStorePanelSwt){
+      CanvasStorePanelSwt canvas = (CanvasStorePanelSwt) currPanel.panelComposite;
+      canvas.store.drawImage(imageGui, rr.x, rr.x, rr.dx, rr.dy, 1.0f);
+    }
+    return null;
+  }
+
+  
+  
+  //@Override 
+  public Object XXXaddImage(String sName, InputStream imageStream, int height, int width, String sCmd)
+  {
+    ////
+    ImageData imageData = new ImageData(imageStream);
+    byte[] data = imageData.data;
+    Label widget = new Label((Composite)currPanel.panelComposite, 0);
+    Image image = new Image(((Composite)currPanel.panelComposite).getDisplay(), imageData); 
+    widget.setImage(image);
     widget.setSize(propertiesGui.xPixelUnit() * width, propertiesGui.yPixelUnit() * height);
     setBounds_(widget);
     if(sCmd != null){
       widget.setData(sCmd);
     } 
     WidgetDescriptor widgd = new WidgetDescriptor(sName, widget, 'i', sName, null);
-    indexNameWidgets.put(sName, widgd);
+    if(sName !=null){
+      indexNameWidgets.put(sName, widgd);
+    }
     widgd.setPanelMng(this);
     return widget;
   }

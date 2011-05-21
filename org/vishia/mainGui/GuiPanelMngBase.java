@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.swt.widgets.Control;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.mainCmd.Report;
-import org.vishia.mainGuiSwt.PropertiesGuiSwt;
 import org.vishia.msgDispatch.LogMessage;
 
 /**This is the base class of the GuiPanelMng for several Graphic-Adapters (Swing, SWT etc.). 
@@ -45,6 +45,34 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   
 	protected final VariableContainer_ifc variableContainer;
 	
+  /**Position of the next widget to add. If some widgets are added one after another, 
+   * it is similar like a flow-layout.
+   * But the position can be set.
+   */
+  protected int xPos, xPosFrac =0, yPos, yPosFrac =0;
+  
+  /**Saved last use position. After calling {@link #setPosAndSize_(Control, int, int, int, int)}
+   * the xPos and yPos are setted to the next planned position.
+   * But, if a new position regarded to the last given one is selected, the previous one is need.
+   */
+  protected int xPosPrev, xPosPrevFrac, yPosPrev, yPosPrevFrac;
+  
+  /**width and height for the next element. */
+  protected int xIncr, xSizeFrac, yIncr, ySizeFrac;
+  
+  /**'l' - left 'r'-right, 't' top 'b' bottom. */ 
+  protected char xOrigin = 'l', yOrigin = 'b';
+  
+  protected char directionOfNextElement = 'r';
+  
+  /**The width of the last placed element. 
+   * It is used to determine a next xPos in horizontal direction. */
+  //int xWidth;
+  
+  /**True if the next element should be placed below the last. */
+  protected boolean bBelow, bRigth;
+
+  
 	
 	/**Creates an nee Panel Manager in a new Window.
 	 * @param graphicBaseSystem
@@ -163,6 +191,54 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
 		
 	};
 	
+	
+  protected GuiRectangle getRectangleBounds()
+  { return calcPosAndSize(yPos, yPosFrac, xPos, xPosFrac, this.yIncr, ySizeFrac, this.xIncr, xSizeFrac);
+  }
+  
+  
+
+	
+  protected GuiRectangle calcPosAndSize(int line, int yPosFrac, int column, int xPosFrac, int dy, int ySizeFrac, int dx, int xSizeFrac)
+  {
+    if(line == 19 && yPosFrac == 5)
+      stop();
+    //use values from class if parameter are non-valid.
+    if(line <=0){ line = this.yPos; yPosFrac = this.yPosFrac; }
+    if(column <=0){ column = this.xPos; xPosFrac = this.xPosFrac; }
+    if(dy <=0){ dy = this.yIncr; ySizeFrac = this.ySizeFrac; }
+    if(dx <=0){ dx = this.xIncr; xSizeFrac = this.xSizeFrac; }
+    //
+    int xPixelUnit = propertiesGui.xPixelUnit();
+    int yPixelUnit = propertiesGui.yPixelUnit();
+    //calculate pixel
+    int xPixelSize, yPixelSize;  
+    xPixelSize = xPixelUnit * dx + propertiesGui.xPixelFrac(xSizeFrac) -2 ;
+    yPixelSize = yPixelUnit * dy + propertiesGui.yPixelFrac(ySizeFrac) -2;
+    int xPixel = (int)(column * xPixelUnit) + propertiesGui.xPixelFrac(xPosFrac) +1;
+    int yPixel = (int)(line * yPixelUnit) + propertiesGui.yPixelFrac(yPosFrac) +1;
+    if(yOrigin == 'b'){
+      yPixel -= yPixelSize +1; //line is left bottom, yPixel is left top.
+    }
+    if(xOrigin == 'r'){
+      xPixel -= xPixelSize +1; //yPos is left bottom, yPixel is left top.
+    }
+    if(yPixel < 1){ yPixel = 1; }
+    if(xPixel < 1){ xPixel = 1; }
+    GuiRectangle rectangle = new GuiRectangle(xPixel, yPixel, xPixelSize, yPixelSize);
+    xPosPrev = xPos;    //save to support access to the last positions.
+    yPosPrev = yPos;
+    //set the next planned position:
+    switch(directionOfNextElement){
+    case 'r': xPos += xIncr; break;
+    case 'l': xPos -= xIncr; break;
+    case 'u': yPos -= yIncr; break;
+    case 'd': yPos += yIncr; break;
+    }
+    return rectangle;
+  }
+  
+  void stop(){}
 	
 
 	

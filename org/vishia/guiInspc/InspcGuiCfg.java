@@ -110,7 +110,7 @@ public class InspcGuiCfg
       this.cargs = cargs;
       super.setTitleAndSize("Inspc-GUI-cfg", 50,50,900, 600); //600);  //This instruction should be written first to output syntax errors.
       //super.setStandardMenus(new File("."));
-      super.setOutputArea("A3C3");        //whole area from mid to bottom
+      super.setOutputArea("B3C3");        //whole area from mid to bottom
       super.startGraphicThread();
     }
 
@@ -221,13 +221,13 @@ public class InspcGuiCfg
       tabPanel.addGridPanel("operation", "&Operation",1,1,10,10);
       tabPanel.addGridPanel("panel2", "&Values",1,1,10,10);
       
-      gui.addFrameArea(1,1,3,1, tabPanel.getGuiComponent()); //dialogPanel);
+      gui.addFrameArea(2,1,2,2, tabPanel.getGuiComponent()); //dialogPanel);
       //##
-      WidgetCmpnifc msgPanel = panelMng.createGridPanel(  
+      WidgetCmpnifc treePanel = panelMng.createGridPanel(  
           panelMng.propertiesGui.colorBackground_
           , panelMng.propertiesGui.xPixelUnit(), panelMng.propertiesGui.yPixelUnit(), 5, 5);
-      panelMng.registerPanel("msg", msgPanel);
-      gui.addFrameArea(1,2,3,1, msgPanel); //dialogPanel);
+      panelMng.registerPanel("tree", treePanel);
+      gui.addFrameArea(1,1,1,3, treePanel); //dialogPanel);
       
       gui.removeDispatchListener(this);    
       countExecution();
@@ -345,15 +345,18 @@ public class InspcGuiCfg
     boolean bConfigDone = false;
     if(cargs.sFileGui != null){
       //configGuiWithZbnf.ctDone(0);  //counter for done initialized.
-      File fileSyntax = new File(cargs.sPathZbnf + "/dialog.zbnf");
+      File fileGui = new File(callingArguments.sFileGui);
       {
+        File fileSyntax = new File(cargs.sPathZbnf + "/dialog.zbnf");
         GuiCfgZbnf cfgZbnf = new GuiCfgZbnf(console, fileSyntax);
-        File fileGui = new File(callingArguments.sFileGui);
         
-        cfgZbnf.configureWithZbnf(fileGui, guiCfgData); 
+        String sError = cfgZbnf.configureWithZbnf(fileGui, guiCfgData);
+        if(sError !=null){
+          console.writeError(sError);
+        }
       }
       //dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
-      cfgBuilder = new GuiCfgBuilder(guiCfgData, panelBuildIfc);
+      cfgBuilder = new GuiCfgBuilder(guiCfgData, panelBuildIfc, fileGui.getParentFile());
       gui.addDispatchListener(configGuiWithZbnf);
       bConfigDone = configGuiWithZbnf.awaitExecution(1, 10000);
     }    

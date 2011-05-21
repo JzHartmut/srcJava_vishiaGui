@@ -85,6 +85,16 @@ public final class GuiCfgData
     /**ZBNF: Line::= */
     public void set_Line(GuiCfgLine data){  }
     
+    /**ZBNF: Imagefile::= */
+    public GuiCfgImage new_Imagefile()
+    { GuiCfgImage widgetType1 = new GuiCfgImage(this); 
+      this.widgetType = widgetType1; 
+      return widgetType1;
+    }
+    
+    /**ZBNF: ShowField::= */
+    public void set_Imagefile(GuiCfgImage data){  }
+    
     /**ZBNF: ShowField::= */
     public GuiCfgShowField new_ShowField()
     { GuiCfgShowField widgetType1 = new GuiCfgShowField(this); 
@@ -126,12 +136,15 @@ public final class GuiCfgData
     public boolean yPosRelative;
     public int yPos = -1, yPosFrac;
     public int ySizeDown, ySizeFrac;
-    public boolean yIncr;
+    boolean yIncr_;
     
     public boolean xPosRelative;
     public int xPos = -1, xPosFrac;
     public int xWidth, xSizeFrac;
-    public boolean xIncr;
+    boolean xIncr_;
+    
+    public void set_xIncr(){ xIncr_ = true;}
+    public void set_yIncr(){ yIncr_ = true;}
     
   }//class Position
   
@@ -198,6 +211,21 @@ public final class GuiCfgData
   {
     public float x,y;
   }
+  
+
+  /**ZBNF: Text::= ... ;
+   * Class for instance to capture and store the Table data. */
+  public final static class GuiCfgImage extends WidgetTypeBase
+  {
+    public String size = "B";
+    
+    String file_;
+    
+    public GuiCfgImage(GuiCfgElement itsElement){ super(itsElement); }
+  
+    public void set_file(String value){ file_ = value; }
+  }
+  
   
   
   /**ZBNF: ShowField::= ... ;
@@ -394,6 +422,8 @@ public final class GuiCfgData
   /**From ZBNF: DataReplace: < DataReplace> */
   public void set_Element(GuiCfgElement value)
   { String sPanel = value.positionInput.panel;
+    if(value.widgetType.text !=null && value.widgetType.text.equals("wd:yCos"))
+      stop();
     if(sPanel == null){ //the last panel is used furthermore.
       if(actPanel == null){ 
         actPanel = new GuiCfgPanel("$");
@@ -421,4 +451,5 @@ public final class GuiCfgData
     
   }
 
+  void stop(){}
 }

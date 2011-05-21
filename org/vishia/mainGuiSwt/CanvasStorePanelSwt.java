@@ -14,6 +14,7 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -103,11 +104,18 @@ public class CanvasStorePanelSwt extends Canvas implements WidgetCmpnifc  //Canv
   	
   	for(CanvasStorage.PaintOrder order: store.paintOrders){
   		switch(order.paintWhat){
-  		case CanvasStorage.paintLine:{
-  			g.setForeground(colorSwt(order.color));
-  	  	g.drawLine(order.x1, order.y1, order.x2, order.y2);
-  	  } break;
-  		default: throw new IllegalArgumentException("unknown order");
+    		case CanvasStorage.paintLine: {
+    			g.setForeground(colorSwt(order.color));
+    	  	g.drawLine(order.x1, order.y1, order.x2, order.y2);
+    	  } break;
+    		case CanvasStorage.paintImage: {
+    		  CanvasStorage.PaintOrderImage orderImage = (CanvasStorage.PaintOrderImage) order;
+    		  Image image = (Image)orderImage.image.getImage();
+    		  int dx1 = (int)(orderImage.zoom * order.x2);
+    		  int dy1 = (int)(orderImage.zoom * order.y2);
+          g.drawImage(image, 0, 0, dx1, dy1, order.x1, order.y1, order.x2, order.y2);
+    		} break;
+    		default: throw new IllegalArgumentException("unknown order");
   		}
   	}
   }	
