@@ -781,8 +781,45 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
    *   'l' left, 't' top (above field) 
    * @return
    */
-  public Text addTextField(WidgetDescriptor widgetInfo, boolean editable, String prompt, char promptStylePosition)
+  @Override public WidgetDescriptor addTextField(String name, boolean editable, String prompt, char promptStylePosition)
+  {
+    return addTextField(null, name, editable, prompt, promptStylePosition);
+  }
+  
+
+  /** Adds a text field for showing or editing a text value.
+   * 
+   * @param sName The registering name
+   * @param width Number of grid units for length
+   * @param editable true than edit-able, false to show content 
+   * @param prompt If not null, than a description label is shown
+   * @param promptStylePosition Position and size of description label:
+   *   upper case letter: normal font, lower case letter: small font
+   *   'l' left, 't' top (above field) 
+   * @return
+   */
+  public WidgetDescriptor addTextField(WidgetDescriptor widgetInfo, boolean editable, String prompt, char promptStylePosition)
+  {
+    return addTextField(widgetInfo, null, editable, prompt, promptStylePosition);
+  }
+  
+  
+  /** Adds a text field for showing or editing a text value.
+   * 
+   * @param sName The registering name
+   * @param width Number of grid units for length
+   * @param editable true than edit-able, false to show content 
+   * @param prompt If not null, than a description label is shown
+   * @param promptStylePosition Position and size of description label:
+   *   upper case letter: normal font, lower case letter: small font
+   *   'l' left, 't' top (above field) 
+   * @return
+   */
+  private WidgetDescriptor addTextField(WidgetDescriptor widgetInfo, String name, boolean editable, String prompt, char promptStylePosition)
   { Text widget = new Text((Composite)currPanel.panelComposite, SWT.SINGLE);
+    if(widgetInfo == null){
+      widgetInfo = new WidgetDescriptor(name, editable ? 'T' : 'S');
+    }
     widgetInfo.setPanelMng(this);
     widget.setFont(propertiesGuiSwt.stdInputFont);
     widget.setEditable(editable);
@@ -790,8 +827,6 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     	stop();
     widget.setBackground(propertiesGuiSwt.colorSwt(0xFFFFFF));
     widget.addMouseListener(mouseClickForInfo);
-    if(widgetInfo.sDataPath != null && widgetInfo.sDataPath.startsWith("showBinEnable("))
-    	stop();
     int x =-1, y=-1; 
     if(x >=0 && y >=0){
       //edit.setBounds(x, y, dx * properties.xPixelUnit(), 2* properties.yPixelUnit());
@@ -849,7 +884,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     	}
     }
     currPanel.widgetList.add(widgetInfo);
-    return widget; 
+    return widgetInfo; 
   
   }
   
@@ -1034,7 +1069,6 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     return widgetInfos;
   	
   }
-  
   
   
   

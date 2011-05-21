@@ -92,6 +92,8 @@ public interface GuiPanelMngBuildIfc
    */
   //void setPosition(int ypos, int xpos);
   
+  
+  
   /**Sets the position for the next widget to add in the container.
    * @param line y-Position in y-Units, count from top of the box. 
    *              It is either the top or bottom line of the widget, depending on height.
@@ -127,6 +129,7 @@ public interface GuiPanelMngBuildIfc
   /**Positions the next widget right to the previous one. */
   void setNextPositionX();
 
+  
   /**Adds a button
    * @param sButtonText text in the button
    * @param height in grid-units
@@ -275,9 +278,20 @@ public interface GuiPanelMngBuildIfc
    *   upper case letter: normal font, lower case letter: small font
    *   'l' left, 't' top (above field) 
    * @return
+   * @deprecated
    */
   Object addTextField(WidgetDescriptor widgetInfo, boolean editable, String prompt, char promptStylePosition);
   
+  /**Adds a text field at the current position.
+   * @param name The registering name to get the value from outside or set the content.
+   * @param editable true then an input field, false only for show
+   * @param prompt If not null, then this prompt text is shown above, left, rigth
+   * @param promptStylePosition Position and size of description label:
+   *   upper case letter: normal font, lower case letter: small font
+   *   'l' left, 't' top (above field) 
+   * @return The WidgetDescriptor. An action, tooltip, color etc. can be set there later.
+   */
+  WidgetDescriptor addTextField(String name, boolean editable, String prompt, char promptStylePosition);
   
   /** Adds a box for editing or showing a text.
    * <br><br>

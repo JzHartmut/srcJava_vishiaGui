@@ -18,6 +18,9 @@ import org.vishia.mainGui.GuiPanelMngBuildIfc;
 import org.vishia.mainGui.GuiPanelMngWorkingIfc;
 import org.vishia.mainGui.TabPanel;
 import org.vishia.mainGui.WidgetCmpnifc;
+import org.vishia.mainGui.cfg.GuiCfgBuilder;
+import org.vishia.mainGui.cfg.GuiCfgData;
+import org.vishia.mainGui.cfg.GuiCfgZbnf;
 import org.vishia.mainGuiSwt.GuiPanelMngSwt;
 import org.vishia.mainGuiSwt.MainCmdSwt;
 import org.vishia.mainGuiSwt.PropertiesGuiSwt;
@@ -74,7 +77,11 @@ public class InspcGuiCfg
   
   /**This instance helps to create the Dialog Widget as part of the whole window. It is used only in the constructor.
    * Therewith it may be defined stack-locally. But it is better to show and explain if it is access-able at class level. */
-  GuiDialogZbnfControlled dialogZbnfConfigurator;   
+  //GuiDialogZbnfControlled dialogZbnfConfigurator;   
+  GuiCfgBuilder cfgBuilder;
+  
+  
+  final GuiCfgData guiCfgData = new GuiCfgData();
   
   final InspcGuiComm inspcComm;
   
@@ -250,8 +257,8 @@ public class InspcGuiCfg
       try { 
         File fileGui = new File(callingArguments.sFileGui);
         
-        dialogZbnfConfigurator.configureWithZbnf("Sample Gui", fileGui, panelBuildIfc);
-      
+        //dialogZbnfConfigurator.configureWithZbnf("Sample Gui", fileGui, panelBuildIfc);
+        cfgBuilder.buildGui();
       }  
       catch(Exception exception)
       { //catch the last level of error. No error is reported direct on command line!
@@ -264,7 +271,7 @@ public class InspcGuiCfg
       countExecution();
       
     }
-////
+
   };
   
   
@@ -339,7 +346,14 @@ public class InspcGuiCfg
     if(cargs.sFileGui != null){
       //configGuiWithZbnf.ctDone(0);  //counter for done initialized.
       File fileSyntax = new File(cargs.sPathZbnf + "/dialog.zbnf");
-      dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
+      {
+        GuiCfgZbnf cfgZbnf = new GuiCfgZbnf(console, fileSyntax);
+        File fileGui = new File(callingArguments.sFileGui);
+        
+        cfgZbnf.configureWithZbnf(fileGui, guiCfgData); 
+      }
+      //dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
+      cfgBuilder = new GuiCfgBuilder(guiCfgData, panelBuildIfc);
       gui.addDispatchListener(configGuiWithZbnf);
       bConfigDone = configGuiWithZbnf.awaitExecution(1, 10000);
     }    
@@ -375,7 +389,7 @@ public class InspcGuiCfg
       }
       try{ Thread.sleep(200);} 
       catch (InterruptedException e)
-      { dialogZbnfConfigurator.terminate();
+      { //dialogZbnfConfigurator.terminate();
       }
     }
 

@@ -2,10 +2,11 @@ package org.vishia.mainGui;
 
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.mainGui.cfg.GuiCfgData;
 
 
 
-/**This class holds some infos about a widget. 
+/**This class holds some infos about a widget for execution the GUI. 
  * Instances of this class are places on the widget, and in a Index of all widgets for the panel and globally.
  * @author Hartmut Schorrig
  *
@@ -13,7 +14,19 @@ import org.vishia.byteData.VariableContainer_ifc;
  */
 public class WidgetDescriptor
 {
+  /**The panel where the widget is located. If a TabPanel is used, its the whole panel with all tabs.
+   * This reference is used to set values to other widgets. */
   GuiPanelMngWorkingIfc itsPanel;
+  
+  /**Association to the configuration element from where this widget was built. 
+   * If the widget is moved or its properties are changed in the 'design mode' of the GUI,
+   * this aggregate data are adjusted and re-written to a file. The configuration elemenet
+   * contains all data which are necessary to build the appearance of the GUI.
+   * <br>
+   * If this aggregation is null, the widget can't be changed in the design mode of the GUI.
+   * It is created directly without configuration data. 
+   */
+  public final GuiCfgData.GuiCfgElement itsCfgElement;
   
 	/**Name of the widget in the panel. */
 	public String name;
@@ -80,23 +93,33 @@ public class WidgetDescriptor
 	{ this.name = sName;
 		this.widget = widget;
 		this.whatIs = whatIs;
+		this.itsCfgElement = null;
 	}
 
 	public WidgetDescriptor(String sName, char whatIs)
 	{ this.name = sName;
 		this.widget = null;
 		this.whatIs = whatIs;
+    this.itsCfgElement = null;
 	}
 
   
-	public WidgetDescriptor(String sName, Object widget, char whatIs, String sContentInfo, Object oContentInfo)
-	{ this.name = sName;
-		this.widget = widget;
-		this.whatIs = whatIs;
-		this.sDataPath = sContentInfo;
-		this.oContentInfo = oContentInfo;
-	}
+  public WidgetDescriptor(String sName, Object widget, char whatIs, String sContentInfo, Object oContentInfo)
+  { this.name = sName;
+    this.widget = widget;
+    this.whatIs = whatIs;
+    this.sDataPath = sContentInfo;
+    this.oContentInfo = oContentInfo;
+    this.itsCfgElement = null;
+  }
   
+  public WidgetDescriptor(GuiCfgData.GuiCfgElement cfge, String sName, char whatIs, String sDataPath)
+  { this.name = sName;
+    this.whatIs = whatIs;
+    this.sDataPath = sDataPath;
+    this.itsCfgElement = cfge;
+  }
+	
 	/**Sets a application specific info. It should help to present the content. 
    * This info can be set and changed anytime after registration. */
   public void setContentInfo(Object content){	oContentInfo = content;}
