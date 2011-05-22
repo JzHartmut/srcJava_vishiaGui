@@ -2,6 +2,8 @@ package org.vishia.guiInspc;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InspcDataExchangeAccess.Info;
@@ -51,6 +53,15 @@ public class InspcGuiComm
   /**Instance to evaluate received telegrams. TODO should a part of InspcAccessor? */
   InspcAccessEvaluatorRxTelg inspcRxEval = new InspcAccessEvaluatorRxTelg();
   
+  /**The target ipc-address for Interprocess-Communication with the target.
+   * It is a string, which determines the kind of communication.
+   * For example "UDP:0.0.0.0:60099" to create a socket port for UDP-communication.
+   */
+  private final Map<String, String> indexTargetIpcAddr;
+
+  private Map<String, String> indexFaultDevice;
+
+  
   /**List of all Panels, which have values to show repeating.
    * Any Panel can be an independent window. Any panel may have other values to show.
    * But any panel can select more as one tabs (tabPanel). Then it will be select which values to show.
@@ -59,10 +70,11 @@ public class InspcGuiComm
   
   
   
-  InspcGuiComm(Report console)
+  InspcGuiComm(Report console, Map<String, String> indexTargetIpcAddr)
   {
     this.console = console;
     this.inspcAccessor = new InspcAccessor();
+    this.indexTargetIpcAddr = indexTargetIpcAddr;
   }
   
   
@@ -91,9 +103,9 @@ public class InspcGuiComm
    */
   void procComm()
   {
-    String sIpTarget = "UDP:127.0.0.1:60080";
+    //String sIpTarget = "UDP:127.0.0.1:60080";
+    String sIpTarget = null; 
     
-    inspcAccessor.setTargetAddr(sIpTarget); 
     for(InspcGuiPanelContent panel: listPanels){
       if(panel.newWidgets !=null){
         if(panel.widgets !=null){
@@ -105,31 +117,58 @@ public class InspcGuiComm
       if(panel.widgets !=null) for(WidgetDescriptor widget: panel.widgets){
         
         String sDataPath = widget.getDataPath() + ".";
-        //sDataPath = "workingThread.data.yCos.";
-        //
-        //check whether the widget has an comm action already. 
-        //First time a widgets gets its WidgetCommAction. Then for ever the action is kept.
-        WidgetCommAction commAction;
-        Object oCommAction;
-        if( (oCommAction = widget.getContentInfo()) ==null){
-          commAction = new WidgetCommAction(widget);
-          widget.setContentInfo(commAction);
-        } else {
-          commAction = (WidgetCommAction)oCommAction;
+        int posSepDevice = sDataPath.indexOf(':');
+        if(posSepDevice >0){
+          String sDevice = sDataPath.substring(0, posSepDevice);
+          String sIpTargetNew = indexTargetIpcAddr.get(sDevice);
+          if(sIpTargetNew == null){
+            errorDevice(sDevice);
+          } else {
+            if(sIpTarget == null){
+              sIpTarget = sIpTargetNew;
+              inspcAccessor.setTargetAddr(sIpTarget);
+            }
+          }
+          sDataPath = sDataPath.substring(posSepDevice +1);
         }
         //
-        //create the send command to target.
-        int order = inspcAccessor.cmdGetValueByPath(sDataPath);    
-        //save the order to the action. It is taken on receive.
-        inspcRxEval.setExpectedOrder(order, commAction);
+        if(sIpTarget !=null){
+          //check whether the widget has an comm action already. 
+          //First time a widgets gets its WidgetCommAction. Then for ever the action is kept.
+          WidgetCommAction commAction;
+          Object oCommAction;
+          if( (oCommAction = widget.getContentInfo()) ==null){
+            commAction = new WidgetCommAction(widget);
+            widget.setContentInfo(commAction);
+          } else {
+            commAction = (WidgetCommAction)oCommAction;
+          }
+          //
+          //create the send command to target.
+          int order = inspcAccessor.cmdGetValueByPath(sDataPath);    
+          //save the order to the action. It is taken on receive.
+          inspcRxEval.setExpectedOrder(order, commAction);
+          
+        }
         
       }
     }
-    
-    inspcAccessor.send();
+    if(sIpTarget !=null){
+      inspcAccessor.send();
+    }
 
   }
 
+
+  
+  void errorDevice(String sDevice){
+    if(indexFaultDevice ==null){ indexFaultDevice = new TreeMap<String, String>(); }
+    if(indexFaultDevice.get(sDevice) == null){
+      //write the error message only one time!
+      indexFaultDevice.put(sDevice, sDevice);
+      console.writeError("unknown device key: " + sDevice);
+    }
+  }
   
   
   InspcAccessExecRxOrder_ifc xxxexecuterAnswerInfo = new InspcAccessExecRxOrder_ifc()

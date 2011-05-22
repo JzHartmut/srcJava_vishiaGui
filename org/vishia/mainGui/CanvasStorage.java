@@ -40,11 +40,12 @@ public abstract class CanvasStorage
 	public static class PaintOrderImage extends PaintOrder
 	{
 	  public final GuiImageBase image;
-	  public final float zoom;
-	  PaintOrderImage(GuiImageBase image, int line, int column, int heigth, int width, float zoom)
+	  public final int dxImage, dyImage;
+	  PaintOrderImage(GuiImageBase image, int line, int column, int heigth, int width, GuiRectangle pixelImage)
 	  { super(paintImage, line, column, heigth, width, null);
 	    this.image = image;
-	    this.zoom = zoom;
+      this.dxImage = pixelImage.dx;
+      this.dyImage = pixelImage.dy;
 	  }
 	}//class PaintOrderImage
 	
@@ -71,9 +72,9 @@ public abstract class CanvasStorage
 	}
 	
 
-	public void drawImage(GuiImageBase image, int line, int column, int heigth, int width, float zoom)
+	public void drawImage(GuiImageBase image, int line, int column, int heigth, int width, GuiRectangle imagePixelSize)
 	{
-    PaintOrder order = new PaintOrderImage(image, line, column, heigth, width, zoom);
+    PaintOrder order = new PaintOrderImage(image, line, column, heigth, width, imagePixelSize);
     paintOrders.add(order);  //paint it when drawBackground is invoked.
 	}
 	

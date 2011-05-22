@@ -111,9 +111,9 @@ public class CanvasStorePanelSwt extends Canvas implements WidgetCmpnifc  //Canv
     		case CanvasStorage.paintImage: {
     		  CanvasStorage.PaintOrderImage orderImage = (CanvasStorage.PaintOrderImage) order;
     		  Image image = (Image)orderImage.image.getImage();
-    		  int dx1 = (int)(orderImage.zoom * order.x2);
-    		  int dy1 = (int)(orderImage.zoom * order.y2);
-          g.drawImage(image, 0, 0, dx1, dy1, order.x1, order.y1, order.x2, order.y2);
+    		  //int dx1 = (int)(orderImage.zoom * order.x2);
+    		  //int dy1 = (int)(orderImage.zoom * order.y2);
+          g.drawImage(image, 0, 0, orderImage.dxImage, orderImage.dyImage, order.x1, order.y1, order.x2, order.y2);
     		} break;
     		default: throw new IllegalArgumentException("unknown order");
   		}

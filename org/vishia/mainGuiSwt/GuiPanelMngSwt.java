@@ -953,11 +953,12 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     ImageData imageData = new ImageData(imageStream);
     byte[] data = imageData.data;
     Image image = new Image(((Composite)currPanel.panelComposite).getDisplay(), imageData); 
-    GuiImageBase imageGui = new GuiImageBase(image);
+    GuiImageBase imageGui = new GuiImageSwt(image);
+    GuiRectangle size = imageGui.getPixelSize();
     GuiRectangle rr = getRectangleBounds();
     if(currPanel.panelComposite instanceof CanvasStorePanelSwt){
       CanvasStorePanelSwt canvas = (CanvasStorePanelSwt) currPanel.panelComposite;
-      canvas.store.drawImage(imageGui, rr.x, rr.x, rr.dx, rr.dy, 1.0f);
+      canvas.store.drawImage(imageGui, rr.x, rr.x, rr.dx, rr.dy, size);
     }
     return null;
   }

@@ -243,6 +243,7 @@ public class InspcGuiCfg
   GuiDispatchCallbackWorker configGuiWithZbnf = new GuiDispatchCallbackWorker(){
     
     @Override public void doBeforeDispatching(boolean onlyWakeup){
+      /*
       char sizeArg = callingArguments.sSize == null ? 'A' : callingArguments.sSize.charAt(0);
       switch(sizeArg){
       case 'F': gui.setTitleAndSize("GUI", 0, 0, -1, -1); break;
@@ -254,6 +255,8 @@ public class InspcGuiCfg
       case 'E': gui.setTitleAndSize("GUI", 50, 100, 1200, 1050); break;
       default: gui.setTitleAndSize("GUI", 500, 100, -1, 800); break;
       }
+      */
+      gui.setTitleAndSize("GUI", 50, 100, 1200, 900);
       try { 
         File fileGui = new File(callingArguments.sFileGui);
         
@@ -293,7 +296,7 @@ public class InspcGuiCfg
     boolean bOk = true;
     this.callingArguments = cargs;
     this.console = gui;  
-    this.inspcComm = new InspcGuiComm(console);
+    this.inspcComm = new InspcGuiComm(console, cargs.indexTargetIpcAddr);
     
     inspector = new Inspector("UDP:127.0.0.1:60088");
     inspector.start(this);
@@ -312,7 +315,7 @@ public class InspcGuiCfg
     case 'E': sizePixel = 'E'; break;
     default: sizePixel = 'D'; break;
     }
-    PropertiesGuiSwt propertiesGui = new PropertiesGuiSwt(gui.getDisplay(), sizePixel);
+    PropertiesGuiSwt propertiesGui = new PropertiesGuiSwt(gui.getDisplay(), sizeArg);
     LogMessage log = gui.getLogMessageOutputConsole();
     panelMng = new GuiPanelMngSwt(null, gui.getContentPane(), 120,80, propertiesGui, null, log);
     panelBuildIfc = panelMng;
@@ -411,7 +414,8 @@ public class InspcGuiCfg
     CmdLineAndGui gui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
     try{ gui.parseArguments(); }
     catch(Exception exception)
-    { gui.writeError("Cmdline argument error:", exception);
+    { System.out.append("Cmdline argument error:" +  exception.getMessage() + "\n");
+      //gui.writeError("Cmdline argument error:", exception);
       gui.setExitErrorLevel(MainCmd_ifc.exitWithArgumentError);
       //gui.exit();
       bOk = false;  //not exiting, show error in GUI
