@@ -9,6 +9,8 @@ import java.util.TreeMap;
 import org.eclipse.swt.widgets.Control;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.mainCmd.Report;
+import org.vishia.mainGui.cfg.GuiCfgBuilder;
+import org.vishia.mainGui.cfg.GuiCfgDesigner;
 import org.vishia.msgDispatch.LogMessage;
 
 /**This is the base class of the GuiPanelMng for several Graphic-Adapters (Swing, SWT etc.). 
@@ -30,13 +32,21 @@ import org.vishia.msgDispatch.LogMessage;
 public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMngWorkingIfc
 {
 	
+  GuiCfgBuilder cfgBuilder;
+  protected GuiCfgDesigner designer;
+  
+  public boolean bDesignMode = false;
+  
+
+  protected boolean bDesignerIsInitialized = false;
+  
   final GuiPanelMngBase parent;
   
   /**Base class for managing all panels and related windows.
    * This base class contains all common resources to manage panels and windows.
    */
   final protected GuiMngBase mngBase;
-  
+
   /**Properties of this Dialog Window. */
   public  final PropertiesGui propertiesGui;
 
@@ -72,8 +82,6 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   /**True if the next element should be placed below the last. */
   protected boolean bBelow, bRigth;
 
-  
-	
 	/**Creates an nee Panel Manager in a new Window.
 	 * @param graphicBaseSystem
 	 * @return
@@ -148,6 +156,14 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
 		this.variableContainer = variableContainer;
 		userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
 	}
+
+  
+  @Override public void setCfgBuilder(GuiCfgBuilder cfgBuilder)
+  {
+    this.cfgBuilder = cfgBuilder;
+    this.designer = new GuiCfgDesigner(cfgBuilder, this, log);  ///
+    this.bDesignMode = true;
+  }
 
 
 	public void setLastClickedWidgetInfo(WidgetDescriptor lastClickedWidgetInfo)
@@ -237,6 +253,22 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
     }
     return rectangle;
   }
+  
+  
+  public void pressedLeftMouseDownForDesign(WidgetDescriptor widgd, GuiRectangle xy)
+  { designer.pressedLeftMouseDownForDesign(widgd, xy);
+  }
+  
+  
+  public void releaseLeftMouseForDesign(WidgetDescriptor widgd, GuiRectangle xy, boolean bCopy)
+  { designer.releaseLeftMouseForDesign(widgd, xy, bCopy);
+  }
+  
+  public void pressedRightMouseDownForDesign(WidgetDescriptor widgd, GuiRectangle xy)
+  { designer.pressedRightMouseDownForDesign(widgd, xy);
+  }
+  
+  
   
   void stop(){}
 	

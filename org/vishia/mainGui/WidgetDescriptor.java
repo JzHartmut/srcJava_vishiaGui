@@ -26,7 +26,7 @@ public class WidgetDescriptor
    * If this aggregation is null, the widget can't be changed in the design mode of the GUI.
    * It is created directly without configuration data. 
    */
-  public final GuiCfgData.GuiCfgElement itsCfgElement;
+  private GuiCfgData.GuiCfgElement itsCfgElement;
   
 	/**Name of the widget in the panel. */
 	public String name;
@@ -113,7 +113,7 @@ public class WidgetDescriptor
     this.itsCfgElement = null;
   }
   
-  public WidgetDescriptor(GuiCfgData.GuiCfgElement cfge, String sName, char whatIs, String sDataPath)
+  private WidgetDescriptor(GuiCfgData.GuiCfgElement cfge, String sName, char whatIs, String sDataPath)
   { this.name = sName;
     this.whatIs = whatIs;
     this.sDataPath = sDataPath;
@@ -268,6 +268,16 @@ public class WidgetDescriptor
   public void setValue(int cmd, int ident, Object value)
   { itsPanel.setInfo(this, cmd, ident, value);
   }
+  
+  public void setCfgElement(GuiCfgData.GuiCfgElement cfge)
+  { this.itsCfgElement = cfge;
+  }
+  
+  
+  public GuiCfgData.GuiCfgElement getCfgElement()
+  { return itsCfgElement;
+  }
+  
   
 	/**Especially for test and debug, short info about widget.
 	 * @see java.lang.Object#toString()

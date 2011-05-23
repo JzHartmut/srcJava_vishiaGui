@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.swt.widgets.Menu;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.guiViewCfg.OamRcvValue;
 import org.vishia.guiViewCfg.OamShowValues;
@@ -109,7 +110,9 @@ public class InspcGuiCfg
       //super.addStandardHelpInfo();
       this.cargs = cargs;
       super.setTitleAndSize("Inspc-GUI-cfg", 50,50,900, 600); //600);  //This instruction should be written first to output syntax errors.
-      //super.setStandardMenus(new File("."));
+      super.setStandardMenus(new File("."));
+      //Menu menuItem = super.addMenu("Edit", 'E');
+      
       super.setOutputArea("B3C3");        //whole area from mid to bottom
       super.startGraphicThread();
     }
@@ -360,6 +363,7 @@ public class InspcGuiCfg
       }
       //dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
       cfgBuilder = new GuiCfgBuilder(guiCfgData, panelBuildIfc, fileGui.getParentFile());
+      panelBuildIfc.setCfgBuilder(cfgBuilder);
       gui.addDispatchListener(configGuiWithZbnf);
       bConfigDone = configGuiWithZbnf.awaitExecution(1, 10000);
     }    

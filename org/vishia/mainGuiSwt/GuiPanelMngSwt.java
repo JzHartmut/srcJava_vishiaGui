@@ -66,7 +66,6 @@ import org.vishia.mainGui.ColorGui;
 import org.vishia.mainGui.FileDialogIfc;
 import org.vishia.mainGui.GuiDispatchCallbackWorker;
 import org.vishia.mainGui.GuiImageBase;
-import org.vishia.mainGui.GuiMngBase;
 import org.vishia.mainGui.GuiPanelMngBase;
 import org.vishia.mainGui.GuiPanelMngBuildIfc;
 import org.vishia.mainGui.GuiPanelMngWorkingIfc;
@@ -148,7 +147,6 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     { super("GUI-Element doesn't exist in GUI: " + name);
     }
   }
-  
   
   /**The graphical frame. It is any part of a window (a Composite widget) or the whole window. */
   public final Composite graphicFrame;
@@ -372,6 +370,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   @Override public boolean remove(WidgetDescriptor widget)
   {
     ((Widget)widget.widget).dispose();
+    widget.widget = null;  //remove instance by Garbage collector.
     return true;
     
   }
@@ -395,7 +394,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
 		setPosAndSize_(shell, line,0, column,0, dy,0, dx,0);
 		//shell.setBounds(left,top, width, height);
 		shell.setText("SHELL");
-		GuiShellMngBuildIfc mng = new GuiShellMngSwt(shell, 0, 0, propertiesGuiSwt, variableContainer, log);
+		GuiShellMngBuildIfc mng = new GuiShellMngSwt(shell, this, 0, 0, propertiesGuiSwt, variableContainer, log);
 		//mng.setWindowVisible(true);
 		
 		return mng;
@@ -438,7 +437,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     
     
 		if(title !=null){ shell.setText(title); }
-		GuiShellMngBuildIfc mng = new GuiShellMngSwt(shell, 0, 0, propertiesGuiSwt, variableContainer, log);
+		GuiShellMngBuildIfc mng = new GuiShellMngSwt(shell, this, 0, 0, propertiesGuiSwt, variableContainer, log);
 		//mng.setWindowVisible(true);
 		
 		return mng;
@@ -1302,18 +1301,108 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   //past: insertInfo
   @Override public String setInfo(WidgetDescriptor descr, int cmd, int ident, Object value)
   {
-  	if(descr.name !=null && descr.name.equals("writerEnergy1Sec") && cmd == GuiPanelMngWorkingIfc.cmdInsert) ////)
-  		stop();
-  	//check the admissibility:
-  	switch(cmd){
-  	case GuiPanelMngWorkingIfc.cmdInsert: checkAdmissibility(value != null && value instanceof String); break;
-  	}
-    mngBase.guiChangeRequests.add(new GuiChangeReq(descr, cmd, ident, value));
-	  synchronized(mngBase.guiChangeRequests){ mngBase.guiChangeRequests.notify(); }  //to wake up waiting on guiChangeRequests.
-	  graphicFrame.getDisplay().wake(); //wake-up the GUI-thread, it may sleep elsewhere.
-	  //((Composite)currPanel.panelComposite).getDisplay().wake();  //wake-up the GUI-thread, it may sleep elsewhere. 
-	  return "";
+    long threadId = Thread.currentThread().getId();
+    if(threadId == mngBase.getThreadIdGui()){
+      setInfoDirect(descr, cmd, ident, value);
+    } else {
+    	if(descr.name !=null && descr.name.equals("writerEnergy1Sec") && cmd == GuiPanelMngWorkingIfc.cmdInsert) ////)
+    		stop();
+    	//check the admissibility:
+    	switch(cmd){
+    	case GuiPanelMngWorkingIfc.cmdInsert: checkAdmissibility(value != null && value instanceof String); break;
+    	}
+      mngBase.guiChangeRequests.add(new GuiChangeReq(descr, cmd, ident, value));
+  	  synchronized(mngBase.guiChangeRequests){ mngBase.guiChangeRequests.notify(); }  //to wake up waiting on guiChangeRequests.
+  	  graphicFrame.getDisplay().wake(); //wake-up the GUI-thread, it may sleep elsewhere.
+  	  //((Composite)currPanel.panelComposite).getDisplay().wake();  //wake-up the GUI-thread, it may sleep elsewhere. 
+    }
+  	return "";
   }
+  
+  
+  
+  private void setInfoDirect(WidgetDescriptor descr, int cmd, int ident, Object info)
+  {
+        Object oWidget = descr.widget;
+        if(oWidget !=null){
+          int colorValue;
+          switch(cmd){
+          case GuiPanelMngWorkingIfc.cmdBackColor: 
+            colorValue = ((Integer)(info)).intValue();
+            Color color = propertiesGuiSwt.colorSwt(colorValue & 0xffffff);
+            ((Control)(oWidget)).setBackground(color); 
+            break;
+          case GuiPanelMngWorkingIfc.cmdRedraw: ((Control)(oWidget)).redraw(); break;
+          case GuiPanelMngWorkingIfc.cmdRedrawPart: 
+            assert(oWidget instanceof CurveView);
+            ((CurveView)(oWidget)).redrawData(); break; //causes a partial redraw
+          default: 
+            if(oWidget instanceof Table){ 
+              Table table = (Table)oWidget;
+              switch(cmd){
+              case GuiPanelMngWorkingIfc.cmdInsert: changeTable(table, ident, (String)info); break;
+              case GuiPanelMngWorkingIfc.cmdSet: changeTable(table, ident, (String)info); break;
+              case GuiPanelMngWorkingIfc.cmdClear: clearTable(table, ident); break;
+              default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, descr.name);
+              }
+            } else if(oWidget instanceof Text){ 
+              Text field = (Text)oWidget;
+              switch(cmd){
+                case GuiPanelMngWorkingIfc.cmdInsert: 
+                case GuiPanelMngWorkingIfc.cmdSet: field.setText((String)info); break;
+              default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %x on widget %s", cmd, descr.name);
+              }
+            } else if(oWidget instanceof LedSwt){ 
+              LedSwt field = (LedSwt)oWidget;
+              switch(cmd){
+              case GuiPanelMngWorkingIfc.cmdColor: field.setColor(ident, (Integer)info); break;
+              default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, descr.name);
+              }
+            } else if(oWidget instanceof SwitchButtonSwt){ 
+              SwitchButtonSwt widget = (SwitchButtonSwt)oWidget;
+              widget.setState(info);
+            } else {
+              //all other widgets:    
+              switch(cmd){  ////
+              default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd %x for widget: %s", cmd, descr.name);
+              }
+            }
+          }//switch
+        }//if oWidget !=null
+    
+  }
+  
+  
+  
+  void changeTable(Table table, int ident, String content)
+  {
+    String[] sLine = content.split("\t");
+    TableItem item = new TableItem(table, SWT.NONE);
+    item.setText(sLine);
+    table.showItem(item);
+    //set the scrollbar downward
+    ScrollBar scroll = table.getVerticalBar();
+    if(scroll !=null){
+      int maxScroll = scroll.getMaximum();
+      //log.sendMsg(0, "TEST scroll=%d", maxScroll);
+      //scroll.setSelection(maxScroll);
+    }  
+    //table.set
+    table.redraw(); //update();
+   
+  }
+  
+  
+  void clearTable(Table table, int ident)
+  {
+    if(ident <0){ table.removeAll();}
+    else { table.remove(ident); }
+    table.redraw(); //update();
+  }
+  
+  
+  
+
   
   
   private void checkAdmissibility(boolean value){
@@ -1435,36 +1524,8 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
    */
   private final GuiDispatchCallbackWorker dispatchListener = new GuiDispatchCallbackWorker()
   {
-    void changeTable(Table table, int ident, String content)
-    {
-      String[] sLine = content.split("\t");
-      TableItem item = new TableItem(table, SWT.NONE);
-      item.setText(sLine);
-      table.showItem(item);
-      //set the scrollbar downward
-      ScrollBar scroll = table.getVerticalBar();
-      if(scroll !=null){
-        int maxScroll = scroll.getMaximum();
-        //log.sendMsg(0, "TEST scroll=%d", maxScroll);
-        //scroll.setSelection(maxScroll);
-      }  
-      //table.set
-      table.redraw(); //update();
-     
-    }
-    
-    
-    void clearTable(Table table, int ident)
-    {
-      if(ident <0){ table.removeAll();}
-      else { table.remove(ident); }
-      table.redraw(); //update();
-    }
-    
-    
-    
   	
-  	boolean done = true;
+  	boolean done = false;
 
   	
   	/**This method is called in the GUI-thread. 
@@ -1472,55 +1533,19 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	 */
   	@Override public void doBeforeDispatching(boolean onlyWakeup)
   	{ if(!done){
+        long threadId = Thread.currentThread().getId();
+        mngBase.setThreadIdSwt(threadId);
   		  done=true;
 			}
+  	  if(designer !=null && !bDesignerIsInitialized){
+  	    designer.initGui();
+  	    bDesignerIsInitialized = true;
+  	  }
   	  GuiChangeReq changeReq;
   	  while( (changeReq = mngBase.guiChangeRequests.poll()) != null){
   	  	WidgetDescriptor descr = changeReq.widgetDescr;
-  	  	Object oWidget = descr.widget;
-  	  	int colorValue;
-  	  	switch(changeReq.cmd){
-	  		case GuiPanelMngWorkingIfc.cmdBackColor: 
-	  			colorValue = ((Integer)(changeReq.info)).intValue();
-	  			Color color = propertiesGuiSwt.colorSwt(colorValue & 0xffffff);
-	  			((Control)(oWidget)).setBackground(color); 
-	  			break;
-	  		case GuiPanelMngWorkingIfc.cmdRedraw: ((Control)(oWidget)).redraw(); break;
-	  		case GuiPanelMngWorkingIfc.cmdRedrawPart: 
-	  			assert(oWidget instanceof CurveView);
-	  			((CurveView)(oWidget)).redrawData(); break; //causes a partial redraw
-	  		default: 
-	  	  	if(oWidget instanceof Table){ 
-	  	  		Table table = (Table)oWidget;
-	  	  		switch(changeReq.cmd){
-	  	  		case GuiPanelMngWorkingIfc.cmdInsert: changeTable(table, changeReq.ident, (String)changeReq.info); break;
-	  	  		case GuiPanelMngWorkingIfc.cmdSet: changeTable(table, changeReq.ident, (String)changeReq.info); break;
-	  	  		case GuiPanelMngWorkingIfc.cmdClear: clearTable(table, changeReq.ident); break;
-            default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", changeReq.cmd, descr.name);
-	  	  		}
-	  	  	} else if(oWidget instanceof Text){ 
-	  	  		Text field = (Text)oWidget;
-	  	  		switch(changeReq.cmd){
-	  	  		  case GuiPanelMngWorkingIfc.cmdInsert: 
-	  	  		  case GuiPanelMngWorkingIfc.cmdSet: field.setText((String)changeReq.info); break;
-	  	  		default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %x on widget %s", changeReq.cmd, descr.name);
-	  	  		}
-	  	  	} else if(oWidget instanceof LedSwt){ 
-	  	  		LedSwt field = (LedSwt)oWidget;
-	  	  		switch(changeReq.cmd){
-	  	  		case GuiPanelMngWorkingIfc.cmdColor: field.setColor(changeReq.ident, (Integer)changeReq.info); break;
-	  	  		default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", changeReq.cmd, descr.name);
-	  	  		}
-	  	  	} else if(oWidget instanceof SwitchButtonSwt){ 
-	  	  		SwitchButtonSwt widget = (SwitchButtonSwt)oWidget;
-	  	  	  widget.setState(changeReq.info);
-	  	  	} else {
-	  	      //all other widgets:		
-	  	  		switch(changeReq.cmd){  ////
-	  	  		default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd %x for widget: %s", changeReq.cmd, descr.name);
-	  	  		}
-	  	  	}
-  	  	}//switch
+  	  	setInfoDirect(descr, changeReq.cmd, changeReq.ident, changeReq.info);
+
   	  }
   	}  
   };

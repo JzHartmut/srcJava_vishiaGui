@@ -27,7 +27,7 @@ public final class GuiCfgData
   
   /**ZBNF: Element::= ... ;
    * Class for instance to capture and store one element. */
-  public final static class GuiCfgElement
+  public final static class GuiCfgElement implements Cloneable
   { 
     /**The previous element is necessary because non complete coordinates are resolved with previous.
      * The next element is need to build a queue in order of the text. */
@@ -54,6 +54,19 @@ public final class GuiCfgData
     
     GuiCfgElement(GuiCfgData itsCfgData)
     { this.itsCfgData = itsCfgData;
+    }
+    
+    public GuiCfgElement clone(){ 
+      GuiCfgElement newObj = null;
+      try{ newObj = (GuiCfgElement)super.clone(); 
+        newObj.position = new GuiCfgPosition(); //use a new empty instance in cloned object, empty data.
+        newObj.positionInput = positionInput.clone(); ///use a new cloned instance (use data).
+        newObj.widgetType = widgetType.clone(); ///use a new cloned instance (use data).
+      } catch(CloneNotSupportedException exc){ assert(false); }
+      newObj.previous = this;  //link it in queue after this.
+      newObj.next = next;
+      next = newObj;
+      return newObj; 
     }
     
     /**ZBNF: <?position> */
@@ -130,7 +143,7 @@ public final class GuiCfgData
   
   /**ZBNF: position::= ... ;
    * Class for instance to capture and store the position in an element. */
-  public final static class GuiCfgPosition
+  public final static class GuiCfgPosition implements Cloneable
   {
     public String panel;
     public boolean yPosRelative;
@@ -146,12 +159,18 @@ public final class GuiCfgData
     public void set_xIncr(){ xIncr_ = true;}
     public void set_yIncr(){ yIncr_ = true;}
     
+    protected GuiCfgPosition clone()
+    { GuiCfgPosition clone = null;
+      try{ clone = (GuiCfgPosition)super.clone(); } 
+      catch(CloneNotSupportedException exc){ assert(false); }
+      return clone;
+    }
   }//class Position
   
   
   /**This is the base class of all widget types for the GUI. It contains common elements.
    */
-  public static class WidgetTypeBase
+  public static class WidgetTypeBase implements Cloneable
   {
     private final GuiCfgElement itsElement;
     
@@ -175,13 +194,19 @@ public final class GuiCfgData
     
     public void set_color1(GuiCfgColor value){}
 
-    
+    protected WidgetTypeBase clone()
+    { WidgetTypeBase clone = null;
+      try{ clone = (WidgetTypeBase)super.clone(); } 
+      catch(CloneNotSupportedException exc){ assert(false); }
+      return clone;
+    }
+
   }//class WidgetTypeBase
   
   
   /**ZBNF: Text::= ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgText extends WidgetTypeBase
+  public final static class GuiCfgText extends WidgetTypeBase implements Cloneable
   {
     public String size = "B";
     public GuiCfgText(GuiCfgElement itsElement){ super(itsElement); }
@@ -191,7 +216,7 @@ public final class GuiCfgData
   
   /**ZBNF: Line::= ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgLine extends WidgetTypeBase
+  public final static class GuiCfgLine extends WidgetTypeBase implements Cloneable
   {
     List<GuiCfgCoord> coords = new LinkedList<GuiCfgCoord>();
     
@@ -215,7 +240,7 @@ public final class GuiCfgData
 
   /**ZBNF: Text::= ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgImage extends WidgetTypeBase
+  public final static class GuiCfgImage extends WidgetTypeBase implements Cloneable
   {
     public String size = "B";
     
@@ -230,7 +255,7 @@ public final class GuiCfgData
   
   /**ZBNF: ShowField::= ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgShowField extends WidgetTypeBase
+  public final static class GuiCfgShowField extends WidgetTypeBase implements Cloneable
   {
     
     public GuiCfgShowField(GuiCfgElement itsElement){ super(itsElement); }
@@ -239,7 +264,7 @@ public final class GuiCfgData
   
   /**ZBNF: Button::= ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgButton extends WidgetTypeBase
+  public final static class GuiCfgButton extends WidgetTypeBase implements Cloneable
   {
     
     public GuiCfgButton(GuiCfgElement itsElement){ super(itsElement); }
@@ -249,7 +274,7 @@ public final class GuiCfgData
   
   /**ZBNF: Table::= ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgTable extends WidgetTypeBase
+  public final static class GuiCfgTable extends WidgetTypeBase implements Cloneable
   {
     
     public GuiCfgTable(GuiCfgElement itsElement){ super(itsElement); }
@@ -266,7 +291,7 @@ public final class GuiCfgData
   
   /**ZBNF: Table::= ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgCurveview extends WidgetTypeBase
+  public final static class GuiCfgCurveview extends WidgetTypeBase implements Cloneable
   {
     public int nrofPoints;
     
@@ -309,7 +334,7 @@ public final class GuiCfgData
 
   /**ZBNF: {<?line> ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgCurveLine extends WidgetTypeBase
+  public final static class GuiCfgCurveLine extends WidgetTypeBase implements Cloneable
   {
     String content;
     

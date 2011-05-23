@@ -14,6 +14,11 @@ public class GuiMngBase
 
   public ConcurrentLinkedQueue<GuiChangeReq> guiChangeRequests = new ConcurrentLinkedQueue<GuiChangeReq>();
   
-
+  /**Saved thread id at start. To detect whether set/get actions are done in the GUI-Thread. */
+  private long threadIdSwt;
+  
+  public void setThreadIdSwt(long id){ threadIdSwt = id; }
+  
+  public long getThreadIdGui(){ return threadIdSwt; }
   
 }

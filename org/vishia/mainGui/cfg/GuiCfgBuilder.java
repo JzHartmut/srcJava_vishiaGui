@@ -31,6 +31,16 @@ public class GuiCfgBuilder
     this.currentDir = currentDir;
   }
   
+  
+  public GuiCfgData.GuiCfgElement XXXnewCfgElement(GuiCfgData.GuiCfgElement previous)
+  { //GuiCfgData.GuiCfgElement cfge = new GuiCfgData.GuiCfgElement(cfgData);
+    GuiCfgData.GuiCfgElement cfge = previous.clone();
+    cfge.next = previous.next;
+    cfge.previous = previous;
+    previous.next = cfge;
+    return cfge;
+  }
+  
   public String buildGui()
   {
     String sError = null;
@@ -119,11 +129,12 @@ public class GuiCfgBuilder
     //
     pos.xIncr_ = inp.xIncr_ || (!inp.yIncr_ && prevPos.xIncr_);  //inherit xIncr but not if yIncr. 
     pos.yIncr_ = inp.yIncr_ || (!inp.xIncr_ && prevPos.yIncr_);
+    pos.panel = inp.panel !=null ? inp.panel : prevPos.panel;
     //
     gui.setFinePosition(pos.yPos, pos.yPosFrac, pos.xPos, pos.xPosFrac
       , pos.ySizeDown, pos.ySizeFrac, pos.xWidth, pos.xSizeFrac, 'r');
     //
-    WidgetDescriptor widgd;
+    WidgetDescriptor widgd = null;
     String sName = cfge.widgetType.name;
     if(sName ==null){ sName = cfge.widgetType.text; }
     //
@@ -167,33 +178,13 @@ public class GuiCfgBuilder
       GuiCfgData.GuiCfgShowField wShow = (GuiCfgData.GuiCfgShowField)cfge.widgetType;
       widgd = gui.addTextField(sName, false, null, '.');
       widgd.setDataPath(sDataPath);
+    } else {
+      widgd = null;
+    }
+    if(widgd !=null){
+      widgd.setCfgElement(cfge);
     }
     return sError;
-  }
-  
-  
-  
-  private WidgetDescriptor xxxnewWidget(GuiCfgData.GuiCfgElement cfge)
-  {
-    String sDataPath = cfge.widgetType.info != null ? cfge.widgetType.info : cfge.widgetType.name;
-    if(sDataPath !=null){
-      int posSep = sDataPath.indexOf(':');
-      if(posSep > 0){
-        String sPre = cfge.itsCfgData.dataReplace.get(sDataPath.substring(0, posSep));
-        if(sPre !=null){
-          sDataPath = sPre + sDataPath.substring(posSep+1);
-        }
-      } else {
-        String sReplace = cfge.itsCfgData.dataReplace.get(sDataPath);
-        if(sReplace !=null){
-          sDataPath = sReplace;
-        }
-      }
-    }
-    char whatIs = cfge.widgetType instanceof GuiCfgData.GuiCfgShowField ? 'S'
-      : '.';
-    WidgetDescriptor widgd = new WidgetDescriptor(cfge, cfge.widgetType.name, whatIs, sDataPath);
-    return widgd;
   }
   
   

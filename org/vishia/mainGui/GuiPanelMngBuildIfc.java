@@ -7,6 +7,7 @@ import java.util.Set;
 import org.eclipse.swt.graphics.Color;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.mainGui.PanelContent;
+import org.vishia.mainGui.cfg.GuiCfgBuilder;
 
 
 /**This is a unique interface for the GUI-panel-manager to build its content.
@@ -452,7 +453,7 @@ public interface GuiPanelMngBuildIfc
 	
   GuiWindowMng_ifc createInfoBox(String title, String[] lines, boolean todo);
 
-
+  void setCfgBuilder(GuiCfgBuilder cfgBuilder);
 	
 	FileDialogIfc createFileDialog();
 	
