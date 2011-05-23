@@ -2,15 +2,17 @@ package org.vishia.mainGuiSwt;
 
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
+import org.vishia.mainGui.GuiRectangle;
 import org.vishia.mainGui.WidgetDescriptor;
 
 public class MouseClickInfo implements MouseListener
 {
 
 	protected final GuiPanelMngSwt guiMng;
-	
-	
 	
 	public MouseClickInfo(GuiPanelMngSwt guiMng)
 	{
@@ -30,15 +32,48 @@ public class MouseClickInfo implements MouseListener
 		Object oInfo = widget.getData();
 		if(oInfo instanceof WidgetDescriptor){
 			WidgetDescriptor widgetInfo = (WidgetDescriptor)oInfo;
-			if(widgetInfo ==null || widgetInfo.sDataPath ==null || !widgetInfo.sDataPath.equals("widgetInfo")){
-			  guiMng.setLastClickedWidgetInfo(widgetInfo );
+      if(widgetInfo ==null || widgetInfo.sDataPath ==null || !widgetInfo.sDataPath.equals("widgetInfo")){
+        guiMng.setLastClickedWidgetInfo(widgetInfo );
+      }
+			if(guiMng.bDesignMode){
+			  GuiRectangle rr = new GuiRectangle(ev.x, ev.y, 0, 0);
+        if(ev.button == 1){ //left
+  			  guiMng.pressedLeftMouseDownForDesign(widgetInfo, rr);  
+			  } else if(ev.button == 3){ //right
+			    guiMng.pressedRightMouseDownForDesign(widgetInfo, rr);
+			  }
 			}
 		}
 		
 	}
 
 	/**The mouse up is left empty. It may be overridden by an derived class. */
-	@Override public void mouseUp(MouseEvent arg0)
-	{}
+	@Override public void mouseUp(MouseEvent ev)
+	{
+    Widget widget = ev.widget;
+    Object oInfo = widget.getData();
+    if(oInfo instanceof WidgetDescriptor){
+      WidgetDescriptor widgetInfo = (WidgetDescriptor)oInfo;
+      if(guiMng.bDesignMode){
+        boolean bCopy = (ev.stateMask & org.eclipse.swt.SWT.CTRL) !=0;
+        GuiRectangle rr = new GuiRectangle(ev.x, ev.y, 0, 0);
+        guiMng.releaseLeftMouseForDesign(widgetInfo, rr, bCopy);  
+      }
+    }
+	  
+	}
+	
+	
+	private MouseMoveListener mouseMoveListenerDesignMode = new MouseMoveListener()
+	{
+	  
+	  @Override public void mouseMove(MouseEvent e)
+	  {
+	    //xMouse = e.x;
+	    //yMouse = e.y;
+	  }//method mouseMove
+	};
+	  
+
 	
 }
