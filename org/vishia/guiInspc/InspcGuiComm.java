@@ -61,6 +61,10 @@ public class InspcGuiComm
 
   private Map<String, String> indexFaultDevice;
 
+  long millisecTimeoutOrders = 5000;
+  
+  long timeLastRemoveOrders;
+  
   
   /**List of all Panels, which have values to show repeating.
    * Any Panel can be an independent window. Any panel may have other values to show.
@@ -91,7 +95,7 @@ public class InspcGuiComm
   void openComm(String sOwnAddr)
   {
     inspcAccessor.open(sOwnAddr);
-    inspcAccessor.setExecuterAnswer(executerAnwer);
+    //inspcAccessor.setExecuterAnswer(executerAnwer);
   }
   
   
@@ -146,17 +150,37 @@ public class InspcGuiComm
           //
           //create the send command to target.
           int order = inspcAccessor.cmdGetValueByPath(sDataPath);    
-          //save the order to the action. It is taken on receive.
-          inspcRxEval.setExpectedOrder(order, commAction);
-          
+          if(order !=0){
+            //save the order to the action. It is taken on receive.
+            inspcRxEval.setExpectedOrder(order, commAction);
+          } else {
+            //too much orders.
+          }
         }
         
-      }
+      }//for widgets in panel
     }
     if(sIpTarget !=null){
       inspcAccessor.send();
-    }
+      InspcDataExchangeAccess.Datagram[] answerTelgs = inspcAccessor.awaitAnswer(2000);
+      if(answerTelgs !=null){
+        inspcRxEval.evaluate(answerTelgs, null); //executerAnswerInfo);  //executer on any info block.
+      } else {
+        console.writeWarning("no communication");
+        
+      }
 
+    }
+    
+    long time = System.currentTimeMillis();
+    if(time >= timeLastRemoveOrders + millisecTimeoutOrders){
+      timeLastRemoveOrders = time;
+      int removedOrders = inspcRxEval.checkAndRemoveOldOrders(time - timeLastRemoveOrders);
+      if(removedOrders >0){
+        console.writeWarning("Communication problem, removed Orders = " + removedOrders);
+      }
+    }
+    
   }
 
 

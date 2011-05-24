@@ -82,8 +82,8 @@ public class GuiCfgBuilder
     } else if(prevPos.yIncr_){ //position = previous + heigth/width
       int yPosAdd = 0;  
       if(prevPos.ySizeDown >=0){ //positive if yPos is on top of widget.
-        pos.yPosFrac = prevPos.yPosFrac + prevPos.ySizeFrac;
-        if(pos.yPosFrac >=1){ yPosAdd = 1; pos.yPosFrac -=1; }
+        pos.yPosFrac = prevPos.yPosFrac + prevPos.ySizeFrac;  //frac part from pos + size
+        if(pos.yPosFrac >=1){ yPosAdd = 1; pos.yPosFrac -=1; } //overflow detection >1
       } else { //negative if yPos is the bottom line.
         pos.yPosFrac = prevPos.yPosFrac - prevPos.ySizeFrac;  //ySizeFrac is a positiv number always.
         if(pos.yPosFrac <=0){ yPosAdd = -1; pos.yPosFrac +=1; }
@@ -128,7 +128,7 @@ public class GuiCfgBuilder
     }
     //
     pos.xIncr_ = inp.xIncr_ || (!inp.yIncr_ && prevPos.xIncr_);  //inherit xIncr but not if yIncr. 
-    pos.yIncr_ = inp.yIncr_ || (!inp.xIncr_ && prevPos.yIncr_);
+    pos.yIncr_ = inp.yIncr_ || (!inp.yIncr_ && prevPos.yIncr_);
     pos.panel = inp.panel !=null ? inp.panel : prevPos.panel;
     //
     gui.setFinePosition(pos.yPos, pos.yPosFrac, pos.xPos, pos.xPosFrac
