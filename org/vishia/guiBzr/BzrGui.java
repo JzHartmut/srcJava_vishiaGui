@@ -427,7 +427,7 @@ public class BzrGui
      */
     void initGraphic()
     {
-      addStandardMenus(null);
+      setStandardMenusGThread(null, null);
     }
 
   } //class CmdLineAndGui

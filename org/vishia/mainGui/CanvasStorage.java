@@ -72,9 +72,9 @@ public abstract class CanvasStorage
 	}
 	
 
-	public void drawImage(GuiImageBase image, int line, int column, int heigth, int width, GuiRectangle imagePixelSize)
+	public void drawImage(GuiImageBase image, int x, int y, int dx, int dy, GuiRectangle imagePixelSize)
 	{
-    PaintOrder order = new PaintOrderImage(image, line, column, heigth, width, imagePixelSize);
+    PaintOrder order = new PaintOrderImage(image, x, y, dx, dy, imagePixelSize);
     paintOrders.add(order);  //paint it when drawBackground is invoked.
 	}
 	

@@ -1,6 +1,8 @@
 package org.vishia.mainGui;
 
+import java.io.File;
 import java.io.InputStream;
+import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 
@@ -8,6 +10,7 @@ import org.eclipse.swt.graphics.Color;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.mainGui.PanelContent;
 import org.vishia.mainGui.cfg.GuiCfgBuilder;
+import org.vishia.mainGui.cfg.GuiCfgData;
 
 
 /**This is a unique interface for the GUI-panel-manager to build its content.
@@ -453,8 +456,22 @@ public interface GuiPanelMngBuildIfc
 	
   GuiWindowMng_ifc createInfoBox(String title, String[] lines, boolean todo);
 
-  void setCfgBuilder(GuiCfgBuilder cfgBuilder);
+  /**Sets the builder for content configuration.
+   * @param cfgBuilder
+   */
+  void buildCfg(GuiCfgData data, File fileCfg);
 	
+  /**Sets or resets the design mode. The design mode allows to change the content.
+   * @param mode
+   */
+  void setDesignMode(boolean mode);
+  
+  /**Saves the given configuration.
+   * @param dest
+   * @return
+   */
+  String saveCfg(Writer dest);
+  
 	FileDialogIfc createFileDialog();
 	
 	GuiShellMngIfc getShellMngIfc();

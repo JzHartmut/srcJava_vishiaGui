@@ -1,6 +1,8 @@
 package org.vishia.guiInspc;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -18,7 +20,9 @@ import org.vishia.mainGui.GuiPanelMngBase;
 import org.vishia.mainGui.GuiPanelMngBuildIfc;
 import org.vishia.mainGui.GuiPanelMngWorkingIfc;
 import org.vishia.mainGui.TabPanel;
+import org.vishia.mainGui.UserActionGui;
 import org.vishia.mainGui.WidgetCmpnifc;
+import org.vishia.mainGui.WidgetDescriptor;
 import org.vishia.mainGui.cfg.GuiCfgBuilder;
 import org.vishia.mainGui.cfg.GuiCfgData;
 import org.vishia.mainGui.cfg.GuiCfgZbnf;
@@ -75,12 +79,7 @@ public class InspcGuiCfg
   final CallingArguments callingArguments;
 
   
-  
-  /**This instance helps to create the Dialog Widget as part of the whole window. It is used only in the constructor.
-   * Therewith it may be defined stack-locally. But it is better to show and explain if it is access-able at class level. */
-  //GuiDialogZbnfControlled dialogZbnfConfigurator;   
-  GuiCfgBuilder cfgBuilder;
-  
+  File fileGui;
   
   final GuiCfgData guiCfgData = new GuiCfgData();
   
@@ -110,8 +109,6 @@ public class InspcGuiCfg
       //super.addStandardHelpInfo();
       this.cargs = cargs;
       super.setTitleAndSize("Inspc-GUI-cfg", 50,50,900, 600); //600);  //This instruction should be written first to output syntax errors.
-      super.setStandardMenus(new File("."));
-      //Menu menuItem = super.addMenu("Edit", 'E');
       
       super.setOutputArea("B3C3");        //whole area from mid to bottom
       super.startGraphicThread();
@@ -212,7 +209,9 @@ public class InspcGuiCfg
    */
   GuiDispatchCallbackWorker initGuiDialog = new GuiDispatchCallbackWorker()
   {
-    @Override public void doBeforeDispatching(boolean onlyWakeup){
+    @Override public void doBeforeDispatching(boolean onlyWakeup)
+    {
+      gui.setStandardMenusGThread(new File("."), actionFile);
       gui.setFrameAreaBorders(20, 80, 60, 85);
 
       
@@ -260,18 +259,8 @@ public class InspcGuiCfg
       }
       */
       gui.setTitleAndSize("GUI", 50, 100, 1200, 900);
-      try { 
-        File fileGui = new File(callingArguments.sFileGui);
-        
-        //dialogZbnfConfigurator.configureWithZbnf("Sample Gui", fileGui, panelBuildIfc);
-        cfgBuilder.buildGui();
-      }  
-      catch(Exception exception)
-      { //catch the last level of error. No error is reported direct on command line!
-        gui.writeError("Uncatched Exception on main level:", exception);
-        gui.writeStackTrace(exception);
-        gui.setExitErrorLevel(MainCmd_ifc.exitWithErrors);
-      }
+      panelBuildIfc.buildCfg(guiCfgData, fileGui);
+      
       gui.removeDispatchListener(this);    
       
       countExecution();
@@ -320,6 +309,7 @@ public class InspcGuiCfg
     }
     PropertiesGuiSwt propertiesGui = new PropertiesGuiSwt(gui.getDisplay(), sizeArg);
     LogMessage log = gui.getLogMessageOutputConsole();
+    //Menu menuItem = super.addMenu("Edit", 'E');
     panelMng = new GuiPanelMngSwt(null, gui.getContentPane(), 120,80, propertiesGui, null, log);
     panelBuildIfc = panelMng;
     guiAccess = panelMng;
@@ -351,7 +341,8 @@ public class InspcGuiCfg
     boolean bConfigDone = false;
     if(cargs.sFileGui != null){
       //configGuiWithZbnf.ctDone(0);  //counter for done initialized.
-      File fileGui = new File(callingArguments.sFileGui);
+      fileGui = new File(callingArguments.sFileGui);
+      if(fileGui.exists())
       {
         File fileSyntax = new File(cargs.sPathZbnf + "/dialog.zbnf");
         GuiCfgZbnf cfgZbnf = new GuiCfgZbnf(console, fileSyntax);
@@ -359,25 +350,28 @@ public class InspcGuiCfg
         String sError = cfgZbnf.configureWithZbnf(fileGui, guiCfgData);
         if(sError !=null){
           console.writeError(sError);
+        } else {
+          //dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
+          //cfgBuilder = new GuiCfgBuilder(guiCfgData, panelBuildIfc, fileGui.getParentFile());
+          //panelBuildIfc.setCfgBuilder(cfgBuilder);
+          gui.addDispatchListener(configGuiWithZbnf);
+          bConfigDone = configGuiWithZbnf.awaitExecution(1, 10000);
+          if(!bConfigDone){
+            console.writeError("No configuration");
+          } else {
+            try{ Thread.sleep(10);} catch(InterruptedException exc){}
+            //The GUI-dispatch-loop should know the change worker of the panel manager. Connect both:
+            gui.addDispatchListener(panelBuildIfc.getTheGuiChangeWorker());
+            try{ Thread.sleep(10);} catch(InterruptedException exc){}
+            //gets all prepared fields to show informations.
+            //oamShowValues.setFieldsToShow(panelBuildIfc.getShowFields());
+          }  
         }
+      } else {
+        console.writeError("Config file not found: " + fileGui.getAbsolutePath());
       }
-      //dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
-      cfgBuilder = new GuiCfgBuilder(guiCfgData, panelBuildIfc, fileGui.getParentFile());
-      panelBuildIfc.setCfgBuilder(cfgBuilder);
-      gui.addDispatchListener(configGuiWithZbnf);
-      bConfigDone = configGuiWithZbnf.awaitExecution(1, 10000);
     }    
     //assigns the fields which are visible to the oamOutValues-Manager to fill it with the values.
-    if(!bConfigDone){
-      console.writeError("No configuration");
-    } else {
-      try{ Thread.sleep(10);} catch(InterruptedException exc){}
-      //The GUI-dispatch-loop should know the change worker of the panel manager. Connect both:
-      gui.addDispatchListener(panelBuildIfc.getTheGuiChangeWorker());
-      try{ Thread.sleep(10);} catch(InterruptedException exc){}
-      //gets all prepared fields to show informations.
-      //oamShowValues.setFieldsToShow(panelBuildIfc.getShowFields());
-    }  
 
     //msgReceiver.test(); //use it after initGuiDialog!
     
@@ -406,6 +400,25 @@ public class InspcGuiCfg
   }
   
   
+  UserActionGui actionFile = new UserActionGui()
+  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+    {
+      if(sIntension.equals("save")){
+        String sError = null;
+        try{
+          Writer writer = new FileWriter("save.cfg");
+          sError = panelMng.saveCfg(writer);
+          writer.close();
+        } catch(java.io.IOException exc){
+          sError = "Problem open file ";
+        }
+        if(sError !=null){
+          console.writeError(sError);
+        }
+      }
+    }
+    
+  };
   
   
   /**The command-line-invocation (primary command-line-call. 

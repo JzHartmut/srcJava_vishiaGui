@@ -1,5 +1,7 @@
 package org.vishia.mainGui;
 
+import java.io.File;
+import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -10,7 +12,9 @@ import org.eclipse.swt.widgets.Control;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.mainCmd.Report;
 import org.vishia.mainGui.cfg.GuiCfgBuilder;
+import org.vishia.mainGui.cfg.GuiCfgData;
 import org.vishia.mainGui.cfg.GuiCfgDesigner;
+import org.vishia.mainGui.cfg.GuiCfgWriter;
 import org.vishia.msgDispatch.LogMessage;
 
 /**This is the base class of the GuiPanelMng for several Graphic-Adapters (Swing, SWT etc.). 
@@ -32,8 +36,18 @@ import org.vishia.msgDispatch.LogMessage;
 public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMngWorkingIfc
 {
 	
+  /**This instance helps to create the Dialog Widget as part of the whole window. It is used only in the constructor.
+   * Therewith it may be defined stack-locally. But it is better to show and explain if it is access-able at class level. */
+  //GuiDialogZbnfControlled dialogZbnfConfigurator;   
   GuiCfgBuilder cfgBuilder;
+  
+  GuiCfgWriter cfgWriter;
+  
+  /**The designer is an aggregated part of the PanelManager, but only created if necessary. 
+   * TODO check whether it should be disposed to {@link #mngBase} .*/
   protected GuiCfgDesigner designer;
+  
+  private GuiCfgData cfgData;
   
   public boolean bDesignMode = false;
   
@@ -158,14 +172,34 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
 	}
 
   
-  @Override public void setCfgBuilder(GuiCfgBuilder cfgBuilder)
+  @Override public void buildCfg(GuiCfgData data, File fileCfg) //GuiCfgBuilder cfgBuilder)
   {
-    this.cfgBuilder = cfgBuilder;
+    this.cfgData = data;
+    File currentDir = fileCfg.getParentFile();
+    this.cfgBuilder = new GuiCfgBuilder(cfgData, this, currentDir);
+    cfgBuilder.buildGui();
     this.designer = new GuiCfgDesigner(cfgBuilder, this, log);  ///
     this.bDesignMode = true;
   }
 
+  /**Sets or resets the design mode. The design mode allows to change the content.
+   * @param mode
+   */
+  @Override public void setDesignMode(boolean mode){ this.bDesignMode = mode; }
+  
+  /**Saves the given configuration.
+   * @param dest
+   * @return
+   */
+  @Override public String saveCfg(Writer dest)
+  { cfgWriter = new GuiCfgWriter(log);
+    String sError = cfgWriter.saveCfg(dest, cfgData);
+    return sError;
+  }
+  
 
+  
+  
 	public void setLastClickedWidgetInfo(WidgetDescriptor lastClickedWidgetInfo)
 	{
 		this.lastClickedWidgetInfo = lastClickedWidgetInfo;
@@ -255,15 +289,27 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   }
   
   
+  /**It will be called only at the GUI-implementation level. TODO protected and delegation.
+   * @param widgd
+   * @param xy
+   */
   public void pressedLeftMouseDownForDesign(WidgetDescriptor widgd, GuiRectangle xy)
   { designer.pressedLeftMouseDownForDesign(widgd, xy);
   }
   
   
+  /**It will be called only at the GUI-implementation level. TODO protected and delegation.
+   * @param widgd
+   * @param xy
+   */
   public void releaseLeftMouseForDesign(WidgetDescriptor widgd, GuiRectangle xy, boolean bCopy)
   { designer.releaseLeftMouseForDesign(widgd, xy, bCopy);
   }
   
+  /**It will be called only at the GUI-implementation level. TODO protected and delegation.
+   * @param widgd
+   * @param xy
+   */
   public void pressedRightMouseDownForDesign(WidgetDescriptor widgd, GuiRectangle xy)
   { designer.pressedRightMouseDownForDesign(widgd, xy);
   }

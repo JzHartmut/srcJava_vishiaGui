@@ -62,6 +62,7 @@ import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainGui.GuiDispatchCallbackWorker;
 import org.vishia.mainGui.GuiMainAreaifc;
 import org.vishia.mainGui.TextBoxGuifc;
+import org.vishia.mainGui.UserActionGui;
 import org.vishia.mainGui.WidgetCmpnifc;
 import org.vishia.mainGui.Widgetifc;
 import org.vishia.util.MinMaxTime;
@@ -156,7 +157,7 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
   	{
   		initGrafic(sTitle, 0, 0, xSize, ySize);
       if(bSetStandardMenus){
-      	addStandardMenus(currentDirectory);
+      	setStandardMenusGThread(currentDirectory, actionFile);
       }
       if(outputArea != null){
       	int xArea = outputArea.charAt(0) - 'A' +1;
@@ -254,6 +255,8 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
   /** Current Directory for file choosing. */
   File currentDirectory = null;
   
+  UserActionGui actionFile;
+  
   /**Set on call of {@link #setStandardMenus(File)} to add in in the graphic thread. */
   private boolean bSetStandardMenus;
   
@@ -287,7 +290,7 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
       if(currentDirectory != null) { fileChooser.setFileName(currentDirectory.getAbsolutePath()); }
       String sFile = fileChooser.open();
       if(sFile != null){
-        File file = new File(sFile);
+        actionFile.userActionGui("open", null, sFile);
         //actionFileOpen(file);
         //ActionEvent eventCreated = new ActionEvent(this, 0x0, "open " + sTelgFile);
       }  
@@ -321,14 +324,12 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
   {
 		@Override
 		public void widgetDefaultSelected(SelectionEvent e) {
-			// TODO Auto-generated method stub
-			
+      actionFile.userActionGui("save", null, "");
 		}
 	
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-			// TODO Auto-generated method stub
-			
+      actionFile.userActionGui("save", null, "");
 		}
   }
 
@@ -672,9 +673,10 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
 	}
 
 	
-	protected final void setStandardMenus(File openStandardDirectory)
-	{ currentDirectory = openStandardDirectory;
-    bSetStandardMenus = true;
+	public final void setStandardMenus(File openStandardDirectory, UserActionGui actionFile)
+	{ this.currentDirectory = openStandardDirectory;
+	  this.actionFile = actionFile;
+    this.bSetStandardMenus = true;
 		
 	}
 	
@@ -684,8 +686,9 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
    * @param openStandardDirectory may be null or a directory as default for "file-open" menue.
    */
   
-  protected final void addStandardMenus(File openStandardDirectory)
-  { currentDirectory = openStandardDirectory;
+  public final void setStandardMenusGThread(File openStandardDirectory, UserActionGui actionFile)
+  { this.currentDirectory = openStandardDirectory;
+    this.actionFile = actionFile;
     { //create the menue
       menuBar = new Menu(graphicFrame, SWT.BAR);
       graphicFrame.setMenuBar(menuBar);

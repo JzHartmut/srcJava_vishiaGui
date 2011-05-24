@@ -21,7 +21,8 @@ public class GuiCfgDesigner
   /**A Panel which contains the table to select some projectPaths. */
   private GuiShellMngBuildIfc dialogWindowProps;
 
-  private WidgetDescriptor dialogFieldDatapath;
+  /**Some dialog widget elements. */
+  private WidgetDescriptor dialogFieldName, dialogFieldDatapath, dialogFieldText;
   
   private WidgetDescriptor dialogButtonOk, dialogButtonEsc;
   
@@ -48,11 +49,13 @@ public class GuiCfgDesigner
   public void initGui()
   {
     assert(dialogWindowProps == null); //check call only one time.
-    mng.setPosition(2, 60, 16, 30, 'r');
+    mng.setPosition(2, 60, 22, 40, 'r');
     dialogWindowProps = mng.createWindow("Widget Properties", false);
-    dialogWindowProps.setPosition(0, 0, 2, 30, 'd');
+    dialogWindowProps.setPosition(0, 0, 2, 39, 'd');
+    dialogFieldName = dialogWindowProps.addTextField("name", true, "name", 'r');
     dialogFieldDatapath = dialogWindowProps.addTextField("dataPath", true, "dataPath", 'r');
-    dialogWindowProps.setPosition(4, 2, 3, 10, 'r');
+    dialogFieldText = dialogWindowProps.addTextField("text", true, "text", 'r');
+    dialogWindowProps.setPosition(16, 2, 3, 10, 'r');
     dialogButtonOk = dialogWindowProps.addButton("OK", actionOk, null, null, null, "OK");
     dialogButtonEsc = dialogWindowProps.addButton("esc", actionOk, null, null, null, "esc");
     
@@ -107,7 +110,18 @@ public class GuiCfgDesigner
   public void pressedRightMouseDownForDesign(WidgetDescriptor widgd, GuiRectangle xy)
   { if(widgdInDialog == null){
       widgdInDialog = widgd;
-      dialogFieldDatapath.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, widgd.getDataPath());
+      GuiCfgData.GuiCfgElement cfge = widgd.getCfgElement();
+      String sName, sDataPath, sText;
+      if(cfge !=null){
+        sName = cfge.widgetType.name;
+        sDataPath = cfge.widgetType.info;
+        sText = cfge.widgetType.text;
+        if(sName != null){ dialogFieldName.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sName); }
+        if(sDataPath != null){ dialogFieldDatapath.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sDataPath); }
+        if(sText != null){ dialogFieldText.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sText); }
+      } else {
+        dialogFieldName.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, "error cfge");
+      }
     }
     dialogWindowProps.setWindowVisible(true);
   }
@@ -115,8 +129,15 @@ public class GuiCfgDesigner
   private UserActionGui actionOk = new UserActionGui()
   { @Override public void userActionGui(String sIntension, WidgetDescriptor widgd, Object... params)
     { if(widgdInDialog !=null){
+        String sName = dialogFieldName.getValue();
         String sDataPath = dialogFieldDatapath.getValue();
-        widgdInDialog.setDataPath(sDataPath);
+        String sText = dialogFieldText.getValue();
+        GuiCfgData.GuiCfgElement cfge = widgdInDialog.getCfgElement();
+        if(cfge !=null){
+          if(sName.trim().length() >0) { cfge.widgetType.name = sName; }
+          if(sDataPath.trim().length() >0) { cfge.widgetType.info = sDataPath; }
+          if(sText.trim().length() >0) { cfge.widgetType.text = sText; }
+        }
         dialogWindowProps.setWindowVisible(false);
         widgdInDialog = null;
       }

@@ -361,7 +361,7 @@ public final class GuiCfgData
   }
   
   
-  private GuiCfgElement firstElement = null;
+  GuiCfgElement firstElement = null;
   
   private GuiCfgElement actualElement = null;
   

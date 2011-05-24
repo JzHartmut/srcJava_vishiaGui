@@ -957,7 +957,8 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     GuiRectangle rr = getRectangleBounds();
     if(currPanel.panelComposite instanceof CanvasStorePanelSwt){
       CanvasStorePanelSwt canvas = (CanvasStorePanelSwt) currPanel.panelComposite;
-      canvas.store.drawImage(imageGui, rr.x, rr.x, rr.dx, rr.dy, size);
+      //coordinates are in pixel
+      canvas.store.drawImage(imageGui, rr.x, rr.y, rr.dx, rr.dy, size);
     }
     return null;
   }
