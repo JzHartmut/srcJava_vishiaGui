@@ -67,6 +67,13 @@ public class InspcGuiComm
   
   String sIpTarget;
   
+  boolean bUserCalled;
+
+  /**true while running {@link #procComm()} if a send order is stored in telegram but send ins't invoked. */
+  boolean bSendOrder;
+  
+  boolean bShouldSend;
+  
   /**List of all Panels, which have values to show repeating.
    * Any Panel can be an independent window. Any panel may have other values to show.
    * But any panel can select more as one tabs (tabPanel). Then it will be select which values to show.
@@ -113,6 +120,8 @@ public class InspcGuiComm
   void procComm()
   {
     sIpTarget = null; 
+    bUserCalled = false;
+    bSendOrder = false;
     //
     //
     for(InspcGuiPanelContent panel: listPanels){
@@ -128,30 +137,26 @@ public class InspcGuiComm
         if(widget.whatIs == 'D'){
           int cc = 0;
         }
-          
+        //special action to request content from target:  
         UserActionGui actionShow = widget.getActionShow();
         if(actionShow !=null){
           actionShow.userActionGui("tx", widget);
         } else {
           actionShowTextfield.userActionGui("tx", widget);
         }
-        
+        if(bShouldSend){
+          sendAndAwaitAnswer();
+          //repeat the request for the field:
+          //TODO: don't use the show action! use datapath with meta info.
+          actionShowTextfield.userActionGui("tx", widget);
+        }
       }//for widgets in panel
     }
     if(sIpTarget !=null){
-      inspcAccessor.send();
+      sendAndAwaitAnswer();
       if(user !=null){
         user.isSent(0);
       }
-
-      InspcDataExchangeAccess.Datagram[] answerTelgs = inspcAccessor.awaitAnswer(2000);
-      if(answerTelgs !=null){
-        inspcAccessor.rxEval.evaluate(answerTelgs, null); //executerAnswerInfo);  //executer on any info block.
-      } else {
-        console.writeWarning("no communication");
-        
-      }
-
     }
     
     long time = System.currentTimeMillis();
@@ -166,6 +171,22 @@ public class InspcGuiComm
   }
 
 
+  
+  
+  void sendAndAwaitAnswer()
+  { bSendOrder = false;
+    bShouldSend = false;
+    inspcAccessor.send();
+    InspcDataExchangeAccess.Datagram[] answerTelgs = inspcAccessor.awaitAnswer(2000);
+    if(answerTelgs !=null){
+      inspcAccessor.rxEval.evaluate(answerTelgs, null); //executerAnswerInfo);  //executer on any info block.
+    } else {
+      console.writeWarning("no communication");
+      
+    }
+  }
+
+  
   
   UserActionGui actionShowTextfield = new UserActionGui()
   { @Override public void userActionGui(String sIntension, WidgetDescriptor widget, Object... params)
@@ -188,8 +209,9 @@ public class InspcGuiComm
       }
       //
       if(sIpTarget !=null){
-        if(user !=null){
+        if(user !=null && !bUserCalled){  //call only one time per procComm()
           user.requData(0);
+          bUserCalled = true;
         }
         //check whether the widget has an comm action already. 
         //First time a widgets gets its WidgetCommAction. Then for ever the action is kept.
@@ -207,7 +229,9 @@ public class InspcGuiComm
         if(order !=0){
           //save the order to the action. It is taken on receive.
           inspcAccessor.rxEval.setExpectedOrder(order, commAction);
+          bSendOrder = true;
         } else {
+          bShouldSend = true;
           //too much orders.
         }
       }
