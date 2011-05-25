@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.vishia.mainGui.GuiPanelMngBuildIfc;
+import org.vishia.mainGui.UserActionGui;
 import org.vishia.mainGui.WidgetDescriptor;
 import org.vishia.mainGui.cfg.GuiCfgData.GuiCfgElement;
 
@@ -47,7 +48,11 @@ public class GuiCfgBuilder
 
     for(Map.Entry<String, GuiCfgData.GuiCfgPanel> panelEntry: cfgData.idxPanels.entrySet()){
       GuiCfgData.GuiCfgPanel panel = panelEntry.getValue();
-      buildPanel(panel);  
+      String sErrorPanel = buildPanel(panel);  
+      if(sErrorPanel !=null){
+        if(sError == null){ sError = sErrorPanel; }
+        else { sError += "\n" + sErrorPanel; }
+      }
     }
     
     return sError;
@@ -59,7 +64,11 @@ public class GuiCfgBuilder
     String sError = null;
     gui.selectPanel(cfgDataPanel.name);
     for(GuiCfgElement cfge: cfgDataPanel.listElements){
-      buildWidget(cfge);
+      String sErrorWidgd = buildWidget(cfge);
+      if(sErrorWidgd !=null){
+        if(sError == null){ sError = sErrorWidgd; }
+        else { sError += "\n" + sErrorWidgd; }
+      }
     }
     return sError;
   }
@@ -163,6 +172,11 @@ public class GuiCfgBuilder
       else if(wText.colorName !=null){ colorValue = gui.getColorValue(wText.colorName.color);}
       else{ colorValue = 0; } //black
       widgd = gui.addText(cfge.widgetType.text, wText.size.charAt(0), colorValue);
+    } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgLed){
+      GuiCfgData.GuiCfgLed ww = (GuiCfgData.GuiCfgLed)cfge.widgetType;
+      final int colorValue;
+      widgd = gui.addLed(sName, ww.showMethod, sDataPath);
+      
     } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgImage){
       GuiCfgData.GuiCfgImage wImage = (GuiCfgData.GuiCfgImage)cfge.widgetType;
       File fileImage = new File(currentDir, wImage.file_);
@@ -182,6 +196,15 @@ public class GuiCfgBuilder
       widgd = null;
     }
     if(widgd !=null){
+      String sShowMethod = cfge.widgetType.showMethod;
+      if(sShowMethod !=null){
+        UserActionGui actionShow = gui.getRegisteredUserAction(sShowMethod);
+        if(actionShow == null){
+          sError = "GuiCfgBuilder - show method not found: " + sShowMethod;
+        } else {
+          widgd.setActionShow(actionShow);
+        }
+      }
       widgd.setCfgElement(cfge);
     }
     return sError;

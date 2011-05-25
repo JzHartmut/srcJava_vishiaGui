@@ -88,8 +88,9 @@ public class SwitchButtonSwt extends ButtonSwt
 			isSwitchedDown = ! isSwitchedDown;
       if(isSwitchedDown){ setBackground(colorPressed); }
       else {  setBackground(colorReleased); }
-			if(widgd.action != null){
-			  widgd.action.userActionGui(sCmd + (isSwitchedDown? "1" : "0"), infos);
+			UserActionGui action = widgd.getActionChange();
+      if(action != null){
+			  action.userActionGui(sCmd + (isSwitchedDown? "1" : "0"), infos);
 			}
 			
 		}

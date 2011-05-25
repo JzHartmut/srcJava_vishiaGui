@@ -179,7 +179,7 @@ public class TableSwt
         Object oData = ((Control)source).getData();
         if(oData instanceof WidgetDescriptor){
           widgetDescr = (WidgetDescriptor)oData;
-          action = widgetDescr.action;
+          action = widgetDescr.getActionChange();
         } else { widgetDescr = null; action = null; }
         } else { widgetDescr = null; action = null;
       }

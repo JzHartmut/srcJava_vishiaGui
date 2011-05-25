@@ -71,6 +71,9 @@ public class InspcGuiCfg
      * For example "UDP:0.0.0.0:60099" to create a socket port for UDP-communication.
      */
     Map<String, String> indexTargetIpcAddr = new TreeMap<String, String>();
+
+    /**A class which is used as plugin for user specifies. It is of interface {@link InspcPlugUser_ifc}. */
+    String sPluginClass;
     
   } //class CallingArguments
   
@@ -85,6 +88,7 @@ public class InspcGuiCfg
   
   final InspcGuiComm inspcComm;
   
+  InspcPlugUser_ifc user;
   
   /**Organisation class for the GUI.
    */
@@ -158,6 +162,10 @@ public class InspcGuiCfg
         else if(arg.startsWith("-size=")) 
         { cargs.sSize = getArgument(6);   //an example for default output
         }
+        else if(arg.startsWith("-plugin=")) 
+        { cargs.sPluginClass = getArgument(8);   //an example for default output
+        }
+        
         else if(arg.startsWith("-_")) 
         { //accept but ignore it. Commented calling arguments.
         }
@@ -288,7 +296,24 @@ public class InspcGuiCfg
     boolean bOk = true;
     this.callingArguments = cargs;
     this.console = gui;  
-    this.inspcComm = new InspcGuiComm(console, cargs.indexTargetIpcAddr);
+    if(cargs.sPluginClass !=null){
+      try{
+        Class<?> pluginClass = Class.forName(cargs.sPluginClass);
+        Object oUser = pluginClass.newInstance();
+        if(oUser instanceof InspcPlugUser_ifc){
+          user = (InspcPlugUser_ifc) oUser;
+        } else {
+          console.writeError("Inspc-plugin - fault type: " + cargs.sPluginClass 
+            + "; it should be type of InspcPlugUser_ifc");
+        }
+      } catch (Exception exc){
+        user = null;
+        console.writeError("Inspc-plugin - cannot instantiate: " + cargs.sPluginClass + "; "
+          + exc.getMessage());
+      }
+    }
+    
+    this.inspcComm = new InspcGuiComm(console, cargs.indexTargetIpcAddr, user);
     
     inspector = new Inspector("UDP:127.0.0.1:60088");
     inspector.start(this);
@@ -314,7 +339,9 @@ public class InspcGuiCfg
     panelBuildIfc = panelMng;
     guiAccess = panelMng;
     
-    
+    if(user !=null){
+      user.registerMethods(panelBuildIfc);
+    }
     //oamShowValues = new OamShowValues(gui, dlgAccess);
     //showValuesOk = oamShowValues.readVariableCfg();
     

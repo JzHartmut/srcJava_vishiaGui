@@ -12,6 +12,7 @@ import org.vishia.inspectorAccessor.InspcAccessExecAnswerTelg_ifc;
 import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
 import org.vishia.inspectorAccessor.InspcAccessor;
 import org.vishia.mainCmd.Report;
+import org.vishia.mainGui.UserActionGui;
 import org.vishia.mainGui.WidgetDescriptor;
 
 /**The communication manager. */
@@ -47,11 +48,10 @@ public class InspcGuiComm
   /**To Output log informations. The ouput will be done in the output area of the graphic. */
   private final Report console;
 
+  private final InspcPlugUser_ifc user;
+  
   /**Instance for the inspector access to the target. */
   private final InspcAccessor inspcAccessor;
-  
-  /**Instance to evaluate received telegrams. TODO should a part of InspcAccessor? */
-  InspcAccessEvaluatorRxTelg inspcRxEval = new InspcAccessEvaluatorRxTelg();
   
   /**The target ipc-address for Interprocess-Communication with the target.
    * It is a string, which determines the kind of communication.
@@ -65,6 +65,7 @@ public class InspcGuiComm
   
   long timeLastRemoveOrders;
   
+  String sIpTarget;
   
   /**List of all Panels, which have values to show repeating.
    * Any Panel can be an independent window. Any panel may have other values to show.
@@ -74,11 +75,15 @@ public class InspcGuiComm
   
   
   
-  InspcGuiComm(Report console, Map<String, String> indexTargetIpcAddr)
+  InspcGuiComm(Report console, Map<String, String> indexTargetIpcAddr, InspcPlugUser_ifc user)
   {
     this.console = console;
-    this.inspcAccessor = new InspcAccessor();
+    this.user = user;
+    this.inspcAccessor = new InspcAccessor(new InspcAccessEvaluatorRxTelg());
     this.indexTargetIpcAddr = indexTargetIpcAddr;
+    if(user !=null){
+      user.init(inspcAccessor);
+    }
   }
   
   
@@ -107,9 +112,9 @@ public class InspcGuiComm
    */
   void procComm()
   {
-    //String sIpTarget = "UDP:127.0.0.1:60080";
-    String sIpTarget = null; 
-    
+    sIpTarget = null; 
+    //
+    //
     for(InspcGuiPanelContent panel: listPanels){
       if(panel.newWidgets !=null){
         if(panel.widgets !=null){
@@ -120,51 +125,28 @@ public class InspcGuiComm
       }
       if(panel.widgets !=null) for(WidgetDescriptor widget: panel.widgets){
         
-        String sDataPath = widget.getDataPath() + ".";
-        int posSepDevice = sDataPath.indexOf(':');
-        if(posSepDevice >0){
-          String sDevice = sDataPath.substring(0, posSepDevice);
-          String sIpTargetNew = indexTargetIpcAddr.get(sDevice);
-          if(sIpTargetNew == null){
-            errorDevice(sDevice);
-          } else {
-            if(sIpTarget == null){
-              sIpTarget = sIpTargetNew;
-              inspcAccessor.setTargetAddr(sIpTarget);
-            }
-          }
-          sDataPath = sDataPath.substring(posSepDevice +1);
+        if(widget.whatIs == 'D'){
+          int cc = 0;
         }
-        //
-        if(sIpTarget !=null){
-          //check whether the widget has an comm action already. 
-          //First time a widgets gets its WidgetCommAction. Then for ever the action is kept.
-          WidgetCommAction commAction;
-          Object oCommAction;
-          if( (oCommAction = widget.getContentInfo()) ==null){
-            commAction = new WidgetCommAction(widget);
-            widget.setContentInfo(commAction);
-          } else {
-            commAction = (WidgetCommAction)oCommAction;
-          }
-          //
-          //create the send command to target.
-          int order = inspcAccessor.cmdGetValueByPath(sDataPath);    
-          if(order !=0){
-            //save the order to the action. It is taken on receive.
-            inspcRxEval.setExpectedOrder(order, commAction);
-          } else {
-            //too much orders.
-          }
+          
+        UserActionGui actionShow = widget.getActionShow();
+        if(actionShow !=null){
+          actionShow.userActionGui("tx", widget);
+        } else {
+          actionShowTextfield.userActionGui("tx", widget);
         }
         
       }//for widgets in panel
     }
     if(sIpTarget !=null){
       inspcAccessor.send();
+      if(user !=null){
+        user.isSent(0);
+      }
+
       InspcDataExchangeAccess.Datagram[] answerTelgs = inspcAccessor.awaitAnswer(2000);
       if(answerTelgs !=null){
-        inspcRxEval.evaluate(answerTelgs, null); //executerAnswerInfo);  //executer on any info block.
+        inspcAccessor.rxEval.evaluate(answerTelgs, null); //executerAnswerInfo);  //executer on any info block.
       } else {
         console.writeWarning("no communication");
         
@@ -175,7 +157,7 @@ public class InspcGuiComm
     long time = System.currentTimeMillis();
     if(time >= timeLastRemoveOrders + millisecTimeoutOrders){
       timeLastRemoveOrders = time;
-      int removedOrders = inspcRxEval.checkAndRemoveOldOrders(time - timeLastRemoveOrders);
+      int removedOrders = inspcAccessor.rxEval.checkAndRemoveOldOrders(time - timeLastRemoveOrders);
       if(removedOrders >0){
         console.writeWarning("Communication problem, removed Orders = " + removedOrders);
       }
@@ -184,6 +166,60 @@ public class InspcGuiComm
   }
 
 
+  
+  UserActionGui actionShowTextfield = new UserActionGui()
+  { @Override public void userActionGui(String sIntension, WidgetDescriptor widget, Object... params)
+    {
+    
+      String sDataPath = widget.getDataPath() + ".";
+      int posSepDevice = sDataPath.indexOf(':');
+      if(posSepDevice >0){
+        String sDevice = sDataPath.substring(0, posSepDevice);
+        String sIpTargetNew = indexTargetIpcAddr.get(sDevice);
+        if(sIpTargetNew == null){
+          errorDevice(sDevice);
+        } else {
+          if(sIpTarget == null){
+            sIpTarget = sIpTargetNew;
+            inspcAccessor.setTargetAddr(sIpTarget);
+          }
+        }
+        sDataPath = sDataPath.substring(posSepDevice +1);
+      }
+      //
+      if(sIpTarget !=null){
+        if(user !=null){
+          user.requData(0);
+        }
+        //check whether the widget has an comm action already. 
+        //First time a widgets gets its WidgetCommAction. Then for ever the action is kept.
+        WidgetCommAction commAction;
+        Object oCommAction;
+        if( (oCommAction = widget.getContentInfo()) ==null){
+          commAction = new WidgetCommAction(widget);
+          widget.setContentInfo(commAction);
+        } else {
+          commAction = (WidgetCommAction)oCommAction;
+        }
+        //
+        //create the send command to target.
+        int order = inspcAccessor.cmdGetValueByPath(sDataPath);    
+        if(order !=0){
+          //save the order to the action. It is taken on receive.
+          inspcAccessor.rxEval.setExpectedOrder(order, commAction);
+        } else {
+          //too much orders.
+        }
+      }
+    }
+    
+  };
+  
+  
+  
+  
+  
+  
   
   void errorDevice(String sDevice){
     if(indexFaultDevice ==null){ indexFaultDevice = new TreeMap<String, String>(); }
@@ -208,7 +244,7 @@ public class InspcGuiComm
   private InspcAccessExecAnswerTelg_ifc executerAnwer = new InspcAccessExecAnswerTelg_ifc()
   { @Override public void execInspcRxTelg(InspcDataExchangeAccess.Datagram[] telgs)
     { 
-      inspcRxEval.evaluate(telgs, null); //executerAnswerInfo);  //executer on any info block.
+      inspcAccessor.rxEval.evaluate(telgs, null); //executerAnswerInfo);  //executer on any info block.
     }
     
   };

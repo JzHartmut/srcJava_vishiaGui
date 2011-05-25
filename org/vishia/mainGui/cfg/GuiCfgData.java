@@ -88,6 +88,16 @@ public final class GuiCfgData
     /**ZBNF: Text::= */
     public void set_Text(GuiCfgText data){  }
     
+    /**ZBNF: Led::= */
+    public GuiCfgLed new_Led()
+    { GuiCfgLed widgetType1 = new GuiCfgLed(this); 
+      this.widgetType = widgetType1; 
+      return widgetType1;
+    }
+    
+    /**ZBNF: Text::= */
+    public void set_Led(GuiCfgLed data){  }
+    
     /**ZBNF: Line::= */
     public GuiCfgLine new_Line()
     { GuiCfgLine widgetType1 = new GuiCfgLine(this); 
@@ -175,7 +185,7 @@ public final class GuiCfgData
     private final GuiCfgElement itsElement;
     
     public String name, text;
-    public String cmd, userAction, info;
+    public String cmd, userAction, info, showMethod, format, type;
     
     public GuiCfgColor colorName = null, color0 = null, color1 = null;
     
@@ -210,6 +220,15 @@ public final class GuiCfgData
   {
     public String size = "B";
     public GuiCfgText(GuiCfgElement itsElement){ super(itsElement); }
+  }
+  
+  
+  /**ZBNF: Text::= ... ;
+   * Class for instance to capture and store the Table data. */
+  public final static class GuiCfgLed extends WidgetTypeBase implements Cloneable
+  {
+    //public String size = "B";
+    public GuiCfgLed(GuiCfgElement itsElement){ super(itsElement); }
   }
   
   

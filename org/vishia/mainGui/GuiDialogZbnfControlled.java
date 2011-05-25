@@ -370,7 +370,7 @@ public class GuiDialogZbnfControlled
           	if(type == null) throw new IllegalArgumentException("type is unknown: " + sType + " for Element " + sName + "/" + sInfo);
             //take not defined informations from the type:
           	if(sCmd == null){ sCmd = type.sCmd; }
-          	if(sUserAction == null){ action = (UserActionGui)type.action; }
+          	if(sUserAction == null){ action = type.getActionChange(); } //(UserActionGui)type.action; }
           	if(sInfo == null){ sInfo = type.sDataPath; }
           	if(sShowMethod == null){ sShowMethod = type.getShowMethod(); }
           }
@@ -397,7 +397,7 @@ public class GuiDialogZbnfControlled
           if(semantic.equals("Type"))
 	        { String sTypeName = item.getChildString("typeName");
 	        	WidgetDescriptor widgetDescr = new WidgetDescriptor(sTypeName, '@');
-	          widgetDescr.action = action;
+	          widgetDescr.setActionChange(action);
 	          widgetDescr.sCmd = sCmd;
 	          widgetDescr.sDataPath = sInfo;
 	          widgetDescr.sFormat = null;
@@ -407,7 +407,7 @@ public class GuiDialogZbnfControlled
 	        } else {
 	        	//create a widget description with the given data, it should be used by all elements except some.
 	        	WidgetDescriptor widgetInfo = new WidgetDescriptor(sName, '.');
-	          widgetInfo.action = action;
+	          widgetInfo.setActionChange(action);
 	          widgetInfo.sCmd = sCmd;
 	          widgetInfo.sDataPath = sInfo;
 	          widgetInfo.sFormat = sFormat;

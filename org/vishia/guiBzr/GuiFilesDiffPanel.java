@@ -52,7 +52,7 @@ public class GuiFilesDiffPanel
     int[] columnWidths = {40, 10, 2,8};
     
     widgdTableFilesCmpn = panelBuildifc.addTable("selectFile", 20, columnWidths);
-    widgdTableFilesCmpn.setAction(actionTableLineFile);
+    widgdTableFilesCmpn.setActionChange(actionTableLineFile);
     panelBuildifc.setPosition(2, 61, 3, 9, 'd');
     panelBuildifc.addButton("refresh", actionRefresh, "","","","&refresh");
     panelBuildifc.addButton("view", actionView, "","","","&view");

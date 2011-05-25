@@ -79,9 +79,15 @@ public class WidgetDescriptor
 	/**Numeric informations about the content. */
 	int[] indices;
 	
-	/**Action method on activating, changing or release the widget-focus. */
-	public UserActionGui action;
+  /**Action method on activating, changing or release the widget-focus. */
+  private UserActionGui actionChanging;
 
+  
+  /**Action method for showing. */
+  private UserActionGui actionShow;
+
+  
+	
 	/**command string given by the action as parameter. */
 	public String sCmd;
 	
@@ -146,11 +152,27 @@ public class WidgetDescriptor
    */
   public String getDataPath(){ return sDataPath; }
 	
-  /**Sets the action for application context.
+  /**Sets the action in application context for change the widget.
+   * Change means, mouse button actions, user inputs
    * @param action any instance. Its action method is invoked depending of the type of widget
-   *        usual if the user takes an action on sceen, press button etc.
+   *        usual if the user takes an action on screen, press button etc.
    */
-  public void setAction(UserActionGui action){ this.action = action; }
+  public void setActionChange(UserActionGui action){ actionChanging = action; }
+  
+  /**Gets the action for change the widget. */
+  public UserActionGui getActionChange(){ return actionChanging; }
+  
+  
+  /**Sets the action in application context for showing the widget, apply any data.
+   * The action is called either cyclically for all widgets of visible windows,
+   * or if any data are received.
+   * @param action any instance. .
+   */
+  public void setActionShow(UserActionGui action){ actionShow = action; }
+  
+  /**Gets the action to show the widget. */
+  public UserActionGui getActionShow(){ return actionShow; }
+  
   
 	public String getsToolTip()
 	{
@@ -169,6 +191,7 @@ public class WidgetDescriptor
 		return sShowMethod;
 	}
 
+	
 	public int getDataIx(){ return dataIx; }
 
 	public void setDataIx(int dataIx){ this.dataIx = dataIx; }

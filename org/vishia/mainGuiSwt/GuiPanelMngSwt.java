@@ -1100,7 +1100,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	
   	WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, 'B');
     widgetInfos.setPanelMng(this);
-    widgetInfos.action = action;
+    widgetInfos.setActionChange(action);
     widgetInfos.sCmd = sCmd;
     widgetInfos.setShowMethod(sShowMethod);
     widgetInfos.sDataPath = sDataPath;
@@ -1357,6 +1357,10 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
               LedSwt field = (LedSwt)oWidget;
               switch(cmd){
               case GuiPanelMngWorkingIfc.cmdColor: field.setColor(ident, (Integer)info); break;
+              case GuiPanelMngWorkingIfc.cmdSet: {
+                int colorInner = ((Integer)info).intValue();
+                field.setColor(ident, colorInner);
+              } break;
               default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, descr.name);
               }
             } else if(oWidget instanceof SwitchButtonSwt){ 

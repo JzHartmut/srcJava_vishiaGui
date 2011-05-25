@@ -16,8 +16,8 @@ public class SwitchExclusiveButtonMng implements VariableAccess_ifc
   
   public void add(WidgetDescriptor widgd){ 
     listSwitchButtons.add(widgd);
-    if(widgd.action == null){
-      widgd.action = switchAction;
+    if(widgd.getActionChange() == null){
+      widgd.setActionChange(switchAction);
     }
   }
   

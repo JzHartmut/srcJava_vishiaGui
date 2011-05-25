@@ -99,7 +99,7 @@ public class GuiStatusPanel
     int[] columnWidths = {40, 10};
     selectorProjectPath.setPosition(0, 0, 10, 60, 'd');
     selectorProjectPathTable = selectorProjectPath.addTable("selectProjectPath", 20, columnWidths);
-    selectorProjectPathTable.setAction(actionSelectorProjectPathTable);
+    selectorProjectPathTable.setActionChange(actionSelectorProjectPathTable);
     selectorProjectPath.setPosition(20, 0, -3, 10, 'r');
     selectorProjectPath.addButton("closeProjectBzrComponents", actionCloseProjectBzrComponents, "","","","ok");
     String sPrjPath = null;
