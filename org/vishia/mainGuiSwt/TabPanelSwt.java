@@ -53,7 +53,7 @@ public class TabPanelSwt extends TabPanel
 	
   
   
-	@Override public Object addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
+	@Override public PanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
 	{ TabItem tabItemOperation = new TabItem(tabMng.widgetSwt, SWT.None);
 		tabItemOperation.setText(sLabel);
 		CanvasStorePanelSwt panel;
@@ -66,11 +66,11 @@ public class TabPanelSwt extends TabPanel
 		PanelContent panelContent = mng.registerPanel(sName, panel);
 	  tabItemOperation.setControl(panel);
 	  panel.setData(panelContent);
-	  return panel;
+	  return panelContent;
   }
 
   
-	@Override public Object addCanvasPanel(String sName, String sLabel)
+	@Override public PanelContent addCanvasPanel(String sName, String sLabel)
 	{ TabItem tabItemOperation = new TabItem(tabMng.widgetSwt, SWT.None);
 		tabItemOperation.setText(sLabel);
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
@@ -78,7 +78,7 @@ public class TabPanelSwt extends TabPanel
 	  PanelContent panelContent = mng.registerPanel(sName, panel);
 	  tabItemOperation.setControl(panel);
 	  panel.setData(panelContent);
-	  return panel;
+	  return panelContent;
   }
 
   

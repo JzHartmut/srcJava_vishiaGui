@@ -39,6 +39,7 @@ public class GuiCfgWriter
     writePosition(ww, cfge.positionInput);
     if(cfge.widgetType instanceof GuiCfgData.GuiCfgShowField){ writeShowField((GuiCfgData.GuiCfgShowField)cfge.widgetType); }
     else if(cfge.widgetType instanceof GuiCfgData.GuiCfgText){ writeText((GuiCfgData.GuiCfgText)cfge.widgetType); }
+    else if(cfge.widgetType instanceof GuiCfgData.GuiCfgLed){ writeLed((GuiCfgData.GuiCfgLed)cfge.widgetType); }
     else { writeUnknown(cfge.widgetType); }
   }
   
@@ -79,6 +80,15 @@ public class GuiCfgWriter
   }
 
   
+  void writeLed(GuiCfgData.GuiCfgLed ee) throws IOException
+  { String sep = "";
+    ww.append("Led(");
+    writeParam(ee);
+    ww.append("); ");
+  }
+
+  
+  
   void writeText(GuiCfgData.GuiCfgText ee) throws IOException
   { String sep = "";
     ww.append("Text(");
@@ -100,10 +110,12 @@ public class GuiCfgWriter
   
   void writeParam(GuiCfgData.WidgetTypeBase pp) throws IOException
   { String sep = "";
-    if(pp.text !=null){ ww.            append("\"")     .append(pp.text).append("\""); sep = ", "; }
-    if(pp.name !=null){ ww.append(sep).append("name=")  .append(pp.name); sep = ", "; }
-    if(pp.cmd  !=null){ ww.append(sep).append("cmd=")   .append(pp.cmd);  sep = ", "; }
-    if(pp.info !=null){ ww.append(sep).append("info=\"").append(pp.info).append("\""); sep = ", "; }
+    if(pp.text !=null)      { ww.            append("\"")       .append(pp.text).append("\""); sep = ", "; }
+    if(pp.name !=null)      { ww.append(sep).append("name=")    .append(pp.name); sep = ", "; }
+    if(pp.cmd  !=null)      { ww.append(sep).append("cmd=")     .append(pp.cmd);  sep = ", "; }
+    if(pp.showMethod !=null){ ww.append(sep).append("show=\"")  .append(pp.showMethod).append("\""); sep = ", "; }
+    if(pp.format !=null)    { ww.append(sep).append("format=\"").append(pp.format).append("\""); sep = ", "; }
+    if(pp.info !=null)      { ww.append(sep).append("info=\"")  .append(pp.info).append("\""); sep = ", "; }
     
   }
 

@@ -52,6 +52,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   public boolean bDesignMode = false;
   
 
+  
   protected boolean bDesignerIsInitialized = false;
   
   final GuiPanelMngBase parent;
@@ -64,6 +65,9 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   /**Properties of this Dialog Window. */
   public  final PropertiesGui propertiesGui;
 
+  /**Any kind of TabPanel for this PanelManager TODO make protected
+   */
+  public TabPanel tabPanel;
   
   protected final LogMessage log;
   

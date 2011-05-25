@@ -477,6 +477,8 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   	currPanel = panels.get(sName);
   	sCurrPanel = sName;
   	if(currPanel == null) {
+  	  currPanel = tabPanel.addGridPanel("sName", "&" + sName,1,1,10,10);
+  	  panels.put(sName, currPanel);
   		log.sendMsg(0, "GuiPanelMng:selectPanel: unknown panel name %s", sName);
   	  //Note: because the currPanel is null, not placement will be done.
   	} else {
@@ -1140,6 +1142,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     widgetInfos.sDataPath = sDataPath;
     widgetInfos.setShowMethod(sShowMethod);
     widget.setData(widgetInfos);
+    widget.addMouseListener(mouseClickForInfo);
     currPanel.widgetList.add(widgetInfos);
     if(sName != null){
       indexNameWidgets.put(sName, widgetInfos);

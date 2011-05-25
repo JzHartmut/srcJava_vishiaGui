@@ -63,6 +63,7 @@ public class GuiCfgBuilder
   {
     String sError = null;
     gui.selectPanel(cfgDataPanel.name);
+    
     for(GuiCfgElement cfge: cfgDataPanel.listElements){
       String sErrorWidgd = buildWidget(cfge);
       if(sErrorWidgd !=null){

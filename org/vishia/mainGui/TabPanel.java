@@ -32,9 +32,9 @@ public abstract class TabPanel
 	 * @param xGrid2  Number of grid lines horizontal per wider ranges for lines
 	 * @return
 	 */
-	abstract public Object addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2);
+	abstract public PanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2);
 	
-	abstract public Object addCanvasPanel(String sName, String sLabel);
+	abstract public PanelContent addCanvasPanel(String sName, String sLabel);
 	
 	
 	abstract public WidgetCmpnifc getGuiComponent();

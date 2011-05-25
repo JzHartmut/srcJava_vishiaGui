@@ -220,24 +220,24 @@ public class InspcGuiCfg
     @Override public void doBeforeDispatching(boolean onlyWakeup)
     {
       gui.setStandardMenusGThread(new File("."), actionFile);
-      gui.setFrameAreaBorders(20, 80, 60, 85);
+      gui.setFrameAreaBorders(20, 80, 60, 92);
 
       
       //Creates a Tab-Panel:
       InspcGuiPanelContent panelContent = new InspcGuiPanelContent();
       inspcComm.addPanel(panelContent);
       //create a Tab panel, on activation of any tab the panelContent will be notified.
-      TabPanel tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate);
-      tabPanel.addGridPanel("operation", "&Operation",1,1,10,10);
-      tabPanel.addGridPanel("panel2", "&Values",1,1,10,10);
+      panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate);
+      panelMng.tabPanel.addGridPanel("operation", "&Operation",1,1,10,10);
+      panelMng.tabPanel.addGridPanel("panel2", "&Values",1,1,10,10);
       
-      gui.addFrameArea(2,1,2,2, tabPanel.getGuiComponent()); //dialogPanel);
+      gui.addFrameArea(1,1,3,2, panelMng.tabPanel.getGuiComponent()); //dialogPanel);
       //##
       WidgetCmpnifc treePanel = panelMng.createGridPanel(  
           panelMng.propertiesGui.colorBackground_
           , panelMng.propertiesGui.xPixelUnit(), panelMng.propertiesGui.yPixelUnit(), 5, 5);
       panelMng.registerPanel("tree", treePanel);
-      gui.addFrameArea(1,1,1,3, treePanel); //dialogPanel);
+      //gui.addFrameArea(1,1,1,3, treePanel); //dialogPanel);
       
       gui.removeDispatchListener(this);    
       countExecution();
@@ -348,21 +348,9 @@ public class InspcGuiCfg
     
     //oamRcvUdpValue = new OamRcvValue(oamShowValues, gui);
     
-    
     //create the basic appearance of the GUI. The execution sets dlgAccess:
     gui.addDispatchListener(initGuiDialog);
     if(!initGuiDialog.awaitExecution(1, 10000)) throw new RuntimeException("unexpected fail of execution initGuiDialog");
-    
-    //fileHandlerUcell = new FileViewer(panelMng);
-    
-    
-    
-    /**Creates the dialog elements while reading a config-file. */
-    //
-    //Register any user action. This should be done before the GUI-configuration is read.
-    //panelBuildIfc.registerUserAction("fileHandlerUcell", fileHandlerUcell.getAction());
-    //dialogCellMng.registerTableAccess("msgOfDay", msgReceiver.msgOfDayAccessGui);
-    //panelBuildIfc.registerTableAccess("msgOfDay", msgReceiver.msgOfDay;
     
     //dialogVellMng.re
     boolean bConfigDone = false;
@@ -399,6 +387,18 @@ public class InspcGuiCfg
       }
     }    
     //assigns the fields which are visible to the oamOutValues-Manager to fill it with the values.
+    
+    //fileHandlerUcell = new FileViewer(panelMng);
+    
+    
+    
+    /**Creates the dialog elements while reading a config-file. */
+    //
+    //Register any user action. This should be done before the GUI-configuration is read.
+    //panelBuildIfc.registerUserAction("fileHandlerUcell", fileHandlerUcell.getAction());
+    //dialogCellMng.registerTableAccess("msgOfDay", msgReceiver.msgOfDayAccessGui);
+    //panelBuildIfc.registerTableAccess("msgOfDay", msgReceiver.msgOfDay;
+    
 
     //msgReceiver.test(); //use it after initGuiDialog!
     
