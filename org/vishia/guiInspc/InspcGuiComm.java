@@ -152,11 +152,11 @@ public class InspcGuiComm
         }
       }//for widgets in panel
     }
-    if(sIpTarget !=null){
+    if(bShouldSend){
       sendAndAwaitAnswer();
-      if(user !=null){
-        user.isSent(0);
-      }
+    }
+    if(user !=null){
+      user.isSent(0);
     }
     
     long time = System.currentTimeMillis();

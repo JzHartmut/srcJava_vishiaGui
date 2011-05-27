@@ -3,6 +3,7 @@ package org.vishia.guiInspc;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -19,6 +20,7 @@ import org.vishia.mainGui.GuiDispatchCallbackWorker;
 import org.vishia.mainGui.GuiPanelMngBase;
 import org.vishia.mainGui.GuiPanelMngBuildIfc;
 import org.vishia.mainGui.GuiPanelMngWorkingIfc;
+import org.vishia.mainGui.PanelActivatedGui;
 import org.vishia.mainGui.TabPanel;
 import org.vishia.mainGui.UserActionGui;
 import org.vishia.mainGui.WidgetCmpnifc;
@@ -88,6 +90,7 @@ public class InspcGuiCfg
   
   final InspcGuiComm inspcComm;
   
+  /**Some actions may be processed by a user implementation. */
   InspcPlugUser_ifc user;
   
   /**Organisation class for the GUI.
@@ -224,7 +227,7 @@ public class InspcGuiCfg
 
       
       //Creates a Tab-Panel:
-      InspcGuiPanelContent panelContent = new InspcGuiPanelContent();
+      InspcGuiPanelContent panelContent = new InspcGuiPanelContent(user);
       inspcComm.addPanel(panelContent);
       //create a Tab panel, on activation of any tab the panelContent will be notified.
       panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate);
@@ -484,8 +487,6 @@ public class InspcGuiCfg
   }
 
   void stop(){} //debug helper
-
-
 
 
 }

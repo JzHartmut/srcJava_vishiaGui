@@ -21,13 +21,25 @@ public class InspcGuiPanelContent
   List<WidgetDescriptor> newWidgets;
   
 
+  /**Some actions may be processed by a user implementation. */
+  final InspcPlugUser_ifc user;
   
+
+  
+  
+  
+  public InspcGuiPanelContent(InspcPlugUser_ifc user)
+  { this.user = user;
+  }
+
+
   /**Changes the communication data base because another tab was activated on the TabPanel. 
    * @param widgets The new widgets.
    */
   void changeWidgets(List<WidgetDescriptor> widgets)
   {
     newWidgets = widgets; //signal for other thread, there are new one.
+    user.changedView("unknown yet", 0);
   }
   
   
@@ -39,3 +51,5 @@ public class InspcGuiPanelContent
 
   
 }
+
+

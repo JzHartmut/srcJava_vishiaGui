@@ -206,6 +206,15 @@ public class GuiCfgBuilder
           widgd.setActionShow(actionShow);
         }
       }
+      String sCmd = cfge.widgetType.cmd;
+      if(sCmd !=null){
+        UserActionGui actionCmd = gui.getRegisteredUserAction(sCmd);
+        if(actionCmd == null){
+          sError = "GuiCfgBuilder - cmd action not found: " + sCmd;
+        } else {
+          widgd.setActionChange(actionCmd);
+        }
+      }
       widgd.setCfgElement(cfge);
     }
     return sError;

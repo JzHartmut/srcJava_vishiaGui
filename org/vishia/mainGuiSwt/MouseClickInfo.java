@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.mainGui.GuiPanelMngBase;
 import org.vishia.mainGui.GuiRectangle;
+import org.vishia.mainGui.UserActionGui;
 import org.vishia.mainGui.WidgetDescriptor;
 
 /**Universal Mouse Listener which works with the {@link WidgetDescriptor}.
@@ -30,6 +31,8 @@ public class MouseClickInfo implements MouseListener
 		this.guiMng = guiMng;
 	}
 
+	int xDown, yDown;
+	
 	/**The mouse doubleclick is left empty. It may be overridden by an derived class. */
 	@Override public void mouseDoubleClick(MouseEvent arg0)
 	{}
@@ -49,6 +52,7 @@ public class MouseClickInfo implements MouseListener
 			if(guiMng.bDesignMode){
 			  GuiRectangle rr = new GuiRectangle(ev.x, ev.y, 0, 0);
         if(ev.button == 1){ //left
+          xDown = ev.x; yDown = ev.y;
   			  guiMng.pressedLeftMouseDownForDesign(widgetInfo, rr);  
 			  } else if(ev.button == 3){ //right
 			    guiMng.pressedRightMouseDownForDesign(widgetInfo, rr);
@@ -64,11 +68,17 @@ public class MouseClickInfo implements MouseListener
     Widget widget = ev.widget;
     Object oInfo = widget.getData();
     if(oInfo instanceof WidgetDescriptor){
-      WidgetDescriptor widgetInfo = (WidgetDescriptor)oInfo;
-      if(guiMng.bDesignMode){
+      WidgetDescriptor widgd = (WidgetDescriptor)oInfo;
+      int dx = ev.x - xDown, dy = ev.y - yDown;
+      if(dx < 10 && dx > -10 && dy < 10 && dy > -10){
+        UserActionGui action = widgd.getActionChange();
+        if(action !=null){
+          action.userActionGui("lu", widgd, null);
+        }
+      } else if(guiMng.bDesignMode){
         boolean bCopy = (ev.stateMask & org.eclipse.swt.SWT.CTRL) !=0;
         GuiRectangle rr = new GuiRectangle(ev.x, ev.y, 0, 0);
-        guiMng.releaseLeftMouseForDesign(widgetInfo, rr, bCopy);  
+        guiMng.releaseLeftMouseForDesign(widgd, rr, bCopy);  
       }
     }
 	  
