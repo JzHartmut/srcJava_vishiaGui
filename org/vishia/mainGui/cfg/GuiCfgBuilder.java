@@ -141,6 +141,8 @@ public class GuiCfgBuilder
     pos.yIncr_ = inp.yIncr_ || (!inp.yIncr_ && prevPos.yIncr_);
     pos.panel = inp.panel !=null ? inp.panel : prevPos.panel;
     //
+    if(pos.xWidth == Integer.MAX_VALUE)
+      stop();
     gui.setFinePosition(pos.yPos, pos.yPosFrac, pos.xPos, pos.xPosFrac
       , pos.ySizeDown, pos.ySizeFrac, pos.xWidth, pos.xSizeFrac, 'r');
     //

@@ -657,7 +657,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     } else {
       //pos =null;
     }
-    GuiRectangle rectangle = calcPosAndSize(line, yPosFrac, column, xPosFrac, dy, ySizeFrac, dx,xSizeFrac);
+    GuiRectangle rectangle = calcPosAndSize(line, yPosFrac, column, xPosFrac, dy, ySizeFrac, dx,xSizeFrac,0,0);
     component.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
     
   }
@@ -956,7 +956,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     Image image = new Image(((Composite)currPanel.panelComposite).getDisplay(), imageData); 
     GuiImageBase imageGui = new GuiImageSwt(image);
     GuiRectangle size = imageGui.getPixelSize();
-    GuiRectangle rr = getRectangleBounds();
+    GuiRectangle rr = getRectangleBounds(size.dy, size.dx);
     if(currPanel.panelComposite instanceof CanvasStorePanelSwt){
       CanvasStorePanelSwt canvas = (CanvasStorePanelSwt) currPanel.panelComposite;
       //coordinates are in pixel

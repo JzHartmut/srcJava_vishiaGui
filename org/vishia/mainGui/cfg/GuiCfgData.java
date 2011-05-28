@@ -168,6 +168,8 @@ public final class GuiCfgData
     
     public void set_xIncr(){ xIncr_ = true; yIncr_ = false; }
     public void set_yIncr(){ yIncr_ = true; xIncr_ = false; }
+    public void set_xOwnSize(){ xWidth = Integer.MAX_VALUE; }
+    public void set_yOwnSize(){ ySizeDown = Integer.MAX_VALUE; }
     
     protected GuiCfgPosition clone()
     { GuiCfgPosition clone = null;

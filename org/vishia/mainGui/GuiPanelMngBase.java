@@ -246,14 +246,31 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
 	};
 	
 	
-  protected GuiRectangle getRectangleBounds()
-  { return calcPosAndSize(yPos, yPosFrac, xPos, xPosFrac, this.yIncr, ySizeFrac, this.xIncr, xSizeFrac);
+  protected GuiRectangle getRectangleBounds(int dyDefault, int dxDefault)
+  { return calcPosAndSize(yPos, yPosFrac, xPos, xPosFrac
+      , this.yIncr, ySizeFrac, this.xIncr, xSizeFrac, dyDefault, dxDefault);
   }
   
   
 
 	
-  protected GuiRectangle calcPosAndSize(int line, int yPosFrac, int column, int xPosFrac, int dy, int ySizeFrac, int dx, int xSizeFrac)
+  /**
+   * @param line
+   * @param yPosFrac
+   * @param column
+   * @param xPosFrac
+   * @param dy
+   * @param ySizeFrac
+   * @param dx
+   * @param xSizeFrac
+   * @param dyPixelDefault Value used if dy == Integer.MAXVALUE 
+   * @param dxPixelDefault
+   * @return
+   */
+  protected GuiRectangle calcPosAndSize(int line, int yPosFrac, int column, int xPosFrac
+    , int dy, int ySizeFrac, int dx, int xSizeFrac
+    , int dyPixelDefault, int dxPixelDefault
+    )
   {
     if(line == 19 && yPosFrac == 5)
       stop();
@@ -267,8 +284,13 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
     int yPixelUnit = propertiesGui.yPixelUnit();
     //calculate pixel
     int xPixelSize, yPixelSize;  
-    xPixelSize = xPixelUnit * dx + propertiesGui.xPixelFrac(xSizeFrac) -2 ;
-    yPixelSize = yPixelUnit * dy + propertiesGui.yPixelFrac(ySizeFrac) -2;
+    if(dx == Integer.MAX_VALUE){ xPixelSize = dxPixelDefault; }
+    else if(dx == Integer.MIN_VALUE){ xPixelSize = dxPixelDefault; }
+    else { xPixelSize = xPixelUnit * dx + propertiesGui.xPixelFrac(xSizeFrac) -2 ; }
+    if(dy == Integer.MAX_VALUE){ yPixelSize = dyPixelDefault; }
+    else if(dy == Integer.MIN_VALUE){ yPixelSize = dyPixelDefault; }
+    else { yPixelSize = yPixelUnit * dy + propertiesGui.yPixelFrac(ySizeFrac) -2;}
+    
     int xPixel = (int)(column * xPixelUnit) + propertiesGui.xPixelFrac(xPosFrac) +1;
     int yPixel = (int)(line * yPixelUnit) + propertiesGui.yPixelFrac(yPosFrac) +1;
     if(yOrigin == 'b'){

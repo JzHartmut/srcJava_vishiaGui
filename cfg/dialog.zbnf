@@ -6,14 +6,14 @@ GuiDialogZbnfControlled::=
 |<?Element> 
  [<?position> @ [<$?panel> ,] 
                 [<?yPosRelative> &+]
-                [<#?yPos>][\.<#?yPosFrac>] 
-                [ [+] <#-?ySizeDown>][\.<#?ySizeFrac>] ##| - <#?ySizeUp>|] 
-                [<?yIncr> ++] 
+                [<#?yPos>[\.<#?yPosFrac>]] 
+                [ [+] <#-?ySizeDown>[\.<#?ySizeFrac>]| +* <?yOwnSize> |] ##| - <#?ySizeUp>|] 
+                [ <?yIncr> ++] 
                 [ ,
                   [<?xPosRelative> &+] 
-                  [<#?xPos>][\.<#?xPosFrac>] 
-                  [ [+] <#-?xWidth>] [\.<#?xSizeFrac>]
-                  [<?xIncr> ++]
+                  [<#?xPos>[\.<#?xPosFrac>]] 
+                  [ [+] <#-?xWidth>[\.<#?xSizeFrac>]| +* <?xOwnSize> |]
+                  [ <?xIncr> ++]
                 ] :
  ] 
  [ Type <Type> | Led <Led> | <Button> 
@@ -22,11 +22,11 @@ GuiDialogZbnfControlled::=
  | InputTextline ( <param?InputTextline> ) ;
  | Slider ( <param?Slider> ) ;
  | Show <ShowField> ;
- | <Table> | <Text> | <Imagefile> | <Line> | <ShowField>| <Curveview> | <InputField>| <FileInputField>] 
+ | <Table> | <Text> | <Imagefile> | <Line> | <Curveview> | <InputField>| <FileInputField>] 
 } \e.
 
 
-DataReplace::= <$?key> = <$-/\.?string> ;.
+DataReplace::= <$?key> = <$-/\.:?string> ;.
 
 param::=<?>
 { cmd =  [<""?cmd>|\[<*\]?cmd>\]] 
@@ -63,15 +63,16 @@ SwitchButton::=( <param> ) ;.
 
 
 
-Led::=(  
-{ text = [<""?text>|<$?text>] 
-| name = [<""?name>|<$?name>] 
-| info = [<""?info>|<$/?info>] 
-| data = [<""?info>|<$/?info>] 
-| show = [<""?showMethod>|<$/?showMethod>] 
-| type = <$?type>
-? , 
-} ) ; .
+Led::=( <param?> ) ;.  
+##{ 
+##| text = [<""?text>|<$?text>] 
+##| name = [<""?name>|<$?name>] 
+##| info = [<""?info>|<$/?info>] 
+##| data = [<""?info>|<$/?info>] 
+##| show = [<""?showMethod>|<$/?showMethod>] 
+##| type = <$?type>
+##? , 
+##} ) ; .
 
 
 Button::=Button ( [|<""?text>|<*)?text>] ) : 
@@ -93,7 +94,7 @@ Table::=Table ( [<""?text>|<*)?text>] ) :
 } ; .
 
 Curveview::=Curveview ( <$?name> [ , <#?nrofPoints>]) :
-{<?line> line ( <$name> 
+{<?line> line ( <$?name> 
 [ , { color = [<colorName>| <#x?colorValue>] 
     | offset = <#f?offset> 
 		| scale = <#f?scale>
@@ -112,7 +113,7 @@ Text::= Text ( [<""?text>|<*)?text>]
 Imagefile::= Imagefile 
 (  { <!\[ABCDE\]?size> 
    | name = <$?name>
-	 | file = <""?file>|<*)?file>
+	 | file = <""?file>|<* ,)?file>
    ? , }
 ) ; .
 
