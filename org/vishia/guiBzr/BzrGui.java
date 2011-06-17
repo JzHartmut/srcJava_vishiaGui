@@ -25,6 +25,17 @@ import org.vishia.msgDispatch.LogMessage;
 
 public class BzrGui
 {
+  /**Version, able to read as hex yyyymmdd.
+   * Changes:
+   * <ul>
+   * <li>2011-05-17 new association panelOutput to the output panel for any outputs. It is used yet
+   *     for the diff output. 
+   * <li>2011-05-01 Hartmut: Created
+   * </ul>
+   */
+  public final static int version = 0x20110617;
+
+  
   private final Inspector inspector;
 
   /**To Output log informations. The ouput will be done in the output area of the graphic. */
@@ -92,6 +103,8 @@ public class BzrGui
 
   final GuiCommitPanel guiCommitPanel;
   
+  final PanelOutput panelOutput;
+  
   final GuiFilesDiffPanel guiFilesDiffPanel;
   
   /**ctor for the main class of the application. 
@@ -150,7 +163,9 @@ public class BzrGui
     guiCommitPanel = new GuiCommitPanel(mainData, panelBuildifc);
     guiFilesDiffPanel = new GuiFilesDiffPanel(mainData, panelBuildifc);
     
-    mainData.mainAction = new MainAction(mainData, guiStatusPanel, guiCommitPanel, guiFilesDiffPanel);
+    panelOutput = new PanelOutput(mainData, panelBuildifc);
+    
+    mainData.mainAction = new MainAction(mainData, guiStatusPanel, guiCommitPanel, guiFilesDiffPanel, panelOutput);
     
     
     //create the basic appearance of the GUI. The execution sets dlgAccess:
@@ -209,7 +224,8 @@ public class BzrGui
     tabPanel.addGridPanel("Select", "&Select",1,1,10,10);
     tabPanel.addGridPanel("Commit", "&Commit",1,1,10,10);
     tabPanel.addGridPanel("Log", "&Log",1,1,10,10);
-    tabPanel.addGridPanel("FilesDiff", "&Files && Dif",1,1,10,10);
+    tabPanel.addGridPanel("FilesDiff", "&Files && Diff",1,1,10,10);
+    tabPanel.addGridPanel("Output", "&Output",1,1,10,10);
 
     gui.addFrameArea(1,1,3,1, tabPanel.getGuiComponent()); //dialogPanel);
     //##
@@ -264,7 +280,7 @@ public class BzrGui
         guiStatusPanel.initGui();
         guiCommitPanel.initGui();
         guiFilesDiffPanel.initGui();
-          
+        panelOutput.initGui();  
       }  
       catch(Exception exception)
       { //catch the last level of error. No error is reported direct on command line!

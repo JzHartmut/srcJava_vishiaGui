@@ -16,6 +16,15 @@ import org.vishia.mainGui.WidgetDescriptor;
 
 public class GuiFilesDiffPanel
 {
+  /**Version, able to read as hex yyyymmdd.
+   * Changes:
+   * <ul>
+   * <li>2011-05-17 Button view & diff now used. It produces bzr diff FILE in the output panel. 
+   * <li>2011-05-01 Hartmut: Created
+   * </ul>
+   */
+  public final static int version = 0x20110617;
+
   /**Aggregation to the main data of the GUI. */
   final MainData mainData;
 
@@ -398,8 +407,23 @@ public class GuiFilesDiffPanel
   
   private final UserActionGui actionViewdiff = new UserActionGui()
   { 
-    public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
+    public void userActionGui(String sCmdP, WidgetDescriptor widgetInfos, Object... values)
     {
+      StringBuilder uCmd = new StringBuilder(200);
+      String[] sValue = widgdTableFilesCmpn.getValue().split("\t");
+      mainData.mainCmdifc.writeInfoln(sValue[0]);
+      String sCmd = mainData.cfg.indexCmds.get("fileDiff");
+      uCmd.append(sCmd);
+      int posFile = sCmd.indexOf("$File");
+      if(posFile >=0){
+        uCmd.replace(posFile, posFile + 5, sValue[0]);  //idea: $Files<-F $$> prescript to replace
+      } else {
+        //what todo
+      }
+      StringBuilder out = new StringBuilder();      
+      mainData.mainCmdifc.executeCmdLine(mainData.cmdMng, uCmd.toString(), null, Report.info, out, out);
+      mainData.mainAction.panelOutput.widgdOutputText.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, out.toString());
+      stop();
     }
   };
   

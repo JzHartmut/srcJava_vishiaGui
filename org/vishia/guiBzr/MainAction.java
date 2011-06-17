@@ -14,18 +14,19 @@ public class MainAction
   
   final GuiFilesDiffPanel guiFilesDiffPanel;
   
-
+  final PanelOutput panelOutput;
   
   MainAction(MainData mainData, GuiStatusPanel guiStatusPanel
       , final GuiCommitPanel guiCommitPanel, 
       final GuiFilesDiffPanel guiFilesDiffPanel
+      , PanelOutput panelOutput
       )
   {
     this.mainData = mainData;
     this.guiStatusPanel = guiStatusPanel;
     this.guiCommitPanel = guiCommitPanel;
     this.guiFilesDiffPanel = guiFilesDiffPanel;
-      
+    this.panelOutput = panelOutput;  
   }
   
   Runnable initNewComponent = new Runnable()
