@@ -12,15 +12,25 @@ import org.vishia.inspectorAccessor.InspcAccessExecAnswerTelg_ifc;
 import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
 import org.vishia.inspectorAccessor.InspcAccessor;
 import org.vishia.mainCmd.Report;
+import org.vishia.mainGui.GuiPanelMngWorkingIfc;
 import org.vishia.mainGui.UserActionGui;
 import org.vishia.mainGui.WidgetDescriptor;
 
 /**The communication manager. */
 public class InspcGuiComm
 {
-  
+  /**Version, able to read as hex yyyymmdd.
+   * Changes:
+   * <ul>
+   * <li>2011-05-17 execInspcRxOrder() int32AngleDegree etc. to present a angle in degrees
+   * <li>2011-05-01 Hartmut: Created
+   * </ul>
+   */
+  public final static int version = 0x20110617;
+
   /**This class joins the GUI-Widget with the inspector communication info block.
    * It is created for any Widget one time if need and used for the communication after that. 
+   * The routine {@link #execInspcRxOrder(Info)} is used to show the received values.
    */
   private static class WidgetCommAction implements InspcAccessExecRxOrder_ifc
   {
@@ -36,8 +46,18 @@ public class InspcGuiComm
       int order = info.getOrder();
       int cmd = info.getCmd();
       if(cmd == InspcDataExchangeAccess.Info.kAnswerValue){
-        float value = InspcAccessEvaluatorRxTelg.valueFloatFromRxValue(info);
-        sShow = Float.toString(value);
+        if(widgd.sFormat !=null && widgd.sFormat.equals("int32AngleDegree")){
+          int value = InspcAccessEvaluatorRxTelg.valueIntFromRxValue(info);
+          float angle = value * (180.0f/2147483648.0f);
+          sShow = String.format("%3.2f°", angle);
+        } else if(widgd.sFormat !=null && widgd.sFormat.equals("int16AngleDegree")){
+            int value = InspcAccessEvaluatorRxTelg.valueIntFromRxValue(info);
+            float angle = value * (180.0f/32768.0f);
+            sShow = String.format("%3.2f°", angle);
+        } else {
+          float value = InspcAccessEvaluatorRxTelg.valueFloatFromRxValue(info);
+          sShow = Float.toString(value);
+        }
       } else {
         sShow = "??" + cmd;
       }
@@ -188,6 +208,9 @@ public class InspcGuiComm
 
   
   
+  /**This action is used to request a telegram from target.
+   * 
+   */
   UserActionGui actionShowTextfield = new UserActionGui()
   { @Override public void userActionGui(String sIntension, WidgetDescriptor widget, Object... params)
     {
@@ -265,7 +288,7 @@ public class InspcGuiComm
   
   
   
-  private InspcAccessExecAnswerTelg_ifc executerAnwer = new InspcAccessExecAnswerTelg_ifc()
+  private InspcAccessExecAnswerTelg_ifc XXXexecuterAnwer = new InspcAccessExecAnswerTelg_ifc()
   { @Override public void execInspcRxTelg(InspcDataExchangeAccess.Datagram[] telgs)
     { 
       inspcAccessor.rxEval.evaluate(telgs, null); //executerAnswerInfo);  //executer on any info block.

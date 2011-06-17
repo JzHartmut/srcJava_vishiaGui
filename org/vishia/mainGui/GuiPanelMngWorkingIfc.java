@@ -125,9 +125,13 @@ public interface GuiPanelMngWorkingIfc
 	 */
 	String getValue(String sName);
 
-	/**Gets the value from a widget with given descriptor
+	/**Gets the String value from a widget with given descriptor
+	 * <ul>
+	 * <li>Text field: The content written into, with all spaces.
+	 * <li>Table: content of the selected line, all cells separated with tabulator char.
+	 * </ul> 
 	 * @param widgetDescr The widget.
-	 * @return null if the widget isn't able to input.
+	 * @return The content.
 	 */
 	String getValueFromWidget(WidgetDescriptor widgetDescr);
 }

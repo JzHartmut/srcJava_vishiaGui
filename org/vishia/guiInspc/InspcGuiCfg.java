@@ -421,7 +421,7 @@ public class InspcGuiCfg
         System.out.println("unexpected Exception: " + exc.getMessage());
         exc.printStackTrace();
       }
-      try{ Thread.sleep(50);} 
+      try{ Thread.sleep(250);} 
       catch (InterruptedException e)
       { //dialogZbnfConfigurator.terminate();
       }

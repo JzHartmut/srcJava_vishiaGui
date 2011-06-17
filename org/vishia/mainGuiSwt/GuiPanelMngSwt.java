@@ -125,6 +125,8 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
 	/**Version, able to read as hex yyyymmdd.
 	 * Changes:
 	 * <ul>
+	 * <li>2011-06-17 Hartmut getValueFromWidget(): Table returns the whole selected line, cells separated with tab.
+	 *     The String-return.split("\t") separates the result to the cell values.
 	 * <li>2011-05-08 Hartmut new; {@link GuiPanelMngWorkingIfc#cmdClear} used to clear a whole swt.Table, commonly using: clear a content of widget.
    * <li>2010-12-02 Hartmut: in method insertInfo((): call of checkAdmissibility() for some input parameter, 
 	 *     elsewhere exceptions may be possible on evaluating the inserted info in doBeforeDispatching().
@@ -132,7 +134,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
 	 * <li>2010-12-02 Hartmut: Up to now this version variable, its description contains the version history.
 	 * </ul>
 	 */
-	public final static int version = 0x20110502;
+	public final static int version = 0x20110617;
 
 	/**The GUI may be determined by a external user file. Not all planned fields, buttons etc. 
    * may be placed in the GUI, a user can desire about the elements. 
@@ -1352,8 +1354,10 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
             } else if(oWidget instanceof Text){ 
               Text field = (Text)oWidget;
               switch(cmd){
+                case GuiPanelMngWorkingIfc.cmdSet:
                 case GuiPanelMngWorkingIfc.cmdInsert: 
-                case GuiPanelMngWorkingIfc.cmdSet: field.setText((String)info); break;
+                  field.setText((String)info); 
+                  break;
               default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %x on widget %s", cmd, descr.name);
               }
             } else if(oWidget instanceof LedSwt){ 
@@ -1665,10 +1669,25 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   		sValue = button.isOn() ? "1" : "0"; 
   	} else if(widget instanceof Button){
   		sValue = "0"; //TODO input.button.isSelected() ? "1" : "0";
+  	} else if(widget instanceof Table){
+      Table table = (Table)widget;
+      sValue = getValueFromTable(table);
   	} else {
   		sValue = "";
   	}
 		return sValue;
+	}
+	
+	
+	private String getValueFromTable(Table table)
+	{ StringBuilder u = new StringBuilder();
+    int actLine = table.getSelectionIndex();
+    TableItem item = table.getItem(actLine);
+    int nrofColumns = table.getColumnCount();
+    for(int iCol = 0; iCol < nrofColumns; ++iCol){
+      u.append(item.getText(iCol)).append('\t');
+    }
+	  return u.toString();
 	}
 	
 	

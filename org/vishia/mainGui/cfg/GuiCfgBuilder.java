@@ -217,6 +217,10 @@ public class GuiCfgBuilder
           widgd.setActionChange(actionCmd);
         }
       }
+      String sFormat = cfge.widgetType.format;
+      if(sFormat !=null){
+         widgd.setFormat(sFormat);
+      }
       widgd.setCfgElement(cfge);
     }
     return sError;

@@ -20,9 +20,12 @@ public class GuiCfgDesigner
 
   /**A Panel which contains the table to select some projectPaths. */
   private GuiShellMngBuildIfc dialogWindowProps;
-
+  //private GuiWindowMng_ifc dialogWindowProps;
+  
   /**Some dialog widget elements. */
-  private WidgetDescriptor dialogFieldName, dialogFieldDatapath, dialogFieldText;
+  private WidgetDescriptor dialogFieldName, dialogFieldDatapath, dialogFieldText, dialogFieldFormat
+    , dialogFieldShow, dialogFieldAction
+    , dialogFieldLine, dialogFieldColumn, dialogFieldHeight, dialogFieldWidth;
   
   private WidgetDescriptor dialogButtonOk, dialogButtonEsc;
   
@@ -49,15 +52,26 @@ public class GuiCfgDesigner
   public void initGui()
   {
     assert(dialogWindowProps == null); //check call only one time.
-    mng.setPosition(2, 60, 22, 40, 'r');
+    mng.setPosition(2, 60, 30, 40, 'r');
     dialogWindowProps = mng.createWindow("Widget Properties", false);
-    dialogWindowProps.setPosition(0, 0, 2, 39, 'd');
-    dialogFieldName = dialogWindowProps.addTextField("name", true, "name", 'r');
-    dialogFieldDatapath = dialogWindowProps.addTextField("dataPath", true, "dataPath", 'r');
-    dialogFieldText = dialogWindowProps.addTextField("text", true, "text", 'r');
-    dialogWindowProps.setPosition(16, 2, 3, 10, 'r');
+    dialogWindowProps.setPosition(0, 0, 3, 34, 'd');
+    dialogFieldName = dialogWindowProps.addTextField("name", true, "name", 't');
+    dialogFieldDatapath = dialogWindowProps.addTextField("dataPath", true, "data", 't');
+    dialogFieldText = dialogWindowProps.addTextField("text", true, "text", 't');
+    dialogFieldFormat = dialogWindowProps.addTextField("format", true, "format", 't');
+    dialogFieldShow = dialogWindowProps.addTextField("show", true, "show method", 't');
+    dialogFieldAction = dialogWindowProps.addTextField("action", true, "action method", 't');
+    dialogWindowProps.setPosition(19, 2, 3, 5, 'r');
+    dialogFieldLine = dialogWindowProps.addTextField("line", true, "pos-y", 't');
+    //dialogWindowProps.addText(", ", 'B', 0);
+    dialogFieldColumn = dialogWindowProps.addTextField("column", true, "pos-x", 't');
+    //dialogWindowProps.addText("   ", 'B', 0);
+    dialogFieldHeight = dialogWindowProps.addTextField("height", true, "size-y", 't');
+    //dialogWindowProps.addText(" x ", 'B', 0);
+    dialogFieldWidth = dialogWindowProps.addTextField("width", true, "size-x", 't');
+    dialogWindowProps.setPosition(23, 2, 3, 10, 'r');
     dialogButtonOk = dialogWindowProps.addButton("OK", actionOk, null, null, null, "OK");
-    dialogButtonEsc = dialogWindowProps.addButton("esc", actionOk, null, null, null, "esc");
+    dialogButtonEsc = dialogWindowProps.addButton("esc", actionEsc, null, null, null, "esc");
     
   }
   
@@ -108,39 +122,69 @@ public class GuiCfgDesigner
 
   
   public void pressedRightMouseDownForDesign(WidgetDescriptor widgd, GuiRectangle xy)
-  { if(widgdInDialog == null){
+  { //if(widgdInDialog == null){
       widgdInDialog = widgd;
       GuiCfgData.GuiCfgElement cfge = widgd.getCfgElement();
-      String sName, sDataPath, sText;
+      String sName, sDataPath, sText, sFormat, sShowMethod,  sActionMethod;
+      String sLine, sColumn, sWidth, sHeight;
       if(cfge !=null){
         sName = cfge.widgetType.name;
         sDataPath = cfge.widgetType.info;
         sText = cfge.widgetType.text;
-        if(sName != null){ dialogFieldName.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sName); }
-        if(sDataPath != null){ dialogFieldDatapath.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sDataPath); }
-        if(sText != null){ dialogFieldText.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sText); }
+        sFormat = cfge.widgetType.format;
+        sShowMethod = cfge.widgetType.showMethod;
+        sActionMethod = cfge.widgetType.userAction;
+        sLine = "" + cfge.positionInput.xPos + (cfge.positionInput.xPosFrac !=0 ? "." + cfge.positionInput.xPosFrac : "");
+        dialogFieldName.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sName ==null ? "" : sName);
+        dialogFieldDatapath.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sDataPath == null ? "" : sDataPath);
+        dialogFieldText.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sText ==null ? "" : sText);
+        dialogFieldFormat.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sFormat ==null ? "" : sFormat);
+        dialogFieldShow.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sShowMethod ==null ? "" : sShowMethod);
+        dialogFieldAction.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sActionMethod ==null ? "" : sActionMethod);
+        dialogFieldLine.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sLine);
       } else {
-        dialogFieldName.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, "error cfge");
+        dialogFieldName.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, "ERROR cfge");
       }
-    }
+    //}
     dialogWindowProps.setWindowVisible(true);
   }
   
   private UserActionGui actionOk = new UserActionGui()
   { @Override public void userActionGui(String sIntension, WidgetDescriptor widgd, Object... params)
-    { if(widgdInDialog !=null){
+    { //note widgd is the OK-button!
+      if(widgdInDialog !=null){
         String sName = dialogFieldName.getValue();
         String sDataPath = dialogFieldDatapath.getValue();
         String sText = dialogFieldText.getValue();
+        String sFormat = dialogFieldFormat.getValue();
         GuiCfgData.GuiCfgElement cfge = widgdInDialog.getCfgElement();
         if(cfge !=null){
-          if(sName.trim().length() >0) { cfge.widgetType.name = sName; }
+          String sPanel = cfge.position.panel;  //Note: The cloned Object maybe empty here before buildWidget() is called
+            /*if(sName.trim().length() >0) { cfge.widgetType.name = sName; }
           if(sDataPath.trim().length() >0) { cfge.widgetType.info = sDataPath; }
           if(sText.trim().length() >0) { cfge.widgetType.text = sText; }
+          if(sFormat.trim().length() >0) { cfge.widgetType.format = sFormat; }
+          */
+          cfge.widgetType.name = sName.trim().length() >0 ? sName : null;
+          cfge.widgetType.info = sDataPath.trim().length() >0 ? sDataPath : null;
+          cfge.widgetType.text = sText.trim().length() >0 ? sText : null;
+          cfge.widgetType.format = sFormat.trim().length() >0 ? sFormat : null;
+          mng.remove(widgdInDialog);  //remove the widget.
+          mng.selectPanel(sPanel);
+          cfgBuilder.buildWidget(cfge);
         }
         dialogWindowProps.setWindowVisible(false);
         widgdInDialog = null;
       }
+    }
+    
+  };
+
+  
+  private UserActionGui actionEsc = new UserActionGui()
+  { @Override public void userActionGui(String sIntension, WidgetDescriptor widgd, Object... params)
+    { dialogWindowProps.setWindowVisible(false);
+      widgdInDialog = null;
     }
     
   };

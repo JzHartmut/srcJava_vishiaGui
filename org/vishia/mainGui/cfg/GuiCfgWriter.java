@@ -112,7 +112,7 @@ public class GuiCfgWriter
   { String sep = "";
     if(pp.text !=null)      { ww.            append("\"")       .append(pp.text).append("\""); sep = ", "; }
     if(pp.name !=null)      { ww.append(sep).append("name=")    .append(pp.name); sep = ", "; }
-    if(pp.cmd  !=null)      { ww.append(sep).append("cmd=")     .append(pp.cmd);  sep = ", "; }
+    if(pp.cmd  !=null)      { ww.append(sep).append("cmd=\"")   .append(pp.cmd).append("\"");  sep = ", "; }
     if(pp.showMethod !=null){ ww.append(sep).append("show=\"")  .append(pp.showMethod).append("\""); sep = ", "; }
     if(pp.format !=null)    { ww.append(sep).append("format=\"").append(pp.format).append("\""); sep = ", "; }
     if(pp.info !=null)      { ww.append(sep).append("info=\"")  .append(pp.info).append("\""); sep = ", "; }
