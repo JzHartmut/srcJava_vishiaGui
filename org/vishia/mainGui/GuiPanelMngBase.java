@@ -35,7 +35,24 @@ import org.vishia.msgDispatch.LogMessage;
  */
 public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMngWorkingIfc
 {
-	
+	/**This class is used for a selection field for file names and pathes. */
+  protected class FileSelectInfo
+  {
+    public List<String> listRecentFiles;
+    public final String startDirMask;
+    public final FileDialogIfc dialogFile;
+    public final WidgetDescriptor dstWidgd;
+    
+    public FileSelectInfo(List<String> listRecentFiles, String startDirMask, WidgetDescriptor dstWidgd)
+    { this.listRecentFiles = listRecentFiles;
+      this.dstWidgd = dstWidgd;
+      this.startDirMask = startDirMask;
+      int mode = startDirMask.endsWith("/") ? FileDialogIfc.directory : 0;
+      this.dialogFile = createFileDialog("Files", mode);
+    }
+    
+  }
+  
   /**This instance helps to create the Dialog Widget as part of the whole window. It is used only in the constructor.
    * Therewith it may be defined stack-locally. But it is better to show and explain if it is access-able at class level. */
   //GuiDialogZbnfControlled dialogZbnfConfigurator;   
@@ -86,7 +103,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   protected int xPosPrev, xPosPrevFrac, yPosPrev, yPosPrevFrac;
   
   /**width and height for the next element. */
-  protected int xIncr, xSizeFrac, yIncr, ySizeFrac;
+  protected int xSize, xSizeFrac, ySize, ySizeFrac;
   
   /**'l' - left 'r'-right, 't' top 'b' bottom. */ 
   protected char xOrigin = 'l', yOrigin = 'b';
@@ -248,7 +265,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
 	
   protected GuiRectangle getRectangleBounds(int dyDefault, int dxDefault)
   { return calcPosAndSize(yPos, yPosFrac, xPos, xPosFrac
-      , this.yIncr, ySizeFrac, this.xIncr, xSizeFrac, dyDefault, dxDefault);
+      , this.ySize, ySizeFrac, this.xSize, xSizeFrac, dyDefault, dxDefault);
   }
   
   
@@ -277,8 +294,8 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
     //use values from class if parameter are non-valid.
     if(line <=0){ line = this.yPos; yPosFrac = this.yPosFrac; }
     if(column <=0){ column = this.xPos; xPosFrac = this.xPosFrac; }
-    if(dy <=0){ dy = this.yIncr; ySizeFrac = this.ySizeFrac; }
-    if(dx <=0){ dx = this.xIncr; xSizeFrac = this.xSizeFrac; }
+    if(dy <=0){ dy = this.ySize; ySizeFrac = this.ySizeFrac; }
+    if(dx <=0){ dx = this.xSize; xSizeFrac = this.xSizeFrac; }
     //
     int xPixelUnit = propertiesGui.xPixelUnit();
     int yPixelUnit = propertiesGui.yPixelUnit();
@@ -306,13 +323,52 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
     yPosPrev = yPos;
     //set the next planned position:
     switch(directionOfNextElement){
-    case 'r': xPos += xIncr; break;
-    case 'l': xPos -= xIncr; break;
-    case 'u': yPos -= yIncr; break;
-    case 'd': yPos += yIncr; break;
+    case 'r': xPos += xSize; break;
+    case 'l': xPos -= xSize; break;
+    case 'u': yPos -= ySize; break;
+    case 'd': yPos += ySize; break;
     }
     return rectangle;
   }
+  
+  
+  
+  @Override public WidgetDescriptor addFileSelectField(String name, List<String> listRecentFiles, String startDirMask, String prompt, char promptStylePosition)
+  { int xPos1 = xPos;
+    int xSize1 = xSize;
+    //reduce the length of the text field:
+    xSize -= ySize;
+    WidgetDescriptor widgd = addTextField(name, true, prompt, promptStylePosition );
+    //xPos += xSize;
+    xSize = ySize;
+    WidgetDescriptor widgdSelect = addButton(name + "<", actionFileSelect, "", null, null, "<");
+    FileSelectInfo fileSelectInfo = new FileSelectInfo(listRecentFiles, startDirMask, widgd);
+    widgdSelect.setContentInfo(fileSelectInfo); 
+    xSize = xSize1;
+    return widgd;
+  }
+
+  
+  
+  UserActionGui actionFileSelect = new UserActionGui()
+  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+    {
+      FileSelectInfo fileSelectInfo = (FileSelectInfo)infos.getContentInfo();
+      if(fileSelectInfo.listRecentFiles !=null){
+        stop();
+      } else {
+        fileSelectInfo.dialogFile.show(fileSelectInfo.startDirMask, infos.name);
+        String fileSelect = fileSelectInfo.dialogFile.getSelection(); 
+        fileSelectInfo.dstWidgd.setValue(cmdSet, 0, fileSelect);
+      }
+      
+    }
+    
+  };
+  
+  
+  
+
   
   
   /**It will be called only at the GUI-implementation level. TODO protected and delegation.

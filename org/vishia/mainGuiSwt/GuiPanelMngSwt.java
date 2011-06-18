@@ -24,7 +24,9 @@
 
 package org.vishia.mainGuiSwt;
 
+import java.io.File;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -50,6 +52,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
@@ -429,8 +432,8 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     int yPixelUnit = propertiesGui.yPixelUnit();
     //calculate pixel
     int xPixelSize, yPixelSize;  
-    xPixelSize = xPixelUnit * xIncr + propertiesGui.xPixelFrac(yPosFrac) -2;
-    yPixelSize = yPixelUnit * yIncr + propertiesGui.xPixelFrac(yPosFrac) -2;
+    xPixelSize = xPixelUnit * xSize + propertiesGui.xPixelFrac(yPosFrac) -2;
+    yPixelSize = yPixelUnit * ySize + propertiesGui.xPixelFrac(yPosFrac) -2;
     int xPixel = (int)(xPos * xPixelUnit) + propertiesGui.xPixelFrac(yPosFrac) +1;
     int yPixel = (int)(yPos * yPixelUnit) + propertiesGui.yPixelFrac(yPosFrac) +1;
     Rectangle rectShell = graphicFrame.getBounds();
@@ -547,11 +550,11 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   public void setSize(int height, int ySizeFrac, int width, int xSizeFrac)
   {
   	if(height !=0){
-  		yIncr = height >0 ? height : -height;
+  		ySize = height >0 ? height : -height;
       this.ySizeFrac = ySizeFrac;
   	}
   	if(width !=0){
-  		xIncr = width >0 ? width: -width;
+  		xSize = width >0 ? width: -width;
   	  this.xSizeFrac = xSizeFrac;
     }
   	if(height >0){ yOrigin = 't'; }
@@ -629,7 +632,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   
   protected void setPosAndSize_(Control component)
   {
-  	setPosAndSize_(component, yPos, yPosFrac, xPos, xPosFrac, this.yIncr, ySizeFrac, this.xIncr, xSizeFrac);
+  	setPosAndSize_(component, yPos, yPosFrac, xPos, xPosFrac, this.ySize, ySizeFrac, this.xSize, xSizeFrac);
     //int dx1 = (xPixelSize + propertiesGui.xPixelUnit() -1 ) / propertiesGui.xPixelUnit(); 
     //int dy1 = (yPixelSize + propertiesGui.yPixelUnit() -1 ) / propertiesGui.yPixelUnit(); 
     //furtherSetPosition(, dy);
@@ -639,8 +642,8 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   
   protected void setSize_(Control component, int dy, int ySizeFrac, int dx, int xSizeFrac)
   {
-  	if(dy <=0){ dy = this.yIncr; }
-  	if(dx <=0){ dx = this.xIncr; }
+  	if(dy <=0){ dy = this.ySize; }
+  	if(dx <=0){ dx = this.xSize; }
   	setPosAndSize_(component, yPos, yPosFrac, xPos, xPosFrac, dy, ySizeFrac, dx, xSizeFrac);
     //int dx1 = (xPixelSize + propertiesGui.xPixelUnit() -1 ) / propertiesGui.xPixelUnit(); 
     //int dy1 = (yPixelSize + propertiesGui.yPixelUnit() -1 ) / propertiesGui.yPixelUnit(); 
@@ -696,7 +699,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   	widget.setBackground(propertiesGuiSwt.colorBackground);
   	widget.setText(sText);
   	//Font font = propertiesGui.stdInputFont;
-  	Font font = propertiesGuiSwt.getTextFont(yIncr, ySizeFrac);
+  	Font font = propertiesGuiSwt.getTextFont(ySize, ySizeFrac);
   	widget.setFont(font);
   	//font.getFontData()[0].
   	Point textSize = widget.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
@@ -785,7 +788,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     	final int yPixelField;
       final Font promptFont;
       char sizeFontPrompt;
-      	switch(yIncr){
+      	switch(ySize){
     	case 3:  promptFont = propertiesGuiSwt.smallPromptFont;
     	         yPixelField = propertiesGui.yPixelUnit() * 2 -3;
     	         break;
@@ -836,7 +839,6 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   
 
   
-  
 /** Adds a text box for showing or editing a text in multi lines.
  * 
  * @param sName The registering name
@@ -861,7 +863,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   if(prompt != null && promptStylePosition == 't'){
     final int yPixelField;
     final Font promptFont;
-    switch(yIncr){
+    switch(ySize){
     case 3:  promptFont = propertiesGuiSwt.smallPromptFont;
              yPixelField = propertiesGuiSwt.yPixelUnit() * 2 -3;
              break;
@@ -1052,7 +1054,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	//, String sCmd, String sUserAction, String sName)
   )
   {
-  	char size = yIncr > 3? 'B' : 'A';
+  	char size = ySize > 3? 'B' : 'A';
   	WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, 'B');
     widgetInfos.setPanelMng(this);
     ButtonSwt button = new ButtonSwt(this, widgetInfos, size);
@@ -1061,7 +1063,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	
     button.setText(sButtonText);
     button.setForeground(propertiesGuiSwt.colorSwt(0xff00));
-    button.setSize(propertiesGui.xPixelUnit() * xIncr -2, propertiesGui.yPixelUnit() * yIncr -2);
+    button.setSize(propertiesGui.xPixelUnit() * xSize -2, propertiesGui.yPixelUnit() * ySize -2);
     setBounds_(button);
     if(sName == null){ sName = sButtonText; }
     widgetInfos.sCmd = sCmd;
@@ -1099,7 +1101,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	//, String sCmd, String sUserAction, String sName)
   )
   {
-  	char size = yIncr > 3? 'B' : 'A';
+  	char size = ySize > 3? 'B' : 'A';
   	if(sColor0 == null || sColor1 == null) throw new IllegalArgumentException("SwitchButton " + sName + ": color0 and color1 should be given.");
   	
   	WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, 'B');
@@ -1115,7 +1117,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     button.setColorReleased(propertiesGui.getColorValue(sColor0));  
     button.setText(sButtonText);
     button.setForeground(propertiesGuiSwt.colorSwt(0xff00));
-    button.setSize(propertiesGui.xPixelUnit() * xIncr -2, propertiesGui.yPixelUnit() * yIncr -2);
+    button.setSize(propertiesGui.xPixelUnit() * xSize -2, propertiesGui.yPixelUnit() * ySize -2);
     setBounds_(button);
     if(sName == null){ sName = sButtonText; }
     button.setData(widgetInfos);
@@ -1137,7 +1139,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	widget.setBackground(propertiesGuiSwt.colorBackground);
   	
     widget.setForeground(propertiesGuiSwt.colorSwt(0xff00));
-    widget.setSize(propertiesGui.xPixelUnit() * xIncr -2, propertiesGui.yPixelUnit() * yIncr -2);
+    widget.setSize(propertiesGui.xPixelUnit() * xSize -2, propertiesGui.yPixelUnit() * ySize -2);
     setBounds_(widget);
     WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, widget, 'D');
     widgetInfos.setPanelMng(this);
@@ -1155,8 +1157,8 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
 	@Override
 	public Canvas addCurveViewY(String sName, int nrofXvalues,
 			int nrofTracks) {
-		int dxWidget = this.xIncr * propertiesGui.xPixelUnit();
-		int dyWidget = this.yIncr * propertiesGui.yPixelUnit();
+		int dxWidget = this.xSize * propertiesGui.xPixelUnit();
+		int dyWidget = this.ySize * propertiesGui.yPixelUnit();
 		CurveView curveView = new CurveView((Composite)currPanel.panelComposite, dxWidget, dyWidget, nrofXvalues, nrofTracks);
 		testHelp.curveView = curveView; //store to inspect.
 		curveView.setSize(dxWidget, dyWidget);
@@ -1516,9 +1518,9 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   }
 
   
-  @Override public FileDialogIfc createFileDialog()
+  @Override public FileDialogIfc createFileDialog(String sTitle, int mode)
   {
-  	return new FileDialogSwt(theShellOfWindow);
+  	return new FileDialogSwt(theShellOfWindow, sTitle, mode);
   }
 
   

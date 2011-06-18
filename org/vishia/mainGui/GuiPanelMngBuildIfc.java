@@ -3,6 +3,7 @@ package org.vishia.mainGui;
 import java.io.File;
 import java.io.InputStream;
 import java.io.Writer;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,32 +14,47 @@ import org.vishia.mainGui.cfg.GuiCfgBuilder;
 import org.vishia.mainGui.cfg.GuiCfgData;
 
 
+
 /**This is a unique interface for the GUI-panel-manager to build its content.
  * To work with the graphical application see {@link GuiPanelMngBuildIfc}. 
  * <br><br>
- * The add-methods return the adequate graphic-objects from the used Graphic-basic 
- * in form of an abstract typed reference. It can be casted to the expected class 
- * adequate to the used graphic-base, to use special features additionally. For the most
- * simple applications, the capability of this class and adaption may be sufficient,
- * so the return value isn't necessary to use.
- * 
- * If you want to have only simple properties, which are resolved with this interface
- * and its implementation class, you don't need the returned graphic object.
- * But you can do any more with the especial platform, then you have to cast
- * the returned graphic object to the known object of the graphic-base.
+ * Any widget is represented by a {@link WidgetDescriptor}. Either the WidgetDescriptor
+ * should be created before, and taken as parameter for the widget-creating method,
+ * or the WidgetDescriptor is returned by the widget-creating method. The second form takes
+ * most of the characteristics as parameters for the creating method.
  * <br><br>
- * Generally, the widgets are addressed with a identification in String-format to do something with it. 
- * The template type should be the base type of all widgets of the basic graphic library.
+ * The platform-specific Widget Object (Swing: javax.swing.JComponent, org.eclipse.swt.widgets.Control etc.)
+ * is stored as Object-reference in the {@link WidgetDescriptor#widget}.   
+ * If necessary it can be casted to the expected class if some special operations 
+ * using the graphic platform are need. For the most
+ * simple applications, the capability of this interface and its given implementation 
+ * for the platform may be sufficient, so the platform-specific widget isn't necessary to use.
+ * It may be better to enhance this interface and its implementation(s) if new features are need.
+ * But the definition of that enhancements should be done in a commonly form which is able to implement
+ * in any known Java GUI platform.
+ * <br><br>
+ * Generally, the widgets are able to address with an identification String to do something with it
+ * for symbolic access. 
+ * <br><br>
+ * To build a GUI you must use the following order of calls:
  * <ul>
- * <li>Swing: javax.swing.JComponent
- * <li>SWT: org.eclipse.swt.widgets.Control
+ * <li>Create a panel manager which is typeof {@link GuiPanelMngBase} or this interface.
+ *   For example create {@link org.vishia.mainGuiSwt.GuiPanelMngSwt}.
+ * <li>Create a panel, for example call {@link #createGridPanel(ColorGui, int, int, int, int)}
+ *   and add the panel to the given     
+ * <li>Before add, you can select any given panel by String-identifier, using {@link #selectPanel(String)}.
+ * <li>Before add, you have to determine the position and size using 
+ *   <ul><li>{@link #setPosition(int, int, int, int, char)} in grid units
+ *     <li>{@link #setFinePosition(int, int, int, int, int, int, int, int, char)} 
+ *     <li>{@link #setNextPositionX()}
+ *   </ul>   
+ * <li><b>addMethods</b>: This methods create the widget in the current selected panel.
  * </ul>
  * @author Hartmut Schorrig
  *
  */
 public interface GuiPanelMngBuildIfc 
 {
-	
   
   /**The version of this interface:
    * <ul>
@@ -116,7 +132,7 @@ public interface GuiPanelMngBuildIfc
   
   /**Same as {@link #setPosition(int, int, int, int, char)}, but the positions can be in a fine division.
    * @param line
-   * @param lineFrac Number betwenn 0..9 for fine positioning in the grid step.
+   * @param lineFrac Number between 0..9 for fine positioning in the grid step.
    * @param column
    * @param columnFrac
    * @param height
@@ -333,7 +349,21 @@ public interface GuiPanelMngBuildIfc
    */
   Object addCurveViewY(String sName, int nrofXvalues, int nrofTracks);
   
-  
+  /**Adds a special text field to select a file. On the right side a small button [<] is arranged
+   * to open the standard file select dialog. 
+   * The text field is a receiver of file objects for drag % drop or paste the clipboard. 
+   * @param name Name of the widget
+   * @param listRecentFiles maybe null, a list which stores and offers selected files.
+   * @param defaultDir The start directory on open the dialog.
+   * @param startDirMask The start dir and selection mask. Both are separated with a ':' character
+   *        in this string. See {@link FileDialogIfc}. 
+   *        If the last or only one char is '/' then a directory should be selected.
+   *        For example "D:/MyDir:*.txt" shows only .txt-files to select in the dialog starting from d:/MyDir. 
+   * @param prompt Prompt for the text field.
+   * @param promptStylePosition
+   * @return
+   */
+  WidgetDescriptor addFileSelectField(String name, List<String> listRecentFiles, String startDirMask, String prompt, char promptStylePosition);
   
   Object addMouseButtonAction(String sName, UserActionGui action, String sCmdPress, String sCmdRelease, String sCmdDoubleClick);
 
@@ -402,7 +432,7 @@ public interface GuiPanelMngBuildIfc
   /**Returns a Set of all fields, which are created to show.
    * @return the set, never null, possible an empty set.
    */
-  public Set<Map.Entry<String, WidgetDescriptor>> getShowFields();
+  public Set< Map.Entry <String, WidgetDescriptor>> getShowFields();
 
   
   /**The GUI-change-listener should be called in the dispatch-loop of the GUI-(SWT)-Thread.
@@ -472,7 +502,11 @@ public interface GuiPanelMngBuildIfc
    */
   String saveCfg(Writer dest);
   
-	FileDialogIfc createFileDialog();
+  /**Creates a file or directory dialog. The dialog can be activated (showed) any time. 
+   * The dialog is showed in a own window, maybe modal or not.
+   * @return Interface to deal with the dialog.
+   */
+	FileDialogIfc createFileDialog(String sTitle, int mode);
 	
 	GuiShellMngIfc getShellMngIfc();
 

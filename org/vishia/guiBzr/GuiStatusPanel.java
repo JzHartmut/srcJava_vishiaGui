@@ -1,5 +1,7 @@
 package org.vishia.guiBzr;
 
+import java.io.File;
+
 import org.vishia.mainGui.GuiPanelMngBuildIfc;
 import org.vishia.mainGui.GuiPanelMngWorkingIfc;
 import org.vishia.mainGui.GuiShellMngBuildIfc;
@@ -39,7 +41,7 @@ public class GuiStatusPanel
    * The project is a user-project which contains one or more source archive-sandboxes.
    * 
    * */
-  final WidgetDescriptor widgdProjektpath = new WidgetDescriptor("projectPath", 'E'); 
+  WidgetDescriptor widgdProjektpath; 
   
   
   /**A Panel which contains the table to select some projectPaths. */
@@ -80,7 +82,8 @@ public class GuiStatusPanel
   
     panelBuildifc.selectPanel("Select");
     panelBuildifc.setPosition(yposProjectPath, xposProjectPath, -2, 70, 'r');
-    panelBuildifc.addTextField(widgdProjektpath, true, "Project path", 't');
+    //widgdProjektpath = panelBuildifc.addTextField("projectPath", true, "Project path", 't');
+    widgdProjektpath = panelBuildifc.addFileSelectField("projectPath", null, "D:/:/", "Project path", 't');
     panelBuildifc.setPosition(-1, -1, -2, 2, 'r');
     panelBuildifc.addButton("selectProjectPath", selectProjectPath, "c", "s", "d", "?");
     ///
