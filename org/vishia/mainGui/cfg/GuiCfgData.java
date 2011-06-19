@@ -88,6 +88,22 @@ public final class GuiCfgData
     /**ZBNF: Text::= */
     public void set_Text(GuiCfgText data){  }
     
+    public WidgetTypeBase new_InputFile()
+    { GuiCfgInputFile widgt = new GuiCfgInputFile(this);
+      this.widgetType = widgt;
+      return widgt;
+    }
+    
+    public void set_InputFile(WidgetTypeBase data) {  }
+    
+    public WidgetTypeBase new_Button()
+    { GuiCfgButton widgt = new GuiCfgButton(this);
+      this.widgetType = widgt;
+      return widgt;
+    }
+    
+    public void set_Button(WidgetTypeBase data) {  }
+    
     /**ZBNF: Led::= */
     public GuiCfgLed new_Led()
     { GuiCfgLed widgetType1 = new GuiCfgLed(this); 
@@ -283,8 +299,17 @@ public final class GuiCfgData
   }
   
   
-  /**ZBNF: Button::= ... ;
+  /**ZBNF: ShowField::= ... ;
    * Class for instance to capture and store the Table data. */
+  public final static class GuiCfgInputFile extends WidgetTypeBase implements Cloneable
+  {
+    
+    public GuiCfgInputFile(GuiCfgElement itsElement){ super(itsElement); }
+  }
+  
+  
+  /**ZBNF: Button::= ... ;
+   * Class for instance to capture and store the Button data. */
   public final static class GuiCfgButton extends WidgetTypeBase implements Cloneable
   {
     
@@ -468,7 +493,7 @@ public final class GuiCfgData
   /**From ZBNF: DataReplace: < DataReplace> */
   public void set_Element(GuiCfgElement value)
   { String sPanel = value.positionInput.panel;
-    if(value.widgetType.text !=null && value.widgetType.text.equals("wd:yCos"))
+    if(value.widgetType != null && value.widgetType.text !=null && value.widgetType.text.equals("wd:yCos"))
       stop();
     if(sPanel == null){ //the last panel is used furthermore.
       if(actPanel == null){ 
@@ -497,5 +522,25 @@ public final class GuiCfgData
     
   }
 
+  
+  public String replacePathPrefix(String path, String[] target)
+  {
+    String pathRet = path;
+    int posSep = path.indexOf(':');
+    if(posSep >=0){
+      String sRepl = dataReplace.get(path.substring(0, posSep));
+      if(sRepl !=null){
+        pathRet = sRepl + path.substring(posSep+1);  //Note: sRepl may contain a ':', its the device.
+      }
+      posSep = pathRet.indexOf(':');  //after replace or if it isn't replaced
+      if(posSep >=0){
+        target[0] = pathRet.substring(0, posSep);
+        pathRet = pathRet.substring(posSep+1);
+      }
+    }
+    return pathRet;
+  }
+  
+  
   void stop(){}
 }

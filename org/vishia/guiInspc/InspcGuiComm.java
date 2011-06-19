@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InspcDataExchangeAccess.Info;
@@ -71,7 +72,7 @@ public class InspcGuiComm
   private final InspcPlugUser_ifc user;
   
   /**Instance for the inspector access to the target. */
-  private final InspcAccessor inspcAccessor;
+  public final InspcAccessor inspcAccessor;
   
   /**The target ipc-address for Interprocess-Communication with the target.
    * It is a string, which determines the kind of communication.
@@ -90,15 +91,19 @@ public class InspcGuiComm
   boolean bUserCalled;
 
   /**true while running {@link #procComm()} if a send order is stored in telegram but send ins't invoked. */
-  boolean bSendOrder;
+  //boolean bSendOrder;
   
-  boolean bShouldSend;
+  /**True if a cmd...() can't be placed in the telegram, therefore the current tx telegram should send firstly. */
+  //boolean bShouldSend;
   
   /**List of all Panels, which have values to show repeating.
    * Any Panel can be an independent window. Any panel may have other values to show.
    * But any panel can select more as one tabs (tabPanel). Then it will be select which values to show.
    */
   private final List<InspcGuiPanelContent> listPanels = new LinkedList<InspcGuiPanelContent>();
+  
+
+  public ConcurrentLinkedQueue<Runnable> userOrders = new ConcurrentLinkedQueue<Runnable>();
   
   
   
@@ -109,7 +114,7 @@ public class InspcGuiComm
     this.inspcAccessor = new InspcAccessor(new InspcAccessEvaluatorRxTelg());
     this.indexTargetIpcAddr = indexTargetIpcAddr;
     if(user !=null){
-      user.init(inspcAccessor);
+      user.setInspcComm(this);
     }
   }
   
@@ -130,6 +135,14 @@ public class InspcGuiComm
     //inspcAccessor.setExecuterAnswer(executerAnwer);
   }
   
+
+  public void addUserOrder(Runnable order)
+  {
+    userOrders.add(order);
+  }
+  
+  
+  
   
   
   /**Processes the communication.
@@ -141,7 +154,6 @@ public class InspcGuiComm
   {
     sIpTarget = null; 
     bUserCalled = false;
-    bSendOrder = false;
     //
     //
     for(InspcGuiPanelContent panel: listPanels){
@@ -164,7 +176,7 @@ public class InspcGuiComm
         } else {
           actionShowTextfield.userActionGui("tx", widget);
         }
-        if(bShouldSend){
+        if(inspcAccessor.shouldSend()){
           sendAndAwaitAnswer();
           //repeat the request for the field:
           //TODO: don't use the show action! use datapath with meta info.
@@ -172,9 +184,14 @@ public class InspcGuiComm
         }
       }//for widgets in panel
     }
-    if(bShouldSend){
+    Runnable userOrder;
+    if(inspcAccessor.isFilledTxTelg()){
       sendAndAwaitAnswer();
     }
+    while( (userOrder = userOrders.poll()) !=null){
+      userOrder.run();
+    }
+    
     if(user !=null){
       user.isSent(0);
     }
@@ -194,9 +211,7 @@ public class InspcGuiComm
   
   
   void sendAndAwaitAnswer()
-  { bSendOrder = false;
-    bShouldSend = false;
-    inspcAccessor.send();
+  { inspcAccessor.send();
     InspcDataExchangeAccess.Datagram[] answerTelgs = inspcAccessor.awaitAnswer(2000);
     if(answerTelgs !=null){
       inspcAccessor.rxEval.evaluate(answerTelgs, null); //executerAnswerInfo);  //executer on any info block.
@@ -208,8 +223,13 @@ public class InspcGuiComm
 
   
   
-  /**This action is used to request a telegram from target.
-   * 
+  /**This action is used to request a telegram from target. It is executed in the communication thread.
+   * <ul>
+   * <li>A info block is prepared in the tx telegram to target.
+   * <li>If the info block doesn't fit in the telegram (telegram too long), 
+   *     then this action should be called repeatedly. In this case {@link InspcAccessor#shouldSend()}
+   *     returns true.
+   * </ul>     
    */
   UserActionGui actionShowTextfield = new UserActionGui()
   { @Override public void userActionGui(String sIntension, WidgetDescriptor widget, Object... params)
@@ -252,11 +272,7 @@ public class InspcGuiComm
         if(order !=0){
           //save the order to the action. It is taken on receive.
           inspcAccessor.rxEval.setExpectedOrder(order, commAction);
-          bSendOrder = true;
-        } else {
-          bShouldSend = true;
-          //too much orders.
-        }
+        } 
       }
     }
     

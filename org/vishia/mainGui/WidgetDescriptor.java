@@ -302,6 +302,14 @@ public class WidgetDescriptor
   }
   
   
+  /**Gets the working interface of the panel where the widget is member of. 
+   * It can be used to set and get values from other widgets symbolic identified by its name.
+   * Note: It is possible too to store the {@link WidgetDescriptor} of specific widgets
+   * to get and set values and properties of this widgets non-symbolic.
+   * @return The panel.
+   */
+  public GuiPanelMngWorkingIfc getPanel(){ return itsPanel; }
+  
 	/**Especially for test and debug, short info about widget.
 	 * @see java.lang.Object#toString()
 	 */

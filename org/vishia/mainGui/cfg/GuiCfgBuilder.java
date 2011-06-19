@@ -166,8 +166,16 @@ public class GuiCfgBuilder
       }
     }
     //
+    final UserActionGui userAction;
+    if(cfge.widgetType.userAction !=null){
+      userAction = gui.getRegisteredUserAction(cfge.widgetType.userAction);
+      if(userAction == null){
+        sError = "GuiCfgBuilder - user action not found: " + cfge.widgetType.userAction;
+      }
+    } else { userAction = null; }
+    //
     if(cfge.widgetType instanceof GuiCfgData.GuiCfgButton){
-      widgd = gui.addButton(cfge.widgetType.name, null, cfge.widgetType.cmd, null, cfge.widgetType.info, cfge.widgetType.text);
+      widgd = gui.addButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd, null, cfge.widgetType.info, cfge.widgetType.text);
     } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgText){
       GuiCfgData.GuiCfgText wText = (GuiCfgData.GuiCfgText)cfge.widgetType;
       final int colorValue;
@@ -194,6 +202,10 @@ public class GuiCfgBuilder
     } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgShowField){
       GuiCfgData.GuiCfgShowField wShow = (GuiCfgData.GuiCfgShowField)cfge.widgetType;
       widgd = gui.addTextField(sName, false, null, '.');
+      widgd.setDataPath(sDataPath);
+    } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgInputFile){
+      GuiCfgData.GuiCfgInputFile widgt = (GuiCfgData.GuiCfgInputFile)cfge.widgetType;
+      widgd = gui.addFileSelectField(sName, null, "", null, 't');
       widgd.setDataPath(sDataPath);
     } else {
       widgd = null;

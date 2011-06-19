@@ -1,13 +1,16 @@
 package org.vishia.guiInspc;
 
+import java.util.Map;
+
 import org.vishia.inspectorAccessor.InspcAccessor;
+import org.vishia.msgDispatch.LogMessage;
 
 public interface InspcPlugUser_ifc
 {
   
-  void init(InspcAccessor inspcAccessorP);
+  void init(UserInspcPlug_ifc inspc, LogMessage log);
 
-  
+  void setInspcComm(InspcGuiComm inspcCommP);
   
   void registerMethods(org.vishia.mainGui.GuiPanelMngBuildIfc guiMng);
   

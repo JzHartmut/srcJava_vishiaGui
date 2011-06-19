@@ -316,6 +316,9 @@ public class InspcGuiCfg
       }
     }
     
+    if(user !=null){
+      user.init(userInspcPlug, console.getLogMessageOutputConsole());
+    }
     this.inspcComm = new InspcGuiComm(console, cargs.indexTargetIpcAddr, user);
     
     inspector = new Inspector("UDP:127.0.0.1:60088");
@@ -486,6 +489,19 @@ public class InspcGuiCfg
     gui.exit();
   }
 
+  
+  private UserInspcPlug_ifc userInspcPlug = new UserInspcPlug_ifc()
+  {
+
+    @Override public String replacePathPrefix(String path, String[] target)
+    {
+      // TODO Auto-generated method stub
+      return guiCfgData.replacePathPrefix(path, target);
+    }
+    
+  };
+  
+  
   void stop(){} //debug helper
 
 

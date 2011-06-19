@@ -58,6 +58,9 @@ public interface GuiPanelMngBuildIfc
   
   /**The version of this interface:
    * <ul>
+   * <li>2011-06-18 Hartmut chg: createFileDialog() improved, 
+   *     new addFileSelectField(): A Field that comprises the possibility to open a file select dialog
+   *     and that are a destination for drop or paste a file mime type from clipboard. 
    * <li>2011-05-01 Hartmut new: {@link #addTextBox(WidgetDescriptor, boolean, String, char)}: 
    *     A Text box with more as one line. The TextField has only one line.
    * <li>2011-05-01 Hartmut new: {@link #createCompositeBox()}. It is a box with its own PanelMng
