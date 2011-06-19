@@ -20,6 +20,7 @@ GuiDialogZbnfControlled::=
  | SwitchButton ( <param?SwitchButton> ) ; 
  | ValueBar ( <param?ValueBar> ) ;
  | InputTextline ( <param?InputTextline> ) ;
+ | InputFile ( <param?InputFile> ) ;
  | Slider ( <param?Slider> ) ;
  | Show <ShowField> ;
  | <Table> | <Text> | <Imagefile> | <Line> | <Curveview> | <InputField>| <FileInputField>] 
@@ -42,6 +43,7 @@ param::=<?>
 | color = <colorName?color0> [ / <colorName?color1> ] 
 | <""?text>
 | <$-/\.:?text>
+##| <*,)?text>
 ? , 
 }.
 
@@ -75,7 +77,7 @@ Led::=( <param?> ) ;.
 ##} ) ; .
 
 
-Button::=Button ( [|<""?text>|<*)?text>] ) : 
+Button::=Button ( <param>)  [: ##[|<""?text>|<*)?text>] ) : 
 { cmd = [<""?cmd>|\[<*\]?cmd>\]] 
 | action = <$?userAction> 
 | name = [<""?name>|<$?name>] 
@@ -84,7 +86,7 @@ Button::=Button ( [|<""?text>|<*)?text>] ) :
 | show = [<""?showMethod>|<$/?showMethod>] 
 | type = <$?type>
 ? , 
-} ; .
+}] ; .
 
 Table::=Table ( [<""?text>|<*)?text>] ) : 
 { size ( { <#?columnWidth> ? + } x <#?height> ) 
