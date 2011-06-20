@@ -16,6 +16,8 @@ set MANIFEST_JAVAC=vishiaGUI.manifest
 
 REM Input for javac, only choice of primary sources, relativ path from current (make)-directory:
 set INPUT_JAVAC=../org/vishia/guiViewCfg/ViewCfg.java
+set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/*.java
+set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/cfg/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/guiBzr/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/guiInspc/*.java
 

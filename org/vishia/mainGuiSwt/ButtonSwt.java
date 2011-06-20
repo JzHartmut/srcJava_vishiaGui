@@ -15,8 +15,8 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
-import org.vishia.mainGui.UserActionGui;
-import org.vishia.mainGui.WidgetDescriptor;
+import org.vishia.gral.UserActionGui;
+import org.vishia.gral.WidgetDescriptor;
 
 public class ButtonSwt extends Canvas
 {

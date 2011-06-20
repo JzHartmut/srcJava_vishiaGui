@@ -1,8 +1,8 @@
-package org.vishia.mainGui;
+package org.vishia.gral;
 
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
-import org.vishia.mainGui.cfg.GuiCfgData;
+import org.vishia.gral.cfg.GuiCfgData;
 
 
 

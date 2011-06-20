@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.vishia.gral.ColorGui;
+import org.vishia.gral.GuiPanelMngBuildIfc;
+import org.vishia.gral.GuiPanelMngWorkingIfc;
+import org.vishia.gral.TableLineGui_ifc;
+import org.vishia.gral.UserActionGui;
+import org.vishia.gral.WidgetDescriptor;
 import org.vishia.mainCmd.Report;
-import org.vishia.mainGui.ColorGui;
-import org.vishia.mainGui.GuiPanelMngBuildIfc;
-import org.vishia.mainGui.GuiPanelMngWorkingIfc;
-import org.vishia.mainGui.TableLineGui_ifc;
-import org.vishia.mainGui.UserActionGui;
-import org.vishia.mainGui.WidgetDescriptor;
 
 public class GuiFilesDiffPanel
 {

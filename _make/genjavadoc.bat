@@ -9,8 +9,8 @@ set docuSrc=
 set docuSrc=%docuSrc% ../org/vishia/guiBzr/*.java
 set docuSrc=%docuSrc% ../org/vishia/guiInspc/*.java
 set docuSrc=%docuSrc% ../org/vishia/guiViewCfg/*.java
-set docuSrc=%docuSrc% ../org/vishia/mainGui/*.java
-set docuSrc=%docuSrc% ../org/vishia/mainGui/cfg/*.java
+set docuSrc=%docuSrc% ../org/vishia/gral/*.java
+set docuSrc=%docuSrc% ../org/vishia/gral/cfg/*.java
 set docuSrc=%docuSrc% ../org/vishia/mainGuiSwt/*.java
 set docuSrc=%docuSrc% ../org/vishia/windows/*.java
 

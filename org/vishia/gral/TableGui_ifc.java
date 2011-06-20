@@ -1,4 +1,4 @@
-package org.vishia.mainGui;
+package org.vishia.gral;
 
 /**This interface can be used to work with a whole table.
  * It is an abstraction between SWT and swing table capabilities.

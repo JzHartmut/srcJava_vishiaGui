@@ -5,10 +5,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.gral.GuiMainAreaifc;
+import org.vishia.gral.GuiPanelMngBuildIfc;
+import org.vishia.gral.GuiPanelMngWorkingIfc;
 import org.vishia.mainCmd.MainCmd_ifc;
-import org.vishia.mainGui.GuiMainAreaifc;
-import org.vishia.mainGui.GuiPanelMngBuildIfc;
-import org.vishia.mainGui.GuiPanelMngWorkingIfc;
 
 public class MainData
 {

@@ -1,4 +1,4 @@
-package org.vishia.mainGui;
+package org.vishia.gral;
 
 public interface GuiShellMngIfc extends GuiWindowMng_ifc, GuiPanelMngWorkingIfc  //, GuiPanelMngBuildIfc
 {

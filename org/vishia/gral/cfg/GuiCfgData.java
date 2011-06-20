@@ -1,14 +1,14 @@
-package org.vishia.mainGui.cfg;
+package org.vishia.gral.cfg;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.vishia.mainGui.GuiPanelMngBuildIfc;
+import org.vishia.gral.GuiPanelMngBuildIfc;
 
 /**This class contains all configuration data for the appearance of the GUI.
- * It can be filled by {@link org.vishia.mainGui.cfg.GuiCfgZbnf} or others.
+ * It can be filled by {@link org.vishia.gral.cfg.GuiCfgZbnf} or others.
  * It is changed by user handling on GUI.
  * It can be written out in a new configuration file
  * 

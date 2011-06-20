@@ -2,8 +2,8 @@ package org.vishia.guiInspc;
 
 import java.util.List;
 
-import org.vishia.mainGui.PanelActivatedGui;
-import org.vishia.mainGui.WidgetDescriptor;
+import org.vishia.gral.PanelActivatedGui;
+import org.vishia.gral.WidgetDescriptor;
 
 /**This class contains the info about the values to show in one panel.
  * 

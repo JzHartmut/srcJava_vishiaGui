@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.vishia.mainGui.GuiWindowMng_ifc;
+import org.vishia.gral.GuiWindowMng_ifc;
 
 
 /**This class is a simple Info box containing a text. The class can instantiated at any time,

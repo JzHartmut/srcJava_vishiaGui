@@ -12,7 +12,7 @@ public interface InspcPlugUser_ifc
 
   void setInspcComm(InspcGuiComm inspcCommP);
   
-  void registerMethods(org.vishia.mainGui.GuiPanelMngBuildIfc guiMng);
+  void registerMethods(org.vishia.gral.GuiPanelMngBuildIfc guiMng);
   
   /**This method is called periodically on start of requesting data all widgets in visible windows.
    * It is possible to get some special data here.

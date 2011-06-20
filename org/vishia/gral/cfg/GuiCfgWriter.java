@@ -1,4 +1,4 @@
-package org.vishia.mainGui.cfg;
+package org.vishia.gral.cfg;
 
 import java.io.IOException;
 import java.io.Writer;

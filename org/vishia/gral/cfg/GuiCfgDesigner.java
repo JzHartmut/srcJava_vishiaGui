@@ -1,11 +1,11 @@
-package org.vishia.mainGui.cfg;
+package org.vishia.gral.cfg;
 
-import org.vishia.mainGui.GuiPanelMngBase;
-import org.vishia.mainGui.GuiPanelMngWorkingIfc;
-import org.vishia.mainGui.GuiRectangle;
-import org.vishia.mainGui.GuiShellMngBuildIfc;
-import org.vishia.mainGui.UserActionGui;
-import org.vishia.mainGui.WidgetDescriptor;
+import org.vishia.gral.GuiPanelMngBase;
+import org.vishia.gral.GuiPanelMngWorkingIfc;
+import org.vishia.gral.GuiRectangle;
+import org.vishia.gral.GuiShellMngBuildIfc;
+import org.vishia.gral.UserActionGui;
+import org.vishia.gral.WidgetDescriptor;
 import org.vishia.msgDispatch.LogMessage;
 
 public class GuiCfgDesigner

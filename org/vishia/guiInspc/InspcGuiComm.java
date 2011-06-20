@@ -8,14 +8,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InspcDataExchangeAccess.Info;
+import org.vishia.gral.GuiPanelMngWorkingIfc;
+import org.vishia.gral.UserActionGui;
+import org.vishia.gral.WidgetDescriptor;
 import org.vishia.inspectorAccessor.InspcAccessEvaluatorRxTelg;
 import org.vishia.inspectorAccessor.InspcAccessExecAnswerTelg_ifc;
 import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
 import org.vishia.inspectorAccessor.InspcAccessor;
 import org.vishia.mainCmd.Report;
-import org.vishia.mainGui.GuiPanelMngWorkingIfc;
-import org.vishia.mainGui.UserActionGui;
-import org.vishia.mainGui.WidgetDescriptor;
 
 /**The communication manager. */
 public class InspcGuiComm
@@ -62,7 +62,7 @@ public class InspcGuiComm
       } else {
         sShow = "??" + cmd;
       }
-      widgd.setValue(org.vishia.mainGui.GuiPanelMngWorkingIfc.cmdSet, 0, sShow);
+      widgd.setValue(org.vishia.gral.GuiPanelMngWorkingIfc.cmdSet, 0, sShow);
     }
   }
  

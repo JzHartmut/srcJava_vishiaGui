@@ -6,14 +6,14 @@ import java.util.Set;
 
 import org.vishia.byteData.RawDataAccess;
 import org.vishia.mainCmd.Report;
-import org.vishia.mainGui.GuiPanelMngWorkingIfc;
-import org.vishia.mainGui.GuiSetValueIfc;
-import org.vishia.mainGui.PanelActivatedGui;
-import org.vishia.mainGui.UserActionGui;
-import org.vishia.mainGui.ValueBar;
-import org.vishia.mainGui.WidgetDescriptor;
 
 import org.vishia.byteData.ByteDataSymbolicAccess;
+import org.vishia.gral.GuiPanelMngWorkingIfc;
+import org.vishia.gral.GuiSetValueIfc;
+import org.vishia.gral.PanelActivatedGui;
+import org.vishia.gral.UserActionGui;
+import org.vishia.gral.ValueBar;
+import org.vishia.gral.WidgetDescriptor;
 
 public class OamShowValues
 {

@@ -9,9 +9,8 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
-import org.vishia.mainGui.UserActionGui;
-import org.vishia.mainGui.WidgetDescriptor;
-//import org.vishia.mainGuiSwt.GuiPanelMngSwt.UserAction;
+import org.vishia.gral.UserActionGui;
+import org.vishia.gral.WidgetDescriptor;
 
 /**This action class supports the call of a user method while mouse-button.
  * 

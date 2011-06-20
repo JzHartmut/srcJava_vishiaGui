@@ -6,16 +6,16 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
-import org.vishia.mainGui.GuiPanelMngBase;
-import org.vishia.mainGui.GuiRectangle;
-import org.vishia.mainGui.UserActionGui;
-import org.vishia.mainGui.WidgetDescriptor;
+import org.vishia.gral.GuiPanelMngBase;
+import org.vishia.gral.GuiRectangle;
+import org.vishia.gral.UserActionGui;
+import org.vishia.gral.WidgetDescriptor;
 
 /**Universal Mouse Listener which works with the {@link WidgetDescriptor}.
  * <ul>
  * <li>Always sets {@link GuiPanelMngBase#setLastClickedWidgetInfo(WidgetDescriptor)}.
  * <li>Design mode: Left and right button for design in the {@link GuiPanelMngBase}
- *     using the {@link org.vishia.mainGui.cfg.GuiCfgDesigner}.
+ *     using the {@link org.vishia.gral.cfg.GuiCfgDesigner}.
  * <li>Normal mode: calls {@link WidgetDescriptor#getActionChange()}
  * </ul>      
  * @author Hartmut Schorrig

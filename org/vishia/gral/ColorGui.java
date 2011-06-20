@@ -1,4 +1,4 @@
-package org.vishia.mainGui;
+package org.vishia.gral;
 
 public class ColorGui
 {

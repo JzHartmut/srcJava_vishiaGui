@@ -1,13 +1,13 @@
-package org.vishia.mainGui.cfg;
+package org.vishia.gral.cfg;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 
+import org.vishia.gral.GuiDialogZbnfControlled;
+import org.vishia.gral.GuiPanelMngBuildIfc;
 import org.vishia.mainCmd.Report;
-import org.vishia.mainGui.GuiDialogZbnfControlled;
-import org.vishia.mainGui.GuiPanelMngBuildIfc;
 import org.vishia.util.StringPart;
 import org.vishia.util.StringPartFromFileLines;
 import org.vishia.zbnf.ZbnfJavaOutput;

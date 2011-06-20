@@ -1,4 +1,4 @@
-package org.vishia.mainGui;
+package org.vishia.gral;
 
 
 /**This class is the common base class for Tab-Panels.

@@ -1,4 +1,4 @@
-package org.vishia.mainGui;
+package org.vishia.gral;
 
 public interface TableLineGui_ifc extends WidgetGui_ifc
 {

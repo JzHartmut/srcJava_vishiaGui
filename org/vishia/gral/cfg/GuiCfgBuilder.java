@@ -1,4 +1,4 @@
-package org.vishia.mainGui.cfg;
+package org.vishia.gral.cfg;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,10 +8,10 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.vishia.mainGui.GuiPanelMngBuildIfc;
-import org.vishia.mainGui.UserActionGui;
-import org.vishia.mainGui.WidgetDescriptor;
-import org.vishia.mainGui.cfg.GuiCfgData.GuiCfgElement;
+import org.vishia.gral.GuiPanelMngBuildIfc;
+import org.vishia.gral.UserActionGui;
+import org.vishia.gral.WidgetDescriptor;
+import org.vishia.gral.cfg.GuiCfgData.GuiCfgElement;
 
 public class GuiCfgBuilder
 {

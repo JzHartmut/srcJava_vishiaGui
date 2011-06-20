@@ -9,10 +9,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.byteData.VariableContainer_ifc;
-import org.vishia.mainGui.GuiMngBase;
-import org.vishia.mainGui.GuiPanelMngBase;
-import org.vishia.mainGui.GuiShellMngBuildIfc;
-import org.vishia.mainGui.GuiShellMngIfc;
+import org.vishia.gral.GuiMngBase;
+import org.vishia.gral.GuiPanelMngBase;
+import org.vishia.gral.GuiShellMngBuildIfc;
+import org.vishia.gral.GuiShellMngIfc;
 import org.vishia.msgDispatch.LogMessage;
 
 public class GuiShellMngSwt extends GuiPanelMngSwt implements GuiShellMngBuildIfc

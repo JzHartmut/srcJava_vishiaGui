@@ -6,7 +6,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.vishia.mainGui.FileDialogIfc;
+import org.vishia.gral.FileDialogIfc;
 
 public class FileDialogSwt implements FileDialogIfc
 {

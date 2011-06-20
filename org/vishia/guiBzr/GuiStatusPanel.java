@@ -2,13 +2,13 @@ package org.vishia.guiBzr;
 
 import java.io.File;
 
-import org.vishia.mainGui.GuiPanelMngBuildIfc;
-import org.vishia.mainGui.GuiPanelMngWorkingIfc;
-import org.vishia.mainGui.GuiShellMngBuildIfc;
-import org.vishia.mainGui.GuiWindowMng_ifc;
-import org.vishia.mainGui.SwitchExclusiveButtonMng;
-import org.vishia.mainGui.UserActionGui;
-import org.vishia.mainGui.WidgetDescriptor;
+import org.vishia.gral.GuiPanelMngBuildIfc;
+import org.vishia.gral.GuiPanelMngWorkingIfc;
+import org.vishia.gral.GuiShellMngBuildIfc;
+import org.vishia.gral.GuiWindowMng_ifc;
+import org.vishia.gral.SwitchExclusiveButtonMng;
+import org.vishia.gral.UserActionGui;
+import org.vishia.gral.WidgetDescriptor;
 import org.vishia.mainGuiSwt.InfoBox;
 
 /**This class contains all data and methods of the status (select) panel.

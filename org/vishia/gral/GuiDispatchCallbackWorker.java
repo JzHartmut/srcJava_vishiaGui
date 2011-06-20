@@ -1,4 +1,4 @@
-package org.vishia.mainGui;
+package org.vishia.gral;
 
 /**This is the base class for user classes, which contains code, that is executed in the graphic thread,
  * any-time when any graphic dispatching occurs. Especially it is used for SWT.  

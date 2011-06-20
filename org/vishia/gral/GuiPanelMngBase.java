@@ -1,4 +1,4 @@
-package org.vishia.mainGui;
+package org.vishia.gral;
 
 import java.io.File;
 import java.io.Writer;
@@ -10,11 +10,11 @@ import java.util.TreeMap;
 
 import org.eclipse.swt.widgets.Control;
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.cfg.GuiCfgBuilder;
+import org.vishia.gral.cfg.GuiCfgData;
+import org.vishia.gral.cfg.GuiCfgDesigner;
+import org.vishia.gral.cfg.GuiCfgWriter;
 import org.vishia.mainCmd.Report;
-import org.vishia.mainGui.cfg.GuiCfgBuilder;
-import org.vishia.mainGui.cfg.GuiCfgData;
-import org.vishia.mainGui.cfg.GuiCfgDesigner;
-import org.vishia.mainGui.cfg.GuiCfgWriter;
 import org.vishia.msgDispatch.LogMessage;
 
 /**This is the base class of the GuiPanelMng for several Graphic-Adapters (Swing, SWT etc.). 

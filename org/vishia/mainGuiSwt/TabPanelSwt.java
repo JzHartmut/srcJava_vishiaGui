@@ -11,11 +11,11 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Widget;
-import org.vishia.mainGui.PanelActivatedGui;
-import org.vishia.mainGui.TabPanel;
-import org.vishia.mainGui.PanelContent;
-import org.vishia.mainGui.WidgetCmpnifc;
-import org.vishia.mainGui.WidgetDescriptor;
+import org.vishia.gral.PanelActivatedGui;
+import org.vishia.gral.PanelContent;
+import org.vishia.gral.TabPanel;
+import org.vishia.gral.WidgetCmpnifc;
+import org.vishia.gral.WidgetDescriptor;
 
 public class TabPanelSwt extends TabPanel
 {

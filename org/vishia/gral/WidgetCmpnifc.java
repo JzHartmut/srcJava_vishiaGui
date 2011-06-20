@@ -1,4 +1,4 @@
-package org.vishia.mainGui;
+package org.vishia.gral;
 
 
 /**Marker interface for widgets, which contain other widgets (components)

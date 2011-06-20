@@ -1,4 +1,4 @@
-package org.vishia.mainGui;
+package org.vishia.gral;
 
 import java.io.File;
 import java.io.InputStream;
@@ -9,9 +9,9 @@ import java.util.Set;
 
 import org.eclipse.swt.graphics.Color;
 import org.vishia.byteData.VariableContainer_ifc;
-import org.vishia.mainGui.PanelContent;
-import org.vishia.mainGui.cfg.GuiCfgBuilder;
-import org.vishia.mainGui.cfg.GuiCfgData;
+import org.vishia.gral.PanelContent;
+import org.vishia.gral.cfg.GuiCfgBuilder;
+import org.vishia.gral.cfg.GuiCfgData;
 
 
 

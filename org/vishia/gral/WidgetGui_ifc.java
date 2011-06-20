@@ -1,4 +1,4 @@
-package org.vishia.mainGui;
+package org.vishia.gral;
 
 
 /**This interface should support changing of widget of the underlying GUI.
