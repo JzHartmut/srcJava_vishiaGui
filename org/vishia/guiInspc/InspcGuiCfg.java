@@ -496,7 +496,12 @@ public class InspcGuiCfg
     @Override public String replacePathPrefix(String path, String[] target)
     {
       // TODO Auto-generated method stub
-      return guiCfgData.replacePathPrefix(path, target);
+      String pathRet = guiCfgData.replacePathPrefix(path, target);
+      if(target[0] !=null){
+        String targetIp = inspcComm.translateDeviceToAddrIp(target[0]);
+        if(targetIp !=null){ target[0] = targetIp; }  //else let it unchanged.
+      }
+      return pathRet;
     }
     
   };

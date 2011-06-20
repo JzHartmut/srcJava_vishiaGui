@@ -239,7 +239,7 @@ public class InspcGuiComm
       int posSepDevice = sDataPath.indexOf(':');
       if(posSepDevice >0){
         String sDevice = sDataPath.substring(0, posSepDevice);
-        String sIpTargetNew = indexTargetIpcAddr.get(sDevice);
+        String sIpTargetNew = translateDeviceToAddrIp(sDevice); ///
         if(sIpTargetNew == null){
           errorDevice(sDevice);
         } else {
@@ -279,7 +279,11 @@ public class InspcGuiComm
   };
   
   
-  
+  String translateDeviceToAddrIp(String sDevice)
+  {
+    String ret = indexTargetIpcAddr.get(sDevice);
+    return ret;
+  }
   
   
   
