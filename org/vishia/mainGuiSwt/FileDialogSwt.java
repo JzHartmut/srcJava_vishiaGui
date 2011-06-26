@@ -11,51 +11,58 @@ import org.vishia.gral.FileDialogIfc;
 public class FileDialogSwt implements FileDialogIfc
 {
 
-	private final FileDialog fileDialog;
+	private FileDialog fileDialog;
 	
-	private final DirectoryDialog dirDialog;
+	private DirectoryDialog dirDialog;
 
 	private final Shell shell;
 	
-	private String sDir;
+	private String sOpenResult;
 	
-	
-	public FileDialogSwt(Shell shell, String sTitle, int mode)
-	{ this.shell = shell;
+	@Override public boolean open(String sTitle, int mode)
+	{
     int modeSwt = 0;
-	  
-	  if((mode & FileDialogIfc.multi)!=0) { modeSwt |= SWT.MULTI; }
-	  
-	  if((mode & FileDialogIfc.directory)!=0) {
-	    this.dirDialog = new DirectoryDialog(shell, SWT.MULTI);
-	    if(sTitle != null){
-	      dirDialog.setText(sTitle);
-	    }
-	    this.fileDialog = null;
-  	} else {
-  	  this.dirDialog = null;
+    
+    if((mode & FileDialogIfc.multi)!=0) { modeSwt |= SWT.MULTI; }
+    
+    if((mode & FileDialogIfc.directory)!=0) {
+      this.dirDialog = new DirectoryDialog(shell, SWT.MULTI);
+      if(sTitle != null){
+        dirDialog.setText(sTitle);
+      }
+      this.fileDialog = null;
+    } else {
+      this.dirDialog = null;
       this.fileDialog = new FileDialog(shell, SWT.OPEN | modeSwt);
       if(sTitle != null){
         fileDialog.setText(sTitle);
       }
-  	}
+    }
+	  return true;
+	}
+	
+	
+	public FileDialogSwt(Shell shell)
+	{ this.shell = shell;
 	}
 	
 
-	@Override public String show(String startDirMask, String sTitle)
+	/* (non-Javadoc)
+	 * @see org.vishia.gral.FileDialogIfc#show(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override public String show(String sBaseDir, String sLocalDir, String sMask, String sTitle)
 	{
-    int posSep = startDirMask.indexOf(':', 2); //After windows drive designation 'C:'
     if(fileDialog !=null){
-      if(posSep >=2){
-        fileDialog.setFileName(startDirMask.substring(0, posSep)); 
+      if(sBaseDir !=null || sLocalDir !=null){
+        String sStartDir = (sBaseDir !=null ? sBaseDir : "") + (sLocalDir !=null ? sLocalDir : "");
+        fileDialog.setFileName(sStartDir); 
       }
-
       if(sTitle != null){
         fileDialog.setText(sTitle);
       }
       shell.setVisible(true);
       shell.setActive();
-      sDir = fileDialog.open();  //it is opened, and this thread waits.
+      sOpenResult = fileDialog.open();  //it is opened, and this thread waits.
       //String sDir = fileDialog.getFilterPath();
     } else {
       if(sTitle != null){
@@ -63,11 +70,11 @@ public class FileDialogSwt implements FileDialogIfc
       }
       shell.setVisible(true);
       shell.setActive();
-      sDir = dirDialog.open();  //it is opened, and this thread waits.
+      sOpenResult = dirDialog.open();  //it is opened, and this thread waits.
       //String sDir = dirDialog.getFilterPath();
       
     }
-		return sDir;
+		return sOpenResult;
 	}
 
 
@@ -77,7 +84,16 @@ public class FileDialogSwt implements FileDialogIfc
 
 
   @Override public String getSelection()
-  { return fileDialog !=null ? fileDialog.getFileName() : sDir;
+  { if(fileDialog !=null){
+      if(sOpenResult == null){ return null; }    //aborted selection.
+      else {
+        String sPath = fileDialog.getFilterPath();
+        String sName = fileDialog.getFileName();
+        return sPath + "/" + sName;
+      }
+    } else {
+      return sOpenResult;  //selected dir is the value from open()
+    }
   }
 	
 	

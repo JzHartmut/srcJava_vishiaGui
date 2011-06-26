@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.vishia.gral.GuiPanelMngBuildIfc;
 import org.vishia.gral.UserActionGui;
@@ -24,12 +25,16 @@ public class GuiCfgBuilder
    * It is used if other files are given with relative path.*/
   private final File currentDir;
 
+  private Map<String, String> indexAlias = new TreeMap<String, String>();
+  
   
   public GuiCfgBuilder(GuiCfgData cfgData, GuiPanelMngBuildIfc gui, File currentDir)
   {
     this.cfgData = cfgData;
     this.gui = gui;
     this.currentDir = currentDir;
+    String sCanonicalPath = org.vishia.util.FileSystem.getCanonicalPath(currentDir);
+    indexAlias.put("cfg", sCanonicalPath);
   }
   
   
@@ -205,7 +210,11 @@ public class GuiCfgBuilder
       widgd.setDataPath(sDataPath);
     } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgInputFile){
       GuiCfgData.GuiCfgInputFile widgt = (GuiCfgData.GuiCfgInputFile)cfge.widgetType;
-      widgd = gui.addFileSelectField(sName, null, "", null, 't');
+      final String dirMask;
+      if(widgt.info !=null){
+        dirMask = replaceAlias(widgt.info);
+      } else { dirMask = ""; }
+      widgd = gui.addFileSelectField(sName, null, dirMask, null, 't');
       widgd.setDataPath(sDataPath);
     } else {
       widgd = null;
@@ -236,6 +245,25 @@ public class GuiCfgBuilder
       widgd.setCfgElement(cfge);
     }
     return sError;
+  }
+  
+  
+  
+  String replaceAlias(String src)
+  {
+    int posSep;
+    if((posSep = src.indexOf("<*")) < 0) { return src; } //unchanged
+    else {
+      StringBuilder u = new StringBuilder(src);
+      do{
+        int posEnd = u.indexOf(">", posSep+2);
+        String sAlias = src.substring(posSep + 2, posEnd);
+        String sValue = indexAlias.get(sAlias);
+        if(sValue == null){ sValue = "??" + sAlias + "??";}
+        u.replace(posSep, posEnd+1, sValue);
+      } while((posSep = u.indexOf("<*", posSep)) >=0);  //note nice side effect: replace in sValue too
+      return u.toString();
+    }
   }
   
   

@@ -57,7 +57,9 @@ public class InspcGuiComm
             sShow = String.format("%3.2f°", angle);
         } else {
           float value = InspcAccessEvaluatorRxTelg.valueFloatFromRxValue(info);
-          sShow = Float.toString(value);
+          if(value == 0.0f){ sShow = "0.0"; }
+          if(Math.abs(value) < 1e-5){ sShow = "0.00001"; }  //shorten output, don't show exponent.
+          else { sShow = Float.toString(value); }
         }
       } else {
         sShow = "??" + cmd;

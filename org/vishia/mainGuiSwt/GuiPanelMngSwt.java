@@ -1518,9 +1518,9 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   }
 
   
-  @Override public FileDialogIfc createFileDialog(String sTitle, int mode)
+  @Override public FileDialogIfc createFileDialog()
   {
-  	return new FileDialogSwt(theShellOfWindow, sTitle, mode);
+  	return new FileDialogSwt(theShellOfWindow);
   }
 
   

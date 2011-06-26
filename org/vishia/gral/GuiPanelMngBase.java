@@ -39,16 +39,46 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   protected class FileSelectInfo
   {
     public List<String> listRecentFiles;
-    public final String startDirMask;
+    public String sRootDir;
+    public String sLocalDir;
+    public String sMask;
+    public String sTitle;
     public final FileDialogIfc dialogFile;
     public final WidgetDescriptor dstWidgd;
     
-    public FileSelectInfo(List<String> listRecentFiles, String startDirMask, WidgetDescriptor dstWidgd)
+    
+    public FileSelectInfo(String sTitle, List<String> listRecentFiles, String startDirMask, WidgetDescriptor dstWidgd)
     { this.listRecentFiles = listRecentFiles;
       this.dstWidgd = dstWidgd;
-      this.startDirMask = startDirMask;
-      int mode = startDirMask.endsWith("/") ? FileDialogIfc.directory : 0;
-      this.dialogFile = createFileDialog("Files", mode);
+      this.sTitle = sTitle;
+      int posColon = startDirMask.indexOf(':',2);  //regard : after windows drive letter.
+      String sLocalDir1;
+      if(posColon >=0){
+        this.sRootDir = startDirMask.substring(0, posColon) + "/";
+        sLocalDir1 = startDirMask.substring(posColon+1);
+      } else {
+        this.sRootDir = "";
+        sLocalDir1 = startDirMask;
+      }
+      int mode;
+      String sMask1;
+      int posSlash = sLocalDir1.lastIndexOf('/');
+      if(posSlash == sLocalDir1.length()-1){ //last is slash
+        mode = FileDialogIfc.directory;
+        sMask1 = "";
+      } else {
+        mode = 0;
+        sMask1 = sLocalDir1.substring(posSlash+1);
+        if(sMask1.indexOf('*') >=0){ //contains an asterix
+          sLocalDir1 = sLocalDir1.substring(0, posSlash);
+        } else {
+          sMask1 = null;  //no mask, sLocalDir is a directory.  
+        }
+      }
+      this.sMask = sMask1;
+      this.sLocalDir = sLocalDir1;
+      this.dialogFile = createFileDialog();
+      this.dialogFile.open(sTitle, mode);
     }
     
   }
@@ -342,7 +372,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
     //xPos += xSize;
     xSize = ySize;
     WidgetDescriptor widgdSelect = addButton(name + "<", actionFileSelect, "", null, null, "<");
-    FileSelectInfo fileSelectInfo = new FileSelectInfo(listRecentFiles, startDirMask, widgd);
+    FileSelectInfo fileSelectInfo = new FileSelectInfo(name, listRecentFiles, startDirMask, widgd);
     widgdSelect.setContentInfo(fileSelectInfo); 
     xSize = xSize1;
     return widgd;
@@ -357,9 +387,12 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
       if(fileSelectInfo.listRecentFiles !=null){
         stop();
       } else {
-        fileSelectInfo.dialogFile.show(fileSelectInfo.startDirMask, infos.name);
+        fileSelectInfo.dialogFile.show(fileSelectInfo.sRootDir, fileSelectInfo.sLocalDir
+          , fileSelectInfo.sMask, fileSelectInfo.sTitle);
         String fileSelect = fileSelectInfo.dialogFile.getSelection(); 
-        fileSelectInfo.dstWidgd.setValue(cmdSet, 0, fileSelect);
+        if(fileSelect !=null){
+          fileSelectInfo.dstWidgd.setValue(cmdSet, 0, fileSelect);
+        }
       }
       
     }

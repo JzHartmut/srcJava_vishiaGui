@@ -509,7 +509,7 @@ public interface GuiPanelMngBuildIfc
    * The dialog is showed in a own window, maybe modal or not.
    * @return Interface to deal with the dialog.
    */
-	FileDialogIfc createFileDialog(String sTitle, int mode);
+	FileDialogIfc createFileDialog();
 	
 	GuiShellMngIfc getShellMngIfc();
 
