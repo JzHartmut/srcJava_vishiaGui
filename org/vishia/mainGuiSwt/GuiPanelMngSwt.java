@@ -374,7 +374,9 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   
   @Override public boolean remove(WidgetDescriptor widget)
   {
-    ((Widget)widget.widget).dispose();
+    if(widget !=null && widget.widget !=null){
+      ((Widget)widget.widget).dispose();
+    }
     widget.widget = null;  //remove instance by Garbage collector.
     return true;
     
