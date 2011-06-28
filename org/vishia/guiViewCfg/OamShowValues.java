@@ -2,6 +2,7 @@ package org.vishia.guiViewCfg;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import org.vishia.byteData.RawDataAccess;
@@ -15,6 +16,7 @@ import org.vishia.gral.UserActionGui;
 import org.vishia.gral.ValueBar;
 import org.vishia.gral.WidgetDescriptor;
 
+
 public class OamShowValues
 {
 
@@ -25,7 +27,7 @@ public class OamShowValues
 
 	boolean dataValid = false;
 	
-	List<WidgetDescriptor> widgetsInTab;
+	Queue<WidgetDescriptor> widgetsInTab;
 	
 	/**The access to the gui, to change data to show. */
 	protected final GuiPanelMngWorkingIfc guiAccess;
@@ -84,7 +86,7 @@ public class OamShowValues
 		//TEST TODO:
 		//accessOamVariable.setFloat("ctrl/energyLoadCapac2Diff", checkWithoutNewdata);
 		//current panel:
-		List<WidgetDescriptor> listWidgets = guiAccess.getListCurrWidgets();
+		Queue<WidgetDescriptor> listWidgets = guiAccess.getListCurrWidgets();
 		for(WidgetDescriptor widgetInfo : listWidgets){
 			String sName = widgetInfo.name;
 		}
@@ -490,7 +492,7 @@ public class OamShowValues
 	 */
 	public final PanelActivatedGui tabActivatedImpl = new PanelActivatedGui()
 	{
-		@Override	public void panelActivatedGui(List<WidgetDescriptor> widgets)
+		@Override	public void panelActivatedGui(Queue<WidgetDescriptor> widgets)
 		{
 			widgetsInTab = widgets;
 			writeValuesOfTab();

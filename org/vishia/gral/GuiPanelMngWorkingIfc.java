@@ -2,6 +2,7 @@ package org.vishia.gral;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 import org.vishia.byteData.VariableContainer_ifc;
 
@@ -48,7 +49,7 @@ public interface GuiPanelMngWorkingIfc
 	 * If it should be used, the graphic implementation should be known
 	 * and a adequate instanceof-test and cast is necessary. 
 	 */
-	List<WidgetDescriptor> getListCurrWidgets();
+	Queue<WidgetDescriptor> getListCurrWidgets();
 	
   /**Inserts a textual information at any widget. The widget may be for example:
    * <ul>

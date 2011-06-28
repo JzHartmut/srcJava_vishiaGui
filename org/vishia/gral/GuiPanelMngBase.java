@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.TreeMap;
 
 import org.eclipse.swt.widgets.Control;
@@ -193,7 +194,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   protected WidgetDescriptor lastClickedWidgetInfo;
   
 
-	public List<WidgetDescriptor> getListCurrWidgets(){ return currPanel.widgetList; }
+	@Override public Queue<WidgetDescriptor> getListCurrWidgets(){ return currPanel.widgetList; }
 	
   /**Index of all user actions, which are able to use in Button etc. 
    * The user action "showWidgetInfos" defined here is added initially.

@@ -81,6 +81,11 @@ public class GuiCfgBuilder
   
   
   
+  /**Builds the graphical widget inclusive its {@link WidgetDescriptor} and place it in the GUI.
+   * @param cfge The configuration element data read from config file or edit.
+   * @return null if OK, an error String for a user info message on warning or error.
+   *         It is possible that a named user action is not found etc. 
+   */
   public String buildWidget(GuiCfgElement cfge)
   {
     String sError = null;

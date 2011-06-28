@@ -1,6 +1,7 @@
 package org.vishia.mainGuiSwt;
 
 import java.util.List;
+import java.util.Queue;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -105,7 +106,7 @@ public class TabPanelSwt extends TabPanel
 				if(data != null && notifyingUserInstanceWhileSelectingTab !=null){
 					@SuppressWarnings("unchecked")
 					PanelContent panelContent = (PanelContent)(data);
-					List<WidgetDescriptor> widgetInfos = panelContent.widgetList; 
+					Queue<WidgetDescriptor> widgetInfos = panelContent.widgetList; 
 					notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);
 				}
 			}

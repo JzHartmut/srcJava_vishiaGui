@@ -1,6 +1,7 @@
 package org.vishia.gral;
 
 import java.util.List;
+import java.util.Queue;
 
 
 /**This interface should be implemented by any user class to call user actions when a panel is activated.
@@ -17,6 +18,6 @@ public interface PanelActivatedGui
 	 * @param widgets Information about all widgets in this panel, which should be updated 
 	 *        with correct values for example with data of a running process.
 	 * */
-	void panelActivatedGui(List<WidgetDescriptor> widgets);
+	void panelActivatedGui(Queue<WidgetDescriptor> widgets);
 	
 }

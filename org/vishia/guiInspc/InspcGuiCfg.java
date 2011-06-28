@@ -49,7 +49,13 @@ public class InspcGuiCfg
   static class CallingArguments
   {
     /**Name of the config-file for the Gui-appearance. */
-    String sFileGui;
+    //String sFileGui;
+    
+    /**The configuration file. It is created while parsing arguments.
+     * The file is opened and closed while the configuration is used to build the GUI.
+     * The file is used to write on menu-save action.
+     */
+    private File fileGuiCfg;
     
     /**File with the values from the S7 to show. */
     String sFileOamValues;
@@ -81,13 +87,15 @@ public class InspcGuiCfg
   
   
   
-  final CallingArguments callingArguments;
+  /**The calling arguments of this class. It may be filled by command line invocation 
+   * but maybe given in a direct way too while calling this class in a Java environment. */
+  final CallingArguments cargs;
 
   
-  File fileGui;
-  
+  /**The configuration data for graphical appearance. */
   final GuiCfgData guiCfgData = new GuiCfgData();
   
+  /**The communication manager. */
   final InspcGuiComm inspcComm;
   
   /**Some actions may be processed by a user implementation. */
@@ -139,7 +147,8 @@ public class InspcGuiCfg
     { boolean bOk = true;  //set to false if the argc is not passed
       try {
         if(arg.startsWith("-gui="))      
-        { cargs.sFileGui = getArgument(5);  //the graphic GUI-appearance 
+        { cargs.fileGuiCfg = new File(getArgument(5));  //the graphic GUI-appearance
+        
         }
         else if(arg.startsWith("-targetIpc=")) 
         { String sArg = getArgument(11);
@@ -270,7 +279,7 @@ public class InspcGuiCfg
       }
       */
       gui.setTitleAndSize("GUI", 50, 100, 1200, 900);
-      panelBuildIfc.buildCfg(guiCfgData, fileGui);
+      panelBuildIfc.buildCfg(guiCfgData, cargs.fileGuiCfg);
       
       gui.removeDispatchListener(this);    
       
@@ -297,7 +306,7 @@ public class InspcGuiCfg
   InspcGuiCfg(CallingArguments cargs, MainCmdSwt gui) 
   { this.gui = gui;
     boolean bOk = true;
-    this.callingArguments = cargs;
+    this.cargs = cargs;
     this.console = gui;  
     if(cargs.sPluginClass !=null){
       try{
@@ -327,7 +336,7 @@ public class InspcGuiCfg
     //Creates a panel manager to work with grid units and symbolic access.
     //Its properties:  //##
     final char sizePixel;
-    char sizeArg = callingArguments.sSize == null ? 'A' : callingArguments.sSize.charAt(0);
+    char sizeArg = cargs.sSize == null ? 'A' : cargs.sSize.charAt(0);
     switch(sizeArg){
     case 'F': sizePixel = 'D'; break;
     case 'A': sizePixel = 'D'; break;
@@ -360,15 +369,14 @@ public class InspcGuiCfg
     
     //dialogVellMng.re
     boolean bConfigDone = false;
-    if(cargs.sFileGui != null){
+    if(cargs.fileGuiCfg != null){
       //configGuiWithZbnf.ctDone(0);  //counter for done initialized.
-      fileGui = new File(callingArguments.sFileGui);
-      if(fileGui.exists())
+      if(cargs.fileGuiCfg.exists())
       {
         File fileSyntax = new File(cargs.sPathZbnf + "/dialog.zbnf");
         GuiCfgZbnf cfgZbnf = new GuiCfgZbnf(console, fileSyntax);
         
-        String sError = cfgZbnf.configureWithZbnf(fileGui, guiCfgData);
+        String sError = cfgZbnf.configureWithZbnf(cargs.fileGuiCfg, guiCfgData);
         if(sError !=null){
           console.writeError(sError);
         } else {
@@ -389,7 +397,7 @@ public class InspcGuiCfg
           }  
         }
       } else {
-        console.writeError("Config file not found: " + fileGui.getAbsolutePath());
+        console.writeError("Config file not found: " + cargs.fileGuiCfg.getAbsolutePath());
       }
     }    
     //assigns the fields which are visible to the oamOutValues-Manager to fill it with the values.
@@ -412,7 +420,7 @@ public class InspcGuiCfg
   
   void execute()
   {
-    inspcComm.openComm(callingArguments.sOwnIpcAddr);
+    inspcComm.openComm(cargs.sOwnIpcAddr);
     //msgReceiver.start();
     //oamRcvUdpValue.start();
     while(gui.isRunning())
@@ -439,7 +447,7 @@ public class InspcGuiCfg
       if(sIntension.equals("save")){
         String sError = null;
         try{
-          Writer writer = new FileWriter("save.cfg");
+          Writer writer = new FileWriter(cargs.fileGuiCfg); //"save.cfg");
           sError = panelMng.saveCfg(writer);
           writer.close();
         } catch(java.io.IOException exc){
