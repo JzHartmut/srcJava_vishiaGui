@@ -16,6 +16,8 @@ import org.vishia.inspectorAccessor.InspcAccessExecAnswerTelg_ifc;
 import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
 import org.vishia.inspectorAccessor.InspcAccessor;
 import org.vishia.mainCmd.Report;
+import org.vishia.reflect.ClassJc;
+import org.vishia.util.StringFormatter;
 
 /**The communication manager. */
 public class InspcGuiComm
@@ -23,6 +25,10 @@ public class InspcGuiComm
   /**Version, able to read as hex yyyymmdd.
    * Changes:
    * <ul>
+   * <li>2011-06-30 Hartmut new: {@link #sendAndPrepareCmdSetValueByPath(String, long, int, InspcAccessExecRxOrder_ifc)}:
+   *     It is the first method which organizes that info blocks can be created one after another
+   *     without regarding the telegram length. It simplifies the usage.
+   * <li>2011-06-30 Hartmut improved: {@link WidgetCommAction#execInspcRxOrder(Info)} for formatted output   
    * <li>2011-05-17 execInspcRxOrder() int32AngleDegree etc. to present a angle in degrees
    * <li>2011-05-01 Hartmut: Created
    * </ul>
@@ -47,18 +53,40 @@ public class InspcGuiComm
       int order = info.getOrder();
       int cmd = info.getCmd();
       if(cmd == InspcDataExchangeAccess.Info.kAnswerValue){
-        if(widgd.sFormat !=null && widgd.sFormat.equals("int32AngleDegree")){
-          int value = InspcAccessEvaluatorRxTelg.valueIntFromRxValue(info);
-          float angle = value * (180.0f/2147483648.0f);
-          sShow = String.format("%3.2f°", angle);
-        } else if(widgd.sFormat !=null && widgd.sFormat.equals("int16AngleDegree")){
+        if(widgd.sFormat !=null){
+          if(widgd.sFormat.equals("int32AngleDegree")){
+            int value = InspcAccessEvaluatorRxTelg.valueIntFromRxValue(info);
+            float angle = value * (180.0f/2147483648.0f);
+            sShow = String.format("%3.2f°", angle);
+          } else if(widgd.sFormat.equals("int16AngleDegree")){
             int value = InspcAccessEvaluatorRxTelg.valueIntFromRxValue(info);
             float angle = value * (180.0f/32768.0f);
             sShow = String.format("%3.2f°", angle);
-        } else {
+          } else {
+            float value = InspcAccessEvaluatorRxTelg.valueFloatFromRxValue(info);
+            try{ sShow = String.format(widgd.sFormat, value); }
+            catch(java.util.IllegalFormatException exc){ 
+              sShow = null;  //maybe integer 
+            }
+            if(sShow == null){
+              try{ sShow = String.format(widgd.sFormat, (int)value); }
+              catch(java.util.IllegalFormatException exc){ 
+                sShow = "?format";  
+              }
+            }
+            sShow += " ";
+          }
+        }
+        else { //no format given
           float value = InspcAccessEvaluatorRxTelg.valueFloatFromRxValue(info);
+          float valueAbs = Math.abs(value); 
+          StringFormatter format;
           if(value == 0.0f){ sShow = "0.0"; }
-          if(Math.abs(value) < 1e-5){ sShow = "0.00001"; }  //shorten output, don't show exponent.
+          else if(valueAbs < 1e-5){ sShow = "0.00001"; }  //shorten output, don't show exponent.
+          else if(valueAbs >= 1e3){ sShow = String.format("%3.1f k", value/1000); }  //shorten output, don't show exponent.
+          else if(valueAbs >= 1e6){ sShow = String.format("%3.1f M", value/1000000); }  //shorten output, don't show exponent.
+          else if(valueAbs >= 1e9){ sShow = String.format("%3.1g", value); }  //shorten output, don't show exponent.
+          //else if(valueAbs >= 1e6){ sShow = Float.toString(value/1000000) + " M"; }  //shorten output, don't show exponent.
           else { sShow = Float.toString(value); }
         }
       } else {
@@ -210,6 +238,38 @@ public class InspcGuiComm
   }
 
 
+  
+  /**Sends the given telegram if the requested command doesn't fit in the telegram yet,
+   * prepares the given command as info in the given or a new one telegram and registers the exec on answer.
+   * <br><br>
+   * After the last such request {@link #sendAndAwaitAnswer()} have to be called
+   * to send at least the last request. 
+   * @param sPathInTarget
+   * @param value The value as long-image, it may be a double, float, int etc.
+   * @param typeofValue The type of the value, use {@link InspcDataExchangeAccess#kScalarTypes}
+   *                    + {@link ClassJc#REFLECTION_double} etc.
+   * @param exec The routine to execute on answer.
+   * @return true if a new telegram was created. It is an info only.
+   * 
+   */
+  public boolean sendAndPrepareCmdSetValueByPath(String sPathInTarget, long value, int typeofValue, InspcAccessExecRxOrder_ifc exec)
+  { int order;
+    boolean sent = false;
+    do {
+      order = inspcAccessor.cmdSetValueByPath(sPathInTarget, value, typeofValue);    
+      if(order !=0){ //save the order to the action. It is taken on receive.
+        inspcAccessor.rxEval.setExpectedOrder(order, exec);
+      } else {
+        sendAndAwaitAnswer();  //calls execInspcRxOrder as callback.
+        sent = true;
+      }
+    } while(order == 0);  
+    return sent;
+  }
+  
+  
+  
+  
   
   
   void sendAndAwaitAnswer()
