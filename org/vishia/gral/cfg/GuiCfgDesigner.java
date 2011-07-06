@@ -69,9 +69,10 @@ public class GuiCfgDesigner
     dialogFieldHeight = dialogWindowProps.addTextField("height", true, "size-y", 't');
     //dialogWindowProps.addText(" x ", 'B', 0);
     dialogFieldWidth = dialogWindowProps.addTextField("width", true, "size-x", 't');
-    dialogWindowProps.setPosition(23, 2, 3, 10, 'r');
-    dialogButtonOk = dialogWindowProps.addButton("OK", actionOk, null, null, null, "OK");
+    dialogWindowProps.setPosition(23, 2, 3, 8, 'r');
     dialogButtonEsc = dialogWindowProps.addButton("esc", actionEsc, null, null, null, "esc");
+    dialogButtonOk = dialogWindowProps.addButton("del", actionDel, null, null, null, "del");
+    dialogButtonOk = dialogWindowProps.addButton("OK", actionOk, null, null, null, "OK");
     
   }
   
@@ -134,7 +135,10 @@ public class GuiCfgDesigner
         sFormat = cfge.widgetType.format;
         sShowMethod = cfge.widgetType.showMethod;
         sActionMethod = cfge.widgetType.userAction;
-        sLine = "" + cfge.positionInput.xPos + (cfge.positionInput.xPosFrac !=0 ? "." + cfge.positionInput.xPosFrac : "");
+        sLine = (cfge.positionInput.yPosRelative ? "&" : "") + cfge.positionInput.yPos + (cfge.positionInput.yPosFrac !=0 ? "." + cfge.positionInput.yPosFrac : "");
+        sColumn = (cfge.positionInput.xPosRelative ? "&" : "") + cfge.positionInput.xPos + (cfge.positionInput.xPosFrac !=0 ? "." + cfge.positionInput.xPosFrac : "");
+        sHeight = "" + cfge.positionInput.ySizeDown + (cfge.positionInput.ySizeFrac !=0 ? "." + cfge.positionInput.ySizeFrac : "");
+        sWidth = "" + cfge.positionInput.xWidth + (cfge.positionInput.xSizeFrac !=0 ? "." + cfge.positionInput.xSizeFrac : "");
         dialogFieldName.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sName ==null ? "" : sName);
         dialogFieldDatapath.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sDataPath == null ? "" : sDataPath);
         dialogFieldText.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sText ==null ? "" : sText);
@@ -142,6 +146,9 @@ public class GuiCfgDesigner
         dialogFieldShow.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sShowMethod ==null ? "" : sShowMethod);
         dialogFieldAction.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sActionMethod ==null ? "" : sActionMethod);
         dialogFieldLine.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sLine);
+        dialogFieldColumn.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sColumn);
+        dialogFieldHeight.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sHeight);
+        dialogFieldWidth.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, sWidth);
       } else {
         dialogFieldName.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, "ERROR cfge");
       }
@@ -157,6 +164,11 @@ public class GuiCfgDesigner
         String sDataPath = dialogFieldDatapath.getValue();
         String sText = dialogFieldText.getValue();
         String sFormat = dialogFieldFormat.getValue();
+        String sLine = dialogFieldLine.getValue();
+        String sColumn = dialogFieldColumn.getValue();
+        String sWidth = dialogFieldWidth.getValue();
+        String sHeight = dialogFieldHeight.getValue();
+        
         GuiCfgData.GuiCfgElement cfge = widgdInDialog.getCfgElement();
         if(cfge !=null){
           String sPanel = cfge.position.panel;  //Note: The cloned Object maybe empty here before buildWidget() is called
@@ -169,6 +181,13 @@ public class GuiCfgDesigner
           cfge.widgetType.info = sDataPath.trim().length() >0 ? sDataPath : null;
           cfge.widgetType.text = sText.trim().length() >0 ? sText : null;
           cfge.widgetType.format = sFormat.trim().length() >0 ? sFormat : null;
+          boolean bOk;
+          bOk = cfge.positionInput.setPosElement('y', sLine.trim());          
+          bOk = bOk && cfge.positionInput.setPosElement('x', sColumn.trim());          
+          bOk = bOk && cfge.positionInput.setPosElement('h', sHeight.trim());          
+          bOk = bOk && cfge.positionInput.setPosElement('w', sWidth.trim());
+          if(!bOk)
+            stop();
           mng.remove(widgdInDialog);  //remove the widget.
           mng.selectPanel(sPanel);
           cfgBuilder.buildWidget(cfge);
@@ -180,6 +199,26 @@ public class GuiCfgDesigner
     
   };
 
+  
+  
+  
+  private UserActionGui actionDel = new UserActionGui()
+  { @Override public void userActionGui(String sIntension, WidgetDescriptor widgd, Object... params)
+    { //note widgd is the OK-button!
+      if(widgdInDialog !=null){
+        mng.remove(widgdInDialog);  //remove the widget.
+        dialogWindowProps.setWindowVisible(false);
+        widgdInDialog = null;
+      }
+    }
+    
+  };
+
+  
+  
+  
+  
+  
   
   private UserActionGui actionEsc = new UserActionGui()
   { @Override public void userActionGui(String sIntension, WidgetDescriptor widgd, Object... params)
