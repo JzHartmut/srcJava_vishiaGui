@@ -71,7 +71,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
         mode = 0;
         sMask1 = sLocalDir1.substring(posSlash+1);
         if(sMask1.indexOf('*') >=0){ //contains an asterix
-          sLocalDir1 = sLocalDir1.substring(0, posSlash);
+          sLocalDir1 = posSlash >=0 ? sLocalDir1.substring(0, posSlash) : "";
         } else {
           sMask1 = null;  //no mask, sLocalDir is a directory.  
         }
@@ -229,7 +229,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
     this.cfgData = data;
     File currentDir = fileCfg.getParentFile();
     this.cfgBuilder = new GuiCfgBuilder(cfgData, this, currentDir);
-    cfgBuilder.buildGui();
+    cfgBuilder.buildGui(log, 0);
     this.designer = new GuiCfgDesigner(cfgBuilder, this, log);  ///
     this.bDesignMode = true;
   }

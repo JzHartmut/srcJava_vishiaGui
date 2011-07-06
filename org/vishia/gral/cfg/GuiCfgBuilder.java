@@ -13,6 +13,7 @@ import org.vishia.gral.GuiPanelMngBuildIfc;
 import org.vishia.gral.UserActionGui;
 import org.vishia.gral.WidgetDescriptor;
 import org.vishia.gral.cfg.GuiCfgData.GuiCfgElement;
+import org.vishia.msgDispatch.LogMessage;
 
 public class GuiCfgBuilder
 {
@@ -47,7 +48,13 @@ public class GuiCfgBuilder
     return cfge;
   }
   
-  public String buildGui()
+  /**Builds the gui with the given {@link GuiCfgData} cfgData.
+   * 
+   * @param log maybe null, errors and warnings are written
+   * @param msgIdent The message identification for output.
+   * @return null if ok, elsewhere the error hints which are written to log, one per line.
+   */
+  public String buildGui(LogMessage log, int msgIdent)
   {
     String sError = null;
 
@@ -55,6 +62,9 @@ public class GuiCfgBuilder
       GuiCfgData.GuiCfgPanel panel = panelEntry.getValue();
       String sErrorPanel = buildPanel(panel);  
       if(sErrorPanel !=null){
+        if(log !=null){
+          log.sendMsg(msgIdent, "GUIPanelMng - cfg error; %s", sErrorPanel);
+        }
         if(sError == null){ sError = sErrorPanel; }
         else { sError += "\n" + sErrorPanel; }
       }

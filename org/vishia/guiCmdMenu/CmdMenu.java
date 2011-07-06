@@ -2,21 +2,22 @@ package org.vishia.guiCmdMenu;
 
 import java.io.File;
 
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.GuiDialogZbnfControlled;
 import org.vishia.gral.GuiDispatchCallbackWorker;
 import org.vishia.gral.GuiPanelMngBuildIfc;
 import org.vishia.gral.GuiPanelMngWorkingIfc;
+import org.vishia.gral.GuiPlugUser_ifc;
 import org.vishia.gral.TabPanel;
 import org.vishia.gral.UserActionGui;
 import org.vishia.gral.WidgetCmpnifc;
 import org.vishia.gral.WidgetDescriptor;
+import org.vishia.gral.cfg.GuiCfgData;
+import org.vishia.gral.cfg.GuiCfgZbnf;
+import org.vishia.guiInspc.InspcPlugUser_ifc;
 import org.vishia.inspector.Inspector;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
-import org.vishia.mainGuiSwt.GridPanelSwt;
 import org.vishia.mainGuiSwt.GuiPanelMngSwt;
 import org.vishia.mainGuiSwt.MainCmdSwt;
 import org.vishia.mainGuiSwt.PropertiesGuiSwt;
@@ -52,13 +53,17 @@ private final Report console;
 static class CallingArguments
 {
   /**Name of the config-file for the Gui-appearance. */
-  String sFileGui;
+  //String sFileGui;
   
-  /**Directory where sFileCfg is placed, with / on end. The current dir if sFileCfg is given without path. */
-  String sParamBin;
+  /**The configuration file. It is created while parsing arguments.
+   * The file is opened and closed while the configuration is used to build the GUI.
+   * The file is used to write on menu-save action.
+   */
+  private File fileGuiCfg;
   
-  String sFileCtrlValues;
-  
+  /**File with the values from the S7 to show. */
+  String sFileOamValues;
+
   String sPathZbnf = "GUI";
   
   /**The time zone to present all time informations. */
@@ -66,11 +71,27 @@ static class CallingArguments
   
   /**Size, either A,B or F for 800x600, 1024x768 or full screen. */
   String sSize;
+  
+  /**The own ipc-address for Interprocess-Communication with the target.
+   * It is a string, which determines the kind of communication.
+   * For example "UDP:0.0.0.0:60099" to create a socket port for UDP-communication.
+   */
+  String sOwnIpcAddr;
+  
+  /**A class which is used as plugin for user specifies. It is of interface {@link InspcPlugUser_ifc}. */
+  String sPluginClass;
+  
 } //class CallingArguments
 
 
 
-final CallingArguments callingArguments;
+
+/**The calling arguments of this class. It may be filled by command line invocation 
+ * but maybe given in a direct way too while calling this class in a Java environment. */
+final CallingArguments cargs;
+
+/**The configuration data for graphical appearance. */
+final GuiCfgData guiCfgData = new GuiCfgData();
 
 
 
@@ -80,6 +101,9 @@ final CallingArguments callingArguments;
 GuiDialogZbnfControlled dialogZbnfConfigurator;   
 
 
+
+/**Some actions may be processed by a user implementation. */
+GuiPlugUser_ifc user;
 
 
 
@@ -136,21 +160,23 @@ private static class CmdLineAndGui extends MainCmdSwt
   { boolean bOk = true;  //set to false if the argc is not passed
     try {
       if(arg.startsWith("-gui="))      
-      { cargs.sFileGui = getArgument(5);  //the graphic GUI-appearance 
+      { cargs.fileGuiCfg = new File(getArgument(5));  //the graphic GUI-appearance
+      
       }
-        else if(arg.startsWith("-parambin=")) 
-        { cargs.sParamBin = getArgument(10);   //an example for default output
-        }
-        else if(arg.startsWith("-ctrlbin=")) 
-        { cargs.sFileCtrlValues = getArgument(9);   //an example for default output
-        }
-        else if(arg.startsWith("-timeZone=")) 
-        { cargs.sTimeZone = getArgument(10);   //an example for default output
-        }
-        else if(arg.startsWith("-size=")) 
-        { cargs.sSize = getArgument(6);   //an example for default output
-        }
-        else if(arg.startsWith("-_")) 
+      else if(arg.startsWith("-ownIpc=")) 
+      { cargs.sOwnIpcAddr = getArgument(8);   //an example for default output
+      }
+      else if(arg.startsWith("-timeZone=")) 
+      { cargs.sTimeZone = getArgument(10);   //an example for default output
+      }
+      else if(arg.startsWith("-size=")) 
+      { cargs.sSize = getArgument(6);   //an example for default output
+      }
+      else if(arg.startsWith("-plugin=")) 
+      { cargs.sPluginClass = getArgument(8);   //an example for default output
+      }
+      
+      else if(arg.startsWith("-_")) 
       { //accept but ignore it. Commented calling arguments.
       }
       else 
@@ -209,8 +235,6 @@ GuiDispatchCallbackWorker initGuiDialog = new GuiDispatchCallbackWorker()
     //Creates a Tab-Panel:
     TabPanel tabPanel = panelMng.createTabPanel(null);
     tabPanel.addGridPanel("operation", "&Operation",1,1,10,10);
-    tabPanel.addGridPanel("panel2", "&Panel_" +
-            "2",1,1,10,10);
       
     gui.addFrameArea(1,1,3,1, tabPanel.getGuiComponent()); //dialogPanel);
     //##
@@ -235,32 +259,12 @@ GuiDispatchCallbackWorker configGuiWithZbnf = new GuiDispatchCallbackWorker()
 {
   
   @Override public void doBeforeDispatching(boolean onlyWakeup){
-    char sizeArg = callingArguments.sSize == null ? 'A' : callingArguments.sSize.charAt(0);
-      switch(sizeArg){
-      case 'F':   gui.setTitleAndSize("GUI", 0, 0, -1, -1); break;
-      case 'A': gui.setTitleAndSize("GUI", 500, 100, 800, 600); break;
-      case 'a': gui.setTitleAndSize("GUI", 50, 100, 512, 396); break;
-      case 'b': gui.setTitleAndSize("GUI", 50, 100, 640, 480); break;
-      case 'c': gui.setTitleAndSize("GUI", 50, 100, 800, 600); break;
-      case 'D': gui.setTitleAndSize("GUI", 50, 100, 1024, 768); break;
-      case 'E': gui.setTitleAndSize("GUI", 50, 100, 1200, 1050); break;
-      default: gui.setTitleAndSize("GUI", 500, 100, -1, 800); break;
-    }
-    try { 
-      File fileGui = new File(callingArguments.sFileGui);
-      
-      dialogZbnfConfigurator.configureWithZbnf("Sample Gui", fileGui, panelBuildIfc);
+    gui.setTitleAndSize("GUI", 50, 100, 1200, 900);
+    panelBuildIfc.buildCfg(guiCfgData, cargs.fileGuiCfg);
     
-    }  
-    catch(Exception exception)
-    { //catch the last level of error. No error is reported direct on command line!
-      gui.writeError("Uncatched Exception on main level:", exception);
-      gui.writeStackTrace(exception);
-      gui.setExitErrorLevel(MainCmd_ifc.exitWithErrors);
-    }
-      gui.removeDispatchListener(this);    
-      
-      countExecution();
+    gui.removeDispatchListener(this);    
+    
+    countExecution();
       
   }
 ////
@@ -283,8 +287,29 @@ GuiDispatchCallbackWorker configGuiWithZbnf = new GuiDispatchCallbackWorker()
 CmdMenu(CallingArguments cargs, MainCmdSwt gui) 
 { this.gui = gui;
   boolean bOk = true;
-  this.callingArguments = cargs;
+  this.cargs = cargs;
   this.console = gui;  
+
+  if(cargs.sPluginClass !=null){
+    try{
+      Class<?> pluginClass = Class.forName(cargs.sPluginClass);
+      Object oUser = pluginClass.newInstance();
+      if(oUser instanceof GuiPlugUser_ifc){
+        user = (GuiPlugUser_ifc) oUser;
+      } else {
+        console.writeError("user-plugin - fault type: " + cargs.sPluginClass 
+          + "; it should be type of GuiPlugUser_ifc");
+      }
+    } catch (Exception exc){
+      user = null;
+      console.writeError("user-plugin - cannot instantiate: " + cargs.sPluginClass + "; "
+        + exc.getMessage());
+    }
+  }
+  
+  if(user !=null){
+    user.init(console.getLogMessageOutputConsole());
+  }
   
   inspector = new Inspector("UDP:127.0.0.1:60088");
   inspector.start(this);
@@ -292,7 +317,7 @@ CmdMenu(CallingArguments cargs, MainCmdSwt gui)
   //Creates a panel manager to work with grid units and symbolic access.
     //Its properties:  //##
   final char sizePixel;
-  char sizeArg = callingArguments.sSize == null ? 'A' : callingArguments.sSize.charAt(0);
+  char sizeArg = cargs.sSize == null ? 'A' : cargs.sSize.charAt(0);
       switch(sizeArg){
       case 'F':   sizePixel = 'D'; break;
       case 'A': sizePixel = 'D'; break;
@@ -309,13 +334,13 @@ CmdMenu(CallingArguments cargs, MainCmdSwt gui)
   panelBuildIfc = panelMng;
   dlgAccess = panelMng;
   
+  if(user !=null){
+    user.registerMethods(panelBuildIfc);
+  }
   
   //create the basic appearance of the GUI. The execution sets dlgAccess:
   gui.addDispatchListener(initGuiDialog);
   if(!initGuiDialog.awaitExecution(1, 10000)) throw new RuntimeException("unexpected fail of execution initGuiDialog");
-      
-  //fileHandlerUcell = new FileViewer(panelMng);
-  
       
       
   /**Creates the dialog elements while reading a config-file. */
@@ -327,26 +352,37 @@ CmdMenu(CallingArguments cargs, MainCmdSwt gui)
   
   //dialogVellMng.re
   boolean bConfigDone = false;
-  if(cargs.sFileGui != null){
-      //configGuiWithZbnf.ctDone(0);  //counter for done initialized.
+  if(cargs.fileGuiCfg != null){
+    //configGuiWithZbnf.ctDone(0);  //counter for done initialized.
+    if(cargs.fileGuiCfg.exists())
+    {
       File fileSyntax = new File(cargs.sPathZbnf + "/dialog.zbnf");
-      dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
-      gui.addDispatchListener(configGuiWithZbnf);
-      bConfigDone = configGuiWithZbnf.awaitExecution(1, 10000);
+      GuiCfgZbnf cfgZbnf = new GuiCfgZbnf(console, fileSyntax);
+      
+      String sError = cfgZbnf.configureWithZbnf(cargs.fileGuiCfg, guiCfgData);
+      if(sError !=null){
+        console.writeError(sError);
+      } else {
+        //dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
+        //cfgBuilder = new GuiCfgBuilder(guiCfgData, panelBuildIfc, fileGui.getParentFile());
+        //panelBuildIfc.setCfgBuilder(cfgBuilder);
+        gui.addDispatchListener(configGuiWithZbnf);
+        bConfigDone = configGuiWithZbnf.awaitExecution(1, 10000);
+        if(!bConfigDone){
+          console.writeError("No configuration");
+        } else {
+          try{ Thread.sleep(10);} catch(InterruptedException exc){}
+          //The GUI-dispatch-loop should know the change worker of the panel manager. Connect both:
+          gui.addDispatchListener(panelBuildIfc.getTheGuiChangeWorker());
+          try{ Thread.sleep(10);} catch(InterruptedException exc){}
+          //gets all prepared fields to show informations.
+          //oamShowValues.setFieldsToShow(panelBuildIfc.getShowFields());
+        }  
+      }
+    } else {
+      console.writeError("Config file not found: " + cargs.fileGuiCfg.getAbsolutePath());
+    }
   }    
-  //assigns the fields which are visible to the oamOutValues-Manager to fill it with the values.
-  if(!bConfigDone){
-      console.writeError("No configuration");
-  } else {
-      try{ Thread.sleep(10);} catch(InterruptedException exc){}
-      //The GUI-dispatch-loop should know the change worker of the panel manager. Connect both:
-      gui.addDispatchListener(panelBuildIfc.getTheGuiChangeWorker());
-      try{ Thread.sleep(10);} catch(InterruptedException exc){}
-      //gets all prepared fields to show informations.
-      //oamShowValues.setFieldsToShow(panelBuildIfc.getShowFields());
-  }  
-
-  //msgReceiver.test(); //use it after initGuiDialog!
   
 }
 

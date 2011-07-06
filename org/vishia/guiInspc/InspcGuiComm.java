@@ -83,9 +83,9 @@ public class InspcGuiComm
           StringFormatter format;
           if(value == 0.0f){ sShow = "0.0"; }
           else if(valueAbs < 1e-5){ sShow = "0.00001"; }  //shorten output, don't show exponent.
-          else if(valueAbs >= 1e3){ sShow = String.format("%3.1f k", value/1000); }  //shorten output, don't show exponent.
-          else if(valueAbs >= 1e6){ sShow = String.format("%3.1f M", value/1000000); }  //shorten output, don't show exponent.
-          else if(valueAbs >= 1e9){ sShow = String.format("%3.1g", value); }  //shorten output, don't show exponent.
+          else if(valueAbs >= 1e3){ sShow = String.format("%3.3f k", value/1000); }  //shorten output, don't show exponent.
+          else if(valueAbs >= 1e6){ sShow = String.format("%3.3f M", value/1000000); }  //shorten output, don't show exponent.
+          else if(valueAbs >= 1e9){ sShow = String.format("%3.3g", value); }  //shorten output, don't show exponent.
           //else if(valueAbs >= 1e6){ sShow = Float.toString(value/1000000) + " M"; }  //shorten output, don't show exponent.
           else { sShow = Float.toString(value); }
         }
