@@ -22,7 +22,6 @@ import org.vishia.mainGuiSwt.GuiPanelMngSwt;
 import org.vishia.mainGuiSwt.MainCmdSwt;
 import org.vishia.mainGuiSwt.PropertiesGuiSwt;
 import org.vishia.msgDispatch.LogMessage;
-import org.vishia.util.FileSystem;
 
 public class BzrGui
 {
@@ -67,14 +66,11 @@ public class BzrGui
 
     /**Size, either A,B or F for 800x600, 1024x768 or full screen. */
     String sSize;
-    
-    /**This file contains all bzr commands and the pathes of the users sandboxes. */
-    File fileCfg;
   } //class CallingArguments
 
 
 
-  final CallingArguments cargs;
+  final CallingArguments callingArguments;
 
 
 
@@ -125,13 +121,13 @@ public class BzrGui
    */
   BzrGui(CallingArguments cargs, CmdLineAndGui gui) 
   { boolean bOk = true;
-    this.cargs = cargs;
+    this.callingArguments = cargs;
     this.console = gui;  
     
       //Creates a panel manager to work with grid units and symbolic access.
     //Its properties:  //##
     final char sizePixel;
-    char sizeArg = cargs.sSize == null ? 'A' : cargs.sSize.charAt(0);
+    char sizeArg = callingArguments.sSize == null ? 'A' : callingArguments.sSize.charAt(0);
     switch(sizeArg){
     case 'F':   sizePixel = 'D'; break;
     case 'A': sizePixel = 'D'; break;
@@ -149,7 +145,8 @@ public class BzrGui
     
     mainData = new MainData(gui);
     
-    String sError = mainData.cfg.readConfig(cargs.fileCfg);
+    File fileCfg = new File("D:/Bzr/bzrGui.cfg");
+    String sError = mainData.cfg.readConfig(fileCfg);
     if(sError !=null){
     	gui.writeError(sError);
     }
@@ -265,7 +262,7 @@ public class BzrGui
   {
 
     @Override public void doBeforeDispatching(boolean onlyWakeup){
-      char sizeArg = cargs.sSize == null ? 'A' : cargs.sSize.charAt(0);
+      char sizeArg = callingArguments.sSize == null ? 'A' : callingArguments.sSize.charAt(0);
       switch(sizeArg){
       case 'F':   guix.setTitleAndSize("GUI", 0, 0, -1, -1); break;
       case 'A': guix.setTitleAndSize("GUI", 500, 100, 800, 600); break;
@@ -392,10 +389,6 @@ public class BzrGui
       if(arg.startsWith("-gui="))      
       { cargs.sFileGui = getArgument(5);  //the graphic GUI-appearance 
       }
-      else if(arg.startsWith("-cfg=")){      
-        String sPath = FileSystem.absolutePath(getArgument(5), null);
-        cargs.fileCfg = new File(sPath);
-      }  
       else if(arg.startsWith("-parambin=")) 
       { cargs.sParamBin = getArgument(10);   //an example for default output
       }

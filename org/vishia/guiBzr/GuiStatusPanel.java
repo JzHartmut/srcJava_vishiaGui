@@ -10,6 +10,7 @@ import org.vishia.gral.SwitchExclusiveButtonMng;
 import org.vishia.gral.UserActionGui;
 import org.vishia.gral.WidgetDescriptor;
 import org.vishia.mainGuiSwt.InfoBox;
+import org.vishia.util.FileSystem;
 
 /**This class contains all data and methods of the status (select) panel.
  * 
@@ -118,7 +119,7 @@ public class GuiStatusPanel
     */
     //Test only in one Project
     widgdProjektpath.setValue(GuiPanelMngWorkingIfc.cmdInsert, 0,sPrjPath);
-    mainData.currPrj = new DataProject(sPrjPath);
+    mainData.currPrj = new DataProject(FileSystem.absolutePath(sPrjPath, null));
     
   }
   
@@ -148,7 +149,7 @@ public class GuiStatusPanel
   {
     String sProjectPath = widgdProjektpath.getValue();
     //
-    mainData.getterStatus.getBzrLocations(sProjectPath);
+    mainData.getterStatus.getBzrLocations(FileSystem.absolutePath(sProjectPath, null));
     //
     cleanComponentsInfoSelectBoxes();
     switchExcluder = new SwitchExclusiveButtonMng();
