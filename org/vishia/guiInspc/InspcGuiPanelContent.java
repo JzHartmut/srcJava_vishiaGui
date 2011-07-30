@@ -3,6 +3,7 @@ package org.vishia.guiInspc;
 import java.util.List;
 import java.util.Queue;
 
+import org.vishia.gral.GuiPlugUser_ifc;
 import org.vishia.gral.PanelActivatedGui;
 import org.vishia.gral.WidgetDescriptor;
 
@@ -23,13 +24,13 @@ public class InspcGuiPanelContent
   
 
   /**Some actions may be processed by a user implementation. */
-  final InspcPlugUser_ifc user;
+  private final GuiPlugUser_ifc user;
   
 
   
   
   
-  public InspcGuiPanelContent(InspcPlugUser_ifc user)
+  public InspcGuiPanelContent(GuiPlugUser_ifc user)
   { this.user = user;
   }
 
@@ -44,7 +45,7 @@ public class InspcGuiPanelContent
   }
   
   
-  PanelActivatedGui actionPanelActivate = new PanelActivatedGui()
+  public PanelActivatedGui actionPanelActivate = new PanelActivatedGui()
   { @Override public void panelActivatedGui(Queue<WidgetDescriptor> widgets)
     {  changeWidgets(widgets);
     }
