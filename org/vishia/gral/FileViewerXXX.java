@@ -14,7 +14,7 @@ import java.util.Map;
  * @author Hartmut Schorrig
  *
  */
-public class FileViewer
+public class FileViewerXXX
 {
 	private final GuiPanelMngBuildIfc guiMng;
 	boolean bActiv;
@@ -24,7 +24,7 @@ public class FileViewer
 	
 	GuiShellMngBuildIfc shell;
 	
-	public FileViewer(GuiPanelMngBuildIfc guiMng)
+	public FileViewerXXX(GuiPanelMngBuildIfc guiMng)
 	{
 		this.guiMng = guiMng;
 		
