@@ -2,11 +2,16 @@ package org.vishia.gral;
 
 import org.vishia.msgDispatch.LogMessage;
 
+
+
+/**This interface plugs an user application to the basic GUI application. */ 
 public interface GuiPlugUser_ifc
 {
 
-  void init(LogMessage log);
+  //void init(LogMessage log);
   
+  void init(UserPlugGral_ifc inspc, LogMessage log);
+
   
   void registerMethods(org.vishia.gral.GuiPanelMngBuildIfc guiMng);
   

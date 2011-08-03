@@ -169,27 +169,14 @@ public CmdMenu(CallingArguments cargs, MainCmdSwt gui)
     }
   }
   
-  if(user !=null){
-    user.init(console.getLogMessageOutputConsole());
-  }
-  
+  userInit();
   inspector = new Inspector("UDP:127.0.0.1:60088");
   inspector.start(this);
   
   //Creates a panel manager to work with grid units and symbolic access.
     //Its properties:  //##
-  final char sizePixel;
-  char sizeArg = cargs.sSize == null ? 'A' : cargs.sSize.charAt(0);
-      switch(sizeArg){
-      case 'F':   sizePixel = 'D'; break;
-      case 'A': sizePixel = 'D'; break;
-      case 'a': sizePixel = 'A'; break;
-      case 'b': sizePixel = 'B'; break;
-      case 'c': sizePixel = 'C'; break;
-      case 'D': sizePixel = 'D'; break;
-      case 'E': sizePixel = 'E'; break;
-      default: sizePixel = 'D'; break;
-  }
+  final char sizePixel = cargs.sSize == null ? 'C' : cargs.sSize.charAt(0);
+  //for test situation
   PropertiesGuiSwt propertiesGui = new PropertiesGuiSwt(gui.getDisplay(), sizePixel);
       LogMessage log = gui.getLogMessageOutputConsole();
   panelMng = new GuiPanelMngSwt(null, gui.getContentPane(), 120,80, propertiesGui, null, log);
@@ -247,6 +234,20 @@ public CmdMenu(CallingArguments cargs, MainCmdSwt gui)
       console.writeError("Config file not found: " + cargs.fileGuiCfg.getAbsolutePath());
     }
   }    
+  
+}
+
+
+
+/**Will be overridden... TODO InspcGui
+ * 
+ */
+protected void userInit()
+{
+  if(user !=null){
+    user.init(null, console.getLogMessageOutputConsole());
+  }
+  
   
 }
 

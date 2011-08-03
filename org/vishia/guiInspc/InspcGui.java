@@ -23,6 +23,9 @@ public class InspcGui extends CmdMenu
     super(cargs, cmdgui);
     this.cargs = cargs;
     assert(user instanceof InspcPlugUser_ifc);
+    if(user !=null){
+      user.init(userInspcPlug, console.getLogMessageOutputConsole());
+    }
     this.inspcComm = new InspcGuiComm(console, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
     inspcComm.addPanel(panelContent);
 
@@ -112,6 +115,17 @@ public class InspcGui extends CmdMenu
       
     gui.addFrameArea(1,1,3,2, panelMng.tabPanel.getGuiComponent()); //dialogPanel);
    
+  }
+
+
+  
+  /**The user may contain any other routines which are Inspc-specific. 
+   * 
+   */
+  @Override public void userInit()
+  {
+    //left empty, userInit is done in its own constructor.    
+    
   }
 
 

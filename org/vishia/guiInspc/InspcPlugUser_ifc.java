@@ -9,8 +9,6 @@ import org.vishia.msgDispatch.LogMessage;
 public interface InspcPlugUser_ifc extends GuiPlugUser_ifc
 {
   
-  void init(UserInspcPlug_ifc inspc, LogMessage log);
-
   void setInspcComm(InspcGuiComm inspcCommP);
   
   /**This method is called periodically on start of requesting data all widgets in visible windows.

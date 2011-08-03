@@ -308,6 +308,7 @@ public class InspcGuiCfg
     boolean bOk = true;
     this.cargs = cargs;
     this.console = gui;  
+    if(true){ throw new RuntimeException("Deprecated. Use org.vishia.guiInspc.InspcGui.java");}
     if(cargs.sPluginClass !=null){
       try{
         Class<?> pluginClass = Class.forName(cargs.sPluginClass);
