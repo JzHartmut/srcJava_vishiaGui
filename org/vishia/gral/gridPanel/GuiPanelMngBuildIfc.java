@@ -1,4 +1,4 @@
-package org.vishia.gral.ifc;
+package org.vishia.gral.gridPanel;
 
 import java.io.File;
 import java.io.InputStream;
@@ -9,12 +9,14 @@ import java.util.Set;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.cfg.GuiCfgData;
-import org.vishia.gral.gridPanel.GuiPanelMngBase;
-import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
-import org.vishia.gral.gridPanel.PanelActivatedGui;
-import org.vishia.gral.gridPanel.PanelContent;
-import org.vishia.gral.gridPanel.TabPanel;
 import org.vishia.gral.gui.GuiDispatchCallbackWorker;
+import org.vishia.gral.ifc.ColorGui;
+import org.vishia.gral.ifc.FileDialogIfc;
+import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.ifc.GuiShellMngIfc;
+import org.vishia.gral.ifc.GuiWindowMng_ifc;
+import org.vishia.gral.ifc.UserActionGui;
+import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.gral.widget.WidgetCmpnifc;
 
 

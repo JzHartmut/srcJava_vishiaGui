@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.text.ParseException;
 
 import org.vishia.gral.gridPanel.GuiDialogZbnfControlled;
-import org.vishia.gral.ifc.GuiPanelMngBuildIfc;
+import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.mainCmd.Report;
 import org.vishia.util.StringPart;
 import org.vishia.util.StringPartFromFileLines;
@@ -68,8 +68,7 @@ public class GuiCfgZbnf
    *         using the own Report-implementation.
    */
   public String configureWithZbnf(File fileConfigurationZbnf, GuiCfgData destination)
-  { boolean bOk = true;
-    String sError = null;
+  { String sError = null;
     File dirOfconfig = fileConfigurationZbnf.getParentFile();
     
     sError = ZbnfJavaOutput.parseFileAndFillJavaObject(destination.getClass(), destination
@@ -85,12 +84,12 @@ public class GuiCfgZbnf
       spToParse = new StringPartFromFileLines(fileConfigurationZbnf, -1, null, null);
     }
     catch(FileNotFoundException exception)
-    { console.writeError("file not found:" + fileConfigurationZbnf.getAbsolutePath());
-      bOk = false;
+    { sError = "file not found:" + fileConfigurationZbnf.getAbsolutePath();
+      console.writeError(sError);
     }
     catch(IOException exception)
-    { console.writeError("file read error:" + fileConfigurationZbnf.getAbsolutePath());
-      bOk = false;
+    { sError = "file read error:" + fileConfigurationZbnf.getAbsolutePath();
+      console.writeError(sError);
     }
     if(spToParse != null)
     { //sError = configureWithZbnf(sTitle, spToParse, panel, dirOfconfig);
@@ -105,12 +104,12 @@ public class GuiCfgZbnf
    * @param spConfigurationZbnf
    * @return
    */
-  private String configureWithZbnf(String sTitle, StringPart spConfigurationZbnf, final GuiPanelMngBuildIfc panelMng, File currentDir)
+  private String configureWithZbnf(String sTitle, StringPart spConfigurationZbnf, final GuiPanelMngBuildIfc panelMng, File currentDirP)
   { boolean bOk = true;
     //int xWindows = 80 * propertiesGui.xPixelUnit();
     //int yWindows = 30 * propertiesGui.yPixelUnit();
   
-    this.currentDir = currentDir;
+    this.currentDir = currentDirP;
     ConfigureWithZbnf mdata = new ConfigureWithZbnf();
     mdata.parserCfg = new ZbnfParser(console);
     try{ 

@@ -1,10 +1,6 @@
 package org.vishia.gral.gridPanel;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Queue;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.ifc.WidgetDescriptor;

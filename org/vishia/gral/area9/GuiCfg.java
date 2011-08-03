@@ -1,4 +1,4 @@
-package org.vishia.guiCmdMenu;
+package org.vishia.gral.area9;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -9,16 +9,13 @@ import org.vishia.gral.cfg.GuiCfgData;
 import org.vishia.gral.cfg.GuiCfgZbnf;
 import org.vishia.gral.gridPanel.GuiDialogZbnfControlled;
 import org.vishia.gral.gridPanel.GuiPanelMngBase;
-import org.vishia.gral.gridPanel.TabPanel;
+import org.vishia.gral.gridPanel.GralPanelContent;
+import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.gui.GuiDispatchCallbackWorker;
-import org.vishia.gral.ifc.GuiPanelMngBuildIfc;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
 import org.vishia.gral.ifc.GuiPlugUser_ifc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
-import org.vishia.gral.widget.WidgetCmpnifc;
-import org.vishia.guiInspc.InspcGuiPanelContent;
-import org.vishia.guiInspc.InspcPlugUser_ifc;
 import org.vishia.inspector.Inspector;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
@@ -35,7 +32,7 @@ import org.vishia.msgDispatch.LogMessage;
  * @author Hartmut Schorrig.
  *
  */
-public class CmdMenu 
+public class GuiCfg 
 {
 
   /**The version.
@@ -53,6 +50,8 @@ public class CmdMenu
   
   /**To Output log informations. The ouput will be done in the output area of the graphic. */
   protected final Report console;
+
+  protected final GralPanelContent panelContent;
 
     
 
@@ -87,7 +86,7 @@ public class CmdMenu
      */
     public String sOwnIpcAddr;
     
-    /**A class which is used as plugin for user specifies. It is of interface {@link InspcPlugUser_ifc}. */
+    /**A class which is used as plugin for user specifies. It is of interface {@link PlugUser_ifc}. */
     String sPluginClass;
     
   } //class CallingArguments
@@ -118,9 +117,6 @@ protected GuiPlugUser_ifc user;
 
 
 
-protected final InspcGuiPanelContent panelContent;
-
-
 
 
 
@@ -146,9 +142,8 @@ private GuiPanelMngWorkingIfc guiAccess;
  * @param cargs The given calling arguments.
  * @param gui The GUI-organization.
  */
-public CmdMenu(CallingArguments cargs, MainCmdSwt gui) 
+public GuiCfg(CallingArguments cargs, MainCmdSwt gui) 
 { this.gui = gui;
-  boolean bOk = true;
   this.cargs = cargs;
   this.console = gui;  
 
@@ -183,10 +178,10 @@ public CmdMenu(CallingArguments cargs, MainCmdSwt gui)
   panelBuildIfc = panelMng;
   guiAccess = panelMng;
   
+  panelContent = new GralPanelContent(user);
   if(user !=null){
     user.registerMethods(panelBuildIfc);
   }
-  panelContent = new InspcGuiPanelContent(user);
   
 
   //create the basic appearance of the GUI. The execution sets dlgAccess:
@@ -493,19 +488,21 @@ public static void main(String[] args)
     bOk = false;  //not exiting, show error in GUI
   }
   
-  //String ipcFactory = "org.vishia.communication.InterProcessComm_Socket";
-  //try{ ClassLoader.getSystemClassLoader().loadClass(ipcFactory, true);
-  //}catch(ClassNotFoundException exc){
-  //  System.out.println("class not found: " + "org.vishia.communication.InterProcessComm_Socket");
-  //}
-  //Loads the named class, and its base class InterProcessCommFactory. 
-  //In that kind the calling of factory methods are regarded to socket.
-  new InterProcessCommFactorySocket();
+  if(bOk){
+    //String ipcFactory = "org.vishia.communication.InterProcessComm_Socket";
+    //try{ ClassLoader.getSystemClassLoader().loadClass(ipcFactory, true);
+    //}catch(ClassNotFoundException exc){
+    //  System.out.println("class not found: " + "org.vishia.communication.InterProcessComm_Socket");
+    //}
+    //Loads the named class, and its base class InterProcessCommFactory. 
+    //In that kind the calling of factory methods are regarded to socket.
+    
+    new InterProcessCommFactorySocket();
+    
+    GuiCfg main = new GuiCfg(cargs, gui);
   
-  CmdMenu main = new CmdMenu(cargs, gui);
-
-  main.execute();
-  
+    main.execute();
+  }    
   gui.exit();
 }
 

@@ -17,7 +17,6 @@ import org.vishia.gral.cfg.GuiCfgDesigner;
 import org.vishia.gral.cfg.GuiCfgWriter;
 import org.vishia.gral.gui.GuiMngBase;
 import org.vishia.gral.ifc.FileDialogIfc;
-import org.vishia.gral.ifc.GuiPanelMngBuildIfc;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
 import org.vishia.gral.ifc.GuiRectangle;
 import org.vishia.gral.ifc.UserActionGui;

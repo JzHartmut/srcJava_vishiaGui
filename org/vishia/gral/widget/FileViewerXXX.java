@@ -2,8 +2,8 @@ package org.vishia.gral.widget;
 
 import java.util.Map;
 
+import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
-import org.vishia.gral.ifc.GuiPanelMngBuildIfc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
 

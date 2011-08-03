@@ -13,7 +13,7 @@ public interface GuiPlugUser_ifc
   void init(UserPlugGral_ifc inspc, LogMessage log);
 
   
-  void registerMethods(org.vishia.gral.ifc.GuiPanelMngBuildIfc guiMng);
+  void registerMethods(org.vishia.gral.gridPanel.GuiPanelMngBuildIfc guiMng);
   
   /**This method is called if the view is changed. 
    * @param sTitle title of a window or panel.

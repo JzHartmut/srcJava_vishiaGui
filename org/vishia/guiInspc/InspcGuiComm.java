@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InspcDataExchangeAccess.Info;
+import org.vishia.gral.gridPanel.GralPanelContent;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
@@ -130,7 +131,7 @@ public class InspcGuiComm
    * Any Panel can be an independent window. Any panel may have other values to show.
    * But any panel can select more as one tabs (tabPanel). Then it will be select which values to show.
    */
-  private final List<InspcGuiPanelContent> listPanels = new LinkedList<InspcGuiPanelContent>();
+  private final List<GralPanelContent> listPanels = new LinkedList<GralPanelContent>();
   
 
   public ConcurrentLinkedQueue<Runnable> userOrders = new ConcurrentLinkedQueue<Runnable>();
@@ -149,7 +150,7 @@ public class InspcGuiComm
   }
   
   
-  void addPanel(InspcGuiPanelContent panel)
+  void addPanel(GralPanelContent panel)
   {
     listPanels.add(panel);
   }
@@ -186,7 +187,7 @@ public class InspcGuiComm
     bUserCalled = false;
     //
     //
-    for(InspcGuiPanelContent panel: listPanels){
+    for(GralPanelContent panel: listPanels){
       if(panel.newWidgets !=null){
         if(panel.widgets !=null){
           //remove communication request for actual widgets.

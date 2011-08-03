@@ -12,8 +12,8 @@ import org.vishia.mainCmd.Report;
 import org.vishia.util.FileSystem;
 
 import org.vishia.byteData.ByteDataSymbolicAccess;
+import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.gridPanel.PanelActivatedGui;
-import org.vishia.gral.ifc.GuiPanelMngBuildIfc;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
 import org.vishia.gral.ifc.GuiSetValueIfc;
 import org.vishia.gral.ifc.UserActionGui;

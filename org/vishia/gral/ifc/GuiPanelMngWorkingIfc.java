@@ -4,7 +4,12 @@ import java.util.Queue;
 
 
 /**This is a unique interface for the GUI-panel-manager to work with it.
- * To build the graphical application see {@link GuiPanelMngBuildIfc}. 
+ * To build the graphical application see {@link org.vishia.gral.gridPanel.GuiPanelMngBuildIfc}.
+ * This interface supports handling with all widgets in a GUI. 
+ * The widgets were selected by identifier or with their {@link WidgetDescriptor} instance
+ * whereby the implementation environment of a widget may be known. That implementation environment
+ * is a implementor of this interface.
+ *   
  * @author Hartmut Schorrig
  *
  */

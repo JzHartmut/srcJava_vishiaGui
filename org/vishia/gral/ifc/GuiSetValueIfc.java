@@ -1,5 +1,10 @@
 package org.vishia.gral.ifc;
 
+/**Interface for all widgets which can represent a float value maybe showing or regarding a minimal and maximal value.
+ * It is applicable commonly.
+ * @author Hartmut Schorrig
+ *
+ */
 public interface GuiSetValueIfc
 {
 

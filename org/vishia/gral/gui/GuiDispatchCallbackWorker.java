@@ -5,7 +5,8 @@ package org.vishia.gral.gui;
  * @author Hartmut Schorrig.
  *
  */
-public abstract class GuiDispatchCallbackWorker {
+public abstract class GuiDispatchCallbackWorker 
+{
 	private int ctDone = 0;
 	private boolean reqCtDone = false;
 

@@ -2,7 +2,7 @@ package org.vishia.guiBzr;
 
 import java.io.File;
 
-import org.vishia.gral.ifc.GuiPanelMngBuildIfc;
+import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.mainCmd.Report;

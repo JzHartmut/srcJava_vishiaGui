@@ -5,11 +5,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.communication.InterProcessCommFactorySocket;
-import org.vishia.guiCmdMenu.CmdMenu;
+import org.vishia.gral.area9.GuiCfg;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainGuiSwt.MainCmdSwt;
 
-public class InspcGui extends CmdMenu
+public class InspcGui extends GuiCfg
 {
 
   /**The communication manager. */
@@ -17,7 +17,8 @@ public class InspcGui extends CmdMenu
   
   private final CallingArguments cargs;
 
-  
+
+
   InspcGui(CallingArguments cargs, MainCmdSwt cmdgui)
   {
     super(cargs, cmdgui);
@@ -33,7 +34,7 @@ public class InspcGui extends CmdMenu
   
   
   
-  private static class CallingArguments extends CmdMenu.CallingArguments
+  private static class CallingArguments extends GuiCfg.CallingArguments
   {
     /**The target ipc-address for Interprocess-Communication with the target.
      * It is a string, which determines the kind of communication.
@@ -50,7 +51,7 @@ public class InspcGui extends CmdMenu
   
   /**Organisation class for the GUI.
    */
-  private static class CmdLineAndGui extends CmdMenu.CmdLineAndGui
+  private static class CmdLineAndGui extends GuiCfg.CmdLineAndGui
   {
 
     /**Aggregation to given instance for the command-line-argument. The instance can be arranged anywhere else.

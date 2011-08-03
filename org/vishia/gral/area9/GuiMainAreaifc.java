@@ -1,6 +1,5 @@
 package org.vishia.gral.area9;
 
-import org.eclipse.swt.widgets.Control;
 import org.vishia.gral.gui.GuiDispatchCallbackWorker;
 import org.vishia.gral.widget.Widgetifc;
 

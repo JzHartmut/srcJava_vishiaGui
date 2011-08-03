@@ -2,15 +2,13 @@ package org.vishia.gral.cfg;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.gral.cfg.GuiCfgData.GuiCfgElement;
-import org.vishia.gral.ifc.GuiPanelMngBuildIfc;
+import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.msgDispatch.LogMessage;
@@ -205,7 +203,6 @@ public class GuiCfgBuilder
       widgd = gui.addText(cfge.widgetType.text, wText.size.charAt(0), colorValue);
     } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgLed){
       GuiCfgData.GuiCfgLed ww = (GuiCfgData.GuiCfgLed)cfge.widgetType;
-      final int colorValue;
       widgd = gui.addLed(sName, ww.showMethod, sDataPath);
       
     } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgImage){
@@ -220,7 +217,7 @@ public class GuiCfgBuilder
       }
       
     } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgShowField){
-      GuiCfgData.GuiCfgShowField wShow = (GuiCfgData.GuiCfgShowField)cfge.widgetType;
+      //GuiCfgData.GuiCfgShowField wShow = (GuiCfgData.GuiCfgShowField)cfge.widgetType;
       widgd = gui.addTextField(sName, false, null, '.');
       widgd.setDataPath(sDataPath);
     } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgInputFile){

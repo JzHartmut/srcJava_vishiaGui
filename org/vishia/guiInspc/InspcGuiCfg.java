@@ -14,10 +14,11 @@ import org.vishia.gral.cfg.GuiCfgData;
 import org.vishia.gral.cfg.GuiCfgZbnf;
 import org.vishia.gral.gridPanel.GuiDialogZbnfControlled;
 import org.vishia.gral.gridPanel.GuiPanelMngBase;
+import org.vishia.gral.gridPanel.GralPanelContent;
+import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.gridPanel.PanelActivatedGui;
 import org.vishia.gral.gridPanel.TabPanel;
 import org.vishia.gral.gui.GuiDispatchCallbackWorker;
-import org.vishia.gral.ifc.GuiPanelMngBuildIfc;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
@@ -236,7 +237,7 @@ public class InspcGuiCfg
 
       
       //Creates a Tab-Panel:
-      InspcGuiPanelContent panelContent = new InspcGuiPanelContent(user);
+      GralPanelContent panelContent = new GralPanelContent(user);
       inspcComm.addPanel(panelContent);
       //create a Tab panel, on activation of any tab the panelContent will be notified.
       panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate);

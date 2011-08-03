@@ -1,9 +1,7 @@
-package org.vishia.guiInspc;
+package org.vishia.gral.gridPanel;
 
-import java.util.List;
 import java.util.Queue;
 
-import org.vishia.gral.gridPanel.PanelActivatedGui;
 import org.vishia.gral.ifc.GuiPlugUser_ifc;
 import org.vishia.gral.ifc.WidgetDescriptor;
 
@@ -12,15 +10,15 @@ import org.vishia.gral.ifc.WidgetDescriptor;
  * @author Hartmut Schorrig
  *
  */
-public class InspcGuiPanelContent
+public class GralPanelContent
 {
   /**The actual widgets in that panel. It may a sub-panel or changed content. The list can be changed. */
-  Queue<WidgetDescriptor> widgets;
+  public Queue<WidgetDescriptor> widgets;
   
   /**A new list of actual widgets, set while select another tab etc. The reference may be set 
    * in the GUI-Thread (GUI-listener). The communication-manager thread reads whether it isn't null,
    * processes it and sets this reference to null if it is processed. */
-  Queue<WidgetDescriptor> newWidgets;
+  public Queue<WidgetDescriptor> newWidgets;
   
 
   /**Some actions may be processed by a user implementation. */
@@ -30,24 +28,24 @@ public class InspcGuiPanelContent
   
   
   
-  public InspcGuiPanelContent(GuiPlugUser_ifc user)
+  public GralPanelContent(GuiPlugUser_ifc user)
   { this.user = user;
   }
 
 
   /**Changes the communication data base because another tab was activated on the TabPanel. 
-   * @param widgets The new widgets.
+   * @param newWidgets The new widgets.
    */
-  void changeWidgets(Queue<WidgetDescriptor> widgets)
+  void changeWidgets(Queue<WidgetDescriptor> newWidgetsP)
   {
-    newWidgets = widgets; //signal for other thread, there are new one.
+    this.newWidgets = newWidgetsP; //signal for other thread, there are new one.
     user.changedView("unknown yet", 0);
   }
   
   
   public PanelActivatedGui actionPanelActivate = new PanelActivatedGui()
-  { @Override public void panelActivatedGui(Queue<WidgetDescriptor> widgets)
-    {  changeWidgets(widgets);
+  { @Override public void panelActivatedGui(Queue<WidgetDescriptor> widgetsP)
+    {  changeWidgets(widgetsP);
     }
   };
 

@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.area9.GuiMainAreaifc;
-import org.vishia.gral.ifc.GuiPanelMngBuildIfc;
+import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
 import org.vishia.mainCmd.MainCmd_ifc;
 

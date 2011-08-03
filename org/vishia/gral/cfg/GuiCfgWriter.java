@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
-import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
 
 public class GuiCfgWriter
@@ -12,7 +11,7 @@ public class GuiCfgWriter
   
   final LogMessage log;
 
-  Writer ww;
+  Writer writer;
   
   public GuiCfgWriter(LogMessage log)
   { this.log = log;
@@ -20,10 +19,10 @@ public class GuiCfgWriter
   
   
   public String saveCfg(Writer dest, GuiCfgData cfg)
-  { this.ww = dest;
+  { this.writer = dest;
     String sError = null;
     try{
-      ww.append("size(500,120); ");   //TODO it isn't used yet
+      writer.append("size(500,120); ");   //TODO it isn't used yet
       writeDataReplace(cfg);
       GuiCfgData.GuiCfgElement cfge = cfg.firstElement;
       while(cfge !=null){
@@ -38,11 +37,11 @@ public class GuiCfgWriter
   
   
   void writeDataReplace(GuiCfgData cfg) throws IOException
-  { ww.append("\n");
+  { writer.append("\n");
     for( Map.Entry<String, String> entry: cfg.dataReplace.entrySet()){
-      ww.append("DataReplace: ").append(entry.getKey()).append(" = ").append(entry.getValue()).append(";\n");
+      writer.append("DataReplace: ").append(entry.getKey()).append(" = ").append(entry.getValue()).append(";\n");
     }
-    ww.append("\n");
+    writer.append("\n");
     
   }
   
@@ -94,63 +93,63 @@ public class GuiCfgWriter
 
   
   void writeShowField(GuiCfgData.GuiCfgShowField ee) throws IOException
-  { String sep = "";
-    ww.append("Show(");
+  { //String sep = "";
+    writer.append("Show(");
     writeParam(ee);
-    ww.append("); ");
+    writer.append("); ");
   }
 
   
   void writeLed(GuiCfgData.GuiCfgLed ee) throws IOException
-  { String sep = "";
-    ww.append("Led(");
+  { //String sep = "";
+    writer.append("Led(");
     writeParam(ee);
-    ww.append("); ");
+    writer.append("); ");
   }
 
   
   void writeImage(GuiCfgData.GuiCfgImage ee) throws IOException
   { //String sep = "";
-    ww.append("Imagefile(file=\"");
-    ww.append(ee.file_).append("\"");
+    writer.append("Imagefile(file=\"");
+    writer.append(ee.file_).append("\"");
     writeParam(ee, ",");
-    ww.append(");\n");
+    writer.append(");\n");
   }
 
   
   
   void writeInputFile(GuiCfgData.GuiCfgInputFile ee) throws IOException
   { //String sep = "";
-    ww.append("InputFile(");
+    writer.append("InputFile(");
     writeParam(ee);
-    ww.append(");\n");
+    writer.append(");\n");
   }
 
   
   
   void writeButton(GuiCfgData.GuiCfgButton ee) throws IOException
   { //String sep = "";
-    ww.append("Button(");
+    writer.append("Button(");
     writeParam(ee);
-    ww.append(");\n");
+    writer.append(");\n");
   }
 
   
   
   void writeText(GuiCfgData.GuiCfgText ee) throws IOException
-  { String sep = "";
-    ww.append("Text(");
+  { //String sep = "";
+    writer.append("Text(");
     writeParam(ee);
-    ww.append("); ");
+    writer.append("); ");
   }
 
   
   
   void writeUnknown(GuiCfgData.WidgetTypeBase ee) throws IOException
-  { String sep = "";
-    ww.append("Unknown(");
+  { //String sep = "";
+    writer.append("Unknown(");
     writeParam(ee);
-    ww.append("); ");
+    writer.append("); ");
   }
 
   
@@ -162,16 +161,16 @@ public class GuiCfgWriter
   
   private void writeParam(GuiCfgData.WidgetTypeBase pp, String sep) throws IOException
   { //String sep = "";
-    if(pp.text !=null)      { ww.            append("\"")       .append(pp.text).append("\""); sep = ", "; }
-    if(pp.name !=null)      { ww.append(sep).append("name=")    .append(pp.name); sep = ", "; }
-    if(pp.cmd  !=null)      { ww.append(sep).append("cmd=\"")   .append(pp.cmd).append("\"");  sep = ", "; }
-    if(pp.showMethod !=null){ ww.append(sep).append("show=\"")  .append(pp.showMethod).append("\""); sep = ", "; }
-    if(pp.format !=null)    { ww.append(sep).append("format=\"").append(pp.format).append("\""); sep = ", "; }
-    if(pp.type !=null)      { ww.append(sep).append("type=")    .append(pp.type); sep = ", "; }
-    if(pp.info !=null)      { ww.append(sep).append("info=\"")  .append(pp.info).append("\""); sep = ", "; }
-    if(pp.userAction !=null){ ww.append(sep).append("action=")  .append(pp.userAction); sep = ", "; }
-    if(pp.color0 !=null)    { ww.append(sep).append("color=")   .append(pp.color0.color); 
-      if(pp.color0 !=null)    { ww.append("/").append(pp.color1.color); }  sep = ", "; }
+    if(pp.text !=null)      { writer.            append("\"")       .append(pp.text).append("\""); sep = ", "; }
+    if(pp.name !=null)      { writer.append(sep).append("name=")    .append(pp.name); sep = ", "; }
+    if(pp.cmd  !=null)      { writer.append(sep).append("cmd=\"")   .append(pp.cmd).append("\"");  sep = ", "; }
+    if(pp.showMethod !=null){ writer.append(sep).append("show=\"")  .append(pp.showMethod).append("\""); sep = ", "; }
+    if(pp.format !=null)    { writer.append(sep).append("format=\"").append(pp.format).append("\""); sep = ", "; }
+    if(pp.type !=null)      { writer.append(sep).append("type=")    .append(pp.type); sep = ", "; }
+    if(pp.info !=null)      { writer.append(sep).append("info=\"")  .append(pp.info).append("\""); sep = ", "; }
+    if(pp.userAction !=null){ writer.append(sep).append("action=")  .append(pp.userAction); sep = ", "; }
+    if(pp.color0 !=null)    { writer.append(sep).append("color=")   .append(pp.color0.color); 
+      if(pp.color0 !=null)    { writer.append("/").append(pp.color1.color); }  sep = ", "; }
   }
 
   

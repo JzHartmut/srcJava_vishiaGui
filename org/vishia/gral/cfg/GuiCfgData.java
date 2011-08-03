@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.vishia.gral.ifc.GuiPanelMngBuildIfc;
+import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.ifc.WidgetCfg_ifc;
 
 
@@ -425,7 +425,6 @@ public final class GuiCfgData
     
     public GuiCfgCurveLine(GuiCfgElement itsElement){ super(itsElement); }
     
-    public String name;
     public int colorValue = -1;
     public float offset, scale;
     public int nullLine;

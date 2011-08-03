@@ -1,6 +1,5 @@
 package org.vishia.gral.ifc;
 
-import java.io.File;
 
 public interface FileDialogIfc
 {

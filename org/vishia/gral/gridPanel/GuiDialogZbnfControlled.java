@@ -13,7 +13,6 @@ import java.util.TreeMap;
 import java.text.ParseException;
 
 
-import org.vishia.gral.ifc.GuiPanelMngBuildIfc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.mainCmd.MainCmd_ifc;

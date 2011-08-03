@@ -1,8 +1,5 @@
 package org.vishia.gral.ifc;
 
-import java.util.Map;
-
-import org.vishia.gral.gridPanel.GuiDialogZbnfControlled;
 
 /**This Interface should be implemented by any user class to call user actions when buttons are pressed,
  * a selection is done, a slider is changed or any widget is activated. Whether this interface is used,
