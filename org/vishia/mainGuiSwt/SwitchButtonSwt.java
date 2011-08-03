@@ -3,8 +3,8 @@ package org.vishia.mainGuiSwt;
 import java.util.Map;
 
 import org.eclipse.swt.graphics.Color;
-import org.vishia.gral.UserActionGui;
-import org.vishia.gral.WidgetDescriptor;
+import org.vishia.gral.ifc.UserActionGui;
+import org.vishia.gral.ifc.WidgetDescriptor;
 
 /**This class presents a button, which is shown as pressed and non-pressed. 
  * Two different colors are used. If the state is changed, a user event will be invoked if given.

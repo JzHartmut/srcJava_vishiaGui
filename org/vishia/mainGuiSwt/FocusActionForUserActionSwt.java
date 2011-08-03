@@ -6,8 +6,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
-import org.vishia.gral.UserActionGui;
-import org.vishia.gral.WidgetDescriptor;
+import org.vishia.gral.ifc.UserActionGui;
+import org.vishia.gral.ifc.WidgetDescriptor;
 
 public class FocusActionForUserActionSwt
 implements FocusListener

@@ -65,24 +65,24 @@ import org.eclipse.swt.widgets.Widget;
 
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
-import org.vishia.gral.ColorGui;
-import org.vishia.gral.FileDialogIfc;
-import org.vishia.gral.GuiDispatchCallbackWorker;
-import org.vishia.gral.GuiImageBase;
-import org.vishia.gral.GuiPanelMngBase;
-import org.vishia.gral.GuiPanelMngBuildIfc;
-import org.vishia.gral.GuiPanelMngWorkingIfc;
-import org.vishia.gral.GuiRectangle;
-import org.vishia.gral.GuiShellMngBuildIfc;
-import org.vishia.gral.GuiShellMngIfc;
-import org.vishia.gral.GuiWindowMng_ifc;
-import org.vishia.gral.PanelActivatedGui;
-import org.vishia.gral.PanelContent;
-import org.vishia.gral.PropertiesGui;
-import org.vishia.gral.TabPanel;
-import org.vishia.gral.UserActionGui;
-import org.vishia.gral.WidgetCmpnifc;
-import org.vishia.gral.WidgetDescriptor;
+import org.vishia.gral.gridPanel.GuiPanelMngBase;
+import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
+import org.vishia.gral.gridPanel.PanelActivatedGui;
+import org.vishia.gral.gridPanel.PanelContent;
+import org.vishia.gral.gridPanel.PropertiesGui;
+import org.vishia.gral.gridPanel.TabPanel;
+import org.vishia.gral.gui.GuiDispatchCallbackWorker;
+import org.vishia.gral.ifc.ColorGui;
+import org.vishia.gral.ifc.FileDialogIfc;
+import org.vishia.gral.ifc.GuiImageBase;
+import org.vishia.gral.ifc.GuiPanelMngBuildIfc;
+import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.ifc.GuiRectangle;
+import org.vishia.gral.ifc.GuiShellMngIfc;
+import org.vishia.gral.ifc.GuiWindowMng_ifc;
+import org.vishia.gral.ifc.UserActionGui;
+import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.widget.WidgetCmpnifc;
 import org.vishia.msgDispatch.LogMessage;
 
 
@@ -110,7 +110,7 @@ import org.vishia.msgDispatch.LogMessage;
  * in runtime
  * and selecting of button-actions and data-container while creating with symbolic access
  * to the action-instance or the data-container. This property is used especially 
- * by the text-script-controlled built of a dialog widget using the {@link org.vishia.gral.GuiDialogZbnfControlled},
+ * by the text-script-controlled built of a dialog widget using the {@link org.vishia.gral.gridPanel.GuiDialogZbnfControlled},
  * but it is able to simplify the access to data and actions elsewhere too.
  * <br><br>
  * <br><br>
@@ -1725,7 +1725,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
 	private UserActionGui syncVariableOnFocus = new UserActionGui()
 	{	/**Writes the value to the named variable on leaving the focus.
 		 * The name of the variable is contained in the {@link WidgetDescriptor}.
-		 * @see org.vishia.gral.UserActionGui#userActionGui(java.lang.String, org.vishia.gral.WidgetDescriptor, java.lang.Object[])
+		 * @see org.vishia.gral.ifc.UserActionGui#userActionGui(java.lang.String, org.vishia.gral.ifc.WidgetDescriptor, java.lang.Object[])
 		 */
 		@Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
 		{

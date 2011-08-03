@@ -6,10 +6,10 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
-import org.vishia.gral.GuiPanelMngBase;
-import org.vishia.gral.GuiRectangle;
-import org.vishia.gral.UserActionGui;
-import org.vishia.gral.WidgetDescriptor;
+import org.vishia.gral.gridPanel.GuiPanelMngBase;
+import org.vishia.gral.ifc.GuiRectangle;
+import org.vishia.gral.ifc.UserActionGui;
+import org.vishia.gral.ifc.WidgetDescriptor;
 
 /**Universal Mouse Listener which works with the {@link WidgetDescriptor}.
  * <ul>

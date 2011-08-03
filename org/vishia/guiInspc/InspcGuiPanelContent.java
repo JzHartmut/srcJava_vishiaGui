@@ -3,9 +3,9 @@ package org.vishia.guiInspc;
 import java.util.List;
 import java.util.Queue;
 
-import org.vishia.gral.GuiPlugUser_ifc;
-import org.vishia.gral.PanelActivatedGui;
-import org.vishia.gral.WidgetDescriptor;
+import org.vishia.gral.gridPanel.PanelActivatedGui;
+import org.vishia.gral.ifc.GuiPlugUser_ifc;
+import org.vishia.gral.ifc.WidgetDescriptor;
 
 /**This class contains the info about the values to show in one panel.
  * 

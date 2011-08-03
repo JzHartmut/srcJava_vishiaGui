@@ -4,10 +4,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.vishia.gral.CanvasStorage;
-import org.vishia.gral.ColorGui;
-import org.vishia.gral.WidgetCmpnifc;
-import org.vishia.gral.Widgetifc;
+import org.vishia.gral.ifc.CanvasStorage;
+import org.vishia.gral.ifc.ColorGui;
+import org.vishia.gral.widget.WidgetCmpnifc;
+import org.vishia.gral.widget.Widgetifc;
 
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;

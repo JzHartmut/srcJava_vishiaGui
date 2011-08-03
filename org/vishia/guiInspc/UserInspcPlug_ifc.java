@@ -1,6 +1,6 @@
 package org.vishia.guiInspc;
 
-import org.vishia.gral.UserPlugGral_ifc;
+import org.vishia.gral.ifc.UserPlugGral_ifc;
 
 /**This interface is the plug from a user plugin to the Inspc. 
  * 

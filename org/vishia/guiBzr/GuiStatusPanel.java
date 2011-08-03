@@ -2,13 +2,13 @@ package org.vishia.guiBzr;
 
 import java.io.File;
 
-import org.vishia.gral.GuiPanelMngBuildIfc;
-import org.vishia.gral.GuiPanelMngWorkingIfc;
-import org.vishia.gral.GuiShellMngBuildIfc;
-import org.vishia.gral.GuiWindowMng_ifc;
-import org.vishia.gral.SwitchExclusiveButtonMng;
-import org.vishia.gral.UserActionGui;
-import org.vishia.gral.WidgetDescriptor;
+import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
+import org.vishia.gral.ifc.GuiPanelMngBuildIfc;
+import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.ifc.GuiWindowMng_ifc;
+import org.vishia.gral.ifc.UserActionGui;
+import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.widget.SwitchExclusiveButtonMng;
 import org.vishia.mainGuiSwt.InfoBox;
 import org.vishia.util.FileSystem;
 

@@ -14,11 +14,11 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
-import org.vishia.gral.ColorGui;
-import org.vishia.gral.TableLineGui_ifc;
-import org.vishia.gral.UserActionGui;
-import org.vishia.gral.WidgetDescriptor;
-import org.vishia.gral.WidgetGui_ifc;
+import org.vishia.gral.ifc.ColorGui;
+import org.vishia.gral.ifc.UserActionGui;
+import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.widget.TableLineGui_ifc;
+import org.vishia.gral.widget.WidgetGui_ifc;
 
 public class TableSwt
 {

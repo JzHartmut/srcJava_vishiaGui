@@ -10,7 +10,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.vishia.gral.WidgetDescriptor;
+import org.vishia.gral.ifc.WidgetDescriptor;
 
 public class ButtonSwt extends Canvas
 {

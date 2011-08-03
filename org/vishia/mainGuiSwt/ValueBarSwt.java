@@ -11,8 +11,8 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.vishia.gral.GuiSetValueIfc;
-import org.vishia.gral.ValueBar;
+import org.vishia.gral.ifc.GuiSetValueIfc;
+import org.vishia.gral.widget.ValueBar;
 
 public class ValueBarSwt extends ValueBar implements GuiSetValueIfc
 {

@@ -1,8 +1,8 @@
 package org.vishia.mainGuiSwt;
 
 import org.eclipse.swt.graphics.Image;
-import org.vishia.gral.GuiImageBase;
-import org.vishia.gral.GuiRectangle;
+import org.vishia.gral.ifc.GuiImageBase;
+import org.vishia.gral.ifc.GuiRectangle;
 
 public class GuiImageSwt extends GuiImageBase
 {

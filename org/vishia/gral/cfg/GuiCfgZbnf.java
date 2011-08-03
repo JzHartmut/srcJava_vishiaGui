@@ -5,8 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 
-import org.vishia.gral.GuiDialogZbnfControlled;
-import org.vishia.gral.GuiPanelMngBuildIfc;
+import org.vishia.gral.gridPanel.GuiDialogZbnfControlled;
+import org.vishia.gral.ifc.GuiPanelMngBuildIfc;
 import org.vishia.mainCmd.Report;
 import org.vishia.util.StringPart;
 import org.vishia.util.StringPartFromFileLines;

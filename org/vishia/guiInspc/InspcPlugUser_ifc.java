@@ -2,7 +2,7 @@ package org.vishia.guiInspc;
 
 import java.util.Map;
 
-import org.vishia.gral.GuiPlugUser_ifc;
+import org.vishia.gral.ifc.GuiPlugUser_ifc;
 import org.vishia.inspectorAccessor.InspcAccessor;
 import org.vishia.msgDispatch.LogMessage;
 

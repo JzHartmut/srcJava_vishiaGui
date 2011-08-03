@@ -13,7 +13,7 @@ import java.util.TimeZone;
 import org.vishia.bridgeC.OS_TimeStamp;
 import org.vishia.bridgeC.Va_list;
 import org.vishia.byteData.ByteDataAccess;
-import org.vishia.gral.GuiPanelMngWorkingIfc;
+import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageFile;

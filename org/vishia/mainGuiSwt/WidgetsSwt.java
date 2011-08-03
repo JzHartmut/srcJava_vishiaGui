@@ -6,9 +6,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
-import org.vishia.gral.ColorGui;
-import org.vishia.gral.TextBoxGuifc;
-import org.vishia.gral.Widgetifc;
+import org.vishia.gral.ifc.ColorGui;
+import org.vishia.gral.widget.TextBoxGuifc;
+import org.vishia.gral.widget.Widgetifc;
 
 public class WidgetsSwt
 {

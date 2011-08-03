@@ -8,8 +8,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
-import org.vishia.gral.ColorGui;
-import org.vishia.gral.PropertiesGui;
+import org.vishia.gral.gridPanel.PropertiesGui;
+import org.vishia.gral.ifc.ColorGui;
 
 
 public class PropertiesGuiSwt extends PropertiesGui

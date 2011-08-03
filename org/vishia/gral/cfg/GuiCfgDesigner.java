@@ -1,11 +1,11 @@
 package org.vishia.gral.cfg;
 
-import org.vishia.gral.GuiPanelMngBase;
-import org.vishia.gral.GuiPanelMngWorkingIfc;
-import org.vishia.gral.GuiRectangle;
-import org.vishia.gral.GuiShellMngBuildIfc;
-import org.vishia.gral.UserActionGui;
-import org.vishia.gral.WidgetDescriptor;
+import org.vishia.gral.gridPanel.GuiPanelMngBase;
+import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
+import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.ifc.GuiRectangle;
+import org.vishia.gral.ifc.UserActionGui;
+import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.msgDispatch.LogMessage;
 
 public class GuiCfgDesigner
@@ -99,7 +99,7 @@ public class GuiCfgDesigner
       int dxGrid = (int)(dxGridf >0 ? dxGridf + 0.5f : dxGridf - 0.5f);
       int dyGrid = (int)(dyGridf >0 ? dyGridf + 0.5f : dyGridf - 0.5f);
       
-      GuiCfgData.GuiCfgElement cfge = widgd.getCfgElement();
+      GuiCfgData.GuiCfgElement cfge = (GuiCfgData.GuiCfgElement)widgd.getCfgElement();
       if(cfge !=null){
         String sPanel = cfge.position.panel;  //Note: The cloned Object maybe empty here before buildWidget() is called
         int xPosAct = cfge.position.xPos;
@@ -125,7 +125,7 @@ public class GuiCfgDesigner
   public void pressedRightMouseDownForDesign(WidgetDescriptor widgd, GuiRectangle xy)
   { //if(widgdInDialog == null){
       widgdInDialog = widgd;
-      GuiCfgData.GuiCfgElement cfge = widgd.getCfgElement();
+      GuiCfgData.GuiCfgElement cfge = (GuiCfgData.GuiCfgElement)widgd.getCfgElement();
       String sName, sDataPath, sText, sFormat, sShowMethod,  sActionMethod;
       String sLine, sColumn, sWidth, sHeight;
       if(cfge !=null){
@@ -169,7 +169,7 @@ public class GuiCfgDesigner
         String sWidth = dialogFieldWidth.getValue();
         String sHeight = dialogFieldHeight.getValue();
         
-        GuiCfgData.GuiCfgElement cfge = widgdInDialog.getCfgElement();
+        GuiCfgData.GuiCfgElement cfge = (GuiCfgData.GuiCfgElement)widgdInDialog.getCfgElement();
         if(cfge !=null){
           String sPanel = cfge.position.panel;  //Note: The cloned Object maybe empty here before buildWidget() is called
             /*if(sName.trim().length() >0) { cfge.widgetType.name = sName; }

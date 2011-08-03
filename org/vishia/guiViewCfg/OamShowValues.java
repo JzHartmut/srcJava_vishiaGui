@@ -9,12 +9,12 @@ import org.vishia.byteData.RawDataAccess;
 import org.vishia.mainCmd.Report;
 
 import org.vishia.byteData.ByteDataSymbolicAccess;
-import org.vishia.gral.GuiPanelMngWorkingIfc;
-import org.vishia.gral.GuiSetValueIfc;
-import org.vishia.gral.PanelActivatedGui;
-import org.vishia.gral.UserActionGui;
-import org.vishia.gral.ValueBar;
-import org.vishia.gral.WidgetDescriptor;
+import org.vishia.gral.gridPanel.PanelActivatedGui;
+import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.ifc.GuiSetValueIfc;
+import org.vishia.gral.ifc.UserActionGui;
+import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.widget.ValueBar;
 
 
 public class OamShowValues
