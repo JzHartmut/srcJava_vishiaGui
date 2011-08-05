@@ -27,7 +27,7 @@ public class DataCmpn
    * <li>Or the sandbox version is stored in the bzr data file of the project.
    * </ul>  
    */
-  int nrSboxRev, nrTopRev;
+  String nrSboxRev, nrTopRev;
   
   /**The timestamp of the version in the sandbox and in the branch. */
   long dateSboxRevSbox, dateTopRev;

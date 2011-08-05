@@ -166,9 +166,9 @@ public class BzrGetStatus
         if( (pos = sLine.indexOf("revno:"))>=0){
           //line: revno: <#?revision>
           String sRevision = sLine.substring(pos + 6).trim();
-          int nrRev = Integer.parseInt(sRevision);
-          if(sbox){ data.nrSboxRev = nrRev; } 
-          else    { data.nrTopRev= nrRev; } 
+          //int nrRev = Integer.parseInt(sRevision);
+          if(sbox){ data.nrSboxRev = sRevision; } 
+          else    { data.nrTopRev= sRevision; } 
           bRevnrOk = true;
         } else if( (pos = sLine.indexOf("timestamp:"))>=0){
           //line: timestamp: <timestamp>
