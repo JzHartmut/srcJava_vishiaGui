@@ -5,7 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.vishia.communication.InterProcessCommFactorySocket;
+import org.vishia.gral.area9.GuiCallingArgs;
+import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GuiMainAreaifc;
+import org.vishia.gral.area9.GuiMainCmd;
 import org.vishia.gral.gridPanel.GuiPanelMngBase;
 import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.gridPanel.PropertiesGui;
@@ -24,7 +27,7 @@ import org.vishia.mainGuiSwt.PropertiesGuiSwt;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.FileSystem;
 
-public class BzrGui
+public class BzrGui extends GuiCfg
 {
   /**Version, able to read as hex yyyymmdd.
    * Changes:
@@ -36,38 +39,12 @@ public class BzrGui
    */
   public final static int version = 0x20110617;
 
-  
-  private final Inspector inspector;
-
-  /**To Output log informations. The ouput will be done in the output area of the graphic. */
-  private final Report console;
-
-  final MainData mainData;
-
-  //final MainAction mainAction;
-
   /**The command-line-arguments may be stored in an extra class, which can arranged in any other class too. 
    * The separation of command line argument helps to invoke the functionality with different calls, 
    * for example calling in a GUI, calling in a command-line-batch-process or calling from ANT 
    */
-  static class CallingArguments
+  static class CallingArguments extends GuiCallingArgs
   {
-    /**Name of the config-file for the Gui-appearance. */
-    String sFileGui;
-
-    /**Directory where sFileCfg is placed, with / on end. The current dir if sFileCfg is given without path. */
-    String sParamBin;
-
-    String sFileCtrlValues;
-
-    String sPathZbnf = "GUI";
-
-    /**The time zone to present all time informations. */
-    String sTimeZone = "GMT";
-
-    /**Size, either A,B or F for 800x600, 1024x768 or full screen. */
-    String sSize;
-    
     /**This file contains all bzr commands and the pathes of the users sandboxes. */
     File fileCfg;
   } //class CallingArguments
@@ -76,7 +53,7 @@ public class BzrGui
 
   final CallingArguments cargs;
 
-
+  final MainData mainData;
 
 
   /**This instance helps to create the Dialog Widget as part of the whole window. It is used only in the constructor.
@@ -85,12 +62,8 @@ public class BzrGui
 
 
 
-  /**The GUI. */
-  private final CmdLineAndGui guix;
-  private final GuiMainAreaifc gui;
-
   /**Panel-Management-interface for the panels. */
-  GuiPanelMngBuildIfc panelBuildifc;
+  //GuiPanelMngBuildIfc panelBuildifc;
 
 
 
@@ -100,7 +73,7 @@ public class BzrGui
 
 
 
-  private GuiPanelMngBase panelMng;
+  //private GuiPanelMngBase panelMng;
 
   
   final GuiStatusPanel guiStatusPanel;
@@ -123,140 +96,39 @@ public class BzrGui
    * @param cargs The given calling arguments.
    * @param gui The GUI-organization.
    */
-  BzrGui(CallingArguments cargs, CmdLineAndGui gui) 
-  { boolean bOk = true;
-    this.cargs = cargs;
-    this.console = gui;  
+  BzrGui(CallingArguments cargs, GuiMainCmd cmdgui) 
+  { super(cargs, cmdgui);  //builds all graphic panels
+    this.cargs = cargs;  //args in the correct derived type.
+    boolean bOk = true;
     
-      //Creates a panel manager to work with grid units and symbolic access.
-    //Its properties:  //##
-    final char sizePixel;
-    char sizeArg = cargs.sSize == null ? 'A' : cargs.sSize.charAt(0);
-    switch(sizeArg){
-    case 'F':   sizePixel = 'D'; break;
-    case 'A': sizePixel = 'D'; break;
-    case 'a': sizePixel = 'A'; break;
-    case 'b': sizePixel = 'B'; break;
-    case 'c': sizePixel = 'C'; break;
-    case 'D': sizePixel = 'D'; break;
-    case 'E': sizePixel = 'E'; break;
-    default: sizePixel = 'D'; break;
-    }
-    PropertiesGui propertiesGui = new PropertiesGuiSwt(gui.getDisplay(), sizePixel);
-    LogMessage log = gui.getLogMessageOutputConsole();
-    try{ Thread.sleep(1000);} catch(InterruptedException exc){}
-    panelMng = new GuiPanelMngSwt(null, gui.getContentPane(), 120,80, (PropertiesGuiSwt)propertiesGui, null, log);
     
-    mainData = new MainData(gui);
-    
+    mainData = new MainData(cmdgui);
     String sError = mainData.cfg.readConfig(cargs.fileCfg);
     if(sError !=null){
-    	gui.writeError(sError);
+      cmdgui.writeError(sError);
     }
-    inspector = new Inspector("UDP:127.0.0.1:60088");
-    inspector.start(this);
-  
-    panelBuildifc = panelMng;
+    
     mainData.panelAccess = panelMng;
   
-    mainData.guifc = this.gui = this.guix = gui;
+    mainData.guifc = this.gui;
     
     //creates the panel classes in constructor, don't initialize the GUI yet.
-    guiStatusPanel = new GuiStatusPanel(mainData, panelBuildifc);
-    guiCommitPanel = new GuiCommitPanel(mainData, panelBuildifc);
-    guiFilesDiffPanel = new GuiFilesDiffPanel(mainData, panelBuildifc);
+    guiStatusPanel = new GuiStatusPanel(mainData, panelBuildIfc);
+    guiCommitPanel = new GuiCommitPanel(mainData, panelBuildIfc);
+    guiFilesDiffPanel = new GuiFilesDiffPanel(mainData, panelBuildIfc);
     
-    panelOutput = new PanelOutput(mainData, panelBuildifc);
+    panelOutput = new PanelOutput(mainData, panelBuildIfc);
     
     mainData.mainAction = new MainAction(mainData, guiStatusPanel, guiCommitPanel, guiFilesDiffPanel, panelOutput);
     
-    
-    //create the basic appearance of the GUI. The execution sets dlgAccess:
-    gui.addDispatchListener(initGuiDialog);
-    if(!initGuiDialog.awaitExecution(1, 10000)) throw new RuntimeException("unexpected fail of execution initGuiDialog");
-  
-    //fileHandlerUcell = new FileViewer(panelMng);
-  
-  
-  
-    /**Creates the dialog elements while reading a config-file. */
-    //
-    //Register any user action. This should be done before the GUI-configuration is read.
-    panelBuildifc.registerUserAction("cmdInvoke", cmdInvoke);
-    //dialogCellMng.registerTableAccess("msgOfDay", msgReceiver.msgOfDayAccessGui);
-    //panelBuildIfc.registerTableAccess("msgOfDay", msgReceiver.msgOfDay;
-  
-    //dialogVellMng.re
-    boolean bConfigDone = false;
-    //if(cargs.sFileGui != null){
-      //configGuiWithZbnf.ctDone(0);  //counter for done initialized.
-      //File fileSyntax = new File(cargs.sPathZbnf + "/dialog.zbnf");
-      //dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
-      gui.addDispatchListener(configGui);
-      bConfigDone = configGui.awaitExecution(1, 10000);
-    //}    
-    //assigns the fields which are visible to the oamOutValues-Manager to fill it with the values.
-    if(!bConfigDone){
-      console.writeError("No configuration");
-    } else {
-      try{ Thread.sleep(10);} catch(InterruptedException exc){}
-      //The GUI-dispatch-loop should know the change worker of the panel manager. Connect both:
-      gui.addDispatchListener(panelBuildifc.getTheGuiChangeWorker());
-      try{ Thread.sleep(10);} catch(InterruptedException exc){}
-      //gets all prepared fields to show informations.
-      //oamShowValues.setFieldsToShow(panelBuildIfc.getShowFields());
-    }  
-  
-    //msgReceiver.test(); //use it after initGuiDialog!
 
-  }
-
-
-  /**Inits the widgets of the whole Gui with all panels. 
-   * This method is invoked from the {@link #initGuiDialog} callback-worker from the GUI-Thread. 
-   * 
-   */
-  void initGuiWidgets()
-  {
-    guix.initGraphic();
-    gui.setFrameAreaBorders(20, 80, 60, 85);
-
-
-    //Creates a Tab-Panel:
-    TabPanel tabPanel = panelMng.createTabPanel(null);
-    tabPanel.addGridPanel("Select", "&Select",1,1,10,10);
-    tabPanel.addGridPanel("Commit", "&Commit",1,1,10,10);
-    tabPanel.addGridPanel("Log", "&Log",1,1,10,10);
-    tabPanel.addGridPanel("FilesDiff", "&Files && Diff",1,1,10,10);
-    tabPanel.addGridPanel("Output", "&Output",1,1,10,10);
-
-    gui.addFrameArea(1,1,3,1, tabPanel.getGuiComponent()); //dialogPanel);
-    //##
-    WidgetCmpnifc msgPanel = panelMng.createGridPanel(  
-        panelMng.propertiesGui.colorBackground_
-        , panelMng.propertiesGui.xPixelUnit(), panelMng.propertiesGui.yPixelUnit(), 5, 5);
-    panelMng.registerPanel("msg", msgPanel);
-    gui.addFrameArea(1,2,3,1, msgPanel); //dialogPanel);
+    gui.addDispatchListener(configGui);
 
     
+    
   }
-  
-  /**Code snippet for initializing the GUI area (panel). This snippet will be executed
-   * in the GUI-Thread if the GUI is created. 
-   */
-  GuiDispatchCallbackWorker initGuiDialog = new GuiDispatchCallbackWorker()
-  {
-    @Override public void doBeforeDispatching(boolean onlyWakeup)
-    { initGuiWidgets();
-      gui.removeDispatchListener(this);    
-      countExecution();
-    }
 
 
-  };
-
-
-  
  
   /**Code snippet to run the ZBNF-configurator (text controlled GUI)
    * 
@@ -265,21 +137,20 @@ public class BzrGui
   {
 
     @Override public void doBeforeDispatching(boolean onlyWakeup){
-      char sizeArg = cargs.sSize == null ? 'A' : cargs.sSize.charAt(0);
-      switch(sizeArg){
-      case 'F':   guix.setTitleAndSize("GUI", 0, 0, -1, -1); break;
-      case 'A': guix.setTitleAndSize("GUI", 500, 100, 800, 600); break;
-      case 'a': guix.setTitleAndSize("GUI", 50, 100, 512, 396); break;
-      case 'b': guix.setTitleAndSize("GUI", 50, 100, 640, 480); break;
-      case 'c': guix.setTitleAndSize("GUI", 50, 100, 800, 600); break;
-      case 'D': guix.setTitleAndSize("GUI", 50, 100, 1024, 768); break;
-      case 'E': guix.setTitleAndSize("GUI", 50, 100, 1200, 1050); break;
-      default: guix.setTitleAndSize("GUI", 500, 100, -1, 800); break;
-      }
       try { 
-        //File fileGui = new File(callingArguments.sFileGui);
-        //xxx
-        //dialogZbnfConfigurator.configureWithZbnf("Sample Gui", fileGui, panelBuildIfc);
+        panelMng.tabPanel.addGridPanel("Select", "&Select",1,1,10,10);
+        panelMng.tabPanel.addGridPanel("Commit", "&Commit",1,1,10,10);
+        panelMng.tabPanel.addGridPanel("Log", "&Log",1,1,10,10);
+        panelMng.tabPanel.addGridPanel("FilesDiff", "&Files && Diff",1,1,10,10);
+        panelMng.tabPanel.addGridPanel("Output", "&Output",1,1,10,10);
+
+        //##
+        WidgetCmpnifc msgPanel = panelMng.createGridPanel(  
+            panelMng.propertiesGui.colorBackground_
+            , panelMng.propertiesGui.xPixelUnit(), panelMng.propertiesGui.yPixelUnit(), 5, 5);
+        panelMng.registerPanel("msg", msgPanel);
+        gui.addFrameArea(1,2,3,1, msgPanel); //dialogPanel);
+
         guiStatusPanel.initGui();
         guiCommitPanel.initGui();
         guiFilesDiffPanel.initGui();
@@ -287,9 +158,9 @@ public class BzrGui
       }  
       catch(Exception exception)
       { //catch the last level of error. No error is reported direct on command line!
-        guix.writeError("Uncatched Exception on main level:", exception);
-        guix.writeStackTrace(exception);
-        guix.setExitErrorLevel(MainCmd_ifc.exitWithErrors);
+        mainCmd.writeError("Uncatched Exception on main level:", exception);
+        mainCmd.writeStackTrace(exception);
+        mainCmd.setExitErrorLevel(MainCmd_ifc.exitWithErrors);
       }
       gui.removeDispatchListener(this);    
 
@@ -301,42 +172,6 @@ public class BzrGui
 
 
 
-  
-
-  void execute()
-  {
-    while(guix.isRunning())
-    { Runnable order = mainData.awaitOrderBackground(1000);
-      if(order !=null){
-        order.run();
-      }
-    }
-
-  }
-
-
-
-
-
-  private final UserActionGui cmdInvoke = new UserActionGui()
-  { 
-    ProcessBuilder processBuilder = new ProcessBuilder("pwd");
-
-    StringBuilder output = new StringBuilder();
-    StringBuilder error = new StringBuilder();
-
-    public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
-    {
-      if(sCmd != null){
-        output.setLength(0);
-        error.setLength(0);
-        guix.executeCmdLine(processBuilder, widgetInfos.sCmd, null, Report.info, output, error);
-        stop();
-        mainData.panelAccess.insertInfo("output", 0, output.toString());
-        //gui.executeCmdLine(widgetInfos.sCmd, 0, null, null);
-      }
-    }
-  };
 
 
   
@@ -346,7 +181,7 @@ public class BzrGui
 
   /**Organisation class for the GUI.
    */
-  private static class CmdLineAndGui extends MainCmdSwt
+  private static class CmdLineAndGui extends GuiMainCmd
   {
 
 
@@ -361,15 +196,10 @@ public class BzrGui
      */
     public CmdLineAndGui(CallingArguments cargs, String[] args)
     { 
-      super(args);
-      super.addAboutInfo("Bazaar-Gui");
-      super.addAboutInfo("made by HSchorrig, 2011-04-30, 2011-05-01");
-      //super.addStandardHelpInfo();
+      super(cargs, args, "Bazaar-Gui");
       this.cargs = cargs;
-      super.setTitleAndSize("Bazaar-Gui", 50,50,800, 600); //600);  //This instruction should be written first to output syntax errors.
-      //super.setStandardMenus(new File("."));
-      super.setOutputArea("A3C3");        //whole area from mid to bottom
-      super.startGraphicThread();
+      addAboutInfo("Bazaar-Gui");
+      addAboutInfo("made by HSchorrig, 2011-04-30, 2011-05-01");
     }
 
 
@@ -388,35 +218,18 @@ public class BzrGui
      */
     @Override protected boolean testArgument(String arg, int nArg)
     { boolean bOk = true;  //set to false if the argc is not passed
-    try {
-      if(arg.startsWith("-gui="))      
-      { cargs.sFileGui = getArgument(5);  //the graphic GUI-appearance 
+      try {
+        if(arg.startsWith("-cfg=")){      
+          String sPath = FileSystem.absolutePath(getArgument(5), null);
+          cargs.fileCfg = new File(sPath);
+        }  
+        else if(arg.startsWith("-_")) 
+        { //accept but ignore it. Commented calling arguments.
+        }
+        else { bOk = super.testArgument(arg, nArg); }
+        } catch(Exception exc){
       }
-      else if(arg.startsWith("-cfg=")){      
-        String sPath = FileSystem.absolutePath(getArgument(5), null);
-        cargs.fileCfg = new File(sPath);
-      }  
-      else if(arg.startsWith("-parambin=")) 
-      { cargs.sParamBin = getArgument(10);   //an example for default output
-      }
-      else if(arg.startsWith("-ctrlbin=")) 
-      { cargs.sFileCtrlValues = getArgument(9);   //an example for default output
-      }
-      else if(arg.startsWith("-timeZone=")) 
-      { cargs.sTimeZone = getArgument(10);   //an example for default output
-      }
-      else if(arg.startsWith("-size=")) 
-      { cargs.sSize = getArgument(6);   //an example for default output
-      }
-      else if(arg.startsWith("-_")) 
-      { //accept but ignore it. Commented calling arguments.
-      }
-      else 
-      { bOk=false;
-      }
-    } catch(Exception exc){
-    }
-    return bOk;
+      return bOk;
     }
 
 
@@ -450,7 +263,7 @@ public class BzrGui
      */
     void initGraphic()
     {
-      setStandardMenusGThread(null, null);
+      gui.setStandardMenusGThread(null, null);
     }
 
   } //class CmdLineAndGui

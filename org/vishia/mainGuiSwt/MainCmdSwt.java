@@ -58,6 +58,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.vishia.gral.area9.GuiMainAreaBase;
 import org.vishia.gral.area9.GuiMainAreaifc;
 import org.vishia.gral.gui.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.UserActionGui;
@@ -65,6 +66,7 @@ import org.vishia.gral.widget.TextBoxGuifc;
 import org.vishia.gral.widget.WidgetCmpnifc;
 import org.vishia.gral.widget.Widgetifc;
 import org.vishia.mainCmd.MainCmd;
+import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.MinMaxTime;
 import org.vishia.windows.WindowMng;
 
@@ -100,7 +102,8 @@ date       who      change
 
 */
 
-public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
+//public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
+public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 {
   
   
@@ -114,6 +117,8 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
    */
   final static int version = 0x20110502;
 
+  
+  final MainCmd mainCmd;
   
 	public interface GuiBuild
 	{
@@ -156,20 +161,6 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
   	@Override public void run()
   	{
   		initGrafic(sTitle, 0, 0, xSize, ySize);
-      if(bSetStandardMenus){
-      	setStandardMenusGThread(currentDirectory, actionFile);
-      }
-      if(outputArea != null){
-      	int xArea = outputArea.charAt(0) - 'A' +1;
-      	int yArea = outputArea.charAt(1) - '0';
-      	int dxArea = outputArea.charAt(2) - 'A' +1 - xArea +1;
-      	int dyArea = outputArea.charAt(3) - '0' - yArea +1;
-      	addOutputFrameArea(xArea, yArea, dxArea, dyArea);
-      }
-  		for(Runnable build: buildOrders){
-  			build.run();
-      }
-  		synchronized(this){notify(); }
       dispatch();
   		//synchronized(this){ notify(); }  //to weak up waiting on configGrafic().
   	}
@@ -198,6 +189,8 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
   /**True if the startup is done. */
   boolean bStarted = false; 
  
+  boolean bWaitStart = false;
+  
   /**Size of display window. */
   int xSize,ySize;
   /**left and top edge of display-window. */
@@ -259,9 +252,6 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
   
   /**Set on call of {@link #setStandardMenus(File)} to add in in the graphic thread. */
   private boolean bSetStandardMenus;
-  
-  /**Area settings for output. */
-  private String outputArea;
   
   Queue<String> outputTexts = new ConcurrentLinkedQueue<String>();
   
@@ -344,9 +334,9 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
 	
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-      String[] sHelpText = new String[listHelpInfo.size()];
+      String[] sHelpText = new String[mainCmd.listHelpInfo.size()];
       int ix = 0;
-      for(String line: listHelpInfo){
+      for(String line: mainCmd.listHelpInfo){
         sHelpText[ix++] = line;
       }
       InfoBox helpDlg = new InfoBox(graphicFrame, "Help", sHelpText, false);//main.writeInfoln("action!");
@@ -369,9 +359,9 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
 		@Override
 		public void widgetSelected(SelectionEvent e)
     {
-      String[] sText = new String[listAboutInfo.size()];
+      String[] sText = new String[mainCmd.listAboutInfo.size()];
       int ix = 0;
-      for(String line: listAboutInfo){
+      for(String line: mainCmd.listAboutInfo){
         sText[ix++] = line;
       }
       InfoBox aboutDlg = new InfoBox(graphicFrame, "...about", sText, false);//main.writeInfoln("action!");
@@ -487,8 +477,9 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
   }
   */
   
-  protected MainCmdSwt(String[] args)
-  { super(args);
+  public MainCmdSwt(MainCmd cmdP) //String[] args)
+  { //super(args);
+    mainCmd = cmdP;
   }
   
   /**Sets the title and size before initialization.
@@ -525,7 +516,6 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
   {
   	if(!bStarted){
   		setTitleAndSize(sTitle, left, top, xSize, ySize);
-  		bStarted = true;
   		idThreadGui = Thread.currentThread().getId();
       guiDevice = new Display ();
       guiDevice.addFilter(SWT.Close, windowsCloseListener);
@@ -551,6 +541,25 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
       graphicFrame.addShellListener(mainComponentListerner);
       graphicFrame.addControlListener(resizeListener);
       setFrameAreaBorders(30,70,30,70);
+      if(bSetStandardMenus){
+        setStandardMenusGThread(currentDirectory, actionFile);
+      }
+      if(outputArea != null){
+        int xArea = outputArea.charAt(0) - 'A' +1;
+        int yArea = outputArea.charAt(1) - '0';
+        int dxArea = outputArea.charAt(2) - 'A' +1 - xArea +1;
+        int dyArea = outputArea.charAt(3) - '0' - yArea +1;
+        addOutputFrameArea(xArea, yArea, dxArea, dyArea);
+      }
+      for(Runnable build: buildOrders){
+        build.run();
+      }
+      synchronized(this){
+        if(bWaitStart){
+          notify(); 
+        }
+        bStarted = true;
+      }
     } else throw new IllegalArgumentException("graphic is configured already, do it one time only.");
   	
   }
@@ -613,9 +622,13 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
   public boolean startGraphicThread(){
   	if(bStarted) throw new IllegalStateException("it is started already.");
   	guiThread.start();
-  	while(!bStarted){
-  	  synchronized(guiThread){ try{guiThread.wait(1000);} catch(InterruptedException exc){}}
-  	}
+  	synchronized(guiThread){ 
+    	while(!bStarted){
+    	  bWaitStart = true;
+    	  try{guiThread.wait(5000);} catch(InterruptedException exc){}
+    	}
+    	bWaitStart =false;
+    }
   	return bStarted;
   }
   
@@ -936,17 +949,6 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
   { addOutputFrameArea(1, 3, 3, 1);   //x, y, dx, dy);
   }
   
-  /**Sets the output window to a defined area. .
-   * Adds the edit-menu too. 
-   * @param xArea 1 to 3 for left, middle, right, See {@link #setFrameAreaBorders(int, int, int, int)}
-   * @param yArea 1 to 3 for top, middle, bottom
-   * @param dxArea 1 to 3 for 1 field to 3 fields to right.
-   * @param dyArea 1 to 3 for 1 field to 3 field to bottom
-   */
-  protected void setOutputArea(String area){
-    outputArea = area;
-  }
-
   
   
   /**Sets the output window to a defined area. .
@@ -1089,7 +1091,7 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
 				checkTimes.cyclTime();
 				String line;
 				while((line = outputTexts.poll())!=null){
-					writeDirectly(line, kInfoln_writeInfoDirectly);
+					writeDirectly(line, MainCmd.kInfoln_writeInfoDirectly);
 				}
 				for(GuiDispatchCallbackWorker listener: dispatchListeners){
 				  //use isWakedUpOnly for run as parameter?
@@ -1120,7 +1122,7 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
 	{ if(!bExit && !guiDevice.isDisposed()){ 
 		  guiDevice.dispose();
 	  }  
-		System.exit(getExitErrorLevel());
+		System.exit(mainCmd.getExitErrorLevel());
 	}
   
   
@@ -1177,7 +1179,7 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
       	extEventSet.set(true);
       }
   	}  
-    else super.writeDirectly(sInfo, kind);     
+    else mainCmd.writeDirectly(sInfo, kind);     
   }
   
   /** Overloads MainCmd.writeDirectly. This method may be overloaded by the user
@@ -1194,10 +1196,10 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
       textAreaOutput.viewTrail();
       graphicFrame.update();  //update in TextBox...
     }
-    else super.writeErrorDirectly(sInfo, exception);     
+    else mainCmd.writeErrorDirectly(sInfo, exception);     
   }
   
-  
+  @Override public MainCmd_ifc getMainCmd(){ return mainCmd; }
   
   /** Sets the graphic frame, called inside the derived class. 
    *  The derived class has to organize the graphical frame.
@@ -1245,7 +1247,7 @@ public abstract class MainCmdSwt extends MainCmd implements GuiMainAreaifc
    */
   public void actionFileOpen(File file)
   {
-    writeInfo("action file open:" + file.getName());
+    mainCmd.writeInfo("action file open:" + file.getName());
   }
   
 
@@ -1295,7 +1297,7 @@ class GuiActionAbout //implements ActionListener
   GuiActionAbout(MainCmdSwt mainP) { main = mainP;}
 
   public void actionPerformed( int e) //ActionEvent e )
-  { main.writeAboutInfo();
+  { main.mainCmd.writeAboutInfo();
   }
 
 

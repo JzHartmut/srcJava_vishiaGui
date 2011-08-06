@@ -39,7 +39,7 @@ public class DataProject
   DataProject(String sPrjPath)
   { this.sPrjPath = sPrjPath;
     this.filePrjPath = new File(sPrjPath);
-    assert(filePrjPath.exists() && filePrjPath.isDirectory());
+    //assert(filePrjPath.exists() && filePrjPath.isDirectory());
   }
   
   /**Initializes newly. It is called on refresh.

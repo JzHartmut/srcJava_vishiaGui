@@ -39,7 +39,7 @@ public class GralPanelContent
   void changeWidgets(Queue<WidgetDescriptor> newWidgetsP)
   {
     this.newWidgets = newWidgetsP; //signal for other thread, there are new one.
-    user.changedView("unknown yet", 0);
+    if(user !=null){ user.changedView("unknown yet", 0); }
   }
   
   

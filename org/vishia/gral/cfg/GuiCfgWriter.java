@@ -38,7 +38,7 @@ public class GuiCfgWriter
   
   void writeDataReplace(GuiCfgData cfg) throws IOException
   { writer.append("\n");
-    for( Map.Entry<String, String> entry: cfg.dataReplace.entrySet()){
+    if(cfg !=null)for( Map.Entry<String, String> entry: cfg.dataReplace.entrySet()){
       writer.append("DataReplace: ").append(entry.getKey()).append(" = ").append(entry.getValue()).append(";\n");
     }
     writer.append("\n");

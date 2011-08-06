@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.communication.InterProcessCommFactorySocket;
+import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
+import org.vishia.gral.area9.GuiMainCmd;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainGuiSwt.MainCmdSwt;
 
@@ -19,10 +21,10 @@ public class InspcGui extends GuiCfg
 
 
 
-  InspcGui(CallingArguments cargs, MainCmdSwt cmdgui)
+  InspcGui(CallingArguments cargs, GuiMainCmd cmdgui)
   {
     super(cargs, cmdgui);
-    this.cargs = cargs;
+    this.cargs = cargs;  //args in the correct derived type.
     assert(user instanceof InspcPlugUser_ifc);
     if(user !=null){
       user.init(userInspcPlug, console.getLogMessageOutputConsole());
@@ -34,7 +36,7 @@ public class InspcGui extends GuiCfg
   
   
   
-  private static class CallingArguments extends GuiCfg.CallingArguments
+  private static class CallingArguments extends GuiCallingArgs
   {
     /**The target ipc-address for Interprocess-Communication with the target.
      * It is a string, which determines the kind of communication.
@@ -51,7 +53,7 @@ public class InspcGui extends GuiCfg
   
   /**Organisation class for the GUI.
    */
-  private static class CmdLineAndGui extends GuiCfg.CmdLineAndGui
+  private static class CmdLineAndGui extends GuiMainCmd
   {
 
     /**Aggregation to given instance for the command-line-argument. The instance can be arranged anywhere else.
@@ -90,19 +92,18 @@ public class InspcGui extends GuiCfg
         else if(arg.startsWith("-oambin=")) 
         { cargs.sFileOamValues = getArgument(8);   //an example for default output
         }
-        else bOk = super.testArgument(arg, nArg);
+        else { bOk = super.testArgument(arg, nArg); }
       } catch(Exception exc){ bOk = false; }
       return bOk;
     }
 
   
-  }  
+  } //class CmdLineAndGui 
   
 
   
   
   /**Initializes the areas for the configuration panels. It is called in the graphic thread.
-   * 
    */
   @Override protected void initGuiAreas()
   {

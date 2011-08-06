@@ -111,12 +111,9 @@ public class GuiStatusPanel
       if(sPrjPath ==null){ sPrjPath = sPrjPath1; } //The first is offered.
     	mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0,sPrjPath1);
     }
-    /*
-    mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0,"/home/hartmut/vishia/GUI");
-    mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0,"/home/hartmut/vishia/bazaarGui");
-    mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0,"/home/hartmut/vishia/Java2C/sf/Java2C");
-    mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0,"/home/hartmut/vishia/ZBNF/sf/ZBNF");
-    */
+    if(sPrjPath==null){ 
+      sPrjPath = "??no project directories found.";
+    }
     //Test only in one Project
     widgdProjektpath.setValue(GuiPanelMngWorkingIfc.cmdInsert, 0,sPrjPath);
     mainData.currPrj = new DataProject(FileSystem.absolutePath(sPrjPath, null));
