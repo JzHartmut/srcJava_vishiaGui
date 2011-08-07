@@ -4,10 +4,13 @@ import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GuiMainCmd;
+import org.vishia.gral.gridPanel.TabPanel;
 import org.vishia.mainCmd.MainCmd_ifc;
 
 public class CmdSelect extends GuiCfg
 {
+  
+  TabPanel tabCmd, tabFile1, tabFile2;
 
   public CmdSelect(GuiCallingArgs cargs, GuiMainCmd cmdgui)
   { 
@@ -15,6 +18,26 @@ public class CmdSelect extends GuiCfg
     // TODO Auto-generated constructor stub
   }
   
+  
+  /**Initializes the areas for the panels and configure the panels.
+   * This routine can be overridden if other areas are need.
+   */
+  @Override protected void initGuiAreas()
+  {
+    gui.setFrameAreaBorders(30, 65, 80, 90);
+    //gui.setStandardMenusGThread(new File("."), actionFile);
+
+    
+    //Creates a Tab-Panel:
+    tabCmd = panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate);
+    panelMng.tabPanel.addGridPanel("A", "&A",1,1,10,10);
+      
+    
+    gui.addFrameArea(1,1,1,1, panelMng.tabPanel.getGuiComponent()); //dialogPanel);
+   
+  }
+
+
   
   
   /**The command-line-invocation (primary command-line-call. 

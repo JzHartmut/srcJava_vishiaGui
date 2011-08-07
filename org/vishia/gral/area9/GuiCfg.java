@@ -256,7 +256,7 @@ GuiDispatchCallbackWorker configGuiWithZbnf = new GuiDispatchCallbackWorker()
 
 
 
-/**Initializes the areas for the configuration panels.
+/**Initializes the areas for the panels and configure the panels.
  * This routine can be overridden if other areas are need.
  */
 protected void initGuiAreas()

@@ -554,9 +554,9 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
       for(Runnable build: buildOrders){
         build.run();
       }
-      synchronized(this){
+      synchronized(guiThread){
         if(bWaitStart){
-          notify(); 
+          guiThread.notify(); 
         }
         bStarted = true;
       }
