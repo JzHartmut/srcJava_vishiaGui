@@ -1,12 +1,14 @@
 package org.vishia.gral.widget;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.cmd.PrepareCmd;
 import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
@@ -26,13 +28,20 @@ import org.vishia.gral.ifc.WidgetDescriptor;
 public class CommandSelector extends SelectList
 {
 
+  /**Description of one command.
+   */
   public class CmdBlock
   {
+    /**The identification for user in the selection list. */
     public String name;
+    
+    /**Some commands of this block. */
     private final List<PrepareCmd> listCmd = new LinkedList<PrepareCmd>();
 
+    /**Possible call from {@link org.vishia.zbnf.ZbnfJavaOutput}. Creates an instance of one command */
     public PrepareCmd new_cmd(){ return new PrepareCmd(); }
     
+    /**Possible call from {@link org.vishia.zbnf.ZbnfJavaOutput}. Adds the instance of command */
     public void add_cmd(PrepareCmd cmd)
     { cmd.prepareListCmdReplace();
       listCmd.add(cmd); 
@@ -40,18 +49,28 @@ public class CommandSelector extends SelectList
     
   }
   
+  /**Contains all commands read from the configuration file. */
   private final List<CmdBlock> listCmd = new LinkedList<CmdBlock>();
-  
-  public CmdBlock new_CmdBlock(){ return new CmdBlock(); }
-  
-  public void add_CmdBlock(CmdBlock value){ listCmd.add(value); }
-  
   
   private String syntaxCmd = "Cmds::={ <cmd> }\\e. "
     + "cmd::= <* :?name> : { <*\\n?cmd> \\n } ."; 
   
+
+  final ConcurrentLinkedQueue<CmdBlock> pendingCmds = new ConcurrentLinkedQueue<CmdBlock>();
   
-  String readCmdCfg(String cfgFile)
+  public CommandSelector()
+  {
+    
+  }
+  
+  /**Possible call from {@link org.vishia.zbnf.ZbnfJavaOutput}. Creates an instance of one command block */
+  public CmdBlock new_CmdBlock(){ return new CmdBlock(); }
+  
+  /**Possible call from {@link org.vishia.zbnf.ZbnfJavaOutput}. Adds the instance of command block. */
+  public void add_CmdBlock(CmdBlock value){ listCmd.add(value); }
+  
+  
+  public String readCmdCfg(File cfgFile)
   { String sError = null;
     BufferedReader reader = null;
     try{
@@ -74,6 +93,7 @@ public class CommandSelector extends SelectList
             actBlock.name = sLine.substring(0, posSep);
           }
         }
+        if(actBlock !=null){ add_CmdBlock(actBlock); } 
       } catch(IOException exc){ sError = "CommandSelector - cfg file error; " + cfgFile; }
     }
     return sError;
@@ -83,9 +103,31 @@ public class CommandSelector extends SelectList
   {
     for(CmdBlock data: listCmd){
       
-      wdgdTable.setValue(GuiPanelMngWorkingIfc.cmdInsert, 0, data.name);
+      wdgdTable.setValue(GuiPanelMngWorkingIfc.cmdInsert, 0, data.name, data);
     }
 
   }
+  
+  
+  @Override public void actionOk(Object userData)
+  {
+    CmdBlock cmdBlock = (CmdBlock)userData;
+    pendingCmds.add(cmdBlock);  //to execute.
+  }
+  
+  
+  /**Execute the pending commands.
+   * This method should be called in a specified user thread.
+   * 
+   */
+  public final void executeCmds()
+  {
+    CmdBlock block;
+    while( (block = pendingCmds.poll())!=null){
+      System.out.println(block.name);
+    }
+  }
+  
+  
   
 }

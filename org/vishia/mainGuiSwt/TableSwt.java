@@ -123,13 +123,15 @@ public class TableSwt implements TableGui_ifc
   
   
   
-  void changeTable(int ident, Object content)
+  void changeTable(int ident, Object visibleInfo, Object userData)
   {
     TableItem item = new TableItem(table, SWT.NONE);
-    if(content instanceof String){
-      String[] sLine = ((String)content).split("\t");
+    
+    if(visibleInfo instanceof String){
+      String[] sLine = ((String)visibleInfo).split("\t");
       item.setText(sLine);
     }
+    item.setData(new TableItemWidget(item, userData));
     table.showItem(item);
     //set the scrollbar downward
     ScrollBar scroll = table.getVerticalBar();
@@ -142,6 +144,8 @@ public class TableSwt implements TableGui_ifc
     table.redraw(); //update();
    
   }
+  
+  
   
   
   void clearTable(int ident)
@@ -228,7 +232,7 @@ public class TableSwt implements TableGui_ifc
 		        TableItem line = table1.getItem(ixRow);
 		        TableLineGui_ifc lineGui = (TableLineGui_ifc)line.getData();
 		        if(lineGui == null){
-		          lineGui = new TableItemWidget(line);
+		          lineGui = new TableItemWidget(line, null);
 		          line.setData(lineGui);
 		        }
 		        if(keyEv.keyCode == 0x0d){ //Enter-key pressed:
@@ -287,11 +291,15 @@ public class TableSwt implements TableGui_ifc
    * The instance knows its TableSwt and therefore the supports the access to the whole table.
    *
    */
-  class TableItemWidget implements TableLineGui_ifc
+  private class TableItemWidget implements TableLineGui_ifc
   {
-    final TableItem item;
-    public TableItemWidget(TableItem item)
+    private final TableItem item;
+    
+    private Object userData;
+    
+    public TableItemWidget(TableItem item, Object userData)
     { this.item = item;
+      this.userData = userData;
       item.setData(this);
     }
     
@@ -342,9 +350,9 @@ public class TableSwt implements TableGui_ifc
       return sOldtext;
     }
 
-    @Override public Object getUserData() { return item.getData(); }
+    @Override public Object getUserData() { return userData; }
 
-    @Override public void setUserData(Object data) { item.setData(data); }
+    @Override public void setUserData(Object data) { userData = data; }
     
   }
   

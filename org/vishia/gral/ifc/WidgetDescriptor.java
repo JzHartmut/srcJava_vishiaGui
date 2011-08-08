@@ -284,11 +284,20 @@ public class WidgetDescriptor
   
   /**Sets the current value of the content of the widget in the given context.
    * @param cmd see {@link GuiPanelMngWorkingIfc#cmdSet} etc. It is possible to set the color etc.
-   * @param ident Any number to specifiy set, maybe 0
+   * @param ident Any number to specify set, maybe 0
    * @param value The value in the necessary representation.
    */
-  public void setValue(int cmd, int ident, Object value)
-  { itsPanel.setInfo(this, cmd, ident, value);
+  public void setValue(int cmd, int ident, Object visibleInfo)
+  { itsPanel.setInfo(this, cmd, ident, visibleInfo, null);
+  }
+  
+  /**Sets the current value of the content of the widget in the given context.
+   * @param cmd see {@link GuiPanelMngWorkingIfc#cmdSet} etc. It is possible to set the color etc.
+   * @param ident Any number to specify set, maybe 0
+   * @param value The value in the necessary representation.
+   */
+  public void setValue(int cmd, int ident, Object visibleInfo, Object userData)
+  { itsPanel.setInfo(this, cmd, ident, visibleInfo, userData);
   }
   
   public void setCfgElement(WidgetCfg_ifc cfge)

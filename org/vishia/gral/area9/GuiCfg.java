@@ -153,52 +153,9 @@ public GuiCfg(GuiCallingArgs cargs, GuiMainCmd cmdGui)
   if(user !=null){
     user.registerMethods(panelBuildIfc);
   }
-  
 
-  //create the basic appearance of the GUI. The execution sets dlgAccess:
-  gui.addDispatchListener(initGuiDialog);
-  if(!initGuiDialog.awaitExecution(1, 10000)) throw new RuntimeException("unexpected fail of execution initGuiDialog");
-      
-      
-  /**Creates the dialog elements while reading a config-file. */
-  //
-      //Register any user action. This should be done before the GUI-configuration is read.
+  //Register any user action. This should be done before the GUI-configuration is read.
   panelBuildIfc.registerUserAction("cmdInvoke", cmdInvoke);
-  //dialogCellMng.registerTableAccess("msgOfDay", msgReceiver.msgOfDayAccessGui);
-  //panelBuildIfc.registerTableAccess("msgOfDay", msgReceiver.msgOfDay;
-  
-  //dialogVellMng.re
-  boolean bConfigDone = false;
-  if(cargs.fileGuiCfg != null){
-    //configGuiWithZbnf.ctDone(0);  //counter for done initialized.
-    if(cargs.fileGuiCfg.exists())
-    {
-      File fileSyntax = new File(cargs.sPathZbnf + "/dialog.zbnf");
-      GuiCfgZbnf cfgZbnf = new GuiCfgZbnf(console, fileSyntax);
-      
-      String sError = cfgZbnf.configureWithZbnf(cargs.fileGuiCfg, guiCfgData);
-      if(sError !=null){
-        console.writeError(sError);
-      } else {
-        //dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
-        //cfgBuilder = new GuiCfgBuilder(guiCfgData, panelBuildIfc, fileGui.getParentFile());
-        //panelBuildIfc.setCfgBuilder(cfgBuilder);
-        gui.addDispatchListener(configGuiWithZbnf);
-        bConfigDone = configGuiWithZbnf.awaitExecution(1, 10000);
-        if(!bConfigDone){
-          console.writeError("No configuration");
-        }  
-      }
-    } else {
-      console.writeError("Config file not found: " + cargs.fileGuiCfg.getAbsolutePath());
-    }
-  }    
-  try{ Thread.sleep(10);} catch(InterruptedException exc){}
-  //The GUI-dispatch-loop should know the change worker of the panel manager. Connect both:
-  gui.addDispatchListener(panelBuildIfc.getTheGuiChangeWorker());
-  try{ Thread.sleep(10);} catch(InterruptedException exc){}
-  //gets all prepared fields to show informations.
-  //oamShowValues.setFieldsToShow(panelBuildIfc.getShowFields());
   
 }
 
@@ -281,7 +238,49 @@ protected void initGuiAreas()
  
 }
 
-protected void initMain(){}
+protected void initMain()
+{
+  //create the basic appearance of the GUI. The execution sets dlgAccess:
+  gui.addDispatchListener(initGuiDialog);
+  if(!initGuiDialog.awaitExecution(1, 10000)) throw new RuntimeException("unexpected fail of execution initGuiDialog");
+      
+      
+  /**Creates the dialog elements while reading a config-file. */
+  //
+  //dialogVellMng.re
+  boolean bConfigDone = false;
+  if(cargs.fileGuiCfg != null){
+    //configGuiWithZbnf.ctDone(0);  //counter for done initialized.
+    if(cargs.fileGuiCfg.exists())
+    {
+      File fileSyntax = new File(cargs.sPathZbnf + "/dialog.zbnf");
+      GuiCfgZbnf cfgZbnf = new GuiCfgZbnf(console, fileSyntax);
+      
+      String sError = cfgZbnf.configureWithZbnf(cargs.fileGuiCfg, guiCfgData);
+      if(sError !=null){
+        console.writeError(sError);
+      } else {
+        //dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
+        //cfgBuilder = new GuiCfgBuilder(guiCfgData, panelBuildIfc, fileGui.getParentFile());
+        //panelBuildIfc.setCfgBuilder(cfgBuilder);
+        gui.addDispatchListener(configGuiWithZbnf);
+        bConfigDone = configGuiWithZbnf.awaitExecution(1, 10000);
+        if(!bConfigDone){
+          console.writeError("No configuration");
+        }  
+      }
+    } else {
+      console.writeError("Config file not found: " + cargs.fileGuiCfg.getAbsolutePath());
+    }
+  }    
+  try{ Thread.sleep(10);} catch(InterruptedException exc){}
+  //The GUI-dispatch-loop should know the change worker of the panel manager. Connect both:
+  gui.addDispatchListener(panelBuildIfc.getTheGuiChangeWorker());
+  try{ Thread.sleep(10);} catch(InterruptedException exc){}
+  //gets all prepared fields to show informations.
+  //oamShowValues.setFieldsToShow(panelBuildIfc.getShowFields());
+  
+}
 
 protected void stepMain(){}
 

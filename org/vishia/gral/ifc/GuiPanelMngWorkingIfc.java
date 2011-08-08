@@ -45,6 +45,8 @@ public interface GuiPanelMngWorkingIfc
   
   final static int cmdRemove = 0xde1e7e;  //delete
   
+  //final static int cmdSetData = 0x5e1da1a;  //setdata
+  
 
 	/**Returns the list of all widgets with its informations. 
 	 * The graphical representation of the widgets is unknown here.
@@ -83,8 +85,7 @@ public interface GuiPanelMngWorkingIfc
    * @param value The value to insert, usual a String
    * @return 
    */
-  String setInfo(WidgetDescriptor widgd, int cmd, int ident, Object value);
-  
+  String setInfo(WidgetDescriptor widgd, int cmd, int ident, Object visibleInfo, Object userData);
   
   /**Sets the color of background of the widget, if possible.
    * @param name The name of the widget, which was given by the add...()-Operation

@@ -109,7 +109,7 @@ public class GuiStatusPanel
     String sPrjPath = null;
     for(String sPrjPath1: mainData.cfg.listSwPrjs){
       if(sPrjPath ==null){ sPrjPath = sPrjPath1; } //The first is offered.
-    	mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0,sPrjPath1);
+    	mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0, sPrjPath1, null);
     }
     if(sPrjPath==null){ 
       sPrjPath = "??no project directories found.";

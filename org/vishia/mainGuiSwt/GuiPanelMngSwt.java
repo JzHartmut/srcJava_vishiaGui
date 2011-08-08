@@ -192,13 +192,16 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   	final int ident;
   	
   	/**The textual information which were to be changed or add. */
-  	final Object info;
+  	final Object visibleInfo;
 		
-  	GuiChangeReq(WidgetDescriptor widgetDescr, int cmd, int indent, Object info) 
+  	final Object userData;
+  	
+  	GuiChangeReq(WidgetDescriptor widgetDescr, int cmd, int indent, Object visibleInfo, Object userData) 
 		{ this.widgetDescr = widgetDescr;
 		  this.cmd = cmd;
 			this.ident = indent;
-			this.info = info;
+			this.visibleInfo = visibleInfo;
+			this.userData = userData;
 		}
   	
   }
@@ -1299,30 +1302,30 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   
   public String insertInfo(WidgetDescriptor descr, int ident, String content)
   {
-  	return setInfo(descr, GuiPanelMngWorkingIfc.cmdInsert, ident, content);
+  	return setInfo(descr, GuiPanelMngWorkingIfc.cmdInsert, ident, content, null);
   }
   
   
   
   public String insertInfo(WidgetDescriptor descr, int ident, Object value)
   {
-  	return setInfo(descr, GuiPanelMngWorkingIfc.cmdInsert, ident, value);
+  	return setInfo(descr, GuiPanelMngWorkingIfc.cmdInsert, ident, value, null);
   }
   
   //past: insertInfo
-  @Override public String setInfo(WidgetDescriptor descr, int cmd, int ident, Object value)
+  @Override public String setInfo(WidgetDescriptor descr, int cmd, int ident, Object visibleInfo, Object userData)
   {
     long threadId = Thread.currentThread().getId();
     if(threadId == mngBase.getThreadIdGui()){
-      setInfoDirect(descr, cmd, ident, value);
+      setInfoDirect(descr, cmd, ident, visibleInfo, userData);
     } else {
     	if(descr.name !=null && descr.name.equals("writerEnergy1Sec") && cmd == GuiPanelMngWorkingIfc.cmdInsert) ////)
     		stop();
     	//check the admissibility:
     	switch(cmd){
-    	case GuiPanelMngWorkingIfc.cmdInsert: checkAdmissibility(value != null && value instanceof String); break;
+    	case GuiPanelMngWorkingIfc.cmdInsert: checkAdmissibility(visibleInfo != null && visibleInfo instanceof String); break;
     	}
-      mngBase.guiChangeRequests.add(new GuiChangeReq(descr, cmd, ident, value));
+      mngBase.guiChangeRequests.add(new GuiChangeReq(descr, cmd, ident, visibleInfo, userData));
   	  synchronized(mngBase.guiChangeRequests){ mngBase.guiChangeRequests.notify(); }  //to wake up waiting on guiChangeRequests.
   	  graphicFrame.getDisplay().wake(); //wake-up the GUI-thread, it may sleep elsewhere.
   	  //((Composite)currPanel.panelComposite).getDisplay().wake();  //wake-up the GUI-thread, it may sleep elsewhere. 
@@ -1332,7 +1335,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   
   
   
-  private void setInfoDirect(WidgetDescriptor descr, int cmd, int ident, Object info)
+  private void setInfoDirect(WidgetDescriptor descr, int cmd, int ident, Object info, Object data)
   {
         Object oWidget = descr.widget;
         if(oWidget !=null){
@@ -1352,8 +1355,8 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
               TableSwt table = (TableSwt)oWidget;
               //NOTE: ident is the row number. Insert before row.
               switch(cmd){
-              case GuiPanelMngWorkingIfc.cmdInsert: table.changeTable(ident, info); break;
-              case GuiPanelMngWorkingIfc.cmdSet: table.changeTable(ident, info); break;
+              case GuiPanelMngWorkingIfc.cmdInsert: table.changeTable(ident, info, data); break;
+              case GuiPanelMngWorkingIfc.cmdSet: table.changeTable(ident, info, data); break;
               case GuiPanelMngWorkingIfc.cmdClear: table.clearTable(ident); break;
               default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, descr.name);
               }
@@ -1448,7 +1451,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   public void setBackColor(WidgetDescriptor descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
   	WidgetDescriptor descr = (WidgetDescriptor) descr1;
-  	setInfo(descr, GuiPanelMngWorkingIfc.cmdBackColor, ix, color);
+  	setInfo(descr, GuiPanelMngWorkingIfc.cmdBackColor, ix, color, null);
   } 
   
   
@@ -1456,7 +1459,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   {
   	@SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
   	WidgetDescriptor descr = (WidgetDescriptor) widgetDescr;
-  	setInfo(descr, GuiPanelMngWorkingIfc.cmdColor, colorBorder, colorInner);
+  	setInfo(descr, GuiPanelMngWorkingIfc.cmdColor, colorBorder, colorInner, null);
   	
   }
   
@@ -1523,7 +1526,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	  GuiChangeReq changeReq;
   	  while( (changeReq = mngBase.guiChangeRequests.poll()) != null){
   	  	WidgetDescriptor descr = changeReq.widgetDescr;
-  	  	setInfoDirect(descr, changeReq.cmd, changeReq.ident, changeReq.info);
+  	  	setInfoDirect(descr, changeReq.cmd, changeReq.ident, changeReq.visibleInfo, changeReq.userData);
 
   	  }
   	}  
@@ -1593,7 +1596,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sName);
   	} else if((descr.widget instanceof CurveView)) {
   		//sends a redraw information.
-  	  mngBase.guiChangeRequests.add(new GuiChangeReq(descr, GuiPanelMngWorkingIfc.cmdRedrawPart, 0, null));
+  	  mngBase.guiChangeRequests.add(new GuiChangeReq(descr, GuiPanelMngWorkingIfc.cmdRedrawPart, 0, null, null));
   		((Composite)currPanel.panelComposite).getDisplay().wake();  //wake-up the GUI-thread, it may sleep elsewhere. 
   	} else {
   	}

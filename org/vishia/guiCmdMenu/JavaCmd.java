@@ -1,5 +1,7 @@
 package org.vishia.guiCmdMenu;
 
+import java.io.File;
+
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
@@ -8,17 +10,25 @@ import org.vishia.gral.gridPanel.TabPanel;
 import org.vishia.gral.widget.CommandSelector;
 import org.vishia.mainCmd.MainCmd_ifc;
 
-public class CmdSelect extends GuiCfg
+public class JavaCmd extends GuiCfg
 {
+  
+  private static class CallingArgs extends GuiCallingArgs
+  {
+    File fileCfgCmds;
+  }
+  
+  private final CallingArgs cargs;
   
   TabPanel tabCmd, tabFile1, tabFile2;
   
-  CommandSelector cmdSelector;
+  private final CommandSelector cmdSelector = new CommandSelector();
+  
 
-  public CmdSelect(GuiCallingArgs cargs, GuiMainCmd cmdgui)
+  public JavaCmd(CallingArgs cargs, GuiMainCmd cmdgui)
   { 
     super(cargs, cmdgui);
-    // TODO Auto-generated constructor stub
+    this.cargs = cargs;
   }
   
   
@@ -44,7 +54,6 @@ public class CmdSelect extends GuiCfg
     tabFile2.addGridPanel("file2", "File&2",1,1,10,10);
     gui.addFrameArea(3,1,1,1, tabFile2.getGuiComponent()); //dialogPanel);
       
-    cmdSelector = new CommandSelector();
     CommandSelector.CmdBlock cmd = cmdSelector.new_CmdBlock();
     cmd.name = "test1";
     cmdSelector.add_CmdBlock(cmd);
@@ -58,7 +67,48 @@ public class CmdSelect extends GuiCfg
    
   }
 
+  @Override protected final void initMain()
+  { if(cargs.fileCfgCmds == null){
+      mainCmd.writeError("Argument cmdcfg:CONFIGFILE should be given.");
+      //mainCmd.e
+    } else {
+      cmdSelector.readCmdCfg(cargs.fileCfgCmds);  
+    }
+    super.initMain();  //starts initializing of graphic. Do it after config command selector!
+  
+  }
+  
+  /**Executing in the main thread loop. It handles commands.
+   * @see org.vishia.gral.area9.GuiCfg#stepMain()
+   */
+  @Override public void stepMain()
+  {
+    cmdSelector.executeCmds();
+  }
+  
+  
+  
+  private static class MainCmd extends GuiMainCmd
+  {
 
+    private final CallingArgs cargs;
+    
+    public MainCmd(CallingArgs cargs, String[] args)
+    {
+      super(cargs, args, "Java Commander");
+      this.cargs = cargs;
+    }
+    
+    @Override protected boolean testArgument(String arg, int nArg)
+    { boolean bOk = true;
+      if(arg.startsWith("cmdcfg:")){
+        cargs.fileCfgCmds = new File(arg.substring(7));
+      }
+      else { bOk = super.testArgument(arg, nArg); }
+      return bOk;
+    }
+    
+  }
   
   
   /**The command-line-invocation (primary command-line-call. 
@@ -66,10 +116,10 @@ public class CmdSelect extends GuiCfg
    */
   public static void main(String[] args)
   { boolean bOk = true;
-    GuiCallingArgs cargs = new GuiCallingArgs();
+    CallingArgs cargs = new CallingArgs();
     //Initializes the GUI till a output window to show information.
     //Uses the commonly GuiMainCmd class because here are not extra arguments.
-    GuiMainCmd cmdgui = new GuiMainCmd(cargs, args, "Java-Commander");  //implements MainCmd, parses calling arguments
+    GuiMainCmd cmdgui = new MainCmd(cargs, args);  //implements MainCmd, parses calling arguments
     try{ cmdgui.parseArguments(); }
     catch(Exception exception)
     { cmdgui.writeError("Cmdline argument error:", exception);
@@ -81,7 +131,7 @@ public class CmdSelect extends GuiCfg
       new InterProcessCommFactorySocket();
       //
       //Initialize this main class and execute.
-      CmdSelect main = new CmdSelect(cargs, cmdgui);
+      JavaCmd main = new JavaCmd(cargs, cmdgui);
       main.execute();
     }
     cmdgui.exit();

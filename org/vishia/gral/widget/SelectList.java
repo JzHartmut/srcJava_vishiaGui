@@ -13,7 +13,7 @@ import org.vishia.gral.ifc.WidgetDescriptor;
  * @author Hartmut Schorrig
  *
  */
-public class SelectList
+public abstract class SelectList
 {
   /**The table which is showing in the widget. */
   WidgetDescriptor wdgdTable;
@@ -37,6 +37,13 @@ public class SelectList
   }
   
   
+  /**Action if a table line is selected and entered. Its either a double click with the mouse
+   * or click of OK (Enter) button.
+   * @param userData The user data stored in the line of table.
+   */
+  abstract void actionOk(Object userData);
+  
+  
   UserActionGui actionTable = new UserActionGui()
   {
 
@@ -45,6 +52,7 @@ public class SelectList
       TableGui_ifc table = (TableGui_ifc)infos.widget;
       TableLineGui_ifc line = table.getCurrentLine();
       Object data = line.getUserData();
+      actionOk(data);
     }
     
   };
