@@ -60,7 +60,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.vishia.gral.area9.GuiMainAreaBase;
 import org.vishia.gral.area9.GuiMainAreaifc;
-import org.vishia.gral.gui.GuiDispatchCallbackWorker;
+import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.widget.TextBoxGuifc;
 import org.vishia.gral.widget.WidgetCmpnifc;
@@ -215,7 +215,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   
   /**The id of the thread, which created the display. 
    * It is to check whether gui-commands should be queued or not. */
-  protected long idThreadGui;
+  //protected long idThreadGui;
   
   /** The frame of the Window in the GUI (Graphical Unit Interface)*/
   protected Shell graphicFrame;
@@ -477,8 +477,9 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   }
   */
   
-  public MainCmdSwt(MainCmd cmdP) //String[] args)
+  public MainCmdSwt(MainCmd cmdP, GralDeviceSwt gralDevice) //String[] args)
   { //super(args);
+    super(gralDevice);
     mainCmd = cmdP;
   }
   
@@ -516,7 +517,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   {
   	if(!bStarted){
   		setTitleAndSize(sTitle, left, top, xSize, ySize);
-  		idThreadGui = Thread.currentThread().getId();
+  		gralDevice.guiThreadId = Thread.currentThread().getId();
       guiDevice = new Display ();
       guiDevice.addFilter(SWT.Close, windowsCloseListener);
       graphicFrame = new Shell(guiDevice); //, SWT.ON_TOP | SWT.MAX | SWT.TITLE);
@@ -1163,7 +1164,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    * if it has a better way to show infos.*/
   protected void writeDirectly(String sInfo, short kind)  //##a
   { if(textAreaOutput != null){
-      if(Thread.currentThread().getId() == idThreadGui){
+      if(Thread.currentThread().getId() == gralDevice.guiThreadId){
 	  	  if((kind & MainCmd.mNewln_writeInfoDirectly) != 0)
 	      { textAreaOutput.append("\n");
 	      }

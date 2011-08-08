@@ -79,6 +79,13 @@ public class CommandSelector extends SelectList
     return sError;
   }
   
-  
+  public void fillIn()
+  {
+    for(CmdBlock data: listCmd){
+      
+      wdgdTable.setValue(GuiPanelMngWorkingIfc.cmdInsert, 0, data.name);
+    }
+
+  }
   
 }

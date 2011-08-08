@@ -1,7 +1,11 @@
 package org.vishia.gral.area9;
 
+import org.vishia.gral.base.GralDevice;
+
 public class GuiMainAreaBase
 {
+  protected final GralDevice gralDevice;
+  
   /**Area settings for output. */
   protected String outputArea;
   
@@ -14,6 +18,12 @@ public class GuiMainAreaBase
    */
   public void setOutputArea(String area){
     outputArea = area;
+  }
+
+  public GuiMainAreaBase(GralDevice guiDevice)
+  {
+    super();
+    this.gralDevice = guiDevice;
   }
 
 

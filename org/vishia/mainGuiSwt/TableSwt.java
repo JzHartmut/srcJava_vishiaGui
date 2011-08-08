@@ -10,6 +10,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -17,10 +18,11 @@ import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.ifc.ColorGui;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.widget.TableGui_ifc;
 import org.vishia.gral.widget.TableLineGui_ifc;
 import org.vishia.gral.widget.WidgetGui_ifc;
 
-public class TableSwt
+public class TableSwt implements TableGui_ifc
 {
 
   private final Table table;
@@ -110,7 +112,7 @@ public class TableSwt
     final TableSwt table;
     Composite parent = (Composite)mng.currPanel.panelComposite;
     table = new TableSwt(mng, parent, height, columnWidths); //, selectionColumn, selectionText);
-    WidgetDescriptor widgd = new WidgetDescriptor(sName, table.table, 'L', sName, null);
+    WidgetDescriptor widgd = new WidgetDescriptor(sName, table, 'L', sName, null);
     widgd.setPanelMng(mng);
     table.table.setData(widgd);
     mng.indexNameWidgets.put(sName, widgd);
@@ -120,6 +122,40 @@ public class TableSwt
   
   
   
+  
+  void changeTable(int ident, Object content)
+  {
+    TableItem item = new TableItem(table, SWT.NONE);
+    if(content instanceof String){
+      String[] sLine = ((String)content).split("\t");
+      item.setText(sLine);
+    }
+    table.showItem(item);
+    //set the scrollbar downward
+    ScrollBar scroll = table.getVerticalBar();
+    if(scroll !=null){
+      int maxScroll = scroll.getMaximum();
+      //log.sendMsg(0, "TEST scroll=%d", maxScroll);
+      //scroll.setSelection(maxScroll);
+    }  
+    //table.set
+    table.redraw(); //update();
+   
+  }
+  
+  
+  void clearTable(int ident)
+  {
+    if(ident <0){ table.removeAll();}
+    else { table.remove(ident); }
+    table.redraw(); //update();
+  }
+  
+  
+  
+
+  
+
   
   
   
@@ -256,6 +292,7 @@ public class TableSwt
     final TableItem item;
     public TableItemWidget(TableItem item)
     { this.item = item;
+      item.setData(this);
     }
     
     @Override public Widget getWidget(){ return item; } 
@@ -304,9 +341,94 @@ public class TableSwt
       item.setText(column, text);
       return sOldtext;
     }
+
+    @Override public Object getUserData() { return item.getData(); }
+
+    @Override public void setUserData(Object data) { item.setData(data); }
     
   }
   
   
   void stop(){}
+
+
+  @Override
+  public TableLineGui_ifc getCurrentLine()
+  {
+    int row = table.getSelectionIndex();
+    if(row >=0){
+      TableItem tableLineSwt = table.getItem(row);
+      return (TableLineGui_ifc)tableLineSwt.getData();
+    } else return null;  //nothing selected.
+  }
+
+
+  @Override public TableLineGui_ifc getLine(int row)
+  {
+    TableItem tableLineSwt = table.getItem(row);
+    return (TableLineGui_ifc)tableLineSwt.getData();
+  }
+
+
+  @Override
+  public TableLineGui_ifc getLine(String key)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+  @Override
+  public int insertLine(String key, TableLineGui_ifc line, int row)
+  {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+
+  @Override
+  public int searchLine(String key)
+  {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+
+  @Override
+  public String getText()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+  @Override
+  public ColorGui setBackgroundColor(ColorGui color)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+  @Override
+  public ColorGui setForegroundColor(ColorGui color)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+  @Override
+  public String setText(String text)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+  @Override
+  public Object getWidget()
+  {
+    return table;
+  }
 }

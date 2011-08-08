@@ -65,6 +65,7 @@ import org.eclipse.swt.widgets.Widget;
 
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GralDevice;
 import org.vishia.gral.gridPanel.GuiPanelMngBase;
 import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
@@ -72,9 +73,9 @@ import org.vishia.gral.gridPanel.PanelActivatedGui;
 import org.vishia.gral.gridPanel.PanelContent;
 import org.vishia.gral.gridPanel.PropertiesGui;
 import org.vishia.gral.gridPanel.TabPanel;
-import org.vishia.gral.gui.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.ColorGui;
 import org.vishia.gral.ifc.FileDialogIfc;
+import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.GuiImageBase;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
 import org.vishia.gral.ifc.GuiRectangle;
@@ -298,11 +299,11 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public GuiPanelMngSwt( Device device, Composite graphicFrame
+  public GuiPanelMngSwt(GralDevice gralDevice,  Device device, Composite graphicFrame
   , int width, int height, char displaySize, VariableContainer_ifc variableContainer
 	, LogMessage log)
   { //super(sTitle); 
-  	this(null, graphicFrame, width, height, new PropertiesGuiSwt(device, displaySize), variableContainer, log);
+  	this(gralDevice, null, graphicFrame, width, height, new PropertiesGuiSwt(device, displaySize), variableContainer, log);
   	
   }
 
@@ -313,11 +314,11 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public GuiPanelMngSwt(GuiPanelMngBase parent, Composite graphicFrame, int width, int height, PropertiesGuiSwt propertiesGui
+  public GuiPanelMngSwt(GralDevice gralDevice, GuiPanelMngBase parent, Composite graphicFrame, int width, int height, PropertiesGuiSwt propertiesGui
   	, VariableContainer_ifc variableContainer
   	, LogMessage log
   	)
-  { super(parent, propertiesGui, variableContainer, log);
+  { super(gralDevice, parent, propertiesGui, variableContainer, log);
     this.propertiesGuiSwt = propertiesGui;
   	this.graphicFrame = graphicFrame;
   	Composite shell = graphicFrame;
@@ -352,7 +353,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     Composite box = new Composite((Composite)currPanel.panelComposite, 0);
     setPosAndSize_(box);
     Point size = box.getSize();
-    GuiPanelMngSwt mng = new GuiPanelMngSwt(this, box, size.y, size.x, propertiesGuiSwt, variableContainer, log);
+    GuiPanelMngSwt mng = new GuiPanelMngSwt(mngBase.gralDevice, this, box, size.y, size.x, propertiesGuiSwt, variableContainer, log);
     return mng;
   }
 
@@ -401,7 +402,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
 		setPosAndSize_(shell, line,0, column,0, dy,0, dx,0);
 		//shell.setBounds(left,top, width, height);
 		shell.setText("SHELL");
-		GuiShellMngBuildIfc mng = new GuiShellMngSwt(shell, this, 0, 0, propertiesGuiSwt, variableContainer, log);
+		GuiShellMngBuildIfc mng = new GuiShellMngSwt(mngBase.gralDevice, shell, this, 0, 0, propertiesGuiSwt, variableContainer, log);
 		//mng.setWindowVisible(true);
 		
 		return mng;
@@ -444,7 +445,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     
     
 		if(title !=null){ shell.setText(title); }
-		GuiShellMngBuildIfc mng = new GuiShellMngSwt(shell, this, 0, 0, propertiesGuiSwt, variableContainer, log);
+		GuiShellMngBuildIfc mng = new GuiShellMngSwt(mngBase.gralDevice, shell, this, 0, 0, propertiesGuiSwt, variableContainer, log);
 		//mng.setWindowVisible(true);
 		
 		return mng;
@@ -1347,12 +1348,13 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
             assert(oWidget instanceof CurveView);
             ((CurveView)(oWidget)).redrawData(); break; //causes a partial redraw
           default: 
-            if(oWidget instanceof Table){ 
-              Table table = (Table)oWidget;
+            if(oWidget instanceof TableSwt){ 
+              TableSwt table = (TableSwt)oWidget;
+              //NOTE: ident is the row number. Insert before row.
               switch(cmd){
-              case GuiPanelMngWorkingIfc.cmdInsert: changeTable(table, ident, (String)info); break;
-              case GuiPanelMngWorkingIfc.cmdSet: changeTable(table, ident, (String)info); break;
-              case GuiPanelMngWorkingIfc.cmdClear: clearTable(table, ident); break;
+              case GuiPanelMngWorkingIfc.cmdInsert: table.changeTable(ident, info); break;
+              case GuiPanelMngWorkingIfc.cmdSet: table.changeTable(ident, info); break;
+              case GuiPanelMngWorkingIfc.cmdClear: table.clearTable(ident); break;
               default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, descr.name);
               }
             } else if(oWidget instanceof Text){ 
@@ -1387,38 +1389,6 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
         }//if oWidget !=null
     
   }
-  
-  
-  
-  void changeTable(Table table, int ident, String content)
-  {
-    String[] sLine = content.split("\t");
-    TableItem item = new TableItem(table, SWT.NONE);
-    item.setText(sLine);
-    table.showItem(item);
-    //set the scrollbar downward
-    ScrollBar scroll = table.getVerticalBar();
-    if(scroll !=null){
-      int maxScroll = scroll.getMaximum();
-      //log.sendMsg(0, "TEST scroll=%d", maxScroll);
-      //scroll.setSelection(maxScroll);
-    }  
-    //table.set
-    table.redraw(); //update();
-   
-  }
-  
-  
-  void clearTable(Table table, int ident)
-  {
-    if(ident <0){ table.removeAll();}
-    else { table.remove(ident); }
-    table.redraw(); //update();
-  }
-  
-  
-  
-
   
   
   private void checkAdmissibility(boolean value){
@@ -1541,19 +1511,12 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   private final GuiDispatchCallbackWorker dispatchListener = new GuiDispatchCallbackWorker()
   {
   	
-  	boolean done = false;
-
   	
   	/**This method is called in the GUI-thread. 
   	 * 
   	 */
   	@Override public void doBeforeDispatching(boolean onlyWakeup)
-  	{ if(!done){
-        long threadId = Thread.currentThread().getId();
-        mngBase.setThreadIdSwt(threadId);
-  		  done=true;
-			}
-  	  if(designer !=null && !bDesignerIsInitialized){
+  	{ if(designer !=null && !bDesignerIsInitialized){
   	    designer.initGui();
   	    bDesignerIsInitialized = true;
   	  }

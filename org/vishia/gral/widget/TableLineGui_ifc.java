@@ -8,4 +8,8 @@ public interface TableLineGui_ifc extends WidgetGui_ifc
   
   String setCellText(String text, int column);
   
+  void setUserData(Object data);
+  
+  Object getUserData();
+  
 }

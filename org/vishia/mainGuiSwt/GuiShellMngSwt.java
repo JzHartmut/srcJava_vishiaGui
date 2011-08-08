@@ -9,9 +9,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GralDevice;
+import org.vishia.gral.gridPanel.GuiMngBase;
 import org.vishia.gral.gridPanel.GuiPanelMngBase;
 import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
-import org.vishia.gral.gui.GuiMngBase;
 import org.vishia.gral.ifc.GuiShellMngIfc;
 import org.vishia.msgDispatch.LogMessage;
 
@@ -27,12 +28,12 @@ public class GuiShellMngSwt extends GuiPanelMngSwt implements GuiShellMngBuildIf
 
   boolean bActiv;
   
-	public GuiShellMngSwt(Shell graphicFrame, GuiPanelMngBase parent, int width, int height,
+	public GuiShellMngSwt(GralDevice gralDevice, Shell graphicFrame, GuiPanelMngBase parent, int width, int height,
 		PropertiesGuiSwt propertiesGui, VariableContainer_ifc variableContainer
   	, LogMessage log
 	)
 	{
-		super(parent, graphicFrame, width, height, propertiesGui, variableContainer, log);
+		super(gralDevice, parent, graphicFrame, width, height, propertiesGui, variableContainer, log);
 	  guiDevice = graphicFrame.getDisplay();
 		graphicFrame.addShellListener(shellListener);
 	}

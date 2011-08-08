@@ -11,11 +11,11 @@ import java.util.TreeMap;
 
 import org.eclipse.swt.widgets.Control;
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GralDevice;
 import org.vishia.gral.cfg.GuiCfgBuilder;
 import org.vishia.gral.cfg.GuiCfgData;
 import org.vishia.gral.cfg.GuiCfgDesigner;
 import org.vishia.gral.cfg.GuiCfgWriter;
-import org.vishia.gral.gui.GuiMngBase;
 import org.vishia.gral.ifc.FileDialogIfc;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
 import org.vishia.gral.ifc.GuiRectangle;
@@ -214,12 +214,12 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   
 	
 	
-  public GuiPanelMngBase(GuiPanelMngBase parent
+  public GuiPanelMngBase(GralDevice gralDevice, GuiPanelMngBase parent
       , PropertiesGui props
       , VariableContainer_ifc variableContainer, LogMessage log)
 	{ this.parent = parent;
 	  if(parent == null){
-	    mngBase = new GuiMngBase();
+	    mngBase = new GuiMngBase(gralDevice);
 	  } else {
 	    mngBase = parent.mngBase;
 	  }

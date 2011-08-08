@@ -9,9 +9,9 @@ import java.util.Set;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.cfg.GuiCfgData;
-import org.vishia.gral.gui.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.ColorGui;
 import org.vishia.gral.ifc.FileDialogIfc;
+import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
 import org.vishia.gral.ifc.GuiShellMngIfc;
 import org.vishia.gral.ifc.GuiWindowMng_ifc;
