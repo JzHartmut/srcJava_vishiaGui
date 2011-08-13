@@ -84,6 +84,7 @@ import org.vishia.gral.ifc.GuiWindowMng_ifc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.gral.widget.WidgetCmpnifc;
+import org.vishia.gral.widget.Widgetifc;
 import org.vishia.msgDispatch.LogMessage;
 
 
@@ -564,7 +565,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     final GuiRectangle rectangle;
     if(dx == Integer.MIN_VALUE+1){
       final Point parentSize = parentComp.getSize();
-      rectangle = calcWidgetPosAndSize(parentSize.x, parentSize.y);
+      rectangle = calcWidgetPosAndSize(pos, parentSize.x, parentSize.y);
     } else {
       rectangle = calcPosAndSize(line, yPosFrac, column, xPosFrac, dy, ySizeFrac, dx,xSizeFrac,0,0);
     }
@@ -1500,6 +1501,19 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	} else {
   	}
 	}
+
+	
+	@Override public void resizeWidget(WidgetDescriptor widgd, int xSizeParent, int ySizeParent)
+	{
+	  Widgetifc widget = (Widgetifc)(widgd.widget);
+	  Control swtWidget = (Control)widget.getWidget();
+	  Point size = swtWidget.getParent().getSize();
+	  //Composite parent = swtWidget.
+	  GuiRectangle posSize = calcWidgetPosAndSize(widgd.pos, size.x, size.y);
+	  swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
+	  swtWidget.redraw();
+	}
+	
 	
 	@Override
 	public void setColorGridCurveViewY(String sName, int backgroundColor,

@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.vishia.gral.gridPanel.PanelContent;
 import org.vishia.gral.ifc.CanvasStorage;
 import org.vishia.gral.ifc.ColorGui;
+import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.gral.widget.WidgetCmpnifc;
 import org.vishia.gral.widget.Widgetifc;
 
@@ -164,6 +165,11 @@ public class CanvasStorePanelSwt extends PanelContent implements WidgetCmpnifc  
 
     @Override public void controlResized(ControlEvent e) 
     { 
+      Widget wparent = e.widget; //it is the SwtCanvas because this method is assigned only there.
+      //Control parent = wparent;
+      for(WidgetDescriptor widgd: widgetsToResize){
+        widgd.getPanel().resizeWidget(widgd, 0, 0);
+      }
       stop();
       //validateFrameAreas();  //calculates the size of the areas newly and redraw.
     }

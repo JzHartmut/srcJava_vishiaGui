@@ -26,10 +26,9 @@ public class GralPanelContent
   
 
   
-  
-  
   public GralPanelContent(GuiPlugUser_ifc user)
-  { this.user = user;
+  { 
+    this.user = user;
   }
 
 

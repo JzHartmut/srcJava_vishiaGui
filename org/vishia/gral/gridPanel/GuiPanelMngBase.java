@@ -503,20 +503,26 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   }
   
   
-  protected GuiRectangle calcWidgetPosAndSize(int dxPixelParent, int dyPixelParent)
+  /**Calculates the position and size of a widget
+   * @param posWidget The position.
+   * @param widthParentPixel The size of the panel, where the widget is member of
+   * @param heightParentPixel The size of the panel, where the widget is member of
+   * @return A rectangle for setBounds.
+   */
+  protected GuiRectangle calcWidgetPosAndSize(GralGridPosition posWidget, int widthParentPixel, int heightParentPixel)
   {
     int xPixelUnit = propertiesGui.xPixelUnit();
     int yPixelUnit = propertiesGui.yPixelUnit();
     //calculate pixel
     final int x1,y1, x2, y2;
-    x1 = xPixelUnit * pos.x + propertiesGui.xPixelFrac(pos.xFrac)  //negative if from right
-       + (pos.x < 0 ? dxPixelParent : 0);  //from right
-    y1 = yPixelUnit * pos.y + propertiesGui.yPixelFrac(pos.yFrac)  //negative if from right
-       + (pos.y < 0 ? dyPixelParent : 0);  //from right
-    x2 = xPixelUnit * pos.xEnd + propertiesGui.xPixelFrac(pos.xEndFrac)  //negative if from right
-       + (pos.xEnd < 0 ? dxPixelParent : 0);  //from right
-    y2 = yPixelUnit * pos.yEnd + propertiesGui.yPixelFrac(pos.yEndFrac)  //negative if from right
-       + (pos.yEnd < 0 ? dyPixelParent : 0);  //from right
+    x1 = xPixelUnit * posWidget.x + propertiesGui.xPixelFrac(posWidget.xFrac)  //negative if from right
+       + (posWidget.x < 0 ? widthParentPixel : 0);  //from right
+    y1 = yPixelUnit * posWidget.y + propertiesGui.yPixelFrac(posWidget.yFrac)  //negative if from right
+       + (posWidget.y < 0 ? heightParentPixel : 0);  //from right
+    x2 = xPixelUnit * posWidget.xEnd + propertiesGui.xPixelFrac(posWidget.xEndFrac)  //negative if from right
+       + (posWidget.xEnd < 0 ? widthParentPixel : 0);  //from right
+    y2 = yPixelUnit * posWidget.yEnd + propertiesGui.yPixelFrac(posWidget.yEndFrac)  //negative if from right
+       + (posWidget.yEnd < 0 ? heightParentPixel : 0);  //from right
     
     GuiRectangle rectangle = new GuiRectangle(x1, y1, x2-x1, y2-y1);
     return rectangle;

@@ -117,6 +117,13 @@ public interface GuiPanelMngWorkingIfc
    */
   void redrawWidget(String sName);
   
+  
+  
+  /**Forces the resizing of the given widged. 
+   * @param widgd the widget
+   */
+  void resizeWidget(WidgetDescriptor widgd, int xSizeParent, int ySizeParent);
+  
 	/**Gets the value to the named color. It is a method of the graphic.
 	 * @param sName supported: red, green, blue, yellow
 	 * @return 3 bytes intensity: bit23..16 blue, bit15..8: green, bit 7..0 red. 

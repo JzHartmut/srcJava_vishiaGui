@@ -4,13 +4,15 @@ import org.vishia.gral.widget.WidgetCmpnifc;
 
 
 /**This class is the common base class for Tab-Panels.
+ * A TabPanel is the container for Tabs. It doesn't contain other widgets than Tabs.
+ * A Tab inside the TabPanel is a usability Panel.
  * <ul>
  * <li>SWT: TabFolder, TabItem
  * <li>Swing: TabbedPane
  * @author Hartmut Schorrig
  *
  */
-public abstract class TabPanel extends GralPanel
+public abstract class TabPanel
 {
 	final protected PanelActivatedGui notifyingUserInstanceWhileSelectingTab;
 	
@@ -19,8 +21,7 @@ public abstract class TabPanel extends GralPanel
 	 * @param user
 	 */
 	protected TabPanel(PanelActivatedGui user, int property)
-	{ super(property);
-		this.notifyingUserInstanceWhileSelectingTab = user;
+	{ this.notifyingUserInstanceWhileSelectingTab = user;
 	}
 	
 	/**Adds a grid-panel in the TabPanel. The panel will be registered in the GuiPanelMng,

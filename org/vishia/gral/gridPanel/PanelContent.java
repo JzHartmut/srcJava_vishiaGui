@@ -28,11 +28,27 @@ public class PanelContent
 
   public List<WidgetDescriptor> widgetsToResize = new LinkedList<WidgetDescriptor>();
 
-	
+
+  /**True then the content of the panel is zoomed with the actual size of panel. 
+   * It means that all widgets are zoomed in position and size,  but there content isn't changed. */
+  protected boolean bZoomed;
+  
+  /**True then the grid of the panel is zoomed with the actual size of panel. 
+   * It means that all fonts are changed too.
+   * */
+  protected boolean bGridZoomed;
+  
+  
+  
+
+  
 	public PanelContent(Object panelComposite)
 	//public PanelContent(CanvasStorePanel panelComposite)
 	{
 		this.panelComposite = panelComposite;
+    int property = 0; //TODO parameter
+    bZoomed = (property & GuiPanelMngBuildIfc.propZoomedPanel) !=0;
+    bGridZoomed = (property & GuiPanelMngBuildIfc.propGridZoomedPanel) !=0;
 	}
 	
 	
