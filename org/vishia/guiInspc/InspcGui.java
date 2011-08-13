@@ -112,7 +112,7 @@ public class InspcGui extends GuiCfg
 
     
     //Creates a Tab-Panel:
-    panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate);
+    panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate, 0);
     panelMng.tabPanel.addGridPanel("operation", "&Operation",1,1,10,10);
       
     gui.addFrameArea(1,1,3,2, panelMng.tabPanel.getGuiComponent()); //dialogPanel);
@@ -138,7 +138,8 @@ public class InspcGui extends GuiCfg
     inspcComm.openComm(cargs.sOwnIpcAddr);
     //msgReceiver.start();
     //oamRcvUdpValue.start();
-    
+    super.initMain();  //starts initializing of graphic. Do it after reading some configurations.
+
   }
   
   @Override protected void stepMain()

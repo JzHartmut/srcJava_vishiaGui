@@ -1,6 +1,8 @@
 package org.vishia.mainGuiSwt;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -29,6 +31,8 @@ public class TableSwt implements TableGui_ifc
   
   private final GuiPanelMngSwt mng;
   
+  private int[] columnWidths;
+  
   //private final int selectionColumn;
   //private final CharSequence selectionText;
   
@@ -36,6 +40,7 @@ public class TableSwt implements TableGui_ifc
       , int[] columnWidths) //, int selectionColumn, CharSequence selectionText)
   {
     this.mng = mng;
+    this.columnWidths = columnWidths;
     //this.selectionColumn = selectionColumn;
     //this.selectionText = selectionText;
     this.table = new Table(parent, 0) ; //, SWT.FULL_SELECTION); //| SWT.CHECK);
@@ -49,6 +54,8 @@ public class TableSwt implements TableGui_ifc
     }
     table.addKeyListener(new TableKeyListerner(null));
     table.addSelectionListener(selectionListener);
+    table.addControlListener(resizeListener);
+    
     table.setFont(mng.propertiesGuiSwt.stdInputFont);
     //table.setColumnSelectionAllowed(true);
     //table.setRowHeight(2 * this.propertiesGui.xPixelUnit());
@@ -99,8 +106,17 @@ public class TableSwt implements TableGui_ifc
     //setBounds_(table, diff);
     guiContent.add(widget);
    */
-    mng.setBounds_(table);
+   resizeTable();
   }
+
+  
+  void resizeTable()
+  {
+    mng.setBounds_(table);
+    
+  }
+  
+  
   
   
   public static WidgetDescriptor addTable(GuiPanelMngSwt mng, String sName, int height, int[] columnWidths
@@ -115,6 +131,7 @@ public class TableSwt implements TableGui_ifc
     WidgetDescriptor widgd = new WidgetDescriptor(sName, table, 'L', sName, null);
     widgd.setPanelMng(mng);
     table.table.setData(widgd);
+    mng.setWidgetToResize(widgd);
     mng.indexNameWidgets.put(sName, widgd);
     return widgd;
 
@@ -357,11 +374,26 @@ public class TableSwt implements TableGui_ifc
   }
   
   
+  ControlListener resizeListener = new ControlListener()
+  { @Override public void controlMoved(ControlEvent e) 
+    { //do nothing if moved.
+      stop();
+    }
+
+    @Override public void controlResized(ControlEvent e) 
+    { 
+      stop();
+      //validateFrameAreas();  //calculates the size of the areas newly and redraw.
+    }
+    
+  };
+  
+
+  
   void stop(){}
 
 
-  @Override
-  public TableLineGui_ifc getCurrentLine()
+  @Override public TableLineGui_ifc getCurrentLine()
   {
     int row = table.getSelectionIndex();
     if(row >=0){
@@ -378,16 +410,14 @@ public class TableSwt implements TableGui_ifc
   }
 
 
-  @Override
-  public TableLineGui_ifc getLine(String key)
+  @Override public TableLineGui_ifc getLine(String key)
   {
     // TODO Auto-generated method stub
     return null;
   }
 
 
-  @Override
-  public int insertLine(String key, TableLineGui_ifc line, int row)
+  @Override public int insertLine(String key, TableLineGui_ifc line, int row)
   {
     // TODO Auto-generated method stub
     return 0;

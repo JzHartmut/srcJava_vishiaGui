@@ -6,5 +6,5 @@ public class GralDeviceSwt extends GralDevice
 {
   
   //TODO: graphictrhead and main dispatch loop here!
-  
+  int dummy;
 }

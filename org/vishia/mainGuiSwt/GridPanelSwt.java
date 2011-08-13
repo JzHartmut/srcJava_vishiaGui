@@ -19,18 +19,6 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class GridPanelSwt extends CanvasStorePanelSwt
 {
-  PaintListener paintListener = new PaintListener()
-  {
-
-		@Override
-		public void paintControl(PaintEvent e) {
-			// TODO Auto-generated method stub
-			GC gc = e.gc;
-			drawBackground(e.gc, e.x, e.y, e.width, e.height);
-			stop();
-		}
-  	
-  };
 	
 	private static final long serialVersionUID = 6448419343757106982L;
 	
@@ -39,9 +27,16 @@ public class GridPanelSwt extends CanvasStorePanelSwt
   int xS, yS;
   
 	public GridPanelSwt(Composite parent, int style, Color backGround, int xG, int yG, int xS, int yS)
-	{ super(parent, style, backGround);
-		setGridWidth(xG, yG, xS, yS);
-		addPaintListener(paintListener);
+	{ super();
+	  swtCanvas = new SwtCanvasGridPanel(this, parent, style);
+    super.panelComposite = swtCanvas;
+    swtCanvas.setData(this);
+    swtCanvas.setLayout(null);
+    currColor = swtCanvas.getForeground();
+    swtCanvas.addPaintListener(paintListener);
+    swtCanvas.addControlListener(resizeItemListener);
+    swtCanvas.setBackground(backGround);
+	  setGridWidth(xG, yG, xS, yS);
 	}
 	
 	public void setGridWidth(int xG, int yG, int xS, int yS)
@@ -50,35 +45,53 @@ public class GridPanelSwt extends CanvasStorePanelSwt
 		this.xS = xS; this.yS = yS;
 	}
 	
-  @Override
-  public void drawBackground(GC g, int x, int y, int dx, int dy) {
-  	//NOTE: forces stack overflow because calling of this routine recursively: super.paint(g);
-  	Color colorBack = getBackground();
-  	Device device = colorBack.getDevice();
-  	Color color1 = new Color(device, colorBack.getRed() ^ 0x08, colorBack.getGreen() ^ 0x08, colorBack.getBlue() ^0x08);
-  	Color color2 = new Color(device, colorBack.getRed() ^ 0x10, colorBack.getGreen() ^ 0x10, colorBack.getBlue() ^0x10);
-  	int xGrid = xG;
-  	int xS1 = xS;
-  	while(xGrid < dx){
-  		if(--xS1 <=0){
-  			xS1 = xS; g.setForeground(color2);
-  		} else { g.setForeground(color1);
-  		}
-  		g.drawLine(xGrid, 0, xGrid, dy);
-  		xGrid += xG;
-  	}
-  	int yGrid = yG;
-  	int yS1 = yS;
-  	while(yGrid < dy){
-  		if(--yS1 <=0){
-  			yS1 = yS; g.setForeground(color2);
-  		} else { g.setForeground(color1);
-  		}
-  		g.drawLine(0, yGrid, dx, yGrid);
-  		yGrid += yG;
-  	}
-  	super.drawBackground(g, x, y, dx, dy);
-  }	
+	
+	
+	
+	
+	protected static class SwtCanvasGridPanel extends SwtCanvas
+	{
+	  private final GridPanelSwt mng;
+	  
+	  SwtCanvasGridPanel(GridPanelSwt storeMng, Composite parent, int style)
+	  { super(storeMng, parent, style);
+	    this.mng = storeMng;
+	    
+	  }
+	  
+	  
+    @Override
+    public void drawBackground(GC g, int x, int y, int dx, int dy) {
+    	//NOTE: forces stack overflow because calling of this routine recursively: super.paint(g);
+    	Color colorBack = getBackground();
+    	Device device = colorBack.getDevice();
+    	Color color1 = new Color(device, colorBack.getRed() ^ 0x08, colorBack.getGreen() ^ 0x08, colorBack.getBlue() ^0x08);
+    	Color color2 = new Color(device, colorBack.getRed() ^ 0x10, colorBack.getGreen() ^ 0x10, colorBack.getBlue() ^0x10);
+    	int xGrid = mng.xG;
+    	int xS1 = mng.xS;
+    	while(xGrid < dx){
+    		if(--xS1 <=0){
+    			xS1 = mng.xS; g.setForeground(color2);
+    		} else { g.setForeground(color1);
+    		}
+    		g.drawLine(xGrid, 0, xGrid, dy);
+    		xGrid += mng.xG;
+    	}
+    	int yGrid = mng.yG;
+    	int yS1 = mng.yS;
+    	while(yGrid < dy){
+    		if(--yS1 <=0){
+    			yS1 = mng.yS; g.setForeground(color2);
+    		} else { g.setForeground(color1);
+    		}
+    		g.drawLine(0, yGrid, dx, yGrid);
+    		yGrid += mng.yG;
+    	}
+    	super.drawBackground(g, x, y, dx, dy);
+    }	
+	}
+	
+	
 	
   void stop(){} //debug
   

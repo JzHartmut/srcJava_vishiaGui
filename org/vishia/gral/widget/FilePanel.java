@@ -19,5 +19,5 @@ package org.vishia.gral.widget;
  */
 public class FilePanel
 {
-
+  int dummy;
 }

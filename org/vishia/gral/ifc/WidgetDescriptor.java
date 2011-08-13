@@ -2,6 +2,7 @@ package org.vishia.gral.ifc;
 
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.gridPanel.GralGridPosition;
 
 
 
@@ -13,6 +14,17 @@ import org.vishia.byteData.VariableContainer_ifc;
  */
 public class WidgetDescriptor
 {
+  
+  /**Changes:
+   * <ul>
+   * <li>2011-08-13 Hartmut new: WidgetDescriptor now contains the position of the widget. 
+   * It is used for resizing of large widgets.
+   * A large widget is a widget, which lengthens over the panel and it is changed in size with panel size change. 
+   * A typical example is a text-area-widget.
+   * </ul>
+   */
+  public final static int version = 0x20110813;
+  
   /**The panel where the widget is located. If a TabPanel is used, its the whole panel with all tabs.
    * This reference is used to set values to other widgets. */
   GuiPanelMngWorkingIfc itsPanel;
@@ -29,6 +41,9 @@ public class WidgetDescriptor
   
 	/**Name of the widget in the panel. */
 	public String name;
+	
+	/**The position of the widget. */
+	public GralGridPosition pos;  
 	
 	/**The graphical widget. It is untyped because it depends on the underlying graphic system. 
 	 * It may be a wrapper class arround a graphical widget too. 

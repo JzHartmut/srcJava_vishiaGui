@@ -10,7 +10,7 @@ import org.vishia.gral.widget.WidgetCmpnifc;
  * @author Hartmut Schorrig
  *
  */
-public abstract class TabPanel
+public abstract class TabPanel extends GralPanel
 {
 	final protected PanelActivatedGui notifyingUserInstanceWhileSelectingTab;
 	
@@ -18,8 +18,8 @@ public abstract class TabPanel
 	/**The constructor can only be invoked from a implementing class.
 	 * @param user
 	 */
-	protected TabPanel(PanelActivatedGui user)
-	{
+	protected TabPanel(PanelActivatedGui user, int property)
+	{ super(property);
 		this.notifyingUserInstanceWhileSelectingTab = user;
 	}
 	

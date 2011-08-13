@@ -129,6 +129,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
 	/**Version, able to read as hex yyyymmdd.
 	 * Changes:
 	 * <ul>
+	 * <li>2011-08-13 Hartmut chg: New routines for store and calculate the position to regard large widgets.
 	 * <li>2011-06-17 Hartmut getValueFromWidget(): Table returns the whole selected line, cells separated with tab.
 	 *     The String-return.split("\t") separates the result to the cell values.
 	 * <li>2011-05-08 Hartmut new; {@link GuiPanelMngWorkingIfc#cmdClear} used to clear a whole swt.Table, commonly using: clear a content of widget.
@@ -340,8 +341,8 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   	sCurrPanel = "$";
   	
     
-    xPos = xPosPrev = 0; //start-position
-    yPos = yPosPrev = 4 * propertiesGui.yPixelUnit();
+    pos.x = xPosPrev = 0; //start-position
+    pos.y = yPosPrev = 4 * propertiesGui.yPixelUnit();
     
 		userActions.put("syncVariableOnFocus", this.syncVariableOnFocus);
 
@@ -438,10 +439,10 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     int yPixelUnit = propertiesGui.yPixelUnit();
     //calculate pixel
     int xPixelSize, yPixelSize;  
-    xPixelSize = xPixelUnit * xSize + propertiesGui.xPixelFrac(yPosFrac) -2;
-    yPixelSize = yPixelUnit * ySize + propertiesGui.xPixelFrac(yPosFrac) -2;
-    int xPixel = (int)(xPos * xPixelUnit) + propertiesGui.xPixelFrac(yPosFrac) +1;
-    int yPixel = (int)(yPos * yPixelUnit) + propertiesGui.yPixelFrac(yPosFrac) +1;
+    xPixelSize = xPixelUnit * xSize + propertiesGui.xPixelFrac(pos.yFrac) -2;
+    yPixelSize = yPixelUnit * ySize + propertiesGui.xPixelFrac(pos.yFrac) -2;
+    int xPixel = (int)(pos.x * xPixelUnit) + propertiesGui.xPixelFrac(pos.yFrac) +1;
+    int yPixel = (int)(pos.y * yPixelUnit) + propertiesGui.yPixelFrac(pos.yFrac) +1;
     Rectangle rectShell = graphicFrame.getBounds();
     Rectangle rectPanel = ((Composite)currPanel.panelComposite).getBounds();
     shell.setBounds(xPixel + rectShell.x + rectPanel.x, yPixel + rectShell.y + rectPanel.y, xPixelSize, yPixelSize);    
@@ -464,14 +465,27 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
    * @param name Name of the panel.
    * @param panel The panel.
    */
-  public PanelContent registerPanel(String name, Object panelP){
-  	Composite panel = (Composite)panelP;
-  	PanelContent panelContent = new PanelContent(panel);
-  	panels.put(name, panelContent);
-  	panel.setLayout(null);
-  	currPanel = panelContent;
-  	sCurrPanel = name;
-  	return panelContent;
+  public PanelContent XXXregisterPanel(String name, Object panelP){
+    Composite panel = (Composite)panelP;
+    PanelContent panelContent = new PanelContent(panel);
+    panels.put(name, panelContent);
+    panel.setLayout(null);
+    currPanel = panelContent;
+    sCurrPanel = name;
+    return panelContent;
+  }
+  
+  
+  /**Registers a panel to place the widgets. 
+   * After registration, the panel can be selected
+   * with its name calling the {@link #selectPanel(String)} -routine
+   * @param name Name of the panel.
+   * @param panel The panel.
+   */
+  @Override public void registerPanel(String name, PanelContent panel){
+    panels.put(name, panel);
+    currPanel = panel;
+    sCurrPanel = name;
   }
   
   
@@ -505,140 +519,19 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   }
   
   
-  /**Sets the position for the next widget to add in the container.
-   * @param line y-Position in y-Units, count from top of the box. It is the bottom line of the widget.
-   *              It means ypos = 0 is not a proper value. To show a text in the first line, use y=2.
-   *              If <0, then the previous position is valid still.
-   * @param column x-Position in x-Units, count from left of the box. 
-   *              If <0, then the previous position is valid still.
-   * @param heigth: The height of the line. If <0, then the param line is the buttom line, 
-   *                and (line-height) is the top line. If 0 then the last value of height is not changed. 
-   * @param length: The number of columns. If <0, then the param column is the right column, 
-   *                and column-length is the left column. If 0 then the last value of length is not changed.
-   * @param direction: direction for a next widget, use 'r', 'l', 'u', 'd' for right, left, up, down                
-   */
-  @Override public void setFinePosition(int line, int yPosFrac, int column, int xPosFrac, int height, int ySizeFrac, int width, int xSizeFrac, char direction)
-  {
-  	if("rlud".indexOf(direction)>=0 ){
-  		directionOfNextElement = direction;
-  	}
-  	setSize(height, ySizeFrac, width, xSizeFrac);
-  	if(column >=0 || xPosFrac >0){ 
-  		this.xPos = xPosPrev = column;
-  		this.xPosFrac = xPosFrac;
-  	} else {
-  		//use the same xPos as before adding the last Component, 
-  		//because a new yPos is given.
-  		column = xPosPrev; 
-  		xPosFrac = xPosPrevFrac;
-    }
-  	if(line >=0 || yPosFrac >0){ 
-  		this.yPos = yPosPrev = line;
-  		this.yPosFrac = yPosFrac;
-    } else {
-  		//use the same yPos as before adding the last Component, 
-  		//because a new xPos may be given.
-  		line = yPosPrev; 
-  		yPosFrac = yPosPrevFrac;
-    }
-  	if(height <0){
-  		//yPosPrev = (yPos -= height);
-  	}
-  	if(width <0){
-  		//xPosPrev = (xPos -= width);
-  	}
-  		
-  	this.bBelow = false; //because yPos is set.
-    this.bRigth = true;
-  }
-  
-  
-  public void setSize(int height, int ySizeFrac, int width, int xSizeFrac)
-  {
-  	if(height !=0){
-  		ySize = height >0 ? height : -height;
-      this.ySizeFrac = ySizeFrac;
-  	}
-  	if(width !=0){
-  		xSize = width >0 ? width: -width;
-  	  this.xSizeFrac = xSizeFrac;
-    }
-  	if(height >0){ yOrigin = 't'; }
-  	else if(height < 0){ yOrigin = 'b'; }
-  	else; //let it unchanged if height == 0
-  	if(width >0){ xOrigin = 'l'; }
-  	else if(width < 0){ xOrigin = 'r'; }
-  	else; //let it unchanged if width == 0
-  }
-  
-  
-  /**Positions the next widget below to the previous one. */
-  public void setNextPositionX()
-  { //xPos = xWidth; 
-  }
-  
-  /**Positions the next widget on the right next to the previous one. */
-  public void setNextPositionY()
-  { bBelow = true;
-  }
-  
-  /**Returns the width (number of grid step horizontal) of the last element.
-   * @return Difference between current auto-position and last pos.
-   */
-  public int xxxgetWidthLast(){ return 0; }
-  
   /**Places a current component with knowledge of the current positions and the spreads of the component on graphic.
    * @param component The component to place.
    */
   void setBounds_(Control component)
   { setPosAndSize_(component);
-  	//setBounds_(component, 0,0, 0, 0);
+    //setBounds_(component, 0,0, 0, 0);
   }
   
-  /**Places a current component with knowledge of the current positions and the spreads of the component on graphic.
-   * @param component The component to place.
-   * @param diff movement of the placement in dedicated pixel units, usefull for example to place a table head and body.
-   *             It may be null.
-   */
-  private void xxxsetBounds_(Control component, int pyGrid, int pxGrid, int dyGrid, int dxGrid)
-  { int xPixelUnit = propertiesGui.xPixelUnit();
-  	int yPixelUnit = propertiesGui.yPixelUnit();
-  	
-  //The size in pixel is given either by the current size of the widget,
-  	//or it is calculate by given dxyGrid.
-  	int xPixelSize = -1, yPixelSize = -1;  //initial with an unexpected value, it will be set in any case!
-  	if(dyGrid <= 0 || dxGrid <= 0){ 
-  	  Point size = component.getSize();
-  	  if(dyGrid <= 0){ yPixelSize = size.y; }
-  	  if(dxGrid <= 0){ xPixelSize = size.x; }
-    }
-    if(dyGrid > 0){ yPixelSize = dyGrid * yPixelUnit; }
-	  if(dxGrid > 0){ xPixelSize = dxGrid * xPixelUnit; }
-  
-	  //The position-movement in pixel is given either by the current size of the widget,
-  	//or it is set by given dxyGrid.
-  	int xPixel0, yPixel0;
-  	yPixel0 = pyGrid * yPixelUnit;  //unused
-	  xPixel0 = pxGrid * xPixelUnit;
-  
-	  //If top origin, the yPos
-	  //int yPos1 = yOrigin == 't' ? this.yPos - this.yIncr : this.yPos;
-	  int xPixel = (int)(xPos * xPixelUnit) + xPixel0 +1;
-    int yPixel = (int)(yPos * yPixelUnit) + yPixel0 +1;
-    if(yOrigin == 'b'){
-      yPixel -= yPixelSize; //yPos is left bottom, yPixel is left top.
-    }
-    if(yPixel < 1){ yPixel = 1; }
-    component.setBounds(xPixel, yPixel, xPixelSize, yPixelSize);
-    int dx = (xPixelSize + xPixel0 + propertiesGui.xPixelUnit() -1 ) / propertiesGui.xPixelUnit(); 
-    int dy = (yPixelSize + yPixel0 + propertiesGui.yPixelUnit() -1 ) / propertiesGui.yPixelUnit(); 
-    furtherSetPosition(dx, dy);
-  }          
   
   
   protected void setPosAndSize_(Control component)
   {
-  	setPosAndSize_(component, yPos, yPosFrac, xPos, xPosFrac, this.ySize, ySizeFrac, this.xSize, xSizeFrac);
+  	setPosAndSize_(component, pos.y, pos.yFrac, pos.x, pos.xFrac, this.ySize, ySizeFrac, this.xSize, xSizeFrac);
     //int dx1 = (xPixelSize + propertiesGui.xPixelUnit() -1 ) / propertiesGui.xPixelUnit(); 
     //int dy1 = (yPixelSize + propertiesGui.yPixelUnit() -1 ) / propertiesGui.yPixelUnit(); 
     //furtherSetPosition(, dy);
@@ -650,7 +543,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   {
   	if(dy <=0){ dy = this.ySize; }
   	if(dx <=0){ dx = this.xSize; }
-  	setPosAndSize_(component, yPos, yPosFrac, xPos, xPosFrac, dy, ySizeFrac, dx, xSizeFrac);
+  	setPosAndSize_(component, pos.y, pos.yFrac, pos.x, pos.xFrac, dy, ySizeFrac, dx, xSizeFrac);
     //int dx1 = (xPixelSize + propertiesGui.xPixelUnit() -1 ) / propertiesGui.xPixelUnit(); 
     //int dy1 = (yPixelSize + propertiesGui.yPixelUnit() -1 ) / propertiesGui.yPixelUnit(); 
     //furtherSetPosition(dx, dy);
@@ -668,7 +561,13 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     } else {
       //pos =null;
     }
-    GuiRectangle rectangle = calcPosAndSize(line, yPosFrac, column, xPosFrac, dy, ySizeFrac, dx,xSizeFrac,0,0);
+    final GuiRectangle rectangle;
+    if(dx == Integer.MIN_VALUE+1){
+      final Point parentSize = parentComp.getSize();
+      rectangle = calcWidgetPosAndSize(parentSize.x, parentSize.y);
+    } else {
+      rectangle = calcPosAndSize(line, yPosFrac, column, xPosFrac, dy, ySizeFrac, dx,xSizeFrac,0,0);
+    }
     component.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
     
   }
@@ -681,18 +580,18 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
    * @param dy
    */
   private void furtherSetPosition(int dx, int dy){
-    xPosPrev = xPos;
-    yPosPrev = yPos;
+    xPosPrev = pos.x;
+    yPosPrev = pos.y;
     //calculate maxWith etc.
-    if(bBelow){ yPos += dy; }
-    else { xPos += dx; }
+    if(bBelow){ pos.y += dy; }
+    else { pos.x += dx; }
   }
   
 
   
-	@Override public TabPanel createTabPanel(PanelActivatedGui user)
+	@Override public TabPanel createTabPanel(PanelActivatedGui user, int property)
 	{
-		return new TabPanelSwt(this, user);
+		return new TabPanelSwt(this, user, property);
 	}
 	
   
@@ -938,10 +837,10 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   		ColorGui color = propertiesGui.color(colorValue);
   		int xgrid = propertiesGui.xPixelUnit();
   		int ygrid = propertiesGui.yPixelUnit();
-  		int x1 = (int)((xPos + xa) * xgrid);
-  		int y1 = (int)((yPos - ya) * ygrid);
-  		int x2 = (int)((xPos + xe) * xgrid);
-  		int y2 = (int)((yPos - ye) * ygrid);
+  		int x1 = (int)((pos.x + xa) * xgrid);
+  		int y1 = (int)((pos.y - ya) * ygrid);
+  		int x2 = (int)((pos.x + xe) * xgrid);
+  		int y2 = (int)((pos.y - ye) * ygrid);
   		//Any panel which is created in the SWT-implementation is a CanvasStorePanel.
   		//This is because lines should be drawn.
   		((CanvasStorePanelSwt) currPanel.panelComposite).store.drawLine(color, x1, y1, x2, y2);

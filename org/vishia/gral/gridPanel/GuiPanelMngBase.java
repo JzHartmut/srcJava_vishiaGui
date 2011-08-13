@@ -42,6 +42,13 @@ import org.vishia.msgDispatch.LogMessage;
  */
 public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMngWorkingIfc
 {
+  /**Changes:
+   * <ul>
+   * <li>2011-08-13 Hartmut chg: New routines for store and calculate the position to regard large widgets.
+   * </ul>
+   */
+  public final static int version = 0x20110813;
+  
 	/**This class is used for a selection field for file names and pathes. */
   protected class FileSelectInfo
   {
@@ -90,6 +97,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
     
   }
   
+  
   /**This instance helps to create the Dialog Widget as part of the whole window. It is used only in the constructor.
    * Therewith it may be defined stack-locally. But it is better to show and explain if it is access-able at class level. */
   //GuiDialogZbnfControlled dialogZbnfConfigurator;   
@@ -127,11 +135,13 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   
 	protected final VariableContainer_ifc variableContainer;
 	
+	
+	
   /**Position of the next widget to add. If some widgets are added one after another, 
    * it is similar like a flow-layout.
    * But the position can be set.
    */
-  protected int xPos, xPosFrac =0, yPos, yPosFrac =0;
+  protected GralGridPosition pos = new GralGridPosition(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
   
   /**Saved last use position. After calling {@link #setPosAndSize_(Control, int, int, int, int)}
    * the xPos and yPos are setted to the next planned position.
@@ -139,7 +149,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
    */
   protected int xPosPrev, xPosPrevFrac, yPosPrev, yPosPrevFrac;
   
-  /**width and height for the next element. */
+  /**width and height for the next element. If a value */
   protected int xSize, xSizeFrac, ySize, ySizeFrac;
   
   /**'l' - left 'r'-right, 't' top 'b' bottom. */ 
@@ -189,6 +199,120 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
 	}
 
 	
+  /**Sets the position for the next widget to add in the container.
+   * @param line y-Position in y-Units, count from top of the box. It is the bottom line of the widget.
+   *              It means ypos = 0 is not a proper value. To show a text in the first line, use y=2.
+   *              If <0, then the previous position is valid still.
+   * @param column x-Position in x-Units, count from left of the box. 
+   *              If <0, then the previous position is valid still.
+   * @param heigth: The height of the line. If <0, then the param line is the buttom line, 
+   *                and (line-height) is the top line. If 0 then the last value of height is not changed. 
+   * @param length: The number of columns. If <0, then the param column is the right column, 
+   *                and column-length is the left column. If 0 then the last value of length is not changed.
+   * @param direction: direction for a next widget, use 'r', 'l', 'u', 'd' for right, left, up, down                
+   */
+  @Override public void setFinePosition(int line, int yPosFrac, int column, int xPosFrac, int height, int ySizeFrac, int width, int xSizeFrac, char direction)
+  {
+    pos.xEnd = pos.yEnd = 0;  //they are disabled.
+    if("rlud".indexOf(direction)>=0 ){
+      directionOfNextElement = direction;
+    }
+    setSize(height, ySizeFrac, width, xSizeFrac);
+    if(column >=0 || pos.xFrac >0){ 
+      this.pos.x = xPosPrev = column;
+      this.pos.xFrac = pos.xFrac;
+    } else {
+      //use the same pos.x as before adding the last Component, 
+      //because a new yPos is given.
+      column = xPosPrev; 
+      pos.xFrac = xPosPrevFrac;
+    }
+    if(line >=0 || yPosFrac >0){ 
+      this.pos.y = yPosPrev = line;
+      this.pos.yFrac = yPosFrac;
+    } else {
+      //use the same yPos as before adding the last Component, 
+      //because a new xPos may be given.
+      line = yPosPrev; 
+      yPosFrac = yPosPrevFrac;
+    }
+    if(height <0){
+      //yPosPrev = (yPos -= height);
+    }
+    if(width <0){
+      //xPosPrev = (xPos -= width);
+    }
+      
+    this.bBelow = false; //because yPos is set.
+    this.bRigth = true;
+  }
+  
+  
+  public void setSize(int height, int ySizeFrac, int width, int xSizeFrac)
+  {
+    if(height !=0){
+      ySize = height >0 ? height : -height;
+      this.ySizeFrac = ySizeFrac;
+    }
+    if(width !=0){
+      xSize = width >0 ? width: -width;
+      this.xSizeFrac = xSizeFrac;
+    }
+    if(height >0){ yOrigin = 't'; }
+    else if(height < 0){ yOrigin = 'b'; }
+    else; //let it unchanged if height == 0
+    if(width >0){ xOrigin = 'l'; }
+    else if(width < 0){ xOrigin = 'r'; }
+    else; //let it unchanged if width == 0
+  }
+  
+  
+  /**Positions the next widget below to the previous one. */
+  public void setNextPositionX()
+  { //xPos = xWidth; 
+  }
+  
+  /**Positions the next widget on the right next to the previous one. */
+  public void setNextPositionY()
+  { bBelow = true;
+  }
+  
+  /**Returns the width (number of grid step horizontal) of the last element.
+   * @return Difference between current auto-position and last pos.
+   */
+  public int xxxgetWidthLast(){ return 0; }
+  
+	
+  @Override public void setPositionInPanel(float line, float column, float lineEnd, float columnEnd, char direction)
+  {
+    xSize = Integer.MIN_VALUE+1;  //designate, use xEnd, yEnd.
+    pos.y = (int)(line - (line < 0 ? 0.9f : 0));  //they are used.
+    pos.yFrac = (int)(10*(line - pos.y));  
+    pos.x = (int)(column - (column < 0 ? 0.9f : 0));  //may be negative 
+    pos.xFrac = (int)(10*(column - pos.x));  
+    
+    pos.yEnd = (int)(lineEnd - (lineEnd < 0 ? 0.9f : 0));  //they are used.
+    pos.yEndFrac = (int)(10*(lineEnd - pos.yEnd));  
+    pos.xEnd = (int)(columnEnd - (columnEnd < 0 ? 0.9f : 0));  //may be negative 
+    pos.xEndFrac = (int)(10*(columnEnd - pos.xEnd));  
+    
+    if("rlud".indexOf(direction)>=0 ){
+      directionOfNextElement = direction;
+    }
+    this.bBelow = false; //because yPos is set.
+    this.bRigth = true;
+    
+  }
+
+	
+  
+  void setSizeFromPositionInPanel()
+  {
+    
+  }
+  
+  
+  
 	
   /**Map of all panels. A panel may be a dialog box etc. */
   protected final Map<String,PanelContent> panels = new TreeMap<String,PanelContent>();
@@ -278,6 +402,16 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   }
   
   
+  public void setWidgetToResize(WidgetDescriptor widgd)
+  {
+    if(  xSize == Integer.MIN_VALUE+1 
+      && (pos.x * pos.xEnd < 0 || pos.y * pos.yEnd <0)){ //TRICKY: different sign vor x and xEnd
+      widgd.pos = pos.clone();
+      //widgd.pos.set(pos);
+      currPanel.widgetsToResize.add(widgd);
+    }
+      
+  }
   
 
 	UserActionGui actionShowWidgetInfos = new UserActionGui()
@@ -301,7 +435,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
 	
 	
   protected GuiRectangle getRectangleBounds(int dyDefault, int dxDefault)
-  { return calcPosAndSize(yPos, yPosFrac, xPos, xPosFrac
+  { return calcPosAndSize(pos.y, pos.yFrac, pos.x, pos.xFrac
       , this.ySize, ySizeFrac, this.xSize, xSizeFrac, dyDefault, dxDefault);
   }
   
@@ -329,8 +463,8 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
     if(line == 19 && yPosFrac == 5)
       stop();
     //use values from class if parameter are non-valid.
-    if(line <=0){ line = this.yPos; yPosFrac = this.yPosFrac; }
-    if(column <=0){ column = this.xPos; xPosFrac = this.xPosFrac; }
+    if(line <=0){ line = this.pos.y; yPosFrac = this.pos.yFrac; }
+    if(column <=0){ column = this.pos.x; xPosFrac = this.pos.xFrac; }
     if(dy <=0){ dy = this.ySize; ySizeFrac = this.ySizeFrac; }
     if(dx <=0){ dx = this.xSize; xSizeFrac = this.xSizeFrac; }
     //
@@ -356,22 +490,43 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
     if(yPixel < 1){ yPixel = 1; }
     if(xPixel < 1){ xPixel = 1; }
     GuiRectangle rectangle = new GuiRectangle(xPixel, yPixel, xPixelSize, yPixelSize);
-    xPosPrev = xPos;    //save to support access to the last positions.
-    yPosPrev = yPos;
+    xPosPrev = pos.x;    //save to support access to the last positions.
+    yPosPrev = pos.y;
     //set the next planned position:
     switch(directionOfNextElement){
-    case 'r': xPos += xSize; break;
-    case 'l': xPos -= xSize; break;
-    case 'u': yPos -= ySize; break;
-    case 'd': yPos += ySize; break;
+    case 'r': pos.x += xSize; break;
+    case 'l': pos.x -= xSize; break;
+    case 'u': pos.y -= ySize; break;
+    case 'd': pos.y += ySize; break;
     }
     return rectangle;
   }
   
   
+  protected GuiRectangle calcWidgetPosAndSize(int dxPixelParent, int dyPixelParent)
+  {
+    int xPixelUnit = propertiesGui.xPixelUnit();
+    int yPixelUnit = propertiesGui.yPixelUnit();
+    //calculate pixel
+    final int x1,y1, x2, y2;
+    x1 = xPixelUnit * pos.x + propertiesGui.xPixelFrac(pos.xFrac)  //negative if from right
+       + (pos.x < 0 ? dxPixelParent : 0);  //from right
+    y1 = yPixelUnit * pos.y + propertiesGui.yPixelFrac(pos.yFrac)  //negative if from right
+       + (pos.y < 0 ? dyPixelParent : 0);  //from right
+    x2 = xPixelUnit * pos.xEnd + propertiesGui.xPixelFrac(pos.xEndFrac)  //negative if from right
+       + (pos.xEnd < 0 ? dxPixelParent : 0);  //from right
+    y2 = yPixelUnit * pos.yEnd + propertiesGui.yPixelFrac(pos.yEndFrac)  //negative if from right
+       + (pos.yEnd < 0 ? dyPixelParent : 0);  //from right
+    
+    GuiRectangle rectangle = new GuiRectangle(x1, y1, x2-x1, y2-y1);
+    return rectangle;
+  }
+  
+  
+  
   
   @Override public WidgetDescriptor addFileSelectField(String name, List<String> listRecentFiles, String startDirMask, String prompt, char promptStylePosition)
-  { int xPos1 = xPos;
+  { int xPos1 = pos.x;
     int xSize1 = xSize;
     //reduce the length of the text field:
     xSize -= ySize;

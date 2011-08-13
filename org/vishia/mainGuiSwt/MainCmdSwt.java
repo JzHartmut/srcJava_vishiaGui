@@ -46,6 +46,7 @@ import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -1027,7 +1028,8 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
         { Control control = (Control)component.getWidget();
           setBoundsForFrameArea(idxArea, idyArea);
           control.update();
-          control.redraw();
+          Rectangle bounds = control.getBounds();
+          control.redraw(bounds.x, bounds.y, bounds.width, bounds.height, true);
     } } }
     for(int ixMover = 0; ixMover < yAreaMover.length; ++ixMover){
     	if(yAreaMover[ixMover] != null){

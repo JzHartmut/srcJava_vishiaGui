@@ -82,7 +82,16 @@ public interface GuiPanelMngBuildIfc
    * </ul>
    */
   final static int version = 0x20110502;
+
+  /**
+   * 
+   */
+  public static final int propZoomedPanel = 0x0001;
   
+  public static final int propGridZoomedPanel = 0x0002;
+  
+  
+
 	/**Returns the width (number of grid step horizontal) of the last element.
    * @return Difference between current auto-position and last pos.
    */
@@ -99,15 +108,16 @@ public interface GuiPanelMngBuildIfc
    *              If it the instance is fault, a ClassCastException is thrown.
    *         
    */
-  public PanelContent registerPanel(String name, Object panel);
+  public void registerPanel(String name, PanelContent panel);
   
   
   /**Creates a panel for tabs and registers it in the GUI.
    * @param user If not null, then this user class will be notified when a tab is selected.
    *             The user should update showed values.
+   * @param properties use or of constants {@link #propZoomedPanel}, {@link #propGridZoomedPanel}
    * @return The Tab-container, there the tabs can be registered.
    */
-  TabPanel createTabPanel(PanelActivatedGui user);
+  TabPanel createTabPanel(PanelActivatedGui user, int properties);
   
   /**selects a registered panel for the next add-operations.
    * see {@link #registerPanel(String, Object)}. 
@@ -123,7 +133,7 @@ public interface GuiPanelMngBuildIfc
   
   
   
-  /**Sets the position for the next widget to add in the container.
+  /**Sets the position and size for the next widget to add in the container.
    * @param line y-Position in y-Units, count from top of the box. 
    *              It is either the top or bottom line of the widget, depending on height.
    *              If < 0, then the previous position is valid furthermore.
@@ -153,11 +163,30 @@ public interface GuiPanelMngBuildIfc
   public void setFinePosition(int line, int lineFrac, int column, int columnFrac, int height, int heigthFrac, int width, int widthFrac, char direction);
   
   public void setSize(int ySize, int ySizeFrac, int xSize, int xSizeFrac);
+
+  
+  /**Set the position for the next widget especially for widgets, which should be placed relativ in the whole panel. 
+   * It is adequate {@link #setPosition(int, int, int, int, char)}, but here the size isn't given, instead the end line and column.
+   * That approach allows to set positions for widgets, which are placed relative to the actual size of the window.
+   * @param line Line in the grid. Fine positions in 1 fractional part digit can be used. Negative value counts from bottom.
+   * @param column Column in the grid. Fine positions in 1 fractional part digit can be used. Negative value counts from rigth.
+   * @param lineEnd The line position after the widget. Fine positions in 1 fractional part digit can be used. Negative value counts from bottom.
+   * @param columnEnd. Fine positions in 1 fractional part digit can be used. Negative value counts from bottom.
+   * @param direction
+   */
+  public void setPositionInPanel(float line, float column, float lineEnd, float columnEnd, char direction);
+  
+  
+  
   
   
   /**Positions the next widget right to the previous one. */
   void setNextPositionX();
 
+  
+  
+  
+  
   
   /**Adds a button
    * @param sButtonText text in the button

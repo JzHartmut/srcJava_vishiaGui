@@ -26,6 +26,7 @@ public class SampleGuiSwtButtonInput
 	static class Args
 	{
 	  //empty here.	
+	  int dummy;
 	}
 	
 	

@@ -6,6 +6,7 @@ import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GuiMainCmd;
+import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.gridPanel.TabPanel;
 import org.vishia.gral.widget.CommandSelector;
 import org.vishia.mainCmd.MainCmd_ifc;
@@ -22,7 +23,7 @@ public class JavaCmd extends GuiCfg
   
   TabPanel tabCmd, tabFile1, tabFile2;
   
-  private final CommandSelector cmdSelector = new CommandSelector();
+  private final CommandSelector cmdSelector = new CommandSelector(mainCmd);
   
 
   public JavaCmd(CallingArgs cargs, GuiMainCmd cmdgui)
@@ -33,7 +34,6 @@ public class JavaCmd extends GuiCfg
   
   
   /**Initializes the areas for the panels and configure the panels.
-   * This routine can be overridden if other areas are need.
    */
   @Override protected void initGuiAreas()
   {
@@ -42,15 +42,15 @@ public class JavaCmd extends GuiCfg
 
     
     //Creates a Tab-Panel:
-    tabCmd = panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate);
+    tabCmd = panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate, GuiPanelMngBuildIfc.propZoomedPanel);
     panelMng.tabPanel.addGridPanel("cmd", "&A",1,1,10,10);
     gui.addFrameArea(1,1,1,1, panelMng.tabPanel.getGuiComponent()); //dialogPanel);
       
-    tabFile1 = panelMng.createTabPanel(panelContent.actionPanelActivate);
+    tabFile1 = panelMng.createTabPanel(panelContent.actionPanelActivate, GuiPanelMngBuildIfc.propZoomedPanel);
     tabFile1.addGridPanel("file1", "&File1",1,1,10,10);
     gui.addFrameArea(2,1,1,1, tabFile1.getGuiComponent()); //dialogPanel);
       
-    tabFile2 = panelMng.createTabPanel(panelContent.actionPanelActivate);
+    tabFile2 = panelMng.createTabPanel(panelContent.actionPanelActivate, GuiPanelMngBuildIfc.propZoomedPanel);
     tabFile2.addGridPanel("file2", "File&2",1,1,10,10);
     gui.addFrameArea(3,1,1,1, tabFile2.getGuiComponent()); //dialogPanel);
       
@@ -61,7 +61,7 @@ public class JavaCmd extends GuiCfg
     cmd.name = "test2";
     cmdSelector.add_CmdBlock(cmd);
     panelMng.selectPanel("cmd");
-    panelMng.setPosition(0, 0, 10, 21, 'r');
+    panelMng.setPositionInPanel(2, 0, -2, -0.1f, '.');
     cmdSelector.add("cmds", panelMng, null, 5, new int[]{10,10}, 'A');
     cmdSelector.fillIn();
    
@@ -83,6 +83,7 @@ public class JavaCmd extends GuiCfg
    */
   @Override public void stepMain()
   {
+    
     cmdSelector.executeCmds();
   }
   
@@ -111,11 +112,28 @@ public class JavaCmd extends GuiCfg
   }
   
   
+  static void testT1()
+  {
+    float R = 10000.0f;
+    float C = 0.000000001f;
+    float tStep = 0.0000001f;
+    float uc =0.0f;
+    float ue = 1.0f;
+    for(int step = 0; step < 100; ++step){
+      float iR = (ue - uc) / R;
+      uc = uc + iR / C * tStep;
+    }
+      
+  }
+  
+  
+  
   /**The command-line-invocation (primary command-line-call. 
    * @param args Some calling arguments are taken. This is the GUI-configuration especially.   
    */
   public static void main(String[] args)
-  { boolean bOk = true;
+  { testT1();
+    boolean bOk = true;
     CallingArgs cargs = new CallingArgs();
     //Initializes the GUI till a output window to show information.
     //Uses the commonly GuiMainCmd class because here are not extra arguments.

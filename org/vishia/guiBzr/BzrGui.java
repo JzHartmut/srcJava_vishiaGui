@@ -122,7 +122,7 @@ public class BzrGui extends GuiCfg
     mainData.mainAction = new MainAction(mainData, guiStatusPanel, guiCommitPanel, guiFilesDiffPanel, panelOutput);
     
 
-    gui.addDispatchListener(configGui);
+    //gui.addDispatchListener(configGui);
 
     
     
@@ -130,14 +130,26 @@ public class BzrGui extends GuiCfg
 
 
  
-  /**Code snippet to run the ZBNF-configurator (text controlled GUI)
-   * 
-   */
-  GuiDispatchCallbackWorker configGui = new GuiDispatchCallbackWorker()
-  {
+  //GuiDispatchCallbackWorker configGui = new GuiDispatchCallbackWorker()
+  //{
 
-    @Override public void doBeforeDispatching(boolean onlyWakeup){
-      try { 
+    //@Override public void doBeforeDispatching(boolean onlyWakeup){
+  /**Initializes the areas for the panels and configure the panels.
+   * This routine can be overridden if other areas are need.
+   */
+  protected void initGuiAreas()
+  {
+    gui.setFrameAreaBorders(20, 80, 60, 85);
+    gui.setStandardMenusGThread(new File("."), actionFile);
+
+    
+    //Creates a Tab-Panel:
+    panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate, 0);
+    panelMng.tabPanel.addGridPanel("operation", "&Operation",1,1,10,10);
+      
+    gui.addFrameArea(1,1,3,1, panelMng.tabPanel.getGuiComponent()); //dialogPanel);
+
+    try { 
         panelMng.tabPanel.addGridPanel("Select", "&Select",1,1,10,10);
         panelMng.tabPanel.addGridPanel("Commit", "&Commit",1,1,10,10);
         panelMng.tabPanel.addGridPanel("Log", "&Log",1,1,10,10);
@@ -148,8 +160,8 @@ public class BzrGui extends GuiCfg
         WidgetCmpnifc msgPanel = panelMng.createGridPanel(  
             panelMng.propertiesGui.colorBackground_
             , panelMng.propertiesGui.xPixelUnit(), panelMng.propertiesGui.yPixelUnit(), 5, 5);
-        panelMng.registerPanel("msg", msgPanel);
-        gui.addFrameArea(1,2,3,1, msgPanel); //dialogPanel);
+        //panelMng.registerPanel("msg", msgPanel);
+        //gui.addFrameArea(1,2,3,1, msgPanel); //dialogPanel);
 
         guiStatusPanel.initGui();
         guiCommitPanel.initGui();
@@ -162,13 +174,13 @@ public class BzrGui extends GuiCfg
         mainCmd.writeStackTrace(exception);
         mainCmd.setExitErrorLevel(MainCmd_ifc.exitWithErrors);
       }
-      gui.removeDispatchListener(this);    
+      //gui.removeDispatchListener(this);    
 
-      countExecution();
+      //countExecution();
 
     }
     
-  };
+  //};
 
 
 

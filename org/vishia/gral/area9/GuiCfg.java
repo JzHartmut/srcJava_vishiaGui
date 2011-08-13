@@ -223,7 +223,7 @@ protected void initGuiAreas()
 
   
   //Creates a Tab-Panel:
-  panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate);
+  panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate, 0);
   panelMng.tabPanel.addGridPanel("operation", "&Operation",1,1,10,10);
     
   gui.addFrameArea(1,1,3,1, panelMng.tabPanel.getGuiComponent()); //dialogPanel);
@@ -242,7 +242,7 @@ protected void initMain()
 {
   //create the basic appearance of the GUI. The execution sets dlgAccess:
   gui.addDispatchListener(initGuiDialog);
-  if(!initGuiDialog.awaitExecution(1, 10000)) throw new RuntimeException("unexpected fail of execution initGuiDialog");
+  if(!initGuiDialog.awaitExecution(1, 60000)) throw new RuntimeException("unexpected fail of execution initGuiDialog");
       
       
   /**Creates the dialog elements while reading a config-file. */

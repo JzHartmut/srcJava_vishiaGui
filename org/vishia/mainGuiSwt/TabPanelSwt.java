@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Queue;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -21,10 +23,13 @@ import org.vishia.gral.widget.WidgetCmpnifc;
 public class TabPanelSwt extends TabPanel
 {
 
+  /**Wrapper arround the TabFolder. The swt.TabFolder is the container for all TabItem. */
   private class TabFolder_ implements WidgetCmpnifc
   {
     final TabFolder widgetSwt;
-    TabFolder_(Composite parent, int style){ widgetSwt = new TabFolder(parent, style); }
+    TabFolder_(Composite parent, int style)
+    { widgetSwt = new TabFolder(parent, style); 
+    }
     @Override public Widget getWidget(){ return widgetSwt; } 
   }
   
@@ -32,11 +37,12 @@ public class TabPanelSwt extends TabPanel
 	
 	final GuiPanelMngSwt mng;
 	
-	TabPanelSwt(GuiPanelMngSwt mng, PanelActivatedGui user)
-	{ super(user);
+	TabPanelSwt(GuiPanelMngSwt mng, PanelActivatedGui user, int property)
+	{ super(user, property);
 		this.mng = mng;
 		tabMng = new TabFolder_(mng.graphicFrame, SWT.TOP);
 		tabMng.widgetSwt.addSelectionListener(tabItemSelectListener);
+		tabMng.widgetSwt.addControlListener(resizeListener);
   	
 	}
 	
@@ -44,19 +50,11 @@ public class TabPanelSwt extends TabPanel
 	{ return tabMng;
 	}
 	
-	static TabPanel xxxcreateTabPanel(GuiPanelMngSwt mng, PanelActivatedGui user)
-	{
-		TabPanelSwt tabPanel = new TabPanelSwt(mng, user);
-		//tabMng.addSelectionListener(panelMng.tabItemSelectListener);
-	  return tabPanel;
-	}
-
-	
   
   
 	@Override public PanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
 	{ TabItem tabItemOperation = new TabItem(tabMng.widgetSwt, SWT.None);
-		tabItemOperation.setText(sLabel);
+	  tabItemOperation.setText(sLabel);
 		CanvasStorePanelSwt panel;
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
 	  if(yGrid <0 || xGrid <0){
@@ -64,10 +62,9 @@ public class TabPanelSwt extends TabPanel
 		} else {
 	  	panel = new GridPanelSwt(tabMng.widgetSwt, 0, colorBackground, mng.propertiesGui.xPixelUnit(), mng.propertiesGui.yPixelUnit(), 5, 5);
 		}
-		PanelContent panelContent = mng.registerPanel(sName, panel);
-	  tabItemOperation.setControl(panel);
-	  panel.setData(panelContent);
-	  return panelContent;
+		mng.registerPanel(sName, panel);
+	  tabItemOperation.setControl(panel.swtCanvas);
+	  return panel;
   }
 
   
@@ -76,10 +73,9 @@ public class TabPanelSwt extends TabPanel
 		tabItemOperation.setText(sLabel);
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
 	  CanvasStorePanelSwt panel = new CanvasStorePanelSwt(tabMng.widgetSwt, 0, colorBackground);
-	  PanelContent panelContent = mng.registerPanel(sName, panel);
-	  tabItemOperation.setControl(panel);
-	  panel.setData(panelContent);
-	  return panelContent;
+    mng.registerPanel(sName, panel);
+	  tabItemOperation.setControl(panel.swtCanvas);
+	  return panel;
   }
 
   
@@ -115,7 +111,37 @@ public class TabPanelSwt extends TabPanel
   };
   
   
+  ControlListener resizeListener = new ControlListener()
+  { @Override public void controlMoved(ControlEvent e) 
+    { //do nothing if moved.
+      stop();
+    }
+
+    @Override public void controlResized(ControlEvent e) 
+    { 
+      stop();
+      //validateFrameAreas();  //calculates the size of the areas newly and redraw.
+    }
+    
+  };
   
 
+  ControlListener resizeItemListener = new ControlListener()
+  { @Override public void controlMoved(ControlEvent e) 
+    { //do nothing if moved.
+      stop();
+    }
+
+    @Override public void controlResized(ControlEvent e) 
+    { 
+      stop();
+      //validateFrameAreas();  //calculates the size of the areas newly and redraw.
+    }
+    
+  };
+  
+
+  
+  void stop(){}
 	
 }

@@ -4,11 +4,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.gral.gridPanel.PanelContent;
 import org.vishia.gral.ifc.CanvasStorage;
 import org.vishia.gral.ifc.ColorGui;
 import org.vishia.gral.widget.WidgetCmpnifc;
 import org.vishia.gral.widget.Widgetifc;
 
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -30,9 +33,10 @@ import org.eclipse.swt.widgets.Widget;
  * @author Hartmut Schorrig
  *
  */
-public class CanvasStorePanelSwt extends Canvas implements WidgetCmpnifc  //CanvasStorePanel //
+public class CanvasStorePanelSwt extends PanelContent implements WidgetCmpnifc  //CanvasStorePanel //
 {
 	
+  protected SwtCanvas swtCanvas;
 	
 	/**The storage for the Canvas content. */
 	CanvasStorage store = new CanvasStorage(){
@@ -49,7 +53,7 @@ public class CanvasStorePanelSwt extends Canvas implements WidgetCmpnifc  //Canv
 	Color colorSwt(ColorGui colorGui)
 	{
 	  if(colorGui.colorGuimpl == null){
-	    colorGui.colorGuimpl = new Color(getDisplay(), colorGui.red, colorGui.green, colorGui.blue);
+	    colorGui.colorGuimpl = new Color(swtCanvas.getDisplay(), colorGui.red, colorGui.green, colorGui.blue);
 	  } else if(!(colorGui.colorGuimpl instanceof Color)){
 	    throw new IllegalArgumentException("unauthorized change");
 	  };
@@ -58,7 +62,7 @@ public class CanvasStorePanelSwt extends Canvas implements WidgetCmpnifc  //Canv
 	
 	//@Override 
 	public Composite xxxgetGuiContainer(){
-		return this;
+		return swtCanvas;
 	}
 
 	
@@ -68,14 +72,14 @@ public class CanvasStorePanelSwt extends Canvas implements WidgetCmpnifc  //Canv
 	//class MyCanvas extends Canvas{
 	
   /**The listener for paint events. It is called whenever the window is shown newly. */
-  private PaintListener paintListener = new PaintListener()
+  protected PaintListener paintListener = new PaintListener()
   {
 
 		@Override
 		public void paintControl(PaintEvent e) {
 			// TODO Auto-generated method stub
 			GC gc = e.gc;
-			drawBackground(e.gc, e.x, e.y, e.width, e.height);
+			swtCanvas.drawBackground(e.gc, e.x, e.y, e.width, e.height);
 			stop();
 		}
   	
@@ -83,45 +87,91 @@ public class CanvasStorePanelSwt extends Canvas implements WidgetCmpnifc  //Canv
 	
 	private static final long serialVersionUID = 6448419343757106982L;
 	
-  private Color currColor;
+  protected Color currColor;
 	
-	public CanvasStorePanelSwt(Composite parent, int style, Color backGround)
-	{ super(parent, style);
-	  currColor = getForeground();
-		addPaintListener(paintListener);
-		setBackground(backGround);
-	}
-	
-	public void xxxsetForeground(Color color){
+  /**Constructs the instance with a SWT-Canvas Panel.
+   * @param parent
+   * @param style
+   * @param backGround
+   */
+  public CanvasStorePanelSwt(Composite parent, int style, Color backGround)
+  { super();
+    swtCanvas = new SwtCanvas(this,parent, style);
+    super.panelComposite = swtCanvas;
+    swtCanvas.setData(this);
+    swtCanvas.setLayout(null);
+    currColor = swtCanvas.getForeground();
+    swtCanvas.addPaintListener(paintListener);
+    swtCanvas.setBackground(backGround);
+    swtCanvas.addControlListener(resizeItemListener);
+  }
+  
+  /**Constructor called in derived classes. The derived class have to be instantiate the Canvas
+   * maybe with other draw routines. 
+   */
+  protected CanvasStorePanelSwt()
+  {
+    
+  }
+  
+
+  public void xxxsetForeground(Color color){
     currColor = color;		
 	}
 	
 	
 	
-  @Override
-  public void drawBackground(GC g, int x, int y, int dx, int dy) {
-  	//NOTE: forces stack overflow because calling of this routine recursively: super.paint(g);
-  	
-  	for(CanvasStorage.PaintOrder order: store.paintOrders){
-  		switch(order.paintWhat){
-    		case CanvasStorage.paintLine: {
-    			g.setForeground(colorSwt(order.color));
-    	  	g.drawLine(order.x1, order.y1, order.x2, order.y2);
-    	  } break;
-    		case CanvasStorage.paintImage: {
-    		  CanvasStorage.PaintOrderImage orderImage = (CanvasStorage.PaintOrderImage) order;
-    		  Image image = (Image)orderImage.image.getImage();
-    		  //int dx1 = (int)(orderImage.zoom * order.x2);
-    		  //int dy1 = (int)(orderImage.zoom * order.y2);
-          g.drawImage(image, 0, 0, orderImage.dxImage, orderImage.dyImage, order.x1, order.y1, order.x2, order.y2);
-    		} break;
-    		default: throw new IllegalArgumentException("unknown order");
-  		}
-  	}
-  }	
-	//};
+	protected static class SwtCanvas extends Canvas
+	{
+	  private final CanvasStorePanelSwt storeMng;
+	  
+	  SwtCanvas(CanvasStorePanelSwt storeMng, Composite parent, int style)
+	  {
+	    super(parent, style);
+	    this.storeMng = storeMng;
+	  }
+	  
+    @Override
+    public void drawBackground(GC g, int x, int y, int dx, int dy) {
+    	//NOTE: forces stack overflow because calling of this routine recursively: super.paint(g);
+    	
+    	for(CanvasStorage.PaintOrder order: storeMng.store.paintOrders){
+    		switch(order.paintWhat){
+      		case CanvasStorage.paintLine: {
+      			g.setForeground(storeMng.colorSwt(order.color));
+      	  	g.drawLine(order.x1, order.y1, order.x2, order.y2);
+      	  } break;
+      		case CanvasStorage.paintImage: {
+      		  CanvasStorage.PaintOrderImage orderImage = (CanvasStorage.PaintOrderImage) order;
+      		  Image image = (Image)orderImage.image.getImage();
+      		  //int dx1 = (int)(orderImage.zoom * order.x2);
+      		  //int dy1 = (int)(orderImage.zoom * order.y2);
+            g.drawImage(image, 0, 0, orderImage.dxImage, orderImage.dyImage, order.x1, order.y1, order.x2, order.y2);
+      		} break;
+      		default: throw new IllegalArgumentException("unknown order");
+    		}
+    	}
+    }	
+	}
 	
-  @Override public Control getWidget(){ return this; } 
+  @Override public Control getWidget(){ return swtCanvas; } 
+
+  protected ControlListener resizeItemListener = new ControlListener()
+  { @Override public void controlMoved(ControlEvent e) 
+    { //do nothing if moved.
+      stop();
+    }
+
+    @Override public void controlResized(ControlEvent e) 
+    { 
+      stop();
+      //validateFrameAreas();  //calculates the size of the areas newly and redraw.
+    }
+    
+  };
+  
+
+
   
   void stop(){} //debug
   
