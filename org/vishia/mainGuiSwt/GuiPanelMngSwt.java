@@ -1238,22 +1238,23 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   
   private void setInfoDirect(WidgetDescriptor descr, int cmd, int ident, Object info, Object data)
   {
-        Object oWidget = descr.widget;
-        if(oWidget !=null){
+    Widgetifc widget = descr.widget;
+        if(widget !=null){
+          Control swtWidget = (Control)widget.getWidget(); 
           int colorValue;
           switch(cmd){
           case GuiPanelMngWorkingIfc.cmdBackColor: 
             colorValue = ((Integer)(info)).intValue();
             Color color = propertiesGuiSwt.colorSwt(colorValue & 0xffffff);
-            ((Control)(oWidget)).setBackground(color); 
+            swtWidget.setBackground(color); 
             break;
-          case GuiPanelMngWorkingIfc.cmdRedraw: ((Control)(oWidget)).redraw(); break;
+          case GuiPanelMngWorkingIfc.cmdRedraw: swtWidget.redraw(); break;
           case GuiPanelMngWorkingIfc.cmdRedrawPart: 
-            assert(oWidget instanceof CurveView);
-            ((CurveView)(oWidget)).redrawData(); break; //causes a partial redraw
+            assert(swtWidget instanceof CurveView);
+            ((CurveView)(swtWidget)).redrawData(); break; //causes a partial redraw
           default: 
-            if(oWidget instanceof TableSwt){ 
-              TableSwt table = (TableSwt)oWidget;
+            if(widget instanceof TableSwt){ 
+              TableSwt table = (TableSwt)widget;
               //NOTE: ident is the row number. Insert before row.
               switch(cmd){
               case GuiPanelMngWorkingIfc.cmdInsert: table.changeTable(ident, info, data); break;
@@ -1261,8 +1262,8 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
               case GuiPanelMngWorkingIfc.cmdClear: table.clearTable(ident); break;
               default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, descr.name);
               }
-            } else if(oWidget instanceof Text){ 
-              Text field = (Text)oWidget;
+            } else if(swtWidget instanceof Text){ 
+              Text field = (Text)swtWidget;
               switch(cmd){
                 case GuiPanelMngWorkingIfc.cmdSet:
                 case GuiPanelMngWorkingIfc.cmdInsert: 
@@ -1270,8 +1271,8 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
                   break;
               default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %x on widget %s", cmd, descr.name);
               }
-            } else if(oWidget instanceof LedSwt){ 
-              LedSwt field = (LedSwt)oWidget;
+            } else if(swtWidget instanceof LedSwt){ 
+              LedSwt field = (LedSwt)swtWidget;
               switch(cmd){
               case GuiPanelMngWorkingIfc.cmdColor: field.setColor(ident, (Integer)info); break;
               case GuiPanelMngWorkingIfc.cmdSet: {
@@ -1280,9 +1281,9 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
               } break;
               default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, descr.name);
               }
-            } else if(oWidget instanceof SwitchButtonSwt){ 
-              SwitchButtonSwt widget = (SwitchButtonSwt)oWidget;
-              widget.setState(info);
+            } else if(swtWidget instanceof SwitchButtonSwt){ 
+              SwitchButtonSwt widgetButton = (SwitchButtonSwt)swtWidget;
+              widgetButton.setState(info);
             } else {
               //all other widgets:    
               switch(cmd){  ////

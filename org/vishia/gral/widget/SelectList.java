@@ -1,6 +1,7 @@
 package org.vishia.gral.widget;
 
 import java.util.List;
+import java.util.Map;
 
 import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
@@ -20,7 +21,10 @@ public abstract class SelectList
   
   TableGui_ifc table;
   
-  public void add(String name, GuiPanelMngBuildIfc panel, List<String[]> data, int rows, int[] columns, char size)
+  /**Not used yet, register actions? */
+  Map<String, UserActionGui> actions;
+  
+  public void setToPanel(GuiPanelMngBuildIfc panel, String name, int rows, int[] columns, char size)
   {
     wdgdTable = panel.addTable(name, rows, columns);
     wdgdTable.setActionChange(actionTable);
@@ -41,7 +45,17 @@ public abstract class SelectList
    * or click of OK (Enter) button.
    * @param userData The user data stored in the line of table.
    */
-  abstract void actionOk(Object userData);
+  abstract void actionOk(Object userData, TableLineGui_ifc line);
+  
+  /**Action if a table line is selected and ctrl-left is pressed or the release button is pressed.
+   * @param userData The user data stored in the line of table.
+   */
+  abstract void actionLeft(Object userData, TableLineGui_ifc line);
+  
+  /**Action if a table line is selected and ctrl-right is pressed or the release button is pressed.
+   * @param userData The user data stored in the line of table.
+   */
+  abstract void actionRight(Object userData, TableLineGui_ifc line);
   
   
   UserActionGui actionTable = new UserActionGui()
@@ -52,7 +66,9 @@ public abstract class SelectList
       TableGui_ifc table = (TableGui_ifc)infos.widget;
       TableLineGui_ifc line = table.getCurrentLine();
       Object data = line.getUserData();
-      actionOk(data);
+      if(sIntension.equals("ok")){ actionOk(data, line); }
+      else if(sIntension.equals("s-left")){ actionLeft(data, line); }
+      else if(sIntension.equals("s-right")){ actionRight(data, line); }
     }
     
   };

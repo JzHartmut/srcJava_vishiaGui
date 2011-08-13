@@ -53,6 +53,16 @@ public interface GuiWindow_ifc
    */
   void setStandardMenusGThread(File openStandardDirectory, UserActionGui actionFile);
   
+  
+  /**Adds any menu item
+   * @param name Menu position. Use slash as separator, use & for accelerator.
+   *   For example "&edit/&search/co&ntinue" creates a menu edit or uses the existing one,
+   *   then creates the search menu item, and then continue with 'n' as accelerator. 
+   * @param action called on menu activation.
+   */
+  void addMenuItemGThread(String name, UserActionGui action);
+  
+  
   /**Adds a listener, which will be called in the dispatch loop.
    * @param listener
    */

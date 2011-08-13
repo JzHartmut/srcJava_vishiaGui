@@ -131,6 +131,8 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
    */
   public TabPanel tabPanel;
   
+  private WidgetDescriptor widgetInFocus;
+  
   protected final LogMessage log;
   
 	protected final VariableContainer_ifc variableContainer;
@@ -286,14 +288,14 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   @Override public void setPositionInPanel(float line, float column, float lineEnd, float columnEnd, char direction)
   {
     xSize = Integer.MIN_VALUE+1;  //designate, use xEnd, yEnd.
-    pos.y = (int)(line - (line < 0 ? 0.9f : 0));  //they are used.
+    pos.y = (int)(line - (line < 0 ? 0.95f : 0));  //they are used.
     pos.yFrac = (int)(10*(line - pos.y));  
-    pos.x = (int)(column - (column < 0 ? 0.9f : 0));  //may be negative 
+    pos.x = (int)(column - (column < 0 ? 0.95f : 0));  //may be negative 
     pos.xFrac = (int)(10*(column - pos.x));  
     
-    pos.yEnd = (int)(lineEnd - (lineEnd < 0 ? 0.9f : 0));  //they are used.
+    pos.yEnd = (int)(lineEnd - (lineEnd < 0 ? 0.95f : 0));  //they are used.
     pos.yEndFrac = (int)(10*(lineEnd - pos.yEnd));  
-    pos.xEnd = (int)(columnEnd - (columnEnd < 0 ? 0.9f : 0));  //may be negative 
+    pos.xEnd = (int)(columnEnd - (columnEnd < 0 ? 0.95f : 0));  //may be negative 
     pos.xEndFrac = (int)(10*(columnEnd - pos.xEnd));  
     
     if("rlud".indexOf(direction)>=0 ){
@@ -305,6 +307,8 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   }
 
 	
+  @Override public GralGridPosition getPositionInPanel(){ return pos; }
+  
   
   void setSizeFromPositionInPanel()
   {
@@ -412,6 +416,15 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
     }
       
   }
+  
+  
+  @Override public void notifyFocus(WidgetDescriptor widgd)
+  {
+    widgetInFocus = widgd;
+  }
+  
+  @Override public WidgetDescriptor getWidgetInFocus(){ return widgetInFocus; }
+  
   
 
 	UserActionGui actionShowWidgetInfos = new UserActionGui()

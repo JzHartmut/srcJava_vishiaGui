@@ -3,6 +3,8 @@ package org.vishia.mainGuiSwt;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -43,7 +45,7 @@ public class TableSwt implements TableGui_ifc
     this.columnWidths = columnWidths;
     //this.selectionColumn = selectionColumn;
     //this.selectionText = selectionText;
-    this.table = new Table(parent, 0) ; //, SWT.FULL_SELECTION); //| SWT.CHECK);
+    this.table = new Table(parent, SWT.FULL_SELECTION) ; //, SWT.FULL_SELECTION); //| SWT.CHECK);
     //Note: the SWT.CHECK produces a checkbox at left side of any table line. It is not usual.
     //A line would be checked by pressing space-key. But it is pressed twice, an exception is thrown (?)
     //Don't use it. It seems to be not good.
@@ -55,6 +57,7 @@ public class TableSwt implements TableGui_ifc
     table.addKeyListener(new TableKeyListerner(null));
     table.addSelectionListener(selectionListener);
     table.addControlListener(resizeListener);
+    table.addFocusListener(focusListener);
     
     table.setFont(mng.propertiesGuiSwt.stdInputFont);
     //table.setColumnSelectionAllowed(true);
@@ -143,9 +146,12 @@ public class TableSwt implements TableGui_ifc
   void changeTable(int ident, Object visibleInfo, Object userData)
   {
     TableItem item = new TableItem(table, SWT.NONE);
-    
+    String[] sLine;
     if(visibleInfo instanceof String){
-      String[] sLine = ((String)visibleInfo).split("\t");
+      sLine = ((String)visibleInfo).split("\t");
+      item.setText(sLine);
+    } else if (visibleInfo instanceof String[]){
+      sLine = (String[])visibleInfo;
       item.setText(sLine);
     }
     item.setData(new TableItemWidget(item, userData));
@@ -252,37 +258,70 @@ public class TableSwt implements TableGui_ifc
 		          lineGui = new TableItemWidget(line, null);
 		          line.setData(lineGui);
 		        }
-		        if(keyEv.keyCode == 0x0d){ //Enter-key pressed:
-		          TableItem[] tableItem = table1.getSelection();
-		          int zColumns = tableItem.length;
-		          String[] content = new String[zColumns];
-		          for(int ii=0; ii < zColumns; ++ii){
-		            String text= tableItem[ii].getText();  //first column? TODO
-		            String text2= tableItem[ii].getText(0);
-		            content[ii] = text;  //content of the table item
-		          }
-		          action.userActionGui("ok", widgetDescr, content);    
-		        } else if(keyEv.keyCode == SWT.KeyUp 
-		                 && source instanceof Table && ixRow == 0){
-		          action.userActionGui("upleave", widgetDescr, (Object)null);    
-		        } else if(keyEv.character == ' '){
-		          action.userActionGui("mark", widgetDescr, lineGui);    
-		            
-		          /*
-		          && selectionColumn >=0){
-		          String selected = line.getText(selectionColumn);
-		          if(selected.length() >0) {
-		            line.setText(selectionColumn, "");
-		            line.setBackground(mng.propertiesGui.color(0xffffff));
-		          }
-		          else { 
-		            line.setText(selectionColumn, selectionText.toString());
-		            line.setBackground(mng.propertiesGui.color(0x00ff00));
-		          }
-		          //table.setSelection(select);
-		          stop();
-		          */
-		        }
+		        if((keyEv.stateMask & (SWT.CONTROL + SWT.ALT + SWT.SHIFT)) == SWT.CONTROL){
+              //all key events with only ctrl
+              final String sIntension;
+              switch(keyEv.keyCode){
+                case SWT.ARROW_LEFT:  sIntension = "c-left"; break;
+                case SWT.ARROW_RIGHT: sIntension = "c-right"; break;
+                case SWT.ARROW_UP:    sIntension = "c-up"; break;
+                case SWT.ARROW_DOWN:  sIntension = "c-dn"; break;
+                case SWT.PAGE_UP:     sIntension = "c-pgup"; break;
+                case SWT.PAGE_DOWN:   sIntension = "c-pgdn"; break;
+                default: sIntension = null;
+              }
+              if(sIntension !=null){
+                action.userActionGui(sIntension, widgetDescr, lineGui);    
+              }
+            } else if((keyEv.stateMask & (SWT.CONTROL + SWT.ALT + SWT.SHIFT)) == SWT.SHIFT){
+              //all key events with only ctrl
+              final String sIntension;
+              switch(keyEv.keyCode){
+                case SWT.ARROW_LEFT:  sIntension = "s-left"; break;
+                case SWT.ARROW_RIGHT: sIntension = "s-right"; break;
+                case SWT.ARROW_UP:    sIntension = "s-up"; break;
+                case SWT.ARROW_DOWN:  sIntension = "s-dn"; break;
+                case SWT.PAGE_UP:     sIntension = "s-pgup"; break;
+                case SWT.PAGE_DOWN:   sIntension = "s-pgdn"; break;
+                default: sIntension = null;
+              }
+              if(sIntension !=null){
+                action.userActionGui(sIntension, widgetDescr, lineGui);    
+              }
+            } else {
+  		        if(keyEv.keyCode == 0x0d){ //Enter-key pressed:
+  		          TableItem[] tableItem = table1.getSelection();
+  		          int zColumns = tableItem.length;
+  		          String[] content = new String[zColumns];
+  		          for(int ii=0; ii < zColumns; ++ii){
+  		            String text= tableItem[ii].getText();  //first column? TODO
+  		            String text2= tableItem[ii].getText(0);
+  		            content[ii] = text;  //content of the table item
+  		          }
+  		          action.userActionGui("ok", widgetDescr, content);    
+  		        } else if(keyEv.keyCode == SWT.KeyUp 
+  		                 && source instanceof Table && ixRow == 0){
+  		          //able to use to leave, disable the table.
+  		          action.userActionGui("upleave", widgetDescr, (Object)null);    
+  		        } else if(keyEv.character == ' '){
+  		          action.userActionGui("mark", widgetDescr, lineGui);    
+  		            
+  		          /*
+  		          && selectionColumn >=0){
+  		          String selected = line.getText(selectionColumn);
+  		          if(selected.length() >0) {
+  		            line.setText(selectionColumn, "");
+  		            line.setBackground(mng.propertiesGui.color(0xffffff));
+  		          }
+  		          else { 
+  		            line.setText(selectionColumn, selectionText.toString());
+  		            line.setBackground(mng.propertiesGui.color(0x00ff00));
+  		          }
+  		          //table.setSelection(select);
+  		          stop();
+  		          */
+  		        }
+		        }  
 	        } //if(table.)
 	      } catch(Exception exc){
       		stop();  //ignore it
@@ -374,6 +413,20 @@ public class TableSwt implements TableGui_ifc
   }
   
   
+  FocusListener focusListener = new FocusListener()
+  {
+    
+    @Override public void focusLost(FocusEvent e)
+    { //empty, don't register lost focus. Only the last widget in focus is registered.
+    }
+    
+    @Override public void focusGained(FocusEvent ev)
+    { WidgetDescriptor widgd = (WidgetDescriptor)ev.widget.getData();
+      widgd.getPanel().notifyFocus(widgd);  
+    }
+  };
+  
+  
   ControlListener resizeListener = new ControlListener()
   { @Override public void controlMoved(ControlEvent e) 
     { //do nothing if moved.
@@ -402,6 +455,14 @@ public class TableSwt implements TableGui_ifc
     } else return null;  //nothing selected.
   }
 
+  
+  @Override public void setCurrentCell(int line, int column)
+  {
+    //table.select(line);
+    table.setSelection(line);
+    
+  }
+  
 
   @Override public TableLineGui_ifc getLine(int row)
   {

@@ -13,6 +13,8 @@ public interface TableGui_ifc extends WidgetGui_ifc
 
   TableLineGui_ifc getCurrentLine();
   
+  void setCurrentCell(int line, int column);
+  
   TableLineGui_ifc getLine(int row);
   
   /**Get the line which is designated with the requested key.

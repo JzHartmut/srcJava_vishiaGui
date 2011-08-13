@@ -8,7 +8,10 @@ import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GuiMainCmd;
 import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.gridPanel.TabPanel;
+import org.vishia.gral.ifc.UserActionGui;
+import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.gral.widget.CommandSelector;
+import org.vishia.gral.widget.FileSelector;
 import org.vishia.mainCmd.MainCmd_ifc;
 
 public class JavaCmd extends GuiCfg
@@ -26,6 +29,10 @@ public class JavaCmd extends GuiCfg
   private final CommandSelector cmdSelector = new CommandSelector(mainCmd);
   
 
+  private final FileSelector[] fileSelector = new FileSelector[]
+    { new FileSelector(mainCmd), new FileSelector(mainCmd), new FileSelector(mainCmd)};
+  
+  
   public JavaCmd(CallingArgs cargs, GuiMainCmd cmdgui)
   { 
     super(cargs, cmdgui);
@@ -38,20 +45,25 @@ public class JavaCmd extends GuiCfg
   @Override protected void initGuiAreas()
   {
     gui.setFrameAreaBorders(30, 65, 80, 90);
-    //gui.setStandardMenusGThread(new File("."), actionFile);
-
+    gui.setStandardMenusGThread(new File("."), actionFile);
+    gui.addMenuItemGThread("&Command/Set&WorkingDir", actionSetCmdWorkingDir); ///
+    //gui.addMenuItemGThread("&Command/E&xecute", actionSetCmdCurrentDir); ///
+    gui.addMenuItemGThread("&Command/CmdCf&gFile/&Set", actionSetCmdCfg); ///
+    gui.addMenuItemGThread("&Command/CmdCf&gFile/&Check", actionSetCmdCfg); ///
+    //gui.set
     
     //Creates a Tab-Panel:
     tabCmd = panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate, GuiPanelMngBuildIfc.propZoomedPanel);
-    panelMng.tabPanel.addGridPanel("cmd", "&A",1,1,10,10);
+    panelMng.tabPanel.addGridPanel("cmd", "Cm&d",1,1,10,10);
+    panelMng.tabPanel.addGridPanel("file0", "File&1",1,1,10,10);
     gui.addFrameArea(1,1,1,1, panelMng.tabPanel.getGuiComponent()); //dialogPanel);
       
     tabFile1 = panelMng.createTabPanel(panelContent.actionPanelActivate, GuiPanelMngBuildIfc.propZoomedPanel);
-    tabFile1.addGridPanel("file1", "&File1",1,1,10,10);
+    tabFile1.addGridPanel("file1", "File&2",1,1,10,10);
     gui.addFrameArea(2,1,1,1, tabFile1.getGuiComponent()); //dialogPanel);
       
     tabFile2 = panelMng.createTabPanel(panelContent.actionPanelActivate, GuiPanelMngBuildIfc.propZoomedPanel);
-    tabFile2.addGridPanel("file2", "File&2",1,1,10,10);
+    tabFile2.addGridPanel("file2", "File&3",1,1,10,10);
     gui.addFrameArea(3,1,1,1, tabFile2.getGuiComponent()); //dialogPanel);
       
     CommandSelector.CmdBlock cmd = cmdSelector.new_CmdBlock();
@@ -60,11 +72,27 @@ public class JavaCmd extends GuiCfg
     cmd = cmdSelector.new_CmdBlock();
     cmd.name = "test2";
     cmdSelector.add_CmdBlock(cmd);
+
     panelMng.selectPanel("cmd");
     panelMng.setPositionInPanel(2, 0, -2, -0.1f, '.');
-    cmdSelector.add("cmds", panelMng, null, 5, new int[]{10,10}, 'A');
+    cmdSelector.setToPanel(panelMng, "cmds", 5, new int[]{10,10}, 'A');
     cmdSelector.fillIn();
-   
+
+    panelMng.selectPanel("file0");
+    panelMng.setPositionInPanel(0, 0, -2, -0.1f, '.');
+    fileSelector[1].setToPanel(panelMng, "file0", 5, new int[]{2,20,5,10}, 'A');
+    fileSelector[1].fillIn(new File("D:/"));
+    
+    panelMng.selectPanel("file1");
+    panelMng.setPositionInPanel(0, 0, -2, -0.1f, '.');
+    fileSelector[1].setToPanel(panelMng, "file1", 5, new int[]{2,20,5,10}, 'A');
+    fileSelector[1].fillIn(new File("D:/"));
+
+    panelMng.selectPanel("file2");
+    panelMng.setPositionInPanel(0, 0, -2, -0.1f, '.');
+    fileSelector[2].setToPanel(panelMng, "file2", 5, new int[]{2,20,5,10}, 'A');
+    fileSelector[2].fillIn(new File("D:/"));
+
   }
 
   @Override protected final void initMain()
@@ -72,7 +100,7 @@ public class JavaCmd extends GuiCfg
       mainCmd.writeError("Argument cmdcfg:CONFIGFILE should be given.");
       //mainCmd.e
     } else {
-      cmdSelector.readCmdCfg(cargs.fileCfgCmds);  
+      cmdSelector.readCmdCfg(cargs.fileCfgCmds);  ///
     }
     super.initMain();  //starts initializing of graphic. Do it after config command selector!
   
@@ -86,6 +114,51 @@ public class JavaCmd extends GuiCfg
     
     cmdSelector.executeCmds();
   }
+  
+  
+  
+  private UserActionGui actionSetCmdWorkingDir = new UserActionGui() 
+  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+    { WidgetDescriptor widgdFocus = panelMng.getWidgetInFocus();
+      if(widgdFocus.name.startsWith("file")){
+        int ixFilePanel = widgdFocus.name.charAt(4) - '0';
+        assert(ixFilePanel >=0 && ixFilePanel < fileSelector.length);  //only such names are registered.
+        FileSelector fileSel = fileSelector[ixFilePanel];
+        File file = fileSel.getSelectedFile();
+        cmdSelector.setWorkingDir(file); 
+      }
+      stop();
+      if(sIntension.equals("")){
+        stop();
+      }
+    }
+    
+  };
+  
+  
+  
+  
+  private UserActionGui actionSetCmdCfg = new UserActionGui() 
+  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+    { WidgetDescriptor widgdFocus = panelMng.getWidgetInFocus();
+      if(widgdFocus.name.startsWith("file")){
+        int ixFilePanel = widgdFocus.name.charAt(4) - '0';
+        assert(ixFilePanel >=0 && ixFilePanel < fileSelector.length);  //only such names are registered.
+        FileSelector fileSel = fileSelector[ixFilePanel];
+        File file = fileSel.getSelectedFile();
+        cmdSelector.readCmdCfg(file);
+        cmdSelector.fillIn();
+      }
+      stop();
+      if(sIntension.equals("")){
+        stop();
+      }
+    }
+    
+  };
+  
+  
+  
   
   
   
@@ -157,5 +230,6 @@ public class JavaCmd extends GuiCfg
 
 
 
+  void stop(){}
 
 }

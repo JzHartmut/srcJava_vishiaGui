@@ -178,7 +178,7 @@ public interface GuiPanelMngBuildIfc
   
   
   
-  
+  GralGridPosition getPositionInPanel();
   
   /**Positions the next widget right to the previous one. */
   void setNextPositionX();

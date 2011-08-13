@@ -88,6 +88,7 @@ public class CommandSelector extends SelectList
     } catch(FileNotFoundException exc){ sError = "CommandSelector - cfg file not found; " + cfgFile; }
     if(reader !=null){
       CmdBlock actBlock = null;
+      listCmd.clear();
       try{
         String sLine;
         int posSep;
@@ -115,6 +116,7 @@ public class CommandSelector extends SelectList
   
   public void fillIn()
   {
+    wdgdTable.setValue(GuiPanelMngWorkingIfc.cmdClear, -1, null, null);
     for(CmdBlock data: listCmd){
       
       wdgdTable.setValue(GuiPanelMngWorkingIfc.cmdInsert, 0, data.name, data);
@@ -123,10 +125,31 @@ public class CommandSelector extends SelectList
   }
   
   
-  @Override public void actionOk(Object userData)
+  public void setWorkingDir(File file)
+  { final File dir;
+    if(!file.isDirectory()){
+      dir = file.getParentFile();
+    } else {
+      dir = file;
+    }
+    processBuilder.directory(dir);
+  }
+  
+  
+  @Override public void actionOk(Object userData, TableLineGui_ifc line)
   {
     CmdBlock cmdBlock = (CmdBlock)userData;
     pendingCmds.add(cmdBlock);  //to execute.
+  }
+  
+  
+  
+  @Override public void actionLeft(Object userData, TableLineGui_ifc line)
+  {
+  }
+  
+  @Override public void actionRight(Object userData, TableLineGui_ifc line)
+  {
   }
   
   
@@ -145,6 +168,8 @@ public class CommandSelector extends SelectList
         } else {
           //a operation system command:
           mainCmd.executeCmdLine(processBuilder, sCmd, null, Report.anytime, this.cmdOutput, cmdError);
+          System.out.append(cmdOutput);
+          System.out.append(cmdError);
         }
       }
       System.out.println(block.name);

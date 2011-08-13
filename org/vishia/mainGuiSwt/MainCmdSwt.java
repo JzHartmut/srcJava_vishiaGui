@@ -30,7 +30,9 @@ package org.vishia.mainGuiSwt;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -238,6 +240,17 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   /**The help menu is extendable. */
   private Menu menuHelp;
   
+  private static class MenuEntry
+  {
+    String name;
+    /**If it is a superior menu item, the menu below. Else null. */
+    Menu menu;
+    Map<String, MenuEntry> subMenu;
+  }
+  
+  Map<String, MenuEntry> menus = new TreeMap<String, MenuEntry>();
+  
+  
   //protected JScrollPane textAreaOutputPane;
   
   /** Paint Methoden */
@@ -388,6 +401,29 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   }
   
 
+  
+  class ActionUserMenuItem implements SelectionListener
+  { 
+    final UserActionGui action;
+    
+    public ActionUserMenuItem(UserActionGui action)
+    { this.action = action;
+    }
+
+    @Override
+    public void widgetDefaultSelected(SelectionEvent e) {
+      // TODO Auto-generated method stub
+      
+    }
+  
+    @Override
+    public void widgetSelected(SelectionEvent e)
+    { action.userActionGui("", null, (Object[])null);
+    }
+  }
+  
+  
+  
   ShellListener mainComponentListerner = new ShellListener()
   {
 
@@ -760,6 +796,38 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
     }
     
   }
+  
+  
+  @Override public void addMenuItemGThread(String namePath, UserActionGui action)
+  {
+    String[] names = namePath.split("/");
+    Menu parentMenu = menuBar;
+    Map<String, MenuEntry> menustore = menus;
+    int ii;
+    for(ii=0; ii<names.length-1; ++ii){
+      String name = names[ii];
+      MenuEntry menuEntry = menustore.get(name);
+      if(menuEntry == null){
+        menuEntry = new MenuEntry();
+        menustore.put(name, menuEntry);
+        menuEntry.name = name;
+        menuEntry.subMenu = new TreeMap<String, MenuEntry>();
+        MenuItem item = new MenuItem(parentMenu, SWT.CASCADE);
+        item.setText(name);
+        menuEntry.menu = new Menu(graphicFrame, SWT.DROP_DOWN);
+        item.setMenu(menuEntry.menu);
+      }
+      menustore = menuEntry.subMenu;
+      parentMenu = menuEntry.menu;
+    }
+    String name = names[ii];
+    MenuItem item = new MenuItem(parentMenu, SWT.None); 
+    item.setText(name);
+    //item.setAccelerator(SWT.CONTROL | 'S');
+    item.addSelectionListener(this.new ActionUserMenuItem(action));
+    ///
+  }
+  
   
   
   

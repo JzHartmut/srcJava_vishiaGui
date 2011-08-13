@@ -145,4 +145,16 @@ public interface GuiPanelMngWorkingIfc
 	 * @return The content.
 	 */
 	String getValueFromWidget(WidgetDescriptor widgetDescr);
+	
+	/**Notifies that this widget has the focus gotten.
+	 * Note: not all widgets notifies this. The focus can be used to detect which widget is active
+	 * while a menu command or any button is pressed.
+	 * @param widgd The widget descriptor
+	 */
+	void notifyFocus(WidgetDescriptor widgd);
+	
+	
+	WidgetDescriptor getWidgetInFocus();
+	
+	
 }
