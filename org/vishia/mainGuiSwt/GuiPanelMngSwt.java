@@ -83,6 +83,7 @@ import org.vishia.gral.ifc.GuiShellMngIfc;
 import org.vishia.gral.ifc.GuiWindowMng_ifc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.swt.WidgetSimpleWrapperSwt;
 import org.vishia.gral.widget.WidgetCmpnifc;
 import org.vishia.gral.widget.Widgetifc;
 import org.vishia.msgDispatch.LogMessage;
@@ -620,7 +621,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   	}
   	widget.setSize(textSize);
   	//guiContent.add(widget);
-  	WidgetDescriptor widgd = new WidgetDescriptor(sText, widget, 'S');
+  	WidgetDescriptor widgd = new WidgetDescriptor(sText, new WidgetSimpleWrapperSwt(widget), 'S');
   	return widgd;
   }
 
@@ -730,7 +731,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     	widgetInfo.name = sCurrPanel + widgetInfo.name.substring(1);
     }
     //link the widget with is information together.
-    widgetInfo.widget = widget;
+    widgetInfo.widget = new WidgetSimpleWrapperSwt(widget);
     widget.setData(widgetInfo);
     if(widgetInfo.name !=null){
       indexNameWidgets.put(widgetInfo.name, widgetInfo);
@@ -805,7 +806,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     widgetInfo.name = sCurrPanel + widgetInfo.name.substring(1);
   }
   //link the widget with is information together.
-  widgetInfo.widget = widget;
+  widgetInfo.widget = new WidgetSimpleWrapperSwt(widget);
   widget.setData(widgetInfo);
   if(widgetInfo.name !=null){
     indexNameWidgets.put(widgetInfo.name, widgetInfo);
@@ -891,7 +892,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     if(sCmd != null){
       widget.setData(sCmd);
     } 
-    WidgetDescriptor widgd = new WidgetDescriptor(sName, widget, 'i', sName, null);
+    WidgetDescriptor widgd = new WidgetDescriptor(sName, new WidgetSimpleWrapperSwt(widget), 'i', sName, null);
     if(sName !=null){
       indexNameWidgets.put(sName, widgd);
     }
@@ -933,7 +934,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	Slider control = new Slider((Composite)this.currPanel.panelComposite, SWT.VERTICAL);
   	control.setBackground(propertiesGuiSwt.colorBackground);
   	setPosAndSize_(control);
-   	WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, control, 'V');
+   	WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, new WidgetSimpleWrapperSwt(control), 'V');
    	widgetInfos.setPanelMng(this);
     if(action != null){
   		SelectionListenerForSlider actionSlider = new SelectionListenerForSlider(widgetInfos, action);
@@ -964,7 +965,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, 'B');
     widgetInfos.setPanelMng(this);
     ButtonSwt button = new ButtonSwt(this, widgetInfos, size);
-    widgetInfos.widget = button;
+    widgetInfos.widget = new WidgetSimpleWrapperSwt(button);
     button.setBackground(propertiesGuiSwt.colorBackground);
   	
     button.setText(sButtonText);
@@ -1017,7 +1018,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     widgetInfos.setShowMethod(sShowMethod);
     widgetInfos.sDataPath = sDataPath;
     SwitchButtonSwt button = new SwitchButtonSwt(this, widgetInfos, size);
-    widgetInfos.widget = button;
+    widgetInfos.widget = new WidgetSimpleWrapperSwt(button);
   	button.setBackground(propertiesGuiSwt.colorBackground);
   	button.setColorPressed(propertiesGui.getColorValue(sColor1));  
     button.setColorReleased(propertiesGui.getColorValue(sColor0));  
@@ -1047,7 +1048,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     widget.setForeground(propertiesGuiSwt.colorSwt(0xff00));
     widget.setSize(propertiesGui.xPixelUnit() * xSize -2, propertiesGui.yPixelUnit() * ySize -2);
     setBounds_(widget);
-    WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, widget, 'D');
+    WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, new WidgetSimpleWrapperSwt(widget), 'D');
     widgetInfos.setPanelMng(this);
     widgetInfos.sDataPath = sDataPath;
     widgetInfos.setShowMethod(sShowMethod);

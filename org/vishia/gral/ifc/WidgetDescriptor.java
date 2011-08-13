@@ -3,6 +3,8 @@ package org.vishia.gral.ifc;
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.gridPanel.GralGridPosition;
+import org.vishia.gral.swt.WidgetSimpleWrapperSwt;
+import org.vishia.gral.widget.Widgetifc;
 
 
 
@@ -17,6 +19,11 @@ public class WidgetDescriptor
   
   /**Changes:
    * <ul>
+   * <li>2011-08-14 Hartmut chg: {@link #widget} is now type of {@link Widgetifc} and not Object.
+   *    Generally it is the reference to the implementing code of the widget. The implementing code 
+   *    may based on a graphic base widget (SWT: Control) and implements the {@link Widgetifc}, 
+   *    or it references the graphic base widget instance. The class {@link WidgetSimpleWrapperSwt} 
+   *    is able to wrap simple graphical base widget instances.
    * <li>2011-08-13 Hartmut new: WidgetDescriptor now contains the position of the widget. 
    * It is used for resizing of large widgets.
    * A large widget is a widget, which lengthens over the panel and it is changed in size with panel size change. 
@@ -50,7 +57,7 @@ public class WidgetDescriptor
 	 * This element is used for setting operations, which depends from the graphic system
 	 * and the type of the widget. It is only used in the graphic-system-special implementation.
 	 * */
-	public Object widget;
+	public Widgetifc widget;
 	
 	/**numeric info what to do (kind of widget). 
 	 * <ul>
@@ -109,7 +116,7 @@ public class WidgetDescriptor
 	 * This info can be set and changed after registration. */
 	private Object oContentInfo;
 	
-	public WidgetDescriptor(String sName, Object widget, char whatIs)
+	public WidgetDescriptor(String sName, Widgetifc widget, char whatIs)
 	{ this.name = sName;
 		this.widget = widget;
 		this.whatIs = whatIs;
@@ -124,7 +131,7 @@ public class WidgetDescriptor
 	}
 
   
-  public WidgetDescriptor(String sName, Object widget, char whatIs, String sContentInfo, Object oContentInfo)
+  public WidgetDescriptor(String sName, Widgetifc widget, char whatIs, String sContentInfo, Object oContentInfo)
   { this.name = sName;
     this.widget = widget;
     this.whatIs = whatIs;

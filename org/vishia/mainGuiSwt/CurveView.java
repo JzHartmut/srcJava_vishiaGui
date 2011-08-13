@@ -15,8 +15,10 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.vishia.gral.widget.Widgetifc;
 
-public class CurveView extends Canvas{
+public class CurveView extends Canvas implements Widgetifc
+{
 
 	//final Canvas canvas;
 	
@@ -255,14 +257,16 @@ public class CurveView extends Canvas{
 	  //values.notify();
 	}
 	
-	
+  @Override public Object getWidget()
+  { return this;
+  }
+  
+
 	
   PaintListener paintListener = new PaintListener()
   {
 
-		@Override
-		public void paintControl(PaintEvent e) {
-			// TODO Auto-generated method stub
+		@Override public void paintControl(PaintEvent e) {
 			GC gc = e.gc;
 			drawBackground(e.gc, e.x, e.y, e.width, e.height);
 		}
@@ -497,6 +501,6 @@ public class CurveView extends Canvas{
 	
 	
 	void stop(){} //marker for debug
-	
+
 	
 }

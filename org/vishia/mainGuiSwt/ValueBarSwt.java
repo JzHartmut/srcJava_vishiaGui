@@ -13,8 +13,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.vishia.gral.ifc.GuiSetValueIfc;
 import org.vishia.gral.widget.ValueBar;
+import org.vishia.gral.widget.Widgetifc;
 
-public class ValueBarSwt extends ValueBar implements GuiSetValueIfc
+public class ValueBarSwt extends ValueBar implements GuiSetValueIfc, Widgetifc
 {
 
 	final GuiPanelMngSwt mng;
@@ -63,7 +64,10 @@ public class ValueBarSwt extends ValueBar implements GuiSetValueIfc
   	}
   }
 	
-	
+  @Override public Object getWidget()
+  { return widget;
+  }
+
 	public class BarWidget extends Canvas
 	{
 		BarWidget()
@@ -135,4 +139,5 @@ public class ValueBarSwt extends ValueBar implements GuiSetValueIfc
 	}  
 	  
 	void stop(){}
+
 }
