@@ -868,8 +868,8 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     GuiImageBase imageGui = new GuiImageSwt(image);
     GuiRectangle size = imageGui.getPixelSize();
     GuiRectangle rr = getRectangleBounds(size.dy, size.dx);
-    if(currPanel.panelComposite instanceof CanvasStorePanelSwt){
-      CanvasStorePanelSwt canvas = (CanvasStorePanelSwt) currPanel.panelComposite;
+    if(currPanel instanceof CanvasStorePanelSwt){
+      CanvasStorePanelSwt canvas = (CanvasStorePanelSwt) currPanel;
       //coordinates are in pixel
       canvas.store.drawImage(imageGui, rr.x, rr.y, rr.dx, rr.dy, size);
     }

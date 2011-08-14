@@ -121,6 +121,9 @@ public class FileSelector extends SelectList
   {
     File file = (File)(userData);
     File dir = file.getParentFile();
+    String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir);
+    String sName = line.getCellText(1);
+    indexSelection.put(sDir, sName);
     if(dir !=null){
       dir = dir.getParentFile();  
     }
@@ -133,8 +136,13 @@ public class FileSelector extends SelectList
   @Override public void actionRight(Object userData, TableLineGui_ifc line)
   {
     File file = (File)(userData);
+    File dir = file.getParentFile();
+    String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir);
+    String sName = line.getCellText(1);
     if(file.isDirectory()){
-      fillIn(file); 
+      //save the last selection of that level
+      indexSelection.put(sDir, sName);
+      fillIn(file);
     }
   }
   
