@@ -91,9 +91,17 @@ public class FileSelector extends SelectList
   
   public File getSelectedFile()
   {
+    if(table == null){
+      stop();
+      return null;
+    }
     TableLineGui_ifc line = table.getCurrentLine();
-    File file = (File)line.getUserData();
-    return file;
+    if(line !=null){
+      File file = (File)line.getUserData();
+      return file;
+    } else {
+      return null;
+    }
   }
   
   

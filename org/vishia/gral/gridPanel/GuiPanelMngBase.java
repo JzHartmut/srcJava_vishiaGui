@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -131,7 +132,9 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
    */
   public TabPanel tabPanel;
   
-  private WidgetDescriptor widgetInFocus;
+  //private WidgetDescriptor widgetInFocus;
+  
+  private List<WidgetDescriptor> widgetsInFocus = new LinkedList<WidgetDescriptor>();
   
   protected final LogMessage log;
   
@@ -420,10 +423,15 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   
   @Override public void notifyFocus(WidgetDescriptor widgd)
   {
-    widgetInFocus = widgd;
+    synchronized(widgetsInFocus){
+      widgetsInFocus.remove(widgd);  //remove it anywhere inside
+      widgetsInFocus.add(0, widgd);     //add at start.
+    }
   }
   
-  @Override public WidgetDescriptor getWidgetInFocus(){ return widgetInFocus; }
+  @Override public WidgetDescriptor getWidgetInFocus(){ return widgetsInFocus.get(0); }
+  
+  @Override public List<WidgetDescriptor> getWidgetsInFocus(){ return widgetsInFocus; }
   
   
 

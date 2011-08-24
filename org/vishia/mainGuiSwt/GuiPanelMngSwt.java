@@ -382,7 +382,8 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   @Override public boolean remove(WidgetDescriptor widget)
   {
     if(widget !=null && widget.widget !=null){
-      ((Widget)widget.widget).dispose();
+      Object swtWidgd = widget.widget.getWidget();
+      ((Widget)swtWidgd).dispose();
     }
     widget.widget = null;  //remove instance by Garbage collector.
     return true;
@@ -1544,20 +1545,22 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
 
 
 	
-	@Override public String getValueFromWidget(WidgetDescriptor widgetDescr)
+	@Override public String getValueFromWidget(WidgetDescriptor widgd)
 	{ final String sValue;
-  	Object widget = widgetDescr.widget;
-		if(widget instanceof Text){
-  	  sValue = ((Text)widget).getText();
-  	} else if(widget instanceof SwitchButtonSwt){
-  		SwitchButtonSwt button = (SwitchButtonSwt)widget;
+  	Widgetifc widget = (Widgetifc)(widgd.widget);
+    Control swtWidget = (Control)widget.getWidget();
+		if(swtWidget instanceof Text){
+  	  sValue = ((Text)swtWidget).getText();
+  	} else if(swtWidget instanceof SwitchButtonSwt){
+  		SwitchButtonSwt button = (SwitchButtonSwt)swtWidget;
   		sValue = button.isOn() ? "1" : "0"; 
-  	} else if(widget instanceof Button){
+  	} else if(swtWidget instanceof Button){
   		sValue = "0"; //TODO input.button.isSelected() ? "1" : "0";
-  	} else if(widget instanceof Table){
-      Table table = (Table)widget;
+  	} else if(swtWidget instanceof Table){
+      Table table = (Table)swtWidget;
       sValue = getValueFromTable(table);
   	} else {
+  	  log.sendMsg(0, "GuiPanelMngSwt.getValueFromWidget - unknown widget type;");
   		sValue = "";
   	}
 		return sValue;

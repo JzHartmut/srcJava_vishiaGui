@@ -1,5 +1,6 @@
 package org.vishia.gral.ifc;
 
+import java.util.List;
 import java.util.Queue;
 
 
@@ -154,7 +155,16 @@ public interface GuiPanelMngWorkingIfc
 	void notifyFocus(WidgetDescriptor widgd);
 	
 	
-	WidgetDescriptor getWidgetInFocus();
-	
+  WidgetDescriptor getWidgetInFocus();
+  
+  /**Returns a list of the last widgets in focus in there focus order.
+   * On access to the list, usual with an iterator, the returned list should be used
+   * with mutex. Use 'synchronized(focusList){....}'. But don't block the access for a longer time!
+   * The graphical thread will be wait on mutex if any other widget will be focused.
+   *  
+   * @return The list.
+   */
+  List<WidgetDescriptor> getWidgetsInFocus();
+  
 	
 }

@@ -1,7 +1,10 @@
 package org.vishia.guiCmdMenu;
 
 import java.io.File;
+import java.util.Iterator;
+import java.util.List;
 
+import org.vishia.cmd.CmdGetFileArgs_ifc;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
@@ -13,6 +16,7 @@ import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.gral.widget.CommandSelector;
 import org.vishia.gral.widget.FileSelector;
 import org.vishia.mainCmd.MainCmd_ifc;
+
 
 public class JavaCmd extends GuiCfg
 {
@@ -28,6 +32,7 @@ public class JavaCmd extends GuiCfg
   
   private final CommandSelector cmdSelector = new CommandSelector(mainCmd);
   
+  private File[] selectedFiles;
 
   private final FileSelector[] fileSelector = new FileSelector[]
     { new FileSelector(mainCmd), new FileSelector(mainCmd), new FileSelector(mainCmd)};
@@ -41,10 +46,12 @@ public class JavaCmd extends GuiCfg
   
   
   /**Initializes the areas for the panels and configure the panels.
+   * Note that the window is initialized with an output area already. This is used for output messages
+   * if problems occurs while build the rest of the GUI.
    */
   @Override protected void initGuiAreas()
   {
-    gui.setFrameAreaBorders(30, 65, 80, 90);
+    gui.setFrameAreaBorders(30, 65, 80, 82);  //x1, x2, y1, y2
     gui.setStandardMenusGThread(new File("."), actionFile);
     gui.addMenuItemGThread("&Command/Set&WorkingDir", actionSetCmdWorkingDir); ///
     //gui.addMenuItemGThread("&Command/E&xecute", actionSetCmdCurrentDir); ///
@@ -77,6 +84,7 @@ public class JavaCmd extends GuiCfg
     panelMng.setPositionInPanel(2, 0, -2, -0.1f, '.');
     cmdSelector.setToPanel(panelMng, "cmds", 5, new int[]{10,10}, 'A');
     cmdSelector.fillIn();
+    cmdSelector.setGetterFiles(getterFiles);
 
     panelMng.selectPanel("file0");
     panelMng.setPositionInPanel(0, 0, -2, -0.1f, '.');
@@ -137,16 +145,32 @@ public class JavaCmd extends GuiCfg
   
   
   
+  private File[] getSelectedFile()
+  { File file[] = new File[3];
+    int ixFile = 0;
+    List<WidgetDescriptor> widgdFocus = panelMng.getWidgetsInFocus();
+    synchronized(widgdFocus){
+      Iterator<WidgetDescriptor> iterFocus = widgdFocus.iterator();
+      while(ixFile < file.length && iterFocus.hasNext()){
+        WidgetDescriptor widgd = iterFocus.next();
+        if(widgd.name.startsWith("file")){
+          int ixFilePanel = widgd.name.charAt(4) - '0';
+          assert(ixFilePanel >=0 && ixFilePanel < fileSelector.length);  //only such names are registered.
+          FileSelector fileSel = fileSelector[ixFilePanel];
+          file[ixFile++] = fileSel.getSelectedFile();
+        }
+      }
+    }
+    return file;
+  }
+  
+  
   
   private UserActionGui actionSetCmdCfg = new UserActionGui() 
   { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
-    { WidgetDescriptor widgdFocus = panelMng.getWidgetInFocus();
-      if(widgdFocus.name.startsWith("file")){
-        int ixFilePanel = widgdFocus.name.charAt(4) - '0';
-        assert(ixFilePanel >=0 && ixFilePanel < fileSelector.length);  //only such names are registered.
-        FileSelector fileSel = fileSelector[ixFilePanel];
-        File file = fileSel.getSelectedFile();
-        cmdSelector.readCmdCfg(file);
+    { selectedFiles = getSelectedFile();
+      if(selectedFiles[0] !=null){
+        cmdSelector.readCmdCfg(selectedFiles[0]);
         cmdSelector.fillIn();
       }
       stop();
@@ -183,6 +207,23 @@ public class JavaCmd extends GuiCfg
     }
     
   }
+  
+  
+  CmdGetFileArgs_ifc getterFiles = new CmdGetFileArgs_ifc()
+  { @Override public void  prepareFileSelection()
+    { selectedFiles = getSelectedFile();
+    }
+
+    @Override public File getFileSelect()
+    { return selectedFiles[0];
+    }
+    
+    @Override public File getFile1() { return selectedFiles[0]; }
+    
+    @Override public File getFile2() { return selectedFiles[1]; }
+    
+    @Override public File getFile3() { return selectedFiles[2]; }
+  };
   
   
   static void testT1()

@@ -348,5 +348,7 @@ public class WidgetDescriptor
 		return name + ":" + sDataPath;
 	}
 	
+	
+	
 }
 

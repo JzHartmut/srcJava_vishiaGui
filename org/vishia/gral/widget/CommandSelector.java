@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.cmd.CmdGetFileArgs_ifc;
 import org.vishia.cmd.PrepareCmd;
 import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
@@ -30,6 +31,11 @@ import org.vishia.mainCmd.Report;
 public class CommandSelector extends SelectList
 {
 
+  /**Gets in grsphical thread!
+   * 
+   */
+  private CmdGetFileArgs_ifc getterFiles;
+  
   /**Description of one command.
    */
   public class CmdBlock
@@ -51,6 +57,36 @@ public class CommandSelector extends SelectList
     
   }
   
+  
+  
+  
+  private static class PendingCmd implements CmdGetFileArgs_ifc
+  {
+    final CmdBlock cmdBlock;
+    final File[] files;
+    
+    public PendingCmd(CmdBlock cmdBlock, File[] files)
+    { this.cmdBlock = cmdBlock;
+      this.files = files;
+    }
+
+    @Override public void  prepareFileSelection()
+    { }
+
+    @Override public File getFileSelect()
+    { return files[0];
+    }
+    
+    @Override public File getFile1() { return files[0]; }
+    
+    @Override public File getFile2() { return files[1]; }
+    
+    @Override public File getFile3() { return files[2]; }
+
+  }
+  
+  
+  
   /**Contains all commands read from the configuration file. */
   private final List<CmdBlock> listCmd = new LinkedList<CmdBlock>();
   
@@ -59,7 +95,7 @@ public class CommandSelector extends SelectList
   
   private final MainCmd_ifc mainCmd;
 
-  private final ConcurrentLinkedQueue<CmdBlock> pendingCmds = new ConcurrentLinkedQueue<CmdBlock>();
+  private final ConcurrentLinkedQueue<PendingCmd> pendingCmds = new ConcurrentLinkedQueue<PendingCmd>();
   
   private final ProcessBuilder processBuilder = new ProcessBuilder();
   
@@ -72,6 +108,12 @@ public class CommandSelector extends SelectList
   {
     this.mainCmd = mainCmd;
   }
+  
+  public void setGetterFiles(CmdGetFileArgs_ifc getterFiles)
+  {
+    this.getterFiles = getterFiles;
+  }
+  
   
   /**Possible call from {@link org.vishia.zbnf.ZbnfJavaOutput}. Creates an instance of one command block */
   public CmdBlock new_CmdBlock(){ return new CmdBlock(); }
@@ -139,7 +181,12 @@ public class CommandSelector extends SelectList
   @Override public void actionOk(Object userData, TableLineGui_ifc line)
   {
     CmdBlock cmdBlock = (CmdBlock)userData;
-    pendingCmds.add(cmdBlock);  //to execute.
+    getterFiles.prepareFileSelection();
+    File[] files = new File[3];
+    files[0] = getterFiles.getFile1();
+    files[1] = getterFiles.getFile2();
+    files[2] = getterFiles.getFile3();
+    pendingCmds.add(new PendingCmd(cmdBlock, files));  //to execute.
   }
   
   
@@ -160,9 +207,10 @@ public class CommandSelector extends SelectList
   public final void executeCmds()
   {
     CmdBlock block;
-    while( (block = pendingCmds.poll())!=null){
-      for(PrepareCmd cmd: block.listCmd){
-        String sCmd = cmd.prepareCmd(new File("."));
+    PendingCmd cmd1;
+    while( (cmd1 = pendingCmds.poll())!=null){
+      for(PrepareCmd cmd: cmd1.cmdBlock.listCmd){
+        String sCmd = cmd.prepareCmd(cmd1);
         if(sCmd.startsWith("@")){
           
         } else {
@@ -172,7 +220,7 @@ public class CommandSelector extends SelectList
           System.out.append(cmdError);
         }
       }
-      System.out.println(block.name);
+      System.out.println(cmd1.cmdBlock.name);
     }
   }
   

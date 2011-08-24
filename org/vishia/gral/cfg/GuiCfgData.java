@@ -206,7 +206,7 @@ public final class GuiCfgData
     public boolean setPosElement(char what, String sVal)
     { boolean ok = true;
       final int val; final int frac;
-      if(sVal.length() >=0){
+      if(sVal.length() >0){
         boolean posRelativ = sVal.charAt(0)=='&';
         int pos1 = posRelativ ? 1: 0;
         if(sVal.charAt(pos1) == '+'){
