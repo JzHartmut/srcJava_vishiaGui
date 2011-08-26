@@ -58,6 +58,12 @@ public abstract class SelectList
   abstract void actionRight(Object userData, TableLineGui_ifc line);
   
   
+  /**Action if a table line is selected and any other key is pressed or the context menu is invoked.
+   * @param userData The user data stored in the line of table.
+   */
+  abstract void actionUserKey(String sKey, Object userData, TableLineGui_ifc line);
+  
+  
   UserActionGui actionTable = new UserActionGui()
   {
 
@@ -69,6 +75,7 @@ public abstract class SelectList
       if(sIntension.equals("ok")){ actionOk(data, line); }
       else if(sIntension.equals("s-left")){ actionLeft(data, line); }
       else if(sIntension.equals("s-right")){ actionRight(data, line); }
+      else { actionUserKey(sIntension, data, line); }
     }
     
   };

@@ -155,6 +155,19 @@ public class FileSelector extends SelectList
   }
   
   
+  
+  @Override public void actionUserKey(String sIntension, Object data, TableLineGui_ifc line)
+  {
+    File file = (File)(data);
+    if(sIntension.equals("a-f7")){ 
+      String[] result = FileSystem.searchInFiles(new File[]{file}, "ordersBackground"); 
+      stop();
+    }
+  }
+  
+  
+  
+  
   void stop(){}
   
 }
