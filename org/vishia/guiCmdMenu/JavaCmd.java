@@ -89,17 +89,17 @@ public class JavaCmd extends GuiCfg
     panelMng.selectPanel("file0");
     panelMng.setPositionInPanel(0, 0, -2, -0.1f, '.');
     fileSelector[1].setToPanel(panelMng, "file0", 5, new int[]{2,20,5,10}, 'A');
-    fileSelector[1].fillIn(new File("D:/"));
+    fileSelector[1].fillIn(new File("/"));
     
     panelMng.selectPanel("file1");
     panelMng.setPositionInPanel(0, 0, -2, -0.1f, '.');
     fileSelector[1].setToPanel(panelMng, "file1", 5, new int[]{2,20,5,10}, 'A');
-    fileSelector[1].fillIn(new File("D:/"));
+    fileSelector[1].fillIn(new File("/"));
 
     panelMng.selectPanel("file2");
     panelMng.setPositionInPanel(0, 0, -2, -0.1f, '.');
     fileSelector[2].setToPanel(panelMng, "file2", 5, new int[]{2,20,5,10}, 'A');
-    fileSelector[2].fillIn(new File("D:/"));
+    fileSelector[2].fillIn(new File("/"));
 
   }
 

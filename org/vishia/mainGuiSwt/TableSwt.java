@@ -273,7 +273,7 @@ public class TableSwt implements TableGui_ifc
               if(sIntension !=null){
                 action.userActionGui(sIntension, widgetDescr, lineGui);    
               }
-            } else if((keyEv.stateMask & (SWT.CONTROL + SWT.ALT + SWT.SHIFT)) == SWT.SHIFT){
+		        } else if((keyEv.stateMask & (SWT.CONTROL + SWT.ALT + SWT.SHIFT)) == SWT.SHIFT){
               //all key events with only ctrl
               final String sIntension;
               switch(keyEv.keyCode){
@@ -284,6 +284,32 @@ public class TableSwt implements TableGui_ifc
                 case SWT.PAGE_UP:     sIntension = "s-pgup"; break;
                 case SWT.PAGE_DOWN:   sIntension = "s-pgdn"; break;
                 default: sIntension = null;
+              }
+              if(sIntension !=null){
+                action.userActionGui(sIntension, widgetDescr, lineGui);    
+              }
+		        } else if((keyEv.stateMask & (SWT.CONTROL + SWT.ALT + SWT.SHIFT)) == SWT.ALT){
+              //all key events with only ctrl
+              final String sIntension;
+              switch(keyEv.keyCode){
+                case SWT.ARROW_LEFT:  sIntension = "a-left"; break;
+                case SWT.ARROW_RIGHT: sIntension = "a-right"; break;
+                case SWT.ARROW_UP:    sIntension = "a-up"; break;
+                case SWT.ARROW_DOWN:  sIntension = "a-dn"; break;
+                case SWT.PAGE_UP:     sIntension = "a-pgup"; break;
+                case SWT.F1:          sIntension = "a-f1"; break;
+                case SWT.F2:          sIntension = "a-f2"; break;
+                case SWT.F3:          sIntension = "a-f3"; break;
+                case SWT.F4:          sIntension = "a-f4"; break;
+                case SWT.F5:          sIntension = "a-f5"; break;
+                case SWT.F6:          sIntension = "a-f6"; break;
+                case SWT.F7:          sIntension = "a-f7"; break;
+                case SWT.F8:          sIntension = "a-f8"; break;
+                case SWT.F9:          sIntension = "a-f9"; break;
+                case SWT.F10:         sIntension = "a-f10"; break;
+                case SWT.F11:         sIntension = "a-f12"; break;
+                case SWT.F12:         sIntension = "a-f12"; break;
+                 default: sIntension = null;
               }
               if(sIntension !=null){
                 action.userActionGui(sIntension, widgetDescr, lineGui);    
