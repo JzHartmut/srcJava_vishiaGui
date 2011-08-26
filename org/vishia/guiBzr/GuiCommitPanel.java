@@ -56,11 +56,11 @@ public class GuiCommitPanel
       	//what todo
       }
       //String sCmd = "bzr commit -F " + fileCommitText.getAbsolutePath();
-      mainData.cmdMng.directory(mainData.currCmpn.fileBzrLocation);
+      mainData.cmdExec.setCurrentDir(mainData.currCmpn.fileBzrLocation);
       String sCmdStatus = mainData.cfg.indexCmds.get("status");
-      mainData.mainCmdifc.executeCmdLine(mainData.cmdMng, sCmdStatus, null, Report.info, uCommitOut, uCommitOut);
+      mainData.cmdExec.execWait(sCmdStatus, null, uCommitOut, uCommitOut);
       uCommitOut.setLength(0);
-      mainData.mainCmdifc.executeCmdLine(mainData.cmdMng, sCmdCommit.toString(), null, Report.info, uCommitOut, uCommitOut);
+      mainData.cmdExec.execWait(sCmdCommit.toString(), null, uCommitOut, uCommitOut);
       stop();
     }
   };

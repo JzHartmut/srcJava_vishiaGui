@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.cmd.CmdExecuter;
 import org.vishia.gral.area9.GuiMainAreaifc;
 import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
@@ -15,6 +16,8 @@ public class MainData
   
   final MainCmd_ifc mainCmdifc;
 
+  final CmdExecuter cmdExec = new CmdExecuter();
+  
   MainAction mainAction;
   
   GuiPanelMngWorkingIfc panelAccess;
@@ -35,7 +38,7 @@ public class MainData
   final DateFormat dateFormatShowingHour =     new SimpleDateFormat("HH:mm");
   
   /**Only one command invocation should be active in one time. */
-  final ProcessBuilder cmdMng = new ProcessBuilder("");
+  //final ProcessBuilder cmdMng = new ProcessBuilder("");
   
   private final ConcurrentLinkedQueue<Runnable> ordersBackground =new ConcurrentLinkedQueue<Runnable>();
 

@@ -183,7 +183,13 @@ public class BzrGui extends GuiCfg
   //};
 
 
-
+  protected void stepMain()
+  {
+    Runnable order = mainData.awaitOrderBackground(1000);
+    if(order !=null){
+      order.run();
+    }
+  }
 
 
   
