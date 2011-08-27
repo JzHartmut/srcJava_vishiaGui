@@ -17,13 +17,20 @@ import org.vishia.gral.ifc.WidgetDescriptor;
 public abstract class SelectList
 {
   /**The table which is showing in the widget. */
-  WidgetDescriptor wdgdTable;
+  protected WidgetDescriptor wdgdTable;
   
-  TableGui_ifc table;
+  protected TableGui_ifc table;
   
   /**Not used yet, register actions? */
-  Map<String, UserActionGui> actions;
+  protected Map<String, UserActionGui> actions;
   
+  /**
+   * @param panel
+   * @param name
+   * @param rows
+   * @param columns
+   * @param size
+   */
   public void setToPanel(GuiPanelMngBuildIfc panel, String name, int rows, int[] columns, char size)
   {
     wdgdTable = panel.addTable(name, rows, columns);
@@ -64,7 +71,7 @@ public abstract class SelectList
   abstract void actionUserKey(String sKey, Object userData, TableLineGui_ifc line);
   
   
-  UserActionGui actionTable = new UserActionGui()
+  private UserActionGui actionTable = new UserActionGui()
   {
 
     @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
