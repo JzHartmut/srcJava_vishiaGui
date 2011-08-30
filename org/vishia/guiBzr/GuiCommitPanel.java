@@ -32,10 +32,10 @@ public class GuiCommitPanel
    */
   void initGui()
   { panelBuildifc.selectPanel("Commit");
-    panelBuildifc.setPosition(2,0, 30, 70, 'r');
+    panelBuildifc.setPositionSize(2,0, 30, 70, 'r');
     panelBuildifc.addTextBox(widgdCommitText, true, null, ' '); // "commit Text", 't');
     
-    panelBuildifc.setPosition(33,0, 3, 10, 'r');
+    panelBuildifc.setPositionSize(33,0, 3, 10, 'r');
     panelBuildifc.addButton("commit", actionCommit, "commit", null, null, "commit");
     
   }

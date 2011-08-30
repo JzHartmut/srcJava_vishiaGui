@@ -305,7 +305,8 @@ public class GuiDialogZbnfControlled
 	        	if(mdata.xPos >=0 || mdata.yPos >=0){
 	        	  //only if one of the position is given, set it. 
 	        		//If a position is -1, than the automatic increment is used by the calling method.
-	        		dialog.setFinePosition(mdata.yPos, yPosFrac, mdata.xPos, xPosFrac, mdata.yWidth, ySizeFrac, mdata.xWidth, xSizeFrac, direction);
+	        		dialog.setFinePosition(mdata.yPos, yPosFrac, mdata.yWidth + GralPos.size, ySizeFrac
+	        		    , mdata.xPos, xPosFrac, mdata.xWidth + GralPos.size, xSizeFrac, direction, 0);
 	        	} else if(mdata.xWidth !=0 || mdata.yWidth != 0) {
 	        		dialog.setSize(mdata.yWidth, ySizeFrac, mdata.xWidth, xSizeFrac);
 	        	}

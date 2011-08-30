@@ -15,6 +15,7 @@ public class WidgetSimpleWrapperSwt implements Widgetifc
   { return widgetSwt;
   }
   
-  
+  @Override public boolean setFocus(){ return widgetSwt.setFocus(); }
+
   
 }

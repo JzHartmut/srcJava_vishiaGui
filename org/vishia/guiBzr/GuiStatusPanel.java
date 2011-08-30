@@ -82,15 +82,15 @@ public class GuiStatusPanel
   { int xposProjectPath = 0, yposProjectPath=5; 
   
     panelBuildifc.selectPanel("Select");
-    panelBuildifc.setPosition(yposProjectPath, xposProjectPath, -2, 70, 'r');
+    panelBuildifc.setPositionSize(yposProjectPath, xposProjectPath, -2, 70, 'r');
     //widgdProjektpath = panelBuildifc.addTextField("projectPath", true, "Project path", 't');
     widgdProjektpath = panelBuildifc.addFileSelectField("projectPath", null, "D:/:/", "Project path", 't');
-    panelBuildifc.setPosition(-1, -1, -2, 2, 'r');
+    panelBuildifc.setPositionSize(-1, -1, -2, 2, 'r');
     panelBuildifc.addButton("selectProjectPath", selectProjectPath, "c", "s", "d", "?");
     ///
     //WidgetDescriptor widgdRefresh = new WidgetDescriptor("refresh", 'B');
     //widgdRefresh.setAction(refreshProjectBzrComponents);
-    panelBuildifc.setPosition(-1, -1, -3, 10, 'r');
+    panelBuildifc.setPositionSize(-1, -1, -3, 10, 'r');
     panelBuildifc.addButton("Brefresh", refreshProjectBzrComponents, "c", "s", "d", "Get/Refresh");
 
     String[] lines = {"1", "2"};
@@ -98,13 +98,13 @@ public class GuiStatusPanel
     testDialogBox = panelBuildifc.createInfoBox( "Title", lines, true);
     //testDialogBox = new InfoBox(mainData.guifc.getitsGraphicFrame(), "Title", lines, true);
 
-    panelBuildifc.setPosition(yposProjectPath, xposProjectPath, 20, 60, 'r');
+    panelBuildifc.setPositionSize(yposProjectPath, xposProjectPath, 20, 60, 'r');
     selectorProjectPath = panelBuildifc.createWindow(null, false);
     int[] columnWidths = {40, 10};
-    selectorProjectPath.setPosition(0, 0, 10, 60, 'd');
+    selectorProjectPath.setPositionSize(0, 0, 10, 60, 'd');
     selectorProjectPathTable = selectorProjectPath.addTable("selectProjectPath", 20, columnWidths);
     selectorProjectPathTable.setActionChange(actionSelectorProjectPathTable);
-    selectorProjectPath.setPosition(20, 0, -3, 10, 'r');
+    selectorProjectPath.setPositionSize(20, 0, -3, 10, 'r');
     selectorProjectPath.addButton("closeProjectBzrComponents", actionCloseProjectBzrComponents, "","","","ok");
     String sPrjPath = null;
     for(String sPrjPath1: mainData.cfg.listSwPrjs){
@@ -170,12 +170,12 @@ public class GuiStatusPanel
     DataCmpn data = mainData.currPrj.data[iComponent]; 
     String sName = data.getBzrLocationDir().getName();
     panelBuildifc.selectPanel("Select");
-    panelBuildifc.setPosition(yPosComponents, 1, 2, 70, 'r');
+    panelBuildifc.setPositionSize(yPosComponents, 1, 2, 70, 'r');
     GuiPanelMngBuildIfc box;
     bzrComponentBox[iComponent] = box = panelBuildifc.createCompositeBox();
     SelectInfoBoxWidgds widgds = new SelectInfoBoxWidgds(box,data);
     box.selectPanel("$");
-    box.setPosition(0, 0, 2, 2, 'r');
+    box.setPositionSize(0, 0, 2, 2, 'r');
     if(switchButtons[iComponent] !=null){
       switchExcluder.remove(switchButtons[iComponent]);
     }
@@ -183,7 +183,7 @@ public class GuiStatusPanel
     switchExcluder.add(widgdButton);
     widgdButton.setContentInfo(widgds);
     switchButtons[iComponent] = widgdButton;
-    box.setPosition(0, 6, 2, 15, 'r');
+    box.setPositionSize(0, 6, 2, 15, 'r');
     box.addText(sName, 'B', 0);
     widgds.widgdTextRevision = box.addText("Rev. unknown", 'B', 0x808080);
     widgds.widgdTextStatus = box.addText("- select it", 'B', 0x808080);
@@ -196,7 +196,7 @@ public class GuiStatusPanel
     widgds.box.remove(widgds.widgdTextRevision);
     widgds.box.remove(widgds.widgdTextStatus);
     widgds.box.selectPanel("$");
-    widgds.box.setPosition(0, 21, 2, 15, 'r');
+    widgds.box.setPositionSize(0, 21, 2, 15, 'r');
     String sRev = "Rev. ";
     if(widgds.data.nrTopRev == widgds.data.nrSboxRev){
       sRev = "Rev. " + widgds.data.nrSboxRev + " uptodate ";

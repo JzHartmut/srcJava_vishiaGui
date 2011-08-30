@@ -337,14 +337,21 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     	//guiContainer.setSize(width * propertiesGui.xPixelUnit(), height * propertiesGui.yPixelUnit());
     }
     
-    PanelContent panelContent = new PanelContent(graphicFrame);
+    PanelContent panelContent = new PanelContent(graphicFrame){
+
+      @Override
+      public boolean setFocus()
+      { return false;
+      }
+      
+    };
   	panels.put("$", panelContent);
   	currPanel = panelContent;
   	sCurrPanel = "$";
   	
     
-    pos.x = xPosPrev = 0; //start-position
-    pos.y = yPosPrev = 4 * propertiesGui.yPixelUnit();
+    pos.x = 0; //start-position
+    pos.y = 4 * propertiesGui.yPixelUnit();
     
 		userActions.put("syncVariableOnFocus", this.syncVariableOnFocus);
 
@@ -364,10 +371,12 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   }
 
   
-  @Override public WidgetCmpnifc createGridPanel(ColorGui backGround, int xG, int yG, int xS, int yS)
+  @Override public WidgetCmpnifc createGridPanel(String namePanel, ColorGui backGround, int xG, int yG, int xS, int yS)
   {
     Color backColorSwt = propertiesGuiSwt.colorSwt(backGround);
     GridPanelSwt panel = new GridPanelSwt(graphicFrame, 0, backColorSwt, xG, yG, xS, yS);
+    registerPanel(namePanel, panel);
+
     return panel;
   }
   
@@ -406,7 +415,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
 		Shell shell = new Shell(graphicFrame.getDisplay());
 		//TODO
 		//Shell shell = (Shell)graphicFrame; //new Shell(display);
-		setPosAndSize_(shell, line,0, column,0, dy,0, dx,0);
+		setPosAndSize_(shell);
 		//shell.setBounds(left,top, width, height);
 		shell.setText("SHELL");
 		GuiShellMngBuildIfc mng = new GuiShellMngSwt(mngBase.gralDevice, shell, this, 0, 0, propertiesGuiSwt, variableContainer, log);
@@ -438,17 +447,10 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
 		//Shell shell = (Shell)graphicFrame; //new Shell(display);
 		//setPosAndSize_(shell); //, line,0, column,0, dy,0, dx,0);
 		//shell.setBounds(left,top, width, height);
-    int xPixelUnit = propertiesGui.xPixelUnit();
-    int yPixelUnit = propertiesGui.yPixelUnit();
-    //calculate pixel
-    int xPixelSize, yPixelSize;  
-    xPixelSize = xPixelUnit * xSize + propertiesGui.xPixelFrac(pos.yFrac) -2;
-    yPixelSize = yPixelUnit * ySize + propertiesGui.xPixelFrac(pos.yFrac) -2;
-    int xPixel = (int)(pos.x * xPixelUnit) + propertiesGui.xPixelFrac(pos.yFrac) +1;
-    int yPixel = (int)(pos.y * yPixelUnit) + propertiesGui.yPixelFrac(pos.yFrac) +1;
+		GuiRectangle size = calcWidgetPosAndSize(pos, 600, 800, 800, 600);
     Rectangle rectShell = graphicFrame.getBounds();
     Rectangle rectPanel = ((Composite)currPanel.panelComposite).getBounds();
-    shell.setBounds(xPixel + rectShell.x + rectPanel.x, yPixel + rectShell.y + rectPanel.y, xPixelSize, yPixelSize);    
+    shell.setBounds(size.x + rectShell.x + rectPanel.x, size.y + rectShell.y + rectPanel.y, size.dx, size.dy);    
     
     
 		if(title !=null){ shell.setText(title); }
@@ -461,22 +463,6 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   
   
   
-  
-  /**Registers a panel to place the widgets. 
-   * After registration, the panel can be selected
-   * with its name calling the {@link #selectPanel(String)} -routine
-   * @param name Name of the panel.
-   * @param panel The panel.
-   */
-  public PanelContent XXXregisterPanel(String name, Object panelP){
-    Composite panel = (Composite)panelP;
-    PanelContent panelContent = new PanelContent(panel);
-    panels.put(name, panelContent);
-    panel.setLayout(null);
-    currPanel = panelContent;
-    sCurrPanel = name;
-    return panelContent;
-  }
   
   
   /**Registers a panel to place the widgets. 
@@ -532,29 +518,16 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   
   
   
+  
   protected void setPosAndSize_(Control component)
+  { setPosAndSize_(component, 0,0);
+  }  
+  
+  protected void setPosAndSize_(Control component, int widthwidgetNat, int heigthWidgetNat)
   {
-  	setPosAndSize_(component, pos.y, pos.yFrac, pos.x, pos.xFrac, this.ySize, ySizeFrac, this.xSize, xSizeFrac);
-    //int dx1 = (xPixelSize + propertiesGui.xPixelUnit() -1 ) / propertiesGui.xPixelUnit(); 
-    //int dy1 = (yPixelSize + propertiesGui.yPixelUnit() -1 ) / propertiesGui.yPixelUnit(); 
-    //furtherSetPosition(, dy);
-  }
-  
-  
-  
-  protected void setSize_(Control component, int dy, int ySizeFrac, int dx, int xSizeFrac)
-  {
-  	if(dy <=0){ dy = this.ySize; }
-  	if(dx <=0){ dx = this.xSize; }
-  	setPosAndSize_(component, pos.y, pos.yFrac, pos.x, pos.xFrac, dy, ySizeFrac, dx, xSizeFrac);
-    //int dx1 = (xPixelSize + propertiesGui.xPixelUnit() -1 ) / propertiesGui.xPixelUnit(); 
-    //int dy1 = (yPixelSize + propertiesGui.yPixelUnit() -1 ) / propertiesGui.yPixelUnit(); 
-    //furtherSetPosition(dx, dy);
-  }
-  
-
-  protected void setPosAndSize_(Control component, int line, int yPosFrac, int column, int xPosFrac, int dy, int ySizeFrac, int dx, int xSizeFrac)
-  {
+    if(posUsed){
+      setNextPosition();
+    }
     Control parentComp = component.getParent();
     //Rectangle pos;
     if(parentComp != graphicFrame){
@@ -565,31 +538,16 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
       //pos =null;
     }
     final GuiRectangle rectangle;
-    if(dx == Integer.MIN_VALUE+1){
-      final Point parentSize = parentComp.getSize();
-      rectangle = calcWidgetPosAndSize(pos, parentSize.x, parentSize.y);
-    } else {
-      rectangle = calcPosAndSize(line, yPosFrac, column, xPosFrac, dy, ySizeFrac, dx,xSizeFrac,0,0);
-    }
+    final Point parentSize = parentComp.getSize();
+    rectangle = calcWidgetPosAndSize(pos, parentSize.x, parentSize.y, widthwidgetNat, heigthWidgetNat);
     component.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
-    
+    posUsed = true;
+       
   }
   
 
 
 
-  /**Sets the position for further add.. calls.
-   * @param dx
-   * @param dy
-   */
-  private void furtherSetPosition(int dx, int dy){
-    xPosPrev = pos.x;
-    yPosPrev = pos.y;
-    //calculate maxWith etc.
-    if(bBelow){ pos.y += dy; }
-    else { pos.x += dx; }
-  }
-  
 
   
 	@Override public TabPanel createTabPanel(PanelActivatedGui user, int property)
@@ -600,30 +558,70 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   
   
   
-  public WidgetDescriptor addText(String sText, char size, int color)
+  @Override public WidgetDescriptor addText(String sText, char size, int color)
   {
-  	Label widget = new Label((Composite)currPanel.panelComposite, 0);
-  	widget.setForeground(propertiesGuiSwt.colorSwt(color));
-  	widget.setBackground(propertiesGuiSwt.colorBackground);
-  	widget.setText(sText);
-  	//Font font = propertiesGui.stdInputFont;
-  	Font font = propertiesGuiSwt.getTextFont(ySize, ySizeFrac);
-  	widget.setFont(font);
-  	//font.getFontData()[0].
-  	Point textSize = widget.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-  	//int width = sText.length();
-  	//widget.setSize(sizePixel);
-  	
-  	setPosAndSize_(widget);
-  	
-  	Point widgetSize = widget.getSize();
-  	if(widgetSize.x < textSize.x){
-  		widget.setSize(textSize);
-  	}
-  	widget.setSize(textSize);
-  	//guiContent.add(widget);
-  	WidgetDescriptor widgd = new WidgetDescriptor(sText, new WidgetSimpleWrapperSwt(widget), 'S');
-  	return widgd;
+    Label widget = new Label((Composite)currPanel.panelComposite, 0);
+    widget.setForeground(propertiesGuiSwt.colorSwt(color));
+    widget.setBackground(propertiesGuiSwt.colorBackground);
+    widget.setText(sText);
+    //Font font = propertiesGui.stdInputFont;
+    Font font = propertiesGuiSwt.getTextFont(pos.height());
+    widget.setFont(font);
+    //font.getFontData()[0].
+    Point textSize = widget.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+    //int width = sText.length();
+    //widget.setSize(sizePixel);
+    
+    setPosAndSize_(widget);
+    
+    Point widgetSize = widget.getSize();
+    if(widgetSize.x < textSize.x){
+      widget.setSize(textSize);
+    }
+    widget.setSize(textSize);
+    //guiContent.add(widget);
+    WidgetDescriptor widgd = new WidgetDescriptor(sText, new WidgetSimpleWrapperSwt(widget), 'S');
+    return widgd;
+  }
+
+  
+  @Override public WidgetDescriptor addText(String sText, int origin, ColorGui textColor, ColorGui backColor)
+  {
+    int mode;
+    switch(origin){
+    case 1: mode = SWT.LEFT; break;
+    case 2: mode = SWT.CENTER; break;
+    case 3: mode = SWT.RIGHT; break;
+    case 4: mode = SWT.LEFT; break;
+    case 5: mode = SWT.CENTER; break;
+    case 6: mode = SWT.RIGHT; break;
+    case 7: mode = SWT.LEFT; break;
+    case 8: mode = SWT.CENTER; break;
+    case 9: mode = SWT.RIGHT; break;
+    default: mode = 0;
+    }
+    Label widget = new Label((Composite)currPanel.panelComposite, mode);
+    widget.setForeground(propertiesGuiSwt.colorSwt(textColor));
+    widget.setBackground(propertiesGuiSwt.colorSwt(backColor));
+    widget.setText(sText);
+    //Font font = propertiesGui.stdInputFont;
+    Font font = propertiesGuiSwt.getTextFont(pos.height());
+    widget.setFont(font);
+    //font.getFontData()[0].
+    Point textSize = widget.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+    //int width = sText.length();
+    //widget.setSize(sizePixel);
+    
+    setPosAndSize_(widget);
+    
+    Point widgetSize = widget.getSize();
+    if(widgetSize.x < textSize.x){
+      widget.setSize(textSize);
+    }
+    widget.setSize(textSize);
+    //guiContent.add(widget);
+    WidgetDescriptor widgd = new WidgetDescriptor(sText, new WidgetSimpleWrapperSwt(widget), 'S');
+    return widgd;
   }
 
   
@@ -696,7 +694,8 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     	final int yPixelField;
       final Font promptFont;
       char sizeFontPrompt;
-      	switch(ySize){
+      int ySize = (int)(pos.height());
+      switch(ySize){
     	case 3:  promptFont = propertiesGuiSwt.smallPromptFont;
     	         yPixelField = propertiesGui.yPixelUnit() * 2 -3;
     	         break;
@@ -771,6 +770,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   if(prompt != null && promptStylePosition == 't'){
     final int yPixelField;
     final Font promptFont;
+    int ySize = (int)(pos.height());
     switch(ySize){
     case 3:  promptFont = propertiesGuiSwt.smallPromptFont;
              yPixelField = propertiesGuiSwt.yPixelUnit() * 2 -3;
@@ -847,7 +847,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   		//Any panel which is created in the SWT-implementation is a CanvasStorePanel.
   		//This is because lines should be drawn.
   		((CanvasStorePanelSwt) currPanel.panelComposite).store.drawLine(color, x1, y1, x2, y2);
-  		furtherSetPosition((int)(xe + 0.99F), (int)(ye + 0.99F));
+  		//furtherSetPosition((int)(xe + 0.99F), (int)(ye + 0.99F));
   	} else {
   		log.sendMsg(0, "GuiPanelMng:addLine: panel is not a CanvasStorePanel");
     }
@@ -862,13 +862,12 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   @Override 
   public Object addImage(String sName, InputStream imageStream, int height, int width, String sCmd)
   {
-    ////
     ImageData imageData = new ImageData(imageStream);
     byte[] data = imageData.data;
     Image image = new Image(((Composite)currPanel.panelComposite).getDisplay(), imageData); 
     GuiImageBase imageGui = new GuiImageSwt(image);
     GuiRectangle size = imageGui.getPixelSize();
-    GuiRectangle rr = getRectangleBounds(size.dy, size.dx);
+    GuiRectangle rr = calcWidgetPosAndSize(pos, 0, 0, size.dy, size.dx);
     if(currPanel instanceof CanvasStorePanelSwt){
       CanvasStorePanelSwt canvas = (CanvasStorePanelSwt) currPanel;
       //coordinates are in pixel
@@ -882,7 +881,6 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   //@Override 
   public Object XXXaddImage(String sName, InputStream imageStream, int height, int width, String sCmd)
   {
-    ////
     ImageData imageData = new ImageData(imageStream);
     byte[] data = imageData.data;
     Label widget = new Label((Composite)currPanel.panelComposite, 0);
@@ -962,7 +960,10 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	//, String sCmd, String sUserAction, String sName)
   )
   {
-  	char size = ySize > 3? 'B' : 'A';
+    int ySize = (int)pos.height();
+    int xSize = (int)pos.width();
+    
+    char size = ySize > 3? 'B' : 'A';
   	WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, 'B');
     widgetInfos.setPanelMng(this);
     ButtonSwt button = new ButtonSwt(this, widgetInfos, size);
@@ -1009,7 +1010,9 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	//, String sCmd, String sUserAction, String sName)
   )
   {
-  	char size = ySize > 3? 'B' : 'A';
+    int ySize = (int)(pos.height());
+    int xSize = (int)(pos.width());
+    char size = ySize > 3? 'B' : 'A';
   	if(sColor0 == null || sColor1 == null) throw new IllegalArgumentException("SwitchButton " + sName + ": color0 and color1 should be given.");
   	
   	WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, 'B');
@@ -1043,7 +1046,9 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   , String sDataPath
   )
   {
-  	LedSwt widget = new LedSwt(this, 'r');
+    int ySize = (int)(pos.height());
+    int xSize = (int)(pos.width());
+    LedSwt widget = new LedSwt(this, 'r');
   	widget.setBackground(propertiesGuiSwt.colorBackground);
   	
     widget.setForeground(propertiesGuiSwt.colorSwt(0xff00));
@@ -1065,8 +1070,10 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
 	@Override
 	public Canvas addCurveViewY(String sName, int nrofXvalues,
 			int nrofTracks) {
-		int dxWidget = this.xSize * propertiesGui.xPixelUnit();
-		int dyWidget = this.ySize * propertiesGui.yPixelUnit();
+	  int ySize = (int)(pos.height());
+    int xSize = (int)(pos.width());
+    int dxWidget = xSize * propertiesGui.xPixelUnit();
+		int dyWidget = ySize * propertiesGui.yPixelUnit();
 		CurveView curveView = new CurveView((Composite)currPanel.panelComposite, dxWidget, dyWidget, nrofXvalues, nrofTracks);
 		testHelp.curveView = curveView; //store to inspect.
 		curveView.setSize(dxWidget, dyWidget);
@@ -1221,7 +1228,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     if(threadId == mngBase.getThreadIdGui()){
       setInfoDirect(descr, cmd, ident, visibleInfo, userData);
     } else {
-    	if(descr.name !=null && descr.name.equals("writerEnergy1Sec") && cmd == GuiPanelMngWorkingIfc.cmdInsert) ////)
+    	if(descr.name !=null && descr.name.equals("writerEnergy1Sec") && cmd == GuiPanelMngWorkingIfc.cmdInsert) 
     		stop();
     	//check the admissibility:
     	switch(cmd){
@@ -1287,7 +1294,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
               widgetButton.setState(info);
             } else {
               //all other widgets:    
-              switch(cmd){  ////
+              switch(cmd){  
               default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd %x for widget: %s", cmd, descr.name);
               }
             }
@@ -1512,7 +1519,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
 	  Control swtWidget = (Control)widget.getWidget();
 	  Point size = swtWidget.getParent().getSize();
 	  //Composite parent = swtWidget.
-	  GuiRectangle posSize = calcWidgetPosAndSize(widgd.pos, size.x, size.y);
+	  GuiRectangle posSize = calcWidgetPosAndSize(widgd.pos, size.x, size.y, 0, 0);
 	  swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
 	  swtWidget.redraw();
 	}
@@ -1540,10 +1547,6 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
 	}
   
 	
-	//TODO write in common base
-	@Override public int getColorValue(String sColorName){ return propertiesGui.getColorValue(sColorName); }
-
-
 	
 	@Override public String getValueFromWidget(WidgetDescriptor widgd)
 	{ final String sValue;

@@ -1,10 +1,13 @@
 package org.vishia.gral.widget;
 
-/**It is a marker interface for a widget of the implementing GUI
+/**It is a basic interface for any widget of the implementing GUI
  * @author Hartmut Schorrig
  *
  */
 public interface Widgetifc
 {
+  /**Returns the implementation class of the widget. */
   Object getWidget();
+  
+  boolean setFocus();
 }

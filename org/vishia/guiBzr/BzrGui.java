@@ -156,13 +156,6 @@ public class BzrGui extends GuiCfg
         panelMng.tabPanel.addGridPanel("FilesDiff", "&Files && Diff",1,1,10,10);
         panelMng.tabPanel.addGridPanel("Output", "&Output",1,1,10,10);
 
-        //##
-        WidgetCmpnifc msgPanel = panelMng.createGridPanel(  
-            panelMng.propertiesGui.colorBackground_
-            , panelMng.propertiesGui.xPixelUnit(), panelMng.propertiesGui.yPixelUnit(), 5, 5);
-        //panelMng.registerPanel("msg", msgPanel);
-        //gui.addFrameArea(1,2,3,1, msgPanel); //dialogPanel);
-
         guiStatusPanel.initGui();
         guiCommitPanel.initGui();
         guiFilesDiffPanel.initGui();

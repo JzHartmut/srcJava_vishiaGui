@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.cmd.CmdGetFileArgs_ifc;
+import org.vishia.cmd.CmdQueue;
+import org.vishia.cmd.CmdStore;
 import org.vishia.cmd.PrepareCmd;
 import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
@@ -31,82 +33,24 @@ import org.vishia.mainCmd.Report;
 public class CommandSelector extends SelectList
 {
 
-  /**Gets in grsphical thread!
+  public final CmdStore cmdStore;
+  
+  private final CmdQueue cmdQueue;
+  
+  /**Gets in graphical thread!
    * 
    */
   private CmdGetFileArgs_ifc getterFiles;
   
-  /**Description of one command.
-   */
-  public class CmdBlock
+  
+  
+  
+  
+  
+  public CommandSelector(CmdQueue cmdQueue)
   {
-    /**The identification for user in the selection list. */
-    public String name;
-    
-    /**Some commands of this block. */
-    private final List<PrepareCmd> listCmd = new LinkedList<PrepareCmd>();
-
-    /**Possible call from {@link org.vishia.zbnf.ZbnfJavaOutput}. Creates an instance of one command */
-    public PrepareCmd new_cmd(){ return new PrepareCmd(); }
-    
-    /**Possible call from {@link org.vishia.zbnf.ZbnfJavaOutput}. Adds the instance of command */
-    public void add_cmd(PrepareCmd cmd)
-    { cmd.prepareListCmdReplace();
-      listCmd.add(cmd); 
-    }
-    
-  }
-  
-  
-  
-  
-  private static class PendingCmd implements CmdGetFileArgs_ifc
-  {
-    final CmdBlock cmdBlock;
-    final File[] files;
-    
-    public PendingCmd(CmdBlock cmdBlock, File[] files)
-    { this.cmdBlock = cmdBlock;
-      this.files = files;
-    }
-
-    @Override public void  prepareFileSelection()
-    { }
-
-    @Override public File getFileSelect()
-    { return files[0];
-    }
-    
-    @Override public File getFile1() { return files[0]; }
-    
-    @Override public File getFile2() { return files[1]; }
-    
-    @Override public File getFile3() { return files[2]; }
-
-  }
-  
-  
-  
-  /**Contains all commands read from the configuration file. */
-  private final List<CmdBlock> listCmd = new LinkedList<CmdBlock>();
-  
-  private String syntaxCmd = "Cmds::={ <cmd> }\\e. "
-    + "cmd::= <* :?name> : { <*\\n?cmd> \\n } ."; 
-  
-  private final MainCmd_ifc mainCmd;
-
-  private final ConcurrentLinkedQueue<PendingCmd> pendingCmds = new ConcurrentLinkedQueue<PendingCmd>();
-  
-  private final ProcessBuilder processBuilder = new ProcessBuilder();
-  
-  private final StringBuilder cmdOutput = new StringBuilder(4000);
-  
-  private final StringBuilder cmdError = new StringBuilder(1000);
-  
-  
-  public CommandSelector(MainCmd_ifc mainCmd)
-  {
-    this.mainCmd = mainCmd;
+    this.cmdStore = new CmdStore();
+    this.cmdQueue = cmdQueue;
   }
   
   public void setGetterFiles(CmdGetFileArgs_ifc getterFiles)
@@ -115,51 +59,10 @@ public class CommandSelector extends SelectList
   }
   
   
-  /**Possible call from {@link org.vishia.zbnf.ZbnfJavaOutput}. Creates an instance of one command block */
-  public CmdBlock new_CmdBlock(){ return new CmdBlock(); }
-  
-  /**Possible call from {@link org.vishia.zbnf.ZbnfJavaOutput}. Adds the instance of command block. */
-  public void add_CmdBlock(CmdBlock value){ listCmd.add(value); }
-  
-  
-  public String readCmdCfg(File cfgFile)
-  { String sError = null;
-    BufferedReader reader = null;
-    try{
-      reader = new BufferedReader(new FileReader(cfgFile));
-    } catch(FileNotFoundException exc){ sError = "CommandSelector - cfg file not found; " + cfgFile; }
-    if(reader !=null){
-      CmdBlock actBlock = null;
-      listCmd.clear();
-      try{
-        String sLine;
-        int posSep;
-        while( (sLine = reader.readLine()) !=null){
-          if( sLine.startsWith("==")){
-            posSep = sLine.indexOf("==", 2);  
-            //a new command block
-            if(actBlock !=null){ add_CmdBlock(actBlock); } 
-            actBlock = new_CmdBlock();
-            actBlock.name = sLine.substring(2, posSep);
-          } else if(sLine.startsWith("@")){
-              
-          } else  if(sLine.startsWith(" ")){  //a command line
-            PrepareCmd cmd = actBlock.new_cmd();
-            cmd.cmd = sLine.trim();
-            cmd.prepareListCmdReplace();
-            actBlock.add_cmd(cmd);
-          }      
-        }
-        if(actBlock !=null){ add_CmdBlock(actBlock); } 
-      } catch(IOException exc){ sError = "CommandSelector - cfg file error; " + cfgFile; }
-    }
-    return sError;
-  }
-  
   public void fillIn()
   {
     wdgdTable.setValue(GuiPanelMngWorkingIfc.cmdClear, -1, null, null);
-    for(CmdBlock data: listCmd){
+    for(CmdStore.CmdBlock data: cmdStore.listCmd){
       
       wdgdTable.setValue(GuiPanelMngWorkingIfc.cmdInsert, 0, data.name, data);
     }
@@ -167,26 +70,15 @@ public class CommandSelector extends SelectList
   }
   
   
-  public void setWorkingDir(File file)
-  { final File dir;
-    if(!file.isDirectory()){
-      dir = file.getParentFile();
-    } else {
-      dir = file;
-    }
-    processBuilder.directory(dir);
-  }
-  
-  
   @Override public void actionOk(Object userData, TableLineGui_ifc line)
   {
-    CmdBlock cmdBlock = (CmdBlock)userData;
+    CmdStore.CmdBlock cmdBlock = (CmdStore.CmdBlock)userData;
     getterFiles.prepareFileSelection();
     File[] files = new File[3];
     files[0] = getterFiles.getFile1();
     files[1] = getterFiles.getFile2();
     files[2] = getterFiles.getFile3();
-    pendingCmds.add(new PendingCmd(cmdBlock, files));  //to execute.
+    cmdQueue.addCmd(cmdBlock, files);  //to execute.
   }
   
   
@@ -200,30 +92,6 @@ public class CommandSelector extends SelectList
   }
   
   
-  /**Execute the pending commands.
-   * This method should be called in a specified user thread.
-   * 
-   */
-  public final void executeCmds()
-  {
-    CmdBlock block;
-    PendingCmd cmd1;
-    while( (cmd1 = pendingCmds.poll())!=null){
-      for(PrepareCmd cmd: cmd1.cmdBlock.listCmd){
-        String sCmd = cmd.prepareCmd(cmd1);
-        if(sCmd.startsWith("@")){
-          
-        } else {
-          //a operation system command:
-          mainCmd.executeCmdLine(processBuilder, sCmd, null, Report.anytime, this.cmdOutput, cmdError);
-          System.out.append(cmdOutput);
-          System.out.append(cmdError);
-        }
-      }
-      System.out.println(cmd1.cmdBlock.name);
-    }
-  }
-
   @Override
   void actionUserKey(String sKey, Object userData, TableLineGui_ifc line)
   {

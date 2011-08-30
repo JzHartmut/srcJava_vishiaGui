@@ -63,7 +63,7 @@ public class FileViewerXXX
 			shell.setWindowVisible(false);  //it isn't visible, until the file dialog is activated.
       
 			//some buttons to view, delete, select
-			shell.setPosition(2, 20, 4, 15, 'd');
+			shell.setPositionSize(2, 20, 4, 15, 'd');
 			shell.addButton("selStart", null, null, null, null, "select-start");
 			shell.addButton("selLast", null, null, null, null, "select-last");
 			shell.addButton("selLast", null, null, null, null, "select-last");

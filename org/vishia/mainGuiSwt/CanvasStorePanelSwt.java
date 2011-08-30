@@ -176,7 +176,10 @@ public class CanvasStorePanelSwt extends PanelContent implements WidgetCmpnifc  
     
   };
   
-
+  @Override public boolean setFocus()
+  {
+    return swtCanvas.setFocus();
+  }
 
   
   void stop(){} //debug

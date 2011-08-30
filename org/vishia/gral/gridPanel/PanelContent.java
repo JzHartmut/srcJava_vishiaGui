@@ -6,10 +6,11 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.widget.WidgetCmpnifc;
 
 
 /**This class describes a panel with its content for managing. */
-public class PanelContent
+public abstract class PanelContent implements WidgetCmpnifc
 {
 
 	/**The GUI-Widget of the panel.   
@@ -53,6 +54,12 @@ public class PanelContent
 	
 	
 	protected PanelContent(){}
+
+
+  @Override public Object getWidget()
+  { return panelComposite;
+  }
+	
 	
 }
 

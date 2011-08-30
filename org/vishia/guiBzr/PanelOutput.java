@@ -38,7 +38,7 @@ public class PanelOutput
    */
   void initGui()
   { panelBuildifc.selectPanel("Output");
-    panelBuildifc.setPosition(2,0, 30, 70, 'r');
+    panelBuildifc.setPositionSize(2,0, 30, 70, 'r');
     panelBuildifc.addTextBox(widgdOutputText, true, null, ' '); // "commit Text", 't');
   }
     

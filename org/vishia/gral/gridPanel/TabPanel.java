@@ -1,5 +1,8 @@
 package org.vishia.gral.gridPanel;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.vishia.gral.widget.WidgetCmpnifc;
 
 
@@ -16,7 +19,10 @@ public abstract class TabPanel
 {
 	final protected PanelActivatedGui notifyingUserInstanceWhileSelectingTab;
 	
+	final protected Map<String, PanelContent> panels = new TreeMap<String, PanelContent>();
 
+	protected PanelContent currentPanel;
+	
 	/**The constructor can only be invoked from a implementing class.
 	 * @param user
 	 */
@@ -40,6 +46,9 @@ public abstract class TabPanel
 	abstract public PanelContent addCanvasPanel(String sName, String sLabel);
 	
 	
+	
 	abstract public WidgetCmpnifc getGuiComponent();
+	
+	public PanelContent getCurrentPanel(){ return currentPanel; }
 	
 }

@@ -2,7 +2,7 @@ package org.vishia.gral.ifc;
 
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
-import org.vishia.gral.gridPanel.GralGridPosition;
+import org.vishia.gral.gridPanel.GralPos;
 import org.vishia.gral.swt.WidgetSimpleWrapperSwt;
 import org.vishia.gral.widget.Widgetifc;
 
@@ -50,7 +50,7 @@ public class WidgetDescriptor
 	public String name;
 	
 	/**The position of the widget. */
-	public GralGridPosition pos;  
+	public GralPos pos;  
 	
 	/**The graphical widget. It is untyped because it depends on the underlying graphic system. 
 	 * It may be a wrapper class arround a graphical widget too. 

@@ -436,6 +436,12 @@ public class TableSwt implements TableGui_ifc
 
     @Override public void setUserData(Object data) { userData = data; }
     
+    @Override public boolean setFocus()
+    {
+      return table.setFocus();
+    }
+
+
   }
   
   
@@ -550,7 +556,14 @@ public class TableSwt implements TableGui_ifc
     return null;
   }
 
+  @Override public boolean setFocus()
+  {
+    return table.setFocus();
+  }
 
+
+  
+  
   @Override
   public Object getWidget()
   {

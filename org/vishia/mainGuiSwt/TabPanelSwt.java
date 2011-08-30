@@ -30,7 +30,9 @@ public class TabPanelSwt extends TabPanel
     TabFolder_(Composite parent, int style)
     { widgetSwt = new TabFolder(parent, style); 
     }
-    @Override public Widget getWidget(){ return widgetSwt; } 
+    @Override public Widget getWidget(){ return widgetSwt; }
+    @Override public boolean setFocus(){ return widgetSwt.setFocus(); }
+    
   }
   
 	private final TabFolder_ tabMng;
@@ -64,6 +66,7 @@ public class TabPanelSwt extends TabPanel
 		}
 		mng.registerPanel(sName, panel);
 	  tabItemOperation.setControl(panel.swtCanvas);
+	  panels.put(sName, panel);
 	  return panel;
   }
 
@@ -75,6 +78,7 @@ public class TabPanelSwt extends TabPanel
 	  CanvasStorePanelSwt panel = new CanvasStorePanelSwt(tabMng.widgetSwt, 0, colorBackground);
     mng.registerPanel(sName, panel);
 	  tabItemOperation.setControl(panel.swtCanvas);
+    panels.put(sName, panel);
 	  return panel;
   }
 
@@ -104,6 +108,7 @@ public class TabPanelSwt extends TabPanel
 					PanelContent panelContent = (PanelContent)(data);
 					Queue<WidgetDescriptor> widgetInfos = panelContent.widgetList; 
 					notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);
+					currentPanel = panelContent;
 				}
 			}
 		}

@@ -22,7 +22,7 @@ import org.vishia.gral.widget.WidgetCmpnifc;
 
 
 /**This is a unique interface for the GUI-panel-manager to build its content.
- * To work with the graphical application see {@link GuiPanelMngBuildIfc}. 
+ * To work with the graphical application see {@link GuiPanelMngWorkingIfc}. 
  * <br><br>
  * Any widget is represented by a {@link WidgetDescriptor}. Either the WidgetDescriptor
  * should be created before, and taken as parameter for the widget-creating method,
@@ -50,12 +50,16 @@ import org.vishia.gral.widget.WidgetCmpnifc;
  *   and add the panel to the given     
  * <li>Before add, you can select any given panel by String-identifier, using {@link #selectPanel(String)}.
  * <li>Before add, you have to determine the position and size using 
- *   <ul><li>{@link #setPosition(int, int, int, int, char)} in grid units
- *     <li>{@link #setFinePosition(int, int, int, int, int, int, int, int, char)} 
+ *   <ul><li>{@link #setPositionSize(int, int, int, int, char)} in grid units
+ *     <li>{@link #setFinePositionSize(int, int, int, int, int, int, int, int, char)} 
  *     <li>{@link #setNextPositionX()}
  *   </ul>   
  * <li><b>addMethods</b>: This methods create the widget in the current selected panel.
  * </ul>
+ * <br><br>
+ * <b>Concept of positioning</b>: see method {@link #setPosition(float, float, float, float, char, int)}.
+ * <br><br>
+ *  
  * @author Hartmut Schorrig
  *
  */
@@ -75,7 +79,7 @@ public interface GuiPanelMngBuildIfc
    *     to remove widgets, for dynamic views.
    * <li>2011-05-01 Hartmut new: {@link #createWindow(String, boolean)} instead createModalWindow(String).
    *     This method should be used for any sub-windows in the application. The window position is determined
-   *     inside the current window with the known {@link #setPosition(int, int, int, int, char)} functionality.
+   *     inside the current window with the known {@link #setPositionSize(int, int, int, int, char)} functionality.
    *     The {@link #createWindow(int, int, int, int, VariableContainer_ifc)} with absolute coordinates
    *     may be deprecated. (Is it necessary to create a window outside the own borders? )             
    * <li>All other changes in 2010
@@ -144,33 +148,117 @@ public interface GuiPanelMngBuildIfc
    *                If 0 then the last value of height is taken furthermore. 
    * @param length The number of columns. If <0, then the param column is the right column, 
    *                and column-length is the left column. If 0 then the last value of length is not changed.
-   * @param direction direction for a next widget, use 'r', 'l', 'u', 'd' for right, left, up, down                
+   * @param direction direction for a next widget, use 'r', 'l', 'u', 'd' for right, left, up, down
+   * @deprecated. Use {@link #setPosition(float, float, float, float, char, int)}.                
    */
-  public void setPosition(int line, int column, int height, int length, char direction);
+  public void setPositionSize(int line, int column, int height, int length, char direction);
   
   
-  /**Same as {@link #setPosition(int, int, int, int, char)}, but the positions can be in a fine division.
-   * @param line
-   * @param lineFrac Number between 0..9 for fine positioning in the grid step.
+  /**Sets the position.
+   * <b>Concept of positioning</b>:<br>
+   * The position are never given as pixel positions. They are user-oriented positions. The calculation
+   * of pixel units are done from the implementing graphic layer depending on the graphic device properties
+   * and the requested size appearance.
+   * <br><br>
+   * A normal text with a font in the standard proper read-able size is presented by 2 units of the Gral-positions
+   * in vertical direction (lines) and approximately 1 position per character in horizontal direction.
+   * Of course the horizontal character size depends on the font properties, it is only a standard value.
+   * A text can be presented in a smaller font. A very small font is presented by 1 vertical gral-unit.
+   * Such a text can be used as short title for text input fields (prompt) or adequate.
+   * <br>
+   * A button is able to present with 3 vertical gral units. A small check box may be presented 
+   * with 1 x 1 gral unit.
+   * <br><br>
+   * A gral unit should be have the same distance in vertical in horizontal direction. It depends on the 
+   * graphical implementation. One gral unit may have approximately 6 to 30 pixel, 
+   * depending from the requested size of appearance and the display pixel size. Any graphic can be shown
+   * with several sizes of appearance, depending from parameters.
+   * <br><br>
+   * <b>Fine positions</b>:
+   * Either the positions are given with 2 integer values or with a float value. The fine position is given
+   * as one digit from 0 to 9. It is one fractional part digit of the float or the frac int argument.
+   * The fine position divide one gral position into 5 or 6 fine positions. 
+   * The odd numbers divide into 6 positions. In this kind a gral position is able to divide by 2, 3 and 6:
+   * <ul>
+   * <li>1: 1/6 = 0.1333
+   * <li>3: 1/3 = 0.3333
+   * <li>5: 1/2 = 0.5
+   * <li>7: 2/3 = 0.6667
+   * <li>9: 5/6 = 0.8667
+   * </ul>
+   * The even numbers divide into 5 positions: 
+   * <ul>
+   * <li>2: 1/5 = 0.2
+   * <li>4: 2/5 = 0.4
+   * <li>6: 3/5 = 0.6
+   * <li>8: 4/5 = 0.8
+   * </ul>
+   * The fine positioning enables a fine positioning of widgets in respect to the fundamental positions.
+   * <br><br>
+   * Positions may be given from left or top with positive numbers, from right or bottom with negative numbers, 
+   * as width or height or as percent value from the panel size.
+   * <br>
+   * 
+   *        
+   * @param framePos The given frame.
+   * @param line The line
+   * @param lineEndOrSize
    * @param column
-   * @param columnFrac
-   * @param height
-   * @param heigthFrac
-   * @param width
-   * @param widthFrac
-   * @param direction
+   * @param columnEndOrSize
    */
-  public void setFinePosition(int line, int lineFrac, int column, int columnFrac, int height, int heigthFrac, int width, int widthFrac, char direction);
+  public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
+    , char direction, int origin);
   
+  
+  /**Sets the position in relation to a given position.
+   * @param framePos The given frame.
+   * @param line The line
+   * @param lineEnd
+   * @param column
+   * @param columnEnd
+   * @deprecated. 
+   */
+  public void setPosition(GralPos framePos, float line, float lineEnd, float column, float columnEnd);
+  
+  
+  
+  /**Same as {@link #setPositionSize(int, int, int, int, char)}, but the positions can be in a fine division.
+   * @param y The line. 
+   * @param yFrac Number between 0..9 for fine positioning in the grid step.
+   * @param yEnd
+   * @param yEndFrac Number between 0..9 for fine positioning in the grid step.
+   * @param x
+   * @param xFrac Number between 0..9 for fine positioning in the grid step.
+   * @param xEnd
+   * @param xEndFrac Number between 0..9 for fine positioning in the grid step.
+   * @param direction Direction of the next position if that is not given than or {@link GralPos#next} is given than.
+   *        A value other then r, l, u, d let the direction unchanged from previous call.
+   * @param origin Origin of inner widgets or next widgets. Use:
+   *        <pre>
+   *        1    2    3
+   *        4    5    6
+   *        7    8    9
+   *        </pre>
+   *        for the origin points. (origin-1) %3 is the horizontal origin, (origin-1 /3) is the vertical one.
+   *        A value 0 let the origin unchanged from previous call.
+   */
+  public void setFinePosition(int y, int yFrac, int yEnd, int yEndFrac, int x, int xFrac, int xEnd, int xEndFrac, char direction, int origin);
+  
+  /**Sets the next position if the position is used, but change the size.
+   * @param ySize
+   * @param ySizeFrac
+   * @param xSize
+   * @param xSizeFrac
+   */
   public void setSize(int ySize, int ySizeFrac, int xSize, int xSizeFrac);
 
   
   /**Set the position for the next widget especially for widgets, which should be placed relativ in the whole panel. 
-   * It is adequate {@link #setPosition(int, int, int, int, char)}, but here the size isn't given, instead the end line and column.
+   * It is adequate {@link #setPositionSize(int, int, int, int, char)}, but here the size isn't given, instead the end line and column.
    * That approach allows to set positions for widgets, which are placed relative to the actual size of the window.
    * @param line Line in the grid. Fine positions in 1 fractional part digit can be used. Negative value counts from bottom.
-   * @param column Column in the grid. Fine positions in 1 fractional part digit can be used. Negative value counts from rigth.
    * @param lineEnd The line position after the widget. Fine positions in 1 fractional part digit can be used. Negative value counts from bottom.
+   * @param column Column in the grid. Fine positions in 1 fractional part digit can be used. Negative value counts from rigth.
    * @param columnEnd. Fine positions in 1 fractional part digit can be used. Negative value counts from bottom.
    * @param direction
    */
@@ -178,7 +266,7 @@ public interface GuiPanelMngBuildIfc
   
   
   
-  GralGridPosition getPositionInPanel();
+  GralPos getPositionInPanel();
   
   /**Positions the next widget right to the previous one. */
   void setNextPositionX();
@@ -294,6 +382,16 @@ public interface GuiPanelMngBuildIfc
    * @return
    */
   WidgetDescriptor addText(String sText, char size, int color);
+ 
+  
+  /**Adds a simple text at the current position.
+   * @param sText
+   * @param origin Origin, use char 1..9 for 1 top-left, 2 top-middle, ... 5 middle, 9 bottom-right.  
+   * @param textColor
+   * @param BackColor
+   * @return
+   */
+  WidgetDescriptor addText(String sText, int origin, ColorGui textColor, ColorGui BackColor);
   
   Object addImage(String sName, InputStream imageStream, int height, int width, String sCmd);
 
@@ -446,12 +544,18 @@ public interface GuiPanelMngBuildIfc
    */
   void setColorGridCurveViewY(String sName, int backgroundColor, int[] colorLines, char grid);
   
-	/**Gets the value to the named color. It is a method of the graphic.
-	 * @param sName supported: red, green, blue, yellow
-	 * @return 3 bytes intensity: bit23..16 blue, bit15..8: green, bit 7..0 red. 
-	 */
-	int getColorValue(String sName);
-	
+  /**Gets the value to the named color. It is a method of the graphic.
+   * @param sName supported: red, green, blue, yellow
+   * @return 3 bytes intensity: bit23..16 blue, bit15..8: green, bit 7..0 red. 
+   */
+  int getColorValue(String sName);
+  
+
+  /**Gets the named color. 
+   * @param sName supported: red, green, blue, yellow
+   */
+  ColorGui getColor(String sName);
+  
 
   /**Forces a newly paint of the GUI-container. 
    * This method should only be called in the graphic thread (SWT).*/
@@ -488,7 +592,19 @@ public interface GuiPanelMngBuildIfc
   GuiPanelMngBuildIfc createCompositeBox();
   
   
-  WidgetCmpnifc createGridPanel(ColorGui backGround, int xG, int yG, int xS, int yS);
+  
+  /**Creates an independent grid panel which is managed by this.
+   * The panel can be associated to any graphic frame.
+   * @param namePanel
+   * @param backGround
+   * @param xG
+   * @param yG
+   * @param xS
+   * @param yS
+   * @return
+   */
+  WidgetCmpnifc createGridPanel(String namePanel, ColorGui backGround, int xG, int yG, int xS, int yS);
+  
   
   /**Removes a composite box from the graphic representation.
    * @param compositeBox
@@ -514,7 +630,7 @@ public interface GuiPanelMngBuildIfc
 	 * {@link GuiShellMngIfc#setWindowVisible(boolean)}. The interface therefore can be get calling
 	 * {@link GuiShellMngBuildIfc#getShellMngIfc()}.
 	 * The position and size of the window is set with the adequate strategy like all other widget: 
-	 * using {@link #setPosition(int, int, int, int, char)}. 
+	 * using {@link #setPositionSize(int, int, int, int, char)}. 
 	 * @param title Title of the window, may be null, then without title bar.
 	 * @param exclusive true then non-modal.
 	 * @return

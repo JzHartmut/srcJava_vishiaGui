@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.vishia.gral.gridPanel.GralGridPosition;
+import org.vishia.gral.gridPanel.GralPos;
 import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
 import org.vishia.gral.ifc.WidgetDescriptor;
@@ -14,7 +14,7 @@ import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
-public class FileSelector
+public class FileSelector implements Widgetifc
 {
 
   private static class FileAndName
@@ -114,16 +114,22 @@ public class FileSelector
    */
   public void setToPanel(GuiPanelMngBuildIfc panel, String name, int rows, int[] columns, char size)
   {
-    GralGridPosition posAll = panel.getPositionInPanel().clone();
+    //The macro widget consists of more as one widget. Position the inner widgets:
+    GralPos posAll = panel.getPositionInPanel().clone();
     //Text field for path above list
-    panel.setPositionInPanel(posAll.y + 0.1f * posAll.yFrac, posAll.x + 0.1f * posAll.xFrac
-      , 2 + posAll.y + 0.1f * posAll.yFrac, posAll.xEnd + 0.1f * posAll.xEndFrac, ' ');
+    panel.setPosition(posAll, GralPos.same, 2.0F, GralPos.same, GralPos.same);
     widgdPath = panel.addTextField(name + "-Path", false, null, '.');
     //the list
-    panel.setPositionInPanel(2 + posAll.y + 0.1f * posAll.yFrac, posAll.x + 0.1f * posAll.xFrac
-      , posAll.yEnd + 0.1f * posAll.yFrac, posAll.xEnd + 0.1f * posAll.xEndFrac, ' ');
+    panel.setPosition(posAll, 2.0F, GralPos.same, GralPos.same, GralPos.same);
     selectList.setToPanel(panel, name, rows, columns, size);
   }
+  
+
+  @Override public Object getWidget(){ return selectList.table.getWidget(); }
+
+  @Override public boolean setFocus(){ return selectList.table.setFocus(); }
+  
+  
 
   
   

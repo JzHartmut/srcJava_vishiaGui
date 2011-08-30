@@ -63,17 +63,17 @@ public class GuiFilesDiffPanel
    */
   void initGui()
   { panelBuildifc.selectPanel("FilesDiff");
-    panelBuildifc.setPosition(2,0, 30, 60, 'r');
+    panelBuildifc.setPositionSize(2,0, 30, 60, 'r');
     int[] columnWidths = {40, 10, 2,8};
     
     widgdTableFilesCmpn = panelBuildifc.addTable("selectFile", 20, columnWidths);
     widgdTableFilesCmpn.setActionChange(actionTableLineFile);
-    panelBuildifc.setPosition(2, 61, 3, 9, 'd');
+    panelBuildifc.setPositionSize(2, 61, 3, 9, 'd');
     panelBuildifc.addButton("refresh", actionRefresh, "","","","&refresh");
     panelBuildifc.addButton("view", actionView, "","","","&view");
     panelBuildifc.addButton("diff", actionViewdiff, "","","","view &diff");
     //panelBuildifc.addButton("add", actionAdd, "","","","&add");
-    panelBuildifc.setPosition(13, 61, 3, 9, 'd');
+    panelBuildifc.setPositionSize(13, 61, 3, 9, 'd');
     panelBuildifc.addButton("rename", actionRename, "","","","&rename");
     panelBuildifc.addButton("commit", actionCommit, "","","","&commit");
     

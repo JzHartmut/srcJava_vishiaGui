@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.gral.cfg.GuiCfgData.GuiCfgElement;
+import org.vishia.gral.gridPanel.GralPos;
 import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
@@ -161,8 +162,8 @@ public class GuiCfgBuilder
     //
     if(pos.xWidth == Integer.MAX_VALUE)
       stop();
-    gui.setFinePosition(pos.yPos, pos.yPosFrac, pos.xPos, pos.xPosFrac
-      , pos.ySizeDown, pos.ySizeFrac, pos.xWidth, pos.xSizeFrac, 'r');
+    gui.setFinePosition(pos.yPos, pos.yPosFrac, pos.ySizeDown + GralPos.size, pos.ySizeFrac
+        , pos.xPos, pos.xPosFrac, pos.xWidth + GralPos.size, pos.xSizeFrac, 'r', 0);
     //
     WidgetDescriptor widgd = null;
     String sName = cfge.widgetType.name;

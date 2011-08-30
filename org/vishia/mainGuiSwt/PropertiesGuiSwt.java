@@ -123,18 +123,17 @@ public class PropertiesGuiSwt extends PropertiesGui
   
 
   
-  public Font getTextFont(int ySize, int ySizeFrac)
+  public Font getTextFont(float size)
   {
-  	float size = ySize + ySizeFrac/10.0F;
-  	if(size <=1.25F) return textFont[0];  //1, 1.1, 1.2
-  	if(size <=1.45F) return textFont[1];  // 1 1/3, 
-  	if(size <=1.55F) return textFont[2];  //1.5
-  	if(size <=1.95F) return textFont[3];  //1 2/3
-  	if(size <=2.05F) return textFont[4];  //2
-  	if(size <=2.4F) return textFont[5];   //2 1/3
-  	if(size <=2.8F) return textFont[6];   //2.5, 2 2/3
-  	if(size <=3.1F) return textFont[7];   //3
-  	if(size <=3.9F) return textFont[8];   //3.5
+  	if(size <=1.2f) return textFont[0];  //1, 1.1, 1.2
+  	if(size <=1.4f) return textFont[1];  // 1 1/3, 
+  	if(size <=1.6f) return textFont[2];  //1.5
+  	if(size <=1.8f) return textFont[3];  //1 2/3
+  	if(size <=2.0f) return textFont[4];  //2
+  	if(size <=2.4f) return textFont[5];   //2 1/3
+  	if(size <=2.8f) return textFont[6];   //2.5, 2 2/3
+  	if(size <=3.1f) return textFont[7];   //3
+  	if(size <=3.9f) return textFont[8];   //3.5
     return textFont[9];                   //>=4
   	
   }

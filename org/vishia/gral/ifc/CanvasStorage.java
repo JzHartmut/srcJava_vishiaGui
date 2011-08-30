@@ -62,7 +62,7 @@ public abstract class CanvasStorage
 	/**Accepts a order to draw a line. The coordinates are stored only. 
 	 * This method can be called in any thread. It is thread-safe.
 	 * @param color
-	 * @param x1
+	 * @param x1 TODO yet it is pixel coordinates, use GralGrid coordinates.
 	 * @param y1
 	 * @param x2
 	 * @param y2

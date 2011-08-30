@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.vishia.cmd.CmdGetFileArgs_ifc;
+import org.vishia.cmd.CmdQueue;
+import org.vishia.cmd.CmdStore;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
@@ -15,6 +17,7 @@ import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.gral.widget.CommandSelector;
 import org.vishia.gral.widget.FileSelector;
+import org.vishia.gral.widget.WidgetCmpnifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 
 
@@ -24,13 +27,19 @@ public class JavaCmd extends GuiCfg
   private static class CallingArgs extends GuiCallingArgs
   {
     File fileCfgCmds;
+    
+    File fileCfgButtonCmds;
   }
   
   private final CallingArgs cargs;
   
   TabPanel tabCmd, tabFile1, tabFile2;
   
-  private final CommandSelector cmdSelector = new CommandSelector(mainCmd);
+  WidgetCmpnifc panelButtons;
+  
+  final CmdQueue cmdQueue = new CmdQueue(mainCmd);
+  
+  private final CommandSelector cmdSelector = new CommandSelector(cmdQueue);
   
   private File[] selectedFiles;
 
@@ -38,10 +47,14 @@ public class JavaCmd extends GuiCfg
     { new FileSelector(mainCmd), new FileSelector(mainCmd), new FileSelector(mainCmd)};
   
   
+  /**The commands which are used for some buttons or menu items from the JavaCommander itself. */
+  final CmdStore buttonCmds;
+  
   public JavaCmd(CallingArgs cargs, GuiMainCmd cmdgui)
   { 
     super(cargs, cmdgui);
     this.cargs = cargs;
+    buttonCmds = new CmdStore();
   }
   
   
@@ -51,7 +64,7 @@ public class JavaCmd extends GuiCfg
    */
   @Override protected void initGuiAreas()
   {
-    gui.setFrameAreaBorders(30, 65, 80, 82);  //x1, x2, y1, y2
+    gui.setFrameAreaBorders(30, 65, 70, 85);  //x1, x2, y1, y2
     gui.setStandardMenusGThread(new File("."), actionFile);
     gui.addMenuItemGThread("&Command/Set&WorkingDir", actionSetCmdWorkingDir); ///
     //gui.addMenuItemGThread("&Command/E&xecute", actionSetCmdCurrentDir); ///
@@ -73,13 +86,11 @@ public class JavaCmd extends GuiCfg
     tabFile2.addGridPanel("file2", "File&3",1,1,10,10);
     gui.addFrameArea(3,1,1,1, tabFile2.getGuiComponent()); //dialogPanel);
       
-    CommandSelector.CmdBlock cmd = cmdSelector.new_CmdBlock();
-    cmd.name = "test1";
-    cmdSelector.add_CmdBlock(cmd);
-    cmd = cmdSelector.new_CmdBlock();
-    cmd.name = "test2";
-    cmdSelector.add_CmdBlock(cmd);
-
+    panelButtons = panelMng.createGridPanel("Buttons", panelMng.getColor("gr"), 1, 1, 10, 10);
+    gui.addFrameArea(1,2,3,1, panelButtons); //dialogPanel);
+    initPanelButtons();
+    
+    
     panelMng.selectPanel("cmd");
     panelMng.setPositionInPanel(2, 0, -2, -0.1f, '.');
     cmdSelector.setToPanel(panelMng, "cmds", 5, new int[]{10,10}, 'A');
@@ -103,12 +114,78 @@ public class JavaCmd extends GuiCfg
 
   }
 
+  private void initPanelButtons()
+  {
+    panelMng.selectPanel("Buttons");
+    panelMng.setPositionInPanel(0, 10, 1, 20, 'r');
+    panelMng.addText("F1", 'A', 0x0);
+    panelMng.addText("F2", 'A', 0x0);
+    panelMng.addText("F3", 'A', 0x0);
+    panelMng.addText("F4", 'A', 0x0);
+    panelMng.addText("F5", 'A', 0x0);
+    panelMng.addText("F6", 'A', 0x0);
+    panelMng.addText("F7", 'A', 0x0);
+    panelMng.addText("F8", 'A', 0x0);
+    panelMng.addText("F9", 'A', 0x0);
+    panelMng.addText("F10", 'A', 0x0);
+    panelMng.setPositionInPanel(3, 0, 5, 4, 'd');
+    panelMng.addText("alt", 'A', 0x0);
+    panelMng.addText("ctr", 'A', 0x0);
+    panelMng.addText("sh", 'A', 0x0);
+    
+    panelMng.setPositionInPanel(1, 4, 3, 14, 'r');
+    panelMng.addButton("b-help", null, "help", null, null, "help");
+    panelMng.addButton("b-F2", null, "help", null, null, "F2");
+    panelMng.addButton("b-help", null, "help", null, null, "view");
+    panelMng.addButton("b-edit", actionEdit, "", null, null, "edit");
+    panelMng.addButton("b-help", null, "help", null, null, "copy");
+    panelMng.addButton("b-help", null, "help", null, null, "move");
+    panelMng.addButton("b-help", null, "help", null, null, "mkdir");
+    panelMng.addButton("b-help", null, "help", null, null, "del");
+    panelMng.addButton("b-help", null, "help", null, null, "cmd");
+    panelMng.addButton("b-help", null, "help", null, null, "F10");
+    panelMng.setPositionInPanel(3, 4, 5, 14, 'r');
+    panelMng.addButton("selectLeft", selectPanelLeft, "selectLeft", null, null, "left");
+    panelMng.addButton("selectMiddle", selectPanelMiddle, "help", null, null, "middle");
+    panelMng.addButton("selectRight", selectPanelRight, "", null, null, "right");
+    panelMng.addButton("selectCmd", selectPanelOut, "", null, null, "cmd");
+    panelMng.addButton("b-help", null, "help", null, null, "zip");
+    panelMng.addButton("b-help", null, "help", null, null, "link");
+    panelMng.addButton("b-help", null, "help", null, null, "find");
+    panelMng.addButton("b-help", null, "help", null, null, "a-F8");
+    panelMng.addButton("b-help", null, "help", null, null, "a-F9");
+    panelMng.addButton("b-help", null, "help", null, null, "a-F10");
+    panelMng.setPositionInPanel(5, 4, 7, 14, 'r');
+    panelMng.addButton("b-help", null, "help", null, null, "brief");
+    panelMng.addButton("b-F2", null, "help", null, null, "full");
+    panelMng.addButton("b-help", null, "help", null, null, "name");
+    panelMng.addButton("b-help", null, "help", null, null, "ext");
+    panelMng.addButton("b-help", null, "help", null, null, "time");
+    panelMng.addButton("b-help", null, "help", null, null, "size");
+    panelMng.addButton("b-help", null, "help", null, null, "nat");
+    panelMng.addButton("b-help", null, "help", null, null, "tree");
+    panelMng.addButton("b-help", null, "help", null, null, "c-F9");
+    panelMng.addButton("b-help", null, "help", null, null, "c-F10");
+  }
+  
+  
+  
+  
   @Override protected final void initMain()
   { if(cargs.fileCfgCmds == null){
-      mainCmd.writeError("Argument cmdcfg:CONFIGFILE should be given.");
+    mainCmd.writeError("Argument cmdcfg:CONFIGFILE should be given.");
+    //mainCmd.e
+    } else if(cargs.fileCfgButtonCmds == null){
+      mainCmd.writeError("Argument cmdButton:CONFIGFILE should be given.");
       //mainCmd.e
     } else {
-      cmdSelector.readCmdCfg(cargs.fileCfgCmds);  ///
+      String sError;
+      File fileCfg;
+      sError = cmdSelector.cmdStore.readCmdCfg(fileCfg = cargs.fileCfgCmds); 
+      if(sError == null){ buttonCmds.readCmdCfg(fileCfg = cargs.fileCfgButtonCmds); }
+      if(sError !=null){
+        mainCmd.writeError("Error reading " + fileCfg.getAbsolutePath() + ": " + sError);
+      }
     }
     super.initMain();  //starts initializing of graphic. Do it after config command selector!
   
@@ -120,7 +197,7 @@ public class JavaCmd extends GuiCfg
   @Override public void stepMain()
   {
     
-    cmdSelector.executeCmds();
+    cmdQueue.execCmds();
   }
   
   
@@ -133,7 +210,7 @@ public class JavaCmd extends GuiCfg
         assert(ixFilePanel >=0 && ixFilePanel < fileSelector.length);  //only such names are registered.
         FileSelector fileSel = fileSelector[ixFilePanel];
         File file = fileSel.getSelectedFile();
-        cmdSelector.setWorkingDir(file); 
+        cmdQueue.setWorkingDir(file); 
       }
       stop();
       if(sIntension.equals("")){
@@ -170,7 +247,7 @@ public class JavaCmd extends GuiCfg
   { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
     { selectedFiles = getSelectedFile();
       if(selectedFiles[0] !=null){
-        cmdSelector.readCmdCfg(selectedFiles[0]);
+        cmdSelector.cmdStore.readCmdCfg(selectedFiles[0]);
         cmdSelector.fillIn();
       }
       stop();
@@ -201,6 +278,9 @@ public class JavaCmd extends GuiCfg
     { boolean bOk = true;
       if(arg.startsWith("cmdcfg:")){
         cargs.fileCfgCmds = new File(arg.substring(7));
+      }
+      else if(arg.startsWith("cmdButton:")){
+        cargs.fileCfgButtonCmds = new File(arg.substring(10));
       }
       else { bOk = super.testArgument(arg, nArg); }
       return bOk;
@@ -270,6 +350,51 @@ public class JavaCmd extends GuiCfg
   }
 
 
+  UserActionGui selectPanelLeft = new UserActionGui()
+  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+    { tabCmd.getCurrentPanel().setFocus();
+    }
+  };
+  
+
+  UserActionGui selectPanelMiddle = new UserActionGui()
+  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+    { tabFile1.getCurrentPanel().setFocus();
+    }
+  };
+  
+
+  UserActionGui selectPanelRight = new UserActionGui()
+  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+    { fileSelector[2].setFocus();
+      //tabFile2.getCurrentPanel().setFocus();
+    }
+  };
+  
+  UserActionGui selectPanelOut = new UserActionGui()
+  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+    { tabCmd.getCurrentPanel().setFocus();
+    }
+  };
+  
+
+  UserActionGui actionEdit = new UserActionGui()
+  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+    { CmdStore.CmdBlock cmdBlock = buttonCmds.getCmd("edit");
+      if(cmdBlock == null){ mainCmd.writeError("internal problem - don't find 'edit' command. "); }
+      else {
+        selectedFiles = getSelectedFile();  
+        getterFiles.prepareFileSelection();
+        File[] files = new File[3];
+        files[0] = getterFiles.getFile1();
+        files[1] = getterFiles.getFile2();
+        files[2] = getterFiles.getFile3();
+        cmdQueue.addCmd(cmdBlock, files);  //to execute.
+      }
+      ///
+    }
+  };
+  
 
   void stop(){}
 
