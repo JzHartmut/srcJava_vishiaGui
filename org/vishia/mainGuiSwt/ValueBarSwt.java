@@ -64,9 +64,8 @@ public class ValueBarSwt extends ValueBar implements GuiSetValueIfc, Widgetifc
   	}
   }
 	
-  @Override public Object getWidget()
-  { return widget;
-  }
+  @Override public Object getWidget() { return widget; }
+  @Override public boolean setFocus(){ return widget.setFocus(); }
 
 	public class BarWidget extends Canvas
 	{

@@ -32,7 +32,8 @@ public class WidgetsSwt
     }
 
     @Override public Widget getWidget(){ return text; } 
-    
+    @Override public boolean setFocus(){ return text.setFocus(); }
+
 
     @Override
     public void viewTrail()
