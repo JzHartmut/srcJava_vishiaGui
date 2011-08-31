@@ -1,4 +1,4 @@
-package org.vishia.guiCmdMenu;
+package org.vishia.commander;
 
 import java.io.File;
 import java.util.Iterator;

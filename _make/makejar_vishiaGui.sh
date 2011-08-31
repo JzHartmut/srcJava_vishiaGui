@@ -16,11 +16,18 @@ export MANIFEST_JAVAC="vishiaGUI.manifest"
 
 ## Input for javac, only choice of primary sources, relativ path from current (make)-directory:
 INPUT_JAVAC=""
-INPUT_JAVAC="$INPUT_JAVAC ../org/vishia/guiViewCfg/ViewCfg.java"
-INPUT_JAVAC="$INPUT_JAVAC ../org/vishia/gral/*.java"
+INPUT_JAVAC="$INPUT_JAVAC ../org/vishia/gral/area9/*.java"
+INPUT_JAVAC="$INPUT_JAVAC ../org/vishia/gral/base/*.java"
 INPUT_JAVAC="$INPUT_JAVAC ../org/vishia/gral/cfg/*.java"
+INPUT_JAVAC="$INPUT_JAVAC ../org/vishia/gral/gridPanel/*.java"
+INPUT_JAVAC="$INPUT_JAVAC ../org/vishia/gral/ifc/*.java"
+INPUT_JAVAC="$INPUT_JAVAC ../org/vishia/gral/swt/*.java"
+INPUT_JAVAC="$INPUT_JAVAC ../org/vishia/gral/widget/*.java"
 INPUT_JAVAC="$INPUT_JAVAC ../org/vishia/guiBzr/*.java"
-INPUT_JAVAC="$INPUT_JAVAC ../org/vishia/guiInspc/*.java"
+##INPUT_JAVAC="$INPUT_JAVAC ../org/vishia/guiInspc/*.java"
+INPUT_JAVAC="$INPUT_JAVAC ../org/vishia/mainGuiSwt/*.java"
+##INPUT_JAVAC="$INPUT_JAVAC ../org/vishia/guiViewCfg/*.java"
+INPUT_JAVAC="$INPUT_JAVAC ../org/vishia/commander/*.java"
 export INPUT_JAVAC
 
 ## Sets the CLASSPATH variable for compilation (used jar-libraries). Do not leaf empty also it aren't needed because it is used in command line.
