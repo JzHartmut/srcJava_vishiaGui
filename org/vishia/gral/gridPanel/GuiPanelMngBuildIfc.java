@@ -195,8 +195,25 @@ public interface GuiPanelMngBuildIfc
    * </ul>
    * The fine positioning enables a fine positioning of widgets in respect to the fundamental positions.
    * <br><br>
-   * Positions may be given from left or top with positive numbers, from right or bottom with negative numbers, 
-   * as width or height or as percent value from the panel size.
+   * Positions may be given in the following forms: <ul>
+   * <li>Positive number in range 0...about 100..200: Gral Unit from left or top.
+   * <li>Negative number in range -1...about -200..-200: Gral Unit from right or bottom.
+   * <li>0 for lineEnd or columnEnd means the right or bottom. 
+   * <li>Positive Number added with {@link GralPos#size} applied at lineEnd or columnEnd: 
+   *   The size. In this case the line and column is the left top corner. 
+   *   All further related positions has the same left or top line.
+   * <li>Negative Number added with {@link GralPos#size} applied at lineEnd or columnEnd: 
+   *   The absolute value is the size. It is negative because the size is measured from right to left
+   *   respectively bottom to top. It means the line and column is the right or the bottom line. 
+   *   All further related positions has the same right or bottom line. Especially the bottom line is used
+   *   usual if more as one widgets are placed in one line after another, with a common bottom line.
+   * <li>TODO {@link GralPos#same}
+   * <li> {@link GralPos#next} and {@link GralPos#nextBlock}   
+   * <li>as width or height or as percent value from the panel size.
+   * </ul>
+   * Fine positions are given always from left. 
+   * For example a value -1.3 means, the widget is placed 1 unit from right, and then 1/3 inside this unit.
+   * This is 2/3 unit from right. A value for example -0.3 is not admissible, because -0 is not defined. 
    * <br>
    * 
    *        
@@ -207,7 +224,7 @@ public interface GuiPanelMngBuildIfc
    * @param columnEndOrSize
    */
   public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
-    , char direction, int origin);
+    , int origin, char direction );
   
   
   /**Sets the position in relation to a given position.
@@ -218,7 +235,8 @@ public interface GuiPanelMngBuildIfc
    * @param columnEnd
    * @deprecated. 
    */
-  public void setPosition(GralPos framePos, float line, float lineEnd, float column, float columnEnd);
+  public void setPosition(GralPos framePos, float line, float lineEnd, float column, float columnEnd
+      , int origin, char direction);
   
   
   
@@ -235,14 +253,16 @@ public interface GuiPanelMngBuildIfc
    *        A value other then r, l, u, d let the direction unchanged from previous call.
    * @param origin Origin of inner widgets or next widgets. Use:
    *        <pre>
-   *        1    2    3
-   *        4    5    6
-   *        7    8    9
+   *        1    4    7
+   *        2    5    8
+   *        3    6    9
    *        </pre>
    *        for the origin points. (origin-1) %3 is the horizontal origin, (origin-1 /3) is the vertical one.
    *        A value 0 let the origin unchanged from previous call.
    */
-  public void setFinePosition(int y, int yFrac, int yEnd, int yEndFrac, int x, int xFrac, int xEnd, int xEndFrac, char direction, int origin);
+  public void setFinePosition(int y, int yFrac, int yEnd, int yEndFrac
+      , int x, int xFrac, int xEnd, int xEndFrac
+      , int origin, char direction, GralPos frame);
   
   /**Sets the next position if the position is used, but change the size.
    * @param ySize
@@ -262,7 +282,7 @@ public interface GuiPanelMngBuildIfc
    * @param columnEnd. Fine positions in 1 fractional part digit can be used. Negative value counts from bottom.
    * @param direction
    */
-  public void setPositionInPanel(float line, float column, float lineEnd, float columnEnd, char direction);
+  public void xxxsetPositionInPanel(float line, float column, float lineEnd, float columnEnd, char direction);
   
   
   

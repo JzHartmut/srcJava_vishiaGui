@@ -117,10 +117,10 @@ public class FileSelector implements Widgetifc
     //The macro widget consists of more as one widget. Position the inner widgets:
     GralPos posAll = panel.getPositionInPanel().clone();
     //Text field for path above list
-    panel.setPosition(posAll, GralPos.same, 2.0F, GralPos.same, GralPos.same);
+    panel.setPosition(posAll, GralPos.same, 2.0F, GralPos.same, GralPos.same, 1, 'd');
     widgdPath = panel.addTextField(name + "-Path", false, null, '.');
     //the list
-    panel.setPosition(posAll, 2.0F, GralPos.same, GralPos.same, GralPos.same);
+    panel.setPosition(posAll, 2.0F, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
     selectList.setToPanel(panel, name, rows, columns, size);
   }
   

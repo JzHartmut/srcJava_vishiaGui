@@ -219,12 +219,20 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
 	@Override public void setPositionSize(int line, int column, int height, int width, char direction)
 	{ if(line < 0){ line = posUsed? GralPos.next: GralPos.same; }
 	  if(column < 0){ column = posUsed? GralPos.next: GralPos.same; }
-	  setFinePosition(line, 0, height + GralPos.size, 0, column, 0, width + GralPos.size, 0, direction, 0);
+	  setFinePosition(line, 0, height + GralPos.size, 0, column, 0, width + GralPos.size, 0, 1, direction, pos);
 	}
 
 	
   @Override public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
-      , char direction, int origin)
+      , int origin, char direction)
+  { setPosition(pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
+  }
+
+  
+  
+  
+  @Override public void setPosition(GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
+      , int origin, char direction)
   {
     int y1 = (int)(line);
     int y1f = y1 >=0 ? (int)((line - y1)* 10.001F) : (int)((line - y1)* -10.001F);  
@@ -234,10 +242,11 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
     int x1f = x1 >=0 ? (int)((column - x1)* 10.001F) : (int)((column - x1)* -10.001F);  
     int x2 = (int)(columnEndOrSize);
     int x2f = x2 >=0 ? (int)((columnEndOrSize - x2)* 10.001F) : (int)((columnEndOrSize - x2)* -10.001F); 
-    setFinePosition(y1, y1f, y2, y2f, x1, x1f, x2, x2f, direction, origin);
+    setFinePosition(y1, y1f, y2, y2f, x1, x1f, x2, x2f, origin, direction, framePos);
   }
+  
+  
 
-	
 	
   /**Sets the position for the next widget to add in the container.
    * Implementation note: This is the core function to calculate positions. It is called from all other ones.
@@ -253,7 +262,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
    * @param direction: direction for a next widget, use 'r', 'l', 'u', 'd' for right, left, up, down                
    */
   @Override public void setFinePosition(int line, int yPosFrac, int ye, int yef
-      , int column, int xPosFrac, int xe, int xef, char direction, int origin)
+      , int column, int xPosFrac, int xe, int xef, int origin, char direction, GralPos frame)
   {
     //Inner class to calculate for x and y.   
     class Calc{
@@ -360,6 +369,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
         if(pOrigin <0){ pOrigin = 0; } //set default if not determined. 
       }
     }
+    if(frame == null){ frame = pos; }
     Calc calc = new Calc();
     if(origin >0 && origin <=9){
       int yOrigin = (origin-1) /3;
@@ -368,14 +378,14 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
       pos.yOrigin = "tmb".charAt(yOrigin);
     }
     //calculate y
-    calc.p = pos.y; calc.pe = pos.yEnd; calc.pf = pos.yFrac; calc.pef = pos.yEndFrac;
-    calc.pd = pos.height(); calc.pDir = "ud".indexOf(pos.dirNext); calc.pOrigin = "tmb".indexOf(pos.yOrigin);
+    calc.p = frame.y; calc.pe = frame.yEnd; calc.pf = frame.yFrac; calc.pef = frame.yEndFrac;
+    calc.pd = frame.height(); calc.pDir = "ud".indexOf(frame.dirNext); calc.pOrigin = "tmb".indexOf(frame.yOrigin);
     calc.calc(line, yPosFrac, ye, yef);
     pos.y = calc.p; pos.yEnd = calc.pe; pos.yFrac = calc.pf; pos.yEndFrac = calc.pef;
     pos.yOrigin = "tmb".charAt(calc.pOrigin); if(calc.pDir >=0){ pos.dirNext = calc.pDir == 0 ? 'u': 'd'; }
     //calculate x
-    calc.p = pos.x; calc.pe = pos.xEnd; calc.pf = pos.xFrac; calc.pef = pos.xEndFrac;
-    calc.pd = pos.width(); calc.pDir = "lr".indexOf(pos.dirNext); calc.pOrigin = "lmr".indexOf(pos.xOrigin);
+    calc.p = frame.x; calc.pe = frame.xEnd; calc.pf = frame.xFrac; calc.pef = frame.xEndFrac;
+    calc.pd = frame.width(); calc.pDir = "lr".indexOf(frame.dirNext); calc.pOrigin = "lmr".indexOf(frame.xOrigin);
     calc.calc(column, xPosFrac, xe, xef);
     pos.x = calc.p; pos.xEnd = calc.pe; pos.xFrac = calc.pf; pos.xEndFrac = calc.pef;
     pos.xOrigin = "lmr".charAt(calc.pOrigin); if(calc.pDir >=0){ pos.dirNext = calc.pDir == 0 ? 'l': 'r'; }
@@ -433,34 +443,6 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   }
   
   
-  @Override public void setPosition(GralPos framePos, float line, float lineEnd, float column, float columnEnd)
-  {
-    posUsed = false;
-    int y1 = (int)(line);
-    int y1f = y1 >=0 ? (int)((line - y1)* 10.001F) : (int)((line - y1)* -10.001F);  
-    int y2 = (int)(lineEnd);
-    int y2f = y2 >=0 ? (int)((lineEnd - y2)* 10.001F) : (int)((lineEnd - y2)* -10.001F);  
-    int x1 = (int)(column);
-    int x1f = x1 >=0 ? (int)((column - x1)* 10.001F) : (int)((column - x1)* -10.001F);  
-    int x2 = (int)(columnEnd);
-    int x2f = x2 >=0 ? (int)((columnEnd - x2)* 10.001F) : (int)((columnEnd - x2)* -10.001F); 
-    if(y1 == GralPos.same){ y1 = framePos.y; y1f = framePos.yFrac; }
-    if(y2 == GralPos.same){ y2 = framePos.yEnd; y2f = framePos.yEndFrac; }
-    if(x1 == GralPos.same){ x1 = framePos.x; x1f = framePos.xFrac; }
-    if(x2 == GralPos.same){ x2 = framePos.xEnd; x2f = framePos.xEndFrac; }
-    pos.y = y1;
-    pos.yFrac = y1f;
-    pos.yEnd = y2;
-    pos.yEndFrac = y2f;
-    pos.x = x1;
-    pos.xFrac = x1f;
-    pos.xEnd = x2;
-    pos.xEndFrac = x2f;
-    pos.xOrigin = 'l';
-    pos.yOrigin = 't';
-  }
-  
-  
   
   
   public void setSize(int height, int ySizeFrac, int width, int xSizeFrac)
@@ -489,7 +471,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
     int y2f = y2 >=0 ? (int)((height - y2)* 10.001F) : (int)((height - y2)* -10.001F);  
     int x2 = (int)(width);
     int x2f = x2 >=0 ? (int)((width - x2)* 10.001F) : (int)((width - x2)* -10.001F); 
-    setFinePosition(GralPos.next, 0,  y2 + GralPos.size, y2f, GralPos.next, 0, x2 + GralPos.size, x2f, pos.dirNext, 0);
+    setFinePosition(GralPos.next, 0,  y2 + GralPos.size, y2f, GralPos.next, 0, x2 + GralPos.size, x2f, 0, pos.dirNext, pos);
   }
   
   
@@ -528,7 +510,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   public int xxxgetWidthLast(){ return 0; }
   
 	
-  @Override public void setPositionInPanel(float line, float column, float lineEnd, float columnEnd, char direction)
+  @Override public void xxxsetPositionInPanel(float line, float column, float lineEnd, float columnEnd, char direction)
   {
     posUsed = false;
     int y1 = (int)(line);
@@ -655,7 +637,8 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   
   public void setWidgetToResize(WidgetDescriptor widgd)
   {
-    if(pos.x * pos.xEnd < 0 || pos.y * pos.yEnd <0){ //TRICKY: different sign vor x and xEnd
+    if(pos.x < 0 || pos.xEnd <= 0 || pos.y< 0 || pos.yEnd <=0){ 
+      //only widgets with size from right TODO percent size too.
       widgd.pos = pos.clone();
       //widgd.pos.set(pos);
       currPanel.widgetsToResize.add(widgd);
@@ -731,13 +714,13 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
       x2 = x1 + widthWidgetNat; 
     } else {
       x2 = xPixelUnit * posWidget.xEnd + propertiesGui.xPixelFrac(posWidget.xEndFrac)  //negative if from right
-         + (posWidget.xEnd < 0 ? widthParentPixel : 0);  //from right
+         + (posWidget.xEnd < 0 || posWidget.xEnd == 0 && posWidget.xEndFrac == 0 ? widthParentPixel : 0);  //from right
     }
     if(posWidget.xEnd == GralPos.useNatSize){
       y2 = y1 + heightWidgetNat; 
     } else {
       y2 = yPixelUnit * posWidget.yEnd + propertiesGui.yPixelFrac(posWidget.yEndFrac)  //negative if from right
-         + (posWidget.yEnd < 0 ? heightParentPixel : 0);  //from right
+         + (posWidget.yEnd < 0  || posWidget.yEnd == 0 && posWidget.yEndFrac == 0 ? heightParentPixel : 0);  //from right
     }
     GuiRectangle rectangle = new GuiRectangle(x1, y1, x2-x1, y2-y1);
     return rectangle;
@@ -751,7 +734,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
     //The macro widget consists of more as one widget. Position the inner widgets:
     GralPos posAll = getPositionInPanel().clone(); //saved whole position.
     //reduce the length of the text field:
-    setPosition(GralPos.same, GralPos.same, GralPos.same, GralPos.same -2.0F, 'r', 1);
+    setPosition(GralPos.same, GralPos.same, GralPos.same, GralPos.same -2.0F, 1, 'r');
     
     //xSize -= ySize;
     WidgetDescriptor widgd = addTextField(name, true, prompt, promptStylePosition );

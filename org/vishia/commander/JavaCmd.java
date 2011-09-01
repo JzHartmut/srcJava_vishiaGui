@@ -92,23 +92,23 @@ public class JavaCmd extends GuiCfg
     
     
     panelMng.selectPanel("cmd");
-    panelMng.setPositionInPanel(2, 0, -2, -0.1f, '.');
+    panelMng.setPosition(2, -2, 0, -0, 1, 'd');
     cmdSelector.setToPanel(panelMng, "cmds", 5, new int[]{10,10}, 'A');
     cmdSelector.fillIn();
     cmdSelector.setGetterFiles(getterFiles);
 
     panelMng.selectPanel("file0");
-    panelMng.setPositionInPanel(0, 0, -2, -0.1f, '.');
+    panelMng.setPosition(0, -2, 0, -0, 1, 'd');
     fileSelector[1].setToPanel(panelMng, "file0", 5, new int[]{2,20,5,10}, 'A');
     fileSelector[1].fillIn(new File("/"));
     
     panelMng.selectPanel("file1");
-    panelMng.setPositionInPanel(0, 0, -2, -0.1f, '.');
+    panelMng.setPosition(0, -2, 0, -0, 1, 'd');
     fileSelector[1].setToPanel(panelMng, "file1", 5, new int[]{2,20,5,10}, 'A');
     fileSelector[1].fillIn(new File("/"));
 
     panelMng.selectPanel("file2");
-    panelMng.setPositionInPanel(0, 0, -2, -0.1f, '.');
+    panelMng.setPosition(0, -2, 0, -0, 1, 'd');
     fileSelector[2].setToPanel(panelMng, "file2", 5, new int[]{2,20,5,10}, 'A');
     fileSelector[2].fillIn(new File("/"));
 
@@ -117,7 +117,7 @@ public class JavaCmd extends GuiCfg
   private void initPanelButtons()
   {
     panelMng.selectPanel("Buttons");
-    panelMng.setPositionInPanel(0, 10, 1, 20, 'r');
+    panelMng.setPosition(0, 1, 10, 20, 1, 'r');
     panelMng.addText("F1", 'A', 0x0);
     panelMng.addText("F2", 'A', 0x0);
     panelMng.addText("F3", 'A', 0x0);
@@ -128,12 +128,12 @@ public class JavaCmd extends GuiCfg
     panelMng.addText("F8", 'A', 0x0);
     panelMng.addText("F9", 'A', 0x0);
     panelMng.addText("F10", 'A', 0x0);
-    panelMng.setPositionInPanel(3, 0, 5, 4, 'd');
+    panelMng.setPosition(1, 3, 0, 4, 1, 'd');
     panelMng.addText("alt", 'A', 0x0);
     panelMng.addText("ctr", 'A', 0x0);
     panelMng.addText("sh", 'A', 0x0);
     
-    panelMng.setPositionInPanel(1, 4, 3, 14, 'r');
+    panelMng.setPosition(1, 3, 4, 14, 1, 'r');
     panelMng.addButton("b-help", null, "help", null, null, "help");
     panelMng.addButton("b-F2", null, "help", null, null, "F2");
     panelMng.addButton("b-help", null, "help", null, null, "view");
@@ -144,7 +144,7 @@ public class JavaCmd extends GuiCfg
     panelMng.addButton("b-help", null, "help", null, null, "del");
     panelMng.addButton("b-help", null, "help", null, null, "cmd");
     panelMng.addButton("b-help", null, "help", null, null, "F10");
-    panelMng.setPositionInPanel(3, 4, 5, 14, 'r');
+    panelMng.setPosition(3, 5, 4, 14, 1, 'r');
     panelMng.addButton("selectLeft", selectPanelLeft, "selectLeft", null, null, "left");
     panelMng.addButton("selectMiddle", selectPanelMiddle, "help", null, null, "middle");
     panelMng.addButton("selectRight", selectPanelRight, "", null, null, "right");
@@ -155,7 +155,7 @@ public class JavaCmd extends GuiCfg
     panelMng.addButton("b-help", null, "help", null, null, "a-F8");
     panelMng.addButton("b-help", null, "help", null, null, "a-F9");
     panelMng.addButton("b-help", null, "help", null, null, "a-F10");
-    panelMng.setPositionInPanel(5, 4, 7, 14, 'r');
+    panelMng.setPosition(5, 7, 4, 14, 1, 'r');
     panelMng.addButton("b-help", null, "help", null, null, "brief");
     panelMng.addButton("b-F2", null, "help", null, null, "full");
     panelMng.addButton("b-help", null, "help", null, null, "name");

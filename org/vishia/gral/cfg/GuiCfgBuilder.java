@@ -163,7 +163,7 @@ public class GuiCfgBuilder
     if(pos.xWidth == Integer.MAX_VALUE)
       stop();
     gui.setFinePosition(pos.yPos, pos.yPosFrac, pos.ySizeDown + GralPos.size, pos.ySizeFrac
-        , pos.xPos, pos.xPosFrac, pos.xWidth + GralPos.size, pos.xSizeFrac, 'r', 0);
+        , pos.xPos, pos.xPosFrac, pos.xWidth + GralPos.size, pos.xSizeFrac, 1, 'r', null);
     //
     WidgetDescriptor widgd = null;
     String sName = cfge.widgetType.name;
