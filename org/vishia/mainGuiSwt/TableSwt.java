@@ -1,5 +1,8 @@
 package org.vishia.mainGuiSwt;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -15,10 +18,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
+import org.vishia.gral.gridPanel.PanelContent;
 import org.vishia.gral.ifc.ColorGui;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
@@ -134,8 +140,7 @@ public class TableSwt implements TableGui_ifc
     WidgetDescriptor widgd = new WidgetDescriptor(sName, table, 'L', sName, null);
     widgd.setPanelMng(mng);
     table.table.setData(widgd);
-    mng.setWidgetToResize(widgd);
-    mng.indexNameWidgets.put(sName, widgd);
+    mng.registerWidget(widgd);
     return widgd;
 
   }
@@ -143,18 +148,21 @@ public class TableSwt implements TableGui_ifc
   
   
   
-  void changeTable(int ident, Object visibleInfo, Object userData)
+  TableLineGui_ifc changeTable(int ident, Object visibleInfo, Object userData)
   {
     TableItem item = new TableItem(table, SWT.NONE);
     String[] sLine;
-    if(visibleInfo instanceof String){
+    if(visibleInfo == null){
+      //do nothing
+    } else if(visibleInfo instanceof String){
       sLine = ((String)visibleInfo).split("\t");
       item.setText(sLine);
     } else if (visibleInfo instanceof String[]){
       sLine = (String[])visibleInfo;
       item.setText(sLine);
     }
-    item.setData(new TableItemWidget(item, userData));
+    TableLineGui_ifc line = new TableItemWidget(item, userData); 
+    item.setData(line);
     table.showItem(item);
     //set the scrollbar downward
     ScrollBar scroll = table.getVerticalBar();
@@ -165,7 +173,7 @@ public class TableSwt implements TableGui_ifc
     }  
     //table.set
     table.redraw(); //update();
-   
+    return line;
   }
   
   
@@ -510,10 +518,9 @@ public class TableSwt implements TableGui_ifc
   }
 
 
-  @Override public int insertLine(String key, TableLineGui_ifc line, int row)
+  @Override public TableLineGui_ifc insertLine(String key, int row)
   {
-    // TODO Auto-generated method stub
-    return 0;
+    return changeTable(row, null, null);
   }
 
 
@@ -557,12 +564,12 @@ public class TableSwt implements TableGui_ifc
   }
 
   @Override public boolean setFocus()
-  {
+  { mng.setFocusOfTabSwt(table);
+    table.forceFocus();
     return table.setFocus();
   }
 
 
-  
   
   @Override
   public Object getWidget()
