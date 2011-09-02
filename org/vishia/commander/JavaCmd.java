@@ -3,6 +3,8 @@ package org.vishia.commander;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.vishia.cmd.CmdGetFileArgs_ifc;
 import org.vishia.cmd.CmdQueue;
@@ -47,8 +49,8 @@ public class JavaCmd extends GuiCfg
   
   private File[] selectedFiles;
 
-  private final FileSelector[] fileSelector = new FileSelector[]
-    { new FileSelector(mainCmd), new FileSelector(mainCmd), new FileSelector(mainCmd)};
+  private final Map<String, FileSelector> idxFileSelector = new TreeMap<String, FileSelector>();
+    //{ new TreeMap<String, FileSelector>(), new TreeMap<String, FileSelector>(), new TreeMap<String, FileSelector>()};
   
   
   
@@ -99,8 +101,10 @@ public class JavaCmd extends GuiCfg
       if(info.active == 'l'){
         tabCmd.addGridPanel(info.tabName, info.tabName,1,1,10,10);
         panelMng.setPosition(0, -2, 0, -0, 1, 'd');
-        fileSelector[1].setToPanel(panelMng, info.tabName, 5, new int[]{2,20,5,10}, 'A');
-        fileSelector[1].fillIn(new File(info.path));
+        FileSelector fileSelector = new FileSelector(mainCmd);
+        idxFileSelector.put(info.tabName, fileSelector);
+        fileSelector.setToPanel(panelMng, info.tabName, 5, new int[]{2,20,5,10}, 'A');
+        fileSelector.fillIn(new File(info.path));
       }
     }
     
@@ -115,9 +119,11 @@ public class JavaCmd extends GuiCfg
     
     tabFile1.addGridPanel("file1", "File&2",1,1,10,10);
     panelMng.setPosition(0, -2, 0, -0, 1, 'd');
-    fileSelector[1].setToPanel(panelMng, "file1", 5, new int[]{2,20,5,10}, 'A');
-    fileSelector[1].fillIn(new File("/"));
-
+    { FileSelector fileSelector = new FileSelector(mainCmd);
+      idxFileSelector.put("file1", fileSelector);
+      fileSelector.setToPanel(panelMng, "file1", 5, new int[]{2,20,5,10}, 'A');
+      fileSelector.fillIn(new File("/"));
+    }
     tabFile2 = panelMng.createTabPanel(panelContent.actionPanelActivate, GuiPanelMngBuildIfc.propZoomedPanel);
     gui.addFrameArea(3,1,1,1, tabFile2.getGuiComponent()); //dialogPanel);
       
@@ -135,9 +141,11 @@ public class JavaCmd extends GuiCfg
     
     panelMng.selectPanel("file2");
     panelMng.setPosition(0, -2, 0, -0, 1, 'd');
-    fileSelector[2].setToPanel(panelMng, "file2", 5, new int[]{2,20,5,10}, 'A');
-    fileSelector[2].fillIn(new File("/"));
-
+    { FileSelector fileSelector = new FileSelector(mainCmd);
+      idxFileSelector.put("file2", fileSelector);
+      fileSelector.setToPanel(panelMng, "file2", 5, new int[]{2,20,5,10}, 'A');
+      fileSelector.fillIn(new File("/"));
+    }
     panelMng.selectPanel("file1");
     panelMng.setPosition(0, -0, 0, -0, 1, 'd');
     //panelMng.createWindow("selectTab", "select", true);
@@ -239,10 +247,12 @@ public class JavaCmd extends GuiCfg
   private UserActionGui actionSetCmdWorkingDir = new UserActionGui() 
   { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
     { WidgetDescriptor widgdFocus = panelMng.getWidgetInFocus();
-      if(widgdFocus.name.startsWith("file")){
-        int ixFilePanel = widgdFocus.name.charAt(4) - '0';
-        assert(ixFilePanel >=0 && ixFilePanel < fileSelector.length);  //only such names are registered.
-        FileSelector fileSel = fileSelector[ixFilePanel];
+      FileSelector fileSel = idxFileSelector.get(widgdFocus.name);
+      if(fileSel !=null){ //is a FileSelector focused yet?
+      //if(widgdFocus.name.startsWith("file")){
+        //int ixFilePanel = widgdFocus.name.charAt(4) - '0';
+        //assert(ixFilePanel >=0 && ixFilePanel < fileSelector.length);  //only such names are registered.
+        //FileSelector fileSel = fileSelector[ixFilePanel];
         File file = fileSel.getSelectedFile();
         cmdQueue.setWorkingDir(file); 
       }
@@ -264,10 +274,12 @@ public class JavaCmd extends GuiCfg
       Iterator<WidgetDescriptor> iterFocus = widgdFocus.iterator();
       while(ixFile < file.length && iterFocus.hasNext()){
         WidgetDescriptor widgd = iterFocus.next();
-        if(widgd.name.startsWith("file")){
-          int ixFilePanel = widgd.name.charAt(4) - '0';
-          assert(ixFilePanel >=0 && ixFilePanel < fileSelector.length);  //only such names are registered.
-          FileSelector fileSel = fileSelector[ixFilePanel];
+        FileSelector fileSel = idxFileSelector.get(widgd.name);
+        if(fileSel !=null){ //is a FileSelector focused yet?
+        //if(widgd.name.startsWith("file")){
+          //int ixFilePanel = widgd.name.charAt(4) - '0';
+          //assert(ixFilePanel >=0 && ixFilePanel < fileSelector.length);  //only such names are registered.
+          //FileSelector fileSel = fileSelector[ixFilePanel];
           file[ixFile++] = fileSel.getSelectedFile();
         }
       }
@@ -403,7 +415,7 @@ public class JavaCmd extends GuiCfg
 
   UserActionGui selectPanelRight = new UserActionGui()
   { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
-    { fileSelector[2].setFocus();
+    { //fileSelector[2].setFocus();
       //tabFile2.getCurrentPanel().setFocus();
     }
   };
