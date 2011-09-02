@@ -9,5 +9,9 @@ public interface Widgetifc
   /**Returns the implementation class of the widget. */
   Object getWidget();
   
+  /**Sets the focus to the widget.
+   * TODO call GuiPanelMngSwt#setFocusOfTabSwt() for all widgets, see TabelSwt!
+   * @return true if set
+   */
   boolean setFocus();
 }

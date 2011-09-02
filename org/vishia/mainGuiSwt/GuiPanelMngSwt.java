@@ -26,6 +26,7 @@ package org.vishia.mainGuiSwt;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -57,6 +58,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Slider;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
@@ -177,39 +180,6 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
    */
   MouseClickInfo mouseClickForInfo = new MouseClickInfo(this);
   
-  /**This class holds the informations for 1 widget, which things should be changed.
-   * An instance of this is used temporary in a queue.
-   */
-  public static class GuiChangeReq
-  {
-  	/**The widget where the change should be done. */
-  	final WidgetDescriptor widgetDescr;
-  	
-  	/**The command which should be done to change. It is one of the static definitions cmd... of this class. */
-  	final int cmd;
-  	
-  	/**Numeric value describes the position of widget where the change should be done.
-  	 * For example, if the widget is a table, it is either the table line or it is
-  	 * Integer.MAX_VALUE or 0 to designate top or end.
-  	 */
-  	final int ident;
-  	
-  	/**The textual information which were to be changed or add. */
-  	final Object visibleInfo;
-		
-  	final Object userData;
-  	
-  	GuiChangeReq(WidgetDescriptor widgetDescr, int cmd, int indent, Object visibleInfo, Object userData) 
-		{ this.widgetDescr = widgetDescr;
-		  this.cmd = cmd;
-			this.ident = indent;
-			this.visibleInfo = visibleInfo;
-			this.userData = userData;
-		}
-  	
-  }
-  
-  
   /**It is a marker interface. */
   protected interface XXXUserAction{}
   
@@ -279,15 +249,6 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   
   
   
-  /**Index of all input fields to access symbolic for all panels. */
-  final Map<String, WidgetDescriptor> indexNameWidgets = new TreeMap<String, WidgetDescriptor>();
-
-  /**Index of all input fields to access symbolic. NOTE: The generic type of WidgetDescriptor is unknown,
-   * because the set is used independently from the graphic system. */
-  final Map<String, WidgetDescriptor> showFields = new TreeMap<String, WidgetDescriptor>();
-
-  //private final IndexMultiTable showFieldsM;
-
 	/**This class is only used to store values to inspect. The Inspector is a tool which works with
 	 * reflection and with it internal variable can be visited in runtime. See {@link org.vishia.inspector.Inspector}.
 	 */
@@ -435,31 +396,47 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
 	 * @param height
 	 * @return
 	 */
-	public GuiShellMngBuildIfc createWindow(String title, boolean exclusive)
-	{
-		//Display display = new Display();
-	  int props = 0;
-	  if(exclusive){ props |= SWT.PRIMARY_MODAL; }
-	  if(title !=null){ props |= SWT.TITLE; }
-		Shell shell = new Shell(graphicFrame.getShell(), props);
-		
-		//TODO
-		//Shell shell = (Shell)graphicFrame; //new Shell(display);
-		//setPosAndSize_(shell); //, line,0, column,0, dy,0, dx,0);
-		//shell.setBounds(left,top, width, height);
-		GuiRectangle size = calcWidgetPosAndSize(pos, 600, 800, 800, 600);
+  public GuiShellMngBuildIfc createWindow(String title, boolean exclusive)
+  {
+    //Display display = new Display();
+    int props = 0;
+    if(exclusive){ props |= SWT.PRIMARY_MODAL; }
+    if(title !=null){ props |= SWT.TITLE; }
+    Shell shell = new Shell(graphicFrame.getShell(), props);
+    
+    //TODO
+    //Shell shell = (Shell)graphicFrame; //new Shell(display);
+    //setPosAndSize_(shell); //, line,0, column,0, dy,0, dx,0);
+    //shell.setBounds(left,top, width, height);
+    
+    GuiRectangle size = calcWidgetPosAndSize(pos, 600, 800, 800, 600);
     Rectangle rectShell = graphicFrame.getBounds();
     Rectangle rectPanel = ((Composite)currPanel.panelComposite).getBounds();
     shell.setBounds(size.x + rectShell.x + rectPanel.x, size.y + rectShell.y + rectPanel.y, size.dx, size.dy);    
     
     
-		if(title !=null){ shell.setText(title); }
-		GuiShellMngBuildIfc mng = new GuiShellMngSwt(mngBase.gralDevice, shell, this, 0, 0, propertiesGuiSwt, variableContainer, log);
-		//mng.setWindowVisible(true);
-		
-		return mng;
+    if(title !=null){ shell.setText(title); }
+    GuiShellMngBuildIfc mng = new GuiShellMngSwt(mngBase.gralDevice, shell, this, 0, 0, propertiesGuiSwt, variableContainer, log);
+    //mng.setWindowVisible(true);
+    
+    return mng;
 
-	}
+  }
+  
+  public WidgetDescriptor createWindow(String name, String title, boolean exclusive)
+  {
+    //Display display = new Display();
+    WindowSwt window = new WindowSwt(graphicFrame.getDisplay(), title, exclusive);
+    
+    setPosAndSize_(window.window);
+    
+    
+    WidgetDescriptor widgd = new WidgetDescriptor(name, new WidgetSimpleWrapperSwt(window.window), 'w');
+    registerPanel(name, window);
+    window.window.setVisible(true);
+    return widgd;
+
+  }
   
   
   
@@ -538,8 +515,12 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
       //pos =null;
     }
     final GuiRectangle rectangle;
-    final Point parentSize = parentComp.getSize();
-    rectangle = calcWidgetPosAndSize(pos, parentSize.x, parentSize.y, widthwidgetNat, heigthWidgetNat);
+    if(parentComp == null){
+      rectangle = calcWidgetPosAndSize(pos, 800, 600, widthwidgetNat, heigthWidgetNat);
+    } else {
+      final Point parentSize = parentComp.getSize();
+      rectangle = calcWidgetPosAndSize(pos, parentSize.x, parentSize.y, widthwidgetNat, heigthWidgetNat);
+    }
     component.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
     posUsed = true;
        
@@ -1638,7 +1619,41 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     return new InfoBox(graphicFrame.getShell(), title, lines, todo);
   }
 
-	
+  
+  
+  /**Sets the correct TabItem if any widget at this TabItem is focused. That is not done by swt graphic
+   * on Control.setFocus().
+   * @param control
+   */
+  void setFocusOfTabSwt(Control control)
+  {
+    List<Control> parents = new LinkedList<Control>();
+    Control parent = control;
+    TabItem tabItemSwt = null;
+    while( (parent = parent.getParent())!=null){
+      parents.add(parent);
+    }
+    for(Control parent1: parents){
+      Object gralObj = parent1.getData();
+      if(gralObj !=null && gralObj instanceof PanelContent){
+        PanelContent gralPanel = (PanelContent) gralObj;
+        Object tabitem = gralPanel.itsTabSwt;
+        if(tabitem instanceof TabItem){
+          tabItemSwt = (TabItem)tabitem;
+        }
+      }
+      if(parent1 instanceof TabFolder){
+        TabFolder tf = (TabFolder)parent1;
+        tf.setFocus();
+        tf.setSelection(tabItemSwt);
+        stop();
+      }
+    }
+    
+  }
+  
+  
+
 
 	void stop(){}  //debug helper
 

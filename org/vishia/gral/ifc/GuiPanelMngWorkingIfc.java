@@ -49,6 +49,12 @@ public interface GuiPanelMngWorkingIfc
   //final static int cmdSetData = 0x5e1da1a;  //setdata
   
 
+  /**Searches a widget by name.
+   * @param name The name which is assigned on build.
+   * @return null if the widget is not found.
+   */
+  WidgetDescriptor getWidget(String name);
+  
 	/**Returns the list of all widgets with its informations. 
 	 * The graphical representation of the widgets is unknown here.
 	 * If it should be used, the graphic implementation should be known
@@ -146,6 +152,13 @@ public interface GuiPanelMngWorkingIfc
 	 * @return The content.
 	 */
 	String getValueFromWidget(WidgetDescriptor widgetDescr);
+
+	
+	/**Sets the focus to the designated widget.
+	 * @param widgd
+	 * @return true if the focus is set. False if it isn't able to set the focus.
+	 */
+	boolean setFocus(WidgetDescriptor widgd);
 	
 	/**Notifies that this widget has the focus gotten.
 	 * Note: not all widgets notifies this. The focus can be used to detect which widget is active

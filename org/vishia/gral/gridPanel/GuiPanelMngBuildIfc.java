@@ -541,6 +541,12 @@ public interface GuiPanelMngBuildIfc
   void addFocusAction(WidgetDescriptor widgetInfo, UserActionGui action, String sCmdEnter, String sCmdRelease);
 
   
+  /**Register all widgets, which are created in its own classes, not add here.
+   * The widgets are stored in the index of names.
+   * @param widgd
+   */
+  void registerWidget(WidgetDescriptor widgd);
+  
   /**Sets the values for a line
    * @param sName The registered name
    * @param yNull array of values for all tracks in percent from 0..100.0, where its 0-line is shown.
@@ -657,6 +663,10 @@ public interface GuiPanelMngBuildIfc
 	 */
 	GuiShellMngBuildIfc createWindow(String title, boolean exclusive);
   
+	
+	WidgetDescriptor createWindow(String name, String title, boolean exclusive);
+	
+	
 	
   GuiWindowMng_ifc createInfoBox(String title, String[] lines, boolean todo);
 

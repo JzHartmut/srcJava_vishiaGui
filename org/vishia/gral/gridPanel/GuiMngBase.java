@@ -3,7 +3,7 @@ package org.vishia.gral.gridPanel;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.base.GralDevice;
-import org.vishia.mainGuiSwt.GuiPanelMngSwt.GuiChangeReq;
+import org.vishia.gral.gridPanel.GuiPanelMngBase.GuiChangeReq;
 
 /**Any instance of a {@link GuiPanelMngBase} refers only one instance of this class.
  * 

@@ -75,6 +75,7 @@ public class WidgetDescriptor
 	 * <li>t: a text input area.
 	 * <li>U: a graphical value representation (bar etc)
 	 * <li>V: a graphical value enter representation (slider etc)
+	 * <li>w: A window.
 	 * <li>
 	 * </ul>
 	 * */

@@ -154,7 +154,7 @@ public class FileSelector implements Widgetifc
     }
     int lineSelect = 1;
     int lineCt = 1;
-    for(String name: files){
+    if(files !=null) for(String name: files){
       if(sFileSelected != null && name.equals(sFileSelected)){
         lineSelect = lineCt;
       }

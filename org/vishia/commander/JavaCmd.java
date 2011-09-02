@@ -29,6 +29,8 @@ public class JavaCmd extends GuiCfg
     File fileCfgCmds;
     
     File fileCfgButtonCmds;
+    
+    File fileSelectTabPaths;
   }
   
   private final CallingArgs cargs;
@@ -39,12 +41,16 @@ public class JavaCmd extends GuiCfg
   
   final CmdQueue cmdQueue = new CmdQueue(mainCmd);
   
+  private final SelectTab selectTab = new SelectTab(mainCmd, panelMng);
+  
   private final CommandSelector cmdSelector = new CommandSelector(cmdQueue);
   
   private File[] selectedFiles;
 
   private final FileSelector[] fileSelector = new FileSelector[]
     { new FileSelector(mainCmd), new FileSelector(mainCmd), new FileSelector(mainCmd)};
+  
+  
   
   
   /**The commands which are used for some buttons or menu items from the JavaCommander itself. */
@@ -72,46 +78,70 @@ public class JavaCmd extends GuiCfg
     gui.addMenuItemGThread("&Command/CmdCf&gFile/&Check", actionSetCmdCfg); ///
     //gui.set
     
-    //Creates a Tab-Panel:
+    //Creates tab-Panels for the file lists and command lists.
     tabCmd = panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate, GuiPanelMngBuildIfc.propZoomedPanel);
-    panelMng.tabPanel.addGridPanel("cmd", "Cm&d",1,1,10,10);
-    panelMng.tabPanel.addGridPanel("file0", "File&1",1,1,10,10);
     gui.addFrameArea(1,1,1,1, panelMng.tabPanel.getGuiComponent()); //dialogPanel);
-      
-    tabFile1 = panelMng.createTabPanel(panelContent.actionPanelActivate, GuiPanelMngBuildIfc.propZoomedPanel);
-    tabFile1.addGridPanel("file1", "File&2",1,1,10,10);
-    gui.addFrameArea(2,1,1,1, tabFile1.getGuiComponent()); //dialogPanel);
-      
-    tabFile2 = panelMng.createTabPanel(panelContent.actionPanelActivate, GuiPanelMngBuildIfc.propZoomedPanel);
-    tabFile2.addGridPanel("file2", "File&3",1,1,10,10);
-    gui.addFrameArea(3,1,1,1, tabFile2.getGuiComponent()); //dialogPanel);
-      
-    panelButtons = panelMng.createGridPanel("Buttons", panelMng.getColor("gr"), 1, 1, 10, 10);
-    gui.addFrameArea(1,2,3,1, panelButtons); //dialogPanel);
-    initPanelButtons();
+
+    int[] widthSelecttable = new int[]{2, 20, 30};
     
+    tabCmd.addGridPanel("Sel0", "a-F1",1,1,10,10);
+    panelMng.setPosition(0, 0, 0, -0, 1, 'd');
+    selectTab.listLeft.setToPanel(panelMng, "sel0", 5, widthSelecttable, 'A');
+    selectTab.fillInLeft();
     
-    panelMng.selectPanel("cmd");
+    tabCmd.addGridPanel("cmd", "Cm&d",1,1,10,10);
     panelMng.setPosition(2, -2, 0, -0, 1, 'd');
     cmdSelector.setToPanel(panelMng, "cmds", 5, new int[]{10,10}, 'A');
     cmdSelector.fillIn();
     cmdSelector.setGetterFiles(getterFiles);
 
-    panelMng.selectPanel("file0");
-    panelMng.setPosition(0, -2, 0, -0, 1, 'd');
-    fileSelector[1].setToPanel(panelMng, "file0", 5, new int[]{2,20,5,10}, 'A');
-    fileSelector[1].fillIn(new File("/"));
+    for(SelectTab.SelectInfo info: selectTab.selectLeft){
+      if(info.active == 'l'){
+        tabCmd.addGridPanel(info.tabName, info.tabName,1,1,10,10);
+        panelMng.setPosition(0, -2, 0, -0, 1, 'd');
+        fileSelector[1].setToPanel(panelMng, info.tabName, 5, new int[]{2,20,5,10}, 'A');
+        fileSelector[1].fillIn(new File(info.path));
+      }
+    }
     
-    panelMng.selectPanel("file1");
+      
+    tabFile1 = panelMng.createTabPanel(panelContent.actionPanelActivate, GuiPanelMngBuildIfc.propZoomedPanel);
+    gui.addFrameArea(2,1,1,1, tabFile1.getGuiComponent()); //dialogPanel);
+    
+    tabFile1.addGridPanel("Sel1", "a-F2",1,1,10,10);
+    panelMng.setPosition(0, 0, 0, -0, 1, 'd');
+    selectTab.listMid.setToPanel(panelMng, "sel0", 5, widthSelecttable, 'A');
+    selectTab.fillInMid();
+    
+    tabFile1.addGridPanel("file1", "File&2",1,1,10,10);
     panelMng.setPosition(0, -2, 0, -0, 1, 'd');
     fileSelector[1].setToPanel(panelMng, "file1", 5, new int[]{2,20,5,10}, 'A');
     fileSelector[1].fillIn(new File("/"));
 
+    tabFile2 = panelMng.createTabPanel(panelContent.actionPanelActivate, GuiPanelMngBuildIfc.propZoomedPanel);
+    gui.addFrameArea(3,1,1,1, tabFile2.getGuiComponent()); //dialogPanel);
+      
+    tabFile2.addGridPanel("file2", "File&3",1,1,10,10);
+
+    tabFile2.addGridPanel("Sel1", "a-F2",1,1,10,10);
+    panelMng.setPosition(0, 0, 0, -0, 1, 'd');
+    selectTab.listRight.setToPanel(panelMng, "sel0", 5, widthSelecttable, 'A');
+    selectTab.fillInRight();
+    
+    panelButtons = panelMng.createGridPanel("Buttons", panelMng.getColor("gr"), 1, 1, 10, 10);
+    gui.addFrameArea(1,2,3,1, panelButtons); //dialogPanel);
+    initPanelButtons();
+    
+    
     panelMng.selectPanel("file2");
     panelMng.setPosition(0, -2, 0, -0, 1, 'd');
     fileSelector[2].setToPanel(panelMng, "file2", 5, new int[]{2,20,5,10}, 'A');
     fileSelector[2].fillIn(new File("/"));
 
+    panelMng.selectPanel("file1");
+    panelMng.setPosition(0, -0, 0, -0, 1, 'd');
+    //panelMng.createWindow("selectTab", "select", true);
+    
   }
 
   private void initPanelButtons()
@@ -173,16 +203,20 @@ public class JavaCmd extends GuiCfg
   
   @Override protected final void initMain()
   { if(cargs.fileCfgCmds == null){
-    mainCmd.writeError("Argument cmdcfg:CONFIGFILE should be given.");
-    //mainCmd.e
-    } else if(cargs.fileCfgButtonCmds == null){
-      mainCmd.writeError("Argument cmdButton:CONFIGFILE should be given.");
+      mainCmd.writeError("Argument cmdcfg:CONFIGFILE should be given.");
       //mainCmd.e
-    } else {
+  } else if(cargs.fileCfgButtonCmds == null){
+    mainCmd.writeError("Argument cmdButton:CONFIGFILE should be given.");
+    //mainCmd.e
+  } else if(cargs.fileSelectTabPaths == null){
+    mainCmd.writeError("Argument sel:SELECTFILE should be given.");
+    //mainCmd.e
+  } else {
       String sError;
       File fileCfg;
       sError = cmdSelector.cmdStore.readCmdCfg(fileCfg = cargs.fileCfgCmds); 
-      if(sError == null){ buttonCmds.readCmdCfg(fileCfg = cargs.fileCfgButtonCmds); }
+      if(sError == null){ sError = buttonCmds.readCmdCfg(fileCfg = cargs.fileCfgButtonCmds); }
+      if(sError == null){ sError = selectTab.readCfg(fileCfg = cargs.fileSelectTabPaths); }
       if(sError !=null){
         mainCmd.writeError("Error reading " + fileCfg.getAbsolutePath() + ": " + sError);
       }
@@ -281,6 +315,9 @@ public class JavaCmd extends GuiCfg
       }
       else if(arg.startsWith("cmdButton:")){
         cargs.fileCfgButtonCmds = new File(arg.substring(10));
+      }
+      else if(arg.startsWith("sel:")){
+        cargs.fileSelectTabPaths = new File(arg.substring(4));
       }
       else { bOk = super.testArgument(arg, nArg); }
       return bOk;

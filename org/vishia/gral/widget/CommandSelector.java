@@ -93,7 +93,7 @@ public class CommandSelector extends SelectList
   
   
   @Override
-  void actionUserKey(String sKey, Object userData, TableLineGui_ifc line)
+  protected void actionUserKey(String sKey, Object userData, TableLineGui_ifc line)
   {
     // TODO Auto-generated method stub
     

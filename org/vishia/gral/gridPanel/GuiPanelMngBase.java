@@ -99,6 +99,39 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
     
   }
   
+  /**This class holds the informations for 1 widget, which things should be changed.
+   * An instance of this is used temporary in a queue.
+   */
+  public static class GuiChangeReq
+  {
+    /**The widget where the change should be done. */
+    public final WidgetDescriptor widgetDescr;
+    
+    /**The command which should be done to change. It is one of the static definitions cmd... of this class. */
+    public final int cmd;
+    
+    /**Numeric value describes the position of widget where the change should be done.
+     * For example, if the widget is a table, it is either the table line or it is
+     * Integer.MAX_VALUE or 0 to designate top or end.
+     */
+    public final int ident;
+    
+    /**The textual information which were to be changed or add. */
+    public final Object visibleInfo;
+    
+    public final Object userData;
+    
+    public GuiChangeReq(WidgetDescriptor widgetDescr, int cmd, int indent, Object visibleInfo, Object userData) 
+    { this.widgetDescr = widgetDescr;
+      this.cmd = cmd;
+      this.ident = indent;
+      this.visibleInfo = visibleInfo;
+      this.userData = userData;
+    }
+    
+  }
+  
+  
   
   /**This instance helps to create the Dialog Widget as part of the whole window. It is used only in the constructor.
    * Therewith it may be defined stack-locally. But it is better to show and explain if it is access-able at class level. */
@@ -133,8 +166,15 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
    */
   public TabPanel tabPanel;
   
-  //private WidgetDescriptor widgetInFocus;
-  
+  /**Index of all input fields to access symbolic for all panels. */
+  protected final Map<String, WidgetDescriptor> indexNameWidgets = new TreeMap<String, WidgetDescriptor>();
+
+  /**Index of all input fields to access symbolic. NOTE: The generic type of WidgetDescriptor is unknown,
+   * because the set is used independently from the graphic system. */
+  protected final Map<String, WidgetDescriptor> showFields = new TreeMap<String, WidgetDescriptor>();
+
+  //private final IndexMultiTable showFieldsM;
+
   private List<WidgetDescriptor> widgetsInFocus = new LinkedList<WidgetDescriptor>();
   
   protected final LogMessage log;
@@ -587,6 +627,12 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
 	}
 
   
+  @Override public WidgetDescriptor getWidget(String name)
+  { return indexNameWidgets.get(name);
+  }
+  
+  
+  
   @Override public void buildCfg(GuiCfgData data, File fileCfg) //GuiCfgBuilder cfgBuilder)
   {
     this.cfgData = data;
@@ -635,7 +681,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   }
   
   
-  public void setWidgetToResize(WidgetDescriptor widgd)
+  @Override public void registerWidget(WidgetDescriptor widgd)
   {
     if(pos.x < 0 || pos.xEnd <= 0 || pos.y< 0 || pos.yEnd <=0){ 
       //only widgets with size from right TODO percent size too.
@@ -643,10 +689,16 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
       //widgd.pos.set(pos);
       currPanel.widgetsToResize.add(widgd);
     }
+    indexNameWidgets.put(widgd.name, widgd);
       
   }
   
+  @Override public boolean setFocus(WidgetDescriptor widgd)
+  {
+    return widgd.widget.setFocus();
+  }
   
+
   @Override public void notifyFocus(WidgetDescriptor widgd)
   {
     synchronized(widgetsInFocus){

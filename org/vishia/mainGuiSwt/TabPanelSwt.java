@@ -55,8 +55,8 @@ public class TabPanelSwt extends TabPanel
   
   
 	@Override public PanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
-	{ TabItem tabItemOperation = new TabItem(tabMng.widgetSwt, SWT.None);
-	  tabItemOperation.setText(sLabel);
+	{ TabItem tabItem = new TabItem(tabMng.widgetSwt, SWT.None);
+	  tabItem.setText(sLabel);
 		CanvasStorePanelSwt panel;
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
 	  if(yGrid <0 || xGrid <0){
@@ -64,9 +64,10 @@ public class TabPanelSwt extends TabPanel
 		} else {
 	  	panel = new GridPanelSwt(tabMng.widgetSwt, 0, colorBackground, mng.propertiesGui.xPixelUnit(), mng.propertiesGui.yPixelUnit(), 5, 5);
 		}
+	  panel.itsTabSwt = tabItem;
+		tabItem.setControl(panel.swtCanvas);
 		mng.registerPanel(sName, panel);
-	  tabItemOperation.setControl(panel.swtCanvas);
-	  panels.put(sName, panel);
+    panels.put(sName, panel);
 	  return panel;
   }
 

@@ -13,10 +13,20 @@ import org.vishia.gral.widget.WidgetCmpnifc;
 public abstract class PanelContent implements WidgetCmpnifc
 {
 
-	/**The GUI-Widget of the panel.   
+  /**The GUI-Widget of the panel.   
    *   (Swing:  Device guiDevice, SWT: Composite based on Control);
+   * Note: can't be final because it may be unknown on calling constructor  
    */
-	public Object panelComposite; 
+  public Object panelComposite; 
+  
+  /**A possible tab in a TabFolder. Especially for SWT.   
+   * Note: can't be final because it may be unknown on calling constructor  
+   */
+  public Object itsTabSwt; 
+  
+	
+	
+	
 	//public final CanvasStorePanel panelComposite;
 	
 	//public final Map<String, WidgetDescriptor<WidgetTYPE>> widgetIndex = new TreeMap<String, WidgetDescriptor<WidgetTYPE>>();

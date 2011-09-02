@@ -19,6 +19,7 @@ public abstract class SelectList
   /**The table which is showing in the widget. */
   protected WidgetDescriptor wdgdTable;
   
+  /**The table which is showing in the widget. */
   protected TableGui_ifc table;
   
   /**Not used yet, register actions? */
@@ -52,23 +53,23 @@ public abstract class SelectList
    * or click of OK (Enter) button.
    * @param userData The user data stored in the line of table.
    */
-  abstract void actionOk(Object userData, TableLineGui_ifc line);
+  protected abstract void actionOk(Object userData, TableLineGui_ifc line);
   
   /**Action if a table line is selected and ctrl-left is pressed or the release button is pressed.
    * @param userData The user data stored in the line of table.
    */
-  abstract void actionLeft(Object userData, TableLineGui_ifc line);
+  protected abstract void actionLeft(Object userData, TableLineGui_ifc line);
   
   /**Action if a table line is selected and ctrl-right is pressed or the release button is pressed.
    * @param userData The user data stored in the line of table.
    */
-  abstract void actionRight(Object userData, TableLineGui_ifc line);
+  protected abstract void actionRight(Object userData, TableLineGui_ifc line);
   
   
   /**Action if a table line is selected and any other key is pressed or the context menu is invoked.
    * @param userData The user data stored in the line of table.
    */
-  abstract void actionUserKey(String sKey, Object userData, TableLineGui_ifc line);
+  protected abstract void actionUserKey(String sKey, Object userData, TableLineGui_ifc line);
   
   
   private UserActionGui actionTable = new UserActionGui()

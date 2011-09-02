@@ -34,7 +34,7 @@ public interface TableGui_ifc extends WidgetGui_ifc
    *        Integer.MAXINT or number greater as number of rows: append on end.
    * @return row where the line is inserted.
    */
-  int insertLine(String key, TableLineGui_ifc line, int row);
+  TableLineGui_ifc insertLine(String key, int row);
   
   /**Search where this line is shown.
    * @param key
