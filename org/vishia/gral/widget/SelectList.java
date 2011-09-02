@@ -88,6 +88,10 @@ public abstract class SelectList
     
   };
 
+  /**Sets the focus to this SelectList, the table-widget gets the focus. */
+  public void setFocus()
+  { table.setFocus(); }
+  
   void stop(){}
   
 }

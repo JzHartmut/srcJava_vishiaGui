@@ -98,7 +98,7 @@ protected GuiPanelMngBase panelMng;
 /**Panel-Management-interface for the panels. */
 protected GuiPanelMngBuildIfc panelBuildIfc;
 
-private GuiPanelMngWorkingIfc guiAccess;
+protected GuiPanelMngWorkingIfc guiAccess;
 
 /**ctor for the main class of the application. 
  * The main class can be created in some other kinds as done in static main too.
@@ -285,7 +285,7 @@ protected void initMain()
 protected void stepMain(){}
 
 
-public void execute()
+public final void execute()
 {
   initMain();
   //guiAccess.insertInfo("msgOfDay", Integer.MAX_VALUE, "Test\tMsg");

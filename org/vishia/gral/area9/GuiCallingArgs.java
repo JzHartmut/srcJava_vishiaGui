@@ -28,7 +28,7 @@ public class GuiCallingArgs
   String sPathZbnf = "GUI";
   
   /**The time zone to present all time informations. */
-  String sTimeZone = "GMT";
+  protected String sTimeZone = "GMT";
   
   /**Size, either A,B or F for 800x600, 1024x768 or full screen. */
   String sSize;

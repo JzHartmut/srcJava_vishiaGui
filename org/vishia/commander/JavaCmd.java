@@ -401,7 +401,8 @@ public class JavaCmd extends GuiCfg
 
   UserActionGui selectPanelLeft = new UserActionGui()
   { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
-    { tabCmd.getCurrentPanel().setFocus();
+    { selectTab.listLeft.setFocus();
+      //tabCmd.getCurrentPanel().setFocus();
     }
   };
   
