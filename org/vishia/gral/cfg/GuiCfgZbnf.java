@@ -70,7 +70,8 @@ public class GuiCfgZbnf
   public String configureWithZbnf(File fileConfigurationZbnf, GuiCfgData destination)
   { String sError = null;
     File dirOfconfig = fileConfigurationZbnf.getParentFile();
-    
+    //parses the configuration file and fill the configuration data.
+    //Note: The building of the graphic appearance will be done in the graphic thread with this data later.
     sError = ZbnfJavaOutput.parseFileAndFillJavaObject(destination.getClass(), destination
       , fileConfigurationZbnf, fileSyntax, console, 0);
     if(sError != null)

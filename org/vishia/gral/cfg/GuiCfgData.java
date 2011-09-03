@@ -197,7 +197,7 @@ public final class GuiCfgData
     }
     
     /**Sets a position element. It is able to call from a configuration input or gui input.
-     * @param what use y, x, h, w for pos-y, pos-x, height, wight. All other chars causes an IllegalArgumentException.
+     * @param what use y, x, h, w for pos-y, pos-x, height, width. All other chars causes an IllegalArgumentException.
      * @param sVal String given Value in ZBNF-syntax-form ::=[< ?posRelative> &+]< #?val>[ \. <#?frac> ]. Fault inputs causes return false.
      *        It should not have leeding or trailing spaces! Trim outside. 
      *        It is admissible that the string is empty, then no action is done.

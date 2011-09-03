@@ -21,6 +21,7 @@ import org.vishia.gral.widget.CommandSelector;
 import org.vishia.gral.widget.FileSelector;
 import org.vishia.gral.widget.WidgetCmpnifc;
 import org.vishia.mainCmd.MainCmd_ifc;
+import org.vishia.mainGuiSwt.MainCmdSwt.GuiBuild;
 
 
 public class JavaCmd extends GuiCfg
@@ -98,14 +99,10 @@ public class JavaCmd extends GuiCfg
     cmdSelector.setGetterFiles(getterFiles);
 
     for(SelectTab.SelectInfo info: selectTab.selectLeft){
-      if(info.active == 'l'){
-        tabCmd.addGridPanel(info.tabName, info.tabName,1,1,10,10);
-        panelMng.setPosition(0, -2, 0, -0, 1, 'd');
-        FileSelector fileSelector = new FileSelector(mainCmd);
-        idxFileSelector.put(info.tabName, fileSelector);
-        fileSelector.setToPanel(panelMng, info.tabName, 5, new int[]{2,20,5,10}, 'A');
-        fileSelector.fillIn(new File(info.path));
-      }
+      if(info.active == 'l'){ buildTabFromSelection(info, tabCmd); }
+    }
+    for(SelectTab.SelectInfo info: selectTab.selectAll){
+      if(info.active == 'l'){ buildTabFromSelection(info, tabCmd); }
     }
     
       
@@ -117,38 +114,32 @@ public class JavaCmd extends GuiCfg
     selectTab.listMid.setToPanel(panelMng, "sel0", 5, widthSelecttable, 'A');
     selectTab.fillInMid();
     
-    tabFile1.addGridPanel("file1", "File&2",1,1,10,10);
-    panelMng.setPosition(0, -2, 0, -0, 1, 'd');
-    { FileSelector fileSelector = new FileSelector(mainCmd);
-      idxFileSelector.put("file1", fileSelector);
-      fileSelector.setToPanel(panelMng, "file1", 5, new int[]{2,20,5,10}, 'A');
-      fileSelector.fillIn(new File("/"));
+    for(SelectTab.SelectInfo info: selectTab.selectMid){
+      if(info.active == 'm'){ buildTabFromSelection(info, tabFile1); }
     }
+    for(SelectTab.SelectInfo info: selectTab.selectAll){
+      if(info.active == 'm'){ buildTabFromSelection(info, tabFile1); }
+    }
+    
     tabFile2 = panelMng.createTabPanel(panelContent.actionPanelActivate, GuiPanelMngBuildIfc.propZoomedPanel);
     gui.addFrameArea(3,1,1,1, tabFile2.getGuiComponent()); //dialogPanel);
       
-    tabFile2.addGridPanel("file2", "File&3",1,1,10,10);
-
     tabFile2.addGridPanel("Sel1", "a-F2",1,1,10,10);
     panelMng.setPosition(0, 0, 0, -0, 1, 'd');
     selectTab.listRight.setToPanel(panelMng, "sel0", 5, widthSelecttable, 'A');
     selectTab.fillInRight();
     
+    for(SelectTab.SelectInfo info: selectTab.selectRight){
+      if(info.active == 'r'){ buildTabFromSelection(info, tabFile2); }
+    }
+    for(SelectTab.SelectInfo info: selectTab.selectAll){
+      if(info.active == 'r'){ buildTabFromSelection(info, tabFile2); }
+    }
+    
     panelButtons = panelMng.createGridPanel("Buttons", panelMng.getColor("gr"), 1, 1, 10, 10);
     gui.addFrameArea(1,2,3,1, panelButtons); //dialogPanel);
     initPanelButtons();
     
-    
-    panelMng.selectPanel("file2");
-    panelMng.setPosition(0, -2, 0, -0, 1, 'd');
-    { FileSelector fileSelector = new FileSelector(mainCmd);
-      idxFileSelector.put("file2", fileSelector);
-      fileSelector.setToPanel(panelMng, "file2", 5, new int[]{2,20,5,10}, 'A');
-      fileSelector.fillIn(new File("/"));
-    }
-    panelMng.selectPanel("file1");
-    panelMng.setPosition(0, -0, 0, -0, 1, 'd');
-    //panelMng.createWindow("selectTab", "select", true);
     
   }
 
@@ -166,7 +157,7 @@ public class JavaCmd extends GuiCfg
     panelMng.addText("F8", 'A', 0x0);
     panelMng.addText("F9", 'A', 0x0);
     panelMng.addText("F10", 'A', 0x0);
-    panelMng.setPosition(1, 3, 0, 4, 1, 'd');
+    panelMng.setPosition(3, 5, 0, 4, 1, 'd');
     panelMng.addText("alt", 'A', 0x0);
     panelMng.addText("ctr", 'A', 0x0);
     panelMng.addText("sh", 'A', 0x0);
@@ -207,7 +198,18 @@ public class JavaCmd extends GuiCfg
   }
   
   
-  
+  /**Builds a tab for file or command view from a selected line of selection.
+   * @param info The selection info
+   */
+  private void buildTabFromSelection(SelectTab.SelectInfo info, TabPanel tabPanel)
+  { 
+    tabPanel.addGridPanel(info.tabName, info.tabName,1,1,10,10);
+    panelMng.setPosition(0, -2, 0, -0, 1, 'd');
+    FileSelector fileSelector = new FileSelector(mainCmd);
+    idxFileSelector.put(info.tabName, fileSelector);
+    fileSelector.setToPanel(panelMng, info.tabName, 5, new int[]{2,20,5,10}, 'A');
+    fileSelector.fillIn(new File(info.path));
+  }
   
   @Override protected final void initMain()
   { if(cargs.fileCfgCmds == null){
@@ -244,6 +246,10 @@ public class JavaCmd extends GuiCfg
   
   
   
+  /**Action to set the working directory for the next command invocation.
+   * The working directory is the directory in the focused file tab.
+   * 
+   */
   private UserActionGui actionSetCmdWorkingDir = new UserActionGui() 
   { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
     { WidgetDescriptor widgdFocus = panelMng.getWidgetInFocus();
@@ -266,6 +272,12 @@ public class JavaCmd extends GuiCfg
   
   
   
+  /**Routine to prepare up to 3 files, which were simple selected at last in the panels.
+   * The order of focused file-panel-tables is used for that. The currently selected file
+   * in any of the tables in order of last gotten focus is used to get the files.
+   * It is the input for some command invocations.
+   * @return Array of files in order of last focus
+   */
   private File[] getSelectedFile()
   { File file[] = new File[3];
     int ixFile = 0;
@@ -289,6 +301,9 @@ public class JavaCmd extends GuiCfg
   
   
   
+  /**Action to set the command list from file. It is called from menu.
+   * 
+   */
   private UserActionGui actionSetCmdCfg = new UserActionGui() 
   { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
     { selectedFiles = getSelectedFile();
@@ -309,6 +324,9 @@ public class JavaCmd extends GuiCfg
   
   
   
+  /**This class is instantiated in the static main routine and builds a command line interface
+   * and the graphical frame. The mainly functionality is contained in the super class. 
+   */
   private static class MainCmd extends GuiMainCmd
   {
 
@@ -335,9 +353,12 @@ public class JavaCmd extends GuiCfg
       return bOk;
     }
     
-  }
+  } //class MainCmd
   
   
+  /**Instance to get three selected files for some command line invocations.
+   * 
+   */
   CmdGetFileArgs_ifc getterFiles = new CmdGetFileArgs_ifc()
   { @Override public void  prepareFileSelection()
     { selectedFiles = getSelectedFile();
@@ -399,28 +420,38 @@ public class JavaCmd extends GuiCfg
   }
 
 
+  /**Key alt-F1 to select a directory/cmd list in a list of directories for the left panel.
+   * The original Norton Commander approach is to select a drive letter for windows.
+   * Selection of paths instead are adequate.
+   */
   UserActionGui selectPanelLeft = new UserActionGui()
   { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
     { selectTab.listLeft.setFocus();
-      //tabCmd.getCurrentPanel().setFocus();
     }
   };
   
 
+  /**Key alt-F2 to select a directory/cmd list in a list of directories for the middle panel. */
   UserActionGui selectPanelMiddle = new UserActionGui()
   { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
-    { tabFile1.getCurrentPanel().setFocus();
+    { selectTab.listMid.setFocus();
     }
   };
   
 
+  /**Key alt-F3 to select a directory/cmd list in a list of directories for the right panel.
+   */
   UserActionGui selectPanelRight = new UserActionGui()
   { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
-    { //fileSelector[2].setFocus();
-      //tabFile2.getCurrentPanel().setFocus();
+    { selectTab.listRight.setFocus();
     }
   };
   
+  /**Key alt-F4 or ctrl-O to focus the output/text panel.
+   * The original Norton Commander knows an output panel for the output of commands, 
+   * which uses the whole display and is selected with ctrl-O.
+   * This output/text panel is used for content output too. It is always visible. 
+   */
   UserActionGui selectPanelOut = new UserActionGui()
   { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
     { tabCmd.getCurrentPanel().setFocus();
@@ -428,6 +459,8 @@ public class JavaCmd extends GuiCfg
   };
   
 
+  /**Key F4 for edit command. Its like Norton Commander. 
+   */
   UserActionGui actionEdit = new UserActionGui()
   { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
     { CmdStore.CmdBlock cmdBlock = buttonCmds.getCmd("edit");

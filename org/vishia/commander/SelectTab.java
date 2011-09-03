@@ -159,7 +159,7 @@ class SelectTab
     {
       TableLineGui_ifc line = table.insertLine(null, -1);
       line.setUserData(info);
-      line.setCellText(info.active == where ? "*": " ",0);
+      line.setCellText(info.active == where ? "" + where: " ",0);
       line.setCellText(info.selectName, 1);
       line.setCellText(info.path, 2);
     }
