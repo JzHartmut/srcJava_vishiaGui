@@ -6,7 +6,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
-import org.vishia.gral.ifc.ColorGui;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.widget.TextBoxGuifc;
 import org.vishia.gral.widget.Widgetifc;
 

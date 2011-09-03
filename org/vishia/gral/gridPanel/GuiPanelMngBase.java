@@ -17,7 +17,7 @@ import org.vishia.gral.cfg.GuiCfgBuilder;
 import org.vishia.gral.cfg.GuiCfgData;
 import org.vishia.gral.cfg.GuiCfgDesigner;
 import org.vishia.gral.cfg.GuiCfgWriter;
-import org.vishia.gral.ifc.ColorGui;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.FileDialogIfc;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
 import org.vishia.gral.ifc.GuiRectangle;
@@ -714,7 +714,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   
   @Override public int getColorValue(String sColorName){ return propertiesGui.getColorValue(sColorName); }
 
-  @Override public ColorGui getColor(String sColorName){ return propertiesGui.color(getColorValue(sColorName)); }
+  @Override public GralColor getColor(String sColorName){ return propertiesGui.color(getColorValue(sColorName)); }
 
 
 

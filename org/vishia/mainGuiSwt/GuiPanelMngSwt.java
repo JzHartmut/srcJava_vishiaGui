@@ -76,7 +76,7 @@ import org.vishia.gral.gridPanel.PanelActivatedGui;
 import org.vishia.gral.gridPanel.PanelContent;
 import org.vishia.gral.gridPanel.PropertiesGui;
 import org.vishia.gral.gridPanel.TabPanel;
-import org.vishia.gral.ifc.ColorGui;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.FileDialogIfc;
 import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.GuiImageBase;
@@ -332,7 +332,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   }
 
   
-  @Override public WidgetCmpnifc createGridPanel(String namePanel, ColorGui backGround, int xG, int yG, int xS, int yS)
+  @Override public WidgetCmpnifc createGridPanel(String namePanel, GralColor backGround, int xG, int yG, int xS, int yS)
   {
     Color backColorSwt = propertiesGuiSwt.colorSwt(backGround);
     GridPanelSwt panel = new GridPanelSwt(graphicFrame, 0, backColorSwt, xG, yG, xS, yS);
@@ -566,7 +566,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   }
 
   
-  @Override public WidgetDescriptor addText(String sText, int origin, ColorGui textColor, ColorGui backColor)
+  @Override public WidgetDescriptor addText(String sText, int origin, GralColor textColor, GralColor backColor)
   {
     int mode;
     switch(origin){
@@ -818,7 +818,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
    */
   public void addLine(int colorValue, float xa, float ya, float xe, float ye){
   	if(currPanel.panelComposite instanceof CanvasStorePanelSwt){
-  		ColorGui color = propertiesGui.color(colorValue);
+  		GralColor color = propertiesGui.color(colorValue);
   		int xgrid = propertiesGui.xPixelUnit();
   		int ygrid = propertiesGui.yPixelUnit();
   		int x1 = (int)((pos.x + xa) * xgrid);
@@ -1339,7 +1339,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
    * @param content The content to insert.
    * @return
    */
-  public void setBackColor(WidgetDescriptor descr1, int ix, int color)
+  @Override public void setBackColor(WidgetDescriptor descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
   	WidgetDescriptor descr = (WidgetDescriptor) descr1;
   	setInfo(descr, GuiPanelMngWorkingIfc.cmdBackColor, ix, color, null);

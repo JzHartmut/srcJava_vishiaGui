@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.bridgeC.IllegalArgumentExceptionJc;
-import org.vishia.gral.ifc.ColorGui;
+import org.vishia.gral.ifc.GralColor;
 
 public class PropertiesGui
 {
@@ -77,12 +77,10 @@ public class PropertiesGui
   	  
   protected final int xPixelUnit;
 
-  private final Map<String, Integer> colorNames = new TreeMap<String, Integer>();
-
-  Map<Integer, ColorGui> colors = new TreeMap<Integer, ColorGui>();
+  //Map<Integer, GralColor> colors = new TreeMap<Integer, GralColor>();
 
   /**A common background color for all widgets which are paint at the background. */
-  public ColorGui colorBackground_;
+  public GralColor colorBackground_;
 
   
   /**The size of this propety set.*/
@@ -94,74 +92,15 @@ public class PropertiesGui
 	  if(size <0 || size >= stdInputFontSize.length) throw new IllegalArgumentException("parameter size should be 1.." + stdInputFontSize.length);
   	this.size = size; 
     this.xPixelUnit = xPixelUnit_[size];
-    setColorNames();
     colorBackground_ = color(0xeeeeee);
 	}
   
-
-  private void setColorNames(){
-  	colorNames.put("white",  0xffffff); 
-  	colorNames.put("gray",   0x808080);
-  	colorNames.put("black",  0x000000);
-  	colorNames.put("red",    0xff0000);
-  	colorNames.put("green",  0x00ff00);
-  	colorNames.put("blue",   0x0000ff);
-  	colorNames.put("yellow", 0xffff00);
-  	colorNames.put("magenta",0xff00ff);
-  	colorNames.put("cyan",   0x00ffff);
-  	colorNames.put("brown",  0x600020);
-  	colorNames.put("amber",  0xffe000);
-  	colorNames.put("orange",  0xffa000);
-  	colorNames.put("violet",  0x6000ff);
-    
-  	//saturated colors
-  	colorNames.put("wh", 0xffffff);
-  	colorNames.put("gr", 0x808080);
-  	colorNames.put("bk", 0x000000);
-  	colorNames.put("rd", 0xff0000);
-  	colorNames.put("gn", 0x00ff00);
-  	colorNames.put("bl", 0x0000ff);
-  	colorNames.put("ye", 0xffff00);
-  	colorNames.put("ma", 0xff00ff);
-  	colorNames.put("cy", 0x00ffff);
-  	colorNames.put("bn", 0x400000);
-  	colorNames.put("am", 0xffe000);
-  	colorNames.put("or", 0xffa000);
-  	colorNames.put("vi", 0x6000ff);
-    
-  	//light colors
-  	colorNames.put("lgr", 0xc0c0c0);
-  	colorNames.put("lrd", 0xff8080);
-  	colorNames.put("lgn", 0x80ff80);
-  	colorNames.put("lbl", 0x8080ff);
-  	colorNames.put("lye", 0xffff00);
-  	colorNames.put("lma", 0xff00ff);
-  	colorNames.put("lcy", 0x00ffff);
-  	colorNames.put("bn", 0x400000);
-    
-  	//pastel colors, especially for background color
-  	colorNames.put("pgr", 0xf0f0f0);
-  	colorNames.put("prd", 0xffe0e0);
-  	colorNames.put("pgn", 0xe0ffe0);
-  	colorNames.put("pbl", 0xe0e0ff);
-  	colorNames.put("pye", 0xffffa0);
-  	colorNames.put("pma", 0xffa0ff);
-  	colorNames.put("pcy", 0xa0ffff);
-
-  	//dark colors for forground
-  	colorNames.put("dgr", 0x404040);
-  	colorNames.put("drd", 0x800000);
-  	colorNames.put("dgn", 0x008000);
-  	colorNames.put("dbl", 0x000080);
-  	colorNames.put("dye", 0x606000);
-  	colorNames.put("dma", 0x600060);
-  	colorNames.put("dcy", 0x006060);
-  }
 	
 	public int getColorValue(String sColorName)
-	{ Integer colorValue = colorNames.get(sColorName);
-	  if(colorValue == null) return 0x606060;
-	  else return colorValue;
+	{ //Integer colorValue = 
+	  GralColor color = GralColor.getColor(sColorName);
+	  if(color == null) return 0x606060;
+	  else return color.getColorValue();
 	}
 	
   
@@ -171,14 +110,10 @@ public class PropertiesGui
    * @param colorValue red, green and blue
    * @return An instance of color
    */
-  public ColorGui color(int colorValue){
-    ColorGui color;
+  public GralColor color(int colorValue){
+    GralColor color;
     if(colorValue >=0 && colorValue < 0x1000000){
-      color = colors.get(colorValue);
-      if(color==null){
-        color = new ColorGui((colorValue >>16)&0xff, (colorValue >>8)&0xff, (colorValue)&0xff );
-        colors.put(colorValue, color);  //store it to reuse.
-      }
+      color = GralColor.getColor(colorValue);
     } else {
       throw new IllegalArgumentExceptionJc("color value fault", colorValue);
     }

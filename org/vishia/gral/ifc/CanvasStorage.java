@@ -18,7 +18,7 @@ public abstract class CanvasStorage
 	 */
 	public static class PaintOrder
 	{
-		PaintOrder(int paintWhat, int x1, int y1, int x2, int y2, ColorGui color) {
+		PaintOrder(int paintWhat, int x1, int y1, int x2, int y2, GralColor color) {
 			super();
 			this.paintWhat = paintWhat;
 			this.x1 = x1;
@@ -34,7 +34,7 @@ public abstract class CanvasStorage
 		/**Coordinates. */
 		public final int x1,y1,x2,y2;
 		
-		public final ColorGui color;
+		public final GralColor color;
 	}//class PaintOrder
 
 	
@@ -67,7 +67,7 @@ public abstract class CanvasStorage
 	 * @param x2
 	 * @param y2
 	 */
-	public void drawLine(ColorGui color, int x1, int y1, int x2, int y2){
+	public void drawLine(GralColor color, int x1, int y1, int x2, int y2){
 		PaintOrder order = new PaintOrder(paintLine, x1,y1,x2,y2, color);
 		paintOrders.add(order);  //paint it when drawBackground is invoked.
 	}

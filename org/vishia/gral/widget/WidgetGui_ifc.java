@@ -1,6 +1,6 @@
 package org.vishia.gral.widget;
 
-import org.vishia.gral.ifc.ColorGui;
+import org.vishia.gral.ifc.GralColor;
 
 
 /**This interface should support changing of widget of the underlying GUI.
@@ -11,9 +11,9 @@ import org.vishia.gral.ifc.ColorGui;
 public interface WidgetGui_ifc extends Widgetifc
 {
 
-  ColorGui setBackgroundColor(ColorGui color);
+  GralColor setBackgroundColor(GralColor color);
   
-  ColorGui setForegroundColor(ColorGui color);
+  GralColor setForegroundColor(GralColor color);
   
   String getText();
   

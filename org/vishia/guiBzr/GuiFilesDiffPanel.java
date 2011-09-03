@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
-import org.vishia.gral.ifc.ColorGui;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
@@ -45,9 +45,9 @@ public class GuiFilesDiffPanel
 
   private static final int columnMark = 2;
   
-  private static final ColorGui colorMarked = new ColorGui(128,255, 128);  //light green
+  private static final GralColor colorMarked = new GralColor(128,255, 128);  //light green
   
-  private static final ColorGui colorNonMarked = new ColorGui(255,255, 255);  //white
+  private static final GralColor colorNonMarked = new GralColor(255,255, 255);  //white
   
   final Map<String, TableLineGui_ifc> indexMarkedFiles = new TreeMap<String, TableLineGui_ifc>();
   

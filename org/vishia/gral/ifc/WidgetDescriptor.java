@@ -314,6 +314,11 @@ public class WidgetDescriptor
   { itsPanel.setInfo(this, cmd, ident, visibleInfo, null);
   }
   
+  
+  public void setBackColor(GralColor color, int ix){ itsPanel.setBackColor(this, ix, color.getColorValue()); }
+  
+  
+  
   /**Sets the current value of the content of the widget in the given context.
    * @param cmd see {@link GuiPanelMngWorkingIfc#cmdSet} etc. It is possible to set the color etc.
    * @param ident Any number to specify set, maybe 0

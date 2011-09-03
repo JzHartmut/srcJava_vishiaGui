@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.cfg.GuiCfgData;
-import org.vishia.gral.ifc.ColorGui;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.FileDialogIfc;
 import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
@@ -46,7 +46,7 @@ import org.vishia.gral.widget.WidgetCmpnifc;
  * <ul>
  * <li>Create a panel manager which is typeof {@link GuiPanelMngBase} or this interface.
  *   For example create {@link org.vishia.mainGuiSwt.GuiPanelMngSwt}.
- * <li>Create a panel, for example call {@link #createGridPanel(ColorGui, int, int, int, int)}
+ * <li>Create a panel, for example call {@link #createGridPanel(GralColor, int, int, int, int)}
  *   and add the panel to the given     
  * <li>Before add, you can select any given panel by String-identifier, using {@link #selectPanel(String)}.
  * <li>Before add, you have to determine the position and size using 
@@ -411,7 +411,7 @@ public interface GuiPanelMngBuildIfc
    * @param BackColor
    * @return
    */
-  WidgetDescriptor addText(String sText, int origin, ColorGui textColor, ColorGui BackColor);
+  WidgetDescriptor addText(String sText, int origin, GralColor textColor, GralColor BackColor);
   
   Object addImage(String sName, InputStream imageStream, int height, int width, String sCmd);
 
@@ -580,7 +580,7 @@ public interface GuiPanelMngBuildIfc
   /**Gets the named color. 
    * @param sName supported: red, green, blue, yellow
    */
-  ColorGui getColor(String sName);
+  GralColor getColor(String sName);
   
 
   /**Forces a newly paint of the GUI-container. 
@@ -629,7 +629,7 @@ public interface GuiPanelMngBuildIfc
    * @param yS
    * @return
    */
-  WidgetCmpnifc createGridPanel(String namePanel, ColorGui backGround, int xG, int yG, int xS, int yS);
+  WidgetCmpnifc createGridPanel(String namePanel, GralColor backGround, int xG, int yG, int xS, int yS);
   
   
   /**Removes a composite box from the graphic representation.

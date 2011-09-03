@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.gridPanel.PanelContent;
-import org.vishia.gral.ifc.ColorGui;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.gral.widget.TableGui_ifc;
@@ -397,16 +397,16 @@ public class TableSwt implements TableGui_ifc
     
 
     @Override
-    public ColorGui setBackgroundColor(ColorGui color)
-    { ColorGui oldColor = PropertiesGuiSwt.createColorGui(item.getBackground());
+    public GralColor setBackgroundColor(GralColor color)
+    { GralColor oldColor = PropertiesGuiSwt.createColorGui(item.getBackground());
       Color colorSwt = mng.propertiesGuiSwt.colorSwt(color.getColorValue());
       item.setBackground(colorSwt);
       return oldColor;
     }
     
     @Override
-    public ColorGui setForegroundColor(ColorGui color)
-    { ColorGui oldColor = PropertiesGuiSwt.createColorGui(item.getForeground());
+    public GralColor setForegroundColor(GralColor color)
+    { GralColor oldColor = PropertiesGuiSwt.createColorGui(item.getForeground());
       Color colorSwt = mng.propertiesGuiSwt.colorSwt(color.getColorValue());
       item.setForeground(colorSwt);
       return oldColor;
@@ -541,7 +541,7 @@ public class TableSwt implements TableGui_ifc
 
 
   @Override
-  public ColorGui setBackgroundColor(ColorGui color)
+  public GralColor setBackgroundColor(GralColor color)
   {
     // TODO Auto-generated method stub
     return null;
@@ -549,7 +549,7 @@ public class TableSwt implements TableGui_ifc
 
 
   @Override
-  public ColorGui setForegroundColor(ColorGui color)
+  public GralColor setForegroundColor(GralColor color)
   {
     // TODO Auto-generated method stub
     return null;

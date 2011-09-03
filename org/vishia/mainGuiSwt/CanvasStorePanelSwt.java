@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.gridPanel.PanelContent;
 import org.vishia.gral.ifc.CanvasStorage;
-import org.vishia.gral.ifc.ColorGui;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.gral.widget.WidgetCmpnifc;
 import org.vishia.gral.widget.Widgetifc;
@@ -51,7 +51,7 @@ public class CanvasStorePanelSwt extends PanelContent implements WidgetCmpnifc  
 	};
 	
 	
-	Color colorSwt(ColorGui colorGui)
+	Color colorSwt(GralColor colorGui)
 	{
 	  if(colorGui.colorGuimpl == null){
 	    colorGui.colorGuimpl = new Color(swtCanvas.getDisplay(), colorGui.red, colorGui.green, colorGui.blue);

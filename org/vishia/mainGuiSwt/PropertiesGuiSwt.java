@@ -9,7 +9,7 @@ import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
 import org.vishia.gral.gridPanel.PropertiesGui;
-import org.vishia.gral.ifc.ColorGui;
+import org.vishia.gral.ifc.GralColor;
 
 
 public class PropertiesGuiSwt extends PropertiesGui
@@ -65,7 +65,7 @@ public class PropertiesGuiSwt extends PropertiesGui
    * @param color The given color in system-indpending form.
    * @return An instance of SWT-color
    */
-  public Color colorSwt(ColorGui color)
+  public Color colorSwt(GralColor color)
   {
     int colorValue = color.getColorValue();
     if(color.colorGuimpl == null){
@@ -115,9 +115,9 @@ public class PropertiesGuiSwt extends PropertiesGui
    * @param color The SWT-color
    * @return a new instance.
    */
-  public static ColorGui createColorGui(Color color)
+  public static GralColor createColorGui(Color color)
   { RGB rgb = color.getRGB();
-    ColorGui ret = new ColorGui(rgb.red, rgb.green, rgb.blue);
+    GralColor ret = new GralColor(rgb.red, rgb.green, rgb.blue);
     return ret;
   }
   

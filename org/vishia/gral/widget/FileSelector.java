@@ -119,6 +119,7 @@ public class FileSelector implements Widgetifc
     //Text field for path above list
     panel.setPosition(posAll, GralPos.same, 2.0F, GralPos.same, GralPos.same, 1, 'd');
     widgdPath = panel.addTextField(name + "-Path", false, null, '.');
+    widgdPath.setBackColor(panel.getColor("pye"), 0xeeffff);  //color pastel yellow
     //the list
     panel.setPosition(posAll, 2.0F, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
     selectList.setToPanel(panel, name, rows, columns, size);
