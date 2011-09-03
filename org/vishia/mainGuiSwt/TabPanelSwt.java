@@ -9,6 +9,8 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.TabFolder;
@@ -55,7 +57,9 @@ public class TabPanelSwt extends TabPanel
   
   
 	@Override public PanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
-	{ TabItem tabItem = new TabItem(tabMng.widgetSwt, SWT.None);
+	{ ///
+	  Rectangle sizeTabFolder = tabMng.widgetSwt.getBounds();
+	  TabItem tabItem = new TabItem(tabMng.widgetSwt, SWT.None);
 	  tabItem.setText(sLabel);
 		CanvasStorePanelSwt panel;
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
@@ -64,6 +68,7 @@ public class TabPanelSwt extends TabPanel
 		} else {
 	  	panel = new GridPanelSwt(tabMng.widgetSwt, 0, colorBackground, mng.propertiesGui.xPixelUnit(), mng.propertiesGui.yPixelUnit(), 5, 5);
 		}
+	  panel.swtCanvas.setBounds(sizeTabFolder);
 	  panel.itsTabSwt = tabItem;
 		tabItem.setControl(panel.swtCanvas);
 		mng.registerPanel(sName, panel);

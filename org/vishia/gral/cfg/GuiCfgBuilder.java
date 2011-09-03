@@ -91,7 +91,7 @@ public class GuiCfgBuilder
   
   
   /**Builds the graphical widget inclusive its {@link WidgetDescriptor} and place it in the GUI.
-   * @param cfge The configuration element data read from config file or edit.
+   * @param cfge The configuration element data read from config file or set from the GUI-editor.
    * @return null if OK, an error String for a user info message on warning or error.
    *         It is possible that a named user action is not found etc. 
    */
@@ -162,8 +162,10 @@ public class GuiCfgBuilder
     //
     if(pos.xWidth == Integer.MAX_VALUE)
       stop();
-    gui.setFinePosition(pos.yPos, pos.yPosFrac, pos.ySizeDown + GralPos.size, pos.ySizeFrac
-        , pos.xPos, pos.xPosFrac, pos.xWidth + GralPos.size, pos.xSizeFrac, 1, 'r', null);
+    int heightArg = pos.ySizeDown == Integer.MAX_VALUE ? GralPos.useNatSize : pos.ySizeDown + GralPos.size;
+    int widthArg = pos.xWidth == Integer.MAX_VALUE ? GralPos.useNatSize : pos.xWidth + GralPos.size;
+    gui.setFinePosition(pos.yPos, pos.yPosFrac, heightArg, pos.ySizeFrac
+        , pos.xPos, pos.xPosFrac, widthArg, pos.xSizeFrac, 1, 'r', null);
     //
     WidgetDescriptor widgd = null;
     String sName = cfge.widgetType.name;

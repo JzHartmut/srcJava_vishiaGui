@@ -848,7 +848,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     Image image = new Image(((Composite)currPanel.panelComposite).getDisplay(), imageData); 
     GuiImageBase imageGui = new GuiImageSwt(image);
     GuiRectangle size = imageGui.getPixelSize();
-    GuiRectangle rr = calcWidgetPosAndSize(pos, 0, 0, size.dy, size.dx);
+    GuiRectangle rr = calcWidgetPosAndSize(pos, 0, 0, size.dx, size.dy);
     if(currPanel instanceof CanvasStorePanelSwt){
       CanvasStorePanelSwt canvas = (CanvasStorePanelSwt) currPanel;
       //coordinates are in pixel
