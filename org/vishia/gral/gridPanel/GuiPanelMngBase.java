@@ -690,7 +690,8 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
       currPanel.widgetsToResize.add(widgd);
     }
     indexNameWidgets.put(widgd.name, widgd);
-      
+    currPanel.widgetList.add(widgd);
+    
   }
   
   @Override public boolean setFocus(WidgetDescriptor widgd)

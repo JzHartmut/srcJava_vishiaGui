@@ -720,7 +720,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     	  showFields.put(widgetInfo.name, widgetInfo);
     	}
     }
-    currPanel.widgetList.add(widgetInfo);
+    registerWidget(widgetInfo);
     return widgetInfo; 
   
   }

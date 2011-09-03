@@ -204,7 +204,7 @@ public class JavaCmd extends GuiCfg
   private void buildTabFromSelection(SelectTab.SelectInfo info, TabPanel tabPanel)
   { 
     tabPanel.addGridPanel(info.tabName, info.tabName,1,1,10,10);
-    panelMng.setPosition(0, -2, 0, -0, 1, 'd');
+    panelMng.setPosition(0, 0, 0, -0, 1, 'd'); //the whole panel.
     FileSelector fileSelector = new FileSelector(mainCmd);
     idxFileSelector.put(info.tabName, fileSelector);
     fileSelector.setToPanel(panelMng, info.tabName, 5, new int[]{2,20,5,10}, 'A');
