@@ -109,11 +109,15 @@ public class TabPanelSwt extends TabPanel
 			if(container != null){
 			//TabFolder tabFolder = tab.getParent();
 				Object data = container.getData();
-				if(data != null && notifyingUserInstanceWhileSelectingTab !=null){
+				if(data != null){
 					@SuppressWarnings("unchecked")
 					PanelContent panelContent = (PanelContent)(data);
 					Queue<WidgetDescriptor> widgetInfos = panelContent.widgetList; 
-					notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);
+					if(notifyingUserInstanceWhileSelectingTab !=null){
+					  notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);
+					}
+					//TODO remove visible infos for last panel, active act panel.
+					mng.changeWidgets(widgetInfos);
 					currentPanel = panelContent;
 				}
 			}

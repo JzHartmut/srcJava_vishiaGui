@@ -82,8 +82,8 @@ public class JavaCmd extends GuiCfg
     //gui.set
     
     //Creates tab-Panels for the file lists and command lists.
-    tabCmd = panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate, GuiPanelMngBuildIfc.propZoomedPanel);
-    gui.addFrameArea(1,1,1,1, panelMng.tabPanel.getGuiComponent()); //dialogPanel);
+    tabCmd = panelMng.createTabPanel(null, GuiPanelMngBuildIfc.propZoomedPanel);
+    gui.addFrameArea(1,1,1,1, tabCmd.getGuiComponent()); //dialogPanel);
 
     int[] widthSelecttable = new int[]{2, 20, 30};
     
@@ -106,7 +106,7 @@ public class JavaCmd extends GuiCfg
     }
     
       
-    tabFile1 = panelMng.createTabPanel(panelContent.actionPanelActivate, GuiPanelMngBuildIfc.propZoomedPanel);
+    tabFile1 = panelMng.createTabPanel(null, GuiPanelMngBuildIfc.propZoomedPanel);
     gui.addFrameArea(2,1,1,1, tabFile1.getGuiComponent()); //dialogPanel);
     
     tabFile1.addGridPanel("Sel1", "a-F2",1,1,10,10);
@@ -121,7 +121,7 @@ public class JavaCmd extends GuiCfg
       if(info.active == 'm'){ buildTabFromSelection(info, tabFile1); }
     }
     
-    tabFile2 = panelMng.createTabPanel(panelContent.actionPanelActivate, GuiPanelMngBuildIfc.propZoomedPanel);
+    tabFile2 = panelMng.createTabPanel(null, GuiPanelMngBuildIfc.propZoomedPanel);
     gui.addFrameArea(3,1,1,1, tabFile2.getGuiComponent()); //dialogPanel);
       
     tabFile2.addGridPanel("Sel1", "a-F2",1,1,10,10);

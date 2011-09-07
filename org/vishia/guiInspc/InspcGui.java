@@ -29,8 +29,8 @@ public class InspcGui extends GuiCfg
     if(user !=null){
       user.init(userInspcPlug, console.getLogMessageOutputConsole());
     }
-    this.inspcComm = new InspcGuiComm(console, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
-    inspcComm.addPanel(panelContent);
+    this.inspcComm = new InspcGuiComm(console, panelMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
+    //inspcComm.addPanel(panelContent);
 
   }
   
@@ -103,22 +103,17 @@ public class InspcGui extends GuiCfg
 
   
   
-  /**Initializes the areas for the configuration panels. It is called in the graphic thread.
+  /**Initializes the areas for the panels and configure the panels.
+   * This routine can be overridden if other areas are need.
    */
   @Override protected void initGuiAreas()
   {
     gui.setFrameAreaBorders(20, 80, 60, 85);
     gui.setStandardMenusGThread(new File("."), actionFile);
-
-    
-    //Creates a Tab-Panel:
-    panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate, 0);
-    panelMng.tabPanel.addGridPanel("operation", "&Operation",1,1,10,10);
       
-    gui.addFrameArea(1,1,3,2, panelMng.tabPanel.getGuiComponent()); //dialogPanel);
+    gui.addFrameArea(1,1,3,2, mainTabPanel.getGuiComponent()); //dialogPanel);
    
   }
-
 
   
   /**The user may contain any other routines which are Inspc-specific. 

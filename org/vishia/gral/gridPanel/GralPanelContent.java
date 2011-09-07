@@ -10,7 +10,7 @@ import org.vishia.gral.ifc.WidgetDescriptor;
  * @author Hartmut Schorrig
  *
  */
-public class GralPanelContent
+abstract class GralPanelContent
 {
   /**The actual widgets in that panel. It may a sub-panel or changed content. The list can be changed. */
   public Queue<WidgetDescriptor> widgets;

@@ -317,6 +317,8 @@ public class WidgetDescriptor
   
   public void setBackColor(GralColor color, int ix){ itsPanel.setBackColor(this, ix, color.getColorValue()); }
   
+  public void setLineColor(GralColor color, int ix){ itsPanel.setLineColor(this, ix, color.getColorValue()); }
+  
   
   
   /**Sets the current value of the content of the widget in the given context.

@@ -48,7 +48,8 @@ public class ButtonSwt extends Canvas
 		this.mng = mng;
 		black = mng.propertiesGuiSwt.colorSwt(0);
 		white = mng.propertiesGuiSwt.colorSwt(0xffffff);
-		
+		setForeground(black);
+    
 	  addPaintListener(paintListener);	
 	}
 
@@ -71,7 +72,8 @@ public class ButtonSwt extends Canvas
 			//gc.d
 			Rectangle dim = ButtonSwt.this.getBounds();
 			drawBackground(e.gc, dim.x+1, dim.y+1, dim.width-1, dim.height-1);
-			gc.setForeground(black);  //black
+			Color color = getForeground(); //of the widget.
+			gc.setForeground(color);  //black
 			gc.setFont(fontText);
 			//FontData fontData = mng.propertiesGui.stdButtonFont.getFontData();
 			//fontData.

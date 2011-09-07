@@ -38,6 +38,10 @@ public interface GuiPanelMngWorkingIfc
   
   final static int cmdBackColor = 0xbacc0103;     //add
   
+  final static int cmdLineColor = 0x111c0103;
+  
+  final static int cmdTextColor = 0x1e8c0103;     //add
+  
   final static int cmdColor = 0xc0103;
   
   final static int cmdRedraw = 0x3ed3a2;  //redraw
@@ -111,6 +115,24 @@ public interface GuiPanelMngWorkingIfc
   void setBackColor(WidgetDescriptor widgetDescr, int ix, int colorValue);
   
   
+  /**Sets the color of line of the widget, if possible.
+   * @param name The name of the widget, which was given by the add...()-Operation
+   * @ix may be a line number of table or an position identifier. 0 if unused for the kind of widget. 
+   * @param colorValue blue, green and red in the bits 23..16, 15..8 and 7..0. 
+   *        opaque in bits 31..24 if possible. 
+   */
+  void setLineColor(WidgetDescriptor widgetDescr, int ix, int colorValue);
+  
+  
+  /**Sets the color of text of the widget, if possible.
+   * @param name The name of the widget, which was given by the add...()-Operation
+   * @ix may be a line number of table or an position identifier. 0 if unused for the kind of widget. 
+   * @param colorValue blue, green and red in the bits 23..16, 15..8 and 7..0. 
+   *        opaque in bits 31..24 if possible. 
+   */
+  void setTextColor(WidgetDescriptor widgetDescr, int ix, int colorValue);
+  
+  
   void setLed(WidgetDescriptor widgetDescr, int colorBorder, int colorInner);
   
   /**Adds a sampling value set.
@@ -179,5 +201,11 @@ public interface GuiPanelMngWorkingIfc
    */
   List<WidgetDescriptor> getWidgetsInFocus();
   
+  
+  /**Gets the list of all widgets which are visible yet and should be updated with valuew. 
+   * This method uses the widgets, which are set calling {@link #changeWidgets()}. 
+   * @return The list.
+   */
+  Queue<WidgetDescriptor> getWidgetsVisible();
 	
 }

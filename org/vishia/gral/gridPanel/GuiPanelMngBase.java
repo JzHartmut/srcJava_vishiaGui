@@ -20,6 +20,7 @@ import org.vishia.gral.cfg.GuiCfgWriter;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.FileDialogIfc;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.ifc.GuiPlugUser_ifc;
 import org.vishia.gral.ifc.GuiRectangle;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
@@ -148,7 +149,8 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   
   public boolean bDesignMode = false;
   
-
+  /**Some actions may be processed by a user implementation. */
+  //private final GuiPlugUser_ifc user;
   
   protected boolean bDesignerIsInitialized = false;
   
@@ -162,10 +164,6 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   /**Properties of this Dialog Window. */
   public  final PropertiesGui propertiesGui;
 
-  /**Any kind of TabPanel for this PanelManager TODO make protected
-   */
-  public TabPanel tabPanel;
-  
   /**Index of all input fields to access symbolic for all panels. */
   protected final Map<String, WidgetDescriptor> indexNameWidgets = new TreeMap<String, WidgetDescriptor>();
 
@@ -176,6 +174,17 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   //private final IndexMultiTable showFieldsM;
 
   private List<WidgetDescriptor> widgetsInFocus = new LinkedList<WidgetDescriptor>();
+ 
+  /**The actual widgets in the visible panel. It may a sub-panel or changed content. The list can be changed. */
+  public Queue<WidgetDescriptor> widgetsVisible;
+  
+  /**A new list of actual widgets, set while select another tab etc. The reference may be set 
+   * in the GUI-Thread (GUI-listener). The communication-manager thread reads whether it isn't null,
+   * processes it and sets this reference to null if it is processed. */
+  public Queue<WidgetDescriptor> newWidgetsVisible;
+  
+
+  
   
   protected final LogMessage log;
   
@@ -590,6 +599,10 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   /**Map of all panels. A panel may be a dialog box etc. */
   protected final Map<String,PanelContent> panels = new TreeMap<String,PanelContent>();
   
+  /**Any kind of TabPanel for this PanelManager TODO make protected
+   */
+  public TabPanel currTabPanel;
+  
   public PanelContent currPanel;
   
   protected String sCurrPanel;
@@ -693,6 +706,129 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
     currPanel.widgetList.add(widgd);
     
   }
+  
+  /**Changes the communication data base because another tab was activated on the TabPanel. 
+   * @param newWidgets The new widgets.
+   */
+  //@Override 
+  public void changeWidgets(Queue<WidgetDescriptor> newWidgetsP)
+  {
+    this.newWidgetsVisible = newWidgetsP; //signal for other thread, there are new one.
+    //if(user !=null){ user.changedView("unknown yet", 0); }
+  }
+  
+  
+  @Override public Queue<WidgetDescriptor> getWidgetsVisible()
+  {
+    if(newWidgetsVisible !=null){
+      //if(panel.widgetList !=null){
+        //remove communication request for actual widgets.
+      //}
+      widgetsVisible = newWidgetsVisible;
+      newWidgetsVisible = null;
+    }
+    
+    return widgetsVisible;
+  }
+
+  
+  
+  public PanelActivatedGui actionPanelActivate = new PanelActivatedGui()
+  { @Override public void panelActivatedGui(Queue<WidgetDescriptor> widgetsP)
+    {  changeWidgets(widgetsP);
+    }
+  };
+
+
+  
+  protected void checkAdmissibility(boolean value){
+    if(!value){
+      throw new IllegalArgumentException("failure");
+    }
+  }
+  
+  
+  /**Sets the background color of any widget. The widget may be for example:
+   * <ul>
+   * <li>a Table: Then a new line will be colored. 
+   * <li>a Tree: Then a new leaf is colored.
+   * <li>a Text-edit-widget: Then the field background color is set.
+   * </ul>
+   * The color is written into a queue, which is red in another thread. 
+   * It may be possible too, that the GUI is realized in another module, maybe remote.
+   * It means, that a few milliseconds should be planned before the change appears.
+   * If the thread doesn't run or the remote receiver isn't present, 
+   * than the queue may be overflowed or the request may be lost.
+   *    
+   * @param name The name of the widget, which was given by the add...()-Operation
+   * @param ident A identifying number. It meaning depends on the kind of widget.
+   *        0 means, insert on top.  Integer.MAXVALUE means, insert after the last element (append).
+   * @param content The content to insert.
+   * @return
+   */
+  public void setBackColor(String name, int ix, int color)
+  {
+    WidgetDescriptor descr = indexNameWidgets.get(name);
+    if(descr == null){
+      log.sendMsg(0, "GuiMainDialog:setBackColor: unknown widget %s", name);
+    } else {
+      setBackColor(descr, ix, color);
+    }
+  } 
+  
+  
+  /**Sets the background color of any widget. The widget may be for example:
+   * <ul>
+   * <li>a Table: Then a new line will be colored. 
+   * <li>a Tree: Then a new leaf is colored.
+   * <li>a Text-edit-widget: Then the field background color is set.
+   * </ul>
+   * The color is written into a queue, which is red in another thread. 
+   * It may be possible too, that the GUI is realized in another module, maybe remote.
+   * It means, that a few milliseconds should be planned before the change appears.
+   * If the thread doesn't run or the remote receiver isn't present, 
+   * than the queue may be overflowed or the request may be lost.
+   *    
+   * @param name The name of the widget, which was given by the add...()-Operation
+   * @param ident A identifying number. It meaning depends on the kind of widget.
+   *        0 means, insert on top.  Integer.MAXVALUE means, insert after the last element (append).
+   * @param content The content to insert.
+   * @return
+   */
+  @Override public void setBackColor(WidgetDescriptor descr1, int ix, int color)
+  { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
+    WidgetDescriptor descr = (WidgetDescriptor) descr1;
+    setInfo(descr, GuiPanelMngWorkingIfc.cmdBackColor, ix, color, null);
+  } 
+  
+  
+  @Override public void setLineColor(WidgetDescriptor descr1, int ix, int color)
+  { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
+    WidgetDescriptor descr = (WidgetDescriptor) descr1;
+    setInfo(descr, GuiPanelMngWorkingIfc.cmdLineColor, ix, color, null);
+  } 
+  
+  
+  @Override public void setTextColor(WidgetDescriptor descr1, int ix, int color)
+  { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
+    WidgetDescriptor descr = (WidgetDescriptor) descr1;
+    setInfo(descr, GuiPanelMngWorkingIfc.cmdTextColor, ix, color, null);
+  } 
+  
+  
+  @Override public void setLed(WidgetDescriptor widgetDescr, int colorBorder, int colorInner)
+  {
+    @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
+    WidgetDescriptor descr = (WidgetDescriptor) widgetDescr;
+    setInfo(descr, GuiPanelMngWorkingIfc.cmdColor, colorBorder, colorInner, null);
+    
+  }
+  
+  
+  
+  
+
+  
   
   @Override public boolean setFocus(WidgetDescriptor widgd)
   {

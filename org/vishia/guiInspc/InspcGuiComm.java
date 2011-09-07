@@ -3,12 +3,13 @@ package org.vishia.guiInspc;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InspcDataExchangeAccess.Info;
-import org.vishia.gral.gridPanel.GralPanelContent;
+import org.vishia.gral.gridPanel.PanelContent;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
@@ -100,6 +101,8 @@ public class InspcGuiComm
   /**To Output log informations. The ouput will be done in the output area of the graphic. */
   private final Report console;
 
+  private final GuiPanelMngWorkingIfc mng;
+  
   private final InspcPlugUser_ifc user;
   
   /**Instance for the inspector access to the target. */
@@ -131,16 +134,17 @@ public class InspcGuiComm
    * Any Panel can be an independent window. Any panel may have other values to show.
    * But any panel can select more as one tabs (tabPanel). Then it will be select which values to show.
    */
-  private final List<GralPanelContent> listPanels = new LinkedList<GralPanelContent>();
+  //private final List<PanelContent> listPanels = new LinkedList<PanelContent>();
   
 
   public ConcurrentLinkedQueue<Runnable> userOrders = new ConcurrentLinkedQueue<Runnable>();
   
   
   
-  InspcGuiComm(Report console, Map<String, String> indexTargetIpcAddr, InspcPlugUser_ifc user)
+  InspcGuiComm(Report console, GuiPanelMngWorkingIfc mng, Map<String, String> indexTargetIpcAddr, InspcPlugUser_ifc user)
   {
     this.console = console;
+    this.mng = mng;
     this.user = user;
     this.inspcAccessor = new InspcAccessor(new InspcAccessEvaluatorRxTelg());
     this.indexTargetIpcAddr = indexTargetIpcAddr;
@@ -150,9 +154,9 @@ public class InspcGuiComm
   }
   
   
-  void addPanel(GralPanelContent panel)
+  void xxxaddPanel(PanelContent panel)
   {
-    listPanels.add(panel);
+    //listPanels.add(panel);
   }
   
   
@@ -187,15 +191,9 @@ public class InspcGuiComm
     bUserCalled = false;
     //
     //
-    for(GralPanelContent panel: listPanels){
-      if(panel.newWidgets !=null){
-        if(panel.widgets !=null){
-          //remove communication request for actual widgets.
-        }
-        panel.widgets = panel.newWidgets;
-        panel.newWidgets = null;
-      }
-      if(panel.widgets !=null) for(WidgetDescriptor widget: panel.widgets){
+    //for(PanelContent panel: listPanels){
+      Queue<WidgetDescriptor> widgetsVisible = mng.getWidgetsVisible();
+      if(widgetsVisible !=null) for(WidgetDescriptor widget: widgetsVisible){
         
         if(widget.whatIs == 'D'){
           int cc = 0;
@@ -214,7 +212,7 @@ public class InspcGuiComm
           actionShowTextfield.userActionGui("tx", widget);
         }
       }//for widgets in panel
-    }
+    //}
     Runnable userOrder;
     if(inspcAccessor.isFilledTxTelg()){
       sendAndAwaitAnswer();

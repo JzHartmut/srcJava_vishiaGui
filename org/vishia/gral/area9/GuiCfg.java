@@ -9,9 +9,9 @@ import org.vishia.gral.cfg.GuiCfgData;
 import org.vishia.gral.cfg.GuiCfgZbnf;
 import org.vishia.gral.gridPanel.GuiDialogZbnfControlled;
 import org.vishia.gral.gridPanel.GuiPanelMngBase;
-import org.vishia.gral.gridPanel.GralPanelContent;
 import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.gridPanel.PropertiesGui;
+import org.vishia.gral.gridPanel.TabPanel;
 import org.vishia.gral.ifc.GraphicBaseFactory_ifc;
 import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
@@ -54,7 +54,7 @@ public class GuiCfg
   /**To Output log informations. The ouput will be done in the output area of the graphic. */
   protected final Report console;
 
-  protected final GralPanelContent panelContent;
+  //protected final GralPanelContent panelContent;
 
     
 
@@ -99,6 +99,9 @@ protected GuiPanelMngBase panelMng;
 protected GuiPanelMngBuildIfc panelBuildIfc;
 
 protected GuiPanelMngWorkingIfc guiAccess;
+
+protected TabPanel mainTabPanel;
+
 
 /**ctor for the main class of the application. 
  * The main class can be created in some other kinds as done in static main too.
@@ -149,7 +152,7 @@ public GuiCfg(GuiCallingArgs cargs, GuiMainCmd cmdGui)
   panelBuildIfc = panelMng;
   guiAccess = panelMng;
   
-  panelContent = new GralPanelContent(user);
+  //panelContent = new PanelContent(user);
   if(user !=null){
     user.registerMethods(panelBuildIfc);
   }
@@ -182,6 +185,7 @@ GuiDispatchCallbackWorker initGuiDialog = new GuiDispatchCallbackWorker()
 {
   @Override public void doBeforeDispatching(boolean onlyWakeup)
   {
+    mainTabPanel = panelMng.createTabPanel(null, 0);
     initGuiAreas();
     gui.removeDispatchListener(this);    
     countExecution();
@@ -220,21 +224,8 @@ protected void initGuiAreas()
 {
   gui.setFrameAreaBorders(20, 80, 60, 85);
   gui.setStandardMenusGThread(new File("."), actionFile);
-
-  
-  //Creates a Tab-Panel:
-  panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate, 0);
-  panelMng.tabPanel.addGridPanel("operation", "&Operation",1,1,10,10);
     
-  gui.addFrameArea(1,1,3,1, panelMng.tabPanel.getGuiComponent()); //dialogPanel);
-  //##
-  /*
-  WidgetCmpnifc msgPanel = panelMng.createGridPanel(  
-      panelMng.propertiesGui.colorBackground_
-      , panelMng.propertiesGui.xPixelUnit(), panelMng.propertiesGui.yPixelUnit(), 5, 5);
-  panelMng.registerPanel("msg", msgPanel);
-  gui.addFrameArea(1,2,3,1, msgPanel); //dialogPanel);
-  */
+  gui.addFrameArea(1,1,3,1, mainTabPanel.getGuiComponent()); //dialogPanel);
  
 }
 

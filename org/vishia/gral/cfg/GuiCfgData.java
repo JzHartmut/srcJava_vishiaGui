@@ -182,7 +182,7 @@ public final class GuiCfgData
     public boolean xPosRelative;
     public int xPos = -1, xPosFrac;
     public int xWidth, xSizeFrac;
-    boolean xIncr_ = true;
+    boolean xIncr_ = false;
     
     public void set_xIncr(){ xIncr_ = true; yIncr_ = false; }
     public void set_yIncr(){ yIncr_ = true; xIncr_ = false; }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.gral.ifc.GuiPlugUser_ifc;
 import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.gral.widget.WidgetCmpnifc;
 
@@ -34,8 +35,7 @@ public abstract class PanelContent implements WidgetCmpnifc
 	/**List of all widgets which are contained in this panel.
 	 * This list is used in the communication thread to update the widget's content.
 	 */
-	//public final List<WidgetDescriptor> widgetList = new LinkedList<WidgetDescriptor>();
-	public final Queue<WidgetDescriptor> widgetList = new ConcurrentLinkedQueue<WidgetDescriptor>();
+	public Queue<WidgetDescriptor> widgetList = new ConcurrentLinkedQueue<WidgetDescriptor>();
 
   public List<WidgetDescriptor> widgetsToResize = new LinkedList<WidgetDescriptor>();
 
@@ -63,8 +63,10 @@ public abstract class PanelContent implements WidgetCmpnifc
 	}
 	
 	
-	protected PanelContent(){}
+	
+	protected PanelContent(){ }
 
+	
 
   @Override public Object getWidget()
   { return panelComposite;

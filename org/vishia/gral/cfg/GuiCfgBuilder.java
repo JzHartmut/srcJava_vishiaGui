@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import org.vishia.gral.cfg.GuiCfgData.GuiCfgElement;
 import org.vishia.gral.gridPanel.GralPos;
 import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.msgDispatch.LogMessage;
@@ -104,11 +105,17 @@ public class GuiCfgBuilder
     if(cfge.widgetType.text !=null && cfge.widgetType.text.equals("wd:yCos"))
       stop();
 
+    pos.xIncr_ = inp.xIncr_ || (!inp.yIncr_ && prevPos.xIncr_);  //inherit xIncr but not if yIncr. 
+    pos.yIncr_ = inp.yIncr_ || (!inp.xIncr_ && prevPos.yIncr_);
+    final char dirNext;
+    if(inp.yIncr_){ dirNext = 'd';}
+    else if(inp.xIncr_){ dirNext = 'r';}
+    else { dirNext = '.'; }
     //yPos
     if(inp.yPos >=0){
       pos.yPos = inp.yPos;
       pos.yPosFrac = inp.yPosFrac;
-    } else if(prevPos.yIncr_){ //position = previous + heigth/width
+    } else if(pos.yIncr_){ //position = previous + heigth/width
       int yPosAdd = 0;  
       if(prevPos.ySizeDown >=0){ //positive if yPos is on top of widget.
         pos.yPosFrac = prevPos.yPosFrac + prevPos.ySizeFrac;  //frac part from pos + size
@@ -126,7 +133,8 @@ public class GuiCfgBuilder
     if(inp.xPos >=0){
       pos.xPos = inp.xPos;
       pos.xPosFrac = inp.xPosFrac;
-    } else if(prevPos.xIncr_){ //position = previous + heigth/width
+    } else if(pos.xIncr_ || (inp.yPos < 0 && ! pos.yIncr_)){ //if same x and y but no increment, then default increment x 
+      //position = previous + width
       int xPosAdd = 0;  
       if(prevPos.xWidth >=0){ //positive if yPos is on top of widget.
         pos.xPosFrac = prevPos.xPosFrac + prevPos.xSizeFrac;
@@ -156,8 +164,6 @@ public class GuiCfgBuilder
       pos.xSizeFrac = prevPos.xSizeFrac;
     }
     //
-    pos.xIncr_ = inp.xIncr_ || (!inp.yIncr_ && prevPos.xIncr_);  //inherit xIncr but not if yIncr. 
-    pos.yIncr_ = inp.yIncr_ || (!inp.yIncr_ && prevPos.yIncr_);
     pos.panel = inp.panel !=null ? inp.panel : prevPos.panel;
     //
     if(pos.xWidth == Integer.MAX_VALUE)
@@ -165,7 +171,7 @@ public class GuiCfgBuilder
     int heightArg = pos.ySizeDown == Integer.MAX_VALUE ? GralPos.useNatSize : pos.ySizeDown + GralPos.size;
     int widthArg = pos.xWidth == Integer.MAX_VALUE ? GralPos.useNatSize : pos.xWidth + GralPos.size;
     gui.setFinePosition(pos.yPos, pos.yPosFrac, heightArg, pos.ySizeFrac
-        , pos.xPos, pos.xPosFrac, widthArg, pos.xSizeFrac, 1, 'r', null);
+        , pos.xPos, pos.xPosFrac, widthArg, pos.xSizeFrac, 1, dirNext, null);
     //
     WidgetDescriptor widgd = null;
     String sName = cfge.widgetType.name;
@@ -235,6 +241,7 @@ public class GuiCfgBuilder
       widgd = null;
     }
     if(widgd !=null){
+      //set common attributes for widgets:
       String sShowMethod = cfge.widgetType.showMethod;
       if(sShowMethod !=null){
         UserActionGui actionShow = gui.getRegisteredUserAction(sShowMethod);
@@ -257,6 +264,16 @@ public class GuiCfgBuilder
       if(sFormat !=null){
          widgd.setFormat(sFormat);
       }
+      if(cfge.widgetType.colorName != null){
+        widgd.setBackColor(GralColor.getColor(cfge.widgetType.colorName.color), 0);
+      }
+      if(cfge.widgetType.color0 != null){
+        widgd.setBackColor(GralColor.getColor(cfge.widgetType.color0.color), 0);
+      }
+      if(cfge.widgetType.color1 != null){
+        widgd.setLineColor(GralColor.getColor(cfge.widgetType.color1.color), 0);
+      }
+      //save the configuration element as association from the widget.
       widgd.setCfgElement(cfge);
     }
     return sError;
