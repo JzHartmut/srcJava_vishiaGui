@@ -39,6 +39,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -475,6 +477,23 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   
   
   
+  KeyListener keyListener = new KeyListener()
+  {
+    @Override public void keyPressed(KeyEvent key)
+    {
+      // TODO Auto-generated method stub
+      stop();
+    }
+
+    @Override public void keyReleased(KeyEvent e)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+    
+  };
+  
+  
   MouseListener mouseListener = new MouseListener()
   {
     int captureAreaDivider;
@@ -558,6 +577,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
       guiDevice = new Display ();
       guiDevice.addFilter(SWT.Close, windowsCloseListener);
       graphicFrame = new Shell(guiDevice); //, SWT.ON_TOP | SWT.MAX | SWT.TITLE);
+      graphicFrame.addKeyListener(keyListener);
       graphicFrame.open();
     	
       //graphicFramePos = new Position(graphicFrame.getContentPane());

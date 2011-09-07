@@ -245,6 +245,7 @@ public class TableSwt implements TableGui_ifc
     {
       final WidgetDescriptor widgetDescr;
       final UserActionGui action;
+      System.out.println("" + keyEv.character + Integer.toHexString(keyEv.keyCode));
       final Object source = keyEv.getSource();
       if(source instanceof Control){
         Object oData = ((Control)source).getData();
