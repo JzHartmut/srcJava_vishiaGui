@@ -1,12 +1,15 @@
 package org.vishia.gral.gridPanel;
 
 import java.util.Map;
+import java.util.Queue;
 import java.util.TreeMap;
 
+import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
+import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.gral.widget.WidgetCmpnifc;
 
 
-/**This class is the common base class for Tab-Panels.
+/**This class is the common base class for Tabbed-Panels.
  * A TabPanel is the container for Tabs. It doesn't contain other widgets than Tabs.
  * A Tab inside the TabPanel is a usability Panel.
  * <ul>
@@ -15,7 +18,7 @@ import org.vishia.gral.widget.WidgetCmpnifc;
  * @author Hartmut Schorrig
  *
  */
-public abstract class TabPanel
+public abstract class GralTabbedPanel implements GralVisibleWidgets_ifc
 {
 	final protected PanelActivatedGui notifyingUserInstanceWhileSelectingTab;
 	
@@ -23,10 +26,20 @@ public abstract class TabPanel
 
 	protected PanelContent currentPanel;
 	
+  /**The actual widgets in the visible panel. It may a sub-panel or changed content. The list can be changed. */
+  public Queue<WidgetDescriptor> widgetsVisible;
+
+  /**A new list of actual widgets, set while select another tab etc. The reference may be set 
+   * in the GUI-Thread (GUI-listener). The communication-manager thread reads whether it isn't null,
+   * processes it and sets this reference to null if it is processed. */
+  public Queue<WidgetDescriptor> newWidgetsVisible;
+  
+
+
 	/**The constructor can only be invoked from a implementing class.
 	 * @param user
 	 */
-	protected TabPanel(PanelActivatedGui user, int property)
+	protected GralTabbedPanel(PanelActivatedGui user, int property)
 	{ this.notifyingUserInstanceWhileSelectingTab = user;
 	}
 	
@@ -50,5 +63,20 @@ public abstract class TabPanel
 	abstract public WidgetCmpnifc getGuiComponent();
 	
 	public PanelContent getCurrentPanel(){ return currentPanel; }
+	
+  @Override public Queue<WidgetDescriptor> getWidgetsVisible()
+  {
+    if(newWidgetsVisible !=null){
+      //if(panel.widgetList !=null){
+        //remove communication request for actual widgets.
+      //}
+      widgetsVisible = newWidgetsVisible;
+      newWidgetsVisible = null;
+    }
+    
+    return widgetsVisible;
+  }
+
+  
 	
 }

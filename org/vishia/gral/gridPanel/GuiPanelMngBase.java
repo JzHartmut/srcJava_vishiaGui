@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.eclipse.swt.widgets.Control;
 import org.vishia.byteData.VariableContainer_ifc;
@@ -19,6 +20,7 @@ import org.vishia.gral.cfg.GuiCfgDesigner;
 import org.vishia.gral.cfg.GuiCfgWriter;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.FileDialogIfc;
+import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
 import org.vishia.gral.ifc.GuiPlugUser_ifc;
 import org.vishia.gral.ifc.GuiRectangle;
@@ -175,16 +177,11 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
 
   private List<WidgetDescriptor> widgetsInFocus = new LinkedList<WidgetDescriptor>();
  
-  /**The actual widgets in the visible panel. It may a sub-panel or changed content. The list can be changed. */
-  public Queue<WidgetDescriptor> widgetsVisible;
   
-  /**A new list of actual widgets, set while select another tab etc. The reference may be set 
-   * in the GUI-Thread (GUI-listener). The communication-manager thread reads whether it isn't null,
-   * processes it and sets this reference to null if it is processed. */
-  public Queue<WidgetDescriptor> newWidgetsVisible;
-  
-
-  
+  /**List of all panels which may be visible yet. 
+   * The list can be iterated. Therefore it is lock-free multi-threading accessible.
+   */
+  protected final ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listVisiblePanels = new ConcurrentLinkedQueue<GralVisibleWidgets_ifc>();
   
   protected final LogMessage log;
   
@@ -601,7 +598,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   
   /**Any kind of TabPanel for this PanelManager TODO make protected
    */
-  public TabPanel currTabPanel;
+  public GralTabbedPanel currTabPanel;
   
   public PanelContent currPanel;
   
@@ -707,35 +704,11 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
     
   }
   
-  /**Changes the communication data base because another tab was activated on the TabPanel. 
-   * @param newWidgets The new widgets.
-   */
-  //@Override 
-  public void changeWidgets(Queue<WidgetDescriptor> newWidgetsP)
-  {
-    this.newWidgetsVisible = newWidgetsP; //signal for other thread, there are new one.
-    //if(user !=null){ user.changedView("unknown yet", 0); }
-  }
-  
-  
-  @Override public Queue<WidgetDescriptor> getWidgetsVisible()
-  {
-    if(newWidgetsVisible !=null){
-      //if(panel.widgetList !=null){
-        //remove communication request for actual widgets.
-      //}
-      widgetsVisible = newWidgetsVisible;
-      newWidgetsVisible = null;
-    }
-    
-    return widgetsVisible;
-  }
-
   
   
   public PanelActivatedGui actionPanelActivate = new PanelActivatedGui()
   { @Override public void panelActivatedGui(Queue<WidgetDescriptor> widgetsP)
-    {  changeWidgets(widgetsP);
+    {  //changeWidgets(widgetsP);
     }
   };
 
@@ -826,7 +799,11 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   
   
   
-  
+  @Override public ConcurrentLinkedQueue<GralVisibleWidgets_ifc> getVisiblePanels()
+  {
+    return listVisiblePanels;
+  }
+
 
   
   

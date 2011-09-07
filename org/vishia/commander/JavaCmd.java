@@ -14,7 +14,7 @@ import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GuiMainCmd;
 import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
-import org.vishia.gral.gridPanel.TabPanel;
+import org.vishia.gral.gridPanel.GralTabbedPanel;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.gral.widget.CommandSelector;
@@ -38,7 +38,7 @@ public class JavaCmd extends GuiCfg
   
   private final CallingArgs cargs;
   
-  TabPanel tabCmd, tabFile1, tabFile2;
+  GralTabbedPanel tabCmd, tabFile1, tabFile2;
   
   WidgetCmpnifc panelButtons;
   
@@ -201,7 +201,7 @@ public class JavaCmd extends GuiCfg
   /**Builds a tab for file or command view from a selected line of selection.
    * @param info The selection info
    */
-  private void buildTabFromSelection(SelectTab.SelectInfo info, TabPanel tabPanel)
+  private void buildTabFromSelection(SelectTab.SelectInfo info, GralTabbedPanel tabPanel)
   { 
     tabPanel.addGridPanel(info.tabName, info.tabName,1,1,10,10);
     panelMng.setPosition(0, 0, 0, -0, 1, 'd'); //the whole panel.

@@ -75,7 +75,7 @@ import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
 import org.vishia.gral.gridPanel.PanelActivatedGui;
 import org.vishia.gral.gridPanel.PanelContent;
 import org.vishia.gral.gridPanel.PropertiesGui;
-import org.vishia.gral.gridPanel.TabPanel;
+import org.vishia.gral.gridPanel.GralTabbedPanel;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.FileDialogIfc;
 import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
@@ -531,9 +531,10 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
 
 
   
-	@Override public TabPanel createTabPanel(PanelActivatedGui user, int property)
+	@Override public GralTabbedPanel createTabPanel(PanelActivatedGui user, int property)
 	{
 		currTabPanel = new TabPanelSwt(this, user, property);
+		listVisiblePanels.add(currTabPanel);
 		return currTabPanel;
 	}
 	

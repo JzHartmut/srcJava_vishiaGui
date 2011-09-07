@@ -11,7 +11,7 @@ import org.vishia.gral.gridPanel.GuiDialogZbnfControlled;
 import org.vishia.gral.gridPanel.GuiPanelMngBase;
 import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
 import org.vishia.gral.gridPanel.PropertiesGui;
-import org.vishia.gral.gridPanel.TabPanel;
+import org.vishia.gral.gridPanel.GralTabbedPanel;
 import org.vishia.gral.ifc.GraphicBaseFactory_ifc;
 import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
@@ -100,7 +100,7 @@ protected GuiPanelMngBuildIfc panelBuildIfc;
 
 protected GuiPanelMngWorkingIfc guiAccess;
 
-protected TabPanel mainTabPanel;
+protected GralTabbedPanel mainTabPanel;
 
 
 /**ctor for the main class of the application. 

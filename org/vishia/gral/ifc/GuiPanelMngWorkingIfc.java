@@ -2,6 +2,7 @@ package org.vishia.gral.ifc;
 
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 /**This is a unique interface for the GUI-panel-manager to work with it.
@@ -202,10 +203,9 @@ public interface GuiPanelMngWorkingIfc
   List<WidgetDescriptor> getWidgetsInFocus();
   
   
-  /**Gets the list of all widgets which are visible yet and should be updated with valuew. 
-   * This method uses the widgets, which are set calling {@link #changeWidgets()}. 
+  /**Gets the list of all panels which are visible yet and should be updated with values therefore. 
    * @return The list.
    */
-  Queue<WidgetDescriptor> getWidgetsVisible();
+  ConcurrentLinkedQueue<GralVisibleWidgets_ifc> getVisiblePanels();
 	
 }

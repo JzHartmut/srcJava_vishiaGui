@@ -121,7 +121,7 @@ public interface GuiPanelMngBuildIfc
    * @param properties use or of constants {@link #propZoomedPanel}, {@link #propGridZoomedPanel}
    * @return The Tab-container, there the tabs can be registered.
    */
-  TabPanel createTabPanel(PanelActivatedGui user, int properties);
+  GralTabbedPanel createTabPanel(PanelActivatedGui user, int properties);
   
   /**selects a registered panel for the next add-operations.
    * see {@link #registerPanel(String, Object)}. 

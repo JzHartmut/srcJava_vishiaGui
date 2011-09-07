@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InspcDataExchangeAccess.Info;
 import org.vishia.gral.gridPanel.PanelContent;
+import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
@@ -191,8 +192,9 @@ public class InspcGuiComm
     bUserCalled = false;
     //
     //
-    //for(PanelContent panel: listPanels){
-      Queue<WidgetDescriptor> widgetsVisible = mng.getWidgetsVisible();
+    ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = mng.getVisiblePanels();
+    for(GralVisibleWidgets_ifc panel: listPanels){
+      Queue<WidgetDescriptor> widgetsVisible = panel.getWidgetsVisible();
       if(widgetsVisible !=null) for(WidgetDescriptor widget: widgetsVisible){
         
         if(widget.whatIs == 'D'){
@@ -212,7 +214,7 @@ public class InspcGuiComm
           actionShowTextfield.userActionGui("tx", widget);
         }
       }//for widgets in panel
-    //}
+    }
     Runnable userOrder;
     if(inspcAccessor.isFilledTxTelg()){
       sendAndAwaitAnswer();

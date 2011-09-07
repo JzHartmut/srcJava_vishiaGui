@@ -18,11 +18,11 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.gridPanel.PanelActivatedGui;
 import org.vishia.gral.gridPanel.PanelContent;
-import org.vishia.gral.gridPanel.TabPanel;
+import org.vishia.gral.gridPanel.GralTabbedPanel;
 import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.gral.widget.WidgetCmpnifc;
 
-public class TabPanelSwt extends TabPanel
+public class TabPanelSwt extends GralTabbedPanel
 {
 
   /**Wrapper arround the TabFolder. The swt.TabFolder is the container for all TabItem. */
@@ -117,7 +117,8 @@ public class TabPanelSwt extends TabPanel
 					  notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);
 					}
 					//TODO remove visible infos for last panel, active act panel.
-					mng.changeWidgets(widgetInfos);
+					newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
+					//mng.changeWidgets(widgetInfos);
 					currentPanel = panelContent;
 				}
 			}
