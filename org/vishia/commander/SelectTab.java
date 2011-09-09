@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.vishia.cmd.PrepareCmd;
 import org.vishia.cmd.CmdStore.CmdBlock;
-import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.gral.widget.SelectList;
 import org.vishia.gral.widget.TableLineGui_ifc;
@@ -28,7 +28,7 @@ class SelectTab
     char active;
   }
   
-  private final GuiPanelMngWorkingIfc mng;
+  private final GralPanelMngWorking_ifc mng;
   
   List<SelectInfo> selectLeft = new LinkedList<SelectInfo>();
   
@@ -47,7 +47,7 @@ class SelectTab
   final MainCmd_ifc console;
   
   
-  SelectTab(MainCmd_ifc console, GuiPanelMngWorkingIfc mng)
+  SelectTab(MainCmd_ifc console, GralPanelMngWorking_ifc mng)
   { this.console = console;
     this.mng = mng;
   }

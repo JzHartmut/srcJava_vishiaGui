@@ -8,11 +8,11 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
-import org.vishia.gral.gridPanel.PropertiesGui;
+import org.vishia.gral.gridPanel.GralGridProperties;
 import org.vishia.gral.ifc.GralColor;
 
 
-public class PropertiesGuiSwt extends PropertiesGui
+public class PropertiesGuiSwt extends GralGridProperties
 {
 	private final Device guiDevice;
 

@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.gral.cfg.GuiCfgData.GuiCfgElement;
-import org.vishia.gral.gridPanel.GralPos;
-import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
+import org.vishia.gral.gridPanel.GralGridPos;
+import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
@@ -20,7 +20,7 @@ public class GuiCfgBuilder
 
   private final GuiCfgData cfgData;
   
-  private final GuiPanelMngBuildIfc gui;
+  private final GralGridBuild_ifc gui;
   
   /**The current directory is that directory, where the config file is located. 
    * It is used if other files are given with relative path.*/
@@ -29,7 +29,7 @@ public class GuiCfgBuilder
   private Map<String, String> indexAlias = new TreeMap<String, String>();
   
   
-  public GuiCfgBuilder(GuiCfgData cfgData, GuiPanelMngBuildIfc gui, File currentDir)
+  public GuiCfgBuilder(GuiCfgData cfgData, GralGridBuild_ifc gui, File currentDir)
   {
     this.cfgData = cfgData;
     this.gui = gui;
@@ -168,8 +168,8 @@ public class GuiCfgBuilder
     //
     if(pos.xWidth == Integer.MAX_VALUE)
       stop();
-    int heightArg = pos.ySizeDown == Integer.MAX_VALUE ? GralPos.useNatSize : pos.ySizeDown + GralPos.size;
-    int widthArg = pos.xWidth == Integer.MAX_VALUE ? GralPos.useNatSize : pos.xWidth + GralPos.size;
+    int heightArg = pos.ySizeDown == Integer.MAX_VALUE ? GralGridPos.useNatSize : pos.ySizeDown + GralGridPos.size;
+    int widthArg = pos.xWidth == Integer.MAX_VALUE ? GralGridPos.useNatSize : pos.xWidth + GralGridPos.size;
     gui.setFinePosition(pos.yPos, pos.yPosFrac, heightArg, pos.ySizeFrac
         , pos.xPos, pos.xPosFrac, widthArg, pos.xSizeFrac, 1, dirNext, null);
     //

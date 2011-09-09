@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 /**This is a unique interface for the GUI-panel-manager to work with it.
- * To build the graphical application see {@link org.vishia.gral.gridPanel.GuiPanelMngBuildIfc}.
+ * To build the graphical application see {@link org.vishia.gral.gridPanel.GralGridBuild_ifc}.
  * This interface supports handling with all widgets in a GUI. 
  * The widgets were selected by identifier or with their {@link WidgetDescriptor} instance
  * whereby the implementation environment of a widget may be known. That implementation environment
@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author Hartmut Schorrig
  *
  */
-public interface GuiPanelMngWorkingIfc 
+public interface GralPanelMngWorking_ifc 
 {
 
   /**The version history of this interface:

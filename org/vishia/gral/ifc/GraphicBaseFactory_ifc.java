@@ -2,8 +2,8 @@ package org.vishia.gral.ifc;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.area9.GuiMainAreaifc;
-import org.vishia.gral.gridPanel.GuiPanelMngBase;
-import org.vishia.gral.gridPanel.PropertiesGui;
+import org.vishia.gral.gridPanel.GralGridMngBase;
+import org.vishia.gral.gridPanel.GralGridProperties;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.msgDispatch.LogMessage;
 
@@ -17,10 +17,10 @@ public interface GraphicBaseFactory_ifc
 
   GuiMainAreaifc createGuiWindow(MainCmd cmdP);
   
-  PropertiesGui createProperties(char sizePixel);
+  GralGridProperties createProperties(char sizePixel);
   
-  GuiPanelMngBase createPanelMng(GuiPanelMngBase parent, int width, int height
-  , PropertiesGui propertiesGui
+  GralGridMngBase createPanelMng(GralGridMngBase parent, int width, int height
+  , GralGridProperties propertiesGui
   , VariableContainer_ifc variableContainer, LogMessage log);
       
 }

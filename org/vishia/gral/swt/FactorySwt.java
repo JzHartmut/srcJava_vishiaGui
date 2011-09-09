@@ -3,9 +3,8 @@ package org.vishia.gral.swt;
 import org.eclipse.swt.widgets.Composite;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.area9.GuiMainAreaifc;
-import org.vishia.gral.base.GralDevice;
-import org.vishia.gral.gridPanel.GuiPanelMngBase;
-import org.vishia.gral.gridPanel.PropertiesGui;
+import org.vishia.gral.gridPanel.GralGridMngBase;
+import org.vishia.gral.gridPanel.GralGridProperties;
 import org.vishia.gral.ifc.GraphicBaseFactory_ifc;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainGuiSwt.GralDeviceSwt;
@@ -33,14 +32,14 @@ public class FactorySwt implements GraphicBaseFactory_ifc
     return gui = new MainCmdSwt(cmdP, gralDevice);
   }
 
-  @Override public PropertiesGui createProperties(char sizePixel)
+  @Override public GralGridProperties createProperties(char sizePixel)
   {
     return new PropertiesGuiSwt(gui.getDisplay(), sizePixel);
   }
   
   
-  @Override public GuiPanelMngBase createPanelMng(GuiPanelMngBase parent, int width, int height
-  , PropertiesGui propertiesGui
+  @Override public GralGridMngBase createPanelMng(GralGridMngBase parent, int width, int height
+  , GralGridProperties propertiesGui
   , VariableContainer_ifc variableContainer, LogMessage log)
   {
     return new GuiPanelMngSwt(gralDevice, parent, gui.getContentPane(), width, height

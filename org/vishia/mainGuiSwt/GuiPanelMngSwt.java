@@ -69,18 +69,19 @@ import org.eclipse.swt.widgets.Widget;
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralDevice;
-import org.vishia.gral.gridPanel.GuiPanelMngBase;
-import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
+import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralTabbedPanel;
+import org.vishia.gral.base.GralPanelActivated_ifc;
+import org.vishia.gral.cfg.GuiCfgBuilder;
+import org.vishia.gral.gridPanel.GralGridMngBase;
+import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
-import org.vishia.gral.gridPanel.PanelActivatedGui;
-import org.vishia.gral.gridPanel.PanelContent;
-import org.vishia.gral.gridPanel.PropertiesGui;
-import org.vishia.gral.gridPanel.GralTabbedPanel;
+import org.vishia.gral.gridPanel.GralGridProperties;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.FileDialogIfc;
 import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.GuiImageBase;
-import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GuiRectangle;
 import org.vishia.gral.ifc.GuiShellMngIfc;
 import org.vishia.gral.ifc.GuiWindowMng_ifc;
@@ -116,7 +117,7 @@ import org.vishia.msgDispatch.LogMessage;
  * in runtime
  * and selecting of button-actions and data-container while creating with symbolic access
  * to the action-instance or the data-container. This property is used especially 
- * by the text-script-controlled built of a dialog widget using the {@link org.vishia.gral.gridPanel.GuiDialogZbnfControlled},
+ * by the text-script-controlled built of a dialog widget using the {@link GuiCfgBuilder},
  * but it is able to simplify the access to data and actions elsewhere too.
  * <br><br>
  * <br><br>
@@ -126,7 +127,7 @@ import org.vishia.msgDispatch.LogMessage;
  * @author Hartmut Schorrig
  *
  */
-public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMngWorkingIfc
+public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc, GralPanelMngWorking_ifc
 //GuiShellMngIfc<Control>   
 {
   private static final long serialVersionUID = -2547814076794969689L;
@@ -137,7 +138,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
 	 * <li>2011-08-13 Hartmut chg: New routines for store and calculate the position to regard large widgets.
 	 * <li>2011-06-17 Hartmut getValueFromWidget(): Table returns the whole selected line, cells separated with tab.
 	 *     The String-return.split("\t") separates the result to the cell values.
-	 * <li>2011-05-08 Hartmut new; {@link GuiPanelMngWorkingIfc#cmdClear} used to clear a whole swt.Table, commonly using: clear a content of widget.
+	 * <li>2011-05-08 Hartmut new; {@link GralPanelMngWorking_ifc#cmdClear} used to clear a whole swt.Table, commonly using: clear a content of widget.
    * <li>2010-12-02 Hartmut: in method insertInfo((): call of checkAdmissibility() for some input parameter, 
 	 *     elsewhere exceptions may be possible on evaluating the inserted info in doBeforeDispatching().
 	 *     There the causer isn't found quickly while debugging.
@@ -168,8 +169,8 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   protected Rectangle currPanelPos;
   
 
-  /**Properties of this Dialog Window. The {@link GuiPanelMngBase} contains an aggregation 
-   * to the same instance, but with type {@link PropertiesGui}. Internally there are some more
+  /**Properties of this Dialog Window. The {@link GralGridMngBase} contains an aggregation 
+   * to the same instance, but with type {@link GralGridProperties}. Internally there are some more
    * Swt-capabilities in the derived type.
    */
   public  final PropertiesGuiSwt propertiesGuiSwt;
@@ -281,7 +282,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public GuiPanelMngSwt(GralDevice gralDevice, GuiPanelMngBase parent, Composite graphicFrame, int width, int height, PropertiesGuiSwt propertiesGui
+  public GuiPanelMngSwt(GralDevice gralDevice, GralGridMngBase parent, Composite graphicFrame, int width, int height, PropertiesGuiSwt propertiesGui
   	, VariableContainer_ifc variableContainer
   	, LogMessage log
   	)
@@ -298,7 +299,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     	//guiContainer.setSize(width * propertiesGui.xPixelUnit(), height * propertiesGui.yPixelUnit());
     }
     
-    PanelContent panelContent = new PanelContent(graphicFrame){
+    GralPanelContent panelContent = new GralPanelContent(graphicFrame){
 
       @Override
       public boolean setFocus()
@@ -321,13 +322,13 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
 
   
   
-  @Override public GuiPanelMngBuildIfc createCompositeBox()
+  @Override public GralGridBuild_ifc createCompositeBox()
   {
     //Composite box = new Composite(graphicFrame, 0);
     Composite box = new Composite((Composite)currPanel.panelComposite, 0);
     setPosAndSize_(box);
     Point size = box.getSize();
-    GuiPanelMngSwt mng = new GuiPanelMngSwt(mngBase.gralDevice, this, box, size.y, size.x, propertiesGuiSwt, variableContainer, log);
+    GuiPanelMngSwt mng = new GuiPanelMngSwt(gralDevice, this, box, size.y, size.x, propertiesGuiSwt, variableContainer, log);
     return mng;
   }
 
@@ -343,7 +344,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
   
   
   
-  @Override public boolean remove(GuiPanelMngBuildIfc compositeBox)
+  @Override public boolean remove(GralGridBuild_ifc compositeBox)
   { 
     ((GuiPanelMngSwt)compositeBox).graphicFrame.dispose();
     return true;
@@ -379,7 +380,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
 		setPosAndSize_(shell);
 		//shell.setBounds(left,top, width, height);
 		shell.setText("SHELL");
-		GuiShellMngBuildIfc mng = new GuiShellMngSwt(mngBase.gralDevice, shell, this, 0, 0, propertiesGuiSwt, variableContainer, log);
+		GuiShellMngBuildIfc mng = new GuiShellMngSwt(gralDevice, shell, this, 0, 0, propertiesGuiSwt, variableContainer, log);
 		//mng.setWindowVisible(true);
 		
 		return mng;
@@ -416,7 +417,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
     
     
     if(title !=null){ shell.setText(title); }
-    GuiShellMngBuildIfc mng = new GuiShellMngSwt(mngBase.gralDevice, shell, this, 0, 0, propertiesGuiSwt, variableContainer, log);
+    GuiShellMngBuildIfc mng = new GuiShellMngSwt(gralDevice, shell, this, 0, 0, propertiesGuiSwt, variableContainer, log);
     //mng.setWindowVisible(true);
     
     return mng;
@@ -448,7 +449,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
    * @param name Name of the panel.
    * @param panel The panel.
    */
-  @Override public void registerPanel(String name, PanelContent panel){
+  @Override public void registerPanel(String name, GralPanelContent panel){
     panels.put(name, panel);
     currPanel = panel;
     sCurrPanel = name;
@@ -531,7 +532,7 @@ public class GuiPanelMngSwt extends GuiPanelMngBase implements GuiPanelMngBuildI
 
 
   
-	@Override public GralTabbedPanel createTabPanel(PanelActivatedGui user, int property)
+	@Override public GralTabbedPanel createTabPanel(GralPanelActivated_ifc user, int property)
 	{
 		currTabPanel = new TabPanelSwt(this, user, property);
 		listVisiblePanels.add(currTabPanel);
@@ -1194,31 +1195,31 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   
   public String insertInfo(WidgetDescriptor descr, int ident, String content)
   {
-  	return setInfo(descr, GuiPanelMngWorkingIfc.cmdInsert, ident, content, null);
+  	return setInfo(descr, GralPanelMngWorking_ifc.cmdInsert, ident, content, null);
   }
   
   
   
   public String insertInfo(WidgetDescriptor descr, int ident, Object value)
   {
-  	return setInfo(descr, GuiPanelMngWorkingIfc.cmdInsert, ident, value, null);
+  	return setInfo(descr, GralPanelMngWorking_ifc.cmdInsert, ident, value, null);
   }
   
   //past: insertInfo
   @Override public String setInfo(WidgetDescriptor descr, int cmd, int ident, Object visibleInfo, Object userData)
   {
     long threadId = Thread.currentThread().getId();
-    if(threadId == mngBase.getThreadIdGui()){
+    if(threadId == gralDevice.getThreadIdGui()){
       setInfoDirect(descr, cmd, ident, visibleInfo, userData);
     } else {
-    	if(descr.name !=null && descr.name.equals("writerEnergy1Sec") && cmd == GuiPanelMngWorkingIfc.cmdInsert) 
+    	if(descr.name !=null && descr.name.equals("writerEnergy1Sec") && cmd == GralPanelMngWorking_ifc.cmdInsert) 
     		stop();
     	//check the admissibility:
     	switch(cmd){
-    	case GuiPanelMngWorkingIfc.cmdInsert: checkAdmissibility(visibleInfo != null && visibleInfo instanceof String); break;
+    	case GralPanelMngWorking_ifc.cmdInsert: checkAdmissibility(visibleInfo != null && visibleInfo instanceof String); break;
     	}
-      mngBase.guiChangeRequests.add(new GuiChangeReq(descr, cmd, ident, visibleInfo, userData));
-  	  synchronized(mngBase.guiChangeRequests){ mngBase.guiChangeRequests.notify(); }  //to wake up waiting on guiChangeRequests.
+      gralDevice.guiChangeRequests.add(new GuiChangeReq(descr, cmd, ident, visibleInfo, userData));
+  	  synchronized(gralDevice.guiChangeRequests){ gralDevice.guiChangeRequests.notify(); }  //to wake up waiting on guiChangeRequests.
   	  graphicFrame.getDisplay().wake(); //wake-up the GUI-thread, it may sleep elsewhere.
   	  //((Composite)currPanel.panelComposite).getDisplay().wake();  //wake-up the GUI-thread, it may sleep elsewhere. 
     }
@@ -1234,18 +1235,18 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
           Control swtWidget = (Control)widget.getWidget(); 
           int colorValue;
           switch(cmd){
-          case GuiPanelMngWorkingIfc.cmdBackColor: {
+          case GralPanelMngWorking_ifc.cmdBackColor: {
             colorValue = ((Integer)(info)).intValue();
             Color color = propertiesGuiSwt.colorSwt(colorValue & 0xffffff);
             swtWidget.setBackground(color); 
           } break;
-          case GuiPanelMngWorkingIfc.cmdLineColor:{ 
+          case GralPanelMngWorking_ifc.cmdLineColor:{ 
             colorValue = ((Integer)(info)).intValue();
             Color color = propertiesGuiSwt.colorSwt(colorValue & 0xffffff);
             swtWidget.setForeground(color); 
           } break;
-          case GuiPanelMngWorkingIfc.cmdRedraw: swtWidget.redraw(); break;
-          case GuiPanelMngWorkingIfc.cmdRedrawPart: 
+          case GralPanelMngWorking_ifc.cmdRedraw: swtWidget.redraw(); break;
+          case GralPanelMngWorking_ifc.cmdRedrawPart: 
             assert(swtWidget instanceof CurveView);
             ((CurveView)(swtWidget)).redrawData(); break; //causes a partial redraw
           default: 
@@ -1253,16 +1254,16 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
               TableSwt table = (TableSwt)widget;
               //NOTE: ident is the row number. Insert before row.
               switch(cmd){
-              case GuiPanelMngWorkingIfc.cmdInsert: table.changeTable(ident, info, data); break;
-              case GuiPanelMngWorkingIfc.cmdSet: table.changeTable(ident, info, data); break;
-              case GuiPanelMngWorkingIfc.cmdClear: table.clearTable(ident); break;
+              case GralPanelMngWorking_ifc.cmdInsert: table.changeTable(ident, info, data); break;
+              case GralPanelMngWorking_ifc.cmdSet: table.changeTable(ident, info, data); break;
+              case GralPanelMngWorking_ifc.cmdClear: table.clearTable(ident); break;
               default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, descr.name);
               }
             } else if(swtWidget instanceof Text){ 
               Text field = (Text)swtWidget;
               switch(cmd){
-                case GuiPanelMngWorkingIfc.cmdSet:
-                case GuiPanelMngWorkingIfc.cmdInsert: 
+                case GralPanelMngWorking_ifc.cmdSet:
+                case GralPanelMngWorking_ifc.cmdInsert: 
                   field.setText((String)info); 
                   break;
               default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %x on widget %s", cmd, descr.name);
@@ -1270,8 +1271,8 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
             } else if(swtWidget instanceof LedSwt){ 
               LedSwt field = (LedSwt)swtWidget;
               switch(cmd){
-              case GuiPanelMngWorkingIfc.cmdColor: field.setColor(ident, (Integer)info); break;
-              case GuiPanelMngWorkingIfc.cmdSet: {
+              case GralPanelMngWorking_ifc.cmdColor: field.setColor(ident, (Integer)info); break;
+              case GralPanelMngWorking_ifc.cmdSet: {
                 int colorInner = ((Integer)info).intValue();
                 field.setColor(ident, colorInner);
               } break;
@@ -1350,7 +1351,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	    bDesignerIsInitialized = true;
   	  }
   	  GuiChangeReq changeReq;
-  	  while( (changeReq = mngBase.guiChangeRequests.poll()) != null){
+  	  while( (changeReq = gralDevice.guiChangeRequests.poll()) != null){
   	  	WidgetDescriptor descr = changeReq.widgetDescr;
   	  	setInfoDirect(descr, changeReq.cmd, changeReq.ident, changeReq.visibleInfo, changeReq.userData);
 
@@ -1422,7 +1423,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sName);
   	} else if((descr.widget instanceof CurveView)) {
   		//sends a redraw information.
-  	  mngBase.guiChangeRequests.add(new GuiChangeReq(descr, GuiPanelMngWorkingIfc.cmdRedrawPart, 0, null, null));
+  	  gralDevice.guiChangeRequests.add(new GuiChangeReq(descr, GralPanelMngWorking_ifc.cmdRedrawPart, 0, null, null));
   		((Composite)currPanel.panelComposite).getDisplay().wake();  //wake-up the GUI-thread, it may sleep elsewhere. 
   	} else {
   	}
@@ -1570,8 +1571,8 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     }
     for(Control parent1: parents){
       Object gralObj = parent1.getData();
-      if(gralObj !=null && gralObj instanceof PanelContent){
-        PanelContent gralPanel = (PanelContent) gralObj;
+      if(gralObj !=null && gralObj instanceof GralPanelContent){
+        GralPanelContent gralPanel = (GralPanelContent) gralObj;
         Object tabitem = gralPanel.itsTabSwt;
         if(tabitem instanceof TabItem){
           tabItemSwt = (TabItem)tabitem;

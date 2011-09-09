@@ -1,4 +1,4 @@
-package org.vishia.gral.gridPanel;
+package org.vishia.gral.base;
 
 import java.util.List;
 import java.util.Queue;
@@ -13,7 +13,7 @@ import org.vishia.gral.ifc.WidgetDescriptor;
  * @author e09srrh0
  *
  */
-public interface PanelActivatedGui
+public interface GralPanelActivated_ifc
 {
 
 	/**If a panel is actived, the user will be notified. 

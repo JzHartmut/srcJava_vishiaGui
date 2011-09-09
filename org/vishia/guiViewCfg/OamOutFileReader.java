@@ -12,9 +12,9 @@ import org.vishia.mainCmd.Report;
 import org.vishia.util.FileSystem;
 
 import org.vishia.byteData.ByteDataSymbolicAccess;
-import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
-import org.vishia.gral.gridPanel.PanelActivatedGui;
-import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.base.GralPanelActivated_ifc;
+import org.vishia.gral.gridPanel.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GuiSetValueIfc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;

@@ -2,7 +2,9 @@ package org.vishia.gral.ifc;
 
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
-import org.vishia.gral.gridPanel.GralPos;
+import org.vishia.gral.cfg.GuiCfgBuilder;
+import org.vishia.gral.gridPanel.GralGridPos;
+import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.swt.WidgetSimpleWrapperSwt;
 import org.vishia.gral.widget.Widgetifc;
 
@@ -34,7 +36,7 @@ public class WidgetDescriptor
   
   /**The panel where the widget is located. If a TabPanel is used, its the whole panel with all tabs.
    * This reference is used to set values to other widgets. */
-  GuiPanelMngWorkingIfc itsPanel;
+  GralPanelMngWorking_ifc itsPanel;
   
   /**Association to the configuration element from where this widget was built. 
    * If the widget is moved or its properties are changed in the 'design mode' of the GUI,
@@ -50,7 +52,7 @@ public class WidgetDescriptor
 	public String name;
 	
 	/**The position of the widget. */
-	public GralPos pos;  
+	public GralGridPos pos;  
 	
 	/**The graphical widget. It is untyped because it depends on the underlying graphic system. 
 	 * It may be a wrapper class arround a graphical widget too. 
@@ -174,8 +176,8 @@ public class WidgetDescriptor
    */
   public String getDataPath(){ return sDataPath; }
 	
-  /**Sets the action in application context for change the widget.
-   * Change means, mouse button actions, user inputs
+  /**Sets the action in application context for processing of user handling for thewidget.
+   * Handling means, pressing button, user inputs of text fields
    * @param action any instance. Its action method is invoked depending of the type of widget
    *        usual if the user takes an action on screen, press button etc.
    */
@@ -185,14 +187,34 @@ public class WidgetDescriptor
   public UserActionGui getActionChange(){ return actionChanging; }
   
   
-  /**Sets the action in application context for showing the widget, apply any data.
-   * The action is called either cyclically for all widgets of visible windows,
-   * or if any data are received.
-   * @param action any instance. .
+  /**Sets the action in application context which is invoked for applying user data to show in the widget.
+   * <br><br>
+   * The invocation of the action should be organized in the user context, maybe cyclically for all widgets
+   * of visible windows  or if any data are received. 
+   * <br><br>
+   * In the action the user should read any data from its application
+   * and invoke {@link #setValue(int, int, Object, Object)} after data preparation to display the value.
+   * Because the {@link WidgetDescriptor} is given as parameter, the implementation can use the information
+   * for example {@link #sDataPath} or {@link #sFormat}. The implementation of the action can be done
+   * in the users context in a specialized form, or some standard actions can be used. 
+   * See notes of {@link #getActionShow()}.
+   * <br><br>
+   * To get the action in a script context (GuiCfgBuilder) some actions can be registered 
+   * using {@link GralGridBuild_ifc#registerUserAction(String, UserActionGui)}. They are gotten by name
+   * invoking {@link GralGridBuild_ifc#getRegisteredUserAction(String)} in the {@link GuiCfgBuilder}.
+   * 
+   * @param action The action instance.
    */
   public void setActionShow(UserActionGui action){ actionShow = action; }
   
-  /**Gets the action to show the widget. */
+  /**Gets the action to show the widget. This method is helpfully to invoke showing after receiving data
+   * in the users context. Invoke {@link UserActionGui#userActionGui(String, WidgetDescriptor, Object...)}
+   * with this WidgetDescriptor and additional user data. The implementation of that method
+   * may be done in the users context but in another module or the implementation may be given in any 
+   * library superordinated to this graphic adapter library but subordinated in respect to the explicit application.
+   * The usage of a show method given in the implementation of {@link UserActionGui} helps to separate
+   * the invocation of showing and the decision what and how is to show.
+   */
   public UserActionGui getActionShow(){ return actionShow; }
   
   
@@ -231,6 +253,10 @@ public class WidgetDescriptor
 	*/
 	public void clearShowParam(){ sShowParam = null; }
 
+	/**
+	 * @param sShowMethod
+	 * @deprecated use {@link #setActionShow(UserActionGui)}.
+	 */
 	public void setShowMethod(String sShowMethod)
 	{ if(sShowMethod == null){
 			this.sShowMethod = null;
@@ -272,7 +298,7 @@ public class WidgetDescriptor
 		this.sFormat = sFormat;
 	}
 
-	public void setPanelMng(GuiPanelMngWorkingIfc panel)
+	public void setPanelMng(GralPanelMngWorking_ifc panel)
 	{ this.itsPanel = panel; 
 	}
 	
@@ -306,7 +332,7 @@ public class WidgetDescriptor
   }
   
   /**Sets the current value of the content of the widget in the given context.
-   * @param cmd see {@link GuiPanelMngWorkingIfc#cmdSet} etc. It is possible to set the color etc.
+   * @param cmd see {@link GralPanelMngWorking_ifc#cmdSet} etc. It is possible to set the color etc.
    * @param ident Any number to specify set, maybe 0
    * @param value The value in the necessary representation.
    */
@@ -322,7 +348,7 @@ public class WidgetDescriptor
   
   
   /**Sets the current value of the content of the widget in the given context.
-   * @param cmd see {@link GuiPanelMngWorkingIfc#cmdSet} etc. It is possible to set the color etc.
+   * @param cmd see {@link GralPanelMngWorking_ifc#cmdSet} etc. It is possible to set the color etc.
    * @param ident Any number to specify set, maybe 0
    * @param value The value in the necessary representation.
    */
@@ -346,7 +372,7 @@ public class WidgetDescriptor
    * to get and set values and properties of this widgets non-symbolic.
    * @return The panel.
    */
-  public GuiPanelMngWorkingIfc getPanel(){ return itsPanel; }
+  public GralPanelMngWorking_ifc getPanel(){ return itsPanel; }
   
 	/**Especially for test and debug, short info about widget.
 	 * @see java.lang.Object#toString()

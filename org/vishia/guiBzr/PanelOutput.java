@@ -2,7 +2,7 @@ package org.vishia.guiBzr;
 
 import java.io.File;
 
-import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
+import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.mainCmd.Report;
@@ -21,13 +21,13 @@ public class PanelOutput
   final MainData mainData;
 
   /**Aggregation to the build interface of the manager where the panel is member of. */
-  final GuiPanelMngBuildIfc panelBuildifc;
+  final GralGridBuild_ifc panelBuildifc;
   
   final StringBuilder uCommitOut =  new StringBuilder();
   
   final WidgetDescriptor widgdOutputText = new WidgetDescriptor("OutputText", 'T');
   
-  public PanelOutput(MainData mainData, GuiPanelMngBuildIfc panelBuildifc)
+  public PanelOutput(MainData mainData, GralGridBuild_ifc panelBuildifc)
   {
     this.panelBuildifc = panelBuildifc;
     this.mainData = mainData;

@@ -5,16 +5,15 @@ import java.io.FileWriter;
 import java.io.Writer;
 
 import org.vishia.communication.InterProcessCommFactorySocket;
+import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.cfg.GuiCfgData;
 import org.vishia.gral.cfg.GuiCfgZbnf;
-import org.vishia.gral.gridPanel.GuiDialogZbnfControlled;
-import org.vishia.gral.gridPanel.GuiPanelMngBase;
-import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
-import org.vishia.gral.gridPanel.PropertiesGui;
-import org.vishia.gral.gridPanel.GralTabbedPanel;
+import org.vishia.gral.gridPanel.GralGridMngBase;
+import org.vishia.gral.gridPanel.GralGridBuild_ifc;
+import org.vishia.gral.gridPanel.GralGridProperties;
 import org.vishia.gral.ifc.GraphicBaseFactory_ifc;
 import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
-import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GuiPlugUser_ifc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
@@ -75,7 +74,7 @@ protected final GuiCfgData guiCfgData = new GuiCfgData();
 
 /**This instance helps to create the Dialog Widget as part of the whole window. It is used only in the constructor.
  * Therewith it may be defined stack-locally. But it is better to show and explain if it is access-able at class level. */
-GuiDialogZbnfControlled dialogZbnfConfigurator;   
+//GuiDialogZbnfControlled dialogZbnfConfigurator;   
 
 
 
@@ -93,12 +92,12 @@ protected final GuiMainAreaifc gui;
 
 protected final MainCmd_ifc mainCmd;
 
-protected GuiPanelMngBase panelMng;
+protected GralGridMngBase panelMng;
 
 /**Panel-Management-interface for the panels. */
-protected GuiPanelMngBuildIfc panelBuildIfc;
+protected GralGridBuild_ifc panelBuildIfc;
 
-protected GuiPanelMngWorkingIfc guiAccess;
+protected GralPanelMngWorking_ifc guiAccess;
 
 protected GralTabbedPanel mainTabPanel;
 
@@ -145,7 +144,7 @@ public GuiCfg(GuiCallingArgs cargs, GuiMainCmd cmdGui)
   //Creates a panel manager to work with grid units and symbolic access.
     //Its properties:  //##
   final char sizePixel = cargs.sSize == null ? 'C' : cargs.sSize.charAt(0);
-  PropertiesGui propertiesGui = cargs.graphicFactory.createProperties(sizePixel);
+  GralGridProperties propertiesGui = cargs.graphicFactory.createProperties(sizePixel);
   LogMessage log = console.getLogMessageOutputConsole();
   //panelMng = new GuiPanelMngSwt(null, gui.getContentPane(), 120,80, propertiesGui, null, log);
   panelMng = cargs.graphicFactory.createPanelMng(null, 120,80, propertiesGui, null, log);
@@ -285,7 +284,7 @@ public final void execute()
   { stepMain();
     try{ Thread.sleep(100);} 
     catch (InterruptedException e)
-    { dialogZbnfConfigurator.terminate();
+    { //dialogZbnfConfigurator.terminate();
     }
   }
 

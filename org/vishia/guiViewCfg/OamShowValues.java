@@ -9,8 +9,8 @@ import org.vishia.byteData.RawDataAccess;
 import org.vishia.mainCmd.Report;
 
 import org.vishia.byteData.ByteDataSymbolicAccess;
-import org.vishia.gral.gridPanel.PanelActivatedGui;
-import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.base.GralPanelActivated_ifc;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GuiSetValueIfc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
@@ -30,7 +30,7 @@ public class OamShowValues
 	Queue<WidgetDescriptor> widgetsInTab;
 	
 	/**The access to the gui, to change data to show. */
-	protected final GuiPanelMngWorkingIfc guiAccess;
+	protected final GralPanelMngWorking_ifc guiAccess;
 	
 	Set<Map.Entry<String, WidgetDescriptor>> fieldsToShow;
 	
@@ -39,7 +39,7 @@ public class OamShowValues
 
 	public OamShowValues(
 		Report log
-	, GuiPanelMngWorkingIfc guiAccess
+	, GralPanelMngWorking_ifc guiAccess
 	)
 	{
 		this.log = log;
@@ -305,7 +305,7 @@ public class OamShowValues
 		
 		Element[] data;
 		
-		ValueColorAssignment(String[] sParams, GuiPanelMngWorkingIfc guiAccess){
+		ValueColorAssignment(String[] sParams, GralPanelMngWorking_ifc guiAccess){
 			data = new Element[sParams.length-1];
 			int state = 0;
 			for(int ii = 1; ii < sParams.length; ++ii){
@@ -490,7 +490,7 @@ public class OamShowValues
 
 	/**Agent instance to offer the interface for updating the tab in the main TabPanel
 	 */
-	public final PanelActivatedGui tabActivatedImpl = new PanelActivatedGui()
+	public final GralPanelActivated_ifc tabActivatedImpl = new GralPanelActivated_ifc()
 	{
 		@Override	public void panelActivatedGui(Queue<WidgetDescriptor> widgets)
 		{

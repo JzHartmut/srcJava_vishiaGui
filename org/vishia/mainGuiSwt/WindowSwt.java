@@ -3,10 +3,10 @@ package org.vishia.mainGuiSwt;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.vishia.gral.gridPanel.PanelContent;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.widget.WidgetCmpnifc;
 
-public class WindowSwt extends PanelContent implements WidgetCmpnifc
+public class WindowSwt extends GralPanelContent implements WidgetCmpnifc
 {
 
   final Shell window;

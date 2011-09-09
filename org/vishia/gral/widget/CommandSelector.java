@@ -14,8 +14,8 @@ import org.vishia.cmd.CmdGetFileArgs_ifc;
 import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
 import org.vishia.cmd.PrepareCmd;
-import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
-import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.gridPanel.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
@@ -61,10 +61,10 @@ public class CommandSelector extends SelectList
   
   public void fillIn()
   {
-    wdgdTable.setValue(GuiPanelMngWorkingIfc.cmdClear, -1, null, null);
+    wdgdTable.setValue(GralPanelMngWorking_ifc.cmdClear, -1, null, null);
     for(CmdStore.CmdBlock data: cmdStore.listCmd){
       
-      wdgdTable.setValue(GuiPanelMngWorkingIfc.cmdInsert, 0, data.name, data);
+      wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, data.name, data);
     }
 
   }

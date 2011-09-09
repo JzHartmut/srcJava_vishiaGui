@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.vishia.gral.gridPanel.PanelContent;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.CanvasStorage;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.WidgetDescriptor;
@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Widget;
  * @author Hartmut Schorrig
  *
  */
-public class CanvasStorePanelSwt extends PanelContent implements WidgetCmpnifc  //CanvasStorePanel //
+public class CanvasStorePanelSwt extends GralPanelContent implements WidgetCmpnifc  //CanvasStorePanel //
 {
 	
   protected SwtCanvas swtCanvas;

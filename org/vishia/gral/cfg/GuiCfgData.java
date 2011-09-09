@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
+import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.WidgetCfg_ifc;
 
 
@@ -555,7 +555,7 @@ public final class GuiCfgData
   
   
   
-  void processConfiguration(final GuiPanelMngBuildIfc panel)
+  void processConfiguration(final GralGridBuild_ifc panel)
   {
     
   }

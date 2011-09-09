@@ -1,6 +1,6 @@
 package org.vishia.gral.widget;
 
-import org.vishia.gral.gridPanel.GuiPanelMngBase;
+import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GuiSetValueIfc;
 import org.vishia.mainGuiSwt.GuiPanelMngSwt;
 
@@ -35,7 +35,7 @@ abstract public class ValueBar implements GuiSetValueIfc
 	
 	
 	
-	protected ValueBar(GuiPanelMngBase mng)
+	protected ValueBar(GralGridMngBase mng)
 	{
 		this.horizontal = false;
 	}

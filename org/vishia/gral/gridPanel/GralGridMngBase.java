@@ -14,6 +14,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.eclipse.swt.widgets.Control;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralDevice;
+import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralTabbedPanel;
+import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.cfg.GuiCfgBuilder;
 import org.vishia.gral.cfg.GuiCfgData;
 import org.vishia.gral.cfg.GuiCfgDesigner;
@@ -21,7 +24,7 @@ import org.vishia.gral.cfg.GuiCfgWriter;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.FileDialogIfc;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
-import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GuiPlugUser_ifc;
 import org.vishia.gral.ifc.GuiRectangle;
 import org.vishia.gral.ifc.UserActionGui;
@@ -45,7 +48,7 @@ import org.vishia.msgDispatch.LogMessage;
  * @param <WidgetTYPE> The special base type of the composed widgets in the underlying graphic adapter specialization.
  *                     (SWT: Composite)
  */
-public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMngWorkingIfc
+public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMngWorking_ifc
 {
   /**Changes:
    * <ul>
@@ -144,7 +147,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   GuiCfgWriter cfgWriter;
   
   /**The designer is an aggregated part of the PanelManager, but only created if necessary. 
-   * TODO check whether it should be disposed to {@link #mngBase} .*/
+   * TODO check whether it should be disposed to {@link #gralDevice} .*/
   protected GuiCfgDesigner designer;
   
   private GuiCfgData cfgData;
@@ -156,15 +159,15 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   
   protected boolean bDesignerIsInitialized = false;
   
-  final GuiPanelMngBase parent;
+  final GralGridMngBase parent;
   
   /**Base class for managing all panels and related windows.
    * This base class contains all common resources to manage panels and windows.
    */
-  final protected GuiMngBase mngBase;
+  final protected GralDevice gralDevice;
 
   /**Properties of this Dialog Window. */
-  public  final PropertiesGui propertiesGui;
+  public  final GralGridProperties propertiesGui;
 
   /**Index of all input fields to access symbolic for all panels. */
   protected final Map<String, WidgetDescriptor> indexNameWidgets = new TreeMap<String, WidgetDescriptor>();
@@ -194,7 +197,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
    * But the position can be set.
    * The values inside the position are positive in any case, so that the calculation of size is simple.
    */
-  protected GralPos pos = new GralPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
+  protected GralGridPos pos = new GralGridPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
   
   /**False if the position is given newly. True if it is used. Then the next add-widget invocation 
    * calculates the next position in direction of {@link #pos.dirNext}. */
@@ -203,7 +206,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   /**Position for the next widget to store.
    * The Position values may be negative which means measurement from right or bottom.
    */
-  protected GralPos posWidget = new GralPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
+  protected GralGridPos posWidget = new GralGridPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
   
   
   
@@ -234,17 +237,17 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static GuiPanelMngBase createWindow(String graphicBaseSystem)
-	{ Class<GuiPanelMngBase> mngClass;
-		GuiPanelMngBase mng = null;
+	public static GralGridMngBase createWindow(String graphicBaseSystem)
+	{ Class<GralGridMngBase> mngClass;
+		GralGridMngBase mng = null;
 		String sGraphicBaseSystem = "org.vishia.mainGuiSwt.GuiPanelMngSwt";
 		try{ 
-			mngClass = (Class<GuiPanelMngBase>) Class.forName(sGraphicBaseSystem);
+			mngClass = (Class<GralGridMngBase>) Class.forName(sGraphicBaseSystem);
 		} catch(ClassNotFoundException exc){ mngClass = null; }
 		
 		if(mngClass == null) throw new IllegalArgumentException("Graphic base system not found: " + sGraphicBaseSystem);
 		try{ 
-			Constructor<GuiPanelMngBase> ctor = mngClass.getConstructor();
+			Constructor<GralGridMngBase> ctor = mngClass.getConstructor();
 			mng = ctor.newInstance();
 			//mng = mngClass.newInstance();
 		
@@ -263,9 +266,9 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
 	 * @see org.vishia.gral.gridPanel.GuiPanelMngBuildIfc#setPosition(int, int, int, int, char)
 	 */
 	@Override public void setPositionSize(int line, int column, int height, int width, char direction)
-	{ if(line < 0){ line = posUsed? GralPos.next: GralPos.same; }
-	  if(column < 0){ column = posUsed? GralPos.next: GralPos.same; }
-	  setFinePosition(line, 0, height + GralPos.size, 0, column, 0, width + GralPos.size, 0, 1, direction, pos);
+	{ if(line < 0){ line = posUsed? GralGridPos.next: GralGridPos.same; }
+	  if(column < 0){ column = posUsed? GralGridPos.next: GralGridPos.same; }
+	  setFinePosition(line, 0, height + GralGridPos.size, 0, column, 0, width + GralGridPos.size, 0, 1, direction, pos);
 	}
 
 	
@@ -277,7 +280,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   
   
   
-  @Override public void setPosition(GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
+  @Override public void setPosition(GralGridPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
       , int origin, char direction)
   {
     int y1 = (int)(line);
@@ -308,7 +311,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
    * @param direction: direction for a next widget, use 'r', 'l', 'u', 'd' for right, left, up, down                
    */
   @Override public void setFinePosition(int line, int yPosFrac, int ye, int yef
-      , int column, int xPosFrac, int xe, int xef, int origin, char direction, GralPos frame)
+      , int column, int xPosFrac, int xe, int xef, int origin, char direction, GralGridPos frame)
   {
     //Inner class to calculate for x and y.   
     class Calc{
@@ -320,10 +323,10 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
       void calc(int z, int zf, int ze, int zef)
       {
         final boolean bxSizeNeg;
-        final boolean bxSize =  ze > (GralPos.size - GralPos.sizeRange_)
-                            && ze < (GralPos.size + GralPos.sizeRange_);
+        final boolean bxSize =  ze > (GralGridPos.size - GralGridPos.sizeRange_)
+                            && ze < (GralGridPos.size + GralGridPos.sizeRange_);
         if(bxSize){ 
-          ze -= GralPos.size; //may be negative!
+          ze -= GralGridPos.size; //may be negative!
           bxSizeNeg = ze < 0;
           if(bxSizeNeg){ 
             ze =  -ze;
@@ -332,15 +335,15 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
             if(pOrigin <0){ pOrigin = 0; }
           }
         } else { bxSizeNeg = false; }
-        final boolean bxSame = z > (GralPos.same - GralPos.sizeRange_)
-                            && z < (GralPos.same + GralPos.sizeRange_);
+        final boolean bxSame = z > (GralGridPos.same - GralGridPos.sizeRange_)
+                            && z < (GralGridPos.same + GralGridPos.sizeRange_);
         if(bxSame){ 
-          z -= GralPos.same; //may be negative!
+          z -= GralGridPos.same; //may be negative!
         }  
-        final boolean bxSameEnd = ze > (GralPos.same - GralPos.sizeRange_)
-                            && ze < (GralPos.same + GralPos.sizeRange_);
+        final boolean bxSameEnd = ze > (GralGridPos.same - GralGridPos.sizeRange_)
+                            && ze < (GralGridPos.same + GralGridPos.sizeRange_);
         if(bxSameEnd){ 
-          ze -= GralPos.same; //may be negative!
+          ze -= GralGridPos.same; //may be negative!
         }  
         final boolean bColumnFromRight = z < 0;
         if(bColumnFromRight){ z = - z; } //use positive values anytime
@@ -364,9 +367,9 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
           }
           p += z; pf += zf; 
           if(pf >=10){ pf -=10; p+=1; }
-        } else if(z == GralPos.next && pDir==1 || z == GralPos.nextBlock){
+        } else if(z == GralGridPos.next && pDir==1 || z == GralGridPos.nextBlock){
           //calculate next x
-          if(bxSameEnd || ze == GralPos.next || ze == GralPos.nextBlock){ 
+          if(bxSameEnd || ze == GralGridPos.next || ze == GralGridPos.nextBlock){ 
             //calculate next position, don't change end column
             int xd = (int)pd;
             zef = (int)((pd - xd)* 10.001F) + pef;
@@ -386,7 +389,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
             pe = ze; pef = zef;
           }
         } else { //position z is given:
-          if(z == GralPos.next){  //next is given, but not for this coordinate: 
+          if(z == GralGridPos.next){  //next is given, but not for this coordinate: 
             if(bxSizeNeg){
               z = pe; zf = pef;     //use the actual value.
             } else {
@@ -394,7 +397,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
             }
           }
           //position is given or next is set but not in this direction:
-          if(bxSameEnd || ze == GralPos.next || ze == GralPos.nextBlock){ 
+          if(bxSameEnd || ze == GralGridPos.next || ze == GralGridPos.nextBlock){ 
             //don't change end position
             p = z; pf = zf;
           } else if(bxSize){
@@ -517,7 +520,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
     int y2f = y2 >=0 ? (int)((height - y2)* 10.001F) : (int)((height - y2)* -10.001F);  
     int x2 = (int)(width);
     int x2f = x2 >=0 ? (int)((width - x2)* 10.001F) : (int)((width - x2)* -10.001F); 
-    setFinePosition(GralPos.next, 0,  y2 + GralPos.size, y2f, GralPos.next, 0, x2 + GralPos.size, x2f, 0, pos.dirNext, pos);
+    setFinePosition(GralGridPos.next, 0,  y2 + GralGridPos.size, y2f, GralGridPos.next, 0, x2 + GralGridPos.size, x2f, 0, pos.dirNext, pos);
   }
   
   
@@ -582,7 +585,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   }
 
 	
-  @Override public GralPos getPositionInPanel(){ return pos; }
+  @Override public GralGridPos getPositionInPanel(){ return pos; }
   
   
   void setSizeFromPositionInPanel()
@@ -594,13 +597,13 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   
 	
   /**Map of all panels. A panel may be a dialog box etc. */
-  protected final Map<String,PanelContent> panels = new TreeMap<String,PanelContent>();
+  protected final Map<String,GralPanelContent> panels = new TreeMap<String,GralPanelContent>();
   
   /**Any kind of TabPanel for this PanelManager TODO make protected
    */
   public GralTabbedPanel currTabPanel;
   
-  public PanelContent currPanel;
+  public GralPanelContent currPanel;
   
   protected String sCurrPanel;
   
@@ -621,14 +624,14 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   
 	
 	
-  public GuiPanelMngBase(GralDevice gralDevice, GuiPanelMngBase parent
-      , PropertiesGui props
+  public GralGridMngBase(GralDevice device, GralGridMngBase parent
+      , GralGridProperties props
       , VariableContainer_ifc variableContainer, LogMessage log)
 	{ this.parent = parent;
 	  if(parent == null){
-	    mngBase = new GuiMngBase(gralDevice);
+	    gralDevice = device == null ? new GralDevice(): device;
 	  } else {
-	    mngBase = parent.mngBase;
+	    gralDevice = parent.gralDevice;
 	  }
 	  this.propertiesGui = props;
 		this.log = log;
@@ -706,7 +709,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   
   
   
-  public PanelActivatedGui actionPanelActivate = new PanelActivatedGui()
+  public GralPanelActivated_ifc actionPanelActivate = new GralPanelActivated_ifc()
   { @Override public void panelActivatedGui(Queue<WidgetDescriptor> widgetsP)
     {  //changeWidgets(widgetsP);
     }
@@ -771,21 +774,21 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   @Override public void setBackColor(WidgetDescriptor descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
     WidgetDescriptor descr = (WidgetDescriptor) descr1;
-    setInfo(descr, GuiPanelMngWorkingIfc.cmdBackColor, ix, color, null);
+    setInfo(descr, GralPanelMngWorking_ifc.cmdBackColor, ix, color, null);
   } 
   
   
   @Override public void setLineColor(WidgetDescriptor descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
     WidgetDescriptor descr = (WidgetDescriptor) descr1;
-    setInfo(descr, GuiPanelMngWorkingIfc.cmdLineColor, ix, color, null);
+    setInfo(descr, GralPanelMngWorking_ifc.cmdLineColor, ix, color, null);
   } 
   
   
   @Override public void setTextColor(WidgetDescriptor descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
     WidgetDescriptor descr = (WidgetDescriptor) descr1;
-    setInfo(descr, GuiPanelMngWorkingIfc.cmdTextColor, ix, color, null);
+    setInfo(descr, GralPanelMngWorking_ifc.cmdTextColor, ix, color, null);
   } 
   
   
@@ -793,7 +796,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   {
     @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
     WidgetDescriptor descr = (WidgetDescriptor) widgetDescr;
-    setInfo(descr, GuiPanelMngWorkingIfc.cmdColor, colorBorder, colorInner, null);
+    setInfo(descr, GralPanelMngWorking_ifc.cmdColor, colorBorder, colorInner, null);
     
   }
   
@@ -843,8 +846,8 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
 		{ 
 			if(lastClickedWidgetInfo !=null){
 				log.sendMsg(Report.info, "widget %s, datapath=%s"
-					, GuiPanelMngBase.this.lastClickedWidgetInfo.name
-					, GuiPanelMngBase.this.lastClickedWidgetInfo.getDataPath());
+					, GralGridMngBase.this.lastClickedWidgetInfo.name
+					, GralGridMngBase.this.lastClickedWidgetInfo.getDataPath());
 			} else {
 				log.sendMsg(0, "widgetInfo - no widget selected");
 			}
@@ -864,7 +867,7 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
    * @param heightParentPixel The size of the panel, where the widget is member of
    * @return A rectangle for setBounds.
    */
-  protected GuiRectangle calcWidgetPosAndSize(GralPos posWidget, 
+  protected GuiRectangle calcWidgetPosAndSize(GralGridPos posWidget, 
       int widthParentPixel, int heightParentPixel,
       int widthWidgetNat, int heightWidgetNat)
   {
@@ -876,13 +879,13 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
        + (posWidget.x < 0 ? widthParentPixel : 0);  //from right
     y1 = yPixelUnit * posWidget.y + propertiesGui.yPixelFrac(posWidget.yFrac)  //negative if from right
        + (posWidget.y < 0 ? heightParentPixel : 0);  //from right
-    if(posWidget.xEnd == GralPos.useNatSize){
+    if(posWidget.xEnd == GralGridPos.useNatSize){
       x2 = x1 + widthWidgetNat; 
     } else {
       x2 = xPixelUnit * posWidget.xEnd + propertiesGui.xPixelFrac(posWidget.xEndFrac)  //negative if from right
          + (posWidget.xEnd < 0 || posWidget.xEnd == 0 && posWidget.xEndFrac == 0 ? widthParentPixel : 0);  //from right
     }
-    if(posWidget.xEnd == GralPos.useNatSize){
+    if(posWidget.xEnd == GralGridPos.useNatSize){
       y2 = y1 + heightWidgetNat; 
     } else {
       y2 = yPixelUnit * posWidget.yEnd + propertiesGui.yPixelFrac(posWidget.yEndFrac)  //negative if from right
@@ -898,9 +901,9 @@ public abstract class GuiPanelMngBase implements GuiPanelMngBuildIfc, GuiPanelMn
   @Override public WidgetDescriptor addFileSelectField(String name, List<String> listRecentFiles, String startDirMask, String prompt, char promptStylePosition)
   { //int xSize1 = xSize;
     //The macro widget consists of more as one widget. Position the inner widgets:
-    GralPos posAll = getPositionInPanel().clone(); //saved whole position.
+    GralGridPos posAll = getPositionInPanel().clone(); //saved whole position.
     //reduce the length of the text field:
-    setPosition(GralPos.same, GralPos.same, GralPos.same, GralPos.same -2.0F, 1, 'r');
+    setPosition(GralGridPos.same, GralGridPos.same, GralGridPos.same, GralGridPos.same -2.0F, 1, 'r');
     
     //xSize -= ySize;
     WidgetDescriptor widgd = addTextField(name, true, prompt, promptStylePosition );

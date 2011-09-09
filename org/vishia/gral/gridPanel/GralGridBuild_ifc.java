@@ -8,11 +8,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralTabbedPanel;
+import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.cfg.GuiCfgData;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.FileDialogIfc;
 import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
-import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GuiShellMngIfc;
 import org.vishia.gral.ifc.GuiWindowMng_ifc;
 import org.vishia.gral.ifc.UserActionGui;
@@ -22,7 +25,7 @@ import org.vishia.gral.widget.WidgetCmpnifc;
 
 
 /**This is a unique interface for the GUI-panel-manager to build its content.
- * To work with the graphical application see {@link GuiPanelMngWorkingIfc}. 
+ * To work with the graphical application see {@link GralPanelMngWorking_ifc}. 
  * <br><br>
  * Any widget is represented by a {@link WidgetDescriptor}. Either the WidgetDescriptor
  * should be created before, and taken as parameter for the widget-creating method,
@@ -44,7 +47,7 @@ import org.vishia.gral.widget.WidgetCmpnifc;
  * <br><br>
  * To build a GUI you must use the following order of calls:
  * <ul>
- * <li>Create a panel manager which is typeof {@link GuiPanelMngBase} or this interface.
+ * <li>Create a panel manager which is typeof {@link GralGridMngBase} or this interface.
  *   For example create {@link org.vishia.mainGuiSwt.GuiPanelMngSwt}.
  * <li>Create a panel, for example call {@link #createGridPanel(GralColor, int, int, int, int)}
  *   and add the panel to the given     
@@ -63,7 +66,7 @@ import org.vishia.gral.widget.WidgetCmpnifc;
  * @author Hartmut Schorrig
  *
  */
-public interface GuiPanelMngBuildIfc 
+public interface GralGridBuild_ifc 
 {
   
   /**The version of this interface:
@@ -75,7 +78,7 @@ public interface GuiPanelMngBuildIfc
    *     A Text box with more as one line. The TextField has only one line.
    * <li>2011-05-01 Hartmut new: {@link #createCompositeBox()}. It is a box with its own PanelMng
    *     which is located in an area of another panel. (Composite)
-   * <li>2011-05-01 Hartmut new: {@link #remove(GuiPanelMngBuildIfc)} and {@link #remove(WidgetDescriptor)}
+   * <li>2011-05-01 Hartmut new: {@link #remove(GralGridBuild_ifc)} and {@link #remove(WidgetDescriptor)}
    *     to remove widgets, for dynamic views.
    * <li>2011-05-01 Hartmut new: {@link #createWindow(String, boolean)} instead createModalWindow(String).
    *     This method should be used for any sub-windows in the application. The window position is determined
@@ -112,7 +115,7 @@ public interface GuiPanelMngBuildIfc
    *              If it the instance is fault, a ClassCastException is thrown.
    *         
    */
-  public void registerPanel(String name, PanelContent panel);
+  public void registerPanel(String name, GralPanelContent panel);
   
   
   /**Creates a panel for tabs and registers it in the GUI.
@@ -121,7 +124,7 @@ public interface GuiPanelMngBuildIfc
    * @param properties use or of constants {@link #propZoomedPanel}, {@link #propGridZoomedPanel}
    * @return The Tab-container, there the tabs can be registered.
    */
-  GralTabbedPanel createTabPanel(PanelActivatedGui user, int properties);
+  GralTabbedPanel createTabPanel(GralPanelActivated_ifc user, int properties);
   
   /**selects a registered panel for the next add-operations.
    * see {@link #registerPanel(String, Object)}. 
@@ -199,16 +202,16 @@ public interface GuiPanelMngBuildIfc
    * <li>Positive number in range 0...about 100..200: Gral Unit from left or top.
    * <li>Negative number in range -1...about -200..-200: Gral Unit from right or bottom.
    * <li>0 for lineEnd or columnEnd means the right or bottom. 
-   * <li>Positive Number added with {@link GralPos#size} applied at lineEnd or columnEnd: 
+   * <li>Positive Number added with {@link GralGridPos#size} applied at lineEnd or columnEnd: 
    *   The size. In this case the line and column is the left top corner. 
    *   All further related positions has the same left or top line.
-   * <li>Negative Number added with {@link GralPos#size} applied at lineEnd or columnEnd: 
+   * <li>Negative Number added with {@link GralGridPos#size} applied at lineEnd or columnEnd: 
    *   The absolute value is the size. It is negative because the size is measured from right to left
    *   respectively bottom to top. It means the line and column is the right or the bottom line. 
    *   All further related positions has the same right or bottom line. Especially the bottom line is used
    *   usual if more as one widgets are placed in one line after another, with a common bottom line.
-   * <li>TODO {@link GralPos#same}
-   * <li> {@link GralPos#next} and {@link GralPos#nextBlock}   
+   * <li>TODO {@link GralGridPos#same}
+   * <li> {@link GralGridPos#next} and {@link GralGridPos#nextBlock}   
    * <li>as width or height or as percent value from the panel size.
    * </ul>
    * Fine positions are given always from left. 
@@ -235,7 +238,7 @@ public interface GuiPanelMngBuildIfc
    * @param columnEnd
    * @deprecated. 
    */
-  public void setPosition(GralPos framePos, float line, float lineEnd, float column, float columnEnd
+  public void setPosition(GralGridPos framePos, float line, float lineEnd, float column, float columnEnd
       , int origin, char direction);
   
   
@@ -249,7 +252,7 @@ public interface GuiPanelMngBuildIfc
    * @param xFrac Number between 0..9 for fine positioning in the grid step.
    * @param xEnd
    * @param xEndFrac Number between 0..9 for fine positioning in the grid step.
-   * @param direction Direction of the next position if that is not given than or {@link GralPos#next} is given than.
+   * @param direction Direction of the next position if that is not given than or {@link GralGridPos#next} is given than.
    *        A value other then r, l, u, d let the direction unchanged from previous call.
    * @param origin Origin of inner widgets or next widgets. Use:
    *        <pre>
@@ -262,7 +265,7 @@ public interface GuiPanelMngBuildIfc
    */
   public void setFinePosition(int y, int yFrac, int yEnd, int yEndFrac
       , int x, int xFrac, int xEnd, int xEndFrac
-      , int origin, char direction, GralPos frame);
+      , int origin, char direction, GralGridPos frame);
   
   /**Sets the next position if the position is used, but change the size.
    * @param ySize
@@ -286,7 +289,7 @@ public interface GuiPanelMngBuildIfc
   
   
   
-  GralPos getPositionInPanel();
+  GralGridPos getPositionInPanel();
   
   /**Positions the next widget right to the previous one. */
   void setNextPositionX();
@@ -434,7 +437,7 @@ public interface GuiPanelMngBuildIfc
   /** Adds a field for editing or showing a text. This text can be prepared especially as number value too.
    * The field has one line. The number of chars are not limited. 
    * <br><br>
-   * The current content of the edit field is able to get any time calling {@link GuiPanelMngWorkingIfc#getValue(String)}
+   * The current content of the edit field is able to get any time calling {@link GralPanelMngWorking_ifc#getValue(String)}
    * with the given registering name.
    * <br><br>
    * To force a set of content or an action while getting focus of this field the method {@link #addActionFocused(String, UserActionGui, String)}
@@ -471,7 +474,7 @@ public interface GuiPanelMngBuildIfc
   
   /** Adds a box for editing or showing a text.
    * <br><br>
-   * The current content of the edit field is able to get anytime calling {@link GuiPanelMngWorkingIfc#getValue(String)}
+   * The current content of the edit field is able to get anytime calling {@link GralPanelMngWorking_ifc#getValue(String)}
    * with the given registering name.
    * <br><br>
    * To force a set of content or an action while getting focus of this field the method {@link #addActionFocused(String, UserActionGui, String)}
@@ -615,7 +618,7 @@ public interface GuiPanelMngBuildIfc
    * @return
    * @since 2010-05-01
    */
-  GuiPanelMngBuildIfc createCompositeBox();
+  GralGridBuild_ifc createCompositeBox();
   
   
   
@@ -636,7 +639,7 @@ public interface GuiPanelMngBuildIfc
    * @param compositeBox
    * @return true if removed.
    */
-  boolean remove(GuiPanelMngBuildIfc compositeBox);
+  boolean remove(GralGridBuild_ifc compositeBox);
   
   boolean remove(WidgetDescriptor widget);
   

@@ -30,7 +30,7 @@ import org.vishia.zbnf.ZbnfParser;
  * <br>
 */
 
-public class GuiDialogZbnfControlled
+class Deprecated_GuiDialogZbnfControlled
 {
 
   private static final long serialVersionUID = -5745557828207884305L;
@@ -68,7 +68,7 @@ public class GuiDialogZbnfControlled
   
   
 
-  public GuiDialogZbnfControlled(MainCmd_ifc cmdLineIfc, File fileSyntax)
+  public Deprecated_GuiDialogZbnfControlled(MainCmd_ifc cmdLineIfc, File fileSyntax)
   { //super("", 80,80, 'C');
   	this.fileSyntax = fileSyntax;
   	this.console = cmdLineIfc;
@@ -102,7 +102,7 @@ public class GuiDialogZbnfControlled
    * @return true if successfully, false on any error. If false, an error message was written
    *         using the own Report-implementation.
    */
-  public String configureWithZbnf(String sTitle, File fileConfigurationZbnf, final GuiPanelMngBuildIfc panel)
+  public String configureWithZbnf(String sTitle, File fileConfigurationZbnf, final GralGridBuild_ifc panel)
   { boolean bOk = true;
   	String sError = null;
     File dirOfconfig = fileConfigurationZbnf.getParentFile();
@@ -139,7 +139,7 @@ public class GuiDialogZbnfControlled
    * @return true if successfully, false on any error. If false, an error message was written
    *         using the own Report-implementation.
    */
-  public String configureWithZbnf(String sTitle, String sConfigurationZbnf, GuiPanelMngBuildIfc panel, File currentDir) throws ParseException
+  public String configureWithZbnf(String sTitle, String sConfigurationZbnf, GralGridBuild_ifc panel, File currentDir) throws ParseException
   {
     StringPart spToParse = new StringPart(sConfigurationZbnf);
     return configureWithZbnf(sTitle, spToParse, panel, currentDir);
@@ -147,7 +147,7 @@ public class GuiDialogZbnfControlled
   
   
   
-  /**Helper class for configuration only used in the method {@link GuiDialogZbnfControlled#configureWithZbnf(String, StringPart)}.
+  /**Helper class for configuration only used in the method {@link Deprecated_GuiDialogZbnfControlled#configureWithZbnf(String, StringPart)}.
    * The class is defined outside to make it visible for documentation.
    *
    */
@@ -166,12 +166,12 @@ public class GuiDialogZbnfControlled
 
   }
   
-  /**Inner, working method of {@link GuiDialogZbnfControlled#configureWithZbnf(String, File)} respectively {@link GuiDialogZbnfControlled#configureWithZbnf(String, String)}.
+  /**Inner, working method of {@link Deprecated_GuiDialogZbnfControlled#configureWithZbnf(String, File)} respectively {@link Deprecated_GuiDialogZbnfControlled#configureWithZbnf(String, String)}.
    * @param sTitle
    * @param spConfigurationZbnf
    * @return
    */
-  private String configureWithZbnf(String sTitle, StringPart spConfigurationZbnf, final GuiPanelMngBuildIfc panelMng, File currentDir)
+  private String configureWithZbnf(String sTitle, StringPart spConfigurationZbnf, final GralGridBuild_ifc panelMng, File currentDir)
   { boolean bOk = true;
     //int xWindows = 80 * propertiesGui.xPixelUnit();
     //int yWindows = 30 * propertiesGui.yPixelUnit();
@@ -229,7 +229,7 @@ public class GuiDialogZbnfControlled
       //mainDialog.setLayout(null); //new FlowLayout()); 
       
       //GuiPanelMngSwt dialog = panels.get("main");
-      GuiPanelMngBuildIfc dialog = panelMng;
+      GralGridBuild_ifc dialog = panelMng;
       if(dialog == null){
         console.writeError("panel not found: ");      	
       }
@@ -305,8 +305,8 @@ public class GuiDialogZbnfControlled
 	        	if(mdata.xPos >=0 || mdata.yPos >=0){
 	        	  //only if one of the position is given, set it. 
 	        		//If a position is -1, than the automatic increment is used by the calling method.
-	        		dialog.setFinePosition(mdata.yPos, yPosFrac, mdata.yWidth + GralPos.size, ySizeFrac
-	        		    , mdata.xPos, xPosFrac, mdata.xWidth + GralPos.size, xSizeFrac, 0, direction, null);
+	        		dialog.setFinePosition(mdata.yPos, yPosFrac, mdata.yWidth + GralGridPos.size, ySizeFrac
+	        		    , mdata.xPos, xPosFrac, mdata.xWidth + GralGridPos.size, xSizeFrac, 0, direction, null);
 	        	} else if(mdata.xWidth !=0 || mdata.yWidth != 0) {
 	        		dialog.setSize(mdata.yWidth, ySizeFrac, mdata.xWidth, xSizeFrac);
 	        	}
@@ -575,7 +575,7 @@ public class GuiDialogZbnfControlled
     return null;
   }
 
-  private int getColorValue(ZbnfParseResultItem parent, GuiPanelMngBuildIfc mng){
+  private int getColorValue(ZbnfParseResultItem parent, GralGridBuild_ifc mng){
 	  ZbnfParseResultItem child;
 	  int colorValue = 0;
   	if( (child = parent.getChild("colorValue"))!=null) { 

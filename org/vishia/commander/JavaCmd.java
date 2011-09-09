@@ -13,8 +13,8 @@ import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GuiMainCmd;
-import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
-import org.vishia.gral.gridPanel.GralTabbedPanel;
+import org.vishia.gral.base.GralTabbedPanel;
+import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.gral.widget.CommandSelector;
@@ -82,7 +82,7 @@ public class JavaCmd extends GuiCfg
     //gui.set
     
     //Creates tab-Panels for the file lists and command lists.
-    tabCmd = panelMng.createTabPanel(null, GuiPanelMngBuildIfc.propZoomedPanel);
+    tabCmd = panelMng.createTabPanel(null, GralGridBuild_ifc.propZoomedPanel);
     gui.addFrameArea(1,1,1,1, tabCmd.getGuiComponent()); //dialogPanel);
 
     int[] widthSelecttable = new int[]{2, 20, 30};
@@ -106,7 +106,7 @@ public class JavaCmd extends GuiCfg
     }
     
       
-    tabFile1 = panelMng.createTabPanel(null, GuiPanelMngBuildIfc.propZoomedPanel);
+    tabFile1 = panelMng.createTabPanel(null, GralGridBuild_ifc.propZoomedPanel);
     gui.addFrameArea(2,1,1,1, tabFile1.getGuiComponent()); //dialogPanel);
     
     tabFile1.addGridPanel("Sel1", "a-F2",1,1,10,10);
@@ -121,7 +121,7 @@ public class JavaCmd extends GuiCfg
       if(info.active == 'm'){ buildTabFromSelection(info, tabFile1); }
     }
     
-    tabFile2 = panelMng.createTabPanel(null, GuiPanelMngBuildIfc.propZoomedPanel);
+    tabFile2 = panelMng.createTabPanel(null, GralGridBuild_ifc.propZoomedPanel);
     gui.addFrameArea(3,1,1,1, tabFile2.getGuiComponent()); //dialogPanel);
       
     tabFile2.addGridPanel("Sel1", "a-F2",1,1,10,10);
@@ -418,6 +418,18 @@ public class JavaCmd extends GuiCfg
     }
     cmdgui.exit();
   }
+
+  
+  /**This action is invoked for all general key pressed actions.
+   * It tests the key and switches to the concretely action for the pressed key.
+   * General keys are [F1] for help, [F4] for edit etc.  
+   */
+  UserActionGui actionKey = new UserActionGui()
+  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+    { stop();
+    }
+  };
+  
 
 
   /**Key alt-F1 to select a directory/cmd list in a list of directories for the left panel.

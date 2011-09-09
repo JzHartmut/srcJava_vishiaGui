@@ -4,7 +4,7 @@ package org.vishia.gral.gridPanel;
  * @author Hartmut Schorrig
  *
  */
-public class GralPos implements Cloneable
+public class GralGridPos implements Cloneable
 {
   /**This adding value applied at any coordinate of any setPosition- method means, that the value is 
    * relative to the current position. The relative value may be given as positive or negative number.
@@ -91,7 +91,7 @@ public class GralPos implements Cloneable
 
  
   
-  public void set(GralPos pos)
+  public void set(GralGridPos pos)
   {
     x = pos.x; xEnd = pos.xEnd; //etc TODO
   }
@@ -119,9 +119,9 @@ public class GralPos implements Cloneable
   }
   
   
-  public GralPos clone(){ 
-    GralPos newObj = null;
-    try{ newObj = (GralPos)super.clone(); 
+  public GralGridPos clone(){ 
+    GralGridPos newObj = null;
+    try{ newObj = (GralGridPos)super.clone(); 
     } catch(CloneNotSupportedException exc){ assert(false); }
     return newObj; 
   }

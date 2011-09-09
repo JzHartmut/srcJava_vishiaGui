@@ -2,7 +2,7 @@ package org.vishia.gral.widget;
 
 import java.util.Map;
 
-import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
+import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
@@ -21,7 +21,7 @@ import org.vishia.gral.ifc.WidgetDescriptor;
  */
 public class FileViewerXXX
 {
-	private final GuiPanelMngBuildIfc guiMng;
+	private final GralGridBuild_ifc guiMng;
 	boolean bActiv;
 	boolean bActivate;
 	
@@ -29,7 +29,7 @@ public class FileViewerXXX
 	
 	GuiShellMngBuildIfc shell;
 	
-	public FileViewerXXX(GuiPanelMngBuildIfc guiMng)
+	public FileViewerXXX(GralGridBuild_ifc guiMng)
 	{
 		this.guiMng = guiMng;
 		

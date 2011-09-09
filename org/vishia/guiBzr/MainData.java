@@ -7,8 +7,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.cmd.CmdExecuter;
 import org.vishia.gral.area9.GuiMainAreaifc;
-import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
-import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.gridPanel.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 
 public class MainData
@@ -20,7 +20,7 @@ public class MainData
   
   MainAction mainAction;
   
-  GuiPanelMngWorkingIfc panelAccess;
+  GralPanelMngWorking_ifc panelAccess;
   
   GuiMainAreaifc guifc;
   

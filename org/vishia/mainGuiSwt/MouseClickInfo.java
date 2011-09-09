@@ -6,15 +6,15 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
-import org.vishia.gral.gridPanel.GuiPanelMngBase;
+import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GuiRectangle;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
 
 /**Universal Mouse Listener which works with the {@link WidgetDescriptor}.
  * <ul>
- * <li>Always sets {@link GuiPanelMngBase#setLastClickedWidgetInfo(WidgetDescriptor)}.
- * <li>Design mode: Left and right button for design in the {@link GuiPanelMngBase}
+ * <li>Always sets {@link GralGridMngBase#setLastClickedWidgetInfo(WidgetDescriptor)}.
+ * <li>Design mode: Left and right button for design in the {@link GralGridMngBase}
  *     using the {@link org.vishia.gral.cfg.GuiCfgDesigner}.
  * <li>Normal mode: calls {@link WidgetDescriptor#getActionChange()}
  * </ul>      
@@ -24,7 +24,7 @@ import org.vishia.gral.ifc.WidgetDescriptor;
 public class MouseClickInfo implements MouseListener
 {
 
-	protected final GuiPanelMngBase guiMng;
+	protected final GralGridMngBase guiMng;
 	
 	public MouseClickInfo(GuiPanelMngSwt guiMng)
 	{

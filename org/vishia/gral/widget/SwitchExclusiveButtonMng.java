@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.vishia.byteData.VariableAccess_ifc;
-import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
 
@@ -44,7 +44,7 @@ public class SwitchExclusiveButtonMng implements VariableAccess_ifc
       currentButtonText = infos.sCmd;
       for(WidgetDescriptor item: listSwitchButtons){
         if(item != infos){
-          item.setValue(GuiPanelMngWorkingIfc.cmdSet, 0, 0);
+          item.setValue(GralPanelMngWorking_ifc.cmdSet, 0, 0);
         }
       }
     }

@@ -1,17 +1,18 @@
-package org.vishia.gral.gridPanel;
+package org.vishia.gral.base;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GuiPlugUser_ifc;
 import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.gral.widget.WidgetCmpnifc;
 
 
 /**This class describes a panel with its content for managing. */
-public abstract class PanelContent implements WidgetCmpnifc
+public abstract class GralPanelContent implements WidgetCmpnifc
 {
 
   /**The GUI-Widget of the panel.   
@@ -53,18 +54,18 @@ public abstract class PanelContent implements WidgetCmpnifc
   
 
   
-	public PanelContent(Object panelComposite)
+	public GralPanelContent(Object panelComposite)
 	//public PanelContent(CanvasStorePanel panelComposite)
 	{
 		this.panelComposite = panelComposite;
     int property = 0; //TODO parameter
-    bZoomed = (property & GuiPanelMngBuildIfc.propZoomedPanel) !=0;
-    bGridZoomed = (property & GuiPanelMngBuildIfc.propGridZoomedPanel) !=0;
+    bZoomed = (property & GralGridBuild_ifc.propZoomedPanel) !=0;
+    bGridZoomed = (property & GralGridBuild_ifc.propGridZoomedPanel) !=0;
 	}
 	
 	
 	
-	protected PanelContent(){ }
+	protected GralPanelContent(){ }
 
 	
 

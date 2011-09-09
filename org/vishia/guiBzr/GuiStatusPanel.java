@@ -2,9 +2,9 @@ package org.vishia.guiBzr;
 
 import java.io.File;
 
-import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
+import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
-import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GuiWindowMng_ifc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
@@ -22,11 +22,11 @@ public class GuiStatusPanel
   
   private static class SelectInfoBoxWidgds
   {
-    final GuiPanelMngBuildIfc box;
+    final GralGridBuild_ifc box;
     final DataCmpn data;
     WidgetDescriptor widgdTextRevision, widgdTextStatus;
     
-    SelectInfoBoxWidgds(GuiPanelMngBuildIfc box, DataCmpn data)
+    SelectInfoBoxWidgds(GralGridBuild_ifc box, DataCmpn data)
     { this.box = box; this.data = data; }
     
   }
@@ -35,7 +35,7 @@ public class GuiStatusPanel
   final MainData mainData;
 
   /**Aggregation to the build interface of the manager where the panel is member of. */
-  final GuiPanelMngBuildIfc panelBuildifc;
+  final GralGridBuild_ifc panelBuildifc;
   
   
   /**Widget to select the project path. 
@@ -54,7 +54,7 @@ public class GuiStatusPanel
   
   /**Any component has its PanelManager. It is one line with some widgets.
    */
-  private GuiPanelMngBuildIfc[] bzrComponentBox = new GuiPanelMngBuildIfc[100]; 
+  private GralGridBuild_ifc[] bzrComponentBox = new GralGridBuild_ifc[100]; 
 
   private GuiWindowMng_ifc testDialogBox;
 
@@ -69,7 +69,7 @@ public class GuiStatusPanel
   private WidgetDescriptor[] switchButtons;
   
 
-  public GuiStatusPanel(MainData mainData, GuiPanelMngBuildIfc panelBuildifc)
+  public GuiStatusPanel(MainData mainData, GralGridBuild_ifc panelBuildifc)
   {
     this.panelBuildifc = panelBuildifc;
     this.mainData = mainData;
@@ -109,13 +109,13 @@ public class GuiStatusPanel
     String sPrjPath = null;
     for(String sPrjPath1: mainData.cfg.listSwPrjs){
       if(sPrjPath ==null){ sPrjPath = sPrjPath1; } //The first is offered.
-    	mainData.panelAccess.setInfo(selectorProjectPathTable, GuiPanelMngWorkingIfc.cmdInsert, 0, sPrjPath1, null);
+    	mainData.panelAccess.setInfo(selectorProjectPathTable, GralPanelMngWorking_ifc.cmdInsert, 0, sPrjPath1, null);
     }
     if(sPrjPath==null){ 
       sPrjPath = "??no project directories found.";
     }
     //Test only in one Project
-    widgdProjektpath.setValue(GuiPanelMngWorkingIfc.cmdInsert, 0,sPrjPath);
+    widgdProjektpath.setValue(GralPanelMngWorking_ifc.cmdInsert, 0,sPrjPath);
     mainData.currPrj = new DataProject(FileSystem.absolutePath(sPrjPath, null));
     
   }
@@ -129,7 +129,7 @@ public class GuiStatusPanel
     if(bzrComponentBox !=null){
       panelBuildifc.selectPanel("Select");
       for(int ii=0; ii< bzrComponentBox.length; ++ii){
-        GuiPanelMngBuildIfc item = bzrComponentBox[ii]; 
+        GralGridBuild_ifc item = bzrComponentBox[ii]; 
         if(item !=null){ 
           bzrComponentBox[ii] = null;
           panelBuildifc.remove(item); 
@@ -171,7 +171,7 @@ public class GuiStatusPanel
     String sName = data.getBzrLocationDir().getName();
     panelBuildifc.selectPanel("Select");
     panelBuildifc.setPositionSize(yPosComponents, 1, 2, 70, 'r');
-    GuiPanelMngBuildIfc box;
+    GralGridBuild_ifc box;
     bzrComponentBox[iComponent] = box = panelBuildifc.createCompositeBox();
     SelectInfoBoxWidgds widgds = new SelectInfoBoxWidgds(box,data);
     box.selectPanel("$");
@@ -243,7 +243,7 @@ public class GuiStatusPanel
     {
       if(sCmd.equals("ok")){
         String sPath = (String)values[0];
-        widgdProjektpath.setValue(GuiPanelMngWorkingIfc.cmdInsert, 0, sPath);
+        widgdProjektpath.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, sPath);
         buildComponentsInfoSelectBoxes();
       }
       selectorProjectPath.setWindowVisible(false);

@@ -1,4 +1,4 @@
-package org.vishia.gral.gridPanel;
+package org.vishia.gral.base;
 
 import java.util.Map;
 import java.util.Queue;
@@ -20,11 +20,11 @@ import org.vishia.gral.widget.WidgetCmpnifc;
  */
 public abstract class GralTabbedPanel implements GralVisibleWidgets_ifc
 {
-	final protected PanelActivatedGui notifyingUserInstanceWhileSelectingTab;
+	final protected GralPanelActivated_ifc notifyingUserInstanceWhileSelectingTab;
 	
-	final protected Map<String, PanelContent> panels = new TreeMap<String, PanelContent>();
+	final protected Map<String, GralPanelContent> panels = new TreeMap<String, GralPanelContent>();
 
-	protected PanelContent currentPanel;
+	protected GralPanelContent currentPanel;
 	
   /**The actual widgets in the visible panel. It may a sub-panel or changed content. The list can be changed. */
   public Queue<WidgetDescriptor> widgetsVisible;
@@ -39,7 +39,7 @@ public abstract class GralTabbedPanel implements GralVisibleWidgets_ifc
 	/**The constructor can only be invoked from a implementing class.
 	 * @param user
 	 */
-	protected GralTabbedPanel(PanelActivatedGui user, int property)
+	protected GralTabbedPanel(GralPanelActivated_ifc user, int property)
 	{ this.notifyingUserInstanceWhileSelectingTab = user;
 	}
 	
@@ -54,15 +54,15 @@ public abstract class GralTabbedPanel implements GralVisibleWidgets_ifc
 	 * @param xGrid2  Number of grid lines horizontal per wider ranges for lines
 	 * @return
 	 */
-	abstract public PanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2);
+	abstract public GralPanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2);
 	
-	abstract public PanelContent addCanvasPanel(String sName, String sLabel);
+	abstract public GralPanelContent addCanvasPanel(String sName, String sLabel);
 	
 	
 	
 	abstract public WidgetCmpnifc getGuiComponent();
 	
-	public PanelContent getCurrentPanel(){ return currentPanel; }
+	public GralPanelContent getCurrentPanel(){ return currentPanel; }
 	
   @Override public Queue<WidgetDescriptor> getWidgetsVisible()
   {

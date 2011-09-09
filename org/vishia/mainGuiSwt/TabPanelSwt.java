@@ -16,9 +16,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Widget;
-import org.vishia.gral.gridPanel.PanelActivatedGui;
-import org.vishia.gral.gridPanel.PanelContent;
-import org.vishia.gral.gridPanel.GralTabbedPanel;
+import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralTabbedPanel;
+import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.ifc.WidgetDescriptor;
 import org.vishia.gral.widget.WidgetCmpnifc;
 
@@ -41,7 +41,7 @@ public class TabPanelSwt extends GralTabbedPanel
 	
 	final GuiPanelMngSwt mng;
 	
-	TabPanelSwt(GuiPanelMngSwt mng, PanelActivatedGui user, int property)
+	TabPanelSwt(GuiPanelMngSwt mng, GralPanelActivated_ifc user, int property)
 	{ super(user, property);
 		this.mng = mng;
 		tabMng = new TabFolder_(mng.graphicFrame, SWT.TOP);
@@ -56,7 +56,7 @@ public class TabPanelSwt extends GralTabbedPanel
 	
   
   
-	@Override public PanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
+	@Override public GralPanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
 	{ ///
 	  Rectangle sizeTabFolder = tabMng.widgetSwt.getBounds();
 	  TabItem tabItem = new TabItem(tabMng.widgetSwt, SWT.None);
@@ -77,7 +77,7 @@ public class TabPanelSwt extends GralTabbedPanel
   }
 
   
-	@Override public PanelContent addCanvasPanel(String sName, String sLabel)
+	@Override public GralPanelContent addCanvasPanel(String sName, String sLabel)
 	{ TabItem tabItemOperation = new TabItem(tabMng.widgetSwt, SWT.None);
 		tabItemOperation.setText(sLabel);
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
@@ -111,7 +111,7 @@ public class TabPanelSwt extends GralTabbedPanel
 				Object data = container.getData();
 				if(data != null){
 					@SuppressWarnings("unchecked")
-					PanelContent panelContent = (PanelContent)(data);
+					GralPanelContent panelContent = (GralPanelContent)(data);
 					Queue<WidgetDescriptor> widgetInfos = panelContent.widgetList; 
 					if(notifyingUserInstanceWhileSelectingTab !=null){
 					  notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);

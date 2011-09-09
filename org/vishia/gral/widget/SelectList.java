@@ -3,8 +3,8 @@ package org.vishia.gral.widget;
 import java.util.List;
 import java.util.Map;
 
-import org.vishia.gral.gridPanel.GuiPanelMngBuildIfc;
-import org.vishia.gral.ifc.GuiPanelMngWorkingIfc;
+import org.vishia.gral.gridPanel.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.ifc.WidgetDescriptor;
 
@@ -32,7 +32,7 @@ public abstract class SelectList
    * @param columns
    * @param size
    */
-  public void setToPanel(GuiPanelMngBuildIfc panel, String name, int rows, int[] columns, char size)
+  public void setToPanel(GralGridBuild_ifc panel, String name, int rows, int[] columns, char size)
   {
     wdgdTable = panel.addTable(name, rows, columns);
     wdgdTable.setActionChange(actionTable);
@@ -44,7 +44,7 @@ public abstract class SelectList
   public void set(List<String[]> listData)
   {
     for(String[] data: listData){
-      wdgdTable.setValue(GuiPanelMngWorkingIfc.cmdInsert, 0, data[0]);
+      wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, data[0]);
     }
   }
   
