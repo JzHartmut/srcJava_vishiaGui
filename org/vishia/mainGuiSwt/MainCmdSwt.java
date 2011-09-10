@@ -65,6 +65,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.vishia.gral.area9.GuiMainAreaBase;
 import org.vishia.gral.area9.GuiMainAreaifc;
+import org.vishia.gral.base.GralDevice;
 import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.UserActionGui;
 import org.vishia.gral.widget.TextBoxGuifc;
@@ -136,40 +137,12 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 		 * or the graphic can be changed. */
 		void change();
 	}
-	
-	
-  /**Queue of dispatchListeners. Any instance will be invoked in the dispatch-loop.
-   * See {@link #addDispatchListener(Runnable)}. 
-   * Hint: A dispatch-listener can be run only one time, than it should delete itself in its run-method.*/
-  ConcurrentLinkedQueue<GuiDispatchCallbackWorker> dispatchListeners = new ConcurrentLinkedQueue<GuiDispatchCallbackWorker>();
-  
-  /**Set if any external event is set. Then the dispatcher shouldn't sleep after finishing dispatching. 
-   * This is important if the external event occurs while the GUI is busy in the operation-system-dispatching loop.
-   */
-  private AtomicBoolean extEventSet = new AtomicBoolean(false);
-
-  /**Queue of orders for building the graphic. Any instance will be invoked 
-   * after initializing the graphic and before entry in the dispatch-loop.
-   * See {@link #addGuiBuildOrder(Runnable)}. */
-  ConcurrentLinkedQueue<Runnable> buildOrders = new ConcurrentLinkedQueue<Runnable>();
-  
 
 	
+  private PrimaryWindowSwt swtWindow = new PrimaryWindowSwt();
 	
 	
-  /**This thread can (not have to be) used for all graphic actions. If the user calls
-   * 
-   * 
-   */
-  Thread guiThread = new Thread("GUI-SWT")
-  {
-  	@Override public void run()
-  	{
-  		initGrafic(sTitle, 0, 0, xSize, ySize);
-      dispatch();
-  		//synchronized(this){ notify(); }  //to weak up waiting on configGrafic().
-  	}
-  };
+	
 	
   /**All main components of the Display in each FrameArea. */
   private Widgetifc[][] componentFrameArea = new Widgetifc[3][3];
@@ -191,40 +164,16 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    */
   private byte[][][] dxyFrameArea = new byte[3][3][2]; 
   
-  /**True if the startup is done. */
-  boolean bStarted = false; 
- 
-  boolean bWaitStart = false;
-  
-  /**Size of display window. */
-  int xSize,ySize;
-  /**left and top edge of display-window. */
-  int xPos, yPos;
-  
-  /**Title of display window. */
-  String sTitle;
-  
-  
   /**Number of pixels per percent unit of size, set if {@link #validateFrameAreas()} was called. */
   private float pixelPerXpercent = 1, pixelPerYpercent =1;  
   
   /** The interface to the application. */
   //private final MainApplicationWin_ifc application;
   
-  /**If true, than the application is to be terminate. */
-  protected boolean bTerminated = false;
-
-  protected Display guiDevice;
-  
-  private boolean isWakedUpOnly;
-  
   /**The id of the thread, which created the display. 
    * It is to check whether gui-commands should be queued or not. */
   //protected long idThreadGui;
   
-  /** The frame of the Window in the GUI (Graphical Unit Interface)*/
-  protected Shell graphicFrame;
-
   final protected StringBuffer sbWriteInfo = new StringBuffer(1000);  //max. 1 line!
   
   /** If it is set, the writeInfo is redirected to this.*/
@@ -272,27 +221,10 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   Queue<String> outputTexts = new ConcurrentLinkedQueue<String>();
   
   
-  /** set to true to exit in main*/
-	private boolean bExit = false;
-	
-	
-	/**The windows-closing event handler. It is used private only, but public set because documentation. */
-	public final class WindowsCloseListener implements Listener{
-		/**Invoked when the window is closed; it sets {@link #bExit}, able to get with {@link #isRunning()}.
-		 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
-		 */
-		@Override public void handleEvent(Event event) {
-			bExit = true;
-		}
-	}
-
-	/**Instance of windowsCloseHandler. */
-	private final WindowsCloseListener windowsCloseListener = new WindowsCloseListener(); 
-	
 	class ActionFileOpen implements SelectionListener
   { @Override public void widgetSelected(SelectionEvent e)
     { 
-      FileDialog fileChooser = new FileDialog(graphicFrame);
+      FileDialog fileChooser = new FileDialog(swtWindow.graphicFrame);
       if(currentDirectory != null) { fileChooser.setFileName(currentDirectory.getAbsolutePath()); }
       String sFile = fileChooser.open();
       if(sFile != null){
@@ -355,7 +287,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
       for(String line: mainCmd.listHelpInfo){
         sHelpText[ix++] = line;
       }
-      InfoBox helpDlg = new InfoBox(graphicFrame, "Help", sHelpText, false);//main.writeInfoln("action!");
+      InfoBox helpDlg = new InfoBox(swtWindow.graphicFrame, "Help", sHelpText, false);//main.writeInfoln("action!");
       helpDlg.open();
       helpDlg.setVisible(true);
       stop();
@@ -380,7 +312,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
       for(String line: mainCmd.listAboutInfo){
         sText[ix++] = line;
       }
-      InfoBox aboutDlg = new InfoBox(graphicFrame, "...about", sText, false);//main.writeInfoln("action!");
+      InfoBox aboutDlg = new InfoBox(swtWindow.graphicFrame, "...about", sText, false);//main.writeInfoln("action!");
       
       aboutDlg.setVisible(true);
       stop();
@@ -426,42 +358,6 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   
   
   
-  ShellListener mainComponentListerner = new ShellListener()
-  {
-
-    		
-		@Override
-		public void shellActivated(ShellEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void shellClosed(ShellEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void shellDeactivated(ShellEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void shellDeiconified(ShellEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void shellIconified(ShellEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-    
-  };
-  
   
   
   ControlListener resizeListener = new ControlListener()
@@ -476,22 +372,6 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   };
   
   
-  
-  KeyListener keyListener = new KeyListener()
-  {
-    @Override public void keyPressed(KeyEvent key)
-    {
-      // TODO Auto-generated method stub
-      stop();
-    }
-
-    @Override public void keyReleased(KeyEvent e)
-    {
-      // TODO Auto-generated method stub
-      
-    }
-    
-  };
   
   
   MouseListener mouseListener = new MouseListener()
@@ -525,6 +405,20 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   	
   };
   
+  /**Sets the title and size before initialization.
+   * @param sTitle
+   * @param xSize
+   * @param ySize
+   */
+  public void setTitleAndSize(String sTitle, int left, int top, int xSize, int ySize)
+  { //assert(!bStarted);
+    if(swtWindow !=null){
+      swtWindow.setTitleAndSize(sTitle, left, top, xSize, ySize);
+    }
+  }
+  
+
+
   
   /*	
   protected MainCmdWin(String[] args, MainApplicationWin_ifc application)
@@ -535,69 +429,42 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   
   public MainCmdSwt(MainCmd cmdP, GralDeviceSwt gralDevice) //String[] args)
   { //super(args);
-    super(gralDevice);
+    super(); //gralDevice);
+    swtWindow.addGuiBuildOrder(initOutputArea); 
+    swtWindow.addDispatchListener(writeOutputTextDirectly);
     mainCmd = cmdP;
   }
   
-  /**Sets the title and size before initialization.
-   * @param sTitle
-   * @param xSize
-   * @param ySize
-   */
-  public void setTitleAndSize(String sTitle, int left, int top, int xSize, int ySize)
-  { //assert(!bStarted);
-		this.xSize = xSize;
-		this.ySize = ySize;
-		this.xPos = left;
-		this.yPos = top;
-		this.sTitle = sTitle;
-		if(bStarted){
-			if(xSize < 0 || ySize < 0){
-				graphicFrame.setFullScreen(true);
-			} else {
-			  graphicFrame.setBounds(left,top, xSize, ySize );  //Start position.
-			}  
-		  graphicFrame.setText(sTitle);
-		}
-  }
+  
+  public GralDevice getPrimaryWindow(){ return swtWindow; }
   
   /**Initialize, in the graphic thread. 
    * @deprecated.
    * @param sTitle
    */
-  protected final void initGrafic(String sTitle)
-  { initGrafic(sTitle, 100, 100, 800, 500);
+  protected final void xxxinitGrafic(String sTitle)
+  { xxxinitGrafic(sTitle, 100, 100, 800, 500);
   }
     
-  protected final void initGrafic(String sTitle, int left, int top, int xSize, int ySize)
+  protected final void xxxinitGrafic(String sTitle, int left, int top, int xSize, int ySize)
   {
-  	if(!bStarted){
-  		setTitleAndSize(sTitle, left, top, xSize, ySize);
-  		gralDevice.guiThreadId = Thread.currentThread().getId();
-      guiDevice = new Display ();
-      guiDevice.addFilter(SWT.Close, windowsCloseListener);
-      graphicFrame = new Shell(guiDevice); //, SWT.ON_TOP | SWT.MAX | SWT.TITLE);
-      graphicFrame.addKeyListener(keyListener);
-      graphicFrame.open();
-    	
-      //graphicFramePos = new Position(graphicFrame.getContentPane());
-      //graphicFramePos.set(0,0,xSize,ySize);
-      // main = this;
-      graphicFrame.setText(sTitle);
-      //graphicFrame.getContentPane().setLayout(new BorderLayout());
-      //graphicFrame.addWindowListener(new WindowClosingAdapter(true));
-      //graphicFrame.setSize( xSize, ySize );
-      if(xSize == -1 || ySize == -1){
-      	graphicFrame.setFullScreen(true);
-      } else {
-        graphicFrame.setBounds(left,top, xSize, ySize );  //Start position.
-      }
-      graphicFrame.setVisible( true ); 
+  	if(!swtWindow.bStarted){///
+      swtWindow.setTitleAndSize(sTitle, left, top, xSize, ySize);
 
-      //graphicFrame.getContentPane().setLayout(new FlowLayout());
-      graphicFrame.setLayout(null);
-      graphicFrame.addShellListener(mainComponentListerner);
-      graphicFrame.addControlListener(resizeListener);
+      addDispatchListener(writeOutputTextDirectly);
+      
+  	  swtWindow.startGraphicThread();
+  	  
+      swtWindow.processBuildOrders();
+    } else throw new IllegalArgumentException("graphic is configured already, do it one time only.");
+  	
+  }
+  
+
+  Runnable initOutputArea = new Runnable(){
+    @Override public void run()
+    {
+      swtWindow.graphicFrame.addControlListener(resizeListener);
       setFrameAreaBorders(30,70,30,70);
       if(bSetStandardMenus){
         setStandardMenusGThread(currentDirectory, actionFile);
@@ -609,19 +476,38 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
         int dyArea = outputArea.charAt(3) - '0' - yArea +1;
         addOutputFrameArea(xArea, yArea, dxArea, dyArea);
       }
-      for(Runnable build: buildOrders){
-        build.run();
-      }
-      synchronized(guiThread){
-        if(bWaitStart){
-          guiThread.notify(); 
-        }
-        bStarted = true;
-      }
-    } else throw new IllegalArgumentException("graphic is configured already, do it one time only.");
-  	
-  }
+    }
+  };
+
   
+  
+  GuiDispatchCallbackWorker writeOutputTextDirectly = new GuiDispatchCallbackWorker()
+  { @Override public void doBeforeDispatching(boolean onlyWakeup)
+    { String line;
+      while((line = outputTexts.poll())!=null){
+        writeDirectly(line, MainCmd.kInfoln_writeInfoDirectly);
+      }
+    }
+  };
+  
+  
+  
+  /**Exits the cmdline application with the maximum of setted exit error level.
+  This method should be called only on end of the application, never inside. If the user will abort
+  the application from inside, he should throw an exception instead. So an comprising application
+  may catch the exception and works beyond.
+  This method is not member of MainCmd_Ifc and is setted protected, because
+  the users Main class (UserMain in the introcuction) only should call exit.
+*/
+@Override public void exit()
+{ if(!swtWindow.bExit && !swtWindow.guiDevice.isDisposed()){ 
+  swtWindow.guiDevice.dispose();
+  }  
+  System.exit(mainCmd.getExitErrorLevel());
+}
+
+
+
   
   /**Sets the divisions of the frame. The frame is divide into 9 parts,
    * where two horizontal and two vertical lines built them:
@@ -651,44 +537,11 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
     ypFrameArea[1] = (byte)y1p;
     ypFrameArea[2] = (byte)y2p;
     ypFrameArea[3] = 100;
-    if(bStarted)
+    if(swtWindow!=null)
     { validateFrameAreas();
     }
   }
   
-  
-  
-  /**Starts the execution of the graphic initializing in a own thread.
-   * The following sets should be called already:
-   * <pre>
-   * setTitleAndSize("SES_GUI", 800, 600);  //This instruction should be written first to output syntax errors.
-     setStandardMenus(new File("."));
-     setOutputArea("A3C3");        //whole area from mid to bottom
-     setFrameAreaBorders(20, 80, 75, 80);
-     </pre>
-   * They sets only some values, no initializing of the graphic is executed till now.
-   * <br><br>
-   * The graphic thread inside this class {@link #guiThread} initializes the graphic.
-   * All other GUI-actions should be done only in the graphic-thread. 
-   * The method {@link #addDispatchListener(Runnable)} is to be used therefore.
-   * <br><br>
-   * The method to use an own thread for the GUI is not prescribed. The initialization
-   * and all actions can be done in the users thread too. But then, the user thread
-   * have to be called {@link #dispatch()} to dispatch the graphic events. It is busy with it than.   
-   * @return true if started
-   */
-  public boolean startGraphicThread(){
-  	if(bStarted) throw new IllegalStateException("it is started already.");
-  	guiThread.start();
-  	synchronized(guiThread){ 
-    	while(!bStarted){
-    	  bWaitStart = true;
-    	  try{guiThread.wait(5000);} catch(InterruptedException exc){}
-    	}
-    	bWaitStart =false;
-    }
-  	return bStarted;
-  }
   
   
   /**Sets a Component into a defined area. See {@link #setFrameAreaBorders(int, int, int, int)}.
@@ -732,11 +585,11 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 	  //scrollPane.validate();
 	  //graphicFrame.add(component); //scrollPane);
 	  if(yAreaMover[1] == null){
-	  	yAreaMover[1] = new Canvas(graphicFrame, SWT.None);
+	  	yAreaMover[1] = new Canvas(swtWindow.graphicFrame, SWT.None);
 	  	yAreaMover[1].setSize(10,10);
-	  	yAreaMover[1].setBackground(guiDevice.getSystemColor(SWT.COLOR_GREEN));
+	  	yAreaMover[1].setBackground(swtWindow.guiDevice.getSystemColor(SWT.COLOR_GREEN));
 	  }
-	  if(bStarted)
+	  if(swtWindow!=null)
 	  { validateFrameAreas();
 	  }
 	  ((Control)component.getWidget()).addMouseListener(mouseListener);
@@ -761,12 +614,12 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   { this.currentDirectory = openStandardDirectory;
     this.actionFile = actionFile;
     { //create the menue
-      menuBar = new Menu(graphicFrame, SWT.BAR);
-      graphicFrame.setMenuBar(menuBar);
+      menuBar = new Menu(swtWindow.graphicFrame, SWT.BAR);
+      swtWindow.graphicFrame.setMenuBar(menuBar);
       { MenuItem menuItemFile = new MenuItem(menuBar, SWT.CASCADE);
         menuItemFile.setText("File");
         menuItemFile.setAccelerator(SWT.CONTROL | 'F');
-        menuFile = new Menu(graphicFrame, SWT.DROP_DOWN);
+        menuFile = new Menu(swtWindow.graphicFrame, SWT.DROP_DOWN);
         menuItemFile.setMenu(menuFile);
       	
         if(openStandardDirectory != null)
@@ -796,7 +649,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
       { MenuItem menuItemHelp = new MenuItem(menuBar, SWT.CASCADE);
         menuItemHelp.setText("Help");
         menuItemHelp.setAccelerator(SWT.CONTROL | 'H');
-        menuHelp = new Menu(graphicFrame, SWT.DROP_DOWN);
+        menuHelp = new Menu(swtWindow.graphicFrame, SWT.DROP_DOWN);
         menuItemHelp.setMenu(menuHelp);
       	{ MenuItem item = new MenuItem(menuHelp, SWT.None); item.setText("Help");
           item.setAccelerator(SWT.CONTROL | 'H');
@@ -812,7 +665,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
       }
       //graphicFrame.setJMenuBar(menuBar);
       //graphicFrame.setVisible( true );
-      graphicFrame.update();
+      swtWindow.graphicFrame.update();
     }
     
   }
@@ -834,7 +687,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
         menuEntry.subMenu = new TreeMap<String, MenuEntry>();
         MenuItem item = new MenuItem(parentMenu, SWT.CASCADE);
         item.setText(name);
-        menuEntry.menu = new Menu(graphicFrame, SWT.DROP_DOWN);
+        menuEntry.menu = new Menu(swtWindow.graphicFrame, SWT.DROP_DOWN);
         item.setMenu(menuEntry.menu);
       }
       menustore = menuEntry.subMenu;
@@ -870,36 +723,6 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   protected Menu getOutputMenu(){ return menuOutput; }
   
   
-  /**Adds a order for building the gui. The order will be execute one time after intializing the Graphic
-   * and before entry in the dispatch loop. After usage the orders will be removed,
-   * to force garbage collection for the orders.
-   * @param order
-   */
-  public void addGuiBuildOrder(Runnable order)
-  { buildOrders.add(order);
-  }
-  
-  /**Adds a listener, which will be called in the dispatch loop.
-   * @param listener
-   */
-  @Override public void addDispatchListener(GuiDispatchCallbackWorker listener)
-  { dispatchListeners.add(listener);
-		//it is possible that the GUI is busy with dispatching and doesn't sleep yet.
-    //therefore:
-    extEventSet.getAndSet(true);
-  	guiDevice.wake();  //to wake up the GUI-thread, to run the listener at least one time.
-  }
-  
-  
-  
-  /**Removes a listener, which was called in the dispatch loop.
-   * @param listener
-   */
-  public void removeDispatchListener(GuiDispatchCallbackWorker listener)
-  { dispatchListeners.remove(listener);
-  }
-  
-  
   /** Adds a complete pull down menu at the last but one position.
    * In standard menu technic the first position is the file menu and the
    * last position is the help menu. Both are added by calling addStandardMenus().
@@ -908,14 +731,28 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    */
   protected void addMenu(Menu menu, String text, char accelerator)
   {
-    Menu menuBar = graphicFrame.getMenuBar();
+    Menu menuBar = swtWindow.graphicFrame.getMenuBar();
     int nrofMenus = menuBar.getItemCount();  //ComponentCount();
     
     MenuItem menuItem = new MenuItem(menuBar, SWT.DROP_DOWN);
     menuItem.setText(text);
     menuItem.setAccelerator(SWT.CONTROL | accelerator);
     menuItem.setMenu(menu);
-    graphicFrame.update();
+    swtWindow.graphicFrame.update();
+  }
+  
+  
+  /**Adds a listener, which will be called in the dispatch loop.
+   * @param listener
+   */
+  @Override public void addDispatchListener(GuiDispatchCallbackWorker listener)
+  { swtWindow.addDispatchListener(listener);
+  }
+  
+  
+  
+  @Override public void removeDispatchListener(GuiDispatchCallbackWorker listener)
+  { swtWindow.removeDispatchListener(listener);
   }
   
   
@@ -927,15 +764,15 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    */
   protected Menu addMenu(String text, char accelerator)
   {
-    Menu menuBar = graphicFrame.getMenuBar();
+    Menu menuBar = swtWindow.graphicFrame.getMenuBar();
     int nrofMenus = menuBar.getItemCount();  //ComponentCount();
     
     MenuItem menuItem = new MenuItem(menuBar, SWT.DROP_DOWN);
     menuItem.setText(text);
     menuItem.setAccelerator(SWT.CONTROL | accelerator);
-    Menu menu = new Menu(graphicFrame, SWT.DROP_DOWN);
+    Menu menu = new Menu(swtWindow.graphicFrame, SWT.DROP_DOWN);
     menuItem.setMenu(menu);
-    //graphicFrame.update();
+    //swtWindow.graphicFrame.update();
     return menu;
   }
 
@@ -946,14 +783,14 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    * 
   protected void addMenuItem(MenuItem menuItem, int idx)
   {
-    Menu menuBar = graphicFrame.getMenuBar();
+    Menu menuBar = swtWindow.graphicFrame.getMenuBar();
     MenuItem[] items = menuBar.getItems();
     MenuItem barItem = items[idx];
     Menu menuBarEntry = barItem.getMenu();
     int nrofMenuItems = menuBarEntry.getItemCount();
     menuItem.set
     menu.add(menuItem, nrofMenuItems -1);
-    graphicFrame.validate();
+    swtWindow.graphicFrame.validate();
   }
    */
   
@@ -965,7 +802,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   {
     int nrofMenuItems = menuFile.getMenuComponentCount(); //  .getComponentCount();
     menuFile.add(menuItem, nrofMenuItems -1);
-    graphicFrame.validate();
+    swtWindow.graphicFrame.validate();
     
   }
    */
@@ -1005,7 +842,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
       if(positionInMenu < 0)throw new IndexOutOfBoundsException(" fault position =" + positionInMenu);
     }
     parent.add(menuItem, positionInMenu);
-    graphicFrame.validate();
+    swtWindow.graphicFrame.validate();
   }
    */
   
@@ -1050,19 +887,19 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    */
   protected void addOutputFrameArea(int xArea, int yArea, int dxArea, int dyArea)
   { int widgetStyle = SWT.H_SCROLL | SWT.V_SCROLL;
-  	textAreaOutput = new WidgetsSwt.TextBoxSwt(graphicFrame, widgetStyle);
+  	textAreaOutput = new WidgetsSwt.TextBoxSwt(swtWindow.graphicFrame, widgetStyle);
     //textAreaPos = new Position(textAreaOutput);
     //textAreaPos.x = x; textAreaPos.y = y; textAreaPos.dx = dx; textAreaPos.dy = dy; 
-    //textAreaOutput.setSize(350,100); //graphicFrame.get)
+    //textAreaOutput.setSize(350,100); //swtWindow.graphicFrame.get)
     //textAreaOutput.setBounds(x, y, dx,dy);
-    ((WidgetsSwt.TextBoxSwt)textAreaOutput).text.setFont(new Font(guiDevice, "Monospaced",11, SWT.NORMAL));
+    ((WidgetsSwt.TextBoxSwt)textAreaOutput).text.setFont(new Font(swtWindow.guiDevice, "Monospaced",11, SWT.NORMAL));
     textAreaOutput.append("output...\n");
     //textAreaOutputPane = new JScrollPane(textAreaOutput, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
     //pane.setSize(800,300);
     addFrameArea(xArea, yArea, dxArea, dyArea, textAreaOutput);
     
-    //textAreaPos.setBounds(textAreaOuptutPane, graphicFramePos);
-    //graphicFrame.getContentPane().add(textAreaOuptutPane);
+    //textAreaPos.setBounds(textAreaOuptutPane, swtWindow.graphicFramePos);
+    //swtWindow.graphicFrame.getContentPane().add(textAreaOuptutPane);
 /*
     { menuOutput = new JMenu("Edit");//##a
       menuOutput.setMnemonic('E');
@@ -1080,7 +917,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
     }
 */      
     
-    graphicFrame.update();
+    swtWindow.graphicFrame.update();
   }
 
 /*
@@ -1090,19 +927,19 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 		  return;
 	  
 	  paintArea = panel;
-	  graphicFrame.getContentPane().add(paintArea);
-	  //graphicFrame.validate();
+	  swtWindow.graphicFrame.getContentPane().add(paintArea);
+	  //swtWindow.graphicFrame.validate();
 	  paintArea.repaint();
   }
 */  
   
   protected void validateFrameAreas()
   {
-    if(!bStarted) return;
-    Point size = graphicFrame.getSize();
-    int xWidth = size.x -6; //graphicFrame.getWidth();
-    int yWidth = size.y -53; //graphicFrame.getHeight() - 50;  //height of title and menu TODO calculate correctly
-    //Control content = graphicFrame.getContentPane();
+    if(!swtWindow.bStarted) return;
+    Point size = swtWindow.graphicFrame.getSize();
+    int xWidth = size.x -6; //swtWindow.graphicFrame.getWidth();
+    int yWidth = size.y -53; //swtWindow.graphicFrame.getHeight() - 50;  //height of title and menu TODO calculate correctly
+    //Control content = swtWindow.graphicFrame.getContentPane();
     //xWidth = content.getWidth();
     //yWidth = content.getHeight();
     pixelPerXpercent = xWidth / 100.0F;
@@ -1128,102 +965,19 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
     		yAreaMover[ixMover].redraw(); 		
       }
     }
-    //graphicFrame.update();
-    //graphicFrame.redraw();
-    //graphicFrame.update();
+    //swtWindow.graphicFrame.update();
+    //swtWindow.graphicFrame.redraw();
+    //swtWindow.graphicFrame.update();
     
   }
  
-  
-  private static class CntSleep
-  {
-  	long lastTime;
-  	long minMillisecBetweenSleep= Long.MAX_VALUE;
-  	long maxMillisecBetweenSleep= 0;
-  	double avMillisecBetweenSleep = 0.0;
-  	double percentActive = 0.0;
-  };
-  
-  private CntSleep cntSleep;
-  
-  
-  MinMaxTime checkTimes = new MinMaxTime();
-  
-  
-  public void wakeup(){
-  	guiDevice.wake();
-  	isWakedUpOnly = true;
-  }
-  
-  public boolean isWakedUpOnly(){ return isWakedUpOnly; }
-  
-  
-  public void dispatch()
-  {
-  	checkTimes.init();
-  	checkTimes.adjust();
-  	checkTimes.cyclTime();
-		while (! (bExit = graphicFrame.isDisposed ())) {
-			while (guiDevice.readAndDispatch ()){
-				//isWakedUpOnly = false;  //after 1 event, it may be wakeUp, set if false.
-			}
-			checkTimes.calcTime();
-			isWakedUpOnly = false;
-			//System.out.println("dispatched");
-			if(!extEventSet.get()) {
-				guiDevice.sleep ();
-			}
-			if(!bExit){
-				extEventSet.set(false); //the list will be tested!
-		  	if(isWakedUpOnly)
-		  		stop();
-				//it may be waked up by the operation system or by calling Display.wake().
-		  	//if wakeUp() is called, isWakedUpOnly is set.
-				checkTimes.cyclTime();
-				String line;
-				while((line = outputTexts.poll())!=null){
-					writeDirectly(line, MainCmd.kInfoln_writeInfoDirectly);
-				}
-				for(GuiDispatchCallbackWorker listener: dispatchListeners){
-				  //use isWakedUpOnly for run as parameter?
-					///System.out.println("BeforeDispatch");
-					listener.doBeforeDispatching(isWakedUpOnly);	
-					///System.out.println("BeforeDispatch-ready");
-				}
-			}	
-		}
-		guiDevice.dispose ();
-	  bExit = true;
-  }
-  
-  
-  
-  
-  public boolean isRunning(){ return !bExit; }
-  
-  
-	  /**Exits the cmdline application with the maximum of setted exit error level.
-	  This method should be called only on end of the application, never inside. If the user will abort
-	  the application from inside, he should throw an exception instead. So an comprising application
-	  may catch the exception and works beyond.
-	  This method is not member of MainCmd_Ifc and is setted protected, because
-	  the users Main class (UserMain in the introcuction) only should call exit.
-	*/
-	@Override public void exit()
-	{ if(!bExit && !guiDevice.isDisposed()){ 
-		  guiDevice.dispose();
-	  }  
-		System.exit(mainCmd.getExitErrorLevel());
-	}
-  
-  
   
   /**Sets the bounds for the component, which is localized at the given area.
    * @param idxArea
    * @param idyArea
    */
   private void setBoundsForFrameArea(int idxArea, int idyArea)
-  { Point size = graphicFrame.getSize();
+  { Point size = swtWindow.graphicFrame.getSize();
     int xWidth = size.x -6; //graphicFrame.getWidth();
     int yWidth = size.y -53; //graphicFrame.getHeight() - 50;  //height of title and menu TODO calculate correctly
     //Control content = graphicFrame.getContentPane();
@@ -1262,12 +1016,12 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 	      int nrofLines = textAreaOutput.getNrofLines();
 	      textAreaOutput.viewTrail();
 	      //textAreaOutput.setCaretPosition(nrofLines-1);
-	      graphicFrame.update();
+	      swtWindow.graphicFrame.update();
       } else {  
         //queue the text
       	outputTexts.add(sInfo);
-      	guiDevice.wake();
-      	extEventSet.set(true);
+      	swtWindow.guiDevice.wake();
+      	swtWindow.extEventSet.set(true);
       }
   	}  
     else mainCmd.writeDirectly(sInfo, kind);     
@@ -1285,7 +1039,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   { if(textAreaOutput != null)
     { textAreaOutput.append("\nEXCEPTION: " + sInfo + exception.getMessage());
       textAreaOutput.viewTrail();
-      graphicFrame.update();  //update in TextBox...
+      swtWindow.graphicFrame.update();  //update in TextBox...
     }
     else mainCmd.writeErrorDirectly(sInfo, exception);     
   }
@@ -1297,20 +1051,20 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    *  @param frame The graphical frame.
    */
 	protected final void setGraphicFrame(Shell frame)
-  { this.graphicFrame = frame;
+  { swtWindow.graphicFrame = frame;
   }
 
   
   /** Gets the graphical frame. */
-  public final Shell getitsGraphicFrame(){ return graphicFrame; }
+  public final Shell getitsGraphicFrame(){ return swtWindow.graphicFrame; }
   
   /** Gets the graphical frame. */
   public final Composite getContentPane()
   {
-    return graphicFrame; //.getContentPane();
+    return swtWindow.graphicFrame; //.getContentPane();
   }
   
-  public Display getDisplay(){ return guiDevice; }
+  public Display getDisplay(){ return swtWindow.guiDevice; }
   
   //public final Device getGuiDevice(){ return guiDevice.get
   
@@ -1318,8 +1072,8 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   /**This method have to be called by user if the layout of the application is set. */
   public final void validateGraphic()
   { validateFrameAreas();
-	  if(!bStarted){
-		  bStarted = true;
+	  if(!swtWindow.bStarted){
+	    swtWindow.bStarted = true;
 		  //guiThread.start();
 	  }
 		
@@ -1332,6 +1086,17 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   */
   
   
+  @Override public boolean isRunning(){ return swtWindow.isRunning(); }
+
+  
+  
+  @Override public boolean startGraphicThread()  ///
+  { return swtWindow.startGraphicThread(); 
+  }
+
+  
+
+  
   /** This method is called when a standard file open dialog is done and a file
    * was selected. The user have to overload this method in its derived application class.
    * @param sFileName full path of selected file
@@ -1341,7 +1106,6 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
     mainCmd.writeInfo("action file open:" + file.getName());
   }
   
-
 
 
 

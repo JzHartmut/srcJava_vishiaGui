@@ -4,7 +4,7 @@ import org.vishia.gral.base.GralDevice;
 
 public class GuiMainAreaBase
 {
-  protected final GralDevice gralDevice;
+  protected GralDevice gralDevice;
   
   /**Area settings for output. */
   protected String outputArea;
@@ -19,6 +19,8 @@ public class GuiMainAreaBase
   public void setOutputArea(String area){
     outputArea = area;
   }
+
+  public GuiMainAreaBase(){}
 
   public GuiMainAreaBase(GralDevice guiDevice)
   {

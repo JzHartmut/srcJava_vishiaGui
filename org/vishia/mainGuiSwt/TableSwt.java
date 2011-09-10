@@ -247,14 +247,19 @@ public class TableSwt implements TableGui_ifc
       final UserActionGui action;
       System.out.println("" + keyEv.character + Integer.toHexString(keyEv.keyCode));
       final Object source = keyEv.getSource();
+      final Control swtControl;
       if(source instanceof Control){
-        Object oData = ((Control)source).getData();
+        swtControl = ((Control)source);
+        Object oData = swtControl.getData();
         if(oData instanceof WidgetDescriptor){
           widgetDescr = (WidgetDescriptor)oData;
           action = widgetDescr.getActionChange();
         } else { widgetDescr = null; action = null; }
-        } else { widgetDescr = null; action = null;
+      } else { 
+        widgetDescr = null; action = null;
+        swtControl = null;
       }
+      UserActionGui mainKeyAction = mng.getRegisteredUserAction("KeyAction");
       if(action !=null){
       	int ixRow = -99999;
       	try{
@@ -363,8 +368,16 @@ public class TableSwt implements TableGui_ifc
       	}
       }
       stop();
-      //basicListener.keyPressed(arg0);
-      
+      if(basicListener !=null){
+        basicListener.keyPressed(keyEv);
+      }
+      if(swtControl !=null){
+        Control parent = swtControl.getParent();
+        if(parent !=null){
+          //KeyListener parentListener = parent.getListener(SWT.KEY_MASK);
+          //parent.
+        }
+      }
     }
 
     @Override

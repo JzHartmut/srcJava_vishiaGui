@@ -3,11 +3,11 @@ package org.vishia.gral.swt;
 import org.eclipse.swt.widgets.Composite;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.area9.GuiMainAreaifc;
+import org.vishia.gral.base.GralDevice;
 import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.gridPanel.GralGridProperties;
 import org.vishia.gral.ifc.GraphicBaseFactory_ifc;
 import org.vishia.mainCmd.MainCmd;
-import org.vishia.mainGuiSwt.GralDeviceSwt;
 import org.vishia.mainGuiSwt.GuiPanelMngSwt;
 import org.vishia.mainGuiSwt.MainCmdSwt;
 import org.vishia.mainGuiSwt.PropertiesGuiSwt;
@@ -20,16 +20,18 @@ public class FactorySwt implements GraphicBaseFactory_ifc
   
   /**One instance per factory class for possible more as one windows.
    */
-  GralDeviceSwt gralDevice;
+  GralDevice gralDevice;
   
   //PropertiesGuiSwt propertiesGui;
 
   @Override public GuiMainAreaifc createGuiWindow(MainCmd cmdP)
   {
+    gui = new MainCmdSwt(cmdP, null);
+    gralDevice = gui.getPrimaryWindow();
     if(gralDevice ==null){
-      gralDevice = new GralDeviceSwt();
+      //gralDevice = new GralDeviceSwt();
     }
-    return gui = new MainCmdSwt(cmdP, gralDevice);
+    return gui; // = new MainCmdSwt(cmdP, gralDevice);
   }
 
   @Override public GralGridProperties createProperties(char sizePixel)

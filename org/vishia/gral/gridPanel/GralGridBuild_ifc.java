@@ -11,6 +11,7 @@ import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
+import org.vishia.gral.cfg.GuiCfgBuilder;
 import org.vishia.gral.cfg.GuiCfgData;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.FileDialogIfc;
@@ -590,8 +591,17 @@ public interface GralGridBuild_ifc
    * This method should only be called in the graphic thread (SWT).*/
   void repaint();
   
-  /**Registered a user action for a button. The register of the action should be done
-   * before it is used.
+  /**Registered any user action. A registered user action is used especially for a script build GUI.
+   * Action can be given by this register name. 
+   * <br><br>
+   * The registering of user actions should be done at startup of the application, before the 
+   * {@link GuiCfgBuilder#buildGui(org.vishia.msgDispatch.LogMessage, int)} is invoked.
+   * The user actions can be called in any specialized context.
+   * <br><br>
+   * Some user actions can be invoked from the GUI itself:
+   * <ul>
+   * <li> "KeyAction": Action for all common keys.
+   * </ul>
    * @param name Name of the action
    * @param action what to do.
    */

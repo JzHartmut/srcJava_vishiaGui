@@ -34,9 +34,9 @@ public class WidgetDescriptor
    */
   public final static int version = 0x20110813;
   
-  /**The panel where the widget is located. If a TabPanel is used, its the whole panel with all tabs.
-   * This reference is used to set values to other widgets. */
-  GralPanelMngWorking_ifc itsPanel;
+  /**The panel manager from where the widget is organized. Most of methods need the information
+   * stored in the panel manager. This reference is used to set values to other widgets. */
+  private GralPanelMngWorking_ifc itsMng;
   
   /**Association to the configuration element from where this widget was built. 
    * If the widget is moved or its properties are changed in the 'design mode' of the GUI,
@@ -299,7 +299,7 @@ public class WidgetDescriptor
 	}
 
 	public void setPanelMng(GralPanelMngWorking_ifc panel)
-	{ this.itsPanel = panel; 
+	{ this.itsMng = panel; 
 	}
 	
 	
@@ -328,7 +328,7 @@ public class WidgetDescriptor
    * @return The value in String representation, null if the widget has no possibility of input.
    */
   public String getValue()
-  { return itsPanel.getValueFromWidget(this);
+  { return itsMng.getValueFromWidget(this);
   }
   
   /**Sets the current value of the content of the widget in the given context.
@@ -337,13 +337,13 @@ public class WidgetDescriptor
    * @param value The value in the necessary representation.
    */
   public void setValue(int cmd, int ident, Object visibleInfo)
-  { itsPanel.setInfo(this, cmd, ident, visibleInfo, null);
+  { itsMng.setInfo(this, cmd, ident, visibleInfo, null);
   }
   
   
-  public void setBackColor(GralColor color, int ix){ itsPanel.setBackColor(this, ix, color.getColorValue()); }
+  public void setBackColor(GralColor color, int ix){ itsMng.setBackColor(this, ix, color.getColorValue()); }
   
-  public void setLineColor(GralColor color, int ix){ itsPanel.setLineColor(this, ix, color.getColorValue()); }
+  public void setLineColor(GralColor color, int ix){ itsMng.setLineColor(this, ix, color.getColorValue()); }
   
   
   
@@ -353,7 +353,7 @@ public class WidgetDescriptor
    * @param value The value in the necessary representation.
    */
   public void setValue(int cmd, int ident, Object visibleInfo, Object userData)
-  { itsPanel.setInfo(this, cmd, ident, visibleInfo, userData);
+  { itsMng.setInfo(this, cmd, ident, visibleInfo, userData);
   }
   
   public void setCfgElement(WidgetCfg_ifc cfge)
@@ -372,7 +372,7 @@ public class WidgetDescriptor
    * to get and set values and properties of this widgets non-symbolic.
    * @return The panel.
    */
-  public GralPanelMngWorking_ifc getPanel(){ return itsPanel; }
+  public GralPanelMngWorking_ifc getPanel(){ return itsMng; }
   
 	/**Especially for test and debug, short info about widget.
 	 * @see java.lang.Object#toString()
