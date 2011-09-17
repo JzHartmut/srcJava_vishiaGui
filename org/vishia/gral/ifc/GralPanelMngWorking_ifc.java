@@ -5,10 +5,11 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
+
 /**This is a unique interface for the GUI-panel-manager to work with it.
  * To build the graphical application see {@link org.vishia.gral.gridPanel.GralGridBuild_ifc}.
  * This interface supports handling with all widgets in a GUI. 
- * The widgets were selected by identifier or with their {@link WidgetDescriptor} instance
+ * The widgets were selected by identifier or with their {@link GralWidget} instance
  * whereby the implementation environment of a widget may be known. That implementation environment
  * is a implementor of this interface.
  *   
@@ -22,7 +23,7 @@ public interface GralPanelMngWorking_ifc
    * <ul>
    * <li>2011-05-08 Hartmut new; {@link #cmdClear} used to clear a whole swt.Table, commonly using: clear a content of widget.
    * <li>2011-05-01 Hartmut new: {@link #cmdInsert} etc now here. 
-   * <li>2011-05-01 Hartmut new: {@link #setInfo(WidgetDescriptor, int, int, Object)} as adequate method
+   * <li>2011-05-01 Hartmut new: {@link #setInfo(GralWidget, int, int, Object)} as adequate method
    *     to {@link #insertInfo(String, int, String) but without symbolic addressing of the widget.
    *     It calls the internal method to insert an information in a queue for the graphical thread. 
    *     It is thread-safe.
@@ -58,14 +59,14 @@ public interface GralPanelMngWorking_ifc
    * @param name The name which is assigned on build.
    * @return null if the widget is not found.
    */
-  WidgetDescriptor getWidget(String name);
+  GralWidget getWidget(String name);
   
 	/**Returns the list of all widgets with its informations. 
 	 * The graphical representation of the widgets is unknown here.
 	 * If it should be used, the graphic implementation should be known
 	 * and a adequate instanceof-test and cast is necessary. 
 	 */
-	Queue<WidgetDescriptor> getListCurrWidgets();
+	Queue<GralWidget> getListCurrWidgets();
 	
   /**Inserts a textual information at any widget. The widget may be for example:
    * <ul>
@@ -97,7 +98,7 @@ public interface GralPanelMngWorking_ifc
    * @param value The value to insert, usual a String
    * @return 
    */
-  String setInfo(WidgetDescriptor widgd, int cmd, int ident, Object visibleInfo, Object userData);
+  String setInfo(GralWidget widgd, int cmd, int ident, Object visibleInfo, Object userData);
   
   /**Sets the color of background of the widget, if possible.
    * @param name The name of the widget, which was given by the add...()-Operation
@@ -113,7 +114,7 @@ public interface GralPanelMngWorking_ifc
    * @param colorValue blue, green and red in the bits 23..16, 15..8 and 7..0. 
    *        opaque in bits 31..24 if possible. 
    */
-  void setBackColor(WidgetDescriptor widgetDescr, int ix, int colorValue);
+  void setBackColor(GralWidget widgetDescr, int ix, int colorValue);
   
   
   /**Sets the color of line of the widget, if possible.
@@ -122,7 +123,7 @@ public interface GralPanelMngWorking_ifc
    * @param colorValue blue, green and red in the bits 23..16, 15..8 and 7..0. 
    *        opaque in bits 31..24 if possible. 
    */
-  void setLineColor(WidgetDescriptor widgetDescr, int ix, int colorValue);
+  void setLineColor(GralWidget widgetDescr, int ix, int colorValue);
   
   
   /**Sets the color of text of the widget, if possible.
@@ -131,10 +132,10 @@ public interface GralPanelMngWorking_ifc
    * @param colorValue blue, green and red in the bits 23..16, 15..8 and 7..0. 
    *        opaque in bits 31..24 if possible. 
    */
-  void setTextColor(WidgetDescriptor widgetDescr, int ix, int colorValue);
+  void setTextColor(GralWidget widgetDescr, int ix, int colorValue);
   
   
-  void setLed(WidgetDescriptor widgetDescr, int colorBorder, int colorInner);
+  void setLed(GralWidget widgetDescr, int colorBorder, int colorInner);
   
   /**Adds a sampling value set.
    * @param sName The registered name
@@ -152,7 +153,36 @@ public interface GralPanelMngWorking_ifc
   /**Forces the resizing of the given widged. 
    * @param widgd the widget
    */
-  void resizeWidget(WidgetDescriptor widgd, int xSizeParent, int ySizeParent);
+  void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent);
+  
+  
+  /**Sets a given and registered window visible at the given position and size.
+   * <br>
+   * A window can be created by invoking {@link org.vishia.gral.gridPanel.GralGridBuild_ifc#createWindow(String, boolean)}
+   * in the build phase of the gui. It can be hidden because it is not necessary to show and operate with them.
+   * In a adequate phase of operate it can be shown and focused.
+   * <br>
+   * The position is given relative to that panel,
+   * which is stored in {@link GralGridPos#panel}. To get a position instance,
+   * you can set a position invoking 
+   * <ul>
+   * <li>{@link org.vishia.gral.gridPanel.GralGridBuild_ifc#selectPanel(String)}
+   * <li>{@link org.vishia.gral.gridPanel.GralGridBuild_ifc#setPosition(float, float, float, float, int, char)}
+   * <li>GralGridPos pos = {@link org.vishia.gral.gridPanel.GralGridBuild_ifc#getPositionInPanel()}.
+   * </ul>
+   * That can be done in the build phase of the graphic. The position can be stored. It is possible to adjust
+   * the position relative to the unchanged panel by changing the values of {@link GralGridPos#x} etc.
+   * It is possible too to change the Panel which relates to the position. Then the grid managing instance 
+   * have to be known via the {@link org.vishia.gral.gridPanel.GralGridBuild_ifc} to select a panel.
+   * The panels may be moved or resized. With the knowledge of the relative position of the window in respect to a panel
+   * of the parent window, the window can be placed onto a proper position of the whole display.
+   *   
+   * @param window the instance of the window wrapper.
+   * @param atPos The position and size of the window.  
+   * @return
+   */
+  boolean setWindowsVisible(GralWindow_ifc window, GralGridPos atPos);
+  
   
 	/**Gets the value to the named color. It is a method of the graphic.
 	 * @param sName supported: red, green, blue, yellow
@@ -174,24 +204,24 @@ public interface GralPanelMngWorking_ifc
 	 * @param widgetDescr The widget.
 	 * @return The content.
 	 */
-	String getValueFromWidget(WidgetDescriptor widgetDescr);
+	String getValueFromWidget(GralWidget widgetDescr);
 
 	
 	/**Sets the focus to the designated widget.
 	 * @param widgd
 	 * @return true if the focus is set. False if it isn't able to set the focus.
 	 */
-	boolean setFocus(WidgetDescriptor widgd);
+	boolean setFocus(GralWidget widgd);
 	
 	/**Notifies that this widget has the focus gotten.
 	 * Note: not all widgets notifies this. The focus can be used to detect which widget is active
 	 * while a menu command or any button is pressed.
 	 * @param widgd The widget descriptor
 	 */
-	void notifyFocus(WidgetDescriptor widgd);
+	void notifyFocus(GralWidget widgd);
 	
 	
-  WidgetDescriptor getWidgetInFocus();
+  GralWidget getWidgetInFocus();
   
   /**Returns a list of the last widgets in focus in there focus order.
    * On access to the list, usual with an iterator, the returned list should be used
@@ -200,7 +230,7 @@ public interface GralPanelMngWorking_ifc
    *  
    * @return The list.
    */
-  List<WidgetDescriptor> getWidgetsInFocus();
+  List<GralWidget> getWidgetsInFocus();
   
   
   /**Gets the list of all panels which are visible yet and should be updated with values therefore. 

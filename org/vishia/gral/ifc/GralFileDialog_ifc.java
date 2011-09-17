@@ -1,7 +1,7 @@
 package org.vishia.gral.ifc;
 
 
-public interface FileDialogIfc
+public interface GralFileDialog_ifc
 {
   /**Creates a dialog to select directories, not files. It is used while creation of the FileDialog. */
   static final int directory = 1;

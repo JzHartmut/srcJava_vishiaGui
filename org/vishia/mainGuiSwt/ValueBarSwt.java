@@ -11,11 +11,12 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.vishia.gral.ifc.GuiSetValueIfc;
+import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralSetValue_ifc;
+import org.vishia.gral.ifc.Widgetifc;
 import org.vishia.gral.widget.ValueBar;
-import org.vishia.gral.widget.Widgetifc;
 
-public class ValueBarSwt extends ValueBar implements GuiSetValueIfc, Widgetifc
+public class ValueBarSwt extends ValueBar implements GralSetValue_ifc, Widgetifc
 {
 
 	final GuiPanelMngSwt mng;
@@ -71,7 +72,7 @@ public class ValueBarSwt extends ValueBar implements GuiSetValueIfc, Widgetifc
 	{
 		BarWidget()
 		{
-			super((Composite)mng.currPanel.panelComposite, 0);  //Canvas
+			super((Composite)mng.pos.panel.panelComposite, 0);  //Canvas
 			addPaintListener(paintListener);	
 			
 		}
@@ -138,5 +139,19 @@ public class ValueBarSwt extends ValueBar implements GuiSetValueIfc, Widgetifc
 	}  
 	  
 	void stop(){}
+
+  @Override
+  public GralColor setBackgroundColor(GralColor color)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public GralColor setForegroundColor(GralColor color)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 }

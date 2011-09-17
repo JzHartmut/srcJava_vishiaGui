@@ -8,11 +8,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.gral.cfg.GuiCfgData.GuiCfgElement;
-import org.vishia.gral.gridPanel.GralGridPos;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.msgDispatch.LogMessage;
 
 public class GuiCfgBuilder
@@ -91,7 +91,7 @@ public class GuiCfgBuilder
   
   
   
-  /**Builds the graphical widget inclusive its {@link WidgetDescriptor} and place it in the GUI.
+  /**Builds the graphical widget inclusive its {@link GralWidget} and place it in the GUI.
    * @param cfge The configuration element data read from config file or set from the GUI-editor.
    * @return null if OK, an error String for a user info message on warning or error.
    *         It is possible that a named user action is not found etc. 
@@ -173,7 +173,7 @@ public class GuiCfgBuilder
     gui.setFinePosition(pos.yPos, pos.yPosFrac, heightArg, pos.ySizeFrac
         , pos.xPos, pos.xPosFrac, widthArg, pos.xSizeFrac, 1, dirNext, null);
     //
-    WidgetDescriptor widgd = null;
+    GralWidget widgd = null;
     String sName = cfge.widgetType.name;
     if(sName ==null){ sName = cfge.widgetType.text; }
     //
@@ -193,7 +193,7 @@ public class GuiCfgBuilder
       }
     }
     //
-    final UserActionGui userAction;
+    final GralUserAction userAction;
     if(cfge.widgetType.userAction !=null){
       userAction = gui.getRegisteredUserAction(cfge.widgetType.userAction);
       if(userAction == null){
@@ -244,7 +244,7 @@ public class GuiCfgBuilder
       //set common attributes for widgets:
       String sShowMethod = cfge.widgetType.showMethod;
       if(sShowMethod !=null){
-        UserActionGui actionShow = gui.getRegisteredUserAction(sShowMethod);
+        GralUserAction actionShow = gui.getRegisteredUserAction(sShowMethod);
         if(actionShow == null){
           sError = "GuiCfgBuilder - show method not found: " + sShowMethod;
         } else {
@@ -253,7 +253,7 @@ public class GuiCfgBuilder
       }
       String sCmd = cfge.widgetType.cmd;
       if(sCmd !=null){
-        UserActionGui actionCmd = gui.getRegisteredUserAction(sCmd);
+        GralUserAction actionCmd = gui.getRegisteredUserAction(sCmd);
         if(actionCmd == null){
           sError = "GuiCfgBuilder - cmd action not found: " + sCmd;
         } else {

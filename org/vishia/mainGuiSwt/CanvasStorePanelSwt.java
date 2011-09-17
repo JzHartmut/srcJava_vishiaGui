@@ -5,11 +5,10 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.ifc.CanvasStorage;
+import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.WidgetDescriptor;
-import org.vishia.gral.widget.WidgetCmpnifc;
-import org.vishia.gral.widget.Widgetifc;
+import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.ifc.Widgetifc;
 
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -34,13 +33,13 @@ import org.eclipse.swt.widgets.Widget;
  * @author Hartmut Schorrig
  *
  */
-public class CanvasStorePanelSwt extends GralPanelContent implements WidgetCmpnifc  //CanvasStorePanel //
+public class CanvasStorePanelSwt extends GralPanelContent  //CanvasStorePanel //
 {
 	
   protected SwtCanvas swtCanvas;
 	
 	/**The storage for the Canvas content. */
-	CanvasStorage store = new CanvasStorage(){
+	GralCanvasStorage store = new GralCanvasStorage(){
 
 		@Override public void redraw()
 		{
@@ -95,8 +94,8 @@ public class CanvasStorePanelSwt extends GralPanelContent implements WidgetCmpni
    * @param style
    * @param backGround
    */
-  public CanvasStorePanelSwt(Composite parent, int style, Color backGround)
-  { super();
+  public CanvasStorePanelSwt(String namePanel, Composite parent, int style, Color backGround)
+  { super(namePanel);
     swtCanvas = new SwtCanvas(this,parent, style);
     super.panelComposite = swtCanvas;
     swtCanvas.setData(this);
@@ -110,9 +109,9 @@ public class CanvasStorePanelSwt extends GralPanelContent implements WidgetCmpni
   /**Constructor called in derived classes. The derived class have to be instantiate the Canvas
    * maybe with other draw routines. 
    */
-  protected CanvasStorePanelSwt()
+  protected CanvasStorePanelSwt(String namePanel)
   {
-    
+    super(namePanel);
   }
   
 
@@ -136,14 +135,14 @@ public class CanvasStorePanelSwt extends GralPanelContent implements WidgetCmpni
     public void drawBackground(GC g, int x, int y, int dx, int dy) {
     	//NOTE: forces stack overflow because calling of this routine recursively: super.paint(g);
     	
-    	for(CanvasStorage.PaintOrder order: storeMng.store.paintOrders){
+    	for(GralCanvasStorage.PaintOrder order: storeMng.store.paintOrders){
     		switch(order.paintWhat){
-      		case CanvasStorage.paintLine: {
+      		case GralCanvasStorage.paintLine: {
       			g.setForeground(storeMng.colorSwt(order.color));
       	  	g.drawLine(order.x1, order.y1, order.x2, order.y2);
       	  } break;
-      		case CanvasStorage.paintImage: {
-      		  CanvasStorage.PaintOrderImage orderImage = (CanvasStorage.PaintOrderImage) order;
+      		case GralCanvasStorage.paintImage: {
+      		  GralCanvasStorage.PaintOrderImage orderImage = (GralCanvasStorage.PaintOrderImage) order;
       		  Image image = (Image)orderImage.image.getImage();
       		  //int dx1 = (int)(orderImage.zoom * order.x2);
       		  //int dy1 = (int)(orderImage.zoom * order.y2);
@@ -167,7 +166,7 @@ public class CanvasStorePanelSwt extends GralPanelContent implements WidgetCmpni
     { 
       Widget wparent = e.widget; //it is the SwtCanvas because this method is assigned only there.
       //Control parent = wparent;
-      for(WidgetDescriptor widgd: widgetsToResize){
+      for(GralWidget widgd: widgetsToResize){
         widgd.getPanel().resizeWidget(widgd, 0, 0);
       }
       stop();
@@ -183,6 +182,20 @@ public class CanvasStorePanelSwt extends GralPanelContent implements WidgetCmpni
 
   
   void stop(){} //debug
+
+  @Override
+  public GralColor setBackgroundColor(GralColor color)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public GralColor setForegroundColor(GralColor color)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
   
 }
 

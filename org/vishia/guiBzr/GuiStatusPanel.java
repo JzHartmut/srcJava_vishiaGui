@@ -5,9 +5,9 @@ import java.io.File;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
-import org.vishia.gral.ifc.GuiWindowMng_ifc;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.SwitchExclusiveButtonMng;
 import org.vishia.mainGuiSwt.InfoBox;
 import org.vishia.util.FileSystem;
@@ -24,7 +24,7 @@ public class GuiStatusPanel
   {
     final GralGridBuild_ifc box;
     final DataCmpn data;
-    WidgetDescriptor widgdTextRevision, widgdTextStatus;
+    GralWidget widgdTextRevision, widgdTextStatus;
     
     SelectInfoBoxWidgds(GralGridBuild_ifc box, DataCmpn data)
     { this.box = box; this.data = data; }
@@ -42,21 +42,21 @@ public class GuiStatusPanel
    * The project is a user-project which contains one or more source archive-sandboxes.
    * 
    * */
-  WidgetDescriptor widgdProjektpath; 
+  GralWidget widgdProjektpath; 
   
   
   /**A Panel which contains the table to select some projectPaths. */
   private GuiShellMngBuildIfc selectorProjectPath;
   
   /**The table (list) which contains the selectable project paths. */
-  private WidgetDescriptor selectorProjectPathTable;
+  private GralWidget selectorProjectPathTable;
   
   
   /**Any component has its PanelManager. It is one line with some widgets.
    */
   private GralGridBuild_ifc[] bzrComponentBox = new GralGridBuild_ifc[100]; 
 
-  private GuiWindowMng_ifc testDialogBox;
+  private GralWindow_ifc testDialogBox;
 
   
   /**Instance for some buttons to exclude switch on only for one button.
@@ -66,7 +66,7 @@ public class GuiStatusPanel
   private SwitchExclusiveButtonMng switchExcluder;
   
   /**Save the switchButtons to remove it when the widget is removed. */ 
-  private WidgetDescriptor[] switchButtons;
+  private GralWidget[] switchButtons;
   
 
   public GuiStatusPanel(MainData mainData, GralGridBuild_ifc panelBuildifc)
@@ -99,7 +99,7 @@ public class GuiStatusPanel
     //testDialogBox = new InfoBox(mainData.guifc.getitsGraphicFrame(), "Title", lines, true);
 
     panelBuildifc.setPositionSize(yposProjectPath, xposProjectPath, 20, 60, 'r');
-    selectorProjectPath = panelBuildifc.createWindow(null, false);
+    selectorProjectPath = panelBuildifc.createWindowOld(null, false);
     int[] columnWidths = {40, 10};
     selectorProjectPath.setPositionSize(0, 0, 10, 60, 'd');
     selectorProjectPathTable = selectorProjectPath.addTable("selectProjectPath", 20, columnWidths);
@@ -150,7 +150,7 @@ public class GuiStatusPanel
     //
     cleanComponentsInfoSelectBoxes();
     switchExcluder = new SwitchExclusiveButtonMng();
-    switchButtons = new WidgetDescriptor[mainData.currPrj.data.length];
+    switchButtons = new GralWidget[mainData.currPrj.data.length];
     //
     //Only one of the switch buttons are checked. If another button is pressed, it should be deselect.
     //The switchExcluder helps to do so. 
@@ -179,7 +179,7 @@ public class GuiStatusPanel
     if(switchButtons[iComponent] !=null){
       switchExcluder.remove(switchButtons[iComponent]);
     }
-    WidgetDescriptor widgdButton = box.addSwitchButton("selectMain", actionSelectCmpn, "", null, data.sNameCmpn, "", "wh", "rd");
+    GralWidget widgdButton = box.addSwitchButton("selectMain", actionSelectCmpn, "", null, data.sNameCmpn, "", "wh", "rd");
     switchExcluder.add(widgdButton);
     widgdButton.setContentInfo(widgds);
     switchButtons[iComponent] = widgdButton;
@@ -221,9 +221,9 @@ public class GuiStatusPanel
   
   
   
-  private final UserActionGui selectProjectPath = new UserActionGui()
+  private final GralUserAction selectProjectPath = new GralUserAction()
   { 
-    public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
+    public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     {
       //testDialogBox.open();
       selectorProjectPath.setWindowVisible(true);
@@ -237,9 +237,9 @@ public class GuiStatusPanel
    * If the top line is leaved, the table will be closed.
    * 
    */
-  private final UserActionGui actionSelectorProjectPathTable = new UserActionGui()
+  private final GralUserAction actionSelectorProjectPathTable = new GralUserAction()
   { 
-    public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
+    public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     {
       if(sCmd.equals("ok")){
         String sPath = (String)values[0];
@@ -251,27 +251,27 @@ public class GuiStatusPanel
   };
   
   
-  private final UserActionGui actionCloseProjectBzrComponents = new UserActionGui()
+  private final GralUserAction actionCloseProjectBzrComponents = new GralUserAction()
   { 
-    public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
+    public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     {
       selectorProjectPath.setWindowVisible(false);
     }
   };
 
   
-  private final UserActionGui refreshProjectBzrComponents = new UserActionGui()
+  private final GralUserAction refreshProjectBzrComponents = new GralUserAction()
   { 
-    public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
+    public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     { buildComponentsInfoSelectBoxes();
     }
   };
 
   
   
-  private final UserActionGui actionSelectCmpn = new UserActionGui()
+  private final GralUserAction actionSelectCmpn = new GralUserAction()
   { 
-    public void userActionGui(String sCmd, WidgetDescriptor widgd, Object... values)
+    public void userActionGui(String sCmd, GralWidget widgd, Object... values)
     {
       mainData.currCmpn = mainData.currPrj.selectComponent(widgd.sDataPath);
       //

@@ -1,5 +1,7 @@
 package org.vishia.gral.widget;
 
+import org.vishia.gral.ifc.Widgetifc;
+
 
 /**This interface can be used to work with a whole table.
  * It is an abstraction between SWT and swing table capabilities.
@@ -8,7 +10,7 @@ package org.vishia.gral.widget;
  * @author Hartmut Schorrig
  *
  */
-public interface TableGui_ifc extends WidgetGui_ifc
+public interface TableGui_ifc extends Widgetifc
 {
 
   TableLineGui_ifc getCurrentLine();

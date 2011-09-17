@@ -14,8 +14,8 @@ import java.util.TreeMap;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.TableLineGui_ifc;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.Report;
@@ -40,7 +40,7 @@ public class GuiFilesDiffPanel
   final StringBuilder uRenameOut =  new StringBuilder();
   
   /**The table (list) which contains the selectable project paths. */
-  private WidgetDescriptor widgdTableFilesCmpn;
+  private GralWidget widgdTableFilesCmpn;
   
 
   private static final int columnMark = 2;
@@ -207,9 +207,9 @@ public class GuiFilesDiffPanel
   
   
   
-  private final UserActionGui actionTableLineFile = new UserActionGui()
+  private final GralUserAction actionTableLineFile = new GralUserAction()
   { 
-    public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
+    public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     {
       if(sCmd.equals("mark")){
         TableLineGui_ifc line = (TableLineGui_ifc) values[0];
@@ -232,17 +232,17 @@ public class GuiFilesDiffPanel
   };
 
 
-  private final UserActionGui actionAdd = new UserActionGui()
+  private final GralUserAction actionAdd = new GralUserAction()
   { 
-    public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
+    public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     {
     }
   };
   
   
-  private final UserActionGui actionRename = new UserActionGui()
+  private final GralUserAction actionRename = new GralUserAction()
   { 
-    public void userActionGui(String sActionCmd, WidgetDescriptor widgetInfos, Object... values)
+    public void userActionGui(String sActionCmd, GralWidget widgetInfos, Object... values)
     { if(sActionCmd.equals("Button-up")){
         String sFileOld =null, sFileNew =null;
         TableLineGui_ifc lineOld = null, lineNew = null;
@@ -380,9 +380,9 @@ public class GuiFilesDiffPanel
   
   
   
-  private final UserActionGui actionCommit = new UserActionGui()
+  private final GralUserAction actionCommit = new GralUserAction()
   { 
-    public void userActionGui(String sActionCmd, WidgetDescriptor widgetInfos, Object... values)
+    public void userActionGui(String sActionCmd, GralWidget widgetInfos, Object... values)
     { if(sActionCmd.equals("Button-up")){
         commitSelectedFiles();     
       }
@@ -392,9 +392,9 @@ public class GuiFilesDiffPanel
   
   
   
-  private final UserActionGui actionRefresh = new UserActionGui()
+  private final GralUserAction actionRefresh = new GralUserAction()
   { 
-    public void userActionGui(String sActionCmd, WidgetDescriptor widgetInfos, Object... values)
+    public void userActionGui(String sActionCmd, GralWidget widgetInfos, Object... values)
     { if(sActionCmd.equals("Button-up")){
         refreshFiles();
       }
@@ -403,17 +403,17 @@ public class GuiFilesDiffPanel
   
   
   
-  private final UserActionGui actionView = new UserActionGui()
+  private final GralUserAction actionView = new GralUserAction()
   { 
-    public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
+    public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     {
     }
   };
   
   
-  private final UserActionGui actionViewdiff = new UserActionGui()
+  private final GralUserAction actionViewdiff = new GralUserAction()
   { 
-    public void userActionGui(String sCmdP, WidgetDescriptor widgetInfos, Object... values)
+    public void userActionGui(String sCmdP, GralWidget widgetInfos, Object... values)
     {
       StringBuilder uCmd = new StringBuilder(200);
       String[] sValue = widgdTableFilesCmpn.getValue().split("\t");

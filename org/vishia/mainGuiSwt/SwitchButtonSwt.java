@@ -3,8 +3,8 @@ package org.vishia.mainGuiSwt;
 import java.util.Map;
 
 import org.eclipse.swt.graphics.Color;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 
 /**This class presents a button, which is shown as pressed and non-pressed. 
  * Two different colors are used. If the state is changed, a user event will be invoked if given.
@@ -23,7 +23,7 @@ public class SwitchButtonSwt extends ButtonSwt
 	//private final UserActionGui userActionOnSwitch;
 
 	
-	public SwitchButtonSwt(GuiPanelMngSwt mng, WidgetDescriptor widgd, char size)
+	public SwitchButtonSwt(GuiPanelMngSwt mng, GralWidget widgd, char size)
 	{
 		super(mng, widgd, size);
 		//this.userActionOnSwitch = null;
@@ -70,25 +70,25 @@ public class SwitchButtonSwt extends ButtonSwt
    * It is a inner non-static class of the button to influence the button with color.
    */
   private class MouseClickSwitchButtonAction extends MouseClickActionForUserActionSwt
-  implements UserActionGui
+  implements GralUserAction
   {
 		/**
 		 * @param properties
 		 * @param userAction //may be null.
 		 */
-		public MouseClickSwitchButtonAction(GuiPanelMngSwt guiMng, UserActionGui userAction)
+		public MouseClickSwitchButtonAction(GuiPanelMngSwt guiMng, GralUserAction userAction)
 		{
 			
 			super(guiMng, null, null, "switchButton", null);
 			setUserAction(this);  //set this action primary, it calls the user action.
 		}
   	
-		@Override	public void userActionGui(String sCmd, WidgetDescriptor infos, Object... params)
+		@Override	public void userActionGui(String sCmd, GralWidget infos, Object... params)
 		{
 			isSwitchedDown = ! isSwitchedDown;
       if(isSwitchedDown){ setBackground(colorPressed); }
       else {  setBackground(colorReleased); }
-			UserActionGui action = widgd.getActionChange();
+			GralUserAction action = widgd.getActionChange();
       if(action != null){
 			  action.userActionGui(sCmd + (isSwitchedDown? "1" : "0"), infos);
 			}

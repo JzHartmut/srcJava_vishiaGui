@@ -1,4 +1,5 @@
-package org.vishia.gral.widget;
+package org.vishia.gral.ifc;
+
 
 /**It is a basic interface for any widget of the implementing GUI
  * @author Hartmut Schorrig
@@ -14,4 +15,11 @@ public interface Widgetifc
    * @return true if set
    */
   boolean setFocus();
+  
+  GralColor setBackgroundColor(GralColor color);
+  
+  GralColor setForegroundColor(GralColor color);
+  
+  
+
 }

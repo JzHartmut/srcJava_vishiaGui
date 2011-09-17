@@ -12,8 +12,8 @@ import org.vishia.communication.InspcDataExchangeAccess.Info;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.inspectorAccessor.InspcAccessEvaluatorRxTelg;
 import org.vishia.inspectorAccessor.InspcAccessExecAnswerTelg_ifc;
 import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
@@ -44,9 +44,9 @@ public class InspcGuiComm
    */
   private static class WidgetCommAction implements InspcAccessExecRxOrder_ifc
   {
-    final WidgetDescriptor widgd;
+    final GralWidget widgd;
     
-    WidgetCommAction(WidgetDescriptor widgd)
+    WidgetCommAction(GralWidget widgd)
     { this.widgd = widgd;
     }
 
@@ -194,14 +194,14 @@ public class InspcGuiComm
     //
     ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = mng.getVisiblePanels();
     for(GralVisibleWidgets_ifc panel: listPanels){
-      Queue<WidgetDescriptor> widgetsVisible = panel.getWidgetsVisible();
-      if(widgetsVisible !=null) for(WidgetDescriptor widget: widgetsVisible){
+      Queue<GralWidget> widgetsVisible = panel.getWidgetsVisible();
+      if(widgetsVisible !=null) for(GralWidget widget: widgetsVisible){
         
         if(widget.whatIs == 'D'){
           int cc = 0;
         }
         //special action to request content from target:  
-        UserActionGui actionShow = widget.getActionShow();
+        GralUserAction actionShow = widget.getActionShow();
         if(actionShow !=null){
           actionShow.userActionGui("tx", widget);
         } else {
@@ -294,8 +294,8 @@ public class InspcGuiComm
    *     returns true.
    * </ul>     
    */
-  UserActionGui actionShowTextfield = new UserActionGui()
-  { @Override public void userActionGui(String sIntension, WidgetDescriptor widget, Object... params)
+  GralUserAction actionShowTextfield = new GralUserAction()
+  { @Override public void userActionGui(String sIntension, GralWidget widget, Object... params)
     {
     
       String sDataPath = widget.getDataPath() + ".";

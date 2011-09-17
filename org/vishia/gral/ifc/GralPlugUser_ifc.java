@@ -5,12 +5,12 @@ import org.vishia.msgDispatch.LogMessage;
 
 
 /**This interface plugs an user application to the basic GUI application. */ 
-public interface GuiPlugUser_ifc
+public interface GralPlugUser_ifc
 {
 
   //void init(LogMessage log);
   
-  void init(UserPlugGral_ifc inspc, LogMessage log);
+  void init(GralPlugUser2Gral_ifc inspc, LogMessage log);
 
   
   void registerMethods(org.vishia.gral.gridPanel.GralGridBuild_ifc guiMng);

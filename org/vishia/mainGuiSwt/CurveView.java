@@ -15,7 +15,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.vishia.gral.widget.Widgetifc;
+import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.Widgetifc;
 
 public class CurveView extends Canvas implements Widgetifc
 {
@@ -501,6 +502,20 @@ public class CurveView extends Canvas implements Widgetifc
 	
 	
 	void stop(){} //marker for debug
+
+  @Override
+  public GralColor setBackgroundColor(GralColor color)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public GralColor setForegroundColor(GralColor color)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 	
 }

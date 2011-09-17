@@ -14,7 +14,7 @@ public interface GralVisibleWidgets_ifc
   /**Gets the list of all widgets which are visible yet and should be updated with values therefore. 
    * @return The list.
    */
-  Queue<WidgetDescriptor> getWidgetsVisible();
+  Queue<GralWidget> getWidgetsVisible();
   
   
 }

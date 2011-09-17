@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author Hartmut Schorrig
  *
  */
-public abstract class CanvasStorage
+public abstract class GralCanvasStorage
 {
 	/**Data class to store an order.
 	 */
@@ -40,9 +40,9 @@ public abstract class CanvasStorage
 	
 	public static class PaintOrderImage extends PaintOrder
 	{
-	  public final GuiImageBase image;
+	  public final GralImageBase image;
 	  public final int dxImage, dyImage;
-	  PaintOrderImage(GuiImageBase image, int line, int column, int heigth, int width, GuiRectangle pixelImage)
+	  PaintOrderImage(GralImageBase image, int line, int column, int heigth, int width, GralRectangle pixelImage)
 	  { super(paintImage, line, column, heigth, width, null);
 	    this.image = image;
       this.dxImage = pixelImage.dx;
@@ -73,7 +73,7 @@ public abstract class CanvasStorage
 	}
 	
 
-	public void drawImage(GuiImageBase image, int x, int y, int dx, int dy, GuiRectangle imagePixelSize)
+	public void drawImage(GralImageBase image, int x, int y, int dx, int dy, GralRectangle imagePixelSize)
 	{
     PaintOrder order = new PaintOrderImage(image, x, y, dx, dy, imagePixelSize);
     paintOrders.add(order);  //paint it when drawBackground is invoked.

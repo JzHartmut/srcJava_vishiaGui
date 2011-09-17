@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 
 /**Complex widget which contains a list what's items are able to select. 
  * It is the base class for file selection and command selection.
@@ -17,13 +17,13 @@ import org.vishia.gral.ifc.WidgetDescriptor;
 public abstract class SelectList
 {
   /**The table which is showing in the widget. */
-  protected WidgetDescriptor wdgdTable;
+  protected GralWidget wdgdTable;
   
   /**The table which is showing in the widget. */
   protected TableGui_ifc table;
   
   /**Not used yet, register actions? */
-  protected Map<String, UserActionGui> actions;
+  protected Map<String, GralUserAction> actions;
   
   /**
    * @param panel
@@ -72,10 +72,10 @@ public abstract class SelectList
   protected abstract void actionUserKey(String sKey, Object userData, TableLineGui_ifc line);
   
   
-  private UserActionGui actionTable = new UserActionGui()
+  private GralUserAction actionTable = new GralUserAction()
   {
 
-    @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+    @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
     {
       TableGui_ifc table = (TableGui_ifc)infos.widget;
       TableLineGui_ifc line = table.getCurrentLine();

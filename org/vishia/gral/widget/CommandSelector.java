@@ -16,7 +16,7 @@ import org.vishia.cmd.CmdStore;
 import org.vishia.cmd.PrepareCmd;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
 

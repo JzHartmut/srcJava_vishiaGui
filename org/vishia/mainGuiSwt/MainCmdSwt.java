@@ -28,53 +28,38 @@
 package org.vishia.mainGuiSwt;
 
 import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Queue;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.vishia.gral.area9.GuiMainAreaBase;
 import org.vishia.gral.area9.GuiMainAreaifc;
-import org.vishia.gral.base.GralDevice;
-import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
-import org.vishia.gral.ifc.UserActionGui;
+import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralPrimaryWindow;
+import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.Widgetifc;
 import org.vishia.gral.widget.TextBoxGuifc;
-import org.vishia.gral.widget.WidgetCmpnifc;
-import org.vishia.gral.widget.Widgetifc;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmd_ifc;
-import org.vishia.util.MinMaxTime;
-import org.vishia.windows.WindowMng;
 
 
 //import java.awt.event.*;
@@ -124,8 +109,6 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   final static int version = 0x20110502;
 
   
-  final MainCmd mainCmd;
-  
 	public interface GuiBuild
 	{
 		/**Called in the build phase
@@ -145,7 +128,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 	
 	
   /**All main components of the Display in each FrameArea. */
-  private Widgetifc[][] componentFrameArea = new Widgetifc[3][3];
+  private GralPanelContent[][] componentFrameArea = new GralPanelContent[3][3];
 
   /**A little control to capture the mouse position for movement of area borders. */
   private Control[] yAreaMover = new Control[2];
@@ -179,9 +162,6 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   /** If it is set, the writeInfo is redirected to this.*/
   protected TextBoxGuifc textAreaOutput = null;
   
-  /**The file menuBar is extendable. */
-  private Menu menuBar;
-  
   /**The file menu is extendable. */
   private Menu menuFile;
   
@@ -191,17 +171,6 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   /**The help menu is extendable. */
   private Menu menuHelp;
   
-  private static class MenuEntry
-  {
-    String name;
-    /**If it is a superior menu item, the menu below. Else null. */
-    Menu menu;
-    Map<String, MenuEntry> subMenu;
-  }
-  
-  Map<String, MenuEntry> menus = new TreeMap<String, MenuEntry>();
-  
-  
   //protected JScrollPane textAreaOutputPane;
   
   /** Paint Methoden */
@@ -209,18 +178,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   
   /** If it is set, it is a area for some Buttons, edit windows and others.*/
   private Composite mainDialog = null;
-  
-  /** Current Directory for file choosing. */
-  File currentDirectory = null;
-  
-  UserActionGui actionFile;
-  
-  /**Set on call of {@link #setStandardMenus(File)} to add in in the graphic thread. */
-  private boolean bSetStandardMenus;
-  
-  Queue<String> outputTexts = new ConcurrentLinkedQueue<String>();
-  
-  
+
 	class ActionFileOpen implements SelectionListener
   { @Override public void widgetSelected(SelectionEvent e)
     { 
@@ -336,27 +294,6 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   
 
   
-  class ActionUserMenuItem implements SelectionListener
-  { 
-    final UserActionGui action;
-    
-    public ActionUserMenuItem(UserActionGui action)
-    { this.action = action;
-    }
-
-    @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-      // TODO Auto-generated method stub
-      
-    }
-  
-    @Override
-    public void widgetSelected(SelectionEvent e)
-    { action.userActionGui("", null, (Object[])null);
-    }
-  }
-  
-  
   
   
   
@@ -429,36 +366,13 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   
   public MainCmdSwt(MainCmd cmdP, GralDeviceSwt gralDevice) //String[] args)
   { //super(args);
-    super(); //gralDevice);
+    super(cmdP); //gralDevice);
     swtWindow.addGuiBuildOrder(initOutputArea); 
     swtWindow.addDispatchListener(writeOutputTextDirectly);
-    mainCmd = cmdP;
   }
   
   
-  public GralDevice getPrimaryWindow(){ return swtWindow; }
-  
-  /**Initialize, in the graphic thread. 
-   * @deprecated.
-   * @param sTitle
-   */
-  protected final void xxxinitGrafic(String sTitle)
-  { xxxinitGrafic(sTitle, 100, 100, 800, 500);
-  }
-    
-  protected final void xxxinitGrafic(String sTitle, int left, int top, int xSize, int ySize)
-  {
-  	if(!swtWindow.bStarted){///
-      swtWindow.setTitleAndSize(sTitle, left, top, xSize, ySize);
-
-      addDispatchListener(writeOutputTextDirectly);
-      
-  	  swtWindow.startGraphicThread();
-  	  
-      swtWindow.processBuildOrders();
-    } else throw new IllegalArgumentException("graphic is configured already, do it one time only.");
-  	
-  }
+  public GralPrimaryWindow getPrimaryWindow(){ return swtWindow; }
   
 
   Runnable initOutputArea = new Runnable(){
@@ -474,14 +388,14 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
         int yArea = outputArea.charAt(1) - '0';
         int dxArea = outputArea.charAt(2) - 'A' +1 - xArea +1;
         int dyArea = outputArea.charAt(3) - '0' - yArea +1;
-        addOutputFrameArea(xArea, yArea, dxArea, dyArea);
+        outputPanel = addOutputFrameArea(xArea, yArea, dxArea, dyArea);
       }
     }
   };
 
   
   
-  GuiDispatchCallbackWorker writeOutputTextDirectly = new GuiDispatchCallbackWorker()
+  GralDispatchCallbackWorker writeOutputTextDirectly = new GralDispatchCallbackWorker()
   { @Override public void doBeforeDispatching(boolean onlyWakeup)
     { String line;
       while((line = outputTexts.poll())!=null){
@@ -500,9 +414,8 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   the users Main class (UserMain in the introcuction) only should call exit.
 */
 @Override public void exit()
-{ if(!swtWindow.bExit && !swtWindow.guiDevice.isDisposed()){ 
-  swtWindow.guiDevice.dispose();
-  }  
+{ 
+  swtWindow.terminate();  
   System.exit(mainCmd.getExitErrorLevel());
 }
 
@@ -553,7 +466,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 	 * @param component The component.
 	 * @throws IndexOutOfBoundsException if the arguments are false or the area is occupied already.
 	 */
-	@Override public final void addFrameArea(int xArea, int yArea, int dxArea, int dyArea, Widgetifc component)
+	@Override public final void addFrameArea(int xArea, int yArea, int dxArea, int dyArea, GralPanelContent component)
 	throws IndexOutOfBoundsException
 	{ //int idxArea = (x -1) + 3 * (y -1);
 	  //Composite component = new Composite(graphicFrame, SWT.NONE);
@@ -597,7 +510,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 	}
 
 	
-	public final void setStandardMenus(File openStandardDirectory, UserActionGui actionFile)
+	public final void setStandardMenus(File openStandardDirectory, GralUserAction actionFile)
 	{ this.currentDirectory = openStandardDirectory;
 	  this.actionFile = actionFile;
     this.bSetStandardMenus = true;
@@ -610,59 +523,16 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    * @param openStandardDirectory may be null or a directory as default for "file-open" menue.
    */
   
-  public final void setStandardMenusGThread(File openStandardDirectory, UserActionGui actionFile)
+  public final void setStandardMenusGThread(File openStandardDirectory, GralUserAction actionFile)
   { this.currentDirectory = openStandardDirectory;
     this.actionFile = actionFile;
     { //create the menue
-      menuBar = new Menu(swtWindow.graphicFrame, SWT.BAR);
-      swtWindow.graphicFrame.setMenuBar(menuBar);
-      { MenuItem menuItemFile = new MenuItem(menuBar, SWT.CASCADE);
-        menuItemFile.setText("File");
-        menuItemFile.setAccelerator(SWT.CONTROL | 'F');
-        menuFile = new Menu(swtWindow.graphicFrame, SWT.DROP_DOWN);
-        menuItemFile.setMenu(menuFile);
-      	
-        if(openStandardDirectory != null)
-        { { MenuItem item = new MenuItem(menuFile, SWT.None); item.setText("Open");
-            item.setAccelerator(SWT.CONTROL | 'O');
-            item.addSelectionListener(this.new ActionFileOpen());
-            //menuFile.add(item);
-          }
-          { MenuItem item = new MenuItem(menuFile, SWT.None); item.setText("Close");
-            item.setAccelerator(SWT.CONTROL | 'C');
-            item.addSelectionListener(this.new ActionFileClose());
-            //menuFile.add(item);
-          }
-          { MenuItem item = new MenuItem(menuFile, SWT.None); item.setText("Save");
-            item.setAccelerator(SWT.CONTROL | 'S');
-            item.addSelectionListener(this.new ActionFileSave());
-            //menuFile.add(item);
-          }
-        }  
-        { MenuItem item = new MenuItem(menuFile, SWT.None); item.setText("Exit");
-          item.setAccelerator(SWT.CONTROL | 'X');
-          //item.addActionListener(this.new ActionFileSave());
-          //menuFile.add(item);
-        }
-        
-      }
-      { MenuItem menuItemHelp = new MenuItem(menuBar, SWT.CASCADE);
-        menuItemHelp.setText("Help");
-        menuItemHelp.setAccelerator(SWT.CONTROL | 'H');
-        menuHelp = new Menu(swtWindow.graphicFrame, SWT.DROP_DOWN);
-        menuItemHelp.setMenu(menuHelp);
-      	{ MenuItem item = new MenuItem(menuHelp, SWT.None); item.setText("Help");
-          item.setAccelerator(SWT.CONTROL | 'H');
-          item.addSelectionListener(this.new ActionHelp());
-          //menuHelp.add(item);
-        }
-        { MenuItem item = new MenuItem(menuHelp, SWT.None); item.setText("About");
-          item.setAccelerator(SWT.CONTROL | 'A');
-          item.addSelectionListener(this.new ActionAbout());
-          //menuHelp.add(item);
-        }
-        
-      }
+      swtWindow.addMenuItemGThread("&File/&Open", this.new ActionFileOpen());
+      swtWindow.addMenuItemGThread("&File/&Close", this.new ActionFileClose());
+      swtWindow.addMenuItemGThread("&File/&Save", this.new ActionFileSave());
+      //swtWindow.addMenuItemGThread("&File/E&xit", this.new ActionFileOpen());
+      swtWindow.addMenuItemGThread("&Help/&Help", this.new ActionHelp());
+      swtWindow.addMenuItemGThread("&Help/&About", this.new ActionAbout());
       //graphicFrame.setJMenuBar(menuBar);
       //graphicFrame.setVisible( true );
       swtWindow.graphicFrame.update();
@@ -671,34 +541,8 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   }
   
   
-  @Override public void addMenuItemGThread(String namePath, UserActionGui action)
-  {
-    String[] names = namePath.split("/");
-    Menu parentMenu = menuBar;
-    Map<String, MenuEntry> menustore = menus;
-    int ii;
-    for(ii=0; ii<names.length-1; ++ii){
-      String name = names[ii];
-      MenuEntry menuEntry = menustore.get(name);
-      if(menuEntry == null){
-        menuEntry = new MenuEntry();
-        menustore.put(name, menuEntry);
-        menuEntry.name = name;
-        menuEntry.subMenu = new TreeMap<String, MenuEntry>();
-        MenuItem item = new MenuItem(parentMenu, SWT.CASCADE);
-        item.setText(name);
-        menuEntry.menu = new Menu(swtWindow.graphicFrame, SWT.DROP_DOWN);
-        item.setMenu(menuEntry.menu);
-      }
-      menustore = menuEntry.subMenu;
-      parentMenu = menuEntry.menu;
-    }
-    String name = names[ii];
-    MenuItem item = new MenuItem(parentMenu, SWT.None); 
-    item.setText(name);
-    //item.setAccelerator(SWT.CONTROL | 'S');
-    item.addSelectionListener(this.new ActionUserMenuItem(action));
-    ///
+  @Override public void addMenuItemGThread(String namePath, GralUserAction action)
+  { swtWindow.addMenuItemGThread(namePath, action);
   }
   
   
@@ -729,7 +573,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    * The user menus should be added between this both pull-down menus. 
    * @param menu A user's menu.
    */
-  protected void addMenu(Menu menu, String text, char accelerator)
+  protected void XXXaddMenu(Menu menu, String text, char accelerator)
   {
     Menu menuBar = swtWindow.graphicFrame.getMenuBar();
     int nrofMenus = menuBar.getItemCount();  //ComponentCount();
@@ -745,13 +589,13 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   /**Adds a listener, which will be called in the dispatch loop.
    * @param listener
    */
-  @Override public void addDispatchListener(GuiDispatchCallbackWorker listener)
+  @Override public void addDispatchListener(GralDispatchCallbackWorker listener)
   { swtWindow.addDispatchListener(listener);
   }
   
   
   
-  @Override public void removeDispatchListener(GuiDispatchCallbackWorker listener)
+  @Override public void removeDispatchListener(GralDispatchCallbackWorker listener)
   { swtWindow.removeDispatchListener(listener);
   }
   
@@ -762,7 +606,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    * The user menus should be added between this both pull-down menus. 
    * @param menu A user's menu.
    */
-  protected Menu addMenu(String text, char accelerator)
+  protected Menu XXXaddMenu(String text, char accelerator)
   {
     Menu menuBar = swtWindow.graphicFrame.getMenuBar();
     int nrofMenus = menuBar.getItemCount();  //ComponentCount();
@@ -885,18 +729,19 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    * @param dxArea 1 to 3 for 1 field to 3 fields to right.
    * @param dyArea 1 to 3 for 1 field to 3 field to bottom
    */
-  protected void addOutputFrameArea(int xArea, int yArea, int dxArea, int dyArea)
+  protected GralPanelContent addOutputFrameArea(int xArea, int yArea, int dxArea, int dyArea)
   { int widgetStyle = SWT.H_SCROLL | SWT.V_SCROLL;
-  	textAreaOutput = new WidgetsSwt.TextBoxSwt(swtWindow.graphicFrame, widgetStyle);
+    TextPanelSwt textPanel = new TextPanelSwt("output", swtWindow.graphicFrame, widgetStyle);
+  	//textAreaOutput = new WidgetsSwt.TextBoxSwt(swtWindow.graphicFrame, widgetStyle);
     //textAreaPos = new Position(textAreaOutput);
     //textAreaPos.x = x; textAreaPos.y = y; textAreaPos.dx = dx; textAreaPos.dy = dy; 
     //textAreaOutput.setSize(350,100); //swtWindow.graphicFrame.get)
     //textAreaOutput.setBounds(x, y, dx,dy);
-    ((WidgetsSwt.TextBoxSwt)textAreaOutput).text.setFont(new Font(swtWindow.guiDevice, "Monospaced",11, SWT.NORMAL));
-    textAreaOutput.append("output...\n");
+    //((WidgetsSwt.TextBoxSwt)textAreaOutput).text.setFont(new Font(swtWindow.guiDevice, "Monospaced",11, SWT.NORMAL));
+    textPanel.append("output...\n");
     //textAreaOutputPane = new JScrollPane(textAreaOutput, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
     //pane.setSize(800,300);
-    addFrameArea(xArea, yArea, dxArea, dyArea, textAreaOutput);
+    addFrameArea(xArea, yArea, dxArea, dyArea, textPanel);
     
     //textAreaPos.setBounds(textAreaOuptutPane, swtWindow.graphicFramePos);
     //swtWindow.graphicFrame.getContentPane().add(textAreaOuptutPane);
@@ -918,6 +763,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 */      
     
     swtWindow.graphicFrame.update();
+    return textPanel;
   }
 
 /*
@@ -935,7 +781,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   
   protected void validateFrameAreas()
   {
-    if(!swtWindow.bStarted) return;
+    if(!swtWindow.isRunning()) return;
     Point size = swtWindow.graphicFrame.getSize();
     int xWidth = size.x -6; //swtWindow.graphicFrame.getWidth();
     int yWidth = size.y -53; //swtWindow.graphicFrame.getHeight() - 50;  //height of title and menu TODO calculate correctly
@@ -948,7 +794,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 
     for(int idxArea = 0; idxArea <= 2; idxArea++)
     { for(int idyArea = 0; idyArea <= 2; idyArea++)
-      { Widgetifc component = componentFrameArea[idyArea][idxArea];
+      { GralPanelContent component = componentFrameArea[idyArea][idxArea];
         if(component !=null)
         { Control control = (Control)component.getWidget();
           setBoundsForFrameArea(idxArea, idyArea);
@@ -1020,8 +866,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
       } else {  
         //queue the text
       	outputTexts.add(sInfo);
-      	swtWindow.guiDevice.wake();
-      	swtWindow.extEventSet.set(true);
+      	swtWindow.wakeup();
       }
   	}  
     else mainCmd.writeDirectly(sInfo, kind);     
@@ -1043,8 +888,6 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
     }
     else mainCmd.writeErrorDirectly(sInfo, exception);     
   }
-  
-  @Override public MainCmd_ifc getMainCmd(){ return mainCmd; }
   
   /** Sets the graphic frame, called inside the derived class. 
    *  The derived class has to organize the graphical frame.
@@ -1072,11 +915,6 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   /**This method have to be called by user if the layout of the application is set. */
   public final void validateGraphic()
   { validateFrameAreas();
-	  if(!swtWindow.bStarted){
-	    swtWindow.bStarted = true;
-		  //guiThread.start();
-	  }
-		
   }
   
   /** Adds a graphical component
@@ -1113,6 +951,20 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   { //to set breakpoint
   }
 
+
+
+
+  @Override
+  public boolean isWindowsVisible()
+  { return swtWindow.isWindowsVisible();
+  }
+
+
+
+
+  @Override  public void setWindowVisible(boolean visible)
+  { swtWindow.setWindowVisible(visible);
+  }
 }
 
 

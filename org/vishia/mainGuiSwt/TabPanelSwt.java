@@ -19,21 +19,38 @@ import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
-import org.vishia.gral.ifc.WidgetDescriptor;
-import org.vishia.gral.widget.WidgetCmpnifc;
+import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralWidget;
 
 public class TabPanelSwt extends GralTabbedPanel
 {
 
-  /**Wrapper arround the TabFolder. The swt.TabFolder is the container for all TabItem. */
-  private class TabFolder_ implements WidgetCmpnifc
+  /**Wrapper arround the TabFolder. The swt.TabFolder is the container for all TabItem. 
+   * It is designated as {@link GralPanelContent} too, because it is used as a Panel.,
+   * though it doesn't contain other Widgets as the Tabs.  
+   */
+  private class TabFolder_ extends GralPanelContent// implements WidgetCmpnifc
   {
     final TabFolder widgetSwt;
-    TabFolder_(Composite parent, int style)
-    { widgetSwt = new TabFolder(parent, style); 
+    TabFolder_(String namePanel, Composite parent, int style)
+    { super(namePanel);
+      widgetSwt = new TabFolder(parent, style); 
     }
     @Override public Widget getWidget(){ return widgetSwt; }
     @Override public boolean setFocus(){ return widgetSwt.setFocus(); }
+
+    @Override
+    public GralColor setBackgroundColor(GralColor color)
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+    @Override
+    public GralColor setForegroundColor(GralColor color)
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
     
   }
   
@@ -41,16 +58,19 @@ public class TabPanelSwt extends GralTabbedPanel
 	
 	final GuiPanelMngSwt mng;
 	
-	TabPanelSwt(GuiPanelMngSwt mng, GralPanelActivated_ifc user, int property)
+	TabPanelSwt(String namePanel, GuiPanelMngSwt mng, GralPanelActivated_ifc user, int property)
 	{ super(user, property);
 		this.mng = mng;
-		tabMng = new TabFolder_(mng.graphicFrame, SWT.TOP);
+		Object oParent = mng.pos.panel.panelComposite;
+		if(oParent == null || !(oParent instanceof Composite) ){ throw new IllegalArgumentException("Software error. You must select a panel before."); }
+		Composite parent = (Composite)oParent;
+		tabMng = new TabFolder_(namePanel, parent, SWT.TOP);
 		tabMng.widgetSwt.addSelectionListener(tabItemSelectListener);
 		tabMng.widgetSwt.addControlListener(resizeListener);
   	
 	}
 	
-	@Override public WidgetCmpnifc getGuiComponent()
+	@Override public GralPanelContent getGuiComponent()
 	{ return tabMng;
 	}
 	
@@ -64,14 +84,14 @@ public class TabPanelSwt extends GralTabbedPanel
 		CanvasStorePanelSwt panel;
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
 	  if(yGrid <0 || xGrid <0){
-			panel = new CanvasStorePanelSwt(tabMng.widgetSwt, 0, colorBackground);
+			panel = new CanvasStorePanelSwt(sName, tabMng.widgetSwt, 0, colorBackground);
 		} else {
-	  	panel = new GridPanelSwt(tabMng.widgetSwt, 0, colorBackground, mng.propertiesGui.xPixelUnit(), mng.propertiesGui.yPixelUnit(), 5, 5);
+	  	panel = new GridPanelSwt(sName, tabMng.widgetSwt, 0, colorBackground, mng.propertiesGui.xPixelUnit(), mng.propertiesGui.yPixelUnit(), 5, 5);
 		}
 	  panel.swtCanvas.setBounds(sizeTabFolder);
 	  panel.itsTabSwt = tabItem;
 		tabItem.setControl(panel.swtCanvas);
-		mng.registerPanel(sName, panel);
+		mng.registerPanel(panel);
     panels.put(sName, panel);
 	  return panel;
   }
@@ -81,8 +101,8 @@ public class TabPanelSwt extends GralTabbedPanel
 	{ TabItem tabItemOperation = new TabItem(tabMng.widgetSwt, SWT.None);
 		tabItemOperation.setText(sLabel);
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
-	  CanvasStorePanelSwt panel = new CanvasStorePanelSwt(tabMng.widgetSwt, 0, colorBackground);
-    mng.registerPanel(sName, panel);
+	  CanvasStorePanelSwt panel = new CanvasStorePanelSwt(sName, tabMng.widgetSwt, 0, colorBackground);
+    mng.registerPanel(panel);
 	  tabItemOperation.setControl(panel.swtCanvas);
     panels.put(sName, panel);
 	  return panel;
@@ -112,7 +132,7 @@ public class TabPanelSwt extends GralTabbedPanel
 				if(data != null){
 					@SuppressWarnings("unchecked")
 					GralPanelContent panelContent = (GralPanelContent)(data);
-					Queue<WidgetDescriptor> widgetInfos = panelContent.widgetList; 
+					Queue<GralWidget> widgetInfos = panelContent.widgetList; 
 					if(notifyingUserInstanceWhileSelectingTab !=null){
 					  notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);
 					}

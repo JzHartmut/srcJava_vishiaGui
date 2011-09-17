@@ -1,4 +1,6 @@
-package org.vishia.gral.gridPanel;
+package org.vishia.gral.ifc;
+
+import org.vishia.gral.base.GralPanelContent;
 
 /**This class describes a position in a grid panel. 
  * @author Hartmut Schorrig
@@ -66,9 +68,13 @@ public class GralGridPos implements Cloneable
   /**Position of any widget.
    * Generally: There are coordinates in a grid, not in pixel. 
    * Positive value is from top or left, negative value is from right or bottom.
+   * {@link GralGridPos#useNatSize} on xEnd, yEnd means, that the natural size of the object should be used.
+   * 
    */
   public int x, xEnd, y, yEnd;
 
+  
+  
   /**Fractional part of position.
    * Generally: It is a number from 0 to 9 as part of 1 grid unit.
    */
@@ -89,11 +95,15 @@ public class GralGridPos implements Cloneable
    * negative Index: separation line with negate value as index is right or bottom. */
   public int xEndSepLine, yEndSepLine;
 
- 
+  public GralPanelContent panel;
   
   public void set(GralGridPos pos)
   {
-    x = pos.x; xEnd = pos.xEnd; //etc TODO
+    x = pos.x; xEnd = pos.xEnd; y = pos.y; yEnd = pos.yEnd;
+    xFrac = pos.xFrac; xEndFrac = pos.xEndFrac; yFrac = pos.yFrac; yEndFrac = pos.yEndFrac;
+    xOrigin = pos.xOrigin; yOrigin = pos.yOrigin; xSepLine = pos.xSepLine; ySepLine = pos.ySepLine;
+    dirNext = pos.dirNext;
+    
   }
   
   

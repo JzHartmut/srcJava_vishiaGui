@@ -1,7 +1,7 @@
 package org.vishia.gral.ifc;
 
 
-public interface GuiShellMngIfc extends GuiWindowMng_ifc, GralPanelMngWorking_ifc  //, GuiPanelMngBuildIfc
+public interface GuiShellMngIfc extends GralWindow_ifc, GralPanelMngWorking_ifc  //, GuiPanelMngBuildIfc
 {
 
 	/**The dispatch routine should be invoked in the display's thread, if the manager is the only one

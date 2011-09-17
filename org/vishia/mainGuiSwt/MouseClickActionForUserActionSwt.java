@@ -9,8 +9,8 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 
 /**This action class supports the call of a user method while mouse-button.
  * 
@@ -32,7 +32,7 @@ implements MouseListener
   private boolean isPressed;
 	
 	/**Reference to the users method. */
-  private UserActionGui userAction;
+  private GralUserAction userAction;
   
   private final String sCmdPress, sCmdRelease, sCmdDoubleClick;
   
@@ -45,7 +45,7 @@ implements MouseListener
    */
   public MouseClickActionForUserActionSwt(
   	GuiPanelMngSwt guiMng
-  , UserActionGui userCmdGui
+  , GralUserAction userCmdGui
   , String sCmdPress
   , String sCmdRelease
   , String sCmdDoubleClick
@@ -59,7 +59,7 @@ implements MouseListener
   }
   
   
-  void setUserAction(UserActionGui userAction)
+  void setUserAction(GralUserAction userAction)
   {
   	this.userAction = userAction;
   }
@@ -88,7 +88,7 @@ implements MouseListener
     }
     if(sCmdPress != null){
     	@SuppressWarnings("unchecked")
-    	WidgetDescriptor infos = (WidgetDescriptor)widget.getData();
+    	GralWidget infos = (GralWidget)widget.getData();
       userAction.userActionGui(sCmdPress,infos);
     }
 	}
@@ -112,10 +112,10 @@ implements MouseListener
 			Object data = e.widget.getData();
 			final String sNameWidget, sInfoWidget;
 	    @SuppressWarnings("unchecked")
-	  	WidgetDescriptor infos = (WidgetDescriptor)widget.getData();
-			if(data instanceof WidgetDescriptor){
+	  	GralWidget infos = (GralWidget)widget.getData();
+			if(data instanceof GralWidget){
 				@SuppressWarnings("unchecked")
-				WidgetDescriptor descr = (WidgetDescriptor)data;
+				GralWidget descr = (GralWidget)data;
 				sNameWidget = descr.name;
 				sInfoWidget = descr.sDataPath;
 			} else {
@@ -157,9 +157,9 @@ implements MouseListener
   	//
 		Object data = e.widget.getData();
 		final String sNameWidget, sInfoWidget;
-		final WidgetDescriptor descr;
-		if(data instanceof WidgetDescriptor){
-			descr = (WidgetDescriptor)data;
+		final GralWidget descr;
+		if(data instanceof GralWidget){
+			descr = (GralWidget)data;
 			sNameWidget = descr.name;
 			sInfoWidget = descr.sDataPath;
 		} else {

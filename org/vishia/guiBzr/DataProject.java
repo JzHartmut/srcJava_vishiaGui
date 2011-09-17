@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.vishia.gral.ifc.UserActionGui;
+import org.vishia.gral.ifc.GralUserAction;
 
 /**This class contains or refers all data of a project.
  * A project is a software project which contains one or more archives of sources.

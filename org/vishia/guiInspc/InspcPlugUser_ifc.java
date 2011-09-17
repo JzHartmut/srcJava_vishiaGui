@@ -2,11 +2,11 @@ package org.vishia.guiInspc;
 
 import java.util.Map;
 
-import org.vishia.gral.ifc.GuiPlugUser_ifc;
+import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.inspectorAccessor.InspcAccessor;
 import org.vishia.msgDispatch.LogMessage;
 
-public interface InspcPlugUser_ifc extends GuiPlugUser_ifc
+public interface InspcPlugUser_ifc extends GralPlugUser_ifc
 {
   
   void setInspcComm(InspcGuiComm inspcCommP);

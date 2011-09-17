@@ -6,10 +6,12 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.vishia.gral.gridPanel.GralGridPos;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.ifc.Widgetifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
@@ -91,7 +93,7 @@ public class FileSelector implements Widgetifc
   private Map<String, String> indexSelection = new TreeMap<String, String>(); 
   
   
-  WidgetDescriptor widgdPath;
+  GralWidget widgdPath;
   
   final SimpleDateFormat dateFormat = new SimpleDateFormat("yy-MMM-dd HH:mm:ss"); 
   
@@ -115,7 +117,7 @@ public class FileSelector implements Widgetifc
   public void setToPanel(GralGridBuild_ifc panel, String name, int rows, int[] columns, char size)
   {
     //The macro widget consists of more as one widget. Position the inner widgets:
-    GralGridPos posAll = panel.getPositionInPanel().clone();
+    GralGridPos posAll = panel.getPositionInPanel();
     //Text field for path above list
     panel.setPosition(posAll, GralGridPos.same, 2.0F, GralGridPos.same, GralGridPos.same, 1, 'd');
     widgdPath = panel.addTextField(name + "-Path", false, null, '.');
@@ -197,5 +199,21 @@ public class FileSelector implements Widgetifc
   
   
   void stop(){}
+
+
+  @Override
+  public GralColor setBackgroundColor(GralColor color)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+  @Override
+  public GralColor setForegroundColor(GralColor color)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
   
 }

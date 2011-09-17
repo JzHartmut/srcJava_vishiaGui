@@ -10,11 +10,11 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralWidget;
 
 public class ButtonSwt extends Canvas
 {
-  final WidgetDescriptor widgd;
+  final GralWidget widgd;
 
 	String sButtonText;
 	
@@ -34,17 +34,17 @@ public class ButtonSwt extends Canvas
 	 * @param mng The Gui-panel-manager contains information about the graphic frame and properties.
 	 * @param size The size of text in button, use 'A' or 'B' for small - bold
 	 */
-	public ButtonSwt(GuiPanelMngSwt mng, WidgetDescriptor widgd, char size)
+	public ButtonSwt(GuiPanelMngSwt mng, GralWidget widgd, char size)
 	{
-		super((Composite)mng.currPanel.panelComposite, 0);
+		super((Composite)mng.pos.panel.panelComposite, 0);
 		this.widgd = widgd;
-		//super((Composite)mng.currPanel.panelComposite, 0);  //Canvas
+		//super((Composite)mng.pos.panel.panelComposite, 0);  //Canvas
 		switch(size){ 
 		case 'A': fontText = mng.propertiesGuiSwt.stdInputFont; break;
 		case 'B': fontText = mng.propertiesGuiSwt.stdButtonFont; break;
 		default: throw new IllegalArgumentException("param size must be A or B");
 		}
-		//Control xx = mng.currPanel.panelComposite;
+		//Control xx = mng.pos.panel.panelComposite;
 		this.mng = mng;
 		black = mng.propertiesGuiSwt.colorSwt(0);
 		white = mng.propertiesGuiSwt.colorSwt(0xffffff);

@@ -1,8 +1,8 @@
 package org.vishia.mainGuiSwt;
 
-import org.vishia.gral.base.GralDevice;
+import org.vishia.gral.base.GralPrimaryWindow;
 
-abstract class GralDeviceSwt extends GralDevice
+abstract class GralDeviceSwt extends GralPrimaryWindow
 {
   
   //TODO: graphictrhead and main dispatch loop here!

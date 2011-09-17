@@ -2,11 +2,6 @@ package org.vishia.gral.ifc;
 
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
-import org.vishia.gral.cfg.GuiCfgBuilder;
-import org.vishia.gral.gridPanel.GralGridPos;
-import org.vishia.gral.gridPanel.GralGridBuild_ifc;
-import org.vishia.gral.swt.WidgetSimpleWrapperSwt;
-import org.vishia.gral.widget.Widgetifc;
 
 
 
@@ -16,7 +11,7 @@ import org.vishia.gral.widget.Widgetifc;
  *
  * @param <WidgetTYPE>
  */
-public class WidgetDescriptor
+public class GralWidget
 {
   
   /**Changes:
@@ -46,7 +41,7 @@ public class WidgetDescriptor
    * If this aggregation is null, the widget can't be changed in the design mode of the GUI.
    * It is created directly without configuration data. 
    */
-  private WidgetCfg_ifc itsCfgElement;
+  private GralWidgetCfg_ifc itsCfgElement;
   
 	/**Name of the widget in the panel. */
 	public String name;
@@ -104,11 +99,11 @@ public class WidgetDescriptor
 	int[] indices;
 	
   /**Action method on activating, changing or release the widget-focus. */
-  private UserActionGui actionChanging;
+  private GralUserAction actionChanging;
 
   
   /**Action method for showing. */
-  private UserActionGui actionShow;
+  private GralUserAction actionShow;
 
   
 	
@@ -119,14 +114,14 @@ public class WidgetDescriptor
 	 * This info can be set and changed after registration. */
 	private Object oContentInfo;
 	
-	public WidgetDescriptor(String sName, Widgetifc widget, char whatIs)
+	public GralWidget(String sName, Widgetifc widget, char whatIs)
 	{ this.name = sName;
 		this.widget = widget;
 		this.whatIs = whatIs;
 		this.itsCfgElement = null;
 	}
 
-	public WidgetDescriptor(String sName, char whatIs)
+	public GralWidget(String sName, char whatIs)
 	{ this.name = sName;
 		this.widget = null;
 		this.whatIs = whatIs;
@@ -134,7 +129,7 @@ public class WidgetDescriptor
 	}
 
   
-  public WidgetDescriptor(String sName, Widgetifc widget, char whatIs, String sContentInfo, Object oContentInfo)
+  public GralWidget(String sName, Widgetifc widget, char whatIs, String sContentInfo, Object oContentInfo)
   { this.name = sName;
     this.widget = widget;
     this.whatIs = whatIs;
@@ -143,7 +138,7 @@ public class WidgetDescriptor
     this.itsCfgElement = null;
   }
   
-  private WidgetDescriptor(WidgetCfg_ifc cfge, String sName, char whatIs, String sDataPath)
+  private GralWidget(GralWidgetCfg_ifc cfge, String sName, char whatIs, String sDataPath)
   { this.name = sName;
     this.whatIs = whatIs;
     this.sDataPath = sDataPath;
@@ -181,10 +176,10 @@ public class WidgetDescriptor
    * @param action any instance. Its action method is invoked depending of the type of widget
    *        usual if the user takes an action on screen, press button etc.
    */
-  public void setActionChange(UserActionGui action){ actionChanging = action; }
+  public void setActionChange(GralUserAction action){ actionChanging = action; }
   
   /**Gets the action for change the widget. */
-  public UserActionGui getActionChange(){ return actionChanging; }
+  public GralUserAction getActionChange(){ return actionChanging; }
   
   
   /**Sets the action in application context which is invoked for applying user data to show in the widget.
@@ -194,28 +189,29 @@ public class WidgetDescriptor
    * <br><br>
    * In the action the user should read any data from its application
    * and invoke {@link #setValue(int, int, Object, Object)} after data preparation to display the value.
-   * Because the {@link WidgetDescriptor} is given as parameter, the implementation can use the information
+   * Because the {@link GralWidget} is given as parameter, the implementation can use the information
    * for example {@link #sDataPath} or {@link #sFormat}. The implementation of the action can be done
    * in the users context in a specialized form, or some standard actions can be used. 
    * See notes of {@link #getActionShow()}.
    * <br><br>
    * To get the action in a script context (GuiCfgBuilder) some actions can be registered 
-   * using {@link GralGridBuild_ifc#registerUserAction(String, UserActionGui)}. They are gotten by name
-   * invoking {@link GralGridBuild_ifc#getRegisteredUserAction(String)} in the {@link GuiCfgBuilder}.
+   * using {@link org.vishia.gral.gridPanel.GralGridBuild_ifc#registerUserAction(String, GralUserAction)}. They are gotten by name
+   * invoking {@link org.vishia.gral.gridPanel.GralGridBuild_ifc#getRegisteredUserAction(String)} 
+   * in the {@link org.vishia.gral.cfg.GuiCfgBuilder}.
    * 
    * @param action The action instance.
    */
-  public void setActionShow(UserActionGui action){ actionShow = action; }
+  public void setActionShow(GralUserAction action){ actionShow = action; }
   
   /**Gets the action to show the widget. This method is helpfully to invoke showing after receiving data
-   * in the users context. Invoke {@link UserActionGui#userActionGui(String, WidgetDescriptor, Object...)}
+   * in the users context. Invoke {@link GralUserAction#userActionGui(String, GralWidget, Object...)}
    * with this WidgetDescriptor and additional user data. The implementation of that method
    * may be done in the users context but in another module or the implementation may be given in any 
    * library superordinated to this graphic adapter library but subordinated in respect to the explicit application.
-   * The usage of a show method given in the implementation of {@link UserActionGui} helps to separate
+   * The usage of a show method given in the implementation of {@link GralUserAction} helps to separate
    * the invocation of showing and the decision what and how is to show.
    */
-  public UserActionGui getActionShow(){ return actionShow; }
+  public GralUserAction getActionShow(){ return actionShow; }
   
   
 	public String getsToolTip()
@@ -255,7 +251,7 @@ public class WidgetDescriptor
 
 	/**
 	 * @param sShowMethod
-	 * @deprecated use {@link #setActionShow(UserActionGui)}.
+	 * @deprecated use {@link #setActionShow(GralUserAction)}.
 	 */
 	public void setShowMethod(String sShowMethod)
 	{ if(sShowMethod == null){
@@ -356,19 +352,19 @@ public class WidgetDescriptor
   { itsMng.setInfo(this, cmd, ident, visibleInfo, userData);
   }
   
-  public void setCfgElement(WidgetCfg_ifc cfge)
+  public void setCfgElement(GralWidgetCfg_ifc cfge)
   { this.itsCfgElement = cfge;
   }
   
   
-  public WidgetCfg_ifc getCfgElement()
+  public GralWidgetCfg_ifc getCfgElement()
   { return itsCfgElement;
   }
   
   
   /**Gets the working interface of the panel where the widget is member of. 
    * It can be used to set and get values from other widgets symbolic identified by its name.
-   * Note: It is possible too to store the {@link WidgetDescriptor} of specific widgets
+   * Note: It is possible too to store the {@link GralWidget} of specific widgets
    * to get and set values and properties of this widgets non-symbolic.
    * @return The panel.
    */

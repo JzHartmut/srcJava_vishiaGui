@@ -14,27 +14,27 @@ import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.cfg.GuiCfgBuilder;
 import org.vishia.gral.cfg.GuiCfgData;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.FileDialogIfc;
-import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralFileDialog_ifc;
+import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GuiShellMngIfc;
-import org.vishia.gral.ifc.GuiWindowMng_ifc;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
-import org.vishia.gral.widget.WidgetCmpnifc;
+import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 
 
 
 /**This is a unique interface for the GUI-panel-manager to build its content.
  * To work with the graphical application see {@link GralPanelMngWorking_ifc}. 
  * <br><br>
- * Any widget is represented by a {@link WidgetDescriptor}. Either the WidgetDescriptor
+ * Any widget is represented by a {@link GralWidget}. Either the WidgetDescriptor
  * should be created before, and taken as parameter for the widget-creating method,
  * or the WidgetDescriptor is returned by the widget-creating method. The second form takes
  * most of the characteristics as parameters for the creating method.
  * <br><br>
  * The platform-specific Widget Object (Swing: javax.swing.JComponent, org.eclipse.swt.widgets.Control etc.)
- * is stored as Object-reference in the {@link WidgetDescriptor#widget}.   
+ * is stored as Object-reference in the {@link GralWidget#widget}.   
  * If necessary it can be casted to the expected class if some special operations 
  * using the graphic platform are need. For the most
  * simple applications, the capability of this interface and its given implementation 
@@ -75,11 +75,11 @@ public interface GralGridBuild_ifc
    * <li>2011-06-18 Hartmut chg: createFileDialog() improved, 
    *     new addFileSelectField(): A Field that comprises the possibility to open a file select dialog
    *     and that are a destination for drop or paste a file mime type from clipboard. 
-   * <li>2011-05-01 Hartmut new: {@link #addTextBox(WidgetDescriptor, boolean, String, char)}: 
+   * <li>2011-05-01 Hartmut new: {@link #addTextBox(GralWidget, boolean, String, char)}: 
    *     A Text box with more as one line. The TextField has only one line.
    * <li>2011-05-01 Hartmut new: {@link #createCompositeBox()}. It is a box with its own PanelMng
    *     which is located in an area of another panel. (Composite)
-   * <li>2011-05-01 Hartmut new: {@link #remove(GralGridBuild_ifc)} and {@link #remove(WidgetDescriptor)}
+   * <li>2011-05-01 Hartmut new: {@link #remove(GralGridBuild_ifc)} and {@link #remove(GralWidget)}
    *     to remove widgets, for dynamic views.
    * <li>2011-05-01 Hartmut new: {@link #createWindow(String, boolean)} instead createModalWindow(String).
    *     This method should be used for any sub-windows in the application. The window position is determined
@@ -116,7 +116,7 @@ public interface GralGridBuild_ifc
    *              If it the instance is fault, a ClassCastException is thrown.
    *         
    */
-  public void registerPanel(String name, GralPanelContent panel);
+  public void registerPanel(GralPanelContent panel);
   
   
   /**Creates a panel for tabs and registers it in the GUI.
@@ -125,7 +125,7 @@ public interface GralGridBuild_ifc
    * @param properties use or of constants {@link #propZoomedPanel}, {@link #propGridZoomedPanel}
    * @return The Tab-container, there the tabs can be registered.
    */
-  GralTabbedPanel createTabPanel(GralPanelActivated_ifc user, int properties);
+  GralTabbedPanel createTabPanel(String namePanel, GralPanelActivated_ifc user, int properties);
   
   /**selects a registered panel for the next add-operations.
    * see {@link #registerPanel(String, Object)}. 
@@ -170,10 +170,10 @@ public interface GralGridBuild_ifc
    * A text can be presented in a smaller font. A very small font is presented by 1 vertical gral-unit.
    * Such a text can be used as short title for text input fields (prompt) or adequate.
    * <br>
-   * A button is able to present with 3 vertical gral units. A small check box may be presented 
+   * A button is able to present with 3 or 2 vertical gral units. A small check box may be presented 
    * with 1 x 1 gral unit.
    * <br><br>
-   * A gral unit should be have the same distance in vertical in horizontal direction. It depends on the 
+   * A gral unit should be have the same distance in vertical as in horizontal direction. It depends on the 
    * graphical implementation. One gral unit may have approximately 6 to 30 pixel, 
    * depending from the requested size of appearance and the display pixel size. Any graphic can be shown
    * with several sizes of appearance, depending from parameters.
@@ -181,7 +181,7 @@ public interface GralGridBuild_ifc
    * <b>Fine positions</b>:
    * Either the positions are given with 2 integer values or with a float value. The fine position is given
    * as one digit from 0 to 9. It is one fractional part digit of the float or the frac int argument.
-   * The fine position divide one gral position into 5 or 6 fine positions. 
+   * The fine position divides one gral position into 5 or into 6 fine positions. 
    * The odd numbers divide into 6 positions. In this kind a gral position is able to divide by 2, 3 and 6:
    * <ul>
    * <li>1: 1/6 = 0.1333
@@ -201,7 +201,7 @@ public interface GralGridBuild_ifc
    * <br><br>
    * Positions may be given in the following forms: <ul>
    * <li>Positive number in range 0...about 100..200: Gral Unit from left or top.
-   * <li>Negative number in range -1...about -200..-200: Gral Unit from right or bottom.
+   * <li>Negative number in range 0 or -1...about -200..-200: Gral Unit from right or bottom.
    * <li>0 for lineEnd or columnEnd means the right or bottom. 
    * <li>Positive Number added with {@link GralGridPos#size} applied at lineEnd or columnEnd: 
    *   The size. In this case the line and column is the left top corner. 
@@ -215,7 +215,7 @@ public interface GralGridBuild_ifc
    * <li> {@link GralGridPos#next} and {@link GralGridPos#nextBlock}   
    * <li>as width or height or as percent value from the panel size.
    * </ul>
-   * Fine positions are given always from left. 
+   * Fine positions are given always from left or top of the fundamental positions. 
    * For example a value -1.3 means, the widget is placed 1 unit from right, and then 1/3 inside this unit.
    * This is 2/3 unit from right. A value for example -0.3 is not admissible, because -0 is not defined. 
    * <br>
@@ -306,14 +306,14 @@ public interface GralGridBuild_ifc
    * @param width in grid-unigs
    * @param sCmd The command string will be transfered to the action-method
    * @param sUserAction The user action shoult be registered before 
-   *         calling {@link #registerUserAction(String, UserActionGui)}
+   *         calling {@link #registerUserAction(String, GralUserAction)}
    * @param sName
    * @return
    */
   //Object addButton(String sButtonText, int height, int width, String sCmd, String sUserAction, String sName);
-  public WidgetDescriptor addButton(
+  public GralWidget addButton(
   	String sName
-  , UserActionGui action
+  , GralUserAction action
   , String sCmd
   , String sShowMethod
   , String sDataPath
@@ -331,9 +331,9 @@ public interface GralGridBuild_ifc
    * @param sButtonText
    * @return
    */
-  public WidgetDescriptor addSwitchButton(
+  public GralWidget addSwitchButton(
   	String sName
-  , UserActionGui action
+  , GralUserAction action
   , String sCmd
   , String sShowMethod
   , String sDataPath
@@ -350,22 +350,22 @@ public interface GralGridBuild_ifc
    * @return
    */
   //Object addButton(String sButtonText, int height, int width, String sCmd, String sUserAction, String sName);
-  WidgetDescriptor addLed(
+  GralWidget addLed(
   	String sName
   , String sShowMethod
   , String sDataPath
   );
   
-  WidgetDescriptor addValueBar(
+  GralWidget addValueBar(
   	String sName
   , String sShowMethod
   , String sDataPath
   );
   
   
-  WidgetDescriptor addSlider(
+  GralWidget addSlider(
   	String sName
-  , UserActionGui action
+  , GralUserAction action
   , String sShowMethod
   , String sDataPath
   );
@@ -380,7 +380,7 @@ public interface GralGridBuild_ifc
    *        adequate to the possibilities of the used graphic base system. 
    * @return
    */
-  WidgetDescriptor addTable(String sName, int height, int[] columnWidths);
+  GralWidget addTable(String sName, int height, int[] columnWidths);
 
   /**Adds a table which supports selection of some lines.
    * Parameter see {@link #addTable(String, int, int[])}.
@@ -405,7 +405,7 @@ public interface GralGridBuild_ifc
    * @param color The color as RGB-value in 3 Byte. 0xffffff is white, 0xff0000 is red.
    * @return
    */
-  WidgetDescriptor addText(String sText, char size, int color);
+  GralWidget addText(String sText, char size, int color);
  
   
   /**Adds a simple text at the current position.
@@ -415,7 +415,7 @@ public interface GralGridBuild_ifc
    * @param BackColor
    * @return
    */
-  WidgetDescriptor addText(String sText, int origin, GralColor textColor, GralColor BackColor);
+  GralWidget addText(String sText, int origin, GralColor textColor, GralColor BackColor);
   
   Object addImage(String sName, InputStream imageStream, int height, int width, String sCmd);
 
@@ -441,14 +441,14 @@ public interface GralGridBuild_ifc
    * The current content of the edit field is able to get any time calling {@link GralPanelMngWorking_ifc#getValue(String)}
    * with the given registering name.
    * <br><br>
-   * To force a set of content or an action while getting focus of this field the method {@link #addActionFocused(String, UserActionGui, String)}
-   * can be called after invoking this method (any time, able to change). The {@link UserActionGui#userActionGui(String, String, WidgetDescriptor, Map)}
+   * To force a set of content or an action while getting focus of this field the method {@link #addActionFocused(String, GralUserAction, String)}
+   * can be called after invoking this method (any time, able to change). The {@link GralUserAction#userActionGui(String, String, GralWidget, Map)}
    * is called in the GUI-thread before the field gets the focus.
    * <br><br>
-   * To force a check of content or an action while finish editing the method {@link #addActionFocusRelease(String, UserActionGui, String)}
+   * To force a check of content or an action while finish editing the method {@link #addActionFocusRelease(String, GralUserAction, String)}
    * can be called after invoking this method (any time, able to change). The adequate userActionGui is called after editing the field.
    * <br><br>
-   * If the {@link WidgetDescriptor#action} refers an instance of type {@link UserActionGui}, than it is the action on finish editing.
+   * If the {@link GralWidget#action} refers an instance of type {@link GralUserAction}, than it is the action on finish editing.
    * 
    * @param sName The registering name
    * @param widgetInfo The informations about the textfield.
@@ -460,7 +460,7 @@ public interface GralGridBuild_ifc
    * @return
    * @deprecated
    */
-  Object addTextField(WidgetDescriptor widgetInfo, boolean editable, String prompt, char promptStylePosition);
+  Object addTextField(GralWidget widgetInfo, boolean editable, String prompt, char promptStylePosition);
   
   /**Adds a text field at the current position.
    * @param name The registering name to get the value from outside or set the content.
@@ -471,21 +471,21 @@ public interface GralGridBuild_ifc
    *   'l' left, 't' top (above field) 
    * @return The WidgetDescriptor. An action, tooltip, color etc. can be set there later.
    */
-  WidgetDescriptor addTextField(String name, boolean editable, String prompt, char promptStylePosition);
+  GralWidget addTextField(String name, boolean editable, String prompt, char promptStylePosition);
   
   /** Adds a box for editing or showing a text.
    * <br><br>
    * The current content of the edit field is able to get anytime calling {@link GralPanelMngWorking_ifc#getValue(String)}
    * with the given registering name.
    * <br><br>
-   * To force a set of content or an action while getting focus of this field the method {@link #addActionFocused(String, UserActionGui, String)}
-   * can be called after invoking this method (any time, able to change). The {@link UserActionGui#userActionGui(String, String, WidgetDescriptor, Map)}
+   * To force a set of content or an action while getting focus of this field the method {@link #addActionFocused(String, GralUserAction, String)}
+   * can be called after invoking this method (any time, able to change). The {@link GralUserAction#userActionGui(String, String, GralWidget, Map)}
    * is called in the GUI-thread before the field gets the focus.
    * <br><br>
-   * To force a check of content or an action while finish editing the method {@link #addActionFocusRelease(String, UserActionGui, String)}
+   * To force a check of content or an action while finish editing the method {@link #addActionFocusRelease(String, GralUserAction, String)}
    * can be called after invoking this method (any time, able to change). The adequate userActionGui is called after editing the field.
    * <br><br>
-   * If the {@link WidgetDescriptor#action} refers an instance of type {@link UserActionGui}, than it is the action on finish editing.
+   * If the {@link GralWidget#action} refers an instance of type {@link GralUserAction}, than it is the action on finish editing.
    * 
    * @param sName The registering name
    * @param widgetInfo The informations about the textfield.
@@ -496,7 +496,7 @@ public interface GralGridBuild_ifc
    *   'l' left, 't' top (above field) 
    * @return
    */
-  Object addTextBox(WidgetDescriptor widgetInfo, boolean editable, String prompt, char promptStylePosition);
+  Object addTextBox(GralWidget widgetInfo, boolean editable, String prompt, char promptStylePosition);
   
   /**Adds a curve view for displaying values with ordinary x-coordinate.
    * The scaling of the curve view is set to -100..100 per default. 
@@ -516,16 +516,16 @@ public interface GralGridBuild_ifc
    * @param listRecentFiles maybe null, a list which stores and offers selected files.
    * @param defaultDir The start directory on open the dialog.
    * @param startDirMask The start dir and selection mask. Both are separated with a ':' character
-   *        in this string. See {@link FileDialogIfc}. 
+   *        in this string. See {@link GralFileDialog_ifc}. 
    *        If the last or only one char is '/' then a directory should be selected.
    *        For example "D:/MyDir:*.txt" shows only .txt-files to select in the dialog starting from d:/MyDir. 
    * @param prompt Prompt for the text field.
    * @param promptStylePosition
    * @return
    */
-  WidgetDescriptor addFileSelectField(String name, List<String> listRecentFiles, String startDirMask, String prompt, char promptStylePosition);
+  GralWidget addFileSelectField(String name, List<String> listRecentFiles, String startDirMask, String prompt, char promptStylePosition);
   
-  Object addMouseButtonAction(String sName, UserActionGui action, String sCmdPress, String sCmdRelease, String sCmdDoubleClick);
+  Object addMouseButtonAction(String sName, GralUserAction action, String sCmdPress, String sCmdRelease, String sCmdDoubleClick);
 
   /**Adds the given Focus action to the named widget.
    * @param sName The name of the widget. It should be registered calling any add... method.
@@ -534,7 +534,7 @@ public interface GralGridBuild_ifc
    * @param sCmdRelease
    * @return
    */
-  WidgetDescriptor addFocusAction(String sName, UserActionGui action, String sCmdEnter, String sCmdRelease);
+  GralWidget addFocusAction(String sName, GralUserAction action, String sCmdEnter, String sCmdRelease);
 
   /**Adds the given Focus action to the known widget.
    * @param widgetInfo
@@ -542,14 +542,14 @@ public interface GralGridBuild_ifc
    * @param sCmdEnter
    * @param sCmdRelease
    */
-  void addFocusAction(WidgetDescriptor widgetInfo, UserActionGui action, String sCmdEnter, String sCmdRelease);
+  void addFocusAction(GralWidget widgetInfo, GralUserAction action, String sCmdEnter, String sCmdRelease);
 
   
   /**Register all widgets, which are created in its own classes, not add here.
    * The widgets are stored in the index of names.
    * @param widgd
    */
-  void registerWidget(WidgetDescriptor widgd);
+  void registerWidget(GralWidget widgd);
   
   /**Sets the values for a line
    * @param sName The registered name
@@ -605,22 +605,22 @@ public interface GralGridBuild_ifc
    * @param name Name of the action
    * @param action what to do.
    */
-  void registerUserAction(String name, UserActionGui action);
+  void registerUserAction(String name, GralUserAction action);
   
-  UserActionGui getRegisteredUserAction(String name);
+  GralUserAction getRegisteredUserAction(String name);
   
   
   /**Returns a Set of all fields, which are created to show.
    * @return the set, never null, possible an empty set.
    */
-  public Set< Map.Entry <String, WidgetDescriptor>> getShowFields();
+  public Set< Map.Entry <String, GralWidget>> getShowFields();
 
   
   /**The GUI-change-listener should be called in the dispatch-loop of the GUI-(SWT)-Thread.
    * @return The instance to call run(). 
    * Hint: run() returns after checking orders and should be called any time in the loop. 
    */
-  public GuiDispatchCallbackWorker getTheGuiChangeWorker();
+  public GralDispatchCallbackWorker getTheGuiChangeWorker();
   
   
   /**Creates a box inside the current panel to hold some widgets.
@@ -642,7 +642,7 @@ public interface GralGridBuild_ifc
    * @param yS
    * @return
    */
-  WidgetCmpnifc createGridPanel(String namePanel, GralColor backGround, int xG, int yG, int xS, int yS);
+  GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG, int xS, int yS);
   
   
   /**Removes a composite box from the graphic representation.
@@ -651,7 +651,7 @@ public interface GralGridBuild_ifc
    */
   boolean remove(GralGridBuild_ifc compositeBox);
   
-  boolean remove(WidgetDescriptor widget);
+  boolean remove(GralWidget widget);
   
 	/**Creates a new window additional to a given window with Panel Manager.
 	 * @param left
@@ -666,22 +666,22 @@ public interface GralGridBuild_ifc
 	
 	/**Creates a Window for a modal or non modal dialog. The window is described by the returned interface. 
 	 * It can be filled with elements. The dialog is able to show and hide calling 
-	 * {@link GuiShellMngIfc#setWindowVisible(boolean)}. The interface therefore can be get calling
-	 * {@link GuiShellMngBuildIfc#getShellMngIfc()}.
+	 * {@link GralWindow_ifc#setWindowVisible(boolean)} or 
+	 * {@link GralPanelMngWorking_ifc#setWindowsVisible(GralWindow_ifc, GralGridPos)}. 
 	 * The position and size of the window is set with the adequate strategy like all other widget: 
 	 * using {@link #setPositionSize(int, int, int, int, char)}. 
 	 * @param title Title of the window, may be null, then without title bar.
 	 * @param exclusive true then non-modal.
 	 * @return
 	 */
-	GuiShellMngBuildIfc createWindow(String title, boolean exclusive);
+	GralWindow_ifc createWindow(String title, boolean exclusive);
   
 	
-	WidgetDescriptor createWindow(String name, String title, boolean exclusive);
+	GuiShellMngBuildIfc createWindowOld(String title, boolean exclusive);
 	
 	
 	
-  GuiWindowMng_ifc createInfoBox(String title, String[] lines, boolean todo);
+  GralWindow_ifc createInfoBox(String title, String[] lines, boolean todo);
 
   /**Sets the builder for content configuration.
    * @param cfgBuilder
@@ -703,7 +703,7 @@ public interface GralGridBuild_ifc
    * The dialog is showed in a own window, maybe modal or not.
    * @return Interface to deal with the dialog.
    */
-	FileDialogIfc createFileDialog();
+	GralFileDialog_ifc createFileDialog();
 	
 	GuiShellMngIfc getShellMngIfc();
 

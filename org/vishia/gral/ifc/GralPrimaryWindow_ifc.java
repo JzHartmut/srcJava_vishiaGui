@@ -10,7 +10,7 @@ import org.vishia.mainCmd.MainCmd_ifc;
  * @author Hartmut Schorrig
  *
  */
-public interface GuiWindow_ifc
+public interface GralPrimaryWindow_ifc extends GralWindow_ifc
 {
   /**Sets the title and the pixel size for the whole window. */
   void setTitleAndSize(String sTitle, int left, int top, int xSize, int ySize);
@@ -51,7 +51,7 @@ public interface GuiWindow_ifc
    * @param openStandardDirectory If given, then this is the default directory for file open.
    * @param actionFile Action on file menu entries.
    */
-  void setStandardMenusGThread(File openStandardDirectory, UserActionGui actionFile);
+  void setStandardMenusGThread(File openStandardDirectory, GralUserAction actionFile);
   
   
   /**Adds any menu item
@@ -60,19 +60,19 @@ public interface GuiWindow_ifc
    *   then creates the search menu item, and then continue with 'n' as accelerator. 
    * @param action called on menu activation.
    */
-  void addMenuItemGThread(String name, UserActionGui action);
+  void addMenuItemGThread(String name, GralUserAction action);
   
   
   /**Adds a listener, which will be called in the dispatch loop.
    * @param listener
    */
-  void addDispatchListener(GuiDispatchCallbackWorker listener);
+  void addDispatchListener(GralDispatchCallbackWorker listener);
   
   
   /**Removes a listener, which was called in the dispatch loop.
    * @param listener
    */
-  public void removeDispatchListener(GuiDispatchCallbackWorker listener);
+  public void removeDispatchListener(GralDispatchCallbackWorker listener);
   
   
   MainCmd_ifc getMainCmd();

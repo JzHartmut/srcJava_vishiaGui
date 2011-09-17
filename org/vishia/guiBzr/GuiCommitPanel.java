@@ -3,8 +3,8 @@ package org.vishia.guiBzr;
 import java.io.File;
 
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.mainCmd.Report;
 import org.vishia.util.FileSystem;
 
@@ -19,7 +19,7 @@ public class GuiCommitPanel
   
   final StringBuilder uCommitOut =  new StringBuilder();
   
-  final WidgetDescriptor widgdCommitText = new WidgetDescriptor("commitText", 'T');
+  final GralWidget widgdCommitText = new GralWidget("commitText", 'T');
   
   public GuiCommitPanel(MainData mainData, GralGridBuild_ifc panelBuildifc)
   {
@@ -43,9 +43,9 @@ public class GuiCommitPanel
   
   
   
-  private final UserActionGui actionCommit = new UserActionGui()
+  private final GralUserAction actionCommit = new GralUserAction()
   { 
-    public void userActionGui(String sCmdGui, WidgetDescriptor widgetInfos, Object... values)
+    public void userActionGui(String sCmdGui, GralWidget widgetInfos, Object... values)
     {
       File fileCommitText = mainData.mainAction.getContentofCommitText();
       StringBuilder sCmdCommit = new StringBuilder(mainData.cfg.indexCmds.get("commit"));

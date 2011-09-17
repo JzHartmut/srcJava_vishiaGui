@@ -2,10 +2,11 @@ package org.vishia.gral.area9;
 
 import java.io.File;
 
-import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
-import org.vishia.gral.ifc.GuiWindow_ifc;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.widget.Widgetifc;
+import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.Widgetifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainGuiSwt.MainCmdSwt;
 
@@ -49,7 +50,7 @@ import org.vishia.mainGuiSwt.MainCmdSwt;
  * @author Hartmut Schorrig
  *
  */
-public interface GuiMainAreaifc extends GuiWindow_ifc
+public interface GuiMainAreaifc extends GralPrimaryWindow_ifc
 {
   /**Version history:
    * <ul>
@@ -67,8 +68,8 @@ public interface GuiMainAreaifc extends GuiWindow_ifc
   final static int version = 0x20110806;
 
   
-  /**Sets the output window to a defined area. .
-   * Adds the edit-menu too. 
+  /**Sets the output window to a defined area.
+   * This method can be invoked before the graphicThread is started.
    * @param area Two letter combination A1..C3 for horizontal and vertical area. 
    *        A..C is left to right, 1..3 is top to bottom.
    *        The first combination is the top left area for output, 
@@ -79,6 +80,11 @@ public interface GuiMainAreaifc extends GuiWindow_ifc
    */
   void setOutputArea(String area);
 
+  
+  /**Returns the outputArea, which was created by the graphic thread. 
+   */
+  GralPanelContent getOutputPanel();
+  
   /**Sets the divisions of the frame. The frame is divide into 9 parts,
    * where two horizontal and two vertical lines built them:
    * <pre>
@@ -101,7 +107,7 @@ public interface GuiMainAreaifc extends GuiWindow_ifc
   void setFrameAreaBorders(int x1p, int x2p, int y1p, int y2p);
   
   
-  /**Sets a Component into a defined area. See {@link #setFrameAreaBorders(int, int, int, int)}.
+  /**Sets a Panel into a defined area. See {@link #setFrameAreaBorders(int, int, int, int)}.
    * It should be called only in the GUI-Thread.
    * @param xArea 1 to 3 for left, middle, right
    * @param yArea 1 to 3 for top, middle, bottom
@@ -110,7 +116,7 @@ public interface GuiMainAreaifc extends GuiWindow_ifc
    * @param component The component.
    * @throws IndexOutOfBoundsException if the arguments are false or the area is occupied already.
    */
-  void addFrameArea(int xArea, int yArea, int dxArea, int dyArea, Widgetifc component)
+  void addFrameArea(int xArea, int yArea, int dxArea, int dyArea, GralPanelContent component)
   throws IndexOutOfBoundsException;
   
   

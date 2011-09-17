@@ -24,7 +24,6 @@
 
 package org.vishia.mainGuiSwt;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,13 +31,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -53,9 +47,8 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.ScrollBar;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.TabFolder;
@@ -68,7 +61,7 @@ import org.eclipse.swt.widgets.Widget;
 
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
-import org.vishia.gral.base.GralDevice;
+import org.vishia.gral.base.GralPrimaryWindow;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
@@ -78,18 +71,19 @@ import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
 import org.vishia.gral.gridPanel.GralGridProperties;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.FileDialogIfc;
-import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
-import org.vishia.gral.ifc.GuiImageBase;
+import org.vishia.gral.ifc.GralFileDialog_ifc;
+import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralWidgetChangeRequ;
+import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralImageBase;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
-import org.vishia.gral.ifc.GuiRectangle;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GuiShellMngIfc;
-import org.vishia.gral.ifc.GuiWindowMng_ifc;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.ifc.Widgetifc;
 import org.vishia.gral.swt.WidgetSimpleWrapperSwt;
-import org.vishia.gral.widget.WidgetCmpnifc;
-import org.vishia.gral.widget.Widgetifc;
 import org.vishia.msgDispatch.LogMessage;
 
 
@@ -176,7 +170,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   public  final PropertiesGuiSwt propertiesGuiSwt;
   
   /**This mouse-click-implementor is added to any widget,
-   * which is associated to a {@link WidgetDescriptor} in its data.
+   * which is associated to a {@link GralWidget} in its data.
    * The infos of the last clicked widget can be got with it.
    */
   MouseClickInfo mouseClickForInfo = new MouseClickInfo(this);
@@ -189,17 +183,17 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    * An instance of this class is able to assign as button-action.
    * The actionPerformed-method is implemented here, but the procedure calls a used-defined
    * action method which is implemented in the user-space implementing the
-   *  {@link UserActionGui#userActionGui(String, String, Map)}-interface. 
+   *  {@link GralUserAction#userActionGui(String, String, Map)}-interface. 
    */
   protected class XXXButtonUserAction implements XXXUserAction, SelectionListener
   {
 
     /**Reference to the users method. */
-    private final UserActionGui userCmdGui;
+    private final GralUserAction userCmdGui;
     
     /**Constructor.
      * @param userCmdGui The users method for the action. */
-    private XXXButtonUserAction(UserActionGui userCmdGui)
+    private XXXButtonUserAction(GralUserAction userCmdGui)
     {
       this.userCmdGui = userCmdGui;
     }
@@ -226,7 +220,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
 			Widget src = e.widget;
 			Object widgetData = src.getData();
 			@SuppressWarnings("unchecked")
-			WidgetDescriptor infos = widgetData instanceof WidgetDescriptor ? (WidgetDescriptor)widgetData : null; 
+			GralWidget infos = widgetData instanceof GralWidget ? (GralWidget)widgetData : null; 
 			if(src instanceof Button){
 				Button button = (Button)src;
 				data = button.getData();
@@ -267,11 +261,11 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public GuiPanelMngSwt(GralDevice gralDevice,  Device device, Composite graphicFrame
+  public GuiPanelMngSwt(GralPrimaryWindow gralDevice ,  Device device /*, Composite graphicFrame */
   , int width, int height, char displaySize, VariableContainer_ifc variableContainer
 	, LogMessage log)
   { //super(sTitle); 
-  	this(gralDevice, null, graphicFrame, width, height, new PropertiesGuiSwt(device, displaySize), variableContainer, log);
+  	this(gralDevice, width, height, new PropertiesGuiSwt(device, displaySize), variableContainer, log);
   	
   }
 
@@ -282,13 +276,15 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public GuiPanelMngSwt(GralDevice gralDevice, GralGridMngBase parent, Composite graphicFrame, int width, int height, PropertiesGuiSwt propertiesGui
+  public GuiPanelMngSwt(GralPrimaryWindow gralDevice /*, GralGridMngBase parent, Composite graphicFrame*/, int width, int height, PropertiesGuiSwt propertiesGui
   	, VariableContainer_ifc variableContainer
   	, LogMessage log
   	)
-  { super(gralDevice, parent, propertiesGui, variableContainer, log);
+  { super(gralDevice, null /*parent*/, propertiesGui, variableContainer, log);
     this.propertiesGuiSwt = propertiesGui;
-  	this.graphicFrame = graphicFrame;
+  	Object oPanelComposite = gralDevice.panelComposite;  //from the baseclass GralPanelContent
+    if(! (oPanelComposite instanceof Shell)){ throw new IllegalArgumentException("");}
+  	this.graphicFrame = (Shell)oPanelComposite; //from the primaryWindow  //old:graphicFrame;
   	Composite shell = graphicFrame;
   	if(!(shell instanceof Shell)){
   		shell = shell.getShell();
@@ -299,17 +295,32 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     	//guiContainer.setSize(width * propertiesGui.xPixelUnit(), height * propertiesGui.yPixelUnit());
     }
     
-    GralPanelContent panelContent = new GralPanelContent(graphicFrame){
+    GralPanelContent panelContent = gralDevice; /*new GralPanelContent("$", graphicFrame){
 
       @Override
       public boolean setFocus()
       { return false;
       }
+
+      @Override
+      public GralColor setBackgroundColor(GralColor color)
+      {
+        // TODO Auto-generated method stub
+        return null;
+      }
+
+      @Override
+      public GralColor setForegroundColor(GralColor color)
+      {
+        // TODO Auto-generated method stub
+        return null;
+      }
       
     };
-  	panels.put("$", panelContent);
-  	currPanel = panelContent;
-  	sCurrPanel = "$";
+    */
+  	panels.put(panelContent.namePanel, panelContent);
+  	pos.panel = panelContent;
+  	sCurrPanel = panelContent.namePanel;
   	
     
     pos.x = 0; //start-position
@@ -325,19 +336,19 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   @Override public GralGridBuild_ifc createCompositeBox()
   {
     //Composite box = new Composite(graphicFrame, 0);
-    Composite box = new Composite((Composite)currPanel.panelComposite, 0);
+    Composite box = new Composite((Composite)pos.panel.panelComposite, 0);
     setPosAndSize_(box);
     Point size = box.getSize();
-    GuiPanelMngSwt mng = new GuiPanelMngSwt(gralDevice, this, box, size.y, size.x, propertiesGuiSwt, variableContainer, log);
+    GuiPanelMngSwt mng = new GuiPanelMngSwt(gralDevice, size.y, size.x, propertiesGuiSwt, variableContainer, log);
     return mng;
   }
 
   
-  @Override public WidgetCmpnifc createGridPanel(String namePanel, GralColor backGround, int xG, int yG, int xS, int yS)
+  @Override public GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG, int xS, int yS)
   {
     Color backColorSwt = propertiesGuiSwt.colorSwt(backGround);
-    GridPanelSwt panel = new GridPanelSwt(graphicFrame, 0, backColorSwt, xG, yG, xS, yS);
-    registerPanel(namePanel, panel);
+    GridPanelSwt panel = new GridPanelSwt(namePanel, graphicFrame, 0, backColorSwt, xG, yG, xS, yS);
+    registerPanel(panel);
 
     return panel;
   }
@@ -350,7 +361,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     return true;
   }
   
-  @Override public boolean remove(WidgetDescriptor widget)
+  @Override public boolean remove(GralWidget widget)
   {
     if(widget !=null && widget.widget !=null){
       Object swtWidgd = widget.widget.getWidget();
@@ -397,7 +408,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
 	 * @param height
 	 * @return
 	 */
-  public GuiShellMngBuildIfc createWindow(String title, boolean exclusive)
+  public GuiShellMngBuildIfc createWindowOld(String title, boolean exclusive)
   {
     //Display display = new Display();
     int props = 0;
@@ -410,9 +421,9 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     //setPosAndSize_(shell); //, line,0, column,0, dy,0, dx,0);
     //shell.setBounds(left,top, width, height);
     
-    GuiRectangle size = calcWidgetPosAndSize(pos, 600, 800, 800, 600);
+    GralRectangle size = calcWidgetPosAndSize(pos, 600, 800, 800, 600);
     Rectangle rectShell = graphicFrame.getBounds();
-    Rectangle rectPanel = ((Composite)currPanel.panelComposite).getBounds();
+    Rectangle rectPanel = ((Composite)pos.panel.panelComposite).getBounds();
     shell.setBounds(size.x + rectShell.x + rectPanel.x, size.y + rectShell.y + rectPanel.y, size.dx, size.dy);    
     
     
@@ -424,20 +435,80 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
 
   }
   
-  public WidgetDescriptor createWindow(String name, String title, boolean exclusive)
+  public GralWindow_ifc createWindow(String title, boolean exclusive)
   {
-    //Display display = new Display();
-    WindowSwt window = new WindowSwt(graphicFrame.getDisplay(), title, exclusive);
+    GralRectangle rect = calcPositionOfWindow(this.pos);
     
-    setPosAndSize_(window.window);
+    //Shell currShell = pos.panelSwt.getShell();
+    //final Rectangle rectShell = currShell.getBounds();
     
+    //int xPos = rectShell.x + rectParent.x + rectangle.x;
+    //int yPos = rectShell.y + rectParent.y + rectangle.y;
+    SubWindowSwt window = new SubWindowSwt(graphicFrame.getDisplay(), title, exclusive);
+    window.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
+    //setPosAndSize_(window.window);
     
-    WidgetDescriptor widgd = new WidgetDescriptor(name, new WidgetSimpleWrapperSwt(window.window), 'w');
-    registerPanel(name, window);
-    window.window.setVisible(true);
-    return widgd;
+    //TODO create a Panel in the window.
+    
+    //WidgetDescriptor widgd = new WidgetDescriptor(name, new WidgetSimpleWrapperSwt(window.window), 'w');
+    //TODO registerPanel(name, window);
+    //window.window.setVisible(true);
+    return window;
 
   }
+  
+  
+  
+  
+  
+  @Override public boolean setWindowsVisible(GralWindow_ifc window, GralGridPos atPos)
+  {
+    GralRectangle rect = calcPositionOfWindow(atPos);
+    SubWindowSwt windowSwt = (SubWindowSwt)window;
+    windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
+    
+    window.setWindowVisible(true); ///
+    return true;
+  }
+
+  
+
+  
+  
+  
+  GralRectangle calcPositionOfWindow(GralGridPos posWindow)
+  {
+    Control panel = (Control) pos.panel.panelComposite;
+    Point loc;
+    Rectangle rectParent  = panel.getBounds();
+    loc = panel.getLocation();
+    final GralRectangle rectangle = calcWidgetPosAndSize(posWindow, rectParent.width, rectParent.height, 400, 300);
+    int xPos = rectParent.x, yPos = rectParent.y;
+    while( (panel = panel.getParent()) !=null){
+      rectParent = panel.getBounds();
+      loc = panel.getLocation();
+      xPos += rectParent.x;
+      yPos += rectParent.y;
+      if(panel instanceof Shell){
+        Shell shell = (Shell)panel;
+        Rectangle rectArea = shell.getClientArea(); //size of client area
+        Menu menu = shell.getMenuBar();
+        //Point sizeArea = shell.getSize();
+        int dy = rectParent.height - rectArea.height; //The start of client area
+        if(menu !=null){ dy *=2; } //Menu needs the same size as title.
+        int dx = rectParent.width - rectArea.width;
+        xPos += dx;
+        yPos += dy;
+      } else {
+      }
+      
+    }
+    rectangle.x += xPos;
+    rectangle.y += yPos;
+    return rectangle;
+  }
+  
+  
   
   
   
@@ -449,10 +520,10 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    * @param name Name of the panel.
    * @param panel The panel.
    */
-  @Override public void registerPanel(String name, GralPanelContent panel){
-    panels.put(name, panel);
-    currPanel = panel;
-    sCurrPanel = name;
+  @Override public void registerPanel(GralPanelContent panel){
+    panels.put(panel.namePanel, panel);
+    pos.panel = panel;
+    sCurrPanel = panel.namePanel;
   }
   
   
@@ -466,21 +537,21 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   /**selects a registered panel for the next add-operations. 
    */
   public void selectPanel(String sName){
-  	currPanel = panels.get(sName);
+  	pos.panel = panels.get(sName);
   	sCurrPanel = sName;
-  	if(currPanel == null) {
-  	  currPanel = currTabPanel.addGridPanel("sName", "&" + sName,1,1,10,10);
-  	  panels.put(sName, currPanel);
+  	if(pos.panel == null) {
+  	  pos.panel = currTabPanel.addGridPanel("sName", "&" + sName,1,1,10,10);
+  	  panels.put(sName, pos.panel);
   		log.sendMsg(0, "GuiPanelMng:selectPanel: unknown panel name %s", sName);
-  	  //Note: because the currPanel is null, not placement will be done.
+  	  //Note: because the pos.panel is null, not placement will be done.
   	} else {
   		
-  		Control parent = (Composite)currPanel.panelComposite;
-  		do
+  		Control parent = (Control)pos.panel.panelComposite;
+  		while(!(parent instanceof Shell))
   		{ //Rectangle bounds = parent.getBounds();
   			parent = parent.getParent();
-  		} while(!(parent instanceof Shell)); 
-  		currPanelPos = ((Composite)currPanel.panelComposite).getBounds();
+  		}  
+  		//pos.panelPos = ((Control)pos.panel.panelComposite).getBounds();
   		
   	}
   }
@@ -511,11 +582,11 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     if(parentComp != graphicFrame){
       //it is not a widget in this panel:
       stop();
-      //pos = currPanel.panelComposite.getBounds(); 
+      //pos = pos.panel.panelComposite.getBounds(); 
     } else {
       //pos =null;
     }
-    final GuiRectangle rectangle;
+    final GralRectangle rectangle;
     if(parentComp == null){
       rectangle = calcWidgetPosAndSize(pos, 800, 600, widthwidgetNat, heigthWidgetNat);
     } else {
@@ -532,9 +603,9 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
 
 
   
-	@Override public GralTabbedPanel createTabPanel(GralPanelActivated_ifc user, int property)
+	@Override public GralTabbedPanel createTabPanel(String namePanel, GralPanelActivated_ifc user, int property)
 	{
-		currTabPanel = new TabPanelSwt(this, user, property);
+		currTabPanel = new TabPanelSwt(namePanel, this, user, property);
 		listVisiblePanels.add(currTabPanel);
 		return currTabPanel;
 	}
@@ -542,9 +613,9 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   
   
   
-  @Override public WidgetDescriptor addText(String sText, char size, int color)
+  @Override public GralWidget addText(String sText, char size, int color)
   {
-    Label widget = new Label((Composite)currPanel.panelComposite, 0);
+    Label widget = new Label((Composite)pos.panel.panelComposite, 0);
     widget.setForeground(propertiesGuiSwt.colorSwt(color));
     widget.setBackground(propertiesGuiSwt.colorBackground);
     widget.setText(sText);
@@ -564,12 +635,12 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     }
     widget.setSize(textSize);
     //guiContent.add(widget);
-    WidgetDescriptor widgd = new WidgetDescriptor(sText, new WidgetSimpleWrapperSwt(widget), 'S');
+    GralWidget widgd = new GralWidget(sText, new WidgetSimpleWrapperSwt(widget), 'S');
     return widgd;
   }
 
   
-  @Override public WidgetDescriptor addText(String sText, int origin, GralColor textColor, GralColor backColor)
+  @Override public GralWidget addText(String sText, int origin, GralColor textColor, GralColor backColor)
   {
     int mode;
     switch(origin){
@@ -584,7 +655,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     case 9: mode = SWT.RIGHT; break;
     default: mode = 0;
     }
-    Label widget = new Label((Composite)currPanel.panelComposite, mode);
+    Label widget = new Label((Composite)pos.panel.panelComposite, mode);
     widget.setForeground(propertiesGuiSwt.colorSwt(textColor));
     widget.setBackground(propertiesGuiSwt.colorSwt(backColor));
     widget.setText(sText);
@@ -604,7 +675,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     }
     widget.setSize(textSize);
     //guiContent.add(widget);
-    WidgetDescriptor widgd = new WidgetDescriptor(sText, new WidgetSimpleWrapperSwt(widget), 'S');
+    GralWidget widgd = new GralWidget(sText, new WidgetSimpleWrapperSwt(widget), 'S');
     return widgd;
   }
 
@@ -620,7 +691,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    *   'l' left, 't' top (above field) 
    * @return
    */
-  @Override public WidgetDescriptor addTextField(String name, boolean editable, String prompt, char promptStylePosition)
+  @Override public GralWidget addTextField(String name, boolean editable, String prompt, char promptStylePosition)
   {
     return addTextField(null, name, editable, prompt, promptStylePosition);
   }
@@ -637,7 +708,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    *   'l' left, 't' top (above field) 
    * @return
    */
-  public WidgetDescriptor addTextField(WidgetDescriptor widgetInfo, boolean editable, String prompt, char promptStylePosition)
+  public GralWidget addTextField(GralWidget widgetInfo, boolean editable, String prompt, char promptStylePosition)
   {
     return addTextField(widgetInfo, null, editable, prompt, promptStylePosition);
   }
@@ -654,10 +725,10 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    *   'l' left, 't' top (above field) 
    * @return
    */
-  private WidgetDescriptor addTextField(WidgetDescriptor widgetInfo, String name, boolean editable, String prompt, char promptStylePosition)
-  { Text widget = new Text((Composite)currPanel.panelComposite, SWT.SINGLE);
+  private GralWidget addTextField(GralWidget widgetInfo, String name, boolean editable, String prompt, char promptStylePosition)
+  { Text widget = new Text((Composite)pos.panel.panelComposite, SWT.SINGLE);
     if(widgetInfo == null){
-      widgetInfo = new WidgetDescriptor(name, editable ? 'T' : 'S');
+      widgetInfo = new GralWidget(name, editable ? 'T' : 'S');
     }
     widgetInfo.setPanelMng(this);
     widget.setFont(propertiesGuiSwt.stdInputFont);
@@ -700,7 +771,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
       	boundsField.y += (boundsField.height - yPixelField );
       	boundsField.height = yPixelField;
       }
-      Label wgPrompt = new Label((Composite)currPanel.panelComposite, 0);
+      Label wgPrompt = new Label((Composite)pos.panel.panelComposite, 0);
       wgPrompt.setFont(promptFont);
       wgPrompt.setText(prompt);
       Point promptSize = wgPrompt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
@@ -741,9 +812,9 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
  *   'l' left, 't' top (above field) 
  * @return
  */
-public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String prompt, char promptStylePosition)
+public Text addTextBox(GralWidget widgetInfo, boolean editable, String prompt, char promptStylePosition)
 { widgetInfo.setPanelMng(this);
-  Text widget = new Text((Composite)currPanel.panelComposite, SWT.MULTI);
+  Text widget = new Text((Composite)pos.panel.panelComposite, SWT.MULTI);
   widget.setFont(propertiesGuiSwt.stdInputFont);
   widget.setEditable(editable);
   if(editable)
@@ -776,7 +847,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
       boundsField.y += (boundsField.height - yPixelField );
       boundsField.height = yPixelField;
     }
-    Label wgPrompt = new Label((Composite)currPanel.panelComposite, 0);
+    Label wgPrompt = new Label((Composite)pos.panel.panelComposite, 0);
     wgPrompt.setFont(promptFont);
     wgPrompt.setText(prompt);
     Point promptSize = wgPrompt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
@@ -799,7 +870,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
       showFields.put(widgetInfo.name, widgetInfo);
     }
   }
-  currPanel.widgetList.add(widgetInfo);
+  pos.panel.widgetList.add(widgetInfo);
   return widget; 
 
 }
@@ -820,7 +891,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
    * @param ye end of line relative to current position in grid units.
    */
   public void addLine(int colorValue, float xa, float ya, float xe, float ye){
-  	if(currPanel.panelComposite instanceof CanvasStorePanelSwt){
+  	if(pos.panel.panelComposite instanceof CanvasStorePanelSwt){
   		GralColor color = propertiesGui.color(colorValue);
   		int xgrid = propertiesGui.xPixelUnit();
   		int ygrid = propertiesGui.yPixelUnit();
@@ -830,7 +901,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   		int y2 = (int)((pos.y - ye) * ygrid);
   		//Any panel which is created in the SWT-implementation is a CanvasStorePanel.
   		//This is because lines should be drawn.
-  		((CanvasStorePanelSwt) currPanel.panelComposite).store.drawLine(color, x1, y1, x2, y2);
+  		((CanvasStorePanelSwt) pos.panel.panelComposite).store.drawLine(color, x1, y1, x2, y2);
   		//furtherSetPosition((int)(xe + 0.99F), (int)(ye + 0.99F));
   	} else {
   		log.sendMsg(0, "GuiPanelMng:addLine: panel is not a CanvasStorePanel");
@@ -848,12 +919,12 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   {
     ImageData imageData = new ImageData(imageStream);
     byte[] data = imageData.data;
-    Image image = new Image(((Composite)currPanel.panelComposite).getDisplay(), imageData); 
-    GuiImageBase imageGui = new GuiImageSwt(image);
-    GuiRectangle size = imageGui.getPixelSize();
-    GuiRectangle rr = calcWidgetPosAndSize(pos, 0, 0, size.dx, size.dy);
-    if(currPanel instanceof CanvasStorePanelSwt){
-      CanvasStorePanelSwt canvas = (CanvasStorePanelSwt) currPanel;
+    Image image = new Image(((Composite)pos.panel.panelComposite).getDisplay(), imageData); 
+    GralImageBase imageGui = new GuiImageSwt(image);
+    GralRectangle size = imageGui.getPixelSize();
+    GralRectangle rr = calcWidgetPosAndSize(pos, 0, 0, size.dx, size.dy);
+    if(pos.panel instanceof CanvasStorePanelSwt){
+      CanvasStorePanelSwt canvas = (CanvasStorePanelSwt) pos.panel;
       //coordinates are in pixel
       canvas.store.drawImage(imageGui, rr.x, rr.y, rr.dx, rr.dy, size);
     }
@@ -867,15 +938,15 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   {
     ImageData imageData = new ImageData(imageStream);
     byte[] data = imageData.data;
-    Label widget = new Label((Composite)currPanel.panelComposite, 0);
-    Image image = new Image(((Composite)currPanel.panelComposite).getDisplay(), imageData); 
+    Label widget = new Label((Composite)pos.panel.panelComposite, 0);
+    Image image = new Image(((Composite)pos.panel.panelComposite).getDisplay(), imageData); 
     widget.setImage(image);
     widget.setSize(propertiesGui.xPixelUnit() * width, propertiesGui.yPixelUnit() * height);
     setBounds_(widget);
     if(sCmd != null){
       widget.setData(sCmd);
     } 
-    WidgetDescriptor widgd = new WidgetDescriptor(sName, new WidgetSimpleWrapperSwt(widget), 'i', sName, null);
+    GralWidget widgd = new GralWidget(sName, new WidgetSimpleWrapperSwt(widget), 'i', sName, null);
     if(sName !=null){
       indexNameWidgets.put(sName, widgd);
     }
@@ -885,7 +956,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
 
   
   
-  @Override public WidgetDescriptor addValueBar(
+  @Override public GralWidget addValueBar(
   	String sName
   , String sShowMethod
   , String sDataPath
@@ -893,13 +964,13 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   {
   	ValueBarSwt widget = new ValueBarSwt(this);
   	setPosAndSize_(widget.widget);
-  	WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, widget, 'U');
+  	GralWidget widgetInfos = new GralWidget(sName, widget, 'U');
   	widgetInfos.setPanelMng(this);
     widgetInfos.setShowMethod(sShowMethod);
   	widgetInfos.setDataPath(sDataPath);
     widget.widget.setData(widgetInfos);
     widget.widget.addMouseListener(mouseClickForInfo);
-    currPanel.widgetList.add(widgetInfos);
+    pos.panel.widgetList.add(widgetInfos);
     if(sName != null){
       indexNameWidgets.put(sName, widgetInfos);
     }
@@ -907,17 +978,17 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   }
   
   
-  @Override public WidgetDescriptor addSlider(
+  @Override public GralWidget addSlider(
   	String sName
-  , UserActionGui action
+  , GralUserAction action
   , String sShowMethod
   , String sDataPath
   )
   {
-  	Slider control = new Slider((Composite)this.currPanel.panelComposite, SWT.VERTICAL);
+  	Slider control = new Slider((Composite)this.pos.panel.panelComposite, SWT.VERTICAL);
   	control.setBackground(propertiesGuiSwt.colorBackground);
   	setPosAndSize_(control);
-   	WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, new WidgetSimpleWrapperSwt(control), 'V');
+   	GralWidget widgetInfos = new GralWidget(sName, new WidgetSimpleWrapperSwt(control), 'V');
    	widgetInfos.setPanelMng(this);
     if(action != null){
   		SelectionListenerForSlider actionSlider = new SelectionListenerForSlider(widgetInfos, action);
@@ -933,9 +1004,9 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   
   
   
-  @Override public WidgetDescriptor addButton(
+  @Override public GralWidget addButton(
   	String sName
-  , UserActionGui action
+  , GralUserAction action
   , String sCmd
   , String sShowMethod
   , String sDataPath
@@ -948,7 +1019,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     int xSize = (int)pos.width();
     
     char size = ySize > 3? 'B' : 'A';
-  	WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, 'B');
+  	GralWidget widgetInfos = new GralWidget(sName, 'B');
     widgetInfos.setPanelMng(this);
     ButtonSwt button = new ButtonSwt(this, widgetInfos, size);
     widgetInfos.widget = new WidgetSimpleWrapperSwt(button);
@@ -963,8 +1034,8 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     widgetInfos.setShowMethod(sShowMethod);
     widgetInfos.sDataPath = sDataPath;
     button.setData(widgetInfos);
-    //currPanel.widgetIndex.put(sName, widgetInfos);
-    currPanel.widgetList.add(widgetInfos);
+    //pos.panel.widgetIndex.put(sName, widgetInfos);
+    pos.panel.widgetList.add(widgetInfos);
     if(sCmd != null){
       //button.setData(sCmd);
     } 
@@ -981,9 +1052,9 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   
 
   
-  @Override public WidgetDescriptor addSwitchButton(
+  @Override public GralWidget addSwitchButton(
   	String sName
-  , UserActionGui action
+  , GralUserAction action
   , String sCmd
   , String sShowMethod
   , String sDataPath
@@ -999,7 +1070,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     char size = ySize > 3? 'B' : 'A';
   	if(sColor0 == null || sColor1 == null) throw new IllegalArgumentException("SwitchButton " + sName + ": color0 and color1 should be given.");
   	
-  	WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, 'B');
+  	GralWidget widgetInfos = new GralWidget(sName, 'B');
     widgetInfos.setPanelMng(this);
     widgetInfos.setActionChange(action);
     widgetInfos.sCmd = sCmd;
@@ -1016,15 +1087,15 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     setBounds_(button);
     if(sName == null){ sName = sButtonText; }
     button.setData(widgetInfos);
-    //currPanel.widgetIndex.put(sName, widgetInfos);
-    currPanel.widgetList.add(widgetInfos);
+    //pos.panel.widgetIndex.put(sName, widgetInfos);
+    pos.panel.widgetList.add(widgetInfos);
     if(sName != null){
       indexNameWidgets.put(sName, widgetInfos);
     }
     return widgetInfos;
   }
   
-  @Override public WidgetDescriptor addLed(
+  @Override public GralWidget addLed(
   	String sName
   , String sShowMethod
   , String sDataPath
@@ -1038,13 +1109,13 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     widget.setForeground(propertiesGuiSwt.colorSwt(0xff00));
     widget.setSize(propertiesGui.xPixelUnit() * xSize -2, propertiesGui.yPixelUnit() * ySize -2);
     setBounds_(widget);
-    WidgetDescriptor widgetInfos = new WidgetDescriptor(sName, new WidgetSimpleWrapperSwt(widget), 'D');
+    GralWidget widgetInfos = new GralWidget(sName, new WidgetSimpleWrapperSwt(widget), 'D');
     widgetInfos.setPanelMng(this);
     widgetInfos.sDataPath = sDataPath;
     widgetInfos.setShowMethod(sShowMethod);
     widget.setData(widgetInfos);
     widget.addMouseListener(mouseClickForInfo);
-    currPanel.widgetList.add(widgetInfos);
+    pos.panel.widgetList.add(widgetInfos);
     if(sName != null){
       indexNameWidgets.put(sName, widgetInfos);
     }
@@ -1058,14 +1129,14 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     int xSize = (int)(pos.width());
     int dxWidget = xSize * propertiesGui.xPixelUnit();
 		int dyWidget = ySize * propertiesGui.yPixelUnit();
-		CurveView curveView = new CurveView((Composite)currPanel.panelComposite, dxWidget, dyWidget, nrofXvalues, nrofTracks);
+		CurveView curveView = new CurveView((Composite)pos.panel.panelComposite, dxWidget, dyWidget, nrofXvalues, nrofTracks);
 		testHelp.curveView = curveView; //store to inspect.
 		curveView.setSize(dxWidget, dyWidget);
 		setBounds_(curveView); //, dyGrid, dxGrid);
 		curveView.setGridVertical(10, 5);   //10 data-points per grid line, 50 data-points per strong line.
 		curveView.setGridHorizontal(50.0F, 5);  //10%-divisions, with 5 sub-divisions
 		curveView.setGridColor(propertiesGuiSwt.colorGrid, propertiesGuiSwt.colorGridStrong);
-		WidgetDescriptor widgd = new WidgetDescriptor(sName, curveView, 'c', sName, null);
+		GralWidget widgd = new GralWidget(sName, curveView, 'c', sName, null);
 		widgd.setPanelMng(this);
     indexNameWidgets.put(sName, widgd);
 		return curveView;
@@ -1091,10 +1162,10 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
    * @param sRegisteredUserAction The registered user action. 
    * @return
    */
-  @Override public Object addMouseButtonAction(String sName, UserActionGui action, String sCmdPress, String sCmdRelease, String sCmdDoubleClick)
+  @Override public Object addMouseButtonAction(String sName, GralUserAction action, String sCmdPress, String sCmdRelease, String sCmdDoubleClick)
   {
   	String sNameUsed = sName.charAt(0) == '$' ? sCurrPanel + sName.substring(1) : sName;
-    WidgetDescriptor widget = indexNameWidgets.get(sNameUsed);
+    GralWidget widget = indexNameWidgets.get(sNameUsed);
   	if(widget == null || !(widget.widget instanceof Control)){
   		log.sendMsg(0, "GuiMainDialog:addClickAction: unknown widget %s", sName);
   	} else {
@@ -1105,9 +1176,9 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	return widget.widget;
   }
 	
-	@Override public WidgetDescriptor addFocusAction(String sName, UserActionGui action, String sCmdEnter, String sCmdRelease)
+	@Override public GralWidget addFocusAction(String sName, GralUserAction action, String sCmdEnter, String sCmdRelease)
 	{
-    WidgetDescriptor widget = indexNameWidgets.get(sName);
+    GralWidget widget = indexNameWidgets.get(sName);
   	if(widget == null || !(widget.widget instanceof Control)){
   		log.sendMsg(0, "GuiMainDialog:addClickAction: unknown widget %s", sName);
   	} else {
@@ -1119,13 +1190,13 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
 	}
 
 	
-	@Override public void addFocusAction(WidgetDescriptor widgetInfo, UserActionGui action, String sCmdEnter, String sCmdRelease)
+	@Override public void addFocusAction(GralWidget widgetInfo, GralUserAction action, String sCmdEnter, String sCmdRelease)
 	{
     ((Control)(widgetInfo.widget)).addFocusListener( new FocusActionForUserActionSwt(this, action, sCmdEnter, sCmdRelease));
   }
 
 	
-  @Override public WidgetDescriptor addTable(String sName, int height, int[] columnWidths)
+  @Override public GralWidget addTable(String sName, int height, int[] columnWidths)
   {
     return TableSwt.addTable(this, sName, height, columnWidths);
   }
@@ -1138,8 +1209,8 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	graphicFrame.redraw();
     graphicFrame.update();
   	
-  	//((Composite)currPanel.panelComposite).update();
-  	//((Composite)currPanel.panelComposite).redraw();
+  	//((Composite)pos.panel.panelComposite).update();
+  	//((Composite)pos.panel.panelComposite).redraw();
   }
   
   
@@ -1153,7 +1224,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   public String setFieldContent(String name, String content)
   throws NotExistException
   {
-    WidgetDescriptor descr = indexNameWidgets.get(name);
+    GralWidget descr = indexNameWidgets.get(name);
     if(descr == null) throw new NotExistException(name);
     assert(descr.widget instanceof Text);
     Text field = (Text)descr.widget;
@@ -1184,7 +1255,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
    */
   public String insertInfo(String name, int ident, String content)
   {
-  	WidgetDescriptor descr = indexNameWidgets.get(name);
+  	GralWidget descr = indexNameWidgets.get(name);
   	if(descr == null){
   		log.sendMsg(0, "GuiMainDialog:insertInfo: unknown widget %s", name);
   	} else {
@@ -1193,20 +1264,20 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	return "";
   } 
   
-  public String insertInfo(WidgetDescriptor descr, int ident, String content)
+  public String insertInfo(GralWidget descr, int ident, String content)
   {
   	return setInfo(descr, GralPanelMngWorking_ifc.cmdInsert, ident, content, null);
   }
   
   
   
-  public String insertInfo(WidgetDescriptor descr, int ident, Object value)
+  public String insertInfo(GralWidget descr, int ident, Object value)
   {
   	return setInfo(descr, GralPanelMngWorking_ifc.cmdInsert, ident, value, null);
   }
   
   //past: insertInfo
-  @Override public String setInfo(WidgetDescriptor descr, int cmd, int ident, Object visibleInfo, Object userData)
+  @Override public String setInfo(GralWidget descr, int cmd, int ident, Object visibleInfo, Object userData)
   {
     long threadId = Thread.currentThread().getId();
     if(threadId == gralDevice.getThreadIdGui()){
@@ -1218,17 +1289,17 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
     	switch(cmd){
     	case GralPanelMngWorking_ifc.cmdInsert: checkAdmissibility(visibleInfo != null && visibleInfo instanceof String); break;
     	}
-      gralDevice.guiChangeRequests.add(new GuiChangeReq(descr, cmd, ident, visibleInfo, userData));
+      gralDevice.guiChangeRequests.add(new GralWidgetChangeRequ(descr, cmd, ident, visibleInfo, userData));
   	  synchronized(gralDevice.guiChangeRequests){ gralDevice.guiChangeRequests.notify(); }  //to wake up waiting on guiChangeRequests.
   	  graphicFrame.getDisplay().wake(); //wake-up the GUI-thread, it may sleep elsewhere.
-  	  //((Composite)currPanel.panelComposite).getDisplay().wake();  //wake-up the GUI-thread, it may sleep elsewhere. 
+  	  //((Composite)pos.panel.panelComposite).getDisplay().wake();  //wake-up the GUI-thread, it may sleep elsewhere. 
     }
   	return "";
   }
   
   
   
-  private void setInfoDirect(WidgetDescriptor descr, int cmd, int ident, Object info, Object data)
+  private void setInfoDirect(GralWidget descr, int cmd, int ident, Object info, Object data)
   {
     Widgetifc widget = descr.widget;
         if(widget !=null){
@@ -1302,7 +1373,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   public String getFieldContent(String name)
   throws NotExistException
   {
-    WidgetDescriptor descr = indexNameWidgets.get(name);
+    GralWidget descr = indexNameWidgets.get(name);
     if(descr == null) throw new NotExistException(name);
     Text field = (Text)descr.widget;
     String content = field.getText();
@@ -1313,14 +1384,14 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   /**Returns a Set of all fields, which are created to show.
    * @return the set, never null, possible an empty set.
    */
-  public Set<Entry<String, WidgetDescriptor>> getShowFields()
+  public Set<Entry<String, GralWidget>> getShowFields()
   {
-  	Set<Entry<String, WidgetDescriptor>> set = showFields.entrySet();
+  	Set<Entry<String, GralWidget>> set = showFields.entrySet();
   	return set; //(Set<Entry<String, WidgetDescriptor>>)set;
   }
 
   
-  @Override public FileDialogIfc createFileDialog()
+  @Override public GralFileDialog_ifc createFileDialog()
   {
   	return new FileDialogSwt(theShellOfWindow);
   }
@@ -1338,7 +1409,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
    * <li>{@link #insertInfo(String, int, String)} 
    * </ul>
    */
-  private final GuiDispatchCallbackWorker dispatchListener = new GuiDispatchCallbackWorker()
+  private final GralDispatchCallbackWorker dispatchListener = new GralDispatchCallbackWorker()
   {
   	
   	
@@ -1350,9 +1421,9 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   	    designer.initGui();
   	    bDesignerIsInitialized = true;
   	  }
-  	  GuiChangeReq changeReq;
+  	  GralWidgetChangeRequ changeReq;
   	  while( (changeReq = gralDevice.guiChangeRequests.poll()) != null){
-  	  	WidgetDescriptor descr = changeReq.widgetDescr;
+  	  	GralWidget descr = changeReq.widgetDescr;
   	  	setInfoDirect(descr, changeReq.cmd, changeReq.ident, changeReq.visibleInfo, changeReq.userData);
 
   	  }
@@ -1363,13 +1434,13 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   
   static class SelectionListenerForSlider implements SelectionListener
   {
-  	private final UserActionGui userAction; 
+  	private final GralUserAction userAction; 
 
-  	private final WidgetDescriptor widgetInfo;
+  	private final GralWidget widgetInfo;
   	
   	
   	
-  	public SelectionListenerForSlider(WidgetDescriptor widgetInfo, UserActionGui userAction)
+  	public SelectionListenerForSlider(GralWidget widgetInfo, GralUserAction userAction)
 		{
 			this.userAction = userAction;
   		this.widgetInfo = widgetInfo;
@@ -1399,11 +1470,11 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
    * @return The instance to call run(). 
    * Hint: run() returns after checking orders and should be called any time in the loop. 
    */
-  public GuiDispatchCallbackWorker getTheGuiChangeWorker(){ return dispatchListener; }
+  public GralDispatchCallbackWorker getTheGuiChangeWorker(){ return dispatchListener; }
 
 	@Override
 	public void setSampleCurveViewY(String sName, float[] values) {
-		WidgetDescriptor descr = indexNameWidgets.get(sName);
+		GralWidget descr = indexNameWidgets.get(sName);
 		if(descr == null){
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sName);
   	} else if(!(descr.widget instanceof CurveView)) {
@@ -1418,25 +1489,25 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
 	
 	@Override public void redrawWidget(String sName)
 	{
-		WidgetDescriptor descr = indexNameWidgets.get(sName);
+		GralWidget descr = indexNameWidgets.get(sName);
 		if(descr == null){
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sName);
   	} else if((descr.widget instanceof CurveView)) {
   		//sends a redraw information.
-  	  gralDevice.guiChangeRequests.add(new GuiChangeReq(descr, GralPanelMngWorking_ifc.cmdRedrawPart, 0, null, null));
-  		((Composite)currPanel.panelComposite).getDisplay().wake();  //wake-up the GUI-thread, it may sleep elsewhere. 
+  	  gralDevice.guiChangeRequests.add(new GralWidgetChangeRequ(descr, GralPanelMngWorking_ifc.cmdRedrawPart, 0, null, null));
+  		((Composite)pos.panel.panelComposite).getDisplay().wake();  //wake-up the GUI-thread, it may sleep elsewhere. 
   	} else {
   	}
 	}
 
 	
-	@Override public void resizeWidget(WidgetDescriptor widgd, int xSizeParent, int ySizeParent)
+	@Override public void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent)
 	{
 	  Widgetifc widget = (Widgetifc)(widgd.widget);
 	  Control swtWidget = (Control)widget.getWidget();
 	  Point size = swtWidget.getParent().getSize();
 	  //Composite parent = swtWidget.
-	  GuiRectangle posSize = calcWidgetPosAndSize(widgd.pos, size.x, size.y, 0, 0);
+	  GralRectangle posSize = calcWidgetPosAndSize(widgd.pos, size.x, size.y, 0, 0);
 	  swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
 	  swtWidget.redraw();
 	}
@@ -1452,7 +1523,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
 	@Override
   public void setLineCurveView(String sNameView, int trackNr, String sNameLine, String sVariable, int colorValue, int style, int nullLine, float yScale, float yOffset)
 	{
-		WidgetDescriptor descr = indexNameWidgets.get(sNameView);
+		GralWidget descr = indexNameWidgets.get(sNameView);
 		if(descr == null){
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sNameView);
   	} else if(!(descr.widget instanceof CurveView)) {
@@ -1465,7 +1536,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
   
 	
 	
-	@Override public String getValueFromWidget(WidgetDescriptor widgd)
+	@Override public String getValueFromWidget(GralWidget widgd)
 	{ final String sValue;
   	Widgetifc widget = (Widgetifc)(widgd.widget);
     Control swtWidget = (Control)widget.getWidget();
@@ -1503,7 +1574,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
 	public Map<String, String> getAllValues()
 	{
 		Map<String, String> values = new TreeMap<String, String>();
-    for(WidgetDescriptor input: indexNameWidgets.values()){
+    for(GralWidget input: indexNameWidgets.values()){
     	String sValue = getValueFromWidget(input);
       values.put(input.name, sValue);
     }
@@ -1512,7 +1583,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
 
 	@Override public String getValue(String sName)
 	{ final String sValue;
-		WidgetDescriptor widgetDescr = indexNameWidgets.get(sName);
+		GralWidget widgetDescr = indexNameWidgets.get(sName);
 		if(widgetDescr !=null){
 			sValue = getValueFromWidget(widgetDescr);
 		} else {
@@ -1523,15 +1594,15 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
 	
 	
 	
-	/**This userAction can be used by name (calling {@link #addFocusAction(String, UserActionGui, String, String)} 
+	/**This userAction can be used by name (calling {@link #addFocusAction(String, GralUserAction, String, String)} 
 	 * to set a variable when an input field is leaved.
 	 */
-	private UserActionGui syncVariableOnFocus = new UserActionGui()
+	private GralUserAction syncVariableOnFocus = new GralUserAction()
 	{	/**Writes the value to the named variable on leaving the focus.
-		 * The name of the variable is contained in the {@link WidgetDescriptor}.
-		 * @see org.vishia.gral.ifc.UserActionGui#userActionGui(java.lang.String, org.vishia.gral.ifc.WidgetDescriptor, java.lang.Object[])
+		 * The name of the variable is contained in the {@link GralWidget}.
+		 * @see org.vishia.gral.ifc.GralUserAction#userActionGui(java.lang.String, org.vishia.gral.ifc.GralWidget, java.lang.Object[])
 		 */
-		@Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+		@Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
 		{
 			Object oWidget = infos.widget;
 			final VariableAccess_ifc variable = infos.getVariableFromContentInfo(variableContainer);
@@ -1550,7 +1621,7 @@ public Text addTextBox(WidgetDescriptor widgetInfo, boolean editable, String pro
 	};
 	
 	
-  @Override public GuiWindowMng_ifc createInfoBox(String title, String[] lines, boolean todo)
+  @Override public GralWindow_ifc createInfoBox(String title, String[] lines, boolean todo)
   {
     return new InfoBox(graphicFrame.getShell(), title, lines, todo);
   }

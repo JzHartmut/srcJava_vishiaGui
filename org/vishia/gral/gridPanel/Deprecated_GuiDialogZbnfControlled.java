@@ -13,8 +13,9 @@ import java.util.TreeMap;
 import java.text.ParseException;
 
 
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
 import org.vishia.util.StringPart;
@@ -62,7 +63,7 @@ class Deprecated_GuiDialogZbnfControlled
   
   
   /**Types saves commonly properties for more as one widget. */
-  private final Map<String,WidgetDescriptor> types = new TreeMap<String,WidgetDescriptor>();
+  private final Map<String,GralWidget> types = new TreeMap<String,GralWidget>();
   
   private final Map<String, String> nameReplace = new TreeMap<String,String>();
   
@@ -341,7 +342,7 @@ class Deprecated_GuiDialogZbnfControlled
           String sType = item.getChildString("type");
           String sColor0 = item.getChildString("color0/color");
           String sColor1 = item.getChildString("color1/color");
-          UserActionGui action = null;
+          GralUserAction action = null;
           if(sFormat ==null && sInfo !=null){
 						int posFormat=sInfo.indexOf('%');  //Format on end of datapath
 						if(posFormat >0){
@@ -368,7 +369,7 @@ class Deprecated_GuiDialogZbnfControlled
           */
 					if(sType != null){
           	//if a type is given, use that widgetDescriptor and copy it.
-          	WidgetDescriptor type = types.get(sType);
+          	GralWidget type = types.get(sType);
           	if(type == null) throw new IllegalArgumentException("type is unknown: " + sType + " for Element " + sName + "/" + sInfo);
             //take not defined informations from the type:
           	if(sCmd == null){ sCmd = type.sCmd; }
@@ -398,7 +399,7 @@ class Deprecated_GuiDialogZbnfControlled
           //Check type of element and create it.
           if(semantic.equals("Type"))
 	        { String sTypeName = item.getChildString("typeName");
-	        	WidgetDescriptor widgetDescr = new WidgetDescriptor(sTypeName, '@');
+	        	GralWidget widgetDescr = new GralWidget(sTypeName, '@');
 	          widgetDescr.setActionChange(action);
 	          widgetDescr.sCmd = sCmd;
 	          widgetDescr.sDataPath = sInfo;
@@ -408,7 +409,7 @@ class Deprecated_GuiDialogZbnfControlled
 	          types.put(sTypeName, widgetDescr);
 	        } else {
 	        	//create a widget description with the given data, it should be used by all elements except some.
-	        	WidgetDescriptor widgetInfo = new WidgetDescriptor(sName, '.');
+	        	GralWidget widgetInfo = new GralWidget(sName, '.');
 	          widgetInfo.setActionChange(action);
 	          widgetInfo.sCmd = sCmd;
 	          widgetInfo.sDataPath = sInfo;
@@ -420,7 +421,7 @@ class Deprecated_GuiDialogZbnfControlled
 	          	widgetInfo.name = sInfo;    //use sInfo
 	          }
 	          if(semantic.equals("Button"))
-		        { WidgetDescriptor widgetDescr = 
+		        { GralWidget widgetDescr = 
 		        	dialog.addButton(sName, action, sCmd, sShowMethod, sInfo, sText);
 		        }
 	          else if(semantic.equals("ValueBar"))
@@ -430,10 +431,10 @@ class Deprecated_GuiDialogZbnfControlled
 		        { dialog.addSlider(sName, action, sShowMethod, sInfo);
 		        }
 	          else if(semantic.equals("SwitchButton"))
-		        { WidgetDescriptor widgetDescr = dialog.addSwitchButton(sName, action, sCmd, sShowMethod, sInfo, sText, sColor0, sColor1);
+		        { GralWidget widgetDescr = dialog.addSwitchButton(sName, action, sCmd, sShowMethod, sInfo, sText, sColor0, sColor1);
 		        }
 	          else if(semantic.equals("Led"))
-		        { WidgetDescriptor widgetDescr = dialog.addLed(sName, sShowMethod, sInfo);
+		        { GralWidget widgetDescr = dialog.addLed(sName, sShowMethod, sInfo);
 		          //widgetDescr.setsShowMethod(sShowMethod);
 		        }
 		        else if(semantic.equals("Table"))

@@ -1,11 +1,11 @@
 package org.vishia.guiInspc;
 
-import org.vishia.gral.ifc.UserPlugGral_ifc;
+import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 
 /**This interface is the plug from a user plugin to the Inspc. 
  * 
  */
-public interface UserInspcPlug_ifc extends UserPlugGral_ifc
+public interface UserInspcPlug_ifc extends GralPlugUser2Gral_ifc
 {
   /**Replaces the prefix of the path with a possible replacement. 
    * @param path the path given in scripts. It may have the form PREFIX:PATH or TARGET:PATH

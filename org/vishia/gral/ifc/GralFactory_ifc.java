@@ -12,7 +12,7 @@ import org.vishia.msgDispatch.LogMessage;
  * @author Hartmut Schorrig
  *
  */
-public interface GraphicBaseFactory_ifc
+public interface GralFactory_ifc
 {
 
   GuiMainAreaifc createGuiWindow(MainCmd cmdP);

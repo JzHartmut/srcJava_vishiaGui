@@ -2,7 +2,7 @@ package org.vishia.gral.area9;
 
 import java.io.File;
 
-import org.vishia.gral.ifc.GraphicBaseFactory_ifc;
+import org.vishia.gral.ifc.GralFactory_ifc;
 
 /**The standard command-line-arguments for a graphic application are stored in an extra class. 
  * This class should be the base class for users command line argument storage.
@@ -14,7 +14,7 @@ public class GuiCallingArgs
 {
   /**The graphic base factory can be detected from command line arguments
    * or set directly from the calling level. */
-  GraphicBaseFactory_ifc graphicFactory;
+  GralFactory_ifc graphicFactory;
   
   /**Name of the config-file for the Gui-appearance. */
   //String sFileGui;

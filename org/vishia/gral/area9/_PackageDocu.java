@@ -19,5 +19,5 @@ package org.vishia.gral.area9;
  */
 public interface _PackageDocu
 {
-  
+  static final int version = 0x20110918;
 }

@@ -1,7 +1,9 @@
 package org.vishia.gral.widget;
 
+import org.vishia.gral.ifc.Widgetifc;
 
-public interface TableLineGui_ifc extends WidgetGui_ifc
+
+public interface TableLineGui_ifc extends Widgetifc
 {
 
   String getCellText(int column);

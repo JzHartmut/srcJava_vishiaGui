@@ -3,8 +3,8 @@ package org.vishia.guiBzr;
 import java.io.File;
 
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.mainCmd.Report;
 
 public class PanelOutput
@@ -25,7 +25,7 @@ public class PanelOutput
   
   final StringBuilder uCommitOut =  new StringBuilder();
   
-  final WidgetDescriptor widgdOutputText = new WidgetDescriptor("OutputText", 'T');
+  final GralWidget widgdOutputText = new GralWidget("OutputText", 'T');
   
   public PanelOutput(MainData mainData, GralGridBuild_ifc panelBuildifc)
   {

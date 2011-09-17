@@ -6,14 +6,15 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
-import org.vishia.gral.ifc.GuiPlugUser_ifc;
-import org.vishia.gral.ifc.WidgetDescriptor;
-import org.vishia.gral.widget.WidgetCmpnifc;
+import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.ifc.Widgetifc;
 
 
 /**This class describes a panel with its content for managing. */
-public abstract class GralPanelContent implements WidgetCmpnifc
+public abstract class GralPanelContent implements Widgetifc
 {
+
+  public final String namePanel;
 
   /**The GUI-Widget of the panel.   
    *   (Swing:  Device guiDevice, SWT: Composite based on Control);
@@ -36,9 +37,9 @@ public abstract class GralPanelContent implements WidgetCmpnifc
 	/**List of all widgets which are contained in this panel.
 	 * This list is used in the communication thread to update the widget's content.
 	 */
-	public Queue<WidgetDescriptor> widgetList = new ConcurrentLinkedQueue<WidgetDescriptor>();
+	public Queue<GralWidget> widgetList = new ConcurrentLinkedQueue<GralWidget>();
 
-  public List<WidgetDescriptor> widgetsToResize = new LinkedList<WidgetDescriptor>();
+  public List<GralWidget> widgetsToResize = new LinkedList<GralWidget>();
 
 
   /**True then the content of the panel is zoomed with the actual size of panel. 
@@ -54,9 +55,10 @@ public abstract class GralPanelContent implements WidgetCmpnifc
   
 
   
-	public GralPanelContent(Object panelComposite)
+	public GralPanelContent(String namePanel, Object panelComposite)
 	//public PanelContent(CanvasStorePanel panelComposite)
 	{
+	  this.namePanel = namePanel;
 		this.panelComposite = panelComposite;
     int property = 0; //TODO parameter
     bZoomed = (property & GralGridBuild_ifc.propZoomedPanel) !=0;
@@ -65,7 +67,7 @@ public abstract class GralPanelContent implements WidgetCmpnifc
 	
 	
 	
-	protected GralPanelContent(){ }
+	protected GralPanelContent(String namePanel){ this.namePanel = namePanel; }
 
 	
 
@@ -74,5 +76,7 @@ public abstract class GralPanelContent implements WidgetCmpnifc
   }
 	
 	
+  @Override public String toString(){ return "GralPanel:" + namePanel; }
+  
 }
 

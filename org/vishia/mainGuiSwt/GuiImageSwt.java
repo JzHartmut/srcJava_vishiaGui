@@ -1,10 +1,10 @@
 package org.vishia.mainGuiSwt;
 
 import org.eclipse.swt.graphics.Image;
-import org.vishia.gral.ifc.GuiImageBase;
-import org.vishia.gral.ifc.GuiRectangle;
+import org.vishia.gral.ifc.GralImageBase;
+import org.vishia.gral.ifc.GralRectangle;
 
-public class GuiImageSwt extends GuiImageBase
+public class GuiImageSwt extends GralImageBase
 {
   final Image image;
   
@@ -14,9 +14,9 @@ public class GuiImageSwt extends GuiImageBase
     this.image = oImage;
   }
   
-  public GuiRectangle getPixelSize()
+  public GralRectangle getPixelSize()
   { org.eclipse.swt.graphics.ImageData data = image.getImageData();
-    GuiRectangle rr = new GuiRectangle(0, 0, data.width, data.height);
+    GralRectangle rr = new GralRectangle(0, 0, data.width, data.height);
     return rr;
   }
   

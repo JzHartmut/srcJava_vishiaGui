@@ -6,15 +6,15 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 
 public class FocusActionForUserActionSwt
 implements FocusListener
 {
 
 	/**Reference to the users method. */
-  private UserActionGui userAction;
+  private GralUserAction userAction;
   
 	protected final GuiPanelMngSwt guiMng;
 
@@ -31,7 +31,7 @@ implements FocusListener
    */
   public FocusActionForUserActionSwt(
   	GuiPanelMngSwt guiMng
-  , UserActionGui userCmdGui
+  , GralUserAction userCmdGui
   , String sCmdEnter
   , String sCmdRelease
   )
@@ -43,7 +43,7 @@ implements FocusListener
   }
   
   
-  void setUserAction(UserActionGui userAction)
+  void setUserAction(GralUserAction userAction)
   {
   	this.userAction = userAction;
   }
@@ -65,12 +65,12 @@ implements FocusListener
 	{
 		final Widget widget = ev.widget;
 		final Object oInfo = widget.getData();
-		final WidgetDescriptor widgetInfo;
+		final GralWidget widgetInfo;
 		final String sContent;
 		if(widget instanceof Text){ sContent = ((Text)widget).getText(); }
 		else { sContent = null; }
-		if(oInfo instanceof WidgetDescriptor){
-			widgetInfo = (WidgetDescriptor)oInfo;
+		if(oInfo instanceof GralWidget){
+			widgetInfo = (GralWidget)oInfo;
 		} else { widgetInfo = null; }
   	userAction.userActionGui(sCmd, widgetInfo, sContent);
 	}

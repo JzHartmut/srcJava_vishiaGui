@@ -7,16 +7,16 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.gridPanel.GralGridMngBase;
-import org.vishia.gral.ifc.GuiRectangle;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 
-/**Universal Mouse Listener which works with the {@link WidgetDescriptor}.
+/**Universal Mouse Listener which works with the {@link GralWidget}.
  * <ul>
- * <li>Always sets {@link GralGridMngBase#setLastClickedWidgetInfo(WidgetDescriptor)}.
+ * <li>Always sets {@link GralGridMngBase#setLastClickedWidgetInfo(GralWidget)}.
  * <li>Design mode: Left and right button for design in the {@link GralGridMngBase}
  *     using the {@link org.vishia.gral.cfg.GuiCfgDesigner}.
- * <li>Normal mode: calls {@link WidgetDescriptor#getActionChange()}
+ * <li>Normal mode: calls {@link GralWidget#getActionChange()}
  * </ul>      
  * @author Hartmut Schorrig
  *
@@ -44,13 +44,13 @@ public class MouseClickInfo implements MouseListener
 	{
 		Widget widget = ev.widget;
 		Object oInfo = widget.getData();
-		if(oInfo instanceof WidgetDescriptor){
-			WidgetDescriptor widgetInfo = (WidgetDescriptor)oInfo;
+		if(oInfo instanceof GralWidget){
+			GralWidget widgetInfo = (GralWidget)oInfo;
       if(widgetInfo ==null || widgetInfo.sDataPath ==null || !widgetInfo.sDataPath.equals("widgetInfo")){
         guiMng.setLastClickedWidgetInfo(widgetInfo );
       }
 			if(guiMng.bDesignMode){
-			  GuiRectangle rr = new GuiRectangle(ev.x, ev.y, 0, 0);
+			  GralRectangle rr = new GralRectangle(ev.x, ev.y, 0, 0);
         if(ev.button == 1){ //left
           xDown = ev.x; yDown = ev.y;
   			  guiMng.pressedLeftMouseDownForDesign(widgetInfo, rr);  
@@ -67,17 +67,17 @@ public class MouseClickInfo implements MouseListener
 	{
     Widget widget = ev.widget;
     Object oInfo = widget.getData();
-    if(oInfo instanceof WidgetDescriptor){
-      WidgetDescriptor widgd = (WidgetDescriptor)oInfo;
+    if(oInfo instanceof GralWidget){
+      GralWidget widgd = (GralWidget)oInfo;
       int dx = ev.x - xDown, dy = ev.y - yDown;
       if(dx < 10 && dx > -10 && dy < 10 && dy > -10){
-        UserActionGui action = widgd.getActionChange();
+        GralUserAction action = widgd.getActionChange();
         if(action !=null){
           action.userActionGui("lu", widgd, null);
         }
       } else if(guiMng.bDesignMode){
         boolean bCopy = (ev.stateMask & org.eclipse.swt.SWT.CTRL) !=0;
-        GuiRectangle rr = new GuiRectangle(ev.x, ev.y, 0, 0);
+        GralRectangle rr = new GralRectangle(ev.x, ev.y, 0, 0);
         guiMng.releaseLeftMouseForDesign(widgd, rr, bCopy);  
       }
     }

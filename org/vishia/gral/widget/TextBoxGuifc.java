@@ -1,10 +1,12 @@
 package org.vishia.gral.widget;
 
+import org.vishia.gral.ifc.Widgetifc;
+
 
 public interface TextBoxGuifc extends Widgetifc //WidgetGui_ifc
 {
 
-  void setText(String text);
+  String setText(String text);
   
   void append(String text);
   

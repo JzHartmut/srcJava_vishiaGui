@@ -5,18 +5,19 @@ import java.io.FileWriter;
 import java.io.Writer;
 
 import org.vishia.communication.InterProcessCommFactorySocket;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.cfg.GuiCfgData;
 import org.vishia.gral.cfg.GuiCfgZbnf;
 import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.gridPanel.GralGridProperties;
-import org.vishia.gral.ifc.GraphicBaseFactory_ifc;
-import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralFactory_ifc;
+import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
-import org.vishia.gral.ifc.GuiPlugUser_ifc;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralPlugUser_ifc;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.swt.FactorySwt;
 import org.vishia.inspector.Inspector;
 import org.vishia.mainCmd.MainCmd;
@@ -79,7 +80,7 @@ protected final GuiCfgData guiCfgData = new GuiCfgData();
 
 
 /**Some actions may be processed by a user implementation. */
-protected GuiPlugUser_ifc user;
+protected GralPlugUser_ifc user;
 
 
 
@@ -124,8 +125,8 @@ public GuiCfg(GuiCallingArgs cargs, GuiMainCmd cmdGui)
     try{
       Class<?> pluginClass = Class.forName(cargs.sPluginClass);
       Object oUser = pluginClass.newInstance();
-      if(oUser instanceof GuiPlugUser_ifc){
-        user = (GuiPlugUser_ifc) oUser;
+      if(oUser instanceof GralPlugUser_ifc){
+        user = (GralPlugUser_ifc) oUser;
       } else {
         console.writeError("user-plugin - fault type: " + cargs.sPluginClass 
           + "; it should be type of GuiPlugUser_ifc");
@@ -150,7 +151,8 @@ public GuiCfg(GuiCallingArgs cargs, GuiMainCmd cmdGui)
   panelMng = cargs.graphicFactory.createPanelMng(null, 120,80, propertiesGui, null, log);
   panelBuildIfc = panelMng;
   guiAccess = panelMng;
-  
+  GralPanelContent outputPanel = cmdGui.gui.getOutputPanel();
+  panelMng.registerPanel(outputPanel);
   //panelContent = new PanelContent(user);
   if(user !=null){
     user.registerMethods(panelBuildIfc);
@@ -180,11 +182,12 @@ protected void userInit()
 /**Code snippet for initializing the GUI area (panel). This snippet will be executed
  * in the GUI-Thread if the GUI is created. 
  */
-GuiDispatchCallbackWorker initGuiDialog = new GuiDispatchCallbackWorker()
+GralDispatchCallbackWorker initGuiDialog = new GralDispatchCallbackWorker()
 {
   @Override public void doBeforeDispatching(boolean onlyWakeup)
   {
-    mainTabPanel = panelMng.createTabPanel(null, 0);
+    panelMng.selectPanel("primaryWindow");
+    mainTabPanel = panelMng.createTabPanel("mainTab", null, 0);
     initGuiAreas();
     gui.removeDispatchListener(this);    
     countExecution();
@@ -197,7 +200,7 @@ GuiDispatchCallbackWorker initGuiDialog = new GuiDispatchCallbackWorker()
 /**Code snippet to run the ZBNF-configurator (text controlled GUI)
  * 
  */
-GuiDispatchCallbackWorker configGuiWithZbnf = new GuiDispatchCallbackWorker()
+GralDispatchCallbackWorker configGuiWithZbnf = new GralDispatchCallbackWorker()
 {
   
   @Override public void doBeforeDispatching(boolean onlyWakeup){
@@ -293,14 +296,14 @@ public final void execute()
 
 
 
-private final UserActionGui cmdInvoke = new UserActionGui()
+private final GralUserAction cmdInvoke = new GralUserAction()
 { 
   ProcessBuilder processBuilder = new ProcessBuilder("pwd");
   
   StringBuilder output = new StringBuilder();
   StringBuilder error = new StringBuilder();
    
-  public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
+  public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
   {
     if(sCmd != null){
       output.setLength(0);
@@ -314,8 +317,8 @@ private final UserActionGui cmdInvoke = new UserActionGui()
 };
 
 
-protected UserActionGui actionFile = new UserActionGui()
-{ @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+protected GralUserAction actionFile = new GralUserAction()
+{ @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
   {
     if(sIntension.equals("save")){
       String sError = null;

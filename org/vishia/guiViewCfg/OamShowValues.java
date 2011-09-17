@@ -11,9 +11,9 @@ import org.vishia.mainCmd.Report;
 import org.vishia.byteData.ByteDataSymbolicAccess;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
-import org.vishia.gral.ifc.GuiSetValueIfc;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralSetValue_ifc;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.ValueBar;
 
 
@@ -27,12 +27,12 @@ public class OamShowValues
 
 	boolean dataValid = false;
 	
-	Queue<WidgetDescriptor> widgetsInTab;
+	Queue<GralWidget> widgetsInTab;
 	
 	/**The access to the gui, to change data to show. */
 	protected final GralPanelMngWorking_ifc guiAccess;
 	
-	Set<Map.Entry<String, WidgetDescriptor>> fieldsToShow;
+	Set<Map.Entry<String, GralWidget>> fieldsToShow;
 	
 	
 	private final float[] valueUserCurves = new float[6];  
@@ -62,7 +62,7 @@ public class OamShowValues
 	  return nrofVariable >0;
 	}
 	
-	public void setFieldsToShow(Set<Map.Entry<String, WidgetDescriptor>> fields)
+	public void setFieldsToShow(Set<Map.Entry<String, GralWidget>> fields)
 	{
 		fieldsToShow = fields;
 	}
@@ -86,8 +86,8 @@ public class OamShowValues
 		//TEST TODO:
 		//accessOamVariable.setFloat("ctrl/energyLoadCapac2Diff", checkWithoutNewdata);
 		//current panel:
-		Queue<WidgetDescriptor> listWidgets = guiAccess.getListCurrWidgets();
-		for(WidgetDescriptor widgetInfo : listWidgets){
+		Queue<GralWidget> listWidgets = guiAccess.getListCurrWidgets();
+		for(GralWidget widgetInfo : listWidgets){
 			String sName = widgetInfo.name;
 		}
 		//read all variables which are necessary to show.
@@ -101,7 +101,7 @@ public class OamShowValues
 		redrawCurveValues();
 	}
 	
-	private void writeField(WidgetDescriptor widgetInfo)
+	private void writeField(GralWidget widgetInfo)
 	{ String sName = widgetInfo.name;
 		String sInfo = widgetInfo.sDataPath;
 		String sValue;
@@ -148,7 +148,7 @@ public class OamShowValues
 	private void writeValuesOfTab()
 	{ if(dataValid){
 			if(widgetsInTab != null)
-			for(WidgetDescriptor widgetInfo: widgetsInTab){
+			for(GralWidget widgetInfo: widgetsInTab){
 				String sContentInfo = widgetInfo.sDataPath;
 				if(sContentInfo !=null && sContentInfo.length() >0 && widgetInfo.widget !=null){
 					stop();
@@ -163,7 +163,7 @@ public class OamShowValues
 	}
 	
 	
-	ByteDataSymbolicAccess.Variable getVariableFromContentInfo(WidgetDescriptor widgetInfo)
+	ByteDataSymbolicAccess.Variable getVariableFromContentInfo(GralWidget widgetInfo)
 	{
 		ByteDataSymbolicAccess.Variable variable;
 		Object oContentInfo = widgetInfo.getContentInfo();
@@ -191,7 +191,7 @@ public class OamShowValues
 	}
 	
 	
-	boolean callMethod(WidgetDescriptor widgetInfo)
+	boolean callMethod(GralWidget widgetInfo)
 	{ String sName = widgetInfo.name;
 		String sInfo = widgetInfo.sDataPath;
 		final String sMethodName;
@@ -365,7 +365,7 @@ public class OamShowValues
 		
 	
 	
-	void widgetSetColor(String sName, String[] sParam, WidgetDescriptor widgetInfo)
+	void widgetSetColor(String sName, String[] sParam, GralWidget widgetInfo)
 	{ ColoredWidget userData;
 	  Object oUserData = widgetInfo.getContentInfo();
 		if(oUserData == null){
@@ -389,7 +389,7 @@ public class OamShowValues
 	}
 	
 	
-	void showBinFromByte(WidgetDescriptor widgetInfo)
+	void showBinFromByte(GralWidget widgetInfo)
 	{ ByteDataSymbolicAccess.Variable variable;
 	  Object oUserData = widgetInfo.getContentInfo();
 		if(oUserData == null){
@@ -415,7 +415,7 @@ public class OamShowValues
 	}
 	
 	
-	void setValue(WidgetDescriptor widgetInfo)
+	void setValue(GralWidget widgetInfo)
 	{ ByteDataSymbolicAccess.Variable variable;
 	  Object oUserData = widgetInfo.getContentInfo();
 		if(oUserData == null){
@@ -427,14 +427,14 @@ public class OamShowValues
 		}
 		float value = variable.bytes.getFloat(variable, -1);
 		Object oWidget = widgetInfo.widget;
-		if(oWidget instanceof GuiSetValueIfc){
-			GuiSetValueIfc widget = (GuiSetValueIfc) oWidget;
+		if(oWidget instanceof GralSetValue_ifc){
+			GralSetValue_ifc widget = (GralSetValue_ifc) oWidget;
 			widget.setValue(value);
 		}
 	}
 	
 	
-	void setBar(WidgetDescriptor widgetInfo)
+	void setBar(GralWidget widgetInfo)
 	{ ByteDataSymbolicAccess.Variable variable = getVariableFromContentInfo(widgetInfo);
 	  if(variable == null){
 			debugStop();
@@ -492,7 +492,7 @@ public class OamShowValues
 	 */
 	public final GralPanelActivated_ifc tabActivatedImpl = new GralPanelActivated_ifc()
 	{
-		@Override	public void panelActivatedGui(Queue<WidgetDescriptor> widgets)
+		@Override	public void panelActivatedGui(Queue<GralWidget> widgets)
 		{
 			widgetsInTab = widgets;
 			writeValuesOfTab();
@@ -502,8 +502,8 @@ public class OamShowValues
 	
 
 	
-	final UserActionGui actionSetValueTestInInput = new UserActionGui()
-  { public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
+	final GralUserAction actionSetValueTestInInput = new GralUserAction()
+  { public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     { 
   		final int[] ixArrayA = new int[1];
   		ByteDataSymbolicAccess.Variable variable = getVariable(widgetInfos.sDataPath, ixArrayA);

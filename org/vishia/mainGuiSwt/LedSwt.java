@@ -30,7 +30,7 @@ public class LedSwt extends Canvas
 	public LedSwt(GuiPanelMngSwt mng, char kind)
 	{
 		
-		super((Composite)mng.currPanel.panelComposite, 0);
+		super((Composite)mng.pos.panel.panelComposite, 0);
 		switch(kind){ 
 		case 'r': round = true; break;
 		case 'q': round = false; break;

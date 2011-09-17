@@ -11,7 +11,7 @@ import java.util.List;
 import org.vishia.cmd.PrepareCmd;
 import org.vishia.cmd.CmdStore.CmdBlock;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.SelectList;
 import org.vishia.gral.widget.TableLineGui_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
@@ -171,7 +171,7 @@ class SelectTab
       SelectInfo info = (SelectInfo)line.getUserData();
       if(info.active != '.'){
         String tabName = info.tabName;
-        WidgetDescriptor widgd = mng.getWidget(tabName);
+        GralWidget widgd = mng.getWidget(tabName);
         if(widgd !=null){
           mng.setFocus(widgd);
         }

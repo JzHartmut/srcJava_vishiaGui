@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
-import org.vishia.gral.ifc.WidgetCfg_ifc;
+import org.vishia.gral.ifc.GralWidgetCfg_ifc;
 
 
 /**This class contains all configuration data for the appearance of the GUI.
@@ -29,7 +29,7 @@ public final class GuiCfgData
   
   /**ZBNF: Element::= ... ;
    * Class for instance to capture and store one element. */
-  public final static class GuiCfgElement implements Cloneable, WidgetCfg_ifc
+  public final static class GuiCfgElement implements Cloneable, GralWidgetCfg_ifc
   { 
     /**The previous element is necessary because non complete coordinates are resolved with previous.
      * The next element is need to build a queue in order of the text. */

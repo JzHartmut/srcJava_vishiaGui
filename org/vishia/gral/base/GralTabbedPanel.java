@@ -5,8 +5,7 @@ import java.util.Queue;
 import java.util.TreeMap;
 
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
-import org.vishia.gral.ifc.WidgetDescriptor;
-import org.vishia.gral.widget.WidgetCmpnifc;
+import org.vishia.gral.ifc.GralWidget;
 
 
 /**This class is the common base class for Tabbed-Panels.
@@ -27,12 +26,12 @@ public abstract class GralTabbedPanel implements GralVisibleWidgets_ifc
 	protected GralPanelContent currentPanel;
 	
   /**The actual widgets in the visible panel. It may a sub-panel or changed content. The list can be changed. */
-  public Queue<WidgetDescriptor> widgetsVisible;
+  public Queue<GralWidget> widgetsVisible;
 
   /**A new list of actual widgets, set while select another tab etc. The reference may be set 
    * in the GUI-Thread (GUI-listener). The communication-manager thread reads whether it isn't null,
    * processes it and sets this reference to null if it is processed. */
-  public Queue<WidgetDescriptor> newWidgetsVisible;
+  public Queue<GralWidget> newWidgetsVisible;
   
 
 
@@ -60,11 +59,11 @@ public abstract class GralTabbedPanel implements GralVisibleWidgets_ifc
 	
 	
 	
-	abstract public WidgetCmpnifc getGuiComponent();
+	abstract public GralPanelContent getGuiComponent();
 	
 	public GralPanelContent getCurrentPanel(){ return currentPanel; }
 	
-  @Override public Queue<WidgetDescriptor> getWidgetsVisible()
+  @Override public Queue<GralWidget> getWidgetsVisible()
   {
     if(newWidgetsVisible !=null){
       //if(panel.widgetList !=null){

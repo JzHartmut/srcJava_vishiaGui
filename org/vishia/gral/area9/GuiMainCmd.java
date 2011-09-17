@@ -8,7 +8,7 @@ import org.vishia.mainCmd.MainCmd;
 public class GuiMainCmd extends MainCmd
 {
   
-  protected final GuiMainAreaifc gui;
+  public final GuiMainAreaifc gui;
   
   /**Aggregation to given instance for the command-line-argument. The instance can be arranged anywhere else.
    * It is given as ctor-parameter.

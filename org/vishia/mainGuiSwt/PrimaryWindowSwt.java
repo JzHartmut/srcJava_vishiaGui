@@ -1,140 +1,70 @@
 package org.vishia.mainGuiSwt;
 
 
+import java.io.File;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.vishia.gral.base.GralDevice;
-import org.vishia.gral.ifc.GuiDispatchCallbackWorker;
-import org.vishia.gral.ifc.GuiWindowMng_ifc;
+import org.vishia.gral.base.GralPrimaryWindow;
+import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.MinMaxTime;
 
-public class PrimaryWindowSwt extends GralDevice implements GuiWindowMng_ifc
+public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_ifc
 {
   protected Display guiDevice; 
 
   /** The frame of the Window in the GUI (Graphical Unit Interface)*/
   protected Shell graphicFrame;
 
-  /**Size of display window. */
-  int xSize,ySize;
-  /**left and top edge of display-window. */
-  int xPos, yPos;
-  
-  /**Title of display window. */
-  String sTitle;
+  /**The file menuBar is extendable. */
+  private Menu menuBar;
   
 
-
-  
-  /**This thread can (not have to be) used for all graphic actions. If the user calls
-   * 
-   * 
-   */
-  Thread guiThread = new Thread("GUI-SWT")
+  private static class MenuEntry
   {
-    @Override public void run()
-    {
-      initGraphic(sTitle, 0, 0, xSize, ySize);
-      dispatch();
-      //synchronized(this){ notify(); }  //to weak up waiting on configGrafic().
-    }
-  };
-  
-
-  
-  /**True if the startup is done. */
-  boolean bStarted = false; 
-
-  boolean bWaitStart = false;
-  
-  /**If true, than the application is to be terminate. */
-  protected boolean bTerminated = false;
-
-  private boolean isWakedUpOnly;
-  
-
-  
-  /** set to true to exit in main*/
-  boolean bExit = false;
-  
-  /**Queue of dispatchListeners. Any instance will be invoked in the dispatch-loop.
-   * See {@link #addDispatchListener(Runnable)}. 
-   * Hint: A dispatch-listener can be run only one time, than it should delete itself in its run-method.*/
-  ConcurrentLinkedQueue<GuiDispatchCallbackWorker> dispatchListeners = new ConcurrentLinkedQueue<GuiDispatchCallbackWorker>();
-  
-  /**Set if any external event is set. Then the dispatcher shouldn't sleep after finishing dispatching. 
-   * This is important if the external event occurs while the GUI is busy in the operation-system-dispatching loop.
-   */
-  AtomicBoolean extEventSet = new AtomicBoolean(false);
-
-  /**Queue of orders for building the graphic. Any instance will be invoked 
-   * after initializing the graphic and before entry in the dispatch-loop.
-   * See {@link #addGuiBuildOrder(Runnable)}. */
-  ConcurrentLinkedQueue<Runnable> buildOrders = new ConcurrentLinkedQueue<Runnable>();
-  
-
-  
-  
-  
-  PrimaryWindowSwt()
-  {
-  }  
-  
-  /**Starts the execution of the graphic initializing in a own thread.
-   * The following sets should be called already:
-   * <pre>
-   * setTitleAndSize("SES_GUI", 800, 600);  //This instruction should be written first to output syntax errors.
-     setStandardMenus(new File("."));
-     setOutputArea("A3C3");        //whole area from mid to bottom
-     setFrameAreaBorders(20, 80, 75, 80);
-     </pre>
-   * They sets only some values, no initializing of the graphic is executed till now.
-   * <br><br>
-   * The graphic thread inside this class {@link #guiThread} initializes the graphic.
-   * All other GUI-actions should be done only in the graphic-thread. 
-   * The method {@link #addDispatchListener(Runnable)} is to be used therefore.
-   * <br><br>
-   * The method to use an own thread for the GUI is not prescribed. The initialization
-   * and all actions can be done in the users thread too. But then, the user thread
-   * have to be called {@link #dispatch()} to dispatch the graphic events. It is busy with it than.   
-   * @return true if started
-   */
-  public boolean startGraphicThread(){
-    if(bStarted) throw new IllegalStateException("it is started already.");
-    guiThread.start();
-    
-    synchronized(guiThread){ 
-      while(!bStarted){
-        bWaitStart = true;
-        try{guiThread.wait(5000);} catch(InterruptedException exc){}
-      }
-      bWaitStart =false;
-    }
-    return bStarted;
+    String name;
+    /**If it is a superior menu item, the menu below. Else null. */
+    Menu menu;
+    Map<String, MenuEntry> subMenu;
   }
   
+  Map<String, MenuEntry> menus = new TreeMap<String, MenuEntry>();
+  
   
 
   
+  PrimaryWindowSwt()
+  { super();
+  }  
   
-  void initGraphic(String sTitle, int left, int top, int xSize, int ySize)
+  
+  
+  @Override protected void initGraphic(String sTitle, int left, int top, int xSize, int ySize)
   {
     guiThreadId = Thread.currentThread().getId();
     guiDevice = new Display ();
     guiDevice.addFilter(SWT.Close, windowsCloseListener);
     graphicFrame = new Shell(guiDevice); //, SWT.ON_TOP | SWT.MAX | SWT.TITLE);
     graphicFrame.addKeyListener(keyListener);
-    graphicFrame.open();
     
     //graphicFramePos = new Position(graphicFrame.getContentPane());
     //graphicFramePos.set(0,0,xSize,ySize);
@@ -148,11 +78,14 @@ public class PrimaryWindowSwt extends GralDevice implements GuiWindowMng_ifc
     } else {
       graphicFrame.setBounds(left,top, xSize, ySize );  //Start position.
     }
+    graphicFrame.open();
     graphicFrame.setVisible( true ); 
 
     //graphicFrame.getContentPane().setLayout(new FlowLayout());
     graphicFrame.setLayout(null);
     graphicFrame.addShellListener(mainComponentListerner);
+    
+    super.panelComposite = graphicFrame;
     
     for(Runnable build: buildOrders){
       build.run();
@@ -205,7 +138,7 @@ public class PrimaryWindowSwt extends GralDevice implements GuiWindowMng_ifc
   /**Removes a listener, which was called in the dispatch loop.
    * @param listener
    */
-  public void removeDispatchListener(GuiDispatchCallbackWorker listener)
+  public void removeDispatchListener(GralDispatchCallbackWorker listener)
   { dispatchListeners.remove(listener);
   }
   
@@ -216,7 +149,7 @@ public class PrimaryWindowSwt extends GralDevice implements GuiWindowMng_ifc
   /**Adds a listener, which will be called in the dispatch loop.
    * @param listener
    */
-  public void addDispatchListener(GuiDispatchCallbackWorker listener)
+  public void addDispatchListener(GralDispatchCallbackWorker listener)
   { dispatchListeners.add(listener);
     //it is possible that the GUI is busy with dispatching and doesn't sleep yet.
     //therefore:
@@ -250,13 +183,14 @@ public class PrimaryWindowSwt extends GralDevice implements GuiWindowMng_ifc
   
   public void wakeup(){
     guiDevice.wake();
+    extEventSet.set(true);
     isWakedUpOnly = true;
   }
   
   public boolean isWakedUpOnly(){ return isWakedUpOnly; }
   
   
-  public void dispatch()
+  @Override protected void dispatch()
   {
     checkTimes.init();
     checkTimes.adjust();
@@ -278,7 +212,7 @@ public class PrimaryWindowSwt extends GralDevice implements GuiWindowMng_ifc
         //it may be waked up by the operation system or by calling Display.wake().
         //if wakeUp() is called, isWakedUpOnly is set.
         checkTimes.cyclTime();
-        for(GuiDispatchCallbackWorker listener: dispatchListeners){
+        for(GralDispatchCallbackWorker listener: dispatchListeners){
           //use isWakedUpOnly for run as parameter?
           ///System.out.println("BeforeDispatch");
           listener.doBeforeDispatching(isWakedUpOnly);  
@@ -291,11 +225,20 @@ public class PrimaryWindowSwt extends GralDevice implements GuiWindowMng_ifc
   }
   
   
+  public void terminate()
+  {
+    if(!bExit && !guiDevice.isDisposed()){ 
+      guiDevice.dispose();
+    }  
+
+  }
   
   
-  public boolean isRunning(){ return !bExit; }
+  public boolean isStarted(){ return bStarted; }
   
+  public boolean isRunning(){ return bStarted && !bExit; }
   
+  public boolean isTerminated(){ return bStarted && bExit; }
 
   @Override public boolean isWindowsVisible()
   { return graphicFrame.isVisible();
@@ -308,6 +251,30 @@ public class PrimaryWindowSwt extends GralDevice implements GuiWindowMng_ifc
     graphicFrame.setVisible(visible);
   }
   
+  
+  
+  class ActionUserMenuItem implements SelectionListener
+  { 
+    final GralUserAction action;
+    
+    public ActionUserMenuItem(GralUserAction action)
+    { this.action = action;
+    }
+
+    @Override
+    public void widgetDefaultSelected(SelectionEvent e) {
+      // TODO Auto-generated method stub
+      
+    }
+  
+    @Override
+    public void widgetSelected(SelectionEvent e)
+    { action.userActionGui("", null, (Object[])null);
+    }
+  }
+  
+  
+
   
   /**The windows-closing event handler. It is used private only, but public set because documentation. */
   public final class WindowsCloseListener implements Listener{
@@ -379,6 +346,128 @@ public class PrimaryWindowSwt extends GralDevice implements GuiWindowMng_ifc
   
   void stop()
   { //to set breakpoint
+  }
+
+
+  @Override public void addMenuItemGThread(String namePath, GralUserAction action)
+  {
+    addMenuItemGThread(namePath, this.new ActionUserMenuItem(action));
+  }
+  
+  
+  /**Adds a menu item with a SWT-specific {@link SelectionListener}. This method can be invoked
+   * from any derived SWT-specific class. {@link MainCmdSwt} do so. 
+   * @param namePath
+   * @param action
+   */
+  protected void addMenuItemGThread(String namePath, SelectionListener action)
+  {
+    String[] names = namePath.split("/");
+    if(menuBar == null){
+      menuBar = new Menu(graphicFrame, SWT.BAR);
+      graphicFrame.setMenuBar(menuBar);
+    }
+    Menu parentMenu = menuBar;
+    Map<String, MenuEntry> menustore = menus;
+    int ii;
+    for(ii=0; ii<names.length-1; ++ii){
+      String name = names[ii];
+      final char cAccelerator;
+      final int posAccelerator = name.indexOf('&');
+      if(posAccelerator >=0){
+        cAccelerator = Character.toUpperCase(name.charAt(posAccelerator));
+        name = name.replace("&", "");
+      } else {
+        cAccelerator = 0;
+      }
+      MenuEntry menuEntry = menustore.get(name);
+      if(menuEntry == null){
+        menuEntry = new MenuEntry();
+        menustore.put(name, menuEntry);
+        menuEntry.name = name;
+        menuEntry.subMenu = new TreeMap<String, MenuEntry>();
+        MenuItem item = new MenuItem(parentMenu, SWT.CASCADE);
+        item.setText(name);
+        if(cAccelerator !=0){
+          item.setAccelerator(SWT.CONTROL | cAccelerator);
+        }
+        menuEntry.menu = new Menu(graphicFrame, SWT.DROP_DOWN);
+        item.setMenu(menuEntry.menu);
+      }
+      menustore = menuEntry.subMenu;
+      parentMenu = menuEntry.menu;
+    }
+    String name = names[ii];
+    MenuItem item = new MenuItem(parentMenu, SWT.None); 
+    item.setText(name);
+    //item.setAccelerator(SWT.CONTROL | 'S');
+    item.addSelectionListener(action);
+    ///
+  }
+  
+  
+  
+
+
+  @Override
+  public void exit()
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+
+
+  @Override
+  public MainCmd_ifc getMainCmd()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+
+  @Override
+  public Object getitsGraphicFrame()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+
+  @Override
+  public void setStandardMenusGThread(File openStandardDirectory, GralUserAction actionFile)
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+
+
+  @Override
+  public GralColor setBackgroundColor(GralColor color)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+
+  @Override
+  public boolean setFocus()
+  {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+
+
+  @Override
+  public GralColor setForegroundColor(GralColor color)
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   

@@ -15,9 +15,9 @@ import org.vishia.byteData.ByteDataSymbolicAccess;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
-import org.vishia.gral.ifc.GuiSetValueIfc;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralSetValue_ifc;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 
 public class OamOutFileReader 
 {

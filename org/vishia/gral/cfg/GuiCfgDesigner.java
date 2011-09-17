@@ -3,9 +3,9 @@ package org.vishia.gral.cfg;
 import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
-import org.vishia.gral.ifc.GuiRectangle;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.msgDispatch.LogMessage;
 
 public class GuiCfgDesigner
@@ -23,11 +23,11 @@ public class GuiCfgDesigner
   //private GuiWindowMng_ifc dialogWindowProps;
   
   /**Some dialog widget elements. */
-  private WidgetDescriptor dialogFieldName, dialogFieldDatapath, dialogFieldText, dialogFieldFormat
+  private GralWidget dialogFieldName, dialogFieldDatapath, dialogFieldText, dialogFieldFormat
     , dialogFieldShow, dialogFieldAction
     , dialogFieldLine, dialogFieldColumn, dialogFieldHeight, dialogFieldWidth;
   
-  private WidgetDescriptor dialogButtonOk, dialogButtonEsc;
+  private GralWidget dialogButtonOk, dialogButtonEsc;
   
   /**Coordinates while left mouse pressed. */
   private int xMouse0, yMouse0;
@@ -37,7 +37,7 @@ public class GuiCfgDesigner
   
   private boolean bWidgetMoving = false;
   
-  WidgetDescriptor widgdInDialog = null;
+  GralWidget widgdInDialog = null;
   
   public GuiCfgDesigner(GuiCfgBuilder cfgBuilder, GralGridMngBase mng, LogMessage log)
   { this.cfgBuilder = cfgBuilder;
@@ -53,7 +53,7 @@ public class GuiCfgDesigner
   {
     assert(dialogWindowProps == null); //check call only one time.
     mng.setPositionSize(2, 60, 30, 40, 'r');
-    dialogWindowProps = mng.createWindow("Widget Properties", false);
+    dialogWindowProps = mng.createWindowOld("Widget Properties", false);
     dialogWindowProps.setPositionSize(0, 0, 3, 34, 'd');
     dialogFieldName = dialogWindowProps.addTextField("name", true, "name", 't');
     dialogFieldDatapath = dialogWindowProps.addTextField("dataPath", true, "data", 't');
@@ -78,7 +78,7 @@ public class GuiCfgDesigner
   
   
 
-  public void pressedLeftMouseDownForDesign(WidgetDescriptor widgd, GuiRectangle xy)
+  public void pressedLeftMouseDownForDesign(GralWidget widgd, GralRectangle xy)
   {
     xMouse0 = xy.x;
     yMouse0 = xy.y;
@@ -86,7 +86,7 @@ public class GuiCfgDesigner
   }
   
   
-  public void releaseLeftMouseForDesign(WidgetDescriptor widgd, GuiRectangle xy, boolean bCopy)
+  public void releaseLeftMouseForDesign(GralWidget widgd, GralRectangle xy, boolean bCopy)
   {
     if(bWidgetMoving){
       bWidgetMoving = false;
@@ -122,7 +122,7 @@ public class GuiCfgDesigner
   }
 
   
-  public void pressedRightMouseDownForDesign(WidgetDescriptor widgd, GuiRectangle xy)
+  public void pressedRightMouseDownForDesign(GralWidget widgd, GralRectangle xy)
   { //if(widgdInDialog == null){
       widgdInDialog = widgd;
       GuiCfgData.GuiCfgElement cfge = (GuiCfgData.GuiCfgElement)widgd.getCfgElement();
@@ -156,8 +156,8 @@ public class GuiCfgDesigner
     dialogWindowProps.setWindowVisible(true);
   }
   
-  private UserActionGui actionOk = new UserActionGui()
-  { @Override public void userActionGui(String sIntension, WidgetDescriptor widgd, Object... params)
+  private GralUserAction actionOk = new GralUserAction()
+  { @Override public void userActionGui(String sIntension, GralWidget widgd, Object... params)
     { //note widgd is the OK-button!
       if(widgdInDialog !=null){
         String sName = dialogFieldName.getValue();
@@ -202,8 +202,8 @@ public class GuiCfgDesigner
   
   
   
-  private UserActionGui actionDel = new UserActionGui()
-  { @Override public void userActionGui(String sIntension, WidgetDescriptor widgd, Object... params)
+  private GralUserAction actionDel = new GralUserAction()
+  { @Override public void userActionGui(String sIntension, GralWidget widgd, Object... params)
     { //note widgd is the OK-button!
       if(widgdInDialog !=null){
         mng.remove(widgdInDialog);  //remove the widget.
@@ -220,8 +220,8 @@ public class GuiCfgDesigner
   
   
   
-  private UserActionGui actionEsc = new UserActionGui()
-  { @Override public void userActionGui(String sIntension, WidgetDescriptor widgd, Object... params)
+  private GralUserAction actionEsc = new GralUserAction()
+  { @Override public void userActionGui(String sIntension, GralWidget widgd, Object... params)
     { dialogWindowProps.setWindowVisible(false);
       widgdInDialog = null;
     }

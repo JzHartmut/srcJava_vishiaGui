@@ -5,7 +5,7 @@ package org.vishia.gral.ifc;
  * @author Hartmut Schorrig.
  *
  */
-public abstract class GuiDispatchCallbackWorker 
+public abstract class GralDispatchCallbackWorker 
 {
 	private int ctDone = 0;
 	private boolean reqCtDone = false;

@@ -1,8 +1,13 @@
 package org.vishia.gral.swt;
 
 import org.eclipse.swt.widgets.Control;
-import org.vishia.gral.widget.Widgetifc;
+import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.Widgetifc;
 
+/**This class wraps a SWT widget. In this form it is able to reference in the SWT-independent GRAL
+ * @author Hartmut Schorrig
+ *
+ */
 public class WidgetSimpleWrapperSwt implements Widgetifc
 {
   public final Control widgetSwt;
@@ -16,6 +21,20 @@ public class WidgetSimpleWrapperSwt implements Widgetifc
   }
   
   @Override public boolean setFocus(){ return widgetSwt.setFocus(); }
+
+  @Override
+  public GralColor setBackgroundColor(GralColor color)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public GralColor setForegroundColor(GralColor color)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
   
 }

@@ -7,8 +7,8 @@ import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.Widgetifc;
 import org.vishia.gral.widget.TextBoxGuifc;
-import org.vishia.gral.widget.Widgetifc;
 
 public class WidgetsSwt
 {
@@ -19,7 +19,22 @@ public class WidgetsSwt
     public TextSwt(Composite parent, int style)
     { super(parent, style);
     }
-    @Override public Widget getWidget(){ return this; } 
+    
+    @Override public Widget getWidget(){ return this; }
+
+    @Override
+    public GralColor setBackgroundColor(GralColor color)
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    @Override
+    public GralColor setForegroundColor(GralColor color)
+    {
+      // TODO Auto-generated method stub
+      return null;
+    } 
     
   }
   
@@ -71,10 +86,11 @@ public class WidgetsSwt
     }
 
     @Override
-    public void setText(String arg)
+    public String setText(String arg)
     {
+      String oldText = text.getText();
       text.setText(arg);
-      
+      return oldText;
     }
 
     @Override
@@ -82,6 +98,20 @@ public class WidgetsSwt
     {
       text.append(src);
       
+    }
+
+    @Override
+    public GralColor setBackgroundColor(GralColor color)
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    @Override
+    public GralColor setForegroundColor(GralColor color)
+    {
+      // TODO Auto-generated method stub
+      return null;
     }
 
     

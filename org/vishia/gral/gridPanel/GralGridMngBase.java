@@ -11,9 +11,8 @@ import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.eclipse.swt.widgets.Control;
 import org.vishia.byteData.VariableContainer_ifc;
-import org.vishia.gral.base.GralDevice;
+import org.vishia.gral.base.GralPrimaryWindow;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
@@ -22,13 +21,15 @@ import org.vishia.gral.cfg.GuiCfgData;
 import org.vishia.gral.cfg.GuiCfgDesigner;
 import org.vishia.gral.cfg.GuiCfgWriter;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.FileDialogIfc;
+import org.vishia.gral.ifc.GralFileDialog_ifc;
+import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
-import org.vishia.gral.ifc.GuiPlugUser_ifc;
-import org.vishia.gral.ifc.GuiRectangle;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralPlugUser_ifc;
+import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
 
@@ -65,11 +66,11 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
     public String sLocalDir;
     public String sMask;
     public String sTitle;
-    public final FileDialogIfc dialogFile;
-    public final WidgetDescriptor dstWidgd;
+    public final GralFileDialog_ifc dialogFile;
+    public final GralWidget dstWidgd;
     
     
-    public FileSelectInfo(String sTitle, List<String> listRecentFiles, String startDirMask, WidgetDescriptor dstWidgd)
+    public FileSelectInfo(String sTitle, List<String> listRecentFiles, String startDirMask, GralWidget dstWidgd)
     { this.listRecentFiles = listRecentFiles;
       this.dstWidgd = dstWidgd;
       this.sTitle = sTitle;
@@ -86,7 +87,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
       String sMask1;
       int posSlash = sLocalDir1.lastIndexOf('/');
       if(posSlash == sLocalDir1.length()-1){ //last is slash
-        mode = FileDialogIfc.directory;
+        mode = GralFileDialog_ifc.directory;
         sMask1 = "";
       } else {
         mode = 0;
@@ -101,38 +102,6 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
       this.sLocalDir = sLocalDir1;
       this.dialogFile = createFileDialog();
       this.dialogFile.open(sTitle, mode);
-    }
-    
-  }
-  
-  /**This class holds the informations for 1 widget, which things should be changed.
-   * An instance of this is used temporary in a queue.
-   */
-  public static class GuiChangeReq
-  {
-    /**The widget where the change should be done. */
-    public final WidgetDescriptor widgetDescr;
-    
-    /**The command which should be done to change. It is one of the static definitions cmd... of this class. */
-    public final int cmd;
-    
-    /**Numeric value describes the position of widget where the change should be done.
-     * For example, if the widget is a table, it is either the table line or it is
-     * Integer.MAX_VALUE or 0 to designate top or end.
-     */
-    public final int ident;
-    
-    /**The textual information which were to be changed or add. */
-    public final Object visibleInfo;
-    
-    public final Object userData;
-    
-    public GuiChangeReq(WidgetDescriptor widgetDescr, int cmd, int indent, Object visibleInfo, Object userData) 
-    { this.widgetDescr = widgetDescr;
-      this.cmd = cmd;
-      this.ident = indent;
-      this.visibleInfo = visibleInfo;
-      this.userData = userData;
     }
     
   }
@@ -164,21 +133,21 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   /**Base class for managing all panels and related windows.
    * This base class contains all common resources to manage panels and windows.
    */
-  final protected GralDevice gralDevice;
+  final protected GralPrimaryWindow gralDevice;
 
   /**Properties of this Dialog Window. */
   public  final GralGridProperties propertiesGui;
 
   /**Index of all input fields to access symbolic for all panels. */
-  protected final Map<String, WidgetDescriptor> indexNameWidgets = new TreeMap<String, WidgetDescriptor>();
+  protected final Map<String, GralWidget> indexNameWidgets = new TreeMap<String, GralWidget>();
 
   /**Index of all input fields to access symbolic. NOTE: The generic type of WidgetDescriptor is unknown,
    * because the set is used independently from the graphic system. */
-  protected final Map<String, WidgetDescriptor> showFields = new TreeMap<String, WidgetDescriptor>();
+  protected final Map<String, GralWidget> showFields = new TreeMap<String, GralWidget>();
 
   //private final IndexMultiTable showFieldsM;
 
-  private List<WidgetDescriptor> widgetsInFocus = new LinkedList<WidgetDescriptor>();
+  private List<GralWidget> widgetsInFocus = new LinkedList<GralWidget>();
  
   
   /**List of all panels which may be visible yet. 
@@ -197,7 +166,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
    * But the position can be set.
    * The values inside the position are positive in any case, so that the calculation of size is simple.
    */
-  protected GralGridPos pos = new GralGridPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
+  public GralGridPos pos = new GralGridPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
   
   /**False if the position is given newly. True if it is used. Then the next add-widget invocation 
    * calculates the next position in direction of {@link #pos.dirNext}. */
@@ -410,6 +379,10 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
               pe = z + ze; pef = zf + zef;
               if(pef >=10){ pef -=10; pe +=1; }
             } 
+          } else if(bColumnFromRight){
+            p = -z; pf = zf;      //Note: values may be negative then calculate pixel from right or bottom border. 
+            pe = ze; pef = zef;
+            
           } else { //column and end column is given:
             p = z; pf = zf;      //Note: values may be negative then calculate pixel from right or bottom border. 
             pe = ze; pef = zef;
@@ -585,7 +558,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   }
 
 	
-  @Override public GralGridPos getPositionInPanel(){ return pos; }
+  @Override public GralGridPos getPositionInPanel(){ return pos.clone(); }
   
   
   void setSizeFromPositionInPanel()
@@ -603,20 +576,20 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
    */
   public GralTabbedPanel currTabPanel;
   
-  public GralPanelContent currPanel;
+  //public GralPanelContent currPanel;
   
   protected String sCurrPanel;
   
-  protected WidgetDescriptor lastClickedWidgetInfo;
+  protected GralWidget lastClickedWidgetInfo;
   
 
-	@Override public Queue<WidgetDescriptor> getListCurrWidgets(){ return currPanel.widgetList; }
+	@Override public Queue<GralWidget> getListCurrWidgets(){ return pos.panel.widgetList; }
 	
   /**Index of all user actions, which are able to use in Button etc. 
    * The user action "showWidgetInfos" defined here is added initially.
-   * Some more user-actions can be add calling {@link #registerUserAction(String, UserActionGui)}. 
+   * Some more user-actions can be add calling {@link #registerUserAction(String, GralUserAction)}. 
    * */
-  protected final Map<String, UserActionGui> userActions = new TreeMap<String, UserActionGui>();
+  protected final Map<String, GralUserAction> userActions = new TreeMap<String, GralUserAction>();
   //private final Map<String, ButtonUserAction> userActions = new TreeMap<String, ButtonUserAction>();
   
   /**Index of all Tables, which are representable. */
@@ -624,12 +597,12 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   
 	
 	
-  public GralGridMngBase(GralDevice device, GralGridMngBase parent
+  public GralGridMngBase(GralPrimaryWindow device, GralGridMngBase parent
       , GralGridProperties props
       , VariableContainer_ifc variableContainer, LogMessage log)
 	{ this.parent = parent;
 	  if(parent == null){
-	    gralDevice = device == null ? new GralDevice(): device;
+	    gralDevice = device;
 	  } else {
 	    gralDevice = parent.gralDevice;
 	  }
@@ -640,7 +613,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
 	}
 
   
-  @Override public WidgetDescriptor getWidget(String name)
+  @Override public GralWidget getWidget(String name)
   { return indexNameWidgets.get(name);
   }
   
@@ -674,7 +647,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
 
   
   
-	public void setLastClickedWidgetInfo(WidgetDescriptor lastClickedWidgetInfo)
+	public void setLastClickedWidgetInfo(GralWidget lastClickedWidgetInfo)
 	{
 		this.lastClickedWidgetInfo = lastClickedWidgetInfo;
 	}
@@ -683,34 +656,34 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
    * @param name
    * @param action
    */
-  @Override public void registerUserAction(String name, UserActionGui action)
+  @Override public void registerUserAction(String name, GralUserAction action)
   {
     userActions.put(name, action);
   }
   
-  @Override public UserActionGui getRegisteredUserAction(String name)
+  @Override public GralUserAction getRegisteredUserAction(String name)
   {
     return userActions.get(name);
   }
   
   
-  @Override public void registerWidget(WidgetDescriptor widgd)
+  @Override public void registerWidget(GralWidget widgd)
   {
     if(pos.x < 0 || pos.xEnd <= 0 || pos.y< 0 || pos.yEnd <=0){ 
       //only widgets with size from right TODO percent size too.
       widgd.pos = pos.clone();
       //widgd.pos.set(pos);
-      currPanel.widgetsToResize.add(widgd);
+      pos.panel.widgetsToResize.add(widgd);
     }
     indexNameWidgets.put(widgd.name, widgd);
-    currPanel.widgetList.add(widgd);
+    pos.panel.widgetList.add(widgd);
     
   }
   
   
   
   public GralPanelActivated_ifc actionPanelActivate = new GralPanelActivated_ifc()
-  { @Override public void panelActivatedGui(Queue<WidgetDescriptor> widgetsP)
+  { @Override public void panelActivatedGui(Queue<GralWidget> widgetsP)
     {  //changeWidgets(widgetsP);
     }
   };
@@ -744,7 +717,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
    */
   public void setBackColor(String name, int ix, int color)
   {
-    WidgetDescriptor descr = indexNameWidgets.get(name);
+    GralWidget descr = indexNameWidgets.get(name);
     if(descr == null){
       log.sendMsg(0, "GuiMainDialog:setBackColor: unknown widget %s", name);
     } else {
@@ -771,37 +744,36 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
    * @param content The content to insert.
    * @return
    */
-  @Override public void setBackColor(WidgetDescriptor descr1, int ix, int color)
+  @Override public void setBackColor(GralWidget descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
-    WidgetDescriptor descr = (WidgetDescriptor) descr1;
+    GralWidget descr = (GralWidget) descr1;
     setInfo(descr, GralPanelMngWorking_ifc.cmdBackColor, ix, color, null);
   } 
   
   
-  @Override public void setLineColor(WidgetDescriptor descr1, int ix, int color)
+  @Override public void setLineColor(GralWidget descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
-    WidgetDescriptor descr = (WidgetDescriptor) descr1;
+    GralWidget descr = (GralWidget) descr1;
     setInfo(descr, GralPanelMngWorking_ifc.cmdLineColor, ix, color, null);
   } 
   
   
-  @Override public void setTextColor(WidgetDescriptor descr1, int ix, int color)
+  @Override public void setTextColor(GralWidget descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
-    WidgetDescriptor descr = (WidgetDescriptor) descr1;
+    GralWidget descr = (GralWidget) descr1;
     setInfo(descr, GralPanelMngWorking_ifc.cmdTextColor, ix, color, null);
   } 
   
   
-  @Override public void setLed(WidgetDescriptor widgetDescr, int colorBorder, int colorInner)
+  @Override public void setLed(GralWidget widgetDescr, int colorBorder, int colorInner)
   {
     @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
-    WidgetDescriptor descr = (WidgetDescriptor) widgetDescr;
+    GralWidget descr = (GralWidget) widgetDescr;
     setInfo(descr, GralPanelMngWorking_ifc.cmdColor, colorBorder, colorInner, null);
     
   }
   
-  
-  
+
   @Override public ConcurrentLinkedQueue<GralVisibleWidgets_ifc> getVisiblePanels()
   {
     return listVisiblePanels;
@@ -810,13 +782,13 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
 
   
   
-  @Override public boolean setFocus(WidgetDescriptor widgd)
+  @Override public boolean setFocus(GralWidget widgd)
   {
     return widgd.widget.setFocus();
   }
   
 
-  @Override public void notifyFocus(WidgetDescriptor widgd)
+  @Override public void notifyFocus(GralWidget widgd)
   {
     synchronized(widgetsInFocus){
       widgetsInFocus.remove(widgd);  //remove it anywhere inside
@@ -824,9 +796,9 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
     }
   }
   
-  @Override public WidgetDescriptor getWidgetInFocus(){ return widgetsInFocus.get(0); }
+  @Override public GralWidget getWidgetInFocus(){ return widgetsInFocus.get(0); }
   
-  @Override public List<WidgetDescriptor> getWidgetsInFocus(){ return widgetsInFocus; }
+  @Override public List<GralWidget> getWidgetsInFocus(){ return widgetsInFocus; }
   
   @Override public int getColorValue(String sColorName){ return propertiesGui.getColorValue(sColorName); }
 
@@ -836,12 +808,12 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
 
   
 
-	UserActionGui actionShowWidgetInfos = new UserActionGui()
+	GralUserAction actionShowWidgetInfos = new GralUserAction()
 	{
 
 		@Override public void userActionGui(
 			String sCmd
-		, WidgetDescriptor infos, Object... params
+		, GralWidget infos, Object... params
 		)
 		{ 
 			if(lastClickedWidgetInfo !=null){
@@ -867,7 +839,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
    * @param heightParentPixel The size of the panel, where the widget is member of
    * @return A rectangle for setBounds.
    */
-  protected GuiRectangle calcWidgetPosAndSize(GralGridPos posWidget, 
+  protected GralRectangle calcWidgetPosAndSize(GralGridPos posWidget, 
       int widthParentPixel, int heightParentPixel,
       int widthWidgetNat, int heightWidgetNat)
   {
@@ -891,26 +863,26 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
       y2 = yPixelUnit * posWidget.yEnd + propertiesGui.yPixelFrac(posWidget.yEndFrac)  //negative if from right
          + (posWidget.yEnd < 0  || posWidget.yEnd == 0 && posWidget.yEndFrac == 0 ? heightParentPixel : 0);  //from right
     }
-    GuiRectangle rectangle = new GuiRectangle(x1, y1, x2-x1, y2-y1);
+    GralRectangle rectangle = new GralRectangle(x1, y1, x2-x1, y2-y1);
     return rectangle;
   }
   
   
   
   
-  @Override public WidgetDescriptor addFileSelectField(String name, List<String> listRecentFiles, String startDirMask, String prompt, char promptStylePosition)
+  @Override public GralWidget addFileSelectField(String name, List<String> listRecentFiles, String startDirMask, String prompt, char promptStylePosition)
   { //int xSize1 = xSize;
     //The macro widget consists of more as one widget. Position the inner widgets:
-    GralGridPos posAll = getPositionInPanel().clone(); //saved whole position.
+    GralGridPos posAll = getPositionInPanel(); //saved whole position.
     //reduce the length of the text field:
     setPosition(GralGridPos.same, GralGridPos.same, GralGridPos.same, GralGridPos.same -2.0F, 1, 'r');
     
     //xSize -= ySize;
-    WidgetDescriptor widgd = addTextField(name, true, prompt, promptStylePosition );
+    GralWidget widgd = addTextField(name, true, prompt, promptStylePosition );
     setSize(posAll.height(), 2.0F);
     //xPos += xSize;
     //xSize = ySize;
-    WidgetDescriptor widgdSelect = addButton(name + "<", actionFileSelect, "", null, null, "<");
+    GralWidget widgdSelect = addButton(name + "<", actionFileSelect, "", null, null, "<");
     FileSelectInfo fileSelectInfo = new FileSelectInfo(name, listRecentFiles, startDirMask, widgd);
     widgdSelect.setContentInfo(fileSelectInfo); 
     //xSize = xSize1;
@@ -920,8 +892,8 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
 
   
   
-  UserActionGui actionFileSelect = new UserActionGui()
-  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+  GralUserAction actionFileSelect = new GralUserAction()
+  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
     {
       FileSelectInfo fileSelectInfo = (FileSelectInfo)infos.getContentInfo();
       if(fileSelectInfo.listRecentFiles !=null){
@@ -948,7 +920,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
    * @param widgd
    * @param xy
    */
-  public void pressedLeftMouseDownForDesign(WidgetDescriptor widgd, GuiRectangle xy)
+  public void pressedLeftMouseDownForDesign(GralWidget widgd, GralRectangle xy)
   { designer.pressedLeftMouseDownForDesign(widgd, xy);
   }
   
@@ -957,7 +929,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
    * @param widgd
    * @param xy
    */
-  public void releaseLeftMouseForDesign(WidgetDescriptor widgd, GuiRectangle xy, boolean bCopy)
+  public void releaseLeftMouseForDesign(GralWidget widgd, GralRectangle xy, boolean bCopy)
   { designer.releaseLeftMouseForDesign(widgd, xy, bCopy);
   }
   
@@ -965,7 +937,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
    * @param widgd
    * @param xy
    */
-  public void pressedRightMouseDownForDesign(WidgetDescriptor widgd, GuiRectangle xy)
+  public void pressedRightMouseDownForDesign(GralWidget widgd, GralRectangle xy)
   { designer.pressedRightMouseDownForDesign(widgd, xy);
   }
   

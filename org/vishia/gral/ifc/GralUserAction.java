@@ -8,11 +8,11 @@ package org.vishia.gral.ifc;
  * This should be done with the method {@link GralGridBuild_ifc#registerUserAction(String, UserActionGui)}.
  * Thereby the instance implementing this interface is associated. 
  * <br><br>
- * Some widgets can know the same implementing instance. The differencing is done with the {@link WidgetDescriptor}
+ * Some widgets can know the same implementing instance. The differencing is done with the {@link GralWidget}
  * as parameter while calling.
  * <br><br>
  */
-public interface UserActionGui
+public interface GralUserAction
 {
   /**Call of users method while a widget is activated.
    * @param sIntension A short string describes the intension of call, means which action is done. 
@@ -25,5 +25,5 @@ public interface UserActionGui
    *        With this information the same action method can be used for more as one action type. 
    * @param params Some optional params, depending on the implementation and the sIntension.
    */
-  void userActionGui(String sIntension, WidgetDescriptor infos, Object... params);
+  void userActionGui(String sIntension, GralWidget infos, Object... params);
 }

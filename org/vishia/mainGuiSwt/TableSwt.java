@@ -26,11 +26,10 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.TableGui_ifc;
 import org.vishia.gral.widget.TableLineGui_ifc;
-import org.vishia.gral.widget.WidgetGui_ifc;
 
 public class TableSwt implements TableGui_ifc
 {
@@ -128,16 +127,16 @@ public class TableSwt implements TableGui_ifc
   
   
   
-  public static WidgetDescriptor addTable(GuiPanelMngSwt mng, String sName, int height, int[] columnWidths
+  public static GralWidget addTable(GuiPanelMngSwt mng, String sName, int height, int[] columnWidths
   //, int selectionColumn, CharSequence selectionText    
   )
   {
     
     boolean TEST = false;
     final TableSwt table;
-    Composite parent = (Composite)mng.currPanel.panelComposite;
+    Composite parent = (Composite)mng.pos.panel.panelComposite;
     table = new TableSwt(mng, parent, height, columnWidths); //, selectionColumn, selectionText);
-    WidgetDescriptor widgd = new WidgetDescriptor(sName, table, 'L', sName, null);
+    GralWidget widgd = new GralWidget(sName, table, 'L', sName, null);
     widgd.setPanelMng(mng);
     table.table.setData(widgd);
     mng.registerWidget(widgd);
@@ -221,7 +220,7 @@ public class TableSwt implements TableGui_ifc
   
   
   /**A Table is completed with a special key listener. On some keys and situation 
-   * the {@link UserActionGui} given in the WidgetDescriptor is called. 
+   * the {@link GralUserAction} given in the WidgetDescriptor is called. 
    * The following keys are detected:
    * <ul><li>Enter: "ok" Selection of a line or cell in the table
    * <li>KeyUp on the first line: "upleave": Leave the table.
@@ -243,23 +242,23 @@ public class TableSwt implements TableGui_ifc
     @Override
     public void keyPressed(KeyEvent keyEv)
     {
-      final WidgetDescriptor widgetDescr;
-      final UserActionGui action;
+      final GralWidget widgetDescr;
+      final GralUserAction action;
       System.out.println("" + keyEv.character + Integer.toHexString(keyEv.keyCode));
       final Object source = keyEv.getSource();
       final Control swtControl;
       if(source instanceof Control){
         swtControl = ((Control)source);
         Object oData = swtControl.getData();
-        if(oData instanceof WidgetDescriptor){
-          widgetDescr = (WidgetDescriptor)oData;
+        if(oData instanceof GralWidget){
+          widgetDescr = (GralWidget)oData;
           action = widgetDescr.getActionChange();
         } else { widgetDescr = null; action = null; }
       } else { 
         widgetDescr = null; action = null;
         swtControl = null;
       }
-      UserActionGui mainKeyAction = mng.getRegisteredUserAction("KeyAction");
+      GralUserAction mainKeyAction = mng.getRegisteredUserAction("KeyAction");
       if(action !=null){
       	int ixRow = -99999;
       	try{
@@ -428,19 +427,6 @@ public class TableSwt implements TableGui_ifc
     
     
     @Override
-    public String getText()
-    {
-      // TODO Auto-generated method stub
-      return null;
-    }
-    @Override
-    public String setText(String text)
-    {
-      // TODO Auto-generated method stub
-      return null;
-    }
-
-    @Override
     public String getCellText(int column)
     {
       return item.getText(column);
@@ -475,7 +461,7 @@ public class TableSwt implements TableGui_ifc
     }
     
     @Override public void focusGained(FocusEvent ev)
-    { WidgetDescriptor widgd = (WidgetDescriptor)ev.widget.getData();
+    { GralWidget widgd = (GralWidget)ev.widget.getData();
       widgd.getPanel().notifyFocus(widgd);  
     }
   };
@@ -546,13 +532,6 @@ public class TableSwt implements TableGui_ifc
   }
 
 
-  @Override
-  public String getText()
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
 
   @Override
   public GralColor setBackgroundColor(GralColor color)
@@ -569,13 +548,6 @@ public class TableSwt implements TableGui_ifc
     return null;
   }
 
-
-  @Override
-  public String setText(String text)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
 
   @Override public boolean setFocus()
   { mng.setFocusOfTabSwt(table);

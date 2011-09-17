@@ -26,8 +26,8 @@ public class GridPanelSwt extends CanvasStorePanelSwt
 	
   int xS, yS;
   
-	public GridPanelSwt(Composite parent, int style, Color backGround, int xG, int yG, int xS, int yS)
-	{ super();
+	public GridPanelSwt(String namePanel, Composite parent, int style, Color backGround, int xG, int yG, int xS, int yS)
+	{ super(namePanel);
 	  swtCanvas = new SwtCanvasGridPanel(this, parent, style);
     super.panelComposite = swtCanvas;
     swtCanvas.setData(this);

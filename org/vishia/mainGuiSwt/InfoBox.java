@@ -7,8 +7,8 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.vishia.gral.ifc.GuiWindowMng_ifc;
-import org.vishia.gral.ifc.GuiWindow_ifc;
+import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 
 
 /**This class is a simple Info box containing a text. The class can instantiated at any time,
@@ -17,7 +17,7 @@ import org.vishia.gral.ifc.GuiWindow_ifc;
  * <br><br>
  * TODO: The user should be set non-modal per mouse-click if it is opened modal. 
  */
-public class InfoBox extends Composite implements GuiWindowMng_ifc
+public class InfoBox extends Composite implements GralWindow_ifc
 {
 
   private static final long serialVersionUID = 392806902552552727L;
@@ -82,11 +82,8 @@ public class InfoBox extends Composite implements GuiWindowMng_ifc
     return dlg;  
   }
 
-  @Override
-  public void setWindowVisible(boolean visible)
-  {
-    setVisible(visible);
-    
+  @Override public void setWindowVisible(boolean visible)
+  { setVisible(visible);
   }
 
   @Override

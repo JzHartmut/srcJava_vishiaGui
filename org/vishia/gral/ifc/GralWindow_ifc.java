@@ -1,6 +1,7 @@
 package org.vishia.gral.ifc;
 
-public interface GuiWindowMng_ifc
+
+public interface GralWindow_ifc
 {
   
   /**Controls whether the whole window, which contains this panel, should be visible or not.
@@ -10,6 +11,9 @@ public interface GuiWindowMng_ifc
    * @return
    */
   void setWindowVisible(boolean visible);
+  
+  //see GralGrid...
+  //void setWindowVisible(boolean visible, GralGridPos atPos);
   
   boolean isWindowsVisible();
   

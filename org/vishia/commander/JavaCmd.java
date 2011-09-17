@@ -13,15 +13,16 @@ import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GuiMainCmd;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.CommandSelector;
 import org.vishia.gral.widget.FileSelector;
-import org.vishia.gral.widget.WidgetCmpnifc;
 import org.vishia.mainCmd.MainCmd_ifc;
-import org.vishia.mainGuiSwt.MainCmdSwt.GuiBuild;
 
 
 public class JavaCmd extends GuiCfg
@@ -40,7 +41,7 @@ public class JavaCmd extends GuiCfg
   
   GralTabbedPanel tabCmd, tabFile1, tabFile2;
   
-  WidgetCmpnifc panelButtons;
+  GralPanelContent panelButtons;
   
   final CmdQueue cmdQueue = new CmdQueue(mainCmd);
   
@@ -53,8 +54,9 @@ public class JavaCmd extends GuiCfg
   private final Map<String, FileSelector> idxFileSelector = new TreeMap<String, FileSelector>();
     //{ new TreeMap<String, FileSelector>(), new TreeMap<String, FileSelector>(), new TreeMap<String, FileSelector>()};
   
+  GralWindow_ifc windConfirmCopy;
   
-  
+  GralGridPos posWindConfirmCopy;
   
   /**The commands which are used for some buttons or menu items from the JavaCommander itself. */
   final CmdStore buttonCmds;
@@ -82,7 +84,8 @@ public class JavaCmd extends GuiCfg
     //gui.set
     
     //Creates tab-Panels for the file lists and command lists.
-    tabCmd = panelMng.createTabPanel(null, GralGridBuild_ifc.propZoomedPanel);
+    panelMng.selectPanel("primaryWindow");
+    tabCmd = panelMng.createTabPanel("File0Tab", null, GralGridBuild_ifc.propZoomedPanel);
     gui.addFrameArea(1,1,1,1, tabCmd.getGuiComponent()); //dialogPanel);
 
     int[] widthSelecttable = new int[]{2, 20, 30};
@@ -106,7 +109,8 @@ public class JavaCmd extends GuiCfg
     }
     
       
-    tabFile1 = panelMng.createTabPanel(null, GralGridBuild_ifc.propZoomedPanel);
+    panelMng.selectPanel("primaryWindow");
+    tabFile1 = panelMng.createTabPanel("File1Tab", null, GralGridBuild_ifc.propZoomedPanel);
     gui.addFrameArea(2,1,1,1, tabFile1.getGuiComponent()); //dialogPanel);
     
     tabFile1.addGridPanel("Sel1", "a-F2",1,1,10,10);
@@ -121,7 +125,8 @@ public class JavaCmd extends GuiCfg
       if(info.active == 'm'){ buildTabFromSelection(info, tabFile1); }
     }
     
-    tabFile2 = panelMng.createTabPanel(null, GralGridBuild_ifc.propZoomedPanel);
+    panelMng.selectPanel("primaryWindow");
+    tabFile2 = panelMng.createTabPanel("File2Tab", null, GralGridBuild_ifc.propZoomedPanel);
     gui.addFrameArea(3,1,1,1, tabFile2.getGuiComponent()); //dialogPanel);
       
     tabFile2.addGridPanel("Sel1", "a-F2",1,1,10,10);
@@ -140,7 +145,16 @@ public class JavaCmd extends GuiCfg
     gui.addFrameArea(1,2,3,1, panelButtons); //dialogPanel);
     initPanelButtons();
     
+    panelMng.selectPanel("output"); //Buttons");
+    //panelMng.setPosition(1, 30+GralGridPos.size, 1, 40+GralGridPos.size, 1, 'r');
+    panelMng.setPosition(-30, 0, -40, 0, 1, 'r');
     
+    posWindConfirmCopy = panelMng.getPositionInPanel();
+    windConfirmCopy = panelMng.createWindow("confirm copy", false);
+    //windConfirmCopy.setWindowVisible(true);
+    //panelMng.setPosition(-30, 0, 40, 40+GralGridPos.size, 1, 'r');
+    //windConfirmCopy = panelMng.createWindow(null, false);
+    //windConfirmCopy.setWindowVisible(true);
   }
 
   private void initPanelButtons()
@@ -167,7 +181,7 @@ public class JavaCmd extends GuiCfg
     panelMng.addButton("b-F2", null, "help", null, null, "F2");
     panelMng.addButton("b-help", null, "help", null, null, "view");
     panelMng.addButton("b-edit", actionEdit, "", null, null, "edit");
-    panelMng.addButton("b-help", null, "help", null, null, "copy");
+    panelMng.addButton("b-copy", actionCopy, "", null, null, "copy");
     panelMng.addButton("b-help", null, "help", null, null, "move");
     panelMng.addButton("b-help", null, "help", null, null, "mkdir");
     panelMng.addButton("b-help", null, "help", null, null, "del");
@@ -250,9 +264,9 @@ public class JavaCmd extends GuiCfg
    * The working directory is the directory in the focused file tab.
    * 
    */
-  private UserActionGui actionSetCmdWorkingDir = new UserActionGui() 
-  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
-    { WidgetDescriptor widgdFocus = panelMng.getWidgetInFocus();
+  private GralUserAction actionSetCmdWorkingDir = new GralUserAction() 
+  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
+    { GralWidget widgdFocus = panelMng.getWidgetInFocus();
       FileSelector fileSel = idxFileSelector.get(widgdFocus.name);
       if(fileSel !=null){ //is a FileSelector focused yet?
       //if(widgdFocus.name.startsWith("file")){
@@ -281,11 +295,11 @@ public class JavaCmd extends GuiCfg
   private File[] getSelectedFile()
   { File file[] = new File[3];
     int ixFile = 0;
-    List<WidgetDescriptor> widgdFocus = panelMng.getWidgetsInFocus();
+    List<GralWidget> widgdFocus = panelMng.getWidgetsInFocus();
     synchronized(widgdFocus){
-      Iterator<WidgetDescriptor> iterFocus = widgdFocus.iterator();
+      Iterator<GralWidget> iterFocus = widgdFocus.iterator();
       while(ixFile < file.length && iterFocus.hasNext()){
-        WidgetDescriptor widgd = iterFocus.next();
+        GralWidget widgd = iterFocus.next();
         FileSelector fileSel = idxFileSelector.get(widgd.name);
         if(fileSel !=null){ //is a FileSelector focused yet?
         //if(widgd.name.startsWith("file")){
@@ -304,8 +318,8 @@ public class JavaCmd extends GuiCfg
   /**Action to set the command list from file. It is called from menu.
    * 
    */
-  private UserActionGui actionSetCmdCfg = new UserActionGui() 
-  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+  private GralUserAction actionSetCmdCfg = new GralUserAction() 
+  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
     { selectedFiles = getSelectedFile();
       if(selectedFiles[0] !=null){
         cmdSelector.cmdStore.readCmdCfg(selectedFiles[0]);
@@ -424,8 +438,8 @@ public class JavaCmd extends GuiCfg
    * It tests the key and switches to the concretely action for the pressed key.
    * General keys are [F1] for help, [F4] for edit etc.  
    */
-  UserActionGui actionKey = new UserActionGui()
-  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+  GralUserAction actionKey = new GralUserAction()
+  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
     { stop();
     }
   };
@@ -436,16 +450,16 @@ public class JavaCmd extends GuiCfg
    * The original Norton Commander approach is to select a drive letter for windows.
    * Selection of paths instead are adequate.
    */
-  UserActionGui selectPanelLeft = new UserActionGui()
-  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+  GralUserAction selectPanelLeft = new GralUserAction()
+  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
     { selectTab.listLeft.setFocus();
     }
   };
   
 
   /**Key alt-F2 to select a directory/cmd list in a list of directories for the middle panel. */
-  UserActionGui selectPanelMiddle = new UserActionGui()
-  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+  GralUserAction selectPanelMiddle = new GralUserAction()
+  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
     { selectTab.listMid.setFocus();
     }
   };
@@ -453,8 +467,8 @@ public class JavaCmd extends GuiCfg
 
   /**Key alt-F3 to select a directory/cmd list in a list of directories for the right panel.
    */
-  UserActionGui selectPanelRight = new UserActionGui()
-  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+  GralUserAction selectPanelRight = new GralUserAction()
+  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
     { selectTab.listRight.setFocus();
     }
   };
@@ -464,8 +478,8 @@ public class JavaCmd extends GuiCfg
    * which uses the whole display and is selected with ctrl-O.
    * This output/text panel is used for content output too. It is always visible. 
    */
-  UserActionGui selectPanelOut = new UserActionGui()
-  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+  GralUserAction selectPanelOut = new GralUserAction()
+  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
     { tabCmd.getCurrentPanel().setFocus();
     }
   };
@@ -473,8 +487,8 @@ public class JavaCmd extends GuiCfg
 
   /**Key F4 for edit command. Its like Norton Commander. 
    */
-  UserActionGui actionEdit = new UserActionGui()
-  { @Override public void userActionGui(String sIntension, WidgetDescriptor infos, Object... params)
+  GralUserAction actionEdit = new GralUserAction()
+  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
     { CmdStore.CmdBlock cmdBlock = buttonCmds.getCmd("edit");
       if(cmdBlock == null){ mainCmd.writeError("internal problem - don't find 'edit' command. "); }
       else {
@@ -486,6 +500,23 @@ public class JavaCmd extends GuiCfg
         files[2] = getterFiles.getFile3();
         cmdQueue.addCmd(cmdBlock, files);  //to execute.
       }
+      ///
+    }
+  };
+  
+
+  /**Key F5 for copy command. Its like Norton Commander. 
+   */
+  GralUserAction actionCopy = new GralUserAction()
+  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
+    { selectedFiles = getSelectedFile();  
+      getterFiles.prepareFileSelection();
+      File[] files = new File[3];
+      files[0] = getterFiles.getFile1();
+      files[1] = getterFiles.getFile2();
+      files[2] = getterFiles.getFile3();
+      
+      panelMng.setWindowsVisible(windConfirmCopy, posWindConfirmCopy);
       ///
     }
   };

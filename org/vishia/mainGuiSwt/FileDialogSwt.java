@@ -6,9 +6,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.vishia.gral.ifc.FileDialogIfc;
+import org.vishia.gral.ifc.GralFileDialog_ifc;
 
-public class FileDialogSwt implements FileDialogIfc
+public class FileDialogSwt implements GralFileDialog_ifc
 {
 
 	private FileDialog fileDialog;
@@ -23,9 +23,9 @@ public class FileDialogSwt implements FileDialogIfc
 	{
     int modeSwt = 0;
     
-    if((mode & FileDialogIfc.multi)!=0) { modeSwt |= SWT.MULTI; }
+    if((mode & GralFileDialog_ifc.multi)!=0) { modeSwt |= SWT.MULTI; }
     
-    if((mode & FileDialogIfc.directory)!=0) {
+    if((mode & GralFileDialog_ifc.directory)!=0) {
       this.dirDialog = new DirectoryDialog(shell, SWT.MULTI);
       if(sTitle != null){
         dirDialog.setText(sTitle);

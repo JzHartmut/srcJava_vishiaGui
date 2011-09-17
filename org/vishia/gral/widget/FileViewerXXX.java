@@ -4,8 +4,8 @@ import java.util.Map;
 
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 
 
 /**This is an experience only yet. It should show a file manager in an own window
@@ -37,10 +37,10 @@ public class FileViewerXXX
 		
 	}
 	
-	private UserActionGui actionFileButton = new UserActionGui(){
+	private GralUserAction actionFileButton = new GralUserAction(){
 
 		@Override
-		public void userActionGui(String sCmd, WidgetDescriptor infos, Object... params)
+		public void userActionGui(String sCmd, GralWidget infos, Object... params)
 		{
 		  bActiv = true;
 		  bActivate = true;
@@ -101,7 +101,7 @@ public class FileViewerXXX
 	
 	
 	
-	public UserActionGui getAction(){ return actionFileButton; }
+	public GralUserAction getAction(){ return actionFileButton; }
 	
 	
 	
