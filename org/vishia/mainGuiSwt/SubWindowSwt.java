@@ -34,7 +34,11 @@ public class SubWindowSwt extends GralSubWindow
 
   @Override public boolean isWindowsVisible(){ return window.isVisible(); }
 
-  @Override public void setWindowVisible(boolean visible){ window.setVisible(visible); }
+  @Override public void setWindowVisible(boolean visible)
+  { 
+    window.setVisible(visible);
+    if(visible){ window.setFocus(); }
+  }
 
   @Override
   public GralColor setBackgroundColor(GralColor color)

@@ -93,7 +93,7 @@ protected final GuiMainAreaifc gui;
 
 protected final MainCmd_ifc mainCmd;
 
-protected GralGridMngBase panelMng;
+public GralGridMngBase panelMng;
 
 /**Panel-Management-interface for the panels. */
 protected GralGridBuild_ifc panelBuildIfc;

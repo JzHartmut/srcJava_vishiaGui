@@ -242,6 +242,7 @@ public class GuiCfgBuilder
     }
     if(widgd !=null){
       //set common attributes for widgets:
+      widgd.pos = gui.getPositionInPanel();
       String sShowMethod = cfge.widgetType.showMethod;
       if(sShowMethod !=null){
         GralUserAction actionShow = gui.getRegisteredUserAction(sShowMethod);

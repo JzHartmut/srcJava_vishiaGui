@@ -1,11 +1,14 @@
 package org.vishia.gral.cfg;
 
+import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
+import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
 
 public class GuiCfgDesigner
@@ -19,9 +22,9 @@ public class GuiCfgDesigner
   private final GuiCfgBuilder cfgBuilder;
 
   /**A Panel which contains the table to select some projectPaths. */
-  private GuiShellMngBuildIfc dialogWindowProps;
-  //private GuiWindowMng_ifc dialogWindowProps;
-  
+  //private GuiShellMngBuildIfc dialogWindowProps;
+  private GralSubWindow dialogWindowProps;
+
   /**Some dialog widget elements. */
   private GralWidget dialogFieldName, dialogFieldDatapath, dialogFieldText, dialogFieldFormat
     , dialogFieldShow, dialogFieldAction
@@ -53,7 +56,8 @@ public class GuiCfgDesigner
   {
     assert(dialogWindowProps == null); //check call only one time.
     mng.setPositionSize(2, 60, 30, 40, 'r');
-    dialogWindowProps = mng.createWindowOld("Widget Properties", false);
+    dialogWindowProps = mng.createWindow("Widget Properties", false);
+    /*
     dialogWindowProps.setPositionSize(0, 0, 3, 34, 'd');
     dialogFieldName = dialogWindowProps.addTextField("name", true, "name", 't');
     dialogFieldDatapath = dialogWindowProps.addTextField("dataPath", true, "data", 't');
@@ -73,7 +77,26 @@ public class GuiCfgDesigner
     dialogButtonEsc = dialogWindowProps.addButton("esc", actionEsc, null, null, null, "esc");
     dialogButtonOk = dialogWindowProps.addButton("del", actionDel, null, null, null, "del");
     dialogButtonOk = dialogWindowProps.addButton("OK", actionOk, null, null, null, "OK");
-    
+    */
+    mng.setPositionSize(0, 0, 3, 34, 'd');
+    dialogFieldName = mng.addTextField("name", true, "name", 't');
+    dialogFieldDatapath = mng.addTextField("dataPath", true, "data", 't');
+    dialogFieldText = mng.addTextField("text", true, "text", 't');
+    dialogFieldFormat = mng.addTextField("format", true, "format", 't');
+    dialogFieldShow = mng.addTextField("show", true, "show method", 't');
+    dialogFieldAction = mng.addTextField("action", true, "action method", 't');
+    mng.setPositionSize(19, 2, 3, 5, 'r');
+    dialogFieldLine = mng.addTextField("line", true, "pos-y", 't');
+    //mng.addText(", ", 'B', 0);
+    dialogFieldColumn = mng.addTextField("column", true, "pos-x", 't');
+    //mng.addText("   ", 'B', 0);
+    dialogFieldHeight = mng.addTextField("height", true, "size-y", 't');
+    //mng.addText(" x ", 'B', 0);
+    dialogFieldWidth = mng.addTextField("width", true, "size-x", 't');
+    mng.setPositionSize(23, 2, 3, 8, 'r');
+    dialogButtonEsc = mng.addButton("esc", actionEsc, null, null, null, "esc");
+    dialogButtonOk = mng.addButton("del", actionDel, null, null, null, "del");
+    dialogButtonOk = mng.addButton("OK", actionOk, null, null, null, "OK");
   }
   
   
@@ -153,7 +176,10 @@ public class GuiCfgDesigner
         dialogFieldName.setValue(GralPanelMngWorking_ifc.cmdSet, 0, "ERROR cfge");
       }
     //}
-    dialogWindowProps.setWindowVisible(true);
+    //dialogWindowProps.setWindowVisible(true);
+    GralGridPos posWindow = dialogWindowProps.posWindow;
+    posWindow.setPosition(widgd.pos.x, widgd.pos.y +2);
+    mng.setWindowsVisible(dialogWindowProps, posWindow);
   }
   
   private GralUserAction actionOk = new GralUserAction()

@@ -230,344 +230,48 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
 		return mng;
 	}
 	
-	
-	/* (non-Javadoc)
-	 * @see org.vishia.gral.gridPanel.GuiPanelMngBuildIfc#setPosition(int, int, int, int, char)
-	 */
-	@Override public void setPositionSize(int line, int column, int height, int width, char direction)
-	{ if(line < 0){ line = posUsed? GralGridPos.next: GralGridPos.same; }
-	  if(column < 0){ column = posUsed? GralGridPos.next: GralGridPos.same; }
-	  setFinePosition(line, 0, height + GralGridPos.size, 0, column, 0, width + GralGridPos.size, 0, 1, direction, pos);
-	}
+  @Override public void setPositionSize(int line, int column, int height, int width, char direction)
+  { if(line < 0){ line = posUsed? GralGridPos.next: GralGridPos.same; }
+    if(column < 0){ column = posUsed? GralGridPos.next: GralGridPos.same; }
+    setFinePosition(line, 0, height + GralGridPos.size, 0, column, 0, width + GralGridPos.size, 0, 1, direction, pos);
+  }
 
-	
   @Override public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
-      , int origin, char direction)
+    , int origin, char direction)
   { setPosition(pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
   }
 
-  
-  
-  
-  @Override public void setPosition(GralGridPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
-      , int origin, char direction)
-  {
-    int y1 = (int)(line);
-    int y1f = y1 >=0 ? (int)((line - y1)* 10.001F) : (int)((line - y1)* -10.001F);  
-    int y2 = (int)(lineEndOrSize);
-    int y2f = y2 >=0 ? (int)((lineEndOrSize - y2)* 10.001F) : (int)((lineEndOrSize - y2)* -10.001F);  
-    int x1 = (int)(column);
-    int x1f = x1 >=0 ? (int)((column - x1)* 10.001F) : (int)((column - x1)* -10.001F);  
-    int x2 = (int)(columnEndOrSize);
-    int x2f = x2 >=0 ? (int)((columnEndOrSize - x2)* 10.001F) : (int)((columnEndOrSize - x2)* -10.001F); 
-    setFinePosition(y1, y1f, y2, y2f, x1, x1f, x2, x2f, origin, direction, framePos);
-  }
-  
-  
 
-	
-  /**Sets the position for the next widget to add in the container.
-   * Implementation note: This is the core function to calculate positions. It is called from all other ones.
-   * @param line y-Position in y-Units, count from top of the box. It is the bottom line of the widget.
-   *              It means ypos = 0 is not a proper value. To show a text in the first line, use y=2.
-   *              If <0, then the previous position is valid still.
-   * @param column x-Position in x-Units, count from left of the box. 
-   *              If <0, then the previous position is valid still.
-   * @param heigth: The height of the line. If <0, then the param line is the buttom line, 
-   *                and (line-height) is the top line. If 0 then the last value of height is not changed. 
-   * @param length: The number of columns. If <0, then the param column is the right column, 
-   *                and column-length is the left column. If 0 then the last value of length is not changed.
-   * @param direction: direction for a next widget, use 'r', 'l', 'u', 'd' for right, left, up, down                
-   */
+  @Override public void setPosition(GralGridPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
+    , int origin, char direction)
+  {
+      pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
+  }
+  
   @Override public void setFinePosition(int line, int yPosFrac, int ye, int yef
-      , int column, int xPosFrac, int xe, int xef, int origin, char direction, GralGridPos frame)
+    , int column, int xPosFrac, int xe, int xef, int origin, char direction, GralGridPos frame)
   {
-    //Inner class to calculate for x and y.   
-    class Calc{
-      int p, pf, pe, pef;
-      float pd;
-      int pDir;  //0 for up or left, 1 for down or right, -1 else 
-      int pOrigin;
-      
-      void calc(int z, int zf, int ze, int zef)
-      {
-        final boolean bxSizeNeg;
-        final boolean bxSize =  ze > (GralGridPos.size - GralGridPos.sizeRange_)
-                            && ze < (GralGridPos.size + GralGridPos.sizeRange_);
-        if(bxSize){ 
-          ze -= GralGridPos.size; //may be negative!
-          bxSizeNeg = ze < 0;
-          if(bxSizeNeg){ 
-            ze =  -ze;
-            if(pOrigin <0){ pOrigin = 2; }
-          } else {
-            if(pOrigin <0){ pOrigin = 0; }
-          }
-        } else { bxSizeNeg = false; }
-        final boolean bxSame = z > (GralGridPos.same - GralGridPos.sizeRange_)
-                            && z < (GralGridPos.same + GralGridPos.sizeRange_);
-        if(bxSame){ 
-          z -= GralGridPos.same; //may be negative!
-        }  
-        final boolean bxSameEnd = ze > (GralGridPos.same - GralGridPos.sizeRange_)
-                            && ze < (GralGridPos.same + GralGridPos.sizeRange_);
-        if(bxSameEnd){ 
-          ze -= GralGridPos.same; //may be negative!
-        }  
-        final boolean bColumnFromRight = z < 0;
-        if(bColumnFromRight){ z = - z; } //use positive values anytime
-        posUsed = false;
-        if(bxSame){
-          //don't change column
-          if(bxSameEnd){
-            pe += ze; pef += zef;
-            if(pef >=10){ pef -=10; pe+=1; }
-          } else if(bxSize){
-            //The size is changed but the same column
-            if(bxSizeNeg){
-              p = pe - ze; pf = pef - zef;
-              if(pf <0){ p -=1; pf +=10; }
-            } else {
-              pe = p + ze; pef = pf + zef;
-              if(pef >=10){ pe +=1; pef -=10; }
-            }
-          } else { //an end position is given
-            pe = ze; pef = zef;
-          }
-          p += z; pf += zf; 
-          if(pf >=10){ pf -=10; p+=1; }
-        } else if(z == GralGridPos.next && pDir==1 || z == GralGridPos.nextBlock){
-          //calculate next x
-          if(bxSameEnd || ze == GralGridPos.next || ze == GralGridPos.nextBlock){ 
-            //calculate next position, don't change end column
-            int xd = (int)pd;
-            zef = (int)((pd - xd)* 10.001F) + pef;
-            
-            p = pe; pf = pef;
-            if(zef >= 10){ zef -=10; xd +=1; }
-            pe = p + xd;
-            pef = zef;
-          } else if(bxSize){
-            //calculate next position, size is given:
-            p = pe; pf = pef;  //set start to previous end.
-            zef += pef; if(zef >=10){ zef -=10; ze +=1; }
-            pe = p + ze; pef = zef;  //set end to newstart + size
-          } else { 
-            //calculate next position, end position is given:
-            p = pe; pf = pef;
-            pe = ze; pef = zef;
-          }
-        } else { //position z is given:
-          if(z == GralGridPos.next){  //next is given, but not for this coordinate: 
-            if(bxSizeNeg){
-              z = pe; zf = pef;     //use the actual value.
-            } else {
-              z = p; zf = pf;       //use the actual value.
-            }
-          }
-          //position is given or next is set but not in this direction:
-          if(bxSameEnd || ze == GralGridPos.next || ze == GralGridPos.nextBlock){ 
-            //don't change end position
-            p = z; pf = zf;
-          } else if(bxSize){
-            if(bxSizeNeg){ //the given position is the right or button one:
-              p = z - ze; pf = zf - zef;
-              if(pf < 0){ pf +=10; p -=1; }
-              pe = z; pef = zf;  //the end position is the given one.
-            } else { //the given position is the left one:
-              p = z; pf = zf; 
-              pe = z + ze; pef = zf + zef;
-              if(pef >=10){ pef -=10; pe +=1; }
-            } 
-          } else if(bColumnFromRight){
-            p = -z; pf = zf;      //Note: values may be negative then calculate pixel from right or bottom border. 
-            pe = ze; pef = zef;
-            
-          } else { //column and end column is given:
-            p = z; pf = zf;      //Note: values may be negative then calculate pixel from right or bottom border. 
-            pe = ze; pef = zef;
-          }
-        }
-        if(pOrigin <0){ pOrigin = 0; } //set default if not determined. 
-      }
-    }
-    if(frame == null){ frame = pos; }
-    Calc calc = new Calc();
-    if(origin >0 && origin <=9){
-      int yOrigin = (origin-1) /3;
-      int xOrigin = origin - yOrigin -1; //0..2
-      pos.xOrigin = "lmr".charAt(xOrigin);
-      pos.yOrigin = "tmb".charAt(yOrigin);
-    }
-    //calculate y
-    calc.p = frame.y; calc.pe = frame.yEnd; calc.pf = frame.yFrac; calc.pef = frame.yEndFrac;
-    calc.pd = frame.height(); calc.pDir = "ud".indexOf(frame.dirNext); calc.pOrigin = "tmb".indexOf(frame.yOrigin);
-    calc.calc(line, yPosFrac, ye, yef);
-    pos.y = calc.p; pos.yEnd = calc.pe; pos.yFrac = calc.pf; pos.yEndFrac = calc.pef;
-    pos.yOrigin = "tmb".charAt(calc.pOrigin); if(calc.pDir >=0){ pos.dirNext = calc.pDir == 0 ? 'u': 'd'; }
-    //calculate x
-    calc.p = frame.x; calc.pe = frame.xEnd; calc.pf = frame.xFrac; calc.pef = frame.xEndFrac;
-    calc.pd = frame.width(); calc.pDir = "lr".indexOf(frame.dirNext); calc.pOrigin = "lmr".indexOf(frame.xOrigin);
-    calc.calc(column, xPosFrac, xe, xef);
-    pos.x = calc.p; pos.xEnd = calc.pe; pos.xFrac = calc.pf; pos.xEndFrac = calc.pef;
-    pos.xOrigin = "lmr".charAt(calc.pOrigin); if(calc.pDir >=0){ pos.dirNext = calc.pDir == 0 ? 'l': 'r'; }
-    
-    /*
-    if(column >=0){ 
-      this.pos.x = column;
-      this.pos.xFrac = xPosFrac;
-      this.pos.xEnd = (column + width);
-    } else {
-      //use the same pos.x as before adding the last Component, 
-      //because a new yPos is given.
-      if(pos.dirNext == 'r') { 
-        int xSize = pos.xEnd - pos.x;
-        pos.x = pos.xEnd;
-        pos.xEnd = pos.x + xSize;
-      }
-    }
-    if(line >=0){ 
-      if(height >=0){
-        this.pos.y = (line); pos.yFrac = yPosFrac;
-        int yEndFrac = yPosFrac + ySizeFrac;
-        if(yEndFrac >=10){ yEndFrac -=10; height +=1; }
-        this.pos.yEnd = (line + height);
-        pos.yEndFrac = yEndFrac;
-        pos.yOrigin = 't';
-      } else {
-        this.pos.yEnd = (line); pos.yEndFrac = yPosFrac;
-        int yFrac = yPosFrac - ySizeFrac;
-        if(yFrac <0){ yFrac +=10; height -=1; }
-        this.pos.y = (line + height);  //less then yEnd because height is negative.
-        pos.yFrac = yFrac;
-        pos.yOrigin = 'b';
-      }
-        
-    } else {
-      //use the same yPos as before adding the last Component, 
-      //because a new xPos may be given.
-      if(pos.dirNext == 'd') { 
-        int ySize = pos.yEnd - pos.y;
-        pos.y = pos.yEnd;
-        pos.yEnd = pos.y + ySize;
-      }
-    }
-    if(height <0){
-      //yPosPrev = (yPos -= height);
-    }
-    if(width <0){
-      //xPosPrev = (xPos -= width);
-    }
-    */
-    if("rlud".indexOf(direction)>=0 ){
-      pos.dirNext = direction;
-    }
-  }
-  
-  
-  
-  
-  public void setSize(int height, int ySizeFrac, int width, int xSizeFrac)
-  {
+    pos.setFinePosition(line, yPosFrac, ye, yef, column, xPosFrac, xe, xef, origin, direction, frame);
     posUsed = false;
-    if(height !=0){
-      //ySize = height >0 ? height : -height;
-      //this.ySizeFrac = ySizeFrac;
-    }
-    if(width !=0){
-      //xSize = width >0 ? width: -width;
-      //this.xSizeFrac = xSizeFrac;
-    }
-    if(height >0){ pos.yOrigin = 't'; }
-    else if(height < 0){ pos.yOrigin = 'b'; }
-    else; //let it unchanged if height == 0
-    if(width >0){ pos.xOrigin = 'l'; }
-    else if(width < 0){ pos.xOrigin = 'r'; }
-    else; //let it unchanged if width == 0
   }
   
+  
+  @Override public void setSize(int height, int ySizeFrac, int width, int xSizeFrac)
+  {
+    pos.setSize(height, ySizeFrac, width, xSizeFrac);
+    posUsed = false;
+  }
   
   void setSize(float height, float width)
-  { 
-    int y2 = (int)(height);
-    int y2f = y2 >=0 ? (int)((height - y2)* 10.001F) : (int)((height - y2)* -10.001F);  
-    int x2 = (int)(width);
-    int x2f = x2 >=0 ? (int)((width - x2)* 10.001F) : (int)((width - x2)* -10.001F); 
-    setFinePosition(GralGridPos.next, 0,  y2 + GralGridPos.size, y2f, GralGridPos.next, 0, x2 + GralGridPos.size, x2f, 0, pos.dirNext, pos);
-  }
-  
-  
-  
-  /**Positions the next widget below to the previous one. */
-  public void setNextPositionX()
-  { //xPos = xWidth; 
-  }
-  
-  /**Positions the next widget on the right next to the previous one. */
-  public void setNextPositionY()
-  { bBelow = true;
+  { pos.setSize(height, width, pos);
   }
   
   /**Sets the position to the next adequate the {@link #pos.dirNext}. */
   public void setNextPosition()
-  {
-    float dx3 = pos.width();
-    float dy3 = pos.height();
-    int dx = (int)dx3;
-    int dxf = (int)((dx3 - dx) * 10.001F) + pos.xEndFrac;
-    if(dxf >= 10){ dxf -=10; dx +=1; }
-    int dy = (int)dy3;
-    int dyf = (int)((dy3 - dy) * 10.001F) + pos.yEndFrac;
-    if(dyf >= 10){ dyf -=10; dy +=1; }
-    switch(pos.dirNext){
-    case 'r': pos.x = pos.xEnd; pos.xFrac = pos.xEndFrac; pos.xEnd = pos.x + dx; pos.xEndFrac = dxf; break;
-    case 'd': pos.y = pos.yEnd; pos.yFrac = pos.yEndFrac; pos.yEnd = pos.y + dy; pos.yEndFrac = dyf; break;
-    }
-  }
+  { pos.setNextPosition();
+  }  
   
-  
-  /**Returns the width (number of grid step horizontal) of the last element.
-   * @return Difference between current auto-position and last pos.
-   */
-  public int xxxgetWidthLast(){ return 0; }
-  
-	
-  @Override public void xxxsetPositionInPanel(float line, float column, float lineEnd, float columnEnd, char direction)
-  {
-    posUsed = false;
-    int y1 = (int)(line);
-    int y1f = y1 >=0 ? (int)((line - y1)* 10.001F) : (int)((line - y1)* -10.001F);  
-    int y2 = (int)(lineEnd);
-    int y2f = y2 >=0 ? (int)((lineEnd - y2)* 10.001F) : (int)((lineEnd - y2)* -10.001F);  
-    int x1 = (int)(column);
-    int x1f = x1 >=0 ? (int)((column - x1)* 10.001F) : (int)((column - x1)* -10.001F);  
-    int x2 = (int)(columnEnd);
-    int x2f = x2 >=0 ? (int)((columnEnd - x2)* 10.001F) : (int)((columnEnd - x2)* -10.001F); 
-    pos.y = y1;
-    pos.yFrac = y1f;
-    pos.yEnd = y2;
-    pos.yEndFrac = y2f;
-    pos.x = x1;
-    pos.xFrac = x1f;
-    pos.xEnd = x2;
-    pos.xEndFrac = x2f;
-    
-    if("rlud".indexOf(direction)>=0 ){
-      pos.dirNext = direction;
-    }
-  }
-
-	
   @Override public GralGridPos getPositionInPanel(){ return pos.clone(); }
-  
-  
-  void setSizeFromPositionInPanel()
-  {
-    
-  }
-  
-  
-  
 	
   /**Map of all panels. A panel may be a dialog box etc. */
   protected final Map<String,GralPanelContent> panels = new TreeMap<String,GralPanelContent>();

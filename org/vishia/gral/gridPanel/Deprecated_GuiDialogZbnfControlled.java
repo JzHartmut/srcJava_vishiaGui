@@ -317,7 +317,7 @@ class Deprecated_GuiDialogZbnfControlled
 	        
 	        }else{
 	        	//no position given:
-	        	dialog.setNextPositionX();
+	        	//dialog.setNextPositionX();
 	        }
 	        
 	        //gather all informations maybe available for the element.

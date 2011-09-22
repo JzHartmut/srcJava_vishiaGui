@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.cfg.GuiCfgBuilder;
@@ -119,7 +120,7 @@ public interface GralGridBuild_ifc
   public void registerPanel(GralPanelContent panel);
   
   
-  /**Creates a panel for tabs and registers it in the GUI.
+  /**Creates a panel for tabs as child of the current panel.
    * @param user If not null, then this user class will be notified when a tab is selected.
    *             The user should update showed values.
    * @param properties use or of constants {@link #propZoomedPanel}, {@link #propGridZoomedPanel}
@@ -277,24 +278,15 @@ public interface GralGridBuild_ifc
   public void setSize(int ySize, int ySizeFrac, int xSize, int xSizeFrac);
 
   
-  /**Set the position for the next widget especially for widgets, which should be placed relativ in the whole panel. 
-   * It is adequate {@link #setPositionSize(int, int, int, int, char)}, but here the size isn't given, instead the end line and column.
-   * That approach allows to set positions for widgets, which are placed relative to the actual size of the window.
-   * @param line Line in the grid. Fine positions in 1 fractional part digit can be used. Negative value counts from bottom.
-   * @param lineEnd The line position after the widget. Fine positions in 1 fractional part digit can be used. Negative value counts from bottom.
-   * @param column Column in the grid. Fine positions in 1 fractional part digit can be used. Negative value counts from rigth.
-   * @param columnEnd. Fine positions in 1 fractional part digit can be used. Negative value counts from bottom.
-   * @param direction
+  
+  /**Gets the current position in the panel to store anywhere other. Usual the position is stored in the widget itself.
+   * This operation returns an independent instance of GralGridPos. 
+   * Note that the {@link GralGridMngBase#pos} is reused there. Therefore the implementation of the method
+   * returns a cloned instance.   
+   * @return An independent instance with current data of {@link GralGridMngBase#pos}. 
    */
-  public void xxxsetPositionInPanel(float line, float column, float lineEnd, float columnEnd, char direction);
-  
-  
-  
   GralGridPos getPositionInPanel();
   
-  /**Positions the next widget right to the previous one. */
-  void setNextPositionX();
-
   
   
   
@@ -674,7 +666,7 @@ public interface GralGridBuild_ifc
 	 * @param exclusive true then non-modal.
 	 * @return
 	 */
-	GralWindow_ifc createWindow(String title, boolean exclusive);
+	GralSubWindow createWindow(String title, boolean exclusive);
   
 	
 	GuiShellMngBuildIfc createWindowOld(String title, boolean exclusive);

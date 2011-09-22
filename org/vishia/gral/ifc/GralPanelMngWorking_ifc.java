@@ -156,7 +156,7 @@ public interface GralPanelMngWorking_ifc
   void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent);
   
   
-  /**Sets a given and registered window visible at the given position and size.
+  /**Sets a given and registered window visible at the given position and size or set it invisible.
    * <br>
    * A window can be created by invoking {@link org.vishia.gral.gridPanel.GralGridBuild_ifc#createWindow(String, boolean)}
    * in the build phase of the gui. It can be hidden because it is not necessary to show and operate with them.
@@ -178,8 +178,10 @@ public interface GralPanelMngWorking_ifc
    * of the parent window, the window can be placed onto a proper position of the whole display.
    *   
    * @param window the instance of the window wrapper.
-   * @param atPos The position and size of the window.  
-   * @return
+   * @param atPos If null then hide the window. If not null then show the window. 
+   *        The position and size of the window is given related to any panel of any other window. 
+   *         
+   * @return true if it is visible.
    */
   boolean setWindowsVisible(GralWindow_ifc window, GralGridPos atPos);
   

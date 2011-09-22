@@ -49,14 +49,12 @@ public class JavaCmd extends GuiCfg
   
   private final CommandSelector cmdSelector = new CommandSelector(cmdQueue);
   
+  private final CopyCmd copyCmd = new CopyCmd(this);
+  
   private File[] selectedFiles;
 
   private final Map<String, FileSelector> idxFileSelector = new TreeMap<String, FileSelector>();
     //{ new TreeMap<String, FileSelector>(), new TreeMap<String, FileSelector>(), new TreeMap<String, FileSelector>()};
-  
-  GralWindow_ifc windConfirmCopy;
-  
-  GralGridPos posWindConfirmCopy;
   
   /**The commands which are used for some buttons or menu items from the JavaCommander itself. */
   final CmdStore buttonCmds;
@@ -149,12 +147,7 @@ public class JavaCmd extends GuiCfg
     //panelMng.setPosition(1, 30+GralGridPos.size, 1, 40+GralGridPos.size, 1, 'r');
     panelMng.setPosition(-30, 0, -40, 0, 1, 'r');
     
-    posWindConfirmCopy = panelMng.getPositionInPanel();
-    windConfirmCopy = panelMng.createWindow("confirm copy", false);
-    //windConfirmCopy.setWindowVisible(true);
-    //panelMng.setPosition(-30, 0, 40, 40+GralGridPos.size, 1, 'r');
-    //windConfirmCopy = panelMng.createWindow(null, false);
-    //windConfirmCopy.setWindowVisible(true);
+    copyCmd.buildWindowConfirmCopy();
   }
 
   private void initPanelButtons()
@@ -515,8 +508,7 @@ public class JavaCmd extends GuiCfg
       files[0] = getterFiles.getFile1();
       files[1] = getterFiles.getFile2();
       files[2] = getterFiles.getFile3();
-      
-      panelMng.setWindowsVisible(windConfirmCopy, posWindConfirmCopy);
+      copyCmd.confirmCopy();
       ///
     }
   };

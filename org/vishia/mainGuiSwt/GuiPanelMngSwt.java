@@ -63,6 +63,7 @@ import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralPrimaryWindow;
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.cfg.GuiCfgBuilder;
@@ -435,24 +436,15 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
 
   }
   
-  public GralWindow_ifc createWindow(String title, boolean exclusive)
+  public GralSubWindow createWindow(String title, boolean exclusive)
   {
-    GralRectangle rect = calcPositionOfWindow(this.pos);
-    
-    //Shell currShell = pos.panelSwt.getShell();
-    //final Rectangle rectShell = currShell.getBounds();
-    
-    //int xPos = rectShell.x + rectParent.x + rectangle.x;
-    //int yPos = rectShell.y + rectParent.y + rectangle.y;
     SubWindowSwt window = new SubWindowSwt(graphicFrame.getDisplay(), title, exclusive);
+    window.posWindow = getPositionInPanel();
+    GralRectangle rect = calcPositionOfWindow(window.posWindow);
     window.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
-    //setPosAndSize_(window.window);
+    this.pos.panel = window; //it is selected.
     
-    //TODO create a Panel in the window.
-    
-    //WidgetDescriptor widgd = new WidgetDescriptor(name, new WidgetSimpleWrapperSwt(window.window), 'w');
-    //TODO registerPanel(name, window);
-    //window.window.setVisible(true);
+    //this.pos.set(0,0,0,0,'r');
     return window;
 
   }
@@ -462,13 +454,15 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   
   
   @Override public boolean setWindowsVisible(GralWindow_ifc window, GralGridPos atPos)
-  {
-    GralRectangle rect = calcPositionOfWindow(atPos);
-    SubWindowSwt windowSwt = (SubWindowSwt)window;
-    windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
-    
-    window.setWindowVisible(true); ///
-    return true;
+  { SubWindowSwt windowSwt = (SubWindowSwt)window;
+    if(atPos ==null){
+      window.setWindowVisible(false); ///
+    } else {
+      GralRectangle rect = calcPositionOfWindow(atPos);
+      windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
+      window.setWindowVisible(true); ///
+    }
+    return windowSwt.window.isVisible();
   }
 
   
