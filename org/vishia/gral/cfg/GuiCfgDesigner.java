@@ -183,7 +183,7 @@ public class GuiCfgDesigner
   }
   
   private GralUserAction actionOk = new GralUserAction()
-  { @Override public void userActionGui(String sIntension, GralWidget widgd, Object... params)
+  { @Override public boolean userActionGui(String sIntension, GralWidget widgd, Object... params)
     { //note widgd is the OK-button!
       if(widgdInDialog !=null){
         String sName = dialogFieldName.getValue();
@@ -221,6 +221,7 @@ public class GuiCfgDesigner
         dialogWindowProps.setWindowVisible(false);
         widgdInDialog = null;
       }
+      return true;
     }
     
   };
@@ -229,12 +230,15 @@ public class GuiCfgDesigner
   
   
   private GralUserAction actionDel = new GralUserAction()
-  { @Override public void userActionGui(String sIntension, GralWidget widgd, Object... params)
+  { @Override public boolean userActionGui(String sIntension, GralWidget widgd, Object... params)
     { //note widgd is the OK-button!
       if(widgdInDialog !=null){
         mng.remove(widgdInDialog);  //remove the widget.
         dialogWindowProps.setWindowVisible(false);
         widgdInDialog = null;
+        return true;
+      } else {
+        return false;
       }
     }
     
@@ -247,9 +251,10 @@ public class GuiCfgDesigner
   
   
   private GralUserAction actionEsc = new GralUserAction()
-  { @Override public void userActionGui(String sIntension, GralWidget widgd, Object... params)
+  { @Override public boolean userActionGui(String sIntension, GralWidget widgd, Object... params)
     { dialogWindowProps.setWindowVisible(false);
       widgdInDialog = null;
+      return true;
     }
     
   };

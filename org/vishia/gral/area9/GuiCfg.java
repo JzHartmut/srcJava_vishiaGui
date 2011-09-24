@@ -303,7 +303,7 @@ private final GralUserAction cmdInvoke = new GralUserAction()
   StringBuilder output = new StringBuilder();
   StringBuilder error = new StringBuilder();
    
-  public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+  public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
   {
     if(sCmd != null){
       output.setLength(0);
@@ -312,13 +312,14 @@ private final GralUserAction cmdInvoke = new GralUserAction()
       stop();
       guiAccess.insertInfo("output", 0, output.toString());
       //gui.executeCmdLine(widgetInfos.sCmd, 0, null, null);
-    }
+      return true;
+    } else return false;
   }
 };
 
 
 protected GralUserAction actionFile = new GralUserAction()
-{ @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
+{ @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
   {
     if(sIntension.equals("save")){
       String sError = null;
@@ -333,6 +334,8 @@ protected GralUserAction actionFile = new GralUserAction()
         console.writeError(sError);
       }
     }
+    return true;
+
   }
   
 };

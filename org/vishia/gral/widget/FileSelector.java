@@ -4,6 +4,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
@@ -144,35 +145,44 @@ public class FileSelector implements Widgetifc
     String sDir = FileSystem.getCanonicalPath(dir);
     String sFileSelected = indexSelection.get(sDir);
     widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sDir);
-    String[] files = dir.list();
-    String[] line = new String[4];
-    selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdClear, -1, null, null);
-    /*
-    if(dir.getParent() !=null){
-      line[0] = "<";
-      line[1] = "..";
-      line[2] = "";
-      line[3] = "";
-      selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, line, dir);
-      
-    }
-    */
-    int lineSelect = 1;
-    int lineCt = 1;
-    if(files !=null) for(String name: files){
-      if(sFileSelected != null && name.equals(sFileSelected)){
-        lineSelect = lineCt;
+    File[] files = dir.listFiles();
+    if(files !=null){ 
+      Map<String, File> sortFiles = new TreeMap<String, File>();
+      for(File file: files){
+        String sort = (file.isDirectory()? "D" : "F") + file.getName();
+        sortFiles.put(sort,file);
       }
-      File file = new File(dir, name);
-      if(file.isDirectory()){ line[0] = "D"; }
-      else { line[0] = "";}
-      line[1] = name;
-      Date timestamp = new Date(file.lastModified());
-      line[3] = dateFormat.format(timestamp);
-      selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, line, file);
-      lineCt +=1;
+      String[] line = new String[4];
+      selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdClear, -1, null, null);
+      /*
+      if(dir.getParent() !=null){
+        line[0] = "<";
+        line[1] = "..";
+        line[2] = "";
+        line[3] = "";
+        selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, line, dir);
+        
+      }
+      */
+      int lineSelect = 0;  
+      int lineCt = 0; //count lines to select the line number with equal sFileSelect.
+      for(Map.Entry<String, File> entry: sortFiles.entrySet()){
+        File file = entry.getValue();
+        String name = file.getName();
+        if(sFileSelected != null && name.equals(sFileSelected)){
+          lineSelect = lineCt;
+        }
+        if(file.isDirectory()){ line[0] = "D"; }
+        else if(file.isHidden()){ line[0] = "x"; }
+        else { line[0] = "";}
+        line[1] = name;
+        Date timestamp = new Date(file.lastModified());
+        line[3] = dateFormat.format(timestamp);
+        selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, line, file);
+        lineCt +=1;
+      }
+      selectList.table.setCurrentCell(lineSelect, 1);
     }
-    selectList.table.setCurrentCell(lineSelect, 1);
   }
   
   

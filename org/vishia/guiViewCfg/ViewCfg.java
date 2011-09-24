@@ -7,10 +7,11 @@ import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GuiMainCmd;
-import org.vishia.gral.gridPanel.GuiDialogZbnfControlled;
 //import org.vishia.gral.gui.GuiDispatchCallbackWorker;
-import org.vishia.gral.ifc.UserActionGui;
-import org.vishia.gral.ifc.WidgetDescriptor;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.mainCmd.MainCmd_ifc;
 
 /**Class contains main, it is able to use for a GUI without any programming in Java.*/
@@ -72,7 +73,7 @@ public class ViewCfg extends GuiCfg
   
   /**This instance helps to create the Dialog Widget as part of the whole window. It is used only in the constructor.
    * Therewith it may be defined stack-locally. But it is better to show and explain if it is access-able at class level. */
-  GuiDialogZbnfControlled dialogZbnfConfigurator;   
+  //GuiDialogZbnfControlled dialogZbnfConfigurator;   
   
   
   
@@ -82,13 +83,14 @@ public class ViewCfg extends GuiCfg
   
   
   
-  private final UserActionGui actionKeyboard = new UserActionGui()
-  { public void userActionGui(String sCmd, WidgetDescriptor widgetInfos, Object... values)
+  private final GralUserAction actionKeyboard = new GralUserAction()
+  { public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     {
   		if(sCmd != null){  
   			//String sCmd1 = "TouchInputPc.exe";
   			mainCmd.executeCmdLine(widgetInfos.sCmd, 0, null, null);
-  		}
+        return true;
+  		} else return false;
     }
   };
   

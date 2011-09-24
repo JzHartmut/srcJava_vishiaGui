@@ -3,6 +3,13 @@ package org.vishia.gral.ifc;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**This class defines a data structure to hold color values in a usual but system-independent form
+ * and defines some standard colors by name.
+ * 
+ *  
+ * @author Hartmut Schorrig
+ *
+ */
 public class GralColor
 {
   /**Values 0..255 for the base colors. */

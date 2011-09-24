@@ -334,14 +334,16 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
 
   
   
-  @Override public GralGridBuild_ifc createCompositeBox()
+  @Override public GralPanelContent createCompositeBox(String name)
   {
     //Composite box = new Composite(graphicFrame, 0);
     Composite box = new Composite((Composite)pos.panel.panelComposite, 0);
     setPosAndSize_(box);
     Point size = box.getSize();
-    GuiPanelMngSwt mng = new GuiPanelMngSwt(gralDevice, size.y, size.x, propertiesGuiSwt, variableContainer, log);
-    return mng;
+    GralPanelContent panel = new PanelSwt(name, box);
+    registerPanel(panel);
+    //GuiPanelMngSwt mng = new GuiPanelMngSwt(gralDevice, size.y, size.x, propertiesGuiSwt, variableContainer, log);
+    return panel;
   }
 
   
@@ -356,9 +358,9 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   
   
   
-  @Override public boolean remove(GralGridBuild_ifc compositeBox)
-  { 
-    ((GuiPanelMngSwt)compositeBox).graphicFrame.dispose();
+  @Override public boolean remove(GralPanelContent compositeBox)
+  { Composite panelSwt = (Composite)compositeBox.panelComposite;
+    panelSwt.dispose();
     return true;
   }
   
@@ -1329,7 +1331,10 @@ public Text addTextBox(GralWidget widgetInfo, boolean editable, String prompt, c
               switch(cmd){
                 case GralPanelMngWorking_ifc.cmdSet:
                 case GralPanelMngWorking_ifc.cmdInsert: 
-                  field.setText((String)info); 
+                  String sInfo = (String)info;
+                  field.setText(sInfo); 
+                  //shows the end of text because the position after last char is selected.
+                  field.setSelection(sInfo.length());  
                   break;
               default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %x on widget %s", cmd, descr.name);
               }
@@ -1596,8 +1601,9 @@ public Text addTextBox(GralWidget widgetInfo, boolean editable, String prompt, c
 		 * The name of the variable is contained in the {@link GralWidget}.
 		 * @see org.vishia.gral.ifc.GralUserAction#userActionGui(java.lang.String, org.vishia.gral.ifc.GralWidget, java.lang.Object[])
 		 */
-		@Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
+		@Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
 		{
+		  
 			Object oWidget = infos.widget;
 			final VariableAccess_ifc variable = infos.getVariableFromContentInfo(variableContainer);
 			final int ixData = infos.getDataIx();
@@ -1611,7 +1617,8 @@ public Text addTextBox(GralWidget widgetInfo, boolean editable, String prompt, c
 					else { sValue = null; }
 				} else throw new IllegalArgumentException("GuiPanelMng.syncVariableOnFocus: unexpected intension on focus: " + sIntension); 
 			} else throw new IllegalArgumentException("GuiPanelMng.syncVariableOnFocus: variable not found: " + infos.getDataPath()); 
-   	}
+      return true;
+		}
 	};
 	
 	

@@ -83,7 +83,7 @@ public class SwitchButtonSwt extends ButtonSwt
 			setUserAction(this);  //set this action primary, it calls the user action.
 		}
   	
-		@Override	public void userActionGui(String sCmd, GralWidget infos, Object... params)
+		@Override	public boolean userActionGui(String sCmd, GralWidget infos, Object... params)
 		{
 			isSwitchedDown = ! isSwitchedDown;
       if(isSwitchedDown){ setBackground(colorPressed); }
@@ -92,7 +92,7 @@ public class SwitchButtonSwt extends ButtonSwt
       if(action != null){
 			  action.userActionGui(sCmd + (isSwitchedDown? "1" : "0"), infos);
 			}
-			
+			return true;
 		}
   }
   

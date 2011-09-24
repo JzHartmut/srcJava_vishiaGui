@@ -45,7 +45,7 @@ public class GuiCommitPanel
   
   private final GralUserAction actionCommit = new GralUserAction()
   { 
-    public void userActionGui(String sCmdGui, GralWidget widgetInfos, Object... values)
+    public boolean userActionGui(String sCmdGui, GralWidget widgetInfos, Object... values)
     {
       File fileCommitText = mainData.mainAction.getContentofCommitText();
       StringBuilder sCmdCommit = new StringBuilder(mainData.cfg.indexCmds.get("commit"));
@@ -62,6 +62,7 @@ public class GuiCommitPanel
       uCommitOut.setLength(0);
       mainData.cmdExec.execWait(sCmdCommit.toString(), null, uCommitOut, uCommitOut);
       stop();
+      return true;
     }
   };
 

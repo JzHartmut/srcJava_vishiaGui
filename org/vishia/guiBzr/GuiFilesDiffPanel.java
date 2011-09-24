@@ -209,8 +209,8 @@ public class GuiFilesDiffPanel
   
   private final GralUserAction actionTableLineFile = new GralUserAction()
   { 
-    public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
-    {
+    public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+    { boolean bDone = true;
       if(sCmd.equals("mark")){
         TableLineGui_ifc line = (TableLineGui_ifc) values[0];
         String isMarked = line.getCellText(columnMark);
@@ -226,23 +226,24 @@ public class GuiFilesDiffPanel
           String sType = line.getCellText(3);
           indexMarkedFiles.put(sFile, line);
         } 
-      }
-      stop();
+      } else { bDone = false; }
+      return bDone;
     }
   };
 
 
   private final GralUserAction actionAdd = new GralUserAction()
   { 
-    public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+    public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     {
+      return true;
     }
   };
   
   
   private final GralUserAction actionRename = new GralUserAction()
   { 
-    public void userActionGui(String sActionCmd, GralWidget widgetInfos, Object... values)
+    public boolean userActionGui(String sActionCmd, GralWidget widgetInfos, Object... values)
     { if(sActionCmd.equals("Button-up")){
         String sFileOld =null, sFileNew =null;
         TableLineGui_ifc lineOld = null, lineNew = null;
@@ -285,6 +286,7 @@ public class GuiFilesDiffPanel
         }
         refreshFiles();
       }
+      return true;
     }
   };
   
@@ -382,10 +384,12 @@ public class GuiFilesDiffPanel
   
   private final GralUserAction actionCommit = new GralUserAction()
   { 
-    public void userActionGui(String sActionCmd, GralWidget widgetInfos, Object... values)
-    { if(sActionCmd.equals("Button-up")){
+    public boolean userActionGui(String sActionCmd, GralWidget widgetInfos, Object... values)
+    { boolean bDone = true;
+      if(sActionCmd.equals("Button-up")){
         commitSelectedFiles();     
       }
+      return bDone;
     }
   };
   
@@ -394,10 +398,12 @@ public class GuiFilesDiffPanel
   
   private final GralUserAction actionRefresh = new GralUserAction()
   { 
-    public void userActionGui(String sActionCmd, GralWidget widgetInfos, Object... values)
-    { if(sActionCmd.equals("Button-up")){
+    public boolean userActionGui(String sActionCmd, GralWidget widgetInfos, Object... values)
+    { boolean bDone = true;
+      if(sActionCmd.equals("Button-up")){
         refreshFiles();
       }
+      return bDone;
     }
   };
   
@@ -405,15 +411,16 @@ public class GuiFilesDiffPanel
   
   private final GralUserAction actionView = new GralUserAction()
   { 
-    public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+    public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     {
+      return true;
     }
   };
   
   
   private final GralUserAction actionViewdiff = new GralUserAction()
   { 
-    public void userActionGui(String sCmdP, GralWidget widgetInfos, Object... values)
+    public boolean userActionGui(String sCmdP, GralWidget widgetInfos, Object... values)
     {
       StringBuilder uCmd = new StringBuilder(200);
       String[] sValue = widgdTableFilesCmpn.getValue().split("\t");
@@ -430,6 +437,7 @@ public class GuiFilesDiffPanel
       mainData.cmdExec.execWait(uCmd.toString(), null, out, out);
       mainData.mainAction.panelOutput.widgdOutputText.setValue(GralPanelMngWorking_ifc.cmdSet, 0, out.toString());
       stop();
+      return true;
     }
   };
   

@@ -620,7 +620,7 @@ public interface GralGridBuild_ifc
    * @return
    * @since 2010-05-01
    */
-  GralGridBuild_ifc createCompositeBox();
+  GralPanelContent createCompositeBox(String name);
   
   
   
@@ -641,7 +641,7 @@ public interface GralGridBuild_ifc
    * @param compositeBox
    * @return true if removed.
    */
-  boolean remove(GralGridBuild_ifc compositeBox);
+  boolean remove(GralPanelContent compositeBox);
   
   boolean remove(GralWidget widget);
   

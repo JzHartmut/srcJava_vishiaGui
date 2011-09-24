@@ -258,7 +258,7 @@ public class JavaCmd extends GuiCfg
    * 
    */
   private GralUserAction actionSetCmdWorkingDir = new GralUserAction() 
-  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
+  { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     { GralWidget widgdFocus = panelMng.getWidgetInFocus();
       FileSelector fileSel = idxFileSelector.get(widgdFocus.name);
       if(fileSel !=null){ //is a FileSelector focused yet?
@@ -273,6 +273,7 @@ public class JavaCmd extends GuiCfg
       if(sIntension.equals("")){
         stop();
       }
+      return true;
     }
     
   };
@@ -312,7 +313,7 @@ public class JavaCmd extends GuiCfg
    * 
    */
   private GralUserAction actionSetCmdCfg = new GralUserAction() 
-  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
+  { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     { selectedFiles = getSelectedFile();
       if(selectedFiles[0] !=null){
         cmdSelector.cmdStore.readCmdCfg(selectedFiles[0]);
@@ -322,6 +323,7 @@ public class JavaCmd extends GuiCfg
       if(sIntension.equals("")){
         stop();
       }
+      return true;
     }
     
   };
@@ -432,8 +434,9 @@ public class JavaCmd extends GuiCfg
    * General keys are [F1] for help, [F4] for edit etc.  
    */
   GralUserAction actionKey = new GralUserAction()
-  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
+  { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     { stop();
+      return true;
     }
   };
   
@@ -444,16 +447,18 @@ public class JavaCmd extends GuiCfg
    * Selection of paths instead are adequate.
    */
   GralUserAction selectPanelLeft = new GralUserAction()
-  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
+  { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     { selectTab.listLeft.setFocus();
+      return true;
     }
   };
   
 
   /**Key alt-F2 to select a directory/cmd list in a list of directories for the middle panel. */
   GralUserAction selectPanelMiddle = new GralUserAction()
-  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
+  { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     { selectTab.listMid.setFocus();
+      return true;
     }
   };
   
@@ -461,8 +466,9 @@ public class JavaCmd extends GuiCfg
   /**Key alt-F3 to select a directory/cmd list in a list of directories for the right panel.
    */
   GralUserAction selectPanelRight = new GralUserAction()
-  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
+  { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     { selectTab.listRight.setFocus();
+      return true;
     }
   };
   
@@ -472,8 +478,9 @@ public class JavaCmd extends GuiCfg
    * This output/text panel is used for content output too. It is always visible. 
    */
   GralUserAction selectPanelOut = new GralUserAction()
-  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
+  { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     { tabCmd.getCurrentPanel().setFocus();
+      return true;
     }
   };
   
@@ -481,7 +488,7 @@ public class JavaCmd extends GuiCfg
   /**Key F4 for edit command. Its like Norton Commander. 
    */
   GralUserAction actionEdit = new GralUserAction()
-  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
+  { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     { CmdStore.CmdBlock cmdBlock = buttonCmds.getCmd("edit");
       if(cmdBlock == null){ mainCmd.writeError("internal problem - don't find 'edit' command. "); }
       else {
@@ -493,7 +500,7 @@ public class JavaCmd extends GuiCfg
         files[2] = getterFiles.getFile3();
         cmdQueue.addCmd(cmdBlock, files);  //to execute.
       }
-      ///
+      return true;
     }
   };
   
@@ -501,7 +508,7 @@ public class JavaCmd extends GuiCfg
   /**Key F5 for copy command. Its like Norton Commander. 
    */
   GralUserAction actionCopy = new GralUserAction()
-  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
+  { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     { selectedFiles = getSelectedFile();  
       getterFiles.prepareFileSelection();
       File[] files = new File[3];
@@ -509,6 +516,7 @@ public class JavaCmd extends GuiCfg
       files[1] = getterFiles.getFile2();
       files[2] = getterFiles.getFile3();
       copyCmd.confirmCopy();
+      return true;
       ///
     }
   };

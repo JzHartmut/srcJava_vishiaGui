@@ -503,7 +503,7 @@ public class OamShowValues
 
 	
 	final GralUserAction actionSetValueTestInInput = new GralUserAction()
-  { public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+  { public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     { 
   		final int[] ixArrayA = new int[1];
   		ByteDataSymbolicAccess.Variable variable = getVariable(widgetInfos.sDataPath, ixArrayA);
@@ -514,6 +514,7 @@ public class OamShowValues
   		variable.bytes.setFloat(variable, -1, 2.5F* value -120);
   		dataValid = true;
   		writeValuesOfTab();  //to show
+  		return true;
     }
   };
 

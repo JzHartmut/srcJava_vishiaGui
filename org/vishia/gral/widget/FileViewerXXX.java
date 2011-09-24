@@ -40,13 +40,14 @@ public class FileViewerXXX
 	private GralUserAction actionFileButton = new GralUserAction(){
 
 		@Override
-		public void userActionGui(String sCmd, GralWidget infos, Object... params)
+		public boolean userActionGui(String sCmd, GralWidget infos, Object... params)
 		{
 		  bActiv = true;
 		  bActivate = true;
 		  shell.wakeShell();
 		  
 			//fileDialog.open();
+      return true;
 			
 		}
 		

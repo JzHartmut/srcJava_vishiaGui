@@ -60,11 +60,11 @@ public class InspcGuiComm
           if(widgd.sFormat.equals("int32AngleDegree")){
             int value = InspcAccessEvaluatorRxTelg.valueIntFromRxValue(info);
             float angle = value * (180.0f/2147483648.0f);
-            sShow = String.format("%3.2f°", angle);
+            sShow = String.format("%3.2fï¿½", angle);
           } else if(widgd.sFormat.equals("int16AngleDegree")){
             int value = InspcAccessEvaluatorRxTelg.valueIntFromRxValue(info);
             float angle = value * (180.0f/32768.0f);
-            sShow = String.format("%3.2f°", angle);
+            sShow = String.format("%3.2fï¿½", angle);
           } else {
             float value = InspcAccessEvaluatorRxTelg.valueFloatFromRxValue(info);
             try{ sShow = String.format(widgd.sFormat, value); }
@@ -295,10 +295,8 @@ public class InspcGuiComm
    * </ul>     
    */
   GralUserAction actionShowTextfield = new GralUserAction()
-  { @Override public void userActionGui(String sIntension, GralWidget widget, Object... params)
-    {
-    
-      String sDataPath = widget.getDataPath() + ".";
+  { @Override public boolean userActionGui(String sIntension, GralWidget widget, Object... params)
+    { String sDataPath = widget.getDataPath() + ".";
       int posSepDevice = sDataPath.indexOf(':');
       if(posSepDevice >0){
         String sDevice = sDataPath.substring(0, posSepDevice);
@@ -337,6 +335,7 @@ public class InspcGuiComm
           inspcAccessor.rxEval.setExpectedOrder(order, commAction);
         } 
       }
+      return true;
     }
     
   };

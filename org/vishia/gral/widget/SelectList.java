@@ -75,7 +75,7 @@ public abstract class SelectList
   private GralUserAction actionTable = new GralUserAction()
   {
 
-    @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
+    @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     {
       TableGui_ifc table = (TableGui_ifc)infos.widget;
       TableLineGui_ifc line = table.getCurrentLine();
@@ -84,6 +84,7 @@ public abstract class SelectList
       else if(sIntension.equals("s-left")){ actionLeft(data, line); }
       else if(sIntension.equals("s-right")){ actionRight(data, line); }
       else { actionUserKey(sIntension, data, line); }
+      return true;
     }
     
   };

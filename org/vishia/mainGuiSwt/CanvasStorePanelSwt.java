@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Widget;
  * @author Hartmut Schorrig
  *
  */
-public class CanvasStorePanelSwt extends GralPanelContent  //CanvasStorePanel //
+public class CanvasStorePanelSwt extends PanelSwt  //CanvasStorePanel //
 {
 	
   protected SwtCanvas swtCanvas;

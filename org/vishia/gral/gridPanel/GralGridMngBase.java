@@ -246,6 +246,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
     , int origin, char direction)
   {
       pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
+      posUsed = false;
   }
   
   @Override public void setFinePosition(int line, int yPosFrac, int ye, int yef
@@ -515,7 +516,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
 	GralUserAction actionShowWidgetInfos = new GralUserAction()
 	{
 
-		@Override public void userActionGui(
+		@Override public boolean userActionGui(
 			String sCmd
 		, GralWidget infos, Object... params
 		)
@@ -524,9 +525,11 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
 				log.sendMsg(Report.info, "widget %s, datapath=%s"
 					, GralGridMngBase.this.lastClickedWidgetInfo.name
 					, GralGridMngBase.this.lastClickedWidgetInfo.getDataPath());
+	      return true;
 			} else {
 				log.sendMsg(0, "widgetInfo - no widget selected");
 			}
+      return false;
 		}
 		
 	};
@@ -597,7 +600,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   
   
   GralUserAction actionFileSelect = new GralUserAction()
-  { @Override public void userActionGui(String sIntension, GralWidget infos, Object... params)
+  { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     {
       FileSelectInfo fileSelectInfo = (FileSelectInfo)infos.getContentInfo();
       if(fileSelectInfo.listRecentFiles !=null){
@@ -610,6 +613,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
           fileSelectInfo.dstWidgd.setValue(cmdSet, 0, fileSelect);
         }
       }
+      return true;
       
     }
     

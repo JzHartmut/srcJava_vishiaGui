@@ -37,7 +37,10 @@ public class SubWindowSwt extends GralSubWindow
   @Override public void setWindowVisible(boolean visible)
   { 
     window.setVisible(visible);
-    if(visible){ window.setFocus(); }
+    if(visible){ 
+      window.setFocus();
+      window.setActive();
+    }
   }
 
   @Override

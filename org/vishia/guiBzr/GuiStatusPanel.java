@@ -2,6 +2,8 @@ package org.vishia.guiBzr;
 
 import java.io.File;
 
+import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
@@ -22,11 +24,11 @@ public class GuiStatusPanel
   
   private static class SelectInfoBoxWidgds
   {
-    final GralGridBuild_ifc box;
+    final GralPanelContent box;
     final DataCmpn data;
     GralWidget widgdTextRevision, widgdTextStatus;
     
-    SelectInfoBoxWidgds(GralGridBuild_ifc box, DataCmpn data)
+    SelectInfoBoxWidgds(GralPanelContent box, DataCmpn data)
     { this.box = box; this.data = data; }
     
   }
@@ -46,7 +48,7 @@ public class GuiStatusPanel
   
   
   /**A Panel which contains the table to select some projectPaths. */
-  private GuiShellMngBuildIfc selectorProjectPath;
+  private GralSubWindow selectorProjectPath;
   
   /**The table (list) which contains the selectable project paths. */
   private GralWidget selectorProjectPathTable;
@@ -54,7 +56,7 @@ public class GuiStatusPanel
   
   /**Any component has its PanelManager. It is one line with some widgets.
    */
-  private GralGridBuild_ifc[] bzrComponentBox = new GralGridBuild_ifc[100]; 
+  private GralPanelContent[] bzrComponentBox = new GralPanelContent[100]; 
 
   private GralWindow_ifc testDialogBox;
 
@@ -99,13 +101,13 @@ public class GuiStatusPanel
     //testDialogBox = new InfoBox(mainData.guifc.getitsGraphicFrame(), "Title", lines, true);
 
     panelBuildifc.setPositionSize(yposProjectPath, xposProjectPath, 20, 60, 'r');
-    selectorProjectPath = panelBuildifc.createWindowOld(null, false);
+    selectorProjectPath = panelBuildifc.createWindow(null, false);
     int[] columnWidths = {40, 10};
-    selectorProjectPath.setPositionSize(0, 0, 10, 60, 'd');
-    selectorProjectPathTable = selectorProjectPath.addTable("selectProjectPath", 20, columnWidths);
+    panelBuildifc.setPositionSize(0, 0, 10, 60, 'd');
+    selectorProjectPathTable = panelBuildifc.addTable("selectProjectPath", 20, columnWidths);
     selectorProjectPathTable.setActionChange(actionSelectorProjectPathTable);
-    selectorProjectPath.setPositionSize(20, 0, -3, 10, 'r');
-    selectorProjectPath.addButton("closeProjectBzrComponents", actionCloseProjectBzrComponents, "","","","ok");
+    panelBuildifc.setPositionSize(20, 0, -3, 10, 'r');
+    panelBuildifc.addButton("closeProjectBzrComponents", actionCloseProjectBzrComponents, "","","","ok");
     String sPrjPath = null;
     for(String sPrjPath1: mainData.cfg.listSwPrjs){
       if(sPrjPath ==null){ sPrjPath = sPrjPath1; } //The first is offered.
@@ -129,7 +131,7 @@ public class GuiStatusPanel
     if(bzrComponentBox !=null){
       panelBuildifc.selectPanel("Select");
       for(int ii=0; ii< bzrComponentBox.length; ++ii){
-        GralGridBuild_ifc item = bzrComponentBox[ii]; 
+        GralPanelContent item = bzrComponentBox[ii]; 
         if(item !=null){ 
           bzrComponentBox[ii] = null;
           panelBuildifc.remove(item); 
@@ -169,64 +171,66 @@ public class GuiStatusPanel
     }
     DataCmpn data = mainData.currPrj.data[iComponent]; 
     String sName = data.getBzrLocationDir().getName();
+    String sNamePanel = "BzrStatusSelect-"+sName;
     panelBuildifc.selectPanel("Select");
     panelBuildifc.setPositionSize(yPosComponents, 1, 2, 70, 'r');
-    GralGridBuild_ifc box;
-    bzrComponentBox[iComponent] = box = panelBuildifc.createCompositeBox();
+    GralPanelContent box;
+    bzrComponentBox[iComponent] = box = panelBuildifc.createCompositeBox(sNamePanel);
     SelectInfoBoxWidgds widgds = new SelectInfoBoxWidgds(box,data);
-    box.selectPanel("$");
-    box.setPositionSize(0, 0, 2, 2, 'r');
+    panelBuildifc.selectPanel(sNamePanel);
+    panelBuildifc.setPositionSize(0, 0, 2, 2, 'r');
     if(switchButtons[iComponent] !=null){
       switchExcluder.remove(switchButtons[iComponent]);
     }
-    GralWidget widgdButton = box.addSwitchButton("selectMain", actionSelectCmpn, "", null, data.sNameCmpn, "", "wh", "rd");
+    GralWidget widgdButton = panelBuildifc.addSwitchButton("selectMain", actionSelectCmpn, "", null, data.sNameCmpn, "", "wh", "rd");
     switchExcluder.add(widgdButton);
     widgdButton.setContentInfo(widgds);
     switchButtons[iComponent] = widgdButton;
-    box.setPositionSize(0, 6, 2, 15, 'r');
-    box.addText(sName, 'B', 0);
-    widgds.widgdTextRevision = box.addText("Rev. unknown", 'B', 0x808080);
-    widgds.widgdTextStatus = box.addText("- select it", 'B', 0x808080);
+    panelBuildifc.setPositionSize(0, 6, 2, 15, 'r');
+    panelBuildifc.addText(sName, 'B', 0);
+    widgds.widgdTextRevision = panelBuildifc.addText("Rev. unknown", 'B', 0x808080);
+    widgds.widgdTextStatus = panelBuildifc.addText("- select it", 'B', 0x808080);
     
   }
   
   
   private void setInfoWidgetsInSelectBox(SelectInfoBoxWidgds widgds)
   {
-    widgds.box.remove(widgds.widgdTextRevision);
-    widgds.box.remove(widgds.widgdTextStatus);
-    widgds.box.selectPanel("$");
-    widgds.box.setPositionSize(0, 21, 2, 15, 'r');
+    panelBuildifc.selectPanel(widgds.box.namePanel);
+    panelBuildifc.remove(widgds.widgdTextRevision);
+    panelBuildifc.remove(widgds.widgdTextStatus);
+    panelBuildifc.setPositionSize(0, 21, 2, 15, 'r');
     String sRev = "Rev. ";
     if(widgds.data.nrTopRev == widgds.data.nrSboxRev){
       sRev = "Rev. " + widgds.data.nrSboxRev + " uptodate ";
     } else {
       sRev = "Rev. " + widgds.data.nrSboxRev + " / "+ widgds.data.nrTopRev;
     }
-    widgds.widgdTextRevision = widgds.box.addText(sRev, 'B', 0x0);
+    widgds.widgdTextRevision = panelBuildifc.addText(sRev, 'B', 0x0);
     String sBzrStatus = widgds.data.uBzrStatusOutput.toString();
     boolean isModified = sBzrStatus.indexOf("modified:") >=0;
     boolean hasNew = sBzrStatus.indexOf("non-versioned:") >=0;
     if(isModified){
       //bzrComponentBox[iComponent].setPosition(0, 40, 2, 10, 'r');
-      widgds.widgdTextStatus = widgds.box.addText("- modified", 'B', 0xff0000);
+      widgds.widgdTextStatus = panelBuildifc.addText("- modified", 'B', 0xff0000);
     } else if(hasNew){
       //bzrComponentBox[iComponent].setPosition(0, 40, 2, 10, 'r');
-      widgds.widgdTextStatus = widgds.box.addText("- new Files", 'B', 0xff0000);
+      widgds.widgdTextStatus = panelBuildifc.addText("- new Files", 'B', 0xff0000);
     } else {
-      widgds.widgdTextStatus = widgds.box.addText("- no changes", 'B', 0x00ff00);
+      widgds.widgdTextStatus = panelBuildifc.addText("- no changes", 'B', 0x00ff00);
     }
-    widgds.box.repaint();
+    panelBuildifc.repaint();
   }
   
   
   
   private final GralUserAction selectProjectPath = new GralUserAction()
   { 
-    public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+    public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     {
       //testDialogBox.open();
       selectorProjectPath.setWindowVisible(true);
+      return true;
     }
   };
   
@@ -239,7 +243,7 @@ public class GuiStatusPanel
    */
   private final GralUserAction actionSelectorProjectPathTable = new GralUserAction()
   { 
-    public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+    public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     {
       if(sCmd.equals("ok")){
         String sPath = (String)values[0];
@@ -247,23 +251,26 @@ public class GuiStatusPanel
         buildComponentsInfoSelectBoxes();
       }
       selectorProjectPath.setWindowVisible(false);
+      return true;
     }
   };
   
   
   private final GralUserAction actionCloseProjectBzrComponents = new GralUserAction()
   { 
-    public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+    public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     {
       selectorProjectPath.setWindowVisible(false);
+      return true;
     }
   };
 
   
   private final GralUserAction refreshProjectBzrComponents = new GralUserAction()
   { 
-    public void userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+    public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     { buildComponentsInfoSelectBoxes();
+      return true;
     }
   };
 
@@ -271,7 +278,7 @@ public class GuiStatusPanel
   
   private final GralUserAction actionSelectCmpn = new GralUserAction()
   { 
-    public void userActionGui(String sCmd, GralWidget widgd, Object... values)
+    public boolean userActionGui(String sCmd, GralWidget widgd, Object... values)
     {
       mainData.currCmpn = mainData.currPrj.selectComponent(widgd.sDataPath);
       //
@@ -291,6 +298,7 @@ public class GuiStatusPanel
       
       //call the exclusion of the other button:
       switchExcluder.switchAction.userActionGui(sCmd, widgd, values);
+      return true;
     }
   };
   
