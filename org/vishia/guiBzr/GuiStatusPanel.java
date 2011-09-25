@@ -5,13 +5,12 @@ import java.io.File;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
-import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.SwitchExclusiveButtonMng;
-import org.vishia.mainGuiSwt.InfoBox;
+import org.vishia.mainGuiSwt.DeprecatedInfoBoxSwt;
 import org.vishia.util.FileSystem;
 
 /**This class contains all data and methods of the status (select) panel.
@@ -97,7 +96,7 @@ public class GuiStatusPanel
 
     String[] lines = {"1", "2"};
     
-    testDialogBox = panelBuildifc.createInfoBox( "Title", lines, true);
+    //testDialogBox = panelBuildifc.createInfoBox( "Title", lines, true);
     //testDialogBox = new InfoBox(mainData.guifc.getitsGraphicFrame(), "Title", lines, true);
 
     panelBuildifc.setPositionSize(yposProjectPath, xposProjectPath, 20, 60, 'r');

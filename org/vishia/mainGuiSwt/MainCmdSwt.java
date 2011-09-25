@@ -245,7 +245,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
       for(String line: mainCmd.listHelpInfo){
         sHelpText[ix++] = line;
       }
-      InfoBox helpDlg = new InfoBox(swtWindow.graphicFrame, "Help", sHelpText, false);//main.writeInfoln("action!");
+      DeprecatedInfoBoxSwt helpDlg = new DeprecatedInfoBoxSwt(swtWindow.graphicFrame, "Help", sHelpText, false);//main.writeInfoln("action!");
       helpDlg.open();
       helpDlg.setVisible(true);
       stop();
@@ -270,7 +270,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
       for(String line: mainCmd.listAboutInfo){
         sText[ix++] = line;
       }
-      InfoBox aboutDlg = new InfoBox(swtWindow.graphicFrame, "...about", sText, false);//main.writeInfoln("action!");
+      DeprecatedInfoBoxSwt aboutDlg = new DeprecatedInfoBoxSwt(swtWindow.graphicFrame, "...about", sText, false);//main.writeInfoln("action!");
       
       aboutDlg.setVisible(true);
       stop();

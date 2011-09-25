@@ -4,24 +4,22 @@ import java.io.IOException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.Widgetifc;
 import org.vishia.gral.widget.TextBoxGuifc;
 
 public class TextPanelSwt extends GralPanelContent implements TextBoxGuifc, Appendable
 {
   
-  WidgetsSwt.TextBoxSwt textAreaOutput;
+  TextBoxSwt textAreaOutput;
   
   TextPanelSwt(String namePanel, Shell shell, int style)
   { super(namePanel);
     Display device = shell.getDisplay();
     //Composite panel = (Composite) panelComposite;
-    textAreaOutput = new WidgetsSwt.TextBoxSwt(shell, style);
+    textAreaOutput = new TextBoxSwt(shell, style);
     textAreaOutput.text.setFont(new Font(device, "Monospaced",11, SWT.NORMAL));
     panelComposite = textAreaOutput.text;  //it is a control,    
   }

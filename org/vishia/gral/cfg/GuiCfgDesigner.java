@@ -2,7 +2,6 @@ package org.vishia.gral.cfg;
 
 import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.gridPanel.GralGridMngBase;
-import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralRectangle;

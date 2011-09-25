@@ -69,7 +69,6 @@ import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.cfg.GuiCfgBuilder;
 import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
-import org.vishia.gral.gridPanel.GuiShellMngBuildIfc;
 import org.vishia.gral.gridPanel.GralGridProperties;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
@@ -79,7 +78,6 @@ import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralImageBase;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralRectangle;
-import org.vishia.gral.ifc.GuiShellMngIfc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
@@ -377,66 +375,6 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
 
   
   
-	/**Creates a new window additional to a given window with Panel Manager.
-	 * @param left
-	 * @param top
-	 * @param width
-	 * @param height
-	 * @return
-	 */
-	public GuiShellMngBuildIfc createWindow(int line, int column, int dy, int dx, VariableContainer_ifc variableContainer
-  	)
-	{
-		//Display display = new Display();
-		Shell shell = new Shell(graphicFrame.getDisplay());
-		//TODO
-		//Shell shell = (Shell)graphicFrame; //new Shell(display);
-		setPosAndSize_(shell);
-		//shell.setBounds(left,top, width, height);
-		shell.setText("SHELL");
-		GuiShellMngBuildIfc mng = new GuiShellMngSwt(gralDevice, shell, this, 0, 0, propertiesGuiSwt, variableContainer, log);
-		//mng.setWindowVisible(true);
-		
-		return mng;
-
-	}
-  
-  
-  
-  
-	/**Creates a new window additional to a given window with Panel Manager.
-	 * @param left
-	 * @param top
-	 * @param width
-	 * @param height
-	 * @return
-	 */
-  public GuiShellMngBuildIfc createWindowOld(String title, boolean exclusive)
-  {
-    //Display display = new Display();
-    int props = 0;
-    if(exclusive){ props |= SWT.PRIMARY_MODAL; }
-    if(title !=null){ props |= SWT.TITLE; }
-    Shell shell = new Shell(graphicFrame.getShell(), props);
-    
-    //TODO
-    //Shell shell = (Shell)graphicFrame; //new Shell(display);
-    //setPosAndSize_(shell); //, line,0, column,0, dy,0, dx,0);
-    //shell.setBounds(left,top, width, height);
-    
-    GralRectangle size = calcWidgetPosAndSize(pos, 600, 800, 800, 600);
-    Rectangle rectShell = graphicFrame.getBounds();
-    Rectangle rectPanel = ((Composite)pos.panel.panelComposite).getBounds();
-    shell.setBounds(size.x + rectShell.x + rectPanel.x, size.y + rectShell.y + rectPanel.y, size.dx, size.dy);    
-    
-    
-    if(title !=null){ shell.setText(title); }
-    GuiShellMngBuildIfc mng = new GuiShellMngSwt(gralDevice, shell, this, 0, 0, propertiesGuiSwt, variableContainer, log);
-    //mng.setWindowVisible(true);
-    
-    return mng;
-
-  }
   
   public GralSubWindow createWindow(String title, boolean exclusive)
   {
@@ -1622,9 +1560,9 @@ public Text addTextBox(GralWidget widgetInfo, boolean editable, String prompt, c
 	};
 	
 	
-  @Override public GralWindow_ifc createInfoBox(String title, String[] lines, boolean todo)
+  public GralWindow_ifc XXXcreateInfoBox(String title, String[] lines, boolean todo)
   {
-    return new InfoBox(graphicFrame.getShell(), title, lines, todo);
+    return new DeprecatedInfoBoxSwt(graphicFrame.getShell(), title, lines, todo);
   }
 
   
@@ -1664,15 +1602,6 @@ public Text addTextBox(GralWidget widgetInfo, boolean editable, String prompt, c
 
 
 	void stop(){}  //debug helper
-
-	@Override
-	public GuiShellMngIfc getShellMngIfc()
-	{ if(this instanceof GuiShellMngIfc){
-		  return (GuiShellMngIfc)this;
-	  } else {
-	  	throw new IllegalStateException("The panel isn't a Window.");
-	  }
-	}
 
 
 }

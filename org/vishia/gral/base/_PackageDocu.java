@@ -7,5 +7,5 @@ package org.vishia.gral.base;
  */
 public class _PackageDocu
 {
-  
+  public final static int version = 0x20110925;
 }

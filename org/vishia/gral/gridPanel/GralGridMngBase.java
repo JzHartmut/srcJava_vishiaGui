@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralPrimaryWindow;
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.cfg.GuiCfgBuilder;
@@ -30,6 +31,7 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.widget.InfoBox;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
 
@@ -649,6 +651,12 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   { designer.pressedRightMouseDownForDesign(widgd, xy);
   }
   
+  
+  @Override public InfoBox createInfoBox(String name, String title)
+  {
+    return InfoBox.create(this, name, title);
+  }
+
   
   
   void stop(){}

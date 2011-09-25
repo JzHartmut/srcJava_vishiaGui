@@ -19,10 +19,11 @@ import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
-import org.vishia.gral.ifc.GuiShellMngIfc;
+//import org.vishia.gral.ifc.GuiShellMngIfc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.widget.InfoBox;
 
 
 
@@ -654,7 +655,7 @@ public interface GralGridBuild_ifc
 	 * @return
 	 * @deprecated
 	 */
-	GuiShellMngBuildIfc createWindow(int left, int top, int width, int height, VariableContainer_ifc variableContainer);
+	//GuiShellMngBuildIfc createWindow(int left, int top, int width, int height, VariableContainer_ifc variableContainer);
 	
 	/**Creates a Window for a modal or non modal dialog. The window is described by the returned interface. 
 	 * It can be filled with elements. The dialog is able to show and hide calling 
@@ -669,11 +670,11 @@ public interface GralGridBuild_ifc
 	GralSubWindow createWindow(String title, boolean exclusive);
   
 	
-	GuiShellMngBuildIfc createWindowOld(String title, boolean exclusive);
+	//GuiShellMngBuildIfc createWindowOld(String title, boolean exclusive);
 	
 	
 	
-  GralWindow_ifc createInfoBox(String title, String[] lines, boolean todo);
+  InfoBox createInfoBox(String name, String title);
 
   /**Sets the builder for content configuration.
    * @param cfgBuilder
@@ -697,6 +698,6 @@ public interface GralGridBuild_ifc
    */
 	GralFileDialog_ifc createFileDialog();
 	
-	GuiShellMngIfc getShellMngIfc();
+	//GuiShellMngIfc getShellMngIfc();
 
 }

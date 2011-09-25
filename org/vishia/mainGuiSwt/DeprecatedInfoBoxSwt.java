@@ -17,7 +17,7 @@ import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
  * <br><br>
  * TODO: The user should be set non-modal per mouse-click if it is opened modal. 
  */
-public class InfoBox extends Composite implements GralWindow_ifc
+public class DeprecatedInfoBoxSwt extends Composite implements GralWindow_ifc
 {
 
   private static final long serialVersionUID = 392806902552552727L;
@@ -33,7 +33,7 @@ public class InfoBox extends Composite implements GralWindow_ifc
    *        The font used is the text standard font for the selected size, see {@link PropertiesGuiSwt}.
    * @param modal true than the window should be closed to force further working on the parent window.
    */
-  public InfoBox (Shell parent, String sTitle, String[] textLines, boolean modal) {
+  public DeprecatedInfoBoxSwt (Shell parent, String sTitle, String[] textLines, boolean modal) {
     super (parent, 0);
     this.parentShell = parent;
     this.sTitle = sTitle;
@@ -76,7 +76,7 @@ public class InfoBox extends Composite implements GralWindow_ifc
   
   static Composite showInfo(Shell frame, String sTitle, String[] textLines, boolean modal)
   {
-  	InfoBox dlg = new InfoBox(frame, sTitle, textLines, modal);//main.writeInfoln("action!");
+  	DeprecatedInfoBoxSwt dlg = new DeprecatedInfoBoxSwt(frame, sTitle, textLines, modal);//main.writeInfoln("action!");
     dlg.open();
     dlg.setVisible(true);
     return dlg;  
