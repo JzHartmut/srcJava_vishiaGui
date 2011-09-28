@@ -56,27 +56,6 @@ public class GuiCfgDesigner
     assert(dialogWindowProps == null); //check call only one time.
     mng.setPositionSize(2, 60, 30, 40, 'r');
     dialogWindowProps = mng.createWindow("Widget Properties", false);
-    /*
-    dialogWindowProps.setPositionSize(0, 0, 3, 34, 'd');
-    dialogFieldName = dialogWindowProps.addTextField("name", true, "name", 't');
-    dialogFieldDatapath = dialogWindowProps.addTextField("dataPath", true, "data", 't');
-    dialogFieldText = dialogWindowProps.addTextField("text", true, "text", 't');
-    dialogFieldFormat = dialogWindowProps.addTextField("format", true, "format", 't');
-    dialogFieldShow = dialogWindowProps.addTextField("show", true, "show method", 't');
-    dialogFieldAction = dialogWindowProps.addTextField("action", true, "action method", 't');
-    dialogWindowProps.setPositionSize(19, 2, 3, 5, 'r');
-    dialogFieldLine = dialogWindowProps.addTextField("line", true, "pos-y", 't');
-    //dialogWindowProps.addText(", ", 'B', 0);
-    dialogFieldColumn = dialogWindowProps.addTextField("column", true, "pos-x", 't');
-    //dialogWindowProps.addText("   ", 'B', 0);
-    dialogFieldHeight = dialogWindowProps.addTextField("height", true, "size-y", 't');
-    //dialogWindowProps.addText(" x ", 'B', 0);
-    dialogFieldWidth = dialogWindowProps.addTextField("width", true, "size-x", 't');
-    dialogWindowProps.setPositionSize(23, 2, 3, 8, 'r');
-    dialogButtonEsc = dialogWindowProps.addButton("esc", actionEsc, null, null, null, "esc");
-    dialogButtonOk = dialogWindowProps.addButton("del", actionDel, null, null, null, "del");
-    dialogButtonOk = dialogWindowProps.addButton("OK", actionOk, null, null, null, "OK");
-    */
     mng.setPositionSize(0, 0, 3, 34, 'd');
     dialogFieldName = mng.addTextField("name", true, "name", 't');
     dialogFieldDatapath = mng.addTextField("dataPath", true, "data", 't');

@@ -30,6 +30,7 @@ import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.ifc.GralWidgetChangeRequ;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.InfoBox;
 import org.vishia.mainCmd.Report;
@@ -55,6 +56,13 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
 {
   /**Changes:
    * <ul>
+   * <li>2011-09-29 Hartmut chg: {@link #calcWidgetPosAndSize(GralGridPos, int, int, int, int)}: calculates dy and dx one pixel less.
+   *                             In result a fine space between fields is shown.
+   * <li>2011-09-23 Hartmut chg: All implementation routines for positioning are moved to the class {@link GralGridPos}. This class contains only wrappers now.
+   * <li>2011-09-18 Hartmut chg: Inner static class GuiChangeReq now stored in an own class {@link GralWidgetChangeRequ}.
+   * <li>2011-09-18 Hartmut new: : {@link GralGridPos#setFinePosition(int, int, int, int, int, int, int, int, int, char, GralGridPos)} calculates from right or bottom with negative values.                            
+   * <li>2011-09-10 Hartmut chg: Renaming this class, old name was GuiMngBase.                             
+   * <li>2011-09-10 Hartmut chg: Some routines form SWT implementation moved to this base class. It doesn't depends on the underlying graphic base.                            
    * <li>2011-08-13 Hartmut chg: New routines for store and calculate the position to regard large widgets.
    * </ul>
    */
@@ -572,7 +580,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
       y2 = yPixelUnit * posWidget.yEnd + propertiesGui.yPixelFrac(posWidget.yEndFrac)  //negative if from right
          + (posWidget.yEnd < 0  || posWidget.yEnd == 0 && posWidget.yEndFrac == 0 ? heightParentPixel : 0);  //from right
     }
-    GralRectangle rectangle = new GralRectangle(x1, y1, x2-x1, y2-y1);
+    GralRectangle rectangle = new GralRectangle(x1, y1, x2-x1-1, y2-y1-1);
     return rectangle;
   }
   

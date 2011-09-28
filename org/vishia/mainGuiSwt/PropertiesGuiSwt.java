@@ -44,7 +44,7 @@ public class PropertiesGuiSwt extends GralGridProperties
     this.colorGrid = colorSwt(0xe0e0e0);
     this.colorGridStrong = colorSwt(0xc0c0c0);
     this.colorBackground = colorSwt(colorBackground_);
-    this.smallPromptFont = new Font(device, "Arial", smallPromptFontSize[size], SWT.ITALIC);
+    this.smallPromptFont = new Font(device, "Arial", smallPromptFontSize[size], SWT.NORMAL);
     this.stdInputFont = new Font(device, "Arial", stdInputFontSize[size], SWT.NORMAL);
     this.stdButtonFont = new Font(device, "Arial", stdButtonFontSize[size], SWT.NORMAL);
     this.textFont[0] = new Font(device, "Arial", stdTextFontSize[0][size], SWT.NORMAL);

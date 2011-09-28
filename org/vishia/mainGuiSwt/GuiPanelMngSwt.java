@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Slider;
@@ -670,6 +671,10 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     if(editable)
     	stop();
     widget.setBackground(propertiesGuiSwt.colorSwt(0xFFFFFF));
+    Listener[] oldMouseListener = widget.getListeners(SWT.MouseDown);
+    for(Listener lst: oldMouseListener){
+      widget.removeListener(SWT.MouseDown, lst);
+    }
     widget.addMouseListener(mouseClickForInfo);
     int x =-1, y=-1; 
     if(x >=0 && y >=0){
@@ -678,43 +683,41 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     	//widget.setSize(xIncr * propertiesGui.xPixelUnit()-1, 2* propertiesGui.yPixelUnit()-1);
     }
     //
-    setPosAndSize_(widget);
     if(prompt != null && promptStylePosition == 't'){
-    	final int yPixelField;
-      final Font promptFont;
-      char sizeFontPrompt;
-      int ySize = (int)(pos.height());
-      switch(ySize){
-    	case 3:  promptFont = propertiesGuiSwt.smallPromptFont;
-    	         yPixelField = propertiesGui.yPixelUnit() * 2 -3;
-    	         break;
-    	case 2:  promptFont = propertiesGuiSwt.smallPromptFont;
-               yPixelField = (int)(1.5F * propertiesGui.yPixelUnit());
-               break;
-    	default: promptFont = propertiesGuiSwt.smallPromptFont;
-    	         yPixelField = propertiesGui.yPixelUnit() * 2 -3;
-    	}//switch
-      Rectangle boundsField = widget.getBounds();
-      Rectangle boundsPrompt = new Rectangle(boundsField.x, boundsField.y-3  //occupy part of field above, only above the normal letters
-      	, boundsField.width, boundsField.height );
-      
-      if(promptStylePosition == 't'){	
-      	boundsPrompt.height -= (yPixelField -4);
-      	boundsPrompt.y -= 1;
-      	
-      	boundsField.y += (boundsField.height - yPixelField );
-      	boundsField.height = yPixelField;
+      if(posUsed){
+        setNextPosition();
       }
+    	final Font promptFont;
+      char sizeFontPrompt;
+      GralRectangle boundsAll, boundsPrompt, boundsField;
+      final GralGridPos posPrompt = new GralGridPos(), posField = new GralGridPos();
+      boundsAll = calcWidgetPosAndSize(this.pos, 800, 600, 100, 20);
+      float ySize = pos.height();
+      //float xSize = pos.width();
+      switch(promptStylePosition){
+        case 't':{
+          posPrompt.setPosition(this.pos, GralGridPos.same, ySize * 0.37f + GralGridPos.size, 0, 0, 0, '.');
+          posField.setPosition(this.pos, -ySize * 0.63f + GralGridPos.refer, GralGridPos.same, 0, 0, 0, '.');
+        } break;
+      }
+      promptFont = propertiesGuiSwt.smallPromptFont;
+      boundsPrompt = calcWidgetPosAndSize(posPrompt, boundsAll.dx, boundsAll.dy, 10,100);
+      boundsField = calcWidgetPosAndSize(posField, boundsAll.dx, boundsAll.dy, 10,100);
       Label wgPrompt = new Label((Composite)pos.panel.panelComposite, 0);
       wgPrompt.setFont(promptFont);
       wgPrompt.setText(prompt);
       Point promptSize = wgPrompt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-    	if(promptSize.x > boundsPrompt.width){
-    		boundsPrompt.width = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
-    	}
-      widget.setBounds(boundsField);
-      wgPrompt.setBounds(boundsPrompt);
-    } 
+      if(promptSize.x > boundsPrompt.dx){
+        boundsPrompt.dx = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
+      }
+      wgPrompt.setBounds(boundsPrompt.x, boundsPrompt.y, boundsPrompt.dx, boundsPrompt.dy+1);
+      widget.setBounds(boundsField.x, boundsField.y, boundsField.dx, boundsField.dy);
+      posUsed = true;
+      
+    } else {
+      //without prompt
+      setPosAndSize_(widget);
+    }
     //
     if(widgetInfo.name !=null && widgetInfo.name.charAt(0) == '$'){
     	widgetInfo.name = sCurrPanel + widgetInfo.name.substring(1);

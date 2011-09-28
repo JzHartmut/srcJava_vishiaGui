@@ -279,8 +279,8 @@ public class GralGridPos implements Cloneable
   
   public float height()
   { float height;
-    if(y > 0 && yEnd > 0){ height = yEnd - y + (yEndFrac - yFrac) * 0.1F; }
-    else if(y < 0 && yEnd < 0){ height = yEnd - y + (yEndFrac - yFrac) * 0.1F; }
+    if(y >= 0 && yEnd > 0){ height = yEnd - y + (yEndFrac - yFrac) * 0.1F; }
+    else if(y < 0 && yEnd <= 0){ height = yEnd - y + (yEndFrac - yFrac) * 0.1F; }
     else { height = 2.0F; } //not able to determine, use default.
     return height;
   }
@@ -335,7 +335,15 @@ public class GralGridPos implements Cloneable
         ){
         //related value to frame or previous position
         qParamDesg |= mBitRel;
+        //add parent position:
         z -= same;
+        //NOTE: q, qe will be set after ze is checked.
+        if(z >=0){
+          z += p;
+        } else {
+          z = pe + z;  //negative: refer from end.  
+        }
+        zf += pf;  //frac part always positive.
       } else if( z == next || z == nextBlock){
         if(this.pDir == 1){
           z = p + pSize;

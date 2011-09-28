@@ -8,7 +8,7 @@ import org.vishia.gral.ifc.GralColor;
 
 public class GralGridProperties
 {
-  protected final static int[] smallPromptFontSize = {5,6,8,9,11,12};
+  protected final static int[] smallPromptFontSize = {5,5,6,6,7,8};  //{5,6,8,9,11,12};
   protected final static int[] stdInputFontSize =    {9,10,11,12,14,18};
   protected final static int[] stdButtonFontSize =   {10,11,12,14,16,20};
   
