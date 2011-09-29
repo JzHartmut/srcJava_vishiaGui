@@ -49,7 +49,9 @@ public class JavaCmd extends GuiCfg
   
   private final CommandSelector cmdSelector = new CommandSelector(cmdQueue);
   
-  private final CopyCmd copyCmd = new CopyCmd(this);
+  final CopyCmd copyCmd = new CopyCmd(this);
+  
+  private final JavaCmdKeyActions keyActions = new JavaCmdKeyActions(this);
   
   private File[] selectedFiles;
 
@@ -73,6 +75,8 @@ public class JavaCmd extends GuiCfg
    */
   @Override protected void initGuiAreas()
   {
+    panelBuildIfc.registerUserAction("KeyAction", keyActions.commanderKeyActions);  //all key actions, registered central
+    
     gui.setFrameAreaBorders(30, 65, 70, 85);  //x1, x2, y1, y2
     gui.setStandardMenusGThread(new File("."), actionFile);
     gui.addMenuItemGThread("&Command/Set&WorkingDir", actionSetCmdWorkingDir); ///

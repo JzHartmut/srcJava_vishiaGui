@@ -373,7 +373,7 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
     for(ii=0; ii<names.length-1; ++ii){
       String name = names[ii];
       final char cAccelerator;
-      final int posAccelerator = name.indexOf('&');
+      final int posAccelerator = name.indexOf('?');
       if(posAccelerator >=0){
         cAccelerator = Character.toUpperCase(name.charAt(posAccelerator));
         name = name.replace("&", "");

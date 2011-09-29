@@ -13,6 +13,16 @@ import org.vishia.msgDispatch.LogMessage;
 public class GuiCfgDesigner
 {
   
+  /**The version.
+   * <ul>
+   * <li>2011-09-30 Hartmut chg: rename pressedRightMouseDownForDesign(...) to {@link #editFieldProperties(GralWidget, GralRectangle)}.
+   *     because it isn't called as mouse action.
+   * <li>2011-09-23 Hartmut corr: Use the new windows concept with {@link GralSubWindow}.
+   * <li>2011-07-07 Hartmut new: Improve dialog, edit all fields of the {@link GralWidget} inclusive positions.
+   * <li>2011-05-24 Created. The configuration of fields of a GUI are edit-able now in the GUI itself without any other tool.
+   * </ul>
+   */
+  public final int version = 0x20110930;
   
   protected final LogMessage log;
 
@@ -123,7 +133,7 @@ public class GuiCfgDesigner
   }
 
   
-  public void pressedRightMouseDownForDesign(GralWidget widgd, GralRectangle xy)
+  public void editFieldProperties(GralWidget widgd, GralRectangle xy)
   { //if(widgdInDialog == null){
       widgdInDialog = widgd;
       GuiCfgData.GuiCfgElement cfge = (GuiCfgData.GuiCfgElement)widgd.getCfgElement();

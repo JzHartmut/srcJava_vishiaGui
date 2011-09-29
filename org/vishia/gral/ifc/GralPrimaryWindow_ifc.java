@@ -55,9 +55,9 @@ public interface GralPrimaryWindow_ifc extends GralWindow_ifc
   
   
   /**Adds any menu item
-   * @param name Menu position. Use slash as separator, use & for accelerator.
-   *   For example "&edit/&search/co&ntinue" creates a menu edit or uses the existing one,
-   *   then creates the search menu item, and then continue with 'n' as accelerator. 
+   * @param name Menu position. Use slash as separator, use & for hot key.
+   *   For example "&edit/&search/co&ntinue" creates a menu 'edit' or uses the existing one in the top level (menu bar),
+   *   then creates the search menu item as pull down in menu bar, and then 'continue' with 'n' as hot key as sub-menu. 
    * @param action called on menu activation.
    */
   void addMenuItemGThread(String name, GralUserAction action);

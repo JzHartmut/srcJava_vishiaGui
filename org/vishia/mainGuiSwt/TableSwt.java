@@ -62,7 +62,7 @@ public class TableSwt implements TableGui_ifc
     table.addKeyListener(new TableKeyListerner(null));
     table.addSelectionListener(selectionListener);
     table.addControlListener(resizeListener);
-    table.addFocusListener(focusListener);
+    table.addFocusListener(mng.focusListener);
     
     table.setFont(mng.propertiesGuiSwt.stdInputFont);
     //table.setColumnSelectionAllowed(true);
@@ -258,7 +258,7 @@ public class TableSwt implements TableGui_ifc
         widgetDescr = null; action = null;
         swtControl = null;
       }
-      GralUserAction mainKeyAction = mng.getRegisteredUserAction("KeyAction");
+      boolean actionDone = false;
       if(action !=null){
       	int ixRow = -99999;
       	try{
@@ -366,6 +366,13 @@ public class TableSwt implements TableGui_ifc
       		stop();  //ignore it
       	}
       }
+      if(!actionDone){
+        GralUserAction mainKeyAction = mng.getRegisteredUserAction("KeyAction");
+        if(mainKeyAction !=null){
+          int gralKey = GralKeySwt.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
+          mainKeyAction.userActionGui("key", widgetDescr, new Integer(gralKey));
+        }
+      }
       stop();
       if(basicListener !=null){
         basicListener.keyPressed(keyEv);
@@ -451,20 +458,6 @@ public class TableSwt implements TableGui_ifc
 
 
   }
-  
-  
-  FocusListener focusListener = new FocusListener()
-  {
-    
-    @Override public void focusLost(FocusEvent e)
-    { //empty, don't register lost focus. Only the last widget in focus is registered.
-    }
-    
-    @Override public void focusGained(FocusEvent ev)
-    { GralWidget widgd = (GralWidget)ev.widget.getData();
-      widgd.getPanel().notifyFocus(widgd);  
-    }
-  };
   
   
   ControlListener resizeListener = new ControlListener()

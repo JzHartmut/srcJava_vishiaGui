@@ -83,7 +83,7 @@ public class GuiStatusPanel
   { int xposProjectPath = 0, yposProjectPath=5; 
   
     panelBuildifc.selectPanel("Select");
-    panelBuildifc.setPositionSize(yposProjectPath, xposProjectPath, -2, 70, 'r');
+    panelBuildifc.setPositionSize(yposProjectPath, xposProjectPath, -3, 70, 'r');
     //widgdProjektpath = panelBuildifc.addTextField("projectPath", true, "Project path", 't');
     widgdProjektpath = panelBuildifc.addFileSelectField("projectPath", null, "D:/:/", "Project path", 't');
     panelBuildifc.setPositionSize(-1, -1, -2, 2, 'r');

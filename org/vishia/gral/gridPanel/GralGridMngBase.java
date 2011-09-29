@@ -56,6 +56,8 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
 {
   /**Changes:
    * <ul>
+   * <li>2011-09-30 Harmut new: {@link #actionDesignEditField}. It is the action which is called from menu now.
+   *     
    * <li>2011-09-29 Hartmut chg: {@link #calcWidgetPosAndSize(GralGridPos, int, int, int, int)}: calculates dy and dx one pixel less.
    *                             In result a fine space between fields is shown.
    * <li>2011-09-23 Hartmut chg: All implementation routines for positioning are moved to the class {@link GralGridPos}. This class contains only wrappers now.
@@ -66,7 +68,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
    * <li>2011-08-13 Hartmut chg: New routines for store and calculate the position to regard large widgets.
    * </ul>
    */
-  public final static int version = 0x20110813;
+  public final static int version = 0x20110930;
   
 	/**This class is used for a selection field for file names and pathes. */
   protected class FileSelectInfo
@@ -511,7 +513,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
     }
   }
   
-  @Override public GralWidget getWidgetInFocus(){ return widgetsInFocus.get(0); }
+  @Override public GralWidget getWidgetInFocus(){ return widgetsInFocus.size() >0 ? widgetsInFocus.get(0) : null; }
   
   @Override public List<GralWidget> getWidgetsInFocus(){ return widgetsInFocus; }
   
@@ -630,6 +632,19 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   };
   
   
+
+  public GralUserAction actionDesignEditField = new GralUserAction()
+  { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
+    {
+      GralWidget widgd = getWidgetInFocus();
+      if(widgd !=null){
+        designer.editFieldProperties(widgd, null);
+      }
+      return true;
+    }
+  };
+
+
   
 
   
@@ -656,7 +671,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
    * @param xy
    */
   public void pressedRightMouseDownForDesign(GralWidget widgd, GralRectangle xy)
-  { designer.pressedRightMouseDownForDesign(widgd, xy);
+  { designer.editFieldProperties(widgd, xy);
   }
   
   

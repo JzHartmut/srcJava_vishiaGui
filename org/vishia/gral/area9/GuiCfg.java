@@ -8,24 +8,19 @@ import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.cfg.GuiCfgData;
+import org.vishia.gral.cfg.GuiCfgDesigner;
 import org.vishia.gral.cfg.GuiCfgZbnf;
 import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.gridPanel.GralGridProperties;
-import org.vishia.gral.ifc.GralFactory_ifc;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.swt.FactorySwt;
 import org.vishia.inspector.Inspector;
-import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
-import org.vishia.mainGuiSwt.GuiPanelMngSwt;
-import org.vishia.mainGuiSwt.MainCmdSwt;
-import org.vishia.mainGuiSwt.PropertiesGuiSwt;
 import org.vishia.msgDispatch.LogMessage;
 
 /**This class is the basic class for configurable GUI applications with 9-Area Main window.
@@ -41,11 +36,25 @@ public class GuiCfg
 
   /**The version.
    * <ul>
+   * <li>2011-09-30 Hartmut new: menu 'Design/...' to edit fields and work with the {@link GuiCfgDesigner}.
+   * <li>2011-09-18 Hartmut new: The main tab panel has the name 'mainTab' and it is registered in the {@link #panelMng} now.
+   *     Generally an application may have more as one tabbed panels.
+   * <li>2011-09-10 Hartmut del: Remove dialogZbnfConfigurator, it was not used. It is the old solution.
+   * <li>2011-09-08 Hartmut del: Remove the message panel. It was a special solution. 
+   * <li>2011-08-08 Hartmut new: {@link #initMain()} as override-able method instead direct call of initializing.
+   * <li>2011-08-07 Hartmut chg: Now {@link GuiCallingArgs} as primary class, not an inner class here.
+   * <li>2011-08-07 Hartmut chg: Now {@link GuiMainCmd} as extra primary class.
+   * <li>2011-08-04 Hartmut chg: rename and move from org/vishia/guiCmdMenu/CmdMenu.java to org/vishia/gral/area9/GuiCfg.java.
+   *     It is a universal GUI which is configurable in content. Also it is a base class for some configurable GUI applications.
+   * <li>2011-08-04 Hartmut chg: Use {@link GralPanelContent} instead the special InspcGuiPanelContent.     
+   * <li>2011-08-04 Hartmut new: {@link #userInit()} as override-able method instead direct call of user.init(). 
+   *     Advantage: User can do anything in the derived class.
+   * <li>2011-08-04 Hartmut new: Use first key of argument --size: to determine the size. TODO parseArgs    
    * <li>2011-07-31 Hartmut new: First usage as super class.
    * <li>2010-01-01 Hartmut new: The base of this class was created with some applications.
    * </ul>
    */
-  public final int version = 0x20110731;
+  public final int version = 0x20110930;
   
   /**Composition of a Inspector-Target instance. This is only to visit this application for debugging.
    * Not necessary for functionality. */
@@ -226,7 +235,8 @@ protected void initGuiAreas()
 {
   gui.setFrameAreaBorders(20, 80, 60, 85);
   gui.setStandardMenusGThread(new File("."), actionFile);
-    
+  gui.addMenuItemGThread("&Design/e&Nable", panelMng.actionDesignEditField);  
+  gui.addMenuItemGThread("&Design/Edit &field", panelMng.actionDesignEditField);  
   gui.addFrameArea(1,1,3,1, mainTabPanel.getGuiComponent()); //dialogPanel);
  
 }
@@ -335,10 +345,9 @@ protected GralUserAction actionFile = new GralUserAction()
       }
     }
     return true;
-
   }
-  
 };
+
 
 
 /**The command-line-invocation (primary command-line-call. 

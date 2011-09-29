@@ -33,6 +33,8 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -671,6 +673,8 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     if(editable)
     	stop();
     widget.setBackground(propertiesGuiSwt.colorSwt(0xFFFFFF));
+    widget.addFocusListener(focusListener);
+
     Listener[] oldMouseListener = widget.getListeners(SWT.MouseDown);
     for(Listener lst: oldMouseListener){
       widget.removeListener(SWT.MouseDown, lst);
@@ -1600,6 +1604,23 @@ public Text addTextBox(GralWidget widgetInfo, boolean editable, String prompt, c
     }
     
   }
+  
+  
+  /**Universal focus listener to register which widgets were in focus in its order.
+   * 
+   */
+  FocusListener focusListener = new FocusListener()
+  {
+    
+    @Override public void focusLost(FocusEvent e)
+    { //empty, don't register lost focus. Only the last widget in focus is registered.
+    }
+    
+    @Override public void focusGained(FocusEvent ev)
+    { GralWidget widgd = (GralWidget)ev.widget.getData();
+      widgd.getPanel().notifyFocus(widgd);  
+    }
+  };
   
   
 
