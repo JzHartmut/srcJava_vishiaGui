@@ -8,6 +8,24 @@ import org.vishia.gral.base.GralPanelContent;
  */
 public class GralGridPos implements Cloneable
 {
+  /**Version and history:
+   * <ul>
+   * <li>2011-10-01 Hartmut corr: Calculation of next position or refer + value if the size was negative and sameSize is selected.
+   *                Then the new input value should calculate from the bottom or left value because the size is negative furthermore.
+   * <li>2011-10-01 Hartmut bugfix: if(qf >= 10)... instead >10 
+   * <li>2011-09-23 Hartmut chg: The methods {@link #setPosition(GralGridPos, float, float, float, float, int, char)} etc
+   *     are moved from the GralGridMngBase to this. It are methods of this class functionally. The GralGridMngBase wrappes it
+   *     because that methods should be able to call there.
+   * <li>2011-08-31 Hartmut new: constants {@link #same} etc. as adding values for setPosition-methods.
+   *     It prevents the necessity of a lot of special set methods. The parameter for positions may be relative, referred etc.
+   *     to the previous position or to a frame.
+   * <li>2011-08-31 Hartmut new: method {@link #toString()} to see values of instance in debug
+   * <li>2011-08-14 Hartmut new: creation of this class. Beforehand this values are stored inside the GralGridMngBase as main position.
+   *     But a position in this kind is necessary in other contexts too, and the position values should be pooled in one class.                       
+   * </ul>
+   */
+  public static int version = 0x20111001;
+  
   /**This adding value applied at any coordinate parameter of any setPosition- method means, that the value is 
    * referred to the position of the previous or given position. The referred value may be given as positive or negative number.
    * Adding this constant a value in range 0x2000 to 0x2fff results.
@@ -58,6 +76,12 @@ public class GralGridPos implements Cloneable
    * further elements or inner elements is on bottom line or right line of the current widget.
    */
   public final static int size = 0x1800;
+  
+  
+  /**Use the same size.
+   * 
+   */
+  public final static int samesize = 0x4000;
   
   /**Range of size. The size range of any size value is from 0x1001 to 0x1fff for negative and positive size values.
    * The user should add only + GralgridPosition.size to a positive or negative value in range of 
@@ -330,6 +354,11 @@ public class GralGridPos implements Cloneable
                         -1;
       //check the ranges of input parameter. There are added constants, see parameter of setPosition.
       //check z: set z to the absolute value, positive or negative.
+      int zRefer, zfRefer;
+      if((paramDesg & mBitSizeNeg)!=0){ 
+        zRefer = pe;  zfRefer = pef;    //size was negative: refer from end.
+      } else { zRefer = p;  zfRefer = pf; }
+      
       if(  z > (GralGridPos.same - GralGridPos.mValueRange_)
         && z < (GralGridPos.same + GralGridPos.mValueRange_)
         ){
@@ -338,18 +367,12 @@ public class GralGridPos implements Cloneable
         //add parent position:
         z -= same;
         //NOTE: q, qe will be set after ze is checked.
-        if(z >=0){
-          z += p;
-        } else {
-          z = pe + z;  //negative: refer from end.  
-        }
-        zf += pf;  //frac part always positive.
+        z = zRefer + z;
+        zf = zfRefer + zf;  //frac part always positive.
       } else if( z == next || z == nextBlock){
         if(this.pDir == 1){
-          z = p + pSize;
-        } else {
-          z = p;
-        }
+          z = zRefer + pSize;
+        } else { z = zRefer; }
       }
       //check ze: set the final positions q...
       if(  ze > (GralGridPos.same - GralGridPos.mValueRange_)
@@ -519,14 +542,14 @@ public class GralGridPos implements Cloneable
       }
       */
       
-      if(qf > 10){
+      if(qf >= 10){
         p = q +1; pf = qf -10;
       } else if(qf < 0){
         p = q - 1; pf = qf +10;
       } else {
         p = q; pf = qf;   
       }
-      if(qef > 10){
+      if(qef >= 10){
         pe = qe +1; pef = qef -10;
       } else if(qef < 0){
         pe = qe - 1; pef = qef +10;

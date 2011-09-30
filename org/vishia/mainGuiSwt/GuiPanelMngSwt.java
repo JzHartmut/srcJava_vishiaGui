@@ -451,19 +451,6 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   
   
   
-  /**Registers a panel to place the widgets. 
-   * After registration, the panel can be selected
-   * with its name calling the {@link #selectPanel(String)} -routine
-   * @param name Name of the panel.
-   * @param panel The panel.
-   */
-  @Override public void registerPanel(GralPanelContent panel){
-    panels.put(panel.namePanel, panel);
-    pos.panel = panel;
-    sCurrPanel = panel.namePanel;
-  }
-  
-  
   /**This method can be override by the user to force some actions if the dialog window is closed. It may be left empty. */
   protected void windowClosing()
   {

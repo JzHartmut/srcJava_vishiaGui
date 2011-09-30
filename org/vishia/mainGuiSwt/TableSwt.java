@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.TableGui_ifc;
@@ -147,6 +148,13 @@ public class TableSwt implements TableGui_ifc
   
   
   
+  /**Inserts a line. it is called from {@link GralPanelMngWorking_ifc#setInfo(GralWidget, int, int, Object, Object)} 
+   * and from {@link #insertLine(String, int)}.
+   * @param ident
+   * @param visibleInfo
+   * @param userData
+   * @return
+   */
   TableLineGui_ifc changeTable(int ident, Object visibleInfo, Object userData)
   {
     TableItem item = new TableItem(table, SWT.NONE);
@@ -514,6 +522,16 @@ public class TableSwt implements TableGui_ifc
   @Override public TableLineGui_ifc insertLine(String key, int row)
   {
     return changeTable(row, null, null);
+  }
+
+
+  @Override public void deleteLine(TableLineGui_ifc line)
+  {
+  }
+
+
+  @Override public void clearTable()
+  { clearTable(-1);
   }
 
 

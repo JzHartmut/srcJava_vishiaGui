@@ -56,10 +56,10 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
 {
   /**Changes:
    * <ul>
-   * <li>2011-09-30 Harmut new: {@link #actionDesignEditField}. It is the action which is called from menu now.
-   *     
+   * <li>2011-10-01 Hartmut chg: move {@link #registerPanel(GralPanelContent)} from the SWT implementation to this.
+   * <li>2011-10-01 Hartmut new: method {@link #getPanel(String)} to get a registered panel by name.    
+   * <li>2011-09-30 Hartmut new: {@link #actionDesignEditField}. It is the action which is called from menu now.
    * <li>2011-09-29 Hartmut chg: {@link #calcWidgetPosAndSize(GralGridPos, int, int, int, int)}: calculates dy and dx one pixel less.
-   *                             In result a fine space between fields is shown.
    * <li>2011-09-23 Hartmut chg: All implementation routines for positioning are moved to the class {@link GralGridPos}. This class contains only wrappers now.
    * <li>2011-09-18 Hartmut chg: Inner static class GuiChangeReq now stored in an own class {@link GralWidgetChangeRequ}.
    * <li>2011-09-18 Hartmut new: : {@link GralGridPos#setFinePosition(int, int, int, int, int, int, int, int, int, char, GralGridPos)} calculates from right or bottom with negative values.                            
@@ -68,7 +68,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
    * <li>2011-08-13 Hartmut chg: New routines for store and calculate the position to regard large widgets.
    * </ul>
    */
-  public final static int version = 0x20110930;
+  public final static int version = 0x20111001;
   
 	/**This class is used for a selection field for file names and pathes. */
   protected class FileSelectInfo
@@ -397,6 +397,22 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
     
   }
   
+  /**Registers a panel to place the widgets. 
+   * After registration, the panel can be selected
+   * with its name calling the {@link #selectPanel(String)} -routine
+   * @param name Name of the panel.
+   * @param panel The panel.
+   */
+  @Override public void registerPanel(GralPanelContent panel){
+    panels.put(panel.namePanel, panel);
+    pos.panel = panel;
+    sCurrPanel = panel.namePanel;
+  }
+  
+  
+  public GralPanelContent getPanel(String name){
+    return panels.get(name);
+  }
   
   
   public GralPanelActivated_ifc actionPanelActivate = new GralPanelActivated_ifc()

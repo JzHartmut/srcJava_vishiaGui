@@ -16,18 +16,40 @@ public class GralWidget
   
   /**Changes:
    * <ul>
+   * <li>2011-10-01 Hartmut new: method {@link #setFocus()}. It wrappes the {@link GralPanelMngWorking_ifc#setFocus(GralWidget)}.
+   * <li>2011-09-18 Hartmut chg: rename from WidgetDescriptor to GralWidget. It is the representation of a Widget in the graphic adapter
+   *     inclusive some additional capabilities in comparison to basic graphic widgets, like {@link #sFormat} etc.
+   * <li>2011-09-11 Hartmut chg: rename itsPanel to {@link #itsMng}. The original approach was, that the PanelManager manages only one panel
+   *     then one window. Now the GralPanelMng manages all panels of one application. It is instantiated only one time.
+   *     Therefore this association isn't the associated panel where the widget is member of. 
+   * <li>2011-09-08 Hartmut new: method {@link #setLineColor(GralColor, int)}.
+   *     Background: Any widget have a background. Most of widgets have lines. The color of them 
+   *     should be able to animate if user data are changed.        
+   * <li>2011-09-04 Hartmut new: method {@link #setBackColor(GralColor, int)}.        
    * <li>2011-08-14 Hartmut chg: {@link #widget} is now type of {@link Widgetifc} and not Object.
    *    Generally it is the reference to the implementing code of the widget. The implementing code 
    *    may based on a graphic base widget (SWT: Control) and implements the {@link Widgetifc}, 
    *    or it references the graphic base widget instance. The class {@link WidgetSimpleWrapperSwt} 
    *    is able to wrap simple graphical base widget instances.
    * <li>2011-08-13 Hartmut new: WidgetDescriptor now contains the position of the widget. 
-   * It is used for resizing of large widgets.
-   * A large widget is a widget, which lengthens over the panel and it is changed in size with panel size change. 
-   * A typical example is a text-area-widget.
+   *     It is used for resizing of large widgets.
+   *     A large widget is a widget, which lengthens over the panel and it is changed in size with panel size change. 
+   *     A typical example is a text-area-widget.
+   * <li>2011-06-20 Hartmut new: method {@link #getPanel()} It is the panel manager!
+   * <li>2011-05-26 Hartmut new: separate action in {@link #actionChanging} and {@link #actionShow}.
+   *     The actionChanging was the old action. It was called from the listener of the widgets of the underlying graphic
+   *     if any changing is done on the widget (mouse click etc). But the actionShow is necessary too 
+   *     to prepare values to animate widgets without knowledge of the special kind of widget. The application
+   *     should call only the actionShow, all specifics should be done in the action.
+   * <li>2011-05-22 Hartmut new: The Widget knows its {@link #itsCfgElement} now if it is present.
+   *   It is possible to configurate widgets with the GralDesigner up to now.
+   * <li>2011-05-14 Hartmut chg: The WidgetDescriptor is now non-generic. 
+   *   Older Concept: Store the GUI implementation widget type as generic type there.
+   *   But now a widget is stored as Object and it is casted in the implementation. It is more simple 
+   *   because the type is only used and the casting is only necessary in the implementation level.       
    * </ul>
    */
-  public final static int version = 0x20110813;
+  public final static int version = 0x20111001;
   
   /**The panel manager from where the widget is organized. Most of methods need the information
    * stored in the panel manager. This reference is used to set values to other widgets. */
@@ -361,6 +383,11 @@ public class GralWidget
   { return itsCfgElement;
   }
   
+  
+  public boolean setFocus()
+  {
+    return itsMng.setFocus(this);
+  }
   
   /**Gets the working interface of the panel where the widget is member of. 
    * It can be used to set and get values from other widgets symbolic identified by its name.

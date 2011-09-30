@@ -109,6 +109,15 @@ public class TabPanelSwt extends GralTabbedPanel
   }
 
   
+	
+	@Override public GralPanelContent selectTab(String name)
+	{
+	  GralPanelContent panel = mng.getPanel(name);
+	  TabItem tabItem = (TabItem)panel.itsTabSwt;
+	  tabMng.widgetSwt.setSelection(tabItem);
+	  return panel;
+	}
+	
   
   public SelectionListener tabItemSelectListener = new SelectionListener(){
 

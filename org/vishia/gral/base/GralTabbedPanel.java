@@ -9,16 +9,36 @@ import org.vishia.gral.ifc.GralWidget;
 
 
 /**This class is the common base class for Tabbed-Panels.
- * A TabPanel is the container for Tabs. It doesn't contain other widgets than Tabs.
+ * A TabbbedPanel is the container for Tabs. It doesn't contain other widgets than Tabs.
  * A Tab inside the TabPanel is a usability Panel.
+ * <br><br>
+ * Concepts in base graphic:
  * <ul>
  * <li>SWT: TabFolder, TabItem
  * <li>Swing: TabbedPane
+ * </ul>
  * @author Hartmut Schorrig
  *
  */
 public abstract class GralTabbedPanel implements GralVisibleWidgets_ifc
 {
+  /**The version and history:
+   * <ul>
+   * <li>2011-10-01 Hartmut new: abstract method {@link #selectTab(String)}.
+   * <li>2011-09-10 Hartmut chg: move this class from gral/gridPanel/TabPanel to gral/base/GralTabbedPanel
+   *     Reason: it isn't a concept of the grid panel  but a basic concept of gral. It hasn't any dependencies to gridPanel. 
+   * <li>2011-09-08 Hartmut chg: The {@link #widgetsVisible} were stored in the GuiPanelMngBase before.
+   *     But an application can have more as one tabbed panel, and any of them can change the visible widgets while changing the tab.
+   *     The visible widgets are not an concpet of the grid panel manager but a topic of the panel content. 
+   *     It is not a question of one PanelContent but a question of the TabbedPanel which contains some panels.
+   * <li>2011-08-31 Hartmut chg: The {@link #currentPanel} and {@link #getCurrentPanel()} is moved from GuiPanelMngBase to here.
+   *     Reason: One application can have more as one tabbed panel.    
+   * <li>2011-05-26 Hartmut chg: {@link #addCanvasPanel(String, String)} now returns {@link GralPanelContent} instead an untyped Object.    
+   * <li>2010-05-00 Hartmut created   
+   * </ul>
+   */
+  public static final int version = 0x20111001;
+  
 	final protected GralPanelActivated_ifc notifyingUserInstanceWhileSelectingTab;
 	
 	final protected Map<String, GralPanelContent> panels = new TreeMap<String, GralPanelContent>();
@@ -62,6 +82,18 @@ public abstract class GralTabbedPanel implements GralVisibleWidgets_ifc
 	abstract public GralPanelContent getGuiComponent();
 	
 	public GralPanelContent getCurrentPanel(){ return currentPanel; }
+	
+	
+	/**The named tab should be focused.
+   * TODO which widget should be focused? It may be a first widget in any GralPanelContent?
+   * In SWT it works if any widget in a tab is focused. The the tab is focused then automatically.
+   * It means this method is not necessary. If selectTab is called, the whole tab has the focus
+   * which means it content is visible. That is able to use.
+	 * @param name
+	 * @return
+	 */
+	abstract public GralPanelContent selectTab(String name);
+	
 	
   @Override public Queue<GralWidget> getWidgetsVisible()
   {

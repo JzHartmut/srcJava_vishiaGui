@@ -13,6 +13,18 @@ import org.vishia.gral.ifc.Widgetifc;
 public interface TableGui_ifc extends Widgetifc
 {
 
+  /**Version and history:
+   * <ul>
+   * <li>2011-10-01 Hartmut new: {@link #clearTable()}
+   * <li>2011-09-03 Hartmut chg: method {@link #insertLine(String, int)} returns now the instance of {@link TableLineGui_ifc}
+   *   The user doesn't create a line instance, an extra factory isn't necessary. The implementing instance
+   *   can be determined by the implementer of this interface.
+   * <li>2011-05-11 Hartmut new: creation. Tables are a relevant medium to present GUIs. The implementation of tables
+   *   in SWT or swing are strong different. It needs a simple interface to work with tables.  
+   * </ul>
+   */
+  public final static int version = 0x20111001;
+  
   TableLineGui_ifc getCurrentLine();
   
   void setCurrentCell(int line, int column);
@@ -37,6 +49,15 @@ public interface TableGui_ifc extends Widgetifc
    * @return row where the line is inserted.
    */
   TableLineGui_ifc insertLine(String key, int row);
+  
+  
+  /**Deletes a line in the table.
+   * 
+   */
+  void deleteLine(  TableLineGui_ifc line);
+
+  void clearTable();
+  
   
   /**Search where this line is shown.
    * @param key

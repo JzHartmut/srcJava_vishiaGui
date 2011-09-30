@@ -39,15 +39,15 @@ public class JavaCmd extends GuiCfg
   
   private final CallingArgs cargs;
   
-  GralTabbedPanel tabCmd, tabFile1, tabFile2;
+  //GralTabbedPanel tabbedPanelsLeft, tabbedPanelsMid, tabbedPanelsRight;
   
   GralPanelContent panelButtons;
   
   final CmdQueue cmdQueue = new CmdQueue(mainCmd);
   
-  private final SelectTab selectTab = new SelectTab(mainCmd, panelMng);
+  private final SelectTab selectTab = new SelectTab(mainCmd, this);
   
-  private final CommandSelector cmdSelector = new CommandSelector(cmdQueue);
+  final CommandSelector cmdSelector = new CommandSelector(cmdQueue);
   
   final CopyCmd copyCmd = new CopyCmd(this);
   
@@ -55,7 +55,7 @@ public class JavaCmd extends GuiCfg
   
   private File[] selectedFiles;
 
-  private final Map<String, FileSelector> idxFileSelector = new TreeMap<String, FileSelector>();
+  final Map<String, FileSelector> idxFileSelector = new TreeMap<String, FileSelector>();
     //{ new TreeMap<String, FileSelector>(), new TreeMap<String, FileSelector>(), new TreeMap<String, FileSelector>()};
   
   /**The commands which are used for some buttons or menu items from the JavaCommander itself. */
@@ -87,69 +87,31 @@ public class JavaCmd extends GuiCfg
     
     //Creates tab-Panels for the file lists and command lists.
     panelMng.selectPanel("primaryWindow");
-    tabCmd = panelMng.createTabPanel("File0Tab", null, GralGridBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(1,1,1,1, tabCmd.getGuiComponent()); //dialogPanel);
+    selectTab.panelLeft.tabbedPanel = panelMng.createTabPanel("File0Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    gui.addFrameArea(1,1,1,1, selectTab.panelLeft.tabbedPanel.getGuiComponent()); //dialogPanel);
 
-    int[] widthSelecttable = new int[]{2, 20, 30};
-    
-    tabCmd.addGridPanel("Sel0", "a-F1",1,1,10,10);
-    panelMng.setPosition(0, 0, 0, -0, 1, 'd');
-    selectTab.listLeft.setToPanel(panelMng, "sel0", 5, widthSelecttable, 'A');
-    selectTab.fillInLeft();
-    
-    tabCmd.addGridPanel("cmd", "Cm&d",1,1,10,10);
-    panelMng.setPosition(2, -2, 0, -0, 1, 'd');
-    cmdSelector.setToPanel(panelMng, "cmds", 5, new int[]{10,10}, 'A');
-    cmdSelector.fillIn();
-    cmdSelector.setGetterFiles(getterFiles);
+    selectTab.buildInitialTabs(selectTab.panelLeft);
+    panelMng.selectPanel("primaryWindow");
+    selectTab.panelMid.tabbedPanel = panelMng.createTabPanel("File1Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    gui.addFrameArea(2,1,1,1, selectTab.panelMid.tabbedPanel.getGuiComponent()); //dialogPanel);
+    selectTab.buildInitialTabs(selectTab.panelMid);
 
-    for(SelectTab.SelectInfo info: selectTab.selectLeft){
-      if(info.active == 'l'){ buildTabFromSelection(info, tabCmd); }
-    }
-    for(SelectTab.SelectInfo info: selectTab.selectAll){
-      if(info.active == 'l'){ buildTabFromSelection(info, tabCmd); }
-    }
-    
-      
     panelMng.selectPanel("primaryWindow");
-    tabFile1 = panelMng.createTabPanel("File1Tab", null, GralGridBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(2,1,1,1, tabFile1.getGuiComponent()); //dialogPanel);
-    
-    tabFile1.addGridPanel("Sel1", "a-F2",1,1,10,10);
-    panelMng.setPosition(0, 0, 0, -0, 1, 'd');
-    selectTab.listMid.setToPanel(panelMng, "sel0", 5, widthSelecttable, 'A');
-    selectTab.fillInMid();
-    
-    for(SelectTab.SelectInfo info: selectTab.selectMid){
-      if(info.active == 'm'){ buildTabFromSelection(info, tabFile1); }
-    }
-    for(SelectTab.SelectInfo info: selectTab.selectAll){
-      if(info.active == 'm'){ buildTabFromSelection(info, tabFile1); }
-    }
-    
-    panelMng.selectPanel("primaryWindow");
-    tabFile2 = panelMng.createTabPanel("File2Tab", null, GralGridBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(3,1,1,1, tabFile2.getGuiComponent()); //dialogPanel);
+    selectTab.panelRight.tabbedPanel = panelMng.createTabPanel("File2Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    gui.addFrameArea(3,1,1,1, selectTab.panelRight.tabbedPanel.getGuiComponent()); //dialogPanel);
+    selectTab.buildInitialTabs(selectTab.panelRight);
       
-    tabFile2.addGridPanel("Sel1", "a-F2",1,1,10,10);
-    panelMng.setPosition(0, 0, 0, -0, 1, 'd');
-    selectTab.listRight.setToPanel(panelMng, "sel0", 5, widthSelecttable, 'A');
-    selectTab.fillInRight();
-    
+    /*
     for(SelectTab.SelectInfo info: selectTab.selectRight){
-      if(info.active == 'r'){ buildTabFromSelection(info, tabFile2); }
+      if(info.active == 'r'){ selectTab.buildTabFromSelection(info, tabbedPanelsRight); }
     }
     for(SelectTab.SelectInfo info: selectTab.selectAll){
-      if(info.active == 'r'){ buildTabFromSelection(info, tabFile2); }
+      if(info.active == 'r'){ selectTab.buildTabFromSelection(info, tabbedPanelsRight); }
     }
-    
+    */
     panelButtons = panelMng.createGridPanel("Buttons", panelMng.getColor("gr"), 1, 1, 10, 10);
     gui.addFrameArea(1,2,3,1, panelButtons); //dialogPanel);
     initPanelButtons();
-    
-    panelMng.selectPanel("output"); //Buttons");
-    //panelMng.setPosition(1, 30+GralGridPos.size, 1, 40+GralGridPos.size, 1, 'r');
-    panelMng.setPosition(-30, 0, -40, 0, 1, 'r');
     
     copyCmd.buildWindowConfirmCopy();
   }
@@ -208,19 +170,6 @@ public class JavaCmd extends GuiCfg
     panelMng.addButton("b-help", null, "help", null, null, "c-F10");
   }
   
-  
-  /**Builds a tab for file or command view from a selected line of selection.
-   * @param info The selection info
-   */
-  private void buildTabFromSelection(SelectTab.SelectInfo info, GralTabbedPanel tabPanel)
-  { 
-    tabPanel.addGridPanel(info.tabName, info.tabName,1,1,10,10);
-    panelMng.setPosition(0, 0, 0, -0, 1, 'd'); //the whole panel.
-    FileSelector fileSelector = new FileSelector(mainCmd);
-    idxFileSelector.put(info.tabName, fileSelector);
-    fileSelector.setToPanel(panelMng, info.tabName, 5, new int[]{2,20,5,10}, 'A');
-    fileSelector.fillIn(new File(info.path));
-  }
   
   @Override protected final void initMain()
   { if(cargs.fileCfgCmds == null){
@@ -452,7 +401,7 @@ public class JavaCmd extends GuiCfg
    */
   GralUserAction selectPanelLeft = new GralUserAction()
   { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
-    { selectTab.listLeft.setFocus();
+    { selectTab.panelLeft.selectTable.setFocus();
       return true;
     }
   };
@@ -461,7 +410,7 @@ public class JavaCmd extends GuiCfg
   /**Key alt-F2 to select a directory/cmd list in a list of directories for the middle panel. */
   GralUserAction selectPanelMiddle = new GralUserAction()
   { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
-    { selectTab.listMid.setFocus();
+    { selectTab.panelMid.selectTable.setFocus();
       return true;
     }
   };
@@ -471,7 +420,7 @@ public class JavaCmd extends GuiCfg
    */
   GralUserAction selectPanelRight = new GralUserAction()
   { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
-    { selectTab.listRight.setFocus();
+    { selectTab.panelRight.selectTable.setFocus();
       return true;
     }
   };
@@ -483,7 +432,7 @@ public class JavaCmd extends GuiCfg
    */
   GralUserAction selectPanelOut = new GralUserAction()
   { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
-    { tabCmd.getCurrentPanel().setFocus();
+    { selectTab.panelMid.tabbedPanel.getCurrentPanel().setFocus();
       return true;
     }
   };

@@ -12,6 +12,21 @@ import java.util.TreeMap;
  */
 public class GralColor
 {
+  
+  
+  /**Version and history:
+   * <ul>
+   * <li>2011-10-01 Hartmut new: color lbk light black darker than dark gray. Change values for gray.
+   * <li>2011-09-08 Hartmut new: some enhancements, new colors.
+   * <li>2011-09-04 Hartmut chg: Rename from ColorGui to GralColor
+   * <li>2011-09-04 Hartmut chg: Move the {@link #getColor(String)} and {@link #getColor(int)} with the colorContainer
+   *     from gridPanel/PropertiesGUI to this.
+   * <li>2011-05-14 Hartmut new: Reference to the {@link #colorGuimpl} to get the graphic base system color instance if need.
+   * <li>2010-00-00 Hartmut created. It had contain only the 3 int red, green, blue     
+   * </ul>
+   */
+  public final static int version = 0x20111001;
+  
   /**Values 0..255 for the base colors. */
   public final int red, green, blue;
 
@@ -57,7 +72,7 @@ public class GralColor
       
       //saturated colors
       addColor("wh", 0xffffff);
-      addColor("gr", 0x808080);
+      addColor("gr", 0xa0a0a0);
       addColor("bk", 0x000000);
       addColor("rd", 0xff0000);
       addColor("gn", 0x00ff00);
@@ -73,7 +88,7 @@ public class GralColor
       addColor("pu", 0xff0040);
       
       //light colors
-      addColor("lgr", 0xc0c0c0);
+      addColor("lgr", 0xd0d0d0);
       addColor("lrd", 0xff8080);
       addColor("lgn", 0x80ff80);
       addColor("lbl", 0x8080ff);
@@ -82,6 +97,7 @@ public class GralColor
       addColor("lor", 0xffa060);
       addColor("lma", 0xff80ff);
       addColor("lcy", 0x00ffff);
+      addColor("lbk", 0x404040);
       
       //pastel colors, especially for background color
       addColor("pgr", 0xf0f0f0);
@@ -95,7 +111,7 @@ public class GralColor
       addColor("pcy", 0xa0ffff);
 
       //dark colors for forground
-      addColor("dgr", 0x404040);
+      addColor("dgr", 0x606060);
       addColor("drd", 0x800000);
       addColor("dbn", 0x400010);
       addColor("dgn", 0x008000);
@@ -138,7 +154,7 @@ public class GralColor
    * <br>saturated colors: The same as full name colors. All colors are designated with 2 letters.
    * <ul>
    * <li>"wh", white, 0xffffff);
-   * <li>"gr", gray, 0x808080);
+   * <li>"gr", gray, 0xa0a0a0);
    * <li>"bk", black, 0x000000);
    * <li>"rd", red, 0xff0000);
    * <li>"gn", green, 0x00ff00);
@@ -155,13 +171,14 @@ public class GralColor
       
    * <br>light colors: The more light version is designated with a "l" before the 2-letter color name.
    * <ul>
-   * <li>"lgr", 0xc0c0c0);
+   * <li>"lgr", 0xd0d0d0);
    * <li>"lrd", 0xff8080);
    * <li>"lgn", 0x80ff80);
    * <li>"lbl", 0x8080ff);
    * <li>"lye", 0xffff00);
    * <li>"lma", 0xff00ff);
    * <li>"lcy", 0x00ffff);
+   * <li>"lbk", 0x404040);  a black which is lighter, but darker as dark gray
    * </ul>
       
    * <br>pastel colors, especially for background color. They are designates with "p" before the 2-letter color name.
@@ -177,7 +194,7 @@ public class GralColor
 
    * <br>dark colors for lines and fonts: They are designates with "p" before the 2-letter color name.
    * <ul>
-   * <li>"dgr", 0x404040);
+   * <li>"dgr", 0x606060);
    * <li>"drd", 0x800000);
    * <li>"dbn", 0x400010);
    * <li>"dgn", 0x008000);
