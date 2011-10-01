@@ -21,6 +21,7 @@ $inputJava=fileset
 , org/vishia/gral/swt/*.java
 , org/vishia/gral/widget/*.java
 , org/vishia/mainGuiSwt/*.java
+, org/vishia/commander/*.java
 );
 
 rpy/gral.xmi:= genXMI($inputJava); 

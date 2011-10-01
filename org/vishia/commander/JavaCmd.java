@@ -45,7 +45,7 @@ public class JavaCmd extends GuiCfg
   
   final CmdQueue cmdQueue = new CmdQueue(mainCmd);
   
-  private final SelectTab selectTab = new SelectTab(mainCmd, this);
+  final SelectTab selectTab = new SelectTab(mainCmd, this);
   
   final CommandSelector cmdSelector = new CommandSelector(cmdQueue);
   

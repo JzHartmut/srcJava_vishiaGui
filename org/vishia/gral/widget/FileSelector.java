@@ -17,8 +17,27 @@ import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
+/**This class is a large widget which contains a list to select files in a directory, 
+ * supports navigation in the directory tree and shows the current path in an extra text field.
+ * Additional 'search in files' is supported.
+ * @author Hartmut Schorrig
+ *
+ */
 public class FileSelector implements Widgetifc
 {
+  
+  
+  
+  /**Version and History:
+   * <ul>
+   * <li>2011-10-01 new: {@link #setOriginDir(File)} and {@link #fillInOriginDir()}.
+   *   The origin dir is the directory of first selection or can be set by user. If the user navigates misty,
+   *   the origin dir helps to find again the start point.
+   * <li>2011-09-28 new: {@link #getCurrentDir()}
+   * <li>2011-08-14 created. Firstly used for the Java commander. But it is a universal file select widget.
+   * </ul>
+   */
+  public static final int version = 0x20111001;
 
   private static class FileAndName
   { String sPath;
@@ -28,7 +47,7 @@ public class FileSelector implements Widgetifc
   
   /**Implementation of the base widget.
    */
-  private SelectList selectList = new SelectList()
+  private class FileSelectList extends SelectList
   {
     @Override public void actionOk(Object userData, TableLineGui_ifc line)
     {
@@ -89,16 +108,36 @@ public class FileSelector implements Widgetifc
       case KeyCode.alt + KeyCode.F + '7': FileSystem.searchInFiles(new File[]{file}, "ordersBackground"); break;
       }
     }
-  }; //selectList implementation
+  } //selectList implementation
   
+  
+  
+  /**The implementation of SelectList. */
+  private FileSelectList selectList = new FileSelectList();
+  
+  
+  /**This index stores the last selected file for any directory path which was used.
+   * If the directory path is reused later, the same file will be selected initially.
+   * It helps by navigation through the file tree.   
+   */
   private Map<String, String> indexSelection = new TreeMap<String, String>(); 
   
   
+  /**The widget for showing the path. */
   GralWidget widgdPath;
   
   final SimpleDateFormat dateFormat = new SimpleDateFormat("yy-MMM-dd HH:mm:ss"); 
   
   final MainCmd_ifc mainCmd;
+
+  /**The current shown directory. */
+  File currentDir;
+  
+  String sCurrentDir;
+  
+  
+  /**The directory which was used on start. */
+  File originDir;
   
   public FileSelector(MainCmd_ifc mainCmd)
   {
@@ -126,25 +165,37 @@ public class FileSelector implements Widgetifc
     //the list
     panel.setPosition(posAll, 2.0F, GralGridPos.same, GralGridPos.same, GralGridPos.same, 1, 'd');
     selectList.setToPanel(panel, name, rows, columns, size);
+    //store this in the GralWidgets to get back from widgets later.
+    widgdPath.setContentInfo(this);
+    selectList.wdgdTable.setContentInfo(this);
   }
   
 
-  @Override public Object getWidget(){ return selectList.table.getWidget(); }
-
-  @Override public boolean setFocus(){ return selectList.table.setFocus(); }
+  public File getCurrentDir(){ return currentDir; }
+  
+  public void setOriginDir(File dir){ originDir = dir; }
   
   
-
-  
+  /**Fills the content with the first directory or the directory which was set with 
+   * {@link #setOriginDir(File)}.
+   */
+  public void fillInOriginDir()
+  {
+    fillIn(originDir);
+  }
   
   /**Fills the content with given directory.
    * @param dir The directory which's files are shown.
    */
   public void fillIn(File dir)
   {
-    String sDir = FileSystem.getCanonicalPath(dir);
-    String sFileSelected = indexSelection.get(sDir);
-    widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sDir);
+    this.currentDir = dir;
+    if(originDir == null){
+      originDir = dir;      //sets on the first invocation. 
+    }
+    this.sCurrentDir = FileSystem.getCanonicalPath(dir);
+    String sFileSelected = indexSelection.get(sCurrentDir);
+    widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sCurrentDir);
     File[] files = dir.listFiles();
     if(files !=null){ 
       Map<String, File> sortFiles = new TreeMap<String, File>();
@@ -210,6 +261,14 @@ public class FileSelector implements Widgetifc
   
   void stop(){}
 
+  
+  
+  
+  @Override public Object getWidget(){ return selectList.table.getWidget(); }
+
+  @Override public boolean setFocus(){ return selectList.table.setFocus(); }
+  
+  
 
   @Override
   public GralColor setBackgroundColor(GralColor color)
