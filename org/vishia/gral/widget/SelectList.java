@@ -7,6 +7,7 @@ import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.util.KeyCode;
 
 /**Complex widget which contains a list what's items are able to select. 
  * It is the base class for file selection and command selection.
@@ -16,6 +17,15 @@ import org.vishia.gral.ifc.GralWidget;
  */
 public abstract class SelectList
 {
+  /**Version and history:
+   * <ul>
+   * <li>2011-10-02 chg: Uses keycodes from {@link KeyCode} now,
+   * <li>2011-10-02 chg: {@link #actionOk(Object, TableLineGui_ifc)} returns boolean now, false if no action is done.
+   * <li>older- TODO
+   * </ul>
+   */
+  public static final int version = 0x20111002;
+  
   /**The table which is showing in the widget. */
   protected GralWidget wdgdTable;
   
@@ -53,7 +63,7 @@ public abstract class SelectList
    * or click of OK (Enter) button.
    * @param userData The user data stored in the line of table.
    */
-  protected abstract void actionOk(Object userData, TableLineGui_ifc line);
+  protected abstract boolean actionOk(Object userData, TableLineGui_ifc line);
   
   /**Action if a table line is selected and ctrl-left is pressed or the release button is pressed.
    * @param userData The user data stored in the line of table.
@@ -75,16 +85,18 @@ public abstract class SelectList
   private GralUserAction actionTable = new GralUserAction()
   {
 
-    @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
+    @Override public boolean userActionGui(String sIntension, GralWidget widgdTable, Object... params)
     {
-      TableGui_ifc table = (TableGui_ifc)infos.widget;
-      TableLineGui_ifc line = table.getCurrentLine();
+      assert(sIntension.equals("table-key"));
+      TableLineGui_ifc line = (TableLineGui_ifc)params[0];
       Object data = line.getUserData();
-      if(sIntension.equals("ok")){ actionOk(data, line); }
-      else if(sIntension.equals("s-left")){ actionLeft(data, line); }
-      else if(sIntension.equals("s-right")){ actionRight(data, line); }
-      else { actionUserKey(sIntension, data, line); }
-      return true;
+      int keyCode = (Integer)params[1];
+      boolean done = true;
+      if(keyCode == KeyCode.shift + KeyCode.left){ actionLeft(data, line); }
+      else if(keyCode == KeyCode.shift + KeyCode.right){ actionRight(data, line); }
+      else if(keyCode == KeyCode.enter){ done = actionOk(data, line); }
+      else { done = false; }
+      return done;
     }
     
   };

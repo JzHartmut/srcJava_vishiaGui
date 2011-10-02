@@ -65,6 +65,7 @@ public class JavaCmdKeyActions
           else if(keyCode == keyCopy){ main.actionCopy.userActionGui(sIntension, widgd, params); }
           //navigation
           else if(keyCode == keyOriginDir){ main.selectTab.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }
+          else if(keyCode == KeyCode.enter){ main.selectTab.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }
           else { done = false; }
         }
       }

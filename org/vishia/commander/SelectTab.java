@@ -141,6 +141,7 @@ class SelectTab
     tabbedPanel.tabbedPanel.addGridPanel(WidgetNames.panelFile + "main"+tabbedPanel.cNr, "file&"+tabbedPanel.cNr,1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd'); //the whole panel.
     tabbedPanel.fileSelectorMain = new FileSelector(console);
+    tabbedPanel.fileSelectorMain.setActionOnEnterFile(main.executer.actionExecute);
     String nameTab = WidgetNames.tableFile + "main" + tabbedPanel.cNr;
     main.idxFileSelector.put(nameTab, tabbedPanel.fileSelectorMain);
     tabbedPanel.fileSelectorMain.setToPanel(mng, nameTab, 5, new int[]{2,20,5,10}, 'A');
@@ -172,6 +173,7 @@ class SelectTab
     tabPanel.addGridPanel(info.tabName, info.tabName,1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd'); //the whole panel.
     FileSelector fileSelector = new FileSelector(console);
+    fileSelector.setActionOnEnterFile(main.executer.actionExecute);
     main.idxFileSelector.put(info.tabName, fileSelector);
     fileSelector.setToPanel(mng, info.tabName, 5, new int[]{2,20,5,10}, 'A');
     fileSelector.fillIn(new File(info.path));
@@ -290,8 +292,7 @@ class SelectTab
     }
     
     
-    @Override
-    protected void actionOk(Object userData, TableLineGui_ifc line)
+    @Override protected boolean actionOk(Object userData, TableLineGui_ifc line)
     {
       SelectInfo info = (SelectInfo)line.getUserData();
       if(info.active != '.'){
@@ -318,7 +319,7 @@ class SelectTab
           panel.fileSelectorMain.setFocus();
         }
       }
-      
+      return true;
     }
   
     @Override

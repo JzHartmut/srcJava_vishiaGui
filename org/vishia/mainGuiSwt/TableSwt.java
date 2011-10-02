@@ -252,7 +252,8 @@ public class TableSwt implements TableGui_ifc
     {
       final GralWidget widgetDescr;
       final GralUserAction action;
-      System.out.println("" + keyEv.character + Integer.toHexString(keyEv.keyCode));
+      //System.out.println("" + keyEv.character + Integer.toHexString(keyEv.keyCode));
+      
       final Object source = keyEv.getSource();
       final Control swtControl;
       if(source instanceof Control){
@@ -267,114 +268,29 @@ public class TableSwt implements TableGui_ifc
         swtControl = null;
       }
       boolean actionDone = false;
-      if(action !=null){
+      if(action !=null && (keyEv.keyCode & 0xffff) !=0){
       	int ixRow = -99999;
       	try{
 	      	Table table1 = (Table)source;
-	        ixRow  = table1.getSelectionIndex();
+	        ixRow  = table1.getSelectionIndex();   //the currently selected line.
 	        if(ixRow >=0){  //< 0 if nothing is selected.
-		        TableItem line = table1.getItem(ixRow);
-		        TableLineGui_ifc lineGui = (TableLineGui_ifc)line.getData();
-		        if(lineGui == null){
-		          lineGui = new TableItemWidget(line, null);
-		          line.setData(lineGui);
+		        TableItem tableLineSwt = table1.getItem(ixRow);   // the SWT TableItem which presents the line.
+		        //The SWT-TableItem contains data, which implements the gral TableLineGui_ifc to get data from the line.
+		        //firstly: Build the instance and associate to the TableItem.
+		        //later: Re-Use the instance.
+		        TableLineGui_ifc lineGral = (TableLineGui_ifc)tableLineSwt.getData();
+		        if(lineGral == null){
+		          lineGral = new TableItemWidget(tableLineSwt, null);
+		          tableLineSwt.setData(lineGral);  //Set the data for usage later.
 		        }
-		        if((keyEv.stateMask & (SWT.CONTROL + SWT.ALT + SWT.SHIFT)) == SWT.CONTROL){
-              //all key events with only ctrl
-              final String sIntension;
-              switch(keyEv.keyCode){
-                case SWT.ARROW_LEFT:  sIntension = "c-left"; break;
-                case SWT.ARROW_RIGHT: sIntension = "c-right"; break;
-                case SWT.ARROW_UP:    sIntension = "c-up"; break;
-                case SWT.ARROW_DOWN:  sIntension = "c-dn"; break;
-                case SWT.PAGE_UP:     sIntension = "c-pgup"; break;
-                case SWT.PAGE_DOWN:   sIntension = "c-pgdn"; break;
-                default: sIntension = null;
-              }
-              if(sIntension !=null){
-                action.userActionGui(sIntension, widgetDescr, lineGui);    
-              }
-		        } else if((keyEv.stateMask & (SWT.CONTROL + SWT.ALT + SWT.SHIFT)) == SWT.SHIFT){
-              //all key events with only ctrl
-              final String sIntension;
-              switch(keyEv.keyCode){
-                case SWT.ARROW_LEFT:  sIntension = "s-left"; break;
-                case SWT.ARROW_RIGHT: sIntension = "s-right"; break;
-                case SWT.ARROW_UP:    sIntension = "s-up"; break;
-                case SWT.ARROW_DOWN:  sIntension = "s-dn"; break;
-                case SWT.PAGE_UP:     sIntension = "s-pgup"; break;
-                case SWT.PAGE_DOWN:   sIntension = "s-pgdn"; break;
-                default: sIntension = null;
-              }
-              if(sIntension !=null){
-                action.userActionGui(sIntension, widgetDescr, lineGui);    
-              }
-		        } else if((keyEv.stateMask & (SWT.CONTROL + SWT.ALT + SWT.SHIFT)) == SWT.ALT){
-              //all key events with only ctrl
-              final String sIntension;
-              switch(keyEv.keyCode){
-                case SWT.ARROW_LEFT:  sIntension = "a-left"; break;
-                case SWT.ARROW_RIGHT: sIntension = "a-right"; break;
-                case SWT.ARROW_UP:    sIntension = "a-up"; break;
-                case SWT.ARROW_DOWN:  sIntension = "a-dn"; break;
-                case SWT.PAGE_UP:     sIntension = "a-pgup"; break;
-                case SWT.F1:          sIntension = "a-f1"; break;
-                case SWT.F2:          sIntension = "a-f2"; break;
-                case SWT.F3:          sIntension = "a-f3"; break;
-                case SWT.F4:          sIntension = "a-f4"; break;
-                case SWT.F5:          sIntension = "a-f5"; break;
-                case SWT.F6:          sIntension = "a-f6"; break;
-                case SWT.F7:          sIntension = "a-f7"; break;
-                case SWT.F8:          sIntension = "a-f8"; break;
-                case SWT.F9:          sIntension = "a-f9"; break;
-                case SWT.F10:         sIntension = "a-f10"; break;
-                case SWT.F11:         sIntension = "a-f12"; break;
-                case SWT.F12:         sIntension = "a-f12"; break;
-                 default: sIntension = null;
-              }
-              if(sIntension !=null){
-                action.userActionGui(sIntension, widgetDescr, lineGui);    
-              }
-            } else {
-  		        if(keyEv.keyCode == 0x0d){ //Enter-key pressed:
-  		          TableItem[] tableItem = table1.getSelection();
-  		          int zColumns = tableItem.length;
-  		          String[] content = new String[zColumns];
-  		          for(int ii=0; ii < zColumns; ++ii){
-  		            String text= tableItem[ii].getText();  //first column? TODO
-  		            String text2= tableItem[ii].getText(0);
-  		            content[ii] = text;  //content of the table item
-  		          }
-  		          action.userActionGui("ok", widgetDescr, content);    
-  		        } else if(keyEv.keyCode == SWT.KeyUp 
-  		                 && source instanceof Table && ixRow == 0){
-  		          //able to use to leave, disable the table.
-  		          action.userActionGui("upleave", widgetDescr, (Object)null);    
-  		        } else if(keyEv.character == ' '){
-  		          action.userActionGui("mark", widgetDescr, lineGui);    
-  		            
-  		          /*
-  		          && selectionColumn >=0){
-  		          String selected = line.getText(selectionColumn);
-  		          if(selected.length() >0) {
-  		            line.setText(selectionColumn, "");
-  		            line.setBackground(mng.propertiesGui.color(0xffffff));
-  		          }
-  		          else { 
-  		            line.setText(selectionColumn, selectionText.toString());
-  		            line.setBackground(mng.propertiesGui.color(0x00ff00));
-  		          }
-  		          //table.setSelection(select);
-  		          stop();
-  		          */
-  		        }
-		        }  
+		        int keyCode = GralKeySwt.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
+		        actionDone = action.userActionGui("table-key", widgetDescr, lineGral, keyCode);
 	        } //if(table.)
 	      } catch(Exception exc){
       		stop();  //ignore it
       	}
       }
-      if(!actionDone){
+      if(!actionDone  && (keyEv.keyCode & 0xffff) !=0){
         GralUserAction mainKeyAction = mng.getRegisteredUserAction("KeyAction");
         if(mainKeyAction !=null){
           int gralKey = GralKeySwt.convertFromSwt(keyEv.keyCode, keyEv.stateMask);

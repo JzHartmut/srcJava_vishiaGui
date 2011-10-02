@@ -33,6 +33,7 @@ import org.vishia.mainCmd.Report;
 public class CommandSelector extends SelectList
 {
 
+  /**Store of all possible commands given in the command file. */
   public final CmdStore cmdStore;
   
   private final CmdQueue cmdQueue;
@@ -70,7 +71,7 @@ public class CommandSelector extends SelectList
   }
   
   
-  @Override public void actionOk(Object userData, TableLineGui_ifc line)
+  @Override public boolean actionOk(Object userData, TableLineGui_ifc line)
   {
     CmdStore.CmdBlock cmdBlock = (CmdStore.CmdBlock)userData;
     getterFiles.prepareFileSelection();
@@ -78,7 +79,8 @@ public class CommandSelector extends SelectList
     files[0] = getterFiles.getFile1();
     files[1] = getterFiles.getFile2();
     files[2] = getterFiles.getFile3();
-    cmdQueue.addCmd(cmdBlock, files);  //to execute.
+    cmdQueue.addCmd(cmdBlock, files, null);  //to execute.
+    return true;
   }
   
   

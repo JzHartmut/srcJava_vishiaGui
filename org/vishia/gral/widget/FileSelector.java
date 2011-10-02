@@ -4,13 +4,13 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.Widgetifc;
 import org.vishia.mainCmd.MainCmd_ifc;
@@ -30,6 +30,7 @@ public class FileSelector implements Widgetifc
   
   /**Version and History:
    * <ul>
+   * <li>2011-10-02  New: {@link #setActionOnEnterFile(GralUserAction)}. It executes this action if Enter is pressed (or mouse-left- or doubleclick-TODO).
    * <li>2011-10-01 new: {@link #setOriginDir(File)} and {@link #fillInOriginDir()}.
    *   The origin dir is the directory of first selection or can be set by user. If the user navigates misty,
    *   the origin dir helps to find again the start point.
@@ -37,7 +38,7 @@ public class FileSelector implements Widgetifc
    * <li>2011-08-14 created. Firstly used for the Java commander. But it is a universal file select widget.
    * </ul>
    */
-  public static final int version = 0x20111001;
+  public static final int version = 0x20111002;
 
   private static class FileAndName
   { String sPath;
@@ -49,8 +50,8 @@ public class FileSelector implements Widgetifc
    */
   private class FileSelectList extends SelectList
   {
-    @Override public void actionOk(Object userData, TableLineGui_ifc line)
-    {
+    @Override public boolean actionOk(Object userData, TableLineGui_ifc line)
+    { boolean done = true;
       File file = (File)(userData);
       File dir = file.getParentFile();
       String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir);
@@ -64,8 +65,15 @@ public class FileSelector implements Widgetifc
           //save the last selection of that level
           indexSelection.put(sDir, sName);
           fillIn(file);
+        } else {
+          if(actionOnEnterFile !=null){
+            actionOnEnterFile.userActionGui("FileSelector-file", widgdPath, file);
+          } else {
+            done = false;
+          }
         }
       }
+      return done;
     }
     
     
@@ -139,32 +147,39 @@ public class FileSelector implements Widgetifc
   /**The directory which was used on start. */
   File originDir;
   
+  
+  GralUserAction actionOnEnterFile;
+  
   public FileSelector(MainCmd_ifc mainCmd)
   {
     this.mainCmd = mainCmd;
   }
   
   
-  /**Sets this widget to a panel.
-   * @param panel The panel where this Widget should be set. The position in the panel 
-   *        should be set before using {@link GralGridBuild_ifc#setPositionInPanel(float, float, float, float, char)}.
-   * @param name The name of the widget in the panel.
+  /**Sets the widgets of this instance to a panel.
+   * The panel and the position in the panel 
+   * should be set before using {@link GralGridBuild_ifc#selectPanel(String)} and 
+   * {@link GralGridBuild_ifc#setPositionInPanel(float, float, float, float, char)}.
+   * The instance has more as one widget, all widgets are set in the area of the given position.
+   * The position area should be a range of at least 3 lines.
+   * @param panelMng The panelManager. 
+   * @param name The name of the table widget. The Text-widget for the path gets the name * "-Path".
    * @param rows Number of rows to show
    * @param columns Array with column width.
    * @param size Presentation size. It is a character 'A'..'E', where 'A' is a small size. The size determines
    *        the font size especially. 
    */
-  public void setToPanel(GralGridBuild_ifc panel, String name, int rows, int[] columns, char size)
+  public void setToPanel(GralGridBuild_ifc panelMng, String name, int rows, int[] columns, char size)
   {
     //The macro widget consists of more as one widget. Position the inner widgets:
-    GralGridPos posAll = panel.getPositionInPanel();
+    GralGridPos posAll = panelMng.getPositionInPanel();
     //Text field for path above list
-    panel.setPosition(posAll, GralGridPos.same, 2.0F, GralGridPos.same, GralGridPos.same, 1, 'd');
-    widgdPath = panel.addTextField(name + "-Path", false, null, '.');
-    widgdPath.setBackColor(panel.getColor("pye"), 0xeeffff);  //color pastel yellow
+    panelMng.setPosition(posAll, GralGridPos.same, 2.0F, GralGridPos.same, GralGridPos.same, 1, 'd');
+    widgdPath = panelMng.addTextField(name + "-Path", false, null, '.');
+    widgdPath.setBackColor(panelMng.getColor("pye"), 0xeeffff);  //color pastel yellow
     //the list
-    panel.setPosition(posAll, 2.0F, GralGridPos.same, GralGridPos.same, GralGridPos.same, 1, 'd');
-    selectList.setToPanel(panel, name, rows, columns, size);
+    panelMng.setPosition(posAll, 2.0F, GralGridPos.same, GralGridPos.same, GralGridPos.same, 1, 'd');
+    selectList.setToPanel(panelMng, name, rows, columns, size);
     //store this in the GralWidgets to get back from widgets later.
     widgdPath.setContentInfo(this);
     selectList.wdgdTable.setContentInfo(this);
@@ -174,6 +189,17 @@ public class FileSelector implements Widgetifc
   public File getCurrentDir(){ return currentDir; }
   
   public void setOriginDir(File dir){ originDir = dir; }
+  
+  /**Sets the action which is called if any file is entered. It means the Enter-Key is pressed or
+   * a mouse double-click is done on a file.
+   * @param newAction The action to use. The action is invoked with TODO
+   * @return The current assigned action or null.
+   */
+  public GralUserAction setActionOnEnterFile(GralUserAction newAction)
+  { GralUserAction oldAction = actionOnEnterFile;
+    actionOnEnterFile = newAction;
+    return oldAction;
+  }
   
   
   /**Fills the content with the first directory or the directory which was set with 

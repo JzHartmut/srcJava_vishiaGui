@@ -32,6 +32,8 @@ public class JavaCmd extends GuiCfg
   {
     File fileCfgCmds;
     
+    File fileCmdsForExt;
+    
     File fileCfgButtonCmds;
     
     File fileSelectTabPaths;
@@ -46,6 +48,8 @@ public class JavaCmd extends GuiCfg
   final CmdQueue cmdQueue = new CmdQueue(mainCmd);
   
   final SelectTab selectTab = new SelectTab(mainCmd, this);
+  
+  final Executer executer = new Executer(mainCmd, this);
   
   final CommandSelector cmdSelector = new CommandSelector(cmdQueue);
   
@@ -173,18 +177,22 @@ public class JavaCmd extends GuiCfg
   
   @Override protected final void initMain()
   { if(cargs.fileCfgCmds == null){
-      mainCmd.writeError("Argument cmdcfg:CONFIGFILE should be given.");
+    mainCmd.writeError("Argument cmdcfg:CONFIGFILE should be given.");
+    //mainCmd.e
+    } else if(cargs.fileCmdsForExt == null){
+      mainCmd.writeError("Argument cmdext:CONFIGFILE should be given.");
       //mainCmd.e
-  } else if(cargs.fileCfgButtonCmds == null){
-    mainCmd.writeError("Argument cmdButton:CONFIGFILE should be given.");
-    //mainCmd.e
-  } else if(cargs.fileSelectTabPaths == null){
-    mainCmd.writeError("Argument sel:SELECTFILE should be given.");
-    //mainCmd.e
-  } else {
+    } else if(cargs.fileCfgButtonCmds == null){
+      mainCmd.writeError("Argument cmdButton:CONFIGFILE should be given.");
+      //mainCmd.e
+    } else if(cargs.fileSelectTabPaths == null){
+      mainCmd.writeError("Argument sel:SELECTFILE should be given.");
+      //mainCmd.e
+    } else {
       String sError;
       File fileCfg;
       sError = cmdSelector.cmdStore.readCmdCfg(fileCfg = cargs.fileCfgCmds); 
+      if(sError == null){ sError = executer.readCmdFile(fileCfg = cargs.fileCmdsForExt); }
       if(sError == null){ sError = buttonCmds.readCmdCfg(fileCfg = cargs.fileCfgButtonCmds); }
       if(sError == null){ sError = selectTab.readCfg(fileCfg = cargs.fileSelectTabPaths); }
       if(sError !=null){
@@ -304,6 +312,9 @@ public class JavaCmd extends GuiCfg
     { boolean bOk = true;
       if(arg.startsWith("cmdcfg:")){
         cargs.fileCfgCmds = new File(arg.substring(7));
+      }
+      else if(arg.startsWith("cmdext:")){
+        cargs.fileCmdsForExt = new File(arg.substring(7));
       }
       else if(arg.startsWith("cmdButton:")){
         cargs.fileCfgButtonCmds = new File(arg.substring(10));
@@ -451,7 +462,7 @@ public class JavaCmd extends GuiCfg
         files[0] = getterFiles.getFile1();
         files[1] = getterFiles.getFile2();
         files[2] = getterFiles.getFile3();
-        cmdQueue.addCmd(cmdBlock, files);  //to execute.
+        cmdQueue.addCmd(cmdBlock, files, null);  //to execute.
       }
       return true;
     }

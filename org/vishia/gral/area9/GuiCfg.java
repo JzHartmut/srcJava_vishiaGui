@@ -27,7 +27,17 @@ import org.vishia.msgDispatch.LogMessage;
  * It works without any derivation, if only simple widgets are necessary.
  * If additional capabilities are need, this class can uses as the super class.
  * Some protected methods support overriding.
- * 
+ * <br><br>
+ * The class contains a {@link #main(String[])}. It is a complete ready to run application. 
+ * The content of the GUI can be controlled by a script. The command line arguments are parsed in
+ * {@link GuiMainCmd}, the universal or basic MainCmd for GUI applications.
+ * <br>
+ * Registered user action can be used by script.
+ * <ul>
+ * <li>"cmdInvoke": The given parameter 'cmd' of the widget will be executed as command line.
+ *   It is usefull to start commands from this GUI.
+ * </ul>
+ * A user plugin class can be plugged which can register some more user actions etc.
  * @author Hartmut Schorrig.
  *
  */
@@ -306,6 +316,9 @@ public final void execute()
 
 
 
+/**Registered as user action.
+ * 
+ */
 private final GralUserAction cmdInvoke = new GralUserAction()
 { 
   ProcessBuilder processBuilder = new ProcessBuilder("pwd");
