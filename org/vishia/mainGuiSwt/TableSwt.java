@@ -31,10 +31,23 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.TableGui_ifc;
 import org.vishia.gral.widget.TableLineGui_ifc;
+import org.vishia.util.KeyCode;
 
 public class TableSwt implements TableGui_ifc
 {
 
+  
+  /**Version and History:
+   * <ul>
+   * <li>2011-10-02: Hartmut chg: The key handling is improved. The old idea - a String for any key - is now obsolete.
+   *   The keycodes are contained in {@link KeyCode}, that are used. The conversion routine for SWT-keys is {@link GralKeySwt}.
+   * <li>older: TODO
+   * </ul>
+   */
+  public static final int version = 0x20111001;
+
+
+  
   private final Table table;
   
   private final GuiPanelMngSwt mng;
