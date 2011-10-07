@@ -271,12 +271,13 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   
   @Override public void setSize(int height, int ySizeFrac, int width, int xSizeFrac)
   {
-    pos.setSize(height, ySizeFrac, width, xSizeFrac);
+    pos.setSize(height, ySizeFrac, width, xSizeFrac);  //NOTE: setSize sets the next pos 
     posUsed = false;
   }
   
   void setSize(float height, float width)
   { pos.setSize(height, width, pos);
+    posUsed = false;
   }
   
   /**Sets the position to the next adequate the {@link #pos.dirNext}. */

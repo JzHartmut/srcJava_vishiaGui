@@ -303,9 +303,16 @@ public class GralGridPos implements Cloneable
   
   public float height()
   { float height;
-    if(y >= 0 && yEnd > 0){ height = yEnd - y + (yEndFrac - yFrac) * 0.1F; }
-    else if(y < 0 && yEnd <= 0){ height = yEnd - y + (yEndFrac - yFrac) * 0.1F; }
-    else { height = 2.0F; } //not able to determine, use default.
+    if(y * yEnd >= 0){
+      height = yEnd - y;
+      if((parameterDesignation & mBitSizeNeg)!=0) {
+        height = -height;
+      }
+    }
+    else{ 
+      height = 2.0F;  //not able to determine, use default.
+    }
+    height += (yEndFrac - yFrac) * 0.1F;
     return height;
   }
   
@@ -354,10 +361,10 @@ public class GralGridPos implements Cloneable
                         -1;
       //check the ranges of input parameter. There are added constants, see parameter of setPosition.
       //check z: set z to the absolute value, positive or negative.
-      int zRefer, zfRefer;
+      int pRefer, pfRefer;
       if((paramDesg & mBitSizeNeg)!=0){ 
-        zRefer = pe;  zfRefer = pef;    //size was negative: refer from end.
-      } else { zRefer = p;  zfRefer = pf; }
+        pRefer = pe;  pfRefer = pef;    //size was negative: refer from end if size is given.
+      } else { pRefer = p;  pfRefer = pf; }
       
       if(  z > (GralGridPos.same - GralGridPos.mValueRange_)
         && z < (GralGridPos.same + GralGridPos.mValueRange_)
@@ -367,12 +374,10 @@ public class GralGridPos implements Cloneable
         //add parent position:
         z -= same;
         //NOTE: q, qe will be set after ze is checked.
-        z = zRefer + z;
-        zf = zfRefer + zf;  //frac part always positive.
       } else if( z == next || z == nextBlock){
         if(this.pDir == 1){
-          z = zRefer + pSize;
-        } else { z = zRefer; }
+          z = pRefer + pSize;
+        } else { z = pRefer; }
       }
       //check ze: set the final positions q...
       if(  ze > (GralGridPos.same - GralGridPos.mValueRange_)
@@ -381,14 +386,32 @@ public class GralGridPos implements Cloneable
         //related end value to frame or previous position
         qParamDesg |= mBitRelEnd;
         ze -= same;
-        q = z; qf = zf;   //use the left/top position like given.
-        qe = pe + ze; qef = pef + zef;  //use the end position like given.
+        //regard maybe related position in z,zf for start. 
+        if((qParamDesg & mBitRel)!=0){
+          q = z + p; qf = zf + pf;
+        } else {
+          q = z; qf = zf;
+        }
+        qe = ze + pe; qef = zef + pf; 
+        /*
+        if((paramDesg & mBitSizeNeg) != 0){ 
+          qe = z; qef = zf;   //use the left/top position like given.
+          q = p + ze; qf = pf + zef;  //use the end position like given.
+        } else {
+          q = z; qf = zf;   //use the left/top position like given.
+          qe = pe + ze; qef = pef + zef;  //use the end position like given.
+        }
+        */
       } else if(  ze > (GralGridPos.size - GralGridPos.mValueRange_)
                && ze < (GralGridPos.size + GralGridPos.mValueRange_)
                ){
         //size value
         qParamDesg |= mBitSize;
         ze -= size;
+        if((qParamDesg & mBitRel)!=0){  //The z parameter was detected as refer (same)
+          z = pRefer + z;     //use the pRefer instead p or pe 
+          zf = pfRefer + zf;  //frac part always positive.
+        } 
         if(bxSizeNeg = (ze <0)){
           qParamDesg |= mBitSizeNeg;
           ///
@@ -404,6 +427,10 @@ public class GralGridPos implements Cloneable
                && ze < (GralGridPos.size + GralGridPos.same + GralGridPos.mValueRange_)
                ){
         //size value related to frame or previous size
+        if((qParamDesg & mBitRel)!=0){
+          z = pRefer + z;
+          zf = pfRefer + zf;  //frac part always positive.
+        }
         qParamDesg |= mBitSize + mBitRelEnd;
         ze -= size + same;
         ze += pSize;  //the size
@@ -423,124 +450,6 @@ public class GralGridPos implements Cloneable
         q = z; qf = zf;
         qe = ze; qef = zef;
       }
-      /*
-      if(bxSame){ 
-        z -= GralGridPos.same; //may be negative!
-      }
-      if(bSameSize){
-        qSameNextSizeProperty = same + size;
-        ze -= GralGridPos.size +  GralGridPos.same; //may be negative!
-        bxSizeNeg = pe < 0;  //use negative size form parent or frame.
-        ze = pe + ze;        //but increment the size with given relative size.
-        zef = pef + zef;
-        if(bxSizeNeg){ 
-          if(pOrigin <0){ pOrigin = 2; }
-        } else {
-          if(pOrigin <0){ pOrigin = 0; }
-        }
-      } else if(bxSize){
-          qSameNextSizeProperty = size;
-          ze -= GralGridPos.size; //may be negative!
-          bxSizeNeg = ze < 0;
-          if(bxSizeNeg){ 
-            ze =  -ze;
-            if(pOrigin <0){ pOrigin = 2; }
-          } else {
-            if(pOrigin <0){ pOrigin = 0; }
-          }
-      } else if(bxSameEnd){ 
-          ze -= GralGridPos.same; //may be negative!
-        bxSizeNeg = false;
-      } else {
-        bxSizeNeg = false;
-      }
-      
-      final boolean bColumnFromRight = z < 0;
-      if(bColumnFromRight){ z = - z; } //use positive values anytime
-      if(bxSame){
-        //don't change column
-        if(bxSameEnd){
-          q = p + z; qf = pf + zf; 
-          qe = pe + ze; qef = pef + zef;
-          //if(qef >=10){ qef -=10; qe+=1; }
-        } else if(bxSize){
-          //The size is changed but the same column
-          if(bxSizeNeg){
-            if(pef >= zef){
-              q = pe - ze; qf = pef - zef;
-            } else {
-              q = pe - ze -1; qf = 10 + pef - zef;
-            }
-            qe = pe; qef = pef;
-            //if(pf <0){ p -=1; pf +=10; }
-          } else {
-            q = p + z; qf = pf + zf; 
-            qe = p + ze; qef = pf + zef;
-            //if(pef >=10){ pe +=1; pef -=10; }
-          }
-        } else { //an end position is given
-          q = p + z; qf = pf + zf; 
-          qe = ze; qef = zef;
-        }
-        //if(pf >=10){ pf -=10; p+=1; }
-      } else if(z == GralGridPos.next && pDir==1 || z == GralGridPos.nextBlock){
-        //calculate next x
-        if(bxSameEnd || ze == GralGridPos.next || ze == GralGridPos.nextBlock){ 
-          //calculate next position, don't change end column
-          int xd = (int)pd;
-          zef = (int)((pd - xd)* 10.001F) + pef;
-          
-          q = pe; qf = pef;
-          if(zef >= 10){ zef -=10; xd +=1; }
-          qe = p + xd;
-          qef = zef;
-        } else if(bxSize){
-          //calculate next position, size is given:
-          q = pe; qf = pef;  //set start to previous end.
-          zef += pef; if(zef >=10){ zef -=10; ze +=1; }
-          qe = p + ze; qef = zef;  //set end to newstart + size
-        } else { 
-          //calculate next position, end position is given:
-          q = pe; qf = pef;
-          qe = ze; qef = zef;
-        }
-      } else { //position z is given:
-        if(z == GralGridPos.next){  //next is given, but not for this coordinate: 
-          if(bxSizeNeg){
-            z = pe; zf = pef;     //use the actual value.
-          } else {
-            z = p; zf = pf;       //use the actual value.
-          }
-        }
-        //position is given or next is set but not in this direction:
-        if(bxSameEnd || ze == GralGridPos.next || ze == GralGridPos.nextBlock){ 
-          //don't change end position
-          q = z; qf = zf;
-          qe = pe; qef = pef;
-        } else if(bxSize){
-          if(bxSizeNeg){ //the given position is the right or button one:
-            if(zf >= zef){
-              q = z - ze; qf = zf - zef;
-            } else {
-              q = z - ze -1; qf = zf - zef + 10;
-            }
-            //if(pf < 0){ pf +=10; p -=1; }
-            qe = z; qef = zf;  //the end position is the given one.
-          } else { //the given position is the left one:
-            q = z; qf = zf; 
-            qe = z + ze; qef = zf + zef;
-            //if(pef >=10){ pef -=10; pe +=1; }
-          } 
-        } else if(bColumnFromRight){
-          q = -z; qf = zf;      //Note: values may be negative then calculate pixel from right or bottom border. 
-          qe = ze; qef = zef;
-          
-        } else { //column and end column is given:
-          q = z; qf = zf;      //Note: values may be negative then calculate pixel from right or bottom border. 
-          qe = ze; qef = zef;
-        }
-      }
-      */
       
       if(qf >= 10){
         p = q +1; pf = qf -10;

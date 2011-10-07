@@ -146,7 +146,7 @@ public class BzrGui extends GuiCfg
     //panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate, 0);
     //panelMng.tabPanel.addGridPanel("operation", "&Operation",1,1,10,10);
       
-    gui.addFrameArea(1,1,3,1, mainTabPanel.getGuiComponent()); //dialogPanel);
+    gui.addFrameArea(1,1,3,2, mainTabPanel.getGuiComponent()); //dialogPanel);
 
     try { 
         mainTabPanel.addGridPanel("Select", "&Select",1,1,10,10);

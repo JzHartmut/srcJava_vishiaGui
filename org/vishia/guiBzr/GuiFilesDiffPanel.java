@@ -19,6 +19,7 @@ import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.TableLineGui_ifc;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.Report;
+import org.vishia.util.KeyCode;
 
 public class GuiFilesDiffPanel
 {
@@ -207,11 +208,22 @@ public class GuiFilesDiffPanel
   
   
   
+  /**Action for mark a line. It is the actionChange for the table. This action will be called
+   * on any key events or mouse events on the table. 
+   * The action method returns true if the key or mouse is used.
+   * Here it is the space bar or enter to mark a line.
+   * */
   private final GralUserAction actionTableLineFile = new GralUserAction()
   { 
     public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     { boolean bDone = true;
-      if(sCmd.equals("mark")){
+      final int key;
+      if(sCmd.equals("table-key") && values[1] instanceof Integer){
+        key = (Integer)(values[1]);
+      } else {
+        key = 0;
+      }
+      if(key == KeyCode.enter || key == ' '){
         TableLineGui_ifc line = (TableLineGui_ifc) values[0];
         String isMarked = line.getCellText(columnMark);
         if(isMarked.equals("*")) {

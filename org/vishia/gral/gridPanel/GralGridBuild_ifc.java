@@ -24,6 +24,8 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.InfoBox;
+import org.vishia.gral.widget.TableLineGui_ifc;
+import org.vishia.util.KeyCode;
 
 
 
@@ -365,6 +367,17 @@ public interface GralGridBuild_ifc
   
   
   /**Adds a table, which is able to scroll.
+   * A user action on the GUI with the table invokes the {@link GralWidget#setActionChange(GralUserAction)}
+   * with 
+   * <ul>
+   * <li> with given command "table-key".
+   * <li>values[0] is the selected line referenced with {@link TableLineGui_ifc}
+   * <li>values[1] is the key code described in {@link KeyCode}
+   * </ul> 
+   * If the method isn't given or returns false, the central key action given in {@link GralGridMngBase#getRegisteredUserAction(String)}
+   * for "keyAction" is tried to get and then invoked with cmd = "key" and the key code in values[0].
+   * This central keyAction may be used for application centralized keys without association to the table itself.
+   * 
    * @param sName register name, used for {@link GuiPanelMngWorkingIfc#insertInfo(String, int, String).}
    * @param height The height in grid units for the appearance
    * @param columnWidths Array with width of the columns. 
@@ -375,21 +388,6 @@ public interface GralGridBuild_ifc
    */
   GralWidget addTable(String sName, int height, int[] columnWidths);
 
-  /**Adds a table which supports selection of some lines.
-   * Parameter see {@link #addTable(String, int, int[])}.
-   * Additional parameter:
-   * @param selectionColumn Column in which the selection is written. 
-   * @param selectionText Text which is written in the selection-column cell. 
-   *        If the selection alternates, the text is replaced by an empty String.
-   *        The String can be changed outside if this parameter refers to a StringBuilder-buffer
-   *        and thats content is changed. The currently text will be used. 
-   * @return
-   * TODO it may be better to use a derived WidgetDescriptorSelection, which contain a method
-   *      setSelectionAction(UserActionGui) or maybe using setAction() for a standard action...
-   *      The action may receive the line and sends back an information to change.
-   *      It should be able to applicate to a tree-leafe too! See {@link WidgetGui_ifc}.
-   */
-  //WidgetDescriptor addTable(String sName, int height, int[] columnWidths, int selectionColumn, CharSequence selectionText);
 
   /**Adds a simple text at the current position.
    * 

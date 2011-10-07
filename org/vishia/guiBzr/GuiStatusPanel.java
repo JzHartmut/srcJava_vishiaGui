@@ -10,8 +10,10 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.SwitchExclusiveButtonMng;
+import org.vishia.gral.widget.TableLineGui_ifc;
 import org.vishia.mainGuiSwt.DeprecatedInfoBoxSwt;
 import org.vishia.util.FileSystem;
+import org.vishia.util.KeyCode;
 
 /**This class contains all data and methods of the status (select) panel.
  * 
@@ -235,7 +237,7 @@ public class GuiStatusPanel
   
   
   
-  /**Action if a line is confirmed or up command on top line is invoked.
+  /**Action if a line is confirmed.
    * If a line is confirmed, the path is set to {@link #widgdProjektpath}.
    * If the top line is leaved, the table will be closed.
    * 
@@ -243,14 +245,21 @@ public class GuiStatusPanel
   private final GralUserAction actionSelectorProjectPathTable = new GralUserAction()
   { 
     public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
-    {
-      if(sCmd.equals("ok")){
-        String sPath = (String)values[0];
+    {  boolean bDone = true;
+      final int key;
+      if(sCmd.equals("table-key") && values[1] instanceof Integer){
+        key = (Integer)(values[1]);
+      } else {
+        key = 0;
+      }
+      if(key == KeyCode.enter){
+        TableLineGui_ifc line = (TableLineGui_ifc)values[0];
+        String sPath = line.getCellText(0);
         widgdProjektpath.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, sPath);
         buildComponentsInfoSelectBoxes();
-      }
-      selectorProjectPath.setWindowVisible(false);
-      return true;
+        selectorProjectPath.setWindowVisible(false);
+      } else { bDone = false; }
+      return bDone;
     }
   };
   

@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -240,14 +241,16 @@ public class TableSwt implements TableGui_ifc
   
   
   
-  /**A Table is completed with a special key listener. On some keys and situation 
-   * the {@link GralUserAction} given in the WidgetDescriptor is called. 
-   * The following keys are detected:
-   * <ul><li>Enter: "ok" Selection of a line or cell in the table
-   * <li>KeyUp on the first line: "upleave": Leave the table.
+  /**A Table is completed with a special key listener. On all keys 
+   * the {@link GralUserAction} given in the {@link GralWidget#getActionChange()} is called
    * <ul>
-   * The 
-   *
+   * <li> with given command "table-key".
+   * <li>params[0] is the selected line referenced with {@link TableLineGui_ifc}
+   * <li>params[1] is the key code described in {@link KeyCode}
+   * </ul> 
+   * If the method returns false, the central key action given in {@link GralGridMngBase#getRegisteredUserAction(String)}
+   * for "keyAction" is tried to get and then invoked with cmd = "key" and the key code in params[0].
+   * This central keyAction may be used for application centralized keys without association to the table itself.
    */
   class TableKeyListerner implements KeyListener
   {
