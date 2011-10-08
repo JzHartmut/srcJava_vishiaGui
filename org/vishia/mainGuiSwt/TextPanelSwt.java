@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.widget.TextBoxGuifc;
 
 public class TextPanelSwt extends GralPanelContent implements TextBoxGuifc, Appendable
@@ -15,11 +16,11 @@ public class TextPanelSwt extends GralPanelContent implements TextBoxGuifc, Appe
   
   TextBoxSwt textAreaOutput;
   
-  TextPanelSwt(String namePanel, Shell shell, int style)
-  { super(namePanel);
+  TextPanelSwt(String namePanel, Shell shell, int style, GralPrimaryWindow_ifc mainWindow)
+  { super(namePanel, mainWindow);
     Display device = shell.getDisplay();
     //Composite panel = (Composite) panelComposite;
-    textAreaOutput = new TextBoxSwt(shell, style);
+    textAreaOutput = new TextBoxSwt(shell, style, super.mainWindow);
     textAreaOutput.text.setFont(new Font(device, "Monospaced",11, SWT.NORMAL));
     panelComposite = textAreaOutput.text;  //it is a control,    
   }

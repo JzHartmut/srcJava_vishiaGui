@@ -7,6 +7,7 @@ import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.Widgetifc;
+import org.vishia.gral.widget.TextBoxGuifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainGuiSwt.MainCmdSwt;
 
@@ -119,5 +120,10 @@ public interface GuiMainAreaifc extends GralPrimaryWindow_ifc
   void addFrameArea(int xArea, int yArea, int dxArea, int dyArea, GralPanelContent component)
   throws IndexOutOfBoundsException;
   
+  
+  /**Returns the text box which is used as output box for common messages of the application.
+   * @return null if no output window is given.
+   */
+  TextBoxGuifc getOutputBox();
   
 }

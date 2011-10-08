@@ -206,7 +206,7 @@ public class BzrGui extends GuiCfg
      */
     public CmdLineAndGui(CallingArguments cargs, String[] args)
     { 
-      super(cargs, args, "Bazaar-Gui");
+      super(cargs, args, "Bazaar-Gui", "3A3C");
       this.cargs = cargs;
       addAboutInfo("Bazaar-Gui");
       addAboutInfo("made by HSchorrig, 2011-04-30, 2011-05-01");

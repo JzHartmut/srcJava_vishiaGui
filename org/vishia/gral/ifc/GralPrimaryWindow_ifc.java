@@ -38,6 +38,8 @@ public interface GralPrimaryWindow_ifc extends GralWindow_ifc
   boolean startGraphicThread();
 
   
+  long getThreadIdGui();
+  
   /**Returns true if the graphical application runs. 
    * @return
    */

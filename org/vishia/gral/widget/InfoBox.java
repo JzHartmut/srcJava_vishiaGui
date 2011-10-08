@@ -1,5 +1,7 @@
 package org.vishia.gral.widget;
 
+import java.io.IOException;
+
 import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralColor;
@@ -115,6 +117,28 @@ public class InfoBox implements TextBoxGuifc, GralWindow_ifc
   {
     // TODO Auto-generated method stub
     
+  }
+
+  @Override
+  public Appendable append(CharSequence arg0) throws IOException
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Appendable append(char arg0) throws IOException
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Appendable append(CharSequence arg0, int arg1, int arg2)
+      throws IOException
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
   
 }

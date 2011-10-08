@@ -6,6 +6,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.Widgetifc;
 
@@ -28,7 +29,7 @@ public abstract class GralPanelContent implements Widgetifc
   public Object itsTabSwt; 
   
 	
-	
+	public GralPrimaryWindow_ifc mainWindow;
 	
 	//public final CanvasStorePanel panelComposite;
 	
@@ -67,7 +68,9 @@ public abstract class GralPanelContent implements Widgetifc
 	
 	
 	
-	protected GralPanelContent(String namePanel){ this.namePanel = namePanel; }
+	protected GralPanelContent(String namePanel, GralPrimaryWindow_ifc mainWindow)
+	{ this.namePanel = namePanel; this.mainWindow = mainWindow;
+  }
 
 	
 

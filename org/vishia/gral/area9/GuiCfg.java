@@ -108,16 +108,16 @@ protected GralPlugUser_ifc user;
 
 
 
-protected final GuiMainAreaifc gui;
+public final GuiMainAreaifc gui;
 
-protected final MainCmd_ifc mainCmd;
+public final MainCmd_ifc mainCmd;
 
 public GralGridMngBase panelMng;
 
 /**Panel-Management-interface for the panels. */
-protected GralGridBuild_ifc panelBuildIfc;
+public GralGridBuild_ifc panelBuildIfc;
 
-protected GralPanelMngWorking_ifc guiAccess;
+public GralPanelMngWorking_ifc guiAccess;
 
 protected GralTabbedPanel mainTabPanel;
 
@@ -371,7 +371,7 @@ public static void main(String[] args)
   GuiCallingArgs cargs = new GuiCallingArgs();
   //Initializes the GUI till a output window to show information.
   //Uses the commonly GuiMainCmd class because here are not extra arguments.
-  GuiMainCmd cmdGui = new GuiMainCmd(cargs, args, "GUI-cfg");  //implements MainCmd, parses calling arguments
+  GuiMainCmd cmdGui = new GuiMainCmd(cargs, args, "GUI-cfg", "3A3C");  //implements MainCmd, parses calling arguments
   try{ cmdGui.parseArguments(); }
   catch(Exception exception)
   { cmdGui.writeError("Cmdline argument error:", exception);

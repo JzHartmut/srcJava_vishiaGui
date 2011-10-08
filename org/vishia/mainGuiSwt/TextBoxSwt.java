@@ -7,14 +7,21 @@ import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.widget.TextBoxGuifc;
 
-public class TextBoxSwt implements TextBoxGuifc, Appendable
+public class TextBoxSwt implements TextBoxGuifc
 {
   final Text text;
   
-  public TextBoxSwt(Composite parent, int style)
+  final GralPrimaryWindow_ifc mainWindow;
+  
+  StringBuffer newText = new StringBuffer();
+  
+  public TextBoxSwt(Composite parent, int style, GralPrimaryWindow_ifc mainWindow)
   { text = new Text(parent, style);
+    this.mainWindow = mainWindow;
   }
 
   @Override public Widget getWidget(){ return text; } 
@@ -37,22 +44,32 @@ public class TextBoxSwt implements TextBoxGuifc, Appendable
 
   @Override
   public Appendable append(CharSequence arg0) throws IOException
-  { text.append(arg0.toString());
+  { if(Thread.currentThread().getId() == mainWindow.getThreadIdGui()){
+      text.append(arg0.toString());
+    } else {
+      newText.append(arg0);
+      mainWindow.addDispatchListener(changeGui);    
+    }
     return this;
   }
 
   @Override
   public Appendable append(char arg0) throws IOException
-  {
-    // TODO Auto-generated method stub
-    return null;
+  { if(Thread.currentThread().getId() == mainWindow.getThreadIdGui()){
+    String ss = "" + arg0;
+    text.append(ss);
+  } else {
+    newText.append(arg0);
+    mainWindow.addDispatchListener(changeGui);    
   }
+  return this;
+}
 
   @Override
   public Appendable append(CharSequence arg0, int arg1, int arg2)
       throws IOException
   {
-    text.append(arg0.subSequence(arg1, arg2).toString());
+    append(arg0.subSequence(arg1, arg2).toString());
     return this;
   }
 
@@ -85,4 +102,18 @@ public class TextBoxSwt implements TextBoxGuifc, Appendable
     return null;
   }
 
+  
+  
+  GralDispatchCallbackWorker changeGui = new GralDispatchCallbackWorker()
+  { @Override public void doBeforeDispatching(boolean onlyWakeup)
+    { if(newText.length() >0){
+        text.append(newText.toString());
+        viewTrail();
+        newText.setLength(0);
+      }
+      mainWindow.removeDispatchListener(this);
+    }
+  };
+  
+  
 }

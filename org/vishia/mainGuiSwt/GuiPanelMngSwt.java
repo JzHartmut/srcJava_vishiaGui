@@ -86,6 +86,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.Widgetifc;
 import org.vishia.gral.swt.WidgetSimpleWrapperSwt;
+import org.vishia.gral.widget.TextBoxGuifc;
 import org.vishia.msgDispatch.LogMessage;
 
 
@@ -740,16 +741,17 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
  *   'l' left, 't' top (above field) 
  * @return
  */
-public Text addTextBox(GralWidget widgetInfo, boolean editable, String prompt, char promptStylePosition)
+public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String prompt, char promptStylePosition)
 { widgetInfo.setPanelMng(this);
-  Text widget = new Text((Composite)pos.panel.panelComposite, SWT.MULTI);
-  widget.setFont(propertiesGuiSwt.stdInputFont);
-  widget.setEditable(editable);
+  TextBoxSwt widgetSwt = new TextBoxSwt((Composite)pos.panel.panelComposite, SWT.MULTI, gralDevice);
+  //Text widgetSwt = new Text((Composite)pos.panel.panelComposite, SWT.MULTI);
+  widgetSwt.text.setFont(propertiesGuiSwt.stdInputFont);
+  widgetSwt.text.setEditable(editable);
   if(editable)
     stop();
-  widget.setBackground(propertiesGuiSwt.colorSwt(0xFFFFFF));
-  widget.addMouseListener(mouseClickForInfo);
-  setPosAndSize_(widget);
+  widgetSwt.text.setBackground(propertiesGuiSwt.colorSwt(0xFFFFFF));
+  widgetSwt.text.addMouseListener(mouseClickForInfo);
+  setPosAndSize_(widgetSwt.text);
   if(prompt != null && promptStylePosition == 't'){
     final int yPixelField;
     final Font promptFont;
@@ -764,7 +766,7 @@ public Text addTextBox(GralWidget widgetInfo, boolean editable, String prompt, c
     default: promptFont = propertiesGuiSwt.smallPromptFont;
              yPixelField = propertiesGui.yPixelUnit() * 2 -3;
     }//switch
-    Rectangle boundsField = widget.getBounds();
+    Rectangle boundsField = widgetSwt.text.getBounds();
     Rectangle boundsPrompt = new Rectangle(boundsField.x, boundsField.y-3  //occupy part of field above, only above the normal letters
       , boundsField.width, boundsField.height );
     
@@ -782,7 +784,7 @@ public Text addTextBox(GralWidget widgetInfo, boolean editable, String prompt, c
     if(promptSize.x > boundsPrompt.width){
       boundsPrompt.width = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
     }
-    widget.setBounds(boundsField);
+    widgetSwt.text.setBounds(boundsField);
     wgPrompt.setBounds(boundsPrompt);
   } 
   //
@@ -790,8 +792,8 @@ public Text addTextBox(GralWidget widgetInfo, boolean editable, String prompt, c
     widgetInfo.name = sCurrPanel + widgetInfo.name.substring(1);
   }
   //link the widget with is information together.
-  widgetInfo.widget = new WidgetSimpleWrapperSwt(widget);
-  widget.setData(widgetInfo);
+  widgetInfo.widget = widgetSwt;
+  widgetSwt.text.setData(widgetInfo);
   if(widgetInfo.name !=null){
     indexNameWidgets.put(widgetInfo.name, widgetInfo);
     if(!editable){
@@ -799,7 +801,7 @@ public Text addTextBox(GralWidget widgetInfo, boolean editable, String prompt, c
     }
   }
   pos.panel.widgetList.add(widgetInfo);
-  return widget; 
+  return widgetSwt; 
 
 }
 

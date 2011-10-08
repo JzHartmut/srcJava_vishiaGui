@@ -6,7 +6,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPrimaryWindow;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.widget.TextBoxGuifc;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmd_ifc;
 
@@ -20,6 +22,8 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
   protected String outputArea;
 
   protected GralPanelContent outputPanel;
+  
+  protected TextBoxGuifc outputBox;
   
   /** Current Directory for file choosing. */
   protected File currentDirectory = null;
@@ -57,6 +61,23 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
   
   @Override public GralPanelContent getOutputPanel(){ return outputPanel; } ///
   
+  @Override public TextBoxGuifc getOutputBox(){ return outputBox; }
+
+  
+  protected GralRectangle convertArea(String area)
+  { int x1,x2,y1,y2;
+    x1 = "ABC".indexOf(area.charAt(0));
+    if(x1 < 0){x1 = "ABC".indexOf(area.charAt(1));}
+    x2 = "ABC".indexOf(area.charAt(2));
+    if(x2 < 0){x2 = "ABC".indexOf(area.charAt(3));}
+    y1 = "123".indexOf(area.charAt(0));
+    if(y1 < 0){y1 = "123".indexOf(area.charAt(1));}
+    y2 = "123".indexOf(area.charAt(2));
+    if(y2 < 0){y2 = "123".indexOf(area.charAt(3));}
+    
+    GralRectangle ret = new GralRectangle(x1+1, y1+1, x2-x1+1, y2-y1+1);
+    return ret;
+  }
 
 
 }

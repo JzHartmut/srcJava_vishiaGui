@@ -20,6 +20,7 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralWidget;
 
 public class TabPanelSwt extends GralTabbedPanel
@@ -32,8 +33,8 @@ public class TabPanelSwt extends GralTabbedPanel
   private class TabFolder_ extends GralPanelContent// implements WidgetCmpnifc
   {
     final TabFolder widgetSwt;
-    TabFolder_(String namePanel, Composite parent, int style)
-    { super(namePanel);
+    TabFolder_(String namePanel, Composite parent, int style, GralPrimaryWindow_ifc mainWindow)
+    { super(namePanel, mainWindow);
       widgetSwt = new TabFolder(parent, style); 
     }
     @Override public Widget getWidget(){ return widgetSwt; }
@@ -64,7 +65,7 @@ public class TabPanelSwt extends GralTabbedPanel
 		Object oParent = mng.pos.panel.panelComposite;
 		if(oParent == null || !(oParent instanceof Composite) ){ throw new IllegalArgumentException("Software error. You must select a panel before."); }
 		Composite parent = (Composite)oParent;
-		tabMng = new TabFolder_(namePanel, parent, SWT.TOP);
+		tabMng = new TabFolder_(namePanel, parent, SWT.TOP, null);
 		tabMng.widgetSwt.addSelectionListener(tabItemSelectListener);
 		tabMng.widgetSwt.addControlListener(resizeListener);
   	

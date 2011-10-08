@@ -3,7 +3,7 @@ package org.vishia.gral.widget;
 import org.vishia.gral.ifc.Widgetifc;
 
 
-public interface TextBoxGuifc extends Widgetifc //WidgetGui_ifc
+public interface TextBoxGuifc extends Widgetifc, Appendable //WidgetGui_ifc
 {
 
   String setText(String text);

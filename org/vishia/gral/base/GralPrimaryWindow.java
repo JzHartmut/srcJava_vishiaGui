@@ -152,7 +152,7 @@ public abstract class GralPrimaryWindow extends GralSubWindow implements GralPri
   //------------------------------------------------------------------------------------------
   //get methods
   
-  public long getThreadIdGui(){ return guiThreadId; }
+  @Override public long getThreadIdGui(){ return guiThreadId; }
 
   
   

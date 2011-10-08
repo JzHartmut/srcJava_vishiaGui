@@ -26,7 +26,7 @@ public class FactorySwt implements GralFactory_ifc
 
   @Override public GuiMainAreaifc createGuiWindow(MainCmd cmdP)
   {
-    gui = new MainCmdSwt(cmdP, null);
+    gui = new MainCmdSwt(cmdP);
     gralDevice = gui.getPrimaryWindow();
     if(gralDevice ==null){
       //gralDevice = new GralDeviceSwt();

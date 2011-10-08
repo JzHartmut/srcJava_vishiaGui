@@ -22,6 +22,8 @@ public class JavaCmdKeyActions
   
   int keyCopy = KeyCode.F5;
   
+  int keyWindFullOut = KeyCode.ctrl + 'o';
+  
   //---------------------------------------------------------------------------------
   //Navigation 
   int keySelectPanelLeft = KeyCode.alt + KeyCode.F1;
@@ -66,6 +68,7 @@ public class JavaCmdKeyActions
           //navigation
           else if(keyCode == keyOriginDir){ main.selectTab.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }
           else if(keyCode == KeyCode.enter){ main.selectTab.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }
+          else if(keyCode == keyWindFullOut){ main.windMng.actionWindFullOut.userActionGui(sIntension, widgd, params); }
           else { done = false; }
         }
       }

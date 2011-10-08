@@ -4,6 +4,7 @@ package org.vishia.mainGuiSwt;
 import org.eclipse.swt.widgets.Composite;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 
 public class PanelSwt extends GralPanelContent
 {
@@ -12,7 +13,7 @@ public class PanelSwt extends GralPanelContent
   
   public PanelSwt(String name)
   {
-    super(name);
+    super(name, null);
   }
 
   public PanelSwt(String name, Composite panelSwt)

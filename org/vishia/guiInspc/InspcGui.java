@@ -64,7 +64,7 @@ public class InspcGui extends GuiCfg
     
     public CmdLineAndGui(CallingArguments cargs, String[] args)
     {
-      super(cargs, args, "Inspc-GUI-cfg");
+      super(cargs, args, "Inspc-GUI-cfg", "3A3C");
       this.cargs = cargs;
       super.addAboutInfo("Inspc-GUI-cfg");
       super.addAboutInfo("made by HSchorrig, 2011-05-18, 2011-05-19");

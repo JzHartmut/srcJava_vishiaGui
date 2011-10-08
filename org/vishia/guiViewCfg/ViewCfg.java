@@ -114,7 +114,7 @@ public class ViewCfg extends GuiCfg
      */
     public CmdLineAndGui(CallingArguments cargs, String[] args)
     { 
-      super(cargs, args, "ViewCfg");
+      super(cargs, args, "ViewCfg", "3A3C");
       super.addAboutInfo("ViewCfg");
       super.addAboutInfo("made by HSchorrig, 2010-06-07, 2011-09-03");
       //super.addStandardHelpInfo();

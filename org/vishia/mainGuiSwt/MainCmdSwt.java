@@ -55,6 +55,7 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPrimaryWindow;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.Widgetifc;
 import org.vishia.gral.widget.TextBoxGuifc;
@@ -364,9 +365,10 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   }
   */
   
-  public MainCmdSwt(MainCmd cmdP, GralDeviceSwt gralDevice) //String[] args)
+  public MainCmdSwt(MainCmd cmdP) //String[] args)
   { //super(args);
     super(cmdP); //gralDevice);
+    super.gralDevice = swtWindow;
     swtWindow.addGuiBuildOrder(initOutputArea); 
     swtWindow.addDispatchListener(writeOutputTextDirectly);
   }
@@ -384,11 +386,14 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
         setStandardMenusGThread(currentDirectory, actionFile);
       }
       if(outputArea != null){
+        GralRectangle area = convertArea(outputArea);
+        /*
         int xArea = outputArea.charAt(0) - 'A' +1;
         int yArea = outputArea.charAt(1) - '0';
         int dxArea = outputArea.charAt(2) - 'A' +1 - xArea +1;
         int dyArea = outputArea.charAt(3) - '0' - yArea +1;
-        outputPanel = addOutputFrameArea(xArea, yArea, dxArea, dyArea);
+        */
+        outputPanel = addOutputFrameArea(area.x, area.y, area.dx, area.dy);
       }
     }
   };
@@ -731,8 +736,9 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    */
   protected GralPanelContent addOutputFrameArea(int xArea, int yArea, int dxArea, int dyArea)
   { int widgetStyle = SWT.H_SCROLL | SWT.V_SCROLL;
-    TextPanelSwt textPanel = new TextPanelSwt("output", swtWindow.graphicFrame, widgetStyle);
-  	//textAreaOutput = new WidgetsSwt.TextBoxSwt(swtWindow.graphicFrame, widgetStyle);
+    TextPanelSwt textPanel = new TextPanelSwt("output", swtWindow.graphicFrame, widgetStyle, gralDevice);
+    super.outputBox = textPanel.textAreaOutput;
+    //textAreaOutput = new WidgetsSwt.TextBoxSwt(swtWindow.graphicFrame, widgetStyle);
     //textAreaPos = new Position(textAreaOutput);
     //textAreaPos.x = x; textAreaPos.y = y; textAreaPos.dx = dx; textAreaPos.dy = dy; 
     //textAreaOutput.setSize(350,100); //swtWindow.graphicFrame.get)
@@ -766,6 +772,11 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
     return textPanel;
   }
 
+  
+  
+  
+  
+  
 /*
   protected void setJPanel(JPanel panel)
   { 
@@ -964,6 +975,13 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 
   @Override  public void setWindowVisible(boolean visible)
   { swtWindow.setWindowVisible(visible);
+  }
+
+
+
+
+  @Override public long getThreadIdGui()
+  { return swtWindow.getThreadIdGui();
   }
 }
 

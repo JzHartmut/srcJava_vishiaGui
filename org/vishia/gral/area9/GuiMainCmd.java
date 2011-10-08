@@ -21,20 +21,23 @@ public class GuiMainCmd extends MainCmd
   /**ctor called in static main.
    * @param cargs aggregation to command-line-argument data, it will be filled here.
    * @param args The command-line-calling arguments from static main
+   * @param sTitle Title in title line
+   * @param sOutputArea area for output, for example "3A3C".
    */
-  public GuiMainCmd(GuiCallingArgs cargs, String[] args, String sTitle)
+  public GuiMainCmd(GuiCallingArgs cargs, String[] args, String sTitle, String sOutputArea)
   { 
     super(args);
     this.cargs = cargs;
     cargs.graphicFactory = new FactorySwt(); 
+    if(sOutputArea == null){ sOutputArea = "A3C3"; }
     
     gui = cargs.graphicFactory.createGuiWindow(this);
     
-    super.addAboutInfo("Gui");
+    super.addAboutInfo(sTitle);
     super.addAboutInfo("made by HSchorrig, 2010-06-07, 2011-08-07");
     //super.addStandardHelpInfo();
     gui.setTitleAndSize(sTitle, 50,50,900, 600); //600);  //This instruction should be written first to output syntax errors.
-    gui.setOutputArea("A3C3");        //whole area from mid to bottom
+    gui.setOutputArea(sOutputArea);        //whole area from mid to bottom
     gui.startGraphicThread();
   }
 
