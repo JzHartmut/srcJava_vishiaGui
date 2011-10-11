@@ -5,6 +5,10 @@ import java.io.File;
 import org.vishia.gral.swt.FactorySwt;
 import org.vishia.mainCmd.MainCmd;
 
+/**This class is an extension of the {@link MainCmd} for graphic applications.
+ * @author Hartmut Schorrig
+ *
+ */
 public class GuiMainCmd extends MainCmd
 {
   

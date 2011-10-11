@@ -688,8 +688,8 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
       //float xSize = pos.width();
       switch(promptStylePosition){
         case 't':{
-          posPrompt.setPosition(this.pos, GralGridPos.same, ySize * 0.37f + GralGridPos.size, 0, 0, 0, '.');
-          posField.setPosition(this.pos, GralGridPos.refer + ySize * 0.37f, GralGridPos.same, 0, 0, 0, '.');
+          posPrompt.setPosition(this.pos, GralGridPos.same, ySize * 0.37f + GralGridPos.size, GralGridPos.same, GralGridPos.same, 0, '.');
+          posField.setPosition(this.pos, GralGridPos.refer + ySize * 0.37f, GralGridPos.same, GralGridPos.same, GralGridPos.same, 0, '.');
         } break;
       }
       promptFont = propertiesGuiSwt.smallPromptFont;

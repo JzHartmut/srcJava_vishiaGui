@@ -67,6 +67,7 @@ public class GralColor
       addColor("amber",  0xffe000);
       addColor("orange", 0xffa000);
       addColor("violet", 0x6000ff);
+      addColor("mauve",  0xd0d0ff);
       addColor("pink",   0xff0080);
       addColor("purple", 0xff0060);
       
@@ -83,6 +84,7 @@ public class GralColor
       addColor("ma", 0xff00ff);
       addColor("cy", 0x00ffff);
       addColor("bn", 0x600020);
+      addColor("mv", 0xd0d0ff);
       addColor("vi", 0x6000ff);
       addColor("pk", 0xff0080);
       addColor("pu", 0xff0040);
@@ -96,6 +98,7 @@ public class GralColor
       addColor("lam", 0xfff080);
       addColor("lor", 0xffa060);
       addColor("lma", 0xff80ff);
+      addColor("lmv", 0xe0e0ff);
       addColor("lcy", 0x00ffff);
       addColor("lbk", 0x404040);
       
@@ -107,6 +110,7 @@ public class GralColor
       addColor("pye", 0xffffc0);
       addColor("pam", 0xfff0c0);
       addColor("por", 0xffc080);
+      addColor("pmv", 0xfff0ff);
       addColor("pma", 0xffa0ff);
       addColor("pcy", 0xa0ffff);
 

@@ -63,7 +63,7 @@ public class CommandSelector extends SelectList
   public void fillIn()
   {
     wdgdTable.setValue(GralPanelMngWorking_ifc.cmdClear, -1, null, null);
-    for(CmdStore.CmdBlock data: cmdStore.listCmd){
+    for(CmdStore.CmdBlock data: cmdStore.getListCmds()){
       
       wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, data.name, data);
     }

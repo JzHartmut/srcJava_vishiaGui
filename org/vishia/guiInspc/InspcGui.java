@@ -115,6 +115,8 @@ public class InspcGui extends GuiCfg
       
     gui.addFrameArea(1,1,3,2, mainTabPanel.getGuiComponent()); //dialogPanel);
    
+    Appendable out = gui.getOutputBox();
+    mainCmd.setOutputChannels(out, out);
   }
 
   

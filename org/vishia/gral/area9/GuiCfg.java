@@ -248,6 +248,8 @@ protected void initGuiAreas()
   gui.addMenuItemGThread("&Design/e&Nable", panelMng.actionDesignEditField);  
   gui.addMenuItemGThread("&Design/Edit &field", panelMng.actionDesignEditField);  
   gui.addFrameArea(1,1,3,1, mainTabPanel.getGuiComponent()); //dialogPanel);
+  Appendable out = gui.getOutputBox();
+  mainCmd.setOutputChannels(out, out);
  
 }
 

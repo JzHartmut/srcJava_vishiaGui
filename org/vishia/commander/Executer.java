@@ -63,4 +63,17 @@ public class Executer
       return false;
   } };
   
+  
+  /**User action to abort a running command.
+   * 
+   */
+  GralUserAction actionCmdAbort = new GralUserAction()
+  { @Override public boolean userActionGui(String sIntension, GralWidget widgd, Object... params)
+    { main.cmdQueue.abortCmd();
+      return true;
+    }
+  };
+  
+
+  
 }

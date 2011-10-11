@@ -293,7 +293,7 @@ public class GuiFilesDiffPanel
           } else {
           	//what todo
           }
-          mainData.cmdExec.execWait(uCmd.toString(), null, uRenameOut, uRenameOut);
+          mainData.cmdExec.execute(uCmd.toString(), null, uRenameOut, uRenameOut);
           mainData.mainCmdifc.writeInfoln(sCmd + "\n" + uRenameOut);
         }
         refreshFiles();
@@ -374,7 +374,7 @@ public class GuiFilesDiffPanel
       if(bAdd){
         //mainData.log 
       	uCmdAdd.append(uFilesAdd);
-      	mainData.cmdExec.execWait(uCmdAdd.toString(), null, uRenameOut, uRenameOut);
+      	mainData.cmdExec.execute(uCmdAdd.toString(), null, uRenameOut, uRenameOut);
         mainData.mainCmdifc.writeInfoln(uCmdAdd + "\n" + uRenameOut);
       }
       if(bCommitSel && bAdd){
@@ -382,7 +382,7 @@ public class GuiFilesDiffPanel
       }
       if(bCommitSel || bAdd){
         uRenameOut.setLength(0);
-        mainData.cmdExec.execWait(uCmdCommit.toString(), null, uRenameOut, uRenameOut);
+        mainData.cmdExec.execute(uCmdCommit.toString(), null, uRenameOut, uRenameOut);
         mainData.mainCmdifc.writeInfoln(uCmdAdd + "\n" + uRenameOut);
       } else {
         mainData.mainCmdifc.writeError("Nothing to commit - Please select files with space-bar");
@@ -446,7 +446,7 @@ public class GuiFilesDiffPanel
         //what todo
       }
       StringBuilder out = new StringBuilder();      
-      mainData.cmdExec.execWait(uCmd.toString(), null, out, out);
+      mainData.cmdExec.execute(uCmd.toString(), null, out, out);
       mainData.mainAction.panelOutput.widgdOutputText.setValue(GralPanelMngWorking_ifc.cmdSet, 0, out.toString());
       stop();
       return true;

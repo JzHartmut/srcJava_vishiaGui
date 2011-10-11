@@ -60,11 +60,11 @@ public class InspcGuiComm
           if(widgd.sFormat.equals("int32AngleDegree")){
             int value = InspcAccessEvaluatorRxTelg.valueIntFromRxValue(info);
             float angle = value * (180.0f/2147483648.0f);
-            sShow = String.format("%3.2fï¿½", angle);
+            sShow = String.format("%3.2f °", angle);
           } else if(widgd.sFormat.equals("int16AngleDegree")){
             int value = InspcAccessEvaluatorRxTelg.valueIntFromRxValue(info);
             float angle = value * (180.0f/32768.0f);
-            sShow = String.format("%3.2fï¿½", angle);
+            sShow = String.format("%3.2f °", angle);
           } else {
             float value = InspcAccessEvaluatorRxTelg.valueFloatFromRxValue(info);
             try{ sShow = String.format(widgd.sFormat, value); }

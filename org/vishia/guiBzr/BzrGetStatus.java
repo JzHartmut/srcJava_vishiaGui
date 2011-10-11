@@ -79,8 +79,8 @@ public class BzrGetStatus
     mainData.cmdExec.setCurrentDir(data.fileBzrLocation);
     String sCmdStatus = mainData.cfg.indexCmds.get("status");
     String sCmdheadRevision = mainData.cfg.indexCmds.get("headRevision");
-    mainData.cmdExec.execWait(sCmdStatus, null, data.uBzrStatusOutput, data.uBzrError);
-    mainData.cmdExec.execWait(sCmdheadRevision, null, data.uBzrLastVersion, data.uBzrError);
+    mainData.cmdExec.execute(sCmdStatus, null, data.uBzrStatusOutput, data.uBzrError);
+    mainData.cmdExec.execute(sCmdheadRevision, null, data.uBzrLastVersion, data.uBzrError);
     getVersionFromLogOutput(data.uBzrLastVersion, data, false);
     File fileBzrVersion = new File(data.fileBzrLocation, "_bzrVersion.txt");
     if(fileBzrVersion.exists()){ 
