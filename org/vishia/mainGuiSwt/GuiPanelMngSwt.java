@@ -69,7 +69,7 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
-import org.vishia.gral.cfg.GuiCfgBuilder;
+import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.gridPanel.GralGridProperties;
@@ -114,7 +114,7 @@ import org.vishia.msgDispatch.LogMessage;
  * in runtime
  * and selecting of button-actions and data-container while creating with symbolic access
  * to the action-instance or the data-container. This property is used especially 
- * by the text-script-controlled built of a dialog widget using the {@link GuiCfgBuilder},
+ * by the text-script-controlled built of a dialog widget using the {@link GralCfgBuilder},
  * but it is able to simplify the access to data and actions elsewhere too.
  * <br><br>
  * <br><br>

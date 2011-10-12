@@ -219,7 +219,7 @@ public class GralWidget
    * To get the action in a script context (GuiCfgBuilder) some actions can be registered 
    * using {@link org.vishia.gral.gridPanel.GralGridBuild_ifc#registerUserAction(String, GralUserAction)}. They are gotten by name
    * invoking {@link org.vishia.gral.gridPanel.GralGridBuild_ifc#getRegisteredUserAction(String)} 
-   * in the {@link org.vishia.gral.cfg.GuiCfgBuilder}.
+   * in the {@link org.vishia.gral.cfg.GralCfgBuilder}.
    * 
    * @param action The action instance.
    */

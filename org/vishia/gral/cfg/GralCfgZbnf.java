@@ -14,17 +14,17 @@ import org.vishia.zbnf.ZbnfParseResultItem;
 import org.vishia.zbnf.ZbnfParser;
 
 /**Class to read the configuration script for a Graphical User Interface. The syntax of the configuration
- * matches to the class {@link GuiCfgData}, which contains all data of read configuration
+ * matches to the class {@link GralCfgData}, which contains all data of read configuration
  * after invoking the read method. That configuration data are associated in 
- * {@link GuiCfgBuilder#GuiCfgBuilder(GuiCfgData, GralGridBuild_ifc, File)} and used in
- * {@link GuiCfgBuilder#buildGui(org.vishia.msgDispatch.LogMessage, int)} to build the GUI appearance.
- * The building of the GUI with the {@link GuiCfgData} can be done without this script reader too,
+ * {@link GralCfgBuilder#GuiCfgBuilder(GralCfgData, GralGridBuild_ifc, File)} and used in
+ * {@link GralCfgBuilder#buildGui(org.vishia.msgDispatch.LogMessage, int)} to build the GUI appearance.
+ * The building of the GUI with the {@link GralCfgData} can be done without this script reader too,
  * but this class reads that data from a script.
  * 
  * @author Hartmut Schorrig
  *
  */
-public class GuiCfgZbnf
+public class GralCfgZbnf
 {
   
   private final ZbnfParser parser;
@@ -39,7 +39,7 @@ public class GuiCfgZbnf
    * It is used if other files are given with relative path.*/
   File currentDir;
 
-  public GuiCfgZbnf(Report log, File fileSyntax)
+  public GralCfgZbnf(Report log, File fileSyntax)
   { this.console = log;
     this.fileSyntax = fileSyntax;
     this.parser = new ZbnfParser(log);
@@ -58,7 +58,7 @@ public class GuiCfgZbnf
    * @return true if successfully, false on any error. If false, an error message was written
    *         using the own Report-implementation.
    */
-  public String configureWithZbnf(File fileConfigurationZbnf, GuiCfgData destination)
+  public String configureWithZbnf(File fileConfigurationZbnf, GralCfgData destination)
   { String sError = null;
     File dirOfconfig = fileConfigurationZbnf.getParentFile();
     //parses the configuration file and fill the configuration data.

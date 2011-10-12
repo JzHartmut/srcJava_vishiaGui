@@ -6,25 +6,25 @@ import java.util.Map;
 
 import org.vishia.msgDispatch.LogMessage;
 
-public class GuiCfgWriter
+public class GralCfgWriter
 {
   
   final LogMessage log;
 
   Writer writer;
   
-  public GuiCfgWriter(LogMessage log)
+  public GralCfgWriter(LogMessage log)
   { this.log = log;
   }
   
   
-  public String saveCfg(Writer dest, GuiCfgData cfg)
+  public String saveCfg(Writer dest, GralCfgData cfg)
   { this.writer = dest;
     String sError = null;
     try{
       writer.append("size(500,120); ");   //TODO it isn't used yet
       writeDataReplace(cfg);
-      GuiCfgData.GuiCfgElement cfge = cfg.firstElement;
+      GralCfgElement cfge = cfg.firstElement;
       while(cfge !=null){
         writeElement(dest, cfge);
         cfge = cfge.next;
@@ -36,7 +36,7 @@ public class GuiCfgWriter
   
   
   
-  void writeDataReplace(GuiCfgData cfg) throws IOException
+  void writeDataReplace(GralCfgData cfg) throws IOException
   { writer.append("\n");
     if(cfg !=null)for( Map.Entry<String, String> entry: cfg.dataReplace.entrySet()){
       writer.append("DataReplace: ").append(entry.getKey()).append(" = ").append(entry.getValue()).append(";\n");
@@ -46,25 +46,25 @@ public class GuiCfgWriter
   }
   
   
-  void writeElement(Writer ww, GuiCfgData.GuiCfgElement cfge) 
+  void writeElement(Writer ww, GralCfgElement cfge) 
   throws IOException
   {
-    if(cfge.widgetType instanceof GuiCfgData.GuiCfgImage){
+    if(cfge.widgetType instanceof GralCfgData.GuiCfgImage){
       ww.append("\n\n//================================================================================\n");
     }
     writePosition(ww, cfge.positionInput);
-    if(cfge.widgetType instanceof GuiCfgData.GuiCfgShowField){ writeShowField((GuiCfgData.GuiCfgShowField)cfge.widgetType); }
-    else if(cfge.widgetType instanceof GuiCfgData.GuiCfgText){ writeText((GuiCfgData.GuiCfgText)cfge.widgetType); }
-    else if(cfge.widgetType instanceof GuiCfgData.GuiCfgLed){ writeLed((GuiCfgData.GuiCfgLed)cfge.widgetType); }
-    else if(cfge.widgetType instanceof GuiCfgData.GuiCfgImage){ writeImage((GuiCfgData.GuiCfgImage)cfge.widgetType); }
-    else if(cfge.widgetType instanceof GuiCfgData.GuiCfgInputFile){ writeInputFile((GuiCfgData.GuiCfgInputFile)cfge.widgetType); }
-    else if(cfge.widgetType instanceof GuiCfgData.GuiCfgButton){ writeButton((GuiCfgData.GuiCfgButton)cfge.widgetType); }
+    if(cfge.widgetType instanceof GralCfgData.GuiCfgShowField){ writeShowField((GralCfgData.GuiCfgShowField)cfge.widgetType); }
+    else if(cfge.widgetType instanceof GralCfgData.GuiCfgText){ writeText((GralCfgData.GuiCfgText)cfge.widgetType); }
+    else if(cfge.widgetType instanceof GralCfgData.GuiCfgLed){ writeLed((GralCfgData.GuiCfgLed)cfge.widgetType); }
+    else if(cfge.widgetType instanceof GralCfgData.GuiCfgImage){ writeImage((GralCfgData.GuiCfgImage)cfge.widgetType); }
+    else if(cfge.widgetType instanceof GralCfgData.GuiCfgInputFile){ writeInputFile((GralCfgData.GuiCfgInputFile)cfge.widgetType); }
+    else if(cfge.widgetType instanceof GralCfgData.GuiCfgButton){ writeButton((GralCfgData.GuiCfgButton)cfge.widgetType); }
     //else if(cfge.widgetType instanceof GuiCfgData.GuiCfg){ writeButton((GuiCfgData.GuiCfgButton)cfge.widgetType); }
     else { writeUnknown(cfge.widgetType); }
   }
   
   
-  void writePosition(Writer ww, GuiCfgData.GuiCfgPosition pp) throws IOException
+  void writePosition(Writer ww, GralCfgPosition pp) throws IOException
   {
     if(pp.yPos >=0 || pp.xPos >=0 || pp.ySizeDown !=0 || pp.xWidth !=0){
       ww.append("\n@");
@@ -92,7 +92,7 @@ public class GuiCfgWriter
   }
 
   
-  void writeShowField(GuiCfgData.GuiCfgShowField ee) throws IOException
+  void writeShowField(GralCfgData.GuiCfgShowField ee) throws IOException
   { //String sep = "";
     writer.append("Show(");
     writeParam(ee);
@@ -100,7 +100,7 @@ public class GuiCfgWriter
   }
 
   
-  void writeLed(GuiCfgData.GuiCfgLed ee) throws IOException
+  void writeLed(GralCfgData.GuiCfgLed ee) throws IOException
   { //String sep = "";
     writer.append("Led(");
     writeParam(ee);
@@ -108,7 +108,7 @@ public class GuiCfgWriter
   }
 
   
-  void writeImage(GuiCfgData.GuiCfgImage ee) throws IOException
+  void writeImage(GralCfgData.GuiCfgImage ee) throws IOException
   { //String sep = "";
     writer.append("Imagefile(file=\"");
     writer.append(ee.file_).append("\"");
@@ -118,7 +118,7 @@ public class GuiCfgWriter
 
   
   
-  void writeInputFile(GuiCfgData.GuiCfgInputFile ee) throws IOException
+  void writeInputFile(GralCfgData.GuiCfgInputFile ee) throws IOException
   { //String sep = "";
     writer.append("InputFile(");
     writeParam(ee);
@@ -127,7 +127,7 @@ public class GuiCfgWriter
 
   
   
-  void writeButton(GuiCfgData.GuiCfgButton ee) throws IOException
+  void writeButton(GralCfgData.GuiCfgButton ee) throws IOException
   { //String sep = "";
     writer.append("Button(");
     writeParam(ee);
@@ -136,7 +136,7 @@ public class GuiCfgWriter
 
   
   
-  void writeText(GuiCfgData.GuiCfgText ee) throws IOException
+  void writeText(GralCfgData.GuiCfgText ee) throws IOException
   { //String sep = "";
     writer.append("Text(");
     writeParam(ee);
@@ -145,7 +145,7 @@ public class GuiCfgWriter
 
   
   
-  void writeUnknown(GuiCfgData.WidgetTypeBase ee) throws IOException
+  void writeUnknown(GralCfgData.WidgetTypeBase ee) throws IOException
   { //String sep = "";
     writer.append("Unknown(");
     writeParam(ee);
@@ -153,13 +153,13 @@ public class GuiCfgWriter
   }
 
   
-  private void writeParam(GuiCfgData.WidgetTypeBase pp) throws IOException
+  private void writeParam(GralCfgData.WidgetTypeBase pp) throws IOException
   {
     writeParam(pp, "");
   }
   
   
-  private void writeParam(GuiCfgData.WidgetTypeBase pp, String sep) throws IOException
+  private void writeParam(GralCfgData.WidgetTypeBase pp, String sep) throws IOException
   { //String sep = "";
     if(pp.text !=null)      { writer.            append("\"")       .append(pp.text).append("\""); sep = ", "; }
     if(pp.name !=null)      { writer.append(sep).append("name=")    .append(pp.name); sep = ", "; }

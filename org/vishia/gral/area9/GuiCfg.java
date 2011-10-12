@@ -7,9 +7,9 @@ import java.io.Writer;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
-import org.vishia.gral.cfg.GuiCfgData;
-import org.vishia.gral.cfg.GuiCfgDesigner;
-import org.vishia.gral.cfg.GuiCfgZbnf;
+import org.vishia.gral.cfg.GralCfgData;
+import org.vishia.gral.cfg.GralCfgDesigner;
+import org.vishia.gral.cfg.GralCfgZbnf;
 import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.gridPanel.GralGridProperties;
@@ -46,7 +46,8 @@ public class GuiCfg
 
   /**The version.
    * <ul>
-   * <li>2011-09-30 Hartmut new: menu 'Design/...' to edit fields and work with the {@link GuiCfgDesigner}.
+   * <li>2011-10-11 Hartmut new: Switches MainCmd-output to OutputBox.
+   * <li>2011-09-30 Hartmut new: menu 'Design/...' to edit fields and work with the {@link GralCfgDesigner}.
    * <li>2011-09-18 Hartmut new: The main tab panel has the name 'mainTab' and it is registered in the {@link #panelMng} now.
    *     Generally an application may have more as one tabbed panels.
    * <li>2011-09-10 Hartmut del: Remove dialogZbnfConfigurator, it was not used. It is the old solution.
@@ -87,7 +88,7 @@ public class GuiCfg
 final GuiCallingArgs cargs;
 
 /**The configuration data for graphical appearance. */
-protected final GuiCfgData guiCfgData = new GuiCfgData();
+protected final GralCfgData guiCfgData = new GralCfgData();
 
 
 
@@ -211,8 +212,6 @@ GralDispatchCallbackWorker initGuiDialog = new GralDispatchCallbackWorker()
     gui.removeDispatchListener(this);    
     countExecution();
   }
-  
-  
 };
 
 
@@ -245,13 +244,22 @@ protected void initGuiAreas()
 {
   gui.setFrameAreaBorders(20, 80, 60, 85);
   gui.setStandardMenusGThread(new File("."), actionFile);
-  gui.addMenuItemGThread("&Design/e&Nable", panelMng.actionDesignEditField);  
-  gui.addMenuItemGThread("&Design/Edit &field", panelMng.actionDesignEditField);  
+  initMenuGralDesigner();
   gui.addFrameArea(1,1,3,1, mainTabPanel.getGuiComponent()); //dialogPanel);
   Appendable out = gui.getOutputBox();
   mainCmd.setOutputChannels(out, out);
  
 }
+
+
+protected void initMenuGralDesigner()
+{
+  gui.addMenuItemGThread("&Design/e&Nable", panelMng.actionDesignEditField);  
+  gui.addMenuItemGThread("&Design/Edit &field", panelMng.actionDesignEditField);  
+  
+}
+
+
 
 protected void initMain()
 {
@@ -269,7 +277,7 @@ protected void initMain()
     if(cargs.fileGuiCfg.exists())
     {
       File fileSyntax = new File(cargs.sPathZbnf + "/dialog.zbnf");
-      GuiCfgZbnf cfgZbnf = new GuiCfgZbnf(console, fileSyntax);
+      GralCfgZbnf cfgZbnf = new GralCfgZbnf(console, fileSyntax);
       
       String sError = cfgZbnf.configureWithZbnf(cargs.fileGuiCfg, guiCfgData);
       if(sError !=null){

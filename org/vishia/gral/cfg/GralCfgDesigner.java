@@ -10,7 +10,7 @@ import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
 
-public class GuiCfgDesigner
+public class GralCfgDesigner
 {
   
   /**The version.
@@ -28,7 +28,7 @@ public class GuiCfgDesigner
 
   private final GralGridMngBase mng;
   
-  private final GuiCfgBuilder cfgBuilder;
+  private final GralCfgBuilder cfgBuilder;
 
   /**A Panel which contains the table to select some projectPaths. */
   //private GuiShellMngBuildIfc dialogWindowProps;
@@ -51,7 +51,7 @@ public class GuiCfgDesigner
   
   GralWidget widgdInDialog = null;
   
-  public GuiCfgDesigner(GuiCfgBuilder cfgBuilder, GralGridMngBase mng, LogMessage log)
+  public GralCfgDesigner(GralCfgBuilder cfgBuilder, GralGridMngBase mng, LogMessage log)
   { this.cfgBuilder = cfgBuilder;
     this.log = log;
     this.mng = mng;
@@ -110,13 +110,13 @@ public class GuiCfgDesigner
       int dxGrid = (int)(dxGridf >0 ? dxGridf + 0.5f : dxGridf - 0.5f);
       int dyGrid = (int)(dyGridf >0 ? dyGridf + 0.5f : dyGridf - 0.5f);
       
-      GuiCfgData.GuiCfgElement cfge = (GuiCfgData.GuiCfgElement)widgd.getCfgElement();
+      GralCfgElement cfge = (GralCfgElement)widgd.getCfgElement();
       if(cfge !=null){
         String sPanel = cfge.position.panel;  //Note: The cloned Object maybe empty here before buildWidget() is called
         int xPosAct = cfge.position.xPos;
         int yPosAct = cfge.position.yPos;
         if(bCopy){
-          GuiCfgData.GuiCfgElement cfgn = cfge.clone(); //cfgBuilder.newCfgElement(cfge);
+          GralCfgElement cfgn = cfge.clone(); //cfgBuilder.newCfgElement(cfge);
           cfge = cfgn;
         }
         cfge.positionInput.xPos = xPosAct + dxGrid; 
@@ -136,7 +136,7 @@ public class GuiCfgDesigner
   public void editFieldProperties(GralWidget widgd, GralRectangle xy)
   { //if(widgdInDialog == null){
       widgdInDialog = widgd;
-      GuiCfgData.GuiCfgElement cfge = (GuiCfgData.GuiCfgElement)widgd.getCfgElement();
+      GralCfgElement cfge = (GralCfgElement)widgd.getCfgElement();
       String sName, sDataPath, sText, sFormat, sShowMethod,  sActionMethod;
       String sLine, sColumn, sWidth, sHeight;
       if(cfge !=null){
@@ -183,7 +183,7 @@ public class GuiCfgDesigner
         String sWidth = dialogFieldWidth.getValue();
         String sHeight = dialogFieldHeight.getValue();
         
-        GuiCfgData.GuiCfgElement cfge = (GuiCfgData.GuiCfgElement)widgdInDialog.getCfgElement();
+        GralCfgElement cfge = (GralCfgElement)widgdInDialog.getCfgElement();
         if(cfge !=null){
           String sPanel = cfge.position.panel;  //Note: The cloned Object maybe empty here before buildWidget() is called
             /*if(sName.trim().length() >0) { cfge.widgetType.name = sName; }

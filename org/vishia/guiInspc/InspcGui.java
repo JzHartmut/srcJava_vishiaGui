@@ -110,8 +110,7 @@ public class InspcGui extends GuiCfg
   {
     gui.setFrameAreaBorders(20, 80, 60, 85);
     gui.setStandardMenusGThread(new File("."), actionFile);
-    gui.addMenuItemGThread("&Design/e&Nable", panelMng.actionDesignEditField);  
-    gui.addMenuItemGThread("&Design/Edit &field", panelMng.actionDesignEditField);  
+    super.initMenuGralDesigner();
       
     gui.addFrameArea(1,1,3,2, mainTabPanel.getGuiComponent()); //dialogPanel);
    

@@ -12,8 +12,8 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
-import org.vishia.gral.cfg.GuiCfgBuilder;
-import org.vishia.gral.cfg.GuiCfgData;
+import org.vishia.gral.cfg.GralCfgBuilder;
+import org.vishia.gral.cfg.GralCfgData;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
@@ -586,7 +586,7 @@ public interface GralGridBuild_ifc
    * Action can be given by this register name. 
    * <br><br>
    * The registering of user actions should be done at startup of the application, before the 
-   * {@link GuiCfgBuilder#buildGui(org.vishia.msgDispatch.LogMessage, int)} is invoked.
+   * {@link GralCfgBuilder#buildGui(org.vishia.msgDispatch.LogMessage, int)} is invoked.
    * The user actions can be called in any specialized context.
    * <br><br>
    * Some user actions can be invoked from the GUI itself:
@@ -677,7 +677,7 @@ public interface GralGridBuild_ifc
   /**Sets the builder for content configuration.
    * @param cfgBuilder
    */
-  void buildCfg(GuiCfgData data, File fileCfg);
+  void buildCfg(GralCfgData data, File fileCfg);
 	
   /**Sets or resets the design mode. The design mode allows to change the content.
    * @param mode

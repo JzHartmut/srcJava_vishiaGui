@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.vishia.gral.cfg.GuiCfgData.GuiCfgElement;
+import org.vishia.gral.cfg.GralCfgElement;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralGridPos;
@@ -15,10 +15,10 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.msgDispatch.LogMessage;
 
-public class GuiCfgBuilder
+public class GralCfgBuilder
 {
 
-  private final GuiCfgData cfgData;
+  private final GralCfgData cfgData;
   
   private final GralGridBuild_ifc gui;
   
@@ -29,7 +29,7 @@ public class GuiCfgBuilder
   private Map<String, String> indexAlias = new TreeMap<String, String>();
   
   
-  public GuiCfgBuilder(GuiCfgData cfgData, GralGridBuild_ifc gui, File currentDir)
+  public GralCfgBuilder(GralCfgData cfgData, GralGridBuild_ifc gui, File currentDir)
   {
     this.cfgData = cfgData;
     this.gui = gui;
@@ -39,27 +39,29 @@ public class GuiCfgBuilder
   }
   
   
-  public GuiCfgData.GuiCfgElement XXXnewCfgElement(GuiCfgData.GuiCfgElement previous)
-  { //GuiCfgData.GuiCfgElement cfge = new GuiCfgData.GuiCfgElement(cfgData);
-    GuiCfgData.GuiCfgElement cfge = previous.clone();
+  public GralCfgElement XXXnewCfgElement(GralCfgElement previous)
+  { //GuiCfgElement cfge = new GuiCfgElement(cfgData);
+    GralCfgElement cfge = previous.clone();
     cfge.next = previous.next;
     cfge.previous = previous;
     previous.next = cfge;
     return cfge;
   }
   
-  /**Builds the gui with the given {@link GuiCfgData} cfgData.
+  /**Builds the appearance of the whole graphic with the given {@link GralCfgData} cfgData.
+   * Calls {@link #buildPanel(org.vishia.gral.cfg.GralCfgPanel)} for the any panel 
+   * in the {@link GralCfgData#idxPanels}. Fills the panels one after another.
    * 
    * @param log maybe null, errors and warnings are written
    * @param msgIdent The message identification for output.
-   * @return null if ok, elsewhere the error hints which are written to log, one per line.
+   * @return null if ok, elsewhere the error hints which maybe written to log too, one per line.
    */
   public String buildGui(LogMessage log, int msgIdent)
   {
     String sError = null;
 
-    for(Map.Entry<String, GuiCfgData.GuiCfgPanel> panelEntry: cfgData.idxPanels.entrySet()){
-      GuiCfgData.GuiCfgPanel panel = panelEntry.getValue();
+    for(Map.Entry<String, GralCfgPanel> panelEntry: cfgData.idxPanels.entrySet()){
+      GralCfgPanel panel = panelEntry.getValue();
       String sErrorPanel = buildPanel(panel);  
       if(sErrorPanel !=null){
         if(log !=null){
@@ -74,12 +76,16 @@ public class GuiCfgBuilder
   }
   
   
-  public String buildPanel(GuiCfgData.GuiCfgPanel cfgDataPanel)
+  /**Builds the appearance of one panel with the given {@link GralCfgPanel} cfgData.
+   * @param cfgDataPanel
+   * @return null if ok, elsewhere the error hints, one per line.
+   */
+  public String buildPanel(GralCfgPanel cfgDataPanel)
   {
     String sError = null;
     gui.selectPanel(cfgDataPanel.name);
     
-    for(GuiCfgElement cfge: cfgDataPanel.listElements){
+    for(GralCfgElement cfge: cfgDataPanel.listElements){
       String sErrorWidgd = buildWidget(cfge);
       if(sErrorWidgd !=null){
         if(sError == null){ sError = sErrorWidgd; }
@@ -96,12 +102,12 @@ public class GuiCfgBuilder
    * @return null if OK, an error String for a user info message on warning or error.
    *         It is possible that a named user action is not found etc. 
    */
-  public String buildWidget(GuiCfgElement cfge)
+  public String buildWidget(GralCfgElement cfge)
   {
     String sError = null;
-    GuiCfgData.GuiCfgPosition prevPos = cfge.previous !=null ? cfge.previous.position : cfge.positionInput;
-    GuiCfgData.GuiCfgPosition pos = cfge.position;
-    GuiCfgData.GuiCfgPosition inp = cfge.positionInput;
+    GralCfgPosition prevPos = cfge.previous !=null ? cfge.previous.position : cfge.positionInput;
+    GralCfgPosition pos = cfge.position;
+    GralCfgPosition inp = cfge.positionInput;
     if(cfge.widgetType.text !=null && cfge.widgetType.text.equals("wd:yCos"))
       stop();
 
@@ -201,21 +207,21 @@ public class GuiCfgBuilder
       }
     } else { userAction = null; }
     //
-    if(cfge.widgetType instanceof GuiCfgData.GuiCfgButton){
+    if(cfge.widgetType instanceof GralCfgData.GuiCfgButton){
       widgd = gui.addButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd, null, cfge.widgetType.info, cfge.widgetType.text);
-    } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgText){
-      GuiCfgData.GuiCfgText wText = (GuiCfgData.GuiCfgText)cfge.widgetType;
+    } else if(cfge.widgetType instanceof GralCfgData.GuiCfgText){
+      GralCfgData.GuiCfgText wText = (GralCfgData.GuiCfgText)cfge.widgetType;
       final int colorValue;
       if(wText.color0 !=null){ colorValue = gui.getColorValue(wText.color0.color); }
       else if(wText.colorName !=null){ colorValue = gui.getColorValue(wText.colorName.color);}
       else{ colorValue = 0; } //black
       widgd = gui.addText(cfge.widgetType.text, wText.size.charAt(0), colorValue);
-    } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgLed){
-      GuiCfgData.GuiCfgLed ww = (GuiCfgData.GuiCfgLed)cfge.widgetType;
+    } else if(cfge.widgetType instanceof GralCfgData.GuiCfgLed){
+      GralCfgData.GuiCfgLed ww = (GralCfgData.GuiCfgLed)cfge.widgetType;
       widgd = gui.addLed(sName, ww.showMethod, sDataPath);
       
-    } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgImage){
-      GuiCfgData.GuiCfgImage wImage = (GuiCfgData.GuiCfgImage)cfge.widgetType;
+    } else if(cfge.widgetType instanceof GralCfgData.GuiCfgImage){
+      GralCfgData.GuiCfgImage wImage = (GralCfgData.GuiCfgImage)cfge.widgetType;
       File fileImage = new File(currentDir, wImage.file_);
       if(fileImage.exists()){
         try{ InputStream imageStream = new FileInputStream(fileImage); 
@@ -225,12 +231,12 @@ public class GuiCfgBuilder
           
       }
       
-    } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgShowField){
+    } else if(cfge.widgetType instanceof GralCfgData.GuiCfgShowField){
       //GuiCfgData.GuiCfgShowField wShow = (GuiCfgData.GuiCfgShowField)cfge.widgetType;
       widgd = gui.addTextField(sName, false, null, '.');
       widgd.setDataPath(sDataPath);
-    } else if(cfge.widgetType instanceof GuiCfgData.GuiCfgInputFile){
-      GuiCfgData.GuiCfgInputFile widgt = (GuiCfgData.GuiCfgInputFile)cfge.widgetType;
+    } else if(cfge.widgetType instanceof GralCfgData.GuiCfgInputFile){
+      GralCfgData.GuiCfgInputFile widgt = (GralCfgData.GuiCfgInputFile)cfge.widgetType;
       final String dirMask;
       if(widgt.info !=null){
         dirMask = replaceAlias(widgt.info);

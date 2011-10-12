@@ -15,7 +15,7 @@ import org.vishia.gral.ifc.GralWidget;
  * <ul>
  * <li>Always sets {@link GralGridMngBase#setLastClickedWidgetInfo(GralWidget)}.
  * <li>Design mode: Left and right button for design in the {@link GralGridMngBase}
- *     using the {@link org.vishia.gral.cfg.GuiCfgDesigner}.
+ *     using the {@link org.vishia.gral.cfg.GralCfgDesigner}.
  * <li>Normal mode: calls {@link GralWidget#getActionChange()}
  * </ul>      
  * @author Hartmut Schorrig

@@ -2,8 +2,8 @@ package org.vishia.gral;
 
 import org.vishia.commander.TabbedPanelData;
 import org.vishia.gral.area9.GuiMainAreaBase;
-import org.vishia.gral.cfg.GuiCfgDesigner;
-import org.vishia.gral.cfg.GuiCfgZbnf;
+import org.vishia.gral.cfg.GralCfgDesigner;
+import org.vishia.gral.cfg.GralCfgZbnf;
 import org.vishia.gral.widget.CommandSelector;
 import org.vishia.gral.widget.FileSelector;
 import org.vishia.gral.widget.SelectList;
@@ -27,8 +27,8 @@ import org.vishia.guiInspc.InspcGui;
  * <li>A System to place widgets with grid coordinates, allowing larger and smaller presentation with proper fonts etc.
  *   The user should not deal with pixel positions.
  *   {@link org.vishia.gral.gridPanel._PackageDocu}
- * <li>A system to build the graphic from a script. {@link GuiCfgZbnf}
- * <li>The possibility to edit the appearance of GUI on runtime: {@link GuiCfgDesigner}
+ * <li>A system to build the graphic from a script. {@link GralCfgZbnf}
+ * <li>The possibility to edit the appearance of GUI on runtime: {@link GralCfgDesigner}
  * <li>Animated graphic, especially for process data viewing: {@link InspcGui}
  * <li> 
  * </ul>     

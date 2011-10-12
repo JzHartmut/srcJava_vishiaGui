@@ -17,10 +17,10 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
-import org.vishia.gral.cfg.GuiCfgBuilder;
-import org.vishia.gral.cfg.GuiCfgData;
-import org.vishia.gral.cfg.GuiCfgDesigner;
-import org.vishia.gral.cfg.GuiCfgWriter;
+import org.vishia.gral.cfg.GralCfgBuilder;
+import org.vishia.gral.cfg.GralCfgData;
+import org.vishia.gral.cfg.GralCfgDesigner;
+import org.vishia.gral.cfg.GralCfgWriter;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralGridPos;
@@ -123,15 +123,15 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   /**This instance helps to create the Dialog Widget as part of the whole window. It is used only in the constructor.
    * Therewith it may be defined stack-locally. But it is better to show and explain if it is access-able at class level. */
   //GuiDialogZbnfControlled dialogZbnfConfigurator;   
-  GuiCfgBuilder cfgBuilder;
+  GralCfgBuilder cfgBuilder;
   
-  GuiCfgWriter cfgWriter;
+  GralCfgWriter cfgWriter;
   
   /**The designer is an aggregated part of the PanelManager, but only created if necessary. 
    * TODO check whether it should be disposed to {@link #gralDevice} .*/
-  protected GuiCfgDesigner designer;
+  protected GralCfgDesigner designer;
   
-  private GuiCfgData cfgData;
+  private GralCfgData cfgData;
   
   public boolean bDesignMode = false;
   
@@ -337,13 +337,13 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   
   
   
-  @Override public void buildCfg(GuiCfgData data, File fileCfg) //GuiCfgBuilder cfgBuilder)
+  @Override public void buildCfg(GralCfgData data, File fileCfg) //GuiCfgBuilder cfgBuilder)
   {
     this.cfgData = data;
     File currentDir = fileCfg.getParentFile();
-    this.cfgBuilder = new GuiCfgBuilder(cfgData, this, currentDir);
+    this.cfgBuilder = new GralCfgBuilder(cfgData, this, currentDir);
     cfgBuilder.buildGui(log, 0);
-    this.designer = new GuiCfgDesigner(cfgBuilder, this, log);  
+    this.designer = new GralCfgDesigner(cfgBuilder, this, log);  
     this.bDesignMode = true;
   }
 
@@ -357,7 +357,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
    * @return
    */
   @Override public String saveCfg(Writer dest)
-  { cfgWriter = new GuiCfgWriter(log);
+  { cfgWriter = new GralCfgWriter(log);
     String sError = cfgWriter.saveCfg(dest, cfgData);
     return sError;
   }
@@ -650,7 +650,23 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   
   
 
+  /**Action to edit the properties of one widget in the graphic. */
   public GralUserAction actionDesignEditField = new GralUserAction()
+  { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
+    {
+      GralWidget widgd = getWidgetInFocus();
+      if(widgd !=null){
+        designer.editFieldProperties(widgd, null);
+      }
+      return true;
+    }
+  };
+
+
+  
+
+  /**Action to edit the properties of one widget in the graphic. */
+  public GralUserAction actionReadPanelCfg = new GralUserAction()
   { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     {
       GralWidget widgd = getWidgetInFocus();
