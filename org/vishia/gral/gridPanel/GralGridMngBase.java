@@ -669,9 +669,13 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   public GralUserAction actionReadPanelCfg = new GralUserAction()
   { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     {
+      //GralPanelContent currPanel = 
       GralWidget widgd = getWidgetInFocus();
       if(widgd !=null){
-        designer.editFieldProperties(widgd, null);
+        GralPanelContent panel = widgd.pos.panel;
+        String namePanel = panel.namePanel;
+        cfgBuilder.buildGui(log, 0);
+        //designer.editFieldProperties(widgd, null);
       }
       return true;
     }

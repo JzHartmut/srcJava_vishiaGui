@@ -256,6 +256,7 @@ protected void initMenuGralDesigner()
 {
   gui.addMenuItemGThread("&Design/e&Nable", panelMng.actionDesignEditField);  
   gui.addMenuItemGThread("&Design/Edit &field", panelMng.actionDesignEditField);  
+  gui.addMenuItemGThread("&Design/update &Panel from cfg-file", panelMng.actionReadPanelCfg);  
   
 }
 

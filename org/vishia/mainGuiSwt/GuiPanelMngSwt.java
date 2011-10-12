@@ -465,7 +465,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   	pos.panel = panels.get(sName);
   	sCurrPanel = sName;
   	if(pos.panel == null) {
-  	  pos.panel = currTabPanel.addGridPanel("sName", "&" + sName,1,1,10,10);
+  	  pos.panel = currTabPanel.addGridPanel(sName, /*"&" + */sName,1,1,10,10);
   	  panels.put(sName, pos.panel);
   		log.sendMsg(0, "GuiPanelMng:selectPanel: unknown panel name %s", sName);
   	  //Note: because the pos.panel is null, not placement will be done.

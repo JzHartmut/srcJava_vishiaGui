@@ -287,6 +287,12 @@ public class GralCfgBuilder
   }
   
   
+  public void updatePanel(String panelName)
+  {
+    
+  }
+  
+  
   
   String replaceAlias(String src)
   {

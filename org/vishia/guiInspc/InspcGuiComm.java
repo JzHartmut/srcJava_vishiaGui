@@ -20,6 +20,7 @@ import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
 import org.vishia.inspectorAccessor.InspcAccessor;
 import org.vishia.mainCmd.Report;
 import org.vishia.reflect.ClassJc;
+import org.vishia.util.CalculatorExpr;
 import org.vishia.util.StringFormatter;
 
 /**The communication manager. */
@@ -46,6 +47,8 @@ public class InspcGuiComm
   {
     final GralWidget widgd;
     
+    private CalculatorExpr calculator;
+    
     WidgetCommAction(GralWidget widgd)
     { this.widgd = widgd;
     }
@@ -66,8 +69,32 @@ public class InspcGuiComm
             float angle = value * (180.0f/32768.0f);
             sShow = String.format("%3.2f °", angle);
           } else {
+            final String sFormat;
             float value = InspcAccessEvaluatorRxTelg.valueFloatFromRxValue(info);
-            try{ sShow = String.format(widgd.sFormat, value); }
+            if(widgd.sFormat.startsWith("!")){
+              int posEnd = widgd.sFormat.indexOf('!',1);
+              if(posEnd >=0){
+                String sExpr = widgd.sFormat.substring(1, posEnd);
+                sFormat = widgd.sFormat.substring(posEnd+1);
+                if(calculator ==null){
+                  calculator = new CalculatorExpr();
+                  String sError = calculator.setExpr(sExpr);
+                  if(sError !=null){ 
+                    //console.writeError(sError);
+                    widgd.sFormat = sFormat;
+                    calculator = null;
+                  }
+                }
+                if(calculator !=null){
+                  value = (float)calculator.calc(value);
+                }
+              } else {
+                sFormat = widgd.sFormat;  
+              }
+            } else {
+              sFormat = widgd.sFormat;
+            }
+            try{ sShow = String.format(sFormat, value); }
             catch(java.util.IllegalFormatException exc){ 
               sShow = null;  //maybe integer 
             }
@@ -77,7 +104,7 @@ public class InspcGuiComm
                 sShow = "?format";  
               }
             }
-            sShow += " ";
+            //sShow += " ";
           }
         }
         else { //no format given
