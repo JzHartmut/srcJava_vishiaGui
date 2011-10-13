@@ -5,11 +5,37 @@ import org.vishia.byteData.VariableContainer_ifc;
 
 
 
-/**This class holds some infos about a widget for execution the GUI. 
- * Instances of this class are places on the widget, and in a Index of all widgets for the panel and globally.
+/**This class holds some infos about a widget for showing and animating in a GUI. 
+ * <br>
+ * The ObjectModelDiagram may shown the relations:
+ * <img src="../../../../img/Widget_gral.png"><br>
+ * This class GralWidget knows the graphic basic widget via an {@link Widgetifc} and a wrapper in the adaption layer.
+ * In this figure a wrapper {@link org.vishia.mainGuiSwt.TableSwt} is shown for a Table is shown
+ * for a org.eclipse.swt.widgets.Table. The {@link Widgetifc} allows some fundamental operations with any widget
+ * like {@link Widgetifc#setFocus()}. 
+ * <br><br>
+ * The Widget knows its {@link GralGridPos} at its panel where it is placed. The panel knows all widgets
+ * which are placed there (widgetList).
+ * <br><br>
+ * The user can invoke the methods of the widget to animate it in a GUI etc, for example {@link #setBackColor(GralColor, int)}
+ * or {@link #setValue(int, int, Object)}. This methods can be called in any thread. There are thread safe. 
+ * The organization of this actions are done in the implementation of the {@link org.vishia.gral.gridPanel.GralGridMngBase}
+ * like {@link org.vishia.mainGuiSwt.GuiPanelMngSwt}. This implementation adapts the basic graphic and knows theire methods
+ * to set colors, values etc. The user need deal only with this widget class. The thread safe  capability is organized
+ * with a ConcurrentLinkedQueue which contains requests of type {@link org.vishia.gral.GralWidgetChangeRequ}.
+ * <br><br>
+ * The widget may know any user data with its association oContentInfo, see {@link #getContentInfo()} and {@link #setContentInfo(Object)}.
+ * Mostly there are classes to support getting of values, formatting etc. The type of this classes depends on the user's application.
+ * <br><br>
+ * This class may contain associations to methods of {@link GralUserAction} to animate (change viewable content) and get values from this widget.
+ * An independent part of the user application can invoke the methods {@link GralUserAction#userActionGui(String, GralWidget, Object...)}
+ * which maybe implemented in another part of the user's application.
+ * <br><br>
+ * Last and least the properties of widget are able to change. The widget may know its {@link GralWidgetCfg_ifc} which provides
+ * data for design the GUI.
+ * 
  * @author Hartmut Schorrig
  *
- * @param <WidgetTYPE>
  */
 public class GralWidget
 {
@@ -193,7 +219,7 @@ public class GralWidget
    */
   public String getDataPath(){ return sDataPath; }
 	
-  /**Sets the action in application context for processing of user handling for thewidget.
+  /**Sets the action in application context for processing of user handling for the widget.
    * Handling means, pressing button, user inputs of text fields
    * @param action any instance. Its action method is invoked depending of the type of widget
    *        usual if the user takes an action on screen, press button etc.
@@ -321,7 +347,20 @@ public class GralWidget
 	}
 	
 	
-	//DBbyteMap.Variable 
+	
+	/**Gets the info to access the values for this widget in the users context.
+	 * If this method is called the first time for the widget after start the application, the access info
+	 * is searched in the container calling {@link VariableContainer_ifc#getVariable(String, int[])}
+	 * with the stored textual info {@link #setDataPath(String)} and {@link #setDataIx(int)}.
+	 * This operation may need a little bit of calcualtion time, which were to expensive if a lot of widgets
+	 * should be provided with user values. Therefore the returned {@link VariableAccess_ifc} instance is stored
+	 * in the {@link #oContentInfo} of the widget and returned on the further calls.
+	 * <br>
+	 * The returned {@link VariableAccess_ifc} should be allow the fast access to users values.
+	 *  
+	 * @param container The container where all {@link VariableAccess_ifc} should be found.
+	 * @return The access to a user variable in the user's context.
+	 */
 	public VariableAccess_ifc getVariableFromContentInfo(VariableContainer_ifc container)
 	{
 		//DBbyteMap.Variable variable;
@@ -384,6 +423,9 @@ public class GralWidget
   }
   
   
+  /**See {@link GralPanelMngWorking_ifc#setFocus(GralWidget)}.
+   * @return true if the focus is set really.
+   */
   public boolean setFocus()
   {
     return itsMng.setFocus(this);
