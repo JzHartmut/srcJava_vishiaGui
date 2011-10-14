@@ -17,6 +17,7 @@ import org.vishia.cmd.PrepareCmd;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
 
@@ -71,7 +72,7 @@ public class CommandSelector extends SelectList
   }
   
   
-  @Override public boolean actionOk(Object userData, TableLineGui_ifc line)
+  @Override public boolean actionOk(Object userData, GralTableLine_ifc line)
   {
     CmdStore.CmdBlock cmdBlock = (CmdStore.CmdBlock)userData;
     getterFiles.prepareFileSelection();
@@ -85,17 +86,17 @@ public class CommandSelector extends SelectList
   
   
   
-  @Override public void actionLeft(Object userData, TableLineGui_ifc line)
+  @Override public void actionLeft(Object userData, GralTableLine_ifc line)
   {
   }
   
-  @Override public void actionRight(Object userData, TableLineGui_ifc line)
+  @Override public void actionRight(Object userData, GralTableLine_ifc line)
   {
   }
   
   
   @Override
-  protected void actionUserKey(String sKey, Object userData, TableLineGui_ifc line)
+  protected void actionUserKey(String sKey, Object userData, GralTableLine_ifc line)
   {
     // TODO Auto-generated method stub
     

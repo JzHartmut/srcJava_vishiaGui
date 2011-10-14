@@ -9,8 +9,8 @@ import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.widget.SwitchExclusiveButtonMng;
-import org.vishia.gral.widget.TableLineGui_ifc;
 import org.vishia.mainGuiSwt.DeprecatedInfoBoxSwt;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
@@ -253,7 +253,7 @@ public class GuiStatusPanel
         key = 0;
       }
       if(key == KeyCode.enter){
-        TableLineGui_ifc line = (TableLineGui_ifc)values[0];
+        GralTableLine_ifc line = (GralTableLine_ifc)values[0];
         String sPath = line.getCellText(0);
         widgdProjektpath.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, sPath);
         buildComponentsInfoSelectBoxes();

@@ -7,12 +7,13 @@ import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.ifc.GralTextBox_ifc;
 
 /**This class presents a sub window which is used as info box for any messages.
  * @author Hartmut Schorrig
  *
  */
-public class InfoBox implements TextBoxGuifc, GralWindow_ifc
+public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
 {
 
   /**The window is created invoking the {@link GralGridBuild_ifc#createWindow(String, boolean)}. 
@@ -60,12 +61,16 @@ public class InfoBox implements TextBoxGuifc, GralWindow_ifc
   }
 
   @Override
-  public String setText(String text)
+  public void setText(String text)
   {
     // TODO Auto-generated method stub
-    return null;
   }
 
+  @Override public String getText()
+  { return null;
+  
+  }
+  
   @Override
   public void viewTrail()
   {
@@ -74,7 +79,7 @@ public class InfoBox implements TextBoxGuifc, GralWindow_ifc
   }
 
   @Override
-  public Object getWidget()
+  public Object getWidgetImplementation()
   {
     // TODO Auto-generated method stub
     return null;

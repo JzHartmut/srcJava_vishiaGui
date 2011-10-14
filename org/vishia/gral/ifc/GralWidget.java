@@ -5,14 +5,15 @@ import org.vishia.byteData.VariableContainer_ifc;
 
 
 
-/**This class holds some infos about a widget for showing and animating in a GUI. 
+/**This class holds some information about a widget for showing and animating in a GUI and refers the graphical widget. 
  * <br>
  * The ObjectModelDiagram may shown the relations:
  * <img src="../../../../img/Widget_gral.png"><br>
- * This class GralWidget knows the graphic basic widget via an {@link Widgetifc} and a wrapper in the adaption layer.
- * In this figure a wrapper {@link org.vishia.mainGuiSwt.TableSwt} is shown for a Table is shown
- * for a org.eclipse.swt.widgets.Table. The {@link Widgetifc} allows some fundamental operations with any widget
- * like {@link Widgetifc#setFocus()}. 
+ * This class GralWidget knows the gral graphic widget via an {@link GralWidget_ifc}. It is a wrapper around the widget of the adaption layer.
+ * In this figure a wrapper {@link org.vishia.mainGuiSwt.TableSwt} is shown which wraps 
+ * a org.eclipse.swt.widgets.Table. The wrapper supports the interface {@link org.vishia.gral.ifc.GralTable_ifc.TableGui_ifc}.
+ * This interface allows to deal with the table procured by the wrapper. See the derived interfaces of {@link GralWidget_ifc}.  
+ * The {@link GralWidget_ifc} allows some fundamental operations with any widget like {@link GralWidget_ifc#setFocus()}. 
  * <br><br>
  * The Widget knows its {@link GralGridPos} at its panel where it is placed. The panel knows all widgets
  * which are placed there (widgetList).
@@ -52,9 +53,9 @@ public class GralWidget
    *     Background: Any widget have a background. Most of widgets have lines. The color of them 
    *     should be able to animate if user data are changed.        
    * <li>2011-09-04 Hartmut new: method {@link #setBackColor(GralColor, int)}.        
-   * <li>2011-08-14 Hartmut chg: {@link #widget} is now type of {@link Widgetifc} and not Object.
+   * <li>2011-08-14 Hartmut chg: {@link #widget} is now type of {@link GralWidget_ifc} and not Object.
    *    Generally it is the reference to the implementing code of the widget. The implementing code 
-   *    may based on a graphic base widget (SWT: Control) and implements the {@link Widgetifc}, 
+   *    may based on a graphic base widget (SWT: Control) and implements the {@link GralWidget_ifc}, 
    *    or it references the graphic base widget instance. The class {@link WidgetSimpleWrapperSwt} 
    *    is able to wrap simple graphical base widget instances.
    * <li>2011-08-13 Hartmut new: WidgetDescriptor now contains the position of the widget. 
@@ -102,7 +103,7 @@ public class GralWidget
 	 * This element is used for setting operations, which depends from the graphic system
 	 * and the type of the widget. It is only used in the graphic-system-special implementation.
 	 * */
-	public Widgetifc widget;
+	protected GralWidget_ifc widget;
 	
 	/**numeric info what to do (kind of widget). 
 	 * <ul>
@@ -162,7 +163,7 @@ public class GralWidget
 	 * This info can be set and changed after registration. */
 	private Object oContentInfo;
 	
-	public GralWidget(String sName, Widgetifc widget, char whatIs)
+	public GralWidget(String sName, GralWidget_ifc widget, char whatIs)
 	{ this.name = sName;
 		this.widget = widget;
 		this.whatIs = whatIs;
@@ -177,7 +178,7 @@ public class GralWidget
 	}
 
   
-  public GralWidget(String sName, Widgetifc widget, char whatIs, String sContentInfo, Object oContentInfo)
+  public GralWidget(String sName, GralWidget_ifc widget, char whatIs, String sContentInfo, Object oContentInfo)
   { this.name = sName;
     this.widget = widget;
     this.whatIs = whatIs;
@@ -192,6 +193,21 @@ public class GralWidget
     this.sDataPath = sDataPath;
     this.itsCfgElement = cfge;
   }
+  
+  /**Sets the graphical widget. It is a wrapper around the widget of the graphic implementation base.
+   * This method shouldn't invoke by an user's application. It is only invoked by the gral itself. 
+   * @param widget The wrapper.
+   */
+  public void setGraphicWidgetWrapper(GralWidget_ifc widget){ this.widget = widget; }
+  
+  /**Gets the graphical widget. The difference between this class and the graphical widget is:
+   * This class contains unified description data to any kind of widget, where the graphical widget
+   * is a special or simple wrapper around the implementation of the widget in the graphical implementation base.
+   * 
+   * @return The gral graphical widget. Note: The type can be instanceof some derived interfaces of the gral.
+   */
+  public GralWidget_ifc getGraphicWidgetWrapper(){ return widget; }
+  
 	
 	/**Sets a application specific info. It should help to present the content. 
    * This info can be set and changed anytime after registration. */

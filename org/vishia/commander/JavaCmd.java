@@ -565,11 +565,11 @@ public class JavaCmd extends GuiCfg
     {
       selectedFiles = getSelectedFile();
       getterFiles.prepareFileSelection();
-      File[] files = new File[3];
-      files[0] = getterFiles.getFile1();
-      files[1] = getterFiles.getFile2();
-      files[2] = getterFiles.getFile3();
-      copyCmd.confirmCopy();
+      //File[] files = new File[3];
+      File fileSrc = getterFiles.getFile1();
+      File fileDst = getterFiles.getFile2();
+      //files[2] = getterFiles.getFile3();
+      copyCmd.confirmCopy(fileDst, fileSrc);
       return true;
       // /
     }

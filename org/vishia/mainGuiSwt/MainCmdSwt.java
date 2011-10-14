@@ -57,8 +57,8 @@ import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.Widgetifc;
-import org.vishia.gral.widget.TextBoxGuifc;
+import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.ifc.GralTextBox_ifc;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmd_ifc;
 
@@ -161,7 +161,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   final protected StringBuffer sbWriteInfo = new StringBuffer(1000);  //max. 1 line!
   
   /** If it is set, the writeInfo is redirected to this.*/
-  protected TextBoxGuifc textAreaOutput = null;
+  protected GralTextBox_ifc textAreaOutput = null;
   
   /**The file menu is extendable. */
   private Menu menuFile;
@@ -510,7 +510,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 	  if(swtWindow!=null)
 	  { validateFrameAreas();
 	  }
-	  ((Control)component.getWidget()).addMouseListener(mouseListener);
+	  ((Control)component.getWidgetImplementation()).addMouseListener(mouseListener);
 	  //return component;
 	}
 
@@ -807,7 +807,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
     { for(int idyArea = 0; idyArea <= 2; idyArea++)
       { GralPanelContent component = componentFrameArea[idyArea][idxArea];
         if(component !=null)
-        { Control control = (Control)component.getWidget();
+        { Control control = (Control)component.getWidgetImplementation();
           setBoundsForFrameArea(idxArea, idyArea);
           control.update();
           Rectangle bounds = control.getBounds();
@@ -854,7 +854,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
     int yp = (int)(yf1  * pixelPerYpercent);
     int dxp = (int) ((xf2-xf1) * pixelPerXpercent);
     int dyp = (int) ((yf2-yf1) * pixelPerYpercent);
-    Control component = (Control)componentFrameArea[idyArea][idxArea].getWidget();
+    Control component = (Control)componentFrameArea[idyArea][idxArea].getWidgetImplementation();
     component.setBounds(xp,yp,dxp,dyp-6);
   }
   

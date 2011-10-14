@@ -37,7 +37,7 @@ public class TabPanelSwt extends GralTabbedPanel
     { super(namePanel, mainWindow);
       widgetSwt = new TabFolder(parent, style); 
     }
-    @Override public Widget getWidget(){ return widgetSwt; }
+    @Override public Widget getWidgetImplementation(){ return widgetSwt; }
     @Override public boolean setFocus(){ return widgetSwt.setFocus(); }
 
     @Override

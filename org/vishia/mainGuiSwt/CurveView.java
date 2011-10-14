@@ -16,9 +16,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.Widgetifc;
+import org.vishia.gral.ifc.GralWidget_ifc;
 
-public class CurveView extends Canvas implements Widgetifc
+public class CurveView extends Canvas implements GralWidget_ifc
 {
 
 	//final Canvas canvas;
@@ -258,7 +258,7 @@ public class CurveView extends Canvas implements Widgetifc
 	  //values.notify();
 	}
 	
-  @Override public Object getWidget()
+  @Override public Object getWidgetImplementation()
   { return this;
   }
   

@@ -6,8 +6,8 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.Widgetifc;
-import org.vishia.gral.widget.TextBoxGuifc;
+import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.ifc.GralTextBox_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainGuiSwt.MainCmdSwt;
 
@@ -124,6 +124,6 @@ public interface GuiMainAreaifc extends GralPrimaryWindow_ifc
   /**Returns the text box which is used as output box for common messages of the application.
    * @return null if no output window is given.
    */
-  TextBoxGuifc getOutputBox();
+  GralTextBox_ifc getOutputBox();
   
 }

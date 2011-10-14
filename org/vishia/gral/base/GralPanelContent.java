@@ -8,11 +8,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.ifc.Widgetifc;
+import org.vishia.gral.ifc.GralWidget_ifc;
 
 
 /**This class describes a panel with its content for managing. */
-public abstract class GralPanelContent implements Widgetifc
+public abstract class GralPanelContent implements GralWidget_ifc
 {
 
   public final String namePanel;
@@ -74,7 +74,7 @@ public abstract class GralPanelContent implements Widgetifc
 
 	
 
-  @Override public Object getWidget()
+  @Override public Object getWidgetImplementation()
   { return panelComposite;
   }
 	

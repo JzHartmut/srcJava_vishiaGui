@@ -15,9 +15,9 @@ import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.widget.FileSelector;
 import org.vishia.gral.widget.SelectList;
-import org.vishia.gral.widget.TableLineGui_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 
 /**This class implements the selection functionality of tabs and pathes. */
@@ -278,7 +278,7 @@ class SelectTab
 
     void add(SelectInfo info, char where)
     {
-      TableLineGui_ifc line = table.insertLine(null, 0);
+      GralTableLine_ifc line = table.insertLine(null, 0);
       line.setUserData(info);
       line.setCellText(info.active == where ? "" + where: " ",0);
       line.setCellText(info.selectName, 1);
@@ -292,7 +292,7 @@ class SelectTab
     }
     
     
-    @Override protected boolean actionOk(Object userData, TableLineGui_ifc line)
+    @Override protected boolean actionOk(Object userData, GralTableLine_ifc line)
     {
       SelectInfo info = (SelectInfo)line.getUserData();
       if(info.active != '.'){
@@ -323,14 +323,14 @@ class SelectTab
     }
   
     @Override
-    protected void actionLeft(Object userData, TableLineGui_ifc line)
+    protected void actionLeft(Object userData, GralTableLine_ifc line)
     {
       // TODO Auto-generated method stub
       
     }
   
     @Override
-    protected void actionRight(Object userData, TableLineGui_ifc line)
+    protected void actionRight(Object userData, GralTableLine_ifc line)
     {
       // TODO Auto-generated method stub
       
@@ -338,7 +338,7 @@ class SelectTab
   
     @Override
     protected void actionUserKey(String sKey, Object userData,
-        TableLineGui_ifc line)
+        GralTableLine_ifc line)
     {
       // TODO Auto-generated method stub
       

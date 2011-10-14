@@ -84,9 +84,9 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.ifc.Widgetifc;
+import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.ifc.GralTextBox_ifc;
 import org.vishia.gral.swt.WidgetSimpleWrapperSwt;
-import org.vishia.gral.widget.TextBoxGuifc;
 import org.vishia.msgDispatch.LogMessage;
 
 
@@ -368,11 +368,11 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   
   @Override public boolean remove(GralWidget widget)
   {
-    if(widget !=null && widget.widget !=null){
-      Object swtWidgd = widget.widget.getWidget();
+    if(widget !=null && widget.getGraphicWidgetWrapper() !=null){
+      Object swtWidgd = widget.getGraphicWidgetWrapper().getWidgetImplementation();
       ((Widget)swtWidgd).dispose();
     }
-    widget.widget = null;  //remove instance by Garbage collector.
+    widget.setGraphicWidgetWrapper(null);  //remove instance by Garbage collector.
     return true;
     
   }
@@ -651,23 +651,23 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    * @return
    */
   private GralWidget addTextField(GralWidget widgetInfo, String name, boolean editable, String prompt, char promptStylePosition)
-  { Text widget = new Text((Composite)pos.panel.panelComposite, SWT.SINGLE);
+  { Text widgetSwt = new Text((Composite)pos.panel.panelComposite, SWT.SINGLE);
     if(widgetInfo == null){
       widgetInfo = new GralWidget(name, editable ? 'T' : 'S');
     }
     widgetInfo.setPanelMng(this);
-    widget.setFont(propertiesGuiSwt.stdInputFont);
-    widget.setEditable(editable);
+    widgetSwt.setFont(propertiesGuiSwt.stdInputFont);
+    widgetSwt.setEditable(editable);
     if(editable)
     	stop();
-    widget.setBackground(propertiesGuiSwt.colorSwt(0xFFFFFF));
-    widget.addFocusListener(focusListener);
+    widgetSwt.setBackground(propertiesGuiSwt.colorSwt(0xFFFFFF));
+    widgetSwt.addFocusListener(focusListener);
 
-    Listener[] oldMouseListener = widget.getListeners(SWT.MouseDown);
+    Listener[] oldMouseListener = widgetSwt.getListeners(SWT.MouseDown);
     for(Listener lst: oldMouseListener){
-      widget.removeListener(SWT.MouseDown, lst);
+      widgetSwt.removeListener(SWT.MouseDown, lst);
     }
-    widget.addMouseListener(mouseClickForInfo);
+    widgetSwt.addMouseListener(mouseClickForInfo);
     int x =-1, y=-1; 
     if(x >=0 && y >=0){
       //edit.setBounds(x, y, dx * properties.xPixelUnit(), 2* properties.yPixelUnit());
@@ -703,20 +703,21 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
         boundsPrompt.dx = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
       }
       wgPrompt.setBounds(boundsPrompt.x, boundsPrompt.y, boundsPrompt.dx, boundsPrompt.dy+1);
-      widget.setBounds(boundsField.x, boundsField.y, boundsField.dx, boundsField.dy);
+      widgetSwt.setBounds(boundsField.x, boundsField.y, boundsField.dx, boundsField.dy);
       posUsed = true;
       
     } else {
       //without prompt
-      setPosAndSize_(widget);
+      setPosAndSize_(widgetSwt);
     }
     //
     if(widgetInfo.name !=null && widgetInfo.name.charAt(0) == '$'){
     	widgetInfo.name = sCurrPanel + widgetInfo.name.substring(1);
     }
     //link the widget with is information together.
-    widgetInfo.widget = new WidgetSimpleWrapperSwt(widget);
-    widget.setData(widgetInfo);
+    SwtTextFieldWrapper widgetWrapper = new SwtTextFieldWrapper(widgetSwt, gralDevice);
+    widgetInfo.setGraphicWidgetWrapper(widgetWrapper);
+    widgetSwt.setData(widgetInfo);
     if(widgetInfo.name !=null){
       indexNameWidgets.put(widgetInfo.name, widgetInfo);
       if(!editable){
@@ -741,17 +742,17 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
  *   'l' left, 't' top (above field) 
  * @return
  */
-public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String prompt, char promptStylePosition)
+public GralTextBox_ifc addTextBox(GralWidget widgetInfo, boolean editable, String prompt, char promptStylePosition)
 { widgetInfo.setPanelMng(this);
   TextBoxSwt widgetSwt = new TextBoxSwt((Composite)pos.panel.panelComposite, SWT.MULTI, gralDevice);
   //Text widgetSwt = new Text((Composite)pos.panel.panelComposite, SWT.MULTI);
-  widgetSwt.text.setFont(propertiesGuiSwt.stdInputFont);
-  widgetSwt.text.setEditable(editable);
+  widgetSwt.textFieldSwt.setFont(propertiesGuiSwt.stdInputFont);
+  widgetSwt.textFieldSwt.setEditable(editable);
   if(editable)
     stop();
-  widgetSwt.text.setBackground(propertiesGuiSwt.colorSwt(0xFFFFFF));
-  widgetSwt.text.addMouseListener(mouseClickForInfo);
-  setPosAndSize_(widgetSwt.text);
+  widgetSwt.textFieldSwt.setBackground(propertiesGuiSwt.colorSwt(0xFFFFFF));
+  widgetSwt.textFieldSwt.addMouseListener(mouseClickForInfo);
+  setPosAndSize_(widgetSwt.textFieldSwt);
   if(prompt != null && promptStylePosition == 't'){
     final int yPixelField;
     final Font promptFont;
@@ -766,7 +767,7 @@ public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String p
     default: promptFont = propertiesGuiSwt.smallPromptFont;
              yPixelField = propertiesGui.yPixelUnit() * 2 -3;
     }//switch
-    Rectangle boundsField = widgetSwt.text.getBounds();
+    Rectangle boundsField = widgetSwt.textFieldSwt.getBounds();
     Rectangle boundsPrompt = new Rectangle(boundsField.x, boundsField.y-3  //occupy part of field above, only above the normal letters
       , boundsField.width, boundsField.height );
     
@@ -784,7 +785,7 @@ public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String p
     if(promptSize.x > boundsPrompt.width){
       boundsPrompt.width = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
     }
-    widgetSwt.text.setBounds(boundsField);
+    widgetSwt.textFieldSwt.setBounds(boundsField);
     wgPrompt.setBounds(boundsPrompt);
   } 
   //
@@ -792,8 +793,8 @@ public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String p
     widgetInfo.name = sCurrPanel + widgetInfo.name.substring(1);
   }
   //link the widget with is information together.
-  widgetInfo.widget = widgetSwt;
-  widgetSwt.text.setData(widgetInfo);
+  widgetInfo.setGraphicWidgetWrapper(widgetSwt);
+  widgetSwt.textFieldSwt.setData(widgetInfo);
   if(widgetInfo.name !=null){
     indexNameWidgets.put(widgetInfo.name, widgetInfo);
     if(!editable){
@@ -952,7 +953,7 @@ public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String p
   	GralWidget widgetInfos = new GralWidget(sName, 'B');
     widgetInfos.setPanelMng(this);
     ButtonSwt button = new ButtonSwt(this, widgetInfos, size);
-    widgetInfos.widget = new WidgetSimpleWrapperSwt(button);
+    widgetInfos.setGraphicWidgetWrapper(new WidgetSimpleWrapperSwt(button));
     button.setBackground(propertiesGuiSwt.colorBackground);
   	
     button.setText(sButtonText);
@@ -1007,7 +1008,7 @@ public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String p
     widgetInfos.setShowMethod(sShowMethod);
     widgetInfos.sDataPath = sDataPath;
     SwitchButtonSwt button = new SwitchButtonSwt(this, widgetInfos, size);
-    widgetInfos.widget = new WidgetSimpleWrapperSwt(button);
+    widgetInfos.setGraphicWidgetWrapper(new WidgetSimpleWrapperSwt(button));
   	button.setBackground(propertiesGuiSwt.colorBackground);
   	button.setColorPressed(propertiesGui.getColorValue(sColor1));  
     button.setColorReleased(propertiesGui.getColorValue(sColor0));  
@@ -1096,24 +1097,24 @@ public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String p
   {
   	String sNameUsed = sName.charAt(0) == '$' ? sCurrPanel + sName.substring(1) : sName;
     GralWidget widget = indexNameWidgets.get(sNameUsed);
-  	if(widget == null || !(widget.widget instanceof Control)){
+  	if(widget == null || !(widget.getGraphicWidgetWrapper() instanceof Control)){
   		log.sendMsg(0, "GuiMainDialog:addClickAction: unknown widget %s", sName);
   	} else {
     	/**The class ButtonUserAction implements the general button action, which class the registered user action. */
-      ((Control)(widget.widget)).addMouseListener( new MouseClickActionForUserActionSwt(this, action, sCmdPress, sCmdRelease, sCmdDoubleClick));
+      ((Control)(widget.getGraphicWidgetWrapper())).addMouseListener( new MouseClickActionForUserActionSwt(this, action, sCmdPress, sCmdRelease, sCmdDoubleClick));
       
   	}
-  	return widget.widget;
+  	return widget.getGraphicWidgetWrapper();
   }
 	
 	@Override public GralWidget addFocusAction(String sName, GralUserAction action, String sCmdEnter, String sCmdRelease)
 	{
     GralWidget widget = indexNameWidgets.get(sName);
-  	if(widget == null || !(widget.widget instanceof Control)){
+  	if(widget == null || !(widget.getGraphicWidgetWrapper() instanceof Control)){
   		log.sendMsg(0, "GuiMainDialog:addClickAction: unknown widget %s", sName);
   	} else {
     	/**The class ButtonUserAction implements the general button action, which class the registered user action. */
-      ((Control)(widget.widget)).addFocusListener( new FocusActionForUserActionSwt(this, action, sCmdEnter, sCmdRelease));
+      ((Control)(widget.getGraphicWidgetWrapper())).addFocusListener( new FocusActionForUserActionSwt(this, action, sCmdEnter, sCmdRelease));
       
   	}
   	return widget;
@@ -1122,7 +1123,7 @@ public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String p
 	
 	@Override public void addFocusAction(GralWidget widgetInfo, GralUserAction action, String sCmdEnter, String sCmdRelease)
 	{
-    ((Control)(widgetInfo.widget)).addFocusListener( new FocusActionForUserActionSwt(this, action, sCmdEnter, sCmdRelease));
+    ((Control)(widgetInfo.getGraphicWidgetWrapper())).addFocusListener( new FocusActionForUserActionSwt(this, action, sCmdEnter, sCmdRelease));
   }
 
 	
@@ -1150,14 +1151,15 @@ public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String p
    * @param content The new content.
    * @return The old content of the field.
    * throws GuiDialogZbnfControlled.NotExistException if the field with the given name isn't found.
+   * @deprecated it doesn't work yet. It isn't threadsafe. Use {@link #setInfo(GralWidget, int, int, Object, Object)}
    */
   public String setFieldContent(String name, String content)
   throws NotExistException
   {
     GralWidget descr = indexNameWidgets.get(name);
     if(descr == null) throw new NotExistException(name);
-    assert(descr.widget instanceof Text);
-    Text field = (Text)descr.widget;
+    assert(descr.getGraphicWidgetWrapper() instanceof Text);
+    Text field = (Text)descr.getGraphicWidgetWrapper();
     String oldContent = field.getText();
     field.setText(content);
     return oldContent;
@@ -1231,9 +1233,9 @@ public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String p
   
   private void setInfoDirect(GralWidget descr, int cmd, int ident, Object info, Object data)
   {
-    Widgetifc widget = descr.widget;
+    GralWidget_ifc widget = descr.getGraphicWidgetWrapper();
         if(widget !=null){
-          Control swtWidget = (Control)widget.getWidget(); 
+          Control swtWidget = (Control)widget.getWidgetImplementation(); 
           int colorValue;
           switch(cmd){
           case GralPanelMngWorking_ifc.cmdBackColor: {
@@ -1302,13 +1304,14 @@ public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String p
    *             in the configuration.
    * @return The content of the field.
    * throws GuiDialogZbnfControlled.NotExistException if the field with the given name isn't found.
+   * @deprecated it doesn't work yet. It isn't threadsafe. Use {@link #setInfo(GralWidget, int, int, Object, Object)}
    */
   public String getFieldContent(String name)
   throws NotExistException
   {
     GralWidget descr = indexNameWidgets.get(name);
     if(descr == null) throw new NotExistException(name);
-    Text field = (Text)descr.widget;
+    Text field = (Text)descr.getGraphicWidgetWrapper();
     String content = field.getText();
     return content;
   }
@@ -1410,10 +1413,10 @@ public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String p
 		GralWidget descr = indexNameWidgets.get(sName);
 		if(descr == null){
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sName);
-  	} else if(!(descr.widget instanceof CurveView)) {
+  	} else if(!(descr.getGraphicWidgetWrapper() instanceof CurveView)) {
   		log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: widget %s fault type", sName);
   	} else {
-  		((CurveView)descr.widget).setSample(values);
+  		((CurveView)descr.getGraphicWidgetWrapper()).setSample(values);
   		
   	}
   	
@@ -1425,7 +1428,7 @@ public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String p
 		GralWidget descr = indexNameWidgets.get(sName);
 		if(descr == null){
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sName);
-  	} else if((descr.widget instanceof CurveView)) {
+  	} else if((descr.getGraphicWidgetWrapper() instanceof CurveView)) {
   		//sends a redraw information.
   	  gralDevice.guiChangeRequests.add(new GralWidgetChangeRequ(descr, GralPanelMngWorking_ifc.cmdRedrawPart, 0, null, null));
   		((Composite)pos.panel.panelComposite).getDisplay().wake();  //wake-up the GUI-thread, it may sleep elsewhere. 
@@ -1436,8 +1439,8 @@ public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String p
 	
 	@Override public void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent)
 	{
-	  Widgetifc widget = (Widgetifc)(widgd.widget);
-	  Control swtWidget = (Control)widget.getWidget();
+	  GralWidget_ifc widget = widgd.getGraphicWidgetWrapper();
+	  Control swtWidget = (Control)widget.getWidgetImplementation();
 	  Point size = swtWidget.getParent().getSize();
 	  //Composite parent = swtWidget.
 	  GralRectangle posSize = calcWidgetPosAndSize(widgd.pos, size.x, size.y, 0, 0);
@@ -1459,10 +1462,10 @@ public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String p
 		GralWidget descr = indexNameWidgets.get(sNameView);
 		if(descr == null){
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sNameView);
-  	} else if(!(descr.widget instanceof CurveView)) {
+  	} else if(!(descr.getGraphicWidgetWrapper() instanceof CurveView)) {
   		log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: widget %s fault type", sNameView);
   	} else {
-      CurveView view = (CurveView)descr.widget;
+      CurveView view = (CurveView)descr.getGraphicWidgetWrapper();
       view.setLine(trackNr, sNameLine, colorValue, style, nullLine, yScale, yOffset);
   	}
 	}
@@ -1471,8 +1474,8 @@ public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String p
 	
 	@Override public String getValueFromWidget(GralWidget widgd)
 	{ final String sValue;
-  	Widgetifc widget = (Widgetifc)(widgd.widget);
-    Control swtWidget = (Control)widget.getWidget();
+  	GralWidget_ifc widget = widgd.getGraphicWidgetWrapper();
+    Control swtWidget = (Control)widget.getWidgetImplementation();
 		if(swtWidget instanceof Text){
   	  sValue = ((Text)swtWidget).getText();
   	} else if(swtWidget instanceof SwitchButtonSwt){
@@ -1529,6 +1532,7 @@ public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String p
 	
 	/**This userAction can be used by name (calling {@link #addFocusAction(String, GralUserAction, String, String)} 
 	 * to set a variable when an input field is leaved.
+	 * TODO it isn't Text
 	 */
 	private GralUserAction syncVariableOnFocus = new GralUserAction()
 	{	/**Writes the value to the named variable on leaving the focus.
@@ -1538,7 +1542,7 @@ public TextBoxGuifc addTextBox(GralWidget widgetInfo, boolean editable, String p
 		@Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
 		{
 		  
-			Object oWidget = infos.widget;
+			Object oWidget = infos.getGraphicWidgetWrapper();  
 			final VariableAccess_ifc variable = infos.getVariableFromContentInfo(variableContainer);
 			final int ixData = infos.getDataIx();
 			final String sValue;

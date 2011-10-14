@@ -8,7 +8,7 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.ifc.Widgetifc;
+import org.vishia.gral.ifc.GralWidget_ifc;
 
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -154,7 +154,7 @@ public class CanvasStorePanelSwt extends PanelSwt  //CanvasStorePanel //
     }	
 	}
 	
-  @Override public Control getWidget(){ return swtCanvas; } 
+  @Override public Control getWidgetImplementation(){ return swtCanvas; } 
 
   protected ControlListener resizeItemListener = new ControlListener()
   { @Override public void controlMoved(ControlEvent e) 

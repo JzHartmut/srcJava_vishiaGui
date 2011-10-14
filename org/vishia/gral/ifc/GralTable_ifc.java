@@ -1,22 +1,21 @@
-package org.vishia.gral.widget;
+package org.vishia.gral.ifc;
 
-import org.vishia.gral.ifc.Widgetifc;
 
 
 /**This interface can be used to work with a whole table.
  * It is an abstraction between SWT and swing table capabilities.
  * <br><br>
- * To work with lines of a table see {@link TableLineGui_ifc}.
+ * To work with lines of a table see {@link GralTableLine_ifc}.
  * @author Hartmut Schorrig
  *
  */
-public interface TableGui_ifc extends Widgetifc
+public interface GralTable_ifc extends GralWidget_ifc
 {
 
   /**Version and history:
    * <ul>
    * <li>2011-10-01 Hartmut new: {@link #clearTable()}
-   * <li>2011-09-03 Hartmut chg: method {@link #insertLine(String, int)} returns now the instance of {@link TableLineGui_ifc}
+   * <li>2011-09-03 Hartmut chg: method {@link #insertLine(String, int)} returns now the instance of {@link GralTableLine_ifc}
    *   The user doesn't create a line instance, an extra factory isn't necessary. The implementing instance
    *   can be determined by the implementer of this interface.
    * <li>2011-05-11 Hartmut new: creation. Tables are a relevant medium to present GUIs. The implementation of tables
@@ -25,11 +24,11 @@ public interface TableGui_ifc extends Widgetifc
    */
   public final static int version = 0x20111001;
   
-  TableLineGui_ifc getCurrentLine();
+  GralTableLine_ifc getCurrentLine();
   
   void setCurrentCell(int line, int column);
   
-  TableLineGui_ifc getLine(int row);
+  GralTableLine_ifc getLine(int row);
   
   /**Get the line which is designated with the requested key.
    * Background: The lines of a table can be sorted in view. To get a line
@@ -39,7 +38,7 @@ public interface TableGui_ifc extends Widgetifc
    * @param key The key to find out the row.
    * @return null if such line isn't found.
    */
-  TableLineGui_ifc getLine(String key);
+  GralTableLine_ifc getLine(String key);
   
   /**Inserts a line in the table.
    * @param key The key to get it.
@@ -48,13 +47,13 @@ public interface TableGui_ifc extends Widgetifc
    *        Integer.MAXINT or number greater as number of rows: append on end.
    * @return row where the line is inserted.
    */
-  TableLineGui_ifc insertLine(String key, int row);
+  GralTableLine_ifc insertLine(String key, int row);
   
   
   /**Deletes a line in the table.
    * 
    */
-  void deleteLine(  TableLineGui_ifc line);
+  void deleteLine(  GralTableLine_ifc line);
 
   void clearTable();
   

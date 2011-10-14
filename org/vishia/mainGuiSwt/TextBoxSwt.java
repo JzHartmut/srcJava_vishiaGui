@@ -9,46 +9,39 @@ import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
-import org.vishia.gral.widget.TextBoxGuifc;
+import org.vishia.gral.ifc.GralTextBox_ifc;
 
-public class TextBoxSwt implements TextBoxGuifc
+public class TextBoxSwt extends SwtTextFieldWrapper implements GralTextBox_ifc
 {
-  final Text text;
-  
-  final GralPrimaryWindow_ifc mainWindow;
-  
-  StringBuffer newText = new StringBuffer();
-  
   public TextBoxSwt(Composite parent, int style, GralPrimaryWindow_ifc mainWindow)
-  { text = new Text(parent, style);
-    this.mainWindow = mainWindow;
+  { super(new Text(parent, style), mainWindow);
   }
 
-  @Override public Widget getWidget(){ return text; } 
-  @Override public boolean setFocus(){ return text.setFocus(); }
+  //@Override public Widget getWidgetImplementation(){ return textFieldSwt; } 
+  //@Override public boolean setFocus(){ return textFieldSwt.setFocus(); }
 
 
   @Override
   public void viewTrail()
   {
     //textAreaOutput.setCaretPosition(textAreaOutput.getLineCount());
-    ScrollBar scroll = text.getVerticalBar();
+    ScrollBar scroll = textFieldSwt.getVerticalBar();
     int maxScroll = scroll.getMaximum();
     scroll.setSelection(maxScroll);
-    text.update();
+    textFieldSwt.update();
     
   }
 
   @Override
-  public int getNrofLines(){ return text.getLineCount(); }
+  public int getNrofLines(){ return textFieldSwt.getLineCount(); }
 
   @Override
   public Appendable append(CharSequence arg0) throws IOException
   { if(Thread.currentThread().getId() == mainWindow.getThreadIdGui()){
-      text.append(arg0.toString());
+      textFieldSwt.append(arg0.toString());
     } else {
       newText.append(arg0);
-      mainWindow.addDispatchListener(changeGui);    
+      mainWindow.addDispatchListener(changeTextBoxTrail);    
     }
     return this;
   }
@@ -57,10 +50,10 @@ public class TextBoxSwt implements TextBoxGuifc
   public Appendable append(char arg0) throws IOException
   { if(Thread.currentThread().getId() == mainWindow.getThreadIdGui()){
     String ss = "" + arg0;
-    text.append(ss);
+    textFieldSwt.append(ss);
   } else {
     newText.append(arg0);
-    mainWindow.addDispatchListener(changeGui);    
+    mainWindow.addDispatchListener(changeTextBoxTrail);    
   }
   return this;
 }
@@ -74,46 +67,25 @@ public class TextBoxSwt implements TextBoxGuifc
   }
 
   @Override
-  public String setText(String arg)
-  {
-    String oldText = text.getText();
-    text.setText(arg);
-    return oldText;
-  }
-
-  @Override
   public void append(String src)
   {
-    text.append(src);
+    textFieldSwt.append(src);
     
   }
 
-  @Override
-  public GralColor setBackgroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public GralColor setForegroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  
-  
-  GralDispatchCallbackWorker changeGui = new GralDispatchCallbackWorker()
+  protected GralDispatchCallbackWorker changeTextBoxTrail = new GralDispatchCallbackWorker()
   { @Override public void doBeforeDispatching(boolean onlyWakeup)
     { if(newText.length() >0){
-        text.append(newText.toString());
+        textFieldSwt.append(newText.toString());
         viewTrail();
         newText.setLength(0);
       }
       mainWindow.removeDispatchListener(this);
     }
   };
+  
+  
+
   
   
 }

@@ -9,9 +9,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
-import org.vishia.gral.widget.TextBoxGuifc;
+import org.vishia.gral.ifc.GralTextBox_ifc;
 
-public class TextPanelSwt extends GralPanelContent implements TextBoxGuifc, Appendable
+public class TextPanelSwt extends GralPanelContent implements GralTextBox_ifc, Appendable
 {
   
   TextBoxSwt textAreaOutput;
@@ -21,8 +21,8 @@ public class TextPanelSwt extends GralPanelContent implements TextBoxGuifc, Appe
     Display device = shell.getDisplay();
     //Composite panel = (Composite) panelComposite;
     textAreaOutput = new TextBoxSwt(shell, style, super.mainWindow);
-    textAreaOutput.text.setFont(new Font(device, "Monospaced",11, SWT.NORMAL));
-    panelComposite = textAreaOutput.text;  //it is a control,    
+    textAreaOutput.textFieldSwt.setFont(new Font(device, "Monospaced",11, SWT.NORMAL));
+    panelComposite = textAreaOutput.textFieldSwt;  //it is a control,    
   }
 
   @Override
@@ -53,10 +53,12 @@ public class TextPanelSwt extends GralPanelContent implements TextBoxGuifc, Appe
   }
 
   @Override
-  public String setText(String text)
+  public void setText(String text)
   {
-    return textAreaOutput.setText(text);
+    textAreaOutput.setText(text);
   }
+  
+  @Override public String getText(){ return textAreaOutput.getText(); }
 
   @Override
   public void viewTrail()

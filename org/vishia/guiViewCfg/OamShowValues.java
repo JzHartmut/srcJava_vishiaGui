@@ -14,6 +14,7 @@ import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.ValueBar;
 
 
@@ -150,7 +151,7 @@ public class OamShowValues
 			if(widgetsInTab != null)
 			for(GralWidget widgetInfo: widgetsInTab){
 				String sContentInfo = widgetInfo.sDataPath;
-				if(sContentInfo !=null && sContentInfo.length() >0 && widgetInfo.widget !=null){
+				if(sContentInfo !=null && sContentInfo.length() >0 && widgetInfo.getGraphicWidgetWrapper() !=null){
 					stop();
 					if(!callMethod(widgetInfo)){
 						//show value direct
@@ -426,7 +427,7 @@ public class OamShowValues
 			variable = (ByteDataSymbolicAccess.Variable)oUserData;
 		}
 		float value = variable.bytes.getFloat(variable, -1);
-		Object oWidget = widgetInfo.widget;
+		GralWidget_ifc oWidget = widgetInfo.getGraphicWidgetWrapper();
 		if(oWidget instanceof GralSetValue_ifc){
 			GralSetValue_ifc widget = (GralSetValue_ifc) oWidget;
 			widget.setValue(value);
@@ -441,7 +442,7 @@ public class OamShowValues
 		} else {
 			float value = variable.bytes.getFloat(variable, -1);
 			
-			Object oWidget = widgetInfo.widget;
+			GralWidget_ifc oWidget = widgetInfo.getGraphicWidgetWrapper();
 			if(oWidget instanceof ValueBar){
 				ValueBar widget = (ValueBar) oWidget;
 				String[] sParam;

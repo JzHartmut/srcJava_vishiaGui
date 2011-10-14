@@ -5,7 +5,7 @@ package org.vishia.gral.ifc;
  * @author Hartmut Schorrig
  *
  */
-public interface GralSetValue_ifc
+public interface GralSetValue_ifc extends GralWidget_ifc
 {
 
 	/**Sets a value to show.

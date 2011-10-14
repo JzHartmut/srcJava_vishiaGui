@@ -13,10 +13,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralSetValue_ifc;
-import org.vishia.gral.ifc.Widgetifc;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.ValueBar;
 
-public class ValueBarSwt extends ValueBar implements GralSetValue_ifc, Widgetifc
+public class ValueBarSwt extends ValueBar implements GralSetValue_ifc, GralWidget_ifc
 {
 
 	final GuiPanelMngSwt mng;
@@ -65,7 +65,7 @@ public class ValueBarSwt extends ValueBar implements GralSetValue_ifc, Widgetifc
   	}
   }
 	
-  @Override public Object getWidget() { return widget; }
+  @Override public Object getWidgetImplementation() { return widget; }
   @Override public boolean setFocus(){ return widget.setFocus(); }
 
 	public class BarWidget extends Canvas

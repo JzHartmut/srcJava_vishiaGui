@@ -8,7 +8,7 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPrimaryWindow;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.widget.TextBoxGuifc;
+import org.vishia.gral.ifc.GralTextBox_ifc;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmd_ifc;
 
@@ -23,7 +23,7 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
 
   protected GralPanelContent outputPanel;
   
-  protected TextBoxGuifc outputBox;
+  protected GralTextBox_ifc outputBox;
   
   /** Current Directory for file choosing. */
   protected File currentDirectory = null;
@@ -61,7 +61,7 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
   
   @Override public GralPanelContent getOutputPanel(){ return outputPanel; } ///
   
-  @Override public TextBoxGuifc getOutputBox(){ return outputBox; }
+  @Override public GralTextBox_ifc getOutputBox(){ return outputBox; }
 
   
   protected GralRectangle convertArea(String area)

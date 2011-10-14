@@ -12,7 +12,8 @@ import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.ifc.Widgetifc;
+import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
@@ -23,7 +24,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class FileSelector implements Widgetifc
+public class FileSelector implements GralWidget_ifc
 {
   
   
@@ -50,7 +51,7 @@ public class FileSelector implements Widgetifc
    */
   private class FileSelectList extends SelectList
   {
-    @Override public boolean actionOk(Object userData, TableLineGui_ifc line)
+    @Override public boolean actionOk(Object userData, GralTableLine_ifc line)
     { boolean done = true;
       File file = (File)(userData);
       File dir = file.getParentFile();
@@ -77,7 +78,7 @@ public class FileSelector implements Widgetifc
     }
     
     
-    @Override public void actionLeft(Object userData, TableLineGui_ifc line)
+    @Override public void actionLeft(Object userData, GralTableLine_ifc line)
     {
       File file = (File)(userData);
       File dir = file.getParentFile();
@@ -93,7 +94,7 @@ public class FileSelector implements Widgetifc
     }
     
     
-    @Override public void actionRight(Object userData, TableLineGui_ifc line)
+    @Override public void actionRight(Object userData, GralTableLine_ifc line)
     {
       File file = (File)(userData);
       File dir = file.getParentFile();
@@ -108,7 +109,7 @@ public class FileSelector implements Widgetifc
     
     
     
-    @Override public void actionUserKey(String sIntension, Object data, TableLineGui_ifc line)
+    @Override public void actionUserKey(String sIntension, Object data, GralTableLine_ifc line)
     {
       File file = (File)(data);
       KeyCode keyCode = new KeyCode(sIntension);
@@ -274,7 +275,7 @@ public class FileSelector implements Widgetifc
       stop();
       return null;
     }
-    TableLineGui_ifc line = selectList.table.getCurrentLine();
+    GralTableLine_ifc line = selectList.table.getCurrentLine();
     if(line !=null){
       File file = (File)line.getUserData();
       return file;
@@ -290,7 +291,7 @@ public class FileSelector implements Widgetifc
   
   
   
-  @Override public Object getWidget(){ return selectList.table.getWidget(); }
+  @Override public Object getWidgetImplementation(){ return selectList.table.getWidgetImplementation(); }
 
   @Override public boolean setFocus(){ return selectList.table.setFocus(); }
   

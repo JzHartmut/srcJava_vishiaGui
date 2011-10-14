@@ -5,10 +5,10 @@ package org.vishia.gral.ifc;
  * @author Hartmut Schorrig
  *
  */
-public interface Widgetifc
+public interface GralWidget_ifc
 {
   /**Returns the implementation class of the widget. */
-  Object getWidget();
+  Object getWidgetImplementation();
   
   /**Sets the focus to the widget.
    * TODO call GuiPanelMngSwt#setFocusOfTabSwt() for all widgets, see TabelSwt!

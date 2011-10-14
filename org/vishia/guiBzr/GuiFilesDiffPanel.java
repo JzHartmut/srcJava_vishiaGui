@@ -16,7 +16,7 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.widget.TableLineGui_ifc;
+import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.Report;
 import org.vishia.util.KeyCode;
@@ -50,7 +50,7 @@ public class GuiFilesDiffPanel
   
   private static final GralColor colorNonMarked = new GralColor(255,255, 255);  //white
   
-  final Map<String, TableLineGui_ifc> indexMarkedFiles = new TreeMap<String, TableLineGui_ifc>();
+  final Map<String, GralTableLine_ifc> indexMarkedFiles = new TreeMap<String, GralTableLine_ifc>();
   
   
   public GuiFilesDiffPanel(MainData mainData, GralGridBuild_ifc panelBuildifc)
@@ -224,7 +224,7 @@ public class GuiFilesDiffPanel
         key = 0;
       }
       if(key == KeyCode.enter || key == ' '){
-        TableLineGui_ifc line = (TableLineGui_ifc) values[0];
+        GralTableLine_ifc line = (GralTableLine_ifc) values[0];
         String isMarked = line.getCellText(columnMark);
         if(isMarked.equals("*")) {
           line.setCellText("", columnMark);
@@ -258,9 +258,9 @@ public class GuiFilesDiffPanel
     public boolean userActionGui(String sActionCmd, GralWidget widgetInfos, Object... values)
     { if(sActionCmd.equals("Button-up")){
         String sFileOld =null, sFileNew =null;
-        TableLineGui_ifc lineOld = null, lineNew = null;
-        for(Map.Entry<String, TableLineGui_ifc> entry: indexMarkedFiles.entrySet()){
-          TableLineGui_ifc line = entry.getValue();
+        GralTableLine_ifc lineOld = null, lineNew = null;
+        for(Map.Entry<String, GralTableLine_ifc> entry: indexMarkedFiles.entrySet()){
+          GralTableLine_ifc line = entry.getValue();
           String sType = line.getCellText(3);
           String sFile = entry.getKey();
           if(sType.equals("del")){
@@ -357,8 +357,8 @@ public class GuiFilesDiffPanel
       //assemble the files to add and to commit:
       boolean bAdd = false;
       boolean bCommitSel = false;
-      for(Map.Entry<String, TableLineGui_ifc> entry: indexMarkedFiles.entrySet()){
-        TableLineGui_ifc line = entry.getValue();
+      for(Map.Entry<String, GralTableLine_ifc> entry: indexMarkedFiles.entrySet()){
+        GralTableLine_ifc line = entry.getValue();
         String sType = line.getCellText(3);
         String sFile = entry.getKey();
         if(sType.equals("new")){

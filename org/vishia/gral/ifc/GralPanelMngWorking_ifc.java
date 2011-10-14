@@ -68,20 +68,8 @@ public interface GralPanelMngWorking_ifc
 	 */
 	Queue<GralWidget> getListCurrWidgets();
 	
-  /**Inserts a textual information at any widget. The widget may be for example:
-   * <ul>
-   * <li>a Table: Than a new line will be inserted or appended. 
-   *     The content associated to the cells are separated with a tab-char <code>'\t'</code>.
-   *     The line number is identified by the ident. 
-   * <li>a Tree: Than a new leaf is insert after the leaf, which is identified by the ident.
-   * <li>a Text-edit-widget: Than a text is inserted in the field.
-   * </ul>
-   * The insertion is written into a queue, which is red in another thread. 
-   * It may be possible too, that the GUI is realized in another module, maybe remote.
-   * It means, that a few milliseconds should be planned before the change appears.
-   * If the thread doesn't run or the remote receiver isn't present, 
-   * than the queue may be overflowed or the request may be lost.
-   *    
+  /**Inserts a textual information to any widget. Calls {@link #setInfo(GralWidget, int, int, Object, Object)}
+   * with {@link #cmdInsert}.
    * @param name The name of the widget, which was given by the add...()-Operation
    * @param ident A identifying number. It meaning depends on the kind of widget.
    *        0 means, insert on top.  Integer.MAXVALUE means, insert after the last element (append).
@@ -91,12 +79,29 @@ public interface GralPanelMngWorking_ifc
   String insertInfo(String name, int ident, String content);
 
   
-  /**Adequate {@link #insertInfo(String, int, String)}, but not symbolic but direct.
+  /**Sets any information to the given widget.
+   * The widget may be for example:
+   * <ul>
+   * <li>a Table: Than a new line will be inserted or appended. 
+   *     The content associated to the cells are separated with a tab-char <code>'\t'</code>.
+   *     The line number is identified by the ident. 
+   * <li>a Tree: Than a new leaf may be inserted after the leaf, which is identified by the ident.
+   * <li>a Text-edit-widget: Than a text can be set or inserted to the field.
+   * </ul>
+   * The insertion is written into a queue, which is red in another thread. 
+   * It may be possible too, that the GUI is realized in another module, maybe remote.
+   * It means, that a few milliseconds should be planned before the change appears.
+   * If the thread doesn't run or the remote receiver isn't present, 
+   * than the queue may be overflowed or the request may be lost.
+   *    
    * @param widgd The widget
    * @param cmd See {@link #cmdBackColor} etc.
    * @param ident A value, widget-specific.
-   * @param value The value to insert, usual a String
-   * @return 
+   * @param visibleInfo The data which should be shown. It is a String in most of cases.
+   * @param userData Any user data. If the widget consist of elements like a table or a tree,
+   *   this data are referenced from the element of the widget (the table line, the leaf in the tree). 
+   *   Which element it is, it is given by param ident.
+   * @return
    */
   String setInfo(GralWidget widgd, int cmd, int ident, Object visibleInfo, Object userData);
   

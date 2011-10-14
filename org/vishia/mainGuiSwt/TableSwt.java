@@ -30,11 +30,11 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.widget.TableGui_ifc;
-import org.vishia.gral.widget.TableLineGui_ifc;
+import org.vishia.gral.ifc.GralTable_ifc;
+import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.util.KeyCode;
 
-public class TableSwt implements TableGui_ifc
+public class TableSwt implements GralTable_ifc
 {
 
   
@@ -169,7 +169,7 @@ public class TableSwt implements TableGui_ifc
    * @param userData
    * @return
    */
-  TableLineGui_ifc changeTable(int ident, Object visibleInfo, Object userData)
+  GralTableLine_ifc changeTable(int ident, Object visibleInfo, Object userData)
   {
     TableItem item = new TableItem(table, SWT.NONE);
     String[] sLine;
@@ -182,7 +182,7 @@ public class TableSwt implements TableGui_ifc
       sLine = (String[])visibleInfo;
       item.setText(sLine);
     }
-    TableLineGui_ifc line = new TableItemWidget(item, userData); 
+    GralTableLine_ifc line = new TableItemWidget(item, userData); 
     item.setData(line);
     table.showItem(item);
     //set the scrollbar downward
@@ -245,7 +245,7 @@ public class TableSwt implements TableGui_ifc
    * the {@link GralUserAction} given in the {@link GralWidget#getActionChange()} is called
    * <ul>
    * <li> with given command "table-key".
-   * <li>params[0] is the selected line referenced with {@link TableLineGui_ifc}
+   * <li>params[0] is the selected line referenced with {@link GralTableLine_ifc}
    * <li>params[1] is the key code described in {@link KeyCode}
    * </ul> 
    * If the method returns false, the central key action given in {@link GralGridMngBase#getRegisteredUserAction(String)}
@@ -294,7 +294,7 @@ public class TableSwt implements TableGui_ifc
 		        //The SWT-TableItem contains data, which implements the gral TableLineGui_ifc to get data from the line.
 		        //firstly: Build the instance and associate to the TableItem.
 		        //later: Re-Use the instance.
-		        TableLineGui_ifc lineGral = (TableLineGui_ifc)tableLineSwt.getData();
+		        GralTableLine_ifc lineGral = (GralTableLine_ifc)tableLineSwt.getData();
 		        if(lineGral == null){
 		          lineGral = new TableItemWidget(tableLineSwt, null);
 		          tableLineSwt.setData(lineGral);  //Set the data for usage later.
@@ -341,7 +341,7 @@ public class TableSwt implements TableGui_ifc
    * The instance knows its TableSwt and therefore the supports the access to the whole table.
    *
    */
-  private class TableItemWidget implements TableLineGui_ifc
+  private class TableItemWidget implements GralTableLine_ifc
   {
     private final TableItem item;
     
@@ -353,7 +353,7 @@ public class TableSwt implements TableGui_ifc
       item.setData(this);
     }
     
-    @Override public Widget getWidget(){ return item; } 
+    @Override public Widget getWidgetImplementation(){ return item; } 
     
 
     @Override
@@ -419,12 +419,12 @@ public class TableSwt implements TableGui_ifc
   void stop(){}
 
 
-  @Override public TableLineGui_ifc getCurrentLine()
+  @Override public GralTableLine_ifc getCurrentLine()
   {
     int row = table.getSelectionIndex();
     if(row >=0){
       TableItem tableLineSwt = table.getItem(row);
-      return (TableLineGui_ifc)tableLineSwt.getData();
+      return (GralTableLine_ifc)tableLineSwt.getData();
     } else return null;  //nothing selected.
   }
 
@@ -437,27 +437,27 @@ public class TableSwt implements TableGui_ifc
   }
   
 
-  @Override public TableLineGui_ifc getLine(int row)
+  @Override public GralTableLine_ifc getLine(int row)
   {
     TableItem tableLineSwt = table.getItem(row);
-    return (TableLineGui_ifc)tableLineSwt.getData();
+    return (GralTableLine_ifc)tableLineSwt.getData();
   }
 
 
-  @Override public TableLineGui_ifc getLine(String key)
+  @Override public GralTableLine_ifc getLine(String key)
   {
     // TODO Auto-generated method stub
     return null;
   }
 
 
-  @Override public TableLineGui_ifc insertLine(String key, int row)
+  @Override public GralTableLine_ifc insertLine(String key, int row)
   {
     return changeTable(row, null, null);
   }
 
 
-  @Override public void deleteLine(TableLineGui_ifc line)
+  @Override public void deleteLine(GralTableLine_ifc line)
   {
   }
 
@@ -501,7 +501,7 @@ public class TableSwt implements TableGui_ifc
 
   
   @Override
-  public Object getWidget()
+  public Object getWidgetImplementation()
   {
     return table;
   }

@@ -19,12 +19,12 @@ import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralTableLine_ifc;
 //import org.vishia.gral.ifc.GuiShellMngIfc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.InfoBox;
-import org.vishia.gral.widget.TableLineGui_ifc;
 import org.vishia.util.KeyCode;
 
 
@@ -371,7 +371,7 @@ public interface GralGridBuild_ifc
    * with 
    * <ul>
    * <li> with given command "table-key".
-   * <li>values[0] is the selected line referenced with {@link TableLineGui_ifc}
+   * <li>values[0] is the selected line referenced with {@link GralTableLine_ifc}
    * <li>values[1] is the key code described in {@link KeyCode}
    * </ul> 
    * If the method isn't given or returns false, the central key action given in {@link GralGridMngBase#getRegisteredUserAction(String)}
