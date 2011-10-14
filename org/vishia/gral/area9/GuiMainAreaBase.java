@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPrimaryWindow;
+import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTextBox_ifc;
@@ -23,7 +24,7 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
 
   protected GralPanelContent outputPanel;
   
-  protected GralTextBox_ifc outputBox;
+  protected GralTextBox outputBox;
   
   /** Current Directory for file choosing. */
   protected File currentDirectory = null;
@@ -61,7 +62,7 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
   
   @Override public GralPanelContent getOutputPanel(){ return outputPanel; } ///
   
-  @Override public GralTextBox_ifc getOutputBox(){ return outputBox; }
+  @Override public GralTextBox getOutputBox(){ return outputBox; }
 
   
   protected GralRectangle convertArea(String area)

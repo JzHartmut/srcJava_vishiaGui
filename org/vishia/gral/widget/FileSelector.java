@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralGridPos;
@@ -24,7 +25,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class FileSelector implements GralWidget_ifc
+public class FileSelector extends GralWidget
 {
   
   
@@ -51,6 +52,7 @@ public class FileSelector implements GralWidget_ifc
    */
   private class FileSelectList extends SelectList
   {
+
     @Override public boolean actionOk(Object userData, GralTableLine_ifc line)
     { boolean done = true;
       File file = (File)(userData);
@@ -117,6 +119,30 @@ public class FileSelector implements GralWidget_ifc
       case KeyCode.alt + KeyCode.F + '7': FileSystem.searchInFiles(new File[]{file}, "ordersBackground"); break;
       }
     }
+
+
+    @Override
+    public Object getWidgetImplementation()
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+
+    @Override
+    public GralColor setBackgroundColor(GralColor color)
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+
+    @Override
+    public GralColor setForegroundColor(GralColor color)
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
   } //selectList implementation
   
   
@@ -133,7 +159,7 @@ public class FileSelector implements GralWidget_ifc
   
   
   /**The widget for showing the path. */
-  GralWidget widgdPath;
+  GralTextField widgdPath;
   
   final SimpleDateFormat dateFormat = new SimpleDateFormat("yy-MMM-dd HH:mm:ss"); 
   
@@ -153,6 +179,7 @@ public class FileSelector implements GralWidget_ifc
   
   public FileSelector(MainCmd_ifc mainCmd)
   {
+    super('l');
     this.mainCmd = mainCmd;
   }
   
@@ -259,7 +286,7 @@ public class FileSelector implements GralWidget_ifc
         selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, line, file);
         lineCt +=1;
       }
-      selectList.table.setCurrentCell(lineSelect, 1);
+      selectList.wdgdTable.setCurrentCell(lineSelect, 1);
     }
   }
   
@@ -271,11 +298,11 @@ public class FileSelector implements GralWidget_ifc
    */
   public File getSelectedFile()
   {
-    if(selectList.table == null){
+    if(selectList.wdgdTable == null){
       stop();
       return null;
     }
-    GralTableLine_ifc line = selectList.table.getCurrentLine();
+    GralTableLine_ifc line = selectList.wdgdTable.getCurrentLine();
     if(line !=null){
       File file = (File)line.getUserData();
       return file;
@@ -291,9 +318,9 @@ public class FileSelector implements GralWidget_ifc
   
   
   
-  @Override public Object getWidgetImplementation(){ return selectList.table.getWidgetImplementation(); }
+  @Override public Object getWidgetImplementation(){ return selectList.wdgdTable.getWidgetImplementation(); }
 
-  @Override public boolean setFocus(){ return selectList.table.setFocus(); }
+  @Override public boolean setFocus(){ return selectList.wdgdTable.setFocus(); }
   
   
 
@@ -312,4 +339,9 @@ public class FileSelector implements GralWidget_ifc
     return null;
   }
   
+  @Override public void removeWidgetImplementation()
+  {
+    //widgdPath.rem   
+  }
+ 
 }

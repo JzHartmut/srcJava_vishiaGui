@@ -21,7 +21,7 @@ public class ValueBarSwt extends ValueBar implements GralSetValue_ifc, GralWidge
 
 	final GuiPanelMngSwt mng;
 
-	final public BarWidget widget;
+	protected BarWidget widgetSwt;
 	
 	final Color black;
 	//final Color colorValueOk, colorValueMinLimit, colorValueMaxLimit;
@@ -33,12 +33,13 @@ public class ValueBarSwt extends ValueBar implements GralSetValue_ifc, GralWidge
 	 * @param mng The Gui-panel-manager contains information about the graphic frame and properties.
 	 * @param size The size of text in button, use 'A' or 'B' for small - bold
 	 */
-	public ValueBarSwt(GuiPanelMngSwt mng)
+	public ValueBarSwt(String name, GuiPanelMngSwt mng)
 	{
-    super(mng);
+    super(name, mng);
     this.mng = mng;
-		this.widget = this.new BarWidget();		
-		this.widget.setBackground(mng.propertiesGuiSwt.colorBackgroundSwt());
+		this.widgetSwt = this.new BarWidget();
+		this.widgetSwt.setData(this);
+		this.widgetSwt.setBackground(mng.propertiesGuiSwt.colorBackgroundSwt());
   	//Control xx = mng.currPanel.panelComposite;
 		black = mng.propertiesGuiSwt.colorSwt(0);
 		//white = mng.propertiesGui.color(0xffffff);
@@ -51,7 +52,7 @@ public class ValueBarSwt extends ValueBar implements GralSetValue_ifc, GralWidge
 
   @Override public void redraw()
   {
-		this.widget.getDisplay().asyncExec(widget.redraw);
+		this.widgetSwt.getDisplay().asyncExec(widgetSwt.redraw);
   }
 	
   
@@ -65,8 +66,8 @@ public class ValueBarSwt extends ValueBar implements GralSetValue_ifc, GralWidge
   	}
   }
 	
-  @Override public Object getWidgetImplementation() { return widget; }
-  @Override public boolean setFocus(){ return widget.setFocus(); }
+  @Override public Object getWidgetImplementation() { return widgetSwt; }
+  @Override public boolean setFocus(){ return widgetSwt.setFocus(); }
 
 	public class BarWidget extends Canvas
 	{
@@ -153,5 +154,13 @@ public class ValueBarSwt extends ValueBar implements GralSetValue_ifc, GralWidge
     // TODO Auto-generated method stub
     return null;
   }
+
+  
+  @Override public void removeWidgetImplementation()
+  {
+    widgetSwt.dispose();
+    widgetSwt = null;
+  }
+
 
 }

@@ -25,7 +25,7 @@ public class PanelOutput
   
   final StringBuilder uCommitOut =  new StringBuilder();
   
-  final GralWidget widgdOutputText = new GralWidget("OutputText", 'T');
+  GralWidget widgdOutputText; // = new GralWidget("OutputText", 'T');
   
   public PanelOutput(MainData mainData, GralGridBuild_ifc panelBuildifc)
   {
@@ -39,7 +39,7 @@ public class PanelOutput
   void initGui()
   { panelBuildifc.selectPanel("Output");
     panelBuildifc.setPositionSize(2,0, 30, 70, 'r');
-    panelBuildifc.addTextBox(widgdOutputText, true, null, ' '); // "commit Text", 't');
+    widgdOutputText = panelBuildifc.addTextBox("OutputText", true, null, ' '); // "commit Text", 't');
   }
     
   

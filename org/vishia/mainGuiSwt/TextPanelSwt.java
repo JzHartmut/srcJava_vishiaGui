@@ -20,7 +20,7 @@ public class TextPanelSwt extends GralPanelContent implements GralTextBox_ifc, A
   { super(namePanel, mainWindow);
     Display device = shell.getDisplay();
     //Composite panel = (Composite) panelComposite;
-    textAreaOutput = new TextBoxSwt(shell, style, super.mainWindow);
+    textAreaOutput = new TextBoxSwt(namePanel + "-widg", shell, style, super.mainWindow);
     textAreaOutput.textFieldSwt.setFont(new Font(device, "Monospaced",11, SWT.NORMAL));
     panelComposite = textAreaOutput.textFieldSwt;  //it is a control,    
   }
@@ -81,4 +81,10 @@ public class TextPanelSwt extends GralPanelContent implements GralTextBox_ifc, A
   { return textAreaOutput.append(csq, start, end);
   }
   
+  @Override public void removeWidgetImplementation()
+  {
+    textAreaOutput.removeWidgetImplementation();    
+  }
+
+
 }

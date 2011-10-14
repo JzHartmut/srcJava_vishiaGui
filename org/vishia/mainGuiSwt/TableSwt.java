@@ -1,40 +1,32 @@
 package org.vishia.mainGuiSwt;
 
-import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
-import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralTable;
 import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.util.KeyCode;
 
-public class TableSwt implements GralTable_ifc
+public class TableSwt extends GralTable
 {
 
   
@@ -45,11 +37,12 @@ public class TableSwt implements GralTable_ifc
    * <li>older: TODO
    * </ul>
    */
+  @SuppressWarnings("hiding")
   public static final int version = 0x20111001;
 
 
   
-  private final Table table;
+  private Table table;
   
   private final GuiPanelMngSwt mng;
   
@@ -58,9 +51,9 @@ public class TableSwt implements GralTable_ifc
   //private final int selectionColumn;
   //private final CharSequence selectionText;
   
-  public TableSwt(GuiPanelMngSwt mng, Composite parent,  int height
+  public TableSwt(GuiPanelMngSwt mng, String name, Composite parent,  int height
       , int[] columnWidths) //, int selectionColumn, CharSequence selectionText)
-  {
+  { super(name);
     this.mng = mng;
     this.columnWidths = columnWidths;
     //this.selectionColumn = selectionColumn;
@@ -142,7 +135,7 @@ public class TableSwt implements GralTable_ifc
   
   
   
-  public static GralWidget addTable(GuiPanelMngSwt mng, String sName, int height, int[] columnWidths
+  public static GralTable addTable(GuiPanelMngSwt mng, String sName, int height, int[] columnWidths
   //, int selectionColumn, CharSequence selectionText    
   )
   {
@@ -150,12 +143,13 @@ public class TableSwt implements GralTable_ifc
     boolean TEST = false;
     final TableSwt table;
     Composite parent = (Composite)mng.pos.panel.panelComposite;
-    table = new TableSwt(mng, parent, height, columnWidths); //, selectionColumn, selectionText);
-    GralWidget widgd = new GralWidget(sName, table, 'L', sName, null);
-    widgd.setPanelMng(mng);
-    table.table.setData(widgd);
-    mng.registerWidget(widgd);
-    return widgd;
+    table = new TableSwt(mng, sName, parent, height, columnWidths); //, selectionColumn, selectionText);
+    //GralWidget widgd = new GralWidget(sName, table, 'L', sName, null);
+    table.setContentInfo(sName);
+    table.setPanelMng(mng);
+    table.table.setData(table);
+    mng.registerWidget(table);
+    return table;
 
   }
   
@@ -343,7 +337,7 @@ public class TableSwt implements GralTable_ifc
    */
   private class TableItemWidget implements GralTableLine_ifc
   {
-    private final TableItem item;
+    private TableItem item;
     
     private Object userData;
     
@@ -395,6 +389,13 @@ public class TableSwt implements GralTable_ifc
     {
       return table.setFocus();
     }
+
+    @Override public void removeWidgetImplementation()
+    {
+      item.dispose();
+      item = null;
+    }
+
 
 
   }
@@ -476,6 +477,22 @@ public class TableSwt implements GralTable_ifc
 
 
 
+
+  @Override public boolean setFocus()
+  { mng.setFocusOfTabSwt(table);
+    table.forceFocus();
+    return table.setFocus();
+  }
+
+
+  
+  //@Override
+  public Object getWidgetImplementation()
+  {
+    return table;
+  }
+
+
   @Override
   public GralColor setBackgroundColor(GralColor color)
   {
@@ -490,19 +507,13 @@ public class TableSwt implements GralTable_ifc
     // TODO Auto-generated method stub
     return null;
   }
-
-
-  @Override public boolean setFocus()
-  { mng.setFocusOfTabSwt(table);
-    table.forceFocus();
-    return table.setFocus();
-  }
-
-
   
-  @Override
-  public Object getWidgetImplementation()
+  
+  @Override public void removeWidgetImplementation()
   {
-    return table;
+    table.dispose();
+    table = null;
   }
+
+
 }

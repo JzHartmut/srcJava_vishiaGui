@@ -6,15 +6,25 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
+import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
 
-public class TextBoxSwt extends SwtTextFieldWrapper implements GralTextBox_ifc
+public class TextBoxSwt extends GralTextBox
 {
-  public TextBoxSwt(Composite parent, int style, GralPrimaryWindow_ifc mainWindow)
-  { super(new Text(parent, style), mainWindow);
+  protected Text textFieldSwt;
+  
+  final GralPrimaryWindow_ifc mainWindow;
+  
+  StringBuffer newText = new StringBuffer();
+  
+  
+  public TextBoxSwt(String name, Composite parent, int style, GralPrimaryWindow_ifc mainWindow)
+  { super(name, 't');
+    textFieldSwt = new Text(parent, style);
+    this.mainWindow = mainWindow;
   }
 
   //@Override public Widget getWidgetImplementation(){ return textFieldSwt; } 
@@ -73,6 +83,42 @@ public class TextBoxSwt extends SwtTextFieldWrapper implements GralTextBox_ifc
     
   }
 
+  @Override public void setText(String arg)
+  {
+    if(Thread.currentThread().getId() == mainWindow.getThreadIdGui()){
+      textFieldSwt.setText(arg);
+    } else {
+      newText.setLength(0);
+      newText.append(arg);
+      mainWindow.addDispatchListener(changeText);    
+    }
+  }
+  
+  @Override public String getText()
+  {
+    String oldText = textFieldSwt.getText();
+    return oldText;
+  }
+   
+  @Override public Object getWidgetImplementation()
+  { return textFieldSwt;
+  }
+
+
+  @Override public GralColor setBackgroundColor(GralColor color)
+  { return SwtWidgetHelper.setBackgroundColor(color, textFieldSwt);
+  }
+  
+
+  @Override public GralColor setForegroundColor(GralColor color)
+  { return SwtWidgetHelper.setForegroundColor(color, textFieldSwt);
+  }
+  
+  
+
+
+
+  
   protected GralDispatchCallbackWorker changeTextBoxTrail = new GralDispatchCallbackWorker()
   { @Override public void doBeforeDispatching(boolean onlyWakeup)
     { if(newText.length() >0){
@@ -85,6 +131,23 @@ public class TextBoxSwt extends SwtTextFieldWrapper implements GralTextBox_ifc
   };
   
   
+  protected GralDispatchCallbackWorker changeText = new GralDispatchCallbackWorker()
+  { @Override public void doBeforeDispatching(boolean onlyWakeup)
+    { if(newText.length() >0){
+        textFieldSwt.setText(newText.toString());
+        newText.setLength(0);
+      }
+      mainWindow.removeDispatchListener(this);
+    }
+  };
+  
+  
+  @Override public void removeWidgetImplementation()
+  {
+    textFieldSwt.dispose();
+    textFieldSwt = null;
+  }
+
 
   
   

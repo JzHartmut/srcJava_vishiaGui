@@ -8,18 +8,20 @@ package org.vishia.gral.ifc;
 public interface GralWidget_ifc
 {
   /**Returns the implementation class of the widget. */
-  Object getWidgetImplementation();
+  public abstract Object getWidgetImplementation();
+  
+  public abstract void removeWidgetImplementation();
   
   /**Sets the focus to the widget.
    * TODO call GuiPanelMngSwt#setFocusOfTabSwt() for all widgets, see TabelSwt!
    * @return true if set
    */
-  boolean setFocus();
+  public abstract boolean setFocus();
   
-  GralColor setBackgroundColor(GralColor color);
+  public abstract GralColor setBackgroundColor(GralColor color);
   
-  GralColor setForegroundColor(GralColor color);
+  public abstract GralColor setForegroundColor(GralColor color);
   
-  
+  //public abstract GralWidget getGralWidget();
 
 }

@@ -3,6 +3,7 @@ package org.vishia.gral.widget;
 import java.io.IOException;
 
 import org.vishia.gral.base.GralSubWindow;
+import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralWidget;
@@ -146,4 +147,11 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
     return null;
   }
   
+  
+  @Override public void removeWidgetImplementation()
+  {
+    //textBox.removeWidgetImplementation();
+  }
+
+
 }

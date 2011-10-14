@@ -24,7 +24,7 @@ public class CopyCmd
   
   GralGridPos posWindConfirmCopy;
   
-  GralWidget widgdCopyFrom, widgdCopyTo;
+  //GralWidget widgdCopyFrom, widgdCopyTo;
   
   GralTextField_ifc widgCopyFrom, widgCopyTo;
   
@@ -49,11 +49,9 @@ public class CopyCmd
     
     main.panelMng.setPosition(2, GralGridPos.size -2, 1, GralGridPos.size +45, 0, 'd');
     main.panelMng.addText("source path/file:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    widgdCopyFrom = main.panelMng.addTextField("copyFrom", true, null, 't');
-    widgCopyFrom = (GralTextField_ifc)widgdCopyFrom.getGraphicWidgetWrapper();
+    widgCopyFrom = main.panelMng.addTextField("copyFrom", true, null, 't');
     main.panelMng.addText("destination path/file:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    widgdCopyTo = main.panelMng.addTextField("copyTo", true, null, 't');
-    widgCopyTo = (GralTextField_ifc)widgdCopyTo.getGraphicWidgetWrapper();
+    widgCopyTo = main.panelMng.addTextField("copyTo", true, null, 't');
     
     main.panelMng.setPosition(GralGridPos.refer+3.5f, GralGridPos.size -3, GralGridPos.same, GralGridPos.size + 15, 0, 'r');
     widgdOverwrite = main.panelMng.addSwitchButton("copyOverwrite", null, null, null, null, "overwrite", "wh", "gn");

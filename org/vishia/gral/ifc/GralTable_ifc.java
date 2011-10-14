@@ -1,17 +1,8 @@
 package org.vishia.gral.ifc;
 
 
-
-/**This interface can be used to work with a whole table.
- * It is an abstraction between SWT and swing table capabilities.
- * <br><br>
- * To work with lines of a table see {@link GralTableLine_ifc}.
- * @author Hartmut Schorrig
- *
- */
 public interface GralTable_ifc extends GralWidget_ifc
 {
-
   /**Version and history:
    * <ul>
    * <li>2011-10-01 Hartmut new: {@link #clearTable()}
@@ -24,11 +15,11 @@ public interface GralTable_ifc extends GralWidget_ifc
    */
   public final static int version = 0x20111001;
   
-  GralTableLine_ifc getCurrentLine();
+  public abstract GralTableLine_ifc getCurrentLine();
   
-  void setCurrentCell(int line, int column);
+  public abstract void setCurrentCell(int line, int column);
   
-  GralTableLine_ifc getLine(int row);
+  public abstract GralTableLine_ifc getLine(int row);
   
   /**Get the line which is designated with the requested key.
    * Background: The lines of a table can be sorted in view. To get a line
@@ -38,7 +29,7 @@ public interface GralTable_ifc extends GralWidget_ifc
    * @param key The key to find out the row.
    * @return null if such line isn't found.
    */
-  GralTableLine_ifc getLine(String key);
+  public abstract GralTableLine_ifc getLine(String key);
   
   /**Inserts a line in the table.
    * @param key The key to get it.
@@ -47,21 +38,21 @@ public interface GralTable_ifc extends GralWidget_ifc
    *        Integer.MAXINT or number greater as number of rows: append on end.
    * @return row where the line is inserted.
    */
-  GralTableLine_ifc insertLine(String key, int row);
+  public abstract GralTableLine_ifc insertLine(String key, int row);
   
   
   /**Deletes a line in the table.
    * 
    */
-  void deleteLine(  GralTableLine_ifc line);
+  public abstract void deleteLine(  GralTableLine_ifc line);
 
-  void clearTable();
+  public abstract void clearTable();
   
   
   /**Search where this line is shown.
    * @param key
    * @return -1 if the key isn't found in the table. 0... row where this line is shown in table.
    */
-  int searchLine(String key);
+  public abstract int searchLine(String key);
   
 }

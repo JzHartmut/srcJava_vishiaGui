@@ -15,6 +15,7 @@ import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
 import org.vishia.cmd.PrepareCmd;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralTableLine_ifc;
@@ -49,8 +50,8 @@ public class CommandSelector extends SelectList
   
   
   
-  public CommandSelector(CmdQueue cmdQueue)
-  {
+  public CommandSelector(String name, CmdQueue cmdQueue)
+  { super(name);
     this.cmdStore = new CmdStore();
     this.cmdQueue = cmdQueue;
   }
@@ -101,7 +102,7 @@ public class CommandSelector extends SelectList
     // TODO Auto-generated method stub
     
   }
-  
+
   
   
 }

@@ -1,22 +1,25 @@
 package org.vishia.mainGuiSwt;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Text;
+import org.vishia.gral.base.GralTextField;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.swt.WidgetSimpleWrapperSwt;
 
-public class SwtTextFieldWrapper extends WidgetSimpleWrapperSwt implements GralTextField_ifc
+public class SwtTextFieldWrapper extends GralTextField
 {
-  final Text textFieldSwt;
+  protected Text textFieldSwt;
   
   final GralPrimaryWindow_ifc mainWindow;
   
   StringBuffer newText = new StringBuffer();
   
   
-  public SwtTextFieldWrapper(Text widgetSwt, GralPrimaryWindow_ifc mainWindow)
-  { super(widgetSwt);
+  public SwtTextFieldWrapper(String name, Text widgetSwt, char whatis, GralPrimaryWindow_ifc mainWindow)
+  { super(name, whatis);
     textFieldSwt = widgetSwt;
     this.mainWindow = mainWindow;
   }
@@ -51,8 +54,29 @@ public class SwtTextFieldWrapper extends WidgetSimpleWrapperSwt implements GralT
       mainWindow.removeDispatchListener(this);
     }
   };
+
+
+  @Override public Object getWidgetImplementation()
+  { return textFieldSwt;
+  }
+
+
+  @Override public GralColor setBackgroundColor(GralColor color)
+  { return SwtWidgetHelper.setBackgroundColor(color, textFieldSwt);
+  }
+  
+
+  @Override public GralColor setForegroundColor(GralColor color)
+  { return SwtWidgetHelper.setForegroundColor(color, textFieldSwt);
+  }
   
   
+  @Override public void removeWidgetImplementation()
+  {
+    textFieldSwt.dispose();
+    textFieldSwt = null;
+  }
+
 
   
 }

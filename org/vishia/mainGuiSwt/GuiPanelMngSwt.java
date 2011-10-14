@@ -69,6 +69,9 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
+import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralTextBox;
+import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
@@ -87,6 +90,7 @@ import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
 import org.vishia.gral.swt.WidgetSimpleWrapperSwt;
+import org.vishia.gral.widget.GralCurveView;
 import org.vishia.msgDispatch.LogMessage;
 
 
@@ -366,13 +370,14 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     return true;
   }
   
-  @Override public boolean remove(GralWidget widget)
+  @Override public boolean remove(GralWidget widgetP)
   {
-    if(widget !=null && widget.getGraphicWidgetWrapper() !=null){
-      Object swtWidgd = widget.getGraphicWidgetWrapper().getWidgetImplementation();
+    GralWidget_ifc widget = (GralWidget_ifc)widgetP;
+    if(widget !=null && widget.getWidgetImplementation() !=null){
+      Object swtWidgd = widget.getWidgetImplementation();
       ((Widget)swtWidgd).dispose();
     }
-    widget.setGraphicWidgetWrapper(null);  //remove instance by Garbage collector.
+    widget.removeWidgetImplementation();  //remove instance by Garbage collector.
     return true;
     
   }
@@ -560,7 +565,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     }
     widget.setSize(textSize);
     //guiContent.add(widget);
-    GralWidget widgd = new GralWidget(sText, new WidgetSimpleWrapperSwt(widget), 'S');
+    GralWidget widgd = new WidgetSimpleWrapperSwt("", 'S', widget);
     return widgd;
   }
 
@@ -600,7 +605,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     }
     widget.setSize(textSize);
     //guiContent.add(widget);
-    GralWidget widgd = new GralWidget(sText, new WidgetSimpleWrapperSwt(widget), 'S');
+    GralWidget widgd = new WidgetSimpleWrapperSwt("", 'S', widget);
     return widgd;
   }
 
@@ -616,9 +621,9 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    *   'l' left, 't' top (above field) 
    * @return
    */
-  @Override public GralWidget addTextField(String name, boolean editable, String prompt, char promptStylePosition)
+  public GralWidget XXXaddTextField(String name, boolean editable, String prompt, char promptStylePosition)
   {
-    return addTextField(null, name, editable, prompt, promptStylePosition);
+    return null; //addTextField(null, name, editable, prompt, promptStylePosition);
   }
   
 
@@ -633,9 +638,9 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    *   'l' left, 't' top (above field) 
    * @return
    */
-  public GralWidget addTextField(GralWidget widgetInfo, boolean editable, String prompt, char promptStylePosition)
+  public GralWidget XXXaddTextField(GralWidget widgetInfo, boolean editable, String prompt, char promptStylePosition)
   {
-    return addTextField(widgetInfo, null, editable, prompt, promptStylePosition);
+    return null; //addTextField(widgetInfo, null, editable, prompt, promptStylePosition);
   }
   
   
@@ -650,11 +655,9 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    *   'l' left, 't' top (above field) 
    * @return
    */
-  private GralWidget addTextField(GralWidget widgetInfo, String name, boolean editable, String prompt, char promptStylePosition)
+  @Override public GralTextField addTextField(String name, boolean editable, String prompt, char promptStylePosition)
   { Text widgetSwt = new Text((Composite)pos.panel.panelComposite, SWT.SINGLE);
-    if(widgetInfo == null){
-      widgetInfo = new GralWidget(name, editable ? 'T' : 'S');
-    }
+    GralTextField widgetInfo = new SwtTextFieldWrapper(name, widgetSwt, editable ? 'T' : 'S', gralDevice);
     widgetInfo.setPanelMng(this);
     widgetSwt.setFont(propertiesGuiSwt.stdInputFont);
     widgetSwt.setEditable(editable);
@@ -715,8 +718,6 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     	widgetInfo.name = sCurrPanel + widgetInfo.name.substring(1);
     }
     //link the widget with is information together.
-    SwtTextFieldWrapper widgetWrapper = new SwtTextFieldWrapper(widgetSwt, gralDevice);
-    widgetInfo.setGraphicWidgetWrapper(widgetWrapper);
     widgetSwt.setData(widgetInfo);
     if(widgetInfo.name !=null){
       indexNameWidgets.put(widgetInfo.name, widgetInfo);
@@ -742,9 +743,10 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
  *   'l' left, 't' top (above field) 
  * @return
  */
-public GralTextBox_ifc addTextBox(GralWidget widgetInfo, boolean editable, String prompt, char promptStylePosition)
-{ widgetInfo.setPanelMng(this);
-  TextBoxSwt widgetSwt = new TextBoxSwt((Composite)pos.panel.panelComposite, SWT.MULTI, gralDevice);
+@Override public GralTextBox addTextBox(String name, boolean editable, String prompt, char promptStylePosition)
+{ TextBoxSwt widgetSwt = new TextBoxSwt(name, (Composite)pos.panel.panelComposite, SWT.MULTI, gralDevice);
+  GralWidget widgetInfo = widgetSwt;
+  widgetInfo.setPanelMng(this);
   //Text widgetSwt = new Text((Composite)pos.panel.panelComposite, SWT.MULTI);
   widgetSwt.textFieldSwt.setFont(propertiesGuiSwt.stdInputFont);
   widgetSwt.textFieldSwt.setEditable(editable);
@@ -793,7 +795,6 @@ public GralTextBox_ifc addTextBox(GralWidget widgetInfo, boolean editable, Strin
     widgetInfo.name = sCurrPanel + widgetInfo.name.substring(1);
   }
   //link the widget with is information together.
-  widgetInfo.setGraphicWidgetWrapper(widgetSwt);
   widgetSwt.textFieldSwt.setData(widgetInfo);
   if(widgetInfo.name !=null){
     indexNameWidgets.put(widgetInfo.name, widgetInfo);
@@ -877,7 +878,7 @@ public GralTextBox_ifc addTextBox(GralWidget widgetInfo, boolean editable, Strin
     if(sCmd != null){
       widget.setData(sCmd);
     } 
-    GralWidget widgd = new GralWidget(sName, new WidgetSimpleWrapperSwt(widget), 'i', sName, null);
+    GralWidget widgd = new WidgetSimpleWrapperSwt(sName, 'i', widget);
     if(sName !=null){
       indexNameWidgets.put(sName, widgd);
     }
@@ -893,19 +894,18 @@ public GralTextBox_ifc addTextBox(GralWidget widgetInfo, boolean editable, Strin
   , String sDataPath
   )
   {
-  	ValueBarSwt widget = new ValueBarSwt(this);
-  	setPosAndSize_(widget.widget);
-  	GralWidget widgetInfos = new GralWidget(sName, widget, 'U');
-  	widgetInfos.setPanelMng(this);
-    widgetInfos.setShowMethod(sShowMethod);
-  	widgetInfos.setDataPath(sDataPath);
-    widget.widget.setData(widgetInfos);
-    widget.widget.addMouseListener(mouseClickForInfo);
-    pos.panel.widgetList.add(widgetInfos);
+  	ValueBarSwt widget = new ValueBarSwt(sName, this);
+  	setPosAndSize_(widget.widgetSwt);
+  	widget.setPanelMng(this);
+    widget.setShowMethod(sShowMethod);
+  	widget.setDataPath(sDataPath);
+    //widget.widget.setData(widgetInfos);
+    widget.widgetSwt.addMouseListener(mouseClickForInfo);
+    pos.panel.widgetList.add(widget);
     if(sName != null){
-      indexNameWidgets.put(sName, widgetInfos);
+      indexNameWidgets.put(sName, widget);
     }
-    return widgetInfos;
+    return widget;
   }
   
   
@@ -919,7 +919,7 @@ public GralTextBox_ifc addTextBox(GralWidget widgetInfo, boolean editable, Strin
   	Slider control = new Slider((Composite)this.pos.panel.panelComposite, SWT.VERTICAL);
   	control.setBackground(propertiesGuiSwt.colorBackground);
   	setPosAndSize_(control);
-   	GralWidget widgetInfos = new GralWidget(sName, new WidgetSimpleWrapperSwt(control), 'V');
+   	GralWidget widgetInfos = new WidgetSimpleWrapperSwt(sName, 'V', control);
    	widgetInfos.setPanelMng(this);
     if(action != null){
   		SelectionListenerForSlider actionSlider = new SelectionListenerForSlider(widgetInfos, action);
@@ -950,10 +950,10 @@ public GralTextBox_ifc addTextBox(GralWidget widgetInfo, boolean editable, Strin
     int xSize = (int)pos.width();
     
     char size = ySize > 3? 'B' : 'A';
-  	GralWidget widgetInfos = new GralWidget(sName, 'B');
+  	ButtonSwt button = new ButtonSwt(this, null, size);
+  	GralWidget widgetInfos = new WidgetSimpleWrapperSwt(sName, 'B', button);
     widgetInfos.setPanelMng(this);
-    ButtonSwt button = new ButtonSwt(this, widgetInfos, size);
-    widgetInfos.setGraphicWidgetWrapper(new WidgetSimpleWrapperSwt(button));
+    button.setData(widgetInfos);
     button.setBackground(propertiesGuiSwt.colorBackground);
   	
     button.setText(sButtonText);
@@ -964,7 +964,6 @@ public GralTextBox_ifc addTextBox(GralWidget widgetInfo, boolean editable, Strin
     widgetInfos.sCmd = sCmd;
     widgetInfos.setShowMethod(sShowMethod);
     widgetInfos.sDataPath = sDataPath;
-    button.setData(widgetInfos);
     //pos.panel.widgetIndex.put(sName, widgetInfos);
     pos.panel.widgetList.add(widgetInfos);
     if(sCmd != null){
@@ -1001,15 +1000,14 @@ public GralTextBox_ifc addTextBox(GralWidget widgetInfo, boolean editable, Strin
     char size = ySize > 3? 'B' : 'A';
   	if(sColor0 == null || sColor1 == null) throw new IllegalArgumentException("SwitchButton " + sName + ": color0 and color1 should be given.");
   	
-  	GralWidget widgetInfos = new GralWidget(sName, 'B');
+  	SwitchButtonSwt button = new SwitchButtonSwt(this, null, size);
+    GralWidget widgetInfos = new WidgetSimpleWrapperSwt(sName, 'B', button);
     widgetInfos.setPanelMng(this);
     widgetInfos.setActionChange(action);
     widgetInfos.sCmd = sCmd;
     widgetInfos.setShowMethod(sShowMethod);
     widgetInfos.sDataPath = sDataPath;
-    SwitchButtonSwt button = new SwitchButtonSwt(this, widgetInfos, size);
-    widgetInfos.setGraphicWidgetWrapper(new WidgetSimpleWrapperSwt(button));
-  	button.setBackground(propertiesGuiSwt.colorBackground);
+    button.setBackground(propertiesGuiSwt.colorBackground);
   	button.setColorPressed(propertiesGui.getColorValue(sColor1));  
     button.setColorReleased(propertiesGui.getColorValue(sColor0));  
     button.setText(sButtonText);
@@ -1040,7 +1038,7 @@ public GralTextBox_ifc addTextBox(GralWidget widgetInfo, boolean editable, Strin
     widget.setForeground(propertiesGuiSwt.colorSwt(0xff00));
     widget.setSize(propertiesGui.xPixelUnit() * xSize -2, propertiesGui.yPixelUnit() * ySize -2);
     setBounds_(widget);
-    GralWidget widgetInfos = new GralWidget(sName, new WidgetSimpleWrapperSwt(widget), 'D');
+    GralWidget widgetInfos = new WidgetSimpleWrapperSwt(sName, 'D', widget);
     widgetInfos.setPanelMng(this);
     widgetInfos.sDataPath = sDataPath;
     widgetInfos.setShowMethod(sShowMethod);
@@ -1056,6 +1054,7 @@ public GralTextBox_ifc addTextBox(GralWidget widgetInfo, boolean editable, Strin
 	@Override
 	public Canvas addCurveViewY(String sName, int nrofXvalues,
 			int nrofTracks) {
+    GralWidget widgd = new SwtCurveView(sName); //, curveView, 'c', sName, null);
 	  int ySize = (int)(pos.height());
     int xSize = (int)(pos.width());
     int dxWidget = xSize * propertiesGui.xPixelUnit();
@@ -1067,7 +1066,6 @@ public GralTextBox_ifc addTextBox(GralWidget widgetInfo, boolean editable, Strin
 		curveView.setGridVertical(10, 5);   //10 data-points per grid line, 50 data-points per strong line.
 		curveView.setGridHorizontal(50.0F, 5);  //10%-divisions, with 5 sub-divisions
 		curveView.setGridColor(propertiesGuiSwt.colorGrid, propertiesGuiSwt.colorGridStrong);
-		GralWidget widgd = new GralWidget(sName, curveView, 'c', sName, null);
 		widgd.setPanelMng(this);
     indexNameWidgets.put(sName, widgd);
 		return curveView;
@@ -1127,7 +1125,7 @@ public GralTextBox_ifc addTextBox(GralWidget widgetInfo, boolean editable, Strin
   }
 
 	
-  @Override public GralWidget addTable(String sName, int height, int[] columnWidths)
+  @Override public GralTable addTable(String sName, int height, int[] columnWidths)
   {
     return TableSwt.addTable(this, sName, height, columnWidths);
   }

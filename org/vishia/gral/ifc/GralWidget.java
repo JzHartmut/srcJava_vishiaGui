@@ -2,6 +2,7 @@ package org.vishia.gral.ifc;
 
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GralTable;
 
 
 
@@ -11,7 +12,8 @@ import org.vishia.byteData.VariableContainer_ifc;
  * <img src="../../../../img/Widget_gral.png"><br>
  * This class GralWidget knows the gral graphic widget via an {@link GralWidget_ifc}. It is a wrapper around the widget of the adaption layer.
  * In this figure a wrapper {@link org.vishia.mainGuiSwt.TableSwt} is shown which wraps 
- * a org.eclipse.swt.widgets.Table. The wrapper supports the interface {@link org.vishia.gral.ifc.GralTable_ifc.TableGui_ifc}.
+ * a org.eclipse.swt.widgets.Table. The wrapper based on {@link org.vishia.gral.base.GralTable} 
+ * and supports the interface {@link org.vishia.gral.ifc.GralTable_ifc}.
  * This interface allows to deal with the table procured by the wrapper. See the derived interfaces of {@link GralWidget_ifc}.  
  * The {@link GralWidget_ifc} allows some fundamental operations with any widget like {@link GralWidget_ifc#setFocus()}. 
  * <br><br>
@@ -38,11 +40,14 @@ import org.vishia.byteData.VariableContainer_ifc;
  * @author Hartmut Schorrig
  *
  */
-public class GralWidget
+public abstract class GralWidget implements GralWidget_ifc
 {
   
   /**Changes:
    * <ul>
+   * <li>2011-10-15 Hartmut chg: This class is now abstract. It is the super class for all wrapper implementations.
+   *   The wrapper implements special interfaces for the kind of widgets. It is more simple for usage, less instances to know.
+   *   A GralWidget is able to test with instanceof whether it is a special widget.
    * <li>2011-10-01 Hartmut new: method {@link #setFocus()}. It wrappes the {@link GralPanelMngWorking_ifc#setFocus(GralWidget)}.
    * <li>2011-09-18 Hartmut chg: rename from WidgetDescriptor to GralWidget. It is the representation of a Widget in the graphic adapter
    *     inclusive some additional capabilities in comparison to basic graphic widgets, like {@link #sFormat} etc.
@@ -103,7 +108,7 @@ public class GralWidget
 	 * This element is used for setting operations, which depends from the graphic system
 	 * and the type of the widget. It is only used in the graphic-system-special implementation.
 	 * */
-	protected GralWidget_ifc widget;
+	//protected GralWidget_ifc widget;
 	
 	/**numeric info what to do (kind of widget). 
 	 * <ul>
@@ -163,29 +168,27 @@ public class GralWidget
 	 * This info can be set and changed after registration. */
 	private Object oContentInfo;
 	
-	public GralWidget(String sName, GralWidget_ifc widget, char whatIs)
+	
+	protected GralWidget(char whatIs)
+  { this.whatIs = whatIs;
+  }
+
+	
+	
+	private GralWidget(String sName, GralWidget_ifc widget, char whatIs)
 	{ this.name = sName;
-		this.widget = widget;
+		//this.widget = null; //widget;
 		this.whatIs = whatIs;
 		this.itsCfgElement = null;
 	}
 
 	public GralWidget(String sName, char whatIs)
 	{ this.name = sName;
-		this.widget = null;
+		//this.widget = null;
 		this.whatIs = whatIs;
     this.itsCfgElement = null;
 	}
 
-  
-  public GralWidget(String sName, GralWidget_ifc widget, char whatIs, String sContentInfo, Object oContentInfo)
-  { this.name = sName;
-    this.widget = widget;
-    this.whatIs = whatIs;
-    this.sDataPath = sContentInfo;
-    this.oContentInfo = oContentInfo;
-    this.itsCfgElement = null;
-  }
   
   private GralWidget(GralWidgetCfg_ifc cfge, String sName, char whatIs, String sDataPath)
   { this.name = sName;
@@ -198,15 +201,16 @@ public class GralWidget
    * This method shouldn't invoke by an user's application. It is only invoked by the gral itself. 
    * @param widget The wrapper.
    */
-  public void setGraphicWidgetWrapper(GralWidget_ifc widget){ this.widget = widget; }
+  //public void setGraphicWidgetWrapper(GralWidget_ifc widget){ this.widget = widget; }
   
   /**Gets the graphical widget. The difference between this class and the graphical widget is:
    * This class contains unified description data to any kind of widget, where the graphical widget
    * is a special or simple wrapper around the implementation of the widget in the graphical implementation base.
    * 
    * @return The gral graphical widget. Note: The type can be instanceof some derived interfaces of the gral.
+   * @deprecated
    */
-  public GralWidget_ifc getGraphicWidgetWrapper(){ return widget; }
+  public GralWidget_ifc getGraphicWidgetWrapper(){ return (GralWidget_ifc)this; }
   
 	
 	/**Sets a application specific info. It should help to present the content. 
@@ -439,13 +443,16 @@ public class GralWidget
   }
   
   
-  /**See {@link GralPanelMngWorking_ifc#setFocus(GralWidget)}.
+  /**Sets the focus to the widget.
+   * See {@link GralPanelMngWorking_ifc#setFocus(GralWidget)}.
    * @return true if the focus is set really.
    */
   public boolean setFocus()
   {
     return itsMng.setFocus(this);
   }
+
+  
   
   /**Gets the working interface of the panel where the widget is member of. 
    * It can be used to set and get values from other widgets symbolic identified by its name.
@@ -462,8 +469,7 @@ public class GralWidget
 	{
 		return name + ":" + sDataPath;
 	}
-	
-	
+
 	
 }
 

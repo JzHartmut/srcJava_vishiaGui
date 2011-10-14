@@ -10,8 +10,8 @@ public interface GralTextField_ifc extends GralWidget_ifc
    * The text may be stored in a queue and applied to the widget in the graphical thread.
    * @param text The content
    */
-  void setText(String text);
+  public abstract void setText(String text);
   
-  String getText();
+  public abstract String getText();
   
 }

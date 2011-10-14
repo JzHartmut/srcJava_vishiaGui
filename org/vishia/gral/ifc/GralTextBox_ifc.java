@@ -5,6 +5,8 @@ package org.vishia.gral.ifc;
 public interface GralTextBox_ifc extends GralTextField_ifc, Appendable //WidgetGui_ifc
 {
 
+  //void setText(String text);
+  
   void append(String text);
   
   int getNrofLines();

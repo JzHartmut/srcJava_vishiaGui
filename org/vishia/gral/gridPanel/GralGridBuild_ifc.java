@@ -12,6 +12,9 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
+import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralTextBox;
+import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.cfg.GralCfgData;
 import org.vishia.gral.ifc.GralColor;
@@ -20,6 +23,7 @@ import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
+import org.vishia.gral.ifc.GralTextBox_ifc;
 //import org.vishia.gral.ifc.GuiShellMngIfc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -386,7 +390,7 @@ public interface GralGridBuild_ifc
    *        adequate to the possibilities of the used graphic base system. 
    * @return
    */
-  GralWidget addTable(String sName, int height, int[] columnWidths);
+  GralTable addTable(String sName, int height, int[] columnWidths);
 
 
   /**Adds a simple text at the current position.
@@ -451,7 +455,7 @@ public interface GralGridBuild_ifc
    * @return
    * @deprecated
    */
-  Object addTextField(GralWidget widgetInfo, boolean editable, String prompt, char promptStylePosition);
+  //Object addTextField(GralWidget widgetInfo, boolean editable, String prompt, char promptStylePosition);
   
   /**Adds a text field at the current position.
    * @param name The registering name to get the value from outside or set the content.
@@ -462,7 +466,7 @@ public interface GralGridBuild_ifc
    *   'l' left, 't' top (above field) 
    * @return The WidgetDescriptor. An action, tooltip, color etc. can be set there later.
    */
-  GralWidget addTextField(String name, boolean editable, String prompt, char promptStylePosition);
+  GralTextField addTextField(String name, boolean editable, String prompt, char promptStylePosition);
   
   /** Adds a box for editing or showing a text.
    * <br><br>
@@ -487,7 +491,8 @@ public interface GralGridBuild_ifc
    *   'l' left, 't' top (above field) 
    * @return
    */
-  Object addTextBox(GralWidget widgetInfo, boolean editable, String prompt, char promptStylePosition);
+  //GralTextBox_ifc 
+  GralTextBox addTextBox(String name,/*GralWidget widgetInfo, */boolean editable, String prompt, char promptStylePosition);
   
   /**Adds a curve view for displaying values with ordinary x-coordinate.
    * The scaling of the curve view is set to -100..100 per default. 

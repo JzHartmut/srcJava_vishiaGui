@@ -10,7 +10,7 @@ import org.vishia.gral.ifc.GralColor;
 public class SubWindowSwt extends GralSubWindow
 {
 
-  final Shell window;
+  protected Shell window;
   
   
   SubWindowSwt(Display display, String title, boolean exclusive)
@@ -56,4 +56,12 @@ public class SubWindowSwt extends GralSubWindow
     // TODO Auto-generated method stub
     return null;
   }
+  
+  @Override public void removeWidgetImplementation()
+  {
+    window.dispose();
+    window = null;
+  }
+
+
 }

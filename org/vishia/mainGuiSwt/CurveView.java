@@ -517,5 +517,9 @@ public class CurveView extends Canvas implements GralWidget_ifc
     return null;
   }
 
+  @Override public void removeWidgetImplementation()
+  {
+    //TODO    
+  }
 	
 }

@@ -19,7 +19,7 @@ public class GuiCommitPanel
   
   final StringBuilder uCommitOut =  new StringBuilder();
   
-  final GralWidget widgdCommitText = new GralWidget("commitText", 'T');
+  GralWidget widgdCommitText; // = new GralWidget("commitText", 'T');
   
   public GuiCommitPanel(MainData mainData, GralGridBuild_ifc panelBuildifc)
   {
@@ -33,7 +33,7 @@ public class GuiCommitPanel
   void initGui()
   { panelBuildifc.selectPanel("Commit");
     panelBuildifc.setPositionSize(2,0, 30, 70, 'r');
-    panelBuildifc.addTextBox(widgdCommitText, true, null, ' '); // "commit Text", 't');
+    widgdCommitText = panelBuildifc.addTextBox("commitText", true, null, ' '); // "commit Text", 't');
     
     panelBuildifc.setPositionSize(33,0, 3, 10, 'r');
     panelBuildifc.addButton("commit", actionCommit, "commit", null, null, "commit");

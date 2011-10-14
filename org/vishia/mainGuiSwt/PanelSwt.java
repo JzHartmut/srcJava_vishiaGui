@@ -42,5 +42,12 @@ public class PanelSwt extends GralPanelContent
     // TODO Auto-generated method stub
     return null;
   }
+  
+  @Override public void removeWidgetImplementation()
+  {
+    
+  }
+
+
 
 }

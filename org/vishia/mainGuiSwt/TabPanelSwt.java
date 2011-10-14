@@ -32,7 +32,7 @@ public class TabPanelSwt extends GralTabbedPanel
    */
   private class TabFolder_ extends GralPanelContent// implements WidgetCmpnifc
   {
-    final TabFolder widgetSwt;
+    private TabFolder widgetSwt;
     TabFolder_(String namePanel, Composite parent, int style, GralPrimaryWindow_ifc mainWindow)
     { super(namePanel, mainWindow);
       widgetSwt = new TabFolder(parent, style); 
@@ -52,6 +52,14 @@ public class TabPanelSwt extends GralTabbedPanel
       // TODO Auto-generated method stub
       return null;
     }
+    
+    @Override public void removeWidgetImplementation()
+    {
+      widgetSwt.dispose();
+      widgetSwt = null;
+    }
+
+
     
   }
   

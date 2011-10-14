@@ -278,7 +278,7 @@ class SelectTab
 
     void add(SelectInfo info, char where)
     {
-      GralTableLine_ifc line = table.insertLine(null, 0);
+      GralTableLine_ifc line = wdgdTable.insertLine(null, 0);
       line.setUserData(info);
       line.setCellText(info.active == where ? "" + where: " ",0);
       line.setCellText(info.selectName, 1);
@@ -288,7 +288,7 @@ class SelectTab
     
     void clear()
     {
-      table.clearTable();
+      wdgdTable.clearTable();
     }
     
     

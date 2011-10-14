@@ -3,12 +3,14 @@ package org.vishia.gral.widget;
 import java.util.List;
 import java.util.Map;
 
+import org.vishia.gral.base.GralTable;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.KeyCode;
 
 /**Complex widget which contains a list what's items are able to select. 
@@ -17,7 +19,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public abstract class SelectList
+public abstract class SelectList extends GralWidget
 {
   /**Version and history:
    * <ul>
@@ -29,14 +31,26 @@ public abstract class SelectList
   public static final int version = 0x20111002;
   
   /**The table which is showing in the widget. */
-  protected GralWidget wdgdTable;
+  //protected GralWidget wdgdTable;
   
   /**The table which is showing in the widget. */
-  protected GralTable_ifc table;
+  public GralTable wdgdTable;
   
   /**Not used yet, register actions? */
   protected Map<String, GralUserAction> actions;
   
+  public SelectList(String name)
+  {
+    super(name, 'l');
+  }
+
+
+  public SelectList()
+  {
+    super('l');
+  }
+
+
   /**
    * @param panel
    * @param name
@@ -48,7 +62,6 @@ public abstract class SelectList
   {
     wdgdTable = panel.addTable(name, rows, columns);
     wdgdTable.setActionChange(actionTable);
-    table = (GralTable_ifc)wdgdTable.getGraphicWidgetWrapper();
   }
   
   
@@ -104,8 +117,36 @@ public abstract class SelectList
   };
 
   /**Sets the focus to this SelectList, the table-widget gets the focus. */
-  public void setFocus()
-  { table.setFocus(); }
+  @Override public boolean setFocus()
+  { return wdgdTable.setFocus(); }
+  
+  @Override public void removeWidgetImplementation()
+  {
+    
+  }
+
+  @Override
+  public Object getWidgetImplementation()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public GralColor setBackgroundColor(GralColor color)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public GralColor setForegroundColor(GralColor color)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  
+
   
   void stop(){}
   

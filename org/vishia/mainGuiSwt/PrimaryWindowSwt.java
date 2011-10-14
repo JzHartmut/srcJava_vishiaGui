@@ -470,5 +470,13 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
     return null;
   }
 
+  @Override public void removeWidgetImplementation()
+  {
+    graphicFrame.dispose();
+    graphicFrame = null;
+    menuBar = null;
+  }
+
+
   
 }

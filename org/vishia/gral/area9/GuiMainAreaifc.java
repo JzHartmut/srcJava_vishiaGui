@@ -3,6 +3,7 @@ package org.vishia.gral.area9;
 import java.io.File;
 
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -124,6 +125,6 @@ public interface GuiMainAreaifc extends GralPrimaryWindow_ifc
   /**Returns the text box which is used as output box for common messages of the application.
    * @return null if no output window is given.
    */
-  GralTextBox_ifc getOutputBox();
+  GralTextBox getOutputBox();
   
 }

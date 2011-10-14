@@ -518,7 +518,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   
   @Override public boolean setFocus(GralWidget widgd)
   {
-    return widgd.getGraphicWidgetWrapper().setFocus();
+    return widgd.setFocus();
   }
   
 
