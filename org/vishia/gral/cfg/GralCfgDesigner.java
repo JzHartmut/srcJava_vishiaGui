@@ -122,7 +122,8 @@ public class GralCfgDesigner
         cfge.positionInput.xPos = xPosAct + dxGrid; 
         cfge.positionInput.yPos = yPosAct + dyGrid; 
         if(!bCopy){
-          mng.remove(widgd);  //remove the widget.
+          widgd.remove();
+          //mng.remove(widgd);  //remove the widget.
         }
         mng.selectPanel(sPanel);
         cfgBuilder.buildWidget(cfge);
@@ -164,10 +165,10 @@ public class GralCfgDesigner
         dialogFieldName.setValue(GralPanelMngWorking_ifc.cmdSet, 0, "ERROR cfge");
       }
     //}
+    dialogWindowProps.posWindow.setPosition(widgd.pos.y +2, widgd.pos.x );
     //dialogWindowProps.setWindowVisible(true);
-    GralGridPos posWindow = dialogWindowProps.posWindow;
-    posWindow.setPosition(widgd.pos.x, widgd.pos.y +2);
-    mng.setWindowsVisible(dialogWindowProps, posWindow);
+    //use manager to position.
+    mng.setWindowsVisible(dialogWindowProps, dialogWindowProps.posWindow);
   }
   
   private GralUserAction actionOk = new GralUserAction()
@@ -221,6 +222,7 @@ public class GralCfgDesigner
   { @Override public boolean userActionGui(String sIntension, GralWidget widgd, Object... params)
     { //note widgd is the OK-button!
       if(widgdInDialog !=null){
+        //widgdInDialog.remove();
         mng.remove(widgdInDialog);  //remove the widget.
         dialogWindowProps.setWindowVisible(false);
         widgdInDialog = null;

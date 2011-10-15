@@ -390,7 +390,7 @@ public class TableSwt extends GralTable
       return table.setFocus();
     }
 
-    @Override public void removeWidgetImplementation()
+    protected void xxremoveWidgetImplementation()
     {
       item.dispose();
       item = null;

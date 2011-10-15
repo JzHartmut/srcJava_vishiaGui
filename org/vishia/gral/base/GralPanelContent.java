@@ -36,7 +36,7 @@ public abstract class GralPanelContent implements GralWidget_ifc
 	//public final Map<String, WidgetDescriptor<WidgetTYPE>> widgetIndex = new TreeMap<String, WidgetDescriptor<WidgetTYPE>>();
 
 	/**List of all widgets which are contained in this panel.
-	 * This list is used in the communication thread to update the widget's content.
+	 * This list is used in the communication thread to update the content of all widgets in the panel.
 	 */
 	public Queue<GralWidget> widgetList = new ConcurrentLinkedQueue<GralWidget>();
 
@@ -64,6 +64,13 @@ public abstract class GralPanelContent implements GralWidget_ifc
     int property = 0; //TODO parameter
     bZoomed = (property & GralGridBuild_ifc.propZoomedPanel) !=0;
     bGridZoomed = (property & GralGridBuild_ifc.propGridZoomedPanel) !=0;
+	}
+	
+	
+	public void removeWidget(GralWidget widg)
+	{
+	  widgetList.remove(widg);
+	  widgetsToResize.remove(widg);
 	}
 	
 	

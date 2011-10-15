@@ -38,7 +38,7 @@ public class WidgetSimpleWrapperSwt extends GralWidget
     return null;
   }
 
-  @Override public void removeWidgetImplementation()
+  @Override protected void removeWidgetImplementation()
   {
     widgetSwt.dispose();
     widgetSwt = null;

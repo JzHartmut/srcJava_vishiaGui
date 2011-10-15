@@ -53,11 +53,6 @@ public class TabPanelSwt extends GralTabbedPanel
       return null;
     }
     
-    @Override public void removeWidgetImplementation()
-    {
-      widgetSwt.dispose();
-      widgetSwt = null;
-    }
 
 
     

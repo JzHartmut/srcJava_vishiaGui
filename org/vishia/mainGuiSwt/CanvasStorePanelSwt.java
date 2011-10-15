@@ -167,7 +167,7 @@ public class CanvasStorePanelSwt extends PanelSwt  //CanvasStorePanel //
       Widget wparent = e.widget; //it is the SwtCanvas because this method is assigned only there.
       //Control parent = wparent;
       for(GralWidget widgd: widgetsToResize){
-        widgd.getPanel().resizeWidget(widgd, 0, 0);
+        widgd.getMng().resizeWidget(widgd, 0, 0);
       }
       stop();
       //validateFrameAreas();  //calculates the size of the areas newly and redraw.

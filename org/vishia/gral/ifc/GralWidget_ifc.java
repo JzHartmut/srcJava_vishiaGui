@@ -10,8 +10,6 @@ public interface GralWidget_ifc
   /**Returns the implementation class of the widget. */
   public abstract Object getWidgetImplementation();
   
-  public abstract void removeWidgetImplementation();
-  
   /**Sets the focus to the widget.
    * TODO call GuiPanelMngSwt#setFocusOfTabSwt() for all widgets, see TabelSwt!
    * @return true if set

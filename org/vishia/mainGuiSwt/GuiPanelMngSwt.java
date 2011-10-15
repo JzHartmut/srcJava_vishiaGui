@@ -370,14 +370,8 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     return true;
   }
   
-  @Override public boolean remove(GralWidget widgetP)
-  {
-    GralWidget_ifc widget = (GralWidget_ifc)widgetP;
-    if(widget !=null && widget.getWidgetImplementation() !=null){
-      Object swtWidgd = widget.getWidgetImplementation();
-      ((Widget)swtWidgd).dispose();
-    }
-    widget.removeWidgetImplementation();  //remove instance by Garbage collector.
+  @Override public boolean remove(GralWidget widget)
+  { widget.remove();  //remove instance by Garbage collector.
     return true;
     
   }
@@ -1609,7 +1603,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     
     @Override public void focusGained(FocusEvent ev)
     { GralWidget widgd = (GralWidget)ev.widget.getData();
-      widgd.getPanel().notifyFocus(widgd);  
+      widgd.getMng().notifyFocus(widgd);  
     }
   };
   

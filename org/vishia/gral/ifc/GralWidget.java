@@ -2,6 +2,7 @@ package org.vishia.gral.ifc;
 
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTable;
 
 
@@ -47,7 +48,8 @@ public abstract class GralWidget implements GralWidget_ifc
    * <ul>
    * <li>2011-10-15 Hartmut chg: This class is now abstract. It is the super class for all wrapper implementations.
    *   The wrapper implements special interfaces for the kind of widgets. It is more simple for usage, less instances to know.
-   *   A GralWidget is able to test with instanceof whether it is a special widget.
+   *   A GralWidget is able to test with instanceof whether it is a special widget. The element widget is removed because the reference
+   *   to the implementation widget will be present in the derived classes.
    * <li>2011-10-01 Hartmut new: method {@link #setFocus()}. It wrappes the {@link GralPanelMngWorking_ifc#setFocus(GralWidget)}.
    * <li>2011-09-18 Hartmut chg: rename from WidgetDescriptor to GralWidget. It is the representation of a Widget in the graphic adapter
    *     inclusive some additional capabilities in comparison to basic graphic widgets, like {@link #sFormat} etc.
@@ -67,7 +69,7 @@ public abstract class GralWidget implements GralWidget_ifc
    *     It is used for resizing of large widgets.
    *     A large widget is a widget, which lengthens over the panel and it is changed in size with panel size change. 
    *     A typical example is a text-area-widget.
-   * <li>2011-06-20 Hartmut new: method {@link #getPanel()} It is the panel manager!
+   * <li>2011-06-20 Hartmut new: method {@link #getMng()} It is the panel manager!
    * <li>2011-05-26 Hartmut new: separate action in {@link #actionChanging} and {@link #actionShow}.
    *     The actionChanging was the old action. It was called from the listener of the widgets of the underlying graphic
    *     if any changing is done on the widget (mouse click etc). But the actionShow is necessary too 
@@ -454,13 +456,34 @@ public abstract class GralWidget implements GralWidget_ifc
 
   
   
-  /**Gets the working interface of the panel where the widget is member of. 
+  /**Gets the working interface of the manager. 
    * It can be used to set and get values from other widgets symbolic identified by its name.
    * Note: It is possible too to store the {@link GralWidget} of specific widgets
    * to get and set values and properties of this widgets non-symbolic.
+   * @return The manager.
+   */
+  public GralPanelMngWorking_ifc getMng(){ return itsMng; }
+  
+  
+  /**Gets the panel where the widget is member of. 
    * @return The panel.
    */
-  public GralPanelMngWorking_ifc getPanel(){ return itsMng; }
+  public GralPanelContent getItsPanel(){ return pos.panel; }
+  
+  
+  /**Removes the graphical widget in the graphic. */
+  protected abstract void removeWidgetImplementation();
+  
+  /**Removes the widget from the lists in its panel and from the graphical representation.
+   * It calls the protected {@link #removeWidgetImplementation()} which is implemented in the adaption.
+   */
+  public void remove()
+  {
+    removeWidgetImplementation();
+    pos.panel.removeWidget(this);
+  }
+  
+  
   
 	/**Especially for test and debug, short info about widget.
 	 * @see java.lang.Object#toString()

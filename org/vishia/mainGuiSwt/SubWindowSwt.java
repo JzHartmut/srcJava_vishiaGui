@@ -5,6 +5,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralRectangle;
 
 //public class SubWindowSwt extends GralPanelContent implements WidgetCmpnifc
 public class SubWindowSwt extends GralSubWindow
@@ -57,7 +58,7 @@ public class SubWindowSwt extends GralSubWindow
     return null;
   }
   
-  @Override public void removeWidgetImplementation()
+  public void removeWidgetImplementation()
   {
     window.dispose();
     window = null;

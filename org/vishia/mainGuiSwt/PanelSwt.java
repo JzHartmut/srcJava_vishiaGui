@@ -43,10 +43,6 @@ public class PanelSwt extends GralPanelContent
     return null;
   }
   
-  @Override public void removeWidgetImplementation()
-  {
-    
-  }
 
 
 

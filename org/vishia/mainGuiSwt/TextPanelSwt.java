@@ -81,10 +81,5 @@ public class TextPanelSwt extends GralPanelContent implements GralTextBox_ifc, A
   { return textAreaOutput.append(csq, start, end);
   }
   
-  @Override public void removeWidgetImplementation()
-  {
-    textAreaOutput.removeWidgetImplementation();    
-  }
-
 
 }

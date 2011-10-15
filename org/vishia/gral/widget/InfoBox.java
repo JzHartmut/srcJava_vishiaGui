@@ -148,10 +148,6 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   }
   
   
-  @Override public void removeWidgetImplementation()
-  {
-    //textBox.removeWidgetImplementation();
-  }
 
 
 }
