@@ -1,5 +1,6 @@
 package org.vishia.mainGuiSwt;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -55,7 +56,7 @@ public class MouseClickInfo implements MouseListener
           xDown = ev.x; yDown = ev.y;
   			  guiMng.pressedLeftMouseDownForDesign(widgetInfo, rr);  
 			  } else if(ev.button == 3){ //right
-			    guiMng.pressedRightMouseDownForDesign(widgetInfo, rr);
+			    //guiMng.pressedRightMouseDownForDesign(widgetInfo, rr);
 			  }
 			}
 		}
@@ -75,7 +76,7 @@ public class MouseClickInfo implements MouseListener
         if(action !=null){
           action.userActionGui("lu", widgd, null);
         }
-      } else if(guiMng.bDesignMode){
+      } else if(guiMng.bDesignMode && ev.button == 1){
         boolean bCopy = (ev.stateMask & org.eclipse.swt.SWT.CTRL) !=0;
         GralRectangle rr = new GralRectangle(ev.x, ev.y, 0, 0);
         guiMng.releaseLeftMouseForDesign(widgd, rr, bCopy);  

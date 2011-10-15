@@ -707,7 +707,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
    * @param widgd
    * @param xy
    */
-  public void pressedRightMouseDownForDesign(GralWidget widgd, GralRectangle xy)
+  public void XXXpressedRightMouseDownForDesign(GralWidget widgd, GralRectangle xy)
   { designer.editFieldProperties(widgd, xy);
   }
   

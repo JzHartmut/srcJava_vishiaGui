@@ -64,7 +64,7 @@ public class GralCfgDesigner
   public void initGui()
   {
     assert(dialogWindowProps == null); //check call only one time.
-    mng.setPositionSize(2, 60, 30, 40, 'r');
+    mng.setPosition(-30, GralGridPos.size +30, -40, GralGridPos.size +40, 1, 'r');
     dialogWindowProps = mng.createWindow("Widget Properties", false);
     mng.setPositionSize(0, 0, 3, 34, 'd');
     dialogFieldName = mng.addTextField("name", true, "name", 't');
@@ -165,7 +165,7 @@ public class GralCfgDesigner
         dialogFieldName.setValue(GralPanelMngWorking_ifc.cmdSet, 0, "ERROR cfge");
       }
     //}
-    dialogWindowProps.posWindow.setPosition(widgd.pos.y +2, widgd.pos.x );
+    //dialogWindowProps.posWindow.setPosition(widgd.pos, widgd.pos.y +2, GralGridPos.size+30, widgd.pos.x, GralGridPos.size+40, 1, 'r' );
     //dialogWindowProps.setWindowVisible(true);
     //use manager to position.
     mng.setWindowsVisible(dialogWindowProps, dialogWindowProps.posWindow);
