@@ -25,11 +25,11 @@ implements MouseListener
 	 * If the mouse-position is shifted outside the area of the widget, the mouse-release-user-action
 	 * is not executed.
 	 */
-	private int xMousePress, yMousePress;
+	protected int xMousePress, yMousePress;
 	
 	private Color backgroundWhilePressed;
 	
-  private boolean isPressed;
+  protected boolean isPressed;
 	
 	/**Reference to the users method. */
   private GralUserAction userAction;
@@ -70,32 +70,33 @@ implements MouseListener
     userAction.userActionGui(sCmdDoubleClick, null);
 	}
 
-	@Override
-	public void mouseDown(MouseEvent e) {
-    super.mouseDown(e);
-		isPressed = true;
-		xMousePress = e.x;
-    yMousePress = e.y;
-    Control widget = (Control) e.widget;  //a widget is a Control always.
-    widget.addMouseMoveListener(mouseMoveListener);
-    if(e.widget instanceof ButtonSwt){
-      ButtonSwt button = (ButtonSwt)e.widget;
-      button.setActivated(true);
-    }
-    else {
-      backgroundWhilePressed = widget.getBackground();
-      widget.setBackground(propertiesGui.colorSwt(0x800080));
-    }
-    if(sCmdPress != null){
-    	@SuppressWarnings("unchecked")
-    	GralWidget infos = (GralWidget)widget.getData();
-      userAction.userActionGui(sCmdPress,infos);
-    }
+	@Override public void mouseDown(MouseEvent e) {
+    try{ 
+  	  super.mouseDown(e);
+  		isPressed = true;
+  		xMousePress = e.x;
+      yMousePress = e.y;
+      Control widget = (Control) e.widget;  //a widget is a Control always.
+      widget.addMouseMoveListener(mouseMoveListener);
+      if(e.widget instanceof ButtonSwt){
+        ButtonSwt button = (ButtonSwt)e.widget;
+        button.setActivated(true);
+      }
+      else {
+        backgroundWhilePressed = widget.getBackground();
+        widget.setBackground(propertiesGui.colorSwt(0x800080));
+      }
+      if(sCmdPress != null){
+      	@SuppressWarnings("unchecked")
+      	GralWidget infos = (GralWidget)widget.getData();
+        userAction.userActionGui(sCmdPress,infos);
+      }
+    } catch(Exception exc){ guiMng.writeLog(0, exc); }
 	}
 
-	@Override
-	public void mouseUp(MouseEvent e) {
-    //set the background color to the originally value again if it was changed.
+	@Override public void mouseUp(MouseEvent e) {
+    try{
+	  //set the background color to the originally value again if it was changed.
 	  if(isPressed){
 			Control widget = (Control)e.widget;
 	  	widget.removeMouseMoveListener(mouseMoveListener);
@@ -128,6 +129,7 @@ implements MouseListener
 	  	*/
 	  	userAction.userActionGui(sCmdRelease, infos);
 	  }
+    } catch(Exception exc){ guiMng.writeLog(0, exc); }
 	}
 	
 
@@ -184,26 +186,28 @@ implements MouseListener
 	
 
 
-	private MouseMoveListener mouseMoveListener = new MouseMoveListener()
+	protected MouseMoveListener mouseMoveListener = new MouseMoveListener()
 	{
 
 		@Override	public void mouseMove(MouseEvent e)
 		{
-		  if(e.widget instanceof Control){
-		  	Control widget = (Control)e.widget;
-		  	Point size = widget.getSize();
-		  	//xSize = size.x; ySize = size.y;
-		  	if(  e.x < 0 || e.x > size.x
-		  		|| e.y < 0 || e.y > size.y
-		  	  ){
-		      isPressed = false;
-		      widget.removeMouseMoveListener(mouseMoveListener);
-			    if(e.widget instanceof ButtonSwt){
-		        ButtonSwt button = (ButtonSwt)e.widget;
-		        button.setActivated(false);
-		      }
-		  	}
-		  }	
+      try{
+  		  if(e.widget instanceof Control){
+  		  	Control widget = (Control)e.widget;
+  		  	Point size = widget.getSize();
+  		  	//xSize = size.x; ySize = size.y;
+  		  	if(  e.x < 0 || e.x > size.x
+  		  		|| e.y < 0 || e.y > size.y
+  		  	  ){
+  		      isPressed = false;
+  		      widget.removeMouseMoveListener(mouseMoveListener);
+  			    if(e.widget instanceof ButtonSwt){
+  		        ButtonSwt button = (ButtonSwt)e.widget;
+  		        button.setActivated(false);
+  		      }
+  		  	}
+  		  }	
+      } catch(Exception exc){ guiMng.writeLog(0, exc); }
 		}//method mouseMove
 	};
   

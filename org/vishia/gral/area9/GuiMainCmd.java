@@ -2,8 +2,11 @@ package org.vishia.gral.area9;
 
 import java.io.File;
 
+import org.vishia.gral.gridPanel.GralGridMngBase;
+import org.vishia.gral.gridPanel.GralGridProperties;
 import org.vishia.gral.swt.FactorySwt;
 import org.vishia.mainCmd.MainCmd;
+import org.vishia.msgDispatch.LogMessage;
 
 /**This class is an extension of the {@link MainCmd} for graphic applications.
  * @author Hartmut Schorrig
@@ -19,7 +22,7 @@ public class GuiMainCmd extends MainCmd
    */
   protected final GuiCallingArgs cargs;
   
-  
+  public final GralGridMngBase gralMng;
   
   
   /**ctor called in static main.
@@ -35,14 +38,20 @@ public class GuiMainCmd extends MainCmd
     cargs.graphicFactory = new FactorySwt(); 
     if(sOutputArea == null){ sOutputArea = "A3C3"; }
     
-    gui = cargs.graphicFactory.createGuiWindow(this);
+    gui = cargs.graphicFactory.createGuiWindow((MainCmd)this);
+    gralMng = gui.getGralMng();
+    /*
+    GralGridProperties propertiesGui = cargs.graphicFactory.createProperties('C');
+    LogMessage log = getLogMessageOutputConsole();
+    gralMng = cargs.graphicFactory.createPanelMng(null, 120,80, propertiesGui, null, log);
+    */
     
     super.addAboutInfo(sTitle);
     super.addAboutInfo("made by HSchorrig, 2010-06-07, 2011-08-07");
     //super.addStandardHelpInfo();
-    gui.setTitleAndSize(sTitle, 50,50,900, 600); //600);  //This instruction should be written first to output syntax errors.
     gui.setOutputArea(sOutputArea);        //whole area from mid to bottom
-    gui.startGraphicThread();
+    
+    gui.buildMainWindow(sTitle, 50,50,800, 600); //600);  //This instruction should be written first to output syntax errors.
   }
 
 

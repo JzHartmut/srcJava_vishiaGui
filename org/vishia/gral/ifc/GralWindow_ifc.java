@@ -17,5 +17,6 @@ public interface GralWindow_ifc
   
   boolean isWindowsVisible();
   
+  void redraw();
 
 }

@@ -53,6 +53,7 @@ import org.vishia.gral.area9.GuiMainAreaBase;
 import org.vishia.gral.area9.GuiMainAreaifc;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPrimaryWindow;
+import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralRectangle;
@@ -61,6 +62,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmd_ifc;
+import org.vishia.msgDispatch.LogMessage;
 
 
 //import java.awt.event.*;
@@ -123,7 +125,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 	}
 
 	
-  private PrimaryWindowSwt swtWindow = new PrimaryWindowSwt();
+  private final PrimaryWindowSwt swtWindow;
 	
 	
 	
@@ -162,6 +164,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   
   /** If it is set, the writeInfo is redirected to this.*/
   protected GralTextBox_ifc textAreaOutput = null;
+  
   
   /**The file menu is extendable. */
   private Menu menuFile;
@@ -343,18 +346,6 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   	
   };
   
-  /**Sets the title and size before initialization.
-   * @param sTitle
-   * @param xSize
-   * @param ySize
-   */
-  public void setTitleAndSize(String sTitle, int left, int top, int xSize, int ySize)
-  { //assert(!bStarted);
-    if(swtWindow !=null){
-      swtWindow.setTitleAndSize(sTitle, left, top, xSize, ySize);
-    }
-  }
-  
 
 
   
@@ -367,11 +358,15 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   
   public MainCmdSwt(MainCmd cmdP) //String[] args)
   { //super(args);
+    //assert(false);
     super(cmdP); //gralDevice);
+  
+    swtWindow = PrimaryWindowSwt.create(cmdP.getLogMessageOutputConsole());
     super.gralDevice = swtWindow;
     swtWindow.addGuiBuildOrder(initOutputArea); 
     swtWindow.addDispatchListener(writeOutputTextDirectly);
   }
+  
   
   
   public GralPrimaryWindow getPrimaryWindow(){ return swtWindow; }
@@ -505,7 +500,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 	  if(yAreaMover[1] == null){
 	  	yAreaMover[1] = new Canvas(swtWindow.graphicFrame, SWT.None);
 	  	yAreaMover[1].setSize(10,10);
-	  	yAreaMover[1].setBackground(swtWindow.guiDevice.getSystemColor(SWT.COLOR_GREEN));
+	  	yAreaMover[1].setBackground(swtWindow.displaySwt.getSystemColor(SWT.COLOR_GREEN));
 	  }
 	  if(swtWindow!=null)
 	  { validateFrameAreas();
@@ -736,7 +731,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    */
   protected GralPanelContent addOutputFrameArea(int xArea, int yArea, int dxArea, int dyArea)
   { int widgetStyle = SWT.H_SCROLL | SWT.V_SCROLL;
-    TextPanelSwt textPanel = new TextPanelSwt("output", swtWindow.graphicFrame, widgetStyle, gralDevice);
+    TextPanelSwt textPanel = new TextPanelSwt("output", swtWindow.graphicFrame, widgetStyle, swtWindow.gralMng); //gralDevice);
     super.outputBox = textPanel.textAreaOutput;
     //textAreaOutput = new WidgetsSwt.TextBoxSwt(swtWindow.graphicFrame, widgetStyle);
     //textAreaPos = new Position(textAreaOutput);
@@ -908,6 +903,10 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   { swtWindow.graphicFrame = frame;
   }
 
+	
+  @Override public void redraw(){  swtWindow.graphicFrame.redraw(); }
+
+
   
   /** Gets the graphical frame. */
   public final Shell getitsGraphicFrame(){ return swtWindow.graphicFrame; }
@@ -918,7 +917,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
     return swtWindow.graphicFrame; //.getContentPane();
   }
   
-  public Display getDisplay(){ return swtWindow.guiDevice; }
+  public Display getDisplay(){ return swtWindow.displaySwt; }
   
   //public final Device getGuiDevice(){ return guiDevice.get
   
@@ -939,10 +938,11 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 
   
   
-  @Override public boolean startGraphicThread()  ///
-  { return swtWindow.startGraphicThread(); 
+  /*
+  @Override public boolean buildMainWindow(String sTitle, int x, int y, int dx, int dy)
+  { return swtWindow.buildMainWindow(sTitle, x, y, dx, dy);
   }
-
+  */
   
 
   
@@ -982,6 +982,18 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 
   @Override public long getThreadIdGui()
   { return swtWindow.getThreadIdGui();
+  }
+
+  @Override public void buildMainWindow(String sTitle, int left, int top, int xSize, int ySize)
+  { swtWindow.buildMainWindow(sTitle, left, top, xSize, ySize);
+  }
+
+  
+  @Override public void addGuiBuildOrder(Runnable order){ swtWindow.addGuiBuildOrder(order); }
+
+
+  @Override public GralGridMngBase getGralMng()
+  { return swtWindow.gralMng;
   }
 }
 

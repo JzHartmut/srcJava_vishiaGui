@@ -587,6 +587,11 @@ public interface GralGridBuild_ifc
    * This method should only be called in the graphic thread (SWT).*/
   void repaint();
   
+  
+  /**Forces a newly paint of the current panel. 
+   * This method should only be called in the graphic thread. It should be used after changing content. */
+  void repaintCurrentPanel();
+  
   /**Registered any user action. A registered user action is used especially for a script build GUI.
    * Action can be given by this register name. 
    * <br><br>

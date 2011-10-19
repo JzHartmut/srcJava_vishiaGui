@@ -52,7 +52,7 @@ public class JavaCmd extends GuiCfg
 
   final Executer executer = new Executer(mainCmd, this);
 
-  final CommandSelector cmdSelector = new CommandSelector("cmdSelector", cmdQueue);
+  final CommandSelector cmdSelector = new CommandSelector("cmdSelector", cmdQueue, panelMng);
 
   final CopyCmd copyCmd = new CopyCmd(this);
 

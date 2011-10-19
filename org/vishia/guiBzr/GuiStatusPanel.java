@@ -220,7 +220,7 @@ public class GuiStatusPanel
     } else {
       widgds.widgdTextStatus = panelBuildifc.addText("- no changes", 'B', 0x00ff00);
     }
-    panelBuildifc.repaint();
+    panelBuildifc.repaintCurrentPanel();
   }
   
   

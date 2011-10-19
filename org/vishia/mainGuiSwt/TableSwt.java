@@ -53,7 +53,7 @@ public class TableSwt extends GralTable
   
   public TableSwt(GuiPanelMngSwt mng, String name, Composite parent,  int height
       , int[] columnWidths) //, int selectionColumn, CharSequence selectionText)
-  { super(name);
+  { super(name, mng);
     this.mng = mng;
     this.columnWidths = columnWidths;
     //this.selectionColumn = selectionColumn;
@@ -389,6 +389,10 @@ public class TableSwt extends GralTable
     {
       return table.setFocus();
     }
+    
+    
+    @Override public void redraw(){  table.redraw(); table.update(); }
+
 
     protected void xxremoveWidgetImplementation()
     {
@@ -507,6 +511,9 @@ public class TableSwt extends GralTable
     // TODO Auto-generated method stub
     return null;
   }
+  
+  @Override public void redraw(){  table.redraw(); table.update(); }
+
   
   
   @Override public void removeWidgetImplementation()

@@ -245,4 +245,13 @@ public interface GralPanelMngWorking_ifc
    */
   ConcurrentLinkedQueue<GralVisibleWidgets_ifc> getVisiblePanels();
 	
+  
+  /**Writes a log message instead throwing an exception or writing on standard output.
+   * The log message contains a timestamp and can be dispatched to any destination. 
+   * All internal methods of gral writes exceptions to that logging system instead abort the execution of the application.
+   * @param msgId The ident number for dispatching and evaluation.
+   * @param exc The catched exception.
+   */
+  void writeLog(int msgId, Exception exc);
+
 }

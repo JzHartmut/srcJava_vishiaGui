@@ -165,10 +165,9 @@ public GuiCfg(GuiCallingArgs cargs, GuiMainCmd cmdGui)
   //Creates a panel manager to work with grid units and symbolic access.
     //Its properties:  //##
   final char sizePixel = cargs.sSize == null ? 'C' : cargs.sSize.charAt(0);
-  GralGridProperties propertiesGui = cargs.graphicFactory.createProperties(sizePixel);
-  LogMessage log = console.getLogMessageOutputConsole();
-  //panelMng = new GuiPanelMngSwt(null, gui.getContentPane(), 120,80, propertiesGui, null, log);
-  panelMng = cargs.graphicFactory.createPanelMng(null, 120,80, propertiesGui, null, log);
+  //GralGridProperties propertiesGui = cargs.graphicFactory.createProperties(sizePixel);
+  //LogMessage log = console.getLogMessageOutputConsole();
+  panelMng = cmdGui.gralMng; //cargs.graphicFactory.createPanelMng(null, 120,80, propertiesGui, null, log);
   panelBuildIfc = panelMng;
   guiAccess = panelMng;
   GralPanelContent outputPanel = cmdGui.gui.getOutputPanel();
@@ -222,7 +221,6 @@ GralDispatchCallbackWorker configGuiWithZbnf = new GralDispatchCallbackWorker()
 {
   
   @Override public void doBeforeDispatching(boolean onlyWakeup){
-    gui.setTitleAndSize("GUI", 50, 100, 1200, 900);
     panelBuildIfc.buildCfg(guiCfgData, cargs.fileGuiCfg);
     
     gui.removeDispatchListener(this);    

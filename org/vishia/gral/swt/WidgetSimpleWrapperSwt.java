@@ -1,6 +1,7 @@
 package org.vishia.gral.swt;
 
 import org.eclipse.swt.widgets.Control;
+import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -13,8 +14,8 @@ public class WidgetSimpleWrapperSwt extends GralWidget
 {
   public Control widgetSwt;
 
-  public WidgetSimpleWrapperSwt(String name, char whatis, Control widgetSwt)
-  { super(name, whatis);
+  public WidgetSimpleWrapperSwt(String name, char whatis, Control widgetSwt, GralGridMngBase mng)
+  { super(name, whatis, mng);
     this.widgetSwt = widgetSwt;
   }
 
@@ -44,5 +45,10 @@ public class WidgetSimpleWrapperSwt extends GralWidget
     widgetSwt = null;
   }
 
+  @Override public void redraw(){  widgetSwt.redraw(); }
+
+
+  
+  
   
 }

@@ -3,6 +3,7 @@ package org.vishia.mainGuiSwt;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Text;
 import org.vishia.gral.base.GralTextField;
+import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
@@ -13,26 +14,23 @@ public class SwtTextFieldWrapper extends GralTextField
 {
   protected Text textFieldSwt;
   
-  final GralPrimaryWindow_ifc mainWindow;
-  
   StringBuffer newText = new StringBuffer();
   
   
-  public SwtTextFieldWrapper(String name, Text widgetSwt, char whatis, GralPrimaryWindow_ifc mainWindow)
-  { super(name, whatis);
+  public SwtTextFieldWrapper(String name, Text widgetSwt, char whatis, GralGridMngBase mng)
+  { super(name, whatis, mng);
     textFieldSwt = widgetSwt;
-    this.mainWindow = mainWindow;
   }
 
   
   @Override public void setText(String arg)
   {
-    if(Thread.currentThread().getId() == mainWindow.getThreadIdGui()){
+    if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
       textFieldSwt.setText(arg);
     } else {
       newText.setLength(0);
       newText.append(arg);
-      mainWindow.addDispatchListener(changeText);    
+      windowMng.addDispatchListener(changeText);    
     }
   }
   
@@ -51,7 +49,7 @@ public class SwtTextFieldWrapper extends GralTextField
         textFieldSwt.setText(newText.toString());
         newText.setLength(0);
       }
-      mainWindow.removeDispatchListener(this);
+      windowMng.removeDispatchListener(this);
     }
   };
 
@@ -70,6 +68,9 @@ public class SwtTextFieldWrapper extends GralTextField
   { return SwtWidgetHelper.setForegroundColor(color, textFieldSwt);
   }
   
+  
+  @Override public void redraw(){  textFieldSwt.redraw(); textFieldSwt.update(); }
+
   
   @Override public void removeWidgetImplementation()
   {

@@ -6,6 +6,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
+import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -30,6 +31,8 @@ public abstract class GralPanelContent implements GralWidget_ifc
   
 	
 	public GralPrimaryWindow_ifc mainWindow;
+	
+	public final GralGridMngBase gralMng;
 	
 	//public final CanvasStorePanel panelComposite;
 	
@@ -61,6 +64,7 @@ public abstract class GralPanelContent implements GralWidget_ifc
 	{
 	  this.namePanel = namePanel;
 		this.panelComposite = panelComposite;
+		this.gralMng = null;
     int property = 0; //TODO parameter
     bZoomed = (property & GralGridBuild_ifc.propZoomedPanel) !=0;
     bGridZoomed = (property & GralGridBuild_ifc.propGridZoomedPanel) !=0;
@@ -75,11 +79,16 @@ public abstract class GralPanelContent implements GralWidget_ifc
 	
 	
 	
-	protected GralPanelContent(String namePanel, GralPrimaryWindow_ifc mainWindow)
-	{ this.namePanel = namePanel; this.mainWindow = mainWindow;
+  protected GralPanelContent(String namePanel, GralPrimaryWindow_ifc mainWindow)
+  { this.namePanel = namePanel; this.mainWindow = mainWindow; this.gralMng = null;
   }
 
-	
+  
+  protected GralPanelContent(String namePanel, GralGridMngBase mng)
+  { this.namePanel = namePanel; this.mainWindow = mng.gralDevice; this.gralMng = mng;
+  }
+
+  
 
   @Override public Object getWidgetImplementation()
   { return panelComposite;

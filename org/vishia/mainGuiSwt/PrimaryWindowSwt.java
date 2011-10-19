@@ -21,16 +21,18 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralPrimaryWindow;
+import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.mainCmd.MainCmd_ifc;
+import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.MinMaxTime;
 
 public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_ifc
 {
-  protected Display guiDevice; 
+  protected final Display displaySwt; 
 
   /** The frame of the Window in the GUI (Graphical Unit Interface)*/
   protected Shell graphicFrame;
@@ -47,23 +49,54 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
     Map<String, MenuEntry> subMenu;
   }
   
+  
+  /**Class to instantiate in the static routine {@link #create(LogMessage)}
+   * which contains the inital run method to build the gui device.
+   */
+  private static class Init implements Runnable
+  {
+    Display displaySwt;
+    
+    @Override public void run(){
+      displaySwt = new Display();
+    }
+    
+  }
+  
   Map<String, MenuEntry> menus = new TreeMap<String, MenuEntry>();
   
   
 
   
-  PrimaryWindowSwt()
-  { super();
+  private PrimaryWindowSwt(GralGridMngBase gralMng, Thread graphicThread, Display displaySwt)
+  { super(gralMng, graphicThread);
+    this.displaySwt = displaySwt; 
   }  
   
   
+  static PrimaryWindowSwt create(LogMessage log)
+  { Init init = new Init();
+    GuiThread graphicThread = startGraphicThread(init);  
+
+    PropertiesGuiSwt propertiesGui = new PropertiesGuiSwt(init.displaySwt, 'C');
+    GralGridMngBase gralMng = new GuiPanelMngSwt(propertiesGui, null, log);
+    
+
+    PrimaryWindowSwt instance = new PrimaryWindowSwt(gralMng, graphicThread.getThread(), init.displaySwt);
+    graphicThread.setWindow(instance);  //now the initializing of the window occurs.
+    return instance;
+  }
   
-  @Override protected void initGraphic(String sTitle, int left, int top, int xSize, int ySize)
+  
+
+  
+  
+  
+  @Override protected Object initGraphic() //String sTitle, int left, int top, int xSize, int ySize)
   {
-    guiThreadId = Thread.currentThread().getId();
-    guiDevice = new Display ();
-    guiDevice.addFilter(SWT.Close, windowsCloseListener);
-    graphicFrame = new Shell(guiDevice); //, SWT.ON_TOP | SWT.MAX | SWT.TITLE);
+    guiThreadId = Thread.currentThread().getId(); ///
+    displaySwt.addFilter(SWT.Close, windowsCloseListener);
+    graphicFrame = new Shell(displaySwt); //, SWT.ON_TOP | SWT.MAX | SWT.TITLE);
     graphicFrame.addKeyListener(keyListener);
     
     //graphicFramePos = new Position(graphicFrame.getContentPane());
@@ -76,7 +109,7 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
     if(xSize == -1 || ySize == -1){
       graphicFrame.setFullScreen(true);
     } else {
-      graphicFrame.setBounds(left,top, xSize, ySize );  //Start position.
+      graphicFrame.setBounds(xPos,yPos, xSize, ySize );  //Start position.
     }
     graphicFrame.open();
     graphicFrame.setVisible( true ); 
@@ -85,19 +118,7 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
     graphicFrame.setLayout(null);
     graphicFrame.addShellListener(mainComponentListerner);
     
-    super.panelComposite = graphicFrame;
-    
-    for(Runnable build: buildOrders){
-      build.run();
-    }
-    synchronized(guiThread){
-      if(bWaitStart){
-        guiThread.notify(); 
-      }
-      bStarted = true;
-    }
-
-    
+    return graphicFrame;
     
   }
 
@@ -108,12 +129,11 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
    * @param xSize
    * @param ySize
    */
-  public void setTitleAndSize(String sTitle, int left, int top, int xSize, int ySize)
+  @Override public void buildMainWindow(String sTitle, int left, int top, int xSize, int ySize)
   { this.xSize = xSize;
     this.ySize = ySize;
     this.xPos = left;
     this.yPos = top;
-    this.sTitle = sTitle;
     if(bStarted){
       if(xSize < 0 || ySize < 0){
         graphicFrame.setFullScreen(true);
@@ -121,7 +141,20 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
         graphicFrame.setBounds(left,top, xSize, ySize );  //Start position.
       }  
       graphicFrame.setText(sTitle);
-    }
+    } else {
+      synchronized(guiThread){
+        if(!bStarted){
+          this.sTitle = sTitle;
+          guiThread.notify();     //Run the GUI Thread
+        }
+      }
+      synchronized(this){
+        while(!bStarted){
+          bWaitStart = true;
+          try{ wait(10000);  } catch(InterruptedException exc){}   //Await the GUI Thread
+        }
+      }
+    }    
   }
   
 
@@ -154,8 +187,8 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
     //it is possible that the GUI is busy with dispatching and doesn't sleep yet.
     //therefore:
     extEventSet.getAndSet(true);
-    if(guiDevice !=null){
-      guiDevice.wake();  //to wake up the GUI-thread, to run the listener at least one time.
+    if(displaySwt !=null){
+      displaySwt.wake();  //to wake up the GUI-thread, to run the listener at least one time.
     }
   }
   
@@ -182,7 +215,7 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
   
   
   public void wakeup(){
-    guiDevice.wake();
+    displaySwt.wake();
     extEventSet.set(true);
     isWakedUpOnly = true;
   }
@@ -196,14 +229,14 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
     checkTimes.adjust();
     checkTimes.cyclTime();
     while (! (bExit = graphicFrame.isDisposed ())) {
-      while (guiDevice.readAndDispatch ()){
+      while (displaySwt.readAndDispatch ()){
         //isWakedUpOnly = false;  //after 1 event, it may be wakeUp, set if false.
       }
       checkTimes.calcTime();
       isWakedUpOnly = false;
       //System.out.println("dispatched");
       if(!extEventSet.get()) {
-        guiDevice.sleep ();
+        displaySwt.sleep ();
       }
       if(!bExit){
         extEventSet.set(false); //the list will be tested!
@@ -220,15 +253,15 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
         }
       } 
     }
-    guiDevice.dispose ();
+    displaySwt.dispose ();
     bExit = true;
   }
   
   
   public void terminate()
   {
-    if(!bExit && !guiDevice.isDisposed()){ 
-      guiDevice.dispose();
+    if(!bExit && !displaySwt.isDisposed()){ 
+      displaySwt.dispose();
     }  
 
   }
@@ -470,6 +503,10 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
     return null;
   }
 
+  @Override public void redraw(){  graphicFrame.redraw(); graphicFrame.update(); }
+
+
+  
   public void removeWidgetImplementation()
   {
     graphicFrame.dispose();

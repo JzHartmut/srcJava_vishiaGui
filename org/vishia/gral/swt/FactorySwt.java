@@ -44,8 +44,7 @@ public class FactorySwt implements GralFactory_ifc
   , GralGridProperties propertiesGui
   , VariableContainer_ifc variableContainer, LogMessage log)
   {
-    return new GuiPanelMngSwt(gralDevice, width, height
-        , (PropertiesGuiSwt)propertiesGui, variableContainer, log);
+    return null; //new GuiPanelMngSwt(gralDevice, width, height , (PropertiesGuiSwt)propertiesGui, variableContainer, log);
   }
   
 

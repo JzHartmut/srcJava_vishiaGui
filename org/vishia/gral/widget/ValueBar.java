@@ -37,7 +37,7 @@ abstract public class ValueBar extends GralWidget implements GralSetValue_ifc
 	
 	
 	protected ValueBar(String name, GralGridMngBase mng)
-	{ super(name, 'U');
+	{ super(name, 'U', mng);
 		this.horizontal = false;
 	}
 

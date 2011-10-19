@@ -22,4 +22,6 @@ public interface GralWidget_ifc
   
   //public abstract GralWidget getGralWidget();
 
+  public void redraw();
+  
 }

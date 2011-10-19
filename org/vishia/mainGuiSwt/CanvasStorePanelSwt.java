@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralWidget;
@@ -94,8 +95,8 @@ public class CanvasStorePanelSwt extends PanelSwt  //CanvasStorePanel //
    * @param style
    * @param backGround
    */
-  public CanvasStorePanelSwt(String namePanel, Composite parent, int style, Color backGround)
-  { super(namePanel);
+  public CanvasStorePanelSwt(String namePanel, Composite parent, int style, Color backGround, GralGridMngBase gralMng)
+  { super(namePanel, gralMng);
     swtCanvas = new SwtCanvas(this,parent, style);
     super.panelComposite = swtCanvas;
     swtCanvas.setData(this);
@@ -109,9 +110,9 @@ public class CanvasStorePanelSwt extends PanelSwt  //CanvasStorePanel //
   /**Constructor called in derived classes. The derived class have to be instantiate the Canvas
    * maybe with other draw routines. 
    */
-  protected CanvasStorePanelSwt(String namePanel)
+  protected CanvasStorePanelSwt(String namePanel, GralGridMngBase gralMng)
   {
-    super(namePanel);
+    super(namePanel, gralMng);
   }
   
 

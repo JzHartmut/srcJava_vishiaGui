@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralTextBox;
+import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
@@ -16,15 +17,12 @@ public class TextBoxSwt extends GralTextBox
 {
   protected Text textFieldSwt;
   
-  final GralPrimaryWindow_ifc mainWindow;
-  
   StringBuffer newText = new StringBuffer();
   
   
-  public TextBoxSwt(String name, Composite parent, int style, GralPrimaryWindow_ifc mainWindow)
-  { super(name, 't');
+  public TextBoxSwt(String name, Composite parent, int style, GralGridMngBase mng)
+  { super(name, 't', mng);
     textFieldSwt = new Text(parent, style);
-    this.mainWindow = mainWindow;
   }
 
   //@Override public Widget getWidgetImplementation(){ return textFieldSwt; } 
@@ -47,23 +45,23 @@ public class TextBoxSwt extends GralTextBox
 
   @Override
   public Appendable append(CharSequence arg0) throws IOException
-  { if(Thread.currentThread().getId() == mainWindow.getThreadIdGui()){
+  { if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
       textFieldSwt.append(arg0.toString());
     } else {
       newText.append(arg0);
-      mainWindow.addDispatchListener(changeTextBoxTrail);    
+      windowMng.addDispatchListener(changeTextBoxTrail);    
     }
     return this;
   }
 
   @Override
   public Appendable append(char arg0) throws IOException
-  { if(Thread.currentThread().getId() == mainWindow.getThreadIdGui()){
+  { if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
     String ss = "" + arg0;
     textFieldSwt.append(ss);
   } else {
     newText.append(arg0);
-    mainWindow.addDispatchListener(changeTextBoxTrail);    
+    windowMng.addDispatchListener(changeTextBoxTrail);    
   }
   return this;
 }
@@ -85,12 +83,12 @@ public class TextBoxSwt extends GralTextBox
 
   @Override public void setText(String arg)
   {
-    if(Thread.currentThread().getId() == mainWindow.getThreadIdGui()){
+    if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
       textFieldSwt.setText(arg);
     } else {
       newText.setLength(0);
       newText.append(arg);
-      mainWindow.addDispatchListener(changeText);    
+      windowMng.addDispatchListener(changeText);    
     }
   }
   
@@ -126,7 +124,7 @@ public class TextBoxSwt extends GralTextBox
         viewTrail();
         newText.setLength(0);
       }
-      mainWindow.removeDispatchListener(this);
+      windowMng.removeDispatchListener(this);
     }
   };
   
@@ -137,10 +135,14 @@ public class TextBoxSwt extends GralTextBox
         textFieldSwt.setText(newText.toString());
         newText.setLength(0);
       }
-      mainWindow.removeDispatchListener(this);
+      windowMng.removeDispatchListener(this);
     }
   };
   
+  
+  @Override public void redraw(){  textFieldSwt.redraw(); textFieldSwt.update(); }
+
+
   
   @Override public void removeWidgetImplementation()
   {

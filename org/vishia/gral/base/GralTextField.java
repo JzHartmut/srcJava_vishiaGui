@@ -1,5 +1,7 @@
 package org.vishia.gral.base;
 
+import org.vishia.gral.gridPanel.GralGridMngBase;
+import org.vishia.gral.ifc.GralWindowMng_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralWidget;
 
@@ -9,8 +11,11 @@ import org.vishia.gral.ifc.GralWidget;
  */
 public abstract class GralTextField extends GralWidget implements GralTextField_ifc
 {
-  public GralTextField(String name, char whatis){
-    super(name, whatis);
+  protected final GralWindowMng_ifc windowMng;
+  
+  public GralTextField(String name, char whatis, GralGridMngBase mng){
+    super(name, whatis, mng);
+    this.windowMng = mng.gralDevice;
   }
   
 }

@@ -145,7 +145,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   /**Base class for managing all panels and related windows.
    * This base class contains all common resources to manage panels and windows.
    */
-  final protected GralPrimaryWindow gralDevice;
+  public GralPrimaryWindow gralDevice;
 
   /**Properties of this Dialog Window. */
   public  final GralGridProperties propertiesGui;
@@ -167,7 +167,10 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
    */
   protected final ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listVisiblePanels = new ConcurrentLinkedQueue<GralVisibleWidgets_ifc>();
   
-  protected final LogMessage log;
+  /**It is possible to write any message via this class to a logging system.
+   * All internal methods of gral writes exceptions to that logging system instead abort the execution of the application.
+   */
+  public final LogMessage log;
   
 	protected final VariableContainer_ifc variableContainer;
 	
@@ -315,21 +318,20 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   
 	
 	
-  public GralGridMngBase(GralPrimaryWindow device, GralGridMngBase parent
-      , GralGridProperties props
-      , VariableContainer_ifc variableContainer, LogMessage log)
-	{ this.parent = parent;
-	  if(parent == null){
-	    gralDevice = device;
-	  } else {
-	    gralDevice = parent.gralDevice;
-	  }
+  public GralGridMngBase(GralGridProperties props, VariableContainer_ifc variableContainer, LogMessage log)
+	{ this.parent = null;
 	  this.propertiesGui = props;
 		this.log = log;
 		this.variableContainer = variableContainer;
 		userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
 	}
 
+
+  public void setGralDevice(GralPrimaryWindow device)
+  {
+    this.gralDevice = device;
+  }
+  
   
   @Override public GralWidget getWidget(String name)
   { return indexNameWidgets.get(name);
@@ -717,6 +719,14 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
     return InfoBox.create(this, name, title);
   }
 
+  
+  @Override public void writeLog(int msgId, Exception exc)
+  {
+    String sMsg = exc.toString();
+    StackTraceElement[] stackTrace = exc.getStackTrace();
+    String sWhere = stackTrace[0].getFileName() + ":" + stackTrace[0].getLineNumber();
+    log.sendMsg(msgId, sMsg + " @" + sWhere);
+  }
   
   
   void stop(){}

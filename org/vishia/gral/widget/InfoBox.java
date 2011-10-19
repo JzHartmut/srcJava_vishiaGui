@@ -72,6 +72,10 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   
   }
   
+  @Override public void redraw(){  window.redraw(); }
+
+
+  
   @Override
   public void viewTrail()
   {

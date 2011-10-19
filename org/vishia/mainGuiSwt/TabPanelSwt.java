@@ -54,6 +54,8 @@ public class TabPanelSwt extends GralTabbedPanel
     }
     
 
+    @Override public void redraw(){  widgetSwt.redraw(); widgetSwt.update(); }
+
 
     
   }
@@ -88,9 +90,9 @@ public class TabPanelSwt extends GralTabbedPanel
 		CanvasStorePanelSwt panel;
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
 	  if(yGrid <0 || xGrid <0){
-			panel = new CanvasStorePanelSwt(sName, tabMng.widgetSwt, 0, colorBackground);
+			panel = new CanvasStorePanelSwt(sName, tabMng.widgetSwt, 0, colorBackground, mng);
 		} else {
-	  	panel = new GridPanelSwt(sName, tabMng.widgetSwt, 0, colorBackground, mng.propertiesGui.xPixelUnit(), mng.propertiesGui.yPixelUnit(), 5, 5);
+	  	panel = new GridPanelSwt(sName, tabMng.widgetSwt, 0, colorBackground, mng.propertiesGui.xPixelUnit(), mng.propertiesGui.yPixelUnit(), 5, 5, mng);
 		}
 	  panel.swtCanvas.setBounds(sizeTabFolder);
 	  panel.itsTabSwt = tabItem;
@@ -105,7 +107,7 @@ public class TabPanelSwt extends GralTabbedPanel
 	{ TabItem tabItemOperation = new TabItem(tabMng.widgetSwt, SWT.None);
 		tabItemOperation.setText(sLabel);
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
-	  CanvasStorePanelSwt panel = new CanvasStorePanelSwt(sName, tabMng.widgetSwt, 0, colorBackground);
+	  CanvasStorePanelSwt panel = new CanvasStorePanelSwt(sName, tabMng.widgetSwt, 0, colorBackground, mng);
     mng.registerPanel(panel);
 	  tabItemOperation.setControl(panel.swtCanvas);
     panels.put(sName, panel);
@@ -123,6 +125,7 @@ public class TabPanelSwt extends GralTabbedPanel
 	}
 	
   
+	
   public SelectionListener tabItemSelectListener = new SelectionListener(){
 
 		@Override

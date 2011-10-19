@@ -7,6 +7,7 @@ import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.vishia.gral.gridPanel.GralGridMngBase;
 
 /**This is a org.eclipse.swt.widgets.Composite. 
  * It can contain some GUI-Elements like Button, Text, Label, Table etc from org.eclipse.swt.widgets.
@@ -26,8 +27,8 @@ public class GridPanelSwt extends CanvasStorePanelSwt
 	
   int xS, yS;
   
-	public GridPanelSwt(String namePanel, Composite parent, int style, Color backGround, int xG, int yG, int xS, int yS)
-	{ super(namePanel);
+	public GridPanelSwt(String namePanel, Composite parent, int style, Color backGround, int xG, int yG, int xS, int yS, GralGridMngBase gralMng)
+	{ super(namePanel, gralMng);
 	  swtCanvas = new SwtCanvasGridPanel(this, parent, style);
     super.panelComposite = swtCanvas;
     swtCanvas.setData(this);

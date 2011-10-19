@@ -339,6 +339,10 @@ public class FileSelector extends GralWidget
     return null;
   }
   
+  @Override public void redraw(){  selectList.redraw(); }
+
+
+  
   @Override public void removeWidgetImplementation()
   {
     //widgdPath.rem   

@@ -7,6 +7,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
@@ -16,11 +17,11 @@ public class TextPanelSwt extends GralPanelContent implements GralTextBox_ifc, A
   
   TextBoxSwt textAreaOutput;
   
-  TextPanelSwt(String namePanel, Shell shell, int style, GralPrimaryWindow_ifc mainWindow)
-  { super(namePanel, mainWindow);
+  TextPanelSwt(String namePanel, Shell shell, int style, GralGridMngBase mng) //GralPrimaryWindow_ifc mainWindow)
+  { super(namePanel, mng);
     Display device = shell.getDisplay();
     //Composite panel = (Composite) panelComposite;
-    textAreaOutput = new TextBoxSwt(namePanel + "-widg", shell, style, super.mainWindow);
+    textAreaOutput = new TextBoxSwt(namePanel + "-widg", shell, style, mng);
     textAreaOutput.textFieldSwt.setFont(new Font(device, "Monospaced",11, SWT.NORMAL));
     panelComposite = textAreaOutput.textFieldSwt;  //it is a control,    
   }
@@ -66,6 +67,10 @@ public class TextPanelSwt extends GralPanelContent implements GralTextBox_ifc, A
     textAreaOutput.viewTrail();
   }
 
+  @Override public void redraw(){  textAreaOutput.redraw(); }
+
+
+  
   @Override
   public Appendable append(CharSequence csq) throws IOException
   { return textAreaOutput.append(csq);

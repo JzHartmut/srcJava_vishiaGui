@@ -39,7 +39,7 @@ public class CopyCmd
   
   void buildWindowConfirmCopy()
   {
-    main.panelMng.selectPanel("output"); //position relative to the output panel
+    main.panelMng.selectPanel("primaryWindow"); //"output"); //position relative to the output panel
     //panelMng.setPosition(1, 30+GralGridPos.size, 1, 40+GralGridPos.size, 1, 'r');
     main.panelMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
     

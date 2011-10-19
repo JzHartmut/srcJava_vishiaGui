@@ -4,6 +4,7 @@ import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTable;
+import org.vishia.gral.gridPanel.GralGridMngBase;
 
 
 
@@ -178,17 +179,19 @@ public abstract class GralWidget implements GralWidget_ifc
 	
 	
 	private GralWidget(String sName, GralWidget_ifc widget, char whatIs)
-	{ this.name = sName;
+	{ assert(false);
+	  this.name = sName;
 		//this.widget = null; //widget;
 		this.whatIs = whatIs;
 		this.itsCfgElement = null;
 	}
 
-	public GralWidget(String sName, char whatIs)
+	public GralWidget(String sName, char whatIs, GralGridMngBase mng)
 	{ this.name = sName;
 		//this.widget = null;
 		this.whatIs = whatIs;
     this.itsCfgElement = null;
+    this.itsMng = mng;
 	}
 
   
@@ -469,6 +472,8 @@ public abstract class GralWidget implements GralWidget_ifc
    * @return The panel.
    */
   public GralPanelContent getItsPanel(){ return pos.panel; }
+  
+  
   
   
   /**Removes the graphical widget in the graphic. */

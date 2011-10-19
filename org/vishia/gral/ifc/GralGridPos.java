@@ -337,7 +337,8 @@ public class GralGridPos implements Cloneable
    * @see java.lang.Object#toString()
    */
   @Override public String toString()
-  { return "line:" + y + "." + yFrac + ".." + yEnd + "." + yEndFrac + " col:" + x + "." + xFrac + ".." + xEnd + "." + xEndFrac + " " + dirNext + yOrigin + xOrigin;
+  { return "panel=" + (panel == null ? "?" : panel.toString()) + ", "
+    +"line=" + y + "." + yFrac + ".." + yEnd + "." + yEndFrac + " col=" + x + "." + xFrac + ".." + xEnd + "." + xEndFrac + " " + dirNext + yOrigin + xOrigin;
   }
 
   

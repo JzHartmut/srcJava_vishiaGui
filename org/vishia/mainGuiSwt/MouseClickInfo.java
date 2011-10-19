@@ -43,45 +43,48 @@ public class MouseClickInfo implements MouseListener
 	 */
 	@Override public void mouseDown(MouseEvent ev)
 	{
-		Widget widget = ev.widget;
-		Object oInfo = widget.getData();
-		if(oInfo instanceof GralWidget){
-			GralWidget widgetInfo = (GralWidget)oInfo;
-      if(widgetInfo ==null || widgetInfo.sDataPath ==null || !widgetInfo.sDataPath.equals("widgetInfo")){
-        guiMng.setLastClickedWidgetInfo(widgetInfo );
-      }
-			if(guiMng.bDesignMode){
-			  GralRectangle rr = new GralRectangle(ev.x, ev.y, 0, 0);
-        if(ev.button == 1){ //left
-          xDown = ev.x; yDown = ev.y;
-  			  guiMng.pressedLeftMouseDownForDesign(widgetInfo, rr);  
-			  } else if(ev.button == 3){ //right
-			    //guiMng.pressedRightMouseDownForDesign(widgetInfo, rr);
-			  }
-			}
-		}
+    try{
+  	  Widget widget = ev.widget;
+  		Object oInfo = widget.getData();
+  		if(oInfo instanceof GralWidget){
+  			GralWidget widgetInfo = (GralWidget)oInfo;
+        if(widgetInfo ==null || widgetInfo.sDataPath ==null || !widgetInfo.sDataPath.equals("widgetInfo")){
+          guiMng.setLastClickedWidgetInfo(widgetInfo );
+        }
+  			if(guiMng.bDesignMode){
+  			  GralRectangle rr = new GralRectangle(ev.x, ev.y, 0, 0);
+          if(ev.button == 1){ //left
+            xDown = ev.x; yDown = ev.y;
+    			  guiMng.pressedLeftMouseDownForDesign(widgetInfo, rr);  
+  			  } else if(ev.button == 3){ //right
+  			    //guiMng.pressedRightMouseDownForDesign(widgetInfo, rr);
+  			  }
+  			}
+  		}
+    } catch(Exception exc){ guiMng.writeLog(0, exc); }
 		
 	}
 
 	/**The mouse up is left empty. It may be overridden by an derived class. */
 	@Override public void mouseUp(MouseEvent ev)
-	{
-    Widget widget = ev.widget;
-    Object oInfo = widget.getData();
-    if(oInfo instanceof GralWidget){
-      GralWidget widgd = (GralWidget)oInfo;
-      int dx = ev.x - xDown, dy = ev.y - yDown;
-      if(dx < 10 && dx > -10 && dy < 10 && dy > -10){
-        GralUserAction action = widgd.getActionChange();
-        if(action !=null){
-          action.userActionGui("lu", widgd, null);
+	{ try{
+      Widget widget = ev.widget;
+      Object oInfo = widget.getData();
+      if(oInfo instanceof GralWidget){
+        GralWidget widgd = (GralWidget)oInfo;
+        int dx = ev.x - xDown, dy = ev.y - yDown;
+        if(dx < 10 && dx > -10 && dy < 10 && dy > -10){
+          GralUserAction action = widgd.getActionChange();
+          if(action !=null){
+            action.userActionGui("lu", widgd, null);
+          }
+        } else if(guiMng.bDesignMode && ev.button == 1){
+          boolean bCopy = (ev.stateMask & org.eclipse.swt.SWT.CTRL) !=0;
+          GralRectangle rr = new GralRectangle(ev.x, ev.y, 0, 0);
+          guiMng.releaseLeftMouseForDesign(widgd, rr, bCopy);  
         }
-      } else if(guiMng.bDesignMode && ev.button == 1){
-        boolean bCopy = (ev.stateMask & org.eclipse.swt.SWT.CTRL) !=0;
-        GralRectangle rr = new GralRectangle(ev.x, ev.y, 0, 0);
-        guiMng.releaseLeftMouseForDesign(widgd, rr, bCopy);  
       }
-    }
+	  } catch(Exception exc){ guiMng.writeLog(0, exc); }
 	  
 	}
 	
