@@ -941,6 +941,9 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     char size = ySize > 3? 'B' : 'A';
     if(sName == null){ sName = sButtonText; }
     SwtButton widgButton = new SwtButton(sName, this, (Composite)pos.panel.panelComposite, 0, size, gralDevice);
+    if(action !=null)
+      stop();
+    widgButton.setActionChange(action);  //maybe null
   	widgButton.setText(sButtonText);
     //ButtonSwt button = new ButtonSwt(this, null, size);
   	//GralWidget widgetInfos = new WidgetSimpleWrapperSwt(sName, 'B', button);

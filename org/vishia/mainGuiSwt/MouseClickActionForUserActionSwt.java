@@ -67,7 +67,17 @@ implements MouseListener
 
 	@Override
 	public void mouseDoubleClick(MouseEvent e) {
-    userAction.userActionGui(sCmdDoubleClick, null);
+	  xMousePress = e.x;
+    yMousePress = e.y;
+    Control widget = (Control) e.widget;  //a widget is a Control always.
+    GralWidget widgg = (GralWidget)widget.getData();
+    GralUserAction action = widgg ==null ? null : widgg.getActionChange();
+    if(userAction !=null){
+      //userAction on this class, TODO it is unused up to now
+      userAction.userActionGui(sCmdPress, widgg);
+    } else if(action !=null){
+      action.userActionGui(sCmdPress, widgg);
+    }
 	}
 
 	@Override public void mouseDown(MouseEvent e) {
@@ -87,9 +97,14 @@ implements MouseListener
         widget.setBackground(propertiesGui.colorSwt(0x800080));
       }
       if(sCmdPress != null){
-      	@SuppressWarnings("unchecked")
-      	GralWidget infos = (GralWidget)widget.getData();
-        userAction.userActionGui(sCmdPress,infos);
+      	GralWidget widgg = (GralWidget)widget.getData();
+        GralUserAction action = widgg ==null ? null : widgg.getActionChange();
+      	if(userAction !=null){
+          //userAction on this class, TODO it is unused up to now
+          userAction.userActionGui(sCmdPress, widgg);
+        } else if(action !=null){
+          action.userActionGui(sCmdPress, widgg);
+        }
       }
     } catch(Exception exc){ guiMng.writeLog(0, exc); }
 	}
@@ -110,9 +125,9 @@ implements MouseListener
 	  	}
 	  	backgroundWhilePressed = null;
 	  	//
-			Object data = e.widget.getData();
+			/*
+	  	Object data = e.widget.getData();
 			final String sNameWidget, sInfoWidget;
-	    @SuppressWarnings("unchecked")
 	  	GralWidget infos = (GralWidget)widget.getData();
 			if(data instanceof GralWidget){
 				@SuppressWarnings("unchecked")
@@ -123,11 +138,15 @@ implements MouseListener
 				sNameWidget = "unknown";
 				sInfoWidget = null;
 			}
-			/*
-	  	TreeMap<String, String> info = new TreeMap<String, String>();
-	  	info.put("info", sInfoWidget);
-	  	*/
-	  	userAction.userActionGui(sCmdRelease, infos);
+			*/
+      GralWidget widgg = (GralWidget)widget.getData();
+      GralUserAction action = widgg ==null ? null : widgg.getActionChange();
+      if(userAction !=null){
+        //userAction on this class, TODO it is unused up to now
+        userAction.userActionGui(sCmdPress, widgg);
+      } else if(action !=null){
+        action.userActionGui(sCmdPress, widgg);
+      }
 	  }
     } catch(Exception exc){ guiMng.writeLog(0, exc); }
 	}

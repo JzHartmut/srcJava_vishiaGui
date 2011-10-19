@@ -72,7 +72,7 @@ public class JavaCmd extends GuiCfg
 
   public JavaCmd(CallingArgs cargs, GuiMainCmd cmdgui)
   {
-    super(cargs, cmdgui);
+    super(cargs, cmdgui, null);
     this.cargs = cargs;
     buttonCmds = new CmdStore();
     cmdQueue.setOutput(gui.getOutputBox(), null);

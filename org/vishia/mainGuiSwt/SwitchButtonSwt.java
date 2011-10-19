@@ -88,7 +88,7 @@ public class SwitchButtonSwt extends ButtonSwt
 			isSwitchedDown = ! isSwitchedDown;
       if(isSwitchedDown){ setBackground(colorPressed); }
       else {  setBackground(colorReleased); }
-			GralUserAction action = widgd.getActionChange();
+			GralUserAction action = infos.getActionChange();
       if(action != null){
 			  action.userActionGui(sCmd + (isSwitchedDown? "1" : "0"), infos);
 			}

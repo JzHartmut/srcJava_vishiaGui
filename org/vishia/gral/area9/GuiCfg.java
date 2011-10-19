@@ -15,6 +15,7 @@ import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.gridPanel.GralGridProperties;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
@@ -46,6 +47,8 @@ public class GuiCfg
 
   /**The version.
    * <ul>
+   * <li>2011-10-20 Hartmut chg: ctor needs a {@link GralPlugUser2Gral_ifc} which may be null.
+   *   Idea: a derived class should support it. Other Idea: either both via reflection or both maybe direct. 
    * <li>2011-10-11 Hartmut new: Switches MainCmd-output to OutputBox.
    * <li>2011-09-30 Hartmut new: menu 'Design/...' to edit fields and work with the {@link GralCfgDesigner}.
    * <li>2011-09-18 Hartmut new: The main tab panel has the name 'mainTab' and it is registered in the {@link #panelMng} now.
@@ -72,7 +75,7 @@ public class GuiCfg
   private final Inspector inspector;
   
   /**To Output log informations. The ouput will be done in the output area of the graphic. */
-  protected final Report console;
+  public final Report console;
 
   //protected final GralPanelContent panelContent;
 
@@ -88,7 +91,7 @@ public class GuiCfg
 final GuiCallingArgs cargs;
 
 /**The configuration data for graphical appearance. */
-protected final GralCfgData guiCfgData = new GralCfgData();
+public final GralCfgData guiCfgData = new GralCfgData();
 
 
 
@@ -102,7 +105,7 @@ protected final GralCfgData guiCfgData = new GralCfgData();
 /**Some actions may be processed by a user implementation. */
 protected GralPlugUser_ifc user;
 
-
+protected final GralPlugUser2Gral_ifc plugUser2Gui;
 
 
 
@@ -133,12 +136,16 @@ protected GralTabbedPanel mainTabPanel;
  * The the GUI will be completed with the content of the GUI-configuration file.  
  *   
  * @param cargs The given calling arguments.
- * @param gui The GUI-organization.
+ * @param cmdGui The GUI-organization.
+ * @param plugUser2Gui maybe possible a instances which plugs the user instance to the GUI.
+ *   This instance may be defined in the context which calls this constructor.
+ *   Note: A user instance may be instantiated with the cmd line calling argument "-plugin=JAVACLASSPATH"  
  */
-public GuiCfg(GuiCallingArgs cargs, GuiMainCmd cmdGui) 
+public GuiCfg(GuiCallingArgs cargs, GuiMainCmd cmdGui, GralPlugUser2Gral_ifc plugUser2Gui) 
 { this.mainCmd = cmdGui;
   this.gui = cmdGui.gui;
   this.cargs = cargs;
+  this.plugUser2Gui = plugUser2Gui;
   this.console = gui.getMainCmd();  
 
   if(cargs.sPluginClass !=null){
@@ -183,6 +190,9 @@ public GuiCfg(GuiCallingArgs cargs, GuiMainCmd cmdGui)
 }
 
 
+public GralPlugUser_ifc getPluggedUser(){ return user; }
+
+
 
 /**Will be overridden... TODO InspcGui
  * 
@@ -190,7 +200,7 @@ public GuiCfg(GuiCallingArgs cargs, GuiMainCmd cmdGui)
 protected void userInit()
 {
   if(user !=null){
-    user.init(null, console.getLogMessageOutputConsole());
+    user.init(plugUser2Gui, console.getLogMessageOutputConsole());
   }
   
   
@@ -400,7 +410,7 @@ public static void main(String[] args)
     
     new InterProcessCommFactorySocket();
     
-    GuiCfg main = new GuiCfg(cargs, cmdGui);
+    GuiCfg main = new GuiCfg(cargs, cmdGui, null);
   
     main.execute();
   }    

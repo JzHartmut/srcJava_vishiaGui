@@ -8,28 +8,46 @@ import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GuiMainCmd;
+import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
+import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainGuiSwt.MainCmdSwt;
+import org.vishia.msgDispatch.LogMessage;
 
-public class InspcGui extends GuiCfg
+public class InspcGui //extends GuiCfg
 {
 
+  /**Version and history
+   * <ul>
+   * <li>2011-04-20 Don't derive this class from {@link GuiCfg}, instead uses the inner class {@link InspcGuiCfg}.
+   *   It is a problem of order of instantiation.
+   * <li>2011-04-00 Hartmut creation.
+   * </ul>
+   */
+  public final static int version = 0x20111020;
+  
   /**The communication manager. */
   final InspcGuiComm inspcComm;
   
   private final CallingArguments cargs;
 
-
+  final GuiCfg guiCfg;
 
   InspcGui(CallingArguments cargs, GuiMainCmd cmdgui)
   {
-    super(cargs, cmdgui);
+    guiCfg = new InspcGuiCfg(cargs, cmdgui, userInspcPlug);
+    LogMessage log = cmdgui.getLogMessageOutputConsole();
     this.cargs = cargs;  //args in the correct derived type.
+    /**
     assert(user instanceof InspcPlugUser_ifc);
     if(user !=null){
-      user.init(userInspcPlug, console.getLogMessageOutputConsole());
+      user.init(userInspcPlug, log);
     }
-    this.inspcComm = new InspcGuiComm(console, panelMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
+    */
+    GralPlugUser_ifc user = guiCfg.getPluggedUser(); 
+    assert(user instanceof InspcPlugUser_ifc);
+    
+    this.inspcComm = new InspcGuiComm(guiCfg.console, guiCfg.panelMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
     //inspcComm.addPanel(panelContent);
 
   }
@@ -101,6 +119,13 @@ public class InspcGui extends GuiCfg
   } //class CmdLineAndGui 
   
 
+private class InspcGuiCfg extends GuiCfg
+{
+  
+  
+  InspcGuiCfg(CallingArguments cargs, GuiMainCmd cmdgui, GralPlugUser2Gral_ifc plugUser2Gui)
+  { super(cargs, cmdgui, plugUser2Gui);  
+  }
   
   
   /**Initializes the areas for the panels and configure the panels.
@@ -117,17 +142,6 @@ public class InspcGui extends GuiCfg
     Appendable out = gui.getOutputBox();
     mainCmd.setOutputChannels(out, out);
   }
-
-  
-  /**The user may contain any other routines which are Inspc-specific. 
-   * 
-   */
-  @Override public void userInit()
-  {
-    //left empty, userInit is done in its own constructor.    
-    
-  }
-
 
   
   
@@ -153,7 +167,7 @@ public class InspcGui extends GuiCfg
 
   }
   
-  
+} //class InspcGuiCfg
   
   private UserInspcPlug_ifc userInspcPlug = new UserInspcPlug_ifc()
   {
@@ -161,7 +175,7 @@ public class InspcGui extends GuiCfg
     @Override public String replacePathPrefix(String path, String[] target)
     {
       // TODO Auto-generated method stub
-      String pathRet = guiCfgData.replacePathPrefix(path, target);
+      String pathRet = guiCfg.guiCfgData.replacePathPrefix(path, target);
       if(target[0] !=null){
         String targetIp = inspcComm.translateDeviceToAddrIp(target[0]);
         if(targetIp !=null){ target[0] = targetIp; }  //else let it unchanged.
@@ -188,6 +202,7 @@ public class InspcGui extends GuiCfg
       cmdgui.setExitErrorLevel(MainCmd_ifc.exitWithArgumentError);
       bOk = false;  //not exiting, show error in GUI
     }
+    LogMessage log = cmdgui.getLogMessageOutputConsole();
     
     //String ipcFactory = "org.vishia.communication.InterProcessComm_Socket";
     //try{ ClassLoader.getSystemClassLoader().loadClass(ipcFactory, true);
@@ -200,7 +215,7 @@ public class InspcGui extends GuiCfg
     
     InspcGui main = new InspcGui(cargs, cmdgui);
 
-    main.execute();
+    main.guiCfg.execute();
     
     cmdgui.exit();
   }
