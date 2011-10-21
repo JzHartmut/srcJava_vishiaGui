@@ -180,7 +180,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    * which is associated to a {@link GralWidget} in its data.
    * The infos of the last clicked widget can be got with it.
    */
-  MouseClickInfo mouseClickForInfo = new MouseClickInfo(this);
+  MouseClickInfo mouseClickForInfo = new MouseClickInfo();
   
   /**It is a marker interface. */
   protected interface XXXUserAction{}
@@ -940,7 +940,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     
     char size = ySize > 3? 'B' : 'A';
     if(sName == null){ sName = sButtonText; }
-    SwtButton widgButton = new SwtButton(sName, this, (Composite)pos.panel.panelComposite, 0, size, gralDevice);
+    SwtButton widgButton = new SwtButton(sName, this, (Composite)pos.panel.panelComposite, 0, size);
     if(action !=null)
       stop();
     widgButton.setActionChange(action);  //maybe null
@@ -1089,7 +1089,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   		log.sendMsg(0, "GuiMainDialog:addClickAction: unknown widget %s", sName);
   	} else {
     	/**The class ButtonUserAction implements the general button action, which class the registered user action. */
-      ((Control)(widget.getGraphicWidgetWrapper())).addMouseListener( new MouseClickActionForUserActionSwt(this, action, sCmdPress, sCmdRelease, sCmdDoubleClick));
+      ((Control)(widget.getGraphicWidgetWrapper())).addMouseListener( new MouseClickActionForUserActionSwt(action, sCmdPress, sCmdRelease, sCmdDoubleClick));
       
   	}
   	return widget.getGraphicWidgetWrapper();

@@ -11,7 +11,6 @@ import org.vishia.gral.area9.GuiMainCmd;
 import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
-import org.vishia.mainGuiSwt.MainCmdSwt;
 import org.vishia.msgDispatch.LogMessage;
 
 public class InspcGui //extends GuiCfg

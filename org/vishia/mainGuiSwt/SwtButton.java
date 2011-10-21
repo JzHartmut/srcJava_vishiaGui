@@ -12,6 +12,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWindowMng_ifc;
@@ -21,31 +22,25 @@ public class SwtButton extends GralButton
 
   Canvas widgetSwt;
   
-  String sButtonText;
-  
-  final GuiPanelMngSwt mng;
-  
   final Color black;
   final Color white;
   
   final Font fontText;
   
   
-  boolean isActivated;
   
   
 
   
-  public SwtButton(String sName, GuiPanelMngSwt mng, Composite parent, int styleSwt, char size, GralWindowMng_ifc windowMng)
+  public SwtButton(String sName, GuiPanelMngSwt mng, Composite parent, int styleSwt, char size)
   {
-    super(sName, windowMng, mng);
+    super(sName, mng);
     switch(size){ 
       case 'A': fontText = mng.propertiesGuiSwt.stdInputFont; break;
       case 'B': fontText = mng.propertiesGuiSwt.stdButtonFont; break;
       default: throw new IllegalArgumentException("param size must be A or B");
       }
       //Control xx = mng.pos.panel.panelComposite;
-      this.mng = mng;
       black = mng.propertiesGuiSwt.colorSwt(0);
       white = mng.propertiesGuiSwt.colorSwt(0xffffff);
       widgetSwt = new SwtButtonImpl(parent, styleSwt);
@@ -171,22 +166,18 @@ public class SwtButton extends GralButton
      * @param sCmdDoubleClick
      */
     public MouseClickButton()
-    { super(mng, null, "Button-down", "Button-up", "Button-click");
+    { super(null, "Button-down", "Button-up", "Button-click");
     }
 
     
     @Override public void mouseDown(MouseEvent e) {
-      try{ 
-        super.mouseDown(e);
-        setActivated(true);
-      } catch(Exception exc){ guiMng.writeLog(0, exc); }
+      super.mouseDown(e);
+      setActivated(true);
     }
 
     @Override public void mouseUp(MouseEvent e) {
-      try{
-        super.mouseUp(e);
-        setActivated(false);
-      } catch(Exception exc){ guiMng.writeLog(0, exc); }
+      super.mouseUp(e);
+      setActivated(false);
     }
 
     

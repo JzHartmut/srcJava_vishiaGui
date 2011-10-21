@@ -88,7 +88,7 @@ public abstract class GralWidget implements GralWidget_ifc
   
   /**The panel manager from where the widget is organized. Most of methods need the information
    * stored in the panel manager. This reference is used to set values to other widgets. */
-  private GralPanelMngWorking_ifc itsMng;
+  private GralGridMngBase itsMng;
   
   /**Association to the configuration element from where this widget was built. 
    * If the widget is moved or its properties are changed in the 'design mode' of the GUI,
@@ -367,7 +367,7 @@ public abstract class GralWidget implements GralWidget_ifc
 		this.sFormat = sFormat;
 	}
 
-	public void setPanelMng(GralPanelMngWorking_ifc panel)
+	public void setPanelMng(GralGridMngBase panel)
 	{ this.itsMng = panel; 
 	}
 	
@@ -465,7 +465,7 @@ public abstract class GralWidget implements GralWidget_ifc
    * to get and set values and properties of this widgets non-symbolic.
    * @return The manager.
    */
-  public GralPanelMngWorking_ifc getMng(){ return itsMng; }
+  public GralGridMngBase getMng(){ return itsMng; }
   
   
   /**Gets the panel where the widget is member of. 

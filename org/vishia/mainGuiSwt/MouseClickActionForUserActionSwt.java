@@ -9,6 +9,7 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
+import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 
@@ -19,7 +20,6 @@ import org.vishia.gral.ifc.GralWidget;
 public class MouseClickActionForUserActionSwt extends MouseClickInfo 
 implements MouseListener
 {
-	private final PropertiesGuiSwt propertiesGui;
 	
 	/**Positions saved on mouse press, to detect whether the mouse-release occurs in the pressed area.
 	 * If the mouse-position is shifted outside the area of the widget, the mouse-release-user-action
@@ -44,14 +44,12 @@ implements MouseListener
    * @param sCmdDoubleClick
    */
   public MouseClickActionForUserActionSwt(
-  	GuiPanelMngSwt guiMng
-  , GralUserAction userCmdGui
+  	GralUserAction userCmdGui
   , String sCmdPress
   , String sCmdRelease
   , String sCmdDoubleClick
   )
-  { super(guiMng);
-  	this.propertiesGui = guiMng.propertiesGuiSwt;
+  { super();
   	this.sCmdPress = sCmdPress;
     this.sCmdRelease = sCmdRelease;
     this.sCmdDoubleClick = sCmdDoubleClick;
@@ -81,23 +79,16 @@ implements MouseListener
 	}
 
 	@Override public void mouseDown(MouseEvent e) {
-    try{ 
-  	  super.mouseDown(e);
-  		isPressed = true;
-  		xMousePress = e.x;
-      yMousePress = e.y;
-      Control widget = (Control) e.widget;  //a widget is a Control always.
-      widget.addMouseMoveListener(mouseMoveListener);
-      if(e.widget instanceof ButtonSwt){
-        ButtonSwt button = (ButtonSwt)e.widget;
-        button.setActivated(true);
-      }
-      else {
-        backgroundWhilePressed = widget.getBackground();
-        widget.setBackground(propertiesGui.colorSwt(0x800080));
-      }
-      if(sCmdPress != null){
-      	GralWidget widgg = (GralWidget)widget.getData();
+    super.mouseDown(e);
+		isPressed = true;
+		xMousePress = e.x;
+    yMousePress = e.y;
+    Control widget = (Control) e.widget;  //a widget is a Control always.
+    widget.addMouseMoveListener(mouseMoveListener);
+    if(sCmdPress != null){
+    	GralWidget widgg = (GralWidget)widget.getData();
+      GralGridMngBase guiMng = widgg.getMng();
+      try{ 
         GralUserAction action = widgg ==null ? null : widgg.getActionChange();
       	if(userAction !=null){
           //userAction on this class, TODO it is unused up to now
@@ -105,12 +96,14 @@ implements MouseListener
         } else if(action !=null){
           action.userActionGui(sCmdPress, widgg);
         }
-      }
-    } catch(Exception exc){ guiMng.writeLog(0, exc); }
+      } catch(Exception exc){ guiMng.writeLog(0, exc); }
+    }
 	}
 
+	
+	
+	
 	@Override public void mouseUp(MouseEvent e) {
-    try{
 	  //set the background color to the originally value again if it was changed.
 	  if(isPressed){
 			Control widget = (Control)e.widget;
@@ -140,15 +133,17 @@ implements MouseListener
 			}
 			*/
       GralWidget widgg = (GralWidget)widget.getData();
-      GralUserAction action = widgg ==null ? null : widgg.getActionChange();
-      if(userAction !=null){
-        //userAction on this class, TODO it is unused up to now
-        userAction.userActionGui(sCmdPress, widgg);
-      } else if(action !=null){
-        action.userActionGui(sCmdPress, widgg);
-      }
+      GralGridMngBase guiMng = widgg.getMng();
+      try{ 
+        GralUserAction action = widgg ==null ? null : widgg.getActionChange();
+        if(userAction !=null){
+          //userAction on this class, TODO it is unused up to now
+          userAction.userActionGui(sCmdPress, widgg);
+        } else if(action !=null){
+          action.userActionGui(sCmdPress, widgg);
+        }
+      } catch(Exception exc){ guiMng.writeLog(0, exc); }
 	  }
-    } catch(Exception exc){ guiMng.writeLog(0, exc); }
 	}
 	
 
@@ -210,23 +205,25 @@ implements MouseListener
 
 		@Override	public void mouseMove(MouseEvent e)
 		{
-      try{
-  		  if(e.widget instanceof Control){
-  		  	Control widget = (Control)e.widget;
-  		  	Point size = widget.getSize();
-  		  	//xSize = size.x; ySize = size.y;
-  		  	if(  e.x < 0 || e.x > size.x
-  		  		|| e.y < 0 || e.y > size.y
-  		  	  ){
-  		      isPressed = false;
-  		      widget.removeMouseMoveListener(mouseMoveListener);
-  			    if(e.widget instanceof ButtonSwt){
-  		        ButtonSwt button = (ButtonSwt)e.widget;
-  		        button.setActivated(false);
-  		      }
-  		  	}
-  		  }	
-      } catch(Exception exc){ guiMng.writeLog(0, exc); }
+		  if(e.widget instanceof Control){
+		  	Control widget = (Control)e.widget;
+		  	Point size = widget.getSize();
+		  	//xSize = size.x; ySize = size.y;
+		  	if(  e.x < 0 || e.x > size.x
+		  		|| e.y < 0 || e.y > size.y
+		  	  ){
+		      isPressed = false;
+		      widget.removeMouseMoveListener(mouseMoveListener);
+			    if(e.widget instanceof ButtonSwt){
+		        ButtonSwt button = (ButtonSwt)e.widget;
+		        button.setActivated(false);
+		      }
+		      GralWidget widgg = (GralWidget)widget.getData();
+		      GralGridMngBase guiMng = widgg.getMng();
+		      try{ 
+		      } catch(Exception exc){ guiMng.writeLog(0, exc); }
+		  	}
+		  }	
 		}//method mouseMove
 	};
   

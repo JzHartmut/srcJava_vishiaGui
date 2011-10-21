@@ -29,7 +29,7 @@ public class SwitchButtonSwt extends ButtonSwt
 		//this.userActionOnSwitch = null;
 		this.isSwitchedDown = false;
 		MouseClickSwitchButtonAction action = new MouseClickSwitchButtonAction(mng, null);
-		addMouseListener( new MouseClickActionForUserActionSwt(mng, action, null, "SwitchButton", null));
+		addMouseListener( new MouseClickActionForUserActionSwt(action, null, "SwitchButton", null));
   	
 	}
 	
@@ -79,7 +79,7 @@ public class SwitchButtonSwt extends ButtonSwt
 		public MouseClickSwitchButtonAction(GuiPanelMngSwt guiMng, GralUserAction userAction)
 		{
 			
-			super(guiMng, null, null, "switchButton", null);
+			super(null, null, "switchButton", null);
 			setUserAction(this);  //set this action primary, it calls the user action.
 		}
   	
