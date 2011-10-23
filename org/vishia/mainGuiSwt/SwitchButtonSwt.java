@@ -29,7 +29,7 @@ public class SwitchButtonSwt extends ButtonSwt
 		//this.userActionOnSwitch = null;
 		this.isSwitchedDown = false;
 		MouseClickSwitchButtonAction action = new MouseClickSwitchButtonAction(mng, null);
-		addMouseListener( new MouseClickActionForUserActionSwt(action, null, "SwitchButton", null));
+		//addMouseListener( new MouseClickActionForUserActionSwt(action, null, "SwitchButton", null));
   	
 	}
 	
@@ -70,7 +70,7 @@ public class SwitchButtonSwt extends ButtonSwt
    * It is a inner non-static class of the button to influence the button with color.
    */
   private class MouseClickSwitchButtonAction extends MouseClickActionForUserActionSwt
-  implements GralUserAction
+  //implements GralUserAction
   {
 		/**
 		 * @param properties
@@ -80,10 +80,10 @@ public class SwitchButtonSwt extends ButtonSwt
 		{
 			
 			super(null, null, "switchButton", null);
-			setUserAction(this);  //set this action primary, it calls the user action.
+			//setUserAction(this);  //set this action primary, it calls the user action.
 		}
   	
-		@Override	public boolean userActionGui(String sCmd, GralWidget infos, Object... params)
+		public boolean userActionGui(String sCmd, GralWidget infos, Object... params)
 		{
 			isSwitchedDown = ! isSwitchedDown;
       if(isSwitchedDown){ setBackground(colorPressed); }

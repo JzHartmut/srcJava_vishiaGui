@@ -4,6 +4,10 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Control;
 import org.vishia.gral.ifc.GralColor;
 
+/**The static methods of this class are called in some situations, where same functionality is need in some classes.
+ * @author Hartmut Schorrig
+ *
+ */
 class SwtWidgetHelper
 {
 

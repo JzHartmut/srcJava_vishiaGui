@@ -632,8 +632,13 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   
   GralUserAction actionFileSelect = new GralUserAction()
   { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
+    { assert(false);
+      return userActionGui(null, infos);
+    }
+  
+    @Override public boolean userActionGui(int actionCode, GralWidget widgg, Object... params) 
     {
-      FileSelectInfo fileSelectInfo = (FileSelectInfo)infos.getContentInfo();
+      FileSelectInfo fileSelectInfo = (FileSelectInfo)widgg.getContentInfo();
       if(fileSelectInfo.listRecentFiles !=null){
         stop();
       } else {
@@ -644,9 +649,8 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
           fileSelectInfo.dstWidgd.setValue(cmdSet, 0, fileSelect);
         }
       }
-      return true;
-      
-    }
+      return true;      
+    }; 
     
   };
   

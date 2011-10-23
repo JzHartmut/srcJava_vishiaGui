@@ -1081,7 +1081,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    * @param sRegisteredUserAction The registered user action. 
    * @return
    */
-  @Override public Object addMouseButtonAction(String sName, GralUserAction action, String sCmdPress, String sCmdRelease, String sCmdDoubleClick)
+  @Override public Object XXXaddMouseButtonAction(String sName, GralUserAction action, String sCmdPress, String sCmdRelease, String sCmdDoubleClick)
   {
   	String sNameUsed = sName.charAt(0) == '$' ? sCurrPanel + sName.substring(1) : sName;
     GralWidget widget = indexNameWidgets.get(sNameUsed);

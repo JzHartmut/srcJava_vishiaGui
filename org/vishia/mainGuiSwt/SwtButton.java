@@ -1,7 +1,6 @@
 package org.vishia.mainGuiSwt;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -12,10 +11,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.vishia.gral.base.GralButton;
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWindowMng_ifc;
 
 public class SwtButton extends GralButton
 {
@@ -28,7 +24,7 @@ public class SwtButton extends GralButton
   final Font fontText;
   
   
-  
+  final SwtGralMouseListener.MouseListenerUserAction mouseListener = new SwtGralMouseListener.MouseListenerUserAction(mouseWidgetAction);
   
 
   
@@ -46,8 +42,7 @@ public class SwtButton extends GralButton
       widgetSwt = new SwtButtonImpl(parent, styleSwt);
       widgetSwt.setData(this);
       widgetSwt.setBackground(mng.propertiesGuiSwt.colorBackground);
-      MouseClickButton mouseClickButton = new MouseClickButton();
-      widgetSwt.addMouseListener(mouseClickButton);
+      widgetSwt.addMouseListener(mouseListener);
       setBoundsGraphic(mng);
   }
 
@@ -59,18 +54,6 @@ public class SwtButton extends GralButton
     
   }
   
-  public void setText(String sButtonText){ this.sButtonText = sButtonText; }
-  
-  /**Show the button in an activated state. This method is called especially 
-   * in its mouse press and release events. 
-   * In the activated state the button looks like pressed.*/
-  public void setActivated(boolean value){ 
-    isActivated = value;
-    widgetSwt.redraw();
-  }
-  
-  
-
   @Override public void redraw(){  widgetSwt.redraw(); widgetSwt.update(); }
   
   
@@ -155,34 +138,6 @@ public class SwtButton extends GralButton
     
   }
   
-  
-  private class MouseClickButton extends MouseClickActionForUserActionSwt
-  {
-    /**Constructor.
-     * @param guiMng The Gui-manager
-     * @param userCmdGui The users method for the action. 
-     * @param sCmdPress command string provided as first parameter on mouse button press.
-     * @param sCmdRelease
-     * @param sCmdDoubleClick
-     */
-    public MouseClickButton()
-    { super(null, "Button-down", "Button-up", "Button-click");
-    }
-
-    
-    @Override public void mouseDown(MouseEvent e) {
-      super.mouseDown(e);
-      setActivated(true);
-    }
-
-    @Override public void mouseUp(MouseEvent e) {
-      super.mouseUp(e);
-      setActivated(false);
-    }
-
-    
-    
-  }
   
   
 }

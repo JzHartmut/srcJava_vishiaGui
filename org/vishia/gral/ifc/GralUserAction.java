@@ -2,6 +2,7 @@ package org.vishia.gral.ifc;
 
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.widget.FileSelector;
+import org.vishia.util.KeyCode;
 
 
 /**This Interface should be implemented by any user class to receive any user actions on the graphic.
@@ -22,8 +23,22 @@ import org.vishia.gral.widget.FileSelector;
  * as parameter while calling.
  * <br><br>
  */
-public interface GralUserAction
+public abstract class GralUserAction
 {
+  /**Version and history:
+   * <ul>
+   * <li>2011-10-23 Hartmut chg: Not it is not an interface but a abstract class with the KeyCode-sensitive method.
+   *   All implementations yet uses the anonymous class, therefore no changes in its usage.
+   *   Typical the implementation is a simple inheritance embedded as inner class.
+   *   Then an abstract class is able to use like a interface.
+   *   The idea is, don't use the String determined method any more, instead the new method with KeyCode.
+   *   All calling should call both methods, but the user can implement only one of them. The other returns false.
+   *   So only the calling places in sources should be adapted for usage yet. 
+   * </ul>
+   */
+  static final int version = 0x20111023;
+  
+  
   /**Call of users method while a widget is activated.
    * Usual intensions:
    * <ul>
@@ -49,5 +64,16 @@ public interface GralUserAction
    *        doesn't much to that implementation. It is possible to build a queue of user action invocations.
    *        The first invocation which returns true may finish the invocations.
    */
-  boolean userActionGui(String sIntension, GralWidget widgd, Object... params);
+  public boolean userActionGui(String sIntension, GralWidget widgd, Object... params){ return false; }
+  
+  /**Call of users method while any user action on the gui is done.
+   * @param actionCode See {@link KeyCode}. Any special action is designated with 0.
+   * @param widgd The Gral widget
+   * @param params Some optional values, depending on special user designation. In most cases no parameter.
+   *   The user may be test the type of parameter for complex usage.
+   * @return true if execution is succeed. false if the users application can't deal with the actionCode or the widget. 
+   */
+  public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ return false; }
+  
+  
 }
