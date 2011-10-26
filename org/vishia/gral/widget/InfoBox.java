@@ -6,6 +6,7 @@ import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
@@ -37,12 +38,12 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   public static InfoBox create(GralGridBuild_ifc mng, String name, String title)
   {
     GralSubWindow window = mng.createWindow(title, false);
-    mng.setPosition(0, -3, 0, 0, 0, '.');
+    mng.setPosition(3, -3, 0, 0, 0, '.');
     GralWidget text = mng.addText(name, 'C', 0);
-    mng.setPosition(-3, 0, -6, 0, 0, '.');
+    mng.setPosition(-6, -3, -6, 0, 0, '.');
     GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "", null, null, "OK");
     InfoBox box = new InfoBox(window, text, buttonOk);
-    box.buttonOk.setActionChange(null);
+    box.buttonOk.setActionChange(box.actionOk);
     return box; 
 
   }
@@ -125,6 +126,7 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   @Override
   public void setWindowVisible(boolean visible)
   {
+    window.setWindowVisible(visible);
     // TODO Auto-generated method stub
     
   }
@@ -151,7 +153,12 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
     return null;
   }
   
-  
+  GralUserAction actionOk = new GralUserAction(){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
+      window.setWindowVisible(false);
+      return true;
+    }
+  };
 
 
 }

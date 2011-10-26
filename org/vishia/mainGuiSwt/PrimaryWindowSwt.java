@@ -74,7 +74,7 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
   }  
   
   
-  static PrimaryWindowSwt create(LogMessage log)
+  public static PrimaryWindowSwt create(LogMessage log)
   { Init init = new Init();
     GuiThread graphicThread = startGraphicThread(init);  
 

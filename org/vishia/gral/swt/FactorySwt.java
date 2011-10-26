@@ -10,6 +10,7 @@ import org.vishia.gral.ifc.GralFactory_ifc;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainGuiSwt.GuiPanelMngSwt;
 import org.vishia.mainGuiSwt.MainCmdSwt;
+import org.vishia.mainGuiSwt.PrimaryWindowSwt;
 import org.vishia.mainGuiSwt.PropertiesGuiSwt;
 import org.vishia.msgDispatch.LogMessage;
 
@@ -26,7 +27,9 @@ public class FactorySwt implements GralFactory_ifc
 
   @Override public GuiMainAreaifc createGuiWindow(MainCmd cmdP)
   {
-    gui = new MainCmdSwt(cmdP);
+    GralPrimaryWindow swtWindow = PrimaryWindowSwt.create(cmdP.getLogMessageOutputConsole());
+
+    gui = new MainCmdSwt(cmdP, swtWindow);
     gralDevice = gui.getPrimaryWindow();
     if(gralDevice ==null){
       //gralDevice = new GralDeviceSwt();

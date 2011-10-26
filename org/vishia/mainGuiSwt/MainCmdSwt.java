@@ -60,6 +60,7 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
+import org.vishia.gral.widget.InfoBox;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.msgDispatch.LogMessage;
@@ -244,15 +245,19 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 	
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-      String[] sHelpText = new String[mainCmd.listHelpInfo.size()];
-      int ix = 0;
-      for(String line: mainCmd.listHelpInfo){
-        sHelpText[ix++] = line;
+      //String[] sHelpText = new String[mainCmd.listHelpInfo.size()];
+      if(infoHelp == null){
+        GralGridMngBase gralMng = getGralMng();
+        gralMng.selectPanel(outputArea);
+        gralMng.setPosition(0,0,0,0,0,'.');
+        infoHelp = InfoBox.create(gralMng, "Help", "Help");
+        for(String line: mainCmd.listHelpInfo){
+          infoHelp.append(line);
+          //sHelpText[ix++] = line;
+        }
+        
       }
-      DeprecatedInfoBoxSwt helpDlg = new DeprecatedInfoBoxSwt(swtWindow.graphicFrame, "Help", sHelpText, false);//main.writeInfoln("action!");
-      helpDlg.open();
-      helpDlg.setVisible(true);
-      stop();
+      infoHelp.setWindowVisible(true);
 		}
   	
   }
@@ -269,15 +274,18 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 		@Override
 		public void widgetSelected(SelectionEvent e)
     {
-      String[] sText = new String[mainCmd.listAboutInfo.size()];
-      int ix = 0;
-      for(String line: mainCmd.listAboutInfo){
-        sText[ix++] = line;
+      if(infoAbout == null){
+        GralGridMngBase gralMng = getGralMng();
+        gralMng.selectPanel(outputArea);
+        gralMng.setPosition(-20,0,-40,0,0,'.');
+        infoAbout = InfoBox.create(getGralMng(), "about", "about");
+        for(String line: mainCmd.listAboutInfo){
+          infoAbout.append(line);
+          //sHelpText[ix++] = line;
+        }
+        
       }
-      DeprecatedInfoBoxSwt aboutDlg = new DeprecatedInfoBoxSwt(swtWindow.graphicFrame, "...about", sText, false);//main.writeInfoln("action!");
-      
-      aboutDlg.setVisible(true);
-      stop();
+      infoAbout.setWindowVisible(true);
     }
   }
 
@@ -356,13 +364,13 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   }
   */
   
-  public MainCmdSwt(MainCmd cmdP) //String[] args)
+  public MainCmdSwt(MainCmd cmdP, GralPrimaryWindow guiDevice) //String[] args)
   { //super(args);
     //assert(false);
-    super(cmdP); //gralDevice);
+    super(cmdP, guiDevice); //gralDevice);
   
-    swtWindow = PrimaryWindowSwt.create(cmdP.getLogMessageOutputConsole());
-    super.gralDevice = swtWindow;
+    swtWindow = (PrimaryWindowSwt)guiDevice; //PrimaryWindowSwt.create(cmdP.getLogMessageOutputConsole());
+    //super.gralDevice = swtWindow;
     swtWindow.addGuiBuildOrder(initOutputArea); 
     swtWindow.addDispatchListener(writeOutputTextDirectly);
   }
@@ -993,7 +1001,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 
 
   @Override public GralGridMngBase getGralMng()
-  { return swtWindow.gralMng;
+  { return gralDevice.gralMng;
   }
 }
 

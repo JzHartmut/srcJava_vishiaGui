@@ -64,6 +64,7 @@ import org.eclipse.swt.widgets.Widget;
 
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralPrimaryWindow;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralSubWindow;
@@ -180,7 +181,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    * which is associated to a {@link GralWidget} in its data.
    * The infos of the last clicked widget can be got with it.
    */
-  MouseClickInfo mouseClickForInfo = new MouseClickInfo();
+  SwtGralMouseListener.MouseListenerNoAction mouseClickForInfo = new SwtGralMouseListener.MouseListenerNoAction();
   
   /**It is a marker interface. */
   protected interface XXXUserAction{}
@@ -1006,50 +1007,6 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   }
   
 
-  
-  
-  public GralWidget OldaddSwitchButton(
-    String sName
-  , GralUserAction action
-  , String sCmd
-  , String sShowMethod
-  , String sDataPath
-  , String sButtonText
-  , String sColor0
-  , String sColor1
-    //, int height, int width
-    //, String sCmd, String sUserAction, String sName)
-  )
-  {
-    int ySize = (int)(pos.height());
-    int xSize = (int)(pos.width());
-    char size = ySize > 3? 'B' : 'A';
-  	if(sColor0 == null || sColor1 == null) throw new IllegalArgumentException("SwitchButton " + sName + ": color0 and color1 should be given.");
-  	
-  	SwitchButtonSwt button = new SwitchButtonSwt(this, null, size);
-    GralWidget widgetInfos = new WidgetSimpleWrapperSwt(sName, 'B', button, this);
-    widgetInfos.setPanelMng(this);
-    widgetInfos.setActionChange(action);
-    widgetInfos.sCmd = sCmd;
-    widgetInfos.setShowMethod(sShowMethod);
-    widgetInfos.sDataPath = sDataPath;
-    button.setBackground(propertiesGuiSwt.colorBackground);
-  	button.setColorPressed(propertiesGui.getColorValue(sColor1));  
-    button.setColorReleased(propertiesGui.getColorValue(sColor0));  
-    button.setText(sButtonText);
-    //button.setForeground(propertiesGuiSwt.colorSwt(0xff00));
-    button.setSize(propertiesGui.xPixelUnit() * xSize -2, propertiesGui.yPixelUnit() * ySize -2);
-    setBounds_(button);
-    if(sName == null){ sName = sButtonText; }
-    button.setData(widgetInfos);
-    //pos.panel.widgetIndex.put(sName, widgetInfos);
-    pos.panel.widgetList.add(widgetInfos);
-    if(sName != null){
-      indexNameWidgets.put(sName, widgetInfos);
-    }
-    return widgetInfos;
-  }
-  
   @Override public GralWidget addLed(
   	String sName
   , String sShowMethod
@@ -1097,39 +1054,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
 		return curveView;
 	}
 
-  /**Adds a mouse click action (left button) to any widget. 
-   * It is able to apply especially for widget without mouse handling,
-   * for example geometric figures all a canvas area. 
-   * It should not be applied to a widget which has a special handling for mouse buttons already.
-   * <br><br>
-   * The first parameter of user action will be called with
-   *        <ul>
-   *        <li>"d": for double-click
-   *        <li>"p": for press (down)
-   *        <li>"r": for release (up)
-   *        <ul>
-   * Hint: If only a release is evaluated and the press are ignored,
-   * it is proper for handling with a touch panel. 
-   * Then the reaction to an inadvertent press can be prevent 
-   * by dragging the mouse without release away from the widget.         
-   * 
-   * @param sName registered name of the widget.
-   * @param sRegisteredUserAction The registered user action. 
-   * @return
-   */
-  @Override public Object XXXaddMouseButtonAction(String sName, GralUserAction action, String sCmdPress, String sCmdRelease, String sCmdDoubleClick)
-  {
-  	String sNameUsed = sName.charAt(0) == '$' ? sCurrPanel + sName.substring(1) : sName;
-    GralWidget widget = indexNameWidgets.get(sNameUsed);
-  	if(widget == null || !(widget.getGraphicWidgetWrapper() instanceof Control)){
-  		log.sendMsg(0, "GuiMainDialog:addClickAction: unknown widget %s", sName);
-  	} else {
-    	/**The class ButtonUserAction implements the general button action, which class the registered user action. */
-      ((Control)(widget.getGraphicWidgetWrapper())).addMouseListener( new MouseClickActionForUserActionSwt(action, sCmdPress, sCmdRelease, sCmdDoubleClick));
-      
-  	}
-  	return widget.getGraphicWidgetWrapper();
-  }
+
 	
 	@Override public GralWidget addFocusAction(String sName, GralUserAction action, String sCmdEnter, String sCmdRelease)
 	{
@@ -1258,9 +1183,8 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   
   
   
-  private void setInfoDirect(GralWidget descr, int cmd, int ident, Object info, Object data)
+  private void setInfoDirect(GralWidget widget, int cmd, int ident, Object info, Object data)
   {
-    GralWidget_ifc widget = descr.getGraphicWidgetWrapper();
         if(widget !=null){
           Control swtWidget = (Control)widget.getWidgetImplementation(); 
           int colorValue;
@@ -1287,7 +1211,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
               case GralPanelMngWorking_ifc.cmdInsert: table.changeTable(ident, info, data); break;
               case GralPanelMngWorking_ifc.cmdSet: table.changeTable(ident, info, data); break;
               case GralPanelMngWorking_ifc.cmdClear: table.clearTable(ident); break;
-              default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, descr.name);
+              default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, widget.name);
               }
             } else if(swtWidget instanceof Text){ 
               Text field = (Text)swtWidget;
@@ -1299,7 +1223,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
                   //shows the end of text because the position after last char is selected.
                   //field.setSelection(sInfo.length());  
                   break;
-              default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %x on widget %s", cmd, descr.name);
+              default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %x on widget %s", cmd, widget.name);
               }
             } else if(swtWidget instanceof LedSwt){ 
               LedSwt field = (LedSwt)swtWidget;
@@ -1309,15 +1233,15 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
                 int colorInner = ((Integer)info).intValue();
                 field.setColor(ident, colorInner);
               } break;
-              default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, descr.name);
+              default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, widget.name);
               }
-            } else if(swtWidget instanceof SwitchButtonSwt){ 
-              SwitchButtonSwt widgetButton = (SwitchButtonSwt)swtWidget;
+            } else if(widget instanceof GralButton){ 
+              GralButton widgetButton = (GralButton)widget;
               widgetButton.setState(info);
             } else {
               //all other widgets:    
               switch(cmd){  
-              default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd %x for widget: %s", cmd, descr.name);
+              default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd %x for widget: %s", cmd, widget.name);
               }
             }
           }//switch
@@ -1509,8 +1433,8 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     Control swtWidget = (Control)widget.getWidgetImplementation();
 		if(swtWidget instanceof Text){
   	  sValue = ((Text)swtWidget).getText();
-  	} else if(swtWidget instanceof SwitchButtonSwt){
-  		SwitchButtonSwt button = (SwitchButtonSwt)swtWidget;
+  	} else if(widgd instanceof GralButton){
+  		GralButton button = (GralButton)widgd;
   		sValue = button.isOn() ? "1" : "0"; 
   	} else if(swtWidget instanceof Button){
   		sValue = "0"; //TODO input.button.isSelected() ? "1" : "0";

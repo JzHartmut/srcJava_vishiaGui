@@ -10,6 +10,7 @@ import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTextBox_ifc;
+import org.vishia.gral.widget.InfoBox;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmd_ifc;
 
@@ -25,6 +26,8 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
   protected GralPanelContent outputPanel;
   
   protected GralTextBox outputBox;
+  
+  protected InfoBox infoHelp, infoAbout;
   
   /** Current Directory for file choosing. */
   protected File currentDirectory = null;
@@ -49,7 +52,7 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
     outputArea = area;
   }
 
-  public GuiMainAreaBase(MainCmd mainCmd){ this.mainCmd = mainCmd; }
+  private GuiMainAreaBase(MainCmd mainCmd){ this.mainCmd = mainCmd; }
 
   public GuiMainAreaBase(MainCmd mainCmd, GralPrimaryWindow guiDevice)
   {

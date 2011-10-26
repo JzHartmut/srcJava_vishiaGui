@@ -521,18 +521,6 @@ public interface GralGridBuild_ifc
    */
   GralWidget addFileSelectField(String name, List<String> listRecentFiles, String startDirMask, String prompt, char promptStylePosition);
   
-  /**
-   * @param sName
-   * @param action
-   * @param sCmdPress
-   * @param sCmdRelease
-   * @param sCmdDoubleClick
-   * @return
-   * @Deprecated. The standard for all mouse actions are given with the {@link GralWidget#setActionChange(GralUserAction)}.
-   * The evaluation of this action is given on all user-mouse-click sensitive widgets, especially buttons
-   */
-  Object XXXaddMouseButtonAction(String sName, GralUserAction action, String sCmdPress, String sCmdRelease, String sCmdDoubleClick);
-
   /**Adds the given Focus action to the named widget.
    * @param sName The name of the widget. It should be registered calling any add... method.
    * @param action

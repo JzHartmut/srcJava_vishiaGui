@@ -11,7 +11,6 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.widget.SwitchExclusiveButtonMng;
-import org.vishia.mainGuiSwt.DeprecatedInfoBoxSwt;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
