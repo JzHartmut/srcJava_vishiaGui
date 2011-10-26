@@ -227,7 +227,7 @@ public class GuiStatusPanel
   
   private final GralUserAction selectProjectPath = new GralUserAction()
   { 
-    public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+    @Override public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     {
       //testDialogBox.open();
       selectorProjectPath.setWindowVisible(true);

@@ -54,7 +54,10 @@ public class SwtButton extends GralButton
     
   }
   
-  @Override public void redraw(){  widgetSwt.redraw(); widgetSwt.update(); }
+  @Override public void redraw(){  
+    widgetSwt.redraw(); 
+    //widgetSwt.update();
+  }
   
   
   @Override
@@ -101,12 +104,37 @@ public class SwtButton extends GralButton
         GC gc = e.gc;
         //gc.d
         Rectangle dim = getBounds();
+        if(colorOff == null){ 
+          //it isn't initalize
+          colorOff = GralColor.getColor("wh");  //white background
+        }
+        GralColor colorgback = switchedOn && colorOn != null ? colorOn : colorOff;
+        
+        Color colorBack = (Color)getMng().getColorImpl(colorgback);
+        gc.setBackground(colorBack);
         drawBackground(e.gc, dim.x+1, dim.y+1, dim.width-1, dim.height-1);
         Color color = getForeground(); //of the widget.
         gc.setForeground(color);  //black
         gc.setFont(fontText);
         //FontData fontData = mng.propertiesGui.stdButtonFont.getFontData();
         //fontData.
+        final String sButtonText = switchedOn && sButtonTextOn != null ? sButtonTextOn : sButtonTextOff;
+        if(isActivated){
+          gc.setLineWidth(3);
+          gc.drawRectangle(1,1,dim.width-2, dim.height-2);
+          gc.setLineStyle(SWT.LINE_DOT);
+          gc.drawRectangle(3,3,dim.width-6, dim.height-6);
+        } else {
+          gc.setLineWidth(1);
+          gc.setForeground(colorBack);
+          gc.fillRectangle(2,2,dim.width-6, dim.height-6);
+          gc.setForeground(black);
+          gc.drawRectangle(1,1,dim.width-5, dim.height-5);
+          gc.setForeground(white); 
+          gc.setLineWidth(3);
+          gc.drawLine(0, dim.height-2,dim.width, dim.height-2);
+          gc.drawLine(dim.width-1, 0, dim.width-1, dim.height);
+        }
         if(sButtonText !=null){
           FontMetrics fontMetrics = gc.getFontMetrics();
           int charWidth = fontMetrics.getAverageCharWidth();
@@ -115,21 +143,8 @@ public class SwtButton extends GralButton
           if(xText < 2){ xText = 2; }
           int halfHeightButtonText = fontMetrics.getHeight() /2;
           int yText = dim.height / 2 - halfHeightButtonText;
-          gc.drawString(sButtonText, xText, yText);
-        }
-        if(isActivated){
-          gc.setLineWidth(3);
-          gc.drawRectangle(1,1,dim.width-2, dim.height-2);
-          gc.setLineStyle(SWT.LINE_DOT);
-          gc.drawRectangle(3,3,dim.width-6, dim.height-6);
-        } else {
-          gc.setLineWidth(1);
           gc.setForeground(black);
-          gc.drawRectangle(1,1,dim.width-5, dim.height-5);
-          gc.setForeground(white); 
-          gc.setLineWidth(3);
-          gc.drawLine(0, dim.height-2,dim.width, dim.height-2);
-          gc.drawLine(dim.width-1, 0, dim.width-1, dim.height);
+          gc.drawString(sButtonText, xText, yText);
         }
       }
     };

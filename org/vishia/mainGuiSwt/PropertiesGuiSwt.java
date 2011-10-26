@@ -67,8 +67,8 @@ public class PropertiesGuiSwt extends GralGridProperties
    */
   public Color colorSwt(GralColor color)
   {
-    int colorValue = color.getColorValue();
     if(color.colorGuimpl == null){
+      int colorValue = color.getColorValue();
       color.colorGuimpl = colorSwt(colorValue);
     } else if(!(color.colorGuimpl instanceof Color)){
       throw new IllegalArgumentException("unauthorized color setting");

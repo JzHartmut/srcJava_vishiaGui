@@ -197,6 +197,14 @@ public interface GralPanelMngWorking_ifc
 	 */
 	int getColorValue(String sName);
 	
+	/**Gets the color of the graphic implementation (swt.Color, swing.TODO)
+	 * Either the implementation color instance is stored already in the GralColor,
+	 * or it will be created, stored in GralColor and returned here.
+	 * @param color The Color.
+	 * @return Instance of the implementation color.
+	 */
+	Object getColorImpl(GralColor color);
+	
 	/**Gets the value from a widget.
 	 * @param sName The name of the widget. The widget will be searched per name.
 	 * @return null if the named widget isn't found or the widget is not able to input.

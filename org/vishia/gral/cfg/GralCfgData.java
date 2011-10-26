@@ -152,8 +152,9 @@ public final class GralCfgData
    * Class for instance to capture and store the Button data. */
   public final static class GuiCfgButton extends WidgetTypeBase implements Cloneable
   {
-    
-    public GuiCfgButton(GralCfgElement itsElement){ super(itsElement); }
+    final boolean bSwitch;
+    public GuiCfgButton(GralCfgElement itsElement){ super(itsElement); bSwitch = false; }
+    public GuiCfgButton(GralCfgElement itsElement, boolean bSwitch){ super(itsElement); this.bSwitch = bSwitch; }
   }
   
   

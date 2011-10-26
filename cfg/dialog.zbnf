@@ -161,8 +161,10 @@ InputField::= Input ( [|<""?prompt>|<*)?prompt>] ) : { width = <#?width> | name 
 
 FileInputField::= FileInput ( [|<""?prompt>|<*)?prompt>] ) : { width = <#?width> | name = [<""?name>|<$?name>] ? , } ; .
 
-colorName::=[<?color> red|green|blue|black|white|gray|brown|cyan|magenta|orange|amber
-|rd|gn|bl|gr|bn|cy|ma|or|wh|bk
-|lrd|lgn|lbl
-|dgn]
+colorName::=[<?color> red|green|blue|black|white|gray|brown|cyan|magenta|orange|amber|yellow|violet|purple
+|rd|gn|bl|gr|bn|cy|ma|or|wh|bk|ye|or|vi|pk|pu|am
+|lrd|lgn|lbl|lgr|lye|lor|lam|lma|lcy
+|prd|pgn|pbl|pgr|pye|por|pam|pma|pcy
+|drd|dgn|dbl|drg|dye|dor|dam|dma|dcy
+]
  

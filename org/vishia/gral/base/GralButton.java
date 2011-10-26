@@ -1,6 +1,8 @@
 package org.vishia.gral.base;
 
 import org.vishia.gral.gridPanel.GralGridMngBase;
+import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralImageBase;
 import org.vishia.gral.ifc.GralWindowMng_ifc;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.mainGuiSwt.SwtGralMouseListener;
@@ -15,7 +17,12 @@ public abstract class GralButton extends GralWidget
   protected boolean pressed;
   protected boolean switchedOn;
 
-  protected String sButtonText;
+  protected String sButtonTextOff, sButtonTextOn;
+  
+  protected GralImageBase imageOff, imageOn;
+  
+  /**Color of button. If colorOff is null, then it is not a switch button. */
+  protected GralColor colorOff, colorOn;
   
   //final GralGridMngBase mng;
   protected boolean isActivated;
@@ -31,8 +38,28 @@ public abstract class GralButton extends GralWidget
     //this.mainWindow = mainWindow;
   }
   
+  public void setSwitchMode(String sButtonTextOff, String sButtonTextOn){ 
+    this.sButtonTextOn = sButtonTextOn;
+    this.sButtonTextOff = sButtonTextOff;
+    shouldSwitched = true; 
+  }
   
-  public void setText(String sButtonText){ this.sButtonText = sButtonText; }
+  
+  public void setSwitchMode(GralColor colorOff, GralColor colorOn){ 
+    this.colorOn = colorOn;
+    this.colorOff = colorOff;
+    shouldSwitched = true; 
+  }
+  
+  
+  public void setSwitchMode(GralImageBase imageOff, GralImageBase imageOn){ 
+    this.imageOn = imageOn;
+    this.imageOff = imageOff;
+    shouldSwitched = true; 
+  }
+  
+  
+  public void setText(String sButtonText){ this.sButtonTextOff = sButtonText; }
   
   /**Show the button in an activated state. This method is called especially 
    * in its mouse press and release events. 
@@ -47,14 +74,11 @@ public abstract class GralButton extends GralWidget
 
   
   
+  /**Inner class to implement the mouse actions called from the gral implementing layer.
+   */
   private class MouseActionButton implements GralMouseWidgetAction_ifc
   {
     /**Constructor.
-     * @param guiMng The Gui-manager
-     * @param userCmdGui The users method for the action. 
-     * @param sCmdPress command string provided as first parameter on mouse button press.
-     * @param sCmdRelease
-     * @param sCmdDoubleClick
      */
     public MouseActionButton()
     { //super(this);
@@ -81,10 +105,12 @@ public abstract class GralButton extends GralWidget
     }
 
 
-    @Override
-    public void mouse1Up()
+    @Override public void mouse1Up()
     {
       setActivated(false);
+      if(shouldSwitched){
+        switchedOn = ! switchedOn;
+      }
     }
 
 

@@ -973,7 +973,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
 
   
   @Override public GralWidget addSwitchButton(
-  	String sName
+    String sName
   , GralUserAction action
   , String sCmd
   , String sShowMethod
@@ -981,8 +981,44 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   , String sButtonText
   , String sColor0
   , String sColor1
-  	//, int height, int width
-  	//, String sCmd, String sUserAction, String sName)
+    //, int height, int width
+    //, String sCmd, String sUserAction, String sName)
+  )
+  {
+    int ySize = (int)pos.height();
+    int xSize = (int)pos.width();
+    
+    char size = ySize > 3? 'B' : 'A';
+    if(sName == null){ sName = sButtonText; }
+    SwtButton widgButton = new SwtButton(sName, this, (Composite)pos.panel.panelComposite, 0, size);
+    GralColor colorOff = GralColor.getColor(sColor0);
+    GralColor colorOn = GralColor.getColor(sColor1);
+    widgButton.setSwitchMode(colorOff, colorOn);
+    widgButton.setActionChange(action);  //maybe null
+    widgButton.setText(sButtonText);
+    GralWidget widgetInfos = widgButton;
+    widgetInfos.setPanelMng(this);
+    widgetInfos.sCmd = sCmd;
+    widgetInfos.setShowMethod(sShowMethod);
+    widgetInfos.sDataPath = sDataPath;
+    pos.panel.widgetList.add(widgetInfos);
+    return widgetInfos;
+  }
+  
+
+  
+  
+  public GralWidget OldaddSwitchButton(
+    String sName
+  , GralUserAction action
+  , String sCmd
+  , String sShowMethod
+  , String sDataPath
+  , String sButtonText
+  , String sColor0
+  , String sColor1
+    //, int height, int width
+    //, String sCmd, String sUserAction, String sName)
   )
   {
     int ySize = (int)(pos.height());
@@ -1261,7 +1297,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
                   String sInfo = (String)info;
                   field.setText(sInfo); 
                   //shows the end of text because the position after last char is selected.
-                  field.setSelection(sInfo.length());  
+                  //field.setSelection(sInfo.length());  
                   break;
               default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %x on widget %s", cmd, descr.name);
               }
@@ -1523,6 +1559,12 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
 		return sValue;
 	}
 	
+	
+	
+	@Override public Color getColorImpl(GralColor colorGral)
+	{ return propertiesGuiSwt.colorSwt(colorGral);
+	}
+
 	
 	
 	/**This userAction can be used by name (calling {@link #addFocusAction(String, GralUserAction, String, String)} 

@@ -208,7 +208,13 @@ public class GralCfgBuilder
     } else { userAction = null; }
     //
     if(cfge.widgetType instanceof GralCfgData.GuiCfgButton){
-      widgd = gui.addButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd, null, cfge.widgetType.info, cfge.widgetType.text);
+      GralCfgData.GuiCfgButton wButton = (GralCfgData.GuiCfgButton) cfge.widgetType;
+      if(wButton.bSwitch){
+        widgd = gui.addSwitchButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd, null
+          , cfge.widgetType.info, cfge.widgetType.text, cfge.widgetType.color0.color, cfge.widgetType.color1.color);
+      } else {
+        widgd = gui.addButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd, null, cfge.widgetType.info, cfge.widgetType.text);
+      }
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgText){
       GralCfgData.GuiCfgText wText = (GralCfgData.GuiCfgText)cfge.widgetType;
       final int colorValue;

@@ -92,6 +92,14 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   
   public void set_Button(WidgetTypeBase data) {  }
   
+  public WidgetTypeBase new_SwitchButton()
+  { GuiCfgButton widgt = new GuiCfgButton(this, true);
+    this.widgetType = widgt;
+    return widgt;
+  }
+  
+  public void set_SwitchButton(WidgetTypeBase data) {  }
+  
   /**ZBNF: Led::= */
   public GuiCfgLed new_Led()
   { GuiCfgLed widgetType1 = new GuiCfgLed(this); 

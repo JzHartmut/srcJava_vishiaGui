@@ -90,7 +90,9 @@ public class SwtGralMouseListener
             GralRectangle rr = new GralRectangle(ev.x, ev.y, 0, 0);
             guiMng.releaseLeftMouseForDesign(widgd, rr, bCopy);  
           }
+          widgd.redraw();
         } catch(Exception exc){ guiMng.writeLog(0, exc); }
+        
       }
       
     }
@@ -197,14 +199,15 @@ public class SwtGralMouseListener
     
     @Override public void mouseUp(MouseEvent e) {
       //set the background color to the originally value again if it was changed.
+      super.mouseUp(e);
       if(isPressed){
         Control widget = (Control)e.widget;
         widget.removeMouseMoveListener(mouseMoveListener);
         isPressed = false;
         if(mouseWidgetAction !=null){
           switch(e.button){ 
-            case 1: mouseWidgetAction.mouse1Up();
-            case 2: mouseWidgetAction.mouse2Up();
+            case 1: mouseWidgetAction.mouse1Up(); break;
+            case 2: mouseWidgetAction.mouse2Up(); break;
           }  
         }
         backgroundWhilePressed = null;
@@ -223,6 +226,7 @@ public class SwtGralMouseListener
             action.userActionGui(keyCode, widgg);
           }
         } catch(Exception exc){ guiMng.writeLog(0, exc); }
+        widgg.redraw();
       }
     }
 
