@@ -230,8 +230,9 @@ public interface GralGridBuild_ifc
    * 
    *        
    * @param framePos The given frame.
-   * @param line The line
-   * @param lineEndOrSize
+   * @param line The line. Positive: from top, negative: from end. 
+   * @param lineEndOrSize The position of end of widget. negative or 0: from end. 0: the end position of Panel.
+   *   see {@link GralGridPos#same} etc.
    * @param column
    * @param columnEndOrSize
    */

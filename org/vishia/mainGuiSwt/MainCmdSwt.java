@@ -28,6 +28,7 @@
 package org.vishia.mainGuiSwt;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -248,14 +249,15 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
       //String[] sHelpText = new String[mainCmd.listHelpInfo.size()];
       if(infoHelp == null){
         GralGridMngBase gralMng = getGralMng();
-        gralMng.selectPanel(outputArea);
-        gralMng.setPosition(0,0,0,0,0,'.');
-        infoHelp = InfoBox.create(gralMng, "Help", "Help");
-        for(String line: mainCmd.listHelpInfo){
-          infoHelp.append(line);
-          //sHelpText[ix++] = line;
-        }
-        
+        try{
+          gralMng.selectPanel("output");
+          gralMng.setPosition(-40,0,0,0,0,'.');
+          infoHelp = InfoBox.create(gralMng, "Help", "Help");
+          for(String line: mainCmd.listHelpInfo){
+            infoHelp.append(line).append("\n");
+            //sHelpText[ix++] = line;
+          }
+        } catch(Exception exc){ gralMng.writeLog(0, exc); }
       }
       infoHelp.setWindowVisible(true);
 		}
@@ -274,15 +276,17 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 		@Override
 		public void widgetSelected(SelectionEvent e)
     {
-      if(infoAbout == null){
-        GralGridMngBase gralMng = getGralMng();
-        gralMng.selectPanel(outputArea);
-        gralMng.setPosition(-20,0,-40,0,0,'.');
-        infoAbout = InfoBox.create(getGralMng(), "about", "about");
-        for(String line: mainCmd.listAboutInfo){
-          infoAbout.append(line);
-          //sHelpText[ix++] = line;
-        }
+	    if(infoAbout == null){
+	      GralGridMngBase gralMng = getGralMng();
+	      try{
+	        gralMng.selectPanel("output");
+          gralMng.setPosition(-20,0,-40,0,0,'.');
+          infoAbout = InfoBox.create(getGralMng(), "about", "about");
+          for(String line: mainCmd.listAboutInfo){
+            infoAbout.append(line).append("\n");
+            //sHelpText[ix++] = line;
+          }
+        } catch(Exception exc){ gralMng.writeLog(0, exc); }
         
       }
       infoAbout.setWindowVisible(true);
@@ -747,7 +751,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
     //textAreaOutput.setSize(350,100); //swtWindow.graphicFrame.get)
     //textAreaOutput.setBounds(x, y, dx,dy);
     //((WidgetsSwt.TextBoxSwt)textAreaOutput).text.setFont(new Font(swtWindow.guiDevice, "Monospaced",11, SWT.NORMAL));
-    textPanel.append("output...\n");
+    try{ textPanel.append("output...\n"); } catch(IOException exc){}
     //textAreaOutputPane = new JScrollPane(textAreaOutput, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
     //pane.setSize(800,300);
     addFrameArea(xArea, yArea, dxArea, dyArea, textPanel);
@@ -869,14 +873,16 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   protected void writeDirectly(String sInfo, short kind)  //##a
   { if(textAreaOutput != null){
       if(Thread.currentThread().getId() == gralDevice.guiThreadId){
-	  	  if((kind & MainCmd.mNewln_writeInfoDirectly) != 0)
-	      { textAreaOutput.append("\n");
-	      }
-	      textAreaOutput.append(sInfo);
-	      int nrofLines = textAreaOutput.getNrofLines();
-	      textAreaOutput.viewTrail();
-	      //textAreaOutput.setCaretPosition(nrofLines-1);
-	      swtWindow.graphicFrame.update();
+	  	  try{
+          if((kind & MainCmd.mNewln_writeInfoDirectly) != 0)
+  	      { textAreaOutput.append("\n");
+  	      }
+  	      textAreaOutput.append(sInfo);
+  	      int nrofLines = textAreaOutput.getNrofLines();
+  	      textAreaOutput.viewTrail();
+  	      //textAreaOutput.setCaretPosition(nrofLines-1);
+  	      swtWindow.graphicFrame.update();
+	  	  } catch(IOException exc){ getGralMng().writeLog(0, exc); }
       } else {  
         //queue the text
       	outputTexts.add(sInfo);
@@ -896,9 +902,11 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   */
   protected void writeErrorDirectly(String sInfo, Exception exception)
   { if(textAreaOutput != null)
-    { textAreaOutput.append("\nEXCEPTION: " + sInfo + exception.getMessage());
-      textAreaOutput.viewTrail();
-      swtWindow.graphicFrame.update();  //update in TextBox...
+    { try{
+        textAreaOutput.append("\nEXCEPTION: " + sInfo + exception.getMessage());
+        textAreaOutput.viewTrail();
+        swtWindow.graphicFrame.update();  //update in TextBox...
+      }catch(IOException exc){ }
     }
     else mainCmd.writeErrorDirectly(sInfo, exception);     
   }

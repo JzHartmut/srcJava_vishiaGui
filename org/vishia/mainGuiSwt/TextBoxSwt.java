@@ -74,13 +74,6 @@ public class TextBoxSwt extends GralTextBox
     return this;
   }
 
-  @Override
-  public void append(String src)
-  {
-    textFieldSwt.append(src);
-    
-  }
-
   @Override public void setText(String arg)
   {
     if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){

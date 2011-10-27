@@ -7,7 +7,7 @@ public interface GralTextBox_ifc extends GralTextField_ifc, Appendable //WidgetG
 
   //void setText(String text);
   
-  void append(String text);
+  //void append(String text);
   
   int getNrofLines();
   

@@ -42,13 +42,6 @@ public class TextPanelSwt extends GralPanelContent implements GralTextBox_ifc, A
   }
 
   @Override
-  public void append(String text)
-  {
-    textAreaOutput.append(text);
-    
-  }
-
-  @Override
   public int getNrofLines()
   { return textAreaOutput.getNrofLines();
   }

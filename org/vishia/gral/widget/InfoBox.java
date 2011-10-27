@@ -24,11 +24,11 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   
   
   /**The widget which holds the text in the {@link #window}. */
-  private final GralWidget textBox;
+  private final GralTextBox textBox;
   
   private final GralWidget buttonOk;
   
-  public InfoBox(GralSubWindow window, GralWidget textBox, GralWidget buttonOk)
+  public InfoBox(GralSubWindow window, GralTextBox textBox, GralWidget buttonOk)
   {
     this.window = window;
     this.textBox = textBox;
@@ -38,9 +38,9 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   public static InfoBox create(GralGridBuild_ifc mng, String name, String title)
   {
     GralSubWindow window = mng.createWindow(title, false);
-    mng.setPosition(3, -3, 0, 0, 0, '.');
-    GralWidget text = mng.addText(name, 'C', 0);
-    mng.setPosition(-6, -3, -6, 0, 0, '.');
+    mng.setPosition(0, -4, 0, 0, 0, '.');
+    GralTextBox text = mng.addTextBox(name, false, null, '.');
+    mng.setPosition(-4, -1, -6, 0, 0, '.');
     GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "", null, null, "OK");
     InfoBox box = new InfoBox(window, text, buttonOk);
     box.buttonOk.setActionChange(box.actionOk);
@@ -48,12 +48,7 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
 
   }
   
-  @Override
-  public void append(String text)
-  {
-    // TODO Auto-generated method stub
-    
-  }
+  @Override public Appendable append(CharSequence text) throws IOException{ return textBox.append(text); }
 
   @Override
   public int getNrofLines()
@@ -129,13 +124,6 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
     window.setWindowVisible(visible);
     // TODO Auto-generated method stub
     
-  }
-
-  @Override
-  public Appendable append(CharSequence arg0) throws IOException
-  {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   @Override
