@@ -73,7 +73,7 @@ public class ValueBarSwt extends ValueBar implements GralSetValue_ifc, GralWidge
 	{
 		BarWidget()
 		{
-			super((Composite)mng.pos.panel.panelComposite, 0);  //Canvas
+			super(((PanelSwt)mng.pos.panel).getPanelImpl(), 0);  //Canvas
 			addPaintListener(paintListener);	
 			
 		}

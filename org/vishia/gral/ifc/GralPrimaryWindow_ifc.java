@@ -13,7 +13,7 @@ import org.vishia.mainCmd.MainCmd_ifc;
 public interface GralPrimaryWindow_ifc extends GralWindow_ifc, GralWindowMng_ifc
 {
   /**Sets the title and the pixel size for the whole window. */
-  void buildMainWindow(String sTitle, int left, int top, int xSize, int ySize);
+  //void buildMainWindow(String sTitle, int left, int top, int xSize, int ySize);
   
   
   /**Activates the menu bar with the standard entries, especially the file open entry.

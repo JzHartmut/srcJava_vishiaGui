@@ -61,7 +61,7 @@ public interface GralWindowMng_ifc
    * to force garbage collection for the orders.
    * @param order
    */
-  public void addGuiBuildOrder(Runnable order);
+  //public void addGuiBuildOrder(Runnable order);
 
   
   /**Adds a listener, which will be called in the dispatch loop.

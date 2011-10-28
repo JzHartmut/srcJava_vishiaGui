@@ -142,7 +142,7 @@ public class TableSwt extends GralTable
     
     boolean TEST = false;
     final TableSwt table;
-    Composite parent = (Composite)mng.pos.panel.panelComposite;
+    Composite parent = ((PanelSwt)mng.pos.panel).getPanelImpl();
     table = new TableSwt(mng, sName, parent, height, columnWidths); //, selectionColumn, selectionText);
     //GralWidget widgd = new GralWidget(sName, table, 'L', sName, null);
     table.setContentInfo(sName);

@@ -12,7 +12,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.byteData.VariableContainer_ifc;
-import org.vishia.gral.base.GralPrimaryWindow;
+import org.vishia.gral.base.GralWindowMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.base.GralTabbedPanel;
@@ -145,7 +145,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   /**Base class for managing all panels and related windows.
    * This base class contains all common resources to manage panels and windows.
    */
-  public GralPrimaryWindow gralDevice;
+  public GralWindowMng gralDevice;
 
   /**Properties of this Dialog Window. */
   public  final GralGridProperties propertiesGui;
@@ -327,7 +327,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
 	}
 
 
-  public void setGralDevice(GralPrimaryWindow device)
+  public void setGralDevice(GralWindowMng device)
   {
     this.gralDevice = device;
   }

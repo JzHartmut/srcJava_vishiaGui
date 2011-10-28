@@ -5,7 +5,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralPrimaryWindow;
+import org.vishia.gral.base.GralWindowMng;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
@@ -18,7 +18,7 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
 {
   public final MainCmd mainCmd;
   
-  protected GralPrimaryWindow gralDevice;
+  protected GralWindowMng gralDevice;
   
   /**Area settings for output. */
   protected String outputArea;
@@ -54,7 +54,7 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
 
   private GuiMainAreaBase(MainCmd mainCmd){ this.mainCmd = mainCmd; }
 
-  public GuiMainAreaBase(MainCmd mainCmd, GralPrimaryWindow guiDevice)
+  public GuiMainAreaBase(MainCmd mainCmd, GralWindowMng guiDevice)
   {
     super();
     this.mainCmd = mainCmd;

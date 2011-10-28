@@ -22,7 +22,7 @@ public abstract class GralPanelContent implements GralWidget_ifc
    *   (Swing:  Device guiDevice, SWT: Composite based on Control);
    * Note: can't be final because it may be unknown on calling constructor  
    */
-  public Object panelComposite; 
+  protected Object panelComposite; 
   
   /**A possible tab in a TabFolder. Especially for SWT.   
    * Note: can't be final because it may be unknown on calling constructor  
@@ -94,7 +94,12 @@ public abstract class GralPanelContent implements GralWidget_ifc
   { return panelComposite;
   }
 	
-	
+
+  /**Returns the container instance of the panel of the implementing graphic.
+   * @return The container.
+   */
+  public abstract Object getPanelImpl();
+  
   @Override public String toString(){ return "GralPanel:" + namePanel; }
   
 }

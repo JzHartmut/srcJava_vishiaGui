@@ -1,6 +1,7 @@
 package org.vishia.mainGuiSwt;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralSubWindow;
@@ -29,9 +30,7 @@ public class SubWindowSwt extends GralSubWindow
   
   //@Override
   public boolean setFocus()
-  {
-    // TODO Auto-generated method stub
-    return false;
+  { return window.setFocus();
   }
 
   @Override public boolean isWindowsVisible(){ return window.isVisible(); }
@@ -68,5 +67,6 @@ public class SubWindowSwt extends GralSubWindow
     window = null;
   }
 
+  @Override public Composite getPanelImpl() { return window; }
 
 }

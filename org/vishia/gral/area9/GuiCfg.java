@@ -177,8 +177,6 @@ public GuiCfg(GuiCallingArgs cargs, GuiMainCmd cmdGui, GralPlugUser2Gral_ifc plu
   panelMng = cmdGui.gralMng; //cargs.graphicFactory.createPanelMng(null, 120,80, propertiesGui, null, log);
   panelBuildIfc = panelMng;
   guiAccess = panelMng;
-  GralPanelContent outputPanel = cmdGui.gui.getOutputPanel();
-  panelMng.registerPanel(outputPanel);
   //panelContent = new PanelContent(user);
   if(user !=null){
     user.registerMethods(panelBuildIfc);

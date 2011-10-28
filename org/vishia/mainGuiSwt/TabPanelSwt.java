@@ -56,6 +56,7 @@ public class TabPanelSwt extends GralTabbedPanel
 
     @Override public void redraw(){  widgetSwt.redraw(); widgetSwt.update(); }
 
+    @Override public Composite getPanelImpl() { return widgetSwt; }
 
     
   }
@@ -67,7 +68,7 @@ public class TabPanelSwt extends GralTabbedPanel
 	TabPanelSwt(String namePanel, GuiPanelMngSwt mng, GralPanelActivated_ifc user, int property)
 	{ super(user, property);
 		this.mng = mng;
-		Object oParent = mng.pos.panel.panelComposite;
+		Object oParent = mng.pos.panel.getPanelImpl();
 		if(oParent == null || !(oParent instanceof Composite) ){ throw new IllegalArgumentException("Software error. You must select a panel before."); }
 		Composite parent = (Composite)oParent;
 		tabMng = new TabFolder_(namePanel, parent, SWT.TOP, null);

@@ -3,7 +3,7 @@ package org.vishia.gral.swt;
 import org.eclipse.swt.widgets.Composite;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.area9.GuiMainAreaifc;
-import org.vishia.gral.base.GralPrimaryWindow;
+import org.vishia.gral.base.GralWindowMng;
 import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.gridPanel.GralGridProperties;
 import org.vishia.gral.ifc.GralFactory_ifc;
@@ -21,15 +21,15 @@ public class FactorySwt implements GralFactory_ifc
   
   /**One instance per factory class for possible more as one windows.
    */
-  GralPrimaryWindow gralDevice;
+  GralWindowMng gralDevice;
   
   //PropertiesGuiSwt propertiesGui;
 
-  @Override public GuiMainAreaifc createGuiWindow(MainCmd cmdP)
+  @Override public GuiMainAreaifc createGuiWindow(MainCmd cmdP, String sTitle, int left, int top, int xSize, int ySize, String sOutputArea)
   {
-    GralPrimaryWindow swtWindow = PrimaryWindowSwt.create(cmdP.getLogMessageOutputConsole());
+    GralWindowMng swtWindow = PrimaryWindowSwt.create(cmdP.getLogMessageOutputConsole(), sTitle, left, top, xSize, ySize);
 
-    gui = new MainCmdSwt(cmdP, swtWindow);
+    gui = new MainCmdSwt(cmdP, swtWindow, sOutputArea);
     gralDevice = gui.getPrimaryWindow();
     if(gralDevice ==null){
       //gralDevice = new GralDeviceSwt();

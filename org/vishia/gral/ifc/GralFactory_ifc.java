@@ -15,7 +15,7 @@ import org.vishia.msgDispatch.LogMessage;
 public interface GralFactory_ifc
 {
 
-  GuiMainAreaifc createGuiWindow(MainCmd cmdP);
+  GuiMainAreaifc createGuiWindow(MainCmd cmdP, String sTitle, int left, int top, int xSize, int ySize, String sOutputArea);
   
   GralGridProperties createProperties(char sizePixel);
   

@@ -65,7 +65,7 @@ import org.eclipse.swt.widgets.Widget;
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
-import org.vishia.gral.base.GralPrimaryWindow;
+import org.vishia.gral.base.GralWindowMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.base.GralTabbedPanel;
@@ -344,7 +344,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   @Override public GralPanelContent createCompositeBox(String name)
   {
     //Composite box = new Composite(graphicFrame, 0);
-    Composite box = new Composite((Composite)pos.panel.panelComposite, 0);
+    Composite box = new Composite(((PanelSwt)pos.panel).getPanelImpl(), 0);
     setPosAndSize_(box);
     Point size = box.getSize();
     GralPanelContent panel = new PanelSwt(name, box);
@@ -357,7 +357,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   @Override public GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG, int xS, int yS)
   {
     Color backColorSwt = propertiesGuiSwt.colorSwt(backGround);
-    Composite panelSwt = (Composite)pos.panel.panelComposite;  
+    Composite panelSwt = ((PanelSwt)pos.panel).getPanelImpl();  
     GridPanelSwt panel = new GridPanelSwt(namePanel, panelSwt, 0, backColorSwt, xG, yG, xS, yS, this);
     registerPanel(panel);
 
@@ -367,7 +367,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   
   
   @Override public boolean remove(GralPanelContent compositeBox)
-  { Composite panelSwt = (Composite)compositeBox.panelComposite;
+  { Composite panelSwt = ((PanelSwt)compositeBox).getPanelImpl();
     panelSwt.dispose();
     return true;
   }
@@ -383,7 +383,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   
   public GralSubWindow createWindow(String title, boolean exclusive)
   {
-    Composite panelSwt = (Composite)gralDevice.panelComposite;  
+    Shell panelSwt = ((PrimaryWindowSwt)gralDevice).getitsGraphicFrame(); //  (Composite)gralDevice.panelComposite;  
     SubWindowSwt window = new SubWindowSwt(panelSwt.getDisplay(), title, exclusive, this);
     window.posWindow = getPositionInPanel();
     GralRectangle rect = calcPositionOfWindow(window.posWindow);
@@ -418,7 +418,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   
   GralRectangle calcPositionOfWindow(GralGridPos posWindow)
   {
-    Control panel = (Control) pos.panel.panelComposite;
+    Control panel = ((PanelSwt)pos.panel).getPanelImpl();
     Point loc;
     Rectangle rectParent  = panel.getBounds();
     loc = panel.getLocation();
@@ -473,12 +473,12 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   	  //Note: because the pos.panel is null, not placement will be done.
   	} else {
   		
-  		Control parent = (Control)pos.panel.panelComposite;
+  		Control parent = (Composite)pos.panel.getPanelImpl();
   		while(!(parent instanceof Shell))
   		{ //Rectangle bounds = parent.getBounds();
   			parent = parent.getParent();
   		}  
-  		//pos.panelPos = ((Control)pos.panel.panelComposite).getBounds();
+  		//pos.panelPos = (((PanelSwt)pos.panel).getPanelImpl()).getBounds();
   		
   	}
   }
@@ -535,7 +535,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   
   @Override public GralWidget addText(String sText, char size, int color)
   {
-    Label widget = new Label((Composite)pos.panel.panelComposite, 0);
+    Label widget = new Label(((PanelSwt)pos.panel).getPanelImpl(), 0);
     widget.setForeground(propertiesGuiSwt.colorSwt(color));
     widget.setBackground(propertiesGuiSwt.colorBackground);
     widget.setText(sText);
@@ -575,7 +575,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     case 9: mode = SWT.RIGHT; break;
     default: mode = 0;
     }
-    Label widget = new Label((Composite)pos.panel.panelComposite, mode);
+    Label widget = new Label(((PanelSwt)pos.panel).getPanelImpl(), mode);
     widget.setForeground(propertiesGuiSwt.colorSwt(textColor));
     widget.setBackground(propertiesGuiSwt.colorSwt(backColor));
     widget.setText(sText);
@@ -646,7 +646,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    * @return
    */
   @Override public GralTextField addTextField(String name, boolean editable, String prompt, char promptStylePosition)
-  { Text widgetSwt = new Text((Composite)pos.panel.panelComposite, SWT.SINGLE);
+  { Text widgetSwt = new Text((Composite)pos.panel.getPanelImpl(), SWT.SINGLE);
     GralTextField widgetInfo = new SwtTextFieldWrapper(name, widgetSwt, editable ? 'T' : 'S', this);
     widgetInfo.setPanelMng(this);
     widgetSwt.setFont(propertiesGuiSwt.stdInputFont);
@@ -688,7 +688,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
       promptFont = propertiesGuiSwt.smallPromptFont;
       boundsPrompt = calcWidgetPosAndSize(posPrompt, boundsAll.dx, boundsAll.dy, 10,100);
       boundsField = calcWidgetPosAndSize(posField, boundsAll.dx, boundsAll.dy, 10,100);
-      Label wgPrompt = new Label((Composite)pos.panel.panelComposite, 0);
+      Label wgPrompt = new Label((Composite)pos.panel.getPanelImpl(), 0);
       wgPrompt.setFont(promptFont);
       wgPrompt.setText(prompt);
       Point promptSize = wgPrompt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
@@ -734,10 +734,10 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
  * @return
  */
 @Override public GralTextBox addTextBox(String name, boolean editable, String prompt, char promptStylePosition)
-{ TextBoxSwt widgetSwt = new TextBoxSwt(name, (Composite)pos.panel.panelComposite, SWT.MULTI, this);
+{ TextBoxSwt widgetSwt = new TextBoxSwt(name, ((PanelSwt)pos.panel).getPanelImpl(), SWT.MULTI, this);
   GralWidget widgetInfo = widgetSwt;
   widgetInfo.setPanelMng(this);
-  //Text widgetSwt = new Text((Composite)pos.panel.panelComposite, SWT.MULTI);
+  //Text widgetSwt = new Text(((PanelSwt)pos.panel).getPanelImpl(), SWT.MULTI);
   widgetSwt.textFieldSwt.setFont(propertiesGuiSwt.stdInputFont);
   widgetSwt.textFieldSwt.setEditable(editable);
   if(editable)
@@ -770,7 +770,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
       boundsField.y += (boundsField.height - yPixelField );
       boundsField.height = yPixelField;
     }
-    Label wgPrompt = new Label((Composite)pos.panel.panelComposite, 0);
+    Label wgPrompt = new Label(((PanelSwt)pos.panel).getPanelImpl(), 0);
     wgPrompt.setFont(promptFont);
     wgPrompt.setText(prompt);
     Point promptSize = wgPrompt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
@@ -813,7 +813,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    * @param ye end of line relative to current position in grid units.
    */
   public void addLine(int colorValue, float xa, float ya, float xe, float ye){
-  	if(pos.panel.panelComposite instanceof CanvasStorePanelSwt){
+  	if(pos.panel.getPanelImpl() instanceof CanvasStorePanelSwt){
   		GralColor color = propertiesGui.color(colorValue);
   		int xgrid = propertiesGui.xPixelUnit();
   		int ygrid = propertiesGui.yPixelUnit();
@@ -823,7 +823,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   		int y2 = (int)((pos.y - ye) * ygrid);
   		//Any panel which is created in the SWT-implementation is a CanvasStorePanel.
   		//This is because lines should be drawn.
-  		((CanvasStorePanelSwt) pos.panel.panelComposite).store.drawLine(color, x1, y1, x2, y2);
+  		((CanvasStorePanelSwt) pos.panel.getPanelImpl()).store.drawLine(color, x1, y1, x2, y2);
   		//furtherSetPosition((int)(xe + 0.99F), (int)(ye + 0.99F));
   	} else {
   		log.sendMsg(0, "GuiPanelMng:addLine: panel is not a CanvasStorePanel");
@@ -841,7 +841,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   {
     ImageData imageData = new ImageData(imageStream);
     byte[] data = imageData.data;
-    Image image = new Image(((Composite)pos.panel.panelComposite).getDisplay(), imageData); 
+    Image image = new Image((((PanelSwt)pos.panel).getPanelImpl()).getDisplay(), imageData); 
     GralImageBase imageGui = new GuiImageSwt(image);
     GralRectangle size = imageGui.getPixelSize();
     GralRectangle rr = calcWidgetPosAndSize(pos, 0, 0, size.dx, size.dy);
@@ -860,8 +860,8 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   {
     ImageData imageData = new ImageData(imageStream);
     byte[] data = imageData.data;
-    Label widget = new Label((Composite)pos.panel.panelComposite, 0);
-    Image image = new Image(((Composite)pos.panel.panelComposite).getDisplay(), imageData); 
+    Label widget = new Label(((PanelSwt)pos.panel).getPanelImpl(), 0);
+    Image image = new Image((((PanelSwt)pos.panel).getPanelImpl()).getDisplay(), imageData); 
     widget.setImage(image);
     widget.setSize(propertiesGui.xPixelUnit() * width, propertiesGui.yPixelUnit() * height);
     setBounds_(widget);
@@ -906,7 +906,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   , String sDataPath
   )
   {
-  	Slider control = new Slider((Composite)this.pos.panel.panelComposite, SWT.VERTICAL);
+  	Slider control = new Slider(((PanelSwt)pos.panel).getPanelImpl(), SWT.VERTICAL);
   	control.setBackground(propertiesGuiSwt.colorBackground);
   	setPosAndSize_(control);
    	GralWidget widgetInfos = new WidgetSimpleWrapperSwt(sName, 'V', control, this);
@@ -941,7 +941,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     
     char size = ySize > 3? 'B' : 'A';
     if(sName == null){ sName = sButtonText; }
-    SwtButton widgButton = new SwtButton(sName, this, (Composite)pos.panel.panelComposite, 0, size);
+    SwtButton widgButton = new SwtButton(sName, this, (Composite)pos.panel.getPanelImpl(), 0, size);
     if(action !=null)
       stop();
     widgButton.setActionChange(action);  //maybe null
@@ -991,7 +991,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     
     char size = ySize > 3? 'B' : 'A';
     if(sName == null){ sName = sButtonText; }
-    SwtButton widgButton = new SwtButton(sName, this, (Composite)pos.panel.panelComposite, 0, size);
+    SwtButton widgButton = new SwtButton(sName, this, ((PanelSwt)pos.panel).getPanelImpl(), 0, size);
     GralColor colorOff = GralColor.getColor(sColor0);
     GralColor colorOn = GralColor.getColor(sColor1);
     widgButton.setSwitchMode(colorOff, colorOn);
@@ -1042,7 +1042,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     int xSize = (int)(pos.width());
     int dxWidget = xSize * propertiesGui.xPixelUnit();
 		int dyWidget = ySize * propertiesGui.yPixelUnit();
-		CurveView curveView = new CurveView((Composite)pos.panel.panelComposite, dxWidget, dyWidget, nrofXvalues, nrofTracks);
+		CurveView curveView = new CurveView(((PanelSwt)pos.panel).getPanelImpl(), dxWidget, dyWidget, nrofXvalues, nrofTracks);
 		testHelp.curveView = curveView; //store to inspect.
 		curveView.setSize(dxWidget, dyWidget);
 		setBounds_(curveView); //, dyGrid, dxGrid);
@@ -1172,11 +1172,9 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     	switch(cmd){
     	case GralPanelMngWorking_ifc.cmdInsert: checkAdmissibility(visibleInfo != null && visibleInfo instanceof String); break;
     	}
-      gralDevice.guiChangeRequests.add(new GralWidgetChangeRequ(descr, cmd, ident, visibleInfo, userData));
-  	  synchronized(gralDevice.guiChangeRequests){ gralDevice.guiChangeRequests.notify(); }  //to wake up waiting on guiChangeRequests.
-  	  Composite panelSwt = (Composite)gralDevice.panelComposite;  
-  	  panelSwt.getDisplay().wake(); //wake-up the GUI-thread, it may sleep elsewhere.
-  	  //((Composite)pos.panel.panelComposite).getDisplay().wake();  //wake-up the GUI-thread, it may sleep elsewhere. 
+      gralDevice.graphicThread.guiChangeRequests.add(new GralWidgetChangeRequ(descr, cmd, ident, visibleInfo, userData));
+  	  synchronized(gralDevice.graphicThread.guiChangeRequests){ gralDevice.graphicThread.guiChangeRequests.notify(); }  //to wake up waiting on guiChangeRequests.
+  	  gralDevice.wakeup();
     }
   	return "";
   }
@@ -1280,7 +1278,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   
   @Override public GralFileDialog_ifc createFileDialog()
   {
-    Composite panelSwt = (Composite)pos.panel.panelComposite; //cast admissible, it should be SWT
+    Composite panelSwt = ((PanelSwt)pos.panel).getPanelImpl(); //cast admissible, it should be SWT
     while(!(panelSwt instanceof Shell)){
       panelSwt = panelSwt.getParent();
     }
@@ -1313,7 +1311,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   	    bDesignerIsInitialized = true;
   	  }
   	  GralWidgetChangeRequ changeReq;
-  	  while( (changeReq = gralDevice.guiChangeRequests.poll()) != null){
+  	  while( (changeReq = gralDevice.graphicThread.guiChangeRequests.poll()) != null){
   	  	GralWidget descr = changeReq.widgetDescr;
   	  	setInfoDirect(descr, changeReq.cmd, changeReq.ident, changeReq.visibleInfo, changeReq.userData);
 
@@ -1385,8 +1383,8 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sName);
   	} else if((descr.getGraphicWidgetWrapper() instanceof CurveView)) {
   		//sends a redraw information.
-  	  gralDevice.guiChangeRequests.add(new GralWidgetChangeRequ(descr, GralPanelMngWorking_ifc.cmdRedrawPart, 0, null, null));
-  		((Composite)pos.panel.panelComposite).getDisplay().wake();  //wake-up the GUI-thread, it may sleep elsewhere. 
+  	  gralDevice.graphicThread.guiChangeRequests.add(new GralWidgetChangeRequ(descr, GralPanelMngWorking_ifc.cmdRedrawPart, 0, null, null));
+  		(((PanelSwt)pos.panel).getPanelImpl()).getDisplay().wake();  //wake-up the GUI-thread, it may sleep elsewhere. 
   	} else {
   	}
 	}

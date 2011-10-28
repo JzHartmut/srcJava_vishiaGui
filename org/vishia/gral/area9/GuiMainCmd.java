@@ -34,11 +34,13 @@ public class GuiMainCmd extends MainCmd
   public GuiMainCmd(GuiCallingArgs cargs, String[] args, String sTitle, String sOutputArea)
   { 
     super(args);
+    super.addAboutInfo(sTitle);
+    super.addAboutInfo("made by HSchorrig, 2010-06-07, 2011-08-07");
     this.cargs = cargs;
     cargs.graphicFactory = new FactorySwt(); 
     if(sOutputArea == null){ sOutputArea = "A3C3"; }
     
-    gui = cargs.graphicFactory.createGuiWindow((MainCmd)this);
+    gui = cargs.graphicFactory.createGuiWindow((MainCmd)this, sTitle, 50,50,800, 600, sOutputArea);
     gralMng = gui.getGralMng();
     /*
     GralGridProperties propertiesGui = cargs.graphicFactory.createProperties('C');
@@ -46,12 +48,10 @@ public class GuiMainCmd extends MainCmd
     gralMng = cargs.graphicFactory.createPanelMng(null, 120,80, propertiesGui, null, log);
     */
     
-    super.addAboutInfo(sTitle);
-    super.addAboutInfo("made by HSchorrig, 2010-06-07, 2011-08-07");
     //super.addStandardHelpInfo();
-    gui.setOutputArea(sOutputArea);        //whole area from mid to bottom
+    //gui.setOutputArea(sOutputArea);        //whole area from mid to bottom
     
-    gui.buildMainWindow(sTitle, 50,50,800, 600); //600);  //This instruction should be written first to output syntax errors.
+    //gui.buildMainWindow(sTitle, 50,50,800, 600); //600);  //This instruction should be written first to output syntax errors.
   }
 
 

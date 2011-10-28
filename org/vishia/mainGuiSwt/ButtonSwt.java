@@ -36,7 +36,7 @@ public class ButtonSwt extends Canvas
 	 */
 	public ButtonSwt(GuiPanelMngSwt mng, GralWidget widgd, char size)
 	{
-		super((Composite)mng.pos.panel.panelComposite, 0);
+		super(((PanelSwt)mng.pos.panel).getPanelImpl(), 0);
 		this.widgd = widgd;
 		//super((Composite)mng.pos.panel.panelComposite, 0);  //Canvas
 		switch(size){ 

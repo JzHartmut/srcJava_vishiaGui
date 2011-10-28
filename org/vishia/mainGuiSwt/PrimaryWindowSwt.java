@@ -14,13 +14,15 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.vishia.gral.base.GralPrimaryWindow;
+import org.vishia.gral.base.GralGraphicThread;
+import org.vishia.gral.base.GralWindowMng;
 import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
@@ -30,17 +32,21 @@ import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.MinMaxTime;
 
-public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_ifc
+public class PrimaryWindowSwt extends GralWindowMng implements GralWindow_ifc
 {
-  protected final Display displaySwt; 
+  //protected final Display displaySwt; 
 
   /** The frame of the Window in the GUI (Graphical Unit Interface)*/
-  protected Shell graphicFrame;
+  //protected Shell graphicFrame;
 
   /**The file menuBar is extendable. */
   private Menu menuBar;
   
-
+  /**It is the same instance as {@link GralWindowMng#graphicThread} but refer the SWT type.
+   * 
+   */
+  final SwtGraphicThread graphicThreadSwt;
+  
   private static class MenuEntry
   {
     String name;
@@ -50,40 +56,38 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
   }
   
   
-  /**Class to instantiate in the static routine {@link #create(LogMessage)}
-   * which contains the inital run method to build the gui device.
-   */
-  private static class Init implements Runnable
-  {
-    Display displaySwt;
-    
-    @Override public void run(){
-      displaySwt = new Display();
-    }
-    
-  }
   
   Map<String, MenuEntry> menus = new TreeMap<String, MenuEntry>();
   
   
 
   
-  private PrimaryWindowSwt(GralGridMngBase gralMng, Thread graphicThread, Display displaySwt)
+  private PrimaryWindowSwt(GralGridMngBase gralMng, SwtGraphicThread graphicThread, Display displaySwt)
   { super(gralMng, graphicThread);
-    this.displaySwt = displaySwt; 
+    this.graphicThreadSwt = graphicThread;  //refers SWT type
   }  
   
   
-  public static PrimaryWindowSwt create(LogMessage log)
-  { Init init = new Init();
-    GuiThread graphicThread = startGraphicThread(init);  
+  public static PrimaryWindowSwt create(LogMessage log, String sTitle, int left, int top, int xSize, int ySize)
+  { SwtGraphicThread init = new SwtGraphicThread(sTitle, left, top, xSize, ySize);
+    //GuiThread graphicThread = startGraphicThread(init);  
 
+    synchronized(init){
+      while(init.guiThreadId == 0){
+        try{ init.wait(1000);} catch(InterruptedException exc){}
+      }
+    }
+    //The propertiesGuiSwt needs the Display instance for Font and Color. Therefore the graphic thread with creation of Display should be executed before. 
     PropertiesGuiSwt propertiesGui = new PropertiesGuiSwt(init.displaySwt, 'C');
     GralGridMngBase gralMng = new GuiPanelMngSwt(propertiesGui, null, log);
     
-
-    PrimaryWindowSwt instance = new PrimaryWindowSwt(gralMng, graphicThread.getThread(), init.displaySwt);
-    graphicThread.setWindow(instance);  //now the initializing of the window occurs.
+    //The PrimaryWindowSwt is a derivation of the GralPrimaryWindow. It is more as only a SWT Shell.
+    PrimaryWindowSwt instance = new PrimaryWindowSwt(gralMng, init, init.displaySwt);
+    instance.panelComposite = init; //window.sTitle, window.xPos, window.yPos, window.xSize, window.ySize);
+    gralMng.setGralDevice(instance);
+    gralMng.registerPanel(instance);
+    
+    //init.setWindow(instance);  //now the initializing of the window occurs.
     return instance;
   }
   
@@ -91,9 +95,9 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
 
   
   
-  
+  /*
   @Override protected Object initGraphic() //String sTitle, int left, int top, int xSize, int ySize)
-  {
+  { ///
     guiThreadId = Thread.currentThread().getId(); ///
     displaySwt.addFilter(SWT.Close, windowsCloseListener);
     graphicFrame = new Shell(displaySwt); //, SWT.ON_TOP | SWT.MAX | SWT.TITLE);
@@ -121,14 +125,13 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
     return graphicFrame;
     
   }
-
+  */
   
   
   /**Sets the title and size before initialization.
    * @param sTitle
    * @param xSize
    * @param ySize
-   */
   @Override public void buildMainWindow(String sTitle, int left, int top, int xSize, int ySize)
   { this.xSize = xSize;
     this.ySize = ySize;
@@ -156,47 +159,7 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
       }
     }    
   }
-  
-
-  
-  /**Adds a order for building the gui. The order will be execute one time after intializing the Graphic
-   * and before entry in the dispatch loop. After usage the orders will be removed,
-   * to force garbage collection for the orders.
-   * @param order
    */
-  public void addGuiBuildOrder(Runnable order)
-  { buildOrders.add(order);
-  }
-  
-  /**Removes a listener, which was called in the dispatch loop.
-   * @param listener
-   */
-  public void removeDispatchListener(GralDispatchCallbackWorker listener)
-  { dispatchListeners.remove(listener);
-  }
-  
-  
-
-  
-  
-  /**Adds a listener, which will be called in the dispatch loop.
-   * @param listener
-   */
-  public void addDispatchListener(GralDispatchCallbackWorker listener)
-  { dispatchListeners.add(listener);
-    //it is possible that the GUI is busy with dispatching and doesn't sleep yet.
-    //therefore:
-    extEventSet.getAndSet(true);
-    if(displaySwt !=null){
-      displaySwt.wake();  //to wake up the GUI-thread, to run the listener at least one time.
-    }
-  }
-  
-  
-  void processBuildOrders()
-  {
-  }
-  
   
   
   private static class CntSleep
@@ -211,78 +174,28 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
   private CntSleep cntSleep;
   
   
-  MinMaxTime checkTimes = new MinMaxTime();
   
-  
-  public void wakeup(){
-    displaySwt.wake();
-    extEventSet.set(true);
-    isWakedUpOnly = true;
-  }
-  
-  public boolean isWakedUpOnly(){ return isWakedUpOnly; }
-  
-  
-  @Override protected void dispatch()
-  {
-    checkTimes.init();
-    checkTimes.adjust();
-    checkTimes.cyclTime();
-    while (! (bExit = graphicFrame.isDisposed ())) {
-      while (displaySwt.readAndDispatch ()){
-        //isWakedUpOnly = false;  //after 1 event, it may be wakeUp, set if false.
-      }
-      checkTimes.calcTime();
-      isWakedUpOnly = false;
-      //System.out.println("dispatched");
-      if(!extEventSet.get()) {
-        displaySwt.sleep ();
-      }
-      if(!bExit){
-        extEventSet.set(false); //the list will be tested!
-        if(isWakedUpOnly)
-          stop();
-        //it may be waked up by the operation system or by calling Display.wake().
-        //if wakeUp() is called, isWakedUpOnly is set.
-        checkTimes.cyclTime();
-        for(GralDispatchCallbackWorker listener: dispatchListeners){
-          //use isWakedUpOnly for run as parameter?
-          ///System.out.println("BeforeDispatch");
-          listener.doBeforeDispatching(isWakedUpOnly);  
-          ///System.out.println("BeforeDispatch-ready");
-        }
-      } 
-    }
-    displaySwt.dispose ();
-    bExit = true;
-  }
-  
+  //public boolean isWakedUpOnly(){ return graphicThread.isWakedUpOnly; }
   
   public void terminate()
   {
-    if(!bExit && !displaySwt.isDisposed()){ 
-      displaySwt.dispose();
+    if(!graphicThread.bExit && !graphicThreadSwt.displaySwt.isDisposed()){ 
+      graphicThreadSwt.displaySwt.dispose();
     }  
 
   }
   
-  
-  public boolean isStarted(){ return bStarted; }
-  
-  public boolean isRunning(){ return bStarted && !bExit; }
-  
-  public boolean isTerminated(){ return bStarted && bExit; }
-
   @Override public boolean isWindowsVisible()
-  { return graphicFrame.isVisible();
+  { return graphicThreadSwt.windowSwt.isVisible();
   }
 
 
   @Override
   public void setWindowVisible(boolean visible)
   {
-    graphicFrame.setVisible(visible);
+    graphicThreadSwt.windowSwt.setVisible(visible);
   }
+  
   
   
   
@@ -309,74 +222,6 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
   
 
   
-  /**The windows-closing event handler. It is used private only, but public set because documentation. */
-  public final class WindowsCloseListener implements Listener{
-    /**Invoked when the window is closed; it sets {@link #bExit}, able to get with {@link #isRunning()}.
-     * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
-     */
-    @Override public void handleEvent(Event event) {
-      bExit = true;
-    }
-  }
-
-  /**Instance of windowsCloseHandler. */
-  private final WindowsCloseListener windowsCloseListener = new WindowsCloseListener(); 
-  
-  
-  KeyListener keyListener = new KeyListener()
-  {
-    @Override public void keyPressed(KeyEvent key)
-    {
-      // TODO Auto-generated method stub
-      stop();
-    }
-
-    @Override public void keyReleased(KeyEvent e)
-    {
-      // TODO Auto-generated method stub
-      
-    }
-    
-  };
-  
-  
-  ShellListener mainComponentListerner = new ShellListener()
-  {
-
-        
-    @Override
-    public void shellActivated(ShellEvent e) {
-      // TODO Auto-generated method stub
-      
-    }
-
-    @Override
-    public void shellClosed(ShellEvent e) {
-      // TODO Auto-generated method stub
-      
-    }
-
-    @Override
-    public void shellDeactivated(ShellEvent e) {
-      // TODO Auto-generated method stub
-      
-    }
-
-    @Override
-    public void shellDeiconified(ShellEvent e) {
-      // TODO Auto-generated method stub
-      
-    }
-
-    @Override
-    public void shellIconified(ShellEvent e) {
-      // TODO Auto-generated method stub
-      
-    }
-    
-  };
-  
-  
   void stop()
   { //to set breakpoint
   }
@@ -397,8 +242,8 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
   {
     String[] names = namePath.split("/");
     if(menuBar == null){
-      menuBar = new Menu(graphicFrame, SWT.BAR);
-      graphicFrame.setMenuBar(menuBar);
+      menuBar = new Menu(graphicThreadSwt.windowSwt, SWT.BAR);
+      graphicThreadSwt.windowSwt.setMenuBar(menuBar);
     }
     Menu parentMenu = menuBar;
     Map<String, MenuEntry> menustore = menus;
@@ -424,7 +269,7 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
         if(cAccelerator !=0){
           item.setAccelerator(SWT.CONTROL | cAccelerator);
         }
-        menuEntry.menu = new Menu(graphicFrame, SWT.DROP_DOWN);
+        menuEntry.menu = new Menu(graphicThreadSwt.windowSwt, SWT.DROP_DOWN);
         item.setMenu(menuEntry.menu);
       }
       menustore = menuEntry.subMenu;
@@ -461,10 +306,10 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
 
 
   @Override
-  public Object getitsGraphicFrame()
+  public Shell getitsGraphicFrame()
   {
     // TODO Auto-generated method stub
-    return null;
+    return ((SwtGraphicThread)graphicThread).windowSwt;
   }
 
 
@@ -503,16 +348,19 @@ public class PrimaryWindowSwt extends GralPrimaryWindow implements GralWindow_if
     return null;
   }
 
-  @Override public void redraw(){  graphicFrame.redraw(); graphicFrame.update(); }
+  @Override public void redraw(){  graphicThreadSwt.windowSwt.redraw(); graphicThreadSwt.windowSwt.update(); }
 
 
   
   public void removeWidgetImplementation()
   {
-    graphicFrame.dispose();
-    graphicFrame = null;
+    graphicThreadSwt.windowSwt.dispose();
+    graphicThreadSwt.windowSwt = null;
     menuBar = null;
   }
+
+
+  @Override public Composite getPanelImpl() { return graphicThreadSwt.windowSwt; }
 
 
   

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralPanelContent;
@@ -79,5 +80,6 @@ public class TextPanelSwt extends GralPanelContent implements GralTextBox_ifc, A
   { return textAreaOutput.append(csq, start, end);
   }
   
+  @Override public Composite getPanelImpl() { return (Composite)panelComposite; }
 
 }

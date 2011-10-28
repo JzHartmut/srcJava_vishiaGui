@@ -53,7 +53,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.area9.GuiMainAreaBase;
 import org.vishia.gral.area9.GuiMainAreaifc;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralPrimaryWindow;
+import org.vishia.gral.base.GralWindowMng;
 import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralGridPos;
@@ -188,7 +188,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 	class ActionFileOpen implements SelectionListener
   { @Override public void widgetSelected(SelectionEvent e)
     { 
-      FileDialog fileChooser = new FileDialog(swtWindow.graphicFrame);
+      FileDialog fileChooser = new FileDialog(swtWindow.graphicThreadSwt.windowSwt);
       if(currentDirectory != null) { fileChooser.setFileName(currentDirectory.getAbsolutePath()); }
       String sFile = fileChooser.open();
       if(sFile != null){
@@ -368,26 +368,27 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   }
   */
   
-  public MainCmdSwt(MainCmd cmdP, GralPrimaryWindow guiDevice) //String[] args)
+  public MainCmdSwt(MainCmd cmdP, GralWindowMng guiDevice, String sOutputArea) //String[] args)
   { //super(args);
     //assert(false);
     super(cmdP, guiDevice); //gralDevice);
   
     swtWindow = (PrimaryWindowSwt)guiDevice; //PrimaryWindowSwt.create(cmdP.getLogMessageOutputConsole());
     //super.gralDevice = swtWindow;
-    swtWindow.addGuiBuildOrder(initOutputArea); 
+    this.outputArea = sOutputArea;
+    swtWindow.addDispatchListener(initOutputArea); 
     swtWindow.addDispatchListener(writeOutputTextDirectly);
   }
   
   
   
-  public GralPrimaryWindow getPrimaryWindow(){ return swtWindow; }
+  public GralWindowMng getPrimaryWindow(){ return swtWindow; }
   
 
-  Runnable initOutputArea = new Runnable(){
-    @Override public void run()
+  GralDispatchCallbackWorker initOutputArea = new GralDispatchCallbackWorker(){
+    @Override public void doBeforeDispatching(boolean onlyWakeup)
     {
-      swtWindow.graphicFrame.addControlListener(resizeListener);
+      swtWindow.graphicThreadSwt.windowSwt.addControlListener(resizeListener);
       setFrameAreaBorders(30,70,30,70);
       if(bSetStandardMenus){
         setStandardMenusGThread(currentDirectory, actionFile);
@@ -401,6 +402,9 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
         int dyArea = outputArea.charAt(3) - '0' - yArea +1;
         */
         outputPanel = addOutputFrameArea(area.x, area.y, area.dx, area.dy);
+        gralDevice.gralMng.registerPanel(outputPanel);
+        swtWindow.removeDispatchListener(this);
+        countExecution();
       }
     }
   };
@@ -481,7 +485,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 	@Override public final void addFrameArea(int xArea, int yArea, int dxArea, int dyArea, GralPanelContent component)
 	throws IndexOutOfBoundsException
 	{ //int idxArea = (x -1) + 3 * (y -1);
-	  //Composite component = new Composite(graphicFrame, SWT.NONE);
+	  //Composite component = new Composite(swtWindow.graphicThreadSwt, SWT.NONE);
 		if(  xArea <1 || xArea > componentFrameArea[0].length
 	    || dxArea < 1
 	    || xArea+dxArea-2 > componentFrameArea[0].length
@@ -508,11 +512,11 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 	  componentFrameArea[yArea-1][xArea-1] = component; //scrollPane;
 	  setBoundsForFrameArea(xArea-1, yArea-1);
 	  //scrollPane.validate();
-	  //graphicFrame.add(component); //scrollPane);
+	  //swtWindow.graphicThreadSwt.add(component); //scrollPane);
 	  if(yAreaMover[1] == null){
-	  	yAreaMover[1] = new Canvas(swtWindow.graphicFrame, SWT.None);
+	  	yAreaMover[1] = new Canvas(swtWindow.graphicThreadSwt.windowSwt, SWT.None);
 	  	yAreaMover[1].setSize(10,10);
-	  	yAreaMover[1].setBackground(swtWindow.displaySwt.getSystemColor(SWT.COLOR_GREEN));
+	  	yAreaMover[1].setBackground(swtWindow.graphicThreadSwt.displaySwt.getSystemColor(SWT.COLOR_GREEN));
 	  }
 	  if(swtWindow!=null)
 	  { validateFrameAreas();
@@ -545,9 +549,9 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
       //swtWindow.addMenuItemGThread("&File/E&xit", this.new ActionFileOpen());
       swtWindow.addMenuItemGThread("&Help/&Help", this.new ActionHelp());
       swtWindow.addMenuItemGThread("&Help/&About", this.new ActionAbout());
-      //graphicFrame.setJMenuBar(menuBar);
-      //graphicFrame.setVisible( true );
-      swtWindow.graphicFrame.update();
+      //swtWindow.graphicThreadSwt.setJMenuBar(menuBar);
+      //swtWindow.graphicThreadSwt.setVisible( true );
+      swtWindow.graphicThreadSwt.windowSwt.update();
     }
     
   }
@@ -587,14 +591,14 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    */
   protected void XXXaddMenu(Menu menu, String text, char accelerator)
   {
-    Menu menuBar = swtWindow.graphicFrame.getMenuBar();
+    Menu menuBar = swtWindow.graphicThreadSwt.windowSwt.getMenuBar();
     int nrofMenus = menuBar.getItemCount();  //ComponentCount();
     
     MenuItem menuItem = new MenuItem(menuBar, SWT.DROP_DOWN);
     menuItem.setText(text);
     menuItem.setAccelerator(SWT.CONTROL | accelerator);
     menuItem.setMenu(menu);
-    swtWindow.graphicFrame.update();
+    swtWindow.graphicThreadSwt.windowSwt.update();
   }
   
   
@@ -620,15 +624,15 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    */
   protected Menu XXXaddMenu(String text, char accelerator)
   {
-    Menu menuBar = swtWindow.graphicFrame.getMenuBar();
+    Menu menuBar = swtWindow.graphicThreadSwt.windowSwt.getMenuBar();
     int nrofMenus = menuBar.getItemCount();  //ComponentCount();
     
     MenuItem menuItem = new MenuItem(menuBar, SWT.DROP_DOWN);
     menuItem.setText(text);
     menuItem.setAccelerator(SWT.CONTROL | accelerator);
-    Menu menu = new Menu(swtWindow.graphicFrame, SWT.DROP_DOWN);
+    Menu menu = new Menu(swtWindow.graphicThreadSwt.windowSwt, SWT.DROP_DOWN);
     menuItem.setMenu(menu);
-    //swtWindow.graphicFrame.update();
+    //swtWindow.graphicThreadSwt.update();
     return menu;
   }
 
@@ -639,14 +643,14 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    * 
   protected void addMenuItem(MenuItem menuItem, int idx)
   {
-    Menu menuBar = swtWindow.graphicFrame.getMenuBar();
+    Menu menuBar = swtWindow.graphicThreadSwt.getMenuBar();
     MenuItem[] items = menuBar.getItems();
     MenuItem barItem = items[idx];
     Menu menuBarEntry = barItem.getMenu();
     int nrofMenuItems = menuBarEntry.getItemCount();
     menuItem.set
     menu.add(menuItem, nrofMenuItems -1);
-    swtWindow.graphicFrame.validate();
+    swtWindow.graphicThreadSwt.validate();
   }
    */
   
@@ -658,7 +662,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   {
     int nrofMenuItems = menuFile.getMenuComponentCount(); //  .getComponentCount();
     menuFile.add(menuItem, nrofMenuItems -1);
-    swtWindow.graphicFrame.validate();
+    swtWindow.graphicThreadSwt.validate();
     
   }
    */
@@ -698,7 +702,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
       if(positionInMenu < 0)throw new IndexOutOfBoundsException(" fault position =" + positionInMenu);
     }
     parent.add(menuItem, positionInMenu);
-    swtWindow.graphicFrame.validate();
+    swtWindow.graphicThreadSwt.validate();
   }
    */
   
@@ -743,12 +747,12 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    */
   protected GralPanelContent addOutputFrameArea(int xArea, int yArea, int dxArea, int dyArea)
   { int widgetStyle = SWT.H_SCROLL | SWT.V_SCROLL;
-    TextPanelSwt textPanel = new TextPanelSwt("output", swtWindow.graphicFrame, widgetStyle, swtWindow.gralMng); //gralDevice);
+    TextPanelSwt textPanel = new TextPanelSwt("output", swtWindow.graphicThreadSwt.windowSwt, widgetStyle, swtWindow.gralMng); //gralDevice);
     super.outputBox = textPanel.textAreaOutput;
-    //textAreaOutput = new WidgetsSwt.TextBoxSwt(swtWindow.graphicFrame, widgetStyle);
+    //textAreaOutput = new WidgetsSwt.TextBoxSwt(swtWindow.graphicThreadSwt, widgetStyle);
     //textAreaPos = new Position(textAreaOutput);
     //textAreaPos.x = x; textAreaPos.y = y; textAreaPos.dx = dx; textAreaPos.dy = dy; 
-    //textAreaOutput.setSize(350,100); //swtWindow.graphicFrame.get)
+    //textAreaOutput.setSize(350,100); //swtWindow.graphicThreadSwt.get)
     //textAreaOutput.setBounds(x, y, dx,dy);
     //((WidgetsSwt.TextBoxSwt)textAreaOutput).text.setFont(new Font(swtWindow.guiDevice, "Monospaced",11, SWT.NORMAL));
     try{ textPanel.append("output...\n"); } catch(IOException exc){}
@@ -757,7 +761,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
     addFrameArea(xArea, yArea, dxArea, dyArea, textPanel);
     
     //textAreaPos.setBounds(textAreaOuptutPane, swtWindow.graphicFramePos);
-    //swtWindow.graphicFrame.getContentPane().add(textAreaOuptutPane);
+    //swtWindow.graphicThreadSwt.getContentPane().add(textAreaOuptutPane);
 /*
     { menuOutput = new JMenu("Edit");//##a
       menuOutput.setMnemonic('E');
@@ -775,7 +779,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
     }
 */      
     
-    swtWindow.graphicFrame.update();
+    swtWindow.graphicThreadSwt.windowSwt.update();
     return textPanel;
   }
 
@@ -791,8 +795,8 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 		  return;
 	  
 	  paintArea = panel;
-	  swtWindow.graphicFrame.getContentPane().add(paintArea);
-	  //swtWindow.graphicFrame.validate();
+	  swtWindow.graphicThreadSwt.getContentPane().add(paintArea);
+	  //swtWindow.graphicThreadSwt.validate();
 	  paintArea.repaint();
   }
 */  
@@ -800,10 +804,10 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   protected void validateFrameAreas()
   {
     if(!swtWindow.isRunning()) return;
-    Point size = swtWindow.graphicFrame.getSize();
-    int xWidth = size.x -6; //swtWindow.graphicFrame.getWidth();
-    int yWidth = size.y -53; //swtWindow.graphicFrame.getHeight() - 50;  //height of title and menu TODO calculate correctly
-    //Control content = swtWindow.graphicFrame.getContentPane();
+    Point size = swtWindow.graphicThreadSwt.windowSwt.getSize();
+    int xWidth = size.x -6; //swtWindow.graphicThreadSwt.getWidth();
+    int yWidth = size.y -53; //swtWindow.graphicThreadSwt.getHeight() - 50;  //height of title and menu TODO calculate correctly
+    //Control content = swtWindow.graphicThreadSwt.getContentPane();
     //xWidth = content.getWidth();
     //yWidth = content.getHeight();
     pixelPerXpercent = xWidth / 100.0F;
@@ -829,9 +833,9 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
     		yAreaMover[ixMover].redraw(); 		
       }
     }
-    //swtWindow.graphicFrame.update();
-    //swtWindow.graphicFrame.redraw();
-    //swtWindow.graphicFrame.update();
+    //swtWindow.graphicThreadSwt.update();
+    //swtWindow.graphicThreadSwt.redraw();
+    //swtWindow.graphicThreadSwt.update();
     
   }
  
@@ -841,10 +845,10 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    * @param idyArea
    */
   private void setBoundsForFrameArea(int idxArea, int idyArea)
-  { Point size = swtWindow.graphicFrame.getSize();
-    int xWidth = size.x -6; //graphicFrame.getWidth();
-    int yWidth = size.y -53; //graphicFrame.getHeight() - 50;  //height of title and menu TODO calculate correctly
-    //Control content = graphicFrame.getContentPane();
+  { Point size = swtWindow.graphicThreadSwt.windowSwt.getSize();
+    int xWidth = size.x -6; //swtWindow.graphicThreadSwt.getWidth();
+    int yWidth = size.y -53; //swtWindow.graphicThreadSwt.getHeight() - 50;  //height of title and menu TODO calculate correctly
+    //Control content = swtWindow.graphicThreadSwt.getContentPane();
     //xWidth = content.getWidth();
     //yWidth = content.getHeight();
     pixelPerXpercent = xWidth / 100.0F;
@@ -872,7 +876,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
    * if it has a better way to show infos.*/
   protected void writeDirectly(String sInfo, short kind)  //##a
   { if(textAreaOutput != null){
-      if(Thread.currentThread().getId() == gralDevice.guiThreadId){
+      if(Thread.currentThread().getId() == gralDevice.graphicThread.guiThreadId){
 	  	  try{
           if((kind & MainCmd.mNewln_writeInfoDirectly) != 0)
   	      { textAreaOutput.append("\n");
@@ -881,7 +885,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   	      int nrofLines = textAreaOutput.getNrofLines();
   	      textAreaOutput.viewTrail();
   	      //textAreaOutput.setCaretPosition(nrofLines-1);
-  	      swtWindow.graphicFrame.update();
+  	      swtWindow.graphicThreadSwt.windowSwt.update();
 	  	  } catch(IOException exc){ getGralMng().writeLog(0, exc); }
       } else {  
         //queue the text
@@ -905,35 +909,27 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
     { try{
         textAreaOutput.append("\nEXCEPTION: " + sInfo + exception.getMessage());
         textAreaOutput.viewTrail();
-        swtWindow.graphicFrame.update();  //update in TextBox...
+        swtWindow.graphicThreadSwt.windowSwt.update();  //update in TextBox...
       }catch(IOException exc){ }
     }
     else mainCmd.writeErrorDirectly(sInfo, exception);     
   }
-  
-  /** Sets the graphic frame, called inside the derived class. 
-   *  The derived class has to organize the graphical frame.
-   *  @param frame The graphical frame.
-   */
-	protected final void setGraphicFrame(Shell frame)
-  { swtWindow.graphicFrame = frame;
-  }
 
 	
-  @Override public void redraw(){  swtWindow.graphicFrame.redraw(); }
+  @Override public void redraw(){  swtWindow.redraw(); }
 
 
   
   /** Gets the graphical frame. */
-  public final Shell getitsGraphicFrame(){ return swtWindow.graphicFrame; }
+  public final Shell getitsGraphicFrame(){ return swtWindow.graphicThreadSwt.windowSwt; }
   
   /** Gets the graphical frame. */
   public final Composite getContentPane()
   {
-    return swtWindow.graphicFrame; //.getContentPane();
+    return swtWindow.graphicThreadSwt.windowSwt; //.getContentPane();
   }
   
-  public Display getDisplay(){ return swtWindow.displaySwt; }
+  public Display getDisplay(){ return swtWindow.graphicThreadSwt.displaySwt; }
   
   //public final Device getGuiDevice(){ return guiDevice.get
   
@@ -945,7 +941,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   
   /** Adds a graphical component
   public final void addGraphicComponent(JComponent comp)
-  { graphicFrame.getContentPane().add(comp);
+  { swtWindow.graphicThreadSwt.getContentPane().add(comp);
   }
   */
   
@@ -1000,12 +996,13 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   { return swtWindow.getThreadIdGui();
   }
 
+  /*
   @Override public void buildMainWindow(String sTitle, int left, int top, int xSize, int ySize)
   { swtWindow.buildMainWindow(sTitle, left, top, xSize, ySize);
   }
-
+  */
   
-  @Override public void addGuiBuildOrder(Runnable order){ swtWindow.addGuiBuildOrder(order); }
+  //@Override public void addGuiBuildOrder(Runnable order){ swtWindow.addGuiBuildOrder(order); }
 
 
   @Override public GralGridMngBase getGralMng()

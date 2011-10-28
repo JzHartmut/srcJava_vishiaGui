@@ -24,6 +24,11 @@ public class PanelSwt extends GralPanelContent
     
   }
 
+  @Override public Composite getPanelImpl()
+  {
+    return (Composite)panelComposite;
+  }
+  
   @Override
   public boolean setFocus()
   {
