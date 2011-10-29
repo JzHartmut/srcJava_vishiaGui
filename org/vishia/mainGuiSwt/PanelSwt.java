@@ -53,6 +53,11 @@ public class PanelSwt extends GralPanelContent
   @Override public void redraw(){  ((Control)panelComposite).redraw(); }
 
 
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  { ((Composite)panelComposite).setBounds(x,y,dx,dy);
+  }
+  
+
 
 
 }

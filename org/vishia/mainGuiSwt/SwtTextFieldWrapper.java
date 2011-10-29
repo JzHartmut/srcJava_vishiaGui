@@ -78,6 +78,10 @@ public class SwtTextFieldWrapper extends GralTextField
     textFieldSwt = null;
   }
 
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  { textFieldSwt.setBounds(x,y,dx,dy);
+  }
+  
 
   
 }

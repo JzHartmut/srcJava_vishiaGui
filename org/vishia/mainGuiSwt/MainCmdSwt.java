@@ -52,6 +52,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.area9.GuiMainAreaBase;
 import org.vishia.gral.area9.GuiMainAreaifc;
+import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindowMng;
@@ -114,59 +115,11 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   final static int version = 0x20110502;
 
   
-	public interface GuiBuild
-	{
-		/**Called in the build phase
-		 * @param gui
-		 */
-		void build(Display gui);
-		
-		/**Called in the dispatch-event phase. In this phase, calls to graphic elements can be done
-		 * or the graphic can be changed. */
-		void change();
-	}
-
 	
   private final PrimaryWindowSwt swtWindow;
 	
 	
 	
-	
-  /**All main components of the Display in each FrameArea. */
-  private GralPanelContent[][] componentFrameArea = new GralPanelContent[3][3];
-
-  /**A little control to capture the mouse position for movement of area borders. */
-  private Control[] yAreaMover = new Control[2];
-  
-  /**Position of the FrameArea borders in percent. 
-   * [0] is always 0, [1] and [2] are the given borders, [3] is always 100.
-   * It is because lower and higher bound should be accessed always without tests.
-   * Use area +1, because it is a Off-by-one problem */
-  private byte xpFrameArea[] = new byte[4],
-               ypFrameArea[] = new byte[4];
-  
-  /**spread of each frame area in x direction.
-   * It it is -1, than the area is occupied by another area.
-   * If it is 0, the area is free.
-   * 1..3 are the number of areas in horizontal direction.
-   */
-  private byte[][][] dxyFrameArea = new byte[3][3][2]; 
-  
-  /**Number of pixels per percent unit of size, set if {@link #validateFrameAreas()} was called. */
-  private float pixelPerXpercent = 1, pixelPerYpercent =1;  
-  
-  /** The interface to the application. */
-  //private final MainApplicationWin_ifc application;
-  
-  /**The id of the thread, which created the display. 
-   * It is to check whether gui-commands should be queued or not. */
-  //protected long idThreadGui;
-  
-  final protected StringBuffer sbWriteInfo = new StringBuffer(1000);  //max. 1 line!
-  
-  /** If it is set, the writeInfo is redirected to this.*/
-  protected GralTextBox_ifc textAreaOutput = null;
-  
   
   /**The file menu is extendable. */
   private Menu menuFile;
@@ -368,16 +321,16 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   }
   */
   
-  public MainCmdSwt(MainCmd cmdP, GralWindowMng guiDevice, String sOutputArea) //String[] args)
+  public MainCmdSwt(MainCmd cmdP, GralWindowMng guiDevice, GralSubWindow window, String sOutputArea) //String[] args)
   { //super(args);
     //assert(false);
-    super(cmdP, guiDevice); //gralDevice);
+    super(cmdP, guiDevice, window); //gralDevice);
   
     swtWindow = (PrimaryWindowSwt)guiDevice; //PrimaryWindowSwt.create(cmdP.getLogMessageOutputConsole());
     //super.gralDevice = swtWindow;
     this.outputArea = sOutputArea;
-    swtWindow.addDispatchListener(initOutputArea); 
-    swtWindow.addDispatchListener(writeOutputTextDirectly);
+    guiDevice.addDispatchListener(initOutputArea); 
+    guiDevice.addDispatchListener(writeOutputTextDirectly);
   }
   
   
@@ -436,96 +389,6 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 }
 
 
-
-  
-  /**Sets the divisions of the frame. The frame is divide into 9 parts,
-   * where two horizontal and two vertical lines built them:
-   * <pre>
-   * +=======+===============+===========+
-   * |       |               |           | 
-   * +-------+---------------+-----------+ 
-   * |       |               |           | 
-   * |       |               |           | 
-   * +-------+---------------+-----------+ 
-   * |       |               |           | 
-   * |       |               |           | 
-   * +=======+===============+===========+
-   * </pre>
-   * 
-   * @param x1p percent from left for first vertical divide line.
-   * @param x2p percent from left for second vertical divide line.
-   * @param y1p percent from left for first horizontal divide line.
-   * @param y2p percent from left for first horizontal divide line.
-   */
-  @Override public void setFrameAreaBorders(int x1p, int x2p, int y1p, int y2p)
-  { xpFrameArea[0] = 0;
-    xpFrameArea[1] = (byte)x1p;
-    xpFrameArea[2] = (byte)x2p;
-    xpFrameArea[3] = 100;
-    ypFrameArea[0] = 0;
-    ypFrameArea[1] = (byte)y1p;
-    ypFrameArea[2] = (byte)y2p;
-    ypFrameArea[3] = 100;
-    if(swtWindow!=null)
-    { validateFrameAreas();
-    }
-  }
-  
-  
-  
-  /**Sets a Component into a defined area. See {@link #setFrameAreaBorders(int, int, int, int)}.
-	 * It should be called only in the GUI-Thread.
-	 * @param xArea 1 to 3 for left, middle, right
-	 * @param yArea 1 to 3 for top, middle, bottom
-	 * @param dxArea 1 to 3 for 1 field to 3 fields to right.
-	 * @param dyArea 1 to 3 for 1 field to 3 field to bottom
-	 * @param component The component.
-	 * @throws IndexOutOfBoundsException if the arguments are false or the area is occupied already.
-	 */
-	@Override public final void addFrameArea(int xArea, int yArea, int dxArea, int dyArea, GralPanelContent component)
-	throws IndexOutOfBoundsException
-	{ //int idxArea = (x -1) + 3 * (y -1);
-	  //Composite component = new Composite(swtWindow.graphicThreadSwt, SWT.NONE);
-		if(  xArea <1 || xArea > componentFrameArea[0].length
-	    || dxArea < 1
-	    || xArea+dxArea-2 > componentFrameArea[0].length
-	    || yArea <1 || yArea > componentFrameArea.length
-	    || dyArea < 1
-	    || yArea+dyArea-1 > componentFrameArea.length
-	    ) 
-	    throw new IndexOutOfBoundsException("failed argument");
-	  for(int idxArea = xArea-1; idxArea <= xArea + dxArea -2; idxArea++)
-	  { for(int idyArea = yArea-1; idyArea <= yArea + dyArea -2; idyArea++)
-	    { if(dxyFrameArea[idyArea][idxArea][0] != 0) throw new IndexOutOfBoundsException("area occupied already");
-	    }
-	  }
-	  for(int idxArea = xArea-1; idxArea <= xArea + dxArea -2; idxArea++)
-	  { for(int idyArea = yArea-1; idyArea <= yArea + dyArea -2; idyArea++)
-	    { dxyFrameArea[idyArea][idxArea][0] = -1; //ocuupy it.
-	    }
-	  }
-	  dxyFrameArea[yArea-1][xArea-1][0] = (byte)dxArea;
-	  dxyFrameArea[yArea-1][xArea-1][1] = (byte)dyArea;
-	  //JScrollPane scrollPane = new JScrollPane(component);
-	  //scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-	  //scrollPane.setViewportView(component);
-	  componentFrameArea[yArea-1][xArea-1] = component; //scrollPane;
-	  setBoundsForFrameArea(xArea-1, yArea-1);
-	  //scrollPane.validate();
-	  //swtWindow.graphicThreadSwt.add(component); //scrollPane);
-	  if(yAreaMover[1] == null){
-	  	yAreaMover[1] = new Canvas(swtWindow.graphicThreadSwt.windowSwt, SWT.None);
-	  	yAreaMover[1].setSize(10,10);
-	  	yAreaMover[1].setBackground(swtWindow.graphicThreadSwt.displaySwt.getSystemColor(SWT.COLOR_GREEN));
-	  }
-	  if(swtWindow!=null)
-	  { validateFrameAreas();
-	  }
-	  ((Control)component.getWidgetImplementation()).addMouseListener(mouseListener);
-	  //return component;
-	}
-
-	
 	public final void setStandardMenus(File openStandardDirectory, GralUserAction actionFile)
 	{ this.currentDirectory = openStandardDirectory;
 	  this.actionFile = actionFile;
@@ -801,75 +664,6 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   }
 */  
   
-  protected void validateFrameAreas()
-  {
-    if(!swtWindow.isRunning()) return;
-    Point size = swtWindow.graphicThreadSwt.windowSwt.getSize();
-    int xWidth = size.x -6; //swtWindow.graphicThreadSwt.getWidth();
-    int yWidth = size.y -53; //swtWindow.graphicThreadSwt.getHeight() - 50;  //height of title and menu TODO calculate correctly
-    //Control content = swtWindow.graphicThreadSwt.getContentPane();
-    //xWidth = content.getWidth();
-    //yWidth = content.getHeight();
-    pixelPerXpercent = xWidth / 100.0F;
-    pixelPerYpercent = yWidth / 100.0F;
-    
-
-    for(int idxArea = 0; idxArea <= 2; idxArea++)
-    { for(int idyArea = 0; idyArea <= 2; idyArea++)
-      { GralPanelContent component = componentFrameArea[idyArea][idxArea];
-        if(component !=null)
-        { Control control = (Control)component.getWidgetImplementation();
-          setBoundsForFrameArea(idxArea, idyArea);
-          control.update();
-          Rectangle bounds = control.getBounds();
-          control.redraw(bounds.x, bounds.y, bounds.width, bounds.height, true);
-    } } }
-    for(int ixMover = 0; ixMover < yAreaMover.length; ++ixMover){
-    	if(yAreaMover[ixMover] != null){
-    		int yp = (int)(ypFrameArea[ixMover+1] * pixelPerYpercent);
-    		//TODO it doesn't work yet, not visible, why?:
-    		yAreaMover[ixMover].setBounds(10,yp,10,10);
-    		yAreaMover[ixMover].update(); 		
-    		yAreaMover[ixMover].redraw(); 		
-      }
-    }
-    //swtWindow.graphicThreadSwt.update();
-    //swtWindow.graphicThreadSwt.redraw();
-    //swtWindow.graphicThreadSwt.update();
-    
-  }
- 
-  
-  /**Sets the bounds for the component, which is localized at the given area.
-   * @param idxArea
-   * @param idyArea
-   */
-  private void setBoundsForFrameArea(int idxArea, int idyArea)
-  { Point size = swtWindow.graphicThreadSwt.windowSwt.getSize();
-    int xWidth = size.x -6; //swtWindow.graphicThreadSwt.getWidth();
-    int yWidth = size.y -53; //swtWindow.graphicThreadSwt.getHeight() - 50;  //height of title and menu TODO calculate correctly
-    //Control content = swtWindow.graphicThreadSwt.getContentPane();
-    //xWidth = content.getWidth();
-    //yWidth = content.getHeight();
-    pixelPerXpercent = xWidth / 100.0F;
-    pixelPerYpercent = yWidth / 100.0F;
-    int xf1 = xpFrameArea[idxArea];  //percent left
-    int yf1 = ypFrameArea[idyArea];
-    int dxf = dxyFrameArea[idyArea][idxArea][0]; //nr of occupied areas
-    int dyf = dxyFrameArea[idyArea][idxArea][1];
-    int xf2 = xpFrameArea[idxArea + dxf]; //percent right
-    int yf2 = ypFrameArea[idyArea + dyf];
-    
-    //calculate pixel size for the component:
-    int xp = (int)(xf1  * pixelPerXpercent);
-    int yp = (int)(yf1  * pixelPerYpercent);
-    int dxp = (int) ((xf2-xf1) * pixelPerXpercent);
-    int dyp = (int) ((yf2-yf1) * pixelPerYpercent);
-    Control component = (Control)componentFrameArea[idyArea][idxArea].getWidgetImplementation();
-    component.setBounds(xp,yp,dxp,dyp-6);
-  }
-  
-  
   
   
   /** Overloads MainCmd.writeDirectly. This method may be overloaded by the user
@@ -1008,6 +802,10 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   @Override public GralWidgetMng getGralMng()
   { return gralDevice.gralMng;
   }
+  
+  @Override public GralRectangle getPixelPositionSize(){ return window.getPixelPositionSize(); }
+
+  
 }
 
 

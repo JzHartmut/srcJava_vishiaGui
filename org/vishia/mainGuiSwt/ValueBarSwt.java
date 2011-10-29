@@ -155,6 +155,11 @@ public class ValueBarSwt extends ValueBar implements GralSetValue_ifc, GralWidge
     return null;
   }
 
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  { widgetSwt.setBounds(x,y,dx,dy);
+  }
+  
+
   
   @Override public void removeWidgetImplementation()
   {

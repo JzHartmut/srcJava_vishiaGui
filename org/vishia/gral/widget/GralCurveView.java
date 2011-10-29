@@ -45,4 +45,10 @@ public class GralCurveView extends GralWidget
     return null;
   }
   
+  
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  { //widgetSwt.setBounds(x,y,dx,dy);
+  }
+  
+
 }

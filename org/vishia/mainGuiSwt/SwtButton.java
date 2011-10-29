@@ -85,7 +85,11 @@ public class SwtButton extends GralButton
     return null;
   }
   
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  { widgetSwt.setBounds(x,y,dx,dy);
+  }
   
+
   
   private class SwtButtonImpl extends Canvas
   {

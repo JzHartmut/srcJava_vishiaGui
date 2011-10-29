@@ -20,6 +20,8 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 
 public class CurveView extends Canvas implements GralWidget_ifc
 {
+  
+  private final CurveView widgSwt;
 
 	//final Canvas canvas;
 	
@@ -172,6 +174,7 @@ public class CurveView extends Canvas implements GralWidget_ifc
 		addPaintListener(paintListener);
 		addFocusListener(focusListener);
 		addMouseListener(mouseLeftButtonListener);
+		widgSwt = this;
 	}
 	
 	public void setGridVertical(int dataPointsBetweenGridLines, int periodStrongLine){
@@ -517,5 +520,9 @@ public class CurveView extends Canvas implements GralWidget_ifc
     return null;
   }
 
-	
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  { widgSwt.setBounds(x,y,dx,dy);
+  }
+  
+
 }

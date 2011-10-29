@@ -340,7 +340,7 @@ public class JavaCmd extends GuiCfg
 
     public MainCmd(CallingArgs cargs, String[] args)
     {
-      super(cargs, args, "Java Commander", "2B2C");
+      super(cargs, args);
       this.cargs = cargs;
     }
 
@@ -431,6 +431,8 @@ public class JavaCmd extends GuiCfg
     // Uses the commonly GuiMainCmd class because here are not extra arguments.
     GuiMainCmd cmdgui = new MainCmd(cargs, args); // implements MainCmd, parses
                                                   // calling arguments
+    bOk = cmdgui.parseArgumentsAndInitGraphic("The.file.Commander", "2B2C");
+
     try {
       cmdgui.parseArguments();
     } catch (Exception exception) {

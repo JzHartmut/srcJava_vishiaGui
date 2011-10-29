@@ -52,7 +52,13 @@ public class TabPanelSwt extends GralTabbedPanel
       // TODO Auto-generated method stub
       return null;
     }
+
+    @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+    { widgetSwt.setBounds(x,y,dx,dy);
+    }
     
+
+
 
     @Override public void redraw(){  widgetSwt.redraw(); widgetSwt.update(); }
 
@@ -125,7 +131,6 @@ public class TabPanelSwt extends GralTabbedPanel
 	  return panel;
 	}
 	
-  
 	
   public SelectionListener tabItemSelectListener = new SelectionListener(){
 

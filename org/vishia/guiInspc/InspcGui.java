@@ -81,7 +81,7 @@ public class InspcGui //extends GuiCfg
     
     public CmdLineAndGui(CallingArguments cargs, String[] args)
     {
-      super(cargs, args, "Inspc-GUI-cfg", "3A3C");
+      super(cargs, args);
       this.cargs = cargs;
       super.addAboutInfo("Inspc-GUI-cfg");
       super.addAboutInfo("made by HSchorrig, 2011-05-18, 2011-05-19");
@@ -194,12 +194,8 @@ private class InspcGuiCfg extends GuiCfg
     CallingArguments cargs = new CallingArguments();
     //Initializes the GUI till a output window to show informations:
     CmdLineAndGui cmdgui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
-    try{ cmdgui.parseArguments(); }
-    catch(Exception exception)
-    { cmdgui.writeError("Cmdline argument error:", exception);
-      cmdgui.setExitErrorLevel(MainCmd_ifc.exitWithArgumentError);
-      bOk = false;  //not exiting, show error in GUI
-    }
+    bOk = cmdgui.parseArgumentsAndInitGraphic("Inspc-GUI-cfg", "3A3C");
+
     LogMessage log = cmdgui.getLogMessageOutputConsole();
     
     //String ipcFactory = "org.vishia.communication.InterProcessComm_Socket";

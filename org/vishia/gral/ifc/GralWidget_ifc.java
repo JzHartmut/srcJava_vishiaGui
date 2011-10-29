@@ -24,4 +24,6 @@ public interface GralWidget_ifc
 
   public void redraw();
   
+  void setBoundsPixel(int x, int y, int dx, int dy);
+  
 }

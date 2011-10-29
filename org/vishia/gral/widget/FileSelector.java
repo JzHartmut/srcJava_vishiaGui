@@ -347,5 +347,11 @@ public class FileSelector extends GralWidget
   {
     //widgdPath.rem   
   }
- 
+
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  { //TODO build a panel for all widgets.
+    //widgetSwt.setBounds(x,y,dx,dy);
+  }
+  
+
 }

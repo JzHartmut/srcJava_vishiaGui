@@ -393,6 +393,10 @@ public class TableSwt extends GralTable
     
     @Override public void redraw(){  table.redraw(); table.update(); }
 
+    @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+    { table.setBounds(x,y,dx,dy);
+    }
+    
 
     protected void xxremoveWidgetImplementation()
     {
@@ -514,7 +518,11 @@ public class TableSwt extends GralTable
   
   @Override public void redraw(){  table.redraw(); table.update(); }
 
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  { table.setBounds(x,y,dx,dy);
+  }
   
+
   
   @Override public void removeWidgetImplementation()
   {

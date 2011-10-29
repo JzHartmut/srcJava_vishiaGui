@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralWidgetMng;
@@ -81,5 +82,10 @@ public class TextPanelSwt extends GralPanelContent implements GralTextBox_ifc, A
   }
   
   @Override public Composite getPanelImpl() { return (Composite)panelComposite; }
+
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  { ((Control)panelComposite).setBounds(x,y,dx,dy);
+  }
+  
 
 }

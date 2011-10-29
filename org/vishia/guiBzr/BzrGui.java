@@ -206,10 +206,11 @@ public class BzrGui extends GuiCfg
      */
     public CmdLineAndGui(CallingArguments cargs, String[] args)
     { 
-      super(cargs, args, "Bazaar-Gui", "3A3C");
+      super(cargs, args);
       this.cargs = cargs;
       addAboutInfo("Bazaar-Gui");
       addAboutInfo("made by HSchorrig, 2011-04-30, 2011-05-01");
+      parseArgumentsAndInitGraphic("Bazaar-Gui", "3A3C");
     }
 
 
@@ -289,9 +290,9 @@ public class BzrGui extends GuiCfg
     try{ gui.parseArguments(); }
     catch(Exception exception)
     { gui.writeError("Cmdline argument error:", exception);
-    gui.setExitErrorLevel(MainCmd_ifc.exitWithArgumentError);
-    //gui.exit();
-    bOk = false;  //not exiting, show error in GUI
+      gui.setExitErrorLevel(MainCmd_ifc.exitWithArgumentError);
+      //gui.exit();
+      bOk = false;  //not exiting, show error in GUI
     }
     
     //String ipcFactory = "org.vishia.communication.InterProcessComm_Socket";

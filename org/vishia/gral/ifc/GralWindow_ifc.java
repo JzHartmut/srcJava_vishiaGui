@@ -19,4 +19,6 @@ public interface GralWindow_ifc
   
   void redraw();
 
+  GralRectangle getPixelPositionSize();
+  
 }

@@ -6,6 +6,7 @@ import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
@@ -147,6 +148,15 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
       return true;
     }
   };
+
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  { window.setBoundsPixel(x,y,dx,dy);
+  }
+  
+  
+  
+  @Override public GralRectangle getPixelPositionSize(){ return window.getPixelPositionSize(); }
+    
 
 
 }

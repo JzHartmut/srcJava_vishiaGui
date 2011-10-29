@@ -388,14 +388,8 @@ public static void main(String[] args)
   GuiCallingArgs cargs = new GuiCallingArgs();
   //Initializes the GUI till a output window to show information.
   //Uses the commonly GuiMainCmd class because here are not extra arguments.
-  GuiMainCmd cmdGui = new GuiMainCmd(cargs, args, "GUI-cfg", "3A3C");  //implements MainCmd, parses calling arguments
-  try{ cmdGui.parseArguments(); }
-  catch(Exception exception)
-  { cmdGui.writeError("Cmdline argument error:", exception);
-    cmdGui.setExitErrorLevel(MainCmd_ifc.exitWithArgumentError);
-    //gui.exit();
-    bOk = false;  //not exiting, show error in GUI
-  }
+  GuiMainCmd cmdGui = new GuiMainCmd(cargs, args);  //implements MainCmd, parses calling arguments
+  bOk = cmdGui.parseArgumentsAndInitGraphic("Gui-Cfg", "3A3C");
   
   if(bOk){
     //String ipcFactory = "org.vishia.communication.InterProcessComm_Socket";

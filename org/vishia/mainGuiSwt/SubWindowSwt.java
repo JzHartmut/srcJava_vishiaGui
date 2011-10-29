@@ -1,6 +1,7 @@
 package org.vishia.mainGuiSwt;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -68,5 +69,17 @@ public class SubWindowSwt extends GralSubWindow
   }
 
   @Override public Composite getPanelImpl() { return window; }
+  
+  @Override public GralRectangle getPixelPositionSize(){
+    Rectangle r = window.getBounds();
+    GralRectangle posSize = new GralRectangle(r.x, r.y, r.width, r.height);
+    return posSize;
+  }
 
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  { window.setBounds(x,y,dx,dy);
+  }
+  
+
+  
 }

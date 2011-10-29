@@ -133,6 +133,13 @@ public class TextBoxSwt extends GralTextBox
   };
   
   
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  { textFieldSwt.setBounds(x,y,dx,dy);
+  }
+  
+
+
+  
   @Override public void redraw(){  textFieldSwt.redraw(); textFieldSwt.update(); }
 
 

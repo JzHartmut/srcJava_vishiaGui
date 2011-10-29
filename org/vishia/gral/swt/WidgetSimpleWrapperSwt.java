@@ -48,7 +48,8 @@ public class WidgetSimpleWrapperSwt extends GralWidget
   @Override public void redraw(){  widgetSwt.redraw(); }
 
 
-  
-  
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  { widgetSwt.setBounds(x,y,dx,dy);
+  }
   
 }

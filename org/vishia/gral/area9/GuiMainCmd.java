@@ -15,15 +15,16 @@ import org.vishia.msgDispatch.LogMessage;
 public class GuiMainCmd extends MainCmd
 {
   
-  public final GuiMainAreaifc gui;
+  public GuiMainAreaifc gui;
   
   /**Aggregation to given instance for the command-line-argument. The instance can be arranged anywhere else.
    * It is given as ctor-parameter.
    */
   protected final GuiCallingArgs cargs;
   
-  public final GralWidgetMng gralMng;
+  public GralWidgetMng gralMng;
   
+  String sArgError = null;
   
   /**ctor called in static main.
    * @param cargs aggregation to command-line-argument data, it will be filled here.
@@ -31,29 +32,33 @@ public class GuiMainCmd extends MainCmd
    * @param sTitle Title in title line
    * @param sOutputArea area for output, for example "3A3C".
    */
-  public GuiMainCmd(GuiCallingArgs cargs, String[] args, String sTitle, String sOutputArea)
+  public GuiMainCmd(GuiCallingArgs cargs, String[] args)
   { 
     super(args);
-    super.addAboutInfo(sTitle);
     super.addAboutInfo("made by HSchorrig, 2010-06-07, 2011-08-07");
     this.cargs = cargs;
+  }
+
+  
+  public boolean parseArgumentsAndInitGraphic(String sTitle, String sOutputArea)
+  {
+    boolean bOk = true;
+    try{ parseArguments(); }
+    catch(Exception exception)
+    { sArgError = "Cmdline argument error:" + exception.getLocalizedMessage();
+      setExitErrorLevel(exitWithArgumentError);
+      bOk = false;
+    }
     cargs.graphicFactory = new FactorySwt(); 
     if(sOutputArea == null){ sOutputArea = "A3C3"; }
     
     gui = cargs.graphicFactory.createGuiWindow((MainCmd)this, sTitle, 50,50,800, 600, sOutputArea);
     gralMng = gui.getGralMng();
-    /*
-    GralGridProperties propertiesGui = cargs.graphicFactory.createProperties('C');
-    LogMessage log = getLogMessageOutputConsole();
-    gralMng = cargs.graphicFactory.createPanelMng(null, 120,80, propertiesGui, null, log);
-    */
-    
-    //super.addStandardHelpInfo();
-    //gui.setOutputArea(sOutputArea);        //whole area from mid to bottom
-    
-    //gui.buildMainWindow(sTitle, 50,50,800, 600); //600);  //This instruction should be written first to output syntax errors.
+    if(sArgError !=null){
+      writeError(sArgError);
+    }
+    return bOk;
   }
-
 
   
   /*---------------------------------------------------------------------------------------------*/

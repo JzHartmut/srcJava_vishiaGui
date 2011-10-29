@@ -149,6 +149,10 @@ public abstract class SelectList extends GralWidget
   
   @Override public void redraw(){  wdgdTable.redraw(); }
 
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  { wdgdTable.setBoundsPixel(x,y,dx,dy);
+  }
+  
 
   
   void stop(){}

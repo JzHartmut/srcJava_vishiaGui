@@ -14,6 +14,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -26,6 +27,7 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralWindowMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.mainCmd.MainCmd_ifc;
@@ -362,6 +364,16 @@ public class PrimaryWindowSwt extends GralWindowMng implements GralWindow_ifc
 
   @Override public Composite getPanelImpl() { return graphicThreadSwt.windowSwt; }
 
+  @Override public GralRectangle getPixelPositionSize(){
+    Rectangle r = graphicThreadSwt.windowSwt.getBounds();
+    GralRectangle posSize = new GralRectangle(r.x, r.y, r.width, r.height);
+    return posSize;
+  }
+
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  { graphicThreadSwt.windowSwt.setBounds(x,y,dx,dy);
+  }
+  
 
   
 }
