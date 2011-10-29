@@ -58,28 +58,20 @@ public abstract class GralPanelContent implements GralWidget_ifc
   
 
   
-	public GralPanelContent(String namePanel, Object panelComposite)
+	public GralPanelContent(String namePanel, GralWidgetMng mng, Object panelComposite)
 	//public PanelContent(CanvasStorePanel panelComposite)
 	{
 	  this.namePanel = namePanel;
 		this.panelComposite = panelComposite;
-		this.gralMng = null;
+		this.gralMng = mng;
     int property = 0; //TODO parameter
     bZoomed = (property & GralGridBuild_ifc.propZoomedPanel) !=0;
     bGridZoomed = (property & GralGridBuild_ifc.propGridZoomedPanel) !=0;
 	}
 	
 	
-	public void removeWidget(GralWidget widg)
-	{
-	  widgetList.remove(widg);
-	  widgetsToResize.remove(widg);
-	}
-	
-	
-	
   protected GralPanelContent(String namePanel, GralPrimaryWindow_ifc mainWindow)
-  { this.namePanel = namePanel; this.mainWindow = mainWindow; this.gralMng = null;
+  { this.namePanel = namePanel; this.mainWindow = mainWindow; this.gralMng = null; //mainWindow.;
   }
 
   
@@ -87,6 +79,14 @@ public abstract class GralPanelContent implements GralWidget_ifc
   { this.namePanel = namePanel; this.mainWindow = mng.gralDevice; this.gralMng = mng;
   }
 
+  
+  public void removeWidget(GralWidget widg)
+  {
+    widgetList.remove(widg);
+    widgetsToResize.remove(widg);
+  }
+  
+  
   
 
   @Override public Object getWidgetImplementation()

@@ -1,17 +1,23 @@
 package org.vishia.gral.area9;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.base.GralWidgetImplWrapper;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralWindowMng;
 import org.vishia.gral.base.GralTextBox;
+import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralFileDialog_ifc;
+import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTextBox_ifc;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.InfoBox;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmd_ifc;
@@ -102,14 +108,47 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
    * @param guiDevice The window manager
    * @param window The window itself. It doesn't be the primary window but a sub window too.
    */
-  public GuiMainAreaBase(MainCmd mainCmd, GralWindowMng guiDevice, GralSubWindow window)
+  public GuiMainAreaBase(MainCmd mainCmd, GralWindowMng guiDevice, GralSubWindow window, String sOutputArea)
   {
     super();
     this.mainCmd = mainCmd;
     this.gralDevice = guiDevice;
     this.window = window;
+    this.outputArea = sOutputArea;
+    guiDevice.addDispatchListener(initOutputArea); 
+    guiDevice.addDispatchListener(writeOutputTextDirectly);
+
   }
 
+  
+  GralDispatchCallbackWorker initOutputArea = new GralDispatchCallbackWorker(){
+    @Override public void doBeforeDispatching(boolean onlyWakeup)
+    {
+      window.setResizeAction(resizeAction);
+      //swtWindow.graphicThreadSwt.windowSwt.addControlListener(resizeListener);
+      setFrameAreaBorders(30,70,30,70);
+      if(bSetStandardMenus){
+        setStandardMenusGThread(currentDirectory, actionFile);
+      }
+      if(outputArea != null){
+        GralRectangle area = convertArea(outputArea);
+        /*
+        int xArea = outputArea.charAt(0) - 'A' +1;
+        int yArea = outputArea.charAt(1) - '0';
+        int dxArea = outputArea.charAt(2) - 'A' +1 - xArea +1;
+        int dyArea = outputArea.charAt(3) - '0' - yArea +1;
+        */
+        outputPanel = addOutputFrameArea(area.x, area.y, area.dx, area.dy);
+        gralDevice.gralMng.registerPanel(outputPanel);
+        gralDevice.removeDispatchListener(this);
+        countExecution();
+      }
+    }
+  };
+
+  
+
+  
   @Override public MainCmd_ifc getMainCmd(){ return mainCmd; }
   
   @Override public GralPanelContent getOutputPanel(){ return outputPanel; } ///
@@ -298,6 +337,245 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
     GralRectangle ret = new GralRectangle(x1+1, y1+1, x2-x1+1, y2-y1+1);
     return ret;
   }
+
+  
+  
+
+  public final void setStandardMenus(File openStandardDirectory, GralUserAction actionFile)
+  { this.currentDirectory = openStandardDirectory;
+    this.actionFile = actionFile;
+    this.bSetStandardMenus = true;
+    
+  }
+  
+
+  
+  
+  public final void setStandardMenusGThread(File openStandardDirectory, GralUserAction actionFile)
+  { this.currentDirectory = openStandardDirectory;
+    this.actionFile = actionFile;
+    if(window instanceof GralPrimaryWindow_ifc)
+    { GralPrimaryWindow_ifc pWindow = (GralPrimaryWindow_ifc) window;
+      //create the menue
+      pWindow.addMenuItemGThread("&File/&Open", this.new GralActionFileOpen());
+      //swtWindow.addMenuItemGThread("&File/&Close", this.new ActionFileClose());
+      pWindow.addMenuItemGThread("&File/&Save", actionFile);
+      //swtWindow.addMenuItemGThread("&File/E&xit", this.new ActionFileOpen());
+      pWindow.addMenuItemGThread("&Help/&Help", this.new GralActionHelp());
+      pWindow.addMenuItemGThread("&Help/&About", this.new GralActionAbout());
+      //swtWindow.graphicThreadSwt.setJMenuBar(menuBar);
+      //swtWindow.graphicThreadSwt.setVisible( true );
+      pWindow.redraw();
+    } else {
+      throw new IllegalArgumentException("Error: can't apply menus in a sub window");
+      //window.gralMng.writeLog(0, "Error: can't apply menus in a sub window");
+    }
+    
+  }
+  
+  
+  @Override public void addMenuItemGThread(String namePath, GralUserAction action)
+  { if(window instanceof GralPrimaryWindow_ifc)
+    { GralPrimaryWindow_ifc pWindow = (GralPrimaryWindow_ifc) window;
+      pWindow.addMenuItemGThread(namePath, action);
+    }
+  }
+  
+
+  
+  protected GralPanelContent addOutputFrameArea(int xArea, int yArea, int dxArea, int dyArea)
+  {
+    GralPanelContent outputArea = window.gralMng.createCompositeBox("outputArea");
+    addFrameArea(xArea, yArea, dxArea, dyArea, outputArea);
+    
+    window.gralMng.setPosition(0,0,0,0,0,'b');
+    outputBox = window.gralMng.addTextBox("output", false, null, '.');
+    try{ outputBox.append("output...\nA\nb\nc\nd\ne\nf\ng\nA\nA\n"); } catch(IOException exc){}
+    
+    return outputArea;
+  }
+  
+  
+  
+  GralDispatchCallbackWorker writeOutputTextDirectly = new GralDispatchCallbackWorker()
+  { @Override public void doBeforeDispatching(boolean onlyWakeup)
+    { String line;
+      while((line = outputTexts.poll())!=null){
+        writeDirectly(line, MainCmd.kInfoln_writeInfoDirectly);
+      }
+    }
+  };
+  
+  
+  
+  
+  
+  /** Overloads MainCmd.writeDirectly. This method may be overloaded by the user
+   * if it has a better way to show infos.*/
+  protected void writeDirectly(String sInfo, short kind)  //##a
+  { if(textAreaOutput != null){
+      if(Thread.currentThread().getId() == gralDevice.graphicThread.guiThreadId){
+        try{
+          if((kind & MainCmd.mNewln_writeInfoDirectly) != 0)
+          { textAreaOutput.append("\n");
+          }
+          textAreaOutput.append(sInfo);
+          int nrofLines = textAreaOutput.getNrofLines();
+          textAreaOutput.viewTrail();
+          //textAreaOutput.setCaretPosition(nrofLines-1);
+          textAreaOutput.redraw();
+        } catch(IOException exc){ getGralMng().writeLog(0, exc); }
+      } else {  
+        //queue the text
+        outputTexts.add(sInfo);
+        gralDevice.wakeup();
+      }
+    }  
+    else mainCmd.writeDirectly(sInfo, kind);     
+  }
+  
+  
+
+  
+  
+  
+  /**Adds a listener, which will be called in the dispatch loop.
+   * @param listener
+   */
+  @Override public void addDispatchListener(GralDispatchCallbackWorker listener)
+  { gralDevice.addDispatchListener(listener);
+  }
+  
+  
+  
+  @Override public void removeDispatchListener(GralDispatchCallbackWorker listener)
+  { gralDevice.removeDispatchListener(listener);
+  }
+  
+  
+
+
+  @Override
+  public boolean isWindowsVisible()
+  { return window.isWindowsVisible();
+  }
+
+
+
+
+  @Override  public void setWindowVisible(boolean visible)
+  { window.setWindowVisible(visible);
+  }
+
+
+  @Override public boolean isRunning(){ return gralDevice.isRunning(); }
+
+  @Override public void redraw(){  window.redraw(); }
+
+
+
+  
+  /** Gets the graphical frame. */
+  @Override public Object getitsGraphicFrame(){ return window.getWidgetImplementation(); }
+
+
+
+  @Override public long getThreadIdGui()
+  { return gralDevice.getThreadIdGui();
+  }
+
+  
+  @Override public GralWidgetMng getGralMng()
+  { return gralDevice.gralMng;
+  }
+  
+  @Override public GralRectangle getPixelPositionSize(){ return window.getPixelPositionSize(); }
+
+  
+  @Override public void closeWindow()
+  { 
+    window.closeWindow();
+  }
+
+
+
+  @Override public void exit()
+  { closeWindow(); 
+  }
+
+  
+  
+  @Override public void setResizeAction(GralUserAction action){
+    throw new IllegalArgumentException("this instance has its resizeListener already.");
+  }
+  
+
+
+  private GralUserAction resizeAction = new GralUserAction()
+  { @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    { validateFrameAreas();  //calculates the size of the areas newly and redraw.
+      return true;
+  } };
+  
+  
+  /**TODO actionFile in user space?
+   *
+   */
+  protected class GralActionFileOpen extends GralUserAction
+  { private final GralFileDialog_ifc fileDialog;
+  
+    public GralActionFileOpen(){
+      fileDialog = window.gralMng.createFileDialog();
+      fileDialog.open("FileDialog", 0);
+    }
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    { fileDialog.show("d:/vishia", "", "*.*", "select");
+      return true; 
+  } }
+
+
+  protected class GralActionHelp extends GralUserAction
+  { //final InfoBox infoHelp;
+    public GralActionHelp(){
+      InfoBox infoHelp1 = null;
+      try{
+        window.gralMng.selectPanel("output");
+        window.gralMng.setPosition(-40,0,0,0,0,'.');
+        infoHelp1 = InfoBox.create(window.gralMng, "Help", "Help");
+        for(String line: mainCmd.listHelpInfo){
+          infoHelp1.append(line).append("\n");
+          //sHelpText[ix++] = line;
+        }
+      } catch(Exception exc){ window.gralMng.writeLog(0, exc); }
+      infoHelp = infoHelp1;
+    }
+
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    { infoHelp.setWindowVisible(true);
+      return true; 
+  } }
+
+
+  protected class GralActionAbout extends GralUserAction
+  { //final InfoBox infoHelp;
+    public GralActionAbout(){
+      //InfoBox infoHelp1 = null;
+      try{
+        window.gralMng.selectPanel("output");
+        window.gralMng.setPosition(-20,0,-40,0,0,'.');
+        infoAbout = InfoBox.create(getGralMng(), "about", "about");
+        for(String line: mainCmd.listAboutInfo){
+          infoAbout.append(line).append("\n");
+          //sHelpText[ix++] = line;
+        }
+      } catch(Exception exc){ window.gralMng.writeLog(0, exc); }
+      //infoAbout = infoHelp1;
+    }
+
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    { infoAbout.setWindowVisible(true);
+      return true; 
+  } }
 
 
 }

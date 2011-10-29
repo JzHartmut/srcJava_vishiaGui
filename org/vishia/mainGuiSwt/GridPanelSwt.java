@@ -31,11 +31,11 @@ public class GridPanelSwt extends CanvasStorePanelSwt
 	{ super(namePanel, gralMng);
 	  swtCanvas = new SwtCanvasGridPanel(this, parent, style);
     super.panelComposite = swtCanvas;
+    swtCanvas.addControlListener(resizeItemListener);
     swtCanvas.setData(this);
     swtCanvas.setLayout(null);
     currColor = swtCanvas.getForeground();
     swtCanvas.addPaintListener(paintListener);
-    swtCanvas.addControlListener(resizeItemListener);
     swtCanvas.setBackground(backGround);
 	  setGridWidth(xG, yG, xS, yS);
 	}

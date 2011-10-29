@@ -17,7 +17,11 @@ public interface GralWindow_ifc
   
   boolean isWindowsVisible();
   
+  void setResizeAction(GralUserAction action);
+  
   void redraw();
+  
+  void closeWindow();
 
   GralRectangle getPixelPositionSize();
   

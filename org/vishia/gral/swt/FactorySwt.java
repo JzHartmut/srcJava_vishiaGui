@@ -30,16 +30,12 @@ public class FactorySwt implements GralFactory_ifc
     PrimaryWindowSwt swtWindow = PrimaryWindowSwt.create(cmdP.getLogMessageOutputConsole(), sTitle, left, top, xSize, ySize);
 
     gui = new MainCmdSwt(cmdP, swtWindow, swtWindow, sOutputArea);
-    gralDevice = gui.getPrimaryWindow();
-    if(gralDevice ==null){
-      //gralDevice = new GralDeviceSwt();
-    }
     return gui; // = new MainCmdSwt(cmdP, gralDevice);
   }
 
   @Override public GralGridProperties createProperties(char sizePixel)
   {
-    return new PropertiesGuiSwt(gui.getDisplay(), sizePixel);
+    return null; //new PropertiesGuiSwt(gui.getDisplay(), sizePixel);
   }
   
   

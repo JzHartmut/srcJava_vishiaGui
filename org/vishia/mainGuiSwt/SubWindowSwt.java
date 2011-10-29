@@ -1,6 +1,8 @@
 package org.vishia.mainGuiSwt;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -9,12 +11,15 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.gral.ifc.GralUserAction;
 
 //public class SubWindowSwt extends GralPanelContent implements WidgetCmpnifc
 public class SubWindowSwt extends GralSubWindow
 {
 
   protected Shell window;
+  
+  
   
   
   SubWindowSwt(Display display, String title, boolean exclusive, GralWidgetMng gralMng)
@@ -80,6 +85,34 @@ public class SubWindowSwt extends GralSubWindow
   { window.setBounds(x,y,dx,dy);
   }
   
+  @Override public void closeWindow()
+  { 
+    window.close();
+  }
 
+  
+  @Override public void setResizeAction(GralUserAction action){
+    resizeAction = action;
+    if(resizeAction == null){
+      window.addControlListener(resizeListener);
+    }
+  }
+  
+  ControlListener resizeListener = new ControlListener()
+  { @Override public void controlMoved(ControlEvent e) 
+    { //do nothing if moved.
+    }
+
+    @Override public void controlResized(ControlEvent e) 
+    { if(resizeAction !=null){
+        resizeAction.userActionGui(0, null);
+      }
+    }
+  };
+  
+  
+  
+
+  
   
 }

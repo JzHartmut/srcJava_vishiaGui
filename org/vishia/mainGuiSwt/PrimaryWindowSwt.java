@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -217,7 +219,7 @@ public class PrimaryWindowSwt extends GralWindowMng implements GralWindow_ifc
   
     @Override
     public void widgetSelected(SelectionEvent e)
-    { action.userActionGui("", null, (Object[])null);
+    { action.userActionGui(0, null);
     }
   }
   
@@ -352,6 +354,13 @@ public class PrimaryWindowSwt extends GralWindowMng implements GralWindow_ifc
 
   @Override public void redraw(){  graphicThreadSwt.windowSwt.redraw(); graphicThreadSwt.windowSwt.update(); }
 
+  @Override public void setResizeAction(GralUserAction action){
+    resizeAction = action;
+    if(resizeAction == null){
+      graphicThreadSwt.windowSwt.addControlListener(resizeListener);
+    }
+  }
+  
 
   
   public void removeWidgetImplementation()
@@ -375,5 +384,24 @@ public class PrimaryWindowSwt extends GralWindowMng implements GralWindow_ifc
   }
   
 
+  @Override public void closeWindow()
+  { 
+    terminate();
+  }
   
+  
+  ControlListener resizeListener = new ControlListener()
+  { @Override public void controlMoved(ControlEvent e) 
+    { //do nothing if moved.
+    }
+
+    @Override public void controlResized(ControlEvent e) 
+    { if(resizeAction !=null){
+        resizeAction.userActionGui(0, null);
+      }
+    }
+  };
+  
+  
+
 }

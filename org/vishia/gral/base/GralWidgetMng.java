@@ -391,7 +391,9 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
       //widgd.pos.set(pos);
       pos.panel.widgetsToResize.add(widgd);
     }
-    indexNameWidgets.put(widgd.name, widgd);
+    if(widgd.name != null){
+      indexNameWidgets.put(widgd.name, widgd);
+    }
     pos.panel.widgetList.add(widgd);
     
   }

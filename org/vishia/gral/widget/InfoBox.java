@@ -142,6 +142,13 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
     return null;
   }
   
+  
+  @Override public void setResizeAction(GralUserAction action){
+    window.setResizeAction(action);
+  }
+  
+
+  
   GralUserAction actionOk = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
       window.setWindowVisible(false);
@@ -157,6 +164,10 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   
   @Override public GralRectangle getPixelPositionSize(){ return window.getPixelPositionSize(); }
     
+  @Override public void closeWindow()
+  { 
+    window.closeWindow();
+  }
 
 
 }

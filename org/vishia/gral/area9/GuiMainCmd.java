@@ -129,7 +129,7 @@ public class GuiMainCmd extends MainCmd
 
   
   @Override public void exit()
-  { gui.exit();
+  { gui.closeWindow();
   }
   
 }

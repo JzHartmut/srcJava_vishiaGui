@@ -96,15 +96,15 @@ public class CanvasStorePanelSwt extends PanelSwt  //CanvasStorePanel //
    * @param backGround
    */
   public CanvasStorePanelSwt(String namePanel, Composite parent, int style, Color backGround, GralWidgetMng gralMng)
-  { super(namePanel, gralMng);
+  { super(namePanel, gralMng, null);
     swtCanvas = new SwtCanvas(this,parent, style);
     super.panelComposite = swtCanvas;
+    swtCanvas.addControlListener(resizeItemListener);
     swtCanvas.setData(this);
     swtCanvas.setLayout(null);
     currColor = swtCanvas.getForeground();
     swtCanvas.addPaintListener(paintListener);
     swtCanvas.setBackground(backGround);
-    swtCanvas.addControlListener(resizeItemListener);
   }
   
   /**Constructor called in derived classes. The derived class have to be instantiate the Canvas
@@ -112,7 +112,7 @@ public class CanvasStorePanelSwt extends PanelSwt  //CanvasStorePanel //
    */
   protected CanvasStorePanelSwt(String namePanel, GralWidgetMng gralMng)
   {
-    super(namePanel, gralMng);
+    super(namePanel, gralMng, null);
   }
   
 
@@ -157,25 +157,6 @@ public class CanvasStorePanelSwt extends PanelSwt  //CanvasStorePanel //
 	
   @Override public Control getWidgetImplementation(){ return swtCanvas; } 
 
-  protected ControlListener resizeItemListener = new ControlListener()
-  { @Override public void controlMoved(ControlEvent e) 
-    { //do nothing if moved.
-      stop();
-    }
-
-    @Override public void controlResized(ControlEvent e) 
-    { 
-      Widget wparent = e.widget; //it is the SwtCanvas because this method is assigned only there.
-      //Control parent = wparent;
-      for(GralWidget widgd: widgetsToResize){
-        widgd.getMng().resizeWidget(widgd, 0, 0);
-      }
-      stop();
-      //validateFrameAreas();  //calculates the size of the areas newly and redraw.
-    }
-    
-  };
-  
   @Override public boolean setFocus()
   {
     return swtCanvas.setFocus();

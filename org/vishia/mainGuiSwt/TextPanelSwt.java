@@ -81,7 +81,7 @@ public class TextPanelSwt extends GralPanelContent implements GralTextBox_ifc, A
   { return textAreaOutput.append(csq, start, end);
   }
   
-  @Override public Composite getPanelImpl() { return (Composite)panelComposite; }
+  @Override public Control getPanelImpl() { return (Control)panelComposite; }
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
   { ((Control)panelComposite).setBounds(x,y,dx,dy);

@@ -344,10 +344,10 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   @Override public GralPanelContent createCompositeBox(String name)
   {
     //Composite box = new Composite(graphicFrame, 0);
-    Composite box = new Composite(((PanelSwt)pos.panel).getPanelImpl(), 0);
+    Composite box = new Composite((Composite)pos.panel.getPanelImpl(), 0);
     setPosAndSize_(box);
     Point size = box.getSize();
-    GralPanelContent panel = new PanelSwt(name, box);
+    GralPanelContent panel = new PanelSwt(name, this, box);
     registerPanel(panel);
     //GuiPanelMngSwt mng = new GuiPanelMngSwt(gralDevice, size.y, size.x, propertiesGuiSwt, variableContainer, log);
     return panel;
@@ -383,7 +383,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   public GralSubWindow createWindow(String title, boolean exclusive)
   {
-    Shell panelSwt = ((PrimaryWindowSwt)gralDevice).getitsGraphicFrame(); //  (Composite)gralDevice.panelComposite;  
+    Shell panelSwt = (Shell)gralDevice.getitsGraphicFrame(); //  (Composite)gralDevice.panelComposite;  
     SubWindowSwt window = new SubWindowSwt(panelSwt.getDisplay(), title, exclusive, this);
     window.posWindow = getPositionInPanel();
     GralRectangle rect = calcPositionOfWindow(window.posWindow);
@@ -473,7 +473,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   	  //Note: because the pos.panel is null, not placement will be done.
   	} else {
   		
-  		Control parent = (Composite)pos.panel.getPanelImpl();
+  		Control parent = (Control)pos.panel.getPanelImpl();
   		while(!(parent instanceof Shell))
   		{ //Rectangle bounds = parent.getBounds();
   			parent = parent.getParent();
@@ -710,7 +710,6 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     //link the widget with is information together.
     widgetSwt.setData(widgetInfo);
     if(widgetInfo.name !=null){
-      indexNameWidgets.put(widgetInfo.name, widgetInfo);
       if(!editable){
     	  showFields.put(widgetInfo.name, widgetInfo);
     	}
@@ -734,7 +733,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
  * @return
  */
 @Override public GralTextBox addTextBox(String name, boolean editable, String prompt, char promptStylePosition)
-{ TextBoxSwt widgetSwt = new TextBoxSwt(name, ((PanelSwt)pos.panel).getPanelImpl(), SWT.MULTI, this);
+{ TextBoxSwt widgetSwt = new TextBoxSwt(name, (Composite)pos.panel.getPanelImpl(), SWT.MULTI|SWT.H_SCROLL|SWT.V_SCROLL, this);
   GralWidget widgetInfo = widgetSwt;
   widgetInfo.setPanelMng(this);
   //Text widgetSwt = new Text(((PanelSwt)pos.panel).getPanelImpl(), SWT.MULTI);
@@ -787,12 +786,11 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   //link the widget with is information together.
   widgetSwt.textFieldSwt.setData(widgetInfo);
   if(widgetInfo.name !=null){
-    indexNameWidgets.put(widgetInfo.name, widgetInfo);
     if(!editable){
       showFields.put(widgetInfo.name, widgetInfo);
     }
   }
-  pos.panel.widgetList.add(widgetInfo);
+  registerWidget(widgetInfo);
   return widgetSwt; 
 
 }
@@ -869,10 +867,8 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
       widget.setData(sCmd);
     } 
     GralWidget widgd = new WidgetSimpleWrapperSwt(sName, 'i', widget, this);
-    if(sName !=null){
-      indexNameWidgets.put(sName, widgd);
-    }
     widgd.setPanelMng(this);
+    registerWidget(widgd);
     return widget;
   }
 
@@ -891,10 +887,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   	widget.setDataPath(sDataPath);
     //widget.widget.setData(widgetInfos);
     widget.widgetSwt.addMouseListener(mouseClickForInfo);
-    pos.panel.widgetList.add(widget);
-    if(sName != null){
-      indexNameWidgets.put(sName, widget);
-    }
+    registerWidget(widget);
     return widget;
   }
   
@@ -957,7 +950,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     widgetInfos.setShowMethod(sShowMethod);
     widgetInfos.sDataPath = sDataPath;
     //pos.panel.widgetIndex.put(sName, widgetInfos);
-    pos.panel.widgetList.add(widgetInfos);
+    registerWidget(widgetInfos);
     /*
     if(action != null){
     	widgButton.widgetSwt.addMouseListener( new MouseClickActionForUserActionSwt(this, action, null, "Button-up", null));
@@ -1002,7 +995,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     widgetInfos.sCmd = sCmd;
     widgetInfos.setShowMethod(sShowMethod);
     widgetInfos.sDataPath = sDataPath;
-    pos.panel.widgetList.add(widgetInfos);
+    registerWidget(widgetInfos);
     return widgetInfos;
   }
   
@@ -1027,10 +1020,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     widgetInfos.setShowMethod(sShowMethod);
     widget.setData(widgetInfos);
     widget.addMouseListener(mouseClickForInfo);
-    pos.panel.widgetList.add(widgetInfos);
-    if(sName != null){
-      indexNameWidgets.put(sName, widgetInfos);
-    }
+    registerWidget(widgetInfos);
     return widgetInfos;
   }
   
@@ -1050,7 +1040,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 		curveView.setGridHorizontal(50.0F, 5);  //10%-divisions, with 5 sub-divisions
 		curveView.setGridColor(propertiesGuiSwt.colorGrid, propertiesGuiSwt.colorGridStrong);
 		widgd.setPanelMng(this);
-    indexNameWidgets.put(sName, widgd);
+    registerWidget(widgd);
 		return curveView;
 	}
 
@@ -1276,7 +1266,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   @Override public GralFileDialog_ifc createFileDialog()
   {
-    Composite panelSwt = ((PanelSwt)pos.panel).getPanelImpl(); //cast admissible, it should be SWT
+    Composite panelSwt = (Composite)pos.panel.getPanelImpl(); //cast admissible, it should be SWT
     while(!(panelSwt instanceof Shell)){
       panelSwt = panelSwt.getParent();
     }

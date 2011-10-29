@@ -5,7 +5,7 @@ import org.vishia.gral.ifc.GralTextBox_ifc;
 
 public abstract class GralTextBox extends GralTextField implements Appendable, GralTextBox_ifc
 {
-  public GralTextBox(String name, char whatis, GralWidgetMng mng)
+  protected GralTextBox(String name, char whatis, GralWidgetMng mng)
   { super(name, whatis, mng);
   }
 
