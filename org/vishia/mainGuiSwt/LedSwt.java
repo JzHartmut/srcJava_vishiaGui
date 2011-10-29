@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Control;
  */
 public class LedSwt extends Canvas
 {
-	final GuiPanelMngSwt mng;
+	final SwtWidgetMng mng;
 
 	boolean round;
 	
@@ -27,7 +27,7 @@ public class LedSwt extends Canvas
 	 * @param mng The Gui-panel-manager contains information about the graphic frame and properties.
 	 * @param kind Use 'r' or 'q' for a round or a square LED.
 	 */
-	public LedSwt(GuiPanelMngSwt mng, char kind)
+	public LedSwt(SwtWidgetMng mng, char kind)
 	{
 		
 		super(((PanelSwt)mng.pos.panel).getPanelImpl(), 0);

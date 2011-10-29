@@ -6,8 +6,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTextBox;
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
@@ -20,7 +20,7 @@ public class TextBoxSwt extends GralTextBox
   StringBuffer newText = new StringBuffer();
   
   
-  public TextBoxSwt(String name, Composite parent, int style, GralGridMngBase mng)
+  public TextBoxSwt(String name, Composite parent, int style, GralWidgetMng mng)
   { super(name, 't', mng);
     textFieldSwt = new Text(parent, style);
   }

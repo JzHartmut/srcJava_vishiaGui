@@ -3,7 +3,6 @@ package org.vishia.gral.base;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralWidgetChangeRequ;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
@@ -60,7 +59,7 @@ public abstract class GralWindowMng extends GralSubWindow implements GralPrimary
   //protected abstract void dispatch();
     
   
-  public GralWindowMng(GralGridMngBase gralMng, GralGraphicThread graphicThread)
+  public GralWindowMng(GralWidgetMng gralMng, GralGraphicThread graphicThread)
   { super("primaryWindow", gralMng);
     this.graphicThread = graphicThread;
   }

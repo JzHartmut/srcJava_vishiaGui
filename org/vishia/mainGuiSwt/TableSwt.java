@@ -17,8 +17,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTable;
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -44,14 +44,14 @@ public class TableSwt extends GralTable
   
   private Table table;
   
-  private final GuiPanelMngSwt mng;
+  private final SwtWidgetMng mng;
   
   private int[] columnWidths;
   
   //private final int selectionColumn;
   //private final CharSequence selectionText;
   
-  public TableSwt(GuiPanelMngSwt mng, String name, Composite parent,  int height
+  public TableSwt(SwtWidgetMng mng, String name, Composite parent,  int height
       , int[] columnWidths) //, int selectionColumn, CharSequence selectionText)
   { super(name, mng);
     this.mng = mng;
@@ -135,7 +135,7 @@ public class TableSwt extends GralTable
   
   
   
-  public static GralTable addTable(GuiPanelMngSwt mng, String sName, int height, int[] columnWidths
+  public static GralTable addTable(SwtWidgetMng mng, String sName, int height, int[] columnWidths
   //, int selectionColumn, CharSequence selectionText    
   )
   {
@@ -242,7 +242,7 @@ public class TableSwt extends GralTable
    * <li>params[0] is the selected line referenced with {@link GralTableLine_ifc}
    * <li>params[1] is the key code described in {@link KeyCode}
    * </ul> 
-   * If the method returns false, the central key action given in {@link GralGridMngBase#getRegisteredUserAction(String)}
+   * If the method returns false, the central key action given in {@link GralWidgetMng#getRegisteredUserAction(String)}
    * for "keyAction" is tried to get and then invoked with cmd = "key" and the key code in params[0].
    * This central keyAction may be used for application centralized keys without association to the table itself.
    */

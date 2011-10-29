@@ -7,6 +7,36 @@ import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralWidgetChangeRequ;
 import org.vishia.util.MinMaxTime;
 
+/**This class is the base for implementation of graphic threading. It is implemented for SWT and Swing yet.
+ * <br><br>
+ * <b>The functionality and necessity of a graphic thread</b>: <br>
+ * Swing is not thread safe but it works if widgets are changed from other threads. 
+ * SWT causes an exception if a widget is changed in another thread than the graphic thread.
+ * The graphic thread in SWT calls the operation system routine to dispatch events. 
+ * If any event call-back method is invoked from the graphic system, it runs in the graphic thread.
+ * Therefore all other widgets can changed in this thread. For example a button is pressed, and therefore
+ * some widgets are changed in appearance (setText(), setColor()) or new widgets are created and other are deleted.
+ * <br><br>
+ * <b>Necessity of other threads as the graphic thread, divide of functionality in some threads</b>:<br> 
+ * To get the data from the application some actions should be done which may need time or/and may wait of something
+ * for example network communication transfer. It that action are done in the graphic thread immediately, 
+ * the graphic seems as frozen. It doesn't execute other activities which are need for example to resize a window,
+ * hide and focus it etc. This phenomena is known by some graphic applications. It is bothering. 
+ * Therefore long running or waiting actions should be organized in another thread. The GUI can be show any hint
+ * that an action is executing. Other actions of the GUI runs well.
+ * <br><br>
+ * To organize such working the action on the GUI (calling back method, event) should notify and inform the other thread
+ * which does the work. If that thread is finished, its result should be shown on the graphic. 
+ * But because the graphic isn't thread safe the graphic can't be changed in this other thread direct.
+ * The information which should be changed are queued calling {@link #addChangeRequest(GralWidgetChangeRequ)}
+ * from this class. The execution of the change requests can't be done with the information contained in this class
+ * because it is the common and simple graphic thread implementation which doesn't know details about widgets.
+ * The proper class for that action is the {@link org.vishia.gral.base.GralWidgetMng} 
+ * and its derivation for the graphic implementation. That class calls {@link #pollChangeRequest()}.   
+ *  
+ * @author Hartmut Schorrig
+ *
+ */
 public abstract class GralGraphicThread implements Runnable
 {
   //protected GralPrimaryWindow window;
@@ -21,7 +51,7 @@ public abstract class GralGraphicThread implements Runnable
 
   /**List of all requests to change the graphical presentation of values. The list can be filled in some Threads.
    * It is processed in the {@link #dispatch()} routine.  */
-  public ConcurrentLinkedQueue<GralWidgetChangeRequ> guiChangeRequests = new ConcurrentLinkedQueue<GralWidgetChangeRequ>();
+  protected ConcurrentLinkedQueue<GralWidgetChangeRequ> guiChangeRequests = new ConcurrentLinkedQueue<GralWidgetChangeRequ>();
   
   /**True if the startup of the main window is done and the main window is visible. */
   protected boolean bStarted = false; 
@@ -74,6 +104,30 @@ public abstract class GralGraphicThread implements Runnable
   protected GralGraphicThread(String name)
   { thread = new Thread(this, name);
   }
+  
+  
+  /**Adds any change request of the graphic appearance in any other thread.
+   * The graphic thread will be poll it.
+   * @param requ
+   */
+  public void addChangeRequest(GralWidgetChangeRequ requ)
+  {
+    guiChangeRequests.add(requ);
+    synchronized(guiChangeRequests){ guiChangeRequests.notify(); }  //to wake up waiting on guiChangeRequests.
+    wakeup();
+
+  }
+  
+
+  /**Polls one change request. This method should be called in the graphic thread from any class,
+   * which knows details about the graphic. That class is {@link org.vishia.gral.base.GralWidgetMng}.
+   * @return null if the queue is empty.
+   */
+  public GralWidgetChangeRequ pollChangeRequest()
+  {
+    return guiChangeRequests.poll();
+  }
+  
   
   /**This method should be implemented by the graphical base. It should build the graphic main window
    * and returned when finished. This routine is called as the first routine in the Graphic thread's
@@ -153,7 +207,7 @@ public abstract class GralGraphicThread implements Runnable
     //synchronized(this){ notify(); }  //to weak up waiting on configGrafic().
   }
 
-  //public Thread getThread(){ return thread; }
+  
 
 }
 

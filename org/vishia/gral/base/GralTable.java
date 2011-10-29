@@ -1,6 +1,5 @@
 package org.vishia.gral.base;
 
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralWidget;
@@ -17,7 +16,7 @@ import org.vishia.gral.ifc.GralWidget;
 public abstract class GralTable extends GralWidget implements GralTable_ifc
 {
 
-  public GralTable(String name, GralGridMngBase mng)
+  public GralTable(String name, GralWidgetMng mng)
   {
     super(name, 'L', mng);
   }

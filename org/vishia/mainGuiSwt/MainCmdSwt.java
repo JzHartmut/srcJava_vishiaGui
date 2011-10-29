@@ -52,9 +52,9 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.area9.GuiMainAreaBase;
 import org.vishia.gral.area9.GuiMainAreaifc;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindowMng;
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralRectangle;
@@ -248,7 +248,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 		public void widgetSelected(SelectionEvent e) {
       //String[] sHelpText = new String[mainCmd.listHelpInfo.size()];
       if(infoHelp == null){
-        GralGridMngBase gralMng = getGralMng();
+        GralWidgetMng gralMng = getGralMng();
         try{
           gralMng.selectPanel("output");
           gralMng.setPosition(-40,0,0,0,0,'.');
@@ -277,7 +277,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 		public void widgetSelected(SelectionEvent e)
     {
 	    if(infoAbout == null){
-	      GralGridMngBase gralMng = getGralMng();
+	      GralWidgetMng gralMng = getGralMng();
 	      try{
 	        gralMng.selectPanel("output");
           gralMng.setPosition(-20,0,-40,0,0,'.');
@@ -1005,7 +1005,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   //@Override public void addGuiBuildOrder(Runnable order){ swtWindow.addGuiBuildOrder(order); }
 
 
-  @Override public GralGridMngBase getGralMng()
+  @Override public GralWidgetMng getGralMng()
   { return gralDevice.gralMng;
   }
 }

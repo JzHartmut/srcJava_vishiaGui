@@ -4,8 +4,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralSubWindow;
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 
@@ -16,7 +16,7 @@ public class SubWindowSwt extends GralSubWindow
   protected Shell window;
   
   
-  SubWindowSwt(Display display, String title, boolean exclusive, GralGridMngBase gralMng)
+  SubWindowSwt(Display display, String title, boolean exclusive, GralWidgetMng gralMng)
   { super("sub", gralMng);
     int props = 0; ////|SWT.CLOSE;
     if(title !=null){ props |= SWT.TITLE | SWT.BORDER; }

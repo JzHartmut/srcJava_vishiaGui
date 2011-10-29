@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.base.GralTextBox;
-import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;

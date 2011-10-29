@@ -1,6 +1,5 @@
 package org.vishia.gral.base;
 
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
@@ -17,7 +16,7 @@ public abstract class GralSubWindow extends GralPanelContent implements GralWind
   
   public GralGridPos posWindow;
   
-  public GralSubWindow(String nameWindow, GralGridMngBase mng)
+  public GralSubWindow(String nameWindow, GralWidgetMng mng)
   {
     super( nameWindow, mng);
   }

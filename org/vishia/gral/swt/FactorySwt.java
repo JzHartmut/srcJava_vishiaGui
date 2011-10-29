@@ -3,12 +3,12 @@ package org.vishia.gral.swt;
 import org.eclipse.swt.widgets.Composite;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.area9.GuiMainAreaifc;
+import org.vishia.gral.base.GralGridProperties;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralWindowMng;
-import org.vishia.gral.gridPanel.GralGridMngBase;
-import org.vishia.gral.gridPanel.GralGridProperties;
 import org.vishia.gral.ifc.GralFactory_ifc;
 import org.vishia.mainCmd.MainCmd;
-import org.vishia.mainGuiSwt.GuiPanelMngSwt;
+import org.vishia.mainGuiSwt.SwtWidgetMng;
 import org.vishia.mainGuiSwt.MainCmdSwt;
 import org.vishia.mainGuiSwt.PrimaryWindowSwt;
 import org.vishia.mainGuiSwt.PropertiesGuiSwt;
@@ -43,7 +43,7 @@ public class FactorySwt implements GralFactory_ifc
   }
   
   
-  @Override public GralGridMngBase createPanelMng(GralGridMngBase parent, int width, int height
+  @Override public GralWidgetMng createPanelMng(GralWidgetMng parent, int width, int height
   , GralGridProperties propertiesGui
   , VariableContainer_ifc variableContainer, LogMessage log)
   {

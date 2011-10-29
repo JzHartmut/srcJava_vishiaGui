@@ -63,9 +63,9 @@ public class TabPanelSwt extends GralTabbedPanel
   
 	private final TabFolder_ tabMng;
 	
-	final GuiPanelMngSwt mng;
+	final SwtWidgetMng mng;
 	
-	TabPanelSwt(String namePanel, GuiPanelMngSwt mng, GralPanelActivated_ifc user, int property)
+	TabPanelSwt(String namePanel, SwtWidgetMng mng, GralPanelActivated_ifc user, int property)
 	{ super(user, property);
 		this.mng = mng;
 		Object oParent = mng.pos.panel.getPanelImpl();

@@ -65,6 +65,8 @@ import org.eclipse.swt.widgets.Widget;
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralGridProperties;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralWindowMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralSubWindow;
@@ -74,11 +76,9 @@ import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.cfg.GralCfgBuilder;
-import org.vishia.gral.gridPanel.GralGridMngBase;
-import org.vishia.gral.gridPanel.GralGridBuild_ifc;
-import org.vishia.gral.gridPanel.GralGridProperties;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
+import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralWidgetChangeRequ;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
@@ -129,7 +129,7 @@ import org.vishia.msgDispatch.LogMessage;
  * @author Hartmut Schorrig
  *
  */
-public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc, GralPanelMngWorking_ifc
+public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWorking_ifc
 //GuiShellMngIfc<Control>   
 {
   private static final long serialVersionUID = -2547814076794969689L;
@@ -171,7 +171,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   protected Rectangle currPanelPos;
   
 
-  /**Properties of this Dialog Window. The {@link GralGridMngBase} contains an aggregation 
+  /**Properties of this Dialog Window. The {@link GralWidgetMng} contains an aggregation 
    * to the same instance, but with type {@link GralGridProperties}. Internally there are some more
    * Swt-capabilities in the derived type.
    */
@@ -269,7 +269,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public GuiPanelMngSwt(Device device /*, Composite graphicFrame */
+  public SwtWidgetMng(Device device /*, Composite graphicFrame */
   , char displaySize, VariableContainer_ifc variableContainer
 	, LogMessage log)
   { //super(sTitle); 
@@ -284,7 +284,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public GuiPanelMngSwt(PropertiesGuiSwt propertiesGui
+  public SwtWidgetMng(PropertiesGuiSwt propertiesGui
   	, VariableContainer_ifc variableContainer
   	, LogMessage log
   	)
@@ -418,7 +418,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   
   GralRectangle calcPositionOfWindow(GralGridPos posWindow)
   {
-    Control panel = ((PanelSwt)pos.panel).getPanelImpl();
+    Control panel = (Control)pos.panel.getPanelImpl();
     Point loc;
     Rectangle rectParent  = panel.getBounds();
     loc = panel.getLocation();
@@ -575,7 +575,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     case 9: mode = SWT.RIGHT; break;
     default: mode = 0;
     }
-    Label widget = new Label(((PanelSwt)pos.panel).getPanelImpl(), mode);
+    Label widget = new Label((Composite)pos.panel.getPanelImpl(), mode);
     widget.setForeground(propertiesGuiSwt.colorSwt(textColor));
     widget.setBackground(propertiesGuiSwt.colorSwt(backColor));
     widget.setText(sText);
@@ -991,7 +991,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     
     char size = ySize > 3? 'B' : 'A';
     if(sName == null){ sName = sButtonText; }
-    SwtButton widgButton = new SwtButton(sName, this, ((PanelSwt)pos.panel).getPanelImpl(), 0, size);
+    SwtButton widgButton = new SwtButton(sName, this, (Composite)pos.panel.getPanelImpl(), 0, size);
     GralColor colorOff = GralColor.getColor(sColor0);
     GralColor colorOn = GralColor.getColor(sColor1);
     widgButton.setSwitchMode(colorOff, colorOn);
@@ -1172,9 +1172,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
     	switch(cmd){
     	case GralPanelMngWorking_ifc.cmdInsert: checkAdmissibility(visibleInfo != null && visibleInfo instanceof String); break;
     	}
-      gralDevice.graphicThread.guiChangeRequests.add(new GralWidgetChangeRequ(descr, cmd, ident, visibleInfo, userData));
-  	  synchronized(gralDevice.graphicThread.guiChangeRequests){ gralDevice.graphicThread.guiChangeRequests.notify(); }  //to wake up waiting on guiChangeRequests.
-  	  gralDevice.wakeup();
+      gralDevice.graphicThread.addChangeRequest(new GralWidgetChangeRequ(descr, cmd, ident, visibleInfo, userData));
     }
   	return "";
   }
@@ -1300,23 +1298,23 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
    */
   private final GralDispatchCallbackWorker dispatchListener = new GralDispatchCallbackWorker()
   {
-  	
-  	
-  	/**This method is called in the GUI-thread. 
-  	 * 
-  	 */
-  	@Override public void doBeforeDispatching(boolean onlyWakeup)
-  	{ if(designer !=null && !bDesignerIsInitialized){
-  	    designer.initGui();
-  	    bDesignerIsInitialized = true;
-  	  }
-  	  GralWidgetChangeRequ changeReq;
-  	  while( (changeReq = gralDevice.graphicThread.guiChangeRequests.poll()) != null){
-  	  	GralWidget descr = changeReq.widgetDescr;
-  	  	setInfoDirect(descr, changeReq.cmd, changeReq.ident, changeReq.visibleInfo, changeReq.userData);
+    
+    
+    /**This method is called in the GUI-thread. 
+     * 
+     */
+    @Override public void doBeforeDispatching(boolean onlyWakeup)
+    { if(designer !=null && !bDesignerIsInitialized){
+        designer.initGui();
+        bDesignerIsInitialized = true;
+      }
+      GralWidgetChangeRequ changeReq;
+      while( (changeReq = gralDevice.graphicThread.pollChangeRequest()) != null){
+        GralWidget descr = changeReq.widgetDescr;
+        setInfoDirect(descr, changeReq.cmd, changeReq.ident, changeReq.visibleInfo, changeReq.userData);
 
-  	  }
-  	}  
+      }
+    }  
   };
   
   
@@ -1383,8 +1381,7 @@ public class GuiPanelMngSwt extends GralGridMngBase implements GralGridBuild_ifc
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sName);
   	} else if((descr.getGraphicWidgetWrapper() instanceof CurveView)) {
   		//sends a redraw information.
-  	  gralDevice.graphicThread.guiChangeRequests.add(new GralWidgetChangeRequ(descr, GralPanelMngWorking_ifc.cmdRedrawPart, 0, null, null));
-  		(((PanelSwt)pos.panel).getPanelImpl()).getDisplay().wake();  //wake-up the GUI-thread, it may sleep elsewhere. 
+  	  gralDevice.graphicThread.addChangeRequest(new GralWidgetChangeRequ(descr, GralPanelMngWorking_ifc.cmdRedrawPart, 0, null, null));
   	} else {
   	}
 	}

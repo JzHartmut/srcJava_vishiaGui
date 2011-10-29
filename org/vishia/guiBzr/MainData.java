@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.cmd.CmdExecuter;
 import org.vishia.gral.area9.GuiMainAreaifc;
-import org.vishia.gral.gridPanel.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 

@@ -13,7 +13,7 @@ public interface GralPlugUser_ifc
   void init(GralPlugUser2Gral_ifc plugUser2Gui, LogMessage log);
 
   
-  void registerMethods(org.vishia.gral.gridPanel.GralGridBuild_ifc guiMng);
+  void registerMethods(org.vishia.gral.ifc.GralGridBuild_ifc guiMng);
   
   /**This method is called if the view is changed. 
    * @param sTitle title of a window or panel.

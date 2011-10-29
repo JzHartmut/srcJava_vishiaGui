@@ -2,9 +2,9 @@ package org.vishia.gral.ifc;
 
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTable;
-import org.vishia.gral.gridPanel.GralGridMngBase;
 
 
 
@@ -24,8 +24,8 @@ import org.vishia.gral.gridPanel.GralGridMngBase;
  * <br><br>
  * The user can invoke the methods of the widget to animate it in a GUI etc, for example {@link #setBackColor(GralColor, int)}
  * or {@link #setValue(int, int, Object)}. This methods can be called in any thread. There are thread safe. 
- * The organization of this actions are done in the implementation of the {@link org.vishia.gral.gridPanel.GralGridMngBase}
- * like {@link org.vishia.mainGuiSwt.GuiPanelMngSwt}. This implementation adapts the basic graphic and knows theire methods
+ * The organization of this actions are done in the implementation of the {@link org.vishia.gral.base.GralWidgetMng}
+ * like {@link org.vishia.mainGuiSwt.SwtWidgetMng}. This implementation adapts the basic graphic and knows theire methods
  * to set colors, values etc. The user need deal only with this widget class. The thread safe  capability is organized
  * with a ConcurrentLinkedQueue which contains requests of type {@link org.vishia.gral.GralWidgetChangeRequ}.
  * <br><br>
@@ -88,7 +88,7 @@ public abstract class GralWidget implements GralWidget_ifc
   
   /**The panel manager from where the widget is organized. Most of methods need the information
    * stored in the panel manager. This reference is used to set values to other widgets. */
-  private GralGridMngBase itsMng;
+  private GralWidgetMng itsMng;
   
   /**Association to the configuration element from where this widget was built. 
    * If the widget is moved or its properties are changed in the 'design mode' of the GUI,
@@ -186,7 +186,7 @@ public abstract class GralWidget implements GralWidget_ifc
 		this.itsCfgElement = null;
 	}
 
-	public GralWidget(String sName, char whatIs, GralGridMngBase mng)
+	public GralWidget(String sName, char whatIs, GralWidgetMng mng)
 	{ this.name = sName;
 		//this.widget = null;
 		this.whatIs = whatIs;
@@ -268,8 +268,8 @@ public abstract class GralWidget implements GralWidget_ifc
    * See notes of {@link #getActionShow()}.
    * <br><br>
    * To get the action in a script context (GuiCfgBuilder) some actions can be registered 
-   * using {@link org.vishia.gral.gridPanel.GralGridBuild_ifc#registerUserAction(String, GralUserAction)}. They are gotten by name
-   * invoking {@link org.vishia.gral.gridPanel.GralGridBuild_ifc#getRegisteredUserAction(String)} 
+   * using {@link org.vishia.gral.ifc.GralGridBuild_ifc#registerUserAction(String, GralUserAction)}. They are gotten by name
+   * invoking {@link org.vishia.gral.ifc.GralGridBuild_ifc#getRegisteredUserAction(String)} 
    * in the {@link org.vishia.gral.cfg.GralCfgBuilder}.
    * 
    * @param action The action instance.
@@ -367,7 +367,7 @@ public abstract class GralWidget implements GralWidget_ifc
 		this.sFormat = sFormat;
 	}
 
-	public void setPanelMng(GralGridMngBase panel)
+	public void setPanelMng(GralWidgetMng panel)
 	{ this.itsMng = panel; 
 	}
 	
@@ -465,7 +465,7 @@ public abstract class GralWidget implements GralWidget_ifc
    * to get and set values and properties of this widgets non-symbolic.
    * @return The manager.
    */
-  public GralGridMngBase getMng(){ return itsMng; }
+  public GralWidgetMng getMng(){ return itsMng; }
   
   
   /**Gets the panel where the widget is member of. 

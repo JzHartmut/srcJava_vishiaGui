@@ -7,8 +7,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralMouseWidgetAction_ifc;
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
@@ -50,7 +50,7 @@ public class SwtGralMouseListener
       Object oInfo = widget.getData();
       if(oInfo instanceof GralWidget){
         GralWidget widgetInfo = (GralWidget)oInfo;
-        GralGridMngBase guiMng = widgetInfo.getMng();
+        GralWidgetMng guiMng = widgetInfo.getMng();
         try{
           if(widgetInfo ==null || widgetInfo.sDataPath ==null || !widgetInfo.sDataPath.equals("widgetInfo")){
             guiMng.setLastClickedWidgetInfo(widgetInfo );
@@ -76,7 +76,7 @@ public class SwtGralMouseListener
       Object oInfo = widget.getData();
       if(oInfo instanceof GralWidget){
         GralWidget widgetInfo = (GralWidget)oInfo;
-        GralGridMngBase guiMng = widgetInfo.getMng();
+        GralWidgetMng guiMng = widgetInfo.getMng();
         try{
           GralWidget widgd = (GralWidget)oInfo;
           int dx = ev.x - xDown, dy = ev.y - yDown;
@@ -172,7 +172,7 @@ public class SwtGralMouseListener
       Control widget = (Control) e.widget;  //a widget is a Control always.
       widget.addMouseMoveListener(mouseMoveListener);
       GralWidget widgg = (GralWidget)widget.getData();
-      GralGridMngBase guiMng = widgg.getMng();
+      GralWidgetMng guiMng = widgg.getMng();
       try{ 
         if(mouseWidgetAction !=null){
           switch(e.button){ 
@@ -212,7 +212,7 @@ public class SwtGralMouseListener
         }
         backgroundWhilePressed = null;
         GralWidget widgg = (GralWidget)widget.getData();
-        GralGridMngBase guiMng = widgg.getMng();
+        GralWidgetMng guiMng = widgg.getMng();
         try{ 
           GralUserAction action = widgg ==null ? null : widgg.getActionChange();
           if(action !=null){

@@ -1,9 +1,9 @@
 package org.vishia.gral.widget;
 
-import org.vishia.gral.gridPanel.GralGridMngBase;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.mainGuiSwt.GuiPanelMngSwt;
+import org.vishia.mainGuiSwt.SwtWidgetMng;
 
 /**This is a common base class for a ValueBar-widget. 
  * It is designed as a container for the widget. The widget itself is derived from the graphical base class,
@@ -36,7 +36,7 @@ abstract public class ValueBar extends GralWidget implements GralSetValue_ifc
 	
 	
 	
-	protected ValueBar(String name, GralGridMngBase mng)
+	protected ValueBar(String name, GralWidgetMng mng)
 	{ super(name, 'U', mng);
 		this.horizontal = false;
 	}

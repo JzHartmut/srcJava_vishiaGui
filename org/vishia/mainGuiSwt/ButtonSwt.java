@@ -18,7 +18,7 @@ public class ButtonSwt extends Canvas
 
 	String sButtonText;
 	
-	final GuiPanelMngSwt mng;
+	final SwtWidgetMng mng;
 	
 	final Color black;
 	final Color white;
@@ -34,7 +34,7 @@ public class ButtonSwt extends Canvas
 	 * @param mng The Gui-panel-manager contains information about the graphic frame and properties.
 	 * @param size The size of text in button, use 'A' or 'B' for small - bold
 	 */
-	public ButtonSwt(GuiPanelMngSwt mng, GralWidget widgd, char size)
+	public ButtonSwt(SwtWidgetMng mng, GralWidget widgd, char size)
 	{
 		super(((PanelSwt)mng.pos.panel).getPanelImpl(), 0);
 		this.widgd = widgd;

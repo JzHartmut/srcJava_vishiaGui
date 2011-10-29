@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.vishia.gral.gridPanel.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralWidgetCfg_ifc;
 
 

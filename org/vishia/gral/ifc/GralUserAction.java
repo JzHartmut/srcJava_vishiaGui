@@ -1,6 +1,5 @@
 package org.vishia.gral.ifc;
 
-import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.widget.FileSelector;
 import org.vishia.util.KeyCode;
 

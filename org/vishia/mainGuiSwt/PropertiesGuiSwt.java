@@ -8,7 +8,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
-import org.vishia.gral.gridPanel.GralGridProperties;
+import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.ifc.GralColor;
 
 

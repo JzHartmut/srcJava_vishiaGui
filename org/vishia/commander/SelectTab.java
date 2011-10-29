@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTabbedPanel;
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralTableLine_ifc;
@@ -34,7 +34,7 @@ class SelectTab
   
   final TabbedPanelData panelLeft, panelMid, panelRight;
   
-  private final GralGridMngBase mng;
+  private final GralWidgetMng mng;
   
   private final JavaCmd main;
   
@@ -241,7 +241,7 @@ class SelectTab
    * Implementation note: 
    * <ul>
    * <li>The last focused file tab is searched. The last focused widgets are stored
-   * in a List and are returned from {@link GralGridMngBase#getWidgetsInFocus()} if the widget implementation
+   * in a List and are returned from {@link GralWidgetMng#getWidgetsInFocus()} if the widget implementation
    * has the necessary focus action. Most of widgets have it, especially the File tables.
    * The instance of {@link FileSelector} is stored in the {@link GralWidget#getContentInfo()} .
    * The {@link #getLastFileTab()} method gets it.

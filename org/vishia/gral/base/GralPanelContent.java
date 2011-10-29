@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.vishia.gral.gridPanel.GralGridBuild_ifc;
-import org.vishia.gral.gridPanel.GralGridMngBase;
+import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -32,7 +31,7 @@ public abstract class GralPanelContent implements GralWidget_ifc
 	
 	public GralPrimaryWindow_ifc mainWindow;
 	
-	public final GralGridMngBase gralMng;
+	public final GralWidgetMng gralMng;
 	
 	//public final CanvasStorePanel panelComposite;
 	
@@ -84,7 +83,7 @@ public abstract class GralPanelContent implements GralWidget_ifc
   }
 
   
-  protected GralPanelContent(String namePanel, GralGridMngBase mng)
+  protected GralPanelContent(String namePanel, GralWidgetMng mng)
   { this.namePanel = namePanel; this.mainWindow = mng.gralDevice; this.gralMng = mng;
   }
 

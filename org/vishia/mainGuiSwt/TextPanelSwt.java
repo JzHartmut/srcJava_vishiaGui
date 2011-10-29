@@ -7,8 +7,8 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
@@ -18,7 +18,7 @@ public class TextPanelSwt extends GralPanelContent implements GralTextBox_ifc, A
   
   TextBoxSwt textAreaOutput;
   
-  TextPanelSwt(String namePanel, Shell shell, int style, GralGridMngBase mng) //GralPrimaryWindow_ifc mainWindow)
+  TextPanelSwt(String namePanel, Shell shell, int style, GralWidgetMng mng) //GralPrimaryWindow_ifc mainWindow)
   { super(namePanel, mng);
     Display device = shell.getDisplay();
     //Composite panel = (Composite) panelComposite;

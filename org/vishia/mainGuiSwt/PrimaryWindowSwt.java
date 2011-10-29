@@ -22,8 +22,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralGraphicThread;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralWindowMng;
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralWindow_ifc;
@@ -62,7 +62,7 @@ public class PrimaryWindowSwt extends GralWindowMng implements GralWindow_ifc
   
 
   
-  private PrimaryWindowSwt(GralGridMngBase gralMng, SwtGraphicThread graphicThread, Display displaySwt)
+  private PrimaryWindowSwt(GralWidgetMng gralMng, SwtGraphicThread graphicThread, Display displaySwt)
   { super(gralMng, graphicThread);
     this.graphicThreadSwt = graphicThread;  //refers SWT type
   }  
@@ -79,7 +79,7 @@ public class PrimaryWindowSwt extends GralWindowMng implements GralWindow_ifc
     }
     //The propertiesGuiSwt needs the Display instance for Font and Color. Therefore the graphic thread with creation of Display should be executed before. 
     PropertiesGuiSwt propertiesGui = new PropertiesGuiSwt(init.displaySwt, 'C');
-    GralGridMngBase gralMng = new GuiPanelMngSwt(propertiesGui, null, log);
+    GralWidgetMng gralMng = new SwtWidgetMng(propertiesGui, null, log);
     
     //The PrimaryWindowSwt is a derivation of the GralPrimaryWindow. It is more as only a SWT Shell.
     PrimaryWindowSwt instance = new PrimaryWindowSwt(gralMng, init, init.displaySwt);

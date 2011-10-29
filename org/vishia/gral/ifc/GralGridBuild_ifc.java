@@ -1,4 +1,4 @@
-package org.vishia.gral.gridPanel;
+package org.vishia.gral.ifc;
 
 import java.io.File;
 import java.io.InputStream;
@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralSubWindow;
 import org.vishia.gral.base.GralTabbedPanel;
@@ -17,17 +18,7 @@ import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.cfg.GralCfgData;
-import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralFileDialog_ifc;
-import org.vishia.gral.ifc.GralDispatchCallbackWorker;
-import org.vishia.gral.ifc.GralGridPos;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
-import org.vishia.gral.ifc.GralTableLine_ifc;
-import org.vishia.gral.ifc.GralTextBox_ifc;
 //import org.vishia.gral.ifc.GuiShellMngIfc;
-import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.InfoBox;
 import org.vishia.util.KeyCode;
 
@@ -56,8 +47,8 @@ import org.vishia.util.KeyCode;
  * <br><br>
  * To build a GUI you must use the following order of calls:
  * <ul>
- * <li>Create a panel manager which is typeof {@link GralGridMngBase} or this interface.
- *   For example create {@link org.vishia.mainGuiSwt.GuiPanelMngSwt}.
+ * <li>Create a panel manager which is typeof {@link GralWidgetMng} or this interface.
+ *   For example create {@link org.vishia.mainGuiSwt.SwtWidgetMng}.
  * <li>Create a panel, for example call {@link #createGridPanel(GralColor, int, int, int, int)}
  *   and add the panel to the given     
  * <li>Before add, you can select any given panel by String-identifier, using {@link #selectPanel(String)}.
@@ -289,9 +280,9 @@ public interface GralGridBuild_ifc
   
   /**Gets the current position in the panel to store anywhere other. Usual the position is stored in the widget itself.
    * This operation returns an independent instance of GralGridPos. 
-   * Note that the {@link GralGridMngBase#pos} is reused there. Therefore the implementation of the method
+   * Note that the {@link GralWidgetMng#pos} is reused there. Therefore the implementation of the method
    * returns a cloned instance.   
-   * @return An independent instance with current data of {@link GralGridMngBase#pos}. 
+   * @return An independent instance with current data of {@link GralWidgetMng#pos}. 
    */
   GralGridPos getPositionInPanel();
   
@@ -379,7 +370,7 @@ public interface GralGridBuild_ifc
    * <li>values[0] is the selected line referenced with {@link GralTableLine_ifc}
    * <li>values[1] is the key code described in {@link KeyCode}
    * </ul> 
-   * If the method isn't given or returns false, the central key action given in {@link GralGridMngBase#getRegisteredUserAction(String)}
+   * If the method isn't given or returns false, the central key action given in {@link GralWidgetMng#getRegisteredUserAction(String)}
    * for "keyAction" is tried to get and then invoked with cmd = "key" and the key code in values[0].
    * This central keyAction may be used for application centralized keys without association to the table itself.
    * 

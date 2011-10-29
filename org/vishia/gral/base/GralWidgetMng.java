@@ -1,4 +1,4 @@
-package org.vishia.gral.gridPanel;
+package org.vishia.gral.base;
 
 import java.io.File;
 import java.io.Writer;
@@ -12,17 +12,13 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.byteData.VariableContainer_ifc;
-import org.vishia.gral.base.GralWindowMng;
-import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralSubWindow;
-import org.vishia.gral.base.GralTabbedPanel;
-import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.cfg.GralCfgData;
 import org.vishia.gral.cfg.GralCfgDesigner;
 import org.vishia.gral.cfg.GralCfgWriter;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
+import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
@@ -41,8 +37,8 @@ import org.vishia.msgDispatch.LogMessage;
  * The GuiPanelMng is a common approach to work with graphical interface simply, 
  * it is implemented by the several graphic-system-supporting classes
  * <ul>
- * <li>{@link org.vishia.mainGuiSwt.GuiPanelMngSwt}
- * <li>{@link org.vishia.mainGuiSwing.GuiPanelMngSwt}
+ * <li>{@link org.vishia.mainGuiSwt.SwtWidgetMng}
+ * <li>{@link org.vishia.SwtWidgetMng.GuiPanelMngSwt}
  * </ul>
  * to offer a unique interface to work with simple graphic applications.
  * <br><br>
@@ -52,7 +48,7 @@ import org.vishia.msgDispatch.LogMessage;
  * @param <WidgetTYPE> The special base type of the composed widgets in the underlying graphic adapter specialization.
  *                     (SWT: Composite)
  */
-public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMngWorking_ifc
+public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWorking_ifc
 {
   /**Changes:
    * <ul>
@@ -140,7 +136,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   
   protected boolean bDesignerIsInitialized = false;
   
-  final GralGridMngBase parent;
+  final GralWidgetMng parent;
   
   /**Base class for managing all panels and related windows.
    * This base class contains all common resources to manage panels and windows.
@@ -221,17 +217,17 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static GralGridMngBase createWindow(String graphicBaseSystem)
-	{ Class<GralGridMngBase> mngClass;
-		GralGridMngBase mng = null;
+	public static GralWidgetMng createWindow(String graphicBaseSystem)
+	{ Class<GralWidgetMng> mngClass;
+		GralWidgetMng mng = null;
 		String sGraphicBaseSystem = "org.vishia.mainGuiSwt.GuiPanelMngSwt";
 		try{ 
-			mngClass = (Class<GralGridMngBase>) Class.forName(sGraphicBaseSystem);
+			mngClass = (Class<GralWidgetMng>) Class.forName(sGraphicBaseSystem);
 		} catch(ClassNotFoundException exc){ mngClass = null; }
 		
 		if(mngClass == null) throw new IllegalArgumentException("Graphic base system not found: " + sGraphicBaseSystem);
 		try{ 
-			Constructor<GralGridMngBase> ctor = mngClass.getConstructor();
+			Constructor<GralWidgetMng> ctor = mngClass.getConstructor();
 			mng = ctor.newInstance();
 			//mng = mngClass.newInstance();
 		
@@ -318,7 +314,7 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
   
 	
 	
-  public GralGridMngBase(GralGridProperties props, VariableContainer_ifc variableContainer, LogMessage log)
+  public GralWidgetMng(GralGridProperties props, VariableContainer_ifc variableContainer, LogMessage log)
 	{ this.parent = null;
 	  this.propertiesGui = props;
 		this.log = log;
@@ -554,8 +550,8 @@ public abstract class GralGridMngBase implements GralGridBuild_ifc, GralPanelMng
 		{ 
 			if(lastClickedWidgetInfo !=null){
 				log.sendMsg(Report.info, "widget %s, datapath=%s"
-					, GralGridMngBase.this.lastClickedWidgetInfo.name
-					, GralGridMngBase.this.lastClickedWidgetInfo.getDataPath());
+					, GralWidgetMng.this.lastClickedWidgetInfo.name
+					, GralWidgetMng.this.lastClickedWidgetInfo.getDataPath());
 	      return true;
 			} else {
 				log.sendMsg(0, "widgetInfo - no widget selected");

@@ -2,8 +2,8 @@ package org.vishia.gral.area9;
 
 import java.io.File;
 
-import org.vishia.gral.gridPanel.GralGridMngBase;
-import org.vishia.gral.gridPanel.GralGridProperties;
+import org.vishia.gral.base.GralGridProperties;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.swt.FactorySwt;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.msgDispatch.LogMessage;
@@ -22,7 +22,7 @@ public class GuiMainCmd extends MainCmd
    */
   protected final GuiCallingArgs cargs;
   
-  public final GralGridMngBase gralMng;
+  public final GralWidgetMng gralMng;
   
   
   /**ctor called in static main.

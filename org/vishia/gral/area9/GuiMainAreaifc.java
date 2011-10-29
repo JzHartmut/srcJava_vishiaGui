@@ -2,9 +2,9 @@ package org.vishia.gral.area9;
 
 import java.io.File;
 
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTextBox;
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -129,6 +129,6 @@ public interface GuiMainAreaifc extends GralPrimaryWindow_ifc
   GralTextBox getOutputBox();
   
   
-  GralGridMngBase getGralMng();
+  GralWidgetMng getGralMng();
   
 }

@@ -19,7 +19,7 @@ import org.vishia.gral.widget.ValueBar;
 public class ValueBarSwt extends ValueBar implements GralSetValue_ifc, GralWidget_ifc
 {
 
-	final GuiPanelMngSwt mng;
+	final SwtWidgetMng mng;
 
 	protected BarWidget widgetSwt;
 	
@@ -33,7 +33,7 @@ public class ValueBarSwt extends ValueBar implements GralSetValue_ifc, GralWidge
 	 * @param mng The Gui-panel-manager contains information about the graphic frame and properties.
 	 * @param size The size of text in button, use 'A' or 'B' for small - bold
 	 */
-	public ValueBarSwt(String name, GuiPanelMngSwt mng)
+	public ValueBarSwt(String name, SwtWidgetMng mng)
 	{
     super(name, mng);
     this.mng = mng;
@@ -73,7 +73,7 @@ public class ValueBarSwt extends ValueBar implements GralSetValue_ifc, GralWidge
 	{
 		BarWidget()
 		{
-			super(((PanelSwt)mng.pos.panel).getPanelImpl(), 0);  //Canvas
+			super((Composite)mng.pos.panel.getPanelImpl(), 0);  //Canvas
 			addPaintListener(paintListener);	
 			
 		}

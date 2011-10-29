@@ -3,8 +3,8 @@ package org.vishia.mainGuiSwt;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 
@@ -13,7 +13,7 @@ public class PanelSwt extends GralPanelContent
   
   //protected Composite panelSwt;
   
-  public PanelSwt(String name, GralGridMngBase mng)
+  public PanelSwt(String name, GralWidgetMng mng)
   {
     super(name, mng);
   }

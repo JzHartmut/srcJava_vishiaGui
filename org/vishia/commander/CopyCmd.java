@@ -2,7 +2,7 @@ package org.vishia.commander;
 
 import java.io.File;
 
-import org.vishia.gral.gridPanel.GralGridMngBase;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralTextField_ifc;
@@ -88,15 +88,15 @@ public class CopyCmd
   
   
   GralUserAction actionConfirmCopy = new GralUserAction()
-  { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
-    { if(sIntension.equals("ok")){
-      //copy
+  { @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
+    { if(infos.sCmd.equals("ok")){
+        stop();
       }
       main.panelMng.setWindowsVisible(windConfirmCopy, null); //set it invisible.
       return true;
     }
   };
   
-  
+  void stop(){}
   
 }

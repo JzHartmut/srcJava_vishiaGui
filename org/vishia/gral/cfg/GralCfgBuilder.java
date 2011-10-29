@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.gral.cfg.GralCfgElement;
-import org.vishia.gral.gridPanel.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;

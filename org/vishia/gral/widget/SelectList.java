@@ -3,10 +3,10 @@ package org.vishia.gral.widget;
 import java.util.List;
 import java.util.Map;
 
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTable;
-import org.vishia.gral.gridPanel.GralGridBuild_ifc;
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
@@ -40,7 +40,7 @@ public abstract class SelectList extends GralWidget
   /**Not used yet, register actions? */
   protected Map<String, GralUserAction> actions;
   
-  public SelectList(String name, GralGridMngBase mng)
+  public SelectList(String name, GralWidgetMng mng)
   {
     super(name, 'l', mng);
   }

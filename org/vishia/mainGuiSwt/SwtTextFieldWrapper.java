@@ -2,8 +2,8 @@ package org.vishia.mainGuiSwt;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Text;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTextField;
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
@@ -17,7 +17,7 @@ public class SwtTextFieldWrapper extends GralTextField
   StringBuffer newText = new StringBuffer();
   
   
-  public SwtTextFieldWrapper(String name, Text widgetSwt, char whatis, GralGridMngBase mng)
+  public SwtTextFieldWrapper(String name, Text widgetSwt, char whatis, GralWidgetMng mng)
   { super(name, whatis, mng);
     textFieldSwt = widgetSwt;
   }

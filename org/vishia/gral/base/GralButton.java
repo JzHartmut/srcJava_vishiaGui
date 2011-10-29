@@ -1,6 +1,5 @@
 package org.vishia.gral.base;
 
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralImageBase;
 import org.vishia.gral.ifc.GralWindowMng_ifc;
@@ -31,7 +30,7 @@ public abstract class GralButton extends GralWidget
   protected boolean shouldSwitched;
   
   //public GralButton(String sName, GralWindowMng_ifc mainWindow, GralGridMngBase mng)
-  public GralButton(String sName, GralGridMngBase mng)
+  public GralButton(String sName, GralWidgetMng mng)
   {
     super(sName, 'B', mng);  //GralWidget
     //this.mng = mng;

@@ -1,7 +1,7 @@
 package org.vishia.gral.cfg;
 
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralSubWindow;
-import org.vishia.gral.gridPanel.GralGridMngBase;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralRectangle;
@@ -26,7 +26,7 @@ public class GralCfgDesigner
   
   protected final LogMessage log;
 
-  private final GralGridMngBase mng;
+  private final GralWidgetMng mng;
   
   private final GralCfgBuilder cfgBuilder;
 
@@ -51,7 +51,7 @@ public class GralCfgDesigner
   
   GralWidget widgdInDialog = null;
   
-  public GralCfgDesigner(GralCfgBuilder cfgBuilder, GralGridMngBase mng, LogMessage log)
+  public GralCfgDesigner(GralCfgBuilder cfgBuilder, GralWidgetMng mng, LogMessage log)
   { this.cfgBuilder = cfgBuilder;
     this.log = log;
     this.mng = mng;

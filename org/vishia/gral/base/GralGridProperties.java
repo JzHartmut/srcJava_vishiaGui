@@ -1,4 +1,4 @@
-package org.vishia.gral.gridPanel;
+package org.vishia.gral.base;
 
 import java.util.Map;
 import java.util.TreeMap;

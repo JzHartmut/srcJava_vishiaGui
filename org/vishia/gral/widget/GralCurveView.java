@@ -1,13 +1,13 @@
 package org.vishia.gral.widget;
 
-import org.vishia.gral.gridPanel.GralGridMngBase;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralWidget;
 
 public class GralCurveView extends GralWidget
 {
 
-  public GralCurveView(String sName, GralGridMngBase mng)
+  public GralCurveView(String sName, GralWidgetMng mng)
   {
     super(sName, 'c', mng);
   }
