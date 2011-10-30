@@ -329,6 +329,22 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   }
   
   
+  /**selects a registered panel for the next add-operations. 
+   */
+  @Override public void selectPanel(String sName){
+    pos.panel = panels.get(sName);
+    sCurrPanel = sName;
+    if(pos.panel == null) {
+      pos.panel = currTabPanel.addGridPanel(sName, /*"&" + */sName,1,1,10,10);
+      panels.put(sName, pos.panel);
+      log.sendMsg(0, "GuiPanelMng:selectPanel: unknown panel name %s", sName);
+      //Note: because the pos.panel is null, not placement will be done.
+    }
+  }
+  
+  
+
+  
   @Override public GralWidget getWidget(String name)
   { return indexNameWidgets.get(name);
   }

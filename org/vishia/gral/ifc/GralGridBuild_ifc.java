@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
@@ -302,7 +303,7 @@ public interface GralGridBuild_ifc
    * @return
    */
   //Object addButton(String sButtonText, int height, int width, String sCmd, String sUserAction, String sName);
-  public GralWidget addButton(
+  public GralButton addButton(
   	String sName
   , GralUserAction action
   , String sCmd

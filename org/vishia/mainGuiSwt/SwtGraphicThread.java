@@ -96,7 +96,7 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
   final String sTitle; final int xPos, yPos, xSize, ySize;
   
   SwtGraphicThread(String sTitle, int left, int top, int xSize, int ySize)
-  { super(sTitle);
+  { super();
     this.sTitle = sTitle; this.xPos = left; this.yPos = top; this.xSize = xSize; this.ySize = ySize; 
     thread.start();
     

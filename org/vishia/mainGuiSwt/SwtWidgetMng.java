@@ -460,29 +460,6 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   }
   
   
-  /**selects a registered panel for the next add-operations. 
-   */
-  public void selectPanel(String sName){
-  	pos.panel = panels.get(sName);
-  	sCurrPanel = sName;
-  	if(pos.panel == null) {
-  	  pos.panel = currTabPanel.addGridPanel(sName, /*"&" + */sName,1,1,10,10);
-  	  panels.put(sName, pos.panel);
-  		log.sendMsg(0, "GuiPanelMng:selectPanel: unknown panel name %s", sName);
-  	  //Note: because the pos.panel is null, not placement will be done.
-  	} else {
-  		
-  		Control parent = (Control)pos.panel.getPanelImpl();
-  		while(!(parent instanceof Shell))
-  		{ //Rectangle bounds = parent.getBounds();
-  			parent = parent.getParent();
-  		}  
-  		//pos.panelPos = (((PanelSwt)pos.panel).getPanelImpl()).getBounds();
-  		
-  	}
-  }
-  
-  
   /**Places a current component with knowledge of the current positions and the spreads of the component on graphic.
    * @param component The component to place.
    */
@@ -652,7 +629,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     widgetSwt.setEditable(editable);
     if(editable)
     	stop();
-    widgetSwt.setBackground(propertiesGuiSwt.colorSwt(0xFFFFFF));
+    widgetSwt.setBackground(propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));
     widgetSwt.addFocusListener(focusListener);
 
     Listener[] oldMouseListener = widgetSwt.getListeners(SWT.MouseDown);
@@ -917,7 +894,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   
   
-  @Override public GralWidget addButton(
+  @Override public GralButton addButton(
   	String sName
   , GralUserAction action
   , String sCmd
@@ -940,16 +917,15 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   	widgButton.setText(sButtonText);
     //ButtonSwt button = new ButtonSwt(this, null, size);
   	//GralWidget widgetInfos = new WidgetSimpleWrapperSwt(sName, 'B', button);
-    GralWidget widgetInfos = widgButton;
-    widgetInfos.setPanelMng(this);
+    widgButton.setPanelMng(this);
     //button.setForeground(propertiesGuiSwt.colorSwt(0xff00));
     //button.setSize(propertiesGui.xPixelUnit() * xSize -2, propertiesGui.yPixelUnit() * ySize -2);
     //setBounds_(button);
-    widgetInfos.sCmd = sCmd;
-    widgetInfos.setShowMethod(sShowMethod);
-    widgetInfos.sDataPath = sDataPath;
-    //pos.panel.widgetIndex.put(sName, widgetInfos);
-    registerWidget(widgetInfos);
+    widgButton.sCmd = sCmd;
+    widgButton.setShowMethod(sShowMethod);
+    widgButton.sDataPath = sDataPath;
+    //pos.panel.widgetIndex.put(sName, widgButton);
+    registerWidget(widgButton);
     /*
     if(action != null){
     	widgButton.widgetSwt.addMouseListener( new MouseClickActionForUserActionSwt(this, action, null, "Button-up", null));
@@ -957,10 +933,10 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
       widgButton.widgetSwt.addMouseListener(mouseClickForInfo);
     }
     if(sName != null){
-      indexNameWidgets.put(sName, widgetInfos);
+      indexNameWidgets.put(sName, widgButton);
     }
     */
-    return widgetInfos;
+    return widgButton;
   }
   
 
@@ -989,13 +965,12 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     widgButton.setSwitchMode(colorOff, colorOn);
     widgButton.setActionChange(action);  //maybe null
     widgButton.setText(sButtonText);
-    GralWidget widgetInfos = widgButton;
-    widgetInfos.setPanelMng(this);
-    widgetInfos.sCmd = sCmd;
-    widgetInfos.setShowMethod(sShowMethod);
-    widgetInfos.sDataPath = sDataPath;
-    registerWidget(widgetInfos);
-    return widgetInfos;
+    widgButton.setPanelMng(this);
+    widgButton.sCmd = sCmd;
+    widgButton.setShowMethod(sShowMethod);
+    widgButton.sDataPath = sDataPath;
+    registerWidget(widgButton);
+    return widgButton;
   }
   
 

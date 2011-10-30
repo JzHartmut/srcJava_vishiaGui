@@ -101,8 +101,8 @@ public abstract class GralGraphicThread implements Runnable
    * after all parameter are saved to execute the overridden {@link #initGraphic()} method.
    * @param name Name of the thread.
    */
-  protected GralGraphicThread(String name)
-  { thread = new Thread(this, name);
+  protected GralGraphicThread()
+  { thread = new Thread(this, "graphic");
   }
   
   

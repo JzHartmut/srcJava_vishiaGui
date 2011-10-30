@@ -34,9 +34,7 @@ public class PrimaryWindowSwt extends SubWindowSwt implements GralPrimaryWindow_
   /**The file menuBar is extendable. */
   private Menu menuBar;
   
-  /**It is the same instance as {@link GralWidgetMng#gralDevice} but refer the SWT type.
-   * 
-   */
+  /** */
   final SwtGraphicThread graphicThreadSwt;
   
   private static class MenuEntry

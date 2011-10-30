@@ -2,6 +2,7 @@ package org.vishia.gral.area9;
 
 import java.io.File;
 
+import org.vishia.gral.awt.AwtFactory;
 import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralWidgetMng;
@@ -50,7 +51,9 @@ public class GralArea9MainCmd extends MainCmd
       setExitErrorLevel(exitWithArgumentError);
       bOk = false;
     }
-    cargs.graphicFactory = new FactorySwt(); 
+    if(cargs.graphicFactory == null){
+      cargs.graphicFactory = new FactorySwt();
+    }
     if(sOutputArea == null){ sOutputArea = "A3C3"; }
     
     GralWindow primaryWindow = cargs.graphicFactory.createWindow(getLogMessageOutputConsole(), sTitle, 50,50,800, 600);
@@ -93,6 +96,14 @@ public class GralArea9MainCmd extends MainCmd
       }
       else if(arg.startsWith("-plugin=")) 
       { cargs.sPluginClass = getArgument(8);   //an example for default output
+      }
+      
+      else if(arg.startsWith("-SWT")) 
+      { cargs.graphicFactory = new FactorySwt();   //an example for default output
+      }
+      
+      else if(arg.startsWith("-AWT")) 
+      { cargs.graphicFactory = new AwtFactory();   //an example for default output
       }
       
       else if(arg.startsWith("-_")) 
