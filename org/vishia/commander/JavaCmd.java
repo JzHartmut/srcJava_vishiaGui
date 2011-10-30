@@ -101,32 +101,21 @@ public class JavaCmd extends GuiCfg
 
     // Creates tab-Panels for the file lists and command lists.
     panelMng.selectPanel("primaryWindow");
-    selectTab.panelLeft.tabbedPanel = panelMng.createTabPanel("File0Tab", null,
-        GralGridBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(1, 1, 1, 1,
-        selectTab.panelLeft.tabbedPanel.getGuiComponent()); // dialogPanel);
+    selectTab.panelLeft.tabbedPanel = panelMng.createTabPanel("File0Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    gui.addFrameArea(1, 1, 1, 1, selectTab.panelLeft.tabbedPanel.getGuiComponent()); // dialogPanel);
 
     selectTab.buildInitialTabs(selectTab.panelLeft);
     panelMng.selectPanel("primaryWindow");
-    selectTab.panelMid.tabbedPanel = panelMng.createTabPanel("File1Tab", null,
-        GralGridBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(2, 1, 1, 1,
-        selectTab.panelMid.tabbedPanel.getGuiComponent()); // dialogPanel);
+    selectTab.panelMid.tabbedPanel = panelMng.createTabPanel("File1Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    gui.addFrameArea(2, 1, 1, 1, selectTab.panelMid.tabbedPanel.getGuiComponent()); // dialogPanel);
     selectTab.buildInitialTabs(selectTab.panelMid);
 
     panelMng.selectPanel("primaryWindow");
-    selectTab.panelRight.tabbedPanel = panelMng.createTabPanel("File2Tab",
-        null, GralGridBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(3, 1, 1, 1,
-        selectTab.panelRight.tabbedPanel.getGuiComponent()); // dialogPanel);
+    selectTab.panelRight.tabbedPanel = panelMng.createTabPanel("File2Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    gui.addFrameArea(3, 1, 1, 1, selectTab.panelRight.tabbedPanel.getGuiComponent()); // dialogPanel);
     selectTab.buildInitialTabs(selectTab.panelRight);
 
-    /*
-     * for(SelectTab.SelectInfo info: selectTab.selectRight){ if(info.active ==
-     * 'r'){ selectTab.buildTabFromSelection(info, tabbedPanelsRight); } }
-     * for(SelectTab.SelectInfo info: selectTab.selectAll){ if(info.active ==
-     * 'r'){ selectTab.buildTabFromSelection(info, tabbedPanelsRight); } }
-     */
+    panelMng.selectPanel("primaryWindow");
     panelButtons = panelMng.createGridPanel("Buttons", panelMng.getColor("gr"),
         1, 1, 10, 10);
     gui.addFrameArea(1, 3, 3, 1, panelButtons); // dialogPanel);

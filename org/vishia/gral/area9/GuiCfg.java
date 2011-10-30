@@ -216,7 +216,7 @@ GralDispatchCallbackWorker initGuiDialog = new GralDispatchCallbackWorker()
     panelMng.selectPanel("primaryWindow");
     mainTabPanel = panelMng.createTabPanel("mainTab", null, 0);
     initGuiAreas();
-    gui.removeDispatchListener(this);    
+    panelMng.gralDevice.removeDispatchListener(this);    
     countExecution();
   }
 };
@@ -231,7 +231,7 @@ GralDispatchCallbackWorker configGuiWithZbnf = new GralDispatchCallbackWorker()
   @Override public void doBeforeDispatching(boolean onlyWakeup){
     panelBuildIfc.buildCfg(guiCfgData, cargs.fileGuiCfg);
     
-    gui.removeDispatchListener(this);    
+    panelMng.gralDevice.removeDispatchListener(this);    
     
     countExecution();
       
@@ -271,7 +271,7 @@ protected void initMenuGralDesigner()
 protected void initMain()
 {
   //create the basic appearance of the GUI. The execution sets dlgAccess:
-  gui.addDispatchListener(initGuiDialog);
+  panelMng.gralDevice.addDispatchListener(initGuiDialog);
   if(!initGuiDialog.awaitExecution(1, 60000)) throw new RuntimeException("unexpected fail of execution initGuiDialog");
       
       
@@ -293,7 +293,7 @@ protected void initMain()
         //dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
         //cfgBuilder = new GuiCfgBuilder(guiCfgData, panelBuildIfc, fileGui.getParentFile());
         //panelBuildIfc.setCfgBuilder(cfgBuilder);
-        gui.addDispatchListener(configGuiWithZbnf);
+        panelMng.gralDevice.addDispatchListener(configGuiWithZbnf);
         bConfigDone = configGuiWithZbnf.awaitExecution(1, 10000);
         if(!bConfigDone){
           console.writeError("No configuration");
@@ -305,7 +305,7 @@ protected void initMain()
   }    
   try{ Thread.sleep(10);} catch(InterruptedException exc){}
   //The GUI-dispatch-loop should know the change worker of the panel manager. Connect both:
-  gui.addDispatchListener(panelBuildIfc.getTheGuiChangeWorker());
+  panelMng.gralDevice.addDispatchListener(panelBuildIfc.getTheGuiChangeWorker());
   try{ Thread.sleep(10);} catch(InterruptedException exc){}
   //gets all prepared fields to show informations.
   //oamShowValues.setFieldsToShow(panelBuildIfc.getShowFields());
@@ -320,7 +320,7 @@ public final void execute()
   initMain();
   //guiAccess.insertInfo("msgOfDay", Integer.MAX_VALUE, "Test\tMsg");
   //msgReceiver.start();
-  while(gui.isRunning())
+  while(panelMng.gralDevice.isRunning())
   { stepMain();
     try{ Thread.sleep(100);} 
     catch (InterruptedException e)

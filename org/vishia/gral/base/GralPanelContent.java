@@ -29,7 +29,7 @@ public abstract class GralPanelContent implements GralWidget_ifc
   public Object itsTabSwt; 
   
 	
-	public GralPrimaryWindow_ifc mainWindow;
+	//public GralPrimaryWindow_ifc mainWindow;
 	
 	public final GralWidgetMng gralMng;
 	
@@ -64,19 +64,22 @@ public abstract class GralPanelContent implements GralWidget_ifc
 	  this.namePanel = namePanel;
 		this.panelComposite = panelComposite;
 		this.gralMng = mng;
+		if(mng !=null){
+		  mng.registerPanel(this);
+		}
     int property = 0; //TODO parameter
     bZoomed = (property & GralGridBuild_ifc.propZoomedPanel) !=0;
     bGridZoomed = (property & GralGridBuild_ifc.propGridZoomedPanel) !=0;
 	}
 	
 	
-  protected GralPanelContent(String namePanel, GralPrimaryWindow_ifc mainWindow)
-  { this.namePanel = namePanel; this.mainWindow = mainWindow; this.gralMng = null; //mainWindow.;
+  private GralPanelContent(String namePanel, GralPrimaryWindow_ifc mainWindow)
+  { this.namePanel = namePanel; this.gralMng = null; //mainWindow.;
   }
 
   
-  protected GralPanelContent(String namePanel, GralWidgetMng mng)
-  { this.namePanel = namePanel; this.mainWindow = mng.gralDevice; this.gralMng = mng;
+  private GralPanelContent(String namePanel, GralWidgetMng mng)
+  { this.namePanel = namePanel; this.gralMng = mng;
   }
 
   

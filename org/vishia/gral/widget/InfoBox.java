@@ -38,7 +38,7 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   
   public static InfoBox create(GralGridBuild_ifc mng, String name, String title)
   {
-    GralSubWindow window = mng.createWindow(title, false);
+    GralSubWindow window = mng.createWindow(name, title, false);
     mng.setPosition(0, -4, 0, 0, 0, '.');
     GralTextBox text = mng.addTextBox(name, false, null, '.');
     mng.setPosition(-4, -1, -6, 0, 0, '.');

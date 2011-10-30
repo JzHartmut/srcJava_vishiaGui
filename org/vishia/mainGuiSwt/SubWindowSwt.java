@@ -22,8 +22,8 @@ public class SubWindowSwt extends GralSubWindow
   
   
   
-  SubWindowSwt(Display display, String title, boolean exclusive, GralWidgetMng gralMng)
-  { super("sub", gralMng);
+  SubWindowSwt(String name, Display display, String title, boolean exclusive, GralWidgetMng gralMng)
+  { super(name, gralMng, null);
     int props = 0; ////|SWT.CLOSE;
     if(title !=null){ props |= SWT.TITLE | SWT.BORDER; }
     //if(exclusive){ props |= SWT.PRIMARY_MODAL | SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL; }
@@ -31,6 +31,12 @@ public class SubWindowSwt extends GralSubWindow
     window = new Shell(display, props);
     super.panelComposite = window;
     if(title !=null){ window.setText(title); }
+    
+  }
+  
+  SubWindowSwt(String name, Shell shell, GralWidgetMng gralMng)
+  { super(name, gralMng, shell);
+    this.window = shell;
     
   }
   

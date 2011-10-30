@@ -26,7 +26,7 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
 {
   public final MainCmd mainCmd;
   
-  protected final GralWindowMng gralDevice;
+  //protected final GralWindowMng gralDevice;
   
   protected final GralSubWindow window;
   
@@ -108,15 +108,16 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
    * @param guiDevice The window manager
    * @param window The window itself. It doesn't be the primary window but a sub window too.
    */
-  public GuiMainAreaBase(MainCmd mainCmd, GralWindowMng guiDevice, GralSubWindow window, String sOutputArea)
+  public GuiMainAreaBase(MainCmd mainCmd, GralSubWindow window, String sOutputArea)
   {
     super();
     this.mainCmd = mainCmd;
-    this.gralDevice = guiDevice;
+    //this.gralDevice = guiDevice;
     this.window = window;
     this.outputArea = sOutputArea;
-    guiDevice.addDispatchListener(initOutputArea); 
-    guiDevice.addDispatchListener(writeOutputTextDirectly);
+    window.gralMng.gralDevice.addDispatchListener(initOutputArea); 
+    initOutputArea.awaitExecution(1, 0);
+    window.gralMng.gralDevice.addDispatchListener(writeOutputTextDirectly);
 
   }
 
@@ -139,8 +140,8 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
         int dyArea = outputArea.charAt(3) - '0' - yArea +1;
         */
         outputPanel = addOutputFrameArea(area.x, area.y, area.dx, area.dy);
-        gralDevice.gralMng.registerPanel(outputPanel);
-        gralDevice.removeDispatchListener(this);
+        window.gralMng.registerPanel(outputPanel);
+        window.gralMng.gralDevice.removeDispatchListener(this);
         countExecution();
       }
     }
@@ -389,7 +390,8 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
     addFrameArea(xArea, yArea, dxArea, dyArea, outputArea);
     
     window.gralMng.setPosition(0,0,0,0,0,'b');
-    outputBox = window.gralMng.addTextBox("output", false, null, '.');
+    //NOTE: it is a edit-able box. It may be usefully to edit the content by user sometimes. 
+    outputBox = window.gralMng.addTextBox("output", true, null, '.');  
     try{ outputBox.append("output...\nA\nb\nc\nd\ne\nf\ng\nA\nA\n"); } catch(IOException exc){}
     
     return outputArea;
@@ -414,7 +416,7 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
    * if it has a better way to show infos.*/
   protected void writeDirectly(String sInfo, short kind)  //##a
   { if(textAreaOutput != null){
-      if(Thread.currentThread().getId() == gralDevice.graphicThread.guiThreadId){
+      if(Thread.currentThread().getId() == window.gralMng.gralDevice.guiThreadId){
         try{
           if((kind & MainCmd.mNewln_writeInfoDirectly) != 0)
           { textAreaOutput.append("\n");
@@ -428,7 +430,7 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
       } else {  
         //queue the text
         outputTexts.add(sInfo);
-        gralDevice.wakeup();
+        window.gralMng.gralDevice.wakeup();
       }
     }  
     else mainCmd.writeDirectly(sInfo, kind);     
@@ -437,20 +439,6 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
   
 
   
-  
-  
-  /**Adds a listener, which will be called in the dispatch loop.
-   * @param listener
-   */
-  @Override public void addDispatchListener(GralDispatchCallbackWorker listener)
-  { gralDevice.addDispatchListener(listener);
-  }
-  
-  
-  
-  @Override public void removeDispatchListener(GralDispatchCallbackWorker listener)
-  { gralDevice.removeDispatchListener(listener);
-  }
   
   
 
@@ -468,7 +456,6 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
   }
 
 
-  @Override public boolean isRunning(){ return gralDevice.isRunning(); }
 
   @Override public void redraw(){  window.redraw(); }
 
@@ -480,13 +467,9 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
 
 
 
-  @Override public long getThreadIdGui()
-  { return gralDevice.getThreadIdGui();
-  }
-
   
   @Override public GralWidgetMng getGralMng()
-  { return gralDevice.gralMng;
+  { return window.gralMng;
   }
   
   @Override public GralRectangle getPixelPositionSize(){ return window.getPixelPositionSize(); }
@@ -498,10 +481,6 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
   }
 
 
-
-  @Override public void exit()
-  { closeWindow(); 
-  }
 
   
   

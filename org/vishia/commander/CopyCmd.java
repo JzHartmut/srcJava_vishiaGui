@@ -45,7 +45,7 @@ public class CopyCmd
     
 
     posWindConfirmCopy = main.panelMng.getPositionInPanel();
-    windConfirmCopy = main.panelMng.createWindow("confirm copy", false);
+    windConfirmCopy = main.panelMng.createWindow("copyWindow", "confirm copy", false);
     
     main.panelMng.setPosition(2, GralGridPos.size -2, 1, GralGridPos.size +45, 0, 'd');
     main.panelMng.addText("source path/file:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));

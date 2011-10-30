@@ -43,7 +43,7 @@ public abstract class GralDispatchCallbackWorker
 	 */
   /**
    * @param ctDoneRequested Number of executions requested.
-   * @param timeout maximal waiting time in millisec
+   * @param timeout maximal waiting time in millisec, 0 means wait for ever for execution.
    * @return true if it is executed the requested number of.
    */
   public synchronized boolean awaitExecution(int ctDoneRequested, int timeout)
@@ -54,7 +54,7 @@ public abstract class GralDispatchCallbackWorker
   		if(this.ctDone < ctDoneRequested ){
 	  		reqCtDone = true;
 	  		long waitingTime = timeEnd - System.currentTimeMillis();
-	  		if(waitingTime > 0){
+	  		if(waitingTime > 0 || timeout == 0){
 	  		  try{ wait(timeout); } catch(InterruptedException exc){}
 	  		  bWait = true;
 	  		} else bWait = false;

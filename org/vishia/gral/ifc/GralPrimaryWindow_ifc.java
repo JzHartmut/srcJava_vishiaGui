@@ -10,7 +10,7 @@ import org.vishia.mainCmd.MainCmd_ifc;
  * @author Hartmut Schorrig
  *
  */
-public interface GralPrimaryWindow_ifc extends GralWindow_ifc, GralWindowMng_ifc
+public interface GralPrimaryWindow_ifc extends GralWindow_ifc //, GralWindowMng_ifc
 {
   /**Sets the title and the pixel size for the whole window. */
   //void buildMainWindow(String sTitle, int left, int top, int xSize, int ySize);

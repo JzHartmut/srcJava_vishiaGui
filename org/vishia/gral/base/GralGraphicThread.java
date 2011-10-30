@@ -128,6 +128,36 @@ public abstract class GralGraphicThread implements Runnable
     return guiChangeRequests.poll();
   }
   
+
+  
+  /** Adds a method which will be called in anytime in the dispatch loop until the listener will remove itself.
+   * @see org.vishia.gral.ifc.GralWindowMng_ifc#addDispatchListener(org.vishia.gral.ifc.GralDispatchCallbackWorker)
+   * @param listener
+   */
+  public void addDispatchListener(GralDispatchCallbackWorker listener)
+  { dispatchListeners.add(listener);
+    //it is possible that the GUI is busy with dispatching and doesn't sleep yet.
+    //therefore:
+    extEventSet.getAndSet(true);
+    if(bStarted){
+      
+      wakeup();  //to wake up the GUI-thread, to run the listener at least one time.
+    }
+  }
+  
+  
+
+  
+  
+  /**Removes a listener, which was called in the dispatch loop.
+   * @param listener
+   */
+  public void removeDispatchListener(GralDispatchCallbackWorker listener)
+  { dispatchListeners.remove(listener);
+  }
+  
+  
+
   
   /**This method should be implemented by the graphical base. It should build the graphic main window
    * and returned when finished. This routine is called as the first routine in the Graphic thread's
@@ -146,9 +176,18 @@ public abstract class GralGraphicThread implements Runnable
   
   /**This method should be implemented by the graphical base. It should be waked up the execution 
    * of the graphic thread because some actions are registered.. */
-  protected abstract void wakeup();
+  public abstract void wakeup();
+  
+  public long getThreadIdGui(){ return guiThreadId; }
   
   
+  public boolean isStarted(){ return bStarted; }
+  
+  public boolean isRunning(){ return bStarted && !bExit; }
+  
+  public boolean isTerminated(){ return bStarted && bExit; }
+
+
   
   /**The run method of the graphic thread. This method will be invoked automatically in the constructor
    * of the derived class.

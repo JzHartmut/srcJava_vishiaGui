@@ -357,7 +357,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   @Override public GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG, int xS, int yS)
   {
     Color backColorSwt = propertiesGuiSwt.colorSwt(backGround);
-    Composite panelSwt = ((PanelSwt)pos.panel).getPanelImpl();  
+    Composite panelSwt = (Composite)pos.panel.getPanelImpl();  
     GridPanelSwt panel = new GridPanelSwt(namePanel, panelSwt, 0, backColorSwt, xG, yG, xS, yS, this);
     registerPanel(panel);
 
@@ -381,10 +381,10 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   
   
-  public GralSubWindow createWindow(String title, boolean exclusive)
+  public GralSubWindow createWindow(String name, String title, boolean exclusive)
   {
-    Shell panelSwt = (Shell)gralDevice.getitsGraphicFrame(); //  (Composite)gralDevice.panelComposite;  
-    SubWindowSwt window = new SubWindowSwt(panelSwt.getDisplay(), title, exclusive, this);
+    SwtGraphicThread swtDevice = (SwtGraphicThread)gralDevice;
+    SubWindowSwt window = new SubWindowSwt(name, swtDevice.displaySwt, title, exclusive, this);
     window.posWindow = getPositionInPanel();
     GralRectangle rect = calcPositionOfWindow(window.posWindow);
     window.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
@@ -1074,7 +1074,8 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   @Override public void repaint()
   {
-  	gralDevice.redraw();
+  	assert(false);
+    //gralDevice.redraw();
   }
   
   
@@ -1162,7 +1163,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     	switch(cmd){
     	case GralPanelMngWorking_ifc.cmdInsert: checkAdmissibility(visibleInfo != null && visibleInfo instanceof String); break;
     	}
-      gralDevice.graphicThread.addChangeRequest(new GralWidgetChangeRequ(descr, cmd, ident, visibleInfo, userData));
+      gralDevice.addChangeRequest(new GralWidgetChangeRequ(descr, cmd, ident, visibleInfo, userData));
     }
   	return "";
   }
@@ -1299,7 +1300,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
         bDesignerIsInitialized = true;
       }
       GralWidgetChangeRequ changeReq;
-      while( (changeReq = gralDevice.graphicThread.pollChangeRequest()) != null){
+      while( (changeReq = gralDevice.pollChangeRequest()) != null){
         GralWidget descr = changeReq.widgetDescr;
         setInfoDirect(descr, changeReq.cmd, changeReq.ident, changeReq.visibleInfo, changeReq.userData);
 
@@ -1371,7 +1372,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sName);
   	} else if((descr.getGraphicWidgetWrapper() instanceof CurveView)) {
   		//sends a redraw information.
-  	  gralDevice.graphicThread.addChangeRequest(new GralWidgetChangeRequ(descr, GralPanelMngWorking_ifc.cmdRedrawPart, 0, null, null));
+  	  gralDevice.addChangeRequest(new GralWidgetChangeRequ(descr, GralPanelMngWorking_ifc.cmdRedrawPart, 0, null, null));
   	} else {
   	}
 	}

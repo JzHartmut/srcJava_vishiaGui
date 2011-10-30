@@ -4,23 +4,15 @@ package org.vishia.mainGuiSwt;
 import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -29,6 +21,7 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralWindowMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -36,7 +29,7 @@ import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.MinMaxTime;
 
-public class PrimaryWindowSwt extends GralWindowMng implements GralWindow_ifc
+public class PrimaryWindowSwt extends SubWindowSwt implements GralPrimaryWindow_ifc //GralWindowMng implements GralWindow_ifc
 {
   //protected final Display displaySwt; 
 
@@ -46,7 +39,7 @@ public class PrimaryWindowSwt extends GralWindowMng implements GralWindow_ifc
   /**The file menuBar is extendable. */
   private Menu menuBar;
   
-  /**It is the same instance as {@link GralWindowMng#graphicThread} but refer the SWT type.
+  /**It is the same instance as {@link GralWidgetMng#gralDevice} but refer the SWT type.
    * 
    */
   final SwtGraphicThread graphicThreadSwt;
@@ -67,7 +60,8 @@ public class PrimaryWindowSwt extends GralWindowMng implements GralWindow_ifc
 
   
   private PrimaryWindowSwt(GralWidgetMng gralMng, SwtGraphicThread graphicThread, Display displaySwt)
-  { super(gralMng, graphicThread);
+  { super("primaryWindow", graphicThread.windowSwt, gralMng);
+    //super(gralMng, graphicThread);
     this.graphicThreadSwt = graphicThread;  //refers SWT type
   }  
   
@@ -88,7 +82,7 @@ public class PrimaryWindowSwt extends GralWindowMng implements GralWindow_ifc
     //The PrimaryWindowSwt is a derivation of the GralPrimaryWindow. It is more as only a SWT Shell.
     PrimaryWindowSwt instance = new PrimaryWindowSwt(gralMng, init, init.displaySwt);
     instance.panelComposite = init; //window.sTitle, window.xPos, window.yPos, window.xSize, window.ySize);
-    gralMng.setGralDevice(instance);
+    gralMng.setGralDevice(init);
     gralMng.registerPanel(instance);
     
     //init.setWindow(instance);  //now the initializing of the window occurs.
@@ -183,7 +177,7 @@ public class PrimaryWindowSwt extends GralWindowMng implements GralWindow_ifc
   
   public void terminate()
   {
-    if(!graphicThread.bExit && !graphicThreadSwt.displaySwt.isDisposed()){ 
+    if(!graphicThreadSwt.bExit && !graphicThreadSwt.displaySwt.isDisposed()){ 
       graphicThreadSwt.displaySwt.dispose();
     }  
 
@@ -291,14 +285,6 @@ public class PrimaryWindowSwt extends GralWindowMng implements GralWindow_ifc
   
 
 
-  @Override
-  public void exit()
-  {
-    // TODO Auto-generated method stub
-    
-  }
-
-
 
   @Override
   public MainCmd_ifc getMainCmd()
@@ -313,7 +299,7 @@ public class PrimaryWindowSwt extends GralWindowMng implements GralWindow_ifc
   public Shell getitsGraphicFrame()
   {
     // TODO Auto-generated method stub
-    return ((SwtGraphicThread)graphicThread).windowSwt;
+    return (graphicThreadSwt).windowSwt;
   }
 
 
@@ -355,10 +341,10 @@ public class PrimaryWindowSwt extends GralWindowMng implements GralWindow_ifc
   @Override public void redraw(){  graphicThreadSwt.windowSwt.redraw(); graphicThreadSwt.windowSwt.update(); }
 
   @Override public void setResizeAction(GralUserAction action){
-    resizeAction = action;
     if(resizeAction == null){
       graphicThreadSwt.windowSwt.addControlListener(resizeListener);
     }
+    resizeAction = action;
   }
   
 

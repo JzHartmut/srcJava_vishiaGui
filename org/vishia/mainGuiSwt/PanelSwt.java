@@ -19,7 +19,7 @@ public class PanelSwt extends GralPanelContent
   
   private PanelSwt(String name, GralWidgetMng mng)
   {
-    super(name, mng);
+    super(name, mng, null);
   }
 
   /**Constructs a panel

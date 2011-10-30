@@ -19,9 +19,9 @@ public abstract class GralSubWindow extends GralPanelContent implements GralWind
   
   protected GralUserAction resizeAction;
   
-  public GralSubWindow(String nameWindow, GralWidgetMng mng)
+  public GralSubWindow(String nameWindow, GralWidgetMng mng, Object panelComposite)
   {
-    super( nameWindow, mng);
+    super( nameWindow, mng, panelComposite);
   }
   
   

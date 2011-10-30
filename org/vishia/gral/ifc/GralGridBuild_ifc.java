@@ -665,7 +665,7 @@ public interface GralGridBuild_ifc
 	 * @param exclusive true then non-modal.
 	 * @return
 	 */
-	GralSubWindow createWindow(String title, boolean exclusive);
+	GralSubWindow createWindow(String name, String title, boolean exclusive);
   
 	
 	//GuiShellMngBuildIfc createWindowOld(String title, boolean exclusive);

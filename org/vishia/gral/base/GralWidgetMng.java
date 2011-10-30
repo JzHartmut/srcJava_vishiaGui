@@ -141,7 +141,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   /**Base class for managing all panels and related windows.
    * This base class contains all common resources to manage panels and windows.
    */
-  public GralWindowMng gralDevice;
+  public GralGraphicThread gralDevice;
 
   /**Properties of this Dialog Window. */
   public  final GralGridProperties propertiesGui;
@@ -323,7 +323,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
 	}
 
 
-  public void setGralDevice(GralWindowMng device)
+  public void setGralDevice(GralGraphicThread device)
   {
     this.gralDevice = device;
   }

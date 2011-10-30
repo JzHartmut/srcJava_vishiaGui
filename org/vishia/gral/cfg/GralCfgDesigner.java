@@ -65,7 +65,7 @@ public class GralCfgDesigner
   {
     assert(dialogWindowProps == null); //check call only one time.
     mng.setPosition(-30, GralGridPos.size +30, -40, GralGridPos.size +40, 1, 'r');
-    dialogWindowProps = mng.createWindow("Widget Properties", false);
+    dialogWindowProps = mng.createWindow("widgetEdit", "Widget Properties", false);
     mng.setPositionSize(0, 0, 3, 34, 'd');
     dialogFieldName = mng.addTextField("name", true, "name", 't');
     dialogFieldDatapath = mng.addTextField("dataPath", true, "data", 't');

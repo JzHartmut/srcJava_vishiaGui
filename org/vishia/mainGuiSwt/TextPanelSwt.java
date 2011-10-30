@@ -20,7 +20,7 @@ public class TextPanelSwt extends GralPanelContent implements GralTextBox_ifc, A
   TextBoxSwt textAreaOutput;
   
   TextPanelSwt(String namePanel, Shell shell, int style, GralWidgetMng mng) //GralPrimaryWindow_ifc mainWindow)
-  { super(namePanel, mng);
+  { super(namePanel, mng, shell);
     Display device = shell.getDisplay();
     //Composite panel = (Composite) panelComposite;
     textAreaOutput = new TextBoxSwt(namePanel + "-widg", shell, style, mng);

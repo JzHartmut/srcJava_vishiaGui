@@ -101,7 +101,7 @@ public class GuiStatusPanel
     //testDialogBox = new InfoBox(mainData.guifc.getitsGraphicFrame(), "Title", lines, true);
 
     panelBuildifc.setPositionSize(yposProjectPath, xposProjectPath, 20, 60, 'r');
-    selectorProjectPath = panelBuildifc.createWindow(null, false);
+    selectorProjectPath = panelBuildifc.createWindow("sel", null, false);
     int[] columnWidths = {40, 10};
     panelBuildifc.setPositionSize(0, 0, 10, 60, 'd');
     selectorProjectPathTable = panelBuildifc.addTable("selectProjectPath", 20, columnWidths);

@@ -117,7 +117,7 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
 
   
 	
-  private final PrimaryWindowSwt swtWindow;
+  //private final PrimaryWindowSwt swtWindow;
 	
 	
   
@@ -186,12 +186,12 @@ public class MainCmdSwt extends GuiMainAreaBase implements GuiMainAreaifc
   }
   */
   
-  public MainCmdSwt(MainCmd cmdP, GralWindowMng guiDevice, GralSubWindow window, String sOutputArea) //String[] args)
+  public MainCmdSwt(MainCmd cmdP, GralSubWindow window, String sOutputArea) //String[] args)
   { //super(args);
     //assert(false);
-    super(cmdP, guiDevice, window, sOutputArea); //gralDevice);
+    super(cmdP, window, sOutputArea); //gralDevice);
   
-    swtWindow = (PrimaryWindowSwt)guiDevice; //PrimaryWindowSwt.create(cmdP.getLogMessageOutputConsole());
+    //swtWindow = (PrimaryWindowSwt)guiDevice; //PrimaryWindowSwt.create(cmdP.getLogMessageOutputConsole());
     //super.gralDevice = swtWindow;
   }
   

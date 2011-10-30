@@ -19,17 +19,12 @@ public class FactorySwt implements GralFactory_ifc
   
   MainCmdSwt gui;
   
-  /**One instance per factory class for possible more as one windows.
-   */
-  GralWindowMng gralDevice;
-  
-  //PropertiesGuiSwt propertiesGui;
 
   @Override public GuiMainAreaifc createGuiWindow(MainCmd cmdP, String sTitle, int left, int top, int xSize, int ySize, String sOutputArea)
   {
     PrimaryWindowSwt swtWindow = PrimaryWindowSwt.create(cmdP.getLogMessageOutputConsole(), sTitle, left, top, xSize, ySize);
 
-    gui = new MainCmdSwt(cmdP, swtWindow, swtWindow, sOutputArea);
+    gui = new MainCmdSwt(cmdP, swtWindow, sOutputArea);
     return gui; // = new MainCmdSwt(cmdP, gralDevice);
   }
 

@@ -10,7 +10,7 @@ import org.vishia.gral.ifc.GralWidget;
  */
 public abstract class GralTextField extends GralWidget implements GralTextField_ifc
 {
-  protected final GralWindowMng_ifc windowMng;
+  protected final GralGraphicThread windowMng;
   
   public GralTextField(String name, char whatis, GralWidgetMng mng){
     super(name, whatis, mng);

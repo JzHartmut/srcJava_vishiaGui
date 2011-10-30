@@ -34,7 +34,7 @@ public class TabPanelSwt extends GralTabbedPanel
   {
     private TabFolder widgetSwt;
     TabFolder_(String namePanel, Composite parent, int style, GralPrimaryWindow_ifc mainWindow)
-    { super(namePanel, mainWindow);
+    { super(namePanel, null, mainWindow);
       widgetSwt = new TabFolder(parent, style); 
     }
     @Override public Widget getWidgetImplementation(){ return widgetSwt; }
