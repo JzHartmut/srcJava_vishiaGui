@@ -6,10 +6,9 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralSubWindow;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralWidgetImplWrapper;
 import org.vishia.gral.base.GralWidgetMng;
-import org.vishia.gral.base.GralWindowMng;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
@@ -22,13 +21,13 @@ import org.vishia.gral.widget.InfoBox;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmd_ifc;
 
-public abstract class GuiMainAreaBase implements GuiMainAreaifc
+public class GralArea9Window implements GralArea9_ifc
 {
   public final MainCmd mainCmd;
   
   //protected final GralWindowMng gralDevice;
   
-  protected final GralSubWindow window;
+  protected final GralWindow window;
   
   /**Area settings for output. */
   protected String outputArea;
@@ -108,7 +107,7 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
    * @param guiDevice The window manager
    * @param window The window itself. It doesn't be the primary window but a sub window too.
    */
-  public GuiMainAreaBase(MainCmd mainCmd, GralSubWindow window, String sOutputArea)
+  public GralArea9Window(MainCmd mainCmd, GralWindow window, String sOutputArea)
   {
     super();
     this.mainCmd = mainCmd;
@@ -484,12 +483,30 @@ public abstract class GuiMainAreaBase implements GuiMainAreaifc
 
   
   
-  @Override public void setResizeAction(GralUserAction action){
-    throw new IllegalArgumentException("this instance has its resizeListener already.");
-  }
+
+
+  private GralUserAction mouseAction = new GralUserAction()
+  { int captureAreaDivider;
   
-
-
+  
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    { GralRectangle mousePos = (GralRectangle)params[0]; 
+      int yf1 = ypFrameArea[1];
+      int yf2 = ypFrameArea[2];
+      int xf1 = xpFrameArea[1]; //percent right
+      int xf2 = xpFrameArea[2]; //percent right
+      if(mousePos.x < 20){
+        //calculate pixel size for the component:
+        int y1 = (int)(yf1  * pixelPerYpercent);
+        int y2 = (int)(yf1  * pixelPerYpercent);
+        if(mousePos.y > y1-20 && mousePos.y < y1 + 20){
+          captureAreaDivider = 1;     
+      }
+    }
+return true;
+  } };
+  
+  
   private GralUserAction resizeAction = new GralUserAction()
   { @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { validateFrameAreas();  //calculates the size of the areas newly and redraw.

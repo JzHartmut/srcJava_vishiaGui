@@ -2,7 +2,7 @@ package org.vishia.gral.widget;
 
 import java.io.IOException;
 
-import org.vishia.gral.base.GralSubWindow;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
@@ -21,7 +21,7 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
 
   /**The window is created invoking the {@link GralGridBuild_ifc#createWindow(String, boolean)}. 
    * It has its implementation in the underlying graphic system.  */
-  private final GralSubWindow window;
+  private final GralWindow window;
   
   
   /**The widget which holds the text in the {@link #window}. */
@@ -29,7 +29,7 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   
   private final GralWidget buttonOk;
   
-  public InfoBox(GralSubWindow window, GralTextBox textBox, GralWidget buttonOk)
+  public InfoBox(GralWindow window, GralTextBox textBox, GralWidget buttonOk)
   {
     this.window = window;
     this.textBox = textBox;
@@ -38,7 +38,7 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   
   public static InfoBox create(GralGridBuild_ifc mng, String name, String title)
   {
-    GralSubWindow window = mng.createWindow(name, title, false);
+    GralWindow window = mng.createWindow(name, title, false);
     mng.setPosition(0, -4, 0, 0, 0, '.');
     GralTextBox text = mng.addTextBox(name, false, null, '.');
     mng.setPosition(-4, -1, -6, 0, 0, '.');
@@ -142,10 +142,6 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
     return null;
   }
   
-  
-  @Override public void setResizeAction(GralUserAction action){
-    window.setResizeAction(action);
-  }
   
 
   

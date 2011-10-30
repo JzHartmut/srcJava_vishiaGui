@@ -10,7 +10,7 @@ import java.util.Set;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralSubWindow;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralTable;
@@ -665,7 +665,7 @@ public interface GralGridBuild_ifc
 	 * @param exclusive true then non-modal.
 	 * @return
 	 */
-	GralSubWindow createWindow(String name, String title, boolean exclusive);
+	GralWindow createWindow(String name, String title, boolean exclusive);
   
 	
 	//GuiShellMngBuildIfc createWindowOld(String title, boolean exclusive);

@@ -7,8 +7,8 @@ import java.util.List;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
-import org.vishia.gral.area9.GuiMainAreaifc;
-import org.vishia.gral.area9.GuiMainCmd;
+import org.vishia.gral.area9.GralArea9_ifc;
+import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTabbedPanel;
@@ -21,7 +21,6 @@ import org.vishia.inspector.Inspector;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
 import org.vishia.mainGuiSwt.SwtWidgetMng;
-import org.vishia.mainGuiSwt.MainCmdSwt;
 import org.vishia.mainGuiSwt.PropertiesGuiSwt;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.FileSystem;
@@ -95,7 +94,7 @@ public class BzrGui extends GuiCfg
    * @param cargs The given calling arguments.
    * @param gui The GUI-organization.
    */
-  BzrGui(CallingArguments cargs, GuiMainCmd cmdgui) 
+  BzrGui(CallingArguments cargs, GralArea9MainCmd cmdgui) 
   { super(cargs, cmdgui, null);  //builds all graphic panels
     this.cargs = cargs;  //args in the correct derived type.
     boolean bOk = true;
@@ -191,7 +190,7 @@ public class BzrGui extends GuiCfg
 
   /**Organisation class for the GUI.
    */
-  private static class CmdLineAndGui extends GuiMainCmd
+  private static class CmdLineAndGui extends GralArea9MainCmd
   {
 
 

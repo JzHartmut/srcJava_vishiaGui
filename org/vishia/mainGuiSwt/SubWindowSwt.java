@@ -3,18 +3,21 @@ package org.vishia.mainGuiSwt;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralWidgetMng;
-import org.vishia.gral.base.GralSubWindow;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.util.KeyCode;
 
 //public class SubWindowSwt extends GralPanelContent implements WidgetCmpnifc
-public class SubWindowSwt extends GralSubWindow
+public class SubWindowSwt extends GralWindow
 {
 
   protected Shell window;
@@ -98,13 +101,22 @@ public class SubWindowSwt extends GralSubWindow
 
   
   @Override public void setResizeAction(GralUserAction action){
-    resizeAction = action;
     if(resizeAction == null){
       window.addControlListener(resizeListener);
     }
+    resizeAction = action;
   }
   
-  ControlListener resizeListener = new ControlListener()
+  @Override public void setMouseAction(GralUserAction action){
+    if(mouseAction == null){
+      window.addControlListener(resizeListener);
+    }
+    mouseAction = action;
+  }
+  
+  /**The resizeListener will be activated if {@link #setResizeAction(GralUserAction)} will be called.
+   * It calls this user action on resize. */
+  private ControlListener resizeListener = new ControlListener()
   { @Override public void controlMoved(ControlEvent e) 
     { //do nothing if moved.
     }
@@ -117,6 +129,33 @@ public class SubWindowSwt extends GralSubWindow
   };
   
   
+  /**The mouseListener will be activated if {@link #setMouseAction(GralUserAction)} will be called.
+   * It calls this user action on resize. */
+  MouseListener mouseListener = new MouseListener()
+  {
+    int captureAreaDivider;
+    
+    @Override public void mouseDoubleClick(MouseEvent e) 
+    { GralRectangle pos = new GralRectangle(e.x, e.y, 0,0);
+      int key = KeyCode.mouse1Double;  //TODO select key, alt, ctrl etc.
+      mouseAction.userActionGui(key, null, pos);
+    }
+
+    @Override public void mouseDown(MouseEvent e) 
+    { GralRectangle pos = new GralRectangle(e.x, e.y, 0,0);
+      int key = KeyCode.mouse1Down;  //TODO select key, alt, ctrl etc.
+      mouseAction.userActionGui(key, null, pos);
+    }
+
+    @Override public void mouseUp(MouseEvent e) 
+    { GralRectangle pos = new GralRectangle(e.x, e.y, 0,0);
+      int key = KeyCode.mouse1Up;  //TODO select key, alt, ctrl etc.
+      mouseAction.userActionGui(key, null, pos);
+    }
+    
+  };
+  
+
   
 
   

@@ -1,9 +1,10 @@
 package org.vishia.gral;
 
 import org.vishia.commander.TabbedPanelData;
-import org.vishia.gral.area9.GuiMainAreaBase;
+import org.vishia.gral.area9.GralArea9Window;
 import org.vishia.gral.cfg.GralCfgDesigner;
 import org.vishia.gral.cfg.GralCfgZbnf;
+import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.widget.CommandSelector;
 import org.vishia.gral.widget.FileSelector;
 import org.vishia.gral.widget.SelectList;
@@ -23,7 +24,7 @@ import org.vishia.guiInspc.InspcGui;
  * The gral supports some independent concepts to fit that requests:
  * <ul>
  * <li>A frame for a standard GUI application, which supports up to 9 areas in the application window for input, output etc.
- *   {@link GuiMainAreaBase}, {@link org.vishia.gral.area9._PackageDocu}
+ *   {@link GralArea9Window}, {@link org.vishia.gral.area9._PackageDocu}
  * <li>A System to place widgets with grid coordinates, allowing larger and smaller presentation with proper fonts etc.
  *   The user should not deal with pixel positions.
  *   {@link org.vishia.gral.gridPanel._PackageDocu}
@@ -32,6 +33,13 @@ import org.vishia.guiInspc.InspcGui;
  * <li>Animated graphic, especially for process data viewing: {@link InspcGui}
  * <li> 
  * </ul>     
+ * <b>Overview</b>:
+ * <img src="../../../img/Overview_gral.png"><br>
+ * The user creates the instances for the window and the Gral manager using a factory class for the choiced graphic base.
+ * Then the appearance of GUI can be created using the {@link GralGridBuild_ifc}.
+ * <br>
+ * After them the user can work with its GUI.
+ * 
  * <br><br>
  * <b>Example ussage of a org.eclipse.swt.widgets.Table from the GUI application 'JavaCommander'</b>:
  * <img src="../../../img/JCmd_gralWidget_SwtTable.png"><br>

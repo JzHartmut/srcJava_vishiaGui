@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.cmd.CmdExecuter;
-import org.vishia.gral.area9.GuiMainAreaifc;
+import org.vishia.gral.area9.GralArea9_ifc;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
@@ -22,7 +22,7 @@ public class MainData
   
   GralPanelMngWorking_ifc panelAccess;
   
-  GuiMainAreaifc guifc;
+  GralArea9_ifc guifc;
   
   final DataConfig cfg = new DataConfig();
   

@@ -16,18 +16,13 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralWidgetMng;
-import org.vishia.gral.base.GralWindowMng;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
-import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.msgDispatch.LogMessage;
-import org.vishia.util.MinMaxTime;
 
 public class PrimaryWindowSwt extends SubWindowSwt implements GralPrimaryWindow_ifc //GralWindowMng implements GralWindow_ifc
 {
@@ -339,14 +334,6 @@ public class PrimaryWindowSwt extends SubWindowSwt implements GralPrimaryWindow_
   }
 
   @Override public void redraw(){  graphicThreadSwt.windowSwt.redraw(); graphicThreadSwt.windowSwt.update(); }
-
-  @Override public void setResizeAction(GralUserAction action){
-    if(resizeAction == null){
-      graphicThreadSwt.windowSwt.addControlListener(resizeListener);
-    }
-    resizeAction = action;
-  }
-  
 
   
   public void removeWidgetImplementation()

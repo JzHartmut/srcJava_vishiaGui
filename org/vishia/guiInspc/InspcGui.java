@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
-import org.vishia.gral.area9.GuiMainCmd;
+import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
@@ -32,7 +32,7 @@ public class InspcGui //extends GuiCfg
 
   final GuiCfg guiCfg;
 
-  InspcGui(CallingArguments cargs, GuiMainCmd cmdgui)
+  InspcGui(CallingArguments cargs, GralArea9MainCmd cmdgui)
   {
     guiCfg = new InspcGuiCfg(cargs, cmdgui, userInspcPlug);
     LogMessage log = cmdgui.getLogMessageOutputConsole();
@@ -70,7 +70,7 @@ public class InspcGui //extends GuiCfg
   
   /**Organisation class for the GUI.
    */
-  private static class CmdLineAndGui extends GuiMainCmd
+  private static class CmdLineAndGui extends GralArea9MainCmd
   {
 
     /**Aggregation to given instance for the command-line-argument. The instance can be arranged anywhere else.
@@ -121,7 +121,7 @@ public class InspcGui //extends GuiCfg
 private class InspcGuiCfg extends GuiCfg
 {
   
-  InspcGuiCfg(CallingArguments cargs, GuiMainCmd cmdgui, GralPlugUser2Gral_ifc plugUser2Gui)
+  InspcGuiCfg(CallingArguments cargs, GralArea9MainCmd cmdgui, GralPlugUser2Gral_ifc plugUser2Gui)
   { super(cargs, cmdgui, plugUser2Gui); 
   }
   

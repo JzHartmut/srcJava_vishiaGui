@@ -31,7 +31,7 @@ import org.vishia.msgDispatch.LogMessage;
  * <br><br>
  * The class contains a {@link #main(String[])}. It is a complete ready to run application. 
  * The content of the GUI can be controlled by a script. The command line arguments are parsed in
- * {@link GuiMainCmd}, the universal or basic MainCmd for GUI applications.
+ * {@link GralArea9MainCmd}, the universal or basic MainCmd for GUI applications.
  * <br>
  * Registered user action can be used by script.
  * <ul>
@@ -57,7 +57,7 @@ public class GuiCfg
    * <li>2011-09-08 Hartmut del: Remove the message panel. It was a special solution. 
    * <li>2011-08-08 Hartmut new: {@link #initMain()} as override-able method instead direct call of initializing.
    * <li>2011-08-07 Hartmut chg: Now {@link GuiCallingArgs} as primary class, not an inner class here.
-   * <li>2011-08-07 Hartmut chg: Now {@link GuiMainCmd} as extra primary class.
+   * <li>2011-08-07 Hartmut chg: Now {@link GralArea9MainCmd} as extra primary class.
    * <li>2011-08-04 Hartmut chg: rename and move from org/vishia/guiCmdMenu/CmdMenu.java to org/vishia/gral/area9/GuiCfg.java.
    *     It is a universal GUI which is configurable in content. Also it is a base class for some configurable GUI applications.
    * <li>2011-08-04 Hartmut chg: Use {@link GralPanelContent} instead the special InspcGuiPanelContent.     
@@ -112,7 +112,7 @@ protected final GralPlugUser2Gral_ifc plugUser2Gui;
 
 
 
-public final GuiMainAreaifc gui;
+public final GralArea9_ifc gui;
 
 public final MainCmd_ifc mainCmd;
 
@@ -141,7 +141,7 @@ protected GralTabbedPanel mainTabPanel;
  *   This instance may be defined in the context which calls this constructor.
  *   Note: A user instance may be instantiated with the cmd line calling argument "-plugin=JAVACLASSPATH"  
  */
-public GuiCfg(GuiCallingArgs cargs, GuiMainCmd cmdGui, GralPlugUser2Gral_ifc plugUser2Gui) 
+public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui, GralPlugUser2Gral_ifc plugUser2Gui) 
 { this.mainCmd = cmdGui;
   this.gui = cmdGui.gui;
   this.cargs = cargs;
@@ -388,7 +388,7 @@ public static void main(String[] args)
   GuiCallingArgs cargs = new GuiCallingArgs();
   //Initializes the GUI till a output window to show information.
   //Uses the commonly GuiMainCmd class because here are not extra arguments.
-  GuiMainCmd cmdGui = new GuiMainCmd(cargs, args);  //implements MainCmd, parses calling arguments
+  GralArea9MainCmd cmdGui = new GralArea9MainCmd(cargs, args);  //implements MainCmd, parses calling arguments
   bOk = cmdGui.parseArgumentsAndInitGraphic("Gui-Cfg", "3A3C");
   
   if(bOk){

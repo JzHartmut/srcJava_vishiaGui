@@ -12,7 +12,7 @@ import org.vishia.cmd.CmdStore;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
-import org.vishia.gral.area9.GuiMainCmd;
+import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
@@ -70,7 +70,7 @@ public class JavaCmd extends GuiCfg
    */
   final CmdStore buttonCmds;
 
-  public JavaCmd(CallingArgs cargs, GuiMainCmd cmdgui)
+  public JavaCmd(CallingArgs cargs, GralArea9MainCmd cmdgui)
   {
     super(cargs, cmdgui, null);
     this.cargs = cargs;
@@ -322,7 +322,7 @@ public class JavaCmd extends GuiCfg
    * line interface and the graphical frame. The mainly functionality is
    * contained in the super class.
    */
-  private static class MainCmd extends GuiMainCmd
+  private static class MainCmd extends GralArea9MainCmd
   {
 
     private final CallingArgs cargs;
@@ -418,7 +418,7 @@ public class JavaCmd extends GuiCfg
     CallingArgs cargs = new CallingArgs();
     // Initializes the GUI till a output window to show information.
     // Uses the commonly GuiMainCmd class because here are not extra arguments.
-    GuiMainCmd cmdgui = new MainCmd(cargs, args); // implements MainCmd, parses
+    GralArea9MainCmd cmdgui = new MainCmd(cargs, args); // implements MainCmd, parses
                                                   // calling arguments
     bOk = cmdgui.parseArgumentsAndInitGraphic("The.file.Commander", "2B2C");
 

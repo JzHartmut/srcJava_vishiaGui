@@ -3,6 +3,7 @@ package org.vishia.gral.area9;
 import java.io.File;
 
 import org.vishia.gral.base.GralGridProperties;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.swt.FactorySwt;
 import org.vishia.mainCmd.MainCmd;
@@ -12,10 +13,10 @@ import org.vishia.msgDispatch.LogMessage;
  * @author Hartmut Schorrig
  *
  */
-public class GuiMainCmd extends MainCmd
+public class GralArea9MainCmd extends MainCmd
 {
   
-  public GuiMainAreaifc gui;
+  public GralArea9_ifc gui;
   
   /**Aggregation to given instance for the command-line-argument. The instance can be arranged anywhere else.
    * It is given as ctor-parameter.
@@ -32,7 +33,7 @@ public class GuiMainCmd extends MainCmd
    * @param sTitle Title in title line
    * @param sOutputArea area for output, for example "3A3C".
    */
-  public GuiMainCmd(GuiCallingArgs cargs, String[] args)
+  public GralArea9MainCmd(GuiCallingArgs cargs, String[] args)
   { 
     super(args);
     super.addAboutInfo("made by HSchorrig, 2010-06-07, 2011-08-07");
@@ -52,7 +53,8 @@ public class GuiMainCmd extends MainCmd
     cargs.graphicFactory = new FactorySwt(); 
     if(sOutputArea == null){ sOutputArea = "A3C3"; }
     
-    gui = cargs.graphicFactory.createGuiWindow((MainCmd)this, sTitle, 50,50,800, 600, sOutputArea);
+    GralWindow primaryWindow = cargs.graphicFactory.createWindow(getLogMessageOutputConsole(), sTitle, 50,50,800, 600);
+    gui = new GralArea9Window(this, primaryWindow, sOutputArea);
     gralMng = gui.getGralMng();
     if(sArgError !=null){
       writeError(sArgError);

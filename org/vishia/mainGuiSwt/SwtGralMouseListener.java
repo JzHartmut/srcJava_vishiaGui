@@ -90,7 +90,7 @@ public class SwtGralMouseListener
             GralRectangle rr = new GralRectangle(ev.x, ev.y, 0, 0);
             guiMng.releaseLeftMouseForDesign(widgd, rr, bCopy);  
           }
-          widgd.redraw();
+          //widgd.redraw();
         } catch(Exception exc){ guiMng.writeLog(0, exc); }
         
       }

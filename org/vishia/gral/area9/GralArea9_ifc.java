@@ -11,7 +11,6 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
-import org.vishia.mainGuiSwt.MainCmdSwt;
 
 
 
@@ -53,7 +52,7 @@ import org.vishia.mainGuiSwt.MainCmdSwt;
  * @author Hartmut Schorrig
  *
  */
-public interface GuiMainAreaifc extends GralPrimaryWindow_ifc
+public interface GralArea9_ifc extends GralPrimaryWindow_ifc
 {
   /**Version history:
    * <ul>

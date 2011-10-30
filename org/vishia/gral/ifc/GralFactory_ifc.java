@@ -1,8 +1,9 @@
 package org.vishia.gral.ifc;
 
 import org.vishia.byteData.VariableContainer_ifc;
-import org.vishia.gral.area9.GuiMainAreaifc;
+import org.vishia.gral.area9.GralArea9_ifc;
 import org.vishia.gral.base.GralGridProperties;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.msgDispatch.LogMessage;
@@ -15,12 +16,13 @@ import org.vishia.msgDispatch.LogMessage;
 public interface GralFactory_ifc
 {
 
-  GuiMainAreaifc createGuiWindow(MainCmd cmdP, String sTitle, int left, int top, int xSize, int ySize, String sOutputArea);
+  GralWindow createWindow(LogMessage log, String sTitle, int left, int top, int xSize, int ySize);
   
+  /*
   GralGridProperties createProperties(char sizePixel);
   
   GralWidgetMng createPanelMng(GralWidgetMng parent, int width, int height
   , GralGridProperties propertiesGui
   , VariableContainer_ifc variableContainer, LogMessage log);
-      
+  */  
 }

@@ -1,7 +1,7 @@
 package org.vishia.gral.cfg;
 
 import org.vishia.gral.base.GralWidgetMng;
-import org.vishia.gral.base.GralSubWindow;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralRectangle;
@@ -17,7 +17,7 @@ public class GralCfgDesigner
    * <ul>
    * <li>2011-09-30 Hartmut chg: rename pressedRightMouseDownForDesign(...) to {@link #editFieldProperties(GralWidget, GralRectangle)}.
    *     because it isn't called as mouse action.
-   * <li>2011-09-23 Hartmut corr: Use the new windows concept with {@link GralSubWindow}.
+   * <li>2011-09-23 Hartmut corr: Use the new windows concept with {@link GralWindow}.
    * <li>2011-07-07 Hartmut new: Improve dialog, edit all fields of the {@link GralWidget} inclusive positions.
    * <li>2011-05-24 Created. The configuration of fields of a GUI are edit-able now in the GUI itself without any other tool.
    * </ul>
@@ -32,7 +32,7 @@ public class GralCfgDesigner
 
   /**A Panel which contains the table to select some projectPaths. */
   //private GuiShellMngBuildIfc dialogWindowProps;
-  private GralSubWindow dialogWindowProps;
+  private GralWindow dialogWindowProps;
 
   /**Some dialog widget elements. */
   private GralWidget dialogFieldName, dialogFieldDatapath, dialogFieldText, dialogFieldFormat

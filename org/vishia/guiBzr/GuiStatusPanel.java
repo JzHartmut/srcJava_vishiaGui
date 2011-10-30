@@ -3,7 +3,7 @@ package org.vishia.guiBzr;
 import java.io.File;
 
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralSubWindow;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
@@ -48,7 +48,7 @@ public class GuiStatusPanel
   
   
   /**A Panel which contains the table to select some projectPaths. */
-  private GralSubWindow selectorProjectPath;
+  private GralWindow selectorProjectPath;
   
   /**The table (list) which contains the selectable project paths. */
   private GralWidget selectorProjectPathTable;

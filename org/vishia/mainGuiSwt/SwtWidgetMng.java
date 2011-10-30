@@ -67,9 +67,8 @@ import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralWidgetMng;
-import org.vishia.gral.base.GralWindowMng;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralSubWindow;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralTable;
@@ -381,7 +380,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   
   
-  public GralSubWindow createWindow(String name, String title, boolean exclusive)
+  public GralWindow createWindow(String name, String title, boolean exclusive)
   {
     SwtGraphicThread swtDevice = (SwtGraphicThread)gralDevice;
     SubWindowSwt window = new SubWindowSwt(name, swtDevice.displaySwt, title, exclusive, this);
