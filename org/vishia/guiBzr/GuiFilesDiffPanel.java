@@ -216,13 +216,12 @@ public class GuiFilesDiffPanel
   private final GralUserAction actionTableLineFile = new GralUserAction()
   { 
     public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+    { boolean bDone = false;
+      return bDone;
+    }
+    
+    public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     { boolean bDone = true;
-      final int key;
-      if(sCmd.equals("table-key") && values[1] instanceof Integer){
-        key = (Integer)(values[1]);
-      } else {
-        key = 0;
-      }
       if(key == KeyCode.enter || key == ' '){
         GralTableLine_ifc line = (GralTableLine_ifc) values[0];
         String isMarked = line.getCellText(columnMark);
@@ -246,7 +245,7 @@ public class GuiFilesDiffPanel
 
   private final GralUserAction actionAdd = new GralUserAction()
   { 
-    public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+    public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     {
       return true;
     }
@@ -255,8 +254,8 @@ public class GuiFilesDiffPanel
   
   private final GralUserAction actionRename = new GralUserAction()
   { 
-    public boolean userActionGui(String sActionCmd, GralWidget widgetInfos, Object... values)
-    { if(sActionCmd.equals("Button-up")){
+    public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
+    { if(key==KeyCode.mouse1Up){
         String sFileOld =null, sFileNew =null;
         GralTableLine_ifc lineOld = null, lineNew = null;
         for(Map.Entry<String, GralTableLine_ifc> entry: indexMarkedFiles.entrySet()){
@@ -396,9 +395,9 @@ public class GuiFilesDiffPanel
   
   private final GralUserAction actionCommit = new GralUserAction()
   { 
-    public boolean userActionGui(String sActionCmd, GralWidget widgetInfos, Object... values)
+    public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     { boolean bDone = true;
-      if(sActionCmd.equals("Button-up")){
+      if(key==KeyCode.mouse1Up){
         commitSelectedFiles();     
       }
       return bDone;
@@ -410,9 +409,9 @@ public class GuiFilesDiffPanel
   
   private final GralUserAction actionRefresh = new GralUserAction()
   { 
-    public boolean userActionGui(String sActionCmd, GralWidget widgetInfos, Object... values)
+    public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     { boolean bDone = true;
-      if(sActionCmd.equals("Button-up")){
+      if(key==KeyCode.mouse1Up){
         refreshFiles();
       }
       return bDone;
@@ -423,7 +422,7 @@ public class GuiFilesDiffPanel
   
   private final GralUserAction actionView = new GralUserAction()
   { 
-    public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+    public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     {
       return true;
     }
@@ -432,7 +431,7 @@ public class GuiFilesDiffPanel
   
   private final GralUserAction actionViewdiff = new GralUserAction()
   { 
-    public boolean userActionGui(String sCmdP, GralWidget widgetInfos, Object... values)
+    public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     {
       StringBuilder uCmd = new StringBuilder(200);
       String[] sValue = widgdTableFilesCmpn.getValue().split("\t");

@@ -46,10 +46,10 @@ public abstract class SelectList extends GralWidget
   }
 
 
-  public SelectList()
-  {
-    super('l');
-  }
+  //public SelectList()
+  //{
+  //  super('l');
+  //}
 
 
   /**

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.gral.base.GralTabbedPanel;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.widget.FileSelector;
 
 /**Data for one tabbed panel
@@ -35,11 +36,11 @@ public class TabbedPanelData
   
   final char cNr;
   
-  TabbedPanelData(char cc, char cNr, SelectTab tabSelector){
+  TabbedPanelData(char cc, char cNr, SelectTab tabSelector, GralWidgetMng mng){
     this.cc = cc;
     this.cNr = cNr;
     this.tabSelector = tabSelector;
-    selectTable = tabSelector.new SelectTabList(this);
+    selectTable = tabSelector.new SelectTabList("panel-" + cNr, this, mng);
   }
   
   /**Fills the table list left. 

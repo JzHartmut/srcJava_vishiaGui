@@ -103,8 +103,12 @@ public abstract class GralWidget implements GralWidget_ifc
 	/**Name of the widget in the panel. */
 	public String name;
 	
-	/**The position of the widget. */
-	public GralGridPos pos;  
+	/**The position of the widget. It may be null if the widget should not be resized. */
+	public final GralGridPos pos;  
+	
+	
+	/**Panel where the widget is member of. */
+	//public final GralPanelContent itsPanel;
 	
 	/**The graphical widget. It is untyped because it depends on the underlying graphic system. 
 	 * It may be a wrapper class arround a graphical widget too. 
@@ -172,35 +176,21 @@ public abstract class GralWidget implements GralWidget_ifc
 	private Object oContentInfo;
 	
 	
-	protected GralWidget(char whatIs)
-  { this.whatIs = whatIs;
-  }
+	//protected GralWidget(char whatIs)
+  //{ this.whatIs = whatIs;
+  //}
 
 	
 	
-	private GralWidget(String sName, GralWidget_ifc widget, char whatIs)
-	{ assert(false);
-	  this.name = sName;
-		//this.widget = null; //widget;
-		this.whatIs = whatIs;
-		this.itsCfgElement = null;
-	}
-
 	public GralWidget(String sName, char whatIs, GralWidgetMng mng)
 	{ this.name = sName;
 		//this.widget = null;
 		this.whatIs = whatIs;
     this.itsCfgElement = null;
     this.itsMng = mng;
+    this.pos = mng.getPositionInPanel();  //Note: makes a clone because the pos in panel is reused. 
 	}
 
-  
-  private GralWidget(GralWidgetCfg_ifc cfge, String sName, char whatIs, String sDataPath)
-  { this.name = sName;
-    this.whatIs = whatIs;
-    this.sDataPath = sDataPath;
-    this.itsCfgElement = cfge;
-  }
   
   /**Sets the graphical widget. It is a wrapper around the widget of the graphic implementation base.
    * This method shouldn't invoke by an user's application. It is only invoked by the gral itself. 

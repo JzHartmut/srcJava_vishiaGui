@@ -24,13 +24,16 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
   /**The main window. SWT: named as Shell. */
   Shell windowSwt;
   
-  /**The windows-closing event handler. It is used private only, but public set because documentation. */
+  /**The windows-closing event handler. It is used private only, but public set because documentation. 
+   * The close event will be fired also when a SubWindow is closed. Therefore test the Shell instance.
+   * Only if the main window is closed, bExit should be set to true.
+   * */
   public final class WindowsCloseListener implements Listener{
     /**Invoked when the window is closed; it sets {@link #bExit}, able to get with {@link #isRunning()}.
      * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
      */
     @Override public void handleEvent(Event event) {
-      bExit = true;
+      bExit = event.widget == windowSwt; //true;
     }
   }
 

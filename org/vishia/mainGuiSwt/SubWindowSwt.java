@@ -3,8 +3,12 @@ package org.vishia.mainGuiSwt;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -32,6 +36,8 @@ public class SubWindowSwt extends GralWindow
     //if(exclusive){ props |= SWT.PRIMARY_MODAL | SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL; }
     if(exclusive){ props |= SWT.APPLICATION_MODAL; }
     window = new Shell(display, props);
+    window.addShellListener(shellListener);
+    window.addDisposeListener(disposeListener);
     super.panelComposite = window;
     if(title !=null){ window.setText(title); }
     
@@ -114,6 +120,60 @@ public class SubWindowSwt extends GralWindow
     mouseAction = action;
   }
   
+  
+  
+  protected ShellListener shellListener = new ShellListener(){
+
+    @Override
+    public void shellActivated(ShellEvent e)
+    {
+      stop();
+      
+    }
+
+    @Override
+    public void shellClosed(ShellEvent e)
+    {
+      stop();
+      
+    }
+
+    @Override
+    public void shellDeactivated(ShellEvent e)
+    {
+      stop();
+      
+    }
+
+    @Override
+    public void shellDeiconified(ShellEvent e)
+    {
+      stop();
+      
+    }
+
+    @Override
+    public void shellIconified(ShellEvent e)
+    {
+      stop();
+      
+    }
+    
+  };
+  
+  
+  
+  DisposeListener disposeListener = new DisposeListener(){
+    
+    
+    @Override
+    public void widgetDisposed(DisposeEvent e)
+    {
+      stop();
+    }
+  };
+  
+  
   /**The resizeListener will be activated if {@link #setResizeAction(GralUserAction)} will be called.
    * It calls this user action on resize. */
   private ControlListener resizeListener = new ControlListener()
@@ -157,7 +217,7 @@ public class SubWindowSwt extends GralWindow
   
 
   
-
+  void stop(){}
   
   
 }

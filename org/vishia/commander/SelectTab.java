@@ -53,9 +53,9 @@ class SelectTab
   { this.main = main;
     this.console = console;
     this.mng = main.panelMng;
-    panelLeft = new TabbedPanelData('l', '1', this); 
-    panelMid = new TabbedPanelData('m','2',  this); 
-    panelRight = new TabbedPanelData('r', '3',  this);
+    panelLeft = new TabbedPanelData('l', '1', this, mng); 
+    panelMid = new TabbedPanelData('m','2',  this, mng); 
+    panelRight = new TabbedPanelData('r', '3',  this, mng);
 
   }
   
@@ -140,7 +140,7 @@ class SelectTab
     
     tabbedPanel.tabbedPanel.addGridPanel(WidgetNames.panelFile + "main"+tabbedPanel.cNr, "file&"+tabbedPanel.cNr,1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd'); //the whole panel.
-    tabbedPanel.fileSelectorMain = new FileSelector(console);
+    tabbedPanel.fileSelectorMain = new FileSelector("fileSelectorMain", console, (GralWidgetMng)mng);
     tabbedPanel.fileSelectorMain.setActionOnEnterFile(main.executer.actionExecute);
     String nameTab = WidgetNames.tableFile + "main" + tabbedPanel.cNr;
     main.idxFileSelector.put(nameTab, tabbedPanel.fileSelectorMain);
@@ -172,7 +172,7 @@ class SelectTab
   { 
     tabPanel.addGridPanel(info.tabName, info.tabName,1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd'); //the whole panel.
-    FileSelector fileSelector = new FileSelector(console);
+    FileSelector fileSelector = new FileSelector("fileSelector-"+info.tabName, console, mng);
     fileSelector.setActionOnEnterFile(main.executer.actionExecute);
     main.idxFileSelector.put(info.tabName, fileSelector);
     fileSelector.setToPanel(mng, info.tabName, 5, new int[]{2,20,5,10}, 'A');
@@ -271,8 +271,9 @@ class SelectTab
     
     
     
-    public SelectTabList(TabbedPanelData panel)
-    { this.panel = panel;
+    public SelectTabList(String name, TabbedPanelData panel, GralWidgetMng mng)
+    { super(name, mng);
+      this.panel = panel;
     }
 
 

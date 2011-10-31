@@ -142,7 +142,7 @@ public class TableSwt extends GralTable
     
     boolean TEST = false;
     final TableSwt table;
-    Composite parent = ((PanelSwt)mng.pos.panel).getPanelImpl();
+    Composite parent = (Composite)mng.pos.panel.getPanelImpl();
     table = new TableSwt(mng, sName, parent, height, columnWidths); //, selectionColumn, selectionText);
     //GralWidget widgd = new GralWidget(sName, table, 'L', sName, null);
     table.setContentInfo(sName);
@@ -294,7 +294,7 @@ public class TableSwt extends GralTable
 		          tableLineSwt.setData(lineGral);  //Set the data for usage later.
 		        }
 		        int keyCode = GralKeySwt.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
-		        actionDone = action.userActionGui("table-key", widgetDescr, lineGral, keyCode);
+		        actionDone = action.userActionGui(keyCode, widgetDescr, lineGral);
 	        } //if(table.)
 	      } catch(Exception exc){
       		stop();  //ignore it

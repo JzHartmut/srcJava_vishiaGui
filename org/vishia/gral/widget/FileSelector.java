@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.gral.base.GralTextField;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralGridPos;
@@ -53,6 +54,10 @@ public class FileSelector extends GralWidget
   private class FileSelectList extends SelectList
   {
 
+    FileSelectList(String name, GralWidgetMng mng){
+      super(name, mng);
+    }
+    
     @Override public boolean actionOk(Object userData, GralTableLine_ifc line)
     { boolean done = true;
       File file = (File)(userData);
@@ -148,7 +153,7 @@ public class FileSelector extends GralWidget
   
   
   /**The implementation of SelectList. */
-  private FileSelectList selectList = new FileSelectList();
+  private FileSelectList selectList;
   
   
   /**This index stores the last selected file for any directory path which was used.
@@ -177,9 +182,10 @@ public class FileSelector extends GralWidget
   
   GralUserAction actionOnEnterFile;
   
-  public FileSelector(MainCmd_ifc mainCmd)
+  public FileSelector(String name, MainCmd_ifc mainCmd, GralWidgetMng mng)
   {
-    super('l');
+    super(name, 'l', mng);
+    selectList = new FileSelectList(name+"-selectList", mng);
     this.mainCmd = mainCmd;
   }
   

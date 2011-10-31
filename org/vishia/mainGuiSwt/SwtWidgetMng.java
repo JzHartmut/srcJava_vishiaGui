@@ -531,7 +531,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     }
     widget.setSize(textSize);
     //guiContent.add(widget);
-    GralWidget widgd = new WidgetSimpleWrapperSwt("", 'S', widget, this);
+    GralWidget widgd = new WidgetSimpleWrapperSwt("labelText-" + sText, 'S', widget, this);
     return widgd;
   }
 

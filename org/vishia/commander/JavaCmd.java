@@ -422,6 +422,7 @@ public class JavaCmd extends GuiCfg
                                                   // calling arguments
     bOk = cmdgui.parseArgumentsAndInitGraphic("The.file.Commander", "2B2C");
 
+    /*
     try {
       cmdgui.parseArguments();
     } catch (Exception exception) {
@@ -429,6 +430,7 @@ public class JavaCmd extends GuiCfg
       cmdgui.setExitErrorLevel(MainCmd_ifc.exitWithArgumentError);
       bOk = false; // not exiting, show error in GUI
     }
+    */
     if (bOk) {
       // Uses socket communication for InterprocessComm, therefore load the
       // factory.

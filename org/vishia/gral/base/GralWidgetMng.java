@@ -403,7 +403,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   {
     if(pos.x < 0 || pos.xEnd <= 0 || pos.y< 0 || pos.yEnd <=0){ 
       //only widgets with size from right TODO percent size too.
-      widgd.pos = pos.clone();
+      //widgd.pos = pos.clone();
       //widgd.pos.set(pos);
       pos.panel.widgetsToResize.add(widgd);
     }

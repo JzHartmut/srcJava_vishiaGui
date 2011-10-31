@@ -209,7 +209,6 @@ public class BzrGui extends GuiCfg
       this.cargs = cargs;
       addAboutInfo("Bazaar-Gui");
       addAboutInfo("made by HSchorrig, 2011-04-30, 2011-05-01");
-      parseArgumentsAndInitGraphic("Bazaar-Gui", "3A3C");
     }
 
 
@@ -286,6 +285,9 @@ public class BzrGui extends GuiCfg
     CallingArguments cargs = new CallingArguments();
     //Initializes the GUI till a output window to show informations:
     CmdLineAndGui gui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
+    bOk = gui.parseArgumentsAndInitGraphic("BzrGui", "3A3C");
+    
+    /*
     try{ gui.parseArguments(); }
     catch(Exception exception)
     { gui.writeError("Cmdline argument error:", exception);
@@ -293,7 +295,7 @@ public class BzrGui extends GuiCfg
       //gui.exit();
       bOk = false;  //not exiting, show error in GUI
     }
-    
+    */
     //String ipcFactory = "org.vishia.communication.InterProcessComm_Socket";
     //try{ ClassLoader.getSystemClassLoader().loadClass(ipcFactory, true);
     //}catch(ClassNotFoundException exc){
