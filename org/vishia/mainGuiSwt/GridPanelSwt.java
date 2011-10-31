@@ -1,11 +1,8 @@
 package org.vishia.mainGuiSwt;
 
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.vishia.gral.base.GralWidgetMng;
 
@@ -35,7 +32,7 @@ public class GridPanelSwt extends CanvasStorePanelSwt
     swtCanvas.setData(this);
     swtCanvas.setLayout(null);
     currColor = swtCanvas.getForeground();
-    swtCanvas.addPaintListener(paintListener);
+    swtCanvas.addPaintListener(swtCanvas.paintListener);
     swtCanvas.setBackground(backGround);
 	  setGridWidth(xG, yG, xS, yS);
 	}

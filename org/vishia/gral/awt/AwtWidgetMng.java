@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.Composite;
 import java.awt.Container;
 import java.awt.Font;
+import java.awt.Color;
 import java.awt.Label;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -440,7 +441,7 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     
   }
 
-  @Override public Object getColorImpl(GralColor color) { return propertiesGuiAwt.colorAwt(color); }
+  @Override public Color getColorImpl(GralColor color) { return propertiesGuiAwt.colorAwt(color); }
 
   @Override
   public String getValue(String sName)

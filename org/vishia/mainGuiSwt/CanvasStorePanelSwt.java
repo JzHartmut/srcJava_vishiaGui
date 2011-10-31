@@ -1,33 +1,22 @@
 package org.vishia.mainGuiSwt;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.base.GralWidgetMng;
-import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.ifc.GralWidget_ifc;
 
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Widget;
 
-/**Class to store some graphical figures to draw it in its {@link #drawBackground(GC, int, int, int, int)}-routine.
+/**Class to store some graphical figures to draw it in its {@link SwtCanvas#drawBackground(GC, int, int, int, int)}-routine.
  * The figures are stored with its coordinates and it are drawn if necessary. 
  * <br><br>
- * This class is a org.eclipse.swt.widgets.Composite. 
  * It can contain some GUI-Elements like Button, Text, Label, Table etc from org.eclipse.swt.widgets.
  * The graphical figures are shown as background than.
  * 
@@ -40,51 +29,12 @@ public class CanvasStorePanelSwt extends PanelSwt  //CanvasStorePanel //
   protected SwtCanvas swtCanvas;
 	
 	/**The storage for the Canvas content. */
-	GralCanvasStorage store = new GralCanvasStorage(){
-
-		@Override public void redraw()
-		{
-			// TODO Auto-generated method stub
-			
-		}
-		
-	};
-	
-	
-	Color colorSwt(GralColor colorGui)
-	{
-	  if(colorGui.colorGuimpl == null){
-	    colorGui.colorGuimpl = new Color(swtCanvas.getDisplay(), colorGui.red, colorGui.green, colorGui.blue);
-	  } else if(!(colorGui.colorGuimpl instanceof Color)){
-	    throw new IllegalArgumentException("unauthorized change");
-	  };
-	  return (Color)colorGui.colorGuimpl;  
-	}
-	
-	//@Override 
-	public Composite xxxgetGuiContainer(){
-		return swtCanvas;
-	}
-
+	GralCanvasStorage store = new GralCanvasStorage();
 	
 	
 	
 	
 	//class MyCanvas extends Canvas{
-	
-  /**The listener for paint events. It is called whenever the window is shown newly. */
-  protected PaintListener paintListener = new PaintListener()
-  {
-
-		@Override
-		public void paintControl(PaintEvent e) {
-			// TODO Auto-generated method stub
-			GC gc = e.gc;
-			swtCanvas.drawBackground(e.gc, e.x, e.y, e.width, e.height);
-			stop();
-		}
-  	
-  };
 	
 	private static final long serialVersionUID = 6448419343757106982L;
 	
@@ -103,7 +53,7 @@ public class CanvasStorePanelSwt extends PanelSwt  //CanvasStorePanel //
     swtCanvas.setData(this);
     swtCanvas.setLayout(null);
     currColor = swtCanvas.getForeground();
-    swtCanvas.addPaintListener(paintListener);
+    swtCanvas.addPaintListener(swtCanvas.paintListener);
     swtCanvas.setBackground(backGround);
   }
   
@@ -122,6 +72,9 @@ public class CanvasStorePanelSwt extends PanelSwt  //CanvasStorePanel //
 	
 	
 	
+	/**Implementation class for Canvas for Swt
+	 * This class is a org.eclipse.swt.widgets.Composite. 
+	 */
 	protected static class SwtCanvas extends Canvas
 	{
 	  private final CanvasStorePanelSwt storeMng;
@@ -139,7 +92,7 @@ public class CanvasStorePanelSwt extends PanelSwt  //CanvasStorePanel //
     	for(GralCanvasStorage.PaintOrder order: storeMng.store.paintOrders){
     		switch(order.paintWhat){
       		case GralCanvasStorage.paintLine: {
-      			g.setForeground(storeMng.colorSwt(order.color));
+      			g.setForeground(((SwtWidgetMng)storeMng.gralMng).getColorImpl(order.color));
       	  	g.drawLine(order.x1, order.y1, order.x2, order.y2);
       	  } break;
       		case GralCanvasStorage.paintImage: {
@@ -153,6 +106,21 @@ public class CanvasStorePanelSwt extends PanelSwt  //CanvasStorePanel //
     		}
     	}
     }	
+
+    /**The listener for paint events. It is called whenever the window is shown newly. */
+    protected PaintListener paintListener = new PaintListener()
+    {
+
+      @Override
+      public void paintControl(PaintEvent e) {
+        // TODO Auto-generated method stub
+        GC gc = e.gc;
+        drawBackground(e.gc, e.x, e.y, e.width, e.height);
+        //stop();
+      }
+      
+    };
+    
 	}
 	
   @Override public Control getWidgetImplementation(){ return swtCanvas; } 

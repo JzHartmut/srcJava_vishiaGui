@@ -168,8 +168,8 @@ public class ExampleSimpleButton
     //
     //choose a factory, recomment one of the following:
     //
-    GralFactory_ifc graphicFactory = new AwtFactory();
-    //GralFactory_ifc graphicFactory = new FactorySwt();
+    //GralFactory_ifc graphicFactory = new AwtFactory();
+    GralFactory_ifc graphicFactory = new FactorySwt();
     //
     //A logger is a final thing what is need. This logger writes to the console.
     //A complexer application may write to a graphic output window.

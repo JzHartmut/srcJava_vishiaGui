@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralCanvasStorage
+public class GralCanvasStorage implements GralCanvas_ifc
 {
 	/**Data class to store an order.
 	 */
@@ -78,8 +78,24 @@ public abstract class GralCanvasStorage
     PaintOrder order = new PaintOrderImage(image, x, y, dx, dy, imagePixelSize);
     paintOrders.add(order);  //paint it when drawBackground is invoked.
 	}
+
+
+  @Override
+  public void drawText(String text)
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+
+  @Override
+  public void setTextStyle(GralColor color, GralFont font, int origin)
+  {
+    // TODO Auto-generated method stub
+    
+  }
 	
 	
-	public abstract void redraw();
+	//public abstract void redraw();
 	
 }
