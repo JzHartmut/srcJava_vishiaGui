@@ -176,8 +176,8 @@ public class SwtGralMouseListener
       try{ 
         if(mouseWidgetAction !=null){
           switch(e.button){ 
-            case 1: mouseWidgetAction.mouse1Down();
-            case 2: mouseWidgetAction.mouse2Down();
+            case 1: mouseWidgetAction.mouse1Down(); break;
+            case 2: mouseWidgetAction.mouse2Down(); break;
           }  
         }
         GralUserAction action = widgg ==null ? null : widgg.getActionChange();

@@ -10,6 +10,10 @@ public abstract class GralButton extends GralWidget
 {
   //final GralWindowMng_ifc mainWindow;
   
+  /**That action effects that the internal variable {@link #switchedOn} is set for a switching button.
+   * The user action will be called by the standard mouse action of the implementation graphic
+   * AWT: {@link org.vishia.gral.awt.AwtGralMouseListener.MouseListenerUserAction}.
+   */
   final protected GralMouseWidgetAction_ifc mouseWidgetAction = new MouseActionButton();
   
 

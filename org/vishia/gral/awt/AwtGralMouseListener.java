@@ -181,8 +181,8 @@ public class AwtGralMouseListener
       try{ 
         if(mouseWidgetAction !=null){
           switch(e.getButton()){ 
-            case 1: mouseWidgetAction.mouse1Down();
-            case 2: mouseWidgetAction.mouse2Down();
+            case 1: mouseWidgetAction.mouse1Down(); break;
+            case 2: mouseWidgetAction.mouse2Down(); break;
           }  
         }
         GralUserAction action = widgg ==null ? null : widgg.getActionChange();
@@ -241,6 +241,11 @@ public class AwtGralMouseListener
 
       @Override public void mouseMoved(MouseEvent e)
       {
+      }//method mouseMoved
+
+      @Override
+      public void mouseDragged(MouseEvent e)
+      {
         if(e.getComponent() instanceof AwtWidget){
           Component widget = e.getComponent();
           AwtWidget widgetAwt = (AwtWidget)widget;
@@ -256,14 +261,7 @@ public class AwtGralMouseListener
             }
           }
         } 
-      }//method mouseMove
-
-      @Override
-      public void mouseDragged(MouseEvent e)
-      {
-        // TODO Auto-generated method stub
-        
-      }
+      }//method mouseDragged
     };
     
 

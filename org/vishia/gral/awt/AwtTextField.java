@@ -29,9 +29,7 @@ public class AwtTextField extends GralTextField
 
   @Override
   public String getText()
-  {
-    // TODO Auto-generated method stub
-    return null;
+  { return widgetAwt.getText();
   }
 
   @Override
