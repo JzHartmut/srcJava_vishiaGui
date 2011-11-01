@@ -250,7 +250,16 @@ public class GralCfgBuilder
       widgd = gui.addFileSelectField(sName, null, dirMask, null, 't');
       widgd.setDataPath(sDataPath);
     } else {
-      widgd = null;
+      switch(cfge.widgetType.whatIs){
+        case 'T':{
+          widgd = gui.addTextField(sName, true, null, 't');
+          widgd.setDataPath(sDataPath);
+        } break;
+        default: {
+          widgd = null;
+        }//default
+      }
+      
     }
     if(widgd !=null){
       //set common attributes for widgets:

@@ -33,6 +33,7 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -623,11 +624,16 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    */
   @Override public GralTextField addTextField(String name, boolean editable, String prompt, char promptStylePosition)
   { Text widgetSwt = new Text((Composite)pos.panel.getPanelImpl(), SWT.SINGLE);
-    GralTextField widgetInfo = new SwtTextFieldWrapper(name, widgetSwt, editable ? 'T' : 'S', this);
+    SwtTextFieldWrapper widgetInfo = new SwtTextFieldWrapper(name, widgetSwt, editable ? 'T' : 'S', this);
+    //SwtStyledTextFieldWrapper widgetInfo = new SwtStyledTextFieldWrapper(name, (Composite)pos.panel.getPanelImpl(), editable ? 'T' : 'S', this);
+    //StyledText widgetSwt = widgetInfo.textFieldSwt;
     widgetInfo.setPanelMng(this);
     widgetSwt.setFont(propertiesGuiSwt.stdInputFont);
     widgetSwt.setEditable(editable);
     if(editable)
+      widgetSwt.setDragDetect(true);
+      widgetSwt.addDragDetectListener(widgetInfo.dragListener);
+      
     	stop();
     widgetSwt.setBackground(propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));
     widgetSwt.addFocusListener(focusListener);

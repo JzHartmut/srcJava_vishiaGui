@@ -120,17 +120,22 @@ public abstract class GralWidget implements GralWidget_ifc
 	/**numeric info what to do (kind of widget). 
 	 * <ul>
 	 * <li>B: a Button: has a color, has an action method.
-	 * <li>c: curve view
+   * <li>c: curve view
+   * <li>C: traCk of curve view
 	 * <li>D: a LED
-	 * <li>E: an edit field, 1 line
-	 * <li>e: an edit area
-	 * <li>i: an image
+	 * <li>xxx E: an edit field, 1 line
+	 * <li>xxx e: an edit area
+	 * <li>F: input file selection field
+	 * <li>I: a line
+   * <li>i: an image
    * <li>k: a tree node
    * <li>K: a tree leafe
    * <li>l: a list or table
    * <li>L: a list or table line
    * <li>M: a Menu entry
-	 * <li>S: a text field
+   * <li>r: a rectangle area 
+   * <li>R: a rectangle line 
+   * <li>S: a text field to show
 	 * <li>s: a text area.
 	 * <li>T: a text input field
 	 * <li>t: a text input area.

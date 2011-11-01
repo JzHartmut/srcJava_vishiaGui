@@ -31,7 +31,7 @@ import org.vishia.msgDispatch.LogMessage;
  * <br><br>
  * The class contains a {@link #main(String[])}. It is a complete ready to run application. 
  * The content of the GUI can be controlled by a script. The command line arguments are parsed in
- * {@link GralArea9MainCmd}, the universal or basic MainCmd for GUI applications.
+ * {@link GralArea9MainCmd}, the universal or basic MainCmd for gral-GUI applications.
  * <br>
  * Registered user action can be used by script.
  * <ul>

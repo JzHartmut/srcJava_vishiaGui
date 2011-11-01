@@ -14,7 +14,8 @@ import org.vishia.gral.ifc.GralWidgetCfg_ifc;
 
 
 /**ZBNF: Element::= ... ;
- * Class for instance to capture and store one element. */
+ * Class for instance to capture and store one element. Any widget type is an Element.
+ * The distinction between different types are given with the {@link #itsCfgData}. */
 public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
 { 
   /**The previous element is necessary because non complete coordinates are resolved with previous.
@@ -22,6 +23,7 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   GralCfgElement previous, next;
   
   final GralCfgData itsCfgData;
+  
   
   /**The content is set in textual form too. It is because [<?Element>...] was written */
   String content;
@@ -75,6 +77,14 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   
   /**ZBNF: Text::= */
   public void set_Text(GuiCfgText data){  }
+  
+  public WidgetTypeBase new_InputTextline()
+  { GralCfgData.WidgetTypeBase widgt = new GralCfgData.WidgetTypeBase(this, 'T');
+    this.widgetType = widgt;
+    return widgt;
+  }
+  
+  public void set_InputTextline(WidgetTypeBase data) {  }
   
   public WidgetTypeBase new_InputFile()
   { GuiCfgInputFile widgt = new GuiCfgInputFile(this);

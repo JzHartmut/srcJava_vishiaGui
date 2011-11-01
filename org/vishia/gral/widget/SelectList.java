@@ -101,12 +101,12 @@ public abstract class SelectList extends GralWidget
   private GralUserAction actionTable = new GralUserAction()
   {
 
-    @Override public boolean userActionGui(String sIntension, GralWidget widgdTable, Object... params)
+    @Override public boolean userActionGui(int keyCode, GralWidget widgdTable, Object... params)
     {
-      assert(sIntension.equals("table-key"));
+      //assert(sIntension.equals("table-key"));
       GralTableLine_ifc line = (GralTableLine_ifc)params[0];
       Object data = line.getUserData();
-      int keyCode = (Integer)params[1];
+      //int keyCode = (Integer)params[1];
       boolean done = true;
       if(keyCode == KeyCode.shift + KeyCode.left){ actionLeft(data, line); }
       else if(keyCode == KeyCode.shift + KeyCode.right){ actionRight(data, line); }
@@ -114,6 +114,7 @@ public abstract class SelectList extends GralWidget
       else { done = false; }
       return done;
     }
+    
     
   };
 

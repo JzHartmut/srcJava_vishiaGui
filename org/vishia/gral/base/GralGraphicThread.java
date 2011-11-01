@@ -218,9 +218,16 @@ public abstract class GralGraphicThread implements Runnable
     checkTimes.adjust();
     checkTimes.cyclTime();
     while (!bExit) {
-      while (dispatchOsEvents()){
+      boolean bContinueDispatch;
+      do{
+        try{ bContinueDispatch = dispatchOsEvents();}
+        catch(Exception exc){
+          System.out.println(exc.getLocalizedMessage());
+          exc.printStackTrace(System.out);
+          bContinueDispatch = false;
+        }
         //isWakedUpOnly = false;  //after 1 event, it may be wakeUp, set if false.
-      }
+      } while(bContinueDispatch);
       checkTimes.calcTime();
       isWakedUpOnly = false;
       //System.out.println("dispatched");

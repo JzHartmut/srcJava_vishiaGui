@@ -41,14 +41,21 @@ public final class GralCfgData
   public static class WidgetTypeBase implements Cloneable
   {
     private final GralCfgElement itsElement;
-    
+
+    /**See {@link org.vishia.gral.ifc.GralWidget#whatIs}. */
+    final char whatIs;
+
+
     public String name, text;
     public String cmd, userAction, info, showMethod, format, type;
     
     public GuiCfgColor colorName = null, color0 = null, color1 = null;
     
 
-    public WidgetTypeBase(GralCfgElement itsElement){ this.itsElement = itsElement; }
+    public WidgetTypeBase(GralCfgElement itsElement, char whatIs){ 
+      this.itsElement = itsElement; 
+      this.whatIs = whatIs;
+    }
     
     public GuiCfgColor new_colorName(){ return colorName = new GuiCfgColor(); }
     
@@ -77,7 +84,7 @@ public final class GralCfgData
   public final static class GuiCfgText extends WidgetTypeBase implements Cloneable
   {
     public String size = "B";
-    public GuiCfgText(GralCfgElement itsElement){ super(itsElement); }
+    public GuiCfgText(GralCfgElement itsElement){ super(itsElement, 'S'); }
   }
   
   
@@ -86,7 +93,7 @@ public final class GralCfgData
   public final static class GuiCfgLed extends WidgetTypeBase implements Cloneable
   {
     //public String size = "B";
-    public GuiCfgLed(GralCfgElement itsElement){ super(itsElement); }
+    public GuiCfgLed(GralCfgElement itsElement){ super(itsElement, 'D'); }
   }
   
   
@@ -97,7 +104,7 @@ public final class GralCfgData
   {
     List<GuiCfgCoord> coords = new LinkedList<GuiCfgCoord>();
     
-    public GuiCfgLine(GralCfgElement itsElement){ super(itsElement); }
+    public GuiCfgLine(GralCfgElement itsElement){ super(itsElement, 'I'); }
     
     public void set_coord(String value){}
     
@@ -123,7 +130,7 @@ public final class GralCfgData
     
     String file_;
     
-    public GuiCfgImage(GralCfgElement itsElement){ super(itsElement); }
+    public GuiCfgImage(GralCfgElement itsElement){ super(itsElement, 'i'); }
   
     public void set_file(String value){ file_ = value; }
   }
@@ -135,7 +142,7 @@ public final class GralCfgData
   public final static class GuiCfgShowField extends WidgetTypeBase implements Cloneable
   {
     
-    public GuiCfgShowField(GralCfgElement itsElement){ super(itsElement); }
+    public GuiCfgShowField(GralCfgElement itsElement){ super(itsElement, 'S'); }
   }
   
   
@@ -144,7 +151,7 @@ public final class GralCfgData
   public final static class GuiCfgInputFile extends WidgetTypeBase implements Cloneable
   {
     
-    public GuiCfgInputFile(GralCfgElement itsElement){ super(itsElement); }
+    public GuiCfgInputFile(GralCfgElement itsElement){ super(itsElement, 'F'); }
   }
   
   
@@ -153,8 +160,8 @@ public final class GralCfgData
   public final static class GuiCfgButton extends WidgetTypeBase implements Cloneable
   {
     final boolean bSwitch;
-    public GuiCfgButton(GralCfgElement itsElement){ super(itsElement); bSwitch = false; }
-    public GuiCfgButton(GralCfgElement itsElement, boolean bSwitch){ super(itsElement); this.bSwitch = bSwitch; }
+    public GuiCfgButton(GralCfgElement itsElement){ super(itsElement, 'B'); bSwitch = false; }
+    public GuiCfgButton(GralCfgElement itsElement, boolean bSwitch){ super(itsElement, 'B'); this.bSwitch = bSwitch; }
   }
   
   
@@ -164,7 +171,7 @@ public final class GralCfgData
   public final static class GuiCfgTable extends WidgetTypeBase implements Cloneable
   {
     
-    public GuiCfgTable(GralCfgElement itsElement){ super(itsElement); }
+    public GuiCfgTable(GralCfgElement itsElement){ super(itsElement, 'l'); }
 
     public int height;
     
@@ -189,7 +196,7 @@ public final class GralCfgData
     private GuiCfgCurveLine newLine;
     
     
-    public GuiCfgCurveview(GralCfgElement itsElement){ super(itsElement); }
+    public GuiCfgCurveview(GralCfgElement itsElement){ super(itsElement, 'c'); }
 
     
     /**ZBNF: DataReplace: CurveView::= .... <?line> */
@@ -225,7 +232,7 @@ public final class GralCfgData
   {
     String content;
     
-    public GuiCfgCurveLine(GralCfgElement itsElement){ super(itsElement); }
+    public GuiCfgCurveLine(GralCfgElement itsElement){ super(itsElement, 'C'); }
     
     public int colorValue = -1;
     public float offset, scale;
