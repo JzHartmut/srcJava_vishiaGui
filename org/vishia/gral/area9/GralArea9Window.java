@@ -357,12 +357,12 @@ public class GralArea9Window implements GralArea9_ifc
     if(window instanceof GralPrimaryWindow_ifc)
     { GralPrimaryWindow_ifc pWindow = (GralPrimaryWindow_ifc) window;
       //create the menue
-      pWindow.addMenuItemGThread("&File/&Open", this.new GralActionFileOpen());
+      pWindow.addMenuItemGThread("menuFileOpen", "&File/&Open", this.new GralActionFileOpen());
       //swtWindow.addMenuItemGThread("&File/&Close", this.new ActionFileClose());
-      pWindow.addMenuItemGThread("&File/&Save", actionFile);
+      pWindow.addMenuItemGThread("menuFileSave", "&File/&Save", actionFile);
       //swtWindow.addMenuItemGThread("&File/E&xit", this.new ActionFileOpen());
-      pWindow.addMenuItemGThread("&Help/&Help", this.new GralActionHelp());
-      pWindow.addMenuItemGThread("&Help/&About", this.new GralActionAbout());
+      pWindow.addMenuItemGThread("menuHelp", "&Help/&Help", this.new GralActionHelp());
+      pWindow.addMenuItemGThread("menuAbout", "&Help/&About", this.new GralActionAbout());
       //swtWindow.graphicThreadSwt.setJMenuBar(menuBar);
       //swtWindow.graphicThreadSwt.setVisible( true );
       pWindow.redraw();
@@ -374,10 +374,10 @@ public class GralArea9Window implements GralArea9_ifc
   }
   
   
-  @Override public void addMenuItemGThread(String namePath, GralUserAction action)
+  @Override public void addMenuItemGThread(String name, String sMenuPath, GralUserAction action)
   { if(window instanceof GralPrimaryWindow_ifc)
     { GralPrimaryWindow_ifc pWindow = (GralPrimaryWindow_ifc) window;
-      pWindow.addMenuItemGThread(namePath, action);
+      pWindow.addMenuItemGThread(name, sMenuPath, action);
     }
   }
   

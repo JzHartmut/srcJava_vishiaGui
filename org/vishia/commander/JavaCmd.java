@@ -91,11 +91,11 @@ public class JavaCmd extends GuiCfg
 
     gui.setFrameAreaBorders(30, 65, 70, 85); // x1, x2, y1, y2
     gui.setStandardMenusGThread(new File("."), actionFile);
-    gui.addMenuItemGThread("&Command/Set&WorkingDir", actionSetCmdWorkingDir); // /
-    gui.addMenuItemGThread("&Command/&Abort", executer.actionCmdAbort); // /
+    gui.addMenuItemGThread("MenuSetWorkingDir", "&Command/Set&WorkingDir", actionSetCmdWorkingDir); // /
+    gui.addMenuItemGThread("MenuCommandAbort", "&Command/&Abort", executer.actionCmdAbort); // /
     // gui.addMenuItemGThread("&Command/E&xecute", actionSetCmdCurrentDir); ///
-    gui.addMenuItemGThread("&Command/CmdCf&gFile/&Set", actionSetCmdCfg); // /
-    gui.addMenuItemGThread("&Command/CmdCf&gFile/&Check", actionSetCmdCfg); // /
+    gui.addMenuItemGThread("MenuCmdCfgSet", "&Command/CmdCf&gFile/&Set", actionSetCmdCfg); // /
+    gui.addMenuItemGThread("MenuCmdCfgCheck", "&Command/CmdCf&gFile/&Check", actionSetCmdCfg); // /
     this.windMng.initMenuWindMng();
     // gui.set
 

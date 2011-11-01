@@ -672,7 +672,17 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
 
   /**Action to edit the properties of one widget in the graphic. */
   public GralUserAction actionDesignEditField = new GralUserAction()
-  { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
+  { 
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
+    {
+      GralWidget widgd = getWidgetInFocus();
+      if(widgd !=null){
+        designer.editFieldProperties(widgd, null);
+      }
+      return true;
+    }
+    
+    @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     {
       GralWidget widgd = getWidgetInFocus();
       if(widgd !=null){

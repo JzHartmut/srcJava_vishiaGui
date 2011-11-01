@@ -26,12 +26,14 @@ public interface GralPrimaryWindow_ifc extends GralWindow_ifc //, GralWindowMng_
   
   
   /**Adds any menu item
-   * @param name Menu position. Use slash as separator, use & for hot key.
+   * @param name name of the menu, it is used as widget name.
+   * @param sMenuPath Menu position. Use slash as separator, use & for hot key.
    *   For example "&edit/&search/co&ntinue" creates a menu 'edit' or uses the existing one in the top level (menu bar),
    *   then creates the search menu item as pull down in menu bar, and then 'continue' with 'n' as hot key as sub-menu. 
+   *   It is stored in {@link GralWidget#sDataPath}  
    * @param action called on menu activation.
    */
-  void addMenuItemGThread(String name, GralUserAction action);
+  void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction action);
   
   
   

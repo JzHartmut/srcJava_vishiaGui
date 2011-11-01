@@ -260,9 +260,9 @@ protected void initGuiAreas()
 
 protected void initMenuGralDesigner()
 {
-  gui.addMenuItemGThread("&Design/e&Nable", panelMng.actionDesignEditField);  
-  gui.addMenuItemGThread("&Design/Edit &field", panelMng.actionDesignEditField);  
-  gui.addMenuItemGThread("&Design/update &Panel from cfg-file", panelMng.actionReadPanelCfg);  
+  gui.addMenuItemGThread("GralDesignEnable", "&Design/e&Nable", panelMng.actionDesignEditField);  
+  gui.addMenuItemGThread("GralDesignEditField", "&Design/Edit &field", panelMng.actionDesignEditField);  
+  gui.addMenuItemGThread("GralDesignUpdatePanel", "&Design/update &Panel from cfg-file", panelMng.actionReadPanelCfg);  
   
 }
 
@@ -359,9 +359,9 @@ private final GralUserAction cmdInvoke = new GralUserAction()
 
 
 protected GralUserAction actionFile = new GralUserAction()
-{ @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
+{ @Override public boolean userActionGui(int key, GralWidget widg, Object... params)
   {
-    if(sIntension.equals("save")){
+    if(widg.name.equals("menuFileSave")){
       String sError = null;
       try{
         Writer writer = new FileWriter(cargs.fileGuiCfg); //"save.cfg");

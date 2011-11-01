@@ -19,7 +19,7 @@ public class WindowMng
   
   void initMenuWindMng()
   {
-    main.gui.addMenuItemGThread("&Window/&Output", actionWindFullOut);
+    main.gui.addMenuItemGThread("MenuOutputFull", "&Window/&Output", actionWindFullOut);
   }
   
   

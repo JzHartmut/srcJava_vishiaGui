@@ -125,8 +125,11 @@ public abstract class GralWidget implements GralWidget_ifc
 	 * <li>E: an edit field, 1 line
 	 * <li>e: an edit area
 	 * <li>i: an image
-	 * <li>l: a list or table
-	 * <li>m: a Tree
+   * <li>k: a tree node
+   * <li>K: a tree leafe
+   * <li>l: a list or table
+   * <li>L: a list or table line
+   * <li>M: a Menu entry
 	 * <li>S: a text field
 	 * <li>s: a text area.
 	 * <li>T: a text input field

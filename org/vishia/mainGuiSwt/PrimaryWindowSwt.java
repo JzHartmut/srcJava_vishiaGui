@@ -16,13 +16,16 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.KeyCode;
 
 public class PrimaryWindowSwt extends SubWindowSwt implements GralPrimaryWindow_ifc //GralWindowMng implements GralWindow_ifc
 {
@@ -206,7 +209,16 @@ public class PrimaryWindowSwt extends SubWindowSwt implements GralPrimaryWindow_
   
     @Override
     public void widgetSelected(SelectionEvent e)
-    { action.userActionGui(0, null);
+    { Object oWidgSwt = e.getSource();
+      final GralWidget widgg;
+      if(oWidgSwt instanceof Widget){
+        Widget widgSwt = (Widget)oWidgSwt;
+        Object oGralWidg = widgSwt.getData();
+        if(oGralWidg instanceof GralWidget){
+          widgg = (GralWidget)oGralWidg;
+        } else { widgg = null; }
+      } else { widgg = null; }
+      action.userActionGui(KeyCode.menuEntered, widgg);
     }
   }
   
@@ -218,9 +230,9 @@ public class PrimaryWindowSwt extends SubWindowSwt implements GralPrimaryWindow_
   }
 
 
-  @Override public void addMenuItemGThread(String namePath, GralUserAction action)
+  @Override public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction action)
   {
-    addMenuItemGThread(namePath, this.new ActionUserMenuItem(action));
+    addMenuItemGThread(nameWidg, sMenuPath, action, this.new ActionUserMenuItem(action));
   }
   
   
@@ -229,9 +241,9 @@ public class PrimaryWindowSwt extends SubWindowSwt implements GralPrimaryWindow_
    * @param namePath
    * @param action
    */
-  protected void addMenuItemGThread(String namePath, SelectionListener action)
+  protected void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction gralAction, SelectionListener action)
   {
-    String[] names = namePath.split("/");
+    String[] names = sMenuPath.split("/");
     if(menuBar == null){
       menuBar = new Menu(graphicThreadSwt.windowSwt, SWT.BAR);
       graphicThreadSwt.windowSwt.setMenuBar(menuBar);
@@ -240,6 +252,7 @@ public class PrimaryWindowSwt extends SubWindowSwt implements GralPrimaryWindow_
     Map<String, MenuEntry> menustore = menus;
     int ii;
     for(ii=0; ii<names.length-1; ++ii){
+      //search all pre-menu entries before /. It may be existing, otherwise create it.
       String name = names[ii];
       final char cAccelerator;
       final int posAccelerator = name.indexOf('?');
@@ -251,6 +264,7 @@ public class PrimaryWindowSwt extends SubWindowSwt implements GralPrimaryWindow_
       }
       MenuEntry menuEntry = menustore.get(name);
       if(menuEntry == null){
+        //create it.
         menuEntry = new MenuEntry();
         menustore.put(name, menuEntry);
         menuEntry.name = name;
@@ -268,6 +282,7 @@ public class PrimaryWindowSwt extends SubWindowSwt implements GralPrimaryWindow_
     }
     String name = names[ii];
     MenuItem item = new MenuItem(parentMenu, SWT.None); 
+    GralWidget widgMenu = new SwtWidgetMenu(nameWidg, item, sMenuPath, gralMng);
     item.setText(name);
     //item.setAccelerator(SWT.CONTROL | 'S');
     item.addSelectionListener(action);

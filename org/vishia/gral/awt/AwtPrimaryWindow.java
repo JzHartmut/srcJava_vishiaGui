@@ -51,7 +51,7 @@ public class AwtPrimaryWindow extends AwtSubWindow implements GralPrimaryWindow_
   
   
   @Override
-  public void addMenuItemGThread(String name, GralUserAction action)
+  public void addMenuItemGThread(String name1, String name, GralUserAction action)
   {
     // TODO Auto-generated method stub
     
