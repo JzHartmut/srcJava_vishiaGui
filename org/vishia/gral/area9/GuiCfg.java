@@ -165,7 +165,6 @@ public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui, GralPlugUser2Gral_i
     }
   }
   
-  userInit();
   inspector = new Inspector("UDP:127.0.0.1:60088");
   inspector.start(this);
   
@@ -177,6 +176,7 @@ public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui, GralPlugUser2Gral_i
   panelMng = cmdGui.gralMng; //cargs.graphicFactory.createPanelMng(null, 120,80, propertiesGui, null, log);
   panelBuildIfc = panelMng;
   guiAccess = panelMng;
+  userInit();
   //panelContent = new PanelContent(user);
   if(user !=null){
     user.registerMethods(panelBuildIfc);
@@ -198,7 +198,7 @@ public GralPlugUser_ifc getPluggedUser(){ return user; }
 protected void userInit()
 {
   if(user !=null){
-    user.init(plugUser2Gui, console.getLogMessageOutputConsole());
+    user.init(plugUser2Gui, panelMng, console.getLogMessageOutputConsole());
   }
   
   

@@ -14,6 +14,7 @@ import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.KeyCode;
 
 public class GralCfgBuilder
 {
@@ -239,7 +240,9 @@ public class GralCfgBuilder
       
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgShowField){
       //GuiCfgData.GuiCfgShowField wShow = (GuiCfgData.GuiCfgShowField)cfge.widgetType;
-      widgd = gui.addTextField(sName, false, null, '.');
+      char cPromptPosition = cfge.widgetType.promptPosition ==null || cfge.widgetType.promptPosition.length() <1 
+                           ? '.' :  cfge.widgetType.promptPosition.charAt(0);
+      widgd = gui.addTextField(sName, false, cfge.widgetType.prompt, cPromptPosition);
       widgd.setDataPath(sDataPath);
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgInputFile){
       GralCfgData.GuiCfgInputFile widgt = (GralCfgData.GuiCfgInputFile)cfge.widgetType;
@@ -294,6 +297,22 @@ public class GralCfgBuilder
       }
       if(cfge.widgetType.color1 != null){
         widgd.setLineColor(GralColor.getColor(cfge.widgetType.color1.color), 0);
+      }
+      if(cfge.widgetType.dropFiles !=null){
+        GralUserAction actionDrop = gui.getRegisteredUserAction(cfge.widgetType.dropFiles);
+        if(actionDrop == null){
+          sError = "GuiCfgBuilder - action for drop not found: " + cfge.widgetType.dropFiles;
+        } else {
+          widgd.setDropEnable(actionDrop, KeyCode.dropFiles);
+        }
+      }
+      if(cfge.widgetType.dragFiles !=null){
+        GralUserAction actionDrag = gui.getRegisteredUserAction(cfge.widgetType.dragFiles);
+        if(actionDrag == null){
+          sError = "GuiCfgBuilder - action for drag not found: " + cfge.widgetType.dragFiles;
+        } else {
+          widgd.setDragEnable(actionDrag, KeyCode.dragFiles);
+        }
       }
       //save the configuration element as association from the widget.
       widgd.setCfgElement(cfge);

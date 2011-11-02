@@ -46,12 +46,16 @@ public final class GralCfgData
     final char whatIs;
 
 
-    public String name, text;
-    public String cmd, userAction, info, showMethod, format, type;
+    /**From ZBNF-parser param::=<?> ...name = <""?name> etc. values are set if it is parsed. */
+    public String name, text, cmd, userAction, info, showMethod, format, type, prompt, promptPosition;
+    
+    /**From ZBNF-parser param::=<?> ...dropFiles = <""?name> etc. values are set if it is parsed. */
+    public String dragFiles, dropFiles, dragText, dropText;
     
     public GuiCfgColor colorName = null, color0 = null, color1 = null;
     
-
+    /**From ZBNF-parser param::=<?> ...<?dragFiles> etc. boolean values are set if <?name> is parsed. */
+    
     public WidgetTypeBase(GralCfgElement itsElement, char whatIs){ 
       this.itsElement = itsElement; 
       this.whatIs = whatIs;

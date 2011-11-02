@@ -77,14 +77,22 @@ public abstract class GralButton extends GralWidget
 
   public void setState(Object val)
   {
-    String sVal = (val instanceof String) ? (String)val : null;
-    int nVal = val instanceof Integer ? ((Integer)val).intValue(): -1;
-    if(sVal !=null && (sVal.equals("1") || sVal.equals("true") || sVal.equals("on"))
-      || sVal == null && nVal !=0){
-      switchedOn = true;
-    } else if(sVal !=null && (sVal.equals("0") || sVal.equals("false") || sVal.equals("off"))
-        || nVal == 0){
-      switchedOn = false;
+    if(val instanceof GralColor){
+      if(switchedOn){
+        colorOn = (GralColor)val;
+      } else {
+        colorOff = (GralColor)val;
+      }
+    } else {
+      String sVal = (val instanceof String) ? (String)val : null;
+      int nVal = val instanceof Integer ? ((Integer)val).intValue(): -1;
+      if(sVal !=null && (sVal.equals("1") || sVal.equals("true") || sVal.equals("on"))
+        || sVal == null && nVal !=0){
+        switchedOn = true;
+      } else if(sVal !=null && (sVal.equals("0") || sVal.equals("false") || sVal.equals("off"))
+          || nVal == 0){
+        switchedOn = false;
+      }
     }
     redraw();
   }

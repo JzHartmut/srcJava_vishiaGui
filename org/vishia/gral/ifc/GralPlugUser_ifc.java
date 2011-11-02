@@ -1,5 +1,6 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.msgDispatch.LogMessage;
 
 
@@ -10,7 +11,7 @@ public interface GralPlugUser_ifc
 
   //void init(LogMessage log);
   
-  void init(GralPlugUser2Gral_ifc plugUser2Gui, LogMessage log);
+  void init(GralPlugUser2Gral_ifc plugUser2Gui, GralWidgetMng gralMng, LogMessage log);
 
   
   void registerMethods(org.vishia.gral.ifc.GralGridBuild_ifc guiMng);

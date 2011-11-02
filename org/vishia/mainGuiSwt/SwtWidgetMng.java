@@ -623,16 +623,16 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    * @return
    */
   @Override public GralTextField addTextField(String name, boolean editable, String prompt, char promptStylePosition)
-  { Text widgetSwt = new Text((Composite)pos.panel.getPanelImpl(), SWT.SINGLE);
-    SwtTextFieldWrapper widgetInfo = new SwtTextFieldWrapper(name, widgetSwt, editable ? 'T' : 'S', this);
+  { SwtTextFieldWrapper widgetInfo = new SwtTextFieldWrapper(name, (Composite)pos.panel.getPanelImpl(), editable ? 'T' : 'S', this);
+    Text widgetSwt = widgetInfo.textFieldSwt;
     //SwtStyledTextFieldWrapper widgetInfo = new SwtStyledTextFieldWrapper(name, (Composite)pos.panel.getPanelImpl(), editable ? 'T' : 'S', this);
     //StyledText widgetSwt = widgetInfo.textFieldSwt;
     widgetInfo.setPanelMng(this);
     widgetSwt.setFont(propertiesGuiSwt.stdInputFont);
     widgetSwt.setEditable(editable);
     if(editable)
-      widgetSwt.setDragDetect(true);
-      widgetSwt.addDragDetectListener(widgetInfo.dragListener);
+      //widgetSwt.setDragDetect(true);
+      //widgetSwt.addDragDetectListener(widgetInfo.dragListener);
       
     	stop();
     widgetSwt.setBackground(propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));

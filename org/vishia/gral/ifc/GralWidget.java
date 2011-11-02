@@ -174,7 +174,7 @@ public abstract class GralWidget implements GralWidget_ifc
   /**Action method for showing. */
   private GralUserAction actionShow;
 
-  
+  private GralUserAction actionDrag, actionDrop;
 	
 	/**command string given by the action as parameter. */
 	public String sCmd;
@@ -296,7 +296,49 @@ public abstract class GralWidget implements GralWidget_ifc
 		this.sToolTip = sToolTip;
 	}
 
+	
+  /**Sets the action to receive a drop event and initializes the drop feature of the widget.
+   * @param action The action will be called
+   * @param dropType one of {@link org.vishia.util.KeyCode#dropFiles} or ..dropText
+   */
+  public void setDragEnable(GralUserAction action, int dragType)
+  {
+    actionDrag = action;
+    setDragEnable(dragType);  // call implementation specific drop handling. 
+  }
 
+  /**Implementation routine to set receiving a drop event and initializes the drop feature of the widget.
+   * @param dropType one of {@link org.vishia.util.KeyCode#dropFiles} or ..dropText
+   */
+  protected void setDragEnable(int dragType)
+  { //default implementation: causes an exception. The type must override it.
+    throw new IllegalArgumentException("drag not supported for this widget type");
+  }
+  
+  public GralUserAction getActionDrag(){ return actionDrag; }
+  
+  
+  /**Sets the action to receive a drop event and initializes the drop feature of the widget.
+   * @param action The action will be called
+   * @param dropType one of {@link org.vishia.util.KeyCode#dropFiles} or ..dropText
+   */
+  public void setDropEnable(GralUserAction action, int dropType)
+  {
+    actionDrop = action;
+    setDropEnable(dropType);  // call implementation specific drop handling. 
+  }
+
+  /**Implementation routine to set receiving a drop event and initializes the drop feature of the widget.
+   * @param dropType one of {@link org.vishia.util.KeyCode#dropFiles} or ..dropText
+   */
+  protected void setDropEnable(int dropType)
+  { //default implementation: causes an exception. The type must override it.
+    throw new IllegalArgumentException("drop not supported for this widget type");
+  }
+  
+  public GralUserAction getActionDrop(){ return actionDrop; }
+  
+  
 	public String getShowMethod()
 	{
 		return sShowMethod;
