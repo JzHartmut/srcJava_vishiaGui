@@ -95,7 +95,7 @@ public abstract class SelectList extends GralWidget
   /**Action if a table line is selected and any other key is pressed or the context menu is invoked.
    * @param userData The user data stored in the line of table.
    */
-  protected abstract void actionUserKey(String sKey, Object userData, GralTableLine_ifc line);
+  protected abstract boolean actionUserKey(int key, Object userData, GralTableLine_ifc line);
   
   
   private GralUserAction actionTable = new GralUserAction()
@@ -111,7 +111,7 @@ public abstract class SelectList extends GralWidget
       if(keyCode == KeyCode.shift + KeyCode.left){ actionLeft(data, line); }
       else if(keyCode == KeyCode.shift + KeyCode.right){ actionRight(data, line); }
       else if(keyCode == KeyCode.enter){ done = actionOk(data, line); }
-      else { done = false; }
+      else { done = actionUserKey(keyCode, data, line); }
       return done;
     }
     

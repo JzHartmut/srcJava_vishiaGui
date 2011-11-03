@@ -116,13 +116,14 @@ public class FileSelector extends GralWidget
     
     
     
-    @Override public void actionUserKey(String sIntension, Object data, GralTableLine_ifc line)
-    {
+    @Override public boolean actionUserKey(int keyCode, Object data, GralTableLine_ifc line)
+    { boolean ret = true;
       File file = (File)(data);
-      KeyCode keyCode = new KeyCode(sIntension);
-      switch(keyCode.code){
+      switch(keyCode){
       case KeyCode.alt + KeyCode.F + '7': FileSystem.searchInFiles(new File[]{file}, "ordersBackground"); break;
+      default: ret = false;
       }
+      return ret;
     }
 
 

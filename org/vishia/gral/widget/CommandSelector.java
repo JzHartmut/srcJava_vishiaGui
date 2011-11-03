@@ -98,10 +98,10 @@ public class CommandSelector extends SelectList
   
   
   @Override
-  protected void actionUserKey(String sKey, Object userData, GralTableLine_ifc line)
+  protected boolean actionUserKey(int key, Object userData, GralTableLine_ifc line)
   {
     // TODO Auto-generated method stub
-    
+    return false;
   }
 
   

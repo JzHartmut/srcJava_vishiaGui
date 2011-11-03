@@ -243,14 +243,8 @@ public class GuiStatusPanel
    */
   private final GralUserAction actionSelectorProjectPathTable = new GralUserAction()
   { 
-    public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
-    {  boolean bDone = true;
-      final int key;
-      if(sCmd.equals("table-key") && values[1] instanceof Integer){
-        key = (Integer)(values[1]);
-      } else {
-        key = 0;
-      }
+    public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
+    { boolean bDone = true;
       if(key == KeyCode.enter){
         GralTableLine_ifc line = (GralTableLine_ifc)values[0];
         String sPath = line.getCellText(0);
@@ -265,7 +259,7 @@ public class GuiStatusPanel
   
   private final GralUserAction actionCloseProjectBzrComponents = new GralUserAction()
   { 
-    public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+    public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     {
       selectorProjectPath.setWindowVisible(false);
       return true;
@@ -275,7 +269,7 @@ public class GuiStatusPanel
   
   private final GralUserAction refreshProjectBzrComponents = new GralUserAction()
   { 
-    public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+    public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     { buildComponentsInfoSelectBoxes();
       return true;
     }
@@ -285,7 +279,7 @@ public class GuiStatusPanel
   
   private final GralUserAction actionSelectCmpn = new GralUserAction()
   { 
-    public boolean userActionGui(String sCmd, GralWidget widgd, Object... values)
+    public boolean userActionGui(int key, GralWidget widgd, Object... values)
     {
       mainData.currCmpn = mainData.currPrj.selectComponent(widgd.sDataPath);
       //
@@ -304,7 +298,7 @@ public class GuiStatusPanel
       mainData.addOrderBackground(mainData.mainAction.initNewComponent);
       
       //call the exclusion of the other button:
-      switchExcluder.switchAction.userActionGui(sCmd, widgd, values);
+      switchExcluder.switchAction.userActionGui(key, widgd, values);
       return true;
     }
   };

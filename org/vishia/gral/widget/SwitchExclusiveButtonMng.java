@@ -38,7 +38,7 @@ public class SwitchExclusiveButtonMng implements VariableAccess_ifc
   {
     
     @Override
-    public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
+    public boolean userActionGui(int key, GralWidget infos, Object... params)
     {
       // TODO Auto-generated method stub
       currentButtonText = infos.sCmd;

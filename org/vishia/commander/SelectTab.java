@@ -19,6 +19,7 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.widget.FileSelector;
 import org.vishia.gral.widget.SelectList;
 import org.vishia.mainCmd.MainCmd_ifc;
+import org.vishia.util.KeyCode;
 
 /**This class implements the selection functionality of tabs and pathes. */
 class SelectTab
@@ -29,8 +30,10 @@ class SelectTab
     String selectName;
     String tabName;
     char active;
+    @Override public String toString(){ return path; } //for debug
   }
   
+  File fileCfg;
   
   final TabbedPanelData panelLeft, panelMid, panelRight;
   
@@ -64,54 +67,59 @@ class SelectTab
    * @return an error message to output or null
    */
   String readCfg(File cfgFile)
-  {
+  { this.fileCfg = cfgFile;
     String sError = null;
     BufferedReader reader = null;
     try{
       reader = new BufferedReader(new FileReader(cfgFile));
     } catch(FileNotFoundException exc){ sError = "TabSelector - cfg file not found; " + cfgFile; }
     if(reader !=null){
-      panelLeft.selectList.clear();
-      panelMid.selectList.clear();
-      panelRight.selectList.clear();
-      String sLine;
-      int posSep;
-      List<SelectInfo> list = null;
-      boolean bAll = true;
       try{ 
+        panelLeft.selectList.clear();
+        panelMid.selectList.clear();
+        panelRight.selectList.clear();
+        String sLine;
+        int posSep;
+        List<SelectInfo> list = null;
+        boolean bAll = true;
         while( sError == null && (sLine = reader.readLine()) !=null){
-          if( sLine.startsWith("==")){
-            posSep = sLine.indexOf("==", 2);  
-            //a new division
-            String sDiv = sLine.substring(2,posSep);
-            if(sDiv.equals("left")){ list = panelLeft.selectList; }
-            else if(sDiv.equals("mid")){ list = panelMid.selectList; }
-            else if(sDiv.equals("right")){ list = panelRight.selectList; }
-            else if(sDiv.equals("all")){ list = selectAll; }
-            else { sError = "Error in cfg file: ==" + sDiv + "=="; }
-          } else { 
-            char cActive = sLine.charAt(0);
-            if( "lmr".indexOf(cActive) >=0 && sLine.charAt(1)==':'){
-              sLine = sLine.substring(2);
-            } else {
-              cActive = '.';
+          sLine = sLine.trim();
+          if(sLine.length() >0){
+            if( sLine.startsWith("==")){
+              posSep = sLine.indexOf("==", 2);  
+              //a new division
+              String sDiv = sLine.substring(2,posSep);
+              if(sDiv.equals("left")){ list = panelLeft.selectList; }
+              else if(sDiv.equals("mid")){ list = panelMid.selectList; }
+              else if(sDiv.equals("right")){ list = panelRight.selectList; }
+              else if(sDiv.equals("all")){ list = selectAll; }
+              else { sError = "Error in cfg file: ==" + sDiv + "=="; }
+            } else { 
+              char cActive = sLine.charAt(0);
+              if( "lmr".indexOf(cActive) >=0 && sLine.charAt(1)==':'){
+                sLine = sLine.substring(2);
+              } else {
+                cActive = '.';
+              }
+              String[] sParts = sLine.trim().split(",");
+              if(sParts.length < 3){ 
+                sError = "SelectTab format error; " + sLine; 
+              } else {
+                SelectInfo info = new SelectInfo();
+                info.tabName = sParts[0].trim();
+                info.selectName = sParts[1].trim();
+                info.path = sParts[2].trim();
+                info.active = cActive;
+                list.add(info);
+              }
             }
-            String[] sParts = sLine.trim().split(",");
-            if(sParts.length < 3){ 
-              sError = "SelectTab format error; " + sLine; 
-            } else {
-              SelectInfo info = new SelectInfo();
-              info.tabName = sParts[0].trim();
-              info.selectName = sParts[1].trim();
-              info.path = sParts[2].trim();
-              info.active = cActive;
-              list.add(info);
-            }
-          }      
+          }
         }
       } 
       catch(IOException exc){ sError = "selectTab - cfg file read error; " + cfgFile; }
       catch(IllegalArgumentException exc){ sError = "selectTab - cfg file error; " + cfgFile + exc.getMessage(); }
+      catch(Exception exc){ sError = "selectTab - any exception; " + cfgFile + exc.getMessage(); }
+      try{ reader.close(); reader = null; } catch(IOException exc){} //close is close.
     }
     return sError;
   }
@@ -337,12 +345,32 @@ class SelectTab
       
     }
   
-    @Override
-    protected void actionUserKey(String sKey, Object userData,
+    /**Handle the keys for the JavaCommander-Selection of favorites
+     * <ul>
+     * <li>sh-F1 .. shF3: activates fileSelector for left, middle and right panel.
+     * </ul>
+     * @see org.vishia.gral.widget.SelectList#actionUserKey(int, java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
+     */
+    @Override protected boolean actionUserKey(int key, Object userData,
         GralTableLine_ifc line)
-    {
-      // TODO Auto-generated method stub
-      
+    { boolean ret = true;
+      SelectInfo data = (SelectInfo)userData;
+      if(key ==KeyCode.shift + KeyCode.F1){
+        File dir = new File(data.path);
+        panelLeft.fileSelectorMain.fillIn(dir);
+      } else if (key ==KeyCode.shift + KeyCode.F2){
+        File dir = new File(data.path);
+        panelMid.fileSelectorMain.fillIn(dir);
+      } else if (key ==KeyCode.shift + KeyCode.F3){
+          panelRight.fileSelectorMain.fillIn(new File(data.path));
+      } else if (key ==KeyCode.shift + KeyCode.F5){
+        //reread the configuration file.
+        readCfg(fileCfg);
+        panelLeft.fillInTable();
+      } else {
+        ret = false;
+      }//
+      return ret;
     }
   } //class SelectList_  
 }
