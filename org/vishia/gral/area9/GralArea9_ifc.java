@@ -70,8 +70,8 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc
   final static int version = 0x20110806;
 
   
-  /**Sets the output window to a defined area.
-   * This method can be invoked before the graphicThread is started.
+  /**Initializes the output window to a defined area.
+   * This method can be invoked after construction immediately.
    * @param area Two letter combination A1..C3 for horizontal and vertical area. 
    *        A..C is left to right, 1..3 is top to bottom.
    *        The first combination is the top left area for output, 
@@ -80,7 +80,7 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc
    *        For example "A3C3" means that the output area uses the full bottom part of window.
    *        For example "B2C3" means an area consist of 4 basic areas right bottom.  
    */
-  void setOutputArea(String area);
+  void initOutputArea(String area);
 
   
   /**Returns the outputArea, which was created by the graphic thread. 

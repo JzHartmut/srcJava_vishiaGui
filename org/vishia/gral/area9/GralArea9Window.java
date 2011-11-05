@@ -96,7 +96,7 @@ public class GralArea9Window implements GralArea9_ifc
    * @param dxArea 1 to 3 for 1 field to 3 fields to right.
    * @param dyArea 1 to 3 for 1 field to 3 field to bottom
    */
-  public void setOutputArea(String area){
+  public void XXXsetOutputArea(String area){
     outputArea = area;
   }
 
@@ -107,18 +107,28 @@ public class GralArea9Window implements GralArea9_ifc
    * @param guiDevice The window manager
    * @param window The window itself. It doesn't be the primary window but a sub window too.
    */
-  public GralArea9Window(MainCmd mainCmd, GralWindow window, String sOutputArea)
+  public GralArea9Window(MainCmd mainCmd, GralWindow window)
   {
     super();
     this.mainCmd = mainCmd;
     //this.gralDevice = guiDevice;
     this.window = window;
+
+  }
+  
+  
+  /**Initializes the output area, can be called after construction immediately.
+   * @param sOutputArea String for example "A3C3". The letter character is the column. The digit is the row.
+   * It is fromTo. The example means the whole bottom area.
+   */
+  @Override public void initOutputArea(String sOutputArea){
     this.outputArea = sOutputArea;
     window.gralMng.gralDevice.addDispatchListener(initOutputArea); 
     initOutputArea.awaitExecution(1, 0);
     window.gralMng.gralDevice.addDispatchListener(writeOutputTextDirectly);
-
+    
   }
+  
 
   
   GralDispatchCallbackWorker initOutputArea = new GralDispatchCallbackWorker(){
@@ -535,7 +545,7 @@ return true;
     public GralActionHelp(){
       InfoBox infoHelp1 = null;
       try{
-        window.gralMng.selectPanel("output");
+        window.gralMng.selectPanel("outputArea");
         window.gralMng.setPosition(-40,0,0,0,0,'.');
         infoHelp1 = InfoBox.create(window.gralMng, "Help", "Help");
         for(String line: mainCmd.listHelpInfo){
@@ -557,7 +567,7 @@ return true;
     public GralActionAbout(){
       //InfoBox infoHelp1 = null;
       try{
-        window.gralMng.selectPanel("output");
+        window.gralMng.selectPanel("outputArea");
         window.gralMng.setPosition(-20,0,-40,0,0,'.');
         infoAbout = InfoBox.create(getGralMng(), "about", "about");
         for(String line: mainCmd.listAboutInfo){

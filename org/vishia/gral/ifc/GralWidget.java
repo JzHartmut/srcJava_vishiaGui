@@ -534,8 +534,11 @@ public abstract class GralWidget implements GralWidget_ifc
 	 * @see java.lang.Object#toString()
 	 */
 	@Override public String toString()
-	{
-		return name + ":" + sDataPath;
+	{ if(pos !=null && pos.panel !=null){
+		  return whatIs + "-" + name + ":" + sDataPath + "@" + pos.panel.namePanel + "\n";
+	  } else {
+	    return whatIs + "-" + name + ":" + sDataPath + "@?" + "\n";
+	  }
 	}
 
 	

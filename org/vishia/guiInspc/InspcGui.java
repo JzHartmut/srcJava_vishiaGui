@@ -134,7 +134,8 @@ private class InspcGuiCfg extends GuiCfg
     gui.setFrameAreaBorders(20, 80, 60, 85);
     gui.setStandardMenusGThread(new File("."), actionFile);
     super.initMenuGralDesigner();
-      
+    panelMng.selectPanel("primaryWindow");
+    mainTabPanel = panelMng.createTabPanel("mainTab", null, 0);
     gui.addFrameArea(1,1,3,2, mainTabPanel.getGuiComponent()); //dialogPanel);
    
     Appendable out = gui.getOutputBox();

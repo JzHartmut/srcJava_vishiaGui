@@ -37,6 +37,8 @@ public class CopyCmd
   }
   
   
+  /**Builds the content of the confirm-copy window. The window is created static. It is shown
+   * whenever it is used.  */
   void buildWindowConfirmCopy()
   {
     main.panelMng.selectPanel("primaryWindow"); //"output"); //position relative to the output panel

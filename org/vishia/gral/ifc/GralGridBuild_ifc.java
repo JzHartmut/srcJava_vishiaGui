@@ -514,6 +514,12 @@ public interface GralGridBuild_ifc
    */
   GralWidget addFileSelectField(String name, List<String> listRecentFiles, String startDirMask, String prompt, char promptStylePosition);
   
+  
+  /**Adds a panel that is not bound yet.
+   * @param panel
+   */
+  //void addPanel(GralPanelContent panel);
+  
   /**Adds the given Focus action to the named widget.
    * @param sName The name of the widget. It should be registered calling any add... method.
    * @param action

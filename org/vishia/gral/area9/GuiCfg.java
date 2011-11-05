@@ -214,7 +214,7 @@ GralDispatchCallbackWorker initGuiDialog = new GralDispatchCallbackWorker()
   @Override public void doBeforeDispatching(boolean onlyWakeup)
   {
     panelMng.selectPanel("primaryWindow");
-    mainTabPanel = panelMng.createTabPanel("mainTab", null, 0);
+    panelMng.setPosition(10, 16,5,20,0,'.');
     initGuiAreas();
     panelMng.gralDevice.removeDispatchListener(this);    
     countExecution();
@@ -251,6 +251,8 @@ protected void initGuiAreas()
   gui.setFrameAreaBorders(20, 80, 60, 85);
   gui.setStandardMenusGThread(new File("."), actionFile);
   initMenuGralDesigner();
+  panelMng.selectPanel("primaryWindow");
+  mainTabPanel = panelMng.createTabPanel("mainTab", null, 0);
   gui.addFrameArea(1,1,3,1, mainTabPanel.getGuiComponent()); //dialogPanel);
   Appendable out = gui.getOutputBox();
   mainCmd.setOutputChannels(out, out);
@@ -272,7 +274,8 @@ protected void initMain()
 {
   //create the basic appearance of the GUI. The execution sets dlgAccess:
   panelMng.gralDevice.addDispatchListener(initGuiDialog);
-  if(!initGuiDialog.awaitExecution(1, 60000)) throw new RuntimeException("unexpected fail of execution initGuiDialog");
+  
+  if(!initGuiDialog.awaitExecution(1, 0)) throw new RuntimeException("unexpected fail of execution initGuiDialog");
       
       
   /**Creates the dialog elements while reading a config-file. */

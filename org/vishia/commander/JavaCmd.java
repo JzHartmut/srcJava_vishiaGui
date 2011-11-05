@@ -48,7 +48,7 @@ public class JavaCmd extends GuiCfg
 
   final CmdQueue cmdQueue = new CmdQueue(mainCmd);
 
-  final SelectTab selectTab = new SelectTab(mainCmd, this);
+  final FavoritePathSelector selectTab = new FavoritePathSelector(mainCmd, this);
 
   final Executer executer = new Executer(mainCmd, this);
 
@@ -56,7 +56,7 @@ public class JavaCmd extends GuiCfg
 
   final CopyCmd copyCmd = new CopyCmd(this);
 
-  private final JavaCmdKeyActions keyActions = new JavaCmdKeyActions(this);
+  final JavaCmdKeyActions keyActions = new JavaCmdKeyActions(this);
 
   private File[] selectedFiles;
 
@@ -101,19 +101,19 @@ public class JavaCmd extends GuiCfg
 
     // Creates tab-Panels for the file lists and command lists.
     panelMng.selectPanel("primaryWindow");
-    selectTab.panelLeft.tabbedPanel = panelMng.createTabPanel("File0Tab", null, GralGridBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(1, 1, 1, 1, selectTab.panelLeft.tabbedPanel.getGuiComponent()); // dialogPanel);
+    selectTab.panelLeft.tabbedPanelFileTabs = panelMng.createTabPanel("File0Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    gui.addFrameArea(1, 1, 1, 1, selectTab.panelLeft.tabbedPanelFileTabs.getGuiComponent()); // dialogPanel);
 
-    selectTab.buildInitialTabs(selectTab.panelLeft);
+    selectTab.panelLeft.buildInitialTabs('l');
     panelMng.selectPanel("primaryWindow");
-    selectTab.panelMid.tabbedPanel = panelMng.createTabPanel("File1Tab", null, GralGridBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(2, 1, 1, 1, selectTab.panelMid.tabbedPanel.getGuiComponent()); // dialogPanel);
-    selectTab.buildInitialTabs(selectTab.panelMid);
+    selectTab.panelMid.tabbedPanelFileTabs = panelMng.createTabPanel("File1Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    gui.addFrameArea(2, 1, 1, 1, selectTab.panelMid.tabbedPanelFileTabs.getGuiComponent()); // dialogPanel);
+    selectTab.panelMid.buildInitialTabs('m');
 
     panelMng.selectPanel("primaryWindow");
-    selectTab.panelRight.tabbedPanel = panelMng.createTabPanel("File2Tab", null, GralGridBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(3, 1, 1, 1, selectTab.panelRight.tabbedPanel.getGuiComponent()); // dialogPanel);
-    selectTab.buildInitialTabs(selectTab.panelRight);
+    selectTab.panelRight.tabbedPanelFileTabs = panelMng.createTabPanel("File2Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    gui.addFrameArea(3, 1, 1, 1, selectTab.panelRight.tabbedPanelFileTabs.getGuiComponent()); // dialogPanel);
+    selectTab.panelRight.buildInitialTabs('r');
 
     panelMng.selectPanel("primaryWindow");
     panelButtons = panelMng.createGridPanel("Buttons", panelMng.getColor("gr"),
@@ -122,6 +122,7 @@ public class JavaCmd extends GuiCfg
     initPanelButtons();
 
     copyCmd.buildWindowConfirmCopy();
+    selectTab.buildWindowAddFavorite();
   }
 
   private void initPanelButtons()
@@ -470,7 +471,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      selectTab.panelLeft.selectTable.setFocus();
+      selectTab.panelLeft.selectTableAll.setFocus();
       return true;
     }
   };
@@ -485,7 +486,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      selectTab.panelMid.selectTable.setFocus();
+      selectTab.panelMid.selectTableAll.setFocus();
       return true;
     }
   };
@@ -500,7 +501,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      selectTab.panelRight.selectTable.setFocus();
+      selectTab.panelRight.selectTableAll.setFocus();
       return true;
     }
   };
@@ -517,7 +518,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      selectTab.panelMid.tabbedPanel.getCurrentPanel().setFocus();
+      selectTab.panelMid.tabbedPanelFileTabs.getCurrentPanel().setFocus();
       return true;
     }
   };

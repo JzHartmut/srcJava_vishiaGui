@@ -29,6 +29,7 @@ public class JavaCmdKeyActions
   int keySelectPanelLeft = KeyCode.alt + KeyCode.F1;
   int keySelectPanelMid = KeyCode.alt + KeyCode.F2;
   int keySelectPanelRight = KeyCode.alt + KeyCode.F3;
+  int keyCreateFavorite = KeyCode.ctrl + 'b';   //like 'Lesezeichen einfuegen'
   
   /**Show files in the start dir of the selection. Go to the origin dir.*/
   int keyOriginDir = KeyCode.ctrl + '<';  //like total commander: jump to the root directory

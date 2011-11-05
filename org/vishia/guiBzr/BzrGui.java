@@ -139,12 +139,11 @@ public class BzrGui extends GuiCfg
   {
     gui.setFrameAreaBorders(20, 80, 60, 85);
     gui.setStandardMenusGThread(new File("."), actionFile);
-
-    
     //Creates a Tab-Panel:
     //panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate, 0);
     //panelMng.tabPanel.addGridPanel("operation", "&Operation",1,1,10,10);
-      
+    panelMng.selectPanel("primaryWindow");
+    mainTabPanel = panelMng.createTabPanel("mainTab", null, 0);
     gui.addFrameArea(1,1,3,2, mainTabPanel.getGuiComponent()); //dialogPanel);
 
     try { 

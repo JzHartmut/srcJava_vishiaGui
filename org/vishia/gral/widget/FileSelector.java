@@ -53,9 +53,11 @@ public class FileSelector extends GralWidget
    */
   private class FileSelectList extends SelectList
   {
-
-    FileSelectList(String name, GralWidgetMng mng){
+    final FileSelector outer;
+    
+    FileSelectList(FileSelector outer, String name, GralWidgetMng mng){
       super(name, mng);
+      this.outer = outer;
     }
     
     @Override public boolean actionOk(Object userData, GralTableLine_ifc line)
@@ -123,6 +125,9 @@ public class FileSelector extends GralWidget
       case KeyCode.alt + KeyCode.F + '7': FileSystem.searchInFiles(new File[]{file}, "ordersBackground"); break;
       default: ret = false;
       }
+      if(!ret){
+        ret = outer.actionUserKey(keyCode, data, line);
+      }
       return ret;
     }
 
@@ -169,7 +174,7 @@ public class FileSelector extends GralWidget
   
   final SimpleDateFormat dateFormat = new SimpleDateFormat("yy-MMM-dd HH:mm:ss"); 
   
-  final MainCmd_ifc mainCmd;
+  //final MainCmd_ifc mainCmd;
 
   /**The current shown directory. */
   File currentDir;
@@ -183,11 +188,11 @@ public class FileSelector extends GralWidget
   
   GralUserAction actionOnEnterFile;
   
-  public FileSelector(String name, MainCmd_ifc mainCmd, GralWidgetMng mng)
+  public FileSelector(String name, GralWidgetMng mng)
   {
     super(name, 'l', mng);
-    selectList = new FileSelectList(name+"-selectList", mng);
-    this.mainCmd = mainCmd;
+    selectList = new FileSelectList(this, name+"-selectList", mng);
+    //this.mainCmd = mainCmd;
   }
   
   
@@ -360,5 +365,10 @@ public class FileSelector extends GralWidget
     //widgetSwt.setBounds(x,y,dx,dy);
   }
   
+  public boolean actionUserKey(int keyCode, Object data, GralTableLine_ifc line)
+  { 
+    return false;
+  }
+
 
 }
