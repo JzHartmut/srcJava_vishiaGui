@@ -70,6 +70,12 @@ public class PanelSwt extends GralPanelContent
   }
   
 
+  @Override protected void removeWidgetImplementation()
+  { ((Composite)panelComposite).dispose();
+    panelComposite = null;
+  }
+  
+
   protected ControlListener resizeItemListener = new ControlListener()
   { @Override public void controlMoved(ControlEvent e) 
     { //do nothing if moved.
@@ -86,7 +92,7 @@ public class PanelSwt extends GralPanelContent
     }
     
   };
-  
+
 
 
 }

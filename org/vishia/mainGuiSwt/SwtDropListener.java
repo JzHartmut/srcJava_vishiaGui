@@ -37,19 +37,11 @@ public class SwtDropListener implements DropTargetListener
   public void dragEnter(DropTargetEvent event)
   {
     TransferData data = event.currentDataType;
-    Object oDropData = fileTransfer.nativeToJava(data);      
-    String[] files = (String[])oDropData; 
-    DropTarget drop = (DropTarget)event.getSource();
-    Control widgetSwt = drop.getControl();
-    Object oData = widgetSwt.getData();  //the associated text field, should be identical with event.getSource()
-    if(oData!=null && oData instanceof GralWidget){
-      GralWidget widgg = (GralWidget)oData;
-      GralUserAction action = widgg.getActionDrop();
-      if(action !=null){
-        //call the action to apply the data from drop
-        action.userActionGui(KeyCode.dropFiles, widgg, (Object[])files);  //Note: 1 file per variable String argument
-      } else throw new IllegalArgumentException("no action found for drop.");
-    } else throw new IllegalArgumentException("GralWidget as getData() of swt.Control expected.");
+    if(fileTransfer.isSupportedType(data)){
+      event.detail = DND.DROP_COPY;
+    } else {
+      event.detail = DND.DROP_NONE;
+    }
   }
 
   @Override
@@ -79,9 +71,23 @@ public class SwtDropListener implements DropTargetListener
   @Override
   public void drop(DropTargetEvent event)
   {
-    // TODO Auto-generated method stub
-    stop();
-    
+    TransferData data = event.currentDataType;
+    Object oDropData = fileTransfer.nativeToJava(data);      
+    String[] files = (String[])oDropData; 
+    DropTarget drop = (DropTarget)event.getSource();
+    Control widgetSwt = drop.getControl();
+    Object oData = widgetSwt.getData();  //the associated text field, should be identical with event.getSource()
+    if(oData!=null && oData instanceof GralWidget){
+      GralWidget widgg = (GralWidget)oData;
+      GralUserAction action = widgg.getActionDrop();
+      if(action !=null){
+        //call the action to apply the data from drop:
+        for(int ix = 0; ix < files.length; ++ix){
+          files[ix] = files[ix].replace('\\', '/');  //at user level: use slash only, on windows too!
+        }
+        action.userActionGui(KeyCode.dropFiles, widgg, (Object[])files);  //Note: 1 file per variable String argument
+      } else throw new IllegalArgumentException("no action found for drop.");
+    } else throw new IllegalArgumentException("GralWidget as getData() of swt.Control expected.");
   }
 
   @Override

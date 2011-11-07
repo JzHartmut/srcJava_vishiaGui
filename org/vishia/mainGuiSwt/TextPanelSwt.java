@@ -86,6 +86,12 @@ public class TextPanelSwt extends GralPanelContent implements GralTextBox_ifc, A
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
   { ((Control)panelComposite).setBounds(x,y,dx,dy);
   }
+
+  @Override
+  protected void removeWidgetImplementation()
+  { ((Control)panelComposite).dispose();
+    panelComposite = null;
+  }
   
 
 }

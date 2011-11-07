@@ -142,6 +142,9 @@ public abstract class GralWidget implements GralWidget_ifc
 	 * <li>U: a graphical value representation (bar etc)
 	 * <li>V: a graphical value enter representation (slider etc)
 	 * <li>w: A window.
+   * <li>@: A Tabbed Panel
+   * <li>$: Any Panel (composite)
+   * <li>+: A canvas panel
 	 * <li>
 	 * </ul>
 	 * */

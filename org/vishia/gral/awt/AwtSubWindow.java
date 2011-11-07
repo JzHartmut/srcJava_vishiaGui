@@ -105,5 +105,12 @@ public class AwtSubWindow extends GralWindow
     // TODO Auto-generated method stub
     return null;
   }
+
+  @Override
+  protected void removeWidgetImplementation()
+  {
+    // TODO Auto-generated method stub
+    
+  }
   
 }

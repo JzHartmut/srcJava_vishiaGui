@@ -46,7 +46,7 @@ public class FcmdFileTable extends FileSelector
     ///
     selectTableForTab = main.selectTab.new SelectTabList(WidgetNames.tableFavorites + label, mainPanel, mng);
     mainPanel.tabbedPanelSelectionTabs.addGridPanel(WidgetNames.tabFavorites + label, label,1,1,10,10);
-    mng.setPosition(0, 0, 0, -0, 1, 'd');
+    mng.setPosition(2, 0, 0, -0, 1, 'd');  ///p
     selectTableForTab.setToPanel(mng, label+"l", 5, mainPanel.widthSelecttable, 'A');
     //mng.selectPanel(WidgetNames.panelFavoritesLeftMidRight +mainPanel.cNr);
     //String sLabelTab = "file&"+cNr;

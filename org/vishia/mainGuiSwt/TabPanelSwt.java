@@ -1,6 +1,5 @@
 package org.vishia.mainGuiSwt;
 
-import java.util.List;
 import java.util.Queue;
 
 import org.eclipse.swt.SWT;
@@ -9,7 +8,6 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -32,9 +30,9 @@ public class TabPanelSwt extends GralTabbedPanel
    */
   private class TabFolder_ extends GralPanelContent// implements WidgetCmpnifc
   {
-    private TabFolder widgetSwt;
-    TabFolder_(String namePanel, Composite parent, int style, GralPrimaryWindow_ifc mainWindow)
-    { super(namePanel, null, mainWindow);
+    /*pkgprivate*/ TabFolder widgetSwt;
+    TabFolder_(String namePanel, Composite parent, int style, SwtWidgetMng mng)
+    { super(namePanel, mng, parent);
       widgetSwt = new TabFolder(parent, style); 
     }
     @Override public Widget getWidgetImplementation(){ return widgetSwt; }
@@ -63,21 +61,26 @@ public class TabPanelSwt extends GralTabbedPanel
     @Override public void redraw(){  widgetSwt.redraw(); widgetSwt.update(); }
 
     @Override public Composite getPanelImpl() { return widgetSwt; }
+    @Override
+    protected void removeWidgetImplementation()
+    { widgetSwt.dispose();
+      widgetSwt = null;
+    }
 
     
   }
   
-	private final TabFolder_ tabMng;
+	/*pkgprivate*/ final TabFolder_ tabMng;
 	
 	final SwtWidgetMng mng;
 	
 	TabPanelSwt(String namePanel, SwtWidgetMng mng, GralPanelActivated_ifc user, int property)
-	{ super(user, property);
+	{ super(namePanel, mng, user, property);
 		this.mng = mng;
 		Object oParent = mng.pos.panel.getPanelImpl();
 		if(oParent == null || !(oParent instanceof Composite) ){ throw new IllegalArgumentException("Software error. You must select a panel before."); }
 		Composite parent = (Composite)oParent;
-		tabMng = new TabFolder_(namePanel, parent, SWT.TOP, null);
+		tabMng = new TabFolder_(namePanel, parent, SWT.TOP, mng);
 		tabMng.widgetSwt.addSelectionListener(tabItemSelectListener);
 		tabMng.widgetSwt.addControlListener(resizeListener);
   	
@@ -105,6 +108,7 @@ public class TabPanelSwt extends GralTabbedPanel
 	  panel.itsTabSwt = tabItem;
 		tabItem.setControl(panel.swtCanvas);
 		mng.registerPanel(panel);
+		mng.registerWidget(panel);
     panels.put(sName, panel);
 	  return panel;
   }
@@ -198,8 +202,36 @@ public class TabPanelSwt extends GralTabbedPanel
     
   };
   
+  /*
+  @Override protected void removeWidgetImplementation()
+  {
+    // TODO Auto-generated method stub
+    
+  }
 
+  @Override public Object getWidgetImplementation()
+  { return tabMng;
+  }
+
+  @Override public void redraw()
+  {
+    tabMng.redraw();
+  }
+
+  @Override public GralColor setBackgroundColor(GralColor color)
+  { return tabMng.setBackgroundColor(color);
+  }
+
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  { tabMng.setBoundsPixel(x, y, dx, dy);
+  }
+
+  @Override public GralColor setForegroundColor(GralColor color)
+  { return tabMng.setForegroundColor(color);
+  }
+  */
   
   void stop(){}
+
 	
 }

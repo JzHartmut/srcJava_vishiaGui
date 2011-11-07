@@ -58,9 +58,18 @@ public class GralCfgWriter
     else if(cfge.widgetType instanceof GralCfgData.GuiCfgLed){ writeLed((GralCfgData.GuiCfgLed)cfge.widgetType); }
     else if(cfge.widgetType instanceof GralCfgData.GuiCfgImage){ writeImage((GralCfgData.GuiCfgImage)cfge.widgetType); }
     else if(cfge.widgetType instanceof GralCfgData.GuiCfgInputFile){ writeInputFile((GralCfgData.GuiCfgInputFile)cfge.widgetType); }
+    //else if(cfge.widgetType instanceof GralCfgData.GuiCfgInputFile){ writeInputFile((GralCfgData.GuiCfgInputFile)cfge.widgetType); }
     else if(cfge.widgetType instanceof GralCfgData.GuiCfgButton){ writeButton((GralCfgData.GuiCfgButton)cfge.widgetType); }
     //else if(cfge.widgetType instanceof GuiCfgData.GuiCfg){ writeButton((GuiCfgData.GuiCfgButton)cfge.widgetType); }
-    else { writeUnknown(cfge.widgetType); }
+    else if(cfge.widgetType.whatIs == 'T'){ 
+      writer.append("InputTextline(");
+      writeParam(cfge.widgetType);
+      writer.append(");\n");
+
+    }
+    else { 
+      writeUnknown(cfge.widgetType); 
+    }
   }
   
   
@@ -169,8 +178,13 @@ public class GralCfgWriter
     if(pp.type !=null)      { writer.append(sep).append("type=")    .append(pp.type); sep = ", "; }
     if(pp.info !=null)      { writer.append(sep).append("info=\"")  .append(pp.info).append("\""); sep = ", "; }
     if(pp.userAction !=null){ writer.append(sep).append("action=")  .append(pp.userAction); sep = ", "; }
-    if(pp.color0 !=null)    { writer.append(sep).append("color=")   .append(pp.color0.color); 
-      if(pp.color0 !=null)    { writer.append("/").append(pp.color1.color); }  sep = ", "; }
+    if(pp.dragFiles !=null) { writer.append(sep).append("dragFiles=\"") .append(pp.dragFiles).append("\""); sep = ", "; }
+    if(pp.dragText !=null)  { writer.append(sep).append("dragText=\"")  .append(pp.dragText).append("\""); sep = ", "; }
+    if(pp.dropFiles !=null) { writer.append(sep).append("dropFiles=\"") .append(pp.dropFiles).append("\""); sep = ", "; }
+    if(pp.dropText !=null)  { writer.append(sep).append("dropText=\"")  .append(pp.dropText).append("\""); sep = ", "; }
+    if(pp.color0 !=null)    { writer.append(sep).append("color=")       .append(pp.color0.color); 
+      if(pp.color1 !=null)  { writer            .append("/")            .append(pp.color1.color); }  sep = ", "; 
+    }
   }
 
   

@@ -154,20 +154,20 @@ class FavoritePathSelector
               else { sError = "Error in cfg file: ==" + sDiv + "=="; }
             } else { 
               String[] sParts = sLine.trim().split(",");
-              if(sParts.length < 3){ 
+              if(sParts.length < 2){ 
                 sError = "SelectTab format error; " + sLine; 
               } else {
                 SelectInfo info = new SelectInfo();
                 //info. = sParts[0].trim();
-                info.selectName = sParts[1].trim();
-                info.path = sParts[2].trim();
-                for(int ix = 3; ix < sParts.length; ++ix){
+                info.selectName = sParts[0].trim();
+                info.path = sParts[1].trim();
+                for(int ix = 2; ix < sParts.length; ++ix){
                   final String actTabEntry = sParts[ix].trim();
                   final String actTab;
                   if(actTabEntry.length() > 2 && actTabEntry.charAt(1) == ':'){
                     final char cWhere = actTabEntry.charAt(0);
                     final int ixWhere = "lmr".indexOf(cWhere);
-                    if(ixWhere <0)throw new IllegalArgumentException("fault panel, use lmr in file; " + cfgFile + " line; " + sLine);
+                    if(ixWhere <0)throw new IllegalArgumentException("fault panel, use l:label or m:label or r:label in file; " + cfgFile + " line; " + sLine);
                     actTab = actTabEntry.substring(2).trim();
                     info.tabName[ixWhere] = actTab;
                   }
@@ -362,11 +362,19 @@ class FavoritePathSelector
     }
 
 
-    void add(SelectInfo info, char where)
+    /**Adds a line to this table.
+     * @param ix Show which index is used for a local table, 0..2 for left, mid, right,
+     *   than show the label in the left cell (column)
+     * @param info The favorite info
+     */
+    void add(int ix, SelectInfo info)
     {
       GralTableLine_ifc line = wdgdTable.insertLine(null, 0);
       line.setUserData(info);
-      //line.setCellText(info.active == where ? "" + where: " ",0);
+      String label = info.tabName[ix];
+      if(label !=null){
+        line.setCellText(label, 0);
+      }
       line.setCellText(info.selectName, 1);
       line.setCellText(info.path, 2);
     }
@@ -400,15 +408,19 @@ class FavoritePathSelector
             if(fileTable == null){
               if(panel.listTabs.size() >0){
                 fileTable = panel.listTabs.get(0);
+                label = info.tabName[ixtabName] = fileTable.labelTab;
               } else {
                 label = "file" + panel.cNr;
+                info.tabName[ixtabName] = label;
                 fileTable = panel.searchOrCreateFileTabs(label);
               }
             }
-            info.tabName[ixtabName] = label = fileTable.labelTab;
+            panel.fillInAllTables(panel.cc);
           } else {
+            //label is known in the favorite list, use it. The panel should be existing or it is created.
             fileTable = panel.searchOrCreateFileTabs(label);
           }
+         
 
           
           File currentDir;

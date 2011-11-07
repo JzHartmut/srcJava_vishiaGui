@@ -93,7 +93,7 @@ public class GralColor
       addColor("lgr", 0xd0d0d0);
       addColor("lrd", 0xff8080);
       addColor("lgn", 0x80ff80);
-      addColor("lbl", 0x8080ff);
+      addColor("lbl", 0xa0a0ff);
       addColor("lye", 0xffff80);
       addColor("lam", 0xfff080);
       addColor("lor", 0xffa060);

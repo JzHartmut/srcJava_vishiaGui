@@ -10,6 +10,8 @@ import org.vishia.gral.ifc.GralWidget;
 
 /**This class is the common base class for Tabbed-Panels.
  * A TabbbedPanel is the container for Tabs. It doesn't contain other widgets than Tabs.
+ * Therefore it is not a {@link GralPanelContent} and not a {@link GralWidget}.
+ * The Implementation of this class should create a swt.TabFolder or adequate, which is a GralWidget.
  * A Tab inside the TabPanel is a usability Panel.
  * <br><br>
  * Concepts in base graphic:
@@ -20,10 +22,11 @@ import org.vishia.gral.ifc.GralWidget;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralTabbedPanel implements GralVisibleWidgets_ifc
+public abstract class GralTabbedPanel /*extends GralWidget*/ implements GralVisibleWidgets_ifc
 {
   /**The version and history:
    * <ul>
+   * <li>2011-11-07 Hartmut chg: a TabbedPanel is a GralWidget too, 
    * <li>2011-10-01 Hartmut new: abstract method {@link #selectTab(String)}.
    * <li>2011-09-10 Hartmut chg: move this class from gral/gridPanel/TabPanel to gral/base/GralTabbedPanel
    *     Reason: it isn't a concept of the grid panel  but a basic concept of gral. It hasn't any dependencies to gridPanel. 
@@ -43,6 +46,7 @@ public abstract class GralTabbedPanel implements GralVisibleWidgets_ifc
 	
 	final protected Map<String, GralPanelContent> panels = new TreeMap<String, GralPanelContent>();
 
+	/**The currently selected panel in one of the tabs. */
 	protected GralPanelContent currentPanel;
 	
   /**The actual widgets in the visible panel. It may a sub-panel or changed content. The list can be changed. */
@@ -58,8 +62,9 @@ public abstract class GralTabbedPanel implements GralVisibleWidgets_ifc
 	/**The constructor can only be invoked from a implementing class.
 	 * @param user
 	 */
-	protected GralTabbedPanel(GralPanelActivated_ifc user, int property)
-	{ this.notifyingUserInstanceWhileSelectingTab = user;
+	protected GralTabbedPanel(String sName, GralWidgetMng mng, GralPanelActivated_ifc user, int property)
+	{ //super(sName, '@', mng);
+	  this.notifyingUserInstanceWhileSelectingTab = user;
 	}
 	
 	/**Adds a grid-panel in the TabPanel. The panel will be registered in the GuiPanelMng,
