@@ -10,7 +10,8 @@ import org.vishia.gral.ifc.GralWidget;
 
 /**This class is the common base class for Tabbed-Panels.
  * A TabbbedPanel is the container for Tabs. It doesn't contain other widgets than Tabs.
- * Therefore it is not a {@link GralPanelContent} and not a {@link GralWidget}.
+ * Therefore it is not a {@link GralPanelContent}.
+ * But it is a {@link GralWidget} because it is used as one member inside a Panel.
  * The Implementation of this class should create a swt.TabFolder or adequate, which is a GralWidget.
  * A Tab inside the TabPanel is a usability Panel.
  * <br><br>
@@ -34,7 +35,7 @@ public abstract class GralTabbedPanel /*extends GralWidget*/ implements GralVisi
    *     But an application can have more as one tabbed panel, and any of them can change the visible widgets while changing the tab.
    *     The visible widgets are not an concpet of the grid panel manager but a topic of the panel content. 
    *     It is not a question of one PanelContent but a question of the TabbedPanel which contains some panels.
-   * <li>2011-08-31 Hartmut chg: The {@link #currentPanel} and {@link #getCurrentPanel()} is moved from GuiPanelMngBase to here.
+   * <li>2011-08-31 Hartmut chg: The {@link #focusedTab} and {@link #getFocusedTab()} is moved from GuiPanelMngBase to here.
    *     Reason: One application can have more as one tabbed panel.    
    * <li>2011-05-26 Hartmut chg: {@link #addCanvasPanel(String, String)} now returns {@link GralPanelContent} instead an untyped Object.    
    * <li>2010-05-00 Hartmut created   
@@ -46,8 +47,8 @@ public abstract class GralTabbedPanel /*extends GralWidget*/ implements GralVisi
 	
 	final protected Map<String, GralPanelContent> panels = new TreeMap<String, GralPanelContent>();
 
-	/**The currently selected panel in one of the tabs. */
-	protected GralPanelContent currentPanel;
+	/**The currently selected tab. */
+	protected GralPanelContent focusedTab;
 	
   /**The actual widgets in the visible panel. It may a sub-panel or changed content. The list can be changed. */
   public Queue<GralWidget> widgetsVisible;
@@ -86,7 +87,7 @@ public abstract class GralTabbedPanel /*extends GralWidget*/ implements GralVisi
 	
 	abstract public GralPanelContent getGuiComponent();
 	
-	public GralPanelContent getCurrentPanel(){ return currentPanel; }
+	public GralPanelContent getFocusedTab(){ return focusedTab; }
 	
 	
 	/**The named tab should be focused.

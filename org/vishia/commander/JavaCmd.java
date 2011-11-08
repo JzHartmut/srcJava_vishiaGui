@@ -518,7 +518,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      selectTab.panelMid.tabbedPanelFileTabs.getCurrentPanel().setFocus();
+      selectTab.panelMid.tabbedPanelFileTabs.getFocusedTab().setFocus();
       return true;
     }
   };

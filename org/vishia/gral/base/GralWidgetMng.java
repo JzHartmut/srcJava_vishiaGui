@@ -340,6 +340,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
       log.sendMsg(0, "GuiPanelMng:selectPanel: unknown panel name %s", sName);
       //Note: because the pos.panel is null, not placement will be done.
     }
+    setPosition(0,0,0,0,0,'d');  //set the position to default, full panel because the panel was selected newly.
   }
   
   
@@ -401,16 +402,17 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   
   @Override public void registerWidget(GralWidget widgd)
   {
+    GralPanelContent panel = widgd.pos !=null ? widgd.pos.panel : this.pos.panel;
     if(pos.x < 0 || pos.xEnd <= 0 || pos.y< 0 || pos.yEnd <=0){ 
       //only widgets with size from right TODO percent size too.
       //widgd.pos = pos.clone();
       //widgd.pos.set(pos);
-      pos.panel.widgetsToResize.add(widgd);
+      panel.widgetsToResize.add(widgd);
     }
     if(widgd.name != null){
       indexNameWidgets.put(widgd.name, widgd);
     }
-    pos.panel.widgetList.add(widgd);
+    panel.widgetList.add(widgd);
     
   }
   

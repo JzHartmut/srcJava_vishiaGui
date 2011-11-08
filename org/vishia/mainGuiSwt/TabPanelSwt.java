@@ -165,7 +165,7 @@ public class TabPanelSwt extends GralTabbedPanel
 					//TODO remove visible infos for last panel, active act panel.
 					newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
 					//mng.changeWidgets(widgetInfos);
-					currentPanel = panelContent;
+					focusedTab = panelContent;
 				}
 			}
 		}
