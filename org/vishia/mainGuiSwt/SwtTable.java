@@ -26,14 +26,14 @@ import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.util.KeyCode;
 
-public class TableSwt extends GralTable
+public class SwtTable extends GralTable
 {
 
   
   /**Version and History:
    * <ul>
    * <li>2011-10-02: Hartmut chg: The key handling is improved. The old idea - a String for any key - is now obsolete.
-   *   The keycodes are contained in {@link KeyCode}, that are used. The conversion routine for SWT-keys is {@link GralKeySwt}.
+   *   The keycodes are contained in {@link KeyCode}, that are used. The conversion routine for SWT-keys is {@link SwtGralKey}.
    * <li>older: TODO
    * </ul>
    */
@@ -51,7 +51,7 @@ public class TableSwt extends GralTable
   //private final int selectionColumn;
   //private final CharSequence selectionText;
   
-  public TableSwt(SwtWidgetMng mng, String name, Composite parent,  int height
+  public SwtTable(SwtWidgetMng mng, String name, Composite parent,  int height
       , int[] columnWidths) //, int selectionColumn, CharSequence selectionText)
   { super(name, mng);
     this.mng = mng;
@@ -141,9 +141,9 @@ public class TableSwt extends GralTable
   {
     
     boolean TEST = false;
-    final TableSwt table;
+    final SwtTable table;
     Composite parent = (Composite)mng.pos.panel.getPanelImpl();
-    table = new TableSwt(mng, sName, parent, height, columnWidths); //, selectionColumn, selectionText);
+    table = new SwtTable(mng, sName, parent, height, columnWidths); //, selectionColumn, selectionText);
     //GralWidget widgd = new GralWidget(sName, table, 'L', sName, null);
     table.setContentInfo(sName);
     table.setPanelMng(mng);
@@ -293,7 +293,7 @@ public class TableSwt extends GralTable
 		          lineGral = new TableItemWidget(tableLineSwt, null);
 		          tableLineSwt.setData(lineGral);  //Set the data for usage later.
 		        }
-		        int keyCode = GralKeySwt.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
+		        int keyCode = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
 		        actionDone = action.userActionGui(keyCode, widgetDescr, lineGral);
 	        } //if(table.)
 	      } catch(Exception exc){
@@ -303,7 +303,7 @@ public class TableSwt extends GralTable
       if(!actionDone  && (keyEv.keyCode & 0xffff) !=0){
         GralUserAction mainKeyAction = mng.getRegisteredUserAction("KeyAction");
         if(mainKeyAction !=null){
-          int gralKey = GralKeySwt.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
+          int gralKey = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
           mainKeyAction.userActionGui("key", widgetDescr, new Integer(gralKey));
         }
       }
@@ -352,7 +352,7 @@ public class TableSwt extends GralTable
 
     @Override
     public GralColor setBackgroundColor(GralColor color)
-    { GralColor oldColor = PropertiesGuiSwt.createColorGui(item.getBackground());
+    { GralColor oldColor = SwtProperties.createColorGui(item.getBackground());
       Color colorSwt = mng.propertiesGuiSwt.colorSwt(color.getColorValue());
       item.setBackground(colorSwt);
       return oldColor;
@@ -360,7 +360,7 @@ public class TableSwt extends GralTable
     
     @Override
     public GralColor setForegroundColor(GralColor color)
-    { GralColor oldColor = PropertiesGuiSwt.createColorGui(item.getForeground());
+    { GralColor oldColor = SwtProperties.createColorGui(item.getForeground());
       Color colorSwt = mng.propertiesGuiSwt.colorSwt(color.getColorValue());
       item.setForeground(colorSwt);
       return oldColor;

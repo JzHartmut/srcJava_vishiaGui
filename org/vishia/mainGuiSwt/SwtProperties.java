@@ -12,7 +12,7 @@ import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.ifc.GralColor;
 
 
-public class PropertiesGuiSwt extends GralGridProperties
+public class SwtProperties extends GralGridProperties
 {
 	private final Device guiDevice;
 
@@ -37,7 +37,7 @@ public class PropertiesGuiSwt extends GralGridProperties
    * <br><br>
    * @param size number between 1..5 to determine the size of the content (font size, pixel per cell)
    */
-  public PropertiesGuiSwt(Device device, char sizeC)
+  public SwtProperties(Device device, char sizeC)
   { super(sizeC);
   	this.guiDevice = device;
     this.colorBlack = new Color(guiDevice, 0,0,0);

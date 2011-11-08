@@ -27,7 +27,7 @@ import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.KeyCode;
 
-public class PrimaryWindowSwt extends SubWindowSwt implements GralPrimaryWindow_ifc //GralWindowMng implements GralWindow_ifc
+public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_ifc //GralWindowMng implements GralWindow_ifc
 {
   //protected final Display displaySwt; 
 
@@ -55,14 +55,14 @@ public class PrimaryWindowSwt extends SubWindowSwt implements GralPrimaryWindow_
   
 
   
-  private PrimaryWindowSwt(GralWidgetMng gralMng, SwtGraphicThread graphicThread, Display displaySwt)
+  private SwtPrimaryWindow(GralWidgetMng gralMng, SwtGraphicThread graphicThread, Display displaySwt)
   { super("primaryWindow", graphicThread.windowSwt, gralMng);
     //super(gralMng, graphicThread);
     this.graphicThreadSwt = graphicThread;  //refers SWT type
   }  
   
   
-  public static PrimaryWindowSwt create(LogMessage log, String sTitle, int left, int top, int xSize, int ySize)
+  public static SwtPrimaryWindow create(LogMessage log, String sTitle, int left, int top, int xSize, int ySize)
   { SwtGraphicThread init = new SwtGraphicThread(sTitle, left, top, xSize, ySize);
     //GuiThread graphicThread = startGraphicThread(init);  
 
@@ -72,11 +72,11 @@ public class PrimaryWindowSwt extends SubWindowSwt implements GralPrimaryWindow_
       }
     }
     //The propertiesGuiSwt needs the Display instance for Font and Color. Therefore the graphic thread with creation of Display should be executed before. 
-    PropertiesGuiSwt propertiesGui = new PropertiesGuiSwt(init.displaySwt, 'C');
+    SwtProperties propertiesGui = new SwtProperties(init.displaySwt, 'C');
     GralWidgetMng gralMng = new SwtWidgetMng(propertiesGui, null, log);
     
     //The PrimaryWindowSwt is a derivation of the GralPrimaryWindow. It is more as only a SWT Shell.
-    PrimaryWindowSwt instance = new PrimaryWindowSwt(gralMng, init, init.displaySwt);
+    SwtPrimaryWindow instance = new SwtPrimaryWindow(gralMng, init, init.displaySwt);
     instance.panelComposite = init; //window.sTitle, window.xPos, window.yPos, window.xSize, window.ySize);
     gralMng.setGralDevice(init);
     gralMng.registerPanel(instance);

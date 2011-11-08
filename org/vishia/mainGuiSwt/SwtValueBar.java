@@ -1,22 +1,18 @@
 package org.vishia.mainGuiSwt;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.ValueBar;
 
-public class ValueBarSwt extends ValueBar implements GralSetValue_ifc, GralWidget_ifc
+public class SwtValueBar extends ValueBar implements GralSetValue_ifc, GralWidget_ifc
 {
 
 	final SwtWidgetMng mng;
@@ -33,7 +29,7 @@ public class ValueBarSwt extends ValueBar implements GralSetValue_ifc, GralWidge
 	 * @param mng The Gui-panel-manager contains information about the graphic frame and properties.
 	 * @param size The size of text in button, use 'A' or 'B' for small - bold
 	 */
-	public ValueBarSwt(String name, SwtWidgetMng mng)
+	public SwtValueBar(String name, SwtWidgetMng mng)
 	{
     super(name, mng);
     this.mng = mng;
@@ -89,14 +85,14 @@ public class ValueBarSwt extends ValueBar implements GralSetValue_ifc, GralWidge
 				int valuePixelMax = horizontal ? dim.width -2: dim.height -2;
 				if(valuePixelMax != 106)
 					stop();  
-				if((ValueBarSwt.this.valueMax != valuePixelMax || valPixelBorder == null)
+				if((SwtValueBar.this.valueMax != valuePixelMax || valPixelBorder == null)
 					&& floatBorder !=null && floatBorder.length >1) {  //at least one medium border
 					valPixelBorder = new int[floatBorder.length-1];
 					for(int ix = 0; ix < valPixelBorder.length; ++ix){
 						valPixelBorder[ix] = dim.height -1 - (int)(valueMax * ((floatBorder[ix] - minRange) / (maxRange - minRange)));
 					}
 				}
-				ValueBarSwt.this.valueMax = valuePixelMax;
+				SwtValueBar.this.valueMax = valuePixelMax;
 				drawBackground(e.gc, dim.x, dim.y, dim.width, dim.height);
 				gc.setForeground(black);  //black
 				//FontData fontData = mng.propertiesGui.stdButtonFont.getFontData();

@@ -14,16 +14,16 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
 
-public class TextPanelSwt extends GralPanelContent implements GralTextBox_ifc, Appendable
+public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, Appendable
 {
   
-  TextBoxSwt textAreaOutput;
+  SwtTextBox textAreaOutput;
   
-  TextPanelSwt(String namePanel, Shell shell, int style, GralWidgetMng mng) //GralPrimaryWindow_ifc mainWindow)
+  SwtTextPanel(String namePanel, Shell shell, int style, GralWidgetMng mng) //GralPrimaryWindow_ifc mainWindow)
   { super(namePanel, mng, shell);
     Display device = shell.getDisplay();
     //Composite panel = (Composite) panelComposite;
-    textAreaOutput = new TextBoxSwt(namePanel + "-widg", shell, style, mng);
+    textAreaOutput = new SwtTextBox(namePanel + "-widg", shell, style, mng);
     textAreaOutput.textFieldSwt.setFont(new Font(device, "Monospaced",11, SWT.NORMAL));
     panelComposite = textAreaOutput.textFieldSwt;  //it is a control,    
   }

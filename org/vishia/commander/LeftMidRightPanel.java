@@ -77,7 +77,7 @@ public class LeftMidRightPanel
     //A tabbed panel inside the left, middle or right tab for selection.
     String nameTabPanel = WidgetNames.panelFavoritesLeftMidRight + cNr;
     mng.setPosition(2, 0, 0, 0, 1, 'd');
-    tabbedPanelSelectionTabs = mng.createTabPanel(nameTabPanel, null, GralGridBuild_ifc.propZoomedPanel);
+    tabbedPanelSelectionTabs = mng.addTabbedPanel(nameTabPanel, null, GralGridBuild_ifc.propZoomedPanel);
     //The panel for selection from all favorites: 
     nameGridPanel = WidgetNames.tabMainFavorites + cNr;
     tabLabelGridPanel = "a-F"+cNr;

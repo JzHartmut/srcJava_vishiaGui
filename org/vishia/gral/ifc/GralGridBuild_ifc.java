@@ -119,13 +119,13 @@ public interface GralGridBuild_ifc
   public void registerPanel(GralPanelContent panel);
   
   
-  /**Creates a panel for tabs as child of the current panel.
+  /**Adds a panel for tabs as child of the current panel.
    * @param user If not null, then this user class will be notified when a tab is selected.
    *             The user should update showed values.
    * @param properties use or of constants {@link #propZoomedPanel}, {@link #propGridZoomedPanel}
-   * @return The Tab-container, there the tabs can be registered.
+   * @return The tab-container, there the tabs can be registered.
    */
-  GralTabbedPanel createTabPanel(String namePanel, GralPanelActivated_ifc user, int properties);
+  GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int properties);
   
   /**selects a registered panel for the next add-operations.
    * see {@link #registerPanel(String, Object)}. 
@@ -410,7 +410,7 @@ public interface GralGridBuild_ifc
   
   /**Adds a line.
    * <br><br>To adding a line is only possible if the current panel is of type 
-   * {@link CanvasStorePanelSwt}. This class stores the line coordinates and conditions 
+   * {@link SwtCanvasStorePanel}. This class stores the line coordinates and conditions 
    * and draws it as background if drawing is invoked.
    * 
    * @param colorValue The value for color, 0xffffff is white, 0xff0000 is red.

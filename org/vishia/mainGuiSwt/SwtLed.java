@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Control;
  * The LED may have a inner light and a border light. In that case to state,
  * which may have any association, can presented.
  */
-public class LedSwt extends Canvas
+public class SwtLed extends Canvas
 {
 	final SwtWidgetMng mng;
 
@@ -27,10 +27,10 @@ public class LedSwt extends Canvas
 	 * @param mng The Gui-panel-manager contains information about the graphic frame and properties.
 	 * @param kind Use 'r' or 'q' for a round or a square LED.
 	 */
-	public LedSwt(SwtWidgetMng mng, char kind)
+	public SwtLed(SwtWidgetMng mng, char kind)
 	{
 		
-		super(((PanelSwt)mng.pos.panel).getPanelImpl(), 0);
+		super(((SwtPanel)mng.pos.panel).getPanelImpl(), 0);
 		switch(kind){ 
 		case 'r': round = true; break;
 		case 'q': round = false; break;

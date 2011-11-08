@@ -21,7 +21,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.KeyCode;
 
 //public class SubWindowSwt extends GralPanelContent implements WidgetCmpnifc
-public class SubWindowSwt extends GralWindow
+public class SwtSubWindow extends GralWindow
 {
 
   protected Shell window;
@@ -29,7 +29,7 @@ public class SubWindowSwt extends GralWindow
   
   
   
-  SubWindowSwt(String name, Display display, String title, boolean exclusive, GralWidgetMng gralMng)
+  SwtSubWindow(String name, Display display, String title, boolean exclusive, GralWidgetMng gralMng)
   { super(name, gralMng, null);
     int props = 0; ////|SWT.CLOSE;
     if(title !=null){ props |= SWT.TITLE | SWT.BORDER; }
@@ -43,7 +43,7 @@ public class SubWindowSwt extends GralWindow
     
   }
   
-  SubWindowSwt(String name, Shell shell, GralWidgetMng gralMng)
+  SwtSubWindow(String name, Shell shell, GralWidgetMng gralMng)
   { super(name, gralMng, shell);
     this.window = shell;
     

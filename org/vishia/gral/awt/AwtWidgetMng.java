@@ -363,7 +363,7 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   }
 
   @Override
-  public GralTabbedPanel createTabPanel(String namePanel, GralPanelActivated_ifc user,
+  public GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user,
     int properties)
   {
     // TODO Auto-generated method stub

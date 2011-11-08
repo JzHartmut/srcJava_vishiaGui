@@ -15,7 +15,7 @@ import org.vishia.gral.base.GralWidgetMng;
  * @author Hartmut Schorrig
  *
  */
-public class GridPanelSwt extends CanvasStorePanelSwt
+public class SwtGridPanel extends SwtCanvasStorePanel
 {
 	
 	private static final long serialVersionUID = 6448419343757106982L;
@@ -24,7 +24,7 @@ public class GridPanelSwt extends CanvasStorePanelSwt
 	
   int xS, yS;
   
-	public GridPanelSwt(String namePanel, Composite parent, int style, Color backGround, int xG, int yG, int xS, int yS, GralWidgetMng gralMng)
+	public SwtGridPanel(String namePanel, Composite parent, int style, Color backGround, int xG, int yG, int xS, int yS, GralWidgetMng gralMng)
 	{ super(namePanel, gralMng);
 	  swtCanvas = new SwtCanvasGridPanel(this, parent, style);
     super.panelComposite = swtCanvas;
@@ -49,9 +49,9 @@ public class GridPanelSwt extends CanvasStorePanelSwt
 	
 	protected static class SwtCanvasGridPanel extends SwtCanvas
 	{
-	  private final GridPanelSwt mng;
+	  private final SwtGridPanel mng;
 	  
-	  SwtCanvasGridPanel(GridPanelSwt storeMng, Composite parent, int style)
+	  SwtCanvasGridPanel(SwtGridPanel storeMng, Composite parent, int style)
 	  { super(storeMng, parent, style);
 	    this.mng = storeMng;
 	    

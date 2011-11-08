@@ -13,7 +13,7 @@ import org.vishia.gral.base.GralTable;
  * The ObjectModelDiagram may shown the relations:
  * <img src="../../../../img/Widget_gral.png"><br>
  * This class GralWidget knows the gral graphic widget via an {@link GralWidget_ifc}. It is a wrapper around the widget of the adaption layer.
- * In this figure a wrapper {@link org.vishia.mainGuiSwt.TableSwt} is shown which wraps 
+ * In this figure a wrapper {@link org.vishia.mainGuiSwt.SwtTable} is shown which wraps 
  * a org.eclipse.swt.widgets.Table. The wrapper based on {@link org.vishia.gral.base.GralTable} 
  * and supports the interface {@link org.vishia.gral.ifc.GralTable_ifc}.
  * This interface allows to deal with the table procured by the wrapper. See the derived interfaces of {@link GralWidget_ifc}.  

@@ -101,17 +101,17 @@ public class JavaCmd extends GuiCfg
 
     // Creates tab-Panels for the file lists and command lists.
     panelMng.selectPanel("primaryWindow");
-    selectTab.panelLeft.tabbedPanelFileTabs = panelMng.createTabPanel("File0Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    selectTab.panelLeft.tabbedPanelFileTabs = panelMng.addTabbedPanel("File0Tab", null, GralGridBuild_ifc.propZoomedPanel);
     gui.addFrameArea(1, 1, 1, 1, selectTab.panelLeft.tabbedPanelFileTabs); // dialogPanel);
 
     selectTab.panelLeft.buildInitialTabs('l');
     panelMng.selectPanel("primaryWindow");
-    selectTab.panelMid.tabbedPanelFileTabs = panelMng.createTabPanel("File1Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    selectTab.panelMid.tabbedPanelFileTabs = panelMng.addTabbedPanel("File1Tab", null, GralGridBuild_ifc.propZoomedPanel);
     gui.addFrameArea(2, 1, 1, 1, selectTab.panelMid.tabbedPanelFileTabs); // dialogPanel);
     selectTab.panelMid.buildInitialTabs('m');
 
     panelMng.selectPanel("primaryWindow");
-    selectTab.panelRight.tabbedPanelFileTabs = panelMng.createTabPanel("File2Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    selectTab.panelRight.tabbedPanelFileTabs = panelMng.addTabbedPanel("File2Tab", null, GralGridBuild_ifc.propZoomedPanel);
     gui.addFrameArea(3, 1, 1, 1, selectTab.panelRight.tabbedPanelFileTabs); // dialogPanel);
     selectTab.panelRight.buildInitialTabs('r');
 

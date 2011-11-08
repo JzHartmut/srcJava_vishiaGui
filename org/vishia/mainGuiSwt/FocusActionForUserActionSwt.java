@@ -20,7 +20,7 @@ implements FocusListener
 
 	String sCmdEnter, sCmdRelease;
 	
-	private final PropertiesGuiSwt propertiesGui;
+	private final SwtProperties propertiesGui;
   
   /**Constructor.
    * @param guiMng The Gui-manager

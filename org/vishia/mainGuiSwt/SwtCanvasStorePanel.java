@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Control;
  * @author Hartmut Schorrig
  *
  */
-public class CanvasStorePanelSwt extends PanelSwt  //CanvasStorePanel //
+public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
 {
 	
   protected SwtCanvas swtCanvas;
@@ -45,7 +45,7 @@ public class CanvasStorePanelSwt extends PanelSwt  //CanvasStorePanel //
    * @param style
    * @param backGround
    */
-  public CanvasStorePanelSwt(String namePanel, Composite parent, int style, Color backGround, GralWidgetMng gralMng)
+  public SwtCanvasStorePanel(String namePanel, Composite parent, int style, Color backGround, GralWidgetMng gralMng)
   { super(namePanel, gralMng, null);
     swtCanvas = new SwtCanvas(this,parent, style);
     super.panelComposite = swtCanvas;
@@ -60,7 +60,7 @@ public class CanvasStorePanelSwt extends PanelSwt  //CanvasStorePanel //
   /**Constructor called in derived classes. The derived class have to be instantiate the Canvas
    * maybe with other draw routines. 
    */
-  protected CanvasStorePanelSwt(String namePanel, GralWidgetMng gralMng)
+  protected SwtCanvasStorePanel(String namePanel, GralWidgetMng gralMng)
   {
     super(namePanel, gralMng, null);
   }
@@ -77,9 +77,9 @@ public class CanvasStorePanelSwt extends PanelSwt  //CanvasStorePanel //
 	 */
 	protected static class SwtCanvas extends Canvas
 	{
-	  private final CanvasStorePanelSwt storeMng;
+	  private final SwtCanvasStorePanel storeMng;
 	  
-	  SwtCanvas(CanvasStorePanelSwt storeMng, Composite parent, int style)
+	  SwtCanvas(SwtCanvasStorePanel storeMng, Composite parent, int style)
 	  {
 	    super(parent, style);
 	    this.storeMng = storeMng;

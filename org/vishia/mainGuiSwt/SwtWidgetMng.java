@@ -175,7 +175,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    * to the same instance, but with type {@link GralGridProperties}. Internally there are some more
    * Swt-capabilities in the derived type.
    */
-  public  final PropertiesGuiSwt propertiesGuiSwt;
+  public  final SwtProperties propertiesGuiSwt;
   
   /**This mouse-click-implementor is added to any widget,
    * which is associated to a {@link GralWidget} in its data.
@@ -273,7 +273,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   , char displaySize, VariableContainer_ifc variableContainer
 	, LogMessage log)
   { //super(sTitle); 
-  	this(new PropertiesGuiSwt(device, displaySize), variableContainer, log);
+  	this(new SwtProperties(device, displaySize), variableContainer, log);
   	
   }
 
@@ -284,7 +284,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public SwtWidgetMng(PropertiesGuiSwt propertiesGui
+  public SwtWidgetMng(SwtProperties propertiesGui
   	, VariableContainer_ifc variableContainer
   	, LogMessage log
   	)
@@ -347,7 +347,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     Composite box = new Composite((Composite)pos.panel.getPanelImpl(), 0);
     setPosAndSize_(box);
     Point size = box.getSize();
-    GralPanelContent panel = new PanelSwt(name, this, box);
+    GralPanelContent panel = new SwtPanel(name, this, box);
     registerPanel(panel);
     //GuiPanelMngSwt mng = new GuiPanelMngSwt(gralDevice, size.y, size.x, propertiesGuiSwt, variableContainer, log);
     return panel;
@@ -358,7 +358,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   {
     Color backColorSwt = propertiesGuiSwt.colorSwt(backGround);
     Composite panelSwt = (Composite)pos.panel.getPanelImpl();  
-    GridPanelSwt panel = new GridPanelSwt(namePanel, panelSwt, 0, backColorSwt, xG, yG, xS, yS, this);
+    SwtGridPanel panel = new SwtGridPanel(namePanel, panelSwt, 0, backColorSwt, xG, yG, xS, yS, this);
     registerPanel(panel);
 
     return panel;
@@ -367,7 +367,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   
   @Override public boolean remove(GralPanelContent compositeBox)
-  { Composite panelSwt = ((PanelSwt)compositeBox).getPanelImpl();
+  { Composite panelSwt = ((SwtPanel)compositeBox).getPanelImpl();
     panelSwt.dispose();
     return true;
   }
@@ -384,7 +384,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   public GralWindow createWindow(String name, String title, boolean exclusive)
   {
     SwtGraphicThread swtDevice = (SwtGraphicThread)gralDevice;
-    SubWindowSwt window = new SubWindowSwt(name, swtDevice.displaySwt, title, exclusive, this);
+    SwtSubWindow window = new SwtSubWindow(name, swtDevice.displaySwt, title, exclusive, this);
     window.posWindow = getPositionInPanel();
     GralRectangle rect = calcPositionOfWindow(window.posWindow);
     window.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
@@ -400,7 +400,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   
   @Override public boolean setWindowsVisible(GralWindow_ifc window, GralGridPos atPos)
-  { SubWindowSwt windowSwt = (SubWindowSwt)window;
+  { SwtSubWindow windowSwt = (SwtSubWindow)window;
     if(atPos ==null){
       window.setWindowVisible(false); ///
     } else {
@@ -500,9 +500,9 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 
 
   
-	@Override public GralTabbedPanel createTabPanel(String namePanel, GralPanelActivated_ifc user, int property)
+	@Override public GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int property)
 	{
-		TabPanelSwt tabMngPanel = new TabPanelSwt(namePanel, this, user, property);
+		SwtTabbedPanel tabMngPanel = new SwtTabbedPanel(namePanel, this, user, property);
 		currTabPanel = tabMngPanel;
 		//GralWidget tabFolder = currTabPanel;
 		TabFolder tabFolderSwt = (TabFolder)tabMngPanel.getWidgetImplementation();
@@ -517,7 +517,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   @Override public GralWidget addText(String sText, char size, int color)
   {
-    Label widget = new Label(((PanelSwt)pos.panel).getPanelImpl(), 0);
+    Label widget = new Label(((SwtPanel)pos.panel).getPanelImpl(), 0);
     widget.setForeground(propertiesGuiSwt.colorSwt(color));
     widget.setBackground(propertiesGuiSwt.colorBackground);
     widget.setText(sText);
@@ -720,7 +720,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
  * @return
  */
 @Override public GralTextBox addTextBox(String name, boolean editable, String prompt, char promptStylePosition)
-{ TextBoxSwt widgetSwt = new TextBoxSwt(name, (Composite)pos.panel.getPanelImpl(), SWT.MULTI|SWT.H_SCROLL|SWT.V_SCROLL, this);
+{ SwtTextBox widgetSwt = new SwtTextBox(name, (Composite)pos.panel.getPanelImpl(), SWT.MULTI|SWT.H_SCROLL|SWT.V_SCROLL, this);
   GralWidget widgetInfo = widgetSwt;
   widgetInfo.setPanelMng(this);
   //Text widgetSwt = new Text(((PanelSwt)pos.panel).getPanelImpl(), SWT.MULTI);
@@ -756,7 +756,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
       boundsField.y += (boundsField.height - yPixelField );
       boundsField.height = yPixelField;
     }
-    Label wgPrompt = new Label(((PanelSwt)pos.panel).getPanelImpl(), 0);
+    Label wgPrompt = new Label(((SwtPanel)pos.panel).getPanelImpl(), 0);
     wgPrompt.setFont(promptFont);
     wgPrompt.setText(prompt);
     Point promptSize = wgPrompt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
@@ -787,7 +787,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   /**Adds a line.
    * <br><br>To adding a line is only possible if the current panel is of type 
-   * {@link CanvasStorePanelSwt}. This class stores the line coordinates and conditions 
+   * {@link SwtCanvasStorePanel}. This class stores the line coordinates and conditions 
    * and draws it as background if drawing is invoked.
    * 
    * @param colorValue The value for color, 0xffffff is white, 0xff0000 is red.
@@ -798,7 +798,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    * @param ye end of line relative to current position in grid units.
    */
   public void addLine(int colorValue, float xa, float ya, float xe, float ye){
-  	if(pos.panel.getPanelImpl() instanceof CanvasStorePanelSwt){
+  	if(pos.panel.getPanelImpl() instanceof SwtCanvasStorePanel){
   		GralColor color = propertiesGui.color(colorValue);
   		int xgrid = propertiesGui.xPixelUnit();
   		int ygrid = propertiesGui.yPixelUnit();
@@ -808,7 +808,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   		int y2 = (int)((pos.y - ye) * ygrid);
   		//Any panel which is created in the SWT-implementation is a CanvasStorePanel.
   		//This is because lines should be drawn.
-  		((CanvasStorePanelSwt) pos.panel.getPanelImpl()).store.drawLine(color, x1, y1, x2, y2);
+  		((SwtCanvasStorePanel) pos.panel.getPanelImpl()).store.drawLine(color, x1, y1, x2, y2);
   		//furtherSetPosition((int)(xe + 0.99F), (int)(ye + 0.99F));
   	} else {
   		log.sendMsg(0, "GuiPanelMng:addLine: panel is not a CanvasStorePanel");
@@ -826,12 +826,12 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   {
     ImageData imageData = new ImageData(imageStream);
     byte[] data = imageData.data;
-    Image image = new Image((((PanelSwt)pos.panel).getPanelImpl()).getDisplay(), imageData); 
-    GralImageBase imageGui = new GuiImageSwt(image);
+    Image image = new Image((((SwtPanel)pos.panel).getPanelImpl()).getDisplay(), imageData); 
+    GralImageBase imageGui = new SwtImage(image);
     GralRectangle size = imageGui.getPixelSize();
     GralRectangle rr = calcWidgetPosAndSize(pos, 0, 0, size.dx, size.dy);
-    if(pos.panel instanceof CanvasStorePanelSwt){
-      CanvasStorePanelSwt canvas = (CanvasStorePanelSwt) pos.panel;
+    if(pos.panel instanceof SwtCanvasStorePanel){
+      SwtCanvasStorePanel canvas = (SwtCanvasStorePanel) pos.panel;
       //coordinates are in pixel
       canvas.store.drawImage(imageGui, rr.x, rr.y, rr.dx, rr.dy, size);
     }
@@ -845,8 +845,8 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   {
     ImageData imageData = new ImageData(imageStream);
     byte[] data = imageData.data;
-    Label widget = new Label(((PanelSwt)pos.panel).getPanelImpl(), 0);
-    Image image = new Image((((PanelSwt)pos.panel).getPanelImpl()).getDisplay(), imageData); 
+    Label widget = new Label(((SwtPanel)pos.panel).getPanelImpl(), 0);
+    Image image = new Image((((SwtPanel)pos.panel).getPanelImpl()).getDisplay(), imageData); 
     widget.setImage(image);
     widget.setSize(propertiesGui.xPixelUnit() * width, propertiesGui.yPixelUnit() * height);
     setBounds_(widget);
@@ -867,7 +867,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   , String sDataPath
   )
   {
-  	ValueBarSwt widget = new ValueBarSwt(sName, this);
+  	SwtValueBar widget = new SwtValueBar(sName, this);
   	setPosAndSize_(widget.widgetSwt);
   	widget.setPanelMng(this);
     widget.setShowMethod(sShowMethod);
@@ -886,7 +886,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   , String sDataPath
   )
   {
-  	Slider control = new Slider(((PanelSwt)pos.panel).getPanelImpl(), SWT.VERTICAL);
+  	Slider control = new Slider(((SwtPanel)pos.panel).getPanelImpl(), SWT.VERTICAL);
   	control.setBackground(propertiesGuiSwt.colorBackground);
   	setPosAndSize_(control);
    	GralWidget widgetInfos = new WidgetSimpleWrapperSwt(sName, 'V', control, this);
@@ -993,7 +993,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   {
     int ySize = (int)(pos.height());
     int xSize = (int)(pos.width());
-    LedSwt widget = new LedSwt(this, 'r');
+    SwtLed widget = new SwtLed(this, 'r');
   	widget.setBackground(propertiesGuiSwt.colorBackground);
   	
     widget.setForeground(propertiesGuiSwt.colorSwt(0xff00));
@@ -1017,7 +1017,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     int xSize = (int)(pos.width());
     int dxWidget = xSize * propertiesGui.xPixelUnit();
 		int dyWidget = ySize * propertiesGui.yPixelUnit();
-		CurveView curveView = new CurveView(((PanelSwt)pos.panel).getPanelImpl(), dxWidget, dyWidget, nrofXvalues, nrofTracks);
+		CurveView curveView = new CurveView(((SwtPanel)pos.panel).getPanelImpl(), dxWidget, dyWidget, nrofXvalues, nrofTracks);
 		testHelp.curveView = curveView; //store to inspect.
 		curveView.setSize(dxWidget, dyWidget);
 		setBounds_(curveView); //, dyGrid, dxGrid);
@@ -1053,7 +1053,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	
   @Override public GralTable addTable(String sName, int height, int[] columnWidths)
   {
-    return TableSwt.addTable(this, sName, height, columnWidths);
+    return SwtTable.addTable(this, sName, height, columnWidths);
   }
   
   
@@ -1176,8 +1176,8 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
             assert(swtWidget instanceof CurveView);
             ((CurveView)(swtWidget)).redrawData(); break; //causes a partial redraw
           default: 
-            if(widget instanceof TableSwt){ 
-              TableSwt table = (TableSwt)widget;
+            if(widget instanceof SwtTable){ 
+              SwtTable table = (SwtTable)widget;
               //NOTE: ident is the row number. Insert before row.
               switch(cmd){
               case GralPanelMngWorking_ifc.cmdInsert: table.changeTable(ident, info, data); break;
@@ -1197,8 +1197,8 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
                   break;
               default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %x on widget %s", cmd, widget.name);
               }
-            } else if(swtWidget instanceof LedSwt){ 
-              LedSwt field = (LedSwt)swtWidget;
+            } else if(swtWidget instanceof SwtLed){ 
+              SwtLed field = (SwtLed)swtWidget;
               switch(cmd){
               case GralPanelMngWorking_ifc.cmdColor: field.setColor(ident, (Integer)info); break;
               case GralPanelMngWorking_ifc.cmdSet: {

@@ -12,12 +12,12 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralWidget;
 
-public class PanelSwt extends GralPanelContent
+public class SwtPanel extends GralPanelContent
 {
   
   //protected Composite panelSwt;
   
-  private PanelSwt(String name, GralWidgetMng mng)
+  private SwtPanel(String name, GralWidgetMng mng)
   {
     super(name, mng, null);
   }
@@ -28,7 +28,7 @@ public class PanelSwt extends GralPanelContent
    * @param panelSwt may be null, then the {@link GralPanelContent#panelComposite} should be set 
    *   after construction of a derived class.
    */
-  public PanelSwt(String name, GralWidgetMng mng, Composite panelSwt)
+  public SwtPanel(String name, GralWidgetMng mng, Composite panelSwt)
   {
     super(name, mng, panelSwt);
     if(panelSwt !=null){

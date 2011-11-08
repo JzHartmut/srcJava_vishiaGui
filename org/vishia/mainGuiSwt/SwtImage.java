@@ -4,11 +4,11 @@ import org.eclipse.swt.graphics.Image;
 import org.vishia.gral.ifc.GralImageBase;
 import org.vishia.gral.ifc.GralRectangle;
 
-public class GuiImageSwt extends GralImageBase
+public class SwtImage extends GralImageBase
 {
   final Image image;
   
-  public GuiImageSwt(Image oImage)
+  public SwtImage(Image oImage)
   {
     super(oImage);
     this.image = oImage;

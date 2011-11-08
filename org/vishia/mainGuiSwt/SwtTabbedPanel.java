@@ -20,7 +20,7 @@ import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralWidget;
 
-public class TabPanelSwt extends GralTabbedPanel
+public class SwtTabbedPanel extends GralTabbedPanel
 {
 
   /**The Swt TabFolder implementation. */
@@ -28,7 +28,7 @@ public class TabPanelSwt extends GralTabbedPanel
     
 	final SwtWidgetMng mng;
 	
-	TabPanelSwt(String namePanel, SwtWidgetMng mng, GralPanelActivated_ifc user, int property)
+	SwtTabbedPanel(String namePanel, SwtWidgetMng mng, GralPanelActivated_ifc user, int property)
 	{ super(namePanel, mng, user, property);  //initializes as GralWidget and as GralPanel
 		this.mng = mng;
 		Object oParent = this.pos.panel.getPanelImpl();
@@ -57,12 +57,12 @@ public class TabPanelSwt extends GralTabbedPanel
 	  Rectangle sizeTabFolder = widgetSwt.getBounds();
 	  TabItem tabItem = new TabItem(widgetSwt, SWT.None);
 	  tabItem.setText(sLabel);
-		CanvasStorePanelSwt panel;
+		SwtCanvasStorePanel panel;
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
 	  if(yGrid <0 || xGrid <0){
-			panel = new CanvasStorePanelSwt(sName, widgetSwt, 0, colorBackground, mng);
+			panel = new SwtCanvasStorePanel(sName, widgetSwt, 0, colorBackground, mng);
 		} else {
-	  	panel = new GridPanelSwt(sName, widgetSwt, 0, colorBackground, mng.propertiesGui.xPixelUnit(), mng.propertiesGui.yPixelUnit(), 5, 5, mng);
+	  	panel = new SwtGridPanel(sName, widgetSwt, 0, colorBackground, mng.propertiesGui.xPixelUnit(), mng.propertiesGui.yPixelUnit(), 5, 5, mng);
 		}
 	  panel.swtCanvas.setBounds(sizeTabFolder);
 	  panel.itsTabSwt = tabItem;
@@ -78,7 +78,7 @@ public class TabPanelSwt extends GralTabbedPanel
 	{ TabItem tabItemOperation = new TabItem(widgetSwt, SWT.None);
 		tabItemOperation.setText(sLabel);
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
-	  CanvasStorePanelSwt panel = new CanvasStorePanelSwt(sName, widgetSwt, 0, colorBackground, mng);
+	  SwtCanvasStorePanel panel = new SwtCanvasStorePanel(sName, widgetSwt, 0, colorBackground, mng);
     mng.registerPanel(panel);
 	  tabItemOperation.setControl(panel.swtCanvas);
     panels.put(sName, panel);

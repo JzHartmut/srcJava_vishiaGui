@@ -7,12 +7,12 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class GralKeySwt extends KeyCode
+public class SwtGralKey extends KeyCode
 {
   
   /**This class isn't instantiated. Only the static method and the static definitions of KeyCode
    * are used.  */
-  private GralKeySwt()
+  private SwtGralKey()
   { super(0);
   }
   

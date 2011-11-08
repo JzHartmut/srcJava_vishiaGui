@@ -21,7 +21,7 @@ import org.vishia.inspector.Inspector;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
 import org.vishia.mainGuiSwt.SwtWidgetMng;
-import org.vishia.mainGuiSwt.PropertiesGuiSwt;
+import org.vishia.mainGuiSwt.SwtProperties;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.FileSystem;
 
@@ -143,7 +143,7 @@ public class BzrGui extends GuiCfg
     //panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate, 0);
     //panelMng.tabPanel.addGridPanel("operation", "&Operation",1,1,10,10);
     panelMng.selectPanel("primaryWindow");
-    mainTabPanel = panelMng.createTabPanel("mainTab", null, 0);
+    mainTabPanel = panelMng.addTabbedPanel("mainTab", null, 0);
     gui.addFrameArea(1,1,3,2, mainTabPanel); //dialogPanel);
 
     try { 
