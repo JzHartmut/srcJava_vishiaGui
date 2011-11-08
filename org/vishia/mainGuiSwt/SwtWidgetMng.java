@@ -504,11 +504,11 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	{
 		TabPanelSwt tabMngPanel = new TabPanelSwt(namePanel, this, user, property);
 		currTabPanel = tabMngPanel;
-		GralWidget tabFolder = currTabPanel.getGuiComponent();
-		TabFolder tabFolderSwt = (TabFolder)tabFolder.getWidgetImplementation();
+		//GralWidget tabFolder = currTabPanel;
+		TabFolder tabFolderSwt = (TabFolder)tabMngPanel.getWidgetImplementation();
 		setPosAndSize_(tabFolderSwt); //(Control)currTabPanel.getGuiComponent().getWidgetImplementation());
 		listVisiblePanels.add(currTabPanel);  //TODO checkit maybe currTabPanel.getCurrentPanel()
-		registerWidget(tabFolder);
+		registerWidget(tabMngPanel);
 		return currTabPanel;
 	}
 	

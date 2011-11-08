@@ -253,7 +253,7 @@ protected void initGuiAreas()
   initMenuGralDesigner();
   panelMng.selectPanel("primaryWindow");
   mainTabPanel = panelMng.createTabPanel("mainTab", null, 0);
-  gui.addFrameArea(1,1,3,1, mainTabPanel.getGuiComponent()); //dialogPanel);
+  gui.addFrameArea(1,1,3,1, mainTabPanel); //dialogPanel);
   Appendable out = gui.getOutputBox();
   mainCmd.setOutputChannels(out, out);
  

@@ -18,91 +18,51 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralWidget;
 
 public class TabPanelSwt extends GralTabbedPanel
 {
 
-  /**Wrapper arround the TabFolder. The swt.TabFolder is the container for all TabItem. 
-   * It is designated as {@link GralPanelContent} too, because it is used as a Panel.,
-   * though it doesn't contain other Widgets as the Tabs.  
-   */
-  private class TabFolder_ extends GralPanelContent// implements WidgetCmpnifc
-  {
-    /*pkgprivate*/ TabFolder widgetSwt;
-    TabFolder_(String namePanel, Composite parent, int style, SwtWidgetMng mng)
-    { super(namePanel, mng, parent);
-      widgetSwt = new TabFolder(parent, style); 
-    }
-    @Override public Widget getWidgetImplementation(){ return widgetSwt; }
-    @Override public boolean setFocus(){ return widgetSwt.setFocus(); }
-
-    @Override
-    public GralColor setBackgroundColor(GralColor color)
-    {
-      // TODO Auto-generated method stub
-      return null;
-    }
-    @Override
-    public GralColor setForegroundColor(GralColor color)
-    {
-      // TODO Auto-generated method stub
-      return null;
-    }
-
-    @Override public void setBoundsPixel(int x, int y, int dx, int dy)
-    { widgetSwt.setBounds(x,y,dx,dy);
-    }
+  /**The Swt TabFolder implementation. */
+  /*pkgprivate*/ TabFolder widgetSwt;
     
-
-
-
-    @Override public void redraw(){  widgetSwt.redraw(); widgetSwt.update(); }
-
-    @Override public Composite getPanelImpl() { return widgetSwt; }
-    @Override
-    protected void removeWidgetImplementation()
-    { widgetSwt.dispose();
-      widgetSwt = null;
-    }
-
-    
-  }
-  
-	/*pkgprivate*/ final TabFolder_ tabMng;
-	
 	final SwtWidgetMng mng;
 	
 	TabPanelSwt(String namePanel, SwtWidgetMng mng, GralPanelActivated_ifc user, int property)
-	{ super(namePanel, mng, user, property);
+	{ super(namePanel, mng, user, property);  //initializes as GralWidget and as GralPanel
 		this.mng = mng;
-		Object oParent = mng.pos.panel.getPanelImpl();
-		if(oParent == null || !(oParent instanceof Composite) ){ throw new IllegalArgumentException("Software error. You must select a panel before."); }
+		Object oParent = this.pos.panel.getPanelImpl();
+    if(oParent == null || !(oParent instanceof Composite) ){ throw new IllegalArgumentException("Software error. You must select a panel before."); }
 		Composite parent = (Composite)oParent;
-		tabMng = new TabFolder_(namePanel, parent, SWT.TOP, mng);
-		tabMng.widgetSwt.addSelectionListener(tabItemSelectListener);
-		tabMng.widgetSwt.addControlListener(resizeListener);
+		
+		//this.panelComposite = parent;  
+    widgetSwt = new TabFolder(parent, SWT.TOP); 
+    this.panelComposite = widgetSwt;  
+    
+		
+		widgetSwt.addSelectionListener(tabItemSelectListener);
+		widgetSwt.addControlListener(resizeListener);
   	
 	}
 	
-	@Override public GralPanelContent getGuiComponent()
-	{ return tabMng;
+	//@Override 
+	public GralPanelContent XXXgetGuiComponent()
+	{ return this; //tabMng;
 	}
 	
   
   
 	@Override public GralPanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
 	{ ///
-	  Rectangle sizeTabFolder = tabMng.widgetSwt.getBounds();
-	  TabItem tabItem = new TabItem(tabMng.widgetSwt, SWT.None);
+	  Rectangle sizeTabFolder = widgetSwt.getBounds();
+	  TabItem tabItem = new TabItem(widgetSwt, SWT.None);
 	  tabItem.setText(sLabel);
 		CanvasStorePanelSwt panel;
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
 	  if(yGrid <0 || xGrid <0){
-			panel = new CanvasStorePanelSwt(sName, tabMng.widgetSwt, 0, colorBackground, mng);
+			panel = new CanvasStorePanelSwt(sName, widgetSwt, 0, colorBackground, mng);
 		} else {
-	  	panel = new GridPanelSwt(sName, tabMng.widgetSwt, 0, colorBackground, mng.propertiesGui.xPixelUnit(), mng.propertiesGui.yPixelUnit(), 5, 5, mng);
+	  	panel = new GridPanelSwt(sName, widgetSwt, 0, colorBackground, mng.propertiesGui.xPixelUnit(), mng.propertiesGui.yPixelUnit(), 5, 5, mng);
 		}
 	  panel.swtCanvas.setBounds(sizeTabFolder);
 	  panel.itsTabSwt = tabItem;
@@ -115,10 +75,10 @@ public class TabPanelSwt extends GralTabbedPanel
 
   
 	@Override public GralPanelContent addCanvasPanel(String sName, String sLabel)
-	{ TabItem tabItemOperation = new TabItem(tabMng.widgetSwt, SWT.None);
+	{ TabItem tabItemOperation = new TabItem(widgetSwt, SWT.None);
 		tabItemOperation.setText(sLabel);
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
-	  CanvasStorePanelSwt panel = new CanvasStorePanelSwt(sName, tabMng.widgetSwt, 0, colorBackground, mng);
+	  CanvasStorePanelSwt panel = new CanvasStorePanelSwt(sName, widgetSwt, 0, colorBackground, mng);
     mng.registerPanel(panel);
 	  tabItemOperation.setControl(panel.swtCanvas);
     panels.put(sName, panel);
@@ -131,7 +91,7 @@ public class TabPanelSwt extends GralTabbedPanel
 	{
 	  GralPanelContent panel = mng.getPanel(name);
 	  TabItem tabItem = (TabItem)panel.itsTabSwt;
-	  tabMng.widgetSwt.setSelection(tabItem);
+	  widgetSwt.setSelection(tabItem);
 	  return panel;
 	}
 	
@@ -202,34 +162,38 @@ public class TabPanelSwt extends GralTabbedPanel
     
   };
   
-  /*
-  @Override protected void removeWidgetImplementation()
+  @Override public Widget getWidgetImplementation(){ return widgetSwt; }
+  @Override public boolean setFocus(){ return widgetSwt.setFocus(); }
+
+  @Override
+  public GralColor setBackgroundColor(GralColor color)
   {
     // TODO Auto-generated method stub
-    
+    return null;
   }
-
-  @Override public Object getWidgetImplementation()
-  { return tabMng;
-  }
-
-  @Override public void redraw()
+  @Override
+  public GralColor setForegroundColor(GralColor color)
   {
-    tabMng.redraw();
-  }
-
-  @Override public GralColor setBackgroundColor(GralColor color)
-  { return tabMng.setBackgroundColor(color);
+    // TODO Auto-generated method stub
+    return null;
   }
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
-  { tabMng.setBoundsPixel(x, y, dx, dy);
+  { widgetSwt.setBounds(x,y,dx,dy);
+  }
+  
+
+
+
+  @Override public void redraw(){  widgetSwt.redraw(); widgetSwt.update(); }
+
+  @Override public Composite getPanelImpl() { return widgetSwt; }
+
+  @Override protected void removeWidgetImplementation()
+  { widgetSwt.dispose();
+    widgetSwt = null;
   }
 
-  @Override public GralColor setForegroundColor(GralColor color)
-  { return tabMng.setForegroundColor(color);
-  }
-  */
   
   void stop(){}
 

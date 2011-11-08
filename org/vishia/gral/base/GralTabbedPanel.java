@@ -10,10 +10,11 @@ import org.vishia.gral.ifc.GralWidget;
 
 /**This class is the common base class for Tabbed-Panels.
  * A TabbbedPanel is the container for Tabs. It doesn't contain other widgets than Tabs.
- * Therefore it is not a {@link GralPanelContent}.
- * But it is a {@link GralWidget} because it is used as one member inside a Panel.
- * The Implementation of this class should create a swt.TabFolder or adequate, which is a GralWidget.
- * A Tab inside the TabPanel is a usability Panel.
+ * It is a {@link GralPanelContent} because it can be used as one of the areas 
+ * in {@link org.vishia.gral.area9.GralArea9Window}.
+ * It is a {@link GralWidget} because it is used as one member inside another Panel.
+ * The Implementation of this class should create a swt.TabFolder or adequate
+ * A Tab inside the TabPanel is a Panel.
  * <br><br>
  * Concepts in base graphic:
  * <ul>
@@ -23,7 +24,7 @@ import org.vishia.gral.ifc.GralWidget;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralTabbedPanel /*extends GralWidget*/ implements GralVisibleWidgets_ifc
+public abstract class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ implements GralVisibleWidgets_ifc
 {
   /**The version and history:
    * <ul>
@@ -64,7 +65,8 @@ public abstract class GralTabbedPanel /*extends GralWidget*/ implements GralVisi
 	 * @param user
 	 */
 	protected GralTabbedPanel(String sName, GralWidgetMng mng, GralPanelActivated_ifc user, int property)
-	{ //super(sName, '@', mng);
+	{ super(sName, mng, null);
+	  //super(sName, '@', mng);
 	  this.notifyingUserInstanceWhileSelectingTab = user;
 	}
 	
@@ -85,7 +87,7 @@ public abstract class GralTabbedPanel /*extends GralWidget*/ implements GralVisi
 	
 	
 	
-	abstract public GralPanelContent getGuiComponent();
+	//abstract public GralPanelContent getGuiComponent();
 	
 	public GralPanelContent getFocusedTab(){ return focusedTab; }
 	

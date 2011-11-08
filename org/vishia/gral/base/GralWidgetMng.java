@@ -334,7 +334,9 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   @Override public void selectPanel(String sName){
     pos.panel = panels.get(sName);
     sCurrPanel = sName;
-    if(pos.panel == null) {
+    if(pos.panel == null && currTabPanel !=null) {
+      //use the position of the current tab panel for the WidgetMng. Its panel is the parent.
+      pos = currTabPanel.pos;  
       pos.panel = currTabPanel.addGridPanel(sName, /*"&" + */sName,1,1,10,10);
       panels.put(sName, pos.panel);
       log.sendMsg(0, "GuiPanelMng:selectPanel: unknown panel name %s", sName);
