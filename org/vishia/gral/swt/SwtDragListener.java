@@ -2,9 +2,11 @@ package org.vishia.gral.swt;
 
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSource;
+import org.eclipse.swt.dnd.DragSourceAdapter;
 import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.widgets.Control;
@@ -12,19 +14,23 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.KeyCode;
 
-public class SwtDragListener implements DragSourceListener
+public class SwtDragListener extends DragSourceAdapter
 {
-  private FileTransfer fileTransfer;
+  /**This instance helps to check whether a Transfer can be done. */
+  private final FileTransfer fileTransfer;
   
-
+  private final TextTransfer textTransfer;
+  
   SwtDragListener(int dropType, Control control){
     DragSource drag = new DragSource(control, DND.DROP_COPY);
     drag.addDragListener(this);
     switch(dropType){
       case KeyCode.dragFiles:{
         fileTransfer = FileTransfer.getInstance();
-        Transfer[] transfers = new Transfer[1];
+        textTransfer = TextTransfer.getInstance();
+        Transfer[] transfers = new Transfer[2];
         transfers[0]= fileTransfer;
+        transfers[1]= textTransfer;
         drag.setTransfer(transfers);
       } break;
       default: throw new IllegalArgumentException("unknown dragtype: "+ Integer.toHexString(dropType));
@@ -37,10 +43,17 @@ public class SwtDragListener implements DragSourceListener
   public void dragFinished(DragSourceEvent event)
   {
     // TODO Auto-generated method stub
-    stop();    
+    stop();   
+    System.out.println("drag finished\n");
   }
 
 
+  /**This method is called if the mouse button is released over the target.
+   * The possible data types of the receiver are known therefore: The receiver may accept
+   * a text transfer if it is a text editor, or a file transfer if it is a file browser etc.
+   * The type of transfer can be tested with event.dataType.
+   * @see org.eclipse.swt.dnd.DragSourceAdapter#dragSetData(org.eclipse.swt.dnd.DragSourceEvent)
+   */
   @Override public void dragSetData(DragSourceEvent event)
   {
     DragSource drag = (DragSource)event.getSource();
@@ -51,13 +64,25 @@ public class SwtDragListener implements DragSourceListener
       GralUserAction action = widgg.getActionDrag();
       if(action !=null){
         //call the action to get the data from drag
+        //ret is a array which references the necessary String[] for answer.
         String[][] ret = new String[1][];
         boolean bOk = action.userActionGui(KeyCode.dragFiles, widgg, (Object)ret);  //Note: 1 file per variable String argument
         if(bOk && ret[0] !=null){
+          String[] data = ret[0];
           TransferData transferData = event.dataType;
-          fileTransfer.javaToNative(ret[0], transferData);      
-          event.data = transferData;
-          event.doit = true;
+          if(textTransfer.isSupportedType(transferData)){
+            //the call of fileTransfer.javaToNative(data, transferData) will be done       
+            event.data = data; //transferData;
+            event.doit = true;
+          } else if(fileTransfer.isSupportedType(transferData)){
+            //the call of fileTransfer.javaToNative(data, transferData) will be done       
+            data[0] = data[0].replace('/', '\\');
+            event.data = data; //transferData;
+            event.doit = true;
+          } else {
+            //the destination does not support a file transfer.
+            event.doit = false;
+          }
         } else {
           //action will be prevent drag, no data:
           event.doit = false;
