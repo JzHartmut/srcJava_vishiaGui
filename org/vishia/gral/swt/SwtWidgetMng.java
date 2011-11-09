@@ -22,7 +22,7 @@
  *
  ****************************************************************************/
 
-package org.vishia.mainGuiSwt;
+package org.vishia.gral.swt;
 
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -90,7 +90,6 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
-import org.vishia.gral.swt.WidgetSimpleWrapperSwt;
 import org.vishia.gral.widget.GralCurveView;
 import org.vishia.msgDispatch.LogMessage;
 

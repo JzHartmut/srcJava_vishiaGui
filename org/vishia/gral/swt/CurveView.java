@@ -1,4 +1,4 @@
-package org.vishia.mainGuiSwt;
+package org.vishia.gral.swt;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

@@ -13,7 +13,7 @@ import org.vishia.gral.base.GralTable;
  * The ObjectModelDiagram may shown the relations:
  * <img src="../../../../img/Widget_gral.png"><br>
  * This class GralWidget knows the gral graphic widget via an {@link GralWidget_ifc}. It is a wrapper around the widget of the adaption layer.
- * In this figure a wrapper {@link org.vishia.mainGuiSwt.SwtTable} is shown which wraps 
+ * In this figure a wrapper {@link org.vishia.gral.swt.SwtTable} is shown which wraps 
  * a org.eclipse.swt.widgets.Table. The wrapper based on {@link org.vishia.gral.base.GralTable} 
  * and supports the interface {@link org.vishia.gral.ifc.GralTable_ifc}.
  * This interface allows to deal with the table procured by the wrapper. See the derived interfaces of {@link GralWidget_ifc}.  
@@ -25,7 +25,7 @@ import org.vishia.gral.base.GralTable;
  * The user can invoke the methods of the widget to animate it in a GUI etc, for example {@link #setBackColor(GralColor, int)}
  * or {@link #setValue(int, int, Object)}. This methods can be called in any thread. There are thread safe. 
  * The organization of this actions are done in the implementation of the {@link org.vishia.gral.base.GralWidgetMng}
- * like {@link org.vishia.mainGuiSwt.SwtWidgetMng}. This implementation adapts the basic graphic and knows theire methods
+ * like {@link org.vishia.gral.swt.SwtWidgetMng}. This implementation adapts the basic graphic and knows theire methods
  * to set colors, values etc. The user need deal only with this widget class. The thread safe  capability is organized
  * with a ConcurrentLinkedQueue which contains requests of type {@link org.vishia.gral.GralWidgetChangeRequ}.
  * <br><br>

@@ -1,4 +1,4 @@
-package org.vishia.mainGuiSwt;
+package org.vishia.gral.swt;
 
 import org.eclipse.swt.graphics.GC;
 import org.vishia.gral.ifc.GralCanvas_ifc;

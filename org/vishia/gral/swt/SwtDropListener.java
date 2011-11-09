@@ -1,4 +1,4 @@
-package org.vishia.mainGuiSwt;
+package org.vishia.gral.swt;
 
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;

@@ -1,4 +1,4 @@
-package org.vishia.mainGuiSwt;
+package org.vishia.gral.swt;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
@@ -9,7 +9,7 @@ import org.vishia.gral.base.GralWidgetMng;
 /**This is a org.eclipse.swt.widgets.Composite. 
  * It can contain some GUI-Elements like Button, Text, Label, Table etc from org.eclipse.swt.widgets.
  * But additional a grid is shown as background. 
- * This class is imaginary for the {@link org.vishia.mainGuiSwt.SwtWidgetMng}
+ * This class is imaginary for the {@link org.vishia.gral.swt.SwtWidgetMng}
  * to show the grid for positions.
  * 
  * @author Hartmut Schorrig

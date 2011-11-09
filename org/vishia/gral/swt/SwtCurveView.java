@@ -1,4 +1,4 @@
-package org.vishia.mainGuiSwt;
+package org.vishia.gral.swt;
 
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.widget.GralCurveView;

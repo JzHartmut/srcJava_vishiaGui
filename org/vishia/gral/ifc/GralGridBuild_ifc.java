@@ -49,7 +49,7 @@ import org.vishia.util.KeyCode;
  * To build a GUI you must use the following order of calls:
  * <ul>
  * <li>Create a panel manager which is typeof {@link GralWidgetMng} or this interface.
- *   For example create {@link org.vishia.mainGuiSwt.SwtWidgetMng}.
+ *   For example create {@link org.vishia.gral.swt.SwtWidgetMng}.
  * <li>Create a panel, for example call {@link #createGridPanel(GralColor, int, int, int, int)}
  *   and add the panel to the given     
  * <li>Before add, you can select any given panel by String-identifier, using {@link #selectPanel(String)}.

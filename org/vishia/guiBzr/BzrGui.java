@@ -17,11 +17,11 @@ import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.swt.SwtProperties;
+import org.vishia.gral.swt.SwtWidgetMng;
 import org.vishia.inspector.Inspector;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
-import org.vishia.mainGuiSwt.SwtWidgetMng;
-import org.vishia.mainGuiSwt.SwtProperties;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.FileSystem;
 

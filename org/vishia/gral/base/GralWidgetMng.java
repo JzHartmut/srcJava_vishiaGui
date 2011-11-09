@@ -37,8 +37,8 @@ import org.vishia.msgDispatch.LogMessage;
  * The GuiPanelMng is a common approach to work with graphical interface simply, 
  * it is implemented by the several graphic-system-supporting classes
  * <ul>
- * <li>{@link org.vishia.mainGuiSwt.SwtWidgetMng}
- * <li>{@link org.vishia.SwtWidgetMng.GuiPanelMngSwt}
+ * <li>{@link org.vishia.gral.swt.SwtWidgetMng}
+ * <li>{@link org.vishia.gral.swt.SwtWidgetMng.GuiPanelMngSwt}
  * </ul>
  * to offer a unique interface to work with simple graphic applications.
  * <br><br>

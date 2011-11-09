@@ -1,4 +1,4 @@
-package org.vishia.mainGuiSwt;
+package org.vishia.gral.swt;
 
 import org.eclipse.swt.widgets.MenuItem;
 import org.vishia.gral.base.GralWidgetMng;
