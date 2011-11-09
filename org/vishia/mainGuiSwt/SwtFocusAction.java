@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 
-public class FocusActionForUserActionSwt
+public class SwtFocusAction
 implements FocusListener
 {
 
@@ -29,7 +29,7 @@ implements FocusListener
    * @param sCmdRelease
    * @param sCmdDoubleClick
    */
-  public FocusActionForUserActionSwt(
+  public SwtFocusAction(
   	SwtWidgetMng guiMng
   , GralUserAction userCmdGui
   , String sCmdEnter

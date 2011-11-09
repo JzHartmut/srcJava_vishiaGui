@@ -1038,7 +1038,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   		log.sendMsg(0, "GuiMainDialog:addClickAction: unknown widget %s", sName);
   	} else {
     	/**The class ButtonUserAction implements the general button action, which class the registered user action. */
-      ((Control)(widget.getGraphicWidgetWrapper())).addFocusListener( new FocusActionForUserActionSwt(this, action, sCmdEnter, sCmdRelease));
+      ((Control)(widget.getGraphicWidgetWrapper())).addFocusListener( new SwtFocusAction(this, action, sCmdEnter, sCmdRelease));
       
   	}
   	return widget;
@@ -1047,7 +1047,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	
 	@Override public void addFocusAction(GralWidget widgetInfo, GralUserAction action, String sCmdEnter, String sCmdRelease)
 	{
-    ((Control)(widgetInfo.getGraphicWidgetWrapper())).addFocusListener( new FocusActionForUserActionSwt(this, action, sCmdEnter, sCmdRelease));
+    ((Control)(widgetInfo.getGraphicWidgetWrapper())).addFocusListener( new SwtFocusAction(this, action, sCmdEnter, sCmdRelease));
   }
 
 	
@@ -1256,7 +1256,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     while(!(panelSwt instanceof Shell)){
       panelSwt = panelSwt.getParent();
     }
-  	return new FileDialogSwt((Shell)panelSwt);
+  	return new SwtFileDialog((Shell)panelSwt);
   }
 
   

@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 
-public class FileDialogSwt implements GralFileDialog_ifc
+public class SwtFileDialog implements GralFileDialog_ifc
 {
 
 	private FileDialog fileDialog;
@@ -42,7 +42,7 @@ public class FileDialogSwt implements GralFileDialog_ifc
 	}
 	
 	
-	public FileDialogSwt(Shell shell)
+	public SwtFileDialog(Shell shell)
 	{ this.shell = shell;
 	}
 	
