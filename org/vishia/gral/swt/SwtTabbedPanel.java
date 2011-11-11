@@ -18,6 +18,7 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWidget;
 
 public class SwtTabbedPanel extends GralTabbedPanel
@@ -163,6 +164,15 @@ public class SwtTabbedPanel extends GralTabbedPanel
   };
   
   @Override public Widget getWidgetImplementation(){ return widgetSwt; }
+  
+  @Override public GralRectangle getPixelPositionSize(){
+    Rectangle r = widgetSwt.getBounds();
+    GralRectangle posSize = new GralRectangle(r.x, r.y, r.width, r.height);
+    return posSize;
+  }
+
+
+  
   @Override public boolean setFocus(){ return widgetSwt.setFocus(); }
 
   @Override

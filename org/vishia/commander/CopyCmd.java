@@ -2,14 +2,17 @@ package org.vishia.commander;
 
 import java.io.File;
 
+import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.FileSystem;
+import org.vishia.util.KeyCode;
 
 /**This class contains all capabilities to execute copy and move for TheCommander.
  * @author Hartmut Schorrig
@@ -41,31 +44,34 @@ public class CopyCmd
    * whenever it is used.  */
   void buildWindowConfirmCopy()
   {
-    main.panelMng.selectPanel("primaryWindow"); //"output"); //position relative to the output panel
+    main.gralMng.selectPanel("primaryWindow"); //"output"); //position relative to the output panel
+    //System.out.println("CopyWindow frame: " + main.gralMng.pos.panel.getPixelPositionSize().toString());
     //panelMng.setPosition(1, 30+GralGridPos.size, 1, 40+GralGridPos.size, 1, 'r');
-    main.panelMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
+    main.gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
     
 
-    posWindConfirmCopy = main.panelMng.getPositionInPanel();
-    windConfirmCopy = main.panelMng.createWindow("copyWindow", "confirm copy", false);
+    posWindConfirmCopy = main.gralMng.getPositionInPanel();
+    windConfirmCopy = main.gralMng.createWindow("copyWindow", "confirm copy", false);
+    //System.out.println(" window: " + main.gralMng.pos.panel.getPixelPositionSize().toString());
     
-    main.panelMng.setPosition(2, GralGridPos.size -2, 1, GralGridPos.size +45, 0, 'd');
-    main.panelMng.addText("source path/file:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    widgCopyFrom = main.panelMng.addTextField("copyFrom", true, null, 't');
-    main.panelMng.addText("destination path/file:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    widgCopyTo = main.panelMng.addTextField("copyTo", true, null, 't');
+    main.gralMng.setPosition(2, GralGridPos.size -2, 1, GralGridPos.size +45, 0, 'd');
+    main.gralMng.addText("source path/file:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
+    widgCopyFrom = main.gralMng.addTextField("copyFrom", true, null, 't');
+    main.gralMng.addText("destination path/file:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
+    widgCopyTo = main.gralMng.addTextField("copyTo", true, null, 't');
     
-    main.panelMng.setPosition(GralGridPos.refer+3.5f, GralGridPos.size -3, GralGridPos.same, GralGridPos.size + 15, 0, 'r');
-    widgdOverwrite = main.panelMng.addSwitchButton("copyOverwrite", null, null, null, null, "overwrite", "wh", "gn");
-    widgdOverwrite = main.panelMng.addSwitchButton("copyOverwriteReadonly", null, null, null, null, "overwr readonly", "wh", "gn");
-    widgdOverwrite = main.panelMng.addSwitchButton("copyOverwriteHidden", null, null, null, null, "overwr hidden", "wh", "gn");
+    main.gralMng.setPosition(GralGridPos.refer+3.5f, GralGridPos.size -3, GralGridPos.same, GralGridPos.size + 15, 0, 'r');
+    widgdOverwrite = main.gralMng.addSwitchButton("copyOverwrite", null, null, null, null, "overwrite", "wh", "gn");
+    widgdOverwrite = main.gralMng.addSwitchButton("copyOverwriteReadonly", null, null, null, null, "overwr readonly", "wh", "gn");
+    widgdOverwrite = main.gralMng.addSwitchButton("copyOverwriteHidden", null, null, null, null, "overwr hidden", "wh", "gn");
 
-    main.panelMng.setPosition(GralGridPos.refer+3.5f, GralGridPos.samesize, 1, 6, 0, 'r');
-    main.panelMng.addButton("copyEsc", actionConfirmCopy, "esc", null, null, "esc");
-    main.panelMng.setPosition(GralGridPos.same, GralGridPos.size-2, 7, -7, 0, 'r');
-    widgdProgress = main.panelMng.addValueBar("copyProgress", null, null);
-    main.panelMng.setPosition(GralGridPos.same, GralGridPos.size-3, -6, -1, 0, 'r');
-    main.panelMng.addButton("copyOk", actionConfirmCopy, "ok", null, null, "OK");
+    main.gralMng.setPosition(GralGridPos.refer+3.5f, GralGridPos.samesize, 1, 6, 0, 'r');
+    main.gralMng.addButton("copyEsc", actionConfirmCopy, "esc", null, null, "esc");
+    main.gralMng.setPosition(GralGridPos.same, GralGridPos.size-2, 7, -7, 0, 'r');
+    widgdProgress = main.gralMng.addValueBar("copyProgress", null, null);
+    //main.gralMng.setPosition(GralGridPos.same, GralGridPos.size-3, -6, -1, 0, 'r');
+    main.gralMng.setPosition(-1, GralGridPos.size-3, -6, -1, 0, 'r');
+    main.gralMng.addButton("copyOk", actionConfirmCopy, "ok", null, null, "OK");
   
   }
   
@@ -83,18 +89,24 @@ public class CopyCmd
     sSrc = FileSystem.getCanonicalPath(src);
     widgCopyFrom.setText(sSrc);
     widgCopyTo.setText(sDstDir + sDstFile);
-    main.panelMng.setWindowsVisible(windConfirmCopy, posWindConfirmCopy);
+    main.gralMng.setWindowsVisible(windConfirmCopy, posWindConfirmCopy);
 
   }
   
   
   
   GralUserAction actionConfirmCopy = new GralUserAction()
-  { @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
-    { if(infos.sCmd.equals("ok")){
-        stop();
+  { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
+    { if(key == KeyCode.mouse1Up){
+        if(widgg.sCmd.equals("ok")){
+          GralButton widgButton = (GralButton)widgg;
+          widgButton.setText("stop");
+          //widgg.setValue(GralPanelMngWorking_ifc.cmdSet, 0, "stop");
+          stop();
+        } else if(widgg.sCmd.equals("esc")){
+          main.gralMng.setWindowsVisible(windConfirmCopy, null); //set it invisible.
+        }
       }
-      main.panelMng.setWindowsVisible(windConfirmCopy, null); //set it invisible.
       return true;
     }
   };

@@ -2,7 +2,7 @@ package org.vishia.commander;
 
 import java.io.File;
 
-import org.vishia.commander.FavoritePathSelector.SelectTabList;
+import org.vishia.commander.FcmdFavorPathSelector.SelectTabList;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.widget.FileSelector;
@@ -17,7 +17,7 @@ import org.vishia.util.KeyCode;
 public class FcmdFileTable extends FileSelector
 {
   /**Table widget for the select table of the file tab.*/
-  FavoritePathSelector.SelectTabList selectTableForTab;
+  FcmdFavorPathSelector.SelectTabList selectTableForTab;
 
   final JavaCmd main;
   
@@ -36,15 +36,15 @@ public class FcmdFileTable extends FileSelector
    * @param label The label of the tab, it builds the name of all widgets.
    */
   FcmdFileTable(LeftMidRightPanel mainPanelP, String label){
-    super(WidgetNames.tableFile + label, (GralWidgetMng)mainPanelP.main.panelMng);
+    super(WidgetNames.tableFile + label, (GralWidgetMng)mainPanelP.main.gralMng);
     this.main = mainPanelP.main;
     this.mainPanel = mainPanelP;
     this.labelTab = label;
     main.idxFileSelector.put(this.name, this); //it is WidgetNames.tableFile + label, see super(...) 
-    GralWidgetMng mng = main.panelMng;
+    GralWidgetMng mng = main.gralMng;
     ///
     ///
-    selectTableForTab = main.selectTab.new SelectTabList(WidgetNames.tableFavorites + label, mainPanel, mng);
+    selectTableForTab = main.favorPathSelector.new SelectTabList(WidgetNames.tableFavorites + label, mainPanel, mng);
     mainPanel.tabbedPanelSelectionTabs.addGridPanel(WidgetNames.tabFavorites + label, label,1,1,10,10);
     mng.setPosition(2, 0, 0, -0, 1, 'd');  ///p
     selectTableForTab.setToPanel(mng, label+"l", 5, mainPanel.widthSelecttable, 'A');
@@ -69,13 +69,13 @@ public class FcmdFileTable extends FileSelector
     default: ret = false;
     }
     if (keyCode ==main.keyActions.keyCreateFavorite){
-      main.selectTab.windAddFavorite.panelInvocation = mainPanel;
-      main.selectTab.windAddFavorite.widgTab.setText(labelTab);
-      main.selectTab.windAddFavorite.widgShortName.setText("alias");
+      main.favorPathSelector.windAddFavorite.panelInvocation = mainPanel;
+      main.favorPathSelector.windAddFavorite.widgTab.setText(labelTab);
+      main.favorPathSelector.windAddFavorite.widgShortName.setText("alias");
       File lastSelectedFile = getSelectedFile();
       String pathDir = FileSystem.getCanonicalPath(lastSelectedFile.getParentFile());
-      main.selectTab.windAddFavorite.widgPath.setText(pathDir);
-      main.selectTab.windAddFavorite.window.setWindowVisible(true);
+      main.favorPathSelector.windAddFavorite.widgPath.setText(pathDir);
+      main.favorPathSelector.windAddFavorite.window.setWindowVisible(true);
     }
     return ret;
   }

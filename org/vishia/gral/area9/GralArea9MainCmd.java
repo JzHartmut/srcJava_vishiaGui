@@ -58,7 +58,7 @@ public class GralArea9MainCmd extends MainCmd
     
     GralWindow primaryWindow = cargs.graphicFactory.createWindow(getLogMessageOutputConsole(), sTitle, 50,50,800, 600);
     gui = new GralArea9Window(this, primaryWindow);
-    gui.initOutputArea(sOutputArea);
+    gui.initGraphic(sOutputArea);
     gralMng = gui.getGralMng();
     if(sArgError !=null){
       writeError(sArgError);

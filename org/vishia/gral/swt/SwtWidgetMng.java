@@ -136,6 +136,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	/**Version, able to read as hex yyyymmdd.
 	 * Changes:
 	 * <ul>
+	 * <li>2011-11-12 Hartmut chg: {@link #calcPositionOfWindow(GralGridPos)} improved
 	 * <li>2011-08-13 Hartmut chg: New routines for store and calculate the position to regard large widgets.
 	 * <li>2011-06-17 Hartmut getValueFromWidget(): Table returns the whole selected line, cells separated with tab.
 	 *     The String-return.split("\t") separates the result to the cell values.
@@ -146,7 +147,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	 * <li>2010-12-02 Hartmut: Up to now this version variable, its description contains the version history.
 	 * </ul>
 	 */
-	public final static int version = 0x20110617;
+	public final static int version = 0x20111112;
 
 	/**The GUI may be determined by a external user file. Not all planned fields, buttons etc. 
    * may be placed in the GUI, a user can desire about the elements. 
@@ -384,9 +385,10 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   {
     SwtGraphicThread swtDevice = (SwtGraphicThread)gralDevice;
     SwtSubWindow window = new SwtSubWindow(name, swtDevice.displaySwt, title, exclusive, this);
-    window.posWindow = getPositionInPanel();
-    GralRectangle rect = calcPositionOfWindow(window.posWindow);
+    GralRectangle rect = calcPositionOfWindow(window.pos);
     window.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
+    //window.window.redraw();
+    //window.window.update();
     this.pos.panel = window; //it is selected.
     
     //this.pos.set(0,0,0,0,'r');
@@ -415,21 +417,53 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   
   
+  /**Calculates the position as absolute value on screen from a given position inside a panel.
+   * @param posWindow contains any {@link GralGridPos#panel}. Its absolute position will be determined.
+   *   from that position and size the absolute postion will be calculate, with this given grid positions
+   *   inside the panel. 
+   * @return Absolute pixel coordinate.
+   */
   GralRectangle calcPositionOfWindow(GralGridPos posWindow)
   {
-    Control panel = (Control)pos.panel.getPanelImpl();
+    Control parentFrame = (Control)posWindow.panel.getPanelImpl();
     Point loc;
-    Rectangle rectParent  = panel.getBounds();
-    loc = panel.getLocation();
-    final GralRectangle rectangle = calcWidgetPosAndSize(posWindow, rectParent.width, rectParent.height, 400, 300);
+    Shell window = parentFrame.getShell();
+    GralRectangle windowFrame = getPixelUseableAreaOfWindow(posWindow.panel);
+    int dxFrame, dyFrame;  //need if posWindow has coordinates from right or in percent
+    Rectangle rectParent;
+    if(parentFrame == window){
+      dxFrame = windowFrame.dx; dyFrame = windowFrame.dy;
+    } else {
+      rectParent = parentFrame.getBounds();
+      dxFrame = rectParent.width; dyFrame = rectParent.height;
+    }
+    final GralRectangle rectangle = calcWidgetPosAndSize(posWindow, dxFrame, dyFrame, 400, 300);
+    rectangle.x += windowFrame.x;
+    rectangle.y += windowFrame.y;
+    
+    //
+    while ( parentFrame != window){ //The Shell is the last parentFrame
+      //the bounds are relative to its container. Get all parent container and add all positions
+      //until the shell is reached.
+      rectParent = parentFrame.getBounds();
+      rectangle.x += rectParent.x;
+      rectangle.y += rectParent.y;
+      parentFrame = parentFrame.getParent();
+    }
+    return rectangle;
+ 
+    /*
+    Rectangle rectParent  = parentFrame instanceof Shell ? ((Shell)parentFrame).getClientArea() 
+                          : parentFrame.getBounds();
+    //loc = panel.getLocation();
     int xPos = rectParent.x, yPos = rectParent.y;
-    while( (panel = panel.getParent()) !=null){
-      rectParent = panel.getBounds();
-      loc = panel.getLocation();
+    while( (parentFrame = parentFrame.getParent()) !=null){
+      rectParent = parentFrame.getBounds();
+      loc = parentFrame.getLocation();
       xPos += rectParent.x;
       yPos += rectParent.y;
-      if(panel instanceof Shell){
-        Shell shell = (Shell)panel;
+      if(parentFrame instanceof Shell){
+        Shell shell = (Shell)parentFrame;
         Rectangle rectArea = shell.getClientArea(); //size of client area
         Menu menu = shell.getMenuBar();
         //Point sizeArea = shell.getSize();
@@ -445,11 +479,32 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     rectangle.x += xPos;
     rectangle.y += yPos;
     return rectangle;
+    */
   }
   
   
   
-  
+  GralRectangle getPixelUseableAreaOfWindow(GralWidget widgg)
+  { Object oControl = widgg.getWidgetImplementation();
+    Control control = (Control)oControl;
+    Shell window = control.getShell();
+    Rectangle rectWindow = window.getBounds();
+    Rectangle rectWindowArea = window.getClientArea();  //it is inclusive the menu bar.
+    //Problem: the x and y of client are are 0, it may bettet that they are the left top corner
+    //inside the shell window.
+    //assume that the client area is on bottom of the shell. Calculate top position:
+    int dxBorder = rectWindow.width - rectWindowArea.width;
+    int xPos = rectWindow.x + dxBorder/2;
+    int dyTitleMenu = (rectWindow.height - rectWindowArea.height) - dxBorder;  //border and title bar
+    Menu menu = window.getMenuBar();
+    if(menu !=null){
+      //assume that the menu has the same hight as title bar, there is not a way to determine it else
+      dyTitleMenu *=2;  
+    }
+    int yPos = rectWindow.y + dxBorder/2 + dyTitleMenu;
+    GralRectangle ret = new GralRectangle(xPos, yPos, rectWindowArea.width, rectWindowArea.height - dyTitleMenu);
+    return ret;
+  }
   
   
   
@@ -483,12 +538,15 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     Control parentComp = component.getParent();
     //Rectangle pos;
     final GralRectangle rectangle;
+    final Rectangle parentSize;
     if(parentComp == null){
-      rectangle = calcWidgetPosAndSize(pos, 800, 600, widthwidgetNat, heigthWidgetNat);
+      parentSize = new Rectangle(0,0,800, 600);
+    } else if(parentComp instanceof Shell) {
+      parentSize = ((Shell)parentComp).getClientArea();
     } else {
-      final Point parentSize = parentComp.getSize();
-      rectangle = calcWidgetPosAndSize(pos, parentSize.x, parentSize.y, widthwidgetNat, heigthWidgetNat);
+      parentSize = parentComp.getBounds();
     }
+    rectangle = calcWidgetPosAndSize(pos, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
     component.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
     posUsed = true;
        

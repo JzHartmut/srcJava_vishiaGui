@@ -46,7 +46,7 @@ public class InspcGui //extends GuiCfg
     GralPlugUser_ifc user = guiCfg.getPluggedUser(); 
     assert(user instanceof InspcPlugUser_ifc);
     
-    this.inspcComm = new InspcGuiComm(guiCfg.console, guiCfg.panelMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
+    this.inspcComm = new InspcGuiComm(guiCfg.console, guiCfg.gralMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
     //inspcComm.addPanel(panelContent);
 
   }
@@ -134,8 +134,8 @@ private class InspcGuiCfg extends GuiCfg
     gui.setFrameAreaBorders(20, 80, 60, 85);
     gui.setStandardMenusGThread(new File("."), actionFile);
     super.initMenuGralDesigner();
-    panelMng.selectPanel("primaryWindow");
-    mainTabPanel = panelMng.addTabbedPanel("mainTab", null, 0);
+    gralMng.selectPanel("primaryWindow");
+    mainTabPanel = gralMng.addTabbedPanel("mainTab", null, 0);
     gui.addFrameArea(1,1,3,2, mainTabPanel); //dialogPanel);
    
     Appendable out = gui.getOutputBox();

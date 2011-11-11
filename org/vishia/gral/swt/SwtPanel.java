@@ -3,6 +3,7 @@ package org.vishia.gral.swt;
 
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
@@ -10,6 +11,7 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWidget;
 
 public class SwtPanel extends GralPanelContent
@@ -64,6 +66,13 @@ public class SwtPanel extends GralPanelContent
   
   @Override public void redraw(){  ((Control)panelComposite).redraw(); }
 
+  
+  @Override public GralRectangle getPixelPositionSize(){
+    Rectangle r = ((Control)panelComposite).getBounds();
+    GralRectangle posSize = new GralRectangle(r.x, r.y, r.width, r.height);
+    return posSize;
+  }
+
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
   { ((Composite)panelComposite).setBounds(x,y,dx,dy);
@@ -94,5 +103,7 @@ public class SwtPanel extends GralPanelContent
   };
 
 
-
+  
+  
+  
 }

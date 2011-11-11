@@ -145,7 +145,7 @@ public class SwtTable extends GralTable
     Composite parent = (Composite)mng.pos.panel.getPanelImpl();
     table = new SwtTable(mng, sName, parent, height, columnWidths); //, selectionColumn, selectionText);
     //GralWidget widgd = new GralWidget(sName, table, 'L', sName, null);
-    table.setContentInfo(sName);
+    table.setDataPath(sName);
     table.setPanelMng(mng);
     table.table.setData(table);
     mng.registerWidget(table);

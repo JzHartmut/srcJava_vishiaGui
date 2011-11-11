@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -12,6 +13,7 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralTextBox_ifc;
 
 public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, Appendable
@@ -28,6 +30,9 @@ public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, A
     panelComposite = textAreaOutput.textFieldSwt;  //it is a control,    
   }
 
+  
+  
+  
   @Override
   public GralColor setBackgroundColor(GralColor color)
   { return textAreaOutput.setBackgroundColor(color);
@@ -82,6 +87,12 @@ public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, A
   }
   
   @Override public Control getPanelImpl() { return (Control)panelComposite; }
+
+  @Override public GralRectangle getPixelPositionSize(){
+    Rectangle r = ((Control)panelComposite).getBounds();
+    GralRectangle posSize = new GralRectangle(r.x, r.y, r.width, r.height);
+    return posSize;
+  }
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
   { ((Control)panelComposite).setBounds(x,y,dx,dy);

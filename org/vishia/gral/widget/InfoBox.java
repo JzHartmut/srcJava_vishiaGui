@@ -39,9 +39,10 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   public static InfoBox create(GralGridBuild_ifc mng, String name, String title)
   {
     GralWindow window = mng.createWindow(name, title, false);
-    mng.setPosition(0, -4, 0, 0, 0, '.');
+    //TODO the position frame (size) regards the title bar, it should not do so!
+    mng.setPosition(0, -3, 0, 0, 0, '.');
     GralTextBox text = mng.addTextBox(name, false, null, '.');
-    mng.setPosition(-4, -1, -6, 0, 0, '.');
+    mng.setPosition(-3, 0, -6, 0, 0, '.');
     GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "", null, null, "OK");
     InfoBox box = new InfoBox(window, text, buttonOk);
     box.buttonOk.setActionChange(box.actionOk);
@@ -147,6 +148,7 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   
   GralUserAction actionOk = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
+      textBox.setText("");  //'I have seen it, therefore delete.
       window.setWindowVisible(false);
       return true;
     }

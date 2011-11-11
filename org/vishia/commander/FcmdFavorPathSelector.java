@@ -22,10 +22,11 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.FileSelector;
 import org.vishia.gral.widget.SelectList;
 import org.vishia.mainCmd.MainCmd_ifc;
+import org.vishia.util.FileWriter;
 import org.vishia.util.KeyCode;
 
 /**This class implements the selection functionality of tabs and paths for the whole Java commander. */
-class FavoritePathSelector
+class FcmdFavorPathSelector
 {
 
   /**Entry in the favorite list. */
@@ -41,6 +42,9 @@ class FavoritePathSelector
   }
   
   File fileCfg;
+  
+  /**Instance to write the cfgFile. */
+  FileWriter writerCfg = new FileWriter();
   
   /**The three tabbed panels. */
   final LeftMidRightPanel panelLeft, panelMid, panelRight;
@@ -77,10 +81,10 @@ class FavoritePathSelector
   
   WindowConfirmAddFavorite windAddFavorite = new WindowConfirmAddFavorite();
   
-  FavoritePathSelector(MainCmd_ifc console, JavaCmd main)
+  FcmdFavorPathSelector(MainCmd_ifc console, JavaCmd main)
   { this.main = main;
     this.console = console;
-    this.mng = main.panelMng;
+    this.mng = main.gralMng;
     panelLeft = new LeftMidRightPanel(main, 'l', '1', this, mng); 
     panelMid = new LeftMidRightPanel(main, 'm','2',  this, mng); 
     panelRight = new LeftMidRightPanel(main,'r', '3',  this, mng);
@@ -95,23 +99,23 @@ class FavoritePathSelector
    * whenever it is used.  */
   void buildWindowAddFavorite()
   {
-    main.panelMng.selectPanel("primaryWindow"); //"output"); //position relative to the output panel
+    main.gralMng.selectPanel("primaryWindow"); //"output"); //position relative to the output panel
     //panelMng.setPosition(1, 30+GralGridPos.size, 1, 40+GralGridPos.size, 1, 'r');
-    main.panelMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
+    main.gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
     
 
-    windAddFavorite.window = main.panelMng.createWindow("addFavoriteWindow", "add favorite", false);
+    windAddFavorite.window = main.gralMng.createWindow("addFavoriteWindow", "add favorite", false);
     
-    main.panelMng.setPosition(4, GralGridPos.size -4, 1, GralGridPos.size +45, 0, 'd');
+    main.gralMng.setPosition(4, GralGridPos.size -4, 1, GralGridPos.size +45, 0, 'd');
     //main.panelMng.addText("Tab name:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    windAddFavorite.widgTab = main.panelMng.addTextField("addFavoriteTab", true, "file tab", 't');
-    windAddFavorite.widgShortName = main.panelMng.addTextField("addFavoriteAlias", true, "alias (show in list)", 't');
-    windAddFavorite.widgPath = main.panelMng.addTextField("addFavoritePath", true, "the directory path", 't');
+    windAddFavorite.widgTab = main.gralMng.addTextField("addFavoriteTab", true, "file tab", 't');
+    windAddFavorite.widgShortName = main.gralMng.addTextField("addFavoriteAlias", true, "alias (show in list)", 't');
+    windAddFavorite.widgPath = main.gralMng.addTextField("addFavoritePath", true, "the directory path", 't');
     
-    main.panelMng.setPosition(-6, -3, 1, 6, 0, 'r');
-    main.panelMng.addButton("addFavoriteEsc", actionAddFavorite, "esc", null, null, "esc");
-    main.panelMng.setPosition(-6, -3, -6, -1, 0, 'r');
-    main.panelMng.addButton("addFavoriteOk", actionAddFavorite, "ok", null, null, "OK");
+    main.gralMng.setPosition(-6, -3, 1, 6, 0, 'r');
+    main.gralMng.addButton("addFavoriteEsc", actionAddFavorite, "esc", null, null, "esc");
+    main.gralMng.setPosition(-6, -3, -6, -1, 0, 'r');
+    main.gralMng.addButton("addFavoriteOk", actionAddFavorite, "ok", null, null, "OK");
   
   }
   
@@ -192,9 +196,55 @@ class FavoritePathSelector
    * @param cfgFile
    * @return an error message to output or null
    */
-  String writeCfg(File cfgFile)
+  void writeCfg(File cfgFile)
+  { boolean bOk = true;
+    if(cfgFile.exists()){
+      
+      String sName = cfgFile.getName() + ".old";
+      File cfgFileOld = new File(cfgFile.getParentFile(), sName);
+      if(cfgFileOld.exists()){
+        bOk = cfgFileOld.delete();
+        if(!bOk){
+          main.mainCmd.writeError("can't delete " + cfgFileOld.getAbsolutePath());
+        }
+      }
+      if(bOk){
+        bOk = cfgFile.renameTo(cfgFileOld);
+        if(!bOk){
+          main.mainCmd.writeError("can't rename " + cfgFile.getAbsolutePath());
+        }
+      }
+    }
+    if(bOk){
+      bOk = writerCfg.open(cfgFile.getAbsolutePath(), false) ==0;
+    }
+    if(bOk){
+      try{
+        writerCfg.append("==all==\n");
+        for(SelectInfo entry: selectAll){ writeCfgLine(entry); }
+        writerCfg.append("==left==\n");
+        for(SelectInfo entry: panelLeft.selectListAllFavorites){ writeCfgLine(entry); }
+        writerCfg.append("==mid==\n");
+        for(SelectInfo entry: panelMid.selectListAllFavorites){ writeCfgLine(entry); }
+        writerCfg.append("==right==\n");
+        for(SelectInfo entry: panelRight.selectListAllFavorites){ writeCfgLine(entry); }
+      }
+      catch(IOException exc){
+        main.mainCmd.writeError("error writing" , exc);
+      }
+    }
+    writerCfg.close();
+  }
+  
+  
+  
+  private void writeCfgLine(SelectInfo info) throws IOException
   {
-    return "not ready yet.";
+    writerCfg.append(info.selectName).append(", ").append(info.path);
+    if(info.tabName[0] !=null){ writerCfg.append(", l:").append(info.tabName[0]); }
+    if(info.tabName[1] !=null){ writerCfg.append(", m:").append(info.tabName[1]); }
+    if(info.tabName[2] !=null){ writerCfg.append(", r:").append(info.tabName[2]); }
+    writerCfg.append("\n");
   }
   
   
@@ -212,7 +262,7 @@ class FavoritePathSelector
   /**Builds a tab for file or command view from a selected line of selection.
    * @param info The selection info
    */
-  void buildTabFromSelection(FavoritePathSelector.SelectInfo info, GralTabbedPanel tabPanel)
+  void buildTabFromSelection(FcmdFavorPathSelector.SelectInfo info, GralTabbedPanel tabPanel)
   { assert(false);
     /*
     tabPanel.addGridPanel(info.tabName1, info.tabName1,1,1,10,10);
@@ -316,7 +366,7 @@ class FavoritePathSelector
         if(infos.sCmd.equals("ok")){
           //GralTableLine_ifc selectedLine = windAddFavorite.panelInvocation.selectTable.wdgdTable.getCurrentLine();
           SelectInfo selectInfo = actSelectInfo; //(SelectInfo)selectedLine.getUserData();
-          List<FavoritePathSelector.SelectInfo> listAdd = windAddFavorite.panelInvocation.selectListAllFavorites;
+          List<FcmdFavorPathSelector.SelectInfo> listAdd = windAddFavorite.panelInvocation.selectListAllFavorites;
           int posInList = listAdd.indexOf(selectInfo);
           if(posInList == -1){
             //maybe selected one entry from the tab-special list or one entry of the common list.
@@ -338,12 +388,20 @@ class FavoritePathSelector
             windAddFavorite.panelInvocation.fillInAllTables('.'); //windAddFavorite.panelInvocation.cc);
           }
         }
-        main.panelMng.setWindowsVisible(windAddFavorite.window, null); //set it invisible.
+        main.gralMng.setWindowsVisible(windAddFavorite.window, null); //set it invisible.
       }
       return true;
     }
   };
 
+  
+
+  
+  GralUserAction actionSaveFavoritePathes = new GralUserAction()
+  { @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
+    { writeCfg(fileCfg);
+      return true;
+  } };
   
   
   /**This is the list-panel which allows to select all opened tabs, all directories or other entries.  

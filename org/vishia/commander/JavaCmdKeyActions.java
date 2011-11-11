@@ -67,8 +67,8 @@ public class JavaCmdKeyActions
           if(     keyCode == keyEdit){ main.actionEdit.userActionGui(sIntension, widgd, params); }
           else if(keyCode == keyCopy){ main.actionCopy.userActionGui(sIntension, widgd, params); }
           //navigation
-          else if(keyCode == keyOriginDir){ main.selectTab.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }
-          else if(keyCode == KeyCode.enter){ main.selectTab.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }
+          else if(keyCode == keyOriginDir){ main.favorPathSelector.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }
+          else if(keyCode == KeyCode.enter){ main.favorPathSelector.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }
           else if(keyCode == keyWindFullOut){ main.windMng.actionWindFullOut.userActionGui(sIntension, widgd, params); }
           else { done = false; }
         }

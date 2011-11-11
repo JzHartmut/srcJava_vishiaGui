@@ -56,6 +56,8 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc
 {
   /**Version history:
    * <ul>
+   * <li>2011-11-12 Hartmut chg: {@link #initGraphic(String)} instead initOutputArea().
+   * <li>2011-11-12 Hartmut new: {@link #getActionAbout()} and {@link #getActionAbout()} to support menu setting by user
    * <li>2011-08-06 Hartmut chg: This interface is based on MainCmd_ifc. It is a non-side-effect change
    *   because the implementation classes {@link MainCmdSwt} and maybe the adequate Swing class base on {@link MainCmd}.
    *   Using this change only this interface is necessary for applications to use {@link MainCmdSwt} or adequate Swing 
@@ -70,9 +72,22 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc
   final static int version = 0x20110806;
 
   
-  /**Initializes the output window to a defined area.
-   * This method can be invoked after construction immediately.
-   * @param area Two letter combination A1..C3 for horizontal and vertical area. 
+  /**Initializes the graphic of the Area9-Window. It sets the Output window to a defined area
+   * and creates Windows for Help, About and InfoBoxes.
+   * This method can be invoked after construction immediately in any thread. 
+   * <br><br>
+   * In the implementation class {@link org.vishia.gral.area9.GralArea9Window}
+   * the working is done in the graphic thread. The caller thread waits for success in this method.
+   * The following actions are done:
+   * <ul>
+   * <li>Creation of all sub windows for InfoBox, InfoLog, Help and About.
+   * <li>Creation of the output Area.
+   * <li>
+   * <li>Adding the {@link org.vishia.gral.ifc.GralDispatchCallbackWorker}
+   *   {@link org.vishia.gral.area9.GralArea9Window#writeOutputTextDirectly} which transfers
+   *   text lines stored in {@link org.vishia.gral.area9.GralArea9Window#outputTexts} to the output area.
+   * </ul>
+   * @param outputArea Two letter combination A1..C3 for horizontal and vertical area. 
    *        A..C is left to right, 1..3 is top to bottom.
    *        The first combination is the top left area for output, 
    *        the second combination is the bottom right area. 
@@ -80,7 +95,7 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc
    *        For example "A3C3" means that the output area uses the full bottom part of window.
    *        For example "B2C3" means an area consist of 4 basic areas right bottom.  
    */
-  void initOutputArea(String area);
+  void initGraphic(String outputArea);
 
   
   /**Returns the outputArea, which was created by the graphic thread. 
@@ -129,5 +144,16 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc
   
   
   GralWidgetMng getGralMng();
+  
+  /**Returns the prepared action help which opens the help window.
+   * It should be used for the users call of {@link #addMenuItemGThread(String, String, GralUserAction) }
+   * to install the help menu.  */
+  GralUserAction getActionHelp();
+  
+  /**Returns the prepared action about which opens the help window.
+   * It should be used for the users call of {@link #addMenuItemGThread(String, String, GralUserAction) }
+   * to install the help menu.  */
+  GralUserAction getActionAbout();
+  
   
 }

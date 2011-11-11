@@ -34,9 +34,6 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   /** The frame of the Window in the GUI (Graphical Unit Interface)*/
   //protected Shell graphicFrame;
 
-  /**The file menuBar is extendable. */
-  private Menu menuBar;
-  
   /** */
   final SwtGraphicThread graphicThreadSwt;
   
@@ -63,22 +60,22 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   
   
   public static SwtPrimaryWindow create(LogMessage log, String sTitle, int left, int top, int xSize, int ySize)
-  { SwtGraphicThread init = new SwtGraphicThread(sTitle, left, top, xSize, ySize);
+  { SwtGraphicThread graphicThread = new SwtGraphicThread(sTitle, left, top, xSize, ySize);
     //GuiThread graphicThread = startGraphicThread(init);  
 
-    synchronized(init){
-      while(init.guiThreadId == 0){
-        try{ init.wait(1000);} catch(InterruptedException exc){}
+    synchronized(graphicThread){
+      while(graphicThread.guiThreadId == 0){
+        try{ graphicThread.wait(1000);} catch(InterruptedException exc){}
       }
     }
     //The propertiesGuiSwt needs the Display instance for Font and Color. Therefore the graphic thread with creation of Display should be executed before. 
-    SwtProperties propertiesGui = new SwtProperties(init.displaySwt, 'C');
+    SwtProperties propertiesGui = new SwtProperties(graphicThread.displaySwt, 'C');
     GralWidgetMng gralMng = new SwtWidgetMng(propertiesGui, null, log);
     
     //The PrimaryWindowSwt is a derivation of the GralPrimaryWindow. It is more as only a SWT Shell.
-    SwtPrimaryWindow instance = new SwtPrimaryWindow(gralMng, init, init.displaySwt);
-    instance.panelComposite = init; //window.sTitle, window.xPos, window.yPos, window.xSize, window.ySize);
-    gralMng.setGralDevice(init);
+    SwtPrimaryWindow instance = new SwtPrimaryWindow(gralMng, graphicThread, graphicThread.displaySwt);
+    instance.panelComposite = graphicThread.windowSwt; //window.sTitle, window.xPos, window.yPos, window.xSize, window.ySize);
+    gralMng.setGralDevice(graphicThread);
     gralMng.registerPanel(instance);
     
     //init.setWindow(instance);  //now the initializing of the window occurs.
@@ -230,20 +227,11 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   }
 
 
-  @Override public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction action)
-  {
-    addMenuItemGThread(nameWidg, sMenuPath, action, this.new ActionUserMenuItem(action));
-  }
-  
-  
-  /**Adds a menu item with a SWT-specific {@link SelectionListener}. This method can be invoked
-   * from any derived SWT-specific class. {@link MainCmdSwt} do so. 
-   * @param namePath
-   * @param action
-   */
-  protected void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction gralAction, SelectionListener action)
-  {
+  @Override public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction gralAction)
+  { SelectionListener action = this.new ActionUserMenuItem(gralAction);
     String[] names = sMenuPath.split("/");
+    /**The file menuBar is extendable. */
+    Menu menuBar = graphicThreadSwt.windowSwt.getMenuBar();
     if(menuBar == null){
       menuBar = new Menu(graphicThreadSwt.windowSwt, SWT.BAR);
       graphicThreadSwt.windowSwt.setMenuBar(menuBar);
@@ -353,7 +341,6 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   {
     graphicThreadSwt.windowSwt.dispose();
     graphicThreadSwt.windowSwt = null;
-    menuBar = null;
   }
 
 

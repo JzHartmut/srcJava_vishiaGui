@@ -1,6 +1,7 @@
 package org.vishia.commander;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -48,11 +49,11 @@ public class JavaCmd extends GuiCfg
 
   final CmdQueue cmdQueue = new CmdQueue(mainCmd);
 
-  final FavoritePathSelector selectTab = new FavoritePathSelector(mainCmd, this);
+  final FcmdFavorPathSelector favorPathSelector = new FcmdFavorPathSelector(mainCmd, this);
 
   final Executer executer = new Executer(mainCmd, this);
 
-  final CommandSelector cmdSelector = new CommandSelector("cmdSelector", cmdQueue, panelMng);
+  final CommandSelector cmdSelector = new CommandSelector("cmdSelector", cmdQueue, gralMng);
 
   final CopyCmd copyCmd = new CopyCmd(this);
 
@@ -91,95 +92,100 @@ public class JavaCmd extends GuiCfg
 
     gui.setFrameAreaBorders(30, 65, 70, 85); // x1, x2, y1, y2
     gui.setStandardMenusGThread(new File("."), actionFile);
+    gui.addMenuItemGThread("MenuSaveFavoriteSel", "&File/Save favorites &Pathes", favorPathSelector.actionSaveFavoritePathes); // /
     gui.addMenuItemGThread("MenuSetWorkingDir", "&Command/Set&WorkingDir", actionSetCmdWorkingDir); // /
     gui.addMenuItemGThread("MenuCommandAbort", "&Command/&Abort", executer.actionCmdAbort); // /
     // gui.addMenuItemGThread("&Command/E&xecute", actionSetCmdCurrentDir); ///
     gui.addMenuItemGThread("MenuCmdCfgSet", "&Command/CmdCf&gFile/&Set", actionSetCmdCfg); // /
     gui.addMenuItemGThread("MenuCmdCfgCheck", "&Command/CmdCf&gFile/&Check", actionSetCmdCfg); // /
+
     this.windMng.initMenuWindMng();
     // gui.set
 
     // Creates tab-Panels for the file lists and command lists.
-    panelMng.selectPanel("primaryWindow");
-    selectTab.panelLeft.tabbedPanelFileTabs = panelMng.addTabbedPanel("File0Tab", null, GralGridBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(1, 1, 1, 1, selectTab.panelLeft.tabbedPanelFileTabs); // dialogPanel);
+    gralMng.selectPanel("primaryWindow");
+    favorPathSelector.panelLeft.tabbedPanelFileTabs = gralMng.addTabbedPanel("File0Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    gui.addFrameArea(1, 1, 1, 1, favorPathSelector.panelLeft.tabbedPanelFileTabs); // dialogPanel);
 
-    selectTab.panelLeft.buildInitialTabs('l');
-    panelMng.selectPanel("primaryWindow");
-    selectTab.panelMid.tabbedPanelFileTabs = panelMng.addTabbedPanel("File1Tab", null, GralGridBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(2, 1, 1, 1, selectTab.panelMid.tabbedPanelFileTabs); // dialogPanel);
-    selectTab.panelMid.buildInitialTabs('m');
+    favorPathSelector.panelLeft.buildInitialTabs('l');
+    gralMng.selectPanel("primaryWindow");
+    favorPathSelector.panelMid.tabbedPanelFileTabs = gralMng.addTabbedPanel("File1Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    gui.addFrameArea(2, 1, 1, 1, favorPathSelector.panelMid.tabbedPanelFileTabs); // dialogPanel);
+    favorPathSelector.panelMid.buildInitialTabs('m');
 
-    panelMng.selectPanel("primaryWindow");
-    selectTab.panelRight.tabbedPanelFileTabs = panelMng.addTabbedPanel("File2Tab", null, GralGridBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(3, 1, 1, 1, selectTab.panelRight.tabbedPanelFileTabs); // dialogPanel);
-    selectTab.panelRight.buildInitialTabs('r');
+    gralMng.selectPanel("primaryWindow");
+    favorPathSelector.panelRight.tabbedPanelFileTabs = gralMng.addTabbedPanel("File2Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    gui.addFrameArea(3, 1, 1, 1, favorPathSelector.panelRight.tabbedPanelFileTabs); // dialogPanel);
+    favorPathSelector.panelRight.buildInitialTabs('r');
 
-    panelMng.selectPanel("primaryWindow");
-    panelButtons = panelMng.createGridPanel("Buttons", panelMng.getColor("gr"),
+    gralMng.selectPanel("primaryWindow");
+    panelButtons = gralMng.createGridPanel("Buttons", gralMng.getColor("gr"),
         1, 1, 10, 10);
     gui.addFrameArea(1, 3, 3, 1, panelButtons); // dialogPanel);
     initPanelButtons();
 
     copyCmd.buildWindowConfirmCopy();
-    selectTab.buildWindowAddFavorite();
+    favorPathSelector.buildWindowAddFavorite();
+    gui.addMenuItemGThread("menuHelp", "&Help/&Help", gui.getActionHelp());
+    gui.addMenuItemGThread("menuAbout", "&Help/&About", gui.getActionAbout());
+    gui.addMenuItemGThread("MenuTestInfo", "&Help/&Infobox", actionTest); // /
   }
 
   private void initPanelButtons()
   {
-    panelMng.selectPanel("Buttons");
-    panelMng.setPosition(0, 1, 10, 20, 1, 'r');
-    panelMng.addText("F1", 'A', 0x0);
-    panelMng.addText("F2", 'A', 0x0);
-    panelMng.addText("F3", 'A', 0x0);
-    panelMng.addText("F4", 'A', 0x0);
-    panelMng.addText("F5", 'A', 0x0);
-    panelMng.addText("F6", 'A', 0x0);
-    panelMng.addText("F7", 'A', 0x0);
-    panelMng.addText("F8", 'A', 0x0);
-    panelMng.addText("F9", 'A', 0x0);
-    panelMng.addText("F10", 'A', 0x0);
-    panelMng.setPosition(3, 5, 0, 4, 1, 'd');
-    panelMng.addText("alt", 'A', 0x0);
-    panelMng.addText("ctr", 'A', 0x0);
-    panelMng.addText("sh", 'A', 0x0);
+    gralMng.selectPanel("Buttons");
+    gralMng.setPosition(0, 1, 10, 20, 1, 'r');
+    gralMng.addText("F1", 'A', 0x0);
+    gralMng.addText("F2", 'A', 0x0);
+    gralMng.addText("F3", 'A', 0x0);
+    gralMng.addText("F4", 'A', 0x0);
+    gralMng.addText("F5", 'A', 0x0);
+    gralMng.addText("F6", 'A', 0x0);
+    gralMng.addText("F7", 'A', 0x0);
+    gralMng.addText("F8", 'A', 0x0);
+    gralMng.addText("F9", 'A', 0x0);
+    gralMng.addText("F10", 'A', 0x0);
+    gralMng.setPosition(3, 5, 0, 4, 1, 'd');
+    gralMng.addText("alt", 'A', 0x0);
+    gralMng.addText("ctr", 'A', 0x0);
+    gralMng.addText("sh", 'A', 0x0);
 
-    panelMng.setPosition(1, 3, 4, 14, 1, 'r');
-    panelMng.addButton("b-help", null, "help", null, null, "help");
-    panelMng.addButton("b-F2", null, "help", null, null, "F2");
-    panelMng.addButton("b-help", null, "help", null, null, "view");
-    panelMng.addButton("b-edit", actionEdit, "", null, null, "edit");
-    panelMng.addButton("b-copy", actionCopy, "", null, null, "copy");
-    panelMng.addButton("b-help", null, "help", null, null, "move");
-    panelMng.addButton("b-help", null, "help", null, null, "mkdir");
-    panelMng.addButton("b-help", null, "help", null, null, "del");
-    panelMng.addButton("b-help", null, "help", null, null, "cmd");
-    panelMng.addButton("b-help", null, "help", null, null, "F10");
-    panelMng.setPosition(3, 5, 4, 14, 1, 'r');
-    panelMng.addButton("selectLeft", selectPanelLeft, "selectLeft", null, null,
+    gralMng.setPosition(1, 3, 4, 14, 1, 'r');
+    gralMng.addButton("b-help", null, "help", null, null, "help");
+    gralMng.addButton("b-F2", null, "help", null, null, "F2");
+    gralMng.addButton("b-help", null, "help", null, null, "view");
+    gralMng.addButton("b-edit", actionEdit, "", null, null, "edit");
+    gralMng.addButton("b-copy", actionCopy, "", null, null, "copy");
+    gralMng.addButton("b-help", null, "help", null, null, "move");
+    gralMng.addButton("b-help", null, "help", null, null, "mkdir");
+    gralMng.addButton("b-help", null, "help", null, null, "del");
+    gralMng.addButton("b-help", null, "help", null, null, "cmd");
+    gralMng.addButton("b-help", null, "help", null, null, "F10");
+    gralMng.setPosition(3, 5, 4, 14, 1, 'r');
+    gralMng.addButton("selectLeft", selectPanelLeft, "selectLeft", null, null,
         "left");
-    panelMng.addButton("selectMiddle", selectPanelMiddle, "help", null, null,
+    gralMng.addButton("selectMiddle", selectPanelMiddle, "help", null, null,
         "middle");
-    panelMng
+    gralMng
         .addButton("selectRight", selectPanelRight, "", null, null, "right");
-    panelMng.addButton("selectCmd", selectPanelOut, "", null, null, "cmd");
-    panelMng.addButton("b-help", null, "help", null, null, "zip");
-    panelMng.addButton("b-help", null, "help", null, null, "link");
-    panelMng.addButton("b-help", null, "help", null, null, "find");
-    panelMng.addButton("b-help", null, "help", null, null, "a-F8");
-    panelMng.addButton("b-help", null, "help", null, null, "a-F9");
-    panelMng.addButton("b-help", null, "help", null, null, "a-F10");
-    panelMng.setPosition(5, 7, 4, 14, 1, 'r');
-    panelMng.addButton("b-help", null, "help", null, null, "brief");
-    panelMng.addButton("b-F2", null, "help", null, null, "full");
-    panelMng.addButton("b-help", null, "help", null, null, "name");
-    panelMng.addButton("b-help", null, "help", null, null, "ext");
-    panelMng.addButton("b-help", null, "help", null, null, "time");
-    panelMng.addButton("b-help", null, "help", null, null, "size");
-    panelMng.addButton("b-help", null, "help", null, null, "nat");
-    panelMng.addButton("b-help", null, "help", null, null, "tree");
-    panelMng.addButton("b-help", null, "help", null, null, "c-F9");
-    panelMng.addButton("b-help", null, "help", null, null, "c-F10");
+    gralMng.addButton("selectCmd", selectPanelOut, "", null, null, "cmd");
+    gralMng.addButton("b-help", null, "help", null, null, "zip");
+    gralMng.addButton("b-help", null, "help", null, null, "link");
+    gralMng.addButton("b-help", null, "help", null, null, "find");
+    gralMng.addButton("b-help", null, "help", null, null, "a-F8");
+    gralMng.addButton("b-help", null, "help", null, null, "a-F9");
+    gralMng.addButton("b-help", null, "help", null, null, "a-F10");
+    gralMng.setPosition(5, 7, 4, 14, 1, 'r');
+    gralMng.addButton("b-help", null, "help", null, null, "brief");
+    gralMng.addButton("b-F2", null, "help", null, null, "full");
+    gralMng.addButton("b-help", null, "help", null, null, "name");
+    gralMng.addButton("b-help", null, "help", null, null, "ext");
+    gralMng.addButton("b-help", null, "help", null, null, "time");
+    gralMng.addButton("b-help", null, "help", null, null, "size");
+    gralMng.addButton("b-help", null, "help", null, null, "nat");
+    gralMng.addButton("b-help", null, "help", null, null, "tree");
+    gralMng.addButton("b-help", null, "help", null, null, "c-F9");
+    gralMng.addButton("b-help", null, "help", null, null, "c-F10");
   }
 
   @Override
@@ -208,7 +214,7 @@ public class JavaCmd extends GuiCfg
         sError = buttonCmds.readCmdCfg(fileCfg = cargs.fileCfgButtonCmds);
       }
       if (sError == null) {
-        sError = selectTab.readCfg(fileCfg = cargs.fileSelectTabPaths);
+        sError = favorPathSelector.readCfg(fileCfg = cargs.fileSelectTabPaths);
       }
       if (sError != null) {
         mainCmd.writeError("Error reading " + fileCfg.getAbsolutePath() + ": "
@@ -243,7 +249,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      GralWidget widgdFocus = panelMng.getWidgetInFocus();
+      GralWidget widgdFocus = gralMng.getWidgetInFocus();
       FileSelector fileSel = idxFileSelector.get(widgdFocus.name);
       if (fileSel != null) { // is a FileSelector focused yet?
         // if(widgdFocus.name.startsWith("file")){
@@ -275,7 +281,7 @@ public class JavaCmd extends GuiCfg
   {
     File file[] = new File[3];
     int ixFile = 0;
-    List<GralWidget> widgdFocus = panelMng.getWidgetsInFocus();
+    List<GralWidget> widgdFocus = gralMng.getWidgetsInFocus();
     synchronized (widgdFocus) {
       Iterator<GralWidget> iterFocus = widgdFocus.iterator();
       while (ixFile < file.length && iterFocus.hasNext()) {
@@ -449,6 +455,23 @@ public class JavaCmd extends GuiCfg
    * key and switches to the concretely action for the pressed key. General keys
    * are [F1] for help, [F4] for edit etc.
    */
+  GralUserAction actionTest = new GralUserAction()
+  {
+    @Override
+    public boolean userActionGui(int key, GralWidget infos, Object... params)
+    {
+      try{ guiW.infoBox.append("Test\n"); }
+      catch(IOException exc){}
+      guiW.infoBox.setWindowVisible(true);
+      return true;
+    }
+  };
+
+  /**
+   * This action is invoked for all general key pressed actions. It tests the
+   * key and switches to the concretely action for the pressed key. General keys
+   * are [F1] for help, [F4] for edit etc.
+   */
   GralUserAction actionKey = new GralUserAction()
   {
     @Override
@@ -471,7 +494,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      selectTab.panelLeft.selectTableAll.setFocus();
+      favorPathSelector.panelLeft.selectTableAll.setFocus();
       return true;
     }
   };
@@ -486,7 +509,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      selectTab.panelMid.selectTableAll.setFocus();
+      favorPathSelector.panelMid.selectTableAll.setFocus();
       return true;
     }
   };
@@ -501,7 +524,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      selectTab.panelRight.selectTableAll.setFocus();
+      favorPathSelector.panelRight.selectTableAll.setFocus();
       return true;
     }
   };
@@ -518,7 +541,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      selectTab.panelMid.tabbedPanelFileTabs.getFocusedTab().setFocus();
+      favorPathSelector.panelMid.tabbedPanelFileTabs.getFocusedTab().setFocus();
       return true;
     }
   };

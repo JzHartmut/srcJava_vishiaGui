@@ -5,8 +5,12 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.gral.area9.MainCmd;
+import org.vishia.gral.area9.MainCmdSwing;
+import org.vishia.gral.area9.MainCmdSwt;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
 
@@ -14,6 +18,14 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 /**This class describes a panel with its content for managing. */
 public abstract class GralPanelContent extends GralWidget implements GralWidget_ifc
 {
+
+  /**Version history:
+   * <ul>
+   * <li>2011-11-12 Hartmut new: {@link #getPixelPositionSize()}.
+   * </ul>
+   * 
+   */
+  final static int version = 0x20111112;
 
   public final String namePanel;
 
@@ -85,6 +97,9 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
   }
   */
   
+	
+	public abstract   GralRectangle getPixelPositionSize();
+	
   public void removeWidget(GralWidget widg)
   {
     widgetList.remove(widg);

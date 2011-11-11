@@ -7,7 +7,8 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWindow_ifc;
 
 /**This class represents a sub window of an application.
- * 
+ * The {@link GralGridPos#pos} of the baseclass is the position of the window derived from any other 
+ * Position.
  * @author Hartmut Schorrig
  *
  */
@@ -15,7 +16,7 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
 {
   //GralPanelContent panelOfWindow;
   
-  public GralGridPos posWindow;
+  //public GralGridPos posWindow;
   
   /**See {@link GralWindow_ifc#setResizeAction(GralUserAction)}. */
   protected GralUserAction resizeAction;

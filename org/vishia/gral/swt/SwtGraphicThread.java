@@ -8,6 +8,7 @@ import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
@@ -115,6 +116,12 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
     //graphicFramePos.set(0,0,xSize,ySize);
     // main = this;
     windowSwt.setText(sTitle);
+    //
+    //set a menu bar anyway. Otherwise the calculation of used area of the window may be faulty
+    //if it is calculated first, and after them menu items are added.
+    //It isn't able to expected that the user won't have a menu bar in a primary window.
+    Menu menuBar = new Menu(windowSwt, SWT.BAR);
+    windowSwt.setMenuBar(menuBar);
     //graphicFrame.getContentPane().setLayout(new BorderLayout());
     //graphicFrame.addWindowListener(new WindowClosingAdapter(true));
     //graphicFrame.setSize( xSize, ySize );

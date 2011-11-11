@@ -24,11 +24,11 @@ public class LeftMidRightPanel
   GralTabbedPanel tabbedPanelSelectionTabs;
   
   /**All entries for the select list for all favorites in order of the file. */
-  List<FavoritePathSelector.SelectInfo> selectListAllFavorites = new LinkedList<FavoritePathSelector.SelectInfo>();
+  List<FcmdFavorPathSelector.SelectInfo> selectListAllFavorites = new LinkedList<FcmdFavorPathSelector.SelectInfo>();
 
 
   /**Table widget for the select table.*/
-  FavoritePathSelector.SelectTabList selectTableAll;
+  FcmdFavorPathSelector.SelectTabList selectTableAll;
 
 
   
@@ -52,7 +52,7 @@ public class LeftMidRightPanel
   final int[] widthSelecttable = new int[]{2, 20, 30};
 
   
-  LeftMidRightPanel(JavaCmd javaCmd, char cc, char cNr, FavoritePathSelector tabSelector, GralWidgetMng mng){
+  LeftMidRightPanel(JavaCmd javaCmd, char cc, char cNr, FcmdFavorPathSelector tabSelector, GralWidgetMng mng){
     this.main = javaCmd;
     this.cc = cc;
     this.cNr = cNr;
@@ -66,22 +66,22 @@ public class LeftMidRightPanel
    */
   void buildInitialTabs(char which)
   {
-    GralWidgetMng mng = main.panelMng;
+    GralWidgetMng mng = main.gralMng;
     String sName = "Sel" + cNr;
     //inside the left/mid/right tabbed panel: create the panel which contains a tabbed panel for selection
     String nameGridPanel = WidgetNames.tabFavoritesLeftMidRight + cNr;
     String tabLabelGridPanel = "a-F"+cNr;
-    mng.setPosition(2, 0, 0, 0, 1, 'd');
+    mng.setPosition(0, 0, 0, 0, 1, 'd');
     tabbedPanelFileTabs.addGridPanel(nameGridPanel, tabLabelGridPanel,1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd');
     //A tabbed panel inside the left, middle or right tab for selection.
     String nameTabPanel = WidgetNames.panelFavoritesLeftMidRight + cNr;
-    mng.setPosition(2, 0, 0, 0, 1, 'd');
+    mng.setPosition(0, 0, 0, 0, 1, 'd');
     tabbedPanelSelectionTabs = mng.addTabbedPanel(nameTabPanel, null, GralGridBuild_ifc.propZoomedPanel);
     //The panel for selection from all favorites: 
     nameGridPanel = WidgetNames.tabMainFavorites + cNr;
     tabLabelGridPanel = "a-F"+cNr;
-    mng.setPosition(2, 0, 0, 0, 1, 'd');
+    mng.setPosition(0, 0, 0, 0, 1, 'd');
     tabbedPanelSelectionTabs.addGridPanel(nameGridPanel, tabLabelGridPanel, 1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd');
     selectTableAll.setToPanel(mng, WidgetNames.selectMainFavorites + cNr, 5, widthSelecttable, 'A');
@@ -103,7 +103,7 @@ public class LeftMidRightPanel
     for(FcmdFileTable fileTabs: listTabs){
       fileTabs.selectTableForTab.clear();
     }
-    for(FavoritePathSelector.SelectInfo info: selectListAllFavorites){ //panel specific favorites
+    for(FcmdFavorPathSelector.SelectInfo info: selectListAllFavorites){ //panel specific favorites
       String label;
       int ixTabname = "lmr".indexOf(which);
       if(ixTabname >=0){
@@ -117,7 +117,7 @@ public class LeftMidRightPanel
       //tabSelector.initActDir(indexActualDir, info.selectName, info.path);
      
     }
-    for(FavoritePathSelector.SelectInfo info: main.selectTab.selectAll){ //all favorites
+    for(FcmdFavorPathSelector.SelectInfo info: main.favorPathSelector.selectAll){ //all favorites
       String label;
       int ixTabname = "lmr".indexOf(which);
       if(ixTabname >=0){

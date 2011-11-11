@@ -168,7 +168,7 @@ public class GralCfgDesigner
     //dialogWindowProps.posWindow.setPosition(widgd.pos, widgd.pos.y +2, GralGridPos.size+30, widgd.pos.x, GralGridPos.size+40, 1, 'r' );
     //dialogWindowProps.setWindowVisible(true);
     //use manager to position.
-    mng.setWindowsVisible(dialogWindowProps, dialogWindowProps.posWindow);
+    mng.setWindowsVisible(dialogWindowProps, dialogWindowProps.pos);
   }
   
   private GralUserAction actionOk = new GralUserAction()

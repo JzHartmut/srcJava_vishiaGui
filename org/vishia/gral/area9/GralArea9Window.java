@@ -12,6 +12,7 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
+import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
@@ -21,8 +22,28 @@ import org.vishia.gral.widget.InfoBox;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmd_ifc;
 
+/**This class presents a Window appearance with up to 9 areas.
+ * @author hartmut
+ *
+ */
 public class GralArea9Window implements GralArea9_ifc
 {
+  
+  /**Version and History
+   * <ul>
+   * <li>2011-11-12 Hartmut new: The SubWindow for Help, About, InfoBox and InfoLog are created here (InfoLog: TODO).
+   *   This windows can be opened in demand.
+   * <li>2011-11-12 Hartmut chg: All menu items should be prepared in the users application now. The items for help and about
+   *   are supported with actions by {@link #getActionAbout()} and {@link #getActionAbout()}. This actions
+   *   are the standard behavior and opens the sub-windows only. But the user can install a more complex functionality
+   *   for example writing a context sensitive help.
+   * <li>2011-11-12 Harmut chg {@link #initGraphic} was the old initOutputArea, but it does more as only the output area. 
+   *   Now creation of all necessities of Graphic in this functionality.
+   *          
+   * </ul>
+   */
+  public static final int version = 0x20111112;
+  
   public final MainCmd mainCmd;
   
   //protected final GralWindowMng gralDevice;
@@ -36,7 +57,7 @@ public class GralArea9Window implements GralArea9_ifc
   
   protected GralTextBox outputBox;
   
-  protected InfoBox infoHelp, infoAbout;
+  public InfoBox infoHelp, infoAbout, infoBox, infoLog;
   
   /** Current Directory for file choosing. */
   protected File currentDirectory = null;
@@ -121,38 +142,53 @@ public class GralArea9Window implements GralArea9_ifc
    * @param sOutputArea String for example "A3C3". The letter character is the column. The digit is the row.
    * It is fromTo. The example means the whole bottom area.
    */
-  @Override public void initOutputArea(String sOutputArea){
+  @Override public void initGraphic(String sOutputArea){
     this.outputArea = sOutputArea;
-    window.gralMng.gralDevice.addDispatchListener(initOutputArea); 
-    initOutputArea.awaitExecution(1, 0);
+    window.gralMng.gralDevice.addDispatchListener(initGraphic); 
+    initGraphic.awaitExecution(1, 0);
     window.gralMng.gralDevice.addDispatchListener(writeOutputTextDirectly);
     
   }
   
 
   
-  GralDispatchCallbackWorker initOutputArea = new GralDispatchCallbackWorker(){
+  GralDispatchCallbackWorker initGraphic = new GralDispatchCallbackWorker(){
     @Override public void doBeforeDispatching(boolean onlyWakeup)
     {
       window.setResizeAction(resizeAction);
-      //swtWindow.graphicThreadSwt.windowSwt.addControlListener(resizeListener);
       setFrameAreaBorders(30,70,30,70);
       if(bSetStandardMenus){
-        setStandardMenusGThread(currentDirectory, actionFile);
+        //setStandardMenusGThread(currentDirectory, actionFile);
       }
+      window.gralMng.setPosition(-40, 0, 10, 0, 0, 'd');
+      infoBox = window.gralMng.createInfoBox("infoBox", "Info");
+      //
+      window.gralMng.selectPanel("primaryWindow");
+      window.gralMng.setPosition(0,40,10,0,0,'.');
+      infoHelp = window.gralMng.createInfoBox("Help", "Help");
+      try{
+        for(String line: mainCmd.listHelpInfo){
+          infoHelp.append(line).append("\n");
+        }
+      } catch(Exception exc){ window.gralMng.writeLog(0, exc); }
+      //
+      window.gralMng.selectPanel("primaryWindow");
+      window.gralMng.setPosition(0,10,15,GralGridPos.size + 40,0,'.');
+      infoAbout = window.gralMng.createInfoBox("About", "About");
+      try{
+        for(String line: mainCmd.listAboutInfo){
+          infoAbout.append(line).append("\n");
+        }
+      } catch(Exception exc){ window.gralMng.writeLog(0, exc); }
+      //
+      
+      
       if(outputArea != null){
-        GralRectangle area = convertArea(outputArea);
-        /*
-        int xArea = outputArea.charAt(0) - 'A' +1;
-        int yArea = outputArea.charAt(1) - '0';
-        int dxArea = outputArea.charAt(2) - 'A' +1 - xArea +1;
-        int dyArea = outputArea.charAt(3) - '0' - yArea +1;
-        */
-        outputPanel = addOutputFrameArea(area.x, area.y, area.dx, area.dy);
+        outputPanel = addOutputFrameArea(outputArea);
         window.gralMng.registerPanel(outputPanel);
-        window.gralMng.gralDevice.removeDispatchListener(this);
-        countExecution();
       }
+      window.gralMng.gralDevice.removeDispatchListener(this);
+      countExecution();
     }
   };
 
@@ -371,8 +407,6 @@ public class GralArea9Window implements GralArea9_ifc
       //swtWindow.addMenuItemGThread("&File/&Close", this.new ActionFileClose());
       pWindow.addMenuItemGThread("menuFileSave", "&File/&Save", actionFile);
       //swtWindow.addMenuItemGThread("&File/E&xit", this.new ActionFileOpen());
-      pWindow.addMenuItemGThread("menuHelp", "&Help/&Help", this.new GralActionHelp());
-      pWindow.addMenuItemGThread("menuAbout", "&Help/&About", this.new GralActionAbout());
       //swtWindow.graphicThreadSwt.setJMenuBar(menuBar);
       //swtWindow.graphicThreadSwt.setVisible( true );
       pWindow.redraw();
@@ -393,22 +427,22 @@ public class GralArea9Window implements GralArea9_ifc
   
 
   
-  protected GralPanelContent addOutputFrameArea(int xArea, int yArea, int dxArea, int dyArea)
+  protected GralPanelContent addOutputFrameArea(String area)
   {
-    GralPanelContent outputArea = window.gralMng.createCompositeBox("outputArea");
-    addFrameArea(xArea, yArea, dxArea, dyArea, outputArea);
-    
+    GralRectangle areaR = convertArea(area);
+    window.gralMng.selectPanel("primaryWindow");
+    GralPanelContent outputPanel = window.gralMng.createCompositeBox("outputArea");
     window.gralMng.setPosition(0,0,0,0,0,'b');
     //NOTE: it is a edit-able box. It may be usefully to edit the content by user sometimes. 
     outputBox = window.gralMng.addTextBox("output", true, null, '.');  
-    try{ outputBox.append("output...\nA\nb\nc\nd\ne\nf\ng\nA\nA\n"); } catch(IOException exc){}
-    
-    return outputArea;
+    try{ outputBox.append("output...\n"); } catch(IOException exc){}
+    addFrameArea(areaR.x, areaR.y, areaR.dx, areaR.dy, outputPanel);
+    return outputPanel;
   }
   
   
   
-  GralDispatchCallbackWorker writeOutputTextDirectly = new GralDispatchCallbackWorker()
+  private GralDispatchCallbackWorker writeOutputTextDirectly = new GralDispatchCallbackWorker()
   { @Override public void doBeforeDispatching(boolean onlyWakeup)
     { String line;
       while((line = outputTexts.poll())!=null){
@@ -540,48 +574,35 @@ return true;
   } }
 
 
-  protected class GralActionHelp extends GralUserAction
-  { //final InfoBox infoHelp;
-    public GralActionHelp(){
-      InfoBox infoHelp1 = null;
-      try{
-        window.gralMng.selectPanel("outputArea");
-        window.gralMng.setPosition(-40,0,0,0,0,'.');
-        infoHelp1 = InfoBox.create(window.gralMng, "Help", "Help");
-        for(String line: mainCmd.listHelpInfo){
-          infoHelp1.append(line).append("\n");
-          //sHelpText[ix++] = line;
-        }
-      } catch(Exception exc){ window.gralMng.writeLog(0, exc); }
-      infoHelp = infoHelp1;
-    }
-
+  private GralUserAction actionHelp = new  GralUserAction()
+  { 
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { infoHelp.setWindowVisible(true);
       return true; 
-  } }
+  } };
 
 
-  protected class GralActionAbout extends GralUserAction
+  private GralUserAction actionAbout = new  GralUserAction()
   { //final InfoBox infoHelp;
-    public GralActionAbout(){
-      //InfoBox infoHelp1 = null;
-      try{
-        window.gralMng.selectPanel("outputArea");
-        window.gralMng.setPosition(-20,0,-40,0,0,'.');
-        infoAbout = InfoBox.create(getGralMng(), "about", "about");
-        for(String line: mainCmd.listAboutInfo){
-          infoAbout.append(line).append("\n");
-          //sHelpText[ix++] = line;
-        }
-      } catch(Exception exc){ window.gralMng.writeLog(0, exc); }
-      //infoAbout = infoHelp1;
-    }
-
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { infoAbout.setWindowVisible(true);
       return true; 
-  } }
+  } };
+
+
+  /**Returns the standard behavior: opens the help window with its constant text.
+   * @see org.vishia.gral.area9.GralArea9_ifc#getActionAbout()
+   */
+  @Override public GralUserAction getActionAbout()
+  { return actionAbout;
+  }
+
+  /**Returns the standard behavior: opens the about window with its constant text.
+   * @see org.vishia.gral.area9.GralArea9_ifc#getActionAbout()
+   */
+  @Override public GralUserAction getActionHelp()
+  { return actionHelp;
+  }
 
 
 }

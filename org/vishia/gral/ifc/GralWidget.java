@@ -219,8 +219,9 @@ public abstract class GralWidget implements GralWidget_ifc
   public GralWidget_ifc getGraphicWidgetWrapper(){ return (GralWidget_ifc)this; }
   
 	
-	/**Sets a application specific info. It should help to present the content. 
-   * This info can be set and changed anytime after registration. */
+	/**Sets a application specific info. 
+	 * It should help to present user data which are associated to this widget. 
+   * This info can be set and changed anytime. */
   public void setContentInfo(Object content){	oContentInfo = content;}
   
   /**Gets the application specific info. See {@link #setContentInfo(Object)}. */
@@ -390,12 +391,6 @@ public abstract class GralWidget implements GralWidget_ifc
 			  this.sShowParam = null;
 			}
 		}
-	}
-
-
-	public void setContentInfo(String sContentInfo)
-	{
-		this.sDataPath = sContentInfo;
 	}
 
 
