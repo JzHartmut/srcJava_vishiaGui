@@ -69,7 +69,7 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc
    * </ul>
    * 
    */
-  final static int version = 0x20110806;
+  final static int version = 0x20111112;
 
   
   /**Initializes the graphic of the Area9-Window. It sets the Output window to a defined area

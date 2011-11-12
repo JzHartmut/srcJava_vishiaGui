@@ -14,7 +14,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
-/**This class contains all capabilities to execute copy and move for TheCommander.
+/**This class contains all functionality to execute copy and move for The.file.Commander.
  * @author Hartmut Schorrig
  *
  */
@@ -77,6 +77,10 @@ public class CopyCmd
   
   
   
+  /**Opens the confirm-copy window and fills its fields to ask the user whether confirm.
+   * @param dst The path which is selected as destination. It may be a directory or a file
+   * @param src The path which is selected as source. It may be a directory or a file.
+   */
   void confirmCopy(File dst, File src)
   { String sSrc, sDstDir, sDstFile;
     if(!dst.isDirectory()){ 

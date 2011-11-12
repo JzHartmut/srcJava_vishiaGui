@@ -45,6 +45,8 @@ public class JavaCmd extends GuiCfg
 
   final WindowMng windMng = new WindowMng(this);
 
+  final FcmdButtons fButtons = new FcmdButtons();
+  
   GralPanelContent panelButtons;
 
   final CmdQueue cmdQueue = new CmdQueue(mainCmd);
@@ -56,6 +58,8 @@ public class JavaCmd extends GuiCfg
   final CommandSelector cmdSelector = new CommandSelector("cmdSelector", cmdQueue, gralMng);
 
   final CopyCmd copyCmd = new CopyCmd(this);
+
+  final FcmdDelete deleteCmd = new FcmdDelete(this);
 
   final JavaCmdKeyActions keyActions = new JavaCmdKeyActions(this);
 
@@ -125,6 +129,7 @@ public class JavaCmd extends GuiCfg
     initPanelButtons();
 
     copyCmd.buildWindowConfirmCopy();
+    deleteCmd.buildWindowConfirmDelete();
     favorPathSelector.buildWindowAddFavorite();
     gui.addMenuItemGThread("menuHelp", "&Help/&Help", gui.getActionHelp());
     gui.addMenuItemGThread("menuAbout", "&Help/&About", gui.getActionAbout());
@@ -158,7 +163,7 @@ public class JavaCmd extends GuiCfg
     gralMng.addButton("b-copy", actionCopy, "", null, null, "copy");
     gralMng.addButton("b-help", null, "help", null, null, "move");
     gralMng.addButton("b-help", null, "help", null, null, "mkdir");
-    gralMng.addButton("b-help", null, "help", null, null, "del");
+    fButtons.buttonDel = gralMng.addButton("b-delete", actionDelete, "del", null, null, "del");
     gralMng.addButton("b-help", null, "help", null, null, "cmd");
     gralMng.addButton("b-help", null, "help", null, null, "F10");
     gralMng.setPosition(3, 5, 4, 14, 1, 'r');
@@ -587,6 +592,25 @@ public class JavaCmd extends GuiCfg
       File fileDst = getterFiles.getFile2();
       //files[2] = getterFiles.getFile3();
       copyCmd.confirmCopy(fileDst, fileSrc);
+      return true;
+      // /
+    }
+  };
+
+  /**
+   * Key F5 for copy command. Its like Norton Commander.
+   */
+  GralUserAction actionDelete = new GralUserAction()
+  {
+    @Override
+    public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
+    {
+      selectedFiles = getSelectedFile();
+      getterFiles.prepareFileSelection();
+      //File[] files = new File[3];
+      File fileSrc = getterFiles.getFile1();
+      //files[2] = getterFiles.getFile3();
+      deleteCmd.confirmDelete(fileSrc);
       return true;
       // /
     }

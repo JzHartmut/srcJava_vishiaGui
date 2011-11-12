@@ -22,6 +22,10 @@ public class JavaCmdKeyActions
   
   int keyCopy = KeyCode.F5;
   
+  int keyDelete1 = KeyCode.F8;
+  
+  int keyDelete2 = KeyCode.del;
+  
   int keyWindFullOut = KeyCode.ctrl + 'o';
   
   //---------------------------------------------------------------------------------
@@ -66,6 +70,7 @@ public class JavaCmdKeyActions
           done = true;
           if(     keyCode == keyEdit){ main.actionEdit.userActionGui(sIntension, widgd, params); }
           else if(keyCode == keyCopy){ main.actionCopy.userActionGui(sIntension, widgd, params); }
+          else if(keyCode == keyDelete1 || keyCode == keyDelete2){ main.actionDelete.userActionGui(keyCode, widgd); }
           //navigation
           else if(keyCode == keyOriginDir){ main.favorPathSelector.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }
           else if(keyCode == KeyCode.enter){ main.favorPathSelector.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }

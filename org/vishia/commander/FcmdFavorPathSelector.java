@@ -112,9 +112,9 @@ class FcmdFavorPathSelector
     windAddFavorite.widgShortName = main.gralMng.addTextField("addFavoriteAlias", true, "alias (show in list)", 't');
     windAddFavorite.widgPath = main.gralMng.addTextField("addFavoritePath", true, "the directory path", 't');
     
-    main.gralMng.setPosition(-6, -3, 1, 6, 0, 'r');
+    main.gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
     main.gralMng.addButton("addFavoriteEsc", actionAddFavorite, "esc", null, null, "esc");
-    main.gralMng.setPosition(-6, -3, -6, -1, 0, 'r');
+    main.gralMng.setPosition(-4, -1, -6, -1, 0, 'r');
     main.gralMng.addButton("addFavoriteOk", actionAddFavorite, "ok", null, null, "OK");
   
   }
@@ -466,7 +466,7 @@ class FcmdFavorPathSelector
             if(fileTable == null){
               if(panel.listTabs.size() >0){
                 fileTable = panel.listTabs.get(0);
-                label = info.tabName[ixtabName] = fileTable.labelTab;
+                label = info.tabName[ixtabName] = fileTable.nameFilePanel;
               } else {
                 label = "file" + panel.cNr;
                 info.tabName[ixtabName] = label;
@@ -479,24 +479,21 @@ class FcmdFavorPathSelector
             fileTable = panel.searchOrCreateFileTabs(label);
           }
          
-
-          
+          //before changing the content of this fileTable, store the current directory
+          //to restore if this favor respectively selection is used ones more.
           File currentDir;
-          if(fileTable.actualDir !=null){
+          if(fileTable.selectInfo !=null){
             currentDir = fileTable.getCurrentDir();
             if(currentDir !=null){
-              panel.indexActualDir.put(fileTable.actualDir, currentDir);
+              panel.indexActualDir.put(fileTable.selectInfo.selectName, currentDir);
           } }
-          //fill in the standard file panel:
-          fileTable.actualDir = info.selectName;
-          currentDir = panel.indexActualDir.get(info.selectName);
-          if(currentDir == null){
+          
+          //fill in the standard file panel, use maybe a current directory.
+          fileTable.selectInfo = info;
+          if(  name.startsWith(WidgetNames.tableFavoritesMain)   //use the root dir anytime if the main favor path table is used.
+            || (currentDir  = panel.indexActualDir.get(info.selectName)) == null){  //use the root if the entry wasn't use till now
             currentDir = new File(info.path);
           }
-
-          
-          
-          
           fileTable.fillIn(currentDir);
           fileTable.setFocus();
         }

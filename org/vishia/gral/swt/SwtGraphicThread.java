@@ -12,6 +12,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 
 /**This class is the implementation class of a simple graphic implementation for SWT.
  * It doesn't depend of complex functionality of the org.vishia.gral. But that implementations based on this.
@@ -19,6 +21,14 @@ import org.vishia.gral.ifc.GralDispatchCallbackWorker;
  */
 class SwtGraphicThread extends GralGraphicThread //implements Runnable
 {
+  /**Version, able to read as hex yyyymmdd.
+   * Changes:
+   * <ul>
+   * <li>2011-11-12 Hartmut chg: Now the primary window has a menu bar anyway. 
+   * </ul>
+   */
+  public final static int version = 0x20111112;
+
   /**The graphical device for the application for all windows of this application. */
   Display displaySwt;
   

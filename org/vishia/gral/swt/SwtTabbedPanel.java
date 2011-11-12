@@ -127,6 +127,7 @@ public class SwtTabbedPanel extends GralTabbedPanel
 					newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
 					//mng.changeWidgets(widgetInfos);
 					focusedTab = panelContent;
+					mng.log.sendMsg(0, "Fcmd-selectTab %s", panelContent.toString());
 				}
 			}
 		}

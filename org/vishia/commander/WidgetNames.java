@@ -30,7 +30,10 @@ public class WidgetNames
   public final static String tabFavorites = "tabSelect-";   //+1 +2 +3 
   
   /**Name of the tab inside panelFavoritesLeftMidRight for the main selection. */
-  public final static String tableFavorites = "tableSelect-";   //+1 +2 +3 
+  public final static String tableFavorites = "tableSelect-";   //+label +1 +2 +3 
+  
+  /**Name of the tab inside panelFavoritesLeftMidRight for the main selection. */
+  public final static String tableFavoritesMain = "tableSelectMain.";   //+1 +2 +3 
   
   /**Name of the tab inside panelFavoritesLeftMidRight for the main selection. */
   public final static String selectMainFavorites = "selectAll";   //+1 +2 +3 

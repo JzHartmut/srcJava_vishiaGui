@@ -56,7 +56,7 @@ public class LeftMidRightPanel
     this.main = javaCmd;
     this.cc = cc;
     this.cNr = cNr;
-    selectTableAll = tabSelector.new SelectTabList("panel-" + cNr, this, mng);
+    selectTableAll = tabSelector.new SelectTabList(WidgetNames.tableFavoritesMain + cNr, this, mng);
   }
   
   
@@ -137,8 +137,9 @@ public class LeftMidRightPanel
   FcmdFileTable searchOrCreateFileTabs(String label){
   //search or create the tab
     FcmdFileTable fileTab = null;
+    String labelTab = label + "." + cNr;
     for(FcmdFileTable item: listTabs){
-      if(item.labelTab.equals(label)){
+      if(item.nameFilePanel.equals(labelTab)){
         fileTab = item; break;
       }
     } if(fileTab == null){

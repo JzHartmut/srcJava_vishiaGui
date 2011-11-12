@@ -304,6 +304,7 @@ public class SwtTable extends GralTable
         GralUserAction mainKeyAction = mng.getRegisteredUserAction("KeyAction");
         if(mainKeyAction !=null){
           int gralKey = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
+          //old form called because compatibility, if new for with int-parameter returns false.
           mainKeyAction.userActionGui("key", widgetDescr, new Integer(gralKey));
         }
       }
