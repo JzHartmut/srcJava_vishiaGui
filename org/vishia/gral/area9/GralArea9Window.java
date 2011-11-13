@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.base.GralWidgetImplWrapper;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
@@ -75,7 +74,7 @@ public class GralArea9Window implements GralArea9_ifc
 
   
   /**A little control to capture the mouse position for movement of area borders. */
-  private GralWidgetImplWrapper[] yAreaMover = new GralWidgetImplWrapper[2];
+  //private GralWidgetImplWrapper[] yAreaMover = new GralWidgetImplWrapper[2];
   
 
   
@@ -315,6 +314,7 @@ public class GralArea9Window implements GralArea9_ifc
           //Rectangle bounds = control.getBounds();
           //control.redraw(bounds.x, bounds.y, bounds.width, bounds.height, true);
     } } }
+    /*
     for(int ixMover = 0; ixMover < yAreaMover.length; ++ixMover){
       if(yAreaMover[ixMover] != null){
         int yp = (int)(ypFrameArea[ixMover+1] * pixelPerYpercent);
@@ -323,9 +323,10 @@ public class GralArea9Window implements GralArea9_ifc
         yAreaMover[ixMover].setBounds(10,yp,10,10);
         yAreaMover[ixMover].update();     
         yAreaMover[ixMover].redraw();
-        */     
+        * /     
       }
     }
+    */
     //swtWindow.graphicThreadSwt.update();
     //swtWindow.graphicThreadSwt.redraw();
     //swtWindow.graphicThreadSwt.update();

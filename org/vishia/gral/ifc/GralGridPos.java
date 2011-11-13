@@ -24,7 +24,7 @@ public class GralGridPos implements Cloneable
    *     But a position in this kind is necessary in other contexts too, and the position values should be pooled in one class.                       
    * </ul>
    */
-  public static int version = 0x20111001;
+  public final static int version = 0x20111001;
   
   /**This adding value applied at any coordinate parameter of any setPosition- method means, that the value is 
    * referred to the position of the previous or given position. The referred value may be given as positive or negative number.
@@ -97,10 +97,10 @@ public class GralGridPos implements Cloneable
   /**Mask bits to designate related position, related end position and size.
    * 
    */
-  private final int mBitRel = 0x1, mBitSize = 0x2, mBitRelEnd = 0x4, mBitSizeNeg = 8;
+  private final static int mBitRel = 0x1, mBitSize = 0x2, mBitRelEnd = 0x4, mBitSizeNeg = 8;
   
   /**Position and mask of bits to designate kind of parameter. See {@link #parameterDesignation} */ 
-  private final int kBitParamDesignator_x = 0, kBitParamDesignator_y = 8, mParamDesignator = 0xff; 
+  private final static int kBitParamDesignator_x = 0, kBitParamDesignator_y = 8, mParamDesignator = 0xff; 
   
   
   /**The Property for the input parameter to use same, next etc. 
@@ -141,13 +141,16 @@ public class GralGridPos implements Cloneable
 
   public GralPanelContent panel;
   
+  /**Sets all values of this with the values of pos (copy values)
+   * @param pos The src pos
+   */
   public void set(GralGridPos pos)
-  {
+  { parameterDesignation = pos.parameterDesignation;
     x = pos.x; xEnd = pos.xEnd; y = pos.y; yEnd = pos.yEnd;
     xFrac = pos.xFrac; xEndFrac = pos.xEndFrac; yFrac = pos.yFrac; yEndFrac = pos.yEndFrac;
     xOrigin = pos.xOrigin; yOrigin = pos.yOrigin; xSepLine = pos.xSepLine; ySepLine = pos.ySepLine;
     dirNext = pos.dirNext;
-    
+    panel = pos.panel;
   }
   
   
