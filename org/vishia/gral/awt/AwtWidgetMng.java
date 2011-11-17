@@ -371,7 +371,7 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   }
 
   @Override
-  public GralWindow createWindow(String name, String title, boolean exclusive)
+  public GralWindow createWindow(String name, String title, int windPros)
   {
     // TODO Auto-generated method stub
     return null;

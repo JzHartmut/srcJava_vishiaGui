@@ -381,18 +381,18 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   
   
-  public GralWindow createWindow(String name, String title, boolean exclusive)
+  @Override public GralWindow createWindow(String name, String title, int windProps)
   {
-    SwtGraphicThread swtDevice = (SwtGraphicThread)gralDevice;
-    SwtSubWindow window = new SwtSubWindow(name, swtDevice.displaySwt, title, exclusive, this);
-    GralRectangle rect = calcPositionOfWindow(window.pos);
-    window.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
-    //window.window.redraw();
-    //window.window.update();
-    this.pos.panel = window; //it is selected.
-    
-    //this.pos.set(0,0,0,0,'r');
-    return window;
+  SwtGraphicThread swtDevice = (SwtGraphicThread)gralDevice;
+  SwtSubWindow window = new SwtSubWindow(name, swtDevice.displaySwt, title, windProps, this);
+  GralRectangle rect = calcPositionOfWindow(window.pos);
+  window.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
+  //window.window.redraw();
+  //window.window.update();
+  this.pos.panel = window; //it is selected.
+  
+  //this.pos.set(0,0,0,0,'r');
+  return window;
 
   }
   

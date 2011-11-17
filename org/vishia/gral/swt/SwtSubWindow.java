@@ -29,12 +29,18 @@ public class SwtSubWindow extends GralWindow
   
   
   
-  SwtSubWindow(String name, Display display, String title, boolean exclusive, GralWidgetMng gralMng)
+  SwtSubWindow(String name, Display display, String title, int windProps, GralWidgetMng gralMng)
   { super(name, gralMng, null);
     int props = 0; ////|SWT.CLOSE;
     if(title !=null){ props |= SWT.TITLE | SWT.BORDER; }
     //if(exclusive){ props |= SWT.PRIMARY_MODAL | SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL; }
-    if(exclusive){ props |= SWT.APPLICATION_MODAL; }
+    if((windProps & GralWindow.windExclusive) !=0){ 
+      assert((windProps & GralWindow.windConcurrently) ==0);
+      props |= SWT.APPLICATION_MODAL; 
+    } else {
+      assert((windProps & GralWindow.windExclusive) ==0);
+    }
+    if((windProps & GralWindow.windOnTop) !=0){ props |= SWT.ON_TOP; }
     window = new Shell(display, props);
     window.addShellListener(shellListener);
     window.addDisposeListener(disposeListener);

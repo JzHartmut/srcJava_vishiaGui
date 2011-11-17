@@ -319,6 +319,8 @@ protected void initMain()
 
 protected void stepMain(){}
 
+protected void finishMain(){}
+
 
 public final void execute()
 {
@@ -333,6 +335,8 @@ public final void execute()
     }
   }
 
+  inspector.shutdown();
+  finishMain();
 }
 
 

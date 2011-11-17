@@ -7,10 +7,12 @@ import org.eclipse.swt.events.DragDetectEvent;
 import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.vishia.gral.base.GralMouseWidgetAction_ifc;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralUserAction;
 
 public class SwtTextFieldWrapper extends GralTextField
 {
@@ -69,6 +71,22 @@ public class SwtTextFieldWrapper extends GralTextField
   };
 
 
+  /**yet it is the same actionChanged of the widget. is called if the write-able text field was changed and the focus is released.
+   * The distinction between both is the key code in {@link GralUserAction#userActionGui(int, GralWidget, Object...)}.
+   * @param action If null then the action isn't changed. Only the mouse button listener is installed.
+   *   The action should be given calling {@link GralWidget#setActionChange(GralUserAction)} then.
+   *   If no action is given, The mouse listener has no effect.
+
+   * @see org.vishia.gral.base.GralTextField#setMouseAction(org.vishia.gral.ifc.GralUserAction)
+   */
+  @Override public void setMouseAction(GralUserAction action)
+  {
+    if(action !=null){ setActionChange(action); }
+    GralMouseWidgetAction_ifc actionMouse = null;  //TODO it should be the action.
+    SwtGralMouseListener.MouseListenerUserAction mouseListener = new SwtGralMouseListener.MouseListenerUserAction(actionMouse);
+    textFieldSwt.addMouseListener(mouseListener);  
+  }
+  
   @Override public Object getWidgetImplementation()
   { return textFieldSwt;
   }
@@ -109,5 +127,6 @@ public class SwtTextFieldWrapper extends GralTextField
     
   
   void stop(){}
-  
+
+
 }

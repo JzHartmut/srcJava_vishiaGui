@@ -5,6 +5,8 @@ import java.util.Queue;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -58,7 +60,8 @@ public class SwtTabbedPanel extends GralTabbedPanel
 	  Rectangle sizeTabFolder = widgetSwt.getBounds();
 	  TabItem tabItem = new TabItem(widgetSwt, SWT.None);
 	  tabItem.setText(sLabel);
-		SwtCanvasStorePanel panel;
+	  //tabItem.addListener(SWT.FocusIn, focusTabListener);
+	  SwtCanvasStorePanel panel;
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
 	  if(yGrid <0 || xGrid <0){
 			panel = new SwtCanvasStorePanel(sName, widgetSwt, 0, colorBackground, mng);
@@ -68,6 +71,8 @@ public class SwtTabbedPanel extends GralTabbedPanel
 	  panel.swtCanvas.setBounds(sizeTabFolder);
 	  panel.itsTabSwt = tabItem;
 		tabItem.setControl(panel.swtCanvas);
+		panel.swtCanvas.addFocusListener(focusTabListener);
+    
 		mng.registerPanel(panel);   //register the panel in the mng.
 		mng.registerWidget(panel);
     panels.put(sName, panel);   //register the tab panel in the TabbedPanel
@@ -160,6 +165,26 @@ public class SwtTabbedPanel extends GralTabbedPanel
     { 
       stop();
       //validateFrameAreas();  //calculates the size of the areas newly and redraw.
+    }
+    
+  };
+  
+  
+  FocusListener focusTabListener = new FocusListener()
+  {
+
+    @Override
+    public void focusGained(FocusEvent e)
+    {
+      // TODO Auto-generated method stub
+      stop();
+    }
+
+    @Override
+    public void focusLost(FocusEvent e)
+    {
+      // TODO Auto-generated method stub
+      
     }
     
   };

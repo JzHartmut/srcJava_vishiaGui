@@ -314,6 +314,14 @@ public class GralCfgBuilder
           widgd.setDragEnable(actionDrag, KeyCode.dragFiles);
         }
       }
+      if(cfge.widgetType.dragText !=null){
+        GralUserAction actionDrag = gui.getRegisteredUserAction(cfge.widgetType.dragText);
+        if(actionDrag == null){
+          sError = "GuiCfgBuilder - action for drag not found: " + cfge.widgetType.dragText;
+        } else {
+          widgd.setDragEnable(actionDrag, KeyCode.dragText);
+        }
+      }
       //save the configuration element as association from the widget.
       widgd.setCfgElement(cfge);
     }

@@ -2,7 +2,9 @@ package org.vishia.guiInspc;
 
 import java.util.Map;
 
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
+import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.inspectorAccessor.InspcAccessor;
 import org.vishia.msgDispatch.LogMessage;
 
@@ -16,8 +18,6 @@ public interface InspcPlugUser_ifc extends GralPlugUser_ifc
    * @param ident Any identification depending of the caller. It should be understand by the user algorithm.
    */
   void requData(int ident);
-  
-  
   
   void isSent(int seqnr);
   

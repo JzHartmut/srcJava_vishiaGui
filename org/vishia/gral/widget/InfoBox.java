@@ -38,7 +38,7 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   
   public static InfoBox create(GralGridBuild_ifc mng, String name, String title)
   {
-    GralWindow window = mng.createWindow(name, title, false);
+    GralWindow window = mng.createWindow(name, title, GralWindow.windConcurrently);
     //TODO the position frame (size) regards the title bar, it should not do so!
     mng.setPosition(0, -3, 0, 0, 0, '.');
     GralTextBox text = mng.addTextBox(name, false, null, '.');

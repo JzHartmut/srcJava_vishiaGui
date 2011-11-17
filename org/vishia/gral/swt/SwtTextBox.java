@@ -9,6 +9,7 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralUserAction;
 
 public class SwtTextBox extends GralTextBox
 {
@@ -145,6 +146,13 @@ public class SwtTextBox extends GralTextBox
   {
     textFieldSwt.dispose();
     textFieldSwt = null;
+  }
+
+  @Override
+  public void setMouseAction(GralUserAction action)
+  {
+    // TODO Auto-generated method stub
+    
   }
 
 

@@ -21,10 +21,10 @@ public class SwtDragListener extends DragSourceAdapter
   
   private final TextTransfer textTransfer;
   
-  SwtDragListener(int dropType, Control control){
+  SwtDragListener(int dragType, Control control){
     DragSource drag = new DragSource(control, DND.DROP_COPY);
     drag.addDragListener(this);
-    switch(dropType){
+    switch(dragType){
       case KeyCode.dragFiles:{
         fileTransfer = FileTransfer.getInstance();
         textTransfer = TextTransfer.getInstance();
@@ -33,7 +33,14 @@ public class SwtDragListener extends DragSourceAdapter
         transfers[1]= textTransfer;
         drag.setTransfer(transfers);
       } break;
-      default: throw new IllegalArgumentException("unknown dragtype: "+ Integer.toHexString(dropType));
+      case KeyCode.dragText:{
+        fileTransfer = FileTransfer.getInstance();
+        textTransfer = TextTransfer.getInstance();
+        Transfer[] transfers = new Transfer[1];
+        transfers[0]= textTransfer;
+        drag.setTransfer(transfers);
+      } break;
+      default: throw new IllegalArgumentException("unknown dragtype: "+ Integer.toHexString(dragType));
     }
 
   }
@@ -72,7 +79,7 @@ public class SwtDragListener extends DragSourceAdapter
           TransferData transferData = event.dataType;
           if(textTransfer.isSupportedType(transferData)){
             //the call of fileTransfer.javaToNative(data, transferData) will be done       
-            event.data = data; //transferData;
+            event.data = data[0]; //transferData;
             event.doit = true;
           } else if(fileTransfer.isSupportedType(transferData)){
             //the call of fileTransfer.javaToNative(data, transferData) will be done       

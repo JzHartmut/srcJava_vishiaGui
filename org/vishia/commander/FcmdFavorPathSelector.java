@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTabbedPanel;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
@@ -35,9 +36,13 @@ class FcmdFavorPathSelector
     String path;
     /**The name shown in the list. */
     String selectName;
+    /**The label on the tab in tabbed panel. */
+    String label;
+    //bit 0..2 present this favorite on the designated main panel 1..3 or l, m, r,
+    //it means, a tab with the label will be created.
+    int mMainPanel;
     /**The name of the tab in any of the three panels if it is associated to a Tab of the panel. */
-    String[] tabName = new String[3]; //, tabName2, tabName3;
-    //char active;
+    //String[] tabName = new String[3]; //, tabName2, tabName3;
     @Override public String toString(){ return path; } //for debug
   }
   
@@ -104,7 +109,7 @@ class FcmdFavorPathSelector
     main.gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
     
 
-    windAddFavorite.window = main.gralMng.createWindow("addFavoriteWindow", "add favorite", false);
+    windAddFavorite.window = main.gralMng.createWindow("addFavoriteWindow", "add favorite", GralWindow.windConcurrently);
     
     main.gralMng.setPosition(4, GralGridPos.size -4, 1, GralGridPos.size +45, 0, 'd');
     //main.panelMng.addText("Tab name:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
@@ -165,16 +170,20 @@ class FcmdFavorPathSelector
                 //info. = sParts[0].trim();
                 info.selectName = sParts[0].trim();
                 info.path = sParts[1].trim();
-                for(int ix = 2; ix < sParts.length; ++ix){
-                  final String actTabEntry = sParts[ix].trim();
+                if(sParts.length >2){
+                  final String actTabEntry = sParts[2].trim();
                   final String actTab;
-                  if(actTabEntry.length() > 2 && actTabEntry.charAt(1) == ':'){
-                    final char cWhere = actTabEntry.charAt(0);
-                    final int ixWhere = "lmr".indexOf(cWhere);
-                    if(ixWhere <0)throw new IllegalArgumentException("fault panel, use l:label or m:label or r:label in file; " + cfgFile + " line; " + sLine);
-                    actTab = actTabEntry.substring(2).trim();
-                    info.tabName[ixWhere] = actTab;
+                  final int posColon = actTabEntry.indexOf(':');
+                  if(posColon >0){
+                    String sPanelChars = actTabEntry.substring(0, posColon);
+                    actTab = actTabEntry.substring(posColon+1).trim();
+                    if(sPanelChars.indexOf('l')>=0){ info.mMainPanel |= 1; }  
+                    if(sPanelChars.indexOf('m')>=0){ info.mMainPanel |= 2; }  
+                    if(sPanelChars.indexOf('r')>=0){ info.mMainPanel |= 4; }  
+                  } else {
+                    actTab = actTabEntry.trim();
                   }
+                  info.label = actTab;
                 }
                 //info.active = cActive;
                 list.add(info);
@@ -241,10 +250,15 @@ class FcmdFavorPathSelector
   private void writeCfgLine(SelectInfo info) throws IOException
   {
     writerCfg.append(info.selectName).append(", ").append(info.path);
-    if(info.tabName[0] !=null){ writerCfg.append(", l:").append(info.tabName[0]); }
-    if(info.tabName[1] !=null){ writerCfg.append(", m:").append(info.tabName[1]); }
-    if(info.tabName[2] !=null){ writerCfg.append(", r:").append(info.tabName[2]); }
-    writerCfg.append("\n");
+    if(info.label !=null && info.label.length()>0){
+      writerCfg.append(", ");
+      if((info.mMainPanel & 1)!=0){ writerCfg.append('l'); }
+      if((info.mMainPanel & 2)!=0){ writerCfg.append('m'); }
+      if((info.mMainPanel & 4)!=0){ writerCfg.append('r'); }
+      if((info.mMainPanel & 7)!=0){ writerCfg.append(": "); }
+      writerCfg.append(info.label);
+    }
+      writerCfg.append("\n");
   }
   
   
@@ -377,15 +391,18 @@ class FcmdFavorPathSelector
           favorite.path = windAddFavorite.widgPath.getText();
           favorite.selectName = windAddFavorite.widgShortName.getText();
           String tablabel = windAddFavorite.widgTab.getText();
-          int ixtabName = windAddFavorite.panelInvocation.cNr - '1';
-          favorite.tabName[ixtabName] = tablabel;
+          //int ixtabName = windAddFavorite.panelInvocation.cNr - '1';
+          favorite.mMainPanel = 1<< (windAddFavorite.panelInvocation.cNr - '1');
+          //favorite.tabName[ixtabName] = 
+          favorite.label = tablabel;
           listAdd.add(posInList+1, favorite);
           if(listAdd == selectAll){
-            panelLeft.fillInAllTables('.');
-            panelMid.fillInAllTables('.');
-            panelRight.fillInAllTables('.');
+            panelLeft.fillInTables(1);
+            panelMid.fillInTables(2);
+            panelRight.fillInTables(3);
           } else {
-            windAddFavorite.panelInvocation.fillInAllTables('.'); //windAddFavorite.panelInvocation.cc);
+            int where = windAddFavorite.panelInvocation.cNr - '0';  //"lmr"
+            windAddFavorite.panelInvocation.fillInTables(where); //windAddFavorite.panelInvocation.cc);
           }
         }
         main.gralMng.setWindowsVisible(windAddFavorite.window, null); //set it invisible.
@@ -425,13 +442,12 @@ class FcmdFavorPathSelector
      *   than show the label in the left cell (column)
      * @param info The favorite info
      */
-    void add(int ix, SelectInfo info)
+    void add(SelectInfo info)
     {
       GralTableLine_ifc line = wdgdTable.insertLine(null, 0);
       line.setUserData(info);
-      String label = info.tabName[ix];
-      if(label !=null){
-        line.setCellText(label, 0);
+      if(info.label !=null){
+        line.setCellText(info.label, 0);
       }
       line.setCellText(info.selectName, 1);
       line.setCellText(info.path, 2);
@@ -450,54 +466,48 @@ class FcmdFavorPathSelector
       actSelectInfo = info; //The last used selection (independent of tab left, middle, right)
       int ixtabName = panel.cNr - '1';
       
-      if(true){ //info.active != '.'){
-        String tabName = info.tabName[ixtabName];  //The label of file tab.
-        GralWidget widgd;
-        if(tabName !=null && (widgd = mng.getWidget(tabName)) !=null){
-          mng.setFocus(widgd);   //focus the file tab if it is exising. 
-        } else {
-          //a new path is selected:
-          //save the path of the current selection
-      
-          String label = info.tabName[ixtabName];  //from favorite list
-          FcmdFileTable fileTable;
-          if(label  == null){ 
-            fileTable = getLastFileTab();
-            if(fileTable == null){
-              if(panel.listTabs.size() >0){
-                fileTable = panel.listTabs.get(0);
-                label = info.tabName[ixtabName] = fileTable.nameFilePanel;
-              } else {
-                label = "file" + panel.cNr;
-                info.tabName[ixtabName] = label;
-                fileTable = panel.searchOrCreateFileTabs(label);
-              }
-            }
-            panel.fillInAllTables(panel.cc);
+      String tabName = info.label;  //The label of file tab.
+      GralWidget widgd;
+        //a new path is selected:
+        //save the path of the current selection
+    
+      String label = info.label;  //from favorite list
+      FcmdFileTable fileTable;
+      if(label  == null){ 
+        fileTable = getLastFileTab();
+        if(fileTable == null){
+          if(panel.listTabs.size() >0){
+            fileTable = panel.listTabs.get(0);
+            label = info.label = fileTable.label;
           } else {
-            //label is known in the favorite list, use it. The panel should be existing or it is created.
+            label = "file" + panel.cNr;
+            info.label = label;
             fileTable = panel.searchOrCreateFileTabs(label);
           }
-         
-          //before changing the content of this fileTable, store the current directory
-          //to restore if this favor respectively selection is used ones more.
-          File currentDir;
-          if(fileTable.selectInfo !=null){
-            currentDir = fileTable.getCurrentDir();
-            if(currentDir !=null){
-              panel.indexActualDir.put(fileTable.selectInfo.selectName, currentDir);
-          } }
-          
-          //fill in the standard file panel, use maybe a current directory.
-          fileTable.selectInfo = info;
-          if(  name.startsWith(WidgetNames.tableFavoritesMain)   //use the root dir anytime if the main favor path table is used.
-            || (currentDir  = panel.indexActualDir.get(info.selectName)) == null){  //use the root if the entry wasn't use till now
-            currentDir = new File(info.path);
-          }
-          fileTable.fillIn(currentDir);
-          fileTable.setFocus();
         }
+        panel.fillInTables(panel.cNr - '0');
+      } else {
+        //label is known in the favorite list, use it. The panel should be existing or it is created.
+        fileTable = panel.searchOrCreateFileTabs(label);
       }
+     
+      //before changing the content of this fileTable, store the current directory
+      //to restore if this favor respectively selection is used ones more.
+      File currentDir;
+      if(fileTable.selectInfo !=null){
+        currentDir = fileTable.getCurrentDir();
+        if(currentDir !=null){
+          panel.indexActualDir.put(fileTable.selectInfo.selectName, currentDir);
+      } }
+      
+      //fill in the standard file panel, use maybe a current directory.
+      fileTable.selectInfo = info;
+      if(  name.startsWith(WidgetNames.tableFavoritesMain)   //use the root dir anytime if the main favor path table is used.
+        || (currentDir  = panel.indexActualDir.get(info.selectName)) == null){  //use the root if the entry wasn't use till now
+        currentDir = new File(info.path);
+      }
+      fileTable.fillIn(currentDir);
+      fileTable.setFocus();
       return true;
     }
   
@@ -537,7 +547,7 @@ class FcmdFavorPathSelector
       } else if (key ==KeyCode.shift + KeyCode.F5){
         //reread the configuration file.
         readCfg(fileCfg);
-        panelLeft.fillInAllTables('l');
+        panelLeft.fillInTables(1);
       } else if (key ==main.keyActions.keyCreateFavorite){
         actSelectInfo = data; //info in the line of table.
         windAddFavorite.widgTab.setText("file3");

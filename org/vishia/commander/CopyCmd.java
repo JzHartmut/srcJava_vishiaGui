@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
@@ -51,7 +52,7 @@ public class CopyCmd
     
 
     posWindConfirmCopy = main.gralMng.getPositionInPanel();
-    windConfirmCopy = main.gralMng.createWindow("copyWindow", "confirm copy", false);
+    windConfirmCopy = main.gralMng.createWindow("copyWindow", "confirm copy", GralWindow.windConcurrently);
     //System.out.println(" window: " + main.gralMng.pos.panel.getPixelPositionSize().toString());
     
     main.gralMng.setPosition(2, GralGridPos.size -2, 1, GralGridPos.size +45, 0, 'd');

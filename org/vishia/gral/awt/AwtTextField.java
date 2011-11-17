@@ -6,6 +6,7 @@ import java.awt.TextField;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralUserAction;
 
 public class AwtTextField extends GralTextField
 {
@@ -86,6 +87,13 @@ public class AwtTextField extends GralTextField
     @Override public Object getData(){ return data; }
   
     @Override public void setData(Object dataP){ this.data = dataP; }
+    
+  }
+
+  @Override
+  public void setMouseAction(GralUserAction action)
+  {
+    // TODO Auto-generated method stub
     
   }
 

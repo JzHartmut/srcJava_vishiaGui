@@ -52,6 +52,11 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
 {
   /**Changes:
    * <ul>
+   * <li>2011-11-18 Hartmut new {@link #getWidgetOnMouseDown()} to get the last clicked widget in any user routine.
+   *   The information about the widget can be used to capture widgets for any script.
+   * <li>2011-11-17 Hartmut new addText(String) as simple variant.  
+   * <li>2011-11-14 Hartmut bugfix: copy values of GralTabbedPanel.pos to this.pos instead set the reference from GralWidgetMng to GralTabbedPanel.pos 
+   *   The bug effect was removed panel in GralTabbedPanel.pos because it was the same instance as GralWidgetMng.
    * <li>2011-10-01 Hartmut chg: move {@link #registerPanel(GralPanelContent)} from the SWT implementation to this.
    * <li>2011-10-01 Hartmut new: method {@link #getPanel(String)} to get a registered panel by name.    
    * <li>2011-09-30 Hartmut new: {@link #actionDesignEditField}. It is the action which is called from menu now.
@@ -64,7 +69,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
    * <li>2011-08-13 Hartmut chg: New routines for store and calculate the position to regard large widgets.
    * </ul>
    */
-  public final static int version = 0x20111001;
+  public final static int version = 0x20111118;
   
 	/**This class is used for a selection field for file names and pathes. */
   protected class FileSelectInfo
@@ -382,10 +387,25 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
 
   
   
+	/**This method is called whenever the left mouse is pressed on a widget, whiches 
+	 * @param lastClickedWidgetInfo
+	 */
 	public void setLastClickedWidgetInfo(GralWidget lastClickedWidgetInfo)
 	{
 		this.lastClickedWidgetInfo = lastClickedWidgetInfo;
 	}
+	
+	
+	/**Returns that widget which was clicked by mouse at last. This method is usefully for debugging
+	 * and for special functionality. A widget which {@link GralWidget#setDataPath(String)} is initialized
+	 * with "widgetInfo" is not captured for this operation. It means, if any user action method uses
+	 * this method to get the last clicked widget, that widget itself have to be marked with
+	 * <b>setDataPath("widgetInfo");</b> to prevent getting its own widget info.  
+	 * @return The last clicked widget
+	 */
+	public GralWidget getWidgetOnMouseDown(){ return lastClickedWidgetInfo; }
+	
+	
   /**Registers all user actions, which are able to use in Button etc.
    * The name is related with the <code>userAction=</code> designation in the configuration String.
    * @param name
@@ -751,6 +771,15 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
     return InfoBox.create(this, name, title);
   }
 
+  
+  /**Adds a text to the current panel at given position with standard colors, left origin.
+   * The size of text is calculated using the height of positioning values.
+   * @param text
+   */
+  @Override public GralWidget addText(String text)
+  { return addText(text, 0, GralColor.getColor("bk"), GralColor.getColor("wh"));
+  }
+  
   
   @Override public void writeLog(int msgId, Exception exc)
   {

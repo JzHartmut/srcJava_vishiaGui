@@ -134,12 +134,18 @@ private class InspcGuiCfg extends GuiCfg
     gui.setFrameAreaBorders(20, 80, 60, 85);
     gui.setStandardMenusGThread(new File("."), actionFile);
     super.initMenuGralDesigner();
+    //if(user !=null){ user.init(plugUser2Gui, gralMng, null); }
     gralMng.selectPanel("primaryWindow");
     mainTabPanel = gralMng.addTabbedPanel("mainTab", null, 0);
     gui.addFrameArea(1,1,3,2, mainTabPanel); //dialogPanel);
    
     Appendable out = gui.getOutputBox();
     mainCmd.setOutputChannels(out, out);
+    
+    if(user !=null){
+      user.initGui(gralMng);
+      user.addGuiMenu(gui);
+    }
   }
 
   

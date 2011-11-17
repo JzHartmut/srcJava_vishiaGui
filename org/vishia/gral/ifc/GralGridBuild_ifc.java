@@ -72,6 +72,9 @@ public interface GralGridBuild_ifc
   
   /**The version of this interface:
    * <ul>
+   * <li>2011-11-16 Hartmut new: {@link #addText(String)} simple with standards.
+   * <li>2011-11-17 Hartmut chg: {@link #createWindow(String, String, int)} now not only exclusive or not
+   *   but with some control bits {@link GralWindow#windExclusive} etc.
    * <li>2011-06-18 Hartmut chg: createFileDialog() improved, 
    *     new addFileSelectField(): A Field that comprises the possibility to open a file select dialog
    *     and that are a destination for drop or paste a file mime type from clipboard. 
@@ -386,6 +389,12 @@ public interface GralGridBuild_ifc
   GralTable addTable(String sName, int height, int[] columnWidths);
 
 
+  /**Adds a text to the current panel at given position with standard colors, left origin.
+   * The size of text is calculated using the height of positioning values.
+   * @param text
+   */
+  GralWidget addText(String sText);
+  
   /**Adds a simple text at the current position.
    * 
    * @param sText The text
@@ -669,10 +678,10 @@ public interface GralGridBuild_ifc
 	 * The position and size of the window is set with the adequate strategy like all other widget: 
 	 * using {@link #setPositionSize(int, int, int, int, char)}. 
 	 * @param title Title of the window, may be null, then without title bar.
-	 * @param exclusive true then non-modal.
+	 * @param windProps Or of the static variables {@link GralWindow#windExclusive} etc. 
 	 * @return
 	 */
-	GralWindow createWindow(String name, String title, boolean exclusive);
+	GralWindow createWindow(String name, String title, int windProps);
   
 	
 	//GuiShellMngBuildIfc createWindowOld(String title, boolean exclusive);

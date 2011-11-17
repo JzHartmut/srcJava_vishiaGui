@@ -53,7 +53,10 @@ public class SwtGralMouseListener
         GralWidget widgetInfo = (GralWidget)oInfo;
         GralWidgetMng guiMng = widgetInfo.getMng();
         try{
-          if(widgetInfo ==null || widgetInfo.sDataPath ==null || !widgetInfo.sDataPath.equals("widgetInfo")){
+          String sDataPath = widgetInfo.sDataPath;
+          if( sDataPath ==null  //no datapath given, write info! 
+            || !sDataPath.equals("widgetInfo")  //don't write info if it is a widgetInfo widget itself.
+            ){
             guiMng.setLastClickedWidgetInfo(widgetInfo );
           }
           if(guiMng.bDesignMode){
@@ -81,16 +84,11 @@ public class SwtGralMouseListener
         try{
           GralWidget widgd = (GralWidget)oInfo;
           int dx = ev.x - xDown, dy = ev.y - yDown;
-          if(dx < 10 && dx > -10 && dy < 10 && dy > -10){
-            GralUserAction action = widgd.getActionChange();
-            if(action !=null){
-              action.userActionGui("lu", widgd);
-            }
-          } else if(guiMng.bDesignMode && ev.button == 1 && (ev.stateMask & SWT.ALT)!=0){
+          if(guiMng.bDesignMode && ev.button == 1 && (ev.stateMask & SWT.ALT)!=0){
             boolean bCopy = (ev.stateMask & org.eclipse.swt.SWT.CTRL) !=0;
             GralRectangle rr = new GralRectangle(ev.x, ev.y, 0, 0);
             guiMng.releaseLeftMouseForDesign(widgd, rr, bCopy);  
-          }
+          } 
           //widgd.redraw();
         } catch(Exception exc){ guiMng.writeLog(0, exc); }
         
@@ -136,6 +134,8 @@ public class SwtGralMouseListener
     
     
     
+    /**A standard action for a specific widget for example button, which is executed
+     * independently and additional to the user action. */
     private final GralMouseWidgetAction_ifc mouseWidgetAction;
     
     
@@ -201,7 +201,7 @@ public class SwtGralMouseListener
     @Override public void mouseUp(MouseEvent e) {
       //set the background color to the originally value again if it was changed.
       super.mouseUp(e);
-      if(isPressed){
+      //if(isPressed){
         Control widget = (Control)e.widget;
         widget.removeMouseMoveListener(mouseMoveListener);
         isPressed = false;
@@ -217,18 +217,24 @@ public class SwtGralMouseListener
         try{ 
           GralUserAction action = widgg ==null ? null : widgg.getActionChange();
           if(action !=null){
+            int dx = e.x - xMousePress, dy = e.y - yMousePress;
             final int keyCode;
-            switch(e.button){ 
-              case 1: keyCode = KeyCode.mouse1Up; break; 
-              case 2: keyCode = KeyCode.mouse2Up; break;
-              case 3: keyCode = KeyCode.mouse3Up; break;
+            int moved = (dx < 10 && dx > -10 && dy < 10 && dy > -10) ? 0: 100;
+            switch(e.button + moved){ 
+              case   1: keyCode = KeyCode.mouse1Up; break; 
+              case 101: keyCode = KeyCode.mouse1UpMoved; break; 
+              case   2: keyCode = KeyCode.mouse2Up; break;
+              case 102: keyCode = KeyCode.mouse2UpMoved; break;
+              case   3: keyCode = KeyCode.mouse3Up; break;
+              case 103: keyCode = KeyCode.mouse3Up; break;
               default: keyCode = KeyCode.mouse3Up; break;  //other key
             }
+            //TODO add capture ctrl, alt, sh 
             action.userActionGui(keyCode, widgg);
           }
         } catch(Exception exc){ guiMng.writeLog(0, exc); }
         widgg.redraw();
-      }
+      //}
     }
 
     protected MouseMoveListener mouseMoveListener = new MouseMoveListener()

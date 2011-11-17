@@ -111,16 +111,16 @@ public class JavaCmd extends GuiCfg
     favorPathSelector.panelLeft.tabbedPanelFileTabs = gralMng.addTabbedPanel("File0Tab", null, GralGridBuild_ifc.propZoomedPanel);
     gui.addFrameArea(1, 1, 1, 1, favorPathSelector.panelLeft.tabbedPanelFileTabs); // dialogPanel);
 
-    favorPathSelector.panelLeft.buildInitialTabs('l');
+    favorPathSelector.panelLeft.buildInitialTabs(1);
     gralMng.selectPanel("primaryWindow");
     favorPathSelector.panelMid.tabbedPanelFileTabs = gralMng.addTabbedPanel("File1Tab", null, GralGridBuild_ifc.propZoomedPanel);
     gui.addFrameArea(2, 1, 1, 1, favorPathSelector.panelMid.tabbedPanelFileTabs); // dialogPanel);
-    favorPathSelector.panelMid.buildInitialTabs('m');
+    favorPathSelector.panelMid.buildInitialTabs(2);
 
     gralMng.selectPanel("primaryWindow");
     favorPathSelector.panelRight.tabbedPanelFileTabs = gralMng.addTabbedPanel("File2Tab", null, GralGridBuild_ifc.propZoomedPanel);
     gui.addFrameArea(3, 1, 1, 1, favorPathSelector.panelRight.tabbedPanelFileTabs); // dialogPanel);
-    favorPathSelector.panelRight.buildInitialTabs('r');
+    favorPathSelector.panelRight.buildInitialTabs(3);
 
     gralMng.selectPanel("primaryWindow");
     panelButtons = gralMng.createGridPanel("Buttons", gralMng.getColor("gr"),
@@ -236,12 +236,24 @@ public class JavaCmd extends GuiCfg
    * 
    * @see org.vishia.gral.area9.GuiCfg#stepMain()
    */
-  @Override
-  public void stepMain()
+  @Override public void stepMain()
   {
-
     cmdQueue.execCmds();
   }
+  
+  
+  /**
+   * Executing in the main thread loop. It handles commands.
+   * 
+   * @see org.vishia.gral.area9.GuiCfg#stepMain()
+   */
+  @Override public void finishMain()
+  {
+    cmdQueue.close();  //finishes threads.
+  }
+  
+  
+  
 
   /**
    * Action to set the working directory for the next command invocation. The

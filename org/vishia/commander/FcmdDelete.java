@@ -3,6 +3,7 @@ package org.vishia.commander;
 import java.io.File;
 
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralTextField_ifc;
@@ -38,7 +39,7 @@ public class FcmdDelete
     main.gralMng.selectPanel("primaryWindow");
     main.gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
     
-    windConfirmDelete = main.gralMng.createWindow("copyWindow", "confirm copy", false);
+    windConfirmDelete = main.gralMng.createWindow("copyWindow", "confirm copy", GralWindow.windConcurrently);
     //System.out.println(" window: " + main.gralMng.pos.panel.getPixelPositionSize().toString());
     
     main.gralMng.setPosition(2, GralGridPos.size -2, 1, -1, 0, 'd');

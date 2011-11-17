@@ -31,6 +31,11 @@ public class FcmdFileTable extends FileSelector
    * It is the visible label of the tab, following by ".1" till ".3" for the three panels. */
   final String nameFilePanel;
   
+  /**The label which is written in the line of favor file after l:label m:label r:label
+   * It is the label on the tab.
+   */
+  final String label;
+  
   /**Association to the current used favor path selection.
    * Note that this instance is re-used for more as one selection.
    */
@@ -43,6 +48,7 @@ public class FcmdFileTable extends FileSelector
    */
   FcmdFileTable(LeftMidRightPanel mainPanelP, String label){
     super(WidgetNames.tableFile + label + "." + mainPanelP.cNr , mainPanelP.main.gralMng);
+    this.label = label;
     this.main = mainPanelP.main;
     this.mainPanel = mainPanelP;
     this.nameFilePanel = label+ "." + mainPanelP.cNr;

@@ -7,7 +7,11 @@ import java.io.IOException;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralUserAction;
 
+/**
+ *
+ */
 public class AwtTextBox extends GralTextBox
 {
   protected AwtTextAreaImpl textFieldSwt;
@@ -162,6 +166,14 @@ public class AwtTextBox extends GralTextBox
     @Override public Object getData(){ return data; }
   
     @Override public void setData(Object dataP){ this.data = dataP; }
+    
+  }
+
+
+  @Override
+  public void setMouseAction(GralUserAction action)
+  {
+    // TODO Auto-generated method stub
     
   }
 
