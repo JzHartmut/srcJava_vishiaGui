@@ -2,6 +2,8 @@ package org.vishia.gral.awt;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.vishia.gral.ifc.GralColor;
 
@@ -33,6 +35,27 @@ public class AwtWidgetHelper
     return getColor(colorAwtOld);
   }
 
+
   
+  /**Sets the correct TabItem if any widget at this TabItem is focused. That is not done by swt graphic
+   * on Control.setFocus().
+   * @param control
+   */
+  static boolean setFocusOfTabSwt(Component control)
+  {
+    List<Component> parents = new LinkedList<Component>();
+    Component parent = control;
+    while( (parent = parent.getParent())!=null){
+      parents.add(parent);
+    }
+    for(Component parent1: parents){
+    }
+    return false; //TODOcontrol.setf();
+
+    
+  }
+  
+  
+
   
 }

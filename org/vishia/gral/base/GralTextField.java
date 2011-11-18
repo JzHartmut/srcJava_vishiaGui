@@ -12,9 +12,11 @@ import org.vishia.gral.ifc.GralWidget;
 public abstract class GralTextField extends GralWidget implements GralTextField_ifc
 {
   /**Version and history
-   * 2011-11-18 Hartmut new {@link #setMouseAction(GralUserAction)}. This method should be an abstract method
+   * <ul>
+   * <li>2011-11-18 Hartmut new {@link #setMouseAction(GralUserAction)}. This method should be an abstract method
    *   of all {@link GralWidget} but it is used yet only here.
-   * 2011-09-00 Hartmut Creation to build a platform-indenpenden representation of text field. 
+   * <li>2011-09-00 Hartmut Creation to build a platform-indenpenden representation of text field. 
+   * </ul>
    */
   public final static int version = 0x20111118;
   

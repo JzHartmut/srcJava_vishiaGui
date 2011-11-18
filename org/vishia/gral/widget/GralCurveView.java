@@ -49,6 +49,13 @@ public class GralCurveView extends GralWidget
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
   { //widgetSwt.setBounds(x,y,dx,dy);
   }
+
+  @Override
+  public boolean setFocus()
+  {
+    // TODO Auto-generated method stub
+    return false;
+  }
   
 
 }

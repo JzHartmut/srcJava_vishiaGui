@@ -52,7 +52,7 @@ public class CommandSelector extends SelectList
   
   
   public CommandSelector(String name, CmdQueue cmdQueue, GralWidgetMng mng)
-  { super(name, mng);
+  { //super(name, mng);
     this.cmdStore = new CmdStore();
     this.cmdQueue = cmdQueue;
   }

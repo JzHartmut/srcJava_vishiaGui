@@ -47,6 +47,8 @@ public abstract class GralWidget implements GralWidget_ifc
   
   /**Changes:
    * <ul>
+   * <li>2011-11-18 Hartmut bugfix: {@link #setFocus()} had called {@link GralWidgetMng#setFocus(GralWidget)} and vice versa.
+   *   Instead it should be a abstract method here and implemented in all Widgets. See {@link org.vishia.gral.swt.SwtWidgetHelper#setFocusOfTabSwt(org.eclipse.swt.widgets.Control)}.
    * <li>2011-10-15 Hartmut chg: This class is now abstract. It is the super class for all wrapper implementations.
    *   The wrapper implements special interfaces for the kind of widgets. It is more simple for usage, less instances to know.
    *   A GralWidget is able to test with instanceof whether it is a special widget. The element widget is removed because the reference
@@ -88,7 +90,7 @@ public abstract class GralWidget implements GralWidget_ifc
   
   /**The panel manager from where the widget is organized. Most of methods need the information
    * stored in the panel manager. This reference is used to set values to other widgets. */
-  private GralWidgetMng itsMng;
+  protected GralWidgetMng itsMng;
   
   /**Association to the configuration element from where this widget was built. 
    * If the widget is moved or its properties are changed in the 'design mode' of the GUI,
@@ -490,11 +492,12 @@ public abstract class GralWidget implements GralWidget_ifc
    * See {@link GralPanelMngWorking_ifc#setFocus(GralWidget)}.
    * @return true if the focus is set really.
    */
-  public boolean setFocus()
+  public abstract boolean setFocus();
+  /*
   {
     return itsMng.setFocus(this);
   }
-
+  */
   
   
   /**Gets the working interface of the manager. 

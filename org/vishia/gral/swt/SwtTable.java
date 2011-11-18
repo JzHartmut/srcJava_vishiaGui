@@ -485,12 +485,8 @@ public class SwtTable extends GralTable
   }
 
 
-
-
   @Override public boolean setFocus()
-  { mng.setFocusOfTabSwt(table);
-    table.forceFocus();
-    return table.setFocus();
+  { return SwtWidgetHelper.setFocusOfTabSwt(table);
   }
 
 

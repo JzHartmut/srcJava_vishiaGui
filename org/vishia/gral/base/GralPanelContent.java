@@ -17,11 +17,13 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
 
   /**Version history:
    * <ul>
+   * <li>2011-11-19 Hartmut chg: The 'itsTabSwt' is moved to {@link org.vishia.gral.swt.SwtPanel} now.
    * <li>2011-11-12 Hartmut new: {@link #getPixelPositionSize()}.
    * </ul>
    * 
    */
-  final static int version = 0x20111112;
+  @SuppressWarnings("hiding")
+  public final static int version = 0x20111119;
 
   public final String namePanel;
 
@@ -30,11 +32,6 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
    * Note: can't be final because it may be unknown on calling constructor  
    */
   protected Object panelComposite; 
-  
-  /**A possible tab in a TabFolder. Especially for SWT.   
-   * Note: can't be final because it may be unknown on calling constructor  
-   */
-  public Object itsTabSwt; 
   
 	
 	//public GralPrimaryWindow_ifc mainWindow;

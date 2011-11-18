@@ -5,6 +5,7 @@ import java.io.File;
 import org.vishia.commander.FcmdFavorPathSelector.SelectTabList;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralTableLine_ifc;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.FileSelector;
 
 import org.vishia.util.FileSystem;
@@ -47,19 +48,21 @@ public class FcmdFileTable extends FileSelector
    * @param label The label of the tab, it builds the name of all widgets.
    */
   FcmdFileTable(LeftMidRightPanel mainPanelP, String label){
-    super(WidgetNames.tableFile + label + "." + mainPanelP.cNr , mainPanelP.main.gralMng);
+    super();
     this.label = label;
     this.main = mainPanelP.main;
     this.mainPanel = mainPanelP;
     this.nameFilePanel = label+ "." + mainPanelP.cNr;
-    main.idxFileSelector.put(this.name, this); //it is WidgetNames.tableFile + label +.123, see super(...) 
+    String namePanelFile = WidgetNames.tableFile + nameFilePanel;
+    main.idxFileSelector.put(namePanelFile, this); //it is WidgetNames.tableFile + label +.123, see super(...) 
     GralWidgetMng mng = main.gralMng;
     ///
     ///
-    selectTableForTab = main.favorPathSelector.new SelectTabList(WidgetNames.tableFavorites + nameFilePanel, mainPanel, mng);
+    selectTableForTab = main.favorPathSelector.new SelectTabList(mainPanel);
+    String nameTableSelection = WidgetNames.tableFavorites + nameFilePanel;
     mainPanel.tabbedPanelSelectionTabs.addGridPanel(WidgetNames.tabFavorites + nameFilePanel, label,1,1,10,10);
     mng.setPosition(2, 0, 0, -0, 1, 'd');  ///p
-    selectTableForTab.setToPanel(mng, nameFilePanel, 5, mainPanel.widthSelecttable, 'A');
+    selectTableForTab.setToPanel(mng, nameTableSelection, 5, mainPanel.widthSelecttable, 'A');
     //mng.selectPanel(WidgetNames.panelFavoritesLeftMidRight +mainPanel.cNr);
     //String sLabelTab = "file&"+cNr;
     //The grid panel contains this widget. The grid panel is a tab of mainPanel.tabbedPanel
@@ -67,7 +70,6 @@ public class FcmdFileTable extends FileSelector
     setActionOnEnterFile(mainPanel.main.executer.actionExecute);
     //
     //sets this Widget to the selected panel, it is the grid panel which was created even yet.
-    String namePanelFile = WidgetNames.tableFile + nameFilePanel;
     setToPanel(mng, namePanelFile, 5, new int[]{2,20,5,10}, 'A');
   }
 
@@ -80,7 +82,7 @@ public class FcmdFileTable extends FileSelector
     case KeyCode.alt + KeyCode.F + '7': FileSystem.searchInFiles(new File[]{file}, "ordersBackground"); break;
     default: ret = false;
     }
-    if (keyCode ==main.keyActions.keyCreateFavorite){
+    if (keyCode == main.keyActions.keyCreateFavorite){
       main.favorPathSelector.windAddFavorite.panelInvocation = mainPanel;
       main.favorPathSelector.windAddFavorite.widgTab.setText(nameFilePanel);
       main.favorPathSelector.windAddFavorite.widgShortName.setText("alias");
@@ -88,6 +90,10 @@ public class FcmdFileTable extends FileSelector
       String pathDir = FileSystem.getCanonicalPath(lastSelectedFile.getParentFile());
       main.favorPathSelector.windAddFavorite.widgPath.setText(pathDir);
       main.favorPathSelector.windAddFavorite.window.setWindowVisible(true);
+    } else if (keyCode == main.keyActions.keyPanelSelection){
+      //focuses the panel which is the selection panel for this file table.
+      GralWidget tableSelection = main.gralMng.getWidget(WidgetNames.tableFavorites + nameFilePanel);
+      tableSelection.setFocus();
     }
     return ret;
   }

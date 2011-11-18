@@ -511,7 +511,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      favorPathSelector.panelLeft.selectTableAll.setFocus();
+      favorPathSelector.panelLeft.selectTableAll.wdgdTable.setFocus();
       return true;
     }
   };
@@ -526,7 +526,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      favorPathSelector.panelMid.selectTableAll.setFocus();
+      favorPathSelector.panelMid.selectTableAll.wdgdTable.setFocus();
       return true;
     }
   };
@@ -541,7 +541,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      favorPathSelector.panelRight.selectTableAll.setFocus();
+      favorPathSelector.panelRight.selectTableAll.wdgdTable.setFocus();
       return true;
     }
   };

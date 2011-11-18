@@ -53,6 +53,12 @@ public class AwtTextField extends GralTextField
     // TODO Auto-generated method stub
     
   }
+  
+  @Override public boolean setFocus()
+  { return AwtWidgetHelper.setFocusOfTabSwt(widgetAwt);
+  }
+
+
 
   @Override
   public GralColor setBackgroundColor(GralColor color)

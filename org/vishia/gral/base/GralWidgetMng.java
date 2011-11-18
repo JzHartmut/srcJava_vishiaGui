@@ -561,7 +561,6 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
     return widgd.setFocus();
   }
   
-
   @Override public void notifyFocus(GralWidget widgd)
   {
     synchronized(widgetsInFocus){

@@ -6,6 +6,7 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
@@ -17,6 +18,29 @@ import org.vishia.gral.ifc.GralWidget;
 public class SwtPanel extends GralPanelContent
 {
   
+  /**Version history:
+   * <ul>
+   * <li>2011-11-19 Hartmut chg: {@link #itsTabSwt} with correct type moved from {@link GralPanelContent}.
+   * <li>2011-09-25 Hartmut creation: Common class for all Swt implementations of Panels.
+   *   This class can implement the abstract methods from {@link GralPanelContent} for the implementation
+   *   in a common form.
+   * </ul>
+   * 
+   */
+  @SuppressWarnings("hiding")
+  public final static int version = 0x20111119;
+
+  
+  /**The associated tab in a TabFolder if this panel is the main panel of the TabItem, or null 
+   * if it isn't a main panel of a tab in a tabbed panel.
+   * <br><br>    
+   * Note: can't be final because it may be unknown on calling constructor. The property whether 
+   * a panel is a tab-panel can't be presented with an extra subclass, because this class is the subclass 
+   * of several Swt panel types. Use the aggregation principle instead multi-inheritance.   
+   */
+  public TabItem itsTabSwt; 
+  
+
   //protected Composite panelSwt;
   
   private SwtPanel(String name, GralWidgetMng mng)

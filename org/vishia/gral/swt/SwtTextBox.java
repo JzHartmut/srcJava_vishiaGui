@@ -141,6 +141,11 @@ public class SwtTextBox extends GralTextBox
   @Override public void redraw(){  textFieldSwt.redraw(); textFieldSwt.update(); }
 
 
+  @Override public boolean setFocus()
+  { return SwtWidgetHelper.setFocusOfTabSwt(textFieldSwt);
+  }
+
+
   
   @Override public void removeWidgetImplementation()
   {

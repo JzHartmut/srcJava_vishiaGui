@@ -1550,38 +1550,6 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	
 	
   
-  /**Sets the correct TabItem if any widget at this TabItem is focused. That is not done by swt graphic
-   * on Control.setFocus().
-   * @param control
-   */
-  void setFocusOfTabSwt(Control control)
-  {
-    List<Control> parents = new LinkedList<Control>();
-    Control parent = control;
-    TabItem tabItemSwt = null;
-    while( (parent = parent.getParent())!=null){
-      parents.add(parent);
-    }
-    for(Control parent1: parents){
-      Object gralObj = parent1.getData();
-      if(gralObj !=null && gralObj instanceof GralPanelContent){
-        GralPanelContent gralPanel = (GralPanelContent) gralObj;
-        Object tabitem = gralPanel.itsTabSwt;
-        if(tabitem instanceof TabItem){
-          tabItemSwt = (TabItem)tabitem;
-        }
-      }
-      if(parent1 instanceof TabFolder){
-        TabFolder tf = (TabFolder)parent1;
-        tf.setFocus();
-        tf.setSelection(tabItemSwt);
-        stop();
-      }
-    }
-    
-  }
-  
-  
   /**Universal focus listener to register which widgets were in focus in its order.
    * 
    */

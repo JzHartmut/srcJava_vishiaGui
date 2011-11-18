@@ -99,6 +99,7 @@ public abstract class GralTabbedPanel extends GralPanelContent /*extends GralWid
    * which means it content is visible. That is able to use.
 	 * @param name
 	 * @return
+	 * @deprecated use {@link GralWidget#setFocus()}
 	 */
 	abstract public GralPanelContent selectTab(String name);
 	

@@ -431,8 +431,8 @@ class FcmdFavorPathSelector
     
     
     
-    public SelectTabList(String name, LeftMidRightPanel panel, GralWidgetMng mng)
-    { super(name, mng);
+    public SelectTabList(LeftMidRightPanel panel)
+    { //super(name, mng);
       this.panel = panel;
     }
 
@@ -502,7 +502,7 @@ class FcmdFavorPathSelector
       
       //fill in the standard file panel, use maybe a current directory.
       fileTable.selectInfo = info;
-      if(  name.startsWith(WidgetNames.tableFavoritesMain)   //use the root dir anytime if the main favor path table is used.
+      if(  wdgdTable.name.startsWith(WidgetNames.tableFavoritesMain)   //use the root dir anytime if the main favor path table is used.
         || (currentDir  = panel.indexActualDir.get(info.selectName)) == null){  //use the root if the entry wasn't use till now
         currentDir = new File(info.path);
       }

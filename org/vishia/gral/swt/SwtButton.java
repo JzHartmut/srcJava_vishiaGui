@@ -89,6 +89,12 @@ public class SwtButton extends GralButton
   { widgetSwt.setBounds(x,y,dx,dy);
   }
   
+  @Override public boolean setFocus()
+  { SwtWidgetHelper.setFocusOfTabSwt(widgetSwt);
+    widgetSwt.forceFocus();
+    return widgetSwt.setFocus();
+  }
+
 
   
   private class SwtButtonImpl extends Canvas

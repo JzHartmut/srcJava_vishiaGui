@@ -56,7 +56,7 @@ public class LeftMidRightPanel
     this.main = javaCmd;
     this.cc = cc;
     this.cNr = cNr;
-    selectTableAll = tabSelector.new SelectTabList(WidgetNames.tableFavoritesMain + cNr, this, mng);
+    selectTableAll = tabSelector.new SelectTabList(this);
   }
   
   

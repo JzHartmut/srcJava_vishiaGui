@@ -14,16 +14,25 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.KeyCode;
 
-/**Complex widget which contains a list what's items are able to select. 
+/**The base class for lists which supports nested selections. The associated widget is a table.
+ * The action listener {@link #actionTable} captures all key and mouse activities on the table-widget.
  * It is the base class for file selection and command selection.
+ * <br><br>
+ * Note: this class should not be a derived class of {@link GralTable}, because instances of derived classes
+ * should be created as final compositions in the main thread before the table can be presented 
+ * in the graphic thread. Therefore the aggregation {@link #wdgdTable} cannot be final. It is set 
+ * only when {@link #setToPanel(GralGridBuild_ifc, String, int, int[], char)} is called.  
  * 
  * @author Hartmut Schorrig
  *
  */
-public abstract class SelectList extends GralWidget
+public abstract class SelectList //extends GralWidget
 {
   /**Version and history:
    * <ul>
+   * <li>2011-11-18 chg: This class does not inherit from GralWidget now. The GralWidget, which represents this class,
+   *   is referenced with the public aggregation {@link #wdgdTable}. Only this instance is registered on a panel
+   *   calling {@link #setToPanel(GralGridBuild_ifc, String, int, int[], char)}. 
    * <li>2011-10-02 chg: Uses keycodes from {@link KeyCode} now,
    * <li>2011-10-02 chg: {@link #actionOk(Object, GralTableLine_ifc)} returns boolean now, false if no action is done.
    * <li>older- TODO
@@ -31,20 +40,34 @@ public abstract class SelectList extends GralWidget
    */
   public static final int version = 0x20111002;
   
-  /**The table which is showing in the widget. */
-  //protected GralWidget wdgdTable;
-  
+
   /**The table which is showing in the widget. */
   public GralTable wdgdTable;
+  
+
+  /**The keys for left and right navigation. Default it is shift + left and right arrow key.
+   * 
+   */
+  private int keyLeft = KeyCode.shift + KeyCode.left, keyRight = KeyCode.shift + KeyCode.right;
+  
   
   /**Not used yet, register actions? */
   protected Map<String, GralUserAction> actions;
   
-  public SelectList(String name, GralWidgetMng mng)
+  public SelectList() //String name, GralWidgetMng mng)
   {
-    super(name, 'l', mng);
+    //super(name, 'l', mng);
   }
 
+  
+  /**The left and right key codes for selection left and right can be changed.
+   * The key code is a number maybe in combination with alt, ctrl, shift see {@link KeyCode}.
+   * @param keyLeft Key code for outer selection
+   * @param keyRight KeyCode for deeper selection
+   */
+  public final void setLeftRightKeys(int keyLeft, int keyRight){
+    this.keyLeft = keyLeft; this.keyRight = keyRight;
+  }
 
   //public SelectList()
   //{
@@ -118,42 +141,6 @@ public abstract class SelectList extends GralWidget
     
   };
 
-  /**Sets the focus to this SelectList, the table-widget gets the focus. */
-  @Override public boolean setFocus()
-  { return wdgdTable.setFocus(); }
-  
-  @Override public void removeWidgetImplementation()
-  {
-    
-  }
-
-  @Override
-  public Object getWidgetImplementation()
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public GralColor setBackgroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public GralColor setForegroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  
-  @Override public void redraw(){  wdgdTable.redraw(); }
-
-  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
-  { wdgdTable.setBoundsPixel(x,y,dx,dy);
-  }
-  
 
   
   void stop(){}

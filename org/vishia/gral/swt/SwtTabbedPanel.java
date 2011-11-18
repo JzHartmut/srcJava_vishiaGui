@@ -93,11 +93,18 @@ public class SwtTabbedPanel extends GralTabbedPanel
 
   
 	
+	/**See {@link GralWidget#setFocus()}
+	 * @see org.vishia.gral.base.GralTabbedPanel#selectTab(java.lang.String)
+	 */
 	@Override public GralPanelContent selectTab(String name)
-	{
+	{ assert(false);
 	  GralPanelContent panel = mng.getPanel(name);
-	  TabItem tabItem = (TabItem)panel.itsTabSwt;
-	  widgetSwt.setSelection(tabItem);
+	  if(panel instanceof SwtPanel){
+  	  SwtPanel swtPanel = (SwtPanel)panel;
+  	  if(swtPanel.itsTabSwt !=null){
+	  	  widgetSwt.setSelection(swtPanel.itsTabSwt);
+  	  }
+	  }
 	  return panel;
 	}
 	

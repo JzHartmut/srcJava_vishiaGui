@@ -58,4 +58,11 @@ public class SwtWidgetMenu extends GralWidget
     // TODO Auto-generated method stub
     return null;
   }
+
+  @Override
+  public boolean setFocus()
+  {
+    // TODO Auto-generated method stub
+    return false;
+  }
 }

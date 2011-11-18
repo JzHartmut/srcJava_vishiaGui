@@ -26,7 +26,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class FileSelector extends GralWidget
+public class FileSelector //extends GralWidget
 {
   
   
@@ -55,8 +55,8 @@ public class FileSelector extends GralWidget
   {
     final FileSelector outer;
     
-    FileSelectList(FileSelector outer, String name, GralWidgetMng mng){
-      super(name, mng);
+    FileSelectList(FileSelector outer){
+      //super(name, mng);
       this.outer = outer;
     }
     
@@ -132,28 +132,6 @@ public class FileSelector extends GralWidget
     }
 
 
-    @Override
-    public Object getWidgetImplementation()
-    {
-      // TODO Auto-generated method stub
-      return null;
-    }
-
-
-    @Override
-    public GralColor setBackgroundColor(GralColor color)
-    {
-      // TODO Auto-generated method stub
-      return null;
-    }
-
-
-    @Override
-    public GralColor setForegroundColor(GralColor color)
-    {
-      // TODO Auto-generated method stub
-      return null;
-    }
   } //selectList implementation
   
   
@@ -188,10 +166,9 @@ public class FileSelector extends GralWidget
   
   GralUserAction actionOnEnterFile;
   
-  public FileSelector(String name, GralWidgetMng mng)
+  public FileSelector()
   {
-    super(name, 'l', mng);
-    selectList = new FileSelectList(this, name+"-selectList", mng);
+    selectList = new FileSelectList(this);
     //this.mainCmd = mainCmd;
   }
   
@@ -323,52 +300,22 @@ public class FileSelector extends GralWidget
     }
   }
   
-  
+  /**Sets the focus of the associated table widget.
+   * @return true if focused.
+   */
+  public boolean setFocus(){ return selectList.wdgdTable.setFocus(); }
   
   void stop(){}
 
   
   
   
-  @Override public Object getWidgetImplementation(){ return selectList.wdgdTable.getWidgetImplementation(); }
-
-  @Override public boolean setFocus(){ return selectList.wdgdTable.setFocus(); }
-  
-  
-
-  @Override
-  public GralColor setBackgroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  @Override
-  public GralColor setForegroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  
-  @Override public void redraw(){  selectList.redraw(); }
-
-
-  
-  @Override public void removeWidgetImplementation()
-  {
-    //widgdPath.rem   
-  }
-
-  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
-  { //TODO build a panel for all widgets.
-    //widgetSwt.setBounds(x,y,dx,dy);
-  }
   
   public boolean actionUserKey(int keyCode, Object data, GralTableLine_ifc line)
   { 
     return false;
   }
+
 
 
 }
