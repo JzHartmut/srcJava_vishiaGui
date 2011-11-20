@@ -1,10 +1,13 @@
 package org.vishia.gral.ifc;
 
+import java.util.List;
+
 
 public interface GralTable_ifc extends GralWidget_ifc
 {
   /**Version and history:
    * <ul>
+   * <ul>2011-11-20 Hartmut new {@link #getSelectedLines()}
    * <li>2011-10-01 Hartmut new: {@link #clearTable()}
    * <li>2011-09-03 Hartmut chg: method {@link #insertLine(String, int)} returns now the instance of {@link GralTableLine_ifc}
    *   The user doesn't create a line instance, an extra factory isn't necessary. The implementing instance
@@ -54,5 +57,13 @@ public interface GralTable_ifc extends GralWidget_ifc
    * @return -1 if the key isn't found in the table. 0... row where this line is shown in table.
    */
   public abstract int searchLine(String key);
+  
+  
+  
+  /**Returns all selected lines.
+   */
+  List<GralTableLine_ifc> getSelectedLines();
+  
+
   
 }

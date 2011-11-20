@@ -68,7 +68,7 @@ public class Executer
    * 
    */
   GralUserAction actionCmdAbort = new GralUserAction()
-  { @Override public boolean userActionGui(String sIntension, GralWidget widgd, Object... params)
+  { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
     { main.cmdQueue.abortCmd();
       return true;
     }

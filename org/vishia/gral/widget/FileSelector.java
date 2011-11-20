@@ -3,6 +3,8 @@ package org.vishia.gral.widget;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -19,6 +21,7 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
+import org.vishia.util.SelectMask;
 
 /**This class is a large widget which contains a list to select files in a directory, 
  * supports navigation in the directory tree and shows the current path in an extra text field.
@@ -33,7 +36,11 @@ public class FileSelector //extends GralWidget
   
   /**Version and History:
    * <ul>
-   * <li>2011-10-02  New: {@link #setActionOnEnterFile(GralUserAction)}. It executes this action if Enter is pressed (or mouse-left- or doubleclick-TODO).
+   * <li>2011-11-20 new: Phenomenal basic idea: The files may be located in remote hardware. 
+   *   It means, that a File can't be access here. Therefore the path, name, date, length in the class {@link FileAndName}
+   *   are the data represents on this process on PC. The access to the file is given with remote access. 
+   *   Usage of inner class FileAndName containing path, name, date, length instead a File instance. 
+   * <li>2011-10-02 new: {@link #setActionOnEnterFile(GralUserAction)}. It executes this action if Enter is pressed (or mouse-left- or doubleclick-TODO).
    * <li>2011-10-01 new: {@link #setOriginDir(File)} and {@link #fillInOriginDir()}.
    *   The origin dir is the directory of first selection or can be set by user. If the user navigates misty,
    *   the origin dir helps to find again the start point.
@@ -43,9 +50,21 @@ public class FileSelector //extends GralWidget
    */
   public static final int version = 0x20111002;
 
-  private static class FileAndName
-  { String sPath;
-    String sName;
+  public static class FileAndName //extends SelectMask
+  { public final String path;
+    public final String name;
+    public final long date;
+    public final long length;
+    public final File file;
+    
+    FileAndName(String sPath, String sName, long length, long date){
+      assert(sPath.endsWith("/"));
+      this.path = sPath;
+      this.name = sName;
+      this.length = length;
+      this.date = date;
+      this.file = new File(sPath, sName);
+    }
   }
   
   
@@ -62,22 +81,23 @@ public class FileSelector //extends GralWidget
     
     @Override public boolean actionOk(Object userData, GralTableLine_ifc line)
     { boolean done = true;
-      File file = (File)(userData);
-      File dir = file.getParentFile();
-      String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir);
+      FileAndName data = (FileAndName)userData;
+      //File dir = data.file.getParentFile();
+      //String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir) + "/";
       String sName = line.getCellText(1);
       if(sName.equals("..")){
-        if(dir !=null){
-          fillIn(dir); 
+        String sParent = getParentDir(data);
+        if(sParent !=null){
+          fillIn(sParent); 
         }
       } else {
-        if(file.isDirectory()){
+        if(data.name.endsWith("/")){
           //save the last selection of that level
-          indexSelection.put(sDir, sName);
-          fillIn(file);
+          indexSelection.put(data.path, data.name);
+          fillIn(data.path + data.name);
         } else {
           if(actionOnEnterFile !=null){
-            actionOnEnterFile.userActionGui("FileSelector-file", widgdPath, file);
+            actionOnEnterFile.userActionGui("FileSelector-file", widgdPath, data.file);
           } else {
             done = false;
           }
@@ -87,46 +107,57 @@ public class FileSelector //extends GralWidget
     }
     
     
+    private String getParentDir(FileAndName data){
+      int zPath = data.path.length();
+      int posSep = data.path.lastIndexOf('/',zPath-2);
+      if(posSep >=0){
+        String sDirP = data.path.substring(0, posSep+1);
+        return sDirP;
+      }
+      else return null;
+    }
+    
+    
     @Override public void actionLeft(Object userData, GralTableLine_ifc line)
     {
-      File file = (File)(userData);
-      File dir = file.getParentFile();
-      String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir);
-      String sName = line.getCellText(1);
-      indexSelection.put(sDir, sName);
-      if(dir !=null){
-        dir = dir.getParentFile();  
-      }
-      if(dir !=null){
-        fillIn(dir); 
+      FileAndName data = (FileAndName)userData;
+      //File dir = data.file.getParentFile();
+      //String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir);
+      //String sName = line.getCellText(1);
+      indexSelection.put(data.path, data.name);
+      String sParent = getParentDir(data);
+      if(sParent !=null){
+        fillIn(sParent); 
       }
     }
     
     
     @Override public void actionRight(Object userData, GralTableLine_ifc line)
     {
-      File file = (File)(userData);
-      File dir = file.getParentFile();
-      String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir);
-      String sName = line.getCellText(1);
-      if(file.isDirectory()){
+      FileAndName data = (FileAndName)userData;
+      //File dir = data.file.getParentFile();
+      //String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir);
+      //String sName = line.getCellText(1);
+      if(data.name.endsWith("/")){
         //save the last selection of that level
-        indexSelection.put(sDir, sName);
-        fillIn(file);
+        indexSelection.put(data.path, data.name);
+        fillIn(data.path + "/" + data.name);
       }
     }
     
     
     
-    @Override public boolean actionUserKey(int keyCode, Object data, GralTableLine_ifc line)
+    @Override public boolean actionUserKey(int keyCode, Object oData, GralTableLine_ifc line)
     { boolean ret = true;
-      File file = (File)(data);
+      //File file = (File)(data);
+      FileAndName data = (FileAndName)oData;
       switch(keyCode){
-      case KeyCode.alt + KeyCode.F + '7': FileSystem.searchInFiles(new File[]{file}, "ordersBackground"); break;
+      case KeyCode.alt + KeyCode.F + '7': 
+        FileSystem.searchInFiles(new File[]{data.file}, "ordersBackground"); break;
       default: ret = false;
       }
       if(!ret){
-        ret = outer.actionUserKey(keyCode, data, line);
+        ret = outer.actionUserKey(keyCode, oData, line);
       }
       return ret;
     }
@@ -161,7 +192,7 @@ public class FileSelector //extends GralWidget
   
   
   /**The directory which was used on start. */
-  File originDir;
+  String originDir;
   
   
   GralUserAction actionOnEnterFile;
@@ -203,9 +234,9 @@ public class FileSelector //extends GralWidget
   }
   
 
-  public File getCurrentDir(){ return currentDir; }
+  public String getCurrentDir(){ return sCurrentDir; }
   
-  public void setOriginDir(File dir){ originDir = dir; }
+  public void setOriginDir(String dir){ originDir = dir; }
   
   /**Sets the action which is called if any file is entered. It means the Enter-Key is pressed or
    * a mouse double-click is done on a file.
@@ -227,24 +258,33 @@ public class FileSelector //extends GralWidget
     fillIn(originDir);
   }
   
+  
+  
   /**Fills the content with given directory.
    * @param dir The directory which's files are shown.
    */
-  public void fillIn(File dir)
+  public void fillIn(String path)
   {
+    File dir = new File(path);
     this.currentDir = dir;
     if(originDir == null){
-      originDir = dir;      //sets on the first invocation. 
+      originDir = path;      //sets on the first invocation. 
     }
-    this.sCurrentDir = FileSystem.getCanonicalPath(dir);
+    this.sCurrentDir = FileSystem.getCanonicalPath(dir) + "/";
     String sFileSelected = indexSelection.get(sCurrentDir);
     widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sCurrentDir);
     File[] files = dir.listFiles();
     if(files !=null){ 
-      Map<String, File> sortFiles = new TreeMap<String, File>();
+      Map<String, FileAndName> sortFiles = new TreeMap<String, FileAndName>();
       for(File file: files){
-        String sort = (file.isDirectory()? "D" : "F") + file.getName();
-        sortFiles.put(sort,file);
+        String sName = file.getName();
+        if(file.isDirectory()){ sName += "/"; }
+        long length = file.length();
+        long date = file.lastModified();
+        FileAndName fileItem = new FileAndName(this.sCurrentDir, sName, length, date);
+        
+        String sort = (file.isDirectory()? "D" : "F") + sName;
+        sortFiles.put(sort, fileItem);
       }
       String[] line = new String[4];
       selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdClear, -1, null, null);
@@ -260,17 +300,15 @@ public class FileSelector //extends GralWidget
       */
       int lineSelect = 0;  
       int lineCt = 0; //count lines to select the line number with equal sFileSelect.
-      for(Map.Entry<String, File> entry: sortFiles.entrySet()){
-        File file = entry.getValue();
-        String name = file.getName();
-        if(sFileSelected != null && name.equals(sFileSelected)){
+      for(Map.Entry<String, FileAndName> entry: sortFiles.entrySet()){
+        FileAndName file = entry.getValue();
+        if(sFileSelected != null && file.name.equals(sFileSelected)){
           lineSelect = lineCt;
         }
-        if(file.isDirectory()){ line[0] = "D"; }
-        else if(file.isHidden()){ line[0] = "x"; }
+        if(file.name.endsWith("/")){ line[0] = "/"; }
         else { line[0] = "";}
-        line[1] = name;
-        Date timestamp = new Date(file.lastModified());
+        line[1] = file.name;
+        Date timestamp = new Date(file.date);
         line[3] = dateFormat.format(timestamp);
         selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, line, file);
         lineCt +=1;
@@ -279,13 +317,13 @@ public class FileSelector //extends GralWidget
     }
   }
   
-  
+
 
   
   /**Gets the selected file from this panel.
    * @return null if no line is selected, for example if the panel isn't used yet.
    */
-  public File getSelectedFile()
+  public FileAndName getSelectedFile()
   {
     if(selectList.wdgdTable == null){
       stop();
@@ -293,11 +331,30 @@ public class FileSelector //extends GralWidget
     }
     GralTableLine_ifc line = selectList.wdgdTable.getCurrentLine();
     if(line !=null){
-      File file = (File)line.getUserData();
-      return file;
+      FileAndName data = (FileAndName)line.getUserData();
+      return data;
     } else {
       return null;
     }
+  }
+  
+
+
+  
+  /**Gets all selected file from this panel.
+   * @return null if no line is selected, for example if the panel isn't used yet.
+   */
+  public List<String> getSelectedFiles()
+  { List<String> list = new LinkedList<String>();
+    if(selectList.wdgdTable == null){
+      stop();
+      return null;
+    }
+    for(GralTableLine_ifc line: selectList.wdgdTable.getSelectedLines()){
+      FileAndName data = (FileAndName)line.getUserData();
+      list.add(data.name);
+    }
+    return list;
   }
   
   /**Sets the focus of the associated table widget.

@@ -645,7 +645,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   
   
   
-  @Override public GralWidget addFileSelectField(String name, List<String> listRecentFiles, String startDirMask, String prompt, char promptStylePosition)
+  @Override public GralTextField addFileSelectField(String name, List<String> listRecentFiles, String startDirMask, String prompt, char promptStylePosition)
   { //int xSize1 = xSize;
     //The macro widget consists of more as one widget. Position the inner widgets:
     GralGridPos posAll = getPositionInPanel(); //saved whole position.
@@ -653,7 +653,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
     setPosition(GralGridPos.same, GralGridPos.same, GralGridPos.same, GralGridPos.same -2.0F, 1, 'r');
     
     //xSize -= ySize;
-    GralWidget widgd = addTextField(name, true, prompt, promptStylePosition );
+    GralTextField widgd = addTextField(name, true, prompt, promptStylePosition );
     setSize(posAll.height(), 2.0F);
     //xPos += xSize;
     //xSize = ySize;

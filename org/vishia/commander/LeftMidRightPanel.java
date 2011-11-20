@@ -36,7 +36,7 @@ public class LeftMidRightPanel
   List<FcmdFileTable> listTabs = new LinkedList<FcmdFileTable>();
   
   /**Stores the current directory for all actual file panels. */
-  final Map<String, File> indexActualDir = new TreeMap<String, File>();
+  final Map<String, String> indexActualDir = new TreeMap<String, String>();
   
   /**File panel. */
   //FcmdFileTable fileSelectorMain;

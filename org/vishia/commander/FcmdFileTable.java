@@ -75,20 +75,20 @@ public class FcmdFileTable extends FileSelector
 
   
   
-  @Override public boolean actionUserKey(int keyCode, Object data, GralTableLine_ifc line)
+  @Override public boolean actionUserKey(int keyCode, Object oData, GralTableLine_ifc line)
   { boolean ret = true;
-    File file = (File)(data);
+    FileAndName data = (FileAndName)oData;
     switch(keyCode){
-    case KeyCode.alt + KeyCode.F + '7': FileSystem.searchInFiles(new File[]{file}, "ordersBackground"); break;
+    case KeyCode.alt + KeyCode.F + '7': FileSystem.searchInFiles(new File[]{data.file}, "ordersBackground"); break;
     default: ret = false;
     }
     if (keyCode == main.keyActions.keyCreateFavorite){
       main.favorPathSelector.windAddFavorite.panelInvocation = mainPanel;
       main.favorPathSelector.windAddFavorite.widgTab.setText(nameFilePanel);
       main.favorPathSelector.windAddFavorite.widgShortName.setText("alias");
-      File lastSelectedFile = getSelectedFile();
-      String pathDir = FileSystem.getCanonicalPath(lastSelectedFile.getParentFile());
-      main.favorPathSelector.windAddFavorite.widgPath.setText(pathDir);
+      FileAndName lastSelectedFile = getSelectedFile();
+      //String pathDir = FileSystem.getCanonicalPath(lastSelectedFile.getParentFile());
+      main.favorPathSelector.windAddFavorite.widgPath.setText(lastSelectedFile.path);
       main.favorPathSelector.windAddFavorite.window.setWindowVisible(true);
     } else if (keyCode == main.keyActions.keyPanelSelection){
       //focuses the panel which is the selection panel for this file table.

@@ -1,8 +1,10 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.util.SelectMask_ifc;
 
 
-public interface GralTableLine_ifc extends GralWidget_ifc
+
+public interface GralTableLine_ifc extends GralWidget_ifc, SelectMask_ifc
 {
 
   String getCellText(int column);

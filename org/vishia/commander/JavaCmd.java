@@ -10,6 +10,8 @@ import java.util.TreeMap;
 import org.vishia.cmd.CmdGetFileArgs_ifc;
 import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
+import org.vishia.commander.target.FcmdtTarget;
+import org.vishia.commander.target.FcmdtTarget_ifc;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
@@ -65,10 +67,16 @@ public class JavaCmd extends GuiCfg
 
   private File[] selectedFiles;
 
+  FileSelector[] lastFocusedFileTables = new FileSelector[3];
+  
   final Map<String, FileSelector> idxFileSelector = new TreeMap<String, FileSelector>();
   // { new TreeMap<String, FileSelector>(), new TreeMap<String, FileSelector>(),
   // new TreeMap<String, FileSelector>()};
 
+  
+  FcmdtTarget_ifc target;
+  
+  
   /**
    * The commands which are used for some buttons or menu items from the
    * JavaCommander itself.
@@ -79,6 +87,7 @@ public class JavaCmd extends GuiCfg
   {
     super(cargs, cmdgui, null);
     this.cargs = cargs;
+    target = new FcmdtTarget();  //create the target itself, one process TODO experience with remote target.
     buttonCmds = new CmdStore();
     cmdQueue.setOutput(gui.getOutputBox(), null);
   }
@@ -96,7 +105,7 @@ public class JavaCmd extends GuiCfg
 
     gui.setFrameAreaBorders(30, 65, 70, 85); // x1, x2, y1, y2
     gui.setStandardMenusGThread(new File("."), actionFile);
-    gui.addMenuItemGThread("MenuSaveFavoriteSel", "&File/Save favorites &Pathes", favorPathSelector.actionSaveFavoritePathes); // /
+    gui.addMenuItemGThread("MenuSaveFavoriteSel", "&File/Save favorite &Pathes", favorPathSelector.actionSaveFavoritePathes); // /
     gui.addMenuItemGThread("MenuSetWorkingDir", "&Command/Set&WorkingDir", actionSetCmdWorkingDir); // /
     gui.addMenuItemGThread("MenuCommandAbort", "&Command/&Abort", executer.actionCmdAbort); // /
     // gui.addMenuItemGThread("&Command/E&xecute", actionSetCmdCurrentDir); ///
@@ -160,7 +169,7 @@ public class JavaCmd extends GuiCfg
     gralMng.addButton("b-F2", null, "help", null, null, "F2");
     gralMng.addButton("b-help", null, "help", null, null, "view");
     gralMng.addButton("b-edit", actionEdit, "", null, null, "edit");
-    gralMng.addButton("b-copy", actionCopy, "", null, null, "copy");
+    gralMng.addButton("b-copy", copyCmd.actionConfirmCopy, "", null, null, "copy");
     gralMng.addButton("b-help", null, "help", null, null, "move");
     gralMng.addButton("b-help", null, "help", null, null, "mkdir");
     fButtons.buttonDel = gralMng.addButton("b-delete", actionDelete, "del", null, null, "del");
@@ -248,8 +257,13 @@ public class JavaCmd extends GuiCfg
    * @see org.vishia.gral.area9.GuiCfg#stepMain()
    */
   @Override public void finishMain()
-  {
-    cmdQueue.close();  //finishes threads.
+  { 
+    try{
+      cmdQueue.close();  //finishes threads.
+      target.close();
+    } catch(IOException exc){
+      
+    }
   }
   
   
@@ -274,8 +288,8 @@ public class JavaCmd extends GuiCfg
         // assert(ixFilePanel >=0 && ixFilePanel < fileSelector.length); //only
         // such names are registered.
         // FileSelector fileSel = fileSelector[ixFilePanel];
-        File file = fileSel.getSelectedFile();
-        cmdQueue.setWorkingDir(file);
+        FileSelector.FileAndName file = fileSel.getSelectedFile();
+        cmdQueue.setWorkingDir(new File(file.path + file.name));
       }
       stop();
       if (sIntension.equals("")) {
@@ -286,22 +300,39 @@ public class JavaCmd extends GuiCfg
 
   };
 
-  /**
-   * Routine to prepare up to 3 files, which were simple selected at last in the
+  
+  
+  /**Routine to prepare up to 3 files, which were simple selected at last in the
    * panels. The order of focused file-panel-tables is used for that. The
    * currently selected file in any of the tables in order of last gotten focus
    * is used to get the files. It is the input for some command invocations.
    * 
    * @return Array of files in order of last focus
    */
-  private File[] getSelectedFile()
-  {
+  private File[] getCurrentFileInLastPanels()
+  { findLastFocusedFileTables();
     File file[] = new File[3];
+    int ixFile = -1;
+    for(FileSelector fileTable: lastFocusedFileTables){
+      if(fileTable !=null){
+        FileSelector.FileAndName fileItem = fileTable.getSelectedFile();
+        file[++ixFile] = new File(fileItem.path, fileItem.name);
+      }
+    }
+    return file;
+  }
+
+
+  /**Routine to find out the last focused file tables in order of focus.
+   * 
+   * @set lastFocusedFileTables
+   */
+  void findLastFocusedFileTables(){
     int ixFile = 0;
     List<GralWidget> widgdFocus = gralMng.getWidgetsInFocus();
     synchronized (widgdFocus) {
       Iterator<GralWidget> iterFocus = widgdFocus.iterator();
-      while (ixFile < file.length && iterFocus.hasNext()) {
+      while (ixFile < lastFocusedFileTables.length && iterFocus.hasNext()) {
         GralWidget widgd = iterFocus.next();
         FileSelector fileSel = idxFileSelector.get(widgd.name);
         if (fileSel != null) { // is a FileSelector focused yet?
@@ -310,12 +341,35 @@ public class JavaCmd extends GuiCfg
           // assert(ixFilePanel >=0 && ixFilePanel < fileSelector.length);
           // //only such names are registered.
           // FileSelector fileSel = fileSelector[ixFilePanel];
-          file[ixFile++] = fileSel.getSelectedFile();
+          lastFocusedFileTables[ixFile++] = fileSel;
         }
       }
     }
-    return file;
   }
+  
+  
+  
+  
+  /**Returns all selected files in the last actual file table.
+   * 
+   * @return Array of files which are selected, The array has the length 1 if only one file is selected.
+   */
+  private List<String> getSelectedFilesInLastPanel()
+  {
+    List<GralWidget> widgdFocus = gralMng.getWidgetsInFocus();
+    FileSelector fileSel = null;
+    synchronized (widgdFocus) {
+      Iterator<GralWidget> iterFocus = widgdFocus.iterator();
+      while (fileSel == null && iterFocus.hasNext()) {
+        GralWidget widgd = iterFocus.next();
+        fileSel = idxFileSelector.get(widgd.name);
+      }
+    }
+    if(fileSel !=null){
+      return fileSel.getSelectedFiles();
+    } else return null;
+  }
+
 
   /**
    * Action to set the command list from file. It is called from menu.
@@ -327,7 +381,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      selectedFiles = getSelectedFile();
+      selectedFiles = getCurrentFileInLastPanels();
       if (selectedFiles[0] != null) {
         cmdSelector.cmdStore.readCmdCfg(selectedFiles[0]);
         cmdSelector.fillIn();
@@ -386,7 +440,7 @@ public class JavaCmd extends GuiCfg
     @Override
     public void prepareFileSelection()
     {
-      selectedFiles = getSelectedFile();
+      selectedFiles = getCurrentFileInLastPanels();
     }
 
     @Override
@@ -576,7 +630,7 @@ public class JavaCmd extends GuiCfg
       if (cmdBlock == null) {
         mainCmd.writeError("internal problem - don't find 'edit' command. ");
       } else {
-        selectedFiles = getSelectedFile();
+        selectedFiles = getCurrentFileInLastPanels();
         getterFiles.prepareFileSelection();
         File[] files = new File[3];
         files[0] = getterFiles.getFile1();
@@ -588,36 +642,17 @@ public class JavaCmd extends GuiCfg
     }
   };
 
-  /**
-   * Key F5 for copy command. Its like Norton Commander.
-   */
-  GralUserAction actionCopy = new GralUserAction()
-  {
-    @Override
-    public boolean userActionGui(String sIntension, GralWidget infos,
-        Object... params)
-    {
-      selectedFiles = getSelectedFile();
-      getterFiles.prepareFileSelection();
-      //File[] files = new File[3];
-      File fileSrc = getterFiles.getFile1();
-      File fileDst = getterFiles.getFile2();
-      //files[2] = getterFiles.getFile3();
-      copyCmd.confirmCopy(fileDst, fileSrc);
-      return true;
-      // /
-    }
-  };
 
+  
   /**
-   * Key F5 for copy command. Its like Norton Commander.
+   * Key F6 for delete command. Its like Norton Commander.
    */
   GralUserAction actionDelete = new GralUserAction()
   {
     @Override
     public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     {
-      selectedFiles = getSelectedFile();
+      selectedFiles = getCurrentFileInLastPanels();
       getterFiles.prepareFileSelection();
       //File[] files = new File[3];
       File fileSrc = getterFiles.getFile1();

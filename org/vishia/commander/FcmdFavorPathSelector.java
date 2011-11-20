@@ -378,15 +378,15 @@ class FcmdFavorPathSelector
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { if(key == KeyCode.mouse1Up){
         if(infos.sCmd.equals("ok")){
-          //GralTableLine_ifc selectedLine = windAddFavorite.panelInvocation.selectTable.wdgdTable.getCurrentLine();
+          //check whether the selectInfo should be associated to a local list.
           SelectInfo selectInfo = actSelectInfo; //(SelectInfo)selectedLine.getUserData();
           List<FcmdFavorPathSelector.SelectInfo> listAdd = windAddFavorite.panelInvocation.selectListAllFavorites;
-          int posInList = listAdd.indexOf(selectInfo);
+          int posInList = listAdd.indexOf(selectInfo); //position of last selection
           if(posInList == -1){
             //maybe selected one entry from the tab-special list or one entry of the common list.
             listAdd = selectAll;
-            posInList = listAdd.indexOf(selectInfo);
-          }
+            posInList = listAdd.indexOf(selectInfo); //position of last selection
+          } //add new SelectInfo after the current used.
           SelectInfo favorite = new SelectInfo();
           favorite.path = windAddFavorite.widgPath.getText();
           favorite.selectName = windAddFavorite.widgShortName.getText();
@@ -493,7 +493,7 @@ class FcmdFavorPathSelector
      
       //before changing the content of this fileTable, store the current directory
       //to restore if this favor respectively selection is used ones more.
-      File currentDir;
+      String currentDir;
       if(fileTable.selectInfo !=null){
         currentDir = fileTable.getCurrentDir();
         if(currentDir !=null){
@@ -504,7 +504,7 @@ class FcmdFavorPathSelector
       fileTable.selectInfo = info;
       if(  wdgdTable.name.startsWith(WidgetNames.tableFavoritesMain)   //use the root dir anytime if the main favor path table is used.
         || (currentDir  = panel.indexActualDir.get(info.selectName)) == null){  //use the root if the entry wasn't use till now
-        currentDir = new File(info.path);
+        currentDir = info.path;
       }
       fileTable.fillIn(currentDir);
       fileTable.setFocus();

@@ -66,14 +66,15 @@ public class JavaCmdKeyActions
   }
   
   GralUserAction commanderKeyActions = new GralUserAction()
-  { @Override public boolean userActionGui(String sIntension, GralWidget widgd, Object... params)
+  { @Override public boolean userActionGui(int keyCode, GralWidget widgd, Object... params)
     { boolean done = false;
-      if(sIntension.equals("key")){
-        int keyCode = (Integer)params[0];
+      //if(sIntension.equals("key")){
+        //int keyCode = (Integer)params[0];
+      String sIntension = "key";
         done = true;
         switch (keyCode){
-          case KeyCode.F4: main.actionEdit.userActionGui(sIntension, widgd, params); break;
-          case KeyCode.F5: main.actionCopy.userActionGui(sIntension, widgd, params); break;
+          //case KeyCode.F4: main.actionEdit.userActionGui(sIntension, widgd, params); break;
+          //case KeyCode.F5: main.copyCmd.actionCopy.userActionGui(keyCode, widgd, params); break;
           case KeyCode.alt + KeyCode.F1: main.selectPanelLeft.userActionGui(sIntension, widgd, params); break;
           case KeyCode.alt + KeyCode.F2: main.selectPanelMiddle.userActionGui(sIntension, widgd, params); break;
           case KeyCode.alt + KeyCode.F3: main.selectPanelRight.userActionGui(sIntension, widgd, params); break;
@@ -82,7 +83,7 @@ public class JavaCmdKeyActions
         if(!done){
           done = true;
           if(     keyCode == keyEdit){ main.actionEdit.userActionGui(sIntension, widgd, params); }
-          else if(keyCode == keyCopy){ main.actionCopy.userActionGui(sIntension, widgd, params); }
+          else if(keyCode == keyCopy){ main.copyCmd.actionConfirmCopy.userActionGui(keyCode, widgd, params); }
           else if(keyCode == keyDelete1 || keyCode == keyDelete2){ main.actionDelete.userActionGui(keyCode, widgd); }
           //navigation
           else if(keyCode == keyOriginDir){ main.favorPathSelector.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }
@@ -90,7 +91,7 @@ public class JavaCmdKeyActions
           else if(keyCode == keyWindFullOut){ main.windMng.actionWindFullOut.userActionGui(sIntension, widgd, params); }
           else { done = false; }
         }
-      }
+      //}
       return done;
     }
     

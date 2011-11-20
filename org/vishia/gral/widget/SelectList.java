@@ -13,10 +13,15 @@ import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.KeyCode;
+import org.vishia.util.SelectMask_ifc;
 
 /**The base class for lists which supports nested selections. The associated widget is a table.
  * The action listener {@link #actionTable} captures all key and mouse activities on the table-widget.
  * It is the base class for file selection and command selection.
+ * The base idea is, left and right keys navigates in a tree to outer and deeper nodes. The table
+ * shows only members of the current node. A text line shows the current node path.
+ * It may be possible to switch to a tree presentation (TODO). But this complex widget should occupy
+ * only a simple rectangle of a GUI, not some windows etc. It may be less in spread too if necessary.
  * <br><br>
  * Note: this class should not be a derived class of {@link GralTable}, because instances of derived classes
  * should be created as final compositions in the main thread before the table can be presented 
@@ -49,6 +54,7 @@ public abstract class SelectList //extends GralWidget
    * 
    */
   private int keyLeft = KeyCode.shift + KeyCode.left, keyRight = KeyCode.shift + KeyCode.right;
+  
   
   
   /**Not used yet, register actions? */
@@ -131,8 +137,8 @@ public abstract class SelectList //extends GralWidget
       Object data = line.getUserData();
       //int keyCode = (Integer)params[1];
       boolean done = true;
-      if(keyCode == KeyCode.shift + KeyCode.left){ actionLeft(data, line); }
-      else if(keyCode == KeyCode.shift + KeyCode.right){ actionRight(data, line); }
+      if(keyCode == keyLeft){ actionLeft(data, line); }
+      else if(keyCode == keyRight){ actionRight(data, line); }
       else if(keyCode == KeyCode.enter){ done = actionOk(data, line); }
       else { done = actionUserKey(keyCode, data, line); }
       return done;

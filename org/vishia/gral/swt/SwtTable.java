@@ -1,6 +1,9 @@
 package org.vishia.gral.swt;
 
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -25,6 +28,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.util.KeyCode;
+import org.vishia.util.SelectMask;
 
 public class SwtTable extends GralTable
 {
@@ -278,8 +282,9 @@ public class SwtTable extends GralTable
         swtControl = null;
       }
       boolean actionDone = false;
-      if(action !=null && (keyEv.keyCode & 0xffff) !=0){
-      	int ixRow = -99999;
+      if((keyEv.keyCode & 0xffff) !=0){
+        final int keyCode = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
+        int ixRow = -99999;
       	try{
 	      	Table table1 = (Table)source;
 	        ixRow  = table1.getSelectionIndex();   //the currently selected line.
@@ -293,20 +298,24 @@ public class SwtTable extends GralTable
 		          lineGral = new TableItemWidget(tableLineSwt, null);
 		          tableLineSwt.setData(lineGral);  //Set the data for usage later.
 		        }
-		        int keyCode = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
-		        actionDone = action.userActionGui(keyCode, widgetDescr, lineGral);
+		        procStandardKeys(keyCode, lineGral, ixRow);
+		        if(action !=null){ 
+		          actionDone = action.userActionGui(keyCode, widgetDescr, lineGral);
+		        }
 	        } //if(table.)
 	      } catch(Exception exc){
       		stop();  //ignore it
       	}
-      }
-      if(!actionDone  && (keyEv.keyCode & 0xffff) !=0){
-        GralUserAction mainKeyAction = mng.getRegisteredUserAction("KeyAction");
-        if(mainKeyAction !=null){
-          int gralKey = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
-          //old form called because compatibility, if new for with int-parameter returns false.
-          mainKeyAction.userActionGui("key", widgetDescr, new Integer(gralKey));
-        }
+	      if(action !=null && !actionDone){
+	        GralUserAction mainKeyAction = mng.getRegisteredUserAction("KeyAction");
+	        if(mainKeyAction !=null){
+	          int gralKey = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
+	          //old form called because compatibility, if new for with int-parameter returns false.
+	          if(!mainKeyAction.userActionGui(gralKey, widgetDescr)){
+	            mainKeyAction.userActionGui("key", widgetDescr, new Integer(gralKey));
+	          }
+	        }
+	      }
       }
       stop();
       if(basicListener !=null){
@@ -336,7 +345,7 @@ public class SwtTable extends GralTable
    * The instance knows its TableSwt and therefore the supports the access to the whole table.
    *
    */
-  private class TableItemWidget implements GralTableLine_ifc
+  private class TableItemWidget extends SelectMask implements GralTableLine_ifc
   {
     private TableItem item;
     
@@ -399,13 +408,6 @@ public class SwtTable extends GralTable
     }
     
 
-    protected void xxremoveWidgetImplementation()
-    {
-      item.dispose();
-      item = null;
-    }
-
-
 
   }
   
@@ -453,6 +455,22 @@ public class SwtTable extends GralTable
     return (GralTableLine_ifc)tableLineSwt.getData();
   }
 
+  @Override public List<GralTableLine_ifc> getSelectedLines(){
+    List<GralTableLine_ifc> list = new LinkedList<GralTableLine_ifc>();
+    TableItem[] items = table.getItems();
+    for(TableItem item: items){
+      Object oData = item.getData();
+      if(oData instanceof GralTableLine_ifc){ //if a line isn't used it has null.
+        GralTableLine_ifc data = (GralTableLine_ifc)oData;
+        if((data.getSelection() & 1) !=0){
+          list.add(data);
+        }
+      }
+    }
+    return list;
+  }
+
+  
 
   @Override public GralTableLine_ifc getLine(String key)
   {

@@ -521,7 +521,7 @@ public interface GralGridBuild_ifc
    * @param promptStylePosition
    * @return
    */
-  GralWidget addFileSelectField(String name, List<String> listRecentFiles, String startDirMask, String prompt, char promptStylePosition);
+  GralTextField addFileSelectField(String name, List<String> listRecentFiles, String startDirMask, String prompt, char promptStylePosition);
   
   
   /**Adds a panel that is not bound yet.
