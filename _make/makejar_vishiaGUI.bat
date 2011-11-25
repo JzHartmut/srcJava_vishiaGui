@@ -15,9 +15,12 @@ REM Manifest-file for jar building relativ path from current dir:
 set MANIFEST_JAVAC=vishiaGUI.manifest
 
 REM Input for javac, only choice of primary sources, relativ path from current (make)-directory:
-set INPUT_JAVAC=../org/vishia/guiViewCfg/ViewCfg.java
+set INPUT_JAVAC=
+::set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/guiViewCfg/ViewCfg.java
+set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/commander/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/cfg/*.java
+set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/area9/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/guiBzr/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/guiInspc/*.java
 

@@ -2,7 +2,6 @@ package org.vishia.commander;
 
 import java.io.File;
 
-import org.vishia.commander.FcmdFavorPathSelector.SelectTabList;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralWidget;
@@ -18,8 +17,9 @@ import org.vishia.util.KeyCode;
 public class FcmdFileTable extends FileSelector
 {
   /**Table widget for the select table of the file tab.*/
-  FcmdFavorPathSelector.SelectTabList selectTableForTab;
+  FcmdFavorTable favorTable;
 
+  /**The component */
   final JavaCmd main;
   
   /**The left, mid or right main panel where this tabbed file table is associated. */
@@ -58,11 +58,11 @@ public class FcmdFileTable extends FileSelector
     GralWidgetMng mng = main.gralMng;
     ///
     ///
-    selectTableForTab = main.favorPathSelector.new SelectTabList(mainPanel);
+    favorTable = new FcmdFavorTable(main, mainPanel);
     String nameTableSelection = WidgetNames.tableFavorites + nameFilePanel;
     mainPanel.tabbedPanelSelectionTabs.addGridPanel(WidgetNames.tabFavorites + nameFilePanel, label,1,1,10,10);
     mng.setPosition(2, 0, 0, -0, 1, 'd');  ///p
-    selectTableForTab.setToPanel(mng, nameTableSelection, 5, mainPanel.widthSelecttable, 'A');
+    favorTable.setToPanel(mng, nameTableSelection, 5, mainPanel.widthSelecttable, 'A');
     //mng.selectPanel(WidgetNames.panelFavoritesLeftMidRight +mainPanel.cNr);
     //String sLabelTab = "file&"+cNr;
     //The grid panel contains this widget. The grid panel is a tab of mainPanel.tabbedPanel
@@ -94,6 +94,47 @@ public class FcmdFileTable extends FileSelector
       //focuses the panel which is the selection panel for this file table.
       GralWidget tableSelection = main.gralMng.getWidget(WidgetNames.tableFavorites + nameFilePanel);
       tableSelection.setFocus();
+    } else if (keyCode == main.keyActions.keyPanelLeft){
+      //sets focus to left
+      FcmdFileTable fileTableLeft = null;
+      boolean found = false;
+      for(FcmdFileTable fileTable: mainPanel.listTabs){
+        if(fileTable == this){ found = true;  break;}
+        fileTableLeft = fileTable;  //save this table as table left, use if found.
+      }
+      if(found){
+        if(fileTableLeft !=null){
+          fileTableLeft.setFocus();
+        } else {  //left from first is the selectAllTable of this panel.
+          //panel.selectTableAll.wdgdTable.setFocus();
+        }
+      }
+    } else if (keyCode == main.keyActions.keyPanelRight){
+      //sets focus to right
+      FcmdFileTable fileTableRight = null;
+      boolean found = false; //(mainPanel.selectTableAll == this);
+      for(FcmdFileTable fileTable: mainPanel.listTabs){
+        if(found){ fileTableRight = fileTable; break; }  //use this next table if found before.
+        if(fileTable == this) { found = true; }
+      }
+      if(fileTableRight !=null){
+        fileTableRight.setFocus();
+      }
+      
+    } else if (keyCode == main.keyActions.keyMainPanelLeft){
+      String mainPanelId = mainPanel == main.favorPathSelector.panelRight ? ".2" : ".1";
+      for(GralWidget widg: main.gralMng.getWidgetsInFocus()){
+        if(widg.name.contains(mainPanelId)){
+          widg.setFocus();
+        }
+      }
+    } else if (keyCode == main.keyActions.keyMainPanelRight){
+      String mainPanelId = mainPanel == main.favorPathSelector.panelLeft ? ".2" : ".3";
+      for(GralWidget widg: main.gralMng.getWidgetsInFocus()){
+        if(widg.name.contains(mainPanelId)){
+          widg.setFocus();
+        }
+      }
     }
     return ret;
   }

@@ -3,6 +3,7 @@ package org.vishia.gral.swt;
 import java.io.IOException;
 
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Text;
 import org.vishia.gral.base.GralWidgetMng;
@@ -14,6 +15,9 @@ import org.vishia.gral.ifc.GralUserAction;
 public class SwtTextBox extends GralTextBox
 {
   protected Text textFieldSwt;
+  
+  /**A possible prompt for the text field or null. */
+  Label promptSwt;
   
   StringBuffer newText = new StringBuffer();
   
@@ -93,6 +97,8 @@ public class SwtTextBox extends GralTextBox
   { return textFieldSwt;
   }
 
+  @Override public Label getPromptLabelImpl(){ return promptSwt; }
+
 
   @Override public GralColor setBackgroundColor(GralColor color)
   { return SwtWidgetHelper.setBackgroundColor(color, textFieldSwt);
@@ -151,6 +157,10 @@ public class SwtTextBox extends GralTextBox
   {
     textFieldSwt.dispose();
     textFieldSwt = null;
+    if(promptSwt !=null){
+      promptSwt.dispose();
+      promptSwt = null;
+    }
   }
 
   @Override

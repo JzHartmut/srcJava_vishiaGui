@@ -40,7 +40,19 @@ public class SwtGralMouseListener
     
     /**The mouse doubleclick is left empty. It may be overridden by an derived class. */
     @Override public void mouseDoubleClick(MouseEvent arg0)
-    {}
+    {
+      Widget widget = arg0.widget;
+      Object oInfo = widget.getData();
+      if(oInfo instanceof GralWidget){
+        GralWidget widgetInfo = (GralWidget)oInfo;
+        GralWidgetMng guiMng = widgetInfo.getMng();
+        try{
+          guiMng.log.sendMsg(0, "Info widget: %s / %s", widgetInfo.name, widgetInfo.getDataPath());
+        } catch(Exception exc){ guiMng.writeLog(0, exc); }
+          
+      }
+      
+    }
 
     /**The mouse-down action save some informations about the widget.
      * It may be overridden by an derived class, then this method should be invoked within.

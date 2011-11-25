@@ -732,20 +732,39 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
       promptFont = propertiesGuiSwt.smallPromptFont;
       boundsPrompt = calcWidgetPosAndSize(posPrompt, boundsAll.dx, boundsAll.dy, 10,100);
       boundsField = calcWidgetPosAndSize(posField, boundsAll.dx, boundsAll.dy, 10,100);
-      Label wgPrompt = new Label((Composite)pos.panel.getPanelImpl(), 0);
-      wgPrompt.setFont(promptFont);
-      wgPrompt.setText(prompt);
-      Point promptSize = wgPrompt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+      widgetInfo.promptSwt = new Label((Composite)pos.panel.getPanelImpl(), 0);
+      widgetInfo.promptSwt.setFont(promptFont);
+      widgetInfo.promptSwt.setText(prompt);
+      Point promptSize = widgetInfo.promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
       if(promptSize.x > boundsPrompt.dx){
         boundsPrompt.dx = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
       }
-      wgPrompt.setBounds(boundsPrompt.x, boundsPrompt.y, boundsPrompt.dx, boundsPrompt.dy+1);
+      widgetInfo.promptSwt.setBounds(boundsPrompt.x, boundsPrompt.y, boundsPrompt.dx, boundsPrompt.dy+1);
       widgetSwt.setBounds(boundsField.x, boundsField.y, boundsField.dx, boundsField.dy);
       posUsed = true;
       
     } else {
       //without prompt
       setPosAndSize_(widgetSwt);
+    }
+    if(prompt != null && promptStylePosition == 'r'){
+      Rectangle swtField = widgetSwt.getBounds();
+      Rectangle swtPrompt = new Rectangle(swtField.x + swtField.width, swtField.y, 0, swtField.height);
+      float hight = this.pos.height();
+      final Font promptFont;
+      if(hight <2.0){
+        promptFont = propertiesGuiSwt.smallPromptFont;  
+      } else { 
+        promptFont = propertiesGuiSwt.stdInputFont;  
+      }
+      widgetInfo.promptSwt = new Label((Composite)pos.panel.getPanelImpl(), 0);
+      widgetInfo.promptSwt.setFont(promptFont);
+      widgetInfo.promptSwt.setText(prompt);
+      Point promptSize = widgetInfo.promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+      swtPrompt.width = promptSize.x;
+      widgetInfo.promptSwt.setBounds(swtPrompt);
+      
+      ///
     }
     //
     if(widgetInfo.name !=null && widgetInfo.name.charAt(0) == '$'){
@@ -1213,9 +1232,10 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   
   private void setInfoDirect(GralWidget widget, int cmd, int ident, Object info, Object data)
-  {
-        if(widget !=null){
-          Control swtWidget = (Control)widget.getWidgetImplementation(); 
+  { final Control swtWidget;
+    if(  widget !=null 
+      && ( swtWidget = (Control)widget.getWidgetImplementation()) !=null
+      ){
           int colorValue;
           switch(cmd){
           case GralPanelMngWorking_ifc.cmdBackColor: {

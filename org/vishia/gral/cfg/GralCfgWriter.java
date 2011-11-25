@@ -170,7 +170,10 @@ public class GralCfgWriter
   
   private void writeParam(GralCfgData.WidgetTypeBase pp, String sep) throws IOException
   { //String sep = "";
-    if(pp.text !=null)      { writer.            append("\"")       .append(pp.text).append("\""); sep = ", "; }
+    if(pp.prompt !=null && pp.promptPosition !=null && pp.promptPosition.length() >=1) {
+      writer.append("%").append(pp.promptPosition).append(":\"")  .append(pp.prompt).append("\""); sep = ", "; 
+    }
+    if(pp.text !=null)      { writer.append(sep).append("\"")       .append(pp.text).append("\""); sep = ", "; }
     if(pp.name !=null)      { writer.append(sep).append("name=")    .append(pp.name); sep = ", "; }
     if(pp.cmd  !=null)      { writer.append(sep).append("cmd=\"")   .append(pp.cmd).append("\"");  sep = ", "; }
     if(pp.showMethod !=null){ writer.append(sep).append("show=\"")  .append(pp.showMethod).append("\""); sep = ", "; }
@@ -179,7 +182,8 @@ public class GralCfgWriter
     if(pp.info !=null)      { writer.append(sep).append("info=\"")  .append(pp.info).append("\""); sep = ", "; }
     if(pp.userAction !=null){ writer.append(sep).append("action=")  .append(pp.userAction); sep = ", "; }
     if(pp.dragFiles !=null) { writer.append(sep).append("dragFiles=\"") .append(pp.dragFiles).append("\""); sep = ", "; }
-    if(pp.dragText !=null)  { writer.append(sep).append("dragText=\"")  .append(pp.dragText).append("\""); sep = ", "; }
+    if(pp.dragText !=null)  { 
+      writer.append(sep).append("dragText=\"")  .append(pp.dragText).append("\""); sep = ", "; }
     if(pp.dropFiles !=null) { writer.append(sep).append("dropFiles=\"") .append(pp.dropFiles).append("\""); sep = ", "; }
     if(pp.dropText !=null)  { writer.append(sep).append("dropText=\"")  .append(pp.dropText).append("\""); sep = ", "; }
     if(pp.color0 !=null)    { writer.append(sep).append("color=")       .append(pp.color0.color); 

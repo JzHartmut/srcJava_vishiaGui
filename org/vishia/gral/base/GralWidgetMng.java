@@ -31,6 +31,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.InfoBox;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.KeyCode;
 
 /**This is the base class of the GuiPanelMng for several Graphic-Adapters (Swing, SWT etc.). 
  * It contains the independent parts. 
@@ -684,6 +685,10 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
         String fileSelect = fileSelectInfo.dialogFile.getSelection(); 
         if(fileSelect !=null){
           fileSelectInfo.dstWidgd.setValue(cmdSet, 0, fileSelect);
+          GralUserAction actionSelect = fileSelectInfo.dstWidgd.getActionChange();
+          if(actionSelect !=null){
+            actionSelect.userActionGui(KeyCode.menuEntered, fileSelectInfo.dstWidgd, fileSelect);
+          }
         }
       }
       return true;      

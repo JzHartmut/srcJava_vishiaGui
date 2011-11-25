@@ -44,7 +44,7 @@ import org.vishia.guiInspc.InspcGui;
  * <b>Example ussage of a org.eclipse.swt.widgets.Table from the GUI application 'JavaCommander'</b>:
  * <img src="../../../img/JCmd_gralWidget_SwtTable.png"><br>
  * The ObjectModelDiagram shows the application 'JavaCommander'. That application uses some tables to select files, commandes
- * and selection objects. The classes {@link LeftMidRightPanel.SelectTabList}, {@link CommandSelector} and {@link FileSelector}
+ * and selection objects. The classes {@link LeftMidRightPanel.FcmdFavorTable}, {@link CommandSelector} and {@link FileSelector}
  * are the 3 representants of selection lists from side of application. 
  * They have its implementation of a {@link SelectList}, which is a base class which supports navigaton in a list.
  * The   

@@ -36,7 +36,7 @@ public class GralCfgDesigner
 
   /**Some dialog widget elements. */
   private GralWidget dialogFieldName, dialogFieldDatapath, dialogFieldText, dialogFieldFormat
-    , dialogFieldShow, dialogFieldAction
+    , dialogFieldShow, dialogFieldAction, dialogFieldPrompt, dialogFieldPromptPos 
     , dialogFieldLine, dialogFieldColumn, dialogFieldHeight, dialogFieldWidth;
   
   private GralWidget dialogButtonOk, dialogButtonEsc;
@@ -64,7 +64,7 @@ public class GralCfgDesigner
   public void initGui()
   {
     assert(dialogWindowProps == null); //check call only one time.
-    mng.setPosition(-30, GralGridPos.size +30, -40, GralGridPos.size +40, 1, 'r');
+    mng.setPosition(-32, GralGridPos.size +32, -40, GralGridPos.size +40, 1, 'r');
     dialogWindowProps = mng.createWindow("widgetEdit", "Widget Properties", GralWindow.windConcurrently);
     mng.setPositionSize(0, 0, 3, 34, 'd');
     dialogFieldName = mng.addTextField("name", true, "name", 't');
@@ -73,7 +73,9 @@ public class GralCfgDesigner
     dialogFieldFormat = mng.addTextField("format", true, "format", 't');
     dialogFieldShow = mng.addTextField("show", true, "show method", 't');
     dialogFieldAction = mng.addTextField("action", true, "action method", 't');
-    mng.setPositionSize(19, 2, 3, 5, 'r');
+    dialogFieldPrompt = mng.addTextField("prompt", true, "prompt", 't');
+    //mng.setPositionSize(GralGridPos.same, GralGridPos.same, GralGridPos.next, 2, 'r');
+    mng.setPositionSize(21, 2, 3, 5, 'r');
     dialogFieldLine = mng.addTextField("line", true, "pos-y", 't');
     //mng.addText(", ", 'B', 0);
     dialogFieldColumn = mng.addTextField("column", true, "pos-x", 't');
@@ -81,7 +83,8 @@ public class GralCfgDesigner
     dialogFieldHeight = mng.addTextField("height", true, "size-y", 't');
     //mng.addText(" x ", 'B', 0);
     dialogFieldWidth = mng.addTextField("width", true, "size-x", 't');
-    mng.setPositionSize(23, 2, 3, 8, 'r');
+    dialogFieldPromptPos = mng.addTextField("promptPos", true, "promptPos", 't');
+    mng.setPositionSize(25, 2, 3, 8, 'r');
     dialogButtonEsc = mng.addButton("esc", actionEsc, null, null, null, "esc");
     dialogButtonOk = mng.addButton("del", actionDel, null, null, null, "del");
     dialogButtonOk = mng.addButton("OK", actionOk, null, null, null, "OK");
@@ -139,6 +142,7 @@ public class GralCfgDesigner
       widgdInDialog = widgd;
       GralCfgElement cfge = (GralCfgElement)widgd.getCfgElement();
       String sName, sDataPath, sText, sFormat, sShowMethod,  sActionMethod;
+      String sPrompt, sPromptPos;
       String sLine, sColumn, sWidth, sHeight;
       if(cfge !=null){
         sName = cfge.widgetType.name;
@@ -147,6 +151,9 @@ public class GralCfgDesigner
         sFormat = cfge.widgetType.format;
         sShowMethod = cfge.widgetType.showMethod;
         sActionMethod = cfge.widgetType.userAction;
+        sPrompt = cfge.widgetType.prompt;
+        sPromptPos = cfge.widgetType.promptPosition;
+        
         sLine = (cfge.positionInput.yPosRelative ? "&" : "") + cfge.positionInput.yPos + (cfge.positionInput.yPosFrac !=0 ? "." + cfge.positionInput.yPosFrac : "");
         sColumn = (cfge.positionInput.xPosRelative ? "&" : "") + cfge.positionInput.xPos + (cfge.positionInput.xPosFrac !=0 ? "." + cfge.positionInput.xPosFrac : "");
         sHeight = "" + cfge.positionInput.ySizeDown + (cfge.positionInput.ySizeFrac !=0 ? "." + cfge.positionInput.ySizeFrac : "");
@@ -157,6 +164,8 @@ public class GralCfgDesigner
         dialogFieldFormat.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sFormat ==null ? "" : sFormat);
         dialogFieldShow.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sShowMethod ==null ? "" : sShowMethod);
         dialogFieldAction.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sActionMethod ==null ? "" : sActionMethod);
+        dialogFieldPrompt.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sPrompt ==null ? "" : sPrompt);
+        dialogFieldPromptPos.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sPromptPos ==null ? "" : sPromptPos);
         dialogFieldLine.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sLine);
         dialogFieldColumn.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sColumn);
         dialogFieldHeight.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sHeight);
@@ -179,6 +188,8 @@ public class GralCfgDesigner
         String sDataPath = dialogFieldDatapath.getValue();
         String sText = dialogFieldText.getValue();
         String sFormat = dialogFieldFormat.getValue();
+        String sPrompt = dialogFieldPrompt.getValue();
+        String sPromptPos = dialogFieldPromptPos.getValue();
         String sLine = dialogFieldLine.getValue();
         String sColumn = dialogFieldColumn.getValue();
         String sWidth = dialogFieldWidth.getValue();
@@ -196,6 +207,8 @@ public class GralCfgDesigner
           cfge.widgetType.info = sDataPath.trim().length() >0 ? sDataPath : null;
           cfge.widgetType.text = sText.trim().length() >0 ? sText : null;
           cfge.widgetType.format = sFormat.trim().length() >0 ? sFormat : null;
+          cfge.widgetType.prompt = sPrompt.trim().length() >0 ? sPrompt : null;
+          cfge.widgetType.promptPosition = sPromptPos.trim().length() >0 ? sPromptPos : null;
           boolean bOk;
           bOk = cfge.positionInput.setPosElement('y', sLine.trim());          
           bOk = bOk && cfge.positionInput.setPosElement('x', sColumn.trim());          

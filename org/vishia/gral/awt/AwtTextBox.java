@@ -1,6 +1,7 @@
 package org.vishia.gral.awt;
 
 import java.awt.Container;
+import java.awt.Label;
 import java.awt.TextArea;
 import java.io.IOException;
 
@@ -15,6 +16,9 @@ import org.vishia.gral.ifc.GralUserAction;
 public class AwtTextBox extends GralTextBox
 {
   protected AwtTextAreaImpl textFieldSwt;
+  
+  /**A possible prompt for the text field or null. */
+  /*packagePrivate*/ Label promptSwt;
   
   StringBuffer newText = new StringBuffer();
   
@@ -97,6 +101,7 @@ public class AwtTextBox extends GralTextBox
   { return textFieldSwt;
   }
 
+  @Override public Label getPromptLabelImpl(){ return promptSwt; }
 
   @Override public GralColor setBackgroundColor(GralColor color)
   { return AwtWidgetHelper.setBackgroundColor(color, textFieldSwt);

@@ -28,7 +28,7 @@ public class LeftMidRightPanel
 
 
   /**Table widget for the select table.*/
-  FcmdFavorPathSelector.SelectTabList selectTableAll;
+  FcmdFavorTable selectTableAll;
 
 
   
@@ -52,11 +52,11 @@ public class LeftMidRightPanel
   final int[] widthSelecttable = new int[]{2, 20, 30};
 
   
-  LeftMidRightPanel(JavaCmd javaCmd, char cc, char cNr, FcmdFavorPathSelector tabSelector, GralWidgetMng mng){
+  LeftMidRightPanel(JavaCmd javaCmd, char cc, char cNr, GralWidgetMng mng){
     this.main = javaCmd;
     this.cc = cc;
     this.cNr = cNr;
-    selectTableAll = tabSelector.new SelectTabList(this);
+    selectTableAll = new FcmdFavorTable(main, this);
   }
   
   
@@ -84,7 +84,7 @@ public class LeftMidRightPanel
     mng.setPosition(0, 0, 0, 0, 1, 'd');
     tabbedPanelSelectionTabs.addGridPanel(nameGridPanel, tabLabelGridPanel, 1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd');
-    selectTableAll.setToPanel(mng, WidgetNames.selectMainFavorites + cNr, 5, widthSelecttable, 'A');
+    selectTableAll.setToPanel(mng, WidgetNames.tableFavoritesMain + cNr, 5, widthSelecttable, 'A');
     fillInTables(which);  //build the rest of all tabs and panels depending on content of favorites.
     
     if(cNr == '1'){ //commands only in the left panel.
@@ -104,7 +104,7 @@ public class LeftMidRightPanel
   void fillInTables(int which){
     selectTableAll.clear();
     for(FcmdFileTable fileTabs: listTabs){
-      fileTabs.selectTableForTab.clear();
+      fileTabs.favorTable.clear();
     }
     //List of favor pathes for this main panel
     for(FcmdFavorPathSelector.SelectInfo info: selectListAllFavorites){ //panel specific favorites
@@ -113,7 +113,7 @@ public class LeftMidRightPanel
         //create Panels for the file table and favor path table if not found yet, otherwise search it.
         FcmdFileTable fileTabs = searchOrCreateFileTabs(info.label);
           //Favor select list of the associated File table
-        fileTabs.selectTableForTab.add(info);
+        fileTabs.favorTable.add(info);
       }
       selectTableAll.add(info);
       //tabSelector.initActDir(indexActualDir, info.selectName, info.path);
@@ -127,7 +127,7 @@ public class LeftMidRightPanel
         //create Panels for the file table and favor path table if not found yet, otherwise search it.
         FcmdFileTable fileTabs = searchOrCreateFileTabs(info.label);
           //Favor select list of the associated File table
-        fileTabs.selectTableForTab.add(info);
+        fileTabs.favorTable.add(info);
       }
       selectTableAll.add(info);
       //tabSelector.initActDir(indexActualDir, info.selectName, info.path);

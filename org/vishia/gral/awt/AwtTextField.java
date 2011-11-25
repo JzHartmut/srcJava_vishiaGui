@@ -1,6 +1,7 @@
 package org.vishia.gral.awt;
 
 import java.awt.Container;
+import java.awt.Label;
 import java.awt.TextField;
 
 import org.vishia.gral.base.GralTextField;
@@ -11,6 +12,9 @@ import org.vishia.gral.ifc.GralUserAction;
 public class AwtTextField extends GralTextField
 {
   /*packagePrivate*/ final AwtTextFieldImpl widgetAwt;
+  
+  /**A possible prompt for the text field or null. */
+  /*packagePrivate*/ Label promptSwt;
   
   public AwtTextField(String name, char whatis, AwtWidgetMng mng, Container parent)
   {
@@ -24,7 +28,7 @@ public class AwtTextField extends GralTextField
   @Override
   protected void removeWidgetImplementation()
   {
-    // TODO Auto-generated method stub
+      // TODO Auto-generated method stub
     
   }
 
@@ -46,6 +50,8 @@ public class AwtTextField extends GralTextField
     // TODO Auto-generated method stub
     return null;
   }
+
+  @Override public Label getPromptLabelImpl(){ return promptSwt; }
 
   @Override
   public void redraw()

@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTabbedPanel;
@@ -56,7 +57,7 @@ class FcmdFavorPathSelector
   
   private final GralWidgetMng mng;
   
-  private final JavaCmd main;
+  final JavaCmd main;
   
   /**All entries which are shown in all three select lists. */
   List<SelectInfo> selectAll = new LinkedList<SelectInfo>();
@@ -90,9 +91,9 @@ class FcmdFavorPathSelector
   { this.main = main;
     this.console = console;
     this.mng = main.gralMng;
-    panelLeft = new LeftMidRightPanel(main, 'l', '1', this, mng); 
-    panelMid = new LeftMidRightPanel(main, 'm','2',  this, mng); 
-    panelRight = new LeftMidRightPanel(main,'r', '3',  this, mng);
+    panelLeft = new LeftMidRightPanel(main, 'l', '1', mng); 
+    panelMid = new LeftMidRightPanel(main, 'm','2',  mng); 
+    panelRight = new LeftMidRightPanel(main,'r', '3',  mng);
 
   }
   
@@ -321,7 +322,7 @@ class FcmdFavorPathSelector
    * A FileSelector-Tab is named starting with "tabFile_".
    * @return The last instance
    */
-  private FcmdFileTable getLastFileTab()
+  FcmdFileTable getLastFileTab()
   { List<GralWidget> widgdFocus = mng.getWidgetsInFocus();
     FcmdFileTable lastTab = null;
     //int ixTabs = 0;
@@ -421,145 +422,4 @@ class FcmdFavorPathSelector
   } };
   
   
-  /**This is the list-panel which allows to select all opened tabs, all directories or other entries.  
-   */
-  class SelectTabList extends SelectList
-  {
-    
-    /**The tabbed panel where the List is member of. */
-    final LeftMidRightPanel panel;
-    
-    
-    
-    public SelectTabList(LeftMidRightPanel panel)
-    { //super(name, mng);
-      this.panel = panel;
-    }
-
-
-    /**Adds a line to this table.
-     * @param ix Show which index is used for a local table, 0..2 for left, mid, right,
-     *   than show the label in the left cell (column)
-     * @param info The favorite info
-     */
-    void add(SelectInfo info)
-    {
-      GralTableLine_ifc line = wdgdTable.insertLine(null, 0);
-      line.setUserData(info);
-      if(info.label !=null){
-        line.setCellText(info.label, 0);
-      }
-      line.setCellText(info.selectName, 1);
-      line.setCellText(info.path, 2);
-    }
-    
-    
-    void clear()
-    {
-      wdgdTable.clearTable();
-    }
-    
-    
-    @Override protected boolean actionOk(Object userData, GralTableLine_ifc line)
-    {
-      SelectInfo info = (SelectInfo)line.getUserData();
-      actSelectInfo = info; //The last used selection (independent of tab left, middle, right)
-      int ixtabName = panel.cNr - '1';
-      
-      String tabName = info.label;  //The label of file tab.
-      GralWidget widgd;
-        //a new path is selected:
-        //save the path of the current selection
-    
-      String label = info.label;  //from favorite list
-      FcmdFileTable fileTable;
-      if(label  == null){ 
-        fileTable = getLastFileTab();
-        if(fileTable == null){
-          if(panel.listTabs.size() >0){
-            fileTable = panel.listTabs.get(0);
-            label = info.label = fileTable.label;
-          } else {
-            label = "file" + panel.cNr;
-            info.label = label;
-            fileTable = panel.searchOrCreateFileTabs(label);
-          }
-        }
-        panel.fillInTables(panel.cNr - '0');
-      } else {
-        //label is known in the favorite list, use it. The panel should be existing or it is created.
-        fileTable = panel.searchOrCreateFileTabs(label);
-      }
-     
-      //before changing the content of this fileTable, store the current directory
-      //to restore if this favor respectively selection is used ones more.
-      String currentDir;
-      if(fileTable.selectInfo !=null){
-        currentDir = fileTable.getCurrentDir();
-        if(currentDir !=null){
-          panel.indexActualDir.put(fileTable.selectInfo.selectName, currentDir);
-      } }
-      
-      //fill in the standard file panel, use maybe a current directory.
-      fileTable.selectInfo = info;
-      if(  wdgdTable.name.startsWith(WidgetNames.tableFavoritesMain)   //use the root dir anytime if the main favor path table is used.
-        || (currentDir  = panel.indexActualDir.get(info.selectName)) == null){  //use the root if the entry wasn't use till now
-        currentDir = info.path;
-      }
-      fileTable.fillIn(currentDir);
-      fileTable.setFocus();
-      return true;
-    }
-  
-    @Override
-    protected void actionLeft(Object userData, GralTableLine_ifc line)
-    {
-      // TODO Auto-generated method stub
-      
-    }
-  
-    @Override
-    protected void actionRight(Object userData, GralTableLine_ifc line)
-    {
-      // TODO Auto-generated method stub
-      
-    }
-  
-    /**Handle the keys for the JavaCommander-Selection of favorites
-     * <ul>
-     * <li>sh-F1 .. shF3: activates fileSelector for left, middle and right panel.
-     * </ul>
-     * @see org.vishia.gral.widget.SelectList#actionUserKey(int, java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
-     */
-    @Override protected boolean actionUserKey(int key, Object userData,
-        GralTableLine_ifc line)
-    { boolean ret = true;
-      SelectInfo data = (SelectInfo)userData;
-      //TODO not used no more
-      if(key ==KeyCode.shift + KeyCode.F1){
-        File dir = new File(data.path);
-        //panelLeft.fileSelectorMain.fillIn(dir);
-      } else if (key ==KeyCode.shift + KeyCode.F2){
-        File dir = new File(data.path);
-        //panelMid.fileSelectorMain.fillIn(dir);
-      } else if (key ==KeyCode.shift + KeyCode.F3){
-          //panelRight.fileSelectorMain.fillIn(new File(data.path));
-      } else if (key ==KeyCode.shift + KeyCode.F5){
-        //reread the configuration file.
-        readCfg(fileCfg);
-        panelLeft.fillInTables(1);
-      } else if (key ==main.keyActions.keyCreateFavorite){
-        actSelectInfo = data; //info in the line of table.
-        windAddFavorite.widgTab.setText("file3");
-        windAddFavorite.widgShortName.setText("alias");
-        //File lastSelectedFile = panelRight.fileSelectorMain.getSelectedFile();
-        //String pathDir = FileSystem.getCanonicalPath(lastSelectedFile.getParentFile());
-        //windAddFavorite.widgPath.setText(pathDir);
-        windAddFavorite.window.setWindowVisible(true);
-      } else {
-        ret = false;
-      }//
-      return ret;
-    }
-  } //class SelectList_  
 }

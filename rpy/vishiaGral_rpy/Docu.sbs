@@ -43395,7 +43395,7 @@ application";
 							- _subsystem = "GeneratedFromJava::base";
 							- _class = "GralPrimaryWindow";
 							- _name = "GuiThread";
-							- _id = GUID c5f3cdcb-7ff2-4013-9826-46eb24f65c5f;
+							- _id = GUID 6b3232dd-8702-41ec-9e39-e016e0ac0717;
 						}
 						- m_instance = { IHandle 
 							- _m2Class = "";
@@ -43535,7 +43535,7 @@ application";
 							- _subsystem = "GeneratedFromJava::swt";
 							- _class = "SwtPrimaryWindow";
 							- _name = "Init";
-							- _id = GUID 2453d054-85e4-4d9a-a1d8-9cf73cecb1a5;
+							- _id = GUID 3b3e18cd-25e8-4dce-a126-432d7055ed0c;
 						}
 						- m_instance = { IHandle 
 							- _m2Class = "";
@@ -45141,8 +45141,8 @@ application";
 			- _id = GUID e8698c85-5713-4885-a416-c0441b78d2a4;
 			- _myState = 40960;
 			- _name = "TopLevel";
-			- weakCGTime = 11.11.2011::7:40:54;
-			- strongCGTime = 10.31.2011::7:29:56;
+			- weakCGTime = 11.14.2011::7:30:5;
+			- strongCGTime = 11.14.2011::7:30:5;
 			- _multiplicity = "";
 			- _itsStateChart = { IHandle 
 				- _m2Class = "";

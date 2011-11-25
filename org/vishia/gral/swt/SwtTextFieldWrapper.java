@@ -6,6 +6,7 @@ import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.events.DragDetectEvent;
 import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.vishia.gral.base.GralMouseWidgetAction_ifc;
 import org.vishia.gral.base.GralWidgetMng;
@@ -17,6 +18,9 @@ import org.vishia.gral.ifc.GralUserAction;
 public class SwtTextFieldWrapper extends GralTextField
 {
   protected Text textFieldSwt;
+  
+  /**A possible prompt for the text field or null. */
+  Label promptSwt;
   
   private DropTarget drop;
   
@@ -87,9 +91,12 @@ public class SwtTextFieldWrapper extends GralTextField
     textFieldSwt.addMouseListener(mouseListener);  
   }
   
-  @Override public Object getWidgetImplementation()
+  @Override public Text getWidgetImplementation()
   { return textFieldSwt;
   }
+
+  
+  @Override public Label getPromptLabelImpl(){ return promptSwt; }
 
 
   @Override public GralColor setBackgroundColor(GralColor color)
@@ -113,6 +120,10 @@ public class SwtTextFieldWrapper extends GralTextField
   {
     textFieldSwt.dispose();
     textFieldSwt = null;
+    if(promptSwt !=null){
+      promptSwt.dispose();
+      promptSwt = null;
+    }
   }
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
