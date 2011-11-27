@@ -60,7 +60,7 @@ public class SwtSubWindow extends GralWindow
    * <li>2011-09-03 Hartmut creation as wrapper arround a SWT.Shell inherits {@link org.vishia.gral.base.GralPanelContent}.
    * </ul>
    */
-  public static final int version = 0x20111127:
+  public static final int version = 0x20111127;
   
   protected Shell window;
   

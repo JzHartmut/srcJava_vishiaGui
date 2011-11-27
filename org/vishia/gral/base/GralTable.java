@@ -23,10 +23,11 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc
 
   /**Version and history
    * <ul>
-   * <li>2011-11-27 Hartmut new {@link #setActionOnLineSelected(GralUserAction)}: This routine is called
-   *   anytime if a line is selected by user operation. It can be show any associated content any where
+   * <li>2011-11-27 Hartmut new {@link #setActionOnLineSelected(GralUserAction)}: The user action is called
+   *   anytime if a line is selected by user operation. It can be show any associated content anywhere
    *   additionally. It is used for example in "The.file.Commander" to show date, time and maybe content 
-   *   while the user selects any files. The graphical implementation should be support it. 
+   *   while the user selects any files. The graphical implementation should be call {@link #selectLine(GralTableLine_ifc)}
+   *   in its Selection listener. 
    * <li>2011-11-20 Hartmut new The capability of selection of lines is moved from the 
    *   {@link org.vishia.gral.widget.SelectList} to this class. It means any table has the capability
    *   of selection of multiple lines. This capability is supported with a extension of the
