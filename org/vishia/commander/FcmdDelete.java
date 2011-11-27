@@ -79,6 +79,25 @@ public class FcmdDelete
   }
   
 
+  /**
+   * Key F6 for delete command. Its like Norton Commander.
+   */
+  GralUserAction actionConfirmDelete = new GralUserAction()
+  {
+    @Override
+    public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
+    {
+      main.selectedFiles = main.getCurrentFileInLastPanels();
+      main.getterFiles.prepareFileSelection();
+      //File[] files = new File[3];
+      File fileSrc = main.getterFiles.getFile1();
+      //files[2] = getterFiles.getFile3();
+      confirmDelete(fileSrc);
+      return true;
+      // /
+    }
+  };
+
   
   GralUserAction actionDelete = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)

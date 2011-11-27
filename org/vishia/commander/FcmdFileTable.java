@@ -1,9 +1,13 @@
 package org.vishia.commander;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralTableLine_ifc;
+import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.FileSelector;
 
@@ -42,6 +46,8 @@ public class FcmdFileTable extends FileSelector
    */
   FcmdFavorPathSelector.SelectInfo selectInfo;
   
+  DateFormat formatDateInfo = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss");
+  
   /**Creates an instance and creates the Panel and List for the files and for the path (favorite)
    * selection.
    * @param tabbedPanelP The outer class. (Access is more broadly than using an non-static class)
@@ -62,15 +68,17 @@ public class FcmdFileTable extends FileSelector
     String nameTableSelection = WidgetNames.tableFavorites + nameFilePanel;
     mainPanel.tabbedPanelSelectionTabs.addGridPanel(WidgetNames.tabFavorites + nameFilePanel, label,1,1,10,10);
     mng.setPosition(2, 0, 0, -0, 1, 'd');  ///p
-    favorTable.setToPanel(mng, nameTableSelection, 5, mainPanel.widthSelecttable, 'A');
+    favorTable.setToPanel(mng, nameTableSelection, 5, mainPanel.widthSelecttableSub, 'A');
     //mng.selectPanel(WidgetNames.panelFavoritesLeftMidRight +mainPanel.cNr);
     //String sLabelTab = "file&"+cNr;
     //The grid panel contains this widget. The grid panel is a tab of mainPanel.tabbedPanel
     mainPanel.tabbedPanelFileTabs.addGridPanel(WidgetNames.tabFile + nameFilePanel, label,1,1,10,10);
     setActionOnEnterFile(mainPanel.main.executer.actionExecute);
+    //to show the properties of the selected file in the info line:
     //
     //sets this Widget to the selected panel, it is the grid panel which was created even yet.
     setToPanel(mng, namePanelFile, 5, new int[]{2,20,5,10}, 'A');
+    selectList.wdgdTable.setActionOnLineSelected(actionFileSelected);
   }
 
   
@@ -139,7 +147,28 @@ public class FcmdFileTable extends FileSelector
     return ret;
   }
 
-
+  
+  
+  /**Action to show the file properties in the info line. */
+  GralUserAction actionFileSelected = new GralUserAction(){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object[] params) {
+      if(actionCode == KeyCode.tableLineSelect){
+        GralTableLine_ifc line = (GralTableLine_ifc) params[0];
+        Object oData = line.getUserData();
+        if(oData instanceof FileAndName){
+          FileAndName file = (FileAndName)oData;
+          String sDate = formatDateInfo.format(new Date(file.date));
+          String sLenShort = //String.format("", file.length)
+            file.length >= 1000000 ? String.format("%2.1f MByte", file.length/1000000.0) :
+            file.length >=    1000 ? String.format("%2.1f kByte", file.length/1000.0) :
+            String.format("%3d Byte", file.length);  
+          String info = sDate + " # " + sLenShort + " >" + file.name + "<";        
+          main.widgInfo.setText(info);
+        }
+      }
+      return true;
+    }
+  };
   
   
 }

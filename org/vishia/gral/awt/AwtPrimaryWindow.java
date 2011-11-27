@@ -4,6 +4,7 @@ import java.awt.Frame;
 import java.io.File;
 
 import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
@@ -19,7 +20,7 @@ public class AwtPrimaryWindow extends AwtSubWindow implements GralPrimaryWindow_
 
   
   AwtPrimaryWindow(GralWidgetMng gralMng, String sTitle, AwtGraphicThread graphicThread)
-  { super("primaryWindow", graphicThread.window, "title", true, gralMng);
+  { super("primaryWindow", graphicThread.window, "title", GralWindow.windHasMenu | GralWindow.windConcurrently, gralMng);
     //super(gralMng, graphicThread);
     this.graphicThreadAwt = graphicThread;  //refers SWT type
   }  

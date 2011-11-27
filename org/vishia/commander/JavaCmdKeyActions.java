@@ -18,9 +18,15 @@ public class JavaCmdKeyActions
   
   //---------------------------------------------------------------------------------
   //Working
+  int keyFileProps = KeyCode.F2;
+  
+  int keyView = KeyCode.F3;
+  
   int keyEdit = KeyCode.F4;
   
   int keyCopy = KeyCode.F5;
+  
+  int keyMkDirFile = KeyCode.F7;
   
   int keyDelete1 = KeyCode.F8;
   
@@ -82,9 +88,12 @@ public class JavaCmdKeyActions
         }
         if(!done){
           done = true;
-          if(     keyCode == keyEdit){ main.actionEdit.userActionGui(sIntension, widgd, params); }
+          if(     keyCode == keyFileProps){ main.filePropsCmd.openDialog(null); }  //F2
+          else if(keyCode == keyView){ main.viewCmd.view(null); }                  //F3
+          else if(keyCode == keyEdit){ main.actionEdit.userActionGui(sIntension, widgd, params); }
           else if(keyCode == keyCopy){ main.copyCmd.actionConfirmCopy.userActionGui(keyCode, widgd, params); }
-          else if(keyCode == keyDelete1 || keyCode == keyDelete2){ main.actionDelete.userActionGui(keyCode, widgd); }
+          else if(keyCode == keyMkDirFile){ main.mkCmd.dialogMkDirFile(null); }
+          else if(keyCode == keyDelete1 || keyCode == keyDelete2){ main.deleteCmd.actionConfirmDelete.userActionGui(keyCode, widgd); }
           //navigation
           else if(keyCode == keyOriginDir){ main.favorPathSelector.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }
           else if(keyCode == KeyCode.enter){ main.favorPathSelector.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }

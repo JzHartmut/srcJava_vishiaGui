@@ -36,6 +36,7 @@ public class FileSelector //extends GralWidget
   
   /**Version and History:
    * <ul>
+   * <li>2011-11-27 new: {@link FileAndName#isWriteable}-property.
    * <li>2011-11-20 new: Phenomenal basic idea: The files may be located in remote hardware. 
    *   It means, that a File can't be access here. Therefore the path, name, date, length in the class {@link FileAndName}
    *   are the data represents on this process on PC. The access to the file is given with remote access. 
@@ -50,15 +51,24 @@ public class FileSelector //extends GralWidget
    */
   public static final int version = 0x20111002;
 
+
+  
+  
+  
+  /**This class describes a file. It is similar a java.lang.File, but it contains the information
+   * maybe of remote files.
+   */
   public static class FileAndName //extends SelectMask
   { public final String path;
     public final String name;
     public final long date;
     public final long length;
+    public final boolean isWriteable;
     public final File file;
     
-    FileAndName(String sPath, String sName, long length, long date){
+    FileAndName(String sPath, String sName, long length, long date, boolean isWriteable){
       assert(sPath.endsWith("/"));
+      this.isWriteable = isWriteable;
       this.path = sPath;
       this.name = sName;
       this.length = length;
@@ -68,9 +78,13 @@ public class FileSelector //extends GralWidget
   }
   
   
+  
+  
+  
+  
   /**Implementation of the base widget.
    */
-  private class FileSelectList extends SelectList
+  protected class FileSelectList extends SelectList
   {
     final FileSelector outer;
     
@@ -168,7 +182,7 @@ public class FileSelector //extends GralWidget
   
   
   /**The implementation of SelectList. */
-  private FileSelectList selectList;
+  protected FileSelectList selectList;
   
   
   /**This index stores the last selected file for any directory path which was used.
@@ -281,7 +295,7 @@ public class FileSelector //extends GralWidget
         if(file.isDirectory()){ sName += "/"; }
         long length = file.length();
         long date = file.lastModified();
-        FileAndName fileItem = new FileAndName(this.sCurrentDir, sName, length, date);
+        FileAndName fileItem = new FileAndName(this.sCurrentDir, sName, length, date, file.canWrite());
         
         String sort = (file.isDirectory()? "D" : "F") + sName;
         sortFiles.put(sort, fileItem);

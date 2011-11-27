@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
@@ -31,29 +32,39 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
 {
   //protected final Display displaySwt; 
 
+  /**Version and history.
+   * <ul>
+   * <li>2011-11-27 Hartmut chg: {@link #addMenuItemGThread(String, String, GralUserAction)} moved from
+   *   {@link SwtPrimaryWindow} to this, because the capability to have a menu bar may needed on a sub-window too.
+   * <li>2011-11-12 Hartmut chg: {@link #addMenuItemGThread(String, String, GralUserAction)} now only
+   *   with a GralUserAction. The Swt-internal SelectionListener action is not supported up to now.
+   * <li>2011-11-10 Hartmut chg: move all files from mainGuiSwt to gral.swt, dissolve of package mainGuiSwt
+   * <li>2011-11-09 Hartmut chg: Renamed from PrimaryWindowSwt to SwtPrimaryWindow
+   * <li>2011-11-02 Hartmut chg: Some improvements,  Menus now have a GralWidget as data too, 
+   *   GralUserAction called with the widget to detect what menu is pressed.
+   * <li>2011-10-29 Hartmut chg: Now the build of the primary window is simplified. A new class 
+   *   GralGraphicThread and its implementation SwtGraphicThread is created.
+   * <li>2011-10-20 Hartmut chg: Order of initialization reviewed, works now, but not ready documented and checked in detail.
+   * <li>2011-10-15 Hartmut new {@link #removeWidgetImplementation()}  
+   * <li>2011-09-18 Hartmut chg: improved,  Now a PrimaryWindow and a SubWindow are defined.  
+   * <li>2011-09-11 Hartmut created: A new class PrimaryWindowSwt contains only things for a primary Window, 
+   *   in Swt with a new Display and a new Shell. The code is dissolved from MainCmdSwt, which references 
+   *   that new class yet. Therefore a GralDeviceSwt is unnecessary now. 
+   *   The GralDevice is the primary window always. TODO rename GralDevice to GralPrimaryWindow
+   * </ul>
+   */
+  public final static int version = 0x20111127;
+  
   /** The frame of the Window in the GUI (Graphical Unit Interface)*/
   //protected Shell graphicFrame;
 
   /** */
   final SwtGraphicThread graphicThreadSwt;
   
-  private static class MenuEntry
-  {
-    String name;
-    /**If it is a superior menu item, the menu below. Else null. */
-    Menu menu;
-    Map<String, MenuEntry> subMenu;
-  }
-  
-  
-  
-  Map<String, MenuEntry> menus = new TreeMap<String, MenuEntry>();
-  
-  
 
   
   private SwtPrimaryWindow(GralWidgetMng gralMng, SwtGraphicThread graphicThread, Display displaySwt)
-  { super("primaryWindow", graphicThread.windowSwt, gralMng);
+  { super("primaryWindow", GralWindow.windHasMenu, graphicThread.windowSwt, gralMng);
     //super(gralMng, graphicThread);
     this.graphicThreadSwt = graphicThread;  //refers SWT type
   }  
@@ -190,94 +201,11 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   
   
   
-  class ActionUserMenuItem implements SelectionListener
-  { 
-    final GralUserAction action;
-    
-    public ActionUserMenuItem(GralUserAction action)
-    { this.action = action;
-    }
-
-    @Override
-    public void widgetDefaultSelected(SelectionEvent e) {
-      // TODO Auto-generated method stub
-      
-    }
-  
-    @Override
-    public void widgetSelected(SelectionEvent e)
-    { Object oWidgSwt = e.getSource();
-      final GralWidget widgg;
-      if(oWidgSwt instanceof Widget){
-        Widget widgSwt = (Widget)oWidgSwt;
-        Object oGralWidg = widgSwt.getData();
-        if(oGralWidg instanceof GralWidget){
-          widgg = (GralWidget)oGralWidg;
-        } else { widgg = null; }
-      } else { widgg = null; }
-      action.userActionGui(KeyCode.menuEntered, widgg);
-    }
-  }
-  
-  
-
   
   void stop()
   { //to set breakpoint
   }
 
-
-  @Override public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction gralAction)
-  { SelectionListener action = this.new ActionUserMenuItem(gralAction);
-    String[] names = sMenuPath.split("/");
-    /**The file menuBar is extendable. */
-    Menu menuBar = graphicThreadSwt.windowSwt.getMenuBar();
-    if(menuBar == null){
-      menuBar = new Menu(graphicThreadSwt.windowSwt, SWT.BAR);
-      graphicThreadSwt.windowSwt.setMenuBar(menuBar);
-    }
-    Menu parentMenu = menuBar;
-    Map<String, MenuEntry> menustore = menus;
-    int ii;
-    for(ii=0; ii<names.length-1; ++ii){
-      //search all pre-menu entries before /. It may be existing, otherwise create it.
-      String name = names[ii];
-      final char cAccelerator;
-      final int posAccelerator = name.indexOf('?');
-      if(posAccelerator >=0){
-        cAccelerator = Character.toUpperCase(name.charAt(posAccelerator));
-        name = name.replace("&", "");
-      } else {
-        cAccelerator = 0;
-      }
-      MenuEntry menuEntry = menustore.get(name);
-      if(menuEntry == null){
-        //create it.
-        menuEntry = new MenuEntry();
-        menustore.put(name, menuEntry);
-        menuEntry.name = name;
-        menuEntry.subMenu = new TreeMap<String, MenuEntry>();
-        MenuItem item = new MenuItem(parentMenu, SWT.CASCADE);
-        item.setText(name);
-        if(cAccelerator !=0){
-          item.setAccelerator(SWT.CONTROL | cAccelerator);
-        }
-        menuEntry.menu = new Menu(graphicThreadSwt.windowSwt, SWT.DROP_DOWN);
-        item.setMenu(menuEntry.menu);
-      }
-      menustore = menuEntry.subMenu;
-      parentMenu = menuEntry.menu;
-    }
-    String name = names[ii];
-    MenuItem item = new MenuItem(parentMenu, SWT.None); 
-    GralWidget widgMenu = new SwtWidgetMenu(nameWidg, item, sMenuPath, gralMng);
-    item.setText(name);
-    //item.setAccelerator(SWT.CONTROL | 'S');
-    item.addSelectionListener(action);
-    ///
-  }
-  
-  
   
 
 

@@ -14,9 +14,9 @@ public class AwtSubWindow extends GralWindow
   
   protected final Frame window;
 
-  public AwtSubWindow(String name, Frame window, String title, boolean exclusive, GralWidgetMng gralMng)
+  public AwtSubWindow(String name, Frame window, String title, int windStyle, GralWidgetMng gralMng)
   {
-    super(name, gralMng, window);
+    super(name, windStyle, gralMng, window);
     this.window = window;
     // TODO Auto-generated constructor stub
   }
@@ -108,6 +108,13 @@ public class AwtSubWindow extends GralWindow
 
   @Override
   protected void removeWidgetImplementation()
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction action)
   {
     // TODO Auto-generated method stub
     

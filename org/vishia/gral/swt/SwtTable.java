@@ -36,6 +36,7 @@ public class SwtTable extends GralTable
   
   /**Version and History:
    * <ul>
+   * <li>2011-11-27 Hartmut new {@link #selectionListener}: calls {@link GralTable#selectLine(GralTableLine_ifc)}.
    * <li>2011-10-02: Hartmut chg: The key handling is improved. The old idea - a String for any key - is now obsolete.
    *   The keycodes are contained in {@link KeyCode}, that are used. The conversion routine for SWT-keys is {@link SwtGralKey}.
    * <li>older: TODO
@@ -228,6 +229,10 @@ public class SwtTable extends GralTable
     {
       if(ev.item instanceof TableItem){
         TableItem item = (TableItem)ev.item;
+        Object oData = item.getData();
+        if(oData instanceof GralTableLine_ifc){
+          selectLine((GralTableLine_ifc)oData);
+        }
         //item.setBackground(mng.propertiesGui.color(0x00ffff));
       }
       // TODO Auto-generated method stub

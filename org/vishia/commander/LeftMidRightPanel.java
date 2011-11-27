@@ -49,7 +49,9 @@ public class LeftMidRightPanel
   /**Characteristic number for the panel: 1, 2, 3 */
   final char cNr;
   
-  final int[] widthSelecttable = new int[]{2, 20, 30};
+  final int[] widthSelecttableMain = new int[]{6, 20, 30};
+
+  final int[] widthSelecttableSub = new int[]{2, 20, 30};
 
   
   LeftMidRightPanel(JavaCmd javaCmd, char cc, char cNr, GralWidgetMng mng){
@@ -84,7 +86,7 @@ public class LeftMidRightPanel
     mng.setPosition(0, 0, 0, 0, 1, 'd');
     tabbedPanelSelectionTabs.addGridPanel(nameGridPanel, tabLabelGridPanel, 1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd');
-    selectTableAll.setToPanel(mng, WidgetNames.tableFavoritesMain + cNr, 5, widthSelecttable, 'A');
+    selectTableAll.setToPanel(mng, WidgetNames.tableFavoritesMain + cNr, 5, widthSelecttableMain, 'A');
     fillInTables(which);  //build the rest of all tabs and panels depending on content of favorites.
     
     if(cNr == '1'){ //commands only in the left panel.
@@ -102,9 +104,15 @@ public class LeftMidRightPanel
    * @param which Number 1 2 3 for left, mid, right
    */
   void fillInTables(int which){
-    selectTableAll.clear();
+    
+    selectTableAll.clear();   //the common favor path table.
+    //clear index of entries, it is a mirror of content of the GUI-visible table and prevents
+    //twice adding.
+    selectTableAll.indexEntries.clear();  
+    //clear all GUI tables of this main tab.
     for(FcmdFileTable fileTabs: listTabs){
       fileTabs.favorTable.clear();
+      fileTabs.favorTable.indexEntries.clear();
     }
     //List of favor pathes for this main panel
     for(FcmdFavorPathSelector.SelectInfo info: selectListAllFavorites){ //panel specific favorites

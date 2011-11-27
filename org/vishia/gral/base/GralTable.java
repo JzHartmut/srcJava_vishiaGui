@@ -5,6 +5,7 @@ import java.util.List;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTable_ifc;
+import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.KeyCode;
 
@@ -22,6 +23,10 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc
 
   /**Version and history
    * <ul>
+   * <li>2011-11-27 Hartmut new {@link #setActionOnLineSelected(GralUserAction)}: This routine is called
+   *   anytime if a line is selected by user operation. It can be show any associated content any where
+   *   additionally. It is used for example in "The.file.Commander" to show date, time and maybe content 
+   *   while the user selects any files. The graphical implementation should be support it. 
    * <li>2011-11-20 Hartmut new The capability of selection of lines is moved from the 
    *   {@link org.vishia.gral.widget.SelectList} to this class. It means any table has the capability
    *   of selection of multiple lines. This capability is supported with a extension of the
@@ -38,11 +43,21 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc
   
   private int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
   
+  
+  GralUserAction actionOnLineSelected;
+  
   public GralTable(String name, GralWidgetMng mng)
   {
     super(name, 'L', mng);
   }
   
+  
+  /**Sets an action which is called any time when another line is selected.
+   * @param actionOnLineSelected The action, null to switch off this functionality.
+   */
+  public void setActionOnLineSelected(GralUserAction actionOnLineSelected){
+    this.actionOnLineSelected = actionOnLineSelected;
+  }
   
   
   protected void procStandardKeys(int keyCode, GralTableLine_ifc line, int ixLine){
@@ -57,6 +72,17 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc
       }
     }
   }
+  
+  
+  /**It is called whenever a line is changed. The user can override this method to get infos.
+   * @param line
+   */
+  protected void selectLine(GralTableLine_ifc line){
+    if(actionOnLineSelected !=null){
+      actionOnLineSelected.userActionGui(KeyCode.tableLineSelect, this, line);
+    }
+  }
+  
   
   
 }

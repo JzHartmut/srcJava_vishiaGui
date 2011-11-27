@@ -18,6 +18,7 @@ import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
+import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralWindow_ifc;
@@ -49,6 +50,10 @@ public class JavaCmd extends GuiCfg
 
   final FcmdButtons fButtons = new FcmdButtons();
   
+  GralTextField widgInfo;
+  
+  final String nameTextFieldInfo = "file-info";
+  
   GralPanelContent panelButtons;
 
   final CmdQueue cmdQueue = new CmdQueue(mainCmd);
@@ -59,13 +64,19 @@ public class JavaCmd extends GuiCfg
 
   final CommandSelector cmdSelector = new CommandSelector("cmdSelector", cmdQueue, gralMng);
 
+  final FcmdFileProps filePropsCmd = new FcmdFileProps(this);
+  
+  final FcmdView viewCmd = new FcmdView(this);
+  
   final CopyCmd copyCmd = new CopyCmd(this);
+  
+  final FcmdMkDirFile mkCmd = new FcmdMkDirFile(this);
 
   final FcmdDelete deleteCmd = new FcmdDelete(this);
 
   final JavaCmdKeyActions keyActions = new JavaCmdKeyActions(this);
 
-  private File[] selectedFiles;
+  File[] selectedFiles;
 
   FileSelector[] lastFocusedFileTables = new FileSelector[3];
   
@@ -137,8 +148,11 @@ public class JavaCmd extends GuiCfg
     gui.addFrameArea(1, 3, 3, 1, panelButtons); // dialogPanel);
     initPanelButtons();
 
+    filePropsCmd.buildWindowConfirmMk();  //F2
+    viewCmd.buildWindowConfirmDelete();   //F3
     copyCmd.buildWindowConfirmCopy();
-    deleteCmd.buildWindowConfirmDelete();
+    mkCmd.buildWindowConfirmMk();
+    deleteCmd.buildWindowConfirmDelete(); //F8
     favorPathSelector.buildWindowAddFavorite();
     gui.addMenuItemGThread("menuHelp", "&Help/&Help", gui.getActionHelp());
     gui.addMenuItemGThread("menuAbout", "&Help/&About", gui.getActionAbout());
@@ -148,7 +162,10 @@ public class JavaCmd extends GuiCfg
   private void initPanelButtons()
   {
     gralMng.selectPanel("Buttons");
-    gralMng.setPosition(0, 1, 10, 20, 1, 'r');
+    gralMng.setPosition(0, 2, 0, 0, 1, 'r');
+    ///
+    widgInfo = gralMng.addTextField(nameTextFieldInfo, false, null, '.');
+    gralMng.setPosition(2, 1, 10, 20, 1, 'r');
     gralMng.addText("F1", 'A', 0x0);
     gralMng.addText("F2", 'A', 0x0);
     gralMng.addText("F3", 'A', 0x0);
@@ -159,12 +176,12 @@ public class JavaCmd extends GuiCfg
     gralMng.addText("F8", 'A', 0x0);
     gralMng.addText("F9", 'A', 0x0);
     gralMng.addText("F10", 'A', 0x0);
-    gralMng.setPosition(3, 5, 0, 4, 1, 'd');
-    gralMng.addText("alt", 'A', 0x0);
-    gralMng.addText("ctr", 'A', 0x0);
-    gralMng.addText("sh", 'A', 0x0);
+    gralMng.setPosition(5, 7, 0, 4, 1, 'd');
+    gralMng.addText("alt -", 'A', 0x0);
+    gralMng.addText("ctr -", 'A', 0x0);
+    gralMng.addText("sh  -", 'A', 0x0);
 
-    gralMng.setPosition(1, 3, 4, 14, 1, 'r');
+    gralMng.setPosition(3, 5, 4, 14, 1, 'r');
     gralMng.addButton("b-help", null, "help", null, null, "help");
     gralMng.addButton("b-F2", null, "help", null, null, "F2");
     gralMng.addButton("b-help", null, "help", null, null, "view");
@@ -172,10 +189,10 @@ public class JavaCmd extends GuiCfg
     gralMng.addButton("b-copy", copyCmd.actionConfirmCopy, "", null, null, "copy");
     gralMng.addButton("b-help", null, "help", null, null, "move");
     gralMng.addButton("b-help", null, "help", null, null, "mkdir");
-    fButtons.buttonDel = gralMng.addButton("b-delete", actionDelete, "del", null, null, "del");
+    fButtons.buttonDel = gralMng.addButton("b-delete", deleteCmd.actionConfirmDelete, "del", null, null, "del");
     gralMng.addButton("b-help", null, "help", null, null, "cmd");
     gralMng.addButton("b-help", null, "help", null, null, "F10");
-    gralMng.setPosition(3, 5, 4, 14, 1, 'r');
+    gralMng.setPosition(5, 7, 4, 14, 1, 'r');
     gralMng.addButton("selectLeft", selectPanelLeft, "selectLeft", null, null,
         "left");
     gralMng.addButton("selectMiddle", selectPanelMiddle, "help", null, null,
@@ -189,9 +206,20 @@ public class JavaCmd extends GuiCfg
     gralMng.addButton("b-help", null, "help", null, null, "a-F8");
     gralMng.addButton("b-help", null, "help", null, null, "a-F9");
     gralMng.addButton("b-help", null, "help", null, null, "a-F10");
-    gralMng.setPosition(5, 7, 4, 14, 1, 'r');
+    gralMng.setPosition(7, 9, 4, 14, 1, 'r');
     gralMng.addButton("b-help", null, "help", null, null, "brief");
     gralMng.addButton("b-F2", null, "help", null, null, "full");
+    gralMng.addButton("b-help", null, "help", null, null, "name");
+    gralMng.addButton("b-help", null, "help", null, null, "ext");
+    gralMng.addButton("b-help", null, "help", null, null, "time");
+    gralMng.addButton("b-help", null, "help", null, null, "size");
+    gralMng.addButton("b-help", null, "help", null, null, "nat");
+    gralMng.addButton("b-help", null, "help", null, null, "tree");
+    gralMng.addButton("b-help", null, "help", null, null, "c-F9");
+    gralMng.addButton("b-help", null, "help", null, null, "c-F10");
+    gralMng.setPosition(9, 11, 4, 14, 1, 'r');
+    gralMng.addButton("b-help", null, "help", null, null, "brief");
+    gralMng.addButton("b-F2", null,   "help", null, null, "full");
     gralMng.addButton("b-help", null, "help", null, null, "name");
     gralMng.addButton("b-help", null, "help", null, null, "ext");
     gralMng.addButton("b-help", null, "help", null, null, "time");
@@ -309,14 +337,16 @@ public class JavaCmd extends GuiCfg
    * 
    * @return Array of files in order of last focus
    */
-  private File[] getCurrentFileInLastPanels()
+  File[] getCurrentFileInLastPanels()
   { findLastFocusedFileTables();
     File file[] = new File[3];
     int ixFile = -1;
     for(FileSelector fileTable: lastFocusedFileTables){
       if(fileTable !=null){
         FileSelector.FileAndName fileItem = fileTable.getSelectedFile();
-        file[++ixFile] = new File(fileItem.path, fileItem.name);
+        if(fileItem !=null){
+          file[++ixFile] = new File(fileItem.path, fileItem.name);
+        }
       }
     }
     return file;
@@ -644,25 +674,6 @@ public class JavaCmd extends GuiCfg
 
 
   
-  /**
-   * Key F6 for delete command. Its like Norton Commander.
-   */
-  GralUserAction actionDelete = new GralUserAction()
-  {
-    @Override
-    public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
-    {
-      selectedFiles = getCurrentFileInLastPanels();
-      getterFiles.prepareFileSelection();
-      //File[] files = new File[3];
-      File fileSrc = getterFiles.getFile1();
-      //files[2] = getterFiles.getFile3();
-      deleteCmd.confirmDelete(fileSrc);
-      return true;
-      // /
-    }
-  };
-
   void stop()
   {
   }
