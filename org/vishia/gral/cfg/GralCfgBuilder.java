@@ -119,6 +119,9 @@ public class GralCfgBuilder
     else if(inp.xIncr_){ dirNext = 'r';}
     else { dirNext = '.'; }
     //yPos
+    if(inp.yPosFrac !=0){
+      stop();
+    }
     if(inp.yPos >=0){
       pos.yPos = inp.yPos;
       pos.yPosFrac = inp.yPosFrac;

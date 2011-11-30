@@ -179,9 +179,11 @@ public class GralGridPos implements Cloneable
       , int origin, char direction)
   {
     int y1 = (int)(line);
+    float f = (lineEndOrSize - y1)* 10 + 0.5f;
     int y1f = y1 >=0 ? (int)((line - y1)* 10.001F) : (int)((line - y1)* -10.001F);  
     int y2 = (int)(lineEndOrSize);
-    int y2f = y2 >=0 ? (int)((lineEndOrSize - y2)* 10.001F) : (int)((lineEndOrSize - y2)* -10.001F);  
+    f = (lineEndOrSize - y2)* 10 + 0.5f;
+    int y2f = y2 >=0 ? (int)(f) : (int)(-f);  
     int x1 = (int)(column);
     int x1f = x1 >=0 ? (int)((column - x1)* 10.001F) : (int)((column - x1)* -10.001F);  
     int x2 = (int)(columnEndOrSize);
@@ -354,7 +356,7 @@ public class GralGridPos implements Cloneable
     int pDir;  //0 for up or left, 1 for down or right, -1 else 
     int pOrigin;
     
-    void calc(int z, int zf, int ze, int zef)
+    void calc(int z, int zf, final int ze, final int zef)
     {
       /**User final local variable to set p, pf, pe, pef to check whether all variants are regarded. */
       final int q, qf, qe, qef;
@@ -389,14 +391,13 @@ public class GralGridPos implements Cloneable
         ){ 
         //related end value to frame or previous position
         qParamDesg |= mBitRelEnd;
-        ze -= same;
         //regard maybe related position in z,zf for start. 
         if((qParamDesg & mBitRel)!=0){
           q = z + p; qf = zf + pf;
         } else {
           q = z; qf = zf;
         }
-        qe = ze + pe; qef = zef + pf; 
+        qe = ze-same + pe; qef = zef + pf; 
         /*
         if((paramDesg & mBitSizeNeg) != 0){ 
           qe = z; qef = zf;   //use the left/top position like given.
@@ -411,20 +412,19 @@ public class GralGridPos implements Cloneable
                ){
         //size value
         qParamDesg |= mBitSize;
-        ze -= size;
         if((qParamDesg & mBitRel)!=0){  //The z parameter was detected as refer (same)
           z = pRefer + z;     //use the pRefer instead p or pe 
           zf = pfRefer + zf;  //frac part always positive.
         } 
-        if(bxSizeNeg = (ze <0)){
+        if(bxSizeNeg = (ze < size)){
           qParamDesg |= mBitSizeNeg;
           ///
-          ze = -ze;  //positive
-          q = z - ze; qf = zf - zef;  //the left/top is the given position - size
+          //ze = -ze;  //positive
+          q = z + ze -size; qf = zf + zef;  //the left/top is the given position - size
           qe = z; qef = zf;           //the end position is the given position.
         } else {
           q = z; qf = zf;
-          qe = z + ze; qef = zf + zef;
+          qe = z + ze-size; qef = zf + zef;
         }
         //
       } else if(  ze > (GralGridPos.size + GralGridPos.same- GralGridPos.mValueRange_)
@@ -436,13 +436,11 @@ public class GralGridPos implements Cloneable
           zf = pfRefer + zf;  //frac part always positive.
         }
         qParamDesg |= mBitSize + mBitRelEnd;
-        ze -= size + same;
-        ze += pSize;  //the size
         bxSizeNeg = (this.paramDesg & mBitSizeNeg) !=0;  //the referred pos has negative size
         if(bxSizeNeg){
           qParamDesg |= mBitSizeNeg;
           ///
-          q = z - ze; qf = zf - zef;  //the left/top is the given position - size
+          q = z - ze -(size+same) + pSize; qf = zf - zef;  //the left/top is the given position - size
           qe = z; qef = zf;           //the end position is the given position.
         } else {
           q = z; qf = zf;
