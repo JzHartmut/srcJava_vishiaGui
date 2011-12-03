@@ -49,6 +49,10 @@ public class AwtTextBox extends GralTextBox
   @Override
   public int getNrofLines(){ return 0;  }  //textFieldSwt.getLineCount();
 
+  @Override public int getCursorPos(){ return textFieldSwt.getCaretPosition(); }
+
+
+  
   @Override
   public Appendable append(CharSequence arg0) throws IOException
   { if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){

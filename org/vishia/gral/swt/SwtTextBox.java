@@ -2,7 +2,10 @@ package org.vishia.gral.swt;
 
 import java.io.IOException;
 
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Text;
@@ -11,6 +14,8 @@ import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
+import org.vishia.util.KeyCode;
 
 public class SwtTextBox extends GralTextBox
 {
@@ -22,9 +27,10 @@ public class SwtTextBox extends GralTextBox
   StringBuffer newText = new StringBuffer();
   
   
-  public SwtTextBox(String name, Composite parent, int style, GralWidgetMng mng)
+  public SwtTextBox(String name, Composite parent, int style, SwtWidgetMng mng)
   { super(name, 't', mng);
     textFieldSwt = new Text(parent, style);
+    textFieldSwt.addKeyListener((new SwtTextBoxKeyListener(mng)).swtListener);
   }
 
   //@Override public Widget getWidgetImplementation(){ return textFieldSwt; } 
@@ -42,8 +48,9 @@ public class SwtTextBox extends GralTextBox
     
   }
 
-  @Override
-  public int getNrofLines(){ return textFieldSwt.getLineCount(); }
+  @Override public int getNrofLines(){ return textFieldSwt.getLineCount(); }
+
+  @Override public int getCursorPos(){ return textFieldSwt.getCaretPosition(); }
 
   @Override
   public Appendable append(CharSequence arg0) throws IOException
@@ -171,6 +178,31 @@ public class SwtTextBox extends GralTextBox
   }
 
 
-  
+  /**This class will be instanciated in the {@link SwtWidgetMng} one time for all text boxes.
+   */
+  class SwtTextBoxKeyListener extends SwtKeyListener
+  {
+
+    public SwtTextBoxKeyListener(SwtWidgetMng swtMng)
+    {
+      super(swtMng);
+    }
+
+    protected @Override final boolean specialKeysOfWidgetType(int key, GralWidget widgg){ 
+      boolean bDone = true;
+      if(KeyCode.isWritingOrTextNavigationKey(key)) return true;
+      switch(key){
+        case KeyCode.ctrl + 'a': { 
+          textFieldSwt.selectAll();
+        } break;
+        default: bDone = false;
+      }
+      return bDone; 
+    }
+
+    
+    
+    
+  }
   
 }

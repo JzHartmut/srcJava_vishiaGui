@@ -67,6 +67,7 @@ import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralGridProperties;
+import org.vishia.gral.base.GralLed;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
@@ -136,6 +137,10 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	/**Version, able to read as hex yyyymmdd.
 	 * Changes:
 	 * <ul>
+	 * <li>2011-12-03 Hartmut new: {@link #setInfoDirect(GralWidget, int, int, Object, Object)} catches
+	 *   any exception, before: An exception causes aborting the graphic thread.
+	 * <li>2011-12-03 Hartmut chg: {@link #addLed(String, String, String)} now uses {@link GralLed}.  
+	 * <li>2011-12-03 Hartmut new: {@link #swtKeyListener} as base for all fields.
 	 * <li>2011-11-12 Hartmut chg: {@link #calcPositionOfWindow(GralGridPos)} improved
 	 * <li>2011-08-13 Hartmut chg: New routines for store and calculate the position to regard large widgets.
 	 * <li>2011-06-17 Hartmut getValueFromWidget(): Table returns the whole selected line, cells separated with tab.
@@ -182,6 +187,9 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    * The infos of the last clicked widget can be got with it.
    */
   SwtGralMouseListener.MouseListenerNoAction mouseClickForInfo = new SwtGralMouseListener.MouseListenerNoAction();
+  
+  
+  SwtKeyListener swtKeyListener = new SwtKeyListener(this);
   
   /**It is a marker interface. */
   protected interface XXXUserAction{}
@@ -1069,18 +1077,11 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   {
     int ySize = (int)(pos.height());
     int xSize = (int)(pos.width());
-    SwtLed widget = new SwtLed(this, 'r');
-  	widget.setBackground(propertiesGuiSwt.colorBackground);
-  	
-    widget.setForeground(propertiesGuiSwt.colorSwt(0xff00));
-    widget.setSize(propertiesGui.xPixelUnit() * xSize -2, propertiesGui.yPixelUnit() * ySize -2);
-    setBounds_(widget);
-    GralWidget widgetInfos = new WidgetSimpleWrapperSwt(sName, 'D', widget, this);
+
+    GralWidget widgetInfos = new SwtLed(sName, this);
     widgetInfos.setPanelMng(this);
     widgetInfos.sDataPath = sDataPath;
     widgetInfos.setShowMethod(sShowMethod);
-    widget.setData(widgetInfos);
-    widget.addMouseListener(mouseClickForInfo);
     registerWidget(widgetInfos);
     return widgetInfos;
   }
@@ -1233,9 +1234,10 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   private void setInfoDirect(GralWidget widget, int cmd, int ident, Object info, Object data)
   { final Control swtWidget;
-    if(  widget !=null 
-      && ( swtWidget = (Control)widget.getWidgetImplementation()) !=null
-      ){
+    try{
+      if(  widget !=null 
+        && ( swtWidget = (Control)widget.getWidgetImplementation()) !=null
+        ){
           int colorValue;
           switch(cmd){
           case GralPanelMngWorking_ifc.cmdBackColor: {
@@ -1274,13 +1276,23 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
                   break;
               default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %x on widget %s", cmd, widget.name);
               }
-            } else if(swtWidget instanceof SwtLed){ 
-              SwtLed field = (SwtLed)swtWidget;
+            } else if(widget instanceof SwtLed){ 
+              SwtLed field = (SwtLed)widget;
               switch(cmd){
               case GralPanelMngWorking_ifc.cmdColor: field.setColor(ident, (Integer)info); break;
               case GralPanelMngWorking_ifc.cmdSet: {
-                int colorInner = ((Integer)info).intValue();
-                field.setColor(ident, colorInner);
+                if(info instanceof Integer){
+                  int colorInner = ((Integer)info).intValue();
+                  field.setColor(ident, colorInner);
+                } else if(info instanceof String){
+                  if(((String)info).charAt(0) != '0'){
+                    field.setColor(0xff0000, 0xfff00);
+                  } else {
+                    field.setColor(0x00ff00, 0x00ffff);
+                  }
+                } else {
+                  stop();
+                }
               } break;
               default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, widget.name);
               }
@@ -1294,7 +1306,10 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
               }
             }
           }//switch
-        }//if oWidget !=null
+      }//if oWidget !=null
+    }catch(Exception exc){
+      stop();    
+    }
     
   }
   

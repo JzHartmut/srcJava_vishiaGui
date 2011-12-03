@@ -88,9 +88,9 @@ public abstract class GralWidget implements GralWidget_ifc
    */
   public final static int version = 0x20111001;
   
-  /**The panel manager from where the widget is organized. Most of methods need the information
+  /**The widget manager from where the widget is organized. Most of methods need the information
    * stored in the panel manager. This reference is used to set values to other widgets. */
-  protected GralWidgetMng itsMng;
+  public GralWidgetMng itsMng;
   
   /**Association to the configuration element from where this widget was built. 
    * If the widget is moved or its properties are changed in the 'design mode' of the GUI,

@@ -157,6 +157,7 @@ public class JavaCmd extends GuiCfg
     gui.addMenuItemGThread("menuHelp", "&Help/&Help", gui.getActionHelp());
     gui.addMenuItemGThread("menuAbout", "&Help/&About", gui.getActionAbout());
     gui.addMenuItemGThread("MenuTestInfo", "&Help/&Infobox", actionTest); // /
+    guiW.outputBox.setActionChange(executer.actionCmdFromOutputBox);
   }
 
   private void initPanelButtons()

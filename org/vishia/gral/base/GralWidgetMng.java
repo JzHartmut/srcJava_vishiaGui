@@ -705,6 +705,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
     {
       GralWidget widgd = getWidgetInFocus();
       if(widgd !=null){
+        ///
         designer.editFieldProperties(widgd, null);
       }
       return true;
@@ -759,6 +760,10 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
    */
   public void releaseLeftMouseForDesign(GralWidget widgd, GralRectangle xy, boolean bCopy)
   { designer.releaseLeftMouseForDesign(widgd, xy, bCopy);
+  }
+  
+  public void markWidgetForDesign(GralWidget widgg){
+    designer.markWidgetForDesign(widgg);
   }
   
   /**It will be called only at the GUI-implementation level. TODO protected and delegation.

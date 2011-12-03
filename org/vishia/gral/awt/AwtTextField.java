@@ -37,6 +37,10 @@ public class AwtTextField extends GralTextField
   { return widgetAwt.getText();
   }
 
+  
+  @Override public int getCursorPos(){ return widgetAwt.getCaretPosition(); }
+
+
   @Override
   public void setText(String text)
   {

@@ -54,7 +54,11 @@ public class GralArea9Window implements GralArea9_ifc
 
   protected GralPanelContent outputPanel;
   
-  protected GralTextBox outputBox;
+  /**A Text box which is used for common output. It may be edit-able. 
+   * This output box is created initially. It can be used to show error messages while starting the application
+   * if other GUI-elements are not yet present. It can be used generally to show errors, infos and logs
+   * adequate to a console output.*/
+  public GralTextBox outputBox;
   
   public InfoBox infoHelp, infoAbout, infoBox, infoLog;
   

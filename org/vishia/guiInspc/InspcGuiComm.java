@@ -58,6 +58,9 @@ public class InspcGuiComm
       String sShow;
       int order = info.getOrder();
       int cmd = info.getCmd();
+      //if(widgd instanceof GralLed){
+        
+      //}
       if(cmd == InspcDataExchangeAccess.Info.kAnswerValue){
         if(widgd.sFormat !=null){
           if(widgd.sFormat.equals("int32AngleDegree")){
@@ -221,31 +224,34 @@ public class InspcGuiComm
     //
     ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = mng.getVisiblePanels();
     GralWidget widgdRemove = null;
-    for(GralVisibleWidgets_ifc panel: listPanels){
-      Queue<GralWidget> widgetsVisible = panel.getWidgetsVisible();
-      if(widgetsVisible !=null) for(GralWidget widget: widgetsVisible){
-        if(widget.getWidgetImplementation() !=null){
-          if(widget.whatIs == 'D'){
-            int cc = 0;
-          }
-          //special action to request content from target:  
-          GralUserAction actionShow = widget.getActionShow();
-          if(actionShow !=null){
-            actionShow.userActionGui("tx", widget);
+    try{
+      for(GralVisibleWidgets_ifc panel: listPanels){
+        Queue<GralWidget> widgetsVisible = panel.getWidgetsVisible();
+        if(widgetsVisible !=null) for(GralWidget widget: widgetsVisible){
+          if(widget.getWidgetImplementation() !=null){
+            if(widget.whatIs == 'D'){
+              int cc = 0;
+            }
+            //special action to request content from target:  
+            GralUserAction actionShow = widget.getActionShow();
+            if(actionShow !=null){
+              actionShow.userActionGui("tx", widget);
+            } else {
+              actionShowTextfield.userActionGui("tx", widget);
+            }
+            if(inspcAccessor.shouldSend()){
+              sendAndAwaitAnswer();
+              //repeat the request for the field:
+              //TODO: don't use the show action! use datapath with meta info.
+              actionShowTextfield.userActionGui("tx", widget);
+            }
           } else {
-            actionShowTextfield.userActionGui("tx", widget);
+            //remove from list
+            widgdRemove = widget;
           }
-          if(inspcAccessor.shouldSend()){
-            sendAndAwaitAnswer();
-            //repeat the request for the field:
-            //TODO: don't use the show action! use datapath with meta info.
-            actionShowTextfield.userActionGui("tx", widget);
-          }
-        } else {
-          //remove from list
-          widgdRemove = widget;
-        }
-      }//for widgets in panel
+        }//for widgets in panel
+      }
+    } catch(Exception exc){ 
     }
     Runnable userOrder;
     if(inspcAccessor.isFilledTxTelg()){

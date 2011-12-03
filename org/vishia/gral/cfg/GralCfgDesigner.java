@@ -15,6 +15,8 @@ public class GralCfgDesigner
   
   /**The version.
    * <ul>
+   * <li>2011-12-03 Hartmut chg: Now the current widget is stored by left-mouse-release in the field
+   *   {@link #widggForDialog}. Editing of Led works. sFormat is regarded. 
    * <li>2011-09-30 Hartmut chg: rename pressedRightMouseDownForDesign(...) to {@link #editFieldProperties(GralWidget, GralRectangle)}.
    *     because it isn't called as mouse action.
    * <li>2011-09-23 Hartmut corr: Use the new windows concept with {@link GralWindow}.
@@ -49,7 +51,13 @@ public class GralCfgDesigner
   
   private boolean bWidgetMoving = false;
   
+  /**The widget which properties are edit yet or null. */
   GralWidget widgdInDialog = null;
+  
+  /**The widget which was marked (with left mouse up). This widget will be used for design-edit
+   * if the next action is {@link #editFieldProperties(GralWidget, GralRectangle)}.
+   */
+  GralWidget widggForDialog;
   
   public GralCfgDesigner(GralCfgBuilder cfgBuilder, GralWidgetMng mng, LogMessage log)
   { this.cfgBuilder = cfgBuilder;
@@ -99,6 +107,12 @@ public class GralCfgDesigner
     bWidgetMoving = true;
   }
   
+
+  public void markWidgetForDesign(GralWidget widgg)
+  {
+    widggForDialog = widgg;
+  }
+  
   
   public void releaseLeftMouseForDesign(GralWidget widgd, GralRectangle xy, boolean bCopy)
   {
@@ -138,8 +152,10 @@ public class GralCfgDesigner
 
   
   public void editFieldProperties(GralWidget widgd, GralRectangle xy)
-  { //if(widgdInDialog == null){
-      widgdInDialog = widgd;
+  { widgd = widgdInDialog = widggForDialog;
+    //widgdInDialog = widgd;
+    if(widgdInDialog != null){
+      widgd = widgdInDialog = widggForDialog;
       GralCfgElement cfge = (GralCfgElement)widgd.getCfgElement();
       String sName, sDataPath, sText, sFormat, sShowMethod,  sActionMethod;
       String sPrompt, sPromptPos;
@@ -173,7 +189,7 @@ public class GralCfgDesigner
       } else {
         dialogFieldName.setValue(GralPanelMngWorking_ifc.cmdSet, 0, "ERROR cfge");
       }
-    //}
+    }
     //dialogWindowProps.posWindow.setPosition(widgd.pos, widgd.pos.y +2, GralGridPos.size+30, widgd.pos.x, GralGridPos.size+40, 1, 'r' );
     //dialogWindowProps.setWindowVisible(true);
     //use manager to position.
@@ -188,6 +204,7 @@ public class GralCfgDesigner
         String sDataPath = dialogFieldDatapath.getValue();
         String sText = dialogFieldText.getValue();
         String sFormat = dialogFieldFormat.getValue();
+        String sShowMethod = dialogFieldShow.getValue();
         String sPrompt = dialogFieldPrompt.getValue();
         String sPromptPos = dialogFieldPromptPos.getValue();
         String sLine = dialogFieldLine.getValue();
@@ -207,6 +224,7 @@ public class GralCfgDesigner
           cfge.widgetType.info = sDataPath.trim().length() >0 ? sDataPath : null;
           cfge.widgetType.text = sText.trim().length() >0 ? sText : null;
           cfge.widgetType.format = sFormat.trim().length() >0 ? sFormat : null;
+          cfge.widgetType.showMethod = sShowMethod.trim().length() >0 ? sShowMethod : null;
           cfge.widgetType.prompt = sPrompt.trim().length() >0 ? sPrompt : null;
           cfge.widgetType.promptPosition = sPromptPos.trim().length() >0 ? sPromptPos : null;
           boolean bOk;

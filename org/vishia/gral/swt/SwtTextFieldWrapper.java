@@ -62,6 +62,8 @@ public class SwtTextFieldWrapper extends GralTextField
   }
    
 
+  @Override public int getCursorPos(){ return textFieldSwt.getCaretPosition(); }
+
 
   
   protected GralDispatchCallbackWorker changeText = new GralDispatchCallbackWorker()
@@ -118,7 +120,11 @@ public class SwtTextFieldWrapper extends GralTextField
 
   @Override public void removeWidgetImplementation()
   {
-    textFieldSwt.dispose();
+    if(textFieldSwt !=null){
+      textFieldSwt.dispose();
+    } else {
+      stop();
+    }
     textFieldSwt = null;
     if(promptSwt !=null){
       promptSwt.dispose();

@@ -4,9 +4,11 @@ import java.io.File;
 
 import org.vishia.cmd.CmdStore;
 import org.vishia.cmd.CmdStore.CmdBlock;
+import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.mainCmd.MainCmd_ifc;
+import org.vishia.util.KeyCode;
 
 public class Executer
 {
@@ -37,7 +39,7 @@ public class Executer
     { assert(sIntension.equals("FileSelector-file"));
       File file = (File)params[0];
       if(false && file.canExecute()){
-        main.cmdQueue.addCmd(null, null, null);
+        //main.cmdQueue.addCmd(null, null, null);
       }
       String name = file.getName();
       String ext;
@@ -71,6 +73,25 @@ public class Executer
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
     { main.cmdQueue.abortCmd();
       return true;
+    }
+  };
+  
+
+  GralUserAction actionCmdFromOutputBox = new GralUserAction()
+  { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
+    { if(key == KeyCode.ctrl + KeyCode.enter){
+        GralTextBox widgg = (GralTextBox)widgd;
+        String text = widgg.getText();
+        int cursorPos = widgg.getCursorPos();
+        int start1 = text.lastIndexOf('%', cursorPos);
+        int start2 = text.lastIndexOf('&', cursorPos);
+        int start = start2 > start1 ? start2+1 : start1+1;  //note: on -1 it is 0, start of box
+        int end = text.indexOf('%', start);
+        if(end <0){ end = text.length(); }
+        String sCmd = text.substring(start, end);
+        main.cmdQueue.addCmd(sCmd, null, null);
+        return true;
+      } else return false;
     }
   };
   

@@ -61,14 +61,14 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
 
   @Override
   public void setText(String text)
-  {
-    // TODO Auto-generated method stub
+  { textBox.setText(text);
   }
 
-  @Override public String getText()
-  { return null;
+  @Override public String getText(){ return textBox.getText(); }
   
-  }
+  @Override public int getCursorPos(){ return textBox.getCursorPos(); }
+
+
   
   @Override public void redraw(){  window.redraw(); }
 

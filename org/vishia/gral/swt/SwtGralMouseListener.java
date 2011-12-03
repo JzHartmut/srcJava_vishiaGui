@@ -86,7 +86,7 @@ public class SwtGralMouseListener
       
     }
 
-    /**The mouse up is left empty. It may be overridden by an derived class. */
+    /**The default behaviour for mouse up is used for design mode. */
     @Override public void mouseUp(MouseEvent ev)
   {   Widget widget = ev.widget;
       Object oInfo = widget.getData();
@@ -96,10 +96,14 @@ public class SwtGralMouseListener
         try{
           GralWidget widgd = (GralWidget)oInfo;
           int dx = ev.x - xDown, dy = ev.y - yDown;
-          if(guiMng.bDesignMode && ev.button == 1 && (ev.stateMask & SWT.ALT)!=0){
-            boolean bCopy = (ev.stateMask & org.eclipse.swt.SWT.CTRL) !=0;
-            GralRectangle rr = new GralRectangle(ev.x, ev.y, 0, 0);
-            guiMng.releaseLeftMouseForDesign(widgd, rr, bCopy);  
+          if(guiMng.bDesignMode && ev.button == 1){
+            if((ev.stateMask & SWT.ALT)!=0){
+              boolean bCopy = (ev.stateMask & org.eclipse.swt.SWT.CTRL) !=0;
+              GralRectangle rr = new GralRectangle(ev.x, ev.y, 0, 0);
+              guiMng.releaseLeftMouseForDesign(widgd, rr, bCopy);  
+            } else {
+              guiMng.markWidgetForDesign(widgd);
+            }
           } 
           //widgd.redraw();
         } catch(Exception exc){ guiMng.writeLog(0, exc); }
