@@ -1,6 +1,7 @@
 package org.vishia.guiInspc;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -170,6 +171,12 @@ private class InspcGuiCfg extends GuiCfg
       exc.printStackTrace();
     }
 
+  }
+  
+  @Override protected void finishMain()
+  {
+    super.finishMain();
+    try{ inspcComm.inspcAccessor.close(); } catch(IOException exc){}
   }
   
 } //class InspcGuiCfg

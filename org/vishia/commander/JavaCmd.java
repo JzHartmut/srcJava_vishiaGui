@@ -76,6 +76,13 @@ public class JavaCmd extends GuiCfg
 
   final JavaCmdKeyActions keyActions = new JavaCmdKeyActions(this);
 
+  
+  /**The current directory of the last selected file. */
+  FileSelector.FileAndName currentFile;
+
+  /**The last selected files of the three panels, [0] for left .. [2] for right. */
+  final FileSelector.FileAndName[] selectedFiles123 = new FileSelector.FileAndName[3];
+  
   File[] selectedFiles;
 
   FileSelector[] lastFocusedFileTables = new FileSelector[3];

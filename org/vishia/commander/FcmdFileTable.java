@@ -157,6 +157,8 @@ public class FcmdFileTable extends FileSelector
         Object oData = line.getUserData();
         if(oData instanceof FileAndName){
           FileAndName file = (FileAndName)oData;
+          main.currentFile = file;
+          main.selectedFiles123[mainPanel.ixMainPanel] = file;
           String sDate = formatDateInfo.format(new Date(file.date));
           String sLenShort = //String.format("", file.length)
             file.length >= 1000000 ? String.format("%2.1f MByte", file.length/1000000.0) :

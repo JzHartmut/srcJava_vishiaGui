@@ -1,12 +1,18 @@
 package org.vishia.gral.ifc;
 
+import java.io.Closeable;
+
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.msgDispatch.LogMessage;
 
 
 
-/**This interface plugs an user application to the basic GUI application. */ 
-public interface GralPlugUser_ifc
+/**This interface plugs an user application to the basic GUI application. 
+ * <br><br>
+ * <br>Superinterface Closeable</b>: On close of the application some threads should be finished
+ * or channels should be closed. 
+ * */ 
+public interface GralPlugUser_ifc extends Closeable
 {
 
   //void init(LogMessage log);

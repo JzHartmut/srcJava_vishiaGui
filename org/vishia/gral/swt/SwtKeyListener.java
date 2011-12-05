@@ -103,7 +103,7 @@ public class SwtKeyListener extends GralKeyListener
             }
           }
         } catch(Exception exc){
-          swtMng.log.sendMsg(0, "KeyListener - UsercallException; key=%8.8x; %s;", keyCode, exc.getLocalizedMessage());
+          swtMng.log.sendMsg(0, "KeyListener - UsercallException; key=%8x; %s;", keyCode, exc.getLocalizedMessage());
         }
       }
       if(swtControl !=null){

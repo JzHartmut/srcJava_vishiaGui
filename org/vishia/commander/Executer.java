@@ -7,6 +7,7 @@ import org.vishia.cmd.CmdStore.CmdBlock;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.widget.FileSelector;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.KeyCode;
 
@@ -79,17 +80,38 @@ public class Executer
 
   GralUserAction actionCmdFromOutputBox = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
-    { if(key == KeyCode.ctrl + KeyCode.enter){
+    { final char kindOfExecution;
+      if(key == KeyCode.ctrl + KeyCode.enter) kindOfExecution = '>';
+      else if(key == KeyCode.ctrl + KeyCode.shift + KeyCode.enter) kindOfExecution = '&';
+      else if(key == KeyCode.alt + KeyCode.enter) kindOfExecution = '$';
+      else kindOfExecution = 0;
+      if(kindOfExecution !=0){
         GralTextBox widgg = (GralTextBox)widgd;
         String text = widgg.getText();
         int cursorPos = widgg.getCursorPos();
-        int start1 = text.lastIndexOf('%', cursorPos);
-        int start2 = text.lastIndexOf('&', cursorPos);
+        int start1 = text.lastIndexOf("\n>", cursorPos);
+        int start2 = text.lastIndexOf("\n&", cursorPos);
         int start = start2 > start1 ? start2+1 : start1+1;  //note: on -1 it is 0, start of box
-        int end = text.indexOf('%', start);
-        if(end <0){ end = text.length(); }
-        String sCmd = text.substring(start, end);
-        main.cmdQueue.addCmd(sCmd, null, null);
+        String sCmd = text.substring(start+1, cursorPos);
+        final File currentDir;
+        if(main.currentFile !=null){
+          //note: executes it local:
+          currentDir = new File(main.currentFile.path);
+        } else {
+          currentDir = null;  //use any standard
+        }
+        final File[] files;
+        if(sCmd.indexOf("<*")>=0){ //a file may need
+          files= new File[3];
+          int ix = -1;
+          for(FileSelector.FileAndName fileName: main.selectedFiles123){
+            if(fileName !=null){
+              if(fileName.file !=null ){ files[++ix] = fileName.file; }
+              else { files[++ix] = new File(fileName.path + "/" + fileName.name); }
+            }
+          }
+        } else { files = null; }
+        main.cmdQueue.addCmd(sCmd, files, currentDir, kindOfExecution);
         return true;
       } else return false;
     }

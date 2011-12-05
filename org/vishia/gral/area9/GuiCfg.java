@@ -2,6 +2,7 @@ package org.vishia.gral.area9;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Writer;
 
 import org.vishia.communication.InterProcessCommFactorySocket;
@@ -319,7 +320,13 @@ protected void initMain()
 
 protected void stepMain(){}
 
-protected void finishMain(){}
+/**This routine is called on end of main-execution. This default implementation calls 
+ * {@link GralPlugUser_ifc#close()}.
+ * 
+ */
+protected void finishMain(){
+  if(user !=null){ try{ user.close(); } catch(IOException exc ){} }
+}
 
 
 public final void execute()

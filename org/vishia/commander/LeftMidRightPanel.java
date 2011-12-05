@@ -49,6 +49,8 @@ public class LeftMidRightPanel
   /**Characteristic number for the panel: 1, 2, 3 */
   final char cNr;
   
+  final int ixMainPanel;
+  
   final int[] widthSelecttableMain = new int[]{6, 20, 30};
 
   final int[] widthSelecttableSub = new int[]{2, 20, 30};
@@ -58,6 +60,7 @@ public class LeftMidRightPanel
     this.main = javaCmd;
     this.cc = cc;
     this.cNr = cNr;
+    this.ixMainPanel = cNr - '1';
     selectTableAll = new FcmdFavorTable(main, this);
   }
   

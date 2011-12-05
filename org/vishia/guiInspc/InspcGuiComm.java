@@ -1,5 +1,6 @@
 package org.vishia.guiInspc;
 
+import java.io.Closeable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -322,7 +323,7 @@ public class InspcGuiComm
     }
   }
 
-  
+
   
   /**This action is used to request a telegram from target. It is executed in the communication thread.
    * <ul>

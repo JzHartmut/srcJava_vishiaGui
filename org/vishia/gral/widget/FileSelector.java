@@ -59,7 +59,9 @@ public class FileSelector //extends GralWidget
    * maybe of remote files.
    */
   public static class FileAndName //extends SelectMask
-  { public final String path;
+  { /**The directory path of the file. */
+    public final String path;
+    /**The name with extension of the file. */
     public final String name;
     public final long date;
     public final long length;
