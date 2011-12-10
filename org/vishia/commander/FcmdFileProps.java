@@ -5,6 +5,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.FileSelector;
+import org.vishia.util.FileRemote;
 
 public class FcmdFileProps
 {
@@ -35,7 +36,7 @@ public class FcmdFileProps
   /**Opens the view window and fills its content.
    * @param src The path which is selected as source. It may be a directory or a file.
    */
-  void openDialog(FileSelector.FileAndName src)
+  void openDialog(FileRemote src)
   { String sSrc, sTrash;
     windFileProps.setWindowVisible(true);
 

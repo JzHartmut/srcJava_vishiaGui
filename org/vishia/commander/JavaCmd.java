@@ -27,6 +27,7 @@ import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.CommandSelector;
 import org.vishia.gral.widget.FileSelector;
 import org.vishia.mainCmd.MainCmd_ifc;
+import org.vishia.util.FileRemote;
 
 public class JavaCmd extends GuiCfg
 {
@@ -78,10 +79,10 @@ public class JavaCmd extends GuiCfg
 
   
   /**The current directory of the last selected file. */
-  FileSelector.FileAndName currentFile;
+  FileRemote currentFile;
 
   /**The last selected files of the three panels, [0] for left .. [2] for right. */
-  final FileSelector.FileAndName[] selectedFiles123 = new FileSelector.FileAndName[3];
+  final FileRemote[] selectedFiles123 = new FileRemote[3];
   
   File[] selectedFiles;
 
@@ -324,8 +325,8 @@ public class JavaCmd extends GuiCfg
         // assert(ixFilePanel >=0 && ixFilePanel < fileSelector.length); //only
         // such names are registered.
         // FileSelector fileSel = fileSelector[ixFilePanel];
-        FileSelector.FileAndName file = fileSel.getSelectedFile();
-        cmdQueue.setWorkingDir(new File(file.path + file.name));
+        FileRemote file = fileSel.getSelectedFile();
+        cmdQueue.setWorkingDir(new File(file.getParent() + "/" + file.getName()));
       }
       stop();
       if (sIntension.equals("")) {
@@ -351,9 +352,9 @@ public class JavaCmd extends GuiCfg
     int ixFile = -1;
     for(FileSelector fileTable: lastFocusedFileTables){
       if(fileTable !=null){
-        FileSelector.FileAndName fileItem = fileTable.getSelectedFile();
+        FileRemote fileItem = fileTable.getSelectedFile();
         if(fileItem !=null){
-          file[++ixFile] = new File(fileItem.path, fileItem.name);
+          file[++ixFile] = new File(fileItem.getParent(), fileItem.getName());
         }
       }
     }

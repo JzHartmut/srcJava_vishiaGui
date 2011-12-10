@@ -24,11 +24,12 @@ public class LeftMidRightPanel
   GralTabbedPanel tabbedPanelSelectionTabs;
   
   /**All entries for the select list for all favorites in order of the file. */
-  List<FcmdFavorPathSelector.SelectInfo> selectListAllFavorites = new LinkedList<FcmdFavorPathSelector.SelectInfo>();
+  List<FcmdFavorPathSelector.FavorPath> listAllFavorPaths = new LinkedList<FcmdFavorPathSelector.FavorPath>();
 
 
   /**Table widget for the select table.*/
-  FcmdFavorTable selectTableAll;
+  FcmdFavorTabTable selectTableAll;
+
 
 
   
@@ -61,7 +62,7 @@ public class LeftMidRightPanel
     this.cc = cc;
     this.cNr = cNr;
     this.ixMainPanel = cNr - '1';
-    selectTableAll = new FcmdFavorTable(main, this);
+    selectTableAll = new FcmdFavorTabTable(main, this);
   }
   
   
@@ -111,37 +112,24 @@ public class LeftMidRightPanel
     selectTableAll.clear();   //the common favor path table.
     //clear index of entries, it is a mirror of content of the GUI-visible table and prevents
     //twice adding.
-    selectTableAll.indexEntries.clear();  
+    selectTableAll.indexFavorTabs.clear();  
     //clear all GUI tables of this main tab.
     for(FcmdFileTable fileTabs: listTabs){
       fileTabs.favorTable.clear();
-      fileTabs.favorTable.indexEntries.clear();
+      fileTabs.favorTable.indexFavorPaths.clear();
     }
     //List of favor pathes for this main panel
-    for(FcmdFavorPathSelector.SelectInfo info: selectListAllFavorites){ //panel specific favorites
+    for(FcmdFavorPathSelector.FavorTab favorTabInfo: main.favorPathSelector.listAllFavorTabs){ //panel specific favorites
       int mMainTab = 1 << (which-1);  //1, 2 or 4
-      if((info.mMainPanel & mMainTab) !=0 && info.label !=null && info.label.length() >0){
+      if((favorTabInfo.mMainPanel & mMainTab) !=0 && favorTabInfo.label !=null && favorTabInfo.label.length() >0){
         //create Panels for the file table and favor path table if not found yet, otherwise search it.
-        FcmdFileTable fileTabs = searchOrCreateFileTabs(info.label);
+        FcmdFileTable fileTabs = searchOrCreateFileTabs(favorTabInfo.label);
           //Favor select list of the associated File table
-        fileTabs.favorTable.add(info);
+        fileTabs.addAllFavors(favorTabInfo);
       }
-      selectTableAll.add(info);
+      selectTableAll.add(favorTabInfo);
       //tabSelector.initActDir(indexActualDir, info.selectName, info.path);
      
-    }
-    //
-    //List of all favor pathes (for all main panels)
-    for(FcmdFavorPathSelector.SelectInfo info: main.favorPathSelector.selectAll){ //all favorites
-      int mMainTab = 1 << (which-1);  //1, 2 or 4
-      if((info.mMainPanel & mMainTab) !=0 && info.label !=null && info.label.length() >0){
-        //create Panels for the file table and favor path table if not found yet, otherwise search it.
-        FcmdFileTable fileTabs = searchOrCreateFileTabs(info.label);
-          //Favor select list of the associated File table
-        fileTabs.favorTable.add(info);
-      }
-      selectTableAll.add(info);
-      //tabSelector.initActDir(indexActualDir, info.selectName, info.path);
     }
   }
   

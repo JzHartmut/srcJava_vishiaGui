@@ -32,20 +32,46 @@ class FcmdFavorPathSelector
 {
 
   /**Entry in the favorite list. */
-  static class SelectInfo
+  static class FavorPath
   { /**The path of directory to select. */
     String path;
     /**The name shown in the list. */
     String selectName;
     /**The label on the tab in tabbed panel. */
-    String label;
-    //bit 0..2 present this favorite on the designated main panel 1..3 or l, m, r,
-    //it means, a tab with the label will be created.
+    //String label;
+    /**bit 0..2 present this favorite on the designated main panel 1..3 or l, m, r,
+     * it means, a tab with the label will be created. */
     int mMainPanel;
-    /**The name of the tab in any of the three panels if it is associated to a Tab of the panel. */
-    //String[] tabName = new String[3]; //, tabName2, tabName3;
+
     @Override public String toString(){ return path; } //for debug
   }
+  
+  
+  static class FavorTab
+  {
+    /**The label on the tab in tabbed panel. */
+    final String label;
+    /**The name shown in the list. */
+    final String selectNameTab;
+    /**The associated list of selectInfos. */
+    final List<FavorPath> favorPathInfo = new LinkedList<FavorPath>();
+    /**bit 0..2 present this favorite on the designated main panel 1..3 or l, m, r,
+     * it means, a tab with the label will be created. */
+    int mMainPanel;
+    
+    public FavorTab(String label, String selectNameTab)
+    { this.label = label;
+      this.selectNameTab = selectNameTab;
+    } 
+ 
+    @Override public String toString(){ return label; } //for debug
+    
+  }
+  
+  /**All entries for the select list for all favorites in order of the file. */
+  //Map<String, FcmdFavorPathSelector.SelectTab> selectListOverview = new TreeMap<String, FcmdFavorPathSelector.SelectTab>();
+  List<FcmdFavorPathSelector.FavorTab> listAllFavorTabs = new LinkedList<FcmdFavorPathSelector.FavorTab>();
+
   
   File fileCfg;
   
@@ -60,14 +86,14 @@ class FcmdFavorPathSelector
   final JavaCmd main;
   
   /**All entries which are shown in all three select lists. */
-  List<SelectInfo> selectAll = new LinkedList<SelectInfo>();
+  List<FavorPath> listAllFavorPaths = new LinkedList<FavorPath>();
   
   /**For output messages. */
   final MainCmd_ifc console;
   
   
   /**The last selected SelectInfo. */
-  SelectInfo actSelectInfo;
+  FavorPath actFavorPathInfo;
 
   static class WindowConfirmAddFavorite
   {
@@ -143,37 +169,57 @@ class FcmdFavorPathSelector
     } catch(FileNotFoundException exc){ sError = "TabSelector - cfg file not found; " + cfgFile; }
     if(reader !=null){
       try{ 
-        panelLeft.selectListAllFavorites.clear();
-        panelMid.selectListAllFavorites.clear();
-        panelRight.selectListAllFavorites.clear();
+        panelLeft.listAllFavorPaths.clear();
+        panelMid.listAllFavorPaths.clear();
+        panelRight.listAllFavorPaths.clear();
+        listAllFavorTabs.clear();
         String sLine;
         int posSep;
-        List<SelectInfo> list = null;
-        boolean bAll = true;
+        //List<FavorPath> list = null;
+        FcmdFavorPathSelector.FavorTab favorTabInfo = null;
+        //boolean bAll = true;
         while( sError == null && (sLine = reader.readLine()) !=null){
           sLine = sLine.trim();
           if(sLine.length() >0){
             if( sLine.startsWith("==")){
               posSep = sLine.indexOf("==", 2);  
               //a new division
-              String sDiv = sLine.substring(2,posSep);
+              final String sDiv = sLine.substring(2,posSep).trim();
+              final int pos1 = sDiv.indexOf(':');
+              final String sLabel = pos1 >=0 ? sDiv.substring(0, pos1).trim() : sDiv;
+              final int pos2 = sDiv.indexOf(',');
+              //sDivText is the same as sLabel if pos1 <0 
+              final String sDivText = pos2 >=0 ? sDiv.substring(pos1+1, pos2).trim() : sDiv.substring(pos1).trim(); 
+              final String sSelect = pos2 >=0 ? sDiv.substring(pos2): "";
+              favorTabInfo = null; //selectListOverview.get(sDiv);
+              if(favorTabInfo == null){
+                favorTabInfo = new FcmdFavorPathSelector.FavorTab(sLabel, sDivText);
+                if(sSelect.indexOf('l')>=0){ favorTabInfo.mMainPanel |=1;}
+                if(sSelect.indexOf('m')>=0){ favorTabInfo.mMainPanel |=2;}
+                if(sSelect.indexOf('r')>=0){ favorTabInfo.mMainPanel |=4;}
+                listAllFavorTabs.add(favorTabInfo);
+              }
+              ///
+              /*
               if(sDiv.equals("left")){ list = panelLeft.selectListAllFavorites; }
               else if(sDiv.equals("mid")){ list = panelMid.selectListAllFavorites; }
               else if(sDiv.equals("right")){ list = panelRight.selectListAllFavorites; }
               else if(sDiv.equals("all")){ list = selectAll; }
               else { sError = "Error in cfg file: ==" + sDiv + "=="; }
-            } else { 
+              */
+            } else if(favorTabInfo !=null){ 
               String[] sParts = sLine.trim().split(",");
               if(sParts.length < 2){ 
                 sError = "SelectTab format error; " + sLine; 
               } else {
-                SelectInfo info = new SelectInfo();
+                FavorPath favorPathInfo = new FavorPath();
                 //info. = sParts[0].trim();
-                info.selectName = sParts[0].trim();
-                info.path = sParts[1].trim();
+                favorPathInfo.selectName = sParts[0].trim();
+                favorPathInfo.path = sParts[1].trim();
                 if(sParts.length >2){
                   final String actTabEntry = sParts[2].trim();
-                  final String actTab;
+                  //final String actTab;
+                  /*
                   final int posColon = actTabEntry.indexOf(':');
                   if(posColon >0){
                     String sPanelChars = actTabEntry.substring(0, posColon);
@@ -185,9 +231,11 @@ class FcmdFavorPathSelector
                     actTab = actTabEntry.trim();
                   }
                   info.label = actTab;
+                  */
                 }
                 //info.active = cActive;
-                list.add(info);
+                //list.add(info);
+                favorTabInfo.favorPathInfo.add(favorPathInfo);
               }
             }
           }
@@ -231,13 +279,13 @@ class FcmdFavorPathSelector
     if(bOk){
       try{
         writerCfg.append("==all==\n");
-        for(SelectInfo entry: selectAll){ writeCfgLine(entry); }
+        for(FavorPath entry: listAllFavorPaths){ writeCfgLine(entry); }
         writerCfg.append("==left==\n");
-        for(SelectInfo entry: panelLeft.selectListAllFavorites){ writeCfgLine(entry); }
+        for(FavorPath entry: panelLeft.listAllFavorPaths){ writeCfgLine(entry); }
         writerCfg.append("==mid==\n");
-        for(SelectInfo entry: panelMid.selectListAllFavorites){ writeCfgLine(entry); }
+        for(FavorPath entry: panelMid.listAllFavorPaths){ writeCfgLine(entry); }
         writerCfg.append("==right==\n");
-        for(SelectInfo entry: panelRight.selectListAllFavorites){ writeCfgLine(entry); }
+        for(FavorPath entry: panelRight.listAllFavorPaths){ writeCfgLine(entry); }
       }
       catch(IOException exc){
         main.mainCmd.writeError("error writing" , exc);
@@ -248,9 +296,10 @@ class FcmdFavorPathSelector
   
   
   
-  private void writeCfgLine(SelectInfo info) throws IOException
+  private void writeCfgLine(FavorPath favorPathInfo) throws IOException
   {
-    writerCfg.append(info.selectName).append(", ").append(info.path);
+    writerCfg.append(favorPathInfo.selectName).append(", ").append(favorPathInfo.path);
+    /*
     if(info.label !=null && info.label.length()>0){
       writerCfg.append(", ");
       if((info.mMainPanel & 1)!=0){ writerCfg.append('l'); }
@@ -259,6 +308,7 @@ class FcmdFavorPathSelector
       if((info.mMainPanel & 7)!=0){ writerCfg.append(": "); }
       writerCfg.append(info.label);
     }
+    */
       writerCfg.append("\n");
   }
   
@@ -277,7 +327,7 @@ class FcmdFavorPathSelector
   /**Builds a tab for file or command view from a selected line of selection.
    * @param info The selection info
    */
-  void buildTabFromSelection(FcmdFavorPathSelector.SelectInfo info, GralTabbedPanel tabPanel)
+  void buildTabFromSelection(FcmdFavorPathSelector.FavorPath info, GralTabbedPanel tabPanel)
   { assert(false);
     /*
     tabPanel.addGridPanel(info.tabName1, info.tabName1,1,1,10,10);
@@ -380,24 +430,24 @@ class FcmdFavorPathSelector
     { if(key == KeyCode.mouse1Up){
         if(infos.sCmd.equals("ok")){
           //check whether the selectInfo should be associated to a local list.
-          SelectInfo selectInfo = actSelectInfo; //(SelectInfo)selectedLine.getUserData();
-          List<FcmdFavorPathSelector.SelectInfo> listAdd = windAddFavorite.panelInvocation.selectListAllFavorites;
-          int posInList = listAdd.indexOf(selectInfo); //position of last selection
+          FavorPath favorPathInfo = actFavorPathInfo; //(SelectInfo)selectedLine.getUserData();
+          List<FcmdFavorPathSelector.FavorPath> listAdd = windAddFavorite.panelInvocation.listAllFavorPaths;
+          int posInList = listAdd.indexOf(favorPathInfo); //position of last selection
           if(posInList == -1){
             //maybe selected one entry from the tab-special list or one entry of the common list.
-            listAdd = selectAll;
-            posInList = listAdd.indexOf(selectInfo); //position of last selection
+            listAdd = listAllFavorPaths;
+            posInList = listAdd.indexOf(favorPathInfo); //position of last selection
           } //add new SelectInfo after the current used.
-          SelectInfo favorite = new SelectInfo();
+          FavorPath favorite = new FavorPath();
           favorite.path = windAddFavorite.widgPath.getText();
           favorite.selectName = windAddFavorite.widgShortName.getText();
           String tablabel = windAddFavorite.widgTab.getText();
           //int ixtabName = windAddFavorite.panelInvocation.cNr - '1';
           favorite.mMainPanel = 1<< (windAddFavorite.panelInvocation.cNr - '1');
           //favorite.tabName[ixtabName] = 
-          favorite.label = tablabel;
+          ///favorite.label = tablabel;
           listAdd.add(posInList+1, favorite);
-          if(listAdd == selectAll){
+          if(listAdd == listAllFavorPaths){
             panelLeft.fillInTables(1);
             panelMid.fillInTables(2);
             panelRight.fillInTables(3);

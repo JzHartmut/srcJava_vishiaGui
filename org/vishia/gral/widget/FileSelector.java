@@ -19,6 +19,9 @@ import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
+import org.vishia.util.FileRemote;
+import org.vishia.util.FileRemoteAccessor;
+import org.vishia.util.FileRemoteAccessorLocalFile;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.SelectMask;
@@ -58,7 +61,7 @@ public class FileSelector //extends GralWidget
   /**This class describes a file. It is similar a java.lang.File, but it contains the information
    * maybe of remote files.
    */
-  public static class FileAndName //extends SelectMask
+  public static class XXXFileAndName //extends SelectMask
   { /**The directory path of the file. */
     public final String path;
     /**The name with extension of the file. */
@@ -68,7 +71,7 @@ public class FileSelector //extends GralWidget
     public final boolean isWriteable;
     public final File file;
     
-    FileAndName(String sPath, String sName, long length, long date, boolean isWriteable){
+    XXXFileAndName(String sPath, String sName, long length, long date, boolean isWriteable){
       assert(sPath.endsWith("/"));
       this.isWriteable = isWriteable;
       this.path = sPath;
@@ -81,7 +84,7 @@ public class FileSelector //extends GralWidget
   
   
   
-  
+  FileRemoteAccessor localFileAccessor = FileRemoteAccessorLocalFile.getInstance();
   
   
   /**Implementation of the base widget.
@@ -97,7 +100,7 @@ public class FileSelector //extends GralWidget
     
     @Override public boolean actionOk(Object userData, GralTableLine_ifc line)
     { boolean done = true;
-      FileAndName data = (FileAndName)userData;
+      FileRemote data = (FileRemote)userData;
       //File dir = data.file.getParentFile();
       //String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir) + "/";
       String sName = line.getCellText(1);
@@ -107,13 +110,13 @@ public class FileSelector //extends GralWidget
           fillIn(sParent); 
         }
       } else {
-        if(data.name.endsWith("/")){
+        if(data.getName().endsWith("/")){
           //save the last selection of that level
-          indexSelection.put(data.path, data.name);
-          fillIn(data.path + data.name);
+          indexSelection.put(data.getParent(), data.getName());
+          fillIn(data.getParent() + data.getName());
         } else {
           if(actionOnEnterFile !=null){
-            actionOnEnterFile.userActionGui("FileSelector-file", widgdPath, data.file);
+            actionOnEnterFile.userActionGui("FileSelector-file", widgdPath, data);
           } else {
             done = false;
           }
@@ -123,11 +126,11 @@ public class FileSelector //extends GralWidget
     }
     
     
-    private String getParentDir(FileAndName data){
-      int zPath = data.path.length();
-      int posSep = data.path.lastIndexOf('/',zPath-2);
+    private String getParentDir(FileRemote data){
+      int zPath = data.getParent().length();
+      int posSep = data.getParent().lastIndexOf('/',zPath-2);
       if(posSep >=0){
-        String sDirP = data.path.substring(0, posSep+1);
+        String sDirP = data.getParent().substring(0, posSep+1);
         return sDirP;
       }
       else return null;
@@ -136,11 +139,11 @@ public class FileSelector //extends GralWidget
     
     @Override public void actionLeft(Object userData, GralTableLine_ifc line)
     {
-      FileAndName data = (FileAndName)userData;
+      FileRemote data = (FileRemote)userData;
       //File dir = data.file.getParentFile();
       //String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir);
       //String sName = line.getCellText(1);
-      indexSelection.put(data.path, data.name);
+      indexSelection.put(data.getParent(), data.getName());
       String sParent = getParentDir(data);
       if(sParent !=null){
         fillIn(sParent); 
@@ -150,14 +153,14 @@ public class FileSelector //extends GralWidget
     
     @Override public void actionRight(Object userData, GralTableLine_ifc line)
     {
-      FileAndName data = (FileAndName)userData;
+      FileRemote data = (FileRemote)userData;
       //File dir = data.file.getParentFile();
       //String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir);
       //String sName = line.getCellText(1);
-      if(data.name.endsWith("/")){
+      if(data.getName().endsWith("/")){
         //save the last selection of that level
-        indexSelection.put(data.path, data.name);
-        fillIn(data.path + "/" + data.name);
+        indexSelection.put(data.getParent(), data.getName());
+        fillIn(data.getParent() + "/" + data.getName());
       }
     }
     
@@ -166,10 +169,10 @@ public class FileSelector //extends GralWidget
     @Override public boolean actionUserKey(int keyCode, Object oData, GralTableLine_ifc line)
     { boolean ret = true;
       //File file = (File)(data);
-      FileAndName data = (FileAndName)oData;
+      FileRemote data = (FileRemote)oData;
       switch(keyCode){
       case KeyCode.alt + KeyCode.F + '7': 
-        FileSystem.searchInFiles(new File[]{data.file}, "ordersBackground"); break;
+        FileSystem.searchInFiles(new File[]{data}, "ordersBackground"); break;
       default: ret = false;
       }
       if(!ret){
@@ -291,13 +294,13 @@ public class FileSelector //extends GralWidget
     widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sCurrentDir);
     File[] files = dir.listFiles();
     if(files !=null){ 
-      Map<String, FileAndName> sortFiles = new TreeMap<String, FileAndName>();
+      Map<String, FileRemote> sortFiles = new TreeMap<String, FileRemote>();
       for(File file: files){
         String sName = file.getName();
         if(file.isDirectory()){ sName += "/"; }
         long length = file.length();
         long date = file.lastModified();
-        FileAndName fileItem = new FileAndName(this.sCurrentDir, sName, length, date, file.canWrite());
+        FileRemote fileItem = new FileRemote(localFileAccessor, this.sCurrentDir, sName, length, date, file.canWrite());
         
         String sort = (file.isDirectory()? "D" : "F") + sName;
         sortFiles.put(sort, fileItem);
@@ -316,15 +319,15 @@ public class FileSelector //extends GralWidget
       */
       int lineSelect = 0;  
       int lineCt = 0; //count lines to select the line number with equal sFileSelect.
-      for(Map.Entry<String, FileAndName> entry: sortFiles.entrySet()){
-        FileAndName file = entry.getValue();
-        if(sFileSelected != null && file.name.equals(sFileSelected)){
+      for(Map.Entry<String, FileRemote> entry: sortFiles.entrySet()){
+        FileRemote file = entry.getValue();
+        if(sFileSelected != null && file.getName().equals(sFileSelected)){
           lineSelect = lineCt;
         }
-        if(file.name.endsWith("/")){ line[0] = "/"; }
+        if(file.getName().endsWith("/")){ line[0] = "/"; }
         else { line[0] = "";}
-        line[1] = file.name;
-        Date timestamp = new Date(file.date);
+        line[1] = file.getName();
+        Date timestamp = new Date(file.lastModified());
         line[3] = dateFormat.format(timestamp);
         selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, line, file);
         lineCt +=1;
@@ -339,7 +342,7 @@ public class FileSelector //extends GralWidget
   /**Gets the selected file from this panel.
    * @return null if no line is selected, for example if the panel isn't used yet.
    */
-  public FileAndName getSelectedFile()
+  public FileRemote getSelectedFile()
   {
     if(selectList.wdgdTable == null){
       stop();
@@ -347,7 +350,7 @@ public class FileSelector //extends GralWidget
     }
     GralTableLine_ifc line = selectList.wdgdTable.getCurrentLine();
     if(line !=null){
-      FileAndName data = (FileAndName)line.getUserData();
+      FileRemote data = (FileRemote)line.getUserData();
       return data;
     } else {
       return null;
@@ -367,8 +370,8 @@ public class FileSelector //extends GralWidget
       return null;
     }
     for(GralTableLine_ifc line: selectList.wdgdTable.getSelectedLines()){
-      FileAndName data = (FileAndName)line.getUserData();
-      list.add(data.name);
+      FileRemote data = (FileRemote)line.getUserData();
+      list.add(data.getName());
     }
     return list;
   }

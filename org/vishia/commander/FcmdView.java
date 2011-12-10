@@ -5,6 +5,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.FileSelector;
+import org.vishia.util.FileRemote;
 
 /**All functionality of view (F3-Key) and quick view. 
  * @author Hartmut Schorrig
@@ -48,7 +49,7 @@ public class FcmdView
   /**Opens the view window and fills its content.
    * @param src The path which is selected as source. It may be a directory or a file.
    */
-  void view(FileSelector.FileAndName src)
+  void view(FileRemote src)
   { String sSrc, sTrash;
     windView.setWindowVisible(true);
 

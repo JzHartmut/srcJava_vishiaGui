@@ -9,6 +9,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.FileSelector;
 import org.vishia.mainCmd.MainCmd_ifc;
+import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
 public class Executer
@@ -96,7 +97,7 @@ public class Executer
         final File currentDir;
         if(main.currentFile !=null){
           //note: executes it local:
-          currentDir = new File(main.currentFile.path);
+          currentDir = new File(main.currentFile.getParent());
         } else {
           currentDir = null;  //use any standard
         }
@@ -104,10 +105,10 @@ public class Executer
         if(sCmd.indexOf("<*")>=0){ //a file may need
           files= new File[3];
           int ix = -1;
-          for(FileSelector.FileAndName fileName: main.selectedFiles123){
+          for(FileRemote fileName: main.selectedFiles123){
             if(fileName !=null){
-              if(fileName.file !=null ){ files[++ix] = fileName.file; }
-              else { files[++ix] = new File(fileName.path + "/" + fileName.name); }
+              if(fileName !=null ){ files[++ix] = fileName; }
+              else { files[++ix] = new File(fileName.getParent() + "/" + fileName.getName()); }
             }
           }
         } else { files = null; }

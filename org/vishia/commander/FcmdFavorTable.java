@@ -19,89 +19,75 @@ public class FcmdFavorTable  extends SelectList
   /**The tabbed panel where this class is member of. */
   final LeftMidRightPanel mainPanel;
   
-  /**Index of all entries in the visible list. */
-  Map<String, FcmdFavorPathSelector.SelectInfo> indexEntries = new TreeMap<String, FcmdFavorPathSelector.SelectInfo>();
+  final FcmdFileTable fileTable;
   
-  public FcmdFavorTable(JavaCmd main, LeftMidRightPanel panel)
+  /**Index of all entries in the visible list. */
+  Map<String, FcmdFavorPathSelector.FavorPath> indexFavorPaths = new TreeMap<String, FcmdFavorPathSelector.FavorPath>();
+  
+  public FcmdFavorTable(JavaCmd main, FcmdFileTable fileTable, LeftMidRightPanel panel)
   { //super(name, mng);
     this.main = main;
     this.mainPanel = panel;
+    this.fileTable = fileTable;
   }
 
 
   /**Adds a line to this table.
    * @param ix Show which index is used for a local table, 0..2 for left, mid, right,
    *   than show the label in the left cell (column)
-   * @param info The favorite info
+   * @param favorPathInfo The favorite info
    */
-  void add(FcmdFavorPathSelector.SelectInfo info)
+  void add(FcmdFavorPathSelector.FavorPath favorPathInfo)
   {
-    if(indexEntries.get(info.selectName) == null){
-      indexEntries.put(info.selectName, info);
+    if(indexFavorPaths.get(favorPathInfo.selectName) == null){
+      indexFavorPaths.put(favorPathInfo.selectName, favorPathInfo);
       GralTableLine_ifc line = wdgdTable.insertLine(null, 0);
-      line.setUserData(info);
+      line.setUserData(favorPathInfo);
+      /*
       if(info.label !=null){
         line.setCellText(info.label, 0);
       }
-      line.setCellText(info.selectName, 1);
-      line.setCellText(info.path, 2);
+      */
+      line.setCellText(favorPathInfo.selectName, 1);
+      line.setCellText(favorPathInfo.path, 2);
     }
   }
   
   
   void clear()
   {
+    indexFavorPaths.clear();
     wdgdTable.clearTable();
   }
   
   
   @Override protected boolean actionOk(Object userData, GralTableLine_ifc line)
   {
-    FcmdFavorPathSelector.SelectInfo info = (FcmdFavorPathSelector.SelectInfo)line.getUserData();
-    main.favorPathSelector.actSelectInfo = info; //The last used selection (independent of tab left, middle, right)
+    FcmdFavorPathSelector.FavorPath favorPathInfo = (FcmdFavorPathSelector.FavorPath)line.getUserData();
+    main.favorPathSelector.actFavorPathInfo = favorPathInfo; //The last used selection (independent of tab left, middle, right)
     int ixtabName = mainPanel.cNr - '1';
     
-    String tabName = info.label;  //The label of file tab.
+    //String tabName = info.label;  //The label of file tab.
     GralWidget widgd;
       //a new path is selected:
       //save the path of the current selection
   
-    String label = info.label;  //from favorite list
-    FcmdFileTable fileTable;
-    if(label  == null){ 
-      fileTable = main.favorPathSelector.getLastFileTab();
-      if(fileTable == null){
-        if(mainPanel.listTabs.size() >0){
-          fileTable = mainPanel.listTabs.get(0);
-          label = info.label = fileTable.label;
-        } else {
-          label = "file" + mainPanel.cNr;
-          info.label = label;
-          fileTable = mainPanel.searchOrCreateFileTabs(label);
-        }
-      }
-      mainPanel.fillInTables(mainPanel.cNr - '0');
-    } else {
-      //label is known in the favorite list, use it. The panel should be existing or it is created.
-      fileTable = mainPanel.searchOrCreateFileTabs(label);
-    }
-   
     //before changing the content of this fileTable, store the current directory
     //to restore if this favor respectively selection is used ones more.
     String currentDir;
-    if(fileTable.selectInfo !=null){
+    if(fileTable.favorPathInfo !=null){
       currentDir = fileTable.getCurrentDir();
       if(currentDir !=null){
-        mainPanel.indexActualDir.put(fileTable.selectInfo.selectName, currentDir);
+        mainPanel.indexActualDir.put(fileTable.favorPathInfo.selectName, currentDir);
     } }
     
     //fill in the standard file panel, use maybe a current directory.
-    fileTable.selectInfo = info;
+    fileTable.favorPathInfo = favorPathInfo;
     if(  wdgdTable.name.startsWith(WidgetNames.tableFavoritesMain)   //use the root dir anytime if the main favor path table is used.
-      || (currentDir  = mainPanel.indexActualDir.get(info.selectName)) == null){  //use the root if the entry wasn't use till now
-      currentDir = info.path;
+      || (currentDir  = mainPanel.indexActualDir.get(favorPathInfo.selectName)) == null){  //use the root if the entry wasn't use till now
+      currentDir = favorPathInfo.path;
     }
-    fileTable.favorTable.add(info);
+    fileTable.favorTable.add(favorPathInfo);
     fileTable.fillIn(currentDir);
     fileTable.setFocus();
     return true;
@@ -130,13 +116,13 @@ public class FcmdFavorTable  extends SelectList
   @Override protected boolean actionUserKey(int key, Object userData,
       GralTableLine_ifc line)
   { boolean ret = true;
-    FcmdFavorPathSelector.SelectInfo data = (FcmdFavorPathSelector.SelectInfo)userData;
+    FcmdFavorPathSelector.FavorPath favorPathInfo = (FcmdFavorPathSelector.FavorPath)userData;
     //TODO not used no more
     if(key ==KeyCode.shift + KeyCode.F1){
-      File dir = new File(data.path);
+      File dir = new File(favorPathInfo.path);
       //panelLeft.fileSelectorMain.fillIn(dir);
     } else if (key ==KeyCode.shift + KeyCode.F2){
-      File dir = new File(data.path);
+      File dir = new File(favorPathInfo.path);
       //panelMid.fileSelectorMain.fillIn(dir);
     } else if (key ==KeyCode.shift + KeyCode.F3){
         //panelRight.fileSelectorMain.fillIn(new File(data.path));
@@ -163,7 +149,7 @@ public class FcmdFavorTable  extends SelectList
     } else if (key == main.keyActions.keyPanelRight){
       //sets focus to right
       FcmdFileTable fileTableRight = null;
-      boolean found = (mainPanel.selectTableAll == this);
+      boolean found = false; 
       for(FcmdFileTable fileTable: mainPanel.listTabs){
         if(found){ fileTableRight = fileTable; break; }  //use this next table if found before.
         if(fileTable.favorTable == this) { found = true; }
@@ -186,7 +172,7 @@ public class FcmdFavorTable  extends SelectList
         }
       }
     } else if (key == main.keyActions.keyCreateFavorite){
-      main.favorPathSelector.actSelectInfo = data; //info in the line of table.
+      main.favorPathSelector.actFavorPathInfo = favorPathInfo; //info in the line of table.
       main.favorPathSelector.windAddFavorite.widgTab.setText("file3");
       main.favorPathSelector.windAddFavorite.widgShortName.setText("alias");
       //File lastSelectedFile = panelRight.fileSelectorMain.getSelectedFile();

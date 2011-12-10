@@ -15,6 +15,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.FileSelector;
+import org.vishia.util.FileRemote;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
@@ -122,15 +123,15 @@ public class CopyCmd
           sSrc = srcDir + "*"; 
           sDstName = "*";
         } else {
-          FileSelector.FileAndName srcFile = main.lastFocusedFileTables[0].getSelectedFile();
-          sSrc = srcFile.path + srcFile.name;
-          sDstName = srcFile.name;
+          FileRemote srcFile = main.lastFocusedFileTables[0].getSelectedFile();
+          sSrc = srcFile.getParent() + "/" + srcFile.getName();
+          sDstName = srcFile.getName();
         }
         if(main.lastFocusedFileTables[1] == null){
           sDstName = sDstDir = "?";
         } else {
-          FileSelector.FileAndName dstFile = main.lastFocusedFileTables[1].getSelectedFile();
-          sDstDir = dstFile.path;
+          FileRemote dstFile = main.lastFocusedFileTables[1].getSelectedFile();
+          sDstDir = dstFile.getParent();
         }
       }
       widgCopyFrom.setText(sSrc);

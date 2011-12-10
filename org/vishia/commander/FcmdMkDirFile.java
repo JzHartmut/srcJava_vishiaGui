@@ -5,6 +5,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.FileSelector;
+import org.vishia.util.FileRemote;
 
 /**The F7-Key mkdir is used for mkfile too. This class builds the mkDirFile- dialog window
  * and contains its functionality.
@@ -40,7 +41,7 @@ public class FcmdMkDirFile
   /**Opens the view window and fills its content.
    * @param src The path which is selected as source. It may be a directory or a file.
    */
-  void dialogMkDirFile(FileSelector.FileAndName src)
+  void dialogMkDirFile(FileRemote src)
   { String sSrc, sTrash;
     windMk.setWindowVisible(true);
 

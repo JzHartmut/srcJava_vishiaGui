@@ -11,11 +11,14 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.FileSelector;
 
+import org.vishia.util.FileRemote;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
-/**This is one file table in the Java commander
- * @author hartmut
+/**This is one file table in the Java commander. Each main panel (left, middle, right)
+ * has maybe more as one tabs, each tab has exactly one file table. The file table is reused
+ * for the several tabs of the main panel, and they are reused too if the directory is changed.
+ * @author Hartmut Schorrig
  *
  */
 public class FcmdFileTable extends FileSelector
@@ -44,7 +47,7 @@ public class FcmdFileTable extends FileSelector
   /**Association to the current used favor path selection.
    * Note that this instance is re-used for more as one selection.
    */
-  FcmdFavorPathSelector.SelectInfo selectInfo;
+  FcmdFavorPathSelector.FavorPath favorPathInfo;
   
   DateFormat formatDateInfo = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss");
   
@@ -64,7 +67,7 @@ public class FcmdFileTable extends FileSelector
     GralWidgetMng mng = main.gralMng;
     ///
     ///
-    favorTable = new FcmdFavorTable(main, mainPanel);
+    favorTable = new FcmdFavorTable(main, this, mainPanel);
     String nameTableSelection = WidgetNames.tableFavorites + nameFilePanel;
     mainPanel.tabbedPanelSelectionTabs.addGridPanel(WidgetNames.tabFavorites + nameFilePanel, label,1,1,10,10);
     mng.setPosition(2, 0, 0, -0, 1, 'd');  ///p
@@ -81,22 +84,37 @@ public class FcmdFileTable extends FileSelector
     selectList.wdgdTable.setActionOnLineSelected(actionFileSelected);
   }
 
+ 
+  /**Add all favor paths from the SelectTab newly
+   * @param favorTabInfo
+   */
+  void addAllFavors(FcmdFavorPathSelector.FavorTab favorTabInfo)
+  {
+    favorTable.clear();
+    for( FcmdFavorPathSelector.FavorPath favorPathInfo: favorTabInfo.favorPathInfo){
+      favorTable.add(favorPathInfo);
+    }
+
+  }
+  
+  
+  
   
   
   @Override public boolean actionUserKey(int keyCode, Object oData, GralTableLine_ifc line)
   { boolean ret = true;
-    FileAndName data = (FileAndName)oData;
+    FileRemote data = (FileRemote)oData;
     switch(keyCode){
-    case KeyCode.alt + KeyCode.F + '7': FileSystem.searchInFiles(new File[]{data.file}, "ordersBackground"); break;
+    case KeyCode.alt + KeyCode.F + '7': FileSystem.searchInFiles(new File[]{data}, "ordersBackground"); break;
     default: ret = false;
     }
     if (keyCode == main.keyActions.keyCreateFavorite){
       main.favorPathSelector.windAddFavorite.panelInvocation = mainPanel;
       main.favorPathSelector.windAddFavorite.widgTab.setText(nameFilePanel);
       main.favorPathSelector.windAddFavorite.widgShortName.setText("alias");
-      FileAndName lastSelectedFile = getSelectedFile();
+      FileRemote lastSelectedFile = getSelectedFile();
       //String pathDir = FileSystem.getCanonicalPath(lastSelectedFile.getParentFile());
-      main.favorPathSelector.windAddFavorite.widgPath.setText(lastSelectedFile.path);
+      main.favorPathSelector.windAddFavorite.widgPath.setText(lastSelectedFile.getParent());
       main.favorPathSelector.windAddFavorite.window.setWindowVisible(true);
     } else if (keyCode == main.keyActions.keyPanelSelection){
       //focuses the panel which is the selection panel for this file table.
@@ -155,16 +173,16 @@ public class FcmdFileTable extends FileSelector
       if(actionCode == KeyCode.tableLineSelect){
         GralTableLine_ifc line = (GralTableLine_ifc) params[0];
         Object oData = line.getUserData();
-        if(oData instanceof FileAndName){
-          FileAndName file = (FileAndName)oData;
+        if(oData instanceof FileRemote){
+          FileRemote file = (FileRemote)oData;
           main.currentFile = file;
           main.selectedFiles123[mainPanel.ixMainPanel] = file;
-          String sDate = formatDateInfo.format(new Date(file.date));
+          String sDate = formatDateInfo.format(new Date(file.lastModified()));
           String sLenShort = //String.format("", file.length)
-            file.length >= 1000000 ? String.format("%2.1f MByte", file.length/1000000.0) :
-            file.length >=    1000 ? String.format("%2.1f kByte", file.length/1000.0) :
-            String.format("%3d Byte", file.length);  
-          String info = sDate + " # " + sLenShort + " >" + file.name + "<";        
+            file.length() >= 1000000 ? String.format("%2.1f MByte", file.length()/1000000.0) :
+            file.length() >=    1000 ? String.format("%2.1f kByte", file.length()/1000.0) :
+            String.format("%3d Byte", file.length());  
+          String info = sDate + " # " + sLenShort + " >" + file.getName() + "<";        
           main.widgInfo.setText(info);
         }
       }
