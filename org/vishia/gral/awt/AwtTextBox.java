@@ -84,10 +84,10 @@ public class AwtTextBox extends GralTextBox
     return this;
   }
 
-  @Override public void setText(String arg)
+  @Override public void setText(CharSequence arg)
   {
     if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
-      textFieldSwt.setText(arg);
+      textFieldSwt.setText(arg.toString());
     } else {
       newText.setLength(0);
       newText.append(arg);

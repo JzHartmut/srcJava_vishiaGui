@@ -39,6 +39,7 @@ public class FileSelector //extends GralWidget
   
   /**Version and History:
    * <ul>
+   * <li>2011-12-11 chg: If the directory is empty, show --empty-- because the table should not be empty.
    * <li>2011-11-27 new: {@link FileAndName#isWriteable}-property.
    * <li>2011-11-20 new: Phenomenal basic idea: The files may be located in remote hardware. 
    *   It means, that a File can't be access here. Therefore the path, name, date, length in the class {@link FileAndName}
@@ -141,12 +142,14 @@ public class FileSelector //extends GralWidget
     {
       FileRemote data = (FileRemote)userData;
       //File dir = data.file.getParentFile();
-      //String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir);
+      String sDir = currentDir.getParent();
       //String sName = line.getCellText(1);
-      indexSelection.put(data.getParent(), data.getName());
-      String sParent = getParentDir(data);
-      if(sParent !=null){
-        fillIn(sParent); 
+      if(data !=null && sDir !=null){
+        indexSelection.put(sDir, data.getName());
+      }
+      //String sParent = getParentDir(data);
+      if(sDir !=null){
+        fillIn(sDir); 
       }
     }
     
@@ -166,6 +169,9 @@ public class FileSelector //extends GralWidget
     
     
     
+    /* (non-Javadoc)
+     * @see org.vishia.gral.widget.SelectList#actionUserKey(int, java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
+     */
     @Override public boolean actionUserKey(int keyCode, Object oData, GralTableLine_ifc line)
     { boolean ret = true;
       //File file = (File)(data);
@@ -284,6 +290,7 @@ public class FileSelector //extends GralWidget
    */
   public void fillIn(String path)
   {
+    selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdClear, -1, null, null);
     File dir = new File(path);
     this.currentDir = dir;
     if(originDir == null){
@@ -293,6 +300,8 @@ public class FileSelector //extends GralWidget
     String sFileSelected = indexSelection.get(sCurrentDir);
     widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sCurrentDir);
     File[] files = dir.listFiles();
+    int lineSelect = 0;  
+    int lineCt = 0; //count lines to select the line number with equal sFileSelect.
     if(files !=null){ 
       Map<String, FileRemote> sortFiles = new TreeMap<String, FileRemote>();
       for(File file: files){
@@ -306,7 +315,6 @@ public class FileSelector //extends GralWidget
         sortFiles.put(sort, fileItem);
       }
       String[] line = new String[4];
-      selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdClear, -1, null, null);
       /*
       if(dir.getParent() !=null){
         line[0] = "<";
@@ -317,8 +325,6 @@ public class FileSelector //extends GralWidget
         
       }
       */
-      int lineSelect = 0;  
-      int lineCt = 0; //count lines to select the line number with equal sFileSelect.
       for(Map.Entry<String, FileRemote> entry: sortFiles.entrySet()){
         FileRemote file = entry.getValue();
         if(sFileSelected != null && file.getName().equals(sFileSelected)){
@@ -332,8 +338,24 @@ public class FileSelector //extends GralWidget
         selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, line, file);
         lineCt +=1;
       }
-      selectList.wdgdTable.setCurrentCell(lineSelect, 1);
+      if(files.length ==0){
+        //special case: no files:
+        line[0] = "";
+        line[1] = "--empty--";
+        line[3] = "";
+        selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, line, null);
+        lineCt +=1;
+      }
+    } else {
+      //faulty directory
+      String[] line = new String[4];
+      line[0] = "";
+      line[1] = "--not found--";
+      line[3] = "";
+      selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, line, currentDir);
+      lineCt +=1;
     }
+    selectList.wdgdTable.setCurrentCell(lineSelect, 1);
   }
   
 
@@ -387,7 +409,14 @@ public class FileSelector //extends GralWidget
   
   
   
-  public boolean actionUserKey(int keyCode, Object data, GralTableLine_ifc line)
+  /**This method is called on any user key or mouse event while operating in the file table.
+   * It should be overwritten by a derived class. This routine is empty.
+   * @param key code or mouse code, one of constants from {@link KeyCode}.
+   * @param userDataOfLine The user data stored in the line of table.
+   * @param line The table line.
+   * @return true if is was relevant for the key.
+   */
+  public boolean actionUserKey(int keyCode, Object userDataOfLine, GralTableLine_ifc line)
   { 
     return false;
   }

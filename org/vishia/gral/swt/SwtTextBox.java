@@ -83,10 +83,10 @@ public class SwtTextBox extends GralTextBox
     return this;
   }
 
-  @Override public void setText(String arg)
+  @Override public void setText(CharSequence arg)
   {
     if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
-      textFieldSwt.setText(arg);
+      textFieldSwt.setText(arg.toString());
     } else {
       newText.setLength(0);
       newText.append(arg);
@@ -178,8 +178,6 @@ public class SwtTextBox extends GralTextBox
   }
 
 
-  /**This class will be instanciated in the {@link SwtWidgetMng} one time for all text boxes.
-   */
   class SwtTextBoxKeyListener extends SwtKeyListener
   {
 

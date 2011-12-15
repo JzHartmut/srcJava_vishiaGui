@@ -122,7 +122,10 @@ public abstract class SelectList //extends GralWidget
   
   
   /**Action if a table line is selected and any other key is pressed or the context menu is invoked.
+   * @param key code or mouse code, one of constans from {@link KeyCode}.
    * @param userData The user data stored in the line of table.
+   * @param line The table line.
+   * @return true if is was relevant for the key.
    */
   protected abstract boolean actionUserKey(int key, Object userData, GralTableLine_ifc line);
   

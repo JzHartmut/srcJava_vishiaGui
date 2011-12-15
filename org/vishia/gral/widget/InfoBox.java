@@ -60,7 +60,7 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   }
 
   @Override
-  public void setText(String text)
+  public void setText(CharSequence text)
   { textBox.setText(text);
   }
 

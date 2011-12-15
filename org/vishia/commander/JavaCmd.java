@@ -51,9 +51,11 @@ public class JavaCmd extends GuiCfg
 
   final FcmdButtons fButtons = new FcmdButtons();
   
-  GralTextField widgInfo;
+  GralTextField widgFileInfo, widgRunInfo;
   
   final String nameTextFieldInfo = "file-info";
+  
+  final String nameTextFieldRunInfo = "run-info";
   
   GralPanelContent panelButtons;
 
@@ -171,9 +173,11 @@ public class JavaCmd extends GuiCfg
   private void initPanelButtons()
   {
     gralMng.selectPanel("Buttons");
-    gralMng.setPosition(0, 2, 0, 0, 1, 'r');
-    ///
-    widgInfo = gralMng.addTextField(nameTextFieldInfo, false, null, '.');
+    gralMng.setPosition(0, 2, 0, 9.8f, 1, 'r');
+    widgRunInfo = gralMng.addTextField(nameTextFieldRunInfo, false, null, '.');
+    gralMng.setPosition(0, 2, 10, 0, 1, 'r');
+    widgFileInfo = gralMng.addTextField(nameTextFieldInfo, false, null, '.');
+    
     gralMng.setPosition(2, 1, 10, 20, 1, 'r');
     gralMng.addText("F1", 'A', 0x0);
     gralMng.addText("F2", 'A', 0x0);
@@ -284,8 +288,29 @@ public class JavaCmd extends GuiCfg
    */
   @Override public void stepMain()
   {
-    cmdQueue.execCmds();
+    Appendable writeStatusCmd = new Appendable(){
+
+      @Override public Appendable append(CharSequence csq) throws IOException
+      { widgRunInfo.setText(csq);
+        return this;
+      }
+
+      @Override public Appendable append(char c) throws IOException
+      { if(c == '\0') widgRunInfo.setText(" ");
+        else widgRunInfo.setText("" + c);
+        return this;
+      }
+
+      @Override public Appendable append(CharSequence csq, int start, int end) throws IOException
+      { widgRunInfo.setText(csq.subSequence(start, end));
+        return null;
+      }
+      
+    };
+    
+    cmdQueue.execCmds(writeStatusCmd, null);
   }
+  
   
   
   /**
@@ -537,7 +562,7 @@ public class JavaCmd extends GuiCfg
     // Uses the commonly GuiMainCmd class because here are not extra arguments.
     GralArea9MainCmd cmdgui = new MainCmd(cargs, args); // implements MainCmd, parses
                                                   // calling arguments
-    bOk = cmdgui.parseArgumentsAndInitGraphic("The.file.Commander", "2B2C");
+    bOk = cmdgui.parseArgumentsAndInitGraphic("The.file.Commander", "2A2C");
 
     /*
     try {

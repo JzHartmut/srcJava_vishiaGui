@@ -9,6 +9,8 @@ public interface GralTextField_ifc extends GralWidget_ifc
   
   /**Version and history
    * <ul>
+   * <li>2011-12-11 chg {@link #setText(CharSequence)} now uses CharSequence instead String. 
+   *   A CharSequence is more universal. Internally the contained String will be copied.
    * <li>2011-12-01 new {@link #getCursorPos()}, to get parts of selected texts in a box.
    *   It is used for commands in the output window for JavaCommander.
    * <li>2011-09-00 created, universal access to textual kind fields.
@@ -21,7 +23,7 @@ public interface GralTextField_ifc extends GralWidget_ifc
    * The text may be stored in a queue and applied to the widget in the graphical thread.
    * @param text The content
    */
-  public abstract void setText(String text);
+  public abstract void setText(CharSequence text);
   
   public abstract String getText();
   

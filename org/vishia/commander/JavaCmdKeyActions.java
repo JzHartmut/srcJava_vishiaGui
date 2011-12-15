@@ -34,6 +34,18 @@ public class JavaCmdKeyActions
   
   int keyWindFullOut = KeyCode.ctrl + 'o';
   
+  int keyExecuteInShellOpened = KeyCode.ctrl + KeyCode.alt + KeyCode.shift + KeyCode.enter;
+  
+  int keyExecuteInShell = KeyCode.ctrl + KeyCode.alt + KeyCode.enter;
+  
+  int keyExecuteStartProcess = KeyCode.ctrl + KeyCode.shift + KeyCode.enter;
+  
+  int keyExecuteInJcmd =  KeyCode.ctrl + KeyCode.enter;
+  
+  int keyExecuteAsJavaClass =  KeyCode.ctrl + KeyCode.alt + KeyCode.shift + KeyCode.enter;
+  
+  int keyOpenProperties = KeyCode.alt + KeyCode.enter;
+  
   //---------------------------------------------------------------------------------
   //Navigation 
   int keySelectPanelLeft = KeyCode.alt + KeyCode.F1;

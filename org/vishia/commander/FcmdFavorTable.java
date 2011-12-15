@@ -184,4 +184,8 @@ public class FcmdFavorTable  extends SelectList
     }//
     return ret;
   }
+  
+  
+  @Override public String toString(){ return fileTable.toString(); }
+
 }

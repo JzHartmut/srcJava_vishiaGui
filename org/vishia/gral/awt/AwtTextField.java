@@ -42,7 +42,7 @@ public class AwtTextField extends GralTextField
 
 
   @Override
-  public void setText(String text)
+  public void setText(CharSequence text)
   {
     // TODO Auto-generated method stub
     

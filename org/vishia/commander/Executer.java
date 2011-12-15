@@ -3,6 +3,7 @@ package org.vishia.commander;
 import java.io.File;
 
 import org.vishia.cmd.CmdStore;
+import org.vishia.cmd.PrepareCmd;
 import org.vishia.cmd.CmdStore.CmdBlock;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralUserAction;
@@ -36,10 +37,13 @@ public class Executer
   }
   
   
-  GralUserAction actionExecute = new GralUserAction(){
-    @Override public boolean userActionGui(String sIntension, GralWidget widgd, Object... params)
-    { assert(sIntension.equals("FileSelector-file"));
-      File file = (File)params[0];
+  
+  boolean actionExecuteUserKey(int keyCode, FileRemote file)
+  {
+    
+    final char kindOfExecution = checkKeyOfExecution(keyCode);
+    
+    if(kindOfExecution !=0){
       if(false && file.canExecute()){
         //main.cmdQueue.addCmd(null, null, null);
       }
@@ -49,23 +53,29 @@ public class Executer
       if(posDot > 0){
         ext = name.substring(posDot+1);
       } else {
-        ext = "exe";
+        ext = "";
       }
       CmdBlock cmd = cmdStore.getCmd(ext);
-      if(cmd ==null && file.canExecute()){
-         cmd = cmdStore.getCmd("exe"); 
-      } 
       if(cmd !=null){
-        File[] files = new File[1];
-        files[0] = file;
-        File currentDir = file.getParentFile();
-        main.cmdQueue.addCmd(cmd, files, currentDir);
+        PrepareCmd cmdp = cmd.getCmds().get(0);
+        if(cmd.name.startsWith(">")){
+          main.cmdQueue.addCmd(name, null, file.getParentFile(), kindOfExecution);
+        } else {
+          //the extension determines the command.
+          File[] files = new File[1];
+          files[0] = file;
+          File currentDir = file.getParentFile();
+          main.cmdQueue.addCmd(cmd, files, currentDir);
+        }
       } else {
-        return false;
+        console.writeError("no association found for extension ." + ext);
       }
-      // TODO Auto-generated method stub
-      return false;
-  } };
+      
+    } else{ 
+    }
+    return kindOfExecution != 0;
+  }
+  
   
   
   /**User action to abort a running command.
@@ -81,11 +91,7 @@ public class Executer
 
   GralUserAction actionCmdFromOutputBox = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
-    { final char kindOfExecution;
-      if(key == KeyCode.ctrl + KeyCode.enter) kindOfExecution = '>';
-      else if(key == KeyCode.ctrl + KeyCode.shift + KeyCode.enter) kindOfExecution = '&';
-      else if(key == KeyCode.alt + KeyCode.enter) kindOfExecution = '$';
-      else kindOfExecution = 0;
+    { final char kindOfExecution = checkKeyOfExecution(key);
       if(kindOfExecution !=0){
         GralTextBox widgg = (GralTextBox)widgd;
         String text = widgg.getText();
@@ -119,5 +125,20 @@ public class Executer
   };
   
 
+  private char checkKeyOfExecution(int key){
+    final char kindOfExecution;
+    if(key == main.keyActions.keyExecuteInJcmd) kindOfExecution = PrepareCmd.executeLocalPipes;
+    else if(key == main.keyActions.keyExecuteStartProcess) kindOfExecution = PrepareCmd.executeStartProcess;
+    else if(key == main.keyActions.keyExecuteInShell) kindOfExecution = PrepareCmd.executeInShellClose;
+    else if(key == main.keyActions.keyExecuteInShellOpened) kindOfExecution = PrepareCmd.executeInShellOpened;
+    else if(key == main.keyActions.keyExecuteAsJavaClass) kindOfExecution = PrepareCmd.executeJavaMain;
+    else kindOfExecution = 0;
+    return kindOfExecution;
+  }
+  
+
+  
+  
+  
   
 }

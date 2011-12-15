@@ -54,7 +54,7 @@ public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, A
   }
 
   @Override
-  public void setText(String text)
+  public void setText(CharSequence text)
   {
     textAreaOutput.setText(text);
   }

@@ -4,7 +4,6 @@ import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.gral.widget.FileSelector;
 import org.vishia.util.FileRemote;
 
 /**All functionality of view (F3-Key) and quick view. 

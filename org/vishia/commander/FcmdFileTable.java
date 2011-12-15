@@ -76,7 +76,6 @@ public class FcmdFileTable extends FileSelector
     //String sLabelTab = "file&"+cNr;
     //The grid panel contains this widget. The grid panel is a tab of mainPanel.tabbedPanel
     mainPanel.tabbedPanelFileTabs.addGridPanel(WidgetNames.tabFile + nameFilePanel, label,1,1,10,10);
-    setActionOnEnterFile(mainPanel.main.executer.actionExecute);
     //to show the properties of the selected file in the info line:
     //
     //sets this Widget to the selected panel, it is the grid panel which was created even yet.
@@ -161,10 +160,19 @@ public class FcmdFileTable extends FileSelector
           widg.setFocus();
         }
       }
+    } else if (main.executer.actionExecuteUserKey(keyCode, data)){
+      ret = true;
+    } else {
+      ret = false;
     }
     return ret;
   }
 
+  
+  
+  
+  
+  
   
   
   /**Action to show the file properties in the info line. */
@@ -183,12 +191,16 @@ public class FcmdFileTable extends FileSelector
             file.length() >=    1000 ? String.format("%2.1f kByte", file.length()/1000.0) :
             String.format("%3d Byte", file.length());  
           String info = sDate + " # " + sLenShort + " >" + file.getName() + "<";        
-          main.widgInfo.setText(info);
+          main.widgFileInfo.setText(info);
         }
       }
       return true;
     }
   };
+  
+  
+  
+  @Override public String toString(){ return label + "/" + nameFilePanel; }
   
   
 }
