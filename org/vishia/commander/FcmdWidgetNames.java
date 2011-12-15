@@ -1,9 +1,9 @@
 package org.vishia.commander;
 
-public class WidgetNames
+public class FcmdWidgetNames
 {
 
-  /**Name of the Table-widget and the key in {@link JavaCmd#idxFileSelector} for a file table. 
+  /**Name of the Table-widget and the key in {@link Fcmd#idxFileSelector} for a file table. 
    * The name is following by the visible name of the tab. */
   public final static String tableFile = "panelFile_";
   

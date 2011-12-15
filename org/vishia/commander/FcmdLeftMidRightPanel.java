@@ -13,9 +13,9 @@ import org.vishia.gral.widget.FileSelector;
 
 /**Data for one tabbed panel
  */
-public class LeftMidRightPanel
+public class FcmdLeftMidRightPanel
 {
-  final JavaCmd main;
+  final Fcmd main;
   
   /**The container for all tabs of this TabbedPanel. */
   GralTabbedPanel tabbedPanelFileCards;
@@ -57,7 +57,7 @@ public class LeftMidRightPanel
   final int[] widthSelecttableSub = new int[]{2, 20, 30};
 
   
-  LeftMidRightPanel(JavaCmd javaCmd, char cc, char cNr, GralWidgetMng mng){
+  FcmdLeftMidRightPanel(Fcmd javaCmd, char cc, char cNr, GralWidgetMng mng){
     this.main = javaCmd;
     this.cc = cc;
     this.cNr = cNr;
@@ -75,22 +75,22 @@ public class LeftMidRightPanel
     GralWidgetMng mng = main.gralMng;
     String sName = "Sel" + cNr;
     //inside the left/mid/right tabbed panel: create the panel which contains a tabbed panel for selection
-    String nameGridPanel = WidgetNames.tabFavoritesLeftMidRight + cNr;
+    String nameGridPanel = FcmdWidgetNames.tabFavoritesLeftMidRight + cNr;
     String tabLabelGridPanel = "a-F"+cNr;
     mng.setPosition(0, 0, 0, 0, 1, 'd');
     tabbedPanelFileCards.addGridPanel(nameGridPanel, tabLabelGridPanel,1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd');
     //A tabbed panel inside the left, middle or right tab for selection.
-    String nameTabPanel = WidgetNames.panelFavoritesLeftMidRight + cNr;
+    String nameTabPanel = FcmdWidgetNames.panelFavoritesLeftMidRight + cNr;
     mng.setPosition(0, 0, 0, 0, 1, 'd');
     tabbedPanelFavorCards = mng.addTabbedPanel(nameTabPanel, null, GralGridBuild_ifc.propZoomedPanel);
     //The panel for selection from all favorites: 
-    nameGridPanel = WidgetNames.tabMainFavorites + cNr;
+    nameGridPanel = FcmdWidgetNames.tabMainFavorites + cNr;
     tabLabelGridPanel = "a-F"+cNr;
     mng.setPosition(0, 0, 0, 0, 1, 'd');
     tabbedPanelFavorCards.addGridPanel(nameGridPanel, tabLabelGridPanel, 1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd');
-    selectTabCard.setToPanel(mng, WidgetNames.tableFavoritesMain + cNr, 5, widthSelecttableMain, 'A');
+    selectTabCard.setToPanel(mng, FcmdWidgetNames.tableFavoritesMain + cNr, 5, widthSelecttableMain, 'A');
     fillCards();  //build the rest of all tabs and panels depending on content of favorites.
     
     if(cNr == '1'){ //commands only in the left panel.

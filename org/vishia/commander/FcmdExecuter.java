@@ -13,12 +13,12 @@ import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
-public class Executer
+public class FcmdExecuter
 {
   /**For output messages. */
   final MainCmd_ifc console;
 
-  private final JavaCmd main;
+  private final Fcmd main;
   
 
   /**Store of all possible commands given in the command file. */
@@ -26,7 +26,7 @@ public class Executer
   
 
   
-  Executer(MainCmd_ifc console, JavaCmd main)
+  FcmdExecuter(MainCmd_ifc console, Fcmd main)
   { this.main = main;
     this.console = console;
   }

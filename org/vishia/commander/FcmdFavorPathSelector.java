@@ -82,11 +82,11 @@ class FcmdFavorPathSelector
   FileWriter writerCfg = new FileWriter();
   
   /**The three tabbed panels. */
-  final LeftMidRightPanel panelLeft, panelMid, panelRight;
+  final FcmdLeftMidRightPanel panelLeft, panelMid, panelRight;
   
   private final GralWidgetMng mng;
   
-  final JavaCmd main;
+  final Fcmd main;
   
   /**All entries which are shown in all three select lists. */
   List<FavorPath> listAllFavorPaths = new LinkedList<FavorPath>();
@@ -104,7 +104,7 @@ class FcmdFavorPathSelector
     GralWindow_ifc window;
     
     /**The panel from where the window was opened. It helps to get the current selected line in favorites. */
-    LeftMidRightPanel panelInvocation;
+    FcmdLeftMidRightPanel panelInvocation;
   
     /**The short name input field in window confirm add favorite.  */
     GralTextField_ifc widgShortName;
@@ -118,13 +118,13 @@ class FcmdFavorPathSelector
   
   WindowConfirmAddFavorite windAddFavorite = new WindowConfirmAddFavorite();
   
-  FcmdFavorPathSelector(MainCmd_ifc console, JavaCmd main)
+  FcmdFavorPathSelector(MainCmd_ifc console, Fcmd main)
   { this.main = main;
     this.console = console;
     this.mng = main.gralMng;
-    panelLeft = new LeftMidRightPanel(main, 'l', '1', mng); 
-    panelMid = new LeftMidRightPanel(main, 'm','2',  mng); 
-    panelRight = new LeftMidRightPanel(main,'r', '3',  mng);
+    panelLeft = new FcmdLeftMidRightPanel(main, 'l', '1', mng); 
+    panelMid = new FcmdLeftMidRightPanel(main, 'm','2',  mng); 
+    panelRight = new FcmdLeftMidRightPanel(main,'r', '3',  mng);
 
   }
   
@@ -358,9 +358,9 @@ class FcmdFavorPathSelector
   /**Searches the Tab which is focused at last.
    * @return Array of the tabs in order of last focus
    */
-  private LeftMidRightPanel[] getLastTabs()
+  private FcmdLeftMidRightPanel[] getLastTabs()
   { List<GralWidget> widgdFocus = mng.getWidgetsInFocus();
-    LeftMidRightPanel[] lastTabs = new LeftMidRightPanel[3];
+    FcmdLeftMidRightPanel[] lastTabs = new FcmdLeftMidRightPanel[3];
     int ixTabs = 0;
     synchronized(widgdFocus){
       Iterator<GralWidget> iterFocus = widgdFocus.iterator();

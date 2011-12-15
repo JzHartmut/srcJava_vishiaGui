@@ -29,7 +29,7 @@ import org.vishia.gral.widget.FileSelector;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.FileRemote;
 
-public class JavaCmd extends GuiCfg
+public class Fcmd extends GuiCfg
 {
 
   private static class CallingArgs extends GuiCallingArgs
@@ -47,7 +47,7 @@ public class JavaCmd extends GuiCfg
 
   // GralTabbedPanel tabbedPanelsLeft, tabbedPanelsMid, tabbedPanelsRight;
 
-  final WindowMng windMng = new WindowMng(this);
+  final FcmdWindowMng windMng = new FcmdWindowMng(this);
 
   final FcmdButtons fButtons = new FcmdButtons();
   
@@ -63,7 +63,7 @@ public class JavaCmd extends GuiCfg
 
   final FcmdFavorPathSelector favorPathSelector = new FcmdFavorPathSelector(mainCmd, this);
 
-  final Executer executer = new Executer(mainCmd, this);
+  final FcmdExecuter executer = new FcmdExecuter(mainCmd, this);
 
   final CommandSelector cmdSelector = new CommandSelector("cmdSelector", cmdQueue, gralMng);
 
@@ -71,13 +71,13 @@ public class JavaCmd extends GuiCfg
   
   final FcmdView viewCmd = new FcmdView(this);
   
-  final CopyCmd copyCmd = new CopyCmd(this);
+  final FcmdCopyCmd copyCmd = new FcmdCopyCmd(this);
   
   final FcmdMkDirFile mkCmd = new FcmdMkDirFile(this);
 
   final FcmdDelete deleteCmd = new FcmdDelete(this);
 
-  final JavaCmdKeyActions keyActions = new JavaCmdKeyActions(this);
+  final FcmdKeyActions keyActions = new FcmdKeyActions(this);
 
   
   /**The current directory of the last selected file. */
@@ -104,7 +104,7 @@ public class JavaCmd extends GuiCfg
    */
   final CmdStore buttonCmds;
 
-  public JavaCmd(CallingArgs cargs, GralArea9MainCmd cmdgui)
+  public Fcmd(CallingArgs cargs, GralArea9MainCmd cmdgui)
   {
     super(cargs, cmdgui, null);
     this.cargs = cargs;
@@ -579,7 +579,7 @@ public class JavaCmd extends GuiCfg
       new InterProcessCommFactorySocket();
       //
       // Initialize this main class and execute.
-      JavaCmd main = new JavaCmd(cargs, cmdgui);
+      Fcmd main = new Fcmd(cargs, cmdgui);
       main.execute();
     }
     cmdgui.exit();

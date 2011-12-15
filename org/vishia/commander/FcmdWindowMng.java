@@ -8,11 +8,11 @@ import org.vishia.gral.ifc.GralWidget;
  * @author Hartmut Schorrig
  *
  */
-public class WindowMng
+public class FcmdWindowMng
 {
-  public final JavaCmd main;
+  public final Fcmd main;
 
-  public WindowMng(JavaCmd main)
+  public FcmdWindowMng(Fcmd main)
   { this.main = main;
   }
   

@@ -27,10 +27,10 @@ public class FcmdFileCard extends FileSelector
   FcmdFavorCard favorCard;
 
   /**The component */
-  final JavaCmd main;
+  final Fcmd main;
   
   /**The left, mid or right main panel where this tabbed file table is associated. */
-  final LeftMidRightPanel mainPanel;
+  final FcmdLeftMidRightPanel mainPanel;
   
   /**The organization unit for this FileSelector. */
   //final LeftMidRightPanel.FileTabs fileTabs;
@@ -56,26 +56,26 @@ public class FcmdFileCard extends FileSelector
    * @param tabbedPanelP The outer class. (Access is more broadly than using an non-static class)
    * @param label The label of the tab, it builds the name of all widgets.
    */
-  FcmdFileCard(LeftMidRightPanel mainPanelP, String label){
+  FcmdFileCard(FcmdLeftMidRightPanel mainPanelP, String label){
     super();
     this.label = label;
     this.main = mainPanelP.main;
     this.mainPanel = mainPanelP;
     this.nameFilePanel = label+ "." + mainPanelP.cNr;
-    String namePanelFile = WidgetNames.tableFile + nameFilePanel;
+    String namePanelFile = FcmdWidgetNames.tableFile + nameFilePanel;
     main.idxFileSelector.put(namePanelFile, this); //it is WidgetNames.tableFile + label +.123, see super(...) 
     GralWidgetMng mng = main.gralMng;
     ///
     ///
     favorCard = new FcmdFavorCard(main, this, mainPanel);
-    String nameTableSelection = WidgetNames.tableFavorites + nameFilePanel;
-    mainPanel.tabbedPanelFavorCards.addGridPanel(WidgetNames.tabFavorites + nameFilePanel, label,1,1,10,10);
+    String nameTableSelection = FcmdWidgetNames.tableFavorites + nameFilePanel;
+    mainPanel.tabbedPanelFavorCards.addGridPanel(FcmdWidgetNames.tabFavorites + nameFilePanel, label,1,1,10,10);
     mng.setPosition(2, 0, 0, -0, 1, 'd');  ///p
     favorCard.setToPanel(mng, nameTableSelection, 5, mainPanel.widthSelecttableSub, 'A');
     //mng.selectPanel(WidgetNames.panelFavoritesLeftMidRight +mainPanel.cNr);
     //String sLabelTab = "file&"+cNr;
     //The grid panel contains this widget. The grid panel is a tab of mainPanel.tabbedPanel
-    mainPanel.tabbedPanelFileCards.addGridPanel(WidgetNames.tabFile + nameFilePanel, label,1,1,10,10);
+    mainPanel.tabbedPanelFileCards.addGridPanel(FcmdWidgetNames.tabFile + nameFilePanel, label,1,1,10,10);
     //to show the properties of the selected file in the info line:
     //
     //sets this Widget to the selected panel, it is the grid panel which was created even yet.
@@ -117,7 +117,7 @@ public class FcmdFileCard extends FileSelector
       main.favorPathSelector.windAddFavorite.window.setWindowVisible(true);
     } else if (keyCode == main.keyActions.keyPanelSelection){
       //focuses the panel which is the selection panel for this file table.
-      GralWidget tableSelection = main.gralMng.getWidget(WidgetNames.tableFavorites + nameFilePanel);
+      GralWidget tableSelection = main.gralMng.getWidget(FcmdWidgetNames.tableFavorites + nameFilePanel);
       tableSelection.setFocus();
     } else if (keyCode == main.keyActions.keyPanelLeft){
       //sets focus to left

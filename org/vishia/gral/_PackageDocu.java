@@ -1,6 +1,6 @@
 package org.vishia.gral;
 
-import org.vishia.commander.LeftMidRightPanel;
+import org.vishia.commander.FcmdLeftMidRightPanel;
 import org.vishia.gral.area9.GralArea9Window;
 import org.vishia.gral.cfg.GralCfgDesigner;
 import org.vishia.gral.cfg.GralCfgZbnf;
@@ -44,7 +44,7 @@ import org.vishia.guiInspc.InspcGui;
  * <b>Example ussage of a org.eclipse.swt.widgets.Table from the GUI application 'JavaCommander'</b>:
  * <img src="../../../img/JCmd_gralWidget_SwtTable.png"><br>
  * The ObjectModelDiagram shows the application 'JavaCommander'. That application uses some tables to select files, commandes
- * and selection objects. The classes {@link LeftMidRightPanel.FcmdFavorCard}, {@link CommandSelector} and {@link FileSelector}
+ * and selection objects. The classes {@link FcmdLeftMidRightPanel.FcmdFavorCard}, {@link CommandSelector} and {@link FileSelector}
  * are the 3 representants of selection lists from side of application. 
  * They have its implementation of a {@link SelectList}, which is a base class which supports navigaton in a list.
  * The   

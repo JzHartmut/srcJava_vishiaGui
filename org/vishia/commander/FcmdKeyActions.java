@@ -12,9 +12,9 @@ import org.vishia.util.KeyCode;
  * 
  * Hartmut Schorrig
  */
-public class JavaCmdKeyActions
+public class FcmdKeyActions
 {
-  final JavaCmd main;
+  final Fcmd main;
   
   //---------------------------------------------------------------------------------
   //Working
@@ -78,7 +78,7 @@ public class JavaCmdKeyActions
   //View
   
   
-  JavaCmdKeyActions(JavaCmd parent)
+  FcmdKeyActions(Fcmd parent)
   {
     main = parent;
   }

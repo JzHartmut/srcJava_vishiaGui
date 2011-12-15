@@ -19,7 +19,7 @@ import org.vishia.util.KeyCode;
  */
 public class FcmdDelete
 {
-  protected final JavaCmd main;
+  protected final Fcmd main;
 
   
   GralWindow_ifc windConfirmDelete;
@@ -28,7 +28,7 @@ public class FcmdDelete
   
   GralWidget widgRemoveToTrash, widgDelete;
 
-  FcmdDelete(JavaCmd main)
+  FcmdDelete(Fcmd main)
   { this.main = main;
   }
   

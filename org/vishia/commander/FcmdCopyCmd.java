@@ -23,9 +23,9 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class CopyCmd
+public class FcmdCopyCmd
 {
-  protected final JavaCmd main;
+  protected final Fcmd main;
 
   
   GralWindow_ifc windConfirmCopy;
@@ -42,7 +42,7 @@ public class CopyCmd
   
   List<String> listFileSrc;
   
-  CopyCmd(JavaCmd main)
+  FcmdCopyCmd(Fcmd main)
   { this.main = main;
   }
   

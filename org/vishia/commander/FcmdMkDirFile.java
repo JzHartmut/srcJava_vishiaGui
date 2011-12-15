@@ -14,13 +14,13 @@ import org.vishia.util.FileRemote;
  */
 public class FcmdMkDirFile
 {
-  protected final JavaCmd main;
+  protected final Fcmd main;
 
   GralWindow_ifc windMk;
 
   
   
-  public FcmdMkDirFile(JavaCmd main)
+  public FcmdMkDirFile(Fcmd main)
   { this.main = main;
   }
   

@@ -11,13 +11,13 @@ import org.vishia.util.FileRemote;
  * */
 public class FcmdView
 {
-  protected final JavaCmd main;
+  protected final Fcmd main;
 
   GralWindow_ifc windView;
 
   
   
-  public FcmdView(JavaCmd main)
+  public FcmdView(Fcmd main)
   { this.main = main;
   }
   

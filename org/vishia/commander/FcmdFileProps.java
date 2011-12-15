@@ -9,13 +9,13 @@ import org.vishia.util.FileRemote;
 
 public class FcmdFileProps
 {
-  protected final JavaCmd main;
+  protected final Fcmd main;
 
   GralWindow_ifc windFileProps;
 
   
   
-  public FcmdFileProps(JavaCmd main)
+  public FcmdFileProps(Fcmd main)
   { this.main = main;
   }
   

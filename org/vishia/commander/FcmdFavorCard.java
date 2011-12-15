@@ -14,17 +14,17 @@ import org.vishia.util.KeyCode;
 public class FcmdFavorCard  extends SelectList
 {
   /**The component */
-  final JavaCmd main;
+  final Fcmd main;
 
   /**The tabbed panel where this class is member of. */
-  final LeftMidRightPanel mainPanel;
+  final FcmdLeftMidRightPanel mainPanel;
   
   final FcmdFileCard fileTable;
   
   /**Index of all entries in the visible list. */
   Map<String, FcmdFavorPathSelector.FavorPath> indexFavorPaths = new TreeMap<String, FcmdFavorPathSelector.FavorPath>();
   
-  public FcmdFavorCard(JavaCmd main, FcmdFileCard fileTable, LeftMidRightPanel panel)
+  public FcmdFavorCard(Fcmd main, FcmdFileCard fileTable, FcmdLeftMidRightPanel panel)
   { //super(name, mng);
     this.main = main;
     this.mainPanel = panel;
@@ -83,7 +83,7 @@ public class FcmdFavorCard  extends SelectList
     
     //fill in the standard file panel, use maybe a current directory.
     fileTable.favorPathInfo = favorPathInfo;
-    if(  wdgdTable.name.startsWith(WidgetNames.tableFavoritesMain)   //use the root dir anytime if the main favor path table is used.
+    if(  wdgdTable.name.startsWith(FcmdWidgetNames.tableFavoritesMain)   //use the root dir anytime if the main favor path table is used.
       || (currentDir  = mainPanel.indexActualDir.get(favorPathInfo.selectName)) == null){  //use the root if the entry wasn't use till now
       currentDir = favorPathInfo.path;
     }
