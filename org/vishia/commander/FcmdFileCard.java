@@ -21,10 +21,10 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class FcmdFileTable extends FileSelector
+public class FcmdFileCard extends FileSelector
 {
   /**Table widget for the select table of the file tab.*/
-  FcmdFavorTable favorTable;
+  FcmdFavorCard favorCard;
 
   /**The component */
   final JavaCmd main;
@@ -56,7 +56,7 @@ public class FcmdFileTable extends FileSelector
    * @param tabbedPanelP The outer class. (Access is more broadly than using an non-static class)
    * @param label The label of the tab, it builds the name of all widgets.
    */
-  FcmdFileTable(LeftMidRightPanel mainPanelP, String label){
+  FcmdFileCard(LeftMidRightPanel mainPanelP, String label){
     super();
     this.label = label;
     this.main = mainPanelP.main;
@@ -67,15 +67,15 @@ public class FcmdFileTable extends FileSelector
     GralWidgetMng mng = main.gralMng;
     ///
     ///
-    favorTable = new FcmdFavorTable(main, this, mainPanel);
+    favorCard = new FcmdFavorCard(main, this, mainPanel);
     String nameTableSelection = WidgetNames.tableFavorites + nameFilePanel;
-    mainPanel.tabbedPanelSelectionTabs.addGridPanel(WidgetNames.tabFavorites + nameFilePanel, label,1,1,10,10);
+    mainPanel.tabbedPanelFavorCards.addGridPanel(WidgetNames.tabFavorites + nameFilePanel, label,1,1,10,10);
     mng.setPosition(2, 0, 0, -0, 1, 'd');  ///p
-    favorTable.setToPanel(mng, nameTableSelection, 5, mainPanel.widthSelecttableSub, 'A');
+    favorCard.setToPanel(mng, nameTableSelection, 5, mainPanel.widthSelecttableSub, 'A');
     //mng.selectPanel(WidgetNames.panelFavoritesLeftMidRight +mainPanel.cNr);
     //String sLabelTab = "file&"+cNr;
     //The grid panel contains this widget. The grid panel is a tab of mainPanel.tabbedPanel
-    mainPanel.tabbedPanelFileTabs.addGridPanel(WidgetNames.tabFile + nameFilePanel, label,1,1,10,10);
+    mainPanel.tabbedPanelFileCards.addGridPanel(WidgetNames.tabFile + nameFilePanel, label,1,1,10,10);
     //to show the properties of the selected file in the info line:
     //
     //sets this Widget to the selected panel, it is the grid panel which was created even yet.
@@ -87,11 +87,11 @@ public class FcmdFileTable extends FileSelector
   /**Add all favor paths from the SelectTab newly
    * @param favorTabInfo
    */
-  void addAllFavors(FcmdFavorPathSelector.FavorTab favorTabInfo)
+  void fillFavorPaths(FcmdFavorPathSelector.FavorFolder favorTabInfo)
   {
-    favorTable.clear();
-    for( FcmdFavorPathSelector.FavorPath favorPathInfo: favorTabInfo.favorPathInfo){
-      favorTable.add(favorPathInfo);
+    favorCard.clear();
+    for( FcmdFavorPathSelector.FavorPath favorPathInfo: favorTabInfo.listfavorPaths){
+      favorCard.add(favorPathInfo);
     }
 
   }
@@ -109,7 +109,7 @@ public class FcmdFileTable extends FileSelector
     }
     if (keyCode == main.keyActions.keyCreateFavorite){
       main.favorPathSelector.windAddFavorite.panelInvocation = mainPanel;
-      main.favorPathSelector.windAddFavorite.widgTab.setText(nameFilePanel);
+      main.favorPathSelector.windAddFavorite.widgLabel.setText(nameFilePanel);
       main.favorPathSelector.windAddFavorite.widgShortName.setText("alias");
       FileRemote lastSelectedFile = getSelectedFile();
       //String pathDir = FileSystem.getCanonicalPath(lastSelectedFile.getParentFile());
@@ -121,9 +121,9 @@ public class FcmdFileTable extends FileSelector
       tableSelection.setFocus();
     } else if (keyCode == main.keyActions.keyPanelLeft){
       //sets focus to left
-      FcmdFileTable fileTableLeft = null;
+      FcmdFileCard fileTableLeft = null;
       boolean found = false;
-      for(FcmdFileTable fileTable: mainPanel.listTabs){
+      for(FcmdFileCard fileTable: mainPanel.listTabs){
         if(fileTable == this){ found = true;  break;}
         fileTableLeft = fileTable;  //save this table as table left, use if found.
       }
@@ -136,9 +136,9 @@ public class FcmdFileTable extends FileSelector
       }
     } else if (keyCode == main.keyActions.keyPanelRight){
       //sets focus to right
-      FcmdFileTable fileTableRight = null;
+      FcmdFileCard fileTableRight = null;
       boolean found = false; //(mainPanel.selectTableAll == this);
-      for(FcmdFileTable fileTable: mainPanel.listTabs){
+      for(FcmdFileCard fileTable: mainPanel.listTabs){
         if(found){ fileTableRight = fileTable; break; }  //use this next table if found before.
         if(fileTable == this) { found = true; }
       }

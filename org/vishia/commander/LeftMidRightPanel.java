@@ -18,23 +18,23 @@ public class LeftMidRightPanel
   final JavaCmd main;
   
   /**The container for all tabs of this TabbedPanel. */
-  GralTabbedPanel tabbedPanelFileTabs;
+  GralTabbedPanel tabbedPanelFileCards;
   
   /**The container for the tabs for selection. */
-  GralTabbedPanel tabbedPanelSelectionTabs;
+  GralTabbedPanel tabbedPanelFavorCards;
   
   /**All entries for the select list for all favorites in order of the file. */
   List<FcmdFavorPathSelector.FavorPath> listAllFavorPaths = new LinkedList<FcmdFavorPathSelector.FavorPath>();
 
 
   /**Table widget for the select table.*/
-  FcmdFavorTabTable selectTableAll;
+  FcmdFavorTabCard selectTabCard;
 
 
 
   
 
-  List<FcmdFileTable> listTabs = new LinkedList<FcmdFileTable>();
+  List<FcmdFileCard> listTabs = new LinkedList<FcmdFileCard>();
   
   /**Stores the current directory for all actual file panels. */
   final Map<String, String> indexActualDir = new TreeMap<String, String>();
@@ -62,7 +62,7 @@ public class LeftMidRightPanel
     this.cc = cc;
     this.cNr = cNr;
     this.ixMainPanel = cNr - '1';
-    selectTableAll = new FcmdFavorTabTable(main, this);
+    selectTabCard = new FcmdFavorTabCard(main, this);
   }
   
   
@@ -70,7 +70,7 @@ public class LeftMidRightPanel
   /**Build the initial content of one of the three tabbed panels, called in the build phase of the GUI.
    * @param which Number 1 2 3 for left, mid, right
    */
-  void buildInitialTabs(int which)
+  void buildInitialTabs()
   {
     GralWidgetMng mng = main.gralMng;
     String sName = "Sel" + cNr;
@@ -78,23 +78,23 @@ public class LeftMidRightPanel
     String nameGridPanel = WidgetNames.tabFavoritesLeftMidRight + cNr;
     String tabLabelGridPanel = "a-F"+cNr;
     mng.setPosition(0, 0, 0, 0, 1, 'd');
-    tabbedPanelFileTabs.addGridPanel(nameGridPanel, tabLabelGridPanel,1,1,10,10);
+    tabbedPanelFileCards.addGridPanel(nameGridPanel, tabLabelGridPanel,1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd');
     //A tabbed panel inside the left, middle or right tab for selection.
     String nameTabPanel = WidgetNames.panelFavoritesLeftMidRight + cNr;
     mng.setPosition(0, 0, 0, 0, 1, 'd');
-    tabbedPanelSelectionTabs = mng.addTabbedPanel(nameTabPanel, null, GralGridBuild_ifc.propZoomedPanel);
+    tabbedPanelFavorCards = mng.addTabbedPanel(nameTabPanel, null, GralGridBuild_ifc.propZoomedPanel);
     //The panel for selection from all favorites: 
     nameGridPanel = WidgetNames.tabMainFavorites + cNr;
     tabLabelGridPanel = "a-F"+cNr;
     mng.setPosition(0, 0, 0, 0, 1, 'd');
-    tabbedPanelSelectionTabs.addGridPanel(nameGridPanel, tabLabelGridPanel, 1,1,10,10);
+    tabbedPanelFavorCards.addGridPanel(nameGridPanel, tabLabelGridPanel, 1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd');
-    selectTableAll.setToPanel(mng, WidgetNames.tableFavoritesMain + cNr, 5, widthSelecttableMain, 'A');
-    fillInTables(which);  //build the rest of all tabs and panels depending on content of favorites.
+    selectTabCard.setToPanel(mng, WidgetNames.tableFavoritesMain + cNr, 5, widthSelecttableMain, 'A');
+    fillCards();  //build the rest of all tabs and panels depending on content of favorites.
     
     if(cNr == '1'){ //commands only in the left panel.
-      tabbedPanelFileTabs.addGridPanel("cmd", "Cm&d",1,1,10,10);
+      tabbedPanelFileCards.addGridPanel("cmd", "Cm&d",1,1,10,10);
       mng.setPosition(2, -2, 0, -0, 1, 'd');
       main.cmdSelector.setToPanel(mng, "cmds", 5, new int[]{10,10}, 'A');
       main.cmdSelector.fillIn();
@@ -107,27 +107,33 @@ public class LeftMidRightPanel
   /**
    * @param which Number 1 2 3 for left, mid, right
    */
-  void fillInTables(int which){
+  void fillCards(){
     
-    selectTableAll.clear();   //the common favor path table.
+    selectTabCard.clear();   //the common favor path table.
     //clear index of entries, it is a mirror of content of the GUI-visible table and prevents
     //twice adding.
-    selectTableAll.indexFavorTabs.clear();  
+    selectTabCard.indexFavorFolders.clear();  
     //clear all GUI tables of this main tab.
-    for(FcmdFileTable fileTabs: listTabs){
-      fileTabs.favorTable.clear();
-      fileTabs.favorTable.indexFavorPaths.clear();
+    for(FcmdFileCard fileTabs: listTabs){
+      fileTabs.favorCard.clear();
+      fileTabs.favorCard.indexFavorPaths.clear();
     }
     //List of favor pathes for this main panel
-    for(FcmdFavorPathSelector.FavorTab favorTabInfo: main.favorPathSelector.listAllFavorTabs){ //panel specific favorites
-      int mMainTab = 1 << (which-1);  //1, 2 or 4
-      if((favorTabInfo.mMainPanel & mMainTab) !=0 && favorTabInfo.label !=null && favorTabInfo.label.length() >0){
+    for(FcmdFavorPathSelector.FavorFolder favorFolder: main.favorPathSelector.listAllFavorPathFolders){ //panel specific favorites
+      int mMainTab = 0x1 << (cNr-'1');  //1, 2 or 4
+      if((favorFolder.mMainPanel & mMainTab) !=0 && favorFolder.label !=null && favorFolder.label.length() >0){
         //create Panels for the file table and favor path table if not found yet, otherwise search it.
-        FcmdFileTable fileTabs = searchOrCreateFileTabs(favorTabInfo.label);
+        FcmdFileCard fileTabs = searchOrCreateFileCard(favorFolder.label);
           //Favor select list of the associated File table
-        fileTabs.addAllFavors(favorTabInfo);
+        fileTabs.fillFavorPaths(favorFolder);
+      } else {
+        //The fileTable may be existend, then 
+        FcmdFileCard fileTab = searchFileCard(favorFolder.label);
+        if(fileTab !=null && fileTab.label.equals(favorFolder.label)){
+          fileTab.fillFavorPaths(favorFolder);
+        }
       }
-      selectTableAll.add(favorTabInfo);
+      selectTabCard.addFavorFolder(favorFolder);
       //tabSelector.initActDir(indexActualDir, info.selectName, info.path);
      
     }
@@ -135,23 +141,38 @@ public class LeftMidRightPanel
   
   
   
-  FcmdFileTable searchOrCreateFileTabs(String label){
+  FcmdFileCard searchOrCreateFileCard(String label){
   //search or create the tab
-    FcmdFileTable fileTab = null;
+    FcmdFileCard fileCard = null;
     String labelTab = label + "." + cNr;
-    for(FcmdFileTable item: listTabs){
+    for(FcmdFileCard item: listTabs){
       if(item.nameFilePanel.equals(labelTab)){ 
-        fileTab = item; break;
+        fileCard = item; break;
       }
-    } if(fileTab == null){
-      fileTab = new FcmdFileTable(this, label);
-      listTabs.add(fileTab);
+    } 
+    if(fileCard == null){
+      fileCard = new FcmdFileCard(this, label);
+      listTabs.add(fileCard);
     }
-    return fileTab;
+    return fileCard;
   }
   
-  
-  
+    
+    
+  FcmdFileCard searchFileCard(String label){
+  //search or create the tab
+    FcmdFileCard fileCard = null;
+    String labelTab = label + "." + cNr;
+    for(FcmdFileCard item: listTabs){
+      if(item.nameFilePanel.equals(labelTab)){ 
+        fileCard = item; break;
+      }
+    } 
+    return fileCard;
+  }
+    
+    
+    
   
   
 }

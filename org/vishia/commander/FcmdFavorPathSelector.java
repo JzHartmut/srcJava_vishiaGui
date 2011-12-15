@@ -47,19 +47,19 @@ class FcmdFavorPathSelector
   }
   
   
-  static class FavorTab
+  static class FavorFolder
   {
     /**The label on the tab in tabbed panel. */
     final String label;
     /**The name shown in the list. */
     final String selectNameTab;
     /**The associated list of selectInfos. */
-    final List<FavorPath> favorPathInfo = new LinkedList<FavorPath>();
+    final List<FavorPath> listfavorPaths = new LinkedList<FavorPath>();
     /**bit 0..2 present this favorite on the designated main panel 1..3 or l, m, r,
      * it means, a tab with the label will be created. */
     int mMainPanel;
     
-    public FavorTab(String label, String selectNameTab)
+    public FavorFolder(String label, String selectNameTab)
     { this.label = label;
       this.selectNameTab = selectNameTab;
     } 
@@ -68,9 +68,12 @@ class FcmdFavorPathSelector
     
   }
   
-  /**All entries for the select list for all favorites in order of the file. */
-  //Map<String, FcmdFavorPathSelector.SelectTab> selectListOverview = new TreeMap<String, FcmdFavorPathSelector.SelectTab>();
-  List<FcmdFavorPathSelector.FavorTab> listAllFavorTabs = new LinkedList<FcmdFavorPathSelector.FavorTab>();
+  /**All entries for the select list for all favorite path folders in the order of the configuration file. 
+   * The elements of this list can be activated to present in cards with tabs. The cards contain the favor paths
+   * which are contained in {@link FcmdFavorPathSelector.FavorFolder#listfavorPaths}.
+   * But not all elements should be activated similar in all panels, it may be too much tabs per panel. 
+   * */
+  List<FcmdFavorPathSelector.FavorFolder> listAllFavorPathFolders = new LinkedList<FcmdFavorPathSelector.FavorFolder>();
 
   
   File fileCfg;
@@ -106,9 +109,11 @@ class FcmdFavorPathSelector
     /**The short name input field in window confirm add favorite.  */
     GralTextField_ifc widgShortName;
     /**The tab input field in window confirm add favorite.  */
-    GralTextField_ifc widgTab;
+    GralTextField_ifc widgLabel;
     /**The path input field in window confirm add favorite.  */
     GralTextField_ifc widgPath;
+    /**A field where "lmr" may be written to make the tab persistent.  */
+    GralTextField_ifc widgPersistent;
   }
   
   WindowConfirmAddFavorite windAddFavorite = new WindowConfirmAddFavorite();
@@ -138,9 +143,12 @@ class FcmdFavorPathSelector
 
     windAddFavorite.window = main.gralMng.createWindow("addFavoriteWindow", "add favorite", GralWindow.windConcurrently);
     
-    main.gralMng.setPosition(4, GralGridPos.size -4, 1, GralGridPos.size +45, 0, 'd');
-    //main.panelMng.addText("Tab name:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    windAddFavorite.widgTab = main.gralMng.addTextField("addFavoriteTab", true, "file tab", 't');
+    main.gralMng.setPosition(4, GralGridPos.size -4, 1, GralGridPos.size +34, 0, 'r');
+    windAddFavorite.widgLabel = main.gralMng.addTextField("addFavoriteTab", true, "label", 't');
+    main.gralMng.setPosition(4, GralGridPos.size -4, 35, GralGridPos.size +10, 0, 'r');
+    windAddFavorite.widgPersistent = main.gralMng.addTextField("addFavoriteTab", true, "lmr ?", 't');
+    
+    main.gralMng.setPosition(8, GralGridPos.size -4, 1, GralGridPos.size +45, 0, 'd');
     windAddFavorite.widgShortName = main.gralMng.addTextField("addFavoriteAlias", true, "alias (show in list)", 't');
     windAddFavorite.widgPath = main.gralMng.addTextField("addFavoritePath", true, "the directory path", 't');
     
@@ -172,11 +180,11 @@ class FcmdFavorPathSelector
         panelLeft.listAllFavorPaths.clear();
         panelMid.listAllFavorPaths.clear();
         panelRight.listAllFavorPaths.clear();
-        listAllFavorTabs.clear();
+        listAllFavorPathFolders.clear();
         String sLine;
         int posSep;
         //List<FavorPath> list = null;
-        FcmdFavorPathSelector.FavorTab favorTabInfo = null;
+        FcmdFavorPathSelector.FavorFolder favorTabInfo = null;
         //boolean bAll = true;
         while( sError == null && (sLine = reader.readLine()) !=null){
           sLine = sLine.trim();
@@ -189,15 +197,15 @@ class FcmdFavorPathSelector
               final String sLabel = pos1 >=0 ? sDiv.substring(0, pos1).trim() : sDiv;
               final int pos2 = sDiv.indexOf(',');
               //sDivText is the same as sLabel if pos1 <0 
-              final String sDivText = pos2 >=0 ? sDiv.substring(pos1+1, pos2).trim() : sDiv.substring(pos1).trim(); 
+              final String sDivText = pos2 >=0 ? sDiv.substring(pos1+1, pos2).trim() : sDiv.substring(pos1+1).trim(); 
               final String sSelect = pos2 >=0 ? sDiv.substring(pos2): "";
               favorTabInfo = null; //selectListOverview.get(sDiv);
               if(favorTabInfo == null){
-                favorTabInfo = new FcmdFavorPathSelector.FavorTab(sLabel, sDivText);
+                favorTabInfo = new FcmdFavorPathSelector.FavorFolder(sLabel, sDivText);
                 if(sSelect.indexOf('l')>=0){ favorTabInfo.mMainPanel |=1;}
                 if(sSelect.indexOf('m')>=0){ favorTabInfo.mMainPanel |=2;}
                 if(sSelect.indexOf('r')>=0){ favorTabInfo.mMainPanel |=4;}
-                listAllFavorTabs.add(favorTabInfo);
+                listAllFavorPathFolders.add(favorTabInfo);
               }
               ///
               /*
@@ -235,7 +243,7 @@ class FcmdFavorPathSelector
                 }
                 //info.active = cActive;
                 //list.add(info);
-                favorTabInfo.favorPathInfo.add(favorPathInfo);
+                favorTabInfo.listfavorPaths.add(favorPathInfo);
               }
             }
           }
@@ -278,14 +286,19 @@ class FcmdFavorPathSelector
     }
     if(bOk){
       try{
-        writerCfg.append("==all==\n");
-        for(FavorPath entry: listAllFavorPaths){ writeCfgLine(entry); }
-        writerCfg.append("==left==\n");
-        for(FavorPath entry: panelLeft.listAllFavorPaths){ writeCfgLine(entry); }
-        writerCfg.append("==mid==\n");
-        for(FavorPath entry: panelMid.listAllFavorPaths){ writeCfgLine(entry); }
-        writerCfg.append("==right==\n");
-        for(FavorPath entry: panelRight.listAllFavorPaths){ writeCfgLine(entry); }
+        for(FcmdFavorPathSelector.FavorFolder folder: listAllFavorPathFolders){
+          writerCfg.append("==").append(folder.label).append(": ").append(folder.selectNameTab);
+          if((folder.mMainPanel & 7)!=0){ writerCfg.append(", "); }
+          if((folder.mMainPanel & 1)!=0){ writerCfg.append('l'); }
+          if((folder.mMainPanel & 2)!=0){ writerCfg.append('m'); }
+          if((folder.mMainPanel & 4)!=0){ writerCfg.append('r'); }
+          writerCfg.append("==\n");
+          for(FavorPath favor: folder.listfavorPaths){
+            writerCfg.append(favor.selectName).append(", ").append(favor.path).append("\n");
+          }
+          writerCfg.append("\n");
+          
+        }
       }
       catch(IOException exc){
         main.mainCmd.writeError("error writing" , exc);
@@ -372,17 +385,17 @@ class FcmdFavorPathSelector
    * A FileSelector-Tab is named starting with "tabFile_".
    * @return The last instance
    */
-  FcmdFileTable getLastFileTab()
+  FcmdFileCard getLastFileTab()
   { List<GralWidget> widgdFocus = mng.getWidgetsInFocus();
-    FcmdFileTable lastTab = null;
+    FcmdFileCard lastTab = null;
     //int ixTabs = 0;
     synchronized(widgdFocus){
       Iterator<GralWidget> iterFocus = widgdFocus.iterator();
       while(lastTab ==null && iterFocus.hasNext()){
         GralWidget widgd = iterFocus.next();
         Object oContentInfo;
-        if(widgd.name.startsWith("tabFile_") && ( oContentInfo = widgd.getContentInfo()) instanceof FcmdFileTable){
-          lastTab = (FcmdFileTable)oContentInfo;      
+        if(widgd.name.startsWith("tabFile_") && ( oContentInfo = widgd.getContentInfo()) instanceof FcmdFileCard){
+          lastTab = (FcmdFileCard)oContentInfo;      
         }
       }
     }
@@ -430,6 +443,7 @@ class FcmdFavorPathSelector
     { if(key == KeyCode.mouse1Up){
         if(infos.sCmd.equals("ok")){
           //check whether the selectInfo should be associated to a local list.
+          /*
           FavorPath favorPathInfo = actFavorPathInfo; //(SelectInfo)selectedLine.getUserData();
           List<FcmdFavorPathSelector.FavorPath> listAdd = windAddFavorite.panelInvocation.listAllFavorPaths;
           int posInList = listAdd.indexOf(favorPathInfo); //position of last selection
@@ -438,14 +452,30 @@ class FcmdFavorPathSelector
             listAdd = listAllFavorPaths;
             posInList = listAdd.indexOf(favorPathInfo); //position of last selection
           } //add new SelectInfo after the current used.
+          */
           FavorPath favorite = new FavorPath();
           favorite.path = windAddFavorite.widgPath.getText();
           favorite.selectName = windAddFavorite.widgShortName.getText();
-          String tablabel = windAddFavorite.widgTab.getText();
+          String tablabel = windAddFavorite.widgLabel.getText();
           //int ixtabName = windAddFavorite.panelInvocation.cNr - '1';
           favorite.mMainPanel = 1<< (windAddFavorite.panelInvocation.cNr - '1');
+          FcmdFavorPathSelector.FavorFolder tabDst = null;
+          for(FcmdFavorPathSelector.FavorFolder tab:listAllFavorPathFolders){ //note: used break in loop
+            if(tab.label.equals(tablabel)){
+              tabDst = tab;
+              break;
+            }
+          }
+          if(tabDst == null){
+            //its a new tab
+            tabDst = new FcmdFavorPathSelector.FavorFolder(tablabel, tablabel);
+            listAllFavorPathFolders.add(tabDst);
+          }
+          tabDst.listfavorPaths.add(favorite);
+          windAddFavorite.panelInvocation.fillCards();
           //favorite.tabName[ixtabName] = 
           ///favorite.label = tablabel;
+          /*
           listAdd.add(posInList+1, favorite);
           if(listAdd == listAllFavorPaths){
             panelLeft.fillInTables(1);
@@ -455,6 +485,7 @@ class FcmdFavorPathSelector
             int where = windAddFavorite.panelInvocation.cNr - '0';  //"lmr"
             windAddFavorite.panelInvocation.fillInTables(where); //windAddFavorite.panelInvocation.cc);
           }
+          */
         }
         main.gralMng.setWindowsVisible(windAddFavorite.window, null); //set it invisible.
       }

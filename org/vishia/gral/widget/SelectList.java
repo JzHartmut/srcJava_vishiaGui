@@ -104,6 +104,13 @@ public abstract class SelectList //extends GralWidget
   }
   
   
+  /**Sets the focus of the associated table widget.
+   * @return true if focused.
+   */
+  public boolean setFocus(){ return wdgdTable.setFocus(); }
+  
+
+  
   /**Action if a table line is selected and entered. Its either a double click with the mouse
    * or click of OK (Enter) button.
    * @param userData The user data stored in the line of table.

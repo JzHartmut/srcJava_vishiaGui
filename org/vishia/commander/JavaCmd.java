@@ -138,19 +138,19 @@ public class JavaCmd extends GuiCfg
 
     // Creates tab-Panels for the file lists and command lists.
     gralMng.selectPanel("primaryWindow");
-    favorPathSelector.panelLeft.tabbedPanelFileTabs = gralMng.addTabbedPanel("File0Tab", null, GralGridBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(1, 1, 1, 1, favorPathSelector.panelLeft.tabbedPanelFileTabs); // dialogPanel);
+    favorPathSelector.panelLeft.tabbedPanelFileCards = gralMng.addTabbedPanel("File0Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    gui.addFrameArea(1, 1, 1, 1, favorPathSelector.panelLeft.tabbedPanelFileCards); // dialogPanel);
 
-    favorPathSelector.panelLeft.buildInitialTabs(1);
+    favorPathSelector.panelLeft.buildInitialTabs();
     gralMng.selectPanel("primaryWindow");
-    favorPathSelector.panelMid.tabbedPanelFileTabs = gralMng.addTabbedPanel("File1Tab", null, GralGridBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(2, 1, 1, 1, favorPathSelector.panelMid.tabbedPanelFileTabs); // dialogPanel);
-    favorPathSelector.panelMid.buildInitialTabs(2);
+    favorPathSelector.panelMid.tabbedPanelFileCards = gralMng.addTabbedPanel("File1Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    gui.addFrameArea(2, 1, 1, 1, favorPathSelector.panelMid.tabbedPanelFileCards); // dialogPanel);
+    favorPathSelector.panelMid.buildInitialTabs();
 
     gralMng.selectPanel("primaryWindow");
-    favorPathSelector.panelRight.tabbedPanelFileTabs = gralMng.addTabbedPanel("File2Tab", null, GralGridBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(3, 1, 1, 1, favorPathSelector.panelRight.tabbedPanelFileTabs); // dialogPanel);
-    favorPathSelector.panelRight.buildInitialTabs(3);
+    favorPathSelector.panelRight.tabbedPanelFileCards = gralMng.addTabbedPanel("File2Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    gui.addFrameArea(3, 1, 1, 1, favorPathSelector.panelRight.tabbedPanelFileCards); // dialogPanel);
+    favorPathSelector.panelRight.buildInitialTabs();
 
     gralMng.selectPanel("primaryWindow");
     panelButtons = gralMng.createGridPanel("Buttons", gralMng.getColor("gr"),
@@ -629,7 +629,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      favorPathSelector.panelLeft.selectTableAll.wdgdTable.setFocus();
+      favorPathSelector.panelLeft.selectTabCard.wdgdTable.setFocus();
       return true;
     }
   };
@@ -644,7 +644,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      favorPathSelector.panelMid.selectTableAll.wdgdTable.setFocus();
+      favorPathSelector.panelMid.selectTabCard.wdgdTable.setFocus();
       return true;
     }
   };
@@ -659,7 +659,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      favorPathSelector.panelRight.selectTableAll.wdgdTable.setFocus();
+      favorPathSelector.panelRight.selectTabCard.wdgdTable.setFocus();
       return true;
     }
   };
@@ -676,7 +676,7 @@ public class JavaCmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      favorPathSelector.panelMid.tabbedPanelFileTabs.getFocusedTab().setFocus();
+      favorPathSelector.panelMid.tabbedPanelFileCards.getFocusedTab().setFocus();
       return true;
     }
   };

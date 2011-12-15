@@ -11,7 +11,7 @@ import org.vishia.util.KeyCode;
 
 /**This is one table of favorite pathes in the file commander.  
  */
-public class FcmdFavorTable  extends SelectList
+public class FcmdFavorCard  extends SelectList
 {
   /**The component */
   final JavaCmd main;
@@ -19,12 +19,12 @@ public class FcmdFavorTable  extends SelectList
   /**The tabbed panel where this class is member of. */
   final LeftMidRightPanel mainPanel;
   
-  final FcmdFileTable fileTable;
+  final FcmdFileCard fileTable;
   
   /**Index of all entries in the visible list. */
   Map<String, FcmdFavorPathSelector.FavorPath> indexFavorPaths = new TreeMap<String, FcmdFavorPathSelector.FavorPath>();
   
-  public FcmdFavorTable(JavaCmd main, FcmdFileTable fileTable, LeftMidRightPanel panel)
+  public FcmdFavorCard(JavaCmd main, FcmdFileCard fileTable, LeftMidRightPanel panel)
   { //super(name, mng);
     this.main = main;
     this.mainPanel = panel;
@@ -87,7 +87,7 @@ public class FcmdFavorTable  extends SelectList
       || (currentDir  = mainPanel.indexActualDir.get(favorPathInfo.selectName)) == null){  //use the root if the entry wasn't use till now
       currentDir = favorPathInfo.path;
     }
-    fileTable.favorTable.add(favorPathInfo);
+    fileTable.favorCard.add(favorPathInfo);
     fileTable.fillIn(currentDir);
     fileTable.setFocus();
     return true;
@@ -129,33 +129,33 @@ public class FcmdFavorTable  extends SelectList
     } else if (key ==KeyCode.shift + KeyCode.F5){
       //reread the configuration file.
       main.favorPathSelector.readCfg(main.favorPathSelector.fileCfg);
-      main.favorPathSelector.panelLeft.fillInTables(1);
+      main.favorPathSelector.panelLeft.fillCards();
       
     } else if (key == main.keyActions.keyPanelLeft){
       //sets focus to left
-      FcmdFileTable fileTableLeft = null;
+      FcmdFileCard fileTableLeft = null;
       boolean found = false;
-      for(FcmdFileTable fileTable: mainPanel.listTabs){
-        if(fileTable.favorTable == this){ found = true;  break;}
+      for(FcmdFileCard fileTable: mainPanel.listTabs){
+        if(fileTable.favorCard == this){ found = true;  break;}
         fileTableLeft = fileTable;  //save this table as table left, use if found.
       }
       if(found){
         if(fileTableLeft !=null){
-          fileTableLeft.favorTable.wdgdTable.setFocus();
+          fileTableLeft.favorCard.wdgdTable.setFocus();
         } else {  //left from first is the selectAllTable of this panel.
-          mainPanel.selectTableAll.wdgdTable.setFocus();
+          mainPanel.selectTabCard.wdgdTable.setFocus();
         }
       }
     } else if (key == main.keyActions.keyPanelRight){
       //sets focus to right
-      FcmdFileTable fileTableRight = null;
+      FcmdFileCard fileTableRight = null;
       boolean found = false; 
-      for(FcmdFileTable fileTable: mainPanel.listTabs){
+      for(FcmdFileCard fileTable: mainPanel.listTabs){
         if(found){ fileTableRight = fileTable; break; }  //use this next table if found before.
-        if(fileTable.favorTable == this) { found = true; }
+        if(fileTable.favorCard == this) { found = true; }
       }
       if(fileTableRight !=null){
-        fileTableRight.favorTable.wdgdTable.setFocus();
+        fileTableRight.favorCard.wdgdTable.setFocus();
       }
     } else if (key == main.keyActions.keyMainPanelLeft){
       String mainPanelId = mainPanel == main.favorPathSelector.panelRight ? ".2" : ".1";
@@ -173,7 +173,7 @@ public class FcmdFavorTable  extends SelectList
       }
     } else if (key == main.keyActions.keyCreateFavorite){
       main.favorPathSelector.actFavorPathInfo = favorPathInfo; //info in the line of table.
-      main.favorPathSelector.windAddFavorite.widgTab.setText("file3");
+      main.favorPathSelector.windAddFavorite.widgLabel.setText("file3");
       main.favorPathSelector.windAddFavorite.widgShortName.setText("alias");
       //File lastSelectedFile = panelRight.fileSelectorMain.getSelectedFile();
       //String pathDir = FileSystem.getCanonicalPath(lastSelectedFile.getParentFile());
