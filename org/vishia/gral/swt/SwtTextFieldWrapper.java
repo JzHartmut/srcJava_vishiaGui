@@ -13,6 +13,7 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralUserAction;
 
 public class SwtTextFieldWrapper extends GralTextField
@@ -31,7 +32,14 @@ public class SwtTextFieldWrapper extends GralTextField
     textFieldSwt = new Text(parent, SWT.SINGLE);
   }
 
-  
+  @Override public void setTextStyle(GralColor color, GralFont font)
+  {
+    SwtProperties props = ((SwtWidgetMng)itsMng).propertiesGuiSwt;
+    textFieldSwt.setForeground(props.colorSwt(color));
+    textFieldSwt.setFont(props.fontSwt(font));
+  }
+
+
   protected void setDropEnable(int dropType)
   {
     new SwtDropListener(dropType, textFieldSwt); //associated with textFieldSwt.

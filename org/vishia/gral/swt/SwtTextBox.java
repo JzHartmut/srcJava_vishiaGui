@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -13,6 +14,7 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.KeyCode;
@@ -35,6 +37,14 @@ public class SwtTextBox extends GralTextBox
 
   //@Override public Widget getWidgetImplementation(){ return textFieldSwt; } 
   //@Override public boolean setFocus(){ return textFieldSwt.setFocus(); }
+
+  
+  @Override public void setTextStyle(GralColor color, GralFont font)
+  {
+    SwtProperties props = ((SwtWidgetMng)itsMng).propertiesGuiSwt;
+    textFieldSwt.setForeground(props.colorSwt(color));
+    textFieldSwt.setFont(props.fontSwt(font));
+  }
 
 
   @Override
@@ -202,5 +212,7 @@ public class SwtTextBox extends GralTextBox
     
     
   }
+
+
   
 }

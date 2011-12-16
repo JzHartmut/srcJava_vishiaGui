@@ -5,6 +5,7 @@ import java.util.TreeMap;
 
 import org.vishia.bridgeC.IllegalArgumentExceptionJc;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralFont;
 
 public class GralGridProperties
 {
@@ -12,6 +13,9 @@ public class GralGridProperties
   protected final static int[] stdInputFontSize =    {9,10,11,12,14,18};
   protected final static int[] stdButtonFontSize =   {10,11,12,14,16,20};
   
+  /**This are the font sizes for some heights of fields in the given sizes of presentation. 
+   * First index is the height of field, second is the size of presentation.
+   */
   protected final static int[][] stdTextFontSize =
   { {5, 6, 7, 7, 8, 9}  ////1, 1.1, 1.2
   , {6, 6, 8, 9, 9,10}  // 1 1/3,
@@ -82,6 +86,10 @@ public class GralGridProperties
   /**A common background color for all widgets which are paint at the background. */
   public GralColor colorBackground_;
 
+  public final GralFont[] textFont = new GralFont[10];
+  
+
+  public final GralFont[] fontMonospacedSansSerif = new GralFont[10];  
   
   /**The size of this propety set.*/
   protected final int size;
@@ -93,6 +101,28 @@ public class GralGridProperties
   	this.size = size; 
     this.xPixelUnit = xPixelUnit_[size];
     colorBackground_ = color(0xeeeeee);
+    this.textFont[0] = new GralFont("Arial", stdTextFontSize[0][size], 'n');
+    this.textFont[1] = new GralFont("Arial", stdTextFontSize[1][size], 'n');
+    this.textFont[2] = new GralFont("Arial", stdTextFontSize[2][size], 'n');
+    this.textFont[3] = new GralFont("Arial", stdTextFontSize[3][size], 'n');
+    this.textFont[4] = new GralFont("Arial", stdTextFontSize[4][size], 'n');
+    this.textFont[5] = new GralFont("Arial", stdTextFontSize[5][size], 'n');
+    this.textFont[6] = new GralFont("Arial", stdTextFontSize[6][size], 'n');
+    this.textFont[7] = new GralFont("Arial", stdTextFontSize[7][size], 'n');
+    this.textFont[8] = new GralFont("Arial", stdTextFontSize[8][size], 'n');
+    this.textFont[9] = new GralFont("Arial", stdTextFontSize[9][size], 'n');
+    String sMonospaced = GralFont.fontMonospacedSansSerif;
+    this.fontMonospacedSansSerif[0] = new GralFont(sMonospaced, stdTextFontSize[0][size], 'n');
+    this.fontMonospacedSansSerif[1] = new GralFont(sMonospaced, stdTextFontSize[1][size], 'n');
+    this.fontMonospacedSansSerif[2] = new GralFont(sMonospaced, stdTextFontSize[2][size], 'n');
+    this.fontMonospacedSansSerif[3] = new GralFont(sMonospaced, stdTextFontSize[3][size], 'n');
+    this.fontMonospacedSansSerif[4] = new GralFont(sMonospaced, stdTextFontSize[4][size], 'n');
+    this.fontMonospacedSansSerif[5] = new GralFont(sMonospaced, stdTextFontSize[5][size], 'n');
+    this.fontMonospacedSansSerif[6] = new GralFont(sMonospaced, stdTextFontSize[6][size], 'n');
+    this.fontMonospacedSansSerif[7] = new GralFont(sMonospaced, stdTextFontSize[7][size], 'n');
+    this.fontMonospacedSansSerif[8] = new GralFont(sMonospaced, stdTextFontSize[8][size], 'n');
+    this.fontMonospacedSansSerif[9] = new GralFont(sMonospaced, stdTextFontSize[9][size], 'n');
+
 	}
   
 	
@@ -104,6 +134,55 @@ public class GralGridProperties
 	}
 	
   
+  public GralFont getTextFont(float size)
+  {
+    if(size <=1.2f) return textFont[0];  //1, 1.1, 1.2
+    if(size <=1.4f) return textFont[1];  // 1 1/3, 
+    if(size <=1.6f) return textFont[2];  //1.5
+    if(size <=1.8f) return textFont[3];  //1 2/3
+    if(size <=2.0f) return textFont[4];  //2
+    if(size <=2.4f) return textFont[5];   //2 1/3
+    if(size <=2.8f) return textFont[6];   //2.5, 2 2/3
+    if(size <=3.1f) return textFont[7];   //3
+    if(size <=3.9f) return textFont[8];   //3.5
+    return textFont[9];                   //>=4
+    
+  }
+  
+  /**The type:
+   * <ul>
+   * <li>m: monospaced small
+   * </ul>
+   * The style:
+   * 
+   * @param size
+   * @param style
+   * @return
+   */
+  public GralFont getTextFont(float fontSize, char type, char style)
+  {
+    int ifontSize;
+    if(fontSize <=1.2f) ifontSize = 0;  //1, 1.1, 1.2
+    else if(fontSize <=1.4f) ifontSize = 1;  // 1 1/3, 
+    else if(fontSize <=1.6f) ifontSize = 2;  //1.5
+    else if(fontSize <=1.8f) ifontSize = 3;  //1 2/3
+    else if(fontSize <=2.0f) ifontSize = 4;  //2
+    else if(fontSize <=2.4f) ifontSize = 5;   //2 1/3
+    else if(fontSize <=2.8f) ifontSize = 6;   //2.5, 2 2/3
+    else if(fontSize <=3.1f) ifontSize = 7;   //3
+    else if(fontSize <=3.9f) ifontSize = 8;   //3.5
+    else ifontSize = 9;                   //>=4
+    final GralFont font;
+    switch(type){
+      case 'm': font = fontMonospacedSansSerif[ifontSize]; break;
+      default: font = textFont[ifontSize];
+    }
+    return font;
+  }
+  
+  
+
+	
   /**Returns a color with given numeric color value.
    * The color instance is taken from a pool if the color is used already.
    * Elsewhere it is created newly and put into the pool.

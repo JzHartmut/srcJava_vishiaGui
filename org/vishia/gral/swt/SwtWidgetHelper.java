@@ -26,12 +26,23 @@ public class SwtWidgetHelper
    */
   public final static int version = 0x20111119;
   
+  
+  private final SwtWidgetMng mng;
+  
+  
+  public SwtWidgetHelper(SwtWidgetMng mng)
+  { this.mng = mng;
+  }
+
+
   public static GralColor getColor(Color swtColor)
   {
     int colorValue = swtColor.getBlue() << 16 + swtColor.getGreen() << 8 + swtColor.getRed();
     return GralColor.getColor(colorValue);
   }
   
+  
+  public Color getColor(GralColor color){ return mng.propertiesGuiSwt.colorSwt(color); }
   
   public static GralColor setBackgroundColor(GralColor color, Control swtWidget)
   { Color colorSwt = (Color)color.colorGuimpl;

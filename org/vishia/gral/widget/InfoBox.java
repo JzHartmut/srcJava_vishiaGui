@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
@@ -49,6 +50,12 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
     return box; 
 
   }
+  
+  @Override public void setTextStyle(GralColor color, GralFont font)
+  { textBox.setTextStyle(color, font);
+  }
+
+
   
   @Override public Appendable append(CharSequence text) throws IOException{ return textBox.append(text); }
 

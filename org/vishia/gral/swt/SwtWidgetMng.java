@@ -182,6 +182,8 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    */
   public  final SwtProperties propertiesGuiSwt;
   
+  public final SwtWidgetHelper widgetHelper = new SwtWidgetHelper(this);
+  
   /**This mouse-click-implementor is added to any widget,
    * which is associated to a {@link GralWidget} in its data.
    * The infos of the last clicked widget can be got with it.
@@ -298,47 +300,6 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   	)
   { super(propertiesGui, variableContainer, log);
     this.propertiesGuiSwt = propertiesGui;
-    /*
-    Object oPanelComposite = gralDevice.panelComposite;  //from the baseclass GralPanelContent
-    if(! (oPanelComposite instanceof Shell)){ throw new IllegalArgumentException("");}
-  	this.graphicFrame = (Shell)oPanelComposite; //from the primaryWindow  //old:graphicFrame;
-  	Composite shell = graphicFrame;
-  	if(!(shell instanceof Shell)){
-  		shell = shell.getShell();
-  	  //Rectangle boundsOfGraphicFrame = graphicFrame.getBounds();
-  	}
-  	*/
-  	//this.theShellOfWindow = (Shell)shell;
-    
-    //GralPanelContent panelContent = gralDevice; 
-    /*new GralPanelContent("$", graphicFrame){
-
-      @Override
-      public boolean setFocus()
-      { return false;
-      }
-
-      @Override
-      public GralColor setBackgroundColor(GralColor color)
-      {
-        // TODO Auto-generated method stub
-        return null;
-      }
-
-      @Override
-      public GralColor setForegroundColor(GralColor color)
-      {
-        // TODO Auto-generated method stub
-        return null;
-      }
-      
-    };
-    */
-  	//panels.put(panelContent.namePanel, panelContent);
-  	//pos.panel = panelContent;
-  	//sCurrPanel = panelContent.namePanel;
-  	
-    
     pos.x = 0; //start-position
     pos.y = 4 * propertiesGui.yPixelUnit();
     
@@ -587,7 +548,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     widget.setBackground(propertiesGuiSwt.colorBackground);
     widget.setText(sText);
     //Font font = propertiesGui.stdInputFont;
-    Font font = propertiesGuiSwt.getTextFont(pos.height());
+    Font font = propertiesGuiSwt.getSwtFont(pos.height());
     widget.setFont(font);
     //font.getFontData()[0].
     Point textSize = widget.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
@@ -627,7 +588,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     widget.setBackground(propertiesGuiSwt.colorSwt(backColor));
     widget.setText(sText);
     //Font font = propertiesGui.stdInputFont;
-    Font font = propertiesGuiSwt.getTextFont(pos.height());
+    Font font = propertiesGuiSwt.getSwtFont(pos.height());
     widget.setFont(font);
     //font.getFontData()[0].
     Point textSize = widget.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);

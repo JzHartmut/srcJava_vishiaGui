@@ -159,7 +159,7 @@ public class Fcmd extends GuiCfg
     initPanelButtons();
 
     filePropsCmd.buildWindowConfirmMk();  //F2
-    viewCmd.buildWindowConfirmDelete();   //F3
+    viewCmd.buildWindowView();   //F3
     copyCmd.buildWindowConfirmCopy();
     mkCmd.buildWindowConfirmMk();
     deleteCmd.buildWindowConfirmDelete(); //F8

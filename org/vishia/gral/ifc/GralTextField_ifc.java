@@ -23,10 +23,19 @@ public interface GralTextField_ifc extends GralWidget_ifc
    * The text may be stored in a queue and applied to the widget in the graphical thread.
    * @param text The content
    */
-  public abstract void setText(CharSequence text);
+  void setText(CharSequence text);
   
-  public abstract String getText();
+  String getText();
   
-  public abstract int getCursorPos();
+  int getCursorPos();
+  
+  /**Sets the style of all new set and added texts. The content contained in the text field or box are not changed.
+   * @param color
+   * @param font
+   */
+  void setTextStyle(GralColor color, GralFont font);
+  
+  
+  
   
 }

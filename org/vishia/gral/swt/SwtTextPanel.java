@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralTextBox_ifc;
@@ -31,6 +32,10 @@ public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, A
   }
 
   
+  @Override public void setTextStyle(GralColor color, GralFont font)
+  { textAreaOutput.setTextStyle(color, font);
+  }
+
   
   
   @Override

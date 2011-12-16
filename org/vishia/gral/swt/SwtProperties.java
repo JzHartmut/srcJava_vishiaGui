@@ -10,6 +10,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
 import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralFont;
 
 
 public class SwtProperties extends GralGridProperties
@@ -17,8 +18,6 @@ public class SwtProperties extends GralGridProperties
 	private final Device guiDevice;
 
   public final Font smallPromptFont;
-  
-  public final Font[] textFont = new Font[10];
   
   public final Font stdInputFont;
   
@@ -47,16 +46,6 @@ public class SwtProperties extends GralGridProperties
     this.smallPromptFont = new Font(device, "Arial", smallPromptFontSize[size], SWT.NORMAL);
     this.stdInputFont = new Font(device, "Arial", stdInputFontSize[size], SWT.NORMAL);
     this.stdButtonFont = new Font(device, "Arial", stdButtonFontSize[size], SWT.NORMAL);
-    this.textFont[0] = new Font(device, "Arial", stdTextFontSize[0][size], SWT.NORMAL);
-    this.textFont[1] = new Font(device, "Arial", stdTextFontSize[1][size], SWT.NORMAL);
-    this.textFont[2] = new Font(device, "Arial", stdTextFontSize[2][size], SWT.NORMAL);
-    this.textFont[3] = new Font(device, "Arial", stdTextFontSize[3][size], SWT.NORMAL);
-    this.textFont[4] = new Font(device, "Arial", stdTextFontSize[4][size], SWT.NORMAL);
-    this.textFont[5] = new Font(device, "Arial", stdTextFontSize[5][size], SWT.NORMAL);
-    this.textFont[6] = new Font(device, "Arial", stdTextFontSize[6][size], SWT.NORMAL);
-    this.textFont[7] = new Font(device, "Arial", stdTextFontSize[7][size], SWT.NORMAL);
-    this.textFont[8] = new Font(device, "Arial", stdTextFontSize[8][size], SWT.NORMAL);
-    this.textFont[9] = new Font(device, "Arial", stdTextFontSize[9][size], SWT.NORMAL);
   }
   
   /**Returns a color with given Gui-independent color.
@@ -121,28 +110,52 @@ public class SwtProperties extends GralGridProperties
     return ret;
   }
   
+  public Font getSwtFont(float fontSize){ return fontSwt(super.getTextFont(fontSize)); }
 
-  
-  public Font getTextFont(float size)
-  {
-  	if(size <=1.2f) return textFont[0];  //1, 1.1, 1.2
-  	if(size <=1.4f) return textFont[1];  // 1 1/3, 
-  	if(size <=1.6f) return textFont[2];  //1.5
-  	if(size <=1.8f) return textFont[3];  //1 2/3
-  	if(size <=2.0f) return textFont[4];  //2
-  	if(size <=2.4f) return textFont[5];   //2 1/3
-  	if(size <=2.8f) return textFont[6];   //2.5, 2 2/3
-  	if(size <=3.1f) return textFont[7];   //3
-  	if(size <=3.9f) return textFont[8];   //3.5
-    return textFont[9];                   //>=4
-  	
-  }
-  
   
   /*
    * JLabel   Trace-GUI           56 x 16
    * FileInputField              237 x 34
    * JButton                      73 x 26
    */
+
+  
+  
+  /**Returns a color with given Gui-independent color.
+   * The SWT-Color instance is taken from a pool if the color is used already.
+   * Elsewhere it is created newly and put into the pool.
+   * @param color The given color in system-indpending form.
+   * @return An instance of SWT-color
+   */
+  public Font fontSwt(GralFont font)
+  {
+    if(font.fontImpl == null){
+      int styleSwt = 0;
+      switch(font.style){
+        case 'b': styleSwt |= SWT.BOLD; break;
+        case 'B': styleSwt |= SWT.BOLD; break;
+        case 'i': styleSwt |= SWT.ITALIC; break;
+        case 'I': styleSwt |= SWT.BOLD | SWT.ITALIC; break;
+        default: styleSwt = SWT.NORMAL;
+      }
+      String fontName;
+      //NOTE: on SWT there are not Java standardfonts, there are platform-depending.
+      if(font.fontName.equals(GralFont.fontMonospacedSansSerif)){ fontName = "Courier"; }
+      else if(font.fontName.equals(GralFont.fontMonospacedSmall)){ fontName = "Courier"; }
+      else if(font.fontName.equals(GralFont.fontMonospacedSerif)){ fontName = "Courier"; }
+      else if(font.fontName.equals(GralFont.fontSansSerif)){ fontName = "Arial"; }
+      else if(font.fontName.equals(GralFont.fontSerif)){ fontName = "Serif"; }
+      else {fontName = font.fontName; }
+      font.fontImpl = new Font(guiDevice, fontName, font.size, styleSwt);
+    } else if(!(font.fontImpl instanceof Font)){
+      throw new IllegalArgumentException("unauthorized font setting");
+    }
+    return (Font)font.fontImpl;
+  }
+  
+  
+
+  
+  
   
 }
