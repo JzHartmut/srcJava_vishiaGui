@@ -250,12 +250,18 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   @Override public void setPositionSize(int line, int column, int height, int width, char direction)
   { if(line < 0){ line = posUsed? GralGridPos.next: GralGridPos.same; }
     if(column < 0){ column = posUsed? GralGridPos.next: GralGridPos.same; }
-    setFinePosition(line, 0, height + GralGridPos.size, 0, column, 0, width + GralGridPos.size, 0, 1, direction, pos);
+    setFinePosition(line, 0, height + GralGridPos.size, 0, column, 0, width + GralGridPos.size, 0, 1, direction, 0 ,0 , pos);
   }
 
   @Override public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
     , int origin, char direction)
   { setPosition(pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
+  }
+
+
+  @Override public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
+    , int origin, char direction, float border)
+  { setPosition(pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, border);
   }
 
 
@@ -266,10 +272,17 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
       posUsed = false;
   }
   
-  @Override public void setFinePosition(int line, int yPosFrac, int ye, int yef
-    , int column, int xPosFrac, int xe, int xef, int origin, char direction, GralGridPos frame)
+  @Override public void setPosition(GralGridPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
+    , int origin, char direction, float border)
   {
-    pos.setFinePosition(line, yPosFrac, ye, yef, column, xPosFrac, xe, xef, origin, direction, frame);
+      pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, border);
+      posUsed = false;
+  }
+  
+  @Override public void setFinePosition(int line, int yPosFrac, int ye, int yef
+    , int column, int xPosFrac, int xe, int xef, int origin, char direction, int border, int borderFrac, GralGridPos frame)
+  {
+    pos.setFinePosition(line, yPosFrac, ye, yef, column, xPosFrac, xe, xef, origin, direction, border, borderFrac, frame);
     posUsed = false;
   }
   
@@ -705,7 +718,6 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
     {
       GralWidget widgd = getWidgetInFocus();
       if(widgd !=null){
-        ///
         designer.editFieldProperties(widgd, null);
       }
       return true;

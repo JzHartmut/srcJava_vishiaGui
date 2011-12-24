@@ -14,15 +14,15 @@ set SRC=%SRC% ../org/vishia/guiBzr/*.java
 set SRC=%SRC% ../org/vishia/guiInspc/*.java
 set SRC=%SRC% ../org/vishia/guiViewCfg/*.java
 set SRC=%SRC% ../org/vishia/gral/*.java
+set SRC=%SRC% ../org/vishia/gral/area9/*.java
+set SRC=%SRC% ../org/vishia/gral/awt/*.java
 set SRC=%SRC% ../org/vishia/gral/cfg/*.java
 set SRC=%SRC% ../org/vishia/gral/base/*.java
 set SRC=%SRC% ../org/vishia/gral/ifc/*.java
 set SRC=%SRC% ../org/vishia/gral/widget/*.java
 set SRC=%SRC% ../org/vishia/gral/swt/*.java
-set SRC=%SRC% ../org/vishia/gral/gridPanel/*.java
-set SRC=%SRC% ../org/vishia/gral/area9/*.java
 set SRC=%SRC% ../org/vishia/commander/*.java
-set SRC=%SRC% ../org/vishia/mainGuiSwt/*.java
+set SRC=%SRC% ../org/vishia/commander/target/*.java
 set SRC=%SRC% ../org/vishia/windows/*.java
 
 echo generate docu: %SRC%

@@ -178,7 +178,7 @@ public class Fcmd extends GuiCfg
     gralMng.setPosition(0, 2, 10, 0, 1, 'r');
     widgFileInfo = gralMng.addTextField(nameTextFieldInfo, false, null, '.');
     
-    gralMng.setPosition(2, 1, 10, 20, 1, 'r');
+    gralMng.setPosition(2, GralGridPos.size + 1, 10, 20, 1, 'r');
     gralMng.addText("F1", 'A', 0x0);
     gralMng.addText("F2", 'A', 0x0);
     gralMng.addText("F3", 'A', 0x0);

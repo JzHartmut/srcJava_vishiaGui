@@ -181,7 +181,7 @@ public class GralCfgBuilder
     int heightArg = pos.ySizeDown == Integer.MAX_VALUE ? GralGridPos.useNatSize : pos.ySizeDown + GralGridPos.size;
     int widthArg = pos.xWidth == Integer.MAX_VALUE ? GralGridPos.useNatSize : pos.xWidth + GralGridPos.size;
     gui.setFinePosition(pos.yPos, pos.yPosFrac, heightArg, pos.ySizeFrac
-        , pos.xPos, pos.xPosFrac, widthArg, pos.xSizeFrac, 1, dirNext, null);
+        , pos.xPos, pos.xPosFrac, widthArg, pos.xSizeFrac, 1, dirNext, 0, 0, null);
     //
     GralWidget widgd = null;
     String sName = cfge.widgetType.name;

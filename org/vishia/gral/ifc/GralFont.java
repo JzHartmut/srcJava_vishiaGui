@@ -6,16 +6,21 @@ public class GralFont
    * to minimize the effort in dynamic instances.  */
   public Object fontImpl;
 
-  public static String fontMonospacedSansSerif = "monospacedSansSerif";
+  public static final String fontMonospacedSansSerif = "monospacedSansSerif";
   
-  public static String fontMonospacedSmall = "MonospacedSmall";
+  public static final String fontMonospacedSmall = "MonospacedSmall";
   
-  public static String fontMonospacedSerif = "monospacedSerif";
+  public static final String fontMonospacedSerif = "monospacedSerif";
   
-  public static String fontSansSerif = "sansSerif";
+  public static final String fontSansSerif = "sansSerif";
   
-  public static String fontSerif = "serif";
+  public static final String fontSerif = "serif";
   
+  /**Some types of fonts.*/
+  public static final char typeSmallMonospaced = 'm', typeMonospaced = 'M',
+    typeSansSerif = 'a', typeSerif = 't';
+  
+  public static final char styleNormal = 'n', styleItalic = 'i', styleBoldItalic = 'I', styleBold = 'b';
   
   public String fontName;
   

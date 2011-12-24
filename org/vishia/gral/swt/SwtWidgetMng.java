@@ -79,6 +79,7 @@ import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
+import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralGridPos;
 import org.vishia.gral.ifc.GralWidgetChangeRequ;
@@ -692,13 +693,32 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
       boundsAll = calcWidgetPosAndSize(this.pos, 800, 600, 100, 20);
       float ySize = pos.height();
       //float xSize = pos.width();
-      switch(promptStylePosition){
-        case 't':{
-          posPrompt.setPosition(this.pos, GralGridPos.same, ySize * 0.37f + GralGridPos.size, GralGridPos.same, GralGridPos.same, 0, '.');
-          posField.setPosition(this.pos, GralGridPos.refer + ySize * 0.37f, GralGridPos.same, GralGridPos.same, GralGridPos.same, 0, '.');
-        } break;
-      }
-      promptFont = propertiesGuiSwt.smallPromptFont;
+      float yPosPrompt, heightPrompt, heightText;
+      //switch(promptStylePosition){
+        //case 't':{
+          if(ySize <= 2.0){ //it is very small for top-prompt:
+            yPosPrompt = 1.0f;  //no more less than 1/2 normal line. 
+            heightPrompt = 1.0f;
+            heightText = ySize - 0.7f;
+            if(heightText < 1.0f){ heightText = 1.0f; }
+          } else if(ySize <=4.0){ //it is normally
+            yPosPrompt = ySize - 2.0f;  //no more less than 1/2 normal line. 
+            heightPrompt = yPosPrompt; //ySize - 2.4f;
+            if(yPosPrompt < 1.0f){ yPosPrompt = 1.0f; }
+            if(heightPrompt < 1.0f){ heightPrompt = 1.0f; }
+            heightText = 2.0f;
+          } else { //greater then 4.0
+            yPosPrompt = ySize * 0.5f;
+            heightPrompt = ySize * 0.4f;;
+            heightText = ySize * 0.5f;
+          }
+          //from top, size of prompt
+          posPrompt.setPosition(this.pos, GralGridPos.same - ySize + yPosPrompt, GralGridPos.size - heightPrompt, GralGridPos.same, GralGridPos.same, 0, '.');
+          //from bottom line, size of text
+          posField.setPosition(this.pos, GralGridPos.same, GralGridPos.size - heightText, GralGridPos.same, GralGridPos.same, 0, '.');
+        //} break;
+      //}
+      promptFont = propertiesGuiSwt.getTextFontSwt(heightPrompt, GralFont.typeSansSerif, GralFont.styleNormal); //.smallPromptFont;
       boundsPrompt = calcWidgetPosAndSize(posPrompt, boundsAll.dx, boundsAll.dy, 10,100);
       boundsField = calcWidgetPosAndSize(posField, boundsAll.dx, boundsAll.dy, 10,100);
       widgetInfo.promptSwt = new Label((Composite)pos.panel.getPanelImpl(), 0);

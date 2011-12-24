@@ -155,7 +155,9 @@ public class SwtProperties extends GralGridProperties
   
   
 
-  
+  Font getTextFontSwt(float fontSize, char type, char style){
+    return fontSwt(getTextFont(fontSize, type, style));
+  }
   
   
 }

@@ -247,7 +247,7 @@ public class FileSelector //extends GralWidget
     //The macro widget consists of more as one widget. Position the inner widgets:
     GralGridPos posAll = panelMng.getPositionInPanel();
     //Text field for path above list
-    panelMng.setPosition(posAll, GralGridPos.same, 2.0F, GralGridPos.same, GralGridPos.same, 1, 'd');
+    panelMng.setPosition(posAll, GralGridPos.same, GralGridPos.size + 2.0F, GralGridPos.same, GralGridPos.same, 1, 'd');
     widgdPath = panelMng.addTextField(name + "-Path", false, null, '.');
     widgdPath.setBackColor(panelMng.getColor("pye"), 0xeeffff);  //color pastel yellow
     //the list

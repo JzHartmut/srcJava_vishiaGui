@@ -162,66 +162,6 @@ public interface GralGridBuild_ifc
   
   
   /**Sets the position.
-   * <b>Concept of positioning</b>:<br>
-   * The position are never given as pixel positions. They are user-oriented positions. The calculation
-   * of pixel units are done from the implementing graphic layer depending on the graphic device properties
-   * and the requested size appearance.
-   * <br><br>
-   * A normal text with a font in the standard proper read-able size is presented by 2 units of the Gral-positions
-   * in vertical direction (lines) and approximately 1 position per character in horizontal direction.
-   * Of course the horizontal character size depends on the font properties, it is only a standard value.
-   * A text can be presented in a smaller font. A very small font is presented by 1 vertical gral-unit.
-   * Such a text can be used as short title for text input fields (prompt) or adequate.
-   * <br>
-   * A button is able to present with 3 or 2 vertical gral units. A small check box may be presented 
-   * with 1 x 1 gral unit.
-   * <br><br>
-   * A gral unit should be have the same distance in vertical as in horizontal direction. It depends on the 
-   * graphical implementation. One gral unit may have approximately 6 to 30 pixel, 
-   * depending from the requested size of appearance and the display pixel size. Any graphic can be shown
-   * with several sizes of appearance, depending from parameters.
-   * <br><br>
-   * <b>Fine positions</b>:
-   * Either the positions are given with 2 integer values or with a float value. The fine position is given
-   * as one digit from 0 to 9. It is one fractional part digit of the float or the frac int argument.
-   * The fine position divides one gral position into 5 or into 6 fine positions. 
-   * The odd numbers divide into 6 positions. In this kind a gral position is able to divide by 2, 3 and 6:
-   * <ul>
-   * <li>1: 1/6 = 0.1333
-   * <li>3: 1/3 = 0.3333
-   * <li>5: 1/2 = 0.5
-   * <li>7: 2/3 = 0.6667
-   * <li>9: 5/6 = 0.8667
-   * </ul>
-   * The even numbers divide into 5 positions: 
-   * <ul>
-   * <li>2: 1/5 = 0.2
-   * <li>4: 2/5 = 0.4
-   * <li>6: 3/5 = 0.6
-   * <li>8: 4/5 = 0.8
-   * </ul>
-   * The fine positioning enables a fine positioning of widgets in respect to the fundamental positions.
-   * <br><br>
-   * Positions may be given in the following forms: <ul>
-   * <li>Positive number in range 0...about 100..200: Gral Unit from left or top.
-   * <li>Negative number in range 0 or -1...about -200..-200: Gral Unit from right or bottom.
-   * <li>0 for lineEnd or columnEnd means the right or bottom. 
-   * <li>Positive Number added with {@link GralGridPos#size} applied at lineEnd or columnEnd: 
-   *   The size. In this case the line and column is the left top corner. 
-   *   All further related positions has the same left or top line.
-   * <li>Negative Number added with {@link GralGridPos#size} applied at lineEnd or columnEnd: 
-   *   The absolute value is the size. It is negative because the size is measured from right to left
-   *   respectively bottom to top. It means the line and column is the right or the bottom line. 
-   *   All further related positions has the same right or bottom line. Especially the bottom line is used
-   *   usual if more as one widgets are placed in one line after another, with a common bottom line.
-   * <li>TODO {@link GralGridPos#same}
-   * <li> {@link GralGridPos#next} and {@link GralGridPos#nextBlock}   
-   * <li>as width or height or as percent value from the panel size.
-   * </ul>
-   * Fine positions are given always from left or top of the fundamental positions. 
-   * For example a value -1.3 means, the widget is placed 1 unit from right, and then 1/3 inside this unit.
-   * This is 2/3 unit from right. A value for example -0.3 is not admissible, because -0 is not defined. 
-   * <br>
    * 
    *        
    * @param framePos The given frame.
@@ -244,9 +184,17 @@ public interface GralGridBuild_ifc
    * @deprecated. 
    */
   public void setPosition(GralGridPos framePos, float line, float lineEnd, float column, float columnEnd
-      , int origin, char direction);
-  
-  
+    , int origin, char direction);
+
+
+  public void setPosition(GralGridPos framePos, float line, float lineEnd, float column, float columnEnd
+    , int origin, char direction, float border);
+
+
+  public void setPosition(float line, float lineEnd, float column, float columnEnd
+    , int origin, char direction, float border);
+
+
   
   /**Same as {@link #setPositionSize(int, int, int, int, char)}, but the positions can be in a fine division.
    * @param y The line. 
@@ -270,7 +218,7 @@ public interface GralGridBuild_ifc
    */
   public void setFinePosition(int y, int yFrac, int yEnd, int yEndFrac
       , int x, int xFrac, int xEnd, int xEndFrac
-      , int origin, char direction, GralGridPos frame);
+      , int origin, char direction, int border, int borderFrac, GralGridPos frame);
   
   /**Sets the next position if the position is used, but change the size.
    * @param ySize
