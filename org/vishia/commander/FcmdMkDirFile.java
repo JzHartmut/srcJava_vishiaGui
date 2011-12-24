@@ -36,6 +36,10 @@ public class FcmdMkDirFile
     main.gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
     int windProps = GralWindow.windConcurrently;
     GralWindow window =  main.gralMng.createWindow("windMk", "mkdir/file - The.file.Commander", windProps);
+    main.gralMng.setPosition(4, GralGridPos.size +3.6f, 1, -1, 0, 'd', 0.4f);
+    main.gralMng.setPosition(4, GralGridPos.size -3.6f, 1, -1, 0, 'd', 0.4f);
+    main.gralMng.setPosition(GralGridPos.same, GralGridPos.size -1.6f, 1, -1, 0, 'd', 0.4f);
+    main.gralMng.setPosition(GralGridPos.same, GralGridPos.size +2.6f, 1, -1, 0, 'd', 0.4f);
     main.gralMng.setPosition(4, GralGridPos.size -3.6f, 1, -1, 0, 'd', 0.4f);
     widgParentPath = main.gralMng.addTextField("mkParentPath", true, "parent path:", 't');
     widgParentPath = main.gralMng.addTextField("mkParentPath", true, "name:", 't');

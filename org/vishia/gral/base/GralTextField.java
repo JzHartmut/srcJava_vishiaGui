@@ -33,8 +33,8 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
    */
   abstract public void setMouseAction(GralUserAction action);
   
-  /**Returns the Label implementation for a prompt or null if there isn't used a prompt
+  /**Returns the Label for a prompt or null if there isn't used a prompt
    */
-  abstract public Object getPromptLabelImpl();
+  abstract public String getPromptLabelImpl();
   
 }

@@ -6,6 +6,7 @@ import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.events.DragDetectEvent;
 import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.vishia.gral.base.GralMouseWidgetAction_ifc;
@@ -22,6 +23,7 @@ public class SwtTextFieldWrapper extends GralTextField
   
   /**A possible prompt for the text field or null. */
   Label promptSwt;
+  //Text promptSwt;
   
   private DropTarget drop;
   
@@ -29,7 +31,6 @@ public class SwtTextFieldWrapper extends GralTextField
   
   public SwtTextFieldWrapper(String name, Composite parent, char whatis, GralWidgetMng mng)
   { super(name, whatis, mng);
-    textFieldSwt = new Text(parent, SWT.SINGLE);
   }
 
   @Override public void setTextStyle(GralColor color, GralFont font)
@@ -106,7 +107,7 @@ public class SwtTextFieldWrapper extends GralTextField
   }
 
   
-  @Override public Label getPromptLabelImpl(){ return promptSwt; }
+  @Override public String getPromptLabelImpl(){ return promptSwt.getText(); }
 
 
   @Override public GralColor setBackgroundColor(GralColor color)

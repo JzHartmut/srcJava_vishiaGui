@@ -655,32 +655,12 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    * @return
    */
   @Override public GralTextField addTextField(String name, boolean editable, String prompt, char promptStylePosition)
-  { SwtTextFieldWrapper widgetInfo = new SwtTextFieldWrapper(name, (Composite)pos.panel.getPanelImpl(), editable ? 'T' : 'S', this);
-    Text widgetSwt = widgetInfo.textFieldSwt;
+  { Composite panelSwt = (Composite)pos.panel.getPanelImpl();
+    SwtTextFieldWrapper widgetInfo = new SwtTextFieldWrapper(name, panelSwt, editable ? 'T' : 'S', this);
     //SwtStyledTextFieldWrapper widgetInfo = new SwtStyledTextFieldWrapper(name, (Composite)pos.panel.getPanelImpl(), editable ? 'T' : 'S', this);
     //StyledText widgetSwt = widgetInfo.textFieldSwt;
     widgetInfo.setPanelMng(this);
-    widgetSwt.setFont(propertiesGuiSwt.stdInputFont);
-    widgetSwt.setEditable(editable);
-    if(editable)
-      //widgetSwt.setDragDetect(true);
-      //widgetSwt.addDragDetectListener(widgetInfo.dragListener);
-      
-    	stop();
-    widgetSwt.setBackground(propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));
-    widgetSwt.addFocusListener(focusListener);
-
-    Listener[] oldMouseListener = widgetSwt.getListeners(SWT.MouseDown);
-    for(Listener lst: oldMouseListener){
-      widgetSwt.removeListener(SWT.MouseDown, lst);
-    }
-    widgetSwt.addMouseListener(mouseClickForInfo);
-    int x =-1, y=-1; 
-    if(x >=0 && y >=0){
-      //edit.setBounds(x, y, dx * properties.xPixelUnit(), 2* properties.yPixelUnit());
-    } else {
-    	//widget.setSize(xIncr * propertiesGui.xPixelUnit()-1, 2* propertiesGui.yPixelUnit()-1);
-    }
+    Text widgetSwt;
     //
     if(prompt != null && promptStylePosition == 't'){
       if(posUsed){
@@ -693,19 +673,19 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
       boundsAll = calcWidgetPosAndSize(this.pos, 800, 600, 100, 20);
       float ySize = pos.height();
       //float xSize = pos.width();
+      //posPrompt from top, 
       float yPosPrompt, heightPrompt, heightText;
       //switch(promptStylePosition){
         //case 't':{
-          if(ySize <= 2.0){ //it is very small for top-prompt:
+          if(ySize <= 2.5){ //it is very small for top-prompt:
             yPosPrompt = 1.0f;  //no more less than 1/2 normal line. 
             heightPrompt = 1.0f;
             heightText = ySize - 0.7f;
             if(heightText < 1.0f){ heightText = 1.0f; }
           } else if(ySize <=4.0){ //it is normally
-            yPosPrompt = ySize - 2.0f;  //no more less than 1/2 normal line. 
-            heightPrompt = yPosPrompt; //ySize - 2.4f;
-            if(yPosPrompt < 1.0f){ yPosPrompt = 1.0f; }
+            heightPrompt = ySize - 2.0f + (4.0f - ySize) * 0.5f; 
             if(heightPrompt < 1.0f){ heightPrompt = 1.0f; }
+            yPosPrompt = ySize - heightPrompt; // + 0.5f; /// //no more less than 1/2 normal line. 
             heightText = 2.0f;
           } else { //greater then 4.0
             yPosPrompt = ySize * 0.5f;
@@ -721,21 +701,43 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
       promptFont = propertiesGuiSwt.getTextFontSwt(heightPrompt, GralFont.typeSansSerif, GralFont.styleNormal); //.smallPromptFont;
       boundsPrompt = calcWidgetPosAndSize(posPrompt, boundsAll.dx, boundsAll.dy, 10,100);
       boundsField = calcWidgetPosAndSize(posField, boundsAll.dx, boundsAll.dy, 10,100);
-      widgetInfo.promptSwt = new Label((Composite)pos.panel.getPanelImpl(), 0);
+      widgetInfo.promptSwt = new Label(panelSwt, 0);
       widgetInfo.promptSwt.setFont(promptFont);
       widgetInfo.promptSwt.setText(prompt);
+      widgetInfo.promptSwt.setBackground(null);
       Point promptSize = widgetInfo.promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
       if(promptSize.x > boundsPrompt.dx){
         boundsPrompt.dx = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
       }
-      widgetInfo.promptSwt.setBounds(boundsPrompt.x, boundsPrompt.y, boundsPrompt.dx, boundsPrompt.dy+1);
+      widgetSwt =  new Text(panelSwt, SWT.SINGLE);
+      widgetInfo.textFieldSwt = widgetSwt;
       widgetSwt.setBounds(boundsField.x, boundsField.y, boundsField.dx, boundsField.dy);
+      widgetInfo.promptSwt.setBounds(boundsPrompt.x, boundsPrompt.y, boundsPrompt.dx, boundsPrompt.dy+1);
       posUsed = true;
       
     } else {
       //without prompt
+      widgetSwt =  new Text(panelSwt, SWT.SINGLE);
+      widgetInfo.textFieldSwt = widgetSwt;
       setPosAndSize_(widgetSwt);
     }
+    widgetSwt.setFont(propertiesGuiSwt.stdInputFont);
+    widgetSwt.setEditable(editable);
+    if(editable)
+      //widgetSwt.setDragDetect(true);
+      //widgetSwt.addDragDetectListener(widgetInfo.dragListener);
+      
+      stop();
+    widgetSwt.setBackground(propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));
+    widgetSwt.addFocusListener(focusListener);
+
+    Listener[] oldMouseListener = widgetSwt.getListeners(SWT.MouseDown);
+    for(Listener lst: oldMouseListener){
+      widgetSwt.removeListener(SWT.MouseDown, lst);
+    }
+    widgetSwt.addMouseListener(mouseClickForInfo);
+    
+    
     if(prompt != null && promptStylePosition == 'r'){
       Rectangle swtField = widgetSwt.getBounds();
       Rectangle swtPrompt = new Rectangle(swtField.x + swtField.width, swtField.y, 0, swtField.height);
@@ -822,6 +824,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
       boundsField.height = yPixelField;
     }
     Label wgPrompt = new Label(((SwtPanel)pos.panel).getPanelImpl(), 0);
+    //Text wgPrompt = new Text(((SwtPanel)pos.panel).getPanelImpl(), 0);
     wgPrompt.setFont(promptFont);
     wgPrompt.setText(prompt);
     Point promptSize = wgPrompt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);

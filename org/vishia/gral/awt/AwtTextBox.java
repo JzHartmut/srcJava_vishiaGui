@@ -106,7 +106,7 @@ public class AwtTextBox extends GralTextBox
   { return textFieldSwt;
   }
 
-  @Override public Label getPromptLabelImpl(){ return promptSwt; }
+  @Override public String getPromptLabelImpl(){ return promptSwt.getText(); }
 
   @Override public GralColor setBackgroundColor(GralColor color)
   { return AwtWidgetHelper.setBackgroundColor(color, textFieldSwt);

@@ -261,7 +261,9 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
 
   @Override public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
     , int origin, char direction, float border)
-  { setPosition(pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, border);
+  {
+    pos.setPosition(pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, border);
+    posUsed = false;
   }
 
 

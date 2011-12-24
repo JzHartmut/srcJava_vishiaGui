@@ -56,7 +56,7 @@ public class AwtTextField extends GralTextField
     return null;
   }
 
-  @Override public Label getPromptLabelImpl(){ return promptSwt; }
+  @Override public String getPromptLabelImpl(){ return promptSwt.getText(); }
 
   @Override
   public void redraw()
