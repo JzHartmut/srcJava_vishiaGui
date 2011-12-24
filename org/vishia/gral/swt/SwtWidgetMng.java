@@ -301,8 +301,8 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   	)
   { super(propertiesGui, variableContainer, log);
     this.propertiesGuiSwt = propertiesGui;
-    pos.x = 0; //start-position
-    pos.y = 4 * propertiesGui.yPixelUnit();
+    pos.x.p1 = 0; //start-position
+    pos.y.p1 = 4 * propertiesGui.yPixelUnit();
     
 		userActions.put("syncVariableOnFocus", this.syncVariableOnFocus);
 
@@ -867,10 +867,10 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   		GralColor color = propertiesGui.color(colorValue);
   		int xgrid = propertiesGui.xPixelUnit();
   		int ygrid = propertiesGui.yPixelUnit();
-  		int x1 = (int)((pos.x + xa) * xgrid);
-  		int y1 = (int)((pos.y - ya) * ygrid);
-  		int x2 = (int)((pos.x + xe) * xgrid);
-  		int y2 = (int)((pos.y - ye) * ygrid);
+  		int x1 = (int)((pos.x.p1 + xa) * xgrid);
+  		int y1 = (int)((pos.y.p1 - ya) * ygrid);
+  		int x2 = (int)((pos.x.p1 + xe) * xgrid);
+  		int y2 = (int)((pos.y.p1 - ye) * ygrid);
   		//Any panel which is created in the SWT-implementation is a CanvasStorePanel.
   		//This is because lines should be drawn.
   		((SwtCanvasStorePanel) pos.panel.getPanelImpl()).store.drawLine(color, x1, y1, x2, y2);

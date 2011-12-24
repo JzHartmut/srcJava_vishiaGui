@@ -439,7 +439,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   @Override public void registerWidget(GralWidget widgd)
   {
     GralPanelContent panel = widgd.pos !=null ? widgd.pos.panel : this.pos.panel;
-    if(pos.x < 0 || pos.xEnd <= 0 || pos.y< 0 || pos.yEnd <=0){ 
+    if(pos.x.p1 < 0 || pos.x.p2 <= 0 || pos.y.p1< 0 || pos.y.p2 <=0){ 
       //only widgets with size from right TODO percent size too.
       //widgd.pos = pos.clone();
       //widgd.pos.set(pos);
@@ -636,21 +636,21 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
     int yPixelUnit = propertiesGui.yPixelUnit();
     //calculate pixel
     final int x1,y1, x2, y2;
-    x1 = xPixelUnit * posWidget.x + propertiesGui.xPixelFrac(posWidget.xFrac)  //negative if from right
-       + (posWidget.x < 0 ? widthParentPixel : 0);  //from right
-    y1 = yPixelUnit * posWidget.y + propertiesGui.yPixelFrac(posWidget.yFrac)  //negative if from right
-       + (posWidget.y < 0 ? heightParentPixel : 0);  //from right
-    if(posWidget.xEnd == GralGridPos.useNatSize){
+    x1 = xPixelUnit * posWidget.x.p1 + propertiesGui.xPixelFrac(posWidget.x.p1Frac)  //negative if from right
+       + (posWidget.x.p1 < 0 ? widthParentPixel : 0);  //from right
+    y1 = yPixelUnit * posWidget.y.p1 + propertiesGui.yPixelFrac(posWidget.y.p1Frac)  //negative if from right
+       + (posWidget.y.p1 < 0 ? heightParentPixel : 0);  //from right
+    if(posWidget.x.p2 == GralGridPos.useNatSize){
       x2 = x1 + widthWidgetNat; 
     } else {
-      x2 = xPixelUnit * posWidget.xEnd + propertiesGui.xPixelFrac(posWidget.xEndFrac)  //negative if from right
-         + (posWidget.xEnd < 0 || posWidget.xEnd == 0 && posWidget.xEndFrac == 0 ? widthParentPixel : 0);  //from right
+      x2 = xPixelUnit * posWidget.x.p2 + propertiesGui.xPixelFrac(posWidget.x.p2Frac)  //negative if from right
+         + (posWidget.x.p2 < 0 || posWidget.x.p2 == 0 && posWidget.x.p2Frac == 0 ? widthParentPixel : 0);  //from right
     }
-    if(posWidget.xEnd == GralGridPos.useNatSize){
+    if(posWidget.x.p2 == GralGridPos.useNatSize){
       y2 = y1 + heightWidgetNat; 
     } else {
-      y2 = yPixelUnit * posWidget.yEnd + propertiesGui.yPixelFrac(posWidget.yEndFrac)  //negative if from right
-         + (posWidget.yEnd < 0  || posWidget.yEnd == 0 && posWidget.yEndFrac == 0 ? heightParentPixel : 0);  //from right
+      y2 = yPixelUnit * posWidget.y.p2 + propertiesGui.yPixelFrac(posWidget.y.p2Frac)  //negative if from right
+         + (posWidget.y.p2 < 0  || posWidget.y.p2 == 0 && posWidget.y.p2Frac == 0 ? heightParentPixel : 0);  //from right
     }
     GralRectangle rectangle = new GralRectangle(x1, y1, x2-x1-1, y2-y1-1);
     return rectangle;

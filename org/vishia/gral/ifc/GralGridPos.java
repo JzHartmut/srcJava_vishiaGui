@@ -250,11 +250,14 @@ public class GralGridPos implements Cloneable
   + "   [ [+] <#-?xWidth>[\\.<#?xSizeFrac>]| +* <?xOwnSize> |] [ <?xIncr> ++]"
   + " ] :";
   
+  
+  
+  
   /**The Property for the input parameter to use same, next etc. 
    * This value is used to generate an adequate config file from given input values.
    * The coordinates don't carry the information about that input values.
    */
-  public int parameterDesignation;
+  //public int parameterDesignation;
   
   /**Position of any widget.
    * Generally: There are coordinates in a grid, not in pixel. 
@@ -262,44 +265,41 @@ public class GralGridPos implements Cloneable
    * {@link GralGridPos#useNatSize} on xEnd, yEnd means, that the natural size of the object should be used.
    * 
    */
-  public int x, xEnd, y, yEnd;
+  //public int x, xEnd, y, yEnd;
 
   
   
   /**Fractional part of position.
    * Generally: It is a number from 0 to 9 as part of 1 grid unit.
    */
-  public int xFrac, xEndFrac, yFrac, yEndFrac;
+  //public int xFrac, xEndFrac, yFrac, yEndFrac;
+  
+  /**The values for x and y positions. */
+  public final Pos x = new Pos(), y = new Pos();
   
   /**The border to the next element. */
-  public int xyBorder, xyBorderFrac;
+  //public int xyBorder, xyBorderFrac;
 
   /**Origin of widget, use l, m, r for xOrigin and t, m, b for yOrigin. */
-  public char xOrigin, yOrigin;
+  //public char xOrigin, yOrigin;
   
   /**direction of the next element. Use r, d, l, u. */
-  public char dirNext;
+  //public char dirNext;
   
   /**Relation of x and y left and top to any separation line. 0 - relation to left and top border. */
-  public int xSepLine, ySepLine;
-  /**Relation of xEnd and yEnd right and bottom to any separation line. 
-   * 0 - relation to left and top border. 
-   * positive Index: separation line with this index is left or top. Typical it may be the same index
-   * then for left top position.
-   * negative Index: separation line with negate value as index is right or bottom. */
-  public int xEndSepLine, yEndSepLine;
-
+  //public int xSepLine, ySepLine;
+  
   public GralPanelContent panel;
   
   /**Sets all values of this with the values of pos (copy values)
    * @param pos The src pos
    */
   public void set(GralGridPos pos)
-  { parameterDesignation = pos.parameterDesignation;
-    x = pos.x; xEnd = pos.xEnd; y = pos.y; yEnd = pos.yEnd;
-    xFrac = pos.xFrac; xEndFrac = pos.xEndFrac; yFrac = pos.yFrac; yEndFrac = pos.yEndFrac;
-    xOrigin = pos.xOrigin; yOrigin = pos.yOrigin; xSepLine = pos.xSepLine; ySepLine = pos.ySepLine;
-    dirNext = pos.dirNext;
+  { x.attr = pos.x.attr; y.attr = pos.y.attr; 
+    x.p1 = pos.x.p1; x.p2 = pos.x.p2; y.p1 = pos.y.p1; y.p2 = pos.y.p2;
+    x.p1Frac = pos.x.p1Frac; x.p2Frac = pos.x.p2Frac; y.p1Frac = pos.y.p1Frac; y.p2Frac = pos.y.p2Frac;
+    x.origin = pos.x.origin; y.origin = pos.y.origin; x.sepLine = pos.x.sepLine; y.sepLine = pos.y.sepLine;
+    x.dirNext = pos.x.dirNext; y.dirNext = pos.y.dirNext;
     panel = pos.panel;
   }
   
@@ -330,7 +330,7 @@ public class GralGridPos implements Cloneable
    * @param line The line. If the parameter lineEndOrSize is designated with {@link #size} with a negative value,
    *   it is the bottom line for the position. 
    *   If it is designated with {@link #same} without offset and the lineEndOrSize is designated with {@link #size} 
-   *   with a negative value, the framePos {@link GralGridPos#yEnd} is used. If it is designated
+   *   with a negative value, the framePos {@link GralGridPos#y.p2} is used. If it is designated
    *   with {@link #same} but with any offset, the {@link GralGridPos#y} is used as refer position, it is the top line position.
    *   Elsewhere it is the top position.
    * 
@@ -419,40 +419,51 @@ public class GralGridPos implements Cloneable
     if(origin >0 && origin <=9){
       int yOrigin = (origin-1) /3;
       int xOrigin = origin - yOrigin -1; //0..2
-      this.xOrigin = "lmr".charAt(xOrigin);
-      this.yOrigin = "tmb".charAt(yOrigin);
+      this.x.origin = "lmr".charAt(xOrigin);
+      this.y.origin = "tmb".charAt(yOrigin);
     }
     //calculate y
     int paramDesg1;
-    calc.p = frame.y; calc.pe = frame.yEnd; calc.pf = frame.yFrac; calc.pef = frame.yEndFrac;
-    calc.pd = frame.height(); calc.pDir = "ud".indexOf(frame.dirNext); calc.pOrigin = "tmb".indexOf(frame.yOrigin);
-    if(dirNext == 'u' || dirNext == 'd'){ calc.pb = xyBorder; calc.pbf = xyBorderFrac; } else { calc.pb = calc.pbf = 0; }
-    calc.paramDesg = (parameterDesignation >> kBitParamDesignator_y) & mParamDesignator;
+    calc.p1 = frame.y.p1; calc.p2 = frame.y.p2; calc.p1Frac = frame.y.p1Frac; calc.p2Frac = frame.y.p2Frac;
+    //calc.pd = frame.height(); 
+    //calc.nextDir = "ud".indexOf(frame.dirNext); calc.pOrigin = "tmb".indexOf(frame.yOrigin);
+    //if(dirNext == 'u' || dirNext == 'd'){ calc.pb = xyBorder; calc.pbf = xyBorderFrac; } else { calc.pb = calc.pbf = 0; }
+    //calc.attr = (parameterDesignation >> kBitParamDesignator_y) & mParamDesignator;
     calc.calc(line, yPosFrac, ye, yef);
-    paramDesg1 = calc.paramDesg << kBitParamDesignator_y;
-    this.y = calc.p; this.yEnd = calc.pe; this.yFrac = calc.pf; this.yEndFrac = calc.pef;
-    this.yOrigin = "tmb".charAt(calc.pOrigin); if(calc.pDir >=0){ this.dirNext = calc.pDir == 0 ? 'u': 'd'; }
+    paramDesg1 = calc.attr << kBitParamDesignator_y;
+    this.y.p1 = calc.p1; this.y.p2 = calc.p2; this.y.p1Frac = calc.p1Frac; this.y.p2Frac = calc.p2Frac;
+    //this.yOrigin = "tmb".charAt(calc.pOrigin); if(calc.nextDir >=0){ this.dirNext = calc.nextDir == 0 ? 'u': 'd'; }
     //calculate x
-    calc.p = frame.x; calc.pe = frame.xEnd; calc.pf = frame.xFrac; calc.pef = frame.xEndFrac;
-    calc.pd = frame.width(); calc.pDir = "lr".indexOf(frame.dirNext); calc.pOrigin = "lmr".indexOf(frame.xOrigin);
-    calc.paramDesg = (parameterDesignation >> kBitParamDesignator_x) & mParamDesignator;
-    if(dirNext == 'l' || dirNext == 'r'){ calc.pb = xyBorder; calc.pbf = xyBorderFrac; } else { calc.pb = calc.pbf = 0; }
+    calc.p1 = frame.x.p1; calc.p2 = frame.x.p2; calc.p1Frac = frame.x.p1Frac; calc.p2Frac = frame.x.p2Frac;
+    //calc.pd = frame.width(); 
+    //calc.nextDir = "lr".indexOf(frame.dirNext); calc.pOrigin = "lmr".indexOf(frame.xOrigin);
+    //calc.attr = (parameterDesignation >> kBitParamDesignator_x) & mParamDesignator;
+    //if(dirNext == 'l' || dirNext == 'r'){ calc.pb = xyBorder; calc.pbf = xyBorderFrac; } else { calc.pb = calc.pbf = 0; }
     calc.calc(column, xPosFrac, xe, xef);
-    this.parameterDesignation = calc.paramDesg << kBitParamDesignator_x | paramDesg1;
-    this.x = calc.p; this.xEnd = calc.pe; this.xFrac = calc.pf; this.xEndFrac = calc.pef;
-    this.xOrigin = "lmr".charAt(calc.pOrigin); if(calc.pDir >=0){ this.dirNext = calc.pDir == 0 ? 'l': 'r'; }
+    //this.parameterDesignation = calc.attr << kBitParamDesignator_x | paramDesg1;
+    this.x.p1 = calc.p1; this.x.p2 = calc.p2; this.x.p1Frac = calc.p1Frac; this.x.p2Frac = calc.p2Frac;
+    //this.xOrigin = "lmr".charAt(calc.pOrigin); if(calc.nextDir >=0){ this.dirNext = calc.nextDir == 0 ? 'l': 'r'; }
     
-    if("rlud".indexOf(direction)>=0 ){
-      this.dirNext = direction;
-      this.xyBorder = border;
-      this.xyBorderFrac = borderFrac;
+    if("rl".indexOf(direction)>=0 ){
+      this.x.dirNext = direction;
+      this.y.dirNext = '.';
+      this.x.pb = border;
+      this.x.pbf = borderFrac;
+      this.y.pb = this.y.pbf = 0;
+    } else if("ud".indexOf(direction)>=0 ){
+      this.y.dirNext = direction;
+      this.x.dirNext = '.';
+      this.y.pb = border;
+      this.y.pbf = borderFrac;
+      this.x.pb = this.x.pbf = 0;
     } else {
-      this.dirNext = frame.dirNext;
-      this.xyBorder = frame.xyBorder;
-      this.xyBorderFrac = frame.xyBorderFrac;
+      this.x.dirNext = frame.x.dirNext;
+      this.y.dirNext = frame.y.dirNext;
+      this.x.pb = this.x.pbf = 0;
+      this.y.pb = this.y.pbf = 0;
     }
-    assert(xFrac >=0 && xFrac < 10 && yFrac >=0 && yFrac < 10 );
-    assert(xEndFrac >=0 && xEndFrac < 10 && yEndFrac >=0 && yEndFrac < 10 );
+    assert(x.p1Frac >=0 && x.p1Frac < 10 && y.p1Frac >=0 && y.p1Frac < 10 );
+    assert(x.p2Frac >=0 && x.p2Frac < 10 && y.p2Frac >=0 && y.p2Frac < 10 );
   }
   
   
@@ -468,11 +479,11 @@ public class GralGridPos implements Cloneable
       //xSize = width >0 ? width: -width;
       //this.xSizeFrac = xSizeFrac;
     }
-    if(height >0){ this.yOrigin = 't'; }
-    else if(height < 0){ this.yOrigin = 'b'; }
+    if(height >0){ this.y.origin = 't'; }
+    else if(height < 0){ this.y.origin = 'b'; }
     else; //let it unchanged if height == 0
-    if(width >0){ this.xOrigin = 'l'; }
-    else if(width < 0){ this.xOrigin = 'r'; }
+    if(width >0){ this.x.origin = 'l'; }
+    else if(width < 0){ this.x.origin = 'r'; }
     else; //let it unchanged if width == 0
   }
   
@@ -495,14 +506,14 @@ public class GralGridPos implements Cloneable
     float dx3 = this.width();
     float dy3 = this.height();
     int dx = (int)dx3;
-    int dxf = (int)((dx3 - dx) * 10.001F) + this.xEndFrac;
+    int dxf = (int)((dx3 - dx) * 10.001F) + this.x.p2Frac;
     if(dxf >= 10){ dxf -=10; dx +=1; }
     int dy = (int)dy3;
-    int dyf = (int)((dy3 - dy) * 10.001F) + this.yEndFrac;
+    int dyf = (int)((dy3 - dy) * 10.001F) + this.y.p2Frac;
     if(dyf >= 10){ dyf -=10; dy +=1; }
     switch(this.dirNext){
-    case 'r': this.x = this.xEnd; this.xFrac = this.xEndFrac; this.xEnd = this.x + dx; this.xEndFrac = dxf; break;
-    case 'd': this.y = this.yEnd; this.yFrac = this.yEndFrac; this.yEnd = this.y + dy; this.yEndFrac = dyf; break;
+    case 'r': this.x = this.x.p2; this.x.p1Frac = this.x.p2Frac; this.x.p2 = this.x + dx; this.x.p2Frac = dxf; break;
+    case 'd': this.y = this.y.p2; this.y.p1Frac = this.y.p2Frac; this.y.p2 = this.y + dy; this.y.p2Frac = dyf; break;
     }
     */
   }
@@ -515,24 +526,24 @@ public class GralGridPos implements Cloneable
   
   public float height()
   { float height;
-    if(y * yEnd >= 0){
-      height = yEnd - y;
-      if((parameterDesignation & mBitSizeNeg)!=0) {
+    if(y.p1 * y.p2 >= 0){
+      height = y.p2 - y.p1;
+      if((y.attr & mBitSizeNeg)!=0) {
         height = -height;
       }
     }
     else{ 
       height = 2.0F;  //not able to determine, use default.
     }
-    height += (yEndFrac - yFrac) * 0.1F;
+    height += (y.p2Frac - y.p1Frac) * 0.1F;
     return height;
   }
   
   
   public float width()
   { float width;
-    if(x > 0 && xEnd > 0){ width = xEnd - x + (xEndFrac - xFrac) * 0.1F; }
-    else if(x < 0 && xEnd < 0){ width = xEnd - x + (xEndFrac - xFrac) * 0.1F; }
+    if(y.p1 > 0 && x.p2 > 0){ width = x.p2 - y.p1 + (x.p2Frac - x.p1Frac) * 0.1F; }
+    else if(x.p1 < 0 && x.p2 < 0){ width = x.p2 - x.p1 + (x.p2Frac - x.p1Frac) * 0.1F; }
     else { width = 0.0F; } //not able to determine, use default.
     return width;
   }
@@ -550,18 +561,18 @@ public class GralGridPos implements Cloneable
    */
   @Override public String toString()
   { return "panel=" + (panel == null ? "?" : panel.toString()) + ", "
-    +"line=" + y + "." + yFrac + ".." + yEnd + "." + yEndFrac + " col=" + x + "." + xFrac + ".." + xEnd + "." + xEndFrac + " " + dirNext + yOrigin + xOrigin;
+    +"line=" + y + "." + y.p1Frac + ".." + y.p2 + "." + y.p2Frac + " col=" + x + "." + x.p1Frac + ".." + x.p2 + "." + x.p2Frac + " " + x.dirNext + y.dirNext + y.origin + x.origin;
   }
 
   
   //Inner class to calculate for x and y.   
   class Calc{
     /**Values from parent or frame. */
-    int p, pf, pe, pef, pb, pbf;
-    int paramDesg;
-    float pd;
-    int pDir;  //0 for up or left, 1 for down or right, -1 else 
-    int pOrigin;
+    int p1, p1Frac, p2, p2Frac, pb, pbf;
+    int attr;
+    //float pd;
+    //int nextDir;  //0 for up or left, 1 for down or right, -1 else 
+    //int pOrigin;
     
     void calc(final int z, final int zf, final int ze, final int zef)
     {
@@ -569,10 +580,10 @@ public class GralGridPos implements Cloneable
       final int q, qf, qe, qef;
       int qParamDesg = 0;
       final boolean bxSizeNeg;
-      int pSize = p >=0 && pe >=0 ? pe - p + pb:
-                        p <0 && pe <0 ? p - pe + pb:
+      int pSize = p1 >=0 && p2 >=0 ? p2 - p1 + pb:
+                        p1 <0 && p2 <0 ? p1 - p2 + pb:
                         -1;
-      int pfSize = pef - pf + pbf;
+      int pfSize = p2Frac - p1Frac + pbf;
       if(pfSize < 0 ){ pfSize +=10; pSize -=1; }
       
       //check input parameter ze of size and negative size
@@ -595,7 +606,7 @@ public class GralGridPos implements Cloneable
         case 0 + refer: {
           testCase = 2;                           //q = z
           q = z; qf = zf;                         //qe = pe + refer
-          qe = pe + (ze - refer); qef = pef + zef;
+          qe = p2 + (ze - refer); qef = p2Frac + zef;
         } break;
         //
         case 0 + size: {
@@ -611,78 +622,78 @@ public class GralGridPos implements Cloneable
         //
         case 0 + samesize: {
           testCase = 4;
-          if( (paramDesg & mBitSizeNeg) !=0){     //was the last size negative? the qe is base
+          if( (attr & mBitSizeNeg) !=0){     //was the last size negative? the qe is base
             qe = z; qef = zf;                     //qe = z
-            q = qe - (pe - p) + (ze - samesize);  //q = qe - lastsize + sizediff 
-            qf = qef + (pef - pf) + zef;
+            q = qe - (p2 - p1) + (ze - samesize);  //q = qe - lastsize + sizediff 
+            qf = qef + (p2Frac - p1Frac) + zef;
           } else {
             q = z; qf = zf;                       //q = z 
-            qe = q + (pe - p) + (ze - samesize);  //qe = q + lastsize + sizediff 
-            qef = qf + (pef - pf) + zef;
+            qe = q + (p2 - p1) + (ze - samesize);  //qe = q + lastsize + sizediff 
+            qef = qf + (p2Frac - p1Frac) + zef;
           }
         } break;
         //
         case (refer<<16) + 0: {
           testCase = 5;
-          q = p + (z - refer); qf = pf + zf;      //q = p + refer 
+          q = p1 + (z - refer); qf = p1Frac + zf;      //q = p + refer 
           qe = ze; qef = zef;                     //qe = ze
         } break;
         //
         case (refer<<16) + refer: {
           testCase = 1;
-          q = p + (z - refer); qf = pf + zf;        //q = p + refer
-          qe = pe + (ze - refer); qef = pef + zef;  //qe = pe + refer
+          q = p1 + (z - refer); qf = p1Frac + zf;        //q = p + refer
+          qe = p2 + (ze - refer); qef = p2Frac + zef;  //qe = pe + refer
         } break;
         //
         case (refer<<16) + size: {
           testCase = 6;
           if(zeNeg){ 
-            qe = pe + (z - refer); qef = pef + zf; //qe = pe + refer, z is the bottom/right pos 
+            qe = p2 + (z - refer); qef = p2Frac + zf; //qe = pe + refer, z is the bottom/right pos 
             q = qe + (ze - size); qf = qef - zef;     //q = qe - size
           } else {
-            q = p + z - refer; qf = pf + zf;        //q = p + refer
+            q = p1 + z - refer; qf = p1Frac + zf;        //q = p + refer
             qe = q + (ze - size); qef = qf + zef;   //qe = q + size
           }
         } break;
         //
         case (refer<<16) + samesize: {
           testCase = 7;
-          if( (paramDesg & mBitSizeNeg) !=0){       
-            q = z - (pe - p) + ze - samesize; qf = zf - (pef - pf);
-            qe = pe + z - refer; qef = zef; 
+          if( (attr & mBitSizeNeg) !=0){       
+            q = z - (p2 - p1) + ze - samesize; qf = zf - (p2Frac - p1Frac);
+            qe = p2 + z - refer; qef = zef; 
           } else {
-            q = p + (z - refer); qf = pf + zf;      //q = p + refer
-            qe = q + (pe - p) + (ze - samesize);    //qe = q + lastsize + sizediff 
-            qef = qf + (pef - pf) + zef;
+            q = p1 + (z - refer); qf = p1Frac + zf;      //q = p + refer
+            qe = q + (p2 - p1) + (ze - samesize);    //qe = q + lastsize + sizediff 
+            qef = qf + (p2Frac - p1Frac) + zef;
           }
         } break;
         //
         case (next<<16) + refer: {
           testCase = 8;
-          q = pe + pb; qf = pef + pbf;              //q = pe + pb  the next right/down
-          qe = q + (pe - p) + (ze - refer); qef = qf + (pef - pf) + zef;     //qe = q + (pe - p) + refer  
+          q = p2 + pb; qf = p2Frac + pbf;              //q = pe + pb  the next right/down
+          qe = q + (p2 - p1) + (ze - refer); qef = qf + (p2Frac - p1Frac) + zef;     //qe = q + (pe - p) + refer  
         } break;
         //
         case (next<<16) + size: {
           testCase = 10;
           assert(false);
           if(zeNeg){ 
-            qe = pe + pe - p + z - refer; qef = zef; 
-            q = pe + pb + z - size; qf = zf;
+            qe = p2 + p2 - p1 + z - refer; qef = zef; 
+            q = p2 + pb + z - size; qf = zf;
           } else {
-            q = p + z - refer; qf = zf; 
+            q = p1 + z - refer; qf = zf; 
             qe = ze - size; qef = zef;
           }
         } break;
         //
         case (next<<16) + samesize: {
           testCase = 9;
-          if( (paramDesg & mBitSizeNeg) !=0){ 
-            qe = pe + (pe - p) + pb; qef = pef + (pef - pf) + pbf; 
-            q = qe - (pe - p) + (ze - samesize); qf = qef - (pef - pf) + zef;
+          if( (attr & mBitSizeNeg) !=0){ 
+            qe = p2 + (p2 - p1) + pb; qef = p2Frac + (p2Frac - p1Frac) + pbf; 
+            q = qe - (p2 - p1) + (ze - samesize); qf = qef - (p2Frac - p1Frac) + zef;
           } else {                               //same as next, refer
-            q = pe + pb; qf = pef + pbf;         //q = pe + pb the next right/down
-            qe = q + (pe - p) + ze - samesize; qef = qf + (pef - pf) + zef; 
+            q = p2 + pb; qf = p2Frac + pbf;         //q = pe + pb the next right/down
+            qe = q + (p2 - p1) + ze - samesize; qef = qf + (p2Frac - p1Frac) + zef; 
           }
         } break;
         default: 
@@ -782,22 +793,22 @@ public class GralGridPos implements Cloneable
       assert(q < qe || qe <=0);
       assert(q > -1000 && q < 1000 && qe > -1000 && qe < 1000);
       if(qf >= 10){
-        p = q +1; pf = qf -10;
+        p1 = q +1; p1Frac = qf -10;
       } else if(qf < 0){
-        p = q - 1; pf = qf +10;
+        p1 = q - 1; p1Frac = qf +10;
       } else {
-        p = q; pf = qf;   
+        p1 = q; p1Frac = qf;   
       }
       if(qef >= 10){
-        pe = qe +1; pef = qef -10;
+        p2 = qe +1; p2Frac = qef -10;
       } else if(qef < 0){
-        pe = qe - 1; pef = qef +10;
+        p2 = qe - 1; p2Frac = qef +10;
       } else {
-        pe = qe; pef = qef;   
+        p2 = qe; p2Frac = qef;   
       }
-      assert(pf >=0 && pf <=9 && pef >=0 && pef <=9 );
-      this.paramDesg = qParamDesg;
-      if(pOrigin <0){ pOrigin = 0; } //set default if not determined. 
+      assert(p1Frac >=0 && p1Frac <=9 && p2Frac >=0 && p2Frac <=9 );
+      this.attr = qParamDesg;
+//      if(pOrigin <0){ pOrigin = 0; } //set default if not determined. 
     }//calc
   }//class Calc method-local
 
@@ -806,6 +817,27 @@ public class GralGridPos implements Cloneable
   void stop(){}
 
   
-  
+  public static class Pos
+  {
+    public int p1, p1Frac, p2, p2Frac, pb, pbf;
+    public int attr;
+    
+    char origin;
+    
+    /**direction of the next element. Use r, d, l, u. */
+    public char dirNext;
+
+    
+    /**Relation of x and y left and top to any separation line. 0 - relation to left and top border. */
+    public int sepLine;
+    /**Relation of xEnd and yEnd right and bottom to any separation line. 
+     * 0 - relation to left and top border. 
+     * positive Index: separation line with this index is left or top. Typical it may be the same index
+     * then for left top position.
+     * negative Index: separation line with negate value as index is right or bottom. */
+    public int endSepLine;
+
+
+  }
   
 }
