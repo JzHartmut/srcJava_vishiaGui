@@ -415,34 +415,15 @@ public class GralGridPos implements Cloneable
       stop();
     //
     if(frame == null){ frame = this; }
-    Calc calc = new Calc();
     if(origin >0 && origin <=9){
       int yOrigin = (origin-1) /3;
       int xOrigin = origin - yOrigin -1; //0..2
       this.x.origin = "lmr".charAt(xOrigin);
       this.y.origin = "tmb".charAt(yOrigin);
     }
-    //calculate y
-    int paramDesg1;
-    calc.p1 = frame.y.p1; calc.p2 = frame.y.p2; calc.p1Frac = frame.y.p1Frac; calc.p2Frac = frame.y.p2Frac;
-    //calc.pd = frame.height(); 
-    //calc.nextDir = "ud".indexOf(frame.dirNext); calc.pOrigin = "tmb".indexOf(frame.yOrigin);
-    //if(dirNext == 'u' || dirNext == 'd'){ calc.pb = xyBorder; calc.pbf = xyBorderFrac; } else { calc.pb = calc.pbf = 0; }
-    //calc.attr = (parameterDesignation >> kBitParamDesignator_y) & mParamDesignator;
-    calc.calc(line, yPosFrac, ye, yef);
-    paramDesg1 = calc.attr << kBitParamDesignator_y;
-    this.y.p1 = calc.p1; this.y.p2 = calc.p2; this.y.p1Frac = calc.p1Frac; this.y.p2Frac = calc.p2Frac;
-    //this.yOrigin = "tmb".charAt(calc.pOrigin); if(calc.nextDir >=0){ this.dirNext = calc.nextDir == 0 ? 'u': 'd'; }
-    //calculate x
-    calc.p1 = frame.x.p1; calc.p2 = frame.x.p2; calc.p1Frac = frame.x.p1Frac; calc.p2Frac = frame.x.p2Frac;
-    //calc.pd = frame.width(); 
-    //calc.nextDir = "lr".indexOf(frame.dirNext); calc.pOrigin = "lmr".indexOf(frame.xOrigin);
-    //calc.attr = (parameterDesignation >> kBitParamDesignator_x) & mParamDesignator;
-    //if(dirNext == 'l' || dirNext == 'r'){ calc.pb = xyBorder; calc.pbf = xyBorderFrac; } else { calc.pb = calc.pbf = 0; }
-    calc.calc(column, xPosFrac, xe, xef);
-    //this.parameterDesignation = calc.attr << kBitParamDesignator_x | paramDesg1;
-    this.x.p1 = calc.p1; this.x.p2 = calc.p2; this.x.p1Frac = calc.p1Frac; this.x.p2Frac = calc.p2Frac;
-    //this.xOrigin = "lmr".charAt(calc.pOrigin); if(calc.nextDir >=0){ this.dirNext = calc.nextDir == 0 ? 'l': 'r'; }
+    
+    y.set(line, yPosFrac, ye, yef);
+    x.set(column, xPosFrac, xe, xef);
     
     if("rl".indexOf(direction)>=0 ){
       this.x.dirNext = direction;
@@ -565,16 +546,31 @@ public class GralGridPos implements Cloneable
   }
 
   
-  //Inner class to calculate for x and y.   
-  class Calc{
-    /**Values from parent or frame. */
-    int p1, p1Frac, p2, p2Frac, pb, pbf;
-    int attr;
-    //float pd;
-    //int nextDir;  //0 for up or left, 1 for down or right, -1 else 
-    //int pOrigin;
+  
+  void stop(){}
+
+  
+  public static class Pos
+  {
+    public int p1, p1Frac, p2, p2Frac, pb, pbf;
+    public int attr;
     
-    void calc(final int z, final int zf, final int ze, final int zef)
+    char origin;
+    
+    /**direction of the next element. Use r, d, l, u. */
+    public char dirNext;
+
+    
+    /**Relation of x and y left and top to any separation line. 0 - relation to left and top border. */
+    public int sepLine;
+    /**Relation of xEnd and yEnd right and bottom to any separation line. 
+     * 0 - relation to left and top border. 
+     * positive Index: separation line with this index is left or top. Typical it may be the same index
+     * then for left top position.
+     * negative Index: separation line with negate value as index is right or bottom. */
+    public int endSepLine;
+
+    void set(final int z, final int zf, final int ze, final int zef)
     {
       /**User final local variable to set p, pf, pe, pef to check whether all variants are regarded. */
       final int q, qf, qe, qef;
@@ -703,93 +699,6 @@ public class GralGridPos implements Cloneable
           qe = ze; qef = zef;
       }
       
-      /*      
-      //position. It is either the top/left or the bottom/right value.
-      final int qz, qzf;
-      
-      //refer position from the related position. It is either the top / left value or the bottom /right value,
-      //depending of given size or the size designation from the related position.
-      int pRefer, pfRefer;
-      if((paramDesg & mBitSizeNeg)!=0 || bzeSizeNeg){ 
-        pRefer = pe;  pfRefer = pef;    //size was negative: refer from end if size is given.
-      } else { pRefer = p;  pfRefer = pf; }
-      
-      //check the ranges of input parameter. There are added constants.
-      //check z: set z to the absolute value, positive or negative.
-      if(  z > (GralGridPos.same - GralGridPos.mValueRange_)
-          && z < (GralGridPos.same + GralGridPos.mValueRange_)
-        ){
-        //related value to frame or previous position
-        qParamDesg |= mBitRel;
-        //add parent position:
-        qz = pRefer + z - same;
-        qzf = pfRefer;
-        //NOTE: q, qe will be set after ze is checked.
-      } else if( z == next || z == nextBlock){
-        if(this.pDir == 1){
-          qz = pRefer + pSize;
-          qzf = pfRefer + pfSize;
-        } else { 
-          qz = pRefer; 
-          qzf = pfRefer;
-        }
-      } else {
-        qz = z;
-        qzf = zf;
-      }
-      //check ze: set the final positions q...
-      if(  ze > (GralGridPos.same - GralGridPos.mValueRange_)
-        && ze < (GralGridPos.same + GralGridPos.mValueRange_)
-        ){ 
-        //related end value to frame or previous position
-        qParamDesg |= mBitRelEnd;
-        //regard maybe related position in z,zf for start. 
-        if((qParamDesg & mBitRel)!=0){
-          q = qz + p; qf = qzf + pf;
-        } else {
-          q = qz; qf = qzf;
-        }
-        qe = ze-same + pe; qef = zef + pf; 
-      } else if( bzeSize){
-         
-        //size value
-        qParamDesg |= mBitSize;
-        if(bxSizeNeg = (ze < size)){
-          qParamDesg |= mBitSizeNeg;
-          ///
-          //ze = -ze;  //positive
-          //the left/top is the given position - size
-          q = qz + ze -size; qf = qzf + zef;     //Note: q < z because (ze - size) is negative. z is the end position.  
-          //the end position is the given position.
-          qe = qz; qef = qzf;           
-        } else {
-          q = qz; qf = qzf;
-          qe = qz + ze-size; qef = qzf + zef;
-        }
-        //
-      } else if(  ze > (GralGridPos.size + GralGridPos.same- GralGridPos.mValueRange_)
-               && ze < (GralGridPos.size + GralGridPos.same + GralGridPos.mValueRange_)
-               ){
-        //size value related to frame or previous size
-        qParamDesg |= mBitSize + mBitRelEnd;
-        bxSizeNeg = (this.paramDesg & mBitSizeNeg) !=0;  //the referred pos has negative size
-        if(bxSizeNeg){
-          qParamDesg |= mBitSizeNeg;
-          ///
-          q = qz - ze -(size+same) + pSize; 
-          qf = qzf - zef + pfSize;  //the left/top is the given position - size
-          qe = qz; qef = qzf;           //the end position is the given position.
-        } else {
-          q = qz; qf = qzf;
-          qe = qz + ze; qef = qzf + zef;
-        }
-        
-      } else {
-        //without special designatin, use the position like given
-        q = qz; qf = qzf;
-        qe = ze; qef = zef;
-      }
-      */      
       assert(q < qe || qe <=0);
       assert(q > -1000 && q < 1000 && qe > -1000 && qe < 1000);
       if(qf >= 10){
@@ -810,32 +719,6 @@ public class GralGridPos implements Cloneable
       this.attr = qParamDesg;
 //      if(pOrigin <0){ pOrigin = 0; } //set default if not determined. 
     }//calc
-  }//class Calc method-local
-
-  
-  
-  void stop(){}
-
-  
-  public static class Pos
-  {
-    public int p1, p1Frac, p2, p2Frac, pb, pbf;
-    public int attr;
-    
-    char origin;
-    
-    /**direction of the next element. Use r, d, l, u. */
-    public char dirNext;
-
-    
-    /**Relation of x and y left and top to any separation line. 0 - relation to left and top border. */
-    public int sepLine;
-    /**Relation of xEnd and yEnd right and bottom to any separation line. 
-     * 0 - relation to left and top border. 
-     * positive Index: separation line with this index is left or top. Typical it may be the same index
-     * then for left top position.
-     * negative Index: separation line with negate value as index is right or bottom. */
-    public int endSepLine;
 
 
   }
