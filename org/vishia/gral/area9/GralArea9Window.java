@@ -11,7 +11,7 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
-import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
@@ -176,7 +176,7 @@ public class GralArea9Window implements GralArea9_ifc
       } catch(Exception exc){ window.gralMng.writeLog(0, exc); }
       //
       window.gralMng.selectPanel("primaryWindow");
-      window.gralMng.setPosition(0,10,15,GralGridPos.size + 40,0,'.');
+      window.gralMng.setPosition(0,10,15,GralPos.size + 40,0,'.');
       infoAbout = window.gralMng.createInfoBox("About", "About");
       try{
         for(String line: mainCmd.listAboutInfo){

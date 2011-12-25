@@ -19,7 +19,7 @@ import org.vishia.gral.base.GralTable;
  * This interface allows to deal with the table procured by the wrapper. See the derived interfaces of {@link GralWidget_ifc}.  
  * The {@link GralWidget_ifc} allows some fundamental operations with any widget like {@link GralWidget_ifc#setFocus()}. 
  * <br><br>
- * The Widget knows its {@link GralGridPos} at its panel where it is placed. The panel knows all widgets
+ * The Widget knows its {@link GralPos} at its panel where it is placed. The panel knows all widgets
  * which are placed there (widgetList).
  * <br><br>
  * The user can invoke the methods of the widget to animate it in a GUI etc, for example {@link #setBackColor(GralColor, int)}
@@ -106,7 +106,7 @@ public abstract class GralWidget implements GralWidget_ifc
 	public String name;
 	
 	/**The position of the widget. It may be null if the widget should not be resized. */
-	public final GralGridPos pos;  
+	public final GralPos pos;  
 	
 	
 	/**Panel where the widget is member of. */

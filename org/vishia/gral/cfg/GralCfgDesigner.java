@@ -2,7 +2,7 @@ package org.vishia.gral.cfg;
 
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
@@ -72,7 +72,7 @@ public class GralCfgDesigner
   public void initGui()
   {
     assert(dialogWindowProps == null); //check call only one time.
-    mng.setPosition(-32, GralGridPos.size +32, -40, GralGridPos.size +40, 1, 'r');
+    mng.setPosition(-32, GralPos.size +32, -40, GralPos.size +40, 1, 'r');
     dialogWindowProps = mng.createWindow("widgetEdit", "Widget Properties", GralWindow.windConcurrently);
     mng.setPositionSize(0, 0, 3, 34, 'd');
     dialogFieldName = mng.addTextField("name", true, "name", "t");

@@ -28,7 +28,7 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
-import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
@@ -93,12 +93,12 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
       final Font promptFont;
       char sizeFontPrompt;
       GralRectangle boundsAll, boundsPrompt, boundsField;
-      final GralGridPos posPrompt = new GralGridPos(), posField = new GralGridPos();
+      final GralPos posPrompt = new GralPos(), posField = new GralPos();
       boundsAll = calcWidgetPosAndSize(this.pos, 800, 600, 100, 20);
       float ySize = pos.height();
       //float xSize = pos.width();
-          posPrompt.setPosition(this.pos, GralGridPos.same, ySize * 0.37f + GralGridPos.size, GralGridPos.same, GralGridPos.same, 0, '.');
-          posField.setPosition(this.pos, GralGridPos.refer + ySize * 0.37f, GralGridPos.same, GralGridPos.same, GralGridPos.same, 0, '.');
+          posPrompt.setPosition(this.pos, GralPos.same, ySize * 0.37f + GralPos.size, GralPos.same, GralPos.same, 0, '.');
+          posField.setPosition(this.pos, GralPos.refer + ySize * 0.37f, GralPos.same, GralPos.same, GralPos.same, 0, '.');
       promptFont = propertiesGuiAwt.smallPromptFont;
       boundsPrompt = calcWidgetPosAndSize(posPrompt, boundsAll.dx, boundsAll.dy, 10,100);
       boundsField = calcWidgetPosAndSize(posField, boundsAll.dx, boundsAll.dy, 10,100);
@@ -489,7 +489,7 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   }
 
   @Override
-  public boolean setWindowsVisible(GralWindow_ifc window, GralGridPos atPos)
+  public boolean setWindowsVisible(GralWindow_ifc window, GralPos atPos)
   {
     // TODO Auto-generated method stub
     return false;

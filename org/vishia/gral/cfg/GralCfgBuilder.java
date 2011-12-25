@@ -10,7 +10,7 @@ import java.util.TreeMap;
 import org.vishia.gral.cfg.GralCfgElement;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
-import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.msgDispatch.LogMessage;
@@ -178,8 +178,8 @@ public class GralCfgBuilder
     //
     if(pos.xWidth == Integer.MAX_VALUE)
       stop();
-    int heightArg = pos.ySizeDown == Integer.MAX_VALUE ? GralGridPos.useNatSize : pos.ySizeDown + GralGridPos.size;
-    int widthArg = pos.xWidth == Integer.MAX_VALUE ? GralGridPos.useNatSize : pos.xWidth + GralGridPos.size;
+    int heightArg = pos.ySizeDown == Integer.MAX_VALUE ? GralPos.useNatSize : pos.ySizeDown + GralPos.size;
+    int widthArg = pos.xWidth == Integer.MAX_VALUE ? GralPos.useNatSize : pos.xWidth + GralPos.size;
     gui.setFinePosition(pos.yPos, pos.yPosFrac, heightArg, pos.ySizeFrac
         , pos.xPos, pos.xPosFrac, widthArg, pos.xSizeFrac, 1, dirNext, 0, 0, null);
     //

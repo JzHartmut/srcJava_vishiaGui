@@ -9,7 +9,7 @@ import org.vishia.commander.target.FcmdtTarget_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
@@ -30,7 +30,7 @@ public class FcmdCopyCmd
   
   GralWindow_ifc windConfirmCopy;
   
-  GralGridPos posWindConfirmCopy;
+  GralPos posWindConfirmCopy;
   
   //GralWidget widgdCopyFrom, widgdCopyTo;
   
@@ -61,27 +61,27 @@ public class FcmdCopyCmd
     windConfirmCopy = main.gralMng.createWindow("copyWindow", "confirm copy", GralWindow.windConcurrently);
     //System.out.println(" window: " + main.gralMng.pos.panel.getPixelPositionSize().toString());
     
-    main.gralMng.setPosition(2, GralGridPos.size -2, 1, GralGridPos.size +45, 0, 'd');
+    main.gralMng.setPosition(2, GralPos.size -2, 1, GralPos.size +45, 0, 'd');
     main.gralMng.addText("source:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
     widgCopyFrom = main.gralMng.addTextField("copyFrom", false, null, "t");
     main.gralMng.addText("destination dir path:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
     widgCopyDirDst = main.gralMng.addTextField("copyDirDst", true, null, "t");
     main.gralMng.addText("destination filename:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    main.gralMng.setPosition(GralGridPos.refer + 2, GralGridPos.size -2, 1, 25, 0, 'r');
+    main.gralMng.setPosition(GralPos.refer + 2, GralPos.size -2, 1, 25, 0, 'r');
     widgCopyNameDst = main.gralMng.addTextField("copyNameDst", true, null, "t");
-    main.gralMng.setPosition(GralGridPos.refer, GralGridPos.size -2, 26, 0, 0, 'r');
+    main.gralMng.setPosition(GralPos.refer, GralPos.size -2, 26, 0, 0, 'r');
     widgCopyState = main.gralMng.addTextField("copyStatus", false, null, "t");
     
-    main.gralMng.setPosition(GralGridPos.refer+3.5f, GralGridPos.size -3, 1, 15, 0, 'r');
+    main.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size -3, 1, 15, 0, 'r');
     widgdOverwrite = main.gralMng.addButton("copyOverwrite", null, null, null, null, "overwrite this");
-    main.gralMng.setPosition(GralGridPos.same, GralGridPos.size -3, 16, 30, 0, 'r');
+    main.gralMng.setPosition(GralPos.same, GralPos.size -3, 16, 30, 0, 'r');
     widgdOverwrite = main.gralMng.addSwitchButton("copyOverwrite", null, null, null, null, "overwrite all", "wh", "gn");
-    main.gralMng.setPosition(GralGridPos.same, GralGridPos.size -3, 31, -1, 0, 'r');
+    main.gralMng.setPosition(GralPos.same, GralPos.size -3, 31, -1, 0, 'r');
     widgdOverwrite = main.gralMng.addSwitchButton("copyOverwriteReadonly", null, null, null, null, "overwr all readonly", "wh", "gn");
 
-    main.gralMng.setPosition(GralGridPos.refer+3.5f, GralGridPos.size -3, 1, 15, 0, 'r');
+    main.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size -3, 1, 15, 0, 'r');
     widgdOverwrite = main.gralMng.addButton("copyOverwrite", null, null, null, null, "skip");
-    main.gralMng.setPosition(GralGridPos.same, GralGridPos.size -3, 16, 30, 0, 'r');
+    main.gralMng.setPosition(GralPos.same, GralPos.size -3, 16, 30, 0, 'r');
     widgdOverwrite = main.gralMng.addButton("copyOverwrite", null, null, null, null, "skip dir");
     
     main.gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
@@ -89,7 +89,7 @@ public class FcmdCopyCmd
     main.gralMng.setPosition(-2, -0.5f, 7, -7, 0, 'r');
     widgdProgress = main.gralMng.addValueBar("copyProgress", null, null);
     //main.gralMng.setPosition(GralGridPos.same, GralGridPos.size-3, -6, -1, 0, 'r');
-    main.gralMng.setPosition(-1, GralGridPos.size-3, -6, -1, 0, 'r');
+    main.gralMng.setPosition(-1, GralPos.size-3, -6, -1, 0, 'r');
     main.gralMng.addButton("copyOk", actionDoCopy, "ok", null, null, "OK");
   
   }

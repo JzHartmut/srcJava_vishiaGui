@@ -20,7 +20,7 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
-import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
@@ -178,7 +178,7 @@ public class Fcmd extends GuiCfg
     gralMng.setPosition(0, 2, 10, 0, 1, 'r');
     widgFileInfo = gralMng.addTextField(nameTextFieldInfo, false, null, null);
     
-    gralMng.setPosition(2, GralGridPos.size + 1, 10, 20, 1, 'r');
+    gralMng.setPosition(2, GralPos.size + 1, 10, 20, 1, 'r');
     gralMng.addText("F1", 'A', 0x0);
     gralMng.addText("F2", 'A', 0x0);
     gralMng.addText("F3", 'A', 0x0);

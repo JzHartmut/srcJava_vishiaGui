@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
-import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 
 /**This class is the implementation class of a simple graphic implementation for SWT.

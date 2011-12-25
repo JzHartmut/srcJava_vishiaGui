@@ -11,7 +11,7 @@ import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralFactory_ifc;
-import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.swt.FactorySwt;
@@ -134,7 +134,7 @@ public class ExampleSimpleButton
       gui.widgInput = gui.gralMng.addTextField("input", true, null, "t");
       //Sets the position of the next widget, the button, relative to the last one, 5 lines deeper.
       //Use size instead an line position. 
-      gui.gralMng.setPosition(GralGridPos.same+5, GralGridPos.size +3, 2, GralGridPos.size +10, 0, '.');
+      gui.gralMng.setPosition(GralPos.same+5, GralPos.size +3, 2, GralPos.size +10, 0, '.');
       gui.widgButton = gui.gralMng.addButton("button", actionButtonCode, "test", null, null, "Hello");
       //
       //The button can be presented with colors. Use named colors 'Pastel GreeN' and 'Pastel YEllow'.

@@ -1,14 +1,14 @@
 package org.vishia.gral.base;
 
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
 
 /**This class represents a window of an application.
- * The {@link GralGridPos#pos} of the baseclass is the position of the window derived from any other 
+ * The {@link GralPos#pos} of the baseclass is the position of the window derived from any other 
  * Position.
  * @author Hartmut Schorrig
  *

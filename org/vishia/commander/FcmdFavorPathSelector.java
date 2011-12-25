@@ -14,7 +14,7 @@ import java.util.TreeMap;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -143,12 +143,12 @@ class FcmdFavorPathSelector
 
     windAddFavorite.window = main.gralMng.createWindow("addFavoriteWindow", "add favorite", GralWindow.windConcurrently);
     
-    main.gralMng.setPosition(4, GralGridPos.size -4, 1, GralGridPos.size +34, 0, 'r');
+    main.gralMng.setPosition(4, GralPos.size -4, 1, GralPos.size +34, 0, 'r');
     windAddFavorite.widgLabel = main.gralMng.addTextField("addFavoriteTab", true, "label", "t");
-    main.gralMng.setPosition(4, GralGridPos.size -4, 35, GralGridPos.size +10, 0, 'r');
+    main.gralMng.setPosition(4, GralPos.size -4, 35, GralPos.size +10, 0, 'r');
     windAddFavorite.widgPersistent = main.gralMng.addTextField("addFavoriteTab", true, "lmr ?", "t");
     
-    main.gralMng.setPosition(8, GralGridPos.size -4, 1, GralGridPos.size +45, 0, 'd');
+    main.gralMng.setPosition(8, GralPos.size -4, 1, GralPos.size +45, 0, 'd');
     windAddFavorite.widgShortName = main.gralMng.addTextField("addFavoriteAlias", true, "alias (show in list)", "t");
     windAddFavorite.widgPath = main.gralMng.addTextField("addFavoritePath", true, "the directory path", "t");
     

@@ -5,7 +5,7 @@ import java.io.File;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
@@ -42,19 +42,19 @@ public class FcmdDelete
     windConfirmDelete = main.gralMng.createWindow("copyWindow", "confirm copy", GralWindow.windConcurrently);
     //System.out.println(" window: " + main.gralMng.pos.panel.getPixelPositionSize().toString());
     
-    main.gralMng.setPosition(2, GralGridPos.size -2, 1, -1, 0, 'd');
+    main.gralMng.setPosition(2, GralPos.size -2, 1, -1, 0, 'd');
     main.gralMng.addText("delete:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
     widgDeletePath = main.gralMng.addTextField("deleteTrashPath", true, null, "t");
     
-    main.gralMng.setPosition(7, GralGridPos.size -2, 1, -1, 0, 'd');
+    main.gralMng.setPosition(7, GralPos.size -2, 1, -1, 0, 'd');
     main.gralMng.addText("trash path:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
     widgTrashPath = main.gralMng.addTextField("deleteTrashPath", true, null, "t");
     
     main.gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
     main.gralMng.addButton("deleteEsc", actionDelete, "esc", null, null, "esc");
-    main.gralMng.setPosition(-1, GralGridPos.size-3, -19,-11, 0, 'r');
+    main.gralMng.setPosition(-1, GralPos.size-3, -19,-11, 0, 'r');
     widgRemoveToTrash = main.gralMng.addButton("deleteToTrash", actionDelete, "trash", null, null, "trash");
-    main.gralMng.setPosition(-1, GralGridPos.size-3, -9, -1, 0, 'r');
+    main.gralMng.setPosition(-1, GralPos.size-3, -9, -1, 0, 'r');
     main.gralMng.addButton("deleteOk", actionDelete, "delete", null, null, "delete");
   
   }

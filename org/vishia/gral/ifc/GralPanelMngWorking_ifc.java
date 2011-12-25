@@ -168,7 +168,7 @@ public interface GralPanelMngWorking_ifc
    * In a adequate phase of operate it can be shown and focused.
    * <br>
    * The position is given relative to that panel,
-   * which is stored in {@link GralGridPos#panel}. To get a position instance,
+   * which is stored in {@link GralPos#panel}. To get a position instance,
    * you can set a position invoking 
    * <ul>
    * <li>{@link org.vishia.gral.ifc.GralGridBuild_ifc#selectPanel(String)}
@@ -176,7 +176,7 @@ public interface GralPanelMngWorking_ifc
    * <li>GralGridPos pos = {@link org.vishia.gral.ifc.GralGridBuild_ifc#getPositionInPanel()}.
    * </ul>
    * That can be done in the build phase of the graphic. The position can be stored. It is possible to adjust
-   * the position relative to the unchanged panel by changing the values of {@link GralGridPos#x} etc.
+   * the position relative to the unchanged panel by changing the values of {@link GralPos#x} etc.
    * It is possible too to change the Panel which relates to the position. Then the grid managing instance 
    * have to be known via the {@link org.vishia.gral.ifc.GralGridBuild_ifc} to select a panel.
    * The panels may be moved or resized. With the knowledge of the relative position of the window in respect to a panel
@@ -188,7 +188,7 @@ public interface GralPanelMngWorking_ifc
    *         
    * @return true if it is visible.
    */
-  boolean setWindowsVisible(GralWindow_ifc window, GralGridPos atPos);
+  boolean setWindowsVisible(GralWindow_ifc window, GralPos atPos);
   
   
 	/**Gets the value to the named color. It is a method of the graphic.

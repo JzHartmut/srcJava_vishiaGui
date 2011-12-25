@@ -167,7 +167,7 @@ public interface GralGridBuild_ifc
    * @param framePos The given frame.
    * @param line The line. Positive: from top, negative: from end. 
    * @param lineEndOrSize The position of end of widget. negative or 0: from end. 0: the end position of Panel.
-   *   see {@link GralGridPos#same} etc.
+   *   see {@link GralPos#same} etc.
    * @param column
    * @param columnEndOrSize
    */
@@ -183,11 +183,11 @@ public interface GralGridBuild_ifc
    * @param columnEnd
    * @deprecated. 
    */
-  public void setPosition(GralGridPos framePos, float line, float lineEnd, float column, float columnEnd
+  public void setPosition(GralPos framePos, float line, float lineEnd, float column, float columnEnd
     , int origin, char direction);
 
 
-  public void setPosition(GralGridPos framePos, float line, float lineEnd, float column, float columnEnd
+  public void setPosition(GralPos framePos, float line, float lineEnd, float column, float columnEnd
     , int origin, char direction, float border);
 
 
@@ -205,7 +205,7 @@ public interface GralGridBuild_ifc
    * @param xFrac Number between 0..9 for fine positioning in the grid step.
    * @param xEnd
    * @param xEndFrac Number between 0..9 for fine positioning in the grid step.
-   * @param direction Direction of the next position if that is not given than or {@link GralGridPos#next} is given than.
+   * @param direction Direction of the next position if that is not given than or {@link GralPos#next} is given than.
    *        A value other then r, l, u, d let the direction unchanged from previous call.
    * @param origin Origin of inner widgets or next widgets. Use:
    *        <pre>
@@ -218,7 +218,7 @@ public interface GralGridBuild_ifc
    */
   public void setFinePosition(int y, int yFrac, int yEnd, int yEndFrac
       , int x, int xFrac, int xEnd, int xEndFrac
-      , int origin, char direction, int border, int borderFrac, GralGridPos frame);
+      , int origin, char direction, int border, int borderFrac, GralPos frame);
   
   /**Sets the next position if the position is used, but change the size.
    * @param ySize
@@ -236,7 +236,7 @@ public interface GralGridBuild_ifc
    * returns a cloned instance.   
    * @return An independent instance with current data of {@link GralWidgetMng#pos}. 
    */
-  GralGridPos getPositionInPanel();
+  GralPos getPositionInPanel();
   
   
   
@@ -622,7 +622,7 @@ public interface GralGridBuild_ifc
 	/**Creates a Window for a modal or non modal dialog. The window is described by the returned interface. 
 	 * It can be filled with elements. The dialog is able to show and hide calling 
 	 * {@link GralWindow_ifc#setWindowVisible(boolean)} or 
-	 * {@link GralPanelMngWorking_ifc#setWindowsVisible(GralWindow_ifc, GralGridPos)}. 
+	 * {@link GralPanelMngWorking_ifc#setWindowsVisible(GralWindow_ifc, GralPos)}. 
 	 * The position and size of the window is set with the adequate strategy like all other widget: 
 	 * using {@link #setPositionSize(int, int, int, int, char)}. 
 	 * @param title Title of the window, may be null, then without title bar.

@@ -115,7 +115,7 @@ import org.vishia.gral.base.GralPanelContent;
    *   respectively bottom to top. It means the given line and column is the right or the bottom line. 
    *   If the position is given using {@link #same} or {@link #refer}, the related end position
    *   is used. 
-   * <li> {@link GralGridPos#next} and {@link GralGridPos#nextBlock}   
+   * <li> {@link GralPos#next} and {@link GralPos#nextBlock}   
    * <li>as width or height or as percent value from the panel size.
    * </ul>
    * Fine positions are given always from left or top of the fundamental positions. 
@@ -125,14 +125,14 @@ import org.vishia.gral.base.GralPanelContent;
  * @author Hartmut Schorrig
  *
  */
-public class GralGridPos implements Cloneable
+public class GralPos implements Cloneable
 {
   /**Version and history:
    * <ul>
    * <li>2011-10-01 Hartmut corr: Calculation of next position or refer + value if the size was negative and sameSize is selected.
    *                Then the new input value should calculate from the bottom or left value because the size is negative furthermore.
    * <li>2011-10-01 Hartmut bugfix: if(qf >= 10)... instead >10 
-   * <li>2011-09-23 Hartmut chg: The methods {@link #setPosition(GralGridPos, float, float, float, float, int, char)} etc
+   * <li>2011-09-23 Hartmut chg: The methods {@link #setPosition(GralPos, float, float, float, float, int, char)} etc
    *     are moved from the GralGridMngBase to this. It are methods of this class functionally. The GralGridMngBase wrappes it
    *     because that methods should be able to call there.
    * <li>2011-08-31 Hartmut new: constants {@link #same} etc. as adding values for setPosition-methods.
@@ -295,7 +295,7 @@ public class GralGridPos implements Cloneable
   /**Sets all values of this with the values of pos (copy values)
    * @param pos The src pos
    */
-  public void set(GralGridPos pos)
+  public void set(GralPos pos)
   { x.attr = pos.x.attr; y.attr = pos.y.attr; 
     x.p1 = pos.x.p1; x.p2 = pos.x.p2; y.p1 = pos.y.p1; y.p2 = pos.y.p2;
     x.p1Frac = pos.x.p1Frac; x.p2Frac = pos.x.p2Frac; y.p1Frac = pos.y.p1Frac; y.p2Frac = pos.y.p2Frac;
@@ -317,8 +317,8 @@ public class GralGridPos implements Cloneable
   /* (non-Javadoc)
    * @see org.vishia.gral.gridPanel.GuiPanelMngBuildIfc#setPosition(int, int, int, int, char)
    */
-  public void setPositionSize(int line, int column, int height, int width, char direction, GralGridPos posFrame)
-  { setFinePosition(line, 0, height + GralGridPos.size, 0, column, 0, width + GralGridPos.size, 0, 1, direction, 0, 0, posFrame);
+  public void setPositionSize(int line, int column, int height, int width, char direction, GralPos posFrame)
+  { setFinePosition(line, 0, height + GralPos.size, 0, column, 0, width + GralPos.size, 0, 1, direction, 0, 0, posFrame);
   }
 
   
@@ -331,8 +331,8 @@ public class GralGridPos implements Cloneable
    * @param line The line. If the parameter lineEndOrSize is designated with {@link #size} with a negative value,
    *   it is the bottom line for the position. 
    *   If it is designated with {@link #same} without offset and the lineEndOrSize is designated with {@link #size} 
-   *   with a negative value, the framePos {@link GralGridPos#y.p2} is used. If it is designated
-   *   with {@link #same} but with any offset, the {@link GralGridPos#y} is used as refer position, it is the top line position.
+   *   with a negative value, the framePos {@link GralPos#y.p2} is used. If it is designated
+   *   with {@link #same} but with any offset, the {@link GralPos#y} is used as refer position, it is the top line position.
    *   Elsewhere it is the top position.
    * 
    * @param lineEndOrSize Maybe designated with {@link #size} or {@link #samesize}
@@ -341,7 +341,7 @@ public class GralGridPos implements Cloneable
    * @param origin
    * @param direction
    */
-  public void setPosition(GralGridPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
+  public void setPosition(GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
       , int origin, char direction, float border)
   {
     int[] pos = new int[10];
@@ -382,7 +382,7 @@ public class GralGridPos implements Cloneable
   }
 
 
-  public void setPosition(GralGridPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
+  public void setPosition(GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
     , int origin, char direction)
   {
     setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, 0);
@@ -406,7 +406,7 @@ public class GralGridPos implements Cloneable
   public void setFinePosition(int line, int yPosFrac, int ye, int yef
       , int column, int xPosFrac, int xe, int xef, int origin, char direction
       , int border, int borderFrac
-      , GralGridPos parent)
+      , GralPos parent)
   {
     //
     //
@@ -470,13 +470,13 @@ public class GralGridPos implements Cloneable
   }
   
   
-  public void setSize(float height, float width, GralGridPos frame)
+  public void setSize(float height, float width, GralPos frame)
   { 
     int y2 = (int)(height);
     int y2f = y2 >=0 ? (int)((height - y2)* 10.001F) : (int)((height - y2)* -10.001F);  
     int x2 = (int)(width);
     int x2f = x2 >=0 ? (int)((width - x2)* 10.001F) : (int)((width - x2)* -10.001F); 
-    setFinePosition(GralGridPos.next, 0,  y2 + GralGridPos.size, y2f, GralGridPos.next, 0, x2 + GralGridPos.size, x2f, 0, '.', 0, 0, frame);
+    setFinePosition(GralPos.next, 0,  y2 + GralPos.size, y2f, GralPos.next, 0, x2 + GralPos.size, x2f, 0, '.', 0, 0, frame);
   }
   
   
@@ -531,9 +531,9 @@ public class GralGridPos implements Cloneable
   }
   
   
-  public GralGridPos clone(){
+  public GralPos clone(){
     //Hint: Object.clone() can't be used because it clones the references of x and y and not its values. 
-    GralGridPos newObj = new GralGridPos();
+    GralPos newObj = new GralPos();
     newObj.x.set(x);
     newObj.y.set(y);
     newObj.panel = panel;
@@ -565,7 +565,7 @@ public class GralGridPos implements Cloneable
     /**The start and end position for the spread. */
     public int p1, p1Frac, p2, p2Frac; 
     
-    /**Additional border value for {@link GralGridPos#next}. */
+    /**Additional border value for {@link GralPos#next}. */
     public int pb, pbf;
     
     /**Attributes of this coordinate. */

@@ -12,7 +12,7 @@ import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
-import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
@@ -245,13 +245,13 @@ public class FileSelector //extends GralWidget
   public void setToPanel(GralGridBuild_ifc panelMng, String name, int rows, int[] columns, char size)
   {
     //The macro widget consists of more as one widget. Position the inner widgets:
-    GralGridPos posAll = panelMng.getPositionInPanel();
+    GralPos posAll = panelMng.getPositionInPanel();
     //Text field for path above list
-    panelMng.setPosition(posAll, GralGridPos.same, GralGridPos.size + 2.0F, GralGridPos.same, GralGridPos.same, 1, 'd');
+    panelMng.setPosition(posAll, GralPos.same, GralPos.size + 2.0F, GralPos.same, GralPos.same, 1, 'd');
     widgdPath = panelMng.addTextField(name + "-Path", false, null, null);
     widgdPath.setBackColor(panelMng.getColor("pye"), 0xeeffff);  //color pastel yellow
     //the list
-    panelMng.setPosition(posAll, 2, GralGridPos.same, GralGridPos.same, GralGridPos.same, 1, 'd');
+    panelMng.setPosition(posAll, 2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
     selectList.setToPanel(panelMng, name, rows, columns, size);
     //store this in the GralWidgets to get back from widgets later.
     widgdPath.setContentInfo(this);

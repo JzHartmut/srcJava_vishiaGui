@@ -19,7 +19,7 @@ import org.vishia.gral.cfg.GralCfgWriter;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
-import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
@@ -61,10 +61,10 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
    * <li>2011-10-01 Hartmut chg: move {@link #registerPanel(GralPanelContent)} from the SWT implementation to this.
    * <li>2011-10-01 Hartmut new: method {@link #getPanel(String)} to get a registered panel by name.    
    * <li>2011-09-30 Hartmut new: {@link #actionDesignEditField}. It is the action which is called from menu now.
-   * <li>2011-09-29 Hartmut chg: {@link #calcWidgetPosAndSize(GralGridPos, int, int, int, int)}: calculates dy and dx one pixel less.
-   * <li>2011-09-23 Hartmut chg: All implementation routines for positioning are moved to the class {@link GralGridPos}. This class contains only wrappers now.
+   * <li>2011-09-29 Hartmut chg: {@link #calcWidgetPosAndSize(GralPos, int, int, int, int)}: calculates dy and dx one pixel less.
+   * <li>2011-09-23 Hartmut chg: All implementation routines for positioning are moved to the class {@link GralPos}. This class contains only wrappers now.
    * <li>2011-09-18 Hartmut chg: Inner static class GuiChangeReq now stored in an own class {@link GralWidgetChangeRequ}.
-   * <li>2011-09-18 Hartmut new: : {@link GralGridPos#setFinePosition(int, int, int, int, int, int, int, int, int, char, GralGridPos)} calculates from right or bottom with negative values.                            
+   * <li>2011-09-18 Hartmut new: : {@link GralPos#setFinePosition(int, int, int, int, int, int, int, int, int, char, GralPos)} calculates from right or bottom with negative values.                            
    * <li>2011-09-10 Hartmut chg: Renaming this class, old name was GuiMngBase.                             
    * <li>2011-09-10 Hartmut chg: Some routines form SWT implementation moved to this base class. It doesn't depends on the underlying graphic base.                            
    * <li>2011-08-13 Hartmut chg: New routines for store and calculate the position to regard large widgets.
@@ -183,7 +183,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
    * But the position can be set.
    * The values inside the position are positive in any case, so that the calculation of size is simple.
    */
-  public GralGridPos pos = new GralGridPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
+  public GralPos pos = new GralPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
   
   /**False if the position is given newly. True if it is used. Then the next add-widget invocation 
    * calculates the next position in direction of {@link #pos.dirNext}. */
@@ -192,7 +192,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   /**Position for the next widget to store.
    * The Position values may be negative which means measurement from right or bottom.
    */
-  protected GralGridPos posWidget = new GralGridPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
+  protected GralPos posWidget = new GralPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
   
   
   
@@ -248,9 +248,9 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
 	}
 	
   @Override public void setPositionSize(int line, int column, int height, int width, char direction)
-  { if(line < 0){ line = posUsed? GralGridPos.next: GralGridPos.same; }
-    if(column < 0){ column = posUsed? GralGridPos.next: GralGridPos.same; }
-    setFinePosition(line, 0, height + GralGridPos.size, 0, column, 0, width + GralGridPos.size, 0, 1, direction, 0 ,0 , pos);
+  { if(line < 0){ line = posUsed? GralPos.next: GralPos.same; }
+    if(column < 0){ column = posUsed? GralPos.next: GralPos.same; }
+    setFinePosition(line, 0, height + GralPos.size, 0, column, 0, width + GralPos.size, 0, 1, direction, 0 ,0 , pos);
   }
 
   @Override public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
@@ -267,14 +267,14 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   }
 
 
-  @Override public void setPosition(GralGridPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
+  @Override public void setPosition(GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
     , int origin, char direction)
   {
       pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
       posUsed = false;
   }
   
-  @Override public void setPosition(GralGridPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
+  @Override public void setPosition(GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
     , int origin, char direction, float border)
   {
       pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, border);
@@ -282,7 +282,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   }
   
   @Override public void setFinePosition(int line, int yPosFrac, int ye, int yef
-    , int column, int xPosFrac, int xe, int xef, int origin, char direction, int border, int borderFrac, GralGridPos frame)
+    , int column, int xPosFrac, int xe, int xef, int origin, char direction, int border, int borderFrac, GralPos frame)
   {
     pos.setFinePosition(line, yPosFrac, ye, yef, column, xPosFrac, xe, xef, origin, direction, border, borderFrac, frame);
     posUsed = false;
@@ -305,7 +305,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   { pos.setNextPosition();
   }  
   
-  @Override public GralGridPos getPositionInPanel(){ return pos.clone(); }
+  @Override public GralPos getPositionInPanel(){ return pos.clone(); }
 	
   /**Map of all panels. A panel may be a dialog box etc. */
   protected final Map<String,GralPanelContent> panels = new TreeMap<String,GralPanelContent>();
@@ -632,7 +632,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
    * @param heightParentPixel The size of the panel, where the widget is member of
    * @return A rectangle for setBounds.
    */
-  protected GralRectangle calcWidgetPosAndSize(GralGridPos posWidget, 
+  protected GralRectangle calcWidgetPosAndSize(GralPos posWidget, 
       int widthParentPixel, int heightParentPixel,
       int widthWidgetNat, int heightWidgetNat)
   {
@@ -644,13 +644,13 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
        + (posWidget.x.p1 < 0 ? widthParentPixel : 0);  //from right
     y1 = yPixelUnit * posWidget.y.p1 + propertiesGui.yPixelFrac(posWidget.y.p1Frac)  //negative if from right
        + (posWidget.y.p1 < 0 ? heightParentPixel : 0);  //from right
-    if(posWidget.x.p2 == GralGridPos.useNatSize){
+    if(posWidget.x.p2 == GralPos.useNatSize){
       x2 = x1 + widthWidgetNat; 
     } else {
       x2 = xPixelUnit * posWidget.x.p2 + propertiesGui.xPixelFrac(posWidget.x.p2Frac)  //negative if from right
          + (posWidget.x.p2 < 0 || posWidget.x.p2 == 0 && posWidget.x.p2Frac == 0 ? widthParentPixel : 0);  //from right
     }
-    if(posWidget.x.p2 == GralGridPos.useNatSize){
+    if(posWidget.x.p2 == GralPos.useNatSize){
       y2 = y1 + heightWidgetNat; 
     } else {
       y2 = yPixelUnit * posWidget.y.p2 + propertiesGui.yPixelFrac(posWidget.y.p2Frac)  //negative if from right
@@ -667,9 +667,9 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
     , String startDirMask, String prompt, String promptStylePosition)
   { //int xSize1 = xSize;
     //The macro widget consists of more as one widget. Position the inner widgets:
-    GralGridPos posAll = getPositionInPanel(); //saved whole position.
+    GralPos posAll = getPositionInPanel(); //saved whole position.
     //reduce the length of the text field:
-    setPosition(GralGridPos.same, GralGridPos.same, GralGridPos.same, GralGridPos.same -2.0F, 1, 'r');
+    setPosition(GralPos.same, GralPos.same, GralPos.same, GralPos.same -2.0F, 1, 'r');
     
     //xSize -= ySize;
     GralTextField widgd = addTextField(name, true, prompt, promptStylePosition );

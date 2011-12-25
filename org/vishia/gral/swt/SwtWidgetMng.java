@@ -81,7 +81,7 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
-import org.vishia.gral.ifc.GralGridPos;
+import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralWidgetChangeRequ;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralImageBase;
@@ -142,7 +142,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	 *   any exception, before: An exception causes aborting the graphic thread.
 	 * <li>2011-12-03 Hartmut chg: {@link #addLed(String, String, String)} now uses {@link GralLed}.  
 	 * <li>2011-12-03 Hartmut new: {@link #swtKeyListener} as base for all fields.
-	 * <li>2011-11-12 Hartmut chg: {@link #calcPositionOfWindow(GralGridPos)} improved
+	 * <li>2011-11-12 Hartmut chg: {@link #calcPositionOfWindow(GralPos)} improved
 	 * <li>2011-08-13 Hartmut chg: New routines for store and calculate the position to regard large widgets.
 	 * <li>2011-06-17 Hartmut getValueFromWidget(): Table returns the whole selected line, cells separated with tab.
 	 *     The String-return.split("\t") separates the result to the cell values.
@@ -370,7 +370,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   
   
-  @Override public boolean setWindowsVisible(GralWindow_ifc window, GralGridPos atPos)
+  @Override public boolean setWindowsVisible(GralWindow_ifc window, GralPos atPos)
   { SwtSubWindow windowSwt = (SwtSubWindow)window;
     if(atPos ==null){
       window.setWindowVisible(false); ///
@@ -388,12 +388,12 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   
   /**Calculates the position as absolute value on screen from a given position inside a panel.
-   * @param posWindow contains any {@link GralGridPos#panel}. Its absolute position will be determined.
+   * @param posWindow contains any {@link GralPos#panel}. Its absolute position will be determined.
    *   from that position and size the absolute postion will be calculate, with this given grid positions
    *   inside the panel. 
    * @return Absolute pixel coordinate.
    */
-  GralRectangle calcPositionOfWindow(GralGridPos posWindow)
+  GralRectangle calcPositionOfWindow(GralPos posWindow)
   {
     Control parentFrame = (Control)posWindow.panel.getPanelImpl();
     Point loc;
@@ -669,7 +669,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     	final Font promptFont;
       char sizeFontPrompt;
       GralRectangle boundsAll, boundsPrompt, boundsField;
-      final GralGridPos posPrompt = new GralGridPos(), posField = new GralGridPos();
+      final GralPos posPrompt = new GralPos(), posField = new GralPos();
       boundsAll = calcWidgetPosAndSize(this.pos, 800, 600, 100, 20);
       float ySize = pos.height();
       //float xSize = pos.width();
@@ -693,9 +693,9 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
             heightText = ySize * 0.5f;
           }
           //from top, size of prompt
-          posPrompt.setPosition(this.pos, GralGridPos.same - ySize + yPosPrompt, GralGridPos.size - heightPrompt, GralGridPos.same, GralGridPos.same, 0, '.');
+          posPrompt.setPosition(this.pos, GralPos.same - ySize + yPosPrompt, GralPos.size - heightPrompt, GralPos.same, GralPos.same, 0, '.');
           //from bottom line, size of text
-          posField.setPosition(this.pos, GralGridPos.same, GralGridPos.size - heightText, GralGridPos.same, GralGridPos.same, 0, '.');
+          posField.setPosition(this.pos, GralPos.same, GralPos.size - heightText, GralPos.same, GralPos.same, 0, '.');
         //} break;
       //}
       promptFont = propertiesGuiSwt.getTextFontSwt(heightPrompt, GralFont.typeSansSerif, GralFont.styleNormal); //.smallPromptFont;
