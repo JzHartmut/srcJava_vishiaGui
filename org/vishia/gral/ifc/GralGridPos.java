@@ -531,10 +531,14 @@ public class GralGridPos implements Cloneable
   }
   
   
-  public GralGridPos clone(){ 
-    GralGridPos newObj = null;
-    try{ newObj = (GralGridPos)super.clone(); 
-    } catch(CloneNotSupportedException exc){ assert(false); }
+  public GralGridPos clone(){
+    //Hint: Object.clone() can't be used because it clones the references of x and y and not its values. 
+    GralGridPos newObj = new GralGridPos();
+    newObj.x.set(x);
+    newObj.y.set(y);
+    newObj.panel = panel;
+    //try{ newObj = (GralGridPos)super.clone(); 
+    //} catch(CloneNotSupportedException exc){ assert(false); }
     return newObj; 
   }
   
@@ -589,7 +593,7 @@ public class GralGridPos implements Cloneable
      * @param z2Frac
      * @param parent The refer position. Note that parent may be == this because the new position based on the current.
      */
-    private void set(final int z1, final int z1Frac, final int z2, final int z2Frac, Coordinate parent)
+    private void set(final int z1, final int z1Frac, final int z2, final int z2Frac, final Coordinate parent)
     {
       /**User final local variable to set p, pf, pe, pef to check whether all variants are regarded. */
       final int q1, q1Frac, q2, q2Frac;
@@ -755,6 +759,15 @@ public class GralGridPos implements Cloneable
     }//set
 
 
+    /**Copies all values. Hint: clone isn't able to use because the instance in parent is final.
+     * @param src
+     */
+    private void set(Coordinate src){
+      p1 = src.p1; p1Frac = src.p1Frac; p2 = src.p2; p2Frac = src.p2Frac;
+      pb = src.pb; pbf = src.pbf; attr = src.attr; origin = src.origin; dirNext = src.dirNext;
+      sepLine = src.sepLine; endSepLine = src.endSepLine;
+    }
+    
   }
   
 }

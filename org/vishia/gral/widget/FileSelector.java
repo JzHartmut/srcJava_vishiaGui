@@ -251,7 +251,7 @@ public class FileSelector //extends GralWidget
     widgdPath = panelMng.addTextField(name + "-Path", false, null, '.');
     widgdPath.setBackColor(panelMng.getColor("pye"), 0xeeffff);  //color pastel yellow
     //the list
-    panelMng.setPosition(posAll, 2.0F, GralGridPos.same, GralGridPos.same, GralGridPos.same, 1, 'd');
+    panelMng.setPosition(posAll, 2, GralGridPos.same, GralGridPos.same, GralGridPos.same, 1, 'd');
     selectList.setToPanel(panelMng, name, rows, columns, size);
     //store this in the GralWidgets to get back from widgets later.
     widgdPath.setContentInfo(this);

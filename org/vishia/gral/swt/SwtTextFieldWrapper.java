@@ -22,7 +22,8 @@ public class SwtTextFieldWrapper extends GralTextField
   protected Text textFieldSwt;
   
   /**A possible prompt for the text field or null. */
-  Label promptSwt;
+  //Label promptSwt;
+  SwtTransparentLabel promptSwt;
   //Text promptSwt;
   
   private DropTarget drop;

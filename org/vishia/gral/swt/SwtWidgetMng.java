@@ -685,7 +685,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
           } else if(ySize <=4.0){ //it is normally
             heightPrompt = ySize - 2.0f + (4.0f - ySize) * 0.5f; 
             if(heightPrompt < 1.0f){ heightPrompt = 1.0f; }
-            yPosPrompt = ySize - heightPrompt; // + 0.5f; /// //no more less than 1/2 normal line. 
+            yPosPrompt = ySize - heightPrompt + 0.5f; /// //no more less than 1/2 normal line. 
             heightText = 2.0f;
           } else { //greater then 4.0
             yPosPrompt = ySize * 0.5f;
@@ -701,7 +701,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
       promptFont = propertiesGuiSwt.getTextFontSwt(heightPrompt, GralFont.typeSansSerif, GralFont.styleNormal); //.smallPromptFont;
       boundsPrompt = calcWidgetPosAndSize(posPrompt, boundsAll.dx, boundsAll.dy, 10,100);
       boundsField = calcWidgetPosAndSize(posField, boundsAll.dx, boundsAll.dy, 10,100);
-      widgetInfo.promptSwt = new Label(panelSwt, 0);
+      widgetInfo.promptSwt = new SwtTransparentLabel(panelSwt, SWT.TRANSPARENT);
       widgetInfo.promptSwt.setFont(promptFont);
       widgetInfo.promptSwt.setText(prompt);
       widgetInfo.promptSwt.setBackground(null);
@@ -748,7 +748,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
       } else { 
         promptFont = propertiesGuiSwt.stdInputFont;  
       }
-      widgetInfo.promptSwt = new Label((Composite)pos.panel.getPanelImpl(), 0);
+      widgetInfo.promptSwt = new SwtTransparentLabel((Composite)pos.panel.getPanelImpl(), SWT.TRANSPARENT);
       widgetInfo.promptSwt.setFont(promptFont);
       widgetInfo.promptSwt.setText(prompt);
       Point promptSize = widgetInfo.promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);

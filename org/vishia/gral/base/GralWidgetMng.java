@@ -463,6 +463,8 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   @Override public void registerPanel(GralPanelContent panel){
     panels.put(panel.namePanel, panel);
     pos.panel = panel;
+    //initialize the position because its a new panel. The initial position is the whole panel.
+    pos.setFinePosition(0,0,0,0,0,0,0,0,0,'d',0,0,pos);
     sCurrPanel = panel.namePanel;
   }
   
