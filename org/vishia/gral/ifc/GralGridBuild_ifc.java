@@ -416,7 +416,7 @@ public interface GralGridBuild_ifc
    *   'l' left, 't' top (above field) 
    * @return The WidgetDescriptor. An action, tooltip, color etc. can be set there later.
    */
-  GralTextField addTextField(String name, boolean editable, String prompt, char promptStylePosition);
+  GralTextField addTextField(String name, boolean editable, String prompt, String promptStylePosition);
   
   /** Adds a box for editing or showing a text.
    * <br><br>
@@ -469,7 +469,7 @@ public interface GralGridBuild_ifc
    * @param promptStylePosition
    * @return
    */
-  GralTextField addFileSelectField(String name, List<String> listRecentFiles, String startDirMask, String prompt, char promptStylePosition);
+  GralTextField addFileSelectField(String name, List<String> listRecentFiles, String startDirMask, String prompt, String promptStylePosition);
   
   
   /**Adds a panel that is not bound yet.

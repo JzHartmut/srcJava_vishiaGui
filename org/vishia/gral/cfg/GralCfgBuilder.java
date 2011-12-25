@@ -243,9 +243,9 @@ public class GralCfgBuilder
       
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgShowField){
       //GuiCfgData.GuiCfgShowField wShow = (GuiCfgData.GuiCfgShowField)cfge.widgetType;
-      char cPromptPosition = cfge.widgetType.promptPosition ==null || cfge.widgetType.promptPosition.length() <1 
-                           ? '.' :  cfge.widgetType.promptPosition.charAt(0);
-      widgd = gui.addTextField(sName, false, cfge.widgetType.prompt, cPromptPosition);
+      //char cPromptPosition = cfge.widgetType.promptPosition ==null || cfge.widgetType.promptPosition.length() <1 
+      //                     ? '.' :  cfge.widgetType.promptPosition.charAt(0);
+      widgd = gui.addTextField(sName, false, cfge.widgetType.prompt, cfge.widgetType.promptPosition);
       widgd.setDataPath(sDataPath);
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgInputFile){
       GralCfgData.GuiCfgInputFile widgt = (GralCfgData.GuiCfgInputFile)cfge.widgetType;
@@ -253,12 +253,12 @@ public class GralCfgBuilder
       if(widgt.info !=null){
         dirMask = replaceAlias(widgt.info);
       } else { dirMask = ""; }
-      widgd = gui.addFileSelectField(sName, null, dirMask, null, 't');
+      widgd = gui.addFileSelectField(sName, null, dirMask, null, "t");
       widgd.setDataPath(sDataPath);
     } else {
       switch(cfge.widgetType.whatIs){
         case 'T':{
-          widgd = gui.addTextField(sName, true, null, 't');
+          widgd = gui.addTextField(sName, true, null, null);
           widgd.setDataPath(sDataPath);
         } break;
         default: {

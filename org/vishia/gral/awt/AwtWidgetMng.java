@@ -69,7 +69,7 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    *   'l' left, 't' top (above field) 
    * @return
    */
-  @Override public GralTextField addTextField(String name, boolean editable, String prompt, char promptStylePosition)
+  @Override public GralTextField addTextField(String name, boolean editable, String prompt, String promptStylePosition)
   { Container parent = (Container)pos.panel.getPanelImpl();
     AwtTextField widg = new AwtTextField(name, editable ? 'T' : 'S', this, parent);
     widg.setPanelMng(this);
@@ -86,7 +86,7 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
       //widget.setSize(xIncr * propertiesGui.xPixelUnit()-1, 2* propertiesGui.yPixelUnit()-1);
     }
     //
-    if(prompt != null && promptStylePosition == 't'){
+    if(prompt != null && promptStylePosition.startsWith("t")){
       if(posUsed){
         setNextPosition();
       }
@@ -97,12 +97,8 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
       boundsAll = calcWidgetPosAndSize(this.pos, 800, 600, 100, 20);
       float ySize = pos.height();
       //float xSize = pos.width();
-      switch(promptStylePosition){
-        case 't':{
           posPrompt.setPosition(this.pos, GralGridPos.same, ySize * 0.37f + GralGridPos.size, GralGridPos.same, GralGridPos.same, 0, '.');
           posField.setPosition(this.pos, GralGridPos.refer + ySize * 0.37f, GralGridPos.same, GralGridPos.same, GralGridPos.same, 0, '.');
-        } break;
-      }
       promptFont = propertiesGuiAwt.smallPromptFont;
       boundsPrompt = calcWidgetPosAndSize(posPrompt, boundsAll.dx, boundsAll.dy, 10,100);
       boundsField = calcWidgetPosAndSize(posField, boundsAll.dx, boundsAll.dy, 10,100);

@@ -654,7 +654,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    *   'l' left, 't' top (above field) 
    * @return
    */
-  @Override public GralTextField addTextField(String name, boolean editable, String prompt, char promptStylePosition)
+  @Override public GralTextField addTextField(String name, boolean editable, String prompt, String promptStylePosition)
   { Composite panelSwt = (Composite)pos.panel.getPanelImpl();
     SwtTextFieldWrapper widgetInfo = new SwtTextFieldWrapper(name, panelSwt, editable ? 'T' : 'S', this);
     //SwtStyledTextFieldWrapper widgetInfo = new SwtStyledTextFieldWrapper(name, (Composite)pos.panel.getPanelImpl(), editable ? 'T' : 'S', this);
@@ -662,7 +662,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     widgetInfo.setPanelMng(this);
     Text widgetSwt;
     //
-    if(prompt != null && promptStylePosition == 't'){
+    if(prompt != null && promptStylePosition.startsWith("t")){
       if(posUsed){
         setNextPosition();
       }
@@ -738,7 +738,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     widgetSwt.addMouseListener(mouseClickForInfo);
     
     
-    if(prompt != null && promptStylePosition == 'r'){
+    if(prompt != null && promptStylePosition.startsWith("r")){
       Rectangle swtField = widgetSwt.getBounds();
       Rectangle swtPrompt = new Rectangle(swtField.x + swtField.width, swtField.y, 0, swtField.height);
       float hight = this.pos.height();

@@ -63,14 +63,14 @@ public class FcmdCopyCmd
     
     main.gralMng.setPosition(2, GralGridPos.size -2, 1, GralGridPos.size +45, 0, 'd');
     main.gralMng.addText("source:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    widgCopyFrom = main.gralMng.addTextField("copyFrom", false, null, 't');
+    widgCopyFrom = main.gralMng.addTextField("copyFrom", false, null, "t");
     main.gralMng.addText("destination dir path:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    widgCopyDirDst = main.gralMng.addTextField("copyDirDst", true, null, 't');
+    widgCopyDirDst = main.gralMng.addTextField("copyDirDst", true, null, "t");
     main.gralMng.addText("destination filename:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
     main.gralMng.setPosition(GralGridPos.refer + 2, GralGridPos.size -2, 1, 25, 0, 'r');
-    widgCopyNameDst = main.gralMng.addTextField("copyNameDst", true, null, 't');
+    widgCopyNameDst = main.gralMng.addTextField("copyNameDst", true, null, "t");
     main.gralMng.setPosition(GralGridPos.refer, GralGridPos.size -2, 26, 0, 0, 'r');
-    widgCopyState = main.gralMng.addTextField("copyStatus", false, null, 't');
+    widgCopyState = main.gralMng.addTextField("copyStatus", false, null, "t");
     
     main.gralMng.setPosition(GralGridPos.refer+3.5f, GralGridPos.size -3, 1, 15, 0, 'r');
     widgdOverwrite = main.gralMng.addButton("copyOverwrite", null, null, null, null, "overwrite this");

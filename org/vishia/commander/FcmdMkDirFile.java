@@ -41,8 +41,8 @@ public class FcmdMkDirFile
     main.gralMng.setPosition(GralGridPos.same, GralGridPos.size -1.6f, 1, -1, 0, 'd', 0.4f);
     main.gralMng.setPosition(GralGridPos.same, GralGridPos.size +2.6f, 1, -1, 0, 'd', 0.4f);
     main.gralMng.setPosition(4, GralGridPos.size -3.6f, 1, -1, 0, 'd', 0.4f);
-    widgParentPath = main.gralMng.addTextField("mkParentPath", true, "parent path:", 't');
-    widgParentPath = main.gralMng.addTextField("mkParentPath", true, "name:", 't');
+    widgParentPath = main.gralMng.addTextField("mkParentPath", true, "parent path:", "t");
+    widgParentPath = main.gralMng.addTextField("mkParentPath", true, "name:", "t");
     windMk = window; 
  
   }

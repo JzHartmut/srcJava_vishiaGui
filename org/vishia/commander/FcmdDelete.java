@@ -44,11 +44,11 @@ public class FcmdDelete
     
     main.gralMng.setPosition(2, GralGridPos.size -2, 1, -1, 0, 'd');
     main.gralMng.addText("delete:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    widgDeletePath = main.gralMng.addTextField("deleteTrashPath", true, null, 't');
+    widgDeletePath = main.gralMng.addTextField("deleteTrashPath", true, null, "t");
     
     main.gralMng.setPosition(7, GralGridPos.size -2, 1, -1, 0, 'd');
     main.gralMng.addText("trash path:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    widgTrashPath = main.gralMng.addTextField("deleteTrashPath", true, null, 't');
+    widgTrashPath = main.gralMng.addTextField("deleteTrashPath", true, null, "t");
     
     main.gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
     main.gralMng.addButton("deleteEsc", actionDelete, "esc", null, null, "esc");

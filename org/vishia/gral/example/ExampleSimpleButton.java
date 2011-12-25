@@ -131,7 +131,7 @@ public class ExampleSimpleButton
       gui.gralMng.setPosition(5, 8, 2, 15, 0, '.');
       //Adds a text input field.
       //NOTE: the element gui is arranged in the outer class because it may be accessed later.
-      gui.widgInput = gui.gralMng.addTextField("input", true, null, 't');
+      gui.widgInput = gui.gralMng.addTextField("input", true, null, "t");
       //Sets the position of the next widget, the button, relative to the last one, 5 lines deeper.
       //Use size instead an line position. 
       gui.gralMng.setPosition(GralGridPos.same+5, GralGridPos.size +3, 2, GralGridPos.size +10, 0, '.');

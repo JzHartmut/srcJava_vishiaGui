@@ -144,13 +144,13 @@ class FcmdFavorPathSelector
     windAddFavorite.window = main.gralMng.createWindow("addFavoriteWindow", "add favorite", GralWindow.windConcurrently);
     
     main.gralMng.setPosition(4, GralGridPos.size -4, 1, GralGridPos.size +34, 0, 'r');
-    windAddFavorite.widgLabel = main.gralMng.addTextField("addFavoriteTab", true, "label", 't');
+    windAddFavorite.widgLabel = main.gralMng.addTextField("addFavoriteTab", true, "label", "t");
     main.gralMng.setPosition(4, GralGridPos.size -4, 35, GralGridPos.size +10, 0, 'r');
-    windAddFavorite.widgPersistent = main.gralMng.addTextField("addFavoriteTab", true, "lmr ?", 't');
+    windAddFavorite.widgPersistent = main.gralMng.addTextField("addFavoriteTab", true, "lmr ?", "t");
     
     main.gralMng.setPosition(8, GralGridPos.size -4, 1, GralGridPos.size +45, 0, 'd');
-    windAddFavorite.widgShortName = main.gralMng.addTextField("addFavoriteAlias", true, "alias (show in list)", 't');
-    windAddFavorite.widgPath = main.gralMng.addTextField("addFavoritePath", true, "the directory path", 't');
+    windAddFavorite.widgShortName = main.gralMng.addTextField("addFavoriteAlias", true, "alias (show in list)", "t");
+    windAddFavorite.widgPath = main.gralMng.addTextField("addFavoritePath", true, "the directory path", "t");
     
     main.gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
     main.gralMng.addButton("addFavoriteEsc", actionAddFavorite, "esc", null, null, "esc");
