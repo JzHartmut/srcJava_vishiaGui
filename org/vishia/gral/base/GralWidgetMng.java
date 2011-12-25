@@ -792,9 +792,15 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   }
   
   
-  @Override public InfoBox createInfoBox(String name, String title)
+  @Override public InfoBox createTextInfoBox(String name, String title)
   {
-    return InfoBox.create(this, name, title);
+    return InfoBox.createTextInfoBox(this, name, title);
+  }
+
+  
+  @Override public InfoBox createHtmlInfoBox(String name, String title)
+  {
+    return InfoBox.createHtmlInfoBox(this, name, title);
   }
 
   

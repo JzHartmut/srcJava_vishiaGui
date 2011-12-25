@@ -128,6 +128,7 @@ public abstract class GralWidget implements GralWidget_ifc
 	 * <li>xxx E: an edit field, 1 line
 	 * <li>xxx e: an edit area
 	 * <li>F: input file selection field
+	 * <li>h; HTML text  box (browser)
 	 * <li>I: a line
    * <li>i: an image
    * <li>k: a tree node

@@ -156,4 +156,6 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc
   GralUserAction getActionAbout();
   
   
+  void setHelpUrl(String url);
+  
 }

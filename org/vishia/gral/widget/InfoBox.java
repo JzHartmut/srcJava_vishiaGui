@@ -2,6 +2,7 @@ package org.vishia.gral.widget;
 
 import java.io.IOException;
 
+import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralColor;
@@ -28,21 +29,46 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   /**The widget which holds the text in the {@link #window}. */
   private final GralTextBox textBox;
   
+  private final GralHtmlBox htmlBox;
+  
   private final GralWidget buttonOk;
   
   public InfoBox(GralWindow window, GralTextBox textBox, GralWidget buttonOk)
   {
     this.window = window;
     this.textBox = textBox;
+    this.htmlBox = null;
     this.buttonOk = buttonOk;
   }
   
-  public static InfoBox create(GralGridBuild_ifc mng, String name, String title)
+  public InfoBox(GralWindow window, GralHtmlBox htmlBox, GralWidget buttonOk)
+  {
+    this.window = window;
+    this.textBox = null;
+    this.htmlBox = htmlBox;
+    this.buttonOk = buttonOk;
+  }
+  
+  public static InfoBox createTextInfoBox(GralGridBuild_ifc mng, String name, String title)
   {
     GralWindow window = mng.createWindow(name, title, GralWindow.windConcurrently);
     //TODO the position frame (size) regards the title bar, it should not do so!
     mng.setPosition(0, -3, 0, 0, 0, '.');
     GralTextBox text = mng.addTextBox(name, false, null, '.');
+    mng.setPosition(-3, 0, -6, 0, 0, '.');
+    GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "", null, null, "OK");
+    InfoBox box = new InfoBox(window, text, buttonOk);
+    box.buttonOk.setActionChange(box.actionOk);
+    return box; 
+
+  }
+  
+  public static InfoBox createHtmlInfoBox(GralGridBuild_ifc mng, String name, String title)
+  {
+    GralWindow window = mng.createWindow(name, title, GralWindow.windConcurrently);
+    //TODO the position frame (size) regards the title bar, it should not do so!
+    mng.setPosition(0, -3, 0, 0, 0, '.');
+    GralHtmlBox text = mng.addHtmlBox(name);
     mng.setPosition(-3, 0, -6, 0, 0, '.');
     GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "", null, null, "OK");
     InfoBox box = new InfoBox(window, text, buttonOk);
@@ -70,6 +96,12 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   public void setText(CharSequence text)
   { textBox.setText(text);
   }
+  
+  public void setUrl(String url){
+    if(htmlBox !=null){ htmlBox.setUrl(url); }
+    else throw new IllegalArgumentException("it is not a html box."); 
+  }
+  
 
   @Override public String getText(){ return textBox.getText(); }
   
@@ -155,7 +187,7 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   
   GralUserAction actionOk = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
-      textBox.setText("");  //'I have seen it, therefore delete.
+      if(textBox !=null) {textBox.setText(""); }  //'I have seen it, therefore delete.
       window.setWindowVisible(false);
       return true;
     }

@@ -138,6 +138,8 @@ public class FcmdCopyCmd
       widgCopyDirDst.setText(sDstDir);
       widgCopyNameDst.setText(sDstName);
       main.gralMng.setWindowsVisible(windConfirmCopy, posWindConfirmCopy);
+      main.gui.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.");
+
       return true;
    }  };
   

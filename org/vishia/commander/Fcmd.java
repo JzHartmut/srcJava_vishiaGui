@@ -32,7 +32,7 @@ import org.vishia.util.FileRemote;
 public class Fcmd extends GuiCfg
 {
 
-  private static class CallingArgs extends GuiCallingArgs
+  static class CallingArgs extends GuiCallingArgs
   {
     File fileCfgCmds;
 
@@ -41,9 +41,13 @@ public class Fcmd extends GuiCfg
     File fileCfgButtonCmds;
 
     File fileSelectTabPaths;
+    
+    File dirCfg;
+
+    File dirHtmlHelp;
   }
 
-  private final CallingArgs cargs;
+  final CallingArgs cargs;
 
   // GralTabbedPanel tabbedPanelsLeft, tabbedPanelsMid, tabbedPanelsRight;
 
@@ -168,6 +172,8 @@ public class Fcmd extends GuiCfg
     gui.addMenuItemGThread("menuAbout", "&Help/&About", gui.getActionAbout());
     gui.addMenuItemGThread("MenuTestInfo", "&Help/&Infobox", actionTest); // /
     guiW.outputBox.setActionChange(executer.actionCmdFromOutputBox);
+    
+    gui.setHelpUrl("d:/vishia/ZBNF/index.html");
   }
 
   private void initPanelButtons()
@@ -479,7 +485,11 @@ public class Fcmd extends GuiCfg
     protected boolean testArgument(String arg, int nArg)
     {
       boolean bOk = true;
-      if (arg.startsWith("cmdcfg:")) {
+      if (arg.startsWith("cfg:")) {
+        cargs.dirCfg = new File(arg.substring(4));
+      } else if (arg.startsWith("help:")) {
+        cargs.dirHtmlHelp = new File(arg.substring(5));
+      } else if (arg.startsWith("cmdcfg:")) {
         cargs.fileCfgCmds = new File(arg.substring(7));
       } else if (arg.startsWith("cmdext:")) {
         cargs.fileCmdsForExt = new File(arg.substring(7));

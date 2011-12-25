@@ -67,6 +67,7 @@ import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralGridProperties;
+import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralLed;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
@@ -497,10 +498,15 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   
   protected void setPosAndSize_(Control component)
-  { setPosAndSize_(component, 0,0);
+  { setPosAndSizeSwt(component, 0,0);
   }  
   
-  protected void setPosAndSize_(Control component, int widthwidgetNat, int heigthWidgetNat)
+  /**Set bounds. This method is package-private for SWT-implementation.
+   * @param component The SWT-widget.
+   * @param widthwidgetNat The natural size of the component.
+   * @param heigthWidgetNat The natural size of the component.
+   */
+  void setPosAndSizeSwt(Control component, int widthwidgetNat, int heigthWidgetNat)
   {
     if(posUsed){
       setNextPosition();
@@ -685,7 +691,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
           } else if(ySize <=4.0){ //it is normally
             heightPrompt = ySize - 2.0f + (4.0f - ySize) * 0.5f; 
             if(heightPrompt < 1.0f){ heightPrompt = 1.0f; }
-            yPosPrompt = ySize - heightPrompt + 0.5f; /// //no more less than 1/2 normal line. 
+            yPosPrompt = ySize - heightPrompt + 0.2f; /// //no more less than 1/2 normal line. 
             heightText = 2.0f;
           } else { //greater then 4.0
             yPosPrompt = ySize * 0.5f;
@@ -851,7 +857,10 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 }
 
   
-  
+@Override public GralHtmlBox addHtmlBox(String name){
+  return new SwtHtmlBox(name, this);
+}
+
   
   /**Adds a line.
    * <br><br>To adding a line is only possible if the current panel is of type 

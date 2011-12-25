@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
@@ -219,6 +220,10 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 
     
 
+  @Override public GralHtmlBox addHtmlBox(String name){
+    return null;
+  }
+  
   
   
   @Override public GralButton addButton(

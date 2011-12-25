@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
@@ -444,6 +445,13 @@ public interface GralGridBuild_ifc
   //GralTextBox_ifc 
   GralTextBox addTextBox(String name,/*GralWidget widgetInfo, */boolean editable, String prompt, char promptStylePosition);
   
+  /** Adds a box which presents html content.
+   * 
+   * @param sName The registering name
+   * @return The instance arranged in the current panel at current position of the GralWidgetMng
+   */
+  GralHtmlBox addHtmlBox(String name);
+  
   /**Adds a curve view for displaying values with ordinary x-coordinate.
    * The scaling of the curve view is set to -100..100 per default. 
    * @param sName Its registered name
@@ -636,7 +644,9 @@ public interface GralGridBuild_ifc
 	
 	
 	
-  InfoBox createInfoBox(String name, String title);
+  InfoBox createTextInfoBox(String name, String title);
+
+  InfoBox createHtmlInfoBox(String name, String title);
 
   /**Sets the builder for content configuration.
    * @param cfgBuilder

@@ -159,7 +159,6 @@ public class SwtTextBox extends GralTextBox
   }
   
 
-
   
   @Override public void redraw(){  textFieldSwt.redraw(); textFieldSwt.update(); }
 

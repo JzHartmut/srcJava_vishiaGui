@@ -54,7 +54,7 @@ public class FcmdMkDirFile
   void dialogMkDirFile(FileRemote src)
   { String sSrc, sTrash;
     windMk.setWindowVisible(true);
-
+    main.gui.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.mkdirfile.");
   }
   
 

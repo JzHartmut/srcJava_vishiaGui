@@ -164,11 +164,11 @@ public class GralArea9Window implements GralArea9_ifc
         //setStandardMenusGThread(currentDirectory, actionFile);
       }
       window.gralMng.setPosition(-40, 0, 10, 0, 0, 'd');
-      infoBox = window.gralMng.createInfoBox("infoBox", "Info");
+      infoBox = window.gralMng.createTextInfoBox("infoBox", "Info");
       //
       window.gralMng.selectPanel("primaryWindow");
       window.gralMng.setPosition(0,40,10,0,0,'.');
-      infoHelp = window.gralMng.createInfoBox("Help", "Help");
+      infoHelp = window.gralMng.createHtmlInfoBox("Help", "Help");
       try{
         for(String line: mainCmd.listHelpInfo){
           infoHelp.append(line).append("\n");
@@ -177,7 +177,7 @@ public class GralArea9Window implements GralArea9_ifc
       //
       window.gralMng.selectPanel("primaryWindow");
       window.gralMng.setPosition(0,10,15,GralPos.size + 40,0,'.');
-      infoAbout = window.gralMng.createInfoBox("About", "About");
+      infoAbout = window.gralMng.createTextInfoBox("About", "About");
       try{
         for(String line: mainCmd.listAboutInfo){
           infoAbout.append(line).append("\n");
@@ -498,6 +498,8 @@ public class GralArea9Window implements GralArea9_ifc
 
 
 
+  @Override public void setHelpUrl(String url){ infoHelp.setUrl(url); }
+  
 
   @Override  public void setWindowVisible(boolean visible)
   { window.setWindowVisible(visible);
