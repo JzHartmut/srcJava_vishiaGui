@@ -33,6 +33,7 @@ public class FcmdFavorTabCard extends SelectList
   
   public void setToPanel(GralGridBuild_ifc panel, String name, char size){
     super.setToPanel(panel, name, 20, widthSelecttableMain, size);
+    wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.tabSelect.");
   }
 
   /**Adds a line to this table.

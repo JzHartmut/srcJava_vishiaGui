@@ -49,6 +49,8 @@ public class FcmdFileCard extends FileSelector
    */
   FcmdFavorPathSelector.FavorPath favorPathInfo;
   
+  FileRemote currentFile;
+  
   DateFormat formatDateInfo = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss");
   
   /**Creates an instance and creates the Panel and List for the files and for the path (favorite)
@@ -72,6 +74,7 @@ public class FcmdFileCard extends FileSelector
     mainPanel.tabbedPanelFavorCards.addGridPanel(FcmdWidgetNames.tabFavorites + nameFilePanel, label,1,1,10,10);
     mng.setPosition(2, 0, 0, -0, 1, 'd');  ///p
     favorCard.setToPanel(mng, nameTableSelection, 5, mainPanel.widthSelecttableSub, 'A');
+    favorCard.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorSelect.");
     //mng.selectPanel(WidgetNames.panelFavoritesLeftMidRight +mainPanel.cNr);
     //String sLabelTab = "file&"+cNr;
     //The grid panel contains this widget. The grid panel is a tab of mainPanel.tabbedPanel
@@ -80,6 +83,7 @@ public class FcmdFileCard extends FileSelector
     //
     //sets this Widget to the selected panel, it is the grid panel which was created even yet.
     setToPanel(mng, namePanelFile, 5, new int[]{2,20,5,10}, 'A');
+    super.selectList.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.fileSelect.");
     selectList.wdgdTable.setActionOnLineSelected(actionFileSelected);
   }
 
@@ -170,28 +174,39 @@ public class FcmdFileCard extends FileSelector
 
   
   
+  private void actionFileSelected(FileRemote file){
+    //note the file, able to use for some actions.
+    currentFile = file;
+    main.currentFile = file;
+    main.selectedFiles123[mainPanel.ixMainPanel] = file;
+    //note the file card in order of usage.
+    if(main.lastFileCards.size() == 0 || main.lastFileCards.get(0) != this){
+      main.lastFileCards.remove(this);  //if it is in list on higher position
+      main.lastFileCards.add(0, this);
+    }
+    String sDate = formatDateInfo.format(new Date(file.lastModified()));
+    String sLenShort = //String.format("", file.length)
+      file.length() >= 1000000 ? String.format("%2.1f MByte", file.length()/1000000.0) :
+      file.length() >=    1000 ? String.format("%2.1f kByte", file.length()/1000.0) :
+      String.format("%3d Byte", file.length());  
+    String info = sDate + " # " + sLenShort + " >" + file.getName() + "<";        
+    main.widgFileInfo.setText(info);
+    
+  }
   
   
   
   
   
-  /**Action to show the file properties in the info line. */
+  /**Action to show the file properties in the info line. This action is called anytime if a line
+   * was changed in the file view table. */
   GralUserAction actionFileSelected = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object[] params) {
       if(actionCode == KeyCode.tableLineSelect){
         GralTableLine_ifc line = (GralTableLine_ifc) params[0];
         Object oData = line.getUserData();
         if(oData instanceof FileRemote){
-          FileRemote file = (FileRemote)oData;
-          main.currentFile = file;
-          main.selectedFiles123[mainPanel.ixMainPanel] = file;
-          String sDate = formatDateInfo.format(new Date(file.lastModified()));
-          String sLenShort = //String.format("", file.length)
-            file.length() >= 1000000 ? String.format("%2.1f MByte", file.length()/1000000.0) :
-            file.length() >=    1000 ? String.format("%2.1f kByte", file.length()/1000.0) :
-            String.format("%3d Byte", file.length());  
-          String info = sDate + " # " + sLenShort + " >" + file.getName() + "<";        
-          main.widgFileInfo.setText(info);
+          actionFileSelected((FileRemote)oData);
         }
       }
       return true;

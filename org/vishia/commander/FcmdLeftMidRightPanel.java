@@ -52,7 +52,7 @@ public class FcmdLeftMidRightPanel
   
   final int ixMainPanel;
   
-  final int[] widthSelecttableMain = new int[]{6, 20, 30};
+  //final int[] widthSelecttableMain = new int[]{6, 20, 30};
 
   final int[] widthSelecttableSub = new int[]{2, 20, 30};
 
@@ -90,7 +90,7 @@ public class FcmdLeftMidRightPanel
     mng.setPosition(0, 0, 0, 0, 1, 'd');
     tabbedPanelFavorCards.addGridPanel(nameGridPanel, tabLabelGridPanel, 1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd');
-    selectTabCard.setToPanel(mng, FcmdWidgetNames.tableFavoritesMain + cNr, 5, widthSelecttableMain, 'A');
+    selectTabCard.setToPanel(mng, FcmdWidgetNames.tableFavoritesMain + cNr, 'A');
     fillCards();  //build the rest of all tabs and panels depending on content of favorites.
     
     if(cNr == '1'){ //commands only in the left panel.

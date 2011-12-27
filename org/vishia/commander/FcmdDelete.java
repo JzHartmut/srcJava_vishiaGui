@@ -10,6 +10,9 @@ import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.util.Event;
+import org.vishia.util.EventConsumer;
+import org.vishia.util.FileRemote;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
@@ -28,6 +31,10 @@ public class FcmdDelete
   
   GralWidget widgRemoveToTrash, widgDelete;
 
+  String sFileDelete;
+  
+  FcmdFileCard fileCard;
+  
   FcmdDelete(Fcmd main)
   { this.main = main;
   }
@@ -64,8 +71,11 @@ public class FcmdDelete
   /**Opens the confirm-delete window and fills its fields to ask the user whether confirm.
    * @param src The path which is selected as source. It may be a directory or a file.
    */
-  void confirmDelete(File src)
+  void confirmDelete(File src111)
   { String sSrc, sTrash;
+    FileRemote src;
+    fileCard = main.lastFileCards.get(0);
+    src = fileCard ==null ? null :  fileCard.currentFile; 
     if(src !=null){
       sSrc = FileSystem.getCanonicalPath(src);
       widgDeletePath.setText(sSrc);
@@ -101,23 +111,47 @@ public class FcmdDelete
   
   GralUserAction actionDelete = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
-    { if(key == KeyCode.mouse1Up){
-        if(widgg.sCmd.equals("delete")){
-          String sFileDelete = widgDeletePath.getText();
-          File file = new File(sFileDelete);
-          if(!file.canWrite()){
-            //file.setWritable();
+    { try{ 
+        if(key == KeyCode.mouse1Up){
+          if(widgg.sCmd.equals("delete")){
+            if(!evSuccess.use(0, 1, this)){
+              main.mainCmd.writeError("File communication busy.");
+            } else {
+              sFileDelete = widgDeletePath.getText();
+              FileRemote file = new FileRemote(sFileDelete);
+              if(!file.canWrite()){
+                //file.setWritable();
+              }
+              file.delete(evSuccess);
+            }
+          } else if(widgg.sCmd.equals("esc")){
+            windConfirmDelete.setWindowVisible(false);
           }
-          boolean bOk = file.delete();
-          if(!bOk){
-            main.mainCmd.writeError("can't delete " + sFileDelete);
-          }
-        } else if(widgg.sCmd.equals("esc")){
-          windConfirmDelete.setWindowVisible(false);
         }
-      }
+      } catch(Exception exc){ main.gralMng.log.sendMsg(0, "FcmdDelete-actionDelete"); }
       return true;
     }
   };
 
+  
+  
+  EventConsumer success = new EventConsumer(){
+
+    @Override public boolean processEvent(Event ev)
+    {
+      if(ev.iData !=0){
+        main.mainCmd.writeError("can't delete " + sFileDelete);
+      }
+      ev.consumed();
+      windConfirmDelete.setWindowVisible(false);
+      fileCard.fillInCurrentDir();
+      return true;
+    }
+    
+  };
+  
+  Event evSuccess = new Event(this, success);
+  
+  
+  
 }

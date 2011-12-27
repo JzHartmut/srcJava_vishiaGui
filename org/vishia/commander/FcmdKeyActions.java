@@ -1,7 +1,10 @@
 package org.vishia.commander;
 
+import java.io.File;
+
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
 
@@ -100,11 +103,12 @@ public class FcmdKeyActions
         }
         if(!done){
           done = true;
+          FileRemote[] files = main.getCurrentFileInLastPanels();
           if(     keyCode == keyFileProps){ main.filePropsCmd.openDialog(null); }  //F2
           else if(keyCode == keyView){ main.viewCmd.view(null); }                  //F3
           else if(keyCode == keyEdit){ main.actionEdit.userActionGui(sIntension, widgd, params); }
           else if(keyCode == keyCopy){ main.copyCmd.actionConfirmCopy.userActionGui(keyCode, widgd, params); }
-          else if(keyCode == keyMkDirFile){ main.mkCmd.dialogMkDirFile(null); }
+          else if(keyCode == keyMkDirFile){ main.mkCmd.dialogMkDirFile(files[0]); }
           else if(keyCode == keyDelete1 || keyCode == keyDelete2){ main.deleteCmd.actionConfirmDelete.userActionGui(keyCode, widgd); }
           //navigation
           else if(keyCode == keyOriginDir){ main.favorPathSelector.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }

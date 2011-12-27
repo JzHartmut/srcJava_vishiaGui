@@ -3,6 +3,7 @@ package org.vishia.commander;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -89,6 +90,9 @@ public class Fcmd extends GuiCfg
 
   /**The last selected files of the three panels, [0] for left .. [2] for right. */
   final FileRemote[] selectedFiles123 = new FileRemote[3];
+  
+  
+  List<FcmdFileCard> lastFileCards = new LinkedList<FcmdFileCard>();
   
   File[] selectedFiles;
 
@@ -377,15 +381,15 @@ public class Fcmd extends GuiCfg
    * 
    * @return Array of files in order of last focus
    */
-  File[] getCurrentFileInLastPanels()
+  FileRemote[] getCurrentFileInLastPanels()
   { findLastFocusedFileTables();
-    File file[] = new File[3];
+    FileRemote file[] = new FileRemote[3];
     int ixFile = -1;
     for(FileSelector fileTable: lastFocusedFileTables){
       if(fileTable !=null){
         FileRemote fileItem = fileTable.getSelectedFile();
         if(fileItem !=null){
-          file[++ixFile] = new File(fileItem.getParent(), fileItem.getName());
+          file[++ixFile] = fileItem;
         }
       }
     }

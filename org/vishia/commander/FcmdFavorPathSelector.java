@@ -394,7 +394,7 @@ class FcmdFavorPathSelector
       while(lastTab ==null && iterFocus.hasNext()){
         GralWidget widgd = iterFocus.next();
         Object oContentInfo;
-        if(widgd.name.startsWith("tabFile_") && ( oContentInfo = widgd.getContentInfo()) instanceof FcmdFileCard){
+        if(widgd.name.startsWith(FcmdWidgetNames.tableFile) && ( oContentInfo = widgd.getContentInfo()) instanceof FcmdFileCard){
           lastTab = (FcmdFileCard)oContentInfo;      
         }
       }
