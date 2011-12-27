@@ -47,6 +47,7 @@ public abstract class GralWidget implements GralWidget_ifc
   
   /**Changes:
    * <ul>
+   * <li>2011-12-27 Hartmut new {@link #setHtmlHelp(String)}. For context sensitive help.
    * <li>2011-11-18 Hartmut bugfix: {@link #setFocus()} had called {@link GralWidgetMng#setFocus(GralWidget)} and vice versa.
    *   Instead it should be a abstract method here and implemented in all Widgets. See {@link org.vishia.gral.swt.SwtWidgetHelper#setFocusOfTabSwt(org.eclipse.swt.widgets.Control)}.
    * <li>2011-10-15 Hartmut chg: This class is now abstract. It is the super class for all wrapper implementations.
@@ -86,7 +87,7 @@ public abstract class GralWidget implements GralWidget_ifc
    *   because the type is only used and the casting is only necessary in the implementation level.       
    * </ul>
    */
-  public final static int version = 0x20111001;
+  public final static int version = 0x20111227;
   
   /**The widget manager from where the widget is organized. Most of methods need the information
    * stored in the panel manager. This reference is used to set values to other widgets. */
@@ -184,6 +185,10 @@ public abstract class GralWidget implements GralWidget_ifc
 	
 	/**command string given by the action as parameter. */
 	public String sCmd;
+	
+	
+	/**The relative path to a html help label (maybe an URL, or file, or file with label). */
+	private String htmlHelp;
 	
 	/**Any special info, may be set from any user class. It should help to present the content. 
 	 * This info can be set and changed after registration. */
@@ -408,6 +413,14 @@ public abstract class GralWidget implements GralWidget_ifc
 		this.sFormat = sFormat;
 	}
 
+	
+	public void setHtmlHelp(String url){ htmlHelp = url; }
+  
+	public String getHtmlHelp(){ return htmlHelp; }
+  
+  
+	
+	
 	public void setPanelMng(GralWidgetMng panel)
 	{ this.itsMng = panel; 
 	}

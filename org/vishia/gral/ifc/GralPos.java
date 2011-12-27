@@ -441,8 +441,8 @@ public class GralPos implements Cloneable
     } else {
       this.x.dirNext = parent.x.dirNext;
       this.y.dirNext = parent.y.dirNext;
-      this.x.pb = this.x.pbf = 0;
-      this.y.pb = this.y.pbf = 0;
+      this.x.pb = parent.x.pb; this.x.pbf = parent.x.pbf;
+      this.y.pb = parent.y.pb; this.y.pbf = parent.y.pbf;
     }
     assert(x.p1Frac >=0 && x.p1Frac < 10 && y.p1Frac >=0 && y.p1Frac < 10 );
     assert(x.p2Frac >=0 && x.p2Frac < 10 && y.p2Frac >=0 && y.p2Frac < 10 );

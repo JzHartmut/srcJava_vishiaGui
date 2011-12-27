@@ -30,6 +30,8 @@ public class GralArea9Window implements GralArea9_ifc
   
   /**Version and History
    * <ul>
+   * <li>2011-12-26 Hartmut chg: The help window is a html info box now. New method {@link #setHelpUrl(String)}
+   *   supports context sensitive help.
    * <li>2011-11-12 Hartmut new: The SubWindow for Help, About, InfoBox and InfoLog are created here (InfoLog: TODO).
    *   This windows can be opened in demand.
    * <li>2011-11-12 Hartmut chg: All menu items should be prepared in the users application now. The items for help and about
@@ -41,7 +43,7 @@ public class GralArea9Window implements GralArea9_ifc
    *          
    * </ul>
    */
-  public static final int version = 0x20111112;
+  public static final int version = 0x20111227;
   
   public final MainCmd mainCmd;
   

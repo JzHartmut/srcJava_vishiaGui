@@ -19,6 +19,7 @@ import org.vishia.gral.cfg.GralCfgWriter;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralMngApplAdapter_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
@@ -53,6 +54,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
 {
   /**Changes:
    * <ul>
+   * <li>2011-12-26 Hartmut new {@link #setApplicationAdapter(GralMngApplAdapter_ifc)} to support context sensitive help by focusGained of widgets.
    * <li>2011-11-18 Hartmut new {@link #getWidgetOnMouseDown()} to get the last clicked widget in any user routine.
    *   The information about the widget can be used to capture widgets for any script.
    * <li>2011-11-17 Hartmut new addText(String) as simple variant.  
@@ -70,7 +72,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
    * <li>2011-08-13 Hartmut chg: New routines for store and calculate the position to regard large widgets.
    * </ul>
    */
-  public final static int version = 0x20111118;
+  public final static int version = 0x20111227;
   
 	/**This class is used for a selection field for file names and pathes. */
   protected class FileSelectInfo
@@ -173,6 +175,9 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
    * All internal methods of gral writes exceptions to that logging system instead abort the execution of the application.
    */
   public final LogMessage log;
+  
+  
+  protected GralMngApplAdapter_ifc applAdapter;
   
 	protected final VariableContainer_ifc variableContainer;
 	
@@ -343,6 +348,8 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
 		userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
 	}
 
+  public void setApplicationAdapter(GralMngApplAdapter_ifc adapter){ this.applAdapter = adapter; }
+  
 
   public void setGralDevice(GralGraphicThread device)
   {

@@ -6,6 +6,7 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralMngApplAdapter_ifc;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -48,14 +49,11 @@ import org.vishia.mainCmd.MainCmd_ifc;
  * @author Hartmut Schorrig
  *
  */
-/**
- * @author Hartmut Schorrig
- *
- */
-public interface GralArea9_ifc extends GralPrimaryWindow_ifc
+public interface GralArea9_ifc extends GralPrimaryWindow_ifc, GralMngApplAdapter_ifc
 {
   /**Version history:
    * <ul>
+   * <li>2011-12-26 Hartmut new extends {@link GralMngApplAdapter_ifc}
    * <li>2011-11-12 Hartmut chg: {@link #initGraphic(String)} instead initOutputArea().
    * <li>2011-11-12 Hartmut new: {@link #getActionAbout()} and {@link #getActionAbout()} to support menu setting by user
    * <li>2011-08-06 Hartmut chg: This interface is based on MainCmd_ifc. It is a non-side-effect change
@@ -69,7 +67,7 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc
    * </ul>
    * 
    */
-  final static int version = 0x20111112;
+  final static int version = 0x20111227;
 
   
   /**Initializes the graphic of the Area9-Window. It sets the Output window to a defined area
@@ -155,7 +153,5 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc
    * to install the help menu.  */
   GralUserAction getActionAbout();
   
-  
-  void setHelpUrl(String url);
   
 }

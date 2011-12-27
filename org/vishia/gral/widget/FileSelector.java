@@ -285,6 +285,16 @@ public class FileSelector //extends GralWidget
   
   
   
+  /**It is the refresh operation.
+   * 
+   */
+  public void fillInCurrentDir(){
+    if(currentDir !=null){
+      fillIn(currentDir.getAbsolutePath());
+    }
+  }
+  
+  
   /**Fills the content with given directory.
    * @param dir The directory which's files are shown.
    */

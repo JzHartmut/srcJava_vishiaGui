@@ -1590,7 +1590,11 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     
     @Override public void focusGained(FocusEvent ev)
     { GralWidget widgd = (GralWidget)ev.widget.getData();
-      widgd.getMng().notifyFocus(widgd);  
+      widgd.getMng().notifyFocus(widgd);
+      String htmlHelp = widgd.getHtmlHelp();
+      if(htmlHelp !=null && applAdapter !=null){
+        applAdapter.setHelpUrl(htmlHelp);
+      }
     }
   };
   
