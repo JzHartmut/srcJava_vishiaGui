@@ -11,6 +11,10 @@ public class SwtHtmlBox extends GralHtmlBox
   
   Browser boxSwt;
   
+  String lastUrl, lastUrlOk;
+  
+  boolean bActiv;
+  
   public SwtHtmlBox(String name, GralWidgetMng mng)
   {
     super(name, mng);
@@ -18,10 +22,19 @@ public class SwtHtmlBox extends GralHtmlBox
     Composite parent = (Composite)(mng.pos.panel.getPanelImpl());
     boxSwt = new Browser(parent,0);
     mngSwt.setPosAndSizeSwt(boxSwt, 0, 0);
+    bActiv = false;
   }
 
   @Override public void setUrl(String url){
-    boxSwt.setUrl(url);
+    lastUrl = url;
+    if(bActiv){
+      boolean bOk = boxSwt.setUrl(url);
+      if(bOk){
+        lastUrlOk = url;
+      } else {
+        boxSwt.setUrl(lastUrlOk);
+      }
+    }
   }
 
   @Override

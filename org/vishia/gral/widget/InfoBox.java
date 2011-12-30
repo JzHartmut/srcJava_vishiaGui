@@ -98,7 +98,9 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   }
   
   public void setUrl(String url){
-    if(htmlBox !=null){ htmlBox.setUrl(url); }
+    if(htmlBox !=null){ 
+      htmlBox.setUrl(url); 
+    }
     else throw new IllegalArgumentException("it is not a html box."); 
   }
   

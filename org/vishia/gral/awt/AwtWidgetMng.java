@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralHtmlBox;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
@@ -35,6 +36,7 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.swt.SwtMenu;
 import org.vishia.msgDispatch.LogMessage;
 
 public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWorking_ifc
@@ -341,6 +343,15 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     return null;
   }
 
+  
+  public GralMenu addPopupMenu(String sName){
+    //Control panelSwt = (Control)pos.panel.getPanelImpl();
+    //SwtMenu menu = new SwtMenu(sName, panelSwt, this);
+    return null; //menu;
+  }
+
+  
+  
   @Override
   public GralPanelContent createCompositeBox(String name)
   {

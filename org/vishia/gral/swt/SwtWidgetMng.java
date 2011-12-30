@@ -69,6 +69,7 @@ import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralLed;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
@@ -1125,6 +1126,14 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   {
     return SwtTable.addTable(this, sName, height, columnWidths);
   }
+  
+  public GralMenu addPopupMenu(String sName){
+    Control panelSwt = (Control)pos.panel.getPanelImpl();
+    SwtMenu menu = new SwtMenu(sName, panelSwt, this);
+    return menu;
+  }
+  
+  
   
   
   @Override public void repaint()

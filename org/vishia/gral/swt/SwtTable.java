@@ -303,9 +303,10 @@ public class SwtTable extends GralTable
 		          lineGral = new TableItemWidget(tableLineSwt, null);
 		          tableLineSwt.setData(lineGral);  //Set the data for usage later.
 		        }
-		        procStandardKeys(keyCode, lineGral, ixRow);
-		        if(action !=null){ 
-		          actionDone = action.userActionGui(keyCode, widgetDescr, lineGral);
+		        if(!procStandardKeys(keyCode, lineGral, ixRow)){
+  		        if(action !=null){ 
+  		          actionDone = action.userActionGui(keyCode, widgetDescr, lineGral);
+  		        }
 		        }
 	        } //if(table.)
 	      } catch(Exception exc){

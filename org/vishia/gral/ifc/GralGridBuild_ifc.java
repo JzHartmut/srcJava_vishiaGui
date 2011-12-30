@@ -10,6 +10,7 @@ import java.util.Set;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralHtmlBox;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
@@ -502,6 +503,8 @@ public interface GralGridBuild_ifc
    */
   void addFocusAction(GralWidget widgetInfo, GralUserAction action, String sCmdEnter, String sCmdRelease);
 
+  
+  GralMenu addPopupMenu(String sName);
   
   /**Register all widgets, which are created in its own classes, not add here.
    * The widgets are stored in the index of names.

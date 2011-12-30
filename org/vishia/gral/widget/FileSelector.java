@@ -101,23 +101,23 @@ public class FileSelector //extends GralWidget
     
     @Override public boolean actionOk(Object userData, GralTableLine_ifc line)
     { boolean done = true;
-      FileRemote data = (FileRemote)userData;
+      FileRemote file = (FileRemote)userData;
       //File dir = data.file.getParentFile();
       //String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir) + "/";
       String sName = line.getCellText(1);
       if(sName.equals("..")){
-        String sParent = getParentDir(data);
+        String sParent = getParentDir(file);
         if(sParent !=null){
           fillIn(sParent); 
         }
       } else {
-        if(data.getName().endsWith("/")){
+        if(file.getName().endsWith("/")){
           //save the last selection of that level
-          indexSelection.put(data.getParent(), data.getName());
-          fillIn(data.getParent() + data.getName());
+          indexSelection.put(file.getParent(), file.getName());
+          fillIn(file.getParent() + file.getName());
         } else {
           if(actionOnEnterFile !=null){
-            actionOnEnterFile.userActionGui("FileSelector-file", widgdPath, data);
+            actionOnEnterFile.userActionGui(KeyCode.enter, widgdPath, file);
           } else {
             done = false;
           }

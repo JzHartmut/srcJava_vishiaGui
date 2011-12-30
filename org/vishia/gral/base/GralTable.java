@@ -23,6 +23,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc
 
   /**Version and history
    * <ul>
+   * <li>2011.12.30 Hartmut chg {@link #procStandardKeys(int, GralTableLine_ifc, int)} returns true if standard keys are used. 
    * <li>2011-11-27 Hartmut new {@link #setActionOnLineSelected(GralUserAction)}: The user action is called
    *   anytime if a line is selected by user operation. It can be show any associated content anywhere
    *   additionally. It is used for example in "The.file.Commander" to show date, time and maybe content 
@@ -61,7 +62,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc
   }
   
   
-  protected void procStandardKeys(int keyCode, GralTableLine_ifc line, int ixLine){
+  protected boolean procStandardKeys(int keyCode, GralTableLine_ifc line, int ixLine){
+    boolean bUsed = true;
     if(keyCode == keyMarkDn){
       if((line.getSelection() & 1)!=0){
         //it is selected yet
@@ -71,7 +73,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc
         line.setForegroundColor(GralColor.getColor("rd"));
         line.setSelect(1);
       }
-    }
+    } else bUsed = false;
+    return bUsed;
   }
   
   

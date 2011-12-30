@@ -53,9 +53,8 @@ public class FcmdFileCard extends FileSelector
   
   DateFormat formatDateInfo = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss");
   
-  /**Creates an instance and creates the Panel and List for the files and for the path (favorite)
-   * selection.
-   * @param tabbedPanelP The outer class. (Access is more broadly than using an non-static class)
+  /**Creates the cards with tabs for the files and for the favorite paths.
+   * @param mainPanelP The left, mid or right panel where this cards are assigned to
    * @param label The label of the tab, it builds the name of all widgets.
    */
   FcmdFileCard(FcmdLeftMidRightPanel mainPanelP, String label){
@@ -67,24 +66,28 @@ public class FcmdFileCard extends FileSelector
     String namePanelFile = FcmdWidgetNames.tableFile + nameFilePanel;
     main.idxFileSelector.put(namePanelFile, this); //it is WidgetNames.tableFile + label +.123, see super(...) 
     GralWidgetMng mng = main.gralMng;
-    ///
-    ///
+    //
+    //The favorite paths card
     favorCard = new FcmdFavorCard(main, this, mainPanel);
     String nameTableSelection = FcmdWidgetNames.tableFavorites + nameFilePanel;
     mainPanel.tabbedPanelFavorCards.addGridPanel(FcmdWidgetNames.tabFavorites + nameFilePanel, label,1,1,10,10);
-    mng.setPosition(2, 0, 0, -0, 1, 'd');  ///p
+    mng.setPosition(0, 0, 0, -0, 1, 'd');  ///p
     favorCard.setToPanel(mng, nameTableSelection, 5, mainPanel.widthSelecttableSub, 'A');
     favorCard.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorSelect.");
-    //mng.selectPanel(WidgetNames.panelFavoritesLeftMidRight +mainPanel.cNr);
-    //String sLabelTab = "file&"+cNr;
-    //The grid panel contains this widget. The grid panel is a tab of mainPanel.tabbedPanel
+    //
+    //The files card
     mainPanel.tabbedPanelFileCards.addGridPanel(FcmdWidgetNames.tabFile + nameFilePanel, label,1,1,10,10);
     //to show the properties of the selected file in the info line:
     //
     //sets this Widget to the selected panel, it is the grid panel which was created even yet.
     setToPanel(mng, namePanelFile, 5, new int[]{2,20,5,10}, 'A');
     super.selectList.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.fileSelect.");
+    //
+    //sets the action for a simple table: what to do on line selected: Show file names. 
     selectList.wdgdTable.setActionOnLineSelected(actionFileSelected);
+    //
+    //sets the action for Select a file: open the execute menu
+    setActionOnEnterFile(main.executer.actionOnEnterFile);
   }
 
  
@@ -164,8 +167,8 @@ public class FcmdFileCard extends FileSelector
           widg.setFocus();
         }
       }
-    } else if (main.executer.actionExecuteUserKey(keyCode, data)){
-      ret = true;
+    //} else if (main.executer.actionExecuteUserKey(keyCode, data)){
+    //  ret = true;
     } else {
       ret = false;
     }
@@ -189,9 +192,9 @@ public class FcmdFileCard extends FileSelector
       file.length() >= 1000000 ? String.format("%2.1f MByte", file.length()/1000000.0) :
       file.length() >=    1000 ? String.format("%2.1f kByte", file.length()/1000.0) :
       String.format("%3d Byte", file.length());  
-    String info = sDate + " # " + sLenShort + " >" + file.getName() + "<";        
+    String info = sDate + " # " + sLenShort;        
     main.widgFileInfo.setText(info);
-    
+    main.widgFilePath.setText(file.getAbsolutePath());
   }
   
   

@@ -56,9 +56,11 @@ public class Fcmd extends GuiCfg
 
   final FcmdButtons fButtons = new FcmdButtons();
   
-  GralTextField widgFileInfo, widgRunInfo;
+  GralTextField widgFileInfo, widgFilePath, widgRunInfo;
   
   final String nameTextFieldInfo = "file-info";
+  
+  final String nameTextFieldFilePath = "file-path";
   
   final String nameTextFieldRunInfo = "run-info";
   
@@ -170,6 +172,7 @@ public class Fcmd extends GuiCfg
     viewCmd.buildWindowView();   //F3
     copyCmd.buildWindowConfirmCopy();
     mkCmd.buildWindowConfirmMk();
+    executer.buildWindowConfirmExec();
     deleteCmd.buildWindowConfirmDelete(); //F8
     favorPathSelector.buildWindowAddFavorite();
     gui.addMenuItemGThread("menuHelp", "&Help/&Help", gui.getActionHelp());
@@ -177,18 +180,20 @@ public class Fcmd extends GuiCfg
     gui.addMenuItemGThread("MenuTestInfo", "&Help/&Infobox", actionTest); // /
     guiW.outputBox.setActionChange(executer.actionCmdFromOutputBox);
     
-    gui.setHelpUrl("d:/vishia/ZBNF/index.html");
+    gui.setHelpUrl("/home/hartmut/vishia/JavaCommander/sf/JavaCommander/help/Fcmd.html");
   }
 
   private void initPanelButtons()
   {
     gralMng.selectPanel("Buttons");
-    gralMng.setPosition(0, 2, 0, 9.8f, 1, 'r');
+    gralMng.setPosition(0, 2, 0, 0, 1, 'r');
+    widgFilePath = gralMng.addTextField(nameTextFieldFilePath, false, null, null);
+    gralMng.setPosition(2, 4, 0, 9.8f, 1, 'r');
     widgRunInfo = gralMng.addTextField(nameTextFieldRunInfo, false, null, null);
-    gralMng.setPosition(0, 2, 10, 0, 1, 'r');
+    gralMng.setPosition(2, 4, 10, 0, 1, 'r');
     widgFileInfo = gralMng.addTextField(nameTextFieldInfo, false, null, null);
     
-    gralMng.setPosition(2, GralPos.size + 1, 10, 20, 1, 'r');
+    gralMng.setPosition(4, GralPos.size + 1, 10, 20, 1, 'r');
     gralMng.addText("F1", 'A', 0x0);
     gralMng.addText("F2", 'A', 0x0);
     gralMng.addText("F3", 'A', 0x0);
@@ -204,7 +209,7 @@ public class Fcmd extends GuiCfg
     gralMng.addText("ctr -", 'A', 0x0);
     gralMng.addText("sh  -", 'A', 0x0);
 
-    gralMng.setPosition(3, 5, 4, 14, 1, 'r');
+    gralMng.setPosition(5, 7, 4, 14, 1, 'r');
     gralMng.addButton("b-help", null, "help", null, null, "help");
     gralMng.addButton("b-F2", null, "help", null, null, "F2");
     gralMng.addButton("b-help", null, "help", null, null, "view");
@@ -215,13 +220,10 @@ public class Fcmd extends GuiCfg
     fButtons.buttonDel = gralMng.addButton("b-delete", deleteCmd.actionConfirmDelete, "del", null, null, "del");
     gralMng.addButton("b-help", null, "help", null, null, "cmd");
     gralMng.addButton("b-help", null, "help", null, null, "F10");
-    gralMng.setPosition(5, 7, 4, 14, 1, 'r');
-    gralMng.addButton("selectLeft", selectPanelLeft, "selectLeft", null, null,
-        "left");
-    gralMng.addButton("selectMiddle", selectPanelMiddle, "help", null, null,
-        "middle");
-    gralMng
-        .addButton("selectRight", selectPanelRight, "", null, null, "right");
+    gralMng.setPosition(7, 9, 4, 14, 1, 'r');
+    gralMng.addButton("selectLeft", selectPanelLeft, "selectLeft", null, null, "left");
+    gralMng.addButton("selectMiddle", selectPanelMiddle, "help", null, null, "middle");
+    gralMng.addButton("selectRight", selectPanelRight, "", null, null, "right");
     gralMng.addButton("selectCmd", selectPanelOut, "", null, null, "cmd");
     gralMng.addButton("b-help", null, "help", null, null, "zip");
     gralMng.addButton("b-help", null, "help", null, null, "link");
@@ -229,7 +231,7 @@ public class Fcmd extends GuiCfg
     gralMng.addButton("b-help", null, "help", null, null, "a-F8");
     gralMng.addButton("b-help", null, "help", null, null, "a-F9");
     gralMng.addButton("b-help", null, "help", null, null, "a-F10");
-    gralMng.setPosition(7, 9, 4, 14, 1, 'r');
+    gralMng.setPosition(9, 11, 4, 14, 1, 'r');
     gralMng.addButton("b-help", null, "help", null, null, "brief");
     gralMng.addButton("b-F2", null, "help", null, null, "full");
     gralMng.addButton("b-help", null, "help", null, null, "name");
@@ -240,7 +242,7 @@ public class Fcmd extends GuiCfg
     gralMng.addButton("b-help", null, "help", null, null, "tree");
     gralMng.addButton("b-help", null, "help", null, null, "c-F9");
     gralMng.addButton("b-help", null, "help", null, null, "c-F10");
-    gralMng.setPosition(9, 11, 4, 14, 1, 'r');
+    gralMng.setPosition(11, 13, 4, 14, 1, 'r');
     gralMng.addButton("b-help", null, "help", null, null, "brief");
     gralMng.addButton("b-F2", null,   "help", null, null, "full");
     gralMng.addButton("b-help", null, "help", null, null, "name");
@@ -378,7 +380,7 @@ public class Fcmd extends GuiCfg
    * panels. The order of focused file-panel-tables is used for that. The
    * currently selected file in any of the tables in order of last gotten focus
    * is used to get the files. It is the input for some command invocations.
-   * 
+   * @deprecated
    * @return Array of files in order of last focus
    */
   FileRemote[] getCurrentFileInLastPanels()
@@ -400,6 +402,7 @@ public class Fcmd extends GuiCfg
   /**Routine to find out the last focused file tables in order of focus.
    * 
    * @set lastFocusedFileTables
+   * @deprecated
    */
   void findLastFocusedFileTables(){
     int ixFile = 0;
@@ -425,7 +428,7 @@ public class Fcmd extends GuiCfg
   
   
   /**Returns all selected files in the last actual file table.
-   * 
+   * @deprecated
    * @return Array of files which are selected, The array has the length 1 if only one file is selected.
    */
   private List<String> getSelectedFilesInLastPanel()
@@ -444,6 +447,21 @@ public class Fcmd extends GuiCfg
     } else return null;
   }
 
+  
+  
+  /**Get the last selected files in order of selection.
+   * New method since 2011-12-23
+   * @return array of the last selected files. It hast length ==0 of nothing was selected before. 
+   */
+  FileRemote[] getLastSelectedFiles(){
+    FileRemote[] ret = new FileRemote[lastFileCards.size()];
+    int ix = -1;
+    for(FcmdFileCard card: lastFileCards){
+      ret[++ix] = card.currentFile;
+    }
+    return ret;
+  }
+  
 
   /**
    * Action to set the command list from file. It is called from menu.
@@ -485,8 +503,7 @@ public class Fcmd extends GuiCfg
       this.cargs = cargs;
     }
 
-    @Override
-    protected boolean testArgument(String arg, int nArg)
+    @Override protected boolean testArgument(String arg, int nArg)
     {
       boolean bOk = true;
       if (arg.startsWith("cfg:")) {
@@ -503,6 +520,22 @@ public class Fcmd extends GuiCfg
         cargs.fileSelectTabPaths = new File(arg.substring(4));
       } else {
         bOk = super.testArgument(arg, nArg);
+      }
+      return bOk;
+    }
+    
+    @Override protected boolean checkArguments(){
+      boolean bOk = true;
+      if(cargs.dirCfg == null) { bOk = false; writeError("cmdline argument cfg:PATHCFG is missing"); }
+      if(bOk){
+        if(!cargs.dirCfg.exists()){ bOk = false; writeError("cmdline argument cfg is faulty:" + cargs.dirCfg.getAbsolutePath());}
+      }
+      if(bOk){
+        if(cargs.dirHtmlHelp ==null){ cargs.dirHtmlHelp = new File(cargs.dirCfg, "../help"); }
+        if(cargs.fileCfgCmds ==null){ cargs.fileCfgCmds = new File(cargs.dirCfg, "cmd.cfg"); }
+        if(cargs.fileCmdsForExt ==null){ cargs.fileCmdsForExt = new File(cargs.dirCfg, "ext.cfg"); }
+        if(cargs.fileCfgButtonCmds ==null){ cargs.fileCfgButtonCmds = new File(cargs.dirCfg, "cmdi.cfg"); }
+        if(cargs.fileSelectTabPaths ==null){ cargs.fileSelectTabPaths = new File(cargs.dirCfg, "path.cfg"); }
       }
       return bOk;
     }
