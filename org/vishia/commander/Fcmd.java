@@ -96,8 +96,14 @@ public class Fcmd extends GuiCfg
   
   List<FcmdFileCard> lastFileCards = new LinkedList<FcmdFileCard>();
   
+  /**
+   * @deprecated
+   */
   File[] selectedFiles;
 
+  /**
+   * @deprecated
+   */
   FileSelector[] lastFocusedFileTables = new FileSelector[3];
   
   final Map<String, FileSelector> idxFileSelector = new TreeMap<String, FileSelector>();

@@ -29,10 +29,14 @@ public class FcmdDelete
 
   GralTextField_ifc widgDeletePath, widgTrashPath;
   
+  /**Buttons. */
   GralWidget widgRemoveToTrash, widgDelete;
 
+  /**Name of the file which is attempt to delete. */
   String sFileDelete;
   
+  /**The file card where the directory content is shown where the file will be deleted.
+   */
   FcmdFileCard fileCard;
   
   FcmdDelete(Fcmd main)
@@ -136,7 +140,6 @@ public class FcmdDelete
   
   
   EventConsumer success = new EventConsumer(){
-
     @Override public boolean processEvent(Event ev)
     {
       if(ev.iData !=0){

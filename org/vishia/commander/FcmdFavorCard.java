@@ -76,7 +76,7 @@ public class FcmdFavorCard  extends SelectList
     //to restore if this favor respectively selection is used ones more.
     String currentDir;
     if(fileTable.favorPathInfo !=null){
-      currentDir = fileTable.getCurrentDir();
+      currentDir = fileTable.getCurrentDir().getAbsolutePath();
       if(currentDir !=null){
         mainPanel.indexActualDir.put(fileTable.favorPathInfo.selectName, currentDir);
     } }
