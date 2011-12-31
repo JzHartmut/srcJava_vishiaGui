@@ -1,6 +1,7 @@
 package org.vishia.gral.base;
 
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -18,6 +19,10 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
 
   /**Version and history:
    * <ul>
+   * <li>2011-12-31 Hartmut chg: Implements the set-methods of {@link GralWindow_ifc} in form of calling
+   *   {@link GralPanelMngWorking_ifc#setInfo(GralWidget, int, int, Object, Object)}. This methods
+   *   can be called in any thread, it may be stored using 
+   *   {@link GralGraphicThread#addChangeRequest(org.vishia.gral.ifc.GralWidgetChangeRequ)}.
    * <li>2011-11-27 Hartmut new: {@link #addMenuItemGThread(String, String, GralUserAction)} copied
    *   from {@link org.vishia.gral.ifc.GralPrimaryWindow_ifc}. The capability to have a menu bar
    *   should be enabled for sub-windows too. To support regularity, the property bit {@link #windHasMenu}
@@ -94,6 +99,22 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
    * @param action called on menu activation.
    */
   abstract public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction action);
+  
+  
+  @Override public void setWindowVisible(boolean visible){
+    itsMng.setInfo(this, GralPanelMngWorking_ifc.cmdSetWindowVisible, visible? 1: 0, null, null);
+  }
+  
+
+  @Override public void closeWindow(){
+    itsMng.setInfo(this, GralPanelMngWorking_ifc.cmdCloseWindow, 0, null, null);
+  }
+  
+  
+  @Override public void redraw(){
+    itsMng.setInfo(this, GralPanelMngWorking_ifc.cmdRedraw, 0, null, null);
+  }
+  
   
   
 

@@ -52,6 +52,12 @@ public interface GralPanelMngWorking_ifc
   
   final static int cmdRemove = 0xde1e7e;  //delete
   
+  final static int cmdSelect = 0x5e1ecd;
+  
+  final static int cmdSetWindowVisible = 0x10001;
+  
+  final static int cmdCloseWindow = 0x10002;
+  
   //final static int cmdSetData = 0x5e1da1a;  //setdata
   
 

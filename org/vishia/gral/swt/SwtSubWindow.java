@@ -27,10 +27,13 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.ifc.GralWindow_setifc;
 import org.vishia.util.KeyCode;
 
 //public class SubWindowSwt extends GralPanelContent implements WidgetCmpnifc
-public class SwtSubWindow extends GralWindow
+public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
 {
 
   
@@ -121,15 +124,6 @@ public class SwtSubWindow extends GralWindow
 
   @Override public boolean isWindowsVisible(){ return window.isVisible(); }
 
-  @Override public void setWindowVisible(boolean visible)
-  { 
-    visibleFirst |= visible;
-    window.setVisible(visible);
-    if(visible){ 
-      window.setFocus();
-      window.setActive();
-    }
-  }
 
   @Override
   public GralColor setBackgroundColor(GralColor color)
@@ -145,8 +139,6 @@ public class SwtSubWindow extends GralWindow
     return null;
   }
   
-  @Override public void redraw(){  window.redraw(); window.update(); }
-
   
   public void removeWidgetImplementation()
   {
@@ -166,11 +158,6 @@ public class SwtSubWindow extends GralWindow
   { window.setBounds(x,y,dx,dy);
   }
   
-  @Override public void closeWindow()
-  { 
-    window.close();
-  }
-
   
   @Override public void setResizeAction(GralUserAction action){
     if(resizeAction == null){
@@ -374,10 +361,33 @@ public class SwtSubWindow extends GralWindow
   
   
 
+  /**The methods which are defined here should be called in the graphic thread only. */
+  GralWindow_setifc swtWindow_setifc = new GralWindow_setifc()  //, GralWidget_ifc
+  {
 
+    @Override public void setWindowVisible(boolean visible)
+    { visibleFirst |= visible;
+      window.setVisible(visible);
+      if(visible){ 
+        window.setFocus();
+        window.setActive();
+      }
+    }
+
+    
+    @Override public void redraw(){  window.redraw(); window.update(); }
+
+    @Override public void closeWindow(){ window.close(); }
+
+    
+  };
 
   
   void stop(){}
+
+  @Override public GralWindow_setifc getSwtWindow_ifc(){  return swtWindow_setifc; }
+
+  @Override public GralWidget_ifc getSwtWidget_ifc(){ return null; }
   
   
 }

@@ -269,29 +269,29 @@ public class SwtTable extends GralTable
     @Override
     public void keyPressed(KeyEvent keyEv)
     {
-      final GralWidget widgetDescr;
-      final GralUserAction action;
-      //System.out.println("" + keyEv.character + Integer.toHexString(keyEv.keyCode));
-      
-      final Object source = keyEv.getSource();
-      final Control swtControl;
-      if(source instanceof Control){
-        swtControl = ((Control)source);
-        Object oData = swtControl.getData();
-        if(oData instanceof GralWidget){
-          widgetDescr = (GralWidget)oData;
-          action = widgetDescr.getActionChange();
-        } else { widgetDescr = null; action = null; }
-      } else { 
-        widgetDescr = null; action = null;
-        swtControl = null;
-      }
-      boolean actionDone = false;
-      if((keyEv.keyCode & 0xffff) !=0){
-        final int keyCode = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
-        int ixRow = -99999;
-      	try{
-	      	Table table1 = (Table)source;
+      try{
+        final GralWidget widgetDescr;
+        final GralUserAction action;
+        //System.out.println("" + keyEv.character + Integer.toHexString(keyEv.keyCode));
+        
+        final Object source = keyEv.getSource();
+        final Control swtControl;
+        if(source instanceof Control){
+          swtControl = ((Control)source);
+          Object oData = swtControl.getData();
+          if(oData instanceof GralWidget){
+            widgetDescr = (GralWidget)oData;
+            action = widgetDescr.getActionChange();
+          } else { widgetDescr = null; action = null; }
+        } else { 
+          widgetDescr = null; action = null;
+          swtControl = null;
+        }
+        boolean actionDone = false;
+        if((keyEv.keyCode & 0xffff) !=0){
+          final int keyCode = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
+          int ixRow = -99999;
+      		Table table1 = (Table)source;
 	        ixRow  = table1.getSelectionIndex();   //the currently selected line.
 	        if(ixRow >=0){  //< 0 if nothing is selected.
 		        TableItem tableLineSwt = table1.getItem(ixRow);   // the SWT TableItem which presents the line.
@@ -309,30 +309,30 @@ public class SwtTable extends GralTable
   		        }
 		        }
 	        } //if(table.)
-	      } catch(Exception exc){
-      		stop();  //ignore it
-      	}
-	      if(action !=null && !actionDone){
-	        GralUserAction mainKeyAction = mng.getRegisteredUserAction("KeyAction");
-	        if(mainKeyAction !=null){
-	          int gralKey = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
-	          //old form called because compatibility, if new for with int-parameter returns false.
-	          if(!mainKeyAction.userActionGui(gralKey, widgetDescr)){
-	            mainKeyAction.userActionGui("key", widgetDescr, new Integer(gralKey));
-	          }
-	        }
-	      }
-      }
-      stop();
-      if(basicListener !=null){
-        basicListener.keyPressed(keyEv);
-      }
-      if(swtControl !=null){
-        Control parent = swtControl.getParent();
-        if(parent !=null){
-          //KeyListener parentListener = parent.getListener(SWT.KEY_MASK);
-          //parent.
+  	      if(action !=null && !actionDone){
+  	        GralUserAction mainKeyAction = mng.getRegisteredUserAction("KeyAction");
+  	        if(mainKeyAction !=null){
+  	          int gralKey = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
+  	          //old form called because compatibility, if new for with int-parameter returns false.
+  	          if(!mainKeyAction.userActionGui(gralKey, widgetDescr)){
+  	            mainKeyAction.userActionGui("key", widgetDescr, new Integer(gralKey));
+  	          }
+  	        }
+  	      }
         }
+        stop();
+        if(basicListener !=null){
+          basicListener.keyPressed(keyEv);
+        }
+        if(swtControl !=null){
+          Control parent = swtControl.getParent();
+          if(parent !=null){
+            //KeyListener parentListener = parent.getListener(SWT.KEY_MASK);
+            //parent.
+          }
+        }
+      } catch(Exception exc){
+        mng.log.sendMsg(0, "Exception in SwtTable-KeyEvent; %s", exc.getLocalizedMessage());
       }
     }
 
@@ -449,8 +449,12 @@ public class SwtTable extends GralTable
   
   @Override public void setCurrentCell(int line, int column)
   {
-    //table.select(line);
-    table.setSelection(line);
+    if(Thread.currentThread().getId() == itsMng.gralDevice.getThreadIdGui()){
+      table.setSelection(line);
+      //table.select(line);
+    } else {
+      itsMng.setInfo(this, GralPanelMngWorking_ifc.cmdSelect, line, null, null);
+    }
     
   }
   

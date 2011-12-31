@@ -138,18 +138,27 @@ public class FileSelector //extends GralWidget
     }
     
     
+    /**The 'action left' for the FileSelector shows the parent directory.
+     * The {@link FileSelector#currentDir} is used to get its parent to show.
+     * @param line the current line. It is unused because userData contains the file.
+     * @param userData The {@link GralTableLine_ifc#getUserData()} from line. it is a {@link FileRemote}
+     *   which is currently selected. This file is stored as current for the current directory. 
+     *   The parent of the file is the directory which is shown yet.
+     * @see org.vishia.gral.widget.SelectList#actionLeft(java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
+     */
     @Override public void actionLeft(Object userData, GralTableLine_ifc line)
     {
       FileRemote data = (FileRemote)userData;
       //File dir = data.file.getParentFile();
-      String sDir = currentDir.getParent();
       //String sName = line.getCellText(1);
+      String sDir = currentDir.getPath();
       if(data !=null && sDir !=null){
+        System.out.println("current: " + sDir + " :: " + data.getName());
         indexSelection.put(sDir, data.getName());
       }
-      //String sParent = getParentDir(data);
-      if(sDir !=null){
-        fillIn(sDir); 
+      String sParent = currentDir.getParent();
+      if(sParent !=null){
+        fillIn(sParent); 
       }
     }
     
@@ -211,7 +220,7 @@ public class FileSelector //extends GralWidget
   //final MainCmd_ifc mainCmd;
 
   /**The current shown directory. */
-  File currentDir;
+  FileRemote currentDir;
   
   String sCurrentDir;
   
@@ -259,7 +268,7 @@ public class FileSelector //extends GralWidget
   }
   
 
-  public String getCurrentDir(){ return sCurrentDir; }
+  //public String getCurrentDir(){ return sCurrentDir; }
   
   public void setOriginDir(String dir){ originDir = dir; }
   
@@ -301,17 +310,15 @@ public class FileSelector //extends GralWidget
   public void fillIn(String path)
   {
     selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdClear, -1, null, null);
-    File dir = new File(path);
+    FileRemote dir = new FileRemote(path);
     this.currentDir = dir;
     if(originDir == null){
       originDir = path;      //sets on the first invocation. 
     }
     this.sCurrentDir = FileSystem.getCanonicalPath(dir) + "/";
-    String sFileSelected = indexSelection.get(sCurrentDir);
     widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sCurrentDir);
     File[] files = dir.listFiles();
     int lineSelect = 0;  
-    int lineCt = 0; //count lines to select the line number with equal sFileSelect.
     if(files !=null){ 
       Map<String, FileRemote> sortFiles = new TreeMap<String, FileRemote>();
       for(File file: files){
@@ -324,20 +331,22 @@ public class FileSelector //extends GralWidget
         String sort = (file.isDirectory()? "D" : "F") + sName;
         sortFiles.put(sort, fileItem);
       }
-      String[] line = new String[4];
-      /*
+      int lineCt = 0; //count lines to select the line number with equal sFileSelect.
       if(dir.getParent() !=null){
+        String[] line = new String[4];
         line[0] = "<";
         line[1] = "..";
         line[2] = "";
         line[3] = "";
         selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, line, dir);
-        
+        lineCt +=1;
       }
-      */
+      //The file or directory which was the current one while this directory was shown lastly:
+      String sFileCurrentline = indexSelection.get(sCurrentDir);
       for(Map.Entry<String, FileRemote> entry: sortFiles.entrySet()){
+        String[] line = new String[4];
         FileRemote file = entry.getValue();
-        if(sFileSelected != null && file.getName().equals(sFileSelected)){
+        if(sFileCurrentline != null && file.getName().equals(sFileCurrentline)){
           lineSelect = lineCt;
         }
         if(file.getName().endsWith("/")){ line[0] = "/"; }
@@ -345,11 +354,19 @@ public class FileSelector //extends GralWidget
         line[1] = file.getName();
         Date timestamp = new Date(file.lastModified());
         line[3] = dateFormat.format(timestamp);
+        /*
+        GralTableLine_ifc tLine = selectList.wdgdTable.insertLine(null, lineCt);
+        tLine.setCellText(line[0], 0);
+        tLine.setCellText(line[1], 1);
+        tLine.setCellText(line[2], 2);
+        tLine.setCellText(line[3], 3);
+        */
         selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, line, file);
         lineCt +=1;
       }
-      if(files.length ==0){
+      if(lineCt ==0){
         //special case: no files:
+        String[] line = new String[4];
         line[0] = "";
         line[1] = "--empty--";
         line[3] = "";
@@ -363,12 +380,12 @@ public class FileSelector //extends GralWidget
       line[1] = "--not found--";
       line[3] = "";
       selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, line, currentDir);
-      lineCt +=1;
     }
     selectList.wdgdTable.setCurrentCell(lineSelect, 1);
   }
   
 
+  public FileRemote getCurrentDir(){ return currentDir; }
 
   
   /**Gets the selected file from this panel.

@@ -94,6 +94,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
+import org.vishia.gral.ifc.GralWindow_setifc;
 import org.vishia.gral.widget.GralCurveView;
 import org.vishia.msgDispatch.LogMessage;
 
@@ -140,6 +141,8 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	/**Version, able to read as hex yyyymmdd.
 	 * Changes:
 	 * <ul>
+	 * <li>2012-01-01 Hartmut new: The {@link #setInfoDirect(GralWidget, int, int, Object, Object)} routine
+	 *   uses the {@link SwtSetValue_ifc} capability to associate cmd to types of widgets. Yet used only for {@link SwtSubWindow}.
 	 * <li>2011-12-03 Hartmut new: {@link #setInfoDirect(GralWidget, int, int, Object, Object)} catches
 	 *   any exception, before: An exception causes aborting the graphic thread.
 	 * <li>2011-12-03 Hartmut chg: {@link #addLed(String, String, String)} now uses {@link GralLed}.  
@@ -1225,7 +1228,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     		stop();
     	//check the admissibility:
     	switch(cmd){
-    	case GralPanelMngWorking_ifc.cmdInsert: checkAdmissibility(visibleInfo != null && visibleInfo instanceof String); break;
+    	case GralPanelMngWorking_ifc.cmdInsert: checkAdmissibility(visibleInfo != null && (visibleInfo instanceof String || visibleInfo instanceof String[])); break;
     	}
       gralDevice.addChangeRequest(new GralWidgetChangeRequ(descr, cmd, ident, visibleInfo, userData));
     }
@@ -1237,77 +1240,93 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   private void setInfoDirect(GralWidget widget, int cmd, int ident, Object info, Object data)
   { final Control swtWidget;
     try{
-      if(  widget !=null 
+      if(widget !=null && widget instanceof SwtSetValue_ifc){
+        SwtSetValue_ifc widgs = (SwtSetValue_ifc)widget;
+        GralWindow_setifc gralWindow_setifc = widgs.getSwtWindow_ifc();
+        if(gralWindow_setifc !=null){
+          //check cmd for it:
+          switch(cmd){
+          case GralPanelMngWorking_ifc.cmdSetWindowVisible: gralWindow_setifc.setWindowVisible(ident == 0 ? false : true); break;
+          case GralPanelMngWorking_ifc.cmdCloseWindow: gralWindow_setifc.closeWindow(); break;
+          case GralPanelMngWorking_ifc.cmdRedraw: gralWindow_setifc.redraw(); break;
+          
+          }
+        }
+      }
+      else if(  widget !=null 
         && ( swtWidget = (Control)widget.getWidgetImplementation()) !=null
         ){
-          int colorValue;
-          switch(cmd){
-          case GralPanelMngWorking_ifc.cmdBackColor: {
-            colorValue = ((Integer)(info)).intValue();
-            Color color = propertiesGuiSwt.colorSwt(colorValue & 0xffffff);
-            swtWidget.setBackground(color); 
-          } break;
-          case GralPanelMngWorking_ifc.cmdLineColor:{ 
-            colorValue = ((Integer)(info)).intValue();
-            Color color = propertiesGuiSwt.colorSwt(colorValue & 0xffffff);
-            swtWidget.setForeground(color); 
-          } break;
-          case GralPanelMngWorking_ifc.cmdRedraw: swtWidget.redraw(); break;
-          case GralPanelMngWorking_ifc.cmdRedrawPart: 
-            assert(swtWidget instanceof CurveView);
-            ((CurveView)(swtWidget)).redrawData(); break; //causes a partial redraw
-          default: 
-            if(widget instanceof SwtTable){ 
-              SwtTable table = (SwtTable)widget;
-              //NOTE: ident is the row number. Insert before row.
-              switch(cmd){
-              case GralPanelMngWorking_ifc.cmdInsert: table.changeTable(ident, info, data); break;
-              case GralPanelMngWorking_ifc.cmdSet: table.changeTable(ident, info, data); break;
-              case GralPanelMngWorking_ifc.cmdClear: table.clearTable(ident); break;
-              default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, widget.name);
-              }
-            } else if(swtWidget instanceof Text){ 
-              Text field = (Text)swtWidget;
-              switch(cmd){
-                case GralPanelMngWorking_ifc.cmdSet:
-                case GralPanelMngWorking_ifc.cmdInsert: 
-                  String sInfo = (String)info;
-                  field.setText(sInfo); 
-                  //shows the end of text because the position after last char is selected.
-                  //field.setSelection(sInfo.length());  
-                  break;
-              default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %x on widget %s", cmd, widget.name);
-              }
-            } else if(widget instanceof SwtLed){ 
-              SwtLed field = (SwtLed)widget;
-              switch(cmd){
-              case GralPanelMngWorking_ifc.cmdColor: field.setColor(ident, (Integer)info); break;
-              case GralPanelMngWorking_ifc.cmdSet: {
-                if(info instanceof Integer){
-                  int colorInner = ((Integer)info).intValue();
-                  field.setColor(ident, colorInner);
-                } else if(info instanceof String){
-                  if(((String)info).charAt(0) != '0'){
-                    field.setColor(0xff0000, 0xfff00);
-                  } else {
-                    field.setColor(0x00ff00, 0x00ffff);
-                  }
-                } else {
-                  stop();
-                }
-              } break;
-              default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, widget.name);
-              }
-            } else if(widget instanceof GralButton){ 
-              GralButton widgetButton = (GralButton)widget;
-              widgetButton.setState(info);
-            } else {
-              //all other widgets:    
-              switch(cmd){  
-              default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd %x for widget: %s", cmd, widget.name);
-              }
+        //common methods for all swt.Control
+        int colorValue;
+        switch(cmd){
+        case GralPanelMngWorking_ifc.cmdBackColor: {
+          colorValue = ((Integer)(info)).intValue();
+          Color color = propertiesGuiSwt.colorSwt(colorValue & 0xffffff);
+          swtWidget.setBackground(color); 
+        } break;
+        case GralPanelMngWorking_ifc.cmdLineColor:{ 
+          colorValue = ((Integer)(info)).intValue();
+          Color color = propertiesGuiSwt.colorSwt(colorValue & 0xffffff);
+          swtWidget.setForeground(color); 
+        } break;
+        case GralPanelMngWorking_ifc.cmdRedraw: swtWidget.redraw(); break;
+        case GralPanelMngWorking_ifc.cmdRedrawPart: 
+          assert(swtWidget instanceof CurveView);
+          ((CurveView)(swtWidget)).redrawData(); break; //causes a partial redraw
+        default:
+          
+          if(widget instanceof SwtTable){ 
+            SwtTable table = (SwtTable)widget;
+            //NOTE: ident is the row number. Insert before row.
+            switch(cmd){
+            case GralPanelMngWorking_ifc.cmdInsert: table.changeTable(ident, info, data); break;
+            case GralPanelMngWorking_ifc.cmdSet: table.changeTable(ident, info, data); break;
+            case GralPanelMngWorking_ifc.cmdClear: table.clearTable(ident); break;
+            case GralPanelMngWorking_ifc.cmdSelect: table.setCurrentCell(ident, 0); break;
+            default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, widget.name);
             }
-          }//switch
+          } else if(swtWidget instanceof Text){ 
+            Text field = (Text)swtWidget;
+            switch(cmd){
+              case GralPanelMngWorking_ifc.cmdSet:
+              case GralPanelMngWorking_ifc.cmdInsert: 
+                String sInfo = (String)info;
+                field.setText(sInfo); 
+                //shows the end of text because the position after last char is selected.
+                //field.setSelection(sInfo.length());  
+                break;
+            default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %x on widget %s", cmd, widget.name);
+            }
+          } else if(widget instanceof SwtLed){ 
+            SwtLed field = (SwtLed)widget;
+            switch(cmd){
+            case GralPanelMngWorking_ifc.cmdColor: field.setColor(ident, (Integer)info); break;
+            case GralPanelMngWorking_ifc.cmdSet: {
+              if(info instanceof Integer){
+                int colorInner = ((Integer)info).intValue();
+                field.setColor(ident, colorInner);
+              } else if(info instanceof String){
+                if(((String)info).charAt(0) != '0'){
+                  field.setColor(0xff0000, 0xfff00);
+                } else {
+                  field.setColor(0x00ff00, 0x00ffff);
+                }
+              } else {
+                stop();
+              }
+            } break;
+            default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, widget.name);
+            }
+          } else if(widget instanceof GralButton){ 
+            GralButton widgetButton = (GralButton)widget;
+            widgetButton.setState(info);
+          } else {
+            //all other widgets:    
+            switch(cmd){  
+            default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd %x for widget: %s", cmd, widget.name);
+            }
+          }
+        }//switch
       }//if oWidget !=null
     }catch(Exception exc){
       stop();    
