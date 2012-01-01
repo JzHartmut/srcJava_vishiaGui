@@ -1,9 +1,17 @@
 package org.vishia.commander;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 
 import org.vishia.gral.base.GralTextBox;
@@ -42,6 +50,9 @@ public class FcmdView
   /**The gotten bytes from bytebuffer. */
   private byte[] buffer = new byte[1200];
   
+  
+  //private byte[] outBuffer = new byte[20000];
+  
   /**The current choiced view format.
    * <ul>
    * <li>a: us-ascii-text
@@ -57,6 +68,8 @@ public class FcmdView
   
   
   private static Charset ascii7 = Charset.forName("US-ASCII");
+  
+  private static Charset utf8 = Charset.forName("UTF8");
   
   
   /**Instance to prepare the text especially for hex view. */
@@ -82,6 +95,7 @@ public class FcmdView
     wind.addMenuItemGThread("view-Search", "&View/text-&UTF", actionOpenView);
     wind.addMenuItemGThread("view-Search", "&View/text-&ASCII-7", actionOpenView);
     wind.addMenuItemGThread("view-Search", "&View/text-&Encoding", actionOpenView);
+    wind.addMenuItemGThread(null, "&Save-as/UTF8-Unix-lf", actionConvertUTF8unix);
     main.gralMng.setPosition(0, 0, 0, 0, 1, 'r');
     widgContent = main.gralMng.addTextBox("view-content", false, null, '.');
     widgContent.setTextStyle(GralColor.getColor("bk"), main.gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));
@@ -99,16 +113,27 @@ public class FcmdView
   void view(FileRemote src)
   { String sSrc, sTrash;
     src = main.currentFile;
+    long len = src.length();
+    if(len > 1000000){ len = 1000000; } //nor more than 1MByte, 
+    buffer = new byte[(int)len];
+    int iBuffer = 0;
     ReadableByteChannel reader = src.openRead(0);
     try{
       if(reader == null){
         widgContent.setText("File is not able to read:\n");
         widgContent.append(src.getAbsolutePath());
       } else {
-        byteBuffer.clear();
-        nrofBytes = reader.read(byteBuffer);
+        do{
+          byteBuffer.clear();
+          nrofBytes = reader.read(byteBuffer);
+          if(nrofBytes >0){
+            byteBuffer.rewind();
+            byteBuffer.get(buffer, iBuffer, nrofBytes);
+            iBuffer += nrofBytes;
+          }
+        } while(nrofBytes >0);
         reader.close();
-        byteBuffer.rewind();
+        //byteBuffer.rewind();
         presentContent();
       }
     } catch(IOException exc){
@@ -132,7 +157,7 @@ public class FcmdView
   void presentContentHex() throws IOException
   {
     try{
-      byteBuffer.get(buffer);
+      //byteBuffer.get(buffer);
       for(int ii = 0; ii < 16; ++ii){
         formatterHex.reset();
         formatterHex.addHex(ii, 4).add(": ");
@@ -168,6 +193,56 @@ public class FcmdView
   {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { view(null);
+      return true;
+      // /
+    }
+  };
+
+
+  GralUserAction actionConvertUTF8unix = new GralUserAction()
+  {
+    @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
+    { 
+      try{
+        InputStream inpBytes = new ByteArrayInputStream(buffer);
+        InputStreamReader inpText = new InputStreamReader(inpBytes);
+        BufferedReader inpLines = new BufferedReader(inpText);
+        FileRemote filedst = main.currentFile;
+        WritableByteChannel outchn =filedst.openWrite(0);
+        ByteBuffer outBuffer = ByteBuffer.allocate(1200);
+        //Writer out = new FileWriter();
+        String sLine;
+        do{
+          sLine = inpLines.readLine();
+          if(sLine !=null){
+            byte[] bytes = sLine.getBytes(utf8);
+            if(outBuffer.remaining() < bytes.length+1){
+              outBuffer.rewind();
+              outchn.write(outBuffer);
+              outBuffer.clear();  
+            }
+            int posBytes = 0;
+            int zOutBuffer;
+            while( (zOutBuffer = outBuffer.remaining()) < (bytes.length - posBytes +1)){
+              outBuffer.put(bytes, posBytes, zOutBuffer);
+              outBuffer.rewind();
+              outchn.write(outBuffer);
+              outBuffer.clear();
+              posBytes += zOutBuffer; 
+            }
+            outBuffer.put(bytes, posBytes, bytes.length - posBytes)
+                     .put((byte)0x0a);
+            //outText.append(sLine).append('\n');
+          }
+        } while(sLine !=null);
+        outBuffer.rewind();
+        outchn.write(outBuffer);
+        outBuffer.clear(); 
+        outchn.close();
+        
+      } catch(Exception exc){
+        main.gralMng.writeLog(0, exc);
+      }
       return true;
       // /
     }
