@@ -54,47 +54,18 @@ public class AwtTextBox extends GralTextBox
 
 
   
-  @Override
-  public Appendable append(CharSequence arg0) throws IOException
-  { if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
-      textFieldSwt.append(arg0.toString());
-    } else {
-      newText.append(arg0);
-      windowMng.addDispatchListener(changeTextBoxTrail);    
-    }
-    return this;
+  @Override protected void setTextInGThread(CharSequence text){ 
+    textFieldSwt.setText(text.toString()); 
   }
+  
+  
+  @Override protected void appendTextInGThread(CharSequence text){ 
+    textFieldSwt.append(text.toString()); 
+  }
+  
+  
 
-  @Override
-  public Appendable append(char arg0) throws IOException
-  { if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
-    String ss = "" + arg0;
-    textFieldSwt.append(ss);
-  } else {
-    newText.append(arg0);
-    windowMng.addDispatchListener(changeTextBoxTrail);    
-  }
-  return this;
-}
-
-  @Override
-  public Appendable append(CharSequence arg0, int arg1, int arg2)
-      throws IOException
-  {
-    append(arg0.subSequence(arg1, arg2).toString());
-    return this;
-  }
-
-  @Override public void setText(CharSequence arg)
-  {
-    if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
-      textFieldSwt.setText(arg.toString());
-    } else {
-      newText.setLength(0);
-      newText.append(arg);
-      windowMng.addDispatchListener(changeText);    
-    }
-  }
+  
   
   @Override public String getText()
   {

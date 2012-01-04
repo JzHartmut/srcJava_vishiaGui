@@ -317,7 +317,11 @@ public class FileSelector //extends GralWidget
     if(originDir == null){
       originDir = path;      //sets on the first invocation. 
     }
-    this.sCurrentDir = FileSystem.getCanonicalPath(dir) + "/";
+    //this.sCurrentDir = FileSystem.getCanonicalPath(dir) + "/";
+    this.sCurrentDir = dir.getPath();
+    if(!this.sCurrentDir.endsWith("/")){
+      this.sCurrentDir += "/";
+    }
     widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sCurrentDir);
     File[] files = dir.listFiles();
     int lineSelect = 0;  
