@@ -44,6 +44,8 @@ public class FcmdCopyCmd
 
   GralWidget widgProgressFile, widgProgressAll;
   
+  GralButton widgButtonOk;
+  
   /**The file card where the directory content is shown where the files will be copied to, the destination. */
   FcmdFileCard fileCardSrc, fileCardDst;
   
@@ -52,9 +54,15 @@ public class FcmdCopyCmd
   /**Content from the input fields while copy is pending. */
   String sSrc, sDstDir, sDstName;
   
-  List<String> listFileSrc;
+  long zBytes, zFiles;
   
-  List<Event> listEvCopy = new LinkedList<Event>();
+  //List<String> listFileSrc;
+  
+  final List<Event> listEvCheck = new LinkedList<Event>();
+  
+  final List<Event> listEvCopy = new LinkedList<Event>();
+  
+  final List<FileRemote> filesToCopy = new LinkedList<FileRemote>();
   
   FcmdCopyCmd(Fcmd main)
   { this.main = main;
@@ -100,12 +108,12 @@ public class FcmdCopyCmd
     widgdOverwrite = main.gralMng.addButton("copyOverwrite", null, null, null, null, "skip dir");
     
     main.gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
-    main.gralMng.addButton("copyEsc", actionDoCopy, "esc", null, null, "esc");
-    main.gralMng.setPosition(-4, GralPos.size +1, 7, -7, 0, 'd', 1);
+    main.gralMng.addButton("copyEsc", actionButtonCopy, "esc", null, null, "esc");
+    main.gralMng.setPosition(-4, GralPos.size +1, 7, -11, 0, 'd', 1);
     widgProgressFile = main.gralMng.addValueBar("copyProgressFile", null, null);
     widgProgressAll = main.gralMng.addValueBar("copyProgressAll", null, null);
-    main.gralMng.setPosition(-4, GralPos.size+3, -6, -1, 0, 'r');
-    main.gralMng.addButton("copyOk", actionDoCopy, "ok", null, null, "OK");
+    main.gralMng.setPosition(-4, GralPos.size+3, -10, -1, 0, 'r');
+    widgButtonOk = main.gralMng.addButton("copyOk", actionButtonCopy, "check", null, null, "check");
   
   }
   
@@ -115,8 +123,10 @@ public class FcmdCopyCmd
   }
   
   
-  /**
-   * Key F5 for copy command. Its like Norton Commander.
+  /**Opens the confirm-copy window, prepares the list of src files.
+   * It is Key F5 for copy command from the classic NortonCommander.
+   * The OK-key is designated to "check". On button pressed the {@link #actionButtonCopy} is called,
+   * with the "check" case.
    */
   GralUserAction actionConfirmCopy = new GralUserAction()
   {
@@ -128,14 +138,19 @@ public class FcmdCopyCmd
     public boolean userActionGui(int key, GralWidget infos,
         Object... params)
     { //String sSrc, sDstName, sDstDir;
+      filesToCopy.clear();
       if(main.lastFileCards.size() >=2){
         fileCardSrc = main.lastFileCards.get(0);
         fileCardDst = main.lastFileCards.get(1);
         fileSrcDir = fileCardSrc.getCurrentDir();
         fileDstDir = fileCardDst.getCurrentDir();
-        listFileSrc = fileCardSrc.getSelectedFiles();
+        List<String> listFileSrc = fileCardSrc.getSelectedFiles();
         if(listFileSrc.size()==0){ //nothing selected
           listFileSrc.add(fileCardSrc.currentFile.getName());  
+        }
+        for(String srcName : listFileSrc){
+          FileRemote fileSrc = new FileRemote(fileSrcDir, srcName);
+          filesToCopy.add(fileSrc);
         }
         sDstName = listFileSrc.size() >1 ? "*" 
                    : listFileSrc.size() >=1 ? listFileSrc.get(0) : "??";
@@ -146,7 +161,8 @@ public class FcmdCopyCmd
         fileCardDst = null;
         fileSrcDir = null;
         fileDstDir = null;
-        listFileSrc = null;
+        
+        //listFileSrc = null;
         sSrc = "???";
         sDstName = "???";
         sDstDir = "???";
@@ -154,26 +170,38 @@ public class FcmdCopyCmd
       widgCopyFrom.setText(sSrc);
       widgCopyDirDst.setText(sDstDir);
       widgCopyNameDst.setText(sDstName);
+      widgButtonOk.setText("check");
+      widgButtonOk.sCmd = "check";
       main.gralMng.setWindowsVisible(windConfirmCopy, posWindConfirmCopy);
       main.gui.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.");
-
+      zFiles = zBytes = 0;
       return true;
    }  };
   
   
   
   
-  GralUserAction actionDoCopy = new GralUserAction()
+  /**Action for any button of the confirm-copy window.
+   * After the window was opened
+   * 
+   */
+  GralUserAction actionButtonCopy = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
     { if(key == KeyCode.mouse1Up){
-        if(widgg.sCmd.equals("ok")){
+        if(widgg.sCmd.equals("check")){
+          for(FileRemote fileSrc : filesToCopy){
+            Event callback = new Event(fileSrc, success);
+            listEvCheck.add(callback);
+            fileSrc.check(callback);   //callback.use() will be called on response
+          }
+        }
+        if(widgg.sCmd.equals("copy")){
           sDstName = widgCopyNameDst.getText();
-          for(String srcName : listFileSrc){
-            FileRemote fileSrc = new FileRemote(fileSrcDir, srcName);
+          for(FileRemote fileSrc : filesToCopy){
             int posWildcard = sDstName.indexOf('*');
             final String nameDst1;
             if(posWildcard >=0){
-              nameDst1 = sDstName.substring(0, posWildcard) + srcName + sDstName.substring(posWildcard +1); 
+              nameDst1 = sDstName.substring(0, posWildcard) + fileSrc.getName() + sDstName.substring(posWildcard +1); 
             } else {
               nameDst1 = sDstName;
             }
@@ -183,7 +211,7 @@ public class FcmdCopyCmd
             if(fileSrc.sameDevice(fileDst)){
               Event callback = new Event(fileSrc, success);
               listEvCopy.add(callback);
-              fileSrc.copyTo(fileDst, callback);
+              fileSrc.copyTo(fileDst, callback);  //callback.use() will be called on response
             } else {
               //TODO.
               //read content and write content.
@@ -199,10 +227,27 @@ public class FcmdCopyCmd
   };
   
   
+  private void eventCheckOk(Event ev){
+    zBytes += ev.data3;
+    zFiles += ev.data4;
+    listEvCheck.remove(ev);
+    int nrofPendingFiles = listEvCheck.size();
+    int percent = nrofPendingFiles * 100 / filesToCopy.size();
+    widgProgressAll.setValue(percent, 0, null);
+    if(nrofPendingFiles == 0){
+      //TODO check dst space
+      widgCopyState.setText("files:" + zFiles + ", size:" + zBytes);
+      widgButtonOk.setText("copy");
+      widgButtonOk.sCmd = "copy";
+    }
+  }
+  
+  
+  
   private void eventConsumed(Event ev){
     listEvCopy.remove(ev);
     int nrofPendingFiles = listEvCopy.size();
-    int percent = nrofPendingFiles * 100 / listFileSrc.size();
+    int percent = nrofPendingFiles * 100 / filesToCopy.size();
     widgProgressAll.setValue(percent, 0, null);
     fileCardDst.fillInCurrentDir();
     if(nrofPendingFiles == 0){
@@ -217,8 +262,11 @@ public class FcmdCopyCmd
     @Override public boolean processEvent(Event ev)
     {
       switch(ev.id){
+        case FileRemoteAccessor.kNrofFilesAndBytes:{
+          eventCheckOk(ev);
+        } break;
         case FileRemoteAccessor.kOperation: {
-          int percent = ev.iData;
+          int percent = ev.data1;
           widgProgressFile.setValue(percent, 0, null, null);
         }break;
         case FileRemoteAccessor.kFinishError: {

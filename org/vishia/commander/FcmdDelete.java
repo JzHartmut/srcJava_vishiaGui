@@ -142,7 +142,7 @@ public class FcmdDelete
   EventConsumer success = new EventConsumer(){
     @Override public boolean processEvent(Event ev)
     {
-      if(ev.iData !=0){
+      if(ev.data1 !=0){
         main.mainCmd.writeError("can't delete " + sFileDelete);
       }
       ev.consumed();

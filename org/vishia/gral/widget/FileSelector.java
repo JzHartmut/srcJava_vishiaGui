@@ -106,10 +106,11 @@ public class FileSelector //extends GralWidget
       //String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir) + "/";
       String sName = line.getCellText(1);
       if(sName.equals("..")){
-        String sParent = getParentDir(file);
-        if(sParent !=null){
-          fillIn(sParent); 
-        }
+        actionLeft(userData, line);
+        //String sParent = getParentDir(file);
+        //if(sParent !=null){
+        //  fillIn(sParent); 
+        //}
       } else {
         if(file.getName().endsWith("/")){
           //save the last selection of that level
@@ -172,7 +173,8 @@ public class FileSelector //extends GralWidget
       if(data.getName().endsWith("/")){
         //save the last selection of that level
         indexSelection.put(data.getParent(), data.getName());
-        fillIn(data.getParent() + "/" + data.getName());
+        fillIn(data.getPath());
+        //fillIn(data.getParent() + "/" + data.getName());
       }
     }
     
