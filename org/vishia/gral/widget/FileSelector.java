@@ -111,17 +111,13 @@ public class FileSelector //extends GralWidget
         //if(sParent !=null){
         //  fillIn(sParent); 
         //}
+      } else if(file.isDirectory()){
+        actionRight(userData, line);
       } else {
-        if(file.getName().endsWith("/")){
-          //save the last selection of that level
-          indexSelection.put(file.getParent(), file.getName());
-          fillIn(file.getParent() + file.getName());
+        if(actionOnEnterFile !=null){
+          actionOnEnterFile.userActionGui(KeyCode.enter, widgdPath, file);
         } else {
-          if(actionOnEnterFile !=null){
-            actionOnEnterFile.userActionGui(KeyCode.enter, widgdPath, file);
-          } else {
-            done = false;
-          }
+          done = false;
         }
       }
       return done;
@@ -170,7 +166,7 @@ public class FileSelector //extends GralWidget
       //File dir = data.file.getParentFile();
       //String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir);
       //String sName = line.getCellText(1);
-      if(data.getName().endsWith("/")){
+      if(data.isDirectory()){
         //save the last selection of that level
         indexSelection.put(data.getParent(), data.getName());
         fillIn(data.getPath());
@@ -323,19 +319,20 @@ public class FileSelector //extends GralWidget
       this.sCurrentDir += "/";
     }
     widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sCurrentDir);
-    File[] files = dir.listFiles();
+    FileRemote[] files = dir.listFiles();
     int lineSelect = 0;  
     if(files !=null){ 
       Map<String, FileRemote> sortFiles = new TreeMap<String, FileRemote>();
-      for(File file: files){
+      for(FileRemote file: files){
         String sName = file.getName();
         if(file.isDirectory()){ sName += "/"; }
-        long length = file.length();
-        long date = file.lastModified();
-        FileRemote fileItem = new FileRemote(localFileAccessor, this.sCurrentDir, sName, length, date, file.canWrite());
+        //if(file.isSymbolicLink()){ sName += "/"; }
+        //long length = file.length();
+        //long date = file.lastModified();
+        //FileRemote fileItem = new FileRemote(localFileAccessor, this.sCurrentDir, sName, length, date, 0, null);
         
         String sort = (file.isDirectory()? "D" : "F") + sName;
-        sortFiles.put(sort, fileItem);
+        sortFiles.put(sort, file);
       }
       int lineCt = 0; //count lines to select the line number with equal sFileSelect.
       if(dir.getParent() !=null){
@@ -355,8 +352,9 @@ public class FileSelector //extends GralWidget
         if(sFileCurrentline != null && file.getName().equals(sFileCurrentline)){
           lineSelect = lineCt;
         }
-        if(file.getName().endsWith("/")){ line[0] = "/"; }
-        else { line[0] = "";}
+        if(file.isSymbolicLink()){ line[0] =  file.isDirectory() ? ">" : "s"; }
+        else if(file.isDirectory()){ line[0] = "/"; }
+        else { line[0] = " ";}
         line[1] = file.getName();
         Date timestamp = new Date(file.lastModified());
         line[3] = dateFormat.format(timestamp);
