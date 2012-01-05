@@ -13,5 +13,5 @@ public interface SwtSetValue_ifc
 {
   GralWindow_setifc getSwtWindow_ifc();
   
-  GralWidget_ifc getSwtWidget_ifc();
+  SwtWidgetSet_ifc getSwtWidget_ifc();
 }

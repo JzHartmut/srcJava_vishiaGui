@@ -41,7 +41,7 @@ public class FcmdFavorCard  extends SelectList
   {
     if(indexFavorPaths.get(favorPathInfo.selectName) == null){
       indexFavorPaths.put(favorPathInfo.selectName, favorPathInfo);
-      GralTableLine_ifc line = wdgdTable.insertLine(null, 0);
+      GralTableLine_ifc line = wdgdTable.insertLine(null, 0, null, null);
       line.setUserData(favorPathInfo);
       /*
       if(info.label !=null){
@@ -50,6 +50,7 @@ public class FcmdFavorCard  extends SelectList
       */
       line.setCellText(favorPathInfo.selectName, 1);
       line.setCellText(favorPathInfo.path, 2);
+      line.redraw();
     }
   }
   

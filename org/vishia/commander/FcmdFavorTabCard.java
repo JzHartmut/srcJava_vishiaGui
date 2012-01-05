@@ -45,10 +45,11 @@ public class FcmdFavorTabCard extends SelectList
   {
     if(indexFavorFolders.get(favorTabInfo.label) == null){
       indexFavorFolders.put(favorTabInfo.label, favorTabInfo);
-      GralTableLine_ifc line = wdgdTable.insertLine(null, 0);
+      GralTableLine_ifc line = wdgdTable.insertLine(null, 0, null, null);
       line.setUserData(favorTabInfo);
       line.setCellText(favorTabInfo.label, 0);
       line.setCellText(favorTabInfo.selectNameTab, 1);
+      line.redraw();
     }
   }
   

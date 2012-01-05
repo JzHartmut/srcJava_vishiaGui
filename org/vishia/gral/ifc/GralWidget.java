@@ -175,13 +175,13 @@ public abstract class GralWidget implements GralWidget_ifc
 	int[] indices;
 	
   /**Action method on activating, changing or release the widget-focus. */
-  private GralUserAction actionChanging;
+  protected GralUserAction actionChanging;
 
   
   /**Action method for showing. */
-  private GralUserAction actionShow;
+  protected GralUserAction actionShow;
 
-  private GralUserAction actionDrag, actionDrop;
+  protected GralUserAction actionDrag, actionDrop;
 	
 	/**command string given by the action as parameter. */
 	public String sCmd;

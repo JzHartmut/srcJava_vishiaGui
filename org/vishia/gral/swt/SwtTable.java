@@ -7,6 +7,8 @@ import java.util.List;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -49,9 +51,15 @@ public class SwtTable extends GralTable
   
   private Table table;
   
+  /**The widget manager is stored in the base class too, but here as SWT-type reference. */
   private final SwtWidgetMng mng;
   
+  /**Width of each column in GralUnits. */
   private int[] columnWidths;
+  
+  FocusListener focusListenerTable;
+  
+
   
   //private final int selectionColumn;
   //private final CharSequence selectionText;
@@ -75,7 +83,8 @@ public class SwtTable extends GralTable
     table.addKeyListener(new TableKeyListerner(null));
     table.addSelectionListener(selectionListener);
     table.addControlListener(resizeListener);
-    table.addFocusListener(mng.focusListener);
+    focusListenerTable = this.new FocusListenerTable(mng);
+    table.addFocusListener(focusListenerTable);
     
     table.setFont(mng.propertiesGuiSwt.stdInputFont);
     //table.setColumnSelectionAllowed(true);
@@ -433,6 +442,33 @@ public class SwtTable extends GralTable
   };
   
 
+  class FocusListenerTable extends SwtWidgetMng.SwtMngFocusListener
+  {
+    FocusListenerTable(SwtWidgetMng mng){
+      mng.super();  	
+    }
+    
+    @Override public void focusLost(FocusEvent e){ 
+      int row = table.getSelectionIndex();
+      if(row >=1){
+        TableItem tableLineSwt = table.getItem(row-1);
+      	tableLineSwt.setGrayed(true);
+        //tableLineSwt.setBackground(mng.getColorImpl(mng.propertiesGui.color(0x80ffff)));
+      }
+    }
+    
+    @Override public void focusGained(FocusEvent ev)
+    { super.focusGained(ev);
+      int row = table.getSelectionIndex();
+      if(row >=0){
+        TableItem tableLineSwt = table.getItem(row);
+        tableLineSwt.setGrayed(false);
+        //tableLineSwt.setBackground(mng.getColorImpl(mng.propertiesGui.color(0x00ff00)));
+      }
+    }
+    
+  };
+  
   
   void stop(){}
 
@@ -489,9 +525,9 @@ public class SwtTable extends GralTable
   }
 
 
-  @Override public GralTableLine_ifc insertLine(String key, int row)
+  @Override public GralTableLine_ifc insertLine(String key, int row, String[] cellTexts, Object userData)
   {
-    return changeTable(row, null, null);
+    return changeTable(row, cellTexts, userData);
   }
 
 

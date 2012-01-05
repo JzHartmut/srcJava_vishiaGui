@@ -131,7 +131,7 @@ public class FcmdExecuter
       if(extensionCmd !=null){
         widgSelectExec.clearTable();
         for(CmdBlock block: extensionCmd.listCmd){
-          GralTableLine_ifc line = widgSelectExec.insertLine(block.name, 0);
+          GralTableLine_ifc line = widgSelectExec.insertLine(block.name, 0, null, null);
           line.setCellText(block.title, 0);
           line.setUserData(block);
         }
@@ -189,7 +189,7 @@ public class FcmdExecuter
       if(extensionCmd !=null){
         widgSelectExec.clearTable();
         for(CmdBlock block: extensionCmd.listCmd){
-          GralTableLine_ifc line = widgSelectExec.insertLine(block.name, 0);
+          GralTableLine_ifc line = widgSelectExec.insertLine(block.name, 0, null, null);
           line.setCellText(block.title, 0);
           line.setUserData(block);
         }

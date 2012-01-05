@@ -36,12 +36,20 @@ public interface GralTable_ifc extends GralWidget_ifc
   
   /**Inserts a line in the table.
    * @param key The key to get it.
-   * @param line The line
    * @param row The row where the line should be inserted before. 0 - insert on top. 
    *        Integer.MAXINT or number greater as number of rows: append on end.
-   * @return row where the line is inserted.
+   * @return instance to add info.
    */
-  public abstract GralTableLine_ifc insertLine(String key, int row);
+  //public abstract GralTableLine_ifc insertLine(String key, int row);
+  
+  
+  /**Inserts a line in the table with given content.
+   * @param key The key to get it.
+   * @param row The row where the line should be inserted before. 0 - insert on top. 
+   *        Integer.MAXINT or number greater as number of rows: append on end.
+   * @return instance to add info.
+   */
+  public abstract GralTableLine_ifc insertLine(String key, int row, String[] cellTexts, Object userData);
   
   
   /**Deletes a line in the table.

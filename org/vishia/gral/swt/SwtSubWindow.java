@@ -387,7 +387,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
 
   @Override public GralWindow_setifc getSwtWindow_ifc(){  return swtWindow_setifc; }
 
-  @Override public GralWidget_ifc getSwtWidget_ifc(){ return null; }
+  @Override public SwtWidgetSet_ifc getSwtWidget_ifc(){ return null; }
   
   
 }

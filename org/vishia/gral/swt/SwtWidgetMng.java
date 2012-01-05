@@ -25,15 +25,12 @@
 package org.vishia.gral.swt;
 
 import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -49,14 +46,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
@@ -1127,7 +1122,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	
   @Override public GralTable addTable(String sName, int height, int[] columnWidths)
   {
-    return SwtTable.addTable(this, sName, height, columnWidths);
+    return SwtTable2.addTable(this, sName, height, columnWidths);
   }
   
   public GralMenu addPopupMenu(String sName){
@@ -1238,11 +1233,18 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   
   private void setInfoDirect(GralWidget widget, int cmd, int ident, Object info, Object data)
-  { final Control swtWidget;
+  { final Object oSwtWidget = widget.getWidgetImplementation();
+    final Control swtWidget;
     try{
+      SwtSetValue_ifc widgSet = null;
+      SwtWidgetSet_ifc gralWidget_setifc = null;
       if(widget !=null && widget instanceof SwtSetValue_ifc){
-        SwtSetValue_ifc widgs = (SwtSetValue_ifc)widget;
-        GralWindow_setifc gralWindow_setifc = widgs.getSwtWindow_ifc();
+        widgSet = (SwtSetValue_ifc)widget;
+      } else if (oSwtWidget !=null && oSwtWidget instanceof SwtSetValue_ifc){
+        widgSet = (SwtSetValue_ifc)oSwtWidget;
+      }
+      if(widgSet !=null){
+        GralWindow_setifc gralWindow_setifc = widgSet.getSwtWindow_ifc();
         if(gralWindow_setifc !=null){
           //check cmd for it:
           switch(cmd){
@@ -1252,6 +1254,22 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
           
           }
         }
+        gralWidget_setifc = widgSet.getSwtWidget_ifc();
+      } else if(oSwtWidget !=null && oSwtWidget instanceof SwtWidgetSet_ifc){
+        gralWidget_setifc = (SwtWidgetSet_ifc)oSwtWidget;
+      }
+      
+      if(gralWidget_setifc !=null){
+        //check cmd for it:
+        switch(cmd){
+        case GralPanelMngWorking_ifc.cmdClear: gralWidget_setifc.clearGthread(); break;
+        case GralPanelMngWorking_ifc.cmdRedraw: gralWidget_setifc.redrawGthread(); break;
+        case GralPanelMngWorking_ifc.cmdInsert: gralWidget_setifc.insertGthread(ident, info, data); break;
+        case GralPanelMngWorking_ifc.cmdSet: {
+          if(info instanceof String)
+          gralWidget_setifc.setTextGthread((String)info, data); 
+        } break;
+        }//switch
       }
       else if(  widget !=null 
         && ( swtWidget = (Control)widget.getWidgetImplementation()) !=null
@@ -1333,6 +1351,9 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     }
     
   }
+  
+
+  
   
   
   /**Gets the content of any field during operation. The GUI should be created already.
@@ -1609,7 +1630,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   /**Universal focus listener to register which widgets were in focus in its order.
    * 
    */
-  FocusListener focusListener = new FocusListener()
+  class SwtMngFocusListener implements FocusListener
   {
     
     @Override public void focusLost(FocusEvent e)
@@ -1624,9 +1645,9 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
         applAdapter.setHelpUrl(htmlHelp);
       }
     }
-  };
+  }
   
-  
+  SwtMngFocusListener focusListener = new SwtMngFocusListener();
 
 
 	void stop(){}  //debug helper
