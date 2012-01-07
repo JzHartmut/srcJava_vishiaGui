@@ -326,11 +326,6 @@ public class FileSelector //extends GralWidget
       for(FileRemote file: files){
         String sName = file.getName();
         if(file.isDirectory()){ sName += "/"; }
-        //if(file.isSymbolicLink()){ sName += "/"; }
-        //long length = file.length();
-        //long date = file.lastModified();
-        //FileRemote fileItem = new FileRemote(localFileAccessor, this.sCurrentDir, sName, length, date, 0, null);
-        
         String sort = (file.isDirectory()? "D" : "F") + sName;
         sortFiles.put(sort, file);
       }
@@ -341,7 +336,7 @@ public class FileSelector //extends GralWidget
         line[1] = "..";
         line[2] = "";
         line[3] = "";
-        selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, line, dir);
+        selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, dir);
         lineCt +=1;
       }
       //The file or directory which was the current one while this directory was shown lastly:
@@ -365,7 +360,7 @@ public class FileSelector //extends GralWidget
         tLine.setCellText(line[2], 2);
         tLine.setCellText(line[3], 3);
         */
-        selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, line, file);
+        selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, file);
         lineCt +=1;
       }
       if(lineCt ==0){
@@ -374,7 +369,7 @@ public class FileSelector //extends GralWidget
         line[0] = "";
         line[1] = "--empty--";
         line[3] = "";
-        selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, line, null);
+        selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, null);
         lineCt +=1;
       }
     } else {
@@ -383,9 +378,10 @@ public class FileSelector //extends GralWidget
       line[0] = "";
       line[1] = "--not found--";
       line[3] = "";
-      selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, line, currentDir);
+      selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, currentDir);
     }
     selectList.wdgdTable.setCurrentCell(lineSelect, 1);
+    selectList.wdgdTable.redraw();
   }
   
 

@@ -17,12 +17,13 @@ import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTable2;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.KeyCode;
 
-public class SwtTable2  extends GralTable2{
+public class SwtTable2  extends GralTable2 {
 
   /**The widget manager is stored in the base class too, but here as SWT-type reference. */
   private final SwtWidgetMng mng;
@@ -30,10 +31,22 @@ public class SwtTable2  extends GralTable2{
   private Text[][] cellsSwt;
   
   private final SwtTable2.Table table; 
-
-  final FocusListener focusListenerTable;
   
-  final TableKeyListerner myKeyListener;
+  /**Set to true while {@link #table}.{@link Table#redrawGthread()} is running.
+   * It prevents recursive invocation of redraw() while setFocus() is invoked. */
+  boolean bRedrawPending;
+
+  /**Set true if the focus is gained by mouse click. It causes color set and 
+   * invocation of {@link #selectLine(GralTableLine_ifc)}. 
+   */
+  boolean bFocused;
+  
+  
+  private final FocusListener focusListenerTable;
+  
+  private final FocusListener focusListenerCell;
+  
+  private final TableKeyListerner myKeyListener;
   
   /**The colors. */
   private Color colorBackSelectSwt, colorBackMarkedSwt, colorBackTableSwt
@@ -47,12 +60,13 @@ public class SwtTable2  extends GralTable2{
   { super(name, mng, columnWidths);
     this.mng = mng;
     this.myKeyListener = this.new TableKeyListerner(null);
-    this.cellsSwt = new Text[zLineVisible][zCol];
-    this.table = new SwtTable2.Table(parent, zCol);
+    focusListenerTable = this.new FocusListenerTable(mng);
+    focusListenerCell = this.new FocusListenerCell(mng);
+    this.cellsSwt = new Text[zLineVisibleMax][zColumn];
+    this.table = new SwtTable2.Table(parent, zColumn);
     table.addKeyListener(myKeyListener);
     //table.addSelectionListener(selectionListener);
     table.addControlListener(resizeListener);
-    focusListenerTable = this.new FocusListenerTable(mng);
     table.addFocusListener(focusListenerTable);
     
     table.setFont(mng.propertiesGuiSwt.stdInputFont);
@@ -161,16 +175,18 @@ public class SwtTable2  extends GralTable2{
   
   
   
-  class Table extends Composite implements SwtWidgetSet_ifc {
+  private class Table extends Composite implements SwtWidgetSet_ifc {
 
     public Table(Composite parent, int zColumns) {
       super(parent, 0);
       int yPix = 0;
-      for(int iRow = 0; iRow < zLineVisible; ++iRow){
+      for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){
         for(int iCol = 0; iCol < zColumns; ++iCol){
           Text cell = new Text(this, SWT.LEFT | SWT.SINGLE | SWT.READ_ONLY);
           cell.addKeyListener(myKeyListener);
-          
+          cell.addFocusListener(focusListenerCell);
+          CellData cellData = new CellData(iRow, iCol);
+          cell.setData(cellData);
           int xdPixCol = columnPixel[iCol+1] - columnPixel[iCol];
           cell.setBounds(columnPixel[iCol], yPix, xdPixCol, linePixel);
           cellsSwt[iRow][iCol] = cell;
@@ -185,23 +201,49 @@ public class SwtTable2  extends GralTable2{
     //}
     
     
+    /**Prepares the cells, then redraw. It overrides the super method,
+     * and calls super.redraw() internally. This method is only called
+     * from the graphic system itself in the graphic thread.
+     * It can't be called from the user (in any other thread)
+     * because this class and the built composition with it is private.
+     * @see org.eclipse.swt.widgets.Control#redraw()
+     */
     @Override public void redraw(){
       redrawGthread();
     }
     
     @Override public void redrawGthread(){
-      int iCellLine = 0;
-      Rectangle size = table.getBounds();
-      int zLinesVisible = size.height / linePixel;
-      ixLine2 = ixLine1 + zLinesVisible -1;
-      if(ixLine2 >= tableLines.size() ){
-        ixLine2 = tableLines.size()-1;
+      long dbgtime = System.currentTimeMillis();
+      bRedrawPending = true;
+      int iCellLine;
+      if(ixLineNew != ixLine){
+        iCellLine = ixLine - ixLine1;
+        for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
+          //cellsSwt[iCellLine][iCellCol].setBackground(colorBackTableSwt);
+        }
       }
-      for(int ixLine3 = ixLine1; ixLine3 <= ixLine2 && iCellLine < zLine; ++ixLine3){
+      Rectangle size = table.getBounds();
+      zLineVisible = size.height / linePixel;
+      ixLine2 = ixLine1 + zLineVisible -1;
+      if(ixLineNew < 2){
+        ixLine1 = 0; ixLine2 = zLineVisible -1;
+      } else if(ixLineNew > ixLine2 -2){
+        int dLine = ixLineNew - (ixLine2 -2);
+        ixLine1 += dLine; ixLine2 += dLine;
+      } else if (ixLineNew < ixLine1 +2){
+        int dLine = ixLine1 +2 - ixLineNew;
+        ixLine1 -= dLine; ixLine2 -= dLine;
+      }
+      if(ixLine2 >= zLine ){
+        ixLine2 = zLine-1;
+      }
+      long dbgtime1 = System.currentTimeMillis() - dbgtime;
+      iCellLine = 0;
+      for(int ixLine3 = ixLine1; ixLine3 <= ixLine2 && iCellLine < zLineVisibleMax; ++ixLine3){
         TableItemWidget line = tableLines.get(ixLine3);
         int ctredraw = line.redraw.get();
         if(ctredraw > 0 || true){
-          for(int iCellCol = 0; iCellCol < zCol; ++iCellCol){
+          for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
             String text = line.cellTexts[iCellCol];
             if(text == null){ text = ""; }
             cellsSwt[iCellLine][iCellCol].setText(text);
@@ -212,27 +254,73 @@ public class SwtTable2  extends GralTable2{
           line.redraw.compareAndSet(ctredraw, 0);  
         }
       }
-      while( iCellLine < zLineVisible){
-        for(int iCellCol = 0; iCellCol < zCol; ++iCellCol){
+      long dbgtime2 = System.currentTimeMillis() - dbgtime;
+      while( iCellLine < zLineVisibleMax){
+        for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
           cellsSwt[iCellLine][iCellCol].setText("");
         }
         iCellLine +=1;
       }
-      //mark current line
-      if(ixLineNew != ixLine){
-        for(int iCellCol = 0; iCellCol < zCol; ++iCellCol){
-          cellsSwt[ixLine][iCellCol].setBackground(colorBackTableSwt);
-        }
-        ixLine = ixLineNew;
-        for(int iCellCol = 0; iCellCol < zCol; ++iCellCol){
-          cellsSwt[ixLine][iCellCol].setBackground(colorBackSelectSwt);
-        }
+      long dbgtime3 = System.currentTimeMillis() - dbgtime;
       
+      //mark current line
+      if(ixLineNew != ixLine || bFocused){
+        selectLine(tableLines.get(ixLineNew));
+        bFocused = false;
+        ixLine = ixLineNew;
+      //}
+      //if(true || ixLineNew != ixLine){
+        ixLine = ixLineNew;
+        ixGlineSelectedNew = iCellLine = ixLine - ixLine1;
+        
+        for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
+          Text cellSwt = cellsSwt[iCellLine][iCellCol];
+          //cellSwt.setBackground(colorBackSelectSwt);
+          if(iCellCol == ixColumn){
+            cellSwt.setFocus();  
+          }
+        }
       }
+      writeContentLast.addToGraphicThread(itsMng.gralDevice, 200);
+      long dbgtime4 = System.currentTimeMillis() - dbgtime;
+      System.out.print("\nSwtTable2-redraw1: " + dbgtime1 + " + " + dbgtime2 + " + " + dbgtime3 + " + " + dbgtime4);
+      dbgtime = System.currentTimeMillis();
       super.update();
       super.redraw();
+      bRedrawPending = false;
+      dbgtime1 = System.currentTimeMillis() - dbgtime;
+      System.out.print(", redraw2: " + dbgtime1);
+      
     }
     
+    
+    GralDispatchCallbackWorker writeContentLast = new GralDispatchCallbackWorker(){
+      @Override public void doBeforeDispatching(boolean onlyWakeup) {
+        ///
+        bRedrawPending = true;
+        if(ixGlineSelected >=0 && ixGlineSelectedNew != ixGlineSelected){
+          //set background color for non-selected line.
+          for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
+            Text cellSwt = cellsSwt[ixGlineSelected][iCellCol];
+            cellSwt.setBackground(colorBackTableSwt);
+          }
+        }
+        if(ixGlineSelectedNew != ixGlineSelected || ixGlineSelected >= 0 && bFocused){
+          //set background color for selected line.
+          ixGlineSelected = ixGlineSelectedNew; //Note is equal already if bFocused only
+          for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
+            Text cellSwt = cellsSwt[ixGlineSelected][iCellCol];
+            cellSwt.setBackground(colorBackSelectSwt);
+            if(iCellCol == ixColumn){
+              cellSwt.setFocus();  
+            }
+          }
+        }
+        bRedrawPending = false;
+        countExecution();
+        removeFromGraphicThread(itsMng.gralDevice);
+      }
+    };
 
     @Override
     public void setBackGroundColorGthread(GralColor color) {
@@ -266,6 +354,20 @@ public class SwtTable2  extends GralTable2{
     }
     
 
+  }
+  
+
+  
+  /**Data for each Text widget.
+   */
+  private class CellData{
+    final int ixCellLine, ixCellColumn;
+    TableItemWidget tableItem;
+    
+    CellData(int ixCellLine, int ixCellColumn){
+      this.ixCellLine = ixCellLine; 
+      this.ixCellColumn = ixCellColumn;
+    }
   }
   
   
@@ -387,7 +489,7 @@ public class SwtTable2  extends GralTable2{
   };
   
 
-  class FocusListenerTable extends SwtWidgetMng.SwtMngFocusListener
+  private class FocusListenerTable extends SwtWidgetMng.SwtMngFocusListener
   {
     FocusListenerTable(SwtWidgetMng mng){
       mng.super();    
@@ -410,6 +512,50 @@ public class SwtTable2  extends GralTable2{
         //tableLineSwt.setGrayed(false);
         //tableLineSwt.setBackground(mng.getColorImpl(mng.propertiesGui.color(0x00ff00)));
       }
+    }
+    
+  };
+  
+  
+  private class FocusListenerCell implements FocusListener
+  {
+    FocusListenerCell(SwtWidgetMng mng){
+      //mng.super();    
+    }
+    
+    /**This routine is invoked whenever the focus of any Text field of the table will be lost
+     * the focus. Before that occurs, the field is the selected line, because it has had the focus.
+     * Therefore the {@link GralTable2#colorBackSelectNonFocused} is set.
+     * 
+     */
+    @Override public void focusLost(FocusEvent ev){ 
+      if(!bRedrawPending){
+        CellData data = (CellData)ev.widget.getData();
+        Control widgSwt = (Control)ev.widget;
+        //widgSwt.setBackground(colorBackSelectNonFocusedSwt); 
+        int iCellLine = data.ixCellLine; //ixLineNew - ixLine1;
+        for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
+          Text cellSwt = cellsSwt[iCellLine][iCellCol];
+          cellSwt.setBackground(colorBackSelectNonFocusedSwt);
+        }
+      }
+    }
+    
+    /**This routine is invoked especially if the mouse is landing 
+     * on a Text-field with click. Then this table line and column
+     * should be selected as currently. <br>
+     * This routine is invoked on setFocus()-call too. In this case
+     * it should not done anything. The variable #bRedrawPending guards it.
+     * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
+     */
+    @Override public void focusGained(FocusEvent ev) { 
+      if(!bRedrawPending){
+        CellData data = (CellData)ev.widget.getData();
+        ixLineNew = data.ixCellLine + ixLine1;
+        ixColumn = data.ixCellColumn;
+        bFocused = true;
+        table.redraw();
+      } 
     }
     
   };

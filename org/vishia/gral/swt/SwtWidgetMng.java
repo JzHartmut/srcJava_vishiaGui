@@ -1212,6 +1212,9 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   	return setInfo(descr, GralPanelMngWorking_ifc.cmdInsert, ident, value, null);
   }
   
+  
+  
+  
   //past: insertInfo
   @Override public String setInfo(GralWidget descr, int cmd, int ident, Object visibleInfo, Object userData)
   {
@@ -1229,7 +1232,6 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     }
   	return "";
   }
-  
   
   
   private void setInfoDirect(GralWidget widget, int cmd, int ident, Object info, Object data)

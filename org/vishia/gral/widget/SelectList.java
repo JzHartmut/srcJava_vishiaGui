@@ -53,7 +53,7 @@ public abstract class SelectList //extends GralWidget
   /**The keys for left and right navigation. Default it is shift + left and right arrow key.
    * 
    */
-  private int keyLeft = KeyCode.shift + KeyCode.left, keyRight = KeyCode.shift + KeyCode.right;
+  private int keyLeft = KeyCode.alt + KeyCode.left, keyRight = KeyCode.alt + KeyCode.right;
   
   
   

@@ -57,7 +57,7 @@ public abstract class GralTextBox extends GralTextField implements Appendable, G
         boolean hasText = newText.length() >0;
         newText.append(arg0);
         if(!hasText){  //elsewhere it is added already.
-          windowMng.addDispatchListener(appendTextViewTrail);
+          windowMng.addDispatchOrder(appendTextViewTrail);
         }
       }
     }
@@ -78,7 +78,7 @@ public abstract class GralTextBox extends GralTextField implements Appendable, G
         boolean hasText = newText.length() >0;
         newText.append(arg0);
         if(!hasText){  //elsewhere it is added already.
-          windowMng.addDispatchListener(appendTextViewTrail);
+          windowMng.addDispatchOrder(appendTextViewTrail);
         }
       }
     }
@@ -112,7 +112,7 @@ public abstract class GralTextBox extends GralTextField implements Appendable, G
       synchronized(newText){
         newText.setLength(0);
         newText.append(arg);
-        windowMng.addDispatchListener(setText);
+        windowMng.addDispatchOrder(setText);
       }//synchronized
     }
   }

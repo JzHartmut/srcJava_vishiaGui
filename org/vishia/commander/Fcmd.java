@@ -386,7 +386,7 @@ public class Fcmd extends GuiCfg
    * panels. The order of focused file-panel-tables is used for that. The
    * currently selected file in any of the tables in order of last gotten focus
    * is used to get the files. It is the input for some command invocations.
-   * @deprecated
+   * @deprecated use {@link #lastFileCards} or {@link #getLastSelectedFiles()} instead.
    * @return Array of files in order of last focus
    */
   FileRemote[] getCurrentFileInLastPanels()
@@ -550,7 +550,7 @@ public class Fcmd extends GuiCfg
 
   /**
    * Instance to get three selected files for some command line invocations.
-   * 
+   * @deprecated
    */
   CmdGetFileArgs_ifc getterFiles = new CmdGetFileArgs_ifc()
   {
@@ -739,20 +739,18 @@ public class Fcmd extends GuiCfg
    */
   GralUserAction actionEdit = new GralUserAction()
   {
-    @Override
-    public boolean userActionGui(String sIntension, GralWidget infos,
-        Object... params)
-    {
+    @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params) {
       CmdStore.CmdBlock cmdBlock = buttonCmds.getCmd("edit");
       if (cmdBlock == null) {
         mainCmd.writeError("internal problem - don't find 'edit' command. ");
       } else {
-        selectedFiles = getCurrentFileInLastPanels();
-        getterFiles.prepareFileSelection();
-        File[] files = new File[3];
-        files[0] = getterFiles.getFile1();
-        files[1] = getterFiles.getFile2();
-        files[2] = getterFiles.getFile3();
+        FileRemote[] lastSelected = getLastSelectedFiles(); 
+        //create a new instance of array of files because the selection may be changed
+        //till the command is invoked. The files are stored in a queue and executed in another thread. 
+        File[] files = new File[1];
+        if(lastSelected.length >0){
+          files[0] = lastSelected[0];
+        }
         cmdQueue.addCmd(cmdBlock, files, null); // to execute.
       }
       return true;

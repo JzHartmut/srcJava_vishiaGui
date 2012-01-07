@@ -21,6 +21,7 @@ public interface GralPanelMngWorking_ifc
 
   /**The version history of this interface:
    * <ul>
+   * <li>2012-01-07 Hartmut new: {@link #setInfoDelayed(GralWidgetChangeRequ, int)}
    * <li>2011-05-08 Hartmut new; {@link #cmdClear} used to clear a whole swt.Table, commonly using: clear a content of widget.
    * <li>2011-05-01 Hartmut new: {@link #cmdInsert} etc now here. 
    * <li>2011-05-01 Hartmut new: {@link #setInfo(GralWidget, int, int, Object)} as adequate method
@@ -110,6 +111,10 @@ public interface GralPanelMngWorking_ifc
    * @return
    */
   String setInfo(GralWidget widgd, int cmd, int ident, Object visibleInfo, Object userData);
+  
+  String setInfoDelayed(GralWidget widgd, int cmd, int ident, Object visibleInfo, Object userData, int delay);
+  
+  String setInfoDelayed(GralWidgetChangeRequ changeRequ, int delay);
   
   /**Sets the color of background of the widget, if possible.
    * @param name The name of the widget, which was given by the add...()-Operation

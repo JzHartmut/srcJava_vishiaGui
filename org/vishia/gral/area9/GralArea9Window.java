@@ -149,9 +149,9 @@ public class GralArea9Window implements GralArea9_ifc
    */
   @Override public void initGraphic(String sOutputArea){
     this.outputArea = sOutputArea;
-    window.gralMng.gralDevice.addDispatchListener(initGraphic); 
+    window.gralMng.gralDevice.addDispatchOrder(initGraphic); 
     initGraphic.awaitExecution(1, 0);
-    window.gralMng.gralDevice.addDispatchListener(writeOutputTextDirectly);
+    window.gralMng.gralDevice.addDispatchOrder(writeOutputTextDirectly);
     
   }
   

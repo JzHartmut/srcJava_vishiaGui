@@ -228,7 +228,7 @@ public class CurveView extends Canvas implements GralWidget_ifc
    * <br><br> 
    * The forcing redraw should be triggered outside. It may be triggered only
    * if more as one samples are set. The redraw-call have to be execute in the GUI-thread.
-   * Hint: use {@link org.vishia.mainGuiSwt.MainCmdSwt#addDispatchListener(Runnable)}
+   * Hint: use {@link org.vishia.mainGuiSwt.MainCmdSwt#addDispatchOrder(Runnable)}
    * to force redraw for this component. The Runnable-method should call widget.redraw().
    * @param sName The registered name
    * @param values The values.

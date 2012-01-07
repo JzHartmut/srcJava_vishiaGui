@@ -276,7 +276,7 @@ protected void initMenuGralDesigner()
 protected void initMain()
 {
   //create the basic appearance of the GUI. The execution sets dlgAccess:
-  gralMng.gralDevice.addDispatchListener(initGuiDialog);
+  gralMng.gralDevice.addDispatchOrder(initGuiDialog);
   
   if(!initGuiDialog.awaitExecution(1, 0)) throw new RuntimeException("unexpected fail of execution initGuiDialog");
       
@@ -299,7 +299,7 @@ protected void initMain()
         //dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
         //cfgBuilder = new GuiCfgBuilder(guiCfgData, panelBuildIfc, fileGui.getParentFile());
         //panelBuildIfc.setCfgBuilder(cfgBuilder);
-        gralMng.gralDevice.addDispatchListener(configGuiWithZbnf);
+        gralMng.gralDevice.addDispatchOrder(configGuiWithZbnf);
         bConfigDone = configGuiWithZbnf.awaitExecution(1, 10000);
         if(!bConfigDone){
           console.writeError("No configuration");
@@ -311,7 +311,7 @@ protected void initMain()
   }    
   try{ Thread.sleep(10);} catch(InterruptedException exc){}
   //The GUI-dispatch-loop should know the change worker of the panel manager. Connect both:
-  gralMng.gralDevice.addDispatchListener(panelBuildIfc.getTheGuiChangeWorker());
+  gralMng.gralDevice.addDispatchOrder(panelBuildIfc.getTheGuiChangeWorker());
   try{ Thread.sleep(10);} catch(InterruptedException exc){}
   //gets all prepared fields to show informations.
   //oamShowValues.setFieldsToShow(panelBuildIfc.getShowFields());

@@ -61,7 +61,7 @@ public class SwtTextFieldWrapper extends GralTextField
     } else {
       newText.setLength(0);
       newText.append(arg);
-      windowMng.addDispatchListener(changeText);    
+      windowMng.addDispatchOrder(changeText);    
     }
   }
   

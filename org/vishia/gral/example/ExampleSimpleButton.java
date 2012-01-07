@@ -45,7 +45,7 @@ public class ExampleSimpleButton
     //The code to initialize the GUI appearance should be run in the graphic thread.
     //Therefore the code snippet which contains the functionality to set the graphic is applied to the graphic thread.
     //It is defined in this application class locally.
-    gui.gralMng.gralDevice.addDispatchListener(initGuiCode);
+    gui.gralMng.gralDevice.addDispatchOrder(initGuiCode);
     initGuiCode.awaitExecution(1, 0);  //waits for finishing
     
   }

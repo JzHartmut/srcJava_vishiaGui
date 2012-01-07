@@ -181,8 +181,8 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   
   public void terminate()
   {
-    if(!graphicThreadSwt.bExit && !graphicThreadSwt.displaySwt.isDisposed()){ 
-      graphicThreadSwt.displaySwt.dispose();
+    if(graphicThreadSwt.isRunning() && !graphicThreadSwt.displaySwt.isDisposed()){ 
+      graphicThreadSwt.displaySwt.dispose();  //forces windowsCloseListener and exit=true
     }  
 
   }

@@ -28,19 +28,28 @@ public abstract class GralTable2 extends GralTable{
    * 1 is the first line and the left column.
    * 
    */
-  protected int ixLine, ixLineNew, ixCol;
-  
-  
-  /**Number of lines and columns. */
-  protected int zLine, zCol;
-  
-  protected int zLineVisible = 20;  //maximum number of visible lines.
-  
+  protected int ixLine, ixLineNew, ixColumn;
+
   /**Index of {@link #texts} of the cell left top for presentation. */
   protected int ixLine1, ixCol1;
   
   /**Index of {@link #texts} of the cell right bottom for presentation. It depends of the size of presentation. */
   protected int ixLine2, ixCol2;
+  
+  
+  /**Number of lines and columns of data. */
+  protected int zLine, zColumn;
+  
+  /**Current number of visible lines in the view. */
+  protected int zLineVisible;
+  
+  /**maximum number of visible lines. it is the static amount of line-cells for displaying. */
+  protected int zLineVisibleMax = 20;  
+  
+  /**Index (subscript) of the graphical line (not lines of the table)
+   * which has the selection color and which should be gotten the selection color.
+   */
+  protected int ixGlineSelected = -1, ixGlineSelectedNew = -1;
   
   /**Texts in all lines and columns.
    * 
@@ -62,7 +71,7 @@ public abstract class GralTable2 extends GralTable{
   public GralTable2(String name, GralWidgetMng mng, int[] columnWidths) {
     super(name, mng);
     this.columnWidthsGral = columnWidths;
-    this.zCol = columnWidths.length;
+    this.zColumn = columnWidths.length;
     int xdPix = itsMng.propertiesGui.xPixelUnit();
     columnPixel = new int[columnWidthsGral.length+1];
     int xPix = 0;
@@ -97,8 +106,10 @@ public abstract class GralTable2 extends GralTable{
 
   @Override
   public void setCurrentCell(int line, int column) {
-    // TODO Auto-generated method stub
-    
+    if(line < 0 || line > zLine-1){ line = zLine -1; }
+    if(column < 0 || column > zColumn-1){ column = zColumn -1; }
+    ixLineNew = line;  //forces color setting select color
+    ixColumn = column;
   }
 
   @Override
@@ -115,7 +126,7 @@ public abstract class GralTable2 extends GralTable{
 
   @Override public GralTableLine_ifc insertLine(String key, int row, String[] cellTexts, Object userData) {
     TableItemWidget line = new TableItemWidget();
-    if(row > zLine){
+    if(row > zLine || row < 0){
       row = zLine;
     }
     tableLines.add(row, line);
@@ -139,7 +150,7 @@ public abstract class GralTable2 extends GralTable{
 
   @Override public void clearTable() {
     ixLine1 = ixLine2 = 0;
-    ixCol = 0;
+    ixColumn = 0;
     zLine = 0;
     tableLines.clear();
     redraw();
@@ -157,11 +168,13 @@ public abstract class GralTable2 extends GralTable{
     return null;
   }
 
+  
+  
   protected boolean processKeys(int keyCode){
     boolean done = true;
     switch(keyCode){
     case KeyCode.dn: {
-      if(ixLine < zLine -1 && ixLine < zLineVisible -1){
+      if(ixLine < zLine -1){
         ixLineNew = ixLine + 1;
         redraw();
       }
@@ -212,7 +225,7 @@ public abstract class GralTable2 extends GralTable{
     private Object userData;
     
     TableItemWidget(){
-      cellTexts = new String[zCol];
+      cellTexts = new String[zColumn];
     }
     
     

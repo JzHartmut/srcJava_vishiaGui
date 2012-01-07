@@ -356,6 +356,23 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
     this.gralDevice = device;
   }
   
+ 
+  
+  @Override public String setInfoDelayed(GralWidget widgd, int cmd, int ident, Object visibleInfo, Object userData, int delay){
+    GralWidgetChangeRequ requ = new GralWidgetChangeRequ(widgd, cmd, ident, visibleInfo, userData);
+    return setInfoDelayed(requ, delay);
+  }
+  
+  @Override public String setInfoDelayed(GralWidgetChangeRequ changeRequ, int delay){
+    //TODO check admissibility
+    changeRequ.delayExecution(delay);
+    gralDevice.addChangeRequest(changeRequ);
+    return null;
+  }
+  
+
+
+  
   
   /**selects a registered panel for the next add-operations. 
    */
