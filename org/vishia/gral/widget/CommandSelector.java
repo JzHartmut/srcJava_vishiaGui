@@ -68,17 +68,18 @@ public class CommandSelector extends SelectList
     wdgdTable.setValue(GralPanelMngWorking_ifc.cmdClear, -1, null, null);
     for(CmdStore.CmdBlock data: cmdStore.getListCmds()){
       
-      wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, data.name, data);
+      wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, data.name, data);
     }
-
+    wdgdTable.redraw();
   }
   
   
   @Override public boolean actionOk(Object userData, GralTableLine_ifc line)
   {
     CmdStore.CmdBlock cmdBlock = (CmdStore.CmdBlock)userData;
-    getterFiles.prepareFileSelection();
     File[] files = new File[3];
+    
+    getterFiles.prepareFileSelection();
     files[0] = getterFiles.getFile1();
     files[1] = getterFiles.getFile2();
     files[2] = getterFiles.getFile3();

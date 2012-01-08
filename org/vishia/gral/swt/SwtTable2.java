@@ -9,6 +9,7 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -21,6 +22,7 @@ import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.mainCmd.MainCmd;
 import org.vishia.util.KeyCode;
 
 public class SwtTable2  extends GralTable2 {
@@ -180,9 +182,11 @@ public class SwtTable2  extends GralTable2 {
     public Table(Composite parent, int zColumns) {
       super(parent, 0);
       int yPix = 0;
+      Font font = mng.propertiesGuiSwt.getTextFontSwt(2, whatIs, whatIs);
       for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){
         for(int iCol = 0; iCol < zColumns; ++iCol){
           Text cell = new Text(this, SWT.LEFT | SWT.SINGLE | SWT.READ_ONLY);
+          cell.setFont(font);
           cell.addKeyListener(myKeyListener);
           cell.addFocusListener(focusListenerCell);
           CellData cellData = new CellData(iRow, iCol);
@@ -216,14 +220,21 @@ public class SwtTable2  extends GralTable2 {
       long dbgtime = System.currentTimeMillis();
       bRedrawPending = true;
       int iCellLine;
-      if(ixLineNew != ixLine){
-        iCellLine = ixLine - ixLine1;
-        for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
-          //cellsSwt[iCellLine][iCellCol].setBackground(colorBackTableSwt);
+      if(ixLineNew != ixLine && ixGlineSelected >=0){
+        iCellLine = ixLineNew - ixLine1;  //The line which is currently present and selected, before changing ixLine1:
+        if(iCellLine != ixGlineSelected){ //another line to select:
+          for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
+            cellsSwt[ixGlineSelected][iCellCol].setBackground(colorBackTableSwt);
+          }
+          ixGlineSelected = -1; //because selection isn't shown.
         }
       }
-      Rectangle size = table.getBounds();
+      //calculate number of lines to show:
+      Rectangle size = table.getBounds();  
       zLineVisible = size.height / linePixel;
+      if(zLineVisible > zLineVisibleMax){ 
+        zLineVisible = zLineVisibleMax;   //no more lines existing.
+      }
       ixLine2 = ixLine1 + zLineVisible -1;
       if(ixLineNew < 2){
         ixLine1 = 0; ixLine2 = zLineVisible -1;
@@ -237,6 +248,7 @@ public class SwtTable2  extends GralTable2 {
       if(ixLine2 >= zLine ){
         ixLine2 = zLine-1;
       }
+      MainCmd.assertion(ixLine2 < zLine && ixLineNew < zLine);
       long dbgtime1 = System.currentTimeMillis() - dbgtime;
       iCellLine = 0;
       for(int ixLine3 = ixLine1; ixLine3 <= ixLine2 && iCellLine < zLineVisibleMax; ++ixLine3){
@@ -272,7 +284,7 @@ public class SwtTable2  extends GralTable2 {
       //if(true || ixLineNew != ixLine){
         ixLine = ixLineNew;
         ixGlineSelectedNew = iCellLine = ixLine - ixLine1;
-        
+        MainCmd.assertion(ixGlineSelectedNew < zLineVisible);
         for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
           Text cellSwt = cellsSwt[iCellLine][iCellCol];
           //cellSwt.setBackground(colorBackSelectSwt);
@@ -305,14 +317,16 @@ public class SwtTable2  extends GralTable2 {
             cellSwt.setBackground(colorBackTableSwt);
           }
         }
-        if(ixGlineSelectedNew != ixGlineSelected || ixGlineSelected >= 0 && bFocused){
+        if(ixGlineSelectedNew != ixGlineSelected || ixGlineSelectedNew >= 0 && bFocused){
           //set background color for selected line.
           ixGlineSelected = ixGlineSelectedNew; //Note is equal already if bFocused only
-          for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
-            Text cellSwt = cellsSwt[ixGlineSelected][iCellCol];
-            cellSwt.setBackground(colorBackSelectSwt);
-            if(iCellCol == ixColumn){
-              cellSwt.setFocus();  
+          if(ixGlineSelectedNew >=0){ //only if anything is selected:
+            for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
+              Text cellSwt = cellsSwt[ixGlineSelected][iCellCol];
+              cellSwt.setBackground(colorBackSelectSwt);
+              if(iCellCol == ixColumn){
+                cellSwt.setFocus();  
+              }
             }
           }
         }
@@ -345,6 +359,10 @@ public class SwtTable2  extends GralTable2 {
     @Override public void insertGthread(int pos, Object visibleInfo, Object data) {
       if(visibleInfo instanceof String[]){
         insertLine(null, pos, (String[])visibleInfo, data);
+      } else if(visibleInfo instanceof String){
+        String[] text = new String[1];
+        text[0] = (String)visibleInfo;
+        insertLine(null, pos, text, data);
       }
     }
 
@@ -551,10 +569,13 @@ public class SwtTable2  extends GralTable2 {
     @Override public void focusGained(FocusEvent ev) { 
       if(!bRedrawPending){
         CellData data = (CellData)ev.widget.getData();
-        ixLineNew = data.ixCellLine + ixLine1;
-        ixColumn = data.ixCellColumn;
-        bFocused = true;
-        table.redraw();
+        if(data.tableItem !=null){ //don't do any action if the cell isn't use.
+          ixLineNew = data.ixCellLine + ixLine1;
+          MainCmd.assertion(ixLineNew < zLine);
+          ixColumn = data.ixCellColumn;
+          bFocused = true;
+          table.redraw();
+        }
       } 
     }
     

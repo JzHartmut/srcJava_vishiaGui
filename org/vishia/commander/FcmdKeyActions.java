@@ -103,7 +103,7 @@ public class FcmdKeyActions
         }
         if(!done){
           done = true;
-          FileRemote[] files = main.getCurrentFileInLastPanels();
+          FileRemote[] files = main.getLastSelectedFiles();
           if(     keyCode == keyFileProps){ main.filePropsCmd.openDialog(null); }  //F2
           else if(keyCode == keyView){ main.viewCmd.view(null); }                  //F3
           else if(keyCode == keyEdit){ main.actionEdit.userActionGui(sIntension, widgd, params); }

@@ -13,13 +13,10 @@ import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.gral.widget.FileSelector;
-import org.vishia.gral.widget.SelectList;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
@@ -35,7 +32,7 @@ public class FcmdExecuter
     
     GralMenu menuSelectExe;
     
-    /**Cretes with given extension. @param name the extension. It is the name from a {@link CmdBlock}. */
+    /**Creates with given extension. @param name the extension. It is the name from a {@link CmdBlock}. */
     ExtCmd(String name){ this.ext = name; }
   }
   
@@ -67,8 +64,14 @@ public class FcmdExecuter
   /**Builds the content of the confirm-delete window. The window is created static. It is shown
    * whenever it is used.  */
   void buildWindowConfirmExec()
-  { main.gui.addMenuItemGThread("menuReadCmdiCfg", "&Command/&ExecCfg", actionReadExtensionCmd);
-  
+  { 
+    
+    main.gui.addMenuItemGThread("MenuSetWorkingDir", "&Command/Set&WorkingDir", actionSetCmdWorkingDir); // /
+    main.gui.addMenuItemGThread("MenuCommandAbort", "&Command/&Abort", actionCmdAbort); // /
+    // gui.addMenuItemGThread("&Command/E&xecute", actionSetCmdCurrentDir); ///
+    main.gui.addMenuItemGThread("MenuCmdCfgSet", "&Command/CmdCf&g - read current file", actionSetCmdCfg); // /
+    main.gui.addMenuItemGThread("menuReadCmdiCfg", "&Command/&ExtCfg - read cfg file", actionReadExtensionCmd);
+
     
     main.gralMng.selectPanel("primaryWindow");
     main.gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
@@ -159,6 +162,50 @@ public class FcmdExecuter
     return kindOfExecution != 0;
   }
   
+  /**
+   * Action to set the working directory for the next command invocation. The
+   * working directory is the directory in the focused file tab.
+   * 
+   */
+  private GralUserAction actionSetCmdWorkingDir = new GralUserAction()
+  {
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
+    {
+      GralWidget widgdFocus = main.gralMng.getWidgetInFocus();
+      //FileSelector fileSel = idxFileSelector.get(widgdFocus.name);
+      if (main.currentFile != null) { // is a FileSelector focused yet?
+        // if(widgdFocus.name.startsWith("file")){
+        // int ixFilePanel = widgdFocus.name.charAt(4) - '0';
+        // assert(ixFilePanel >=0 && ixFilePanel < fileSelector.length); //only
+        // such names are registered.
+        // FileSelector fileSel = fileSelector[ixFilePanel];
+        //FileRemote file = fileSel.getSelectedFile();
+        main.cmdQueue.setWorkingDir(main.currentFile.getParentFile());
+      }
+      return true;
+    }
+
+  };
+
+  
+  
+  
+  /**
+   * Action to set the command list from file. It is called from menu.
+   * 
+   */
+  private GralUserAction actionSetCmdCfg = new GralUserAction() { 
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
+      if (main.currentFile != null) {
+        main.cmdSelector.cmdStore.readCmdCfg(main.currentFile);
+        main.cmdSelector.fillIn();
+      }
+      return true;
+    }
+
+  };
+
+
   
   
   /**User action to re-read the configuration file for extension assignments.

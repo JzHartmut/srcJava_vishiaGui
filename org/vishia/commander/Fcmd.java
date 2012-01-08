@@ -143,11 +143,6 @@ public class Fcmd extends GuiCfg
     gui.setFrameAreaBorders(30, 65, 70, 85); // x1, x2, y1, y2
     gui.setStandardMenusGThread(new File("."), actionFile);
     gui.addMenuItemGThread("MenuSaveFavoriteSel", "&File/Save favorite &Pathes", favorPathSelector.actionSaveFavoritePathes); // /
-    gui.addMenuItemGThread("MenuSetWorkingDir", "&Command/Set&WorkingDir", actionSetCmdWorkingDir); // /
-    gui.addMenuItemGThread("MenuCommandAbort", "&Command/&Abort", executer.actionCmdAbort); // /
-    // gui.addMenuItemGThread("&Command/E&xecute", actionSetCmdCurrentDir); ///
-    gui.addMenuItemGThread("MenuCmdCfgSet", "&Command/CmdCf&gFile/&Set", actionSetCmdCfg); // /
-    gui.addMenuItemGThread("MenuCmdCfgCheck", "&Command/CmdCf&gFile/&Check", actionSetCmdCfg); // /
 
     this.windMng.initMenuWindMng();
     // gui.set
@@ -349,39 +344,6 @@ public class Fcmd extends GuiCfg
   
   
 
-  /**
-   * Action to set the working directory for the next command invocation. The
-   * working directory is the directory in the focused file tab.
-   * 
-   */
-  private GralUserAction actionSetCmdWorkingDir = new GralUserAction()
-  {
-    @Override
-    public boolean userActionGui(String sIntension, GralWidget infos,
-        Object... params)
-    {
-      GralWidget widgdFocus = gralMng.getWidgetInFocus();
-      FileSelector fileSel = idxFileSelector.get(widgdFocus.name);
-      if (fileSel != null) { // is a FileSelector focused yet?
-        // if(widgdFocus.name.startsWith("file")){
-        // int ixFilePanel = widgdFocus.name.charAt(4) - '0';
-        // assert(ixFilePanel >=0 && ixFilePanel < fileSelector.length); //only
-        // such names are registered.
-        // FileSelector fileSel = fileSelector[ixFilePanel];
-        FileRemote file = fileSel.getSelectedFile();
-        cmdQueue.setWorkingDir(new File(file.getParent() + "/" + file.getName()));
-      }
-      stop();
-      if (sIntension.equals("")) {
-        stop();
-      }
-      return true;
-    }
-
-  };
-
-  
-  
   /**Routine to prepare up to 3 files, which were simple selected at last in the
    * panels. The order of focused file-panel-tables is used for that. The
    * currently selected file in any of the tables in order of last gotten focus
@@ -470,30 +432,6 @@ public class Fcmd extends GuiCfg
   
 
   /**
-   * Action to set the command list from file. It is called from menu.
-   * 
-   */
-  private GralUserAction actionSetCmdCfg = new GralUserAction()
-  {
-    @Override
-    public boolean userActionGui(String sIntension, GralWidget infos,
-        Object... params)
-    {
-      selectedFiles = getCurrentFileInLastPanels();
-      if (selectedFiles[0] != null) {
-        cmdSelector.cmdStore.readCmdCfg(selectedFiles[0]);
-        cmdSelector.fillIn();
-      }
-      stop();
-      if (sIntension.equals("")) {
-        stop();
-      }
-      return true;
-    }
-
-  };
-
-  /**
    * This class is instantiated in the static main routine and builds a command
    * line interface and the graphical frame. The mainly functionality is
    * contained in the super class.
@@ -557,7 +495,7 @@ public class Fcmd extends GuiCfg
     @Override
     public void prepareFileSelection()
     {
-      selectedFiles = getCurrentFileInLastPanels();
+      selectedFiles = getLastSelectedFiles(); //  getCurrentFileInLastPanels();
     }
 
     @Override

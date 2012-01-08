@@ -22,6 +22,10 @@ public interface GralTable_ifc extends GralWidget_ifc
   
   public abstract void setCurrentCell(int line, int column);
   
+  /**Returns the line at row.
+   * @param row 0 is the first row. Must not be negative.
+   * @return null if the row isn't exists.
+   */
   public abstract GralTableLine_ifc getLine(int row);
   
   /**Get the line which is designated with the requested key.
@@ -46,8 +50,11 @@ public interface GralTable_ifc extends GralWidget_ifc
   /**Inserts a line in the table with given content.
    * @param key The key to get it.
    * @param row The row where the line should be inserted before. 0 - insert on top. 
-   *        Integer.MAXINT or number greater as number of rows: append on end.
+   *        negative or Integer.MAXINT or number greater as number of rows: append on end.
+   * @param cellTexts texts of the cells. May be null.
+   * @param userData data assigned to the line, able to get with {@link GralTableLine_ifc#getUserData()}.
    * @return instance to add info.
+   * @see {@link GralTableLine_ifc} to add content.
    */
   public abstract GralTableLine_ifc insertLine(String key, int row, String[] cellTexts, Object userData);
   
@@ -64,7 +71,7 @@ public interface GralTable_ifc extends GralWidget_ifc
    * @param key
    * @return -1 if the key isn't found in the table. 0... row where this line is shown in table.
    */
-  public abstract int searchLine(String key);
+  //public abstract int searchLine(String key);
   
   
   

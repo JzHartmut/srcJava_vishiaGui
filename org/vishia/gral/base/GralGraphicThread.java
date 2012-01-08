@@ -176,7 +176,6 @@ public abstract class GralGraphicThread implements Runnable
   {
     GralWidgetChangeRequ changeReq = guiChangeRequests.poll();
     while (changeReq != null){
-      changeReq = guiChangeRequests.poll();
       int timeToExecution = changeReq.timeToExecution();
       if(timeToExecution >=0){
         //not yet to proceed
@@ -303,7 +302,7 @@ public abstract class GralGraphicThread implements Runnable
         catch(Exception exc){
           System.out.println(exc.getLocalizedMessage());
           exc.printStackTrace(System.out);
-          bContinueDispatch = false;
+          bContinueDispatch = true; //false;
         }
         //isWakedUpOnly = false;  //after 1 event, it may be wakeUp, set if false.
       } while(bContinueDispatch);

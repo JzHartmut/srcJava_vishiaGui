@@ -386,7 +386,12 @@ class FcmdFavorPathSelector
    * @return The last instance
    */
   FcmdFileCard getLastFileTab()
-  { List<GralWidget> widgdFocus = mng.getWidgetsInFocus();
+  { FcmdFileCard lastTab = main.lastFileCards.size() >0 ? main.lastFileCards.get(0) : null;
+    return lastTab;
+    /*
+    
+    
+    List<GralWidget> widgdFocus = mng.getWidgetsInFocus();
     FcmdFileCard lastTab = null;
     //int ixTabs = 0;
     synchronized(widgdFocus){
@@ -400,6 +405,7 @@ class FcmdFavorPathSelector
       }
     }
     return lastTab;
+    */
   }
   
   
@@ -432,7 +438,7 @@ class FcmdFavorPathSelector
       } else {
         throw new IllegalArgumentException("last file tab not able to found");
       }
-      return false;
+      return true;
     }
   };
   

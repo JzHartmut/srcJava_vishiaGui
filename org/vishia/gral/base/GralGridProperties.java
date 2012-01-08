@@ -153,24 +153,25 @@ public class GralGridProperties
    * <ul>
    * <li>m: monospaced small
    * </ul>
-   * The style:
+   * The style: not supported yet. TODO i, b for italic, bold,...
    * 
-   * @param size
-   * @param style
+   * @param fontHeight height of the text line in GralPos. 2.0f is standard.
+   * @param type 
+   * @param style 
    * @return
    */
-  public GralFont getTextFont(float fontSize, char type, char style)
+  public GralFont getTextFont(float fontHeight, char type, char style)
   {
     int ifontSize;
-    if(fontSize <=1.2f) ifontSize = 0;  //1, 1.1, 1.2
-    else if(fontSize <=1.4f) ifontSize = 1;  // 1 1/3, 
-    else if(fontSize <=1.6f) ifontSize = 2;  //1.5
-    else if(fontSize <=1.8f) ifontSize = 3;  //1 2/3
-    else if(fontSize <=2.0f) ifontSize = 4;  //2
-    else if(fontSize <=2.4f) ifontSize = 5;   //2 1/3
-    else if(fontSize <=2.8f) ifontSize = 6;   //2.5, 2 2/3
-    else if(fontSize <=3.1f) ifontSize = 7;   //3
-    else if(fontSize <=3.9f) ifontSize = 8;   //3.5
+    if(fontHeight <=1.2f) ifontSize = 0;  //1, 1.1, 1.2
+    else if(fontHeight <=1.4f) ifontSize = 1;  // 1 1/3, 
+    else if(fontHeight <=1.6f) ifontSize = 2;  //1.5
+    else if(fontHeight <=1.8f) ifontSize = 3;  //1 2/3
+    else if(fontHeight <=2.0f) ifontSize = 4;  //2
+    else if(fontHeight <=2.4f) ifontSize = 5;   //2 1/3
+    else if(fontHeight <=2.8f) ifontSize = 6;   //2.5, 2 2/3
+    else if(fontHeight <=3.1f) ifontSize = 7;   //3
+    else if(fontHeight <=3.9f) ifontSize = 8;   //3.5
     else ifontSize = 9;                   //>=4
     final GralFont font;
     switch(type){

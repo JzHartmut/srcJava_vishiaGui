@@ -1,6 +1,7 @@
 package org.vishia.gral.base;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -82,7 +83,9 @@ public abstract class GralTable2 extends GralTable{
     }
     int ydPix = itsMng.propertiesGui.yPixelUnit();
     linePixel = 2 * ydPix;
-    
+    ixLineNew = ixLine = -1;
+    ixGlineSelectedNew = ixGlineSelected = -1;  
+
     setColors();
   }
 
@@ -100,8 +103,10 @@ public abstract class GralTable2 extends GralTable{
   
   @Override
   public GralTableLine_ifc getCurrentLine() {
-    // TODO Auto-generated method stub
-    return null;
+    if(ixLine >=0 && ixLine < tableLines.size()){
+      return tableLines.get(ixLine);
+    }
+    else return null;
   }
 
   @Override
@@ -112,10 +117,9 @@ public abstract class GralTable2 extends GralTable{
     ixColumn = column;
   }
 
-  @Override
-  public GralTableLine_ifc getLine(int row) {
-    // TODO Auto-generated method stub
-    return null;
+  @Override public GralTableLine_ifc getLine(int row) {
+    if(row > tableLines.size()) return null;
+    else return tableLines.get(row);
   }
 
   @Override
@@ -153,19 +157,19 @@ public abstract class GralTable2 extends GralTable{
     ixColumn = 0;
     zLine = 0;
     tableLines.clear();
+    ixLineNew = ixLine = -1;
+    ixGlineSelectedNew = -1;  //deselects ixGlineSelected on redraw!
     redraw();
   }
 
-  @Override
-  public int searchLine(String key) {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  @Override
-  public List<GralTableLine_ifc> getSelectedLines() {
-    // TODO Auto-generated method stub
-    return null;
+  @Override public List<GralTableLine_ifc> getSelectedLines() {
+    List<GralTableLine_ifc> list = new LinkedList<GralTableLine_ifc>();
+    for(TableItemWidget item: tableLines){
+      if((item.getSelection() & 1) !=0){
+          list.add(item);
+      }
+    }
+    return list;
   }
 
   

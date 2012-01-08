@@ -541,13 +541,6 @@ public class SwtTable extends GralTable
   }
 
 
-  @Override
-  public int searchLine(String key)
-  {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
 
   @Override public boolean setFocus()
   { return SwtWidgetHelper.setFocusOfTabSwt(table);
