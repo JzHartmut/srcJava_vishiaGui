@@ -90,22 +90,16 @@ public class FcmdFileCard extends FileSelector
     setActionOnEnterFile(main.executer.actionOnEnterFile);
   }
 
- 
-  /**Add all favor paths from the SelectTab newly
-   * @param favorTabInfo
-   */
-  void fillFavorPaths(FcmdFavorPathSelector.FavorFolder favorTabInfo)
-  {
-    favorCard.clear();
-    for( FcmdFavorPathSelector.FavorPath favorPathInfo: favorTabInfo.listfavorPaths){
-      favorCard.add(favorPathInfo);
-    }
-
+  
+  
+  /**Removes this file card with its widgets and data. It is 'close tab'. */
+  @Override public boolean remove(){
+    favorCard.remove();
+    favorPathInfo = null;
+    currentFile = null;
+    return super.remove();
   }
-  
-  
-  
-  
+ 
   
   @Override public boolean actionUserKey(int keyCode, Object oData, GralTableLine_ifc line)
   { boolean ret = true;

@@ -1,11 +1,13 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.util.Removeable;
+
 
 /**It is a basic interface for any widget of the implementing GUI
  * @author Hartmut Schorrig
  *
  */
-public interface GralWidget_ifc
+public interface GralWidget_ifc extends Removeable
 {
   /**Returns the implementation class of the widget. */
   public abstract Object getWidgetImplementation();

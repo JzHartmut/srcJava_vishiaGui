@@ -104,11 +104,23 @@ public class SwtPanel extends GralPanelContent
   
 
   @Override protected void removeWidgetImplementation()
-  { ((Composite)panelComposite).dispose();
-    panelComposite = null;
+  { if(panelComposite !=null){
+      ((Composite)panelComposite).dispose();
+      panelComposite = null;
+    }
   }
   
 
+  @Override public boolean remove(){
+    super.remove();
+    if(itsTabSwt !=null){
+      itsTabSwt.dispose();
+      itsTabSwt = null;
+    }
+    return true;
+  }
+  
+  
   protected ControlListener resizeItemListener = new ControlListener()
   { @Override public void controlMoved(ControlEvent e) 
     { //do nothing if moved.

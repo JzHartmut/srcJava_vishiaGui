@@ -264,7 +264,7 @@ public class FcmdExecuter
           if(cmd !=null){
             //PrepareCmd cmdp = cmd.getCmds().get(0);
             if(cmd.name.startsWith(">")){
-              main.cmdQueue.addCmd(cmd.name, null, main.selectedFiles[0].getParentFile(), '>');
+              main.cmdQueue.addCmd(cmd.name, null, main.currentFile.getParentFile(), '>');
             } else {
               //the extension determines the command.
               File[] files = main.getLastSelectedFiles();

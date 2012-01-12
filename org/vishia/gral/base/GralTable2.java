@@ -3,17 +3,31 @@ package org.vishia.gral.base;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.swt.SwtGralKey;
 import org.vishia.util.KeyCode;
 import org.vishia.util.SelectMask;
 
+/**
+ * @author Hartmut Schorrig
+ *
+ */
 public abstract class GralTable2 extends GralTable{
+
+  /**Version and history
+   * <ul>
+   * <li>2012-01-06 Hartmut new: concept of a table which is independent of the table implementation 
+   *   of the table implementations in the graphic system layer or in operation system: 
+   *   The capability  of a SWT-table is not sufficient, for example the color of the selection bar
+   *   is not able to change. Other reason: Implementation of table in SWT, AWT, Swing is different.
+   *   It seems better to have one table concept with independent features, which based on simple widgets.
+   *   is not  
+   * </ul>
+   */
+  public final static int version = 0x20120113;
 
   
   /**Width of each column in GralUnits. */
@@ -177,15 +191,33 @@ public abstract class GralTable2 extends GralTable{
   protected boolean processKeys(int keyCode){
     boolean done = true;
     switch(keyCode){
-    case KeyCode.dn: {
-      if(ixLine < zLine -1){
-        ixLineNew = ixLine + 1;
+    case KeyCode.pgup: {
+      if(ixLine > zLineVisible){
+        ixLineNew = ixLine - zLineVisible;
+        redraw();
+      } else {
+        ixLineNew = 0;
         redraw();
       }
     } break;
     case KeyCode.up: {
       if(ixLine > 0){
         ixLineNew = ixLine - 1;
+        redraw();
+      }
+    } break;
+    case KeyCode.dn: {
+      if(ixLine < zLine -1){
+        ixLineNew = ixLine + 1;
+        redraw();
+      }
+    } break;
+    case KeyCode.pgdn: {
+      if(ixLine < zLine - zLineVisible){
+        ixLineNew = ixLine + zLineVisible;
+        redraw();
+      } else {
+        ixLineNew = zLine -1;
         redraw();
       }
     } break;
@@ -282,6 +314,14 @@ public abstract class GralTable2 extends GralTable{
     @Override public void setUserData(Object data) {this.userData = data; }
 
     @Override public Object getUserData() { return userData;  }
+
+
+    @Override
+    public boolean remove()
+    {
+      // TODO Auto-generated method stub
+      return false;
+    }
     
   }
   

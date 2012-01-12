@@ -17,6 +17,7 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
 
   /**Version history:
    * <ul>
+   * <li>2012-01-08 Hartmut new: {@link #remove()}
    * <li>2011-11-19 Hartmut chg: The 'itsTabSwt' is moved to {@link org.vishia.gral.swt.SwtPanel} now.
    * <li>2011-11-12 Hartmut new: {@link #getPixelPositionSize()}.
    * </ul>
@@ -93,13 +94,31 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
 	
 	public abstract   GralRectangle getPixelPositionSize();
 	
+  /**Removes this widget from the lists in this panel. This method is not intent to invoke
+   * by an application. It is only used in {@link GralWidget#remove()}. Use the last one method
+   * to remove a widget includint is disposition and remove from the panel.
+   * @param widg The widget.
+   */
   public void removeWidget(GralWidget widg)
   {
     widgetList.remove(widg);
     widgetsToResize.remove(widg);
   }
   
-  
+  /**This overridden form of {@link GralWidget_ifc#remove()} removes all widgets of this panel.
+   * It includes the disposition  of the widgets in the graphic. It is done by invocation
+   * {@link GralWidget#remove()}.
+   * @return true because it is done.
+   */
+  @Override public boolean remove(){
+    super.remove();
+    for(GralWidget widg: widgetList){
+      widg.remove();
+    }
+    widgetList.clear();      //the lists may be cleared already 
+    widgetsToResize.clear(); //because widg.remove() removes the widget from the panel.
+    return true;
+  }
   
 
   @Override public Object getWidgetImplementation()

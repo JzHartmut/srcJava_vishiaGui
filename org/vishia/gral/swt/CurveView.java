@@ -523,6 +523,13 @@ public class CurveView extends Canvas implements GralWidget_ifc
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
   { widgSwt.setBounds(x,y,dx,dy);
   }
+
+  @Override
+  public boolean remove()
+  {
+    // TODO Auto-generated method stub
+    return false;
+  }
   
 
 }

@@ -421,6 +421,13 @@ public class SwtTable extends GralTable
     @Override public void setBoundsPixel(int x, int y, int dx, int dy)
     { table.setBounds(x,y,dx,dy);
     }
+
+    @Override
+    public boolean remove()
+    {
+      // TODO Auto-generated method stub
+      return false;
+    }
     
 
 

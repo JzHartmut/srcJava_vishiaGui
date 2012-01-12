@@ -6,11 +6,9 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.vishia.communication.InterProcessCommFactorySocket;
-import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
-import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.cfg.GralCfgData;
 import org.vishia.gral.cfg.GralCfgDesigner;
 import org.vishia.gral.cfg.GralCfgZbnf;
@@ -21,11 +19,9 @@ import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.widget.InfoBox;
 import org.vishia.inspector.Inspector;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
-import org.vishia.msgDispatch.LogMessage;
 
 /**This class is the basic class for configurable GUI applications with 9-Area Main window.
  * It works without any derivation, if only simple widgets are necessary.
@@ -50,6 +46,8 @@ public class GuiCfg
 
   /**The version.
    * <ul>
+   * <li>2012-10-12 Hartmut chg: ctor needs a {@link GralPlugUser_ifc} which may be null: A plugin may be instantiated
+   *   by reflection with String given class name. It may be possible to give it as parameter too.
    * <li>2011-10-20 Hartmut chg: ctor needs a {@link GralPlugUser2Gral_ifc} which may be null.
    *   Idea: a derived class should support it. Other Idea: either both via reflection or both maybe direct. 
    * <li>2011-10-11 Hartmut new: Switches MainCmd-output to OutputBox.
@@ -145,7 +143,7 @@ protected GralTabbedPanel mainTabPanel;
  *   This instance may be defined in the context which calls this constructor.
  *   Note: A user instance may be instantiated with the cmd line calling argument "-plugin=JAVACLASSPATH"  
  */
-public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui, GralPlugUser2Gral_ifc plugUser2Gui) 
+public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui, GralPlugUser_ifc plugUser, GralPlugUser2Gral_ifc plugUser2Gui) 
 { this.mainCmd = cmdGui;
   this.gui = cmdGui.gui;
   guiW = (GralArea9Window)gui;
@@ -153,7 +151,9 @@ public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui, GralPlugUser2Gral_i
   this.plugUser2Gui = plugUser2Gui;
   this.console = gui.getMainCmd();  
 
-  if(cargs.sPluginClass !=null){
+  if(plugUser !=null){
+    this.user = plugUser;
+  } else  if(cargs.sPluginClass !=null){
     try{
       Class<?> pluginClass = Class.forName(cargs.sPluginClass);
       Object oUser = pluginClass.newInstance();
@@ -396,30 +396,28 @@ protected GralUserAction actionFile = new GralUserAction()
 
 
 
-/**The command-line-invocation (primary command-line-call. 
+/**The command-line-invocation (primary command-line-call). 
  * @param args Some calling arguments are taken. This is the GUI-configuration especially.   
  */
-public static void main(String[] args)
-{ boolean bOk = true;
+public static void main(String[] args){ 
+  boolean bOk = true;
+  //
+  //Uses the commonly GuiCallingArgs class because here are not extra arguments.
   GuiCallingArgs cargs = new GuiCallingArgs();
   //Initializes the GUI till a output window to show information.
-  //Uses the commonly GuiMainCmd class because here are not extra arguments.
   GralArea9MainCmd cmdGui = new GralArea9MainCmd(cargs, args);  //implements MainCmd, parses calling arguments
+  //Initializes the graphic window and parse the parameter of args (command line parameter).
+  //Parameter errors will be output in the graphic window in its given output area.
   bOk = cmdGui.parseArgumentsAndInitGraphic("Gui-Cfg", "3A3C");
   
   if(bOk){
-    //String ipcFactory = "org.vishia.communication.InterProcessComm_Socket";
-    //try{ ClassLoader.getSystemClassLoader().loadClass(ipcFactory, true);
-    //}catch(ClassNotFoundException exc){
-    //  System.out.println("class not found: " + "org.vishia.communication.InterProcessComm_Socket");
-    //}
-    //Loads the named class, and its base class InterProcessCommFactory. 
-    //In that kind the calling of factory methods are regarded to socket.
-    
+    //loads the named class, so it is existent as factory.
     new InterProcessCommFactorySocket();
-    
-    GuiCfg main = new GuiCfg(cargs, cmdGui, null);
-  
+    //
+    //the third parameter may be a plugin, use it in your application if necessary.
+    GuiCfg main = new GuiCfg(cargs, cmdGui, null, null);
+    //
+    //starts execution.
     main.execute();
   }    
   cmdGui.exit();

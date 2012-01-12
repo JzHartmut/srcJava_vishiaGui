@@ -1,5 +1,6 @@
 package org.vishia.commander;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -18,17 +19,15 @@ import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPos;
-import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.CommandSelector;
 import org.vishia.gral.widget.FileSelector;
-import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.FileRemote;
+import org.vishia.util.FileRemoteAccessorLocalFile;
 
 public class Fcmd extends GuiCfg
 {
@@ -74,6 +73,8 @@ public class Fcmd extends GuiCfg
 
   final CommandSelector cmdSelector = new CommandSelector("cmdSelector", cmdQueue, gralMng);
 
+  final FcmdIdents idents = new FcmdIdents();
+  
   final FcmdFileProps filePropsCmd = new FcmdFileProps(this);
   
   final FcmdView viewCmd = new FcmdView(this);
@@ -96,10 +97,6 @@ public class Fcmd extends GuiCfg
   
   List<FcmdFileCard> lastFileCards = new LinkedList<FcmdFileCard>();
   
-  /**
-   * @deprecated
-   */
-  File[] selectedFiles;
 
   /**
    * @deprecated
@@ -120,9 +117,12 @@ public class Fcmd extends GuiCfg
    */
   final CmdStore buttonCmds;
 
+  
+  final List<Closeable> threadsToClose = new LinkedList<Closeable>();
+  
   public Fcmd(CallingArgs cargs, GralArea9MainCmd cmdgui)
   {
-    super(cargs, cmdgui, null);
+    super(cargs, cmdgui, null, null);
     this.cargs = cargs;
     target = new FcmdtTarget();  //create the target itself, one process TODO experience with remote target.
     buttonCmds = new CmdStore();
@@ -178,7 +178,7 @@ public class Fcmd extends GuiCfg
     favorPathSelector.buildWindowAddFavorite();
     gui.addMenuItemGThread("menuHelp", "&Help/&Help", gui.getActionHelp());
     gui.addMenuItemGThread("menuAbout", "&Help/&About", gui.getActionAbout());
-    gui.addMenuItemGThread("MenuTestInfo", "&Help/&Infobox", actionTest); // /
+    gui.addMenuItemGThread("MenuTestInfo", "&Help/&Infobox", actionTest); 
     guiW.outputBox.setActionChange(executer.actionCmdFromOutputBox);
     
     gui.setHelpUrl("/home/hartmut/vishia/JavaCommander/sf/JavaCommander/help/Fcmd.html");
@@ -336,6 +336,7 @@ public class Fcmd extends GuiCfg
     try{
       cmdQueue.close();  //finishes threads.
       target.close();
+      FileRemoteAccessorLocalFile.getInstance().close();
     } catch(IOException exc){
       
     }
@@ -488,10 +489,15 @@ public class Fcmd extends GuiCfg
 
   /**
    * Instance to get three selected files for some command line invocations.
-   * @deprecated
+   * 
    */
   CmdGetFileArgs_ifc getterFiles = new CmdGetFileArgs_ifc()
   {
+    /**
+     * 
+     */
+    File[] selectedFiles;
+
     @Override
     public void prepareFileSelection()
     {

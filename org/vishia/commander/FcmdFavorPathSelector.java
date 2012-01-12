@@ -135,7 +135,8 @@ class FcmdFavorPathSelector
   /**Builds the content of the add-favorite window. The window is created static. It is shown
    * whenever it is used.  */
   void buildWindowAddFavorite()
-  {
+  { main.gui.addMenuItemGThread("menuDelTab", main.idents.menuDelTab, actionDelTab); // /
+
     main.gralMng.selectPanel("primaryWindow"); //"output"); //position relative to the output panel
     //panelMng.setPosition(1, 30+GralGridPos.size, 1, 40+GralGridPos.size, 1, 'r');
     main.gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
@@ -177,9 +178,6 @@ class FcmdFavorPathSelector
     } catch(FileNotFoundException exc){ sError = "TabSelector - cfg file not found; " + cfgFile; }
     if(reader !=null){
       try{ 
-        panelLeft.listAllFavorPaths.clear();
-        panelMid.listAllFavorPaths.clear();
-        panelRight.listAllFavorPaths.clear();
         listAllFavorPathFolders.clear();
         String sLine;
         int posSep;
@@ -417,6 +415,24 @@ class FcmdFavorPathSelector
 
   void stop(){}
   
+
+  
+  GralUserAction actionDelTab = new GralUserAction(){
+    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){
+      if(main.lastFileCards.size() >0){
+        FcmdFileCard fileCard = main.lastFileCards.get(0);
+        fileCard.remove();
+        FcmdLeftMidRightPanel panel = fileCard.mainPanel;
+        panel.listTabs.remove(fileCard);
+        String nameWidgFavorCard = FcmdWidgetNames.tabFavorites + fileCard.nameFilePanel;
+        String nameWidgFileCard = FcmdWidgetNames.tabFile + fileCard.nameFilePanel;
+        panel.tabbedPanelFavorCards.removePanel(nameWidgFavorCard);
+        panel.tabbedPanelFileCards.removePanel(nameWidgFileCard);
+        panel.selectTabCard.setFocus();
+      }
+      return true;
+  } };
+  
   
   /**Sets the origin dir of the last focused file table.
    * <br>
@@ -448,22 +464,10 @@ class FcmdFavorPathSelector
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { if(key == KeyCode.mouse1Up){
         if(infos.sCmd.equals("ok")){
-          //check whether the selectInfo should be associated to a local list.
-          /*
-          FavorPath favorPathInfo = actFavorPathInfo; //(SelectInfo)selectedLine.getUserData();
-          List<FcmdFavorPathSelector.FavorPath> listAdd = windAddFavorite.panelInvocation.listAllFavorPaths;
-          int posInList = listAdd.indexOf(favorPathInfo); //position of last selection
-          if(posInList == -1){
-            //maybe selected one entry from the tab-special list or one entry of the common list.
-            listAdd = listAllFavorPaths;
-            posInList = listAdd.indexOf(favorPathInfo); //position of last selection
-          } //add new SelectInfo after the current used.
-          */
           FavorPath favorite = new FavorPath();
           favorite.path = windAddFavorite.widgPath.getText();
           favorite.selectName = windAddFavorite.widgShortName.getText();
           String tablabel = windAddFavorite.widgLabel.getText();
-          //int ixtabName = windAddFavorite.panelInvocation.cNr - '1';
           favorite.mMainPanel = 1<< (windAddFavorite.panelInvocation.cNr - '1');
           FcmdFavorPathSelector.FavorFolder tabDst = null;
           for(FcmdFavorPathSelector.FavorFolder tab:listAllFavorPathFolders){ //note: used break in loop
@@ -479,19 +483,6 @@ class FcmdFavorPathSelector
           }
           tabDst.listfavorPaths.add(favorite);
           windAddFavorite.panelInvocation.fillCards();
-          //favorite.tabName[ixtabName] = 
-          ///favorite.label = tablabel;
-          /*
-          listAdd.add(posInList+1, favorite);
-          if(listAdd == listAllFavorPaths){
-            panelLeft.fillInTables(1);
-            panelMid.fillInTables(2);
-            panelRight.fillInTables(3);
-          } else {
-            int where = windAddFavorite.panelInvocation.cNr - '0';  //"lmr"
-            windAddFavorite.panelInvocation.fillInTables(where); //windAddFavorite.panelInvocation.cc);
-          }
-          */
         }
         main.gralMng.setWindowsVisible(windAddFavorite.window, null); //set it invisible.
       }

@@ -19,6 +19,15 @@ import org.vishia.util.KeyCode;
 public class GralCfgBuilder
 {
 
+  /**Version and history
+   * <ul>
+   * <li>2012-01-12 Hartmut chg: If no name is given for a widget, it gets the name from panelName/text
+   *   or from panelName/prompt. Before, only text is used. Use the panelName to identify unique.
+   * <li>2011-05-00 Hartmut created, the old ZbnfCfg.. class is obsolte now.
+   * </ul>
+   */
+  public static final int version = 0x2012012;
+  
   private final GralCfgData cfgData;
   
   private final GralGridBuild_ifc gui;
@@ -185,7 +194,8 @@ public class GralCfgBuilder
     //
     GralWidget widgd = null;
     String sName = cfge.widgetType.name;
-    if(sName ==null){ sName = cfge.widgetType.text; }
+    if(sName ==null && cfge.widgetType.text !=null ){ sName = cfgData.actPanel.name + "/" + cfge.widgetType.text; }  //text of button etc.
+    if(sName ==null && cfge.widgetType.prompt !=null){ sName = cfgData.actPanel.name + "/" + cfge.widgetType.prompt; } //the prompt as name
     //
     String sDataPath = cfge.widgetType.info != null ? cfge.widgetType.info : sName;
     if(sDataPath !=null){
@@ -258,7 +268,7 @@ public class GralCfgBuilder
     } else {
       switch(cfge.widgetType.whatIs){
         case 'T':{
-          widgd = gui.addTextField(sName, true, null, null);
+          widgd = gui.addTextField(sName, true, cfge.widgetType.prompt, cfge.widgetType.promptPosition);
           widgd.setDataPath(sDataPath);
         } break;
         default: {

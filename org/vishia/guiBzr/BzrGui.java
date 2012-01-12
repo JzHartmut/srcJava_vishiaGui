@@ -95,7 +95,7 @@ public class BzrGui extends GuiCfg
    * @param gui The GUI-organization.
    */
   BzrGui(CallingArguments cargs, GralArea9MainCmd cmdgui) 
-  { super(cargs, cmdgui, null);  //builds all graphic panels
+  { super(cargs, cmdgui, null, null);  //builds all graphic panels
     this.cargs = cargs;  //args in the correct derived type.
     boolean bOk = true;
     

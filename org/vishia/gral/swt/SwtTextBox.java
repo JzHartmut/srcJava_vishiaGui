@@ -82,12 +82,12 @@ public class SwtTextBox extends GralTextBox
 
 
   
-  @Override protected void setTextInGThread(CharSequence text){ 
+  @Override public void setTextInGThread(CharSequence text){ 
     textFieldSwt.setText(text.toString()); 
   }
   
   
-  @Override protected void appendTextInGThread(CharSequence text){ 
+  @Override public void appendTextInGThread(CharSequence text){ 
     textFieldSwt.append(text.toString()); 
   }
   

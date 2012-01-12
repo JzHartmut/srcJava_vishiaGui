@@ -24,6 +24,7 @@ import org.vishia.util.FileRemoteAccessor;
 import org.vishia.util.FileRemoteAccessorLocalFile;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
+import org.vishia.util.Removeable;
 import org.vishia.util.SelectMask;
 
 /**This class is a large widget which contains a list to select files in a directory, 
@@ -32,7 +33,7 @@ import org.vishia.util.SelectMask;
  * @author Hartmut Schorrig
  *
  */
-public class FileSelector //extends GralWidget
+public class FileSelector implements Removeable //extends GralWidget
 {
   
   
@@ -432,7 +433,13 @@ public class FileSelector //extends GralWidget
   
   void stop(){}
 
-  
+  @Override public boolean remove(){ 
+    selectList.remove();
+    widgdPath.remove();
+    indexSelection.clear();
+    currentDir = null;
+    return true;
+  }
   
   
   

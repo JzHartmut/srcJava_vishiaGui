@@ -13,6 +13,7 @@ import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.KeyCode;
+import org.vishia.util.Removeable;
 import org.vishia.util.SelectMask_ifc;
 
 /**The base class for lists which supports nested selections. The associated widget is a table.
@@ -31,7 +32,7 @@ import org.vishia.util.SelectMask_ifc;
  * @author Hartmut Schorrig
  *
  */
-public abstract class SelectList //extends GralWidget
+public abstract class SelectList implements Removeable //extends GralWidget
 {
   /**Version and history:
    * <ul>
@@ -109,7 +110,11 @@ public abstract class SelectList //extends GralWidget
    */
   public boolean setFocus(){ return wdgdTable.setFocus(); }
   
-
+  /**Removes all data and all widgets of this class. */
+  @Override public boolean remove(){
+    wdgdTable.remove();
+    return true;
+  }
   
   /**Action if a table line is selected and entered. Its either a double click with the mouse
    * or click of OK (Enter) button.

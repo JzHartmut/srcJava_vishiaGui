@@ -11,6 +11,13 @@ import org.vishia.mainCmd.MainCmd;
 import org.vishia.msgDispatch.LogMessage;
 
 /**This class is an extension of the {@link MainCmd} for graphic applications.
+ * It provides up to 9 areas for panels. With them a basic partitioning of panels can be done.
+ * See {@link GralArea9_ifc}. 
+ * This instance can used for graphical output without any inheritance in an user application.
+ * The user application may inherit from {@link GuiCfg} instead or use GuiCfg with a special plugin
+ * and text-given graphic configuration. GuiCfg aggregates this class.
+ * Follow the pattern in {@link GuiCfg#main(String[])} to build a users application.
+ * 
  * @author Hartmut Schorrig
  *
  */
@@ -42,6 +49,14 @@ public class GralArea9MainCmd extends MainCmd
   }
 
   
+  /**Builds the graphic and parses the command line parameters. Possible command line argument errors
+   * or help texts are outputted to the window in the output box.
+   * @param sTitle Title for window
+   * @param sOutputArea Use 1..3 for row and A..C for column in form for example "3A3C".
+   *   In this example the output box occupies all 3 columns (A to C) from the 3. (= bottom) row
+   *   of the 9 areas.  If null is used, the default selection is "3A3C".
+   * @return true if it is successfully.
+   */
   public boolean parseArgumentsAndInitGraphic(String sTitle, String sOutputArea)
   {
     boolean bOk = true;

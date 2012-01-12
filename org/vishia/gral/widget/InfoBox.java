@@ -208,5 +208,12 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
     window.closeWindow();
   }
 
+  @Override
+  public boolean remove()
+  {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
 
 }

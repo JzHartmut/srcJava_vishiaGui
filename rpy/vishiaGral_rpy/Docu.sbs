@@ -43395,7 +43395,7 @@ application";
 							- _subsystem = "GeneratedFromJava::base";
 							- _class = "GralPrimaryWindow";
 							- _name = "GuiThread";
-							- _id = GUID 6948b30a-ccf0-4b14-9007-d557ea986058;
+							- _id = GUID b2cb7750-41aa-45c7-945d-95b355f3b510;
 						}
 						- m_instance = { IHandle 
 							- _m2Class = "";
@@ -43535,7 +43535,7 @@ application";
 							- _subsystem = "GeneratedFromJava::swt";
 							- _class = "SwtPrimaryWindow";
 							- _name = "Init";
-							- _id = GUID abb32a6a-3784-40a9-be63-b2dda826625b;
+							- _id = GUID 8490ed00-8a02-44a7-86ea-62b88f003cfb;
 						}
 						- m_instance = { IHandle 
 							- _m2Class = "";

@@ -61,6 +61,28 @@ public class FcmdFavorCard  extends SelectList
     wdgdTable.clearTable();
   }
   
+
+  
+  /**Add all favor paths from the SelectTab newly
+   * @param favorTabInfo
+   */
+  void fillFavorPaths(FcmdFavorPathSelector.FavorFolder favorTabInfo)
+  {
+    clear();
+    for( FcmdFavorPathSelector.FavorPath favorPathInfo: favorTabInfo.listfavorPaths){
+      add(favorPathInfo);
+    }
+
+  }
+  
+  
+  /**Removes this file card with its widgets and data. It is 'close tab'. */
+  @Override public boolean remove(){
+    super.remove();
+    indexFavorPaths.clear();
+    return true;
+  }
+  
   
   @Override protected boolean actionOk(Object userData, GralTableLine_ifc line)
   {

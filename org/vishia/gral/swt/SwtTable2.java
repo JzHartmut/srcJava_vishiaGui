@@ -64,6 +64,7 @@ public class SwtTable2  extends GralTable2 {
     this.myKeyListener = this.new TableKeyListerner(null);
     focusListenerTable = this.new FocusListenerTable(mng);
     focusListenerCell = this.new FocusListenerCell(mng);
+    setColorsSwt();    
     this.cellsSwt = new Text[zLineVisibleMax][zColumn];
     this.table = new SwtTable2.Table(parent, zColumn);
     table.addKeyListener(myKeyListener);
@@ -89,7 +90,6 @@ public class SwtTable2  extends GralTable2 {
     int widthPixel = width * xPixel;
     int heightPixel = height * mng.propertiesGui.yPixelUnit();
     table.setSize(widthPixel, heightPixel);
-    setColorsSwt();    
     resizeTable();
   }
 
@@ -168,13 +168,28 @@ public class SwtTable2  extends GralTable2 {
 
 
 
-  @Override
-  protected void removeWidgetImplementation() {
+  /**Removes the graphical widgets.
+   * @see org.vishia.gral.ifc.GralWidget#removeWidgetImplementation()
+   */
+  @Override protected void removeWidgetImplementation() {
     // TODO Auto-generated method stub
-    
+    if(!table.isDisposed()){
+      for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){
+        for(int iCol = 0; iCol < zColumn; ++iCol){
+          Text cell = cellsSwt[iRow][iCol];
+          cell.dispose();
+          cellsSwt[iRow][iCol] = null;  
+        }
+      }
+      table.dispose();  //it may be sufficient to dispose table only becaust it is the container....
+    }
   }
 
-  
+  @Override public boolean remove(){
+    super.remove(); //removes the widget implementation.
+    tableLines.clear();
+    return true;
+  }
   
   
   private class Table extends Composite implements SwtWidgetSet_ifc {
@@ -193,6 +208,7 @@ public class SwtTable2  extends GralTable2 {
           cell.setData(cellData);
           int xdPixCol = columnPixel[iCol+1] - columnPixel[iCol];
           cell.setBounds(columnPixel[iCol], yPix, xdPixCol, linePixel);
+          cell.setBackground(colorBackTableSwt);
           cellsSwt[iRow][iCol] = cell;
         }
         yPix += linePixel;
@@ -258,7 +274,10 @@ public class SwtTable2  extends GralTable2 {
           for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
             String text = line.cellTexts[iCellCol];
             if(text == null){ text = ""; }
-            cellsSwt[iCellLine][iCellCol].setText(text);
+            Text cellSwt = cellsSwt[iCellLine][iCellCol]; 
+            cellSwt.setText(text);
+            ((CellData)cellSwt.getData()).tableItem = line;
+            cellSwt.setVisible(true);
           }
           iCellLine +=1;
           //Thread safety: set to 0 only if it isn't changed between quest and here.
@@ -269,7 +288,10 @@ public class SwtTable2  extends GralTable2 {
       long dbgtime2 = System.currentTimeMillis() - dbgtime;
       while( iCellLine < zLineVisibleMax){
         for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
-          cellsSwt[iCellLine][iCellCol].setText("");
+          Text cellSwt = cellsSwt[iCellLine][iCellCol]; 
+          cellSwt.setText("");
+          ((CellData)cellSwt.getData()).tableItem = null;
+          cellSwt.setVisible(false);
         }
         iCellLine +=1;
       }

@@ -4,7 +4,6 @@ import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralTable;
 
 
 
@@ -537,10 +536,11 @@ public abstract class GralWidget implements GralWidget_ifc
   /**Removes the widget from the lists in its panel and from the graphical representation.
    * It calls the protected {@link #removeWidgetImplementation()} which is implemented in the adaption.
    */
-  public void remove()
+  @Override public boolean remove()
   {
     removeWidgetImplementation();
     pos.panel.removeWidget(this);
+    return true;
   }
   
   

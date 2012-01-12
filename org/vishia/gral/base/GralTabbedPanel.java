@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 
+import org.vishia.commander.FcmdWidgetNames;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralWidget;
 
@@ -27,7 +28,7 @@ import org.vishia.gral.ifc.GralWidget;
 public abstract class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ implements GralVisibleWidgets_ifc
 {
   /**The version and history:
-   * <ul>
+   * <ul>2012-01-08 Hartmut new: {@link #removePanel(String)}
    * <li>2011-11-07 Hartmut chg: a TabbedPanel is a GralWidget too, 
    * <li>2011-10-01 Hartmut new: abstract method {@link #selectTab(String)}.
    * <li>2011-09-10 Hartmut chg: move this class from gral/gridPanel/TabPanel to gral/base/GralTabbedPanel
@@ -117,6 +118,26 @@ public abstract class GralTabbedPanel extends GralPanelContent /*extends GralWid
     return widgetsVisible;
   }
 
+  boolean removePanel(GralPanelContent panel){
+    return removePanel(panel.name);
+  }
   
-	
+  /**Removes the named panel from this panel container.
+   * @param namePanel The name which was given by {@link #addCanvasPanel(String, String)} or 
+   *   {@link #addGridPanel(String, String, int, int, int, int)} and which is stored in 
+   *   {@link GralPanelContent#namePanel}.
+   * @return true if removed, false if the namePanel isn't ok and therefore nothing is removed.
+   */
+  public boolean removePanel(String namePanel){
+    boolean bOk = true;
+    GralPanelContent panel = panels.get(namePanel);
+    if(panel !=null){
+      panels.remove(namePanel);
+      panel.remove();
+    } else {
+      bOk = false;
+    }
+    return bOk;
+  }
+  
 }
