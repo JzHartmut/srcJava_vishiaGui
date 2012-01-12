@@ -1,28 +1,12 @@
 package org.vishia.guiBzr;
 
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
-import org.vishia.gral.area9.GralArea9_ifc;
 import org.vishia.gral.area9.GralArea9MainCmd;
-import org.vishia.gral.base.GralGridProperties;
-import org.vishia.gral.base.GralWidgetMng;
-import org.vishia.gral.base.GralTabbedPanel;
-import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralDispatchCallbackWorker;
-import org.vishia.gral.ifc.GralGridBuild_ifc;
-import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.swt.SwtProperties;
-import org.vishia.gral.swt.SwtWidgetMng;
-import org.vishia.inspector.Inspector;
 import org.vishia.mainCmd.MainCmd_ifc;
-import org.vishia.mainCmd.Report;
-import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.FileSystem;
 
 public class BzrGui extends GuiCfg
@@ -97,7 +81,7 @@ public class BzrGui extends GuiCfg
   BzrGui(CallingArguments cargs, GralArea9MainCmd cmdgui) 
   { super(cargs, cmdgui, null, null);  //builds all graphic panels
     this.cargs = cargs;  //args in the correct derived type.
-    boolean bOk = true;
+    //boolean bOk = true;
     
     
     mainData = new MainData(cmdgui);
@@ -183,7 +167,7 @@ public class BzrGui extends GuiCfg
 
 
   
-  void stop(){} //debug helper
+  //void stop(){} //debug helper
 
 
 
@@ -269,7 +253,7 @@ public class BzrGui extends GuiCfg
      * Advantage of protected methods: don't call it without the correct context. 
      * This method is called from outside.
      */
-    void initGraphic()
+    void XXXinitGraphic()
     {
       gui.setStandardMenusGThread(null, null);
     }
@@ -280,7 +264,7 @@ public class BzrGui extends GuiCfg
    * @param args Some calling arguments are taken. This is the GUI-configuration especially.   
    */
   public static void main(String[] args)
-  { boolean bOk = true;
+  { boolean bOk;
     CallingArguments cargs = new CallingArguments();
     //Initializes the GUI till a output window to show informations:
     CmdLineAndGui gui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
@@ -303,11 +287,11 @@ public class BzrGui extends GuiCfg
     //Loads the named class, and its base class InterProcessCommFactory. 
     //In that kind the calling of factory methods are regarded to socket.
     new InterProcessCommFactorySocket();
+    if(bOk){
+      BzrGui main = new BzrGui(cargs, gui);
   
-    BzrGui main = new BzrGui(cargs, gui);
-  
-    main.execute();
-  
+      main.execute();
+    }
     gui.exit();
   }
 

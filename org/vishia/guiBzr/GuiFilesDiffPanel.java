@@ -1,24 +1,19 @@
 package org.vishia.guiBzr;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.vishia.gral.base.GralTable;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralTableLine_ifc;
-import org.vishia.mainCmd.MainCmd;
-import org.vishia.mainCmd.Report;
 import org.vishia.util.KeyCode;
 
 public class GuiFilesDiffPanel
@@ -41,7 +36,7 @@ public class GuiFilesDiffPanel
   final StringBuilder uRenameOut =  new StringBuilder();
   
   /**The table (list) which contains the selectable project paths. */
-  private GralWidget widgdTableFilesCmpn;
+  private GralTable widgdTableFilesCmpn;
   
 
   private static final int columnMark = 2;
