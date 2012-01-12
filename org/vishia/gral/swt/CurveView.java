@@ -177,6 +177,11 @@ public class CurveView extends Canvas implements GralWidget_ifc
 		widgSwt = this;
 	}
 	
+	
+	 @Override public String getName(){ return "?"; }
+	  
+
+	
 	public void setGridVertical(int dataPointsBetweenGridLines, int periodStrongLine){
 		this.gridDistanceY = dataPointsBetweenGridLines;
 		this.gridStrongPeriodY = periodStrongLine;
@@ -530,6 +535,11 @@ public class CurveView extends Canvas implements GralWidget_ifc
     // TODO Auto-generated method stub
     return false;
   }
+  
+  @Override public void redrawDelayed(int delay){
+    redraw();
+  }
+  
   
 
 }

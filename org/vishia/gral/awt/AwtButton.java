@@ -57,6 +57,9 @@ public class AwtButton extends GralButton
     //widgetSwt.update();
   }
   
+  
+
+  
   @Override public boolean setFocus()
   { return AwtWidgetHelper.setFocusOfTabSwt(widgetSwt);
   }

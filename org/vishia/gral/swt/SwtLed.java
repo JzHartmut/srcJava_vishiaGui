@@ -45,7 +45,12 @@ public class SwtLed extends GralLed{
 
   }
 
+  @Override public void redrawDelayed(int delay){
+    redraw();
+  }
   
+  
+
   public void setColor(int nBorderColor, int nInnerColor){
     widgSwt.setColor(nBorderColor, nInnerColor);
   }

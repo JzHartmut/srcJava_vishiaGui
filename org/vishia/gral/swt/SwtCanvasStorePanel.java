@@ -127,7 +127,9 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
 
   @Override public boolean setFocus()
   {
-    return swtCanvas.setFocus();
+    if(!super.setFocus()){
+      return swtCanvas.setFocus();
+    } else return true;
   }
 
   

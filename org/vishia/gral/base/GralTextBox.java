@@ -3,6 +3,7 @@ package org.vishia.gral.base;
 import java.io.IOException;
 
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
 
 public abstract class GralTextBox extends GralTextField implements Appendable, GralTextBox_ifc

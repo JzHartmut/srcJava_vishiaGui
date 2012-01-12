@@ -22,6 +22,11 @@ public class GralCurveView extends GralWidget
   
   @Override public void redraw(){   }
 
+  @Override public void redrawDelayed(int delay){
+    redraw();
+  }
+  
+  
 
   
   @Override

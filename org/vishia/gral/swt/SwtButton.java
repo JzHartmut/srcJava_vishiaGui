@@ -60,6 +60,14 @@ public class SwtButton extends GralButton
   }
   
   
+  @Override public void redrawDelayed(int delay){
+    redraw();
+  }
+  
+  
+
+  
+  
   @Override
   protected void removeWidgetImplementation()
   {

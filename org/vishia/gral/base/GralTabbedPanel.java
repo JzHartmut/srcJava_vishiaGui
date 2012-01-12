@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 
-import org.vishia.commander.FcmdWidgetNames;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralWidget;
 
@@ -73,6 +73,8 @@ public abstract class GralTabbedPanel extends GralPanelContent /*extends GralWid
 	
 	/**Adds a grid-panel in the TabPanel. The panel will be registered in the GuiPanelMng,
 	 * so the access to the panel can be done with its name.
+	 * The position of the widget manager is set to full area of this panel.
+	 * 
 	 * @param sName The name, used in 
 	 * @param sLabel to designate the tab for view. A "&" left from a character determines the hot-key
 	 *               to select the tab.
@@ -117,6 +119,7 @@ public abstract class GralTabbedPanel extends GralPanelContent /*extends GralWid
     
     return widgetsVisible;
   }
+  
 
   boolean removePanel(GralPanelContent panel){
     return removePanel(panel.name);

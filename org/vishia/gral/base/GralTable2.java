@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.KeyCode;
@@ -156,7 +157,7 @@ public abstract class GralTable2 extends GralTable{
     }
     line.userData = userData;
     bFillCells = true;
-    //redraw();
+    redrawDelayed(100);
     return line;
   }
 
@@ -187,7 +188,7 @@ public abstract class GralTable2 extends GralTable{
   }
 
   
-  
+ 
   protected boolean processKeys(int keyCode){
     boolean done = true;
     switch(keyCode){
@@ -260,11 +261,15 @@ public abstract class GralTable2 extends GralTable{
     
     private Object userData;
     
+    //TODO GralColor colorBack, colorText;
+    
     TableItemWidget(){
       cellTexts = new String[zColumn];
     }
     
+    @Override public String getName(){ return name; }
     
+
     @Override
     public Object getWidgetImplementation() {
       // TODO Auto-generated method stub
@@ -295,6 +300,14 @@ public abstract class GralTable2 extends GralTable{
       GralTable2.this.redraw(); 
     }
 
+    @Override public void redrawDelayed(int delay){
+      itsMng.setInfoDelayed(this, GralPanelMngWorking_ifc.cmdRedraw, 0, null, null, delay);
+    }
+    
+
+    
+
+    
     @Override
     public void setBoundsPixel(int x, int y, int dx, int dy) {
       // TODO Auto-generated method stub
@@ -303,11 +316,13 @@ public abstract class GralTable2 extends GralTable{
 
     @Override public String getCellText(int column) { return cellTexts[column]; }
 
+    @Override public String[] getCellTexts() { return cellTexts; }
+
     @Override
     public String setCellText(String text, int column) {
       String oldText = cellTexts[column];
       cellTexts[column] = text;
-      //redraw();
+      GralTable2.this.redrawDelayed(100);
       return oldText;
     }
 

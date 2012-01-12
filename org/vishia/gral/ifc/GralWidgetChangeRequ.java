@@ -13,7 +13,7 @@ public class GralWidgetChangeRequ
   public final static int version = 0x20120108;
   
   /**The widget where the change should be done. */
-  public final GralWidget widgetDescr;
+  public final GralWidget_ifc widgetDescr;
   
   /**The command which should be done to change. It is one of the static definitions cmd... of this class. */
   public final int cmd;
@@ -32,7 +32,7 @@ public class GralWidgetChangeRequ
   
   public final Object userData;
   
-  public GralWidgetChangeRequ(GralWidget widgetDescr, int cmd, int indent, Object visibleInfo, Object userData) 
+  public GralWidgetChangeRequ(GralWidget_ifc widgetDescr, int cmd, int indent, Object visibleInfo, Object userData) 
   { this.widgetDescr = widgetDescr;
     this.cmd = cmd;
     this.ident = indent;

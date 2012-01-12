@@ -112,7 +112,7 @@ public interface GralPanelMngWorking_ifc
    */
   String setInfo(GralWidget widgd, int cmd, int ident, Object visibleInfo, Object userData);
   
-  String setInfoDelayed(GralWidget widgd, int cmd, int ident, Object visibleInfo, Object userData, int delay);
+  String setInfoDelayed(GralWidget_ifc widgd, int cmd, int ident, Object visibleInfo, Object userData, int delay);
   
   String setInfoDelayed(GralWidgetChangeRequ changeRequ, int delay);
   

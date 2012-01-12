@@ -14,6 +14,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTable2;
 import org.vishia.gral.base.GralWidgetMng;
@@ -159,11 +160,23 @@ public class SwtTable2  extends GralTable2 {
 
   
   @Override public boolean setFocus()
-  { if(ixLine >=0){
-      return SwtWidgetHelper.setFocusOfTabSwt(cellsSwt[ixLine][0]);
+  { if(ixGlineSelectedNew >=0 && ixColumn >=0){
+      redrawTableWithFocusedCell(cellsSwt[ixGlineSelectedNew][ixColumn]);
+      return true;
+    } else {
+      if(ixColumn < 0){ ixColumn = 0;}
+      if(ixLine < 0 && zLine >0){ ixLineNew = 0;}
+      bFocused = true;
+      table.redraw();
+      return true;
+    }
+    /*
+    if(ixLineNew >=0){ ///
+      return SwtWidgetHelper.setFocusOfTabSwt(cellsSwt[ixLineNew][0]);
     } else {
       return SwtWidgetHelper.setFocusOfTabSwt(table);
     }
+    */
   }
 
 
@@ -232,6 +245,10 @@ public class SwtTable2  extends GralTable2 {
       redrawGthread();
     }
     
+    /**Redraws the whole table because the current line is changed or the focus is changed.
+     * TODO
+     * {@link SwtWidgetSet_ifc#redrawGthread()}
+     */
     @Override public void redrawGthread(){
       long dbgtime = System.currentTimeMillis();
       bRedrawPending = true;
@@ -298,9 +315,8 @@ public class SwtTable2  extends GralTable2 {
       long dbgtime3 = System.currentTimeMillis() - dbgtime;
       
       //mark current line
-      if(ixLineNew != ixLine || bFocused){
+      if(ixLineNew >=0 && (ixLineNew != ixLine || bFocused)){
         selectLine(tableLines.get(ixLineNew));
-        bFocused = false;
         ixLine = ixLineNew;
       //}
       //if(true || ixLineNew != ixLine){
@@ -309,7 +325,14 @@ public class SwtTable2  extends GralTable2 {
         MainCmd.assertion(ixGlineSelectedNew < zLineVisible);
         for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
           Text cellSwt = cellsSwt[iCellLine][iCellCol];
-          //cellSwt.setBackground(colorBackSelectSwt);
+          //Note: The background color isn't set yet because this routine may be called
+          //in a fast key repetition (50 ms). In the next few ms the next cell may have
+          //the focus then. The setBackground needs about 5 ms per cell on Linux GTK
+          //with an Intel-Atom-processor. It is too much.
+          //The focus is able to see because the cursor is there.
+          //The color will be set in the writeContentLast.
+          //
+          //don't invoke: cellSwt.setBackground(colorBackSelectSwt);
           if(iCellCol == ixColumn){
             cellSwt.setFocus();  
           }
@@ -328,6 +351,11 @@ public class SwtTable2  extends GralTable2 {
     }
     
     
+    /**This routine is called if some time is delayed after a last {@link #redrawGthread()}
+     * invocation. It sets the background color to the focused cell and sets the focus
+     * for the panel.
+     * 
+     */
     GralDispatchCallbackWorker writeContentLast = new GralDispatchCallbackWorker(){
       @Override public void doBeforeDispatching(boolean onlyWakeup) {
         ///
@@ -339,7 +367,7 @@ public class SwtTable2  extends GralTable2 {
             cellSwt.setBackground(colorBackTableSwt);
           }
         }
-        if(ixGlineSelectedNew != ixGlineSelected || ixGlineSelectedNew >= 0 && bFocused){
+        if((ixGlineSelectedNew != ixGlineSelected || bFocused) && ixGlineSelectedNew >= 0 ){
           //set background color for selected line.
           ixGlineSelected = ixGlineSelectedNew; //Note is equal already if bFocused only
           if(ixGlineSelectedNew >=0){ //only if anything is selected:
@@ -347,10 +375,13 @@ public class SwtTable2  extends GralTable2 {
               Text cellSwt = cellsSwt[ixGlineSelected][iCellCol];
               cellSwt.setBackground(colorBackSelectSwt);
               if(iCellCol == ixColumn){
-                cellSwt.setFocus();  
+                SwtWidgetHelper.setFocusOfTabSwt(cellSwt);
+                //cellSwt.setFocus(); 
+                System.out.print("\nSwtTable2.writeContentLast: " + SwtTable2.this.name);
               }
             }
           }
+          bFocused = false;
         }
         bRedrawPending = false;
         countExecution();
@@ -382,8 +413,9 @@ public class SwtTable2  extends GralTable2 {
       if(visibleInfo instanceof String[]){
         insertLine(null, pos, (String[])visibleInfo, data);
       } else if(visibleInfo instanceof String){
-        String[] text = new String[1];
-        text[0] = (String)visibleInfo;
+        String[] text = ((String)visibleInfo).split("\t");
+        //String[] text = new String[1];
+        //text[0] = (String)visibleInfo;
         insertLine(null, pos, text, data);
       }
     }
@@ -589,19 +621,29 @@ public class SwtTable2  extends GralTable2 {
      * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
      */
     @Override public void focusGained(FocusEvent ev) { 
-      if(!bRedrawPending){
-        CellData data = (CellData)ev.widget.getData();
-        if(data.tableItem !=null){ //don't do any action if the cell isn't use.
-          ixLineNew = data.ixCellLine + ixLine1;
-          MainCmd.assertion(ixLineNew < zLine);
-          ixColumn = data.ixCellColumn;
-          bFocused = true;
-          table.redraw();
-        }
+      if(!bRedrawPending){ 
+        redrawTableWithFocusedCell(ev.widget);
       } 
     }
     
   };
+  
+  
+  /**Sets the current cell as focused with the focus color. It causes
+   * a redraw of the whole table because the cell may be shifted in table position.
+   * @param cell The cell 
+   */
+  private void redrawTableWithFocusedCell(Widget cell){
+    CellData data = (CellData)cell.getData();
+    if(data.tableItem !=null){ //don't do any action if the cell isn't use.
+      ixLineNew = data.ixCellLine + ixLine1;
+      MainCmd.assertion(ixLineNew < zLine);
+      ixColumn = data.ixCellColumn;
+      bFocused = true;
+      table.redraw();
+    }
+  }
+  
   
   
   void stop(){}

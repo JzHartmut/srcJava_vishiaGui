@@ -67,12 +67,6 @@ public class SwtPanel extends GralPanelContent
     return (Composite)panelComposite;
   }
   
-  @Override
-  public boolean setFocus()
-  {
-    // TODO Auto-generated method stub
-    return false;
-  }
 
   @Override
   public GralColor setBackgroundColor(GralColor color)
@@ -89,6 +83,13 @@ public class SwtPanel extends GralPanelContent
   }
   
   @Override public void redraw(){  ((Control)panelComposite).redraw(); }
+
+  
+  @Override public void redrawDelayed(int delay){
+    redraw();
+  }
+  
+  
 
   
   @Override public GralRectangle getPixelPositionSize(){

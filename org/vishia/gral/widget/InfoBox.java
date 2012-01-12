@@ -77,6 +77,11 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
 
   }
   
+  @Override public String getName(){ return textBox.getName(); }
+  
+
+  
+  
   @Override public void setTextStyle(GralColor color, GralFont font)
   { textBox.setTextStyle(color, font);
   }
@@ -113,6 +118,12 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   
   @Override public void redraw(){  window.redraw(); }
 
+
+  @Override public void redrawDelayed(int delay){
+    window.redrawDelayed(delay);
+  }
+  
+  
 
   
   @Override

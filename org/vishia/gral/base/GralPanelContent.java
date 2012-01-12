@@ -17,6 +17,7 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
 
   /**Version history:
    * <ul>
+   * <li>2012-01-14 Hartmut new: {@link #setPrimaryWidget(GralWidget)} for panel focus.
    * <li>2012-01-08 Hartmut new: {@link #remove()}
    * <li>2011-11-19 Hartmut chg: The 'itsTabSwt' is moved to {@link org.vishia.gral.swt.SwtPanel} now.
    * <li>2011-11-12 Hartmut new: {@link #getPixelPositionSize()}.
@@ -39,10 +40,12 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
 	
 	public final GralWidgetMng gralMng;
 	
-	//public final CanvasStorePanel panelComposite;
-	
-	//public final Map<String, WidgetDescriptor<WidgetTYPE>> widgetIndex = new TreeMap<String, WidgetDescriptor<WidgetTYPE>>();
 
+	/**The widget which should be focused if the panel is focused. 
+	 * It is possible to set any actual widget to store the focus situation,
+	 * It is possible too to have only one widget to focus. if the panel gets the focus. */
+	protected GralWidget primaryWidget;
+	
 	/**List of all widgets which are contained in this panel.
 	 * This list is used in the communication thread to update the content of all widgets in the panel.
 	 */
@@ -93,6 +96,34 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
   
 	
 	public abstract   GralRectangle getPixelPositionSize();
+	
+	
+	public void setPrimaryWidget(GralWidget widg){ primaryWidget = widg; }
+	
+	
+	void addWidget(GralWidget widg, boolean toResize){
+    widgetList.add(widg);
+    if(toResize){
+      widgetsToResize.add(widg);
+    }
+    if(primaryWidget ==null){
+      primaryWidget = widg; 
+    }
+	}
+	
+	
+	/**Sets the focus to the primary widget if it is set.
+	 * Elsewhere do nothing and returns false. 
+	 * The focus may be set then by the inherit implementation class.
+	 * <br>See {@link #setPrimaryWidget(GralWidget)}.
+	 * @return true if the focus is set to the primary widget. 
+	 */
+	@Override public boolean setFocus()
+	{
+	  if(primaryWidget !=null) return primaryWidget.setFocus();
+	  else return false;
+	}
+	
 	
   /**Removes this widget from the lists in this panel. This method is not intent to invoke
    * by an application. It is only used in {@link GralWidget#remove()}. Use the last one method

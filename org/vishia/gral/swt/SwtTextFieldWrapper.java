@@ -123,6 +123,11 @@ public class SwtTextFieldWrapper extends GralTextField
   
   @Override public void redraw(){  textFieldSwt.redraw(); textFieldSwt.update(); }
 
+  @Override public void redrawDelayed(int delay){
+    redraw();
+  }
+  
+  
   @Override public boolean setFocus()
   { return SwtWidgetHelper.setFocusOfTabSwt(textFieldSwt);
   }

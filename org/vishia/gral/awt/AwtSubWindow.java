@@ -71,6 +71,9 @@ public class AwtSubWindow extends GralWindow
     
   }
 
+  
+  
+
   @Override
   public void setWindowVisible(boolean visible)
   {

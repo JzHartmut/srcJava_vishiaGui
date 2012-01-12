@@ -12,6 +12,8 @@ public interface GralWidget_ifc extends Removeable
   /**Returns the implementation class of the widget. */
   public abstract Object getWidgetImplementation();
   
+  public String getName();
+  
   /**Sets the focus to the widget.
    * TODO call GuiPanelMngSwt#setFocusOfTabSwt() for all widgets, see TabelSwt!
    * @return true if set
@@ -24,7 +26,15 @@ public interface GralWidget_ifc extends Removeable
   
   //public abstract GralWidget getGralWidget();
 
+  /**Have to call only in the graphical thread.
+   * 
+   */
   public void redraw();
+  
+  /**Delayed redraw, can be called in any thread.
+   * @param delay in milliseconds.
+   */
+  public void redrawDelayed(int delay);
   
   void setBoundsPixel(int x, int y, int dx, int dy);
   

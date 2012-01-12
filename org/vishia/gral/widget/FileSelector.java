@@ -9,23 +9,17 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.gral.base.GralTextField;
-import org.vishia.gral.base.GralWidgetMng;
-import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
-import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.FileRemote;
 import org.vishia.util.FileRemoteAccessor;
 import org.vishia.util.FileRemoteAccessorLocalFile;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
-import org.vishia.util.SelectMask;
 
 /**This class is a large widget which contains a list to select files in a directory, 
  * supports navigation in the directory tree and shows the current path in an extra text field.
@@ -146,31 +140,33 @@ public class FileSelector implements Removeable //extends GralWidget
      */
     @Override public void actionLeft(Object userData, GralTableLine_ifc line)
     {
-      FileRemote data = (FileRemote)userData;
+      FileRemote currentFile = (FileRemote)userData;
       //File dir = data.file.getParentFile();
       //String sName = line.getCellText(1);
       String sDir = currentDir.getPath();
-      if(data !=null && sDir !=null){
-        System.out.println("current: " + sDir + " :: " + data.getName());
-        indexSelection.put(sDir, data.getName());
+      if(currentFile !=null && sDir !=null){
+        System.out.println("current: " + sDir + " :: " + currentFile.getName());
+        indexSelection.put(sDir, currentFile.getName());
       }
       String sParent = currentDir.getParent();
-      if(sParent !=null){
-        fillIn(sParent); 
+      File parentDir = currentDir.getParentFile();
+      if(parentDir !=null){
+        indexSelection.put(sParent, currentDir.getName());
+        fillIn(parentDir); 
       }
     }
     
     
     @Override public void actionRight(Object userData, GralTableLine_ifc line)
     {
-      FileRemote data = (FileRemote)userData;
+      FileRemote currentFile = (FileRemote)userData;
       //File dir = data.file.getParentFile();
       //String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir);
       //String sName = line.getCellText(1);
-      if(data.isDirectory()){
+      if(currentFile.isDirectory()){
         //save the last selection of that level
-        indexSelection.put(data.getParent(), data.getName());
-        fillIn(data.getPath());
+        indexSelection.put(currentFile.getParent(), currentFile.getName());
+        fillIn(currentFile);
         //fillIn(data.getParent() + "/" + data.getName());
       }
     }
@@ -206,7 +202,11 @@ public class FileSelector implements Removeable //extends GralWidget
   
   /**This index stores the last selected file for any directory path which was used.
    * If the directory path is reused later, the same file will be selected initially.
-   * It helps by navigation through the file tree.   
+   * It helps by navigation through the file tree.
+   * <ul>
+   * <li>The key is the path in canonical form without terminating '/'.
+   * <li>The value is the name of the file in this directory.   
+   * </ul>
    */
   private Map<String, String> indexSelection = new TreeMap<String, String>(); 
   
@@ -219,13 +219,13 @@ public class FileSelector implements Removeable //extends GralWidget
   //final MainCmd_ifc mainCmd;
 
   /**The current shown directory. */
-  FileRemote currentDir;
+  File currentDir;
   
   String sCurrentDir;
   
   
   /**The directory which was used on start. */
-  String originDir;
+  File originDir;
   
   
   GralUserAction actionOnEnterFile;
@@ -269,7 +269,7 @@ public class FileSelector implements Removeable //extends GralWidget
 
   //public String getCurrentDir(){ return sCurrentDir; }
   
-  public void setOriginDir(String dir){ originDir = dir; }
+  public void setOriginDir(FileRemote dir){ originDir = dir; }
   
   /**Sets the action which is called if any file is entered. It means the Enter-Key is pressed or
    * a mouse double-click is done on a file.
@@ -298,7 +298,7 @@ public class FileSelector implements Removeable //extends GralWidget
    */
   public void fillInCurrentDir(){
     if(currentDir !=null){
-      fillIn(currentDir.getAbsolutePath());
+      fillIn(currentDir);
     }
   }
   
@@ -306,25 +306,23 @@ public class FileSelector implements Removeable //extends GralWidget
   /**Fills the content with given directory.
    * @param dir The directory which's files are shown.
    */
-  public void fillIn(String path)
+  public void fillIn(File dir) //String path)
   {
     selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdClear, -1, null, null);
-    FileRemote dir = new FileRemote(path);
+    //FileRemote dir = new FileRemote(path);
+    //FileRemote rdir = (FileRemote)dir;
     this.currentDir = dir;
     if(originDir == null){
-      originDir = path;      //sets on the first invocation. 
+      originDir = dir; //path;      //sets on the first invocation. 
     }
     //this.sCurrentDir = FileSystem.getCanonicalPath(dir) + "/";
     this.sCurrentDir = dir.getPath();
-    if(!this.sCurrentDir.endsWith("/")){
-      this.sCurrentDir += "/";
-    }
     widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sCurrentDir);
-    FileRemote[] files = dir.listFiles();
+    File[] files = dir.listFiles();
     int lineSelect = 0;  
     if(files !=null){ 
-      Map<String, FileRemote> sortFiles = new TreeMap<String, FileRemote>();
-      for(FileRemote file: files){
+      Map<String, File> sortFiles = new TreeMap<String, File>();
+      for(File file: files){
         String sName = file.getName();
         if(file.isDirectory()){ sName += "/"; }
         String sort = (file.isDirectory()? "D" : "F") + sName;
@@ -342,13 +340,15 @@ public class FileSelector implements Removeable //extends GralWidget
       }
       //The file or directory which was the current one while this directory was shown lastly:
       String sFileCurrentline = indexSelection.get(sCurrentDir);
-      for(Map.Entry<String, FileRemote> entry: sortFiles.entrySet()){
+      for(Map.Entry<String, File> entry: sortFiles.entrySet()){
         String[] line = new String[4];
-        FileRemote file = entry.getValue();
+        File file = entry.getValue();
         if(sFileCurrentline != null && file.getName().equals(sFileCurrentline)){
           lineSelect = lineCt;
         }
-        if(file.isSymbolicLink()){ line[0] =  file.isDirectory() ? ">" : "s"; }
+        if(file instanceof FileRemote && ((FileRemote)file).isSymbolicLink()){ 
+          line[0] =  file.isDirectory() ? ">" : "s"; 
+        }
         else if(file.isDirectory()){ line[0] = "/"; }
         else { line[0] = " ";}
         line[1] = file.getName();
@@ -386,7 +386,7 @@ public class FileSelector implements Removeable //extends GralWidget
   }
   
 
-  public FileRemote getCurrentDir(){ return currentDir; }
+  public File getCurrentDir(){ return currentDir; }
 
   
   /**Gets the selected file from this panel.

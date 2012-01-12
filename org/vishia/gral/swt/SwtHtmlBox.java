@@ -65,6 +65,13 @@ public class SwtHtmlBox extends GralHtmlBox
     
   }
 
+  
+  @Override public void redrawDelayed(int delay){
+    redraw();
+  }
+  
+  
+
   @Override
   public GralColor setBackgroundColor(GralColor color)
   {

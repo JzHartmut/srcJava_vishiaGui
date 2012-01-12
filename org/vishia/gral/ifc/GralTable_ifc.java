@@ -20,6 +20,10 @@ public interface GralTable_ifc extends GralWidget_ifc
   
   public abstract GralTableLine_ifc getCurrentLine();
   
+  /**Sets the cell which is selected in the line.
+   * @param line from 0 for the first (top) line
+   * @param column from 0 for the left column
+   */
   public abstract void setCurrentCell(int line, int column);
   
   /**Returns the line at row.

@@ -11,6 +11,7 @@ import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.eclipse.swt.widgets.TableItem;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.cfg.GralCfgData;
@@ -21,6 +22,7 @@ import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralMngApplAdapter_ifc;
 import org.vishia.gral.ifc.GralPos;
+import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
@@ -28,6 +30,7 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidgetChangeRequ;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.InfoBox;
 import org.vishia.mainCmd.Report;
@@ -54,6 +57,8 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
 {
   /**Changes:
    * <ul>
+   * <li>2012-01-14 Hartmut chg: {@link #registerWidget(GralWidget)}: uses {@link GralPanelContent#addWidget(GralWidget, boolean)}.
+   * <li>2012-01-14 Hartmut new {@link #getValueFromWidget(GralWidget)} implementing here for non-platform depending values, especially GralTable.
    * <li>2011-12-26 Hartmut new {@link #setApplicationAdapter(GralMngApplAdapter_ifc)} to support context sensitive help by focusGained of widgets.
    * <li>2011-11-18 Hartmut new {@link #getWidgetOnMouseDown()} to get the last clicked widget in any user routine.
    *   The information about the widget can be used to capture widgets for any script.
@@ -347,6 +352,29 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
 		this.variableContainer = variableContainer;
 		userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
 	}
+  
+  
+  
+  /**Returns null if the widget value can only be gotten platform-depending.
+   * The platform widget manager should override this method too and invoke super.getValueFromWidget()
+   * to call this method. If it returns a value, then it is ok.
+   * A user invocation calls the overridden platform depending method automatically.
+   * <br>
+   * See {@link org.vishia.gral.swt.SwtWidgetMng}.   
+   */
+  @Override public String getValueFromWidget(GralWidget widgd)
+  { String sValue = null;
+    if(widgd instanceof GralTable){
+      StringBuilder u = new StringBuilder();
+      GralTableLine_ifc line = ((GralTable)widgd).getCurrentLine();
+      String[] texts = line.getCellTexts();
+      for(int iCol = 0; iCol < texts.length; ++iCol){
+        u.append(texts[iCol]).append('\t');
+      }
+      sValue = u.toString();
+    }
+    return sValue;
+  }
 
   public void setApplicationAdapter(GralMngApplAdapter_ifc adapter){ this.applAdapter = adapter; }
   
@@ -358,7 +386,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   
  
   
-  @Override public String setInfoDelayed(GralWidget widgd, int cmd, int ident, Object visibleInfo, Object userData, int delay){
+  @Override public String setInfoDelayed(GralWidget_ifc widgd, int cmd, int ident, Object visibleInfo, Object userData, int delay){
     GralWidgetChangeRequ requ = new GralWidgetChangeRequ(widgd, cmd, ident, visibleInfo, userData);
     return setInfoDelayed(requ, delay);
   }
@@ -465,16 +493,12 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   @Override public void registerWidget(GralWidget widgd)
   {
     GralPanelContent panel = widgd.pos !=null ? widgd.pos.panel : this.pos.panel;
-    if(pos.x.p1 < 0 || pos.x.p2 <= 0 || pos.y.p1< 0 || pos.y.p2 <=0){ 
-      //only widgets with size from right TODO percent size too.
-      //widgd.pos = pos.clone();
-      //widgd.pos.set(pos);
-      panel.widgetsToResize.add(widgd);
-    }
     if(widgd.name != null){
       indexNameWidgets.put(widgd.name, widgd);
     }
-    panel.widgetList.add(widgd);
+    //only widgets with size from right TODO percent size too.
+    boolean toResize = pos.x.p1 < 0 || pos.x.p2 <= 0 || pos.y.p1< 0 || pos.y.p2 <=0; 
+    panel.addWidget(widgd, toResize);
     
   }
   

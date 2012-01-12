@@ -209,6 +209,8 @@ public abstract class GralWidget implements GralWidget_ifc
     this.pos = mng.getPositionInPanel();  //Note: makes a clone because the pos in panel is reused. 
 	}
 
+	
+	@Override public String getName(){ return name; }
   
   /**Sets the graphical widget. It is a wrapper around the widget of the graphic implementation base.
    * This method shouldn't invoke by an user's application. It is only invoked by the gral itself. 
@@ -530,6 +532,11 @@ public abstract class GralWidget implements GralWidget_ifc
   
   
   
+  @Override public void redrawDelayed(int delay){
+    itsMng.setInfoDelayed(this, GralPanelMngWorking_ifc.cmdRedraw, 0, null, null, delay);
+  }
+  
+
   /**Removes the graphical widget in the graphic. */
   protected abstract void removeWidgetImplementation();
   

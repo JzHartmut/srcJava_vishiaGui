@@ -65,6 +65,10 @@ public class AwtTextField extends GralTextField
     
   }
   
+  
+  
+
+  
   @Override public boolean setFocus()
   { return AwtWidgetHelper.setFocusOfTabSwt(widgetAwt);
   }

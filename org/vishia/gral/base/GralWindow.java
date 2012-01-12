@@ -116,7 +116,12 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
   }
   
   
+  @Override public void redrawDelayed(int delay){
+    itsMng.setInfoDelayed(this, GralPanelMngWorking_ifc.cmdRedraw, 0, null, null, delay);
+  }
   
+  
+
 
   
 }

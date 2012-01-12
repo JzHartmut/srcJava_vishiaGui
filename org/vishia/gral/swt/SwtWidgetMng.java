@@ -373,11 +373,11 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   @Override public boolean setWindowsVisible(GralWindow_ifc window, GralPos atPos)
   { SwtSubWindow windowSwt = (SwtSubWindow)window;
     if(atPos ==null){
-      window.setWindowVisible(false); ///
+      window.setWindowVisible(false); 
     } else {
       GralRectangle rect = calcPositionOfWindow(atPos);
       windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
-      window.setWindowVisible(true); ///
+      window.setWindowVisible(true); 
     }
     return windowSwt.window.isVisible();
   }
@@ -690,7 +690,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
           } else if(ySize <=4.0){ //it is normally
             heightPrompt = ySize - 2.0f + (4.0f - ySize) * 0.5f; 
             if(heightPrompt < 1.0f){ heightPrompt = 1.0f; }
-            yPosPrompt = ySize - heightPrompt + 0.2f; /// //no more less than 1/2 normal line. 
+            yPosPrompt = ySize - heightPrompt + 0.2f;  //no more less than 1/2 normal line. 
             heightText = 2.0f;
           } else { //greater then 4.0
             yPosPrompt = ySize * 0.5f;
@@ -760,7 +760,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
       swtPrompt.width = promptSize.x;
       widgetInfo.promptSwt.setBounds(swtPrompt);
       
-      ///
+      
     }
     //
     if(widgetInfo.name !=null && widgetInfo.name.charAt(0) == '$'){
@@ -1234,7 +1234,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   }
   
   
-  private void setInfoDirect(GralWidget widget, int cmd, int ident, Object info, Object data)
+  private void setInfoDirect(GralWidget_ifc widget, int cmd, int ident, Object info, Object data)
   { final Object oSwtWidget = widget.getWidgetImplementation();
     final Control swtWidget;
     try{
@@ -1303,7 +1303,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
             case GralPanelMngWorking_ifc.cmdSet: table.changeTable(ident, info, data); break;
             case GralPanelMngWorking_ifc.cmdClear: table.clearTable(ident); break;
             case GralPanelMngWorking_ifc.cmdSelect: table.setCurrentCell(ident, 0); break;
-            default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, widget.name);
+            default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, widget.getName());
             }
           } else if(swtWidget instanceof Text){ 
             Text field = (Text)swtWidget;
@@ -1315,7 +1315,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
                 //shows the end of text because the position after last char is selected.
                 //field.setSelection(sInfo.length());  
                 break;
-            default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %x on widget %s", cmd, widget.name);
+            default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %x on widget %s", cmd, widget.getName());
             }
           } else if(widget instanceof SwtLed){ 
             SwtLed field = (SwtLed)widget;
@@ -1335,7 +1335,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
                 stop();
               }
             } break;
-            default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, widget.name);
+            default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, widget.getName());
             }
           } else if(widget instanceof GralButton){ 
             GralButton widgetButton = (GralButton)widget;
@@ -1343,7 +1343,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
           } else {
             //all other widgets:    
             switch(cmd){  
-            default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd %x for widget: %s", cmd, widget.name);
+            default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd %x for widget: %s", cmd, widget.getName());
             }
           }
         }//switch
@@ -1422,7 +1422,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
       }
       GralWidgetChangeRequ changeReq;
       while( (changeReq = gralDevice.pollChangeRequest()) != null){
-        GralWidget descr = changeReq.widgetDescr;
+        GralWidget_ifc descr = changeReq.widgetDescr;
         setInfoDirect(descr, changeReq.cmd, changeReq.ident, changeReq.visibleInfo, changeReq.userData);
 
       }
@@ -1535,22 +1535,25 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	
 	
 	@Override public String getValueFromWidget(GralWidget widgd)
-	{ final String sValue;
-  	GralWidget_ifc widget = widgd.getGraphicWidgetWrapper();
-    Control swtWidget = (Control)widget.getWidgetImplementation();
-		if(swtWidget instanceof Text){
-  	  sValue = ((Text)swtWidget).getText();
-  	} else if(widgd instanceof GralButton){
-  		GralButton button = (GralButton)widgd;
-  		sValue = button.isOn() ? "1" : "0"; 
-  	} else if(swtWidget instanceof Button){
-  		sValue = "0"; //TODO input.button.isSelected() ? "1" : "0";
-  	} else if(swtWidget instanceof Table){
-      Table table = (Table)swtWidget;
-      sValue = getValueFromTable(table);
-  	} else {
-  	  log.sendMsg(0, "GuiPanelMngSwt.getValueFromWidget - unknown widget type;");
-  		sValue = "";
+	{ String sValue;
+  	sValue = super.getValueFromWidget(widgd);  //platform independent getting of value
+  	if(sValue == null){
+  	  GralWidget_ifc widget = widgd.getGraphicWidgetWrapper();
+      Control swtWidget = (Control)widget.getWidgetImplementation();
+  		if(swtWidget instanceof Text){
+    	  sValue = ((Text)swtWidget).getText();
+    	} else if(widgd instanceof GralButton){
+    		GralButton button = (GralButton)widgd;
+    		sValue = button.isOn() ? "1" : "0"; 
+    	} else if(swtWidget instanceof Button){
+    		sValue = "0"; //TODO input.button.isSelected() ? "1" : "0";
+    	} else if(swtWidget instanceof Table){
+        Table table = (Table)swtWidget;
+        sValue = getValueFromTable(table);
+    	} else {
+    	  log.sendMsg(0, "GuiPanelMngSwt.getValueFromWidget - unknown widget type;");
+    		sValue = "";
+    	}
   	}
 		return sValue;
 	}

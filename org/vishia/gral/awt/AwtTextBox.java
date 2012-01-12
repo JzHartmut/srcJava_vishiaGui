@@ -125,6 +125,9 @@ public class AwtTextBox extends GralTextBox
   
   @Override public void redraw(){  textFieldSwt.repaint();  }
 
+  
+
+  
   @Override public boolean setFocus()
   { return AwtWidgetHelper.setFocusOfTabSwt(textFieldSwt);
   }

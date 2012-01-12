@@ -139,7 +139,11 @@ public class SwtTable extends GralTable
    resizeTable();
   }
 
+  @Override public void redrawDelayed(int delay){
+    itsMng.setInfoDelayed(this, GralPanelMngWorking_ifc.cmdRedraw, 0, null, null, delay);
+  }
   
+
   void resizeTable()
   {
     mng.setBounds_(table);
@@ -372,8 +376,18 @@ public class SwtTable extends GralTable
       item.setData(this);
     }
     
-    @Override public Widget getWidgetImplementation(){ return item; } 
+    @Override public String getName(){ return name; }
     
+    @Override public String[] getCellTexts() { return null; }
+
+    
+    @Override public Widget getWidgetImplementation(){ return item; } 
+
+    
+    @Override public void redrawDelayed(int delay){
+    }
+    
+
 
     @Override
     public GralColor setBackgroundColor(GralColor color)

@@ -57,10 +57,11 @@ public class SwtTabbedPanel extends GralTabbedPanel
   
 	@Override public GralPanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
 	{ ///
+	  mng.pos.panel = this;  //add the grid panel to this, 
 	  Rectangle sizeTabFolder = widgetSwt.getBounds();
 	  TabItem tabItem = new TabItem(widgetSwt, SWT.None);
 	  tabItem.setText(sLabel);
-	  //tabItem.addListener(SWT.FocusIn, focusTabListener);
+	  //tabItem.addFocusListener(SWT.FocusIn, focusTabListener);
 	  SwtCanvasStorePanel panel;
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
 	  if(yGrid <0 || xGrid <0){
@@ -76,7 +77,9 @@ public class SwtTabbedPanel extends GralTabbedPanel
 		mng.registerPanel(panel);   //register the panel in the mng.
 		mng.registerWidget(panel);
     panels.put(sName, panel);   //register the tab panel in the TabbedPanel
-	  return panel;
+	  mng.setPosition(0, 0, 0, 0, 0, '.');
+	  mng.pos.panel = panel;   //use the new panel as default
+    return panel;
   }
 
   
@@ -123,27 +126,32 @@ public class SwtTabbedPanel extends GralTabbedPanel
 		 */
 		@Override public void widgetSelected(SelectionEvent event)
 		{
-			TabItem tab = (TabItem)event.item;    //The tab
-			Control container = tab.getControl(); //Its container
-			if(container != null){
-			//TabFolder tabFolder = tab.getParent();
-				Object data = container.getData();
-				if(data != null){
-					@SuppressWarnings("unchecked")
-					GralPanelContent panelContent = (GralPanelContent)(data);
-					Queue<GralWidget> widgetInfos = panelContent.widgetList; 
-					if(notifyingUserInstanceWhileSelectingTab !=null){
-					  notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);
-					}
-					//TODO remove visible infos for last panel, active act panel.
-					newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
-					//mng.changeWidgets(widgetInfos);
-					focusedTab = panelContent;
-					mng.log.sendMsg(0, "Fcmd-selectTab %s", panelContent.toString());
-				}
+			try{
+  		  TabItem tab = (TabItem)event.item;    //The tab
+  			Control container = tab.getControl(); //Its container
+  			if(container != null){
+  			//TabFolder tabFolder = tab.getParent();
+  				Object data = container.getData();
+  				if(data != null){
+  					@SuppressWarnings("unchecked")
+  					GralPanelContent panelContent = (GralPanelContent)(data);
+  					Queue<GralWidget> widgetInfos = panelContent.widgetList; 
+  					if(notifyingUserInstanceWhileSelectingTab !=null){
+  					  notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);
+  					}
+  					//TODO remove visible infos for last panel, active act panel.
+  					newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
+  					//mng.changeWidgets(widgetInfos);
+  					focusedTab = panelContent;
+  					focusedTab.setFocus();
+  					mng.log.sendMsg(0, "Fcmd-selectTab %s", panelContent.toString());
+  				}
+  			}
+  		}
+			catch(Exception exc){
+			  System.out.println(exc.getLocalizedMessage());
 			}
 		}
-  	
   };
   
   
