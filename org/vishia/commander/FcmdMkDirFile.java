@@ -1,5 +1,6 @@
 package org.vishia.commander;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.vishia.gral.base.GralButton;
@@ -60,7 +61,7 @@ public class FcmdMkDirFile
   void dialogMkDirFile(FileRemote src){ 
     if(main.lastFileCards.size()>=1){
       FcmdFileCard card = main.lastFileCards.get(0);
-      FileRemote dir = card.getCurrentDir();
+      File dir = card.getCurrentDir();
       widgParentPath.setText(dir.getAbsolutePath());
     } else {
       widgParentPath.setText("?? nothing selected ??");

@@ -142,8 +142,8 @@ public class FcmdCopyCmd
       if(main.lastFileCards.size() >=2){
         fileCardSrc = main.lastFileCards.get(0);
         fileCardDst = main.lastFileCards.get(1);
-        fileSrcDir = fileCardSrc.getCurrentDir();
-        fileDstDir = fileCardDst.getCurrentDir();
+        fileSrcDir = FileRemote.fromFile(fileCardSrc.getCurrentDir());
+        fileDstDir = FileRemote.fromFile(fileCardDst.getCurrentDir());
         List<String> listFileSrc = fileCardSrc.getSelectedFiles();
         if(listFileSrc.size()==0){ //nothing selected
           listFileSrc.add(fileCardSrc.currentFile.getName());  

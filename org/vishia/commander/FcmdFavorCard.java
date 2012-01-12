@@ -5,8 +5,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.gral.ifc.GralTableLine_ifc;
+import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.SelectList;
+import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
 /**This is one table of favorite pathes in the file commander.  
@@ -21,6 +23,11 @@ public class FcmdFavorCard  extends SelectList
   
   final FcmdFileCard fileTable;
   
+  /**Stores the last selected and used favor path (pressing enter or double click)
+   * to select the same line if the favor path will be re-opened.
+   */
+  String sActSelectedFavorPath = "";
+  
   /**Index of all entries in the visible list. */
   Map<String, FcmdFavorPathSelector.FavorPath> indexFavorPaths = new TreeMap<String, FcmdFavorPathSelector.FavorPath>();
   
@@ -29,6 +36,7 @@ public class FcmdFavorCard  extends SelectList
     this.main = main;
     this.mainPanel = panel;
     this.fileTable = fileTable;
+
   }
 
 
@@ -69,9 +77,17 @@ public class FcmdFavorCard  extends SelectList
   void fillFavorPaths(FcmdFavorPathSelector.FavorFolder favorTabInfo)
   {
     clear();
+    int lineCt =0;
+
+    int currentLine = 0;
     for( FcmdFavorPathSelector.FavorPath favorPathInfo: favorTabInfo.listfavorPaths){
       add(favorPathInfo);
+      if(favorPathInfo.selectName.equals(sActSelectedFavorPath)){
+        currentLine = lineCt;
+      }
+      lineCt +=1;
     }
+    wdgdTable.setCurrentCell(currentLine, 1);
 
   }
   
@@ -88,6 +104,7 @@ public class FcmdFavorCard  extends SelectList
   {
     FcmdFavorPathSelector.FavorPath favorPathInfo = (FcmdFavorPathSelector.FavorPath)line.getUserData();
     main.favorPathSelector.actFavorPathInfo = favorPathInfo; //The last used selection (independent of tab left, middle, right)
+    sActSelectedFavorPath = favorPathInfo.selectName;
     int ixtabName = mainPanel.cNr - '1';
     
     //String tabName = info.label;  //The label of file tab.
@@ -97,9 +114,14 @@ public class FcmdFavorCard  extends SelectList
   
     //before changing the content of this fileTable, store the current directory
     //to restore if this favor respectively selection is used ones more.
+    File dir = null;
     String currentDir;
     if(fileTable.favorPathInfo !=null){
-      currentDir = fileTable.getCurrentDir().getAbsolutePath();
+      dir = fileTable.getCurrentDir();
+      if(dir == null){
+        dir = new FileRemote(favorPathInfo.path);
+      }
+      currentDir = dir.getAbsolutePath();
       if(currentDir !=null){
         mainPanel.indexActualDir.put(fileTable.favorPathInfo.selectName, currentDir);
     } }
@@ -109,9 +131,10 @@ public class FcmdFavorCard  extends SelectList
     if(  wdgdTable.name.startsWith(FcmdWidgetNames.tableFavoritesMain)   //use the root dir anytime if the main favor path table is used.
       || (currentDir  = mainPanel.indexActualDir.get(favorPathInfo.selectName)) == null){  //use the root if the entry wasn't use till now
       currentDir = favorPathInfo.path;
+      dir = new FileRemote(currentDir);
     }
     fileTable.favorCard.add(favorPathInfo);
-    fileTable.fillIn(currentDir);
+    fileTable.fillIn(dir);
     fileTable.setFocus();
     return true;
   }
@@ -208,6 +231,21 @@ public class FcmdFavorCard  extends SelectList
     return ret;
   }
   
+  /**Action to show the file properties in the info line. This action is called anytime if a line
+   * was changed in the file view table. */
+  GralUserAction actionFavorSelected = new GralUserAction(){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
+      if(actionCode == KeyCode.tableLineSelect){
+        main.lastFavorCard = FcmdFavorCard.this;
+        GralTableLine_ifc line = (GralTableLine_ifc) params[0];
+        Object oData = line.getUserData();
+        System.out.println("FcmdFavorCard.actionFavorSelected: " + fileTable.label);
+      }
+      return true;
+    }
+  };
+  
+
   
   @Override public String toString(){ return fileTable.toString(); }
 

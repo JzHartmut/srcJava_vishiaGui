@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -70,21 +71,24 @@ public class FcmdFileCard extends FileSelector
     //The favorite paths card
     favorCard = new FcmdFavorCard(main, this, mainPanel);
     String nameTableSelection = FcmdWidgetNames.tableFavorites + nameFilePanel;
-    mainPanel.tabbedPanelFavorCards.addGridPanel(FcmdWidgetNames.tabFavorites + nameFilePanel, label,1,1,10,10);
+    GralPanelContent panelFavors = mainPanel.tabbedPanelFavorCards.addGridPanel(FcmdWidgetNames.tabFavorites + nameFilePanel, label,1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd');  ///p
     favorCard.setToPanel(mng, nameTableSelection, 5, mainPanel.widthSelecttableSub, 'A');
     favorCard.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorSelect.");
+    panelFavors.setPrimaryWidget(favorCard.wdgdTable);
     //
     //The files card
-    mainPanel.tabbedPanelFileCards.addGridPanel(FcmdWidgetNames.tabFile + nameFilePanel, label,1,1,10,10);
+    GralPanelContent panelFiles = mainPanel.tabbedPanelFileCards.addGridPanel(FcmdWidgetNames.tabFile + nameFilePanel, label,1,1,10,10);
     //to show the properties of the selected file in the info line:
     //
     //sets this Widget to the selected panel, it is the grid panel which was created even yet.
     setToPanel(mng, namePanelFile, 5, new int[]{2,20,5,10}, 'A');
     super.selectList.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.fileSelect.");
+    panelFiles.setPrimaryWidget(super.selectList.wdgdTable);
     //
     //sets the action for a simple table: what to do on line selected: Show file names. 
     selectList.wdgdTable.setActionOnLineSelected(actionFileSelected);
+    favorCard.wdgdTable.setActionOnLineSelected(favorCard.actionFavorSelected);
     //
     //sets the action for Select a file: open the execute menu
     setActionOnEnterFile(main.executer.actionOnEnterFile);
@@ -95,6 +99,7 @@ public class FcmdFileCard extends FileSelector
   /**Removes this file card with its widgets and data. It is 'close tab'. */
   @Override public boolean remove(){
     favorCard.remove();
+    favorCard = null;
     favorPathInfo = null;
     currentFile = null;
     return super.remove();
@@ -181,6 +186,7 @@ public class FcmdFileCard extends FileSelector
       main.lastFileCards.remove(this);  //if it is in list on higher position
       main.lastFileCards.add(0, this);
     }
+    main.lastFavorCard = favorCard;
     String sDate = formatDateInfo.format(new Date(file.lastModified()));
     String sLenShort = //String.format("", file.length)
       file.length() >= 1000000 ? String.format("%2.1f MByte", file.length()/1000000.0) :

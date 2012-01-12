@@ -419,10 +419,13 @@ class FcmdFavorPathSelector
   
   GralUserAction actionDelTab = new GralUserAction(){
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){
-      if(main.lastFileCards.size() >0){
-        FcmdFileCard fileCard = main.lastFileCards.get(0);
-        fileCard.remove();
+      if(main.lastFavorCard !=null){
+        FcmdFavorCard favorCard = main.lastFavorCard;
+        FcmdFileCard fileCard = favorCard.fileTable;
+        main.lastFileCards.remove(fileCard);
         FcmdLeftMidRightPanel panel = fileCard.mainPanel;
+        fileCard.remove();
+        panel.actFileCard = null;
         panel.listTabs.remove(fileCard);
         String nameWidgFavorCard = FcmdWidgetNames.tabFavorites + fileCard.nameFilePanel;
         String nameWidgFileCard = FcmdWidgetNames.tabFile + fileCard.nameFilePanel;

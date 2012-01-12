@@ -97,6 +97,10 @@ public class Fcmd extends GuiCfg
   
   List<FcmdFileCard> lastFileCards = new LinkedList<FcmdFileCard>();
   
+  /**The last used favor card or its last used file card.
+   * It is used for delete tab. */
+  FcmdFavorCard lastFavorCard;
+  
 
   /**
    * @deprecated
@@ -225,8 +229,8 @@ public class Fcmd extends GuiCfg
     gralMng.addButton("selectLeft", selectPanelLeft, "selectLeft", null, null, "left");
     gralMng.addButton("selectMiddle", selectPanelMiddle, "help", null, null, "middle");
     gralMng.addButton("selectRight", selectPanelRight, "", null, null, "right");
-    gralMng.addButton("selectCmd", selectPanelOut, "", null, null, "cmd");
     gralMng.addButton("b-help", null, "help", null, null, "zip");
+    gralMng.addButton("selectCmd", actionFocusCmdCard, "", null, null, "cmd");
     gralMng.addButton("b-help", null, "help", null, null, "link");
     gralMng.addButton("b-help", null, "help", null, null, "find");
     gralMng.addButton("b-help", null, "help", null, null, "a-F8");
@@ -661,13 +665,9 @@ public class Fcmd extends GuiCfg
     }
   };
 
-  /**
-   * Key alt-F4 or ctrl-O to focus the output/text panel. The original Norton
-   * Commander knows an output panel for the output of commands, which uses the
-   * whole display and is selected with ctrl-O. This output/text panel is used
-   * for content output too. It is always visible.
+  /**Action to focus the cmd card.
    */
-  GralUserAction selectPanelOut = new GralUserAction()
+  GralUserAction actionFocusCmdCard = new GralUserAction()
   {
     @Override
     public boolean userActionGui(String sIntension, GralWidget infos,

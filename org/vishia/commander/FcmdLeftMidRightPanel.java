@@ -1,5 +1,6 @@
 package org.vishia.commander;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.SelectList;
 import org.vishia.mainCmd.MainCmd;
+import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
 /**Data for one panel left, middle or right.
@@ -138,17 +140,17 @@ public class FcmdLeftMidRightPanel
       case 'l':{ 
         favorFolderFrom1 = main.favorPathSelector.panelMid;
         favorFolderFrom2 = main.favorPathSelector.panelRight;
-        from1 = "from left"; from2 = "from mid";
+        from1 = "from mid"; from2 = "from right";
       } break;  
       case 'm':{ 
         favorFolderFrom1 = main.favorPathSelector.panelLeft;
         favorFolderFrom2 = main.favorPathSelector.panelRight;
-        from1 = "from mid"; from2 = "from rigth";
+        from1 = "from left"; from2 = "from rigth";
       } break;  
       case 'r':{ 
         favorFolderFrom1 = main.favorPathSelector.panelLeft;
         favorFolderFrom2 = main.favorPathSelector.panelMid;
-        from1 = "from left"; from2 = "from right";
+        from1 = "from left"; from2 = "from mid";
       } break;  
       default: favorFolderFrom1 = favorFolderFrom2 = null;
       from1 = from2 = null;
@@ -263,7 +265,7 @@ public class FcmdLeftMidRightPanel
     {
       FcmdFavorPathSelector.FavorFolder favorTabInfo = null;
       final String label;
-      String currentDir = null;
+      File currentDir = null;
       Object oLineData = line.getUserData();
       if(oLineData instanceof FcmdFavorPathSelector.FavorFolder){
         favorTabInfo = (FcmdFavorPathSelector.FavorFolder)line.getUserData();
@@ -274,17 +276,12 @@ public class FcmdLeftMidRightPanel
         //before changing the content of this fileTable, store the current directory
         //to restore if this favor respectively selection is used ones more.
         if(actFileCard.favorPathInfo !=null){
-          
-          currentDir = actFileCard.getCurrentDir().getAbsolutePath();
+          currentDir = actFileCard.getCurrentDir(); //.getAbsolutePath();
         } else {
           //nothing selected, its a new tab
-          FcmdFavorPathSelector.FavorPath favorPathInfo = favorTabInfo.listfavorPaths.get(0);
-          //fill in the standard file panel, use maybe a current directory.
-          actFileCard.favorPathInfo = favorPathInfo;
-          if(  wdgdTable.name.startsWith(FcmdWidgetNames.tableFavoritesMain)   //use the root dir anytime if the main favor path table is used.
-            || (currentDir  = indexActualDir.get(favorPathInfo.selectName)) == null){  //use the root if the entry wasn't use till now
-            currentDir = favorPathInfo.path;
-          }
+          //FcmdFavorPathSelector.FavorPath favorPathInfo = favorTabInfo.listfavorPaths.get(0);
+          //actFileCard.favorPathInfo = favorPathInfo;
+          //currentDir = new FileRemote(favorPathInfo.path);
         }
       } else {
         //it have to be a:
@@ -294,7 +291,7 @@ public class FcmdLeftMidRightPanel
         actFileCard = searchOrCreateFileCard(label);     //search or create such filecard with this label here.
         actFileCard.favorPathInfo = fileCard.favorPathInfo;  //copy it, it is the same instance for all 3 panels.
         actFileCard.currentFile = fileCard.currentFile;      //select the same file.
-        currentDir = fileCard.getCurrentDir().getAbsolutePath();
+        currentDir = fileCard.getCurrentDir(); //.getAbsolutePath();
         if(actFileCard == null){
           MainCmd.assertion(false);
         }
@@ -311,13 +308,12 @@ public class FcmdLeftMidRightPanel
     
       //adds all favorite pathes to it newly.
       actFileCard.favorCard.fillFavorPaths(favorTabInfo);
-     
       if(currentDir !=null){
-        indexActualDir.put(actFileCard.favorPathInfo.selectName, currentDir);
-      } 
-      actFileCard.fillIn(currentDir);
-      
-      actFileCard.favorCard.setFocus();
+        indexActualDir.put(actFileCard.favorPathInfo.selectName, currentDir.getPath());
+        actFileCard.fillIn(currentDir);
+      } else { 
+        actFileCard.favorCard.setFocus();
+      }
       return true;
     }
 
