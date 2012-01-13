@@ -58,11 +58,11 @@ public class FcmdKeyActions
   
   int keyPanelSelection = KeyCode.alt + KeyCode.dn;
   
-  int keyPanelFile = KeyCode.alt + KeyCode.up;
+  int keyPanelFile = KeyCode.alt + KeyCode.ctrl + KeyCode.up;
   
-  int keyPanelLeft = KeyCode.alt + KeyCode.left;
+  int keyPanelLeft = KeyCode.alt + KeyCode.ctrl + KeyCode.left;
   
-  int keyPanelRight = KeyCode.alt + KeyCode.right;
+  int keyPanelRight = KeyCode.alt + KeyCode.ctrl + KeyCode.right;
   
   int keyMainPanelLeft = KeyCode.alt + KeyCode.shift + KeyCode.left;
   

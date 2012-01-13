@@ -153,21 +153,13 @@ public class FcmdFileCard extends FileSelector
       }
       
     } else if (keyCode == main.keyActions.keyMainPanelLeft){
-      String mainPanelId = mainPanel == main.favorPathSelector.panelRight ? ".2" : ".1";
-      for(GralWidget widg: main.gralMng.getWidgetsInFocus()){
-        if(widg.name.contains(mainPanelId)){
-          widg.setFocus();
-        }
-      }
+      FcmdLeftMidRightPanel dstPanel = mainPanel == main.favorPathSelector.panelRight ?
+          main.favorPathSelector.panelMid : main.favorPathSelector.panelLeft;
+      if(dstPanel.actFileCard !=null){ dstPanel.actFileCard.setFocus(); }
     } else if (keyCode == main.keyActions.keyMainPanelRight){
-      String mainPanelId = mainPanel == main.favorPathSelector.panelLeft ? ".2" : ".3";
-      for(GralWidget widg: main.gralMng.getWidgetsInFocus()){
-        if(widg.name.contains(mainPanelId)){
-          widg.setFocus();
-        }
-      }
-    //} else if (main.executer.actionExecuteUserKey(keyCode, data)){
-    //  ret = true;
+      FcmdLeftMidRightPanel dstPanel = mainPanel == main.favorPathSelector.panelLeft ?
+          main.favorPathSelector.panelMid : main.favorPathSelector.panelRight;
+      if(dstPanel.actFileCard !=null){ dstPanel.actFileCard.setFocus(); }
     } else {
       ret = false;
     }
@@ -187,6 +179,7 @@ public class FcmdFileCard extends FileSelector
       main.lastFileCards.add(0, this);
     }
     main.lastFavorCard = favorCard;
+    mainPanel.actFileCard = this;
     String sDate = formatDateInfo.format(new Date(file.lastModified()));
     String sLenShort = //String.format("", file.length)
       file.length() >= 1000000 ? String.format("%2.1f MByte", file.length()/1000000.0) :

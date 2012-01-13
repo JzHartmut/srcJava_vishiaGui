@@ -204,19 +204,13 @@ public class FcmdFavorCard  extends SelectList
         fileTableRight.favorCard.wdgdTable.setFocus();
       }
     } else if (key == main.keyActions.keyMainPanelLeft){
-      String mainPanelId = mainPanel == main.favorPathSelector.panelRight ? ".2" : ".1";
-      for(GralWidget widg: main.gralMng.getWidgetsInFocus()){
-        if(widg.name.contains(mainPanelId)){
-          widg.setFocus();
-        }
-      }
+      FcmdLeftMidRightPanel dstPanel = mainPanel == main.favorPathSelector.panelRight ?
+          main.favorPathSelector.panelMid : main.favorPathSelector.panelLeft;
+      if(dstPanel.actFileCard !=null){ dstPanel.actFileCard.favorCard.setFocus(); }
     } else if (key == main.keyActions.keyMainPanelRight){
-      String mainPanelId = mainPanel == main.favorPathSelector.panelLeft ? ".2" : ".3";
-      for(GralWidget widg: main.gralMng.getWidgetsInFocus()){
-        if(widg.name.contains(mainPanelId)){
-          widg.setFocus();
-        }
-      }
+      FcmdLeftMidRightPanel dstPanel = mainPanel == main.favorPathSelector.panelLeft ?
+          main.favorPathSelector.panelMid : main.favorPathSelector.panelRight;
+      if(dstPanel.actFileCard !=null){ dstPanel.actFileCard.favorCard.setFocus(); }
     } else if (key == main.keyActions.keyCreateFavorite){
       main.favorPathSelector.actFavorPathInfo = favorPathInfo; //info in the line of table.
       main.favorPathSelector.windAddFavorite.widgLabel.setText("file3");
