@@ -94,7 +94,7 @@ public class AwtPrimaryWindow extends AwtSubWindow implements GralPrimaryWindow_
   }
 
   @Override
-  public void redraw()
+  public void repaint()
   {
     // TODO Auto-generated method stub
     

@@ -65,7 +65,7 @@ public class AwtSubWindow extends GralWindow
   }
 
   @Override
-  public void redraw()
+  public void repaint()
   {
     // TODO Auto-generated method stub
     
@@ -119,6 +119,12 @@ public class AwtSubWindow extends GralWindow
   @Override
   public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction action)
   {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void repaintGthread() {
     // TODO Auto-generated method stub
     
   }

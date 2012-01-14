@@ -1144,7 +1144,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   @Override public void repaintCurrentPanel()
   {
-    pos.panel.redraw();
+    pos.panel.repaint();
   }
   
   
@@ -1234,9 +1234,10 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   }
   
   
-  private void setInfoDirect(GralWidget_ifc widget, int cmd, int ident, Object info, Object data)
+  @Override protected String setInfoDirect(GralWidget_ifc widget, int cmd, int ident, Object info, Object data)
   { final Object oSwtWidget = widget.getWidgetImplementation();
     final Control swtWidget;
+    String sError = null;
     try{
       SwtSetValue_ifc widgSet = null;
       SwtWidgetSet_ifc gralWidget_setifc = null;
@@ -1252,7 +1253,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
           switch(cmd){
           case GralPanelMngWorking_ifc.cmdSetWindowVisible: gralWindow_setifc.setWindowVisible(ident == 0 ? false : true); break;
           case GralPanelMngWorking_ifc.cmdCloseWindow: gralWindow_setifc.closeWindow(); break;
-          case GralPanelMngWorking_ifc.cmdRedraw: gralWindow_setifc.redraw(); break;
+          case GralPanelMngWorking_ifc.cmdRedraw: gralWindow_setifc.repaintGthread(); break;
           
           }
         }
@@ -1351,7 +1352,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     }catch(Exception exc){
       stop();    
     }
-    
+    return sError;
   }
   
 

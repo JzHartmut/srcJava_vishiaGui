@@ -382,7 +382,7 @@ public class FileSelector implements Removeable //extends GralWidget
       selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, currentDir);
     }
     selectList.wdgdTable.setCurrentCell(lineSelect, 1);
-    selectList.wdgdTable.redraw();
+    selectList.wdgdTable.repaint();
   }
   
 

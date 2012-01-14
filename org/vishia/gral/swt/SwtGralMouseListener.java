@@ -249,7 +249,7 @@ public class SwtGralMouseListener
             action.userActionGui(keyCode, widgg);
           }
         } catch(Exception exc){ guiMng.writeLog(0, exc); }
-        widgg.redraw();
+        widgg.repaint();
       //}
     }
 

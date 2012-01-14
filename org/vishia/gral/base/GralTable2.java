@@ -157,7 +157,7 @@ public abstract class GralTable2 extends GralTable{
     }
     line.userData = userData;
     bFillCells = true;
-    redrawDelayed(100);
+    repaint(100, 0);
     return line;
   }
 
@@ -174,7 +174,7 @@ public abstract class GralTable2 extends GralTable{
     tableLines.clear();
     ixLineNew = ixLine = -1;
     ixGlineSelectedNew = -1;  //deselects ixGlineSelected on redraw!
-    redraw();
+    repaint();
   }
 
   @Override public List<GralTableLine_ifc> getSelectedLines() {
@@ -195,31 +195,31 @@ public abstract class GralTable2 extends GralTable{
     case KeyCode.pgup: {
       if(ixLine > zLineVisible){
         ixLineNew = ixLine - zLineVisible;
-        redraw();
+        repaint();
       } else {
         ixLineNew = 0;
-        redraw();
+        repaint();
       }
     } break;
     case KeyCode.up: {
       if(ixLine > 0){
         ixLineNew = ixLine - 1;
-        redraw();
+        repaint();
       }
     } break;
     case KeyCode.dn: {
       if(ixLine < zLine -1){
         ixLineNew = ixLine + 1;
-        redraw();
+        repaint();
       }
     } break;
     case KeyCode.pgdn: {
       if(ixLine < zLine - zLineVisible){
         ixLineNew = ixLine + zLineVisible;
-        redraw();
+        repaint();
       } else {
         ixLineNew = zLine -1;
-        redraw();
+        repaint();
       }
     } break;
     default:
@@ -295,12 +295,12 @@ public abstract class GralTable2 extends GralTable{
     }
 
     @Override
-    public void redraw() {
+    public void repaint() {
       redraw.addAndGet(1);
-      GralTable2.this.redraw(); 
+      GralTable2.this.repaint(); 
     }
 
-    @Override public void redrawDelayed(int delay){
+    @Override public void repaint(int delay, int latest){
       itsMng.setInfoDelayed(this, GralPanelMngWorking_ifc.cmdRedraw, 0, null, null, delay);
     }
     
@@ -322,7 +322,7 @@ public abstract class GralTable2 extends GralTable{
     public String setCellText(String text, int column) {
       String oldText = cellTexts[column];
       cellTexts[column] = text;
-      GralTable2.this.redrawDelayed(100);
+      GralTable2.this.repaint(100, 0);
       return oldText;
     }
 

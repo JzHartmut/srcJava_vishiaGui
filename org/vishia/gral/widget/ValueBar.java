@@ -99,11 +99,11 @@ abstract public class ValueBar extends GralWidget implements GralSetValue_ifc
 			break; //found
 			border1 = border2;
 		}
-		this.redraw();
+		this.repaint();
 	}
   
   /**This method should implement the redraw-capability. */
-  abstract public void redraw();
+  abstract public void repaint();
 
 
 	public static class ColorValues

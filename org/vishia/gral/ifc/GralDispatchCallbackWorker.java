@@ -20,6 +20,14 @@ public abstract class GralDispatchCallbackWorker
   private final static int version = 0x20120108;
   
 	private int ctDone = 0;
+	
+	/**It is counted only. Used for debug. Possible to set. */
+	public int dbgctDone = 0;
+	
+	/**It is counted only. Used for debug. Possible to set. */
+  public int dbgctWindup = 0;
+	
+	/**True if a thread waits, see {@link #awaitExecution(int, int)}. */
 	private boolean reqCtDone = false;
 
 	private boolean bAdded;
@@ -41,6 +49,7 @@ public abstract class GralDispatchCallbackWorker
 	    bAdded = true;
 	  }
 	  if(delay >0){
+	    dbgctWindup +=1;
 	    delayExecution(delay);
 	  } else {
 	    timeExecution = 0;
@@ -71,7 +80,7 @@ public abstract class GralDispatchCallbackWorker
 	}
 
 	protected synchronized void countExecution()
-	{
+	{ dbgctDone +=1;
 		ctDone +=1;
 		if(reqCtDone){
 			notify();

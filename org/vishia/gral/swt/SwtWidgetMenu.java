@@ -31,12 +31,12 @@ public class SwtWidgetMenu extends GralWidget
     return null;
   }
 
-  @Override
-  public void redraw()
-  {
-    // TODO Auto-generated method stub
-    
+  
+  @Override protected void repaintGthread(){
+    //NOTE: do nothing, a Menu isn't able to redraw, it isn't a Control.
+    //widgSwt.redraw();
   }
+
 
   @Override
   public GralColor setBackgroundColor(GralColor color)

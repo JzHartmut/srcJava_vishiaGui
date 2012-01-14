@@ -123,7 +123,7 @@ public class AwtTextBox extends GralTextBox
 
 
   
-  @Override public void redraw(){  textFieldSwt.repaint();  }
+  @Override public void repaint(){  textFieldSwt.repaint();  }
 
   
 
@@ -168,6 +168,12 @@ public class AwtTextBox extends GralTextBox
   @Override
   public void setTextStyle(GralColor color, GralFont font)
   {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  protected void repaintGthread() {
     // TODO Auto-generated method stub
     
   }

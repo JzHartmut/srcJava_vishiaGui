@@ -45,10 +45,6 @@ public class SwtLed extends GralLed{
 
   }
 
-  @Override public void redrawDelayed(int delay){
-    redraw();
-  }
-  
   
 
   public void setColor(int nBorderColor, int nInnerColor){
@@ -148,18 +144,18 @@ public class SwtLed extends GralLed{
   { return widgSwt.setFocus();
   }
 
+  
+  @Override protected void repaintGthread(){
+    widgSwt.redraw();
+  }
+
+
   @Override
   public Object getWidgetImplementation()
   {
     return widgSwt;
   }
 
-  @Override
-  public void redraw()
-  {
-    // TODO Auto-generated method stub
-    
-  }
 
   @Override
   public GralColor setBackgroundColor(GralColor color)

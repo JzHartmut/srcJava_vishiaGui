@@ -82,14 +82,6 @@ public class SwtPanel extends GralPanelContent
     return null;
   }
   
-  @Override public void redraw(){  ((Control)panelComposite).redraw(); }
-
-  
-  @Override public void redrawDelayed(int delay){
-    redraw();
-  }
-  
-  
 
   
   @Override public GralRectangle getPixelPositionSize(){
@@ -103,6 +95,15 @@ public class SwtPanel extends GralPanelContent
   { ((Composite)panelComposite).setBounds(x,y,dx,dy);
   }
   
+  
+  @Override protected void repaintGthread(){
+    if(panelComposite !=null){
+      ((Composite)panelComposite).redraw();
+    }
+  }
+
+
+
 
   @Override protected void removeWidgetImplementation()
   { if(panelComposite !=null){

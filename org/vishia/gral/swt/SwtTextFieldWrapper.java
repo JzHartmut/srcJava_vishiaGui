@@ -76,6 +76,9 @@ public class SwtTextFieldWrapper extends GralTextField
 
 
   
+  /**
+   * @deprecated TODO {@link #repaintGthread()}
+   */
   protected GralDispatchCallbackWorker changeText = new GralDispatchCallbackWorker()
   { @Override public void doBeforeDispatching(boolean onlyWakeup)
     { if(newText.length() >0){
@@ -86,6 +89,13 @@ public class SwtTextFieldWrapper extends GralTextField
     }
   };
 
+  
+  @Override protected void repaintGthread(){
+    //TODO newText
+    textFieldSwt.redraw();
+  }
+
+  
 
   /**yet it is the same actionChanged of the widget. is called if the write-able text field was changed and the focus is released.
    * The distinction between both is the key code in {@link GralUserAction#userActionGui(int, GralWidget, Object...)}.
@@ -118,13 +128,6 @@ public class SwtTextFieldWrapper extends GralTextField
 
   @Override public GralColor setForegroundColor(GralColor color)
   { return SwtWidgetHelper.setForegroundColor(color, textFieldSwt);
-  }
-  
-  
-  @Override public void redraw(){  textFieldSwt.redraw(); textFieldSwt.update(); }
-
-  @Override public void redrawDelayed(int delay){
-    redraw();
   }
   
   

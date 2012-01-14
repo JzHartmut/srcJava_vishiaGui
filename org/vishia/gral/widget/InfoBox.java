@@ -116,11 +116,13 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
 
 
   
-  @Override public void redraw(){  window.redraw(); }
+  @Override public void repaintGthread(){  window.repaintGthread(); }
 
 
-  @Override public void redrawDelayed(int delay){
-    window.redrawDelayed(delay);
+  @Override public void repaint(){ repaint(0,0); }
+
+  @Override public void repaint(int delay, int latest){
+    window.repaint(delay, latest);
   }
   
   

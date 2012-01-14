@@ -385,17 +385,26 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   }
   
  
+  protected abstract String setInfoDirect(GralWidget_ifc widget, int cmd, int ident, Object info, Object data);
   
   @Override public String setInfoDelayed(GralWidget_ifc widgd, int cmd, int ident, Object visibleInfo, Object userData, int delay){
-    GralWidgetChangeRequ requ = new GralWidgetChangeRequ(widgd, cmd, ident, visibleInfo, userData);
-    return setInfoDelayed(requ, delay);
+    if(delay == 0 && Thread.currentThread().getId() == gralDevice.getThreadIdGui()){
+      return setInfoDirect(widgd, cmd, ident, visibleInfo, userData);
+    } else {
+      GralWidgetChangeRequ requ = new GralWidgetChangeRequ(widgd, cmd, ident, visibleInfo, userData);
+      return setInfoDelayed(requ, delay);
+    }
   }
   
   @Override public String setInfoDelayed(GralWidgetChangeRequ changeRequ, int delay){
-    //TODO check admissibility
-    changeRequ.delayExecution(delay);
-    gralDevice.addChangeRequest(changeRequ);
-    return null;
+    if(delay == 0 && Thread.currentThread().getId() == gralDevice.getThreadIdGui()){
+      return setInfoDirect(changeRequ.widgetDescr, changeRequ.cmd, changeRequ.ident, changeRequ.visibleInfo, changeRequ.userData);
+    } else {
+      //TODO check admissibility
+      changeRequ.delayExecution(delay);
+      gralDevice.addChangeRequest(changeRequ);
+      return null;
+    }
   }
   
 

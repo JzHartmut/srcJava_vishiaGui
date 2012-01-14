@@ -54,17 +54,6 @@ public class SwtButton extends GralButton
     
   }
   
-  @Override public void redraw(){  
-    widgetSwt.redraw(); 
-    //widgetSwt.update();
-  }
-  
-  
-  @Override public void redrawDelayed(int delay){
-    redraw();
-  }
-  
-  
 
   
   
@@ -101,6 +90,11 @@ public class SwtButton extends GralButton
   { SwtWidgetHelper.setFocusOfTabSwt(widgetSwt);
     widgetSwt.forceFocus();
     return widgetSwt.setFocus();
+  }
+
+  
+  @Override protected void repaintGthread(){
+    widgetSwt.redraw();
   }
 
 

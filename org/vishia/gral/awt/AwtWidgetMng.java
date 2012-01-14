@@ -35,6 +35,7 @@ import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.swt.SwtMenu;
 import org.vishia.msgDispatch.LogMessage;
@@ -550,5 +551,14 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 
 
   void stop(){}
+
+
+
+  @Override
+  protected String setInfoDirect(GralWidget_ifc widget, int cmd, int ident,
+      Object info, Object data) {
+    // TODO Auto-generated method stub
+    return null;
+  }
   
 }

@@ -51,26 +51,18 @@ public class SwtHtmlBox extends GralHtmlBox
     return false;
   }
 
+  @Override protected void repaintGthread(){
+    boxSwt.redraw();
+  }
+
+
+  
   @Override
   public Object getWidgetImplementation()
   {
     // TODO Auto-generated method stub
-    return null;
+    return boxSwt;
   }
-
-  @Override
-  public void redraw()
-  {
-    // TODO Auto-generated method stub
-    
-  }
-
-  
-  @Override public void redrawDelayed(int delay){
-    redraw();
-  }
-  
-  
 
   @Override
   public GralColor setBackgroundColor(GralColor color)

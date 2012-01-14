@@ -99,7 +99,9 @@ public class SwtTextBox extends GralTextBox
   
 
   
-  @Override public void redraw(){  textFieldSwt.redraw(); textFieldSwt.update(); }
+  @Override public void repaintGthread(){  
+    textFieldSwt.redraw(); textFieldSwt.update(); 
+  }
 
 
   @Override public boolean setFocus()

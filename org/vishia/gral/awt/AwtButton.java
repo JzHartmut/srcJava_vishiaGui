@@ -52,11 +52,6 @@ public class AwtButton extends GralButton
     
   }
   
-  @Override public void redraw(){  
-    widgetSwt.repaint(); 
-    //widgetSwt.update();
-  }
-  
   
 
   
@@ -169,7 +164,15 @@ public class AwtButton extends GralButton
         }
          System.out.println("Button") ;
       }
-    };
+    }
+
+
+
+  @Override
+  protected void repaintGthread() {
+    // TODO Auto-generated method stub
+    
+  };
     
 
     

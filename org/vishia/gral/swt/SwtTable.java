@@ -139,10 +139,6 @@ public class SwtTable extends GralTable
    resizeTable();
   }
 
-  @Override public void redrawDelayed(int delay){
-    itsMng.setInfoDelayed(this, GralPanelMngWorking_ifc.cmdRedraw, 0, null, null, delay);
-  }
-  
 
   void resizeTable()
   {
@@ -384,10 +380,6 @@ public class SwtTable extends GralTable
     @Override public Widget getWidgetImplementation(){ return item; } 
 
     
-    @Override public void redrawDelayed(int delay){
-    }
-    
-
 
     @Override
     public GralColor setBackgroundColor(GralColor color)
@@ -430,7 +422,7 @@ public class SwtTable extends GralTable
     }
     
     
-    @Override public void redraw(){  table.redraw(); table.update(); }
+    @Override public void repaint(){  table.redraw(); table.update(); }
 
     @Override public void setBoundsPixel(int x, int y, int dx, int dy)
     { table.setBounds(x,y,dx,dy);
@@ -441,6 +433,12 @@ public class SwtTable extends GralTable
     {
       // TODO Auto-generated method stub
       return false;
+    }
+
+    @Override
+    public void repaint(int delay, int latest) {
+      // TODO Auto-generated method stub
+      
     }
     
 
@@ -567,6 +565,9 @@ public class SwtTable extends GralTable
   { return SwtWidgetHelper.setFocusOfTabSwt(table);
   }
 
+  @Override protected void repaintGthread(){
+    table.redraw();
+  }
 
   
   //@Override
@@ -591,7 +592,7 @@ public class SwtTable extends GralTable
     return null;
   }
   
-  @Override public void redraw(){  table.redraw(); table.update(); }
+  @Override public void repaint(){  table.redraw(); table.update(); }
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
   { table.setBounds(x,y,dx,dy);

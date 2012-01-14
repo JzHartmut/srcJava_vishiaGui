@@ -10,7 +10,7 @@ public interface GralWindow_setifc
    */
   void setWindowVisible(boolean visible);
 
-  void redraw();
+  void repaintGthread();
   
   void closeWindow();
 

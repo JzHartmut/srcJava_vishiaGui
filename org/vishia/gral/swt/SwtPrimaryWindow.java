@@ -262,7 +262,7 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
     return null;
   }
 
-  @Override public void redraw(){  graphicThreadSwt.windowSwt.redraw(); graphicThreadSwt.windowSwt.update(); }
+  @Override public void repaint(){  graphicThreadSwt.windowSwt.redraw(); graphicThreadSwt.windowSwt.update(); }
 
   
   public void removeWidgetImplementation()

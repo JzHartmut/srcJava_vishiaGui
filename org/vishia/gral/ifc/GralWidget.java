@@ -46,6 +46,8 @@ public abstract class GralWidget implements GralWidget_ifc
   
   /**Changes:
    * <ul>
+   * <li>2012-01-16 Hartmut new Concept {@link #repaint()}, can be invoked in any thread. With delay possible. 
+   *   All inherit widgets have to be implement  {@link #repaintGthread()}.
    * <li>2011-12-27 Hartmut new {@link #setHtmlHelp(String)}. For context sensitive help.
    * <li>2011-11-18 Hartmut bugfix: {@link #setFocus()} had called {@link GralWidgetMng#setFocus(GralWidget)} and vice versa.
    *   Instead it should be a abstract method here and implemented in all Widgets. See {@link org.vishia.gral.swt.SwtWidgetHelper#setFocusOfTabSwt(org.eclipse.swt.widgets.Control)}.
@@ -198,7 +200,6 @@ public abstract class GralWidget implements GralWidget_ifc
   //{ this.whatIs = whatIs;
   //}
 
-	
 	
 	public GralWidget(String sName, char whatIs, GralWidgetMng mng)
 	{ this.name = sName;
@@ -530,10 +531,16 @@ public abstract class GralWidget implements GralWidget_ifc
   public GralPanelContent getItsPanel(){ return pos.panel; }
   
   
+  @Override public void repaint(){ repaint(0, 0); }
   
   
-  @Override public void redrawDelayed(int delay){
-    itsMng.setInfoDelayed(this, GralPanelMngWorking_ifc.cmdRedraw, 0, null, null, delay);
+  @Override public void repaint(int delay, int latest){
+    if(delay == 0 && Thread.currentThread().getId() == itsMng.gralDevice.getThreadIdGui()){
+      repaintGthread();
+    } else {
+      repaintRequ.addToGraphicThread(itsMng.gralDevice, delay);
+    }
+    //itsMng.setInfoDelayed(repaintRequ, delay);
   }
   
 
@@ -563,6 +570,28 @@ public abstract class GralWidget implements GralWidget_ifc
 	  }
 	}
 
+  
+	/**This method should be implemented in all Widget implementations of the adapter for the
+   * underlying graphic system. 
+   * <br>Implementation hints: In SWT it should call redraw(). 
+   * <br>It is possible that the widget
+   * consists of more as one graphical widget, then all of it should be redrawn. 
+   * It is possible that some data are set in another thread, they should be applied to the widgets firstly. 
+   * 
+   */
+  protected abstract void repaintGthread();
+
+  
+  /**This callback worker calls the {@link #repaintGthread()} if it is invoked in the graphical thread.
+   * It is used with delay and wind up whenever {@link #repaint(int, int)} with an delay is called.
+   * If its callback method was run, it is dequeued till the next request of {@link #repaint()}.
+   */
+  GralDispatchCallbackWorker repaintRequ = new GralDispatchCallbackWorker(){
+    @Override public void doBeforeDispatching(boolean onlyWakeup) {
+      repaintGthread();
+      countExecution();
+      removeFromGraphicThread(itsMng.gralDevice);
+  } };
 	
 }
 

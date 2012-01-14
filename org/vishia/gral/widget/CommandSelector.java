@@ -70,7 +70,7 @@ public class CommandSelector extends SelectList
       
       wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, data.name, data);
     }
-    wdgdTable.redraw();
+    wdgdTable.repaint();
   }
   
   

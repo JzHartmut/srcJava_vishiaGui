@@ -74,7 +74,7 @@ public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, A
     textAreaOutput.viewTrail();
   }
 
-  @Override public void redraw(){  textAreaOutput.redraw(); }
+  @Override public void repaintGthread(){  textAreaOutput.repaintGthread(); }
 
 
   

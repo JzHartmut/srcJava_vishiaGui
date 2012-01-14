@@ -536,7 +536,11 @@ public class CurveView extends Canvas implements GralWidget_ifc
     return false;
   }
   
-  @Override public void redrawDelayed(int delay){
+  @Override public void repaint(){
+    repaint(0,0);
+  }
+  
+  @Override public void repaint(int delay, int latest){
     redraw();
   }
   

@@ -46,11 +46,16 @@ public class SwtValueBar extends ValueBar implements GralSetValue_ifc, GralWidge
 		colorBorder[0] = mng.propertiesGuiSwt.color("red");
 	}
 
-  @Override public void redraw()
+  @Override public void repaint()
   {
 		this.widgetSwt.getDisplay().asyncExec(widgetSwt.redraw);
   }
 	
+  
+  @Override protected void repaintGthread(){
+    widgetSwt.redraw();
+  }
+
   
   @Override public void setBorderAndColors(String[] sParam)
   {

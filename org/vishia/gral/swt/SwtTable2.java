@@ -20,6 +20,7 @@ import org.vishia.gral.base.GralTable2;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
@@ -154,11 +155,15 @@ public class SwtTable2  extends GralTable2 {
   }
 
 
-  @Override public void redraw() {
-    itsMng.setInfo(this, itsMng.cmdRedraw, 0, null, null);
+  @Override protected void repaintGthread(){
+    table.redrawGthread();
   }
 
   
+  /**Sets the focus to the current cell of the tab
+   * @see org.vishia.gral.ifc.GralWidget#setFocus()
+   * TODO this method must call in the graphic thread yet, queue it with {@link GralWidgetMng#setInfo(GralWidget, int, int, Object, Object)}.
+   */
   @Override public boolean setFocus()
   { if(ixGlineSelectedNew >=0 && ixColumn >=0){
       redrawTableWithFocusedCell(cellsSwt[ixGlineSelectedNew][ixColumn]);
@@ -631,6 +636,7 @@ public class SwtTable2  extends GralTable2 {
   
   /**Sets the current cell as focused with the focus color. It causes
    * a redraw of the whole table because the cell may be shifted in table position.
+   * TODO this method must call in the graphic thread yet, queue it with {@link GralWidgetMng#setInfo(GralWidget, int, int, Object, Object)}.
    * @param cell The cell 
    */
   private void redrawTableWithFocusedCell(Widget cell){

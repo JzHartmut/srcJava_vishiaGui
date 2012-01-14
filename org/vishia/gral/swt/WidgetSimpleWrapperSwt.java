@@ -19,6 +19,12 @@ public class WidgetSimpleWrapperSwt extends GralWidget
     this.widgetSwt = widgetSwt;
   }
 
+  
+  @Override protected void repaintGthread(){
+    widgetSwt.redraw();
+  }
+
+  
   @Override public Object getWidgetImplementation()
   { return widgetSwt;
   }
@@ -44,8 +50,6 @@ public class WidgetSimpleWrapperSwt extends GralWidget
     widgetSwt.dispose();
     widgetSwt = null;
   }
-
-  @Override public void redraw(){  widgetSwt.redraw(); }
 
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)

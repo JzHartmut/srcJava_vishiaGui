@@ -4,7 +4,7 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralWidget;
 
-public class GralCurveView extends GralWidget
+public abstract class GralCurveView extends GralWidget
 {
 
   public GralCurveView(String sName, GralWidgetMng mng)
@@ -19,13 +19,6 @@ public class GralCurveView extends GralWidget
     return null;
   }
 
-  
-  @Override public void redraw(){   }
-
-  @Override public void redrawDelayed(int delay){
-    redraw();
-  }
-  
   
 
   

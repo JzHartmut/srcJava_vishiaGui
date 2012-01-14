@@ -232,7 +232,7 @@ public class AwtGralMouseListener
             action.userActionGui(keyCode, widgg);
           }
         } catch(Exception exc){ guiMng.writeLog(0, exc); }
-        widgg.redraw();
+        widgg.repaint();
       }
     }
 

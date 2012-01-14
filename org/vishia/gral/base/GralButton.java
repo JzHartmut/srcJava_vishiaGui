@@ -69,7 +69,7 @@ public abstract class GralButton extends GralWidget
    * In the activated state the button looks like pressed.*/
   public void setActivated(boolean value){ 
     isActivated = value;
-    redraw();
+    repaint();
   }
   
   
@@ -94,7 +94,7 @@ public abstract class GralButton extends GralWidget
         switchedOn = false;
       }
     }
-    redraw();
+    repaint();
   }
   
 

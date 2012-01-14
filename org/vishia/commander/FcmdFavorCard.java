@@ -58,7 +58,7 @@ public class FcmdFavorCard  extends SelectList
       */
       line.setCellText(favorPathInfo.selectName, 1);
       line.setCellText(favorPathInfo.path, 2);
-      line.redraw();
+      line.repaint(100,0);
     }
   }
   

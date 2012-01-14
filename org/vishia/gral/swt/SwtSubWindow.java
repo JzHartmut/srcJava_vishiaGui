@@ -378,7 +378,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
     }
 
     
-    @Override public void redraw(){  window.redraw(); window.update(); }
+    @Override public void repaintGthread(){  window.redraw(); window.update(); }
 
     @Override public void closeWindow(){ window.close(); }
 
@@ -391,6 +391,8 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
   @Override public GralWindow_setifc getSwtWindow_ifc(){  return swtWindow_setifc; }
 
   @Override public SwtWidgetSet_ifc getSwtWidget_ifc(){ return null; }
+
+  @Override public void repaintGthread() { swtWindow_setifc.repaintGthread(); }
   
   
 }

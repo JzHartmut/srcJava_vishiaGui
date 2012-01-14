@@ -11,4 +11,9 @@ public class SwtCurveView extends GralCurveView
     super(sName, mng);
   }
   
+  @Override protected void repaintGthread(){
+    //TODO
+  }
+
+  
 }

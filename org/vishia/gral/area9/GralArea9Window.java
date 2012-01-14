@@ -368,7 +368,7 @@ public class GralArea9Window implements GralArea9_ifc
     int dyp = (int) ((yf2-yf1) * pixelPerYpercent);
     GralPanelContent area = componentFrameArea[idyArea][idxArea];
     area.setBoundsPixel(xp, yp, dxp, dyp);
-    area.redraw();
+    area.repaint();
   }
   
   
@@ -416,7 +416,7 @@ public class GralArea9Window implements GralArea9_ifc
       //swtWindow.addMenuItemGThread("&File/E&xit", this.new ActionFileOpen());
       //swtWindow.graphicThreadSwt.setJMenuBar(menuBar);
       //swtWindow.graphicThreadSwt.setVisible( true );
-      pWindow.redraw();
+      pWindow.repaintGthread();
     } else {
       throw new IllegalArgumentException("Error: can't apply menus in a sub window");
       //window.gralMng.writeLog(0, "Error: can't apply menus in a sub window");
@@ -475,7 +475,7 @@ public class GralArea9Window implements GralArea9_ifc
           int nrofLines = textAreaOutput.getNrofLines();
           textAreaOutput.viewTrail();
           //textAreaOutput.setCaretPosition(nrofLines-1);
-          textAreaOutput.redraw();
+          textAreaOutput.repaint(100, 500);
         } catch(IOException exc){ getGralMng().writeLog(0, exc); }
       } else {  
         //queue the text
@@ -509,7 +509,7 @@ public class GralArea9Window implements GralArea9_ifc
 
 
 
-  @Override public void redraw(){  window.redraw(); }
+  //@Override public void repaint(){  window.repaint(); }
 
 
 
@@ -612,6 +612,8 @@ return true;
   @Override public GralUserAction getActionHelp()
   { return actionHelp;
   }
+
+  @Override public void repaintGthread() {  window.repaintGthread(); }
 
 
 }

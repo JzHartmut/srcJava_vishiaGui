@@ -58,15 +58,6 @@ public class AwtTextField extends GralTextField
 
   @Override public String getPromptLabelImpl(){ return promptSwt.getText(); }
 
-  @Override
-  public void redraw()
-  {
-    // TODO Auto-generated method stub
-    
-  }
-  
-  
-  
 
   
   @Override public boolean setFocus()
@@ -121,6 +112,12 @@ public class AwtTextField extends GralTextField
   @Override
   public void setTextStyle(GralColor color, GralFont font)
   {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  protected void repaintGthread() {
     // TODO Auto-generated method stub
     
   }

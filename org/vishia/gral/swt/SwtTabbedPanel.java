@@ -236,7 +236,7 @@ public class SwtTabbedPanel extends GralTabbedPanel
 
 
 
-  @Override public void redraw(){  widgetSwt.redraw(); widgetSwt.update(); }
+  @Override public void repaintGthread(){  widgetSwt.redraw(); widgetSwt.update(); }
 
   @Override public Composite getPanelImpl() { return widgetSwt; }
 
