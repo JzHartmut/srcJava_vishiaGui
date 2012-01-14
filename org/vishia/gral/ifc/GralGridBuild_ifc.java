@@ -276,7 +276,7 @@ public interface GralGridBuild_ifc
    * @param sButtonText
    * @return
    */
-  public GralWidget addSwitchButton(
+  public GralButton addSwitchButton(
   	String sName
   , GralUserAction action
   , String sCmd

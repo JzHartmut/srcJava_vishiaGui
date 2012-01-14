@@ -12,7 +12,7 @@ import org.vishia.gral.swt.SwtWidgetMng;
  * @author Hartmut Schorrig
  *
  */
-abstract public class ValueBar extends GralWidget implements GralSetValue_ifc
+abstract public class GralValueBar extends GralWidget implements GralSetValue_ifc
 {
 	final protected boolean horizontal;
 	
@@ -36,7 +36,7 @@ abstract public class ValueBar extends GralWidget implements GralSetValue_ifc
 	
 	
 	
-	protected ValueBar(String name, GralWidgetMng mng)
+	protected GralValueBar(String name, GralWidgetMng mng)
 	{ super(name, 'U', mng);
 		this.horizontal = false;
 	}

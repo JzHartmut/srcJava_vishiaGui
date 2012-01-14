@@ -209,6 +209,11 @@ public abstract class GralWidget implements GralWidget_ifc
     this.itsMng = mng;
     this.pos = mng.getPositionInPanel();  //Note: makes a clone because the pos in panel is reused. 
 	}
+	
+	
+	public void setPrimaryWidgetOfPanel(){
+	  pos.panel.setPrimaryWidget(this);
+	}
 
 	
 	@Override public String getName(){ return name; }

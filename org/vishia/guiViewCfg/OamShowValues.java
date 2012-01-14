@@ -15,7 +15,7 @@ import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
-import org.vishia.gral.widget.ValueBar;
+import org.vishia.gral.widget.GralValueBar;
 
 
 public class OamShowValues
@@ -443,8 +443,8 @@ public class OamShowValues
 			float value = variable.bytes.getFloat(variable, -1);
 			
 			GralWidget_ifc oWidget = widgetInfo.getGraphicWidgetWrapper();
-			if(oWidget instanceof ValueBar){
-				ValueBar widget = (ValueBar) oWidget;
+			if(oWidget instanceof GralValueBar){
+				GralValueBar widget = (GralValueBar) oWidget;
 				String[] sParam;
 				if( (sParam = widgetInfo.getShowParam()) != null){
 					widget.setBorderAndColors(sParam);

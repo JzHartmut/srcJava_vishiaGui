@@ -85,6 +85,8 @@ public class Fcmd extends GuiCfg
 
   final FcmdDelete deleteCmd = new FcmdDelete(this);
 
+  final FcmdFilesCp filesCp = new FcmdFilesCp(this);
+
   final FcmdKeyActions keyActions = new FcmdKeyActions(this);
 
   
@@ -145,8 +147,8 @@ public class Fcmd extends GuiCfg
         keyActions.commanderKeyActions); // all key actions, registered central
 
     gui.setFrameAreaBorders(30, 65, 70, 85); // x1, x2, y1, y2
-    gui.setStandardMenusGThread(new File("."), actionFile);
-    gui.addMenuItemGThread("MenuSaveFavoriteSel", "&File/Save favorite &Pathes", favorPathSelector.actionSaveFavoritePathes); // /
+    //gui.setStandardMenusGThread(new File("."), actionFile);
+    gui.addMenuItemGThread("menuSaveFavoriteSel", idents.menuSaveFavoriteSel, favorPathSelector.actionSaveFavoritePathes); // /
 
     this.windMng.initMenuWindMng();
     // gui.set
@@ -173,6 +175,7 @@ public class Fcmd extends GuiCfg
     gui.addFrameArea(1, 3, 3, 1, panelButtons); // dialogPanel);
     initPanelButtons();
 
+    filesCp.buildGraphic();
     filePropsCmd.buildWindowConfirmMk();  //F2
     viewCmd.buildWindowView();   //F3
     copyCmd.buildWindowConfirmCopy();
@@ -593,8 +596,7 @@ public class Fcmd extends GuiCfg
    */
   GralUserAction actionTest = new GralUserAction()
   {
-    @Override
-    public boolean userActionGui(int key, GralWidget infos, Object... params)
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     {
       try{ guiW.infoBox.append("Test\n"); }
       catch(IOException exc){}

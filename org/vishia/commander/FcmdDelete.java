@@ -46,11 +46,11 @@ public class FcmdDelete
   /**Builds the content of the confirm-delete window. The window is created static. It is shown
    * whenever it is used.  */
   void buildWindowConfirmDelete()
-  {
+  { ///
     main.gralMng.selectPanel("primaryWindow");
     main.gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
     
-    windConfirmDelete = main.gralMng.createWindow("copyWindow", "confirm copy", GralWindow.windConcurrently);
+    windConfirmDelete = main.gralMng.createWindow("windConfirmDelete", main.idents.windConfirmDelete, GralWindow.windConcurrently);
     //System.out.println(" window: " + main.gralMng.pos.panel.getPixelPositionSize().toString());
     
     main.gralMng.setPosition(2, GralPos.size -2, 1, -1, 0, 'd');

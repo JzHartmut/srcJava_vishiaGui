@@ -62,7 +62,10 @@ public abstract class GralButton extends GralWidget
   }
   
   
-  public void setText(String sButtonText){ this.sButtonTextOff = sButtonText; }
+  public void setText(String sButtonText){ 
+    this.sButtonTextOff = sButtonText; 
+    repaint(100, 100);
+  }
   
   /**Show the button in an activated state. This method is called especially 
    * in its mouse press and release events. 

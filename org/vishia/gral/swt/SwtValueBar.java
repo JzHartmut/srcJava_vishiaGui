@@ -10,9 +10,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
-import org.vishia.gral.widget.ValueBar;
+import org.vishia.gral.widget.GralValueBar;
 
-public class SwtValueBar extends ValueBar implements GralSetValue_ifc, GralWidget_ifc
+public class SwtValueBar extends GralValueBar implements GralSetValue_ifc, GralWidget_ifc
 {
 
 	final SwtWidgetMng mng;

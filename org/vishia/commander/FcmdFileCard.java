@@ -12,6 +12,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.FileSelector;
 
+import org.vishia.util.FileCompare;
 import org.vishia.util.FileRemote;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
@@ -52,7 +53,21 @@ public class FcmdFileCard extends FileSelector
   
   FileRemote currentFile;
   
-  DateFormat formatDateInfo = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss");
+  /**If not null, then should synchronize with this file card. */
+  FcmdFileCard otherFileCardtoSync;  ///
+  
+  /**If not null, then it is the base dir for synchronization with the {@link #otherFileCardtoSync}. 
+   * It will be set in {@link FcmdFilesCp#setDirs()}. */
+  String sDirSync;
+  
+  /**length of sDirSync or -1
+   * It will be set in {@link FcmdFilesCp#setDirs()}. */
+  int zDirSync;
+  
+  String sLocalpath, sLocaldir;
+  
+  
+  final DateFormat formatDateInfo = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss");
   
   /**Creates the cards with tabs for the files and for the favorite paths.
    * @param mainPanelP The left, mid or right panel where this cards are assigned to
@@ -72,7 +87,7 @@ public class FcmdFileCard extends FileSelector
     favorCard = new FcmdFavorCard(main, this, mainPanel);
     String nameTableSelection = FcmdWidgetNames.tableFavorites + nameFilePanel;
     GralPanelContent panelFavors = mainPanel.tabbedPanelFavorCards.addGridPanel(FcmdWidgetNames.tabFavorites + nameFilePanel, label,1,1,10,10);
-    mng.setPosition(0, 0, 0, -0, 1, 'd');  ///p
+    mng.setPosition(0, 0, 0, -0, 1, 'd');  
     favorCard.setToPanel(mng, nameTableSelection, 5, mainPanel.widthSelecttableSub, 'A');
     favorCard.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorSelect.");
     panelFavors.setPrimaryWidget(favorCard.wdgdTable);
@@ -92,6 +107,7 @@ public class FcmdFileCard extends FileSelector
     //
     //sets the action for Select a file: open the execute menu
     setActionOnEnterFile(main.executer.actionOnEnterFile);
+    setActionSetFileLineAttrib(actionSetFileLineAttrib);
   }
 
   
@@ -187,7 +203,19 @@ public class FcmdFileCard extends FileSelector
       String.format("%3d Byte", file.length());  
     String info = sDate + " # " + sLenShort;        
     main.widgFileInfo.setText(info);
-    main.widgFilePath.setText(file.getAbsolutePath());
+    String sPath = file.getAbsolutePath();
+    main.widgFilePath.setText(sPath);
+    if(sDirSync !=null){
+      sLocalpath = sPath.substring(zDirSync);
+      String sDir = getCurrentDirPath();
+      sLocaldir = sDir.substring(zDirSync);
+      String sDirOtherSet = otherFileCardtoSync.sDirSync + sLocaldir;
+      String sDirOtherAct = otherFileCardtoSync.getCurrentDirPath();
+      if(!sDirOtherSet.equals(sDirOtherAct)){
+        otherFileCardtoSync.fillIn(new FileRemote(sDirOtherSet));
+      }
+      
+    }
   }
   
   
@@ -197,7 +225,7 @@ public class FcmdFileCard extends FileSelector
   /**Action to show the file properties in the info line. This action is called anytime if a line
    * was changed in the file view table. */
   GralUserAction actionFileSelected = new GralUserAction(){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object[] params) {
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
       if(actionCode == KeyCode.tableLineSelect){
         GralTableLine_ifc line = (GralTableLine_ifc) params[0];
         Object oData = line.getUserData();
@@ -210,7 +238,30 @@ public class FcmdFileCard extends FileSelector
   };
   
   
-  
+  GralUserAction actionSetFileLineAttrib = new GralUserAction(){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
+      //check whether any of the 2 compare directories are base for the current file:
+      try{
+        if(sDirSync !=null){
+          zDirSync = sDirSync.length();
+          GralTableLine_ifc line = (GralTableLine_ifc)(params[0]);
+          File file = (File)line.getUserData();
+          String sPath = file.getAbsolutePath();
+          if(sPath.startsWith(sDirSync)){
+            String sLocalPath = sPath.substring(sDirSync.length()+1);
+            FileCompare.Result result = main.filesCp.idxResult.get(sLocalPath);
+            if(result !=null && !result.contentEqual){
+              line.setCellText("#", 0);
+            }
+          }
+        } else {
+          zDirSync = -1;
+        }
+      } catch(Exception exc){
+        main.gralMng.log.sendMsg(0, "Exception in FcmdFileCard.actionSetFileLineAttrib"); 
+      }
+      return true;
+  } };  
   @Override public String toString(){ return label + "/" + nameFilePanel; }
   
   

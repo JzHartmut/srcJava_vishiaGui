@@ -230,6 +230,8 @@ public class FileSelector implements Removeable //extends GralWidget
   
   GralUserAction actionOnEnterFile;
   
+  GralUserAction actionSetFileAttribs;
+  
   public FileSelector()
   {
     selectList = new FileSelectList(this);
@@ -267,7 +269,7 @@ public class FileSelector implements Removeable //extends GralWidget
   }
   
 
-  //public String getCurrentDir(){ return sCurrentDir; }
+  public String getCurrentDirPath(){ return sCurrentDir; }
   
   public void setOriginDir(FileRemote dir){ originDir = dir; }
   
@@ -279,6 +281,17 @@ public class FileSelector implements Removeable //extends GralWidget
   public GralUserAction setActionOnEnterFile(GralUserAction newAction)
   { GralUserAction oldAction = actionOnEnterFile;
     actionOnEnterFile = newAction;
+    return oldAction;
+  }
+  
+  
+  /**Sets the action which is called if any file is set to the table. 
+   * @param newAction The action to use. The action is invoked with TODO
+   * @return The current assigned action or null.
+   */
+  public GralUserAction setActionSetFileLineAttrib(GralUserAction newAction)
+  { GralUserAction oldAction = actionSetFileAttribs;
+    actionSetFileAttribs = newAction;
     return oldAction;
   }
   
@@ -361,7 +374,11 @@ public class FileSelector implements Removeable //extends GralWidget
         tLine.setCellText(line[2], 2);
         tLine.setCellText(line[3], 3);
         */
-        selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, file);
+        GralTableLine_ifc tline = selectList.wdgdTable.insertLine(null, -1, line, file);
+        //selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, file);
+        if(actionSetFileAttribs !=null){
+          actionSetFileAttribs.userActionGui(0, selectList.wdgdTable, tline);
+        }
         lineCt +=1;
       }
       if(lineCt ==0){

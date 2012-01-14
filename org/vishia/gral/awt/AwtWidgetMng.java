@@ -309,7 +309,7 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   }
 
   @Override
-  public GralWidget addSwitchButton(String sName, GralUserAction action, String sCmd,
+  public GralButton addSwitchButton(String sName, GralUserAction action, String sCmd,
     String sShowMethod, String sDataPath, String sButtonText, String color0, String color1)
   {
     // TODO Auto-generated method stub

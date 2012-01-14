@@ -1028,7 +1028,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
 
   
-  @Override public GralWidget addSwitchButton(
+  @Override public GralButton addSwitchButton(
     String sName
   , GralUserAction action
   , String sCmd
