@@ -59,6 +59,10 @@ public class AwtTextBox extends GralTextBox
   }
   
   
+  @Override public void setSelection(String how){  }
+
+  
+  
   @Override public void appendTextInGThread(CharSequence text){ 
     textFieldSwt.append(text.toString()); 
   }

@@ -122,4 +122,17 @@ public class AwtTextField extends GralTextField
     
   }
 
+  
+  @Override public void setSelection(String how){
+    if(how.equals("|..<")){
+      String sText = widgetAwt.getText();
+      int zChars = sText.length();
+      int pos0 = 0; //zChars - 20;
+      if(pos0 < 0){ pos0 = 0; }
+      //widgetAwt.setSelection(pos0, zChars);
+    }
+  }
+  
+
+  
 }

@@ -57,13 +57,26 @@ public class SwtTextFieldWrapper extends GralTextField
   @Override public void setText(CharSequence arg)
   {
     if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
-      textFieldSwt.setText(arg.toString());
+      String sText = arg.toString();
+      textFieldSwt.setText(sText);
     } else {
       newText.setLength(0);
       newText.append(arg);
       windowMng.addDispatchOrder(changeText);    
     }
   }
+  
+  
+  @Override public void setSelection(String how){
+    if(how.equals("|..<")){
+      String sText = textFieldSwt.getText();
+      int zChars = sText.length();
+      int pos0 = 0; //zChars - 20;
+      if(pos0 < 0){ pos0 = 0; }
+      textFieldSwt.setSelection(pos0, zChars);
+    }
+  }
+  
   
   @Override public String getText()
   {

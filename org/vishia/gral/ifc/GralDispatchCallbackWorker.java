@@ -12,6 +12,7 @@ public abstract class GralDispatchCallbackWorker
   
   /**Version and history:
    * <ul>
+   * <li>2012-01-15 Hartmut new: {@link #name} to identify, proper for debugging
    * <li>2012-01-08 Hartmut new: {@link #addToGraphicThread(GralGraphicThread, int)} and 
    *   {@link #removeFromGraphicThread(GralGraphicThread)} as thread-safe functions which 
    *   marks the instance as added (for delayed execution, for re-using).

@@ -64,6 +64,11 @@ public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, A
     textAreaOutput.setText(text);
   }
   
+  @Override public void setSelection(String how){ textAreaOutput.setSelection(how); }
+  
+
+  
+  
   @Override public String getText(){ return textAreaOutput.getText(); }
 
   @Override public int getCursorPos(){ return textAreaOutput.getCursorPos(); }

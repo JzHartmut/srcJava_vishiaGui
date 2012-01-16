@@ -9,6 +9,8 @@ public interface GralTextField_ifc extends GralWidget_ifc
   
   /**Version and history
    * <ul>
+   * <li>2012-01-17 new {@link #setSelection(String)}. The possible values of the string parameter are not defined well yet.
+   *   The method is only used to show a text right aligned. 
    * <li>2011-12-11 chg {@link #setText(CharSequence)} now uses CharSequence instead String. 
    *   A CharSequence is more universal. Internally the contained String will be copied.
    * <li>2011-12-01 new {@link #getCursorPos()}, to get parts of selected texts in a box.
@@ -36,6 +38,13 @@ public interface GralTextField_ifc extends GralWidget_ifc
   void setTextStyle(GralColor color, GralFont font);
   
   
-  
+  /**Sets the selection of the text.
+   * <ul>
+   * <li>|..< from left to rigth, right aligned
+   * <li>TODO
+   * </ul>
+   * @param how
+   */
+  void setSelection(String how);
   
 }

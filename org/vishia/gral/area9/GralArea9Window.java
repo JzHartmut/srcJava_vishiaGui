@@ -178,7 +178,7 @@ public class GralArea9Window implements GralArea9_ifc
       } catch(Exception exc){ window.gralMng.writeLog(0, exc); }
       //
       window.gralMng.selectPanel("primaryWindow");
-      window.gralMng.setPosition(0,10,15,GralPos.size + 40,0,'.');
+      window.gralMng.setPosition(0,20,15,GralPos.size + 50,0,'.');
       infoAbout = window.gralMng.createTextInfoBox("About", "About");
       try{
         for(String line: mainCmd.listAboutInfo){
@@ -594,7 +594,12 @@ return true;
   private GralUserAction actionAbout = new  GralUserAction()
   { //final InfoBox infoHelp;
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
-    { infoAbout.setWindowVisible(true);
+    { try{
+        for(String line: mainCmd.listAboutInfo){
+          //infoAbout.append(line).append("\n");
+        }
+      } catch(Exception exc){ window.gralMng.writeLog(0, exc); }
+      infoAbout.setWindowVisible(true);
       return true; 
   } };
 

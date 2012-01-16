@@ -21,6 +21,9 @@ public class GralCfgBuilder
 
   /**Version and history
    * <ul>
+   * <li>2012-01-17 Hartmut bugfix: If the cfg script contains forex @10,-3.5 it should be a height og 3.5 with bottom line.
+   *   The {@link GralPos#setFinePosition(int, int, int, int, int, int, int, int, int, char, int, int, GralPos)}
+   *   needs a value of -4 for size and 5 for fractional size. 
    * <li>2012-01-12 Hartmut chg: If no name is given for a widget, it gets the name from panelName/text
    *   or from panelName/prompt. Before, only text is used. Use the panelName to identify unique.
    * <li>2011-05-00 Hartmut created, the old ZbnfCfg.. class is obsolte now.
@@ -168,6 +171,9 @@ public class GralCfgBuilder
       pos.xPosFrac = prevPos.xPosFrac;
     }
     //ySizeDown, xWidth
+    if(inp.ySizeFrac !=0 && inp.ySizeDown == -3){
+      stop();
+    }
     if(inp.ySizeDown !=0){ //ySize is given here.
       pos.ySizeDown = inp.ySizeDown;
       pos.ySizeFrac = inp.ySizeFrac;
@@ -187,7 +193,13 @@ public class GralCfgBuilder
     //
     if(pos.xWidth == Integer.MAX_VALUE)
       stop();
-    int heightArg = pos.ySizeDown == Integer.MAX_VALUE ? GralPos.useNatSize : pos.ySizeDown + GralPos.size;
+    
+    final int heightArg;
+    if(pos.ySizeDown == Integer.MAX_VALUE){ heightArg = GralPos.useNatSize; }
+    else if(pos.ySizeDown < 0 && pos.ySizeFrac !=0) { 
+      heightArg = pos.ySizeDown -1 + GralPos.size;    //forex -3.5 means really 3.5 to up, use -4, 5 
+    } else {heightArg = pos.ySizeDown + GralPos.size; }
+    
     int widthArg = pos.xWidth == Integer.MAX_VALUE ? GralPos.useNatSize : pos.xWidth + GralPos.size;
     gui.setFinePosition(pos.yPos, pos.yPosFrac, heightArg, pos.ySizeFrac
         , pos.xPos, pos.xPosFrac, widthArg, pos.xSizeFrac, 1, dirNext, 0, 0, null);

@@ -85,7 +85,7 @@ public class InspcGui //extends GuiCfg
       super(cargs, args);
       this.cargs = cargs;
       super.addAboutInfo("Inspc-GUI-cfg");
-      super.addAboutInfo("made by HSchorrig, 2011-05-18, 2011-05-19");
+      super.addAboutInfo("made by HSchorrig, 2011-05-18, 2012-01-17");
     }
 
     @Override protected boolean testArgument(String arg, int nArg)
@@ -147,6 +147,10 @@ private class InspcGuiCfg extends GuiCfg
       user.initGui(gralMng);
       user.addGuiMenu(gui);
     }
+    gui.addMenuItemGThread("menuHelp", "&Help/&Help", gui.getActionHelp());
+    gui.addMenuItemGThread("menuAbout", "&Help/&About", gui.getActionAbout());
+    gui.addMenuItemGThread("menuAbout", "&Help/e&Xit", gui.getActionAbout());
+
   }
 
   

@@ -521,20 +521,20 @@ public class Fcmd extends GuiCfg
 
     @Override
     public File getFile1()
-    {
-      return selectedFiles[0];
+    { if(selectedFiles.length >0) return selectedFiles[0];
+      else return null;
     }
 
     @Override
     public File getFile2()
-    {
-      return selectedFiles[1];
+    { if(selectedFiles.length >1) return selectedFiles[1];
+      else return null;
     }
 
     @Override
     public File getFile3()
-    {
-      return selectedFiles[2];
+    { if(selectedFiles.length >2) return selectedFiles[2];
+      else return null;
     }
   };
 

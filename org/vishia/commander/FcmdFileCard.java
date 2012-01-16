@@ -225,7 +225,11 @@ public class FcmdFileCard extends FileSelector
           //bSync = false;
           otherFileCardtoSync.fillIn(new FileRemote(sDirOtherSet));
         }
-        otherFileCardtoSync.selectFile(file.getName());
+        String fileName = file.getName();
+        if(fileName.endsWith(".~1~")){
+          fileName = fileName.substring(0, fileName.length() -4);
+        }
+        otherFileCardtoSync.selectFile(fileName);
       }
     }
   }

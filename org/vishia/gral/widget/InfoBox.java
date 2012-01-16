@@ -102,6 +102,9 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   { textBox.setText(text);
   }
   
+  @Override public void setSelection(String how){ textBox.setSelection(how); }
+  
+  
   public void setUrl(String url){
     if(htmlBox !=null){ 
       htmlBox.setUrl(url); 
