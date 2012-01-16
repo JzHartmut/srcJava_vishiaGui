@@ -361,7 +361,7 @@ public class SwtTable2  extends GralTable2 {
      * for the panel.
      * 
      */
-    GralDispatchCallbackWorker writeContentLast = new GralDispatchCallbackWorker(){
+    GralDispatchCallbackWorker writeContentLast = new GralDispatchCallbackWorker("SwtTable2.writeContentLast"){
       @Override public void doBeforeDispatching(boolean onlyWakeup) {
         ///
         bRedrawPending = true;
@@ -653,6 +653,7 @@ public class SwtTable2  extends GralTable2 {
   
   
   void stop(){}
+
 
 
 

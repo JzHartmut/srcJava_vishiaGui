@@ -17,4 +17,8 @@ public interface GralTableLine_ifc extends GralWidget_ifc, SelectMask_ifc
   
   Object getUserData();
   
+  int getLineNr();
+  
+  int getSelectedColumn();
+  
 }

@@ -440,6 +440,20 @@ public class SwtTable extends GralTable
       // TODO Auto-generated method stub
       
     }
+
+    @Override
+    public int getLineNr()
+    {
+      // TODO Auto-generated method stub
+      return 0;
+    }
+
+    @Override
+    public int getSelectedColumn()
+    {
+      // TODO Auto-generated method stub
+      return 0;
+    }
     
 
 
@@ -502,7 +516,7 @@ public class SwtTable extends GralTable
   }
 
   
-  @Override public void setCurrentCell(int line, int column)
+  @Override public boolean setCurrentCell(int line, int column)
   {
     if(Thread.currentThread().getId() == itsMng.gralDevice.getThreadIdGui()){
       table.setSelection(line);
@@ -510,7 +524,7 @@ public class SwtTable extends GralTable
     } else {
       itsMng.setInfo(this, GralPanelMngWorking_ifc.cmdSelect, line, null, null);
     }
-    
+    return true;
   }
   
 
@@ -605,6 +619,7 @@ public class SwtTable extends GralTable
     table.dispose();
     table = null;
   }
+
 
 
 }

@@ -117,7 +117,7 @@ public class ExampleSimpleButton
   /**Code snippet for initializing the GUI. This snippet will be executed
    * in the graphic thread. It is an anonymous inner class. 
    */
-  private GralDispatchCallbackWorker initGuiCode = new GralDispatchCallbackWorker()
+  private GralDispatchCallbackWorker initGuiCode = new GralDispatchCallbackWorker("ExampleSimpleButton.initGuiCode")
   {
     /**This routine is called in the graphic thread if it was added.
      * @see org.vishia.gral.ifc.GralDispatchCallbackWorker#doBeforeDispatching(boolean)

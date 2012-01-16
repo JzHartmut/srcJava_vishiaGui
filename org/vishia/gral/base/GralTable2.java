@@ -20,6 +20,8 @@ public abstract class GralTable2 extends GralTable{
 
   /**Version and history
    * <ul>
+   * <li>2012-01-15 Hartmut new: {@link #setCurrentLine(String)}, {@link #insertLine(String, int, String[], Object)}:
+   *    the key is supported now. 
    * <li>2012-01-06 Hartmut new: concept of a table which is independent of the table implementation 
    *   of the table implementations in the graphic system layer or in operation system: 
    *   The capability  of a SWT-table is not sufficient, for example the color of the selection bar
@@ -40,10 +42,8 @@ public abstract class GralTable2 extends GralTable{
   /**Pixel per line. */
   protected int linePixel;
   
-  /**Index (subscript) of {@link #texts} of the current line and current color. 0 means: nothing is selected. 
-   * 1 is the first line and the left column.
-   * 
-   */
+  /**Index (subscript) of the current line and current column. 0 is the left column or top line.
+   * -1 means that nothing is selected. */
   protected int ixLine, ixLineNew, ixColumn;
 
   /**Index of {@link #texts} of the cell left top for presentation. */
@@ -125,13 +125,21 @@ public abstract class GralTable2 extends GralTable{
   }
 
   @Override
-  public void setCurrentCell(int line, int column) {
-    if(line < 0 || line > zLine-1){ line = zLine -1; }
-    if(column < 0 || column > zColumn-1){ column = zColumn -1; }
-    ixLineNew = line;  //forces color setting select color
-    ixColumn = column;
+  public boolean setCurrentCell(int line, int column) {
+    if(line < -1 || line > zLine-1){ line = zLine -1; }
+    if(column < -1 || column > zColumn-1){ column = 0; }
+    if(line >=0){
+      ixLineNew = line;  //forces color setting select color
+    }
+    if(column >=0){
+      ixColumn = column;
+    }
+    repaint(50,200);
+    return true;
   }
 
+
+  
   @Override public GralTableLine_ifc getLine(int row) {
     if(row > tableLines.size()) return null;
     else return tableLines.get(row);
@@ -148,6 +156,8 @@ public abstract class GralTable2 extends GralTable{
     if(row > zLine || row < 0){
       row = zLine;
     }
+    line.nLineNr = row;
+    line.key = key;
     tableLines.add(row, line);
     zLine = tableLines.size();
     if(cellTexts !=null){
@@ -157,6 +167,9 @@ public abstract class GralTable2 extends GralTable{
     }
     line.userData = userData;
     bFillCells = true;
+    if(key !=null){
+      idxLine.put(key, line);
+    }
     repaint(100, 0);
     return line;
   }
@@ -257,6 +270,10 @@ public abstract class GralTable2 extends GralTable{
 
     public AtomicInteger redraw = new AtomicInteger();
     
+    int nLineNr;
+    
+    String key;
+    
     public String[] cellTexts;
     
     private Object userData;
@@ -270,10 +287,29 @@ public abstract class GralTable2 extends GralTable{
     @Override public String getName(){ return name; }
     
 
+    @Override public String getCellText(int column) { return cellTexts[column]; }
+
+    @Override public String[] getCellTexts() { return cellTexts; }
+
     @Override
-    public Object getWidgetImplementation() {
-      // TODO Auto-generated method stub
-      return null;
+    public String setCellText(String text, int column) {
+      String oldText = cellTexts[column];
+      cellTexts[column] = text;
+      GralTable2.this.repaint(100, 0);
+      return oldText;
+    }
+
+    @Override public Object getUserData() { return userData;  }
+
+    @Override public void setUserData(Object data) {this.userData = data; }
+
+    @Override public int getLineNr()
+    { return nLineNr;
+    }
+
+    @Override
+    public int getSelectedColumn()
+    { return ixColumn;
     }
 
     @Override
@@ -314,22 +350,11 @@ public abstract class GralTable2 extends GralTable{
       
     }
 
-    @Override public String getCellText(int column) { return cellTexts[column]; }
-
-    @Override public String[] getCellTexts() { return cellTexts; }
-
     @Override
-    public String setCellText(String text, int column) {
-      String oldText = cellTexts[column];
-      cellTexts[column] = text;
-      GralTable2.this.repaint(100, 0);
-      return oldText;
+    public Object getWidgetImplementation() {
+      // TODO Auto-generated method stub
+      return null;
     }
-
-    @Override public void setUserData(Object data) {this.userData = data; }
-
-    @Override public Object getUserData() { return userData;  }
-
 
     @Override
     public boolean remove()
@@ -337,7 +362,7 @@ public abstract class GralTable2 extends GralTable{
       // TODO Auto-generated method stub
       return false;
     }
-    
+
   }
   
 

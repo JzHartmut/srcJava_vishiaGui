@@ -125,15 +125,15 @@ public class FcmdFavorCard  extends SelectList
       if(currentDir !=null){
         mainPanel.indexActualDir.put(fileTable.favorPathInfo.selectName, currentDir);
     } }
-    
-    //fill in the standard file panel, use maybe a current directory.
+    //
+    //Now switch to the new favor in the file panel: 
     fileTable.favorPathInfo = favorPathInfo;
     if(  wdgdTable.name.startsWith(FcmdWidgetNames.tableFavoritesMain)   //use the root dir anytime if the main favor path table is used.
       || (currentDir  = mainPanel.indexActualDir.get(favorPathInfo.selectName)) == null){  //use the root if the entry wasn't use till now
       currentDir = favorPathInfo.path;
       dir = new FileRemote(currentDir);
     }
-    fileTable.favorCard.add(favorPathInfo);
+    fileTable.favorCard.add(favorPathInfo);  //only it is a new one, it will be checked.
     fileTable.fillIn(dir);
     fileTable.setFocus();
     return true;

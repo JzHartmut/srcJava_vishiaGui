@@ -214,7 +214,7 @@ protected void userInit()
 /**Code snippet for initializing the GUI area (panel). This snippet will be executed
  * in the GUI-Thread if the GUI is created. 
  */
-GralDispatchCallbackWorker initGuiDialog = new GralDispatchCallbackWorker()
+GralDispatchCallbackWorker initGraphic = new GralDispatchCallbackWorker("GuiCfg.initGraphic")
 {
   @Override public void doBeforeDispatching(boolean onlyWakeup)
   {
@@ -230,7 +230,7 @@ GralDispatchCallbackWorker initGuiDialog = new GralDispatchCallbackWorker()
 /**Code snippet to run the ZBNF-configurator (text controlled GUI)
  * 
  */
-GralDispatchCallbackWorker configGuiWithZbnf = new GralDispatchCallbackWorker()
+GralDispatchCallbackWorker configGuiWithZbnf = new GralDispatchCallbackWorker("GuiCfg.configGuiWithZbnf")
 {
   
   @Override public void doBeforeDispatching(boolean onlyWakeup){
@@ -276,9 +276,9 @@ protected void initMenuGralDesigner()
 protected void initMain()
 {
   //create the basic appearance of the GUI. The execution sets dlgAccess:
-  gralMng.gralDevice.addDispatchOrder(initGuiDialog);
+  gralMng.gralDevice.addDispatchOrder(initGraphic);
   
-  if(!initGuiDialog.awaitExecution(1, 0)) throw new RuntimeException("unexpected fail of execution initGuiDialog");
+  if(!initGraphic.awaitExecution(1, 0)) throw new RuntimeException("unexpected fail of execution initGuiDialog");
       
       
   /**Creates the dialog elements while reading a config-file. */

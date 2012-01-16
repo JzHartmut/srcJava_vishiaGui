@@ -19,6 +19,9 @@ public abstract class GralDispatchCallbackWorker
    * </ul> */
   private final static int version = 0x20120108;
   
+  /**The name of the dispatch worker, used for debug at least. */
+  public final String name;
+  
 	private int ctDone = 0;
 	
 	/**It is counted only. Used for debug. Possible to set. */
@@ -36,6 +39,11 @@ public abstract class GralDispatchCallbackWorker
   private long timeExecution;
   
 
+  public GralDispatchCallbackWorker(String name)
+  {
+    this.name = name;
+  }
+  
 	public abstract void doBeforeDispatching(boolean onlyWakeup);
 	
 	
@@ -129,6 +137,7 @@ public abstract class GralDispatchCallbackWorker
   }
   
 
+@Override public String toString(){ return name; }  
 
 
 }

@@ -93,7 +93,7 @@ public class AwtTextBox extends GralTextBox
 
 
   
-  protected GralDispatchCallbackWorker changeTextBoxTrail = new GralDispatchCallbackWorker()
+  protected GralDispatchCallbackWorker changeTextBoxTrail = new GralDispatchCallbackWorker("AwtTextBox.changeTextBoxTrail")
   { @Override public void doBeforeDispatching(boolean onlyWakeup)
     { if(newText.length() >0){
         textFieldSwt.append(newText.toString());
@@ -105,7 +105,7 @@ public class AwtTextBox extends GralTextBox
   };
   
   
-  protected GralDispatchCallbackWorker changeText = new GralDispatchCallbackWorker()
+  protected GralDispatchCallbackWorker changeText = new GralDispatchCallbackWorker("AwtTextBox.changeTextB")
   { @Override public void doBeforeDispatching(boolean onlyWakeup)
     { if(newText.length() >0){
         textFieldSwt.setText(newText.toString());
@@ -173,7 +173,7 @@ public class AwtTextBox extends GralTextBox
   }
 
   @Override
-  protected void repaintGthread() {
+  public void repaintGthread() {
     // TODO Auto-generated method stub
     
   }

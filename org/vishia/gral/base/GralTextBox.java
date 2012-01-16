@@ -123,7 +123,7 @@ public abstract class GralTextBox extends GralTextField implements Appendable, G
    * is called with the content of {@link #newText}. The content of newText is delete then.
    * It is invoked under mutex.
    */
-  private final GralDispatchCallbackWorker appendTextViewTrail = new GralDispatchCallbackWorker()
+  private final GralDispatchCallbackWorker appendTextViewTrail = new GralDispatchCallbackWorker("GralTextBox.appendTextViewTrail")
   { @Override public final void doBeforeDispatching(boolean onlyWakeup)
     { synchronized(newText){
         if(newText.length() >0){
@@ -142,7 +142,7 @@ public abstract class GralTextBox extends GralTextField implements Appendable, G
    * is called with the content of {@link #newText}. The content of newText is delete then.
    * It is invoked under mutex.
    */
-  private final GralDispatchCallbackWorker setText = new GralDispatchCallbackWorker()
+  private final GralDispatchCallbackWorker setText = new GralDispatchCallbackWorker("GralTextBox.setText")
   { @Override public final void doBeforeDispatching(boolean onlyWakeup)
     { synchronized(newText){
         if(newText.length() >0){

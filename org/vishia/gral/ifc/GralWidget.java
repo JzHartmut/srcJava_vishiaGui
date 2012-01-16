@@ -317,7 +317,11 @@ public abstract class GralWidget implements GralWidget_ifc
 
 	
   /**Sets the action to receive a drop event and initializes the drop feature of the widget.
-   * @param action The action will be called
+   * For drag file the 'drag get action' method will be offered in the params[0] a String[][] reference. 
+   * This String reference array has to be filled with the absolute path of the file using String[0][0]. 
+   * After that callback invocation a drag file object will be created therewith internally.
+   *  
+   * @param action The drag file get action.
    * @param dropType one of {@link org.vishia.util.KeyCode#dropFiles} or ..dropText
    */
   public void setDragEnable(GralUserAction action, int dragType)
@@ -326,8 +330,11 @@ public abstract class GralWidget implements GralWidget_ifc
     setDragEnable(dragType);  // call implementation specific drop handling. 
   }
 
-  /**Implementation routine to set receiving a drop event and initializes the drop feature of the widget.
-   * @param dropType one of {@link org.vishia.util.KeyCode#dropFiles} or ..dropText
+  /**Implementation routine to set receiving a drag event and initializes the drag feature of the widget.
+   * A overridden routine should be implemented for the implementation graphic layer widget.
+   * This routine is invoked when it isn't overridden, it throws an exception because the drag feature
+   * isn't supported for the implementation.
+   * @param dragType one of {@link org.vishia.util.KeyCode#dragFiles} or ..dragText
    */
   protected void setDragEnable(int dragType)
   { //default implementation: causes an exception. The type must override it.
@@ -591,12 +598,14 @@ public abstract class GralWidget implements GralWidget_ifc
    * It is used with delay and wind up whenever {@link #repaint(int, int)} with an delay is called.
    * If its callback method was run, it is dequeued till the next request of {@link #repaint()}.
    */
-  GralDispatchCallbackWorker repaintRequ = new GralDispatchCallbackWorker(){
+  GralDispatchCallbackWorker repaintRequ = new GralDispatchCallbackWorker("GralWidget.repaintRequ"){
     @Override public void doBeforeDispatching(boolean onlyWakeup) {
       repaintGthread();
       countExecution();
       removeFromGraphicThread(itsMng.gralDevice);
-  } };
+    }
+    @Override public String toString(){ return name + ":" + GralWidget.this.name; }
+  };
 	
 }
 

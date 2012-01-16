@@ -28,6 +28,7 @@ import org.vishia.gral.widget.CommandSelector;
 import org.vishia.gral.widget.FileSelector;
 import org.vishia.util.FileRemote;
 import org.vishia.util.FileRemoteAccessorLocalFile;
+import org.vishia.util.KeyCode;
 
 public class Fcmd extends GuiCfg
 {
@@ -196,6 +197,7 @@ public class Fcmd extends GuiCfg
     gralMng.selectPanel("Buttons");
     gralMng.setPosition(0, 2, 0, 0, 1, 'r');
     widgFilePath = gralMng.addTextField(nameTextFieldFilePath, false, null, null);
+    widgFilePath.setDragEnable(actionDragFileFromStatusLine, KeyCode.dragFiles);
     gralMng.setPosition(2, 4, 0, 9.8f, 1, 'r');
     widgRunInfo = gralMng.addTextField(nameTextFieldRunInfo, false, null, null);
     gralMng.setPosition(2, 4, 10, 0, 1, 'r');
@@ -702,6 +704,25 @@ public class Fcmd extends GuiCfg
       return true;
     }
   };
+
+  
+  
+  /**This callback will be invoked in the drag event while the mouse is released in the destination. 
+   */
+  GralUserAction actionDragFileFromStatusLine = new GralUserAction(){
+    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params) {
+      if(key == KeyCode.dragFiles){
+        String path = widgd.getValue();
+        String[][] sFiles = (String[][])params[0];  //sFiles has lenght 1
+        sFiles[0] = new String[1]; 
+        sFiles[0][0] = path;
+        stop();
+      }
+      return true;
+    }
+  };
+  
+  
 
 
   

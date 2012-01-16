@@ -196,9 +196,14 @@ public class GralCfgBuilder
     String sName = cfge.widgetType.name;
     if(sName ==null && cfge.widgetType.text !=null ){ sName = cfgData.actPanel.name + "/" + cfge.widgetType.text; }  //text of button etc.
     if(sName ==null && cfge.widgetType.prompt !=null){ sName = cfgData.actPanel.name + "/" + cfge.widgetType.prompt; } //the prompt as name
+    //the name may be null, then the widget is not registered.
     //
-    String sDataPath = cfge.widgetType.info != null ? cfge.widgetType.info : sName;
+    String sDataPath = cfge.widgetType.info;
+    //text is the default for a datapath.
+    if(sDataPath ==null && cfge.widgetType.text !=null){ sDataPath = cfge.widgetType.text; }
     if(sDataPath !=null){
+      //replace a prefix before ':' with its replacement, if the prefix is found.
+      //This is a possibility to shorten data path.
       int posSep = sDataPath.indexOf(':');
       if(posSep > 0){
         String sPre = cfge.itsCfgData.dataReplace.get(sDataPath.substring(0, posSep));

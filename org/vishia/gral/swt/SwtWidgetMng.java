@@ -1409,7 +1409,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    * <li>{@link #insertInfo(String, int, String)} 
    * </ul>
    */
-  private final GralDispatchCallbackWorker dispatchListener = new GralDispatchCallbackWorker()
+  private final GralDispatchCallbackWorker widgetChangeRequExecuter = new GralDispatchCallbackWorker("SwtWidgetMng.widgetChangeRequExecuter")
   {
     
     
@@ -1470,7 +1470,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    * @return The instance to call run(). 
    * Hint: run() returns after checking orders and should be called any time in the loop. 
    */
-  public GralDispatchCallbackWorker getTheGuiChangeWorker(){ return dispatchListener; }
+  public GralDispatchCallbackWorker getTheGuiChangeWorker(){ return widgetChangeRequExecuter; }
 
 	@Override
 	public void setSampleCurveViewY(String sName, float[] values) {

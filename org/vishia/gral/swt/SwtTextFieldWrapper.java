@@ -79,7 +79,7 @@ public class SwtTextFieldWrapper extends GralTextField
   /**
    * @deprecated TODO {@link #repaintGthread()}
    */
-  protected GralDispatchCallbackWorker changeText = new GralDispatchCallbackWorker()
+  protected GralDispatchCallbackWorker changeText = new GralDispatchCallbackWorker("SwtTextFieldWrapper.changeText")
   { @Override public void doBeforeDispatching(boolean onlyWakeup)
     { if(newText.length() >0){
         textFieldSwt.setText(newText.toString());

@@ -348,7 +348,8 @@ public class FileSelector implements Removeable //extends GralWidget
         line[1] = "..";
         line[2] = "";
         line[3] = "";
-        selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, dir);
+        selectList.wdgdTable.insertLine("..", -1, line, dir);
+        //selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, dir);
         lineCt +=1;
       }
       //The file or directory which was the current one while this directory was shown lastly:
@@ -374,7 +375,7 @@ public class FileSelector implements Removeable //extends GralWidget
         tLine.setCellText(line[2], 2);
         tLine.setCellText(line[3], 3);
         */
-        GralTableLine_ifc tline = selectList.wdgdTable.insertLine(null, -1, line, file);
+        GralTableLine_ifc tline = selectList.wdgdTable.insertLine(line[1], -1, line, file);
         //selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, file);
         if(actionSetFileAttribs !=null){
           actionSetFileAttribs.userActionGui(0, selectList.wdgdTable, tline);
@@ -387,7 +388,7 @@ public class FileSelector implements Removeable //extends GralWidget
         line[0] = "";
         line[1] = "--empty--";
         line[3] = "";
-        selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, null);
+        selectList.wdgdTable.insertLine(null, -1, line, null);
         lineCt +=1;
       }
     } else {
@@ -442,6 +443,17 @@ public class FileSelector implements Removeable //extends GralWidget
     }
     return list;
   }
+  
+  
+  /**Selects the file with the given name in the table
+   * @param name name of file like it is shown in the table (given as key).
+   * @return true if found and selected.
+   */
+  public boolean selectFile(String name){
+    return selectList.wdgdTable.setCurrentLine(name);
+    
+  }
+  
   
   /**Sets the focus of the associated table widget.
    * @return true if focused.

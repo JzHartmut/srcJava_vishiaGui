@@ -1,6 +1,8 @@
 package org.vishia.gral.base;
 
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTableLine_ifc;
@@ -23,7 +25,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc
 
   /**Version and history
    * <ul>
-   * <li>2011.12.30 Hartmut chg {@link #procStandardKeys(int, GralTableLine_ifc, int)} returns true if standard keys are used. 
+   * <li>2011-12-30 Hartmut chg {@link #procStandardKeys(int, GralTableLine_ifc, int)} returns true if standard keys are used. 
    * <li>2011-11-27 Hartmut new {@link #setActionOnLineSelected(GralUserAction)}: The user action is called
    *   anytime if a line is selected by user operation. It can be show any associated content anywhere
    *   additionally. It is used for example in "The.file.Commander" to show date, time and maybe content 
@@ -46,6 +48,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc
   private int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
   
   
+  protected final Map<String, GralTableLine_ifc> idxLine = new TreeMap<String, GralTableLine_ifc>();
+  
   GralUserAction actionOnLineSelected;
   
   public GralTable(String name, GralWidgetMng mng)
@@ -59,6 +63,16 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc
    */
   public void setActionOnLineSelected(GralUserAction actionOnLineSelected){
     this.actionOnLineSelected = actionOnLineSelected;
+  }
+  
+  
+  @Override public boolean setCurrentLine(String key){
+    GralTableLine_ifc line = idxLine.get(key);
+    if(line == null) return false;
+    else {
+      int nLine = line.getLineNr();
+      return setCurrentCell(nLine, -1);
+    }
   }
   
   
@@ -86,6 +100,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc
       actionOnLineSelected.userActionGui(KeyCode.tableLineSelect, this, line);
     }
   }
+  
   
   
   

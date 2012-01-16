@@ -102,7 +102,7 @@ public class FcmdFileCard extends FileSelector
     panelFiles.setPrimaryWidget(super.selectList.wdgdTable);
     //
     //sets the action for a simple table: what to do on line selected: Show file names. 
-    selectList.wdgdTable.setActionOnLineSelected(actionFileSelected);
+    selectList.wdgdTable.setActionOnLineSelected(actionOnFileSelection);
     favorCard.wdgdTable.setActionOnLineSelected(favorCard.actionFavorSelected);
     //
     //sets the action for Select a file: open the execute menu
@@ -184,7 +184,12 @@ public class FcmdFileCard extends FileSelector
 
   
   
-  private void actionFileSelected(FileRemote file){
+  /**This routine is invoked from {@link #actionOnFileSelection} action listener whenever a file in any file card
+   * will be selected (key up, down, mouse click etc.).
+   * The routine writes infos about the file and may synchronize with another file card.
+   * @param file The currently selected file.
+   */
+  private void actionOnFileSelection(FileRemote file){
     //note the file, able to use for some actions.
     currentFile = file;
     main.currentFile = file;
@@ -196,25 +201,32 @@ public class FcmdFileCard extends FileSelector
     }
     main.lastFavorCard = favorCard;
     mainPanel.actFileCard = this;
-    String sDate = formatDateInfo.format(new Date(file.lastModified()));
+    long lastModified = file.lastModified();
+    String sDate = formatDateInfo.format(new Date(lastModified));
     String sLenShort = //String.format("", file.length)
       file.length() >= 1000000 ? String.format("%2.1f MByte", file.length()/1000000.0) :
       file.length() >=    1000 ? String.format("%2.1f kByte", file.length()/1000.0) :
       String.format("%3d Byte", file.length());  
-    String info = sDate + " # " + sLenShort;        
+    String info = sDate + " = " + lastModified + ", length= " + sLenShort;        
     main.widgFileInfo.setText(info);
     String sPath = file.getAbsolutePath();
     main.widgFilePath.setText(sPath);
-    if(sDirSync !=null){
+    boolean bSync = main.filesCp.widgSyncWalk.isOn()
+      && sDirSync !=null && sPath.length() >= zDirSync;
+    if(bSync){
       sLocalpath = sPath.substring(zDirSync);
       String sDir = getCurrentDirPath();
-      sLocaldir = sDir.substring(zDirSync);
-      String sDirOtherSet = otherFileCardtoSync.sDirSync + sLocaldir;
-      String sDirOtherAct = otherFileCardtoSync.getCurrentDirPath();
-      if(!sDirOtherSet.equals(sDirOtherAct)){
-        otherFileCardtoSync.fillIn(new FileRemote(sDirOtherSet));
+      bSync = sDir.length() >= zDirSync;
+      if(bSync){
+        sLocaldir = sDir.substring(zDirSync);
+        String sDirOtherSet = otherFileCardtoSync.sDirSync + sLocaldir;
+        String sDirOtherAct = otherFileCardtoSync.getCurrentDirPath();
+        if(!sDirOtherSet.equals(sDirOtherAct)){
+          //bSync = false;
+          otherFileCardtoSync.fillIn(new FileRemote(sDirOtherSet));
+        }
+        otherFileCardtoSync.selectFile(file.getName());
       }
-      
     }
   }
   
@@ -224,13 +236,13 @@ public class FcmdFileCard extends FileSelector
   
   /**Action to show the file properties in the info line. This action is called anytime if a line
    * was changed in the file view table. */
-  GralUserAction actionFileSelected = new GralUserAction(){
+  GralUserAction actionOnFileSelection = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
       if(actionCode == KeyCode.tableLineSelect){
         GralTableLine_ifc line = (GralTableLine_ifc) params[0];
         Object oData = line.getUserData();
         if(oData instanceof FileRemote){
-          actionFileSelected((FileRemote)oData);
+          actionOnFileSelection((FileRemote)oData);
         }
       }
       return true;
@@ -262,6 +274,8 @@ public class FcmdFileCard extends FileSelector
       }
       return true;
   } };  
+  
+  
   @Override public String toString(){ return label + "/" + nameFilePanel; }
   
   

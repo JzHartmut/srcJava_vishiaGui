@@ -20,11 +20,14 @@ public interface GralTable_ifc extends GralWidget_ifc
   
   public abstract GralTableLine_ifc getCurrentLine();
   
+  
+  boolean setCurrentLine(String key);
+  
   /**Sets the cell which is selected in the line.
    * @param line from 0 for the first (top) line
    * @param column from 0 for the left column
    */
-  public abstract void setCurrentCell(int line, int column);
+  boolean setCurrentCell(int line, int column);
   
   /**Returns the line at row.
    * @param row 0 is the first row. Must not be negative.
@@ -61,7 +64,6 @@ public interface GralTable_ifc extends GralWidget_ifc
    * @see {@link GralTableLine_ifc} to add content.
    */
   public abstract GralTableLine_ifc insertLine(String key, int row, String[] cellTexts, Object userData);
-  
   
   /**Deletes a line in the table.
    * 

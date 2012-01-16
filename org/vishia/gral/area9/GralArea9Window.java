@@ -157,7 +157,7 @@ public class GralArea9Window implements GralArea9_ifc
   
 
   
-  GralDispatchCallbackWorker initGraphic = new GralDispatchCallbackWorker(){
+  GralDispatchCallbackWorker initGraphic = new GralDispatchCallbackWorker("GralArea9Window.initGraphic"){
     @Override public void doBeforeDispatching(boolean onlyWakeup)
     {
       window.setResizeAction(resizeAction);
@@ -449,7 +449,7 @@ public class GralArea9Window implements GralArea9_ifc
   
   
   
-  private GralDispatchCallbackWorker writeOutputTextDirectly = new GralDispatchCallbackWorker()
+  private GralDispatchCallbackWorker writeOutputTextDirectly = new GralDispatchCallbackWorker("GralArea9Window.writeOutputTextDirectly")
   { @Override public void doBeforeDispatching(boolean onlyWakeup)
     { String line;
       while((line = outputTexts.poll())!=null){
