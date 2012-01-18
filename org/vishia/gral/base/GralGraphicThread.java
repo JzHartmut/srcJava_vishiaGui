@@ -267,9 +267,22 @@ public abstract class GralGraphicThread implements Runnable
 
 
   
-  /**The run method of the graphic thread. This method will be invoked automatically in the constructor
-   * of the derived class.
-   * It will be executed so long as the application runs. 
+  /**The run method of the graphic thread. This method is started in the constructor of the derived class
+   * of this, which implements the graphic system adapter. 
+   * <ul>
+   * <li>{@link #initGraphic()} will be called firstly. It is overridden by the graphic system implementing class
+   *   and does some things necessary for the graphic system implementing level.
+   * <li>The routine runs so long as {@link #bExit} is not set to false. bExit may be set to false 
+   *   in a window close listener of the graphic system level. It means, it is set to false especially 
+   *   if the windows will be closed from the operation system. If the window is closed because the application
+   *   is terminated by any application command the window will be closed, and the close listerer sets bReady
+   *   to false then. 
+   * <li>In the loop the {@link #graphicOrders} will be executed.
+   * <li>For SWT graphic this is the dispatch loop of graphic events. They are executed 
+   *   in the abstract defined here {@link #dispatchOsEvents()} method.
+   * <li>This thread should be wait if not things are to do. The wait will be executed in the here abstract defined
+   *   method {@link #graphicThreadSleep()}.    
+   * </ul>  
    * @see java.lang.Runnable#run()
    */
   @Override public void run()
@@ -320,9 +333,12 @@ public abstract class GralGraphicThread implements Runnable
         checkTimes.cyclTime();
         for(GralDispatchCallbackWorker listener: graphicOrders){
           //use isWakedUpOnly for run as parameter?
-          ///System.out.println("BeforeDispatch");
-          listener.doBeforeDispatching(isWakedUpOnly);  
-          ///System.out.println("BeforeDispatch-ready");
+          try{
+            listener.doBeforeDispatching(isWakedUpOnly);
+          } catch(Exception exc){
+            System.err.println("Exception in GralDispatchCallbackWorker:");
+            exc.printStackTrace();
+          }
         }
       } 
     }

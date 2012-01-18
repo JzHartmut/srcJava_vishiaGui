@@ -38,7 +38,7 @@ public class FcmdFilesCp {
   final FileCompare comparer = new FileCompare(0, null, 0);
   
   /**List for results of comparison as tree. */
-  final List<FileCompare.Result> result = new LinkedList<FileCompare.Result>();
+  List<FileCompare.Result> result = new LinkedList<FileCompare.Result>();
   
   /**List for results of comparison as index sorted to local paths. */
   final Map<String, FileCompare.Result> idxResult = new TreeMap<String, FileCompare.Result>();
@@ -84,7 +84,9 @@ public class FcmdFilesCp {
     file1 = card1.currentFile;
     file2 = card2.currentFile;
     result.clear();
-    comparer.compare(result, file1, file2, null);
+    FileCompare.Result result1 = new FileCompare.Result(file1, file2);
+    comparer.compare(result1, null, 0);
+    result = result1.subFiles;
     for(FileCompare.Result item: result){
       buildIdxResult(item, 0);
     }

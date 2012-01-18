@@ -24,6 +24,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.FileSelector;
 import org.vishia.gral.widget.SelectList;
 import org.vishia.mainCmd.MainCmd_ifc;
+import org.vishia.util.FileRemote;
 import org.vishia.util.FileWriter;
 import org.vishia.util.KeyCode;
 
@@ -34,15 +35,37 @@ class FcmdFavorPathSelector
   /**Entry in the favorite list. */
   static class FavorPath
   { /**The path of directory to select. */
-    String path;
+    final String path;
     /**The name shown in the list. */
-    String selectName;
+    final String selectName;
     /**The label on the tab in tabbed panel. */
     //String label;
     /**bit 0..2 present this favorite on the designated main panel 1..3 or l, m, r,
      * it means, a tab with the label will be created. */
     int mMainPanel;
 
+    /**Origin dir adequate {@link #path}. It is null on initialization, but build on call of
+     * {@link #getOriginDir()}. */
+    private FileRemote dir;
+    
+    public FavorPath(String selectName, String path)
+    { this.path = path;
+      this.selectName = selectName;
+    }
+
+    
+    /**Returns the dir instance for the origin path. The dir instance is built only one time
+     * but only if it is necessary. It means it is built on the first call of this method.
+     * @return
+     */
+    public FileRemote getOriginDir(){
+      if(dir == null){ //build it only one time, but only if it is necessary.
+        dir = new FileRemote(path);
+      }
+      return dir;
+    }
+    
+    
     @Override public String toString(){ return path; } //for debug
   }
   
@@ -218,10 +241,10 @@ class FcmdFavorPathSelector
               if(sParts.length < 2){ 
                 sError = "SelectTab format error; " + sLine; 
               } else {
-                FavorPath favorPathInfo = new FavorPath();
                 //info. = sParts[0].trim();
-                favorPathInfo.selectName = sParts[0].trim();
-                favorPathInfo.path = sParts[1].trim();
+                String selectName = sParts[0].trim();
+                String path = sParts[1].trim();
+                FavorPath favorPathInfo = new FavorPath(selectName, path);
                 if(sParts.length >2){
                   final String actTabEntry = sParts[2].trim();
                   //final String actTab;
@@ -467,9 +490,9 @@ class FcmdFavorPathSelector
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { if(key == KeyCode.mouse1Up){
         if(infos.sCmd.equals("ok")){
-          FavorPath favorite = new FavorPath();
-          favorite.path = windAddFavorite.widgPath.getText();
-          favorite.selectName = windAddFavorite.widgShortName.getText();
+          String path = windAddFavorite.widgPath.getText();
+          String selectName = windAddFavorite.widgShortName.getText();
+          FavorPath favorite = new FavorPath(selectName, path);
           String tablabel = windAddFavorite.widgLabel.getText();
           favorite.mMainPanel = 1<< (windAddFavorite.panelInvocation.cNr - '1');
           FcmdFavorPathSelector.FavorFolder tabDst = null;

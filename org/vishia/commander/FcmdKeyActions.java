@@ -114,6 +114,7 @@ public class FcmdKeyActions
           else if(keyCode == keyOriginDir){ main.favorPathSelector.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }
           else if(keyCode == KeyCode.enter){ main.favorPathSelector.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }
           else if(keyCode == keyWindFullOut){ main.windMng.actionWindFullOut.userActionGui(sIntension, widgd, params); }
+          else if(keyCode == KeyCode.ctrl + KeyCode.enter) { main.cmdSelector.executeCurrCmd(); }
           else { done = false; }
         }
       //}

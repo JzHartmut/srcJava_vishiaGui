@@ -547,7 +547,7 @@ public abstract class GralWidget implements GralWidget_ifc
   
   
   @Override public void repaint(int delay, int latest){
-    if(delay == 0 && Thread.currentThread().getId() == itsMng.gralDevice.getThreadIdGui()){
+    if(delay == 0 && itsMng.currThreadIsGraphic()){
       repaintGthread();
     } else {
       repaintRequ.addToGraphicThread(itsMng.gralDevice, delay);

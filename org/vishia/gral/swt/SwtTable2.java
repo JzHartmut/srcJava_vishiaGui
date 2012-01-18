@@ -25,6 +25,7 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.mainCmd.MainCmd;
+import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
 public class SwtTable2  extends GralTable2 {
@@ -41,7 +42,7 @@ public class SwtTable2  extends GralTable2 {
   boolean bRedrawPending;
 
   /**Set true if the focus is gained by mouse click. It causes color set and 
-   * invocation of {@link #selectLine(GralTableLine_ifc)}. 
+   * invocation of {@link #actionOnLineSelected(GralTableLine_ifc)}. 
    */
   boolean bFocused;
   
@@ -257,6 +258,7 @@ public class SwtTable2  extends GralTable2 {
     @Override public void redrawGthread(){
       long dbgtime = System.currentTimeMillis();
       bRedrawPending = true;
+      Assert.check(itsMng.currThreadIsGraphic());
       int iCellLine;
       if(ixLineNew != ixLine && ixGlineSelected >=0){
         iCellLine = ixLineNew - ixLine1;  //The line which is currently present and selected, before changing ixLine1:
@@ -274,19 +276,21 @@ public class SwtTable2  extends GralTable2 {
         zLineVisible = zLineVisibleMax;   //no more lines existing.
       }
       ixLine2 = ixLine1 + zLineVisible -1;
+      final int dLine;  //Hint: defined outside to see in debugging.
       if(ixLineNew < 2){
         ixLine1 = 0; ixLine2 = zLineVisible -1;
+        dLine = 0;
       } else if(ixLineNew > ixLine2 -2){
-        int dLine = ixLineNew - (ixLine2 -2);
+        dLine = ixLineNew - (ixLine2 -2);
         ixLine1 += dLine; ixLine2 += dLine;
       } else if (ixLineNew < ixLine1 +2){
-        int dLine = ixLine1 +2 - ixLineNew;
-        ixLine1 -= dLine; ixLine2 -= dLine;
+        dLine = ixLineNew - (ixLine1 +2);  //negative
+        ixLine1 += dLine; ixLine2 += dLine;
       }
       if(ixLine2 >= zLine ){
         ixLine2 = zLine-1;
       }
-      MainCmd.assertion(ixLine2 < zLine && ixLineNew < zLine);
+      Assert.check(ixLine2 < zLine && ixLineNew < zLine);
       long dbgtime1 = System.currentTimeMillis() - dbgtime;
       iCellLine = 0;
       for(int ixLine3 = ixLine1; ixLine3 <= ixLine2 && iCellLine < zLineVisibleMax; ++ixLine3){
@@ -321,13 +325,13 @@ public class SwtTable2  extends GralTable2 {
       
       //mark current line
       if(ixLineNew >=0 && (ixLineNew != ixLine || bFocused)){
-        selectLine(tableLines.get(ixLineNew));
+        actionOnLineSelected(tableLines.get(ixLineNew));
         ixLine = ixLineNew;
       //}
       //if(true || ixLineNew != ixLine){
         ixLine = ixLineNew;
         ixGlineSelectedNew = iCellLine = ixLine - ixLine1;
-        MainCmd.assertion(ixGlineSelectedNew < zLineVisible);
+        Assert.check(ixGlineSelectedNew < zLineVisible);
         for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
           Text cellSwt = cellsSwt[iCellLine][iCellCol];
           //Note: The background color isn't set yet because this routine may be called
@@ -356,9 +360,8 @@ public class SwtTable2  extends GralTable2 {
     }
     
     
-    /**This routine is called if some time is delayed after a last {@link #redrawGthread()}
-     * invocation. It sets the background color to the focused cell and sets the focus
-     * for the panel.
+    /**This routine is called in the graphic thread after a last {@link #redrawGthread()} invocation with delay.
+     * It sets the background color to the focused cell and sets the focus for the panel.
      * 
      */
     GralDispatchCallbackWorker writeContentLast = new GralDispatchCallbackWorker("SwtTable2.writeContentLast"){
@@ -643,7 +646,7 @@ public class SwtTable2  extends GralTable2 {
     CellData data = (CellData)cell.getData();
     if(data.tableItem !=null){ //don't do any action if the cell isn't use.
       ixLineNew = data.ixCellLine + ixLine1;
-      MainCmd.assertion(ixLineNew < zLine);
+      Assert.check(ixLineNew < zLine);
       ixColumn = data.ixCellColumn;
       bFocused = true;
       table.redraw();

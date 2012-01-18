@@ -61,7 +61,7 @@ public abstract class SelectList implements Removeable //extends GralWidget
   /**Not used yet, register actions? */
   protected Map<String, GralUserAction> actions;
   
-  public SelectList() //String name, GralWidgetMng mng)
+  protected SelectList() //String name, GralWidgetMng mng)
   {
     //super(name, 'l', mng);
   }
@@ -89,13 +89,13 @@ public abstract class SelectList implements Removeable //extends GralWidget
    * @param columns
    * @param size
    */
-  public void setToPanel(GralGridBuild_ifc panel, String name, int rows, int[] columns, char size)
+  public void setToPanel(GralGridBuild_ifc gralMng, String name, int rows, int[] columns, char size)
   {
-    wdgdTable = panel.addTable(name, rows, columns);
+    wdgdTable = gralMng.addTable(name, rows, columns);
     wdgdTable.setActionChange(actionTable);
   }
   
-  
+ 
   
   public void set(List<String[]> listData)
   {

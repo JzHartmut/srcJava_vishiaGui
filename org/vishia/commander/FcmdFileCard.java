@@ -266,7 +266,7 @@ public class FcmdFileCard extends FileSelector
           if(sPath.startsWith(sDirSync)){
             String sLocalPath = sPath.substring(sDirSync.length()+1);
             FileCompare.Result result = main.filesCp.idxResult.get(sLocalPath);
-            if(result !=null && !result.contentEqual){
+            if(result !=null && !result.equal){
               line.setCellText("#", 0);
             }
           }

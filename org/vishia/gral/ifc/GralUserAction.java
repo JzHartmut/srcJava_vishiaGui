@@ -62,6 +62,7 @@ public abstract class GralUserAction
    * @return true if the user action is done, false if the sIntension or any other parameter
    *        doesn't much to that implementation. It is possible to build a queue of user action invocations.
    *        The first invocation which returns true may finish the invocations.
+   * @deprecated use {@link #userActionGui(int, GralWidget, Object...)}.
    */
   public boolean userActionGui(String sIntension, GralWidget widgd, Object... params){ return false; }
   

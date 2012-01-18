@@ -388,7 +388,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   protected abstract String setInfoDirect(GralWidget_ifc widget, int cmd, int ident, Object info, Object data);
   
   @Override public String setInfoDelayed(GralWidget_ifc widgd, int cmd, int ident, Object visibleInfo, Object userData, int delay){
-    if(delay == 0 && Thread.currentThread().getId() == gralDevice.getThreadIdGui()){
+    if(delay == 0 && currThreadIsGraphic()){
       return setInfoDirect(widgd, cmd, ident, visibleInfo, userData);
     } else {
       GralWidgetChangeRequ requ = new GralWidgetChangeRequ(widgd, cmd, ident, visibleInfo, userData);
@@ -397,7 +397,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   }
   
   @Override public String setInfoDelayed(GralWidgetChangeRequ changeRequ, int delay){
-    if(delay == 0 && Thread.currentThread().getId() == gralDevice.getThreadIdGui()){
+    if(delay == 0 && currThreadIsGraphic()){
       return setInfoDirect(changeRequ.widgetDescr, changeRequ.cmd, changeRequ.ident, changeRequ.visibleInfo, changeRequ.userData);
     } else {
       //TODO check admissibility
@@ -428,6 +428,10 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   }
   
   
+  @Override public boolean currThreadIsGraphic(){
+    return Thread.currentThread().getId() == gralDevice.getThreadIdGui();
+  }
+
 
   
   @Override public GralWidget getWidget(String name)

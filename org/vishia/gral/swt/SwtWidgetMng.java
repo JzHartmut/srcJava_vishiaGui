@@ -1218,8 +1218,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   //past: insertInfo
   @Override public String setInfo(GralWidget descr, int cmd, int ident, Object visibleInfo, Object userData)
   {
-    long threadId = Thread.currentThread().getId();
-    if(threadId == gralDevice.getThreadIdGui()){
+    if(currThreadIsGraphic()){
       setInfoDirect(descr, cmd, ident, visibleInfo, userData);
     } else {
     	if(descr.name !=null && descr.name.equals("writerEnergy1Sec") && cmd == GralPanelMngWorking_ifc.cmdInsert) 

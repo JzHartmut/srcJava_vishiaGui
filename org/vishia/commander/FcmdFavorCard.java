@@ -119,7 +119,7 @@ public class FcmdFavorCard  extends SelectList
     if(fileTable.favorPathInfo !=null){
       dir = fileTable.getCurrentDir();
       if(dir == null){
-        dir = new FileRemote(favorPathInfo.path);
+        dir = favorPathInfo.getOriginDir();
       }
       currentDir = dir.getAbsolutePath();
       if(currentDir !=null){
@@ -134,6 +134,7 @@ public class FcmdFavorCard  extends SelectList
       dir = new FileRemote(currentDir);
     }
     fileTable.favorCard.add(favorPathInfo);  //only it is a new one, it will be checked.
+    fileTable.setOriginDir(favorPathInfo.getOriginDir());
     fileTable.fillIn(dir);
     fileTable.setFocus();
     return true;

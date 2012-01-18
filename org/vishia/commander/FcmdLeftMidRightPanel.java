@@ -13,6 +13,7 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.SelectList;
 import org.vishia.mainCmd.MainCmd;
+import org.vishia.util.Assert;
 import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
@@ -265,7 +266,7 @@ public class FcmdLeftMidRightPanel
     {
       FcmdFavorPathSelector.FavorFolder favorTabInfo = null;
       final String label;
-      File currentDir = null;
+      final File currentDir;
       Object oLineData = line.getUserData();
       if(oLineData instanceof FcmdFavorPathSelector.FavorFolder){
         favorTabInfo = (FcmdFavorPathSelector.FavorFolder)line.getUserData();
@@ -278,10 +279,11 @@ public class FcmdLeftMidRightPanel
         if(actFileCard.favorPathInfo !=null){
           currentDir = actFileCard.getCurrentDir(); //.getAbsolutePath();
         } else {
-          //nothing selected, its a new tab
+          //nothing selected, its a new tab. Don't show files.
+          currentDir = null;
           //FcmdFavorPathSelector.FavorPath favorPathInfo = favorTabInfo.listfavorPaths.get(0);
           //actFileCard.favorPathInfo = favorPathInfo;
-          //currentDir = new FileRemote(favorPathInfo.path);
+          //currentDir = favorPathInfo.getOriginDir();
         }
       } else {
         //it have to be a:
@@ -293,7 +295,7 @@ public class FcmdLeftMidRightPanel
         actFileCard.currentFile = fileCard.currentFile;      //select the same file.
         currentDir = fileCard.getCurrentDir(); //.getAbsolutePath();
         if(actFileCard == null){
-          MainCmd.assertion(false);
+          Assert.check(false);
         }
         //search the proper FavorFolder for the label. 
         //Note it isn't stored in the file card yet though the file card is associated to the label.
@@ -303,7 +305,7 @@ public class FcmdLeftMidRightPanel
             break;  //found.
           }
         }
-        MainCmd.assertion(favorTabInfo != null);
+        Assert.check(favorTabInfo != null);
       }
     
       //adds all favorite pathes to it newly.

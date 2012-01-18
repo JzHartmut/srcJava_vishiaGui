@@ -29,7 +29,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc
    * <li>2011-11-27 Hartmut new {@link #setActionOnLineSelected(GralUserAction)}: The user action is called
    *   anytime if a line is selected by user operation. It can be show any associated content anywhere
    *   additionally. It is used for example in "The.file.Commander" to show date, time and maybe content 
-   *   while the user selects any files. The graphical implementation should be call {@link #selectLine(GralTableLine_ifc)}
+   *   while the user selects any files. The graphical implementation should be call {@link #actionOnLineSelected(GralTableLine_ifc)}
    *   in its Selection listener. 
    * <li>2011-11-20 Hartmut new The capability of selection of lines is moved from the 
    *   {@link org.vishia.gral.widget.SelectList} to this class. It means any table has the capability
@@ -92,10 +92,16 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc
   }
   
   
-  /**It is called whenever a line is changed. The user can override this method to get infos.
+  /**It is called whenever another line is selected, if the focus is gotten by mouse click
+   * or a navigation key is pressed. 
+   * This method calls the {@link GralUserAction#userActionGui(int, GralWidget, Object...)}.
+   * The {@link #setActionOnLineSelected(GralUserAction)} can be set with any user instantiation
+   * of that interface. The params[0] of that routine are filled with the {@link GralTableLine_ifc}
+   * of the selected line.
+   *  
    * @param line
    */
-  protected void selectLine(GralTableLine_ifc line){
+  protected void actionOnLineSelected(GralTableLine_ifc line){
     if(actionOnLineSelected !=null){
       actionOnLineSelected.userActionGui(KeyCode.tableLineSelect, this, line);
     }

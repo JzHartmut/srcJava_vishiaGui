@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.gral.base.GralGraphicThread;
+
 
 
 /**This is a unique interface for the GUI-panel-manager to work with it.
@@ -264,6 +266,13 @@ public interface GralPanelMngWorking_ifc
    */
   ConcurrentLinkedQueue<GralVisibleWidgets_ifc> getVisiblePanels();
 	
+  
+  /**Returns true if the current thread is the graphical thread.
+   * This routine is used internally firstly. The graphical thread is that thread, which dispatches
+   * all orders for the graphic, see {@link GralGraphicThread#run()}.
+   * @return true if this routine is called from the same thread as the graphical thread.
+   */
+  boolean currThreadIsGraphic();
   
   /**Writes a log message instead throwing an exception or writing on standard output.
    * The log message contains a timestamp and can be dispatched to any destination. 

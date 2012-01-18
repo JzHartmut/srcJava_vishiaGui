@@ -206,7 +206,7 @@ public class GralCfgBuilder
     //
     GralWidget widgd = null;
     String sName = cfge.widgetType.name;
-    if(sName ==null && cfge.widgetType.text !=null ){ sName = cfgData.actPanel.name + "/" + cfge.widgetType.text; }  //text of button etc.
+    if(sName ==null && cfge.widgetType.text !=null ){ sName = cfge.widgetType.text; }  //text of button etc.
     if(sName ==null && cfge.widgetType.prompt !=null){ sName = cfgData.actPanel.name + "/" + cfge.widgetType.prompt; } //the prompt as name
     //the name may be null, then the widget is not registered.
     //
