@@ -20,11 +20,9 @@ import org.vishia.gral.base.GralTable2;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.mainCmd.MainCmd;
 import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
@@ -36,15 +34,6 @@ public class SwtTable2  extends GralTable2 {
   private Text[][] cellsSwt;
   
   private final SwtTable2.Table table; 
-  
-  /**Set to true while {@link #table}.{@link Table#redrawGthread()} is running.
-   * It prevents recursive invocation of redraw() while setFocus() is invoked. */
-  boolean bRedrawPending;
-
-  /**Set true if the focus is gained by mouse click. It causes color set and 
-   * invocation of {@link #actionOnLineSelected(GralTableLine_ifc)}. 
-   */
-  boolean bFocused;
   
   
   private final FocusListener focusListenerTable;
@@ -96,6 +85,7 @@ public class SwtTable2  extends GralTable2 {
     resizeTable();
   }
 
+
   
   
   public static GralTable addTable(SwtWidgetMng mng, String sName, int height, int[] columnWidths
@@ -115,7 +105,7 @@ public class SwtTable2  extends GralTable2 {
   }
   
   
-  protected void setColorsSwt(){
+  private void setColorsSwt(){
     colorBackSelectSwt = mng.getColorImpl(colorBackSelect);
     colorBackMarkedSwt = mng.getColorImpl(colorBackMarked);
     colorBackTableSwt = mng.getColorImpl(colorBackTable);
@@ -157,7 +147,10 @@ public class SwtTable2  extends GralTable2 {
 
 
   @Override protected void repaintGthread(){
-    table.redrawGthread();
+    redrawTableGthread();
+    table.superRedraw();
+    bRedrawPending = false;
+
   }
 
   
@@ -211,6 +204,113 @@ public class SwtTable2  extends GralTable2 {
   }
   
   
+  /**Sets the current cell as focused with the focus color. It causes
+   * a redraw of the whole table because the cell may be shifted in table position.
+   * TODO this method must call in the graphic thread yet, queue it with {@link GralWidgetMng#setInfo(GralWidget, int, int, Object, Object)}.
+   * @param cell The cell 
+   */
+  private void redrawTableWithFocusedCell(Widget cell){
+    CellData data = (CellData)cell.getData();
+    if(data.tableItem !=null){ //don't do any action if the cell isn't use.
+      ixLineNew = data.ixCellLine + ixLine1;
+      Assert.check(ixLineNew < zLine);
+      ixColumn = data.ixCellColumn;
+      bFocused = true;
+      table.redraw();
+    }
+  }
+
+
+  
+  @Override protected int getVisibleLinesTableImpl(){
+    Rectangle size = table.getBounds();  
+    return size.height / linePixel;
+  }  
+  
+  
+  @Override protected void drawCellContent(int iCellLine, int iCellCol, TableItemWidget tableItem ){
+    Text cellSwt = cellsSwt[iCellLine][iCellCol]; 
+    CellData data = (CellData)cellSwt.getData();
+    data.tableItem = tableItem;
+    //
+    String text = tableItem.cellTexts[iCellCol];
+    if(text == null){ text = ""; }
+    //
+    cellSwt.setText(text);
+    /*
+    if(ixGlineSelected == iCellLine && ixGlineSelectedNew != iCellLine){
+      cellSwt.setBackground(colorBackTableSwt);
+    } else if(ixGlineSelectedNew == iCellLine){
+      if(ixGlineSelectedNew != ixGlineSelected) {
+        cellSwt.setBackground(colorBackTableSwt);
+      }
+    }
+    */
+    GralColor colorBack;
+    if(ixGlineSelectedNew == iCellLine){
+      colorBack = colorBackSelect;
+    } else {
+      colorBack = colorBackTable;
+    }
+    if(data.colorBack != colorBack){
+      Color colorSwt =  mng.getColorImpl(colorBack);
+      cellSwt.setBackground(colorSwt);
+      data.colorBack = colorBack;
+    }
+    if(ixGlineSelectedNew == iCellLine && iCellCol == ixColumn){
+      SwtWidgetHelper.setFocusOfTabSwt(cellSwt);
+      //cellSwt.setFocus();  
+    }
+
+    cellSwt.setVisible(true);
+    cellSwt.redraw();
+  }
+
+  @Override protected CellData drawCellInvisible(int iCellLine, int iCellCol){
+    Text cellSwt = cellsSwt[iCellLine][iCellCol]; 
+    cellSwt.setText("");
+    cellSwt.setVisible(false);
+    return ((CellData)cellSwt.getData());
+  }
+
+  /**This routine is called in the graphic thread after a last {@link #redrawGthread()} invocation with delay.
+   * It sets the background color to the focused cell and sets the focus for the panel.
+   * @deprecated
+   */
+  GralDispatchCallbackWorker writeContentLast = new GralDispatchCallbackWorker("SwtTable2.writeContentLast"){
+    @Override public void doBeforeDispatching(boolean onlyWakeup) {
+      ///
+      bRedrawPending = true;
+      if(ixGlineSelected >=0 && ixGlineSelectedNew != ixGlineSelected){
+        //set background color for non-selected line.
+        for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
+          Text cellSwt = cellsSwt[ixGlineSelected][iCellCol];
+          cellSwt.setBackground(colorBackTableSwt);
+        }
+      }
+      if((ixGlineSelectedNew != ixGlineSelected || bFocused) && ixGlineSelectedNew >= 0 ){
+        //set background color for selected line.
+        ixGlineSelected = ixGlineSelectedNew; //Note is equal already if bFocused only
+        if(ixGlineSelectedNew >=0){ //only if anything is selected:
+          for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
+            Text cellSwt = cellsSwt[ixGlineSelected][iCellCol];
+            cellSwt.setBackground(colorBackSelectSwt);
+            if(iCellCol == ixColumn){
+              SwtWidgetHelper.setFocusOfTabSwt(cellSwt);
+              //cellSwt.setFocus(); 
+              System.out.print("\nSwtTable2.writeContentLast: " + SwtTable2.this.name);
+            }
+          }
+        }
+        bFocused = false;
+      }
+      bRedrawPending = false;
+      countExecution();
+      removeFromGraphicThread(itsMng.gralDevice);
+    }
+  };
+
+
   private class Table extends Composite implements SwtWidgetSet_ifc {
 
     public Table(Composite parent, int zColumns) {
@@ -251,152 +351,27 @@ public class SwtTable2  extends GralTable2 {
       redrawGthread();
     }
     
-    /**Redraws the whole table because the current line is changed or the focus is changed.
-     * TODO
-     * {@link SwtWidgetSet_ifc#redrawGthread()}
-     */
-    @Override public void redrawGthread(){
-      long dbgtime = System.currentTimeMillis();
-      bRedrawPending = true;
-      Assert.check(itsMng.currThreadIsGraphic());
-      int iCellLine;
-      if(ixLineNew != ixLine && ixGlineSelected >=0){
-        iCellLine = ixLineNew - ixLine1;  //The line which is currently present and selected, before changing ixLine1:
-        if(iCellLine != ixGlineSelected){ //another line to select:
-          for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
-            cellsSwt[ixGlineSelected][iCellCol].setBackground(colorBackTableSwt);
-          }
-          ixGlineSelected = -1; //because selection isn't shown.
-        }
-      }
-      //calculate number of lines to show:
-      Rectangle size = table.getBounds();  
-      zLineVisible = size.height / linePixel;
-      if(zLineVisible > zLineVisibleMax){ 
-        zLineVisible = zLineVisibleMax;   //no more lines existing.
-      }
-      ixLine2 = ixLine1 + zLineVisible -1;
-      final int dLine;  //Hint: defined outside to see in debugging.
-      if(ixLineNew < 2){
-        ixLine1 = 0; ixLine2 = zLineVisible -1;
-        dLine = 0;
-      } else if(ixLineNew > ixLine2 -2){
-        dLine = ixLineNew - (ixLine2 -2);
-        ixLine1 += dLine; ixLine2 += dLine;
-      } else if (ixLineNew < ixLine1 +2){
-        dLine = ixLineNew - (ixLine1 +2);  //negative
-        ixLine1 += dLine; ixLine2 += dLine;
-      }
-      if(ixLine2 >= zLine ){
-        ixLine2 = zLine-1;
-      }
-      Assert.check(ixLine2 < zLine && ixLineNew < zLine);
-      long dbgtime1 = System.currentTimeMillis() - dbgtime;
-      iCellLine = 0;
-      for(int ixLine3 = ixLine1; ixLine3 <= ixLine2 && iCellLine < zLineVisibleMax; ++ixLine3){
-        TableItemWidget line = tableLines.get(ixLine3);
-        int ctredraw = line.redraw.get();
-        if(ctredraw > 0 || true){
-          for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
-            String text = line.cellTexts[iCellCol];
-            if(text == null){ text = ""; }
-            Text cellSwt = cellsSwt[iCellLine][iCellCol]; 
-            cellSwt.setText(text);
-            ((CellData)cellSwt.getData()).tableItem = line;
-            cellSwt.setVisible(true);
-          }
-          iCellLine +=1;
-          //Thread safety: set to 0 only if it isn't changed between quest and here.
-          //Only then the text isn't changed.
-          line.redraw.compareAndSet(ctredraw, 0);  
-        }
-      }
-      long dbgtime2 = System.currentTimeMillis() - dbgtime;
-      while( iCellLine < zLineVisibleMax){
-        for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
-          Text cellSwt = cellsSwt[iCellLine][iCellCol]; 
-          cellSwt.setText("");
-          ((CellData)cellSwt.getData()).tableItem = null;
-          cellSwt.setVisible(false);
-        }
-        iCellLine +=1;
-      }
-      long dbgtime3 = System.currentTimeMillis() - dbgtime;
-      
-      //mark current line
-      if(ixLineNew >=0 && (ixLineNew != ixLine || bFocused)){
-        actionOnLineSelected(tableLines.get(ixLineNew));
-        ixLine = ixLineNew;
-      //}
-      //if(true || ixLineNew != ixLine){
-        ixLine = ixLineNew;
-        ixGlineSelectedNew = iCellLine = ixLine - ixLine1;
-        Assert.check(ixGlineSelectedNew < zLineVisible);
-        for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
-          Text cellSwt = cellsSwt[iCellLine][iCellCol];
-          //Note: The background color isn't set yet because this routine may be called
-          //in a fast key repetition (50 ms). In the next few ms the next cell may have
-          //the focus then. The setBackground needs about 5 ms per cell on Linux GTK
-          //with an Intel-Atom-processor. It is too much.
-          //The focus is able to see because the cursor is there.
-          //The color will be set in the writeContentLast.
-          //
-          //don't invoke: cellSwt.setBackground(colorBackSelectSwt);
-          if(iCellCol == ixColumn){
-            cellSwt.setFocus();  
-          }
-        }
-      }
-      writeContentLast.addToGraphicThread(itsMng.gralDevice, 200);
-      long dbgtime4 = System.currentTimeMillis() - dbgtime;
-      System.out.print("\nSwtTable2-redraw1: " + dbgtime1 + " + " + dbgtime2 + " + " + dbgtime3 + " + " + dbgtime4);
-      dbgtime = System.currentTimeMillis();
-      super.update();
+    
+    /**Does call the super redraw method called inside {@link #redrawGthread()} from the overridden
+     * {@link #redraw()} method. */
+    private void superRedraw(){
+      super.update(); 
       super.redraw();
-      bRedrawPending = false;
-      dbgtime1 = System.currentTimeMillis() - dbgtime;
-      System.out.print(", redraw2: " + dbgtime1);
-      
     }
     
     
-    /**This routine is called in the graphic thread after a last {@link #redrawGthread()} invocation with delay.
-     * It sets the background color to the focused cell and sets the focus for the panel.
-     * 
+    /**Redraws the whole table because the current line is changed or the focus is changed
+     * or the content is changed and #re
+     * TODO
+     * {@link SwtWidgetSet_ifc#redrawGthread()}
      */
-    GralDispatchCallbackWorker writeContentLast = new GralDispatchCallbackWorker("SwtTable2.writeContentLast"){
-      @Override public void doBeforeDispatching(boolean onlyWakeup) {
-        ///
-        bRedrawPending = true;
-        if(ixGlineSelected >=0 && ixGlineSelectedNew != ixGlineSelected){
-          //set background color for non-selected line.
-          for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
-            Text cellSwt = cellsSwt[ixGlineSelected][iCellCol];
-            cellSwt.setBackground(colorBackTableSwt);
-          }
-        }
-        if((ixGlineSelectedNew != ixGlineSelected || bFocused) && ixGlineSelectedNew >= 0 ){
-          //set background color for selected line.
-          ixGlineSelected = ixGlineSelectedNew; //Note is equal already if bFocused only
-          if(ixGlineSelectedNew >=0){ //only if anything is selected:
-            for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
-              Text cellSwt = cellsSwt[ixGlineSelected][iCellCol];
-              cellSwt.setBackground(colorBackSelectSwt);
-              if(iCellCol == ixColumn){
-                SwtWidgetHelper.setFocusOfTabSwt(cellSwt);
-                //cellSwt.setFocus(); 
-                System.out.print("\nSwtTable2.writeContentLast: " + SwtTable2.this.name);
-              }
-            }
-          }
-          bFocused = false;
-        }
-        bRedrawPending = false;
-        countExecution();
-        removeFromGraphicThread(itsMng.gralDevice);
-      }
-    };
-
+    @Override public void redrawGthread(){ 
+      redrawTableGthread(); 
+      superRedraw();
+      bRedrawPending = false;
+    }
+    
+    
     @Override
     public void setBackGroundColorGthread(GralColor color) {
       // TODO Auto-generated method stub
@@ -437,19 +412,6 @@ public class SwtTable2  extends GralTable2 {
   }
   
 
-  
-  /**Data for each Text widget.
-   */
-  private class CellData{
-    final int ixCellLine, ixCellColumn;
-    TableItemWidget tableItem;
-    
-    CellData(int ixCellLine, int ixCellColumn){
-      this.ixCellLine = ixCellLine; 
-      this.ixCellColumn = ixCellColumn;
-    }
-  }
-  
   
   /**A Table is completed with a special key listener. On all keys 
    * the {@link GralUserAction} given in the {@link GralWidget#getActionChange()} is called
@@ -635,24 +597,6 @@ public class SwtTable2  extends GralTable2 {
     }
     
   };
-  
-  
-  /**Sets the current cell as focused with the focus color. It causes
-   * a redraw of the whole table because the cell may be shifted in table position.
-   * TODO this method must call in the graphic thread yet, queue it with {@link GralWidgetMng#setInfo(GralWidget, int, int, Object, Object)}.
-   * @param cell The cell 
-   */
-  private void redrawTableWithFocusedCell(Widget cell){
-    CellData data = (CellData)cell.getData();
-    if(data.tableItem !=null){ //don't do any action if the cell isn't use.
-      ixLineNew = data.ixCellLine + ixLine1;
-      Assert.check(ixLineNew < zLine);
-      ixColumn = data.ixCellColumn;
-      bFocused = true;
-      table.redraw();
-    }
-  }
-  
   
   
   void stop(){}

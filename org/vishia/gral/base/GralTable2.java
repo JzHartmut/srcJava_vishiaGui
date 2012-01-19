@@ -9,6 +9,7 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 import org.vishia.util.SelectMask;
 
@@ -38,6 +39,13 @@ public abstract class GralTable2 extends GralTable{
   
   /**Start position of each column in pixel. */
   protected int[] columnPixel;
+
+  
+  /**The colors of each cell. It is set with the color of {@link TableItemWidget#colorBackground} and
+   * {@link TableItemWidget#colorBackground} of the currently displayed line.
+   */
+  private GralColor[] colorBack, colorText;
+  
 
   /**Pixel per line. */
   protected int linePixel;
@@ -78,6 +86,19 @@ public abstract class GralTable2 extends GralTable{
   /**If true then the graphic implementation fields for cells should be filled newly with the text. */
   protected boolean bFillCells;
   
+  protected long timeLastRedraw;
+  
+  /**Set to true while {@link #table}.{@link Table#redrawGthread()} is running.
+   * It prevents recursive invocation of redraw() while setFocus() is invoked. */
+  protected boolean bRedrawPending;
+
+  /**Set true if the focus is gained by mouse click. It causes color set and 
+   * invocation of {@link #actionOnLineSelected(GralTableLine_ifc)}. 
+   */
+  protected boolean bFocused;
+  
+
+  
   /**The colors. */
   protected GralColor colorBackSelect, colorBackMarked, colorBackTable
   , colorBackSelectNonFocused, colorBackMarkedNonFocused, colorBackTableNonFocused
@@ -88,6 +109,8 @@ public abstract class GralTable2 extends GralTable{
     super(name, mng);
     this.columnWidthsGral = columnWidths;
     this.zColumn = columnWidths.length;
+    this.colorBack = new GralColor[zLineVisibleMax];
+    this.colorText = new GralColor[zLineVisibleMax];
     int xdPix = itsMng.propertiesGui.xPixelUnit();
     columnPixel = new int[columnWidthsGral.length+1];
     int xPix = 0;
@@ -204,40 +227,43 @@ public abstract class GralTable2 extends GralTable{
  
   protected boolean processKeys(int keyCode){
     boolean done = true;
-    switch(keyCode){
-    case KeyCode.pgup: {
-      if(ixLine > zLineVisible){
-        ixLineNew = ixLine - zLineVisible;
-        repaint();
-      } else {
-        ixLineNew = 0;
-        repaint();
-      }
-    } break;
-    case KeyCode.up: {
-      if(ixLine > 0){
-        ixLineNew = ixLine - 1;
-        repaint();
-      }
-    } break;
-    case KeyCode.dn: {
-      if(ixLine < zLine -1){
-        ixLineNew = ixLine + 1;
-        repaint();
-      }
-    } break;
-    case KeyCode.pgdn: {
-      if(ixLine < zLine - zLineVisible){
-        ixLineNew = ixLine + zLineVisible;
-        repaint();
-      } else {
-        ixLineNew = zLine -1;
-        repaint();
-      }
-    } break;
-    default:
-      done = false;
-    }//switch
+    long time = System.currentTimeMillis();
+    if( (time - timeLastRedraw) > 50){
+      switch(keyCode){
+      case KeyCode.pgup: {
+        if(ixLine > zLineVisible){
+          ixLineNew = ixLine - zLineVisible;
+          repaint();
+        } else {
+          ixLineNew = 0;
+          repaint();
+        }
+      } break;
+      case KeyCode.up: {
+        if(ixLine > 0){
+          ixLineNew = ixLine - 1;
+          repaint();
+        }
+      } break;
+      case KeyCode.dn: {
+        if(ixLine < zLine -1){
+          ixLineNew = ixLine + 1;
+          repaint();
+        }
+      } break;
+      case KeyCode.pgdn: {
+        if(ixLine < zLine - zLineVisible){
+          ixLineNew = ixLine + zLineVisible;
+          repaint();
+        } else {
+          ixLineNew = zLine -1;
+          repaint();
+        }
+      } break;
+      default:
+        done = false;
+      }//switch
+    }
     if(!done && ixLine >=0){
       GralTableLine_ifc lineGral = tableLines.get(ixLine);
       if(!procStandardKeys(keyCode, lineGral, ixLine)){
@@ -260,6 +286,140 @@ public abstract class GralTable2 extends GralTable{
 
   
   
+
+
+  /**Redraws the whole table because the current line is changed or the focus is changed
+   * or the content is changed and #re
+   * TODO
+   * {@link SwtWidgetSet_ifc#redrawGthread()}
+   */
+  protected void redrawTableGthread(){
+    long dbgtime = System.currentTimeMillis();
+    //test
+    //try{ Thread.sleep(80);} catch(InterruptedException exc){}
+    bRedrawPending = true;
+    Assert.check(itsMng.currThreadIsGraphic());
+    int iCellLine;
+    /*
+    if(ixLineNew != ixLine && ixGlineSelected >=0){
+      iCellLine = ixLineNew - ixLine1;  //The line which is currently present and selected, before changing ixLine1:
+      if(iCellLine != ixGlineSelected){ //another line to select:
+        for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
+          //cellsSwt[ixGlineSelected][iCellCol].setBackground(colorBackTableSwt);
+        }
+        ixGlineSelected = -1; //because selection isn't shown.
+      }
+    }
+    */
+    //calculate number of lines to show:
+    zLineVisible = getVisibleLinesTableImpl();
+    if(zLineVisible > zLineVisibleMax){ 
+      zLineVisible = zLineVisibleMax;   //no more lines existing.
+    }
+    ixLine2 = ixLine1 + zLineVisible -1;
+    final int dLine;  //Hint: defined outside to see in debugging.
+    if(ixLineNew < 2){
+      ixLine1 = 0; ixLine2 = zLineVisible -1;
+      dLine = 0;
+    } else if(ixLineNew > ixLine2 -2){
+      dLine = ixLineNew - (ixLine2 -2);
+      ixLine1 += dLine; ixLine2 += dLine;
+    } else if (ixLineNew < ixLine1 +2){
+      dLine = ixLineNew - (ixLine1 +2);  //negative
+      ixLine1 += dLine; ixLine2 += dLine;
+    }
+    if(ixLine2 >= zLine ){
+      ixLine2 = zLine-1;
+    }
+    ixGlineSelectedNew = ixLineNew - ixLine1;
+    
+    Assert.check(ixLine2 < zLine && ixLineNew < zLine);
+    Assert.check(ixGlineSelectedNew < zLineVisible);
+    //
+    //draw all table cells.
+    long dbgtime1 = System.currentTimeMillis() - dbgtime;
+    iCellLine = 0;
+    for(int ixLine3 = ixLine1; ixLine3 <= ixLine2 && iCellLine < zLineVisibleMax; ++ixLine3){
+      TableItemWidget line = tableLines.get(ixLine3);
+      int ctredraw = line.ctRepaintLine.get();
+      if(ctredraw > 0 || true){
+        for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
+          //
+          //draw the content of the cell in the graphic implementation.
+          //CellData widgiData = 
+            drawCellContent(iCellLine, iCellCol, line);
+          //widgiData.tableItem = line;  //The widgiData are assigned to the implementation graphic cell.
+        }
+        iCellLine +=1;
+        //Thread safety: set to 0 only if it isn't changed between quest and here.
+        //Only then the text isn't changed.
+        line.ctRepaintLine.compareAndSet(ctredraw, 0);  
+      }
+    }
+    long dbgtime2 = System.currentTimeMillis() - dbgtime;
+    while( iCellLine < zLineVisibleMax){
+      for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
+        CellData widgiData = drawCellInvisible(iCellLine, iCellCol);
+        widgiData.tableItem = null;  //The widgiData are assigned to the implementation graphic cell.
+      }
+      iCellLine +=1;
+    }
+    long dbgtime3 = System.currentTimeMillis() - dbgtime;
+    
+    //mark current line
+    if(ixLineNew >=0 && (ixLineNew != ixLine || bFocused)){
+      actionOnLineSelected(tableLines.get(ixLineNew));
+      ixLine = ixLineNew;
+    //}
+    //if(true || ixLineNew != ixLine){
+      ixLine = ixLineNew;
+      //ixGlineSelectedNew = iCellLine = ixLine - ixLine1;
+      if(ixGlineSelectedNew != ixGlineSelected){ //note: if the table scrolls, the same cell is used as current.
+        //set background color for non-selected line.
+        if(ixGlineSelected >=0){
+          Assert.check(ixGlineSelected < zLineVisibleMax);
+          for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
+            ////Text cellSwt = cellsSwt[ixGlineSelected][iCellCol];
+            ////cellSwt.setBackground(colorBackTableSwt);
+          }
+        }
+        ixGlineSelected = ixGlineSelectedNew;
+      }
+      for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
+        ////Text cellSwt = cellsSwt[iCellLine][iCellCol];
+        //Note: The background color isn't set yet because this routine may be called
+        //in a fast key repetition (50 ms). In the next few ms the next cell may have
+        //the focus then. The setBackground needs about 5 ms per cell on Linux GTK
+        //with an Intel-Atom-processor. It is too much.
+        //The focus is able to see because the cursor is there.
+        //The color will be set in the writeContentLast.
+        //
+        ///don't invoke: 
+        ////cellSwt.setBackground(colorBackSelectSwt);
+        if(iCellCol == ixColumn){
+          ////SwtWidgetHelper.setFocusOfTabSwt(cellSwt);
+          //cellSwt.setFocus();  
+        }
+      }
+    }
+    ///writeContentLast.addToGraphicThread(itsMng.gralDevice, 200);
+    long dbgtime4 = System.currentTimeMillis() - dbgtime;
+    System.out.print("\nSwtTable2-redraw1: " + dbgtime1 + " + " + dbgtime2 + " + " + dbgtime3 + " + " + dbgtime4);
+    dbgtime = System.currentTimeMillis();
+    dbgtime1 = System.currentTimeMillis() - dbgtime;
+    System.out.print(", redraw2: " + dbgtime1);
+    
+  }
+
+  
+
+  protected abstract void drawCellContent(int iCellLine, int iCellCol, TableItemWidget tableItem );
+
+  protected abstract CellData drawCellInvisible(int iCellLine, int iCellCol);
+
+  protected abstract int getVisibleLinesTableImpl();
+  
+  
   /**An instance of this class is assigned to any TableItem.
    * It supports the access to the TableItem (it is a table line) via the SWT-independent interface.
    * The instance knows its TableSwt and therefore the supports the access to the whole table.
@@ -268,13 +428,19 @@ public abstract class GralTable2 extends GralTable{
   protected class TableItemWidget extends SelectMask implements GralTableLine_ifc
   {
 
-    public AtomicInteger redraw = new AtomicInteger();
+    /**If a repaint is necessary, it is changed by increment by 1. If the redraw is executed
+     * and no other redraw is requested, it is set to 0. If another redraw is requested while the
+     * redraw runs but isn't finished, it should be executed a second time. Therefore it isn't reset to 0. 
+     */
+    public AtomicInteger ctRepaintLine = new AtomicInteger();  //NOTE should be public to see it from derived outer class
     
     int nLineNr;
     
     String key;
     
     public String[] cellTexts;
+    
+    GralColor colorForground, colorBackground;
     
     private Object userData;
     
@@ -320,19 +486,23 @@ public abstract class GralTable2 extends GralTable{
 
     @Override
     public GralColor setBackgroundColor(GralColor color) {
-      // TODO Auto-generated method stub
-      return null;
+      GralColor ret = colorBackground;
+      colorBackground = color;
+      repaint(50, 50);
+      return color;
     }
 
     @Override
     public GralColor setForegroundColor(GralColor color) {
-      // TODO Auto-generated method stub
-      return null;
+      GralColor ret = colorForground;
+      colorForground = color;
+      repaint(50, 50);
+      return color;
     }
 
     @Override
     public void repaint() {
-      redraw.addAndGet(1);
+      ctRepaintLine.addAndGet(1);
       GralTable2.this.repaint(); 
     }
 
@@ -366,6 +536,22 @@ public abstract class GralTable2 extends GralTable{
   }
   
 
+  /**Data for each Text widget.
+   * Note: The class is visible only in the graphic implementation layer, because it is protected.
+   * The elements need to set public because there are not visible elsewhere in the derived class
+   * of the outer class. 
+   */
+  protected class CellData{
+    public final int ixCellLine, ixCellColumn;
+    public TableItemWidget tableItem;
+    public GralColor colorBack, colorText;
+    public CellData(int ixCellLine, int ixCellColumn){
+      this.ixCellLine = ixCellLine; 
+      this.ixCellColumn = ixCellColumn;
+    }
+  }
+  
+  
 
   
   
