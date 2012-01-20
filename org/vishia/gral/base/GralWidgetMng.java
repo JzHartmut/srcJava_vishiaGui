@@ -29,7 +29,6 @@ import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.ifc.GralWidgetChangeRequ;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralInfoBox;
@@ -396,7 +395,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
     }
   }
   
-  @Override public String setInfoDelayed(GralWidgetChangeRequ changeRequ, int delay){
+  public String setInfoDelayed(GralWidgetChangeRequ changeRequ, int delay){
     if(delay == 0 && currThreadIsGraphic()){
       return setInfoDirect(changeRequ.widgetDescr, changeRequ.cmd, changeRequ.ident, changeRequ.visibleInfo, changeRequ.userData);
     } else {

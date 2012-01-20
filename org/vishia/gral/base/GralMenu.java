@@ -6,11 +6,12 @@ import org.vishia.gral.ifc.GralWidget;
 public abstract class GralMenu //extends GralWidget
 {
 
+  /**Only a marker interface
+   */
   public abstract class Item
   {
-  
+    static final int version = 0;
   }
-  
   
   
   

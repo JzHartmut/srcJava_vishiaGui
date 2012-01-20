@@ -2,9 +2,7 @@ package org.vishia.gral.ifc;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.area9.GralArea9_ifc;
-import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.msgDispatch.LogMessage;
 

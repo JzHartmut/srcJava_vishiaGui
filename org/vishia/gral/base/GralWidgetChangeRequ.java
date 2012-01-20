@@ -1,4 +1,6 @@
-package org.vishia.gral.ifc;
+package org.vishia.gral.base;
+
+import org.vishia.gral.ifc.GralWidget_ifc;
 
 public class GralWidgetChangeRequ
 {

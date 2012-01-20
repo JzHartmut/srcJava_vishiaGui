@@ -66,6 +66,8 @@ import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralLed;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralWidgetChangeRequ;
+import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
@@ -73,13 +75,13 @@ import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
+import org.vishia.gral.base.GralWindow_setifc;
 import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPos;
-import org.vishia.gral.ifc.GralWidgetChangeRequ;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralImageBase;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
@@ -88,7 +90,6 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
-import org.vishia.gral.ifc.GralWindow_setifc;
 import org.vishia.msgDispatch.LogMessage;
 
 
@@ -1238,7 +1239,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     String sError = null;
     try{
       SwtSetValue_ifc widgSet = null;
-      SwtWidgetSet_ifc gralWidget_setifc = null;
+      GralWidgetGthreadSet_ifc gralWidget_setifc = null;
       if(widget !=null && widget instanceof SwtSetValue_ifc){
         widgSet = (SwtSetValue_ifc)widget;
       } else if (oSwtWidget !=null && oSwtWidget instanceof SwtSetValue_ifc){
@@ -1256,8 +1257,8 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
           }
         }
         gralWidget_setifc = widgSet.getSwtWidget_ifc();
-      } else if(oSwtWidget !=null && oSwtWidget instanceof SwtWidgetSet_ifc){
-        gralWidget_setifc = (SwtWidgetSet_ifc)oSwtWidget;
+      } else if(oSwtWidget !=null && oSwtWidget instanceof GralWidgetGthreadSet_ifc){
+        gralWidget_setifc = (GralWidgetGthreadSet_ifc)oSwtWidget;
       }
       
       if(gralWidget_setifc !=null){

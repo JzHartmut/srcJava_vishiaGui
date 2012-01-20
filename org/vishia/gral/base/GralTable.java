@@ -351,7 +351,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   /**Redraws the whole table because the current line is changed or the focus is changed
    * or the content is changed and #re
    * TODO
-   * {@link SwtWidgetSet_ifc#redrawGthread()}
+   * {@link GralWidgetGthreadSet_ifc#redrawGthread()}
    */
   protected void redrawTableGthread(){
     long dbgtime = System.currentTimeMillis();

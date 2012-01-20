@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.vishia.gral.base.GralGraphicThread;
-
 
 
 /**This is a unique interface for the GUI-panel-manager to work with it.
@@ -116,7 +114,7 @@ public interface GralPanelMngWorking_ifc
   
   String setInfoDelayed(GralWidget_ifc widgd, int cmd, int ident, Object visibleInfo, Object userData, int delay);
   
-  String setInfoDelayed(GralWidgetChangeRequ changeRequ, int delay);
+  //String setInfoDelayed(GralWidgetChangeRequ changeRequ, int delay);
   
   /**Sets the color of background of the widget, if possible.
    * @param name The name of the widget, which was given by the add...()-Operation
@@ -269,7 +267,7 @@ public interface GralPanelMngWorking_ifc
   
   /**Returns true if the current thread is the graphical thread.
    * This routine is used internally firstly. The graphical thread is that thread, which dispatches
-   * all orders for the graphic, see {@link GralGraphicThread#run()}.
+   * all orders for the graphic, see {@link org.vishia.gral.base.GralGraphicThread#run()}.
    * @return true if this routine is called from the same thread as the graphical thread.
    */
   boolean currThreadIsGraphic();

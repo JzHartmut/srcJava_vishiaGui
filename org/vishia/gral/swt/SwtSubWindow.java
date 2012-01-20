@@ -21,13 +21,14 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
+import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.base.GralWindow_setifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.ifc.GralWindow_setifc;
 import org.vishia.util.KeyCode;
 
 //public class SubWindowSwt extends GralPanelContent implements WidgetCmpnifc
@@ -389,7 +390,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
 
   @Override public GralWindow_setifc getSwtWindow_ifc(){  return swtWindow_setifc; }
 
-  @Override public SwtWidgetSet_ifc getSwtWidget_ifc(){ return null; }
+  @Override public GralWidgetGthreadSet_ifc getSwtWidget_ifc(){ return null; }
 
   @Override public void repaintGthread() { swtWindow_setifc.repaintGthread(); }
   

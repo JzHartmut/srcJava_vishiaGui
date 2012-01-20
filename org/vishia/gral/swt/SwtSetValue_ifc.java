@@ -1,7 +1,8 @@
 package org.vishia.gral.swt;
 
+import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
+import org.vishia.gral.base.GralWindow_setifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
-import org.vishia.gral.ifc.GralWindow_setifc;
 
 /**This interface specifies the instance to have any set interfaces 
  * which's methods should be invoked only in the graphic thread.
@@ -13,5 +14,5 @@ public interface SwtSetValue_ifc
 {
   GralWindow_setifc getSwtWindow_ifc();
   
-  SwtWidgetSet_ifc getSwtWidget_ifc();
+  GralWidgetGthreadSet_ifc getSwtWidget_ifc();
 }

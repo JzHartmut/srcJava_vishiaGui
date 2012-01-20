@@ -1,4 +1,4 @@
-package org.vishia.gral.ifc;
+package org.vishia.gral.base;
 
 public interface GralWindow_setifc
 {

@@ -1,8 +1,8 @@
-package org.vishia.gral.swt;
+package org.vishia.gral.base;
 
 import org.vishia.gral.ifc.GralColor;
 
-public interface SwtWidgetSet_ifc {
+public interface GralWidgetGthreadSet_ifc {
   
   void clearGthread();
   

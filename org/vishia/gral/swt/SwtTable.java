@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
@@ -311,7 +312,7 @@ public class SwtTable  extends GralTable {
   };
 
 
-  private class Table extends Composite implements SwtWidgetSet_ifc {
+  private class Table extends Composite implements GralWidgetGthreadSet_ifc {
 
     public Table(Composite parent, int zColumns) {
       super(parent, 0);
@@ -363,7 +364,7 @@ public class SwtTable  extends GralTable {
     /**Redraws the whole table because the current line is changed or the focus is changed
      * or the content is changed and #re
      * TODO
-     * {@link SwtWidgetSet_ifc#redrawGthread()}
+     * {@link GralWidgetGthreadSet_ifc#redrawGthread()}
      */
     @Override public void redrawGthread(){ 
       redrawTableGthread(); 

@@ -140,7 +140,7 @@ public class SwtTextBox extends GralTextBox
       super(swtMng);
     }
 
-    protected @Override final boolean specialKeysOfWidgetType(int key, GralWidget widgg){ 
+    @Override protected final boolean specialKeysOfWidgetType(int key, GralWidget widgg){ 
       boolean bDone = true;
       if(KeyCode.isWritingOrTextNavigationKey(key)) return true;
       switch(key){

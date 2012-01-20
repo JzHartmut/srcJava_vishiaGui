@@ -14,7 +14,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 		- _subsystem = "";
 		- _class = "";
 		- _name = "GeneratedFromJava";
-		- _id = GUID 21638a1e-2540-4b77-a822-f73c5354c4b1;
+		- _id = GUID ed05c8c3-f5af-43f3-8d43-0cbebd207348;
 	}
 	- _component = { IHandle 
 		- _m2Class = "IComponent";
@@ -49,7 +49,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 		- value = 
 		{ ISubsystem 
 			- fileName = "GeneratedFromJava";
-			- _id = GUID 21638a1e-2540-4b77-a822-f73c5354c4b1;
+			- _id = GUID ed05c8c3-f5af-43f3-8d43-0cbebd207348;
 		}
 		{ ISubsystem 
 			- fileName = "Docu";

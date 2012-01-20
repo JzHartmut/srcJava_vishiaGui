@@ -26,7 +26,7 @@ import org.vishia.gral.base.GralPanelContent;
  * The organization of this actions are done in the implementation of the {@link org.vishia.gral.base.GralWidgetMng}
  * like {@link org.vishia.gral.swt.SwtWidgetMng}. This implementation adapts the basic graphic and knows theire methods
  * to set colors, values etc. The user need deal only with this widget class. The thread safe  capability is organized
- * with a ConcurrentLinkedQueue which contains requests of type {@link org.vishia.gral.GralWidgetChangeRequ}.
+ * with a ConcurrentLinkedQueue which contains requests of type {@link org.vishia.gral.base.GralWidgetChangeRequ}.
  * <br><br>
  * The widget may know any user data with its association oContentInfo, see {@link #getContentInfo()} and {@link #setContentInfo(Object)}.
  * Mostly there are classes to support getting of values, formatting etc. The type of this classes depends on the user's application.

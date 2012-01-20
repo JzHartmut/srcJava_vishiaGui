@@ -4,7 +4,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
-import org.vishia.gral.ifc.GralWidgetChangeRequ;
 import org.vishia.util.MinMaxTime;
 
 /**This class is the base for implementation of graphic threading. It is implemented for SWT and Swing yet.
