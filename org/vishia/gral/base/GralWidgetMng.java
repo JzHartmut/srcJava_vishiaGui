@@ -364,9 +364,9 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
    */
   @Override public String getValueFromWidget(GralWidget widgd)
   { String sValue = null;
-    if(widgd instanceof GralTable2){
+    if(widgd instanceof GralTable){
       StringBuilder u = new StringBuilder();
-      GralTableLine_ifc line = ((GralTable2)widgd).getCurrentLine();
+      GralTableLine_ifc line = ((GralTable)widgd).getCurrentLine();
       String[] texts = line.getCellTexts();
       for(int iCol = 0; iCol < texts.length; ++iCol){
         u.append(texts[iCol]).append('\t');

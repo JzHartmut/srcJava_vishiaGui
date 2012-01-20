@@ -12,8 +12,8 @@ import org.vishia.gral.base.GralPanelContent;
  * The ObjectModelDiagram may shown the relations:
  * <img src="../../../../img/Widget_gral.png"><br>
  * This class GralWidget knows the gral graphic widget via an {@link GralWidget_ifc}. It is a wrapper around the widget of the adaption layer.
- * In this figure a wrapper {@link org.vishia.gral.swt.SwtTable2} is shown which wraps 
- * a org.eclipse.swt.widgets.Table. The wrapper based on {@link org.vishia.gral.base.GralTable2} 
+ * In this figure a wrapper {@link org.vishia.gral.swt.SwtTable} is shown which wraps 
+ * a org.eclipse.swt.widgets.Table. The wrapper based on {@link org.vishia.gral.base.GralTable} 
  * and supports the interface {@link org.vishia.gral.ifc.GralTable_ifc}.
  * This interface allows to deal with the table procured by the wrapper. See the derived interfaces of {@link GralWidget_ifc}.  
  * The {@link GralWidget_ifc} allows some fundamental operations with any widget like {@link GralWidget_ifc#setFocus()}. 

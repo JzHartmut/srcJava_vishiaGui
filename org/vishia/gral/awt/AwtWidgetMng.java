@@ -21,8 +21,8 @@ import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
-import org.vishia.gral.base.GralTable2;
-import org.vishia.gral.base.GralTable2;
+import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidgetMng;
@@ -318,7 +318,7 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   }
 
   @Override
-  public GralTable2 addTable(String sName, int height, int[] columnWidths)
+  public GralTable addTable(String sName, int height, int[] columnWidths)
   {
     // TODO Auto-generated method stub
     return null;

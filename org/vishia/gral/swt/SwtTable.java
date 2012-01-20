@@ -15,8 +15,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
-import org.vishia.gral.base.GralTable2;
-import org.vishia.gral.base.GralTable2;
+import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralDispatchCallbackWorker;
@@ -26,14 +26,14 @@ import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
-public class SwtTable2  extends GralTable2 {
+public class SwtTable  extends GralTable {
 
   /**The widget manager is stored in the base class too, but here as SWT-type reference. */
   private final SwtWidgetMng mng;
   
   private Text[][] cellsSwt;
   
-  private final SwtTable2.Table table; 
+  private final SwtTable.Table table; 
   
   
   private final FocusListener focusListenerTable;
@@ -49,7 +49,7 @@ public class SwtTable2  extends GralTable2 {
 
   
   
-  public SwtTable2(SwtWidgetMng mng, String name, Composite parent,  int height
+  public SwtTable(SwtWidgetMng mng, String name, Composite parent,  int height
       , int[] columnWidths) //, int selectionColumn, CharSequence selectionText)
   { super(name, mng, columnWidths);
     this.mng = mng;
@@ -58,7 +58,7 @@ public class SwtTable2  extends GralTable2 {
     focusListenerCell = this.new FocusListenerCell(mng);
     setColorsSwt();    
     this.cellsSwt = new Text[zLineVisibleMax][zColumn];
-    this.table = new SwtTable2.Table(parent, zColumn);
+    this.table = new SwtTable.Table(parent, zColumn);
     table.addKeyListener(myKeyListener);
     //table.addSelectionListener(selectionListener);
     table.addControlListener(resizeListener);
@@ -88,14 +88,14 @@ public class SwtTable2  extends GralTable2 {
 
   
   
-  public static GralTable2 addTable(SwtWidgetMng mng, String sName, int height, int[] columnWidths
+  public static GralTable addTable(SwtWidgetMng mng, String sName, int height, int[] columnWidths
   //, int selectionColumn, CharSequence selectionText    
   ) {
     
     boolean TEST = false;
-    final SwtTable2 table;
+    final SwtTable table;
     Composite parent = (Composite)mng.pos.panel.getPanelImpl();
-    table = new SwtTable2(mng, sName, parent, height, columnWidths); //, selectionColumn, selectionText);
+    table = new SwtTable(mng, sName, parent, height, columnWidths); //, selectionColumn, selectionText);
     table.setDataPath(sName);
     table.setPanelMng(mng);
     table.table.setData(table);
@@ -229,7 +229,7 @@ public class SwtTable2  extends GralTable2 {
   
   
   /**This routine implements all things to set the content of any table cell to show it.
-   * @see org.vishia.gral.base.GralTable2#drawCellContent(int, int, org.vishia.gral.base.GralTable2.TableItemWidget)
+   * @see org.vishia.gral.base.GralTable#drawCellContent(int, int, org.vishia.gral.base.GralTable.TableItemWidget)
    */
   @Override protected void drawCellContent(int iCellLine, int iCellCol, TableItemWidget tableItem ){
     Text cellSwt = cellsSwt[iCellLine][iCellCol]; 
@@ -298,7 +298,7 @@ public class SwtTable2  extends GralTable2 {
             if(iCellCol == ixColumn){
               SwtWidgetHelper.setFocusOfTabSwt(cellSwt);
               //cellSwt.setFocus(); 
-              System.out.print("\nSwtTable2.writeContentLast: " + SwtTable2.this.name);
+              System.out.print("\nSwtTable2.writeContentLast: " + SwtTable.this.name);
             }
           }
         }
@@ -508,7 +508,7 @@ public class SwtTable2  extends GralTable2 {
     
     /**This routine is invoked whenever the focus of any Text field of the table will be lost
      * the focus. Before that occurs, the field is the selected line, because it has had the focus.
-     * Therefore the {@link GralTable2#colorBackSelectNonFocused} is set.
+     * Therefore the {@link GralTable#colorBackSelectNonFocused} is set.
      * 
      */
     @Override public void focusLost(FocusEvent ev){ 

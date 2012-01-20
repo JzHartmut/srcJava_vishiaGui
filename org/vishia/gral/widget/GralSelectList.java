@@ -3,9 +3,9 @@ package org.vishia.gral.widget;
 import java.util.List;
 import java.util.Map;
 
-import org.vishia.gral.base.GralTable2;
+import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidgetMng;
-import org.vishia.gral.base.GralTable2;
+import org.vishia.gral.base.GralTable;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
@@ -25,7 +25,7 @@ import org.vishia.util.SelectMask_ifc;
  * It may be possible to switch to a tree presentation (TODO). But this complex widget should occupy
  * only a simple rectangle of a GUI, not some windows etc. It may be less in spread too if necessary.
  * <br><br>
- * Note: this class should not be a derived class of {@link GralTable2}, because instances of derived classes
+ * Note: this class should not be a derived class of {@link GralTable}, because instances of derived classes
  * should be created as final compositions in the main thread before the table can be presented 
  * in the graphic thread. Therefore the aggregation {@link #wdgdTable} cannot be final. It is set 
  * only when {@link #setToPanel(GralGridBuild_ifc, String, int, int[], char)} is called.  
@@ -49,7 +49,7 @@ public abstract class GralSelectList implements Removeable //extends GralWidget
   
 
   /**The table which is showing in the widget. */
-  public GralTable2 wdgdTable;
+  public GralTable wdgdTable;
   
 
   /**The keys for left and right navigation. Default it is shift + left and right arrow key.

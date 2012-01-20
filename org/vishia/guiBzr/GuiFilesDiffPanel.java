@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.vishia.gral.base.GralTable2;
-import org.vishia.gral.base.GralTable2;
+import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralTable;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
@@ -37,7 +37,7 @@ public class GuiFilesDiffPanel
   final StringBuilder uRenameOut =  new StringBuilder();
   
   /**The table (list) which contains the selectable project paths. */
-  private GralTable2 widgdTableFilesCmpn;
+  private GralTable widgdTableFilesCmpn;
   
 
   private static final int columnMark = 2;

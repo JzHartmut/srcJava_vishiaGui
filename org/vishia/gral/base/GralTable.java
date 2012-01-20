@@ -21,7 +21,7 @@ import org.vishia.util.SelectMask;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralTable2 extends GralWidget implements GralTable_ifc {
+public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   /**Version and history
    * <ul>
@@ -133,7 +133,7 @@ public abstract class GralTable2 extends GralWidget implements GralTable_ifc {
   , colorTextSelect, colorTextMarked, colorTextTable;
   
 
-  public GralTable2(String name, GralWidgetMng mng, int[] columnWidths) {
+  public GralTable(String name, GralWidgetMng mng, int[] columnWidths) {
     super(name, 'L', mng);
     this.columnWidthsGral = columnWidths;
     this.zColumn = columnWidths.length;
@@ -543,7 +543,7 @@ public abstract class GralTable2 extends GralWidget implements GralTable_ifc {
     public String setCellText(String text, int column) {
       String oldText = cellTexts[column];
       cellTexts[column] = text;
-      GralTable2.this.repaint(100, 0);
+      GralTable.this.repaint(100, 0);
       return oldText;
     }
 
@@ -585,7 +585,7 @@ public abstract class GralTable2 extends GralWidget implements GralTable_ifc {
     @Override
     public void repaint() {
       ctRepaintLine.addAndGet(1);
-      GralTable2.this.repaint(); 
+      GralTable.this.repaint(); 
     }
 
     @Override public void repaint(int delay, int latest){

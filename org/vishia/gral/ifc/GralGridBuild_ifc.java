@@ -11,13 +11,13 @@ import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralMenu;
-import org.vishia.gral.base.GralTable2;
+import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
-import org.vishia.gral.base.GralTable2;
+import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.cfg.GralCfgBuilder;
@@ -337,7 +337,7 @@ public interface GralGridBuild_ifc
    *        adequate to the possibilities of the used graphic base system. 
    * @return
    */
-  GralTable2 addTable(String sName, int height, int[] columnWidths);
+  GralTable addTable(String sName, int height, int[] columnWidths);
 
 
   /**Adds a text to the current panel at given position with standard colors, left origin.

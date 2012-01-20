@@ -10,8 +10,8 @@ import org.vishia.cmd.CmdStore;
 import org.vishia.cmd.PrepareCmd;
 import org.vishia.cmd.CmdStore.CmdBlock;
 import org.vishia.gral.base.GralMenu;
-import org.vishia.gral.base.GralTable2;
-import org.vishia.gral.base.GralTable2;
+import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralTableLine_ifc;
@@ -48,7 +48,7 @@ public class FcmdExecuter
   
   GralWindow_ifc windConfirmExec;
 
-  GralTable2 widgSelectExec;
+  GralTable widgSelectExec;
 
   /**Store of all possible commands given in the command file. */
   final CmdStore cmdStore = new CmdStore();
