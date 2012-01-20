@@ -10,7 +10,7 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.widget.FileSelector;
+import org.vishia.gral.widget.GralFileSelector;
 
 import org.vishia.util.FileCompare;
 import org.vishia.util.FileRemote;
@@ -23,7 +23,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class FcmdFileCard extends FileSelector
+public class FcmdFileCard extends GralFileSelector
 {
   /**Table widget for the select table of the file tab.*/
   FcmdFavorCard favorCard;

@@ -41,6 +41,7 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
    * </ul>
    * 
    */
+  @SuppressWarnings("hiding")
   public static final int version = 0x20111127;
   
   /**Property defines that the window is opened exclusive for the application. 

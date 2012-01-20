@@ -8,7 +8,7 @@ import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 
-public class SwitchExclusiveButtonMng implements VariableAccess_ifc
+public class GralSwitchExclusiveButtonMng implements VariableAccess_ifc
 {
   
   //final GuiPanelMngWorkingIfc mng;
@@ -30,7 +30,7 @@ public class SwitchExclusiveButtonMng implements VariableAccess_ifc
   }
   
   
-  public SwitchExclusiveButtonMng() //GuiPanelMngWorkingIfc mng)
+  public GralSwitchExclusiveButtonMng() //GuiPanelMngWorkingIfc mng)
   { //this.mng = mng;
   }
   

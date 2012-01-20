@@ -43,6 +43,7 @@ public abstract class GralTabbedPanel extends GralPanelContent /*extends GralWid
    * <li>2010-05-00 Hartmut created   
    * </ul>
    */
+  @SuppressWarnings("hiding")
   public static final int version = 0x20111001;
   
 	final protected GralPanelActivated_ifc notifyingUserInstanceWhileSelectingTab;

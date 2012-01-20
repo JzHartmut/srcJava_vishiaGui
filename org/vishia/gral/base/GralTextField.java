@@ -18,6 +18,7 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
    * <li>2011-09-00 Hartmut Creation to build a platform-indenpenden representation of text field. 
    * </ul>
    */
+  @SuppressWarnings("hiding")
   public final static int version = 0x20111118;
   
   protected final GralGraphicThread windowMng;

@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
-import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralTable2;
 import org.vishia.gral.base.GralTable2;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
@@ -88,7 +88,7 @@ public class SwtTable2  extends GralTable2 {
 
   
   
-  public static GralTable addTable(SwtWidgetMng mng, String sName, int height, int[] columnWidths
+  public static GralTable2 addTable(SwtWidgetMng mng, String sName, int height, int[] columnWidths
   //, int selectionColumn, CharSequence selectionText    
   ) {
     
@@ -228,6 +228,9 @@ public class SwtTable2  extends GralTable2 {
   }  
   
   
+  /**This routine implements all things to set the content of any table cell to show it.
+   * @see org.vishia.gral.base.GralTable2#drawCellContent(int, int, org.vishia.gral.base.GralTable2.TableItemWidget)
+   */
   @Override protected void drawCellContent(int iCellLine, int iCellCol, TableItemWidget tableItem ){
     Text cellSwt = cellsSwt[iCellLine][iCellCol]; 
     CellData data = (CellData)cellSwt.getData();
@@ -237,18 +240,11 @@ public class SwtTable2  extends GralTable2 {
     if(text == null){ text = ""; }
     //
     cellSwt.setText(text);
-    /*
-    if(ixGlineSelected == iCellLine && ixGlineSelectedNew != iCellLine){
-      cellSwt.setBackground(colorBackTableSwt);
-    } else if(ixGlineSelectedNew == iCellLine){
-      if(ixGlineSelectedNew != ixGlineSelected) {
-        cellSwt.setBackground(colorBackTableSwt);
-      }
-    }
-    */
     GralColor colorBack;
     if(ixGlineSelectedNew == iCellLine){
       colorBack = colorBackSelect;
+    } else if(tableItem.colorBackground !=null){
+      colorBack = tableItem.colorBackground;
     } else {
       colorBack = colorBackTable;
     }
@@ -256,6 +252,10 @@ public class SwtTable2  extends GralTable2 {
       Color colorSwt =  mng.getColorImpl(colorBack);
       cellSwt.setBackground(colorSwt);
       data.colorBack = colorBack;
+    }
+    if(tableItem.colorForground !=null && data.colorText != tableItem.colorForground){
+      cellSwt.setForeground(mng.getColorImpl(tableItem.colorForground));
+      data.colorText = tableItem.colorForground;
     }
     if(ixGlineSelectedNew == iCellLine && iCellCol == ixColumn){
       SwtWidgetHelper.setFocusOfTabSwt(cellSwt);
@@ -439,68 +439,9 @@ public class SwtTable2  extends GralTable2 {
     public void keyPressed(KeyEvent keyEv)
     {
       try{
-        final GralWidget widgetDescr;
-        final GralUserAction action;
-        //System.out.println("" + keyEv.character + Integer.toHexString(keyEv.keyCode));
-        
-        final Object source = keyEv.getSource();
-        final Control swtControl;
-        if(source instanceof Control){
-          swtControl = ((Control)source);
-          Object oData = swtControl.getData();
-          if(oData instanceof GralWidget){
-            widgetDescr = (GralWidget)oData;
-            action = widgetDescr.getActionChange();
-          } else { widgetDescr = null; action = null; }
-        } else { 
-          widgetDescr = null; action = null;
-          swtControl = null;
-        }
-        boolean actionDone = false;
         if((keyEv.keyCode & 0xffff) !=0){
           final int keyCode = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
-          actionDone = processKeys(keyCode);
-          int ixRow = -99999;
-          Table table1 = (Table)source;
-          ixRow  = 1; //table1.getSelectionIndex();   //the currently selected line.
-          if(ixRow >=0){  //< 0 if nothing is selected.
-            /*
-            TableItem tableLineSwt = table1.getItem(ixRow);   // the SWT TableItem which presents the line.
-            //The SWT-TableItem contains data, which implements the gral TableLineGui_ifc to get data from the line.
-            //firstly: Build the instance and associate to the TableItem.
-            //later: Re-Use the instance.
-            GralTableLine_ifc lineGral = (GralTableLine_ifc)tableLineSwt.getData();
-            if(lineGral == null){
-              lineGral = new TableItemWidget(tableLineSwt, null);
-              tableLineSwt.setData(lineGral);  //Set the data for usage later.
-            }
-            if(!procStandardKeys(keyCode, lineGral, ixRow)){
-              if(action !=null){ 
-                actionDone = action.userActionGui(keyCode, widgetDescr, lineGral);
-              }
-            }
-            */
-          } //if(table.)
-          if(action !=null && !actionDone){
-            GralUserAction mainKeyAction = mng.getRegisteredUserAction("KeyAction");
-            if(mainKeyAction !=null){
-              int gralKey = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
-              //old form called because compatibility, if new for with int-parameter returns false.
-              if(!mainKeyAction.userActionGui(gralKey, widgetDescr)){
-                mainKeyAction.userActionGui("key", widgetDescr, new Integer(gralKey));
-              }
-            }
-          }
-        }
-        if(basicListener !=null){
-          basicListener.keyPressed(keyEv);
-        }
-        if(swtControl !=null){
-          Control parent = swtControl.getParent();
-          if(parent !=null){
-            //KeyListener parentListener = parent.getListener(SWT.KEY_MASK);
-            //parent.
-          }
+          processKeys(keyCode);
         }
       } catch(Exception exc){
         mng.log.sendMsg(0, "Exception in SwtTable-KeyEvent; %s", exc.getLocalizedMessage());

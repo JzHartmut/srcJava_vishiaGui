@@ -10,7 +10,7 @@ import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.gral.widget.FileSelector;
+import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 

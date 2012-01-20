@@ -17,6 +17,7 @@ public abstract class GralTextBox extends GralTextField implements Appendable, G
    *   are defined here to implement in the graphic layer. The set- and apppend methods are <b>threadsafe</b> now.
    * </ul>
    */
+  @SuppressWarnings("hiding")
   public final static int version = 0x20120106;
   
   /**Buffer for new text which is set or appended in another thread than the graphic thread.

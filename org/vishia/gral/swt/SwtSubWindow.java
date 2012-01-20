@@ -27,8 +27,6 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.ifc.GralWidget_ifc;
-import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralWindow_setifc;
 import org.vishia.util.KeyCode;
 
@@ -63,6 +61,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
    * <li>2011-09-03 Hartmut creation as wrapper arround a SWT.Shell inherits {@link org.vishia.gral.base.GralPanelContent}.
    * </ul>
    */
+  @SuppressWarnings("hiding")
   public static final int version = 0x20111127;
   
   protected Shell window;

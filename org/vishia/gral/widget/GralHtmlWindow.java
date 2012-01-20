@@ -4,7 +4,7 @@ import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWindow;
 
-public class HtmlWindow
+public class GralHtmlWindow
 {
   /**The window is created invoking the {@link GralGridBuild_ifc#createWindow(String, boolean)}. 
    * It has its implementation in the underlying graphic system.  */
@@ -16,7 +16,7 @@ public class HtmlWindow
   
   private final GralHtmlBox htmlBox;
 
-  public HtmlWindow(GralWindow window, GralHtmlBox htmlBox)
+  public GralHtmlWindow(GralWindow window, GralHtmlBox htmlBox)
   {
     this.window = window;
     this.textBox = null;

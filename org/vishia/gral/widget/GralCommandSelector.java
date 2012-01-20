@@ -29,7 +29,7 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
  * @author Hartmut Schorrig
  *
  */
-public class CommandSelector extends SelectList
+public class GralCommandSelector extends GralSelectList
 {
 
   /**Store of all possible commands given in the command file. 
@@ -51,7 +51,7 @@ public class CommandSelector extends SelectList
   protected CmdStore.CmdBlock selectedCmd;
   
   
-  public CommandSelector(String name, CmdQueue cmdQueue, GralWidgetMng mng)
+  public GralCommandSelector(String name, CmdQueue cmdQueue, GralWidgetMng mng)
   { super();
     this.cmdStore = new CmdStore();
     this.cmdQueue = cmdQueue;
@@ -112,7 +112,7 @@ public class CommandSelector extends SelectList
    * @param userData It is the {@link GralTableLine_ifc#getUserData()}, which is the 
    *   {@link CmdStore.CmdBlock}-instance which is assigned with the line. The method casts without check.
    * @param line isn't used here. It can be null in direct invocations.  
-   * @see org.vishia.gral.widget.SelectList#actionOk(java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
+   * @see org.vishia.gral.widget.GralSelectList#actionOk(java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
    */
   @Override protected boolean actionOk(Object userData, GralTableLine_ifc line)
   {

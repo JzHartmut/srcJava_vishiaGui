@@ -1,6 +1,6 @@
 package org.vishia.gral.ifc;
 
-import org.vishia.gral.widget.FileSelector;
+import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.util.KeyCode;
 
 
@@ -47,7 +47,7 @@ public abstract class GralUserAction
    * <li>"sliderValue": A slider is changed: params contains a Integer value between 0 and 99.
    * <li>ActionMouseButton: "Button-down", "Button-up", "Button-click" 
    * <li>ActionFocused: "Focus-get", "Focus-release"
-   * <li>"FileSelector-file": from {@link FileSelector} if a file is entered.
+   * <li>"FileSelector-file": from {@link GralFileSelector} if a file is entered.
    * </ul>
    * @param sIntension A short string describes the intension of call, means which action is done. 
    *        This String is generated from the calling routine.

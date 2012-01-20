@@ -10,12 +10,13 @@ import org.vishia.commander.target.FcmdtTarget_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.gral.widget.FileSelector;
+import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
 import org.vishia.util.FileRemote;
@@ -182,10 +183,26 @@ public class FcmdCopyCmd
   
   
   /**Action for any button of the confirm-copy window.
-   * After the window was opened
-   * 
+   * in a loop FileRemote.copyTo(dst) is called for any selected file. It may be one file, 
+   * or more files in more selected lines.
+   * The copy process itself is executed in an own thread in management of the FileRemote implementation,
+   * see {@link org.vishia.util.FileRemoteAccessorLocalFile#addCommission(org.vishia.util.FileRemoteAccessor.Commission)}
+   * for local files. The copy process can be executed in an remote device without copying of data
+   * between this device (PC) and the remote device, if the commission is organized in the remote device itself.
+   * <br><br>
+   * To notify for success or progression of the copy process some events are used.
+   * See the {@link #success} {@link EventConsumer} in this class. The event instance is given to the 
+   * {@link FileRemote#copyTo(FileRemote, Event)} invocation. It is used to callback either from the thread
+   * which copies local or from the thread which receives the copy response telegrams for remote communication.
+   * <br><br>
+   * All Events which are created are stored in the {@link #listEvCopy}. If the callback occurs, the event 
+   * will be removed from the list. The list is only used to check whether the copy action is succeeded 
+   * respectively to check whether all copy actions are succeeded. If a copy success callback is not received, 
+   * for example because a remote device hangs or the communication fails, the copy process hasn't no
+   * progression. The operator on this machine sees this situation because the progression bar stands.
+   * The operator can abort the copy process to preset to a default empty state.  
    */
-  GralUserAction actionButtonCopy = new GralUserAction()
+  protected GralUserAction actionButtonCopy = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
     { if(key == KeyCode.mouse1Up){
         if(widgg.sCmd.equals("check")){
@@ -197,6 +214,8 @@ public class FcmdCopyCmd
         }
         if(widgg.sCmd.equals("copy")){
           sDstName = widgCopyNameDst.getText();
+          //
+          //loop calls FileRemote.copyTo(dst) for any selected file. 
           for(FileRemote fileSrc : filesToCopy){
             int posWildcard = sDstName.indexOf('*');
             final String nameDst1;
@@ -211,6 +230,7 @@ public class FcmdCopyCmd
             if(fileSrc.sameDevice(fileDst)){
               Event callback = new Event(fileSrc, success);
               listEvCopy.add(callback);
+              //The copy:
               fileSrc.copyTo(fileDst, callback);  //callback.use() will be called on response
             } else {
               //TODO.
@@ -266,8 +286,8 @@ public class FcmdCopyCmd
           eventCheckOk(ev);
         } break;
         case FileRemoteAccessor.kOperation: {
-          int percent = ev.data1;
-          widgProgressFile.setValue(percent, 0, null, null);
+          int percent = ev.data2;
+          widgProgressFile.setValue(GralPanelMngWorking_ifc.cmdSet, percent/10, null, null);
         }break;
         case FileRemoteAccessor.kFinishError: {
           widgCopyState.setText("error");

@@ -21,8 +21,8 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.gral.widget.FileSelector;
-import org.vishia.gral.widget.SelectList;
+import org.vishia.gral.widget.GralFileSelector;
+import org.vishia.gral.widget.GralSelectList;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.FileRemote;
 import org.vishia.util.FileWriter;
@@ -467,14 +467,14 @@ class FcmdFavorPathSelector
    * <li>The last focused file tab is searched. The last focused widgets are stored
    * in a List and are returned from {@link GralWidgetMng#getWidgetsInFocus()} if the widget implementation
    * has the necessary focus action. Most of widgets have it, especially the File tables.
-   * The instance of {@link FileSelector} is stored in the {@link GralWidget#getContentInfo()} .
+   * The instance of {@link GralFileSelector} is stored in the {@link GralWidget#getContentInfo()} .
    * The {@link #getLastFileTab()} method gets it.
    * <li>
    * </ul>
    */
   GralUserAction actionSetDirOrigin = new GralUserAction(){
     @Override public boolean userActionGui(String sIntension, GralWidget widgd, Object... params)
-    { FileSelector lastTab = getLastFileTab();
+    { GralFileSelector lastTab = getLastFileTab();
       if(lastTab !=null){
         lastTab.fillInOriginDir();
       } else {

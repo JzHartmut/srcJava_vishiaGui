@@ -3,12 +3,16 @@ package org.vishia.gral.base;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
+import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 import org.vishia.util.SelectMask;
@@ -17,7 +21,7 @@ import org.vishia.util.SelectMask;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralTable2 extends GralTable{
+public abstract class GralTable2 extends GralWidget implements GralTable_ifc {
 
   /**Version and history
    * <ul>
@@ -29,10 +33,34 @@ public abstract class GralTable2 extends GralTable{
    *   is not able to change. Other reason: Implementation of table in SWT, AWT, Swing is different.
    *   It seems better to have one table concept with independent features, which based on simple widgets.
    *   is not  
+   * <li>2011-12-30 Hartmut chg {@link #procStandardKeys(int, GralTableLine_ifc, int)} returns true if standard keys are used. 
+   * <li>2011-11-27 Hartmut new {@link #setActionOnLineSelected(GralUserAction)}: The user action is called
+   *   anytime if a line is selected by user operation. It can be show any associated content anywhere
+   *   additionally. It is used for example in "The.file.Commander" to show date, time and maybe content 
+   *   while the user selects any files. The graphical implementation should be call {@link #actionOnLineSelected(GralTableLine_ifc)}
+   *   in its Selection listener. 
+   * <li>2011-11-20 Hartmut new The capability of selection of lines is moved from the 
+   *   {@link org.vishia.gral.widget.GralSelectList} to this class. It means any table has the capability
+   *   of selection of multiple lines. This capability is supported with a extension of the
+   *   {@link GralTableLine_ifc} with {@link org.vishia.util.SelectMask_ifc}. The selection of a line
+   *   is notificated in the users data which are associated with the table line, not in the graphic
+   *   representation of the table. This is differenced to SWT Table implementation. The capability
+   *   of selection in an SWT table isn't used. The selection is done by default with shift-key up/down
+   *   or with mouse selection ctrl-click, shift-click like usual.
+   *   The selection is not missed if the up/down keys are pressed furthermore. More as that,
+   *   more as one ranges of lines can be selected. That is a better capability than in SWT.
    * </ul>
    */
+  @SuppressWarnings("hiding")
   public final static int version = 0x20120113;
 
+  
+  protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
+  
+  
+  protected final Map<String, GralTableLine_ifc> idxLine = new TreeMap<String, GralTableLine_ifc>();
+  
+  GralUserAction actionOnLineSelected;
   
   /**Width of each column in GralUnits. */
   protected int[] columnWidthsGral;
@@ -106,7 +134,7 @@ public abstract class GralTable2 extends GralTable{
   
 
   public GralTable2(String name, GralWidgetMng mng, int[] columnWidths) {
-    super(name, mng);
+    super(name, 'L', mng);
     this.columnWidthsGral = columnWidths;
     this.zColumn = columnWidths.length;
     this.colorBack = new GralColor[zLineVisibleMax];
@@ -127,6 +155,24 @@ public abstract class GralTable2 extends GralTable{
     setColors();
   }
 
+  /**Sets an action which is called any time when another line is selected.
+   * @param actionOnLineSelected The action, null to switch off this functionality.
+   */
+  public void setActionOnLineSelected(GralUserAction actionOnLineSelected){
+    this.actionOnLineSelected = actionOnLineSelected;
+  }
+  
+  
+  @Override public boolean setCurrentLine(String key){
+    GralTableLine_ifc line = idxLine.get(key);
+    if(line == null) return false;
+    else {
+      int nLine = line.getLineNr();
+      return setCurrentCell(nLine, -1);
+    }
+  }
+  
+  
   
   public void setColors(){
     colorBackSelect = GralColor.getColor("gn");
@@ -264,12 +310,26 @@ public abstract class GralTable2 extends GralTable{
         done = false;
       }//switch
     }
+    if(done == false && keyCode == keyMarkDn && ixLine >=0){
+      GralTableLine_ifc line = tableLines.get(ixLine);
+      if((line.getSelection() & 1)!=0){
+        //it is selected yet
+        line.setForegroundColor(GralColor.getColor("bk"));
+        line.setDeselect(1);
+      } else {
+        line.setForegroundColor(GralColor.getColor("rd"));
+        line.setSelect(1);
+      }
+      if(ixLine < zLine -1){
+        ixLineNew = ixLine + 1;
+      }
+      repaint();
+      done = true;
+    }
     if(!done && ixLine >=0){
       GralTableLine_ifc lineGral = tableLines.get(ixLine);
-      if(!procStandardKeys(keyCode, lineGral, ixLine)){
-        if(actionChanging !=null){ 
-          done = actionChanging.userActionGui(keyCode, this, lineGral);
-        }
+      if(actionChanging !=null){ 
+        done = actionChanging.userActionGui(keyCode, this, lineGral);
       }
     } //if(table.)
     if(!done){
@@ -420,6 +480,28 @@ public abstract class GralTable2 extends GralTable{
   protected abstract int getVisibleLinesTableImpl();
   
   
+  
+  /**It is called whenever another line is selected, if the focus is gotten by mouse click
+   * or a navigation key is pressed. 
+   * This method calls the {@link GralUserAction#userActionGui(int, GralWidget, Object...)}.
+   * The {@link #setActionOnLineSelected(GralUserAction)} can be set with any user instantiation
+   * of that interface. The params[0] of that routine are filled with the {@link GralTableLine_ifc}
+   * of the selected line.
+   *  
+   * @param line
+   */
+  protected void actionOnLineSelected(GralTableLine_ifc line){
+    if(actionOnLineSelected !=null){
+      actionOnLineSelected.userActionGui(KeyCode.tableLineSelect, this, line);
+    }
+  }
+  
+  
+  
+  
+  
+
+  
   /**An instance of this class is assigned to any TableItem.
    * It supports the access to the TableItem (it is a table line) via the SWT-independent interface.
    * The instance knows its TableSwt and therefore the supports the access to the whole table.
@@ -440,7 +522,7 @@ public abstract class GralTable2 extends GralTable{
     
     public String[] cellTexts;
     
-    GralColor colorForground, colorBackground;
+    public GralColor colorForground, colorBackground;
     
     private Object userData;
     
@@ -541,7 +623,7 @@ public abstract class GralTable2 extends GralTable{
    * The elements need to set public because there are not visible elsewhere in the derived class
    * of the outer class. 
    */
-  protected class CellData{
+  protected static class CellData{
     public final int ixCellLine, ixCellColumn;
     public TableItemWidget tableItem;
     public GralColor colorBack, colorText;

@@ -22,6 +22,7 @@ public class SwtKeyListener extends GralKeyListener
    * </ul>
    * 
    */
+  @SuppressWarnings("hiding")
   public final static int version = 0x20111203;
   
   final SwtWidgetMng swtMng;

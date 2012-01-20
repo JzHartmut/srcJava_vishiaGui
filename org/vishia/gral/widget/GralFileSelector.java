@@ -27,7 +27,7 @@ import org.vishia.util.Removeable;
  * @author Hartmut Schorrig
  *
  */
-public class FileSelector implements Removeable //extends GralWidget
+public class GralFileSelector implements Removeable //extends GralWidget
 {
   
   
@@ -85,11 +85,11 @@ public class FileSelector implements Removeable //extends GralWidget
   
   /**Implementation of the base widget.
    */
-  protected class FileSelectList extends SelectList
+  protected class FileSelectList extends GralSelectList
   {
-    final FileSelector outer;
+    final GralFileSelector outer;
     
-    FileSelectList(FileSelector outer){
+    FileSelectList(GralFileSelector outer){
       //super(name, mng);
       this.outer = outer;
     }
@@ -131,12 +131,12 @@ public class FileSelector implements Removeable //extends GralWidget
     
     
     /**The 'action left' for the FileSelector shows the parent directory.
-     * The {@link FileSelector#currentDir} is used to get its parent to show.
+     * The {@link GralFileSelector#currentDir} is used to get its parent to show.
      * @param line the current line. It is unused because userData contains the file.
      * @param userData The {@link GralTableLine_ifc#getUserData()} from line. it is a {@link FileRemote}
      *   which is currently selected. This file is stored as current for the current directory. 
      *   The parent of the file is the directory which is shown yet.
-     * @see org.vishia.gral.widget.SelectList#actionLeft(java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
+     * @see org.vishia.gral.widget.GralSelectList#actionLeft(java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
      */
     @Override public void actionLeft(Object userData, GralTableLine_ifc line)
     {
@@ -232,7 +232,7 @@ public class FileSelector implements Removeable //extends GralWidget
   
   GralUserAction actionSetFileAttribs;
   
-  public FileSelector()
+  public GralFileSelector()
   {
     selectList = new FileSelectList(this);
     //this.mainCmd = mainCmd;

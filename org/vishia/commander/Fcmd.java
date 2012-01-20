@@ -24,8 +24,8 @@ import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.widget.CommandSelector;
-import org.vishia.gral.widget.FileSelector;
+import org.vishia.gral.widget.GralCommandSelector;
+import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.util.FileRemote;
 import org.vishia.util.FileRemoteAccessorLocalFile;
 import org.vishia.util.KeyCode;
@@ -72,7 +72,7 @@ public class Fcmd extends GuiCfg
 
   final FcmdExecuter executer = new FcmdExecuter(mainCmd, this);
 
-  final CommandSelector cmdSelector = new CommandSelector("cmdSelector", cmdQueue, gralMng);
+  final GralCommandSelector cmdSelector = new GralCommandSelector("cmdSelector", cmdQueue, gralMng);
 
   final FcmdIdents idents = new FcmdIdents();
   
@@ -108,9 +108,9 @@ public class Fcmd extends GuiCfg
   /**
    * @deprecated
    */
-  FileSelector[] lastFocusedFileTables = new FileSelector[3];
+  GralFileSelector[] lastFocusedFileTables = new GralFileSelector[3];
   
-  final Map<String, FileSelector> idxFileSelector = new TreeMap<String, FileSelector>();
+  final Map<String, GralFileSelector> idxFileSelector = new TreeMap<String, GralFileSelector>();
   // { new TreeMap<String, FileSelector>(), new TreeMap<String, FileSelector>(),
   // new TreeMap<String, FileSelector>()};
 
@@ -365,7 +365,7 @@ public class Fcmd extends GuiCfg
   { findLastFocusedFileTables();
     FileRemote file[] = new FileRemote[3];
     int ixFile = -1;
-    for(FileSelector fileTable: lastFocusedFileTables){
+    for(GralFileSelector fileTable: lastFocusedFileTables){
       if(fileTable !=null){
         FileRemote fileItem = fileTable.getSelectedFile();
         if(fileItem !=null){
@@ -389,7 +389,7 @@ public class Fcmd extends GuiCfg
       Iterator<GralWidget> iterFocus = widgdFocus.iterator();
       while (ixFile < lastFocusedFileTables.length && iterFocus.hasNext()) {
         GralWidget widgd = iterFocus.next();
-        FileSelector fileSel = idxFileSelector.get(widgd.name);
+        GralFileSelector fileSel = idxFileSelector.get(widgd.name);
         if (fileSel != null) { // is a FileSelector focused yet?
           // if(widgd.name.startsWith("file")){
           // int ixFilePanel = widgd.name.charAt(4) - '0';
@@ -412,7 +412,7 @@ public class Fcmd extends GuiCfg
   private List<String> getSelectedFilesInLastPanel()
   {
     List<GralWidget> widgdFocus = gralMng.getWidgetsInFocus();
-    FileSelector fileSel = null;
+    GralFileSelector fileSel = null;
     synchronized (widgdFocus) {
       Iterator<GralWidget> iterFocus = widgdFocus.iterator();
       while (fileSel == null && iterFocus.hasNext()) {

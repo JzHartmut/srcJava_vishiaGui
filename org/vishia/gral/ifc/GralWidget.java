@@ -12,8 +12,8 @@ import org.vishia.gral.base.GralPanelContent;
  * The ObjectModelDiagram may shown the relations:
  * <img src="../../../../img/Widget_gral.png"><br>
  * This class GralWidget knows the gral graphic widget via an {@link GralWidget_ifc}. It is a wrapper around the widget of the adaption layer.
- * In this figure a wrapper {@link org.vishia.gral.swt.SwtTable} is shown which wraps 
- * a org.eclipse.swt.widgets.Table. The wrapper based on {@link org.vishia.gral.base.GralTable} 
+ * In this figure a wrapper {@link org.vishia.gral.swt.SwtTable2} is shown which wraps 
+ * a org.eclipse.swt.widgets.Table. The wrapper based on {@link org.vishia.gral.base.GralTable2} 
  * and supports the interface {@link org.vishia.gral.ifc.GralTable_ifc}.
  * This interface allows to deal with the table procured by the wrapper. See the derived interfaces of {@link GralWidget_ifc}.  
  * The {@link GralWidget_ifc} allows some fundamental operations with any widget like {@link GralWidget_ifc#setFocus()}. 
@@ -68,7 +68,7 @@ public abstract class GralWidget implements GralWidget_ifc
    * <li>2011-08-14 Hartmut chg: {@link #widget} is now type of {@link GralWidget_ifc} and not Object.
    *    Generally it is the reference to the implementing code of the widget. The implementing code 
    *    may based on a graphic base widget (SWT: Control) and implements the {@link GralWidget_ifc}, 
-   *    or it references the graphic base widget instance. The class {@link WidgetSimpleWrapperSwt} 
+   *    or it references the graphic base widget instance. The class {@link SwtWidgetSimpleWrapper} 
    *    is able to wrap simple graphical base widget instances.
    * <li>2011-08-13 Hartmut new: WidgetDescriptor now contains the position of the widget. 
    *     It is used for resizing of large widgets.

@@ -7,13 +7,13 @@ import java.util.TreeMap;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.widget.SelectList;
+import org.vishia.gral.widget.GralSelectList;
 import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
 /**This is one table of favorite pathes in the file commander.  
  */
-public class FcmdFavorCard  extends SelectList
+public class FcmdFavorCard  extends GralSelectList
 {
   /**The component */
   final Fcmd main;
@@ -158,7 +158,7 @@ public class FcmdFavorCard  extends SelectList
    * <ul>
    * <li>sh-F1 .. shF3: activates fileSelector for left, middle and right panel.
    * </ul>
-   * @see org.vishia.gral.widget.SelectList#actionUserKey(int, java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
+   * @see org.vishia.gral.widget.GralSelectList#actionUserKey(int, java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
    */
   @Override protected boolean actionUserKey(int key, Object userData,
       GralTableLine_ifc line)

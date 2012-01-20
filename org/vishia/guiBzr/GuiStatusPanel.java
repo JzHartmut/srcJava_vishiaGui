@@ -10,7 +10,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralTableLine_ifc;
-import org.vishia.gral.widget.SwitchExclusiveButtonMng;
+import org.vishia.gral.widget.GralSwitchExclusiveButtonMng;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
@@ -65,7 +65,7 @@ public class GuiStatusPanel
    * GUI-concept: This is an alternative to TODO
    * 
    */
-  private SwitchExclusiveButtonMng switchExcluder;
+  private GralSwitchExclusiveButtonMng switchExcluder;
   
   /**Save the switchButtons to remove it when the widget is removed. */ 
   private GralWidget[] switchButtons;
@@ -151,7 +151,7 @@ public class GuiStatusPanel
     mainData.getterStatus.getBzrLocations(FileSystem.absolutePath(sProjectPath, null));
     //
     cleanComponentsInfoSelectBoxes();
-    switchExcluder = new SwitchExclusiveButtonMng();
+    switchExcluder = new GralSwitchExclusiveButtonMng();
     switchButtons = new GralWidget[mainData.currPrj.data.length];
     //
     //Only one of the switch buttons are checked. If another button is pressed, it should be deselect.

@@ -8,6 +8,7 @@ public abstract class GralLed extends GralWidget
   * <li>2011-12-03 new Baseclass for LED visualization.
   *   It is the concept of specialized {@link GralWidget}.
   */
+  @SuppressWarnings("hiding")
   static final public int version = 0x20111203;
   
   protected GralLed(String name, GralWidgetMng mng)

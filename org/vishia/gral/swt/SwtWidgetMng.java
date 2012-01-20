@@ -65,12 +65,12 @@ import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralLed;
 import org.vishia.gral.base.GralMenu;
+import org.vishia.gral.base.GralTable2;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
-import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.cfg.GralCfgBuilder;
@@ -88,9 +88,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
-import org.vishia.gral.ifc.GralTextBox_ifc;
 import org.vishia.gral.ifc.GralWindow_setifc;
-import org.vishia.gral.widget.GralCurveView;
 import org.vishia.msgDispatch.LogMessage;
 
 
@@ -153,7 +151,8 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	 * <li>2010-12-02 Hartmut: Up to now this version variable, its description contains the version history.
 	 * </ul>
 	 */
-	public final static int version = 0x20111112;
+  @SuppressWarnings("hiding")
+  public final static int version = 0x20111112;
 
 	/**The GUI may be determined by a external user file. Not all planned fields, buttons etc. 
    * may be placed in the GUI, a user can desire about the elements. 
@@ -569,7 +568,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     }
     widget.setSize(textSize);
     //guiContent.add(widget);
-    GralWidget widgd = new WidgetSimpleWrapperSwt("labelText-" + sText, 'S', widget, this);
+    GralWidget widgd = new SwtWidgetSimpleWrapper("labelText-" + sText, 'S', widget, this);
     return widgd;
   }
 
@@ -609,7 +608,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     }
     widget.setSize(textSize);
     //guiContent.add(widget);
-    GralWidget widgd = new WidgetSimpleWrapperSwt("", 'S', widget, this);
+    GralWidget widgd = new SwtWidgetSimpleWrapper("", 'S', widget, this);
     return widgd;
   }
 
@@ -929,7 +928,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     if(sCmd != null){
       widget.setData(sCmd);
     } 
-    GralWidget widgd = new WidgetSimpleWrapperSwt(sName, 'i', widget, this);
+    GralWidget widgd = new SwtWidgetSimpleWrapper(sName, 'i', widget, this);
     widgd.setPanelMng(this);
     registerWidget(widgd);
     return widget;
@@ -965,7 +964,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   	Slider control = new Slider(((SwtPanel)pos.panel).getPanelImpl(), SWT.VERTICAL);
   	control.setBackground(propertiesGuiSwt.colorBackground);
   	setPosAndSize_(control);
-   	GralWidget widgetInfos = new WidgetSimpleWrapperSwt(sName, 'V', control, this);
+   	GralWidget widgetInfos = new SwtWidgetSimpleWrapper(sName, 'V', control, this);
    	widgetInfos.setPanelMng(this);
     if(action != null){
   		SelectionListenerForSlider actionSlider = new SelectionListenerForSlider(widgetInfos, action);
@@ -1120,7 +1119,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   }
 
 	
-  @Override public GralTable addTable(String sName, int height, int[] columnWidths)
+  @Override public GralTable2 addTable(String sName, int height, int[] columnWidths)
   {
     return SwtTable2.addTable(this, sName, height, columnWidths);
   }
@@ -1295,17 +1294,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
           ((CurveView)(swtWidget)).redrawData(); break; //causes a partial redraw
         default:
           
-          if(widget instanceof SwtTable){ 
-            SwtTable table = (SwtTable)widget;
-            //NOTE: ident is the row number. Insert before row.
-            switch(cmd){
-            case GralPanelMngWorking_ifc.cmdInsert: table.changeTable(ident, info, data); break;
-            case GralPanelMngWorking_ifc.cmdSet: table.changeTable(ident, info, data); break;
-            case GralPanelMngWorking_ifc.cmdClear: table.clearTable(ident); break;
-            case GralPanelMngWorking_ifc.cmdSelect: table.setCurrentCell(ident, 0); break;
-            default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd: %d on widget %s", cmd, widget.getName());
-            }
-          } else if(swtWidget instanceof Text){ 
+        if(swtWidget instanceof Text){ 
             Text field = (Text)swtWidget;
             switch(cmd){
               case GralPanelMngWorking_ifc.cmdSet:

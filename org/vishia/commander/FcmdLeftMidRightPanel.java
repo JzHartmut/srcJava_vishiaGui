@@ -11,7 +11,7 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.widget.SelectList;
+import org.vishia.gral.widget.GralSelectList;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.util.Assert;
 import org.vishia.util.FileRemote;
@@ -217,7 +217,7 @@ public class FcmdLeftMidRightPanel
   }
     
     
-  class FcmdFavorTabCard extends SelectList
+  class FcmdFavorTabCard extends GralSelectList
   {
     /**Index of all entries in the visible list. */
     Map<String, FcmdFavorPathSelector.FavorFolder> indexFavorFolders = new TreeMap<String, FcmdFavorPathSelector.FavorFolder>();
@@ -337,7 +337,7 @@ public class FcmdLeftMidRightPanel
      * <ul>
      * <li>sh-F1 .. shF3: activates fileSelector for left, middle and right panel.
      * </ul>
-     * @see org.vishia.gral.widget.SelectList#actionUserKey(int, java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
+     * @see org.vishia.gral.widget.GralSelectList#actionUserKey(int, java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
      */
     @Override protected boolean actionUserKey(int key, Object userData,
         GralTableLine_ifc line)

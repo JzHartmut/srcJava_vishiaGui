@@ -5,9 +5,9 @@ import org.vishia.gral.area9.GralArea9Window;
 import org.vishia.gral.cfg.GralCfgDesigner;
 import org.vishia.gral.cfg.GralCfgZbnf;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
-import org.vishia.gral.widget.CommandSelector;
-import org.vishia.gral.widget.FileSelector;
-import org.vishia.gral.widget.SelectList;
+import org.vishia.gral.widget.GralCommandSelector;
+import org.vishia.gral.widget.GralFileSelector;
+import org.vishia.gral.widget.GralSelectList;
 import org.vishia.guiInspc.InspcGui;
 
 /**The package gral is a GRaphic Adaption Layer.
@@ -44,9 +44,9 @@ import org.vishia.guiInspc.InspcGui;
  * <b>Example ussage of a org.eclipse.swt.widgets.Table from the GUI application 'JavaCommander'</b>:
  * <img src="../../../img/JCmd_gralWidget_SwtTable.png"><br>
  * The ObjectModelDiagram shows the application 'JavaCommander'. That application uses some tables to select files, commandes
- * and selection objects. The classes {@link FcmdLeftMidRightPanel.FcmdFavorCard}, {@link CommandSelector} and {@link FileSelector}
+ * and selection objects. The classes {@link FcmdLeftMidRightPanel.FcmdFavorCard}, {@link GralCommandSelector} and {@link GralFileSelector}
  * are the 3 representants of selection lists from side of application. 
- * They have its implementation of a {@link SelectList}, which is a base class which supports navigaton in a list.
+ * They have its implementation of a {@link GralSelectList}, which is a base class which supports navigaton in a list.
  * The   
  * The adaption to a basic system is present yet only for SWT. Adaption to Swing is planned.
  * @author Hartmut Schorrig

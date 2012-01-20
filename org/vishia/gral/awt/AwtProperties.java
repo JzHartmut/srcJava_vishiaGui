@@ -13,7 +13,7 @@ public class AwtProperties extends GralGridProperties
 
   public final Font smallPromptFont;
   
-  public final Font[] textFont = new Font[10];
+  public final Font[] textFontAwt = new Font[10];
   
   public final Font stdInputFont;
   
@@ -41,16 +41,16 @@ public class AwtProperties extends GralGridProperties
     this.smallPromptFont = new Font("Arial", 0, smallPromptFontSize[size]);
     this.stdInputFont = new Font("Arial", 0, stdInputFontSize[size]);
     this.stdButtonFont = new Font("Arial", 0, stdButtonFontSize[size]);
-    this.textFont[0] = new Font("Arial", 0, stdTextFontSize[0][size]);
-    this.textFont[1] = new Font("Arial", 0, stdTextFontSize[1][size]);
-    this.textFont[2] = new Font("Arial", 0, stdTextFontSize[2][size]);
-    this.textFont[3] = new Font("Arial", 0, stdTextFontSize[3][size]);
-    this.textFont[4] = new Font("Arial", 0, stdTextFontSize[4][size]);
-    this.textFont[5] = new Font("Arial", 0, stdTextFontSize[5][size]);
-    this.textFont[6] = new Font("Arial", 0, stdTextFontSize[6][size]);
-    this.textFont[7] = new Font("Arial", 0, stdTextFontSize[7][size]);
-    this.textFont[8] = new Font("Arial", 0, stdTextFontSize[8][size]);
-    this.textFont[9] = new Font("Arial", 0, stdTextFontSize[9][size]);
+    this.textFontAwt[0] = new Font("Arial", 0, stdTextFontSize[0][size]);
+    this.textFontAwt[1] = new Font("Arial", 0, stdTextFontSize[1][size]);
+    this.textFontAwt[2] = new Font("Arial", 0, stdTextFontSize[2][size]);
+    this.textFontAwt[3] = new Font("Arial", 0, stdTextFontSize[3][size]);
+    this.textFontAwt[4] = new Font("Arial", 0, stdTextFontSize[4][size]);
+    this.textFontAwt[5] = new Font("Arial", 0, stdTextFontSize[5][size]);
+    this.textFontAwt[6] = new Font("Arial", 0, stdTextFontSize[6][size]);
+    this.textFontAwt[7] = new Font("Arial", 0, stdTextFontSize[7][size]);
+    this.textFontAwt[8] = new Font("Arial", 0, stdTextFontSize[8][size]);
+    this.textFontAwt[9] = new Font("Arial", 0, stdTextFontSize[9][size]);
   }
   
   

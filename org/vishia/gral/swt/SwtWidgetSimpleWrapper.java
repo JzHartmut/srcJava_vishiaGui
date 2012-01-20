@@ -10,11 +10,11 @@ import org.vishia.gral.ifc.GralWidget_ifc;
  * @author Hartmut Schorrig
  *
  */
-public class WidgetSimpleWrapperSwt extends GralWidget
+public class SwtWidgetSimpleWrapper extends GralWidget
 {
   public Control widgetSwt;
 
-  public WidgetSimpleWrapperSwt(String name, char whatis, Control widgetSwt, GralWidgetMng mng)
+  public SwtWidgetSimpleWrapper(String name, char whatis, Control widgetSwt, GralWidgetMng mng)
   { super(name, whatis, mng);
     this.widgetSwt = widgetSwt;
   }

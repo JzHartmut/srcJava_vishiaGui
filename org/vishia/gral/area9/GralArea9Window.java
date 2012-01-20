@@ -17,7 +17,7 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTextBox_ifc;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.widget.InfoBox;
+import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmd_ifc;
 
@@ -62,7 +62,7 @@ public class GralArea9Window implements GralArea9_ifc
    * adequate to a console output.*/
   public GralTextBox outputBox;
   
-  public InfoBox infoHelp, infoAbout, infoBox, infoLog;
+  public GralInfoBox infoHelp, infoAbout, infoBox, infoLog;
   
   /** Current Directory for file choosing. */
   protected File currentDirectory = null;

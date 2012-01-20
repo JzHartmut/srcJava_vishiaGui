@@ -18,7 +18,7 @@ import org.vishia.gral.ifc.GralTextBox_ifc;
  * @author Hartmut Schorrig
  *
  */
-public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
+public class GralInfoBox implements GralTextBox_ifc, GralWindow_ifc
 {
 
   /**The window is created invoking the {@link GralGridBuild_ifc#createWindow(String, boolean)}. 
@@ -33,7 +33,7 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
   
   private final GralWidget buttonOk;
   
-  public InfoBox(GralWindow window, GralTextBox textBox, GralWidget buttonOk)
+  public GralInfoBox(GralWindow window, GralTextBox textBox, GralWidget buttonOk)
   {
     this.window = window;
     this.textBox = textBox;
@@ -41,7 +41,7 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
     this.buttonOk = buttonOk;
   }
   
-  public InfoBox(GralWindow window, GralHtmlBox htmlBox, GralWidget buttonOk)
+  public GralInfoBox(GralWindow window, GralHtmlBox htmlBox, GralWidget buttonOk)
   {
     this.window = window;
     this.textBox = null;
@@ -49,7 +49,7 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
     this.buttonOk = buttonOk;
   }
   
-  public static InfoBox createTextInfoBox(GralGridBuild_ifc mng, String name, String title)
+  public static GralInfoBox createTextInfoBox(GralGridBuild_ifc mng, String name, String title)
   {
     GralWindow window = mng.createWindow(name, title, GralWindow.windConcurrently);
     //TODO the position frame (size) regards the title bar, it should not do so!
@@ -57,13 +57,13 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
     GralTextBox text = mng.addTextBox(name, false, null, '.');
     mng.setPosition(-3, 0, -6, 0, 0, '.');
     GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "", null, null, "OK");
-    InfoBox box = new InfoBox(window, text, buttonOk);
+    GralInfoBox box = new GralInfoBox(window, text, buttonOk);
     box.buttonOk.setActionChange(box.actionOk);
     return box; 
 
   }
   
-  public static InfoBox createHtmlInfoBox(GralGridBuild_ifc mng, String name, String title)
+  public static GralInfoBox createHtmlInfoBox(GralGridBuild_ifc mng, String name, String title)
   {
     GralWindow window = mng.createWindow(name, title, GralWindow.windConcurrently);
     //TODO the position frame (size) regards the title bar, it should not do so!
@@ -71,7 +71,7 @@ public class InfoBox implements GralTextBox_ifc, GralWindow_ifc
     GralHtmlBox text = mng.addHtmlBox(name);
     mng.setPosition(-3, 0, -6, 0, 0, '.');
     GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "", null, null, "OK");
-    InfoBox box = new InfoBox(window, text, buttonOk);
+    GralInfoBox box = new GralInfoBox(window, text, buttonOk);
     box.buttonOk.setActionChange(box.actionOk);
     return box; 
 

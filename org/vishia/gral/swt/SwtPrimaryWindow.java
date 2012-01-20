@@ -53,6 +53,7 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
    *   The GralDevice is the primary window always. TODO rename GralDevice to GralPrimaryWindow
    * </ul>
    */
+  @SuppressWarnings("hiding")
   public final static int version = 0x20111127;
   
   /** The frame of the Window in the GUI (Graphical Unit Interface)*/

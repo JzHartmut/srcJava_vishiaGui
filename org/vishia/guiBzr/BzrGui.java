@@ -19,6 +19,7 @@ public class BzrGui extends GuiCfg
    * <li>2011-05-01 Hartmut: Created
    * </ul>
    */
+  @SuppressWarnings("hiding")
   public final static int version = 0x20110617;
 
   /**The command-line-arguments may be stored in an extra class, which can arranged in any other class too. 

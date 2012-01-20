@@ -32,7 +32,7 @@ import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidgetChangeRequ;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.gral.widget.InfoBox;
+import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.KeyCode;
@@ -364,9 +364,9 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
    */
   @Override public String getValueFromWidget(GralWidget widgd)
   { String sValue = null;
-    if(widgd instanceof GralTable){
+    if(widgd instanceof GralTable2){
       StringBuilder u = new StringBuilder();
-      GralTableLine_ifc line = ((GralTable)widgd).getCurrentLine();
+      GralTableLine_ifc line = ((GralTable2)widgd).getCurrentLine();
       String[] texts = line.getCellTexts();
       for(int iCol = 0; iCol < texts.length; ++iCol){
         u.append(texts[iCol]).append('\t');
@@ -853,15 +853,15 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   }
   
   
-  @Override public InfoBox createTextInfoBox(String name, String title)
+  @Override public GralInfoBox createTextInfoBox(String name, String title)
   {
-    return InfoBox.createTextInfoBox(this, name, title);
+    return GralInfoBox.createTextInfoBox(this, name, title);
   }
 
   
-  @Override public InfoBox createHtmlInfoBox(String name, String title)
+  @Override public GralInfoBox createHtmlInfoBox(String name, String title)
   {
-    return InfoBox.createHtmlInfoBox(this, name, title);
+    return GralInfoBox.createHtmlInfoBox(this, name, title);
   }
 
   
