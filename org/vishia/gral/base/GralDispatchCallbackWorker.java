@@ -1,6 +1,5 @@
-package org.vishia.gral.ifc;
+package org.vishia.gral.base;
 
-import org.vishia.gral.base.GralGraphicThread;
 
 /**This is the base class for user classes, which contains code, that is executed in the graphic thread,
  * any-time when any graphic dispatching occurs. Especially it is used for SWT.  
@@ -45,7 +44,20 @@ public abstract class GralDispatchCallbackWorker
     this.name = name;
   }
   
+	/**Handle any request in the graphic thread before the system's dispatching routine starts.
+	 * @param onlyWakeup
+	 */
 	public abstract void doBeforeDispatching(boolean onlyWakeup);
+	
+	
+	/**Runs the handling of delayed requests inside this.
+	 * Any graphic order can have a queue of delayed requests.
+	 * @param timeDelay The up to now delay in milliseconds, when the timer thread
+	 *   should be waked up to handle a delayed request.
+	 * @return The new delay in milliseconds maybe less than the input timeDelay
+	 *   to execute the next call of this method. It is less or equal the inputed timeDelay.
+	 */
+	public int runTimer(int timeDelay){ return timeDelay; }
 	
 	
 	/**Adds to the graphic thread or sets a new delay it is added already.

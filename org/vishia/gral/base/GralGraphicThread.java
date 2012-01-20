@@ -3,7 +3,6 @@ package org.vishia.gral.base;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.util.MinMaxTime;
 
 /**This class is the base for implementation of graphic threading. It is implemented for SWT and Swing yet.
@@ -27,11 +26,11 @@ import org.vishia.util.MinMaxTime;
  * To organize such working the action on the GUI (calling back method, event) should notify and inform the other thread
  * which does the work. If that thread is finished, its result should be shown on the graphic. 
  * But because the graphic isn't thread safe the graphic can't be changed in this other thread direct.
- * The information which should be changed are queued calling {@link #addChangeRequest(GralWidgetChangeRequ)}
+ * The information which should be changed are queued calling {@link #addRequ(GralWidgetChangeRequ)}
  * from this class. The execution of the change requests can't be done with the information contained in this class
  * because it is the common and simple graphic thread implementation which doesn't know details about widgets.
  * The proper class for that action is the {@link org.vishia.gral.base.GralWidgetMng} 
- * and its derivation for the graphic implementation. That class calls {@link #pollChangeRequest()}.   
+ * and its derivation for the graphic implementation. That class calls {@link #pollRequ()}.   
  *  
  * @author Hartmut Schorrig
  *
@@ -74,21 +73,13 @@ public abstract class GralGraphicThread implements Runnable
    * */
   protected ConcurrentLinkedQueue<GralDispatchCallbackWorker> graphicOrders = new ConcurrentLinkedQueue<GralDispatchCallbackWorker>();
   
+  protected ConcurrentLinkedQueue<GralDispatchCallbackWorker> timedOrders = new ConcurrentLinkedQueue<GralDispatchCallbackWorker>();
+  
   protected ConcurrentLinkedQueue<GralDispatchCallbackWorker> delayedGraphicOrders = new ConcurrentLinkedQueue<GralDispatchCallbackWorker>();
   
   protected ConcurrentLinkedQueue<GralDispatchCallbackWorker> delayedTempGraphicOrders = new ConcurrentLinkedQueue<GralDispatchCallbackWorker>();
   
-  /**List of all requests to change the graphical presentation of values. The list can be filled in some Threads.
-   * It is processed in the {@link #dispatch()} routine.  */
-  protected ConcurrentLinkedQueue<GralWidgetChangeRequ> guiChangeRequests = new ConcurrentLinkedQueue<GralWidgetChangeRequ>();
-  
-  /**List of all requests to change the graphical presentation of values. The list can be filled in some Threads.
-   * It is processed in the {@link #dispatch()} routine.  */
-  protected ConcurrentLinkedQueue<GralWidgetChangeRequ> delayedChangeRequests = new ConcurrentLinkedQueue<GralWidgetChangeRequ>()
-        , delayedTempChangeRequests = new ConcurrentLinkedQueue<GralWidgetChangeRequ>();
-  
-  
-  private boolean bTimeIsWaiting;
+  boolean bTimeIsWaiting;
   
   /**True if the startup of the main window is done and the main window is visible. */
   protected boolean bStarted = false; 
@@ -142,61 +133,9 @@ public abstract class GralGraphicThread implements Runnable
   }
   
   
-  /**Adds any change request of the graphic appearance in any other thread.
-   * The graphic thread will be poll it.
-   * @param requ
-   */
-  public void addChangeRequest(GralWidgetChangeRequ requ)
-  {
-    if(requ.timeToExecution() >=0){
-      delayedChangeRequests.offer(requ);
-      synchronized(runTimer){
-        if(bTimeIsWaiting){
-          runTimer.notify();  
-        }
-      }
-    } else {
-      guiChangeRequests.add(requ);
-      synchronized(guiChangeRequests){ 
-        guiChangeRequests.notify();   //to wake up waiting on guiChangeRequests.
-      }
-      wakeup();
-    }
-  }
-  
-
-  /**Polls one change request. This method should be called in the graphic thread from any class,
-   * which knows details about the graphic. That class is {@link org.vishia.gral.base.GralWidgetMng}.
-   * 
-   * Hint: The method is public only because it will be invoked from the graphical implementation.
-   * @return null if the queue is empty.
-   */
-  public GralWidgetChangeRequ pollChangeRequest()
-  {
-    GralWidgetChangeRequ changeReq = guiChangeRequests.poll();
-    while (changeReq != null){
-      int timeToExecution = changeReq.timeToExecution();
-      if(timeToExecution >=0){
-        //not yet to proceed
-        delayedChangeRequests.offer(changeReq);
-        synchronized(runTimer){
-          if(bTimeIsWaiting){
-            runTimer.notify();  
-          }
-        }
-        changeReq = guiChangeRequests.poll();  //check if there is another.
-      } else {
-        return changeReq;  //take this
-      }
-    }
-    return null;  //nothing found.
-  }
-  
-
-  
   /** Adds a method which will be called in anytime in the dispatch loop until the listener will remove itself.
    * @deprecated: This method sholdn't be called by user, see {@link GralDispatchCallbackWorker#addToGraphicThread(GralGraphicThread, int)}. 
-   * @see org.vishia.gral.ifc.GralWindowMng_ifc#addDispatchListener(org.vishia.gral.ifc.GralDispatchCallbackWorker)
+   * @see org.vishia.gral.ifc.GralWindowMng_ifc#addDispatchListener(org.vishia.gral.base.GralDispatchCallbackWorker)
    * @param order
    */
   public void addDispatchOrder(GralDispatchCallbackWorker order){ 
@@ -222,6 +161,14 @@ public abstract class GralGraphicThread implements Runnable
   
   
 
+  public void addTimedOrder(GralDispatchCallbackWorker order){
+    timedOrders.add(order);
+  }
+  
+  
+  public void removeTimedOrder(GralDispatchCallbackWorker order){
+    timedOrders.remove(order);
+  }
   
   
   /**Removes a order, which was called in the dispatch loop.
@@ -357,24 +304,6 @@ public abstract class GralGraphicThread implements Runnable
       while(!bExit){
         int timeWait = 1000;
         boolean bWake = false;
-        { GralWidgetChangeRequ requ;
-          while( (requ = delayedChangeRequests.poll()) !=null){
-            int timeToExecution = requ.timeToExecution();
-            if(timeToExecution >=0){
-              //not yet to proceed
-              if(timeWait > timeToExecution){ timeWait = timeToExecution; }
-              delayedTempChangeRequests.offer(requ);
-            } else {
-              guiChangeRequests.offer(requ);
-              bWake = true;
-            }
-          }
-          //delayedChangeRequest is tested and empty now.
-          //offer the requ back from the temp queue
-          while( (requ = delayedTempChangeRequests.poll()) !=null){
-            delayedChangeRequests.offer(requ); 
-          }
-        }
         { GralDispatchCallbackWorker order;
           while( (order = delayedGraphicOrders.poll()) !=null){
             int timeToExecution = order.timeToExecution();
@@ -391,6 +320,10 @@ public abstract class GralGraphicThread implements Runnable
           //offer the requ back from the temp queue
           while( (order = delayedTempGraphicOrders.poll()) !=null){
             delayedGraphicOrders.offer(order); 
+          }
+          while( (order = timedOrders.poll()) !=null){
+            //any graphic order can have a queue of delayed requests too.
+            timeWait = order.runTimer(timeWait);
           }
         }
         if(bWake){

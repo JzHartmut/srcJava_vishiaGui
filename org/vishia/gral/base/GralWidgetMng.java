@@ -153,7 +153,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   /**Base class for managing all panels and related windows.
    * This base class contains all common resources to manage panels and windows.
    */
-  public GralGraphicThread gralDevice;
+  public final GralGraphicThread gralDevice;
 
   /**Properties of this Dialog Window. */
   public  final GralGridProperties propertiesGui;
@@ -203,7 +203,9 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
    */
   protected GralPos posWidget = new GralPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
   
+  protected final WidgetChangeRequExecuter widgetChangeRequExecuter = new WidgetChangeRequExecuter();
   
+
   
   
   /**Saved last use position. After calling {@link #setPosAndSize_(Control, int, int, int, int)}
@@ -344,8 +346,9 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   
 	
 	
-  public GralWidgetMng(GralGridProperties props, VariableContainer_ifc variableContainer, LogMessage log)
-	{ this.parent = null;
+  public GralWidgetMng(GralGraphicThread device, GralGridProperties props, VariableContainer_ifc variableContainer, LogMessage log)
+	{ this.gralDevice = device;
+    this.parent = null;
 	  this.propertiesGui = props;
 		this.log = log;
 		this.variableContainer = variableContainer;
@@ -378,9 +381,9 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   public void setApplicationAdapter(GralMngApplAdapter_ifc adapter){ this.applAdapter = adapter; }
   
 
-  public void setGralDevice(GralGraphicThread device)
+  public void XXXsetGralDevice(GralGraphicThread device)
   {
-    this.gralDevice = device;
+    //this.gralDevice = device;
   }
   
  
@@ -401,7 +404,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
     } else {
       //TODO check admissibility
       changeRequ.delayExecution(delay);
-      gralDevice.addChangeRequest(changeRequ);
+      widgetChangeRequExecuter.addRequ(changeRequ);
       return null;
     }
   }
@@ -882,6 +885,144 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   }
   
   
+  
+  /**The dispatch listener should be included in the dispatch loop in the SWT-Thread.
+   * It should be called any time if the Graphic is updated and cyclically too.
+   * <br><br>
+   * The run-method of this class is called one time in any dispatch loop process.
+   * It has to be returned immediately (not like the run-method of the thread),
+   * after it may be changed the graphic appearance. The graphic appearance is changed
+   * if any command is set in the {@link #guiChangeRequests}-Queue, see 
+   * <ul>
+   * <li>{@link #insertInfo(String, int, String)} 
+   * </ul>
+   */
+  protected class WidgetChangeRequExecuter extends GralDispatchCallbackWorker
+  {
+    
+    /**List of all requests to change the graphical presentation of values. The list can be filled in some Threads.
+     * It is processed in the {@link #dispatch()} routine.  */
+    protected ConcurrentLinkedQueue<GralWidgetChangeRequ> guiChangeRequests = new ConcurrentLinkedQueue<GralWidgetChangeRequ>();
+    
+    /**List of all requests to change the graphical presentation of values. The list can be filled in some Threads.
+     * It is processed in the {@link #dispatch()} routine.  */
+    protected ConcurrentLinkedQueue<GralWidgetChangeRequ> delayedChangeRequests = new ConcurrentLinkedQueue<GralWidgetChangeRequ>()
+          , delayedTempChangeRequests = new ConcurrentLinkedQueue<GralWidgetChangeRequ>();
+    
+    
+
+    
+    
+    WidgetChangeRequExecuter(){
+      super("SwtWidgetMng.widgetChangeRequExecuter");
+    }
+    
+    
+    /**Adds any change request of the graphic appearance in any other thread.
+     * The graphic thread will be poll it.
+     * @param requ
+     */
+    public void addRequ(GralWidgetChangeRequ requ)
+    {
+      if(requ.timeToExecution() >=0){
+        delayedChangeRequests.offer(requ);
+        synchronized(gralDevice.runTimer){
+          if(gralDevice.bTimeIsWaiting){
+            gralDevice.runTimer.notify();  
+          }
+        }
+      } else {
+        guiChangeRequests.add(requ);
+        synchronized(guiChangeRequests){ 
+          guiChangeRequests.notify();   //to wake up waiting on guiChangeRequests.
+        }
+        gralDevice.wakeup();
+      }
+    }
+    
+
+
+    /**Polls one change request. This method should be called in the graphic thread from any class,
+     * which knows details about the graphic. That class is {@link org.vishia.gral.base.GralWidgetMng}.
+     * 
+     * Hint: The method is public only because it will be invoked from the graphical implementation.
+     * @return null if the queue is empty.
+     */
+    public GralWidgetChangeRequ pollRequ()
+    {
+      GralWidgetChangeRequ changeReq = guiChangeRequests.poll();
+      while (changeReq != null){
+        int timeToExecution = changeReq.timeToExecution();
+        if(timeToExecution >=0){
+          //not yet to proceed
+          delayedChangeRequests.offer(changeReq);
+          synchronized(gralDevice.runTimer){
+            if(gralDevice.bTimeIsWaiting){
+              gralDevice.runTimer.notify();  
+            }
+          }
+          changeReq = guiChangeRequests.poll();  //check if there is another.
+        } else {
+          return changeReq;  //take this
+        }
+      }
+      return null;  //nothing found.
+    }
+    
+
+    
+
+    
+    
+    /**This method is called in the GUI-thread. 
+     * 
+     */
+    @Override public void doBeforeDispatching(boolean onlyWakeup)
+    { if(designer !=null && !bDesignerIsInitialized){
+        designer.initGui();
+        bDesignerIsInitialized = true;
+      }
+      GralWidgetChangeRequ changeReq;
+      while( (changeReq = widgetChangeRequExecuter.pollRequ()) != null){
+        GralWidget_ifc descr = changeReq.widgetDescr;
+        setInfoDirect(descr, changeReq.cmd, changeReq.ident, changeReq.visibleInfo, changeReq.userData);
+
+      }
+    }  
+
+    @Override public int runTimer(int timeWait){  
+      GralWidgetChangeRequ requ;
+      boolean bWake = false;
+      while( (requ = delayedChangeRequests.poll()) !=null){
+        int timeToExecution = requ.timeToExecution();
+        if(timeToExecution >=0){
+          //not yet to proceed
+          if(timeWait > timeToExecution){ timeWait = timeToExecution; }
+          delayedTempChangeRequests.offer(requ);
+        } else {
+          guiChangeRequests.offer(requ);
+          bWake = true;
+        }
+      }
+      //delayedChangeRequest is tested and empty now.
+      //offer the requ back from the temp queue
+      while( (requ = delayedTempChangeRequests.poll()) !=null){
+        delayedChangeRequests.offer(requ); 
+      }
+      if(bWake){
+        gralDevice.wakeup(); //process changeRequests in the graphic thread.
+      }
+      
+      return timeWait;
+    }
+  
+
+  
+  
+  };
+  
+  
+
   void stop(){}
 	
 

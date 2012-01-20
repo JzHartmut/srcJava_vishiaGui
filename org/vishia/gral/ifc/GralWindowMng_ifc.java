@@ -1,5 +1,7 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.gral.base.GralDispatchCallbackWorker;
+
 /**This interface supports to deal with the graphical implementation, especially the graphic thread.
  * The graphic thread is associated with a graphic device usually. The graphic device handles
  * all window appearances and events.

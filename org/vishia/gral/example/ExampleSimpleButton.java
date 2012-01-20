@@ -4,12 +4,12 @@ import java.io.IOException;
 
 import org.vishia.gral.awt.AwtFactory;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralFactory_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralUserAction;
@@ -120,7 +120,7 @@ public class ExampleSimpleButton
   private GralDispatchCallbackWorker initGuiCode = new GralDispatchCallbackWorker("ExampleSimpleButton.initGuiCode")
   {
     /**This routine is called in the graphic thread if it was added.
-     * @see org.vishia.gral.ifc.GralDispatchCallbackWorker#doBeforeDispatching(boolean)
+     * @see org.vishia.gral.base.GralDispatchCallbackWorker#doBeforeDispatching(boolean)
      */
     @Override public void doBeforeDispatching(boolean onlyWakeup)
     {

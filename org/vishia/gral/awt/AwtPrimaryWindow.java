@@ -36,12 +36,12 @@ public class AwtPrimaryWindow extends AwtSubWindow implements GralPrimaryWindow_
     }
     //The propertiesGuiSwt needs the Display instance for Font and Color. Therefore the graphic thread with creation of Display should be executed before. 
     AwtProperties propertiesGui = new AwtProperties('C');
-    GralWidgetMng gralMng = new AwtWidgetMng(propertiesGui, null, log);
+    GralWidgetMng gralMng = new AwtWidgetMng(init, propertiesGui, null, log);
     
     //The PrimaryWindowSwt is a derivation of the GralPrimaryWindow. It is more as only a SWT Shell.
     AwtPrimaryWindow instance = new AwtPrimaryWindow(gralMng, sTitle, init);
     instance.panelComposite = init; //window.sTitle, window.xPos, window.yPos, window.xSize, window.ySize);
-    gralMng.setGralDevice(init);
+    //gralMng.setGralDevice(init);
     gralMng.registerPanel(instance);
     
     //init.setWindow(instance);  //now the initializing of the window occurs.

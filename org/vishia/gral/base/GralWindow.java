@@ -22,7 +22,7 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
    * <li>2011-12-31 Hartmut chg: Implements the set-methods of {@link GralWindow_ifc} in form of calling
    *   {@link GralPanelMngWorking_ifc#setInfo(GralWidget, int, int, Object, Object)}. This methods
    *   can be called in any thread, it may be stored using 
-   *   {@link GralGraphicThread#addChangeRequest(org.vishia.gral.base.GralWidgetChangeRequ)}.
+   *   {@link GralGraphicThread#addRequ(org.vishia.gral.base.GralWidgetChangeRequ)}.
    * <li>2011-11-27 Hartmut new: {@link #addMenuItemGThread(String, String, GralUserAction)} copied
    *   from {@link org.vishia.gral.ifc.GralPrimaryWindow_ifc}. The capability to have a menu bar
    *   should be enabled for sub-windows too. To support regularity, the property bit {@link #windHasMenu}

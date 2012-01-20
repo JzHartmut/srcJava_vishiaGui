@@ -61,6 +61,8 @@ import org.eclipse.swt.widgets.Widget;
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralLed;
@@ -82,7 +84,6 @@ import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPos;
-import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralImageBase;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralRectangle;
@@ -280,11 +281,11 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public SwtWidgetMng(Device device /*, Composite graphicFrame */
+  protected SwtWidgetMng(GralGraphicThread graldevice, Device device /*, Composite graphicFrame */
   , char displaySize, VariableContainer_ifc variableContainer
 	, LogMessage log)
   { //super(sTitle); 
-  	this(new SwtProperties(device, displaySize), variableContainer, log);
+  	this(graldevice, new SwtProperties(device, displaySize), variableContainer, log);
   	
   }
 
@@ -295,16 +296,18 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public SwtWidgetMng(SwtProperties propertiesGui
+  public SwtWidgetMng(GralGraphicThread device 
+    , SwtProperties propertiesGui
   	, VariableContainer_ifc variableContainer
   	, LogMessage log
   	)
-  { super(propertiesGui, variableContainer, log);
+  { super(device, propertiesGui, variableContainer, log);
     this.propertiesGuiSwt = propertiesGui;
     pos.x.p1 = 0; //start-position
     pos.y.p1 = 4 * propertiesGui.yPixelUnit();
     
 		userActions.put("syncVariableOnFocus", this.syncVariableOnFocus);
+    device.addTimedOrder(widgetChangeRequExecuter);
 
 
   }
@@ -1227,7 +1230,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     	switch(cmd){
     	case GralPanelMngWorking_ifc.cmdInsert: checkAdmissibility(visibleInfo != null && (visibleInfo instanceof String || visibleInfo instanceof String[])); break;
     	}
-      gralDevice.addChangeRequest(new GralWidgetChangeRequ(descr, cmd, ident, visibleInfo, userData));
+    	widgetChangeRequExecuter.addRequ(new GralWidgetChangeRequ(descr, cmd, ident, visibleInfo, userData));
     }
   	return "";
   }
@@ -1387,40 +1390,6 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 
   
   
-  /**The dispatch listener should be included in the dispatch loop in the SWT-Thread.
-   * It should be called any time if the Graphic is updated and cyclically too.
-   * <br><br>
-   * The run-method of this class is called one time in any dispatch loop process.
-   * It has to be returned immediately (not like the run-method of the thread),
-   * after it may be changed the graphic appearance. The graphic appearance is changed
-   * if any command is set in the {@link #guiChangeRequests}-Queue, see 
-   * <ul>
-   * <li>{@link #insertInfo(String, int, String)} 
-   * </ul>
-   */
-  private final GralDispatchCallbackWorker widgetChangeRequExecuter = new GralDispatchCallbackWorker("SwtWidgetMng.widgetChangeRequExecuter")
-  {
-    
-    
-    /**This method is called in the GUI-thread. 
-     * 
-     */
-    @Override public void doBeforeDispatching(boolean onlyWakeup)
-    { if(designer !=null && !bDesignerIsInitialized){
-        designer.initGui();
-        bDesignerIsInitialized = true;
-      }
-      GralWidgetChangeRequ changeReq;
-      while( (changeReq = gralDevice.pollChangeRequest()) != null){
-        GralWidget_ifc descr = changeReq.widgetDescr;
-        setInfoDirect(descr, changeReq.cmd, changeReq.ident, changeReq.visibleInfo, changeReq.userData);
-
-      }
-    }  
-  };
-  
-  
-  
   static class SelectionListenerForSlider implements SelectionListener
   {
   	private final GralUserAction userAction; 
@@ -1483,7 +1452,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sName);
   	} else if((descr.getGraphicWidgetWrapper() instanceof CurveView)) {
   		//sends a redraw information.
-  	  gralDevice.addChangeRequest(new GralWidgetChangeRequ(descr, GralPanelMngWorking_ifc.cmdRedrawPart, 0, null, null));
+  	  widgetChangeRequExecuter.addRequ(new GralWidgetChangeRequ(descr, GralPanelMngWorking_ifc.cmdRedrawPart, 0, null, null));
   	} else {
   	}
 	}

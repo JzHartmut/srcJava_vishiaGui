@@ -2,6 +2,7 @@ package org.vishia.gral.ifc;
 
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 

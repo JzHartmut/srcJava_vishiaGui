@@ -16,6 +16,8 @@ import java.util.Map.Entry;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelActivated_ifc;
@@ -28,7 +30,6 @@ import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPos;
@@ -53,11 +54,11 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public AwtWidgetMng(AwtProperties propertiesGui
+  public AwtWidgetMng(GralGraphicThread device, AwtProperties propertiesGui
     , VariableContainer_ifc variableContainer
     , LogMessage log
     )
-  { super(propertiesGui, variableContainer, log);
+  { super(device, propertiesGui, variableContainer, log);
     this.propertiesGuiAwt = propertiesGui;
   }
 

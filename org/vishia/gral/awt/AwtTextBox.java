@@ -5,9 +5,9 @@ import java.awt.Label;
 import java.awt.TextArea;
 import java.io.IOException;
 
+import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralUserAction;
 
