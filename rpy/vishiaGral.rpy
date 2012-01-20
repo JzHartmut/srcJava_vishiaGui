@@ -14,7 +14,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 		- _subsystem = "";
 		- _class = "";
 		- _name = "GeneratedFromJava";
-		- _id = GUID ed05c8c3-f5af-43f3-8d43-0cbebd207348;
+		- _id = GUID 6294d127-7918-4352-8808-b0f4ea38b38b;
 	}
 	- _component = { IHandle 
 		- _m2Class = "IComponent";
@@ -29,7 +29,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 		- value = 
 		{ IMultiplicityItem 
 			- _name = "1";
-			- _count = -1;
+			- _count = 0;
 		}
 		{ IMultiplicityItem 
 			- _name = "*";
@@ -49,7 +49,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 		- value = 
 		{ ISubsystem 
 			- fileName = "GeneratedFromJava";
-			- _id = GUID ed05c8c3-f5af-43f3-8d43-0cbebd207348;
+			- _id = GUID 6294d127-7918-4352-8808-b0f4ea38b38b;
 		}
 		{ ISubsystem 
 			- fileName = "Docu";

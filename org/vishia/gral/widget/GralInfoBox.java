@@ -3,6 +3,7 @@ package org.vishia.gral.widget;
 import java.io.IOException;
 
 import org.vishia.gral.base.GralHtmlBox;
+import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralColor;
@@ -215,7 +216,11 @@ public class GralInfoBox implements GralTextBox_ifc, GralWindow_ifc
   { window.setBoundsPixel(x,y,dx,dy);
   }
   
+  @Override public GralWidgetGthreadSet_ifc getGthreadSetifc()
+  { return textBox.getGthreadSetifc(); }
+
   
+
   
   @Override public GralRectangle getPixelPositionSize(){ return window.getPixelPositionSize(); }
     

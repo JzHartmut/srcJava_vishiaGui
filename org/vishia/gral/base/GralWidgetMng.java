@@ -387,11 +387,11 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   }
   
  
-  protected abstract String setInfoDirect(GralWidget_ifc widget, int cmd, int ident, Object info, Object data);
+  protected abstract String setInfoGthread(GralWidget_ifc widget, int cmd, int ident, Object info, Object data);
   
   @Override public String setInfoDelayed(GralWidget_ifc widgd, int cmd, int ident, Object visibleInfo, Object userData, int delay){
     if(delay == 0 && currThreadIsGraphic()){
-      return setInfoDirect(widgd, cmd, ident, visibleInfo, userData);
+      return setInfoGthread(widgd, cmd, ident, visibleInfo, userData);
     } else {
       GralWidgetChangeRequ requ = new GralWidgetChangeRequ(widgd, cmd, ident, visibleInfo, userData);
       return setInfoDelayed(requ, delay);
@@ -400,7 +400,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   
   public String setInfoDelayed(GralWidgetChangeRequ changeRequ, int delay){
     if(delay == 0 && currThreadIsGraphic()){
-      return setInfoDirect(changeRequ.widgetDescr, changeRequ.cmd, changeRequ.ident, changeRequ.visibleInfo, changeRequ.userData);
+      return setInfoGthread(changeRequ.widg, changeRequ.cmd, changeRequ.ident, changeRequ.visibleInfo, changeRequ.userData);
     } else {
       //TODO check admissibility
       changeRequ.delayExecution(delay);
@@ -984,8 +984,8 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
       }
       GralWidgetChangeRequ changeReq;
       while( (changeReq = widgetChangeRequExecuter.pollRequ()) != null){
-        GralWidget_ifc descr = changeReq.widgetDescr;
-        setInfoDirect(descr, changeReq.cmd, changeReq.ident, changeReq.visibleInfo, changeReq.userData);
+        GralWidget_ifc widg = changeReq.widg;
+        setInfoGthread(widg, changeReq.cmd, changeReq.ident, changeReq.visibleInfo, changeReq.userData);
 
       }
     }  

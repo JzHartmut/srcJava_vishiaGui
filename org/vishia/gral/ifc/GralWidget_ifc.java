@@ -1,9 +1,32 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.util.Removeable;
 
 
-/**It is a basic interface for any widget of the implementing GUI
+/**It is a basic interface for any widget of the Graphic Adaption Layer (gral).
+ * <br>
+ * <b>Strategy of changing the graphical content of a widget</b>:
+ * The SWT graphical implementation prohibits changing the graphical appearance, for example setText(newText),  
+ * in another thread. Other graphical implementations are not threadsafe. Often a graphic application
+ * runs in only one thread, so that isn't a problem. But applications with complex data gathering processes
+ * needs to run in several threads. It may be fine to set the widgets in that threads immediately,
+ * seen from the programmers perspective. For multithread usage see {@link org.vishia.gral.base.GralGraphicThread}.
+ * <br><br>
+ * The solution in gral is:
+ * <ul>
+ * <li>A {@link GralWidget} can be invoked with methods to set its content from any thread.
+ * <li>If it is the graphic thread and the operation is not delayed, it is executed immediately.
+ *   Therefore the {@link #getGthreadSetifc()} method from any widget implementation is called to get
+ *   the set interface for the graphic thread, and the proper method is invoked. The implementation of the widget
+ *   executes the correct steps.
+ * <li>If a set method is invoked in any other thread, the request is queued internally. 
+ *   The queue is residently in the {@link org.vishia.gral.base.GralWidgetMng}. 
+ *   The queue is processed in the graphic thread. The commission
+ *   to change the widget is stored in an instance of {@link org.vishia.gral.base.GralWidgetChangeRequ}
+ *   with a cmd, an index, the value.
+ * </ul>     
+ *  
  * @author Hartmut Schorrig
  *
  */
@@ -19,6 +42,8 @@ public interface GralWidget_ifc extends Removeable
   
   /**Returns the implementation class of the widget. */
   public abstract Object getWidgetImplementation();
+  
+  GralWidgetGthreadSet_ifc getGthreadSetifc();
   
   public String getName();
   

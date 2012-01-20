@@ -557,7 +557,7 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 
 
   @Override
-  protected String setInfoDirect(GralWidget_ifc widget, int cmd, int ident,
+  protected String setInfoGthread(GralWidget_ifc widget, int cmd, int ident,
       Object info, Object data) {
     // TODO Auto-generated method stub
     return null;

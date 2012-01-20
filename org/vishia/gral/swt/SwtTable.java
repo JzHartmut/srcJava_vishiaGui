@@ -267,6 +267,11 @@ public class SwtTable  extends GralTable {
     cellSwt.redraw();
   }
 
+  
+  @Override public GralWidgetGthreadSet_ifc getGthreadSetifc(){ return table; }
+  
+  
+  
   @Override protected CellData drawCellInvisible(int iCellLine, int iCellCol){
     Text cellSwt = cellsSwt[iCellLine][iCellCol]; 
     cellSwt.setText("");

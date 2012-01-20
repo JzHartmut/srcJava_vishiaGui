@@ -136,9 +136,9 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	/**Version, able to read as hex yyyymmdd.
 	 * Changes:
 	 * <ul>
-	 * <li>2012-01-01 Hartmut new: The {@link #setInfoDirect(GralWidget, int, int, Object, Object)} routine
+	 * <li>2012-01-01 Hartmut new: The {@link #setInfoGthread(GralWidget, int, int, Object, Object)} routine
 	 *   uses the {@link SwtSetValue_ifc} capability to associate cmd to types of widgets. Yet used only for {@link SwtSubWindow}.
-	 * <li>2011-12-03 Hartmut new: {@link #setInfoDirect(GralWidget, int, int, Object, Object)} catches
+	 * <li>2011-12-03 Hartmut new: {@link #setInfoGthread(GralWidget, int, int, Object, Object)} catches
 	 *   any exception, before: An exception causes aborting the graphic thread.
 	 * <li>2011-12-03 Hartmut chg: {@link #addLed(String, String, String)} now uses {@link GralLed}.  
 	 * <li>2011-12-03 Hartmut new: {@link #swtKeyListener} as base for all fields.
@@ -1222,7 +1222,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   @Override public String setInfo(GralWidget descr, int cmd, int ident, Object visibleInfo, Object userData)
   {
     if(currThreadIsGraphic()){
-      setInfoDirect(descr, cmd, ident, visibleInfo, userData);
+      setInfoGthread(descr, cmd, ident, visibleInfo, userData);
     } else {
     	if(descr.name !=null && descr.name.equals("writerEnergy1Sec") && cmd == GralPanelMngWorking_ifc.cmdInsert) 
     		stop();
@@ -1236,10 +1236,11 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   }
   
   
-  @Override protected String setInfoDirect(GralWidget_ifc widget, int cmd, int ident, Object info, Object data)
+  @Override protected String setInfoGthread(GralWidget_ifc widget, int cmd, int ident, Object info, Object data)
   { final Object oSwtWidget = widget.getWidgetImplementation();
     final Control swtWidget;
     String sError = null;
+    boolean done = false;
     try{
       SwtSetValue_ifc widgSet = null;
       GralWidgetGthreadSet_ifc gralWidget_setifc = null;
@@ -1252,11 +1253,12 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
         GralWindow_setifc gralWindow_setifc = widgSet.getSwtWindow_ifc();
         if(gralWindow_setifc !=null){
           //check cmd for it:
+          done = true;
           switch(cmd){
           case GralPanelMngWorking_ifc.cmdSetWindowVisible: gralWindow_setifc.setWindowVisible(ident == 0 ? false : true); break;
           case GralPanelMngWorking_ifc.cmdCloseWindow: gralWindow_setifc.closeWindow(); break;
           case GralPanelMngWorking_ifc.cmdRedraw: gralWindow_setifc.repaintGthread(); break;
-          
+          default: done = false;
           }
         }
         gralWidget_setifc = widgSet.getSwtWidget_ifc();
@@ -1266,6 +1268,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
       
       if(gralWidget_setifc !=null){
         //check cmd for it:
+        done = true;
         switch(cmd){
         case GralPanelMngWorking_ifc.cmdClear: gralWidget_setifc.clearGthread(); break;
         case GralPanelMngWorking_ifc.cmdRedraw: gralWidget_setifc.redrawGthread(); break;
@@ -1274,6 +1277,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
           if(info instanceof String)
           gralWidget_setifc.setTextGthread((String)info, data); 
         } break;
+        default: done = false;
         }//switch
       }
       else if(  widget !=null 
@@ -1281,6 +1285,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
         ){
         //common methods for all swt.Control
         int colorValue;
+        done = true;
         switch(cmd){
         case GralPanelMngWorking_ifc.cmdBackColor: {
           colorValue = ((Integer)(info)).intValue();
@@ -1334,13 +1339,29 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
             GralButton widgetButton = (GralButton)widget;
             widgetButton.setState(info);
           } else {
+            done = false;
             //all other widgets:    
-            switch(cmd){  
-            default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd %x for widget: %s", cmd, widget.getName());
-            }
+            //switch(cmd){  
+            //default: log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd %x for widget: %s", cmd, widget.getName());
+            //}
           }
         }//switch
       }//if oWidget !=null
+      if(!done){
+        //this is the new form. TODO only use that. TODO correct implementations for all widgets.
+        GralWidgetGthreadSet_ifc setIfc = widget.getGthreadSetifc();
+        switch(cmd){
+          case GralPanelMngWorking_ifc.cmdClear: setIfc.clearGthread(); break;
+          case GralPanelMngWorking_ifc.cmdRedraw: setIfc.redrawGthread(); break;
+          case GralPanelMngWorking_ifc.cmdInsert: setIfc.insertGthread(ident, info, data); break;
+          case GralPanelMngWorking_ifc.cmdSet: {
+            if(info instanceof String)
+              setIfc.setTextGthread((String)info, data); 
+          } break;
+          default: 
+            log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd %x for widget: %s", cmd, widget.getName());
+          }//switch
+      }
     }catch(Exception exc){
       stop();    
     }
