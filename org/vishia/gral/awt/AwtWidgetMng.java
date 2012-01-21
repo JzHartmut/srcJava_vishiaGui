@@ -40,6 +40,7 @@ import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.swt.SwtMenu;
+import org.vishia.gral.widget.GralValueBar;
 import org.vishia.msgDispatch.LogMessage;
 
 public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWorking_ifc
@@ -340,7 +341,7 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   }
 
   @Override
-  public GralWidget addValueBar(String sName, String sShowMethod, String sDataPath)
+  public GralValueBar addValueBar(String sName, String sShowMethod, String sDataPath)
   {
     // TODO Auto-generated method stub
     return null;

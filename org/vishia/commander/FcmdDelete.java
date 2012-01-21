@@ -117,8 +117,9 @@ public class FcmdDelete
     { try{ 
         if(key == KeyCode.mouse1Up){
           if(widgg.sCmd.equals("delete")){
-            if(!evSuccess.use(0, 1, this)){
+            if(!evSuccess.use(0, 1, this, success)){
               main.mainCmd.writeError("File communication busy.");
+              //only test: evSuccess.consumed();
             } else {
               sFileDelete = widgDeletePath.getText();
               FileRemote file = new FileRemote(sFileDelete);

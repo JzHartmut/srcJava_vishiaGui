@@ -17,6 +17,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralFileSelector;
+import org.vishia.gral.widget.GralValueBar;
 import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
 import org.vishia.util.FileRemote;
@@ -43,7 +44,8 @@ public class FcmdCopyCmd
   
   GralWidget widgdOverwrite, widgdOverwriteReadOnly, widgdOverwriteHidden;
 
-  GralWidget widgProgressFile, widgProgressAll;
+  //GralWidget widgProgressFile;
+  GralValueBar widgProgressAll;
   
   GralButton widgButtonOk;
   
@@ -111,7 +113,7 @@ public class FcmdCopyCmd
     main.gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
     main.gralMng.addButton("copyEsc", actionButtonCopy, "esc", null, null, "esc");
     main.gralMng.setPosition(-4, GralPos.size +1, 7, -11, 0, 'd', 1);
-    widgProgressFile = main.gralMng.addValueBar("copyProgressFile", null, null);
+    //widgProgressFile = main.gralMng.addValueBar("copyProgressFile", null, null);
     widgProgressAll = main.gralMng.addValueBar("copyProgressAll", null, null);
     main.gralMng.setPosition(-4, GralPos.size+3, -10, -1, 0, 'r');
     widgButtonOk = main.gralMng.addButton("copyOk", actionButtonCopy, "check", null, null, "check");
@@ -287,7 +289,7 @@ public class FcmdCopyCmd
         } break;
         case FileRemoteAccessor.kOperation: {
           int percent = ev.data2;
-          widgProgressFile.setValue(GralPanelMngWorking_ifc.cmdSet, percent/10, null, null);
+          widgProgressAll.setValue(GralPanelMngWorking_ifc.cmdSet, percent/10, null, null);
         }break;
         case FileRemoteAccessor.kFinishError: {
           widgCopyState.setText("error");

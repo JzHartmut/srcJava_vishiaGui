@@ -25,6 +25,7 @@ import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.cfg.GralCfgData;
 //import org.vishia.gral.ifc.GuiShellMngIfc;
 import org.vishia.gral.widget.GralInfoBox;
+import org.vishia.gral.widget.GralValueBar;
 import org.vishia.util.KeyCode;
 
 
@@ -303,7 +304,7 @@ public interface GralGridBuild_ifc
   , String sDataPath
   );
   
-  GralWidget addValueBar(
+  GralValueBar addValueBar(
   	String sName
   , String sShowMethod
   , String sDataPath

@@ -91,6 +91,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.widget.GralValueBar;
 import org.vishia.msgDispatch.LogMessage;
 
 
@@ -940,7 +941,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 
   
   
-  @Override public GralWidget addValueBar(
+  @Override public GralValueBar addValueBar(
   	String sName
   , String sShowMethod
   , String sDataPath
@@ -948,6 +949,8 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   {
   	SwtValueBar widget = new SwtValueBar(sName, this);
   	setPosAndSize_(widget.widgetSwt);
+  	Rectangle rect = widget.widgetSwt.getBounds();
+  	widget.horizontal = rect.width > rect.height;
   	widget.setPanelMng(this);
     widget.setShowMethod(sShowMethod);
   	widget.setDataPath(sDataPath);
@@ -1355,8 +1358,11 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
           case GralPanelMngWorking_ifc.cmdRedraw: setIfc.redrawGthread(); break;
           case GralPanelMngWorking_ifc.cmdInsert: setIfc.insertGthread(ident, info, data); break;
           case GralPanelMngWorking_ifc.cmdSet: {
-            if(info instanceof String)
-              setIfc.setTextGthread((String)info, data); 
+            if(info instanceof String){
+              setIfc.setTextGthread((String)info, data);
+            } else {
+              setIfc.insertGthread(ident, info, data);
+            }
           } break;
           default: 
             log.sendMsg(0, "GuiMainDialog:dispatchListener: unknown cmd %x for widget: %s", cmd, widget.getName());

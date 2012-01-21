@@ -14,7 +14,7 @@ import org.vishia.gral.swt.SwtWidgetMng;
  */
 abstract public class GralValueBar extends GralWidget implements GralSetValue_ifc
 {
-	final protected boolean horizontal;
+	public boolean horizontal;
 	
 	/**The maximal value, number of pixel */
 	protected int valueMax;
@@ -38,7 +38,7 @@ abstract public class GralValueBar extends GralWidget implements GralSetValue_if
 	
 	protected GralValueBar(String name, GralWidgetMng mng)
 	{ super(name, 'U', mng);
-		this.horizontal = false;
+		this.horizontal = false;  //set with setBounds of implementation.
 	}
 
 
@@ -70,8 +70,7 @@ abstract public class GralValueBar extends GralWidget implements GralSetValue_if
 	}
 	
 	
-	@Override
-	public void setValue(float valueP)
+	@Override public void setValue(float valueP)
 	{
 		int value1, value2;
 		

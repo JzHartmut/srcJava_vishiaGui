@@ -49,7 +49,11 @@ public class SwtValueBar extends GralValueBar implements GralSetValue_ifc, GralW
 
   @Override public void repaint()
   {
-		this.widgetSwt.getDisplay().asyncExec(widgetSwt.redraw);
+    if(itsMng.currThreadIsGraphic()){
+      widgetSwt.redraw();
+    } else {
+		  this.widgetSwt.getDisplay().asyncExec(widgetSwt.redraw);
+    }
   }
 	
   
@@ -80,13 +84,18 @@ public class SwtValueBar extends GralValueBar implements GralSetValue_ifc, GralW
     { // TODO Auto-generated method stub
     }
 
-    @Override public void insertGthread(int pos, Object visibleInfo, Object data)
-    { // TODO Auto-generated method stub
+    /**This method is used to set the position of the bar.
+     * @see org.vishia.gral.base.GralWidgetGthreadSet_ifc#insertGthread(int, java.lang.Object, java.lang.Object)
+     */
+    @Override public void insertGthread(int pos, Object visibleInfo, Object data){ 
+      if(visibleInfo == null){
+        setValue(pos);
+        widgetSwt.redraw();
+      }
+      if(data !=null) { setContentInfo(data); }
     }
 
-    @Override public void redrawGthread()
-    { // TODO Auto-generated method stub
-    }
+    @Override public void redrawGthread(){ widgetSwt.redraw(); }
 
     @Override public void setBackGroundColorGthread(GralColor color)
     { // TODO Auto-generated method stub
@@ -141,13 +150,21 @@ public class BarWidget extends Canvas
 				//The bar, colored:
 				gc.setBackground(colorBorder[ixColor]);  //black
 				//gc.fillRectangle(1,dim.height -1 - value1 ,dim.width-2, value2 - value1);
-        int size = value1 - value2;
-        int top = dim.height - value1;
-        if(size <0){
-        	size = -size;
-        	top -= size;
+        int start, size;
+        if(value1 < value2){
+          start = 1 + value1;
+          size = value2 - value1;  //difference start bar, end bar
+        } else {
+          start = value2;
+          size = value1 - value2;
         }
-				gc.fillRectangle(1,top ,dim.width-2, size);
+        if(size > 150 && size < 230)
+          stop();
+        if(horizontal){
+          gc.fillRectangle(start,1 ,size, dim.height-2);
+        } else {
+  				gc.fillRectangle(1,start ,dim.width-2, size);
+        }
 				//division lines for borders.
 				if(valPixelBorder !=null){
 					if(horizontal){
