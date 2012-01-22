@@ -10,4 +10,6 @@ public abstract class GralHtmlBox extends GralWidget
 
   public abstract void setUrl(String url);
 
+  public abstract void activate();
+  
 }

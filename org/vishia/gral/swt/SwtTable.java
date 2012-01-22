@@ -56,7 +56,7 @@ public class SwtTable  extends GralTable {
     this.mng = mng;
     this.myKeyListener = this.new TableKeyListerner(null);
     focusListenerTable = this.new FocusListenerTable(mng);
-    focusListenerCell = this.new FocusListenerCell(mng);
+    focusListenerCell = this.new FocusListenerCell();
     setColorsSwt();    
     this.cellsSwt = new Text[zLineVisibleMax][zColumn];
     this.table = new SwtTable.Table(parent, zColumn);
@@ -478,10 +478,10 @@ public class SwtTable  extends GralTable {
   };
   
 
-  private class FocusListenerTable extends SwtWidgetMng.SwtMngFocusListener
+  private class FocusListenerTable implements FocusListener //extends SwtWidgetMng.SwtMngFocusListener
   {
     FocusListenerTable(SwtWidgetMng mng){
-      mng.super();    
+      //mng.super();    
     }
     
     @Override public void focusLost(FocusEvent e){ 
@@ -494,7 +494,8 @@ public class SwtTable  extends GralTable {
     }
     
     @Override public void focusGained(FocusEvent ev)
-    { super.focusGained(ev);
+    { //super.focusGained(ev);
+      SwtTable.this.implMethod.focusGained();
       int row = 1; //table.getSelectionIndex();
       if(row >=0){
         //TableItem tableLineSwt = table.getItem(row);
@@ -508,9 +509,6 @@ public class SwtTable  extends GralTable {
   
   private class FocusListenerCell implements FocusListener
   {
-    FocusListenerCell(SwtWidgetMng mng){
-      //mng.super();    
-    }
     
     /**This routine is invoked whenever the focus of any Text field of the table will be lost
      * the focus. Before that occurs, the field is the selected line, because it has had the focus.
@@ -538,6 +536,7 @@ public class SwtTable  extends GralTable {
      * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
      */
     @Override public void focusGained(FocusEvent ev) { 
+      SwtTable.this.implMethod.focusGained();  //from GralWidget.
       if(!bRedrawPending){ 
         redrawTableWithFocusedCell(ev.widget);
       } 

@@ -190,7 +190,7 @@ public abstract class GralWidget implements GralWidget_ifc
 	
 	
 	/**The relative path to a html help label (maybe an URL, or file, or file with label). */
-	private String htmlHelp;
+	protected String htmlHelp;
 	
 	/**Any special info, may be set from any user class. It should help to present the content. 
 	 * This info can be set and changed after registration. */
@@ -522,11 +522,7 @@ public abstract class GralWidget implements GralWidget_ifc
    * @return true if the focus is set really.
    */
   public abstract boolean setFocus();
-  /*
-  {
-    return itsMng.setFocus(this);
-  }
-  */
+  
   
   
   /**Gets the working interface of the manager. 
@@ -594,6 +590,34 @@ public abstract class GralWidget implements GralWidget_ifc
    */
   protected abstract void repaintGthread();
 
+  
+  
+  /**This class is used only for the implementation level of the graphic. It is not intent to use
+   * by any application. It is public because the implementation level should accesses it.
+   */
+  public class MethodsForImplementation{
+    
+    /**This method in not intent to call by user. It may be called from all widget implementation 
+     * if the focus of the widget is gained. Use {@link #setFocus()} to set a widget in the focus.
+     * 
+     * It sets the html help for the widget and notifies the widgets in focus for the GralWidgetMng. 
+     * Don't override this method in the graphic implementation!
+     * It should be overridden only in a Gral widget inheritance only if necessary.
+     */
+    public void focusGained(){
+      if(htmlHelp !=null){
+        itsMng.setHtmlHelp(htmlHelp);
+      }
+      //notify GralWidgetMng about focused widget.
+      itsMng.notifyFocus(GralWidget.this);
+    }
+    
+    
+    
+  }
+  
+  public MethodsForImplementation implMethod = new MethodsForImplementation();
+  
   
   /**This callback worker calls the {@link #repaintGthread()} if it is invoked in the graphical thread.
    * It is used with delay and wind up whenever {@link #repaint(int, int)} with an delay is called.

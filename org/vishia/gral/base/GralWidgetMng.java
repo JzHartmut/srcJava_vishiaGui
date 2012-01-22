@@ -381,6 +381,15 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   public void setApplicationAdapter(GralMngApplAdapter_ifc adapter){ this.applAdapter = adapter; }
   
 
+  public GralMngApplAdapter_ifc getApplicationAdapter(){ return applAdapter; } 
+  
+  
+  public void setHtmlHelp(String url){
+    if(applAdapter !=null){
+      applAdapter.setHelpUrl(url);
+    }
+  }
+  
   public void XXXsetGralDevice(GralGraphicThread device)
   {
     //this.gralDevice = device;

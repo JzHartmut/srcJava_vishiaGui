@@ -188,8 +188,8 @@ public class Fcmd extends GuiCfg
     gui.addMenuItemGThread("menuAbout", "&Help/&About", gui.getActionAbout());
     gui.addMenuItemGThread("MenuTestInfo", "&Help/&Infobox", actionTest); 
     guiW.outputBox.setActionChange(executer.actionCmdFromOutputBox);
-    
-    gui.setHelpUrl("/home/hartmut/vishia/JavaCommander/sf/JavaCommander/help/Fcmd.html");
+    String sHelpUrlDir = cargs.dirHtmlHelp.getAbsolutePath();
+    gui.setHelpUrl(sHelpUrlDir + "/Fcmd.html");
   }
 
   private void initPanelButtons()

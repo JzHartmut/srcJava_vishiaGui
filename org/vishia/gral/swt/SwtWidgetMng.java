@@ -1619,7 +1619,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	
   
   /**Universal focus listener to register which widgets were in focus in its order.
-   * 
+   * and to set htmlHelp
    */
   class SwtMngFocusListener implements FocusListener
   {
@@ -1630,14 +1630,18 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     
     @Override public void focusGained(FocusEvent ev)
     { GralWidget widgd = (GralWidget)ev.widget.getData();
+      widgd.implMethod.focusGained();
+      /*
       widgd.getMng().notifyFocus(widgd);
       String htmlHelp = widgd.getHtmlHelp();
       if(htmlHelp !=null && applAdapter !=null){
         applAdapter.setHelpUrl(htmlHelp);
       }
+      */
     }
   }
   
+  /**The package private universal focus listener. */
   SwtMngFocusListener focusListener = new SwtMngFocusListener();
 
 

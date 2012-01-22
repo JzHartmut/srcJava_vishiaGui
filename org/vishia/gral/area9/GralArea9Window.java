@@ -586,7 +586,8 @@ return true;
   private GralUserAction actionHelp = new  GralUserAction()
   { 
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
-    { infoHelp.setWindowVisible(true);
+    { infoHelp.activate();
+      infoHelp.setWindowVisible(true);
       return true; 
   } };
 

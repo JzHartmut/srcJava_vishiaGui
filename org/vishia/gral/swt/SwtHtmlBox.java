@@ -14,7 +14,7 @@ public class SwtHtmlBox extends GralHtmlBox
   
   String lastUrl, lastUrlOk;
   
-  boolean bActiv;
+  public boolean bActiv;
   
   public SwtHtmlBox(String name, GralWidgetMng mng)
   {
@@ -38,6 +38,16 @@ public class SwtHtmlBox extends GralHtmlBox
     }
   }
 
+  
+  
+  @Override public void activate(){
+    bActiv = true;
+    setUrl(lastUrl);
+  }
+  
+
+  
+  
   @Override
   protected void removeWidgetImplementation()
   {

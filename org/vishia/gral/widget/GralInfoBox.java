@@ -78,6 +78,11 @@ public class GralInfoBox implements GralTextBox_ifc, GralWindow_ifc
 
   }
   
+  
+  public void activate(){
+    if(htmlBox !=null){ htmlBox.activate(); }
+  }
+  
   @Override public String getName(){ return textBox.getName(); }
   
 
