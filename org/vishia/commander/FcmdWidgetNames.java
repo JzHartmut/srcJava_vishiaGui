@@ -7,6 +7,8 @@ public class FcmdWidgetNames
    * The name is following by the visible name of the tab. */
   public final static String tableFile = "panelFile_";
   
+  public final static String labelWidgFile = "labelWidgFile_";
+  
   /**Name of the tab panel which contains a file table. 
    * The name is following by the visible name of the tab. */
   public final static String tabFile = "tabFile_";

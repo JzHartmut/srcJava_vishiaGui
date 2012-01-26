@@ -11,9 +11,12 @@ public abstract class GralDispatchCallbackWorker
   
   /**Version and history:
    * <ul>
+   * <li>2012-01-26 Hartmut chg: rename removeFromGraphicThread(GralGraphicThread) 
+   *   to {@link #removeFromQueue(GralGraphicThread)}. It is a better naming because it is removed from the queue
+   *   in the graphic thread. This class is only used in that queue. 
    * <li>2012-01-15 Hartmut new: {@link #name} to identify, proper for debugging
    * <li>2012-01-08 Hartmut new: {@link #addToGraphicThread(GralGraphicThread, int)} and 
-   *   {@link #removeFromGraphicThread(GralGraphicThread)} as thread-safe functions which 
+   *   {@link #removeFromQueue(GralGraphicThread)} as thread-safe functions which 
    *   marks the instance as added (for delayed execution, for re-using).
    * <li>2010-06-00 Hartmut created.
    * </ul> */
@@ -79,9 +82,13 @@ public abstract class GralDispatchCallbackWorker
 	
 	
 	
-	synchronized public void removeFromGraphicThread(GralGraphicThread dst){
+	/**Remove this from the queue of dispatch callbacks which are executed in any loop of the
+	 * graphic thread.
+	 * @param graphicThread it is the singleton instance refered with {@link GralWidgetMng#gralDevice}.
+	 */
+	synchronized public void removeFromQueue(GralGraphicThread graphicThread){
 	  bAdded = false;
-	  dst.removeDispatchListener(this);
+	  graphicThread.removeDispatchListener(this);
 	}
 	
 	

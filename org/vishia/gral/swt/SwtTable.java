@@ -148,8 +148,8 @@ public class SwtTable  extends GralTable {
 
 
   @Override protected void repaintGthread(){
-    redrawTableGthread();
-    table.superRedraw();
+    setAllCellContentGthread();
+    table.superRedraw();  //this is the core-redraw
     bRedrawPending = false;
 
   }
@@ -312,7 +312,7 @@ public class SwtTable  extends GralTable {
       }
       bRedrawPending = false;
       countExecution();
-      removeFromGraphicThread(itsMng.gralDevice);
+      removeFromQueue(itsMng.gralDevice);
     }
   };
 
@@ -372,7 +372,7 @@ public class SwtTable  extends GralTable {
      * {@link GralWidgetGthreadSet_ifc#redrawGthread()}
      */
     @Override public void redrawGthread(){ 
-      redrawTableGthread(); 
+      setAllCellContentGthread(); 
       superRedraw();
       bRedrawPending = false;
     }

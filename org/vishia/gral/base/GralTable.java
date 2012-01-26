@@ -114,7 +114,12 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   /**If true then the graphic implementation fields for cells should be filled newly with the text. */
   protected boolean bFillCells;
   
+  /**Check the last time of redrawing. */
   protected long timeLastRedraw;
+  
+  /**If set, then a next key will be processed. It is set to false if a key event is executed
+   * and it is set to true in {@link #keyActionDone}. */
+  private boolean keyDone = true;
   
   /**Set to true while {@link #table}.{@link Table#redrawGthread()} is running.
    * It prevents recursive invocation of redraw() while setFocus() is invoked. */
@@ -256,7 +261,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     tableLines.clear();
     ixLineNew = ixLine = -1;
     ixGlineSelectedNew = -1;  //deselects ixGlineSelected on redraw!
-    repaint();
+    repaint(200,200);
   }
 
   @Override public List<GralTableLine_ifc> getSelectedLines() {
@@ -270,82 +275,117 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   }
 
   
- 
+  
+  /**Handle all standard keys of table. 
+   * It should call in the key event handler from the implementation class.
+   * <br>Keys:
+   * <ul>
+   * <li>pgup: 
+   * <li>up
+   * <li>dn
+   * <li>pgdn
+   * <li>{@link #keyMarkUp}
+   * <li>{@link #keyMarkDn}
+   * <li>calls {@link GralWidgetMng#getRegisteredUserAction(String what)} with what="KeyAction"
+   *   and invokes the returned action method. With them all standard key actions of this application
+   *   may be done if a {@link GralUserAction} is registered for that.  
+   * </ul>
+   * @param keyCode Encoding see {@link KeyCode}.
+   * @return true if the key is processed, false if the key is not processed here. Maybe processed after them.
+   */
   protected boolean processKeys(int keyCode){
     boolean done = true;
     long time = System.currentTimeMillis();
-    if( (time - timeLastRedraw) > 50){
+    //NOTE: prevent to fast key action if the last redraw is yet finished.
+    //The draw needs to much time in Linux-GTK with an Atom processor (Lenovo)
+    if( keyDone || (time - timeLastRedraw) > 350){  //use 350 ms for timeout if keyDone isn't set.  
+      keyDone = false;
       switch(keyCode){
       case KeyCode.pgup: {
         if(ixLine > zLineVisible){
           ixLineNew = ixLine - zLineVisible;
-          repaint();
         } else {
           ixLineNew = 0;
-          repaint();
         }
       } break;
       case KeyCode.up: {
         if(ixLine > 0){
           ixLineNew = ixLine - 1;
-          repaint();
         }
       } break;
       case KeyCode.dn: {
         if(ixLine < zLine -1){
           ixLineNew = ixLine + 1;
-          repaint();
         }
       } break;
       case KeyCode.pgdn: {
         if(ixLine < zLine - zLineVisible){
           ixLineNew = ixLine + zLineVisible;
-          repaint();
         } else {
           ixLineNew = zLine -1;
-          repaint();
         }
       } break;
       default:
         done = false;
       }//switch
-    }
-    if(done == false && keyCode == keyMarkDn && ixLine >=0){
-      GralTableLine_ifc line = tableLines.get(ixLine);
-      if((line.getSelection() & 1)!=0){
-        //it is selected yet
-        line.setForegroundColor(GralColor.getColor("bk"));
-        line.setDeselect(1);
-      } else {
-        line.setForegroundColor(GralColor.getColor("rd"));
-        line.setSelect(1);
-      }
-      if(ixLine < zLine -1){
-        ixLineNew = ixLine + 1;
-      }
-      repaint();
-      done = true;
-    }
-    if(!done && ixLine >=0){
-      GralTableLine_ifc lineGral = tableLines.get(ixLine);
-      if(actionChanging !=null){ 
-        done = actionChanging.userActionGui(keyCode, this, lineGral);
-      }
-    } //if(table.)
-    if(!done){
-      GralUserAction mainKeyAction = itsMng.getRegisteredUserAction("KeyAction");
-      if(mainKeyAction !=null){
-        //old form called because compatibility, if new for with int-parameter returns false.
-        if(!mainKeyAction.userActionGui(keyCode, this)){
-          done = mainKeyAction.userActionGui("key", this, new Integer(keyCode));
+      if(done == false && keyCode == keyMarkDn && ixLine >=0){
+        GralTableLine_ifc line = tableLines.get(ixLine);
+        if((line.getSelection() & 1)!=0){
+          //it is selected yet
+          line.setForegroundColor(GralColor.getColor("bk"));
+          line.setDeselect(1);
+        } else {
+          line.setForegroundColor(GralColor.getColor("rd"));
+          line.setSelect(1);
         }
+        if(ixLine < zLine -1){
+          ixLineNew = ixLine + 1;
+        }
+        done = true;
+      }
+      if(!done && ixLine >=0){
+        GralTableLine_ifc lineGral = tableLines.get(ixLine);
+        if(actionChanging !=null){ 
+          done = actionChanging.userActionGui(keyCode, this, lineGral);
+        }
+      } //if(table.)
+      if(!done){
+        GralUserAction mainKeyAction = itsMng.getRegisteredUserAction("KeyAction");
+        if(mainKeyAction !=null){
+          //old form called because compatibility, if new for with int-parameter returns false.
+          if(!mainKeyAction.userActionGui(keyCode, this)){
+            done = mainKeyAction.userActionGui("key", this, new Integer(keyCode));
+          }
+        }
+      }
+      if(done){
+        repaint(0,0);  //because some indices and contents are changed.
+        keyActionDone.addToGraphicThread(itsMng.gralDevice, 0);
+        //keyDone = true;
       }
     }
     return done;
   }
 
   
-  
+  /**This callback is need because the paint of a table needs more time if a slow processor is used
+   * and the key repeat rate is higher than the calculation time. After finishing all paint requests
+   * in the graphic thread this action was called. It sets {@link #keyDone} = true, then the next key
+   * is processed immediately. Elsewhere, if the graphic thread is busy in the graphic os dispatching
+   * and a new key event is received there, the key action won't be executed.
+   * <br>
+   * It helps for a run-after effect if the key are released already but some key events are stored.
+   * If a navigation key is released, the table navigation should be stopped immediately.
+   * 
+   */
+  private GralDispatchCallbackWorker keyActionDone = new GralDispatchCallbackWorker("GralTableKeyDone") {
+    @Override
+    public void doBeforeDispatching(boolean onlyWakeup) {
+      keyDone = true;
+      //System.out.println("Key done");
+      removeFromQueue(itsMng.gralDevice);
+    }
+  };
 
 
   /**Redraws the whole table because the current line is changed or the focus is changed
@@ -353,24 +393,11 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    * TODO
    * {@link GralWidgetGthreadSet_ifc#redrawGthread()}
    */
-  protected void redrawTableGthread(){
+  protected void setAllCellContentGthread(){
     long dbgtime = System.currentTimeMillis();
-    //test
-    //try{ Thread.sleep(80);} catch(InterruptedException exc){}
     bRedrawPending = true;
     Assert.check(itsMng.currThreadIsGraphic());
     int iCellLine;
-    /*
-    if(ixLineNew != ixLine && ixGlineSelected >=0){
-      iCellLine = ixLineNew - ixLine1;  //The line which is currently present and selected, before changing ixLine1:
-      if(iCellLine != ixGlineSelected){ //another line to select:
-        for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
-          //cellsSwt[ixGlineSelected][iCellCol].setBackground(colorBackTableSwt);
-        }
-        ixGlineSelected = -1; //because selection isn't shown.
-      }
-    }
-    */
     //calculate number of lines to show:
     zLineVisible = getVisibleLinesTableImpl();
     if(zLineVisible > zLineVisibleMax){ 
@@ -430,10 +457,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     if(ixLineNew >=0 && (ixLineNew != ixLine || bFocused)){
       actionOnLineSelected(tableLines.get(ixLineNew));
       ixLine = ixLineNew;
-    //}
-    //if(true || ixLineNew != ixLine){
       ixLine = ixLineNew;
-      //ixGlineSelectedNew = iCellLine = ixLine - ixLine1;
       if(ixGlineSelectedNew != ixGlineSelected){ //note: if the table scrolls, the same cell is used as current.
         //set background color for non-selected line.
         if(ixGlineSelected >=0){
@@ -445,30 +469,18 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
         }
         ixGlineSelected = ixGlineSelectedNew;
       }
-      for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
-        ////Text cellSwt = cellsSwt[iCellLine][iCellCol];
-        //Note: The background color isn't set yet because this routine may be called
-        //in a fast key repetition (50 ms). In the next few ms the next cell may have
-        //the focus then. The setBackground needs about 5 ms per cell on Linux GTK
-        //with an Intel-Atom-processor. It is too much.
-        //The focus is able to see because the cursor is there.
-        //The color will be set in the writeContentLast.
-        //
-        ///don't invoke: 
-        ////cellSwt.setBackground(colorBackSelectSwt);
-        if(iCellCol == ixColumn){
-          ////SwtWidgetHelper.setFocusOfTabSwt(cellSwt);
-          //cellSwt.setFocus();  
-        }
-      }
+      bFocused = false;
     }
-    ///writeContentLast.addToGraphicThread(itsMng.gralDevice, 200);
-    long dbgtime4 = System.currentTimeMillis() - dbgtime;
-    System.out.print("\nSwtTable2-redraw1: " + dbgtime1 + " + " + dbgtime2 + " + " + dbgtime3 + " + " + dbgtime4);
-    dbgtime = System.currentTimeMillis();
+    //long dbgtime4 = System.currentTimeMillis() - dbgtime;
+    //System.out.print("\nSwtTable2-redraw1: " + dbgtime1 + " + " + dbgtime2 + " + " + dbgtime3 + " + " + dbgtime4);
+    timeLastRedraw = System.currentTimeMillis();
+    dbgtime = timeLastRedraw;
     dbgtime1 = System.currentTimeMillis() - dbgtime;
-    System.out.print(", redraw2: " + dbgtime1);
-    
+    //System.out.print(", redraw2: " + dbgtime1);
+    if(name.equals("tableSelect-doc.3"))
+      dbgtime = 0;
+      //System.out.println("repaint " + name);
+       
   }
 
   

@@ -627,7 +627,7 @@ public abstract class GralWidget implements GralWidget_ifc
     @Override public void doBeforeDispatching(boolean onlyWakeup) {
       repaintGthread();
       countExecution();
-      removeFromGraphicThread(itsMng.gralDevice);
+      removeFromQueue(itsMng.gralDevice);
     }
     @Override public String toString(){ return name + ":" + GralWidget.this.name; }
   };

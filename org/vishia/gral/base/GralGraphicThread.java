@@ -172,7 +172,7 @@ public abstract class GralGraphicThread implements Runnable
   
   
   /**Removes a order, which was called in the dispatch loop.
-   * Hint: Use {@link GralDispatchCallbackWorker#removeFromGraphicThread(GralGraphicThread)}
+   * Hint: Use {@link GralDispatchCallbackWorker#removeFromQueue(GralGraphicThread)}
    * to remove thread safe with signification. Don't call this routine yourself.
    * @param listener
    */

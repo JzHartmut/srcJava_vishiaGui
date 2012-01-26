@@ -6,8 +6,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralTableLine_ifc;
+import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.GralFileSelector;
@@ -46,6 +48,8 @@ public class FcmdFileCard extends GralFileSelector
    */
   final String label;
   
+  final GralTextField_ifc widgLabel; /// 
+  
   /**Association to the current used favor path selection.
    * Note that this instance is re-used for more as one selection.
    */
@@ -54,7 +58,7 @@ public class FcmdFileCard extends GralFileSelector
   FileRemote currentFile;
   
   /**If not null, then should synchronize with this file card. */
-  FcmdFileCard otherFileCardtoSync;  ///
+  FcmdFileCard otherFileCardtoSync;  
   
   /**If not null, then it is the base dir for synchronization with the {@link #otherFileCardtoSync}. 
    * It will be set in {@link FcmdFilesCp#setDirs()}. */
@@ -97,6 +101,10 @@ public class FcmdFileCard extends GralFileSelector
     //to show the properties of the selected file in the info line:
     //
     //sets this Widget to the selected panel, it is the grid panel which was created even yet.
+    mng.setPosition(0, 2, 0, 0, 1, 'd');
+    String nameWidgLabel = FcmdWidgetNames.labelWidgFile + nameFilePanel;
+    widgLabel = mng.addTextField(nameWidgLabel, false, null, null);
+    mng.setPosition(2, 0, 0, 0, 1, 'd');
     setToPanel(mng, namePanelFile, 5, new int[]{2,20,5,10}, 'A');
     super.selectList.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.fileSelect.");
     panelFiles.setPrimaryWidget(super.selectList.wdgdTable);
@@ -110,6 +118,23 @@ public class FcmdFileCard extends GralFileSelector
     setActionSetFileLineAttrib(actionSetFileLineAttrib);
   }
 
+  
+  private void buildGraphic(){
+    //see ctor
+  }
+  
+  
+  void setNewContent(FcmdFavorPathSelector.FavorPath favorPathInfoP, File dir){
+    favorPathInfo = favorPathInfoP;
+    favorCard.add(favorPathInfo);  //only it is a new one, it will be checked.
+    setOriginDir(favorPathInfo.getOriginDir());
+    fillIn(dir);
+    widgLabel.setText(favorPathInfo.selectName);
+    setFocus();
+
+  }
+  
+  
   
   
   /**Removes this file card with its widgets and data. It is 'close tab'. */

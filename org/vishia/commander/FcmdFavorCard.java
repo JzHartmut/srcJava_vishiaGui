@@ -102,41 +102,33 @@ public class FcmdFavorCard  extends GralSelectList
   
   @Override protected boolean actionOk(Object userData, GralTableLine_ifc line)
   {
-    FcmdFavorPathSelector.FavorPath favorPathInfo = (FcmdFavorPathSelector.FavorPath)line.getUserData();
-    main.favorPathSelector.actFavorPathInfo = favorPathInfo; //The last used selection (independent of tab left, middle, right)
-    sActSelectedFavorPath = favorPathInfo.selectName;
-    int ixtabName = mainPanel.cNr - '1';
-    
-    //String tabName = info.label;  //The label of file tab.
-    GralWidget widgd;
-      //a new path is selected:
-      //save the path of the current selection
-  
     //before changing the content of this fileTable, store the current directory
     //to restore if this favor respectively selection is used ones more.
     File dir = null;
     String currentDir;
     if(fileTable.favorPathInfo !=null){
       dir = fileTable.getCurrentDir();
-      if(dir == null){
-        dir = favorPathInfo.getOriginDir();
-      }
-      currentDir = dir.getAbsolutePath();
-      if(currentDir !=null){
-        mainPanel.indexActualDir.put(fileTable.favorPathInfo.selectName, currentDir);
-    } }
+      if(dir != null){
+        currentDir = dir.getAbsolutePath();
+        if(currentDir !=null){
+          mainPanel.indexActualDir.put(fileTable.favorPathInfo.selectName, currentDir);
+    } } }
     //
     //Now switch to the new favor in the file panel: 
-    fileTable.favorPathInfo = favorPathInfo;
-    if(  wdgdTable.name.startsWith(FcmdWidgetNames.tableFavoritesMain)   //use the root dir anytime if the main favor path table is used.
-      || (currentDir  = mainPanel.indexActualDir.get(favorPathInfo.selectName)) == null){  //use the root if the entry wasn't use till now
+    FcmdFavorPathSelector.FavorPath favorPathInfo = (FcmdFavorPathSelector.FavorPath)line.getUserData();
+    main.favorPathSelector.actFavorPathInfo = favorPathInfo; //The last used selection (independent of tab left, middle, right)
+    this.sActSelectedFavorPath = favorPathInfo.selectName;
+    if(  wdgdTable.name.startsWith(FcmdWidgetNames.tableFavoritesMain)) {
+      //use the root dir any time if the main favor path table is used.
       currentDir = favorPathInfo.path;
-      dir = new FileRemote(currentDir);
+    } else {
+      currentDir  = mainPanel.indexActualDir.get(favorPathInfo.selectName);
+      if(currentDir == null){
+        currentDir = favorPathInfo.path;
+      }
     }
-    fileTable.favorCard.add(favorPathInfo);  //only it is a new one, it will be checked.
-    fileTable.setOriginDir(favorPathInfo.getOriginDir());
-    fileTable.fillIn(dir);
-    fileTable.setFocus();
+    dir = new FileRemote(currentDir);
+    fileTable.setNewContent(favorPathInfo, dir);
     return true;
   }
 

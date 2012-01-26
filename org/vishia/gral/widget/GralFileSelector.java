@@ -261,7 +261,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     widgdPath = panelMng.addTextField(name + "-Path", false, null, null);
     widgdPath.setBackColor(panelMng.getColor("pye"), 0xeeffff);  //color pastel yellow
     //the list
-    panelMng.setPosition(posAll, 2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
+    panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
     selectList.setToPanel(panelMng, name, rows, columns, size);
     //store this in the GralWidgets to get back from widgets later.
     widgdPath.setContentInfo(this);
@@ -331,6 +331,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     //this.sCurrentDir = FileSystem.getCanonicalPath(dir) + "/";
     this.sCurrentDir = dir.getPath();
     widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sCurrentDir);
+    widgdPath.setSelection("|..<");
     File[] files = dir.listFiles();
     int lineSelect = 0;  
     if(files !=null){ 
@@ -400,7 +401,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, currentDir);
     }
     selectList.wdgdTable.setCurrentCell(lineSelect, 1);
-    selectList.wdgdTable.repaint();
+    selectList.wdgdTable.repaint(200,200);
   }
   
 
