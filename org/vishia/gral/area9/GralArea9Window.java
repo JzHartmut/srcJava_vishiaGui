@@ -466,7 +466,7 @@ public class GralArea9Window implements GralArea9_ifc
    * if it has a better way to show infos.*/
   protected void writeDirectly(String sInfo, short kind)  //##a
   { if(textAreaOutput != null){
-      if(Thread.currentThread().getId() == window.gralMng.gralDevice.guiThreadId){
+      if(Thread.currentThread().getId() == window.gralMng.gralDevice.getThreadIdGui()){
         try{
           if((kind & MainCmd.mNewln_writeInfoDirectly) != 0)
           { textAreaOutput.append("\n");

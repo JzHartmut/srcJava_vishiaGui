@@ -27,6 +27,16 @@ public interface GralTextField_ifc extends GralWidget_ifc
    */
   void setText(CharSequence text);
   
+  /**Sets the textual content and show it with the given caret position.
+   * It is adequate {@link #setText(CharSequence)}.
+   * @param text The text to show in the widget.
+   * @param caretPos 0 for left, -1 for right, 0 to Integer.MAXINT for a given position.
+   *   If the caret position is greater then the number of chars, it is set right.
+   *   That character which is left from the caret position is shown guaranteed in the text field.
+   *   Especially -1 can be given to show the text right-aligned.
+   */
+  void setText(CharSequence text, int caretPos);
+  
   String getText();
   
   int getCursorPos();
@@ -45,6 +55,6 @@ public interface GralTextField_ifc extends GralWidget_ifc
    * </ul>
    * @param how
    */
-  void setSelection(String how);
+  //void setSelection(String how);
   
 }

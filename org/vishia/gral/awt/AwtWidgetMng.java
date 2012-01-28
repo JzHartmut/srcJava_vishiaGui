@@ -94,9 +94,7 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     }
     //
     if(prompt != null && promptStylePosition.startsWith("t")){
-      if(posUsed){
-        setNextPosition();
-      }
+      setNextPosition();
       final Font promptFont;
       char sizeFontPrompt;
       GralRectangle boundsAll, boundsPrompt, boundsField;
@@ -534,9 +532,7 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   protected void setPosAndSize_(Component component, int widthwidgetNat, int heigthWidgetNat)
   {
-    if(posUsed){
-      setNextPosition();
-    }
+    setNextPosition();
     Component parentComp = component.getParent();
     //Rectangle pos;
     final GralRectangle rectangle;
@@ -547,7 +543,6 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
       rectangle = calcWidgetPosAndSize(pos, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
     }
     component.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
-    posUsed = true;
        
   }
   

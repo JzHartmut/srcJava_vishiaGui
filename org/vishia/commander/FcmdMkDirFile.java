@@ -10,7 +10,6 @@ import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
@@ -43,8 +42,8 @@ public class FcmdMkDirFile
     int windProps = GralWindow.windConcurrently;
     GralWindow window =  main.gralMng.createWindow("windMk", "mkdir/file - The.file.Commander", windProps);
     main.gralMng.setPosition(4, GralPos.size -3.8f, 1, -1, 0, 'd', 0.4f);
-    widgParentPath = main.gralMng.addTextField("mkParentPath", true, "parent path:", "t");
-    widgName = main.gralMng.addTextField("mkParentPath", true, "name:", "t");
+    widgParentPath = main.gralMng.addTextField("mkParentPath", false, "parent path:", "t");
+    widgName = main.gralMng.addTextField("mkName", true, "name:", "t");
     main.gralMng.setPosition(-3.5f, -0.5f, 1, GralPos.size + 10, 0, 'r', 2);
     widgButtonClose = main.gralMng.addButton(null, actionButton, "c", null, null, "close");
     widgButtonMkFile = main.gralMng.addButton(null, actionButton, "f", null, null, "create file");

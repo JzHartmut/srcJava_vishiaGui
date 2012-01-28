@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
 import org.vishia.cmd.PrepareCmd;
 import org.vishia.cmd.CmdStore.CmdBlock;
 import org.vishia.gral.base.GralMenu;
-import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWindow;
@@ -37,6 +37,7 @@ public class FcmdExecuter
     ExtCmd(String name){ this.ext = name; }
   }
   
+  
   Map<String, ExtCmd> extCmds = new TreeMap<String, ExtCmd>();
   
   
@@ -53,11 +54,14 @@ public class FcmdExecuter
   /**Store of all possible commands given in the command file. */
   final CmdStore cmdStore = new CmdStore();
   
+  /**The command queue to execute */
+  final CmdQueue cmdQueue;
 
   
   FcmdExecuter(MainCmd_ifc console, Fcmd main)
   { this.main = main;
     this.console = console;
+    this.cmdQueue = new CmdQueue(main.mainCmd);
   }
   
   
@@ -181,7 +185,7 @@ public class FcmdExecuter
         // such names are registered.
         // FileSelector fileSel = fileSelector[ixFilePanel];
         //FileRemote file = fileSel.getSelectedFile();
-        main.cmdQueue.setWorkingDir(main.currentFile.getParentFile());
+        cmdQueue.setWorkingDir(main.currentFile.getParentFile());
       }
       return true;
     }
@@ -265,12 +269,12 @@ public class FcmdExecuter
           if(cmd !=null){
             //PrepareCmd cmdp = cmd.getCmds().get(0);
             if(cmd.name.startsWith(">")){
-              main.cmdQueue.addCmd(cmd.name, null, main.currentFile.getParentFile(), '>');
+              cmdQueue.addCmd(cmd.name, null, main.currentFile.getParentFile(), '>');
             } else {
               //the extension determines the command.
               File[] files = main.getLastSelectedFiles();
               File currentDir = files[0].getParentFile();
-              main.cmdQueue.addCmd(cmd, files, currentDir);
+              cmdQueue.addCmd(cmd, files, currentDir);
             }
           }
         }
@@ -311,7 +315,7 @@ public class FcmdExecuter
             }
           }
         } else { files = null; }
-        main.cmdQueue.addCmd(sCmd, files, currentDir, kindOfExecution);
+        cmdQueue.addCmd(sCmd, files, currentDir, kindOfExecution);
         return true;
       } else return false;
     }
@@ -323,7 +327,7 @@ public class FcmdExecuter
    */
   GralUserAction actionCmdAbort = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
-    { main.cmdQueue.abortCmd();
+    { cmdQueue.abortCmd();
       return true;
     }
   };

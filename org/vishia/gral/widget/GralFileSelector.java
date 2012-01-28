@@ -24,6 +24,10 @@ import org.vishia.util.Removeable;
 /**This class is a large widget which contains a list to select files in a directory, 
  * supports navigation in the directory tree and shows the current path in an extra text field.
  * Additional 'search in files' is supported.
+ * <br>
+ * The type of a file is {@link FileRemote} which is an derivation of java.io.File. It means that
+ * the files may be existing on any remote device too. The local file system is a special case,
+ * whereby it's the usual case mostly.
  * @author Hartmut Schorrig
  *
  */
@@ -49,39 +53,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * </ul>
    */
   public static final int version = 0x20111002;
-
-
-  
-  
-  
-  /**This class describes a file. It is similar a java.lang.File, but it contains the information
-   * maybe of remote files.
-   */
-  public static class XXXFileAndName //extends SelectMask
-  { /**The directory path of the file. */
-    public final String path;
-    /**The name with extension of the file. */
-    public final String name;
-    public final long date;
-    public final long length;
-    public final boolean isWriteable;
-    public final File file;
-    
-    XXXFileAndName(String sPath, String sName, long length, long date, boolean isWriteable){
-      assert(sPath.endsWith("/"));
-      this.isWriteable = isWriteable;
-      this.path = sPath;
-      this.name = sName;
-      this.length = length;
-      this.date = date;
-      this.file = new File(sPath, sName);
-    }
-  }
-  
-  
   
   FileRemoteAccessor localFileAccessor = FileRemoteAccessorLocalFile.getInstance();
-  
   
   /**Implementation of the base widget.
    */
@@ -330,8 +303,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
     }
     //this.sCurrentDir = FileSystem.getCanonicalPath(dir) + "/";
     this.sCurrentDir = dir.getPath();
-    widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sCurrentDir);
-    widgdPath.setSelection("|..<");
+    //widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sCurrentDir);
+    widgdPath.setText(sCurrentDir, -1);
+    //widgdPath.setSelection("|..<");
     File[] files = dir.listFiles();
     int lineSelect = 0;  
     if(files !=null){ 
@@ -432,15 +406,15 @@ public class GralFileSelector implements Removeable //extends GralWidget
   /**Gets all selected file from this panel.
    * @return null if no line is selected, for example if the panel isn't used yet.
    */
-  public List<String> getSelectedFiles()
-  { List<String> list = new LinkedList<String>();
+  public List<FileRemote> getSelectedFiles()
+  { List<FileRemote> list = new LinkedList<FileRemote>();
     if(selectList.wdgdTable == null){
       stop();
       return null;
     }
     for(GralTableLine_ifc line: selectList.wdgdTable.getSelectedLines()){
-      FileRemote data = (FileRemote)line.getUserData();
-      list.add(data.getName());
+      FileRemote file = (FileRemote)line.getUserData();
+      list.add(file);
     }
     return list;
   }

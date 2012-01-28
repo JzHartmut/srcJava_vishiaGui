@@ -1,11 +1,15 @@
 package org.vishia.gral.base;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWindowMng_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralWidget;
 
-/**This is the interface to all widgets which represents a simple text.
+/**This is the base class for all widgets which represents a simple text.
  * @author Hartmut Schorrig
  *
  */
@@ -21,18 +25,65 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   @SuppressWarnings("hiding")
   public final static int version = 0x20111118;
   
+  protected String text = "";
+  
+  protected int caretPos;
+  
+  protected GralColor colorBack = GralColor.getColor("wh"), colorText = GralColor.getColor("bk");
+  
+  protected GralFont fontText;
+  
+  
+  protected AtomicInteger whatIsChanged = new AtomicInteger();
+  
+  protected static final int chgText = 1, chgColorBack=2, chgColorText=4, chgFont = 8;
+  
+  /**It is used for some operations. */
   protected final GralGraphicThread windowMng;
+  
+  
   
   public GralTextField(String name, char whatis, GralWidgetMng mng){
     super(name, whatis, mng);
     this.windowMng = mng.gralDevice;
   }
   
+  
+  @Override public void setText(CharSequence arg)
+  { setText(arg, 0);
+  }
+  
+  @Override public void setText(CharSequence arg, int caretPos)
+  {
+    text = arg.toString();
+    this.caretPos = caretPos;
+    int yet = whatIsChanged.get();
+    int catastrophicCount = 0;
+    while( !whatIsChanged.compareAndSet(yet, yet | chgText)){ 
+      if(++catastrophicCount > 10000) throw new RuntimeException("");
+    }
+    if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
+      repaintGthread();
+    } else {
+      repaint(100,0);
+    }
+  }
+  
+  
+
+  
   /**Sets the action which is invoked while a mouse button is pressed or release on this widget.
    * Implementation hint: It installs a mouse listener.
    * TODO: use GralMouseWidgetAction_ifc instead GralUserAction, use another action for mouse than change.
    */
   abstract public void setMouseAction(GralUserAction action);
+  
+  
+  @Override public String getText(){ return text; }
+   
+
+
+  
   
   /**Returns the Label for a prompt or null if there isn't used a prompt
    */

@@ -8,7 +8,6 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -72,7 +71,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   /**The colors of each cell. It is set with the color of {@link TableItemWidget#colorBackground} and
    * {@link TableItemWidget#colorBackground} of the currently displayed line.
    */
-  private GralColor[] colorBack, colorText;
+  //private GralColor[] colorBack, colorText;
   
 
   /**Pixel per line. */
@@ -142,8 +141,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     super(name, 'L', mng);
     this.columnWidthsGral = columnWidths;
     this.zColumn = columnWidths.length;
-    this.colorBack = new GralColor[zLineVisibleMax];
-    this.colorText = new GralColor[zLineVisibleMax];
+    //this.colorBack = new GralColor[zLineVisibleMax];
+    //this.colorText = new GralColor[zLineVisibleMax];
     int xdPix = itsMng.propertiesGui.xPixelUnit();
     columnPixel = new int[columnWidthsGral.length+1];
     int xPix = 0;
@@ -183,9 +182,10 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     colorBackSelect = GralColor.getColor("gn");
     colorBackMarked = GralColor.getColor("rd");
     colorBackTable = GralColor.getColor("wh");
-    colorBackSelectNonFocused = GralColor.getColor("lgn");
+    colorBackSelectNonFocused = GralColor.getColor("am");
     colorBackMarkedNonFocused = GralColor.getColor("lrd");
     colorBackTableNonFocused = GralColor.getColor("gr");
+    colorTextTable = GralColor.getColor("bk");
   }
   
   
@@ -307,16 +307,19 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
         } else {
           ixLineNew = 0;
         }
+        keyActionDone.addToGraphicThread(itsMng.gralDevice, 0);
       } break;
       case KeyCode.up: {
         if(ixLine > 0){
           ixLineNew = ixLine - 1;
         }
+        keyActionDone.addToGraphicThread(itsMng.gralDevice, 0);
       } break;
       case KeyCode.dn: {
         if(ixLine < zLine -1){
           ixLineNew = ixLine + 1;
         }
+        keyActionDone.addToGraphicThread(itsMng.gralDevice, 0);
       } break;
       case KeyCode.pgdn: {
         if(ixLine < zLine - zLineVisible){
@@ -324,6 +327,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
         } else {
           ixLineNew = zLine -1;
         }
+        keyActionDone.addToGraphicThread(itsMng.gralDevice, 0);
       } break;
       default:
         done = false;
@@ -341,15 +345,18 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
         if(ixLine < zLine -1){
           ixLineNew = ixLine + 1;
         }
+        keyActionDone.addToGraphicThread(itsMng.gralDevice, 0);
         done = true;
       }
       if(!done && ixLine >=0){
         GralTableLine_ifc lineGral = tableLines.get(ixLine);
-        if(actionChanging !=null){ 
+        if(actionChanging !=null){
+          //all other keys: call actionChanging.
           done = actionChanging.userActionGui(keyCode, this, lineGral);
         }
       } //if(table.)
       if(!done){
+        //if actionChanging.userAction() returns false 
         GralUserAction mainKeyAction = itsMng.getRegisteredUserAction("KeyAction");
         if(mainKeyAction !=null){
           //old form called because compatibility, if new for with int-parameter returns false.
@@ -357,11 +364,6 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
             done = mainKeyAction.userActionGui("key", this, new Integer(keyCode));
           }
         }
-      }
-      if(done){
-        repaint(0,0);  //because some indices and contents are changed.
-        keyActionDone.addToGraphicThread(itsMng.gralDevice, 0);
-        //keyDone = true;
       }
     }
     return done;
@@ -381,6 +383,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   private GralDispatchCallbackWorker keyActionDone = new GralDispatchCallbackWorker("GralTableKeyDone") {
     @Override
     public void doBeforeDispatching(boolean onlyWakeup) {
+      repaintGthread();
       keyDone = true;
       //System.out.println("Key done");
       removeFromQueue(itsMng.gralDevice);
@@ -479,7 +482,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     //System.out.print(", redraw2: " + dbgtime1);
     if(name.equals("tableSelect-doc.3"))
       dbgtime = 0;
-      //System.out.println("repaint " + name);
+    //System.out.println("GralTable.repaint; " + name);
+    //Thread.dumpStack();
        
   }
 
@@ -528,7 +532,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
      */
     public AtomicInteger ctRepaintLine = new AtomicInteger();  //NOTE should be public to see it from derived outer class
     
-    int nLineNr;
+    public int nLineNr;
     
     String key;
     
@@ -601,7 +605,9 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     }
 
     @Override public void repaint(int delay, int latest){
-      itsMng.setInfoDelayed(this, GralPanelMngWorking_ifc.cmdRedraw, 0, null, null, delay);
+      ctRepaintLine.addAndGet(1);
+      GralTable.this.repaint(delay, latest); 
+      //itsMng.setInfoDelayed(this, GralPanelMngWorking_ifc.cmdRedraw, 0, null, null, delay);
     }
     
 

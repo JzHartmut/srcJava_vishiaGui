@@ -30,7 +30,7 @@ public class AwtPrimaryWindow extends AwtSubWindow implements GralPrimaryWindow_
     //GuiThread graphicThread = startGraphicThread(init);  
 
     synchronized(init){
-      while(init.guiThreadId == 0){
+      while(init.getThreadIdGui() == 0){
         try{ init.wait(1000);} catch(InterruptedException exc){}
       }
     }

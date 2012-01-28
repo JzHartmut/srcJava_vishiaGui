@@ -10,6 +10,7 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.swt.SwtWidgetMng;
 
 public class AwtTextField extends GralTextField
 {
@@ -34,12 +35,6 @@ public class AwtTextField extends GralTextField
     
   }
 
-  @Override
-  public String getText()
-  { return widgetAwt.getText();
-  }
-
-  
   @Override public int getCursorPos(){ return widgetAwt.getCaretPosition(); }
 
 
@@ -151,22 +146,20 @@ public static class AwtTextFieldImpl extends TextField implements AwtWidget
     
   }
 
-  @Override
-  protected void repaintGthread() {
-    // TODO Auto-generated method stub
-    
+  @Override protected void repaintGthread(){
+    int chg = this.whatIsChanged.get();
+    int catastrophicalCount = 0;
+    do{
+      if(++catastrophicalCount > 10000) throw new RuntimeException("atomic failed");
+      if((chg & chgText) !=0){ 
+        widgetAwt.setText(text); 
+      }
+      if((chg & chgColorText) !=0){ widgetAwt.setForeground(((AwtWidgetMng)itsMng).getColorImpl(colorText)); }
+      if((chg & chgColorBack) !=0){ widgetAwt.setBackground(((AwtWidgetMng)itsMng).getColorImpl(colorBack)); }
+      widgetAwt.repaint();
+    } while(!whatIsChanged.compareAndSet(chg, 0));
   }
 
-  
-  @Override public void setSelection(String how){
-    if(how.equals("|..<")){
-      String sText = widgetAwt.getText();
-      int zChars = sText.length();
-      int pos0 = 0; //zChars - 20;
-      if(pos0 < 0){ pos0 = 0; }
-      //widgetAwt.setSelection(pos0, zChars);
-    }
-  }
   
 
   

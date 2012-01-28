@@ -1,12 +1,9 @@
 package org.vishia.commander;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.vishia.commander.target.FcmdtTarget_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
@@ -16,13 +13,11 @@ import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.gral.widget.GralValueBar;
 import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
 import org.vishia.util.FileRemote;
 import org.vishia.util.FileRemoteAccessor;
-import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
 /**This class contains all functionality to execute copy and move for The.file.Commander.
@@ -44,7 +39,7 @@ public class FcmdCopyCmd
   
   GralWidget widgdOverwrite, widgdOverwriteReadOnly, widgdOverwriteHidden;
 
-  //GralWidget widgProgressFile;
+  GralValueBar widgProgressFile;
   GralValueBar widgProgressAll;
   
   GralButton widgButtonOk;
@@ -113,7 +108,7 @@ public class FcmdCopyCmd
     main.gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
     main.gralMng.addButton("copyEsc", actionButtonCopy, "esc", null, null, "esc");
     main.gralMng.setPosition(-4, GralPos.size +1, 7, -11, 0, 'd', 1);
-    //widgProgressFile = main.gralMng.addValueBar("copyProgressFile", null, null);
+    widgProgressFile = main.gralMng.addValueBar("copyProgressFile", null, null);
     widgProgressAll = main.gralMng.addValueBar("copyProgressAll", null, null);
     main.gralMng.setPosition(-4, GralPos.size+3, -10, -1, 0, 'r');
     widgButtonOk = main.gralMng.addButton("copyOk", actionButtonCopy, "check", null, null, "check");
@@ -147,16 +142,16 @@ public class FcmdCopyCmd
         fileCardDst = main.lastFileCards.get(1);
         fileSrcDir = FileRemote.fromFile(fileCardSrc.getCurrentDir());
         fileDstDir = FileRemote.fromFile(fileCardDst.getCurrentDir());
-        List<String> listFileSrc = fileCardSrc.getSelectedFiles();
+        List<FileRemote> listFileSrc = fileCardSrc.getSelectedFiles();
         if(listFileSrc.size()==0){ //nothing selected
-          listFileSrc.add(fileCardSrc.currentFile.getName());  
+          listFileSrc.add(fileCardSrc.currentFile);  
         }
-        for(String srcName : listFileSrc){
-          FileRemote fileSrc = new FileRemote(fileSrcDir, srcName);
+        for(File srcFile : listFileSrc){
+          FileRemote fileSrc = FileRemote.fromFile(srcFile);
           filesToCopy.add(fileSrc);
         }
         sDstName = listFileSrc.size() >1 ? "*" 
-                   : listFileSrc.size() >=1 ? listFileSrc.get(0) : "??";
+                   : listFileSrc.size() ==1 ? listFileSrc.get(0).getName() : "??";
         sSrc = fileSrcDir.getAbsolutePath() + "/" + sDstName;
         sDstDir = fileDstDir.getAbsolutePath();
       } else {

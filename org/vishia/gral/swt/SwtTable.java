@@ -214,7 +214,9 @@ public class SwtTable  extends GralTable {
     CellData data = (CellData)cell.getData();
     if(data.tableItem !=null){ //don't do any action if the cell isn't use.
       ixLineNew = data.ixCellLine + ixLine1;
-      Assert.check(ixLineNew < zLine);
+      if(ixLineNew >=zLine){ //files may be deleted 
+        ixLineNew = zLine >0 ? 0 : -1;  //select the first line or select nothing.
+      }
       ixColumn = data.ixCellColumn;
       bFocused = true;
       table.redraw();
@@ -234,29 +236,32 @@ public class SwtTable  extends GralTable {
    */
   @Override protected void drawCellContent(int iCellLine, int iCellCol, TableItemWidget tableItem ){
     Text cellSwt = cellsSwt[iCellLine][iCellCol]; 
-    CellData data = (CellData)cellSwt.getData();
-    data.tableItem = tableItem;
+    CellData cellData = (CellData)cellSwt.getData();
+    cellData.tableItem = tableItem;
     //
     String text = tableItem.cellTexts[iCellCol];
     if(text == null){ text = ""; }
     //
     cellSwt.setText(text);
     GralColor colorBack;
-    if(ixGlineSelectedNew == iCellLine){
+    if(ixLineNew >=0 ? tableItem.nLineNr == ixLineNew  //a new line 
+      : tableItem.nLineNr == ixLine) { //the current line, but only if ixLineNew <0
+    //if(ixGlineSelectedNew == iCellLine){
       colorBack = colorBackSelect;
     } else if(tableItem.colorBackground !=null){
       colorBack = tableItem.colorBackground;
     } else {
       colorBack = colorBackTable;
     }
-    if(data.colorBack != colorBack){
+    if(cellData.colorBack != colorBack){
       Color colorSwt =  mng.getColorImpl(colorBack);
       cellSwt.setBackground(colorSwt);
-      data.colorBack = colorBack;
+      cellData.colorBack = colorBack;
     }
-    if(tableItem.colorForground !=null && data.colorText != tableItem.colorForground){
-      cellSwt.setForeground(mng.getColorImpl(tableItem.colorForground));
-      data.colorText = tableItem.colorForground;
+    GralColor colorText = tableItem.colorForground !=null ? tableItem.colorForground : colorTextTable;
+    if(colorText != cellData.colorText){
+      cellSwt.setForeground(mng.getColorImpl(colorText));
+      cellData.colorText = colorText;
     }
     if(ixGlineSelectedNew == iCellLine && iCellCol == ixColumn){
       SwtWidgetHelper.setFocusOfTabSwt(cellSwt);
@@ -278,44 +283,6 @@ public class SwtTable  extends GralTable {
     cellSwt.setVisible(false);
     return ((CellData)cellSwt.getData());
   }
-
-  /**This routine is called in the graphic thread after a last {@link #redrawGthread()} invocation with delay.
-   * It sets the background color to the focused cell and sets the focus for the panel.
-   * @deprecated
-   */
-  GralDispatchCallbackWorker writeContentLast = new GralDispatchCallbackWorker("SwtTable2.writeContentLast"){
-    @Override public void doBeforeDispatching(boolean onlyWakeup) {
-      ///
-      bRedrawPending = true;
-      if(ixGlineSelected >=0 && ixGlineSelectedNew != ixGlineSelected){
-        //set background color for non-selected line.
-        for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
-          Text cellSwt = cellsSwt[ixGlineSelected][iCellCol];
-          cellSwt.setBackground(colorBackTableSwt);
-        }
-      }
-      if((ixGlineSelectedNew != ixGlineSelected || bFocused) && ixGlineSelectedNew >= 0 ){
-        //set background color for selected line.
-        ixGlineSelected = ixGlineSelectedNew; //Note is equal already if bFocused only
-        if(ixGlineSelectedNew >=0){ //only if anything is selected:
-          for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
-            Text cellSwt = cellsSwt[ixGlineSelected][iCellCol];
-            cellSwt.setBackground(colorBackSelectSwt);
-            if(iCellCol == ixColumn){
-              SwtWidgetHelper.setFocusOfTabSwt(cellSwt);
-              //cellSwt.setFocus(); 
-              System.out.print("\nSwtTable2.writeContentLast: " + SwtTable.this.name);
-            }
-          }
-        }
-        bFocused = false;
-      }
-      bRedrawPending = false;
-      countExecution();
-      removeFromQueue(itsMng.gralDevice);
-    }
-  };
-
 
   private class Table extends Composite implements GralWidgetGthreadSet_ifc {
 
@@ -372,9 +339,7 @@ public class SwtTable  extends GralTable {
      * {@link GralWidgetGthreadSet_ifc#redrawGthread()}
      */
     @Override public void redrawGthread(){ 
-      setAllCellContentGthread(); 
-      superRedraw();
-      bRedrawPending = false;
+      SwtTable.this.repaintGthread();
     }
     
     
@@ -495,7 +460,7 @@ public class SwtTable  extends GralTable {
     
     @Override public void focusGained(FocusEvent ev)
     { //super.focusGained(ev);
-      SwtTable.this.implMethod.focusGained();
+      SwtTable.this.gralWidgetMethod.focusGained();
       int row = 1; //table.getSelectionIndex();
       if(row >=0){
         //TableItem tableLineSwt = table.getItem(row);
@@ -536,10 +501,14 @@ public class SwtTable  extends GralTable {
      * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
      */
     @Override public void focusGained(FocusEvent ev) { 
-      SwtTable.this.implMethod.focusGained();  //from GralWidget.
-      if(!bRedrawPending){ 
-        redrawTableWithFocusedCell(ev.widget);
-      } 
+      try{
+        if(!bRedrawPending){ 
+          SwtTable.this.gralWidgetMethod.focusGained();  //from GralWidget.
+          redrawTableWithFocusedCell(ev.widget);
+        }
+      } catch(Exception exc){
+        itsMng.log.sendMsg(0, "Exception in SwtTable.focusGained");
+      }
     }
     
   };

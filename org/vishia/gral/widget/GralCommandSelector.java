@@ -123,7 +123,8 @@ public class GralCommandSelector extends GralSelectList
     files[0] = getterFiles.getFile1();
     files[1] = getterFiles.getFile2();
     files[2] = getterFiles.getFile3();
-    cmdQueue.addCmd(cmdBlock, files, null);  //to execute.
+    File currDir = files[0].getParentFile();
+    cmdQueue.addCmd(cmdBlock, files, currDir);  //to execute.
     return true;
   }
   

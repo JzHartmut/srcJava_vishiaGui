@@ -1,8 +1,9 @@
 package org.vishia.commander;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPos;
@@ -10,6 +11,7 @@ import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.widget.GralValueBar;
 import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
 import org.vishia.util.FileRemote;
@@ -29,11 +31,19 @@ public class FcmdDelete
 
   GralTextField_ifc widgDeletePath, widgTrashPath;
   
+  GralValueBar widgProgress;
+  
   /**Buttons. */
   GralWidget widgRemoveToTrash, widgDelete;
+  
+  GralWidget widgButtonOk;
 
   /**Name of the file which is attempt to delete. */
-  String sFileDelete;
+  List<FileRemote> listFileDel;
+  //String sFileDelete;
+ 
+  final List<Event> listEvDel = new LinkedList<Event>();
+
   
   /**The file card where the directory content is shown where the file will be deleted.
    */
@@ -61,13 +71,16 @@ public class FcmdDelete
     main.gralMng.addText("trash path:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
     widgTrashPath = main.gralMng.addTextField("deleteTrashPath", true, null, "t");
     
+    main.gralMng.setPosition(-6, GralPos.size +1, 7, -11, 0, 'd', 1);
+    //widgProgressFile = main.gralMng.addValueBar("copyProgressFile", null, null);
+    widgProgress = main.gralMng.addValueBar("copyProgressAll", null, null);
     main.gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
     main.gralMng.addButton("deleteEsc", actionDelete, "esc", null, null, "esc");
     main.gralMng.setPosition(-1, GralPos.size-3, -19,-11, 0, 'r');
     widgRemoveToTrash = main.gralMng.addButton("deleteToTrash", actionDelete, "trash", null, null, "trash");
     main.gralMng.setPosition(-1, GralPos.size-3, -9, -1, 0, 'r');
-    main.gralMng.addButton("deleteOk", actionDelete, "delete", null, null, "delete");
-  
+    widgButtonOk = main.gralMng.addButton("deleteOk", actionDelete, "delete", null, null, "delete");
+    widgButtonOk.setPrimaryWidgetOfPanel();
   }
   
   
@@ -76,18 +89,23 @@ public class FcmdDelete
    * @param src The path which is selected as source. It may be a directory or a file.
    */
   void confirmDelete(File src111)
-  { String sSrc, sTrash;
-    FileRemote src;
-    fileCard = main.lastFileCards.get(0);
-    src = fileCard ==null ? null :  fileCard.currentFile; 
-    if(src !=null){
-      sSrc = FileSystem.getCanonicalPath(src);
-      widgDeletePath.setText(sSrc);
-      widgTrashPath.setText("TODO");
-    } else {
-      widgDeletePath.setText("--no file selected--");
-      widgTrashPath.setText("");
+  { fileCard = main.lastFileCards.get(0);
+    String sFileDel = null;
+    if(fileCard !=null){
+      listFileDel = fileCard.getSelectedFiles();
+      if(listFileDel.size() >0){
+        sFileDel = FileSystem.getCanonicalPath(fileCard.getCurrentDir()) + "/*";
+      } else {
+        sFileDel = FileSystem.getCanonicalPath(fileCard.currentFile);
+        listFileDel.add(fileCard.currentFile);
+      }
     }
+    if(sFileDel == null){
+      sFileDel = "--no files selected--";
+    }
+    widgDeletePath.setText(sFileDel);
+    widgTrashPath.setText("TODO");
+    
     windConfirmDelete.setWindowVisible(true);
 
   }
@@ -117,16 +135,16 @@ public class FcmdDelete
     { try{ 
         if(key == KeyCode.mouse1Up){
           if(widgg.sCmd.equals("delete")){
-            if(!evSuccess.use(0, 1, this, success)){
-              main.mainCmd.writeError("File communication busy.");
-              //only test: evSuccess.consumed();
-            } else {
-              sFileDelete = widgDeletePath.getText();
-              FileRemote file = new FileRemote(sFileDelete);
+            for(FileRemote file : listFileDel){
               if(!file.canWrite()){
                 //file.setWritable();
               }
-              file.delete(evSuccess);
+              Event callback = new Event(file, success);  //NOTE: store file as src to get its name for report in callback.
+              listEvDel.add(callback);
+              //
+              //The delete action:
+              file.delete(callback);
+              //      
             }
           } else if(widgg.sCmd.equals("esc")){
             windConfirmDelete.setWindowVisible(false);
@@ -143,17 +161,22 @@ public class FcmdDelete
     @Override public boolean processEvent(Event ev)
     {
       if(ev.data1 !=0){
-        main.mainCmd.writeError("can't delete " + sFileDelete);
+        main.mainCmd.writeError("can't delete " + ((FileRemote)(ev.getSrc())).getCanonicalPath());
       }
-      ev.consumed();
-      windConfirmDelete.setWindowVisible(false);
+      listEvDel.remove(ev);
+      int nrofPendingFiles = listEvDel.size();
+      int percent = nrofPendingFiles * 100 / listFileDel.size();
+      widgProgress.setValue(percent, 0, null);
+      if(nrofPendingFiles == 0){
+        windConfirmDelete.setWindowVisible(false);      
+      }
       fileCard.fillInCurrentDir();
       return true;
     }
     
   };
   
-  Event evSuccess = new Event(this, success);
+  //XX Event evSuccess = new Event(this, success);
   
   
   

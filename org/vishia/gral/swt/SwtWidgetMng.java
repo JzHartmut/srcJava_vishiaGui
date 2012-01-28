@@ -306,9 +306,9 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     this.propertiesGuiSwt = propertiesGui;
     pos.x.p1 = 0; //start-position
     pos.y.p1 = 4 * propertiesGui.yPixelUnit();
-    
+
+    //its a user action able to use in scripts.
 		userActions.put("syncVariableOnFocus", this.syncVariableOnFocus);
-    device.addTimedOrder(widgetChangeRequExecuter);
 
 
   }
@@ -511,9 +511,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    */
   void setPosAndSizeSwt(Control component, int widthwidgetNat, int heigthWidgetNat)
   {
-    if(posUsed){
-      setNextPosition();
-    }
+    setNextPosition();
     Control parentComp = component.getParent();
     //Rectangle pos;
     final GralRectangle rectangle;
@@ -527,7 +525,6 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     }
     rectangle = calcWidgetPosAndSize(pos, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
     component.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
-    posUsed = true;
        
   }
   
@@ -663,19 +660,38 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    *   'l' left, 't' top (above field) 
    * @return
    */
-  @Override public GralTextField addTextField(String name, boolean editable, String prompt, String promptStylePosition)
+  @Override public GralTextField addTextField(String name, boolean editable, String prompt, String promptStylePosition){
+    if(name !=null && name.charAt(0) == '$'){
+      name = sCurrPanel + name.substring(1);
+    }
+    return new SwtTextFieldWrapper(name, editable, prompt, promptStylePosition, this);
+  }
+
+  
+  
+  /** Adds a text field for showing or editing a text value.
+   * 
+   * @param sName The registering name
+   * @param width Number of grid units for length
+   * @param editable true than edit-able, false to show content 
+   * @param prompt If not null, than a description label is shown
+   * @param promptStylePosition Position and size of description label:
+   *   upper case letter: normal font, lower case letter: small font
+   *   'l' left, 't' top (above field) 
+   * @return
+   */
+  public GralTextField XXXaddTextField(String name, boolean editable, String prompt, String promptStylePosition)
   { Composite panelSwt = (Composite)pos.panel.getPanelImpl();
     SwtTextFieldWrapper widgetInfo = new SwtTextFieldWrapper(name, panelSwt, editable ? 'T' : 'S', this);
     //SwtStyledTextFieldWrapper widgetInfo = new SwtStyledTextFieldWrapper(name, (Composite)pos.panel.getPanelImpl(), editable ? 'T' : 'S', this);
     //StyledText widgetSwt = widgetInfo.textFieldSwt;
+    ///
     widgetInfo.setPanelMng(this);
     Text widgetSwt;
     //
     if(prompt != null && promptStylePosition.startsWith("t")){
-      if(posUsed){
-        setNextPosition();
-      }
-    	final Font promptFont;
+      setNextPosition();
+      final Font promptFont;
       char sizeFontPrompt;
       GralRectangle boundsAll, boundsPrompt, boundsField;
       final GralPos posPrompt = new GralPos(), posField = new GralPos();
@@ -1630,7 +1646,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     
     @Override public void focusGained(FocusEvent ev)
     { GralWidget widgd = (GralWidget)ev.widget.getData();
-      widgd.implMethod.focusGained();
+      widgd.gralWidgetMethod.focusGained();
       /*
       widgd.getMng().notifyFocus(widgd);
       String htmlHelp = widgd.getHtmlHelp();

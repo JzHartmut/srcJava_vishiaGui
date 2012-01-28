@@ -18,6 +18,8 @@ import org.vishia.util.FileCompare;
 import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
+import com.sun.org.apache.bcel.internal.generic.IXOR;
+
 public class FcmdFilesCp {
 
   
@@ -40,8 +42,8 @@ public class FcmdFilesCp {
   /**List for results of comparison as tree. */
   List<FileCompare.Result> result = new LinkedList<FileCompare.Result>();
   
-  /**List for results of comparison as index sorted to local paths. */
-  final Map<String, FileCompare.Result> idxResult = new TreeMap<String, FileCompare.Result>();
+  /**List for results of comparison as index sorted to local file paths. */
+  final Map<String, FileCompare.Result> idxFilepath4Result = new TreeMap<String, FileCompare.Result>();
   
   /**The both selected file cards which are used for comparison.
    * For that file cards a synchronous walk through files may be done.  
@@ -84,6 +86,7 @@ public class FcmdFilesCp {
     file1 = card1.currentFile;
     file2 = card2.currentFile;
     result.clear();
+    idxFilepath4Result.clear();
     FileCompare.Result result1 = new FileCompare.Result(file1, file2);
     comparer.compare(result1, null, 0);
     result = result1.subFiles;
@@ -105,7 +108,7 @@ public class FcmdFilesCp {
       int posRel = file2.getAbsolutePath().length() +1;  //after / starts the local path
       relpath = item.file2.getAbsolutePath().substring(posRel);
     }
-    idxResult.put(relpath, item);
+    idxFilepath4Result.put(relpath, item);
     if(item.subFiles !=null && item.subFiles.size() >0){
       for(FileCompare.Result sub: item.subFiles){
         buildIdxResult(sub, recursion +1);

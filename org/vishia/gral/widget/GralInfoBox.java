@@ -103,12 +103,15 @@ public class GralInfoBox implements GralTextBox_ifc, GralWindow_ifc
     return 0;
   }
 
-  @Override
-  public void setText(CharSequence text)
+  @Override public void setText(CharSequence text)
   { textBox.setText(text);
   }
   
-  @Override public void setSelection(String how){ textBox.setSelection(how); }
+  @Override public void setText(CharSequence text, int caretPos)
+  { textBox.setText(text, caretPos);
+  }
+  
+  //@Override public void setSelection(String how){ textBox.setSelection(how); }
   
   
   public void setUrl(String url){

@@ -111,6 +111,7 @@ public class FcmdFileCard extends GralFileSelector
     //
     //sets the action for a simple table: what to do on line selected: Show file names. 
     selectList.wdgdTable.setActionOnLineSelected(actionOnFileSelection);
+    selectList.wdgdTable.setActionFocused(actionFocused);
     favorCard.wdgdTable.setActionOnLineSelected(favorCard.actionFavorSelected);
     //
     //sets the action for Select a file: open the execute menu
@@ -290,9 +291,11 @@ public class FcmdFileCard extends GralFileSelector
           String sPath = file.getAbsolutePath();
           if(sPath.startsWith(sDirSync)){
             String sLocalPath = sPath.substring(sDirSync.length()+1);
-            FileCompare.Result result = main.filesCp.idxResult.get(sLocalPath);
-            if(result !=null && !result.equal){
-              line.setCellText("#", 0);
+            FileCompare.Result result = main.filesCp.idxFilepath4Result.get(sLocalPath);
+            if(result !=null){
+              if(!result.equal){ line.setCellText("#", 0); }
+              else if(result.alone){ line.setCellText("+", 0); }
+              else if(result.missingFiles){ line.setCellText("-", 0); }
             }
           }
         } else {
@@ -303,6 +306,13 @@ public class FcmdFileCard extends GralFileSelector
       }
       return true;
   } };  
+  
+  
+  GralUserAction actionFocused = new GralUserAction(){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
+      System.out.println("FileTable focused " + FcmdFileCard.super.selectList.wdgdTable.name);
+      return true;      
+  } };
   
   
   @Override public String toString(){ return label + "/" + nameFilePanel; }

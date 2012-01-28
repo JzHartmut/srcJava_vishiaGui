@@ -221,4 +221,11 @@ public class GralColor
     return color;
   }
   
+  @Override public String toString(){
+    int color = ((red << 16) & 0xff0000) | ((green << 8) & 0xff00) | (blue & 0xff);
+    // name = container.colorsByValue.get(color);
+    String name = null;
+    if(name !=null) return name;
+    else return String.format("color=%8X",color);
+  }
 }

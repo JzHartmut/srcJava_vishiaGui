@@ -66,13 +66,12 @@ public class Fcmd extends GuiCfg
   
   GralPanelContent panelButtons;
 
-  final CmdQueue cmdQueue = new CmdQueue(mainCmd);
-
+  
   final FcmdFavorPathSelector favorPathSelector = new FcmdFavorPathSelector(mainCmd, this);
 
   final FcmdExecuter executer = new FcmdExecuter(mainCmd, this);
 
-  final GralCommandSelector cmdSelector = new GralCommandSelector("cmdSelector", cmdQueue, gralMng);
+  final GralCommandSelector cmdSelector = new GralCommandSelector("cmdSelector", executer.cmdQueue, gralMng);
 
   final FcmdIdents idents = new FcmdIdents();
   
@@ -133,7 +132,7 @@ public class Fcmd extends GuiCfg
     this.cargs = cargs;
     target = new FcmdtTarget();  //create the target itself, one process TODO experience with remote target.
     buttonCmds = new CmdStore();
-    cmdQueue.setOutput(gui.getOutputBox(), null);
+    executer.cmdQueue.setOutput(gui.getOutputBox(), null);
   }
 
   /**
@@ -330,7 +329,7 @@ public class Fcmd extends GuiCfg
       
     };
     
-    cmdQueue.execCmds(writeStatusCmd, null);
+    executer.cmdQueue.execCmds(writeStatusCmd, null);
   }
   
   
@@ -343,7 +342,7 @@ public class Fcmd extends GuiCfg
   @Override public void finishMain()
   { 
     try{
-      cmdQueue.close();  //finishes threads.
+      executer.cmdQueue.close();  //finishes threads.
       target.close();
       FileRemoteAccessorLocalFile.getInstance().close();
     } catch(IOException exc){
@@ -403,28 +402,6 @@ public class Fcmd extends GuiCfg
   }
   
   
-  
-  
-  /**Returns all selected files in the last actual file table.
-   * @deprecated
-   * @return Array of files which are selected, The array has the length 1 if only one file is selected.
-   */
-  private List<String> getSelectedFilesInLastPanel()
-  {
-    List<GralWidget> widgdFocus = gralMng.getWidgetsInFocus();
-    GralFileSelector fileSel = null;
-    synchronized (widgdFocus) {
-      Iterator<GralWidget> iterFocus = widgdFocus.iterator();
-      while (fileSel == null && iterFocus.hasNext()) {
-        GralWidget widgd = iterFocus.next();
-        fileSel = idxFileSelector.get(widgd.name);
-      }
-    }
-    if(fileSel !=null){
-      return fileSel.getSelectedFiles();
-    } else return null;
-  }
-
   
   
   /**Get the last selected files in order of selection.
@@ -699,7 +676,7 @@ public class Fcmd extends GuiCfg
         if(lastSelected.length >0){
           files[0] = lastSelected[0];
         }
-        cmdQueue.addCmd(cmdBlock, files, null); // to execute.
+        executer.cmdQueue.addCmd(cmdBlock, files, null); // to execute.
       }
       return true;
     }

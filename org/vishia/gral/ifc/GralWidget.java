@@ -5,6 +5,7 @@ import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.util.KeyCode;
 
 
 
@@ -185,6 +186,9 @@ public abstract class GralWidget implements GralWidget_ifc
 
   protected GralUserAction actionDrag, actionDrop;
 	
+  /**This action will be called if the widget gets the focus. */
+  protected GralUserAction actionFocused;
+  
 	/**command string given by the action as parameter. */
 	public String sCmd;
 	
@@ -303,6 +307,10 @@ public abstract class GralWidget implements GralWidget_ifc
    * the invocation of showing and the decision what and how is to show.
    */
   public GralUserAction getActionShow(){ return actionShow; }
+  
+  public void setActionFocused(GralUserAction action){ actionFocused = action; }
+
+  public GralUserAction getActionFocused(){ return actionFocused; }
   
   
 	public String getsToolTip()
@@ -592,10 +600,11 @@ public abstract class GralWidget implements GralWidget_ifc
 
   
   
-  /**This class is used only for the implementation level of the graphic. It is not intent to use
+  /**Methods which should be called back by events of the implementation layer.
+   * This class is used only for the implementation level of the graphic. It is not intent to use
    * by any application. It is public because the implementation level should accesses it.
    */
-  public class MethodsForImplementation{
+  public class MethodsCalledbackFromImplementation{
     
     /**This method in not intent to call by user. It may be called from all widget implementation 
      * if the focus of the widget is gained. Use {@link #setFocus()} to set a widget in the focus.
@@ -608,6 +617,7 @@ public abstract class GralWidget implements GralWidget_ifc
       if(htmlHelp !=null){
         itsMng.setHtmlHelp(htmlHelp);
       }
+      if(actionFocused !=null){ actionFocused.userActionGui(KeyCode.focusGained, GralWidget.this); }
       //notify GralWidgetMng about focused widget.
       itsMng.notifyFocus(GralWidget.this);
     }
@@ -616,14 +626,17 @@ public abstract class GralWidget implements GralWidget_ifc
     
   }
   
-  public MethodsForImplementation implMethod = new MethodsForImplementation();
+  /**Not intent to get from user: The instance which's methods can be called from an event method of the implementation of the GralWidget. 
+   * Note: This Method is public only because the implementation in another package need to use it.
+   * It should not be used by any application. */
+  public MethodsCalledbackFromImplementation gralWidgetMethod = new MethodsCalledbackFromImplementation();
   
   
   /**This callback worker calls the {@link #repaintGthread()} if it is invoked in the graphical thread.
    * It is used with delay and wind up whenever {@link #repaint(int, int)} with an delay is called.
    * If its callback method was run, it is dequeued till the next request of {@link #repaint()}.
    */
-  GralDispatchCallbackWorker repaintRequ = new GralDispatchCallbackWorker("GralWidget.repaintRequ"){
+  private GralDispatchCallbackWorker repaintRequ = new GralDispatchCallbackWorker("GralWidget.repaintRequ"){
     @Override public void doBeforeDispatching(boolean onlyWakeup) {
       repaintGthread();
       countExecution();

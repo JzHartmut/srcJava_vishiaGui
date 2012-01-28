@@ -76,7 +76,7 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
     //GuiThread graphicThread = startGraphicThread(init);  
 
     synchronized(graphicThread){
-      while(graphicThread.guiThreadId == 0){
+      while(graphicThread.getThreadIdGui() == 0){
         try{ graphicThread.wait(1000);} catch(InterruptedException exc){}
       }
     }
@@ -97,72 +97,7 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   
 
   
-  
   /*
-  @Override protected Object initGraphic() //String sTitle, int left, int top, int xSize, int ySize)
-  { ///
-    guiThreadId = Thread.currentThread().getId(); ///
-    displaySwt.addFilter(SWT.Close, windowsCloseListener);
-    graphicFrame = new Shell(displaySwt); //, SWT.ON_TOP | SWT.MAX | SWT.TITLE);
-    graphicFrame.addKeyListener(keyListener);
-    
-    //graphicFramePos = new Position(graphicFrame.getContentPane());
-    //graphicFramePos.set(0,0,xSize,ySize);
-    // main = this;
-    graphicFrame.setText(sTitle);
-    //graphicFrame.getContentPane().setLayout(new BorderLayout());
-    //graphicFrame.addWindowListener(new WindowClosingAdapter(true));
-    //graphicFrame.setSize( xSize, ySize );
-    if(xSize == -1 || ySize == -1){
-      graphicFrame.setFullScreen(true);
-    } else {
-      graphicFrame.setBounds(xPos,yPos, xSize, ySize );  //Start position.
-    }
-    graphicFrame.open();
-    graphicFrame.setVisible( true ); 
-
-    //graphicFrame.getContentPane().setLayout(new FlowLayout());
-    graphicFrame.setLayout(null);
-    graphicFrame.addShellListener(mainComponentListerner);
-    
-    return graphicFrame;
-    
-  }
-  */
-  
-  
-  /**Sets the title and size before initialization.
-   * @param sTitle
-   * @param xSize
-   * @param ySize
-  @Override public void buildMainWindow(String sTitle, int left, int top, int xSize, int ySize)
-  { this.xSize = xSize;
-    this.ySize = ySize;
-    this.xPos = left;
-    this.yPos = top;
-    if(bStarted){
-      if(xSize < 0 || ySize < 0){
-        graphicFrame.setFullScreen(true);
-      } else {
-        graphicFrame.setBounds(left,top, xSize, ySize );  //Start position.
-      }  
-      graphicFrame.setText(sTitle);
-    } else {
-      synchronized(guiThread){
-        if(!bStarted){
-          this.sTitle = sTitle;
-          guiThread.notify();     //Run the GUI Thread
-        }
-      }
-      synchronized(this){
-        while(!bStarted){
-          bWaitStart = true;
-          try{ wait(10000);  } catch(InterruptedException exc){}   //Await the GUI Thread
-        }
-      }
-    }    
-  }
-   */
   
   
   private static class CntSleep
@@ -176,7 +111,7 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   
   private CntSleep cntSleep;
   
-  
+  */
   
   //public boolean isWakedUpOnly(){ return graphicThread.isWakedUpOnly; }
   

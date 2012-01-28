@@ -1,22 +1,29 @@
 package org.vishia.gral.swt;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.events.DragDetectEvent;
 import org.eclipse.swt.events.DragDetectListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
-import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralMouseWidgetAction_ifc;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
+import org.vishia.gral.ifc.GralPos;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 
 public class SwtTextFieldWrapper extends GralTextField
 {
@@ -29,12 +36,134 @@ public class SwtTextFieldWrapper extends GralTextField
   
   private DropTarget drop;
   
-  StringBuffer newText = new StringBuffer();
-  
   public SwtTextFieldWrapper(String name, Composite parent, char whatis, GralWidgetMng mng)
   { super(name, whatis, mng);
   }
 
+  /**Creates a new GralTextField for Swt and registers it.
+   * <br>
+   * <b>Prompting</b>: The parameter promptStylePosition determines where a prompt is showing.
+   * <ul>
+   * <li>"t": prompt above, calculates inside position
+   * <li>"r": prompt right, calculates outside position.
+   * </ul>
+   * @param name The name to register it.
+   * @param editable false then show field
+   * @param prompt maybe null, propmt text
+   * @param promptStylePosition maybe null, prompt position
+   * @param mng
+   */
+  public SwtTextFieldWrapper(String name, boolean editable, String prompt, String promptStylePosition, SwtWidgetMng mng){
+    super(name, editable ? 'T' : 'S', mng);
+    Composite panelSwt = (Composite)mng.pos.panel.getPanelImpl();
+    setPanelMng(mng);
+    //Text widgetSwt;
+    //
+    if(prompt != null && promptStylePosition.startsWith("t")){
+      mng.setNextPosition();
+      final Font promptFont;
+      char sizeFontPrompt;
+      GralRectangle boundsAll, boundsPrompt, boundsField;
+      final GralPos posPrompt = new GralPos(), posField = new GralPos();
+      boundsAll = mng.calcWidgetPosAndSize(this.pos, 800, 600, 100, 20);
+      float ySize = pos.height();
+      //float xSize = pos.width();
+      //posPrompt from top, 
+      float yPosPrompt, heightPrompt, heightText;
+      //switch(promptStylePosition){
+        //case 't':{
+          if(ySize <= 2.5){ //it is very small for top-prompt:
+            yPosPrompt = 1.0f;  //no more less than 1/2 normal line. 
+            heightPrompt = 1.0f;
+            heightText = ySize - 0.7f;
+            if(heightText < 1.0f){ heightText = 1.0f; }
+          } else if(ySize <=4.0){ //it is normally
+            heightPrompt = ySize - 2.0f + (4.0f - ySize) * 0.5f; 
+            if(heightPrompt < 1.0f){ heightPrompt = 1.0f; }
+            yPosPrompt = ySize - heightPrompt + 0.2f;  //no more less than 1/2 normal line. 
+            heightText = 2.0f;
+          } else { //greater then 4.0
+            yPosPrompt = ySize * 0.5f;
+            heightPrompt = ySize * 0.4f;;
+            heightText = ySize * 0.5f;
+          }
+          //from top, size of prompt
+          posPrompt.setPosition(mng.pos, GralPos.same - ySize + yPosPrompt, GralPos.size - heightPrompt, GralPos.same, GralPos.same, 0, '.');
+          //from bottom line, size of text
+          posField.setPosition(mng.pos, GralPos.same, GralPos.size - heightText, GralPos.same, GralPos.same, 0, '.');
+        //} break;
+      //}
+      promptFont = mng.propertiesGuiSwt.getTextFontSwt(heightPrompt, GralFont.typeSansSerif, GralFont.styleNormal); //.smallPromptFont;
+      boundsPrompt = mng.calcWidgetPosAndSize(posPrompt, boundsAll.dx, boundsAll.dy, 10,100);
+      boundsField = mng.calcWidgetPosAndSize(posField, boundsAll.dx, boundsAll.dy, 10,100);
+      promptSwt = new SwtTransparentLabel(panelSwt, SWT.TRANSPARENT);
+      promptSwt.setFont(promptFont);
+      promptSwt.setText(prompt);
+      promptSwt.setBackground(null);
+      Point promptSize = promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+      if(promptSize.x > boundsPrompt.dx){
+        boundsPrompt.dx = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
+      }
+      textFieldSwt =  new Text(panelSwt, SWT.SINGLE);
+      textFieldSwt.setBounds(boundsField.x, boundsField.y, boundsField.dx, boundsField.dy);
+      promptSwt.setBounds(boundsPrompt.x, boundsPrompt.y, boundsPrompt.dx, boundsPrompt.dy+1);
+      
+    } else {
+      //without prompt
+      textFieldSwt =  new Text(panelSwt, SWT.SINGLE);
+      mng.setPosAndSize_(textFieldSwt);
+    }
+    textFieldSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
+    textFieldSwt.setEditable(editable);
+    if(editable)
+      //textFieldSwt.setDragDetect(true);
+      //textFieldSwt.addDragDetectListener(dragListener);
+      
+      stop();
+    textFieldSwt.setBackground(mng.propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));
+    textFieldSwt.addFocusListener(mng.focusListener);
+
+    Listener[] oldMouseListener = textFieldSwt.getListeners(SWT.MouseDown);
+    for(Listener lst: oldMouseListener){
+      textFieldSwt.removeListener(SWT.MouseDown, lst);
+    }
+    textFieldSwt.addMouseListener(mng.mouseClickForInfo);
+    textFieldSwt.addFocusListener(mng.focusListener);
+    if(editable){
+      TextFieldModifyListener modifyListener = new TextFieldModifyListener();
+      textFieldSwt.addModifyListener(modifyListener);
+    }
+    if(prompt != null && promptStylePosition.startsWith("r")){
+      Rectangle swtField = textFieldSwt.getBounds();
+      Rectangle swtPrompt = new Rectangle(swtField.x + swtField.width, swtField.y, 0, swtField.height);
+      float hight = mng.pos.height();
+      final Font promptFont;
+      if(hight <2.0){
+        promptFont = mng.propertiesGuiSwt.smallPromptFont;  
+      } else { 
+        promptFont = mng.propertiesGuiSwt.stdInputFont;  
+      }
+      promptSwt = new SwtTransparentLabel((Composite)mng.pos.panel.getPanelImpl(), SWT.TRANSPARENT);
+      promptSwt.setFont(promptFont);
+      promptSwt.setText(prompt);
+      Point promptSize = promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+      swtPrompt.width = promptSize.x;
+      promptSwt.setBounds(swtPrompt);
+      
+      
+    }
+    //
+    textFieldSwt.setData(this);
+    if(!editable){
+      mng.registerShowField(this);
+    }
+    mng.registerWidget(this);
+
+  }
+  
+  
+  
+  
   @Override public void setTextStyle(GralColor color, GralFont font)
   {
     SwtProperties props = ((SwtWidgetMng)itsMng).propertiesGuiSwt;
@@ -54,20 +183,7 @@ public class SwtTextFieldWrapper extends GralTextField
     new SwtDragListener(dragType, textFieldSwt); //associated with textFieldSwt.
   }
   
-  
-  @Override public void setText(CharSequence arg)
-  {
-    if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
-      String sText = arg.toString();
-      textFieldSwt.setText(sText);
-    } else {
-      newText.setLength(0);
-      newText.append(arg);
-      windowMng.addDispatchOrder(changeText);    
-    }
-  }
-  
-  
+  /*
   @Override public void setSelection(String how){
     if(how.equals("|..<")){
       String sText = textFieldSwt.getText();
@@ -77,36 +193,40 @@ public class SwtTextFieldWrapper extends GralTextField
       textFieldSwt.setSelection(pos0, zChars);
     }
   }
+  */
   
-  
-  @Override public String getText()
-  {
-    String oldText = textFieldSwt.getText();
-    return oldText;
-  }
-   
-
   @Override public int getCursorPos(){ return textFieldSwt.getCaretPosition(); }
 
 
   
-  /**
-   * @deprecated TODO {@link #repaintGthread()}
-   */
-  protected GralDispatchCallbackWorker changeText = new GralDispatchCallbackWorker("SwtTextFieldWrapper.changeText")
-  { @Override public void doBeforeDispatching(boolean onlyWakeup)
-    { if(newText.length() >0){
-        textFieldSwt.setText(newText.toString());
-        newText.setLength(0);
-      }
-      windowMng.removeDispatchListener(this);
-    }
-  };
-
   
   @Override protected void repaintGthread(){
-    //TODO newText
-    textFieldSwt.redraw();
+    int chg = this.whatIsChanged.get();
+    int catastrophicalCount = 0;
+    do{
+      if(++catastrophicalCount > 10000) throw new RuntimeException("atomic failed");
+      if((chg & chgText) !=0){ 
+        textFieldSwt.setText(text);
+        final int selectionStart, selectionEnd;
+        final int zText = text.length();
+        if(caretPos <0){
+          selectionEnd = text.length(); selectionStart = selectionEnd; // -1;
+        }
+        else if(caretPos >0){
+          selectionEnd = caretPos > zText ? zText : caretPos;
+          selectionStart = selectionEnd; // -1;
+        } else {
+          assert(caretPos ==0);
+          selectionEnd = selectionStart =-1;  //dont call
+        }
+        if(selectionStart >=0){
+          textFieldSwt.setSelection(selectionStart, selectionEnd);
+        }
+      }
+      if((chg & chgColorText) !=0){ textFieldSwt.setForeground(((SwtWidgetMng)itsMng).getColorImpl(colorText)); }
+      if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(((SwtWidgetMng)itsMng).getColorImpl(colorBack)); }
+      textFieldSwt.redraw();
+    } while(!whatIsChanged.compareAndSet(chg, 0));
   }
 
   
@@ -201,7 +321,7 @@ public class SwtTextFieldWrapper extends GralTextField
   
   
   
-DragDetectListener dragListener = new DragDetectListener()
+  DragDetectListener dragListener = new DragDetectListener()
   { @Override public void dragDetected(DragDetectEvent e)
     {
       // TODO Auto-generated method stub
@@ -209,9 +329,45 @@ DragDetectListener dragListener = new DragDetectListener()
     }
   };
 
+  
+  
+  private class TextFieldFocusListener extends SwtWidgetMng.SwtMngFocusListener
+  {
     
+    TextFieldFocusListener(SwtWidgetMng mng){
+      mng.super();
+    }
+
+    @Override public void focusLost(FocusEvent ev){
+      SwtTextFieldWrapper.super.text = textFieldSwt.getText();
+      SwtTextFieldWrapper.super.caretPos = textFieldSwt.getCaretPosition();
+    }
+
+    
+    @Override public void focusGained(FocusEvent ev)
+    { super.focusGained(ev);
+    }
+  }
+  
+
+  
+  private class TextFieldModifyListener implements ModifyListener{
+
+    @Override public void modifyText(ModifyEvent ev) {
+      SwtTextFieldWrapper.super.text = textFieldSwt.getText();
+      //SwtTextFieldWrapper.super.caretPos = textFieldSwt.getCaretPosition();
+    }
+    
+  };
+  
+  
+  
   
   void stop(){}
+
+
+
+
 
 
 }

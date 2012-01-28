@@ -195,7 +195,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   public GralPos pos = new GralPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
   
   /**False if the position is given newly. True if it is used. Then the next add-widget invocation 
-   * calculates the next position in direction of {@link #pos.dirNext}. */
+   * calculates the next position in direction see {@link GralPos#setNextPosition()}. */
   protected boolean posUsed;
   
   /**Position for the next widget to store.
@@ -311,10 +311,23 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
     posUsed = false;
   }
   
-  /**Sets the position to the next adequate the {@link #pos.dirNext}. */
+  /**Not for user: Checks whether the position is used, sets the next position then, markes the position as used.
+   * See @link GralPos#setNextPosition(), {@link #posUsed}. */
   public void setNextPosition()
-  { pos.setNextPosition();
+  { if(posUsed){
+      pos.setNextPosition();
+    }
+    posUsed = true;
   }  
+  
+  public void registerShowField(GralWidget widg){
+    //link the widget with is information together.
+    if(widg.name !=null){
+      showFields.put(widg.name, widg);
+    }
+
+  }
+  
   
   @Override public GralPos getPositionInPanel(){ return pos.clone(); }
 	
@@ -698,13 +711,13 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
 
 	
   
-  /**Calculates the position and size of a widget
+  /**Calculates the position and size of a widget from given {@link #posWidget}.
    * @param posWidget The position.
    * @param widthParentPixel The size of the panel, where the widget is member of
    * @param heightParentPixel The size of the panel, where the widget is member of
    * @return A rectangle for setBounds.
    */
-  protected GralRectangle calcWidgetPosAndSize(GralPos posWidget, 
+  public GralRectangle calcWidgetPosAndSize(GralPos posWidget, 
       int widthParentPixel, int heightParentPixel,
       int widthWidgetNat, int heightWidgetNat)
   {
@@ -935,11 +948,9 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
     {
       if(requ.timeToExecution() >=0){
         delayedChangeRequests.offer(requ);
-        synchronized(gralDevice.runTimer){
-          if(gralDevice.bTimeIsWaiting){
-            gralDevice.runTimer.notify();  
-          }
-        }
+        //TODO is it okay? test
+        //todo the timer should check this queue too!
+        gralDevice.notifyTimer();
       } else {
         guiChangeRequests.add(requ);
         synchronized(guiChangeRequests){ 
@@ -965,11 +976,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
         if(timeToExecution >=0){
           //not yet to proceed
           delayedChangeRequests.offer(changeReq);
-          synchronized(gralDevice.runTimer){
-            if(gralDevice.bTimeIsWaiting){
-              gralDevice.runTimer.notify();  
-            }
-          }
+          gralDevice.notifyTimer();
           changeReq = guiChangeRequests.poll();  //check if there is another.
         } else {
           return changeReq;  //take this

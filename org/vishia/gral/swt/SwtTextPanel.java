@@ -59,13 +59,11 @@ public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, A
   { return textAreaOutput.getNrofLines();
   }
 
-  @Override
-  public void setText(CharSequence text)
-  {
-    textAreaOutput.setText(text);
-  }
+  @Override public void setText(CharSequence text){ textAreaOutput.setText(text); }
   
-  @Override public void setSelection(String how){ textAreaOutput.setSelection(how); }
+  @Override public void setText(CharSequence text, int caretPos){ textAreaOutput.setText(text, caretPos); }
+  
+  //@Override public void setSelection(String how){ textAreaOutput.setSelection(how); }
   
 
   
