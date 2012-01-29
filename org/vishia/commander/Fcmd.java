@@ -97,7 +97,15 @@ public class Fcmd extends GuiCfg
   final FileRemote[] selectedFiles123 = new FileRemote[3];
   
   
+  /**The last selected File card. It may be in the same panel (left/mid/right)
+   * 
+   */
   List<FcmdFileCard> lastFileCards = new LinkedList<FcmdFileCard>();
+
+  
+  /**The last selected file panel. The panel knows the last used file card there. 
+   * The selected file1, file2 are anytime in one and the other panel. */
+  List<FcmdLeftMidRightPanel> lastFilePanel = new LinkedList<FcmdLeftMidRightPanel>();
   
   /**The last used favor card or its last used file card.
    * It is used for delete tab. */

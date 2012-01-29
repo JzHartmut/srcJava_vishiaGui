@@ -45,7 +45,7 @@ public class SwtTable  extends GralTable {
   
   /**The colors. */
   private Color colorBackSelectSwt, colorBackMarkedSwt, colorBackTableSwt
-  , colorBackSelectNonFocusedSwt, colorBackMarkedNonFocusedSwt, colorBackTableNonFocusedSwt
+  //, colorBackSelectNonFocusedSwt, colorBackMarkedNonFocusedSwt, colorBackTableNonFocusedSwt
   , colorTextSelectSwt, colorTextMarkedSwt, colorTextTableSwt;
 
   
@@ -110,9 +110,9 @@ public class SwtTable  extends GralTable {
     colorBackSelectSwt = mng.getColorImpl(colorBackSelect);
     colorBackMarkedSwt = mng.getColorImpl(colorBackMarked);
     colorBackTableSwt = mng.getColorImpl(colorBackTable);
-    colorBackSelectNonFocusedSwt = mng.getColorImpl(colorBackSelectNonFocused);
-    colorBackMarkedNonFocusedSwt = mng.getColorImpl(colorBackMarkedNonFocused);
-    colorBackTableNonFocusedSwt = mng.getColorImpl(colorBackTableNonFocused);
+    //colorBackSelectNonFocusedSwt = mng.getColorImpl(colorBackSelectNonFocused);
+    //colorBackMarkedNonFocusedSwt = mng.getColorImpl(colorBackMarkedNonFocused);
+    //colorBackTableNonFocusedSwt = mng.getColorImpl(colorBackTableNonFocused);
   }
   
   
@@ -263,9 +263,8 @@ public class SwtTable  extends GralTable {
       cellSwt.setForeground(mng.getColorImpl(colorText));
       cellData.colorText = colorText;
     }
-    if(ixGlineSelectedNew == iCellLine && iCellCol == ixColumn){
+    if(ixGlineSelectedNew == iCellLine && iCellCol == ixColumn && bFocused){
       SwtWidgetHelper.setFocusOfTabSwt(cellSwt);
-      //cellSwt.setFocus();  
     }
 
     cellSwt.setVisible(true);
@@ -478,7 +477,7 @@ public class SwtTable  extends GralTable {
     /**This routine is invoked whenever the focus of any Text field of the table will be lost
      * the focus. Before that occurs, the field is the selected line, because it has had the focus.
      * Therefore the {@link GralTable#colorBackSelectNonFocused} is set.
-     * 
+     * @deprecated unnecessary yet.
      */
     @Override public void focusLost(FocusEvent ev){ 
       if(!bRedrawPending){
@@ -488,7 +487,7 @@ public class SwtTable  extends GralTable {
         int iCellLine = data.ixCellLine; //ixLineNew - ixLine1;
         for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
           Text cellSwt = cellsSwt[iCellLine][iCellCol];
-          cellSwt.setBackground(colorBackSelectNonFocusedSwt);
+          //cellSwt.setBackground(colorBackSelectNonFocusedSwt);
         }
       }
     }

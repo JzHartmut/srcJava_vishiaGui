@@ -8,6 +8,7 @@ import java.util.Date;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -35,6 +36,8 @@ public class FcmdFileCard extends GralFileSelector
   
   /**The left, mid or right main panel where this tabbed file table is associated. */
   final FcmdLeftMidRightPanel mainPanel;
+  
+  GralColor[] colorSelectFocused123 = new GralColor[3];
   
   /**The organization unit for this FileSelector. */
   //final LeftMidRightPanel.FileTabs fileTabs;
@@ -83,6 +86,9 @@ public class FcmdFileCard extends GralFileSelector
     this.main = mainPanelP.main;
     this.mainPanel = mainPanelP;
     this.nameFilePanel = label+ "." + mainPanelP.cNr;
+    this.colorSelectFocused123[0] = GralColor.getColor("gn");
+    this.colorSelectFocused123[1] = GralColor.getColor("lbl");
+    this.colorSelectFocused123[2] = GralColor.getColor("lgr");
     String namePanelFile = FcmdWidgetNames.tableFile + nameFilePanel;
     main.idxFileSelector.put(namePanelFile, this); //it is WidgetNames.tableFile + label +.123, see super(...) 
     GralWidgetMng mng = main.gralMng;
@@ -308,9 +314,25 @@ public class FcmdFileCard extends GralFileSelector
   } };  
   
   
+  /**This action is bound in the File selection table. If it is focused, the current file tables
+   * of the other file panels will gotten the {@link #colorSelectNonFocused} to show that are not
+   * the first one. The file table of this is set with the {@link #colorSelectFocused}.
+   * Twice the {@link Fcmd#lastFilePanel} list is ordered with this panel as first one. 
+   * 
+   */
   GralUserAction actionFocused = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
-      System.out.println("FileTable focused " + FcmdFileCard.super.selectList.wdgdTable.name);
+      main.lastFavorCard = favorCard;
+      mainPanel.actFileCard = FcmdFileCard.this;
+      if(main.lastFilePanel.size() == 0 || main.lastFilePanel.get(0) != mainPanel){
+        main.lastFilePanel.remove(mainPanel);  //if it is in list on higher position
+        main.lastFilePanel.add(0, mainPanel);
+        int ixMainPanel = -1;
+        for(FcmdLeftMidRightPanel panel: main.lastFilePanel){
+          panel.actFileCard.selectList.wdgdTable.setColorCurrLine(colorSelectFocused123[++ixMainPanel]);
+        }
+      }
+      //System.out.println("FileTable focused " + FcmdFileCard.super.selectList.wdgdTable.name);
       return true;      
   } };
   

@@ -24,6 +24,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   /**Version and history
    * <ul>
+   * <li>2012-01-30 Hartmut new: {@link #setColorCurrLine(GralColor)}
    * <li>2012-01-15 Hartmut new: {@link #setCurrentLine(String)}, {@link #insertLine(String, int, String[], Object)}:
    *    the key is supported now. 
    * <li>2012-01-06 Hartmut new: concept of a table which is independent of the table implementation 
@@ -133,7 +134,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   
   /**The colors. */
   protected GralColor colorBackSelect, colorBackMarked, colorBackTable
-  , colorBackSelectNonFocused, colorBackMarkedNonFocused, colorBackTableNonFocused
+  //, colorBackSelectNonFocused, colorBackMarkedNonFocused, colorBackTableNonFocused
   , colorTextSelect, colorTextMarked, colorTextTable;
   
 
@@ -179,12 +180,12 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   
   
   public void setColors(){
-    colorBackSelect = GralColor.getColor("gn");
+    colorBackSelect = GralColor.getColor("am");
     colorBackMarked = GralColor.getColor("rd");
     colorBackTable = GralColor.getColor("wh");
-    colorBackSelectNonFocused = GralColor.getColor("am");
-    colorBackMarkedNonFocused = GralColor.getColor("lrd");
-    colorBackTableNonFocused = GralColor.getColor("gr");
+    //colorBackSelectNonFocused = GralColor.getColor("am");
+    //colorBackMarkedNonFocused = GralColor.getColor("lrd");
+    //colorBackTableNonFocused = GralColor.getColor("gr");
     colorTextTable = GralColor.getColor("bk");
   }
   
@@ -212,6 +213,15 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     return true;
   }
 
+  
+  
+  /**Sets the color of the current line. 
+   * @param color
+   */
+  public void setColorCurrLine(GralColor color){ 
+    colorBackSelect = color; 
+    repaint(100, 0);
+  }
 
   
   @Override public GralTableLine_ifc getLine(int row) {
@@ -383,6 +393,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   private GralDispatchCallbackWorker keyActionDone = new GralDispatchCallbackWorker("GralTableKeyDone") {
     @Override
     public void doBeforeDispatching(boolean onlyWakeup) {
+      bFocused = true;  //to focus while repainting
       repaintGthread();
       keyDone = true;
       //System.out.println("Key done");
@@ -472,7 +483,6 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
         }
         ixGlineSelected = ixGlineSelectedNew;
       }
-      bFocused = false;
     }
     //long dbgtime4 = System.currentTimeMillis() - dbgtime;
     //System.out.print("\nSwtTable2-redraw1: " + dbgtime1 + " + " + dbgtime2 + " + " + dbgtime3 + " + " + dbgtime4);
@@ -484,6 +494,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
       dbgtime = 0;
     //System.out.println("GralTable.repaint; " + name);
     //Thread.dumpStack();
+    bFocused = false;
        
   }
 
