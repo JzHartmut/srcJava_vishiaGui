@@ -89,7 +89,7 @@ public class FcmdDelete
    * @param src The path which is selected as source. It may be a directory or a file.
    */
   void confirmDelete(File src111)
-  { fileCard = main.lastFileCards.get(0);
+  { fileCard = main.getLastSelectedFileCards()[0];
     String sFileDel = null;
     if(fileCard !=null){
       listFileDel = fileCard.getSelectedFiles();

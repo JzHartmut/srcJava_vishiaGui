@@ -707,42 +707,11 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
 	
 	
   
-  
-
-	
-  
-  /**Calculates the position and size of a widget from given {@link #posWidget}.
-   * @param posWidget The position.
-   * @param widthParentPixel The size of the panel, where the widget is member of
-   * @param heightParentPixel The size of the panel, where the widget is member of
-   * @return A rectangle for setBounds.
-   */
-  public GralRectangle calcWidgetPosAndSize(GralPos posWidget, 
-      int widthParentPixel, int heightParentPixel,
-      int widthWidgetNat, int heightWidgetNat)
-  {
-    int xPixelUnit = propertiesGui.xPixelUnit();
-    int yPixelUnit = propertiesGui.yPixelUnit();
-    //calculate pixel
-    final int x1,y1, x2, y2;
-    x1 = xPixelUnit * posWidget.x.p1 + propertiesGui.xPixelFrac(posWidget.x.p1Frac)  //negative if from right
-       + (posWidget.x.p1 < 0 ? widthParentPixel : 0);  //from right
-    y1 = yPixelUnit * posWidget.y.p1 + propertiesGui.yPixelFrac(posWidget.y.p1Frac)  //negative if from right
-       + (posWidget.y.p1 < 0 ? heightParentPixel : 0);  //from right
-    if(posWidget.x.p2 == GralPos.useNatSize){
-      x2 = x1 + widthWidgetNat; 
-    } else {
-      x2 = xPixelUnit * posWidget.x.p2 + propertiesGui.xPixelFrac(posWidget.x.p2Frac)  //negative if from right
-         + (posWidget.x.p2 < 0 || posWidget.x.p2 == 0 && posWidget.x.p2Frac == 0 ? widthParentPixel : 0);  //from right
-    }
-    if(posWidget.x.p2 == GralPos.useNatSize){
-      y2 = y1 + heightWidgetNat; 
-    } else {
-      y2 = yPixelUnit * posWidget.y.p2 + propertiesGui.yPixelFrac(posWidget.y.p2Frac)  //negative if from right
-         + (posWidget.y.p2 < 0  || posWidget.y.p2 == 0 && posWidget.y.p2Frac == 0 ? heightParentPixel : 0);  //from right
-    }
-    GralRectangle rectangle = new GralRectangle(x1, y1, x2-x1-1, y2-y1-1);
-    return rectangle;
+  public GralRectangle calcWidgetPosAndSize(GralPos pos,
+    int widthParentPixel, int heightParentPixel,
+    int widthWidgetNat, int heightWidgetNat
+  ){ return pos.calcWidgetPosAndSize(propertiesGui, widthParentPixel, heightParentPixel
+                                    , widthWidgetNat, heightWidgetNat);
   }
   
   

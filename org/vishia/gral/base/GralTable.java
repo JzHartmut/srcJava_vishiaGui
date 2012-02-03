@@ -168,6 +168,10 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   }
   
   
+  public void setColumnWidth(int width, int[] columnWidths){
+    columnWidthsGral = columnWidths;
+  }
+  
   @Override public boolean setCurrentLine(String key){
     GralTableLine_ifc line = idxLine.get(key);
     if(line == null) return false;
@@ -498,6 +502,10 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
        
   }
 
+  
+  protected void resizeTable(int xpixel, int ypixel) {
+    
+  }
   
 
   protected abstract void drawCellContent(int iCellLine, int iCellCol, TableItemWidget tableItem );

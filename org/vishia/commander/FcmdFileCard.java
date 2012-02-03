@@ -9,6 +9,7 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -112,6 +113,8 @@ public class FcmdFileCard extends GralFileSelector
     widgLabel = mng.addTextField(nameWidgLabel, false, null, null);
     mng.setPosition(2, 0, 0, 0, 1, 'd');
     setToPanel(mng, namePanelFile, 5, new int[]{2,20,5,10}, 'A');
+    GralPos.Coordinate[] columns = new GralPos.Coordinate[4];
+    super.selectList.wdgdTable.setColumnWidth(50, new int[]{2,0,-5,-10});
     super.selectList.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.fileSelect.");
     panelFiles.setPrimaryWidget(super.selectList.wdgdTable);
     //
@@ -141,6 +144,17 @@ public class FcmdFileCard extends GralFileSelector
 
   }
   
+  
+  
+  
+  /**Overrides the {@link GralFileSelector#setFocus()} and calls him, before that sets the color
+   * of the current line of table of all 3 current file panels to the 3-stage color
+   * to see which table has the focus. 
+   */
+  @Override public boolean setFocus(){ 
+    setActFilePanel_setColorCurrLine();
+    return super.setFocus(); 
+  }
   
   
   
@@ -227,10 +241,6 @@ public class FcmdFileCard extends GralFileSelector
     main.currentFile = file;
     main.selectedFiles123[mainPanel.ixMainPanel] = file;
     //note the file card in order of usage.
-    if(main.lastFileCards.size() == 0 || main.lastFileCards.get(0) != this){
-      main.lastFileCards.remove(this);  //if it is in list on higher position
-      main.lastFileCards.add(0, this);
-    }
     main.lastFavorCard = favorCard;
     mainPanel.actFileCard = this;
     long lastModified = file.lastModified();
@@ -266,6 +276,28 @@ public class FcmdFileCard extends GralFileSelector
     }
   }
   
+  
+  
+  
+  
+  /**Sets the panel which contains this File card as actual, adjust the order of actual file panels
+   * and sets the color of the current line of table of all 3 current file panels to the 3-stage color
+   * to see which table has the focus. 
+   * Sets {@link Fcmd#lastFavorCard}, {@link FcmdLeftMidRightPanel#actFileCard}, 
+   * {@link Fcmd#lastFilePanels}. 
+   */
+  private void setActFilePanel_setColorCurrLine(){
+    main.lastFavorCard = favorCard;
+    mainPanel.actFileCard = FcmdFileCard.this;
+    if(main.lastFilePanels.size() == 0 || main.lastFilePanels.get(0) != mainPanel){
+      main.lastFilePanels.remove(mainPanel);  //if it is in list on higher position
+      main.lastFilePanels.add(0, mainPanel);
+    }
+    int ixMainPanel = -1;
+    for(FcmdLeftMidRightPanel panel: main.lastFilePanels){
+      panel.actFileCard.selectList.wdgdTable.setColorCurrLine(colorSelectFocused123[++ixMainPanel]);
+    }
+  }
   
   
   
@@ -317,22 +349,12 @@ public class FcmdFileCard extends GralFileSelector
   /**This action is bound in the File selection table. If it is focused, the current file tables
    * of the other file panels will gotten the {@link #colorSelectNonFocused} to show that are not
    * the first one. The file table of this is set with the {@link #colorSelectFocused}.
-   * Twice the {@link Fcmd#lastFilePanel} list is ordered with this panel as first one. 
+   * Twice the {@link Fcmd#lastFilePanels} list is ordered with this panel as first one. 
    * 
    */
   GralUserAction actionFocused = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
-      main.lastFavorCard = favorCard;
-      mainPanel.actFileCard = FcmdFileCard.this;
-      if(main.lastFilePanel.size() == 0 || main.lastFilePanel.get(0) != mainPanel){
-        main.lastFilePanel.remove(mainPanel);  //if it is in list on higher position
-        main.lastFilePanel.add(0, mainPanel);
-        int ixMainPanel = -1;
-        for(FcmdLeftMidRightPanel panel: main.lastFilePanel){
-          panel.actFileCard.selectList.wdgdTable.setColorCurrLine(colorSelectFocused123[++ixMainPanel]);
-        }
-      }
-      //System.out.println("FileTable focused " + FcmdFileCard.super.selectList.wdgdTable.name);
+      setActFilePanel_setColorCurrLine();
       return true;      
   } };
   

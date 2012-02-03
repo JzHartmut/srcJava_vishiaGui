@@ -79,21 +79,23 @@ public class FcmdFilesCp {
   
   
   void filesCp(){
-    if(main.lastFileCards.size() <2) return;
-    widgCompare.setText("stop");
-    card1 = main.lastFileCards.get(0);
-    card2 = main.lastFileCards.get(1);
-    file1 = card1.currentFile;
-    file2 = card2.currentFile;
-    result.clear();
-    idxFilepath4Result.clear();
-    FileCompare.Result result1 = new FileCompare.Result(file1, file2);
-    comparer.compare(result1, null, 0);
-    result = result1.subFiles;
-    for(FileCompare.Result item: result){
-      buildIdxResult(item, 0);
+    FcmdFileCard[] lastFileCards = main.getLastSelectedFileCards();
+    card1 = lastFileCards[0];
+    card2 = lastFileCards[1];
+    if(card1 !=null && card2 !=null){
+      widgCompare.setText("stop");
+      file1 = card1.currentFile;
+      file2 = card2.currentFile;
+      result.clear();
+      idxFilepath4Result.clear();
+      FileCompare.Result result1 = new FileCompare.Result(file1, file2);
+      comparer.compare(result1, null, 0);
+      result = result1.subFiles;
+      for(FileCompare.Result item: result){
+        buildIdxResult(item, 0);
+      }
+      windConfirmCompare.setWindowVisible(false);
     }
-    windConfirmCompare.setWindowVisible(false);
   }
   
   
@@ -118,10 +120,14 @@ public class FcmdFilesCp {
   
   
   
-  void setDirs(){
-    if(main.lastFileCards.size() >=2){
-      card1 = main.lastFileCards.get(0);
-      card2 = main.lastFileCards.get(1);
+  /**Action if button "get dirs" is pressed. 
+   * 
+   */
+  private void setDirs(){
+    FcmdFileCard[] lastFileCards = main.getLastSelectedFileCards();
+    card1 = lastFileCards[0];
+    card2 = lastFileCards[1];
+    if(card1 !=null && card2 !=null){
       card1.otherFileCardtoSync = card2;  //cross connect this file cards.
       card2.otherFileCardtoSync = card1;
       file1 = card1.currentFile;
@@ -132,7 +138,14 @@ public class FcmdFilesCp {
       card2.zDirSync = card2.sDirSync.length();
       widgPath1.setText(card1.sDirSync);
       widgPath2.setText(card2.sDirSync);
+    } else {
+      if(card1 !=null){ card1.otherFileCardtoSync = null; }
+      if(card2 !=null){ card2.otherFileCardtoSync = null; }
+      card1 = card2 = null;
+      widgPath1.setText("");
+      widgPath2.setText("");
     }
+    
   }
   
   

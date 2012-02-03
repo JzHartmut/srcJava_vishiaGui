@@ -1,32 +1,40 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.gral.area9.GuiCallingArgs;
+import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralPanelContent;
 
 /**This class describes a position in a gral panel. 
+   * <br><br>
    * <b>Concept of positioning</b>:<br>
    * The position are never given as pixel positions. They are user-oriented positions. The calculation
    * of pixel units are done from the implementing graphic layer depending on the graphic device properties
    * and the requested size appearance. The same graphic elements can be presented in several sizes
-   * at the display.
+   * on the display.
    * <br><br>
    * A normal text with a font in the standard proper read-able size is presented by 2 units of the Gral-position
    * in vertical direction (line) and approximately 1 unit per character in horizontal direction.
    * Of course the horizontal character size depends on the font properties.
-   * A text can be presented in a smaller or larger font. A very small font is presented by 1 vertical gral-unit.
-   * Such a text can be used as short title for text input fields (prompt) or adequate. 
-   * The text size depends on the height given in the position of the text.
+   * A text can be presented in a smaller or larger font.  
+   * The text height depends on the height given in the position of the text. A very small font is presented by 1 vertical gral-unit.
+   * Such a text can be used as short title for text input fields (prompt) or adequate.
    * <br>
    * A button is able to proper present with 3 or 2 vertical gral units. A small check box may be presented 
    * with 1 x 1 gral unit.
    * <br><br>
    * A gral unit should be have the same distance in vertical as in horizontal direction. It depends on the 
    * graphical implementation. One gral unit may have approximately 6 to 30 pixel, 
-   * depending of the requested size of appearance and the display pixel size. Any graphic can be shown
-   * with several sizes of appearance, given with start parameters.
+   * depending on the requested size of appearance in comparison with the given display pixel size. 
+   * Any graphic can be shown in several sizes of appearance, given with a start parameter of the application
+   * (see {@link GuiCallingArgs#sSize}) respectively the parameter size of {@link GralGridProperties#GralGridProperties(char size)}.
    * <br><br>
-   * <b>Fine positions</b>:
-   * Either the positions are given with 2 integer values or with a float value. The fine position is given
-   * as one digit from 0 to 9. It is one fractional part digit of the float or the frac int argument.
+   * <b>Fine positions</b>:<br>
+   * Either the positions are given with 2 integer values as 'fundamental positions'. 
+   * That are the position described above.
+   * Or they can be given with a float value or a second int named 'fractional part'. From the float value
+   * only the first digit after point is used, a fractional part can be given
+   * with a value from 0 to 9. 
+   * <br><br>
    * The fine position divides one gral position into 5 or into 6 fine positions. 
    * The odd numbers divide into 6 positions. In this kind a gral position is able to divide by 2, 3 and 6:
    * <ul>
@@ -45,6 +53,7 @@ import org.vishia.gral.base.GralPanelContent;
    * </ul>
    * The fine positioning enables a fine positioning of widgets in respect to the fundamental positions.
    * <br><br>
+   * <b>Positions as user arguments</b>:<br>
    * Positions may be given with absolute values of grid units regarded to the actual panel or in related to the 
    * last or parent position. In that cases the constant values are added to the number, see the following list.
    * The position is given in form 'from..to' for the line and column or in form 'from' and 'size'. 
@@ -90,13 +99,6 @@ import org.vishia.gral.base.GralPanelContent;
    * <li>@ %50-2,%10..%90: The positions are calculated from the size of the panel in percent. (feature TODO)  
    * </ul>
    * <br><br>
-   * <b>The position values in this class</b>:<br>
-   * Though the position parameters may be given as size, with bottom line etc the position values are stored
-   * as absolute positions anyway. That are the elements {@link #x}, {@link #xEnd}, {@link #y} etc.
-   * The x and y is the lesser value, left and top, and the xEnd and yEnd is the greater value, right or bottom.
-   * This form of storing is better to calculate the pixel position while building the graphic and it is better
-   * to calculate related position too.    
-   * <br><br>
    * <b>Ranges and Designation of position parameter</b>:
    * <ul>
    * <li>Positive number in range 0...about 100..200 up to 1000: Grid Unit from left or top.
@@ -110,7 +112,7 @@ import org.vishia.gral.base.GralPanelContent;
    *  
    * <li>{@link #size} + number applied at lineEnd or columnEnd: 
    *   The size is given instead from..to. Because the size value is positive, the line and column value is left or top. 
-   * <li>@link #size} - number applied at lineEnd or columnEnd: The size is given negative.  
+   * <li>{@link #size} - number applied at lineEnd or columnEnd: The size is given negative.  
    *   The absolute value is the size. Because the size is negative it is measured from right to left
    *   respectively bottom to top. It means the given line and column is the right or the bottom line. 
    *   If the position is given using {@link #same} or {@link #refer}, the related end position
@@ -121,7 +123,16 @@ import org.vishia.gral.base.GralPanelContent;
    * Fine positions are given always from left or top of the fundamental positions. 
    * For example a value -1.3 means, the widget is placed 1 unit from right, and then 1/3 inside this unit.
    * This is 2/3 unit from right. A value for example -0.3 is not admissible, because -0 is not defined. 
-   * <br>
+   * <br><br>
+   * <b>The position values in this class</b>:<br>
+   * Though the position parameters may be given as size, with bottom line etc the position values are stored
+   * as absolute positions anyway. That are the elements {@link #x}, and {@link #y} with its values in
+   * {@link Coordinate}.
+   * The x and y is the lesser value, left and top, and the xEnd and yEnd is the greater value, right or bottom.
+   * This form of storing is better to calculate the pixel position while building the graphic and it is better
+   * to calculate related position too.    
+   * <br><br>
+   * 
  * @author Hartmut Schorrig
  *
  */
@@ -531,6 +542,10 @@ public class GralPos implements Cloneable
   }
   
   
+  
+  
+  
+  
   public GralPos clone(){
     //Hint: Object.clone() can't be used because it clones the references of x and y and not its values. 
     GralPos newObj = new GralPos();
@@ -541,6 +556,55 @@ public class GralPos implements Cloneable
     //} catch(CloneNotSupportedException exc){ assert(false); }
     return newObj; 
   }
+  
+  
+  
+  
+  
+
+  
+  
+  /**Calculates the position and size of a widget from given {@link #posWidget}.
+   * @param posWidget The position.
+   * @param widthParentPixel The size of the panel, where the widget is member of
+   * @param heightParentPixel The size of the panel, where the widget is member of
+   * @return A rectangle for setBounds.
+   */
+  public GralRectangle calcWidgetPosAndSize(GralGridProperties propertiesGui,
+      int widthParentPixel, int heightParentPixel,
+      int widthWidgetNat, int heightWidgetNat
+  )
+  {
+    int xPixelUnit = propertiesGui.xPixelUnit();
+    int yPixelUnit = propertiesGui.yPixelUnit();
+    //calculate pixel
+    final int x1,y1, x2, y2;
+    ///
+    
+    x1 = xPixelUnit * this.x.p1 + propertiesGui.xPixelFrac(this.x.p1Frac)  //negative if from right
+       + (this.x.p1 < 0 ? widthParentPixel : 0);  //from right
+    y1 = yPixelUnit * this.y.p1 + propertiesGui.yPixelFrac(this.y.p1Frac)  //negative if from right
+       + (this.y.p1 < 0 ? heightParentPixel : 0);  //from right
+    if(this.x.p2 == GralPos.useNatSize){
+      x2 = x1 + widthWidgetNat; 
+    } else {
+      x2 = xPixelUnit * this.x.p2 + propertiesGui.xPixelFrac(this.x.p2Frac)  //negative if from right
+         + (this.x.p2 < 0 || this.x.p2 == 0 && this.x.p2Frac == 0 ? widthParentPixel : 0);  //from right
+    }
+    if(this.x.p2 == GralPos.useNatSize){
+      y2 = y1 + heightWidgetNat; 
+    } else {
+      y2 = yPixelUnit * this.y.p2 + propertiesGui.yPixelFrac(this.y.p2Frac)  //negative if from right
+         + (this.y.p2 < 0  || this.y.p2 == 0 && this.y.p2Frac == 0 ? heightParentPixel : 0);  //from right
+    }
+    GralRectangle rectangle = new GralRectangle(x1, y1, x2-x1-1, y2-y1-1);
+    return rectangle;
+  }
+
+  
+  
+  
+  
   
   /**Use especially for debug.
    * @see java.lang.Object#toString()
@@ -562,8 +626,31 @@ public class GralPos implements Cloneable
    */
   public static class Coordinate
   {
-    /**The start and end position for the spread. */
-    public int p1, p1Frac, p2, p2Frac; 
+    /**The start position for the spread. 
+     * If there are positive numbers, they count from left to right respectively top to bottom. 
+     * If the value is negative, the absolute is the distance from right respectively bottom. 
+     */
+    public int p1;
+    
+    /**The end position for the spread. 
+     * If there are positive numbers, they count from left to right respectively top to bottom. 
+     * If the value is negative or 0, the absolute is the distance from right respectively bottom. 
+     */
+    public int p2;
+    
+    /**Start Position in percent. If -1 then not used.
+     * 
+     */
+    int n1 = -1;
+    ///
+    /**End Position in percent. */
+    int n2;
+    
+    /**Fractional parts of position. Use 0..9 only. 
+     * The fractional part counts from left to right respectively top to bottom 
+     * independent of the sign of p1, p2.
+     */
+    public int p1Frac, p2Frac;
     
     /**Additional border value for {@link GralPos#next}. */
     public int pb, pbf;
@@ -577,7 +664,8 @@ public class GralPos implements Cloneable
     public char dirNext;
 
     
-    /**Relation of x and y left and top to any separation line. 0 - relation to left and top border. */
+    /**Relation of x and y left and top to any separation line. 0 - relation to left and top border. 
+     * TODO the sepLine is planned but not used yet. 2012-01-31 */
     public int sepLine;
     /**Relation of xEnd and yEnd right and bottom to any separation line. 
      * 0 - relation to left and top border. 
@@ -593,7 +681,7 @@ public class GralPos implements Cloneable
      * @param z2Frac
      * @param parent The refer position. Note that parent may be == this because the new position based on the current.
      */
-    private void set(final int z1, final int z1Frac, final int z2, final int z2Frac, final Coordinate parent)
+    public Coordinate set(final int z1, final int z1Frac, final int z2, final int z2Frac, final Coordinate parent)
     {
       /**User final local variable to set p, pf, pe, pef to check whether all variants are regarded. */
       final int q1, q1Frac, q2, q2Frac;
@@ -756,6 +844,7 @@ public class GralPos implements Cloneable
         this.p2 = q2; this.p2Frac = q2Frac;   
       }
       assert(p1Frac >=0 && p1Frac <=9 && p2Frac >=0 && p2Frac <=9 );
+      return this;
     }//set
 
 
@@ -766,6 +855,35 @@ public class GralPos implements Cloneable
       p1 = src.p1; p1Frac = src.p1Frac; p2 = src.p2; p2Frac = src.p2Frac;
       pb = src.pb; pbf = src.pbf; attr = src.attr; origin = src.origin; dirNext = src.dirNext;
       sepLine = src.sepLine; endSepLine = src.endSepLine;
+    }
+    
+    
+    ///
+    /**Calculate from size to pixel. 
+     * 
+     */
+    void calc(int[] dst, int dparent, int dnat, int xPixelUnit, int[] xPixelFrac){
+      int x1, x2;  //begin, end
+      int min, max;
+      
+      //maximum of width
+      x1 = xPixelUnit * p1 + xPixelFrac[p1Frac]  //negative if from right
+      + (p1 < 0 ? dparent : 0);  //from right
+      if(p2 == GralPos.useNatSize){
+        x2 = x1 + dnat; 
+      } else {
+       x2 = xPixelUnit * p2 + xPixelFrac[p2Frac]  //negative if from right
+          + (p2 < 0 || p2 == 0 && p2Frac == 0 ? dparent : 0);  //from right
+      }
+     
+      
+      if(n1 >=0 && ((1000 * (x2 - x1))/dparent) > (n2 - n1) ){
+        //The percent size is less then the maximum size, use it.
+        x1 = n1 * dparent; 
+        x2 = n2 * dparent;
+        max = xPixelUnit * p2;
+        min = xPixelUnit * p1;
+      }
     }
     
   }

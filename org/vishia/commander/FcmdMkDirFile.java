@@ -58,8 +58,8 @@ public class FcmdMkDirFile
    * @param src The path which is selected as source. It may be a directory or a file.
    */
   void dialogMkDirFile(FileRemote src){ 
-    if(main.lastFileCards.size()>=1){
-      FcmdFileCard card = main.lastFileCards.get(0);
+    FcmdFileCard card = main.getLastSelectedFileCards()[0];
+    if(card !=null){
       File dir = card.getCurrentDir();
       widgParentPath.setText(dir.getAbsolutePath());
     } else {

@@ -59,7 +59,7 @@ public class SwtTextFieldWrapper extends GralTextField
     setPanelMng(mng);
     //Text widgetSwt;
     //
-    if(prompt != null && promptStylePosition.startsWith("t")){
+    if(prompt != null && promptStylePosition !=null && promptStylePosition.startsWith("t")){
       mng.setNextPosition();
       final Font promptFont;
       char sizeFontPrompt;
@@ -133,7 +133,7 @@ public class SwtTextFieldWrapper extends GralTextField
       TextFieldModifyListener modifyListener = new TextFieldModifyListener();
       textFieldSwt.addModifyListener(modifyListener);
     }
-    if(prompt != null && promptStylePosition.startsWith("r")){
+    if(prompt != null && promptStylePosition !=null && promptStylePosition.startsWith("r")){
       Rectangle swtField = textFieldSwt.getBounds();
       Rectangle swtPrompt = new Rectangle(swtField.x + swtField.width, swtField.y, 0, swtField.height);
       float hight = mng.pos.height();

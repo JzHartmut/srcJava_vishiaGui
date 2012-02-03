@@ -137,9 +137,11 @@ public class FcmdCopyCmd
         Object... params)
     { //String sSrc, sDstName, sDstDir;
       filesToCopy.clear();
-      if(main.lastFileCards.size() >=2){
-        fileCardSrc = main.lastFileCards.get(0);
-        fileCardDst = main.lastFileCards.get(1);
+      FcmdFileCard[] lastFileCards = main.getLastSelectedFileCards();
+      fileCardSrc = lastFileCards[0];
+      fileCardDst = lastFileCards[1];
+      
+      if(fileCardSrc !=null && fileCardDst !=null){
         fileSrcDir = FileRemote.fromFile(fileCardSrc.getCurrentDir());
         fileDstDir = FileRemote.fromFile(fileCardDst.getCurrentDir());
         List<FileRemote> listFileSrc = fileCardSrc.getSelectedFiles();
@@ -155,8 +157,6 @@ public class FcmdCopyCmd
         sSrc = fileSrcDir.getAbsolutePath() + "/" + sDstName;
         sDstDir = fileDstDir.getAbsolutePath();
       } else {
-        fileCardSrc = null;
-        fileCardDst = null;
         fileSrcDir = null;
         fileDstDir = null;
         

@@ -401,40 +401,6 @@ class FcmdFavorPathSelector
   
   
   
-  /**Searches the File-Tab which is focused at last.
-   * The searching process uses the {@link GralPanelMngWorking_ifc#getWidgetsInFocus()} routine.
-   * A FileSelector-Tab is named starting with "tabFile_".
-   * @return The last instance
-   */
-  FcmdFileCard getLastFileTab()
-  { FcmdFileCard lastTab = main.lastFileCards.size() >0 ? main.lastFileCards.get(0) : null;
-    return lastTab;
-    /*
-    
-    
-    List<GralWidget> widgdFocus = mng.getWidgetsInFocus();
-    FcmdFileCard lastTab = null;
-    //int ixTabs = 0;
-    synchronized(widgdFocus){
-      Iterator<GralWidget> iterFocus = widgdFocus.iterator();
-      while(lastTab ==null && iterFocus.hasNext()){
-        GralWidget widgd = iterFocus.next();
-        Object oContentInfo;
-        if(widgd.name.startsWith(FcmdWidgetNames.tableFile) && ( oContentInfo = widgd.getContentInfo()) instanceof FcmdFileCard){
-          lastTab = (FcmdFileCard)oContentInfo;      
-        }
-      }
-    }
-    return lastTab;
-    */
-  }
-  
-  
-  
-
-  
-  
-  
 
   void stop(){}
   
@@ -445,7 +411,6 @@ class FcmdFavorPathSelector
       if(main.lastFavorCard !=null){
         FcmdFavorCard favorCard = main.lastFavorCard;
         FcmdFileCard fileCard = favorCard.fileTable;
-        main.lastFileCards.remove(fileCard);
         FcmdLeftMidRightPanel panel = fileCard.mainPanel;
         fileCard.remove();
         panel.actFileCard = null;
@@ -474,7 +439,7 @@ class FcmdFavorPathSelector
    */
   GralUserAction actionSetDirOrigin = new GralUserAction(){
     @Override public boolean userActionGui(String sIntension, GralWidget widgd, Object... params)
-    { GralFileSelector lastTab = getLastFileTab();
+    { GralFileSelector lastTab = main.getLastSelectedFileCards()[0];
       if(lastTab !=null){
         lastTab.fillInOriginDir();
       } else {

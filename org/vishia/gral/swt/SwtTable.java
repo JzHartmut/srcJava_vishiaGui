@@ -21,6 +21,8 @@ import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralPos;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
@@ -283,6 +285,40 @@ public class SwtTable  extends GralTable {
     return ((CellData)cellSwt.getData());
   }
 
+  
+  private void setBoundsCells(){
+    Rectangle parentBounds = table.getParent().getBounds();
+    GralRectangle pixTable = pos.calcWidgetPosAndSize(itsMng.propertiesGui, parentBounds.width, parentBounds.height, 0, 0);
+    int xPixelUnit = itsMng.propertiesGui.xPixelUnit();
+    int[] xpixelCell = new int[columnWidthsGral.length+1];
+    int xPixel1 = 0;
+    xpixelCell[0] = xPixel1;
+    int ixPixelCell;
+    int xPos;
+    for(ixPixelCell = 0; ixPixelCell < columnWidthsGral.length && (xPos = columnWidthsGral[ixPixelCell]) > 0; ++ixPixelCell){
+      xPixel1 += xPos * xPixelUnit;
+      xpixelCell[ixPixelCell+1] = xPixel1;
+    }
+    xPixel1 = pixTable.dx;
+    xpixelCell[columnWidthsGral.length] = xPixel1;  //right position.
+    for(ixPixelCell = columnWidthsGral.length-1; ixPixelCell >=0  && (xPos = columnWidthsGral[ixPixelCell]) < 0; --ixPixelCell){
+      xPixel1 += xPos * xPixelUnit;
+      xpixelCell[ixPixelCell] = xPixel1;
+    }
+    int yPix = 0;
+    
+    for(Text[] row: cellsSwt){
+      int ixColumn = 0;
+      for(Text cell: row){
+        cell.setBounds(xpixelCell[ixColumn], yPix, xpixelCell[ixColumn+1] - xpixelCell[ixColumn], linePixel);
+        ixColumn +=1;
+      }
+      yPix += linePixel;
+    }
+      
+  }
+  
+  
   private class Table extends Composite implements GralWidgetGthreadSet_ifc {
 
     public Table(Composite parent, int zColumns) {
@@ -436,7 +472,11 @@ public class SwtTable  extends GralTable {
     @Override public void controlResized(ControlEvent e) 
     { 
       stop();
-      //validateFrameAreas();  //calculates the size of the areas newly and redraw.
+      Rectangle boundsTable = ((Control)e.widget).getBounds();
+      int borderTable = ((Control)e.widget).getBorderWidth();
+      //it calls repaint with delay.
+      SwtTable.this.resizeTable(boundsTable.width, boundsTable.height);
+      SwtTable.this.setBoundsCells();
     }
     
   };

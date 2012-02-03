@@ -25,13 +25,13 @@ public class GuiCallingArgs
    */
   protected File fileGuiCfg;
   
-  String sPathZbnf = "GUI";
+  public String sPathZbnf = "GUI";
   
   /**The time zone to present all time informations. */
-  protected String sTimeZone = "GMT";
+  public String sTimeZone = "GMT";
   
   /**Size, either A,B or F for 800x600, 1024x768 or full screen. */
-  String sSize;
+  public String sSize;
   
   /**The own ipc-address for Interprocess-Communication with the target.
    * It is a string, which determines the kind of communication.

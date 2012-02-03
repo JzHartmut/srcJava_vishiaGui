@@ -100,12 +100,12 @@ public class Fcmd extends GuiCfg
   /**The last selected File card. It may be in the same panel (left/mid/right)
    * 
    */
-  List<FcmdFileCard> lastFileCards = new LinkedList<FcmdFileCard>();
+  List<FcmdFileCard> XXXlastFileCards = new LinkedList<FcmdFileCard>();
 
   
-  /**The last selected file panel. The panel knows the last used file card there. 
+  /**The last selected file panels in its order of selection. The panel knows the last used file card there. 
    * The selected file1, file2 are anytime in one and the other panel. */
-  List<FcmdLeftMidRightPanel> lastFilePanel = new LinkedList<FcmdLeftMidRightPanel>();
+  List<FcmdLeftMidRightPanel> lastFilePanels = new LinkedList<FcmdLeftMidRightPanel>();
   
   /**The last used favor card or its last used file card.
    * It is used for delete tab. */
@@ -412,16 +412,48 @@ public class Fcmd extends GuiCfg
   
   
   
-  /**Get the last selected files in order of selection.
+  /**Get the last selected files in order of selection of the file panels.
    * New method since 2011-12-23
-   * @return array of the last selected files. It hast length ==0 of nothing was selected before. 
+   * @return array[3] of the last selected files in the file panels. It has always a length of 3
+   *   but not all elements are set ( they are ==null) if no files were selected before.
+   *   The returned instance is a new one, not referenced elsewhere. It can be stored
+   *   and it remains the situation of selection files independently of further user actions.
    */
   FileRemote[] getLastSelectedFiles(){
-    FileRemote[] ret = new FileRemote[lastFileCards.size()];
+    FileRemote[] ret = new FileRemote[3];
     int ix = -1;
-    for(FcmdFileCard card: lastFileCards){
-      ret[++ix] = card.currentFile;
+    for(FcmdLeftMidRightPanel panel: lastFilePanels){
+      FcmdFileCard fileCard = panel.actFileCard;
+      if(fileCard !=null){
+        ret[++ix] = fileCard.currentFile;
+      } else {
+        ret[++ix] = null;  //the panel hasn't a file selected now.
+      }
     }
+    //Note: There may be less than 3 file panels, rest of files are null.
+    return ret;
+  }
+  
+
+  /**Get the last selected file cards in order of selection of the file panels.
+   * @return array[3] of the last selected file cards in the file panels. It has always a length of 3
+   *   but not all elements are set ( they are ==null) if the file cards are not opened before
+   *   in the panel.
+   *   The returned instance is a new one, not referenced elsewhere. It can be stored
+   *   and it remains the situation of selection files independently of further user actions.
+   */
+  FcmdFileCard[] getLastSelectedFileCards(){
+    FcmdFileCard[] ret = new FcmdFileCard[3];
+    int ix = -1;
+    for(FcmdLeftMidRightPanel panel: lastFilePanels){
+      FcmdFileCard fileCard = panel.actFileCard;
+      if(fileCard !=null){
+        ret[++ix] = fileCard;
+      } else {
+        ret[++ix] = null;  //the panel hasn't a file selected now.
+      }
+    }
+    //Note: There may be less than 3 file panels, rest of files are null.
     return ret;
   }
   
