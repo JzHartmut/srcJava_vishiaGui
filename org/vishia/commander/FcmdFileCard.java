@@ -29,6 +29,15 @@ import org.vishia.util.KeyCode;
  */
 public class FcmdFileCard extends GralFileSelector
 {
+  /**Version and History
+   * <ul>
+   * <li>2012-02-04 Hartmut new: {@link #searchCompareResult(File)} supports working with
+   *   comparison result, used to set equal if a file was copied.
+   * </ul>
+   * 
+   */
+  public static final int version = 0x20120204;
+  
   /**Table widget for the select table of the file tab.*/
   FcmdFavorCard favorCard;
 
@@ -167,6 +176,35 @@ public class FcmdFileCard extends GralFileSelector
     return super.remove();
   }
  
+  
+  
+  /**Searches whether the given file has a comparison result in this file card.
+   * That method is used to present the file in the table with comparison result information
+   * and to change the comparison result if the file was copied.
+   * @param file The file, usual selected in the file table
+   * @return null a comparison result is not existed, elsewhere the result.
+   */
+  FileCompare.Result searchCompareResult(File file){
+    ///
+    final FileCompare.Result result;
+    if(sDirSync !=null){
+      zDirSync = sDirSync.length();
+      String sPath = file.getAbsolutePath();
+      if(sPath.startsWith(sDirSync)){
+        String sLocalPath = sPath.substring(sDirSync.length()+1);
+        result = main.filesCp.idxFilepath4Result.get(sLocalPath);
+      } else {
+        result = null;  //outside of sDirSync
+      }
+    } else {
+      zDirSync = -1;
+      result = null;  //no comparison active
+    }
+    return result;
+  }
+  
+  
+  
   
   @Override public boolean actionUserKey(int keyCode, Object oData, GralTableLine_ifc line)
   { boolean ret = true;
@@ -322,22 +360,13 @@ public class FcmdFileCard extends GralFileSelector
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
       //check whether any of the 2 compare directories are base for the current file:
       try{
-        if(sDirSync !=null){
-          zDirSync = sDirSync.length();
-          GralTableLine_ifc line = (GralTableLine_ifc)(params[0]);
-          File file = (File)line.getUserData();
-          String sPath = file.getAbsolutePath();
-          if(sPath.startsWith(sDirSync)){
-            String sLocalPath = sPath.substring(sDirSync.length()+1);
-            FileCompare.Result result = main.filesCp.idxFilepath4Result.get(sLocalPath);
-            if(result !=null){
-              if(!result.equal){ line.setCellText("#", 0); }
-              else if(result.alone){ line.setCellText("+", 0); }
-              else if(result.missingFiles){ line.setCellText("-", 0); }
-            }
-          }
-        } else {
-          zDirSync = -1;
+        GralTableLine_ifc line = (GralTableLine_ifc)(params[0]);
+        File file = (File)line.getUserData();
+        FileCompare.Result result = searchCompareResult(file);
+        if(result !=null){
+          if(!result.equal){ line.setCellText("#", 0); }
+          else if(result.alone){ line.setCellText("+", 0); }
+          else if(result.missingFiles){ line.setCellText("-", 0); }
         }
       } catch(Exception exc){
         main.gralMng.log.sendMsg(0, "Exception in FcmdFileCard.actionSetFileLineAttrib"); 

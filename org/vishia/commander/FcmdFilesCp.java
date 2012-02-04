@@ -7,7 +7,6 @@ import java.util.TreeMap;
 
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -18,7 +17,6 @@ import org.vishia.util.FileCompare;
 import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
-import com.sun.org.apache.bcel.internal.generic.IXOR;
 
 public class FcmdFilesCp {
 
@@ -88,13 +86,14 @@ public class FcmdFilesCp {
       file2 = card2.currentFile;
       result.clear();
       idxFilepath4Result.clear();
-      FileCompare.Result result1 = new FileCompare.Result(file1, file2);
+      FileCompare.Result result1 = new FileCompare.Result(null, file1, file2);
       comparer.compare(result1, null, 0);
       result = result1.subFiles;
       for(FileCompare.Result item: result){
         buildIdxResult(item, 0);
       }
-      windConfirmCompare.setWindowVisible(false);
+      //let the window open to set sync or see results there (TODO)
+      //windConfirmCompare.setWindowVisible(false);
     }
   }
   
@@ -145,7 +144,9 @@ public class FcmdFilesCp {
       widgPath1.setText("");
       widgPath2.setText("");
     }
-    
+    widgCompare.setText("compare");
+    widgCompare.sCmd = "cp";
+
   }
   
   

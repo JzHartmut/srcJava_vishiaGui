@@ -9,20 +9,16 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralPos;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralFileSelector;
-import org.vishia.gral.widget.GralSelectList;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.FileRemote;
 import org.vishia.util.FileWriter;
@@ -32,6 +28,14 @@ import org.vishia.util.KeyCode;
 class FcmdFavorPathSelector
 {
 
+  /**Version and History:
+   * <ul>
+   * <li>2012-02-04 Hartmut new menu entries for refresh and origin dir
+   * </ul>
+   * 
+   */
+  public static final int version = 0x20120204;
+  
   /**Entry in the favorite list. */
   static class FavorPath
   { /**The path of directory to select. */
@@ -157,9 +161,11 @@ class FcmdFavorPathSelector
   
   /**Builds the content of the add-favorite window. The window is created static. It is shown
    * whenever it is used.  */
-  void buildWindowAddFavorite()
-  { main.gui.addMenuItemGThread("menuDelTab", main.idents.menuDelTab, actionDelTab); // /
-
+  void buildWindowAddFavorite(){ 
+    main.gui.addMenuItemGThread("menuDelTab", main.idents.menuDelTab, actionDelTab); // /
+    main.gui.addMenuItemGThread("menuFileNaviOriginDir", main.idents.menuFileNaviOriginDir, actionSetDirOrigin); // /
+    main.gui.addMenuItemGThread("menuFileNaviRefresh", main.idents.menuFileNaviRefresh, actionRefreshFileTable); // /
+    
     main.gralMng.selectPanel("primaryWindow"); //"output"); //position relative to the output panel
     //panelMng.setPosition(1, 30+GralGridPos.size, 1, 40+GralGridPos.size, 1, 'r');
     main.gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
@@ -427,25 +433,39 @@ class FcmdFavorPathSelector
   
   /**Sets the origin dir of the last focused file table.
    * <br>
-   * Implementation note: 
-   * <ul>
-   * <li>The last focused file tab is searched. The last focused widgets are stored
-   * in a List and are returned from {@link GralWidgetMng#getWidgetsInFocus()} if the widget implementation
-   * has the necessary focus action. Most of widgets have it, especially the File tables.
-   * The instance of {@link GralFileSelector} is stored in the {@link GralWidget#getContentInfo()} .
-   * The {@link #getLastFileTab()} method gets it.
-   * <li>
-   * </ul>
+   * Implementation note: The last focused file tab is searched using {@link Fcmd#getLastSelectedFileCards()}.
    */
   GralUserAction actionSetDirOrigin = new GralUserAction(){
-    @Override public boolean userActionGui(String sIntension, GralWidget widgd, Object... params)
-    { GralFileSelector lastTab = main.getLastSelectedFileCards()[0];
-      if(lastTab !=null){
-        lastTab.fillInOriginDir();
-      } else {
-        throw new IllegalArgumentException("last file tab not able to found");
-      }
-      return true;
+    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
+    { if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
+        GralFileSelector lastTab = main.getLastSelectedFileCards()[0];
+        if(lastTab !=null){
+          lastTab.fillInOriginDir();
+        } else {
+          throw new IllegalArgumentException("last file tab not able to found");
+        }
+        return true;
+      } else return false;
+    }
+  };
+  
+  
+  
+  /**Sets the origin dir of the last focused file table.
+   * <br>
+   * Implementation note: The last focused file tab is searched using {@link Fcmd#getLastSelectedFileCards()}.
+   */
+  GralUserAction actionRefreshFileTable = new GralUserAction(){
+    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
+    { if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
+        GralFileSelector lastTab = main.getLastSelectedFileCards()[0];
+        if(lastTab !=null){
+          lastTab.fillInCurrentDir();
+        } else {
+          throw new IllegalArgumentException("last file tab not able to found");
+        }
+        return true;
+      } else return false;
     }
   };
   

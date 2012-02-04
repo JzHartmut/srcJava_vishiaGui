@@ -16,6 +16,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralValueBar;
 import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
+import org.vishia.util.FileCompare;
 import org.vishia.util.FileRemote;
 import org.vishia.util.FileRemoteAccessor;
 import org.vishia.util.KeyCode;
@@ -26,6 +27,14 @@ import org.vishia.util.KeyCode;
  */
 public class FcmdCopyCmd
 {
+  /**Version and History
+   * <ul>
+   * <li>2012-02-04 Hartmut new If a file was copied and a comparison result exists, it is set to equal.
+   *   That helps to handle with comparison.
+   * </ul>
+   */
+  public static final int version = 0x20120204; 
+  
   protected final Fcmd main;
 
   
@@ -261,14 +270,23 @@ public class FcmdCopyCmd
   
   
   
-  private void eventConsumed(Event ev){
+  private void eventConsumed(Event ev, boolean ok){
     listEvCopy.remove(ev);
     int nrofPendingFiles = listEvCopy.size();
     int percent = nrofPendingFiles * 100 / filesToCopy.size();
     widgProgressAll.setValue(percent, 0, null);
-    fileCardDst.fillInCurrentDir();
+    if(ok){
+      File file = (File)ev.getSrc();
+      FileCompare.Result cmprResult = fileCardSrc.searchCompareResult(file);
+      if(cmprResult !=null){
+        cmprResult.setToEqual();  
+      }
+      fileCardDst.fillInCurrentDir();
+    }
     if(nrofPendingFiles == 0){
       windConfirmCopy.setWindowVisible(false);      
+      widgButtonOk.setText("check");
+      widgButtonOk.sCmd = "check";
     }
   }
   
@@ -288,15 +306,15 @@ public class FcmdCopyCmd
         }break;
         case FileRemoteAccessor.kFinishError: {
           widgCopyState.setText("error");
-          eventConsumed(ev);
+          eventConsumed(ev, false);
         }break;
         case FileRemoteAccessor.kFinishNok: {
           widgCopyState.setText("nok");
-          eventConsumed(ev);
+          eventConsumed(ev, false);
         }break;
         case FileRemoteAccessor.kFinishOk: {
           widgCopyState.setText("ok");
-          eventConsumed(ev);
+          eventConsumed(ev, true);
         }break;
       }
       //windConfirmCopy.setWindowVisible(false);

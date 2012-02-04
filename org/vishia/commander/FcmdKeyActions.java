@@ -69,8 +69,6 @@ public class FcmdKeyActions
   int keyMainPanelRight = KeyCode.alt + KeyCode.shift + KeyCode.right;
   
 
-  /**Show files in the start dir of the selection. Go to the origin dir.*/
-  int keyOriginDir = KeyCode.ctrl + '<';  //like total commander: jump to the root directory
   /**Show files in the current selected dir. Entry in the directory. */
   int keyEntryDir;
   /**Show files in the parent dir, like cd .. */
@@ -111,8 +109,8 @@ public class FcmdKeyActions
           else if(keyCode == keyMkDirFile){ main.mkCmd.dialogMkDirFile(files[0]); }
           else if(keyCode == keyDelete1 || keyCode == keyDelete2){ main.deleteCmd.actionConfirmDelete.userActionGui(keyCode, widgd); }
           //navigation
-          else if(keyCode == keyOriginDir){ main.favorPathSelector.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }
-          else if(keyCode == KeyCode.enter){ main.favorPathSelector.actionSetDirOrigin.userActionGui(sIntension, widgd, params); }
+          else if(keyCode == main.idents.keyOriginDir){ main.favorPathSelector.actionSetDirOrigin.userActionGui(KeyCode.menuEntered, widgd, params); }
+          else if(keyCode == main.idents.keyRefresh1 || keyCode == main.idents.keyRefresh2){ main.favorPathSelector.actionRefreshFileTable.userActionGui(KeyCode.menuEntered, widgd, params); }
           else if(keyCode == keyWindFullOut){ main.windMng.actionWindFullOut.userActionGui(sIntension, widgd, params); }
           else if(keyCode == KeyCode.ctrl + KeyCode.enter) { main.cmdSelector.executeCurrCmd(); }
           else { done = false; }
