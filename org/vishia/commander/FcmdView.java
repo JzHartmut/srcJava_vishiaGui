@@ -158,7 +158,7 @@ public class FcmdView
   {
     try{
       //byteBuffer.get(buffer);
-      for(int ii = 0; ii < 16; ++ii){
+      for(int ii = 0; ii < 16 && ii < buffer.length /16; ++ii){
         formatterHex.reset();
         formatterHex.addHex(ii, 4).add(": ");
         formatterHex.addHexLine(buffer, 16*ii, 16, StringFormatter.k1);
@@ -166,7 +166,7 @@ public class FcmdView
         widgContent.append(formatterHex.getContent()).append('\n');
       }
     } catch(Exception exc){
-      widgContent.append(exc.getLocalizedMessage());
+      widgContent.append(exc.getMessage());
     }
   }
   
