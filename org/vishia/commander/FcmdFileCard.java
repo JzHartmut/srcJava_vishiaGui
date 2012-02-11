@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidgetMng;
@@ -87,6 +88,8 @@ public class FcmdFileCard extends GralFileSelector
   final DateFormat formatDateInfo = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss");
   
   /**Creates the cards with tabs for the files and for the favorite paths.
+   * This ctor will be called in the graphic thread. Therefore it can initialize the graphic 
+   * for the fileCard and for the associated favor card in this code.
    * @param mainPanelP The left, mid or right panel where this cards are assigned to
    * @param label The label of the tab, it builds the name of all widgets.
    */
@@ -121,15 +124,30 @@ public class FcmdFileCard extends GralFileSelector
     String nameWidgLabel = FcmdWidgetNames.labelWidgFile + nameFilePanel;
     widgLabel = mng.addTextField(nameWidgLabel, false, null, null);
     mng.setPosition(2, 0, 0, 0, 1, 'd');
+    //set the base class GralFileSelector to the panel. It contains the path and the table for file selection.
     setToPanel(mng, namePanelFile, 5, new int[]{2,20,5,10}, 'A');
-    GralPos.Coordinate[] columns = new GralPos.Coordinate[4];
+    //GralPos.Coordinate[] columns = new GralPos.Coordinate[4];
+    //Sets the columns for the table.
     super.selectList.wdgdTable.setColumnWidth(50, new int[]{2,0,-5,-10});
     super.selectList.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.fileSelect.");
+    GralMenu menuFolder = super.widgdPath.getContextMenu();
+    menuFolder.addMenuItemGthread("contextfolder-setOrigin", main.idents.menuFileNaviOriginDirContext, main.favorPathSelector.actionSetDirOrigin);
+    menuFolder.addMenuItemGthread("context-filescp", main.idents.menuFilesCpContext, main.filesCp.actionConfirmCp);
+    menuFolder.addMenuItemGthread("contextfolder-create", main.idents.menuConfirmMkDirFileContext, main.mkCmd.actionOpenDialog);
+    menuFolder.addMenuItemGthread("contextfolder-refresh", main.idents.menuFileNaviRefreshContext, main.favorPathSelector.actionRefreshFileTable);
     panelFiles.setPrimaryWidget(super.selectList.wdgdTable);
     //
     //sets the action for a simple table: what to do on line selected: Show file names. 
     selectList.wdgdTable.setActionOnLineSelected(actionOnFileSelection);
     selectList.wdgdTable.setActionFocused(actionFocused);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFilePropsContext, main.filePropsCmd.actionOpenDialog);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFileViewContext, main.viewCmd.actionOpenView);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFileEditContext, main.actionEdit);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmCopyContext, main.copyCmd.actionConfirmCopy);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmMoveContext, main.copyCmd.actionConfirmCopy);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmFileDelContext, main.deleteCmd.actionConfirmDelete);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteContext, main.executer.actionOnEnterFile);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteCmdContext, main.cmdSelector.actionExecCmdWithFiles);
     favorCard.wdgdTable.setActionOnLineSelected(favorCard.actionFavorSelected);
     //
     //sets the action for Select a file: open the execute menu

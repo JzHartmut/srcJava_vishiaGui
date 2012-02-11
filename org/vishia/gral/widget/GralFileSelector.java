@@ -185,7 +185,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   /**The widget for showing the path. */
-  GralTextField widgdPath;
+  protected GralTextField widgdPath;
   
   final SimpleDateFormat dateFormat = new SimpleDateFormat("yy-MMM-dd HH:mm:ss"); 
   

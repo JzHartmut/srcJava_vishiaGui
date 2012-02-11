@@ -163,8 +163,18 @@ class FcmdFavorPathSelector
    * whenever it is used.  */
   void buildWindowAddFavorite(){ 
     main.gui.addMenuItemGThread("menuDelTab", main.idents.menuDelTab, actionDelTab); // /
-    main.gui.addMenuItemGThread("menuFileNaviOriginDir", main.idents.menuFileNaviOriginDir, actionSetDirOrigin); // /
-    main.gui.addMenuItemGThread("menuFileNaviRefresh", main.idents.menuFileNaviRefresh, actionRefreshFileTable); // /
+    main.gui.addMenuItemGThread("menuFileNaviOriginDir", main.idents.menuFileNaviOriginDirBar, actionSetDirOrigin); // /
+    main.gui.addMenuItemGThread("menuFileNaviRefresh", main.idents.menuFileNaviRefreshBar, actionRefreshFileTable); // /
+    main.gui.addMenuItemGThread("menubarFolderCreate", main.idents.menuConfirmMkdirFileBar, main.mkCmd.actionOpenDialog); // /
+    main.gui.addMenuItemGThread("menubarFileProps", main.idents.menuFilePropsBar, main.filePropsCmd.actionOpenDialog);
+    main.gui.addMenuItemGThread("test", main.idents.menuFileViewBar, main.viewCmd.actionOpenView);
+    main.gui.addMenuItemGThread("test", main.idents.menuFileEditBar, main.actionEdit);
+    main.gui.addMenuItemGThread("test", main.idents.menuConfirmCopyBar, main.copyCmd.actionConfirmCopy);
+    main.gui.addMenuItemGThread("test", main.idents.menuConfirmMoveBar, main.copyCmd.actionConfirmCopy);
+    main.gui.addMenuItemGThread("test", main.idents.menuConfirmFileDelBar, main.deleteCmd.actionConfirmDelete);
+    main.gui.addMenuItemGThread("test", main.idents.menuExecuteBar, main.executer.actionOnEnterFile);
+    main.gui.addMenuItemGThread("test", main.idents.menuExecuteCmdBar, main.cmdSelector.actionExecCmdWithFiles);
+
     
     main.gralMng.selectPanel("primaryWindow"); //"output"); //position relative to the output panel
     //panelMng.setPosition(1, 30+GralGridPos.size, 1, 40+GralGridPos.size, 1, 'r');

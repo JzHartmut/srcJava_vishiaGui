@@ -77,6 +77,7 @@ public interface GralGridBuild_ifc
   
   /**The version of this interface:
    * <ul>
+   * <li>2012-02-11 Hartmut new: {@link #setContextMenu(GralWidget, GralMenu)}. 
    * <li>2011-11-16 Hartmut new: {@link #addText(String)} simple with standards.
    * <li>2011-11-17 Hartmut chg: {@link #createWindow(String, String, int)} now not only exclusive or not
    *   but with some control bits {@link GralWindow#windExclusive} etc.
@@ -507,6 +508,12 @@ public interface GralGridBuild_ifc
   void addFocusAction(GralWidget widgetInfo, GralUserAction action, String sCmdEnter, String sCmdRelease);
 
   
+  /**Sets the context menu for the given widget for right-mouse pressing.
+   * @param widg The widget
+   * @param menu The menu.
+   */
+  GralMenu addContextMenu(GralWidget widg);
+  
   GralMenu addPopupMenu(String sName);
   
   /**Register all widgets, which are created in its own classes, not add here.
@@ -613,6 +620,11 @@ public interface GralGridBuild_ifc
    */
   GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG, int xS, int yS);
   
+  
+  /**Creates an empty context menu.
+   * @return
+   */
+  //GralMenu createContextMenu(String name, GralWidget widg);
   
   /**Removes a composite box from the graphic representation.
    * @param compositeBox

@@ -8,11 +8,16 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralDispatchCallbackWorker;
@@ -38,10 +43,15 @@ public class SwtTable  extends GralTable {
   
   private final SwtTable.Table table; 
   
+  /**Set to true if the table has the focus in window.
+   */
+  private boolean hasFocus;
   
   private final FocusListener focusListenerTable;
   
   private final FocusListener focusListenerCell;
+  
+  private final MousePressedListenerTable mousePressedListener = new MousePressedListenerTable();
   
   private final TableKeyListerner myKeyListener;
   
@@ -61,6 +71,7 @@ public class SwtTable  extends GralTable {
     focusListenerCell = this.new FocusListenerCell();
     setColorsSwt();    
     this.cellsSwt = new Text[zLineVisibleMax][zColumn];
+    this.menuColumns = new SwtMenu[zColumn];
     this.table = new SwtTable.Table(parent, zColumn);
     table.addKeyListener(myKeyListener);
     //table.addSelectionListener(selectionListener);
@@ -325,17 +336,22 @@ public class SwtTable  extends GralTable {
       super(parent, 0);
       int yPix = 0;
       Font font = mng.propertiesGuiSwt.getTextFontSwt(2, whatIs, whatIs);
+      for(int iCol = 0; iCol < zColumns; ++iCol){
+        menuColumns[iCol] = new SwtMenu(name + "_menu" + iCol, this, itsMng);
+      }
       for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){
         for(int iCol = 0; iCol < zColumns; ++iCol){
           Text cell = new Text(this, SWT.LEFT | SWT.SINGLE | SWT.READ_ONLY);
           cell.setFont(font);
           cell.addKeyListener(myKeyListener);
           cell.addFocusListener(focusListenerCell);
+          cell.addMouseListener(mousePressedListener);
           CellData cellData = new CellData(iRow, iCol);
           cell.setData(cellData);
           int xdPixCol = columnPixel[iCol+1] - columnPixel[iCol];
           cell.setBounds(columnPixel[iCol], yPix, xdPixCol, linePixel);
           cell.setBackground(colorBackTableSwt);
+          cell.setMenu((Menu)menuColumns[iCol].getMenuImpl());
           cellsSwt[iRow][iCol] = cell;
         }
         yPix += linePixel;
@@ -481,7 +497,42 @@ public class SwtTable  extends GralTable {
     
   };
   
+  
+  private class MousePressedListenerTable implements MouseListener{
 
+    @Override
+    public void mouseDoubleClick(MouseEvent e)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public void mouseDown(MouseEvent ev)
+    {
+    }
+
+    @Override
+    public void mouseUp(MouseEvent ev)
+    {
+      Text widgSwt = (Text)ev.widget;  //it is only associated to a cell.
+      CellData cellData = (CellData)widgSwt.getData();
+      System.out.println("mouse up");
+      if(true || !hasFocus){
+        SwtTable.this.gralWidgetMethod.focusGained();  //from GralWidget.
+        hasFocus = true;
+        System.out.println("focusTable");
+      }
+      redrawTableWithFocusedCell(ev.widget);
+    }
+    
+  }
+  
+  
+
+  /**Debug: this focus listener is not invoked any time. It is associated to a swt.Composite.
+   *
+   */
   private class FocusListenerTable implements FocusListener //extends SwtWidgetMng.SwtMngFocusListener
   {
     FocusListenerTable(SwtWidgetMng mng){
@@ -489,6 +540,9 @@ public class SwtTable  extends GralTable {
     }
     
     @Override public void focusLost(FocusEvent e){ 
+      System.out.println("table focus lost. ");
+      //assert(false);
+      hasFocus = false;
       int row = 1; //table.getSelectionIndex();
       if(row >=1){
         //TableItem tableLineSwt = table.getItem(row-1);
@@ -500,6 +554,8 @@ public class SwtTable  extends GralTable {
     @Override public void focusGained(FocusEvent ev)
     { //super.focusGained(ev);
       SwtTable.this.gralWidgetMethod.focusGained();
+      System.out.println("table focus gained. ");
+      //assert(false);
       int row = 1; //table.getSelectionIndex();
       if(row >=0){
         //TableItem tableLineSwt = table.getItem(row);
@@ -511,15 +567,22 @@ public class SwtTable  extends GralTable {
   };
   
   
+  /**An instance of this is associated to any cell of the table. 
+   * The focus gained method is used to set the current cell of the table and to invoke redraw
+   * to show the new selection. That focus event is invoked if the mouse button is pressed on that cell.
+   */
   private class FocusListenerCell implements FocusListener
   {
     
-    /**This routine is invoked whenever the focus of any Text field of the table will be lost
+    /**This method does nothing. A lost focus color showing may be forced from redraw of another 
+     * table. Think about: maybe any action?
+     * Old: This routine is invoked whenever the focus of any Text field of the table will be lost
      * the focus. Before that occurs, the field is the selected line, because it has had the focus.
      * Therefore the {@link GralTable#colorBackSelectNonFocused} is set.
      * @deprecated unnecessary yet.
      */
     @Override public void focusLost(FocusEvent ev){ 
+      System.out.println("Cell focus lost");
       if(!bRedrawPending){
         CellData data = (CellData)ev.widget.getData();
         Control widgSwt = (Control)ev.widget;
@@ -527,6 +590,7 @@ public class SwtTable  extends GralTable {
         int iCellLine = data.ixCellLine; //ixLineNew - ixLine1;
         for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
           Text cellSwt = cellsSwt[iCellLine][iCellCol];
+    
           //cellSwt.setBackground(colorBackSelectNonFocusedSwt);
         }
       }
@@ -542,8 +606,14 @@ public class SwtTable  extends GralTable {
     @Override public void focusGained(FocusEvent ev) { 
       try{
         if(!bRedrawPending){ 
-          SwtTable.this.gralWidgetMethod.focusGained();  //from GralWidget.
+          //The focusGained for the table invokes the GralWidget.focusAction for this table.
+          if(true || !hasFocus){
+            SwtTable.this.gralWidgetMethod.focusGained();  //from GralWidget.
+            hasFocus = true;
+            System.out.println("focusTable");
+          }
           redrawTableWithFocusedCell(ev.widget);
+          System.out.println("focusCell");
         }
       } catch(Exception exc){
         itsMng.log.sendMsg(0, "Exception in SwtTable.focusGained");
@@ -551,6 +621,43 @@ public class SwtTable  extends GralTable {
     }
     
   };
+  
+  
+  
+  /**This class wraps the {@link GralUserAction} for a menu action for the table.
+   */
+  static class ActionUserMenuItem implements SelectionListener
+  { 
+    final GralUserAction action;
+    
+    public ActionUserMenuItem(GralUserAction action)
+    { this.action = action;
+    }
+
+    @Override
+    public void widgetDefaultSelected(SelectionEvent e) {
+      // TODO Auto-generated method stub
+      
+    }
+  
+    @Override
+    public void widgetSelected(SelectionEvent e)
+    { Object oWidgSwt = e.getSource();
+      final GralWidget widgg;
+      if(oWidgSwt instanceof Widget){
+        Widget widgSwt = (Widget)oWidgSwt;
+        Object oGralWidg = widgSwt.getData();
+        if(oGralWidg instanceof GralWidget){
+          widgg = (GralWidget)oGralWidg;
+        } else { widgg = null; }
+      } else { widgg = null; }
+      action.userActionGui(KeyCode.menuEntered, widgg);
+    }
+  }
+  
+
+  
+
   
   
   void stop(){}

@@ -3,10 +3,13 @@ package org.vishia.gral.awt;
 import java.awt.Component;
 import java.awt.Composite;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.Label;
+import java.awt.Menu;
 import java.awt.Point;
+import java.awt.PopupMenu;
 import java.awt.Rectangle;
 import java.awt.TextArea;
 import java.awt.TextField;
@@ -346,19 +349,44 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   }
 
   
-  public GralMenu addPopupMenu(String sName){
+  
+
+  
+  @Override public GralMenu addPopupMenu(String sName){
     //Control panelSwt = (Control)pos.panel.getPanelImpl();
     //SwtMenu menu = new SwtMenu(sName, panelSwt, this);
     return null; //menu;
   }
 
   
+  @Override public GralMenu addContextMenu(GralWidget widg){
+    Component widgSwt = (Component)widg.getWidgetImplementation();
+    GralMenu menu = new AwtMenu(widg.name + "_menu", widgSwt, this);
+    PopupMenu menuAwt = (PopupMenu)menu.getMenuImpl();
+    widgSwt.add(menuAwt);
+    menuAwt.show(widgSwt, 10, 10);
+    return menu;
+  }
+ 
   
-  @Override
-  public GralPanelContent createCompositeBox(String name)
+  
+  
+
+  
+  
+  @Override public GralPanelContent createCompositeBox(String name)
   {
-    // TODO Auto-generated method stub
-    return null;
+      //Composite box = new Composite(graphicFrame, 0);
+      Container box = new Container();
+      Container parent = (Container)pos.panel.getPanelImpl();
+      
+      parent.add(box);
+      setPosAndSize_(box);
+      Dimension size = box.getSize();
+      GralPanelContent panel = new AwtPanel(name, this, box);
+      registerPanel(panel);
+      //GuiPanelMngSwt mng = new GuiPanelMngSwt(gralDevice, size.y, size.x, propertiesGuiSwt, variableContainer, log);
+      return panel;
   }
 
   @Override

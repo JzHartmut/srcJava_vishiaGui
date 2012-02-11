@@ -48,8 +48,7 @@ public class AwtTextField extends GralTextField
   @Override
   public Object getWidgetImplementation()
   {
-    // TODO Auto-generated method stub
-    return null;
+    return widgetAwt;
   }
 
   @Override public String getPromptLabelImpl(){ return promptSwt.getText(); }

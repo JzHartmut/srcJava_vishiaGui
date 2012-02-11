@@ -33,6 +33,8 @@ import java.util.Map.Entry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -1147,14 +1149,21 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     return SwtTable.addTable(this, sName, height, columnWidths);
   }
   
-  public GralMenu addPopupMenu(String sName){
+  
+  @Override public GralMenu addPopupMenu(String sName){
     Control panelSwt = (Control)pos.panel.getPanelImpl();
     SwtMenu menu = new SwtMenu(sName, panelSwt, this);
     return menu;
   }
   
   
-  
+  @Override public GralMenu addContextMenu(GralWidget widg){
+    Control widgSwt = (Control)widg.getWidgetImplementation();
+    GralMenu menu = new SwtMenu(widg.name + "_menu", widgSwt, this);
+    widgSwt.setMenu((Menu)menu.getMenuImpl());
+    return menu;
+  }
+ 
   
   @Override public void repaint()
   {
@@ -1659,6 +1668,23 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   /**The package private universal focus listener. */
   SwtMngFocusListener focusListener = new SwtMngFocusListener();
+
+
+  /**Universal context menu listener
+   */
+  class SwtMngMouseMenuListener implements MenuDetectListener
+  {
+
+    @Override
+    public void menuDetected(MenuDetectEvent e)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+  }
+  
+  /**The package private universal focus listener. */
+  SwtMngMouseMenuListener mouseMenuListener = new SwtMngMouseMenuListener();
 
 
 	void stop(){}  //debug helper

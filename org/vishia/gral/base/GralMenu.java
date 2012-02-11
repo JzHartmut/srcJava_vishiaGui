@@ -1,24 +1,43 @@
 package org.vishia.gral.base;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 
 public abstract class GralMenu //extends GralWidget
 {
 
-  /**Only a marker interface
+  
+  /**This class wraps a menu entry of the implementation. It knows all sub menu entries
+   * in a implementation-independent way. So searching entries with given name is possible.
    */
-  public abstract class Item
+  protected static class MenuEntry
   {
-    static final int version = 0;
+    public String name;
+    
+    /**If it is a superior menu item, the menu below. Else null. */
+    public Object menuImpl;
+    
+    /**All menu entries of this menu item. */
+    public Map<String, MenuEntry> subMenu;
+    
+    public MenuEntry(){
+      
+    }
   }
   
+  protected final GralWidgetMng gralMng;
   
+  protected Map<String, MenuEntry> menus = new TreeMap<String, MenuEntry>();
+  
+
   
   public GralMenu(String sName, GralWidgetMng mng)
   {
     //super(sName, 'M', mng);
-    // TODO Auto-generated constructor stub
+    this.gralMng = mng;
   }
 
 
@@ -32,8 +51,10 @@ public abstract class GralMenu //extends GralWidget
    *   It is stored in {@link GralWidget#sDataPath}  
    * @param action called on menu activation.
    */
-  public abstract void addMenuItem(String nameWidg, String sMenuPath, GralUserAction action);
+  public abstract void addMenuItemGthread(String name, String sMenuPath, GralUserAction action);
   
   public abstract void setVisible();
+  
+  public abstract Object getMenuImpl();
   
 }

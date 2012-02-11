@@ -68,7 +68,9 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   /**Start position of each column in pixel. */
   protected int[] columnPixel;
 
+  protected GralMenu[] menuColumns;
   
+
   /**The colors of each cell. It is set with the color of {@link TableItemWidget#colorBackground} and
    * {@link TableItemWidget#colorBackground} of the currently displayed line.
    */
@@ -165,6 +167,11 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    */
   public void setActionOnLineSelected(GralUserAction actionOnLineSelected){
     this.actionOnLineSelected = actionOnLineSelected;
+  }
+  
+  
+  public void addContextMenuEntryGthread(int col, String name, String sMenuPath, GralUserAction action){
+    menuColumns[col].addMenuItemGthread(name, sMenuPath, action);
   }
   
   

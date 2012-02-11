@@ -3,6 +3,7 @@ package org.vishia.gral.ifc;
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.util.KeyCode;
@@ -166,6 +167,10 @@ public abstract class GralWidget implements GralWidget_ifc
 	
 	/**Textual informations about content. It may be a data path or adequate. */
 	public String sDataPath;
+	
+	/**If not null, it is the right-mouse-button menu for this widget. */
+	protected GralMenu contextMenu;
+	
 	
 	/**An index associated to the data. */
 	private int dataIx;
@@ -436,6 +441,14 @@ public abstract class GralWidget implements GralWidget_ifc
 		this.sFormat = sFormat;
 	}
 
+	
+	public GralMenu getContextMenu(){
+	  if(contextMenu == null){
+	    contextMenu = itsMng.addContextMenu(this);   //delegation, the widget mng knows the implementation platform.
+	  }
+	  return contextMenu;
+	}
+	
 	
 	public void setHtmlHelp(String url){ htmlHelp = url; }
   

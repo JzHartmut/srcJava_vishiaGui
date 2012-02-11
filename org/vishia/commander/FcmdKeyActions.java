@@ -112,7 +112,7 @@ public class FcmdKeyActions
           else if(keyCode == main.idents.keyOriginDir){ main.favorPathSelector.actionSetDirOrigin.userActionGui(KeyCode.menuEntered, widgd, params); }
           else if(keyCode == main.idents.keyRefresh1 || keyCode == main.idents.keyRefresh2){ main.favorPathSelector.actionRefreshFileTable.userActionGui(KeyCode.menuEntered, widgd, params); }
           else if(keyCode == keyWindFullOut){ main.windMng.actionWindFullOut.userActionGui(sIntension, widgd, params); }
-          else if(keyCode == KeyCode.ctrl + KeyCode.enter) { main.cmdSelector.executeCurrCmd(); }
+          else if(keyCode == KeyCode.ctrl + KeyCode.enter) { main.cmdSelector.executeCurrCmdWithFiles(); }
           else { done = false; }
         }
       //}

@@ -97,7 +97,7 @@ public class GralCommandSelector extends GralSelectList
   /**Executes the command which is selected currently.
    * Whether or not the selection is visible and recognized by the user, it should be defined in the application.
    */
-  public void executeCurrCmd(){
+  public void executeCurrCmdWithFiles(){
     if(selectedCmd !=null){
       actionOk(selectedCmd, null);  //Note: the argument line isn't used in the called method.
     }
@@ -152,6 +152,13 @@ public class GralCommandSelector extends GralSelectList
       if(line !=null){
         selectedCmd = (CmdStore.CmdBlock)line.getUserData();
       }
+      return true;
+    }
+  };
+  
+  public GralUserAction actionExecCmdWithFiles = new GralUserAction(){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
+      executeCurrCmdWithFiles();
       return true;
     }
   };

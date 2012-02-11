@@ -38,6 +38,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
   
   /**Version and history:
    * <ul>
+   * <li>2012-02-11 Hartmut chg: The menu of the window is managed now in {@link SwtMenu}. Instance refered with {@link #menuBar}
    * <li>2011-11-27 Hartmut chg: {@link #addMenuItemGThread(String, String, GralUserAction)} moved from
    *   {@link SwtPrimaryWindow} to this, because the capability to have a menu bar may needed on a sub-window too.
    * <li>2011-11-18 Hartmut chg: {@link SwtSubWindow#SwtSubWindow(String, Display, String, int, GralWidgetMng)}
@@ -68,18 +69,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
   protected Shell window;
   
   
-  protected static class MenuEntry
-  {
-    String name;
-    /**If it is a superior menu item, the menu below. Else null. */
-    Menu menu;
-    Map<String, MenuEntry> subMenu;
-  }
-  
-  
-  
-  protected Map<String, MenuEntry> menus = new TreeMap<String, MenuEntry>();
-  
+  protected SwtMenu menuBar;
   
 
   
@@ -179,63 +169,15 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
   
   
 
-  @Override public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction gralAction)
-  { SelectionListener action = this.new ActionUserMenuItem(gralAction);
-    String[] names = sMenuPath.split("/");
-    /**The file menuBar is extendable. */
-    Menu menuBar = window.getMenuBar();
+  @Override public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction gralAction){
     if(menuBar == null){
-      menuBar = new Menu(window, SWT.BAR);
-      window.setMenuBar(menuBar);
+      menuBar = new SwtMenu("menubar", window, itsMng);
     }
-    Menu parentMenu = menuBar;
-    Map<String, MenuEntry> menustore = menus;
-    int ii;
-    for(ii=0; ii<names.length-1; ++ii){
-      //search all pre-menu entries before /. It may be existing, otherwise create it.
-      String name = names[ii];
-      final char cAccelerator;
-      final int posAccelerator = name.indexOf('?');
-      if(posAccelerator >=0){
-        cAccelerator = Character.toUpperCase(name.charAt(posAccelerator));
-        name = name.replace("&", "");
-      } else {
-        cAccelerator = 0;
-      }
-      MenuEntry menuEntry = menustore.get(name);
-      if(menuEntry == null){
-        //create it.
-        menuEntry = new MenuEntry();
-        menustore.put(name, menuEntry);
-        menuEntry.name = name;
-        menuEntry.subMenu = new TreeMap<String, MenuEntry>();
-        MenuItem item = new MenuItem(parentMenu, SWT.CASCADE);
-        item.setText(name);
-        if(cAccelerator !=0){
-          item.setAccelerator(SWT.CONTROL | cAccelerator);
-        }
-        menuEntry.menu = new Menu(window, SWT.DROP_DOWN);
-        item.setMenu(menuEntry.menu);
-      }
-      menustore = menuEntry.subMenu;
-      parentMenu = menuEntry.menu;
-    }
-    String name = names[ii];
-    MenuItem item = new MenuItem(parentMenu, SWT.None); 
-    GralWidget widgMenu = new SwtWidgetMenu(nameWidg, item, sMenuPath, gralMng);
-    item.setText(name);
-    //item.setAccelerator(SWT.CONTROL | 'S');
-    item.addSelectionListener(action);
-    if(!visibleFirst){
-      //sets the window visible because the rectangle of window should be calculated with menu
-      visibleFirst = true;
-      window.setVisible(true);  //but not focused
-    }
-    ///
+    menuBar.addMenuItemGthread(nameWidg, sMenuPath, gralAction);
   }
   
   
-
+  
   
   protected ShellListener shellListener = new ShellListener(){
 

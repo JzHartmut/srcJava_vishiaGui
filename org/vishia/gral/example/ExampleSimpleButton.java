@@ -27,13 +27,24 @@ import org.vishia.util.KeyCode;
 public class ExampleSimpleButton
 {
   
-  private final GuiElements gui;
+  /**Instance of inner class contains the graphical elements.
+   * 
+   */
+  protected final GuiElements gui;
   
+  /**Instance to initialize the graphic. */
+  private GralDispatchCallbackWorker initGuiCode;
   
   ExampleSimpleButton(GralWidgetMng gralMng)
   {
+    //this.initGuiCode = new InitGuiCode();
     gui = new GuiElements(gralMng);
     
+  }
+  
+  protected void setInitGuiCode(GralDispatchCallbackWorker initGuiCode)
+  {
+    this.initGuiCode = initGuiCode;
   }
   
   
@@ -94,7 +105,7 @@ public class ExampleSimpleButton
   
   
   
-  private static class GuiElements
+  protected static class GuiElements
   {
     final GralWidgetMng gralMng;
 
@@ -117,8 +128,12 @@ public class ExampleSimpleButton
   /**Code snippet for initializing the GUI. This snippet will be executed
    * in the graphic thread. It is an anonymous inner class. 
    */
-  private GralDispatchCallbackWorker initGuiCode = new GralDispatchCallbackWorker("ExampleSimpleButton.initGuiCode")
+  protected class InitGuiCodeSimpleButton extends GralDispatchCallbackWorker
   {
+    InitGuiCodeSimpleButton(){
+      super("ExampleSimpleButton.initGuiCode");
+    }
+    
     /**This routine is called in the graphic thread if it was added.
      * @see org.vishia.gral.base.GralDispatchCallbackWorker#doBeforeDispatching(boolean)
      */
@@ -155,14 +170,26 @@ public class ExampleSimpleButton
 
 
   
-  
-  
-  
-  
-  
-  
-  
+  /**The main routine. It creates the factory of this class
+   * and then calls {@link #main(String[], Factory)}.
+   * With that pattern a derived class may have a simple main routine too.
+   * @param args command line arguments.
+   */
   public static void main(String[] args)
+  {
+    main(args, new Factory());
+  
+  }  
+  
+  
+  
+  
+  /**Main routine with a factory class. That allows to use the same main routine for a derived class
+   * for further more complex examples.
+   * @param args command line arguments.
+   * @param factoryExample The factory to create the current class which should be derived from this.
+   */
+  protected static void main(String[] args, Factory factoryExample)
   {
     boolean bOk = true;
     //
@@ -186,13 +213,26 @@ public class ExampleSimpleButton
     //while building the application class can be shown for the user. 
     //
     //The gralMng is the main access to the graphic. It is indpenendent of the graphical implementation layer.
-    ExampleSimpleButton mainData = new ExampleSimpleButton(gralMng);
+    ExampleSimpleButton mainData = factoryExample.create(gralMng);
     //
     //Now the appearance of the graphic should be initialized:
     mainData.initGui();
     //
     //Now executes the application code which may be independent of the graphic execution.
     mainData.execute();
+  }
+  
+  
+  
+ 
+  /**This inner class creates this class with given parameter.
+   */
+  static class Factory{
+    ExampleSimpleButton create(GralWidgetMng gralMng){
+      ExampleSimpleButton obj = new ExampleSimpleButton(gralMng);
+      obj.setInitGuiCode(obj.new InitGuiCodeSimpleButton());
+      return obj;
+    }
   }
   
   
