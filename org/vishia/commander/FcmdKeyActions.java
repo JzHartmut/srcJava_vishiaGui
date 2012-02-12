@@ -87,35 +87,23 @@ public class FcmdKeyActions
   GralUserAction commanderKeyActions = new GralUserAction()
   { @Override public boolean userActionGui(int keyCode, GralWidget widgd, Object... params)
     { boolean done = false;
-      //if(sIntension.equals("key")){
-        //int keyCode = (Integer)params[0];
-      String sIntension = "key";
-        done = true;
-        switch (keyCode){
-          //case KeyCode.F4: main.actionEdit.userActionGui(sIntension, widgd, params); break;
-          //case KeyCode.F5: main.copyCmd.actionCopy.userActionGui(keyCode, widgd, params); break;
-          case KeyCode.alt + KeyCode.F1: main.selectPanelLeft.userActionGui(sIntension, widgd, params); break;
-          case KeyCode.alt + KeyCode.F2: main.selectPanelMiddle.userActionGui(sIntension, widgd, params); break;
-          case KeyCode.alt + KeyCode.F3: main.selectPanelRight.userActionGui(sIntension, widgd, params); break;
-          default: done = false;
-        }
-        if(!done){
-          done = true;
-          FileRemote[] files = main.getLastSelectedFiles();
-          if(     keyCode == keyFileProps){ main.filePropsCmd.openDialog(null); }  //F2
-          else if(keyCode == keyView){ main.viewCmd.view(null); }                  //F3
-          else if(keyCode == keyEdit){ main.actionEdit.userActionGui(sIntension, widgd, params); }
-          else if(keyCode == keyCopy){ main.copyCmd.actionConfirmCopy.userActionGui(keyCode, widgd, params); }
-          else if(keyCode == keyMkDirFile){ main.mkCmd.dialogMkDirFile(files[0]); }
-          else if(keyCode == keyDelete1 || keyCode == keyDelete2){ main.deleteCmd.actionConfirmDelete.userActionGui(keyCode, widgd); }
-          //navigation
-          else if(keyCode == main.idents.keyOriginDir){ main.favorPathSelector.actionSetDirOrigin.userActionGui(KeyCode.menuEntered, widgd, params); }
-          else if(keyCode == main.idents.keyRefresh1 || keyCode == main.idents.keyRefresh2){ main.favorPathSelector.actionRefreshFileTable.userActionGui(KeyCode.menuEntered, widgd, params); }
-          else if(keyCode == keyWindFullOut){ main.windMng.actionWindFullOut.userActionGui(sIntension, widgd, params); }
-          else if(keyCode == KeyCode.ctrl + KeyCode.enter) { main.cmdSelector.executeCurrCmdWithFiles(); }
-          else { done = false; }
-        }
-      //}
+      done = true;
+      FileRemote[] files = main.getLastSelectedFiles();
+      if(     keyCode == main.idents.keyFileProps){ main.filePropsCmd.openDialog(null); }  //F2
+      else if(keyCode == main.idents.keyFileView){ main.viewCmd.view(null); }                  //F3
+      else if(keyCode == main.idents.keyFileEdit){ main.actionEdit.userActionGui(KeyCode.menuEntered, widgd, params); }
+      else if(keyCode == main.idents.keyFileCopy){ main.copyCmd.actionConfirmCopy.userActionGui(KeyCode.menuEntered, widgd, params); }
+      else if(keyCode == main.idents.keyFileCreate){ main.mkCmd.dialogMkDirFile(files[0]); }
+      else if(keyCode == main.idents.keyFileDel1 || keyCode == main.idents.keyFileDel2){ main.deleteCmd.actionConfirmDelete.userActionGui(keyCode, widgd); }
+      //navigation
+      else if(keyCode == main.idents.keyOriginDir){ main.favorPathSelector.actionSetDirOrigin.userActionGui(KeyCode.menuEntered, widgd, params); }
+      else if(keyCode == main.idents.keyRefresh1 || keyCode == main.idents.keyRefresh2 || keyCode == main.idents.keyRefresh3){ main.favorPathSelector.actionRefreshFileTable.userActionGui(KeyCode.menuEntered, widgd, params); }
+      else if(keyCode == main.idents.keyWindFullOut){ main.windMng.actionWindFullOut.userActionGui(KeyCode.menuEntered, widgd, params); }
+      else if(keyCode == main.idents.keyExecCmdFile) { main.cmdSelector.executeCurrCmdWithFiles(); }
+      else if(keyCode == main.idents.keyFavorLeft) { main.selectPanelLeft.userActionGui(KeyCode.menuEntered, widgd); }
+      else if(keyCode == main.idents.keyFavorMiddle) { main.selectPanelMiddle.userActionGui(KeyCode.menuEntered, widgd); }
+      else if(keyCode == main.idents.keyFavorRight) { main.selectPanelRight.userActionGui(KeyCode.menuEntered, widgd); }
+      else { done = false; }
       return done;
     }
     

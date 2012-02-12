@@ -110,7 +110,7 @@ public class FcmdLeftMidRightPanel
     fillCards();  //build the rest of all tabs and panels depending on content of favorites.
     
     if(cNr == '1'){ //commands only in the left panel.
-      tabbedPanelFileCards.addGridPanel("cmd", "Cm&d",1,1,10,10);
+      tabbedPanelFileCards.addGridPanel("cmd", "Cmd",1,1,10,10);
       mng.setPosition(2, -2, 0, -0, 1, 'd');
       main.cmdSelector.setToPanel(mng, "cmds", 5, new int[]{10,10}, 'A');
       main.cmdSelector.fillIn();
@@ -313,9 +313,8 @@ public class FcmdLeftMidRightPanel
       if(currentDir !=null){
         indexActualDir.put(actFileCard.favorPathInfo.selectName, currentDir.getPath());
         actFileCard.fillIn(currentDir);
-      } else { 
-        actFileCard.favorCard.setFocus();
-      }
+      } 
+      actFileCard.favorCard.setFocus();
       return true;
     }
 

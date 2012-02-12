@@ -21,6 +21,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.FileRemote;
+import org.vishia.util.KeyCode;
 import org.vishia.util.StringFormatter;
 
 /**All functionality of view (F3-Key) and quick view. 
@@ -113,31 +114,33 @@ public class FcmdView
   void view(FileRemote src)
   { String sSrc, sTrash;
     src = main.currentFile;
-    long len = src.length();
-    if(len > 1000000){ len = 1000000; } //nor more than 1MByte, 
-    buffer = new byte[(int)len];
-    int iBuffer = 0;
-    ReadableByteChannel reader = src.openRead(0);
-    try{
-      if(reader == null){
-        widgContent.setText("File is not able to read:\n");
-        widgContent.append(src.getAbsolutePath());
-      } else {
-        do{
-          byteBuffer.clear();
-          nrofBytes = reader.read(byteBuffer);
-          if(nrofBytes >0){
-            byteBuffer.rewind();
-            byteBuffer.get(buffer, iBuffer, nrofBytes);
-            iBuffer += nrofBytes;
-          }
-        } while(nrofBytes >0);
-        reader.close();
-        //byteBuffer.rewind();
-        presentContent();
+    if(src !=null){
+      long len = src.length();
+      if(len > 1000000){ len = 1000000; } //nor more than 1MByte, 
+      buffer = new byte[(int)len];
+      int iBuffer = 0;
+      ReadableByteChannel reader = src.openRead(0);
+      try{
+        if(reader == null){
+          widgContent.setText("File is not able to read:\n");
+          widgContent.append(src.getAbsolutePath());
+        } else {
+          do{
+            byteBuffer.clear();
+            nrofBytes = reader.read(byteBuffer);
+            if(nrofBytes >0){
+              byteBuffer.rewind();
+              byteBuffer.get(buffer, iBuffer, nrofBytes);
+              iBuffer += nrofBytes;
+            }
+          } while(nrofBytes >0);
+          reader.close();
+          //byteBuffer.rewind();
+          presentContent();
+        }
+      } catch(IOException exc){
+        
       }
-    } catch(IOException exc){
-      
     }
     windView.setWindowVisible(true);
 
@@ -191,9 +194,11 @@ public class FcmdView
    */
   GralUserAction actionOpenView = new GralUserAction()
   {
-    @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
-    { view(null);
-      return true;
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
+    { if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
+        view(null);
+        return true;
+      } else return false; 
       // /
     }
   };

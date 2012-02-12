@@ -10,49 +10,71 @@ public class FcmdIdents
 
   
   
-  String menuFileNaviOriginDirBar = "&Folder/set &Origin dir [c<]";
+  String menuFileNaviOriginDirBar = "fol&Der/set &Origin dir [c<]";
   
   String menuFileNaviOriginDirContext = "set Origin dir [c<]";
   
   /**Show files in the start dir of the selection. Go to the origin dir.*/
   int keyOriginDir = KeyCode.ctrl + '<';  //like total commander: jump to the root directory
 
-  String menuFileNaviRefreshBar = "&Folder/&Refresh [cR]";
+  String menuFileNaviRefreshBar = "fol&Der/&Refresh [cR]";
   String menuFileNaviRefreshContext = "Refresh [cR]";
+  String buttonRefereshFiles = "F5:refresh";
   /**Referesh files.*/
-  int keyRefresh1 = KeyCode.ctrl + 'r', keyRefresh2 = KeyCode.ctrl + 'R';  //like total commander: refresh
+  int keyRefresh1 = KeyCode.ctrl + 'r'
+    , keyRefresh2 = KeyCode.ctrl + 'R'  //like total commander: refresh
+    , keyRefresh3 = KeyCode.F5;
 
+  String menuHelpBar = "&Help/&Help [F1]";
 
+  String menuHelpContext = "Help";
+  
+  String buttonHelp = "F1:help";
+
+  int keyHelp = KeyCode.F1;
+
+  
+  
+  String menuBarAbout = "&Help/&About";
+
+  String menuBarExit = "&Help/e&Xit";
+
+  
+  
   
   String menuFilePropsBar = "&File/&Properties [F2]";
 
   String menuFilePropsContext = "Properties [F2]";
   
-  String buttonFileProps = "props";
+  String buttonFileProps = "F2:props";
+
+  int keyFileProps = KeyCode.F2;
 
   
   String menuFileViewBar = "&File/&View [F3]";
 
   String menuFileViewContext = "View [F3]";
 
-  String buttonFileView = "view";
+  String buttonFileView = "F3:view";
 
-  
+  int keyFileView = KeyCode.F3;
 
   
   String menuFileEditBar = "&File/&Edit [F4]";
 
   String menuFileEditContext = "Edit [F4]";
 
-  String buttonFileEdit = "edit";
+  String buttonFileEdit = "F4:edit";
 
+  int keyFileEdit = KeyCode.F4;
   
-  String menuConfirmCopyBar = "&File/&Copy [F5]";
+  String menuConfirmCopyBar = "&File/&Copy [F6]";
 
-  String menuConfirmCopyContext = "&Copy [F5]";
+  String menuConfirmCopyContext = "&Copy [F6]";
 
-  String buttonFileCopy = "copy";
+  String buttonFileCopy = "F6:copy";
 
+  int keyFileCopy = KeyCode.F6;
   /**Window title. */
   String windConfirmCopy = "confirm copy";
 
@@ -61,7 +83,7 @@ public class FcmdIdents
 
   String menuConfirmMoveContext = "Move [F6]";
 
-  String buttonFileMove = "copy";
+  String buttonFileMove = "Fx:copy";
 
   /**Window title. */
   String windConfirmMove = "confirm move";
@@ -69,11 +91,14 @@ public class FcmdIdents
   
   
   
-  String menuConfirmMkdirFileBar = "&Folder/&Mkdir-file [F7]";
+  String menuConfirmMkdirFileBar = "fol&Der/&Mkdir-file [F7]";
 
   String menuConfirmMkDirFileContext = "Mkdir-file [F7]";
 
-  String buttonMkdirFile = "create";
+  String buttonMkdirFile = "F7:create";
+
+  int keyFileCreate = KeyCode.F7;
+
 
   /**Window title. */
   String windConfirmMkdirFile = "confirm make dir / file";
@@ -84,7 +109,11 @@ public class FcmdIdents
 
   String menuConfirmFileDelContext = "del [F8]";
 
-  String buttonFileDel = "del";
+  String buttonFileDel = "F8:del";
+
+  int keyFileDel1 = KeyCode.F8;
+  int keyFileDel2 = KeyCode.del;
+
 
   /**Window title. */
   String windConfirmDelete = "confirm delete";
@@ -96,7 +125,7 @@ public class FcmdIdents
 
   String menuExecuteContext = "exec [F9]";
 
-  String buttonExecute = "exec";
+  String buttonExecute = "F9:exec";
 
   /**Window title. */
   String windConfirmExecute = "execute with";
@@ -107,13 +136,27 @@ public class FcmdIdents
 
   String menuExecuteCmdContext = "exec [cF9]";
 
-  String buttonExecuteCmd = "cmd";
+  String buttonExecuteCmd = "cF9:cmd";
 
   
   
+  String buttonFavorLeft = "aF1:left";
+  int keyFavorLeft = KeyCode.alt + KeyCode.F1;
+
+  String buttonFavorMiddle = "aF2:middle";
+  int keyFavorMiddle = KeyCode.alt + KeyCode.F2;
+
+  String buttonFavorRight = "aF3:right";
+  int keyFavorRight = KeyCode.alt + KeyCode.F3;
+  
+  
+  int keyExecCmdFile = KeyCode.ctrl + KeyCode.enter;
+  
+  String buttonFocusCmd = "aF9:cmdTable";
+
   
 
-  String menuFilesCpBar = "&Folder/com&Pare folder tree";
+  String menuFilesCpBar = "fol&Der/com&Pare folder tree";
   
   String menuFilesCpContext = "Compare folder tree";
   
@@ -122,4 +165,10 @@ public class FcmdIdents
 
 
 
+  public String menuWindowOutputBar = "&Window/&Output";
+  
+  public String menuWindowOutputContext = "Zoom/Unzoom";
+  
+  int keyWindFullOut = KeyCode.ctrl + 'o';
+  
 }

@@ -54,7 +54,7 @@ public class Fcmd extends GuiCfg
 
   final FcmdWindowMng windMng = new FcmdWindowMng(this);
 
-  final FcmdButtons fButtons = new FcmdButtons();
+  final FcmdButtons fButtons = new FcmdButtons(this);
   
   GralTextField widgFileInfo, widgFilePath, widgRunInfo;
   
@@ -158,7 +158,6 @@ public class Fcmd extends GuiCfg
     //gui.setStandardMenusGThread(new File("."), actionFile);
     gui.addMenuItemGThread("menuSaveFavoriteSel", idents.menuSaveFavoriteSel, favorPathSelector.actionSaveFavoritePathes); // /
 
-    this.windMng.initMenuWindMng();
     // gui.set
 
     // Creates tab-Panels for the file lists and command lists.
@@ -181,7 +180,7 @@ public class Fcmd extends GuiCfg
     panelButtons = gralMng.createGridPanel("Buttons", gralMng.getColor("gr"),
         1, 1, 10, 10);
     gui.addFrameArea(1, 3, 3, 1, panelButtons); // dialogPanel);
-    initPanelButtons();
+    fButtons.initPanelButtons();
 
     filesCp.buildGraphic();
     filePropsCmd.buildWindowConfirmMk();  //F2
@@ -191,85 +190,20 @@ public class Fcmd extends GuiCfg
     executer.buildWindowConfirmExec();
     deleteCmd.buildWindowConfirmDelete(); //F8
     favorPathSelector.buildWindowAddFavorite();
-    gui.addMenuItemGThread("menuHelp", "&Help/&Help", gui.getActionHelp());
-    gui.addMenuItemGThread("menuAbout", "&Help/&About", gui.getActionAbout());
+    
+    gui.addMenuItemGThread("MenuSetWorkingDir", "&Command/Set&WorkingDir", executer.actionSetCmdWorkingDir); // /
+    gui.addMenuItemGThread("MenuCommandAbort", "&Command/&Abort", executer.actionCmdAbort); // /
+    // gui.addMenuItemGThread("&Command/E&xecute", actionSetCmdCurrentDir); ///
+    gui.addMenuItemGThread("MenuCmdCfgSet", "&Command/CmdCf&g - read current file", executer.actionSetCmdCfg); // /
+    gui.addMenuItemGThread("menuReadCmdiCfg", "&Command/&ExtCfg - read cfg file", executer.actionReadExtensionCmd);
+
+    this.windMng.initMenuWindMng();
+    gui.addMenuItemGThread("menuHelp", idents.menuHelpBar, gui.getActionHelp());
+    gui.addMenuItemGThread("menuAbout", idents.menuBarAbout, gui.getActionAbout());
     gui.addMenuItemGThread("MenuTestInfo", "&Help/&Infobox", actionTest); 
     guiW.outputBox.setActionChange(executer.actionCmdFromOutputBox);
     String sHelpUrlDir = cargs.dirHtmlHelp.getAbsolutePath();
     gui.setHelpUrl(sHelpUrlDir + "/Fcmd.html");
-  }
-
-  private void initPanelButtons()
-  {
-    gralMng.selectPanel("Buttons");
-    gralMng.setPosition(0, 2, 0, 0, 1, 'r');
-    widgFilePath = gralMng.addTextField(nameTextFieldFilePath, false, null, null);
-    widgFilePath.setDragEnable(actionDragFileFromStatusLine, KeyCode.dragFiles);
-    gralMng.setPosition(2, 4, 0, 9.8f, 1, 'r');
-    widgRunInfo = gralMng.addTextField(nameTextFieldRunInfo, false, null, null);
-    gralMng.setPosition(2, 4, 10, 0, 1, 'r');
-    widgFileInfo = gralMng.addTextField(nameTextFieldInfo, false, null, null);
-    
-    gralMng.setPosition(4, GralPos.size + 1, 10, 20, 1, 'r');
-    gralMng.addText("F1", 'A', 0x0);
-    gralMng.addText("F2", 'A', 0x0);
-    gralMng.addText("F3", 'A', 0x0);
-    gralMng.addText("F4", 'A', 0x0);
-    gralMng.addText("F5", 'A', 0x0);
-    gralMng.addText("F6", 'A', 0x0);
-    gralMng.addText("F7", 'A', 0x0);
-    gralMng.addText("F8", 'A', 0x0);
-    gralMng.addText("F9", 'A', 0x0);
-    gralMng.addText("F10", 'A', 0x0);
-    gralMng.setPosition(5, 7, 0, 4, 1, 'd');
-    gralMng.addText("alt -", 'A', 0x0);
-    gralMng.addText("ctr -", 'A', 0x0);
-    gralMng.addText("sh  -", 'A', 0x0);
-
-    gralMng.setPosition(5, 7, 4, 14, 1, 'r');
-    gralMng.addButton("b-help", null, "help", null, null, "help");
-    gralMng.addButton("b-F2", null, "help", null, null, "F2");
-    gralMng.addButton("b-help", null, "help", null, null, "view");
-    gralMng.addButton("b-edit", actionEdit, "", null, null, "edit");
-    gralMng.addButton("b-copy", copyCmd.actionConfirmCopy, "", null, null, "copy");
-    gralMng.addButton("b-help", null, "help", null, null, "move");
-    gralMng.addButton("b-help", null, "help", null, null, "mkdir");
-    fButtons.buttonDel = gralMng.addButton("b-delete", deleteCmd.actionConfirmDelete, "del", null, null, "del");
-    gralMng.addButton("b-help", null, "help", null, null, "cmd");
-    gralMng.addButton("b-help", null, "help", null, null, "F10");
-    gralMng.setPosition(7, 9, 4, 14, 1, 'r');
-    gralMng.addButton("selectLeft", selectPanelLeft, "selectLeft", null, null, "left");
-    gralMng.addButton("selectMiddle", selectPanelMiddle, "help", null, null, "middle");
-    gralMng.addButton("selectRight", selectPanelRight, "", null, null, "right");
-    gralMng.addButton("b-help", null, "help", null, null, "zip");
-    gralMng.addButton("selectCmd", actionFocusCmdCard, "", null, null, "cmd");
-    gralMng.addButton("b-help", null, "help", null, null, "link");
-    gralMng.addButton("b-help", null, "help", null, null, "find");
-    gralMng.addButton("b-help", null, "help", null, null, "a-F8");
-    gralMng.addButton("b-help", null, "help", null, null, "a-F9");
-    gralMng.addButton("b-help", null, "help", null, null, "a-F10");
-    gralMng.setPosition(9, 11, 4, 14, 1, 'r');
-    gralMng.addButton("b-help", null, "help", null, null, "brief");
-    gralMng.addButton("b-F2", null, "help", null, null, "full");
-    gralMng.addButton("b-help", null, "help", null, null, "name");
-    gralMng.addButton("b-help", null, "help", null, null, "ext");
-    gralMng.addButton("b-help", null, "help", null, null, "time");
-    gralMng.addButton("b-help", null, "help", null, null, "size");
-    gralMng.addButton("b-help", null, "help", null, null, "nat");
-    gralMng.addButton("b-help", null, "help", null, null, "tree");
-    gralMng.addButton("b-help", null, "help", null, null, "c-F9");
-    gralMng.addButton("b-help", null, "help", null, null, "c-F10");
-    gralMng.setPosition(11, 13, 4, 14, 1, 'r');
-    gralMng.addButton("b-help", null, "help", null, null, "brief");
-    gralMng.addButton("b-F2", null,   "help", null, null, "full");
-    gralMng.addButton("b-help", null, "help", null, null, "name");
-    gralMng.addButton("b-help", null, "help", null, null, "ext");
-    gralMng.addButton("b-help", null, "help", null, null, "time");
-    gralMng.addButton("b-help", null, "help", null, null, "size");
-    gralMng.addButton("b-help", null, "help", null, null, "nat");
-    gralMng.addButton("b-help", null, "help", null, null, "tree");
-    gralMng.addButton("b-help", null, "help", null, null, "c-F9");
-    gralMng.addButton("b-help", null, "help", null, null, "c-F10");
   }
 
   @Override
@@ -647,12 +581,11 @@ public class Fcmd extends GuiCfg
    */
   GralUserAction selectPanelLeft = new GralUserAction()
   {
-    @Override
-    public boolean userActionGui(String sIntension, GralWidget infos,
-        Object... params)
-    {
-      favorPathSelector.panelLeft.selectTabCard.wdgdTable.setFocus();
-      return true;
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
+      if(key == KeyCode.menuEntered || key == KeyCode.mouse1Up){
+        favorPathSelector.panelLeft.selectTabCard.wdgdTable.setFocus();
+        return true;
+      } else return false;
     }
   };
 
@@ -662,12 +595,11 @@ public class Fcmd extends GuiCfg
    */
   GralUserAction selectPanelMiddle = new GralUserAction()
   {
-    @Override
-    public boolean userActionGui(String sIntension, GralWidget infos,
-        Object... params)
-    {
-      favorPathSelector.panelMid.selectTabCard.wdgdTable.setFocus();
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
+      if(key == KeyCode.menuEntered || key == KeyCode.mouse1Up){
+        favorPathSelector.panelMid.selectTabCard.wdgdTable.setFocus();
       return true;
+      } else return false;
     }
   };
 
@@ -677,12 +609,11 @@ public class Fcmd extends GuiCfg
    */
   GralUserAction selectPanelRight = new GralUserAction()
   {
-    @Override
-    public boolean userActionGui(String sIntension, GralWidget infos,
-        Object... params)
-    {
-      favorPathSelector.panelRight.selectTabCard.wdgdTable.setFocus();
-      return true;
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
+      if(key == KeyCode.menuEntered || key == KeyCode.mouse1Up){
+        favorPathSelector.panelRight.selectTabCard.wdgdTable.setFocus();
+        return true;
+      } else return false;
     }
   };
 
@@ -690,12 +621,11 @@ public class Fcmd extends GuiCfg
    */
   GralUserAction actionFocusCmdCard = new GralUserAction()
   {
-    @Override
-    public boolean userActionGui(String sIntension, GralWidget infos,
-        Object... params)
-    {
-      favorPathSelector.panelMid.tabbedPanelFileCards.getFocusedTab().setFocus();
-      return true;
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
+      if(key == KeyCode.menuEntered || key == KeyCode.mouse1Up){ ///
+        cmdSelector.wdgdTable.setFocus();
+        return true;
+      } else return false;
     }
   };
 
@@ -704,19 +634,21 @@ public class Fcmd extends GuiCfg
    */
   GralUserAction actionEdit = new GralUserAction()
   {
-    @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params) {
-      CmdStore.CmdBlock cmdBlock = buttonCmds.getCmd("edit");
-      if (cmdBlock == null) {
-        mainCmd.writeError("internal problem - don't find 'edit' command. ");
-      } else {
-        FileRemote[] lastSelected = getLastSelectedFiles(); 
-        //create a new instance of array of files because the selection may be changed
-        //till the command is invoked. The files are stored in a queue and executed in another thread. 
-        File[] files = new File[1];
-        if(lastSelected.length >0){
-          files[0] = lastSelected[0];
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params) {
+      if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered || key == 0){
+        CmdStore.CmdBlock cmdBlock = buttonCmds.getCmd("edit");
+        if (cmdBlock == null) {
+          mainCmd.writeError("internal problem - don't find 'edit' command. ");
+        } else {
+          FileRemote[] lastSelected = getLastSelectedFiles(); 
+          //create a new instance of array of files because the selection may be changed
+          //till the command is invoked. The files are stored in a queue and executed in another thread. 
+          File[] files = new File[1];
+          if(lastSelected.length >0){
+            files[0] = lastSelected[0];
+          }
+          executer.cmdQueue.addCmd(cmdBlock, files, null); // to execute.
         }
-        executer.cmdQueue.addCmd(cmdBlock, files, null); // to execute.
       }
       return true;
     }

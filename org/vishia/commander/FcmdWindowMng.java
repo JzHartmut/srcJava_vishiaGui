@@ -3,6 +3,7 @@ package org.vishia.commander;
 
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.util.KeyCode;
 
 /**This class manages the window of the Java commander
  * @author Hartmut Schorrig
@@ -19,17 +20,19 @@ public class FcmdWindowMng
   
   void initMenuWindMng()
   {
-    main.gui.addMenuItemGThread("MenuOutputFull", "&Window/&Output", actionWindFullOut);
+    main.gui.addMenuItemGThread("MenuOutputFull", main.idents.menuWindowOutputBar, actionWindFullOut);
   }
   
   
   GralUserAction actionWindFullOut = new GralUserAction()
   { 
     boolean isFullOut = false;
-    @Override public boolean userActionGui(String sIntension, GralWidget widgd, Object... params)
-    { if(isFullOut){main.gui.setFrameAreaBorders(30, 65, 60, 80); isFullOut = false; }
-      else {main.gui.setFrameAreaBorders(10, 55, 30, 99); isFullOut = true; }
-      return true;
+    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
+    { if(key == KeyCode.menuEntered || key == KeyCode.mouse1Up){
+        if(isFullOut){main.gui.setFrameAreaBorders(30, 65, 60, 80); isFullOut = false; }
+        else {main.gui.setFrameAreaBorders(10, 55, 30, 99); isFullOut = true; }
+        return true;
+      } else return false;
     }
     
   };

@@ -18,6 +18,7 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
@@ -71,12 +72,6 @@ public class FcmdExecuter
   void buildWindowConfirmExec()
   { 
     
-    main.gui.addMenuItemGThread("MenuSetWorkingDir", "&Command/Set&WorkingDir", actionSetCmdWorkingDir); // /
-    main.gui.addMenuItemGThread("MenuCommandAbort", "&Command/&Abort", actionCmdAbort); // /
-    // gui.addMenuItemGThread("&Command/E&xecute", actionSetCmdCurrentDir); ///
-    main.gui.addMenuItemGThread("MenuCmdCfgSet", "&Command/CmdCf&g - read current file", actionSetCmdCfg); // /
-    main.gui.addMenuItemGThread("menuReadCmdiCfg", "&Command/&ExtCfg - read cfg file", actionReadExtensionCmd);
-
     
     main.gralMng.selectPanel("primaryWindow");
     main.gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
@@ -172,7 +167,7 @@ public class FcmdExecuter
    * working directory is the directory in the focused file tab.
    * 
    */
-  private GralUserAction actionSetCmdWorkingDir = new GralUserAction()
+  GralUserAction actionSetCmdWorkingDir = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     {
@@ -199,7 +194,7 @@ public class FcmdExecuter
    * Action to set the command list from file. It is called from menu.
    * 
    */
-  private GralUserAction actionSetCmdCfg = new GralUserAction() { 
+  GralUserAction actionSetCmdCfg = new GralUserAction() { 
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if (main.currentFile != null) {
         main.cmdSelector.cmdStore.readCmdCfg(main.currentFile);
@@ -222,33 +217,52 @@ public class FcmdExecuter
     }
   };
   
+
+  
+  private void executeFileByExtension(FileRemote file){
+    String ext;
+    String name = file.getName();
+    int posDot = name.lastIndexOf('.');
+    if(posDot > 0){
+      ext = name.substring(posDot+1);
+    } else if(file.canExecute()){
+      ext = ">";
+    } else {
+      ext = "???";
+    }
+    ExtCmd extensionCmd = extCmds.get(ext);
+    if(extensionCmd !=null){
+      widgSelectExec.clearTable();
+      for(CmdBlock block: extensionCmd.listCmd){
+        GralTableLine_ifc line = widgSelectExec.insertLine(block.name, 0, null, null);
+        line.setCellText(block.title, 0);
+        line.setUserData(block);
+      }
+      windConfirmExec.setWindowVisible(true);
+    } else {
+      console.writeError("no association found for extension ." + ext);
+    }
+    
+  }
   
   
+  
+  GralUserAction actionExecuteFileByExtension = new GralUserAction()
+  { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
+    { if(key == KeyCode.menuEntered || key == KeyCode.mouse1Up){
+        FileRemote file = main.currentFile;
+        executeFileByExtension(file);  
+        return true;
+      } else return false;
+  } };  
+  
+  /**This action is associated to any {@link FcmdFileCard} as action on enter file.
+   * The file is given as parameter then.
+   */
   GralUserAction actionOnEnterFile = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
     { FileRemote file = (FileRemote)params[0]; 
-      String ext;
-      String name = file.getName();
-      int posDot = name.lastIndexOf('.');
-      if(posDot > 0){
-        ext = name.substring(posDot+1);
-      } else if(file.canExecute()){
-        ext = ">";
-      } else {
-        ext = "???";
-      }
-      ExtCmd extensionCmd = extCmds.get(ext);
-      if(extensionCmd !=null){
-        widgSelectExec.clearTable();
-        for(CmdBlock block: extensionCmd.listCmd){
-          GralTableLine_ifc line = widgSelectExec.insertLine(block.name, 0, null, null);
-          line.setCellText(block.title, 0);
-          line.setUserData(block);
-        }
-        windConfirmExec.setWindowVisible(true);
-      } else {
-        console.writeError("no association found for extension ." + ext);
-      }
+      executeFileByExtension(file);  
       return true;
     }
   };

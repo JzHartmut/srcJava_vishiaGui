@@ -172,7 +172,7 @@ class FcmdFavorPathSelector
     main.gui.addMenuItemGThread("test", main.idents.menuConfirmCopyBar, main.copyCmd.actionConfirmCopy);
     main.gui.addMenuItemGThread("test", main.idents.menuConfirmMoveBar, main.copyCmd.actionConfirmCopy);
     main.gui.addMenuItemGThread("test", main.idents.menuConfirmFileDelBar, main.deleteCmd.actionConfirmDelete);
-    main.gui.addMenuItemGThread("test", main.idents.menuExecuteBar, main.executer.actionOnEnterFile);
+    main.gui.addMenuItemGThread("test", main.idents.menuExecuteBar, main.executer.actionExecuteFileByExtension);
     main.gui.addMenuItemGThread("test", main.idents.menuExecuteCmdBar, main.cmdSelector.actionExecCmdWithFiles);
 
     

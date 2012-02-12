@@ -48,7 +48,7 @@ public class SwtGralKey extends KeyCode
       case SWT.F3:          key = F3; break;
       case SWT.F4:          key = F4; break;
       case SWT.F5:          key = F5; break;
-      case SWT.F6:          key = 6; break;
+      case SWT.F6:          key = F6; break;
       case SWT.F7:          key = F7; break;
       case SWT.F8:          key = F8; break;
       case SWT.F9:          key = F9; break;
