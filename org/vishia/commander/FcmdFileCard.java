@@ -138,7 +138,7 @@ public class FcmdFileCard extends GralFileSelector
     panelFiles.setPrimaryWidget(super.selectList.wdgdTable);
     //
     //sets the action for a simple table: what to do on line selected: Show file names. 
-    selectList.wdgdTable.setActionOnLineSelected(actionOnFileSelection);
+    this.setActionOnFileSelected(actionOnFileSelection);
     selectList.wdgdTable.setActionFocused(actionFocused);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFilePropsContext, main.filePropsCmd.actionOpenDialog);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFileViewContext, main.viewCmd.actionOpenView);
@@ -364,12 +364,10 @@ public class FcmdFileCard extends GralFileSelector
    * was changed in the file view table. */
   GralUserAction actionOnFileSelection = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
-      if(actionCode == KeyCode.tableLineSelect){
-        GralTableLine_ifc line = (GralTableLine_ifc) params[0];
-        Object oData = line.getUserData();
-        if(oData instanceof FileRemote){
-          actionOnFileSelection((FileRemote)oData);
-        }
+      GralTableLine_ifc line = (GralTableLine_ifc) params[0];
+      Object oData = line.getUserData();
+      if(oData instanceof FileRemote){
+        actionOnFileSelection((FileRemote)oData);
       }
       return true;
     }

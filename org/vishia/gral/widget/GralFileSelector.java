@@ -14,6 +14,7 @@ import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTableLine_ifc;
+import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.FileRemote;
 import org.vishia.util.FileRemoteAccessor;
 import org.vishia.util.FileRemoteAccessorLocalFile;
@@ -38,6 +39,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version and History:
    * <ul>
+   * <li>2012-02-14 corr: Anytime a file was selected as current, it was added in the {@link #indexSelection}.
+   *   Not only if the directory was changed. It is necessary for refresh to select the current file again.
    * <li>2011-12-11 chg: If the directory is empty, show --empty-- because the table should not be empty.
    * <li>2011-11-27 new: {@link FileAndName#isWriteable}-property.
    * <li>2011-11-20 new: Phenomenal basic idea: The files may be located in remote hardware. 
@@ -55,6 +58,30 @@ public class GralFileSelector implements Removeable //extends GralWidget
   public static final int version = 0x20111002;
   
   FileRemoteAccessor localFileAccessor = FileRemoteAccessorLocalFile.getInstance();
+  
+  
+  /**Action to show the file properties in the info line. This action is called anytime if a line
+   * was changed in the file view table. */
+  private GralUserAction actionOnFileSelection = new GralUserAction(){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
+      if(actionCode == KeyCode.tableLineSelect){
+        GralTableLine_ifc line = (GralTableLine_ifc) params[0];
+        Object oData = line.getUserData();
+        if(oData instanceof FileRemote){
+          FileRemote file = (FileRemote)oData;
+          String sDir = file.getParent();
+          String sName = file.getName();
+          indexSelection.put(sDir, sName);
+          System.out.println("GralFileSelector: " + sDir + ":" + sName);
+          if(actionOnFileSelected !=null){
+            actionOnFileSelected.userActionGui(0, selectList.wdgdTable, line, file);
+          }
+        }
+      }
+      return true;
+    }
+  };
+
   
   /**Implementation of the base widget.
    */
@@ -113,18 +140,13 @@ public class GralFileSelector implements Removeable //extends GralWidget
      */
     @Override public void actionLeft(Object userData, GralTableLine_ifc line)
     {
-      FileRemote currentFile = (FileRemote)userData;
-      //File dir = data.file.getParentFile();
-      //String sName = line.getCellText(1);
-      String sDir = currentDir.getPath();
-      if(currentFile !=null && sDir !=null){
-        System.out.println("current: " + sDir + " :: " + currentFile.getName());
-        indexSelection.put(sDir, currentFile.getName());
-      }
-      String sParent = currentDir.getParent();
+      //FileRemote currentFile = (FileRemote)userData;
+      String sDir = currentDir.getParent();
+      String sName = currentDir.getName();
       File parentDir = currentDir.getParentFile();
       if(parentDir !=null){
-        indexSelection.put(sParent, currentDir.getName());
+        indexSelection.put(sDir, currentDir.getName());
+        System.out.println("GralFileSelector: " + sDir + ":" + sName);
         fillIn(parentDir); 
       }
     }
@@ -138,7 +160,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       //String sName = line.getCellText(1);
       if(currentFile.isDirectory()){
         //save the last selection of that level
-        indexSelection.put(currentFile.getParent(), currentFile.getName());
+        //indexSelection.put(currentFile.getParent(), currentFile.getName());
         fillIn(currentFile);
         //fillIn(data.getParent() + "/" + data.getName());
       }
@@ -172,7 +194,10 @@ public class GralFileSelector implements Removeable //extends GralWidget
   /**The implementation of SelectList. */
   protected FileSelectList selectList;
   
+  /**This action will be called any time when the selection of a current file is changed. */
+  GralUserAction actionOnFileSelected;
   
+
   /**This index stores the last selected file for any directory path which was used.
    * If the directory path is reused later, the same file will be selected initially.
    * It helps by navigation through the file tree.
@@ -239,8 +264,17 @@ public class GralFileSelector implements Removeable //extends GralWidget
     //store this in the GralWidgets to get back from widgets later.
     widgdPath.setContentInfo(this);
     selectList.wdgdTable.setContentInfo(this);
+    selectList.wdgdTable.setActionOnLineSelected(actionOnFileSelection);
   }
   
+  /**Sets an action which is called any time when another line is selected.
+   * @param actionOnLineSelected The action, null to switch off this functionality.
+   */
+  public void setActionOnFileSelected(GralUserAction actionOnLineSelected){
+    this.actionOnFileSelected = actionOnLineSelected;
+  }
+  
+
 
   public String getCurrentDirPath(){ return sCurrentDir; }
   
@@ -303,6 +337,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
     }
     //this.sCurrentDir = FileSystem.getCanonicalPath(dir) + "/";
     this.sCurrentDir = dir.getPath();
+    if(sCurrentDir.endsWith("/"))
+      stop();
     //widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sCurrentDir);
     widgdPath.setText(sCurrentDir, -1);
     //widgdPath.setSelection("|..<");

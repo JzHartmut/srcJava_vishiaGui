@@ -60,6 +60,9 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   
   protected final Map<String, GralTableLine_ifc> idxLine = new TreeMap<String, GralTableLine_ifc>();
   
+  /**This action will be called any time when the selection of the current line is changed. 
+   * The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called
+   * with the line as Object. */
   GralUserAction actionOnLineSelected;
   
   /**Width of each column in GralUnits. */
@@ -163,6 +166,9 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   }
 
   /**Sets an action which is called any time when another line is selected.
+   * This action will be called any time when the selection of the current line is changed. 
+   * The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called
+   * with the line as Object.
    * @param actionOnLineSelected The action, null to switch off this functionality.
    */
   public void setActionOnLineSelected(GralUserAction actionOnLineSelected){

@@ -231,6 +231,7 @@ public abstract class GralGraphicThread implements Runnable
    */
   public void removeDispatchListener(GralDispatchCallbackWorker listener)
   { queueGraphicOrders.remove(listener);
+    queueDelayedGraphicOrders.remove(listener);
   }
   
   

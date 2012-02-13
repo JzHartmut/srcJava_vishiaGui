@@ -11,6 +11,9 @@ public abstract class GralDispatchCallbackWorker
   
   /**Version and history:
    * <ul>
+   * <li>2012-02-14 Hartmut corr: It was happen that an instance was designated with {@link #bAdded}==true
+   *   but it wasn't added, Therefore on {@link #addToGraphicThread(GralGraphicThread, int)} it is removed
+   *   from list and added newly. It is more save. 
    * <li>2012-01-26 Hartmut chg: rename removeFromGraphicThread(GralGraphicThread) 
    *   to {@link #removeFromQueue(GralGraphicThread)}. It is a better naming because it is removed from the queue
    *   in the graphic thread. This class is only used in that queue. 
@@ -68,16 +71,20 @@ public abstract class GralDispatchCallbackWorker
 	 * @param delay time in milliseconds for delayed execution or 0.
 	 */
 	synchronized public void addToGraphicThread(GralGraphicThread dst, int delay){
-	  if(!bAdded){
-	    dst.addDispatchOrder(this);
-	    bAdded = true;
+	  if(bAdded){
+	    //remove and add new, because its state added in queue or not may be false.
+	    dst.removeDispatchListener(this);
 	  }
+	  //if(!bAdded){
+	  //}
 	  if(delay >0){
 	    dbgctWindup +=1;
 	    delayExecution(delay);
 	  } else {
-	    timeExecution = 0;
+	    timeExecution = 0;  //execute at next possible time.
 	  }
+    dst.addDispatchOrder(this);
+    bAdded = true;
 	}
 	
 	
