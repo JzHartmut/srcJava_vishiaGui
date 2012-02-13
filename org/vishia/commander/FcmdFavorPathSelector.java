@@ -162,7 +162,7 @@ class FcmdFavorPathSelector
   /**Builds the content of the add-favorite window. The window is created static. It is shown
    * whenever it is used.  */
   void buildWindowAddFavorite(){ 
-    main.gui.addMenuItemGThread("menuDelTab", main.idents.menuDelTab, actionDelTab); // /
+
     main.gui.addMenuItemGThread("menuFileNaviOriginDir", main.idents.menuFileNaviOriginDirBar, actionSetDirOrigin); // /
     main.gui.addMenuItemGThread("menuFileNaviRefresh", main.idents.menuFileNaviRefreshBar, actionRefreshFileTable); // /
     main.gui.addMenuItemGThread("menubarFolderCreate", main.idents.menuConfirmMkdirFileBar, main.mkCmd.actionOpenDialog); // /
@@ -174,6 +174,11 @@ class FcmdFavorPathSelector
     main.gui.addMenuItemGThread("test", main.idents.menuConfirmFileDelBar, main.deleteCmd.actionConfirmDelete);
     main.gui.addMenuItemGThread("test", main.idents.menuExecuteBar, main.executer.actionExecuteFileByExtension);
     main.gui.addMenuItemGThread("test", main.idents.menuExecuteCmdBar, main.cmdSelector.actionExecCmdWithFiles);
+
+    main.gui.addMenuItemGThread("menuBarCreateFavor", main.idents.menuBarCreateFavor, actionCreateFavor); // /
+    main.gui.addMenuItemGThread("menuDelTab", main.idents.menuDelTab, actionDelTab); // /
+    main.gui.addMenuItemGThread("menuSaveFavoriteSel", main.idents.menuSaveFavoriteSel, actionSaveFavoritePathes); // /
+
 
     
     main.gralMng.selectPanel("primaryWindow"); //"output"); //position relative to the output panel
@@ -421,6 +426,24 @@ class FcmdFavorPathSelector
   void stop(){}
   
 
+  GralUserAction actionCreateFavor = new GralUserAction(){
+    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){
+      if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
+        FcmdLeftMidRightPanel panel = main.lastFilePanels.get(0);
+        FcmdFileCard fileCard = panel.actFileCard;
+        windAddFavorite.panelInvocation = panel;
+        windAddFavorite.widgLabel.setText(fileCard.label);
+        windAddFavorite.widgShortName.setText("alias");
+        File directory = fileCard.getCurrentDir();
+        //String pathDir = FileSystem.getCanonicalPath(lastSelectedFile.getParentFile());
+        windAddFavorite.widgPath.setText(directory.getPath());
+        windAddFavorite.window.setWindowVisible(true);
+    }
+    return true;
+} };
+  
+  
+  
   
   GralUserAction actionDelTab = new GralUserAction(){
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){

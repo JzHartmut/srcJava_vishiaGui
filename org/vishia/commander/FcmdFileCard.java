@@ -132,6 +132,7 @@ public class FcmdFileCard extends GralFileSelector
     super.selectList.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.fileSelect.");
     GralMenu menuFolder = super.widgdPath.getContextMenu();
     menuFolder.addMenuItemGthread("contextfolder-setOrigin", main.idents.menuFileNaviOriginDirContext, main.favorPathSelector.actionSetDirOrigin);
+    menuFolder.addMenuItemGthread("menuContextCreateFavor", main.idents.menuContextCreateFavor, main.favorPathSelector.actionCreateFavor);
     menuFolder.addMenuItemGthread("context-filescp", main.idents.menuFilesCpContext, main.filesCp.actionConfirmCp);
     menuFolder.addMenuItemGthread("contextfolder-create", main.idents.menuConfirmMkDirFileContext, main.mkCmd.actionOpenDialog);
     menuFolder.addMenuItemGthread("contextfolder-refresh", main.idents.menuFileNaviRefreshContext, main.favorPathSelector.actionRefreshFileTable);

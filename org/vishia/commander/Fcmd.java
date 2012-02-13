@@ -156,8 +156,11 @@ public class Fcmd extends GuiCfg
 
     gui.setFrameAreaBorders(30, 65, 70, 85); // x1, x2, y1, y2
     //gui.setStandardMenusGThread(new File("."), actionFile);
-    gui.addMenuItemGThread("menuSaveFavoriteSel", idents.menuSaveFavoriteSel, favorPathSelector.actionSaveFavoritePathes); // /
-
+    gui.addMenuItemGThread("menuBarFavorsLeft", idents.menuBarNavigationLeft, selectPanelLeft);
+    gui.addMenuItemGThread("menuBarFavorsMiddle", idents.menuBarNavigationMiddle, selectPanelMiddle);
+    gui.addMenuItemGThread("menuBarFavorsRight", idents.menuBarNavigationRight, selectPanelRight);
+    gui.addMenuItemGThread("menuBarNavigatonCmd", idents.menuBarNavigatonCmd, actionFocusCmdCard);
+    
     // gui.set
 
     // Creates tab-Panels for the file lists and command lists.

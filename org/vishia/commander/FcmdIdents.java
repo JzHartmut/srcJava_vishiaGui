@@ -8,6 +8,12 @@ public class FcmdIdents
   
   String menuDelTab = "fa&Vors/close &tab";
 
+
+  String menuBarCreateFavor = "fa&Vors/new [cB]";
+  String menuContextCreateFavor = "new Favor [cB]";
+  int keyCreateFavor = KeyCode.ctrl + 'b';
+  
+  
   
   
   String menuFileNaviOriginDirBar = "fol&Der/set &Origin dir [c<]";
@@ -139,19 +145,24 @@ public class FcmdIdents
   String buttonExecuteCmd = "cF9:cmd";
 
   
-  
+  String menuBarNavigationLeft = "&Navigation/left [aF1]";
   String buttonFavorLeft = "aF1:left";
   int keyFavorLeft = KeyCode.alt + KeyCode.F1;
 
+  String menuBarNavigationMiddle = "&Navigation/mid [aF2]";
   String buttonFavorMiddle = "aF2:middle";
   int keyFavorMiddle = KeyCode.alt + KeyCode.F2;
 
+  String menuBarNavigationRight = "&Navigation/right [aF3]";
   String buttonFavorRight = "aF3:right";
   int keyFavorRight = KeyCode.alt + KeyCode.F3;
   
   
   int keyExecCmdFile = KeyCode.ctrl + KeyCode.enter;
   
+  
+  
+  String menuBarNavigatonCmd = "&Navigation/cmd [aF9]";
   String buttonFocusCmd = "aF9:cmdTable";
 
   
