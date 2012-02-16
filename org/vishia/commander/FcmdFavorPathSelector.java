@@ -111,6 +111,8 @@ class FcmdFavorPathSelector
   /**The three tabbed panels. */
   final FcmdLeftMidRightPanel panelLeft, panelMid, panelRight;
   
+  GralFileSelector.WindowConfirmSearch windSearchFiles;
+  
   private final GralWidgetMng mng;
   
   final Fcmd main;
@@ -163,9 +165,12 @@ class FcmdFavorPathSelector
    * whenever it is used.  */
   void buildWindowAddFavorite(){ 
 
+    windSearchFiles = GralFileSelector.createWindowConfirmSearchGthread(mng);
+    
     main.gui.addMenuItemGThread("menuFileNaviOriginDir", main.idents.menuFileNaviOriginDirBar, actionSetDirOrigin); // /
     main.gui.addMenuItemGThread("menuFileNaviRefresh", main.idents.menuFileNaviRefreshBar, actionRefreshFileTable); // /
     main.gui.addMenuItemGThread("menubarFolderCreate", main.idents.menuConfirmMkdirFileBar, main.mkCmd.actionOpenDialog); // /
+    main.gui.addMenuItemGThread("menubarFolderSearch", main.idents.menuBarSearchFiles, actionSearchFiles); // /
     main.gui.addMenuItemGThread("menubarFileProps", main.idents.menuFilePropsBar, main.filePropsCmd.actionOpenDialog);
     main.gui.addMenuItemGThread("test", main.idents.menuFileViewBar, main.viewCmd.actionOpenView);
     main.gui.addMenuItemGThread("test", main.idents.menuFileEditBar, main.actionEdit);
@@ -426,6 +431,18 @@ class FcmdFavorPathSelector
   void stop(){}
   
 
+  GralUserAction actionSearchFiles = new GralUserAction(){
+    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){
+      if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
+        FcmdFileCard fileCard = main.lastFavorCard.fileTable;
+        windSearchFiles.confirmSearchInFiles(fileCard, main.gui.getOutputBox());
+      }
+      return true;
+  } };
+
+  
+  
+  
   GralUserAction actionCreateFavor = new GralUserAction(){
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){
       if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
@@ -440,7 +457,7 @@ class FcmdFavorPathSelector
         windAddFavorite.window.setWindowVisible(true);
     }
     return true;
-} };
+  } };
   
   
   

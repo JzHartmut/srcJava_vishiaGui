@@ -106,6 +106,15 @@ public class FcmdIdents
   int keyFileCreate = KeyCode.F7;
 
 
+  String menuBarSearchFiles = "fol&Der/&Search files [aF7]";
+
+  String menuContextSearchFiles = "Search files [aF7]";
+
+  String buttonSearchFiles = "aF7:search";
+
+  int keySearchFiles = KeyCode.alt + KeyCode.F7;
+
+
   /**Window title. */
   String windConfirmMkdirFile = "confirm make dir / file";
 

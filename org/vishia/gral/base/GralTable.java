@@ -698,6 +698,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
       { // TODO Auto-generated method stub
       }
     };
+
+    @Override public void setHtmlHelp(String url) { GralTable.this.setHtmlHelp(url); }
     
     
     

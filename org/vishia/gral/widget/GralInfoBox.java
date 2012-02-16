@@ -244,5 +244,13 @@ public class GralInfoBox implements GralTextBox_ifc, GralWindow_ifc
     return false;
   }
 
+  @Override
+  public void setHtmlHelp(String url)
+  {
+    if(textBox !=null){ textBox.setHtmlHelp(url); }
+    if(htmlBox !=null){ htmlBox.setHtmlHelp(url); }
+    buttonOk.setHtmlHelp(url);
+  }
+
 
 }

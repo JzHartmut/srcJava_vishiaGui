@@ -226,7 +226,7 @@ public class FcmdFavorCard  extends GralSelectList
         main.lastFavorCard = FcmdFavorCard.this;
         GralTableLine_ifc line = (GralTableLine_ifc) params[0];
         Object oData = line.getUserData();
-        System.out.println("FcmdFavorCard.actionFavorSelected: " + fileTable.label);
+        //System.out.println("FcmdFavorCard.actionFavorSelected: " + fileTable.label);
       }
       return true;
     }

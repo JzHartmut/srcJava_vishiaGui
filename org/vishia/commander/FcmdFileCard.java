@@ -135,6 +135,7 @@ public class FcmdFileCard extends GralFileSelector
     menuFolder.addMenuItemGthread("menuContextCreateFavor", main.idents.menuContextCreateFavor, main.favorPathSelector.actionCreateFavor);
     menuFolder.addMenuItemGthread("context-filescp", main.idents.menuFilesCpContext, main.filesCp.actionConfirmCp);
     menuFolder.addMenuItemGthread("contextfolder-create", main.idents.menuConfirmMkDirFileContext, main.mkCmd.actionOpenDialog);
+    menuFolder.addMenuItemGthread("contextfolder-search", main.idents.menuContextSearchFiles, main.favorPathSelector.actionSearchFiles);
     menuFolder.addMenuItemGthread("contextfolder-refresh", main.idents.menuFileNaviRefreshContext, main.favorPathSelector.actionRefreshFileTable);
     panelFiles.setPrimaryWidget(super.selectList.wdgdTable);
     //
@@ -229,7 +230,7 @@ public class FcmdFileCard extends GralFileSelector
   { boolean ret = true;
     FileRemote data = (FileRemote)oData;
     switch(keyCode){
-    case KeyCode.alt + KeyCode.F + '7': FileSystem.searchInFiles(new File[]{data}, "ordersBackground"); break;
+    //case KeyCode.alt + KeyCode.F + '7': FileSystem.searchInFiles(new File[]{data}, "ordersBackground"); break;
     default: ret = false;
     }
     if (keyCode == main.keyActions.keyCreateFavorite){

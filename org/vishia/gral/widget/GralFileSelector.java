@@ -1,6 +1,8 @@
 package org.vishia.gral.widget;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
@@ -8,13 +10,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralTextField;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.FileRemote;
 import org.vishia.util.FileRemoteAccessor;
 import org.vishia.util.FileRemoteAccessorLocalFile;
@@ -60,6 +66,71 @@ public class GralFileSelector implements Removeable //extends GralWidget
   FileRemoteAccessor localFileAccessor = FileRemoteAccessorLocalFile.getInstance();
   
   
+  public static class WindowConfirmSearch {
+    
+    GralWindow_ifc windConfirmSearch;
+
+    GralTextField_ifc widgPath, widgMask, widgText;
+    
+    GralValueBar widgProgression;
+    
+    /**Buttons. */
+    GralButton widgEsc, widgSubdirs, widgSearch;
+
+    GralFileSelector fileSelector;
+    
+    Appendable searchOutput;
+    
+    /**Use {@link GralFileSelector#createWindowConfirmSearchGthread(GralGridBuild_ifc)} to create.
+    */
+    protected WindowConfirmSearch(){}
+    
+    
+    /**Shows the window.
+     * @param fileSelector
+     */
+    public void confirmSearchInFiles(GralFileSelector fileSelector, Appendable searchOutput){
+      this.fileSelector = fileSelector;
+      this.searchOutput = searchOutput;
+      this.widgPath.setText(fileSelector.sCurrentDir);
+      windConfirmSearch.setWindowVisible(true);
+    }
+    
+    
+    /**Action is called if the button search is pressed. */
+    GralUserAction actionFileSearch = new GralUserAction(){
+      public boolean userActionGui(int key, GralWidget widgd, Object... params){ 
+        if(widgd.sCmd.equals("search") && key == KeyCode.mouse1Up){
+          boolean subDirs = widgSubdirs.isOn();
+          String mask = (subDirs ? "**/" : "") + widgMask.getText();
+          String text = widgText.getText();
+          List<File> files = new LinkedList<File>(); 
+          try{
+            FileSystem.addFileToList(fileSelector.currentDir, mask, files);
+            if(text.length() > 0){
+              FileSystem.searchInFiles(files, text, searchOutput);
+            } else {
+              try{ 
+                for(File file: files){
+                  searchOutput.append("<File=").append(file.getPath()).append(">\n");
+                }
+                searchOutput.append("<done: search in files>\n");
+              }catch(IOException exc){}
+            }
+          } 
+          catch(FileNotFoundException exc){}
+        }
+        return true;
+      }
+
+    };
+    
+  }
+  
+  protected WindowConfirmSearch windSearch;
+  
+  
+  
   /**Action to show the file properties in the info line. This action is called anytime if a line
    * was changed in the file view table. */
   private GralUserAction actionOnFileSelection = new GralUserAction(){
@@ -72,7 +143,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
           String sDir = file.getParent();
           String sName = file.getName();
           indexSelection.put(sDir, sName);
-          System.out.println("GralFileSelector: " + sDir + ":" + sName);
+          //System.out.println("GralFileSelector: " + sDir + ":" + sName);
           if(actionOnFileSelected !=null){
             actionOnFileSelected.userActionGui(0, selectList.wdgdTable, line, file);
           }
@@ -146,7 +217,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       File parentDir = currentDir.getParentFile();
       if(parentDir !=null){
         indexSelection.put(sDir, currentDir.getName());
-        System.out.println("GralFileSelector: " + sDir + ":" + sName);
+        //System.out.println("GralFileSelector: " + sDir + ":" + sName);
         fillIn(parentDir); 
       }
     }
@@ -177,7 +248,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       FileRemote data = (FileRemote)oData;
       switch(keyCode){
       case KeyCode.alt + KeyCode.F + '7': 
-        FileSystem.searchInFiles(new File[]{data}, "ordersBackground"); break;
+        //FileSystem.searchInFiles(new File[]{data}, "ordersBackground"); break;
       default: ret = false;
       }
       if(!ret){
@@ -265,6 +336,33 @@ public class GralFileSelector implements Removeable //extends GralWidget
     widgdPath.setContentInfo(this);
     selectList.wdgdTable.setContentInfo(this);
     selectList.wdgdTable.setActionOnLineSelected(actionOnFileSelection);
+  }
+  
+  
+  /**Creates the window to confirm search in files. This window can be created only one time
+   * for all file panels, if the application has more as one. On activating the directory
+   * and the file panel to show results should be given. But only one search process can be run
+   * simultaneously.
+   * @return The created window.
+   */
+  public static WindowConfirmSearch createWindowConfirmSearchGthread(GralGridBuild_ifc mng){
+    WindowConfirmSearch wind = new WindowConfirmSearch();
+    mng.selectPanel("primaryWindow");
+    mng.setPosition(-24, 0, -67, 0, 1, 'r'); //right buttom, about half less display width and hight.
+    wind.windConfirmSearch = mng.createWindow("windConfirmSearch", "search in file tree", GralWindow.windConcurrently);
+    mng.setPosition(4, GralPos.size -3.5f, 1, -1, 0, 'd', 0.5f);
+    wind.widgPath = mng.addTextField("path", false, "path", "t");
+    wind.widgMask = mng.addTextField("mask", true, "search name/mask:", "t");
+    wind.widgText = mng.addTextField("containsText", true, "contains text:", "t");
+    
+    mng.setPosition(-5, GralPos.size - 1, 1, -1, 0, 'r',2);
+    wind.widgProgression = mng.addValueBar(null, null, null);
+    mng.setPosition(-1, GralPos.size - 3, 1, GralPos.size + 8, 0, 'r',2);
+    mng.addButton(null, wind.actionFileSearch, "esc", null, null, "esc");
+    wind.widgSubdirs = mng.addSwitchButton(null, null, "subdirs", null, null, "subdirs", "wh", "gn");
+    wind.widgSearch = mng.addButton(null, wind.actionFileSearch, "search", null, null, "search");
+    wind.widgSearch.setPrimaryWidgetOfPanel();
+    return wind;
   }
   
   /**Sets an action which is called any time when another line is selected.

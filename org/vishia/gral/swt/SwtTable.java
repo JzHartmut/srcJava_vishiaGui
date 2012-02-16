@@ -517,11 +517,11 @@ public class SwtTable  extends GralTable {
     {
       Text widgSwt = (Text)ev.widget;  //it is only associated to a cell.
       CellData cellData = (CellData)widgSwt.getData();
-      System.out.println("mouse up");
+      //rSystem.out.println("mouse up");
       if(true || !hasFocus){
         SwtTable.this.gralWidgetMethod.focusGained();  //from GralWidget.
         hasFocus = true;
-        System.out.println("focusTable");
+        //System.out.println("focusTable");
       }
       redrawTableWithFocusedCell(ev.widget);
     }
@@ -540,7 +540,7 @@ public class SwtTable  extends GralTable {
     }
     
     @Override public void focusLost(FocusEvent e){ 
-      System.out.println("table focus lost. ");
+      //System.out.println("table focus lost. ");
       //assert(false);
       hasFocus = false;
       int row = 1; //table.getSelectionIndex();
@@ -554,7 +554,7 @@ public class SwtTable  extends GralTable {
     @Override public void focusGained(FocusEvent ev)
     { //super.focusGained(ev);
       SwtTable.this.gralWidgetMethod.focusGained();
-      System.out.println("table focus gained. ");
+      //System.out.println("table focus gained. ");
       //assert(false);
       int row = 1; //table.getSelectionIndex();
       if(row >=0){
@@ -582,7 +582,7 @@ public class SwtTable  extends GralTable {
      * @deprecated unnecessary yet.
      */
     @Override public void focusLost(FocusEvent ev){ 
-      System.out.println("Cell focus lost");
+      //System.out.println("Cell focus lost");
       if(!bRedrawPending){
         CellData data = (CellData)ev.widget.getData();
         Control widgSwt = (Control)ev.widget;
@@ -610,10 +610,10 @@ public class SwtTable  extends GralTable {
           if(true || !hasFocus){
             SwtTable.this.gralWidgetMethod.focusGained();  //from GralWidget.
             hasFocus = true;
-            System.out.println("focusTable");
+            //System.out.println("focusTable");
           }
           redrawTableWithFocusedCell(ev.widget);
-          System.out.println("focusCell");
+          //System.out.println("focusCell");
         }
       } catch(Exception exc){
         itsMng.log.sendMsg(0, "Exception in SwtTable.focusGained");

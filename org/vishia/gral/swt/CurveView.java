@@ -574,6 +574,15 @@ public class CurveView extends Canvas implements GralWidget_ifc
     { // TODO Auto-generated method stub
     }
   };
+
+
+
+  @Override
+  public void setHtmlHelp(String url)
+  {
+    // TODO Auto-generated method stub
+    
+  }
   
   
   

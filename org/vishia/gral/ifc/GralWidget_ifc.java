@@ -57,6 +57,13 @@ public interface GralWidget_ifc extends Removeable
   
   public abstract GralColor setForegroundColor(GralColor color);
   
+  
+  /**Sets the html help url for this widget. That information will be used if the widget is focused
+   * to control the help window output.
+   * @param url String given url, maybe a local file too with #internalLabel.
+   */
+  void setHtmlHelp(String url);
+  
   //public abstract GralWidget getGralWidget();
 
   /**Immediately repaint. It can be called in any thread. If it is called in the graphic thread,
