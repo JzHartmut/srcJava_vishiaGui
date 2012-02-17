@@ -10,6 +10,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -52,6 +53,8 @@ public class SwtTable  extends GralTable {
   private final FocusListener focusListenerCell;
   
   private final MousePressedListenerTable mousePressedListener = new MousePressedListenerTable();
+  
+  private final MouseWheelListenerTable mouseWheelListener = new MouseWheelListenerTable();
   
   private final TableKeyListerner myKeyListener;
   
@@ -357,6 +360,7 @@ public class SwtTable  extends GralTable {
           cell.addKeyListener(myKeyListener);
           cell.addFocusListener(focusListenerCell);
           cell.addMouseListener(mousePressedListener);
+          cell.addMouseWheelListener(mouseWheelListener);
           CellData cellData = new CellData(iRow, iCol);
           cell.setData(cellData);
           int xdPixCol = columnPixel[iCol+1] - columnPixel[iCol];
@@ -562,6 +566,20 @@ public class SwtTable  extends GralTable {
     
   }
   
+ 
+  class MouseWheelListenerTable implements MouseWheelListener{
+
+    @Override
+    public void mouseScrolled(MouseEvent e) {
+      //System.out.println("SwtTable mouseWheel " + e.count);
+      if(e.count >0){
+        processKeys(KeyCode.mouseWheelUp);
+      } else {
+        processKeys(KeyCode.mouseWheelDn);
+      }
+    }
+    
+  }
   
 
   /**Debug: this focus listener is not invoked any time. It is associated to a swt.Composite.
@@ -647,7 +665,7 @@ public class SwtTable  extends GralTable {
             //System.out.println("focusTable");
           }
           redrawTableWithFocusedCell(ev.widget);
-          //System.out.println("focusCell");
+          System.out.println("focusCell");
         }
       } catch(Exception exc){
         itsMng.log.sendMsg(0, "Exception in SwtTable.focusGained");

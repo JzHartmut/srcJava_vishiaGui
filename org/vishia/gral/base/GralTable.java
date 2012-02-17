@@ -24,6 +24,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   /**Version and history
    * <ul>
+   * <li>2012-02-19 Hartmut new: mouseWheel and double click
    * <li>2012-01-30 Hartmut new: {@link #setColorCurrLine(GralColor)}
    * <li>2012-01-15 Hartmut new: {@link #setCurrentLine(String)}, {@link #insertLine(String, int, String[], Object)}:
    *    the key is supported now. 
@@ -126,6 +127,13 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   /**If set, then a next key will be processed. It is set to false if a key event is executed
    * and it is set to true in {@link #keyActionDone}. */
   private boolean keyDone = true;
+  
+  /**The last key which was pressed  */
+  private int lastKey;
+  
+  /**Number of key repetitions if a key was not used because the redraw was pending yet. */
+  private int keyRepetition;
+  
   
   /**Set to true while {@link #table}.{@link Table#redrawGthread()} is running.
    * It prevents recursive invocation of redraw() while setFocus() is invoked. */
@@ -324,6 +332,10 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   protected boolean processKeys(int keyCode){
     boolean done = true;
     long time = System.currentTimeMillis();
+    if(lastKey == keyCode){ keyRepetition +=1;  //same key
+    } else {
+      keyRepetition = 1; //other key.
+    }
     //NOTE: prevent to fast key action if the last redraw is yet finished.
     //The draw needs to much time in Linux-GTK with an Atom processor (Lenovo)
     if( keyDone || keyCode == KeyCode.mouse1Double || (time - timeLastRedraw) > 350){  //use 350 ms for timeout if keyDone isn't set.  
@@ -337,15 +349,19 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
         }
         keyActionDone.addToGraphicThread(itsMng.gralDevice, 0);
       } break;
+      case KeyCode.mouseWheelUp:
       case KeyCode.up: {
         if(ixLine > 0){
-          ixLineNew = ixLine - 1;
+          ixLineNew = ixLine - keyRepetition;
+          if(ixLineNew <0){ ixLineNew = 0; }
         }
         keyActionDone.addToGraphicThread(itsMng.gralDevice, 0);
       } break;
+      case KeyCode.mouseWheelDn:
       case KeyCode.dn: {
         if(ixLine < zLine -1){
-          ixLineNew = ixLine + 1;
+          ixLineNew = ixLine + keyRepetition;
+          if(ixLineNew >= zLine ){ ixLineNew = zLine -1; }
         }
         keyActionDone.addToGraphicThread(itsMng.gralDevice, 0);
       } break;
@@ -393,7 +409,9 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
           }
         }
       }
-    }
+      keyRepetition = 0;  //because it was done.
+    }//if not redraw pending.
+    lastKey = keyCode;
     return done;
   }
 
