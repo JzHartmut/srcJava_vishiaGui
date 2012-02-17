@@ -23,6 +23,7 @@ import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.FileRemote;
 import org.vishia.util.FileWriter;
 import org.vishia.util.KeyCode;
+import org.vishia.util.StringPart;
 
 /**This class implements the selection functionality of tabs and paths for the whole Java commander. */
 class FcmdFavorPathSelector
@@ -232,9 +233,18 @@ class FcmdFavorPathSelector
         int posSep;
         //List<FavorPath> list = null;
         FcmdFavorPathSelector.FavorFolder favorTabInfo = null;
+        StringPart spLine = new StringPart();
+        StringBuilder uLine = new StringBuilder(1000);
         //boolean bAll = true;
         while( sError == null && (sLine = reader.readLine()) !=null){
-          sLine = sLine.trim();
+          if(sLine.contains("$")){
+            uLine.append(sLine.trim());
+            spLine.assignReplaceEnv(uLine);
+            sLine = uLine.toString();
+          } else {
+            sLine = sLine.trim();
+            spLine.assign(sLine);
+          }
           if(sLine.length() >0){
             if( sLine.startsWith("==")){
               posSep = sLine.indexOf("==", 2);  
@@ -294,7 +304,8 @@ class FcmdFavorPathSelector
               }
             }
           }
-        }
+          uLine.setLength(0);
+        }//while
       } 
       catch(IOException exc){ sError = "selectTab - cfg file read error; " + cfgFile; }
       catch(IllegalArgumentException exc){ sError = "selectTab - cfg file error; " + cfgFile + exc.getMessage(); }

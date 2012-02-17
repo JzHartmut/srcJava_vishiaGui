@@ -21,8 +21,13 @@ public class SwtHtmlBox extends GralHtmlBox
     super(name, mng);
     SwtWidgetMng mngSwt = (SwtWidgetMng)mng;
     Composite parent = (Composite)(mng.pos.panel.getPanelImpl());
-    boxSwt = new Browser(parent,0);
-    mngSwt.setPosAndSizeSwt(boxSwt, 0, 0);
+    try {
+      boxSwt = new Browser(parent,0);
+      mngSwt.setPosAndSizeSwt(boxSwt, 0, 0);
+    } catch(Throwable exc){
+      System.err.println("can't create SWT-Browser");
+      exc.printStackTrace(System.err);
+    }
     bActiv = false;
   }
 
@@ -41,8 +46,10 @@ public class SwtHtmlBox extends GralHtmlBox
   
   
   @Override public void activate(){
-    bActiv = true;
-    setUrl(lastUrl);
+    if(boxSwt !=null){
+      bActiv = true;
+      setUrl(lastUrl);
+    }
   }
   
 
@@ -63,7 +70,7 @@ public class SwtHtmlBox extends GralHtmlBox
   }
 
   @Override protected void repaintGthread(){
-    boxSwt.redraw();
+    if(boxSwt !=null){ boxSwt.redraw(); }
   }
 
 

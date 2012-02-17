@@ -30,7 +30,7 @@ set CLASSPATH_JAVAC=d:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_
 ::;../../zbnfjax/zbnf.jar;../../exe/vishiaRun.jar
 
 REM Sets the src-path for this component, maybe for further necessary sources:
-set SRCPATH_JAVAC=..;../../srcJava_ZBNF;../../srcJava_vishiaRun
+set SRCPATH_JAVAC=..;../../srcJava_Zbnf;../../srcJava_vishiaRun
 
 REM Call java-compilation and jar with given input environment. This following commands are the same for all java-compilations.
 echo on
