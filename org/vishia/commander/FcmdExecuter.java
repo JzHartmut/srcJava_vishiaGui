@@ -275,7 +275,7 @@ public class FcmdExecuter
   GralUserAction actionExecCmdAfterChoice = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
     { 
-      if(key == KeyCode.enter || key == KeyCode.mouse1Up){
+      if(key == KeyCode.enter || key == KeyCode.mouse1Up || key == KeyCode.mouse1Double){
         if(params.length > 0 && params[0] instanceof GralTableLine_ifc){
           GralTableLine_ifc line = (GralTableLine_ifc)params[0];
           CmdBlock cmd = (CmdBlock)line.getUserData();

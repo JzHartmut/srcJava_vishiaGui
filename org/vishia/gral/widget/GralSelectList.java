@@ -156,6 +156,7 @@ public abstract class GralSelectList implements Removeable //extends GralWidget
       if(keyCode == keyLeft){ actionLeft(data, line); }
       else if(keyCode == keyRight){ actionRight(data, line); }
       else if(keyCode == KeyCode.enter){ done = actionOk(data, line); }
+      else if(keyCode == KeyCode.mouse1Double){ done = actionOk(data, line); }
       else { done = actionUserKey(keyCode, data, line); }
       return done;
     }

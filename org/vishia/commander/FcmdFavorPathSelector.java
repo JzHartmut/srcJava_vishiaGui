@@ -453,20 +453,25 @@ class FcmdFavorPathSelector
 
   
   
+  void confirmCreateNewFavor(){
+    FcmdLeftMidRightPanel panel = main.lastFilePanels.get(0);
+    FcmdFileCard fileCard = panel.actFileCard;
+    windAddFavorite.panelInvocation = panel;
+    windAddFavorite.widgLabel.setText(fileCard.label);
+    windAddFavorite.widgShortName.setText("alias");
+    File directory = fileCard.getCurrentDir();
+    //String pathDir = FileSystem.getCanonicalPath(lastSelectedFile.getParentFile());
+    windAddFavorite.widgPath.setText(directory.getPath());
+    windAddFavorite.window.setWindowVisible(true);
+    
+  }
+  
   
   GralUserAction actionCreateFavor = new GralUserAction(){
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){
       if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
-        FcmdLeftMidRightPanel panel = main.lastFilePanels.get(0);
-        FcmdFileCard fileCard = panel.actFileCard;
-        windAddFavorite.panelInvocation = panel;
-        windAddFavorite.widgLabel.setText(fileCard.label);
-        windAddFavorite.widgShortName.setText("alias");
-        File directory = fileCard.getCurrentDir();
-        //String pathDir = FileSystem.getCanonicalPath(lastSelectedFile.getParentFile());
-        windAddFavorite.widgPath.setText(directory.getPath());
-        windAddFavorite.window.setWindowVisible(true);
-    }
+        confirmCreateNewFavor();
+      }
     return true;
   } };
   

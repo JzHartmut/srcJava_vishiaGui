@@ -108,10 +108,11 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    */
   protected int ixGlineSelected = -1, ixGlineSelectedNew = -1;
   
-  /**Texts in all lines and columns.
+  /**Any line of the table has one TableItemWidget, a long table has some more.
+   * Contains content, color, selection etc. of the lines with there columns.
    * 
    */
-  protected ArrayList<TableItemWidget> tableLines = new ArrayList<TableItemWidget>();;
+  protected ArrayList<TableItemWidget> tableLines = new ArrayList<TableItemWidget>();
   
   /**True if a line or a column is marked. */
   //protected boolean[] markedLines, markedColumns;
@@ -325,7 +326,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     long time = System.currentTimeMillis();
     //NOTE: prevent to fast key action if the last redraw is yet finished.
     //The draw needs to much time in Linux-GTK with an Atom processor (Lenovo)
-    if( keyDone || (time - timeLastRedraw) > 350){  //use 350 ms for timeout if keyDone isn't set.  
+    if( keyDone || keyCode == KeyCode.mouse1Double || (time - timeLastRedraw) > 350){  //use 350 ms for timeout if keyDone isn't set.  
       keyDone = false;
       switch(keyCode){
       case KeyCode.pgup: {
@@ -458,6 +459,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     long dbgtime1 = System.currentTimeMillis() - dbgtime;
     iCellLine = 0;
     for(int ixLine3 = ixLine1; ixLine3 <= ixLine2 && iCellLine < zLineVisibleMax; ++ixLine3){
+      //cells with content
       TableItemWidget line = tableLines.get(ixLine3);
       int ctredraw = line.ctRepaintLine.get();
       if(ctredraw > 0 || true){
@@ -475,7 +477,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
       }
     }
     long dbgtime2 = System.currentTimeMillis() - dbgtime;
-    while( iCellLine < zLineVisibleMax){
+    while( iCellLine < zLineVisible) { //Max){
       for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
         CellData widgiData = drawCellInvisible(iCellLine, iCellCol);
         widgiData.tableItem = null;  //The widgiData are assigned to the implementation graphic cell.

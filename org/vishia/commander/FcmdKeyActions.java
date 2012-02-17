@@ -100,6 +100,7 @@ public class FcmdKeyActions
       else if(keyCode == main.idents.keyRefresh1 || keyCode == main.idents.keyRefresh2 || keyCode == main.idents.keyRefresh3){ main.favorPathSelector.actionRefreshFileTable.userActionGui(KeyCode.menuEntered, widgd, params); }
       else if(keyCode == main.idents.keyWindFullOut){ main.windMng.actionWindFullOut.userActionGui(KeyCode.menuEntered, widgd, params); }
       else if(keyCode == main.idents.keyExecCmdFile) { main.cmdSelector.executeCurrCmdWithFiles(); }
+      else if(keyCode == main.idents.keyCreateFavor) { main.favorPathSelector.confirmCreateNewFavor(); }
       else if(keyCode == main.idents.keyFavorLeft) { main.selectPanelLeft.userActionGui(KeyCode.menuEntered, widgd); }
       else if(keyCode == main.idents.keyFavorMiddle) { main.selectPanelMiddle.userActionGui(KeyCode.menuEntered, widgd); }
       else if(keyCode == main.idents.keyFavorRight) { main.selectPanelRight.userActionGui(KeyCode.menuEntered, widgd); }

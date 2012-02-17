@@ -233,6 +233,7 @@ public class FcmdFileCard extends GralFileSelector
     //case KeyCode.alt + KeyCode.F + '7': FileSystem.searchInFiles(new File[]{data}, "ordersBackground"); break;
     default: ret = false;
     }
+    /*
     if (keyCode == main.keyActions.keyCreateFavorite){
       main.favorPathSelector.windAddFavorite.panelInvocation = mainPanel;
       main.favorPathSelector.windAddFavorite.widgLabel.setText(nameFilePanel);
@@ -241,7 +242,8 @@ public class FcmdFileCard extends GralFileSelector
       //String pathDir = FileSystem.getCanonicalPath(lastSelectedFile.getParentFile());
       main.favorPathSelector.windAddFavorite.widgPath.setText(lastSelectedFile.getParent());
       main.favorPathSelector.windAddFavorite.window.setWindowVisible(true);
-    } else if (keyCode == main.keyActions.keyPanelSelection){
+    } else*/ 
+    if (keyCode == main.keyActions.keyPanelSelection){
       //focuses the panel which is the selection panel for this file table.
       GralWidget tableSelection = main.gralMng.getWidget(FcmdWidgetNames.tableFavorites + nameFilePanel);
       tableSelection.setFocus();
