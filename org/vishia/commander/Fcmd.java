@@ -417,7 +417,9 @@ public class Fcmd extends GuiCfg
       if (arg.startsWith("cfg:")) {
         cargs.dirCfg = new File(arg.substring(4));
       } else if (arg.startsWith("help:")) {
-        cargs.dirHtmlHelp = new File(arg.substring(5));
+        File file1 = new File(arg.substring(5));
+        String sPathHelpAbs = file1.getAbsolutePath();
+        cargs.dirHtmlHelp = new File(sPathHelpAbs);  //should be absolute because browser.
       } else if (arg.startsWith("cmdcfg:")) {
         cargs.fileCfgCmds = new File(arg.substring(7));
       } else if (arg.startsWith("cmdext:")) {

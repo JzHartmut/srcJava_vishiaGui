@@ -3,6 +3,7 @@ package org.vishia.gral.widget;
 import java.io.IOException;
 
 import org.vishia.gral.base.GralHtmlBox;
+import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTextBox;
@@ -34,19 +35,23 @@ public class GralInfoBox implements GralTextBox_ifc, GralWindow_ifc
   
   private final GralWidget buttonOk;
   
-  public GralInfoBox(GralWindow window, GralTextBox textBox, GralWidget buttonOk)
+  protected final GralTextField infoLine;
+  
+  public GralInfoBox(GralWindow window, GralTextBox textBox, GralTextField infoLine, GralWidget buttonOk)
   {
     this.window = window;
     this.textBox = textBox;
     this.htmlBox = null;
+    this.infoLine = infoLine;
     this.buttonOk = buttonOk;
   }
   
-  public GralInfoBox(GralWindow window, GralHtmlBox htmlBox, GralWidget buttonOk)
+  public GralInfoBox(GralWindow window, GralHtmlBox htmlBox, GralTextField infoLine, GralWidget buttonOk)
   {
     this.window = window;
     this.textBox = null;
     this.htmlBox = htmlBox;
+    this.infoLine = infoLine;
     this.buttonOk = buttonOk;
   }
   
@@ -56,9 +61,11 @@ public class GralInfoBox implements GralTextBox_ifc, GralWindow_ifc
     //TODO the position frame (size) regards the title bar, it should not do so!
     mng.setPosition(0, -3, 0, 0, 0, '.');
     GralTextBox text = mng.addTextBox(name, false, null, '.');
+    mng.setPosition(0, -4, -4, -2, 0, '.');
+    GralTextField infoLine = mng.addTextField("info", false, null, null);
     mng.setPosition(-3, 0, -6, 0, 0, '.');
     GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "", null, null, "OK");
-    GralInfoBox box = new GralInfoBox(window, text, buttonOk);
+    GralInfoBox box = new GralInfoBox(window, text, infoLine, buttonOk);
     box.buttonOk.setActionChange(box.actionOk);
     return box; 
 
@@ -70,9 +77,11 @@ public class GralInfoBox implements GralTextBox_ifc, GralWindow_ifc
     //TODO the position frame (size) regards the title bar, it should not do so!
     mng.setPosition(0, -3, 0, 0, 0, '.');
     GralHtmlBox text = mng.addHtmlBox(name);
+    mng.setPosition(-2.5f, -0.5f, 0, -7, 0, '.');
+    GralTextField infoLine = mng.addTextField("info", false, null, null);
     mng.setPosition(-3, 0, -6, 0, 0, '.');
     GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "", null, null, "OK");
-    GralInfoBox box = new GralInfoBox(window, text, buttonOk);
+    GralInfoBox box = new GralInfoBox(window, text, infoLine, buttonOk);
     box.buttonOk.setActionChange(box.actionOk);
     return box; 
 
@@ -115,6 +124,7 @@ public class GralInfoBox implements GralTextBox_ifc, GralWindow_ifc
   
   
   public void setUrl(String url){
+    infoLine.setText(url);
     if(htmlBox !=null){ 
       htmlBox.setUrl(url); 
     }
@@ -249,7 +259,8 @@ public class GralInfoBox implements GralTextBox_ifc, GralWindow_ifc
   {
     if(textBox !=null){ textBox.setHtmlHelp(url); }
     if(htmlBox !=null){ htmlBox.setHtmlHelp(url); }
-    buttonOk.setHtmlHelp(url);
+    infoLine.setText(url);
+    //buttonOk.setHtmlHelp(url);
   }
 
 

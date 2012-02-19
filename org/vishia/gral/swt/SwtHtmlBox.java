@@ -2,6 +2,7 @@ package org.vishia.gral.swt;
 
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Text;
 import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWidgetMng;
@@ -32,6 +33,7 @@ public class SwtHtmlBox extends GralHtmlBox
   }
 
   @Override public void setUrl(String url){
+    //this.w
     lastUrl = url;
     if(bActiv){
       boolean bOk = boxSwt.setUrl(url);

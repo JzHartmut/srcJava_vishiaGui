@@ -2,6 +2,7 @@ package org.vishia.gral.ifc;
 
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GetGralWidget_ifc;
 import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralWidgetMng;
@@ -44,7 +45,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralWidget implements GralWidget_ifc
+public abstract class GralWidget implements GralWidget_ifc, GetGralWidget_ifc
 {
   
   /**Changes:
@@ -219,6 +220,9 @@ public abstract class GralWidget implements GralWidget_ifc
     this.itsMng = mng;
     this.pos = mng.getPositionInPanel();  //Note: makes a clone because the pos in panel is reused. 
 	}
+	
+	
+	@Override public GralWidget getGralWidget(){ return this; }
 	
 	
 	public void setPrimaryWidgetOfPanel(){

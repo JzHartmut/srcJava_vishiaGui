@@ -9,6 +9,7 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.widgets.Control;
+import org.vishia.gral.base.GetGralWidget_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.KeyCode;
@@ -84,8 +85,8 @@ public class SwtDropListener implements DropTargetListener
   { DropTarget drop = (DropTarget)event.getSource();
     Control widgetSwt = drop.getControl();
     Object oData = widgetSwt.getData();  //the associated text field, should be identical with event.getSource()
-    if(oData!=null && oData instanceof GralWidget){
-      GralWidget widgg = (GralWidget)oData;
+    if(oData!=null && oData instanceof GetGralWidget_ifc){
+      GralWidget widgg = ((GetGralWidget_ifc)oData).getGralWidget();
       GralUserAction action = widgg.getActionDrop();
       if(action !=null){
         Object gralTransferData;

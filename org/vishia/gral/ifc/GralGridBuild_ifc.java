@@ -281,7 +281,7 @@ public interface GralGridBuild_ifc
    * @return
    */
   public GralButton addSwitchButton(
-  	String sName
+    String sName
   , GralUserAction action
   , String sCmd
   , String sShowMethod
@@ -289,6 +289,16 @@ public interface GralGridBuild_ifc
   , String sButtonText
   , String color0
   , String color1
+  );
+  
+  
+  
+  public GralButton addSwitchButton(
+    String sName
+  , String sButtonText0
+  , String sButtonText1
+  , GralColor color0
+  , GralColor color1
   );
   
   

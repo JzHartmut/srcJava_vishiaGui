@@ -259,6 +259,31 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     return widgButton;
   }
   
+  
+  
+  @Override public GralButton addSwitchButton(
+    String sName
+  , String sButtonTextOff
+  , String sButtonTextOn
+  , GralColor colorOff
+  , GralColor colorOn
+    //, int height, int width
+    //, String sCmd, String sUserAction, String sName)
+  )
+  {
+    int ySize = (int)pos.height();
+    int xSize = (int)pos.width();
+    
+    char size = ySize > 3? 'B' : 'A';
+    AwtButton widgButton = new AwtButton(sName, this, (Container)pos.panel.getPanelImpl(), 0, size);
+    widgButton.setSwitchMode(colorOff, colorOn);
+    widgButton.setSwitchMode(sButtonTextOff, sButtonTextOn);
+    widgButton.setPanelMng(this);
+    if(sName !=null){ registerWidget(widgButton); }
+    return widgButton;
+  }
+  
+
 
   @Override
   public Object addCurveViewY(String sName, int nrofXvalues, int nrofTracks)
