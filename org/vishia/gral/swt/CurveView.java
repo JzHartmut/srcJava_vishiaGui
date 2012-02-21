@@ -19,7 +19,7 @@ import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralWidget_ifc;
 
-public class CurveView extends Canvas implements GralWidget_ifc
+abstract class CurveView extends Canvas implements GralWidget_ifc
 {
   
   private final CurveView widgSwt;

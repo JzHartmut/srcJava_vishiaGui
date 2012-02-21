@@ -5,8 +5,43 @@ package org.vishia.gral.ifc;
  * @author Hartmut Schorrig
  *
  */
-public interface GralSetValue_ifc extends GralWidget_ifc
+public interface GralSetValue_ifc
 {
+  
+  
+  /**Version and history
+   * <ul>
+   * <li>2012-02-22 Hartmut Enhanced, now used for lines of a curve view. Now basic interface for GralWidget.
+   * <li>2012-01-01 Hartmut Created, firstly only for the value bar.
+   * </ul>
+   */
+  public static final int version = 0x20120222;
+  
+  /**Sets a application specific info. 
+   * It should help to present user data which are associated to this widget. 
+   * This info can be set and changed anytime. */
+  public void setContentInfo(Object content);
+  
+  /**Gets the application specific info. See {@link #setContentInfo(Object)}. */
+  public Object getContentInfo();
+  
+  /**Sets the data path. It is a String in application context.
+   * @param sDataPath
+   */
+  public void setDataPath(String sDataPath);
+  
+  /**Changes the data path
+   * @param sDataPath the new one
+   * @return the last one.
+   */
+  public String getDataPath();
+  
+  public int getDataIx();
+
+  public void setDataIx(int dataIx);
+
+  
+
 
 	/**Sets a value to show.
 	 * @param value

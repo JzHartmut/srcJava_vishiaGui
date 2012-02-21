@@ -13,6 +13,7 @@ import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.widget.GralCurveView;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.KeyCode;
 
@@ -21,6 +22,7 @@ public class GralCfgBuilder
 
   /**Version and history
    * <ul>
+   * <li>2012-02-22 Hartmut new: Now knows the CurveView
    * <li>2012-01-17 Hartmut bugfix: If the cfg script contains forex @10,-3.5 it should be a height og 3.5 with bottom line.
    *   The {@link GralPos#setFinePosition(int, int, int, int, int, int, int, int, int, char, int, int, GralPos)}
    *   needs a value of -4 for size and 5 for fractional size. 
@@ -282,6 +284,15 @@ public class GralCfgBuilder
       } else { dirMask = ""; }
       widgd = gui.addFileSelectField(sName, null, dirMask, null, "t");
       widgd.setDataPath(sDataPath);
+    } else if(cfge.widgetType instanceof GralCfgData.GuiCfgCurveview){
+      GralCfgData.GuiCfgCurveview widgt = (GralCfgData.GuiCfgCurveview)cfge.widgetType;
+      int nrofTracks = widgt.lines.size(); 
+      GralCurveView widgc = gui.addCurveViewY(sName, widgt.nrofPoints, nrofTracks);
+      for(GralCfgData.GuiCfgCurveLine line: widgt.lines){
+        String sDataPathLine = line.name;
+        widgc.initLine(line.name, sDataPathLine, line.colorValue, 0, line.nullLine, line.scale, line.offset);
+      }
+      widgd = widgc;
     } else {
       switch(cfge.widgetType.whatIs){
         case 'T':{

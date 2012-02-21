@@ -43,6 +43,7 @@ import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.swt.SwtMenu;
+import org.vishia.gral.widget.GralCurveView;
 import org.vishia.gral.widget.GralValueBar;
 import org.vishia.msgDispatch.LogMessage;
 
@@ -286,7 +287,7 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 
 
   @Override
-  public Object addCurveViewY(String sName, int nrofXvalues, int nrofTracks)
+  public GralCurveView addCurveViewY(String sName, int nrofXvalues, int nrofTracks)
   {
     // TODO Auto-generated method stub
     return null;

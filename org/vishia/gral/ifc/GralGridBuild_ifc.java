@@ -24,6 +24,7 @@ import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.cfg.GralCfgData;
 //import org.vishia.gral.ifc.GuiShellMngIfc;
+import org.vishia.gral.widget.GralCurveView;
 import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.gral.widget.GralValueBar;
 import org.vishia.util.KeyCode;
@@ -476,7 +477,7 @@ public interface GralGridBuild_ifc
    * @param nrofTracks number of curves (tracks).
    * @return The Canvas Object.
    */
-  Object addCurveViewY(String sName, int nrofXvalues, int nrofTracks);
+  GralCurveView addCurveViewY(String sName, int nrofXvalues, int nrofTracks);
   
   /**Adds a special text field to select a file. On the right side a small button [<] is arranged
    * to open the standard file select dialog. 

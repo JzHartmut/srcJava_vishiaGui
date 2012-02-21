@@ -93,6 +93,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.widget.GralCurveView;
 import org.vishia.gral.widget.GralValueBar;
 import org.vishia.msgDispatch.LogMessage;
 
@@ -272,7 +273,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	 */
 	@SuppressWarnings("unused")
 	private static class TestHelp{
-  	private CurveView curveView;
+  	private GralCurveView curveView;
   } 
 	TestHelp testHelp = new TestHelp(); 
   
@@ -1125,24 +1126,11 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     return widgetInfos;
   }
   
-	@Override
-	public Canvas addCurveViewY(String sName, int nrofXvalues,
-			int nrofTracks) {
-    GralWidget widgd = new SwtCurveView(sName, this); //, curveView, 'c', sName, null);
-	  int ySize = (int)(pos.height());
-    int xSize = (int)(pos.width());
-    int dxWidget = xSize * propertiesGui.xPixelUnit();
-		int dyWidget = ySize * propertiesGui.yPixelUnit();
-		CurveView curveView = new CurveView(((SwtPanel)pos.panel).getPanelImpl(), dxWidget, dyWidget, nrofXvalues, nrofTracks);
-		testHelp.curveView = curveView; //store to inspect.
-		curveView.setSize(dxWidget, dyWidget);
-		setBounds_(curveView); //, dyGrid, dxGrid);
-		curveView.setGridVertical(10, 5);   //10 data-points per grid line, 50 data-points per strong line.
-		curveView.setGridHorizontal(50.0F, 5);  //10%-divisions, with 5 sub-divisions
-		curveView.setGridColor(propertiesGuiSwt.colorGrid, propertiesGuiSwt.colorGridStrong);
-		widgd.setPanelMng(this);
-    registerWidget(widgd);
-		return curveView;
+	@Override public GralCurveView addCurveViewY(String sName, int nrofXvalues, int nrofTracks) {
+    GralCurveView widgd = new SwtCurveView(sName, this, nrofXvalues, nrofTracks); //, curveView, 'c', sName, null);
+		//CurveView curveView = new CurveView(((SwtPanel)pos.panel).getPanelImpl(), dxWidget, dyWidget, nrofXvalues, nrofTracks);
+		testHelp.curveView = widgd; //store to inspect.
+		return widgd;
 	}
 
 

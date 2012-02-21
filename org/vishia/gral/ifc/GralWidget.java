@@ -45,11 +45,12 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralWidget implements GralWidget_ifc, GetGralWidget_ifc
+public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidget_ifc
 {
   
   /**Changes:
    * <ul>
+   * <li>2012-02-22 Hartmut new: implements {@link GralSetValue_ifc} now.
    * <li>2012-01-16 Hartmut new Concept {@link #repaint()}, can be invoked in any thread. With delay possible. 
    *   All inherit widgets have to be implement  {@link #repaintGthread()}.
    * <li>2011-12-27 Hartmut new {@link #setHtmlHelp(String)}. For context sensitive help.
@@ -531,6 +532,25 @@ public abstract class GralWidget implements GralWidget_ifc, GetGralWidget_ifc
   public void setValue(int cmd, int ident, Object visibleInfo, Object userData)
   { itsMng.setInfo(this, cmd, ident, visibleInfo, userData);
   }
+  
+  /**Sets a value to show.
+   * @param value
+   * This routine may be overridden by some specialized widgets.
+   */
+  @Override public void setValue(float value){
+    itsMng.setInfo(this, GralPanelMngWorking_ifc.cmdSet, 0, value, null);
+  }
+  
+  /**Sets the border of the value range for showing. 
+   * If it is a ValueBar, for exmaple, it is the value for 0% and 100%
+   * This routine is empty per default, should be overridden if it is necessary.
+   * @param minValue
+   * @param maxValue
+   */
+  @Override public void setMinMax(float minValue, float maxValue){}
+
+  
+  
   
   public void setCfgElement(GralWidgetCfg_ifc cfge)
   { this.itsCfgElement = cfge;

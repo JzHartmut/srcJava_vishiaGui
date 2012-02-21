@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.byteData.RawDataAccess;
 import org.vishia.mainCmd.Report;
@@ -13,14 +14,26 @@ import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.widget.GralCurveView;
 import org.vishia.gral.widget.GralValueBar;
 
 
 public class OamShowValues
 {
 
+  
+  /**Version and history
+   * <ul>
+   * <li>2012-02-21 Hartmut chg Now a curve view can be accessed symbolically.
+   * <li>2010-06-00 Hartmut created
+   * </ul>
+   * 
+   */
+  public static final int version = 0x20120222;
+  
 	final Report log;
 
 	/**Index (fast access) of all variable which are sent from the automation device (contained in the cfg-file). */
@@ -92,7 +105,7 @@ public class OamShowValues
 			String sName = widgetInfo.name;
 		}
 		//read all variables which are necessary to show.
-		writeCurveValues();   //write values for curve scoping
+		//writeCurveValues();   //write values for curve scoping
 
 	}
 
@@ -148,7 +161,47 @@ public class OamShowValues
 
 	private void writeValuesOfTab()
 	{ if(dataValid){
-			if(widgetsInTab != null)
+  	  ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = guiAccess.getVisiblePanels();
+      GralWidget widgdRemove = null;
+      try{
+        for(GralVisibleWidgets_ifc panel: listPanels){
+          Queue<GralWidget> widgetsVisible = panel.getWidgetsVisible();
+          if(widgetsVisible !=null) for(GralWidget widget: widgetsVisible){
+            if(widget instanceof GralCurveView){
+              GralCurveView curve = (GralCurveView)widget;
+              List<GralSetValue_ifc> listLines = curve.getLines();
+              float[] values = new float[listLines.size()];
+              int ixValues = -1;
+              for(GralSetValue_ifc line: listLines){
+                ByteDataSymbolicAccess.Variable variable = getVariableFromContentInfo(line);
+                float value;
+                if(variable !=null){
+                  value= variable.bytes.getFloat(variable, line.getDataIx());
+                } else {
+                  value = 0;
+                }
+                line.setValue(value);
+                values[++ixValues] = value;
+              }
+              curve.setSample(values);
+            } else {
+              String sContentInfo = widget.sDataPath;
+              if(sContentInfo !=null && sContentInfo.length() >0 && widget.getGraphicWidgetWrapper() !=null){
+                stop();
+                if(!callMethod(widget)){
+                  //show value direct
+                  writeField(widget);
+                }
+                //log.reportln(3, "TAB: " + sContentInfo);
+              }
+            }
+          }
+        }
+      } catch(Exception exc){ 
+      }
+      
+	  }
+    if(widgetsInTab != null){
 			for(GralWidget widgetInfo: widgetsInTab){
 				String sContentInfo = widgetInfo.sDataPath;
 				if(sContentInfo !=null && sContentInfo.length() >0 && widgetInfo.getGraphicWidgetWrapper() !=null){
@@ -164,7 +217,7 @@ public class OamShowValues
 	}
 	
 	
-	ByteDataSymbolicAccess.Variable getVariableFromContentInfo(GralWidget widgetInfo)
+	ByteDataSymbolicAccess.Variable getVariableFromContentInfo(GralSetValue_ifc widgetInfo)
 	{
 		ByteDataSymbolicAccess.Variable variable;
 		Object oContentInfo = widgetInfo.getContentInfo();
@@ -526,7 +579,7 @@ public class OamShowValues
 		valueUserCurves[2] = accessOamVariable.getFloat("targetWay");
 		valueUserCurves[3] = accessOamVariable.getFloat("dway");
 		valueUserCurves[4] = accessOamVariable.getFloat("output");
-		guiAccess.setSampleCurveViewY("userCurves", valueUserCurves);
+		//guiAccess.setSampleCurveViewY("userCurves", valueUserCurves);
 		
 	}
 	

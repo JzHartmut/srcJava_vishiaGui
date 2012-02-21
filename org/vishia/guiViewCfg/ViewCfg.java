@@ -4,19 +4,24 @@ import java.io.File;
 
 
 import org.vishia.communication.InterProcessCommFactorySocket;
+import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
-import org.vishia.gral.area9.GuiMainCmd;
 //import org.vishia.gral.gui.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.ifc.GralWidget;
-import org.vishia.mainCmd.MainCmd_ifc;
 
 /**Class contains main, it is able to use for a GUI without any programming in Java.*/
 public class ViewCfg extends GuiCfg 
 {
+  
+  /**Version and history
+   * <ul>
+   * <li>2012-20-22 Hartmut chg now works yet.
+   * <li>2010-06-00 Hartmut created
+   * </ul>
+   */
+  public static final int version = 0x20120222;
   
   private final OamShowValues oamShowValues;
 	  
@@ -99,7 +104,7 @@ public class ViewCfg extends GuiCfg
   
   /**Organisation class for the GUI.
    */
-  private static class CmdLineAndGui extends GuiMainCmd
+  private static class CmdLineAndGui extends GralArea9MainCmd
   {
 
     
@@ -114,7 +119,7 @@ public class ViewCfg extends GuiCfg
      */
     public CmdLineAndGui(CallingArguments cargs, String[] args)
     { 
-      super(cargs, args, "ViewCfg", "3A3C");
+      super(cargs, args);
       super.addAboutInfo("ViewCfg");
       super.addAboutInfo("made by HSchorrig, 2010-06-07, 2011-09-03");
       //super.addStandardHelpInfo();
@@ -171,8 +176,8 @@ public class ViewCfg extends GuiCfg
    * @param cargs The given calling arguments.
    * @param gui The GUI-organization.
    */
-  ViewCfg(CallingArguments cargs, GuiMainCmd cmdgui) 
-  { super(cargs, cmdgui);
+  ViewCfg(CallingArguments cargs, GralArea9MainCmd cmdgui) 
+  { super(cargs, cmdgui, null, null);
     this.callingArguments = cargs;
     
     oamShowValues = new OamShowValues(cmdgui, guiAccess);
@@ -225,13 +230,9 @@ public class ViewCfg extends GuiCfg
     CallingArguments cargs = new CallingArguments();
     //Initializes the GUI till a output window to show informations:
     CmdLineAndGui cmdgui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
-    try{ cmdgui.parseArguments(); }
-    catch(Exception exception)
-    { cmdgui.writeError("Cmdline argument error:", exception);
-      cmdgui.setExitErrorLevel(MainCmd_ifc.exitWithArgumentError);
-      //gui.exit();
-      bOk = false;  //not exiting, show error in GUI
-    }
+    //Initializes the graphic window and parse the parameter of args (command line parameter).
+    //Parameter errors will be output in the graphic window in its given output area.
+    bOk = cmdgui.parseArgumentsAndInitGraphic("ViewCfg", "3A3C");
     
     if(bOk){
       //String ipcFactory = "org.vishia.communication.InterProcessComm_Socket";
