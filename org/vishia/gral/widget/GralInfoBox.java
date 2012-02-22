@@ -224,7 +224,7 @@ public class GralInfoBox implements GralTextBox_ifc, GralWindow_ifc
   
   GralUserAction actionOk = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
-      if(textBox !=null) {textBox.setText(""); }  //'I have seen it, therefore delete.
+      //if(textBox !=null) {textBox.setText(""); }  //'I have seen it, therefore delete.
       window.setWindowVisible(false);
       return true;
     }

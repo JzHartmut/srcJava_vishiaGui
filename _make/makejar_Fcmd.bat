@@ -1,8 +1,18 @@
 echo off
 REM The java-copiler may be located at a user-specified position.
 REM Set the environment variable JAVA_HOME, where bin/javac will be found.
-if "%JAVA_HOME%" == "" set JAVA_HOME=D:\Progs\JAVA\jdk1.6.0_21
+if "%JAVA_HOME%" == "" goto :searchJava
+if not exist %JAVA_HOME% goto :searchJava
+goto :okJavaHome
+:searchJava
+  if exist D:\Progs\JAVA\jdk1.6.0_21 set JAVA_HOME=D:\Progs\JAVA\jdk1.6.0_21
+  if exist D:\Programs\JAVA\jdk1.6.0_21 set JAVA_HOME=D:\Programs\JAVA\jdk1.6.0_21
+  if exist C:\Programs\JAVA\jdk1.6.0_21 set JAVA_HOME=C:\Programs\JAVA\jdk1.6.0_21
+  if exist D:\Progs\JAVA\jdk1.6.0_21 set JAVA_HOME=D:\Progs\JAVA\jdk1.6.0_21
+:okJavaHome
+echo Java-JDK found at %JAVA_HOME%
 ::set PATH=%JAVA_HOME%\bin;%PATH%
+
 
 REM The TMP_JAVAC is a directory, which contains only this compiling results. It will be clean in the batch processing.
 set TMP_JAVAC=..\..\..\tmp_javac
@@ -26,7 +36,16 @@ set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/commander/Fcmd.java
 
 REM Sets the CLASSPATH variable for compilation (used jar-libraries).
 REM This component based on the ZBNF and the vishiaRun.
-set CLASSPATH_JAVAC=d:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+
+set SWTJAR=d:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+if exist %SWTJAR% goto :swtOk
+set SWTJAR=Z:\V\vishia\Fcmd\sf\Fcmd\exe\windows\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+if exist %SWTJAR% goto :swtOk
+:swtOk
+::set CLASSPATH_JAVAC=d:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+::set CLASSPATH_JAVAC=d:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+::set CLASSPATH_JAVAC=Z:\V\vishia\Fcmd\sf\Fcmd\exe\windows\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+set CLASSPATH_JAVAC=%SWTJAR%
 ::;../../zbnfjax/zbnf.jar;../../exe/vishiaRun.jar
 
 REM Sets the src-path for this component, maybe for further necessary sources:
@@ -38,7 +57,7 @@ if exist %TMP_JAVAC% rmdir /S /Q %TMP_JAVAC%
 mkdir %TMP_JAVAC%
 mkdir %TMP_JAVAC%\bin
 %JAVA_HOME%\bin\javac.exe -deprecation -d %TMP_JAVAC%/bin -sourcepath %SRCPATH_JAVAC% -classpath %CLASSPATH_JAVAC% %INPUT_JAVAC% 1>>%TMP_JAVAC%\javac_ok.txt 2>%TMP_JAVAC%\error.txt
-echo off
+echo on
 if errorlevel 1 goto :error
 echo copiling successfull, generate jar:
 

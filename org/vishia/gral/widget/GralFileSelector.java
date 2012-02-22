@@ -140,12 +140,14 @@ public class GralFileSelector implements Removeable //extends GralWidget
         Object oData = line.getUserData();
         if(oData instanceof FileRemote){
           FileRemote file = (FileRemote)oData;
-          String sDir = file.getParent();
-          String sName = file.getName();
-          indexSelection.put(sDir, sName);
-          //System.out.println("GralFileSelector: " + sDir + ":" + sName);
-          if(actionOnFileSelected !=null){
-            actionOnFileSelected.userActionGui(0, selectList.wdgdTable, line, file);
+          if(file.exists()){
+            String sDir = file.getParent();
+            String sName = file.getName();
+            indexSelection.put(sDir, sName);
+            //System.out.println("GralFileSelector: " + sDir + ":" + sName);
+            if(actionOnFileSelected !=null){
+              actionOnFileSelected.userActionGui(0, selectList.wdgdTable, line, file);
+            }
           }
         }
       }

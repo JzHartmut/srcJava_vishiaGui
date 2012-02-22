@@ -50,6 +50,8 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   /**Changes:
    * <ul>
+   * <li>2012-02-22 Hartmut new: catch on {@link #repaintGthread()} and continue the calling level
+   *   because elsewhere the repaint order isn't removed from the {@link org.vishia.gral.base.GralGraphicThread#addDispatchOrder(GralDispatchCallbackWorker)}-queue.
    * <li>2012-02-22 Hartmut new: implements {@link GralSetValue_ifc} now.
    * <li>2012-01-16 Hartmut new Concept {@link #repaint()}, can be invoked in any thread. With delay possible. 
    *   All inherit widgets have to be implement  {@link #repaintGthread()}.
@@ -675,7 +677,13 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    */
   private GralDispatchCallbackWorker repaintRequ = new GralDispatchCallbackWorker("GralWidget.repaintRequ"){
     @Override public void doBeforeDispatching(boolean onlyWakeup) {
-      repaintGthread();
+      try{ repaintGthread();
+      
+      } catch(Exception exc){
+        System.err.println("unexpected exception " + exc.getMessage());
+        exc.printStackTrace(System.err);
+        //NOTE: removeFromQueue should invoked on exception too.
+      }
       countExecution();
       removeFromQueue(itsMng.gralDevice);
     }

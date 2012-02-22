@@ -161,12 +161,15 @@ public class SwtTable  extends GralTable {
 
 
   @Override protected void repaintGthread(){
-    setAllCellContentGthread();
-    //System.out.println("swtTable redrawed");
-    table.superRedraw();  //this is the core-redraw
-    redrawtime = System.currentTimeMillis();
-    System.out.println("test SwtTable redraw " + ++redrawct);
-    
+    if(!table.isDisposed()){
+      setAllCellContentGthread();
+      //System.out.println("swtTable redrawed");
+      table.superRedraw();  //this is the core-redraw
+      redrawtime = System.currentTimeMillis();
+      //System.out.println("test SwtTable redraw " + ++redrawct);
+    } else {
+      System.out.println("test SwtTable redraw disposed" + ++redrawct);
+    }
     bRedrawPending = false;
 
   }
@@ -178,11 +181,11 @@ public class SwtTable  extends GralTable {
    */
   @Override public boolean setFocus()
   { if(ixGlineSelectedNew >=0 && ixColumn >=0){
-      System.out.println("test SwtTable.setFocus-1");
+      //System.out.println("test SwtTable.setFocus-1");
       redrawTableWithFocusedCell(cellsSwt[ixGlineSelectedNew][ixColumn]);
       return true;
     } else {
-      System.out.println("test SwtTable.setFocus-2");
+      //System.out.println("test SwtTable.setFocus-2");
       if(ixColumn < 0){ ixColumn = 0;}
       if(ixLine < 0 && zLine >0){ ixLineNew = 0;}
       bFocused = true;
@@ -518,7 +521,7 @@ public class SwtTable  extends GralTable {
     @Override
     public void mouseDoubleClick(MouseEvent e)
     {
-      System.out.println("SwtTable-mouse-double");
+      //System.out.println("SwtTable-mouse-double");
       mousetime = System.currentTimeMillis();
       mouseDoubleClick = true;
       processKeys(KeyCode.mouse1Double);
@@ -527,7 +530,7 @@ public class SwtTable  extends GralTable {
     @Override
     public void mouseDown(MouseEvent ev)
     {
-      System.out.println("SwtTable-mouse dn start" + ++mousect);
+      //System.out.println("SwtTable-mouse dn start" + ++mousect);
       Text widgSwt = (Text)ev.widget;  //it is only associated to a cell.
       CellData cellData = (CellData)widgSwt.getData();
       if(true || !hasFocus){
@@ -539,7 +542,7 @@ public class SwtTable  extends GralTable {
       mousetime = System.currentTimeMillis();
       if((ev.button & SWT.BUTTON1)!=0){ mouse1isDown = true; }
       else if((ev.button & SWT.BUTTON2)!=0){ mouse2isDown = true; }
-      System.out.println("SwtTable-mouse dn end");
+      //System.out.println("SwtTable-mouse dn end");
       
     }
 
@@ -549,13 +552,13 @@ public class SwtTable  extends GralTable {
       long time = System.currentTimeMillis();
       if(mouseDoubleClick)  //mouse up event after double click.
       { mouseDoubleClick = false; 
-        System.out.println("mouse double-up");
+        //System.out.println("mouse double-up");
       
         if((time -mousetime)<3000){
           return; 
         }
       }
-      System.out.println("mouse up");
+      //System.out.println("mouse up");
       if((ev.button & SWT.BUTTON1 | SWT.BUTTON2)!=0){ 
         //while mouseUp 1 button is down:
         //processKeys(KeyCode.mouse1Double);
@@ -665,7 +668,7 @@ public class SwtTable  extends GralTable {
             //System.out.println("focusTable");
           }
           redrawTableWithFocusedCell(ev.widget);
-          System.out.println("focusCell");
+          //System.out.println("focusCell");
         }
       } catch(Exception exc){
         itsMng.log.sendMsg(0, "Exception in SwtTable.focusGained");

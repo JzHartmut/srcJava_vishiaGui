@@ -44,7 +44,8 @@ public class GralArea9MainCmd extends MainCmd
   public GralArea9MainCmd(GuiCallingArgs cargs, String[] args)
   { 
     super(args);
-    super.addAboutInfo("made by HSchorrig, 2010-06-07, 2011-08-07");
+    super.addAboutInfo("The.file.Commander");
+    super.addAboutInfo("made by HSchorrig, 2011-11-01, 2012-02-22");
     this.cargs = cargs;
   }
 
