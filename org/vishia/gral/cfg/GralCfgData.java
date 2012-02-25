@@ -20,6 +20,17 @@ import org.vishia.gral.ifc.GralWidgetCfg_ifc;
 public final class GralCfgData
 {
   
+  /**Version and history
+   * <ul>
+   * <li>2012-02-25 Hartmut chg {@link GuiCfgCurveLine#colorValue} = -1 initially to check whether it is given,
+   *   see {@link GralCfgBuilder#buildWidget(GralCfgElement)}
+   * <li>2011-06-00 Hartmut created: The old concept was evaluating ZBNF parse result of cfg file manually,
+   *   now usage of {@link org.vishia.zbnf.ZbnfJavaOutput} to write result info in this class.
+   * </ul>
+   * 
+   */
+  public static final int version = 0x20120226;
+  
   /**ZBNF: DataReplace::= <$?key> = <$-/\.?string> ;
    * Class for temporary instance to capture key and string. */
   public final static class DataReplace
@@ -238,7 +249,7 @@ public final class GralCfgData
     
     public GuiCfgCurveLine(GralCfgElement itsElement){ super(itsElement, 'C'); }
     
-    public int colorValue = -1;
+    public int colorValue = 0;
     public float offset, scale;
     public int nullLine;
   }

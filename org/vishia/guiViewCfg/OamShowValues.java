@@ -27,6 +27,7 @@ public class OamShowValues
   
   /**Version and history
    * <ul>
+   * <li>2012-02-25 Hartmut new: CurveView: All data have a short timestamp. 
    * <li>2012-02-21 Hartmut chg Now a curve view can be accessed symbolically.
    * <li>2010-06-00 Hartmut created
    * </ul>
@@ -48,6 +49,13 @@ public class OamShowValues
 	
 	Set<Map.Entry<String, GralWidget>> fieldsToShow;
 	
+	/**The access to received data for the timestamp as milliseconds after a base year.
+	 * It is not null if that variable is contained in the received data description
+	 * See {@link #readVariableCfg()}.
+	 */
+	ByteDataSymbolicAccess.Variable varTimeMilliSecFromBaseyear;
+	
+	long timeMilliSecFromBaseyear;
 	
 	private final float[] valueUserCurves = new float[6];  
 
@@ -73,6 +81,7 @@ public class OamShowValues
 	  } else {
 	  	log.writeError(" variables not access-able from file \"exe/SES_oamVar.cfg\".");
 	  }
+	  varTimeMilliSecFromBaseyear = accessOamVariable.getVariable("time_milliseconds1970");
 	  return nrofVariable >0;
 	}
 	
@@ -96,6 +105,12 @@ public class OamShowValues
 	{
 		accessOamVariable.assignData(binData, nrofBytes, from);
 		dataValid = true;
+		if(varTimeMilliSecFromBaseyear !=null){
+		  //read the time stamp from the record:
+		  timeMilliSecFromBaseyear = varTimeMilliSecFromBaseyear.bytes.getInt(varTimeMilliSecFromBaseyear, 0);
+		} else {
+		  timeMilliSecFromBaseyear = System.currentTimeMillis();
+		}
 		writeValuesOfTab();   //write the values in the current tab, most of them will be received here newly.
 		//TEST TODO:
 		//accessOamVariable.setFloat("ctrl/energyLoadCapac2Diff", checkWithoutNewdata);
@@ -183,7 +198,7 @@ public class OamShowValues
                 line.setValue(value);
                 values[++ixValues] = value;
               }
-              curve.setSample(values);
+              curve.setSample(values, (int)timeMilliSecFromBaseyear);
             } else {
               String sContentInfo = widget.sDataPath;
               if(sContentInfo !=null && sContentInfo.length() >0 && widget.getGraphicWidgetWrapper() !=null){

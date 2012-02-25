@@ -195,7 +195,10 @@ public class GralCfgBuilder
     //
     if(pos.xWidth == Integer.MAX_VALUE)
       stop();
-    
+    if(pos.yPos == 4 && pos.xPos == 56){
+      stop();
+    }
+ 
     final int heightArg;
     if(pos.ySizeDown == Integer.MAX_VALUE){ heightArg = GralPos.useNatSize; }
     else if(pos.ySizeDown < 0 && pos.ySizeFrac !=0) { 
@@ -254,6 +257,7 @@ public class GralCfgBuilder
       if(wText.color0 !=null){ colorValue = gui.getColorValue(wText.color0.color); }
       else if(wText.colorName !=null){ colorValue = gui.getColorValue(wText.colorName.color);}
       else{ colorValue = 0; } //black
+      cfge.widgetType.colorName = null;  //it is used, don't set background.
       widgd = gui.addText(cfge.widgetType.text, wText.size.charAt(0), colorValue);
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgLed){
       GralCfgData.GuiCfgLed ww = (GralCfgData.GuiCfgLed)cfge.widgetType;
@@ -290,7 +294,13 @@ public class GralCfgBuilder
       GralCurveView widgc = gui.addCurveViewY(sName, widgt.nrofPoints, nrofTracks);
       for(GralCfgData.GuiCfgCurveLine line: widgt.lines){
         String sDataPathLine = line.name;
-        widgc.initLine(line.name, sDataPathLine, line.colorValue, 0, line.nullLine, line.scale, line.offset);
+        final GralColor colorLine;
+        if(line.colorName !=null){
+          colorLine = GralColor.getColor(line.colorName.color);
+        } else {
+          colorLine = GralColor.getColor(line.colorValue);  //maybe 0 = black if not given.
+        }
+        widgc.initLine(line.name, sDataPathLine, colorLine, 0, line.nullLine, line.scale, line.offset);
       }
       widgd = widgc;
     } else {

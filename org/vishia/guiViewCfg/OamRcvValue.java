@@ -122,7 +122,12 @@ public class OamRcvValue implements Runnable
 	
 	
 	public void sendRequest()
-	{
+	{    
+	  try{ Thread.sleep(300);} 
+    catch (InterruptedException e)
+    { //dialogZbnfConfigurator.terminate();
+    }
+
 		ipc.send(sendData, 10, targetAddr);
 	}
 	
