@@ -409,6 +409,17 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   }
   
  
+  /**This is the central routine of the widget manager to set any graphical information
+   * in the graphical thread. It is called from {@link #setInfo(GralWidget, int, int, Object, Object)}
+   * immediately if the calling thread is the graphic thread. 
+   * The implementation should be done for the graphic system.
+   * @param widget
+   * @param cmd
+   * @param ident
+   * @param info
+   * @param data
+   * @return
+   */
   protected abstract String setInfoGthread(GralWidget_ifc widget, int cmd, int ident, Object info, Object data);
   
   @Override public String setInfoDelayed(GralWidget_ifc widgd, int cmd, int ident, Object visibleInfo, Object userData, int delay){

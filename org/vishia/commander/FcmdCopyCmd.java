@@ -30,7 +30,9 @@ public class FcmdCopyCmd
 {
   /**Version and History
    * <ul>
-   * <li>2012-02-04 Hartmut new If a file was copied and a comparison result exists, it is set to equal.
+   * <li>2012-02-26 Hartmut chg: Strategy for button texts and abort behavior improved. Problem was: 
+   *   The 'check' phase needs some calculation time for a slow network connection. 
+   * <li>2012-02-04 Hartmut new: If a file was copied and a comparison result exists, it is set to equal.
    *   That helps to handle with comparison.
    * </ul>
    */
@@ -54,7 +56,7 @@ public class FcmdCopyCmd
   GralValueBar widgProgressFile;
   GralValueBar widgProgressAll;
   
-  GralButton widgButtonOk;
+  GralButton widgButtonOk, widgButtonEsc;
   
   /**The file card where the directory content is shown where the files will be copied to, the destination. */
   FcmdFileCard fileCardSrc, fileCardDst;
@@ -68,9 +70,9 @@ public class FcmdCopyCmd
   
   //List<String> listFileSrc;
   
-  final List<Event> listEvCheck = new LinkedList<Event>();
+  final List<FileRemote.Callback> listEvCheck = new LinkedList<FileRemote.Callback>();
   
-  final List<Event> listEvCopy = new LinkedList<Event>();
+  final List<FileRemote.Callback> listEvCopy = new LinkedList<FileRemote.Callback>();
   
   final List<FileRemote> filesToCopy = new LinkedList<FileRemote>();
   
@@ -120,11 +122,11 @@ public class FcmdCopyCmd
     widgdMove.setActionChange(actionSwitchButtonMove);
     
     main.gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
-    main.gralMng.addButton("copyEsc", actionButtonCopy, "esc", null, null, "esc");
-    main.gralMng.setPosition(-4, GralPos.size +1, 7, -11, 0, 'd', 1);
+    widgButtonEsc = main.gralMng.addButton("copyEsc", actionButtonCopy, "esc", null, null, "close");
+    main.gralMng.setPosition(-4, GralPos.size +1, 7, -14, 0, 'd', 1);
     widgProgressFile = main.gralMng.addValueBar("copyProgressFile", null, null);
     widgProgressAll = main.gralMng.addValueBar("copyProgressAll", null, null);
-    main.gralMng.setPosition(-4, GralPos.size+3, -10, -1, 0, 'r');
+    main.gralMng.setPosition(-4, GralPos.size+3, -13, -1, 0, 'r');
     widgButtonOk = main.gralMng.addButton("copyOk", actionButtonCopy, "check", null, null, "check");
   
   }
@@ -150,8 +152,11 @@ public class FcmdCopyCmd
     public boolean userActionGui(int key, GralWidget infos,
         Object... params)
     { //String sSrc, sDstName, sDstDir;
-      if(!widgCopyState.getText().equals("busy")){
+      if(widgButtonOk.sCmd.equals("check")) {
+        //only if it is ready to check, get the files.
         filesToCopy.clear();
+        listEvCheck.clear();
+        listEvCopy.clear();
         FcmdFileCard[] lastFileCards = main.getLastSelectedFileCards();
         fileCardSrc = lastFileCards[0];
         fileCardDst = lastFileCards[1];
@@ -190,11 +195,12 @@ public class FcmdCopyCmd
         widgCopyNameDst.setText(sDstName);
         widgButtonOk.setText("check");
         widgButtonOk.sCmd = "check";
-        widgCopyState.setText("check", 0);
+        widgCopyState.setText("check?", 0);
         widgdMove.setValue(GralPanelMngWorking_ifc.cmdSet, 0, 0);
         zFiles = zBytes = 0;
       }
-      main.gralMng.setWindowsVisible(windConfirmCopy, posWindConfirmCopy);
+      windConfirmCopy.setWindowVisible(true);
+      //main.gralMng.setWindowsVisible(windConfirmCopy, posWindConfirmCopy);
       main.gui.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.");
       return true;
    }  };
@@ -226,14 +232,21 @@ public class FcmdCopyCmd
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
     { if(key == KeyCode.mouse1Up){
         if(widgg.sCmd.equals("check")){
+          widgCopyState.setText("busy-check");
+          widgButtonOk.setText("busy-check");
+          widgButtonOk.sCmd="busy";
+          widgButtonEsc.setText("abort");
+          
           for(FileRemote fileSrc : filesToCopy){
             FileRemote.Callback callback = new FileRemote.Callback(fileSrc, success);
             listEvCheck.add(callback);
             fileSrc.check(callback);   //callback.use() will be called on response
           }
-        }
-        if(widgg.sCmd.equals("copy")){
-          widgCopyState.setText("busy");
+        } else if(widgg.sCmd.equals("copy")) {
+          widgCopyState.setText("busy-copy");
+          widgButtonOk.setText("busy-copy");
+          widgButtonOk.sCmd="busy";
+          widgButtonEsc.setText("abort");
           sDstName = widgCopyNameDst.getText();
           sDstDir = widgCopyDirDst.getText();
           if(!FileSystem.isAbsolutePathOrDrive(sDstDir)) {
@@ -269,7 +282,31 @@ public class FcmdCopyCmd
             }
                   
           }
+        } else if(widgg.sCmd.startsWith("abort")) {
+          filesToCopy.clear();
+          for(Event ev: listEvCheck){
+            //TODO aabort given cmd  
+          }
+          listEvCheck.clear();
+          listEvCopy.clear();
+          widgButtonOk.setText("check");
+          widgButtonOk.sCmd="check";
+            
+        } else if(widgg.sCmd.startsWith("quit")) {
+          widgButtonOk.setText("check");
+          widgButtonOk.sCmd="check";
+            
         } else if(widgg.sCmd.equals("esc")){
+          //it is an abort too!
+          //clears the list.
+          //If some commissions are ordered, it can't be countermanded.
+          //but no reaction should be done. Forgot this state.
+          filesToCopy.clear();
+          listEvCheck.clear();
+          listEvCopy.clear();
+          widgButtonOk.setText("check");
+          widgButtonOk.sCmd="check";
+          widgButtonEsc.setText("close");
           main.gralMng.setWindowsVisible(windConfirmCopy, null); //set it invisible.
         }
       }
@@ -301,17 +338,18 @@ public class FcmdCopyCmd
   
   
   private void eventCheckOk(FileRemote.Callback ev){
-    zBytes += ev.nrofBytesAll;
-    zFiles += ev.nrofFiles;
-    listEvCheck.remove(ev);
-    int nrofPendingFiles = listEvCheck.size();
-    int percent = nrofPendingFiles * 100 / filesToCopy.size();
-    widgProgressAll.setValue(percent, 0, null);
-    if(nrofPendingFiles == 0){
-      //TODO check dst space
-      widgCopyState.setText("files:" + zFiles + ", size:" + zBytes);
-      widgButtonOk.setText("copy");
-      widgButtonOk.sCmd = "copy";
+    if(listEvCheck.remove(ev)){
+      zBytes += ev.nrofBytesAll;
+      zFiles += ev.nrofFiles;
+      int nrofPendingFiles = listEvCheck.size();
+      int percent = nrofPendingFiles * 100 / filesToCopy.size();
+      widgProgressAll.setValue(percent);
+      if(nrofPendingFiles == 0){
+        //TODO check dst space
+        widgCopyState.setText("files:" + zFiles + ", size:" + zBytes);
+        widgButtonOk.setText("copy");
+        widgButtonOk.sCmd = "copy";
+      }
     }
   }
   
@@ -321,7 +359,7 @@ public class FcmdCopyCmd
     listEvCopy.remove(ev);
     int nrofPendingFiles = listEvCopy.size();
     int percent = nrofPendingFiles * 100 / filesToCopy.size();
-    widgProgressAll.setValue(percent, 0, null);
+    widgProgressAll.setValue(percent);
     if(ok){
       File file = (File)ev.getSrc();
       FileCompare.Result cmprResult = fileCardSrc.searchCompareResult(file);
@@ -334,9 +372,16 @@ public class FcmdCopyCmd
       }
     }
     if(nrofPendingFiles == 0){
+      if(!ok){
+        widgCopyState.setText("error");
+        widgButtonOk.setText("quit");
+        widgButtonOk.sCmd="quit";
+      } else {
+        widgButtonOk.setText("check");
+        widgButtonOk.sCmd = "check";
+      }
+      widgButtonEsc.setText("close");
       windConfirmCopy.setWindowVisible(false);      
-      widgButtonOk.setText("check");
-      widgButtonOk.sCmd = "check";
     }
   }
   
@@ -352,8 +397,8 @@ public class FcmdCopyCmd
           eventCheckOk(ev1);
         } break;
         case FileRemoteAccessor.kOperation: {
-          int percent = ev.data2;
-          widgProgressAll.setValue(GralPanelMngWorking_ifc.cmdSet, percent/10, null, null);
+          int percent = ev.data2 / 10;
+          widgProgressAll.setValue(percent);
         }break;
         case FileRemoteAccessor.kFinishError: {
           widgCopyState.setText("error");

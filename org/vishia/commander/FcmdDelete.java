@@ -166,7 +166,7 @@ public class FcmdDelete
       listEvDel.remove(ev);
       int nrofPendingFiles = listEvDel.size();
       int percent = nrofPendingFiles * 100 / listFileDel.size();
-      widgProgress.setValue(percent, 0, null);
+      widgProgress.setValue(percent);
       if(nrofPendingFiles == 0){
         windConfirmDelete.setWindowVisible(false);      
       }

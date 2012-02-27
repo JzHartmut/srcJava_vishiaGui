@@ -140,6 +140,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	/**Version, able to read as hex yyyymmdd.
 	 * Changes:
 	 * <ul>
+	 * <li>2012-01-26 Hartmut chg: prevent some error messages which are unnecessary.
 	 * <li>2012-01-01 Hartmut new: The {@link #setInfoGthread(GralWidget, int, int, Object, Object)} routine
 	 *   uses the {@link SwtSetValue_ifc} capability to associate cmd to types of widgets. Yet used only for {@link SwtSubWindow}.
 	 * <li>2011-12-03 Hartmut new: {@link #setInfoGthread(GralWidget, int, int, Object, Object)} catches
@@ -1267,6 +1268,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     		stop();
     	//check the admissibility:
     	switch(cmd){
+      case 0: checkAdmissibility(false);
     	case GralPanelMngWorking_ifc.cmdInsert: checkAdmissibility(visibleInfo != null && (visibleInfo instanceof String || visibleInfo instanceof String[])); break;
     	}
     	widgetChangeRequExecuter.addRequ(new GralWidgetChangeRequ(descr, cmd, ident, visibleInfo, userData));
@@ -1319,7 +1321,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
         default: done = false;
         }//switch
       }
-      else if(  widget !=null 
+      else if( !done &&  widget !=null 
         && ( swtWidget = (Control)widget.getWidgetImplementation()) !=null
         ){
         //common methods for all swt.Control
