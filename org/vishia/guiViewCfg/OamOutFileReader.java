@@ -1,47 +1,33 @@
 package org.vishia.guiViewCfg;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
-import org.eclipse.swt.widgets.Widget;
+import org.vishia.byteData.ByteDataSymbolicAccessReadConfig;
 import org.vishia.byteData.RawDataAccess;
 import org.vishia.mainCmd.Report;
 import org.vishia.util.FileSystem;
 
-import org.vishia.byteData.ByteDataSymbolicAccess;
-import org.vishia.gral.base.GralPanelActivated_ifc;
-import org.vishia.gral.ifc.GralGridBuild_ifc;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
-import org.vishia.gral.ifc.GralSetValue_ifc;
-import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 
 public class OamOutFileReader 
 {
 	/**Index (fast access) of all variable which are contained in the cfg-file. */
-	private final ByteDataSymbolicAccess accessOamVariable;
+	private final ByteDataSymbolicAccessReadConfig accessOamVariable;
 	
 	/**Associated class which shows the values */
-	private final OamShowValues showValues;
+	//private final OamShowValues showValues;
 	
 	boolean dataValid = false;
 	
-	private final Map<String, String> indexUnknownVariable = new TreeMap<String, String>();
+	//private final Map<String, String> indexUnknownVariable = new TreeMap<String, String>();
 	
 	
 	
 	final Report log;
 
-	private final File fileOam, fileUcell;
+	private final File fileOam;
 	
 	/**To detect whether the file is new. */
 	private long lastTimeFile = 0;
-	
-	/**To detect whether the file is new. */
-	private long lastTimeFileUcell = 0;
 	
 	/**To detect timeout while file waiting. */
 	private long lastTimeAccess = System.currentTimeMillis();
@@ -73,14 +59,13 @@ public class OamOutFileReader
 	, OamShowValues showValues
 	)
 	{ this.log = log;
-		this.showValues = showValues;
-		accessOamVariable = new ByteDataSymbolicAccess(log);
+		//this.showValues = showValues;
+		accessOamVariable = new ByteDataSymbolicAccessReadConfig(log);
 	  dataAccess.assignEmpty(binData);
 		dataAccess.setBigEndian(true);
 		dataAccessUcell.assignEmpty(binDataUcell);
 		dataAccessUcell.setBigEndian(true);
 		fileOam = new File(sFileOamValues);
-		fileUcell = new File(sFileOamUcell);
 	
 	}
 	
@@ -101,7 +86,8 @@ public class OamOutFileReader
 	public void checkData()
 	{
 		long fileTime = fileOam.lastModified();
-		int nrofBytes;
+		@SuppressWarnings("unused")
+    int nrofBytes;
 		if(fileTime != lastTimeFile){
 			lastTimeFile = fileTime;
       if((nrofBytes = FileSystem.readBinFile(fileOam, binData)) >0){

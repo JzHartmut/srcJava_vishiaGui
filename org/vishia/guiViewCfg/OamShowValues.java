@@ -6,7 +6,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.vishia.byteData.RawDataAccess;
+import org.vishia.byteData.ByteDataSymbolicAccessReadConfig;
 import org.vishia.mainCmd.Report;
 
 import org.vishia.byteData.ByteDataSymbolicAccess;
@@ -38,7 +38,7 @@ public class OamShowValues
 	final Report log;
 
 	/**Index (fast access) of all variable which are sent from the automation device (contained in the cfg-file). */
-	protected final ByteDataSymbolicAccess accessOamVariable;
+	protected final ByteDataSymbolicAccessReadConfig accessOamVariable;
 
 	boolean dataValid = false;
 	
@@ -66,7 +66,7 @@ public class OamShowValues
 	{
 		this.log = log;
 		this.guiAccess = guiAccess;
-		accessOamVariable = new ByteDataSymbolicAccess(log);
+		accessOamVariable = new ByteDataSymbolicAccessReadConfig(log);
 		//assign an empty array, it is necessary for local test or without data receive.
 		//elsewhere a null-pointer-exception is thrown if the tab-pane is shown.
 		//If data are received, this empty array isn't referenced any more.
@@ -117,7 +117,8 @@ public class OamShowValues
 		//current panel:
 		Queue<GralWidget> listWidgets = guiAccess.getListCurrWidgets();
 		for(GralWidget widgetInfo : listWidgets){
-			String sName = widgetInfo.name;
+			@SuppressWarnings("unused")
+      String sName = widgetInfo.name;
 		}
 		//read all variables which are necessary to show.
 		//writeCurveValues();   //write values for curve scoping
@@ -132,7 +133,7 @@ public class OamShowValues
 	
 	private void writeField(GralWidget widgetInfo)
 	{ String sName = widgetInfo.name;
-		String sInfo = widgetInfo.sDataPath;
+		//String sInfo = widgetInfo.sDataPath;
 		String sValue;
 		/*int posFormat = sInfo.indexOf('%');
 		final String sPathValue = posFormat <0 ? sInfo : sInfo.substring(0, posFormat);
@@ -177,7 +178,7 @@ public class OamShowValues
 	private void writeValuesOfTab()
 	{ if(dataValid){
   	  ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = guiAccess.getVisiblePanels();
-      GralWidget widgdRemove = null;
+      //GralWidget widgdRemove = null;
       try{
         for(GralVisibleWidgets_ifc panel: listPanels){
           Queue<GralWidget> widgetsVisible = panel.getWidgetsVisible();
@@ -201,7 +202,7 @@ public class OamShowValues
               curve.setSample(values, (int)timeMilliSecFromBaseyear);
             } else {
               String sContentInfo = widget.sDataPath;
-              if(sContentInfo !=null && sContentInfo.length() >0 && widget.getGraphicWidgetWrapper() !=null){
+              if(sContentInfo !=null && sContentInfo.length() >0 && widget !=null){
                 stop();
                 if(!callMethod(widget)){
                   //show value direct
@@ -219,7 +220,7 @@ public class OamShowValues
     if(widgetsInTab != null){
 			for(GralWidget widgetInfo: widgetsInTab){
 				String sContentInfo = widgetInfo.sDataPath;
-				if(sContentInfo !=null && sContentInfo.length() >0 && widgetInfo.getGraphicWidgetWrapper() !=null){
+				if(sContentInfo !=null && sContentInfo.length() >0 && widgetInfo !=null){
 					stop();
 					if(!callMethod(widgetInfo)){
 						//show value direct
@@ -495,7 +496,7 @@ public class OamShowValues
 			variable = (ByteDataSymbolicAccess.Variable)oUserData;
 		}
 		float value = variable.bytes.getFloat(variable, -1);
-		GralWidget_ifc oWidget = widgetInfo.getGraphicWidgetWrapper();
+		GralWidget_ifc oWidget = widgetInfo;
 		if(oWidget instanceof GralSetValue_ifc){
 			GralSetValue_ifc widget = (GralSetValue_ifc) oWidget;
 			widget.setValue(value);
@@ -510,7 +511,7 @@ public class OamShowValues
 		} else {
 			float value = variable.bytes.getFloat(variable, -1);
 			
-			GralWidget_ifc oWidget = widgetInfo.getGraphicWidgetWrapper();
+			GralWidget_ifc oWidget = widgetInfo;
 			if(oWidget instanceof GralValueBar){
 				GralValueBar widget = (GralValueBar) oWidget;
 				String[] sParam;
@@ -524,35 +525,6 @@ public class OamShowValues
 	}
 	
 	
-	/**Only for test. This class isn't a thread's run but the run of this class.
-	 * It is called direct, it is the only one routine of the class.
-	 */
-	private Runnable writeCurveRoutine = new Runnable(){
-		float y1,y2,y3 = 0.02F;
-		final float[] valuesCurve = new float[7];
-		
-		@Override public void run()
-  	{
-			for(int ii=0; ii<1; ii++){
-				//create curve points.
-				
-				y1 += y2/20;
-				y2 += y3;
-				if(y2 >=1){y3 = -0.02F;}
-				else if(y2 <=-1){y3 = 0.02F;}
-				valuesCurve[0] = 220 + 5*y2;
-				valuesCurve[1] = 200 + 10*y2;
-				valuesCurve[2] = 205 + y2;
-				valuesCurve[3] = 180 + y2;
-				valuesCurve[4] = y3;
-				valuesCurve[5] = y3;
-				valuesCurve[6] = y3;
-				guiAccess.setSampleCurveViewY("curves", valuesCurve);
-			}
-  	}
-		
-	};
-
 	
 
 
@@ -587,16 +559,6 @@ public class OamShowValues
     }
   };
 
-	private void writeCurveValues()
-	{
-		valueUserCurves[0] = accessOamVariable.getFloat("way");
-		valueUserCurves[1] = accessOamVariable.getFloat("wway");
-		valueUserCurves[2] = accessOamVariable.getFloat("targetWay");
-		valueUserCurves[3] = accessOamVariable.getFloat("dway");
-		valueUserCurves[4] = accessOamVariable.getFloat("output");
-		//guiAccess.setSampleCurveViewY("userCurves", valueUserCurves);
-		
-	}
 	
 	private void redrawCurveValues()
 	{

@@ -7,43 +7,24 @@
 if test "$JAVA_JDK" = "";  then export JAVA_JDK="/usr/share/JDK"; fi
 
 
-export DST="../../javadocGral"
-export DST_priv="../../javadocGral_priv"
+export DST="../../docuSrcJava_vishiaGUI"
+export DST_priv="../../docuSrcJava_vishiaGUI_priv"
 
-rm -f -r $DST
-rm -f -r $DST_priv
+echo set SRC
+export SRC="-subpackages org.vishia.commander:org.vishia.gral"
+export SRC="$SRC ../org/vishia/guiBzr/*.java"
+export SRC="$SRC ../org/vishia/guiInspc/*.java"
+export SRC="$SRC ../org/vishia/guiViewCfg/*.java"
+export SRC="$SRC ../org/vishia/windows/*.java"
 
-mkdir $DST
-mkdir $DST_priv
+#echo generate docu: $SRC
+echo set SRCpATH
+export SRCPATH="..:../../srcJava_vishiaBase:../../srcJava_vishiaRun:../../srcJava_Zbnf"
 
-export SRC=""
-export SRC="$SRC  ../org/vishia/guiBzr/*.java"
-export SRC="$SRC  ../org/vishia/guiInspc/*.java"
-export SRC="$SRC  ../org/vishia/guiViewCfg/*.java"
-export SRC="$SRC  ../org/vishia/gral/*.java"
-export SRC="$SRC  ../org/vishia/gral/area9/*.java"
-export SRC="$SRC  ../org/vishia/gral/awt/*.java"
-export SRC="$SRC  ../org/vishia/gral/cfg/*.java"
-export SRC="$SRC  ../org/vishia/gral/base/*.java"
-export SRC="$SRC  ../org/vishia/gral/ifc/*.java"
-export SRC="$SRC  ../org/vishia/gral/widget/*.java"
-export SRC="$SRC  ../org/vishia/gral/swt/*.java"
-export SRC="$SRC  ../org/vishia/commander/*.java"
-export SRC="$SRC  ../org/vishia/commander/target/*.java"
-export SRC="$SRC  ../org/vishia/windows/*.java"
+echo set linkpath
+export LINKPATH=""
+export LINKPATH="$LINKPATH -link ../docuSrcJava_Zbnf"
+export LINKPATH="$LINKPATH -link ../docuSrcJava_vishiaBase"
+export LINKPATH="$LINKPATH -link ../docuSrcJava_vishiaRun"
 
-echo generate docu: $SRC
-
-$JAVA_JDK/bin/javadoc -d $DST -linksource -notimestamp $SRC   1>$DST/javadoc.rpt 2>$DST/javadoc.err
-$JAVA_JDK/bin/javadoc -d $DST_priv -private -linksource -notimestamp $SRC   1>$DST_priv/javadoc.rpt 2>$DST_priv/javadoc.err
-
-mkdir $DST/img
-cp -r ../img $DST
-
-mkdir $DST_priv/img
-cp -r ../img $DST_priv
-
-cp stylesheet_javadoc.css $DST/stylesheet.css
-cp stylesheet_javadoc.css $DST_priv/stylesheet.css
-
-echo successfull generated $DST
+../../srcJava_vishiaBase/_make/+genjavadocbase.sh

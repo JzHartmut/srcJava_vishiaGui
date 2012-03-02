@@ -18,8 +18,32 @@ public interface GralTextField_ifc extends GralWidget_ifc
    * <li>2011-09-00 created, universal access to textual kind fields.
    * </ul>
    * 
+   * 
+   * <b>Copyright/Copyleft</b>:<br>
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL is not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but doesn't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you intent to use this source without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public final static int version = 0x20111203;
+  public static final int version = 20120303;
+
   
   /**Set the textual content of the widget. This method is able to call in any thread. 
    * The text may be stored in a queue and applied to the widget in the graphical thread.

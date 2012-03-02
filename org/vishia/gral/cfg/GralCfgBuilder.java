@@ -22,16 +22,33 @@ public class GralCfgBuilder
 
   /**Version and history
    * <ul>
-   * <li>2012-02-22 Hartmut new: Now knows the CurveView
-   * <li>2012-01-17 Hartmut bugfix: If the cfg script contains forex @10,-3.5 it should be a height og 3.5 with bottom line.
-   *   The {@link GralPos#setFinePosition(int, int, int, int, int, int, int, int, int, char, int, int, GralPos)}
-   *   needs a value of -4 for size and 5 for fractional size. 
-   * <li>2012-01-12 Hartmut chg: If no name is given for a widget, it gets the name from panelName/text
-   *   or from panelName/prompt. Before, only text is used. Use the panelName to identify unique.
    * <li>2011-05-00 Hartmut created, the old ZbnfCfg.. class is obsolte now.
    * </ul>
+   *
+   * <b>Copyright/Copyleft</b>:<br>
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL is not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but doesn't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you intent to use this source without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 0x2012012;
+  public static final int version = 20120303;
   
   private final GralCfgData cfgData;
   

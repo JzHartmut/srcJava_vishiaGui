@@ -16,6 +16,7 @@ import org.vishia.mainCmd.MainCmd_ifc;
 
 
 /**This interface supports the usage of a window which is divide into 9 areas. 
+ * License see {@link #version}.
  * The 2 horizontal and 2 vertical separation lines may able to move in the implementation class.
  * In that kind the areas are adjustable in size. Some of the 9 areas in a rectangle can be combined
  * to build a greater area. In that kind a proper user-adequate dividing of the window is possible.
@@ -65,6 +66,29 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc, GralMngApplAdapter
    *     Second approach is the documentation of the concept of the 9 areas in a non-implementing class.
    * <li>All other changes from 2010 and in the past
    * </ul>
+   * 
+   * <b>Copyright/Copyleft</b>:
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL ist not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but don't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you are indent to use this sources without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    */
   final static int version = 0x20111227;
