@@ -22,6 +22,7 @@ import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralHtmlBox;
+import org.vishia.gral.base.GralLed;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralPanelContent;
@@ -317,7 +318,7 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   }
 
   @Override
-  public GralWidget addLed(String sName, String sShowMethod, String sDataPath)
+  public GralLed addLed(String sName, String sShowMethod, String sDataPath)
   {
     // TODO Auto-generated method stub
     return null;

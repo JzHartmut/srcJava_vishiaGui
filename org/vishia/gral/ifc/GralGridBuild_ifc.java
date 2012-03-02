@@ -11,6 +11,7 @@ import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralHtmlBox;
+import org.vishia.gral.base.GralLed;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidgetMng;
@@ -310,7 +311,7 @@ public interface GralGridBuild_ifc
    * @return
    */
   //Object addButton(String sButtonText, int height, int width, String sCmd, String sUserAction, String sName);
-  GralWidget addLed(
+  GralLed addLed(
   	String sName
   , String sShowMethod
   , String sDataPath

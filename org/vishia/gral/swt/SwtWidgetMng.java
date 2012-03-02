@@ -1110,7 +1110,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   }
   
 
-  @Override public GralWidget addLed(
+  @Override public GralLed addLed(
   	String sName
   , String sShowMethod
   , String sDataPath
@@ -1119,7 +1119,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     int ySize = (int)(pos.height());
     int xSize = (int)(pos.width());
 
-    GralWidget widgetInfos = new SwtLed(sName, this);
+    GralLed widgetInfos = new SwtLed(sName, this);
     widgetInfos.setPanelMng(this);
     widgetInfos.sDataPath = sDataPath;
     widgetInfos.setShowMethod(sShowMethod);
