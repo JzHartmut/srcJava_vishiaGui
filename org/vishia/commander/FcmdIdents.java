@@ -5,6 +5,7 @@ import org.vishia.util.KeyCode;
 public class FcmdIdents
 {
   String menuSaveFavoriteSel = "fa&Vors/&Save favorite paths";
+  String menuReadFavoriteSel = "fa&Vors/&Read favorite paths";
   
   String menuDelTab = "fa&Vors/close &tab";
 

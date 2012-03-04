@@ -184,6 +184,7 @@ class FcmdFavorPathSelector
     main.gui.addMenuItemGThread("menuBarCreateFavor", main.idents.menuBarCreateFavor, actionCreateFavor); // /
     main.gui.addMenuItemGThread("menuDelTab", main.idents.menuDelTab, actionDelTab); // /
     main.gui.addMenuItemGThread("menuSaveFavoriteSel", main.idents.menuSaveFavoriteSel, actionSaveFavoritePathes); // /
+    main.gui.addMenuItemGThread("menuReadFavoriteSel", main.idents.menuReadFavoriteSel, actionReadFavoritePathes); // /
 
 
     
@@ -193,20 +194,27 @@ class FcmdFavorPathSelector
     
 
     windAddFavorite.window = main.gralMng.createWindow("addFavoriteWindow", "add favorite", GralWindow.windConcurrently);
-    
+        
     main.gralMng.setPosition(4, GralPos.size -4, 1, GralPos.size +34, 0, 'r');
     windAddFavorite.widgLabel = main.gralMng.addTextField("addFavoriteTab", true, "label", "t");
+    windAddFavorite.widgLabel.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.tab.");
     main.gralMng.setPosition(4, GralPos.size -4, 35, GralPos.size +10, 0, 'r');
     windAddFavorite.widgPersistent = main.gralMng.addTextField("addFavoriteTab", true, "lmr ?", "t");
+    windAddFavorite.widgLabel.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.persist.");
     
     main.gralMng.setPosition(8, GralPos.size -4, 1, GralPos.size +45, 0, 'd');
     windAddFavorite.widgShortName = main.gralMng.addTextField("addFavoriteAlias", true, "alias (show in list)", "t");
+    windAddFavorite.widgShortName.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.alias.");
     windAddFavorite.widgPath = main.gralMng.addTextField("addFavoritePath", true, "the directory path", "t");
+    windAddFavorite.widgPath.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.dir.");
     
     main.gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
     main.gralMng.addButton("addFavoriteEsc", actionAddFavorite, "esc", null, null, "esc");
-    main.gralMng.setPosition(-4, -1, -6, -1, 0, 'r');
-    main.gralMng.addButton("addFavoriteOk", actionAddFavorite, "ok", null, null, "OK");
+    main.gralMng.setPosition(-4, -1, -14, GralPos.size +6, 0, 'r',1);
+    GralWidget widg = main.gralMng.addButton("addFavoriteOk", actionAddFavorite, "temp", null, null, "temp");
+    widg.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.temp.");
+    widg = main.gralMng.addButton("addFavoriteOk", actionAddFavorite, "ok", null, null, "Save");
+    widg.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.save.");
   
   }
   
@@ -540,7 +548,7 @@ class FcmdFavorPathSelector
   GralUserAction actionAddFavorite = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { if(key == KeyCode.mouse1Up){
-        if(infos.sCmd.equals("ok")){
+        if(infos.sCmd.equals("ok") || infos.sCmd.equals("temp")){
           String path = windAddFavorite.widgPath.getText();
           String selectName = windAddFavorite.widgShortName.getText();
           FavorPath favorite = new FavorPath(selectName, path);
@@ -560,6 +568,10 @@ class FcmdFavorPathSelector
           }
           tabDst.listfavorPaths.add(favorite);
           windAddFavorite.panelInvocation.fillCards();
+          ///
+          if(infos.sCmd.equals("ok")){
+            writeCfg(fileCfg);
+          }
         }
         main.gralMng.setWindowsVisible(windAddFavorite.window, null); //set it invisible.
       }
@@ -573,6 +585,16 @@ class FcmdFavorPathSelector
   GralUserAction actionSaveFavoritePathes = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { writeCfg(fileCfg);
+      return true;
+  } };
+  
+  
+  GralUserAction actionReadFavoritePathes = new GralUserAction()
+  { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
+      readCfg(fileCfg);
+      panelLeft.fillCards();
+      panelMid.fillCards();
+      panelRight.fillCards();
       return true;
   } };
   
