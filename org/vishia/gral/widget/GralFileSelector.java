@@ -43,8 +43,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   
-  /**Version and History:
+  /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2012-03-09 new {@link #kColFilename} etc. 
    * <li>2012-02-14 corr: Anytime a file was selected as current, it was added in the {@link #indexSelection}.
    *   Not only if the directory was changed. It is necessary for refresh to select the current file again.
    * <li>2011-12-11 chg: If the directory is empty, show --empty-- because the table should not be empty.
@@ -60,8 +61,31 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * <li>2011-09-28 new: {@link #getCurrentDir()}
    * <li>2011-08-14 created. Firstly used for the Java commander. But it is a universal file select widget.
    * </ul>
+   * 
+   * <b>Copyright/Copyleft</b>:<br>
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL is not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but doesn't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you intent to use this source without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 0x20111002;
+  public static final int version = 20120309;
   
   FileRemoteAccessor localFileAccessor = FileRemoteAccessorLocalFile.getInstance();
   
@@ -263,6 +287,37 @@ public class GralFileSelector implements Removeable //extends GralWidget
   } //selectList implementation
   
   
+  /**Number of columns of the table. */
+  public static final int zColumns = 4;
+  
+  /**Column which contains the designation of entry.
+   * <ul>
+   * <li>"/" a directory
+   * <li>">" a linked directory (unix systems, symbolic link)
+   * <li>" " space, normal file
+   * <li>"*" a linked file
+   * <li>"#" comparison result: there are differences
+   * <li>"+" comparison result: contains more
+   * <li>"-" comparison result: contains less
+   * 
+   * </ul>
+   */
+  public static final int kColDesignation = 0;
+  
+  /**Column which contains the filename. The column contains either the name of the file
+   * or ".." or "--unknown--".
+   */
+  public static final int kColFilename = 1;
+  
+  /**Column which contains the length of file
+   */
+  public static final int kColLength = 2;
+  
+  /**Column which contains the time stamp
+   */
+  public static final int kColDate = 3;
+  
+  
   
   /**The implementation of SelectList. */
   protected FileSelectList selectList;
@@ -454,11 +509,11 @@ public class GralFileSelector implements Removeable //extends GralWidget
       }
       int lineCt = 0; //count lines to select the line number with equal sFileSelect.
       if(dir.getParent() !=null){
-        String[] line = new String[4];
-        line[0] = "<";
-        line[1] = "..";
-        line[2] = "";
-        line[3] = "";
+        String[] line = new String[zColumns];
+        line[kColDesignation] = "<";
+        line[kColFilename] = "..";
+        line[kColLength] = "";
+        line[kColDate] = "";
         selectList.wdgdTable.insertLine("..", -1, line, dir);
         //selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, dir);
         lineCt +=1;
@@ -466,7 +521,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       //The file or directory which was the current one while this directory was shown lastly:
       String sFileCurrentline = indexSelection.get(sCurrentDir);
       for(Map.Entry<String, File> entry: sortFiles.entrySet()){
-        String[] line = new String[4];
+        String[] line = new String[zColumns];
         File file = entry.getValue();
         if(sFileCurrentline != null && file.getName().equals(sFileCurrentline)){
           lineSelect = lineCt;
@@ -475,10 +530,10 @@ public class GralFileSelector implements Removeable //extends GralWidget
           line[0] =  file.isDirectory() ? ">" : "s"; 
         }
         else if(file.isDirectory()){ line[0] = "/"; }
-        else { line[0] = " ";}
-        line[1] = file.getName();
+        else { line[kColDesignation] = " ";}
+        line[kColFilename] = file.getName();
         Date timestamp = new Date(file.lastModified());
-        line[3] = dateFormat.format(timestamp);
+        line[kColDate] = dateFormat.format(timestamp);
         /*
         GralTableLine_ifc tLine = selectList.wdgdTable.insertLine(null, lineCt);
         tLine.setCellText(line[0], 0);
@@ -495,19 +550,19 @@ public class GralFileSelector implements Removeable //extends GralWidget
       }
       if(lineCt ==0){
         //special case: no files:
-        String[] line = new String[4];
-        line[0] = "";
-        line[1] = "--empty--";
-        line[3] = "";
+        String[] line = new String[zColumns];
+        line[kColDesignation] = "";
+        line[kColFilename] = "--empty--";
+        line[kColDate] = "";
         selectList.wdgdTable.insertLine(null, -1, line, null);
         lineCt +=1;
       }
     } else {
       //faulty directory
-      String[] line = new String[4];
-      line[0] = "";
-      line[1] = "--not found--";
-      line[3] = "";
+      String[] line = new String[zColumns];
+      line[kColDesignation] = "";
+      line[kColFilename] = "--not found--";
+      line[kColDate] = "";
       selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, currentDir);
     }
     selectList.wdgdTable.setCurrentCell(lineSelect, 1);

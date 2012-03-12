@@ -154,7 +154,7 @@ public class AwtButton extends GralButton
           //it isn't initalize
           colorOff = GralColor.getColor("wh");  //white background
         }
-        GralColor colorgback = switchedOn && colorOn != null ? colorOn : colorOff;
+        GralColor colorgback = switchState == kOn && colorOn != null ? colorOn : colorOff;
         
         Color colorBack = (Color)getMng().getColorImpl(colorgback);
         setBackground(colorBack);
@@ -164,8 +164,8 @@ public class AwtButton extends GralButton
         gc.setFont(fontText);
         //FontData fontData = mng.propertiesGui.stdButtonFont.getFontData();
         //fontData.
-        final String sButtonText = switchedOn && sButtonTextOn != null ? sButtonTextOn : sButtonTextOff;
-        if(isActivated){
+        final String sButtonText = switchState == kOn && sButtonTextOn != null ? sButtonTextOn : sButtonTextOff;
+        if(isPressed){
           //gc.setLineWidth(3);
           gc.drawRect(1,1,dim.width-2, dim.height-2);
           //gc.setLineStyle(SWT.LINE_DOT);

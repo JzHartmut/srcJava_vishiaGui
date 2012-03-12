@@ -1110,6 +1110,37 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   }
   
 
+  
+  public GralButton addCheckButton(
+    String sName
+  , String sButtonTextOn
+  , String sButtonTextOff
+  , String sButtonTextDisabled
+  , GralColor colorOn
+  , GralColor colorOff
+  , GralColor colorDisabled
+  )
+  {
+    int ySize = (int)pos.height();
+    int xSize = (int)pos.width();
+    
+    char size = ySize > 3? 'B' : 'A';
+    SwtButton widgButton = new SwtButton(sName, this, (Composite)pos.panel.getPanelImpl(), 0, size);
+    widgButton.setSwitchMode(colorOff, colorOn, colorDisabled);
+    widgButton.setSwitchMode(sButtonTextOff, sButtonTextOn, sButtonTextDisabled);
+    widgButton.setPanelMng(this);
+    if(sName !=null){ registerWidget(widgButton); }
+    return widgButton;
+  }
+
+  
+  
+
+  
+  
+  
+  
+  
   @Override public GralLed addLed(
   	String sName
   , String sShowMethod

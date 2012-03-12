@@ -13,6 +13,7 @@ import java.util.Map;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -29,11 +30,35 @@ import org.vishia.util.StringPart;
 class FcmdFavorPathSelector
 {
 
-  /**Version and History:
+  /**Version, history and license:
    * <ul>
+   * <li>2012-03-09 Hartmut new menu entry menuBarFolderSync
    * <li>2012-02-04 Hartmut new menu entries for refresh and origin dir
    * </ul>
    * 
+   * 
+   * <b>Copyright/Copyleft</b>:
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL ist not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but don't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you are intent to use this sources without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   public static final int version = 0x20120204;
   
@@ -128,6 +153,9 @@ class FcmdFavorPathSelector
   /**The last selected SelectInfo. */
   FavorPath actFavorPathInfo;
 
+  boolean bSyncMidRight;
+  
+  
   static class WindowConfirmAddFavorite
   {
     /**The window for confirming adding a new favorite. */
@@ -172,6 +200,7 @@ class FcmdFavorPathSelector
     main.gui.addMenuItemGThread("menuFileNaviRefresh", main.idents.menuFileNaviRefreshBar, actionRefreshFileTable); // /
     main.gui.addMenuItemGThread("menubarFolderCreate", main.idents.menuConfirmMkdirFileBar, main.mkCmd.actionOpenDialog); // /
     main.gui.addMenuItemGThread("menubarFolderSearch", main.idents.menuBarSearchFiles, actionSearchFiles); // /
+    main.gui.addMenuItemGThread("menuBarFolderSyncMidRight", main.idents.menuBarFolderSyncMidRight, actionSyncMidRight); // /
     main.gui.addMenuItemGThread("menubarFileProps", main.idents.menuFilePropsBar, main.filePropsCmd.actionOpenDialog);
     main.gui.addMenuItemGThread("test", main.idents.menuFileViewBar, main.viewCmd.actionOpenView);
     main.gui.addMenuItemGThread("test", main.idents.menuFileEditBar, main.actionEdit);
@@ -455,6 +484,23 @@ class FcmdFavorPathSelector
       if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
         FcmdFileCard fileCard = main.lastFavorCard.fileTable;
         windSearchFiles.confirmSearchInFiles(fileCard, main.gui.getOutputBox());
+      }
+      return true;
+  } };
+
+  
+  
+  GralUserAction actionSyncMidRight = new GralUserAction(){
+    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){
+      if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
+        bSyncMidRight = ! bSyncMidRight;
+        if(bSyncMidRight){
+          main.statusLine.widgSyncInfo.setBackgroundColor(GralColor.getColor("gn"));
+          main.statusLine.widgSyncInfo.setText("sync mid-right");
+        } else {
+          main.statusLine.widgSyncInfo.setBackgroundColor(GralColor.getColor("wh"));
+          main.statusLine.widgSyncInfo.setText("");
+        }
       }
       return true;
   } };

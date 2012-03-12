@@ -14,10 +14,15 @@ public class FcmdIdents
   String menuContextCreateFavor = "new Favor [cB]";
   int keyCreateFavor = KeyCode.ctrl + 'b';
   
-  
+  String menuContextShowBackslash = "backslash\\path (Windows)";
+  String menuContextShowSlash = "slash path (compatible)";
   
   
   String menuFileNaviOriginDirBar = "fol&Der/set &Origin dir [c<]";
+  
+  String menuBarFolderSyncMidRight = "fol&Der/s&Ync mid - right";
+  
+
   
   String menuFileNaviOriginDirContext = "set Origin dir [c<]";
   
@@ -56,6 +61,27 @@ public class FcmdIdents
   String buttonFileProps = "F2:props";
 
   int keyFileProps = KeyCode.F2;
+  
+  final String buttonFilePropsChg = "change file";
+
+  final String buttonFilePropsChanging = "changing ...";
+
+  final String buttonFilePropsCopying = "copying ...";
+
+  final String buttonFilePropsRetry = "retry";
+
+  final String buttonFilePropsAbort = "abort change";
+
+  final String buttonFilePropsOk = "done";
+
+  final String buttonFilePropsCopy = "copy file";
+
+  final String buttonFilePropsChgRecurisve = "change recursive";
+
+  final String buttonFilePropsGetAll = "get all properties";
+
+  final String buttonFilePropsCntLen = "count length all files in dir";
+
 
   
   String menuFileViewBar = "&File/&View [F3]";

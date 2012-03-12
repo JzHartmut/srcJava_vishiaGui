@@ -79,6 +79,8 @@ public interface GralGridBuild_ifc
   
   /**The version of this interface:
    * <ul>
+   * <li>2012-03-10 Hartmut chg: Rename this class to GralMngBuild_ifc
+   * <li>2012-03-09 Hartmut new: {@link #addCheckButton(String, String, String, String, GralColor, GralColor, GralColor)}
    * <li>2012-02-11 Hartmut new: {@link #setContextMenu(GralWidget, GralMenu)}. 
    * <li>2011-11-16 Hartmut new: {@link #addText(String)} simple with standards.
    * <li>2011-11-17 Hartmut chg: {@link #createWindow(String, String, int)} now not only exclusive or not
@@ -98,10 +100,6 @@ public interface GralGridBuild_ifc
    *     The {@link #createWindow(int, int, int, int, VariableContainer_ifc)} with absolute coordinates
    *     may be deprecated. (Is it necessary to create a window outside the own borders? )             
    * <li>All other changes in 2010
-   * </ul>
-  /**Version, history and license.
-   * <ul>
-   * <li>2011-06-00 Hartmut created
    * </ul>
    * 
    * <b>Copyright/Copyleft</b>:<br>
@@ -323,12 +321,44 @@ public interface GralGridBuild_ifc
   
   
   
+  /**Adds a button which is switching on or off. The state is shown with 2 colors and 2 different texts
+   * inside the button. The state is able to retrieve calling {@link GralButton#isOn()} 
+   * or {@link GralButton#getValue()}.
+   * @param sName
+   * @param sButtonText0
+   * @param sButtonText1
+   * @param color0
+   * @param color1
+   * @return
+   */
   public GralButton addSwitchButton(
     String sName
-  , String sButtonText0
-  , String sButtonText1
-  , GralColor color0
-  , GralColor color1
+  , String sButtonTextOff
+  , String sButtonTextOn
+  , GralColor colorOff
+  , GralColor colorOn
+  );
+  
+  
+  
+  /**Adds a button which is switching on or off. The state is shown with 2 colors and 2 different texts
+   * inside the button. The state is able to retrieve calling {@link GralButton#isOn()} 
+   * or {@link GralButton#getValue()}.
+   * @param sName
+   * @param sButtonText0
+   * @param sButtonText1
+   * @param color0
+   * @param color1
+   * @return
+   */
+  public GralButton addCheckButton(
+    String sName
+  , String sButtonTextOn
+  , String sButtonTextOff
+  , String sButtonTextDisabled
+  , GralColor colorOn
+  , GralColor colorOff
+  , GralColor colorDisabled
   );
   
   
@@ -395,6 +425,7 @@ public interface GralGridBuild_ifc
    * @param size size, 'A' is small ...'E' is large.
    * @param color The color as RGB-value in 3 Byte. 0xffffff is white, 0xff0000 is red.
    * @return
+   * @deprecated
    */
   GralWidget addText(String sText, char size, int color);
  

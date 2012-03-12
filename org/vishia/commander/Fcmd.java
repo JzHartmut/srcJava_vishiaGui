@@ -33,6 +33,41 @@ import org.vishia.util.KeyCode;
 public class Fcmd extends GuiCfg
 {
 
+
+  /**Version, history and license.
+   * <ul>
+   * <li>1011-2012 some changes, see source files.
+   * <li>2011-10-00 Hartmut created
+   * </ul>
+   * 
+   * <b>Copyright/Copyleft</b>:<br>
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL is not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but doesn't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you intent to use this source without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   */
+  public static final int version = 20120312;
+
+  /**Version visible in about info */
+  public static final String sVersion = "Version 1.01 - 2012-03-12";
+  
   static class CallingArgs extends GuiCallingArgs
   {
     File fileCfgCmds;
@@ -56,7 +91,7 @@ public class Fcmd extends GuiCfg
 
   final FcmdButtons fButtons = new FcmdButtons(this);
   
-  GralTextField widgFileInfo, widgFilePath, widgRunInfo;
+  final FcmdStatusLine statusLine = new FcmdStatusLine(this);
   
   final String nameTextFieldInfo = "file-info";
   
@@ -257,18 +292,18 @@ public class Fcmd extends GuiCfg
     Appendable writeStatusCmd = new Appendable(){
 
       @Override public Appendable append(CharSequence csq) throws IOException
-      { widgRunInfo.setText(csq);
+      { statusLine.widgRunInfo.setText(csq);
         return this;
       }
 
       @Override public Appendable append(char c) throws IOException
-      { if(c == '\0') widgRunInfo.setText(" ");
-        else widgRunInfo.setText("" + c);
+      { if(c == '\0') statusLine.widgRunInfo.setText(" ");
+        else statusLine.widgRunInfo.setText("" + c);
         return this;
       }
 
       @Override public Appendable append(CharSequence csq, int start, int end) throws IOException
-      { widgRunInfo.setText(csq.subSequence(start, end));
+      { statusLine.widgRunInfo.setText(csq.subSequence(start, end));
         return null;
       }
       
@@ -400,15 +435,18 @@ public class Fcmd extends GuiCfg
    * line interface and the graphical frame. The mainly functionality is
    * contained in the super class.
    */
-  private static class MainCmd extends GralArea9MainCmd
+  private static class FcmdMainCmd extends GralArea9MainCmd
   {
 
     private final CallingArgs cargs;
 
-    public MainCmd(CallingArgs cargs, String[] args)
+    public FcmdMainCmd(CallingArgs cargs, String[] args)
     {
       super(cargs, args);
       this.cargs = cargs;
+      super.addAboutInfo("The.file.Commander");
+      super.addAboutInfo("made by Hartmut Schorrig, www.vishia.org, hartmut.schorrig@vishia.de");
+      super.addAboutInfo(sVersion);
     }
 
     @Override protected boolean testArgument(String arg, int nArg)
@@ -522,7 +560,7 @@ public class Fcmd extends GuiCfg
     CallingArgs cargs = new CallingArgs();
     // Initializes the GUI till a output window to show information.
     // Uses the commonly GuiMainCmd class because here are not extra arguments.
-    GralArea9MainCmd cmdgui = new MainCmd(cargs, args); // implements MainCmd, parses
+    GralArea9MainCmd cmdgui = new FcmdMainCmd(cargs, args); // implements MainCmd, parses
                                                   // calling arguments
     bOk = cmdgui.parseArgumentsAndInitGraphic("The.file.Commander", "2A2C");
 
@@ -652,7 +690,8 @@ public class Fcmd extends GuiCfg
           if(lastSelected.length >0){
             files[0] = lastSelected[0];
           }
-          executer.cmdQueue.addCmd(cmdBlock, files, null); // to execute.
+          File currentDir = files[0].getParentFile();
+          executer.cmdQueue.addCmd(cmdBlock, files, currentDir); // to execute.
         }
       }
       return true;

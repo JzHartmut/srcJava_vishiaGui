@@ -17,8 +17,9 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 public abstract class GralWindow extends GralPanelContent implements GralWindow_ifc
 {
 
-  /**Version and history:
+  /**Version, history and license.
    * <ul>
+   * <li>2012-03-13 Hartmut chg: Some abstract method declarations moved to its interface.
    * <li>2011-12-31 Hartmut chg: Implements the set-methods of {@link GralWindow_ifc} in form of calling
    *   {@link GralPanelMngWorking_ifc#setInfo(GralWidget, int, int, Object, Object)}. This methods
    *   can be called in any thread, it may be stored using 
@@ -66,7 +67,7 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
    * 
    */
   @SuppressWarnings("hiding")
-  public static final int version = 0x20111127;
+  public static final int version = 20120310;
   
   /**Or of some wind... constants.
    */
@@ -74,6 +75,8 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
   
   /**See {@link GralWindow_ifc#setResizeAction(GralUserAction)}. */
   protected GralUserAction resizeAction;
+  
+  protected GralUserAction invisibleSetAction;  
   
   /**See {@link GralWindow_ifc#setMouseAction(GralUserAction)}. */
   protected GralUserAction mouseAction;
@@ -85,29 +88,14 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
     super( nameWindow, mng, panelComposite);
     this.windProps = windProps;
   }
+
   
-  /**Sets an action which is invoked if the whole window is resized by user handling on the window borders.
-   * @param action The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called
-   *   without parameter.
-   */
-  public abstract void setResizeAction(GralUserAction action);
   
-  /**Sets an action which is invoked if any mouse button is pressed in the windows area on the screen.
-   * @param action The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called
-   *   with parameter key: The mouse key. params[0]: Instance of {@link GralRectangle} with mouse coordinates.
-   */
-  abstract public void setMouseAction(GralUserAction action);
-  
-  /**Adds any menu item
-   * @param name name of the menu, it is used as widget name.
-   * @param sMenuPath Menu position. Use slash as separator, use & for hot key.
-   *   For example "&edit/&search/co&ntinue" creates a menu 'edit' or uses the existing one in the top level (menu bar),
-   *   then creates the search menu item as pull down in menu bar, and then 'continue' with 'n' as hot key as sub-menu. 
-   *   It is stored in {@link GralWidget#sDataPath}  
-   * @param action called on menu activation.
-   */
-  abstract public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction action);
-  
+  @Override public void setActionOnSettingInvisible(GralUserAction action)
+  { invisibleSetAction = action;
+  }
+
+
   
   @Override public void setWindowVisible(boolean visible){
     itsMng.setInfo(this, GralPanelMngWorking_ifc.cmdSetWindowVisible, visible? 1: 0, null, null);

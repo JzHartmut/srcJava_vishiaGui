@@ -287,8 +287,24 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
 
 
-  @Override
-  public GralCurveView addCurveViewY(String sName, int nrofXvalues, int nrofTracks)
+  public GralButton addCheckButton(
+    String sName
+  , String sButtonTextOn
+  , String sButtonTextOff
+  , String sButtonTextDisabled
+  , GralColor colorOn
+  , GralColor colorOff
+  , GralColor colorDisabled
+  )
+  {
+    return null;  
+  }
+
+  
+  
+  
+  
+  @Override public GralCurveView addCurveViewY(String sName, int nrofXvalues, int nrofTracks)
   {
     // TODO Auto-generated method stub
     return null;

@@ -27,7 +27,7 @@ public class SwtWidgetHelper
   public final static int version = 0x20111119;
   
   
-  private final SwtWidgetMng mng;
+  private static SwtWidgetMng mng;
   
   
   public SwtWidgetHelper(SwtWidgetMng mng)
@@ -42,10 +42,10 @@ public class SwtWidgetHelper
   }
   
   
-  public Color getColor(GralColor color){ return mng.propertiesGuiSwt.colorSwt(color); }
+  public static Color getColor(GralColor color){ return mng.propertiesGuiSwt.colorSwt(color); }
   
   public static GralColor setBackgroundColor(GralColor color, Control swtWidget)
-  { Color colorSwt = (Color)color.colorGuimpl;
+  { Color colorSwt = getColor(color);
     Color colorSwtOld = swtWidget.getBackground();
     swtWidget.setBackground(colorSwt);
     return getColor(colorSwtOld);
@@ -53,7 +53,8 @@ public class SwtWidgetHelper
 
   
   public static GralColor setForegroundColor(GralColor color, Control swtWidget)
-  { Color colorSwt = (Color)color.colorGuimpl;
+  { 
+    Color colorSwt = (Color)color.colorGuimpl;
     Color colorSwtOld = swtWidget.getForeground();
     swtWidget.setForeground(colorSwt);
     return getColor(colorSwtOld);

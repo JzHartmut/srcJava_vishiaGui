@@ -293,6 +293,7 @@ public class FcmdCopyCmd
           widgButtonOk.sCmd="check";
             
         } else if(widgg.sCmd.startsWith("quit")) {
+          filesToCopy.clear();
           widgButtonOk.setText("check");
           widgButtonOk.sCmd="check";
             

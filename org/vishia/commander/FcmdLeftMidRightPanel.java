@@ -65,7 +65,13 @@ public class FcmdLeftMidRightPanel
   /**Characteristic number for the panel: 1, 2, 3 */
   final char cNr;
   
+  /**Index of panel 0, 1, 2. */
   final int ixMainPanel;
+  
+  
+  /**The order number of the panel in order of usage.
+   * 1 = actual focused panel, 2 = last focused, 3 = third focused, 0 = no file panel. */
+  int orderMainPanel;
   
   //final int[] widthSelecttableMain = new int[]{6, 20, 30};
 

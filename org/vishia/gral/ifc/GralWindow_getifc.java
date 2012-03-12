@@ -1,5 +1,10 @@
 package org.vishia.gral.ifc;
 
+/**Interface to get the status of a Window. It is a part of {@link GralWindow_ifc}.
+ * See {@link org.vishia.gral.base.GralWindow}.
+ * @author Hartmut Schorrig
+ *
+ */
 public interface GralWindow_getifc
 {
 

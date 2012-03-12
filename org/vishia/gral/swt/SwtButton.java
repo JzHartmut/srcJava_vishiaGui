@@ -16,6 +16,37 @@ import org.vishia.gral.ifc.GralColor;
 
 public class SwtButton extends GralButton
 {
+  /**The version of this interface:
+   * <ul>
+   * <li>2012-03-09 Hartmut new 3-state-Button.
+   * <li>2012-03-09 Hartmut improved: appearance of the buttons.
+   * <li>All other changes in 2010, 2011
+   * </ul>
+   * 
+   * <b>Copyright/Copyleft</b>:<br>
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL is not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but doesn't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you intent to use this source without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   */
+  public static final int version = 20120309;
 
   Canvas widgetSwt;
   
@@ -38,8 +69,8 @@ public class SwtButton extends GralButton
       default: throw new IllegalArgumentException("param size must be A or B");
       }
       //Control xx = mng.pos.panel.panelComposite;
-      black = mng.propertiesGuiSwt.colorSwt(0);
-      white = mng.propertiesGuiSwt.colorSwt(0xffffff);
+      black = mng.propertiesGuiSwt.colorSwt(0x202020);
+      white = mng.propertiesGuiSwt.colorSwt(0xefefff);
       widgetSwt = new SwtButtonImpl(parent, styleSwt);
       widgetSwt.setData(this);
       widgetSwt.setBackground(mng.propertiesGuiSwt.colorBackground);
@@ -156,7 +187,18 @@ public class SwtButton extends GralButton
           //it isn't initalize
           colorOff = GralColor.getColor("wh");  //white background
         }
-        GralColor colorgback = switchedOn && colorOn != null ? colorOn : colorOff;
+        final String sButtonText;
+        final GralColor colorgback;
+        if(switchState == kOn){ 
+          sButtonText = sButtonTextOn != null ? sButtonTextOn : sButtonTextOff;
+          colorgback = colorOn !=null ? colorOn: colorOff;
+        } else if(switchState == kDisabled){ 
+          sButtonText = sButtonTextDisabled;
+          colorgback = colorDisabled;
+        } else { 
+          sButtonText = sButtonTextOff;
+          colorgback = colorOff;
+        }
         
         Color colorBack = (Color)getMng().getColorImpl(colorgback);
         gc.setBackground(colorBack);
@@ -166,33 +208,79 @@ public class SwtButton extends GralButton
         gc.setFont(fontText);
         //FontData fontData = mng.propertiesGui.stdButtonFont.getFontData();
         //fontData.
-        final String sButtonText = switchedOn && sButtonTextOn != null ? sButtonTextOn : sButtonTextOff;
-        if(isActivated){
-          gc.setLineWidth(3);
-          gc.drawRectangle(1,1,dim.width-2, dim.height-2);
-          gc.setLineStyle(SWT.LINE_DOT);
-          gc.drawRectangle(3,3,dim.width-6, dim.height-6);
-        } else {
-          gc.setLineWidth(1);
-          gc.setForeground(colorBack);
-          gc.fillRectangle(2,2,dim.width-6, dim.height-6);
-          gc.setForeground(black);
-          gc.drawRectangle(1,1,dim.width-5, dim.height-5);
-          gc.setForeground(white); 
-          gc.setLineWidth(3);
-          gc.drawLine(0, dim.height-2,dim.width, dim.height-2);
-          gc.drawLine(dim.width-1, 0, dim.width-1, dim.height);
-        }
+        gc.setForeground(colorBack);
+        gc.fillRectangle(1,1,dim.width-1, dim.height-1);
+        int ypText;
         if(sButtonText !=null){
           FontMetrics fontMetrics = gc.getFontMetrics();
           int charWidth = fontMetrics.getAverageCharWidth();
           int halfWidthButtonText = charWidth * sButtonText.length() /2;
           int xText = dim.width / 2 - halfWidthButtonText;
           if(xText < 2){ xText = 2; }
-          int halfHeightButtonText = fontMetrics.getHeight() /2;
+          ypText = fontMetrics.getHeight();
+          int halfHeightButtonText = ypText /2;
           int yText = dim.height / 2 - halfHeightButtonText;
           gc.setForeground(black);
           gc.drawString(sButtonText, xText, yText);
+        } else {
+          ypText = 0;
+        }
+        if(isPressed){
+          /*
+          gc.setLineWidth(3);
+          gc.drawRectangle(1,1,dim.width-2, dim.height-2);
+          gc.setLineStyle(SWT.LINE_DOT);
+          gc.drawRectangle(3,3,dim.width-6, dim.height-6);
+          */
+          if(ypText < dim.height -4){
+            //normal button
+            gc.setForeground(black);
+            gc.setLineWidth(3);
+            gc.drawRectangle(0,0,dim.width-1, dim.height-1);
+            gc.setForeground(white); 
+            gc.setLineWidth(1);
+            gc.drawLine(2, dim.height-2,dim.width-1, dim.height-2);
+            gc.drawLine(1, dim.height-1,dim.width-1, dim.height-1);
+            gc.drawLine(0, dim.height-0,dim.width-1, dim.height-0);
+            gc.drawLine(dim.width-2, 0, dim.width-2, dim.height-1);
+            gc.drawLine(dim.width-1, 0, dim.width-1, dim.height-1);
+            gc.drawLine(dim.width-0, 0, dim.width-0, dim.height-1);
+          } else {
+            //small button
+            gc.setLineWidth(1);
+            gc.setForeground(black);
+            gc.setLineWidth(1);
+            gc.drawRectangle(0,0,dim.width-1, dim.height-1);
+            gc.setForeground(white); 
+            gc.setLineWidth(1);
+            gc.drawLine(0, dim.height-1,dim.width-1, dim.height-1);
+            gc.drawLine(dim.width-1, 0, dim.width-1, dim.height-1);
+          }
+        } else {
+          if(ypText < dim.height -4){
+            //normal button
+            gc.setForeground(white);
+            gc.setLineWidth(3);
+            gc.drawRectangle(0,0,dim.width-1, dim.height-1);
+            gc.setForeground(black); 
+            gc.setLineWidth(1);
+            gc.drawLine(2, dim.height-2,dim.width-1, dim.height-2);
+            gc.drawLine(1, dim.height-1,dim.width-1, dim.height-1);
+            gc.drawLine(0, dim.height-0,dim.width-1, dim.height-0);
+            gc.drawLine(dim.width-2, 0, dim.width-2, dim.height-1);
+            gc.drawLine(dim.width-1, 0, dim.width-1, dim.height-1);
+            gc.drawLine(dim.width-0, 0, dim.width-0, dim.height-1);
+          } else {
+            //small button
+            gc.setLineWidth(1);
+            gc.setForeground(white);
+            gc.setLineWidth(1);
+            gc.drawRectangle(0,0,dim.width-1, dim.height-1);
+            gc.setForeground(black); 
+            gc.setLineWidth(1);
+            gc.drawLine(0, dim.height-1,dim.width-1, dim.height-1);
+            gc.drawLine(dim.width-1, 0, dim.width-1, dim.height-1);
+          }
         }
       }
     };

@@ -24,6 +24,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   /**Version and history
    * <ul>
+   * <li>2012-03-09 Hartmut bugfix: The {@link #idxLine} was not cleared if the table was cleared.
    * <li>2012-02-19 Hartmut new: mouseWheel and double click
    * <li>2012-01-30 Hartmut new: {@link #setColorCurrLine(GralColor)}
    * <li>2012-01-15 Hartmut new: {@link #setCurrentLine(String)}, {@link #insertLine(String, int, String[], Object)}:
@@ -70,7 +71,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    *    modified sources likewise under this LGPL Lesser General Public License.
    *    You mustn't delete this Copyright/Copyleft inscription in this source file.
    * </ol>
-   * If you are indent to use this sources without publishing its usage, you can get
+   * If you are intent to use this sources without publishing its usage, you can get
    * a second license subscribing a special contract with the author. 
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
@@ -249,6 +250,10 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     else return null;
   }
 
+  
+  
+  
+  
   @Override
   public boolean setCurrentCell(int line, int column) {
     if(line < -1 || line > zLine-1){ line = zLine -1; }
@@ -282,7 +287,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   @Override
   public GralTableLine_ifc getLine(String key) {
     // TODO Auto-generated method stub
-    return null;
+    return idxLine.get(key);
   }
 
   @Override public GralTableLine_ifc insertLine(String key, int row, String[] cellTexts, Object userData) {
@@ -321,6 +326,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     tableLines.clear();
     ixLineNew = ixLine = -1;
     ixGlineSelectedNew = -1;  //deselects ixGlineSelected on redraw!
+    idxLine.clear();
     repaint(200,200);
   }
 

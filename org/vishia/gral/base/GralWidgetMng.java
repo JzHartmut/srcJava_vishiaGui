@@ -56,6 +56,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
 {
   /**Changes:
    * <ul>
+   * <li>2012-03-10 Hartmut chg: {@link #addText(String)} now uses the background color {@link GralGridProperties#colorBackground_}.
    * <li>2012-01-14 Hartmut chg: {@link #registerWidget(GralWidget)}: uses {@link GralPanelContent#addWidget(GralWidget, boolean)}.
    * <li>2012-01-14 Hartmut new {@link #getValueFromWidget(GralWidget)} implementing here for non-platform depending values, especially GralTable.
    * <li>2011-12-26 Hartmut new {@link #setApplicationAdapter(GralMngApplAdapter_ifc)} to support context sensitive help by focusGained of widgets.
@@ -94,7 +95,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
    *    modified sources likewise under this LGPL Lesser General Public License.
    *    You mustn't delete this Copyright/Copyleft inscription in this source file.
    * </ol>
-   * If you are indent to use this sources without publishing its usage, you can get
+   * If you are intent to use this sources without publishing its usage, you can get
    * a second license subscribing a special contract with the author. 
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
@@ -896,10 +897,13 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   
   /**Adds a text to the current panel at given position with standard colors, left origin.
    * The size of text is calculated using the height of positioning values.
+   * see also {@link #addText(String, int, GralColor, GralColor)},
+   * {@link #addTextField(String, boolean, String, String)}
    * @param text
    */
   @Override public GralWidget addText(String text)
-  { return addText(text, 0, GralColor.getColor("bk"), GralColor.getColor("wh"));
+  { //return addText(text, 0, GralColor.getColor("bk"), GralColor.getColor("wh"));
+    return addText(text, 0, GralColor.getColor("bk"), propertiesGui.colorBackground_);
   }
   
   

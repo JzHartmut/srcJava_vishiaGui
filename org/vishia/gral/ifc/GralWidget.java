@@ -477,6 +477,11 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 	}
 
 	
+	/**Gets the context menu to add a menu item. If this widget hasn't a gral context menu, then an empty menu
+	 * is assigned and that is returned. It calls {@link GralWidgetMng#addContextMenu(GralWidget)} and uses
+	 * the element {@link #contextMenu}.
+	 * @return the context menu root for this widget.
+	 */
 	public GralMenu getContextMenu(){
 	  if(contextMenu == null){
 	    contextMenu = itsMng.addContextMenu(this);   //delegation, the widget mng knows the implementation platform.

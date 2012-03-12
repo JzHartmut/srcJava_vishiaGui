@@ -3,10 +3,17 @@ package org.vishia.gral.ifc;
 import org.vishia.gral.base.GralWindow_setifc;
 
 
+/**Interface to a Gral Window. In SWT ist is named as 'shell'. An application can have more as one window.
+ * The base classes {@link org.vishia.gral.base.GralWindow} is the base of implementation.
+ * This interface contains the get and set access-interfaces (the base ones)
+ * and contains the build-method-definition for windows.
+ */
 public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc 
 {
   /**Version, history and license.
    * <ul>
+   * <li>2012-03-13 Hartmut chg: This interface should be used for building the window. Therefore
+   *   all building methods should be contained here. Gotten from implementors. 
    * <li>2011-06-00 Hartmut created
    * </ul>
    * 
@@ -51,6 +58,36 @@ public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc
   public static final int windOnTop =  1 << 14;
   
   public static final int windHasMenu =  1 << 31;
+  
+  
+  /**Sets an action which is invoked if the whole window is resized by user handling on the window borders.
+   * @param action The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called
+   *   without parameter.
+   */
+  public abstract void setResizeAction(GralUserAction action);
+  
+  /**Sets an action which is invoked if any mouse button is pressed in the windows area on the screen.
+   * @param action The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called
+   *   with parameter key: The mouse key. params[0]: Instance of {@link GralRectangle} with mouse coordinates.
+   */
+  abstract public void setMouseAction(GralUserAction action);
+  
+  /**Adds any menu item
+   * @param name name of the menu, it is used as widget name.
+   * @param sMenuPath Menu position. Use slash as separator, use & for hot key.
+   *   For example "&edit/&search/co&ntinue" creates a menu 'edit' or uses the existing one in the top level (menu bar),
+   *   then creates the search menu item as pull down in menu bar, and then 'continue' with 'n' as hot key as sub-menu. 
+   *   It is stored in {@link GralWidget#sDataPath}  
+   * @param action called on menu activation.
+   */
+  abstract public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction action);
+  
+  /**Sets an action which is invoked if the window is set invisible.
+   * @param action The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called
+   *   without parameter.
+   */
+  public abstract void setActionOnSettingInvisible(GralUserAction action);
+  
   
 
 }

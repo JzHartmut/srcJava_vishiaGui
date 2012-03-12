@@ -7,12 +7,14 @@ import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTextBox;
+import org.vishia.gral.base.GralWindow_setifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralGridBuild_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.ifc.GralWindow_getifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
 
@@ -20,7 +22,7 @@ import org.vishia.gral.ifc.GralTextBox_ifc;
  * @author Hartmut Schorrig
  *
  */
-public class GralInfoBox implements GralTextBox_ifc, GralWindow_ifc
+public class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, GralWindow_getifc
 {
 
   /**The window is created invoking the {@link GralGridBuild_ifc#createWindow(String, boolean)}. 

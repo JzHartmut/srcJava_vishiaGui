@@ -2,6 +2,7 @@ package org.vishia.gral.ifc;
 
 import java.io.File;
 
+import org.vishia.gral.base.GralWindow_setifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 
 
@@ -10,10 +11,12 @@ import org.vishia.mainCmd.MainCmd_ifc;
  * @author Hartmut Schorrig
  *
  */
-public interface GralPrimaryWindow_ifc extends GralWindow_ifc //, GralWindowMng_ifc
+public interface GralPrimaryWindow_ifc extends GralWindow_setifc, GralWindow_getifc //, GralWindowMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2012-03-10 Hartmut chg Now the both GralWindow_set- and -getifc are base,
+   *   The GralWindow_ifc is independent of this.
    * <li>2011-06-00 Hartmut created
    * </ul>
    * 

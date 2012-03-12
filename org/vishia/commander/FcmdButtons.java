@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.KeyCode;
@@ -102,17 +103,8 @@ public class FcmdButtons
     Iterator<Map.Entry<String, ButtonAction>> iterButtonAction = idxButtons.entrySet().iterator();
     
     main.gralMng.selectPanel("Buttons");
-    main.gralMng.setPosition(0, 2, 0, 0, 1, 'r');
-    main.widgFilePath = main.gralMng.addTextField(main.nameTextFieldFilePath, false, null, null);
-    main.widgFilePath.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.pathCurr.");
-    main.widgFilePath.setDragEnable(main.actionDragFileFromStatusLine, KeyCode.dragFiles);
-    main.gralMng.setPosition(2, 4, 0, 9.8f, 1, 'r');
-    main.widgRunInfo = main.gralMng.addTextField(main.nameTextFieldRunInfo, false, null, null);
-    main.widgRunInfo.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.pathCurr.");
-    main.gralMng.setPosition(2, 4, 10, 0, 1, 'r');
-    main.widgFileInfo = main.gralMng.addTextField(main.nameTextFieldInfo, false, null, null);
-    main.widgFileInfo.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.pathCurr.");
-
+    main.statusLine.buildGraphic();
+    
     main.gralMng.setPosition(4, GralPos.size + 1, 10, 20, 1, 'r');
     main.gralMng.addText("F1", 'A', 0x0);
     main.gralMng.addText("F2", 'A', 0x0);
@@ -148,5 +140,5 @@ public class FcmdButtons
     }
   }
 
-
+  
 }

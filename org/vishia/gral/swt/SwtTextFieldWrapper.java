@@ -27,6 +27,40 @@ import org.vishia.gral.ifc.GralWidget;
 
 public class SwtTextFieldWrapper extends GralTextField
 {
+  /**Version, history and license.
+   * <ul>
+   * <li>2012-03-10 Hartmut chg: Minor for top-level prompt.
+   * <li>2011-06-00 Hartmut creation
+   * </ul>
+   * 
+   * <b>Copyright/Copyleft</b>:
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL is not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but doesn't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you intent to use this source without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   * 
+   * 
+   */
+  @SuppressWarnings("hiding")
+  public static final int version = 20120310;
+  
   protected Text textFieldSwt;
   
   /**A possible prompt for the text field or null. */
@@ -75,9 +109,13 @@ public class SwtTextFieldWrapper extends GralTextField
           if(ySize <= 2.5){ //it is very small for top-prompt:
             yPosPrompt = 1.0f;  //no more less than 1/2 normal line. 
             heightPrompt = 1.0f;
-            heightText = ySize - 0.7f;
+            heightText = ySize - 0.7f;  //max. 1.8
             if(heightText < 1.0f){ heightText = 1.0f; }
-          } else if(ySize <=4.0){ //it is normally
+          } else if(ySize <=3.3){ //it is normally 2.5..4
+            heightPrompt = ySize - 2.0f + 0.5f;   //1 to 1.8
+            yPosPrompt = ySize - heightPrompt - 0.1f;  //no more less than 1/2 normal line. 
+            heightText = 2.0f;
+          } else if(ySize <=4.0){ //it is normally 2.5..4
             heightPrompt = ySize - 2.0f + (4.0f - ySize) * 0.5f; 
             if(heightPrompt < 1.0f){ heightPrompt = 1.0f; }
             yPosPrompt = ySize - heightPrompt + 0.2f;  //no more less than 1/2 normal line. 

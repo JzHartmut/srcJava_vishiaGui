@@ -30,14 +30,41 @@ import org.vishia.util.KeyCode;
  */
 public class FcmdFileCard extends GralFileSelector
 {
-  /**Version and History
+  /**Version, history and license
    * <ul>
+   * <li>2012-03-09 Hartmut new: Now the synchronization between 2 panels works independent of
+   *   the comparison with a improved algorithm. 
    * <li>2012-02-04 Hartmut new: {@link #searchCompareResult(File)} supports working with
    *   comparison result, used to set equal if a file was copied.
    * </ul>
    * 
+   * 
+   * <b>Copyright/Copyleft</b>:
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL ist not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but don't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you are intent to use this sources without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   * 
+   * 
    */
-  public static final int version = 0x20120204;
+  public static final int version = 0x20120309;
   
   /**Table widget for the select table of the file tab.*/
   FcmdFavorCard favorCard;
@@ -84,8 +111,6 @@ public class FcmdFileCard extends GralFileSelector
   
   String sLocalpath, sLocaldir;
   
-  
-  final DateFormat formatDateInfo = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss");
   
   /**Creates the cards with tabs for the files and for the favorite paths.
    * This ctor will be called in the graphic thread. Therefore it can initialize the graphic 
@@ -294,48 +319,95 @@ public class FcmdFileCard extends GralFileSelector
    * will be selected (key up, down, mouse click etc.).
    * The routine writes infos about the file and may synchronize with another file card.
    * @param file The currently selected file.
+   * @param sFileName Text in the cell, especially ".." for the parent dir entry.
    */
-  private void actionOnFileSelection(FileRemote file){
+  private void actionOnFileSelection(FileRemote file, String sFileName){
     //note the file, able to use for some actions.
     currentFile = file;
     main.currentFile = file;
     main.selectedFiles123[mainPanel.ixMainPanel] = file;
-    //note the file card in order of usage.
-    main.lastFavorCard = favorCard;
-    mainPanel.actFileCard = this;
-    long lastModified = file.lastModified();
-    String sDate = formatDateInfo.format(new Date(lastModified));
-    String sLenShort = //String.format("", file.length)
-      file.length() >= 1000000 ? String.format("%2.1f MByte", file.length()/1000000.0) :
-      file.length() >=    1000 ? String.format("%2.1f kByte", file.length()/1000.0) :
-      String.format("%3d Byte", file.length());  
-    String info = sDate + " = " + lastModified + ", length= " + sLenShort;        
-    main.widgFileInfo.setText(info);
-    String sPath = file.getAbsolutePath();
-    main.widgFilePath.setText(sPath);
-    boolean bSync = main.filesCp.widgSyncWalk.isOn()
-      && sDirSync !=null && sPath.length() >= zDirSync;
-    if(bSync){
-      sLocalpath = sPath.substring(zDirSync);
-      String sDir = getCurrentDirPath();
-      bSync = sDir.length() >= zDirSync;
-      if(bSync){
-        sLocaldir = sDir.substring(zDirSync);
-        String sDirOtherSet = otherFileCardtoSync.sDirSync + sLocaldir;
-        String sDirOtherAct = otherFileCardtoSync.getCurrentDirPath();
-        if(!sDirOtherSet.equals(sDirOtherAct)){
-          //bSync = false;
-          otherFileCardtoSync.fillIn(new FileRemote(sDirOtherSet));
+    
+    if(mainPanel.orderMainPanel == 1){
+      //only if it is the focused panel:
+      //note the file card in order of usage.
+      
+      main.lastFavorCard = favorCard;
+      mainPanel.actFileCard = this;
+      main.statusLine.setFileInfo(file);
+      
+      String sPath = file.getAbsolutePath();
+      if(main.favorPathSelector.bSyncMidRight){
+        syncWithSecondPanel(sFileName);
+      } else {
+        boolean bSync = main.filesCp.widgSyncWalk.isOn()
+          && sDirSync !=null && sPath.length() >= zDirSync;
+        if(bSync){
+          sLocalpath = sPath.substring(zDirSync);
+          String sDir = getCurrentDirPath();
+          bSync = sDir.length() >= zDirSync;
+          if(bSync){
+            sLocaldir = sDir.substring(zDirSync);
+            String sDirOtherSet = otherFileCardtoSync.sDirSync + sLocaldir;
+            String sDirOtherAct = otherFileCardtoSync.getCurrentDirPath();
+            if(!sDirOtherSet.equals(sDirOtherAct)){
+              //bSync = false;
+              otherFileCardtoSync.fillIn(new FileRemote(sDirOtherSet));
+            }
+            String fileName = file.getName();
+            if(fileName.endsWith(".~1~")){
+              fileName = fileName.substring(0, fileName.length() -4);
+            }
+            otherFileCardtoSync.selectFile(fileName);
+          }
         }
-        String fileName = file.getName();
-        if(fileName.endsWith(".~1~")){
-          fileName = fileName.substring(0, fileName.length() -4);
-        }
-        otherFileCardtoSync.selectFile(fileName);
       }
     }
   }
   
+  
+  
+  void syncWithSecondPanel(String sFileName){
+    //String fileName = currentFile.getName();
+    System.out.println("FcmdFileCard " + mainPanel.cc + ":" + sFileName);
+    FcmdFileCard otherFileCard;
+    if(mainPanel.cc == 'm'){ otherFileCard = main.favorPathSelector.panelRight.actFileCard; }
+    else { otherFileCard = main.favorPathSelector.panelMid.actFileCard;  }
+    if(otherFileCard !=null){
+      String sDirName = getCurrentDir().getName();
+      //check whether the other file card contains a entry with this directory name
+      GralTableLine_ifc line = otherFileCard.selectList.wdgdTable.getLine(sDirName);
+      if(line !=null){
+        File dir = (File)line.getUserData();
+        otherFileCard.fillIn(dir);    //use that directory.
+      }
+      boolean bSameFile = otherFileCard.selectFile(sFileName);  //".." also
+      if(!bSameFile){
+        //check whether the file is a directory and it is the directory of the other panel:
+        boolean bToRoot = false;
+        if(currentFile.isDirectory()){
+          File otherDir = otherFileCard.getCurrentDir();
+          if(otherDir != null){
+            String sDirPath = otherDir.getName();
+            if(bToRoot = sDirPath.equals(sFileName)){
+              //the directory of other is the current selected dir of this:
+              File otherParent = otherDir.getParentFile();
+              otherFileCard.fillIn(otherParent);
+              otherFileCard.selectFile(sFileName);
+            }
+          }
+        }
+        if(!bToRoot){
+          //check whether a sub dir is selected:
+          String sOtherSelectedFile = otherFileCard.currentFile.getName();
+          if(sOtherSelectedFile.equals(sDirName)){
+            otherFileCard.fillIn(otherFileCard.currentFile);
+            otherFileCard.selectFile(sFileName);
+          }
+        }
+      }
+    }
+    
+  }
   
   
   
@@ -357,6 +429,9 @@ public class FcmdFileCard extends GralFileSelector
     for(FcmdLeftMidRightPanel panel: main.lastFilePanels){
       if(panel.actFileCard !=null){
         panel.actFileCard.selectList.wdgdTable.setColorCurrLine(colorSelectFocused123[++ixMainPanel]);
+        panel.orderMainPanel = ixMainPanel +1;
+      } else {
+        panel.orderMainPanel = 0; //not used.
       }
     }
   }
@@ -367,11 +442,18 @@ public class FcmdFileCard extends GralFileSelector
   /**Action to show the file properties in the info line. This action is called anytime if a line
    * was changed in the file view table. */
   GralUserAction actionOnFileSelection = new GralUserAction(){
+    /**The action called from {@link GralTable}.
+     * @param params [0] is the Table line. The content of table cells are known here,
+     *   because it is the file table itself. The {@link GralTableLine_ifc#getUserData()}
+     *   returns the {@link FileRemote} file Object.
+     * @see org.vishia.gral.ifc.GralUserAction#userActionGui(int, org.vishia.gral.ifc.GralWidget, java.lang.Object[])
+     */
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
       GralTableLine_ifc line = (GralTableLine_ifc) params[0];
+      String sFileCell = line.getCellText(GralFileSelector.kColFilename);
       Object oData = line.getUserData();
       if(oData instanceof FileRemote){
-        actionOnFileSelection((FileRemote)oData);
+        actionOnFileSelection((FileRemote)oData, sFileCell);
       }
       return true;
     }

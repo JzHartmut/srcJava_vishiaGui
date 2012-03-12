@@ -22,7 +22,38 @@ import org.vishia.util.KeyCode;
  */
 public class SwtGralMouseListener
 {
-  
+  /**Version, History and copyright
+   * <ul>
+   * <li>2012-03-09 Hartmut The methods {@link GralMouseWidgetAction_ifc#mouse1Up()} etc. are not called
+   *   if the cursor was removed from the widget.
+   * </ul>
+   * 
+   * <b>Copyright/Copyleft</b>:<br>
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL is not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but doesn't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you intent to use this source without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   */
+  public static final int version = 20120309;
+
+
   /**This class implements a MouseListener which does not call a user method.
    * Only the information about the clicked widget are stored in the GralMng
    * and the Gral designer is supported.
@@ -221,32 +252,32 @@ public class SwtGralMouseListener
         Control widget = (Control)e.widget;
         widget.removeMouseMoveListener(mouseMoveListener);
         isPressed = false;
-        if(mouseWidgetAction !=null){
-          switch(e.button){ 
-            case 1: mouseWidgetAction.mouse1Up(); break;
-            case 2: mouseWidgetAction.mouse2Up(); break;
-          }  
-        }
         backgroundWhilePressed = null;
         GralWidget widgg = (GralWidget)widget.getData();
         GralWidgetMng guiMng = widgg.getMng();
         try{ 
+          int dx = e.x - xMousePress, dy = e.y - yMousePress;
+          final int keyCode;
+          int moved = (dx < 10 && dx > -10 && dy < 10 && dy > -10) ? 0: 100;
+          switch(e.button + moved){ 
+            case   1: keyCode = KeyCode.mouse1Up; break; 
+            case 101: keyCode = KeyCode.mouse1UpMoved; break; 
+            case   2: keyCode = KeyCode.mouse2Up; break;
+            case 102: keyCode = KeyCode.mouse2UpMoved; break;
+            case   3: keyCode = KeyCode.mouse3Up; break;
+            case 103: keyCode = KeyCode.mouse3Up; break;
+            default: keyCode = KeyCode.mouse3Up; break;  //other key
+          }
+          //TODO add capture ctrl, alt, sh 
+          if(mouseWidgetAction !=null){
+            switch(e.button + moved){ 
+              case 1: mouseWidgetAction.mouse1Up(); break;
+              case 2: mouseWidgetAction.mouse2Up(); break;
+            }  
+          }
           GralUserAction action = widgg ==null ? null : widgg.getActionChange();
           if(action !=null){
-            int dx = e.x - xMousePress, dy = e.y - yMousePress;
-            final int keyCode;
-            int moved = (dx < 10 && dx > -10 && dy < 10 && dy > -10) ? 0: 100;
-            switch(e.button + moved){ 
-              case   1: keyCode = KeyCode.mouse1Up; break; 
-              case 101: keyCode = KeyCode.mouse1UpMoved; break; 
-              case   2: keyCode = KeyCode.mouse2Up; break;
-              case 102: keyCode = KeyCode.mouse2UpMoved; break;
-              case   3: keyCode = KeyCode.mouse3Up; break;
-              case 103: keyCode = KeyCode.mouse3Up; break;
-              default: keyCode = KeyCode.mouse3Up; break;  //other key
-            }
-            //TODO add capture ctrl, alt, sh 
-            action.userActionGui(keyCode, widgg);
+              action.userActionGui(keyCode, widgg);
           }
         } catch(Exception exc){ guiMng.writeLog(0, exc); }
         widgg.repaint();
