@@ -29,6 +29,7 @@ public class SwtTextFieldWrapper extends GralTextField
 {
   /**Version, history and license.
    * <ul>
+   * <li>2012-03-17 Hartmut bugfix: adjustment of prompt for top prompt
    * <li>2012-03-10 Hartmut chg: Minor for top-level prompt.
    * <li>2011-06-00 Hartmut creation
    * </ul>
@@ -59,7 +60,7 @@ public class SwtTextFieldWrapper extends GralTextField
    * 
    */
   @SuppressWarnings("hiding")
-  public static final int version = 20120310;
+  public static final int version = 20120317;
   
   protected Text textFieldSwt;
   
@@ -99,7 +100,8 @@ public class SwtTextFieldWrapper extends GralTextField
       char sizeFontPrompt;
       GralRectangle boundsAll, boundsPrompt, boundsField;
       final GralPos posPrompt = new GralPos(), posField = new GralPos();
-      boundsAll = mng.calcWidgetPosAndSize(this.pos, 800, 600, 100, 20);
+
+      //boundsAll = mng.calcWidgetPosAndSize(this.pos, 800, 600, 100, 20);
       float ySize = pos.height();
       //float xSize = pos.width();
       //posPrompt from top, 
@@ -132,19 +134,21 @@ public class SwtTextFieldWrapper extends GralTextField
         //} break;
       //}
       promptFont = mng.propertiesGuiSwt.getTextFontSwt(heightPrompt, GralFont.typeSansSerif, GralFont.styleNormal); //.smallPromptFont;
-      boundsPrompt = mng.calcWidgetPosAndSize(posPrompt, boundsAll.dx, boundsAll.dy, 10,100);
-      boundsField = mng.calcWidgetPosAndSize(posField, boundsAll.dx, boundsAll.dy, 10,100);
+      //boundsPrompt = mng.calcWidgetPosAndSize(posPrompt, boundsAll.dx, boundsAll.dy, 10,100);
+      //boundsField = mng.calcWidgetPosAndSize(posField, boundsAll.dx, boundsAll.dy, 10,100);
       promptSwt = new SwtTransparentLabel(panelSwt, SWT.TRANSPARENT);
       promptSwt.setFont(promptFont);
       promptSwt.setText(prompt);
       promptSwt.setBackground(null);
       Point promptSize = promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+      boundsPrompt = mng.calcWidgetPosAndSizeSwt(posPrompt, promptSwt, 10,100);
       if(promptSize.x > boundsPrompt.dx){
         boundsPrompt.dx = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
       }
-      textFieldSwt =  new Text(panelSwt, SWT.SINGLE);
-      textFieldSwt.setBounds(boundsField.x, boundsField.y, boundsField.dx, boundsField.dy);
       promptSwt.setBounds(boundsPrompt.x, boundsPrompt.y, boundsPrompt.dx, boundsPrompt.dy+1);
+      textFieldSwt =  new Text(panelSwt, SWT.SINGLE);
+      mng.setPosAndSizeSwt(posField,textFieldSwt, 800, 600);
+      //textFieldSwt.setBounds(boundsField.x, boundsField.y, boundsField.dx, boundsField.dy);
       
     } else {
       //without prompt

@@ -12,11 +12,12 @@ public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2012-03-16 Hartmut new: {@value #windResizeable} defined and supported in SWT-implementation.
    * <li>2012-03-13 Hartmut chg: This interface should be used for building the window. Therefore
    *   all building methods should be contained here. Gotten from implementors. 
    * <li>2011-06-00 Hartmut created
    * </ul>
-   * 
+   * <br><br>
    * <b>Copyright/Copyleft</b>:<br>
    * For this source the LGPL Lesser General Public License,
    * published by the Free Software Foundation is valid.
@@ -40,8 +41,15 @@ public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120303;
+  public static final int version = 20120317;
 
+  
+  
+  
+  /**Property defines that the window is able to resize
+   */
+  public static final int windResizeable = 1<<4;
+  
   /**Property defines that the window is opened exclusive for the application. 
    * It means that the primary window is not accessible if this window is opened.
    * It is 'application modal'. 

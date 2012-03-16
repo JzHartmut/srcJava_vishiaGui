@@ -43,7 +43,6 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.gral.swt.SwtMenu;
 import org.vishia.gral.widget.GralCurveView;
 import org.vishia.gral.widget.GralValueBar;
 import org.vishia.msgDispatch.LogMessage;
@@ -617,6 +616,37 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
        
   }
   
+
+  
+  /**Calculates the bounds of a widget with a given pos independent of this {@link #pos}.
+   * This method is a part of the implementing GralMng because the GralPos is not implemented for
+   * any underlying graphic system and the {@link #propertiesGuiSwt} are used.
+   * It is possible to tune the bounds after calculation, for example to enhance the width if a text
+   * is larger then the intended position. 
+   * @param pos The position.
+   * @param widthwidgetNat The natural size of the component.
+   * @param heigthWidgetNat The natural size of the component.
+   * @return A rectangle with position and size.
+   */
+  @Override public GralRectangle calcWidgetPosAndSize(GralPos pos, int widthwidgetNat, int heigthWidgetNat){
+    Component parentComp = (Component)pos.panel.getPanelImpl();
+    //Rectangle pos;
+    final GralRectangle rectangle;
+    final Rectangle parentSize;
+    if(parentComp == null){
+      parentSize = new Rectangle(0,0,800, 600);
+    /*
+    } else if(parentComp instanceof Shell) {
+      parentSize = ((Shell)parentComp).getClientArea();
+    */
+    } else {
+      parentSize = parentComp.getBounds();
+    }
+    return pos.calcWidgetPosAndSize(propertiesGui, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+  }
+  
+  
+
 
 
   void stop(){}

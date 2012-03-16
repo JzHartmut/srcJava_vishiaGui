@@ -13,8 +13,9 @@ import org.vishia.gral.ifc.GralWidget;
 public abstract class GralCurveView extends GralWidget
 {
   
-  /**Version and history
+  /**Version, history and license.
    * <ul>
+   * <li>2012-03-17 Hartmut chg: All track-associated data now in the {@link Track} inner class.
    * <li>2012-02-25 Hartmut new: All data have a short timestamp. The x-pixel are calculated with timestamp,
    *   not only with currently storage.
    * <li>2012-02-25 Hartmut new: Zoom functinality with timestamp and cursors
@@ -24,8 +25,32 @@ public abstract class GralCurveView extends GralWidget
    *   was not use nevermore. But the CurveView was not adapted for that.
    * <li>2010-03-00 Hartmut The curve view was development as basic feature.
    * </ul>
+   * <br><br>
+   * <b>Copyright/Copyleft</b>:
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL is not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but doesn't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you intent to use this source without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   * 
    */
-  public final static int version = 0x20120225;
+  public final static int version = 20120317;
   
   /**The describing and the actual data of one track (one curve)
    */
@@ -39,10 +64,34 @@ public abstract class GralCurveView extends GralWidget
     
     public float actValue;
     
-    float min, max;
+    public float min, max;
+    
+    /**The scale for 10 percent of view without zoom.. */
+    public float yScale;
+    
+    /**The value of input data which is shown at the 0-line. */
+    public float yOffset;
+    
+    //public float yFactor;
+    
+    /**The percent from 0..100 where the 0-line is presented. */
+    public float y0Line;
+    
+    /**The color of the line. */
+    public GralColor lineColor;
+    
+    //public float y0Pix;
     
     /**Array stores the last values which are able to show. */
     public float[] values;
+    
+    
+    /**last values for paint. 
+     * The current paint goes from lastValueY[1] to the current point.
+     * The lastValueY[0] is used to repaint the last curve peace while shifting draw content.
+     */
+    protected final int[] XXXlastValueY = new int[2];
+
     
     /**The value from last draw, do not calculate twice. */
     public int ypixLast;
@@ -68,14 +117,14 @@ public abstract class GralCurveView extends GralWidget
     }
   }
   
-  protected Track[] lines;
+  protected Track[] tracks;
   
   
   /**All tracks. */
-  protected final List<Track> listLines = new LinkedList<Track>();
+  protected final List<Track> listTracks = new LinkedList<Track>();
   
   /**All tracks to return for filling. */
-  protected final List<GralSetValue_ifc> listLinesSet = new LinkedList<GralSetValue_ifc>();
+  protected final List<GralSetValue_ifc> listTrackSet = new LinkedList<GralSetValue_ifc>();
   
   /**A short timestamp for the values in {@link GralCurveView.Track#values}.
    * It maybe a millisecond timestamp. Then about 2000000 seconds are able to display.
@@ -92,39 +141,11 @@ public abstract class GralCurveView extends GralWidget
   
   //protected final float[][] values;
   
-  /**The percent from 0..100 where the 0-line is presented. */
-  protected final int[] y0Line;
-  
-  /**The pixel value for y0Line refered to pixel-height. */
-  protected final float[] y0Pix;
-  
-  
-  
-  /**The value of input data which is shown at the 0-line. */
-  protected final float[] yOffset;
-  
-  /**The factor to multiply for 1 pixel. for 10 percent.. */
-  protected final float[] yFactor;
-  
-  /**The scale for 10 percent of view without zoom.. */
-  protected final float[] yScale;
-
-  /**last values for paint. 
-   * The current paint goes from lastValueY[track][1] to the current point.
-   * The lastValueY[track][0] is used to repaint the last curve peace while shifting draw content.
-   */
-  protected final int[][] lastValueY;
-  
   /**last x-positions for paint. 
    * The lastPositionX[0] is used to repaint the last curve peace while shifting draw content.
    * Where, xShift (number of shifted pixel) is considered by subtraction.
    */
   protected final int[] lastPositionX = new int[2];
-  
-  /**The last index to data, to detect grid line. */
-  //protected int iDataLast;
-  
-  protected final GralColor[] lineColorsGral;
   
   /**Deepness of the storage of values to present.
    * It is a power of 2 anytime.
@@ -294,32 +315,18 @@ public abstract class GralCurveView extends GralWidget
     this.ixDataWr = -adIxData; //initial write position, first increment to 0.
     //
     this.nrofValuesShow = 0;
-    lines = new Track[nrofTracks];
+    tracks = new Track[nrofTracks];
     timeValues = new int[maxNrofXValues];
     //values = new float[maxNrofXvalues][nrofTracks];
-    y0Line = new int[nrofTracks];
-    y0Pix = new float[nrofTracks];
-    yOffset = new float[nrofTracks];
-    yFactor = new float[nrofTracks];
-    yScale = new float[nrofTracks];
-    lastValueY = new int[nrofTracks][2];
-    lineColorsGral = new GralColor[nrofTracks];
     setPanelMng(mng);
     mng.registerWidget(this);
-    for(int iTrack=0; iTrack < nrofTracks; ++iTrack){
-      y0Line[iTrack] = (iTrack+1) * (100 / (nrofTracks+1));
-      yOffset[iTrack] = 0.0F;
-      yScale[iTrack] = 10.0F;
-      //yFactor[iTrack] = yPixel / 10.0F / yScale[iTrack];
-      //lineColors[iTrack] = defaultColor;
-    }
   }
 
   
-  /**Initializes a line of the curve view.
-   * This routine should be called after construction, only one time per line
-   * in the order of lines.
-   * @param sNameLine
+  /**Initializes a track of the curve view.
+   * This routine should be called after construction, only one time per track
+   * in the order of tracks.
+   * @param sNameTrack
    * @param sDataPath
    * @param colorValue
    * @param style
@@ -327,7 +334,7 @@ public abstract class GralCurveView extends GralWidget
    * @param scale
    * @param offset
    */
-  abstract public void initLine(String sNameLine, String sDataPath, GralColor color, int style
+  abstract public void initTrack(String sNameTrack, String sDataPath, GralColor color, int style
       , int nullLine, float scale, float offset);
 
   
@@ -344,7 +351,7 @@ public abstract class GralCurveView extends GralWidget
   /**This list describes the data paths in that order, which should be regard
    * calling {@link #setSample(float[])}.
    */
-  public List<GralSetValue_ifc> getLines(){ return listLinesSet; }
+  public List<GralSetValue_ifc> getTracks(){ return listTrackSet; }
   
   
   /**Adds a sampling value set.

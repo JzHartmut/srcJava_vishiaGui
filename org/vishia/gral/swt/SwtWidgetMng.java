@@ -137,9 +137,10 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 {
   private static final long serialVersionUID = -2547814076794969689L;
 
-	/**Version, able to read as hex yyyymmdd.
+	/**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
 	 * Changes:
 	 * <ul>
+	 * <li>2012-03-17 Hartmut chg: some changes for {@link #setPosAndSizeSwt(Control, int, int)} etc.
 	 * <li>2012-01-26 Hartmut chg: prevent some error messages which are unnecessary.
 	 * <li>2012-01-01 Hartmut new: The {@link #setInfoGthread(GralWidget, int, int, Object, Object)} routine
 	 *   uses the {@link SwtSetValue_ifc} capability to associate cmd to types of widgets. Yet used only for {@link SwtSubWindow}.
@@ -157,9 +158,32 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	 *     There the causer isn't found quickly while debugging.
 	 * <li>2010-12-02 Hartmut: Up to now this version variable, its description contains the version history.
 	 * </ul>
+   * <br><br> 
+   * <b>Copyright/Copyleft</b>:
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL ist not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but don't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you are intent to use this sources without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
 	 */
   @SuppressWarnings("hiding")
-  public final static int version = 0x20111112;
+  public final static int version = 20120317;
 
 	/**The GUI may be determined by a external user file. Not all planned fields, buttons etc. 
    * may be placed in the GUI, a user can desire about the elements. 
@@ -508,14 +532,85 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   { setPosAndSizeSwt(component, 0,0);
   }  
   
-  /**Set bounds. This method is package-private for SWT-implementation.
+  
+  
+  
+  
+  
+  /**Set bounds of a SWT component with this {@link GralWidgetMng#pos} from the GralWidgetMng. 
+   * The {@link #setNextPosition()} is called to process a used this.pos to its next. 
+   * This method is package-private for SWT-implementation. It calls 
+   * {@link #setNextPosition()} and {@link #setPosAndSizeSwt(GralPos, Control, int, int)}
+   * with 
    * @param component The SWT-widget.
    * @param widthwidgetNat The natural size of the component.
    * @param heigthWidgetNat The natural size of the component.
    */
   void setPosAndSizeSwt(Control component, int widthwidgetNat, int heigthWidgetNat)
+  { setNextPosition();
+    setPosAndSizeSwt(this.pos, component, widthwidgetNat, heigthWidgetNat);
+  }
+  
+
+
+  
+  /**Set bounds of a SWT component with a given position independent of this {@link #pos}.
+   * This routine is proper to use if a GralPos is calculated in any special kind, 
+   * usual with this.pos as reference. 
+   * This method is package-private for SWT-implementation.
+   * @param posP The Position for the component.
+   */
+  void setPosAndSizeSwt(GralPos posP, Control component, int widthwidgetNat, int heigthWidgetNat)
   {
-    setNextPosition();
+    GralRectangle rectangle = calcWidgetPosAndSizeSwt(posP, component, widthwidgetNat, heigthWidgetNat);
+    component.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
+       
+  }
+  
+
+
+  
+  
+  /**Calculates the bounds of a widget with a given pos independent of this {@link #pos}.
+   * This method is a part of the implementing GralMng because the GralPos is not implemented for
+   * any underlying graphic system and the {@link #propertiesGuiSwt} are used.
+   * It is possible to tune the bounds after calculation, for example to enhance the width if a text
+   * is larger then the intended position. 
+   * @param pos The position.
+   * @param widthwidgetNat The natural size of the component.
+   * @param heigthWidgetNat The natural size of the component.
+   * @return A rectangle with position and size.
+   */
+  @Override public GralRectangle calcWidgetPosAndSize(GralPos pos, int widthwidgetNat, int heigthWidgetNat){
+    Composite parentComp = (Composite)pos.panel.getPanelImpl();
+    //Rectangle pos;
+    final GralRectangle rectangle;
+    final Rectangle parentSize;
+    if(parentComp == null){
+      parentSize = new Rectangle(0,0,800, 600);
+    } else if(parentComp instanceof Shell) {
+      parentSize = ((Shell)parentComp).getClientArea();
+    } else {
+      parentSize = parentComp.getBounds();
+    }
+    return pos.calcWidgetPosAndSize(propertiesGui, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+  }
+  
+  
+
+  
+  /**Calculates the bounds of a SWT component with a given position independent of {@link #pos}.
+   * This method is package-private for SWT-implementation.
+   * It is possible to tune the bounds after calculation, for example to enhance the width if a text
+   * is larger then the intended position. 
+   * @param pos The position.
+   * @param component The SWT-widget.
+   * @param widthwidgetNat The natural size of the component.
+   * @param heigthWidgetNat The natural size of the component.
+   * @return A rectangle with position and size.
+   * @deprecated, use {@link #calcWidgetPosAndSizeSwt(GralPos, int, int)}
+   */
+  GralRectangle calcWidgetPosAndSizeSwt(GralPos pos, Control component, int widthwidgetNat, int heigthWidgetNat){
     Control parentComp = component.getParent();
     //Rectangle pos;
     final GralRectangle rectangle;
@@ -527,13 +622,11 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     } else {
       parentSize = parentComp.getBounds();
     }
-    rectangle = calcWidgetPosAndSize(pos, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
-    component.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
-       
+    return calcWidgetPosAndSize(pos, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
   }
   
-
-
+  
+  
 
 
   
@@ -1159,7 +1252,8 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   }
   
 	@Override public GralCurveView addCurveViewY(String sName, int nrofXvalues, int nrofTracks) {
-    GralCurveView widgd = new SwtCurveView(sName, this, nrofXvalues, nrofTracks); //, curveView, 'c', sName, null);
+    setNextPosition();
+	  GralCurveView widgd = new SwtCurveView(sName, this.pos, this, nrofXvalues, nrofTracks); //, curveView, 'c', sName, null);
 		//CurveView curveView = new CurveView(((SwtPanel)pos.panel).getPanelImpl(), dxWidget, dyWidget, nrofXvalues, nrofTracks);
 		testHelp.curveView = widgd; //store to inspect.
 		return widgd;

@@ -114,6 +114,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
       assert((windProps & GralWindow.windExclusive) ==0);
     }
     if((windProps & GralWindow.windOnTop) !=0){ props |= SWT.ON_TOP; }
+    if((windProps & GralWindow.windResizeable) !=0){ props |= SWT.RESIZE; }
     window = new Shell(display, props);
     window.addShellListener(shellListener);
     window.addDisposeListener(disposeListener);

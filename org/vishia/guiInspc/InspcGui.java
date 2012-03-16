@@ -32,10 +32,14 @@ public class InspcGui //extends GuiCfg
   private final CallingArguments cargs;
 
   final GuiCfg guiCfg;
+  
+  InspcCurveView curveA, curveB, curveC;
 
   InspcGui(CallingArguments cargs, GralArea9MainCmd cmdgui)
   {
     guiCfg = new InspcGuiCfg(cargs, cmdgui, userInspcPlug);
+    
+
     LogMessage log = cmdgui.getLogMessageOutputConsole();
     this.cargs = cargs;  //args in the correct derived type.
     /**
@@ -47,8 +51,10 @@ public class InspcGui //extends GuiCfg
     GralPlugUser_ifc user = guiCfg.getPluggedUser(); 
     assert(user instanceof InspcPlugUser_ifc);
     
-    this.inspcComm = new InspcGuiComm(guiCfg.console, guiCfg.gralMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
-    //inspcComm.addPanel(panelContent);
+    this.inspcComm = new InspcGuiComm(this, guiCfg.gralMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
+    curveA = new InspcCurveView(inspcComm, cmdgui.gralMng);
+    curveB = new InspcCurveView(inspcComm, cmdgui.gralMng);
+    curveC = new InspcCurveView(inspcComm, cmdgui.gralMng);
 
   }
   
@@ -119,6 +125,10 @@ public class InspcGui //extends GuiCfg
   } //class CmdLineAndGui 
   
 
+/**Overrides the GuiCfg with special initialization and methods.
+ * @author Hartmut Schorrig
+ *
+ */
 private class InspcGuiCfg extends GuiCfg
 {
   
@@ -128,20 +138,15 @@ private class InspcGuiCfg extends GuiCfg
   
   
   /**Initializes the areas for the panels and configure the panels.
-   * This routine can be overridden if other areas are need.
+   * This routine overrides {@link GuiCfg#initGuiAreas()} and calls its super.
+   * Additional some user initialization is done.
    */
   @Override protected void initGuiAreas()
   {
-    gui.setFrameAreaBorders(20, 80, 60, 85);
-    gui.setStandardMenusGThread(new File("."), actionFile);
-    super.initMenuGralDesigner();
-    //if(user !=null){ user.init(plugUser2Gui, gralMng, null); }
-    gralMng.selectPanel("primaryWindow");
-    mainTabPanel = gralMng.addTabbedPanel("mainTab", null, 0);
-    gui.addFrameArea(1,1,3,2, mainTabPanel); //dialogPanel);
-   
-    Appendable out = gui.getOutputBox();
-    mainCmd.setOutputChannels(out, out);
+    super.initGuiAreas();
+    curveA.buildGraphic(gui, "curve A");
+    curveB.buildGraphic(gui, "curve B");
+    curveC.buildGraphic(gui, "curve C");
     
     if(user !=null){
       user.initGui(gralMng);

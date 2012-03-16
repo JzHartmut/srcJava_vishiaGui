@@ -9,6 +9,7 @@ import java.awt.PopupMenu;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget;
 
 public class AwtMenu extends GralMenu
 {
@@ -28,10 +29,10 @@ public class AwtMenu extends GralMenu
     
   }
 
-  @Override public void addMenuItemGthread(String nameWidg, String sMenuPath, GralUserAction action)
+  @Override public GralWidget addMenuItemGthread(String nameWidg, String sMenuPath, GralUserAction action)
   {
     // TODO Auto-generated method stub
-    
+    return null;
   }
 
 

@@ -104,10 +104,10 @@ public class SwtMenu extends GralMenu
   }
 
   
-  @Override public void addMenuItemGthread(String nameWidg, String sMenuPath, GralUserAction gralAction)
+  @Override public GralWidget addMenuItemGthread(String nameWidg, String sMenuPath, GralUserAction gralAction)
   {
     SelectionListener action = new ActionUserMenuItem(gralAction);
-    addMenuItemGthread(nameWidg, sMenuPath, action);
+    return addMenuItemGthread(nameWidg, sMenuPath, action);
   }  
   
   /**Adds an action with the menu path to this menu.
@@ -117,7 +117,7 @@ public class SwtMenu extends GralMenu
    * @param sMenuPath
    * @param action
    */
-  /*package private*/ void addMenuItemGthread(String nameWidg, String sMenuPath, SelectionListener action)
+  /*package private*/ GralWidget addMenuItemGthread(String nameWidg, String sMenuPath, SelectionListener action)
   {
     String[] names = sMenuPath.split("/");
     Map<String, MenuEntry> menustore = menus;
@@ -159,6 +159,7 @@ public class SwtMenu extends GralMenu
     item.setText(name);
     //item.setAccelerator(SWT.CONTROL | 'S');
     item.addSelectionListener(action);
+    return widgMenu;
   }
 
 

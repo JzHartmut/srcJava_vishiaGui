@@ -30,6 +30,7 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.ifc.GralWindowMng_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.mainCmd.Report;
@@ -56,6 +57,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
 {
   /**Changes:
    * <ul>
+   * <li>2012-03-17 Hartmut new: {@link #calcWidgetPosAndSize(GralPos, int, int)} as abstract method.
    * <li>2012-03-10 Hartmut chg: {@link #addText(String)} now uses the background color {@link GralGridProperties#colorBackground_}.
    * <li>2012-01-14 Hartmut chg: {@link #registerWidget(GralWidget)}: uses {@link GralPanelContent#addWidget(GralWidget, boolean)}.
    * <li>2012-01-14 Hartmut new {@link #getValueFromWidget(GralWidget)} implementing here for non-platform depending values, especially GralTable.
@@ -102,7 +104,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
    * 
    * 
    */
-  public final static int version = 0x20111227;
+  public final static int version = 20120317;
   
 	/**This class is used for a selection field for file names and pathes. */
   protected class FileSelectInfo
@@ -744,6 +746,19 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
 	
 	
   
+  /**Calculates the pixel position and size with a given GralPos for the given size of display appearance.
+   * @param pos Given position
+   * @param widthParentPixel width of the container. This value will be used if the position is given 
+   *   from right with negative numbers.
+   * @param heightParentPixel height of the container. This value will be used if the position is given 
+   *   from bottom with negative numbers.
+   * @param widthWidgetNat natural width of the component which will be positioning. 
+   *   This value is used only if the pos parameter contains {@link GralPos#useNatSize} for the xe-value
+   * @param heightWidgetNat natural height of the component which will be positioning. 
+   *   This value is used only if the pos parameter contains {@link GralPos#useNatSize} for the ye-value
+   * @return The position and size relative in the container. 
+   * @deprecated, use {@link #calcWidgetPosAndSizeSwt(GralPos, int, int)} because the parent is known in pos.
+   */
   public GralRectangle calcWidgetPosAndSize(GralPos pos,
     int widthParentPixel, int heightParentPixel,
     int widthWidgetNat, int heightWidgetNat
@@ -752,6 +767,26 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   }
   
   
+  
+  
+  
+  
+  
+  /**Calculates the bounds of a widget with a given pos independent of this {@link #pos}.
+   * This method is a part of the implementing GralMng because the GralPos is not implemented for
+   * any underlying graphic system and the {@link #propertiesGuiSwt} are used.
+   * This method is not intent to use from an application, only for implementing methods of Gral.
+   * Therefore it isn't a member of the {@link GralWindowMng_ifc} and {@link GralGridBuild_ifc}
+   * It is possible to tune the bounds after calculation, for example to enhance the width if a text
+   * is larger then the intended position. 
+   * @param pos The position.
+   * @param widthwidgetNat The natural size of the component.
+   * @param heigthWidgetNat The natural size of the component.
+   * @return A rectangle with position and size.
+   */
+  public abstract GralRectangle calcWidgetPosAndSize(GralPos pos, int widthwidgetNat, int heigthWidgetNat);
+
+
   
   
   @Override public GralTextField addFileSelectField(String name, List<String> listRecentFiles

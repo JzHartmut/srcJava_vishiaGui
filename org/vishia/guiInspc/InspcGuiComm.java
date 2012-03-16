@@ -54,6 +54,11 @@ public class InspcGuiComm
     { this.widgd = widgd;
     }
 
+    /**This method is called for any info block in the received telegram from target,
+     * if this implementing instance is stored on the order.
+     * It prepares the value presentation.
+     * @see org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc#execInspcRxOrder(org.vishia.communication.InspcDataExchangeAccess.Info)
+     */
     @Override public void execInspcRxOrder(InspcDataExchangeAccess.Info info)
     {
       String sShow;
@@ -133,6 +138,8 @@ public class InspcGuiComm
   /**To Output log informations. The ouput will be done in the output area of the graphic. */
   private final Report console;
 
+  private final InspcGui inspcGui;
+  
   private final GralPanelMngWorking_ifc mng;
   
   private final InspcPlugUser_ifc user;
@@ -173,9 +180,10 @@ public class InspcGuiComm
   
   
   
-  InspcGuiComm(Report console, GralPanelMngWorking_ifc mng, Map<String, String> indexTargetIpcAddr, InspcPlugUser_ifc user)
+  InspcGuiComm(InspcGui inspcGui, GralPanelMngWorking_ifc mng, Map<String, String> indexTargetIpcAddr, InspcPlugUser_ifc user)
   {
-    this.console = console;
+    this.inspcGui = inspcGui;
+    this.console = inspcGui.guiCfg.console;
     this.mng = mng;
     this.user = user;
     this.inspcAccessor = new InspcAccessor(new InspcAccessEvaluatorRxTelg());
@@ -203,6 +211,9 @@ public class InspcGuiComm
   }
   
 
+  /**Adds any program snippet which is executed while preparing the telegram for data request from target.
+   * @param order the program snippet.
+   */
   public void addUserOrder(Runnable order)
   {
     userOrders.add(order);
@@ -252,6 +263,7 @@ public class InspcGuiComm
           }
         }//for widgets in panel
       }
+      inspcGui.curveA.addTxInfoBlock();
     } catch(Exception exc){ 
     }
     Runnable userOrder;
@@ -325,6 +337,42 @@ public class InspcGuiComm
 
 
   
+  
+  
+  void getValueByPath(String sDataPath, InspcAccessExecRxOrder_ifc commAction){
+    int posSepDevice = sDataPath.indexOf(':');
+    if(posSepDevice >0){
+      String sDevice = sDataPath.substring(0, posSepDevice);
+      String sIpTargetNew = translateDeviceToAddrIp(sDevice); ///
+      if(sIpTargetNew == null){
+        errorDevice(sDevice);
+      } else {
+        if(sIpTarget == null){
+          sIpTarget = sIpTargetNew;
+          inspcAccessor.setTargetAddr(sIpTarget);
+        }
+      }
+      sDataPath = sDataPath.substring(posSepDevice +1);
+    }
+    //
+    if(sIpTarget !=null){
+      if(user !=null && !bUserCalled){  //call only one time per procComm()
+        user.requData(0);
+        bUserCalled = true;
+      }
+      //
+      //create the send command to target.
+      int order = inspcAccessor.cmdGetValueByPath(sDataPath);    
+      if(order !=0){
+        //save the order to the action. It is taken on receive.
+        inspcAccessor.rxEval.setExpectedOrder(order, commAction);
+      } 
+    }    
+  }
+  
+  
+  
+  
   /**This action is used to request a telegram from target. It is executed in the communication thread.
    * <ul>
    * <li>A info block is prepared in the tx telegram to target.
@@ -336,44 +384,17 @@ public class InspcGuiComm
   GralUserAction actionShowTextfield = new GralUserAction()
   { @Override public boolean userActionGui(String sIntension, GralWidget widget, Object... params)
     { String sDataPath = widget.getDataPath() + ".";
-      int posSepDevice = sDataPath.indexOf(':');
-      if(posSepDevice >0){
-        String sDevice = sDataPath.substring(0, posSepDevice);
-        String sIpTargetNew = translateDeviceToAddrIp(sDevice); ///
-        if(sIpTargetNew == null){
-          errorDevice(sDevice);
-        } else {
-          if(sIpTarget == null){
-            sIpTarget = sIpTargetNew;
-            inspcAccessor.setTargetAddr(sIpTarget);
-          }
-        }
-        sDataPath = sDataPath.substring(posSepDevice +1);
+    //check whether the widget has an comm action already. 
+    //First time a widgets gets its WidgetCommAction. Then for ever the action is kept.
+      WidgetCommAction commAction;
+      Object oCommAction;
+      if( (oCommAction = widget.getContentInfo()) ==null){
+        commAction = new WidgetCommAction(widget);
+        widget.setContentInfo(commAction);
+      } else {
+        commAction = (WidgetCommAction)oCommAction;
       }
-      //
-      if(sIpTarget !=null){
-        if(user !=null && !bUserCalled){  //call only one time per procComm()
-          user.requData(0);
-          bUserCalled = true;
-        }
-        //check whether the widget has an comm action already. 
-        //First time a widgets gets its WidgetCommAction. Then for ever the action is kept.
-        WidgetCommAction commAction;
-        Object oCommAction;
-        if( (oCommAction = widget.getContentInfo()) ==null){
-          commAction = new WidgetCommAction(widget);
-          widget.setContentInfo(commAction);
-        } else {
-          commAction = (WidgetCommAction)oCommAction;
-        }
-        //
-        //create the send command to target.
-        int order = inspcAccessor.cmdGetValueByPath(sDataPath);    
-        if(order !=0){
-          //save the order to the action. It is taken on receive.
-          inspcAccessor.rxEval.setExpectedOrder(order, commAction);
-        } 
-      }
+      getValueByPath(sDataPath, commAction);
       return true;
     }
     

@@ -185,7 +185,7 @@ public class OamShowValues
           if(widgetsVisible !=null) for(GralWidget widget: widgetsVisible){
             if(widget instanceof GralCurveView){
               GralCurveView curve = (GralCurveView)widget;
-              List<GralSetValue_ifc> listLines = curve.getLines();
+              List<GralSetValue_ifc> listLines = curve.getTracks();
               float[] values = new float[listLines.size()];
               int ixValues = -1;
               for(GralSetValue_ifc line: listLines){

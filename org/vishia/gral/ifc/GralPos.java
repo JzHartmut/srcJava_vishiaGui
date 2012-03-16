@@ -138,7 +138,7 @@ import org.vishia.gral.base.GralPanelContent;
  */
 public class GralPos implements Cloneable
 {
-  /**Version and history:
+  /**Version, history and license.
    * <ul>
    * <li>2011-10-01 Hartmut corr: Calculation of next position or refer + value if the size was negative and sameSize is selected.
    *                Then the new input value should calculate from the bottom or left value because the size is negative furthermore.
@@ -153,7 +153,6 @@ public class GralPos implements Cloneable
    * <li>2011-08-14 Hartmut new: creation of this class. Beforehand this values are stored inside the GralGridMngBase as main position.
    *     But a position in this kind is necessary in other contexts too, and the position values should be pooled in one class.                       
    * </ul>
-  /**Version, history and license.
    * <ul>
    * <li>2011-06-00 Hartmut created
    * </ul>
@@ -181,7 +180,7 @@ public class GralPos implements Cloneable
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20111001;
+  public static final int version = 20120317;
 
   
   /**This adding value applied at any coordinate parameter of any setPosition- method means, that the value is 
@@ -593,9 +592,15 @@ public class GralPos implements Cloneable
   
   
   /**Calculates the position and size of a widget from given {@link #posWidget}.
-   * @param posWidget The position.
-   * @param widthParentPixel The size of the panel, where the widget is member of
-   * @param heightParentPixel The size of the panel, where the widget is member of
+   * @param propertiesGui The properties for presentation.
+   * @param widthParentPixel width of the container. This value will be used if the position is given 
+   *   from right with negative numbers.
+   * @param heightParentPixel height of the container. This value will be used if the position is given 
+   *   from bottom with negative numbers.
+   * @param widthWidgetNat natural width of the component which will be positioning. 
+   *   This value is used only if the pos parameter contains {@link GralPos#useNatSize} for the xe-value
+   * @param heightWidgetNat natural height of the component which will be positioning. 
+   *   This value is used only if the pos parameter contains {@link GralPos#useNatSize} for the ye-value
    * @return A rectangle for setBounds.
    */
   public GralRectangle calcWidgetPosAndSize(GralGridProperties propertiesGui,
@@ -830,7 +835,7 @@ public class GralPos implements Cloneable
           }
         } break;
         //
-        case (next<<16) + samesize: {
+        case (next<<16) + samesize: {  //z1 is next, ze is samesize, means typical next
           testCase = 9;
           switch(dirNext){
             case 'r': case 'd': {

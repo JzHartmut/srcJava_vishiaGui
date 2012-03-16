@@ -21,6 +21,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralPos;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.widget.GralCurveView;
 
 
@@ -29,8 +31,9 @@ import org.vishia.gral.widget.GralCurveView;
 public class SwtCurveView extends GralCurveView
 {
   
-  /**Version and history
+  /**Version, history and license.
    * <ul>
+   * <li>2012-03-17 Hartmut some improvements in paint routine.
    * <li>2012-02-26 Hartmut A lot of details, see {@link GralCurveView}
    * <li>2012-02-21 Hartmut Now the CurveView works in the new environment. Some adjustments necessary yet.
    * <li>2011-06-00 Hartmut New concept of GralWidget etc and new Configuration concept
@@ -38,24 +41,47 @@ public class SwtCurveView extends GralCurveView
    *   was not use nevermore. But the CurveView was not adapted for that.
    * <li>2010-03-00 Hartmut The curve view was development as basic feature.
    * </ul>
+   * <br><br>
+   * <b>Copyright/Copyleft</b>:
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL is not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but doesn't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you intent to use this source without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   * 
    */
-  public final static int version = 0x20120222;
+  public final static int version = 20120317;
 
   private final CurveView curveSwt;
   
   private Image cursorStore1, cursorStore2;
   
-  public SwtCurveView(String sName, SwtWidgetMng mng, int nrofXvalues, int nrofTracks)
+  public SwtCurveView(String sName, GralPos pos, SwtWidgetMng mng, int nrofXvalues, int nrofTracks)
   {
     super(sName, mng, nrofXvalues, nrofTracks);
-    int ySize = (int)(pos.height());
-    int xSize = (int)(pos.width());
-    int dxWidget = xSize * mng.propertiesGui.xPixelUnit();
-    int dyWidget = ySize * mng.propertiesGui.yPixelUnit();
+    
+    GralRectangle bounds = mng.calcWidgetPosAndSize(pos, 800, 600);
     Composite panelSwt = (Composite)pos.panel.getPanelImpl();
-    curveSwt = this.new CurveView(panelSwt, dxWidget, dyWidget, nrofXvalues, nrofTracks);
-    curveSwt.setSize(dxWidget, dyWidget);
-    mng.setBounds_(curveSwt); //, dyGrid, dxGrid);
+    curveSwt = this.new CurveView(panelSwt, bounds.dx, bounds.dy, nrofXvalues, nrofTracks);
+    curveSwt.setSize(bounds.dx, bounds.dy);
+    curveSwt.setBounds(bounds.x, bounds.y, bounds.dx, bounds.dy);
+    //mng.setBounds_(curveSwt); //, dyGrid, dxGrid);
     curveSwt.setGridVertical(10, 5);   //10 data-points per grid line, 50 data-points per strong line.
     curveSwt.setGridHorizontal(50.0F, 5);  //10%-divisions, with 5 sub-divisions
     curveSwt.setGridColor(mng.propertiesGuiSwt.colorGrid, mng.propertiesGuiSwt.colorGridStrong);
@@ -63,19 +89,20 @@ public class SwtCurveView extends GralCurveView
     cursorStore2 = new Image(panelSwt.getDisplay(), 1, 2000);
   }
   
-  @Override public void initLine(String sNameLine, String sDataPath, GralColor color, int style
+  @Override public void initTrack(String sNameTrack, String sDataPath, GralColor color, int style
       , int nullLine, float scale, float offset)
   {
-    Track line = lines[ixLineInit] = new Track(sNameLine);
-    line.values = new float[this.maxNrofXValues];
-    listLines.add(line);
-    listLinesSet.add(line);
+    Track track = tracks[ixLineInit] = new Track(sNameTrack);
+    track.values = new float[this.maxNrofXValues];
+    listTracks.add(track);
+    listTrackSet.add(track);
     //listDataPaths.add(sDataPath);
-    line.sDataPath =sDataPath;
-    y0Line[ixLineInit] = nullLine;
-    yOffset[ixLineInit] = offset;
-    yScale[ixLineInit] = scale;
-    lineColorsGral[ixLineInit] = color;
+    track.sDataPath =sDataPath;
+    track.y0Line = nullLine;
+    track.yOffset = offset;
+    track.yScale = scale;
+    //yScale[ixLineInit] = scale;
+    track.lineColor = color;
     Color colorSwt = (Color)itsMng.getColorImpl(color);
     curveSwt.lineColors[ixLineInit] = colorSwt; //new Color(curveSwt.getDisplay(), (colorValue >>16) & 0xff, (colorValue >>8) & 0xff, (colorValue) & 0xff);  
     ixLineInit +=1;
@@ -130,8 +157,8 @@ public class SwtCurveView extends GralCurveView
     }
     int ixSource = -1;
     int ixWr = (ixDataWr >> shIxiData) & mIxiData;
-    for(Track line: lines){
-      line.values[ixWr] = newValues[++ixSource];  //write in the values.
+    for(Track track: tracks){
+      track.values[ixWr] = newValues[++ixSource];  //write in the values.
     }
     timeValues[ixWr] = timeshort;
     redrawBecauseNewData = true;
@@ -198,7 +225,6 @@ public class SwtCurveView extends GralCurveView
       lineColors = new Color[nrofTracks];
       Color defaultColor = new Color(getDisplay(), 255,0,0);
       for(int iTrack=0; iTrack < nrofTracks; ++iTrack){
-        yFactor[iTrack] = yPixel / 10.0F / yScale[iTrack];
         lineColors[iTrack] = defaultColor;
       }
       addPaintListener(paintListener);
@@ -420,6 +446,115 @@ public class SwtCurveView extends GralCurveView
      * It is outside because inspector-usage. */
     private boolean paintAllExec;
     
+
+    
+    
+    /**prepares indices of data.
+     * All data have a timestamp. the xpixel-values is calculated from the timestamp.
+     * The ixDataShown contains the index into the data for each x pixel from right to left.
+     * If there are more as one data record for one pixel, the stepwidth of ixData is >1,
+     * If there are more as one x-pixel for one data record, the same index is written for that pixel
+     */
+    private void drawPrepareIndicesData(int ixDataRight, int xViewPart, int size_x){
+      ixDataShown[0] = ixDataRight;
+      int ixData = ixDataRight;
+      int ixD = (ixData >> shIxiData) & mIxiData;
+      int ixp2 = 0;
+      int ixp1 = 0;
+      int time9 = timeValues[ixD];
+      //xViewPart = nrof pixel from right
+      //ixp1 counts from 0... right to left
+      while(ixp1 < xViewPart && ixp1 >= ixp2){ //singularly: ixp1 < ixp2 if a faulty timestamp is found.
+        do{ //all values per 1 pixel
+          ixData -= adIxData;                  //decrement to older values
+          ixD = (ixData >> shIxiData) & mIxiData;
+          int dtime = time9 - timeValues[ixD]; //offset to first right point
+          ixp1 = (int)(dtime * pixel7time + 0.5f);  //calculate pixel offset from right, right =0 
+          if(xpCursor1 == cmdSetCursor && ixData == ixDataCursor1){
+            xpCursor1 = ixp1;                  //set cursor xp if the data index is gotten.
+          }
+          if(xpCursor2 == cmdSetCursor && ixData == ixDataCursor2){
+            xpCursor2 = ixp1;
+          }
+        } while( ixp1 == ixp2   //all values for the same 1 pixel
+              && ixData != ixDataRight  //no more as one wrap around, if dtime == 0 or is less
+               );
+        //
+        if(ixp1 > ixp2 && ixp1 <= size_x){ //prevent drawing on false timestamp in data (missing data)
+          do { 
+            ixDataShown[++ixp2] = ixData;
+          } while(ixp2 < ixp1);
+        } else {
+          ixDataShown[++ixp2] = -1;  //xp1 is invalid, stop curve
+        }
+      } 
+      ixDataShown[++ixp2] = -1;      //the last
+      
+    }
+    
+    
+    private void drawTrack(GC g, Point size, Track track, int iTrack){
+      int ixixiData = 0;
+      int xp2 = size.x -1;
+      int xp1 = xp2;
+      int ixData2 = ixDataShown[ixixiData];
+      int ixData = ixData2;
+      int ixD = (ixData >> shIxiData) & mIxiData;
+      //
+      float yFactor = size.y / -10.0F / track.yScale;  //y-scaling
+      float y0Pix = (1.0F - track.y0Line/100.0F) * size.y; //y0-line
+      float yF = track.values[ixD];
+      int yp9 = (int)( (yF - track.yOffset) * yFactor + y0Pix);
+      int yp2 = yp9;  //right value
+      int yp1; //left value
+      int ixData1;
+      if(iTrack == 0){
+        System.out.println("SwtCurveView-drawTrack-start(y0Pix=" + y0Pix + ", yFactor=" + yFactor + ", y=" + yF + ")");
+      }
+      //
+      while( (ixData1 = ixDataShown[++ixixiData]) !=-1){ //for all gotten ixData
+        xp1 -=1;
+        if(ixData != ixData1) {
+          int yp1min = Integer.MAX_VALUE, yp1max = Integer.MIN_VALUE;
+          int nrofYp = 0;
+          yp1 = 0;
+          do{ //all values per 1 pixel
+            ixData -= adIxData;
+            ixD = (ixData >> shIxiData) & mIxiData;
+            int yp11;
+            if(ixData == ixDataDraw){
+              yp11 = track.ypixLast;
+            } else {
+              yF = track.values[ixD];
+              yp11 = (int)( (yF - track.yOffset) * yFactor + y0Pix);
+            }
+            yp1 += yp11;  //build middle value or init first.
+            if(ixData != ixData1){  //more as one value on the same xp
+              if(yp1min > yp11){ yp1min = yp11; }
+              if(yp1max < yp11){ yp1max = yp11; }
+            }
+            nrofYp +=1;
+          } while(ixData != ixData1); // iData != ixDrawValues); //all values per 1 pixel
+          g.setForeground(lineColors[iTrack]);
+          if(nrofYp > 1){ //more as one value on the same xp
+            g.drawLine(xp1, yp1min, xp1, yp1max);  //draw vertical line to show range.
+            yp1 = yp1 / nrofYp;
+          }
+          g.drawLine(xp2, yp2, xp1, yp1);
+          if(iTrack == 0){
+            System.out.println("SwtCurveView-drawTrack(" + xp2 + "+" + (xp1 - xp2) + ", " + yp2 + "+" + (yp1 - yp2) + ")");
+          }
+          xp2 = xp1; //next xp from right to left.
+          yp2 = yp1;
+          ixData2 = ixData1;
+        }
+      } //while(iData != ixDrawValues);
+      track.ypixLast = yp9;
+      
+    }
+    
+    
+    
     
     @Override public void drawBackground(GC g, int xView, int yView, int dxView, int dyView) {
       //NOTE: forces stack overflow because calling of this routine recursively: super.paint(g);
@@ -455,7 +590,10 @@ public class SwtCurveView extends GralCurveView
           //and the number the values are shifted at least by that number, which is mapped to 1 pixel.
           if(xViewPart >0 && xViewPart < size.x){
             xViewLastF -= xViewPart;
-            assert(xView == 0);  //TODO what is if only a part of control is shown
+            if(xView != 0){
+              //TODO what is if only a part of control is shown
+              stop();
+            }
             xp0 = xView + dxView - xViewPart;
             if(xpCursor1 >= xViewPart){  //only if the cursor is in the shifted area:
               //restore graphic under cursor
@@ -496,7 +634,7 @@ public class SwtCurveView extends GralCurveView
         if(xViewPart >0) { //only if anything is to draw
           //only if a new point should be drawn.
           try{Thread.sleep(2);} catch(InterruptedException exc){}
-          int nrofTrack = listLines.size();
+          int nrofTrack = listTracks.size();
           g.setBackground(colorBack);
           //fill, clear the area either from 0 to end or from size.x - xView to end,
           g.fillRectangle(xp0, yView, xViewPart, dyView);  //fill the current background area
@@ -519,94 +657,14 @@ public class SwtCurveView extends GralCurveView
           } 
           //  
           //prepare indices of data.
-          //All data have a timestamp. the xpixel-values is calculated from the timestamp.
-          //The ixDataShown contains the index into the data for each x pixel from right to left.
-          //If there are more as one data record for one pixel, the stepwidth of ixData is >1,
-          //If there are more as one x-pixel for one data record, the same index is written for that pixel
-          ixDataShown[0] = ixDataRight;
-          int ixData = ixDataRight;
-          int ixD = (ixData >> shIxiData) & mIxiData;
-          int ixp2 = 0;
-          int ixp1 = 0;
-          int time9 = timeValues[ixD];
-          //xViewPart = nrof pixel from right
-          //ixp1 counts from 0... right to left
-          while(ixp1 < xViewPart && ixp1 >= ixp2){ //singularly: ixp1 < ixp2 if a faulty timestamp is found.
-            do{ //all values per 1 pixel
-              ixData -= adIxData;                  //decrement to older values
-              ixD = (ixData >> shIxiData) & mIxiData;
-              int dtime = time9 - timeValues[ixD]; //offset to first right point
-              ixp1 = (int)(dtime * pixel7time + 0.5f);  //calculate pixel offset from right, right =0 
-              if(xpCursor1 == cmdSetCursor && ixData == ixDataCursor1){
-                xpCursor1 = ixp1;                  //set cursor xp if the data index is gotten.
-              }
-              if(xpCursor2 == cmdSetCursor && ixData == ixDataCursor2){
-                xpCursor2 = ixp1;
-              }
-            } while(ixp1 == ixp2);  //all values for the same 1 pixel
-            //
-            if(ixp1 > ixp2 && ixp1 <= size.x){ //prevent drawing on false timestamp in data (missing data)
-              do { 
-                ixDataShown[++ixp2] = ixData;
-              } while(ixp2 < ixp1);
-            } else {
-              ixDataShown[++ixp2] = -1;  //xp1 is invalid, stop curve
-            }
-          } 
-          ixDataShown[++ixp2] = -1;      //the last
+          drawPrepareIndicesData(ixDataRight, xViewPart, size.x);
           // 
           //write all tracks.
           int iTrack = 0;
-          for(Track line: listLines){
-            //draw line per line
-            float yFactor = size.y / -10.0F / yScale[iTrack];  //y-scaling
-            float y0Pix = (1.0F - y0Line[iTrack]/100.0F) * size.y; //y0-line
-            float yF = line.values[ixD];
-            int yp9 = (int)( (yF - yOffset[iTrack]) * yFactor + y0Pix);
-            int yp2 = yp9;  //right value
-            int yp1; //left value
-            int xp2 = size.x -1;
-            int xp1 = xp2;
-            int ixixiData = 0;
-            int ixData2 = ixDataShown[0];
-            ixData = ixData2;
-            int ixData1;
-            //
-            while( (ixData1 = ixDataShown[++ixixiData]) !=-1){ //for all gotten ixData
-              xp1 -=1;
-              if(ixData != ixData1) {
-                int yp1min = Integer.MAX_VALUE, yp1max = Integer.MIN_VALUE;
-                int nrofYp = 0;
-                yp1 = 0;
-                do{ //all values per 1 pixel
-                  ixData -= adIxData;
-                  ixD = (ixData >> shIxiData) & mIxiData;
-                  int yp11;
-                  if(ixData == ixDataDraw){
-                    yp11 = line.ypixLast;
-                  } else {
-                    yF = line.values[ixD];
-                    yp11 = (int)( (yF - yOffset[iTrack]) * yFactor + y0Pix);
-                  }
-                  yp1 += yp11;  //build middle value or init first.
-                  if(ixData != ixData1){  //more as one value on the same xp
-                    if(yp1min > yp11){ yp1min = yp11; }
-                    if(yp1max < yp11){ yp1max = yp11; }
-                  }
-                  nrofYp +=1;
-                } while(ixData != ixData1); // iData != ixDrawValues); //all values per 1 pixel
-                g.setForeground(lineColors[iTrack]);
-                if(nrofYp > 1){ //more as one value on the same xp
-                  g.drawLine(xp1, yp1min, xp1, yp1max);  //draw vertical line to show range.
-                  yp1 = yp1 / nrofYp;
-                }
-                g.drawLine(xp2, yp2, xp1, yp1);
-                xp2 = xp1; //next xp from right to left.
-                yp2 = yp1;
-                ixData2 = ixData1;
-              }
-            } //while(iData != ixDrawValues);
-            line.ypixLast = yp9;
+          int ixData;
+          for(Track track: listTracks){
+            //draw line per track
+            drawTrack(g, size, track, iTrack);
             iTrack +=1;
           } //for listlines
           ixDataDraw = ixDataRight;
