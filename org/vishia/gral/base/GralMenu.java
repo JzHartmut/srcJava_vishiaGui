@@ -9,7 +9,14 @@ import org.vishia.gral.ifc.GralWidget;
 public abstract class GralMenu //extends GralWidget
 {
 
-  /**Version, history and licence
+  /**Version, history and license.
+   * <ul>
+   * <li>2012-03-17 Hartmut new: {@link #addMenuItemGthread(String, String, GralUserAction)} returns now
+   *   a {@link GralWidget}. It is necessary to add some information to the menu-widget, which can be used
+   *   if the {@link GralUserAction#userActionGui(int, GralWidget, Object...)} for this menu is called.
+   *   The second param of this method is that menu-GralWidget.
+   * <li>2011-11-00 Hartmut created, menus are present not only in the main window. Context menu etc.
+   * <ul>
    * 
    * <b>Copyright/Copyleft</b>:
    * For this source the LGPL Lesser General Public License,
@@ -36,7 +43,7 @@ public abstract class GralMenu //extends GralWidget
    * 
    * 
    */
-  public final static int version = 0x20120303;
+  public final static int version = 20120317;
   
   /**This class wraps a menu entry of the implementation. It knows all sub menu entries
    * in a implementation-independent way. So searching entries with given name is possible.
@@ -78,8 +85,10 @@ public abstract class GralMenu //extends GralWidget
    *   then creates the search menu item as pull down in menu bar, and then 'continue' with 'n' as hot key as sub-menu. 
    *   It is stored in {@link GralWidget#sDataPath}  
    * @param action called on menu activation.
+   * @return the widget can be used to add any {@link GralWidget#setContentInfo(Object)} etc. 
+   *   It is provided in the action method.
    */
-  public abstract void addMenuItemGthread(String name, String sMenuPath, GralUserAction action);
+  public abstract GralWidget addMenuItemGthread(String name, String sMenuPath, GralUserAction action);
   
   public abstract void setVisible();
   

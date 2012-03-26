@@ -116,7 +116,8 @@ public abstract class GralGraphicThread implements Runnable
   
   /**Version and history:
    * <ul>
-   * <li>2012-11-08 Hartmut new: Delayed orders to dispatch in the graphic thread: 
+   * <li>2012-03-15 Hartmut chg: Message on exception.
+   * <li>2011-11-08 Hartmut new: Delayed orders to dispatch in the graphic thread: 
    *   Some actions need some calculation time. 
    *   If they are called in a fast repetition cycle, a follow up effect may occur. 
    *   Therefore actions should be registered with a delayed start of execution, the start time 
@@ -349,7 +350,7 @@ public abstract class GralGraphicThread implements Runnable
           try{
             listener.doBeforeDispatching(isWakedUpOnly);
           } catch(Exception exc){
-            System.err.println("Exception in GralDispatchCallbackWorker:");
+            System.err.println("GralGraphicThread-" + exc.getMessage());
             exc.printStackTrace();
           }
         }

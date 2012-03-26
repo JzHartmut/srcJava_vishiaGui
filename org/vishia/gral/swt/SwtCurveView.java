@@ -21,9 +21,11 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralCurveViewTrack_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.widget.GralCurveView;
+import org.vishia.util.Assert;
 
 
 
@@ -33,6 +35,7 @@ public class SwtCurveView extends GralCurveView
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-03-25 Hartmut improved zoom
    * <li>2012-03-17 Hartmut some improvements in paint routine.
    * <li>2012-02-26 Hartmut A lot of details, see {@link GralCurveView}
    * <li>2012-02-21 Hartmut Now the CurveView works in the new environment. Some adjustments necessary yet.
@@ -89,7 +92,7 @@ public class SwtCurveView extends GralCurveView
     cursorStore2 = new Image(panelSwt.getDisplay(), 1, 2000);
   }
   
-  @Override public void initTrack(String sNameTrack, String sDataPath, GralColor color, int style
+  @Override public GralCurveViewTrack_ifc initTrack(String sNameTrack, String sDataPath, GralColor color, int style
       , int nullLine, float scale, float offset)
   {
     Track track = tracks[ixLineInit] = new Track(sNameTrack);
@@ -106,6 +109,7 @@ public class SwtCurveView extends GralCurveView
     Color colorSwt = (Color)itsMng.getColorImpl(color);
     curveSwt.lineColors[ixLineInit] = colorSwt; //new Color(curveSwt.getDisplay(), (colorValue >>16) & 0xff, (colorValue >>8) & 0xff, (colorValue) & 0xff);  
     ixLineInit +=1;
+    return track;
   }
   
   
@@ -115,60 +119,6 @@ public class SwtCurveView extends GralCurveView
 
   @Override public GralWidgetGthreadSet_ifc getGthreadSetifc(){ return gThreadSet; }
 
-  
-  /**
-   * @see org.vishia.gral.widget.GralCurveView#setSample(float[], int)
-   */
-  @Override public void setSample(float[] newValues, int timeshort) {
-    /*
-    if(this.nrofValues >= this.values.length){
-      float[] firstLine = this.values[0];
-      //NOTE: arraycopy doesn't copy all data, but the references of float[] in the values-array.
-      System.arraycopy(this.values, 1, this.values, 0, this.values.length-1);
-      this.nrofValues = this.values.length-1;
-      this.values[this.nrofValues] = firstLine;  //reuse first line as last, prevent new allocation.
-      iDataLast -=1;  //because the data are shifted, the index of last access is to be decrement.
-      nrofDataShift.incrementAndGet(); //shift data in graphic.
-    }
-    int nrofTrack = newValues.length;
-    if(nrofTrack > this.values[0].length){
-      nrofTrack = this.values[0].length;     //it is the lesser value of both.
-    }
-    //copy the values in the local area:
-    for(int ix=0; ix < nrofTrack; ++ix){
-      this.values[nrofValues][ix] = newValues[ix];  
-    }
-    */
-    if(testStopWr) return;  //only for debug test.
-    if(nrofValues < maxNrofXValues){
-      this.nrofValues +=1;
-    } else {
-      nrofDataShift.incrementAndGet(); //shift data in graphic.
-    }
-    //if(++ixDataWr >= maxNrofXValues){ ixDataWr = 0; } //wrap arround.
-    ixDataWr += adIxData;
-    if(!bFreeze){
-      ixDataShowRight = ixDataWr;
-    }
-    this.newSamples +=1;  //information for paint event
-    this.nrofValuesForGrid +=1;
-    if(nrofValuesForGrid > maxNrofXValues + gridDistanceStrongY){
-      nrofValuesForGrid -= gridDistanceStrongY;  //prevent large overflow.
-    }
-    int ixSource = -1;
-    int ixWr = (ixDataWr >> shIxiData) & mIxiData;
-    for(Track track: tracks){
-      track.values[ixWr] = newValues[++ixSource];  //write in the values.
-    }
-    timeValues[ixWr] = timeshort;
-    redrawBecauseNewData = true;
-    //System.out.println("" + timeshort);
-    repaint(50,50);
-    //getDisplay().wake();  //wake up the GUI-thread
-    //values.notify();
-  }
-
-  
   
   /**Implementation of the graphic thread widget set interface. */
   GralWidgetGthreadSet_ifc gThreadSet = new GralWidgetGthreadSet_ifc(){
@@ -319,97 +269,43 @@ public class SwtCurveView extends GralCurveView
        * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
        */
       @Override public void mouseDown(MouseEvent e) {
-        Control widgSwt = (Control)e.widget;
-        //Widget widgSwt = e.widget;
-        Point size = widgSwt.getSize();
-        if(e.y < size.y/4) {                  //top range
-          int xr = size.x - e.x;
-          if(xr < xpCursor1 && xpCursor2 > 0 && xr > xpCursor2){
-            //zoom between cursor
-            ixDataCursor1 = ixDataShown[xpCursor1];
-            ixDataCursor2 = ixDataShown[xpCursor2];
-            ixDataShowRight = ixDataCursor2 + (((ixDataCursor2 - ixDataCursor1) / 10) & mIxData);
-            int ixiData1 = (ixDataShown[xpCursor1] >> shIxiData) & mIxiData;
-            int ixiData2 = (ixDataShown[xpCursor2] >> shIxiData) & mIxiData;
-            int time1 = timeValues[ixiData1];
-            int time2 = timeValues[ixiData2];
-            timeSpread = (time2 - time1) * 10/8;
-            assert(timeSpread >0);
-            xpCursor1 = xpCursor2 = cmdSetCursor;  
-            
-          }
-          if(e.x < size.x / 4) {              //edge left top
-            //zoom out
-            if(xpCursor1 >=0){
-              ixDataCursor1 = ixDataShown[xpCursor1];
+        try{
+          Control widgSwt = (Control)e.widget;
+          //Widget widgSwt = e.widget;
+          Point size = widgSwt.getSize();
+          if(e.y < size.y/8) {                       //top range
+            int xr = size.x - e.x;
+            if(xr < xpCursor1 && xpCursor2 > 0 && xr > xpCursor2){
+              //zoom between cursor
+              zoomBetweenCursors();
             }
-            if(xpCursor2 >=0){
-              ixDataCursor2 = ixDataShown[xpCursor2];
-            }
-            xpCursor1 = xpCursor2 = cmdSetCursor;  
-            timeSpread *=2;    //double timespread
-            System.out.println("left-top");
-          } else if(e.x > size.x * 3 / 4){    //edge right top
-            timeSpread /=2;    //half timespread
-            System.out.println("right-top");
-          } else {
-            System.out.println("mid-top");
-          }
-        } else if(e.y > size.y * 3/4 ) { 
-          if(e.x < size.x / 4) {              //edge left bottom
-            if(!bFreeze){ 
-              bFreeze = true;
-              //now ixDataShow remain unchanged.
+            else if(e.x < size.x / 4) {              //edge left top
+              zoomToPast();
+            } else if(e.x > size.x * 3 / 4){          //edge right top
+              zoomToPresent();
             } else {
-              int ixdDataSpread = ixDataShowRight - ixDataShown[nrofValuesShow * 7/8];
-              //int ixDataShowRight1 = ixDataShown[nrofValuesShow * 7/8];
-              //int ixdDataSpread = ixDataShowRight - ixDataShowRight1;
-              ixDataShowRight -= ixdDataSpread;
-              if((ixDataShowRight - ixDataWr) < 0 && (ixDataWr - ixDataShowRight) < ixdDataSpread) {
-                //left end reached.
-                ixDataShowRight = ixDataWr + ixdDataSpread;
-              }
+              System.out.println("mid-top");
             }
-            System.out.println("left-bottom");
-          } else if(e.x > size.x * 3 / 4){    //edge right bottom
-            if(bFreeze){
-              //assume that the same time is used for actual shown data spread as need
-              //for the future.
-              int ixdDataSpread = ixDataShowRight - ixDataShown[nrofValuesShow * 7/8];
-              ixDataShowRight += ixdDataSpread;
-              if((ixDataShowRight - ixDataWr) > 0 && (ixDataShowRight - ixDataWr) < ixdDataSpread * 2) {
-                //right end reached.
-                ixDataShowRight = ixDataWr;
-                bFreeze = false;
-                //ixDataShowRight1 = ixDataWr + ixdDataSpread;
-              }
-              ixDataShowRight += ixDataShown[0] - ixDataShown[nrofValuesShow-1]; 
+          } else if(e.y > size.y * 7/8 ) {            //bottom range 
+            int xr = size.x - e.x;
+            if(xr < xpCursor1 && xpCursor2 > 0 && xr > xpCursor2){
+              cursorUnzoom();
             }
-            System.out.println("right-bottom");
-          } else {
-            System.out.println("mid-bottom");
-          }
-        } else { //middle range y
-          System.out.println("middle");
-          int xr = nrofValuesShow - e.x;  //from right
-          if(xpCursor1 < 0){
-            xpCursor1 = xr;
-            bMouseDownCursor1 = true;
-          } else if(xpCursor2 < 0){
-            xpCursor2 = xr;
-            bMouseDownCursor2 = true;
-          } else { //decide which cursor
-            int xm = (xpCursor1 + xpCursor2) /2;
-            if(xr > xm){ //more left
-              xpCursor1 = xr;
-              bMouseDownCursor1 = true;
+            else if(e.x < size.x / 4) {              //edge left bottom
+              viewToPast();
+            } else if(e.x > size.x * 3 / 4){    //edge right bottom
+              viewToPresent();
             } else {
-              xpCursor2 = xr;
-              bMouseDownCursor2 = true;
+              System.out.println("mid-bottom");
             }
+          } else { //middle range y
+            moveCursors(e.x);
           }
+          paintAllCmd = true;
+        } catch(Exception exc){
+          System.err.println("SwtCurveView.mouseDown; unexpected; " + exc.getMessage());
         }
-        paintAllCmd = true;
+        repaint(100,100);
       }
 
       /**The mouse up is left empty, because the mouse down has its effect.
@@ -432,11 +328,14 @@ public class SwtCurveView extends GralCurveView
       {
         if(bMouseDownCursor1){
           xpCursor1 = nrofValuesShow - e.x;  //from right;
-          System.out.println("SwtCurveView.mouseMove cursor x,y=" + e.x + ", " + e.y);
+          System.out.println("SwtCurveView.mouseMove cursor1 x,y=" + e.x + ", " + e.y);
+          repaint(50,50);
         } else if(bMouseDownCursor2){
           xpCursor2 = nrofValuesShow - e.x;  //from right;
+          System.out.println("SwtCurveView.mouseMove cursor2 x,y=" + e.x + ", " + e.y + ", cursor2=" + xpCursor2);
+          repaint(50,50);
         } else {
-          System.out.println("SwtCurveView.mouseMove x,y=" + e.x + ", " + e.y);
+          //System.out.println("SwtCurveView.mouseMove x,y=" + e.x + ", " + e.y);
             
         }
       }
@@ -449,51 +348,14 @@ public class SwtCurveView extends GralCurveView
 
     
     
-    /**prepares indices of data.
-     * All data have a timestamp. the xpixel-values is calculated from the timestamp.
-     * The ixDataShown contains the index into the data for each x pixel from right to left.
-     * If there are more as one data record for one pixel, the stepwidth of ixData is >1,
-     * If there are more as one x-pixel for one data record, the same index is written for that pixel
+    /**Draws one track using the {@link ixDataShown} indices to the data.
+     * @param g graphic context from SWT
+     * @param size of the panel in pixel
+     * @param track data
+     * @param iTrack Index of track, only used for debugging or test outputs.
+     * @param ixixDataLast The end index in {@link ixDataShown} for this presentation.
      */
-    private void drawPrepareIndicesData(int ixDataRight, int xViewPart, int size_x){
-      ixDataShown[0] = ixDataRight;
-      int ixData = ixDataRight;
-      int ixD = (ixData >> shIxiData) & mIxiData;
-      int ixp2 = 0;
-      int ixp1 = 0;
-      int time9 = timeValues[ixD];
-      //xViewPart = nrof pixel from right
-      //ixp1 counts from 0... right to left
-      while(ixp1 < xViewPart && ixp1 >= ixp2){ //singularly: ixp1 < ixp2 if a faulty timestamp is found.
-        do{ //all values per 1 pixel
-          ixData -= adIxData;                  //decrement to older values
-          ixD = (ixData >> shIxiData) & mIxiData;
-          int dtime = time9 - timeValues[ixD]; //offset to first right point
-          ixp1 = (int)(dtime * pixel7time + 0.5f);  //calculate pixel offset from right, right =0 
-          if(xpCursor1 == cmdSetCursor && ixData == ixDataCursor1){
-            xpCursor1 = ixp1;                  //set cursor xp if the data index is gotten.
-          }
-          if(xpCursor2 == cmdSetCursor && ixData == ixDataCursor2){
-            xpCursor2 = ixp1;
-          }
-        } while( ixp1 == ixp2   //all values for the same 1 pixel
-              && ixData != ixDataRight  //no more as one wrap around, if dtime == 0 or is less
-               );
-        //
-        if(ixp1 > ixp2 && ixp1 <= size_x){ //prevent drawing on false timestamp in data (missing data)
-          do { 
-            ixDataShown[++ixp2] = ixData;
-          } while(ixp2 < ixp1);
-        } else {
-          ixDataShown[++ixp2] = -1;  //xp1 is invalid, stop curve
-        }
-      } 
-      ixDataShown[++ixp2] = -1;      //the last
-      
-    }
-    
-    
-    private void drawTrack(GC g, Point size, Track track, int iTrack){
+    private void drawTrack(GC g, Point size, Track track, int iTrack, int ixixDataLast){
       int ixixiData = 0;
       int xp2 = size.x -1;
       int xp1 = xp2;
@@ -508,11 +370,13 @@ public class SwtCurveView extends GralCurveView
       int yp2 = yp9;  //right value
       int yp1; //left value
       int ixData1;
+      Color lineColor = (Color)itsMng.getColorImpl(track.lineColor);
       if(iTrack == 0){
-        System.out.println("SwtCurveView-drawTrack-start(y0Pix=" + y0Pix + ", yFactor=" + yFactor + ", y=" + yF + ")");
+        //System.out.println("SwtCurveView-drawTrack-start(y0Pix=" + y0Pix + ", yFactor=" + yFactor + ", y=" + yF + ")");
       }
       //
-      while( (ixData1 = ixDataShown[++ixixiData]) !=-1){ //for all gotten ixData
+      while( ixixiData < ixixDataLast){ //for all gotten ixData
+        ixData1 = ixDataShown[++ixixiData];
         xp1 -=1;
         if(ixData != ixData1) {
           int yp1min = Integer.MAX_VALUE, yp1max = Integer.MIN_VALUE;
@@ -535,14 +399,14 @@ public class SwtCurveView extends GralCurveView
             }
             nrofYp +=1;
           } while(ixData != ixData1); // iData != ixDrawValues); //all values per 1 pixel
-          g.setForeground(lineColors[iTrack]);
+          g.setForeground(lineColor); 
           if(nrofYp > 1){ //more as one value on the same xp
             g.drawLine(xp1, yp1min, xp1, yp1max);  //draw vertical line to show range.
             yp1 = yp1 / nrofYp;
           }
           g.drawLine(xp2, yp2, xp1, yp1);
           if(iTrack == 0){
-            System.out.println("SwtCurveView-drawTrack(" + xp2 + "+" + (xp1 - xp2) + ", " + yp2 + "+" + (yp1 - yp2) + ")");
+            //System.out.println("SwtCurveView-drawTrack(" + xp2 + "+" + (xp1 - xp2) + ", " + yp2 + "+" + (yp1 - yp2) + ")");
           }
           xp2 = xp1; //next xp from right to left.
           yp2 = yp1;
@@ -603,7 +467,7 @@ public class SwtCurveView extends GralCurveView
               //restore graphic under cursor
               g.drawImage(cursorStore2, size.x - xpCursor2, 0);
             }
-            g.copyArea(xView + xViewPart, yView, dxView - xViewPart , dyView, xView, yView, false);
+            g.copyArea(xView + xViewPart, yView, dxView - xViewPart , dyView -5, xView, yView, false);
             System.arraycopy(ixDataShown, 0, ixDataShown, xViewPart, size.x - xViewPart);
             testHelp.ctRedrawPart +=1;
           } else if(xViewPart >=size.x){ 
@@ -657,14 +521,14 @@ public class SwtCurveView extends GralCurveView
           } 
           //  
           //prepare indices of data.
-          drawPrepareIndicesData(ixDataRight, xViewPart, size.x);
+          int ixixDataLast = drawPrepareIndicesData(ixDataRight, xViewPart);
           // 
           //write all tracks.
           int iTrack = 0;
           int ixData;
           for(Track track: listTracks){
             //draw line per track
-            drawTrack(g, size, track, iTrack);
+            drawTrack(g, size, track, iTrack, ixixDataLast);
             iTrack +=1;
           } //for listlines
           ixDataDraw = ixDataRight;
@@ -684,6 +548,21 @@ public class SwtCurveView extends GralCurveView
   
         } else { //xViewPart == 0
           System.out.println("SwtCurveView xViewPart=0");
+        }
+        if(nrofValues >0){
+          int ixDataRel2 = ((ixDataWr - ixDataDraw)  >> shIxiData) & mIxiData;
+          int ixDataRel1 = ((ixDataWr - ixDataShown[size.x])  >> shIxiData) & mIxiData;
+          int iPixRange2 = size.x * ixDataRel2 / maxNrofXValues;
+          int iPixRange1 = size.x * ixDataRel1 / maxNrofXValues;
+          int ixDWr = (ixDataWr >> shIxiData) & mIxiData;
+          //System.out.println("SwtCurveView.spread; " + ixDataRel1 + ".." + ixDataRel2 + " ->" +  ixDWr);
+          g.setLineWidth(5);
+          g.setForeground((Color)itsMng.getColorImpl(GralColor.getColor("ye")));
+          g.drawLine(0, size.y -3, size.x - iPixRange1, size.y -3);
+          g.drawLine(size.x - iPixRange2, size.y -3, 0, size.y -3);
+          g.setForeground((Color)itsMng.getColorImpl(GralColor.getColor("dgr")));
+          //g.setAlpha(128);
+          g.drawLine(size.x - iPixRange1, size.y -3, size.x - iPixRange2, size.y -3);
         }
       } catch(Exception exc){
         System.err.println("SwtCurveView-paint; " + exc.getMessage());

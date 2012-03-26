@@ -600,7 +600,7 @@ public interface GralGridBuild_ifc
    *         It is the 0-line-reference of the input values. 
    * @param yScale This value is that value, which is shown in a 10%-difference in the output window.
    */
-  void setLineCurveView(String sNameView, int trackNr, String sNameLine, String sVariable, int colorValue, int style, int y0Line, float yScale, float yOffset);
+  //void setLineCurveView(String sNameView, int trackNr, String sNameLine, String sVariable, int colorValue, int style, int y0Line, float yScale, float yOffset);
   
   
   /**Sets the appearance of the graphic respectively color and grid.
@@ -614,7 +614,7 @@ public interface GralGridBuild_ifc
    * @param grid character to determine how the grid is shown. '0' no grid, 'a'..'f' weak to strong.
    * 
    */
-  void setColorGridCurveViewY(String sName, int backgroundColor, int[] colorLines, char grid);
+  //void setColorGridCurveViewY(String sName, int backgroundColor, int[] colorLines, char grid);
   
   /**Gets the value to the named color. It is a method of the graphic.
    * @param sName supported: red, green, blue, yellow

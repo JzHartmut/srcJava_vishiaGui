@@ -510,20 +510,6 @@ public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     
   }
 
-  @Override
-  public void setColorGridCurveViewY(String sName, int backgroundColor, int[] colorLines, char grid)
-  {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void setLineCurveView(String sNameView, int trackNr, String sNameLine, String sVariable,
-    int colorValue, int style, int y0Line, float yScale, float yOffset)
-  {
-    // TODO Auto-generated method stub
-    
-  }
 
   @Override public Color getColorImpl(GralColor color) { return propertiesGuiAwt.colorAwt(color); }
 

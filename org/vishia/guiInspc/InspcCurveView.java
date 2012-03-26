@@ -7,6 +7,7 @@ import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralCurveViewTrack_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -62,6 +63,9 @@ public class InspcCurveView
   
   private static class TrackValues{
 
+    /**The track description in the view. */
+    GralCurveViewTrack_ifc trackView;
+    
     GralTextField widgVarPath;
     
     //GralTextField widgScale;
@@ -78,12 +82,12 @@ public class InspcCurveView
     
     float min,max,mid;
     
-    float scale, scale0;
+    //float scale, scale0;
     
     /**Percent value of 0-line. 0..100 
      * 
      */
-    int line0;
+    //int line0;
     
     /**Marked with true if it is the last variable, forces output to graphic. */
     boolean bLast;
@@ -94,11 +98,15 @@ public class InspcCurveView
     
   }
   
-  String[] colorCurveDefault = new String[]{"rd", "gn", "bl", "or", "am", "bn", "dgn", "gr", "dgr", "dbl"};
+  String[] colorCurveDefault = new String[]{"rd", "gn", "lbl", "or", "ma", "bn", "dgn", "drd", "cy", "bl"};
   
   
   /**The input field which is the current scaling field. */
   TrackValues trackScale;
+  
+  GralColor colorLineTrackSelected;
+
+  final GralColor colorBlack = GralColor.getColor("bk");
   
   GralTextField widgScale, widgScale0, widgline0;
   
@@ -135,37 +143,36 @@ public class InspcCurveView
     windCurve = gralMng.createWindow("windMapVariables", "Curve A", windProps);
     //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 0, 'd');
     gralMng.setPosition(0, -2, 0, -10, 0, 'd');
-    widgCurve = gralMng.addCurveViewY(sName, 30000, 10);
+    widgCurve = gralMng.addCurveViewY(sName, 3000, 10);
     gralMng.setPosition(0, GralPos.size +2, -10, 0, 0, 'd', 0);
     gralMng.addText("curve variable");
     for(int ii=0; ii<10; ++ii){
       TrackValues track = new TrackValues();
-      track.scale = 3000.0f;
-      track.scale0 = 0.0f;
-      track.line0 = 50;
-      track.colorCurve = GralColor.getColor(colorCurveDefault[ii]);
+      String sColor = colorCurveDefault[ii];
+      track.colorCurve = GralColor.getColor(sColor);
+      if(track.colorCurve ==null){ throw new IllegalArgumentException("InspcCurveView-unknown color; " + sColor); }
       track.rxActionRxValueByPath = new CurveCommRxAction(track);
       this.tracks[ii] = track;
       track.widgVarPath = gralMng.addTextField(null, false, sName, sName);
       track.widgVarPath.setContentInfo(track);
-      track.widgVarPath.setMouseAction(actionSetScale);
+      track.widgVarPath.setMouseAction(actionSetTrackForScale);
       //input[ii].widgPath.setMouseAction(actionDropVariable);
       tracks[ii].widgVarPath.setDataPath("widgetInfo");  //prevent storing the own widgetInfo.
       //input[ii].widgPath.setContentInfo(input[ii]);
       GralMenu menuWidg = track.widgVarPath.getContextMenu();
       GralWidget widgMenuItem = menuWidg.addMenuItemGthread("menuContextShowBackslash", "drop variable", actionDropVariable);
       widgMenuItem.setContentInfo(tracks[ii]);
-      widgCurve.initTrack(sName, null, track.colorCurve, ii, track.line0, track.scale, track.scale0);
+      track.trackView = widgCurve.initTrack(sName, null, track.colorCurve, ii, 50, 5000.0f, 0.0f);
     }
     gralMng.setPosition(22, GralPos.size +3, -10, 0, 0, 'd', 0);
     widgScale = gralMng.addTextField("scale", true, "scale/div", "t");
     widgScale0 = gralMng.addTextField("scale0", true, "mid", "t");
     widgline0 = gralMng.addTextField("line0", true, "line-%", "t");
     gralMng.setPosition(32, GralPos.size +2, -10, GralPos.size +2, 0, 'r', 1);
-    widgBtnDn = gralMng.addButton("btnDn", actionScale, "-", null, null, "-");
-    widgBtnDn = gralMng.addButton("btnUp", actionScale, "+", null, null, "+");
+    widgBtnDn = gralMng.addButton("btnDn", actionSetScaleValues2Track, "-", null, null, "-");
+    widgBtnDn = gralMng.addButton("btnUp", actionSetScaleValues2Track, "+", null, null, "+");
     gralMng.setPosition(GralPos.same, GralPos.size +2, GralPos.next, GralPos.size +4, 0, 'r', 1);
-    widgBtnDn = gralMng.addButton("btnScale", actionScale, "!", null, null, "set");
+    widgBtnDn = gralMng.addButton("btnScale", actionSetScaleValues2Track, "!", null, null, "set");
     
     gralMng.setPosition(-3, GralPos.size +2, -9, -1, 0, 'd', 0);
     widgBtnOff = gralMng.addSwitchButton(sName + "btnOff", "off / ?on", "on / ?off", GralColor.getColor("lgn"), GralColor.getColor("am"));
@@ -251,18 +258,19 @@ public class InspcCurveView
   };
   
 
-  GralUserAction actionScale = new GralUserAction(){
+  GralUserAction actionSetScaleValues2Track = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(actionCode == KeyCode.mouse1Up && trackScale !=null){
         if(widgd.sCmd == "!"){
           try{
             String s1 = widgScale.getText();
-            trackScale.scale = Float.parseFloat(s1);
+            float scale = Float.parseFloat(s1);
             s1 = widgScale0.getText();
-            trackScale.scale0 = Float.parseFloat(s1);
+            float scale0 = Float.parseFloat(s1);
             s1 = widgline0.getText();
-            trackScale.line0 = (int)Float.parseFloat(s1);
-            widgCurve.setMinMax(trackScale.scale, -trackScale.scale);
+            int line0 = (int)Float.parseFloat(s1);
+            //widgCurve.setMinMax(trackScale.scale, -trackScale.scale);
+            trackScale.trackView.setTrackScale(scale, scale0, line0);
             widgBtnScale.setForegroundColor(GralColor.getColor("lgn"));
           } catch(NumberFormatException exc){
             widgBtnScale.setForegroundColor(GralColor.getColor("lrd"));
@@ -273,18 +281,24 @@ public class InspcCurveView
   } };
   
   
-  GralUserAction actionSetScale = new GralUserAction(){
+  /**
+   * 
+   */
+  GralUserAction actionSetTrackForScale = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(actionCode == KeyCode.mouse1Down){
         if(trackScale !=null){
           //last variable
           trackScale.widgVarPath.setBackgroundColor(GralColor.getColor("wh"));
+          trackScale.trackView.setLineColor(colorLineTrackSelected);
         }
         trackScale = (TrackValues)widgd.getContentInfo();
+        colorLineTrackSelected = trackScale.trackView.getLineColor();
+        trackScale.trackView.setLineColor(colorBlack);
         trackScale.widgVarPath.setBackgroundColor(GralColor.getColor("lam"));
-        widgScale.setText("" + trackScale.scale);
-        widgScale0.setText("" + trackScale.scale0);
-        widgline0.setText("" + trackScale.line0);
+        widgScale.setText("" + trackScale.trackView.getScale7div());
+        widgScale0.setText("" + trackScale.trackView.getOffset());
+        widgline0.setText("" + trackScale.trackView.getLinePercent());
       }
       return true;
   } };

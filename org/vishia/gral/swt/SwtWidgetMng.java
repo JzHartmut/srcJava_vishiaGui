@@ -1464,9 +1464,6 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
           swtWidget.setForeground(color); 
         } break;
         case GralPanelMngWorking_ifc.cmdRedraw: swtWidget.redraw(); break;
-        case GralPanelMngWorking_ifc.cmdRedrawPart: 
-          assert(swtWidget instanceof CurveView);
-          ((CurveView)(swtWidget)).redrawData(); break; //causes a partial redraw
         default:
           
         if(swtWidget instanceof Text){ 
@@ -1625,11 +1622,6 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 		GralWidget descr = indexNameWidgets.get(sName);
 		if(descr == null){
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sName);
-  	} else if(!(descr.getGraphicWidgetWrapper() instanceof CurveView)) {
-  		log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: widget %s fault type", sName);
-  	} else {
-  		((CurveView)descr.getGraphicWidgetWrapper()).setSample(values);
-  		
   	}
   	
 	}
@@ -1640,9 +1632,6 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 		GralWidget descr = indexNameWidgets.get(sName);
 		if(descr == null){
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sName);
-  	} else if((descr.getGraphicWidgetWrapper() instanceof CurveView)) {
-  		//sends a redraw information.
-  	  widgetChangeRequExecuter.addRequ(new GralWidgetChangeRequ(descr, GralPanelMngWorking_ifc.cmdRedrawPart, 0, null, null));
   	} else {
   	}
 	}
@@ -1660,26 +1649,6 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	}
 	
 	
-	@Override
-	public void setColorGridCurveViewY(String sName, int backgroundColor,
-			int[] colorLines, char grid) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-  public void setLineCurveView(String sNameView, int trackNr, String sNameLine, String sVariable, int colorValue, int style, int nullLine, float yScale, float yOffset)
-	{
-		GralWidget descr = indexNameWidgets.get(sNameView);
-		if(descr == null){
-  		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sNameView);
-  	} else if(!(descr.getGraphicWidgetWrapper() instanceof CurveView)) {
-  		log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: widget %s fault type", sNameView);
-  	} else {
-      CurveView view = (CurveView)descr.getGraphicWidgetWrapper();
-      view.setLine(trackNr, sNameLine, colorValue, style, nullLine, yScale, yOffset);
-  	}
-	}
   
 	
 	

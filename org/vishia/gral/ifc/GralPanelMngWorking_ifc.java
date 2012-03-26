@@ -72,7 +72,7 @@ public interface GralPanelMngWorking_ifc
   
   final static int cmdRedraw = 0x3ed3a2;  //redraw
   
-  final static int cmdRedrawPart = 0x3ed3a201;  //redraw
+  //final static int cmdRedrawPart = 0x3ed3a201;  //redraw
   
   final static int cmdRemove = 0xde1e7e;  //delete
   

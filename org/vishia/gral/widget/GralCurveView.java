@@ -6,15 +6,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralCurveViewTrack_ifc;
+import org.vishia.gral.ifc.GralCurveView_ifc;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.util.Assert;
 
 
-public abstract class GralCurveView extends GralWidget
+/**Curve representation for timed values. It is the base class for all implementation.
+ * @see GralCurveViewTrack_ifc.
+ * @author Hartmut Schorrig
+ *
+ */
+public abstract class GralCurveView extends GralWidget implements GralCurveView_ifc
 {
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-03-25 Hartmut chg: Some routines from SWT moved to this because there are independent.
    * <li>2012-03-17 Hartmut chg: All track-associated data now in the {@link Track} inner class.
    * <li>2012-02-25 Hartmut new: All data have a short timestamp. The x-pixel are calculated with timestamp,
    *   not only with currently storage.
@@ -54,7 +63,7 @@ public abstract class GralCurveView extends GralWidget
   
   /**The describing and the actual data of one track (one curve)
    */
-  protected static class Track implements GralSetValue_ifc {
+  protected static class Track implements GralCurveViewTrack_ifc, GralSetValue_ifc {
     public final String name;
     public String sDataPath;
     
@@ -75,7 +84,7 @@ public abstract class GralCurveView extends GralWidget
     //public float yFactor;
     
     /**The percent from 0..100 where the 0-line is presented. */
-    public float y0Line;
+    public int y0Line;
     
     /**The color of the line. */
     public GralColor lineColor;
@@ -115,6 +124,32 @@ public abstract class GralCurveView extends GralWidget
     @Override public void setMinMax(float minValue, float maxValue) {
       this.min = minValue; this.max = maxValue;
     }
+
+    @Override public int getLinePercent(){ return y0Line; }
+   
+    @Override public float getOffset(){ return yOffset; }
+    
+    @Override public float getScale7div(){ return yScale;  }
+
+    @Override public GralColor getLineColor(){ return lineColor; }
+
+    
+    /**Change the scaling of a track.
+     * @param trackNr Number of the track in order of creation, 0 ist the first.
+     * @param scale7div value per division
+     * @param offset value, which is shown at line0
+     * @param line0 percent of 0-line in graphic.
+     */
+    public void setTrackScale(float scale7div, float offset, int line0){
+      yScale = scale7div;
+      yOffset = offset;
+      y0Line = line0;
+    }
+
+    @Override public void setLineColor(GralColor color){ lineColor = color; }
+
+
+    
   }
   
   protected Track[] tracks;
@@ -128,6 +163,22 @@ public abstract class GralCurveView extends GralWidget
   
   /**A short timestamp for the values in {@link GralCurveView.Track#values}.
    * It maybe a millisecond timestamp. Then about 2000000 seconds are able to display.
+   * This array and the {@link Track#actValue} array are filled wrapping.
+   * <br><br> 
+   * A negative difference between 2 successive time stamps designates the time break point between newer values
+   * and the successive currently points to the newest one in ascending direction (past to future).
+   * Initially this array will be filled with successive values from 0 to negatives in step -1 
+   * to designate a time break at all points. 
+   * <br><br>
+   * At startup of filling 3 data points this array is filled for example with
+   * <pre>
+   * -1234, -1245, -1256, -3, -4, -5, ... 
+   * </pre>
+   * In this example the wrapping time stamps are negative but successive ascending of course.
+   * The not used 4. point is accepted as a correct point faulty, it produces a presentation to the value 0
+   * because nothing is stored in data in 1253 time units (which may be milliseconds). This faulty presentation
+   * is only present on startup of graphic and only if the difference is in range of presentation width,
+   * see {@link #drawPrepareIndicesData(int, int)}
    */
   protected final int[] timeValues;
   
@@ -317,6 +368,9 @@ public abstract class GralCurveView extends GralWidget
     this.nrofValuesShow = 0;
     tracks = new Track[nrofTracks];
     timeValues = new int[maxNrofXValues];
+    for(int ix = 0; ix < maxNrofXValues; ++ix){
+      timeValues[ix] = ix;  //store succession of time values to designate it as empty.  
+    }
     //values = new float[maxNrofXvalues][nrofTracks];
     setPanelMng(mng);
     mng.registerWidget(this);
@@ -334,7 +388,7 @@ public abstract class GralCurveView extends GralWidget
    * @param scale
    * @param offset
    */
-  abstract public void initTrack(String sNameTrack, String sDataPath, GralColor color, int style
+  abstract public GralCurveViewTrack_ifc initTrack(String sNameTrack, String sDataPath, GralColor color, int style
       , int nullLine, float scale, float offset);
 
   
@@ -346,6 +400,19 @@ public abstract class GralCurveView extends GralWidget
   public void setTimeSpread(int time){
     timeSpread = time; 
   }
+  
+  
+  /**Change the scaling of a track.
+   * @param trackNr Number of the track in order of creation, 0 ist the first.
+   * @param scale7div value per division
+   * @param offset value, which is shown at line0
+   * @param line0 percent of 0-line in graphic.
+   */
+  public void setTrackScale(int trackNr, float scale7div, float offset, int line0){
+    Track track = listTracks.get(trackNr);
+    track.setTrackScale(scale7div, offset, line0);
+  }
+  
   
   
   /**This list describes the data paths in that order, which should be regard
@@ -369,8 +436,144 @@ public abstract class GralCurveView extends GralWidget
    * @param values The values.
    * @param timeshort relative time-stamp as currently wrapping time in milliseconds.
    */
-  public abstract void setSample(float[] newValues, int timeshort);
+  //public abstract void setSample(float[] newValues, int timeshort);
+  /**
+   * @see org.vishia.gral.widget.GralCurveView#setSample(float[], int)
+   */
+  @Override public void setSample(float[] newValues, int timeshort) {
+    /*
+    if(this.nrofValues >= this.values.length){
+      float[] firstLine = this.values[0];
+      //NOTE: arraycopy doesn't copy all data, but the references of float[] in the values-array.
+      System.arraycopy(this.values, 1, this.values, 0, this.values.length-1);
+      this.nrofValues = this.values.length-1;
+      this.values[this.nrofValues] = firstLine;  //reuse first line as last, prevent new allocation.
+      iDataLast -=1;  //because the data are shifted, the index of last access is to be decrement.
+      nrofDataShift.incrementAndGet(); //shift data in graphic.
+    }
+    int nrofTrack = newValues.length;
+    if(nrofTrack > this.values[0].length){
+      nrofTrack = this.values[0].length;     //it is the lesser value of both.
+    }
+    //copy the values in the local area:
+    for(int ix=0; ix < nrofTrack; ++ix){
+      this.values[nrofValues][ix] = newValues[ix];  
+    }
+    */
+    if(testStopWr) return;  //only for debug test.
+    if(nrofValues < maxNrofXValues){
+      this.nrofValues +=1;
+    } else {
+      nrofDataShift.incrementAndGet(); //shift data in graphic.
+    }
+    //if(++ixDataWr >= maxNrofXValues){ ixDataWr = 0; } //wrap arround.
+    ixDataWr += adIxData;
+    if(!bFreeze){
+      ixDataShowRight = ixDataWr;
+    }
+    this.newSamples +=1;  //information for paint event
+    this.nrofValuesForGrid +=1;
+    if(nrofValuesForGrid > maxNrofXValues + gridDistanceStrongY){
+      nrofValuesForGrid -= gridDistanceStrongY;  //prevent large overflow.
+    }
+    int ixSource = -1;
+    int ixWr = (ixDataWr >> shIxiData) & mIxiData;
+    for(Track track: tracks){
+      track.values[ixWr] = newValues[++ixSource];  //write in the values.
+    }
+    timeValues[ixWr] = timeshort;
+    redrawBecauseNewData = true;
+    //System.out.println("" + timeshort);
+    repaint(50,50);
+    //getDisplay().wake();  //wake up the GUI-thread
+    //values.notify();
+  }
 
+  
+  
+
+  
+  
+  
+  /**prepares indices of data.
+   * All data have a timestamp. the xpixel-values are calculated from the timestamp.
+   * The {@link #ixDataShown} array will be filled with the indices to the data for each x pixel from right to left.
+   * If there are more as one data record for one pixel, the step width of ixData is >1,
+   * If there are more as one x-pixel for one data record, the same index is written for that pixel
+   * <br><br>
+   * It uses the {@link timeValues} to get the timestamp of the values starting from param ixDataRight
+   * for the right pixel of view. The ixDataRight will be decremented. It is a wrapping index with
+   * step width of {@link #adIxData}. If the timestamp of any next index is greater than the last one,
+   * it is a indication that any newer data are reached after wrapping. Then the preparation stops.
+   * <br><br>
+   * It fills {@link #ixDataShown} with indices to data per x pixel point.
+   * If there are the same data for more as one pixel (zoomed near), then {@link #ixDataShown} will contain
+   * the same index. The presentation can decide whether it should be shown with the same level (stepwise)
+   * or with any linear approximation
+   * 
+   * @param ixDataRight Index in data array for the right point. 
+   *   It is a index which wraps around full integer range, see {@link #adIxData}.
+   * @param xViewPart width of the spread to prepare in pixel
+   * @return nrof pixel to draw. It is xViewPart if enough data are available, elsewhere less. 
+   */
+  protected int drawPrepareIndicesData(int ixDataRight, int xViewPart){
+    System.arraycopy(ixDataShown, 0, ixDataShown, xViewPart, ixDataShown.length - xViewPart);
+    int ixDataRightLast = ixDataShown[0];  //the index in data of right point for last paint.
+    int ixixDataShownSh = -1;  //store which index is proper to ixDataRightLast
+    ixDataShown[0] = ixDataRight;
+    int ixData = ixDataRight;
+    int ixD = (ixData >> shIxiData) & mIxiData;
+    int ixp2 = 0;
+    int ixp = 0;
+    int time9 = timeValues[ixD];
+    int time2 = time9;  //start time
+    int time = time9;
+    int dtime2 = 0;
+    //int dtime = 0;
+    //xViewPart = nrof pixel from right
+    //ixp1 counts from 0... right to left
+    //int nrofValues1 = nrofValues;
+    while(ixp < xViewPart
+         && dtime2 <=0
+         ){ // && ixp1 >= ixp2){ //singularly: ixp1 < ixp2 if a faulty timestamp is found.
+      do{ //all values per 1 pixel
+        ixData -= adIxData; //decrement to older values
+        //nrofValues -=1;
+        ixD = (ixData >> shIxiData) & mIxiData;
+        time = timeValues[ixD];
+        dtime2 = time - time2;
+        //dtime = time9 - time; //offset to first right point
+        if((dtime2) <0){
+          int dtime0 = time9 - time;
+          ixp = (int)(dtime0 * pixel7time + 0.5f);  //calculate pixel offset from right, right =0 
+          if(ixp > xViewPart){   //next time stamp is in the past of requested view
+            ixp = xViewPart;     //no more than requested nr of points. 
+          }
+          if(xpCursor1 == cmdSetCursor && ixData == ixDataCursor1){
+            xpCursor1 = ixp;                  //set cursor xp if the data index is gotten.
+          }
+          if(xpCursor2 == cmdSetCursor && ixData == ixDataCursor2){
+            xpCursor2 = ixp;
+          }
+        }
+      } while( ixp == ixp2   //all values for the same 1 pixel
+            && dtime2 <00     //stop at time crack to newer values.
+          //&& nrofValues >0
+            //&& ixData != ixDataRight  //no more as one wrap around, if dtime == 0 or is less
+             );
+      //
+      //if(ixp1 > ixp2 && ixp1 <= size_x){ //prevent drawing on false timestamp in data (missing data)
+      while(ixp2 < ixp) { 
+        ixDataShown[++ixp2] = ixData;  //same index to more as one point.
+      }
+    } 
+    //ixDataShown[++ixp2] = -1;      //the last
+    return ixp;
+  }
+  
+  
+
+  
   
   @Override
   public Object getWidgetImplementation()
@@ -416,4 +619,172 @@ public abstract class GralCurveView extends GralWidget
   }
   
 
+  
+  protected void moveCursors(int xPos){
+    System.out.println("middle");
+    int xr = nrofValuesShow - xPos;  //from right
+    if(xpCursor1 < 0){
+      xpCursor1 = xr;
+      bMouseDownCursor1 = true;
+    } else if(xpCursor2 < 0){
+      xpCursor2 = xr;
+      bMouseDownCursor2 = true;
+    } else { //decide which cursor
+      if(xpCursor1 < xpCursor2){
+        int xp = xpCursor1;      //swap
+        xpCursor1 = xpCursor2;
+        xpCursor2 = xp;
+      }
+      int xm = (xpCursor1 + xpCursor2) /2;
+      if(xr > xm){ //more left
+        xpCursor1 = xr;
+        bMouseDownCursor1 = true;
+        System.out.println("SwtCurveView.mouseDown; cursor1");
+      } else {
+        xpCursor2 = xr;
+        bMouseDownCursor2 = true;
+        System.out.println("SwtCurveView.mouseDown; cursor1");
+      }
+    }
+
+  }
+  
+
+  
+  /**Zooms the curve presentation with same index right with a lesser time spread. 
+   * If the curve presentation is running yet, a finer solution in the present is given. 
+   * Note that in this case the right index is the actual write index.*/
+  protected void zoomToPresent(){
+    timeSpread /=2;    //half timespread
+    System.out.println("right-top");
+  }
+  
+  
+  
+  
+  /**Zooms the curve presentation with same index right with a greater time spread. 
+   * If the curve presentation is running yet, a broader solution in the present is given. 
+   * Note that in this case the right index is the actual write index.*/
+  protected void zoomToPast(){
+    //zoom out
+    if(xpCursor1 >=0){
+      ixDataCursor1 = ixDataShown[xpCursor1];
+    }
+    if(xpCursor2 >=0){
+      ixDataCursor2 = ixDataShown[xpCursor2];
+    }
+    xpCursor1 = xpCursor2 = cmdSetCursor;  
+    timeSpread *=2;    //double timespread
+    System.out.println("left-top");
+
+  }
+  
+  
+  /**Zooms between the given vertical cursors.
+   * The time spread is calculated so that the cursors are places on the same data indices at 
+   * 1/10 and 9/10 of the presentation range.
+   */
+  protected void zoomBetweenCursors(){
+    ixDataCursor1 = ixDataShown[xpCursor1];
+    ixDataCursor2 = ixDataShown[xpCursor2];
+    ixDataShowRight = ixDataCursor2 + (((ixDataCursor2 - ixDataCursor1) / 10) & mIxData);
+    int ixiData1 = (ixDataShown[xpCursor1] >> shIxiData) & mIxiData;
+    int ixiData2 = (ixDataShown[xpCursor2] >> shIxiData) & mIxiData;
+    int time1 = timeValues[ixiData1];
+    int time2 = timeValues[ixiData2];
+    timeSpread = (time2 - time1) * 10/8;
+    assert(timeSpread >0);
+    xpCursor1 = xpCursor2 = cmdSetCursor;  
+
+  }
+  
+  
+  /**Unzooms between the given vertical cursors.
+   * The cursors will be set newly in graphic at the same data indices.
+   * The middle value of both cursors will be at the same position.
+   * The time spread is multiplied by the value 5.
+   * If the right border of presentation will be in the future, the {@link #ixDataShowRight}
+   * will be greater than {@link #ixDataWr}, then the presentation will be adjusted to the current
+   * right {@link #ixDataWr} and the cursor positions are changed adequate.
+   *
+   */
+  protected void cursorUnzoom()
+  {
+    int xpCursorMid = (xpCursor1 + xpCursor2) /2;
+    int ixDataMid = ixDataShown[xpCursorMid];  //from Pixel value of cursor to data index
+    //int timeMid = timeValues[(ixDataMid >> shIxiData) & mIxiData];
+    //int timeRight = timeValues[(ixDataShowRight >> shIxiData) & mIxiData];
+    //int dtime = timeRight - timeMid;
+    //Assert.check(dtime > 0);
+    ixDataShowRight = ixDataMid + (ixDataShowRight - ixDataMid) * 5;  //5 times longer
+    if((ixDataShowRight - ixDataWr) >0){
+      ixDataShowRight = ixDataWr;    //show full to right
+    }
+    //ixDataCursor1 = ixDataShown[xpCursor1];  //from Pixel value of cursor to data index
+    //ixDataCursor2 = ixDataShown[xpCursor2];
+    //ixDataShowRight = ixDataCursor2 + (((ixDataCursor2 - ixDataCursor1)));
+    timeSpread *=5;
+    /*
+    int ixiData2 = (ixDataCursor2 >> shIxiData) & mIxiData;
+    int time1 = timeValues[(ixDataCursor1 >> shIxiData) & mIxiData];
+    int time2 = timeValues[ixiData2];
+    timeSpread = (time2 - time1) * 5;
+    */
+    Assert.check(timeSpread >0);
+    xpCursor1 = xpCursor2 = cmdSetCursor;  
+
+  }
+  
+
+  /**Shifts the curve presentation to the present (actual values).
+   * If the TODO
+   */
+  protected void viewToPresent()
+  {
+    if(bFreeze){
+      //assume that the same time is used for actual shown data spread as need
+      //for the future.
+      
+      int timeRight = timeValues[(ixDataShowRight >> shIxiData) & mIxiData];
+      int timeRightNew = timeRight + timeSpread * 7/8;
+      
+      //int ixdDataSpread = ixDataShowRight - ixDataShown[nrofValuesShow * 7/8];
+      //ixDataShowRight += ixdDataSpread;
+      //if((ixDataShowRight - ixDataWr) > 0 && (ixDataShowRight - ixDataWr) < ixdDataSpread * 2) {
+        //right end reached.
+        ixDataShowRight = ixDataWr;
+        bFreeze = false;
+        //ixDataShowRight1 = ixDataWr + ixdDataSpread;
+      //}
+      //ixDataShowRight += ixDataShown[0] - ixDataShown[nrofValuesShow-1]; 
+    }
+    System.out.println("right-bottom");
+  }
+  
+  /**Shifts the curve presentation to the past. If the presentation is running, it is stopped firstly.
+   * If it is stopped, the data index on 20% of current presentation will be adjusted to the right border.
+   * It means 20% are presented overlapping. The time spread is not changed.
+   */
+  protected void viewToPast()
+  {
+    if(!bFreeze){ 
+      bFreeze = true;
+      //now ixDataShow remain unchanged.
+    } else {
+      int ixdDataSpread = ixDataShowRight - ixDataShown[nrofValuesShow * 8/10];
+      //int ixDataShowRight1 = ixDataShown[nrofValuesShow * 7/8];
+      //int ixdDataSpread = ixDataShowRight - ixDataShowRight1;
+      ixDataShowRight -= ixdDataSpread;
+      if((ixDataShowRight - ixDataWr) < 0 && (ixDataWr - ixDataShowRight) < ixdDataSpread) {
+        //left end reached.
+        ixDataShowRight = ixDataWr + ixdDataSpread;
+      }
+    }
+    System.out.println("left-bottom");
+
+  }
+  
+  
+  
+  
 }

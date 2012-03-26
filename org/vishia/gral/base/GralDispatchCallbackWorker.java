@@ -92,7 +92,7 @@ public abstract class GralDispatchCallbackWorker
 	public int runTimer(int timeDelay){ return timeDelay; }
 	
 	
-	/**Adds to the graphic thread or sets a new delay it is added already.
+	/**Adds to the graphic thread or sets a new delay if is added already.
 	 * @param dst The graphic thread.
 	 * @param delay time in milliseconds for delayed execution or 0.
 	 */

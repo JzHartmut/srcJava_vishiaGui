@@ -264,6 +264,8 @@ public class InspcGuiComm
         }//for widgets in panel
       }
       inspcGui.curveA.addTxInfoBlock();
+      inspcGui.curveB.addTxInfoBlock();
+      inspcGui.curveC.addTxInfoBlock();
     } catch(Exception exc){ 
     }
     Runnable userOrder;
