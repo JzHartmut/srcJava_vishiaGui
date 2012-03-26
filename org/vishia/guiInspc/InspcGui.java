@@ -141,9 +141,9 @@ private class InspcGuiCfg extends GuiCfg
    * This routine overrides {@link GuiCfg#initGuiAreas()} and calls its super.
    * Additional some user initialization is done.
    */
-  @Override protected void initGuiAreas()
+  @Override protected void initGuiAreas(String sAreaMainPanel)
   {
-    super.initGuiAreas();
+    super.initGuiAreas("A1C2");
     curveA.buildGraphic(gui, "curve A");
     curveB.buildGraphic(gui, "curve B");
     curveC.buildGraphic(gui, "curve C");

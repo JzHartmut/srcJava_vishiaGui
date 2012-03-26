@@ -245,7 +245,7 @@ GralDispatchCallbackWorker initGraphic = new GralDispatchCallbackWorker("GuiCfg.
   {
     gralMng.selectPanel("primaryWindow");
     gralMng.setPosition(10, 16,5,20,0,'.');
-    initGuiAreas();
+    initGuiAreas("A1C1");
     gralMng.gralDevice.removeDispatchListener(this);    
     countExecution();
   }
@@ -274,14 +274,14 @@ GralDispatchCallbackWorker configGuiWithZbnf = new GralDispatchCallbackWorker("G
 /**Initializes the areas for the panels and configure the panels.
  * This routine can be overridden if other areas are need.
  */
-protected void initGuiAreas()
+protected void initGuiAreas(String sMainArea)
 {
   gui.setFrameAreaBorders(20, 80, 60, 85);
   gui.setStandardMenusGThread(new File("."), actionFile);
   initMenuGralDesigner();
   gralMng.selectPanel("primaryWindow");
   mainTabPanel = gralMng.addTabbedPanel("mainTab", null, 0);
-  gui.addFrameArea(1,1,3,1, mainTabPanel); //dialogPanel);
+  gui.addFrameArea(sMainArea, mainTabPanel); //dialogPanel);
   Appendable out = gui.getOutputBox();
   mainCmd.setOutputChannels(out, out);
  

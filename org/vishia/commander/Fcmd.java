@@ -184,7 +184,7 @@ public class Fcmd extends GuiCfg
    * output messages if problems occurs while build the rest of the GUI.
    */
   @Override
-  protected void initGuiAreas()
+  protected void initGuiAreas(String sAreaMainPanel)
   {
     panelBuildIfc.registerUserAction("KeyAction",
         keyActions.commanderKeyActions); // all key actions, registered central

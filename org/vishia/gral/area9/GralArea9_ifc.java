@@ -54,6 +54,8 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc, GralMngApplAdapter
 {
   /**Version history:
    * <ul>
+   * <li>2012-03-25 Hartmut new/chg: {@link #addFrameArea(String, GralPanelContent)} now with String designation of area.
+   *   It should be used instead designation with 4 integers in range 1..3.
    * <li>2011-12-26 Hartmut new extends {@link GralMngApplAdapter_ifc}
    * <li>2011-11-12 Hartmut chg: {@link #initGraphic(String)} instead initOutputArea().
    * <li>2011-11-12 Hartmut new: {@link #getActionAbout()} and {@link #getActionAbout()} to support menu setting by user
@@ -148,12 +150,24 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc, GralMngApplAdapter
   
   /**Sets a Panel into a defined area. See {@link #setFrameAreaBorders(int, int, int, int)}.
    * It should be called only in the GUI-Thread.
+   * @param sArea Area identifcation, e.g. "B3C3" where alpha-char A..C is column, numeric char 1..3 is row.
+   *   If a range is given, the whole area of that areas is used. 
+   * @param component The component.
+   * @throws IndexOutOfBoundsException if the arguments are false or the area is occupied already.
+   */
+  void addFrameArea(String sArea, GralPanelContent component)
+  throws IndexOutOfBoundsException;
+  
+  
+  /**Sets a Panel into a defined area. See {@link #setFrameAreaBorders(int, int, int, int)}.
+   * It should be called only in the GUI-Thread.
    * @param xArea 1 to 3 for left, middle, right
    * @param yArea 1 to 3 for top, middle, bottom
    * @param dxArea 1 to 3 for 1 field to 3 fields to right.
    * @param dyArea 1 to 3 for 1 field to 3 field to bottom
    * @param component The component.
    * @throws IndexOutOfBoundsException if the arguments are false or the area is occupied already.
+   * @deprecated use {@link #addFrameArea(String, GralPanelContent)}.
    */
   void addFrameArea(int xArea, int yArea, int dxArea, int dyArea, GralPanelContent component)
   throws IndexOutOfBoundsException;

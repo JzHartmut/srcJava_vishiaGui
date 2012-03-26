@@ -266,6 +266,15 @@ public class GralArea9Window implements GralArea9_ifc
   }
   
   
+
+  
+  @Override public void addFrameArea(String sArea, GralPanelContent component)
+  throws IndexOutOfBoundsException {
+    GralRectangle r = convertArea(sArea);
+    addFrameArea(r.x, r.y, r.dx, r.dy, component);
+  }
+ 
+  
   
   /**Sets a Component into a defined area. See {@link #setFrameAreaBorders(int, int, int, int)}.
    * It should be called only in the GUI-Thread.
