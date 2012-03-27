@@ -3,7 +3,7 @@ package org.vishia.gral.cfg;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralPos;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
@@ -197,20 +197,20 @@ public class GralCfgDesigner
         sColumn = (cfge.positionInput.xPosRelative ? "&" : "") + cfge.positionInput.xPos + (cfge.positionInput.xPosFrac !=0 ? "." + cfge.positionInput.xPosFrac : "");
         sHeight = "" + cfge.positionInput.ySizeDown + (cfge.positionInput.ySizeFrac !=0 ? "." + cfge.positionInput.ySizeFrac : "");
         sWidth = "" + cfge.positionInput.xWidth + (cfge.positionInput.xSizeFrac !=0 ? "." + cfge.positionInput.xSizeFrac : "");
-        dialogFieldName.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sName ==null ? "" : sName);
-        dialogFieldDatapath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sDataPath == null ? "" : sDataPath);
-        dialogFieldText.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sText ==null ? "" : sText);
-        dialogFieldFormat.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sFormat ==null ? "" : sFormat);
-        dialogFieldShow.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sShowMethod ==null ? "" : sShowMethod);
-        dialogFieldAction.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sActionMethod ==null ? "" : sActionMethod);
-        dialogFieldPrompt.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sPrompt ==null ? "" : sPrompt);
-        dialogFieldPromptPos.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sPromptPos ==null ? "" : sPromptPos);
-        dialogFieldLine.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sLine);
-        dialogFieldColumn.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sColumn);
-        dialogFieldHeight.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sHeight);
-        dialogFieldWidth.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sWidth);
+        dialogFieldName.setValue(GralMng_ifc.cmdSet, 0, sName ==null ? "" : sName);
+        dialogFieldDatapath.setValue(GralMng_ifc.cmdSet, 0, sDataPath == null ? "" : sDataPath);
+        dialogFieldText.setValue(GralMng_ifc.cmdSet, 0, sText ==null ? "" : sText);
+        dialogFieldFormat.setValue(GralMng_ifc.cmdSet, 0, sFormat ==null ? "" : sFormat);
+        dialogFieldShow.setValue(GralMng_ifc.cmdSet, 0, sShowMethod ==null ? "" : sShowMethod);
+        dialogFieldAction.setValue(GralMng_ifc.cmdSet, 0, sActionMethod ==null ? "" : sActionMethod);
+        dialogFieldPrompt.setValue(GralMng_ifc.cmdSet, 0, sPrompt ==null ? "" : sPrompt);
+        dialogFieldPromptPos.setValue(GralMng_ifc.cmdSet, 0, sPromptPos ==null ? "" : sPromptPos);
+        dialogFieldLine.setValue(GralMng_ifc.cmdSet, 0, sLine);
+        dialogFieldColumn.setValue(GralMng_ifc.cmdSet, 0, sColumn);
+        dialogFieldHeight.setValue(GralMng_ifc.cmdSet, 0, sHeight);
+        dialogFieldWidth.setValue(GralMng_ifc.cmdSet, 0, sWidth);
       } else {
-        dialogFieldName.setValue(GralPanelMngWorking_ifc.cmdSet, 0, "ERROR cfge");
+        dialogFieldName.setValue(GralMng_ifc.cmdSet, 0, "ERROR cfge");
       }
     }
     //dialogWindowProps.posWindow.setPosition(widgd.pos, widgd.pos.y +2, GralGridPos.size+30, widgd.pos.x, GralGridPos.size+40, 1, 'r' );

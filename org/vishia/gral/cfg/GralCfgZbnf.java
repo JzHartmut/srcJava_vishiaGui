@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 
-import org.vishia.gral.ifc.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.mainCmd.Report;
 import org.vishia.util.StringPart;
@@ -17,7 +17,7 @@ import org.vishia.zbnf.ZbnfParser;
 /**Class to read the configuration script for a Graphical User Interface. The syntax of the configuration
  * matches to the class {@link GralCfgData}, which contains all data of read configuration
  * after invoking the read method. That configuration data are associated in 
- * {@link GralCfgBuilder#GuiCfgBuilder(GralCfgData, GralGridBuild_ifc, File)} and used in
+ * {@link GralCfgBuilder#GuiCfgBuilder(GralCfgData, GralMngBuild_ifc, File)} and used in
  * {@link GralCfgBuilder#buildGui(org.vishia.msgDispatch.LogMessage, int)} to build the GUI appearance.
  * The building of the GUI with the {@link GralCfgData} can be done without this script reader too,
  * but this class reads that data from a script.

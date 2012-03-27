@@ -1,27 +1,3 @@
-/****************************************************************************
- * For this source the LGPL Lesser General Public License,
- * published by the Free Software Foundation is valid.
- * It means:
- * 1) You can use this source without any restriction for any desired purpose.
- * 2) You can redistribute copies of this source to everybody.
- * 3) Every user of this source, also the user of redistribute copies
- *    with or without payment, must accept this license for further using.
- * 4) But the LPGL ist not appropriate for a whole software product,
- *    if this source is only a part of them. It means, the user
- *    must publish this part of source,
- *    but don't need to publish the whole source of the own product.
- * 5) You can study and modify (improve) this source
- *    for own using or for redistribution, but you have to license the
- *    modified sources likewise under this LGPL Lesser General Public License.
- *    You mustn't delete this Copyright/Copyleft inscription in this source file.
- *
- * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
- * @version 2010-03-07  (year-month-day)
- * list of changes:
- * 2010-03-07: Hartmut new: The idea for this class comes from the necessity of some helper methods for gui-dialog.
- *
- ****************************************************************************/
-
 package org.vishia.gral.swt;
 
 import java.io.InputStream;
@@ -58,11 +34,11 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
-//import org.eclipse.swt.widgets.;
 
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralGridProperties;
@@ -70,6 +46,7 @@ import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralLed;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidgetChangeRequ;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWidgetMng;
@@ -84,17 +61,15 @@ import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralFont;
-import org.vishia.gral.ifc.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralImageBase;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
-import org.vishia.gral.widget.GralCurveView;
-import org.vishia.gral.widget.GralValueBar;
 import org.vishia.msgDispatch.LogMessage;
 
 
@@ -132,7 +107,7 @@ import org.vishia.msgDispatch.LogMessage;
  * @author Hartmut Schorrig
  *
  */
-public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWorking_ifc
+public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
 //GuiShellMngIfc<Control>   
 {
   private static final long serialVersionUID = -2547814076794969689L;
@@ -152,7 +127,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
 	 * <li>2011-08-13 Hartmut chg: New routines for store and calculate the position to regard large widgets.
 	 * <li>2011-06-17 Hartmut getValueFromWidget(): Table returns the whole selected line, cells separated with tab.
 	 *     The String-return.split("\t") separates the result to the cell values.
-	 * <li>2011-05-08 Hartmut new; {@link GralPanelMngWorking_ifc#cmdClear} used to clear a whole swt.Table, commonly using: clear a content of widget.
+	 * <li>2011-05-08 Hartmut new; {@link GralMng_ifc#cmdClear} used to clear a whole swt.Table, commonly using: clear a content of widget.
    * <li>2010-12-02 Hartmut: in method insertInfo((): call of checkAdmissibility() for some input parameter, 
 	 *     elsewhere exceptions may be possible on evaluating the inserted info in doBeforeDispatching().
 	 *     There the causer isn't found quickly while debugging.
@@ -310,7 +285,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  protected SwtWidgetMng(GralGraphicThread graldevice, Device device /*, Composite graphicFrame */
+  protected SwtMng(GralGraphicThread graldevice, Device device /*, Composite graphicFrame */
   , char displaySize, VariableContainer_ifc variableContainer
 	, LogMessage log)
   { //super(sTitle); 
@@ -325,7 +300,7 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public SwtWidgetMng(GralGraphicThread device 
+  public SwtMng(GralGraphicThread device 
     , SwtProperties propertiesGui
   	, VariableContainer_ifc variableContainer
   	, LogMessage log
@@ -1370,14 +1345,14 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
   
   public String insertInfo(GralWidget descr, int ident, String content)
   {
-  	return setInfo(descr, GralPanelMngWorking_ifc.cmdInsert, ident, content, null);
+  	return setInfo(descr, GralMng_ifc.cmdInsert, ident, content, null);
   }
   
   
   
   public String insertInfo(GralWidget descr, int ident, Object value)
   {
-  	return setInfo(descr, GralPanelMngWorking_ifc.cmdInsert, ident, value, null);
+  	return setInfo(descr, GralMng_ifc.cmdInsert, ident, value, null);
   }
   
   
@@ -1389,12 +1364,12 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
     if(currThreadIsGraphic()){
       setInfoGthread(descr, cmd, ident, visibleInfo, userData);
     } else {
-    	if(descr.name !=null && descr.name.equals("writerEnergy1Sec") && cmd == GralPanelMngWorking_ifc.cmdInsert) 
+    	if(descr.name !=null && descr.name.equals("writerEnergy1Sec") && cmd == GralMng_ifc.cmdInsert) 
     		stop();
     	//check the admissibility:
     	switch(cmd){
       case 0: checkAdmissibility(false);
-    	case GralPanelMngWorking_ifc.cmdInsert: checkAdmissibility(visibleInfo != null && (visibleInfo instanceof String || visibleInfo instanceof String[])); break;
+    	case GralMng_ifc.cmdInsert: checkAdmissibility(visibleInfo != null && (visibleInfo instanceof String || visibleInfo instanceof String[])); break;
     	}
     	widgetChangeRequExecuter.addRequ(new GralWidgetChangeRequ(descr, cmd, ident, visibleInfo, userData));
     }
@@ -1421,9 +1396,9 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
           //check cmd for it:
           done = true;
           switch(cmd){
-          case GralPanelMngWorking_ifc.cmdSetWindowVisible: gralWindow_setifc.setWindowVisible(ident == 0 ? false : true); break;
-          case GralPanelMngWorking_ifc.cmdCloseWindow: gralWindow_setifc.closeWindow(); break;
-          case GralPanelMngWorking_ifc.cmdRedraw: gralWindow_setifc.repaintGthread(); break;
+          case GralMng_ifc.cmdSetWindowVisible: gralWindow_setifc.setWindowVisible(ident == 0 ? false : true); break;
+          case GralMng_ifc.cmdCloseWindow: gralWindow_setifc.closeWindow(); break;
+          case GralMng_ifc.cmdRedraw: gralWindow_setifc.repaintGthread(); break;
           default: done = false;
           }
         }
@@ -1436,10 +1411,10 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
         //check cmd for it:
         done = true;
         switch(cmd){
-        case GralPanelMngWorking_ifc.cmdClear: gralWidget_setifc.clearGthread(); break;
-        case GralPanelMngWorking_ifc.cmdRedraw: gralWidget_setifc.redrawGthread(); break;
-        case GralPanelMngWorking_ifc.cmdInsert: gralWidget_setifc.insertGthread(ident, info, data); break;
-        case GralPanelMngWorking_ifc.cmdSet: {
+        case GralMng_ifc.cmdClear: gralWidget_setifc.clearGthread(); break;
+        case GralMng_ifc.cmdRedraw: gralWidget_setifc.redrawGthread(); break;
+        case GralMng_ifc.cmdInsert: gralWidget_setifc.insertGthread(ident, info, data); break;
+        case GralMng_ifc.cmdSet: {
           if(info instanceof String)
           gralWidget_setifc.setTextGthread((String)info, data); 
         } break;
@@ -1453,24 +1428,24 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
         int colorValue;
         done = true;
         switch(cmd){
-        case GralPanelMngWorking_ifc.cmdBackColor: {
+        case GralMng_ifc.cmdBackColor: {
           colorValue = ((Integer)(info)).intValue();
           Color color = propertiesGuiSwt.colorSwt(colorValue & 0xffffff);
           swtWidget.setBackground(color); 
         } break;
-        case GralPanelMngWorking_ifc.cmdLineColor:{ 
+        case GralMng_ifc.cmdLineColor:{ 
           colorValue = ((Integer)(info)).intValue();
           Color color = propertiesGuiSwt.colorSwt(colorValue & 0xffffff);
           swtWidget.setForeground(color); 
         } break;
-        case GralPanelMngWorking_ifc.cmdRedraw: swtWidget.redraw(); break;
+        case GralMng_ifc.cmdRedraw: swtWidget.redraw(); break;
         default:
           
         if(swtWidget instanceof Text){ 
             Text field = (Text)swtWidget;
             switch(cmd){
-              case GralPanelMngWorking_ifc.cmdSet:
-              case GralPanelMngWorking_ifc.cmdInsert: 
+              case GralMng_ifc.cmdSet:
+              case GralMng_ifc.cmdInsert: 
                 String sInfo = (String)info;
                 field.setText(sInfo); 
                 //shows the end of text because the position after last char is selected.
@@ -1481,8 +1456,8 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
           } else if(widget instanceof SwtLed){ 
             SwtLed field = (SwtLed)widget;
             switch(cmd){
-            case GralPanelMngWorking_ifc.cmdColor: field.setColor(ident, (Integer)info); break;
-            case GralPanelMngWorking_ifc.cmdSet: {
+            case GralMng_ifc.cmdColor: field.setColor(ident, (Integer)info); break;
+            case GralMng_ifc.cmdSet: {
               if(info instanceof Integer){
                 int colorInner = ((Integer)info).intValue();
                 field.setColor(ident, colorInner);
@@ -1514,10 +1489,10 @@ public class SwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, Gr
         //this is the new form. TODO only use that. TODO correct implementations for all widgets.
         GralWidgetGthreadSet_ifc setIfc = widget.getGthreadSetifc();
         switch(cmd){
-          case GralPanelMngWorking_ifc.cmdClear: setIfc.clearGthread(); break;
-          case GralPanelMngWorking_ifc.cmdRedraw: setIfc.redrawGthread(); break;
-          case GralPanelMngWorking_ifc.cmdInsert: setIfc.insertGthread(ident, info, data); break;
-          case GralPanelMngWorking_ifc.cmdSet: {
+          case GralMng_ifc.cmdClear: setIfc.clearGthread(); break;
+          case GralMng_ifc.cmdRedraw: setIfc.redrawGthread(); break;
+          case GralMng_ifc.cmdInsert: setIfc.insertGthread(ident, info, data); break;
+          case GralMng_ifc.cmdSet: {
             if(info instanceof String){
               setIfc.setTextGthread((String)info, data);
             } else {

@@ -12,9 +12,9 @@ public class SwtCanvasDrawer implements GralCanvas_ifc
   
   private final GC graphicContext;
   
-  private final SwtWidgetMng widgMng;
+  private final SwtMng widgMng;
 
-  SwtCanvasDrawer(SwtWidgetMng widgMng, GC graphicContext){
+  SwtCanvasDrawer(SwtMng widgMng, GC graphicContext){
     this.widgMng = widgMng;
     this.graphicContext = graphicContext;
   }

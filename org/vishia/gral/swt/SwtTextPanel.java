@@ -23,7 +23,7 @@ public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, A
   
   SwtTextBox textAreaOutput;
   
-  SwtTextPanel(String namePanel, Shell shell, int style, SwtWidgetMng mng) //GralPrimaryWindow_ifc mainWindow)
+  SwtTextPanel(String namePanel, Shell shell, int style, SwtMng mng) //GralPrimaryWindow_ifc mainWindow)
   { super(namePanel, mng, shell);
     Display device = shell.getDisplay();
     //Composite panel = (Composite) panelComposite;

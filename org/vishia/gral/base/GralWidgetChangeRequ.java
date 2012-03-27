@@ -14,7 +14,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
  * The evaluation of the data of this class are done in the overridden method 
  * {@link GralWidgetMng#setInfoGthread(GralWidget_ifc, int, int, Object, Object)} of the graphical
  * implementation layer. Any change request is determined by its {@link #cmd} code, which is defined
- * in {@link org.vishia.gral.ifc.GralPanelMngWorking_ifc}. A switch-case calls the proper methods
+ * in {@link org.vishia.gral.ifc.GralMng_ifc}. A switch-case calls the proper methods
  * from the {@link GralWidgetGthreadSet_ifc}.
  * <br> 
  * @author Hartmut Schorrig
@@ -60,7 +60,7 @@ public class GralWidgetChangeRequ
   public final GralWidget_ifc widg;
   
   /**The command which should be done to change. It is one of the static definitions cmd... 
-   * of the class n {@link org.vishia.gral.ifc.GralPanelMngWorking_ifc}. */
+   * of the class n {@link org.vishia.gral.ifc.GralMng_ifc}. */
   public final int cmd;
   
   /**Numeric value describes any identification, maybe the position of widget where the change should be done.

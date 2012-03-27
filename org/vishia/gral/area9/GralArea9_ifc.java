@@ -16,7 +16,6 @@ import org.vishia.mainCmd.MainCmd_ifc;
 
 
 /**This interface supports the usage of a window which is divide into 9 areas. 
- * License see {@link #version}.
  * The 2 horizontal and 2 vertical separation lines may able to move in the implementation class.
  * In that kind the areas are adjustable in size. Some of the 9 areas in a rectangle can be combined
  * to build a greater area. In that kind a proper user-adequate dividing of the window is possible.

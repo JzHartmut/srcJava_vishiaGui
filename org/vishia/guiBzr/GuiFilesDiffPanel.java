@@ -9,8 +9,8 @@ import java.util.TreeMap;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralGridBuild_ifc;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
@@ -32,7 +32,7 @@ public class GuiFilesDiffPanel
   final MainData mainData;
 
   /**Aggregation to the build interface of the manager where the panel is member of. */
-  final GralGridBuild_ifc panelBuildifc;
+  final GralMngBuild_ifc panelBuildifc;
   
   final StringBuilder uRenameOut =  new StringBuilder();
   
@@ -49,7 +49,7 @@ public class GuiFilesDiffPanel
   final Map<String, GralTableLine_ifc> indexMarkedFiles = new TreeMap<String, GralTableLine_ifc>();
   
   
-  public GuiFilesDiffPanel(MainData mainData, GralGridBuild_ifc panelBuildifc)
+  public GuiFilesDiffPanel(MainData mainData, GralMngBuild_ifc panelBuildifc)
   {
     this.panelBuildifc = panelBuildifc;
     this.mainData = mainData;
@@ -79,7 +79,7 @@ public class GuiFilesDiffPanel
 
   void fillFileTable(DataCmpn cmpn)
   {
-    widgdTableFilesCmpn.setValue(GralPanelMngWorking_ifc.cmdClear, -1, null);  //clear the whole table
+    widgdTableFilesCmpn.setValue(GralMng_ifc.cmdClear, -1, null);  //clear the whole table
     String sLastDirectory = "";
     List<DataFile> listDataFileInDirectory = new LinkedList<DataFile>();
     boolean bLastWasDirectoryBlock = false;
@@ -108,13 +108,13 @@ public class GuiFilesDiffPanel
 	  if(listDataFileInDirectory.size() >=3){ //if at least 3 files, write directory line above
 		  uLine.setLength(0);
 			uLine.append(sLastDirectory).append("\t------------\t \tdir");
-	    widgdTableFilesCmpn.setValue(GralPanelMngWorking_ifc.cmdInsert, 99999, uLine.toString());
+	    widgdTableFilesCmpn.setValue(GralMng_ifc.cmdInsert, 99999, uLine.toString());
 	    bLastWasDirectoryBlock = true;
 		} else {
 			if(bLastWasDirectoryBlock){
 				uLine.setLength(0);
 	  		uLine.append("----------------------------\t------------\t \tdir");
-	      widgdTableFilesCmpn.setValue(GralPanelMngWorking_ifc.cmdInsert, 99999, uLine.toString());
+	      widgdTableFilesCmpn.setValue(GralMng_ifc.cmdInsert, 99999, uLine.toString());
 	    }
 			bLastWasDirectoryBlock = false;
 		}
@@ -128,7 +128,7 @@ public class GuiFilesDiffPanel
 	      uLine.append("unknown"); 
 	    }
 	    uLine.append("\t \t").append(file.sType);
-	    widgdTableFilesCmpn.setValue(GralPanelMngWorking_ifc.cmdInsert, 99999, uLine.toString());
+	    widgdTableFilesCmpn.setValue(GralMng_ifc.cmdInsert, 99999, uLine.toString());
 		}
 		return bLastWasDirectoryBlock;
   }
@@ -138,7 +138,7 @@ public class GuiFilesDiffPanel
   
   void xxxfillFileTable(DataCmpn cmpn)
   {
-    widgdTableFilesCmpn.setValue(GralPanelMngWorking_ifc.cmdClear, -1, null);  //clear the whole table
+    widgdTableFilesCmpn.setValue(GralMng_ifc.cmdClear, -1, null);  //clear the whole table
     if(cmpn.listModifiedFiles !=null) for(DataFile file: cmpn.listModifiedFiles){
       //String name = file.getName();
       StringBuilder uLine = new StringBuilder(200); 
@@ -149,7 +149,7 @@ public class GuiFilesDiffPanel
         uLine.append("unknown"); 
       }
       uLine.append("\t \tchg");
-      widgdTableFilesCmpn.setValue(GralPanelMngWorking_ifc.cmdInsert, 99999, uLine.toString());
+      widgdTableFilesCmpn.setValue(GralMng_ifc.cmdInsert, 99999, uLine.toString());
     }
     if(cmpn.listAddFiles !=null) for(DataFile file: cmpn.listAddFiles){
       //String name = file.getName();
@@ -161,7 +161,7 @@ public class GuiFilesDiffPanel
         uLine.append("unknown"); 
       }
       uLine.append("\t \tadd");
-      widgdTableFilesCmpn.setValue(GralPanelMngWorking_ifc.cmdInsert, 99999, uLine.toString());
+      widgdTableFilesCmpn.setValue(GralMng_ifc.cmdInsert, 99999, uLine.toString());
     }
     if(cmpn.listNewFiles !=null) for(DataFile file: cmpn.listNewFiles){
       //String name = file.getName();
@@ -173,7 +173,7 @@ public class GuiFilesDiffPanel
         uLine.append("unknown"); 
       }
       uLine.append("\t \tnew");
-      widgdTableFilesCmpn.setValue(GralPanelMngWorking_ifc.cmdInsert, 99999, uLine.toString());
+      widgdTableFilesCmpn.setValue(GralMng_ifc.cmdInsert, 99999, uLine.toString());
     }
     if(cmpn.listRenamedFiles !=null) for(DataFile file: cmpn.listRenamedFiles){
       //String name = file.getName();
@@ -185,7 +185,7 @@ public class GuiFilesDiffPanel
         uLine.append("unknown"); 
       }
       uLine.append("\t \tmove");
-      widgdTableFilesCmpn.setValue(GralPanelMngWorking_ifc.cmdInsert, 99999, uLine.toString());
+      widgdTableFilesCmpn.setValue(GralMng_ifc.cmdInsert, 99999, uLine.toString());
     }
     if(cmpn.listRemovedFiles !=null) for(DataFile file: cmpn.listRemovedFiles){
       //String name = file.getName();
@@ -197,7 +197,7 @@ public class GuiFilesDiffPanel
         uLine.append("unknown"); 
       }
       uLine.append("\t \tdel");
-      widgdTableFilesCmpn.setValue(GralPanelMngWorking_ifc.cmdInsert, 99999, uLine.toString());
+      widgdTableFilesCmpn.setValue(GralMng_ifc.cmdInsert, 99999, uLine.toString());
     }
   }
   
@@ -442,7 +442,7 @@ public class GuiFilesDiffPanel
       }
       StringBuilder out = new StringBuilder();      
       mainData.cmdExec.execute(uCmd.toString(), null, out, out);
-      mainData.mainAction.panelOutput.widgdOutputText.setValue(GralPanelMngWorking_ifc.cmdSet, 0, out.toString());
+      mainData.mainAction.panelOutput.widgdOutputText.setValue(GralMng_ifc.cmdSet, 0, out.toString());
       stop();
       return true;
     }

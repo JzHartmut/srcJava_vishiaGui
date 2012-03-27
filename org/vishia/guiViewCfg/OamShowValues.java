@@ -10,15 +10,15 @@ import org.vishia.byteData.ByteDataSymbolicAccessReadConfig;
 import org.vishia.mainCmd.Report;
 
 import org.vishia.byteData.ByteDataSymbolicAccess;
+import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralPanelActivated_ifc;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.base.GralValueBar;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
-import org.vishia.gral.widget.GralCurveView;
-import org.vishia.gral.widget.GralValueBar;
 
 
 public class OamShowValues
@@ -45,7 +45,7 @@ public class OamShowValues
 	Queue<GralWidget> widgetsInTab;
 	
 	/**The access to the gui, to change data to show. */
-	protected final GralPanelMngWorking_ifc guiAccess;
+	protected final GralMng_ifc guiAccess;
 	
 	Set<Map.Entry<String, GralWidget>> fieldsToShow;
 	
@@ -61,7 +61,7 @@ public class OamShowValues
 
 	public OamShowValues(
 		Report log
-	, GralPanelMngWorking_ifc guiAccess
+	, GralMng_ifc guiAccess
 	)
 	{
 		this.log = log;
@@ -375,7 +375,7 @@ public class OamShowValues
 		
 		Element[] data;
 		
-		ValueColorAssignment(String[] sParams, GralPanelMngWorking_ifc guiAccess){
+		ValueColorAssignment(String[] sParams, GralMng_ifc guiAccess){
 			data = new Element[sParams.length-1];
 			int state = 0;
 			for(int ii = 1; ii < sParams.length; ++ii){

@@ -12,7 +12,7 @@ import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InspcDataExchangeAccess.Info;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.inspectorAccessor.InspcAccessEvaluatorRxTelg;
@@ -131,7 +131,7 @@ public class InspcGuiComm
       } else {
         sShow = "??" + cmd;
       }
-      widgd.setValue(org.vishia.gral.ifc.GralPanelMngWorking_ifc.cmdSet, 0, sShow);
+      widgd.setValue(org.vishia.gral.ifc.GralMng_ifc.cmdSet, 0, sShow);
     }
   }
  
@@ -140,7 +140,7 @@ public class InspcGuiComm
 
   private final InspcGui inspcGui;
   
-  private final GralPanelMngWorking_ifc mng;
+  private final GralMng_ifc mng;
   
   private final InspcPlugUser_ifc user;
   
@@ -180,7 +180,7 @@ public class InspcGuiComm
   
   
   
-  InspcGuiComm(InspcGui inspcGui, GralPanelMngWorking_ifc mng, Map<String, String> indexTargetIpcAddr, InspcPlugUser_ifc user)
+  InspcGuiComm(InspcGui inspcGui, GralMng_ifc mng, Map<String, String> indexTargetIpcAddr, InspcPlugUser_ifc user)
   {
     this.inspcGui = inspcGui;
     this.console = inspcGui.guiCfg.console;

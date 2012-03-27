@@ -12,10 +12,11 @@ import java.util.TreeMap;
 
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralTextField;
+import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.ifc.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralPos;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTableLine_ifc;
@@ -105,7 +106,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     
     Appendable searchOutput;
     
-    /**Use {@link GralFileSelector#createWindowConfirmSearchGthread(GralGridBuild_ifc)} to create.
+    /**Use {@link GralFileSelector#createWindowConfirmSearchGthread(GralMngBuild_ifc)} to create.
     */
     protected WindowConfirmSearch(){}
     
@@ -367,8 +368,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Sets the widgets of this instance to a panel.
    * The panel and the position in the panel 
-   * should be set before using {@link GralGridBuild_ifc#selectPanel(String)} and 
-   * {@link GralGridBuild_ifc#setPositionInPanel(float, float, float, float, char)}.
+   * should be set before using {@link GralMngBuild_ifc#selectPanel(String)} and 
+   * {@link GralMngBuild_ifc#setPositionInPanel(float, float, float, float, char)}.
    * The instance has more as one widget, all widgets are set in the area of the given position.
    * The position area should be a range of at least 3 lines.
    * @param panelMng The panelManager. 
@@ -378,7 +379,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * @param size Presentation size. It is a character 'A'..'E', where 'A' is a small size. The size determines
    *        the font size especially. 
    */
-  public void setToPanel(GralGridBuild_ifc panelMng, String name, int rows, int[] columns, char size)
+  public void setToPanel(GralMngBuild_ifc panelMng, String name, int rows, int[] columns, char size)
   {
     //The macro widget consists of more as one widget. Position the inner widgets:
     GralPos posAll = panelMng.getPositionInPanel();
@@ -402,7 +403,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * simultaneously.
    * @return The created window.
    */
-  public static WindowConfirmSearch createWindowConfirmSearchGthread(GralGridBuild_ifc mng){
+  public static WindowConfirmSearch createWindowConfirmSearchGthread(GralMngBuild_ifc mng){
     WindowConfirmSearch wind = new WindowConfirmSearch();
     mng.selectPanel("primaryWindow");
     mng.setPosition(-24, 0, -67, 0, 1, 'r'); //right buttom, about half less display width and hight.
@@ -483,7 +484,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    */
   public void fillIn(File dir) //String path)
   {
-    selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdClear, -1, null, null);
+    selectList.wdgdTable.setValue(GralMng_ifc.cmdClear, -1, null, null);
     //FileRemote dir = new FileRemote(path);
     //FileRemote rdir = (FileRemote)dir;
     this.currentDir = dir;
@@ -563,7 +564,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       line[kColDesignation] = "";
       line[kColFilename] = "--not found--";
       line[kColDate] = "";
-      selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, currentDir);
+      selectList.wdgdTable.setValue(GralMng_ifc.cmdInsert, -1, line, currentDir);
     }
     selectList.wdgdTable.setCurrentCell(lineSelect, 1);
     selectList.wdgdTable.repaint(200,200);

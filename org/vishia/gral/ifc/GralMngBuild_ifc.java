@@ -9,11 +9,13 @@ import java.util.Set;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralLed;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
@@ -25,15 +27,13 @@ import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.cfg.GralCfgData;
 //import org.vishia.gral.ifc.GuiShellMngIfc;
-import org.vishia.gral.widget.GralCurveView;
 import org.vishia.gral.widget.GralInfoBox;
-import org.vishia.gral.widget.GralValueBar;
 import org.vishia.util.KeyCode;
 
 
 
 /**This is a unique interface for the GUI-panel-manager to build its content.
- * To work with the graphical application see {@link GralPanelMngWorking_ifc}. 
+ * To work with the graphical application see {@link GralMng_ifc}. 
  * <br><br>
  * Any widget is represented by a {@link GralWidget}. Either the WidgetDescriptor
  * should be created before, and taken as parameter for the widget-creating method,
@@ -56,7 +56,7 @@ import org.vishia.util.KeyCode;
  * To build a GUI you must use the following order of calls:
  * <ul>
  * <li>Create a panel manager which is typeof {@link GralWidgetMng} or this interface.
- *   For example create {@link org.vishia.gral.swt.SwtWidgetMng}.
+ *   For example create {@link org.vishia.gral.swt.SwtMng}.
  * <li>Create a panel, for example call {@link #createGridPanel(GralColor, int, int, int, int)}
  *   and add the panel to the given     
  * <li>Before add, you can select any given panel by String-identifier, using {@link #selectPanel(String)}.
@@ -74,7 +74,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public interface GralGridBuild_ifc 
+public interface GralMngBuild_ifc 
 {
   
   /**The version of this interface:
@@ -497,7 +497,7 @@ public interface GralGridBuild_ifc
   
   /** Adds a box for editing or showing a text.
    * <br><br>
-   * The current content of the edit field is able to get anytime calling {@link GralPanelMngWorking_ifc#getValue(String)}
+   * The current content of the edit field is able to get anytime calling {@link GralMng_ifc#getValue(String)}
    * with the given registering name.
    * <br><br>
    * To force a set of content or an action while getting focus of this field the method {@link #addActionFocused(String, GralUserAction, String)}
@@ -719,7 +719,7 @@ public interface GralGridBuild_ifc
 	/**Creates a Window for a modal or non modal dialog. The window is described by the returned interface. 
 	 * It can be filled with elements. The dialog is able to show and hide calling 
 	 * {@link GralWindow_ifc#setWindowVisible(boolean)} or 
-	 * {@link GralPanelMngWorking_ifc#setWindowsVisible(GralWindow_ifc, GralPos)}. 
+	 * {@link GralMng_ifc#setWindowsVisible(GralWindow_ifc, GralPos)}. 
 	 * The position and size of the window is set with the adequate strategy like all other widget: 
 	 * using {@link #setPositionSize(int, int, int, int, char)}. 
 	 * @param title Title of the window, may be null, then without title bar.

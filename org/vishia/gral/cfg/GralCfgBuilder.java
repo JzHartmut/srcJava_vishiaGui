@@ -7,13 +7,13 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.cfg.GralCfgElement;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.widget.GralCurveView;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.KeyCode;
 
@@ -52,7 +52,7 @@ public class GralCfgBuilder
   
   private final GralCfgData cfgData;
   
-  private final GralGridBuild_ifc gui;
+  private final GralMngBuild_ifc gui;
   
   /**The current directory is that directory, where the config file is located. 
    * It is used if other files are given with relative path.*/
@@ -61,7 +61,7 @@ public class GralCfgBuilder
   private Map<String, String> indexAlias = new TreeMap<String, String>();
   
   
-  public GralCfgBuilder(GralCfgData cfgData, GralGridBuild_ifc gui, File currentDir)
+  public GralCfgBuilder(GralCfgData cfgData, GralMngBuild_ifc gui, File currentDir)
   {
     this.cfgData = cfgData;
     this.gui = gui;

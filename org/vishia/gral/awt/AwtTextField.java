@@ -10,7 +10,7 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.swt.SwtWidgetMng;
+import org.vishia.gral.swt.SwtMng;
 
 public class AwtTextField extends GralTextField
 {

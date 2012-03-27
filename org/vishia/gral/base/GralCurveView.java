@@ -1,10 +1,9 @@
-package org.vishia.gral.widget;
+package org.vishia.gral.base;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralCurveViewTrack_ifc;
 import org.vishia.gral.ifc.GralCurveView_ifc;
@@ -438,7 +437,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    */
   //public abstract void setSample(float[] newValues, int timeshort);
   /**
-   * @see org.vishia.gral.widget.GralCurveView#setSample(float[], int)
+   * @see org.vishia.gral.base.GralCurveView#setSample(float[], int)
    */
   @Override public void setSample(float[] newValues, int timeshort) {
     /*

@@ -19,6 +19,7 @@ import java.util.Map.Entry;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralHtmlBox;
@@ -31,23 +32,22 @@ import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
+import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
-import org.vishia.gral.ifc.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralPos;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.gral.widget.GralCurveView;
-import org.vishia.gral.widget.GralValueBar;
 import org.vishia.msgDispatch.LogMessage;
 
-public class AwtWidgetMng extends GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWorking_ifc
+public class AwtWidgetMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
 {
   
   final AwtProperties propertiesGuiAwt; 

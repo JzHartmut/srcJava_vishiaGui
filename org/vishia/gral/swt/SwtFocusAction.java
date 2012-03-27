@@ -16,7 +16,7 @@ implements FocusListener
 	/**Reference to the users method. */
   private GralUserAction userAction;
   
-	protected final SwtWidgetMng guiMng;
+	protected final SwtMng guiMng;
 
 	String sCmdEnter, sCmdRelease;
 	
@@ -30,7 +30,7 @@ implements FocusListener
    * @param sCmdDoubleClick
    */
   public SwtFocusAction(
-  	SwtWidgetMng guiMng
+  	SwtMng guiMng
   , GralUserAction userCmdGui
   , String sCmdEnter
   , String sCmdRelease

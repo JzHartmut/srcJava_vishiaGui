@@ -4,8 +4,8 @@ import java.io.File;
 
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.ifc.GralGridBuild_ifc;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
@@ -37,7 +37,7 @@ public class GuiStatusPanel
   final MainData mainData;
 
   /**Aggregation to the build interface of the manager where the panel is member of. */
-  final GralGridBuild_ifc panelBuildifc;
+  final GralMngBuild_ifc panelBuildifc;
   
   
   /**Widget to select the project path. 
@@ -71,7 +71,7 @@ public class GuiStatusPanel
   private GralWidget[] switchButtons;
   
 
-  public GuiStatusPanel(MainData mainData, GralGridBuild_ifc panelBuildifc)
+  public GuiStatusPanel(MainData mainData, GralMngBuild_ifc panelBuildifc)
   {
     this.panelBuildifc = panelBuildifc;
     this.mainData = mainData;
@@ -111,13 +111,13 @@ public class GuiStatusPanel
     String sPrjPath = null;
     for(String sPrjPath1: mainData.cfg.listSwPrjs){
       if(sPrjPath ==null){ sPrjPath = sPrjPath1; } //The first is offered.
-    	mainData.panelAccess.setInfo(selectorProjectPathTable, GralPanelMngWorking_ifc.cmdInsert, 0, sPrjPath1, null);
+    	mainData.panelAccess.setInfo(selectorProjectPathTable, GralMng_ifc.cmdInsert, 0, sPrjPath1, null);
     }
     if(sPrjPath==null){ 
       sPrjPath = "??no project directories found.";
     }
     //Test only in one Project
-    widgdProjektpath.setValue(GralPanelMngWorking_ifc.cmdInsert, 0,sPrjPath);
+    widgdProjektpath.setValue(GralMng_ifc.cmdInsert, 0,sPrjPath);
     mainData.currPrj = new DataProject(FileSystem.absolutePath(sPrjPath, null));
     
   }
@@ -248,7 +248,7 @@ public class GuiStatusPanel
       if(key == KeyCode.enter){
         GralTableLine_ifc line = (GralTableLine_ifc)values[0];
         String sPath = line.getCellText(0);
-        widgdProjektpath.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, sPath);
+        widgdProjektpath.setValue(GralMng_ifc.cmdInsert, 0, sPath);
         buildComponentsInfoSelectBoxes();
         selectorProjectPath.setWindowVisible(false);
       } else { bDone = false; }

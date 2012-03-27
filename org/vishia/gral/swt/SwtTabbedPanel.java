@@ -30,9 +30,9 @@ public class SwtTabbedPanel extends GralTabbedPanel
   /**The Swt TabFolder implementation. */
   /*pkgprivate*/ TabFolder widgetSwt;
     
-	final SwtWidgetMng mng;
+	final SwtMng mng;
 	
-	SwtTabbedPanel(String namePanel, SwtWidgetMng mng, GralPanelActivated_ifc user, int property)
+	SwtTabbedPanel(String namePanel, SwtMng mng, GralPanelActivated_ifc user, int property)
 	{ super(namePanel, mng, user, property);  //initializes as GralWidget and as GralPanel
 		this.mng = mng;
 		Object oParent = this.pos.panel.getPanelImpl();

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.vishia.gral.ifc.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -101,8 +101,8 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
 		  mng.registerPanel(this);
 		}
     int property = 0; //TODO parameter
-    bZoomed = (property & GralGridBuild_ifc.propZoomedPanel) !=0;
-    bGridZoomed = (property & GralGridBuild_ifc.propGridZoomedPanel) !=0;
+    bZoomed = (property & GralMngBuild_ifc.propZoomedPanel) !=0;
+    bGridZoomed = (property & GralMngBuild_ifc.propGridZoomedPanel) !=0;
 	}
 	
 	/*

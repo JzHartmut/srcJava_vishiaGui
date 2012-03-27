@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.vishia.byteData.VariableAccess_ifc;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 
@@ -44,7 +44,7 @@ public class GralSwitchExclusiveButtonMng implements VariableAccess_ifc
       currentButtonText = infos.sCmd;
       for(GralWidget item: listSwitchButtons){
         if(item != infos){
-          item.setValue(GralPanelMngWorking_ifc.cmdSet, 0, 0);
+          item.setValue(GralMng_ifc.cmdSet, 0, 0);
         }
       }
       return true;

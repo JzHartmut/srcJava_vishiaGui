@@ -20,7 +20,7 @@ import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTextField;
-import org.vishia.gral.ifc.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
@@ -200,17 +200,17 @@ public class Fcmd extends GuiCfg
 
     // Creates tab-Panels for the file lists and command lists.
     gralMng.selectPanel("primaryWindow");
-    favorPathSelector.panelLeft.tabbedPanelFileCards = gralMng.addTabbedPanel("File0Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    favorPathSelector.panelLeft.tabbedPanelFileCards = gralMng.addTabbedPanel("File0Tab", null, GralMngBuild_ifc.propZoomedPanel);
     gui.addFrameArea(1, 1, 1, 1, favorPathSelector.panelLeft.tabbedPanelFileCards); // dialogPanel);
 
     favorPathSelector.panelLeft.buildInitialTabs();
     gralMng.selectPanel("primaryWindow");
-    favorPathSelector.panelMid.tabbedPanelFileCards = gralMng.addTabbedPanel("File1Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    favorPathSelector.panelMid.tabbedPanelFileCards = gralMng.addTabbedPanel("File1Tab", null, GralMngBuild_ifc.propZoomedPanel);
     gui.addFrameArea(2, 1, 1, 1, favorPathSelector.panelMid.tabbedPanelFileCards); // dialogPanel);
     favorPathSelector.panelMid.buildInitialTabs();
 
     gralMng.selectPanel("primaryWindow");
-    favorPathSelector.panelRight.tabbedPanelFileCards = gralMng.addTabbedPanel("File2Tab", null, GralGridBuild_ifc.propZoomedPanel);
+    favorPathSelector.panelRight.tabbedPanelFileCards = gralMng.addTabbedPanel("File2Tab", null, GralMngBuild_ifc.propZoomedPanel);
     gui.addFrameArea(3, 1, 1, 1, favorPathSelector.panelRight.tabbedPanelFileCards); // dialogPanel);
     favorPathSelector.panelRight.buildInitialTabs();
 

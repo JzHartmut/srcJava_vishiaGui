@@ -4,9 +4,9 @@ import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWindow;
 
-public class GralHtmlWindow
+public final class GralHtmlWindow
 {
-  /**The window is created invoking the {@link GralGridBuild_ifc#createWindow(String, boolean)}. 
+  /**The window is created invoking the {@link GralMngBuild_ifc#createWindow(String, boolean)}. 
    * It has its implementation in the underlying graphic system.  */
   private final GralWindow window;
   

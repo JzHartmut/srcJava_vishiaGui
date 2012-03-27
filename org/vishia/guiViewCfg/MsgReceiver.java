@@ -13,7 +13,7 @@ import java.util.TimeZone;
 import org.vishia.bridgeC.OS_TimeStamp;
 import org.vishia.bridgeC.Va_list;
 import org.vishia.byteData.ByteDataAccess;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageFile;
@@ -38,7 +38,7 @@ public class MsgReceiver
 	private final Report console;
 
 	/**The access to the gui, to change data to show. */
-	private final GralPanelMngWorking_ifc guiAccess;
+	private final GralMng_ifc guiAccess;
 	
 	/**true if the messages will be displayed. Only then it will be got from receiver. */
 	private boolean bActivated = false;
@@ -137,7 +137,7 @@ public class MsgReceiver
 	}
 	
 	
-	public MsgReceiver(Report console, GralPanelMngWorking_ifc guiAccess, String sTimeZone, String sPathZbnf)
+	public MsgReceiver(Report console, GralMng_ifc guiAccess, String sTimeZone, String sPathZbnf)
 	{ this.console = console;
 	  this.guiAccess = guiAccess;
 	  this.localization = Locale.ROOT;

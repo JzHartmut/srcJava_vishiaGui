@@ -60,7 +60,7 @@ public class SwtButton extends GralButton
   
 
   
-  public SwtButton(String sName, SwtWidgetMng mng, Composite parent, int styleSwt, char size)
+  public SwtButton(String sName, SwtMng mng, Composite parent, int styleSwt, char size)
   {
     super(sName, mng);
     switch(size){ 
@@ -79,7 +79,7 @@ public class SwtButton extends GralButton
   }
 
   
-  void setBoundsGraphic(SwtWidgetMng mng)
+  void setBoundsGraphic(SwtMng mng)
   {
     //widgetSwt.setSize(mng.propertiesGui.xPixelUnit() * xSize -2, mng.propertiesGui.yPixelUnit() * ySize -2);
     mng.setBounds_(widgetSwt);
@@ -152,10 +152,10 @@ public class SwtButton extends GralButton
     { widgetSwt.redraw(); }
 
     @Override public void setBackGroundColorGthread(GralColor color)
-    { widgetSwt.setBackground(((SwtWidgetMng)itsMng).getColorImpl(color)); }
+    { widgetSwt.setBackground(((SwtMng)itsMng).getColorImpl(color)); }
 
     @Override public void setForeGroundColorGthread(GralColor color)
-    { widgetSwt.setForeground(((SwtWidgetMng)itsMng).getColorImpl(color)); }
+    { widgetSwt.setForeground(((SwtMng)itsMng).getColorImpl(color)); }
 
     @Override
     public void setTextGthread(String text, Object data)

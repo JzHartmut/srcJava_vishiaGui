@@ -19,12 +19,12 @@ import org.vishia.gral.cfg.GralCfgDesigner;
 import org.vishia.gral.cfg.GralCfgWriter;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
-import org.vishia.gral.ifc.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMngApplAdapter_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
@@ -42,8 +42,8 @@ import org.vishia.util.KeyCode;
  * The GuiPanelMng is a common approach to work with graphical interface simply, 
  * it is implemented by the several graphic-system-supporting classes
  * <ul>
- * <li>{@link org.vishia.gral.swt.SwtWidgetMng}
- * <li>{@link org.vishia.gral.swt.SwtWidgetMng.GuiPanelMngSwt}
+ * <li>{@link org.vishia.gral.swt.SwtMng}
+ * <li>{@link org.vishia.gral.swt.SwtMng.GuiPanelMngSwt}
  * </ul>
  * to offer a unique interface to work with simple graphic applications.
  * <br><br>
@@ -53,7 +53,7 @@ import org.vishia.util.KeyCode;
  * @param <WidgetTYPE> The special base type of the composed widgets in the underlying graphic adapter specialization.
  *                     (SWT: Composite)
  */
-public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWorking_ifc
+public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Changes:
    * <ul>
@@ -403,7 +403,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
    * to call this method. If it returns a value, then it is ok.
    * A user invocation calls the overridden platform depending method automatically.
    * <br>
-   * See {@link org.vishia.gral.swt.SwtWidgetMng}.   
+   * See {@link org.vishia.gral.swt.SwtMng}.   
    */
   @Override public String getValueFromWidget(GralWidget widgd)
   { String sValue = null;
@@ -663,21 +663,21 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   @Override public void setBackColor(GralWidget descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
     GralWidget descr = (GralWidget) descr1;
-    setInfo(descr, GralPanelMngWorking_ifc.cmdBackColor, ix, color, null);
+    setInfo(descr, GralMng_ifc.cmdBackColor, ix, color, null);
   } 
   
   
   @Override public void setLineColor(GralWidget descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
     GralWidget descr = (GralWidget) descr1;
-    setInfo(descr, GralPanelMngWorking_ifc.cmdLineColor, ix, color, null);
+    setInfo(descr, GralMng_ifc.cmdLineColor, ix, color, null);
   } 
   
   
   @Override public void setTextColor(GralWidget descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
     GralWidget descr = (GralWidget) descr1;
-    setInfo(descr, GralPanelMngWorking_ifc.cmdTextColor, ix, color, null);
+    setInfo(descr, GralMng_ifc.cmdTextColor, ix, color, null);
   } 
   
   
@@ -685,7 +685,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
   {
     @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
     GralWidget descr = (GralWidget) widgetDescr;
-    setInfo(descr, GralPanelMngWorking_ifc.cmdColor, colorBorder, colorInner, null);
+    setInfo(descr, GralMng_ifc.cmdColor, colorBorder, colorInner, null);
     
   }
   
@@ -776,7 +776,7 @@ public abstract class GralWidgetMng implements GralGridBuild_ifc, GralPanelMngWo
    * This method is a part of the implementing GralMng because the GralPos is not implemented for
    * any underlying graphic system and the {@link #propertiesGuiSwt} are used.
    * This method is not intent to use from an application, only for implementing methods of Gral.
-   * Therefore it isn't a member of the {@link GralWindowMng_ifc} and {@link GralGridBuild_ifc}
+   * Therefore it isn't a member of the {@link GralWindowMng_ifc} and {@link GralMngBuild_ifc}
    * It is possible to tune the bounds after calculation, for example to enhance the width if a text
    * is larger then the intended position. 
    * @param pos The position.

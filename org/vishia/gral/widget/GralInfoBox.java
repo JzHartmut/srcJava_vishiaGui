@@ -10,7 +10,7 @@ import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWindow_setifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
-import org.vishia.gral.ifc.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
@@ -22,10 +22,10 @@ import org.vishia.gral.ifc.GralTextBox_ifc;
  * @author Hartmut Schorrig
  *
  */
-public class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, GralWindow_getifc
+public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, GralWindow_getifc
 {
 
-  /**The window is created invoking the {@link GralGridBuild_ifc#createWindow(String, boolean)}. 
+  /**The window is created invoking the {@link GralMngBuild_ifc#createWindow(String, boolean)}. 
    * It has its implementation in the underlying graphic system.  */
   private final GralWindow window;
   
@@ -57,7 +57,7 @@ public class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, GralWind
     this.buttonOk = buttonOk;
   }
   
-  public static GralInfoBox createTextInfoBox(GralGridBuild_ifc mng, String name, String title)
+  public static GralInfoBox createTextInfoBox(GralMngBuild_ifc mng, String name, String title)
   {
     GralWindow window = mng.createWindow(name, title, GralWindow.windConcurrently);
     //TODO the position frame (size) regards the title bar, it should not do so!
@@ -73,7 +73,7 @@ public class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, GralWind
 
   }
   
-  public static GralInfoBox createHtmlInfoBox(GralGridBuild_ifc mng, String name, String title)
+  public static GralInfoBox createHtmlInfoBox(GralMngBuild_ifc mng, String name, String title)
   {
     GralWindow window = mng.createWindow(name, title, GralWindow.windConcurrently);
     //TODO the position frame (size) regards the title bar, it should not do so!

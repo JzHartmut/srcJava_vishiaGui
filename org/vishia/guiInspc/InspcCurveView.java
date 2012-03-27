@@ -2,6 +2,7 @@ package org.vishia.guiInspc;
 
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidgetMng;
@@ -13,7 +14,6 @@ import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindowMng_ifc;
-import org.vishia.gral.widget.GralCurveView;
 import org.vishia.inspectorAccessor.InspcAccessEvaluatorRxTelg;
 import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
 import org.vishia.util.KeyCode;

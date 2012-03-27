@@ -1,7 +1,7 @@
 package org.vishia.gral.base;
 
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -21,7 +21,7 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
    * <ul>
    * <li>2012-03-13 Hartmut chg: Some abstract method declarations moved to its interface.
    * <li>2011-12-31 Hartmut chg: Implements the set-methods of {@link GralWindow_ifc} in form of calling
-   *   {@link GralPanelMngWorking_ifc#setInfo(GralWidget, int, int, Object, Object)}. This methods
+   *   {@link GralMng_ifc#setInfo(GralWidget, int, int, Object, Object)}. This methods
    *   can be called in any thread, it may be stored using 
    *   {@link GralGraphicThread#addRequ(org.vishia.gral.base.GralWidgetChangeRequ)}.
    * <li>2011-11-27 Hartmut new: {@link #addMenuItemGThread(String, String, GralUserAction)} copied
@@ -98,22 +98,22 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
 
   
   @Override public void setWindowVisible(boolean visible){
-    itsMng.setInfo(this, GralPanelMngWorking_ifc.cmdSetWindowVisible, visible? 1: 0, null, null);
+    itsMng.setInfo(this, GralMng_ifc.cmdSetWindowVisible, visible? 1: 0, null, null);
   }
   
 
   @Override public void closeWindow(){
-    itsMng.setInfo(this, GralPanelMngWorking_ifc.cmdCloseWindow, 0, null, null);
+    itsMng.setInfo(this, GralMng_ifc.cmdCloseWindow, 0, null, null);
   }
   
   
   @Override public void repaint(){
-    itsMng.setInfo(this, GralPanelMngWorking_ifc.cmdRedraw, 0, null, null);
+    itsMng.setInfo(this, GralMng_ifc.cmdRedraw, 0, null, null);
   }
   
   
   @Override public void repaint(int delay, int latest){
-    itsMng.setInfoDelayed(this, GralPanelMngWorking_ifc.cmdRedraw, 0, null, null, delay);
+    itsMng.setInfoDelayed(this, GralMng_ifc.cmdRedraw, 0, null, null, delay);
   }
   
   

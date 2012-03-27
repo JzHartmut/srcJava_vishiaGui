@@ -23,7 +23,7 @@ public class SwtTextBox extends GralTextBox
   Label promptSwt;
   
   
-  public SwtTextBox(String name, Composite parent, int style, SwtWidgetMng mng)
+  public SwtTextBox(String name, Composite parent, int style, SwtMng mng)
   { super(name, 't', mng);
     textFieldSwt = new Text(parent, style);
     textFieldSwt.addKeyListener((new SwtTextBoxKeyListener(mng)).swtListener);
@@ -35,7 +35,7 @@ public class SwtTextBox extends GralTextBox
   
   @Override public void setTextStyle(GralColor color, GralFont font)
   {
-    SwtProperties props = ((SwtWidgetMng)itsMng).propertiesGuiSwt;
+    SwtProperties props = ((SwtMng)itsMng).propertiesGuiSwt;
     textFieldSwt.setForeground(props.colorSwt(color));
     textFieldSwt.setFont(props.fontSwt(font));
   }
@@ -166,7 +166,7 @@ public class SwtTextBox extends GralTextBox
   class SwtTextBoxKeyListener extends SwtKeyListener
   {
 
-    public SwtTextBoxKeyListener(SwtWidgetMng swtMng)
+    public SwtTextBoxKeyListener(SwtMng swtMng)
     {
       super(swtMng);
     }

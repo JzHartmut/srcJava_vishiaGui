@@ -7,16 +7,16 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
-import org.vishia.gral.widget.GralValueBar;
 
 public class SwtValueBar extends GralValueBar implements GralSetValue_ifc, GralWidget_ifc
 {
 
-	final SwtWidgetMng mng;
+	final SwtMng mng;
 
 	protected BarWidget widgetSwt;
 	
@@ -30,7 +30,7 @@ public class SwtValueBar extends GralValueBar implements GralSetValue_ifc, GralW
 	 * @param mng The Gui-panel-manager contains information about the graphic frame and properties.
 	 * @param size The size of text in button, use 'A' or 'B' for small - bold
 	 */
-	public SwtValueBar(String name, SwtWidgetMng mng)
+	public SwtValueBar(String name, SwtMng mng)
 	{
     super(name, mng);
     this.mng = mng;

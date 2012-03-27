@@ -59,7 +59,7 @@ public interface GralPlugUser_ifc extends Closeable
   void init(GralPlugUser2Gral_ifc plugUser2Gui, GralWidgetMng gralMng, LogMessage log);
 
   
-  void registerMethods(org.vishia.gral.ifc.GralGridBuild_ifc guiMng);
+  void registerMethods(org.vishia.gral.ifc.GralMngBuild_ifc guiMng);
   
   /**This method is called if the view is changed. 
    * @param sTitle title of a window or panel.

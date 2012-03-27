@@ -88,7 +88,7 @@ public class SwtTextFieldWrapper extends GralTextField
    * @param promptStylePosition maybe null, prompt position
    * @param mng
    */
-  public SwtTextFieldWrapper(String name, boolean editable, String prompt, String promptStylePosition, SwtWidgetMng mng){
+  public SwtTextFieldWrapper(String name, boolean editable, String prompt, String promptStylePosition, SwtMng mng){
     super(name, editable ? 'T' : 'S', mng);
     Composite panelSwt = (Composite)mng.pos.panel.getPanelImpl();
     setPanelMng(mng);
@@ -208,7 +208,7 @@ public class SwtTextFieldWrapper extends GralTextField
   
   @Override public void setTextStyle(GralColor color, GralFont font)
   {
-    SwtProperties props = ((SwtWidgetMng)itsMng).propertiesGuiSwt;
+    SwtProperties props = ((SwtMng)itsMng).propertiesGuiSwt;
     textFieldSwt.setForeground(props.colorSwt(color));
     textFieldSwt.setFont(props.fontSwt(font));
   }
@@ -265,8 +265,8 @@ public class SwtTextFieldWrapper extends GralTextField
           textFieldSwt.setSelection(selectionStart, selectionEnd);
         }
       }
-      if((chg & chgColorText) !=0){ textFieldSwt.setForeground(((SwtWidgetMng)itsMng).getColorImpl(colorText)); }
-      if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(((SwtWidgetMng)itsMng).getColorImpl(colorBack)); }
+      if((chg & chgColorText) !=0){ textFieldSwt.setForeground(((SwtMng)itsMng).getColorImpl(colorText)); }
+      if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(((SwtMng)itsMng).getColorImpl(colorBack)); }
       textFieldSwt.redraw();
     } while(!whatIsChanged.compareAndSet(chg, 0));
   }
@@ -373,10 +373,10 @@ public class SwtTextFieldWrapper extends GralTextField
 
   
   
-  private class TextFieldFocusListener extends SwtWidgetMng.SwtMngFocusListener
+  private class TextFieldFocusListener extends SwtMng.SwtMngFocusListener
   {
     
-    TextFieldFocusListener(SwtWidgetMng mng){
+    TextFieldFocusListener(SwtMng mng){
       mng.super();
     }
 

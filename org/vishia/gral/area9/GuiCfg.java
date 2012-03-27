@@ -13,8 +13,8 @@ import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.cfg.GralCfgData;
 import org.vishia.gral.cfg.GralCfgDesigner;
 import org.vishia.gral.cfg.GralCfgZbnf;
-import org.vishia.gral.ifc.GralGridBuild_ifc;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -147,9 +147,9 @@ public final MainCmd_ifc mainCmd;
 public GralWidgetMng gralMng;
 
 /**Panel-Management-interface for the panels. */
-public GralGridBuild_ifc panelBuildIfc;
+public GralMngBuild_ifc panelBuildIfc;
 
-public GralPanelMngWorking_ifc guiAccess;
+public GralMng_ifc guiAccess;
 
 protected GralTabbedPanel mainTabPanel;
 

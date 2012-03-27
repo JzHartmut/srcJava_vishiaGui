@@ -7,8 +7,8 @@ import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralGridBuild_ifc;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralTableLine_ifc;
@@ -28,7 +28,7 @@ import org.vishia.util.SelectMask_ifc;
  * Note: this class should not be a derived class of {@link GralTable}, because instances of derived classes
  * should be created as final compositions in the main thread before the table can be presented 
  * in the graphic thread. Therefore the aggregation {@link #wdgdTable} cannot be final. It is set 
- * only when {@link #setToPanel(GralGridBuild_ifc, String, int, int[], char)} is called.  
+ * only when {@link #setToPanel(GralMngBuild_ifc, String, int, int[], char)} is called.  
  * 
  * @author Hartmut Schorrig
  *
@@ -39,7 +39,7 @@ public abstract class GralSelectList implements Removeable //extends GralWidget
    * <ul>
    * <li>2011-11-18 chg: This class does not inherit from GralWidget now. The GralWidget, which represents this class,
    *   is referenced with the public aggregation {@link #wdgdTable}. Only this instance is registered on a panel
-   *   calling {@link #setToPanel(GralGridBuild_ifc, String, int, int[], char)}. 
+   *   calling {@link #setToPanel(GralMngBuild_ifc, String, int, int[], char)}. 
    * <li>2011-10-02 chg: Uses keycodes from {@link KeyCode} now,
    * <li>2011-10-02 chg: {@link #actionOk(Object, GralTableLine_ifc)} returns boolean now, false if no action is done.
    * <li>older- TODO
@@ -90,7 +90,7 @@ public abstract class GralSelectList implements Removeable //extends GralWidget
    * @param columns
    * @param size
    */
-  public void setToPanel(GralGridBuild_ifc gralMng, String name, int rows, int[] columns, char size)
+  public void setToPanel(GralMngBuild_ifc gralMng, String name, int rows, int[] columns, char size)
   {
     wdgdTable = gralMng.addTable(name, rows, columns);
     wdgdTable.setActionChange(actionTable);
@@ -101,7 +101,7 @@ public abstract class GralSelectList implements Removeable //extends GralWidget
   public void set(List<String[]> listData)
   {
     for(String[] data: listData){
-      wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, 0, data[0]);
+      wdgdTable.setValue(GralMng_ifc.cmdInsert, 0, data[0]);
     }
   }
   

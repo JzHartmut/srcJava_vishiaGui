@@ -28,7 +28,7 @@ import org.vishia.util.KeyCode;
  * The user can invoke the methods of the widget to animate it in a GUI etc, for example {@link #setBackColor(GralColor, int)}
  * or {@link #setValue(int, int, Object)}. This methods can be called in any thread. There are thread safe. 
  * The organization of this actions are done in the implementation of the {@link org.vishia.gral.base.GralWidgetMng}
- * like {@link org.vishia.gral.swt.SwtWidgetMng}. This implementation adapts the basic graphic and knows theire methods
+ * like {@link org.vishia.gral.swt.SwtMng}. This implementation adapts the basic graphic and knows theire methods
  * to set colors, values etc. The user need deal only with this widget class. The thread safe  capability is organized
  * with a ConcurrentLinkedQueue which contains requests of type {@link org.vishia.gral.base.GralWidgetChangeRequ}.
  * <br><br>
@@ -64,7 +64,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    *   The wrapper implements special interfaces for the kind of widgets. It is more simple for usage, less instances to know.
    *   A GralWidget is able to test with instanceof whether it is a special widget. The element widget is removed because the reference
    *   to the implementation widget will be present in the derived classes.
-   * <li>2011-10-01 Hartmut new: method {@link #setFocus()}. It wrappes the {@link GralPanelMngWorking_ifc#setFocus(GralWidget)}.
+   * <li>2011-10-01 Hartmut new: method {@link #setFocus()}. It wrappes the {@link GralMng_ifc#setFocus(GralWidget)}.
    * <li>2011-09-18 Hartmut chg: rename from WidgetDescriptor to GralWidget. It is the representation of a Widget in the graphic adapter
    *     inclusive some additional capabilities in comparison to basic graphic widgets, like {@link #sFormat} etc.
    * <li>2011-09-11 Hartmut chg: rename itsPanel to {@link #itsMng}. The original approach was, that the PanelManager manages only one panel
@@ -332,8 +332,8 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * See notes of {@link #getActionShow()}.
    * <br><br>
    * To get the action in a script context (GuiCfgBuilder) some actions can be registered 
-   * using {@link org.vishia.gral.ifc.GralGridBuild_ifc#registerUserAction(String, GralUserAction)}. They are gotten by name
-   * invoking {@link org.vishia.gral.ifc.GralGridBuild_ifc#getRegisteredUserAction(String)} 
+   * using {@link org.vishia.gral.ifc.GralMngBuild_ifc#registerUserAction(String, GralUserAction)}. They are gotten by name
+   * invoking {@link org.vishia.gral.ifc.GralMngBuild_ifc#getRegisteredUserAction(String)} 
    * in the {@link org.vishia.gral.cfg.GralCfgBuilder}.
    * 
    * @param action The action instance.
@@ -546,7 +546,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   }
   
   /**Sets the current value of the content of the widget in the given context.
-   * @param cmd see {@link GralPanelMngWorking_ifc#cmdSet} etc. It is possible to set the color etc.
+   * @param cmd see {@link GralMng_ifc#cmdSet} etc. It is possible to set the color etc.
    * @param ident Any number to specify set, maybe 0
    * @param value The value in the necessary representation.
    */
@@ -562,7 +562,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   
   /**Sets the current value of the content of the widget in the given context.
-   * @param cmd see {@link GralPanelMngWorking_ifc#cmdSet} etc. It is possible to set the color etc.
+   * @param cmd see {@link GralMng_ifc#cmdSet} etc. It is possible to set the color etc.
    * @param ident Any number to specify set, maybe 0
    * @param value The value in the necessary representation.
    */
@@ -575,7 +575,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * This routine may be overridden by some specialized widgets.
    */
   @Override public void setValue(float value){
-    itsMng.setInfo(this, GralPanelMngWorking_ifc.cmdSet, 0, value, null);
+    itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, value, null);
   }
   
   /**Sets the border of the value range for showing. 
@@ -600,7 +600,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   
   /**Sets the focus to the widget.
-   * See {@link GralPanelMngWorking_ifc#setFocus(GralWidget)}.
+   * See {@link GralMng_ifc#setFocus(GralWidget)}.
    * @return true if the focus is set really.
    */
   public abstract boolean setFocus();

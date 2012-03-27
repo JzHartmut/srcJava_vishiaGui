@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 /**This is a unique interface for the GUI-panel-manager to work with it.
- * To build the graphical application see {@link org.vishia.gral.ifc.GralGridBuild_ifc}.
+ * To build the graphical application see {@link org.vishia.gral.ifc.GralMngBuild_ifc}.
  * This interface supports handling with all widgets in a GUI. 
  * The widgets were selected by identifier or with their {@link GralWidget} instance
  * whereby the implementation environment of a widget may be known. That implementation environment
@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author Hartmut Schorrig
  *
  */
-public interface GralPanelMngWorking_ifc 
+public interface GralMng_ifc 
 {
 
   /**The version history of this interface:
@@ -197,7 +197,7 @@ public interface GralPanelMngWorking_ifc
   
   /**Sets a given and registered window visible at the given position and size or set it invisible.
    * <br>
-   * A window can be created by invoking {@link org.vishia.gral.ifc.GralGridBuild_ifc#createWindow(String, boolean)}
+   * A window can be created by invoking {@link org.vishia.gral.ifc.GralMngBuild_ifc#createWindow(String, boolean)}
    * in the build phase of the gui. It can be hidden because it is not necessary to show and operate with them.
    * In a adequate phase of operate it can be shown and focused.
    * <br>
@@ -205,14 +205,14 @@ public interface GralPanelMngWorking_ifc
    * which is stored in {@link GralPos#panel}. To get a position instance,
    * you can set a position invoking 
    * <ul>
-   * <li>{@link org.vishia.gral.ifc.GralGridBuild_ifc#selectPanel(String)}
-   * <li>{@link org.vishia.gral.ifc.GralGridBuild_ifc#setPosition(float, float, float, float, int, char)}
-   * <li>GralGridPos pos = {@link org.vishia.gral.ifc.GralGridBuild_ifc#getPositionInPanel()}.
+   * <li>{@link org.vishia.gral.ifc.GralMngBuild_ifc#selectPanel(String)}
+   * <li>{@link org.vishia.gral.ifc.GralMngBuild_ifc#setPosition(float, float, float, float, int, char)}
+   * <li>GralGridPos pos = {@link org.vishia.gral.ifc.GralMngBuild_ifc#getPositionInPanel()}.
    * </ul>
    * That can be done in the build phase of the graphic. The position can be stored. It is possible to adjust
    * the position relative to the unchanged panel by changing the values of {@link GralPos#x} etc.
    * It is possible too to change the Panel which relates to the position. Then the grid managing instance 
-   * have to be known via the {@link org.vishia.gral.ifc.GralGridBuild_ifc} to select a panel.
+   * have to be known via the {@link org.vishia.gral.ifc.GralMngBuild_ifc} to select a panel.
    * The panels may be moved or resized. With the knowledge of the relative position of the window in respect to a panel
    * of the parent window, the window can be placed onto a proper position of the whole display.
    *   

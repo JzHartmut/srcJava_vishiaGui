@@ -9,7 +9,7 @@ public interface GralCurveView_ifc
   
   /**Version, history and license.
    * <ul>
-   * <li>2012-03-25 Hartmut created as interface to {@link org.vishia.gral.widget.GralCurveView}.
+   * <li>2012-03-25 Hartmut created as interface to {@link org.vishia.gral.base.GralCurveView}.
    *   Approach: The capabilities should be described by an interface. Yet only 1 method.
    * </ul>
    * <br><br>

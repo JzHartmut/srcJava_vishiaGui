@@ -19,12 +19,12 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
+import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralCurveViewTrack_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralRectangle;
-import org.vishia.gral.widget.GralCurveView;
 import org.vishia.util.Assert;
 
 
@@ -75,7 +75,7 @@ public class SwtCurveView extends GralCurveView
   
   private Image cursorStore1, cursorStore2;
   
-  public SwtCurveView(String sName, GralPos pos, SwtWidgetMng mng, int nrofXvalues, int nrofTracks)
+  public SwtCurveView(String sName, GralPos pos, SwtMng mng, int nrofXvalues, int nrofTracks)
   {
     super(sName, mng, nrofXvalues, nrofTracks);
     

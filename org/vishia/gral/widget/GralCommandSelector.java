@@ -6,8 +6,8 @@ import org.vishia.cmd.CmdGetFileArgs_ifc;
 import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
 import org.vishia.gral.base.GralWidgetMng;
-import org.vishia.gral.ifc.GralGridBuild_ifc;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralTableLine_ifc;
@@ -58,7 +58,7 @@ public class GralCommandSelector extends GralSelectList
   }
   
   
-  public void setToPanel(GralGridBuild_ifc gralMng, String name, int rows, int[] columns, char size){
+  public void setToPanel(GralMngBuild_ifc gralMng, String name, int rows, int[] columns, char size){
     super.setToPanel(gralMng, name, rows, columns, size);
     wdgdTable.setActionOnLineSelected(actionOnLineSelected);
   }
@@ -80,10 +80,10 @@ public class GralCommandSelector extends GralSelectList
   
   public void fillIn()
   {
-    wdgdTable.setValue(GralPanelMngWorking_ifc.cmdClear, -1, null, null);
+    wdgdTable.setValue(GralMng_ifc.cmdClear, -1, null, null);
     for(CmdStore.CmdBlock data: cmdStore.getListCmds()){
       
-      wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, data.name, data);
+      wdgdTable.setValue(GralMng_ifc.cmdInsert, -1, data.name, data);
     }
     wdgdTable.repaint();
   }

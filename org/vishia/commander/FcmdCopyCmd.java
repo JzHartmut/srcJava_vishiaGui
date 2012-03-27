@@ -5,15 +5,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.gral.widget.GralValueBar;
 import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
 import org.vishia.util.FileCompare;
@@ -196,7 +196,7 @@ public class FcmdCopyCmd
         widgButtonOk.setText("check");
         widgButtonOk.sCmd = "check";
         widgCopyState.setText("check?", 0);
-        widgdMove.setValue(GralPanelMngWorking_ifc.cmdSet, 0, 0);
+        widgdMove.setValue(GralMng_ifc.cmdSet, 0, 0);
         zFiles = zBytes = 0;
       }
       windConfirmCopy.setWindowVisible(true);

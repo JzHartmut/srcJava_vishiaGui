@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 
-import org.vishia.gral.ifc.GralPanelMngWorking_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralWidget;
 

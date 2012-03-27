@@ -38,7 +38,7 @@ import org.vishia.util.KeyCode;
 public class SwtTable  extends GralTable {
 
   /**The widget manager is stored in the base class too, but here as SWT-type reference. */
-  private final SwtWidgetMng mng;
+  private final SwtMng mng;
   
   private Text[][] cellsSwt;
   
@@ -62,7 +62,7 @@ public class SwtTable  extends GralTable {
   
   private boolean mouse1isDown, mouse2isDown, mouseDoubleClick;
   
-  public SwtTable(SwtWidgetMng mng, String name, Composite parent,  int height
+  public SwtTable(SwtMng mng, String name, Composite parent,  int height
       , int[] columnWidths) //, int selectionColumn, CharSequence selectionText)
   { super(name, mng, columnWidths);
     this.mng = mng;
@@ -102,7 +102,7 @@ public class SwtTable  extends GralTable {
 
   
   
-  public static GralTable addTable(SwtWidgetMng mng, String sName, int height, int[] columnWidths
+  public static GralTable addTable(SwtMng mng, String sName, int height, int[] columnWidths
   //, int selectionColumn, CharSequence selectionText    
   ) {
     
@@ -590,7 +590,7 @@ public class SwtTable  extends GralTable {
    */
   private class FocusListenerTable implements FocusListener //extends SwtWidgetMng.SwtMngFocusListener
   {
-    FocusListenerTable(SwtWidgetMng mng){
+    FocusListenerTable(SwtMng mng){
       //mng.super();    
     }
     

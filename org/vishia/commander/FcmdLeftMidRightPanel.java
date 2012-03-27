@@ -8,7 +8,7 @@ import java.util.TreeMap;
 
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralWidgetMng;
-import org.vishia.gral.ifc.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.GralSelectList;
@@ -105,7 +105,7 @@ public class FcmdLeftMidRightPanel
     //A tabbed panel inside the left, middle or right tab for selection.
     String nameTabPanel = FcmdWidgetNames.panelFavoritesLeftMidRight + cNr;
     mng.setPosition(0, 0, 0, 0, 1, 'd');
-    tabbedPanelFavorCards = mng.addTabbedPanel(nameTabPanel, null, GralGridBuild_ifc.propZoomedPanel);
+    tabbedPanelFavorCards = mng.addTabbedPanel(nameTabPanel, null, GralMngBuild_ifc.propZoomedPanel);
     //The panel for selection from all favorites: 
     nameGridPanel = FcmdWidgetNames.tabMainFavorites + cNr;
     tabLabelGridPanel = "a-F"+cNr;
@@ -236,7 +236,7 @@ public class FcmdLeftMidRightPanel
 
     
     
-    public void setToPanel(GralGridBuild_ifc panel, String name, char size){
+    public void setToPanel(GralMngBuild_ifc panel, String name, char size){
       super.setToPanel(panel, name, 20, widthSelecttableMain, size);
       wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.tabSelect.");
     }

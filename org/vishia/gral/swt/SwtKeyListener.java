@@ -9,7 +9,7 @@ import org.vishia.gral.ifc.GralWidget;
 
 /**A common key listener implementation for SWT. It is applied to all widgets.
  * Derived forms exists for special SWT-widgets.
- * This class is instanciated one time in the {@link SwtWidgetMng}.
+ * This class is instanciated one time in the {@link SwtMng}.
  * @author Hartmut Schorrig
  *
  */
@@ -25,11 +25,11 @@ public class SwtKeyListener extends GralKeyListener
   @SuppressWarnings("hiding")
   public final static int version = 0x20111203;
   
-  final SwtWidgetMng swtMng;
+  final SwtMng swtMng;
   
   final KeyListener swtListener;
   
-  public SwtKeyListener(SwtWidgetMng swtMng)
+  public SwtKeyListener(SwtMng swtMng)
   {
     super();
     this.swtMng = swtMng;

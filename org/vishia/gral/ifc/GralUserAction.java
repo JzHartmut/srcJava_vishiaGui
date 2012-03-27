@@ -16,7 +16,7 @@ import org.vishia.util.KeyCode;
  * <br><br>
  * If a user action should be selected by String in the GUI-Script, it should be supplied by registering 
  * before the script runs.
- * This should be done with the method {@link GralGridBuild_ifc#registerUserAction(String, UserActionGui)}.
+ * This should be done with the method {@link GralMngBuild_ifc#registerUserAction(String, UserActionGui)}.
  * <br><br>
  * Some widgets can know the same implementing instance. The differencing is done with the {@link GralWidget}
  * as parameter while calling.

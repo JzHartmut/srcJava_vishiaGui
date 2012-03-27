@@ -33,7 +33,7 @@ public class SwtLed extends GralLed{
    */
   private SwtLedImpl widgSwt;
   
-  SwtLed(String name, SwtWidgetMng mng){
+  SwtLed(String name, SwtMng mng){
     super(name, mng);
     widgSwt = new SwtLedImpl(mng, 'r');
     widgSwt.setBackground(mng.propertiesGuiSwt.colorBackground);
@@ -87,7 +87,7 @@ public class SwtLed extends GralLed{
   
 private class SwtLedImpl extends Canvas
   {
-  	final SwtWidgetMng mng;
+  	final SwtMng mng;
   
   	boolean round;
   	
@@ -97,7 +97,7 @@ private class SwtLedImpl extends Canvas
   	 * @param mng The Gui-panel-manager contains information about the graphic frame and properties.
   	 * @param kind Use 'r' or 'q' for a round or a square LED.
   	 */
-  	public SwtLedImpl(SwtWidgetMng mng, char kind)
+  	public SwtLedImpl(SwtMng mng, char kind)
   	{
   		
   		super(((SwtPanel)mng.pos.panel).getPanelImpl(), 0);

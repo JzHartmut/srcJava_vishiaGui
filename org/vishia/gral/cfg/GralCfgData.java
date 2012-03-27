@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.vishia.gral.ifc.GralGridBuild_ifc;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralWidgetCfg_ifc;
 
@@ -395,7 +395,7 @@ public final class GralCfgData
   
   
   
-  void processConfiguration(final GralGridBuild_ifc panel)
+  void processConfiguration(final GralMngBuild_ifc panel)
   {
     
   }

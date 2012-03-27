@@ -82,7 +82,7 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
     }
     //The propertiesGuiSwt needs the Display instance for Font and Color. Therefore the graphic thread with creation of Display should be executed before. 
     SwtProperties propertiesGui = new SwtProperties(graphicThread.displaySwt, 'C');
-    GralWidgetMng gralMng = new SwtWidgetMng(graphicThread, propertiesGui, null, log);
+    GralWidgetMng gralMng = new SwtMng(graphicThread, propertiesGui, null, log);
     
     //The PrimaryWindowSwt is a derivation of the GralPrimaryWindow. It is more as only a SWT Shell.
     SwtPrimaryWindow instance = new SwtPrimaryWindow(gralMng, graphicThread, graphicThread.displaySwt);

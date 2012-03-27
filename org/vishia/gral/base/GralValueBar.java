@@ -1,9 +1,8 @@
-package org.vishia.gral.widget;
+package org.vishia.gral.base;
 
-import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.swt.SwtWidgetMng;
+import org.vishia.gral.swt.SwtMng;
 
 /**This is a common base class for a ValueBar-widget. 
  * It is designed as a container for the widget. The widget itself is derived from the graphical base class,

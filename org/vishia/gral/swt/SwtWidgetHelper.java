@@ -27,10 +27,10 @@ public class SwtWidgetHelper
   public final static int version = 0x20111119;
   
   
-  private static SwtWidgetMng mng;
+  private static SwtMng mng;
   
   
-  public SwtWidgetHelper(SwtWidgetMng mng)
+  public SwtWidgetHelper(SwtMng mng)
   { this.mng = mng;
   }
 

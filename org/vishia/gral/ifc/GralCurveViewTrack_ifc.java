@@ -10,9 +10,9 @@ public interface GralCurveViewTrack_ifc
 {
   /**Version, history and license.
    * <ul>
-   * <li>2012-03-17 Hartmut created as interface to {@link org.vishia.gral.widget.GralCurveView.Track}.
+   * <li>2012-03-17 Hartmut created as interface to {@link org.vishia.gral.base.GralCurveView.Track}.
    *   Approach: Accessibility. The class Track is protected. Its details should only be used
-   *   for implementation and inside {@link org.vishia.gral.widget.GralCurveView}
+   *   for implementation and inside {@link org.vishia.gral.base.GralCurveView}
    * </ul>
    * <br><br>
    * <b>Copyright/Copyleft</b>:
