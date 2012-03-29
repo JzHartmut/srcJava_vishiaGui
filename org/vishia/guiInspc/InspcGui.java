@@ -218,7 +218,7 @@ private class InspcGuiCfg extends GuiCfg
     //Initializes the GUI till a output window to show informations:
     CmdLineAndGui cmdgui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
     bOk = cmdgui.parseArgumentsAndInitGraphic("Inspc-GUI-cfg", "3A3C");
-
+    System.err.println("InspcGui - Test; test");
     LogMessage log = cmdgui.getLogMessageOutputConsole();
     
     //String ipcFactory = "org.vishia.communication.InterProcessComm_Socket";

@@ -18,6 +18,7 @@ import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageFile;
 import org.vishia.msgDispatch.MsgDispatcher;
+import org.vishia.msgDispatch.MsgPrintStream;
 
 /**This class receives the messages from the target and writes it in the actual list and in some files.
  * 
@@ -36,6 +37,8 @@ public class MsgReceiver
 	}
 	
 	private final Report console;
+	
+	final MsgPrintStream systemErrAdapter;
 
 	/**The access to the gui, to change data to show. */
 	private final GralMng_ifc guiAccess;
@@ -152,6 +155,7 @@ public class MsgReceiver
   
 		MsgDispatcher msgDispatcher = new MsgDispatcher(1000, 100, 3, 0);
 		this.msgDispatcher = msgDispatcher;
+		this.systemErrAdapter = new MsgPrintStream(msgDispatcher);
 		int secondsToClose = -10; //any 10 seconds, the file will be closed, and re-openened at least after 10 seconds.
 		int hoursPerFile = -3600; //This is 3600 seconds.
 		fileOutput = new LogMessageFile("D:/DATA/msg/log$yyyy-MMM-dd-hh_mm$.log", secondsToClose, hoursPerFile, null, timeZoneForFile, msgDispatcher.getSharedFreeEntries());
@@ -175,6 +179,7 @@ public class MsgReceiver
 			}
 		}
 		setRange(msgDispatcher, dstMsg, firstIdent, lastIdent);  //for the last block.
+		System.err.println("MsgReceiver - test message; test");
 	}
 	
 	

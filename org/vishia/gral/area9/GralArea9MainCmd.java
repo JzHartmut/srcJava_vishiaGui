@@ -9,6 +9,7 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.swt.FactorySwt;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.msgDispatch.MsgPrintStream;
 
 /**This class is an extension of the {@link MainCmd} for graphic applications.
  * It provides up to 9 areas for panels. With them a basic partitioning of panels can be done.
@@ -25,7 +26,10 @@ public class GralArea9MainCmd extends MainCmd
 {
   
   /**Version, history and licence
-   * 
+   * <ul>
+   * <li>2012-03-30 MsgPrintStream systemErrAdapter used here.
+   *   Now System.err.println can be used to generate an dispatch-able message with numeric identifier.
+   * </ul>
    * <b>Copyright/Copyleft</b>:
    * For this source the LGPL Lesser General Public License,
    * published by the Free Software Foundation is valid.
@@ -51,9 +55,14 @@ public class GralArea9MainCmd extends MainCmd
    * 
    * 
    */
-  public final static int version = 0x20120303;
+  public final static int version = 20120330;
   
   public GralArea9_ifc gui;
+  
+  final MsgPrintStream systemErrAdapter;
+  
+  final LogMessage log;
+
   
   /**Aggregation to given instance for the command-line-argument. The instance can be arranged anywhere else.
    * It is given as ctor-parameter.
@@ -74,6 +83,11 @@ public class GralArea9MainCmd extends MainCmd
   { 
     super(args);
     this.cargs = cargs;
+    this.log = getLogMessageErrorConsole();
+    this.systemErrAdapter = new MsgPrintStream(log);
+    System.err.println("GralArea9MainCmd - test message; test");
+    System.err.println("GralArea9MainCmd - test message; test2");
+    
   }
 
   
