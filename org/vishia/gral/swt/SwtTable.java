@@ -534,7 +534,7 @@ public class SwtTable  extends GralTable {
       Text widgSwt = (Text)ev.widget;  //it is only associated to a cell.
       CellData cellData = (CellData)widgSwt.getData();
       if(true || !hasFocus){
-        SwtTable.this.gralWidgetMethod.focusGained();  //from GralWidget.
+        SwtTable.this.implMethodWidget_.focusGained();  //from GralWidget.
         hasFocus = true;
         //System.out.println("focusTable");
       }
@@ -608,7 +608,7 @@ public class SwtTable  extends GralTable {
     
     @Override public void focusGained(FocusEvent ev)
     { //super.focusGained(ev);
-      SwtTable.this.gralWidgetMethod.focusGained();
+      SwtTable.this.implMethodWidget_.focusGained();
       //System.out.println("table focus gained. ");
       //assert(false);
       int row = 1; //table.getSelectionIndex();
@@ -663,7 +663,7 @@ public class SwtTable  extends GralTable {
         if(!bRedrawPending){ 
           //The focusGained for the table invokes the GralWidget.focusAction for this table.
           if(true || !hasFocus){
-            SwtTable.this.gralWidgetMethod.focusGained();  //from GralWidget.
+            SwtTable.this.implMethodWidget_.focusGained();  //from GralWidget.
             hasFocus = true;
             //System.out.println("focusTable");
           }

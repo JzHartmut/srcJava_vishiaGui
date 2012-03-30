@@ -1737,7 +1737,7 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
     
     @Override public void focusGained(FocusEvent ev)
     { GralWidget widgd = (GralWidget)ev.widget.getData();
-      widgd.gralWidgetMethod.focusGained();
+      widgd.implMethodWidget_.focusGained();
       /*
       widgd.getMng().notifyFocus(widgd);
       String htmlHelp = widgd.getHtmlHelp();

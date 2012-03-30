@@ -664,6 +664,9 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
       return false;
     }
 
+    @Override public boolean isVisible(){ return GralTable.this.isVisible(); }
+    
+
     @Override
     public GralColor setBackgroundColor(GralColor color) {
       GralColor ret = colorBackground;

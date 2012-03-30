@@ -17,6 +17,7 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
 
   /**Version history:
    * <ul>
+   * <li>2012-03-31 Hartmut new: {@link #implMethodPanel_} and {@link MethodsCalledbackFromImplementation#setVisible(boolean)}.
    * <li>2012-01-14 Hartmut new: {@link #setPrimaryWidget(GralWidget)} for panel focus.
    * <li>2012-01-08 Hartmut new: {@link #remove()}
    * <li>2011-11-19 Hartmut chg: The 'itsTabSwt' is moved to {@link org.vishia.gral.swt.SwtPanel} now.
@@ -41,7 +42,7 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
    *    modified sources likewise under this LGPL Lesser General Public License.
    *    You mustn't delete this Copyright/Copyleft inscription in this source file.
    * </ol>
-   * If you are indent to use this sources without publishing its usage, you can get
+   * If you are intent to use this sources without publishing its usage, you can get
    * a second license subscribing a special contract with the author. 
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
@@ -180,13 +181,36 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
   { return panelComposite;
   }
 	
-
+  
   /**Returns the container instance of the panel of the implementing graphic.
    * @return The container.
    */
   public abstract Object getPanelImpl();
   
   @Override public String toString(){ return "GralPanel:" + namePanel; }
+
+  
+  
+  /**This inner class contains methods which can call by the implementation layer.
+   * That methods are not intent to be called by the application. 
+   * It is public because the implementation level in another package should accesses it.
+   */
+  public class MethodsCalledbackFromImplementation extends GralWidget.MethodsCalledbackFromImplementation{
+    
+    @Override public void setVisible(boolean visible){
+      for(GralWidget widget: widgetList){
+        widget.implMethodWidget_.setVisible(visible);
+      }
+    }
+  } //class MethodsCalledbackFromImplementation
+
+  /**This reference is a inner class which contains methods which can call by the implementation layer.
+   * That methods are not intent to be called by the application. 
+   * It is public because the implementation level in another package should accesses it.
+   */
+  public MethodsCalledbackFromImplementation implMethodPanel_ = new MethodsCalledbackFromImplementation();
+  
+
   
 }
 

@@ -48,8 +48,10 @@ import org.vishia.util.KeyCode;
 public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidget_ifc
 {
   
-  /**Changes:
+  /**Version, history and license.
    * <ul>
+   * <li>2012-03-31 Hartmut new: {@link #isVisible()} and {@link MethodsCalledbackFromImplementation#setVisible(boolean)}.
+   *   renamed: {@link #implMethodWidget_} instead old: 'gralWidgetMethod'.
    * <li>2012-03-08 Hartmut chg: {@link #repaintRequ} firstly remove the request from queue before execution,
    *   a new request after that time will be added newly therefore, then execute it.
    * <li>2012-02-22 Hartmut new: catch on {@link #repaintGthread()} and continue the calling level
@@ -95,9 +97,6 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    *   Older Concept: Store the GUI implementation widget type as generic type there.
    *   But now a widget is stored as Object and it is casted in the implementation. It is more simple 
    *   because the type is only used and the casting is only necessary in the implementation level.       
-   * </ul>
-  /**Version, history and license.
-   * <ul>
    * <li>2011-06-00 Hartmut created
    * </ul>
    * 
@@ -124,7 +123,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120303;
+  public static final int version = 20120331;
 
   
   /**The widget manager from where the widget is organized. Most of methods need the information
@@ -238,6 +237,17 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 	/**Any special info, may be set from any user class. It should help to present the content. 
 	 * This info can be set and changed after registration. */
 	private Object oContentInfo;
+	
+	
+	
+	
+	/**Set true if its shell, tab card etc is be activated. Set false if it is deactivated.
+	 * It is an estimation whether this widget is be shown yet. 
+	 */
+	private boolean bVisible;
+
+	/**The time when the bVisible state was changed. */
+	private long lastTimeSetVisible;
 	
 	
 	//protected GralWidget(char whatIs)
@@ -509,7 +519,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 	 * If this method is called the first time for the widget after start the application, the access info
 	 * is searched in the container calling {@link VariableContainer_ifc#getVariable(String, int[])}
 	 * with the stored textual info {@link #setDataPath(String)} and {@link #setDataIx(int)}.
-	 * This operation may need a little bit of calcualtion time, which were to expensive if a lot of widgets
+	 * This operation may need a little bit of calculation time, which were to expensive if a lot of widgets
 	 * should be provided with user values. Therefore the returned {@link VariableAccess_ifc} instance is stored
 	 * in the {@link #oContentInfo} of the widget and returned on the further calls.
 	 * <br>
@@ -545,6 +555,13 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   { return itsMng.getValueFromWidget(this);
   }
   
+  
+  
+  @Override public boolean isVisible(){
+    return bVisible;
+  }
+  
+  
   /**Sets the current value of the content of the widget in the given context.
    * @param cmd see {@link GralMng_ifc#cmdSet} etc. It is possible to set the color etc.
    * @param ident Any number to specify set, maybe 0
@@ -578,6 +595,17 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
     itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, value, null);
   }
   
+  
+  /**Sets the visible value given as String. Usual it is applicable if the widget is a text field.
+   * This method can or should be overridden for some widgets to optimize calculation time.
+   * The default implementation uses the {@link GralWidgetMng#setInfo(GralWidget, int, int, Object, Object)}.
+   * @param sValue String given value.
+   */
+  public void setValue(String sValue){
+    itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, sValue, null);
+  }
+  
+  
   /**Sets the border of the value range for showing. 
    * If it is a ValueBar, for exmaple, it is the value for 0% and 100%
    * This routine is empty per default, should be overridden if it is necessary.
@@ -604,6 +632,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * @return true if the focus is set really.
    */
   public abstract boolean setFocus();
+  
   
   
   
@@ -672,8 +701,6 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    */
   protected abstract void repaintGthread();
 
-  
-  
   /**Methods which should be called back by events of the implementation layer.
    * This class is used only for the implementation level of the graphic. It is not intent to use
    * by any application. It is public because the implementation level should accesses it.
@@ -696,6 +723,16 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
       itsMng.notifyFocus(GralWidget.this);
     }
     
+    /**Sets the state of the widget whether it seams to be visible.
+     * This method should not be invoked by the application. It is 
+     * @param visible
+     */
+    public void setVisible(boolean visible){
+      bVisible = visible;
+      lastTimeSetVisible = System.currentTimeMillis();
+    }
+
+    
     
     
   }
@@ -703,7 +740,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   /**Not intent to get from user: The instance which's methods can be called from an event method of the implementation of the GralWidget. 
    * Note: This Method is public only because the implementation in another package need to use it.
    * It should not be used by any application. */
-  public MethodsCalledbackFromImplementation gralWidgetMethod = new MethodsCalledbackFromImplementation();
+  public MethodsCalledbackFromImplementation implMethodWidget_ = new MethodsCalledbackFromImplementation();
   
   
   /**This callback worker calls the {@link #repaintGthread()} if it is invoked in the graphical thread.

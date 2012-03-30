@@ -136,6 +136,9 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
 
   @Override public String getText(){ return textBox.getText(); }
   
+  
+  @Override public boolean isVisible(){ return textBox.isVisible(); }
+  
   @Override public int getCursorPos(){ return textBox.getCursorPos(); }
 
 

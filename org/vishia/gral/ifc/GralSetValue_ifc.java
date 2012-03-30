@@ -11,7 +11,7 @@ public interface GralSetValue_ifc
   
   /**Version and history
    * <ul>
-   * <li>2012-02-22 Hartmut Enhanced, now used for lines of a curve view. Now basic interface for GralWidget.
+   * <li>2012-02-22 Hartmut enhanced: now used for lines of a curve view. Now basic interface for GralWidget.
    * <li>2012-01-01 Hartmut Created, firstly only for the value bar.
    * </ul>
    * 
@@ -73,7 +73,7 @@ public interface GralSetValue_ifc
 	void setValue(float value);
 	
 	/**Sets the border of the value range for showing. 
-	 * If it is a ValueBar, for exmaple, it is the value for 0% and 100%
+	 * If it is a ValueBar, for example, it is the value for 0% and 100%
 	 * @param minValue
 	 * @param maxValue
 	 */

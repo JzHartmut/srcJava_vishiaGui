@@ -33,12 +33,10 @@ import org.vishia.util.Removeable;
 public interface GralWidget_ifc extends Removeable
 {
   
-  /**Version and history:
-   * <ul>
-   * <li>2012-01-16 Hartmut new: Concept {@link #repaint()}, can be invoked in any thread. With delay possible.
-   * </ul> 
   /**Version, history and license.
    * <ul>
+   * <li>2012-03-31 Hartmut new: {@link #isVisible()}
+   * <li>2012-01-16 Hartmut new: Concept {@link #repaint()}, can be invoked in any thread. With delay possible.
    * <li>2011-06-00 Hartmut created
    * </ul>
    * 
@@ -80,6 +78,15 @@ public interface GralWidget_ifc extends Removeable
    * @return true if set
    */
   public abstract boolean setFocus();
+  
+  
+  /**Returns whether the widget is visible or not. This method can be invoked in any thread.
+   * It is an estimation because the state of the widget may be changed in the last time or a window
+   * can be covered by another one. The widget is not visible if it is a member of a card in a tabbed
+   * panel and that tab is not the selected one.
+   * @return true if the widget seams to be visible.
+   */
+  boolean isVisible();
   
   public abstract GralColor setBackgroundColor(GralColor color);
   
