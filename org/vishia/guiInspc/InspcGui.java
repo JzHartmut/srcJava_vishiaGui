@@ -2,19 +2,32 @@ package org.vishia.guiInspc;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.byteData.VariableAccess_ifc;
+import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GralArea9MainCmd;
+import org.vishia.gral.base.GralCurveView;
+import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
+import org.vishia.gral.ifc.GralSetValue_ifc;
+import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
+import org.vishia.gral.ifc.GralWidget;
+import org.vishia.inspectorAccessor.InspcMng;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.CompleteConstructionAndStart;
 
-public class InspcGui //extends GuiCfg
+public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 {
 
   /**Version and history
@@ -26,13 +39,26 @@ public class InspcGui //extends GuiCfg
    */
   public final static int version = 0x20111020;
   
+  private final List<CompleteConstructionAndStart> composites = new LinkedList<CompleteConstructionAndStart>();
+  
   /**The communication manager. */
   final InspcGuiComm inspcComm;
   
   private final CallingArguments cargs;
+  
+  GralPanelActivated_ifc panelActivated = new GralPanelActivated_ifc(){
+    @Override public void panelActivatedGui(Queue<GralWidget> widgets)
+    { panelActivated(widgets); 
+    }
+  };
 
   final GuiCfg guiCfg;
   
+  final VariableContainer_ifc variableMng;
+  
+  final private Runnable callbackOnReceivedData = new Runnable(){ @Override public void run(){ callbackOnReceivedData(); } };
+  
+
   InspcCurveView curveA, curveB, curveC;
 
   InspcGui(CallingArguments cargs, GralArea9MainCmd cmdgui)
@@ -51,13 +77,89 @@ public class InspcGui //extends GuiCfg
     GralPlugUser_ifc user = guiCfg.getPluggedUser(); 
     assert(user instanceof InspcPlugUser_ifc);
     
+    InspcMng variableMng = new InspcMng(cargs.sOwnIpcAddr, cargs.indexTargetIpcAddr);
+    composites.add(variableMng);
+    this.variableMng = variableMng;
+    variableMng.setCallbackOnReceivedData(callbackOnReceivedData);
+    
     this.inspcComm = new InspcGuiComm(this, guiCfg.gralMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
+    composites.add(inspcComm);
     curveA = new InspcCurveView(inspcComm, cmdgui.gralMng);
     curveB = new InspcCurveView(inspcComm, cmdgui.gralMng);
     curveC = new InspcCurveView(inspcComm, cmdgui.gralMng);
 
   }
   
+  @Override public void completeConstruction(){
+    for(CompleteConstructionAndStart composite: composites){
+      composite.completeConstruction();
+    }
+  }
+  
+  @Override public void startupThreads(){
+    for(CompleteConstructionAndStart composite: composites){
+      composite.startupThreads();
+    }
+  }
+
+  
+  
+  void panelActivated(Queue<GralWidget> widgets){
+    for(GralWidget widget: widgets){
+      
+    }
+  }
+  
+  
+
+  
+  private void callbackOnReceivedData(){
+    ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = guiCfg.gralMng.getVisiblePanels();
+    //GralWidget widgdRemove = null;
+    try{
+      for(GralVisibleWidgets_ifc panel: listPanels){
+        Queue<GralWidget> widgetsVisible = panel.getWidgetsVisible();
+        if(widgetsVisible !=null) for(GralWidget widget: widgetsVisible){
+          if(widget instanceof GralCurveView){
+            GralCurveView curve = (GralCurveView)widget;
+            List<GralSetValue_ifc> listLines = curve.getTracks();
+            float[] values = new float[listLines.size()];
+            int ixValues = -1;
+            /*
+            for(GralSetValue_ifc line: listLines){
+              
+              VariableAccess_ifc variable = line.getContentInfo();
+              float value;
+              if(variable !=null){
+                value= variable.bytes.getFloat(variable, line.getDataIx());
+              } else {
+                value = 0;
+              }
+              line.setValue(value);
+              values[++ixValues] = value;
+            }
+            curve.setSample(values, (int)timeMilliSecFromBaseyear);
+            */
+          } else {
+            VariableAccess_ifc variable = widget.getVariableFromContentInfo(variableMng);
+            if(variable !=null){
+              //gets the last received value, maybe force getting new values.
+              float val = variable.getFloat();
+              String sFormat = widget.getFormat();
+              if(sFormat !=null){
+                //format the value
+              }
+              String sVal = Float.toString(val);
+              widget.setValue(sVal);
+            }
+            
+          }
+        }
+      }
+    } catch(Exception exc){ 
+    }
+    
+  }
   
   
   private static class CallingArguments extends GuiCallingArgs
@@ -162,7 +264,7 @@ private class InspcGuiCfg extends GuiCfg
   
   @Override protected void initMain()
   {
-    inspcComm.openComm(cargs.sOwnIpcAddr);
+    //inspcComm.openComm(cargs.sOwnIpcAddr);
     //msgReceiver.start();
     //oamRcvUdpValue.start();
     super.initMain();  //starts initializing of graphic. Do it after reading some configurations.
@@ -171,8 +273,9 @@ private class InspcGuiCfg extends GuiCfg
   
   @Override protected void stepMain()
   {
-    try{ 
-      inspcComm.procComm();  
+    try{
+      synchronized(this){ wait(100); }
+      //inspcComm.procComm();  
       //oamRcvUdpValue.sendRequest();
     } catch(Exception exc){
       //tread-Problem: console.writeError("unexpected Exception", exc);
@@ -231,6 +334,9 @@ private class InspcGuiCfg extends GuiCfg
     new InterProcessCommFactorySocket();
     
     InspcGui main = new InspcGui(cargs, cmdgui);
+    
+    main.completeConstruction();
+    main.startupThreads();
 
     main.guiCfg.execute();
     
@@ -238,5 +344,9 @@ private class InspcGuiCfg extends GuiCfg
   }
 
 
+  
+  
+  
+  
   
 }

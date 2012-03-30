@@ -8,6 +8,8 @@ import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.byteData.VariableAccess_ifc;
+import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InspcDataExchangeAccess.Info;
 import org.vishia.gral.base.GralPanelContent;
@@ -19,13 +21,17 @@ import org.vishia.inspectorAccessor.InspcAccessEvaluatorRxTelg;
 import org.vishia.inspectorAccessor.InspcAccessExecAnswerTelg_ifc;
 import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
 import org.vishia.inspectorAccessor.InspcAccessor;
+import org.vishia.inspectorAccessor.InspcMng;
 import org.vishia.mainCmd.Report;
 import org.vishia.reflect.ClassJc;
 import org.vishia.util.CalculatorExpr;
+import org.vishia.util.CompleteConstructionAndStart;
+import org.vishia.util.Event;
+import org.vishia.util.EventConsumer;
 import org.vishia.util.StringFormatter;
 
 /**The communication manager. */
-public class InspcGuiComm
+public class InspcGuiComm implements CompleteConstructionAndStart
 {
   /**Version, able to read as hex yyyymmdd.
    * Changes:
@@ -40,6 +46,8 @@ public class InspcGuiComm
    */
   public final static int version = 0x20110617;
 
+  private final List<CompleteConstructionAndStart> composites = new LinkedList<CompleteConstructionAndStart>();
+  
   /**This class joins the GUI-Widget with the inspector communication info block.
    * It is created for any Widget one time if need and used for the communication after that. 
    * The routine {@link #execInspcRxOrder(Info)} is used to show the received values.
@@ -179,7 +187,6 @@ public class InspcGuiComm
   public ConcurrentLinkedQueue<Runnable> userOrders = new ConcurrentLinkedQueue<Runnable>();
   
   
-  
   InspcGuiComm(InspcGui inspcGui, GralMng_ifc mng, Map<String, String> indexTargetIpcAddr, InspcPlugUser_ifc user)
   {
     this.inspcGui = inspcGui;
@@ -193,7 +200,20 @@ public class InspcGuiComm
     }
   }
   
+  @Override public void completeConstruction(){
+    for(CompleteConstructionAndStart composite: composites){
+      composite.completeConstruction();
+    }
+  }
   
+  @Override public void startupThreads(){
+    for(CompleteConstructionAndStart composite: composites){
+      composite.startupThreads();
+    }
+  }
+
+  
+
   void xxxaddPanel(GralPanelContent panel)
   {
     //listPanels.add(panel);
@@ -249,14 +269,16 @@ public class InspcGuiComm
             if(actionShow !=null){
               actionShow.userActionGui("tx", widget);
             } else {
-              actionShowTextfield.userActionGui("tx", widget);
+              //actionShowTextfield.userActionGui("tx", widget);
             }
+            /*
             if(inspcAccessor.shouldSend()){
               sendAndAwaitAnswer();
               //repeat the request for the field:
               //TODO: don't use the show action! use datapath with meta info.
               actionShowTextfield.userActionGui("tx", widget);
             }
+            */
           } else {
             //remove from list
             widgdRemove = widget;
