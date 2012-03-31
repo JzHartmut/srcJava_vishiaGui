@@ -255,7 +255,7 @@ public class AwtWidgetMng extends GralWidgetMng implements GralMngBuild_ifc, Gra
     widgButton.setPanelMng(this);
     widgButton.sCmd = sCmd;
     widgButton.setShowMethod(sShowMethod);
-    widgButton.sDataPath = sDataPath;
+    widgButton.setDataPath(sDataPath);
     registerWidget(widgButton);
     return widgButton;
   }

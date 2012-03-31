@@ -11,6 +11,9 @@ public interface GralSetValue_ifc
   
   /**Version and history
    * <ul>
+   * <li>2012-04-01 Hartmut new: {@link #setValue(Object[])} as a possibility to set the appearance of a widget
+   *   with more as one value, maybe float, integer etc. It is used for {@link org.vishia.gral.base.GralLed}
+   *   to determine colors for border and inner.
    * <li>2012-02-22 Hartmut enhanced: now used for lines of a curve view. Now basic interface for GralWidget.
    * <li>2012-01-01 Hartmut Created, firstly only for the value bar.
    * </ul>
@@ -72,6 +75,13 @@ public interface GralSetValue_ifc
 	 */
 	void setValue(float value);
 	
+  /**Sets some values to show any content. Depending from the type of widget more as one value
+   * can be used for several functionality.
+   * @param value array of floats
+   */
+  void setValue(Object[] value);
+  
+  
 	/**Sets the border of the value range for showing. 
 	 * If it is a ValueBar, for example, it is the value for 0% and 100%
 	 * @param minValue

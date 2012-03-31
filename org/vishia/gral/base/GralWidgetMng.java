@@ -57,7 +57,9 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Changes:
    * <ul>
-   * <li>2012-03-17 Hartmut new: {@link #calcWidgetPosAndSize(GralPos, int, int)} as abstract method.
+   * <li>2012-04-01 Hartmut new: {@link #addDataReplace(Map)}, {@link #replaceDataPathPrefix(String)}.
+   *   using alias in the {@link GralWidget#setDataPath(String)}. The resolving of the alias is done
+   *   only if the datapath is used.   * <li>2012-03-17 Hartmut new: {@link #calcWidgetPosAndSize(GralPos, int, int)} as abstract method.
    * <li>2012-03-10 Hartmut chg: {@link #addText(String)} now uses the background color {@link GralGridProperties#colorBackground_}.
    * <li>2012-01-14 Hartmut chg: {@link #registerWidget(GralWidget)}: uses {@link GralPanelContent#addWidget(GralWidget, boolean)}.
    * <li>2012-01-14 Hartmut new {@link #getValueFromWidget(GralWidget)} implementing here for non-platform depending values, especially GralTable.
@@ -385,7 +387,10 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
   /**Index of all Tables, which are representable. */
   //private final Map<String, Table> userTableAccesses = new TreeMap<String, Table>();
   
-	
+  /**Map of replacements of paths to data. Filled from ZBNF: DataReplace::= <$?key> = <$-/\.?string> */
+  private final Map<String, String> dataReplace = new TreeMap<String,String>();
+
+
 	
   public GralWidgetMng(GralGraphicThread device, GralGridProperties props, VariableContainer_ifc variableContainer, LogMessage log)
 	{ this.gralDevice = device;
@@ -423,6 +428,43 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
   
 
   public GralMngApplAdapter_ifc getApplicationAdapter(){ return applAdapter; } 
+  
+  
+  /**It supports usage of an alias in the data path. See {@link #replaceDataPathPrefix(String)}.
+   * @param src this map will added to the existing one.
+   */
+  @Override public void addDataReplace(final Map<String, String> src){
+    dataReplace.putAll(src);    
+  }
+  
+  /**It supports usage of an alias in the data path. See {@link #replaceDataPathPrefix(String)}.
+   * @param alias Any shorter alias
+   * @param value The complete value.
+   */
+  @Override public void addDataReplace(String alias, String value){
+    dataReplace.put(alias, value);    
+  }
+  
+  /**It supports usage of an alias in the data path.
+   * @param path may contain "alias:restOfPath"
+   * @return if "alias" is found in {@link #addDataReplace(String, String)} the it is replaced
+   *   inclusively ":". If alias is not found, it is not replaced.
+   *   Note that another meaning of "prefix:restOfPath" is possible.
+   */
+  @Override public String replaceDataPathPrefix(final String path)
+  {
+    String pathRet = path;
+    int posSep = path.indexOf(':');
+    if(posSep >=0){
+      String sRepl = dataReplace.get(path.substring(0, posSep));
+      if(sRepl !=null){
+        pathRet = sRepl + path.substring(posSep+1);  //Note: sRepl may contain a ':', its the device.
+      }
+    }
+    return pathRet;
+  }
+  
+
   
   
   public void setHtmlHelp(String url){

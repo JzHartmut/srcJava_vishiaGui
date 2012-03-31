@@ -83,16 +83,21 @@ public class GralSwitchExclusiveButtonMng implements VariableAccess_ifc
   }
 
   @Override
-  public String getString(int ixArray)
+  public String getString(int ...ixArray)
   { return currentButtonText;
   }
 
   @Override
-  public String setString(String value, int ixArray)
+  public String setString(String value, int ...ixArray)
   {
     // TODO Auto-generated method stub
     return null;
   }
   
+  @Override public char getType(){ return 'I'; } 
   
+  @Override public int getDimension(int dimension){
+    return 0; //no dimension
+  }
+
 }

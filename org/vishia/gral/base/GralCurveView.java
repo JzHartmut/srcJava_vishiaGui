@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.vishia.byteData.VariableAccessWithIdx;
+import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralCurveViewTrack_ifc;
 import org.vishia.gral.ifc.GralCurveView_ifc;
@@ -22,6 +24,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-04-01 Hartmut new: Using {@link VariableAccessWithIdx} to access values.
    * <li>2012-03-25 Hartmut chg: Some routines from SWT moved to this because there are independent.
    * <li>2012-03-17 Hartmut chg: All track-associated data now in the {@link Track} inner class.
    * <li>2012-02-25 Hartmut new: All data have a short timestamp. The x-pixel are calculated with timestamp,
@@ -65,6 +68,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   protected static class Track implements GralCurveViewTrack_ifc, GralSetValue_ifc {
     public final String name;
     public String sDataPath;
+    
+    public VariableAccessWithIdx variable;
     
     private Object oContent;
     
@@ -110,7 +115,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
 
     @Override public Object getContentInfo() { return oContent;  }
 
-    @Override public void setDataPath(String sDataPath) { this.sDataPath = sDataPath; }
+    @Override public void setDataPath(String sDataPath) { 
+      this.sDataPath = sDataPath; 
+      this.variable = null;
+    }
 
     @Override public String getDataPath() { return sDataPath; }
 
@@ -119,6 +127,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     @Override public void setDataIx(int dataIx) { this.dataIx = dataIx; }
 
     @Override public void setValue(float value) { this.actValue = value; }
+
+    @Override public void setValue(Object[] value) { } //TODO this.actValue = value[0]; }
 
     @Override public void setMinMax(float minValue, float maxValue) {
       this.min = minValue; this.max = maxValue;
@@ -490,7 +500,28 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
 
   
   
-
+  @Override public void refreshFromVariable(VariableContainer_ifc container){
+    float[] values = new float[tracks.length];
+    int ixTrack = -1;
+    for(Track track: tracks){
+      if(track.variable ==null ){ //no variable known, get it.
+        String sDataPath = track.getDataPath();
+        if(sDataPath !=null){
+          String sPath2 = sDataPath.trim();
+          String sPath = itsMng.replaceDataPathPrefix(sPath2);
+          track.variable = container.getVariable(sPath);
+        }
+      }
+      final float value;
+      if(track.variable !=null ){
+        value = track.variable.getFloat();
+      } else {
+        value = 0;
+      }
+      values[++ixTrack] = value;
+    }
+    setSample(values, (int)System.currentTimeMillis());
+  }
   
   
   

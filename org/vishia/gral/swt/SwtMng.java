@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 
+import org.vishia.byteData.VariableAccessWithIdx;
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
@@ -1104,7 +1105,7 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
     //setBounds_(button);
     widgButton.sCmd = sCmd;
     widgButton.setShowMethod(sShowMethod);
-    widgButton.sDataPath = sDataPath;
+    widgButton.setDataPath(sDataPath);
     //pos.panel.widgetIndex.put(sName, widgButton);
     registerWidget(widgButton);
     /*
@@ -1149,7 +1150,7 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
     widgButton.setPanelMng(this);
     widgButton.sCmd = sCmd;
     widgButton.setShowMethod(sShowMethod);
-    widgButton.sDataPath = sDataPath;
+    widgButton.setDataPath(sDataPath);
     registerWidget(widgButton);
     return widgButton;
   }
@@ -1220,7 +1221,7 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
 
     GralLed widgetInfos = new SwtLed(sName, this);
     widgetInfos.setPanelMng(this);
-    widgetInfos.sDataPath = sDataPath;
+    widgetInfos.setDataPath(sDataPath);
     widgetInfos.setShowMethod(sShowMethod);
     registerWidget(widgetInfos);
     return widgetInfos;
@@ -1456,16 +1457,16 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
           } else if(widget instanceof SwtLed){ 
             SwtLed field = (SwtLed)widget;
             switch(cmd){
-            case GralMng_ifc.cmdColor: field.setColor(ident, (Integer)info); break;
+            case GralMng_ifc.cmdColor: field.XXXsetColor(ident, (Integer)info); break;
             case GralMng_ifc.cmdSet: {
               if(info instanceof Integer){
                 int colorInner = ((Integer)info).intValue();
-                field.setColor(ident, colorInner);
+                field.XXXsetColor(ident, colorInner);
               } else if(info instanceof String){
                 if(((String)info).charAt(0) != '0'){
-                  field.setColor(0xff0000, 0xfff00);
+                  field.XXXsetColor(0xff0000, 0xfff00);
                 } else {
-                  field.setColor(0x00ff00, 0x00ffff);
+                  field.XXXsetColor(0x00ff00, 0x00ffff);
                 }
               } else {
                 stop();
@@ -1707,15 +1708,15 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
 		{
 		  
 			Object oWidget = infos.getGraphicWidgetWrapper();  
-			final VariableAccess_ifc variable = infos.getVariableFromContentInfo(variableContainer);
+			final VariableAccessWithIdx variable = infos.getVariableFromContentInfo(variableContainer);
 			final int ixData = infos.getDataIx();
 			final String sValue;
 			if(variable !=null){
 				if(sIntension.equals("o")){
-					if(oWidget instanceof Text){ sValue = ((Text)oWidget).getText(); variable.setString(sValue, ixData); }
+					if(oWidget instanceof Text){ sValue = ((Text)oWidget).getText(); variable.setString(sValue); }
 					else { sValue = null; }
 				} else if(sIntension.equals("i")){
-					if(oWidget instanceof Text){ sValue = variable.getString(ixData); ((Text)oWidget).setText(sValue == null ? "" : sValue); }
+					if(oWidget instanceof Text){ sValue = variable.getString(); ((Text)oWidget).setText(sValue == null ? "" : sValue); }
 					else { sValue = null; }
 				} else throw new IllegalArgumentException("GuiPanelMng.syncVariableOnFocus: unexpected intension on focus: " + sIntension); 
 			} else throw new IllegalArgumentException("GuiPanelMng.syncVariableOnFocus: variable not found: " + infos.getDataPath()); 

@@ -201,7 +201,7 @@ public class OamShowValues
               }
               curve.setSample(values, (int)timeMilliSecFromBaseyear);
             } else {
-              String sContentInfo = widget.sDataPath;
+              String sContentInfo = widget.getDataPath();
               if(sContentInfo !=null && sContentInfo.length() >0 && widget !=null){
                 stop();
                 if(!callMethod(widget)){
@@ -219,7 +219,7 @@ public class OamShowValues
 	  }
     if(widgetsInTab != null){
 			for(GralWidget widgetInfo: widgetsInTab){
-				String sContentInfo = widgetInfo.sDataPath;
+				String sContentInfo = widgetInfo.getDataPath();
 				if(sContentInfo !=null && sContentInfo.length() >0 && widgetInfo !=null){
 					stop();
 					if(!callMethod(widgetInfo)){
@@ -263,7 +263,7 @@ public class OamShowValues
 	
 	boolean callMethod(GralWidget widgetInfo)
 	{ String sName = widgetInfo.name;
-		String sInfo = widgetInfo.sDataPath;
+		String sInfo = widgetInfo.getDataPath();
 		final String sMethodName;
 		final String sVariablePath;
 		final String[] sParam;
@@ -547,7 +547,7 @@ public class OamShowValues
   { public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     { 
   		final int[] ixArrayA = new int[1];
-  		ByteDataSymbolicAccess.Variable variable = getVariable(widgetInfos.sDataPath, ixArrayA);
+  		ByteDataSymbolicAccess.Variable variable = getVariable(widgetInfos.getDataPath(), ixArrayA);
   		int value = 0; //TODO Integer.parseInt(sParam);
   		if(variable.bytes.lengthData() == 0){
   			variable.bytes.assignData(new byte[1500]);

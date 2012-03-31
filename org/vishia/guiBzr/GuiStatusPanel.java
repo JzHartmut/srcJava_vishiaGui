@@ -281,7 +281,7 @@ public class GuiStatusPanel
   { 
     public boolean userActionGui(int key, GralWidget widgd, Object... values)
     {
-      mainData.currCmpn = mainData.currPrj.selectComponent(widgd.sDataPath);
+      mainData.currCmpn = mainData.currPrj.selectComponent(widgd.getDataPath());
       //
       //gets the status of the components archive in the GUI-action,
       //because the appearance of the GUI should be updated:

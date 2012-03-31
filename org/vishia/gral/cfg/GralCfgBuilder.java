@@ -52,7 +52,7 @@ public class GralCfgBuilder
   
   private final GralCfgData cfgData;
   
-  private final GralMngBuild_ifc gui;
+  private final GralMngBuild_ifc gralMng;
   
   /**The current directory is that directory, where the config file is located. 
    * It is used if other files are given with relative path.*/
@@ -64,7 +64,7 @@ public class GralCfgBuilder
   public GralCfgBuilder(GralCfgData cfgData, GralMngBuild_ifc gui, File currentDir)
   {
     this.cfgData = cfgData;
-    this.gui = gui;
+    this.gralMng = gui;
     this.currentDir = currentDir;
     String sCanonicalPath = org.vishia.util.FileSystem.getCanonicalPath(currentDir);
     indexAlias.put("cfg", sCanonicalPath);
@@ -91,13 +91,13 @@ public class GralCfgBuilder
   public String buildGui(LogMessage log, int msgIdent)
   {
     String sError = null;
-
+    gralMng.addDataReplace(cfgData.dataReplace);
     for(Map.Entry<String, GralCfgPanel> panelEntry: cfgData.idxPanels.entrySet()){
       GralCfgPanel panel = panelEntry.getValue();
       String sErrorPanel = buildPanel(panel);  
       if(sErrorPanel !=null){
         if(log !=null){
-          log.sendMsg(msgIdent, "GUIPanelMng - cfg error; %s", sErrorPanel);
+          log.sendMsg(msgIdent, "GralCfgBuilder - cfg error; %s", sErrorPanel);
         }
         if(sError == null){ sError = sErrorPanel; }
         else { sError += "\n" + sErrorPanel; }
@@ -115,7 +115,7 @@ public class GralCfgBuilder
   public String buildPanel(GralCfgPanel cfgDataPanel)
   {
     String sError = null;
-    gui.selectPanel(cfgDataPanel.name);
+    gralMng.selectPanel(cfgDataPanel.name);
     
     for(GralCfgElement cfge: cfgDataPanel.listElements){
       String sErrorWidgd = buildWidget(cfge);
@@ -223,7 +223,7 @@ public class GralCfgBuilder
     } else {heightArg = pos.ySizeDown + GralPos.size; }
     
     int widthArg = pos.xWidth == Integer.MAX_VALUE ? GralPos.useNatSize : pos.xWidth + GralPos.size;
-    gui.setFinePosition(pos.yPos, pos.yPosFrac, heightArg, pos.ySizeFrac
+    gralMng.setFinePosition(pos.yPos, pos.yPosFrac, heightArg, pos.ySizeFrac
         , pos.xPos, pos.xPosFrac, widthArg, pos.xSizeFrac, 1, dirNext, 0, 0, null);
     //
     GralWidget widgd = null;
@@ -235,6 +235,7 @@ public class GralCfgBuilder
     String sDataPath = cfge.widgetType.info;
     //text is the default for a datapath.
     if(sDataPath ==null && cfge.widgetType.text !=null){ sDataPath = cfge.widgetType.text; }
+    /*
     if(sDataPath !=null){
       //replace a prefix before ':' with its replacement, if the prefix is found.
       //This is a possibility to shorten data path.
@@ -251,10 +252,11 @@ public class GralCfgBuilder
         }
       }
     }
+    */
     //
     final GralUserAction userAction;
     if(cfge.widgetType.userAction !=null){
-      userAction = gui.getRegisteredUserAction(cfge.widgetType.userAction);
+      userAction = gralMng.getRegisteredUserAction(cfge.widgetType.userAction);
       if(userAction == null){
         sError = "GuiCfgBuilder - user action not found: " + cfge.widgetType.userAction;
       }
@@ -263,29 +265,29 @@ public class GralCfgBuilder
     if(cfge.widgetType instanceof GralCfgData.GuiCfgButton){
       GralCfgData.GuiCfgButton wButton = (GralCfgData.GuiCfgButton) cfge.widgetType;
       if(wButton.bSwitch){
-        widgd = gui.addSwitchButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd, null
+        widgd = gralMng.addSwitchButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd, null
           , cfge.widgetType.info, cfge.widgetType.text, cfge.widgetType.color0.color, cfge.widgetType.color1.color);
       } else {
-        widgd = gui.addButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd, null, cfge.widgetType.info, cfge.widgetType.text);
+        widgd = gralMng.addButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd, null, cfge.widgetType.info, cfge.widgetType.text);
       }
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgText){
       GralCfgData.GuiCfgText wText = (GralCfgData.GuiCfgText)cfge.widgetType;
       final int colorValue;
-      if(wText.color0 !=null){ colorValue = gui.getColorValue(wText.color0.color); }
-      else if(wText.colorName !=null){ colorValue = gui.getColorValue(wText.colorName.color);}
+      if(wText.color0 !=null){ colorValue = gralMng.getColorValue(wText.color0.color); }
+      else if(wText.colorName !=null){ colorValue = gralMng.getColorValue(wText.colorName.color);}
       else{ colorValue = 0; } //black
       cfge.widgetType.colorName = null;  //it is used, don't set background.
-      widgd = gui.addText(cfge.widgetType.text, wText.size.charAt(0), colorValue);
+      widgd = gralMng.addText(cfge.widgetType.text, wText.size.charAt(0), colorValue);
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgLed){
       GralCfgData.GuiCfgLed ww = (GralCfgData.GuiCfgLed)cfge.widgetType;
-      widgd = gui.addLed(sName, ww.showMethod, sDataPath);
+      widgd = gralMng.addLed(sName, ww.showMethod, sDataPath);
       
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgImage){
       GralCfgData.GuiCfgImage wImage = (GralCfgData.GuiCfgImage)cfge.widgetType;
       File fileImage = new File(currentDir, wImage.file_);
       if(fileImage.exists()){
         try{ InputStream imageStream = new FileInputStream(fileImage); 
-          gui.addImage(sName, imageStream, 10, 20, "?cmd");
+          gralMng.addImage(sName, imageStream, 10, 20, "?cmd");
           imageStream.close();
         } catch(IOException exc){ }
           
@@ -295,7 +297,7 @@ public class GralCfgBuilder
       //GuiCfgData.GuiCfgShowField wShow = (GuiCfgData.GuiCfgShowField)cfge.widgetType;
       //char cPromptPosition = cfge.widgetType.promptPosition ==null || cfge.widgetType.promptPosition.length() <1 
       //                     ? '.' :  cfge.widgetType.promptPosition.charAt(0);
-      widgd = gui.addTextField(sName, false, cfge.widgetType.prompt, cfge.widgetType.promptPosition);
+      widgd = gralMng.addTextField(sName, false, cfge.widgetType.prompt, cfge.widgetType.promptPosition);
       widgd.setDataPath(sDataPath);
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgInputFile){
       GralCfgData.GuiCfgInputFile widgt = (GralCfgData.GuiCfgInputFile)cfge.widgetType;
@@ -303,12 +305,12 @@ public class GralCfgBuilder
       if(widgt.info !=null){
         dirMask = replaceAlias(widgt.info);
       } else { dirMask = ""; }
-      widgd = gui.addFileSelectField(sName, null, dirMask, null, "t");
+      widgd = gralMng.addFileSelectField(sName, null, dirMask, null, "t");
       widgd.setDataPath(sDataPath);
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgCurveview){
       GralCfgData.GuiCfgCurveview widgt = (GralCfgData.GuiCfgCurveview)cfge.widgetType;
       int nrofTracks = widgt.lines.size(); 
-      GralCurveView widgc = gui.addCurveViewY(sName, widgt.nrofPoints, nrofTracks);
+      GralCurveView widgc = gralMng.addCurveViewY(sName, widgt.nrofPoints, nrofTracks);
       for(GralCfgData.GuiCfgCurveLine line: widgt.lines){
         String sDataPathLine = line.name;
         final GralColor colorLine;
@@ -323,7 +325,7 @@ public class GralCfgBuilder
     } else {
       switch(cfge.widgetType.whatIs){
         case 'T':{
-          widgd = gui.addTextField(sName, true, cfge.widgetType.prompt, cfge.widgetType.promptPosition);
+          widgd = gralMng.addTextField(sName, true, cfge.widgetType.prompt, cfge.widgetType.promptPosition);
           widgd.setDataPath(sDataPath);
         } break;
         default: {
@@ -337,7 +339,7 @@ public class GralCfgBuilder
       //widgd.pos = gui.getPositionInPanel();
       String sShowMethod = cfge.widgetType.showMethod;
       if(sShowMethod !=null){
-        GralUserAction actionShow = gui.getRegisteredUserAction(sShowMethod);
+        GralUserAction actionShow = gralMng.getRegisteredUserAction(sShowMethod);
         if(actionShow == null){
           sError = "GuiCfgBuilder - show method not found: " + sShowMethod;
         } else {
@@ -346,7 +348,7 @@ public class GralCfgBuilder
       }
       String sCmd = cfge.widgetType.cmd;
       if(sCmd !=null){
-        GralUserAction actionCmd = gui.getRegisteredUserAction(sCmd);
+        GralUserAction actionCmd = gralMng.getRegisteredUserAction(sCmd);
         if(actionCmd == null){
           sError = "GuiCfgBuilder - cmd action not found: " + sCmd;
         } else {
@@ -367,7 +369,7 @@ public class GralCfgBuilder
         widgd.setLineColor(GralColor.getColor(cfge.widgetType.color1.color), 0);
       }
       if(cfge.widgetType.dropFiles !=null){
-        GralUserAction actionDrop = gui.getRegisteredUserAction(cfge.widgetType.dropFiles);
+        GralUserAction actionDrop = gralMng.getRegisteredUserAction(cfge.widgetType.dropFiles);
         if(actionDrop == null){
           sError = "GuiCfgBuilder - action for drop not found: " + cfge.widgetType.dropFiles;
         } else {
@@ -375,7 +377,7 @@ public class GralCfgBuilder
         }
       }
       if(cfge.widgetType.dragFiles !=null){
-        GralUserAction actionDrag = gui.getRegisteredUserAction(cfge.widgetType.dragFiles);
+        GralUserAction actionDrag = gralMng.getRegisteredUserAction(cfge.widgetType.dragFiles);
         if(actionDrag == null){
           sError = "GuiCfgBuilder - action for drag not found: " + cfge.widgetType.dragFiles;
         } else {
@@ -383,7 +385,7 @@ public class GralCfgBuilder
         }
       }
       if(cfge.widgetType.dragText !=null){
-        GralUserAction actionDrag = gui.getRegisteredUserAction(cfge.widgetType.dragText);
+        GralUserAction actionDrag = gralMng.getRegisteredUserAction(cfge.widgetType.dragText);
         if(actionDrag == null){
           sError = "GuiCfgBuilder - action for drag not found: " + cfge.widgetType.dragText;
         } else {

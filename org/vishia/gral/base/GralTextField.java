@@ -8,6 +8,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWindowMng_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralWidget;
+import org.vishia.util.CalculatorExpr;
 
 /**This is the base class for all widgets which represents a simple text.
  * @author Hartmut Schorrig
@@ -17,6 +18,8 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
 {
   /**Version and history
    * <ul>
+   * <li>2012-04-01 Hartmut new: {@link #setValue(float)} now supports formatting view.
+   *   This algorithm was used for the {@link org.vishia.guiInspc.InspcGui} before.
    * <li>2011-11-18 Hartmut new {@link #setMouseAction(GralUserAction)}. This method should be 
    * an abstract method of all {@link GralWidget} but it is used yet only here.
    * <li>2011-09-00 Hartmut Creation to build a platform-indenpenden representation of text field. 
@@ -40,7 +43,7 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
    *    modified sources likewise under this LGPL Lesser General Public License.
    *    You mustn't delete this Copyright/Copyleft inscription in this source file.
    * </ol>
-   * If you are indent to use this sources without publishing its usage, you can get
+   * If you are intent to use this sources without publishing its usage, you can get
    * a second license subscribing a special contract with the author. 
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
@@ -58,7 +61,9 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   
   protected GralFont fontText;
   
-  
+  /**A calculator to show calculated float values. It is null if it isn't used. */
+  private CalculatorExpr calculator;
+
   protected AtomicInteger whatIsChanged = new AtomicInteger();
   
   protected static final int chgText = 1, chgColorBack=2, chgColorText=4, chgFont = 8;
@@ -73,6 +78,77 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
     this.windowMng = mng.gralDevice;
   }
   
+  
+  /**Sets a float value into a text field.
+   * The float value may be formatted:
+   * <ul>
+   * <li>If the {@link #setFormat(String)} of this widget starts with '!' and contains a second '!',
+   *   the String between that is used as expression to calculate the float value
+   *   using {@link CalculatorExpr}. Therewith any calculation can be done.
+   * <li>The rest after the "!expression!" or the given format is used for String.format(sFormat, value)
+   *   to determine the output appearance.
+   * <li>If no format is given, the value will be shown in proper readable appearance. That assures
+   *   that the value is able to present in a short text field, using maximal 9 digits. 
+   * <li>If no format is given and the absolute of the value is less 0.000001 but not 0, 
+   *   a "0.000001" with the correct sign will be shown. It shows, there is a less value, but not null.
+   * <li>If no format is given and the value is in range up to 1 Billion, it is shown with "k", "M"
+   *   for kilo and Mega with max 3 digits before dot and 3 digits after the dot.
+   * <li>if no format is given and the value is greater than 1 Billion, it is shown with exponent.
+   * <ul>      
+   *   
+   * @see org.vishia.gral.ifc.GralWidget#setValue(float)
+   */
+  @Override public void setValue(float value){
+    final String sFormat1;
+    String sShow;
+    if(sFormat !=null && sFormat.startsWith("!")){
+      int posEnd = sFormat.indexOf('!',1);
+      if(posEnd >=0){
+        String sExpr = sFormat.substring(1, posEnd);
+        sFormat1 = sFormat.substring(posEnd+1);
+        if(calculator ==null){
+          calculator = new CalculatorExpr();
+          String sError = calculator.setExpr(sExpr);
+          if(sError !=null){ 
+            //console.writeError(sError);
+            calculator = null;
+          }
+        }
+        if(calculator !=null){
+          value = (float)calculator.calc(value);
+        }
+      } else {
+        sFormat1 = sFormat;  
+      }
+    } else {
+      sFormat1 = sFormat;  //no expression
+    }
+    if(sFormat1 !=null && sFormat.length() >0){
+      try{ sShow = String.format(sFormat1, value); }
+      catch(java.util.IllegalFormatException exc){ 
+        sShow = null;  //maybe integer 
+      }
+      if(sShow == null){
+        try{ sShow = String.format(sFormat, (int)value); }
+        catch(java.util.IllegalFormatException exc){ 
+          sShow = "?format";  
+        }
+      }
+    } else { //no format given
+      float valueAbs = Math.abs(value); 
+      if(value == 0.0f){ sShow = "0.0"; }
+      else if(valueAbs < 1.0e-7f){ sShow = value < 0 ? "-0.0000001" : "0.0000001"; }  //shorten output, don't show exponent.
+      else if(valueAbs < 1.0f){ sShow = String.format("%1.7f", value); }  //shorten output, don't show exponent.
+      else if(valueAbs < 1.0e3f){ sShow = String.format("%3.4f", value); }  //shorten output, don't show exponent.
+      else if(valueAbs < 1.0e6f){ sShow = String.format("%3.3f k", value/1000); }  //shorten output, don't show exponent.
+      else if(valueAbs < 1.0e9f){ sShow = String.format("%3.3f M", value/1000000); }  //shorten output, don't show exponent.
+      else if(valueAbs >= 1.0e9f){ sShow = String.format("%3.3g", value); }  //shorten output, don't show exponent.
+      //else if(valueAbs >= 1e6){ sShow = Float.toString(value/1000000) + " M"; }  //shorten output, don't show exponent.
+      else { sShow = Float.toString(value); }
+      
+    }
+    setText(sShow);
+  }
   
   @Override public void setText(CharSequence arg)
   { setText(arg, 0);

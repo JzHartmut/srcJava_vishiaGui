@@ -1,5 +1,9 @@
 package org.vishia.gral.ifc;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.vishia.byteData.VariableAccessWithIdx;
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GetGralWidget_ifc;
@@ -50,6 +54,10 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-04-01 Hartmut new: {@link #refreshFromVariable(VariableContainer_ifc)}. A GralWidget is binded now
+   *   more to a variable via the new {@link VariableAccessWithIdx} and then to any {@link VariableAccess_ifc}.
+   *   It is possible to refresh the visible information from the variable.
+   * <li>2012-01-04 Hartmut new: {@link #repaintDelay}, use it.  
    * <li>2012-03-31 Hartmut new: {@link #isVisible()} and {@link MethodsCalledbackFromImplementation#setVisible(boolean)}.
    *   renamed: {@link #implMethodWidget_} instead old: 'gralWidgetMethod'.
    * <li>2012-03-08 Hartmut chg: {@link #repaintRequ} firstly remove the request from queue before execution,
@@ -199,7 +207,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 	private String[] sShowParam;
 	
 	/**Textual informations about content. It may be a data path or adequate. */
-	public String sDataPath;
+	private String sDataPath;
 	
 	/**If not null, it is the right-mouse-button menu for this widget. */
 	protected GralMenu contextMenu;
@@ -213,7 +221,24 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 	public String sFormat;
 	
 	/**Numeric informations about the content. */
-	int[] indices;
+	//int[] indices;
+	
+  /**One variable which is associated with this widget. This reference may be null.
+   * Alternatively {@link #variables} may be set.
+   * See {@link #getVariableFromContentInfo(VariableContainer_ifc)}.
+   * See {@link #setValue(float)}, {@link #setValue(String)}.
+   * See {@link #indices} to use an array- or bit-variable.
+   */
+  private VariableAccessWithIdx variable;
+  
+  /**More as one variable which are associated with this widget. This reference may be null.
+   * Alternatively {@link #variable} may be set.
+   * See {@link #getVariableFromContentInfo(VariableContainer_ifc)}.
+   * See {@link #setValue(float)}, {@link #setValue(String)}.
+   * See {@link #indices} to use an array- or bit-variable.
+   */
+  private List<VariableAccessWithIdx> variables;
+  
 	
   /**Action method on activating, changing or release the widget-focus. */
   protected GralUserAction actionChanging;
@@ -245,6 +270,11 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 	 * It is an estimation whether this widget is be shown yet. 
 	 */
 	private boolean bVisible;
+	
+	/**Delay to repaint.
+	 * 
+	 */
+	protected int repaintDelay = 100, repaintDelayMax = 100;
 
 	/**The time when the bVisible state was changed. */
 	private long lastTimeSetVisible;
@@ -302,7 +332,11 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   /**Sets the data path. It is a String in application context.
    * @param sDataPath
    */
-  public void setDataPath(String sDataPath){	this.sDataPath = sDataPath;}
+  public void setDataPath(String sDataPath){	
+    this.sDataPath = sDataPath;
+    variable = null;
+    variables = null;
+  }
   
   /**Changes the data path
    * @param sDataPath the new one
@@ -526,26 +560,86 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 	 * The returned {@link VariableAccess_ifc} should be allow the fast access to users values.
 	 *  
 	 * @param container The container where all {@link VariableAccess_ifc} should be found.
-	 * @return The access to a user variable in the user's context.
+	 * @return The access to a user variable in the user's context, null if the data path is empty.
 	 */
-	public VariableAccess_ifc getVariableFromContentInfo(VariableContainer_ifc container)
+	public VariableAccessWithIdx getVariableFromContentInfo(VariableContainer_ifc container)
 	{
 		//DBbyteMap.Variable variable;
-		VariableAccess_ifc variable;
+		VariableAccessWithIdx variable;
 		Object oContentInfo = this.getContentInfo();
-		final int[] ixArrayA = new int[1];
 		if(oContentInfo == null){
 			//first usage:
-			variable = container.getVariable(this.getDataPath(), ixArrayA);
-			this.setContentInfo(variable);
-			this.setDataIx(ixArrayA[0]);
+		  String sPath1 = this.getDataPath();
+		  if(sPath1 !=null && (sPath1 = sPath1.trim()).length()>0){
+        String sPath = itsMng.replaceDataPathPrefix(sPath1);
+        variable = container.getVariable(sPath1);
+			  this.setContentInfo(variable);
+		  } else {
+		    variable = null;
+		  }
 		} else if(oContentInfo instanceof VariableAccess_ifc){
-			variable = (VariableAccess_ifc)oContentInfo;
+			variable = (VariableAccessWithIdx)oContentInfo;
 		} else {
 			variable = null;  //other info in widget, not a variable.
 		}
 	  return variable; 
 	}
+	
+	
+	/**Refreshes the graphical content with the content of the variables.
+	 * First time if a variables is not associated the variable is searched in the container
+	 * by the given {@link #setDataPath(String)}. The next times the variable is used independent of
+	 * the reference to the container and independent of the data path. If {@link #setDataPath(String)}
+	 * was called again, the variables are searched in the container newly.
+	 * <br><br>
+	 * If the data path contains ',' as separator, more as one variable is associated.
+	 * 
+	 * @param container contains variables able to search by string.
+	 */
+	public void refreshFromVariable(VariableContainer_ifc container){
+	  if(variable ==null && variables == null){ //no variable known, get it.
+	    final int[] ixArrayA = new int[1];
+	    String sDataPath = this.getDataPath();
+	    if(sDataPath.contains(",")){
+        String[] sDataPaths = sDataPath.split(",");
+        variables = new LinkedList<VariableAccessWithIdx>();
+        for(String sPath1: sDataPaths){
+          String sPath2 = sPath1.trim();
+          String sPath = itsMng.replaceDataPathPrefix(sPath2);
+          VariableAccessWithIdx variable1 = container.getVariable(sPath);
+          variables.add(variable1);       
+        }
+	    } else {
+	      String sPath2 = sDataPath.trim();
+        String sPath = itsMng.replaceDataPathPrefix(sPath2);
+        variable = container.getVariable(sPath);
+	    }
+	  }
+	  if(variable !=null){
+	    char cType = variable.getType();
+	    switch(cType){
+        case 'I': setValue(variable.getInt()); break;
+        case 'F': setValue(variable.getFloat()); break;
+	      case 's': setValue(variable.getString()); break;
+        
+	    }
+	  } else if(variables !=null){
+      Object[] values = new Object[variables.size()];
+      int ixVal = -1;
+	    for(VariableAccessWithIdx variable1: variables){
+	      char cType = variable1.getType();
+	      switch(cType){
+	        case 'I': values[++ixVal] = variable1.getInt(); break;
+	        case 'F': values[++ixVal] = variable1.getFloat(); break;
+	        case 's': values[++ixVal] = variable1.getString(); break;
+	        
+	      } //switch
+        
+      }
+	    setValue(values);
+	  }
+	}
+	
 	
   /**Gets the current value of the content of the widget in the given context.
    * @param mng The context.
@@ -594,6 +688,16 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   @Override public void setValue(float value){
     itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, value, null);
   }
+  
+  
+  /**Sets some value to show any content.
+   * @param value
+   * This routine may be overridden by some specialized widgets.
+   */
+  @Override public void setValue(Object[] value){
+    itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, value, null);
+  }
+  
   
   
   /**Sets the visible value given as String. Usual it is applicable if the widget is a text field.

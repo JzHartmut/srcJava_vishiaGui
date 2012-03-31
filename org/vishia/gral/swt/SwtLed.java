@@ -48,8 +48,8 @@ public class SwtLed extends GralLed{
 
   
 
-  public void setColor(int nBorderColor, int nInnerColor){
-    widgSwt.setColor(nBorderColor, nInnerColor);
+  public void XXXsetColor(int nBorderColor, int nInnerColor){
+    widgSwt.XXXsetColor(nBorderColor, nInnerColor);
   }
   
   
@@ -120,7 +120,9 @@ private class SwtLedImpl extends Canvas
   			GC gc = e.gc;
   			//gc.d
   			//drawBackground(e.gc, e.x, e.y, e.width, e.height);
-  			gc.setBackground(innerColor); 
+  			if(colorBorder !=null){ borderColor = mng.getColorImpl(colorBorder); }
+  			if(colorInner !=null){ innerColor = mng.getColorImpl(colorInner); }
+        gc.setBackground(innerColor); 
   			gc.fillOval(3,3, e.width-4, e.height-4);
   			gc.setForeground(borderColor); 
   			gc.setLineWidth(3);
@@ -129,32 +131,32 @@ private class SwtLedImpl extends Canvas
     };
     
   	
-    void setBorderColor(int color)
+    void XXXsetBorderColor(int color)
     {
       borderColor = mng.propertiesGuiSwt.colorSwt(color);
       redraw();
     }
     
-    void setInnerColor(int color)
+    void XXXsetInnerColor(int color)
     {
       innerColor = mng.propertiesGuiSwt.colorSwt(color);
       redraw();
     }
     
-    void setColor(int color)
+    void XXXsetColor(int color)
     {
       borderColor = innerColor = mng.propertiesGuiSwt.colorSwt(color);
       redraw();
     }
     
-  	void setColor(String sColor)
+  	void XXXsetColor(String sColor)
   	{
   		borderColor = innerColor = mng.propertiesGuiSwt.color(sColor);
   		redraw();
   	}
   	
   	
-  	void setColor(int nBorderColor, int nInnerColor)
+  	void XXXsetColor(int nBorderColor, int nInnerColor)
   	{
   		borderColor = mng.propertiesGuiSwt.colorSwt(nBorderColor);
   		innerColor = mng.propertiesGuiSwt.colorSwt(nInnerColor);

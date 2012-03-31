@@ -401,7 +401,7 @@ public final class GralCfgData
   }
 
   
-  public String replacePathPrefix(String path, String[] target)
+  public String XXXreplacePathPrefix(String path, String[] target)
   {
     String pathRet = path;
     int posSep = path.indexOf(':');

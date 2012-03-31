@@ -84,9 +84,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     
     this.inspcComm = new InspcGuiComm(this, guiCfg.gralMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
     composites.add(inspcComm);
-    curveA = new InspcCurveView(inspcComm, cmdgui.gralMng);
-    curveB = new InspcCurveView(inspcComm, cmdgui.gralMng);
-    curveC = new InspcCurveView(inspcComm, cmdgui.gralMng);
+    curveA = new InspcCurveView(variableMng, cmdgui.gralMng);
+    curveB = new InspcCurveView(variableMng, cmdgui.gralMng);
+    curveC = new InspcCurveView(variableMng, cmdgui.gralMng);
 
   }
   
@@ -120,43 +120,20 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
       for(GralVisibleWidgets_ifc panel: listPanels){
         Queue<GralWidget> widgetsVisible = panel.getWidgetsVisible();
         if(widgetsVisible !=null) for(GralWidget widget: widgetsVisible){
-          if(widget instanceof GralCurveView){
-            GralCurveView curve = (GralCurveView)widget;
-            List<GralSetValue_ifc> listLines = curve.getTracks();
-            float[] values = new float[listLines.size()];
-            int ixValues = -1;
-            /*
-            for(GralSetValue_ifc line: listLines){
-              
-              VariableAccess_ifc variable = line.getContentInfo();
-              float value;
-              if(variable !=null){
-                value= variable.bytes.getFloat(variable, line.getDataIx());
-              } else {
-                value = 0;
-              }
-              line.setValue(value);
-              values[++ixValues] = value;
-            }
-            curve.setSample(values, (int)timeMilliSecFromBaseyear);
-            */
-          } else {
-            VariableAccess_ifc variable = widget.getVariableFromContentInfo(variableMng);
-            if(variable !=null){
-              //gets the last received value, maybe force getting new values.
-              float val = variable.getFloat();
-              String sFormat = widget.getFormat();
-              if(sFormat !=null){
-                //format the value
-              }
-              String sVal = Float.toString(val);
-              widget.setValue(sVal);
-            }
-            
+          try{
+            widget.refreshFromVariable(variableMng);
+          }catch(Exception exc){
+            System.err.println("InspcGui-receivedData-widget; " + exc.getMessage());   
+            exc.printStackTrace(System.err);
           }
         }
       }
+      //referesh the curve view any time if it is enabled:
+      curveA.refreshCurve();
+      curveB.refreshCurve();
+      curveC.refreshCurve();
     } catch(Exception exc){ 
+      System.err.println("InspcGui-receivedData; " + exc.getMessage());   
     }
     
   }
@@ -299,7 +276,7 @@ private class InspcGuiCfg extends GuiCfg
     @Override public String replacePathPrefix(String path, String[] target)
     {
       // TODO Auto-generated method stub
-      String pathRet = guiCfg.guiCfgData.replacePathPrefix(path, target);
+      String pathRet = guiCfg.guiCfgData.XXXreplacePathPrefix(path, target);
       if(target[0] !=null){
         String targetIp = inspcComm.translateDeviceToAddrIp(target[0]);
         if(targetIp !=null){ target[0] = targetIp; }  //else let it unchanged.

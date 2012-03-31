@@ -78,16 +78,16 @@ public class InspcGuiComm implements CompleteConstructionAndStart
       if(cmd == InspcDataExchangeAccess.Info.kAnswerValue){
         if(widgd.sFormat !=null){
           if(widgd.sFormat.equals("int32AngleDegree")){
-            int value = InspcAccessEvaluatorRxTelg.valueIntFromRxValue(info);
+            int value = InspcAccessEvaluatorRxTelg.valueIntFromRxValue(info, InspcAccessEvaluatorRxTelg.getInspcTypeFromRxValue(info));
             float angle = value * (180.0f/2147483648.0f);
             sShow = String.format("%3.2f °", angle);
           } else if(widgd.sFormat.equals("int16AngleDegree")){
-            int value = InspcAccessEvaluatorRxTelg.valueIntFromRxValue(info);
+            int value = InspcAccessEvaluatorRxTelg.valueIntFromRxValue(info, InspcAccessEvaluatorRxTelg.getInspcTypeFromRxValue(info));
             float angle = value * (180.0f/32768.0f);
             sShow = String.format("%3.2f °", angle);
           } else {
             final String sFormat;
-            float value = InspcAccessEvaluatorRxTelg.valueFloatFromRxValue(info);
+            float value = InspcAccessEvaluatorRxTelg.valueFloatFromRxValue(info, InspcAccessEvaluatorRxTelg.getInspcTypeFromRxValue(info));
             if(widgd.sFormat.startsWith("!")){
               int posEnd = widgd.sFormat.indexOf('!',1);
               if(posEnd >=0){
@@ -125,7 +125,7 @@ public class InspcGuiComm implements CompleteConstructionAndStart
           }
         }
         else { //no format given
-          float value = InspcAccessEvaluatorRxTelg.valueFloatFromRxValue(info);
+          float value = InspcAccessEvaluatorRxTelg.valueFloatFromRxValue(info, InspcAccessEvaluatorRxTelg.getInspcTypeFromRxValue(info));
           float valueAbs = Math.abs(value); 
           StringFormatter format;
           if(value == 0.0f){ sShow = "0.0"; }
@@ -253,6 +253,7 @@ public class InspcGuiComm implements CompleteConstructionAndStart
     sIpTarget = null; 
     bUserCalled = false;
     //
+    assert(false);
     //
     ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = mng.getVisiblePanels();
     GralWidget widgdRemove = null;
@@ -285,9 +286,9 @@ public class InspcGuiComm implements CompleteConstructionAndStart
           }
         }//for widgets in panel
       }
-      inspcGui.curveA.addTxInfoBlock();
-      inspcGui.curveB.addTxInfoBlock();
-      inspcGui.curveC.addTxInfoBlock();
+      //inspcGui.curveA.addTxInfoBlock();
+      //inspcGui.curveB.addTxInfoBlock();
+      //inspcGui.curveC.addTxInfoBlock();
     } catch(Exception exc){ 
     }
     Runnable userOrder;

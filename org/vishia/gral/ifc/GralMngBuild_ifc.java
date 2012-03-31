@@ -79,6 +79,9 @@ public interface GralMngBuild_ifc
   
   /**The version of this interface:
    * <ul>
+   * <li>2012-04-01 Hartmut new: {@link #addDataReplace(Map)}, {@link #replaceDataPathPrefix(String)}.
+   *   using alias in the {@link GralWidget#setDataPath(String)}. The resolving of the alias is done
+   *   only if the datapath is used. 
    * <li>2012-03-10 Hartmut chg: Rename this class to GralMngBuild_ifc
    * <li>2012-03-09 Hartmut new: {@link #addCheckButton(String, String, String, String, GralColor, GralColor, GralColor)}
    * <li>2012-02-11 Hartmut new: {@link #setContextMenu(GralWidget, GralMenu)}. 
@@ -274,7 +277,25 @@ public interface GralMngBuild_ifc
   
   
   
+  /**It supports usage of an alias in the data path. See {@link #replaceDataPathPrefix(String)}.
+   * @param src this map will added to the existing one.
+   */
+  void addDataReplace(final Map<String, String> src);
   
+  /**It supports usage of an alias in the data path. See {@link #replaceDataPathPrefix(String)}.
+   * @param alias Any shorter alias
+   * @param value The complete value.
+   */
+  void addDataReplace(String alias, String value);
+  
+  /**It supports usage of an alias in the data path.
+   * @param path may contain "alias:restOfPath"
+   * @return if "alias" is found in {@link #addDataReplace(String, String)} the it is replaced
+   *   inclusively ":". If alias is not found, it is not replaced.
+   *   Note that another meaning of "prefix:restOfPath" is possible.
+   */
+  String replaceDataPathPrefix(final String path);
+
   
   
   /**Adds a button

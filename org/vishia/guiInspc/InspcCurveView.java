@@ -1,5 +1,6 @@
 package org.vishia.guiInspc;
 
+import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralCurveView;
@@ -61,6 +62,8 @@ public class InspcCurveView
   
   final GralWidgetMng gralMng;
   
+  final VariableContainer_ifc variables;
+  
   private static class TrackValues{
 
     /**The track description in the view. */
@@ -120,12 +123,13 @@ public class InspcCurveView
   
   GralButton widgBtnOff;
   
-  final InspcGuiComm comm;
+  //final InspcGuiComm comm;
   
   GralCurveView widgCurve;
   
-  InspcCurveView(InspcGuiComm comm, GralWidgetMng gralMng){
-    this.comm = comm;
+  InspcCurveView(VariableContainer_ifc variables, GralWidgetMng gralMng){
+    //this.comm = comm;
+    this.variables = variables;
     this.gralMng = gralMng;
   }
   
@@ -180,13 +184,16 @@ public class InspcCurveView
   }
 
   
-  
+  void refreshCurve(){
+    if(widgBtnOff.getState() == GralButton.kOn){
+      widgCurve.refreshFromVariable(variables);
+    }
+  }
   
   
   /**Adds an info block to the request telegram to get values. This routine is called
    * when the tx telegram to get values from target is assembled.
    * 
-   */
   void addTxInfoBlock(){
     if(widgBtnOff.getState() == GralButton.kOn){
       TrackValues inpLast = null;
@@ -206,6 +213,7 @@ public class InspcCurveView
       }
     }
   }
+   */
   
   
   
@@ -232,18 +240,8 @@ public class InspcCurveView
         input.mid = 0.0f;
         String sShowMethod = variableWidget.getShowMethod();
         String sPath = variableWidget.getDataPath();
-        if(sShowMethod !=null && sShowMethod.equals("stc_cmd")){
-          //stc_cmd led:
-          String mask = variableWidget.getDataPath();
-          int ix = "abcd".indexOf(mask.charAt(0));
-          sPath = "stc_cmdW:[" + ix + "]";
-          String sBit = ":" + mask.substring(1);
-          input.widgVarPath.setText(sPath);
-          input.widgBit.setText(sBit);
-          input.widgComment.setText(variableWidget.name);
-        } else {
-          input.widgVarPath.setText(variableWidget.name);
-        }
+        input.trackView.setDataPath(sPath);
+        input.widgVarPath.setText(variableWidget.name);
       }
       return true;
     }
@@ -340,7 +338,9 @@ public class InspcCurveView
       int cmd = info.getCmd();
       if(cmd == InspcDataExchangeAccess.Info.kAnswerValue){
         GralWidget widgd = inp.widgetVariable;
-        float val = inp.val = InspcAccessEvaluatorRxTelg.valueFloatFromRxValue(info);
+        int typeInspc = InspcAccessEvaluatorRxTelg.getInspcTypeFromRxValue(info);
+        
+        float val = inp.val = InspcAccessEvaluatorRxTelg.valueFloatFromRxValue(info, typeInspc);
         if(inp.min > val){ inp.min = val; }
         if(inp.max < val){ inp.max = val; }
         inp.mid += 0.01f * (val - inp.mid);
