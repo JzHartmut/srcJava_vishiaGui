@@ -26,7 +26,7 @@ public class InspcCurveView
    * Changes:
    * <ul>
    * <li>2012-03-17 Hartmut creating using the {@link GralCurveView} in a special window
-   *   with the communication in {@link InspcGuiComm}.
+   *   with the communication in {@link InspcMng}.
    * </ul>
    * <br><br> 
    * <b>Copyright/Copyleft</b>:

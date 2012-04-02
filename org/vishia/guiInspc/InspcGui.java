@@ -23,6 +23,8 @@ import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.inspectorAccessor.InspcMng;
+import org.vishia.inspectorAccessor.InspcPlugUser_ifc;
+import org.vishia.inspectorAccessor.UserInspcPlug_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.CompleteConstructionAndStart;
@@ -42,7 +44,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   private final List<CompleteConstructionAndStart> composites = new LinkedList<CompleteConstructionAndStart>();
   
   /**The communication manager. */
-  final InspcGuiComm inspcComm;
+  //final InspcGuiComm XXXinspcComm;
   
   private final CallingArguments cargs;
   
@@ -54,7 +56,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
   final GuiCfg guiCfg;
   
-  final VariableContainer_ifc variableMng;
+  final InspcMng inspcMng;
   
   final private Runnable callbackOnReceivedData = new Runnable(){ @Override public void run(){ callbackOnReceivedData(); } };
   
@@ -77,13 +79,13 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     GralPlugUser_ifc user = guiCfg.getPluggedUser(); 
     assert(user instanceof InspcPlugUser_ifc);
     
-    InspcMng variableMng = new InspcMng(cargs.sOwnIpcAddr, cargs.indexTargetIpcAddr);
+    InspcMng variableMng = new InspcMng(cargs.sOwnIpcAddr, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
     composites.add(variableMng);
-    this.variableMng = variableMng;
+    this.inspcMng = variableMng;
     variableMng.setCallbackOnReceivedData(callbackOnReceivedData);
     
-    this.inspcComm = new InspcGuiComm(this, guiCfg.gralMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
-    composites.add(inspcComm);
+    //this.XXXinspcComm = new InspcGuiComm(this, guiCfg.gralMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
+    //composites.add(XXXinspcComm);
     curveA = new InspcCurveView(variableMng, cmdgui.gralMng);
     curveB = new InspcCurveView(variableMng, cmdgui.gralMng);
     curveC = new InspcCurveView(variableMng, cmdgui.gralMng);
@@ -121,7 +123,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
         Queue<GralWidget> widgetsVisible = panel.getWidgetsVisible();
         if(widgetsVisible !=null) for(GralWidget widget: widgetsVisible){
           try{
-            widget.refreshFromVariable(variableMng);
+            widget.refreshFromVariable(inspcMng);
           }catch(Exception exc){
             System.err.println("InspcGui-receivedData-widget; " + exc.getMessage());   
             exc.printStackTrace(System.err);
@@ -265,7 +267,7 @@ private class InspcGuiCfg extends GuiCfg
   @Override protected void finishMain()
   {
     super.finishMain();
-    try{ inspcComm.inspcAccessor.close(); } catch(IOException exc){}
+    try{ inspcMng.close(); } catch(IOException exc){}
   }
   
 } //class InspcGuiCfg
@@ -278,7 +280,7 @@ private class InspcGuiCfg extends GuiCfg
       // TODO Auto-generated method stub
       String pathRet = guiCfg.guiCfgData.XXXreplacePathPrefix(path, target);
       if(target[0] !=null){
-        String targetIp = inspcComm.translateDeviceToAddrIp(target[0]);
+        String targetIp = inspcMng.translateDeviceToAddrIp(target[0]);
         if(targetIp !=null){ target[0] = targetIp; }  //else let it unchanged.
       }
       return pathRet;
