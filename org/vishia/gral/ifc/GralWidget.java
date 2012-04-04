@@ -600,19 +600,21 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 	  if(variable ==null && variables == null){ //no variable known, get it.
 	    final int[] ixArrayA = new int[1];
 	    String sDataPath = this.getDataPath();
-	    if(sDataPath.contains(",")){
-        String[] sDataPaths = sDataPath.split(",");
-        variables = new LinkedList<VariableAccessWithIdx>();
-        for(String sPath1: sDataPaths){
-          String sPath2 = sPath1.trim();
+	    if(sDataPath !=null){  //only refresh widgets with a data path.
+  	    if(sDataPath.contains(",")){
+          String[] sDataPaths = sDataPath.split(",");
+          variables = new LinkedList<VariableAccessWithIdx>();
+          for(String sPath1: sDataPaths){
+            String sPath2 = sPath1.trim();
+            String sPath = itsMng.replaceDataPathPrefix(sPath2);
+            VariableAccessWithIdx variable1 = container.getVariable(sPath);
+            variables.add(variable1);       
+          }
+  	    } else {
+  	      String sPath2 = sDataPath.trim();
           String sPath = itsMng.replaceDataPathPrefix(sPath2);
-          VariableAccessWithIdx variable1 = container.getVariable(sPath);
-          variables.add(variable1);       
-        }
-	    } else {
-	      String sPath2 = sDataPath.trim();
-        String sPath = itsMng.replaceDataPathPrefix(sPath2);
-        variable = container.getVariable(sPath);
+          variable = container.getVariable(sPath);
+  	    }
 	    }
 	  }
 	  if(variable !=null){

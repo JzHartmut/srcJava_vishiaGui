@@ -1,6 +1,5 @@
 package org.vishia.guiInspc;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,25 +8,26 @@ import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.vishia.byteData.VariableAccess_ifc;
-import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GralArea9MainCmd;
-import org.vishia.gral.base.GralCurveView;
+import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralPanelActivated_ifc;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
-import org.vishia.gral.ifc.GralSetValue_ifc;
+import org.vishia.gral.ifc.GralPos;
+import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.inspectorAccessor.InspcMng;
 import org.vishia.inspectorAccessor.InspcPlugUser_ifc;
 import org.vishia.inspectorAccessor.UserInspcPlug_ifc;
-import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.msgDispatch.LogMessageFile;
 import org.vishia.util.CompleteConstructionAndStart;
+import org.vishia.util.KeyCode;
 
 public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 {
@@ -60,7 +60,11 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   
   final private Runnable callbackOnReceivedData = new Runnable(){ @Override public void run(){ callbackOnReceivedData(); } };
   
+  
+  LogMessage logTelg;
 
+  GralButton btnSwitchOnLog;
+  
   InspcCurveView curveA, curveB, curveC;
 
   InspcGui(CallingArguments cargs, GralArea9MainCmd cmdgui)
@@ -123,7 +127,10 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
         Queue<GralWidget> widgetsVisible = panel.getWidgetsVisible();
         if(widgetsVisible !=null) for(GralWidget widget: widgetsVisible){
           try{
-            widget.refreshFromVariable(inspcMng);
+            String sShowMethod;
+            if((sShowMethod = widget.getShowMethod()) ==null || !sShowMethod.equals("stc_cmd")){
+              widget.refreshFromVariable(inspcMng);
+            }
           }catch(Exception exc){
             System.err.println("InspcGui-receivedData-widget; " + exc.getMessage());   
             exc.printStackTrace(System.err);
@@ -225,6 +232,10 @@ private class InspcGuiCfg extends GuiCfg
   @Override protected void initGuiAreas(String sAreaMainPanel)
   {
     super.initGuiAreas("A1C2");
+    super.gralMng.selectPanel("test");
+    super.gralMng.setPosition(5, GralPos.size -3, 0, GralPos.size +10 , 0, 'r');
+    btnSwitchOnLog = super.gralMng.addSwitchButton("log", "log telg ?", "log telg", GralColor.getColor("wh"), GralColor.getColor("am") );
+    btnSwitchOnLog.setActionChange(actionEnableLog);
     curveA.buildGraphic(gui, "curve A");
     curveB.buildGraphic(gui, "curve B");
     curveC.buildGraphic(gui, "curve C");
@@ -324,7 +335,27 @@ private class InspcGuiCfg extends GuiCfg
 
 
   
-  
+  /**Action for button log. It switches on or off the logging functionality to log the telegram traffic
+   * for debugging. */
+  GralUserAction actionEnableLog = new GralUserAction(){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) { 
+      if(actionCode == KeyCode.mouse1Up){
+        GralButton widgButton = (GralButton)widgd;
+        if(widgButton.isOn()){
+          if(logTelg == null){
+            logTelg = new LogMessageFile("telgLog", 10, 1, null, null, null);
+          }
+          inspcMng.inspcAccessor.setLog(logTelg, 1000);
+        } else {
+          if(logTelg !=null){
+            logTelg.close();
+          }
+          inspcMng.inspcAccessor.setLog(null, 0);
+        }
+      }
+      return true;
+    }
+  };
   
   
   

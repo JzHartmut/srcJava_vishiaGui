@@ -17,6 +17,7 @@ import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindowMng_ifc;
 import org.vishia.inspectorAccessor.InspcAccessEvaluatorRxTelg;
 import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
+import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.KeyCode;
 
 public class InspcCurveView
@@ -332,10 +333,11 @@ public class InspcCurveView
      * It prepares the value presentation.
      * @see org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc#execInspcRxOrder(org.vishia.communication.InspcDataExchangeAccess.Info)
      */
-    @Override public void execInspcRxOrder(InspcDataExchangeAccess.Info info)
+    @Override public void execInspcRxOrder(InspcDataExchangeAccess.Info info, LogMessage log, int identLog)
     {
       int order = info.getOrder();
       int cmd = info.getCmd();
+      assert(false);
       if(cmd == InspcDataExchangeAccess.Info.kAnswerValue){
         GralWidget widgd = inp.widgetVariable;
         int typeInspc = InspcAccessEvaluatorRxTelg.getInspcTypeFromRxValue(info);
