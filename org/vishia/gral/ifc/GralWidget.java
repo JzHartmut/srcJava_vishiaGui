@@ -54,6 +54,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-04-07 Hartmut chg: {@link #refreshFromVariable(VariableContainer_ifc)} regards int16, int8
    * <li>2012-04-01 Hartmut new: {@link #refreshFromVariable(VariableContainer_ifc)}. A GralWidget is binded now
    *   more to a variable via the new {@link VariableAccessWithIdx} and then to any {@link VariableAccess_ifc}.
    *   It is possible to refresh the visible information from the variable.
@@ -131,7 +132,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120331;
+  public static final int version = 20120409;
 
   
   /**The widget manager from where the widget is organized. Most of methods need the information
@@ -620,10 +621,11 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 	  if(variable !=null){
 	    char cType = variable.getType();
 	    switch(cType){
-        case 'I': setValue(variable.getInt()); break;
+	      case 'S': case 'B':
+	      case 'I': setValue(variable.getInt()); break;
         case 'F': setValue(variable.getFloat()); break;
 	      case 's': setValue(variable.getString()); break;
-        
+        default:  setValue(variable.getInt());  //at least request newly if type is faulty
 	    }
 	  } else if(variables !=null){
       Object[] values = new Object[variables.size()];
@@ -631,10 +633,11 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 	    for(VariableAccessWithIdx variable1: variables){
 	      char cType = variable1.getType();
 	      switch(cType){
+	        case 'S': case 'B':
 	        case 'I': values[++ixVal] = variable1.getInt(); break;
 	        case 'F': values[++ixVal] = variable1.getFloat(); break;
 	        case 's': values[++ixVal] = variable1.getString(); break;
-	        
+	        default:  setValue(variable.getInt());  //at least request newly
 	      } //switch
         
       }

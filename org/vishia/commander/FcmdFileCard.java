@@ -1,16 +1,11 @@
 package org.vishia.commander;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -19,8 +14,6 @@ import org.vishia.gral.widget.GralFileSelector;
 
 import org.vishia.util.FileCompare;
 import org.vishia.util.FileRemote;
-import org.vishia.util.FileSystem;
-import org.vishia.util.KeyCode;
 
 /**This is one file table in the Java commander. Each main panel (left, middle, right)
  * has maybe more as one tabs, each tab has exactly one file table. The file table is reused

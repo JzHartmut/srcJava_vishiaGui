@@ -5,6 +5,8 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -18,14 +20,38 @@ import org.vishia.gral.base.GralGraphicThread;
  */
 class SwtGraphicThread extends GralGraphicThread //implements Runnable
 {
-  /**Version, able to read as hex yyyymmdd.
+  /**Version, able to read as hex yyyymmdd, history and license.
    * Changes:
    * <ul>
+   * <li>2012-04-10 Hartmut chg: Now the traversal keys ctrl-Pgdn/up are disabled.
    * <li>2011-11-12 Hartmut chg: Now the primary window has a menu bar anyway. 
    * </ul>
+   * <b>Copyright/Copyleft</b>:
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL ist not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but don't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you are intent to use this sources without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   * 
    */
   @SuppressWarnings("hiding")
-  public final static int version = 0x20111112;
+  public final static int version = 20111112;
 
   /**The graphical device for the application for all windows of this application. */
   Display displaySwt;
@@ -63,6 +89,56 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
       
     }
     
+  };
+  
+  
+  
+  /**Disables the ctrl-pgUp and ctrl-Pgdn as traversal key listener. It should be able to use
+   * by the application. Only Tab and sh-Tab are usual. */
+  TraverseListener XXXkeyTraverse = new TraverseListener(){
+    @Override public void keyTraversed(TraverseEvent e) {
+      stop();
+      if(  e.detail == SWT.TRAVERSE_PAGE_NEXT //|| e.keyCode == SWT.PAGE_DOWN){
+        || e.detail == SWT.TRAVERSE_PAGE_PREVIOUS
+         ) {
+        e.doit = true;
+  } } };
+  
+  
+  /**This interface routine is invoked on any key which is used as 'traverse' key to switch
+   * between widgets, panels etc. SWT uses the ctrl-pgup and ctrl-pgdn to switch between the
+   * tab cards on a TabbedPanel. This is not a standard behavior for all graphic systems.
+   * That keys should be able to use in the application. Therefore they are disabled as traversal keys.
+   * To switch between the tabs - it may be application specific to do it with keys - or the mouse
+   * can be used. 
+   * 
+   */
+  Listener traverseKeyFilter = new Listener(){
+    @Override public void handleEvent(Event event) {
+      // TODO Auto-generated method stub
+      if(event.detail == SWT.TRAVERSE_PAGE_NEXT || event.detail == SWT.TRAVERSE_PAGE_PREVIOUS){
+        event.doit = false;
+      }
+      stop();
+    }
+    
+  };
+  
+  
+  /**This routine is invoked on any key event.
+   * It is possible to change keys, to disable the event handling and to call special routines.
+   * Yet not used.
+   */
+  Listener keyFilter = new Listener(){
+    @Override public void handleEvent(Event event) {
+      // TODO Auto-generated method stub
+      if(event.keyCode == SWT.PAGE_DOWN || event.keyCode == SWT.PAGE_UP ){
+        event.doit = true;
+        //event.keyCode = 0;
+        //event.detail = 0;
+      }
+      stop();
+    }
   };
   
   
@@ -116,8 +192,12 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
   @Override protected void initGraphic(){
     displaySwt = new Display();
     displaySwt.addFilter(SWT.Close, windowsCloseListener);
+    displaySwt.addFilter(SWT.Traverse, traverseKeyFilter);
+    displaySwt.addFilter(SWT.KeyDown, keyFilter);
+    displaySwt.addFilter(SWT.KeyUp, keyFilter);
     windowSwt = new Shell(displaySwt); //, SWT.ON_TOP | SWT.MAX | SWT.TITLE);
     windowSwt.addKeyListener(keyListener);
+    //windowSwt.addTraverseListener(keyTraverse);
     
     //graphicFramePos = new Position(graphicFrame.getContentPane());
     //graphicFramePos.set(0,0,xSize,ySize);

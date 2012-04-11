@@ -120,7 +120,7 @@ public class BzrGui extends GuiCfg
   /**Initializes the areas for the panels and configure the panels.
    * This routine can be overridden if other areas are need.
    */
-  protected void initGuiAreas()
+  @Override protected void initGuiAreas(String sMainArea)
   {
     gui.setFrameAreaBorders(20, 80, 60, 85);
     gui.setStandardMenusGThread(new File("."), actionFile);
@@ -129,7 +129,7 @@ public class BzrGui extends GuiCfg
     //panelMng.tabPanel.addGridPanel("operation", "&Operation",1,1,10,10);
     gralMng.selectPanel("primaryWindow");
     mainTabPanel = gralMng.addTabbedPanel("mainTab", null, 0);
-    gui.addFrameArea(1,1,3,2, mainTabPanel); //dialogPanel);
+    gui.addFrameArea("A1C2", mainTabPanel); //dialogPanel);
 
     try { 
         mainTabPanel.addGridPanel("Select", "&Select",1,1,10,10);

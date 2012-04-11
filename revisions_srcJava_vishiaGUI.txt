@@ -1,0 +1,1933 @@
+------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refreshFromVariable(VariableContainer_ifc). A GralWidget is binded now more to a variable via the new {@link VariableAccessWithIdx} and then to any {@link VariableAccess_ifc}. It is possible to refresh the visible information from the variable.
+  * GralWidget: repaintDelay, use it.
+  * GralSetValue_ifc: setValue(Object[]) as a possibility to set the appearance of a widget with more as one value, maybe float, integer etc. It is used for GralLed to determine colors for border and inner.
+  * GralMngBuid_ifc, GralWidgetMng new: addDataReplace(Map), replaceDataPathPrefix(String). Using alias in the {@link GralWidget#setDataPath(String)}. The resolving of the alias is done only if the datapath is used.
+  * GralCurveView: Using VariableAccessWithIdx to access values.
+  * GralTextField: setValue(float) now supports formatting view. This algorithm was used for the org.vishia.guiInspc.InspcGui before.
+------------------------------------------------------------
+revno: 235
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2012-03-31 10:33:54 +0200
+message:
+  changes in InspcGui, in progress
+------------------------------------------------------------
+revno: 234
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2012-03-31 10:33:33 +0200
+message:
+  * Widget.isVisible
+------------------------------------------------------------
+revno: 233
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2012-03-30 13:57:58 +0200
+message:
+  * GralArea9MainCmd: org/vishia/msgDispatch/MsgPrintStream used here. Now System.err.println can be used to generate an dispatch-able message with numeric identifier.
+  it is a new kind to produce messages.
+  * InspcGuiFieldsFromFile.java: new class, but not used yet
+------------------------------------------------------------
+revno: 232
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2012-03-28 07:42:15 +0200
+message:
+  Some renamings.
+  * GralMng instead GralWidgetMng
+  * GralMng_ifc instead GralPanelMngWorking_ifc
+  etc.
+------------------------------------------------------------
+revno: 231
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-03-27 20:27:05 +0200
+message:
+  * GralArea9_ifc: addFrameArea(String, GralPanelContent)} now with String designation of area. It should be used instead designation with 4 integers in range 1..3.
+------------------------------------------------------------
+revno: 230
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-03-27 10:28:45 +0200
+message:
+  GralCurveView improved:
+  * chg GralMenu: addMenuItemGthread(..) returns now a GralWidget. It is necessary to add some information to the menu-widget, which can be used if the GralUserAction#userActionGui(...) for this menu is called. The second param of this method is that menu-GralWidget.
+  * new GralCurveView-interfaces
+  * GralCurveView and its SwtCurveView implementation improved, zoom etc, in progression.
+  * Old CurveView removed now.
+------------------------------------------------------------
+revno: 229
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2012-03-17 10:03:32 +0100
+message:
+  * _bzr/_bzr_revert.bat now reverts with correct timestamp
+  * GralMenu: addMenuItemGthread(...)} returns now a GralWidget. It is necessary to add some information to the menu-widget, which can be used if the  GralUserAction#userActionGui(...) for this menu is called. The second param of this method is that menu-GralWidget.
+  * GralWidgetMng, SwtWidgetMng: Some improvements of method system calcWidgetPosAndSize(...):
+  * SwtTextFieldWrapper: bugfix: adjustment of prompt for top prompt
+  * SwtCurveView: some improvements in paint routine, not finished yet.
+  * GralWindow_ifc, SwtWindow: Now windResizeable defined and supported in SWT-implementation
+  * InspcGui: curve view now used and improved.
+------------------------------------------------------------
+revno: 228 [merge]
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI.trunk
+timestamp: Tue 2012-03-13 15:12:27 +0100
+message:
+  Fcmd Release 1.01:
+  * Fcmd: Statusline backslash with context menuWindowOutputBar
+  * Fcmd: Version (setAboutInfo) now here
+  * GralArea9MainCmd.java: faulty setAboutInfo removed.
+  * GralButton: Some enhancements for Button, check button, three-state, new Button Layout.
+  * Fcmd: improved status panel, but not ready yet.
+  * Fcmd: New synchronize functionality, indepentent of comparison.
+  * GralWidgetMng: addText(String)} now uses the background color
+  * _cmpn: Getting the base components ideas
+------------------------------------------------------------
+revno: 227
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI.trunk
+timestamp: Fri 2012-03-09 13:32:16 +0100
+message:
+  add createDevelop, force side branch
+------------------------------------------------------------
+revno: 226
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2012-03-05 08:04:45 +0100
+message:
+  Fcmd: Now new favorpath saves the favorite paths in the file anyway if [save] is pressed. The menu entry "faVor-save favorite paths" is unnecessary now. TODO: Don't save entries with [temp] pressed. It is able to edit the favor paths and re-read them.
+------------------------------------------------------------
+revno: 225
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2012-03-03 22:57:00 +0100
+message:
+  License comment
+------------------------------------------------------------
+revno: 224
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2012-03-03 22:24:53 +0100
+message:
+  Fcmd: file props, not ready
+------------------------------------------------------------
+revno: 223
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-02-28 08:26:05 +0100
+message:
+  Improve Fcmd:
+  * FcmdCopyCmd: Strategy for button texts and abort behavior improved. Problem was:  The 'check' phase needs some calculation time for a slow network connection.
+  * SwtWidgetMng: prevent some error messages which are unnecessary.
+------------------------------------------------------------
+revno: 222
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-02-26 12:26:33 +0100
+message:
+  GralCurveView, SwtCurveView: extensive re-ingeneering
+  * All data have a short timestamp. The x-pixel are calculated with timestamp, not only with currently storage.
+  * Zoom functinality with timestamp and cursors
+  * Some mouse click and move handling
+------------------------------------------------------------
+revno: 221
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-02-23 08:42:51 +0100
+message:
+  Bugfixes while testing Fcmd
+  * GralWidget: catch on {@link #repaintGthread()} and continue the calling level because elsewhere the repaint order isn't removed from the GralGraphicThread#addDispatchOrder(...)}-queue.
+  * SwtTable: without System.out
+  * GralFileSelector doesn't save an nonexistent directory
+------------------------------------------------------------
+revno: 220
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2012-02-22 11:43:29 +0100
+message:
+  added _make/bzrGetVersion from the other components
+------------------------------------------------------------
+revno: 219
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2012-02-22 07:57:19 +0100
+message:
+  Now the curve view works fundametally with the new concept for GralWidget since about one half year.
+  Some adjustments necessary.
+  * GralSetValue_ifc now used for a line in GralCurveView and as basic interface for GralWidget.
+  the property to set values is a basicly property of one point of view to widgets.
+  * ViewCfg now works also again
+------------------------------------------------------------
+revno: 218
+tags: 12-02-20
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2012-02-20 08:25:36 +0100
+message:
+  * Fcmd: help-path is absolute now anytime, independent from calling parameter (bugfix failed help in browser)
+  * Fcmd-Copy and Move: Now supports changing of dst path, its possible to write manually
+  * Fcmd-Copy and Move: Now supports move and rename.
+  * SwtDragListener, GetGralWidget_ifc: d&d from a GralTable-Cell is prepared (not ready)
+  * GralInfoBox: has an infoLine yet, used for URL in Browser
+------------------------------------------------------------
+revno: 217
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2012-02-18 19:31:37 +0100
+message:
+  * Mouse wheel in table navigation
+------------------------------------------------------------
+revno: 216
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2012-02-18 09:46:11 +0100
+message:
+  * GralTable: Mouse double click
+------------------------------------------------------------
+revno: 215
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2012-02-18 00:46:51 +0100
+message:
+  * Fcmd: regard environment variables in the path.cfg
+  * SwtHtmlBox: Error catch if SWT.Browser fails. It depends from some environment variables on Linux
+------------------------------------------------------------
+revno: 214
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2012-02-17 22:17:25 +0100
+message:
+  * Fcmd: improvements
+------------------------------------------------------------
+revno: 213
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-02-14 23:18:14 +0100
+message:
+  * Fcmd Menus
+------------------------------------------------------------
+revno: 212
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-02-14 22:34:20 +0100
+message:
+  * GralFileSelector, Jcmd: improving selecting the current file again.
+------------------------------------------------------------
+revno: 211
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2012-02-13 15:15:02 +0100
+message:
+  * Improved buttons and menus
+------------------------------------------------------------
+revno: 210
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-02-12 11:39:26 +0100
+message:
+  * ContextMenu for all Widgets and special solution for GralTable established, used in Fcmd, only SWT, AWT is pre-tested in the ExampleContextMenu
+------------------------------------------------------------
+revno: 209
+tags: 12-02-09
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-02-05 04:52:11 +0100
+message:
+  Fcmd: Comparison and Copy
+------------------------------------------------------------
+revno: 208
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-02-05 08:30:46 +0100
+message:
+  * FcmdView: bugfix Hexa presentation in The.file.Commander
+------------------------------------------------------------
+revno: 207
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2012-02-04 14:11:50 +0100
+message:
+  * GralTable with resize-handling
+  * The.file.Commander: Tables with resize, set active color improved
+------------------------------------------------------------
+revno: 206
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2012-01-30 17:47:29 +0100
+message:
+  * GralTable: new method setColorCurrLine(GralColor), use it for The.file.Commander to set all 3 file panels with a proper color. TODO The setFocus listener method should be called if the table was opened too!
+------------------------------------------------------------
+revno: 205
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-01-29 05:11:42 +0100
+message:
+  Some improvements
+------------------------------------------------------------
+revno: 204
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2012-01-27 08:48:03 +0100
+message:
+  * GralTable: improved
+  * GralDispatchCallbackWorker: Renaming removeFromGraphicThread(GralGraphicThread) to removeFromQueue(GralGraphicThread).
+------------------------------------------------------------
+revno: 203
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2012-01-23 07:40:54 +0100
+message:
+  HtmlHelp
+------------------------------------------------------------
+revno: 202
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-01-22 09:05:16 +0100
+message:
+  GralValueBar
+------------------------------------------------------------
+revno: 201
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2012-01-21 23:45:59 +0100
+message:
+  Implementation of GralWidgetGthreadSet_ifc getGthreadSetifc()
+------------------------------------------------------------
+revno: 200
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2012-01-21 16:51:09 +0100
+message:
+  GralDispatchCallbackWorker: structure refactoring
+------------------------------------------------------------
+revno: 199
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2012-01-21 13:55:43 +0100
+message:
+  Some renaming and moving: GralWidgetGthreadSet_ifc
+------------------------------------------------------------
+revno: 198
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2012-01-21 11:40:47 +0100
+message:
+  Now GralTable2 renamed to GralTable.
+------------------------------------------------------------
+revno: 197
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2012-01-21 11:38:51 +0100
+message:
+  *GralTable: All features of the old GralTable which uses the SWT Table now works with the new table concept. Therefore SwtTable deleted and GralTable included in GralTable2.
+  * Some renamings
+------------------------------------------------------------
+revno: 196
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2012-01-20 03:59:35 +0100
+message:
+  GralTable2 improved
+------------------------------------------------------------
+revno: 195
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-01-19 18:09:30 +0100
+message:
+  Improvements
+------------------------------------------------------------
+revno: 194
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-01-17 13:06:56 +0100
+message:
+  * GralCfgBuilder:  If the cfg script contains forex @10,-3.5 it should be a height og 3.5 with bottom line. The GralPos#setFinePosition(...)  needs a value of -4 for size and 5 for fractional size.
+  * GralTextField_ifc.java: new method setSelection(String). The possible values of the string parameter are not defined well yet. The method is only used to show a text right aligned.
+------------------------------------------------------------
+revno: 193
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-01-17 00:46:38 +0100
+message:
+  * Fcmd: now supports drag from the path line (not yet overall in file card).
+  * Fcmd: synchron walking through file cards
+  * GralTable: setCurrentLine(String), insertLine(String, ...): the key is supported now.
+  * GralDispatchCallbackWorker has a name to identifiy yet, proper for debugging
+------------------------------------------------------------
+revno: 192
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-01-15 17:30:21 +0100
+message:
+  enhancements
+------------------------------------------------------------
+revno: 191
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-01-15 09:38:57 +0100
+message:
+  Concept repaint() and repaintGthread: repaint() can be invoked in any thread. With delay possible.
+------------------------------------------------------------
+revno: 190
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2012-01-14 02:47:33 +0100
+message:
+  FileCommander:Navigation keys
+------------------------------------------------------------
+revno: 189
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2012-01-13 18:19:50 +0100
+message:
+  FileCommander:
+  * close tab now works.
+  * Focus of Tab sets focus to card.
+  * Navigation to parent directory now saves the current directory and shows as current.
+------------------------------------------------------------
+revno: 188
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2012-01-13 18:18:15 +0100
+message:
+  Application of changes for BzrGui
+------------------------------------------------------------
+revno: 187
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2012-01-13 18:17:43 +0100
+message:
+  * GralPanelContent: primaryWidget for panel focus.
+  * GralWidget_ifc, redrawDelayed(delay) used for GralTable2
+  * GralWidgetMng: implements  getValueFromWidget() for non-platform depending widgets, first GralTable
+------------------------------------------------------------
+revno: 186
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2012-01-13 21:37:09 +0100
+message:
+  * FileCmd: Now supports fromMid, fromRight, Close Tab,
+  * Concept of GralWidget.remove(), GralTabbedPanel.removePanel(name).
+  * GralTable2, SwtTable2 improved.
+------------------------------------------------------------
+revno: 185
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2012-01-09 19:40:04 +0100
+message:
+  bugfixes and improvement while using The.file.Commander
+------------------------------------------------------------
+revno: 184
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-01-08 04:48:09 +0100
+message:
+  * GralGraphicThread: Delayed orders to dispatch in the graphic thread: Some actions need some calculation time.
+  If they are called in a fast repetition cycle, a follow up effect may occur.
+  Therefore actions should be registered with a delayed start of execution, the start time
+  should be able to putting off till all repetitions (for example key repetition) are done.
+  * GralWidgetChangeRequ: new fields und methods delayExecution(int) etc.
+  * GralDispatchCallbackWorker: addToGraphicThread(..) and removeFromGraphicThread(...)
+  as thread-safe functions which marks the instance as added (for delayed execution, for re-using).
+  * GralGraphicThread: rename  addDispatchListener to addDispatchOrder and set it deprecated,
+  because this method shouldn't be called by user, instead use GralDispatchCallbackWorker.addToGraphicThread(...).
+  TODO rename GralDispatchCallbackWorker too. TODO: encapsulate the deprecated method
+  in a inner class of this with an protected association and inherit this inner class in
+  GralDispatchCallbackWorker. This is a way to have friend (like C++) associations. Don't offer public,
+  what shouln't be used by the user! The inner class is public too, but it should be a super class of a users class then.
+  * GralTable2, SwtTable2: Usage of this concept of delayed orders.
+  The cause was: swt.Control.SetBackgroundColor() needs about 5 ms in Linux GTK with an Intel Atom.
+  It was too long to set 6..8 Controls with a background color in a key repetition-invoked graphic routine.
+  Instead set the color at finishing of repetition after about 200 ms.
+------------------------------------------------------------
+revno: 183
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2012-01-06 23:48:12 +0100
+message:
+  Table independent of swt.Table, Improving SwtWidgetSet_ifc
+------------------------------------------------------------
+revno: 182
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-01-05 20:23:00 +0100
+message:
+  Changes with FileRemote, especially shows symbolic linked directory.
+------------------------------------------------------------
+revno: 181
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-01-05 12:03:51 +0100
+message:
+  GralTextBox: append and set methods are threadsafe now. Background:
+  There may be appended some text currently in another thread.
+------------------------------------------------------------
+revno: 180
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-01-05 10:28:53 +0100
+message:
+  copy
+------------------------------------------------------------
+revno: 179
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2012-01-02 05:45:12 +0100
+message:
+  Fcmd: View-window now supports writing any text input with 0a only, in UTF8
+------------------------------------------------------------
+revno: 178
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-01-01 11:33:20 +0100
+message:
+  Copy for The.file.Commander
+------------------------------------------------------------
+revno: 177
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-01-01 11:32:44 +0100
+message:
+  Gral graphic set routines: Should be able to call from any threads. Therefore the interface
+  SwtSetValue_ifc was created. It is implemented by all Swt widget implementators (yet only SwtWindow)
+  to support a unique handling of set routines. The SwtWidgetMng.setInfoDirect() method uses it.
+
+------------------------------------------------------------
+revno: 176
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-12-31 17:55:10 +0100
+message:
+  Gral: supports popup-menus. The.file.Commander: Execution of some file types with table of 'open with', used in linux
+------------------------------------------------------------
+revno: 175
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-12-28 09:01:27 +0100
+message:
+  TheFileCommander: Html-sensitive help, delete with Event (FileRemote-conceptt)
+------------------------------------------------------------
+revno: 174
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-12-28 09:00:29 +0100
+message:
+  Support context sensitive help: A GralWidget has a Field with the URL. Anytime if the focus is gained, the GralMngApplAdapter_ifc.setHtmlHelp method is invoked. An application implements this interface, especially GralArea9Window, and displays the current help info. The Help window is an swt.Broswer window now. The Gral interface supports InfoBox.createHtmlInfoBox().
+------------------------------------------------------------
+revno: 173
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-12-26 11:25:32 +0100
+message:
+  new The InfoBox can display html text now (Browser functionality) in SWT. help of The.file.Commander
+------------------------------------------------------------
+revno: 172
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-12-26 07:54:59 +0100
+message:
+  renamining: GralPos instead GralGridPos
+------------------------------------------------------------
+revno: 171
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-12-26 07:51:59 +0100
+message:
+  The parameter promptStylePosition is changed from char to String. In the future some more information for the prompt will be supported with that parameter: Prompt size, hanging in text field.
+------------------------------------------------------------
+revno: 170
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-12-26 07:36:50 +0100
+message:
+  Prompt on Textfields: new class SwtTransparentLabel supports a transparent label which can overlay small parts of the text field.
+------------------------------------------------------------
+revno: 169
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-12-25 20:35:07 +0100
+message:
+  Prompts on textfields
+------------------------------------------------------------
+revno: 168
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-12-25 16:55:44 +0100
+message:
+  GralGridPos: dissolve inner class Calc
+------------------------------------------------------------
+revno: 167
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-12-25 16:52:19 +0100
+message:
+  GralGridPos: separation x and y values in an extra class. Preparing for dissolve inner class Calc
+------------------------------------------------------------
+revno: 166
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-12-25 13:41:39 +0100
+message:
+  Improving GralGridPos, textfield with prompt
+------------------------------------------------------------
+revno: 165
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-12-17 08:18:40 +0100
+message:
+  * GralFont used
+  * Fcmd: view
+------------------------------------------------------------
+revno: 164
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2011-12-16 21:03:08 +0100
+message:
+  Fcmd: renaming. Now all classes start with 'Fcmd'. It is The.file.Commander
+------------------------------------------------------------
+revno: 163
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2011-12-16 20:58:01 +0100
+message:
+  JavaCommander: Some renamings, Selection.
+  Naming convention: A card is the content which is labeled with a tab. For example class FcmdFileCard
+------------------------------------------------------------
+revno: 162
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2011-12-16 16:39:59 +0100
+message:
+  Improving JavaCmd.
+  * GralTextField_ifc: setText(CharSequence)} now uses CharSequence instead String.  A CharSequence is more universal. Internally the contained String will be copied.
+------------------------------------------------------------
+revno: 161
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-12-11 09:33:32 +0100
+message:
+  add forgotten file for last checkpoint.
+------------------------------------------------------------
+revno: 160
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-12-11 09:32:56 +0100
+message:
+  * JavaCmd, FileSelector works now with the org/vishia/util/FileRemote.
+------------------------------------------------------------
+revno: 159
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2011-12-06 17:54:28 +0100
+message:
+  Improvements on closing an application, Improvement cmd incocation in JavaCommander
+  * GuiCfg: user.close() on shutdown the application
+  * GralPlugUser_ifc: extends Closeable to support close a plugin
+  * InspcGuiComm: new close
+------------------------------------------------------------
+revno: 158
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-12-04 17:42:43 +0100
+message:
+  * GralTextField_ifc: getCursorPos()}, to get parts of selected texts in a box.  It is used for commands in the output window for JavaCommander.
+  * GralLed, SwtLed, SwtWidgetMng: Now the Led is a base widget of gral.
+  * SwtWidgetMng: setInfoDirect(..) catches  any exception, before: An exception causes aborting the graphic thread.
+  * GralCfgDesigner: Now the current widget is stored by left-mouse-release in the field #widggForDialog. Editing of Led works. sFormat is regarded.
+  * InspcGuiComm: Now regards GralLed, but only the setValue() is called with float (fine tuning TODO)
+------------------------------------------------------------
+revno: 157
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-12-01 19:16:51 +0100
+message:
+  GralGridPos corr if size is negative and fractional
+------------------------------------------------------------
+revno: 156
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-11-28 10:01:27 +0100
+message:
+  * Fine improvements, now valid.
+------------------------------------------------------------
+revno: 155
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-11-28 09:15:22 +0100
+message:
+  *New files of gral.commander
+------------------------------------------------------------
+revno: 154
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-11-28 09:14:14 +0100
+message:
+  * GralTable, SwtTable: setActionOnLineSelected(GralUserAction): The user action is called anytime if a line is selected by user operation. It can be show any associated content anywhere additionally. It is used for example in "The.file.Commander" to show date, time and maybe content  while the user selects any files. The graphical implementation should be call {@link #selectLine(GralTableLine_ifc)} in its Selection listener.
+  * GralWindow, SwtSubWindow: addMenuItemGThread(String, String, GralUserAction)} copied from GralPrimaryWindow_ifc to GralWindow. The capability to have a menu bar should be enabled for sub-windows too. To support regularity, the property bit {@link #windHasMenu}  is created. The property whether a window has a menu bar or not should be given on creation already. 'windProps' now stored for all implementations here.'visibleFirst': Maybe a problem while creation a menu bar in SWT (?)
+  * commander: Show properties of file in an extra status line
+  * commander: Functionality for view, mkdirfile, fileProps created.
+------------------------------------------------------------
+revno: 153
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-11-26 20:30:03 +0100
+message:
+  * SwtTextField: now contains the Label for prompt and disposes it too, Prompt rightsight supported.
+  * GralCfgDesigner: Prompt field for input.
+   * JavaCommander: Navigation between tables.
+------------------------------------------------------------
+revno: 152
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-11-21 20:03:56 +0100
+message:
+  * JavaCommander: Idea of separation of GUI with the file system itself, means the file system can be located on a embedded hardware without display, and the Commander works with it. It isn't the same as FTP, because FTP is file transfer, this is working with files via remote operation. For that idea the package 'target' is created. All files in target may run in any target system maybe translated to C. It is the first experience with them, one day.
+  * FileSelector: Usage of inner class FileAndName containing path, name, date, length instead a File instance. This is a possibility to separate the GUI for selecting files with the hardware, where the files are located (remote access, see above).
+  * The capability of selection of lines is moved from the org.vishia.gral.widget.SelectList to this class. It means any table has the capability of selection of multiple lines. This capability is supported with a extension of the GralTableLine_ifc with org.vishia.util.SelectMask_ifc. The selection of a line is notificated in the users data which are associated with the table line, not in the graphic representation of the table. This is differenced to SWT Table implementation. The capability of selection in an SWT table isn't used. The selection is done by default with shift-key up/down or with mouse selection ctrl-click, shift-click like usual. The selection is not missed if the up/down keys are pressed furthermore. More as that, more as one ranges of lines can be selected. That is a better capability than in SWT.
+------------------------------------------------------------
+revno: 151
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-11-19 08:46:30 +0100
+message:
+  * GralPanelContent, SwtPanel: The 'itsTabSwt' is moved to {@link org.vishia.gral.swt.SwtPanel} now
+  * setFocus() is implemented now using SwtWidgetHelper.setFocusOfTabSwt(Control). It is the implementation of all  GralWidget#setFocus() implementations. It regards that a tab in a TabFolder should be selected if any widget inside the tab-panel is focused. Used extensive in JavaCommander.
+  * SelectList and its derivates are not a GralWidget, but the GralTable inside is the GralWidget. TODO This class should be extend with the path view and possible switching to a tree presentation, using a derived class.
+  * JavaCommander: Now navigation with alt-down  from File table to selection table works.
+------------------------------------------------------------
+revno: 150
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2011-11-18 16:23:11 +0100
+message:
+  UML
+------------------------------------------------------------
+revno: 149
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2011-11-18 16:20:47 +0100
+message:
+  Functionality to capture widget information in another widget, used to build script files with selectable showing fields of a operationAndMonitoring system.
+  * GralTextField: setMouseAction(GralUserAction)}. This method should be an abstract method
+     of all {@link GralWidget} but it is used yet only here.
+  * GralWidgetMng: new: getWidgetOnMouseDown()} to get the last clicked widget in any user routine
+  * GralWidgetMng: new: addText(String) as simple variant
+  * GralGridBuild_ifc, GralWindow, SwtPrimaryWindow: chg: {@link #createWindow(String, String, int)} now not only exclusive or not but with some control bits {@link GralWindow#windExclusive} etc.
+  * SwtDragListener and -Drop improved with drag textFieldSwt
+  Proper Version of JavaSrc_ZBNF necessary.
+------------------------------------------------------------
+revno: 148
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-11-14 13:58:44 +0100
+message:
+  * GralWidgetImplWrapper, SwtWidgetImplWrapper removed, unecessary, not used code deleted in GralArea9Window.
+  * bugfix GralWidgetMng: copy values of pos instead set the reference from GralWidgetMng into GralTabbedPanel. The bug effect was removed panel in GralTabbedPanel.pos because it was the same instance as GralWidgetMng.
+------------------------------------------------------------
+revno: 147
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-11-13 05:01:33 +0100
+message:
+  * The.file.Commander: improved
+------------------------------------------------------------
+revno: 146
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-11-12 09:15:57 +0100
+message:
+  * GralArea9Window: new: The SubWindow for Help, About, InfoBox and InfoLog are created here (InfoLog: TODO).
+  This windows can be opened in demand.
+  * GralArea9Window: chg: All menu items should be prepared in the users application now. The items for help and about
+  are supported with actions by {@link #getActionAbout()} and {@link #getActionAbout()}. This actions
+  are the standard behavior and opens the sub-windows only. But the user can install a more complex functionality
+  for example writing a context sensitive help.
+  * GralArea9Window: initGraphic was the old initOutputArea, but it does more as only the output area.
+  * GralArea9_ifc: chg: {@link #initGraphic(String)} instead initOutputArea().
+  * SwtWidgetMng: chg: {@link #calcPositionOfWindow(GralGridPos)} improved
+  * chg: SwtGraphicThread: Now the primary window has a menu bar anyway.
+  * Tested with JavaCommander
+------------------------------------------------------------
+revno: 145
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-11-10 12:59:07 +0100
+message:
+  * SwtDragListener.java now works proper with drag files.
+------------------------------------------------------------
+revno: 144
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-11-10 08:09:13 +0100
+message:
+  * move all files from mainGuiSwt to gral.swt, dissolve of package mainGuiSwt
+------------------------------------------------------------
+revno: 143
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-11-10 08:02:39 +0100
+message:
+  * more renaming Swt...
+------------------------------------------------------------
+revno: 142
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-11-09 23:25:03 +0100
+message:
+  * Some renamings ClassSwt to SwtClass
+  * rename addTabbedPanel instead createTabPanel
+------------------------------------------------------------
+revno: 141
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-11-09 23:03:47 +0100
+message:
+  * Restructured: A GralTabbedPanel is a GralPanelContent because it can be used as an area
+  in the area9-Window-System, and it is a GralWidget because it can be arranged as element inside a panel.
+  * The inner class TabFolder_ inside TabPanelSwt is wound up.
+------------------------------------------------------------
+revno: 140
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-11-09 08:17:08 +0100
+message:
+  * bugfix: The GralWidgetMng.pos.panel cannot be used to register a new created panel as widget, because that pos.panel is the new created one yet. Use the GralWidget.pos.panel instead; it is the correct copied pos before creation of the new panel. Now the resize in JavaCommander works.
+------------------------------------------------------------
+revno: 139
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2011-11-08 11:13:45 +0100
+message:
+  * cfg/GralCfgWriter: new drop, drag regarded
+  * GralPanelContent is a GralWidget and it is regarded on resizezing actions. Test on JavaCommander, not ready yet.
+------------------------------------------------------------
+revno: 138
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-11-06 09:47:40 +0100
+message:
+  * Some changes in the file commander, adapt Gral features. file commander: Now all tabs are shown for select and files. But not filled correctly.
+------------------------------------------------------------
+revno: 137
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2011-11-04 09:50:48 +0100
+message:
+  * bugfixes: Some changes for GralUserAction.userActionGui(int key...)
+------------------------------------------------------------
+revno: 136
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-11-03 20:37:48 +0100
+message:
+  * imporve: more drag'n drop
+  * bugfix: GuiCfg.java: userInit() called with known GralWidgetMng
+  * GralButton.setState: now processes GralColor as parameter, sets the colorOn or colorOff (depending on current state).
+------------------------------------------------------------
+revno: 135
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-11-02 22:58:21 +0100
+message:
+  * GralGraphicThread: if any problem in dispatch event, the exception will be catched now, so the graphic thread is not aborted. The exception will be shown by System.out in the console.
+  * GralCfgElement accepts new_InputTextline from ZBNF result now. Some other widget types are not implemented yet because there are not need by the current applications. TODO it. They must be processed in the GralCfgBuilder.
+  * GralCfgData now have the final whatIs. Therefore derived classes are not need if no special data of widgets are necessary.
+  * new Drag and Drop, test with drop a file from FileSystem works!!!
+------------------------------------------------------------
+revno: 134
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-11-02 10:00:20 +0100
+message:
+  * SwtWidgetMenu.java
+------------------------------------------------------------
+revno: 133
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-11-02 10:00:03 +0100
+message:
+  * Menus now have a GralWidget as data too, GralUserAction called with the widget to detect what menu is pressed.
+  * org/vishia/util/KeyCode.menuEntered, use proper version of srcJava_ZBNF
+  * some bugfixes to editFieldProperties
+------------------------------------------------------------
+revno: 132
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2011-11-01 11:35:00 +0100
+message:
+  * GralWidget: The aggregation pos is now final, set anyway with mng.getPositionInPanel();
+  * bugfix on Linux: A sub window has a [X] in the title bar, it has closed the whole appliation.
+  Correction in SwtGraphicThread.WindowsCloseListener, bReady=...
+  * Some corrections in GuiBzr because changed startup sequence of GraphicThread.
+  * TableSwt now calls 'action.userActionGui(keyCode, ' instead userActionGui("table-key", widgetDescr, lineGral, keyCode.
+  Only the newer method of UserActionGui should be used up to now.
+
+------------------------------------------------------------
+revno: 131
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2011-11-01 17:03:44 +0100
+message:
+  * GralCanvas_ifc: it seems to be nice to have to draw independent of the implementation graphic.
+------------------------------------------------------------
+revno: 130
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2011-11-01 09:03:56 +0100
+message:
+  * AWT implementation improved, now acts with the button and appends in the TextBox
+------------------------------------------------------------
+revno: 129
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-10-31 22:37:10 +0100
+message:
+  * Now a AWT implementation exists, yet only with ExampleSimpleButton.
+------------------------------------------------------------
+revno: 128
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-10-31 13:31:14 +0100
+message:
+  * swt/MainCmdSwt is now removed. The renamed GralArea9Window replaces it independent of the implementation graphic layer.
+------------------------------------------------------------
+revno: 127
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-10-31 08:11:13 +0100
+message:
+  * GralWindowMng.java and its derivtion GralDeviceSwt is deleted now. The GralGraphicThread is the instance, which acts therefore. It is referenced centralized with the GralWidgetMng.gralDevice.
+  * The PrimaryWindowSwt is derived now from the SUbWindowSwt, it is more simple. Before that change the PrimaryWindowSwt was derived from the GralDevice'Swt and exists parallel to the SubWindow-implementation.
+------------------------------------------------------------
+revno: 126
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-10-30 22:05:26 +0100
+message:
+  * GuiMainAreaBase: Most of content of  MainCmdSwt is moved to this. A special SWT implementation doesn't be necessary.
+------------------------------------------------------------
+revno: 125
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-10-30 11:17:40 +0100
+message:
+  * GralWidget_ifc: new Method setBoundsPixel() only for resizing a Area9-Window. But it may be usefull elsewhere too. Note: Handle with GralGridPos usual, not with pixel. Handle with pixel only for calculation of pixels in the gral adaption itself !
+  * area9/GuiMainAreaBase: some common functinality moved from MainCmdSwt.
+------------------------------------------------------------
+revno: 124
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-10-30 00:00:15 +0200
+message:
+  * The Package gral/gridPanel is dissolved yet. The old GralGridMngBase and its implementation GuiPanelMngSwt is named now GralWidgetMng and SwtWidgetMng because it manages the widgets. It is a core concept of gral now, not only a possible solution.
+------------------------------------------------------------
+revno: 123
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-10-29 22:23:40 +0200
+message:
+  * Now the build of the primary window is simplified. A new class GralGraphicThread and its implementation SwtGraphicThread is created.
+------------------------------------------------------------
+revno: 122
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2011-10-28 12:00:11 +0200
+message:
+  * Tuning for InfoBox, help and about menu.
+------------------------------------------------------------
+revno: 121
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-10-27 21:51:53 +0200
+message:
+  * Now old ButtonSwt and its MouseClickActionForUserActionSwt.java deleted.
+  * improve infobox
+------------------------------------------------------------
+revno: 120
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-10-27 19:34:26 +0200
+message:
+  * SwtButton
+------------------------------------------------------------
+revno: 119
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-10-24 10:44:49 +0200
+message:
+  * GralButton, GralMouseWidgetAction_ifc: new concept, in test
+  * User proper srcJava_Zbnf!
+------------------------------------------------------------
+revno: 118
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-10-22 12:41:58 +0200
+message:
+  * chg: The MouseClickInfo and MouseClickActionForUserActionSwt should not have an extra association to GralGridMngBase, because the GralWidget has it. The GralWidget is known via a mouseevent, the basic graphic widget and its getData().
+  * Progress: GralButton
+------------------------------------------------------------
+revno: 117
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-10-20 17:46:12 +0200
+message:
+  * InspcGui: Don't derive this class from GuiCfg, instead uses the inner class  InspcGuiCfg.  It is a problem of order of instantiation.
+  * GuiCfg: chg ctor
+------------------------------------------------------------
+revno: 116
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-10-20 11:11:05 +0200
+message:
+  * new GralButton, SwtButton: The old ButtonSwt was not oriented to the GralWidget inheritance. Reviewed, not yet full ready.
+  * new GralWindowMng_ifc: part of the old GralPrimaryWindow_ifc, only the device parts (managing graphic thread).
+  * Order of initiatiations reviewed, works now, but not ready documented and checked in detail.
+------------------------------------------------------------
+revno: 115
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-10-16 11:05:46 +0200
+message:
+  * GralCfgDesigner: Now the right mouse button is not more used for editFieldProperties. Correction of Subwindow for editFieldProperties.
+------------------------------------------------------------
+revno: 114
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-10-16 09:06:52 +0200
+message:
+  * removeWidget improved. It should be removed in its panel too.
+------------------------------------------------------------
+revno: 113
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-10-15 21:12:07 +0200
+message:
+  * Restructured: Now a Widget in the Gral level is represented only with one instance. This instance based on GralWidget and may base on a gral widget-specific implementation like GralTable. It implements some interfaces like GralWidget_ifc and GralTable_ifc. Before that change two instances are need, the GralWidget (in the past 'WidgetDescriptor') and the Wrapper. Not it is more simple for usage, because only one reference in the user space for a widget is need. This reference may refer the GralWidget, the Gral-Wrapper or any of its interfaces. See the ObjectModelDiagram in the description of GralWidget.
+------------------------------------------------------------
+revno: 112
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-10-15 09:32:11 +0200
+message:
+  * Some renamings
+------------------------------------------------------------
+revno: 111
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2011-10-14 22:26:12 +0200
+message:
+  Docu GralWidget
+------------------------------------------------------------
+revno: 110
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-10-13 14:42:21 +0200
+message:
+  * InspcGuiComm: calculation of values in format-String
+------------------------------------------------------------
+revno: 109
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-10-13 09:23:23 +0200
+message:
+  * Renaming and dissolve inner classes in package gral.cfg
+------------------------------------------------------------
+revno: 108
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-10-12 15:07:17 +0200
+message:
+  ! Needs new version of component javaSrc_Zbnf!
+  * GuiCfg, InspcGui: Switches MainCmd-output to OutputBox
+------------------------------------------------------------
+revno: 107
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-10-09 11:19:58 +0200
+message:
+  * JavaCmd: Output window used for cmd invocation output.
+  * GuiMainAreaBase: The Areas for setOutputFrameArea can be written with both "3A3C" and "A3C3". That designation should be used for all Area coordinates.
+  * TextBoxGuifc: It extends java.lang.Appendable. It is organized that append() can be invoked in any thread (TextBoxSwt).
+  Therefore a TextBox can be used as simple output anyway.
+  * A GralPanelContent knows the MainWindow now, to support deal with the graphic thread.
+  * TODO: The interface GralPrimaryWindow_ifc may be split into an interface to deal with the graphic thread (methods addDispatchListener() etc)
+  and a real primary window build interface (methods addMenuItemGThread() etc)
+------------------------------------------------------------
+revno: 106
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-10-08 15:12:36 +0200
+message:
+  * GralGridPos improved
+  * Table-actions described and adapted.
+------------------------------------------------------------
+revno: 105
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-10-05 20:41:58 +0200
+message:
+  files added
+------------------------------------------------------------
+revno: 104
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-10-05 20:23:25 +0200
+message:
+  comment
+------------------------------------------------------------
+revno: 103
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-10-03 18:48:22 +0200
+message:
+  * JavaCommander: Enter on a executable file: execute it.
+  * gral/widget/FileSelector.java: New: setActionOnEnterFile(GralUserAction). It executes this action if Enter is pressed (or mouse-left- or doubleclick-TODO).
+  * gral/widget/SelectList.java: Uses keycodes from vishia.util.KeyCode now,
+  * gral/widget/SelectList.actionOk: return boolean now, false if no action is done.
+  * TableSwt: chg: The key handling is improved. The old idea - a String for any key - is now obsolete.
+     *   The keycodes are contained in {@link KeyCode}, that are used. The conversion routine for SWT-keys is {@link GralKeySwt}.
+  * Uses changed component srcJava_ZBNF for handling commands.
+------------------------------------------------------------
+revno: 102
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-10-02 10:48:27 +0200
+message:
+  * The class GralKey and org/vishia/util/KeyCode are the same approachs. Delete GralKey.java and adapted.
+------------------------------------------------------------
+revno: 101
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-10-02 10:33:42 +0200
+message:
+  * widget&FileSelector: new: setOriginDir(File) and {@link #fillInOriginDir()}.
+  The origin dir is the directory of first selection or can be set by user. If the user navigates misty, the origin dir helps to find again the start point.
+  * Improved JavaCmd, now ctrl-< selects the origin dir of any tab.
+  * ADDED MISSING FILES of privious versions for mainGuiSwt/GralKaySwt and commander
+------------------------------------------------------------
+revno: 100
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-10-01 21:36:25 +0200
+message:
+  * JavaCmd: improved: Now the selection alt-F1 etc of a favorite works without previously creation of tabs.
+  * GralTabbedPanel: abstract method {@link #selectTab(String)
+  * GralGridMngBase: move registerPanel(GralPanelContent)} from the SWT implementation to this.
+  new: method {@link #getPanel(String)} to get a registered panel by name.
+  * GralColor.java some improvements: color lbk light black darker than dark gray. Change values for gray.
+  * GralGridPos: bugfixes
+  * GralWidget: new method {@link #setFocus()}. It wrappes the {@link GralPanelMngWorking_ifc#setFocus(GralWidget)}.
+  * TableGui_ifc: new  {@link #clearTable()}
+------------------------------------------------------------
+revno: 99
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2011-09-30 22:23:16 +0200
+message:
+  * GuiCfg: menu 'Design/...' to edit fields and work with the {@link GuiCfgDesigner}.
+  * GuiCfgDesigner: rename pressedRightMouseDownForDesign(...) to editFieldProperties(...) because it is not called as mouse action.
+  * GralKey, TableSwt: Now the KeyListener from TableSwt calles the central KeyListener registered in the GralGridMngBase.
+  * JavaCmd: The keys alt-F1...F3, F4 now works as keys, not only as button.
+------------------------------------------------------------
+revno: 98
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-09-29 09:15:38 +0200
+message:
+  * GralGridMngBase.calcWidgetPosAndSize alculates dy and dx one pixel less. In result in a fine space between fields is shown.
+  * GuiPanelMngSwt: TextField with prompt is improved.
+------------------------------------------------------------
+revno: 97
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-09-26 08:30:16 +0200
+message:
+  * The GuiShellMngSwt.java is deleted now.
+  * mainGuiSwt/InfoBoxSwt now deprecated. New class gral/widget/InfoBox independent of basic graphic. TODO not ready yet.
+  * WidgetsSwt.java now renamed to TextBoxSwt.java, don't use a wrapping file for some classes. The TextBoxSwt was the only one used static inner class there.
+------------------------------------------------------------
+revno: 96
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-09-25 21:36:46 +0200
+message:
+  * GuiSwt deleted, was never used
+------------------------------------------------------------
+revno: 95
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-09-25 11:33:03 +0200
+message:
+  * gral/ifc/GralUserAction.java changed, returns boolean, some sources adapted
+  * GuiBzr now uses the new GralSubWindow instead the GuiShellMngSwt
+  * createCompositeBox now creates and return a GralPanelContent instead a new instance of GuiPanelMngSwt.
+  * Improving the concept of one instance of GralPanelMng per application and some instances of GralPanelContent
+  or GralSubWindow
+  * JavaCommander improved.
+  * class GralKey created, but not ready and used yet.
+  Concept of key handling planned: calling  GralUserAction.userAction("key", null, Integer(keycode))
+  with a registered GralUserAction for application-wide keys.
+------------------------------------------------------------
+revno: 94
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2011-09-23 15:44:24 +0200
+message:
+  * GralGridPos: Redesign, new size+refer. The methods to calculate a new position are now part of GralGridPos, no longer part of GralGridMngBase
+  * GralSubWindow has a member GralGridPos: Position of the window. The position is referred to any Panel in another Window. It can be tuned and it is used if the Window is set visible.
+  * GuiCfgDesigner uses the new createWindow method now.
+------------------------------------------------------------
+revno: 93
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-09-18 19:31:18 +0200
+message:
+  * WindowManagement: Now a PrimaryWindow and a SubWindow are defined.
+  * Some renaming
+------------------------------------------------------------
+revno: 92
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-09-11 02:54:17 +0200
+message:
+  * A new class PrimaryWindowSwt contains only things for a primary Window, in Swt with a new Display and a new Shell. The code is dissolved from MainCmdSwt, which references that new class yet. Therefore a GralDeviceSwt is unnecessary now. The GralDevice is the primary window always. TODO rename GralDevice to GralPrimaryWindow
+------------------------------------------------------------
+revno: 91
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-09-10 11:32:21 +0200
+message:
+  * gral: Some renamings and movings.
+  ** The package gral/base is independent of the grid concept.
+  ** The GuiPanelMngBase is not a base of panels. Its content is moved to the GralDevice.
+  ** All classes should be prefixed with Gral, GralGrid etc. But the classes of gral/cfg configurates a GUI. Therefore it is a usage of the Gral concept only, not the Gral concpet itself, and therefore that classes don't start with Gral but with GuiCfg. It's unchanged.
+  ** Not all renaming actions are finished. The correct name and package assignments are presented in a UML-representation yet, it is in progress.
+------------------------------------------------------------
+revno: 90
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-09-08 22:16:01 +0200
+message:
+  * MainCmdSwt: a KeyListener doesn't react in the Shell. Only a KeyListener in a widget works. Test for TheCommander
+------------------------------------------------------------
+revno: 89
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-09-08 21:41:57 +0200
+message:
+  * rename GralTabbedPanel instead TabPanel.java
+  *  The switch between visible widgets in the current Panel of a Tabbed Panel is be stored in the class GralTabbedPanel. This class implements the new Interface GralVisibleWidgets_ifc. The GuiPanelMngBase contains a List of Panel Container with this Interface. So more as one Panel with visible Widgets is  possible.
+------------------------------------------------------------
+revno: 88
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-09-08 09:10:16 +0200
+message:
+  * GralColor: some enhancements, WidgetDescriptor.setLineColor etc.
+  * GuiPanelMngBase: the association tabPanel is removed, instead currTabPanel inserted. It is the last one created TabPanel. It is necessary because an script can create Tabs.
+  * Redesign class GralPanelContent is obsolete now, it had contained the list of visible widgets for displaying values. This list is contained now in the GuiPanelMngBase. TODO: The switch between visible widgets in the current Panel of a Tabbed Panel should be stored in the class TabPanel. This class should implement a new Interface GralVisibleWidgets, just as well a Window container. The GuiPanelMngBase should contain a List of this Interface. So more as one Panel with visible Widgets should be possible.
+  The InspcGui runs with this changes. It uses the visible widgets for communication with the target system.
+------------------------------------------------------------
+revno: 87
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-09-04 22:57:31 +0200
+message:
+  * GralColor instead ColorGui.java, All color names are now located at GralColor, not at PropertiesGui.java.
+------------------------------------------------------------
+revno: 86
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-09-04 21:58:20 +0200
+message:
+  * registerWidget() missed on addTextField, therefore it isn't resize. TODO use registerWidget for all widgets instead currPanel.widgetList.add(widgd)
+------------------------------------------------------------
+revno: 85
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-09-04 21:44:18 +0200
+message:
+  * bugfix posiions using the gral/gfg/GuiCfgBuilder
+  * TabPanelSwt: A tabbed panel should get its size from the TabFolder initial, because the widgets with parentsize-usage are not presented elsewhere.
+------------------------------------------------------------
+revno: 84
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-09-04 04:48:12 +0200
+message:
+  * JavaCommander alt-F2, alt-F3 handling, some documentation
+------------------------------------------------------------
+revno: 83
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-09-03 19:10:11 +0200
+message:
+  * ViewConfig now updated, starts, but doesn't show curve view yet...TODO
+  * JavaCommander a-F1
+------------------------------------------------------------
+revno: 82
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-09-03 07:30:29 +0200
+message:
+  * JavaCommander improved/bugfix: Now more as 3 FileSelector instances, use a Map
+------------------------------------------------------------
+revno: 81
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-09-03 05:29:37 +0200
+message:
+  * some files forgotten?
+------------------------------------------------------------
+revno: 80
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-09-03 05:28:22 +0200
+message:
+  * JavaCommander: select Tab functionality.
+  * Gral: setFocus: SWT doesn't set the requested TabItem of a TabFolder, if any of the widgets in the Tab are focused.
+  So the setFocus() call of any widget in a non-active TabItem has not an effect.
+  The setFocus-functinality in the Gral-adaption is enhanced therefore. A gral/gridPanel/PanelContent stores itsTabItem.
+  So the TabItem can be selected using GuiPanelMngSwt.setFocusOfTab().
+------------------------------------------------------------
+revno: 79
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2011-09-02 04:42:42 +0200
+message:
+  * Continue improve positioning
+------------------------------------------------------------
+revno: 78
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-09-01 06:20:41 +0200
+message:
+  * JavaCommander in package org/vishia/commander
+  * makefiles adapted
+------------------------------------------------------------
+revno: 77
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-08-31 21:42:59 +0200
+message:
+  * 2 Files forgotten in last commit
+------------------------------------------------------------
+revno: 76
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-08-31 21:41:43 +0200
+message:
+  * gral: Revised positioning. Some other improvements, for the present.
+  * JavaCommander: now edit-key works and calls the kwrite under linux if it is given in the cfg-file.But the F4-key is not associated yet.
+------------------------------------------------------------
+revno: 75
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-08-28 17:05:14 +0200
+message:
+  * improved: FileSelector is not derived from SelectList now, it contains an implementation class instead.
+------------------------------------------------------------
+revno: 74
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-08-27 21:41:32 +0200
+message:
+  * BzrGui: Improved with new class org.vishia.cmd.CmdExecuter. Now it is faster because unnecessary threads.
+------------------------------------------------------------
+revno: 73
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-08-27 21:40:32 +0200
+message:
+  * new: org/vishia/gral/widget/SelectList.java.actionUserKey(..) is used while selected any line of the list.
+  It is used for the FileSelector of the JavaCommander, but not ready yet.
+------------------------------------------------------------
+revno: 72
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-08-27 21:39:06 +0200
+message:
+  * new: org/vishia/gral/widget/SelectList.java.actionUserKey(..) is used while selected any line of the list.
+  It is used for the FileSelector of the JavaCommander, but not ready yet.
+------------------------------------------------------------
+revno: 71
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-08-25 06:22:46 +0200
+message:
+  * JavaCommander improved
+  * GUI: WidgetInFocus
+------------------------------------------------------------
+revno: 70
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-08-15 08:58:13 +0200
+message:
+  * JavaCommander FileSelector: Now sh-left and sh-right stores the position in file list.
+  * GuiPanelMngSwt: bugfix, Images were not drawn after last inherition change.
+------------------------------------------------------------
+revno: 69
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-08-14 22:31:21 +0200
+message:
+  * JavaCommander now works in simple requirements
+------------------------------------------------------------
+revno: 68
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-08-14 10:32:29 +0200
+message:
+  * WidgetDescriptor.widget is now type of {@link Widgetifc} and not Object. Generally it is the reference to the implementing code of the widget. The implementing code may based on a graphic base widget (SWT: Control) and implements the {@link Widgetifc}, or it references the graphic base widget instance.
+  * The new class {@link WidgetSimpleWrapperSwt} is able to wrap simple graphical base widget instances.
+------------------------------------------------------------
+revno: 67
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-08-14 10:15:18 +0200
+message:
+  * gral: resize works with a SwtTable in a TabPanel.
+------------------------------------------------------------
+revno: 66
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-08-14 07:34:42 +0200
+message:
+  * WidgetDescriptor now contains the position of the widget. It is used for resizing of large widgets.
+    A large widget is a widget, which lengthens over the panel and it is changed in size with panel size change. A typical example is a text-area-widget.
+  * GuiPanelMngBase and GuiPanelMngSwt: New routines for store and calculate the position to regard large widgets.
+  * class structure: GridPanelSwt and CanvasStorePanelSwt now associates the Canvas instance instead inherit from it. Instead this classes based on PanelContent. The class PanelContent was exisiting as a solitaire class to manage widgetes. Now it manages the widgets of its derived panel.
+------------------------------------------------------------
+revno: 65
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2011-08-09 23:26:25 +0200
+message:
+  * WidgetDescriptor: set Userdata parallel to visibleData. Sometimes userData should be stored in a widget, not only the visible data. Set it with the same call because some calls are invoked only one time (Table lines).
+  * Progress on Java commander
+------------------------------------------------------------
+revno: 64
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2011-08-09 09:55:11 +0200
+message:
+  * gral/base/GralDevice: A GUI representation has a device manager for the GUI managing which can have one ore more as one windows. That is the concept of SWT and maybe commonly concept. The device is extract now. Yet only with its threadId, in progression... TODO
+  * CommandSelector and CmdSelect improved
+------------------------------------------------------------
+revno: 63
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-08-08 16:02:01 +0200
+message:
+  * MainCmdSwt: bugfix start-delay, has notified faulty instance
+------------------------------------------------------------
+revno: 62
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-08-07 21:45:21 +0200
+message:
+  * SWT-usage: Now there is a Factory interface and class to instantiate SWT. The applications don't depend on SWT up to now.
+  * guiCmdMenu.CmdSelect: Starts but without content yet.
+  * guiBzr.BzrGui: Works now based on the common GuiCfg-class. How it is done already for guiInspc.InspcGui.
+  * guiViewCfg.ViewCfg isn't adapted yet and doesn't compile yet. TODO.
+------------------------------------------------------------
+revno: 61
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-08-06 09:06:48 +0200
+message:
+  * BzrGui: Revision numbers are strings. regard merge
+------------------------------------------------------------
+revno: 60
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-08-04 23:20:35 +0200
+message:
+  * Continue renmae and move classes in org.vishia.gral
+------------------------------------------------------------
+revno: 59
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-08-04 21:05:39 +0200
+message:
+  * Moving all files from org.vishia.gral to sub-packages
+------------------------------------------------------------
+revno: 58
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-08-04 11:49:26 +0200
+message:
+  * Test and Adaption of InspcGui to CmdMenu. It works. The older InspcGuiCfg is not neccesary furthermore. Its functionality is merged into the new CmdMenu and the reduced InspcGui.
+  * TODO: Better name for guiCmdMenu.CmdMenu.java. It is a base class for common gral applications. The gral consists of the Grid-Panel Manager, the 9-Frame-Window (see gral.GuiMainAreaifc.java) and the SWT-adaption. Separate it. Test a Swing-Adaption.
+------------------------------------------------------------
+revno: 57
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-07-31 23:35:33 +0200
+message:
+  * CmdMenu used for InspecGUI
+------------------------------------------------------------
+revno: 56
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-07-31 18:00:45 +0200
+message:
+  CommandSelector.java and FilePanel.java as new classes, empty yet
+------------------------------------------------------------
+revno: 55
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-07-10 15:55:43 +0200
+message:
+  * _bzrCommit.txt was added by mistake. Deleted.
+------------------------------------------------------------
+revno: 54
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-07-10 09:12:58 +0200
+message:
+  * make-script for linux
+------------------------------------------------------------
+revno: 53
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-07-07 11:08:20 +0200
+message:
+  * gral/GuiCfgDesigner: Now the xyPos, Height, Width values are taken from Dialog box for a Widget, del-Button.
+------------------------------------------------------------
+revno: 52
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-07-07 08:18:38 +0200
+message:
+  * guiCmdMenu prepared for common usage. TODO: This class should be the base class of all similar GUIs, especially the guiInspc, which is in focus of development yet. Adequate algorithm need only one source!
+------------------------------------------------------------
+revno: 51
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-06-30 21:02:33 +0200
+message:
+  * InspcGuiComm.java: sendAndPrepareCmdSetValueByPath(...)}: It is the first method which organizes that info blocks can be created one after anotherwithout regarding the telegram length. It simplifies the usage.
+  * InspcGuiComm.java: WidgetCommAction#execInspcRxOrder(Info) for formatted output
+------------------------------------------------------------
+revno: 50
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-06-29 12:20:17 +0200
+message:
+  * bufgix crash while updating widgets with GuiCfgBuilder: Using a ConcurrentLinkedQueue instead LinkedList. The crash is caused by concurrentListModification because the GUI iterates through the list while it is updating.
+  * completing of saveCfg.
+------------------------------------------------------------
+revno: 49
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2011-06-28 17:51:50 +0200
+message:
+  * GuiCfgWriter improved
+------------------------------------------------------------
+revno: 48
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-06-27 10:52:33 +0200
+message:
+  * FileDialog improved
+------------------------------------------------------------
+revno: 47
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2011-06-21 16:40:56 +0200
+message:
+  * rename: all dependencies to renamed package gral corrected (using rename in Eclipse)
+------------------------------------------------------------
+revno: 46
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2011-06-21 15:39:56 +0200
+message:
+  Rename mainGui to gral (Graphic adaption layer)
+------------------------------------------------------------
+revno: 45
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2011-06-21 15:35:33 +0200
+message:
+  InspcGui: improved recognize device (target) in alias-prefix, translate to IP-address
+------------------------------------------------------------
+revno: 44
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-06-20 10:31:20 +0200
+message:
+  * dialog.zbnf appropriate to the last 2 commits.
+------------------------------------------------------------
+revno: 43
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-06-20 10:27:31 +0200
+message:
+  * GuiCfgData.java, GuiCfgBuilder.java: The File dialog is established as configurable widget now. Button configurable now too.
+  * guiInspc: new interface UserInspcPlug_ifc for requests from the plugin to the InspcGui.
+  * InspcGuiComm.java: improved, handling of info blocks in telgrams espescially from a UserInspcPlug_ifc
+  * InspcPlugUser_ifc.java some changes for improving. Note: The user plugin is used and tested outside of this component.
+------------------------------------------------------------
+revno: 42
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-06-19 10:51:54 +0200
+message:
+  * GuiPanelMngBuildIfc.java: chg: createFileDialog() improved,  new addFileSelectField():
+  A Field that comprises the possibility to open a file select dialog. That interface method is implemented
+  for SWT graphic, but without drop and paste capability yet, only create file dialog. It is tested in the BzrGui.
+------------------------------------------------------------
+revno: 41
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-06-18 16:02:28 +0200
+message:
+  * BzrGui: Now View Diff works. It outputs the differneces of any file in the output panel.
+    There you can visit the diffs in the kind of the bzr diff FILE output. You can assemble a description of changes
+    to write in the source file yet and for the commit text. The handling is checked with the last and this commit.
+------------------------------------------------------------
+revno: 40
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-06-18 15:55:07 +0200
+message:
+  * GuiCfgDesigner.java: improved, used in InspcGui
+  * GuiPanelMngSwt.java: getValueFromWidget(): Table returns the whole selected line, separatet with tabs
+  * InspcGuiComm: execInspcRxOrder() int32AngleDegree etc. to present a angle in degrees
+------------------------------------------------------------
+revno: 39
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-05-29 21:05:43 +0200
+message:
+  * GuiCfg:possibility to write @line+*,col+*: for positions: The star means, the native size of the element. It is used for addImage, use the image size without any zoom.
+------------------------------------------------------------
+revno: 38
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-05-28 23:12:26 +0200
+message:
+  * guiInspc improved
+------------------------------------------------------------
+revno: 37
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-05-26 21:24:11 +0200
+message:
+  * GuiInspc: improved: now more as one telegram per procComm()
+------------------------------------------------------------
+revno: 36
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-05-26 15:12:25 +0200
+message:
+  * GuiPanelMng: Improved, Led with MouseClickInfo
+------------------------------------------------------------
+revno: 35
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-05-26 12:44:57 +0200
+message:
+  * GuiInspc: plugins now possible: Java-class with application specific routines instantiated by Class.forName(String)
+  * WidgetDescriptor: 2 separated UserActionGui for Show and Change
+  * GuiCfgBuilder: Led
+------------------------------------------------------------
+revno: 34
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-05-25 20:37:21 +0200
+message:
+  * GuiInspc: Now sends only 1 telegram and awaits in the same thread.
+------------------------------------------------------------
+revno: 33
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-05-25 15:43:52 +0200
+message:
+  *GuiCfgWriter: now a writer for changed configuration is presented, tested, but not finished.
+  * GuiCfgDesigner improved
+------------------------------------------------------------
+revno: 32
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2011-05-24 08:08:42 +0200
+message:
+  * GUI: New GuiDesigner
+------------------------------------------------------------
+revno: 31
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2011-05-24 08:07:36 +0200
+message:
+  * GUI: New GuiDesigner
+------------------------------------------------------------
+revno: 30
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-05-23 09:06:08 +0200
+message:
+  * GUI: Images now written as background in Canvas
+  * InspcGui: improved
+------------------------------------------------------------
+revno: 29
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-05-22 23:26:48 +0200
+message:
+  * GUI addImage works now in the CanvasStorePanel
+  * Some improvements while programming Inspector-GUI
+------------------------------------------------------------
+revno: 28
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-05-22 11:38:36 +0200
+message:
+  * New Package org.vishia.mainGui.cfg: The configuration of the GUI may be read by ZBNF parsing,
+    the data are hold, a design mode to change position and content of fields is possible now.
+    The class org.vishia.MainGui.GuiDialogZbnfControlled is deprecated up to now then.
+    The new concept works, but have some mistakes yet.
+------------------------------------------------------------
+revno: 27
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-05-21 09:09:03 +0200
+message:
+  * add to last commit, don't use last
+------------------------------------------------------------
+revno: 26
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-05-21 09:07:13 +0200
+message:
+  * GuiDialogZbnfControlled: The config file can contain entries "DataReplace: key = string" to replace the start part of a datapath.
+    It helps to handle with complex long data pathes where only the last part is user-significant.
+  * guiInspc: Bugfixes, now shows correct. See commit in srcJava_vishiaRun
+------------------------------------------------------------
+revno: 25
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2011-05-20 21:11:51 +0200
+message:
+  * guiInspc: Test: It shows a content, but the address in target is simulated yet. The collaboration of threads works.
+------------------------------------------------------------
+revno: 24
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2011-05-20 08:19:15 +0200
+message:
+  * guiInspc: New part of this component, the GUI for Inspector
+------------------------------------------------------------
+revno: 23
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-05-18 20:27:12 +0200
+message:
+  * bzrGui: works outside Eclipse-debug
+  ** ok: view file status, rename, commit several files..
+  ** TODO: viewdiff for files, log etc.
+------------------------------------------------------------
+revno: 22
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-05-15 23:10:04 +0200
+message:
+  * BzrGui: bugfix Table of files
+  * MainGui: Table bugfix
+------------------------------------------------------------
+revno: 21
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-05-15 22:47:47 +0200
+message:
+  * BzrGui: show directory line in File list
+------------------------------------------------------------
+revno: 20
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-05-15 17:26:39 +0200
+message:
+  * BzrGui: Read the cfg file, in test yet fix filename
+  * BzrGui: Use commands from the cfg file. There is the adaption to any cmd line invocation.
+------------------------------------------------------------
+revno: 19
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-05-15 08:16:02 +0200
+message:
+  * BzrGui: Files & Dif-panel, refresh works
+------------------------------------------------------------
+revno: 18
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-05-15 07:56:30 +0200
+message:
+  * BzrGui: Files are able to select for commit, add inclusive.
+------------------------------------------------------------
+revno: 17
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-05-15 07:34:47 +0200
+message:
+  * GUI: missing new files added
+------------------------------------------------------------
+revno: 16
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-05-14 22:12:32 +0200
+message:
+  * GUI: continue separation from SWT
+------------------------------------------------------------
+revno: 15
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-05-14 09:00:00 +0200
+message:
+  * GUI: removed dependencies to SWT in the pkg org.vishia.mainGui
+------------------------------------------------------------
+revno: 14
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sat 2011-05-14 07:39:31 +0200
+message:
+  * GUI: The WidgetDescriptor is now non-generic. Older Concept: Store the GUI implementation widget type as generic type there.
+    But now a widget is stored as Object and it is casted in the implementation. It is more simple
+    because the type is only used and the casting is only necessary in the implementation level.
+  * Adapt all other sources: Replace PanelContent<?> with PanelContent and WidgetDescriptor<?> with WidgetDescriptor
+------------------------------------------------------------
+revno: 13
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Fri 2011-05-13 21:50:36 +0200
+message:
+  * bzrGui: The Select and Info box in the select panel is build immediately and fast after selection the sw-project,
+  it is changed dynamically if the sw-component is selected.
+  * GUI: Its an example to build a GUI-component dynamically.
+
+------------------------------------------------------------
+revno: 12
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-05-11 23:19:22 +0200
+message:
+  *   mainGuiSwt/TableSwt.java and guiBzr/GuiFilesDiffPanel.java: Mark of lines now works with the user action method
+  and the planned interfaces for Tables
+------------------------------------------------------------
+revno: 11
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Wed 2011-05-11 21:57:53 +0200
+message:
+  * Table: Lines are able to mark (not only select some lines, mark permanently).
+  The now found solution for TableSwt is too special. Better solution: special widget interface for a Table.
+  This interface should be support independently usage of Tables from SWT or swing or other graphic.
+------------------------------------------------------------
+revno: 10
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Mon 2011-05-09 06:18:01 +0200
+message:
+  * BzrGui: Showing Timestamp of file.
+  * TODO selection of committing files and add is missing yet.
+  * add missing files manually. They are missing in the last commit too!
+------------------------------------------------------------
+revno: 9
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-05-08 09:45:44 +0200
+message:
+  * GuiPanelMngSwt: GuiPanelMngWorkingIfc.cmdClear used to clear a whole swt.Table
+  * BzrGui: Now the changed files of any component were present in the Files & Diff-Panel in a List.
+------------------------------------------------------------
+revno: 8
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-05-08 03:19:04 +0200
+message:
+  * bzrGui: This commit is done with the bzrGui, it is the first one.
+  * bzrGui: selection of Component in a Project
+------------------------------------------------------------
+revno: 7
+committer: Hartmut Schorrig <hartmut@linux-c8ks>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-05-05 03:27:28 +0200
+message:
+  * BazaarGui as new project inside this Component
+  * Some changes for GUI, in development
+
+------------------------------------------------------------
+revno: 6
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2011-04-14 10:23:09 +0200
+message:
+  batches are personalized, it shouldn't a part of repository.
+------------------------------------------------------------
+revno: 5
+committer: Hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-02-27 18:37:33 +0100
+message:
+  bazaar-batches
+------------------------------------------------------------
+revno: 4
+committer: Hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2011-02-27 18:07:43 +0100
+message:
+  add make,
+  Inspector added in ViewCfg
+------------------------------------------------------------
+revno: 3
+committer: Hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava.GUI
+timestamp: Mon 2011-02-21 19:44:54 +0100
+message:
+  comment
+------------------------------------------------------------
+revno: 2
+committer: e09srrh0 <hartmut.schorrig@siemens.com>
+branch nick: srcJava.GUI
+timestamp: Mon 2011-02-21 17:23:37 +0100
+message:
+  A widget which hasn't a name by ZBNF-control-file gets the name from its dataPath.
+------------------------------------------------------------
+revno: 1
+committer: e09srrh0 <hartmut.schorrig@siemens.com>
+branch nick: srcJava.GUI
+timestamp: Mon 2011-02-21 17:22:27 +0100
+message:
+  first
+------------------------------------------------------------
+Use --include-merges or -n0 to see merged revisions.
+JavaCmd: cmd execution successfull

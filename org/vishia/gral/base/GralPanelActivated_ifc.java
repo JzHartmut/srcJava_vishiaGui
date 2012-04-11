@@ -9,7 +9,7 @@ import org.vishia.gral.ifc.GralWidget;
  * The activation of several panels is done initially, when the Panel becomes visible, or if a tab
  * is activated in a tab-view.
  * 
- * @author e09srrh0
+ * @author Hartmut Schorrig
  *
  */
 public interface GralPanelActivated_ifc

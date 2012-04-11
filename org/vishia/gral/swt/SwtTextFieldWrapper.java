@@ -6,6 +6,8 @@ import org.eclipse.swt.events.DragDetectEvent;
 import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Font;
@@ -29,6 +31,7 @@ public class SwtTextFieldWrapper extends GralTextField
 {
   /**Version, history and license.
    * <ul>
+   * <li>2012-04-10 Hartmut chg: A key listener, only for experience
    * <li>2012-03-17 Hartmut bugfix: adjustment of prompt for top prompt
    * <li>2012-03-10 Hartmut chg: Minor for top-level prompt.
    * <li>2011-06-00 Hartmut creation
@@ -164,7 +167,8 @@ public class SwtTextFieldWrapper extends GralTextField
       stop();
     textFieldSwt.setBackground(mng.propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));
     textFieldSwt.addFocusListener(mng.focusListener);
-
+    textFieldSwt.addKeyListener(keyListener);
+    
     Listener[] oldMouseListener = textFieldSwt.getListeners(SWT.MouseDown);
     for(Listener lst: oldMouseListener){
       textFieldSwt.removeListener(SWT.MouseDown, lst);
@@ -402,7 +406,22 @@ public class SwtTextFieldWrapper extends GralTextField
     
   };
   
-  
+ 
+  KeyListener keyListener = new KeyListener(){
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+      // TODO Auto-generated method stub
+      stop();
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+      // TODO Auto-generated method stub
+      
+    }
+    
+  };
   
   
   void stop(){}

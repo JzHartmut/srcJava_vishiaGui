@@ -32,7 +32,7 @@ import org.vishia.util.Removeable;
 /**This class is a large widget which contains a list to select files in a directory, 
  * supports navigation in the directory tree and shows the current path in an extra text field.
  * Additional 'search in files' is supported.
- * <br>
+ * <br><br>
  * The type of a file is {@link FileRemote} which is an derivation of java.io.File. It means that
  * the files may be existing on any remote device too. The local file system is a special case,
  * whereby it's the usual case mostly.
@@ -46,6 +46,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2012-04-10 chg: Now ctrl-PgUp to select parent dir, like in Norton Commander,
+   *   ctrl-PgDn to entry in dir (parallel to Enter).
    * <li>2012-03-09 new {@link #kColFilename} etc. 
    * <li>2012-02-14 corr: Anytime a file was selected as current, it was added in the {@link #indexSelection}.
    *   Not only if the directory was changed. It is necessary for refresh to select the current file again.
@@ -86,7 +88,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120309;
+  public static final int version = 20120410;
   
   FileRemoteAccessor localFileAccessor = FileRemoteAccessorLocalFile.getInstance();
   
@@ -190,6 +192,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     FileSelectList(GralFileSelector outer){
       //super(name, mng);
       this.outer = outer;
+      super.setLeftRightKeys(KeyCode.ctrl + KeyCode.pgup, KeyCode.pgdn);
     }
     
     @Override public boolean actionOk(Object userData, GralTableLine_ifc line)

@@ -49,9 +49,15 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   private final CallingArguments cargs;
   
   GralPanelActivated_ifc panelActivated = new GralPanelActivated_ifc(){
+
+    public void panelActivatedGui(Queue widgets)
+    { panelActivated(widgets); 
+    }
+    /*
     @Override public void panelActivatedGui(Queue<GralWidget> widgets)
     { panelActivated(widgets); 
     }
+    */
   };
 
   final GuiCfg guiCfg;
@@ -69,7 +75,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
   InspcGui(CallingArguments cargs, GralArea9MainCmd cmdgui)
   {
-    guiCfg = new InspcGuiCfg(cargs, cmdgui, userInspcPlug);
+    guiCfg = new InspcGuiCfg(cargs, cmdgui, null);  //userInspcPlug);
     
 
     LogMessage log = cmdgui.getLogMessageOutputConsole();
@@ -81,7 +87,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     }
     */
     GralPlugUser_ifc user = guiCfg.getPluggedUser(); 
-    assert(user instanceof InspcPlugUser_ifc);
+    assert(user == null || user instanceof InspcPlugUser_ifc);
     
     InspcMng variableMng = new InspcMng(cargs.sOwnIpcAddr, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
     composites.add(variableMng);
