@@ -218,6 +218,12 @@ public class SwtTextFieldWrapper extends GralTextField
   }
 
 
+  @Override public void setEditable(boolean editable){
+    textFieldSwt.setEditable(editable);
+  }
+
+
+  
   protected void setDropEnable(int dropType)
   {
     new SwtDropListener(dropType, textFieldSwt); //associated with textFieldSwt.
@@ -315,6 +321,12 @@ public class SwtTextFieldWrapper extends GralTextField
   { return SwtWidgetHelper.setFocusOfTabSwt(textFieldSwt);
   }
 
+  
+  @Override public int setCursorPos(int pos){
+    int oldPos = textFieldSwt.getCaretPosition();
+    textFieldSwt.setSelection(pos);
+    return oldPos;
+  }
 
   @Override public void removeWidgetImplementation()
   {

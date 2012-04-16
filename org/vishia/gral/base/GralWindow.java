@@ -1,9 +1,7 @@
 package org.vishia.gral.base;
 
-import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralPos;
-import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
@@ -19,6 +17,7 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
 
   /**Version, history and license.
    * <ul>
+   * <li>2012-04-16 Hartmut new: {@link #actionResizeOnePanel}
    * <li>2012-03-13 Hartmut chg: Some abstract method declarations moved to its interface.
    * <li>2011-12-31 Hartmut chg: Implements the set-methods of {@link GralWindow_ifc} in form of calling
    *   {@link GralMng_ifc#setInfo(GralWidget, int, int, Object, Object)}. This methods
@@ -67,7 +66,7 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
    * 
    */
   @SuppressWarnings("hiding")
-  public static final int version = 20120310;
+  public static final int version = 20120416;
   
   /**Or of some wind... constants.
    */
@@ -83,10 +82,35 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
   
   protected boolean visibleFirst;
   
+  
+  /**Standard action for resizing, used if the window contains one panel.
+   * It calls {@link GralMng_ifc#resizeWidget(GralWidget, int, int)} 
+   * for all widgets in the {@link GralPanelContent#widgetsToResize}
+   */
+  protected GralUserAction actionResizeOnePanel = new GralUserAction()
+  { @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
+    { for(GralWidget widgd: widgetsToResize){
+        widgd.getMng().resizeWidget(widgd, 0, 0);
+      }
+      return true;
+    }
+  };
+
+
+
+  
+  /**Constructs a window. 
+   * 
+   * @param nameWindow
+   * @param windProps
+   * @param mng
+   * @param panelComposite The implementing instance for a panel.
+   */
   public GralWindow(String nameWindow, int windProps, GralWidgetMng mng, Object panelComposite)
   {
     super( nameWindow, mng, panelComposite);
     this.windProps = windProps;
+
   }
 
   
@@ -116,8 +140,6 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
     itsMng.setInfoDelayed(this, GralMng_ifc.cmdRedraw, 0, null, null, delay);
   }
   
-  
-
 
   
 }

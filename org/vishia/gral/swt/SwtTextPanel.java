@@ -39,6 +39,12 @@ public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, A
 
   
   
+  @Override public void setEditable(boolean editable){
+    textAreaOutput.setEditable(editable);
+  }
+
+
+  
   @Override
   public GralColor setBackgroundColor(GralColor color)
   { return textAreaOutput.setBackgroundColor(color);
@@ -49,6 +55,15 @@ public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, A
   { return textAreaOutput.setFocus();
   }
 
+  @Override public int setCursorPos(int pos){
+    return textAreaOutput.setCursorPos(pos);
+  }
+
+
+  
+
+  
+  
   @Override
   public GralColor setForegroundColor(GralColor color)
   { return textAreaOutput.setForegroundColor(color);
@@ -66,7 +81,9 @@ public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, A
   //@Override public void setSelection(String how){ textAreaOutput.setSelection(how); }
   
 
+  @Override public boolean isChanged(){ return textAreaOutput.isChanged(); }
   
+
   
   @Override public String getText(){ return textAreaOutput.getText(); }
 

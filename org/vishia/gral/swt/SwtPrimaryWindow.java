@@ -64,7 +64,7 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   
 
   
-  private SwtPrimaryWindow(GralWidgetMng gralMng, SwtGraphicThread graphicThread, Display displaySwt)
+  SwtPrimaryWindow(GralWidgetMng gralMng, SwtGraphicThread graphicThread, Display displaySwt)
   { super("primaryWindow", GralWindow.windHasMenu, graphicThread.windowSwt, gralMng);
     //super(gralMng, graphicThread);
     this.graphicThreadSwt = graphicThread;  //refers SWT type
@@ -72,7 +72,7 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   
   
   public static SwtPrimaryWindow create(LogMessage log, String sTitle, int left, int top, int xSize, int ySize)
-  { SwtGraphicThread graphicThread = new SwtGraphicThread(sTitle, left, top, xSize, ySize);
+  { SwtGraphicThread graphicThread = new SwtGraphicThread(sTitle, left, top, xSize, ySize, log);
     //GuiThread graphicThread = startGraphicThread(init);  
 
     synchronized(graphicThread){
@@ -80,18 +80,9 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
         try{ graphicThread.wait(1000);} catch(InterruptedException exc){}
       }
     }
-    //The propertiesGuiSwt needs the Display instance for Font and Color. Therefore the graphic thread with creation of Display should be executed before. 
-    SwtProperties propertiesGui = new SwtProperties(graphicThread.displaySwt, 'C');
-    GralWidgetMng gralMng = new SwtMng(graphicThread, propertiesGui, null, log);
-    
-    //The PrimaryWindowSwt is a derivation of the GralPrimaryWindow. It is more as only a SWT Shell.
-    SwtPrimaryWindow instance = new SwtPrimaryWindow(gralMng, graphicThread, graphicThread.displaySwt);
-    instance.panelComposite = graphicThread.windowSwt; //window.sTitle, window.xPos, window.yPos, window.xSize, window.ySize);
-    //gralMng.setGralDevice(graphicThread);
-    gralMng.registerPanel(instance);
-    
-    //init.setWindow(instance);  //now the initializing of the window occurs.
-    return instance;
+    graphicThread.gralMng.registerPanel(graphicThread.instance);
+    //gralMng = graphicThread.gralMng;
+    return graphicThread.instance;
   }
   
   
@@ -227,7 +218,7 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   }
   
   
-  ControlListener resizeListener = new ControlListener()
+  ControlListener XXXresizeListener = new ControlListener()
   { @Override public void controlMoved(ControlEvent e) 
     { //do nothing if moved.
     }

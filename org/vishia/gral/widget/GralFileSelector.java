@@ -46,6 +46,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2012-04-16 chg: Capability to sort enhanced.
    * <li>2012-04-10 chg: Now ctrl-PgUp to select parent dir, like in Norton Commander,
    *   ctrl-PgDn to entry in dir (parallel to Enter).
    * <li>2012-03-09 new {@link #kColFilename} etc. 
@@ -88,7 +89,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120410;
+  public static final int version = 20120416;
   
   FileRemoteAccessor localFileAccessor = FileRemoteAccessorLocalFile.getInstance();
   
@@ -321,7 +322,15 @@ public class GralFileSelector implements Removeable //extends GralWidget
    */
   public static final int kColDate = 3;
   
+  public static final char kSortName = 'n';
   
+  public static final char kSortExtension = 'x';
+  
+  public static final char kSortDate = 'd';
+  
+  public static final char kSortSize = 'z';
+  
+  private char sortOrder = 'x';
   
   /**The implementation of SelectList. */
   protected FileSelectList selectList;
@@ -506,9 +515,22 @@ public class GralFileSelector implements Removeable //extends GralWidget
     if(files !=null){ 
       Map<String, File> sortFiles = new TreeMap<String, File>();
       for(File file: files){
-        String sName = file.getName();
-        if(file.isDirectory()){ sName += "/"; }
-        String sort = (file.isDirectory()? "D" : "F") + sName;
+        String sort;
+        switch(sortOrder){
+        case 'n': {
+          String sName = file.getName();
+          if(file.isDirectory()){ sName += "/"; }
+          sort = (file.isDirectory()? "D" : "F") + sName;
+        } break;
+        case 'x': {
+          String sName = file.getName();
+          int posDot = sName.lastIndexOf('.');
+          String sExt = sName.substring(posDot+1);
+          if(file.isDirectory()){ sName += "/"; }
+          sort = (file.isDirectory()? "D" : "F") + sExt + sName;
+        } break;
+        default: { sort = file.getName(); }
+        }
         sortFiles.put(sort, file);
       }
       int lineCt = 0; //count lines to select the line number with equal sFileSelect.

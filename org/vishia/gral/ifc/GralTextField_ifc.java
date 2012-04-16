@@ -65,12 +65,29 @@ public interface GralTextField_ifc extends GralWidget_ifc
   
   int getCursorPos();
   
+  int setCursorPos(int pos);
+  
   /**Sets the style of all new set and added texts. The content contained in the text field or box are not changed.
    * @param color
    * @param font
    */
   void setTextStyle(GralColor color, GralFont font);
   
+  
+  /**Sets whether it is able to edit the content of the text field or text box.
+   * If a content is not able to edit, it is a showing field or box. The user can't change the
+   * content. But the user can set the cursor, select any text and copy to the systems clipboard.
+   * If the content is able to edit, the change should be notified and the content should be gotten.
+   * To do that TODO
+   * @param editable true then the content is going to be able to change. 
+   *   False then the edit functionality is disabled. 
+   */
+  void setEditable(boolean editable);
+  
+  
+  /**Returns true if the content was changed after last setText.
+   */
+  boolean isChanged();
   
   /**Sets the selection of the text.
    * <ul>

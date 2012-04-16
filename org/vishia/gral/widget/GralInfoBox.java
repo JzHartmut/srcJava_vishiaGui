@@ -103,6 +103,11 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   { textBox.setTextStyle(color, font);
   }
 
+  
+  @Override public void setEditable(boolean editable){
+    textBox.setEditable(editable);
+  }
+
 
   
   @Override public Appendable append(CharSequence text) throws IOException{ return textBox.append(text); }
@@ -122,6 +127,17 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   { textBox.setText(text, caretPos);
   }
   
+  
+  @Override public int setCursorPos(int pos){
+    if(textBox !=null){
+      return textBox.setCursorPos(pos);
+    } else {
+      return 0;
+    }
+  }
+
+
+  
   //@Override public void setSelection(String how){ textBox.setSelection(how); }
   
   
@@ -134,6 +150,8 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   }
   
 
+  @Override public boolean isChanged(){ return textBox.isChanged(); }
+  
   @Override public String getText(){ return textBox.getText(); }
   
   

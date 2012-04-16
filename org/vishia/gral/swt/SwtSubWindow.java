@@ -96,6 +96,21 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
   
   protected SwtMenu menuBar;
   
+  /**The resizeListener will be activated if {@link #setResizeAction(GralUserAction)} will be called.
+   * It calls this user action on resize. */
+  private ControlListener resizeListener = new ControlListener()
+  { @Override public void controlMoved(ControlEvent e) 
+    { //do nothing if moved.
+    }
+
+    @Override public void controlResized(ControlEvent e) 
+    { if(resizeAction !=null){
+        resizeAction.userActionGui(0, null);
+      }
+    }
+  };
+  
+  
 
   
   SwtSubWindow(String name, Display display, String title, int windProps, GralWidgetMng gralMng)
@@ -124,12 +139,13 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
     }
     super.panelComposite = window;
     if(title !=null){ window.setText(title); }
-    
+
   }
   
   SwtSubWindow(String name, int windProps, Shell shell, GralWidgetMng gralMng)
   { super(name, windProps, gralMng, shell);
     this.window = shell;
+    setResizeAction(actionResizeOnePanel);
     
   }
   
@@ -180,7 +196,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
   
   @Override public void setResizeAction(GralUserAction action){
     if(resizeAction == null){
-      window.addControlListener(resizeListener);
+      ((Shell)panelComposite).addControlListener(resizeListener);
     }
     resizeAction = action;
   }
@@ -258,21 +274,6 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
     public void widgetDisposed(DisposeEvent e)
     {
       stop();
-    }
-  };
-  
-  
-  /**The resizeListener will be activated if {@link #setResizeAction(GralUserAction)} will be called.
-   * It calls this user action on resize. */
-  private ControlListener resizeListener = new ControlListener()
-  { @Override public void controlMoved(ControlEvent e) 
-    { //do nothing if moved.
-    }
-
-    @Override public void controlResized(ControlEvent e) 
-    { if(resizeAction !=null){
-        resizeAction.userActionGui(0, null);
-      }
     }
   };
   

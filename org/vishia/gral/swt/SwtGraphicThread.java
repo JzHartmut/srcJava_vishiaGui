@@ -13,6 +13,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralGraphicThread;
+import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.msgDispatch.LogMessage;
 
 /**This class is the implementation class of a simple graphic implementation for SWT.
  * It doesn't depend of complex functionality of the org.vishia.gral. But that implementations based on this.
@@ -23,6 +25,8 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
   /**Version, able to read as hex yyyymmdd, history and license.
    * Changes:
    * <ul>
+   * <li>2012-04-16 Hartmut chg: {@link #initGraphic()} now creates the main window, creates the
+   *   {@link SwtMng} instead it is doing in the non-graphic thread. 
    * <li>2012-04-10 Hartmut chg: Now the traversal keys ctrl-Pgdn/up are disabled.
    * <li>2011-11-12 Hartmut chg: Now the primary window has a menu bar anyway. 
    * </ul>
@@ -51,13 +55,19 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
    * 
    */
   @SuppressWarnings("hiding")
-  public final static int version = 20111112;
+  public final static int version = 20120416;
 
   /**The graphical device for the application for all windows of this application. */
   Display displaySwt;
   
   /**The main window. SWT: named as Shell. */
   Shell windowSwt;
+  
+  SwtPrimaryWindow instance;
+  
+  LogMessage log;
+  
+  GralWidgetMng gralMng;
   
   /**The windows-closing event handler. It is used private only, but public set because documentation. 
    * The close event will be fired also when a SubWindow is closed. Therefore test the Shell instance.
@@ -183,8 +193,9 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
   
   final String sTitle; final int xPos, yPos, xSize, ySize;
   
-  SwtGraphicThread(String sTitle, int left, int top, int xSize, int ySize)
+  SwtGraphicThread(String sTitle, int left, int top, int xSize, int ySize, LogMessage log)
   { super();
+    this.log = log;
     this.sTitle = sTitle; this.xPos = left; this.yPos = top; this.xSize = xSize; this.ySize = ySize; 
     threadGuiDispatch.start();
   }
@@ -223,7 +234,14 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
     //graphicFrame.getContentPane().setLayout(new FlowLayout());
     windowSwt.setLayout(null);
     windowSwt.addShellListener(mainComponentListerner);
-    //
+
+    
+    //The propertiesGuiSwt needs the Display instance for Font and Color. Therefore the graphic thread with creation of Display should be executed before. 
+    SwtProperties propertiesGui = new SwtProperties(this.displaySwt, 'C');
+    gralMng = new SwtMng(this, propertiesGui, null, log);
+    
+    //The PrimaryWindowSwt is a derivation of the GralPrimaryWindow. It is more as only a SWT Shell.
+    instance = new SwtPrimaryWindow(gralMng, this, this.displaySwt);
     ///
   }
 

@@ -4,8 +4,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
+import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWindowMng_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.CalculatorExpr;
@@ -16,8 +16,9 @@ import org.vishia.util.CalculatorExpr;
  */
 public abstract class GralTextField extends GralWidget implements GralTextField_ifc
 {
-  /**Version and history
+  /**Version, history and license.
    * <ul>
+   * <li>2012-04-16 Hartmut new: {@link #isChanged()}, {@link #setUser(GralTextFieldUser_ifc)}
    * <li>2012-04-01 Hartmut new: {@link #setValue(float)} now supports formatting view.
    *   This algorithm was used for the {@link org.vishia.guiInspc.InspcGui} before.
    * <li>2011-11-18 Hartmut new {@link #setMouseAction(GralUserAction)}. This method should be 
@@ -55,6 +56,8 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   
   protected String text = "";
   
+  protected boolean bTextChanged;
+  
   protected int caretPos;
   
   protected GralColor colorBack = GralColor.getColor("wh"), colorText = GralColor.getColor("bk");
@@ -64,6 +67,8 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   /**A calculator to show calculated float values. It is null if it isn't used. */
   private CalculatorExpr calculator;
 
+  protected GralTextFieldUser_ifc user;
+  
   protected AtomicInteger whatIsChanged = new AtomicInteger();
   
   protected static final int chgText = 1, chgColorBack=2, chgColorText=4, chgFont = 8;
@@ -77,6 +82,12 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
     super(name, whatis, mng);
     this.windowMng = mng.gralDevice;
   }
+  
+  
+  void setUser(GralTextFieldUser_ifc user){
+    this.user = user;
+  }
+  
   
   
   /**Sets a float value into a text field.
@@ -179,6 +190,8 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
    */
   abstract public void setMouseAction(GralUserAction action);
   
+  
+  @Override public boolean isChanged(){ return bTextChanged; }
   
   @Override public String getText(){ return text; }
    

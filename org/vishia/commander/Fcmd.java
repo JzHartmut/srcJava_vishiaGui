@@ -114,6 +114,8 @@ public class Fcmd extends GuiCfg
   
   final FcmdView viewCmd = new FcmdView(this);
   
+  final FcmdEdit editWind = new FcmdEdit(this);
+  
   final FcmdCopyCmd copyCmd = new FcmdCopyCmd(this);
   
   final FcmdMkDirFile mkCmd = new FcmdMkDirFile(this);
@@ -223,6 +225,7 @@ public class Fcmd extends GuiCfg
     filesCp.buildGraphic();
     filePropsCmd.buildWindowConfirmMk();  //F2
     viewCmd.buildWindowView();   //F3
+    editWind.buildWindow();   //F3
     copyCmd.buildWindowConfirmCopy();
     mkCmd.buildWindowConfirmMk();
     executer.buildWindowConfirmExec();

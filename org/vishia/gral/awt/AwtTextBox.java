@@ -135,6 +135,13 @@ public class AwtTextBox extends GralTextBox
   }
 
 
+  @Override public int setCursorPos(int pos){
+    int oldPos = textFieldSwt.getCaretPosition();
+    textFieldSwt.setCaretPosition(pos);
+    return oldPos;
+  }
+
+
   
   @Override public void removeWidgetImplementation()
   {
@@ -206,6 +213,12 @@ public static class AwtTextAreaImpl extends TextArea implements AwtWidget
     // TODO Auto-generated method stub
     
   }
+  
+  
+  @Override public void setEditable(boolean editable){
+    textFieldSwt.setEditable(editable);
+  }
+
 
   @Override
   public void repaintGthread() {

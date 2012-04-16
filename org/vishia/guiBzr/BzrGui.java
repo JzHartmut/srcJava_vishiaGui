@@ -6,6 +6,10 @@ import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GralArea9MainCmd;
+import org.vishia.gral.base.GralTextBox;
+import org.vishia.gral.base.GralTextField;
+import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.FileSystem;
 
@@ -130,9 +134,16 @@ public class BzrGui extends GuiCfg
     gralMng.selectPanel("primaryWindow");
     mainTabPanel = gralMng.addTabbedPanel("mainTab", null, 0);
     gui.addFrameArea("A1C2", mainTabPanel); //dialogPanel);
-
+    
     try { 
-        mainTabPanel.addGridPanel("Select", "&Select",1,1,10,10);
+      gralMng.setPosition(5, 0, 5, 0, 1, 'r'); //right buttom, about half less display width and hight.
+      mainData.infoWindow = gralMng.createWindow("windViewdiff", "view difference", GralWindow.windConcurrently | GralWindow.windResizeable);
+      gralMng.setPosition(0, -3, 0, 0, 0, '.');
+      mainData.infoBox = gralMng.addTextBox("boxViewDiff", false, null, '.');
+      gralMng.setPosition(0, -4, -4, -2, 0, '.');
+      mainData.infoLine = gralMng.addTextField("info", false, null, null);
+
+      mainTabPanel.addGridPanel("Select", "&Select",1,1,10,10);
         mainTabPanel.addGridPanel("Commit", "&Commit",1,1,10,10);
         mainTabPanel.addGridPanel("Log", "&Log",1,1,10,10);
         mainTabPanel.addGridPanel("FilesDiff", "&Files && Diff",1,1,10,10);

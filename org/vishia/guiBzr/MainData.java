@@ -7,8 +7,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.cmd.CmdExecuter;
 import org.vishia.gral.area9.GralArea9_ifc;
+import org.vishia.gral.base.GralTextBox;
+import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 
 public class MainData
@@ -47,6 +50,14 @@ public class MainData
    */
   DataCmpn selectedCmpn;
   
+  
+  GralWindow_ifc infoWindow;
+  
+  GralTextBox infoBox;
+  
+  GralTextField infoLine;
+  
+
   
   MainData(MainCmd_ifc mainCmd)
   {

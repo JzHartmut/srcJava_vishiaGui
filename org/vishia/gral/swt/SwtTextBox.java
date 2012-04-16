@@ -2,6 +2,7 @@ package org.vishia.gral.swt;
 
 import java.io.IOException;
 
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ScrollBar;
@@ -41,6 +42,12 @@ public class SwtTextBox extends GralTextBox
   }
 
 
+  @Override public void setEditable(boolean editable){
+    textFieldSwt.setEditable(editable);
+  }
+
+
+  
   @Override public void viewTrail()
   {
     //textAreaOutput.setCaretPosition(textAreaOutput.getLineCount());
@@ -103,6 +110,15 @@ public class SwtTextBox extends GralTextBox
 
   
   @Override public void repaintGthread(){  
+    int whatisChanged1 = whatIsChanged.get();
+    int catastrophicCount = 0;
+    while( !whatIsChanged.compareAndSet(whatisChanged1, 0)){ 
+      whatisChanged1 = whatIsChanged.get();  //maybe new requests
+      if(++catastrophicCount > 10000) throw new RuntimeException("");
+    }
+    if((whatisChanged1 & chgText) !=0){
+      textFieldSwt.setText(text);
+    }
     textFieldSwt.redraw(); textFieldSwt.update(); 
   }
 
@@ -111,6 +127,12 @@ public class SwtTextBox extends GralTextBox
   { return SwtWidgetHelper.setFocusOfTabSwt(textFieldSwt);
   }
 
+
+  @Override public int setCursorPos(int pos){
+    int oldPos = textFieldSwt.getCaretPosition();
+    textFieldSwt.setSelection(pos);
+    return oldPos;
+  }
 
   
   @Override public void removeWidgetImplementation()
@@ -173,12 +195,25 @@ public class SwtTextBox extends GralTextBox
 
     @Override protected final boolean specialKeysOfWidgetType(int key, GralWidget widgg){ 
       boolean bDone = true;
+      if(KeyCode.isWritingKey(key)){
+        bTextChanged = true;
+      }
       if(KeyCode.isWritingOrTextNavigationKey(key)) return true;
-      switch(key){
-        case KeyCode.ctrl + 'a': { 
-          textFieldSwt.selectAll();
-        } break;
-        default: bDone = false;
+      boolean bUserOk;
+      if(user !=null){
+        Point selection = textFieldSwt.getSelection();
+        bUserOk = user.userKey(key
+            , textFieldSwt.getText()
+            , textFieldSwt.getCaretPosition()
+            , selection.x, selection.y);
+      } else bUserOk = false;
+      if(!bUserOk ){
+        switch(key){
+          case KeyCode.ctrl + 'a': { 
+            textFieldSwt.selectAll();
+          } break;
+          default: bDone = false;
+        }
       }
       return bDone; 
     }

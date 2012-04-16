@@ -60,6 +60,16 @@ public class AwtTextField extends GralTextField
   }
 
 
+  
+  @Override public int setCursorPos(int pos){
+    int oldPos = widgetAwt.getCaretPosition();
+    widgetAwt.setCaretPosition(pos);
+    return oldPos;
+  }
+
+
+  
+
 
   @Override
   public GralColor setBackgroundColor(GralColor color)
@@ -144,6 +154,13 @@ public static class AwtTextFieldImpl extends TextField implements AwtWidget
     // TODO Auto-generated method stub
     
   }
+  
+  
+  @Override public void setEditable(boolean editable){
+    widgetAwt.setEditable(editable);
+  }
+
+
 
   @Override protected void repaintGthread(){
     int chg = this.whatIsChanged.get();

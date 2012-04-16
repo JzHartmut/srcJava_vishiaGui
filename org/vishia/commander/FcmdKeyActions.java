@@ -92,6 +92,7 @@ public class FcmdKeyActions
       if(     keyCode == main.idents.keyFileProps){ main.filePropsCmd.openDialog(main.currentFile); }  //F2
       else if(keyCode == main.idents.keyFileView){ main.viewCmd.view(null); }                  //F3
       else if(keyCode == main.idents.keyFileEdit){ main.actionEdit.userActionGui(KeyCode.menuEntered, widgd, params); }
+      else if(keyCode == main.idents.keyEditIntern){ main.editWind.openEdit(null); }
       else if(keyCode == main.idents.keyFileCopy){ main.copyCmd.actionConfirmCopy.userActionGui(KeyCode.menuEntered, widgd, params); }
       else if(keyCode == main.idents.keyFileCreate){ main.mkCmd.dialogMkDirFile(files[0]); }
       else if(keyCode == main.idents.keyFileDel1 || keyCode == main.idents.keyFileDel2){ main.deleteCmd.actionConfirmDelete.userActionGui(keyCode, widgd); }

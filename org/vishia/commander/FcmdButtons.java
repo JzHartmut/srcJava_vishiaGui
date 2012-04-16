@@ -50,7 +50,11 @@ public class FcmdButtons
   
   
   
-  void setIdx(GralUserAction action, String buttonText){
+  /**Assign an action to any function button.
+   * @param action The action
+   * @param buttonText use the form "Btn:text" where button is F1..F12, aF1 etc. text is the text.
+   */
+  void setFnBtn(GralUserAction action, String buttonText){
     int posSep = buttonText.indexOf(':');
     if(posSep > 0){
       ButtonAction buttonAction = new ButtonAction(action, buttonText.substring(0, posSep), buttonText.substring(posSep+1));
@@ -85,20 +89,21 @@ public class FcmdButtons
   
   void initPanelButtons()
   {
-    setIdx(main.gui.getActionHelp(), main.idents.buttonHelp);
-    setIdx(main.filePropsCmd.actionOpenDialog, main.idents.buttonFileProps);
-    setIdx(main.viewCmd.actionOpenView, main.idents.buttonFileView);
-    setIdx(main.actionEdit, main.idents.buttonFileEdit);
-    setIdx(main.copyCmd.actionConfirmCopy, main.idents.buttonFileCopy);
-    setIdx(main.copyCmd.actionConfirmCopy, main.idents.buttonFileMove);
-    setIdx(main.mkCmd.actionOpenDialog, main.idents.buttonMkdirFile);
-    setIdx(main.deleteCmd.actionConfirmDelete, main.idents.buttonFileDel);
-    setIdx(main.executer.actionExecuteFileByExtension, main.idents.buttonExecute);
-    setIdx(main.favorPathSelector.actionRefreshFileTable, main.idents.buttonRefereshFiles);
-    setIdx(main.selectPanelLeft, main.idents.buttonFavorLeft);
-    setIdx(main.selectPanelMiddle, main.idents.buttonFavorMiddle);
-    setIdx(main.selectPanelRight, main.idents.buttonFavorRight);
-    setIdx(main.actionFocusCmdCard, main.idents.buttonFocusCmd);
+    setFnBtn(main.gui.getActionHelp(), main.idents.buttonHelp);
+    setFnBtn(main.filePropsCmd.actionOpenDialog, main.idents.buttonFileProps);
+    setFnBtn(main.viewCmd.actionOpenView, main.idents.buttonFileView);
+    setFnBtn(main.editWind.actionOpenEdit, main.idents.buttonEditIntern);
+    setFnBtn(main.actionEdit, main.idents.buttonFileEdit);
+    setFnBtn(main.copyCmd.actionConfirmCopy, main.idents.buttonFileCopy);
+    setFnBtn(main.copyCmd.actionConfirmCopy, main.idents.buttonFileMove);
+    setFnBtn(main.mkCmd.actionOpenDialog, main.idents.buttonMkdirFile);
+    setFnBtn(main.deleteCmd.actionConfirmDelete, main.idents.buttonFileDel);
+    setFnBtn(main.executer.actionExecuteFileByExtension, main.idents.buttonExecute);
+    setFnBtn(main.favorPathSelector.actionRefreshFileTable, main.idents.buttonRefereshFiles);
+    setFnBtn(main.selectPanelLeft, main.idents.buttonFavorLeft);
+    setFnBtn(main.selectPanelMiddle, main.idents.buttonFavorMiddle);
+    setFnBtn(main.selectPanelRight, main.idents.buttonFavorRight);
+    setFnBtn(main.actionFocusCmdCard, main.idents.buttonFocusCmd);
     
     Iterator<Map.Entry<String, ButtonAction>> iterButtonAction = idxButtons.entrySet().iterator();
     

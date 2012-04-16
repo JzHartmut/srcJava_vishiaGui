@@ -101,6 +101,14 @@ public class FcmdIdents
 
   int keyFileEdit = KeyCode.F4;
   
+  String menuBarEditIntern = "&File/&Edit-intern [sh-F4]";
+
+  String menuContextEditIntern = "Edit-intern [sh-F4]";
+
+  String buttonEditIntern = "sF4:edit-i";
+
+  int keyEditIntern = KeyCode.shift | KeyCode.F4;
+  
   String menuConfirmCopyBar = "&File/&Copy [F6]";
 
   String menuConfirmCopyContext = "&Copy [F6]";

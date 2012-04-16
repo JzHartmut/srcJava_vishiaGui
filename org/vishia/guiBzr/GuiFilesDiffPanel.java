@@ -442,7 +442,9 @@ public class GuiFilesDiffPanel
       }
       StringBuilder out = new StringBuilder();      
       mainData.cmdExec.execute(uCmd.toString(), null, out, out);
-      mainData.mainAction.panelOutput.widgdOutputText.setValue(GralMng_ifc.cmdSet, 0, out.toString());
+      //mainData.mainAction.panelOutput.widgdOutputText.setValue(GralMng_ifc.cmdSet, 0, out.toString());
+      mainData.infoBox.setText(out);
+      mainData.infoWindow.setWindowVisible(true);
       stop();
       return true;
     }
