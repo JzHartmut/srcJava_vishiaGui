@@ -138,7 +138,7 @@ public class OamShowValues
 		/*int posFormat = sInfo.indexOf('%');
 		final String sPathValue = posFormat <0 ? sInfo : sInfo.substring(0, posFormat);
 		*/
-		String sFormat = widgetInfo.sFormat;
+		String sFormat = widgetInfo.getFormat();
 		ByteDataSymbolicAccess.Variable variable = getVariableFromContentInfo(widgetInfo);
 		//DBbyteMap.Variable variable = accessOamVariable.getVariable(sPathVariable);
 		if(variable == null){

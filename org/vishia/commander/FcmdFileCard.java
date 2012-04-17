@@ -332,7 +332,10 @@ public class FcmdFileCard extends GralFileSelector
       String sPath = file.getAbsolutePath();
       if(main.favorPathSelector.bSyncMidRight){
         syncWithSecondPanel(sFileName);
-      } else {
+      }
+      /*
+      else {
+        
         boolean bSync = main.filesCp.widgSyncWalk.isOn()
           && sDirSync !=null && sPath.length() >= zDirSync;
         if(bSync){
@@ -355,6 +358,7 @@ public class FcmdFileCard extends GralFileSelector
           }
         }
       }
+      */
     }
   }
   
@@ -365,8 +369,9 @@ public class FcmdFileCard extends GralFileSelector
     System.out.println("FcmdFileCard " + mainPanel.cc + ":" + sFileName);
     FcmdFileCard otherFileCard;
     if(mainPanel.cc == 'm'){ otherFileCard = main.favorPathSelector.panelRight.actFileCard; }
-    else { otherFileCard = main.favorPathSelector.panelMid.actFileCard;  }
-    if(otherFileCard !=null){
+    else if(mainPanel.cc == 'm'){ otherFileCard = main.favorPathSelector.panelMid.actFileCard;  }
+    else { otherFileCard = null; }
+    if(otherFileCard !=null){  //NOTE: though mid and right is selected, the otherFileCard may be null because no tab is open.
       String sDirName = getCurrentDir().getName();
       //check whether the other file card contains a entry with this directory name
       GralTableLine_ifc line = otherFileCard.selectList.wdgdTable.getLine(sDirName);

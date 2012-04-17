@@ -219,7 +219,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 	
 
 	/**Textual info about representation format. */
-	public String sFormat;
+	protected String sFormat;
 	
 	/**Numeric informations about the content. */
 	//int[] indices;

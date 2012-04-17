@@ -32,14 +32,40 @@ import org.vishia.util.KeyCode;
 public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 {
 
-  /**Version and history
+  /**Version, history and license
    * <ul>
+   * <li>2012-04-17 Hartmut new: Parameter {@link CallingArguments#bUseGetValueByIndex} for downward compytibility
+   * 
    * <li>2011-04-20 Don't derive this class from {@link GuiCfg}, instead uses the inner class {@link InspcGuiCfg}.
    *   It is a problem of order of instantiation.
    * <li>2011-04-00 Hartmut creation.
    * </ul>
+   * 
+   * <b>Copyright/Copyleft</b>:
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL ist not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but don't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you are intent to use this sources without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public final static int version = 0x20111020;
+  @SuppressWarnings("hiding")
+  public final static int version = 20120417;
   
   private final List<CompleteConstructionAndStart> composites = new LinkedList<CompleteConstructionAndStart>();
   
@@ -75,7 +101,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
   InspcGui(CallingArguments cargs, GralArea9MainCmd cmdgui)
   {
-    guiCfg = new InspcGuiCfg(cargs, cmdgui, null);  //userInspcPlug);
+    guiCfg = new InspcGuiCfg(cargs, cmdgui, userInspcPlug);
     
 
     LogMessage log = cmdgui.getLogMessageOutputConsole();
@@ -89,7 +115,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     GralPlugUser_ifc user = guiCfg.getPluggedUser(); 
     assert(user == null || user instanceof InspcPlugUser_ifc);
     
-    InspcMng variableMng = new InspcMng(cargs.sOwnIpcAddr, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
+    InspcMng variableMng = new InspcMng(cargs.sOwnIpcAddr, cargs.indexTargetIpcAddr, cargs.bUseGetValueByIndex, (InspcPlugUser_ifc)user);
     composites.add(variableMng);
     this.inspcMng = variableMng;
     variableMng.setCallbackOnReceivedData(callbackOnReceivedData);
@@ -163,9 +189,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     Map<String, String> indexTargetIpcAddr = new TreeMap<String, String>();
 
     /**File with the values from the S7 to show. */
-    protected String sFileOamValues;
+    //protected String sFileOamValues;
 
-
+    boolean bUseGetValueByIndex;
 
   }
   
@@ -206,9 +232,6 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
         }
         else if(arg.startsWith("-ownIpc=")) 
         { cargs.sOwnIpcAddr = getArgument(8);   //an example for default output
-        }
-        else if(arg.startsWith("-oambin=")) 
-        { cargs.sFileOamValues = getArgument(8);   //an example for default output
         }
         else { bOk = super.testArgument(arg, nArg); }
       } catch(Exception exc){ bOk = false; }
@@ -289,22 +312,8 @@ private class InspcGuiCfg extends GuiCfg
   
 } //class InspcGuiCfg
   
-  private UserInspcPlug_ifc userInspcPlug = new UserInspcPlug_ifc()
-  {
 
-    @Override public String replacePathPrefix(String path, String[] target)
-    {
-      // TODO Auto-generated method stub
-      String pathRet = guiCfg.guiCfgData.XXXreplacePathPrefix(path, target);
-      if(target[0] !=null){
-        String targetIp = inspcMng.translateDeviceToAddrIp(target[0]);
-        if(targetIp !=null){ target[0] = targetIp; }  //else let it unchanged.
-      }
-      return pathRet;
-    }
-    
-  };
-
+  private UserInspcPlug userInspcPlug = new UserInspcPlug();
   
   
   
@@ -363,6 +372,25 @@ private class InspcGuiCfg extends GuiCfg
     }
   };
   
-  
+
+  private class UserInspcPlug implements UserInspcPlug_ifc, GralPlugUser2Gral_ifc 
+  {
+    
+    UserInspcPlug(){}
+    
+    @Override public String replacePathPrefix(String path, String[] target)
+    {
+      // TODO Auto-generated method stub
+      String pathRet = guiCfg.guiCfgData.XXXreplacePathPrefix(path, target);
+      if(target[0] !=null){
+        String targetIp = inspcMng.translateDeviceToAddrIp(target[0]);
+        if(targetIp !=null){ target[0] = targetIp; }  //else let it unchanged.
+      }
+      return pathRet;
+    }
+    
+  } //class UserInspcPlug
+
+
   
 }

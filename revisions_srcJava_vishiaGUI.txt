@@ -1,4 +1,14 @@
-﻿* Bzr-GUI: ViewDiff in an extra Window.
+﻿
+------------------------------------------------------------
+2012-04-17 Hartmut
+Usage of InspcGUI for profession:
+* GralTextField: sFormat2 etc: Now format "int16AngleDegree" etc. are recognized as special format. Improved calling calculator in setValue(float).
+* InspcGUI: UserInspcPlug, new: Parameter CallingArguments.bUseGetValueByIndex for downward compatibility
+* FcmdFilesCp, FcmdFileCard: Compares only mid and right panel.
+
+------------------------------------------------------------
+2012-04-10 Hartmut
+* Bzr-GUI: ViewDiff in an extra Window.
 * GralTextField_ifc, GralTextFieldUser_ifc: enhancments, changing of texts
 * GralWindow: resize on subwindows
 * SwtGraphicThread: initGraphic() now creates the main window, creates the SwtMng instead it is doing in the non-graphic thread.
