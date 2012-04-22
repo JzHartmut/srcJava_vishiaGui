@@ -18,6 +18,8 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
 {
   /**Version, history and license.
    * <ul>
+   * <li>2012-04-17 Hartmut new: {@link #sFormat2} etc: Now format "int16AngleDegree" etc. are recognized
+   *   as special format. Improved calling {@link #calculator} in {@link #setValue(float)}.
    * <li>2012-04-16 Hartmut new: {@link #isChanged()}, {@link #setUser(GralTextFieldUser_ifc)}
    * <li>2012-04-01 Hartmut new: {@link #setValue(float)} now supports formatting view.
    *   This algorithm was used for the {@link org.vishia.guiInspc.InspcGui} before.
@@ -52,7 +54,7 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
    * 
    */
   @SuppressWarnings("hiding")
-  public final static int version = 0x20111118;
+  public final static int version = 20120416;
   
   protected String text = "";
   
@@ -67,6 +69,8 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   /**A calculator to show calculated float values. It is null if it isn't used. */
   private CalculatorExpr calculator;
 
+  private String sFormat2;
+  
   protected GralTextFieldUser_ifc user;
   
   protected AtomicInteger whatIsChanged = new AtomicInteger();
@@ -90,6 +94,15 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   
   
   
+  @Override public void setFormat(String sFormat){
+    super.setFormat(sFormat);
+    calculator = null;  //set it on first usage.
+    sFormat2 = null;
+  }
+  
+  
+  
+  
   /**Sets a float value into a text field.
    * The float value may be formatted:
    * <ul>
@@ -109,30 +122,52 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
    *   
    * @see org.vishia.gral.ifc.GralWidget#setValue(float)
    */
-  @Override public void setValue(float value){
+  @Override public void setValue(final float valueP){
     final String sFormat1;
+    float value;
     String sShow;
-    if(sFormat !=null && sFormat.startsWith("!")){
-      int posEnd = sFormat.indexOf('!',1);
-      if(posEnd >=0){
-        String sExpr = sFormat.substring(1, posEnd);
-        sFormat1 = sFormat.substring(posEnd+1);
-        if(calculator ==null){
-          calculator = new CalculatorExpr();
-          String sError = calculator.setExpr(sExpr);
-          if(sError !=null){ 
-            //console.writeError(sError);
-            calculator = null;
+    if(calculator !=null){
+      value = (float)calculator.calc(valueP);
+      sFormat1 = this.sFormat2;
+    } else if(sFormat !=null){
+      if(sFormat.startsWith("!")){
+        int posEnd = sFormat.indexOf('!',1);
+        if(posEnd >=0){
+          String sExpr = sFormat.substring(1, posEnd);
+          this.sFormat2 = sFormat1 = sFormat.substring(posEnd+1);
+          if(calculator ==null){
+            calculator = new CalculatorExpr();
+            String sError = calculator.setExpr(sExpr);
+            if(sError !=null){ 
+              //console.writeError(sError);
+              calculator = null;
+            }
           }
+          if(calculator !=null){
+            value = (float)calculator.calc(valueP);
+          } else {
+            value = valueP;
+          }
+        } else {
+          sFormat1 = sFormat;
+          value = valueP;
         }
-        if(calculator !=null){
-          value = (float)calculator.calc(value);
-        }
+      } else if(sFormat.startsWith("int16AngleDegree")){
+        this.calculator = new CalculatorAngle16();
+        sFormat1 = this.sFormat2 = "%3.3f";
+        value = calculator.calc(valueP);
+      } else if(sFormat.startsWith("int32AngleDegree")){
+        this.calculator = new CalculatorAngle32();
+        sFormat1 = this.sFormat2 = "%3.3f";
+        value = calculator.calc(valueP);
       } else {
-        sFormat1 = sFormat;  
+        sFormat1 = sFormat;
+        value = valueP;
       }
-    } else {
-      sFormat1 = sFormat;  //no expression
+        
+    } else { //sFormat == null
+      sFormat1 = null;  //no expression
+      value = valueP;
     }
     if(sFormat1 !=null && sFormat.length() >0){
       try{ sShow = String.format(sFormat1, value); }
@@ -202,5 +237,23 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   /**Returns the Label for a prompt or null if there isn't used a prompt
    */
   abstract public String getPromptLabelImpl();
+  
+  
+  
+  private static class CalculatorAngle16 extends CalculatorExpr
+  { CalculatorAngle16(){}
+    @Override public float calc(float input){
+      return input * (180.0f / 32768.0f);   
+    }
+  } //class CalculatorAngle16
+  
+  
+  private static class CalculatorAngle32 extends CalculatorExpr
+  { CalculatorAngle32(){}
+    @Override public float calc(float input){
+      return input * (180.0f / 0x7fffffff);   
+    }
+  } //class CalculatorAngle32
+  
   
 }

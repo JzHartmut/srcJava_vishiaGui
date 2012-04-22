@@ -198,11 +198,6 @@ public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui, GralPlugUser_ifc pl
   inspector = new Inspector("UDP:127.0.0.1:60088");
   inspector.start(this);
   
-  //Creates a panel manager to work with grid units and symbolic access.
-    //Its properties:  //##
-  final char sizePixel = cargs.sSize == null ? 'C' : cargs.sSize.charAt(0);
-  //GralGridProperties propertiesGui = cargs.graphicFactory.createProperties(sizePixel);
-  //LogMessage log = console.getLogMessageOutputConsole();
   gralMng = cmdGui.gralMng; //cargs.graphicFactory.createPanelMng(null, 120,80, propertiesGui, null, log);
   panelBuildIfc = gralMng;
   guiAccess = gralMng;

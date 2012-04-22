@@ -62,11 +62,6 @@ public class ViewCfg extends GuiCfg
     
     String sFileCfg;
     
-    String sPathZbnf = "GUI";
-    
-    
-    /**Size, either A,B or F for 800x600, 1024x768 or full screen. */
-    String sSize;
   } //class CallingArguments
   
   

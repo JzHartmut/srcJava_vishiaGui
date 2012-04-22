@@ -60,7 +60,7 @@ public class GralCfgDesigner
   private GralWindow dialogWindowProps;
 
   /**Some dialog widget elements. */
-  private GralWidget dialogFieldName, dialogFieldDatapath, dialogFieldText, dialogFieldFormat
+  GralWidget dialogFieldName, dialogFieldDatapath, dialogFieldText, dialogFieldFormat
     , dialogFieldShow, dialogFieldAction, dialogFieldPrompt, dialogFieldPromptPos 
     , dialogFieldLine, dialogFieldColumn, dialogFieldHeight, dialogFieldWidth;
   
@@ -152,9 +152,9 @@ public class GralCfgDesigner
       
       GralCfgElement cfge = (GralCfgElement)widgd.getCfgElement();
       if(cfge !=null){
-        String sPanel = cfge.position.panel;  //Note: The cloned Object maybe empty here before buildWidget() is called
-        int xPosAct = cfge.position.xPos;
-        int yPosAct = cfge.position.yPos;
+        String sPanel = cfge.getPanel();  //Note: The cloned Object maybe empty here before buildWidget() is called
+        int xPosAct = cfge.get_xPos();
+        int yPosAct = cfge.get_yPos();
         if(bCopy){
           GralCfgElement cfgn = cfge.clone(); //cfgBuilder.newCfgElement(cfge);
           cfge = cfgn;
@@ -237,7 +237,7 @@ public class GralCfgDesigner
         
         GralCfgElement cfge = (GralCfgElement)widgdInDialog.getCfgElement();
         if(cfge !=null){
-          String sPanel = cfge.position.panel;  //Note: The cloned Object maybe empty here before buildWidget() is called
+          String sPanel = cfge.getPanel();  //Note: The cloned Object maybe empty here before buildWidget() is called
             /*if(sName.trim().length() >0) { cfge.widgetType.name = sName; }
           if(sDataPath.trim().length() >0) { cfge.widgetType.info = sDataPath; }
           if(sText.trim().length() >0) { cfge.widgetType.text = sText; }

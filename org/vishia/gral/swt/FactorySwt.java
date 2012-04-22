@@ -11,9 +11,9 @@ public class FactorySwt implements GralFactory_ifc
   GralArea9Window gui;
   
 
-  @Override public GralWindow createWindow(LogMessage log, String sTitle, int left, int top, int xSize, int ySize)
+  @Override public GralWindow createWindow(LogMessage log, String sTitle, char sizeShow, int left, int top, int xSize, int ySize)
   {
-    SwtPrimaryWindow swtWindow = SwtPrimaryWindow.create(log, sTitle, left, top, xSize, ySize);
+    SwtPrimaryWindow swtWindow = SwtPrimaryWindow.create(log, sTitle, sizeShow, left, top, xSize, ySize);
     return swtWindow;
   }
   

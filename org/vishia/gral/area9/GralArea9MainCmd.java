@@ -25,8 +25,11 @@ import org.vishia.msgDispatch.MsgPrintStream;
 public class GralArea9MainCmd extends MainCmd
 {
   
-  /**Version, history and licence
+  /**Version, history and license.
    * <ul>
+   * <li>2012-04-22 Hartmut new: {@link #parseArgumentsAndInitGraphic(String, String, int, int, int, int)}
+   *   for determination of display coordinates in the users application.
+   *   Getting size arguments from main-args. 
    * <li>2012-03-30 MsgPrintStream systemErrAdapter used here.
    *   Now System.err.println can be used to generate an dispatch-able message with numeric identifier.
    * </ul>
@@ -48,14 +51,14 @@ public class GralArea9MainCmd extends MainCmd
    *    modified sources likewise under this LGPL Lesser General Public License.
    *    You mustn't delete this Copyright/Copyleft inscription in this source file.
    * </ol>
-   * If you are indent to use this sources without publishing its usage, you can get
+   * If you are intent to use this sources without publishing its usage, you can get
    * a second license subscribing a special contract with the author. 
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    * 
    */
-  public final static int version = 20120330;
+  public final static int version = 20120422;
   
   public GralArea9_ifc gui;
   
@@ -101,6 +104,20 @@ public class GralArea9MainCmd extends MainCmd
    */
   public boolean parseArgumentsAndInitGraphic(String sTitle, String sOutputArea)
   {
+    return parseArgumentsAndInitGraphic(sTitle, sOutputArea, '.', -1, -1, -1, -1);
+  }
+
+  
+  /**Builds the graphic and parses the command line parameters. Possible command line argument errors
+   * or help texts are outputted to the window in the output box.
+   * @param sTitle Title for window
+   * @param sOutputArea Use 1..3 for row and A..C for column in form for example "3A3C".
+   *   In this example the output box occupies all 3 columns (A to C) from the 3. (= bottom) row
+   *   of the 9 areas.  If null is used, the default selection is "3A3C".
+   * @return true if it is successfully.
+   */
+  public boolean parseArgumentsAndInitGraphic(String sTitle, String sOutputArea, char sizeShow, int left, int top, int xSize, int ySize)
+  {
     boolean bOk = true;
     try{ parseArguments(); }
     catch(Exception exception)
@@ -112,8 +129,13 @@ public class GralArea9MainCmd extends MainCmd
       cargs.graphicFactory = new FactorySwt();
     }
     if(sOutputArea == null){ sOutputArea = "A3C3"; }
+    if("\0 .".indexOf(sizeShow) >=0){  sizeShow = cargs.sizeShow; }  //undefined per parameter, use args 
+    if(left < 0){  left = cargs.xLeftPixelWindow; }  //undefined per parameter, use args 
+    if(top < 0){  top = cargs.yTopPixelWindow; }  //undefined per parameter, use args 
+    if(xSize < 0){  xSize = cargs.dxPixelWindow; }  //undefined per parameter, use args 
+    if(ySize < 0){  ySize = cargs.dyPixelWindow; }  //undefined per parameter, use args 
     
-    GralWindow primaryWindow = cargs.graphicFactory.createWindow(getLogMessageOutputConsole(), sTitle, 50,50,800, 600);
+    GralWindow primaryWindow = cargs.graphicFactory.createWindow(getLogMessageOutputConsole(), sTitle, sizeShow, left, top, xSize, ySize);
     gui = new GralArea9Window(this, primaryWindow);
     gui.getGralMng().setApplicationAdapter(gui);
     gui.initGraphic(sOutputArea);
@@ -124,7 +146,8 @@ public class GralArea9MainCmd extends MainCmd
     return bOk;
   }
 
-  
+  public void setFullScreen(boolean full){ gui.setFullScreen(full); }
+
   /*---------------------------------------------------------------------------------------------*/
   /** Tests one argument. This method is invoked from parseArgument. It is abstract in the superclass MainCmd
       and must be overwritten from the user.
@@ -151,7 +174,15 @@ public class GralArea9MainCmd extends MainCmd
       { cargs.sTimeZone = getArgument(10);   //an example for default output
       }
       else if(arg.startsWith("-size=")) 
-      { cargs.sSize = getArgument(6);   //an example for default output
+      { String sValue = getArgument(6);
+        if(sValue.length() >=1){
+          cargs.sizeShow = sValue.charAt(0);   
+        } else {
+          bOk = false;
+        }
+      }
+      else if(arg.startsWith("-syntax=")) 
+      { cargs.sPathZbnf = getArgument(8);   //an example for default output
       }
       else if(arg.startsWith("-plugin=")) 
       { cargs.sPluginClass = getArgument(8);   //an example for default output

@@ -4,6 +4,8 @@ package org.vishia.gral.swt;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralPoint;
+import org.vishia.gral.ifc.GralRectangle;
 
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -29,7 +31,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
   protected SwtCanvas swtCanvas;
 	
 	/**The storage for the Canvas content. */
-	GralCanvasStorage store = new GralCanvasStorage();
+	//GralCanvasStorage store = new GralCanvasStorage();
 	
 	
 	
@@ -47,6 +49,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
    */
   public SwtCanvasStorePanel(String namePanel, Composite parent, int style, Color backGround, GralWidgetMng gralMng)
   { super(namePanel, gralMng, null);
+    super.canvas = new GralCanvasStorage();
     swtCanvas = new SwtCanvas(this,parent, style);
     super.panelComposite = swtCanvas;
     swtCanvas.addControlListener(resizeItemListener);
@@ -89,11 +92,15 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
     public void drawBackground(GC g, int x, int y, int dx, int dy) {
     	//NOTE: forces stack overflow because calling of this routine recursively: super.paint(g);
     	
-    	for(GralCanvasStorage.PaintOrder order: storeMng.store.paintOrders){
+      if(storeMng.canvas == null){
+        stop();
+      } else 
+    	for(GralCanvasStorage.PaintOrder order: storeMng.canvas.paintOrders){
     		switch(order.paintWhat){
       		case GralCanvasStorage.paintLine: {
       			g.setForeground(((SwtMng)storeMng.gralMng).getColorImpl(order.color));
       	  	g.drawLine(order.x1, order.y1, order.x2, order.y2);
+      	  
       	  } break;
       		case GralCanvasStorage.paintImage: {
       		  GralCanvasStorage.PaintOrderImage orderImage = (GralCanvasStorage.PaintOrderImage) order;
@@ -101,6 +108,19 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
       		  //int dx1 = (int)(orderImage.zoom * order.x2);
       		  //int dy1 = (int)(orderImage.zoom * order.y2);
             g.drawImage(image, 0, 0, orderImage.dxImage, orderImage.dyImage, order.x1, order.y1, order.x2, order.y2);
+      		} break;
+      		case GralCanvasStorage.paintPolyline: {
+      		  GralCanvasStorage.PolyLine line = (GralCanvasStorage.PolyLine) order;
+      		  SwtPolyLine swtLine;
+            { Object oImpl = line.getImplData();
+        		  if(oImpl == null){
+                swtLine = new SwtPolyLine(line, (SwtMng)storeMng.itsMng);
+                line.setImplData(swtLine);
+              } else {
+                swtLine = (SwtPolyLine) oImpl;
+              }
+      		  }
+            g.drawPolyline(swtLine.points);
       		} break;
       		default: throw new IllegalArgumentException("unknown order");
     		}
@@ -121,6 +141,8 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
       
     };
     
+    void stop(){}
+
 	}
 	
   @Override public Control getWidgetImplementation(){ return swtCanvas; } 
@@ -149,5 +171,36 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
     return null;
   }
   
+  
+  public static class SwtPolyLine // extends GralCanvasStorage.PolyLine
+  {
+    int[] points;
+    int nrofPoints;
+    Color color;
+    
+    SwtPolyLine(GralCanvasStorage.PolyLine line, SwtMng gralMng){
+      nrofPoints = line.points.size();
+      points = new int[2 * nrofPoints];
+      GralRectangle rr = gralMng.calcWidgetPosAndSize(line.pos, 0, 0, 800, 600);
+      int ix = -1;
+      int xf, yf;
+      if(line.bPointsAreGralPosUnits){
+        xf = gralMng.propertiesGui.xPixelUnit();  //1.0 is one GralPos unit
+        yf = gralMng.propertiesGui.xPixelUnit();
+      } else {
+        xf = rr.dx;  //0.0..1.0 is size of line.pos
+        yf = rr.dy;
+      }
+      for(GralPoint point: line.points){
+        int x = rr.x + (int)(point.x * xf + 0.5f);
+        int y = rr.y - (int)(point.y * xf + 0.5f);
+        points[++ix] = x;
+        points[++ix] = y;
+      }
+      color = gralMng.getColorImpl(line.color);
+    }
+  }
+  
+
 }
 

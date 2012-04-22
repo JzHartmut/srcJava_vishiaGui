@@ -4,7 +4,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.vishia.gral.ifc.GralWidget;
-import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.MinMaxTime;
 
 /**This class is the base for implementation of graphic threading. It is implemented for SWT and Swing yet.
@@ -116,6 +115,12 @@ public abstract class GralGraphicThread implements Runnable
   
   /**Version and history:
    * <ul>
+   * <li>
+   * <li>2012-04-20 Hartmut bugfix: If a {@link GralDispatchCallbackWorker} throws an exception,
+   *   it was started again because it was in the queue yet. The proplem occurs on build graphic. It
+   *   was repeated till all graphic handles are consumed. Now the {@link #queueGraphicOrders} entries
+   *   are deleted first, then executed. TODO use this class only for SWT, use the adequate given mechanism
+   *   for AWT: java.awt.EventQueue.invokeAndWait(Runnable). use Runnable instead GralDispatchCallbackWorker. 
    * <li>2012-03-15 Hartmut chg: Message on exception.
    * <li>2011-11-08 Hartmut new: Delayed orders to dispatch in the graphic thread: 
    *   Some actions need some calculation time. 
@@ -150,7 +155,7 @@ public abstract class GralGraphicThread implements Runnable
    * 
    * 
    */
-  public final static int version = 0x20120303;
+  public final static int version = 20120422;
   
   //protected GralPrimaryWindow window;
   
@@ -191,7 +196,7 @@ public abstract class GralGraphicThread implements Runnable
   
   protected boolean isWakedUpOnly;
   
-
+  protected final char sizeCharProperties;
   
   /** set to true to exit in main*/
   protected boolean bExit = false;
@@ -215,8 +220,9 @@ public abstract class GralGraphicThread implements Runnable
    * after all parameter are saved to execute the overridden {@link #initGraphic()} method.
    * @param name Name of the thread.
    */
-  protected GralGraphicThread()
-  { threadGuiDispatch = new Thread(this, "graphic");
+  protected GralGraphicThread(char size)
+  { sizeCharProperties = size;
+    threadGuiDispatch = new Thread(this, "graphic");
     threadTimer = new Thread(runTimer, "graphictime");
     threadTimer.start();
   }
@@ -327,7 +333,7 @@ public abstract class GralGraphicThread implements Runnable
       do{
         try{ bContinueDispatch = dispatchOsEvents();}
         catch(Exception exc){
-          System.out.println(exc.getLocalizedMessage());
+          System.out.println(exc.getMessage());
           exc.printStackTrace(System.out);
           bContinueDispatch = true; //false;
         }
@@ -345,8 +351,11 @@ public abstract class GralGraphicThread implements Runnable
         //it may be waked up by the operation system or by calling Display.wake().
         //if wakeUp() is called, isWakedUpOnly is set.
         checkTimes.cyclTime();
-        for(GralDispatchCallbackWorker listener: queueGraphicOrders){
-          //use isWakedUpOnly for run as parameter?
+        
+        GralDispatchCallbackWorker listener;
+        while( (listener = queueGraphicOrders.poll()) !=null){
+        //for(GralDispatchCallbackWorker listener: queueGraphicOrders){
+              //use isWakedUpOnly for run as parameter?
           try{
             listener.doBeforeDispatching(isWakedUpOnly);
           } catch(Exception exc){

@@ -92,7 +92,7 @@ public abstract class GralUserAction
    *        The first invocation which returns true may finish the invocations.
    * @deprecated use {@link #userActionGui(int, GralWidget, Object...)}.
    */
-  public boolean userActionGui(String sIntension, GralWidget widgd, Object... params){ return false; }
+  @Deprecated public boolean userActionGui(String sIntension, GralWidget widgd, Object... params){ return false; }
   
   /**Call of users method while any user action on the gui is done.
    * @param actionCode See {@link KeyCode}. Any special action is designated with 0.

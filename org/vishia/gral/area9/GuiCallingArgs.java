@@ -13,6 +13,10 @@ import org.vishia.gral.ifc.GralFactory_ifc;
 public class GuiCallingArgs
 {
   /**Version, history and licence
+   * <ul>
+   * <li>2012-04-22 Hartmut chg {@link #sizeShow} instead sSize, new {@link #xLeftPixelWindow} etc.
+   * <li>2011-06-00 Hartmut creation, commonly arguments for each GUI application.
+   * </ul>
    * 
    * <b>Copyright/Copyleft</b>:
    * For this source the LGPL Lesser General Public License,
@@ -32,14 +36,14 @@ public class GuiCallingArgs
    *    modified sources likewise under this LGPL Lesser General Public License.
    *    You mustn't delete this Copyright/Copyleft inscription in this source file.
    * </ol>
-   * If you are indent to use this sources without publishing its usage, you can get
+   * If you are intent to use this sources without publishing its usage, you can get
    * a second license subscribing a special contract with the author. 
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    * 
    */
-  public final static int version = 0x20120303;
+  public final static int version = 20120422;
 
   
   /**The graphic base factory can be detected from command line arguments
@@ -61,7 +65,9 @@ public class GuiCallingArgs
   public String sTimeZone = "GMT";
   
   /**Size, either A,B or F for 800x600, 1024x768 or full screen. */
-  public String sSize;
+  public char sizeShow = 'C';
+  
+  public int xLeftPixelWindow = 50, yTopPixelWindow = 50, dxPixelWindow = 730, dyPixelWindow = 520;
   
   /**The own ipc-address for Interprocess-Communication with the target.
    * It is a string, which determines the kind of communication.

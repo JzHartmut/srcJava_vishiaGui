@@ -11,7 +11,6 @@ import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.eclipse.swt.widgets.TableItem;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.cfg.GralCfgData;
@@ -21,17 +20,16 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMngApplAdapter_ifc;
+import org.vishia.gral.ifc.GralPoint;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
-import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindowMng_ifc;
-import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
@@ -57,6 +55,7 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Changes:
    * <ul>
+   * <li>2012-04-22 Hartmut new: {@link #addLine(GralColor, List)} to add in a {@link GralCanvasStorage}.
    * <li>2012-04-01 Hartmut new: {@link #addDataReplace(Map)}, {@link #replaceDataPathPrefix(String)}.
    *   using alias in the {@link GralWidget#setDataPath(String)}. The resolving of the alias is done
    *   only if the datapath is used.   * <li>2012-03-17 Hartmut new: {@link #calcWidgetPosAndSize(GralPos, int, int)} as abstract method.
@@ -106,7 +105,7 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
    * 
    * 
    */
-  public final static int version = 20120317;
+  public final static int version = 20120422;
   
 	/**This class is used for a selection field for file names and pathes. */
   protected class FileSelectInfo
@@ -722,6 +721,50 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
     setInfo(descr, GralMng_ifc.cmdTextColor, ix, color, null);
   } 
   
+  
+  
+  /**Adds a line.
+   * <br><br>To adding a line is only possible if the current panel is of type 
+   * {@link SwtCanvasStorePanel}. This class stores the line coordinates and conditions 
+   * and draws it as background if drawing is invoked.
+   * 
+   * @param colorValue The value for color, 0xffffff is white, 0xff0000 is red.
+   * @param xa start of line relative to current position in grid units.
+   *          The start is relative to the given position! Not absolute in window! 
+   * @param ya start of line relative to current position in grid units.
+   * @param xe end of line relative to current position in grid units.
+   * @param ye end of line relative to current position in grid units.
+   */
+  @Override public void addLine(int colorValue, float xa, float ya, float xe, float ye){
+    //if(pos.panel.getPanelImpl() instanceof SwtCanvasStorePanel){
+    if(pos.panel.canvas !=null){
+      GralColor color = propertiesGui.color(colorValue);
+      int xgrid = propertiesGui.xPixelUnit();
+      int ygrid = propertiesGui.yPixelUnit();
+      int x1 = (int)((pos.x.p1 + xa) * xgrid);
+      int y1 = (int)((pos.y.p1 - ya) * ygrid);
+      int x2 = (int)((pos.x.p1 + xe) * xgrid);
+      int y2 = (int)((pos.y.p1 - ye) * ygrid);
+      //Any panel which is created in the SWT-implementation is a CanvasStorePanel.
+      //This is because lines should be drawn.
+      //((SwtCanvasStorePanel) pos.panel.getPanelImpl()).store.drawLine(color, x1, y1, x2, y2);
+      pos.panel.canvas.drawLine(color, x1, y1, x2, y2);
+      //furtherSetPosition((int)(xe + 0.99F), (int)(ye + 0.99F));
+    } else {
+      log.sendMsg(0, "GuiPanelMng:addLine: panel is not a CanvasStorePanel");
+    }
+  }
+  
+  
+  @Override public void addLine(GralColor color, List<GralPoint> points){
+    if(pos.panel.canvas !=null){
+      pos.panel.canvas.drawLine(pos, color, points);
+    } else {
+      log.sendMsg(0, "GralMng.addLine - panel is not a CanvasStorePanel;");
+    }
+  }
+  
+
   
   @Override public void setLed(GralWidget widgetDescr, int colorBorder, int colorInner)
   {

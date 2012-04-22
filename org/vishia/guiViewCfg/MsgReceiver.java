@@ -19,8 +19,11 @@ import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageFile;
 import org.vishia.msgDispatch.MsgDispatcher;
 import org.vishia.msgDispatch.MsgPrintStream;
+import org.vishia.util.FileSystem;
 
-/**This class receives the messages from the target and writes it in the actual list and in some files.
+/**This class receives the messages from the target device, dispatch it per ident and writes it 
+ * in the actual list and in some files.
+ * The message is dispatched using {@link MsgDispatcher}.
  * 
  * @author Hartmut Schorrig
  *
@@ -28,6 +31,41 @@ import org.vishia.msgDispatch.MsgPrintStream;
 public class MsgReceiver 
 {
 
+  /**Version, history and license.
+   * <ul>
+   * <li>2010-06-00 Hartmut created
+   * </ul>
+   * 
+   * <b>Copyright/Copyleft</b>:
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL ist not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but don't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you are indent to use this sources without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   * 
+   */
+  final static int version = 0x20111227;
+
+  
+  
+  
+  
 	private class MsgItem
 	{
 		String time;
@@ -140,13 +178,13 @@ public class MsgReceiver
 	}
 	
 	
-	public MsgReceiver(Report console, GralMng_ifc guiAccess, String sTimeZone, String sPathZbnf)
+	public MsgReceiver(Report console, GralMng_ifc guiAccess, String sTimeZoneShow, String sTimeZoneLog, String sPathZbnf)
 	{ this.console = console;
 	  this.guiAccess = guiAccess;
 	  this.localization = Locale.ROOT;
 	  this.dateFormat = new SimpleDateFormat("HH:mm:ss.SSS", Locale.ROOT);
-	  this.dateFormat.setTimeZone(TimeZone.getTimeZone(sTimeZone));
-		TimeZone timeZoneForFile = TimeZone.getTimeZone("GMT");  //always GMT!
+	  this.dateFormat.setTimeZone(TimeZone.getTimeZone(sTimeZoneShow));
+		TimeZone timeZoneForFile = TimeZone.getTimeZone(sTimeZoneLog);  
 	  recvData = new MsgItems_h.MsgItems();
 		recvDataBuffer = new byte[MsgItems_h.MsgItems.kIdxAfterLast];
 		recvData.assignEmpty(recvDataBuffer);
@@ -158,7 +196,9 @@ public class MsgReceiver
 		this.systemErrAdapter = new MsgPrintStream(msgDispatcher);
 		int secondsToClose = -10; //any 10 seconds, the file will be closed, and re-openened at least after 10 seconds.
 		int hoursPerFile = -3600; //This is 3600 seconds.
-		fileOutput = new LogMessageFile("D:/DATA/msg/log$yyyy-MMM-dd-hh_mm$.log", secondsToClose, hoursPerFile, null, timeZoneForFile, msgDispatcher.getSharedFreeEntries());
+		try{ FileSystem.mkDirPath("D:/DATA/msg/");}
+		catch(java.io.IOException exc){ console.writeError("can't create D:/DATA/msg/"); }
+		fileOutput = new LogMessageFile("D:/DATA/msg/log$yyyy-MMM-dd-HH_mm$.log", secondsToClose, hoursPerFile, null, timeZoneForFile, msgDispatcher.getSharedFreeEntries());
 		msgDispatcher.setOutputRoutine(ixMsgOutputFile, "File", false, fileOutput);
 		msgDispatcher.setOutputRoutine(ixMsgOutputGuiList, "GUI-List", false, guiMsgOutput);
 		//check all entries in the configuration to configure the MsgDispatcher:
@@ -269,7 +309,7 @@ public class MsgReceiver
 			        	case 2:
 			        	case 3: values[ixV] = new Float(Float.intBitsToFloat(value)); break;
 			        	}
-			        	typeValue >>=3;
+			        	typeValue >>=2;
 			        }
 						  
 						  storeMsgOfDay(timeMillisecUTC, ident, values);

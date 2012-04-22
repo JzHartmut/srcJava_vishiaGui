@@ -340,13 +340,6 @@ public class AwtWidgetMng extends GralWidgetMng implements GralMngBuild_ifc, Gra
   }
 
   @Override
-  public void addLine(int colorValue, float xa, float ya, float xe, float ye)
-  {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
   public GralWidget addSlider(String sName, GralUserAction action, String sShowMethod,
     String sDataPath)
   {

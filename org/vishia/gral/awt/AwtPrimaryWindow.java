@@ -25,8 +25,8 @@ public class AwtPrimaryWindow extends AwtSubWindow implements GralPrimaryWindow_
     this.graphicThreadAwt = graphicThread;  //refers SWT type
   }  
   
-  public static AwtPrimaryWindow create(LogMessage log, String sTitle, int left, int top, int xSize, int ySize)
-  { AwtGraphicThread init = new AwtGraphicThread(sTitle, left, top, xSize, ySize);
+  public static AwtPrimaryWindow create(LogMessage log, String sTitle, char sizeShow, int left, int top, int xSize, int ySize)
+  { AwtGraphicThread init = new AwtGraphicThread(sTitle, sizeShow, left, top, xSize, ySize);
     //GuiThread graphicThread = startGraphicThread(init);  
 
     synchronized(init){

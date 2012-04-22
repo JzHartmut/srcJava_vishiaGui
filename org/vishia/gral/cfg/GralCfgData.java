@@ -3,11 +3,10 @@ package org.vishia.gral.cfg;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.vishia.gral.ifc.GralMngBuild_ifc;
-import org.vishia.gral.ifc.GralPos;
-import org.vishia.gral.ifc.GralWidgetCfg_ifc;
 
 
 /**This class contains all configuration data for the appearance of the GUI.
@@ -23,6 +22,7 @@ public final class GralCfgData
   
   /**Version and history
    * <ul>
+   * <li>2012-04-22 Hartmut support {@link #new_Type()}.
    * <li>2012-02-25 Hartmut chg {@link GuiCfgCurveLine#colorValue} = -1 initially to check whether it is given,
    *   see {@link GralCfgBuilder#buildWidget(GralCfgElement)}
    * <li>2011-06-00 Hartmut created: The old concept was evaluating ZBNF parse result of cfg file manually,
@@ -52,7 +52,7 @@ public final class GralCfgData
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120303;
+  public static final int version = 20120422;
   
   /**ZBNF: DataReplace::= <$?key> = <$-/\.?string> ;
    * Class for temporary instance to capture key and string. */
@@ -86,7 +86,8 @@ public final class GralCfgData
     /**From ZBNF-parser param::=<?> ...dropFiles = <""?name> etc. values are set if it is parsed. */
     public String dragFiles, dropFiles, dragText, dropText;
     
-    public GuiCfgColor colorName = null, color0 = null, color1 = null;
+    //public GuiCfgColor colorName = null; 
+    public GuiCfgColor color0 = null, color1 = null;
     
     /**From ZBNF-parser param::=<?> ...<?dragFiles> etc. boolean values are set if <?name> is parsed. */
     
@@ -95,7 +96,7 @@ public final class GralCfgData
       this.whatIs = whatIs;
     }
     
-    public GuiCfgColor new_colorName(){ return colorName = new GuiCfgColor(); }
+    public GuiCfgColor new_colorName(){ return color0 = new GuiCfgColor(); }
     
     public void set_colorName(GuiCfgColor value){}
     
@@ -114,7 +115,37 @@ public final class GralCfgData
       return clone;
     }
 
+    /**Sets all fields which are not determined by this instance from any other instance,
+     * especially from a type instance.
+     * @param src source for all values which are not determined in this yet.
+     */
+    public void setFromType(WidgetTypeBase src){
+      if(text ==null){ text = src.text; }
+      if(cmd ==null){ cmd = src.cmd; }
+      if(userAction ==null){ userAction = src.userAction; }
+      if(info ==null){ info = src.info; }
+      if(showMethod ==null){ showMethod = src.showMethod; }
+      if(prompt ==null){ prompt = src.prompt; }
+      if(promptPosition !=null){ promptPosition = src.promptPosition;}
+      if(dragFiles ==null){ dragFiles = src.dragFiles; }
+      if(dropFiles ==null){ dropFiles = src.dropFiles; }
+      if(dragText ==null){ dragText = src.dragText; }
+      //if(colorName ==null){ colorName = src.colorName; }
+      if(color0 ==null){ color0 = src.color0; }
+      if(color1 ==null){ color1 = src.color1; }
+    }
+    
+    
   }//class WidgetTypeBase
+  
+  
+  /**ZBNF: Text::= ... ;
+   * Class for instance to capture and store the Table data. */
+  public final static class GuiCfgType extends WidgetTypeBase implements Cloneable
+  {
+    public String typeName;
+    public GuiCfgType(){ super(null, '*'); }
+  }
   
   
   /**ZBNF: Text::= ... ;
@@ -122,7 +153,11 @@ public final class GralCfgData
   public final static class GuiCfgText extends WidgetTypeBase implements Cloneable
   {
     public String size = "B";
+    public int colorValue;
     public GuiCfgText(GralCfgElement itsElement){ super(itsElement, 'S'); }
+    public void XXXset_colorValue(int value){
+      //colorName = 
+    }
   }
   
   
@@ -301,7 +336,7 @@ public final class GralCfgData
   /**Map of replacements of paths to data. Filled from ZBNF: DataReplace::= <$?key> = <$-/\.?string> */
   public final Map<String, String> dataReplace = new TreeMap<String,String>();
 
-  
+  Map<String, WidgetTypeBase> idxTypes = new TreeMap <String, WidgetTypeBase>();
   
   
   /**TODO widgets sorted to panels and tabs!
@@ -312,7 +347,7 @@ public final class GralCfgData
   GralCfgPanel actPanel;
   
   /**Map of replacements of paths to data. Filled from ZBNF: DataReplace::= <$?key> = <$-/\.?string> */
-  public final Map<String, GralCfgPanel> idxPanels = new TreeMap<String,GralCfgPanel>();
+  private final Map<String, GralCfgPanel> idxPanels = new TreeMap<String,GralCfgPanel>();
 
   
   public GralCfgData()
@@ -320,6 +355,8 @@ public final class GralCfgData
     
   }
   
+  
+  public Set<Map.Entry<String, GralCfgPanel>> getPanels(){return idxPanels.entrySet(); } 
   
   /**ZBNF: size( <#?ySize> , <#?xSize> ) */
   public void set_ySize(int value)
@@ -343,7 +380,7 @@ public final class GralCfgData
   } 
   
   
-  /**ZBNF: DataReplace: < Element> */
+  /**ZBNF: DataReplace: < ?Element >[ | | ] */
   public GralCfgElement new_Element()
   { 
     if(newGuiElement == null){ newGuiElement = new GralCfgElement(this); }
@@ -366,7 +403,19 @@ public final class GralCfgData
     //NOTE: the newGuiElement will be returned to fill in in new_Element()
   }
   
+  /**ZBNF: Type::= typeName ( param ); */
+  public GralCfgData.GuiCfgType new_Type()
+  { GralCfgData.GuiCfgType widgt = new GralCfgData.GuiCfgType();
+    return widgt;
+  }
+
   
+  /**ZBNF: Type::= typeName ( param ); */
+  public void add_Type(GralCfgData.GuiCfgType data){  
+    idxTypes.put(data.typeName, data);
+  }
+  
+
   
   /**From ZBNF: DataReplace: < DataReplace> */
   public void set_Element(GralCfgElement value)
@@ -378,7 +427,7 @@ public final class GralCfgData
         actPanel = new GralCfgPanel("$");
       }
       sPanel = actPanel.name;
-      value.position.panel = sPanel;
+      value.setPanel(sPanel);
     } else { //a panel is given.
       actPanel = idxPanels.get(sPanel); 
       if(actPanel == null){ //first time use that:
@@ -395,7 +444,7 @@ public final class GralCfgData
   
   
   
-  void processConfiguration(final GralMngBuild_ifc panel)
+  void XXXprocessConfiguration(final GralMngBuild_ifc panel)
   {
     
   }

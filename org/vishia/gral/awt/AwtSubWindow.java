@@ -95,6 +95,10 @@ public class AwtSubWindow extends GralWindow
     // TODO Auto-generated method stub
     
   }
+  
+  
+  @Override public void setFullScreen(boolean full){ } //TODO window.setFullScreen(full); }
+
 
   @Override
   public boolean setFocus()

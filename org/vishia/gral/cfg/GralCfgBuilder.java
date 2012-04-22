@@ -4,13 +4,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.cfg.GralCfgElement;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
+import org.vishia.gral.ifc.GralPoint;
 import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
@@ -92,7 +96,10 @@ public class GralCfgBuilder
   {
     String sError = null;
     gralMng.addDataReplace(cfgData.dataReplace);
-    for(Map.Entry<String, GralCfgPanel> panelEntry: cfgData.idxPanels.entrySet()){
+    
+    Set<Map.Entry<String, GralCfgPanel>> setIdxPanels = cfgData.getPanels();
+     
+    for(Map.Entry<String, GralCfgPanel> panelEntry: setIdxPanels){  //cfgData.idxPanels.entrySet()){
       GralCfgPanel panel = panelEntry.getValue();
       String sErrorPanel = buildPanel(panel);  
       if(sErrorPanel !=null){
@@ -101,6 +108,8 @@ public class GralCfgBuilder
         }
         if(sError == null){ sError = sErrorPanel; }
         else { sError += "\n" + sErrorPanel; }
+      } else {
+        stop();
       }
     }
     
@@ -137,95 +146,16 @@ public class GralCfgBuilder
   public String buildWidget(GralCfgElement cfge)
   {
     String sError = null;
-    GralCfgPosition prevPos = cfge.previous !=null ? cfge.previous.position : cfge.positionInput;
-    GralCfgPosition pos = cfge.position;
-    GralCfgPosition inp = cfge.positionInput;
-    if(cfge.widgetType.text !=null && cfge.widgetType.text.equals("wd:yCos"))
-      stop();
-
-    pos.xIncr_ = inp.xIncr_ || (!inp.yIncr_ && prevPos.xIncr_);  //inherit xIncr but not if yIncr. 
-    pos.yIncr_ = inp.yIncr_ || (!inp.xIncr_ && prevPos.yIncr_);
-    final char dirNext;
-    if(inp.yIncr_){ dirNext = 'd';}
-    else if(inp.xIncr_){ dirNext = 'r';}
-    else { dirNext = '.'; }
-    //yPos
-    if(inp.yPosFrac !=0){
-      stop();
-    }
-    if(inp.yPos >=0){
-      pos.yPos = inp.yPos;
-      pos.yPosFrac = inp.yPosFrac;
-    } else if(pos.yIncr_){ //position = previous + heigth/width
-      int yPosAdd = 0;  
-      if(prevPos.ySizeDown >=0){ //positive if yPos is on top of widget.
-        pos.yPosFrac = prevPos.yPosFrac + prevPos.ySizeFrac;  //frac part from pos + size
-        if(pos.yPosFrac >=1){ yPosAdd = 1; pos.yPosFrac -=1; } //overflow detection >1
-      } else { //negative if yPos is the bottom line.
-        pos.yPosFrac = prevPos.yPosFrac - prevPos.ySizeFrac;  //ySizeFrac is a positiv number always.
-        if(pos.yPosFrac <=0){ yPosAdd = -1; pos.yPosFrac +=1; }
+    cfge.setPos(gralMng);
+    if(cfge.widgetType.type !=null){
+      GralCfgData.WidgetTypeBase typeData = cfgData.idxTypes.get(cfge.widgetType.type);
+      if(typeData == null){
+        throw new IllegalArgumentException("GralCfgBuilder.buildWidget - unknown type; " + cfge.widgetType.type + "; in " + cfge.content); 
+      } else {
+        cfge.widgetType.setFromType(typeData);
       }
-      pos.yPos = prevPos.yPos + prevPos.ySizeDown + yPosAdd;
-    } else { //!prevPos.Incr: use the previous position
-      pos.yPos = prevPos.yPos;
-      pos.yPosFrac = prevPos.yPosFrac;
     }
-    //xPos
-    if(inp.xPos >=0){
-      pos.xPos = inp.xPos;
-      pos.xPosFrac = inp.xPosFrac;
-    } else if(pos.xIncr_ || (inp.yPos < 0 && ! pos.yIncr_)){ //if same x and y but no increment, then default increment x 
-      //position = previous + width
-      int xPosAdd = 0;  
-      if(prevPos.xWidth >=0){ //positive if yPos is on top of widget.
-        pos.xPosFrac = prevPos.xPosFrac + prevPos.xSizeFrac;
-        if(pos.xPosFrac >=1){ xPosAdd = 1; pos.xPosFrac -=1; }
-      } else { //negative if yPos is the bottom line.
-        pos.xPosFrac = prevPos.xPosFrac - prevPos.xSizeFrac;  //ySizeFrac is a positiv number always.
-        if(pos.xPosFrac <=0){ xPosAdd = -1; pos.xPosFrac +=1; }
-      }
-      pos.xPos = prevPos.xPos + prevPos.xWidth + xPosAdd;
-    } else { //!prevPos.Incr: use the previous position
-      pos.xPos = prevPos.xPos;
-      pos.xPosFrac = prevPos.xPosFrac;
-    }
-    //ySizeDown, xWidth
-    if(inp.ySizeFrac !=0 && inp.ySizeDown == -3){
-      stop();
-    }
-    if(inp.ySizeDown !=0){ //ySize is given here.
-      pos.ySizeDown = inp.ySizeDown;
-      pos.ySizeFrac = inp.ySizeFrac;
-    } else { //use ySize from previous.
-      pos.ySizeDown = prevPos.ySizeDown;
-      pos.ySizeFrac = prevPos.ySizeFrac;
-    }
-    if(inp.xWidth !=0){ //xWidth is given here
-      pos.xWidth = inp.xWidth;
-      pos.xSizeFrac = inp.xSizeFrac;
-    } else { //use xWidth from previous
-      pos.xWidth = prevPos.xWidth;
-      pos.xSizeFrac = prevPos.xSizeFrac;
-    }
-    //
-    pos.panel = inp.panel !=null ? inp.panel : prevPos.panel;
-    //
-    if(pos.xWidth == Integer.MAX_VALUE)
-      stop();
-    if(pos.yPos == 4 && pos.xPos == 56){
-      stop();
-    }
- 
-    final int heightArg;
-    if(pos.ySizeDown == Integer.MAX_VALUE){ heightArg = GralPos.useNatSize; }
-    else if(pos.ySizeDown < 0 && pos.ySizeFrac !=0) { 
-      heightArg = pos.ySizeDown -1 + GralPos.size;    //forex -3.5 means really 3.5 to up, use -4, 5 
-    } else {heightArg = pos.ySizeDown + GralPos.size; }
-    
-    int widthArg = pos.xWidth == Integer.MAX_VALUE ? GralPos.useNatSize : pos.xWidth + GralPos.size;
-    gralMng.setFinePosition(pos.yPos, pos.yPosFrac, heightArg, pos.ySizeFrac
-        , pos.xPos, pos.xPosFrac, widthArg, pos.xSizeFrac, 1, dirNext, 0, 0, null);
-    //
+      //
     GralWidget widgd = null;
     String sName = cfge.widgetType.name;
     if(sName ==null && cfge.widgetType.text !=null ){ sName = cfge.widgetType.text; }  //text of button etc.
@@ -274,9 +204,9 @@ public class GralCfgBuilder
       GralCfgData.GuiCfgText wText = (GralCfgData.GuiCfgText)cfge.widgetType;
       final int colorValue;
       if(wText.color0 !=null){ colorValue = gralMng.getColorValue(wText.color0.color); }
-      else if(wText.colorName !=null){ colorValue = gralMng.getColorValue(wText.colorName.color);}
+      //else if(wText.colorName !=null){ colorValue = gralMng.getColorValue(wText.colorName.color);}
       else{ colorValue = 0; } //black
-      cfge.widgetType.colorName = null;  //it is used, don't set background.
+      cfge.widgetType.color0 = null;  //it is used, don't set background.
       widgd = gralMng.addText(cfge.widgetType.text, wText.size.charAt(0), colorValue);
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgLed){
       GralCfgData.GuiCfgLed ww = (GralCfgData.GuiCfgLed)cfge.widgetType;
@@ -314,8 +244,8 @@ public class GralCfgBuilder
       for(GralCfgData.GuiCfgCurveLine line: widgt.lines){
         String sDataPathLine = line.name;
         final GralColor colorLine;
-        if(line.colorName !=null){
-          colorLine = GralColor.getColor(line.colorName.color);
+        if(line.color0 !=null){
+          colorLine = GralColor.getColor(line.color0.color);
         } else {
           colorLine = GralColor.getColor(line.colorValue);  //maybe 0 = black if not given.
         }
@@ -327,6 +257,15 @@ public class GralCfgBuilder
         case 'T':{
           widgd = gralMng.addTextField(sName, true, cfge.widgetType.prompt, cfge.widgetType.promptPosition);
           widgd.setDataPath(sDataPath);
+        } break;
+        case 'I':{
+          GralCfgData.GuiCfgLine cfgLine = (GralCfgData.GuiCfgLine)cfge.widgetType;
+          //copy the points from the type GuiCfgCoord to GralPoint
+          List<GralPoint> points = new LinkedList<GralPoint>();
+          for(GralCfgData.GuiCfgCoord coord: cfgLine.coords){
+            points.add(new GralPoint(coord.x, coord.y));
+          }
+          gralMng.addLine(GralColor.getColor(cfgLine.color0.color), points);
         } break;
         default: {
           widgd = null;
@@ -346,6 +285,8 @@ public class GralCfgBuilder
           widgd.setActionShow(actionShow);
         }
       }
+      widgd.sCmd = cfge.widgetType.cmd;
+      /*
       String sCmd = cfge.widgetType.cmd;
       if(sCmd !=null){
         GralUserAction actionCmd = gralMng.getRegisteredUserAction(sCmd);
@@ -354,13 +295,13 @@ public class GralCfgBuilder
         } else {
           widgd.setActionChange(actionCmd);
         }
+      }*/
+      if(userAction !=null){
+        widgd.setActionChange(userAction);
       }
       String sFormat = cfge.widgetType.format;
       if(sFormat !=null){
          widgd.setFormat(sFormat);
-      }
-      if(cfge.widgetType.colorName != null){
-        widgd.setBackColor(GralColor.getColor(cfge.widgetType.colorName.color), 0);
       }
       if(cfge.widgetType.color0 != null){
         widgd.setBackColor(GralColor.getColor(cfge.widgetType.color0.color), 0);

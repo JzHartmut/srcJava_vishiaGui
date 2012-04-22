@@ -157,6 +157,11 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
   { return window.setFocus();
   }
 
+  
+  
+  @Override public void setFullScreen(boolean full){ window.setFullScreen(full); }
+
+  
   @Override public boolean isWindowsVisible(){ return window.isVisible(); }
 
 
@@ -349,7 +354,8 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
       }
     }
 
-    
+    @Override public void setFullScreen(boolean full){ window.setFullScreen(full); }
+
     @Override public void repaintGthread(){  window.redraw(); window.update(); }
 
     @Override public void closeWindow(){ window.close(); }

@@ -201,6 +201,9 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     return false;
   }
 
+  @Override public void setFullScreen(boolean full){ window.setFullScreen(full); }
+
+  
   @Override
   public GralColor setForegroundColor(GralColor color)
   {

@@ -195,7 +195,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * <li>@: A Tabbed Panel
    * <li>$: Any Panel (composite)
    * <li>+: A canvas panel
-	 * <li>
+	 * <li>*: A type (not a widget, common information) See {@link org.vishia.gral.cfg.GralCfgData#new_Type()}
 	 * </ul>
 	 * */
 	public char whatIs;
@@ -348,6 +348,11 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
     this.sDataPath = sDataPath;
     return sDataPathLast;
   }
+  
+  public String getCmd(){ return sCmd; }
+  
+  public void setCmd(String cmd){ sCmd = cmd; }
+  
   
   /**Gets the data path. It is a String in application context.
    */

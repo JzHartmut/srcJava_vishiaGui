@@ -233,7 +233,7 @@ public class ExampleSimpleButton
     LogMessage log = new LogMessageStream(System.out);
     //
     //create the window, use the factory.
-    GralWindow primaryWindow = graphicFactory.createWindow(log, "Example Simple Button", 50,50,400, 300);
+    GralWindow primaryWindow = graphicFactory.createWindow(log, "Example Simple Button", 'C', 50,50,400, 300);
     //
     //The widget manager is created with the primary window. Use it.
     GralWidgetMng gralMng = primaryWindow.gralMng;

@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.cmd.CmdGetFileArgs_ifc;
-import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
 import org.vishia.commander.target.FcmdtTarget;
 import org.vishia.commander.target.FcmdtTarget_ifc;
@@ -19,9 +18,7 @@ import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
-import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.GralCommandSelector;
@@ -63,10 +60,11 @@ public class Fcmd extends GuiCfg
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
+  @SuppressWarnings("hiding")
   public static final int version = 20120312;
 
   /**Version visible in about info */
-  public static final String sVersion = "Version 1.01 - 2012-03-12";
+  public static final String sVersion = "Version 1.02 - 2012-04-17";
   
   static class CallingArgs extends GuiCallingArgs
   {
@@ -134,12 +132,6 @@ public class Fcmd extends GuiCfg
   final FileRemote[] selectedFiles123 = new FileRemote[3];
   
   
-  /**The last selected File card. It may be in the same panel (left/mid/right)
-   * 
-   */
-  List<FcmdFileCard> XXXlastFileCards = new LinkedList<FcmdFileCard>();
-
-  
   /**The last selected file panels in its order of selection. The panel knows the last used file card there. 
    * The selected file1, file2 are anytime in one and the other panel. */
   List<FcmdLeftMidRightPanel> lastFilePanels = new LinkedList<FcmdLeftMidRightPanel>();
@@ -149,14 +141,7 @@ public class Fcmd extends GuiCfg
   FcmdFavorCard lastFavorCard;
   
 
-  /**
-   * @deprecated
-   */
-  GralFileSelector[] lastFocusedFileTables = new GralFileSelector[3];
-  
   final Map<String, GralFileSelector> idxFileSelector = new TreeMap<String, GralFileSelector>();
-  // { new TreeMap<String, FileSelector>(), new TreeMap<String, FileSelector>(),
-  // new TreeMap<String, FileSelector>()};
 
   
   FcmdtTarget_ifc target;
@@ -203,23 +188,23 @@ public class Fcmd extends GuiCfg
     // Creates tab-Panels for the file lists and command lists.
     gralMng.selectPanel("primaryWindow");
     favorPathSelector.panelLeft.tabbedPanelFileCards = gralMng.addTabbedPanel("File0Tab", null, GralMngBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(1, 1, 1, 1, favorPathSelector.panelLeft.tabbedPanelFileCards); // dialogPanel);
+    gui.addFrameArea("A1A1", favorPathSelector.panelLeft.tabbedPanelFileCards); // dialogPanel);
 
     favorPathSelector.panelLeft.buildInitialTabs();
     gralMng.selectPanel("primaryWindow");
     favorPathSelector.panelMid.tabbedPanelFileCards = gralMng.addTabbedPanel("File1Tab", null, GralMngBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(2, 1, 1, 1, favorPathSelector.panelMid.tabbedPanelFileCards); // dialogPanel);
+    gui.addFrameArea("B1B1", favorPathSelector.panelMid.tabbedPanelFileCards); // dialogPanel);
     favorPathSelector.panelMid.buildInitialTabs();
 
     gralMng.selectPanel("primaryWindow");
     favorPathSelector.panelRight.tabbedPanelFileCards = gralMng.addTabbedPanel("File2Tab", null, GralMngBuild_ifc.propZoomedPanel);
-    gui.addFrameArea(3, 1, 1, 1, favorPathSelector.panelRight.tabbedPanelFileCards); // dialogPanel);
+    gui.addFrameArea("C1C1", favorPathSelector.panelRight.tabbedPanelFileCards); // dialogPanel);
     favorPathSelector.panelRight.buildInitialTabs();
 
     gralMng.selectPanel("primaryWindow");
     panelButtons = gralMng.createGridPanel("Buttons", gralMng.getColor("gr"),
         1, 1, 10, 10);
-    gui.addFrameArea(1, 3, 3, 1, panelButtons); // dialogPanel);
+    gui.addFrameArea("A3C3", panelButtons); // dialogPanel);
     fButtons.initPanelButtons();
 
     filesCp.buildGraphic();
@@ -336,57 +321,6 @@ public class Fcmd extends GuiCfg
   
   
 
-  /**Routine to prepare up to 3 files, which were simple selected at last in the
-   * panels. The order of focused file-panel-tables is used for that. The
-   * currently selected file in any of the tables in order of last gotten focus
-   * is used to get the files. It is the input for some command invocations.
-   * @deprecated use {@link #lastFileCards} or {@link #getLastSelectedFiles()} instead.
-   * @return Array of files in order of last focus
-   */
-  FileRemote[] getCurrentFileInLastPanels()
-  { findLastFocusedFileTables();
-    FileRemote file[] = new FileRemote[3];
-    int ixFile = -1;
-    for(GralFileSelector fileTable: lastFocusedFileTables){
-      if(fileTable !=null){
-        FileRemote fileItem = fileTable.getSelectedFile();
-        if(fileItem !=null){
-          file[++ixFile] = fileItem;
-        }
-      }
-    }
-    return file;
-  }
-
-
-  /**Routine to find out the last focused file tables in order of focus.
-   * 
-   * @set lastFocusedFileTables
-   * @deprecated
-   */
-  void findLastFocusedFileTables(){
-    int ixFile = 0;
-    List<GralWidget> widgdFocus = gralMng.getWidgetsInFocus();
-    synchronized (widgdFocus) {
-      Iterator<GralWidget> iterFocus = widgdFocus.iterator();
-      while (ixFile < lastFocusedFileTables.length && iterFocus.hasNext()) {
-        GralWidget widgd = iterFocus.next();
-        GralFileSelector fileSel = idxFileSelector.get(widgd.name);
-        if (fileSel != null) { // is a FileSelector focused yet?
-          // if(widgd.name.startsWith("file")){
-          // int ixFilePanel = widgd.name.charAt(4) - '0';
-          // assert(ixFilePanel >=0 && ixFilePanel < fileSelector.length);
-          // //only such names are registered.
-          // FileSelector fileSel = fileSelector[ixFilePanel];
-          lastFocusedFileTables[ixFile++] = fileSel;
-        }
-      }
-    }
-  }
-  
-  
-  
-  
   /**Get the last selected files in order of selection of the file panels.
    * New method since 2011-12-23
    * @return array[3] of the last selected files in the file panels. It has always a length of 3

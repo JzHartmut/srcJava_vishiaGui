@@ -478,6 +478,20 @@ public interface GralMngBuild_ifc
   void addLine(int colorValue, float xa, float ya, float xe, float ye);
     
   
+  /**Adds a line.
+   * <br><br>To adding a line is only possible if the current panel is of type 
+   * {@link SwtCanvasStorePanel}. This class stores the line coordinates and conditions 
+   * and draws it as background if drawing is invoked.
+   * 
+   * @param color
+   * @param points
+   */
+  void addLine(GralColor color, List<GralPoint> points);
+      
+    
+
+    
+  
   /** Adds a field for editing or showing a text. This text can be prepared especially as number value too.
    * The field has one line. The number of chars are not limited. 
    * <br><br>

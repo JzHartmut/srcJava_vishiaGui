@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWidget;
@@ -16,7 +17,7 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
 {
 
   /**Version history:
-   * <ul>
+   * <ul>2012-04-22 Hartmut new: {@link #canvas} as property maybe null for each panel to support stored graphics.
    * <li>2012-03-31 Hartmut new: {@link #implMethodPanel_} and {@link MethodsCalledbackFromImplementation#setVisible(boolean)}.
    * <li>2012-01-14 Hartmut new: {@link #setPrimaryWidget(GralWidget)} for panel focus.
    * <li>2012-01-08 Hartmut new: {@link #remove()}
@@ -50,7 +51,7 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
    * 
    */
   @SuppressWarnings("hiding")
-  public final static int version = 0x20111119;
+  public final static int version = 20120422;
 
   public final String namePanel;
 
@@ -89,7 +90,9 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
   protected boolean bGridZoomed;
   
   
-  
+  /**If this instance is not null, the content of that should be paint in the paint routine
+   * of the implementation graphic. */
+  public GralCanvasStorage canvas;
 
   
 	public GralPanelContent(String namePanel, GralWidgetMng mng, Object panelComposite)

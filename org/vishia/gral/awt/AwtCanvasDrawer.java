@@ -33,6 +33,7 @@ public class AwtCanvasDrawer implements GralCanvas_ifc
   {
     graphicContext.setColor(widgMng.getColorImpl(color));
     graphicContext.drawLine(x1, y1, x2, y2);
+    //graphicContext.drawPolyline(null, null, y2);
     
   }
 

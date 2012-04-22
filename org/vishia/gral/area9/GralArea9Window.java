@@ -30,6 +30,7 @@ public class GralArea9Window implements GralArea9_ifc
   
   /**Version and History
    * <ul>
+   * <li>2012-04-22 Hartmut new: {@link #setFullScreen(boolean)}
    * <li>2011-12-26 Hartmut chg: The help window is a html info box now. New method {@link #setHelpUrl(String)}
    *   supports context sensitive help.
    * <li>2011-11-12 Hartmut new: The SubWindow for Help, About, InfoBox and InfoLog are created here (InfoLog: TODO).
@@ -223,7 +224,7 @@ public class GralArea9Window implements GralArea9_ifc
   };
 
   
-
+  @Override public void setFullScreen(boolean full){ window.setFullScreen(full); }
   
   @Override public MainCmd_ifc getMainCmd(){ return mainCmd; }
   

@@ -1,5 +1,6 @@
 package org.vishia.gral.ifc;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
@@ -16,6 +17,7 @@ public class GralCanvasStorage implements GralCanvas_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2012-04-22 new {@link #drawLine(GralPos, GralColor, List)}, improved {@link PaintOrder}-derivates.
    * <li>2011-06-00 Hartmut created
    * </ul>
    * 
@@ -42,31 +44,68 @@ public class GralCanvasStorage implements GralCanvas_ifc
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120303;
+  public static final int version = 20120422;
 
 	/**Data class to store an order.
 	 */
 	public static class PaintOrder
 	{
-		PaintOrder(int paintWhat, int x1, int y1, int x2, int y2, GralColor color) {
-			super();
-			this.paintWhat = paintWhat;
-			this.x1 = x1;
-			this.y1 = y1;
-			this.x2 = x2;
-			this.y2 = y2;
-			this.color = color;
-		}
-
-		/**One of the static int of this class. Determines what to paint. */
+		/**One of the static int of this class. Determines what to paint. 
+		 * See {@link GralCanvasStorage#paintLine}, {@link GralCanvasStorage#paintImage}, 
+		 * */
 		public final int paintWhat;
 		
 		/**Coordinates. */
 		public final int x1,y1,x2,y2;
 		
+		public final GralPos pos;
+		
 		public final GralColor color;
+
+		/**The implementation data are graphic-platform-specific. It may be prepared data for a defined
+		 * size appearance to support fast redrawing. */
+		private Object implData;
+		
+		public Object getImplData() { return implData; }
+
+    public void setImplData(Object implData) { this.implData = implData; }
+
+    PaintOrder(int paintWhat, int x1, int y1, int x2, int y2, GralColor color) {
+      this.paintWhat = paintWhat;
+      this.x1 = x1;
+      this.y1 = y1;
+      this.x2 = x2;
+      this.y2 = y2;
+      this.color = color;
+      this.pos = null;
+    }
+
+    PaintOrder(int paintWhat, GralPos pos, GralColor color) {
+      this.paintWhat = paintWhat;
+      this.pos = pos.clone();
+      this.x1 = -1;
+      this.y1 = -1;
+      this.x2 = -1;
+      this.y2 = -1;
+      this.color = color;
+    }
+
 	}//class PaintOrder
 
+	
+	public static class PolyLine extends PaintOrder
+	{
+	  public final List<GralPoint> points;
+	  
+	  public boolean bPointsAreGralPosUnits = true;
+	  
+	  PolyLine(GralPos pos, GralColor color, List<GralPoint> points){
+	    super(paintPolyline, pos, color);
+	    this.points = points;
+	  }
+	}
+	
+	
 	
 	public static class PaintOrderImage extends PaintOrder
 	{
@@ -82,6 +121,8 @@ public class GralCanvasStorage implements GralCanvas_ifc
 	
 	public final static int paintLine = 0xee, paintImage = 0x1ae;
 	
+	public final static int paintPolyline = 'y';
+	
 	/**List of all orders to paint in {@link #drawBackground(GC, int, int, int, int)}.
 	 * 
 	 */
@@ -89,19 +130,29 @@ public class GralCanvasStorage implements GralCanvas_ifc
 	
 	
 	
-	/**Accepts a order to draw a line. The coordinates are stored only. 
-	 * This method can be called in any thread. It is thread-safe.
-	 * @param color
-	 * @param x1 TODO yet it is pixel coordinates, use GralGrid coordinates.
-	 * @param y1
-	 * @param x2
-	 * @param y2
-	 */
-	public void drawLine(GralColor color, int x1, int y1, int x2, int y2){
-		PaintOrder order = new PaintOrder(paintLine, x1,y1,x2,y2, color);
-		paintOrders.add(order);  //paint it when drawBackground is invoked.
-	}
-	
+  /**Accepts a order to draw a line. The coordinates are stored only. 
+   * This method can be called in any thread. It is thread-safe.
+   * @param color
+   * @param x1 TODO yet it is pixel coordinates, use GralGrid coordinates.
+   * @param y1
+   * @param x2
+   * @param y2
+   */
+  public void drawLine(GralColor color, int x1, int y1, int x2, int y2){
+    PaintOrder order = new PaintOrder(paintLine, x1,y1,x2,y2, color);
+    paintOrders.add(order);  //paint it when drawBackground is invoked.
+  }
+  
+
+  /**Accepts a order to draw a line. The coordinates are stored only. 
+   * This method can be called in any thread. It is thread-safe.
+   * @param color
+   */
+  public void drawLine(GralPos pos, GralColor color, List<GralPoint> points){
+    PaintOrder order = new PolyLine(pos, color, points);
+    paintOrders.add(order);  //paint it when drawBackground is invoked.
+  }
+  
 
 	public void drawImage(GralImageBase image, int x, int y, int dx, int dy, GralRectangle imagePixelSize)
 	{

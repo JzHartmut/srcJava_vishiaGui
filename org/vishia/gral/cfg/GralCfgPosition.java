@@ -52,12 +52,33 @@ public final class GralCfgPosition implements Cloneable
   public void set_xOwnSize(){ xWidth = Integer.MAX_VALUE; }
   public void set_yOwnSize(){ ySizeDown = Integer.MAX_VALUE; }
   
-  protected GralCfgPosition clone()
+  @Override protected GralCfgPosition clone()
   { GralCfgPosition clone = null;
     try{ clone = (GralCfgPosition)super.clone(); } 
     catch(CloneNotSupportedException exc){ assert(false); }
     return clone;
   }
+  
+  /**Sets all data from src. It is similar as {@link #clone()} but it uses a given instance.
+   * @param src of data
+   */
+  public void set(GralCfgPosition src){
+    panel = src.panel;
+    yPosRelative = src.yPosRelative;
+    yPos = src.yPos;
+    yPosFrac = src.yPosFrac;
+    ySizeDown = src.ySizeDown;
+    ySizeFrac = src.ySizeFrac;
+    yIncr_ = src.yIncr_;
+    xPosRelative = src.xPosRelative;
+    xPos = src.xPos;
+    xPosFrac = src.xPosFrac;
+    xWidth = src.xWidth;
+    xSizeFrac = src.xSizeFrac;
+    xIncr_ = src.yIncr_;
+    
+  }
+  
   
   /**Sets a position element. It is able to call from a configuration input or gui input.
    * @param what use y, x, h, w for pos-y, pos-x, height, width. All other chars causes an IllegalArgumentException.

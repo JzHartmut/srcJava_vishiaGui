@@ -954,39 +954,6 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
 }
 
   
-  /**Adds a line.
-   * <br><br>To adding a line is only possible if the current panel is of type 
-   * {@link SwtCanvasStorePanel}. This class stores the line coordinates and conditions 
-   * and draws it as background if drawing is invoked.
-   * 
-   * @param colorValue The value for color, 0xffffff is white, 0xff0000 is red.
-   * @param xa start of line relative to current position in grid units.
-   *          The start is relative to the given position! Not absolute in window! 
-   * @param ya start of line relative to current position in grid units.
-   * @param xe end of line relative to current position in grid units.
-   * @param ye end of line relative to current position in grid units.
-   */
-  public void addLine(int colorValue, float xa, float ya, float xe, float ye){
-  	if(pos.panel.getPanelImpl() instanceof SwtCanvasStorePanel){
-  		GralColor color = propertiesGui.color(colorValue);
-  		int xgrid = propertiesGui.xPixelUnit();
-  		int ygrid = propertiesGui.yPixelUnit();
-  		int x1 = (int)((pos.x.p1 + xa) * xgrid);
-  		int y1 = (int)((pos.y.p1 - ya) * ygrid);
-  		int x2 = (int)((pos.x.p1 + xe) * xgrid);
-  		int y2 = (int)((pos.y.p1 - ye) * ygrid);
-  		//Any panel which is created in the SWT-implementation is a CanvasStorePanel.
-  		//This is because lines should be drawn.
-  		((SwtCanvasStorePanel) pos.panel.getPanelImpl()).store.drawLine(color, x1, y1, x2, y2);
-  		//furtherSetPosition((int)(xe + 0.99F), (int)(ye + 0.99F));
-  	} else {
-  		log.sendMsg(0, "GuiPanelMng:addLine: panel is not a CanvasStorePanel");
-    }
-  }
-  
-  
-  
-  
   /* (non-Javadoc)
    * @see org.vishia.mainGui.GuiPanelMngIfc#addImage(java.lang.String, int, int, java.lang.String, java.lang.String, java.lang.String)
    */
@@ -1002,7 +969,7 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
     if(pos.panel instanceof SwtCanvasStorePanel){
       SwtCanvasStorePanel canvas = (SwtCanvasStorePanel) pos.panel;
       //coordinates are in pixel
-      canvas.store.drawImage(imageGui, rr.x, rr.y, rr.dx, rr.dy, size);
+      canvas.canvas.drawImage(imageGui, rr.x, rr.y, rr.dx, rr.dy, size);
     }
     return null;
   }

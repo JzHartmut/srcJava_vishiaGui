@@ -1,13 +1,13 @@
 package org.vishia.gral.ifc;
 
-/**A GralRectangle is a commonly use-able data class to hold any x,y and size values in integer. 
- * It is used for some return data, often it is pixel units.
- * <br><br>
- * See {@link GralPoint}.
+/**A GralPoint contains 2 or 3 float values for a point.
+ * The unit of float is 1 grid unit like {@link GralPos}. It means, a figure described with this points
+ * is shown in the correct size. Fractional parts of float determines fine positions.
+ * The third dimension can be used for 3-dimensional figures.
  * @author Hartmut Schorrig
  *
  */
-public class GralRectangle
+public class GralPoint
 {
   /**Version, history and license.
    * <ul>
@@ -37,15 +37,21 @@ public class GralRectangle
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120303;
+  public static final int version = 20120422;
 
-  public int x,y,dx,dy;
+  public final float x,y,z;
 
-  public GralRectangle(int x, int y, int dx, int dy)
-  { this.x = x; this.y = y; this.dx = dx; this.dy = dy;
+  public GralPoint(float x, float y)
+  { this.x = x; this.y = y; this.z = Float.NaN;
+  }
+  
+  public GralPoint(float x, float y, float z)
+  { this.x = x; this.y = y; this.z = z;
   }
   
   @Override public String toString(){
-    return "GralRectangle(" + x + " + " + dx + ", " + y + " + " + dy + ")";
+    if(z == Float.NaN) return "Point(" + x + ":" + y + ")";
+    else return "Point(" + x + ":" + y  + ":" + z + ")";
   }
+  
 }

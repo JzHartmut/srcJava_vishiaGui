@@ -12,8 +12,8 @@ public class AwtGraphicThread extends GralGraphicThread
   final String sTitle; final int xPos, yPos, xSize, ySize;
   
   
-  AwtGraphicThread(String sTitle, int left, int top, int xSize, int ySize)
-  { super();
+  AwtGraphicThread(String sTitle, char sizeShow, int left, int top, int xSize, int ySize)
+  { super(sizeShow);
     this.sTitle = sTitle; this.xPos = left; this.yPos = top; this.xSize = xSize; this.ySize = ySize; 
     threadGuiDispatch.start();
     

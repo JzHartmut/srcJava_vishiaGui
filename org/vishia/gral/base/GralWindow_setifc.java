@@ -2,8 +2,10 @@ package org.vishia.gral.base;
 
 public interface GralWindow_setifc
 {
-  /**Version, history and licence
-   * 
+  /**Version, history and license.
+   * <ul>2012-04-22 Hartmut new {@link #setFullScreen(boolean)}.
+   * <li>2012-01-00 Hartmut created.
+   * </ul>
    * <b>Copyright/Copyleft</b>:
    * For this source the LGPL Lesser General Public License,
    * published by the Free Software Foundation is valid.
@@ -22,7 +24,7 @@ public interface GralWindow_setifc
    *    modified sources likewise under this LGPL Lesser General Public License.
    *    You mustn't delete this Copyright/Copyleft inscription in this source file.
    * </ol>
-   * If you are indent to use this sources without publishing its usage, you can get
+   * If you are intent to use this sources without publishing its usage, you can get
    * a second license subscribing a special contract with the author. 
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
@@ -39,6 +41,8 @@ public interface GralWindow_setifc
    * @return
    */
   void setWindowVisible(boolean visible);
+
+  void setFullScreen(boolean full);
 
   void repaintGthread();
   

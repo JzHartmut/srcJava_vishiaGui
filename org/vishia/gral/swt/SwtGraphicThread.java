@@ -193,8 +193,8 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
   
   final String sTitle; final int xPos, yPos, xSize, ySize;
   
-  SwtGraphicThread(String sTitle, int left, int top, int xSize, int ySize, LogMessage log)
-  { super();
+  SwtGraphicThread(String sTitle, char sizeShow, int left, int top, int xSize, int ySize, LogMessage log)
+  { super(sizeShow);
     this.log = log;
     this.sTitle = sTitle; this.xPos = left; this.yPos = top; this.xSize = xSize; this.ySize = ySize; 
     threadGuiDispatch.start();
@@ -237,7 +237,7 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
 
     
     //The propertiesGuiSwt needs the Display instance for Font and Color. Therefore the graphic thread with creation of Display should be executed before. 
-    SwtProperties propertiesGui = new SwtProperties(this.displaySwt, 'C');
+    SwtProperties propertiesGui = new SwtProperties(this.displaySwt, sizeCharProperties);
     gralMng = new SwtMng(this, propertiesGui, null, log);
     
     //The PrimaryWindowSwt is a derivation of the GralPrimaryWindow. It is more as only a SWT Shell.

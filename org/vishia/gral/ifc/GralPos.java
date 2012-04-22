@@ -1,5 +1,6 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.bridgeC.IllegalArgumentExceptionJc;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralPanelContent;
@@ -447,6 +448,12 @@ public class GralPos implements Cloneable
       , GralPos parent)
   {
     //
+    if(yPosFrac < 0 || yPosFrac >9){
+      throw new IllegalArgumentExceptionJc("GralPos - yPosFrac error", yPosFrac);
+    }
+    if(xPosFrac < 0 || xPosFrac >9) {
+      throw new IllegalArgumentExceptionJc("GralPos - xPosFrac error", xPosFrac);
+    }
     //
     if(ye == (size -1) && yef == 5)
       stop();
@@ -573,7 +580,7 @@ public class GralPos implements Cloneable
   
   
   
-  public GralPos clone(){
+  @Override public GralPos clone(){
     //Hint: Object.clone() can't be used because it clones the references of x and y and not its values. 
     GralPos newObj = new GralPos();
     newObj.x.set(x);
@@ -860,8 +867,12 @@ public class GralPos implements Cloneable
           q2 = z2; q2Frac = z2Frac;
       }
       
-      assert(q1 < q2 || q2 <=0);
-      assert(q1 > -1000 && q1 < 1000 && ((q2 > -1000 && q2 < 1000) || ((q2 - useNatSize) >=0 && (q2 - useNatSize) < 8192)));
+      if(!(q1 <= q2 || q2 <=0)){
+        throw new IllegalArgumentException("start > end " + q1 + " > " + q2);
+      }
+      if(!(q1 > -1000 && q1 < 1000 && ((q2 > -1000 && q2 < 1000) || ((q2 - useNatSize) >=0 && (q2 - useNatSize) < 8192)))){
+        throw new IllegalArgumentException("positions out of range" + q1 + ", " + q2);
+      }
       if(q1Frac >= 10){
         this.p1 = q1 +1; this.p1Frac = q1Frac -10;
       } else if(q1Frac < 0){
@@ -876,7 +887,9 @@ public class GralPos implements Cloneable
       } else {
         this.p2 = q2; this.p2Frac = q2Frac;   
       }
-      assert(p1Frac >=0 && p1Frac <=9 && p2Frac >=0 && p2Frac <=9 );
+      if(!(p1Frac >=0 && p1Frac <=9 && p2Frac >=0 && p2Frac <=9 )){
+        throw new IllegalArgumentException("Fractional position failure: " + p1Frac + ", " + p2Frac);
+      }
       return this;
     }//set
 
@@ -884,7 +897,7 @@ public class GralPos implements Cloneable
     /**Copies all values. Hint: clone isn't able to use because the instance in parent is final.
      * @param src
      */
-    private void set(Coordinate src){
+    void set(Coordinate src){
       p1 = src.p1; p1Frac = src.p1Frac; p2 = src.p2; p2Frac = src.p2Frac;
       pb = src.pb; pbf = src.pbf; attr = src.attr; origin = src.origin; dirNext = src.dirNext;
       sepLine = src.sepLine; endSepLine = src.endSepLine;

@@ -34,7 +34,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
   /**Version, history and license
    * <ul>
-   * <li>2012-04-17 Hartmut new: Parameter {@link CallingArguments#bUseGetValueByIndex} for downward compytibility
+   * <li>2012-04-17 Hartmut new: Parameter {@link CallingArguments#bUseGetValueByIndex} for downward compatibility
    * 
    * <li>2011-04-20 Don't derive this class from {@link GuiCfg}, instead uses the inner class {@link InspcGuiCfg}.
    *   It is a problem of order of instantiation.

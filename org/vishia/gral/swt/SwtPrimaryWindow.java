@@ -71,8 +71,8 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   }  
   
   
-  public static SwtPrimaryWindow create(LogMessage log, String sTitle, int left, int top, int xSize, int ySize)
-  { SwtGraphicThread graphicThread = new SwtGraphicThread(sTitle, left, top, xSize, ySize, log);
+  public static SwtPrimaryWindow create(LogMessage log, String sTitle, char sizeShow, int left, int top, int xSize, int ySize)
+  { SwtGraphicThread graphicThread = new SwtGraphicThread(sTitle, sizeShow, left, top, xSize, ySize, log);
     //GuiThread graphicThread = startGraphicThread(init);  
 
     synchronized(graphicThread){

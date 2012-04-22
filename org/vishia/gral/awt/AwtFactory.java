@@ -6,9 +6,9 @@ import org.vishia.msgDispatch.LogMessage;
 
 public class AwtFactory  implements GralFactory_ifc
 {
-  @Override public GralWindow createWindow(LogMessage log, String sTitle, int left, int top, int xSize, int ySize)
+  @Override public GralWindow createWindow(LogMessage log, String sTitle, char sizeShow, int left, int top, int xSize, int ySize)
   {
-    AwtPrimaryWindow window = AwtPrimaryWindow.create(log, sTitle, left, top, xSize, ySize);
+    AwtPrimaryWindow window = AwtPrimaryWindow.create(log, sTitle, sizeShow, left, top, xSize, ySize);
     return window;
   }
  
