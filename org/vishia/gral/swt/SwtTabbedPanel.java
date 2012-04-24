@@ -169,20 +169,25 @@ public class SwtTabbedPanel extends GralTabbedPanel
   					@SuppressWarnings("unchecked")
   					GralPanelContent panelContent = (GralPanelContent)(data);
   					Queue<GralWidget> widgetInfos = panelContent.widgetList; 
-  					if(notifyingUserInstanceWhileSelectingTab !=null){
-  					  notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);
-  					}
   					newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
-  					focusedTab.implMethodPanel_.setVisible(false);  //the last focused tab.
+  					if(focusedTab !=null){
+  					  focusedTab.implMethodPanel_.setVisible(false);  //the last focused tab.
+  					}
   					focusedTab = panelContent;
   					focusedTab.implMethodPanel_.setVisible(true);   //the currently focused tab.
             focusedTab.setFocus();
   					mng.log.sendMsg(0, "Fcmd-selectTab %s", panelContent.toString());
-  				}
+  					if(notifyingUserInstanceWhileSelectingTab !=null){
+              notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);
+            }
+      		}
   			}
   		}
 			catch(Exception exc){
-			  System.out.println(exc.getLocalizedMessage());
+			  String sMsg = exc.getMessage();
+			  if(sMsg == null){ sMsg = "nullPointer"; }
+			  System.err.println(sMsg);
+			  exc.printStackTrace(System.err);
 			}
 		}
   };

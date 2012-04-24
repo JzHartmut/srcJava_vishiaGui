@@ -278,6 +278,7 @@ public class SwtTextFieldWrapper extends GralTextField
       if((chg & chgColorText) !=0){ textFieldSwt.setForeground(((SwtMng)itsMng).getColorImpl(colorText)); }
       if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(((SwtMng)itsMng).getColorImpl(colorBack)); }
       textFieldSwt.redraw();
+      //System.out.println("SwtTextField " + name + ":" + text);
     } while(!whatIsChanged.compareAndSet(chg, 0));
   }
 

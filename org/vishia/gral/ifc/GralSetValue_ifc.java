@@ -9,8 +9,9 @@ public interface GralSetValue_ifc
 {
   
   
-  /**Version and history
+  /**Version, history and license.
    * <ul>
+   * <li>2012-04-25 Hartmut new: {@link #setText(CharSequence)}
    * <li>2012-04-01 Hartmut new: {@link #setValue(Object[])} as a possibility to set the appearance of a widget
    *   with more as one value, maybe float, integer etc. It is used for {@link org.vishia.gral.base.GralLed}
    *   to determine colors for border and inner.
@@ -41,7 +42,7 @@ public interface GralSetValue_ifc
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120303;
+  public static final int version = 20120425;
 
   
   /**Sets a application specific info. 
@@ -80,6 +81,8 @@ public interface GralSetValue_ifc
    * @param value array of floats
    */
   void setValue(Object[] value);
+  
+  void setText(CharSequence text);
   
   
 	/**Sets the border of the value range for showing. 

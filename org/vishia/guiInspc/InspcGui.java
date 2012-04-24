@@ -152,6 +152,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
   
   private void callbackOnReceivedData(){
+    long time = System.currentTimeMillis();
     ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = guiCfg.gralMng.getVisiblePanels();
     //GralWidget widgdRemove = null;
     try{
@@ -162,6 +163,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
             String sShowMethod;
             if((sShowMethod = widget.getShowMethod()) ==null || !sShowMethod.equals("stc_cmd")){
               widget.refreshFromVariable(inspcMng);
+              widget.requestNewValueForVariable(time);
             }
           }catch(Exception exc){
             System.err.println("InspcGui-receivedData-widget; " + exc.getMessage());   

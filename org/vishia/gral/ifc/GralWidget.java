@@ -54,6 +54,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-04-25 Hartmut some enhancements
    * <li>2012-04-07 Hartmut chg: {@link #refreshFromVariable(VariableContainer_ifc)} regards int16, int8
    * <li>2012-04-01 Hartmut new: {@link #refreshFromVariable(VariableContainer_ifc)}. A GralWidget is binded now
    *   more to a variable via the new {@link VariableAccessWithIdx} and then to any {@link VariableAccess_ifc}.
@@ -132,7 +133,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120409;
+  public static final int version = 20120425;
 
   
   /**The widget manager from where the widget is organized. Most of methods need the information
@@ -614,7 +615,9 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
             String sPath2 = sPath1.trim();
             String sPath = itsMng.replaceDataPathPrefix(sPath2);
             VariableAccessWithIdx variable1 = container.getVariable(sPath);
-            variables.add(variable1);       
+            if(variable !=null){
+              variables.add(variable1);
+            }
           }
   	    } else {
   	      String sPath2 = sDataPath.trim();
@@ -624,13 +627,25 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 	    }
 	  }
 	  if(variable !=null){
+	    long timeVariable = variable.getLastRefreshTime();
+	    boolean bOld = timeVariable > 0 && (System.currentTimeMillis() - timeVariable) > 2000;
+	    if(bOld ){
+	      //TODO setBackgroundColor(GralColor.getColor("cy"));
+	    } else {
+	      //TODO setBackgroundColor(GralColor.getColor("wh"));
+	    }
 	    char cType = variable.getType();
+	    String sValue = null;
 	    switch(cType){
 	      case 'S': case 'B':
 	      case 'I': setValue(variable.getInt()); break;
         case 'F': setValue(variable.getFloat()); break;
-	      case 's': setValue(variable.getString()); break;
-        default:  setValue(variable.getInt());  //at least request newly if type is faulty
+	      case 's': setText(variable.getString()); break;
+        default:  sValue = "?" + cType; //variable.getInt());  //at least request newly if type is faulty
+	    }
+	    if(sValue !=null){
+	      if(bOld){ setText("? " + sValue); }
+	      else { setText(sValue); }
 	    }
 	  } else if(variables !=null){
       Object[] values = new Object[variables.size()];
@@ -642,13 +657,31 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 	        case 'I': values[++ixVal] = variable1.getInt(); break;
 	        case 'F': values[++ixVal] = variable1.getFloat(); break;
 	        case 's': values[++ixVal] = variable1.getString(); break;
-	        default:  setValue(variable.getInt());  //at least request newly
+	        default:  setText("?" + cType); //variable.getInt());  //at least request newly
 	      } //switch
         
       }
 	    setValue(values);
+	  } else if(sDataPath !=null){
+	    setText("?? " + sDataPath);
 	  }
 	}
+	
+	
+	
+	/**Requests new values for all variables which are associated to this widget. This method is usefull
+	 * if the variables are filled by a communication with any remote device and that filling
+	 * should be requested for the current visible variables.
+	 */
+	public void requestNewValueForVariable(long timeRequested){
+	  if(variable !=null){ variable.getVariable().requestValue(timeRequested); }
+	  else if(variables !=null){
+	    for(VariableAccessWithIdx variable1: variables){
+	      variable.getVariable().requestValue(timeRequested); 
+	    }
+	  }
+	}
+	
 	
 	
   /**Gets the current value of the content of the widget in the given context.
@@ -710,12 +743,20 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   
   
+  /**Default implementation calls an log message. It should be overridden.
+   * @see org.vishia.gral.ifc.GralSetValue_ifc#setText(java.lang.CharSequence)
+   */
+  @Override public void setText(CharSequence text){
+    System.err.println("GralWidget - non overridden setText called; Widget = " + name + "; text=" + text);
+  }
+  
+  
   /**Sets the visible value given as String. Usual it is applicable if the widget is a text field.
    * This method can or should be overridden for some widgets to optimize calculation time.
    * The default implementation uses the {@link GralWidgetMng#setInfo(GralWidget, int, int, Object, Object)}.
    * @param sValue String given value.
    */
-  public void setValue(String sValue){
+  public void XXXsetValue(String sValue){
     itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, sValue, null);
   }
   

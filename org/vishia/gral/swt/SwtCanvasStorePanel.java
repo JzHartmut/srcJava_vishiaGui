@@ -66,6 +66,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
   protected SwtCanvasStorePanel(String namePanel, GralWidgetMng gralMng)
   {
     super(namePanel, gralMng, null);
+    super.canvas = new GralCanvasStorage();
   }
   
 

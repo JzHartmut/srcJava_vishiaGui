@@ -100,4 +100,18 @@ public class GralSwitchExclusiveButtonMng implements VariableAccess_ifc
     return 0; //no dimension
   }
 
+  @Override
+  public long getLastRefreshTime()
+  {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public void requestValue(long timeRequested)
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
 }

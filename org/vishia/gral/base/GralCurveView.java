@@ -157,7 +157,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
 
     @Override public void setLineColor(GralColor color){ lineColor = color; }
 
-
+    @Override public void setText(CharSequence text){
+      System.err.println("GralCurveView - setText not supported; Widget = " + name + "; text=" + text);
+    }
+   
     
   }
   
