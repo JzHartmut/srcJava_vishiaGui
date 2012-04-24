@@ -95,20 +95,9 @@ public class SwtCurveView extends GralCurveView
   @Override public GralCurveViewTrack_ifc initTrack(String sNameTrack, String sDataPath, GralColor color, int style
       , int nullLine, float scale, float offset)
   {
-    Track track = tracks[ixLineInit] = new Track(sNameTrack);
-    track.values = new float[this.maxNrofXValues];
-    listTracks.add(track);
-    listTrackSet.add(track);
-    //listDataPaths.add(sDataPath);
-    track.sDataPath =sDataPath;
-    track.y0Line = nullLine;
-    track.yOffset = offset;
-    track.yScale = scale;
-    //yScale[ixLineInit] = scale;
-    track.lineColor = color;
+    GralCurveViewTrack_ifc track = super.initTrack(sNameTrack, sDataPath, color, style, nullLine, scale, offset);
     Color colorSwt = (Color)itsMng.getColorImpl(color);
-    curveSwt.lineColors[ixLineInit] = colorSwt; //new Color(curveSwt.getDisplay(), (colorValue >>16) & 0xff, (colorValue >>8) & 0xff, (colorValue) & 0xff);  
-    ixLineInit +=1;
+    //curveSwt.lineColors[ixLineInit] = colorSwt; //new Color(curveSwt.getDisplay(), (colorValue >>16) & 0xff, (colorValue >>8) & 0xff, (colorValue) & 0xff);  
     return track;
   }
   
@@ -156,7 +145,7 @@ public class SwtCurveView extends GralCurveView
 
     //final Canvas canvas;
     
-    private final Color[] lineColors;
+    //private final Color[] lineColors;
     
     
     private Color gridColor = new Color(getDisplay(), 0, 255, 255);
@@ -172,10 +161,10 @@ public class SwtCurveView extends GralCurveView
       setSize(xPixel, yPixel);  //the size may be changed later by drag the window.
       //this.xPixel = xPixel;
       //this.yPixel = yPixel;
-      lineColors = new Color[nrofTracks];
+      //lineColors = new Color[nrofTracks];
       Color defaultColor = new Color(getDisplay(), 255,0,0);
       for(int iTrack=0; iTrack < nrofTracks; ++iTrack){
-        lineColors[iTrack] = defaultColor;
+        //lineColors[iTrack] = defaultColor;
       }
       addPaintListener(paintListener);
       addFocusListener(focusListener);

@@ -400,8 +400,24 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    * @param scale
    * @param offset
    */
-  abstract public GralCurveViewTrack_ifc initTrack(String sNameTrack, String sDataPath, GralColor color, int style
-      , int nullLine, float scale, float offset);
+  public GralCurveViewTrack_ifc initTrack(String sNameTrack, String sDataPath, GralColor color, int style
+      , int nullLine, float scale, float offset)
+  {
+    Track track = tracks[ixLineInit] = new Track(sNameTrack);
+    track.values = new float[this.maxNrofXValues];
+    listTracks.add(track);
+    listTrackSet.add(track);
+    //listDataPaths.add(sDataPath);
+    track.sDataPath =sDataPath;
+    track.y0Line = nullLine;
+    track.yOffset = offset;
+    track.yScale = scale;
+    //yScale[ixLineInit] = scale;
+    track.lineColor = color;
+    ixLineInit +=1;
+    return track;
+  }
+
 
   
   public void setTimePerPixel(int time){

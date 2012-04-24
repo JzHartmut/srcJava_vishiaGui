@@ -242,7 +242,7 @@ public class GralCfgBuilder
       int nrofTracks = widgt.lines.size(); 
       GralCurveView widgc = gralMng.addCurveViewY(sName, widgt.nrofPoints, nrofTracks);
       for(GralCfgData.GuiCfgCurveLine line: widgt.lines){
-        String sDataPathLine = line.name;
+        String sDataPathLine = line.info;
         final GralColor colorLine;
         if(line.color0 !=null){
           colorLine = GralColor.getColor(line.color0.color);
