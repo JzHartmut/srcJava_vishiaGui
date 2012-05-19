@@ -1,7 +1,6 @@
 package org.vishia.gral.base;
 
 import org.vishia.gral.ifc.GralSetValue_ifc;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.swt.SwtMng;
 
 /**This is a common base class for a ValueBar-widget. 

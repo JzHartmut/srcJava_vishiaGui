@@ -5,11 +5,11 @@ import java.io.File;
 import org.vishia.cmd.CmdGetFileArgs_ifc;
 import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 
 /**This class is a widget to select commands from a table list.

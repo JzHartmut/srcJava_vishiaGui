@@ -3,7 +3,6 @@ package org.vishia.gral.base;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.MinMaxTime;
 
 /**This class is the base for implementation of graphic threading. It is implemented for SWT and Swing yet.
@@ -61,7 +60,7 @@ import org.vishia.util.MinMaxTime;
  *    for any time. They are invoked whenever {@link #wakeup()} is called. 
  * <li><b>Version 2</b>: The order or commission can be instructed to the <code>setInfo(cmd, ...data)</code>-method
  *   of a {@link GralWidget}:
- *   <ul><li>{@link GralWidgetMng#setInfo(org.vishia.gral.ifc.GralWidget widget, int cmd, int ident, Object toshow, Object data)}
+ *   <ul><li>{@link GralWidgetMng#setInfo(org.vishia.gral.base.GralWidget widget, int cmd, int ident, Object toshow, Object data)}
  *   </ul>
  *   This method fills a queue of the {@link GralWidgetMng}:
  *   <ul><li>{@link GralWidgetMng.WidgetChangeRequExecuter#guiChangeRequests}

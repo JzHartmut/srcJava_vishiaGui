@@ -22,16 +22,16 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
@@ -176,7 +176,7 @@ public class SwtTable  extends GralTable {
 
   
   /**Sets the focus to the current cell of the tab
-   * @see org.vishia.gral.ifc.GralWidget#setFocus()
+   * @see org.vishia.gral.base.GralWidget#setFocus()
    * TODO this method must call in the graphic thread yet, queue it with {@link GralWidgetMng#setInfo(GralWidget, int, int, Object, Object)}.
    */
   @Override public boolean setFocus()
@@ -204,7 +204,7 @@ public class SwtTable  extends GralTable {
 
 
   /**Removes the graphical widgets.
-   * @see org.vishia.gral.ifc.GralWidget#removeWidgetImplementation()
+   * @see org.vishia.gral.base.GralWidget#removeWidgetImplementation()
    */
   @Override protected void removeWidgetImplementation() {
     // TODO Auto-generated method stub
@@ -315,8 +315,8 @@ public class SwtTable  extends GralTable {
   
   private void setBoundsCells(){
     Rectangle parentBounds = table.getParent().getBounds();
-    GralRectangle pixTable = pos.calcWidgetPosAndSize(itsMng.propertiesGui, parentBounds.width, parentBounds.height, 0, 0);
-    int xPixelUnit = itsMng.propertiesGui.xPixelUnit();
+    GralRectangle pixTable = pos.calcWidgetPosAndSize(itsMng.propertiesGui(), parentBounds.width, parentBounds.height, 0, 0);
+    int xPixelUnit = itsMng.propertiesGui().xPixelUnit();
     int[] xpixelCell = new int[columnWidthsGral.length+1];
     int xPixel1 = 0;
     xpixelCell[0] = xPixel1;
@@ -354,7 +354,7 @@ public class SwtTable  extends GralTable {
       Font font = mng.propertiesGuiSwt.getTextFontSwt(2, whatIs, whatIs);
       Color colorBackTableSwt = mng.getColorImpl(colorBackTable);
       for(int iCol = 0; iCol < zColumns; ++iCol){
-        menuColumns[iCol] = new SwtMenu(name + "_menu" + iCol, this, itsMng);
+        menuColumns[iCol] = new SwtMenu(name + "_menu" + iCol, this, (GralWidgetMng)itsMng);
       }
       for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){
         for(int iCol = 0; iCol < zColumns; ++iCol){
@@ -671,7 +671,7 @@ public class SwtTable  extends GralTable {
           //System.out.println("focusCell");
         }
       } catch(Exception exc){
-        itsMng.log.sendMsg(0, "Exception in SwtTable.focusGained");
+        itsMng.log().sendMsg(0, "Exception in SwtTable.focusGained");
       }
     }
     

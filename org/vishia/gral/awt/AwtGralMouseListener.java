@@ -9,10 +9,10 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import org.vishia.gral.base.GralMouseWidgetAction_ifc;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.KeyCode;
 
 public class AwtGralMouseListener

@@ -1,14 +1,21 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GetGralWidget_ifc;
+
 /**This interface describes the capabilities of a curve view as application interface.
  * @author Hartmut Schorrig
  *
  */
-public interface GralCurveView_ifc
+public interface GralCurveView_ifc extends GralWidget_ifc, GralSetValue_ifc, GetGralWidget_ifc
 {
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-04-26 Hartmut new extends GralWidget_ifc etc: A reference to a GralCurveView_ifc is a
+   *   reference to a widget too.
+   * <li>2012-04-26 Hartmut new capability for curve view: Set active or non active. It is a state
+   *   whether values are stored, independent of their visualization.
    * <li>2012-03-25 Hartmut created as interface to {@link org.vishia.gral.base.GralCurveView}.
    *   Approach: The capabilities should be described by an interface. Yet only 1 method.
    * </ul>
@@ -37,7 +44,7 @@ public interface GralCurveView_ifc
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    */
-  public static final int version = 20120325;
+  public static final int version = 20120426;
   
   /**Adds a sampling value set.
    * <br><br> 
@@ -53,4 +60,8 @@ public interface GralCurveView_ifc
    */
   void setSample(float[] values, int timeshort);
 
+  void activate(boolean activate);
+  
+  boolean isActiv();
+  
 }

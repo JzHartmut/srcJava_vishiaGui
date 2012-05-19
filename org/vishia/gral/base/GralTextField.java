@@ -7,7 +7,6 @@ import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTextField_ifc;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.CalculatorExpr;
 
 /**This is the base class for all widgets which represents a simple text.
@@ -120,7 +119,7 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
    * <li>if no format is given and the value is greater than 1 Billion, it is shown with exponent.
    * <ul>      
    *   
-   * @see org.vishia.gral.ifc.GralWidget#setValue(float)
+   * @see org.vishia.gral.base.GralWidget#setValue(float)
    */
   @Override public void setValue(final float valueP){
     final String sFormat1;

@@ -1,6 +1,6 @@
 package org.vishia.gral.cfg;
 
-import org.vishia.gral.ifc.GralPos;
+import org.vishia.gral.base.GralPos;
 
 /**ZBNF: position::= ... ;
  * Class for instance to capture and store the position in an element. */

@@ -19,7 +19,7 @@ public class SwtWidgetHelper
   /**Version and history
    * <ul>
    * <li>2011-11-18 Hartmut chg: {@link #setFocusOfTabSwt(Control)} is the implementation of all 
-   *   {@link org.vishia.gral.ifc.GralWidget#setFocus()} implementations. It regards that a tab in a TabFolder
+   *   {@link org.vishia.gral.base.GralWidget#setFocus()} implementations. It regards that a tab in a TabFolder
    *   should be selected if any widget inside the tab-panel is focused. Used extensive in JavaCommander.
    * </ul>
    * 

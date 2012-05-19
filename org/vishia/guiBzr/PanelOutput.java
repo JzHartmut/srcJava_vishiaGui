@@ -2,9 +2,9 @@ package org.vishia.guiBzr;
 
 import java.io.File;
 
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.mainCmd.Report;
 
 public class PanelOutput

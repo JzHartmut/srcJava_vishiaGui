@@ -11,13 +11,13 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.vishia.gral.base.GralCurveView;
+import org.vishia.gral.base.GralPos;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.cfg.GralCfgElement;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralPoint;
-import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.KeyCode;
 
@@ -241,6 +241,7 @@ public class GralCfgBuilder
       GralCfgData.GuiCfgCurveview widgt = (GralCfgData.GuiCfgCurveview)cfge.widgetType;
       int nrofTracks = widgt.lines.size(); 
       GralCurveView widgc = gralMng.addCurveViewY(sName, widgt.nrofPoints, nrofTracks);
+      widgc.activate(widgt.activate);
       for(GralCfgData.GuiCfgCurveLine line: widgt.lines){
         String sDataPathLine = line.info;
         final GralColor colorLine;
@@ -277,7 +278,7 @@ public class GralCfgBuilder
       //set common attributes for widgets:
       //widgd.pos = gui.getPositionInPanel();
       String sShowMethod = cfge.widgetType.showMethod;
-      if(sShowMethod !=null){
+      if(sShowMethod !=null && sShowMethod.length() >0){
         GralUserAction actionShow = gralMng.getRegisteredUserAction(sShowMethod);
         if(actionShow == null){
           sError = "GuiCfgBuilder - show method not found: " + sShowMethod;

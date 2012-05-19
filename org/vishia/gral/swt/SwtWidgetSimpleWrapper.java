@@ -1,10 +1,10 @@
 package org.vishia.gral.swt;
 
 import org.eclipse.swt.widgets.Control;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
 
 /**This class wraps a SWT widget. In this form it is able to reference in the SWT-independent GRAL

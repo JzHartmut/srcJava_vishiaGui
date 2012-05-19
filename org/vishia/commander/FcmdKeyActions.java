@@ -2,8 +2,8 @@ package org.vishia.commander;
 
 import java.io.File;
 
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 

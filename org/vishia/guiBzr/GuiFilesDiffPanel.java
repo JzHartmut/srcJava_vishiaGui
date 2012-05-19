@@ -8,12 +8,12 @@ import java.util.TreeMap;
 
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.util.KeyCode;
 

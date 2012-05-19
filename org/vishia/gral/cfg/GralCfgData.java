@@ -76,7 +76,7 @@ public final class GralCfgData
   {
     private final GralCfgElement itsElement;
 
-    /**See {@link org.vishia.gral.ifc.GralWidget#whatIs}. */
+    /**See {@link org.vishia.gral.base.GralWidget#whatIs}. */
     final char whatIs;
 
 
@@ -261,6 +261,8 @@ public final class GralCfgData
   public final static class GuiCfgCurveview extends WidgetTypeBase implements Cloneable
   {
     public int nrofPoints;
+    
+    public boolean activate;
     
     List<GuiCfgCurveLine> lines = new LinkedList<GuiCfgCurveLine>();
     

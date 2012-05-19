@@ -1,10 +1,10 @@
 package org.vishia.gral.swt;
 
 import org.eclipse.swt.widgets.MenuItem;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralWidget;
 
 public class SwtWidgetMenu extends GralWidget
 {

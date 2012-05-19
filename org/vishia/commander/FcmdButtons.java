@@ -6,7 +6,7 @@ import java.util.TreeMap;
 
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMenu;
-import org.vishia.gral.ifc.GralPos;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.KeyCode;
 

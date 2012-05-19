@@ -5,8 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
-import org.vishia.gral.ifc.GralPos;
 import org.vishia.mainCmd.Report;
 import org.vishia.util.StringPart;
 import org.vishia.util.StringPartFromFileLines;

@@ -13,11 +13,11 @@ import org.vishia.byteData.ByteDataSymbolicAccess;
 import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralValueBar;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
 
 

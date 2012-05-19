@@ -4,6 +4,12 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.gral.base.GralGraphicThread;
+import org.vishia.gral.base.GralGridProperties;
+import org.vishia.gral.base.GralPos;
+import org.vishia.gral.base.GralWidget;
+import org.vishia.msgDispatch.LogMessage;
+
 
 
 /**This is a unique interface for the GUI-panel-manager to work with it.
@@ -84,7 +90,13 @@ public interface GralMng_ifc
   
   //final static int cmdSetData = 0x5e1da1a;  //setdata
   
-
+  
+  GralGridProperties propertiesGui();
+  
+  GralGraphicThread gralDevice();
+  
+  LogMessage log();
+  
   /**Searches a widget by name.
    * @param name The name which is assigned on build.
    * @return null if the widget is not found.

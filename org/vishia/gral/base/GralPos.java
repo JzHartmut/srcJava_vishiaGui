@@ -1,9 +1,7 @@
-package org.vishia.gral.ifc;
+package org.vishia.gral.base;
 
 import org.vishia.bridgeC.IllegalArgumentExceptionJc;
-import org.vishia.gral.area9.GuiCallingArgs;
-import org.vishia.gral.base.GralGridProperties;
-import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.ifc.GralRectangle;
 
 /**This class describes a position in a gral panel. 
    * <br><br>
@@ -27,7 +25,7 @@ import org.vishia.gral.base.GralPanelContent;
    * graphical implementation. One gral unit may have approximately 6 to 30 pixel, 
    * depending on the requested size of appearance in comparison with the given display pixel size. 
    * Any graphic can be shown in several sizes of appearance, given with a start parameter of the application
-   * (see {@link GuiCallingArgs#sSize}) respectively the parameter size of {@link GralGridProperties#GralGridProperties(char size)}.
+   * (see {@link org.vishia.gral.area9.GuiCallingArgs#sSize}) respectively the parameter size of {@link GralGridProperties#GralGridProperties(char size)}.
    * <br><br>
    * <b>Fine positions</b>:<br>
    * Either the positions are given with 2 integer values as 'fundamental positions'. 

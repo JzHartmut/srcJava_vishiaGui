@@ -17,15 +17,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.vishia.gral.base.GralMouseWidgetAction_ifc;
+import org.vishia.gral.base.GralPos;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
-import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 
 public class SwtTextFieldWrapper extends GralTextField
 {
@@ -253,10 +253,12 @@ public class SwtTextFieldWrapper extends GralTextField
   
   
   @Override protected void repaintGthread(){
-    int chg = this.whatIsChanged.get();
     int catastrophicalCount = 0;
+    int chg;
     do{
-      if(++catastrophicalCount > 10000) throw new RuntimeException("atomic failed");
+      chg = this.whatIsChanged.get();
+      if(++catastrophicalCount > 10000) 
+        throw new RuntimeException("atomic failed");
       if((chg & chgText) !=0){ 
         textFieldSwt.setText(text);
         final int selectionStart, selectionEnd;

@@ -1,5 +1,6 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow_setifc;
 
 

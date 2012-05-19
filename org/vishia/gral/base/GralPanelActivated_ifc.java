@@ -2,7 +2,6 @@ package org.vishia.gral.base;
 
 import java.util.Queue;
 
-import org.vishia.gral.ifc.GralWidget;
 
 
 /**This interface should be implemented by any user class to call user actions when a panel is activated.

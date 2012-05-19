@@ -9,11 +9,11 @@ import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Text;
 import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralTextBox;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.KeyCode;
 
 public class SwtTextBox extends GralTextBox

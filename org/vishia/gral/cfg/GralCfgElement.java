@@ -1,5 +1,6 @@
 package org.vishia.gral.cfg;
 
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.cfg.GralCfgData.GuiCfgButton;
 import org.vishia.gral.cfg.GralCfgData.GuiCfgCurveview;
 import org.vishia.gral.cfg.GralCfgData.GuiCfgImage;
@@ -11,7 +12,6 @@ import org.vishia.gral.cfg.GralCfgData.GuiCfgTable;
 import org.vishia.gral.cfg.GralCfgData.GuiCfgText;
 import org.vishia.gral.cfg.GralCfgData.WidgetTypeBase;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
-import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralWidgetCfg_ifc;
 
 

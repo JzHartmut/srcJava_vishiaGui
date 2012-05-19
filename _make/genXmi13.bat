@@ -22,7 +22,9 @@ $inputJava=fileset
 , org/vishia/gral/widget/*.java
 , org/vishia/guiInspc/*.java
 , org/vishia/commander/*.java
-, ../srcJava_vishiaRun/org/vishia/inspectorAccessor/*.java
+, ../srcJava_vishiaRun:org/vishia/inspectorAccessor/*.java
+, ../srcJava_vishiaBase/org/vishia/util/*.java
+, ../srcJava_vishiaBase/org/vishia/byteData/*.java
 );
 
 rpy/gral.xmi:= genXMI($inputJava); 

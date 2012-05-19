@@ -6,7 +6,6 @@ import java.util.TreeMap;
 
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
-import org.vishia.gral.ifc.GralWidget;
 
 
 /**This class is the common base class for Tabbed-Panels.

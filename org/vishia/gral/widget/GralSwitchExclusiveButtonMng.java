@@ -4,9 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.vishia.byteData.VariableAccess_ifc;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 
 public class GralSwitchExclusiveButtonMng implements VariableAccess_ifc
 {

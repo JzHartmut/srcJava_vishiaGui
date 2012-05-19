@@ -1,7 +1,6 @@
 package org.vishia.gral.base;
 
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.ObjectValue;
 
 public abstract class GralLed extends GralWidget

@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralRectangle;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
 
 

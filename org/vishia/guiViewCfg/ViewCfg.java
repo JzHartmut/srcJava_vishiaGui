@@ -7,9 +7,9 @@ import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
+import org.vishia.gral.base.GralWidget;
 //import org.vishia.gral.gui.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 
 /**Class contains main, it is able to use for a GUI without any programming in Java.*/
 public class ViewCfg extends GuiCfg 

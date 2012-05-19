@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.gral.base.GralTabbedPanel;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.GralSelectList;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.util.Assert;

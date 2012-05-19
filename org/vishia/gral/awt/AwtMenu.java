@@ -7,9 +7,9 @@ import java.awt.MenuItem;
 import java.awt.PopupMenu;
 
 import org.vishia.gral.base.GralMenu;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 
 public class AwtMenu extends GralMenu
 {

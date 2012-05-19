@@ -19,10 +19,10 @@ import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
-import org.vishia.gral.ifc.GralWidget;
 
 public class SwtTabbedPanel extends GralTabbedPanel
 {

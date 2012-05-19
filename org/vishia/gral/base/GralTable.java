@@ -7,11 +7,11 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 import org.vishia.util.SelectMask;
@@ -183,7 +183,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     this.zColumn = columnWidths.length;
     //this.colorBack = new GralColor[zLineVisibleMax];
     //this.colorText = new GralColor[zLineVisibleMax];
-    int xdPix = itsMng.propertiesGui.xPixelUnit();
+    int xdPix = itsMng.propertiesGui().xPixelUnit();
     columnPixel = new int[columnWidthsGral.length+1];
     int xPix = 0;
     columnPixel[0] = xPix;
@@ -191,7 +191,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
       xPix += columnWidthsGral[iCol] * xdPix;
       columnPixel[iCol+1] = xPix;
     }
-    int ydPix = itsMng.propertiesGui.yPixelUnit();
+    int ydPix = itsMng.propertiesGui().yPixelUnit();
     linePixel = 2 * ydPix;
     ixLineNew = ixLine = -1;
     ixGlineSelectedNew = ixGlineSelected = -1;  
@@ -377,7 +377,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
         } else {
           ixLineNew = 0;
         }
-        keyActionDone.addToGraphicThread(itsMng.gralDevice, 0);
+        keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
       } break;
       case KeyCode.mouseWheelUp:
       case KeyCode.up: {
@@ -385,7 +385,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
           ixLineNew = ixLine - keyRepetition;
           if(ixLineNew <0){ ixLineNew = 0; }
         }
-        keyActionDone.addToGraphicThread(itsMng.gralDevice, 0);
+        keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
       } break;
       case KeyCode.mouseWheelDn:
       case KeyCode.dn: {
@@ -393,7 +393,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
           ixLineNew = ixLine + keyRepetition;
           if(ixLineNew >= zLine ){ ixLineNew = zLine -1; }
         }
-        keyActionDone.addToGraphicThread(itsMng.gralDevice, 0);
+        keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
       } break;
       case KeyCode.pgdn: {
         if(ixLine < zLine - zLineVisible){
@@ -401,7 +401,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
         } else {
           ixLineNew = zLine -1;
         }
-        keyActionDone.addToGraphicThread(itsMng.gralDevice, 0);
+        keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
       } break;
       default:
         done = false;
@@ -419,7 +419,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
         if(ixLine < zLine -1){
           ixLineNew = ixLine + 1;
         }
-        keyActionDone.addToGraphicThread(itsMng.gralDevice, 0);
+        keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
         done = true;
       }
       if(!done && ixLine >=0){
@@ -463,7 +463,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
       repaintGthread();
       keyDone = true;
       //System.out.println("Key done");
-      removeFromQueue(itsMng.gralDevice);
+      removeFromQueue(itsMng.gralDevice());
     }
   };
 
@@ -705,7 +705,15 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
       
     }
 
+    @Override public void refreshFromVariable(VariableContainer_ifc container){
+      GralTable.this.refreshFromVariable(container);
+    }
+
     
+    @Override public void setDataPath(String sDataPath){
+      GralTable.this.setDataPath(sDataPath);
+    }
+
     
     
     @Override
@@ -752,6 +760,9 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
       }
     };
 
+    
+    
+    
     @Override public void setHtmlHelp(String url) { GralTable.this.setHtmlHelp(url); }
     
     

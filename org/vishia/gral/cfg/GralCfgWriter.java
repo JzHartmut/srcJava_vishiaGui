@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
-import org.vishia.gral.ifc.GralPos;
+import org.vishia.gral.base.GralPos;
 import org.vishia.msgDispatch.LogMessage;
 
 public class GralCfgWriter

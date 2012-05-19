@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.vishia.gral.base.GralTextField;
-import org.vishia.gral.ifc.GralWidget;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.FileSystem;

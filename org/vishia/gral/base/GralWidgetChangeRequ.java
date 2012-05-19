@@ -77,7 +77,7 @@ public class GralWidgetChangeRequ
   public final Object visibleInfo;
   
   /**Data, which should be assigned as user data if the change of content is done.
-   * See {@link org.vishia.gral.ifc.GralWidget#getContentInfo()}
+   * See {@link org.vishia.gral.base.GralWidget#getContentInfo()}
    */
   public final Object userData;
   

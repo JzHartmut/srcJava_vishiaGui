@@ -4,8 +4,8 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Control;
 import org.vishia.gral.base.GralKeyListener;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 
 /**A common key listener implementation for SWT. It is applied to all widgets.
  * Derived forms exists for special SWT-widgets.
@@ -94,7 +94,7 @@ public class SwtKeyListener extends GralKeyListener
               actionDone = action.userActionGui(keyCode, widgetDescr);
           } //if(table.)
           if(!actionDone){
-            GralUserAction mainKeyAction = widgetDescr.itsMng.getRegisteredUserAction("KeyAction");
+            GralUserAction mainKeyAction = widgetDescr.getMng().getRegisteredUserAction("KeyAction");
             if(mainKeyAction !=null){
               int gralKey = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
               //old form called because compatibility, if new for with int-parameter returns false.

@@ -1,6 +1,5 @@
 package org.vishia.gral.base;
 
-import org.vishia.gral.ifc.GralWidget;
 
 public abstract class GralHtmlBox extends GralWidget 
 {

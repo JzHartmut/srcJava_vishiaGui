@@ -3,6 +3,8 @@ package org.vishia.gral.ifc;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.gral.base.GralPos;
+
 
 
 /**The canvas storage is a storage, which stores orders to paint. This orders are painted

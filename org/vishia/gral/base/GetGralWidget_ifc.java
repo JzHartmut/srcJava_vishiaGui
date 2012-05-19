@@ -1,6 +1,5 @@
 package org.vishia.gral.base;
 
-import org.vishia.gral.ifc.GralWidget;
 
 /**This class should only be used for the implementation of the graphic adapter.
  * It helps to associate a GralWidget to any implementation widget.

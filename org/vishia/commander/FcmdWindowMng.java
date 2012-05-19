@@ -1,8 +1,8 @@
 package org.vishia.commander;
 
 
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.KeyCode;
 
 /**This class manages the window of the Java commander

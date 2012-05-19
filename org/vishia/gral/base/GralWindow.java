@@ -1,9 +1,7 @@
 package org.vishia.gral.base;
 
 import org.vishia.gral.ifc.GralMng_ifc;
-import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
 
 /**This class represents a window of an application.

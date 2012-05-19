@@ -3,7 +3,7 @@ package org.vishia.gral.cfg;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.vishia.gral.ifc.GralPos;
+import org.vishia.gral.base.GralPos;
 
 final public class GralCfgPanel
 {

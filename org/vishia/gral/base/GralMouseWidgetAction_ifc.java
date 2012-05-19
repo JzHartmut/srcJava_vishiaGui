@@ -1,6 +1,5 @@
 package org.vishia.gral.base;
 
-import org.vishia.gral.ifc.GralWidget;
 
 /**This interface is implemented in the Widget adaption for the Gral level.
  * It should not be known by the user, except the user creates new widget types.

@@ -46,8 +46,10 @@ import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralLed;
 import org.vishia.gral.base.GralMenu;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralValueBar;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetChangeRequ;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWidgetMng;
@@ -63,13 +65,11 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
-import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralImageBase;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.msgDispatch.LogMessage;
 
@@ -1197,7 +1197,8 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
 	@Override public GralCurveView addCurveViewY(String sName, int nrofXvalues, int nrofTracks) {
     setNextPosition();
 	  GralCurveView widgd = new SwtCurveView(sName, this.pos, this, nrofXvalues, nrofTracks); //, curveView, 'c', sName, null);
-		//CurveView curveView = new CurveView(((SwtPanel)pos.panel).getPanelImpl(), dxWidget, dyWidget, nrofXvalues, nrofTracks);
+		super.curveContainer.add(widgd);
+	  //CurveView curveView = new CurveView(((SwtPanel)pos.panel).getPanelImpl(), dxWidget, dyWidget, nrofXvalues, nrofTracks);
 		testHelp.curveView = widgd; //store to inspect.
 		return widgd;
 	}
@@ -1669,7 +1670,7 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
 	private GralUserAction syncVariableOnFocus = new GralUserAction()
 	{	/**Writes the value to the named variable on leaving the focus.
 		 * The name of the variable is contained in the {@link GralWidget}.
-		 * @see org.vishia.gral.ifc.GralUserAction#userActionGui(java.lang.String, org.vishia.gral.ifc.GralWidget, java.lang.Object[])
+		 * @see org.vishia.gral.ifc.GralUserAction#userActionGui(java.lang.String, org.vishia.gral.base.GralWidget, java.lang.Object[])
 		 */
 		@Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
 		{

@@ -1,5 +1,7 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.gral.base.GralWidget;
+
 
 /**Marker Interface for configuration a widget.
  * It is used in the {@link GralWidget} and it is a property of all widgets.

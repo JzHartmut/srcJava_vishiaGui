@@ -7,6 +7,7 @@ import java.io.Writer;
 
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
@@ -18,7 +19,6 @@ import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.inspector.Inspector;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;

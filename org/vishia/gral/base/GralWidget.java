@@ -1,4 +1,4 @@
-package org.vishia.gral.ifc;
+package org.vishia.gral.base;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -6,25 +6,40 @@ import java.util.List;
 import org.vishia.byteData.VariableAccessWithIdx;
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
-import org.vishia.gral.base.GetGralWidget_ifc;
-import org.vishia.gral.base.GralDispatchCallbackWorker;
-import org.vishia.gral.base.GralMenu;
-import org.vishia.gral.base.GralWidgetMng;
-import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
+import org.vishia.gral.ifc.GralSetValue_ifc;
+import org.vishia.gral.ifc.GralTable_ifc;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidgetCfg_ifc;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.KeyCode;
 
 
 
-/**This class holds some information about a widget for showing and animating in a GUI and refers the graphical widget. 
+/**This class is the base class of representative of a graphical widget in the gral concept. 
+ * All widgets in the gral concept have this base data.
+ * The widget of the implementation layer graphic is referred in the derived class of this 
+ * with a proper association. 
  * <br>
- * The ObjectModelDiagram may shown the relations:
+ * The ObjectModelDiagram may shown the relations:<br>
  * <img src="../../../../img/Widget_gral.png"><br>
- * This class GralWidget knows the gral graphic widget via an {@link GralWidget_ifc}. It is a wrapper around the widget of the adaption layer.
- * In this figure a wrapper {@link org.vishia.gral.swt.SwtTable} is shown which wraps 
- * a org.eclipse.swt.widgets.Table. The wrapper based on {@link org.vishia.gral.base.GralTable} 
- * and supports the interface {@link org.vishia.gral.ifc.GralTable_ifc}.
- * This interface allows to deal with the table procured by the wrapper. See the derived interfaces of {@link GralWidget_ifc}.  
- * The {@link GralWidget_ifc} allows some fundamental operations with any widget like {@link GralWidget_ifc#setFocus()}. 
+ * In this graphic the relationship between this class and the graphical implementation layer widget
+ * is shown with the example 'text field' in SWT:
+ * <ul>
+ * <li>The class {@link GralTextField} is the derived class of this to represent a text field
+ *   in an implementation independent way.
+ * <li>The class {@link org.vishia.gral.swt.SwtTextFieldWrapper} is the implementor for the GralTextField
+ *   for SWT graphic. 
+ * <li>That implementor knows is SWT-specific and refers the SWT widget {@link org.eclipse.swt.widgets.Text}
+ *   It based on the SWT-specific {@link org.eclipse.swt.widgets.Widget}. 
+ * </ul>   
+ * <br>   
+ * The implementation layer widget should to be deal with this GralWidget because of some overridden
+ * methods of the implementation layer widget need that. The general contract is, 
+ * that the implementation layer widget refers this GralWidget in its commonly user data field.
+ * For SWT it is {@link org.eclipse.swt.widgets.Widget#setData(Object)} method.
  * <br><br>
  * The Widget knows its {@link GralPos} at its panel where it is placed. The panel knows all widgets
  * which are placed there (widgetList).
@@ -32,7 +47,7 @@ import org.vishia.util.KeyCode;
  * The user can invoke the methods of the widget to animate it in a GUI etc, for example {@link #setBackColor(GralColor, int)}
  * or {@link #setValue(int, int, Object)}. This methods can be called in any thread. There are thread safe. 
  * The organization of this actions are done in the implementation of the {@link org.vishia.gral.base.GralWidgetMng}
- * like {@link org.vishia.gral.swt.SwtMng}. This implementation adapts the basic graphic and knows theire methods
+ * like {@link org.vishia.gral.swt.SwtMng}. This implementation adapts the basic graphic and knows their methods
  * to set colors, values etc. The user need deal only with this widget class. The thread safe  capability is organized
  * with a ConcurrentLinkedQueue which contains requests of type {@link org.vishia.gral.base.GralWidgetChangeRequ}.
  * <br><br>
@@ -45,7 +60,35 @@ import org.vishia.util.KeyCode;
  * <br><br>
  * Last and least the properties of widget are able to change. The widget may know its {@link GralWidgetCfg_ifc} which provides
  * data for design the GUI.
- * 
+ * <br><br>
+ * <b>Concept of data binding</b><br>
+ * 2012-05-19
+ * <br>
+ * <img src="../../../../img/WidgetVariable_gral.png"><br>
+ * A widget has 2 associations: {@link #variable} and {@link #variables} to a management class {@link VariableAccessWithIdx}
+ * which knows the user data via a commonly {@link VariableAccess_ifc}. The data can be existing in the 
+ * user space with this interface. That part of user software doesn't know the graphical view of the data.
+ * The graphical part of software calls any refresh of showing, it calls the method {@link #refreshFromVariable(VariableContainer_ifc)}
+ * for all visible widgets. With this the widget gets the data from user with the variable associations
+ * and prepares it for the proper appearance depending on the kind of widget, format String etc.
+ * <br><br>
+ * The association to the correct variable is given only with a String as argument of the {@link #setDataPath(String)}
+ * method. The variable is found with the second interface {@link VariableContainer_ifc} which should be known
+ * by the graphical part of software and which is one parameter of the {@link #refreshFromVariable(VariableContainer_ifc)} method.
+ * The conclusion between the String given variable name or path and the data can be supplied in any form
+ * in the users software, which knows the data.
+ * <br><br>
+ * The data can be coming from any remote device. In that kind there are two ways to get the actually values:
+ * <ol>
+ * <li>There is a cyclically communication. The remote device sends all data in a cycle maybe some 100 milliseconds.
+ *   Then the actual data are present. The superior control should be call the {@link #refreshFromVariable(VariableContainer_ifc)}-method
+ *   if the data are received yet or in any other proper cycle.
+ * <li>The data are requested from the remote device only if they are need either for displaying in widgets 
+ *   of for other reasons. This kind of data holding are proper especially if they are a lot of data, 
+ *   not all of them should be communicated any time.
+ * </ol>
+ * For the second approach a time of actuality and a time of requesting are used. The method {@link #requestNewValueForVariable(long)}
+ * can be used to force communication.     
  * @author Hartmut Schorrig
  *
  */
@@ -138,7 +181,9 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   /**The widget manager from where the widget is organized. Most of methods need the information
    * stored in the panel manager. This reference is used to set values to other widgets. */
-  public GralWidgetMng itsMng;
+  protected GralWidgetMng itsMng;
+  
+  protected GralMngBuild_ifc buildMng;
   
   /**Association to the configuration element from where this widget was built. 
    * If the widget is moved or its properties are changed in the 'design mode' of the GUI,
@@ -334,7 +379,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   /**Sets the data path. It is a String in application context.
    * @param sDataPath
    */
-  public void setDataPath(String sDataPath){	
+  @Override public void setDataPath(String sDataPath){	
     this.sDataPath = sDataPath;
     variable = null;
     variables = null;
@@ -603,7 +648,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 	 * 
 	 * @param container contains variables able to search by string.
 	 */
-	public void refreshFromVariable(VariableContainer_ifc container){
+	@Override public void refreshFromVariable(VariableContainer_ifc container){
 	  if(variable ==null && variables == null){ //no variable known, get it.
 	    final int[] ixArrayA = new int[1];
 	    String sDataPath = this.getDataPath();
@@ -615,7 +660,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
             String sPath2 = sPath1.trim();
             String sPath = itsMng.replaceDataPathPrefix(sPath2);
             VariableAccessWithIdx variable1 = container.getVariable(sPath);
-            if(variable !=null){
+            if(variable1 !=null){
               variables.add(variable1);
             }
           }
@@ -648,20 +693,23 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 	      else { setText(sValue); }
 	    }
 	  } else if(variables !=null){
-      Object[] values = new Object[variables.size()];
-      int ixVal = -1;
-	    for(VariableAccessWithIdx variable1: variables){
-	      char cType = variable1.getType();
-	      switch(cType){
-	        case 'S': case 'B':
-	        case 'I': values[++ixVal] = variable1.getInt(); break;
-	        case 'F': values[++ixVal] = variable1.getFloat(); break;
-	        case 's': values[++ixVal] = variable1.getString(); break;
-	        default:  setText("?" + cType); //variable.getInt());  //at least request newly
-	      } //switch
-        
-      }
-	    setValue(values);
+	    if(variables.size() == 0){ variables = null; }
+	    else {
+        Object[] values = new Object[variables.size()];
+        int ixVal = -1;
+        for(VariableAccessWithIdx variable1: variables){
+  	      char cType = variable1.getType();
+  	      switch(cType){
+  	        case 'S': case 'B':
+  	        case 'I': values[++ixVal] = variable1.getInt(); break;
+  	        case 'F': values[++ixVal] = variable1.getFloat(); break;
+  	        case 's': values[++ixVal] = variable1.getString(); break;
+  	        default:  setText("?" + cType); //variable.getInt());  //at least request newly
+  	      } //switch
+          
+        }
+	      setValue(values);
+	    }
 	  } else if(sDataPath !=null){
 	    setText("?? " + sDataPath);
 	  }
@@ -677,7 +725,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 	  if(variable !=null){ variable.getVariable().requestValue(timeRequested); }
 	  else if(variables !=null){
 	    for(VariableAccessWithIdx variable1: variables){
-	      variable.getVariable().requestValue(timeRequested); 
+	      variable1.getVariable().requestValue(timeRequested);
 	    }
 	  }
 	}
@@ -813,7 +861,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
     if(delay == 0 && itsMng.currThreadIsGraphic()){
       repaintGthread();
     } else {
-      repaintRequ.addToGraphicThread(itsMng.gralDevice, delay);
+      repaintRequ.addToGraphicThread(itsMng.gralDevice(), delay);
     }
     //itsMng.setInfoDelayed(repaintRequ, delay);
   }
@@ -906,7 +954,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
     @Override public void doBeforeDispatching(boolean onlyWakeup) {
       //first remove from queue to force add new, if a new request is given.
       //thread safety: If a new request is given, it is not add yet, because it isn't execute.
-      removeFromQueue(itsMng.gralDevice);
+      removeFromQueue(itsMng.gralDevice());
       //now a new request will be added.
       try{ repaintGthread();
       

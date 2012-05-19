@@ -7,16 +7,16 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralPos;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
-import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTextBox_ifc;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmd_ifc;

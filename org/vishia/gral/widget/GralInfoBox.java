@@ -2,8 +2,10 @@ package org.vishia.gral.widget;
 
 import java.io.IOException;
 
+import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralTextField;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTextBox;
@@ -13,7 +15,6 @@ import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_getifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
@@ -289,5 +290,17 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     //buttonOk.setHtmlHelp(url);
   }
 
+  
+  @Override public void refreshFromVariable(VariableContainer_ifc container){
+    if(textBox !=null){ textBox.refreshFromVariable(container); }
+    if(htmlBox !=null){ htmlBox.refreshFromVariable(container); }
+    
+  }
+
+  @Override public void setDataPath(String sDataPath)
+  { 
+    if(textBox !=null){ textBox.setDataPath(sDataPath); }
+    if(htmlBox !=null){ htmlBox.setDataPath(sDataPath); }
+  }
 
 }

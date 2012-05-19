@@ -17,17 +17,16 @@ import org.vishia.gral.cfg.GralCfgData;
 import org.vishia.gral.cfg.GralCfgDesigner;
 import org.vishia.gral.cfg.GralCfgWriter;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralCurveView_ifc;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMngApplAdapter_ifc;
 import org.vishia.gral.ifc.GralPoint;
-import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindowMng_ifc;
 import org.vishia.gral.widget.GralInfoBox;
@@ -55,6 +54,7 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Changes:
    * <ul>
+   * <li>2012-04-22 Hartmut new:
    * <li>2012-04-22 Hartmut new: {@link #addLine(GralColor, List)} to add in a {@link GralCanvasStorage}.
    * <li>2012-04-01 Hartmut new: {@link #addDataReplace(Map)}, {@link #replaceDataPathPrefix(String)}.
    *   using alias in the {@link GralWidget#setDataPath(String)}. The resolving of the alias is done
@@ -212,9 +212,11 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
   
   protected GralMngApplAdapter_ifc applAdapter;
   
+	/**Aggregation to variables set on construction. */
 	protected final VariableContainer_ifc variableContainer;
 	
-	
+	/**Composition of some curve view widgets, which should be filled indepentent of there visibility. */
+	protected final List<GralCurveView_ifc> curveContainer = new LinkedList<GralCurveView_ifc>();
 	
   /**Position of the next widget to add. If some widgets are added one after another, 
    * it is similar like a flow-layout.
@@ -400,7 +402,13 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
 		userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
 	}
   
+  @Override public GralGridProperties propertiesGui(){ return propertiesGui(); }
   
+  @Override public GralGraphicThread gralDevice(){ return gralDevice; }
+  
+  @Override public LogMessage log(){ return log; }
+
+
   
   /**Returns null if the widget value can only be gotten platform-depending.
    * The platform widget manager should override this method too and invoke super.getValueFromWidget()
@@ -1024,6 +1032,15 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
   @Override public GralWidget addText(String text)
   { //return addText(text, 0, GralColor.getColor("bk"), GralColor.getColor("wh"));
     return addText(text, 0, GralColor.getColor("bk"), propertiesGui.colorBackground_);
+  }
+  
+  
+  public void refreshCurvesFromVariable(VariableContainer_ifc container){
+    for(GralCurveView_ifc curve : curveContainer){
+      if(curve.isActiv()){
+        curve.refreshFromVariable(variableContainer);
+      }
+    }
   }
   
   

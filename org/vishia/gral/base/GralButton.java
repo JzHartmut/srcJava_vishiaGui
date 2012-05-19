@@ -4,7 +4,6 @@ import org.vishia.bridgeC.IllegalArgumentExceptionJc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralImageBase;
 import org.vishia.gral.ifc.GralWindowMng_ifc;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.swt.SwtGralMouseListener;
 
 public abstract class GralButton extends GralWidget

@@ -10,7 +10,6 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralCurveViewTrack_ifc;
 import org.vishia.gral.ifc.GralCurveView_ifc;
 import org.vishia.gral.ifc.GralSetValue_ifc;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.Assert;
 
 
@@ -97,7 +96,6 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     
     /**Array stores the last values which are able to show. */
     public float[] values;
-    
     
     /**last values for paint. 
      * The current paint goes from lastValueY[1] to the current point.
@@ -279,6 +277,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   /**If true, then the display is freezed.
    */
   protected boolean bFreeze = false;
+  
+  /**True then saves values.  */
+  protected boolean bActive;
   
   /**The index to show values, it increments with ixWrValues
    * if bFreeze is false
@@ -520,26 +521,29 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   
   @Override public void refreshFromVariable(VariableContainer_ifc container){
-    float[] values = new float[tracks.length];
-    int ixTrack = -1;
-    for(Track track: tracks){
-      if(track.variable ==null ){ //no variable known, get it.
-        String sDataPath = track.getDataPath();
-        if(sDataPath !=null){
-          String sPath2 = sDataPath.trim();
-          String sPath = itsMng.replaceDataPathPrefix(sPath2);
-          track.variable = container.getVariable(sPath);
+    if(bActive){
+      float[] values = new float[tracks.length];
+      int ixTrack = -1;
+      for(Track track: tracks){
+        if(track.variable ==null ){ //no variable known, get it.
+          String sDataPath = track.getDataPath();
+          if(sDataPath !=null){
+            String sPath2 = sDataPath.trim();
+            String sPath = itsMng.replaceDataPathPrefix(sPath2);
+            track.variable = container.getVariable(sPath);
+          }
         }
+        final float value;
+        if(track.variable !=null ){
+          value = track.variable.getFloat();
+          track.variable.getVariable().requestValue(System.currentTimeMillis());
+        } else {
+          value = 0;
+        }
+        values[++ixTrack] = value;
       }
-      final float value;
-      if(track.variable !=null ){
-        value = track.variable.getFloat();
-      } else {
-        value = 0;
-      }
-      values[++ixTrack] = value;
+      setSample(values, (int)System.currentTimeMillis());
     }
-    setSample(values, (int)System.currentTimeMillis());
   }
   
   
@@ -666,6 +670,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     // TODO Auto-generated method stub
     return false;
   }
+  
+  @Override public void activate(boolean activate){ bActive = activate; }
+  
+  @Override public boolean isActiv(){ return bActive; }
   
 
   

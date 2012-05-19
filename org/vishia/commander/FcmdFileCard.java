@@ -4,12 +4,12 @@ import java.io.File;
 
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.widget.GralFileSelector;
 
 import org.vishia.util.FileCompare;
@@ -445,7 +445,7 @@ public class FcmdFileCard extends GralFileSelector
      * @param params [0] is the Table line. The content of table cells are known here,
      *   because it is the file table itself. The {@link GralTableLine_ifc#getUserData()}
      *   returns the {@link FileRemote} file Object.
-     * @see org.vishia.gral.ifc.GralUserAction#userActionGui(int, org.vishia.gral.ifc.GralWidget, java.lang.Object[])
+     * @see org.vishia.gral.ifc.GralUserAction#userActionGui(int, org.vishia.gral.base.GralWidget, java.lang.Object[])
      */
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
       GralTableLine_ifc line = (GralTableLine_ifc) params[0];

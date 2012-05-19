@@ -12,14 +12,14 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralPos;
 import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;

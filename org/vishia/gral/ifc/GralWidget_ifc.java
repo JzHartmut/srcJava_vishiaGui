@@ -1,5 +1,7 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.util.Removeable;
 
@@ -35,6 +37,8 @@ public interface GralWidget_ifc extends Removeable
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-04-25 Hartmut new: {@link #refreshFromVariable(VariableContainer_ifc)}: Capability for any widget
+   *   to update its content from its associated variables described in its sDataPath.
    * <li>2012-03-31 Hartmut new: {@link #isVisible()}
    * <li>2012-01-16 Hartmut new: Concept {@link #repaint()}, can be invoked in any thread. With delay possible.
    * <li>2011-06-00 Hartmut created
@@ -63,7 +67,7 @@ public interface GralWidget_ifc extends Removeable
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120116;
+  public static final int version = 20120425;
 
   
   /**Returns the implementation class of the widget. */
@@ -119,5 +123,20 @@ public interface GralWidget_ifc extends Removeable
   public void repaint(int delay, int latest);
   
   void setBoundsPixel(int x, int y, int dx, int dy);
+ 
   
+  /**Sets the data path. It is a String in application context. If variables are used, it is the path
+   * of one or more variables, see {@link #refreshFromVariable(VariableContainer_ifc)}.
+   * @param sDataPath
+   */
+  void setDataPath(String sDataPath);
+  
+  /**Capability for any widget to update its content from its associated variables described in its sDataPath.
+   * @param container The container is used only if the variable is not known by direct reference
+   *   in the private {@link GralWidget#variable} or {@link GralWidget#variables}. If the variable(s) is/are
+   *   not known, they are searched by there data path set by {@link #setDataPath(String)}. More as one 
+   *   variables are possible separated by "," in the setDataPath("variable1, variable2").
+   *   The variables are searched in the container calling {@link VariableContainer_ifc#getVariable(String)}. 
+   */
+  void refreshFromVariable(VariableContainer_ifc container);
 }

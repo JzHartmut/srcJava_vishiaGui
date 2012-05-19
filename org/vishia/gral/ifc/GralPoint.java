@@ -1,5 +1,7 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.gral.base.GralPos;
+
 /**A GralPoint contains 2 or 3 float values for a point.
  * The unit of float is 1 grid unit like {@link GralPos}. It means, a figure described with this points
  * is shown in the correct size. Fractional parts of float determines fine positions.

@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.base.GralWindow;
@@ -28,7 +29,6 @@ import org.vishia.gral.base.GralWindow_setifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget;
 import org.vishia.util.KeyCode;
 
 //public class SubWindowSwt extends GralPanelContent implements WidgetCmpnifc
@@ -218,7 +218,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
 
   @Override public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction gralAction){
     if(menuBar == null){
-      menuBar = new SwtMenu("menubar", window, itsMng);
+      menuBar = new SwtMenu("menubar", window, (GralWidgetMng)itsMng);
     }
     menuBar.addMenuItemGthread(nameWidg, sMenuPath, gralAction);
   }

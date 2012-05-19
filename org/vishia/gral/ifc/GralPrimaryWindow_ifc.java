@@ -2,6 +2,7 @@ package org.vishia.gral.ifc;
 
 import java.io.File;
 
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow_setifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 
