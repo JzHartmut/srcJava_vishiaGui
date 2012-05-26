@@ -402,7 +402,7 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
 		userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
 	}
   
-  @Override public GralGridProperties propertiesGui(){ return propertiesGui(); }
+  @Override public GralGridProperties propertiesGui(){ return propertiesGui; }
   
   @Override public GralGraphicThread gralDevice(){ return gralDevice; }
   
