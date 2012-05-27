@@ -202,8 +202,7 @@ public class Fcmd extends GuiCfg
     favorPathSelector.panelRight.buildInitialTabs();
 
     gralMng.selectPanel("primaryWindow");
-    panelButtons = gralMng.createGridPanel("Buttons", gralMng.getColor("gr"),
-        1, 1, 10, 10);
+    panelButtons = gralMng.createGridPanel("Buttons", gralMng.getColor("gr"), 1, 1, 10, 10);
     gui.addFrameArea("A3C3", panelButtons); // dialogPanel);
     fButtons.initPanelButtons();
 

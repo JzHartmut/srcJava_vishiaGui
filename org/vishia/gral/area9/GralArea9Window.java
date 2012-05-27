@@ -30,6 +30,8 @@ public class GralArea9Window implements GralArea9_ifc
   
   /**Version and History
    * <ul>
+   * <li>2012-05-17 Hartmut new: {@link #setMinMaxSizeArea(String, int, int, int, int)}: The size can be given 
+   *   with gral units, as min, max or absolute (min, max are equal). The size of a area border can be changed on runtime.
    * <li>2012-04-22 Hartmut new: {@link #setFullScreen(boolean)}
    * <li>2011-12-26 Hartmut chg: The help window is a html info box now. New method {@link #setHelpUrl(String)}
    *   supports context sensitive help.
@@ -124,6 +126,26 @@ public class GralArea9Window implements GralArea9_ifc
    */
   protected byte[][][] dxyFrameArea = new byte[3][3][2]; 
   
+  /**requested minimal size of each window area in GralPos units. If the minimal value is 0, 
+   * the size is calculated from percent always. If the minimal value of percent calculation is lesser
+   * than this value, this value is used. Note that a given minimal value of all areas cannot required
+   * if the window's size is lesser. Then the middle area will 
+   */
+  private short[] xMinGralSize = new short[3], yMinGralSize = new short[3]; 
+  
+  /**requested maximal size of each window area in GralPos units. If the maximal value is greater than 
+   * the size calculated from percent always, the percent value is used. 
+   * Note that a given maximal value of all areas cannot regarded
+   * if the window's size is greater. Then the middle area will be presented  
+   */
+  private short[] xMaxGralSize = new short[3], yMaxGralSize = new short[3];
+  
+  /**Calculated borders of areas. 
+   * [0] is always 0, [1] and [2] are the given borders, [3] is always 100.
+   * It is because lower and higher bound should be accessed always without tests.
+   * Use area +1, because it is a Off-by-one problem */
+  private int[] xPixArea = new int[4], yPixArea = new int[4];
+  
   /**Number of pixels per percent unit of size, set if {@link #validateFrameAreas()} was called. */
   protected float pixelPerXpercent = 1, pixelPerYpercent =1;  
   
@@ -165,7 +187,12 @@ public class GralArea9Window implements GralArea9_ifc
     this.mainCmd = mainCmd;
     //this.gralDevice = guiDevice;
     this.window = window;
-
+    for(int ix = 0; ix < 3; ++ix) for(int iy = 0; iy < 3; ++iy){
+      xMinGralSize[ix] = 4;
+      yMinGralSize[iy] = 4;
+      xMaxGralSize[ix] = Short.MAX_VALUE;
+      yMaxGralSize[iy] = Short.MAX_VALUE;
+    }
   }
   
   
@@ -276,7 +303,6 @@ public class GralArea9Window implements GralArea9_ifc
   }
  
   
-  
   /**Sets a Component into a defined area. See {@link #setFrameAreaBorders(int, int, int, int)}.
    * It should be called only in the GUI-Thread.
    * @param xArea 1 to 3 for left, middle, right
@@ -314,7 +340,7 @@ public class GralArea9Window implements GralArea9_ifc
     //scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     //scrollPane.setViewportView(component);
     componentFrameArea[yArea-1][xArea-1] = component; //scrollPane;
-    setBoundsForFrameArea(xArea-1, yArea-1);
+    //setBoundsForFrameArea(xArea-1, yArea-1);
     //scrollPane.validate();
     //swtWindow.graphicThreadSwt.add(component); //scrollPane);
     /*TODO
@@ -331,29 +357,57 @@ public class GralArea9Window implements GralArea9_ifc
 
   
   
+  @Override public void setMinMaxSizeArea(String sArea, int yMinUnit, int yMaxUnit, int xMinUnit, int xMaxUnit)
+  throws IndexOutOfBoundsException {
+    GralRectangle r = convertArea(sArea);
+    yMinGralSize[r.y -1] = (short)yMinUnit;
+    yMaxGralSize[r.y -1] = yMaxUnit <=0 ? Short.MAX_VALUE : (short)yMaxUnit;
+    xMinGralSize[r.x -1] = (short)xMinUnit;
+    xMaxGralSize[r.x -1] = xMaxUnit <=0 ? Short.MAX_VALUE : (short)xMaxUnit;
+    
+    validateFrameAreas();
+  }
+
+  
+  
   
   protected void validateFrameAreas()
   {
     GralRectangle posSize = window.getPixelPositionSize();
     //Point size = swtWindow.graphicThreadSwt.windowSwt.getSize();
     int xWidth = posSize.dx -6; //swtWindow.graphicThreadSwt.getWidth();
-    int yWidth = posSize.dy -53; //swtWindow.graphicThreadSwt.getHeight() - 50;  //height of title and menu TODO calculate correctly
+    int yWidth = posSize.dy  -50; //swtWindow.graphicThreadSwt.getHeight() - 50;  //height of title and menu TODO calculate correctly
     //Control content = swtWindow.graphicThreadSwt.getContentPane();
     //xWidth = content.getWidth();
     //yWidth = content.getHeight();
     pixelPerXpercent = xWidth / 100.0F;
     pixelPerYpercent = yWidth / 100.0F;
     
+    int xPixUnit = window.gralMng.propertiesGui().xPixelUnit();
+    int yPixUnit = window.gralMng.propertiesGui().yPixelUnit();
+    pixelPerXpercent = xWidth / 100.0F;
+    pixelPerYpercent = yWidth / 100.0F;
+    
+    calcPixSize(xPixArea, xpFrameArea, xMinGralSize, xMaxGralSize, xPixUnit, xWidth, pixelPerXpercent);
+    calcPixSize(yPixArea, ypFrameArea, yMinGralSize, yMaxGralSize, yPixUnit, yWidth, pixelPerYpercent);
 
     for(int idxArea = 0; idxArea <= 2; idxArea++)
     { for(int idyArea = 0; idyArea <= 2; idyArea++)
       { GralPanelContent component = componentFrameArea[idyArea][idxArea];
         if(component !=null)
-        { //Control control = (Control)component.getWidgetImplementation();
-          setBoundsForFrameArea(idxArea, idyArea);
-          //control.update();
-          //Rectangle bounds = control.getBounds();
-          //control.redraw(bounds.x, bounds.y, bounds.width, bounds.height, true);
+        { //setBoundsForFrameArea(idxArea, idyArea);
+          int xp = xPixArea[idxArea];
+          int dxf = dxyFrameArea[idyArea][idxArea][0]; //nr of occupied areas
+          int xf2 = xPixArea[idxArea + dxf]; //percent right
+          int dxp =  xf2 - xp;
+          
+          int yp = yPixArea[idyArea];
+          int dyf = dxyFrameArea[idyArea][idxArea][1];
+          int yf2 = yPixArea[idyArea + dyf];
+          int dyp =  yf2 - yp;
+          GralPanelContent area = componentFrameArea[idyArea][idxArea];
+          area.setBoundsPixel(xp, yp, dxp, dyp);
+          area.repaint();
     } } }
     /*
     for(int ixMover = 0; ixMover < yAreaMover.length; ++ixMover){
@@ -373,7 +427,56 @@ public class GralArea9Window implements GralArea9_ifc
     //swtWindow.graphicThreadSwt.update();
     
   }
- 
+
+  
+  
+  private void calcPixSize(int[] zPixArea, byte[] zpFrameArea, short[] zMinGralSize, short[] zMaxGralSize
+    , int zPixUnit, int zSize, float pixelPerZpercent){
+    int zMinWin = zMinGralSize[0] + zMinGralSize[1] + zMinGralSize[2];  
+    zPixArea[0] = 0;
+    if(zSize >= (zPixUnit * zMinWin)){
+      int zPix = 0;
+      for(int iz=1; iz < 4; ++iz){
+        int zPix2 = (int)(zpFrameArea[iz] * pixelPerZpercent); 
+        if((zPix2 - zPix) > (zMaxGralSize[iz-1] * zPixUnit)){
+          zPix2 = zPix + zMaxGralSize[iz-1] * zPixUnit;
+        }
+        else if((zPix2 - zPix) < (zMinGralSize[iz-1] * zPixUnit)){
+          zPix2 = zPix + zMinGralSize[iz-1] * zPixUnit;
+        }
+        zPixArea[iz] = zPix = zPix2;
+      }
+      if(zPixArea[3] < zSize){
+        zPixArea[3] = zPix = zSize;
+        for(int iz=2; iz >=0; --iz){
+          if(zPix - zPixArea[iz] > zMaxGralSize[iz] * zPixUnit){
+            zPixArea[iz] = zPix - zMaxGralSize[iz] * zPixUnit;
+          }
+          zPix = zPixArea[iz];
+        }
+      } else if(zPixArea[3] > zSize){
+        zPixArea[3] = zPix = zSize;
+        for(int iz=2; iz >=0; --iz){
+          if(zPix - zPixArea[iz] < zMinGralSize[iz] * zPixUnit){
+            zPixArea[iz] = zPix - zMinGralSize[iz] * zPixUnit;
+          }
+          zPix = zPixArea[iz];
+        }
+      }
+    } else { //the window is less than the minimal area sizes:
+      //then the percent are valid, lesser as planned
+      for(int iz=0; iz < 3; ++iz){
+        zPixArea[iz] = (int)(zpFrameArea[iz] * pixelPerZpercent); 
+      }
+    }
+
+  }
+  
+  
+  
+  
+  
+  
   
   /**Sets the bounds for the component, which is localized at the given area.
    * @param idxArea
@@ -401,6 +504,12 @@ public class GralArea9Window implements GralArea9_ifc
     int yp = (int)(yf1  * pixelPerYpercent);
     int dxp = (int) ((xf2-xf1) * pixelPerXpercent);
     int dyp = (int) ((yf2-yf1) * pixelPerYpercent);
+    int xPixUnit = window.gralMng.propertiesGui().xPixelUnit();
+    int yPixUnit = window.gralMng.propertiesGui().yPixelUnit();
+    int xMax = xPixUnit * xMaxGralSize[idxArea];
+    int xMin = xPixUnit * xMinGralSize[idxArea];
+    int yMax = xPixUnit * yMaxGralSize[idyArea];
+    int yMin = xPixUnit * yMinGralSize[idyArea];
     GralPanelContent area = componentFrameArea[idyArea][idxArea];
     area.setBoundsPixel(xp, yp, dxp, dyp);
     area.repaint();
@@ -411,17 +520,24 @@ public class GralArea9Window implements GralArea9_ifc
   
 
   
+  /**Converts a string given are designation to indices.
+   * @param area A, B , C for column, 1, 2, 3 for row.
+   * @return
+   */
   protected GralRectangle convertArea(String area)
   { int x1,x2,y1,y2;
     x1 = "ABC".indexOf(area.charAt(0));
     if(x1 < 0){x1 = "ABC".indexOf(area.charAt(1));}
-    x2 = "ABC".indexOf(area.charAt(2));
-    if(x2 < 0){x2 = "ABC".indexOf(area.charAt(3));}
     y1 = "123".indexOf(area.charAt(0));
     if(y1 < 0){y1 = "123".indexOf(area.charAt(1));}
-    y2 = "123".indexOf(area.charAt(2));
-    if(y2 < 0){y2 = "123".indexOf(area.charAt(3));}
-    
+    if(area.length() >=2){
+      x2 = "ABC".indexOf(area.charAt(2));
+      if(x2 < 0){x2 = "ABC".indexOf(area.charAt(3));}
+      y2 = "123".indexOf(area.charAt(2));
+      if(y2 < 0){y2 = "123".indexOf(area.charAt(3));}
+    } else {
+      x2 = x1; y2 = y1;
+    }
     GralRectangle ret = new GralRectangle(x1+1, y1+1, x2-x1+1, y2-y1+1);
     return ret;
   }

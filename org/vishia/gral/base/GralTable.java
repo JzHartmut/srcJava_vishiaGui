@@ -501,7 +501,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     ixGlineSelectedNew = ixLineNew - ixLine1;
     
     Assert.check(ixLine2 < zLine && ixLineNew < zLine);
-    Assert.check(ixGlineSelectedNew < zLineVisible);
+    //Assert.check(ixGlineSelectedNew < zLineVisible);
     //
     //draw all table cells.
     long dbgtime1 = System.currentTimeMillis() - dbgtime;

@@ -45,6 +45,10 @@ public class FcmdIdents
 
   int keyHelp = KeyCode.F1;
 
+  String menuBarViewButtons = "&Window/view Buttons [sF1]";
+  String buttonViewButtons = "sF1:hide Btns";
+  int keyViewButtons = KeyCode.shift + KeyCode.F1;
+
   
   
   String menuBarAbout = "&Help/&About";

@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPos;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.KeyCode;
 
@@ -20,6 +21,8 @@ public class FcmdButtons
   private final Fcmd main;
   
   GralButton buttonDel;
+  
+  boolean bButtonVisible = true;
 
   FcmdButtons(Fcmd main){
     this.main = main;
@@ -105,6 +108,9 @@ public class FcmdButtons
     setFnBtn(main.selectPanelRight, main.idents.buttonFavorRight);
     setFnBtn(main.actionFocusCmdCard, main.idents.buttonFocusCmd);
     
+    setFnBtn(actionViewButtons, main.idents.buttonViewButtons);
+    main.gui.addMenuItemGThread("menuBarViewButtons", main.idents.menuBarViewButtons, actionViewButtons);
+    
     Iterator<Map.Entry<String, ButtonAction>> iterButtonAction = idxButtons.entrySet().iterator();
     
     main.gralMng.selectPanel("Buttons");
@@ -143,7 +149,27 @@ public class FcmdButtons
     for(idx = 30; idx < 40; ++idx){
       addButton(idx, iterButtonAction);
     }
+    main.gui.setMinMaxSizeArea("A3C3", 13, 13, 0, 0);
   }
 
-  
+
+  /**Action to focus the cmd card.
+   */
+  GralUserAction actionViewButtons = new GralUserAction()
+  {
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
+      if(key == KeyCode.menuEntered || key == KeyCode.mouse1Up){ ///
+        if(bButtonVisible){
+          bButtonVisible = false;
+          main.gui.setMinMaxSizeArea("A3C3", 4, 4, 0, 0);
+        } else {
+          bButtonVisible = true;
+          main.gui.setMinMaxSizeArea("A3C3", 13, 13, 0, 0);
+        }
+        return true;
+      } else return false;
+    }
+  };
+
+
 }

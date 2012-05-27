@@ -105,6 +105,7 @@ public class FcmdKeyActions
       else if(keyCode == main.idents.keyFavorLeft) { main.selectPanelLeft.userActionGui(KeyCode.menuEntered, widgd); }
       else if(keyCode == main.idents.keyFavorMiddle) { main.selectPanelMiddle.userActionGui(KeyCode.menuEntered, widgd); }
       else if(keyCode == main.idents.keyFavorRight) { main.selectPanelRight.userActionGui(KeyCode.menuEntered, widgd); }
+      else if(keyCode == main.idents.keyViewButtons) { main.fButtons.actionViewButtons.userActionGui(KeyCode.menuEntered, widgd); }
       else { done = false; }
       return done;
     }

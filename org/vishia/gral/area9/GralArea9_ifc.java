@@ -53,6 +53,8 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc, GralMngApplAdapter
 {
   /**Version history:
    * <ul>
+   * <li>2012-05-17 Hartmut new: {@link #setMinMaxSizeArea(String, int, int, int, int)}: The size can be given 
+   *   with gral units, as min, max or absolute (min, max are equal). The size of a area border can be changed on runtime.
    * <li>2012-03-25 Hartmut new/chg: {@link #addFrameArea(String, GralPanelContent)} now with String designation of area.
    *   It should be used instead designation with 4 integers in range 1..3.
    * <li>2011-12-26 Hartmut new extends {@link GralMngApplAdapter_ifc}
@@ -155,6 +157,14 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc, GralMngApplAdapter
    * @throws IndexOutOfBoundsException if the arguments are false or the area is occupied already.
    */
   void addFrameArea(String sArea, GralPanelContent component)
+  throws IndexOutOfBoundsException;
+  
+  
+  
+  /**Sets the minimal and maximal size.
+   * @throws IndexOutOfBoundsException if the arguments sArea are false.
+   */
+  void setMinMaxSizeArea(String sArea, int yMinUnit, int yMaxUnit, int xMinUnit, int xMaxUnit)
   throws IndexOutOfBoundsException;
   
   
