@@ -17,8 +17,8 @@ export INPUT_JAVAC="../org/vishia/commander/Fcmd.java"
 ## Sets the CLASSPATH variable for compilation (used jar-libraries). Do not leaf empty also it aren't needed because it is used in command line.
 ##This component depends on the following component:
 if test -d /usr/share/eclipse/plugins; then export SWTJAR="/usr/share/eclipse/plugins/org.eclipse.swt.gtk.linux.x86_3.6.2.v3659b.jar:/usr/share/eclipse/plugins/org.eclipse.swt_3.6.2.v3659c.jar"; fi
+if test -d /usr/local/share/Eclipse/eclipseSDK3_7/eclipse; then export SWTJAR="/usr/local/share/Eclipse/eclipseSDK3_7/eclipse/plugins/org.eclipse.swt.gtk.linux.x86_3.7.1.v3738a.jar"; fi
 if test -d /d/Progs/Eclipse3_5/plugins; then export SWTJAR="/d/Progs/Eclipse3_5/plugins/org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar"; fi
-
 export CLASSPATH_JAVAC="$SWTJAR"
 
 ## Sets the src-path for further necessary sources. It is always .. because the make directory is parallel to the java sources of this component.
