@@ -1,5 +1,6 @@
 package org.vishia.gral.base;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -10,7 +11,11 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralCurveViewTrack_ifc;
 import org.vishia.gral.ifc.GralCurveView_ifc;
 import org.vishia.gral.ifc.GralSetValue_ifc;
+import org.vishia.mainCmd.Report;
+import org.vishia.mainCmd.ReportWrapperLog;
 import org.vishia.util.Assert;
+import org.vishia.zbnf.ZbnfJavaOutput;
+import org.vishia.zbnf.ZbnfParser;
 
 
 /**Curve representation for timed values. It is the base class for all implementation.
@@ -23,7 +28,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   /**Version, history and license.
    * <ul>
-   * <li>2013-04-01 Hartmut new: Using {@link VariableAccessWithIdx} to access values.
+   * <li>2012-06-08 Hartmut new: {@link #applySettings(String)} and {@link #writeSettings(Appendable)} for saving
+   *   and getting the configuration of curve view from a file or another text.
+   * <li>2012-04-01 Hartmut new: Using {@link VariableAccessWithIdx} to access values.
    * <li>2012-03-25 Hartmut chg: Some routines from SWT moved to this because there are independent.
    * <li>2012-03-17 Hartmut chg: All track-associated data now in the {@link Track} inner class.
    * <li>2012-02-25 Hartmut new: All data have a short timestamp. The x-pixel are calculated with timestamp,
@@ -62,6 +69,32 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    */
   public final static int version = 20120317;
   
+  
+  
+  public class ZbnfSetTrack {
+    public String name;
+    public String datapath;
+    GralColor color_; int style_ = 0;
+    public int nullLine;
+    public float scale;
+    public float offset;
+    
+    public void set_color(String color){ color_ = GralColor.getColor(color.trim()); }
+  }
+  
+  
+  public class ZbnfSetCurve{
+    public ZbnfSetTrack new_Track(){
+      return new ZbnfSetTrack();
+    }
+    public void add_Track(ZbnfSetTrack track){
+      initTrack(track.name, track.datapath, track.color_, track.style_, track.nullLine, track.scale, track.offset);
+    }
+    
+  }
+  
+  ZbnfSetCurve zbnfSetCurve = new ZbnfSetCurve();
+  
   /**The describing and the actual data of one track (one curve)
    */
   protected static class Track implements GralCurveViewTrack_ifc, GralSetValue_ifc {
@@ -91,6 +124,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     
     /**The color of the line. */
     public GralColor lineColor;
+    
+    /**The brightness of the line. It is used to show the selected line. */
+    public int lineWidth = 1;
     
     //public float y0Pix;
     
@@ -153,7 +189,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       y0Line = line0;
     }
 
-    @Override public void setLineColor(GralColor color){ lineColor = color; }
+    @Override public void setLineProperties(GralColor color, int width, int pattern){ 
+      lineColor = color; 
+      lineWidth = width;
+    }
 
     @Override public void setText(CharSequence text){
       System.err.println("GralCurveView - setText not supported; Widget = " + name + "; text=" + text);
@@ -450,6 +489,12 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   public List<GralSetValue_ifc> getTracks(){ return listTrackSet; }
   
   
+  /**This list describes the data paths in that order, which should be regard
+   * calling {@link #setSample(float[])}.
+   */
+  public List<? extends GralCurveViewTrack_ifc> getTrackInfo(){ return listTracks; }
+  
+  
   /**Adds a sampling value set.
    * <br><br> 
    * This method can be called in any thread. It updates only data,
@@ -676,6 +721,58 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   @Override public boolean isActiv(){ return bActive; }
   
 
+  
+  @Override public boolean applySettings(String in){
+    boolean bOk;
+    try{
+      //variate syntax in test... 
+      String syntax1 = "curveSettings::= { <Track> } \\e."
+                    + "Track::= track <*:?name> : { datapath = <* ,;?datapath> | color = <* ,;?color> | "
+                    + "scale = <#f?scale> | offset = <#f?offset> | 0-line-percent = <#?nullLine> "
+                    + "? , } ; .";
+      syntax1 = syntaxSettings;
+      Report console = new ReportWrapperLog(itsMng.log());
+      ZbnfParser parser = new ZbnfParser(console);
+      parser.setSyntax(syntax1);
+      bOk = parser.parse(in);
+      if(!bOk){
+        console.writeError(parser.getSyntaxErrorReport());
+      } else {
+        ixLineInit = 0;
+        listTracks.clear();
+        listTrackSet.clear();
+        ZbnfJavaOutput setData = new ZbnfJavaOutput(console);
+        setData.setContent(zbnfSetCurve.getClass(), zbnfSetCurve, parser.getFirstParseResult());
+      }
+    } catch(Exception exc){
+      System.err.println("GralCurveView.writeSettings() - unexpected IOException;" + exc.getMessage());
+      bOk = false;
+    }
+    return bOk;
+  }
+  
+  
+  
+  @Override public void writeSettings(Appendable out){
+    for(Track track: listTracks){
+      if(track.sDataPath !=null){
+        try{
+          out.append("track ").append(track.name).append(":");
+          out.append(" datapath=").append(track.sDataPath);
+          out.append(", color=").append(track.lineColor.toString());
+          out.append(", scale=").append(Float.toString(track.yScale) );
+          out.append(", offset=").append(Float.toString(track.yOffset));
+          out.append("0-line-percent=").append(Integer.toString(track.y0Line));
+          out.append(";\n");
+        } catch(IOException exc){
+          System.err.println("GralCurveView.writeSettings() - unexpected IOException;" + exc.getMessage());
+        }
+      }
+    }
+  }
+  
+  
+  
   
   protected void moveCursors(int xPos){
     System.out.println("middle");

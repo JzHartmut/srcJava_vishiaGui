@@ -46,6 +46,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2012-06-09 new Hartmut: {@link GralFileSelector.WindowFileSelection}, not ready yet.
    * <li>2012-04-16 chg: Capability to sort enhanced.
    * <li>2012-04-10 chg: Now ctrl-PgUp to select parent dir, like in Norton Commander,
    *   ctrl-PgDn to entry in dir (parallel to Enter).
@@ -94,6 +95,11 @@ public class GralFileSelector implements Removeable //extends GralWidget
   FileRemoteAccessor localFileAccessor = FileRemoteAccessorLocalFile.getInstance();
   
   
+  /**A window for search-in-file dialogue.
+   * It is instantiated calling {@link GralFileSelector#createWindowConfirmSearchGthread(GralMngBuild_ifc)}.
+   * The user can invoke {@link #confirmSearchInFiles(GralFileSelector, Appendable)} to open that window. 
+   *
+   */
   public static class WindowConfirmSearch {
     
     GralWindow_ifc windConfirmSearch;
@@ -292,6 +298,66 @@ public class GralFileSelector implements Removeable //extends GralWidget
 
 
   } //selectList implementation
+  
+  
+  
+  
+  
+  
+  /**A window for search-in-file dialogue.
+   * It is instantiated calling {@link GralFileSelector#createWindowConfirmSearchGthread(GralMngBuild_ifc)}.
+   * The user can invoke {@link #confirmSearchInFiles(GralFileSelector, Appendable)} to open that window. 
+   *
+   */
+  public static class WindowFileSelection {
+    
+    GralWindow_ifc wind;
+
+    GralFileSelector fileSelector;
+    
+        
+    /**Use {@link GralFileSelector#createWindowConfirmSearchGthread(GralMngBuild_ifc)} to create.
+    */
+    protected WindowFileSelection(){}
+    
+    
+    
+    /**Creates the window to confirm search in files. This window can be created only one time
+     * for all file panels, if the application has more as one. On activating the directory
+     * and the file panel to show results should be given. But only one search process can be run
+     * simultaneously.
+     * @return The created window.
+     */
+    public static WindowFileSelection create(GralMngBuild_ifc mng){
+      WindowFileSelection wind = new WindowFileSelection();
+      mng.selectPanel("primaryWindow");
+      mng.setPosition(-24, 0, -67, 0, 1, 'r'); //right buttom, about half less display width and hight.
+      wind.wind = mng.createWindow("windSelectFile", "select file", GralWindow.windConcurrently);
+      mng.setPosition(0, 0, 0, -2, 0, 'd', 0.0f);
+      wind.fileSelector = new GralFileSelector();
+      wind.fileSelector.setToPanel(mng, "selectFile", 100, new int[]{2,20,5,10}, 'C');
+      mng.setPosition(-1, GralPos.size - 3, 1, GralPos.size + 8, 0, 'r',2);
+      //mng.addButton(null, wind.actionFileSearch, "esc", null, null, "esc");
+      return wind;
+    }
+
+    
+    
+    /**Shows the window.
+     * @param fileSelector
+     */
+    public void confirmSearchInFiles(GralFileSelector fileSelector, Appendable searchOutput){
+      this.fileSelector = fileSelector;
+      wind.setWindowVisible(true);
+    }
+    
+    
+  }
+  
+  
+  
+  
+  
   
   
   /**Number of columns of the table. */

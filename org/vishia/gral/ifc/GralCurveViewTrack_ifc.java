@@ -10,6 +10,8 @@ public interface GralCurveViewTrack_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2012-06-08 Hartmut new: {@link #getDataPath()}, used to write settings.
+   * <li>2012-06-08 Hartmut chg: {@link #setLineProperties(GralColor, int)} instead setLineColor() 
    * <li>2012-04-01 Hartmut new: {@link #setDataPath(String)}
    * <li>2012-03-17 Hartmut created as interface to {@link org.vishia.gral.base.GralCurveView.Track}.
    *   Approach: Accessibility. The class Track is protected. Its details should only be used
@@ -56,6 +58,8 @@ public interface GralCurveViewTrack_ifc
   /**Returns the set color for this line. */
   GralColor getLineColor();
   
+  String getDataPath();
+  
   /**Change the scaling of a track.
    * @param trackNr Number of the track in order of creation, 0 ist the first.
    * @param scale7div value per division
@@ -64,10 +68,12 @@ public interface GralCurveViewTrack_ifc
    */
   void setTrackScale(float scale7div, float offset, int line0);
   
-  /**Sets the color for this track.
-   * @param color
+  /**Sets the properties for this track.
+   * @param color The color of line
+   * @param width The thickness of the line.
+   * @param pattern a Pattern of the line. Yet the pattern is not used (TODO). Value 0 doesn't change the current one.
    */
-  void setLineColor(GralColor color);
+  void setLineProperties(GralColor color, int width, int pattern);
   
   void setDataPath(String path);
 

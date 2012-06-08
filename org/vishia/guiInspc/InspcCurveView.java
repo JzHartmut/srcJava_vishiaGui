@@ -1,5 +1,10 @@
 package org.vishia.guiInspc;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
+import java.util.List;
+
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.gral.base.GralButton;
@@ -18,6 +23,7 @@ import org.vishia.gral.ifc.GralWindowMng_ifc;
 import org.vishia.inspectorAccessor.InspcAccessEvaluatorRxTelg;
 import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
 public class InspcCurveView
@@ -26,6 +32,8 @@ public class InspcCurveView
   /**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
    * Changes:
    * <ul>
+   * <li>2012-06-08 Hartmut: new Buttons for read and save the configuration (setting). Yet only a simple file is used.
+   *   TODO: File selection.
    * <li>2012-03-17 Hartmut creating using the {@link GralCurveView} in a special window
    *   with the communication in {@link InspcMng}.
    * </ul>
@@ -114,7 +122,7 @@ public class InspcCurveView
   
   GralTextField widgScale, widgScale0, widgline0;
   
-  GralButton widgBtnUp, widgBtnDn, widgBtnScale;
+  GralButton widgBtnUp, widgBtnDn, widgBtnScale, widgBtnRead,widgBtnSave;
   
   
   /**
@@ -175,9 +183,12 @@ public class InspcCurveView
     widgline0 = gralMng.addTextField("line0", true, "line-%", "t");
     gralMng.setPosition(32, GralPos.size +2, -10, GralPos.size +2, 0, 'r', 1);
     widgBtnDn = gralMng.addButton("btnDn", actionSetScaleValues2Track, "-", null, null, "-");
-    widgBtnDn = gralMng.addButton("btnUp", actionSetScaleValues2Track, "+", null, null, "+");
+    widgBtnUp = gralMng.addButton("btnUp", actionSetScaleValues2Track, "+", null, null, "+");
     gralMng.setPosition(GralPos.same, GralPos.size +2, GralPos.next, GralPos.size +4, 0, 'r', 1);
-    widgBtnDn = gralMng.addButton("btnScale", actionSetScaleValues2Track, "!", null, null, "set");
+    widgBtnScale = gralMng.addButton("btnScale", actionSetScaleValues2Track, "!", null, null, "set");
+    gralMng.setPosition(35, GralPos.size +2, -10, GralPos.size +4, 0, 'r', 2);
+    widgBtnRead = gralMng.addButton("btnRead", actionRead, "read", null, null, "read");
+    widgBtnSave = gralMng.addButton("btnSave", actionSave, "save", null, null, "save");
     
     gralMng.setPosition(-3, GralPos.size +2, -9, -1, 0, 'd', 0);
     widgBtnOff = gralMng.addSwitchButton(sName + "btnOff", "off / ?on", "on / ?off", GralColor.getColor("lgn"), GralColor.getColor("am"));
@@ -288,11 +299,11 @@ public class InspcCurveView
         if(trackScale !=null){
           //last variable
           trackScale.widgVarPath.setBackgroundColor(GralColor.getColor("wh"));
-          trackScale.trackView.setLineColor(colorLineTrackSelected);
+          trackScale.trackView.setLineProperties(colorLineTrackSelected, 1, 0);
         }
         trackScale = (TrackValues)widgd.getContentInfo();
         colorLineTrackSelected = trackScale.trackView.getLineColor();
-        trackScale.trackView.setLineColor(colorBlack);
+        trackScale.trackView.setLineProperties(colorLineTrackSelected, 2, 0);
         trackScale.widgVarPath.setBackgroundColor(GralColor.getColor("lam"));
         widgScale.setText("" + trackScale.trackView.getScale7div());
         widgScale0.setText("" + trackScale.trackView.getOffset());
@@ -301,6 +312,56 @@ public class InspcCurveView
       return true;
   } };
   
+  
+  
+  GralUserAction actionRead = new GralUserAction(){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    { if(actionCode == KeyCode.mouse1Up){
+        try{
+          File file = new File("curve.save");
+          System.out.println("read curve view from; " + file.getAbsolutePath());
+          String in = FileSystem.readFile(file);
+          if(in ==null){
+            System.err.println("InspcCurveView.actionRead - file not found;" + file.getAbsolutePath());
+          } else {
+            widgCurve.applySettings(in); 
+            List<? extends GralCurveViewTrack_ifc> listTracks = widgCurve.getTrackInfo();
+            int iTrack = 0;
+            for(GralCurveViewTrack_ifc track: listTracks){
+              TrackValues trackValue = tracks[iTrack];
+              trackValue.trackView = track;
+              trackValue.widgVarPath.setText(track.getDataPath());
+              iTrack +=1;
+            }
+          }
+        } catch(Exception exc){
+          widgBtnScale.setForegroundColor(GralColor.getColor("lrd"));
+        }
+      }
+      return true;
+  } };
+  
+  
+  
+
+  GralUserAction actionSave = new GralUserAction(){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    { if(actionCode == KeyCode.mouse1Up){
+        try{
+          File file = new File("curve.save");
+          System.out.println("save curve view to; " + file.getAbsolutePath());
+          Writer out = new FileWriter(file);
+          widgCurve.writeSettings(out);
+          out.close();
+        } catch(Exception exc){
+          widgBtnScale.setForegroundColor(GralColor.getColor("lrd"));
+        }
+      }
+      return true;
+  } };
+  
+  
+
   
   private void showValues(){
     float[] values = new float[tracks.length];

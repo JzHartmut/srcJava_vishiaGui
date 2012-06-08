@@ -359,7 +359,7 @@ public class SwtCurveView extends GralCurveView
       int yp2 = yp9;  //right value
       int yp1; //left value
       int ixData1;
-      Color lineColor = (Color)itsMng.getColorImpl(track.lineColor);
+      Color lineColor = track.lineColor !=null ? (Color)itsMng.getColorImpl(track.lineColor) : ((SwtProperties)itsMng.propertiesGui).colorBackground;
       if(iTrack == 0){
         //System.out.println("SwtCurveView-drawTrack-start(y0Pix=" + y0Pix + ", yFactor=" + yFactor + ", y=" + yF + ")");
       }
@@ -388,7 +388,8 @@ public class SwtCurveView extends GralCurveView
             }
             nrofYp +=1;
           } while(ixData != ixData1); // iData != ixDrawValues); //all values per 1 pixel
-          g.setForeground(lineColor); 
+          g.setForeground(lineColor);
+          g.setLineWidth(track.lineWidth);
           if(nrofYp > 1){ //more as one value on the same xp
             g.drawLine(xp1, yp1min, xp1, yp1max);  //draw vertical line to show range.
             yp1 = yp1 / nrofYp;

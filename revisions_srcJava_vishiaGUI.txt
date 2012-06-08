@@ -1,6 +1,25 @@
-﻿------------------------------------------------------------
-2012-04-22 Hartmut
-Some enhancements
+﻿2012-06-09 Hartmut
+------------------------------------------------------------
+Intension: Improve curve view
+* GralColor.getColor(String) now accepts a "0xhexa-Value" for a color name.
+If the color name does not match, a magenta color is returned. The method returns a color in any case.
+* GralCurveView and GralCurveView_ifc:  applySettings(String) and {@link #writeSettings(Appendable) 
+for saving and getting the configuration of curve view from a file or another text.
+* GralCurveViewTrack_ifc: setLineProperties(GralColor, int) instead setLineColor().
+* InspcCurveView: new Buttons for read and save the configuration (setting). Yet only a simple file is used.  TODO: File selection.
+------
+Component sources:
+new _bzrGetOtherCmpnVersions.bat and _bzrOtherCmpnVersions.txt to document which depending components are used.
+
+------------------------------------------------------------
+2012-05-28 Hartmut
+Intension: The.file.Commander: Fix the problem of showing the button window (all buttons, a few ...?) 
+* GralArea9Window: setMinMaxSizeArea(...): The size can be given with gral units, as min, max or absolute (min, max are equal). The size of a area border can be changed on runtime.
+* FcmdButtons.java, FcmdIdents.java: enhancement with shift-F1
+------------------------------------------------------------
+2012-05-27 Hartmut
+* GralPos and GralWidget moved from pkg ifc to pkg base.
+* Some fine adjustments
 ------------------------------------------------------------
 2012-04-22 Hartmut
 Usage of GUI for profession

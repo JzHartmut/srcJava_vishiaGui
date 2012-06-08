@@ -75,7 +75,7 @@ public class GralCfgZbnf
   { this.console = log;
     this.fileSyntax = fileSyntax;
     this.parser = new ZbnfParser(log);
-    this.zbnfJavaOutput = new ZbnfJavaOutput();
+    this.zbnfJavaOutput = new ZbnfJavaOutput(log);
   }
 
 

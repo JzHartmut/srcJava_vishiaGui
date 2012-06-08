@@ -899,7 +899,9 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * <br>Implementation hints: In SWT it should call redraw(). 
    * <br>It is possible that the widget
    * consists of more as one graphical widget, then all of it should be redrawn. 
-   * It is possible that some data are set in another thread, they should be applied to the widgets firstly. 
+   * It is possible that some data are set in another thread, they should be applied to the widgets firstly.
+   * It is possible that the widget is removed though a repaintGthread-order is pending from the time before deleting,
+   * for example if the graphic layout is changed. 
    * 
    */
   protected abstract void repaintGthread();

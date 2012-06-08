@@ -12,6 +12,8 @@ public interface GralCurveView_ifc extends GralWidget_ifc, GralSetValue_ifc, Get
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-06-08 Hartmut new: {@link #applySettings(String)} and {@link #writeSettings(Appendable)} for saving
+   *   and getting the configuration of curve view from a file or another text.
    * <li>2012-04-26 Hartmut new extends GralWidget_ifc etc: A reference to a GralCurveView_ifc is a
    *   reference to a widget too.
    * <li>2012-04-26 Hartmut new capability for curve view: Set active or non active. It is a state
@@ -60,8 +62,35 @@ public interface GralCurveView_ifc extends GralWidget_ifc, GralSetValue_ifc, Get
    */
   void setSample(float[] values, int timeshort);
 
+  /**Activates or deactivates. Only if the curve view is activated, it writes in time. If it is not active,
+   * than the curve can be watched, zoomed etc. 
+   * @param activate true to activate, false to deactivate.
+   */
   void activate(boolean activate);
   
+  /**Returns true if the curve view is active. See {@link #activate(boolean)}. */
   boolean isActiv();
+  
+  /**The ZBNF-syntax of a setting for curve view. */
+  static String syntaxSettings = "curveSettings::= { <Track> } \\e."
+    + "Track::= track <*:?name> : { datapath = <* ,;?datapath> | color = <* ,;?color> | "
+    + "scale = <#f?scale> | offset = <#f?offset> | 0-line-percent = <#?nullLine> "
+    + "? , } ; .";
+
+  
+  /**Reads the settings from the given String (maybe read from a file)
+   * and sets all tracks newly.
+   * @param in Input, syntax see {@link #syntaxSettings}
+   * @return true on success.
+   */
+  boolean applySettings(String in);
+
+  /**Writes the settings of the curve view in an output, maybe a file. 
+   * The syntax is matching to {@link #applySettings(String)}.
+   * 
+   * @param out any output stream.
+   */
+  void writeSettings(Appendable out);
+
   
 }

@@ -16,6 +16,8 @@ public class GralColor
   
   /**Version and history:
    * <ul>
+   * <li>2012-06-09 Hartmut new: {@link #getColor(String)} now accepts a "0xhexa-Value" for a color name.
+   *  If the color name does not match, a magenta color is returned. The method returns a color in any case.
    * <li>2011-10-01 Hartmut new: color lbk light black darker than dark gray. Change values for gray.
    * <li>2011-09-08 Hartmut new: some enhancements, new colors.
    * <li>2011-09-04 Hartmut chg: Rename from ColorGui to GralColor
@@ -234,10 +236,29 @@ public class GralColor
    * <li>"dma", 0x600060);
    * <li>"dcy", 0x006060);
    * </ul>
-   * @param name
-   * @return
+   * Additional a hexa value can be given in form "0xffffff" as name. 
+   * @param name The name or 0xhexa
+   * @return The proper color from the color container. The color is not created as a new instance if it is contained
+   *   in the container already.
+   *   If the color name does not match, a magenta color is returned.
    */
-  public static GralColor getColor(String name){ return container.colorsByName.get(name); }
+  public static GralColor getColor(String name){ 
+    GralColor color;
+    if(name.startsWith("0x")){
+      try{
+        int colorValue = Integer.parseInt(name.substring(2).trim(), 16);
+        color = getColor(colorValue);
+      }catch(NumberFormatException exc){
+        color = container.colorsByName.get("ma");
+      }
+    } else {
+      color = container.colorsByName.get(name);
+      if(color == null){
+        color = container.colorsByName.get("ma");
+      }
+    }
+    return color;
+  }
   
   public static GralColor getColor(int value)
   { GralColor color = container.colorsByValue.get(value);
@@ -253,6 +274,6 @@ public class GralColor
     // name = container.colorsByValue.get(color);
     String name = null;
     if(name !=null) return name;
-    else return String.format("color=%8X",color);
+    else return String.format("0x%6X",color);
   }
 }

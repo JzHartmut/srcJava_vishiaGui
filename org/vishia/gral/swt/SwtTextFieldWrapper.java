@@ -31,6 +31,8 @@ public class SwtTextFieldWrapper extends GralTextField
 {
   /**Version, history and license.
    * <ul>
+   * <li>2012-06-08 Hartmut chg: {@link #repaintGthread()} does not do anything if the textFieldSwt is removed 
+   *   because the widget was removed. Prevent null-Pointer exception.
    * <li>2012-04-10 Hartmut chg: A key listener, only for experience
    * <li>2012-03-17 Hartmut bugfix: adjustment of prompt for top prompt
    * <li>2012-03-10 Hartmut chg: Minor for top-level prompt.
@@ -255,33 +257,35 @@ public class SwtTextFieldWrapper extends GralTextField
   @Override protected void repaintGthread(){
     int catastrophicalCount = 0;
     int chg;
-    do{
-      chg = this.whatIsChanged.get();
-      if(++catastrophicalCount > 10000) 
-        throw new RuntimeException("atomic failed");
-      if((chg & chgText) !=0){ 
-        textFieldSwt.setText(text);
-        final int selectionStart, selectionEnd;
-        final int zText = text.length();
-        if(caretPos <0){
-          selectionEnd = text.length(); selectionStart = selectionEnd; // -1;
+    if(textFieldSwt !=null){ //do nothing if the graphic implementation widget is removed.
+      do{
+        chg = this.whatIsChanged.get();
+        if(++catastrophicalCount > 10000) 
+          throw new RuntimeException("atomic failed");
+        if((chg & chgText) !=0){ 
+          textFieldSwt.setText(text);
+          final int selectionStart, selectionEnd;
+          final int zText = text.length();
+          if(caretPos <0){
+            selectionEnd = text.length(); selectionStart = selectionEnd; // -1;
+          }
+          else if(caretPos >0){
+            selectionEnd = caretPos > zText ? zText : caretPos;
+            selectionStart = selectionEnd; // -1;
+          } else {
+            assert(caretPos ==0);
+            selectionEnd = selectionStart =-1;  //dont call
+          }
+          if(selectionStart >=0){
+            textFieldSwt.setSelection(selectionStart, selectionEnd);
+          }
         }
-        else if(caretPos >0){
-          selectionEnd = caretPos > zText ? zText : caretPos;
-          selectionStart = selectionEnd; // -1;
-        } else {
-          assert(caretPos ==0);
-          selectionEnd = selectionStart =-1;  //dont call
-        }
-        if(selectionStart >=0){
-          textFieldSwt.setSelection(selectionStart, selectionEnd);
-        }
-      }
-      if((chg & chgColorText) !=0){ textFieldSwt.setForeground(((SwtMng)itsMng).getColorImpl(colorText)); }
-      if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(((SwtMng)itsMng).getColorImpl(colorBack)); }
-      textFieldSwt.redraw();
+        if((chg & chgColorText) !=0){ textFieldSwt.setForeground(((SwtMng)itsMng).getColorImpl(colorText)); }
+        if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(((SwtMng)itsMng).getColorImpl(colorBack)); }
+        textFieldSwt.redraw();
       //System.out.println("SwtTextField " + name + ":" + text);
-    } while(!whatIsChanged.compareAndSet(chg, 0));
+      } while(!whatIsChanged.compareAndSet(chg, 0));
+    }
   }
 
   
