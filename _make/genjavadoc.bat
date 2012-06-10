@@ -1,48 +1,20 @@
-@echo on
-::rmdir /S /Q ..\javadoc
 
-set DST=..\..\javadocGral
-if exist %DST% rmdir /S /Q %DST%
-if exist %DST%_priv rmdir /S /Q %DST%_priv
+set DST=..\..\docuSrcJava_vishiaGUI
+set DST_priv=..\..\docuSrcJava_vishiaGUI_priv
 
-if not exist %DST% mkdir %DST%
-if not exist %DST%_priv mkdir %DST%_priv
-call setZBNFJAX_HOME.bat
+echo set SRC
+set SRC=-subpackages org.vishia.gral org.vishia.commander 
+set SRC=%SRC% ..\org\vishia\guiBzr\*.java
+set SRC=%SRC% ..\org\vishia\guiInspc\*.java
+set SRC=%SRC% ..\org\vishia\guiViewCfg\*.java
+set SRC=%SRC% ..\org\vishia\windows\*.java
 
-set SRC=
-set SRC=%SRC% ../org/vishia/guiBzr/*.java
-set SRC=%SRC% ../org/vishia/guiInspc/*.java
-set SRC=%SRC% ../org/vishia/guiViewCfg/*.java
-set SRC=%SRC% ../org/vishia/gral/*.java
-set SRC=%SRC% ../org/vishia/gral/area9/*.java
-set SRC=%SRC% ../org/vishia/gral/awt/*.java
-set SRC=%SRC% ../org/vishia/gral/cfg/*.java
-set SRC=%SRC% ../org/vishia/gral/base/*.java
-set SRC=%SRC% ../org/vishia/gral/ifc/*.java
-set SRC=%SRC% ../org/vishia/gral/widget/*.java
-set SRC=%SRC% ../org/vishia/gral/swt/*.java
-set SRC=%SRC% ../org/vishia/commander/*.java
-set SRC=%SRC% ../org/vishia/commander/target/*.java
-set SRC=%SRC% ../org/vishia/windows/*.java
+set SRCPATH=..;..\..\srcJava_vishiaBase;..\..\srcJava_vishiaRun;..\..\srcJava_Zbnf
 
-echo generate docu: %SRC%
-::this batch should be accessable in the PATH and should be set the JAVA_HOME environment variable:
-::call setANT_HOME.bat
-echo on
+echo set linkpath
+set LINKPATH=
+set LINKPATH=%LINKPATH% -link ..\docuSrcJava_Zbnf
+set LINKPATH=%LINKPATH% -link ..\docuSrcJava_vishiaBase
+set LINKPATH=%LINKPATH% -link ..\docuSrcJava_vishiaRun
 
-echo generate docu: %SRC%
-echo on
-
-%JAVA_HOME%\bin\javadoc.exe -d %DST% -linksource -notimestamp %SRC%  1>%DST%\javadoc.rpt 2>%DST%\javadoc.err
-%JAVA_HOME%\bin\javadoc.exe -d %DST%_priv -private -linksource -notimestamp %SRC%  1>%DST%_priv\javadoc.rpt 2>%DST%_priv\javadoc.err
-
-if not exist %DST%\img mkdir %DST%\img
-copy ..\img\* %DST%\img\*
-
-if not exist %DST%_priv\img mkdir %DST%_priv\img
-copy ..\img\* %DST%_priv\img\*
-
-copy stylesheet_javadoc.css %DST%\stylesheet.css
-copy stylesheet_javadoc.css %DST%_priv\stylesheet.css
-if "NOPAUSE" == "" pause
-
+..\..\srcJava_vishiaBase\_make\+genjavadocbase.bat

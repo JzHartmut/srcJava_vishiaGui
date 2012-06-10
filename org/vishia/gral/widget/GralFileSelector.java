@@ -346,8 +346,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     /**Shows the window.
      * @param fileSelector
      */
-    public void confirmSearchInFiles(GralFileSelector fileSelector, Appendable searchOutput){
-      this.fileSelector = fileSelector;
+    public void openDialog(String path){
       wind.setWindowVisible(true);
     }
     

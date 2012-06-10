@@ -20,6 +20,7 @@ import org.vishia.gral.ifc.GralCurveViewTrack_ifc;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWindowMng_ifc;
+import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.inspectorAccessor.InspcAccessEvaluatorRxTelg;
 import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
 import org.vishia.msgDispatch.LogMessage;
@@ -68,6 +69,8 @@ public class InspcCurveView
   
   /**Three windows for curve view. */
   GralWindow windCurve;
+  
+  GralFileSelector.WindowFileSelection windFile;
   
   final GralWidgetMng gralMng;
   
@@ -193,6 +196,8 @@ public class InspcCurveView
     gralMng.setPosition(-3, GralPos.size +2, -9, -1, 0, 'd', 0);
     widgBtnOff = gralMng.addSwitchButton(sName + "btnOff", "off / ?on", "on / ?off", GralColor.getColor("lgn"), GralColor.getColor("am"));
     wind.addMenuItemGThread("menuBarCurveView", "&Window/open " + sName, actionOpenWindow);
+  
+    windFile = GralFileSelector.WindowFileSelection.create(gralMng);
   }
 
   
@@ -318,6 +323,7 @@ public class InspcCurveView
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(actionCode == KeyCode.mouse1Up){
         try{
+          windFile.openDialog(".");
           File file = new File("curve.save");
           System.out.println("read curve view from; " + file.getAbsolutePath());
           String in = FileSystem.readFile(file);
