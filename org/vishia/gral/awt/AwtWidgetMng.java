@@ -6,6 +6,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Color;
+import java.awt.Frame;
 import java.awt.Label;
 import java.awt.Menu;
 import java.awt.Point;
@@ -13,6 +14,8 @@ import java.awt.PopupMenu;
 import java.awt.Rectangle;
 import java.awt.TextArea;
 import java.awt.TextField;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.InputStream;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -52,6 +55,8 @@ public class AwtWidgetMng extends GralWidgetMng implements GralMngBuild_ifc, Gra
   
   final AwtProperties propertiesGuiAwt; 
   
+  final Frame mainWindowAwt;
+  
   /**Creates an instance.
    * @param guiContainer The container where the elements are stored in.
    * @param width in display-units for the window's width, the number of pixel depends from param displaySize.
@@ -59,12 +64,14 @@ public class AwtWidgetMng extends GralWidgetMng implements GralMngBuild_ifc, Gra
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public AwtWidgetMng(GralGraphicThread device, AwtProperties propertiesGui
+  public AwtWidgetMng(GralGraphicThread device, Frame window, AwtProperties propertiesGui
     , VariableContainer_ifc variableContainer
     , LogMessage log
     )
   { super(device, propertiesGui, variableContainer, log);
+    mainWindowAwt = window;
     this.propertiesGuiAwt = propertiesGui;
+    mainWindowAwt.addKeyListener(mainKeyListener);
   }
 
 
@@ -626,6 +633,28 @@ public class AwtWidgetMng extends GralWidgetMng implements GralMngBuild_ifc, Gra
   
   
 
+  KeyListener mainKeyListener = new KeyListener(){
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+      // TODO Auto-generated method stub
+      stop();
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+      // TODO Auto-generated method stub
+      
+    }
+    
+  };
+  
 
 
   void stop(){}

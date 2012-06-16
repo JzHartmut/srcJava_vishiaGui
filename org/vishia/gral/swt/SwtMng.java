@@ -320,7 +320,7 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
 		userActions.put("syncVariableOnFocus", this.syncVariableOnFocus);
 		
 		displaySwt = display;
-		displaySwt.addFilter(SWT.KeyDown, keyFilter);
+		displaySwt.addFilter(SWT.KeyDown, mainKeyListener);
     
 
   }
@@ -1708,7 +1708,7 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
    * It is possible to change keys, to disable the event handling and to call special routines.
    * Yet not used.
    */
-  Listener keyFilter = new Listener(){
+  Listener mainKeyListener = new Listener(){
     @Override public void handleEvent(Event event) {
       // TODO Auto-generated method stub
       if(userMainKeyAction !=null 
