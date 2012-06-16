@@ -1,5 +1,22 @@
 package org.vishia.gral.base;
 
+/**The main key listener.
+ * <b>Processing of keys</b>: (2012-06-17)<br>
+ * Key events are produced by the underlying graphic operation system. Usual they are applied to the widgets of the
+ * operation system graphic. For example, key left and right are used to navigate in a text field.
+ * <br><br>
+ * Any widget can have a key listener. Then the keys are applied to it, the listener determines what to do with keys.
+ * But if main keys should be used, keys which have the same reaction independent of the current focus of widgets,
+ * all widgets have to be catch this keys in there key listener and forwarding to the main handler.
+ * That is not optimal. Some widgets would not do so, and the keys does not take an effect fretfully. The user should
+ * implement a key listener to all widgets.
+ * <br><br>
+ * It is better to have a main key listerner which is invoked in any case. That is realized in 
+ *   {@link GralWidgetMng#setMainKeyAction(org.vishia.gral.ifc.GralUserAction)} and the adequate SWT-Implementation.
+ * 
+ * @author Hartmut
+ *
+ */
 public class GralKeyListener
 {
   /**Version and history

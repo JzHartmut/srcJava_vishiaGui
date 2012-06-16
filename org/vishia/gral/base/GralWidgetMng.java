@@ -259,6 +259,14 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
   
   /**True if the next element should be placed below the last. */
   protected boolean bBelow, bRigth;
+  
+  
+  /**
+   * 
+   */
+  protected GralUserAction userMainKeyAction;
+  
+
 
 	/**Creates an nee Panel Manager in a new Window.
 	 * @param graphicBaseSystem
@@ -401,6 +409,16 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
 		this.variableContainer = variableContainer;
 		userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
 	}
+  
+  
+  /* (non-Javadoc)
+   * @see org.vishia.gral.ifc.GralMngBuild_ifc#setMainKeyAction(org.vishia.gral.ifc.GralUserAction)
+   */
+  @Override public GralUserAction setMainKeyAction(GralUserAction userMainKeyAction){
+    GralUserAction last = this.userMainKeyAction;
+    this.userMainKeyAction = userMainKeyAction;
+    return last;
+  }
   
   @Override public GralGridProperties propertiesGui(){ return propertiesGui; }
   
@@ -1182,6 +1200,21 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   };
+  
+  
+  
+  /**This inner class is public only because the implementation uses it. It is not public for applications.
+   *
+   *
+   */
+  public class ImplementationPublicFields{
+    int xx;
+  }
+  
+  /**Implementation specific fields.
+   * 
+   */
+  ImplementationPublicFields _impl;
   
   
 

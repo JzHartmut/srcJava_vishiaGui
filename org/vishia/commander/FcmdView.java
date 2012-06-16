@@ -332,8 +332,10 @@ public class FcmdView
   GralUserAction actionOpenView = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
-    {   view(null);
+    { if(key != KeyCode.mouse1Down){  //supress both mouse up and down reaction
+        view(null);
         return true;
+      } else return false; 
       // /
     }
   };
@@ -344,7 +346,8 @@ public class FcmdView
   GralUserAction actionSetTextViewUTF8 = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
-    { try{ 
+    { if(key != KeyCode.mouse1Down){  //supress both mouse up and down reaction
+      try{ 
         format = '?';
         presentContentText(utf8);
         format = 'u';
@@ -352,6 +355,8 @@ public class FcmdView
         System.err.println("FcmdView.actionSetTextViewUTF8 - UnsupportedEncodingException; unexpected");
       }
       return true;
+      } else return false; 
+      // /
     }
   };
 
@@ -361,7 +366,8 @@ public class FcmdView
   GralUserAction actionSetHexView = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
-    { try{ 
+    {  if(key != KeyCode.mouse1Down){  //supress both mouse up and down reaction
+       try{ 
         syncContentFromWidg();
         format = '?';
         presentContentHex();
@@ -370,6 +376,8 @@ public class FcmdView
         System.err.println("FcmdView.actionSetHexView - Exception; unexpected");
       }
       return true;
+      } else return false; 
+      // /
     }
   };
 
@@ -379,7 +387,8 @@ public class FcmdView
   GralUserAction actionSetTextViewISO8859_1 = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
-    { try{ 
+    { if(key != KeyCode.mouse1Down){  //supress both mouse up and down reaction
+      try{ 
         format = '?';
         presentContentText(iso8859_1);
         format = 'w';
@@ -387,6 +396,7 @@ public class FcmdView
         System.err.println("FcmdView.actionSetTextViewISO8859_1 - UnsupportedEncodingException; unexpected");
       }
       return true;
+      } else return false; 
       // /
     }
   };
@@ -397,8 +407,11 @@ public class FcmdView
   GralUserAction actionSetEditable = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
-    { widgContent.setEditable(true);
+    { if(key != KeyCode.mouse1Down){  //supress both mouse up and down reaction
+        widgContent.setEditable(true);
       return true;
+      } else return false; 
+      // /
     }
   };
 

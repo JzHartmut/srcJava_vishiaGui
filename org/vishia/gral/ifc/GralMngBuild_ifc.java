@@ -141,6 +141,17 @@ public interface GralMngBuild_ifc
   public static final int propGridZoomedPanel = 0x0002;
   
   
+  
+  /**Sets the action for main keys. Main keys are used in an application independent of the focused widget.
+   * The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} is invoked on any key down event,
+   * exclusive some graphic implementation specific keys. The user should return false in this method
+   * if the key is not used and should not be blocked for widget specific key listeners. 
+   * @param userKeyAction The user action to process main keys.
+   * @return the last set user action.
+   */
+  GralUserAction setMainKeyAction(GralUserAction userKeyAction);
+
+  
 
 	/**Returns the width (number of grid step horizontal) of the last element.
    * @return Difference between current auto-position and last pos.

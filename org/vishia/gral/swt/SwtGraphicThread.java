@@ -85,6 +85,8 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
   /**Instance of windowsCloseHandler. */
   private final WindowsCloseListener windowsCloseListener = new WindowsCloseListener(); 
   
+  
+  
   KeyListener keyListener = new KeyListener()
   {
     @Override public void keyPressed(KeyEvent key)
@@ -132,23 +134,6 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
       stop();
     }
     
-  };
-  
-  
-  /**This routine is invoked on any key event.
-   * It is possible to change keys, to disable the event handling and to call special routines.
-   * Yet not used.
-   */
-  Listener keyFilter = new Listener(){
-    @Override public void handleEvent(Event event) {
-      // TODO Auto-generated method stub
-      if(event.keyCode == SWT.PAGE_DOWN || event.keyCode == SWT.PAGE_UP ){
-        event.doit = true;
-        //event.keyCode = 0;
-        //event.detail = 0;
-      }
-      stop();
-    }
   };
   
   
@@ -204,8 +189,6 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
     displaySwt = new Display();
     displaySwt.addFilter(SWT.Close, windowsCloseListener);
     displaySwt.addFilter(SWT.Traverse, traverseKeyFilter);
-    displaySwt.addFilter(SWT.KeyDown, keyFilter);
-    displaySwt.addFilter(SWT.KeyUp, keyFilter);
     windowSwt = new Shell(displaySwt); //, SWT.ON_TOP | SWT.MAX | SWT.TITLE);
     windowSwt.addKeyListener(keyListener);
     //windowSwt.addTraverseListener(keyTraverse);
@@ -238,7 +221,7 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
     
     //The propertiesGuiSwt needs the Display instance for Font and Color. Therefore the graphic thread with creation of Display should be executed before. 
     SwtProperties propertiesGui = new SwtProperties(this.displaySwt, sizeCharProperties);
-    gralMng = new SwtMng(this, propertiesGui, null, log);
+    gralMng = new SwtMng(this, displaySwt, propertiesGui, null, log);
     
     //The PrimaryWindowSwt is a derivation of the GralPrimaryWindow. It is more as only a SWT Shell.
     instance = new SwtPrimaryWindow(gralMng, this, this.displaySwt);

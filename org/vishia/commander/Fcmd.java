@@ -581,8 +581,10 @@ public class Fcmd extends GuiCfg
   GralUserAction selectPanelLeft = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
+      if(key != KeyCode.mouse1Down){  //supress both mouse up and down reaction
         favorPathSelector.panelLeft.selectTabCard.wdgdTable.setFocus();
         return true;
+      } else return false;
     }
   };
 
@@ -593,8 +595,10 @@ public class Fcmd extends GuiCfg
   GralUserAction selectPanelMiddle = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
-        favorPathSelector.panelMid.selectTabCard.wdgdTable.setFocus();
+      if(key != KeyCode.mouse1Down){  //supress both mouse up and down reaction
+              favorPathSelector.panelMid.selectTabCard.wdgdTable.setFocus();
       return true;
+      } else return false;
     }
   };
 
@@ -605,8 +609,10 @@ public class Fcmd extends GuiCfg
   GralUserAction selectPanelRight = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
+      if(key == KeyCode.menuEntered || key == KeyCode.mouse1Up){
         favorPathSelector.panelRight.selectTabCard.wdgdTable.setFocus();
         return true;
+      } else return false;
     }
   };
 
@@ -615,8 +621,10 @@ public class Fcmd extends GuiCfg
   GralUserAction actionFocusCmdCard = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
+      if(key != KeyCode.mouse1Down){  //supress both mouse up and down reaction
       cmdSelector.wdgdTable.setFocus();
       return true;
+      } else return false;
     }
   };
 
@@ -626,6 +634,7 @@ public class Fcmd extends GuiCfg
   GralUserAction actionEdit = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params) {
+      if(key != KeyCode.mouse1Down){  //supress both mouse up and down reaction
         CmdStore.CmdBlock cmdBlock = buttonCmds.getCmd("edit");
         if (cmdBlock == null) {
           mainCmd.writeError("internal problem - don't find 'edit' command. ");
@@ -640,6 +649,7 @@ public class Fcmd extends GuiCfg
           File currentDir = files[0].getParentFile();
           executer.cmdQueue.addCmd(cmdBlock, files, currentDir); // to execute.
         }
+      }
       return true;
     }
   };

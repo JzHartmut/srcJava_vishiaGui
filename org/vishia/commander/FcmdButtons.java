@@ -1,18 +1,13 @@
 package org.vishia.commander;
 
-import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.gral.base.GralButton;
-import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.widget.FileAndName;
-import org.vishia.gral.widget.GralFileSelector;
-import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
 /**This class contains all functionality of the function buttons in The-file-Commander.
@@ -62,6 +57,7 @@ public class FcmdButtons
 
   FcmdButtons(Fcmd main){
     this.main = main;
+    main.gralMng.setMainKeyAction(actionMainKeys);
   }
   
   static class ButtonAction{
@@ -240,13 +236,25 @@ public class FcmdButtons
     for(int ix = 0; ix< keyAction.length; ++ix){
       if(keys[ix] == keyCode){
         if(keyAction[ix] !=null){
-          keyAction[ix].userActionGui(keyCode, null);
-          return true;
+          boolean bDone = keyAction[ix].userActionGui(keyCode, null);
+          return bDone;
         } else return false;
       }
     }
     return false; //NOTE: returns inside too!
   }
+  
+
+  
+  /**Action to focus the cmd card.
+   */
+  GralUserAction actionMainKeys = new GralUserAction()
+  {
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
+      return processKey(key);
+    }
+  };
+  
   
   
   
@@ -255,6 +263,7 @@ public class FcmdButtons
   GralUserAction actionViewButtons = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
+      if(key != KeyCode.mouse1Down){  //supress both mouse up and down reaction
       if(bButtonVisible){
         bButtonVisible = false;
         main.gui.setMinMaxSizeArea("A3C3", 4, 4, 0, 0);
@@ -263,6 +272,7 @@ public class FcmdButtons
         main.gui.setMinMaxSizeArea("A3C3", 15, 15, 0, 0);
       }
       return true;
+      } else return false;
     }
   };
 

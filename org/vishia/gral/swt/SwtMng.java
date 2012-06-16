@@ -24,6 +24,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -189,6 +191,9 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
    */
   public  final SwtProperties propertiesGuiSwt;
   
+  
+  private final Display displaySwt;
+  
   public final SwtWidgetHelper widgetHelper = new SwtWidgetHelper(this);
   
   /**This mouse-click-implementor is added to any widget,
@@ -286,11 +291,11 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  protected SwtMng(GralGraphicThread graldevice, Device device /*, Composite graphicFrame */
+  protected SwtMng(GralGraphicThread graldevice, Display display /*, Composite graphicFrame */
   , char displaySize, VariableContainer_ifc variableContainer
 	, LogMessage log)
   { //super(sTitle); 
-  	this(graldevice, new SwtProperties(device, displaySize), variableContainer, log);
+  	this(graldevice, display, new SwtProperties(display, displaySize), variableContainer, log);
   	
   }
 
@@ -301,7 +306,7 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public SwtMng(GralGraphicThread device 
+  public SwtMng(GralGraphicThread device, Display display 
     , SwtProperties propertiesGui
   	, VariableContainer_ifc variableContainer
   	, LogMessage log
@@ -313,7 +318,10 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
 
     //its a user action able to use in scripts.
 		userActions.put("syncVariableOnFocus", this.syncVariableOnFocus);
-
+		
+		displaySwt = display;
+		displaySwt.addFilter(SWT.KeyDown, keyFilter);
+    
 
   }
 
@@ -1691,6 +1699,34 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
       return true;
 		}
 	};
+	
+	
+	
+	
+	
+  /**This routine is invoked on any key event.
+   * It is possible to change keys, to disable the event handling and to call special routines.
+   * Yet not used.
+   */
+  Listener keyFilter = new Listener(){
+    @Override public void handleEvent(Event event) {
+      // TODO Auto-generated method stub
+      if(userMainKeyAction !=null 
+          && (event.keyCode & 0xffff) !=0  //don't take anything on alt- etc. alone
+        ){
+        final int keyCode = SwtGralKey.convertFromSwt(event.keyCode, event.stateMask);
+        boolean bDone = userMainKeyAction.userActionGui(keyCode, null);
+        if(bDone){
+          event.doit = false;   //don't use this key for another action.
+        }
+      }
+      stop();
+    }
+  };
+  
+  
+
+	
 	
 	
   
