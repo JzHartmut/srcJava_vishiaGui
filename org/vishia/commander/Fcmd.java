@@ -61,10 +61,10 @@ public class Fcmd extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   @SuppressWarnings("hiding")
-  public static final int version = 20120312;
+  public static final int version = 20120617;
 
   /**Version visible in about info */
-  public static final String sVersion = "Version 1.02 - 2012-04-17";
+  public static final String sVersion = "Version 1.03 - 2012-06-17";
   
   static class CallingArgs extends GuiCallingArgs
   {
@@ -365,6 +365,26 @@ public class Fcmd extends GuiCfg
     return ret;
   }
   
+  
+  
+  
+  
+  /**Get the last selected file card in order of selection of the file panels.
+   * @return The file card reference.   */
+  FcmdFileCard getLastSelectedFileCard(){
+    
+    if(lastFavorCard!=null){
+      return lastFavorCard.fileTable;
+    } else {
+      return null;
+    }
+  }
+  
+  
+  
+  
+  
+  
 
   /**
    * This class is instantiated in the static main routine and builds a command
@@ -561,10 +581,8 @@ public class Fcmd extends GuiCfg
   GralUserAction selectPanelLeft = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
-      if(key == KeyCode.menuEntered || key == KeyCode.mouse1Up){
         favorPathSelector.panelLeft.selectTabCard.wdgdTable.setFocus();
         return true;
-      } else return false;
     }
   };
 
@@ -575,10 +593,8 @@ public class Fcmd extends GuiCfg
   GralUserAction selectPanelMiddle = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
-      if(key == KeyCode.menuEntered || key == KeyCode.mouse1Up){
         favorPathSelector.panelMid.selectTabCard.wdgdTable.setFocus();
       return true;
-      } else return false;
     }
   };
 
@@ -589,10 +605,8 @@ public class Fcmd extends GuiCfg
   GralUserAction selectPanelRight = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
-      if(key == KeyCode.menuEntered || key == KeyCode.mouse1Up){
         favorPathSelector.panelRight.selectTabCard.wdgdTable.setFocus();
         return true;
-      } else return false;
     }
   };
 
@@ -601,10 +615,8 @@ public class Fcmd extends GuiCfg
   GralUserAction actionFocusCmdCard = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
-      if(key == KeyCode.menuEntered || key == KeyCode.mouse1Up){ ///
-        cmdSelector.wdgdTable.setFocus();
-        return true;
-      } else return false;
+      cmdSelector.wdgdTable.setFocus();
+      return true;
     }
   };
 
@@ -614,7 +626,6 @@ public class Fcmd extends GuiCfg
   GralUserAction actionEdit = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params) {
-      if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered || key == 0){
         CmdStore.CmdBlock cmdBlock = buttonCmds.getCmd("edit");
         if (cmdBlock == null) {
           mainCmd.writeError("internal problem - don't find 'edit' command. ");
@@ -629,7 +640,6 @@ public class Fcmd extends GuiCfg
           File currentDir = files[0].getParentFile();
           executer.cmdQueue.addCmd(cmdBlock, files, currentDir); // to execute.
         }
-      }
       return true;
     }
   };

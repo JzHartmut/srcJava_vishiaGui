@@ -89,7 +89,8 @@ public class FcmdKeyActions
     { boolean done = false;
       done = true;
       FileRemote[] files = main.getLastSelectedFiles();
-      if(     keyCode == main.idents.keyFileProps){ main.filePropsCmd.openDialog(main.currentFile); }  //F2
+      if(main.fButtons.processKey(keyCode)){ done = true; }
+      else if(     keyCode == main.idents.keyFileProps){ main.filePropsCmd.openDialog(main.currentFile); }  //F2
       else if(keyCode == main.idents.keyFileView){ main.viewCmd.view(null); }                  //F3
       else if(keyCode == main.idents.keyFileEdit){ main.actionEdit.userActionGui(KeyCode.menuEntered, widgd, params); }
       else if(keyCode == main.idents.keyEditIntern){ main.editWind.openEdit(null); }

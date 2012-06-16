@@ -221,28 +221,29 @@ public class FcmdExecuter
   
   private void executeFileByExtension(FileRemote file){
     String ext;
-    String name = file.getName();
-    int posDot = name.lastIndexOf('.');
-    if(posDot > 0){
-      ext = name.substring(posDot+1);
-    } else if(file.canExecute()){
-      ext = ">";
-    } else {
-      ext = "???";
-    }
-    ExtCmd extensionCmd = extCmds.get(ext);
-    if(extensionCmd !=null){
-      widgSelectExec.clearTable();
-      for(CmdBlock block: extensionCmd.listCmd){
-        GralTableLine_ifc line = widgSelectExec.insertLine(block.name, 0, null, null);
-        line.setCellText(block.title, 0);
-        line.setUserData(block);
+    if(file !=null){
+      String name = file.getName();
+      int posDot = name.lastIndexOf('.');
+      if(posDot > 0){
+        ext = name.substring(posDot+1);
+      } else if(file.canExecute()){
+        ext = ">";
+      } else {
+        ext = "???";
       }
-      windConfirmExec.setWindowVisible(true);
-    } else {
-      console.writeError("no association found for extension ." + ext);
-    }
-    
+      ExtCmd extensionCmd = extCmds.get(ext);
+      if(extensionCmd !=null){
+        widgSelectExec.clearTable();
+        for(CmdBlock block: extensionCmd.listCmd){
+          GralTableLine_ifc line = widgSelectExec.insertLine(block.name, 0, null, null);
+          line.setCellText(block.title, 0);
+          line.setUserData(block);
+        }
+        windConfirmExec.setWindowVisible(true);
+      } else {
+        console.writeError("no association found for extension ." + ext);
+      }
+    } else{ System.err.println("FcmdExecuter.executeFileByExtension - no file selected;"); }
   }
   
   

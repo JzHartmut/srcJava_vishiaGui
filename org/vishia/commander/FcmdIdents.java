@@ -2,6 +2,14 @@ package org.vishia.commander;
 
 import org.vishia.util.KeyCode;
 
+/**This class contains all texts and keys which are used in any menu, hot key etc.
+ * The variables are attempt to set by a script - user or language specific menus and keys.
+ * You find all menu and key actions named here, use find operation in all files (cross references)
+ * to evaluate, where these functions are used.
+ * 
+ * @author Hartmut Schorrig
+ *
+ */
 public class FcmdIdents
 {
   String menuSaveFavoriteSel = "fa&Vors/&Save favorite paths";
@@ -229,5 +237,49 @@ public class FcmdIdents
   public String menuWindowOutputContext = "Zoom/Unzoom";
   
   int keyWindFullOut = KeyCode.ctrl + 'o';
+
   
+  
+  
+  String menuBarFileSortNameCase = "&File/&Sort/&Name case sens";
+  String menuContextFileSortNameCase = "&Sort/&Name case sens";
+  String buttonFileSortNameCase = "gF3:A..Za..z";
+  int keyFileSortNameCase = KeyCode.ctrl + KeyCode.F3;
+
+  String menuBarFileSortNameNonCase = "&File/&Sort/&Name non-case";
+  String menuContextFileSortNameNonCase = "&Sort/&Name non-case";
+  String buttonFileSortNameNonCase = "cF3:Aa..Zz";
+  int keyFileSortNameNonCase = KeyCode.shiftCtrl + KeyCode.F3;
+
+  String menuBarFileSortExtCase = "&File/&Sort/e&Xt case sens";
+  String menuContextFileSortExtCase = "&Sort/e&Xt case sens";
+  String buttonFileSortExtCase = "gF4:.ext A..Za..z";
+  int keyFileSortExtCase = KeyCode.ctrl + KeyCode.F4;
+
+  String menuBarFileSortExtNonCase = "&File/&Sort/e&Xt non-case";
+  String menuContextFileSortExtNonCase = "&Sort/e&Xt non-case";
+  String buttonFileSortExtNonCase = "cF4:.ext Aa..Zz";
+  int keyFileSortExtNonCase = KeyCode.shiftCtrl + KeyCode.F4;
+
+  String menuBarFileSortDateNewest = "&File/&Sort/&Date newest";
+  String menuContextFileSortDateNewest = "&Sort/&Date newest";
+  String buttonFileSortDateNewest = "cF5:newest";
+  int keyFileSortDateNewest = KeyCode.shift + KeyCode.F5;
+
+  String menuBarFileSortDateOldest = "&File/&Sort/date &Oldest";
+  String menuContextFileSortOldest = "&Sort/date &Oldest";
+  String buttonFileSortOldest = "gF5:oldest";
+  int keyFileSortDateLast = KeyCode.shiftCtrl + KeyCode.F5;
+
+  String menuBarFileSortSizeLarge = "&File/&Sort/size &Largest";
+  String menuContextFileSortSizeLarge = "&Sort/size &Largest";
+  String buttonFileSortSizeLarge = "cF6:largest";
+  int keyFileSortSizeLarge = KeyCode.ctrl + KeyCode.F6;
+
+  String menuBarFileSortSizeSmall = "&File/&Sort/size &Smallest";
+  String menuContextFileSortSizeSmall = "&Sort/size &Smallest";
+  String buttonFileSortSizeSmall = "gF6:smallest";
+  int keyFileSortSizeSmall = KeyCode.shiftCtrl + KeyCode.F6;
+
+
 }

@@ -46,6 +46,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2012-06-17 new Hartmut: Now sorts list with name, size, date, format of size and date in list adjusted:
+   *   Separate timestamp of file for today, last year.
    * <li>2012-06-09 new Hartmut: {@link GralFileSelector.WindowFileSelection}, not ready yet.
    * <li>2012-04-16 chg: Capability to sort enhanced.
    * <li>2012-04-10 chg: Now ctrl-PgUp to select parent dir, like in Norton Commander,
@@ -90,7 +92,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120416;
+  public static final int version = 20120617;
   
   FileRemoteAccessor localFileAccessor = FileRemoteAccessorLocalFile.getInstance();
   
@@ -335,7 +337,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       wind.wind = mng.createWindow("windSelectFile", "select file", GralWindow.windConcurrently);
       mng.setPosition(0, 0, 0, -2, 0, 'd', 0.0f);
       wind.fileSelector = new GralFileSelector();
-      wind.fileSelector.setToPanel(mng, "selectFile", 100, new int[]{2,20,5,10}, 'C');
+      wind.fileSelector.setToPanel(mng, "selectFile", 100, new int[]{2,19,6,10}, 'C');
       mng.setPosition(-1, GralPos.size - 3, 1, GralPos.size + 8, 0, 'r',2);
       //mng.addButton(null, wind.actionFileSearch, "esc", null, null, "esc");
       return wind;
@@ -391,11 +393,19 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   public static final char kSortName = 'n';
   
+  public static final char kSortNameNonCase = 'N';
+  
   public static final char kSortExtension = 'x';
   
-  public static final char kSortDate = 'd';
+  public static final char kSortExtensionNonCase = 'X';
   
-  public static final char kSortSize = 'z';
+  public static final char kSortDateNewest = 'd';
+  
+  public static final char kSortDateOldest = 'o';
+  
+  public static final char kSortSizeLargest = 'l';
+  
+  public static final char kSortSizeSmallest = 's';
   
   private char sortOrder = 'x';
   
@@ -420,7 +430,17 @@ public class GralFileSelector implements Removeable //extends GralWidget
   /**The widget for showing the path. */
   protected GralTextField widgdPath;
   
-  final SimpleDateFormat dateFormat = new SimpleDateFormat("yy-MMM-dd HH:mm:ss"); 
+  String sDatePrefixNewer = "";
+  SimpleDateFormat dateFormatNewer = new SimpleDateFormat("?yy-MMdd HH:mm:ss"); 
+  
+  String sDatePrefixToday = "";
+  SimpleDateFormat dateFormatToday = new SimpleDateFormat("@ HH:mm:ss"); 
+  
+  String sDatePrefixYear = "";
+  SimpleDateFormat dateFormatYear = new SimpleDateFormat("dd-MMM HH:mm:ss"); 
+  
+  String sDatePrefixOlder = "";
+  SimpleDateFormat dateFormatOlder = new SimpleDateFormat("yy-MMdd HH:mm:ss"); 
   
   //final MainCmd_ifc mainCmd;
 
@@ -442,6 +462,12 @@ public class GralFileSelector implements Removeable //extends GralWidget
   {
     selectList = new FileSelectList(this);
     //this.mainCmd = mainCmd;
+  }
+  
+  
+  
+  public void setDateFormat(String sFormat){
+    dateFormatOlder = new SimpleDateFormat(sFormat);
   }
   
   
@@ -514,6 +540,26 @@ public class GralFileSelector implements Removeable //extends GralWidget
   public String getCurrentDirPath(){ return sCurrentDir; }
   
   public void setOriginDir(FileRemote dir){ originDir = dir; }
+
+  
+  /**Sets the sort order of entries.
+   * Valid chars for 'sortOrder' are:
+   * <ul>
+   * <li>n: sort by name, case sensitive, A..Z a..z in ASCII order
+   * <li>N: sort by name, non case-sensitive, Aa..Zz, other characters in ASCII order but '_' first.
+   * <li>x: sort by extension, case sensitive. sort by names with equal extension, case sensitive
+   * <li>X: sort by extension, non case sensitive. sort by names with equal extension, non case sensitive
+   * <li>d: sort by timestamp, newest first
+   * <li>o: sort by timestamp, oldest first.
+   * <li>l: sort by size, largest first.
+   * <li>s: sort by size, smallest first.
+   * </ul>
+   * @param sortOrder
+   */
+  public void setSortOrder(char sortOrder){
+    this.sortOrder = sortOrder;
+  }
+  
   
   /**Sets the action which is called if any file is entered. It means the Enter-Key is pressed or
    * a mouse double-click is done on a file.
@@ -563,7 +609,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    */
   public void fillIn(File dir) //String path)
   {
-    selectList.wdgdTable.setValue(GralMng_ifc.cmdClear, -1, null, null);
+    selectList.wdgdTable.clearTable(); //setValue(GralMng_ifc.cmdClear, -1, null, null);
     //FileRemote dir = new FileRemote(path);
     //FileRemote rdir = (FileRemote)dir;
     this.currentDir = dir;
@@ -577,78 +623,151 @@ public class GralFileSelector implements Removeable //extends GralWidget
     //widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sCurrentDir);
     widgdPath.setText(sCurrentDir, -1);
     //widgdPath.setSelection("|..<");
-    File[] files = dir.listFiles();
+    long timeNow = System.currentTimeMillis();
+    
     int lineSelect = 0;  
-    if(files !=null){ 
-      Map<String, File> sortFiles = new TreeMap<String, File>();
-      for(File file: files){
-        String sort;
-        switch(sortOrder){
-        case 'n': {
-          String sName = file.getName();
-          if(file.isDirectory()){ sName += "/"; }
-          sort = (file.isDirectory()? "D" : "F") + sName;
-        } break;
-        case 'x': {
-          String sName = file.getName();
-          int posDot = sName.lastIndexOf('.');
-          String sExt = sName.substring(posDot+1);
-          if(file.isDirectory()){ sName += "/"; }
-          sort = (file.isDirectory()? "D" : "F") + sExt + sName;
-        } break;
-        default: { sort = file.getName(); }
+    if(dir.exists() && dir.isDirectory()){
+      File[] files = dir.listFiles();
+      if(files !=null){ 
+        Map<String, File> sortFiles = new TreeMap<String, File>();
+        for(File file: files){
+          String sort;
+          switch(sortOrder){
+          case kSortName: {
+            String sName = file.getName();
+            if(file.isDirectory()){ sName += "/"; }
+            sort = (file.isDirectory()? "D" : "F") + sName;
+          } break;
+          case kSortNameNonCase: {
+            String sName = file.getName().toLowerCase();
+            if(file.isDirectory()){ sName += "/"; }
+            sort = (file.isDirectory()? "D" : "F") + sName;
+          } break;
+          case kSortExtension: {
+            String sName = file.getName();
+            int posDot = sName.lastIndexOf('.');
+            String sExt = sName.substring(posDot+1);
+            if(file.isDirectory()){ sName += "/"; }
+            sort = (file.isDirectory()? "D" : "F") + sExt + sName;
+          } break;
+          case kSortExtensionNonCase: {
+            String sName = file.getName().toLowerCase();
+            int posDot = sName.lastIndexOf('.');
+            String sExt = sName.substring(posDot+1);
+            if(file.isDirectory()){ sName += "/"; }
+            sort = (file.isDirectory()? "D" : "F") + sExt + sName;
+          } break;
+          case kSortDateNewest: {
+            long nDate = -file.lastModified();
+            String sDate = String.format("%016X", nDate);
+            String sName = file.getName().toLowerCase();
+            sort = (file.isDirectory()? "D" : "F") + sDate + sName;
+          } break;
+          case kSortDateOldest: {
+            long nDate = file.lastModified();
+            String sDate = String.format("%016X", nDate);
+            String sName = file.getName().toLowerCase();
+            sort = (file.isDirectory()? "D" : "F") + sDate + sName;
+          } break;
+          case kSortSizeLargest: {
+            long nSize = 0x7fffffffffffffffL - file.length();
+            String sSize = String.format("%016d", nSize);
+            String sName = file.getName().toLowerCase();
+            sort = (file.isDirectory()? "D" : "F") + sSize + sName;
+          } break;
+          case kSortSizeSmallest: {
+            long nSize = file.length();
+            String sSize = String.format("%016d", nSize);
+            String sName = file.getName().toLowerCase();
+            sort = (file.isDirectory()? "D" : "F") + sSize + sName;
+          } break;
+          default: { sort = file.getName(); }
+          }
+          sortFiles.put(sort, file);
         }
-        sortFiles.put(sort, file);
-      }
-      int lineCt = 0; //count lines to select the line number with equal sFileSelect.
-      if(dir.getParent() !=null){
-        String[] line = new String[zColumns];
-        line[kColDesignation] = "<";
-        line[kColFilename] = "..";
-        line[kColLength] = "";
-        line[kColDate] = "";
-        selectList.wdgdTable.insertLine("..", -1, line, dir);
-        //selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, dir);
-        lineCt +=1;
-      }
-      //The file or directory which was the current one while this directory was shown lastly:
-      String sFileCurrentline = indexSelection.get(sCurrentDir);
-      for(Map.Entry<String, File> entry: sortFiles.entrySet()){
-        String[] line = new String[zColumns];
-        File file = entry.getValue();
-        if(sFileCurrentline != null && file.getName().equals(sFileCurrentline)){
-          lineSelect = lineCt;
+        int lineCt = 0; //count lines to select the line number with equal sFileSelect.
+        if(dir.getParent() !=null){
+          String[] line = new String[zColumns];
+          line[kColDesignation] = "<";
+          line[kColFilename] = "..";
+          line[kColLength] = "";
+          line[kColDate] = "";
+          selectList.wdgdTable.insertLine("..", -1, line, dir);
+          //selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, dir);
+          lineCt +=1;
         }
-        if(file instanceof FileRemote && ((FileRemote)file).isSymbolicLink()){ 
-          line[0] =  file.isDirectory() ? ">" : "s"; 
+        //The file or directory which was the current one while this directory was shown lastly:
+        String sFileCurrentline = indexSelection.get(sCurrentDir);
+        for(Map.Entry<String, File> entry: sortFiles.entrySet()){
+          String[] line = new String[zColumns];
+          File file = entry.getValue();
+          if(sFileCurrentline != null && file.getName().equals(sFileCurrentline)){
+            lineSelect = lineCt;
+          }
+          if(file instanceof FileRemote && ((FileRemote)file).isSymbolicLink()){ 
+            line[0] =  file.isDirectory() ? ">" : "s"; 
+          }
+          else if(file.isDirectory()){ line[0] = "/"; }
+          else { line[kColDesignation] = " ";}
+          line[kColFilename] = file.getName();
+          long fileTime = file.lastModified();
+          long diffTime = timeNow - fileTime;
+          Date timestamp = new Date(fileTime);
+          String sDate;
+          if(diffTime < -10 * 3600000L){
+            sDate = sDatePrefixNewer + dateFormatNewer.format(timestamp);
+          } else if(diffTime < 18*3600000){
+            //files today
+            sDate = sDatePrefixToday + dateFormatToday.format(timestamp);
+          } else if(diffTime < 320 * 24* 3600000){
+            sDate = sDatePrefixYear + dateFormatYear.format(timestamp);
+          } else {
+            sDate = sDatePrefixOlder + dateFormatOlder.format(timestamp);
+          }
+          line[kColDate] = sDate;
+          //
+          String sLength;
+          long fileLength = file.length();
+          if(fileLength < 1000){
+            sLength = "" + fileLength;
+          } else if(fileLength < 10000){
+            sLength = String.format("%1.1f k", fileLength / 1000.0f);
+          } else if(fileLength < 1000000){
+            sLength = String.format("%3.0f k", fileLength / 1000.0f);
+          } else if(fileLength < 10000000){
+            sLength = String.format("%1.1f M", fileLength / 1000000.0f);
+          } else if(fileLength < 1000000000){
+            sLength = String.format("%3.0f M", fileLength / 1000000.0f);
+          } else if(fileLength < 10000000000L){
+            sLength = String.format("%1.1f G", fileLength / 1000000000.0f);
+          } else {
+            sLength = String.format("%2.0f G", fileLength / 1000000000.0f);
+          }
+          line[kColLength] = sLength;
+          //
+          GralTableLine_ifc tline = selectList.wdgdTable.insertLine(line[1], -1, line, file);
+          //selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, file);
+          if(actionSetFileAttribs !=null){
+            actionSetFileAttribs.userActionGui(0, selectList.wdgdTable, tline);
+          }
+          lineCt +=1;
         }
-        else if(file.isDirectory()){ line[0] = "/"; }
-        else { line[kColDesignation] = " ";}
-        line[kColFilename] = file.getName();
-        Date timestamp = new Date(file.lastModified());
-        line[kColDate] = dateFormat.format(timestamp);
-        /*
-        GralTableLine_ifc tLine = selectList.wdgdTable.insertLine(null, lineCt);
-        tLine.setCellText(line[0], 0);
-        tLine.setCellText(line[1], 1);
-        tLine.setCellText(line[2], 2);
-        tLine.setCellText(line[3], 3);
-        */
-        GralTableLine_ifc tline = selectList.wdgdTable.insertLine(line[1], -1, line, file);
-        //selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, file);
-        if(actionSetFileAttribs !=null){
-          actionSetFileAttribs.userActionGui(0, selectList.wdgdTable, tline);
+        if(lineCt ==0){
+          //special case: no files:
+          String[] line = new String[zColumns];
+          line[kColDesignation] = "";
+          line[kColFilename] = "--empty--";
+          line[kColDate] = "";
+          selectList.wdgdTable.insertLine(null, -1, line, null);
+          lineCt +=1;
         }
-        lineCt +=1;
-      }
-      if(lineCt ==0){
-        //special case: no files:
+      } else {
+        //faulty directory
         String[] line = new String[zColumns];
         line[kColDesignation] = "";
-        line[kColFilename] = "--empty--";
+        line[kColFilename] = "--not found-1--";
         line[kColDate] = "";
-        selectList.wdgdTable.insertLine(null, -1, line, null);
-        lineCt +=1;
+        selectList.wdgdTable.setValue(GralMng_ifc.cmdInsert, -1, line, currentDir);
       }
     } else {
       //faulty directory

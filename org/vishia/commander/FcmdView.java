@@ -332,10 +332,8 @@ public class FcmdView
   GralUserAction actionOpenView = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
-    { if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
-        view(null);
+    {   view(null);
         return true;
-      } else return false; 
       // /
     }
   };
@@ -346,17 +344,14 @@ public class FcmdView
   GralUserAction actionSetTextViewUTF8 = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
-    { if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
-        try{ 
-          format = '?';
-          presentContentText(utf8);
-          format = 'u';
-        } catch(UnsupportedEncodingException exc){
-          System.err.println("FcmdView.actionSetTextViewUTF8 - UnsupportedEncodingException; unexpected");
-        }
-        return true;
-      } else return false; 
-      // /
+    { try{ 
+        format = '?';
+        presentContentText(utf8);
+        format = 'u';
+      } catch(UnsupportedEncodingException exc){
+        System.err.println("FcmdView.actionSetTextViewUTF8 - UnsupportedEncodingException; unexpected");
+      }
+      return true;
     }
   };
 
@@ -366,18 +361,15 @@ public class FcmdView
   GralUserAction actionSetHexView = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
-    { if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
-        try{ 
-          syncContentFromWidg();
-          format = '?';
-          presentContentHex();
-          format = 'h';
-        } catch(Exception exc){
-          System.err.println("FcmdView.actionSetHexView - Exception; unexpected");
-        }
-        return true;
-      } else return false; 
-      // /
+    { try{ 
+        syncContentFromWidg();
+        format = '?';
+        presentContentHex();
+        format = 'h';
+      } catch(Exception exc){
+        System.err.println("FcmdView.actionSetHexView - Exception; unexpected");
+      }
+      return true;
     }
   };
 
@@ -387,16 +379,14 @@ public class FcmdView
   GralUserAction actionSetTextViewISO8859_1 = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
-    { if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
-        try{ 
-          format = '?';
-          presentContentText(iso8859_1);
-          format = 'w';
-        } catch(UnsupportedEncodingException exc){
-          System.err.println("FcmdView.actionSetTextViewISO8859_1 - UnsupportedEncodingException; unexpected");
-        }
-        return true;
-      } else return false; 
+    { try{ 
+        format = '?';
+        presentContentText(iso8859_1);
+        format = 'w';
+      } catch(UnsupportedEncodingException exc){
+        System.err.println("FcmdView.actionSetTextViewISO8859_1 - UnsupportedEncodingException; unexpected");
+      }
+      return true;
       // /
     }
   };
@@ -407,11 +397,8 @@ public class FcmdView
   GralUserAction actionSetEditable = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
-    { if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
-        widgContent.setEditable(true);
-        return true;
-      } else return false; 
-      // /
+    { widgContent.setEditable(true);
+      return true;
     }
   };
 

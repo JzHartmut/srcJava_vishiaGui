@@ -26,7 +26,9 @@ import org.vishia.util.FileWriter;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringPart;
 
-/**This class implements the selection functionality of tabs and paths for the whole Java commander. */
+/**This class implements the selection functionality of tabs and paths for the whole Java commander. 
+ * It contains all actions which are instantiated one time but affects a special (the current) file panel.
+ * */
 class FcmdFavorPathSelector
 {
 
@@ -451,29 +453,14 @@ class FcmdFavorPathSelector
   
   
   
-  /**Searches the Tab which is focused at last.
-   * @return Array of the tabs in order of last focus
-   */
-  private FcmdLeftMidRightPanel[] getLastTabs()
-  { List<GralWidget> widgdFocus = mng.getWidgetsInFocus();
-    FcmdLeftMidRightPanel[] lastTabs = new FcmdLeftMidRightPanel[3];
-    int ixTabs = 0;
-    synchronized(widgdFocus){
-      Iterator<GralWidget> iterFocus = widgdFocus.iterator();
-      while(ixTabs < lastTabs.length && iterFocus.hasNext()){
-        GralWidget widgd = iterFocus.next();
-        if(widgd.name.startsWith("file")){
-          
-        }
-      }
-    }
-    return lastTabs;
-  }
-  
-  
-  
 
-  
+  private void setSortOrderFiles(char order){
+    FcmdFileCard fileCard = main.getLastSelectedFileCard();
+    if(fileCard !=null){
+      fileCard.setSortOrder(order);
+      fileCard.fillInCurrentDir();
+    }
+  }
   
   
 
@@ -577,16 +564,14 @@ class FcmdFavorPathSelector
    * Implementation note: The last focused file tab is searched using {@link Fcmd#getLastSelectedFileCards()}.
    */
   GralUserAction actionRefreshFileTable = new GralUserAction(){
-    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
-    { if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
-        GralFileSelector lastTab = main.getLastSelectedFileCards()[0];
-        if(lastTab !=null){
-          lastTab.fillInCurrentDir();
-        } else {
-          throw new IllegalArgumentException("last file tab not able to found");
-        }
-        return true;
-      } else return false;
+    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){ 
+      GralFileSelector lastTab = main.getLastSelectedFileCards()[0];
+      if(lastTab !=null){
+        lastTab.fillInCurrentDir();
+      } else {
+        throw new IllegalArgumentException("last file tab not able to found");
+      }
+      return true;
     }
   };
   
@@ -644,6 +629,81 @@ class FcmdFavorPathSelector
       panelRight.fillCards();
       return true;
   } };
+  
+  
+  
+  GralUserAction actionSortFilePerNameCase = new GralUserAction()
+  { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
+      setSortOrderFiles('n');
+      return true;
+  } };
+  
+  
+  
+  
+  GralUserAction actionSortFilePerNameNonCase = new GralUserAction()
+  { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
+      setSortOrderFiles('N');
+      return true;
+  } };
+  
+  
+  
+  
+  GralUserAction actionSortFilePerExtensionCase = new GralUserAction()
+  { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
+      setSortOrderFiles('x');
+      return true;
+  } };
+  
+  
+  GralUserAction actionSortFilePerExtensionNonCase = new GralUserAction()
+  { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
+      setSortOrderFiles('X');
+      return true;
+  } };
+  
+  
+  
+  
+  
+  GralUserAction actionSortFilePerTimestamp = new GralUserAction()
+  { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
+      setSortOrderFiles('d');
+      return true;
+  } };
+
+  
+  
+  
+  GralUserAction actionSortFilePerTimestampOldestFirst = new GralUserAction()
+  { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
+      setSortOrderFiles('o');
+      return true;
+  } };
+
+  
+  
+  
+  
+  
+  GralUserAction actionSortFilePerLenghLargestFirst = new GralUserAction()
+  { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
+      setSortOrderFiles('l');
+      return true;
+  } };
+
+  
+  
+  
+  GralUserAction actionSortFilePerLenghSmallestFirst = new GralUserAction()
+  { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
+      setSortOrderFiles('s');
+      return true;
+  } };
+
+  
+ 
   
   
 }
