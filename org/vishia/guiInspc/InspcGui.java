@@ -176,7 +176,8 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
       curveB.refreshCurve();
       curveC.refreshCurve();
     } catch(Exception exc){ 
-      System.err.println("InspcGui-receivedData; " + exc.getMessage());   
+      System.err.println("InspcGui-receivedData; " + exc.getMessage()); 
+      exc.printStackTrace(System.out);
     }
     
   }
@@ -356,7 +357,7 @@ private class InspcGuiCfg extends GuiCfg
    * for debugging. */
   GralUserAction actionEnableLog = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) { 
-      if(actionCode == KeyCode.mouse1Up){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         GralButton widgButton = (GralButton)widgd;
         if(widgButton.isOn()){
           if(logTelg == null){

@@ -123,7 +123,7 @@ public class ExampleSimpleButton
     int ctKeyStroke = 0;
     
     public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
-    { if(actionCode == KeyCode.mouse1Up){
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         String textOfField = gui.widgInput.getText();
         try{ gui.widgOutput.append("Button " + (++ctKeyStroke) + " time, text=" + textOfField + "\n");
         } catch(IOException exc){}

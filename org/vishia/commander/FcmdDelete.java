@@ -133,7 +133,7 @@ public class FcmdDelete
   GralUserAction actionDelete = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
     { try{ 
-        if(key == KeyCode.mouse1Up){
+        if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
           if(widgg.sCmd.equals("delete")){
             for(FileRemote file : listFileDel){
               if(!file.canWrite()){

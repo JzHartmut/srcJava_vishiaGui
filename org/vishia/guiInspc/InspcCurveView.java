@@ -155,7 +155,8 @@ public class InspcCurveView
     
     gralMng.selectPanel("primaryWindow");
     gralMng.setPosition(4, 0, 4, 0, 0, '.');
-    int windProps = GralWindow.windConcurrently | GralWindow.windOnTop | GralWindow.windResizeable;
+    //int windProps = GralWindow.windConcurrently | GralWindow.windOnTop | GralWindow.windResizeable;
+    int windProps = GralWindow.windConcurrently  | GralWindow.windResizeable;
     windCurve = gralMng.createWindow("windMapVariables", "Curve A", windProps);
     //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 0, 'd');
     gralMng.setPosition(0, -2, 0, -10, 0, 'd');
@@ -274,7 +275,7 @@ public class InspcCurveView
 
   GralUserAction actionSetScaleValues2Track = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
-    { if(actionCode == KeyCode.mouse1Up && trackScale !=null){
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode) && trackScale !=null){
         if(widgd.sCmd == "!"){
           try{
             String s1 = widgScale.getText();
@@ -352,7 +353,7 @@ public class InspcCurveView
 
   GralUserAction actionSave = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
-    { if(actionCode == KeyCode.mouse1Up){
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
           File file = new File("curve.save");
           System.out.println("save curve view to; " + file.getAbsolutePath());

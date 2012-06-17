@@ -28,7 +28,7 @@ public class FcmdWindowMng
   { 
     boolean isFullOut = false;
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
-    { if(key == KeyCode.menuEntered || key == KeyCode.mouse1Up){
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if(isFullOut){main.gui.setFrameAreaBorders(30, 65, 60, 80); isFullOut = false; }
         else {main.gui.setFrameAreaBorders(10, 55, 30, 99); isFullOut = true; }
         return true;

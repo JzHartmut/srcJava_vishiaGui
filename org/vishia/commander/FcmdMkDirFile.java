@@ -87,7 +87,7 @@ public class FcmdMkDirFile
   GralUserAction actionButton = new GralUserAction()
   {
     @Override public boolean userActionGui(int keyCode, GralWidget widg, Object... params)
-    { if(keyCode == KeyCode.mouse1Up){
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         switch(widg.sCmd.charAt(0)){
           case 'f':{
             String path = widgParentPath.getText();

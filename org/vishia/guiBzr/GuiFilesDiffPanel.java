@@ -251,7 +251,7 @@ public class GuiFilesDiffPanel
   private final GralUserAction actionRename = new GralUserAction()
   { 
     public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
-    { if(key==KeyCode.mouse1Up){
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         String sFileOld =null, sFileNew =null;
         GralTableLine_ifc lineOld = null, lineNew = null;
         for(Map.Entry<String, GralTableLine_ifc> entry: indexMarkedFiles.entrySet()){
@@ -393,7 +393,7 @@ public class GuiFilesDiffPanel
   { 
     public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     { boolean bDone = true;
-      if(key==KeyCode.mouse1Up){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         commitSelectedFiles();     
       }
       return bDone;
@@ -407,7 +407,7 @@ public class GuiFilesDiffPanel
   { 
     public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     { boolean bDone = true;
-      if(key==KeyCode.mouse1Up){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         refreshFiles();
       }
       return bDone;

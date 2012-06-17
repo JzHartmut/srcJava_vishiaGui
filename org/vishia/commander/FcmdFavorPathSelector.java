@@ -469,7 +469,7 @@ class FcmdFavorPathSelector
 
   GralUserAction actionSearchFiles = new GralUserAction(){
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){
-      if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         FcmdFileCard fileCard = main.lastFavorCard.fileTable;
         windSearchFiles.confirmSearchInFiles(fileCard, main.gui.getOutputBox());
       }
@@ -480,7 +480,7 @@ class FcmdFavorPathSelector
   
   GralUserAction actionSyncMidRight = new GralUserAction(){
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){
-      if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         bSyncMidRight = ! bSyncMidRight;
         if(bSyncMidRight){
           main.statusLine.widgSyncInfo.setBackgroundColor(GralColor.getColor("gn"));
@@ -511,7 +511,7 @@ class FcmdFavorPathSelector
   
   GralUserAction actionCreateFavor = new GralUserAction(){
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){
-      if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         confirmCreateNewFavor();
       }
     return true;
@@ -545,7 +545,7 @@ class FcmdFavorPathSelector
    */
   GralUserAction actionSetDirOrigin = new GralUserAction(){
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
-    { if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         GralFileSelector lastTab = main.getLastSelectedFileCards()[0];
         if(lastTab !=null){
           lastTab.fillInOriginDir();
@@ -565,7 +565,7 @@ class FcmdFavorPathSelector
    */
   GralUserAction actionRefreshFileTable = new GralUserAction(){
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){ 
-      if(key != KeyCode.mouse1Down){  //supress both mouse up and down reaction
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
       GralFileSelector lastTab = main.getLastSelectedFileCards()[0];
       if(lastTab !=null){
         lastTab.fillInCurrentDir();
@@ -581,7 +581,7 @@ class FcmdFavorPathSelector
   
   GralUserAction actionAddFavorite = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
-    { if(key == KeyCode.mouse1Up){
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if(infos.sCmd.equals("ok") || infos.sCmd.equals("temp")){
           String path = windAddFavorite.widgPath.getText();
           String selectName = windAddFavorite.widgShortName.getText();
@@ -636,7 +636,7 @@ class FcmdFavorPathSelector
   
   GralUserAction actionSortFilePerNameCase = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
-      setSortOrderFiles('n');
+      setSortOrderFiles(GralFileSelector.kSortName);
       return true;
   } };
   
@@ -645,7 +645,7 @@ class FcmdFavorPathSelector
   
   GralUserAction actionSortFilePerNameNonCase = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
-      setSortOrderFiles('N');
+      setSortOrderFiles(GralFileSelector.kSortNameNonCase);
       return true;
   } };
   
@@ -654,14 +654,14 @@ class FcmdFavorPathSelector
   
   GralUserAction actionSortFilePerExtensionCase = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
-      setSortOrderFiles('x');
+      setSortOrderFiles(GralFileSelector.kSortExtension);
       return true;
   } };
   
   
   GralUserAction actionSortFilePerExtensionNonCase = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
-      setSortOrderFiles('X');
+      setSortOrderFiles(GralFileSelector.kSortExtensionNonCase);
       return true;
   } };
   
@@ -671,7 +671,7 @@ class FcmdFavorPathSelector
   
   GralUserAction actionSortFilePerTimestamp = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
-      setSortOrderFiles('d');
+      setSortOrderFiles(GralFileSelector.kSortDateNewest);
       return true;
   } };
 
@@ -680,7 +680,7 @@ class FcmdFavorPathSelector
   
   GralUserAction actionSortFilePerTimestampOldestFirst = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
-      setSortOrderFiles('o');
+      setSortOrderFiles(GralFileSelector.kSortDateOldest);
       return true;
   } };
 
@@ -691,7 +691,7 @@ class FcmdFavorPathSelector
   
   GralUserAction actionSortFilePerLenghLargestFirst = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
-      setSortOrderFiles('l');
+      setSortOrderFiles(GralFileSelector.kSortSizeLargest);
       return true;
   } };
 
@@ -700,7 +700,7 @@ class FcmdFavorPathSelector
   
   GralUserAction actionSortFilePerLenghSmallestFirst = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
-      setSortOrderFiles('s');
+      setSortOrderFiles(GralFileSelector.kSortSizeSmallest);
       return true;
   } };
 

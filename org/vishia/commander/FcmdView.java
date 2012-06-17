@@ -310,7 +310,7 @@ public class FcmdView
   GralUserAction actionFind = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
-    { if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         String text = widgContent.getText();
         String find = widgFindText.getText();
         int pos0 = widgContent.getCursorPos();
@@ -332,7 +332,7 @@ public class FcmdView
   GralUserAction actionOpenView = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
-    { if(key != KeyCode.mouse1Down){  //supress both mouse up and down reaction
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
         view(null);
         return true;
       } else return false; 
@@ -366,7 +366,7 @@ public class FcmdView
   GralUserAction actionSetHexView = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
-    {  if(key != KeyCode.mouse1Down){  //supress both mouse up and down reaction
+    {  if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
        try{ 
         syncContentFromWidg();
         format = '?';
@@ -407,7 +407,7 @@ public class FcmdView
   GralUserAction actionSetEditable = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
-    { if(key != KeyCode.mouse1Down){  //supress both mouse up and down reaction
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
         widgContent.setEditable(true);
       return true;
       } else return false; 

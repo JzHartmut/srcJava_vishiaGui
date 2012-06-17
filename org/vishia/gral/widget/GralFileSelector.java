@@ -286,7 +286,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       //File file = (File)(data);
       FileRemote data = (FileRemote)oData;
       switch(keyCode){
-      case KeyCode.alt + KeyCode.F + '7': 
+      case KeyCode.alt + KeyCode.F7: 
         stop();
         //FileSystem.searchInFiles(new File[]{data}, "ordersBackground"); break;
         break;
@@ -334,7 +334,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       WindowFileSelection wind = new WindowFileSelection();
       mng.selectPanel("primaryWindow");
       mng.setPosition(-24, 0, -67, 0, 1, 'r'); //right buttom, about half less display width and hight.
-      wind.wind = mng.createWindow("windSelectFile", "select file", GralWindow.windConcurrently);
+      wind.wind = mng.createWindow("windSelectFile", "select file", GralWindow.windExclusive);
       mng.setPosition(0, 0, 0, -2, 0, 'd', 0.0f);
       wind.fileSelector = new GralFileSelector();
       wind.fileSelector.setToPanel(mng, "selectFile", 100, new int[]{2,19,6,10}, 'C');
@@ -431,16 +431,16 @@ public class GralFileSelector implements Removeable //extends GralWidget
   protected GralTextField widgdPath;
   
   String sDatePrefixNewer = "";
-  SimpleDateFormat dateFormatNewer = new SimpleDateFormat("?yy-MMdd HH:mm:ss"); 
+  SimpleDateFormat dateFormatNewer = new SimpleDateFormat("?yy-MM-dd HH:mm:ss"); 
   
   String sDatePrefixToday = "";
   SimpleDateFormat dateFormatToday = new SimpleDateFormat("@ HH:mm:ss"); 
   
   String sDatePrefixYear = "";
-  SimpleDateFormat dateFormatYear = new SimpleDateFormat("dd-MMM HH:mm:ss"); 
+  SimpleDateFormat dateFormatYear = new SimpleDateFormat("MMM-dd HH:mm:ss"); 
   
   String sDatePrefixOlder = "";
-  SimpleDateFormat dateFormatOlder = new SimpleDateFormat("yy-MMdd HH:mm:ss"); 
+  SimpleDateFormat dateFormatOlder = new SimpleDateFormat("yy-MM-dd HH:mm:ss"); 
   
   //final MainCmd_ifc mainCmd;
 

@@ -250,7 +250,7 @@ public class FcmdExecuter
   
   GralUserAction actionExecuteFileByExtension = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
-    { if(key == KeyCode.menuEntered || key == KeyCode.mouse1Up){
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         FileRemote file = main.currentFile;
         executeFileByExtension(file);  
         return true;

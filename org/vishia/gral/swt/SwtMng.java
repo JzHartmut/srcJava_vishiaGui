@@ -1717,7 +1717,8 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
         final int keyCode = SwtGralKey.convertFromSwt(event.keyCode, event.stateMask);
         boolean bDone = userMainKeyAction.userActionGui(keyCode, null);
         if(bDone){
-          event.doit = false;   //don't use this key for another action.
+          event.type = SWT.None;
+          //event.doit = false;   //don't use this key for another action.
         }
       }
       stop();

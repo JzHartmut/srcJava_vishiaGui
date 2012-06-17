@@ -263,7 +263,7 @@ public class FcmdButtons
   GralUserAction actionViewButtons = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
-      if(key != KeyCode.mouse1Down){  //supress both mouse up and down reaction
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
       if(bButtonVisible){
         bButtonVisible = false;
         main.gui.setMinMaxSizeArea("A3C3", 4, 4, 0, 0);

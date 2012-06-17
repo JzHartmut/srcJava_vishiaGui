@@ -230,7 +230,7 @@ public class FcmdCopyCmd
    */
   protected GralUserAction actionButtonCopy = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
-    { if(key == KeyCode.mouse1Up){
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if(widgg.sCmd.equals("check")){
           widgCopyState.setText("busy-check");
           widgButtonOk.setText("busy-check");
@@ -320,7 +320,7 @@ public class FcmdCopyCmd
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { 
-      if(key == KeyCode.mouse1Up){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if(widgdMove.isOn()){
           widgButtonOk.setText("move");
           widgButtonOk.sCmd="copy";

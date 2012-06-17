@@ -191,7 +191,7 @@ public final class FcmdFilesCp {
   GralUserAction actionConfirmCp = new GralUserAction() {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     {
-      if(key == KeyCode.menuEntered || key == KeyCode.mouse1Up){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         setDirs();
         windConfirmCompare.setWindowVisible(true);
       }
@@ -202,7 +202,7 @@ public final class FcmdFilesCp {
   GralUserAction actionFilesCp = new GralUserAction() {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     {
-      if(key == KeyCode.mouse1Up){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if(infos.sCmd.equals("get")){
           setDirs();
         } else

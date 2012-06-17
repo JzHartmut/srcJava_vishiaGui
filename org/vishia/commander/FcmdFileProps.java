@@ -275,7 +275,7 @@ public class FcmdFileProps
   GralUserAction actionOpenDialog = new GralUserAction()
   {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params){ 
-      if(keyCode == KeyCode.menuEntered || keyCode == KeyCode.mouse1Up){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         openDialog(main.currentFile);
       }
       return true;
@@ -289,7 +289,7 @@ public class FcmdFileProps
   GralUserAction actionButton = new GralUserAction()
   {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
-    { if(keyCode == KeyCode.mouse1Up){
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         String name = widgName.getText();
         if(name.equals(actFile.getName())){ name = null; } //don't change it.
         int noMask = 0;
@@ -391,7 +391,7 @@ public class FcmdFileProps
   GralUserAction actionBtnCntLen = new GralUserAction()
   {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
-    { if(keyCode == KeyCode.mouse1Up){
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         widgBtnDirBytes.setText("counting ...");
         evCntLen.forceRelease();
         if(evCntLen.use(0, 0, null, callbackCntLen)){
