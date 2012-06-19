@@ -93,8 +93,8 @@ public class FcmdStatusLine
     long lastModified = file.lastModified();
     String sDate = formatDateInfo.format(new Date(lastModified));
     String sLenShort = //String.format("", file.length)
-      file.length() >= 1000000 ? String.format("%2.1f MByte", file.length()/1000000.0) :
-      file.length() >=    1000 ? String.format("%2.1f kByte", file.length()/1000.0) :
+      file.length() >= (1024 * 1024) ? String.format("%2.3f MByte = %d Byte", file.length()/(1024 * 1024.0), file.length()) :
+      file.length() >=    1024 ? String.format("%3.2f kByte = %d Byte", file.length()/1024.0, file.length()) :
       String.format("%3d Byte", file.length());  
     String info = sDate + " = " + lastModified + ", length= " + sLenShort;        
     main.statusLine.widgFileInfo.setText(info);

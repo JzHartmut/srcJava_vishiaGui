@@ -203,8 +203,11 @@ public class InspcCurveView
 
   
   void refreshCurve(){
-    widgCurve.activate(widgBtnOff.getState() == GralButton.kOn);
-    widgCurve.refreshFromVariable(variables);
+    if(widgCurve !=null && widgBtnOff !=null){
+      int state = widgBtnOff.getState();
+      widgCurve.activate( state == GralButton.kOn);
+      widgCurve.refreshFromVariable(variables);
+    }
   }
   
   

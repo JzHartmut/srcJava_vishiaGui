@@ -94,7 +94,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    */
   public static final int version = 20120617;
   
-  FileRemoteAccessor localFileAccessor = FileRemoteAccessorLocalFile.getInstance();
+  //FileRemoteAccessor localFileAccessor = FileRemoteAccessorLocalFile.getInstance();
   
   
   /**A window for search-in-file dialogue.
@@ -334,7 +334,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       WindowFileSelection wind = new WindowFileSelection();
       mng.selectPanel("primaryWindow");
       mng.setPosition(-24, 0, -67, 0, 1, 'r'); //right buttom, about half less display width and hight.
-      wind.wind = mng.createWindow("windSelectFile", "select file", GralWindow.windExclusive);
+      wind.wind = mng.createWindow("windSelectFile", "select file", GralWindow.windExclusive | GralWindow.windResizeable );
       mng.setPosition(0, 0, 0, -2, 0, 'd', 0.0f);
       wind.fileSelector = new GralFileSelector();
       wind.fileSelector.setToPanel(mng, "selectFile", 100, new int[]{2,19,6,10}, 'C');
@@ -728,20 +728,20 @@ public class GralFileSelector implements Removeable //extends GralWidget
           //
           String sLength;
           long fileLength = file.length();
-          if(fileLength < 1000){
+          if(fileLength < 1024){
             sLength = "" + fileLength;
           } else if(fileLength < 10000){
-            sLength = String.format("%1.1f k", fileLength / 1000.0f);
+            sLength = String.format("%1.1f k", fileLength / 1024.0f);
           } else if(fileLength < 1000000){
-            sLength = String.format("%3.0f k", fileLength / 1000.0f);
+            sLength = String.format("%3.0f k", fileLength / 1024.0f);
           } else if(fileLength < 10000000){
-            sLength = String.format("%1.1f M", fileLength / 1000000.0f);
+            sLength = String.format("%1.1f M", fileLength / (1024 * 1024.0f));
           } else if(fileLength < 1000000000){
-            sLength = String.format("%3.0f M", fileLength / 1000000.0f);
+            sLength = String.format("%3.0f M", fileLength / (1024 * 1024.0f));
           } else if(fileLength < 10000000000L){
-            sLength = String.format("%1.1f G", fileLength / 1000000000.0f);
+            sLength = String.format("%1.1f G", fileLength / (1024 * 1024.0f));
           } else {
-            sLength = String.format("%2.0f G", fileLength / 1000000000.0f);
+            sLength = String.format("%2.0f G", fileLength / (1024 * 1024.0f));
           }
           line[kColLength] = sLength;
           //
