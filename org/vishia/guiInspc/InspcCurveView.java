@@ -33,6 +33,7 @@ public class InspcCurveView
   /**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
    * Changes:
    * <ul>
+   * <li>2012-06-29 Hartmut new open file dialog
    * <li>2012-06-08 Hartmut: new Buttons for read and save the configuration (setting). Yet only a simple file is used.
    *   TODO: File selection.
    * <li>2012-03-17 Hartmut creating using the {@link GralCurveView} in a special window
@@ -191,7 +192,7 @@ public class InspcCurveView
     gralMng.setPosition(GralPos.same, GralPos.size +2, GralPos.next, GralPos.size +4, 0, 'r', 1);
     widgBtnScale = gralMng.addButton("btnScale", actionSetScaleValues2Track, "!", null, null, "set");
     gralMng.setPosition(35, GralPos.size +2, -10, GralPos.size +4, 0, 'r', 2);
-    widgBtnRead = gralMng.addButton("btnRead", actionRead, "read", null, null, "read");
+    widgBtnRead = gralMng.addButton("btnRead", actionOpenFileDialog, "read", null, null, "read");
     widgBtnSave = gralMng.addButton("btnSave", actionSave, "save", null, null, "save");
     
     gralMng.setPosition(-3, GralPos.size +2, -9, -1, 0, 'd', 0);
@@ -323,11 +324,26 @@ public class InspcCurveView
   
   
   
+  GralUserAction actionOpenFileDialog = new GralUserAction(){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    { if(actionCode == KeyCode.mouse1Up){
+        try{
+          File dir = new File("D:/");
+          windFile.fileSelector.fillIn(dir);
+          windFile.openDialog(".");
+        } catch(Exception exc){
+          widgBtnScale.setForegroundColor(GralColor.getColor("lrd"));
+        }
+      }
+      return true;
+  } };
+  
+  
+  
   GralUserAction actionRead = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(actionCode == KeyCode.mouse1Up){
         try{
-          windFile.openDialog(".");
           File file = new File("curve.save");
           System.out.println("read curve view from; " + file.getAbsolutePath());
           String in = FileSystem.readFile(file);
@@ -340,7 +356,8 @@ public class InspcCurveView
             for(GralCurveViewTrack_ifc track: listTracks){
               TrackValues trackValue = tracks[iTrack];
               trackValue.trackView = track;
-              trackValue.widgVarPath.setText(track.getDataPath());
+              String sDataPath = track.getDataPath();
+              trackValue.widgVarPath.setText(sDataPath !=null ? sDataPath : "?dataPath?");
               iTrack +=1;
             }
           }

@@ -38,6 +38,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
   
   /**Version, history and license:
    * <ul>
+   * <li>2012-06-29 Hartmut new: {@link #setResizeAction(GralUserAction)} now for both ctors, resize on subwindow works.
    * <li>2012-03-10 Hartmut new: calls invisibleSetAction.userActionGui if the window is set invisible by pressing the X closing icon.
    * <li>2012-02-11 Hartmut chg: The menu of the window is managed now in {@link SwtMenu}. Instance refered with {@link #menuBar}
    * <li>2011-11-27 Hartmut chg: {@link #addMenuItemGThread(String, String, GralUserAction)} moved from
@@ -139,6 +140,9 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
     }
     super.panelComposite = window;
     if(title !=null){ window.setText(title); }
+    if((windProps & GralWindow.windResizeable) !=0){
+      setResizeAction(actionResizeOnePanel);
+    }
 
   }
   

@@ -315,7 +315,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     
     GralWindow_ifc wind;
 
-    GralFileSelector fileSelector;
+    public GralFileSelector fileSelector;
     
         
     /**Use {@link GralFileSelector#createWindowConfirmSearchGthread(GralMngBuild_ifc)} to create.

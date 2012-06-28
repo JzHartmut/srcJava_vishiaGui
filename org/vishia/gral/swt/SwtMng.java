@@ -512,7 +512,7 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
   
   
   
-  protected void setPosAndSize_(Control component)
+  void setPosAndSize_(Control component)
   { setPosAndSizeSwt(component, 0,0);
   }  
   
@@ -1236,6 +1236,7 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
   @Override public GralTable addTable(String sName, int height, int[] columnWidths)
   {
     return SwtTable.addTable(this, sName, height, columnWidths);
+
   }
   
   
@@ -1591,8 +1592,9 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
 	
 	@Override public void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent)
 	{
-	  GralWidget_ifc widget = widgd.getGraphicWidgetWrapper();
-	  Control swtWidget = (Control)widget.getWidgetImplementation();
+	  //GralWidget_ifc widget = widgd.getGraphicWidgetWrapper();
+	  
+	  Control swtWidget = (Control)widgd.getWidgetImplementation();
 	  Point size = swtWidget.getParent().getSize();
 	  //Composite parent = swtWidget.
 	  GralRectangle posSize = calcWidgetPosAndSize(widgd.pos, size.x, size.y, 0, 0);

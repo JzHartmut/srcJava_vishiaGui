@@ -199,6 +199,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     }
    
     
+    @Override public String toString(){ return "Track: " + name + "(" + sDataPath + "," + (variable !=null ? variable.toString(): "variable = null") + ")"; }
+    
   }
   
   protected Track[] tracks;
@@ -673,23 +675,6 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
 
   
   
-  @Override
-  public Object getWidgetImplementation()
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  
-
-  
-  @Override
-  public void removeWidgetImplementation()
-  {
-    // TODO Auto-generated method stub
-    
-  }
-
   @Override
   public GralColor setBackgroundColor(GralColor color)
   {

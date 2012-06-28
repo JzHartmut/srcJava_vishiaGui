@@ -108,6 +108,18 @@ public class SwtCurveView extends GralCurveView
 
   @Override public GralWidgetGthreadSet_ifc getGthreadSetifc(){ return gThreadSet; }
 
+  @Override public Object getWidgetImplementation(){ return curveSwt; }
+  
+
+  
+  @Override
+  public void removeWidgetImplementation()
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+
   
   /**Implementation of the graphic thread widget set interface. */
   GralWidgetGthreadSet_ifc gThreadSet = new GralWidgetGthreadSet_ifc(){

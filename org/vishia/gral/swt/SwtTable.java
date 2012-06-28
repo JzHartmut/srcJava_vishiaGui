@@ -114,6 +114,7 @@ public class SwtTable  extends GralTable {
     table.setPanelMng(mng);
     table.table.setData(table);
     mng.registerWidget(table);
+    //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
     return table;
 
   }
