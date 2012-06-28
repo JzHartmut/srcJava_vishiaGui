@@ -105,7 +105,7 @@ public class SwtTabbedPanel extends GralTabbedPanel
 	  panel.swtCanvas.setBounds(sizeTabFolder);
 	  panel.itsTabSwt = tabItem;
 		tabItem.setControl(panel.swtCanvas);
-		panel.swtCanvas.addFocusListener(focusTabListener);
+		panel.swtCanvas.addFocusListener(focusTabListener); //unused...
     
 		mng.registerPanel(panel);   //register the panel in the mng.
 		mng.registerWidget(panel);

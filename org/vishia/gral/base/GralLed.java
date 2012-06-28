@@ -69,7 +69,7 @@ public abstract class GralLed extends GralWidget
       if(val1 >= colorBorderSelectable.length){ val1 = colorBorderSelectable.length -1; }
       if(val2 >= colorInnerSelectable.length){ val2 = colorInnerSelectable.length -1; }
       colorBorder = colorBorderSelectable[val1];
-      colorInner = colorInnerSelectable[val1];
+      colorInner = colorInnerSelectable[val2];
       repaint(repaintDelay, repaintDelayMax);
     }
   }

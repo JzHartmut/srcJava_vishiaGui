@@ -320,7 +320,7 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
 		userActions.put("syncVariableOnFocus", this.syncVariableOnFocus);
 		
 		displaySwt = display;
-		displaySwt.addFilter(SWT.KeyDown, mainKeyListener);
+		//displaySwt.addFilter(SWT.KeyDown, mainKeyListener);
     
 
   }

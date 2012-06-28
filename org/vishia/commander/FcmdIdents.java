@@ -218,8 +218,8 @@ public class FcmdIdents
   
   
   
-  String menuBarNavigatonCmd = "&Navigation/cmd [aF9]";
-  String buttonFocusCmd = "aF9:cmdTable";
+  String menuBarNavigatonCmd = "&Navigation/cmd [F9]";
+  String buttonFocusCmd = "F9:cmdTable";
 
   
 
