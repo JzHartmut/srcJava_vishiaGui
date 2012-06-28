@@ -40,7 +40,7 @@ public class GralGridProperties
 
   
   protected final static int[] smallPromptFontSize = {5,5,6,6,7,8};  //{5,6,8,9,11,12};
-  protected final static int[] stdInputFontSize =    {9,10,11,12,14,18};
+  protected final static int[] stdInputFontSize =    {8,9,11,12,14,18};
   protected final static int[] stdButtonFontSize =   {10,11,12,14,16,20};
   
   /**This are the font sizes for some heights of fields in the given sizes of presentation. 
@@ -49,14 +49,14 @@ public class GralGridProperties
   protected final static int[][] stdTextFontSize =
   { {5, 6, 7, 7, 8, 9}  ////1, 1.1, 1.2
   , {6, 6, 8, 9, 9,10}  // 1 1/3,
-  , {7, 8, 9, 9,10,12}  //1.5
-  , {8, 9,10,10,12,14}  //1 2/3
-  , {9,10,11,12,14,18}  //2
-  , {9,10,11,12,14,18}  //2 1/3
+  , {6, 8, 9, 9,10,12}  //1.5
+  , {7, 9,10,10,12,14}  //1 2/3
+  , {8,10,11,12,14,18}  //2
+  , {8,10,11,12,14,18}  //2 1/3
   , {9,10,11,12,14,18}  //2.5, 2 2/3
   , {9,10,11,12,14,18}  //3
-  , {9,10,11,12,14,18}  //3.5
-  , {9,10,11,12,14,18}  //>=4
+  , {10,10,11,12,14,18}  //3.5
+  , {10,10,11,12,14,18}  //>=4
   };
   
   /**Pixel per Y-Unit. 
