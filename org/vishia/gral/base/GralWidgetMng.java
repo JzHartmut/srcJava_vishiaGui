@@ -266,7 +266,7 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
    */
   protected GralUserAction userMainKeyAction;
   
-
+  
 
 	/**Creates an nee Panel Manager in a new Window.
 	 * @param graphicBaseSystem
@@ -419,6 +419,9 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
     this.userMainKeyAction = userMainKeyAction;
     return last;
   }
+  
+  /**package private*/ GralUserAction userMainKeyAction(){ return userMainKeyAction; }
+  
   
   @Override public GralGridProperties propertiesGui(){ return propertiesGui; }
   
@@ -1207,14 +1210,14 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
    *
    *
    */
-  public class ImplementationPublicFields{
-    int xx;
+  public class InternalPublic{
+    public GralKeyListener gralKeyListener = new GralKeyListener(GralWidgetMng.this);
   }
   
   /**Implementation specific fields.
    * 
    */
-  ImplementationPublicFields _impl;
+  public final InternalPublic _impl = new InternalPublic();
   
   
 

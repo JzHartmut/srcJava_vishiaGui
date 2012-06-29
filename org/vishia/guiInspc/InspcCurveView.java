@@ -157,7 +157,7 @@ public class InspcCurveView
     gralMng.selectPanel("primaryWindow");
     gralMng.setPosition(4, 0, 4, 0, 0, '.');
     //int windProps = GralWindow.windConcurrently | GralWindow.windOnTop | GralWindow.windResizeable;
-    int windProps = GralWindow.windConcurrently  | GralWindow.windResizeable;
+    int windProps = GralWindow.windConcurrently ; // | GralWindow.windResizeable;
     windCurve = gralMng.createWindow("windMapVariables", "Curve A", windProps);
     //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 0, 'd');
     gralMng.setPosition(0, -2, 0, -10, 0, 'd');
@@ -200,6 +200,8 @@ public class InspcCurveView
     wind.addMenuItemGThread("menuBarCurveView", "&Window/open " + sName, actionOpenWindow);
   
     windFile = GralFileSelector.WindowFileSelection.create(gralMng);
+    windFile.fileSelector.setActionOnEnterFile(actionRead);
+    windFile.fileSelector.fillIn(new File("D:/"));
   }
 
   
@@ -329,7 +331,7 @@ public class InspcCurveView
     { if(actionCode == KeyCode.mouse1Up){
         try{
           File dir = new File("D:/");
-          windFile.fileSelector.fillIn(dir);
+          windFile.fileSelector.fillInCurrentDir();
           windFile.openDialog(".");
         } catch(Exception exc){
           widgBtnScale.setForegroundColor(GralColor.getColor("lrd"));
@@ -342,28 +344,30 @@ public class InspcCurveView
   
   GralUserAction actionRead = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
-    { if(actionCode == KeyCode.mouse1Up){
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
-          File file = new File("curve.save");
+          File file = (File)params[0];
           System.out.println("read curve view from; " + file.getAbsolutePath());
           String in = FileSystem.readFile(file);
           if(in ==null){
             System.err.println("InspcCurveView.actionRead - file not found;" + file.getAbsolutePath());
           } else {
-            widgCurve.applySettings(in); 
-            List<? extends GralCurveViewTrack_ifc> listTracks = widgCurve.getTrackInfo();
-            int iTrack = 0;
-            for(GralCurveViewTrack_ifc track: listTracks){
-              TrackValues trackValue = tracks[iTrack];
-              trackValue.trackView = track;
-              String sDataPath = track.getDataPath();
-              trackValue.widgVarPath.setText(sDataPath !=null ? sDataPath : "?dataPath?");
-              iTrack +=1;
+            if(widgCurve.applySettings(in)){ 
+              List<? extends GralCurveViewTrack_ifc> listTracks = widgCurve.getTrackInfo();
+              int iTrack = 0;
+              for(GralCurveViewTrack_ifc track: listTracks){
+                TrackValues trackValue = tracks[iTrack];
+                trackValue.trackView = track;
+                String sDataPath = track.getDataPath();
+                trackValue.widgVarPath.setText(sDataPath !=null ? sDataPath : "?dataPath?");
+                iTrack +=1;
+              }
             }
           }
         } catch(Exception exc){
           widgBtnScale.setForegroundColor(GralColor.getColor("lrd"));
         }
+        windFile.wind.closeWindow();
       }
       return true;
   } };

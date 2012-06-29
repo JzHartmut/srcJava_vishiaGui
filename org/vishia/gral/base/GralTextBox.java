@@ -2,8 +2,10 @@ package org.vishia.gral.base;
 
 import java.io.IOException;
 
+import org.eclipse.swt.graphics.Point;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
+import org.vishia.util.KeyCode;
 
 public abstract class GralTextBox extends GralTextField implements Appendable, GralTextBox_ifc
 {
@@ -178,7 +180,6 @@ public abstract class GralTextBox extends GralTextField implements Appendable, G
       }
     }
   };
-  
   
 
 }

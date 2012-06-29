@@ -203,7 +203,7 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
   SwtGralMouseListener.MouseListenerNoAction mouseClickForInfo = new SwtGralMouseListener.MouseListenerNoAction();
   
   
-  SwtKeyListener swtKeyListener = new SwtKeyListener(this);
+  //SwtKeyListener swtKeyListener = new SwtKeyListener(this);
   
   /**It is a marker interface. */
   protected interface XXXUserAction{}

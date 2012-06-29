@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Text;
 import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralKeyListener;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
@@ -18,6 +19,14 @@ import org.vishia.util.KeyCode;
 
 public class SwtTextBox extends GralTextBox
 {
+
+  /**Experience: use SwtTextFieldWrapper as composite? (instead superclass)
+   * 
+   */
+  @SuppressWarnings("unused")
+  private SwtTextFieldWrapper swtText;
+  
+  
   protected Text textFieldSwt;
   
   /**A possible prompt for the text field or null. */
@@ -27,7 +36,7 @@ public class SwtTextBox extends GralTextBox
   public SwtTextBox(String name, Composite parent, int style, SwtMng mng)
   { super(name, 't', mng);
     textFieldSwt = new Text(parent, style);
-    textFieldSwt.addKeyListener((new SwtTextBoxKeyListener(mng)).swtListener);
+    textFieldSwt.addKeyListener(swtKeyListener);
   }
 
   //@Override public Widget getWidgetImplementation(){ return textFieldSwt; } 
@@ -185,15 +194,11 @@ public class SwtTextBox extends GralTextBox
   
   
   
-  class SwtTextBoxKeyListener extends SwtKeyListener
+  
+  protected SwtKeyListener swtKeyListener = new SwtKeyListener(itsMng._impl.gralKeyListener)
   {
 
-    public SwtTextBoxKeyListener(SwtMng swtMng)
-    {
-      super(swtMng);
-    }
-
-    @Override protected final boolean specialKeysOfWidgetType(int key, GralWidget widgg){ 
+    @Override public final boolean specialKeysOfWidgetType(int key, GralWidget widgg){ 
       boolean bDone = true;
       if(KeyCode.isWritingKey(key)){
         bTextChanged = true;
@@ -217,11 +222,10 @@ public class SwtTextBox extends GralTextBox
       }
       return bDone; 
     }
-
     
     
     
-  }
+  };
 
 
   

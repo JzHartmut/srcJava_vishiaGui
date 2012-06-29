@@ -1,23 +1,63 @@
 package org.vishia.gral.base;
 
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.util.KeyCode;
+
 /**The main key listener.
  * <b>Processing of keys</b>: (2012-06-17)<br>
  * Key events are produced by the underlying graphic operation system. Usual they are applied to the widgets of the
  * operation system graphic. For example, key left and right are used to navigate in a text field.
  * <br><br>
- * Any widget can have a key listener. Then the keys are applied to it, the listener determines what to do with keys.
- * But if main keys should be used, keys which have the same reaction independent of the current focus of widgets,
- * all widgets have to be catch this keys in there key listener and forwarding to the main handler.
- * That is not optimal. Some widgets would not do so, and the keys does not take an effect fretfully. The user should
- * implement a key listener to all widgets.
+ * On system graphic level any widget can have its key listener. Then the keys are applied to it, the listener determines 
+ * what to do with keys. Usual the key is applied to the standard behavior of the widget after them. 
+ * But the key event may be set to 'do not do it' in the key listener. Then the standard behavior of the key in that widget is prevent.
  * <br><br>
- * It is better to have a main key listerner which is invoked in any case. That is realized in 
- *   {@link GralWidgetMng#setMainKeyAction(org.vishia.gral.ifc.GralUserAction)} and the adequate SWT-Implementation.
- * 
- * @author Hartmut
+ * The action for some keys may be determined for a special widget or widget type in an graphic system independent way.
+ * The {@link GralWidget#setActionChange(org.vishia.gral.ifc.GralUserAction)} method can be given for any widget.
+ * The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be invoked with the {@link KeyCode} 
+ * and the widget reference. But firstly the {@link #specialKeysOfWidgetType(int, GralWidget)} is called. 
+ * This method may be overridden for the widget type. If it returns true, the key code is not applied to any user action,
+ * it is a widget-special key. 
+ * <br><br>
+ * If that method returns false or a {@link GralWidget#getActionChange()} action is not given for this widget,
+ * the key will be applied to the {@link GralWidgetMng#setMainKeyAction(org.vishia.gral.ifc.GralUserAction)}.
+ * In that way a application-global usage of some keys is organized.
+ * <br><br>
+ * If any of the both widget specific or global {@link GralUserAction#userActionGui(int, GralWidget, Object...)} method 
+ * returns true, the key is not used for the widget in the graphic system. In that kind some keys can be blocked
+ * for standard behavior.
+ * <br><br>
+ * <b>class diagramm of usage for example in SWT: </b>
+ * <pre>
+ *                                                                 GralWidget <------------|
+ *                                                                                         |
+ *    SwtSpecialWidgetKeyListener ----|> SwtKeyListner ----|> swt.KeyListener <------- SwtWidget
+ *    + specialKeysOfWidgetType()                  |
+ *                                           |<----| 
+ *                                           |
+ *    GralSpecialWidgetKeyListener ---|> GralKeyListener
+ *    +specialKeysOfWidgetType()             * keyPressed(key, gralWidg)
+ *                                                * gralWidg.getActionChange().userActionGui(...)
+ *                                                * mng.userMainKeyAction().userActionGui(...)
+ *  
+ *  <|---- inheritance
+ *  <----- association
+ *  <<---- composition
+ *  <o---- aggregation to its outer class
+ *  + overridden_method()
+ *  * called_method()
+ *  - attribute
+ *  </pre>
+ *  <br><br>
+ *  The implementing graphic system aggregates an instance of this class.
+ *  An underived instance is created in the {@link GralWidgetMng.InternalPublic#gralKeyListener}.
+ *  This instance can be used as aggregation in all implementing system listeners, if the
+ *  {@link #specialKeysOfWidgetType(int, GralWidget)} should not overridden.
+ *  
+ * @author Hartmut Schorrig
  *
  */
-public class GralKeyListener
+public class GralKeyListener implements GralKeySpecial_ifc
 {
   /**Version and history
    * <ul>
@@ -52,4 +92,46 @@ public class GralKeyListener
    */
   public final static int version = 0x20111203;
  
+  
+  protected final GralWidgetMng mng;
+  
+  
+  public GralKeyListener(GralWidgetMng mng){
+    this.mng = mng;
+  }
+  
+  
+  
+  public boolean keyPressed(int keyCode, GralWidget widgetDescr){
+    boolean actionDone;
+    final GralUserAction action = widgetDescr.getActionChange();
+    final GralWidgetMng mng = widgetDescr.itsMng;
+    try{
+      actionDone = specialKeysOfWidgetType(keyCode, widgetDescr);
+      if(!actionDone && action !=null){ 
+          actionDone = action.userActionGui(keyCode, widgetDescr);
+      } //if(table.)
+      if(!actionDone && mng.userMainKeyAction() !=null){
+        actionDone = mng.userMainKeyAction().userActionGui(keyCode, widgetDescr);
+      }
+      if(!actionDone){
+        GralUserAction mainKeyAction = mng.getRegisteredUserAction("KeyAction");
+        if(mainKeyAction !=null){
+          //old form called because compatibility, if new for with int-parameter returns false.
+          if(!mainKeyAction.userActionGui(keyCode, widgetDescr)){
+            mainKeyAction.userActionGui("key", widgetDescr, new Integer(keyCode));
+          }
+        }
+      }
+    } catch(Exception exc){
+      mng.log.sendMsg(0, "KeyListener - UsercallException; key=%8x; %s;", keyCode, exc.getLocalizedMessage());
+    }
+
+    return true;
+  }
+  
+  
+  @Override public boolean specialKeysOfWidgetType(int key, GralWidget widgg){ return false; }
+
+  
 }

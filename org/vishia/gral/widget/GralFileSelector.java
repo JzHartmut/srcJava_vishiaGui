@@ -206,7 +206,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     
     @Override public boolean actionOk(Object userData, GralTableLine_ifc line)
     { boolean done = true;
-      FileRemote file = (FileRemote)userData;
+      File file = (File)userData;
       //File dir = data.file.getParentFile();
       //String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir) + "/";
       String sName = line.getCellText(1);
@@ -264,7 +264,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     
     @Override public void actionRight(Object userData, GralTableLine_ifc line)
     {
-      FileRemote currentFile = (FileRemote)userData;
+      File currentFile = (File)userData;
       //File dir = data.file.getParentFile();
       //String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir);
       //String sName = line.getCellText(1);
@@ -313,7 +313,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    */
   public static class WindowFileSelection {
     
-    GralWindow_ifc wind;
+    public GralWindow_ifc wind;
 
     public GralFileSelector fileSelector;
     
@@ -490,7 +490,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
     GralPos posAll = panelMng.getPositionInPanel();
     //Text field for path above list
     panelMng.setPosition(posAll, GralPos.same, GralPos.size + 2.0F, GralPos.same, GralPos.same, 1, 'd');
-    widgdPath = panelMng.addTextField(name + "-Path", false, null, null);
+    widgdPath = panelMng.addTextField(name + "-Path", true, null, null);
+    widgdPath.setActionChange(actionSetPath);
     widgdPath.setBackColor(panelMng.getColor("pye"), 0xeeffff);  //color pastel yellow
     //the list
     panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
@@ -863,5 +864,12 @@ public class GralFileSelector implements Removeable //extends GralWidget
   }
 
 
+  GralUserAction actionSetPath = new GralUserAction(){
+    public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ return false; }
+    {
+      stop();
+    }
+  };
+  
 
 }

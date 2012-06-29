@@ -255,4 +255,12 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   } //class CalculatorAngle32
   
   
+  
+  protected GralKeyListener gralKeyListener = new GralKeyListener(itsMng)
+  {
+    @Override public boolean specialKeysOfWidgetType(int key, GralWidget widgg){ return false; }
+  };
+  
+  
+  
 }

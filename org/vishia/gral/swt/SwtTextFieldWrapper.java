@@ -26,6 +26,7 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.util.KeyCode;
 
 public class SwtTextFieldWrapper extends GralTextField
 {
@@ -169,7 +170,7 @@ public class SwtTextFieldWrapper extends GralTextField
       stop();
     textFieldSwt.setBackground(mng.propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));
     textFieldSwt.addFocusListener(mng.focusListener);
-    textFieldSwt.addKeyListener(keyListener);
+    textFieldSwt.addKeyListener(swtKeyListener);
     
     Listener[] oldMouseListener = textFieldSwt.getListeners(SWT.MouseDown);
     for(Listener lst: oldMouseListener){
@@ -396,6 +397,7 @@ public class SwtTextFieldWrapper extends GralTextField
 
   
   
+  @SuppressWarnings("unused")
   private class TextFieldFocusListener extends SwtMng.SwtMngFocusListener
   {
     
@@ -426,22 +428,38 @@ public class SwtTextFieldWrapper extends GralTextField
   };
   
  
-  KeyListener keyListener = new KeyListener(){
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-      // TODO Auto-generated method stub
-      stop();
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-      // TODO Auto-generated method stub
-      
-    }
-    
-  };
   
+  protected SwtKeyListener swtKeyListener = new SwtKeyListener(itsMng._impl.gralKeyListener)
+  {
+
+    @Override public final boolean specialKeysOfWidgetType(int key, GralWidget widgg){ 
+      boolean bDone = true;
+      if(KeyCode.isWritingKey(key)){
+        bTextChanged = true;
+      }
+      if(KeyCode.isWritingOrTextNavigationKey(key)){
+        bDone = true;
+      } else {
+        boolean bUserOk;
+        if(user !=null){
+          Point selection = textFieldSwt.getSelection();
+          bUserOk = user.userKey(key
+              , textFieldSwt.getText()
+              , textFieldSwt.getCaretPosition()
+              , selection.x, selection.y);
+        } else bUserOk = false;
+        if(!bUserOk ){
+          switch(key){
+            case KeyCode.ctrl + 'a': { 
+              textFieldSwt.selectAll();
+            } break;
+            default: bDone = false;
+          }
+        }
+      }
+      return bDone; 
+    }
+  };
   
   void stop(){}
 
