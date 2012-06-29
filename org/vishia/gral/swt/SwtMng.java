@@ -194,7 +194,7 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
   
   private final Display displaySwt;
   
-  public final SwtWidgetHelper widgetHelper = new SwtWidgetHelper(this);
+  //public final SwtWidgetHelper widgetHelper = new SwtWidgetHelper(this);
   
   /**This mouse-click-implementor is added to any widget,
    * which is associated to a {@link GralWidget} in its data.
@@ -311,7 +311,7 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
   	, VariableContainer_ifc variableContainer
   	, LogMessage log
   	)
-  { super(device, propertiesGui, variableContainer, log);
+  { super(device, new SwtWidgetHelper(), propertiesGui, variableContainer, log);
     this.propertiesGuiSwt = propertiesGui;
     pos.x.p1 = 0; //start-position
     pos.y.p1 = 4 * propertiesGui.yPixelUnit();

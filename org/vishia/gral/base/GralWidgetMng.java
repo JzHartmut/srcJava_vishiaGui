@@ -267,7 +267,8 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
   protected GralUserAction userMainKeyAction;
   
   
-
+  public final GralWidgetHelper widgetHelper;
+  
 	/**Creates an nee Panel Manager in a new Window.
 	 * @param graphicBaseSystem
 	 * @return
@@ -401,8 +402,10 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
 
 
 	
-  public GralWidgetMng(GralGraphicThread device, GralGridProperties props, VariableContainer_ifc variableContainer, LogMessage log)
+  public GralWidgetMng(GralGraphicThread device, GralWidgetHelper widgetHelper, GralGridProperties props, VariableContainer_ifc variableContainer, LogMessage log)
 	{ this.gralDevice = device;
+	  this.widgetHelper = widgetHelper;
+	  widgetHelper.setMng(this);
     this.parent = null;
 	  this.propertiesGui = props;
 		this.log = log;

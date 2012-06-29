@@ -68,7 +68,7 @@ public class AwtWidgetMng extends GralWidgetMng implements GralMngBuild_ifc, Gra
     , VariableContainer_ifc variableContainer
     , LogMessage log
     )
-  { super(device, propertiesGui, variableContainer, log);
+  { super(device, null, propertiesGui, variableContainer, log);
     mainWindowAwt = window;
     this.propertiesGuiAwt = propertiesGui;
     mainWindowAwt.addKeyListener(mainKeyListener);

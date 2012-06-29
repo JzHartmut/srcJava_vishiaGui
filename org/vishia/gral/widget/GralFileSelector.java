@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.vishia.commander.Fcmd;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralValueBar;
@@ -493,6 +495,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
     widgdPath = panelMng.addTextField(name + "-Path", true, null, null);
     widgdPath.setActionChange(actionSetPath);
     widgdPath.setBackColor(panelMng.getColor("pye"), 0xeeffff);  //color pastel yellow
+    GralMenu menuFolder = widgdPath.getContextMenu();
+    menuFolder.addMenuItemGthread(null, "refresh [cR]", actionRefreshFileTable);
     //the list
     panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
     selectList.setToPanel(panelMng, name, rows, columns, size);
@@ -865,11 +869,33 @@ public class GralFileSelector implements Removeable //extends GralWidget
 
 
   GralUserAction actionSetPath = new GralUserAction(){
-    public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ return false; }
+    public boolean userActionGui(int key, GralWidget widg, Object... params)
     {
+      if(key == KeyCode.enter){
+        widg.getMng().widgetHelper.showContextMenu(widg);
+      }
+      
       stop();
+      return false;
     }
   };
   
 
+  
+  /**Sets the origin dir of the last focused file table.
+   * <br>
+   * Implementation note: The last focused file tab is searched using {@link Fcmd#getLastSelectedFileCards()}.
+   */
+  GralUserAction actionRefreshFileTable = new GralUserAction(){
+    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){ 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
+        fillInCurrentDir();
+        return true;
+      } else return false;
+    }
+  };
+  
+
+  
+  
 }

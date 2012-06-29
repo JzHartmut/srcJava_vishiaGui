@@ -4,16 +4,25 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Scrollable;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetHelper;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralRectangle;
 
 /**The static methods of this class are called in some situations, where same functionality is need in some classes.
  * @author Hartmut Schorrig
  *
  */
-public class SwtWidgetHelper
+public class SwtWidgetHelper implements GralWidgetHelper
 {
 
   /**Version and history
@@ -30,8 +39,14 @@ public class SwtWidgetHelper
   private static SwtMng mng;
   
   
-  public SwtWidgetHelper(SwtMng mng)
-  { this.mng = mng;
+  @Override public void setMng(GralWidgetMng mng)
+  { this.mng = (SwtMng)mng;
+  }
+
+
+  public SwtWidgetHelper()
+  { 
+    
   }
 
 
@@ -90,6 +105,47 @@ public class SwtWidgetHelper
     return control.setFocus();
 
     
+  }
+
+  
+  @Override public GralRectangle getAbsoluteBoundsOf(GralWidget widg){
+    Control swtWidg = (Control)widg.getWidgetImplementation();
+    Rectangle pos = swtWidg.getBounds();
+    GralRectangle rect = new GralRectangle(pos.x, pos.y, pos.width, pos.height);
+    Control parent = swtWidg;
+    do{ 
+      parent = parent.getParent();
+      if(parent !=null){
+        Point posParent = parent.getLocation();
+        rect.x += posParent.x;
+        rect.y += posParent.y;
+      }
+      if(parent instanceof Scrollable){
+        Rectangle area = ((Scrollable)parent).getClientArea();
+        rect.x += area.x;
+        rect.y += area.y;
+      }
+    } while(!(parent instanceof Shell));
+    rect.y += 30;  //size of title and menu, where to find in SWT???
+    return rect;
+  }
+  
+
+  @Override
+  public boolean showContextMenu(GralWidget widg) {
+    boolean bOk;
+    Control swtWidg = (Control)widg.getWidgetImplementation();
+    Menu contextMenu = swtWidg.getMenu();
+    if(contextMenu == null){
+      bOk = false;
+    } else {
+      //Rectangle pos = swtWidg.getBounds();
+      GralRectangle pos = getAbsoluteBoundsOf(widg);
+      contextMenu.setLocation(pos.x + pos.dx, pos.y + pos.dy);
+      contextMenu.setVisible(true);
+      bOk = true;
+    }
+    return bOk;
   }
   
   

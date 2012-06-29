@@ -32,6 +32,8 @@ public class SwtTextFieldWrapper extends GralTextField
 {
   /**Version, history and license.
    * <ul>
+   * <li>2012-06-30 Hartmut new {@link #swtKeyListener}. The [Enter] key will be send to the User
+   *   in opposite to {@link SwtTextBox}.
    * <li>2012-06-08 Hartmut chg: {@link #repaintGthread()} does not do anything if the textFieldSwt is removed 
    *   because the widget was removed. Prevent null-Pointer exception.
    * <li>2012-04-10 Hartmut chg: A key listener, only for experience
@@ -437,7 +439,7 @@ public class SwtTextFieldWrapper extends GralTextField
       if(KeyCode.isWritingKey(key)){
         bTextChanged = true;
       }
-      if(KeyCode.isWritingOrTextNavigationKey(key)){
+      if(key != KeyCode.enter && KeyCode.isWritingOrTextNavigationKey(key)){
         bDone = true;
       } else {
         boolean bUserOk;
