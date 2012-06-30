@@ -39,7 +39,7 @@ public class FcmdDelete
   GralWidget widgButtonOk;
 
   /**Name of the file which is attempt to delete. */
-  List<FileRemote> listFileDel;
+  List<File> listFileDel;
   //String sFileDelete;
  
   final List<Event> listEvDel = new LinkedList<Event>();
@@ -93,11 +93,14 @@ public class FcmdDelete
     String sFileDel = null;
     if(fileCard !=null){
       listFileDel = fileCard.getSelectedFiles();
-      if(listFileDel.size() >0){
-        sFileDel = FileSystem.getCanonicalPath(fileCard.getCurrentDir()) + "/*";
+      int nrofFilesDel = listFileDel.size();
+      if(nrofFilesDel >0){
+        sFileDel = FileSystem.getCanonicalPath(fileCard.getCurrentDir()) + "/* ("
+          + nrofFilesDel + "Files)";
       } else {
         sFileDel = FileSystem.getCanonicalPath(fileCard.currentFile);
-        listFileDel.add(fileCard.currentFile);
+        File currentFile = fileCard.currentFile;
+        listFileDel.add(currentFile);
       }
     }
     if(sFileDel == null){
@@ -135,7 +138,7 @@ public class FcmdDelete
     { try{ 
         if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
           if(widgg.sCmd.equals("delete")){
-            for(FileRemote file : listFileDel){
+            for(File file : listFileDel){
               if(!file.canWrite()){
                 //file.setWritable();
               }
@@ -143,7 +146,14 @@ public class FcmdDelete
               listEvDel.add(callback);
               //
               //The delete action:
-              file.delete(callback);
+              if(file instanceof FileRemote){
+                ((FileRemote)file).delete(callback);
+              } else {
+                if(!file.delete()){
+                  file.setWritable(true);
+                  file.delete();
+                }
+              }
               //      
             }
           } else if(widgg.sCmd.equals("esc")){

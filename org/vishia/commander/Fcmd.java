@@ -23,7 +23,7 @@ import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.widget.GralCommandSelector;
 import org.vishia.gral.widget.GralFileSelector;
-import org.vishia.util.FileRemote;
+import org.vishia.msgDispatch.MsgDispatchSystemOutErr;
 import org.vishia.util.FileRemoteAccessorLocalFile;
 import org.vishia.util.KeyCode;
 
@@ -81,6 +81,8 @@ public class Fcmd extends GuiCfg
     File dirHtmlHelp;
   }
 
+  MsgDispatchSystemOutErr msgDisp;
+  
   final CallingArgs cargs;
 
   // GralTabbedPanel tabbedPanelsLeft, tabbedPanelsMid, tabbedPanelsRight;
@@ -126,10 +128,10 @@ public class Fcmd extends GuiCfg
 
   
   /**The current directory of the last selected file. */
-  FileRemote currentFile;
+  File currentFile;
 
   /**The last selected files of the three panels, [0] for left .. [2] for right. */
-  final FileRemote[] selectedFiles123 = new FileRemote[3];
+  final File[] selectedFiles123 = new File[3];
   
   
   /**The last selected file panels in its order of selection. The panel knows the last used file card there. 
@@ -327,8 +329,8 @@ public class Fcmd extends GuiCfg
    *   The returned instance is a new one, not referenced elsewhere. It can be stored
    *   and it remains the situation of selection files independently of further user actions.
    */
-  FileRemote[] getLastSelectedFiles(){
-    FileRemote[] ret = new FileRemote[3];
+  File[] getLastSelectedFiles(){
+    File[] ret = new File[3];
     int ix = -1;
     for(FcmdLeftMidRightPanel panel: lastFilePanels){
       FcmdFileCard fileCard = panel.actFileCard;
@@ -536,6 +538,7 @@ public class Fcmd extends GuiCfg
       //
       // Initialize this main class and execute.
       Fcmd main = new Fcmd(cargs, cmdgui);
+      main.msgDisp = MsgDispatchSystemOutErr.create();
       main.execute();
     }
     cmdgui.exit();
@@ -639,7 +642,7 @@ public class Fcmd extends GuiCfg
         if (cmdBlock == null) {
           mainCmd.writeError("internal problem - don't find 'edit' command. ");
         } else {
-          FileRemote[] lastSelected = getLastSelectedFiles(); 
+          File[] lastSelected = getLastSelectedFiles(); 
           //create a new instance of array of files because the selection may be changed
           //till the command is invoked. The files are stored in a queue and executed in another thread. 
           File[] files = new File[1];

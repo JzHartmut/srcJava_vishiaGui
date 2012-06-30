@@ -163,7 +163,7 @@ public class FcmdCopyCmd
         
         if(fileCardSrc !=null){
           fileSrcDir = FileRemote.fromFile(fileCardSrc.getCurrentDir());
-          List<FileRemote> listFileSrc = fileCardSrc.getSelectedFiles();
+          List<File> listFileSrc = fileCardSrc.getSelectedFiles();
           if(listFileSrc.size()==0){ //nothing selected
             listFileSrc.add(fileCardSrc.currentFile);  
           }

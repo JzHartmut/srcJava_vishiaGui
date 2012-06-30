@@ -19,6 +19,7 @@ import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
 import org.vishia.util.FileRemote;
 import org.vishia.util.FileRemoteAccessor;
+import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
 public class FcmdFileProps
@@ -92,7 +93,7 @@ public class FcmdFileProps
   /**True while a change commission is send and no answer is received yet. */
   //boolean busyChanging;
   
-  FileRemote actFile;
+  File actFile;
   
   /**
    * 
@@ -216,7 +217,7 @@ public class FcmdFileProps
   /**Opens the view window and fills its content.
    * @param src The path which is selected as source. It may be a directory or a file.
    */
-  void openDialog(FileRemote src)
+  void openDialog(File src)
   { //String sSrc, sTrash;
     isVisible = true;
     showFileInfos(src);
@@ -225,7 +226,7 @@ public class FcmdFileProps
   }
   
   
-  void showFileInfos(FileRemote src){
+  void showFileInfos(File src){
     if(isVisible && !evChg.isOccupied()){
       actFile = src;
       widgChgFile.setText(main.idents.buttonFilePropsChg);
@@ -244,8 +245,8 @@ public class FcmdFileProps
         sLength += " = " + length/1000000 + "M";
       }
       widgLength.setText(sLength);
-      if(src.isSymbolicLink()){
-        widgLink.setText(src.getCanonicalPath());
+      if(src instanceof FileRemote && ((FileRemote)src).isSymbolicLink()){
+        widgLink.setText(FileSystem.getCanonicalPath(src));
       } else {
         widgLink.setText("");
       }
@@ -293,7 +294,10 @@ public class FcmdFileProps
         String name = widgName.getText();
         if(name.equals(actFile.getName())){ name = null; } //don't change it.
         int noMask = 0;
-        int mask = 0; int val = actFile.getFlags();
+        FileRemote actFileRemote;
+        if(actFile instanceof FileRemote){ actFileRemote = (FileRemote)actFile; }
+        else { actFileRemote = FileRemote.fromFile(actFile); }
+        int mask = 0; int val = actFileRemote.getFlags();
         switch(widgRd[0].getState()){
           case GralButton.kOff:       val &= ~FileRemote.mCanRead; break;
           case GralButton.kOn:       val |= FileRemote.mCanRead; break;
@@ -314,7 +318,7 @@ public class FcmdFileProps
           case GralButton.kOn:        val |=  FileRemote.mHidden; break;
           case GralButton.kDisabled: noMask |= FileRemote.mHidden; break;
         }
-        int mChg = actFile.getFlags() ^ val;
+        int mChg = actFileRemote.getFlags() ^ val;
         mChg &= ~noMask;
         boolean bAbort = false;
         if(infos.sCmd.equals(sCmdAbort)){
@@ -328,22 +332,22 @@ public class FcmdFileProps
           if(evChg.use(0, 0, widgChgFile, callbackChgProps)){
             //cmds with callback
             widgChgFile.setText(main.idents.buttonFilePropsChanging);
-            actFile.chgProps(name, mChg, val, 0, evChg);
+            actFileRemote.chgProps(name, mChg, val, 0, evChg);
           } else { bAbort = true; }
           //
         } else if(infos.sCmd.equals(sCmdChgRecurs)){
           if(evChg.use(0, 0, widgChrRecurs, callbackChgProps)){
             //cmds with callback
             widgChrRecurs.setText(main.idents.buttonFilePropsChanging);
-            actFile.chgPropsRecursive(mChg, val, 0, evChg);
+            actFileRemote.chgPropsRecursive(mChg, val, 0, evChg);
           } else { bAbort = true; }
           //
         } else if(infos.sCmd.equals(sCmdCopy)){
           if(evChg.use(0, 0, widgCopyFile, callbackChgProps)){
             if(!name.equals(actFile.getName())){
               widgCopyFile.setText(main.idents.buttonFilePropsCopying);
-              FileRemote fileNew = new FileRemote(actFile.getParentFile(), name);
-              actFile.copyTo(fileNew, evChg);
+              FileRemote fileNew = new FileRemote(actFileRemote.getParentFile(), name);
+              actFileRemote.copyTo(fileNew, evChg);
             } else {
               widgCopyFile.setText("copy - name?");
             }
@@ -395,7 +399,7 @@ public class FcmdFileProps
         widgBtnDirBytes.setText("counting ...");
         evCntLen.forceRelease();
         if(evCntLen.use(0, 0, null, callbackCntLen)){
-          actFile.countAllFileLength(evCntLen);
+          FileRemote.fromFile(actFile).countAllFileLength(evCntLen);
         }
       }
       return true;

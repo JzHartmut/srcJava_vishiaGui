@@ -486,6 +486,7 @@ public class SwtTable  extends GralTable {
         }
       } catch(Exception exc){
         mng.log.sendMsg(0, "Exception in SwtTable-KeyEvent; %s", exc.getLocalizedMessage());
+        exc.printStackTrace(System.out);
       }
     }
 

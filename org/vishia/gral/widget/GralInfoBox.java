@@ -18,6 +18,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWindow_getifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
+import org.vishia.util.KeyCode;
 
 /**This class presents a sub window which is used as info box for any messages.
  * @author Hartmut Schorrig
@@ -39,6 +40,8 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   private final GralWidget buttonOk;
   
   protected final GralTextField infoLine;
+  
+  private GralUserAction actionOk;
   
   public GralInfoBox(GralWindow window, GralTextBox textBox, GralTextField infoLine, GralWidget buttonOk)
   {
@@ -69,7 +72,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     mng.setPosition(-3, 0, -6, 0, 0, '.');
     GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "", null, null, "OK");
     GralInfoBox box = new GralInfoBox(window, text, infoLine, buttonOk);
-    box.buttonOk.setActionChange(box.actionOk);
+    box.buttonOk.setActionChange(box.actionOkButton);
     return box; 
 
   }
@@ -85,10 +88,12 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     mng.setPosition(-3, 0, -6, 0, 0, '.');
     GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "", null, null, "OK");
     GralInfoBox box = new GralInfoBox(window, text, infoLine, buttonOk);
-    box.buttonOk.setActionChange(box.actionOk);
+    box.buttonOk.setActionChange(box.actionOkButton);
     return box; 
 
   }
+  
+  public void setActionOk(GralUserAction action){ this.actionOk = action; }
   
   
   public void activate(){
@@ -249,9 +254,10 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   
 
   
-  GralUserAction actionOk = new GralUserAction(){
+  GralUserAction actionOkButton = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
       //if(textBox !=null) {textBox.setText(""); }  //'I have seen it, therefore delete.
+      if(actionOk !=null){ actionOk.userActionGui(KeyCode.enter, widgd); }
       window.setWindowVisible(false);
       return true;
     }

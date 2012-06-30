@@ -89,7 +89,7 @@ public class FcmdFileCard extends GralFileSelector
    */
   FcmdFavorPathSelector.FavorPath favorPathInfo;
   
-  FileRemote currentFile;
+  File currentFile;
   
   /**If not null, then should synchronize with this file card. */
   FcmdFileCard otherFileCardtoSync;  
@@ -257,7 +257,7 @@ public class FcmdFileCard extends GralFileSelector
   
   @Override public boolean actionUserKey(int keyCode, Object oData, GralTableLine_ifc line)
   { boolean ret = true;
-    FileRemote data = (FileRemote)oData;
+    //FileRemote data = (FileRemote)oData;
     switch(keyCode){
     //case KeyCode.alt + KeyCode.F + '7': FileSystem.searchInFiles(new File[]{data}, "ordersBackground"); break;
     default: ret = false;
@@ -325,7 +325,7 @@ public class FcmdFileCard extends GralFileSelector
    * @param file The currently selected file.
    * @param sFileName Text in the cell, especially ".." for the parent dir entry.
    */
-  private void actionOnFileSelection(FileRemote file, String sFileName){
+  private void actionOnFileSelection(File file, String sFileName){
     //note the file, able to use for some actions.
     currentFile = file;
     main.currentFile = file;
@@ -461,8 +461,8 @@ public class FcmdFileCard extends GralFileSelector
       GralTableLine_ifc line = (GralTableLine_ifc) params[0];
       String sFileCell = line.getCellText(GralFileSelector.kColFilename);
       Object oData = line.getUserData();
-      if(oData instanceof FileRemote){
-        actionOnFileSelection((FileRemote)oData, sFileCell);
+      if(oData instanceof File){
+        actionOnFileSelection((File)oData, sFileCell);
       }
       return true;
     }

@@ -124,6 +124,8 @@ public class GralCommandSelector extends GralSelectList
     files[1] = getterFiles.getFile2();
     files[2] = getterFiles.getFile3();
     File currDir = files[0].getParentFile();
+    String sMsg = "GralCommandSelector - put cmd;" + cmdBlock.toString();
+    System.out.println(sMsg);
     cmdQueue.addCmd(cmdBlock, files, currDir);  //to execute.
     return true;
   }

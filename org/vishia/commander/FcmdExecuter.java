@@ -62,7 +62,7 @@ public class FcmdExecuter
   FcmdExecuter(MainCmd_ifc console, Fcmd main)
   { this.main = main;
     this.console = console;
-    this.cmdQueue = new CmdQueue(main.mainCmd);
+    this.cmdQueue = new CmdQueue(System.out);
   }
   
   
@@ -219,7 +219,7 @@ public class FcmdExecuter
   
 
   
-  private void executeFileByExtension(FileRemote file){
+  private void executeFileByExtension(File file){
     String ext;
     if(file !=null){
       String name = file.getName();
@@ -251,7 +251,7 @@ public class FcmdExecuter
   GralUserAction actionExecuteFileByExtension = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        FileRemote file = main.currentFile;
+        File file = main.currentFile;
         executeFileByExtension(file);  
         return true;
       } else return false;
@@ -323,7 +323,7 @@ public class FcmdExecuter
         if(sCmd.indexOf("<*")>=0){ //a file may need
           files= new File[3];
           int ix = -1;
-          for(FileRemote fileName: main.selectedFiles123){
+          for(File fileName: main.selectedFiles123){
             if(fileName !=null){
               if(fileName !=null ){ files[++ix] = fileName; }
               else { files[++ix] = new File(fileName.getParent() + "/" + fileName.getName()); }

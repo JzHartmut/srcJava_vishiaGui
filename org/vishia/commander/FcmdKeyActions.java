@@ -88,7 +88,7 @@ public class FcmdKeyActions
   { @Override public boolean userActionGui(int keyCode, GralWidget widgd, Object... params)
     { boolean done = false;
       done = true;
-      FileRemote[] files = main.getLastSelectedFiles();
+      File[] files = main.getLastSelectedFiles();
       if(main.fButtons.processKey(keyCode)){ done = true; }
       else if(     keyCode == main.idents.keyFileProps){ main.filePropsCmd.openDialog(main.currentFile); }  //F2
       else if(keyCode == main.idents.keyFileView){ main.viewCmd.view(null); }                  //F3

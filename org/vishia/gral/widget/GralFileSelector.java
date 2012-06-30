@@ -35,9 +35,11 @@ import org.vishia.util.Removeable;
  * supports navigation in the directory tree and shows the current path in an extra text field.
  * Additional 'search in files' is supported.
  * <br><br>
- * The type of a file is {@link FileRemote} which is an derivation of java.io.File. It means that
- * the files may be existing on any remote device too. The local file system is a special case,
+ * The type of a file is either a java.io.File or {@link FileRemote}. 
+ * The last one is an derivation of java.io.File. It means that
+ * the files may be existing on any remote device. The local file system is a special case,
  * whereby it's the usual case mostly.
+ * 
  * @author Hartmut Schorrig
  *
  */
@@ -48,6 +50,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2012-07-01 Hartmut Refactoring usage of FileRemote: Normally the java.io.File is used.
+   *   The FileRemote is a specialization, which is not used in all cases.
    * <li>2012-06-17 new Hartmut: Now sorts list with name, size, date, format of size and date in list adjusted:
    *   Separate timestamp of file for today, last year.
    * <li>2012-06-09 new Hartmut: {@link GralFileSelector.WindowFileSelection}, not ready yet.
@@ -176,8 +180,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
       if(actionCode == KeyCode.tableLineSelect){
         GralTableLine_ifc line = (GralTableLine_ifc) params[0];
         Object oData = line.getUserData();
-        if(oData instanceof FileRemote){
-          FileRemote file = (FileRemote)oData;
+        if(oData instanceof File){
+          File file = (File)oData;
           if(file.exists()){
             String sDir = file.getParent();
             String sName = file.getName();
@@ -231,7 +235,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     }
     
     
-    private String getParentDir(FileRemote data){
+    private String getParentDir(File data){
       int zPath = data.getParent().length();
       int posSep = data.getParent().lastIndexOf('/',zPath-2);
       if(posSep >=0){
@@ -245,7 +249,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
     /**The 'action left' for the FileSelector shows the parent directory.
      * The {@link GralFileSelector#currentDir} is used to get its parent to show.
      * @param line the current line. It is unused because userData contains the file.
-     * @param userData The {@link GralTableLine_ifc#getUserData()} from line. it is a {@link FileRemote}
+     * @param userData The {@link GralTableLine_ifc#getUserData()} from line. 
+     *   It is a java.io.File or a {@link FileRemote}
      *   which is currently selected. This file is stored as current for the current directory. 
      *   The parent of the file is the directory which is shown yet.
      * @see org.vishia.gral.widget.GralSelectList#actionLeft(java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
@@ -286,7 +291,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     @Override public boolean actionUserKey(int keyCode, Object oData, GralTableLine_ifc line)
     { boolean ret = true;
       //File file = (File)(data);
-      FileRemote data = (FileRemote)oData;
+      //File data = (File)oData;
       switch(keyCode){
       case KeyCode.alt + KeyCode.F7: 
         stop();
@@ -460,6 +465,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   GralUserAction actionSetFileAttribs;
   
+  
+  private GralInfoBox questionWindow;
+  
   public GralFileSelector()
   {
     selectList = new FileSelectList(this);
@@ -504,6 +512,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
     widgdPath.setContentInfo(this);
     selectList.wdgdTable.setContentInfo(this);
     selectList.wdgdTable.setActionOnLineSelected(actionOnFileSelection);
+    panelMng.setPosition(5, 0, 10, GralPos.size + 40, 1, 'd');
+    questionWindow = GralInfoBox.createTextInfoBox(panelMng, "questionInfoBox", "question");  
+
   }
   
   
@@ -544,7 +555,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
 
   public String getCurrentDirPath(){ return sCurrentDir; }
   
-  public void setOriginDir(FileRemote dir){ originDir = dir; }
+  public void setOriginDir(File dir){ originDir = dir; }
 
   
   /**Sets the sort order of entries.
@@ -793,7 +804,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   /**Gets the selected file from this panel.
    * @return null if no line is selected, for example if the panel isn't used yet.
    */
-  public FileRemote getSelectedFile()
+  public File XXXgetSelectedFile()
   {
     if(selectList.wdgdTable == null){
       stop();
@@ -801,7 +812,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     }
     GralTableLine_ifc line = selectList.wdgdTable.getCurrentLine();
     if(line !=null){
-      FileRemote data = (FileRemote)line.getUserData();
+      File data = (File)line.getUserData();
       return data;
     } else {
       return null;
@@ -814,14 +825,14 @@ public class GralFileSelector implements Removeable //extends GralWidget
   /**Gets all selected file from this panel.
    * @return null if no line is selected, for example if the panel isn't used yet.
    */
-  public List<FileRemote> getSelectedFiles()
-  { List<FileRemote> list = new LinkedList<FileRemote>();
+  public List<File> getSelectedFiles()
+  { List<File> list = new LinkedList<File>();
     if(selectList.wdgdTable == null){
       stop();
       return null;
     }
     for(GralTableLine_ifc line: selectList.wdgdTable.getSelectedLines()){
-      FileRemote file = (FileRemote)line.getUserData();
+      File file = (File)line.getUserData();
       list.add(file);
     }
     return list;
@@ -872,7 +883,37 @@ public class GralFileSelector implements Removeable //extends GralWidget
     public boolean userActionGui(int key, GralWidget widg, Object... params)
     {
       if(key == KeyCode.enter){
-        widg.getMng().widgetHelper.showContextMenu(widg);
+        String sPath = widg.getValue();
+        int posWildcard = sPath.indexOf('*');
+        if(posWildcard >=0){
+          
+        } else {
+          File file = new File(sPath);
+          if(file.isDirectory()){
+            fillIn(file);
+          } else if(file.isFile()){
+            File dir = file.getParentFile();
+            String sDir = FileSystem.getCanonicalPath(dir);
+            String sFile = file.getName();
+            indexSelection.put(sDir, sFile);
+            fillIn(dir);
+          } else {
+            File parent = file.getParentFile();
+            if(parent.exists()){
+              String question = "Do you want to create file\n"
+                +file.getName()
+                + "\n  in directory\n"
+                + parent.getPath();
+              questionWindow.setText(question);
+              questionWindow.setActionOk(confirmCreate);
+            } else {
+              questionWindow.setText("unknown path");
+              questionWindow.setActionOk(null);
+            }
+            questionWindow.setWindowVisible(true);
+          }
+        }
+        //widg.getMng().widgetHelper.showContextMenu(widg);
       }
       
       stop();
@@ -895,7 +936,11 @@ public class GralFileSelector implements Removeable //extends GralWidget
     }
   };
   
-
-  
+  GralUserAction confirmCreate = new GralUserAction()
+  {
+    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){ 
+      return true;
+    }
+  };
   
 }

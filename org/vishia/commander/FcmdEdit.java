@@ -2,6 +2,7 @@ package org.vishia.commander;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -110,7 +111,7 @@ public class FcmdEdit
    */
   void openEdit(FileRemote src)
   { String sSrc, sTrash;
-    src = main.currentFile;
+    src = FileRemote.fromFile(main.currentFile);
     if(src !=null){
       long len = src.length();
       if(len > 1000000){ len = 1000000; } //nor more than 1MByte, 
@@ -209,7 +210,7 @@ public class FcmdEdit
         InputStream inpBytes = new ByteArrayInputStream(buffer);
         InputStreamReader inpText = new InputStreamReader(inpBytes);
         BufferedReader inpLines = new BufferedReader(inpText);
-        FileRemote filedst = main.currentFile;
+        FileRemote filedst = FileRemote.fromFile(main.currentFile);
         WritableByteChannel outchn =filedst.openWrite(0);
         ByteBuffer outBuffer = ByteBuffer.allocate(1200);
         //Writer out = new FileWriter();

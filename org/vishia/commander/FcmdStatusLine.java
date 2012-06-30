@@ -89,7 +89,7 @@ public class FcmdStatusLine
   }
   
   
-  void setFileInfo(FileRemote file){
+  void setFileInfo(File file){
     long lastModified = file.lastModified();
     String sDate = formatDateInfo.format(new Date(lastModified));
     String sLenShort = //String.format("", file.length)

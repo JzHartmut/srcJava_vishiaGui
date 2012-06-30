@@ -1,5 +1,6 @@
 package org.vishia.commander;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -80,7 +81,7 @@ public final class FcmdFilesCp {
   FcmdFileCard card1, card2;
   
   /**The both directories where the comparison was started. */
-  FileRemote file1, file2;
+  File file1, file2;
   
   FcmdFilesCp(Fcmd main){
     this.main = main;

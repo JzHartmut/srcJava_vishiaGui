@@ -54,7 +54,9 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Changes:
    * <ul>
-   * <li>2012-04-22 Hartmut new:
+   * <li>2012-06-30 Hartmut new: Composition {@link #widgetHelper} The widget helper is implemented in the graphic system
+   *   for example as {@link org.vishia.gral.swt.SwtWidgetHelper} to do some widget specific things.
+   * <li>2012-06-30 Hartmut new: Composition {@link #_impl}.{@link InternalPublic#gralKeyListener}
    * <li>2012-04-22 Hartmut new: {@link #addLine(GralColor, List)} to add in a {@link GralCanvasStorage}.
    * <li>2012-04-01 Hartmut new: {@link #addDataReplace(Map)}, {@link #replaceDataPathPrefix(String)}.
    *   using alias in the {@link GralWidget#setDataPath(String)}. The resolving of the alias is done
