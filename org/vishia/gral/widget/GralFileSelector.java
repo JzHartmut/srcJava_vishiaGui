@@ -879,6 +879,19 @@ public class GralFileSelector implements Removeable //extends GralWidget
   }
 
 
+  /**Action on [Enter]-key on the path text field.
+   * <ul>
+   * <li>If the text represents an existing directory, it is used as current.
+   * <li>If the text represents an existing file, the parent directory is used as current
+   *   and the file is stored as current in this directory, see {@link #indexSelection}.
+   * <li>If the path is absolute (starting with '/' or '\\' maybe with leading drive letter for windows
+   *   then it is used absolute. If the path is not absolute, it is used starting from the current one.
+   * <li>If the path contains a name only, it is a file. You can    
+   * <li>If the text represents a file which is not existing, but its directory path is existing,
+   *   a quest is posted whether the file should be created. On [OK] either the file will be
+   *   created as new file or its path is returned.    
+   * </ul>
+   */
   GralUserAction actionSetPath = new GralUserAction(){
     public boolean userActionGui(int key, GralWidget widg, Object... params)
     {
@@ -888,7 +901,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
         if(posWildcard >=0){
           
         } else {
-          File file = new File(sPath);
+          File file = new FileRemote(sPath);
           if(file.isDirectory()){
             fillIn(file);
           } else if(file.isFile()){

@@ -193,7 +193,8 @@ public class MsgReceiver
   
 		MsgDispatcher msgDispatcher = new MsgDispatcher(1000, 100, 3, 0);
 		this.msgDispatcher = msgDispatcher;
-		this.systemErrAdapter = new MsgPrintStream(msgDispatcher);
+		this.systemErrAdapter = new MsgPrintStream(msgDispatcher, 10000, 5000, 20);
+		System.setErr(systemErrAdapter.getPrintStreamLog());
 		int secondsToClose = -10; //any 10 seconds, the file will be closed, and re-openened at least after 10 seconds.
 		int hoursPerFile = -3600; //This is 3600 seconds.
 		try{ FileSystem.mkDirPath("D:/DATA/msg/");}

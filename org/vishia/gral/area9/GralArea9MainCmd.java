@@ -9,6 +9,7 @@ import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.swt.FactorySwt;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.msgDispatch.MsgDispatchSystemOutErr;
 import org.vishia.msgDispatch.MsgPrintStream;
 
 /**This class is an extension of the {@link MainCmd} for graphic applications.
@@ -62,7 +63,9 @@ public class GralArea9MainCmd extends MainCmd
   
   public GralArea9_ifc gui;
   
-  final MsgPrintStream systemErrAdapter;
+  //final MsgPrintStream systemErrAdapter;
+  final MsgDispatchSystemOutErr msgDisp;
+  
   
   final LogMessage log;
 
@@ -87,9 +90,12 @@ public class GralArea9MainCmd extends MainCmd
     super(args);
     this.cargs = cargs;
     this.log = getLogMessageErrorConsole();
-    this.systemErrAdapter = new MsgPrintStream(log);
+    //this.systemErrAdapter = new MsgPrintStream(log);
+    this.msgDisp = MsgDispatchSystemOutErr.create("D:/DATA/msg/log$yyyy-MMM-dd-HH_mm$.log");
+    
     System.err.println("GralArea9MainCmd - test message; test");
     System.err.println("GralArea9MainCmd - test message; test2");
+    System.out.println("GralArea9MainCmd - test message; out");
     
   }
 

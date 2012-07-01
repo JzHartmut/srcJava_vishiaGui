@@ -81,7 +81,7 @@ public class Fcmd extends GuiCfg
     File dirHtmlHelp;
   }
 
-  MsgDispatchSystemOutErr msgDisp;
+  //MsgDispatchSystemOutErr msgDisp;
   
   final CallingArgs cargs;
 
@@ -538,7 +538,7 @@ public class Fcmd extends GuiCfg
       //
       // Initialize this main class and execute.
       Fcmd main = new Fcmd(cargs, cmdgui);
-      main.msgDisp = MsgDispatchSystemOutErr.create();
+      //main.msgDisp = MsgDispatchSystemOutErr.create();
       main.execute();
     }
     cmdgui.exit();
