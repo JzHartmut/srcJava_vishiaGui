@@ -78,5 +78,11 @@ public class GuiCallingArgs
   /**A class which is used as plugin for user specifies. It is of interface {@link PlugUser_ifc}. */
   String sPluginClass;
   
+  
+  /**The own ipc-address for inspector-Communication with this application.
+   * It is a string, which determines the kind of communication.
+   * For example "UDP:0.0.0.0:60099" to create a socket port for UDP-communication.
+   */
+  String sInspectorOwnPort;
 
 }

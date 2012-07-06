@@ -195,8 +195,12 @@ public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui, GralPlugUser_ifc pl
     }
   }
   
-  inspector = new Inspector("UDP:127.0.0.1:60088");
-  inspector.start(this);
+  if(cargs.sInspectorOwnPort !=null){
+    inspector = new Inspector(cargs.sInspectorOwnPort);
+    inspector.start(this);
+  } else {
+    inspector = null; //don't use.
+  }
   
   gralMng = cmdGui.gralMng; //cargs.graphicFactory.createPanelMng(null, 120,80, propertiesGui, null, log);
   panelBuildIfc = gralMng;

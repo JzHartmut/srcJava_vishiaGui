@@ -7,6 +7,7 @@ import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.swt.FactorySwt;
+import org.vishia.inspector.Inspector;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.MsgDispatchSystemOutErr;
@@ -28,6 +29,8 @@ public class GralArea9MainCmd extends MainCmd
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-07-09 Hartmut new: The {@link Inspector} will be initialized only if the command line argument 
+   *   "-inspectorPort=" is given. That parameter in form "UDP:ip:port" is used.
    * <li>2012-04-22 Hartmut new: {@link #parseArgumentsAndInitGraphic(String, String, int, int, int, int)}
    *   for determination of display coordinates in the users application.
    *   Getting size arguments from main-args. 
@@ -69,7 +72,6 @@ public class GralArea9MainCmd extends MainCmd
   
   final LogMessage log;
 
-  
   /**Aggregation to given instance for the command-line-argument. The instance can be arranged anywhere else.
    * It is given as ctor-parameter.
    */
@@ -134,6 +136,7 @@ public class GralArea9MainCmd extends MainCmd
     if(cargs.graphicFactory == null){
       cargs.graphicFactory = new FactorySwt();
     }
+
     if(sOutputArea == null){ sOutputArea = "A3C3"; }
     if("\0 .".indexOf(sizeShow) >=0){  sizeShow = cargs.sizeShow; }  //undefined per parameter, use args 
     if(left < 0){  left = cargs.xLeftPixelWindow; }  //undefined per parameter, use args 
@@ -175,6 +178,9 @@ public class GralArea9MainCmd extends MainCmd
       }
       else if(arg.startsWith("-ownIpc=")) 
       { cargs.sOwnIpcAddr = getArgument(8);   //an example for default output
+      }
+      else if(arg.startsWith("-inspectorPort=")) 
+      { cargs.sInspectorOwnPort = getArgument(15);   //an example for default output
       }
       else if(arg.startsWith("-timeZone=")) 
       { cargs.sTimeZone = getArgument(10);   //an example for default output

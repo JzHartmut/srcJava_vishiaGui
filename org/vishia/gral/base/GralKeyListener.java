@@ -40,14 +40,8 @@ import org.vishia.util.KeyCode;
  *                                                * gralWidg.getActionChange().userActionGui(...)
  *                                                * mng.userMainKeyAction().userActionGui(...)
  *  
- *  <|---- inheritance
- *  <----- association
- *  <<---- composition
- *  <o---- aggregation to its outer class
- *  + overridden_method()
- *  * called_method()
- *  - attribute
  *  </pre>
+ *  (See {@link org.vishia.util.Docu_UML_simpleNotation})
  *  <br><br>
  *  The implementing graphic system aggregates an instance of this class.
  *  An underived instance is created in the {@link GralWidgetMng.InternalPublic#gralKeyListener}.
@@ -59,7 +53,7 @@ import org.vishia.util.KeyCode;
  */
 public class GralKeyListener implements GralKeySpecial_ifc
 {
-  /**Version and history
+  /**Version, history and license
    * <ul>
    * <li>2011-12-03 Hartmut created. Any widget may have the same key listener. It is the baseclass of it
    *   and empty yet. 
@@ -83,14 +77,14 @@ public class GralKeyListener implements GralKeySpecial_ifc
    *    modified sources likewise under this LGPL Lesser General Public License.
    *    You mustn't delete this Copyright/Copyleft inscription in this source file.
    * </ol>
-   * If you are indent to use this sources without publishing its usage, you can get
+   * If you are intent to use this sources without publishing its usage, you can get
    * a second license subscribing a special contract with the author. 
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    * 
    */
-  public final static int version = 0x20111203;
+  public final static int version = 20120609;
  
   
   protected final GralWidgetMng mng;

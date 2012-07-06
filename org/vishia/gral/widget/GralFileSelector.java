@@ -50,6 +50,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2012-07-01 Hartmut new {@link #setActionOnEnterPathNewFile(GralUserAction)}.
+   *   Now this widget is used to select a file to read and save in an application other than the.File.commander.
    * <li>2012-07-01 Hartmut Refactoring usage of FileRemote: Normally the java.io.File is used.
    *   The FileRemote is a specialization, which is not used in all cases.
    * <li>2012-06-17 new Hartmut: Now sorts list with name, size, date, format of size and date in list adjusted:
@@ -427,7 +429,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * If the directory path is reused later, the same file will be selected initially.
    * It helps by navigation through the file tree.
    * <ul>
-   * <li>The key is the path in canonical form without terminating '/'.
+   * <li>The key is the path in canonical form with '/' as separator (in windows too!) 
+   *   but without terminating '/'.
    * <li>The value is the name of the file in this directory.   
    * </ul>
    */
@@ -461,7 +464,25 @@ public class GralFileSelector implements Removeable //extends GralWidget
   File originDir;
   
   
-  GralUserAction actionOnEnterFile;
+  /**This action will be called on pressing enter or mouse-click on a simple file.
+   */
+  private GralUserAction actionOnEnterFile;
+
+  /**This action will be called on pressing enter or mouse-click on a directory.
+   * Usual the directory can be entered and showed. But the user can do any other action.
+   * If this action returns false, the default behavior: enter the directory will be done.
+   */
+  private GralUserAction actionOnEnterDirectory;
+  
+  
+  /**This action will be called on pressing enter or mouse-click on the path text field
+   * if it contains any text which can't assigned to an existing file.
+   * 
+   */
+  private GralUserAction actionOnEnterPathNewFile;
+  
+  
+  
   
   GralUserAction actionSetFileAttribs;
   
@@ -589,6 +610,31 @@ public class GralFileSelector implements Removeable //extends GralWidget
   }
   
   
+  
+  /**This action will be called on pressing enter or mouse-click on a directory.
+   * Usual the directory can be entered and showed. But the user can do any other action.
+   * If this action returns false, the default behavior: enter the directory will be done.
+   */
+  public GralUserAction setActionOnEnterDirectory(GralUserAction newAction)
+  { GralUserAction oldAction = actionOnEnterDirectory;
+  actionOnEnterDirectory = newAction;
+    return oldAction;
+  }
+  
+  
+  /**This action will be called on pressing enter or mouse-click on the path text field
+   * if it contains any text which can't assigned to an existing file.
+   * 
+   */
+  public GralUserAction setActionOnEnterPathNewFile(GralUserAction newAction)
+  { GralUserAction oldAction = actionOnEnterPathNewFile;
+    actionOnEnterPathNewFile = newAction;
+    return oldAction;
+  }
+  
+
+  
+  
   /**Sets the action which is called if any file is set to the table. 
    * @param newAction The action to use. The action is invoked with TODO
    * @return The current assigned action or null.
@@ -623,11 +669,21 @@ public class GralFileSelector implements Removeable //extends GralWidget
   /**Fills the content with given directory.
    * @param dir The directory which's files are shown.
    */
-  public void fillIn(File dir) //String path)
+  public void fillIn(File fileIn) //String path)
   {
     selectList.wdgdTable.clearTable(); //setValue(GralMng_ifc.cmdClear, -1, null, null);
     //FileRemote dir = new FileRemote(path);
     //FileRemote rdir = (FileRemote)dir;
+    File dir;
+    if(fileIn.isDirectory()){
+      dir =fileIn;
+    } else {
+      dir = fileIn.getParentFile(); 
+      String sDir = FileSystem.getCanonicalPath(dir); //with / as separator!
+      String sFile = fileIn.getName();
+      indexSelection.put(sDir, sFile);
+
+    }
     this.currentDir = dir;
     if(originDir == null){
       originDir = dir; //path;      //sets on the first invocation. 
@@ -913,17 +969,22 @@ public class GralFileSelector implements Removeable //extends GralWidget
           } else {
             File parent = file.getParentFile();
             if(parent.exists()){
-              String question = "Do you want to create file\n"
-                +file.getName()
-                + "\n  in directory\n"
-                + parent.getPath();
-              questionWindow.setText(question);
-              questionWindow.setActionOk(confirmCreate);
+              if(actionOnEnterPathNewFile !=null){
+                actionOnEnterPathNewFile.userActionGui(KeyCode.enter, widgdPath, file);
+              } else {
+                String question = "Do you want to create file\n"
+                  +file.getName()
+                  + "\n  in directory\n"
+                  + parent.getPath();
+                questionWindow.setText(question);
+                questionWindow.setActionOk(confirmCreate);
+                questionWindow.setWindowVisible(true);
+              }
             } else {
               questionWindow.setText("unknown path");
               questionWindow.setActionOk(null);
+              questionWindow.setWindowVisible(true);
             }
-            questionWindow.setWindowVisible(true);
           }
         }
         //widg.getMng().widgetHelper.showContextMenu(widg);

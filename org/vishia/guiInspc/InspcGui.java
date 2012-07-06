@@ -325,13 +325,7 @@ private class InspcGuiCfg extends GuiCfg
    */
   public static void main(String[] args)
   { boolean bOk = true;
-    CallingArguments cargs = new CallingArguments();
-    //Initializes the GUI till a output window to show informations:
-    CmdLineAndGui cmdgui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
-    bOk = cmdgui.parseArgumentsAndInitGraphic("Inspc-GUI-cfg", "3A3C");
-    System.err.println("InspcGui - Test; test");
-    LogMessage log = cmdgui.getLogMessageOutputConsole();
-    
+    //
     //String ipcFactory = "org.vishia.communication.InterProcessComm_Socket";
     //try{ ClassLoader.getSystemClassLoader().loadClass(ipcFactory, true);
     //}catch(ClassNotFoundException exc){
@@ -340,6 +334,14 @@ private class InspcGuiCfg extends GuiCfg
     //Loads the named class, and its base class InterProcessCommFactory. 
     //In that kind the calling of factory methods are regarded to socket.
     new InterProcessCommFactorySocket();
+    //
+    CallingArguments cargs = new CallingArguments();
+    //Initializes the GUI till a output window to show informations:
+    CmdLineAndGui cmdgui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
+    bOk = cmdgui.parseArgumentsAndInitGraphic("Inspc-GUI-cfg", "3A3C");
+    System.err.println("InspcGui - Test; test");
+    LogMessage log = cmdgui.getLogMessageOutputConsole();
+    
     
     InspcGui main = new InspcGui(cargs, cmdgui);
     

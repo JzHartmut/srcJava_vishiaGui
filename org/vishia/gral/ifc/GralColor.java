@@ -14,8 +14,9 @@ public class GralColor
 {
   
   
-  /**Version and history:
+  /**Version, history and license.
    * <ul>
+   * <li>2012-09-07 Hartmut  bugfix: toString: color with hexa value with leading 00 for example "0x00ff00".
    * <li>2012-06-09 Hartmut new: {@link #getColor(String)} now accepts a "0xhexa-Value" for a color name.
    *  If the color name does not match, a magenta color is returned. The method returns a color in any case.
    * <li>2011-10-01 Hartmut new: color lbk light black darker than dark gray. Change values for gray.
@@ -25,10 +26,6 @@ public class GralColor
    *     from gridPanel/PropertiesGUI to this.
    * <li>2011-05-14 Hartmut new: Reference to the {@link #colorGuimpl} to get the graphic base system color instance if need.
    * <li>2010-00-00 Hartmut created. It had contain only the 3 int red, green, blue     
-   * </ul>
-  /**Version, history and license.
-   * <ul>
-   * <li>2011-06-00 Hartmut created
    * </ul>
    * 
    * <b>Copyright/Copyleft</b>:<br>
@@ -54,7 +51,9 @@ public class GralColor
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public final static int version = 20111001;
+  public final static int version = 20120907;
+  
+  
   
   /**Values 0..255 for the base colors. */
   public final int red, green, blue;
@@ -274,6 +273,6 @@ public class GralColor
     // name = container.colorsByValue.get(color);
     String name = null;
     if(name !=null) return name;
-    else return String.format("0x%6X",color);
+    else return String.format("0x%06X",color);
   }
 }

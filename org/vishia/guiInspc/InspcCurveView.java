@@ -33,6 +33,7 @@ public class InspcCurveView
   /**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
    * Changes:
    * <ul>
+   * <li>2012-07-06 Hartmut now read and save of the file works.
    * <li>2012-06-29 Hartmut new open file dialog
    * <li>2012-06-08 Hartmut: new Buttons for read and save the configuration (setting). Yet only a simple file is used.
    *   TODO: File selection.
@@ -40,6 +41,7 @@ public class InspcCurveView
    *   with the communication in {@link InspcMng}.
    * </ul>
    * <br><br> 
+   * 
    * <b>Copyright/Copyleft</b>:
    * For this source the LGPL Lesser General Public License,
    * published by the Free Software Foundation is valid.
@@ -64,7 +66,7 @@ public class InspcCurveView
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   @SuppressWarnings("hiding")
-  public final static int version = 20120317;
+  public final static int version = 20120907;
 
   
   
@@ -136,6 +138,9 @@ public class InspcCurveView
   
   GralButton widgBtnOff;
   
+  /**The currently loaded file for curve settings. */
+  File fileCurve = new File("D:/");
+  
   //final InspcGuiComm comm;
   
   GralCurveView widgCurve;
@@ -193,14 +198,13 @@ public class InspcCurveView
     widgBtnScale = gralMng.addButton("btnScale", actionSetScaleValues2Track, "!", null, null, "set");
     gralMng.setPosition(35, GralPos.size +2, -10, GralPos.size +4, 0, 'r', 2);
     widgBtnRead = gralMng.addButton("btnRead", actionOpenFileDialog, "read", null, null, "read");
-    widgBtnSave = gralMng.addButton("btnSave", actionSave, "save", null, null, "save");
+    widgBtnSave = gralMng.addButton("btnSave", actionOpenFileDialog, "save", null, null, "save");
     
     gralMng.setPosition(-3, GralPos.size +2, -9, -1, 0, 'd', 0);
     widgBtnOff = gralMng.addSwitchButton(sName + "btnOff", "off / ?on", "on / ?off", GralColor.getColor("lgn"), GralColor.getColor("am"));
     wind.addMenuItemGThread("menuBarCurveView", "&Window/open " + sName, actionOpenWindow);
   
     windFile = GralFileSelector.WindowFileSelection.create(gralMng);
-    windFile.fileSelector.setActionOnEnterFile(actionRead);
     windFile.fileSelector.fillIn(new File("D:/"));
   }
 
@@ -330,8 +334,14 @@ public class InspcCurveView
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(actionCode == KeyCode.mouse1Up){
         try{
-          File dir = new File("D:/");
-          windFile.fileSelector.fillInCurrentDir();
+          windFile.fileSelector.fillIn(fileCurve);
+          if(widgd.getCmd().equals("read")){
+            windFile.fileSelector.setActionOnEnterFile(actionRead);
+            windFile.fileSelector.setActionOnEnterPathNewFile(null);
+          } else {
+            windFile.fileSelector.setActionOnEnterFile(actionSave);
+            windFile.fileSelector.setActionOnEnterPathNewFile(actionSave);
+          }
           windFile.openDialog(".");
         } catch(Exception exc){
           widgBtnScale.setForegroundColor(GralColor.getColor("lrd"));
@@ -346,11 +356,11 @@ public class InspcCurveView
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
-          File file = (File)params[0];
-          System.out.println("read curve view from; " + file.getAbsolutePath());
-          String in = FileSystem.readFile(file);
+          fileCurve = (File)params[0];
+          System.out.println("InspcCurveView - read curve view from; " + fileCurve.getAbsolutePath());
+          String in = FileSystem.readFile(fileCurve);
           if(in ==null){
-            System.err.println("InspcCurveView.actionRead - file not found;" + file.getAbsolutePath());
+            System.err.println("InspcCurveView - actionRead, file not found;" + fileCurve.getAbsolutePath());
           } else {
             if(widgCurve.applySettings(in)){ 
               List<? extends GralCurveViewTrack_ifc> listTracks = widgCurve.getTrackInfo();
@@ -379,9 +389,10 @@ public class InspcCurveView
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
-          File file = new File("curve.save");
-          System.out.println("save curve view to; " + file.getAbsolutePath());
-          Writer out = new FileWriter(file);
+          fileCurve = (File)params[0];
+          //File file = new File("curve.save");
+          System.out.println("InspcCurveView - save curve view to; " + fileCurve.getAbsolutePath());
+          Writer out = new FileWriter(fileCurve);
           widgCurve.writeSettings(out);
           out.close();
         } catch(Exception exc){

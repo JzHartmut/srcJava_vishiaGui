@@ -284,13 +284,17 @@ public class FcmdExecuter
           if(cmd !=null){
             //PrepareCmd cmdp = cmd.getCmds().get(0);
             if(cmd.name.startsWith(">")){
+              console.writeInfoln("FcmdExecuter - add cmd by extension;" + cmd.name);
               cmdQueue.addCmd(cmd.name, null, main.currentFile.getParentFile(), '>');
             } else {
               //the extension determines the command.
+              console.writeInfoln("FcmdExecuter - add cmd by extension;" + cmd.name);
               File[] files = main.getLastSelectedFiles();
               File currentDir = files[0].getParentFile();
               cmdQueue.addCmd(cmd, files, currentDir);
             }
+          } else {
+            console.writeError("FcmdExecuter - cmd not found; ");
           }
         }
         windConfirmExec.setWindowVisible(false);

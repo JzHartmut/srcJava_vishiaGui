@@ -747,7 +747,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
           out.append(", color=").append(track.lineColor.toString());
           out.append(", scale=").append(Float.toString(track.yScale) );
           out.append(", offset=").append(Float.toString(track.yOffset));
-          out.append("0-line-percent=").append(Integer.toString(track.y0Line));
+          out.append(", 0-line-percent=").append(Integer.toString(track.y0Line));
           out.append(";\n");
         } catch(IOException exc){
           System.err.println("GralCurveView.writeSettings() - unexpected IOException;" + exc.getMessage());
