@@ -358,15 +358,19 @@ public class SwtCurveView extends GralCurveView
      */
     private void drawTrack(GC g, Point size, Track track, int iTrack, int ixixDataLast){
       int ixixiData = 0;
+      //float pixelFromRight = 0;
       int xp2 = size.x -1;
       int xp1 = xp2;
       int ixData2 = ixDataShown[ixixiData];
+      int nrofPixel4Data = SwtCurveView.super.nrofPixel4data[ixixiData];
       int ixData = ixData2;
-      int ixD = (ixData >> shIxiData) & mIxiData;
+      int ixD = (ixData >> shIxiData) & mIxiData; //real index in data
       //
       float yFactor = size.y / -10.0F / track.yScale;  //y-scaling
       float y0Pix = (1.0F - track.y0Line/100.0F) * size.y; //y0-line
       float yF = track.values[ixD];
+      int time2 = timeValues[ixD];
+      int time1;
       int yp9 = (int)( (yF - track.yOffset) * yFactor + y0Pix);
       int yp2 = yp9;  //right value
       int yp1; //left value
@@ -377,8 +381,11 @@ public class SwtCurveView extends GralCurveView
       }
       //
       while( ixixiData < ixixDataLast){ //for all gotten ixData
-        ixData1 = ixDataShown[++ixixiData];
-        xp1 -=1;
+        ixixiData += nrofPixel4Data +1;
+        ixData1 = ixDataShown[ixixiData];
+        //ixData1 = ixDataShown[(int)pixelFromRight];
+        
+        xp1 -= nrofPixel4Data +1;
         if(ixData != ixData1) {
           int yp1min = Integer.MAX_VALUE, yp1max = Integer.MIN_VALUE;
           int nrofYp = 0;
@@ -387,10 +394,14 @@ public class SwtCurveView extends GralCurveView
             ixData -= adIxData;
             ixD = (ixData >> shIxiData) & mIxiData;
             int yp11;
-            if(ixData == ixDataDraw){
-              yp11 = track.ypixLast;
+            //if(ixData == ixDataDraw){
+            if(ixixiData >= ixixDataLast){
+                yp11 = track.ypixLast;
             } else {
               yF = track.values[ixD];
+              time1 = timeValues[ixD];
+              int dTime = time2 - time1;
+              //pixelFromRight += dTime * pixel7time;
               yp11 = (int)( (yF - track.yOffset) * yFactor + y0Pix);
             }
             yp1 += yp11;  //build middle value or init first.
@@ -412,7 +423,9 @@ public class SwtCurveView extends GralCurveView
           }
           xp2 = xp1; //next xp from right to left.
           yp2 = yp1;
+          nrofPixel4Data = SwtCurveView.super.nrofPixel4data[ixixiData];
           ixData2 = ixData1;
+        } else {
         }
       } //while(iData != ixDrawValues);
       track.ypixLast = yp9;
@@ -429,16 +442,20 @@ public class SwtCurveView extends GralCurveView
         //detect how many new data are given. Because the data are written in another thread,
         //the number of data, the write index are accessed only one time from this
         //Note that ixDataShowRight is set by ixDataWr if the curve is running.
-        int ixDataRight = SwtCurveView.this.ixDataShowRight; 
+        int ixDataRight = SwtCurveView.super.ixDataShowRight; 
         Point size = getSize(); //size of the widget.
         nrofValuesShow = size.x;
-        timePerPixel = timeSpread / (size.x +1);
-        pixel7time = (float)(size.x +1) / timeSpread;
+        timePerPixel = timeSpread / (size.x +1); //nr of time units per pixel. 
+        pixel7time = (float)(size.x +1) / timeSpread; //nr of pixel per time unit.
         int xViewPart = -1;   //nr of new pixel if only a part is drawn
         final int xp0;  //left point to draw.
+        final int timeDiff; //time for new values.
         testHelp.xView =xView; testHelp.yView =yView; testHelp.dxView =dxView; testHelp.dyView =dyView;
+        //
         if(!bFreeze && !paintAllCmd && redrawBecauseNewData) {
-          redrawBecauseNewData = false;  //it is done.
+          //paint only a part of the curve to save calculation time.
+          //The curve will be shifted to left.
+          //
           testHelp.ctRedrawBecauseNewData +=1;
           if(ixDataRight != ixDataDraw){
             testStopWr = true;
@@ -449,12 +466,13 @@ public class SwtCurveView extends GralCurveView
           //calculate the number of x-pixel to shift in graphic to left and the width of the range to paint new:
           int timeLast = timeValues[(ixDataDraw >> shIxiData) & mIxiData];
           int timeNow = timeValues[(ixDataRight >> shIxiData) & mIxiData];
-          int timeDiff = timeNow - timeLast;  //0 if nothing was written.
-          xViewPart = (int)(pixel7time * timeDiff + 0.5f);
+          timeDiff = timeNow - timeLast + timeCaryOverNewValue;  //0 if nothing was written.
+          xViewPart = (int)(pixel7time * timeDiff + 0.0f);
           //
           //Shift the graphic if the reason of redraw is only increment samples
           //and the number the values are shifted at least by that number, which is mapped to 1 pixel.
           if(xViewPart >0 && xViewPart < size.x){
+            timeCaryOverNewValue = (int)(timeDiff - xViewPart * timePerPixel);
             xViewLastF -= xViewPart;
             if(xView != 0){
               //TODO what is if only a part of control is shown
@@ -470,7 +488,8 @@ public class SwtCurveView extends GralCurveView
               g.drawImage(cursorStore2, size.x - xpCursor2, 0);
             }
             g.copyArea(xView + xViewPart, yView, dxView - xViewPart , dyView -5, xView, yView, false);
-            System.arraycopy(ixDataShown, 0, ixDataShown, xViewPart, size.x - xViewPart);
+            //System.out.println("SwtCurveView - draw - shift graphic;" + xViewPart);
+            //System.arraycopy(ixDataShown, 0, ixDataShown, xViewPart, size.x - xViewPart);
             testHelp.ctRedrawPart +=1;
           } else if(xViewPart >=size.x){ 
             //too many new values. Show all
@@ -481,11 +500,14 @@ public class SwtCurveView extends GralCurveView
             xViewLastF = 0.0F;
           } else { //xViewPart <=0
             //don't paint.
+            //System.out.println("SwtCurveView - draw - don't shift graphic;" + xViewPart);
             xViewPart = 0;
             xp0 = size.x;
           }
         } else { //paintall
           xViewPart = size.x;
+          timeCaryOverNewValue = 0;
+          timeDiff = (int)(timePerPixel * xViewPart);
           xp0 = 0;
           paintAllCmd = false; //accepted, done
           testHelp.ctRedrawAll +=1;
@@ -523,7 +545,7 @@ public class SwtCurveView extends GralCurveView
           } 
           //  
           //prepare indices of data.
-          int ixixDataLast = drawPrepareIndicesData(ixDataRight, xViewPart);
+          int ixixDataLast = prepareIndicesDataForDrawing(ixDataRight, xViewPart, timeDiff);
           // 
           //write all tracks.
           int iTrack = 0;
@@ -540,16 +562,26 @@ public class SwtCurveView extends GralCurveView
           if(xpCursor1 >=0){
             int xpCursor = size.x - xpCursor1;
             g.copyArea(cursorStore1, xpCursor, 0);
+            g.setForeground(gridColor);
+            g.setLineWidth(1);
             g.drawLine(xpCursor, 0, xpCursor, size.y);
           }
           if(xpCursor2 >=0){
             int xpCursor = size.x - xpCursor2;
             g.copyArea(cursorStore2, xpCursor, 0);
-            g.drawLine(xpCursor, 0, xpCursor, size.y);
+            //if(xViewPart >= size.x){
+              g.setForeground(gridColor);
+              g.setLineWidth(1);
+              g.drawLine(xpCursor, 0, xpCursor, size.y);
+            //}
           }
   
         } else { //xViewPart == 0
-          System.out.println("SwtCurveView xViewPart=0");
+          //This is is normal case if a new value in data has a too less new timestamp.
+          //It can't be shown. Await the next values. Any value will be have a more newer timestamp
+          //with a great-enough time difference to show it.
+          SwtCurveView.super.nrofValuesLessViewPart +=1;
+          //System.out.println("SwtCurveView - xViewPart=0");
         }
         if(nrofValues >0){
           int ixDataRel2 = ((ixDataWr - ixDataDraw)  >> shIxiData) & mIxiData;
@@ -573,7 +605,7 @@ public class SwtCurveView extends GralCurveView
       //g.drawString("xx", 200, dyView-16);
       focusChanged = false; //paint only last area by next paint event without focus event.
       testStopWr = false;
-      
+      redrawBecauseNewData = false;  //it is done.
     } 
     
   }

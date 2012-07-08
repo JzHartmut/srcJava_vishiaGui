@@ -366,7 +366,9 @@ public final void execute()
     }
   }
 
-  inspector.shutdown();
+  if(inspector !=null) { 
+    inspector.shutdown(); 
+  }
   finishMain();
 }
 

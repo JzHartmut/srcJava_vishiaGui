@@ -205,7 +205,7 @@ public class InspcCurveView
     wind.addMenuItemGThread("menuBarCurveView", "&Window/open " + sName, actionOpenWindow);
   
     windFile = GralFileSelector.WindowFileSelection.create(gralMng);
-    windFile.fileSelector.fillIn(new File("D:/"));
+    windFile.fileSelector.fillIn(new File("D:/SFC/SBOX/ReflexAccess/curve2.inspc"));
   }
 
   

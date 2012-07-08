@@ -89,6 +89,7 @@ public class FcmdFileCard extends GralFileSelector
    */
   FcmdFavorPathSelector.FavorPath favorPathInfo;
   
+  /**The last selected file. */
   File currentFile;
   
   /**If not null, then should synchronize with this file card. */

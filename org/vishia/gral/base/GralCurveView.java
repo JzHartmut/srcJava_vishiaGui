@@ -229,7 +229,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    * The not used 4. point is accepted as a correct point faulty, it produces a presentation to the value 0
    * because nothing is stored in data in 1253 time units (which may be milliseconds). This faulty presentation
    * is only present on startup of graphic and only if the difference is in range of presentation width,
-   * see {@link #drawPrepareIndicesData(int, int)}
+   * see {@link #prepareIndicesDataForDrawing(int, int)}
    */
   protected final int[] timeValues;
   
@@ -238,6 +238,12 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    * It is the number of pixel.
    */
   protected final int[] ixDataShown = new int[2000];
+  
+  /**The number of pixel for the current data point from the current pixel to left.
+   * [0] is the number of pixel for the right point.
+   * This array is parallel to {@link #ixDataShown}. 
+   */
+  protected final int[] nrofPixel4data = new int[2000];
   
   protected int ixLineInit = 0;
   
@@ -297,6 +303,11 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   protected int timeSpread = 50000;
   
   
+  /**The cary over of time which is not used for the current point.
+   * 
+   */
+  protected int timeCaryOverNewValue;
+  
   /**Current number of values in the data field. 
    * If less values are set ({@link #setSample(float[])}, 
    * then the nrofValues is less than values.length.
@@ -321,6 +332,11 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   /**True then saves values.  */
   protected boolean bActive;
+  
+  /**The actual number of values which are not shown because its time difference is too small
+   * to show in graphic as new point. It is counted only for debugging.
+   */
+  protected int nrofValuesLessViewPart;
   
   /**The index to show values, it increments with ixWrValues
    * if bFreeze is false
@@ -616,18 +632,24 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    * @param xViewPart width of the spread to prepare in pixel
    * @return nrof pixel to draw. It is xViewPart if enough data are available, elsewhere less. 
    */
-  protected int drawPrepareIndicesData(int ixDataRight, int xViewPart){
+  protected int prepareIndicesDataForDrawing(int ixDataRight, int xViewPart, int timePart){
     System.arraycopy(ixDataShown, 0, ixDataShown, xViewPart, ixDataShown.length - xViewPart);
-    int ixDataRightLast = ixDataShown[0];  //the index in data of right point for last paint.
-    int ixixDataShownSh = -1;  //store which index is proper to ixDataRightLast
+    //
+    //    time,   time2;   ......timeRight     the time stamps in data
+    //    ixData, ixData2, ..... ixDataRight   the 32-bit-index to data
+    //    ixD                              the really index to data
+    //
     ixDataShown[0] = ixDataRight;
+    //System.out.println("GralCurveView - prepareIndices; timePart=" + timePart + "; timexPart=" + xViewPart * timePerPixel + "; xPart=" + xViewPart);
     int ixData = ixDataRight;
+    int ixData2 = ixDataRight;
     int ixD = (ixData >> shIxiData) & mIxiData;
     int ixp2 = 0;
-    int ixp = 0;
-    int time9 = timeValues[ixD];
-    int time2 = time9;  //start time
-    int time = time9;
+    int ixp = 0; //pixel from right to left
+    int nrofPixel4Data =0;
+    int timeRight = timeValues[ixD]; //timestamp of the right value.
+    int time2 = timeRight;  //start time
+    int time = timeRight;
     int dtime2 = 0;
     //int dtime = 0;
     //xViewPart = nrof pixel from right
@@ -637,18 +659,20 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
          && dtime2 <=0
          ){ // && ixp1 >= ixp2){ //singularly: ixp1 < ixp2 if a faulty timestamp is found.
       do{ //all values per 1 pixel
-        ixData -= adIxData; //decrement to older values
+        ixData -= adIxData; //decrement to older values in the data
         //nrofValues -=1;
-        ixD = (ixData >> shIxiData) & mIxiData;
-        time = timeValues[ixD];
-        dtime2 = time - time2;
+        ixD = (ixData >> shIxiData) & mIxiData;  //the correct index in data.
+        time = timeValues[ixD];   //timestamp of that data point 
+        dtime2 = time - time2;    //difference time from the last one. It is negative.
         //dtime = time9 - time; //offset to first right point
-        if((dtime2) <0){
-          int dtime0 = time9 - time;
-          ixp = (int)(dtime0 * pixel7time + 0.5f);  //calculate pixel offset from right, right =0 
-          if(ixp > xViewPart){   //next time stamp is in the past of requested view
-            ixp = xViewPart;     //no more than requested nr of points. 
+        if((dtime2) <0){  //from rigth to left, dtime2 <0 is expected
+          int dtime0 = timeRight - time; //time difference to the right pointt
+          int ixp3 = (int)(dtime0 * pixel7time + 0.5f);  //calculate pixel offset from right, right =0 
+          if(ixp3 > xViewPart){   //next time stamp is in the past of requested view
+            ixp3 = xViewPart;     //no more than requested nr of points. 
           }
+          nrofPixel4Data += (ixp3 - ixp);
+          ixp = ixp3; 
           if(xpCursor1 == cmdSetCursor && ixData == ixDataCursor1){
             xpCursor1 = ixp;                  //set cursor xp if the data index is gotten.
           }
@@ -664,8 +688,11 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       //
       //if(ixp1 > ixp2 && ixp1 <= size_x){ //prevent drawing on false timestamp in data (missing data)
       while(ixp2 < ixp) { 
-        ixDataShown[++ixp2] = ixData;  //same index to more as one point.
+        ixDataShown[ixp2] = ixData2;  //same index to more as one point.
+        this.nrofPixel4data[ixp2] = --nrofPixel4Data;
+        ixp2 +=1;
       }
+      ixData2 = ixData;
     } 
     //ixDataShown[++ixp2] = -1;      //the last
     return ixp;

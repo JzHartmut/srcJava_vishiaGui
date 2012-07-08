@@ -332,12 +332,23 @@ public class Fcmd extends GuiCfg
   File[] getLastSelectedFiles(){
     File[] ret = new File[3];
     int ix = -1;
-    for(FcmdLeftMidRightPanel panel: lastFilePanels){
+    Iterator<FcmdLeftMidRightPanel> iterPanel = lastFilePanels.iterator();
+    while(ix < 2 && iterPanel.hasNext() ){
+      FcmdLeftMidRightPanel panel = iterPanel.next();
+      //for(FcmdLeftMidRightPanel panel: lastFilePanels){
       FcmdFileCard fileCard = panel.actFileCard;
       if(fileCard !=null){
-        ret[++ix] = fileCard.currentFile;
+        List<File> listFiles = fileCard.getSelectedFiles();
+        if(listFiles !=null && listFiles.size() > 0){
+          Iterator<File> iter= listFiles.iterator();
+          while(ix < 2 && iter.hasNext()){
+            ret[++ix] = iter.next();
+          }
+        } else {
+          ret[++ix] = fileCard.currentFile;
+        }
       } else {
-        ret[++ix] = null;  //the panel hasn't a file selected now.
+        //ret[++ix] = null;  //the panel hasn't a file selected now.
       }
     }
     //Note: There may be less than 3 file panels, rest of files are null.
