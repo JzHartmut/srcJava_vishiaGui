@@ -127,9 +127,9 @@ public class SwtWidgetHelper implements GralWidgetHelper
     assert(parent instanceof Shell);
     Rectangle s = parent.getClientArea();
     pos = parent.getBounds();
-    int dframe = (s.width - pos.width) /2;   //width of the frame line.
+    int dframe = (pos.width - s.width) /2;   //width of the frame line.
     posx += r.x + dframe;               //absolute position of the client area!
-    posy += r.y + (s.height - pos.height) - dframe;
+    posy += r.y + (pos.height - s.height) - dframe;
     int dx, dy;
     if(parent == widg){
       dx = s.width;
