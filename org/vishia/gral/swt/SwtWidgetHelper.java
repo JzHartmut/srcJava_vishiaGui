@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Scrollable;
@@ -108,31 +109,42 @@ public class SwtWidgetHelper implements GralWidgetHelper
   }
 
   
-  @Override public GralRectangle getAbsoluteBoundsOf(GralWidget widg){
-    Control swtWidg = (Control)widg.getWidgetImplementation();
-    Rectangle pos = swtWidg.getBounds();
-    GralRectangle rect = new GralRectangle(pos.x, pos.y, pos.width, pos.height);
-    Control parent = swtWidg;
-    do{ 
+  public static GralRectangle getPixelPositionSize(Control widg){
+    int posx = 0, posy = 0;
+    Rectangle r = widg.getBounds();
+    Composite parent;
+    if(widg instanceof Composite){
+      parent = (Composite) widg; //start with them, maybe the shell itself
+    } else {
+      parent = widg.getParent();
+    }
+    Rectangle pos;
+    while( !( parent instanceof Shell ) ){
+      pos = parent.getBounds();
+      posx += pos.x; posy += pos.y;
       parent = parent.getParent();
-      if(parent !=null){
-        Point posParent = parent.getLocation();
-        rect.x += posParent.x;
-        rect.y += posParent.y;
-      }
-      if(parent instanceof Scrollable){
-        Rectangle area = ((Scrollable)parent).getClientArea();
-        rect.x += area.x;
-        rect.y += area.y;
-      }
-    } while(!(parent instanceof Shell));
-    rect.y += 30;  //size of title and menu, where to find in SWT???
-    return rect;
+    }
+    assert(parent instanceof Shell);
+    Rectangle s = parent.getClientArea();
+    pos = parent.getBounds();
+    int dframe = (s.width - pos.width) /2;   //width of the frame line.
+    posx += r.x + dframe;               //absolute position of the client area!
+    posy += r.y + (s.height - pos.height) - dframe;
+    int dx, dy;
+    if(parent == widg){
+      dx = s.width;
+      dy = s.height;
+    } else {
+      dx = r.width;
+      dy = r.height;
+    }
+    GralRectangle posSize = new GralRectangle(posx, posy, dx, dy);
+    return posSize;
   }
-  
 
-  @Override
-  public boolean showContextMenu(GralWidget widg) {
+
+
+  @Override public boolean showContextMenu(GralWidget widg) {
     boolean bOk;
     Control swtWidg = (Control)widg.getWidgetImplementation();
     Menu contextMenu = swtWidg.getMenu();
@@ -140,7 +152,7 @@ public class SwtWidgetHelper implements GralWidgetHelper
       bOk = false;
     } else {
       //Rectangle pos = swtWidg.getBounds();
-      GralRectangle pos = getAbsoluteBoundsOf(widg);
+      GralRectangle pos = getPixelPositionSize(swtWidg);
       contextMenu.setLocation(pos.x + pos.dx, pos.y + pos.dy);
       contextMenu.setVisible(true);
       bOk = true;

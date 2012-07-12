@@ -1,5 +1,7 @@
 package org.vishia.gral.awt;
 
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Rectangle;
 
@@ -58,6 +60,17 @@ public class AwtSubWindow extends GralWindow
     return new GralRectangle(r.x, r.y, r.height, r.width);
   }
 
+
+  @Override public GralRectangle getPixelSize(){
+    Dimension r = ((Component)panelComposite).getSize();
+    GralRectangle posSize = new GralRectangle(0, 0, r.width, r.height);
+    return posSize;
+  }
+
+
+
+  
+  
   @Override
   public boolean isWindowsVisible()
   {

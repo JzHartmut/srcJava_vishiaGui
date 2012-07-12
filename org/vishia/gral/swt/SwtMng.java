@@ -118,6 +118,8 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
 	/**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
 	 * Changes:
 	 * <ul>
+	 * <li>2012-07-13 Hartmut chg: {@link #resizeWidget(GralWidget, int, int)} can work with more as one widget implementation.
+	 *   But it isn't test and used yet. Size of any implementation widget?
 	 * <li>2012-03-17 Hartmut chg: some changes for {@link #setPosAndSizeSwt(Control, int, int)} etc.
 	 * <li>2012-01-26 Hartmut chg: prevent some error messages which are unnecessary.
 	 * <li>2012-01-01 Hartmut new: The {@link #setInfoGthread(GralWidget, int, int, Object, Object)} routine
@@ -1593,13 +1595,29 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
 	@Override public void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent)
 	{
 	  //GralWidget_ifc widget = widgd.getGraphicWidgetWrapper();
+	  Object owidg = widgd.getWidgetImplementation();
 	  
-	  Control swtWidget = (Control)widgd.getWidgetImplementation();
-	  Point size = swtWidget.getParent().getSize();
-	  //Composite parent = swtWidget.
-	  GralRectangle posSize = calcWidgetPosAndSize(widgd.pos, size.x, size.y, 0, 0);
-	  swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
-	  swtWidget.redraw();
+	  if(owidg !=null){
+	    Control swtWidget = (Control)owidg;
+	    GralPanelContent panel = widgd.pos.panel;
+	    GralRectangle size = panel.getPixelPositionSize();
+	    //Point size = swtWidget.getParent().getSize();
+  	  //Composite parent = swtWidget.
+	    //widgd.pos is the Position in its panel:
+  	  GralRectangle posSize = calcWidgetPosAndSize(widgd.pos, size.dx, size.dy, 0, 0);
+  	  swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
+  	  swtWidget.redraw();
+	  } else if( (owidg = widgd.getWidgetMultiImplementations())!=null){
+	    Control[] swtWidgets = (Control[])owidg;
+	    for( Control swtWidget: swtWidgets){
+	      Point size = swtWidget.getParent().getSize();
+	      //Composite parent = swtWidget.
+	      GralRectangle posSize = calcWidgetPosAndSize(widgd.pos, size.x, size.y, 0, 0);
+	      swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
+	      swtWidget.redraw();
+	      
+	    }
+	  }
 	}
 	
 	

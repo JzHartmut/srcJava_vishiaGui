@@ -14,9 +14,11 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -38,6 +40,8 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
   
   /**Version, history and license:
    * <ul>
+   * <li>2012-07-13 Hartmut new:  {@link #getPixelSize()}, chg: {@link #getPixelPositionSize()} in all implementations. 
+   *   A swt.widget.Shell now returns the absolute position and the real size of its client area without menu and title bar.
    * <li>2012-06-29 Hartmut new: {@link #setResizeAction(GralUserAction)} now for both ctors, resize on subwindow works.
    * <li>2012-03-10 Hartmut new: calls invisibleSetAction.userActionGui if the window is set invisible by pressing the X closing icon.
    * <li>2012-02-11 Hartmut chg: The menu of the window is managed now in {@link SwtMenu}. Instance refered with {@link #menuBar}
@@ -143,7 +147,15 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
     if((windProps & GralWindow.windResizeable) !=0){
       setResizeAction(actionResizeOnePanel);
     }
-
+    /* test
+    Label testLabel = new Label(window, 0);
+    testLabel.setText("T");
+    testLabel.setBounds(0,0,10,10);
+    Rectangle bounds = testLabel.getBounds();
+    Point size = window.getSize();
+    Rectangle windowPos = window.getBounds();
+    Rectangle clientAread = window.getClientArea();
+    */
   }
   
   SwtSubWindow(String name, int windProps, Shell shell, GralWidgetMng gralMng)
@@ -193,10 +205,25 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
   @Override public Composite getPanelImpl() { return window; }
   
   @Override public GralRectangle getPixelPositionSize(){
+    return SwtWidgetHelper.getPixelPositionSize(window);
+    /*
     Rectangle r = window.getBounds();
-    GralRectangle posSize = new GralRectangle(r.x, r.y, r.width, r.height);
+    Rectangle s = window.getClientArea();
+    int dframe = (r.width - s.width) /2;   //width of the frame line.
+    int posx = r.x + dframe;               //absolute position of the client area!
+    int posy = r.y + (r.height - s.height) - dframe;
+    GralRectangle posSize = new GralRectangle(posx, posy, s.width, s.height);
+    return posSize;
+    */
+  }
+
+
+  @Override public GralRectangle getPixelSize(){
+    Rectangle r = ((Composite)panelComposite).getClientArea();
+    GralRectangle posSize = new GralRectangle(0, 0, r.width, r.height);
     return posSize;
   }
+
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
   { window.setBounds(x,y,dx,dy);

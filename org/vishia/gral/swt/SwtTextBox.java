@@ -27,7 +27,7 @@ public class SwtTextBox extends GralTextBox
   private SwtTextFieldWrapper swtText;
   
   
-  protected Text textFieldSwt;
+  /*package private*/ Text textFieldSwt;
   
   /**A possible prompt for the text field or null. */
   Label promptSwt;

@@ -16,7 +16,11 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
 {
 
   /**Version history:
-   * <ul>2012-04-22 Hartmut new: {@link #canvas} as property maybe null for each panel to support stored graphics.
+   * 
+   * <ul>
+   * <li>2012-07-13 Hartmut new:  {@link #getPixelSize()}, chg: {@link #getPixelPositionSize()} in all implementations. 
+   *   A swt.widget.Shell now returns the absolute position and the real size of its client area without menu and title bar.
+   * <li>2012-04-22 Hartmut new: {@link #canvas} as property maybe null for each panel to support stored graphics.
    * <li>2012-03-31 Hartmut new: {@link #implMethodPanel_} and {@link MethodsCalledbackFromImplementation#setVisible(boolean)}.
    * <li>2012-01-14 Hartmut new: {@link #setPrimaryWidget(GralWidget)} for panel focus.
    * <li>2012-01-08 Hartmut new: {@link #remove()}
@@ -46,11 +50,9 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
    * a second license subscribing a special contract with the author. 
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
-   * 
-   * 
    */
   @SuppressWarnings("hiding")
-  public final static int version = 20120422;
+  public final static int version = 20120713;
 
   public final String namePanel;
 
@@ -122,7 +124,18 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
   */
   
 	
+	/**Returns the absolute position of this panel on screen and its size.
+	 * If it is a main window, the useable area of the window without title and menu bar is returned.
+	 * @return
+	 */
 	public abstract   GralRectangle getPixelPositionSize();
+	
+	
+	
+  /**Returns the size of this panel in pixel.
+   * @return the x and y is 0, the dy and dy is the size.
+   */
+	public abstract GralRectangle getPixelSize();
 	
 	
 	public void setPrimaryWidget(GralWidget widg){ primaryWidget = widg; }
@@ -188,6 +201,8 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
    * @return The container.
    */
   public abstract Object getPanelImpl();
+  
+  
   
   @Override public String toString(){ return "GralPanel:" + namePanel; }
 

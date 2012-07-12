@@ -2,6 +2,7 @@ package org.vishia.gral.widget;
 
 import java.io.IOException;
 
+import org.eclipse.swt.widgets.Control;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralTextField;
@@ -38,6 +39,9 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   private final GralHtmlBox htmlBox;
   
   private final GralWidget buttonOk;
+  
+  Object[] implWidgets = new Object[3];
+
   
   protected final GralTextField infoLine;
   
@@ -79,7 +83,8 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   
   public static GralInfoBox createHtmlInfoBox(GralMngBuild_ifc mng, String name, String title)
   {
-    GralWindow window = mng.createWindow(name, title, GralWindow.windConcurrently);
+    int props = GralWindow.windConcurrently | GralWindow.windResizeable;
+    GralWindow window = mng.createWindow(name, title, props);
     //TODO the position frame (size) regards the title bar, it should not do so!
     mng.setPosition(0, -3, 0, 0, 0, '.');
     GralHtmlBox text = mng.addHtmlBox(name);
@@ -88,7 +93,11 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     mng.setPosition(-3, 0, -6, 0, 0, '.');
     GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "", null, null, "OK");
     GralInfoBox box = new GralInfoBox(window, text, infoLine, buttonOk);
+    box.implWidgets[0] = text.getWidgetImplementation();
+    box.implWidgets[1] = infoLine.getWidgetImplementation();
+    box.implWidgets[2] = buttonOk.getWidgetImplementation();
     box.buttonOk.setActionChange(box.actionOkButton);
+    //mng.registerWidget(box);
     return box; 
 
   }
@@ -193,6 +202,9 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     return null;
   }
 
+  @Override public Object[] getWidgetMultiImplementations(){ return implWidgets; }
+  
+  
   @Override
   public GralColor setBackgroundColor(GralColor color)
   {

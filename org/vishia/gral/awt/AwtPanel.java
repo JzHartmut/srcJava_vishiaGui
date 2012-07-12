@@ -2,10 +2,13 @@ package org.vishia.gral.awt;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
+import org.eclipse.swt.widgets.Control;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWidgetMng;
@@ -84,6 +87,13 @@ public class AwtPanel  extends GralPanelContent
   @Override public GralRectangle getPixelPositionSize(){
     Rectangle r = ((Component)panelComposite).getBounds();
     GralRectangle posSize = new GralRectangle(r.x, r.y, r.width, r.height);
+    return posSize;
+  }
+
+
+  @Override public GralRectangle getPixelSize(){
+    Dimension r = ((Component)panelComposite).getSize();
+    GralRectangle posSize = new GralRectangle(0, 0, r.width, r.height);
     return posSize;
   }
 

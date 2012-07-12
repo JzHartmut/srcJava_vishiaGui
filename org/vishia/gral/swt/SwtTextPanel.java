@@ -116,15 +116,22 @@ public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, A
   
   @Override public Control getPanelImpl() { return (Control)panelComposite; }
 
-  @Override public GralRectangle getPixelPositionSize(){
-    Rectangle r = ((Control)panelComposite).getBounds();
-    GralRectangle posSize = new GralRectangle(r.x, r.y, r.width, r.height);
+  @Override public GralRectangle getPixelPositionSize(){ return SwtWidgetHelper.getPixelPositionSize(textAreaOutput.textFieldSwt); }
+
+
+  @Override public GralRectangle getPixelSize(){
+    Rectangle r = ((Composite)panelComposite).getClientArea();
+    GralRectangle posSize = new GralRectangle(0, 0, r.width, r.height);
     return posSize;
   }
+
+
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
   { ((Control)panelComposite).setBounds(x,y,dx,dy);
   }
+
+
 
   @Override public GralWidgetGthreadSet_ifc getGthreadSetifc()
   { return textAreaOutput.getGthreadSetifc(); }

@@ -245,9 +245,14 @@ public class SwtTabbedPanel extends GralTabbedPanel
   
   @Override public Widget getWidgetImplementation(){ return widgetSwt; }
   
-  @Override public GralRectangle getPixelPositionSize(){
-    Rectangle r = widgetSwt.getBounds();
-    GralRectangle posSize = new GralRectangle(r.x, r.y, r.width, r.height);
+
+
+  @Override public GralRectangle getPixelPositionSize(){ return SwtWidgetHelper.getPixelPositionSize(widgetSwt); }
+
+
+  @Override public GralRectangle getPixelSize(){
+    Rectangle r = ((Composite)panelComposite).getClientArea();
+    GralRectangle posSize = new GralRectangle(0, 0, r.width, r.height);
     return posSize;
   }
 
@@ -271,7 +276,6 @@ public class SwtTabbedPanel extends GralTabbedPanel
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
   { widgetSwt.setBounds(x,y,dx,dy);
   }
-  
 
 
 

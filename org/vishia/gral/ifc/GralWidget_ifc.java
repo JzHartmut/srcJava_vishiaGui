@@ -37,6 +37,8 @@ public interface GralWidget_ifc extends Removeable
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-07-13 Hartmut new. {@link #getWidgetMultiImplementations()}. This method is not used in any widget yet,
+   *   but it may be necessary for complex widgets.
    * <li>2012-04-25 Hartmut new: {@link #refreshFromVariable(VariableContainer_ifc)}: Capability for any widget
    *   to update its content from its associated variables described in its sDataPath.
    * <li>2012-03-31 Hartmut new: {@link #isVisible()}
@@ -67,11 +69,17 @@ public interface GralWidget_ifc extends Removeable
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120425;
+  public static final int version = 20120713;
 
   
-  /**Returns the implementation class of the widget. */
+  /**Returns the implementation class of the widget. If the widget has more as one implementation widgets,
+   * this method returns null. You should call {@link #getWidgetMultiImplementations()} instead. */
   public abstract Object getWidgetImplementation();
+  
+  
+  /**Returns the implementation class of more as one widget. If the widget has only one implementation widget,
+   * this method returns null. You should call {@link #getWidgetImplementation()} instead. */
+  public Object[] getWidgetMultiImplementations();
   
   GralWidgetGthreadSet_ifc getGthreadSetifc();
   

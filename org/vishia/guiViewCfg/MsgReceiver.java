@@ -274,7 +274,7 @@ public class MsgReceiver
 	}
 	
 	
-	void testAndReceive()
+	public void testAndReceive()
 	{
 		if(bActivated){
 			fileOutput.flush();

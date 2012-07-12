@@ -345,6 +345,13 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 	@Override public GralWidget getGralWidget(){ return this; }
 	
 	
+  /**Default implementation:Most of widgets may have only one implementation widget. This returns null.
+   * @see org.vishia.gral.ifc.GralWidget_ifc#getWidgetMultiImplementations()
+   */
+  public Object[] getWidgetMultiImplementations(){ return null; }
+
+	
+	
 	public void setPrimaryWidgetOfPanel(){
 	  pos.panel.setPrimaryWidget(this);
 	}
