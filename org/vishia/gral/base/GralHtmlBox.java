@@ -33,7 +33,7 @@ public abstract class GralHtmlBox extends GralWidget
   public final static int version = 0x20120303;
 
   
-  protected GralHtmlBox(String name, GralWidgetMng mng)
+  protected GralHtmlBox(String name, GralMng mng)
   { super(name, 'h', mng);
   }
 

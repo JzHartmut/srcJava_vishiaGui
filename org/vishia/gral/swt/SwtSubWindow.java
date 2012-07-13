@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralWindow_setifc;
 import org.vishia.gral.ifc.GralColor;
@@ -47,7 +47,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
    * <li>2012-02-11 Hartmut chg: The menu of the window is managed now in {@link SwtMenu}. Instance refered with {@link #menuBar}
    * <li>2011-11-27 Hartmut chg: {@link #addMenuItemGThread(String, String, GralUserAction)} moved from
    *   {@link SwtPrimaryWindow} to this, because the capability to have a menu bar may needed on a sub-window too.
-   * <li>2011-11-18 Hartmut chg: {@link SwtSubWindow#SwtSubWindow(String, Display, String, int, GralWidgetMng)}
+   * <li>2011-11-18 Hartmut chg: {@link SwtSubWindow#SwtSubWindow(String, Display, String, int, GralMng)}
    *   now gets an int-property instead boolean 'exclusive'. A window has more as one property. Constants
    *   are defined in {@link GralWindow#windExclusive} etc.
    * <li>2011-11-10 Hartmut chg:  move all files from mainGuiSwt to gral.swt, dissolve of package mainGuiSwt
@@ -58,7 +58,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
    *   Not this class is base of {@link SwtPrimaryWindow} and contains this capabilities yet.
    * <li>2011-10-30 Hartmut new: {@link #getPixelPositionSize()} and {@link #setBoundsPixel(int, int, int, int)}
    *   to support pixel-orientation too. Note it isn't a concept of GRAL anyway, but it is needed.
-   * <li>2011-10-20 Hartmut chg: {@link GralWidgetMng} as parameter of constructor: The {@link GralWidget}
+   * <li>2011-10-20 Hartmut chg: {@link GralMng} as parameter of constructor: The {@link GralWidget}
    *   refers it, it should be initialized.
    * <li>2011-10-15 Hartmut new: {@link #removeWidgetImplementation()}.
    * <li>2011-09-23 Hartmut bugfix: setFocus() called in {@link #setWindowVisible(boolean)}, it hasn't
@@ -118,7 +118,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
   
 
   
-  SwtSubWindow(String name, Display display, String title, int windProps, GralWidgetMng gralMng)
+  SwtSubWindow(String name, Display display, String title, int windProps, GralMng gralMng)
   { super(name, windProps, gralMng, null);
     int props = 0; ////|SWT.CLOSE;
     if(title !=null){ 
@@ -158,7 +158,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
     */
   }
   
-  SwtSubWindow(String name, int windProps, Shell shell, GralWidgetMng gralMng)
+  SwtSubWindow(String name, int windProps, Shell shell, GralMng gralMng)
   { super(name, windProps, gralMng, shell);
     this.window = shell;
     setResizeAction(actionResizeOnePanel);
@@ -249,7 +249,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
 
   @Override public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction gralAction){
     if(menuBar == null){
-      menuBar = new SwtMenu("menubar", window, (GralWidgetMng)itsMng);
+      menuBar = new SwtMenu("menubar", window, (GralMng)itsMng);
     }
     menuBar.addMenuItemGthread(nameWidg, sMenuPath, gralAction);
   }

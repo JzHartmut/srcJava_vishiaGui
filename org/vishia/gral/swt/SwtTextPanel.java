@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;

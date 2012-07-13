@@ -3,7 +3,7 @@ package org.vishia.gral.awt;
 import java.awt.Frame;
 import java.io.File;
 
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
@@ -13,13 +13,13 @@ import org.vishia.msgDispatch.LogMessage;
 
 public class AwtPrimaryWindow extends AwtSubWindow implements GralPrimaryWindow_ifc
 {
-  /**It is the same instance as {@link GralWidgetMng#gralDevice} but refer the SWT type.
+  /**It is the same instance as {@link GralMng#gralDevice} but refer the SWT type.
    * 
    */
   final AwtGraphicThread graphicThreadAwt;
 
   
-  AwtPrimaryWindow(GralWidgetMng gralMng, String sTitle, AwtGraphicThread graphicThread)
+  AwtPrimaryWindow(GralMng gralMng, String sTitle, AwtGraphicThread graphicThread)
   { super("primaryWindow", graphicThread.window, "title", GralWindow.windHasMenu | GralWindow.windConcurrently, gralMng);
     //super(gralMng, graphicThread);
     this.graphicThreadAwt = graphicThread;  //refers SWT type
@@ -36,7 +36,7 @@ public class AwtPrimaryWindow extends AwtSubWindow implements GralPrimaryWindow_
     }
     //The propertiesGuiSwt needs the Display instance for Font and Color. Therefore the graphic thread with creation of Display should be executed before. 
     AwtProperties propertiesGui = new AwtProperties('C');
-    GralWidgetMng gralMng = new AwtWidgetMng(init, init.window, propertiesGui, null, log);
+    GralMng gralMng = new AwtWidgetMng(init, init.window, propertiesGui, null, log);
     
     //The PrimaryWindowSwt is a derivation of the GralPrimaryWindow. It is more as only a SWT Shell.
     AwtPrimaryWindow instance = new AwtPrimaryWindow(gralMng, sTitle, init);

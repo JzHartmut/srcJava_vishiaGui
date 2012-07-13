@@ -10,7 +10,7 @@ import java.awt.event.MouseMotionListener;
 
 import org.vishia.gral.base.GralMouseWidgetAction_ifc;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.KeyCode;
@@ -41,7 +41,7 @@ public class AwtGralMouseListener
       Object oInfo = widget.getData();
       if(oInfo instanceof GralWidget){
         GralWidget widgetInfo = (GralWidget)oInfo;
-        GralWidgetMng guiMng = widgetInfo.getMng();
+        GralMng guiMng = widgetInfo.getMng();
         try{
           if(widgetInfo ==null || widgetInfo.getDataPath() ==null || !widgetInfo.getDataPath().equals("widgetInfo")){
             guiMng.setLastClickedWidgetInfo(widgetInfo );
@@ -67,7 +67,7 @@ public class AwtGralMouseListener
       Object oInfo = widget.getData();
       if(oInfo instanceof GralWidget){
         GralWidget widgetInfo = (GralWidget)oInfo;
-        GralWidgetMng guiMng = widgetInfo.getMng();
+        GralMng guiMng = widgetInfo.getMng();
         try{
           GralWidget widgd = (GralWidget)oInfo;
           int dx = ev.getX() - xDown, dy = ev.getY() - yDown;
@@ -177,7 +177,7 @@ public class AwtGralMouseListener
       AwtWidget widgetAwt = (AwtWidget)widget;
       widget.addMouseMotionListener(mouseMoveListener);
       GralWidget widgg = (GralWidget)widgetAwt.getData();
-      GralWidgetMng guiMng = widgg.getMng();
+      GralMng guiMng = widgg.getMng();
       try{ 
         if(mouseWidgetAction !=null){
           switch(e.getButton()){ 
@@ -218,7 +218,7 @@ public class AwtGralMouseListener
         }
         backgroundWhilePressed = null;
         GralWidget widgg = (GralWidget)widgetAwt.getData();
-        GralWidgetMng guiMng = widgg.getMng();
+        GralMng guiMng = widgg.getMng();
         try{ 
           GralUserAction action = widgg ==null ? null : widgg.getActionChange();
           if(action !=null){

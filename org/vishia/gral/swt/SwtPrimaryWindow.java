@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
@@ -64,7 +64,7 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   
 
   
-  SwtPrimaryWindow(GralWidgetMng gralMng, SwtGraphicThread graphicThread, Display displaySwt)
+  SwtPrimaryWindow(GralMng gralMng, SwtGraphicThread graphicThread, Display displaySwt)
   { super("primaryWindow", GralWindow.windHasMenu, graphicThread.windowSwt, gralMng);
     //super(gralMng, graphicThread);
     this.graphicThreadSwt = graphicThread;  //refers SWT type

@@ -50,7 +50,7 @@ import org.vishia.util.KeyCode;
  * @param <WidgetTYPE> The special base type of the composed widgets in the underlying graphic adapter specialization.
  *                     (SWT: Composite)
  */
-public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
+public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Changes:
    * <ul>
@@ -179,7 +179,7 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
   
   protected boolean bDesignerIsInitialized = false;
   
-  final GralWidgetMng parent;
+  final GralMng parent;
   
   /**Base class for managing all panels and related windows.
    * This base class contains all common resources to manage panels and windows.
@@ -276,17 +276,17 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static GralWidgetMng createWindow(String graphicBaseSystem)
-	{ Class<GralWidgetMng> mngClass;
-		GralWidgetMng mng = null;
+	public static GralMng createWindow(String graphicBaseSystem)
+	{ Class<GralMng> mngClass;
+		GralMng mng = null;
 		String sGraphicBaseSystem = "org.vishia.mainGuiSwt.GuiPanelMngSwt";
 		try{ 
-			mngClass = (Class<GralWidgetMng>) Class.forName(sGraphicBaseSystem);
+			mngClass = (Class<GralMng>) Class.forName(sGraphicBaseSystem);
 		} catch(ClassNotFoundException exc){ mngClass = null; }
 		
 		if(mngClass == null) throw new IllegalArgumentException("Graphic base system not found: " + sGraphicBaseSystem);
 		try{ 
-			Constructor<GralWidgetMng> ctor = mngClass.getConstructor();
+			Constructor<GralMng> ctor = mngClass.getConstructor();
 			mng = ctor.newInstance();
 			//mng = mngClass.newInstance();
 		
@@ -404,7 +404,7 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
 
 
 	
-  public GralWidgetMng(GralGraphicThread device, GralWidgetHelper widgetHelper, GralGridProperties props, VariableContainer_ifc variableContainer, LogMessage log)
+  public GralMng(GralGraphicThread device, GralWidgetHelper widgetHelper, GralGridProperties props, VariableContainer_ifc variableContainer, LogMessage log)
 	{ this.gralDevice = device;
 	  this.widgetHelper = widgetHelper;
 	  widgetHelper.setMng(this);
@@ -852,8 +852,8 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
 		{ 
 			if(lastClickedWidgetInfo !=null){
 				log.sendMsg(Report.info, "widget %s, datapath=%s"
-					, GralWidgetMng.this.lastClickedWidgetInfo.name
-					, GralWidgetMng.this.lastClickedWidgetInfo.getDataPath());
+					, GralMng.this.lastClickedWidgetInfo.name
+					, GralMng.this.lastClickedWidgetInfo.getDataPath());
 	      return true;
 			} else {
 				log.sendMsg(0, "widgetInfo - no widget selected");
@@ -1135,7 +1135,7 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
 
 
     /**Polls one change request. This method should be called in the graphic thread from any class,
-     * which knows details about the graphic. That class is {@link org.vishia.gral.base.GralWidgetMng}.
+     * which knows details about the graphic. That class is {@link org.vishia.gral.base.GralMng}.
      * 
      * Hint: The method is public only because it will be invoked from the graphical implementation.
      * @return null if the queue is empty.
@@ -1216,7 +1216,7 @@ public abstract class GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
    *
    */
   public class InternalPublic{
-    public GralKeyListener gralKeyListener = new GralKeyListener(GralWidgetMng.this);
+    public GralKeyListener gralKeyListener = new GralKeyListener(GralMng.this);
   }
   
   /**Implementation specific fields.

@@ -8,7 +8,7 @@ import java.awt.PopupMenu;
 
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralUserAction;
 
 public class AwtMenu extends GralMenu
@@ -18,7 +18,7 @@ public class AwtMenu extends GralMenu
   
   
 
-  public AwtMenu(String sName, Component parent, GralWidgetMng mng)
+  public AwtMenu(String sName, Component parent, GralMng mng)
   {
     super(sName, mng);
     menuAwt = new PopupMenu("test");

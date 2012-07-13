@@ -6,7 +6,7 @@ import java.awt.Frame;
 import java.awt.Rectangle;
 
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
@@ -17,7 +17,7 @@ public class AwtSubWindow extends GralWindow
   
   protected final Frame window;
 
-  public AwtSubWindow(String name, Frame window, String title, int windStyle, GralWidgetMng gralMng)
+  public AwtSubWindow(String name, Frame window, String title, int windStyle, GralMng gralMng)
   {
     super(name, windStyle, gralMng, window);
     this.window = window;

@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Text;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
 
 public class SwtHtmlBox extends GralHtmlBox
@@ -50,7 +50,7 @@ public class SwtHtmlBox extends GralHtmlBox
   
   public boolean bActiv;
   
-  public SwtHtmlBox(String name, GralWidgetMng mng)
+  public SwtHtmlBox(String name, GralMng mng)
   {
     super(name, mng);
     SwtMng mngSwt = (SwtMng)mng;

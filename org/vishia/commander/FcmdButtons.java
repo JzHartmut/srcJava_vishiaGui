@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.KeyCode;
 
@@ -266,7 +266,7 @@ public class FcmdButtons
   
 
   
-  /**The main key action registered in the {@link GralWidgetMng#setMainKeyAction(GralUserAction)}.
+  /**The main key action registered in the {@link GralMng#setMainKeyAction(GralUserAction)}.
    */
   GralUserAction actionMainKeys = new GralUserAction()
   {

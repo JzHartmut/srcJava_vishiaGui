@@ -8,7 +8,7 @@ import java.io.Writer;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.cfg.GralCfgData;
@@ -144,7 +144,7 @@ public final GralArea9Window guiW;
 
 public final MainCmd_ifc mainCmd;
 
-public GralWidgetMng gralMng;
+public GralMng gralMng;
 
 /**Panel-Management-interface for the panels. */
 public GralMngBuild_ifc panelBuildIfc;

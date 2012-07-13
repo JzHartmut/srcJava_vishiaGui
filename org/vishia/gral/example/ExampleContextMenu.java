@@ -1,7 +1,7 @@
 package org.vishia.gral.example;
 
 import org.vishia.gral.base.GralMenu;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 
 public class ExampleContextMenu extends ExampleSimpleButton
 {
@@ -36,7 +36,7 @@ public class ExampleContextMenu extends ExampleSimpleButton
    */
   public static final int version = 20120303;
 
-  ExampleContextMenu(GralWidgetMng gralMng)
+  ExampleContextMenu(GralMng gralMng)
   {
     super(gralMng);
   }
@@ -69,7 +69,7 @@ public class ExampleContextMenu extends ExampleSimpleButton
   /**This inner class creates this class with given parameter.
    */
   static class Factory extends ExampleSimpleButton.Factory{
-    ExampleSimpleButton create(GralWidgetMng gralMng){
+    ExampleSimpleButton create(GralMng gralMng){
       ExampleContextMenu obj = new ExampleContextMenu(gralMng);
       obj.setInitGuiCode(obj.new InitGuiCodeContextMenu());
       return obj;

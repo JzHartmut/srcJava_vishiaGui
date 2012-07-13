@@ -3,7 +3,7 @@ package org.vishia.gral.swt;
 import org.eclipse.swt.widgets.MenuItem;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
 
 public class SwtWidgetMenu extends GralWidget
@@ -11,7 +11,7 @@ public class SwtWidgetMenu extends GralWidget
   
   private final MenuItem widgSwt;
   
-  SwtWidgetMenu(String sName, MenuItem widgSwt, String menuPath, GralWidgetMng mng){
+  SwtWidgetMenu(String sName, MenuItem widgSwt, String menuPath, GralMng mng){
     super(sName, 'M', mng);
     this.widgSwt = widgSwt;
     super.setDataPath("menu-" + menuPath);

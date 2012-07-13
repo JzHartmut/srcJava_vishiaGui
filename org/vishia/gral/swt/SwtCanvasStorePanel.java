@@ -1,7 +1,7 @@
 package org.vishia.gral.swt;
 
 
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPoint;
@@ -47,7 +47,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
    * @param style
    * @param backGround
    */
-  public SwtCanvasStorePanel(String namePanel, Composite parent, int style, Color backGround, GralWidgetMng gralMng)
+  public SwtCanvasStorePanel(String namePanel, Composite parent, int style, Color backGround, GralMng gralMng)
   { super(namePanel, gralMng, null);
     super.canvas = new GralCanvasStorage();
     swtCanvas = new SwtCanvas(this,parent, style);
@@ -63,7 +63,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
   /**Constructor called in derived classes. The derived class have to be instantiate the Canvas
    * maybe with other draw routines. 
    */
-  protected SwtCanvasStorePanel(String namePanel, GralWidgetMng gralMng)
+  protected SwtCanvasStorePanel(String namePanel, GralMng gralMng)
   {
     super(namePanel, gralMng, null);
     super.canvas = new GralCanvasStorage();

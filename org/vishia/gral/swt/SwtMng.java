@@ -54,7 +54,7 @@ import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetChangeRequ;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTabbedPanel;
@@ -110,7 +110,7 @@ import org.vishia.msgDispatch.LogMessage;
  * @author Hartmut Schorrig
  *
  */
-public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
+public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 //GuiShellMngIfc<Control>   
 {
   private static final long serialVersionUID = -2547814076794969689L;
@@ -187,7 +187,7 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
   protected Rectangle currPanelPos;
   
 
-  /**Properties of this Dialog Window. The {@link GralWidgetMng} contains an aggregation 
+  /**Properties of this Dialog Window. The {@link GralMng} contains an aggregation 
    * to the same instance, but with type {@link GralGridProperties}. Internally there are some more
    * Swt-capabilities in the derived type.
    */
@@ -523,7 +523,7 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
   
   
   
-  /**Set bounds of a SWT component with this {@link GralWidgetMng#pos} from the GralWidgetMng. 
+  /**Set bounds of a SWT component with this {@link GralMng#pos} from the GralWidgetMng. 
    * The {@link #setNextPosition()} is called to process a used this.pos to its next. 
    * This method is package-private for SWT-implementation. It calls 
    * {@link #setNextPosition()} and {@link #setPosAndSizeSwt(GralPos, Control, int, int)}

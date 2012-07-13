@@ -117,7 +117,7 @@ public abstract class GralDispatchCallbackWorker
 	
 	/**Remove this from the queue of dispatch callbacks which are executed in any loop of the
 	 * graphic thread.
-	 * @param graphicThread it is the singleton instance refered with {@link GralWidgetMng#gralDevice}.
+	 * @param graphicThread it is the singleton instance refered with {@link GralMng#gralDevice}.
 	 */
 	synchronized public void removeFromQueue(GralGraphicThread graphicThread){
 	  bAdded = false;

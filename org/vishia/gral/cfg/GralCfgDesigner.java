@@ -2,7 +2,7 @@ package org.vishia.gral.cfg;
 
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralRectangle;
@@ -51,7 +51,7 @@ public class GralCfgDesigner
   
   protected final LogMessage log;
 
-  private final GralWidgetMng mng;
+  private final GralMng mng;
   
   private final GralCfgBuilder cfgBuilder;
 
@@ -82,7 +82,7 @@ public class GralCfgDesigner
    */
   GralWidget widggForDialog;
   
-  public GralCfgDesigner(GralCfgBuilder cfgBuilder, GralWidgetMng mng, LogMessage log)
+  public GralCfgDesigner(GralCfgBuilder cfgBuilder, GralMng mng, LogMessage log)
   { this.cfgBuilder = cfgBuilder;
     this.log = log;
     this.mng = mng;

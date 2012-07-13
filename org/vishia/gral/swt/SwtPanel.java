@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
@@ -48,7 +48,7 @@ public class SwtPanel extends GralPanelContent
 
   //protected Composite panelSwt;
   
-  private SwtPanel(String name, GralWidgetMng mng)
+  private SwtPanel(String name, GralMng mng)
   {
     super(name, mng, null);
   }
@@ -59,7 +59,7 @@ public class SwtPanel extends GralPanelContent
    * @param panelSwt may be null, then the {@link GralPanelContent#panelComposite} should be set 
    *   after construction of a derived class.
    */
-  public SwtPanel(String name, GralWidgetMng mng, Composite panelSwt)
+  public SwtPanel(String name, GralMng mng, Composite panelSwt)
   {
     super(name, mng, panelSwt);
     if(panelSwt !=null){

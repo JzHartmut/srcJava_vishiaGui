@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetHelper;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 
@@ -40,7 +40,7 @@ public class SwtWidgetHelper implements GralWidgetHelper
   private static SwtMng mng;
   
   
-  @Override public void setMng(GralWidgetMng mng)
+  @Override public void setMng(GralMng mng)
   { this.mng = (SwtMng)mng;
   }
 

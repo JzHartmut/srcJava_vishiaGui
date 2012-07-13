@@ -34,7 +34,7 @@ abstract public class GralValueBar extends GralWidget implements GralSetValue_if
 	
 	
 	
-	protected GralValueBar(String name, GralWidgetMng mng)
+	protected GralValueBar(String name, GralMng mng)
 	{ super(name, 'U', mng);
 		this.horizontal = false;  //set with setBounds of implementation.
 	}

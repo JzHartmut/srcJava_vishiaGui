@@ -38,7 +38,7 @@ import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
@@ -50,7 +50,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
 
-public class AwtWidgetMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_ifc
+public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   
   final AwtProperties propertiesGuiAwt; 

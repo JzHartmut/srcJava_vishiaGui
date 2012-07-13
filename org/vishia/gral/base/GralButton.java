@@ -84,7 +84,7 @@ public abstract class GralButton extends GralWidget
   protected boolean bThreeStateSwitch;
   
   //public GralButton(String sName, GralWindowMng_ifc mainWindow, GralGridMngBase mng)
-  public GralButton(String sName, GralWidgetMng mng)
+  public GralButton(String sName, GralMng mng)
   {
     super(sName, 'B', mng);  //GralWidget
     //this.mng = mng;

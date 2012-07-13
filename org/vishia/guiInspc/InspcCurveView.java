@@ -13,7 +13,7 @@ import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralCurveViewTrack_ifc;
@@ -75,7 +75,7 @@ public class InspcCurveView
   
   GralFileSelector.WindowFileSelection windFile;
   
-  final GralWidgetMng gralMng;
+  final GralMng gralMng;
   
   final VariableContainer_ifc variables;
   
@@ -145,7 +145,7 @@ public class InspcCurveView
   
   GralCurveView widgCurve;
   
-  InspcCurveView(VariableContainer_ifc variables, GralWidgetMng gralMng){
+  InspcCurveView(VariableContainer_ifc variables, GralMng gralMng){
     //this.comm = comm;
     this.variables = variables;
     this.gralMng = gralMng;
@@ -248,7 +248,7 @@ public class InspcCurveView
   
   /**This action will be called if the mouse is pressed on the drop field.
    * It is not drag and drop because drag'ndrop doesn't works on a field which content is not be able to select.
-   * That is on show fields. Therefore the {@link GralWidgetMng#getWidgetOnMouseDown()} is used to detect
+   * That is on show fields. Therefore the {@link GralMng#getWidgetOnMouseDown()} is used to detect
    * which show field was clicked last.
    * 
    */

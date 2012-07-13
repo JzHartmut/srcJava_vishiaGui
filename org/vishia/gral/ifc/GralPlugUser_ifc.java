@@ -2,7 +2,7 @@ package org.vishia.gral.ifc;
 
 import java.io.Closeable;
 
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.msgDispatch.LogMessage;
 
 
@@ -56,7 +56,7 @@ public interface GralPlugUser_ifc extends Closeable
    * @param gralMng
    * @param log
    */
-  void init(GralPlugUser2Gral_ifc plugUser2Gui, GralWidgetMng gralMng, LogMessage log);
+  void init(GralPlugUser2Gral_ifc plugUser2Gui, GralMng gralMng, LogMessage log);
 
   
   void registerMethods(org.vishia.gral.ifc.GralMngBuild_ifc guiMng);
@@ -71,7 +71,7 @@ public interface GralPlugUser_ifc extends Closeable
   /**This routine can be implemented to add some graphic elements to the gui, including special windows.
    * @param gralMng
    */
-  void initGui(GralWidgetMng gralMng);
+  void initGui(GralMng gralMng);
   
   /**This routine can be implemented to add some specific menu entries.
    * @param wind The main window access

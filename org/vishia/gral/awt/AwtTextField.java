@@ -6,7 +6,7 @@ import java.awt.TextField;
 
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralUserAction;

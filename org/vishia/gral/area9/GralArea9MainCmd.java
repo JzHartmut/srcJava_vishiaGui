@@ -5,7 +5,7 @@ import java.io.File;
 import org.vishia.gral.awt.AwtFactory;
 import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.swt.FactorySwt;
 import org.vishia.inspector.Inspector;
 import org.vishia.mainCmd.MainCmd;
@@ -77,7 +77,7 @@ public class GralArea9MainCmd extends MainCmd
    */
   protected final GuiCallingArgs cargs;
   
-  public GralWidgetMng gralMng;
+  public GralMng gralMng;
   
   String sArgError = null;
   

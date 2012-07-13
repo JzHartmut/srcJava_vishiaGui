@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
@@ -141,7 +141,7 @@ class FcmdFavorPathSelector
   
   GralFileSelector.WindowConfirmSearch windSearchFiles;
   
-  private final GralWidgetMng mng;
+  private final GralMng mng;
   
   final Fcmd main;
   

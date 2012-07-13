@@ -90,7 +90,7 @@ public abstract class GralTabbedPanel extends GralPanelContent /*extends GralWid
 	/**The constructor can only be invoked from a implementing class.
 	 * @param user
 	 */
-	protected GralTabbedPanel(String sName, GralWidgetMng mng, GralPanelActivated_ifc user, int property)
+	protected GralTabbedPanel(String sName, GralMng mng, GralPanelActivated_ifc user, int property)
 	{ super(sName, mng, null);
 	  //super(sName, '@', mng);
 	  this.notifyingUserInstanceWhileSelectingTab = user;

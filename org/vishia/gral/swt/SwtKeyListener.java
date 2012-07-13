@@ -15,7 +15,7 @@ import org.vishia.gral.ifc.GralUserAction;
    * the {@link GralUserAction} given in the {@link GralWidget#getActionChange()} is called
    * <ul>
    * </ul> 
-   * If the method returns false, the central key action given in {@link GralWidgetMng#getRegisteredUserAction(String)}
+   * If the method returns false, the central key action given in {@link GralMng#getRegisteredUserAction(String)}
    * for "keyAction" is tried to get and then invoked with cmd = "key" and the key code in params[0].
    * This central keyAction may be used for application centralized keys without association to the table itself.
  * @see GralKeyListener

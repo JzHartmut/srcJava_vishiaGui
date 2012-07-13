@@ -418,7 +418,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
 
 
 
-  public GralCurveView(String sName, GralWidgetMng mng, int maxNrofXvaluesP, int nrofTracks)
+  public GralCurveView(String sName, GralMng mng, int maxNrofXvaluesP, int nrofTracks)
   {
     super(sName, 'c', mng);
     

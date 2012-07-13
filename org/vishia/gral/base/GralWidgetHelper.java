@@ -37,7 +37,7 @@ public interface GralWidgetHelper {
    */
   public static final int version = 20120713;
 
-  void setMng(GralWidgetMng mng);
+  void setMng(GralMng mng);
   
   //GralRectangle getAbsoluteBoundsOf(GralWidget widg);
     

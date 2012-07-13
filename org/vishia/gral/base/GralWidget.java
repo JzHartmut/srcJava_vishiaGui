@@ -46,7 +46,7 @@ import org.vishia.util.KeyCode;
  * <br><br>
  * The user can invoke the methods of the widget to animate it in a GUI etc, for example {@link #setBackColor(GralColor, int)}
  * or {@link #setValue(int, int, Object)}. This methods can be called in any thread. There are thread safe. 
- * The organization of this actions are done in the implementation of the {@link org.vishia.gral.base.GralWidgetMng}
+ * The organization of this actions are done in the implementation of the {@link org.vishia.gral.base.GralMng}
  * like {@link org.vishia.gral.swt.SwtMng}. This implementation adapts the basic graphic and knows their methods
  * to set colors, values etc. The user need deal only with this widget class. The thread safe  capability is organized
  * with a ConcurrentLinkedQueue which contains requests of type {@link org.vishia.gral.base.GralWidgetChangeRequ}.
@@ -113,7 +113,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * <li>2012-01-16 Hartmut new Concept {@link #repaint()}, can be invoked in any thread. With delay possible. 
    *   All inherit widgets have to be implement  {@link #repaintGthread()}.
    * <li>2011-12-27 Hartmut new {@link #setHtmlHelp(String)}. For context sensitive help.
-   * <li>2011-11-18 Hartmut bugfix: {@link #setFocus()} had called {@link GralWidgetMng#setFocus(GralWidget)} and vice versa.
+   * <li>2011-11-18 Hartmut bugfix: {@link #setFocus()} had called {@link GralMng#setFocus(GralWidget)} and vice versa.
    *   Instead it should be a abstract method here and implemented in all Widgets. See {@link org.vishia.gral.swt.SwtWidgetHelper#setFocusOfTabSwt(org.eclipse.swt.widgets.Control)}.
    * <li>2011-10-15 Hartmut chg: This class is now abstract. It is the super class for all wrapper implementations.
    *   The wrapper implements special interfaces for the kind of widgets. It is more simple for usage, less instances to know.
@@ -181,7 +181,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   /**The widget manager from where the widget is organized. Most of methods need the information
    * stored in the panel manager. This reference is used to set values to other widgets. */
-  protected GralWidgetMng itsMng;
+  protected GralMng itsMng;
   
   protected GralMngBuild_ifc buildMng;
   
@@ -332,7 +332,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   //}
 
 	
-	public GralWidget(String sName, char whatIs, GralWidgetMng mng)
+	public GralWidget(String sName, char whatIs, GralMng mng)
 	{ this.name = sName;
 		//this.widget = null;
 		this.whatIs = whatIs;
@@ -583,7 +583,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 
 	
 	/**Gets the context menu to add a menu item. If this widget hasn't a gral context menu, then an empty menu
-	 * is assigned and that is returned. It calls {@link GralWidgetMng#addContextMenu(GralWidget)} and uses
+	 * is assigned and that is returned. It calls {@link GralMng#addContextMenu(GralWidget)} and uses
 	 * the element {@link #contextMenu}.
 	 * @return the context menu root for this widget.
 	 */
@@ -602,7 +602,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
 	
 	
-	public void setPanelMng(GralWidgetMng panel)
+	public void setPanelMng(GralMng panel)
 	{ this.itsMng = panel; 
 	}
 	
@@ -808,7 +808,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   /**Sets the visible value given as String. Usual it is applicable if the widget is a text field.
    * This method can or should be overridden for some widgets to optimize calculation time.
-   * The default implementation uses the {@link GralWidgetMng#setInfo(GralWidget, int, int, Object, Object)}.
+   * The default implementation uses the {@link GralMng#setInfo(GralWidget, int, int, Object, Object)}.
    * @param sValue String given value.
    */
   public void XXXsetValue(String sValue){
@@ -852,7 +852,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * to get and set values and properties of this widgets non-symbolic.
    * @return The manager.
    */
-  public GralWidgetMng getMng(){ return itsMng; }
+  public GralMng getMng(){ return itsMng; }
   
   
   /**Gets the panel where the widget is member of. 

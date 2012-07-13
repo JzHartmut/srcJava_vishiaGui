@@ -50,7 +50,7 @@ public abstract class GralLed extends GralWidget
   /**The colors which are used for repaint (if not null). */
   protected GralColor colorBorder, colorInner;
   
-  protected GralLed(String name, GralWidgetMng mng)
+  protected GralLed(String name, GralMng mng)
   { super(name, 'D', mng);
     colorBorderSelectable = new GralColor[2];
     colorBorderSelectable[0] = GralColor.getColor("ye");

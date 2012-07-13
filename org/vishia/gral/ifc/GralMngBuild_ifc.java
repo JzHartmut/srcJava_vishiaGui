@@ -18,7 +18,7 @@ import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTabbedPanel;
@@ -57,7 +57,7 @@ import org.vishia.util.KeyCode;
  * <br><br>
  * To build a GUI you must use the following order of calls:
  * <ul>
- * <li>Create a panel manager which is typeof {@link GralWidgetMng} or this interface.
+ * <li>Create a panel manager which is typeof {@link GralMng} or this interface.
  *   For example create {@link org.vishia.gral.swt.SwtMng}.
  * <li>Create a panel, for example call {@link #createGridPanel(GralColor, int, int, int, int)}
  *   and add the panel to the given     
@@ -282,9 +282,9 @@ public interface GralMngBuild_ifc
   
   /**Gets the current position in the panel to store anywhere other. Usual the position is stored in the widget itself.
    * This operation returns an independent instance of GralGridPos. 
-   * Note that the {@link GralWidgetMng#pos} is reused there. Therefore the implementation of the method
+   * Note that the {@link GralMng#pos} is reused there. Therefore the implementation of the method
    * returns a cloned instance.   
-   * @return An independent instance with current data of {@link GralWidgetMng#pos}. 
+   * @return An independent instance with current data of {@link GralMng#pos}. 
    */
   GralPos getPositionInPanel();
   
@@ -432,7 +432,7 @@ public interface GralMngBuild_ifc
    * <li>values[0] is the selected line referenced with {@link GralTableLine_ifc}
    * <li>values[1] is the key code described in {@link KeyCode}
    * </ul> 
-   * If the method isn't given or returns false, the central key action given in {@link GralWidgetMng#getRegisteredUserAction(String)}
+   * If the method isn't given or returns false, the central key action given in {@link GralMng#getRegisteredUserAction(String)}
    * for "keyAction" is tried to get and then invoked with cmd = "key" and the key code in values[0].
    * This central keyAction may be used for application centralized keys without association to the table itself.
    * 

@@ -65,7 +65,7 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
 	
 	//public GralPrimaryWindow_ifc mainWindow;
 	
-	public final GralWidgetMng gralMng;
+	public final GralMng gralMng;
 	
 
 	/**The widget which should be focused if the panel is focused. 
@@ -96,7 +96,7 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
   public GralCanvasStorage canvas;
 
   
-	public GralPanelContent(String namePanel, GralWidgetMng mng, Object panelComposite)
+	public GralPanelContent(String namePanel, GralMng mng, Object panelComposite)
 	//public PanelContent(CanvasStorePanel panelComposite)
 	{ super(namePanel, '$', mng);
 	  this.namePanel = namePanel;

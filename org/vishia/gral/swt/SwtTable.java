@@ -27,7 +27,7 @@ import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralTableLine_ifc;
@@ -178,7 +178,7 @@ public class SwtTable  extends GralTable {
   
   /**Sets the focus to the current cell of the tab
    * @see org.vishia.gral.base.GralWidget#setFocus()
-   * TODO this method must call in the graphic thread yet, queue it with {@link GralWidgetMng#setInfo(GralWidget, int, int, Object, Object)}.
+   * TODO this method must call in the graphic thread yet, queue it with {@link GralMng#setInfo(GralWidget, int, int, Object, Object)}.
    */
   @Override public boolean setFocus()
   { if(ixGlineSelectedNew >=0 && ixColumn >=0){
@@ -230,7 +230,7 @@ public class SwtTable  extends GralTable {
   
   /**Sets the current cell as focused with the focus color. It causes
    * a redraw of the whole table because the cell may be shifted in table position.
-   * TODO this method must call in the graphic thread yet, queue it with {@link GralWidgetMng#setInfo(GralWidget, int, int, Object, Object)}.
+   * TODO this method must call in the graphic thread yet, queue it with {@link GralMng#setInfo(GralWidget, int, int, Object, Object)}.
    * @param cell The cell 
    */
   private void redrawTableWithFocusedCell(Widget cell){
@@ -355,7 +355,7 @@ public class SwtTable  extends GralTable {
       Font font = mng.propertiesGuiSwt.getTextFontSwt(2, whatIs, whatIs);
       Color colorBackTableSwt = mng.getColorImpl(colorBackTable);
       for(int iCol = 0; iCol < zColumns; ++iCol){
-        menuColumns[iCol] = new SwtMenu(name + "_menu" + iCol, this, (GralWidgetMng)itsMng);
+        menuColumns[iCol] = new SwtMenu(name + "_menu" + iCol, this, (GralMng)itsMng);
       }
       for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){
         for(int iCol = 0; iCol < zColumns; ++iCol){
@@ -461,7 +461,7 @@ public class SwtTable  extends GralTable {
    * <li>params[0] is the selected line referenced with {@link GralTableLine_ifc}
    * <li>params[1] is the key code described in {@link KeyCode}
    * </ul> 
-   * If the method returns false, the central key action given in {@link GralWidgetMng#getRegisteredUserAction(String)}
+   * If the method returns false, the central key action given in {@link GralMng#getRegisteredUserAction(String)}
    * for "keyAction" is tried to get and then invoked with cmd = "key" and the key code in params[0].
    * This central keyAction may be used for application centralized keys without association to the table itself.
    */

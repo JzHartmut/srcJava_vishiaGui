@@ -5,7 +5,7 @@ import java.io.File;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
@@ -123,7 +123,7 @@ public class FcmdFileCard extends GralFileSelector
     this.colorSelectFocused123[2] = GralColor.getColor("lgr");
     String namePanelFile = FcmdWidgetNames.tableFile + nameFilePanel;
     main.idxFileSelector.put(namePanelFile, this); //it is WidgetNames.tableFile + label +.123, see super(...) 
-    GralWidgetMng mng = main.gralMng;
+    GralMng mng = main.gralMng;
     //
     //The favorite paths card
     favorCard = new FcmdFavorCard(main, this, mainPanel);

@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.KeyCode;
@@ -77,7 +77,7 @@ public class SwtMenu extends GralMenu
    * @param parent
    * @param mng
    */
-  public SwtMenu(String sName, Control parent, GralWidgetMng mng)
+  public SwtMenu(String sName, Control parent, GralMng mng)
   {
     super(sName, mng);
     this.window = parent.getShell();
@@ -90,7 +90,7 @@ public class SwtMenu extends GralMenu
    * @param window
    * @param mng
    */
-  public SwtMenu(String sName, Shell window, GralWidgetMng mng)
+  public SwtMenu(String sName, Shell window, GralMng mng)
   {
     super(sName, mng);
     this.window = window;

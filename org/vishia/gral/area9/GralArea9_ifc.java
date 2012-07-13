@@ -3,7 +3,7 @@ package org.vishia.gral.area9;
 import java.io.File;
 
 import org.vishia.gral.base.GralDispatchCallbackWorker;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralMngApplAdapter_ifc;
@@ -188,7 +188,7 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc, GralMngApplAdapter
   GralTextBox getOutputBox();
   
   
-  GralWidgetMng getGralMng();
+  GralMng getGralMng();
   
   /**Returns the prepared action help which opens the help window.
    * It should be used for the users call of {@link #addMenuItemGThread(String, String, GralUserAction) }

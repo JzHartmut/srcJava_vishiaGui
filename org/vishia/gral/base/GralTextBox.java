@@ -53,7 +53,7 @@ public abstract class GralTextBox extends GralTextField implements Appendable, G
    */
   private StringBuffer newText = new StringBuffer();
   
-  protected GralTextBox(String name, char whatis, GralWidgetMng mng)
+  protected GralTextBox(String name, char whatis, GralMng mng)
   { super(name, whatis, mng);
   }
 

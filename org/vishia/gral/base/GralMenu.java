@@ -62,13 +62,13 @@ public abstract class GralMenu //extends GralWidget
     }
   }
   
-  protected final GralWidgetMng gralMng;
+  protected final GralMng gralMng;
   
   protected Map<String, MenuEntry> menus = new TreeMap<String, MenuEntry>();
   
 
   
-  public GralMenu(String sName, GralWidgetMng mng)
+  public GralMenu(String sName, GralMng mng)
   {
     //super(sName, 'M', mng);
     this.gralMng = mng;

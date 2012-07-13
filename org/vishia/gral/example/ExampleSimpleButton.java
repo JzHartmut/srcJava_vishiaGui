@@ -9,7 +9,7 @@ import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFactory_ifc;
@@ -65,7 +65,7 @@ public class ExampleSimpleButton
   /**Instance to initialize the graphic. */
   private GralDispatchCallbackWorker initGuiCode;
   
-  ExampleSimpleButton(GralWidgetMng gralMng)
+  ExampleSimpleButton(GralMng gralMng)
   {
     //this.initGuiCode = new InitGuiCode();
     gui = new GuiElements(gralMng);
@@ -137,7 +137,7 @@ public class ExampleSimpleButton
   
   protected static class GuiElements
   {
-    final GralWidgetMng gralMng;
+    final GralMng gralMng;
 
     GralTextField widgInput;
     
@@ -148,7 +148,7 @@ public class ExampleSimpleButton
     /**Constructor with given widget manager.
      * @param gralMng
      */
-    GuiElements(GralWidgetMng gralMng)
+    GuiElements(GralMng gralMng)
     {
       this.gralMng = gralMng;
     }
@@ -236,7 +236,7 @@ public class ExampleSimpleButton
     GralWindow primaryWindow = graphicFactory.createWindow(log, "Example Simple Button", 'C', 50,50,400, 300);
     //
     //The widget manager is created with the primary window. Use it.
-    GralWidgetMng gralMng = primaryWindow.gralMng;
+    GralMng gralMng = primaryWindow.gralMng;
     //
     //An empty graphic window is present now. It is time to create this application class now. 
     //In an complexer application the graphic window can contain an output window, so information
@@ -258,7 +258,7 @@ public class ExampleSimpleButton
   /**This inner class creates this class with given parameter.
    */
   static class Factory{
-    ExampleSimpleButton create(GralWidgetMng gralMng){
+    ExampleSimpleButton create(GralMng gralMng){
       ExampleSimpleButton obj = new ExampleSimpleButton(gralMng);
       obj.setInitGuiCode(obj.new InitGuiCodeSimpleButton());
       return obj;

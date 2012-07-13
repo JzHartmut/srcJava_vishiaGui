@@ -177,7 +177,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   , colorTextSelect, colorTextMarked, colorTextTable;
   
 
-  public GralTable(String name, GralWidgetMng mng, int[] columnWidths) {
+  public GralTable(String name, GralMng mng, int[] columnWidths) {
     super(name, 'L', mng);
     this.columnWidthsGral = columnWidths;
     this.zColumn = columnWidths.length;
@@ -352,7 +352,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    * <li>pgdn
    * <li>{@link #keyMarkUp}
    * <li>{@link #keyMarkDn}
-   * <li>calls {@link GralWidgetMng#getRegisteredUserAction(String what)} with what="KeyAction"
+   * <li>calls {@link GralMng#getRegisteredUserAction(String what)} with what="KeyAction"
    *   and invokes the returned action method. With them all standard key actions of this application
    *   may be done if a {@link GralUserAction} is registered for that.  
    * </ul>

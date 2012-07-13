@@ -10,7 +10,7 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
@@ -671,7 +671,7 @@ public class GralArea9Window implements GralArea9_ifc
 
 
   
-  @Override public GralWidgetMng getGralMng()
+  @Override public GralMng getGralMng()
   { return window.gralMng;
   }
   

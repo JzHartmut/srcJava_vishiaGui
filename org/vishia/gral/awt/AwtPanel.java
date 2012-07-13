@@ -11,7 +11,7 @@ import java.awt.event.ComponentListener;
 import org.eclipse.swt.widgets.Control;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 
@@ -43,7 +43,7 @@ public class AwtPanel  extends GralPanelContent
 
   //protected Composite panelSwt;
   
-  private AwtPanel(String name, GralWidgetMng mng)
+  private AwtPanel(String name, GralMng mng)
   {
     super(name, mng, null);
   }
@@ -54,7 +54,7 @@ public class AwtPanel  extends GralPanelContent
    * @param panelSwt may be null, then the {@link GralPanelContent#panelComposite} should be set 
    *   after construction of a derived class.
    */
-  public AwtPanel(String name, GralWidgetMng mng, Container panelAwt)
+  public AwtPanel(String name, GralMng mng, Container panelAwt)
   {
     super(name, mng, panelAwt);
     if(panelAwt !=null){

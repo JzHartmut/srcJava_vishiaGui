@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralGraphicThread;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.msgDispatch.LogMessage;
 
 /**This class is the implementation class of a simple graphic implementation for SWT.
@@ -68,7 +68,7 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
   
   LogMessage log;
   
-  GralWidgetMng gralMng;
+  GralMng gralMng;
   
   /**The windows-closing event handler. It is used private only, but public set because documentation. 
    * The close event will be fired also when a SubWindow is closed. Therefore test the Shell instance.

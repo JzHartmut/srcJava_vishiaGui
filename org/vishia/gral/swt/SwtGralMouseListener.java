@@ -9,7 +9,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralMouseWidgetAction_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
@@ -76,7 +76,7 @@ public class SwtGralMouseListener
       Object oInfo = widget.getData();
       if(oInfo instanceof GralWidget){
         GralWidget widgetInfo = (GralWidget)oInfo;
-        GralWidgetMng guiMng = widgetInfo.getMng();
+        GralMng guiMng = widgetInfo.getMng();
         try{
           guiMng.log.sendMsg(0, "Info widget: %s / %s", widgetInfo.name, widgetInfo.getDataPath());
         } catch(Exception exc){ guiMng.writeLog(0, exc); }
@@ -94,7 +94,7 @@ public class SwtGralMouseListener
       Object oInfo = widget.getData();
       if(oInfo instanceof GralWidget){
         GralWidget widgetInfo = (GralWidget)oInfo;
-        GralWidgetMng guiMng = widgetInfo.getMng();
+        GralMng guiMng = widgetInfo.getMng();
         try{
           String sDataPath = widgetInfo.getDataPath();
           if( sDataPath ==null  //no datapath given, write info! 
@@ -123,7 +123,7 @@ public class SwtGralMouseListener
       Object oInfo = widget.getData();
       if(oInfo instanceof GralWidget){
         GralWidget widgetInfo = (GralWidget)oInfo;
-        GralWidgetMng guiMng = widgetInfo.getMng();
+        GralMng guiMng = widgetInfo.getMng();
         try{
           GralWidget widgd = (GralWidget)oInfo;
           int dx = ev.x - xDown, dy = ev.y - yDown;
@@ -220,7 +220,7 @@ public class SwtGralMouseListener
       Control widget = (Control) e.widget;  //a widget is a Control always.
       widget.addMouseMoveListener(mouseMoveListener);
       GralWidget widgg = (GralWidget)widget.getData();
-      GralWidgetMng guiMng = widgg.getMng();
+      GralMng guiMng = widgg.getMng();
       try{ 
         if(mouseWidgetAction !=null){
           switch(e.button){ 
@@ -254,7 +254,7 @@ public class SwtGralMouseListener
         isPressed = false;
         backgroundWhilePressed = null;
         GralWidget widgg = (GralWidget)widget.getData();
-        GralWidgetMng guiMng = widgg.getMng();
+        GralMng guiMng = widgg.getMng();
         try{ 
           int dx = e.x - xMousePress, dy = e.y - yMousePress;
           final int keyCode;

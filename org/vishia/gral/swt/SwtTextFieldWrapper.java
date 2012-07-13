@@ -20,7 +20,7 @@ import org.vishia.gral.base.GralMouseWidgetAction_ifc;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
@@ -79,7 +79,7 @@ public class SwtTextFieldWrapper extends GralTextField
   
   private DropTarget drop;
   
-  public SwtTextFieldWrapper(String name, Composite parent, char whatis, GralWidgetMng mng)
+  public SwtTextFieldWrapper(String name, Composite parent, char whatis, GralMng mng)
   { super(name, whatis, mng);
   }
 

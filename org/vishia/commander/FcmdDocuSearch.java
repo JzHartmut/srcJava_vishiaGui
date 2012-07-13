@@ -1,6 +1,6 @@
 package org.vishia.commander;
 
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 
 /**
  * <b>File search, current files</b>:
@@ -16,7 +16,7 @@ public interface FcmdDocuSearch {
   
   
   
-  /**The {@link GralWidgetMng#setMainKeyAction(org.vishia.gral.ifc.GralUserAction)} knows a central processing of keys,
+  /**The {@link GralMng#setMainKeyAction(org.vishia.gral.ifc.GralUserAction)} knows a central processing of keys,
    * which are invoked from all widgets. 
    * The {@link FcmdButtons#actionMainKeys} is registered for that. 
    * The method {@link FcmdButtons#processKey(int)} processes the common keys with the table

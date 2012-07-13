@@ -20,7 +20,7 @@ import org.vishia.util.KeyCode;
  * it is a widget-special key. 
  * <br><br>
  * If that method returns false or a {@link GralWidget#getActionChange()} action is not given for this widget,
- * the key will be applied to the {@link GralWidgetMng#setMainKeyAction(org.vishia.gral.ifc.GralUserAction)}.
+ * the key will be applied to the {@link GralMng#setMainKeyAction(org.vishia.gral.ifc.GralUserAction)}.
  * In that way a application-global usage of some keys is organized.
  * <br><br>
  * If any of the both widget specific or global {@link GralUserAction#userActionGui(int, GralWidget, Object...)} method 
@@ -44,7 +44,7 @@ import org.vishia.util.KeyCode;
  *  (See {@link org.vishia.util.Docu_UML_simpleNotation})
  *  <br><br>
  *  The implementing graphic system aggregates an instance of this class.
- *  An underived instance is created in the {@link GralWidgetMng.InternalPublic#gralKeyListener}.
+ *  An underived instance is created in the {@link GralMng.InternalPublic#gralKeyListener}.
  *  This instance can be used as aggregation in all implementing system listeners, if the
  *  {@link #specialKeysOfWidgetType(int, GralWidget)} should not overridden.
  *  
@@ -87,10 +87,10 @@ public class GralKeyListener implements GralKeySpecial_ifc
   public final static int version = 20120609;
  
   
-  protected final GralWidgetMng mng;
+  protected final GralMng mng;
   
   
-  public GralKeyListener(GralWidgetMng mng){
+  public GralKeyListener(GralMng mng){
     this.mng = mng;
   }
   
@@ -99,7 +99,7 @@ public class GralKeyListener implements GralKeySpecial_ifc
   public boolean keyPressed(int keyCode, GralWidget widgetDescr){
     boolean actionDone;
     final GralUserAction action = widgetDescr.getActionChange();
-    final GralWidgetMng mng = widgetDescr.itsMng;
+    final GralMng mng = widgetDescr.itsMng;
     try{
       actionDone = specialKeysOfWidgetType(keyCode, widgetDescr);
       if(!actionDone && action !=null){ 

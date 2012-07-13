@@ -8,7 +8,7 @@ import java.util.TreeMap;
 
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.widget.GralSelectList;
@@ -78,7 +78,7 @@ public class FcmdLeftMidRightPanel
   final int[] widthSelecttableSub = new int[]{2, 20, 30};
 
   
-  FcmdLeftMidRightPanel(Fcmd javaCmd, char cc, char cNr, GralWidgetMng mng){
+  FcmdLeftMidRightPanel(Fcmd javaCmd, char cc, char cNr, GralMng mng){
     this.main = javaCmd;
     this.cc = cc;
     this.cNr = cNr;
@@ -94,7 +94,7 @@ public class FcmdLeftMidRightPanel
    */
   void buildInitialTabs()
   {
-    GralWidgetMng mng = main.gralMng;
+    GralMng mng = main.gralMng;
     String sName = "Sel" + cNr;
     //inside the left/mid/right tabbed panel: create the panel which contains a tabbed panel for selection
     String nameGridPanel = FcmdWidgetNames.tabFavoritesLeftMidRight + cNr;

@@ -104,7 +104,7 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
    * @param mng
    * @param panelComposite The implementing instance for a panel.
    */
-  public GralWindow(String nameWindow, int windProps, GralWidgetMng mng, Object panelComposite)
+  public GralWindow(String nameWindow, int windProps, GralMng mng, Object panelComposite)
   {
     super( nameWindow, mng, panelComposite);
     this.windProps = windProps;

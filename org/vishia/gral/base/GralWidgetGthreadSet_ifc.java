@@ -13,7 +13,7 @@ import org.vishia.gral.ifc.GralColor;
  * This interface should be implemented in any widget deployment. It is provide by the 
  * {@link org.vishia.gral.ifc.GralWidget_ifc#getGthreadSetifc()} method.
  * It is used in the overridden method 
- * {@link GralWidgetMng#setInfoGthread(GralWidget_ifc, int, int, Object, Object)} of the graphical
+ * {@link GralMng#setInfoGthread(GralWidget_ifc, int, int, Object, Object)} of the graphical
  * implementation layer. Any change request is determined by its {@link #cmd} code, which is defined
  * in {@link org.vishia.gral.ifc.GralMng_ifc}. A switch-case calls the proper methods
  * from this interface.

@@ -8,11 +8,11 @@ import org.vishia.gral.ifc.GralWidget_ifc;
  * <br><br>
  * The ObjectModelDiagram may shown the relations:
  * <img src="../../../../img/GralWidgetGthreadSet_ifc_gral.png"><br>
- * This class is referred from the {@link GralWidgetMng.WidgetChangeRequExecuter}. A change request 
+ * This class is referred from the {@link GralMng.WidgetChangeRequExecuter}. A change request 
  * may be delayed or to execute immediately, therefore two queues exist.
  * <br>
  * The evaluation of the data of this class are done in the overridden method 
- * {@link GralWidgetMng#setInfoGthread(GralWidget_ifc, int, int, Object, Object)} of the graphical
+ * {@link GralMng#setInfoGthread(GralWidget_ifc, int, int, Object, Object)} of the graphical
  * implementation layer. Any change request is determined by its {@link #cmd} code, which is defined
  * in {@link org.vishia.gral.ifc.GralMng_ifc}. A switch-case calls the proper methods
  * from the {@link GralWidgetGthreadSet_ifc}.

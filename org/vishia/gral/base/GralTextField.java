@@ -81,7 +81,7 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   
   
   
-  public GralTextField(String name, char whatis, GralWidgetMng mng){
+  public GralTextField(String name, char whatis, GralMng mng){
     super(name, whatis, mng);
     this.windowMng = mng.gralDevice;
   }

@@ -6,7 +6,7 @@ import org.vishia.cmd.CmdGetFileArgs_ifc;
 import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetMng;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -51,7 +51,7 @@ public class GralCommandSelector extends GralSelectList
   protected CmdStore.CmdBlock selectedCmd;
   
   
-  public GralCommandSelector(String name, CmdQueue cmdQueue, GralWidgetMng mng)
+  public GralCommandSelector(String name, CmdQueue cmdQueue, GralMng mng)
   { super();
     this.cmdStore = new CmdStore();
     this.cmdQueue = cmdQueue;

@@ -60,19 +60,19 @@ import org.vishia.util.MinMaxTime;
  *    for any time. They are invoked whenever {@link #wakeup()} is called. 
  * <li><b>Version 2</b>: The order or commission can be instructed to the <code>setInfo(cmd, ...data)</code>-method
  *   of a {@link GralWidget}:
- *   <ul><li>{@link GralWidgetMng#setInfo(org.vishia.gral.base.GralWidget widget, int cmd, int ident, Object toshow, Object data)}
+ *   <ul><li>{@link GralMng#setInfo(org.vishia.gral.base.GralWidget widget, int cmd, int ident, Object toshow, Object data)}
  *   </ul>
- *   This method fills a queue of the {@link GralWidgetMng}:
- *   <ul><li>{@link GralWidgetMng.WidgetChangeRequExecuter#guiChangeRequests}
- *     <li>{@link GralWidgetMng.WidgetChangeRequExecuter#doBeforeDispatching(boolean)} polls that queue.
- *     <li>{@link GralWidgetMng#widgetChangeRequExecuter}: The instance in the GralWidgetManager.
+ *   This method fills a queue of the {@link GralMng}:
+ *   <ul><li>{@link GralMng.WidgetChangeRequExecuter#guiChangeRequests}
+ *     <li>{@link GralMng.WidgetChangeRequExecuter#doBeforeDispatching(boolean)} polls that queue.
+ *     <li>{@link GralMng#widgetChangeRequExecuter}: The instance in the GralWidgetManager.
  *   </ul>
  *   The instance is a permanent member of the {@link #queueGraphicOrders} queue, it is executed 
  *   any time when a {@link #wakeup()} will be invoked. 
  *   <br>
  *   The commission for changing any widget
  *   is given in that way with a specific command and data, which is realized in the method:
- *   <ul><li>{@link GralWidgetMng#setInfoGthread(org.vishia.gral.ifc.GralWidget_ifc, int, int, Object, Object)}
+ *   <ul><li>{@link GralMng#setInfoGthread(org.vishia.gral.ifc.GralWidget_ifc, int, int, Object, Object)}
  *   </ul>
  *   That method assigns some commands to the implementation level
  *   standard invocation methods to change widget contents such as setText() or setColor(). To support this action

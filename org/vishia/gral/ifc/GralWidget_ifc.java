@@ -23,7 +23,7 @@ import org.vishia.util.Removeable;
  *   the set interface for the graphic thread, and the proper method is invoked. The implementation of the widget
  *   executes the correct steps.
  * <li>If a set method is invoked in any other thread, the request is queued internally. 
- *   The queue is residently in the {@link org.vishia.gral.base.GralWidgetMng}. 
+ *   The queue is residently in the {@link org.vishia.gral.base.GralMng}. 
  *   The queue is processed in the graphic thread. The commission
  *   to change the widget is stored in an instance of {@link org.vishia.gral.base.GralWidgetChangeRequ}
  *   with a cmd, an index, the value.
