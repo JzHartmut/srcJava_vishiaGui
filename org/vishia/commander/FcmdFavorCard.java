@@ -182,7 +182,7 @@ public class FcmdFavorCard  extends GralSelectList
         if(fileTableLeft !=null){
           fileTableLeft.favorCard.wdgdTable.setFocus();
         } else {  //left from first is the selectAllTable of this panel.
-          mainPanel.selectTabCard.wdgdTable.setFocus();
+          mainPanel.cardFavorThemes.wdgdTable.setFocus();
         }
       }
     } else if (key == main.keyActions.keyPanelRight){

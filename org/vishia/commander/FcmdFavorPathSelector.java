@@ -199,19 +199,18 @@ class FcmdFavorPathSelector
     windSearchFiles = GralFileSelector.createWindowConfirmSearchGthread(mng);
     
     main.gui.addMenuItemGThread("menuFileNaviOriginDir", main.idents.menuFileNaviOriginDirBar, actionSetDirOrigin); // /
-    main.gui.addMenuItemGThread("menuFileNaviRefresh", main.idents.menuFileNaviRefreshBar, actionRefreshFileTable); // /
-    main.gui.addMenuItemGThread("menubarFolderCreate", main.idents.menuConfirmMkdirFileBar, main.mkCmd.actionOpenDialog); // /
+    //main.gui.addMenuItemGThread("menuFileNaviRefresh", main.idents.menuFileNaviRefreshBar, actionRefreshFileTable); // /
+    //main.gui.addMenuItemGThread("menubarFolderCreate", main.idents.menuConfirmMkdirFileBar, main.mkCmd.actionOpenDialog); // /
     main.gui.addMenuItemGThread("menubarFolderSearch", main.idents.menuBarSearchFiles, actionSearchFiles); // /
     main.gui.addMenuItemGThread("menuBarFolderSyncMidRight", main.idents.menuBarFolderSyncMidRight, actionSyncMidRight); // /
-    main.gui.addMenuItemGThread("menubarFileProps", main.idents.menuFilePropsBar, main.filePropsCmd.actionOpenDialog);
-    main.gui.addMenuItemGThread("test", main.idents.menuFileViewBar, main.viewCmd.actionOpenView);
-    main.gui.addMenuItemGThread("test", main.idents.menuFileEditBar, main.actionEdit);
-    main.gui.addMenuItemGThread("test", main.idents.menuBarEditIntern, main.editWind.actionOpenEdit);
-    main.gui.addMenuItemGThread("test", main.idents.menuConfirmCopyBar, main.copyCmd.actionConfirmCopy);
-    main.gui.addMenuItemGThread("test", main.idents.menuConfirmMoveBar, main.copyCmd.actionConfirmCopy);
-    main.gui.addMenuItemGThread("test", main.idents.menuConfirmFileDelBar, main.deleteCmd.actionConfirmDelete);
-    main.gui.addMenuItemGThread("test", main.idents.menuExecuteBar, main.executer.actionExecuteFileByExtension);
-    main.gui.addMenuItemGThread("test", main.idents.menuExecuteCmdBar, main.cmdSelector.actionExecCmdWithFiles);
+    //main.gui.addMenuItemGThread("menubarFileProps", main.idents.menuFilePropsBar, main.filePropsCmd.actionOpenDialog);
+    //main.gui.addMenuItemGThread("test", main.idents.menuFileViewBar, main.viewCmd.actionOpenView);
+    //main.gui.addMenuItemGThread("test", main.idents.menuFileEditBar, main.actionEdit);
+    //main.gui.addMenuItemGThread("test", main.idents.menuBarEditIntern, main.editWind.actionOpenEdit);
+    //main.gui.addMenuItemGThread("test", main.idents.menuConfirmCopyBar, main.copyCmd.actionConfirmCopy);
+    //main.gui.addMenuItemGThread("test", main.idents.menuConfirmFileDelBar, main.deleteCmd.actionConfirmDelete);
+    //main.gui.addMenuItemGThread("test", main.idents.menuExecuteBar, main.executer.actionExecuteFileByExtension);
+    //main.gui.addMenuItemGThread("test", main.idents.menuExecuteCmdBar, main.cmdSelector.actionExecCmdWithFiles);
 
     main.gui.addMenuItemGThread("menuBarCreateFavor", main.idents.menuBarCreateFavor, actionCreateFavor); // /
     main.gui.addMenuItemGThread("menuDelTab", main.idents.menuDelTab, actionDelTab); // /
@@ -533,7 +532,7 @@ class FcmdFavorPathSelector
         String nameWidgFileCard = FcmdWidgetNames.tabFile + fileCard.nameFilePanel;
         panel.tabbedPanelFavorCards.removePanel(nameWidgFavorCard);
         panel.tabbedPanelFileCards.removePanel(nameWidgFileCard);
-        panel.selectTabCard.setFocus();
+        panel.cardFavorThemes.setFocus();
       }
       return true;
   } };

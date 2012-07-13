@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetMng;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.KeyCode;
 
@@ -20,7 +21,7 @@ public class FcmdButtons
   /**Version, history and copyright/copyleft.
    * <ul>
    * <li>2012-06-16 Hartmut new: {@link #processKey(int)}: Now all control keys are set together with the buttons
-   *   in {@link #setFnBtn(GralUserAction, String)}.
+   *   in {@link #setBtnMenuAndKeys(GralUserAction, String)}.
    * <li>2012-01-01 created. 
    * </ul>
    * 
@@ -87,7 +88,7 @@ public class FcmdButtons
     , "sF1", "sF2", "sF3", "sF4", "sF5", "sF6", "sF7", "sF8", "sF9", "sF10"
     };
   
-  
+  /*
   int[] keys = { KeyCode.F1, KeyCode.F2, KeyCode.F3, KeyCode.F4, KeyCode.F5, KeyCode.F6, KeyCode.F7, KeyCode.F8, KeyCode.F9, KeyCode.F10
       , KeyCode.alt + KeyCode.F1, KeyCode.alt + KeyCode.F2, KeyCode.alt + KeyCode.F3, KeyCode.alt + KeyCode.F4, KeyCode.alt + KeyCode.F5, KeyCode.alt + KeyCode.F6
       , KeyCode.alt + KeyCode.F7, KeyCode.alt + KeyCode.F8, KeyCode.alt + KeyCode.F9, KeyCode.alt + KeyCode.F10
@@ -98,28 +99,39 @@ public class FcmdButtons
       , KeyCode.shift + KeyCode.F1, KeyCode.shift + KeyCode.F2, KeyCode.shift + KeyCode.F3, KeyCode.shift + KeyCode.F4, KeyCode.shift + KeyCode.F5, KeyCode.shift + KeyCode.F6
       , KeyCode.shift + KeyCode.F7, KeyCode.shift + KeyCode.F8, KeyCode.shift + KeyCode.F9, KeyCode.shift + KeyCode.F10
   };
+  */
   
   /**Actions for all keys in {@link #keys}. */
-  GralUserAction[] keyAction = new GralUserAction[50];
+  //GralUserAction[] keyAction = new GralUserAction[50];
   
-  
+  Map<Integer, GralUserAction> idxKeyAction = new TreeMap<Integer, GralUserAction>();
   
   ButtonAction currentButton;
   
   
   
-  /**Assign an action to any function button.
+  /**Assign an action to any function button, menu and key.
    * @param action The action
    * @param buttonText use the form "Btn:text" where button is F1..F12, aF1 etc. text is the text.
    */
-  void setFnBtn(GralUserAction action, String buttonText){
-    int posSep = buttonText.indexOf(':');
-    if(posSep > 0){
-      ButtonAction buttonAction = new ButtonAction(action, buttonText.substring(0, posSep), buttonText.substring(posSep+1));
-      idxButtons.put(buttonAction.button, buttonAction);
-    } else {
-      System.err.println("faulty button text, should have format \"F1:text\"");
+  void setBtnMenuAndKeys(GralUserAction action, String buttonText, int key, String menu){
+    if(buttonText !=null){
+      int posSep = buttonText.indexOf(':');
+      if(posSep > 0){
+        ButtonAction buttonAction = new ButtonAction(action, buttonText.substring(0, posSep), buttonText.substring(posSep+1));
+        idxButtons.put(buttonAction.button, buttonAction);
+      } else {
+        System.err.println("faulty button text, should have format \"F1:text\"");
+      }
     }
+    if(key !=0){
+      idxKeyAction.put(key, action);
+    }
+    if(menu !=null){
+      main.gui.addMenuItemGThread(null, menu, action);
+
+    }
+    
   }
   
   
@@ -146,37 +158,47 @@ public class FcmdButtons
     ButtonAction button = getNext(idx, iterButtonAction);
     GralButton gralButton = main.gralMng.addButton(button.button, button.action, "", null, null, button.text);
     gralButton.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.Button." + button.text + ".");
-    keyAction[idx] = button.action;
+    //keyAction[idx] = button.action;
   }
   
   
   void initPanelButtons()
   {
-    setFnBtn(main.gui.getActionHelp(), main.idents.buttonHelp);
-    setFnBtn(main.filePropsCmd.actionOpenDialog, main.idents.buttonFileProps);
-    setFnBtn(main.viewCmd.actionOpenView, main.idents.buttonFileView);
-    setFnBtn(main.editWind.actionOpenEdit, main.idents.buttonEditIntern);
-    setFnBtn(main.actionEdit, main.idents.buttonFileEdit);
-    setFnBtn(main.copyCmd.actionConfirmCopy, main.idents.buttonFileCopy);
-    setFnBtn(main.copyCmd.actionConfirmCopy, main.idents.buttonFileMove);
-    setFnBtn(main.mkCmd.actionOpenDialog, main.idents.buttonMkdirFile);
-    setFnBtn(main.deleteCmd.actionConfirmDelete, main.idents.buttonFileDel);
-    setFnBtn(main.executer.actionExecuteFileByExtension, main.idents.buttonExecute);
-    setFnBtn(main.favorPathSelector.actionRefreshFileTable, main.idents.buttonRefereshFiles);
-    setFnBtn(main.selectPanelLeft, main.idents.buttonFavorLeft);
-    setFnBtn(main.selectPanelMiddle, main.idents.buttonFavorMiddle);
-    setFnBtn(main.selectPanelRight, main.idents.buttonFavorRight);
-    setFnBtn(main.actionFocusCmdCard, main.idents.buttonFocusCmd);
-    setFnBtn(main.favorPathSelector.actionSortFilePerNameNonCase, main.idents.buttonFileSortNameNonCase);
-    setFnBtn(main.favorPathSelector.actionSortFilePerNameCase, main.idents.buttonFileSortNameCase);
-    setFnBtn(main.favorPathSelector.actionSortFilePerExtensionNonCase, main.idents.buttonFileSortExtNonCase);
-    setFnBtn(main.favorPathSelector.actionSortFilePerExtensionCase, main.idents.buttonFileSortExtCase);
-    setFnBtn(main.favorPathSelector.actionSortFilePerTimestamp, main.idents.buttonFileSortDateNewest);
-    setFnBtn(main.favorPathSelector.actionSortFilePerTimestampOldestFirst, main.idents.buttonFileSortOldest);
-    setFnBtn(main.favorPathSelector.actionSortFilePerLenghLargestFirst, main.idents.buttonFileSortSizeLarge);
-    setFnBtn(main.favorPathSelector.actionSortFilePerLenghSmallestFirst, main.idents.buttonFileSortSizeSmall);
+    //This calls creates the menu entries in the menu bar. The order determines the order in menu bar. It registeres the button strings and keys.
+    setBtnMenuAndKeys(main.gui.getActionHelp(), main.idents.buttonHelp, main.idents.keyHelp,main.idents.menuHelpBar);
+    setBtnMenuAndKeys(main.filePropsCmd.actionOpenDialog, main.idents.buttonFileProps, main.idents.keyFileProps, main.idents.menuFilePropsBar);
+    setBtnMenuAndKeys(main.viewCmd.actionOpenView, main.idents.buttonFileView, main.idents.keyFileView, main.idents.menuFileViewBar);
+    setBtnMenuAndKeys(main.editWind.actionOpenEdit, main.idents.buttonEditIntern, main.idents.keyEditIntern, main.idents.menuBarEditIntern);
+    setBtnMenuAndKeys(main.actionEdit, main.idents.buttonFileEdit, main.idents.keyFileEdit, main.idents.menuFileEditBar);
+    setBtnMenuAndKeys(main.copyCmd.actionConfirmCopy, main.idents.buttonFileCopy, main.idents.keyFileCopy, main.idents.menuConfirmCopyBar);
+    setBtnMenuAndKeys(main.mkCmd.actionOpenDialog, main.idents.buttonMkdirFile, main.idents.keyFileCreate, main.idents.menuConfirmMkdirFileBar);
+    setBtnMenuAndKeys(main.deleteCmd.actionConfirmDelete, main.idents.buttonFileDel, main.idents.keyFileDel1, main.idents.menuConfirmFileDelBar);
+    setBtnMenuAndKeys(main.deleteCmd.actionConfirmDelete, null, main.idents.keyFileDel2, null);
+    setBtnMenuAndKeys(main.executer.actionExecuteFileByExtension, main.idents.buttonExecute, main.idents.keyExecuteExt, main.idents.menuExecuteBar);
+    setBtnMenuAndKeys(main.favorPathSelector.actionRefreshFileTable, main.idents.buttonRefereshFiles, main.idents.keyRefresh1, main.idents.menuFileNaviRefreshBar);
+    setBtnMenuAndKeys(main.favorPathSelector.actionRefreshFileTable, null, main.idents.keyRefresh2, null);
+    setBtnMenuAndKeys(main.favorPathSelector.actionRefreshFileTable, null, main.idents.keyRefresh3, null);
     
-    setFnBtn(actionViewButtons, main.idents.buttonViewButtons);
+    setBtnMenuAndKeys(main.selectCardThemesLeft, main.idents.buttonFavorLeft, main.idents.keyFavorLeft, main.idents.menuBarNavigationLeft);
+    setBtnMenuAndKeys(main.selectCardThemesMiddle, main.idents.buttonFavorMiddle, main.idents.keyFavorMiddle, main.idents.menuBarNavigationMiddle);
+    setBtnMenuAndKeys(main.selectCardThemesRight, main.idents.buttonFavorRight, main.idents.keyFavorRight, main.idents.menuBarNavigationRight);
+    
+    setBtnMenuAndKeys(main.selectFileCardLeft,  main.idents.buttonSelectPanelLeft,    main.idents.keySelectPanelLeft,   main.idents.menuBarSelectPanelLeft);
+    setBtnMenuAndKeys(main.selectFileCardMid,   main.idents.buttonSelectPanelMiddle,  main.idents.keySelectPanelMiddle, main.idents.menuBarSelectPanelMiddle);
+    setBtnMenuAndKeys(main.selectFileCardRight, main.idents.buttonSelectPanelRight,   main.idents.keySelectPanelRight,  main.idents.menuBarSelectPanelRight);
+    setBtnMenuAndKeys(main.selectFileCardOther, main.idents.buttonSelectPanelOther,   main.idents.keySelectPanelOther,  main.idents.menuBarSelectPanelOther);
+    
+    setBtnMenuAndKeys(main.actionFocusCmdCard, main.idents.buttonFocusCmd, main.idents.keyFocusCmd, main.idents.menuBarNavigatonCmd);
+    setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerNameNonCase, main.idents.buttonFileSortNameNonCase, main.idents.keyFileSortNameNonCase, main.idents.menuBarFileSortNameNonCase);
+    setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerNameCase, main.idents.buttonFileSortNameCase, main.idents.keyFileSortNameCase, main.idents.menuBarFileSortNameCase);
+    setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerExtensionNonCase, main.idents.buttonFileSortExtNonCase, main.idents.keyFileSortExtNonCase, main.idents.menuBarFileSortExtNonCase);
+    setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerExtensionCase, main.idents.buttonFileSortExtCase, main.idents.keyFileSortExtCase, main.idents.menuBarFileSortExtCase);
+    setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerTimestamp, main.idents.buttonFileSortDateNewest, main.idents.keyFileSortDateNewest, main.idents.menuBarFileSortDateNewest);
+    setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerTimestampOldestFirst, main.idents.buttonFileSortOldest, main.idents.keyFileSortDateLast, main.idents.menuBarFileSortDateOldest);
+    setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerLenghLargestFirst, main.idents.buttonFileSortSizeLarge, main.idents.keyFileSortSizeLarge, main.idents.menuBarFileSortSizeLarge);
+    setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerLenghSmallestFirst, main.idents.buttonFileSortSizeSmall, main.idents.keyFileSortSizeSmall, main.idents.menuBarFileSortSizeSmall);
+    
+    setBtnMenuAndKeys(actionViewButtons, main.idents.buttonViewButtons, main.idents.keyViewButtons, main.idents.menuBarViewButtons);
     main.gui.addMenuItemGThread("menuBarViewButtons", main.idents.menuBarViewButtons, actionViewButtons);
     
     Iterator<Map.Entry<String, ButtonAction>> iterButtonAction = idxButtons.entrySet().iterator();
@@ -228,25 +250,23 @@ public class FcmdButtons
 
   
   /**Searches the given keyCode and processes its action. 
-   * The action was set initially from the {@link #setFnBtn(GralUserAction, String)} with key assignment in {@link FcmdIdents}.
+   * The action was set initially from the {@link #setBtnMenuAndKeys(GralUserAction, String)} with key assignment in {@link FcmdIdents}.
    * @param keyCode
    * @return true if done.
    */
   boolean processKey(int keyCode){
-    for(int ix = 0; ix< keyAction.length; ++ix){
-      if(keys[ix] == keyCode){
-        if(keyAction[ix] !=null){
-          boolean bDone = keyAction[ix].userActionGui(keyCode, null);
-          return bDone;
-        } else return false;
-      }
+    GralUserAction action = idxKeyAction.get(keyCode);
+    if(action !=null){
+      boolean bDone = action.userActionGui(keyCode, null);
+      return bDone;
+    } else {
+      return false;
     }
-    return false; //NOTE: returns inside too!
   }
   
 
   
-  /**Action to focus the cmd card.
+  /**The main key action registered in the {@link GralWidgetMng#setMainKeyAction(GralUserAction)}.
    */
   GralUserAction actionMainKeys = new GralUserAction()
   {

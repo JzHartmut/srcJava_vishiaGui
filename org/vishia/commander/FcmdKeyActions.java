@@ -84,6 +84,9 @@ public class FcmdKeyActions
     main = parent;
   }
   
+  /**
+   * @deprecated
+   */
   GralUserAction commanderKeyActions = new GralUserAction()
   { @Override public boolean userActionGui(int keyCode, GralWidget widgd, Object... params)
     { boolean done = false;
@@ -103,9 +106,9 @@ public class FcmdKeyActions
       else if(keyCode == main.idents.keyWindFullOut){ main.windMng.actionWindFullOut.userActionGui(KeyCode.menuEntered, widgd, params); }
       else if(keyCode == main.idents.keyExecCmdFile) { main.cmdSelector.executeCurrCmdWithFiles(); }
       else if(keyCode == main.idents.keyCreateFavor) { main.favorPathSelector.confirmCreateNewFavor(); }
-      else if(keyCode == main.idents.keyFavorLeft) { main.selectPanelLeft.userActionGui(KeyCode.menuEntered, widgd); }
-      else if(keyCode == main.idents.keyFavorMiddle) { main.selectPanelMiddle.userActionGui(KeyCode.menuEntered, widgd); }
-      else if(keyCode == main.idents.keyFavorRight) { main.selectPanelRight.userActionGui(KeyCode.menuEntered, widgd); }
+      else if(keyCode == main.idents.keyFavorLeft) { main.selectCardThemesLeft.userActionGui(KeyCode.menuEntered, widgd); }
+      else if(keyCode == main.idents.keyFavorMiddle) { main.selectCardThemesMiddle.userActionGui(KeyCode.menuEntered, widgd); }
+      else if(keyCode == main.idents.keyFavorRight) { main.selectCardThemesRight.userActionGui(KeyCode.menuEntered, widgd); }
       else if(keyCode == main.idents.keyViewButtons) { main.fButtons.actionViewButtons.userActionGui(KeyCode.menuEntered, widgd); }
       else { done = false; }
       return done;

@@ -180,9 +180,9 @@ public class Fcmd extends GuiCfg
 
     gui.setFrameAreaBorders(30, 65, 70, 85); // x1, x2, y1, y2
     //gui.setStandardMenusGThread(new File("."), actionFile);
-    gui.addMenuItemGThread("menuBarFavorsLeft", idents.menuBarNavigationLeft, selectPanelLeft);
-    gui.addMenuItemGThread("menuBarFavorsMiddle", idents.menuBarNavigationMiddle, selectPanelMiddle);
-    gui.addMenuItemGThread("menuBarFavorsRight", idents.menuBarNavigationRight, selectPanelRight);
+    gui.addMenuItemGThread("menuBarFavorsLeft", idents.menuBarNavigationLeft, selectCardThemesLeft);
+    gui.addMenuItemGThread("menuBarFavorsMiddle", idents.menuBarNavigationMiddle, selectCardThemesMiddle);
+    gui.addMenuItemGThread("menuBarFavorsRight", idents.menuBarNavigationRight, selectCardThemesRight);
     gui.addMenuItemGThread("menuBarNavigatonCmd", idents.menuBarNavigatonCmd, actionFocusCmdCard);
     
     // gui.set
@@ -587,44 +587,96 @@ public class Fcmd extends GuiCfg
     }
   };
 
-  /**
-   * Key alt-F1 to select a directory/cmd list in a list of directories for the
+  /**Key alt-F1 to select a directory/cmd list in a list of directories for the
    * left panel. The original Norton Commander approach is to select a drive
    * letter for windows. Selection of paths instead are adequate.
    */
-  GralUserAction selectPanelLeft = new GralUserAction()
+  GralUserAction selectCardThemesLeft = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-        favorPathSelector.panelLeft.selectTabCard.wdgdTable.setFocus();
+        favorPathSelector.panelLeft.cardFavorThemes.wdgdTable.setFocus();
         return true;
       } else return false;
     }
   };
 
-  /**
-   * Key alt-F2 to select a directory/cmd list in a list of directories for the
+  /**Key alt-F2 to select a directory/cmd list in a list of directories for the
    * middle panel.
    */
-  GralUserAction selectPanelMiddle = new GralUserAction()
+  GralUserAction selectCardThemesMiddle = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-        favorPathSelector.panelMid.selectTabCard.wdgdTable.setFocus();
+        favorPathSelector.panelMid.cardFavorThemes.wdgdTable.setFocus();
         return true;
       } else return false;
     }
   };
 
-  /**
-   * Key alt-F3 to select a directory/cmd list in a list of directories for the
+  /**Key alt-F3 to select a directory/cmd list in a list of directories for the
    * right panel.
    */
-  GralUserAction selectPanelRight = new GralUserAction()
+  GralUserAction selectCardThemesRight = new GralUserAction()
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        favorPathSelector.panelRight.selectTabCard.wdgdTable.setFocus();
+        favorPathSelector.panelRight.cardFavorThemes.wdgdTable.setFocus();
+        return true;
+      } else return false;
+    }
+  };
+
+  /**Key sh-F1 to select a directory/cmd list in a list of directories for the
+   * right panel.
+   */
+  GralUserAction selectFileCardLeft = new GralUserAction()
+  {
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        favorPathSelector.panelLeft.actFileCard.setFocus();
+        return true;
+      } else return false;
+    }
+  };
+
+  /**Key sh-F2 to select a directory/cmd list in a list of directories for the
+   * right panel.
+   */
+  GralUserAction selectFileCardMid = new GralUserAction()
+  {
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        favorPathSelector.panelMid.actFileCard.setFocus();
+        return true;
+      } else return false;
+    }
+  };
+
+  /**Key sh-F3 to select a directory/cmd list in a list of directories for the
+   * right panel.
+   */
+  GralUserAction selectFileCardRight = new GralUserAction()
+  {
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        favorPathSelector.panelRight.actFileCard.setFocus();
+        return true;
+      } else return false;
+    }
+  };
+
+  /**Key sh-F3 to select a directory/cmd list in a list of directories for the
+   * right panel.
+   */
+  GralUserAction selectFileCardOther = new GralUserAction()
+  {
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        if(lastFilePanels.size() >=2){
+          FcmdLeftMidRightPanel otherPanel = lastFilePanels.get(1);
+          otherPanel.actFileCard.setFocus();
+        }
         return true;
       } else return false;
     }

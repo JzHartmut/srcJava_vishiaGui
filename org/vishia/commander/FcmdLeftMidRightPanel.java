@@ -41,7 +41,7 @@ public class FcmdLeftMidRightPanel
   GralTabbedPanel tabbedPanelFavorCards;
   
   /**Table widget for the select table.*/
-  FcmdFavorTabCard selectTabCard;
+  FcmdFavorTabCard cardFavorThemes;
 
   /**List of all Tabs of this Panel, used and unused. This tabs are presented in the {@link FcmdFavorTabCard} table*/
   List<FcmdFileCard> listTabs = new LinkedList<FcmdFileCard>();
@@ -83,7 +83,7 @@ public class FcmdLeftMidRightPanel
     this.cc = cc;
     this.cNr = cNr;
     this.ixMainPanel = cNr - '1';
-    selectTabCard = new FcmdFavorTabCard(main, this);
+    cardFavorThemes = new FcmdFavorTabCard(main, this);
     
   }
   
@@ -112,7 +112,7 @@ public class FcmdLeftMidRightPanel
     mng.setPosition(0, 0, 0, 0, 1, 'd');
     tabbedPanelFavorCards.addGridPanel(nameGridPanel, tabLabelGridPanel, 1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd');
-    selectTabCard.setToPanel(mng, FcmdWidgetNames.tableFavoritesMain + cNr, 'A');
+    cardFavorThemes.setToPanel(mng, FcmdWidgetNames.tableFavoritesMain + cNr, 'A');
     fillCards();  //build the rest of all tabs and panels depending on content of favorites.
     
     if(cNr == '1'){ //commands only in the left panel.
@@ -131,10 +131,10 @@ public class FcmdLeftMidRightPanel
    */
   void fillCards(){
     
-    selectTabCard.clear();   //the common favor path table.
+    cardFavorThemes.clear();   //the common favor path table.
     //clear index of entries, it is a mirror of content of the GUI-visible table and prevents
     //twice adding.
-    selectTabCard.indexFavorFolders.clear();  
+    cardFavorThemes.indexFavorFolders.clear();  
     //clear all GUI tables of this main tab.
     for(FcmdFileCard fileTabs: listTabs){
       fileTabs.favorCard.clear();
@@ -165,9 +165,9 @@ public class FcmdLeftMidRightPanel
     final String[] cells = new String[2];
     cells[0] = "";
     cells[1] = from1;
-    selectTabCard.wdgdTable.insertLine(null, -1, cells, favorFolderFrom1);
+    cardFavorThemes.wdgdTable.insertLine(null, -1, cells, favorFolderFrom1);
     cells[1] = from2;
-    selectTabCard.wdgdTable.insertLine(null, -1, cells, favorFolderFrom2);
+    cardFavorThemes.wdgdTable.insertLine(null, -1, cells, favorFolderFrom2);
 
     //List of favor pathes for this main panel
     for(FcmdFavorPathSelector.FavorFolder favorFolder: main.favorPathSelector.listAllFavorPathFolders){ //panel specific favorites
@@ -184,7 +184,7 @@ public class FcmdLeftMidRightPanel
           fileTab.favorCard.fillFavorPaths(favorFolder);
         }
       }
-      selectTabCard.addFavorFolder(favorFolder);
+      cardFavorThemes.addFavorFolder(favorFolder);
       //tabSelector.initActDir(indexActualDir, info.selectName, info.path);
      
     }

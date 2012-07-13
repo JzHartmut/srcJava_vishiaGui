@@ -53,9 +53,9 @@ public class FcmdIdents
 
   int keyHelp = KeyCode.F1;
 
-  String menuBarViewButtons = "&Window/view Buttons [sF1]";
-  String buttonViewButtons = "sF1:hide Btns";
-  int keyViewButtons = KeyCode.shift + KeyCode.F1;
+  String menuBarViewButtons = "&Window/view Buttons [cF1]";
+  String buttonViewButtons = "cF1:hide Btns";
+  int keyViewButtons = KeyCode.ctrl + KeyCode.F1;
 
   
   
@@ -121,25 +121,15 @@ public class FcmdIdents
 
   int keyEditIntern = KeyCode.shift | KeyCode.F4;
   
-  String menuConfirmCopyBar = "&File/&Copy [F6]";
+  String menuConfirmCopyBar = "&File/&Copy, move [F6]";
 
-  String menuConfirmCopyContext = "&Copy [F6]";
+  String menuConfirmCopyContext = "&Copy, move [F6]";
 
-  String buttonFileCopy = "F6:copy";
+  String buttonFileCopy = "F6:copy / mv";
 
   int keyFileCopy = KeyCode.F6;
   /**Window title. */
   String windConfirmCopy = "confirm copy";
-
-  
-  String menuConfirmMoveBar = "&File/&Move [F6]";
-
-  String menuConfirmMoveContext = "Move [F6]";
-
-  String buttonFileMove = "Fx:copy";
-
-  /**Window title. */
-  String windConfirmMove = "confirm move";
 
   
   
@@ -183,11 +173,13 @@ public class FcmdIdents
   
   
   /**Opens the 'execute with' choice table with the selected file.  */
-  String menuExecuteBar = "&File/&Execute [F9]";
+  String menuExecuteBar = "&File/&Execute by .ext [Enter]";
 
-  String menuExecuteContext = "exec [F9]";
+  String menuExecuteContext = "execute .ext [Enter]";
 
-  String buttonExecute = "F9:exec";
+  String buttonExecute = null;
+  
+  int keyExecuteExt = 0;   //Note: It is realized in the file table.
 
   /**Window title. */
   String windConfirmExecute = "execute with";
@@ -201,17 +193,39 @@ public class FcmdIdents
   String buttonExecuteCmd = "cF9:cmd";
 
   
-  String menuBarNavigationLeft = "&Navigation/left [aF1]";
-  String buttonFavorLeft = "aF1:left";
+  String menuBarNavigationLeft = "&Navigation/themes left [aF1]";
+  String buttonFavorLeft = "aF1:fav-left";
   int keyFavorLeft = KeyCode.alt + KeyCode.F1;
 
-  String menuBarNavigationMiddle = "&Navigation/mid [aF2]";
-  String buttonFavorMiddle = "aF2:middle";
+  String menuBarNavigationMiddle = "&Navigation/themes mid [aF2]";
+  String buttonFavorMiddle = "aF2:fav-mid";
   int keyFavorMiddle = KeyCode.alt + KeyCode.F2;
 
-  String menuBarNavigationRight = "&Navigation/right [aF3]";
-  String buttonFavorRight = "aF3:right";
+  String menuBarNavigationRight = "&Navigation/themes right [aF3]";
+  String buttonFavorRight = "aF3:fav-right";
   int keyFavorRight = KeyCode.alt + KeyCode.F3;
+  
+  
+  String menuBarSelectPanelLeft = "&Navigation/select left [shF1]";
+  String buttonSelectPanelLeft = "sF1:left";
+  int keySelectPanelLeft = KeyCode.shift + KeyCode.F1;
+
+  String menuBarSelectPanelMiddle = "&Navigation/select mid [shF2]";
+  String buttonSelectPanelMiddle = "sF2:middle";
+  int keySelectPanelMiddle = KeyCode.shift + KeyCode.F2;
+
+  String menuBarSelectPanelRight = "&Navigation/select right [shF3]";
+  String buttonSelectPanelRight = "sF3:right";
+  int keySelectPanelRight = KeyCode.shift + KeyCode.F3;
+  
+  /**"&Navigation/select &other [ctrl-tab]" */
+  String menuBarSelectPanelOther = "&Navigation/select &other [ctrl-tab]";
+  String buttonSelectPanelOther = "cTab:other";
+  int keySelectPanelOther = KeyCode.ctrl + '\t';
+  
+  
+  
+  
   
   
   int keyExecCmdFile = KeyCode.ctrl + KeyCode.enter;
@@ -220,7 +234,8 @@ public class FcmdIdents
   
   String menuBarNavigatonCmd = "&Navigation/cmd [F9]";
   String buttonFocusCmd = "F9:cmdTable";
-
+  int keyFocusCmd = KeyCode.F9;
+  
   
 
   String menuFilesCpBar = "fol&Der/com&Pare folder tree";
