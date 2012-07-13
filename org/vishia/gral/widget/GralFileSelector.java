@@ -674,31 +674,35 @@ public class GralFileSelector implements Removeable //extends GralWidget
     selectList.wdgdTable.clearTable(); //setValue(GralMng_ifc.cmdClear, -1, null, null);
     //FileRemote dir = new FileRemote(path);
     //FileRemote rdir = (FileRemote)dir;
-    File dir;
-    if(fileIn.isDirectory()){
-      dir =fileIn;
+    File dir = null;
+    if(fileIn.exists()){
+      if(fileIn.isDirectory()){
+        dir =fileIn;
+      } else {
+        dir = fileIn.getParentFile(); 
+        String sDir = FileSystem.getCanonicalPath(dir); //with / as separator!
+        String sFile = fileIn.getName();
+        indexSelection.put(sDir, sFile);
+  
+      }
+      this.currentDir = dir;
+      if(originDir == null){
+        originDir = dir; //path;      //sets on the first invocation. 
+      }
+      //this.sCurrentDir = FileSystem.getCanonicalPath(dir) + "/";
+      this.sCurrentDir = dir.getPath();
+      if(sCurrentDir.endsWith("/"))
+        stop();
+      //widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sCurrentDir);
+      widgdPath.setText(sCurrentDir, -1);
     } else {
-      dir = fileIn.getParentFile(); 
-      String sDir = FileSystem.getCanonicalPath(dir); //with / as separator!
-      String sFile = fileIn.getName();
-      indexSelection.put(sDir, sFile);
-
+      widgdPath.setText("?? " + fileIn.getAbsolutePath()); 
     }
-    this.currentDir = dir;
-    if(originDir == null){
-      originDir = dir; //path;      //sets on the first invocation. 
-    }
-    //this.sCurrentDir = FileSystem.getCanonicalPath(dir) + "/";
-    this.sCurrentDir = dir.getPath();
-    if(sCurrentDir.endsWith("/"))
-      stop();
-    //widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sCurrentDir);
-    widgdPath.setText(sCurrentDir, -1);
     //widgdPath.setSelection("|..<");
     long timeNow = System.currentTimeMillis();
     
     int lineSelect = 0;  
-    if(dir.exists() && dir.isDirectory()){
+    if(dir !=null && dir.exists() && dir.isDirectory()){
       File[] files = dir.listFiles();
       if(files !=null){ 
         Map<String, File> sortFiles = new TreeMap<String, File>();

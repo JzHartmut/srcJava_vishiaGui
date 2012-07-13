@@ -1600,15 +1600,16 @@ public class SwtMng extends GralWidgetMng implements GralMngBuild_ifc, GralMng_i
 	  if(owidg !=null){
 	    Control swtWidget = (Control)owidg;
 	    GralPanelContent panel = widgd.pos.panel;
-	    GralRectangle size = panel.getPixelPositionSize();
-	    //Point size = swtWidget.getParent().getSize();
-  	  //Composite parent = swtWidget.
-	    //widgd.pos is the Position in its panel:
-  	  GralRectangle posSize = calcWidgetPosAndSize(widgd.pos, size.dx, size.dy, 0, 0);
+	    GralRectangle size = panel.getPixelSize();
+	    GralRectangle posSize = calcWidgetPosAndSize(widgd.pos, size.dx, size.dy, 0, 0);
   	  swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
   	  swtWidget.redraw();
 	  } else if( (owidg = widgd.getWidgetMultiImplementations())!=null){
 	    Control[] swtWidgets = (Control[])owidg;
+	    //TODO that is not comparable with one implementation widget.
+	    //The gral position and size should be known for implementation widgets to resize!
+	    //But the size is a property of GralWidget.
+	    //The resizing can be done only for one implementation widget.
 	    for( Control swtWidget: swtWidgets){
 	      Point size = swtWidget.getParent().getSize();
 	      //Composite parent = swtWidget.

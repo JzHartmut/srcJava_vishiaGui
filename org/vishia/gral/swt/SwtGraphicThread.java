@@ -25,6 +25,7 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
   /**Version, able to read as hex yyyymmdd, history and license.
    * Changes:
    * <ul>
+   * <li<2012-07-14 Hartmut chg: {@link #traverseKeyFilter} now excludes [ctrl-tab]. Only [tab] is a traversal key.
    * <li>2012-04-16 Hartmut chg: {@link #initGraphic()} now creates the main window, creates the
    *   {@link SwtMng} instead it is doing in the non-graphic thread. 
    * <li>2012-04-10 Hartmut chg: Now the traversal keys ctrl-Pgdn/up are disabled.
@@ -127,8 +128,13 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
    */
   Listener traverseKeyFilter = new Listener(){
     @Override public void handleEvent(Event event) {
-      // TODO Auto-generated method stub
-      if(event.detail == SWT.TRAVERSE_PAGE_NEXT || event.detail == SWT.TRAVERSE_PAGE_PREVIOUS){
+      int traverseIdent = event.detail; 
+      int key = event.keyCode;
+      int keyModifier = event.stateMask;
+      if(  traverseIdent == SWT.TRAVERSE_PAGE_NEXT         //the pg-dn key in SWT
+        || traverseIdent == SWT.TRAVERSE_PAGE_PREVIOUS   //the pg-up key in SWT
+        || key == '\t' && keyModifier == SWT.CTRL
+        ) {
         event.doit = false;
       }
       stop();
