@@ -184,8 +184,11 @@ public class FcmdButtons
     setBtnMenuAndKeys(main.selectCardThemesRight, main.idents.buttonFavorRight, main.idents.keyFavorRight, main.idents.menuBarNavigationRight);
     
     setBtnMenuAndKeys(main.selectFileCardLeft,  main.idents.buttonSelectPanelLeft,    main.idents.keySelectPanelLeft,   main.idents.menuBarSelectPanelLeft);
+    setBtnMenuAndKeys(main.selectFileCardLeft,  null,                                main.idents.keySelectPanelLeft2,   null);
     setBtnMenuAndKeys(main.selectFileCardMid,   main.idents.buttonSelectPanelMiddle,  main.idents.keySelectPanelMiddle, main.idents.menuBarSelectPanelMiddle);
+    setBtnMenuAndKeys(main.selectFileCardMid,   null,                                main.idents.keySelectPanelMiddle2, null);
     setBtnMenuAndKeys(main.selectFileCardRight, main.idents.buttonSelectPanelRight,   main.idents.keySelectPanelRight,  main.idents.menuBarSelectPanelRight);
+    setBtnMenuAndKeys(main.selectFileCardRight, null,                                main.idents.keySelectPanelRight2,  null);
     setBtnMenuAndKeys(main.selectFileCardOther, main.idents.buttonSelectPanelOther,   main.idents.keySelectPanelOther,  main.idents.menuBarSelectPanelOther);
     
     setBtnMenuAndKeys(main.actionFocusCmdCard, main.idents.buttonFocusCmd, main.idents.keyFocusCmd, main.idents.menuBarNavigatonCmd);

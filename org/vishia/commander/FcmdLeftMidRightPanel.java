@@ -126,6 +126,19 @@ public class FcmdLeftMidRightPanel
   }
   
 
+  void setFocus(){
+    if(actFileCard !=null){
+      actFileCard.setFocus();
+    } else {
+      main.setLastSelectedPanel(this);
+      cardFavorThemes.setFocus();
+    }
+  }
+  
+
+  
+  
+  
   /**
    * @param which Number 1 2 3 for left, mid, right
    */
@@ -222,6 +235,10 @@ public class FcmdLeftMidRightPanel
     return fileCard;
   }
     
+  
+  @Override public String toString(){ return "panel " + cc; }
+  
+  
     
   class FcmdFavorTabCard extends GralSelectList
   {
@@ -347,7 +364,7 @@ public class FcmdLeftMidRightPanel
     @Override protected boolean actionUserKey(int key, Object userData,
         GralTableLine_ifc line)
     { boolean ret = true;
-      FcmdFavorPathSelector.FavorFolder favorTabInfo = (FcmdFavorPathSelector.FavorFolder)userData;
+      //FcmdFavorPathSelector.FavorFolder favorTabInfo = (FcmdFavorPathSelector.FavorFolder)userData;
       //TODO not used no more
       if (key ==KeyCode.shift + KeyCode.F5){
         //reread the configuration file.

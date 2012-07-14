@@ -430,10 +430,7 @@ public class FcmdFileCard extends GralFileSelector
   private void setActFilePanel_setColorCurrLine(){
     main.lastFavorCard = favorCard;
     mainPanel.actFileCard = FcmdFileCard.this;
-    if(main.lastFilePanels.size() == 0 || main.lastFilePanels.get(0) != mainPanel){
-      main.lastFilePanels.remove(mainPanel);  //if it is in list on higher position
-      main.lastFilePanels.add(0, mainPanel);
-    }
+    main.setLastSelectedPanel(mainPanel);
     int ixMainPanel = -1;
     for(FcmdLeftMidRightPanel panel: main.lastFilePanels){
       if(panel.actFileCard !=null){

@@ -209,14 +209,17 @@ public class FcmdIdents
   String menuBarSelectPanelLeft = "&Navigation/select left [shF1]";
   String buttonSelectPanelLeft = "sF1:left";
   int keySelectPanelLeft = KeyCode.shift + KeyCode.F1;
+  int keySelectPanelLeft2 = KeyCode.alt + KeyCode.shift + KeyCode.F1;
 
   String menuBarSelectPanelMiddle = "&Navigation/select mid [shF2]";
   String buttonSelectPanelMiddle = "sF2:middle";
   int keySelectPanelMiddle = KeyCode.shift + KeyCode.F2;
+  int keySelectPanelMiddle2 = KeyCode.alt + KeyCode.shift + KeyCode.F2;
 
   String menuBarSelectPanelRight = "&Navigation/select right [shF3]";
   String buttonSelectPanelRight = "sF3:right";
   int keySelectPanelRight = KeyCode.shift + KeyCode.F3;
+  int keySelectPanelRight2 = KeyCode.alt + KeyCode.shift + KeyCode.F3;
   
   /**"&Navigation/select &other [ctrl-tab]" */
   String menuBarSelectPanelOther = "&Navigation/select &other [ctrl-tab]";

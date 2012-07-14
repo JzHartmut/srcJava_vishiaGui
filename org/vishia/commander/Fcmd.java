@@ -231,6 +231,10 @@ public class Fcmd extends GuiCfg
     guiW.outputBox.setActionChange(executer.actionCmdFromOutputBox);
     String sHelpUrlDir = cargs.dirHtmlHelp.getAbsolutePath();
     gui.setHelpUrl(sHelpUrlDir + "/Fcmd.html");
+    lastFilePanels.add(favorPathSelector.panelMid);
+    lastFilePanels.add(favorPathSelector.panelRight);
+    lastFilePanels.add(favorPathSelector.panelLeft);
+    favorPathSelector.panelMid.cardFavorThemes.setFocus();
   }
 
   @Override
@@ -320,7 +324,13 @@ public class Fcmd extends GuiCfg
   }
   
   
-  
+  void setLastSelectedPanel(FcmdLeftMidRightPanel panel){
+    if(lastFilePanels.size() == 0 || lastFilePanels.get(0) != panel){
+      lastFilePanels.remove(panel);  //if it is in list on higher position
+      lastFilePanels.add(0, panel);
+    }
+
+  }
 
   /**Get the last selected files in order of selection of the file panels.
    * New method since 2011-12-23
@@ -634,7 +644,7 @@ public class Fcmd extends GuiCfg
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        favorPathSelector.panelLeft.actFileCard.setFocus();
+        favorPathSelector.panelLeft.setFocus();
         return true;
       } else return false;
     }
@@ -647,7 +657,7 @@ public class Fcmd extends GuiCfg
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        favorPathSelector.panelMid.actFileCard.setFocus();
+        favorPathSelector.panelMid.setFocus();
         return true;
       } else return false;
     }
@@ -660,7 +670,7 @@ public class Fcmd extends GuiCfg
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        favorPathSelector.panelRight.actFileCard.setFocus();
+        favorPathSelector.panelRight.setFocus();
         return true;
       } else return false;
     }
@@ -675,12 +685,15 @@ public class Fcmd extends GuiCfg
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if(lastFilePanels.size() >=2){
           FcmdLeftMidRightPanel otherPanel = lastFilePanels.get(1);
-          otherPanel.actFileCard.setFocus();
+          otherPanel.setFocus();
         }
         return true;
       } else return false;
     }
   };
+  
+  
+  
 
   /**Action to focus the cmd card.
    */
