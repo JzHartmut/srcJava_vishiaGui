@@ -67,7 +67,7 @@ public class GuiCallingArgs
   /**Size, either A,B or F for 800x600, 1024x768 or full screen. */
   public char sizeShow = 'C';
   
-  public int xLeftPixelWindow = 50, yTopPixelWindow = 50, dxPixelWindow = 730, dyPixelWindow = 520;
+  public int xLeftPixelWindow = 50, yTopPixelWindow = 50, dxPixelWindow = 930, dyPixelWindow = 520;
   
   /**The own ipc-address for Interprocess-Communication with the target.
    * It is a string, which determines the kind of communication.

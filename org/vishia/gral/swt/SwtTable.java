@@ -15,6 +15,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -37,10 +38,52 @@ import org.vishia.util.KeyCode;
 
 public class SwtTable  extends GralTable {
 
+  /**Version and history
+   * <ul>
+   * <li>2012-07-15 Hartmut new: search functionality: This implementation have a text field 
+   *   which shows the search string. While up and down keys the that lines are selected which text in the {@link #ixColumn}
+   *   starts whith the search string.
+   * <li>2012-01-06 Hartmut new: concept of a table which is independent of the table implementation 
+   *   of the table implementations in the graphic system layer or in operation system: 
+   *   The capability  of a SWT-table is not sufficient, for example the color of the selection bar
+   *   is not able to change. Other reason: Implementation of table in SWT, AWT, Swing is different.
+   *   It seems better to have one table concept with independent features, which based on simple widgets.
+   *   is not  
+   * </ul>
+   * 
+   * <b>Copyright/Copyleft</b>:
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL ist not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but don't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you are intent to use this sources without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   * 
+   */
+  @SuppressWarnings("hiding")
+  public final static int version = 20120715;
+
   /**The widget manager is stored in the base class too, but here as SWT-type reference. */
   private final SwtMng mng;
   
   private Text[][] cellsSwt;
+  
+  private Text swtSearchText;
   
   private final SwtTable.Table table; 
   
@@ -164,6 +207,20 @@ public class SwtTable  extends GralTable {
   @Override protected void repaintGthread(){
     if(!table.isDisposed()){
       setAllCellContentGthread();
+      Color colorSelectBack =  mng.getColorImpl(super.colorSelectCharsBack);
+      Color colorSelect =  mng.getColorImpl(super.colorSelectChars);
+      if(searchChars.length() >0){
+        swtSearchText.setBackground(colorSelectBack);
+        swtSearchText.setForeground(colorSelect);
+        //swtSearchText.
+        swtSearchText.setText(searchChars.toString());
+        Point tabSize = table.getSize();
+        swtSearchText.setBounds(xpixelCell[ixColumn] + 10, tabSize.y - linePixel, xpixelCell[ixColumn+1] - xpixelCell[ixColumn] - 10, linePixel);
+        swtSearchText.setVisible(true);
+        
+      } else {
+        swtSearchText.setVisible(false);
+      }
       //System.out.println("swtTable redrawed");
       table.superRedraw();  //this is the core-redraw
       redrawtime = System.currentTimeMillis();
@@ -318,7 +375,6 @@ public class SwtTable  extends GralTable {
     Rectangle parentBounds = table.getParent().getBounds();
     GralRectangle pixTable = pos.calcWidgetPosAndSize(itsMng.propertiesGui(), parentBounds.width, parentBounds.height, 0, 0);
     int xPixelUnit = itsMng.propertiesGui().xPixelUnit();
-    int[] xpixelCell = new int[columnWidthsGral.length+1];
     int xPixel1 = 0;
     xpixelCell[0] = xPixel1;
     int ixPixelCell;
@@ -357,6 +413,10 @@ public class SwtTable  extends GralTable {
       for(int iCol = 0; iCol < zColumns; ++iCol){
         menuColumns[iCol] = new SwtMenu(name + "_menu" + iCol, this, (GralMng)itsMng);
       }
+      //NOTE: only if the swtSelectText is created first, it will drawn in in the foreground of the other cells.
+      swtSearchText = new Text(this, SWT.LEFT | SWT.SINGLE | SWT.READ_ONLY);
+      swtSearchText.setFont(font);
+      swtSearchText.setVisible(false);
       for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){
         for(int iCol = 0; iCol < zColumns; ++iCol){
           Text cell = new Text(this, SWT.LEFT | SWT.SINGLE | SWT.READ_ONLY);
@@ -375,6 +435,9 @@ public class SwtTable  extends GralTable {
         }
         yPix += linePixel;
       }
+      //The text field for selection string
+
+      
     }
 
     
@@ -400,6 +463,10 @@ public class SwtTable  extends GralTable {
     private void superRedraw(){
       super.update(); 
       super.redraw();
+      if(searchChars.length() >0){
+        //swtSelectText.update();
+        //swtSelectText.redraw();
+      }
     }
     
     
@@ -513,6 +580,7 @@ public class SwtTable  extends GralTable {
       //it calls repaint with delay.
       SwtTable.this.resizeTable(boundsTable.width, boundsTable.height);
       SwtTable.this.setBoundsCells();
+      
     }
     
   };

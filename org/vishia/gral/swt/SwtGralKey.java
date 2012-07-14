@@ -60,6 +60,8 @@ public class SwtGralKey extends KeyCode
       case SWT.INSERT:      key = ins; break;
       case SWT.DEL:         key = del; break;
       case 0x0d:            key = enter; break;
+      case 0x08:            key = back; break;
+      case 0x1b:            key = esc; break;
       default: key = keyCode;
     }
     return stateKeys + key;

@@ -24,6 +24,9 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   /**Version and history
    * <ul>
+   * <li>2012-07-15 Hartmut new: search functionality: The implementation should/may have a text field 
+   *   which shows the search string. While up and down keys the that lines are selected which text in the {@link #ixColumn}
+   *   starts whith the search string.
    * <li>2012-03-09 Hartmut bugfix: The {@link #idxLine} was not cleared if the table was cleared.
    * <li>2012-02-19 Hartmut new: mouseWheel and double click
    * <li>2012-01-30 Hartmut new: {@link #setColorCurrLine(GralColor)}
@@ -78,7 +81,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    * 
    */
   @SuppressWarnings("hiding")
-  public final static int version = 0x20120113;
+  public final static int version = 20120715;
 
   
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
@@ -109,6 +112,9 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   /**Pixel per line. */
   protected int linePixel;
   
+  protected final int[] xpixelCell;
+
+  
   /**Index (subscript) of the current line and current column. 0 is the left column or top line.
    * -1 means that nothing is selected. */
   protected int ixLine, ixLineNew, ixColumn;
@@ -133,6 +139,9 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    * which has the selection color and which should be gotten the selection color.
    */
   protected int ixGlineSelected = -1, ixGlineSelectedNew = -1;
+  
+  
+  protected final StringBuilder searchChars = new StringBuilder(20);
   
   /**Any line of the table has one TableItemWidget, a long table has some more.
    * Contains content, color, selection etc. of the lines with there columns.
@@ -176,10 +185,13 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   //, colorBackSelectNonFocused, colorBackMarkedNonFocused, colorBackTableNonFocused
   , colorTextSelect, colorTextMarked, colorTextTable;
   
+  
+  protected GralColor colorSelectCharsBack, colorSelectChars;
 
   public GralTable(String name, GralMng mng, int[] columnWidths) {
     super(name, 'L', mng);
     this.columnWidthsGral = columnWidths;
+    this.xpixelCell = new int[columnWidthsGral.length+1];
     this.zColumn = columnWidths.length;
     //this.colorBack = new GralColor[zLineVisibleMax];
     //this.colorText = new GralColor[zLineVisibleMax];
@@ -238,6 +250,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     //colorBackMarkedNonFocused = GralColor.getColor("lrd");
     //colorBackTableNonFocused = GralColor.getColor("gr");
     colorTextTable = GralColor.getColor("bk");
+    colorSelectCharsBack = GralColor.getColor("lgr");
+    colorSelectChars = GralColor.getColor("wh");
   }
   
   
@@ -327,6 +341,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     ixLineNew = ixLine = -1;
     ixGlineSelectedNew = -1;  //deselects ixGlineSelected on redraw!
     idxLine.clear();
+    searchChars.setLength(0);
     repaint(200,200);
   }
 
@@ -382,7 +397,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
       case KeyCode.mouseWheelUp:
       case KeyCode.up: {
         if(ixLine > 0){
-          ixLineNew = ixLine - keyRepetition;
+          //ixLineNew = ixLine - keyRepetition;
+          searchContent(true);
           if(ixLineNew <0){ ixLineNew = 0; }
         }
         keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
@@ -390,7 +406,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
       case KeyCode.mouseWheelDn:
       case KeyCode.dn: {
         if(ixLine < zLine -1){
-          ixLineNew = ixLine + keyRepetition;
+          //ixLineNew = ixLine + keyRepetition;
+          searchContent(false);
           if(ixLineNew >= zLine ){ ixLineNew = zLine -1; }
         }
         keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
@@ -404,7 +421,18 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
         keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
       } break;
       default:
-        done = false;
+        if(KeyCode.isTextKey(keyCode)){
+          searchChars.appendCodePoint(keyCode);
+          repaint();
+        } else if(keyCode == KeyCode.esc){
+          searchChars.setLength(0);
+          repaint();
+        } else if(keyCode == KeyCode.back && searchChars.length() >0){
+          searchChars.setLength(searchChars.length()-1);
+          repaint();
+        } else {
+          done = false;
+        }
       }//switch
       if(done == false && keyCode == keyMarkDn && ixLine >=0){
         GralTableLine_ifc line = tableLines.get(ixLine);
@@ -445,6 +473,54 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     return done;
   }
 
+  
+  
+  
+  /**Increments or decrements ixLineNew in [up] or [dn] situation until the {@link #searchChars} are found.
+   * @param bUp direction
+   * @return
+   */
+  protected void searchContent(boolean bUp){
+    if(searchChars.length() >0){
+      String search = searchChars.toString();
+      int ixLineNewAct = ixLineNew;
+      boolean contSearch = true;
+      do{
+        if(bUp && ixLineNew > 0){        //up
+          ixLineNew -=1;
+        } else if(!bUp && ixLineNew < zLine-1){ //down
+          ixLineNew +=1;
+        } else {
+          ixLineNew = ixLineNewAct;
+          contSearch = false;                 //eand reached
+        }
+        if(contSearch){
+          GralTableLine_ifc lineGral = tableLines.get(ixLineNew);
+          String sText = lineGral.getCellText(ixColumn).toLowerCase();
+          if(searchChars.charAt(0) == '*'){
+            contSearch = false;  //TODO
+          } else {
+            if(!sText.startsWith(search)){
+            } else {
+              contSearch = false;                   //found
+            }
+          }
+        }
+      } while(contSearch);
+      
+    } else {
+      if(bUp && ixLineNew > 0){        //up
+        ixLineNew -=1;
+      } else if(!bUp && ixLineNew < zLine-1){ //down
+        ixLineNew +=1;
+      }
+    }
+  }
+  
+  
+  
+  
+  
   
   /**This callback is need because the paint of a table needs more time if a slow processor is used
    * and the key repeat rate is higher than the calculation time. After finishing all paint requests
