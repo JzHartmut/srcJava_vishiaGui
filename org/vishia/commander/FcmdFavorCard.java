@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.gral.widget.GralSelectList;
 import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
@@ -92,6 +93,21 @@ public class FcmdFavorCard  extends GralSelectList
   }
   
   
+  /**Overrides the {@link GralFileSelector#setFocus()} and calls him, before that sets the color
+   * of the current line of table of all 3 current file panels to the 3-stage color
+   * to see which table has the focus. 
+   */
+  @Override public boolean setFocus(){ 
+    mainPanel.bFavorCardHasFocus = true;
+    mainPanel.bFavorThemeCardHasFocus = false;
+    //setActFilePanel_setColorCurrLine();
+    return super.setFocus(); 
+  }
+  
+  
+
+  
+  
   /**Removes this file card with its widgets and data. It is 'close tab'. */
   @Override public boolean remove(){
     super.remove();
@@ -170,6 +186,7 @@ public class FcmdFavorCard  extends GralSelectList
       main.favorPathSelector.readCfg(main.favorPathSelector.fileCfg);
       main.favorPathSelector.panelLeft.fillCards();
       
+    /*
     } else if (key == main.keyActions.keyPanelLeft){
       //sets focus to left
       FcmdFileCard fileTableLeft = null;
@@ -204,6 +221,7 @@ public class FcmdFavorCard  extends GralSelectList
       FcmdLeftMidRightPanel dstPanel = mainPanel == main.favorPathSelector.panelLeft ?
           main.favorPathSelector.panelMid : main.favorPathSelector.panelRight;
       if(dstPanel.actFileCard !=null){ dstPanel.actFileCard.favorCard.setFocus(); }
+    */
     } else if (key == main.keyActions.keyCreateFavorite){
       main.favorPathSelector.actFavorPathInfo = favorPathInfo; //info in the line of table.
       main.favorPathSelector.windAddFavorite.widgLabel.setText("file3");
@@ -218,11 +236,12 @@ public class FcmdFavorCard  extends GralSelectList
     return ret;
   }
   
-  /**Action to show the file properties in the info line. This action is called anytime if a line
-   * was changed in the file view table. */
+  /**Action is called any time if a line was focused in the favor table. */
   GralUserAction actionFavorSelected = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
       if(actionCode == KeyCode.tableLineSelect){
+        mainPanel.bFavorCardHasFocus = true;
+        mainPanel.bFavorThemeCardHasFocus = false;
         main.lastFavorCard = FcmdFavorCard.this;
         GralTableLine_ifc line = (GralTableLine_ifc) params[0];
         Object oData = line.getUserData();

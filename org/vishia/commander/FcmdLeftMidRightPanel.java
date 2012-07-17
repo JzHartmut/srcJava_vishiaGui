@@ -11,6 +11,7 @@ import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
+import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.widget.GralSelectList;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.util.Assert;
@@ -41,13 +42,20 @@ public class FcmdLeftMidRightPanel
   GralTabbedPanel tabbedPanelFavorCards;
   
   /**Table widget for the select table.*/
-  FcmdFavorTabCard cardFavorThemes;
+  FcmdFavorThemeCard cardFavorThemes;
 
-  /**List of all Tabs of this Panel, used and unused. This tabs are presented in the {@link FcmdFavorTabCard} table*/
+  /**List of all Tabs of this Panel, used and unused. This tabs are presented in the {@link FcmdFavorThemeCard} table*/
   List<FcmdFileCard> listTabs = new LinkedList<FcmdFileCard>();
   
   /**The current opened file card. */
   FcmdFileCard actFileCard;
+  
+  /**If the favor card is in foreground, it contains true. If the file card is in foreground, it contains false.
+   * The information will be set in the select line methods of the table.
+   */
+  boolean bFavorCardHasFocus = true;
+  
+  boolean bFavorThemeCardHasFocus= true;
   
   //final FcmdFavorPathSelector.FavorFolder actFavorFolder;
   
@@ -83,7 +91,7 @@ public class FcmdLeftMidRightPanel
     this.cc = cc;
     this.cNr = cNr;
     this.ixMainPanel = cNr - '1';
-    cardFavorThemes = new FcmdFavorTabCard(main, this);
+    cardFavorThemes = new FcmdFavorThemeCard(main, this);
     
   }
   
@@ -128,7 +136,7 @@ public class FcmdLeftMidRightPanel
 
   void setFocus(){
     if(actFileCard !=null){
-      actFileCard.setFocus();
+      actFileCard.setFocusFavorOrFile();
     } else {
       main.setLastSelectedPanel(this);
       cardFavorThemes.setFocus();
@@ -136,8 +144,6 @@ public class FcmdLeftMidRightPanel
   }
   
 
-  
-  
   
   /**
    * @param which Number 1 2 3 for left, mid, right
@@ -236,18 +242,52 @@ public class FcmdLeftMidRightPanel
   }
     
   
+  
   @Override public String toString(){ return "panel " + cc; }
   
   
+  boolean focusLeftCard(){ 
+    FcmdFileCard fileTableLeft = null;
+    boolean found = false;
+    for(FcmdFileCard fileTable: listTabs){
+      if(fileTable == actFileCard){ found = true;  break;}
+      fileTableLeft = fileTable;  //save this table as table left, use if found.
+    }
+    if(found){
+      if(fileTableLeft !=null){
+        fileTableLeft.setFocusFavorOrFile(); 
+      } else {  //left from first is the selectAllTable of this panel.
+        cardFavorThemes.wdgdTable.setFocus();
+      }
+    }
+    return true; 
+  }
+  
+  
+  boolean focusRightCard(){ 
+    //sets focus to right
+    FcmdFileCard fileTableRight = null;
+    boolean found = bFavorThemeCardHasFocus; //true if the left card is focused.
+    for(FcmdFileCard fileTable: listTabs){
+      if(found){ fileTableRight = fileTable; break; }  //use this next table if found before.
+      if(fileTable == actFileCard) { found = true; }
+    }
+    if(fileTableRight !=null){
+      fileTableRight.setFocusFavorOrFile(); 
+    }
+    return true; 
+  }
+  
+  
     
-  class FcmdFavorTabCard extends GralSelectList
+  class FcmdFavorThemeCard extends GralSelectList
   {
     /**Index of all entries in the visible list. */
     Map<String, FcmdFavorPathSelector.FavorFolder> indexFavorFolders = new TreeMap<String, FcmdFavorPathSelector.FavorFolder>();
     
     final int[] widthSelecttableMain = new int[]{10, 30};
 
-    public FcmdFavorTabCard(Fcmd main, FcmdLeftMidRightPanel panel)
+    public FcmdFavorThemeCard(Fcmd main, FcmdLeftMidRightPanel panel)
     { //super(name, mng);
     }
 
@@ -255,6 +295,7 @@ public class FcmdLeftMidRightPanel
     
     public void setToPanel(GralMngBuild_ifc panel, String name, char size){
       super.setToPanel(panel, name, 20, widthSelecttableMain, size);
+      wdgdTable.setActionOnLineSelected(actionFavorThemeLineSelected);
       wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.tabSelect.");
     }
 
@@ -361,42 +402,27 @@ public class FcmdLeftMidRightPanel
      * </ul>
      * @see org.vishia.gral.widget.GralSelectList#actionUserKey(int, java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
      */
-    @Override protected boolean actionUserKey(int key, Object userData,
-        GralTableLine_ifc line)
+    @Override protected boolean actionUserKey(int key, Object userData, GralTableLine_ifc line)
     { boolean ret = true;
-      //FcmdFavorPathSelector.FavorFolder favorTabInfo = (FcmdFavorPathSelector.FavorFolder)userData;
-      //TODO not used no more
-      if (key ==KeyCode.shift + KeyCode.F5){
-        //reread the configuration file.
-        main.favorPathSelector.readCfg(main.favorPathSelector.fileCfg);
-        main.favorPathSelector.panelLeft.fillCards();
-        
-      } else if (key == main.keyActions.keyPanelRight){
-        //sets focus to right
-        FcmdFileCard fileTableRight = listTabs.get(0);
-        if(fileTableRight !=null){
-          fileTableRight.favorCard.wdgdTable.setFocus();
-        }
-      } else if (key == main.keyActions.keyMainPanelLeft){
-        String mainPanelId = FcmdLeftMidRightPanel.this == main.favorPathSelector.panelRight ? ".2" : ".1";
-        for(GralWidget widg: main.gralMng.getWidgetsInFocus()){
-          if(widg.name.contains(mainPanelId)){
-            widg.setFocus();
-          }
-        }
-      } else if (key == main.keyActions.keyMainPanelRight){
-        String mainPanelId = FcmdLeftMidRightPanel.this == main.favorPathSelector.panelLeft ? ".2" : ".3";
-        for(GralWidget widg: main.gralMng.getWidgetsInFocus()){
-          if(widg.name.contains(mainPanelId)){
-            widg.setFocus();
-          }
-        }
-      } else {
-        ret = false;
-      }//
+      ret = false;
       return ret;
     }
 
+    /**Action is called any time if a line was focused in the favor theme table. */
+    GralUserAction actionFavorThemeLineSelected = new GralUserAction(){
+      @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
+        if(actionCode == KeyCode.tableLineSelect){
+          bFavorThemeCardHasFocus = true;
+          GralTableLine_ifc line = (GralTableLine_ifc) params[0];
+          Object oData = line.getUserData();
+          //System.out.println("FcmdFavorCard.actionFavorSelected: " + fileTable.label);
+        }
+        return true;
+      }
+    };
+    
+
+    
   }
   
   

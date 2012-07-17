@@ -190,6 +190,12 @@ public class FcmdButtons
     setBtnMenuAndKeys(main.selectFileCardRight, main.idents.buttonSelectPanelRight,   main.idents.keySelectPanelRight,  main.idents.menuBarSelectPanelRight);
     setBtnMenuAndKeys(main.selectFileCardRight, null,                                main.idents.keySelectPanelRight2,  null);
     setBtnMenuAndKeys(main.selectFileCardOther, main.idents.buttonSelectPanelOther,   main.idents.keySelectPanelOther,  main.idents.menuBarSelectPanelOther);
+
+    setBtnMenuAndKeys(main.actionFocusCardInPanelToLeft, main.idents.buttonFocusLeftCard,   main.idents.keyFocusLeftCard,  main.idents.menuBarFocusLeftCard);
+    setBtnMenuAndKeys(main.actionFocusCardInPanelToRight, main.idents.buttonFocusRightCard,   main.idents.keyFocusRightCard,  main.idents.menuBarFocusRightCard);
+    setBtnMenuAndKeys(main.actionFocusPanelToLeft, main.idents.buttonFocusPanelToLeft,   main.idents.keyFocusPanelToLeft,  main.idents.menuBarFocusPaneltoLeft);
+    setBtnMenuAndKeys(main.actionFocusPanelToRight, main.idents.buttonFocusPanelToRight,   main.idents.keyFocusPanelToRight,  main.idents.menuBarFocusPanelToRight);
+
     
     setBtnMenuAndKeys(main.actionFocusCmdCard, main.idents.buttonFocusCmd, main.idents.keyFocusCmd, main.idents.menuBarNavigatonCmd);
     setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerNameNonCase, main.idents.buttonFileSortNameNonCase, main.idents.keyFileSortNameNonCase, main.idents.menuBarFileSortNameNonCase);

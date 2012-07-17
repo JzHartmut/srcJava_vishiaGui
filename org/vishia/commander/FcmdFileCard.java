@@ -93,7 +93,7 @@ public class FcmdFileCard extends GralFileSelector
   File currentFile;
   
   /**If not null, then should synchronize with this file card. */
-  FcmdFileCard otherFileCardtoSync;  
+  FcmdFileCard otherFileCardtoSync; 
   
   /**If not null, then it is the base dir for synchronization with the {@link #otherFileCardtoSync}. 
    * It will be set in {@link FcmdFilesCp#setDirs()}. */
@@ -202,7 +202,15 @@ public class FcmdFileCard extends GralFileSelector
 
   }
   
+  void setFocusFavorOrFile(){
+    if(mainPanel.bFavorCardHasFocus){
+      favorCard.setFocus();
+    } else {
+      this.setFocus();
+    }
+  }
   
+
   
   
   /**Overrides the {@link GralFileSelector#setFocus()} and calls him, before that sets the color
@@ -210,9 +218,13 @@ public class FcmdFileCard extends GralFileSelector
    * to see which table has the focus. 
    */
   @Override public boolean setFocus(){ 
+    mainPanel.bFavorCardHasFocus = false;
+    mainPanel.bFavorThemeCardHasFocus = false;
     setActFilePanel_setColorCurrLine();
     return super.setFocus(); 
   }
+  
+  
   
   
   
@@ -276,6 +288,7 @@ public class FcmdFileCard extends GralFileSelector
       //focuses the panel which is the selection panel for this file table.
       GralWidget tableSelection = main.gralMng.getWidget(FcmdWidgetNames.tableFavorites + nameFilePanel);
       tableSelection.setFocus();
+    /*
     } else if (keyCode == main.keyActions.keyPanelLeft){
       //sets focus to left
       FcmdFileCard fileTableLeft = null;
@@ -311,6 +324,7 @@ public class FcmdFileCard extends GralFileSelector
       FcmdLeftMidRightPanel dstPanel = mainPanel == main.favorPathSelector.panelLeft ?
           main.favorPathSelector.panelMid : main.favorPathSelector.panelRight;
       if(dstPanel.actFileCard !=null){ dstPanel.actFileCard.setFocus(); }
+    */
     } else {
       ret = false;
     }
@@ -455,6 +469,8 @@ public class FcmdFileCard extends GralFileSelector
      * @see org.vishia.gral.ifc.GralUserAction#userActionGui(int, org.vishia.gral.base.GralWidget, java.lang.Object[])
      */
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
+      mainPanel.bFavorCardHasFocus = false;
+      mainPanel.bFavorThemeCardHasFocus = false;
       GralTableLine_ifc line = (GralTableLine_ifc) params[0];
       String sFileCell = line.getCellText(GralFileSelector.kColFilename);
       Object oData = line.getUserData();

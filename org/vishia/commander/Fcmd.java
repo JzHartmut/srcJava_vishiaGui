@@ -692,6 +692,27 @@ public class Fcmd extends GuiCfg
     }
   };
   
+
+  GralUserAction actionFocusPanelToLeft = new GralUserAction("FcmdLeftMidRightPanel.actionRightCard"){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
+      FcmdLeftMidRightPanel actPanel = lastFilePanels.get(0);
+      if(actPanel.cc == 'm'){ favorPathSelector.panelLeft.setFocus(); }
+      else if(actPanel.cc == 'r'){ favorPathSelector.panelMid.setFocus(); }
+      return true; 
+    }
+  };
+  
+
+  GralUserAction actionFocusPanelToRight = new GralUserAction("FcmdLeftMidRightPanel.actionRightCard"){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
+      FcmdLeftMidRightPanel actPanel = lastFilePanels.get(0);
+      if(actPanel.cc == 'm'){ favorPathSelector.panelRight.setFocus(); }
+      else if(actPanel.cc == 'l'){ favorPathSelector.panelMid.setFocus(); }
+      return true; 
+    }
+  };
+  
+
   
   
 
@@ -706,6 +727,30 @@ public class Fcmd extends GuiCfg
       } else return false;
     }
   };
+  
+  
+  
+  GralUserAction actionFocusCardInPanelToLeft = new GralUserAction("FcmdLeftMidRightPanel.actionLeftCard"){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
+      lastFilePanels.get(0).focusLeftCard();
+      return true; 
+    }
+  };
+  
+  
+  GralUserAction actionFocusCardInPanelToRight = new GralUserAction("FcmdLeftMidRightPanel.actionRightCard"){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
+      //sets focus to right
+      lastFilePanels.get(0).focusRightCard();
+      return true; 
+    }
+  };
+  
+
+  
+  
+  
+  
 
   /**
    * Key F4 for edit command. Its like Norton Commander.

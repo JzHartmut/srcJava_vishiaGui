@@ -58,15 +58,15 @@ public class FcmdKeyActions
   
   int keyPanelSelection = KeyCode.alt + KeyCode.dn;
   
-  int keyPanelFile = KeyCode.alt + KeyCode.ctrl + KeyCode.up;
+  //int keyPanelFile = KeyCode.alt + KeyCode.ctrl + KeyCode.up;
   
-  int keyPanelLeft = KeyCode.alt + KeyCode.ctrl + KeyCode.left;
+  //int keyPanelLeft = KeyCode.alt + KeyCode.ctrl + KeyCode.left;
   
-  int keyPanelRight = KeyCode.alt + KeyCode.ctrl + KeyCode.right;
+  //int keyPanelRight = KeyCode.alt + KeyCode.ctrl + KeyCode.right;
   
-  int keyMainPanelLeft = KeyCode.alt + KeyCode.shift + KeyCode.left;
+  //int keyMainPanelLeft = KeyCode.alt + KeyCode.shift + KeyCode.left;
   
-  int keyMainPanelRight = KeyCode.alt + KeyCode.shift + KeyCode.right;
+  //int keyMainPanelRight = KeyCode.alt + KeyCode.shift + KeyCode.right;
   
 
   /**Show files in the current selected dir. Entry in the directory. */
@@ -106,9 +106,9 @@ public class FcmdKeyActions
       else if(keyCode == main.idents.keyWindFullOut){ main.windMng.actionWindFullOut.userActionGui(KeyCode.menuEntered, widgd, params); }
       else if(keyCode == main.idents.keyExecCmdFile) { main.cmdSelector.executeCurrCmdWithFiles(); }
       else if(keyCode == main.idents.keyCreateFavor) { main.favorPathSelector.confirmCreateNewFavor(); }
-      else if(keyCode == main.idents.keyFavorLeft) { main.selectCardThemesLeft.userActionGui(KeyCode.menuEntered, widgd); }
-      else if(keyCode == main.idents.keyFavorMiddle) { main.selectCardThemesMiddle.userActionGui(KeyCode.menuEntered, widgd); }
-      else if(keyCode == main.idents.keyFavorRight) { main.selectCardThemesRight.userActionGui(KeyCode.menuEntered, widgd); }
+      //else if(keyCode == main.idents.keyFavorLeft) { main.selectCardThemesLeft.userActionGui(KeyCode.menuEntered, widgd); }
+      //else if(keyCode == main.idents.keyFavorMiddle) { main.selectCardThemesMiddle.userActionGui(KeyCode.menuEntered, widgd); }
+      //else if(keyCode == main.idents.keyFavorRight) { main.selectCardThemesRight.userActionGui(KeyCode.menuEntered, widgd); }
       else if(keyCode == main.idents.keyViewButtons) { main.fButtons.actionViewButtons.userActionGui(KeyCode.menuEntered, widgd); }
       else { done = false; }
       return done;

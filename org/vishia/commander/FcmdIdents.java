@@ -209,22 +209,39 @@ public class FcmdIdents
   String menuBarSelectPanelLeft = "&Navigation/select left [shF1]";
   String buttonSelectPanelLeft = "sF1:left";
   int keySelectPanelLeft = KeyCode.shift + KeyCode.F1;
-  int keySelectPanelLeft2 = KeyCode.alt + KeyCode.shift + KeyCode.F1;
+  int keySelectPanelLeft2 = KeyCode.shiftAlt + KeyCode.F1;
 
   String menuBarSelectPanelMiddle = "&Navigation/select mid [shF2]";
   String buttonSelectPanelMiddle = "sF2:middle";
   int keySelectPanelMiddle = KeyCode.shift + KeyCode.F2;
-  int keySelectPanelMiddle2 = KeyCode.alt + KeyCode.shift + KeyCode.F2;
+  int keySelectPanelMiddle2 = KeyCode.shiftAlt + KeyCode.F2;
 
   String menuBarSelectPanelRight = "&Navigation/select right [shF3]";
   String buttonSelectPanelRight = "sF3:right";
   int keySelectPanelRight = KeyCode.shift + KeyCode.F3;
-  int keySelectPanelRight2 = KeyCode.alt + KeyCode.shift + KeyCode.F3;
+  int keySelectPanelRight2 = KeyCode.shiftAlt + KeyCode.F3;
   
   /**"&Navigation/select &other [ctrl-tab]" */
   String menuBarSelectPanelOther = "&Navigation/select &other [ctrl-tab]";
   String buttonSelectPanelOther = "cTab:other";
   int keySelectPanelOther = KeyCode.ctrl + '\t';
+  
+  
+  String menuBarFocusLeftCard = "&Navigation/focus to left card [sh-alt-left]";
+  String buttonFocusLeftCard = null;
+  int keyFocusLeftCard = KeyCode.shiftAlt + KeyCode.left;
+  
+  String menuBarFocusRightCard = "&Navigation/focus to right card [sh-alt-right]";
+  String buttonFocusRightCard = null;
+  int keyFocusRightCard = KeyCode.shiftAlt + KeyCode.right;
+  
+  String menuBarFocusPaneltoLeft = "&Navigation/focus to left panel [sh-alt-pgup]";
+  String buttonFocusPanelToLeft = null;
+  int keyFocusPanelToLeft = KeyCode.shiftAlt + KeyCode.pgup;
+  
+  String menuBarFocusPanelToRight = "&Navigation/focus to right panel [sh-alt-pgdn]";
+  String buttonFocusPanelToRight = null;
+  int keyFocusPanelToRight = KeyCode.shiftAlt + KeyCode.pgdn;
   
   
   

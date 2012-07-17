@@ -25,18 +25,16 @@ import org.vishia.util.KeyCode;
  */
 public abstract class GralUserAction
 {
-  /**Version and history:
+  /**Version, history and license.
    * <ul>
-   * <li>2011-10-23 Hartmut chg: Not it is not an interface but a abstract class with the KeyCode-sensitive method.
+   * <li>2012-07-15 Hartmut new: Constructor with name only for debug (it's nice to have to see anything what it is).
+   * <li>2011-10-23 Hartmut chg: Now it is not an interface but a abstract class with the KeyCode-sensitive method.
    *   All implementations yet uses the anonymous class, therefore no changes in its usage.
    *   Typical the implementation is a simple inheritance embedded as inner class.
    *   Then an abstract class is able to use like a interface.
    *   The idea is, don't use the String determined method any more, instead the new method with KeyCode.
    *   All calling should call both methods, but the user can implement only one of them. The other returns false.
    *   So only the calling places in sources should be adapted for usage yet. 
-   * </ul>
-  /**Version, history and license.
-   * <ul>
    * <li>2011-06-00 Hartmut created
    * </ul>
    * 
@@ -65,7 +63,11 @@ public abstract class GralUserAction
    */
   public static final int version = 20120303;
 
+  final String name;
   
+  public GralUserAction(String ident){ name = ident; }
+  
+  public GralUserAction(){ name = ""; }
   
   /**Call of users method while a widget is activated.
    * Usual intensions:
@@ -104,5 +106,10 @@ public abstract class GralUserAction
    */
   public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ return false; }
   
+  
+  /**Only for debug, to see what it is.
+   * @see java.lang.Object#toString()
+   */
+  @Override public String toString(){ return name; }
   
 }
