@@ -299,7 +299,7 @@ public class FcmdIdents
   String menuBarFileSortDateNewest = "&File/&Sort/&Date newest";
   String menuContextFileSortDateNewest = "&Sort/&Date newest";
   String buttonFileSortDateNewest = "cF5:newest";
-  int keyFileSortDateNewest = KeyCode.shift + KeyCode.F5;
+  int keyFileSortDateNewest = KeyCode.ctrl + KeyCode.F5;
 
   String menuBarFileSortDateOldest = "&File/&Sort/date &Oldest";
   String menuContextFileSortOldest = "&Sort/date &Oldest";

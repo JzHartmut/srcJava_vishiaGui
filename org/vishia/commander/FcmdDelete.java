@@ -29,7 +29,7 @@ public class FcmdDelete
   
   GralWindow_ifc windConfirmDelete;
 
-  GralTextField_ifc widgDeletePath, widgTrashPath;
+  GralTextField_ifc widgDeleteDir, widgDeletePath, widgTrashPath;
   
   GralValueBar widgProgress;
   
@@ -40,7 +40,11 @@ public class FcmdDelete
 
   /**Name of the file which is attempt to delete. */
   List<File> listFileDel;
-  //String sFileDelete;
+  
+  /**Content of the widgDeletePath on confirmation invocation, to compare on actionDelete.
+   * If the user does not change the field, the listFileDel is valid.
+   */
+  String sFileDelete;
  
   final List<Event> listEvDel = new LinkedList<Event>();
 
@@ -48,6 +52,10 @@ public class FcmdDelete
   /**The file card where the directory content is shown where the file will be deleted.
    */
   FcmdFileCard fileCard;
+  
+  File currentDirWhereDelete;
+  
+  //File dirDelete;
   
   FcmdDelete(Fcmd main)
   { this.main = main;
@@ -58,18 +66,17 @@ public class FcmdDelete
   void buildWindowConfirmDelete()
   { ///
     main.gralMng.selectPanel("primaryWindow");
-    main.gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
+    main.gralMng.setPosition(-22, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
     
     windConfirmDelete = main.gralMng.createWindow("windConfirmDelete", main.idents.windConfirmDelete, GralWindow.windConcurrently);
     //System.out.println(" window: " + main.gralMng.pos.panel.getPixelPositionSize().toString());
     
-    main.gralMng.setPosition(2, GralPos.size -2, 1, -1, 0, 'd');
-    main.gralMng.addText("delete:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    widgDeletePath = main.gralMng.addTextField("deleteTrashPath", true, null, "t");
+    main.gralMng.setPosition(4, GralPos.size -3.8f, 1, -1, 0, 'd', 0.2f);
+    widgDeleteDir = main.gralMng.addTextField("deletedirectory", false, "directory", "t");
+    widgDeletePath = main.gralMng.addTextField("deletePath", true, "delete (Note: path/*.ext or path/file* possible)", "t");
     
-    main.gralMng.setPosition(7, GralPos.size -2, 1, -1, 0, 'd');
-    main.gralMng.addText("trash path:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    widgTrashPath = main.gralMng.addTextField("deleteTrashPath", true, null, "t");
+    //main.gralMng.setPosition(12, GralPos.size -3.5f, 1, -1, 0, 'd');
+    widgTrashPath = main.gralMng.addTextField("deleteTrashPath", true, "trash path (Note: left empty to delete forever)", "t");
     
     main.gralMng.setPosition(-6, GralPos.size +1, 7, -11, 0, 'd', 1);
     //widgProgressFile = main.gralMng.addValueBar("copyProgressFile", null, null);
@@ -90,23 +97,24 @@ public class FcmdDelete
    */
   void confirmDelete(File src111)
   { fileCard = main.getLastSelectedFileCards()[0];
-    String sFileDel = null;
+    sFileDelete = null;
+    currentDirWhereDelete = fileCard.getCurrentDir();
     if(fileCard !=null){
       listFileDel = fileCard.getSelectedFiles();
       int nrofFilesDel = listFileDel.size();
       if(nrofFilesDel >0){
-        sFileDel = FileSystem.getCanonicalPath(fileCard.getCurrentDir()) + "/* ("
-          + nrofFilesDel + "Files)";
+        sFileDelete = "select:" + nrofFilesDel + " Files";
       } else {
-        sFileDel = FileSystem.getCanonicalPath(fileCard.currentFile);
         File currentFile = fileCard.currentFile;
+        sFileDelete = currentFile.getName();
         listFileDel.add(currentFile);
       }
     }
-    if(sFileDel == null){
-      sFileDel = "--no files selected--";
+    if(sFileDelete == null){ //NOTE: 
+      sFileDelete = "--no files selected--";
     }
-    widgDeletePath.setText(sFileDel);
+    widgDeleteDir.setText(FileSystem.getCanonicalPath(currentDirWhereDelete));
+    widgDeletePath.setText(sFileDelete);
     widgTrashPath.setText("TODO");
     
     windConfirmDelete.setWindowVisible(true);
@@ -115,7 +123,7 @@ public class FcmdDelete
   
 
   /**
-   * Key F6 for delete command. Its like Norton Commander.
+   * Key F8 for delete command. Its like Norton Commander.
    */
   GralUserAction actionConfirmDelete = new GralUserAction()
   {
@@ -138,23 +146,33 @@ public class FcmdDelete
     { try{ 
         if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
           if(widgg.sCmd.equals("delete")){
-            for(File file : listFileDel){
-              if(!file.canWrite()){
-                //file.setWritable();
-              }
-              Event callback = new Event(file, success);  //NOTE: store file as src to get its name for report in callback.
-              listEvDel.add(callback);
-              //
-              //The delete action:
-              if(file instanceof FileRemote){
-                ((FileRemote)file).delete(callback);
-              } else {
-                if(!file.delete()){
-                  file.setWritable(true);
-                  file.delete();
+            String sPathDelete = widgDeletePath.getText().trim();
+            if(sPathDelete.equals(sFileDelete)){  
+              //no user changing:
+              if(!sPathDelete.equals("--no files selected--")){
+                for(File file : listFileDel){
+                  if(!file.canWrite()){
+                    //file.setWritable();
+                  }
+                  Event callback = new Event(file, success);  //NOTE: store file as src to get its name for report in callback.
+                  listEvDel.add(callback);
+                  //
+                  //The delete action:
+                  if(file instanceof FileRemote){
+                    ((FileRemote)file).delete(callback);
+                  } else {
+                    if(!file.delete()){
+                      file.setWritable(true);
+                      file.delete();
+                    }
+                  }
+                  //      
                 }
               }
-              //      
+            } else { //user has changed the path
+              FileRemote dirRemote = FileRemote.fromFile(currentDirWhereDelete);
+              Event callback = new Event(dirRemote, success);  
+              dirRemote.delete(sPathDelete, true, callback);
             }
           } else if(widgg.sCmd.equals("esc")){
             windConfirmDelete.setWindowVisible(false);

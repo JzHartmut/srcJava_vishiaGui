@@ -61,10 +61,10 @@ public class Fcmd extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   @SuppressWarnings("hiding")
-  public static final int version = 20120617;
+  public static final int version = 20120722;
 
   /**Version visible in about info */
-  public static final String sVersion = "Version 1.03 - 2012-06-17";
+  public static final String sVersion = "Version 1.04 - 2012-07-22";
   
   static class CallingArgs extends GuiCallingArgs
   {
@@ -175,15 +175,15 @@ public class Fcmd extends GuiCfg
   @Override
   protected void initGuiAreas(String sAreaMainPanel)
   {
-    panelBuildIfc.registerUserAction("KeyAction",
-        keyActions.commanderKeyActions); // all key actions, registered central
+    //panelBuildIfc.registerUserAction("KeyAction",
+      //  keyActions.commanderKeyActions); // all key actions, registered central
 
     gui.setFrameAreaBorders(30, 65, 70, 85); // x1, x2, y1, y2
     //gui.setStandardMenusGThread(new File("."), actionFile);
-    gui.addMenuItemGThread("menuBarFavorsLeft", idents.menuBarNavigationLeft, selectCardThemesLeft);
-    gui.addMenuItemGThread("menuBarFavorsMiddle", idents.menuBarNavigationMiddle, selectCardThemesMiddle);
-    gui.addMenuItemGThread("menuBarFavorsRight", idents.menuBarNavigationRight, selectCardThemesRight);
-    gui.addMenuItemGThread("menuBarNavigatonCmd", idents.menuBarNavigatonCmd, actionFocusCmdCard);
+    //gui.addMenuItemGThread("menuBarFavorsLeft", idents.menuBarNavigationLeft, selectCardThemesLeft);
+    //gui.addMenuItemGThread("menuBarFavorsMiddle", idents.menuBarNavigationMiddle, selectCardThemesMiddle);
+    //gui.addMenuItemGThread("menuBarFavorsRight", idents.menuBarNavigationRight, selectCardThemesRight);
+    //gui.addMenuItemGThread("menuBarNavigatonCmd", idents.menuBarNavigatonCmd, actionFocusCmdCard);
     
     // gui.set
 

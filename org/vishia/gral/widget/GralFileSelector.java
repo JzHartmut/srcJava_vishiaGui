@@ -108,6 +108,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   /**A window for search-in-file dialogue.
    * It is instantiated calling {@link GralFileSelector#createWindowConfirmSearchGthread(GralMngBuild_ifc)}.
    * The user can invoke {@link #confirmSearchInFiles(GralFileSelector, Appendable)} to open that window. 
+   * Note: An application may have only one of this window thow more as one GralFileSelector may be exist.
+   * Therefore the window is not instantiated automatically in this class. The user can instantiate it.
    *
    */
   public static class WindowConfirmSearch {
@@ -260,13 +262,15 @@ public class GralFileSelector implements Removeable //extends GralWidget
     @Override public void actionLeft(Object userData, GralTableLine_ifc line)
     {
       //FileRemote currentFile = (FileRemote)userData;
-      String sDir = currentDir.getParent();
-      String sName = currentDir.getName();
-      File parentDir = currentDir.getParentFile();
-      if(parentDir !=null){
-        indexSelection.put(sDir, currentDir.getName());
-        //System.out.println("GralFileSelector: " + sDir + ":" + sName);
-        fillIn(parentDir); 
+      if(currentDir !=null){
+        String sDir = currentDir.getParent();
+        String sName = currentDir.getName();
+        File parentDir = currentDir.getParentFile();
+        if(parentDir !=null){
+          indexSelection.put(sDir, currentDir.getName());
+          //System.out.println("GralFileSelector: " + sDir + ":" + sName);
+          fillIn(parentDir); 
+        }
       }
     }
     
@@ -292,18 +296,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
      */
     @Override public boolean actionUserKey(int keyCode, Object oData, GralTableLine_ifc line)
     { boolean ret = true;
-      //File file = (File)(data);
-      //File data = (File)oData;
-      switch(keyCode){
-      case KeyCode.alt + KeyCode.F7: 
-        stop();
-        //FileSystem.searchInFiles(new File[]{data}, "ordersBackground"); break;
-        break;
-      default: ret = false;
-      }
-      if(!ret){
-        ret = outer.actionUserKey(keyCode, oData, line);
-      }
+      ret = outer.actionUserKey(keyCode, oData, line);
       return ret;
     }
 

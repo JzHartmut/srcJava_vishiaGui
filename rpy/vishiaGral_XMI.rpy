@@ -13,7 +13,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 		- _subsystem = "";
 		- _class = "";
 		- _name = "Default";
-		- _id = GUID 55afad3e-0a47-40df-a33e-b78fa51e907e;
+		- _id = GUID 6100d60f-768f-4e64-b793-99631d657545;
 	}
 	- _component = { IHandle 
 		- _m2Class = "IComponent";
@@ -48,11 +48,11 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 		- value = 
 		{ ISubsystem 
 			- fileName = "Default";
-			- _id = GUID 55afad3e-0a47-40df-a33e-b78fa51e907e;
+			- _id = GUID 6100d60f-768f-4e64-b793-99631d657545;
 		}
 		{ ISubsystem 
 			- fileName = "GeneratedFromJava";
-			- _id = GUID 614d7306-89e4-45bf-af35-160e6066e4bb;
+			- _id = GUID 87980ca7-a2cc-4002-8c6d-e0cff273f571;
 		}
 	}
 	- Diagrams = { IRPYRawContainer 
@@ -62,7 +62,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 			- _id = GUID 7e6cfef6-aade-47b7-b7c6-7b3f11ee282e;
 			- _myState = 8192;
 			- _name = "Model1";
-			- _lastModifiedTime = "8.13.2011::11:9:54";
+			- _lastModifiedTime = "7.14.2012::20:4:54";
 			- _graphicChart = { CGIClassChart 
 				- _id = GUID c0b94b8a-90ed-4f72-a3dd-0f420ac2ea89;
 				- m_type = 0;
@@ -96,7 +96,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "Default";
 						- _class = "";
 						- _name = "TopLevel";
-						- _id = GUID 5d12e513-9a30-4f29-8d23-9bf3fdae89b3;
+						- _id = GUID e96c2e55-8c0b-4538-a703-07ca357a3382;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -156,7 +156,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 				- _subsystem = "";
 				- _class = "";
 				- _name = "Default";
-				- _id = GUID 55afad3e-0a47-40df-a33e-b78fa51e907e;
+				- _id = GUID 6100d60f-768f-4e64-b793-99631d657545;
 			}
 		}
 	}

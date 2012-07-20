@@ -65,6 +65,8 @@ public abstract class GralUserAction
 
   final String name;
   
+  private boolean bCallDeprecated;
+  
   public GralUserAction(String ident){ name = ident; }
   
   public GralUserAction(){ name = ""; }
@@ -97,14 +99,41 @@ public abstract class GralUserAction
    */
   @Deprecated public boolean userActionGui(String sIntension, GralWidget widgd, Object... params){ return false; }
   
+  /**@deprecated use {@link #userActionGui(int, GralWidget_ifc, Object...)} instead.
+   * If any class overrides this method and does not override the non deprecated method, this method is called
+   * if the non deprecated method is called. It is for compatibility. 
+   * @param actionCode
+   * @param widgd
+   * @param params
+   * @return
+   */
+  public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
+    if(bCallDeprecated) return false;
+    else return exec(actionCode, widgd, params); 
+  }
+  
+  
+  
+  
+  
   /**Call of users method while any user action on the gui is done.
+   * If this method is not overridden from the {@link GralUserAction} super class, it tries to call 
+   * the deprecated {@link #userActionGui(int, GralWidget, Object...)} because this method may be overridden. 
    * @param actionCode See {@link KeyCode}. Any special action is designated with 0.
    * @param widgd The Gral widget
    * @param params Some optional values, depending on special user designation. In most cases no parameter.
    *   The user may be test the type of parameter for complex usage.
    * @return true if execution is succeed. false if the users application can't deal with the actionCode or the widget. 
    */
-  public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ return false; }
+  public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){ 
+    bCallDeprecated = true; //prevent recursively.
+    if(widgd == null || (widgd instanceof GralWidget)){ 
+      return userActionGui(actionCode, (GralWidget)widgd, params);  //call this method, it may be overridden.
+    } else { 
+      //try to call 
+      return userActionGui(actionCode, null, params);  //call this method, it may be overridden.
+    }
+  }
   
   
   /**Only for debug, to see what it is.

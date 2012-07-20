@@ -693,10 +693,6 @@ public interface GralMngBuild_ifc
    * {@link GralCfgBuilder#buildGui(org.vishia.msgDispatch.LogMessage, int)} is invoked.
    * The user actions can be called in any specialized context.
    * <br><br>
-   * Some user actions can be invoked from the GUI itself:
-   * <ul>
-   * <li> "KeyAction": Action for all common keys.
-   * </ul>
    * @param name Name of the action
    * @param action what to do.
    */

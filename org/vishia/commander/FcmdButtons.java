@@ -9,6 +9,7 @@ import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.KeyCode;
 
 /**This class contains all functionality of the function buttons in The-file-Commander.
@@ -206,6 +207,7 @@ public class FcmdButtons
     setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerTimestampOldestFirst, main.idents.buttonFileSortOldest, main.idents.keyFileSortDateLast, main.idents.menuBarFileSortDateOldest);
     setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerLenghLargestFirst, main.idents.buttonFileSortSizeLarge, main.idents.keyFileSortSizeLarge, main.idents.menuBarFileSortSizeLarge);
     setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerLenghSmallestFirst, main.idents.buttonFileSortSizeSmall, main.idents.keyFileSortSizeSmall, main.idents.menuBarFileSortSizeSmall);
+    setBtnMenuAndKeys(main.favorPathSelector.actionSearchFiles, main.idents.buttonSearchFiles, main.idents.keySearchFiles, main.idents.menuBarSearchFiles);
     
     setBtnMenuAndKeys(actionViewButtons, main.idents.buttonViewButtons, main.idents.keyViewButtons, main.idents.menuBarViewButtons);
     main.gui.addMenuItemGThread("menuBarViewButtons", main.idents.menuBarViewButtons, actionViewButtons);
@@ -263,10 +265,10 @@ public class FcmdButtons
    * @param keyCode
    * @return true if done.
    */
-  boolean processKey(int keyCode){
+  boolean processKey(int keyCode, GralWidget_ifc widg){
     GralUserAction action = idxKeyAction.get(keyCode);
     if(action !=null){
-      boolean bDone = action.userActionGui(keyCode, null);
+      boolean bDone = action.exec(keyCode, widg);
       return bDone;
     } else {
       return false;
@@ -279,8 +281,8 @@ public class FcmdButtons
    */
   GralUserAction actionMainKeys = new GralUserAction()
   {
-    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
-      return processKey(key);
+    @Override public boolean exec(int key, GralWidget_ifc widg, Object... params){ 
+      return processKey(key, widg);
     }
   };
   

@@ -457,6 +457,9 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
           done = actionChanging.userActionGui(keyCode, this, lineGral);
         }
       } //if(table.)
+      if(!done && itsMng.userMainKeyAction() !=null){
+        done = itsMng.userMainKeyAction().exec(keyCode, getCurrentLine());
+      }
       if(!done){
         //if actionChanging.userAction() returns false 
         GralUserAction mainKeyAction = itsMng.getRegisteredUserAction("KeyAction");
@@ -476,7 +479,11 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   
   
   
-  /**Increments or decrements ixLineNew in [up] or [dn] situation until the {@link #searchChars} are found.
+  /**Increments or decrements ixLineNew in [up] or [dn] situation until the {@link #searchChars} are found
+   * or one time if searchChars are not given.
+   * If the searchChars are not found, either the first or last line will be selected. It is because
+   * any key operation should have an effect for the user. Paradigm: Not the search and found is prior,
+   * the response of operation is prior. The user may see wheter anything is found. 
    * @param bUp direction
    * @return
    */
@@ -491,7 +498,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
         } else if(!bUp && ixLineNew < zLine-1){ //down
           ixLineNew +=1;
         } else {
-          ixLineNew = ixLineNewAct;
+          //ixLineNew = ixLineNewAct;
           contSearch = false;                 //eand reached
         }
         if(contSearch){

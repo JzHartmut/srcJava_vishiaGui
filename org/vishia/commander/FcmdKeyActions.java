@@ -19,8 +19,22 @@ public class FcmdKeyActions
 {
   final Fcmd main;
   
+  int keyExecuteInJcmd =  KeyCode.ctrl + KeyCode.enter;
+  
+  int keyExecuteAsJavaClass =  KeyCode.ctrl + KeyCode.alt + KeyCode.shift + KeyCode.enter;
+  int keyExecuteInShellOpened = KeyCode.ctrl + KeyCode.alt + KeyCode.shift + KeyCode.enter;
+  
+  int keyExecuteInShell = KeyCode.ctrl + KeyCode.alt + KeyCode.enter;
+  
+  int keyExecuteStartProcess = KeyCode.ctrl + KeyCode.shift + KeyCode.enter;
+
+  int keyPanelSelection = KeyCode.alt + KeyCode.dn;
+  
+  
+  int keyCreateFavorite = KeyCode.ctrl + 'b';   //like 'Lesezeichen einfuegen'
   //---------------------------------------------------------------------------------
   //Working
+  /*
   int keyFileProps = KeyCode.F2;
   
   int keyView = KeyCode.F3;
@@ -37,15 +51,7 @@ public class FcmdKeyActions
   
   int keyWindFullOut = KeyCode.ctrl + 'o';
   
-  int keyExecuteInShellOpened = KeyCode.ctrl + KeyCode.alt + KeyCode.shift + KeyCode.enter;
   
-  int keyExecuteInShell = KeyCode.ctrl + KeyCode.alt + KeyCode.enter;
-  
-  int keyExecuteStartProcess = KeyCode.ctrl + KeyCode.shift + KeyCode.enter;
-  
-  int keyExecuteInJcmd =  KeyCode.ctrl + KeyCode.enter;
-  
-  int keyExecuteAsJavaClass =  KeyCode.ctrl + KeyCode.alt + KeyCode.shift + KeyCode.enter;
   
   int keyOpenProperties = KeyCode.alt + KeyCode.enter;
   
@@ -54,10 +60,8 @@ public class FcmdKeyActions
   int keySelectPanelLeft = KeyCode.alt + KeyCode.F1;
   int keySelectPanelMid = KeyCode.alt + KeyCode.F2;
   int keySelectPanelRight = KeyCode.alt + KeyCode.F3;
-  int keyCreateFavorite = KeyCode.ctrl + 'b';   //like 'Lesezeichen einfuegen'
   
-  int keyPanelSelection = KeyCode.alt + KeyCode.dn;
-  
+  */
   //int keyPanelFile = KeyCode.alt + KeyCode.ctrl + KeyCode.up;
   
   //int keyPanelLeft = KeyCode.alt + KeyCode.ctrl + KeyCode.left;
@@ -84,37 +88,6 @@ public class FcmdKeyActions
     main = parent;
   }
   
-  /**
-   * @deprecated
-   */
-  GralUserAction commanderKeyActions = new GralUserAction()
-  { @Override public boolean userActionGui(int keyCode, GralWidget widgd, Object... params)
-    { boolean done = false;
-      done = true;
-      File[] files = main.getLastSelectedFiles();
-      if(main.fButtons.processKey(keyCode)){ done = true; }
-      else if(     keyCode == main.idents.keyFileProps){ main.filePropsCmd.openDialog(main.currentFile); }  //F2
-      else if(keyCode == main.idents.keyFileView){ main.viewCmd.view(null); }                  //F3
-      else if(keyCode == main.idents.keyFileEdit){ main.actionEdit.userActionGui(KeyCode.menuEntered, widgd, params); }
-      else if(keyCode == main.idents.keyEditIntern){ main.editWind.openEdit(null); }
-      else if(keyCode == main.idents.keyFileCopy){ main.copyCmd.actionConfirmCopy.userActionGui(KeyCode.menuEntered, widgd, params); }
-      else if(keyCode == main.idents.keyFileCreate){ main.mkCmd.dialogMkDirFile(files[0]); }
-      else if(keyCode == main.idents.keyFileDel1 || keyCode == main.idents.keyFileDel2){ main.deleteCmd.actionConfirmDelete.userActionGui(keyCode, widgd); }
-      //navigation
-      else if(keyCode == main.idents.keyOriginDir){ main.favorPathSelector.actionSetDirOrigin.userActionGui(KeyCode.menuEntered, widgd, params); }
-      else if(keyCode == main.idents.keyRefresh1 || keyCode == main.idents.keyRefresh2 || keyCode == main.idents.keyRefresh3){ main.favorPathSelector.actionRefreshFileTable.userActionGui(KeyCode.menuEntered, widgd, params); }
-      else if(keyCode == main.idents.keyWindFullOut){ main.windMng.actionWindFullOut.userActionGui(KeyCode.menuEntered, widgd, params); }
-      else if(keyCode == main.idents.keyExecCmdFile) { main.cmdSelector.executeCurrCmdWithFiles(); }
-      else if(keyCode == main.idents.keyCreateFavor) { main.favorPathSelector.confirmCreateNewFavor(); }
-      //else if(keyCode == main.idents.keyFavorLeft) { main.selectCardThemesLeft.userActionGui(KeyCode.menuEntered, widgd); }
-      //else if(keyCode == main.idents.keyFavorMiddle) { main.selectCardThemesMiddle.userActionGui(KeyCode.menuEntered, widgd); }
-      //else if(keyCode == main.idents.keyFavorRight) { main.selectCardThemesRight.userActionGui(KeyCode.menuEntered, widgd); }
-      else if(keyCode == main.idents.keyViewButtons) { main.fButtons.actionViewButtons.userActionGui(KeyCode.menuEntered, widgd); }
-      else { done = false; }
-      return done;
-    }
-    
-  };
 
   
   
