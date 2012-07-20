@@ -224,7 +224,6 @@ public class Fcmd extends GuiCfg
     gui.addMenuItemGThread("MenuCmdCfgSet", "&Command/CmdCf&g - read current file", executer.actionSetCmdCfg); // /
     gui.addMenuItemGThread("menuReadCmdiCfg", "&Command/&ExtCfg - read cfg file", executer.actionReadExtensionCmd);
 
-    this.windMng.initMenuWindMng();
     gui.addMenuItemGThread("menuHelp", idents.menuHelpBar, gui.getActionHelp());
     gui.addMenuItemGThread("menuAbout", idents.menuBarAbout, gui.getActionAbout());
     gui.addMenuItemGThread("MenuTestInfo", "&Help/&Infobox", actionTest); 

@@ -186,12 +186,14 @@ public class FcmdIdents
 
   
   /**execute with currently selected cmd.  */
-  String menuExecuteCmdBar = "&File/&Execute [cF9]";
+  //String menuExecuteCmdBar = "&File/&Execute [cF9]";
 
   String menuExecuteCmdContext = "exec [cF9]";
-
-  String buttonExecuteCmd = "cF9:cmd";
-
+  String menuBarExecuteCmdWithFile = "&Command/e~Xecute cmd with file [cEnter]";
+  int keyExecuteCmdWithFile = KeyCode.ctrl + KeyCode.F9;
+  int keyExecuteCmdWithFile2 = KeyCode.ctrl + KeyCode.enter;
+  String buttonExecuteCmdWithFile = "cF9:exeCmd file";
+  
   
   String menuBarNavigationLeft = "&Navigation/themes left [aF1]";
   String buttonFavorLeft = "aF1:fav-left";
@@ -267,7 +269,12 @@ public class FcmdIdents
 
 
 
-  public String menuWindowOutputBar = "&Window/&Output";
+  public String menuBarWindowOutput = "&Window/&Output";
+  public String menuContextWindowOutput = "&Output zoom";
+  public String buttonWindowOutput = null;
+  public int keyWindowOutput = KeyCode.ctrl + 'o';
+  public int keyWindowOutput2 = KeyCode.ctrl + 'O';
+  
   
   public String menuWindowOutputContext = "Zoom/Unzoom";
   

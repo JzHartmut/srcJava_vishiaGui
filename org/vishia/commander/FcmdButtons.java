@@ -110,12 +110,11 @@ public class FcmdButtons
   ButtonAction currentButton;
   
   
-  
   /**Assign an action to any function button, menu and key.
    * @param action The action
    * @param buttonText use the form "Btn:text" where button is F1..F12, aF1 etc. text is the text.
    */
-  void setBtnMenuAndKeys(GralUserAction action, String buttonText, int key, String menu){
+  void setBtnMenuAndKeys(GralUserAction action, String buttonText, int key, int key2, String menu){
     if(buttonText !=null){
       int posSep = buttonText.indexOf(':');
       if(posSep > 0){
@@ -128,11 +127,21 @@ public class FcmdButtons
     if(key !=0){
       idxKeyAction.put(key, action);
     }
+    if(key2 !=0){
+      idxKeyAction.put(key2, action);
+    }
     if(menu !=null){
       main.gui.addMenuItemGThread(null, menu, action);
-
     }
-    
+  }
+  
+  
+  /**Assign an action to any function button, menu and key.
+   * @param action The action
+   * @param buttonText use the form "Btn:text" where button is F1..F12, aF1 etc. text is the text.
+   */
+  void setBtnMenuAndKeys(GralUserAction action, String buttonText, int key, String menu){
+    setBtnMenuAndKeys(action, buttonText, key, 0, menu);
   }
   
   
@@ -209,7 +218,9 @@ public class FcmdButtons
     setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerLenghSmallestFirst, main.idents.buttonFileSortSizeSmall, main.idents.keyFileSortSizeSmall, main.idents.menuBarFileSortSizeSmall);
     setBtnMenuAndKeys(main.favorPathSelector.actionSearchFiles, main.idents.buttonSearchFiles, main.idents.keySearchFiles, main.idents.menuBarSearchFiles);
     
+    setBtnMenuAndKeys(main.cmdSelector.actionExecCmdWithFiles, main.idents.buttonExecuteCmdWithFile, main.idents.keyExecuteCmdWithFile, main.idents.keyExecuteCmdWithFile2, main.idents.menuBarExecuteCmdWithFile);
     setBtnMenuAndKeys(actionViewButtons, main.idents.buttonViewButtons, main.idents.keyViewButtons, main.idents.menuBarViewButtons);
+    setBtnMenuAndKeys(main.windMng.actionWindFullOut, main.idents.buttonWindowOutput, main.idents.keyWindowOutput, main.idents.keyWindowOutput2, main.idents.menuBarWindowOutput);
     main.gui.addMenuItemGThread("menuBarViewButtons", main.idents.menuBarViewButtons, actionViewButtons);
     
     Iterator<Map.Entry<String, ButtonAction>> iterButtonAction = idxButtons.entrySet().iterator();

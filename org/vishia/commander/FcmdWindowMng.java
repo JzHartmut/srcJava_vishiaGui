@@ -18,11 +18,6 @@ public class FcmdWindowMng
   }
   
   
-  void initMenuWindMng()
-  {
-    main.gui.addMenuItemGThread("MenuOutputFull", main.idents.menuWindowOutputBar, actionWindFullOut);
-  }
-  
   
   GralUserAction actionWindFullOut = new GralUserAction()
   { 
