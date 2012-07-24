@@ -656,7 +656,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   /**Registers a panel to place the widgets. 
    * After registration, the panel can be selected
    * with its name calling the {@link #selectPanel(String)} -routine
-   * @param name Name of the panel.
+   * @param key Name of the panel.
    * @param panel The panel.
    */
   @Override public void registerPanel(GralPanelContent panel){
@@ -729,7 +729,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * If the thread doesn't run or the remote receiver isn't present, 
    * than the queue may be overflowed or the request may be lost.
    *    
-   * @param name The name of the widget, which was given by the add...()-Operation
+   * @param key The name of the widget, which was given by the add...()-Operation
    * @param ident A identifying number. It meaning depends on the kind of widget.
    *        0 means, insert on top.  Integer.MAXVALUE means, insert after the last element (append).
    * @param content The content to insert.

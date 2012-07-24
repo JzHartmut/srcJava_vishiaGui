@@ -28,6 +28,7 @@ import org.vishia.util.FileRemote;
 import org.vishia.util.FileRemoteAccessor;
 import org.vishia.util.FileRemoteAccessorLocalFile;
 import org.vishia.util.FileSystem;
+import org.vishia.util.FileZip;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
 
@@ -228,6 +229,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
         //}
       } else if(file.isDirectory()){
         actionRight(userData, line);
+      } else if(file.getName().endsWith(".zip")){
+        actionRightZip(userData, line);
       } else {
         if(actionOnEnterFile !=null){
           actionOnEnterFile.userActionGui(KeyCode.enter, widgdPath, file);
@@ -287,6 +290,15 @@ public class GralFileSelector implements Removeable //extends GralWidget
         fillIn(currentFile);
         //fillIn(data.getParent() + "/" + data.getName());
       }
+    }
+    
+    
+    public void actionRightZip(Object userData, GralTableLine_ifc line)
+    {
+      File currentFile = (File)userData;
+      FileZip fileZip = new FileZip(currentFile);
+      //fileZip.listFiles();
+      fillIn(fileZip);
     }
     
     
