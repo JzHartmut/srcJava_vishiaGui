@@ -158,9 +158,9 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
 	 * <br>See {@link #setPrimaryWidget(GralWidget)}.
 	 * @return true if the focus is set to the primary widget. 
 	 */
-	@Override public boolean setFocus()
+	@Override public boolean setFocusGThread()
 	{
-	  if(primaryWidget !=null) return primaryWidget.setFocus();
+	  if(primaryWidget !=null) return primaryWidget.setFocusGThread();
 	  else return false;
 	}
 	

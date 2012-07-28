@@ -97,6 +97,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-07-29 Hartmut chg: {@link #setFocus()} and {@link #setFocus(int, int)} can be called in any thread yet.
    * <li>2012-04-25 Hartmut some enhancements
    * <li>2012-04-07 Hartmut chg: {@link #refreshFromVariable(VariableContainer_ifc)} regards int16, int8
    * <li>2012-04-01 Hartmut new: {@link #refreshFromVariable(VariableContainer_ifc)}. A GralWidget is binded now
@@ -113,13 +114,13 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * <li>2012-01-16 Hartmut new Concept {@link #repaint()}, can be invoked in any thread. With delay possible. 
    *   All inherit widgets have to be implement  {@link #repaintGthread()}.
    * <li>2011-12-27 Hartmut new {@link #setHtmlHelp(String)}. For context sensitive help.
-   * <li>2011-11-18 Hartmut bugfix: {@link #setFocus()} had called {@link GralMng#setFocus(GralWidget)} and vice versa.
+   * <li>2011-11-18 Hartmut bugfix: {@link #setFocusGThread()} had called {@link GralMng#setFocus(GralWidget)} and vice versa.
    *   Instead it should be a abstract method here and implemented in all Widgets. See {@link org.vishia.gral.swt.SwtWidgetHelper#setFocusOfTabSwt(org.eclipse.swt.widgets.Control)}.
    * <li>2011-10-15 Hartmut chg: This class is now abstract. It is the super class for all wrapper implementations.
    *   The wrapper implements special interfaces for the kind of widgets. It is more simple for usage, less instances to know.
    *   A GralWidget is able to test with instanceof whether it is a special widget. The element widget is removed because the reference
    *   to the implementation widget will be present in the derived classes.
-   * <li>2011-10-01 Hartmut new: method {@link #setFocus()}. It wrappes the {@link GralMng_ifc#setFocus(GralWidget)}.
+   * <li>2011-10-01 Hartmut new: method {@link #setFocusGThread()}. It wrappes the {@link GralMng_ifc#setFocus(GralWidget)}.
    * <li>2011-09-18 Hartmut chg: rename from WidgetDescriptor to GralWidget. It is the representation of a Widget in the graphic adapter
    *     inclusive some additional capabilities in comparison to basic graphic widgets, like {@link #sFormat} etc.
    * <li>2011-09-11 Hartmut chg: rename itsPanel to {@link #itsMng}. The original approach was, that the PanelManager manages only one panel
@@ -841,7 +842,26 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * See {@link GralMng_ifc#setFocus(GralWidget)}.
    * @return true if the focus is set really.
    */
-  public abstract boolean setFocus();
+  public abstract boolean setFocusGThread();
+  
+  
+  public final void setFocus(){ setFocus(0,0); }
+
+  
+  
+  /**Sets the focus to this widget. This method is possible to call in any thread.
+   * If it is called in the graphic thread and the delay = 0, then it is executed immediately.
+   * Elsewhere the request is stored in the graphic thread execution queue and invoked later.
+   * @param delay Delay in ms for invoking the focus request 
+   * @param latest 
+   */
+  public final void setFocus(int delay, int latest){
+    if(delay == 0 && itsMng.currThreadIsGraphic()){
+      setFocusGThread();
+    } else {
+      setFocusRequ.addToGraphicThread(itsMng.gralDevice(), delay);
+    }
+  }
   
   
   
@@ -976,6 +996,28 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
     }
     @Override public String toString(){ return name + ":" + GralWidget.this.name; }
   };
-	
+  
+  /**This callback worker calls the {@link #repaintGthread()} if it is invoked in the graphical thread.
+   * It is used with delay and wind up whenever {@link #repaint(int, int)} with an delay is called.
+   * If its callback method was run, it is dequeued till the next request of {@link #repaint()}.
+   */
+  private GralDispatchCallbackWorker setFocusRequ = new GralDispatchCallbackWorker("GralWidget.setFocusRequ"){
+    @Override public void doBeforeDispatching(boolean onlyWakeup) {
+      //first remove from queue to force add new, if a new request is given.
+      //thread safety: If a new request is given, it is not add yet, because it isn't execute.
+      removeFromQueue(itsMng.gralDevice());
+      //now a new request will be added.
+      try{ 
+        setFocusGThread();
+      } catch(Exception exc){
+        System.err.println("unexpected exception " + exc.getMessage());
+        exc.printStackTrace(System.err);
+        //NOTE: removeFromQueue should invoked on exception too.
+      }
+      countExecution();
+    }
+    @Override public String toString(){ return name + ":" + GralWidget.this.name; }
+  };
+  
 }
 

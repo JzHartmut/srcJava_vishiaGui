@@ -565,9 +565,10 @@ class FcmdFavorPathSelector
   GralUserAction actionRefreshFileTable = new GralUserAction(){
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-      GralFileSelector lastTab = main.getLastSelectedFileCards()[0];
+      FcmdFileCard lastTab = main.getLastSelectedFileCards()[0];
       if(lastTab !=null){
-        lastTab.fillInCurrentDir();
+        File dir = lastTab.getCurrentDir();
+        lastTab.fillIn(dir);
       } else {
         throw new IllegalArgumentException("last file tab not able to found");
       }

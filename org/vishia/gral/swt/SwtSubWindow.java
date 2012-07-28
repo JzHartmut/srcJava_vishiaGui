@@ -169,7 +169,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
 
   
   //@Override
-  public boolean setFocus()
+  public boolean setFocusGThread()
   { return window.setFocus();
   }
 

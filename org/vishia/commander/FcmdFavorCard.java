@@ -120,10 +120,10 @@ public class FcmdFavorCard  extends GralSelectList
   {
     //before changing the content of this fileTable, store the current directory
     //to restore if this favor respectively selection is used ones more.
-    File dir = null;
+    FileRemote dir = null;
     String currentDir;
     if(fileTable.favorPathInfo !=null){
-      dir = fileTable.getCurrentDir();
+      dir = FileRemote.fromFile(fileTable.getCurrentDir());
       if(dir != null){
         currentDir = dir.getAbsolutePath();
         if(currentDir !=null){

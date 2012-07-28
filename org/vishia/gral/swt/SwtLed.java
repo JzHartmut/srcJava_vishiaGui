@@ -175,7 +175,7 @@ private class SwtLedImpl extends Canvas
   }
 
   @Override
-  public boolean setFocus()
+  public boolean setFocusGThread()
   { return widgSwt.setFocus();
   }
 

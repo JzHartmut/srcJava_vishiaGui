@@ -817,9 +817,9 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
 
   
   
-  @Override public boolean setFocus(GralWidget widgd)
+  @Override public void setFocus(GralWidget widgd)
   {
-    return widgd.setFocus();
+    widgd.setFocus();
   }
   
   @Override public void notifyFocus(GralWidget widgd)

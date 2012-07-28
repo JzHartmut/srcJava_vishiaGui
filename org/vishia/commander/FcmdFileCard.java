@@ -12,6 +12,8 @@ import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.widget.GralFileSelector;
 
+import org.vishia.util.Event;
+import org.vishia.util.EventConsumer;
 import org.vishia.util.FileCompare;
 import org.vishia.util.FileRemote;
 
@@ -192,14 +194,12 @@ public class FcmdFileCard extends GralFileSelector
   }
   
   
-  void setNewContent(FcmdFavorPathSelector.FavorPath favorPathInfoP, File dir){
+  void setNewContent(FcmdFavorPathSelector.FavorPath favorPathInfoP, FileRemote dir){
     favorPathInfo = favorPathInfoP;
     favorCard.add(favorPathInfo);  //only it is a new one, it will be checked.
     setOriginDir(favorPathInfo.getOriginDir());
-    fillIn(dir);
     widgLabel.setText(favorPathInfo.selectName);
-    setFocus();
-
+    fillIn(dir);
   }
   
   void setFocusFavorOrFile(){
@@ -217,11 +217,11 @@ public class FcmdFileCard extends GralFileSelector
    * of the current line of table of all 3 current file panels to the 3-stage color
    * to see which table has the focus. 
    */
-  @Override public boolean setFocus(){ 
+  @Override public void setFocus(){ 
     mainPanel.bFavorCardHasFocus = false;
     mainPanel.bFavorThemeCardHasFocus = false;
     setActFilePanel_setColorCurrLine();
-    return super.setFocus(); 
+    super.setFocus(); 
   }
   
   
@@ -455,8 +455,6 @@ public class FcmdFileCard extends GralFileSelector
       }
     }
   }
-  
-  
   
   
   /**Action to show the file properties in the info line. This action is called anytime if a line

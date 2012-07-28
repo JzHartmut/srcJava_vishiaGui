@@ -56,7 +56,7 @@ public class AwtButton extends GralButton
   
 
   
-  @Override public boolean setFocus()
+  @Override public boolean setFocusGThread()
   { return AwtWidgetHelper.setFocusOfTabSwt(widgetSwt);
   }
 

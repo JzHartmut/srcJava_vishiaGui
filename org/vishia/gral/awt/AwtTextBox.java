@@ -130,7 +130,7 @@ public class AwtTextBox extends GralTextBox
   
 
   
-  @Override public boolean setFocus()
+  @Override public boolean setFocusGThread()
   { return AwtWidgetHelper.setFocusOfTabSwt(textFieldSwt);
   }
 

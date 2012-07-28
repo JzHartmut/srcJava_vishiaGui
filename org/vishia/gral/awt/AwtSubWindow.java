@@ -114,7 +114,7 @@ public class AwtSubWindow extends GralWindow
 
 
   @Override
-  public boolean setFocus()
+  public boolean setFocusGThread()
   {
     // TODO Auto-generated method stub
     return false;

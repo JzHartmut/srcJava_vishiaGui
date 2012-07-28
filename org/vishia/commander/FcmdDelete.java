@@ -189,7 +189,7 @@ public class FcmdDelete
     @Override public boolean processEvent(Event ev)
     {
       if(ev.data1 !=0){
-        main.mainCmd.writeError("can't delete " + ((FileRemote)(ev.getSrc())).getCanonicalPath());
+        main.mainCmd.writeError("can't delete " + ((FileRemote)(ev.getRefData())).getCanonicalPath());
       }
       listEvDel.remove(ev);
       int nrofPendingFiles = listEvDel.size();

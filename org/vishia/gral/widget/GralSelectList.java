@@ -127,7 +127,7 @@ public abstract class GralSelectList implements Removeable //extends GralWidget
   /**Sets the focus of the associated table widget.
    * @return true if focused.
    */
-  public boolean setFocus(){ return wdgdTable.setFocus(); }
+  public boolean setFocus(){ return wdgdTable.setFocusGThread(); }
   
   /**Removes all data and all widgets of this class. */
   @Override public boolean remove(){

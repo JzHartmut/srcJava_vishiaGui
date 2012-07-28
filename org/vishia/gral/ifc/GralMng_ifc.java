@@ -272,7 +272,7 @@ public interface GralMng_ifc
 	 * @param widgd
 	 * @return true if the focus is set. False if it isn't able to set the focus.
 	 */
-	boolean setFocus(GralWidget widgd);
+	void setFocus(GralWidget widgd);
 	
 	/**Notifies that this widget has the focus gotten.
 	 * Note: not all widgets notifies this. The focus can be used to detect which widget is active

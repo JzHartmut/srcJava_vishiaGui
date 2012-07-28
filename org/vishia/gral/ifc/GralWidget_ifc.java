@@ -37,6 +37,7 @@ public interface GralWidget_ifc extends Removeable
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-07-29 Hartmut chg: {@link #setFocus()} and {@link #setFocus(int, int)} can be called in any thread yet.
    * <li>2012-07-13 Hartmut new. {@link #getWidgetMultiImplementations()}. This method is not used in any widget yet,
    *   but it may be necessary for complex widgets.
    * <li>2012-04-25 Hartmut new: {@link #refreshFromVariable(VariableContainer_ifc)}: Capability for any widget
@@ -85,11 +86,17 @@ public interface GralWidget_ifc extends Removeable
   
   public String getName();
   
-  /**Sets the focus to the widget.
-   * TODO call GuiPanelMngSwt#setFocusOfTabSwt() for all widgets, see TabelSwt!
-   * @return true if set
+  /**Sets the focus to the widget. . It can be called in any thread. If it is called in the graphic thread,
+   * the repaint action is executed immediately in the thread. Elsewhere the graphic thread will be woken up.
    */
-  public abstract boolean setFocus();
+  public abstract void setFocus();
+  
+  /**Sets the focus to the widget. . It can be called in any thread. If it is called in the graphic thread,
+   * the repaint action is executed immediately in the thread. Elsewhere the graphic thread will be woken up.
+   * @param delay
+   * @param latest
+   */
+  public abstract void setFocus(int delay, int latest);
   
   
   /**Returns whether the widget is visible or not. This method can be invoked in any thread.

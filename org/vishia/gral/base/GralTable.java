@@ -741,11 +741,9 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     { return ixColumn;
     }
 
-    @Override
-    public boolean setFocus() {
-      // TODO Auto-generated method stub
-      return false;
-    }
+    @Override public void setFocus() { GralTable.this.setFocus(); }
+
+    @Override public void setFocus(int delay, int latest) { GralTable.this.setFocus(delay, latest); }
 
     @Override public boolean isVisible(){ return GralTable.this.isVisible(); }
     

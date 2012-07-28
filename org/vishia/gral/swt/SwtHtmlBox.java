@@ -99,7 +99,7 @@ public class SwtHtmlBox extends GralHtmlBox
   }
 
   @Override
-  public boolean setFocus()
+  public boolean setFocusGThread()
   {
     // TODO Auto-generated method stub
     return false;

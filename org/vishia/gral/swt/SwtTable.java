@@ -234,10 +234,10 @@ public class SwtTable  extends GralTable {
 
   
   /**Sets the focus to the current cell of the tab
-   * @see org.vishia.gral.base.GralWidget#setFocus()
+   * @see org.vishia.gral.base.GralWidget#setFocusGThread()
    * TODO this method must call in the graphic thread yet, queue it with {@link GralMng#setInfo(GralWidget, int, int, Object, Object)}.
    */
-  @Override public boolean setFocus()
+  @Override public boolean setFocusGThread()
   { if(ixGlineSelectedNew >=0 && ixColumn >=0){
       //System.out.println("test SwtTable.setFocus-1");
       redrawTableWithFocusedCell(cellsSwt[ixGlineSelectedNew][ixColumn]);

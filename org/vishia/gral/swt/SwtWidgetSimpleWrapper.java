@@ -30,7 +30,7 @@ public class SwtWidgetSimpleWrapper extends GralWidget
   { return widgetSwt;
   }
   
-  @Override public boolean setFocus(){ return widgetSwt.setFocus(); }
+  @Override public boolean setFocusGThread(){ return widgetSwt.setFocus(); }
 
   @Override
   public GralColor setBackgroundColor(GralColor color)

@@ -362,7 +362,7 @@ public class FcmdCopyCmd
     int percent = nrofPendingFiles * 100 / filesToCopy.size();
     widgProgressAll.setValue(percent);
     if(ok){
-      File file = (File)ev.getSrc();
+      File file = (File)ev.getRefData();
       FileCompare.Result cmprResult = fileCardSrc.searchCompareResult(file);
       if(cmprResult !=null){
         cmprResult.setToEqual();  

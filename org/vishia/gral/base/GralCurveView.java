@@ -722,7 +722,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   }
 
   @Override
-  public boolean setFocus()
+  public boolean setFocusGThread()
   {
     // TODO Auto-generated method stub
     return false;

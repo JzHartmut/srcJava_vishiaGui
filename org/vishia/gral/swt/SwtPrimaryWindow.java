@@ -174,7 +174,7 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
 
 
   @Override
-  public boolean setFocus()
+  public boolean setFocusGThread()
   {
     // TODO Auto-generated method stub
     return false;

@@ -212,11 +212,14 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     return null;
   }
 
-  @Override
-  public boolean setFocus()
-  {
-    // TODO Auto-generated method stub
-    return false;
+  @Override public void setFocus()
+  { if(textBox !=null){ textBox.setFocus(); }
+    else if(htmlBox !=null){ htmlBox.setFocus();}
+  }
+
+  @Override public void setFocus(int delay, int latest)
+  { if(textBox !=null){ textBox.setFocus(delay, latest); }
+    else if(htmlBox !=null){ htmlBox.setFocus(delay, latest);}
   }
 
   @Override public void setFullScreen(boolean full){ window.setFullScreen(full); }

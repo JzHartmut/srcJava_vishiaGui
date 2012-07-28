@@ -73,7 +73,7 @@ public class SwtValueBar extends GralValueBar implements GralSetValue_ifc, GralW
   }
 	
   @Override public Object getWidgetImplementation() { return widgetSwt; }
-  @Override public boolean setFocus(){ return widgetSwt.setFocus(); }
+  @Override public boolean setFocusGThread(){ return widgetSwt.setFocus(); }
 
   @Override public GralWidgetGthreadSet_ifc getGthreadSetifc(){ return gThreadSet; }
 

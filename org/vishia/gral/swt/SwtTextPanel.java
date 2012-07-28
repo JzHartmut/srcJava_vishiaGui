@@ -51,8 +51,8 @@ public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, A
   }
 
   @Override
-  public boolean setFocus()
-  { return textAreaOutput.setFocus();
+  public boolean setFocusGThread()
+  { return textAreaOutput.setFocusGThread();
   }
 
   @Override public int setCursorPos(int pos){

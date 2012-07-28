@@ -327,7 +327,7 @@ public class SwtTextFieldWrapper extends GralTextField
   }
   
   
-  @Override public boolean setFocus()
+  @Override public boolean setFocusGThread()
   { return SwtWidgetHelper.setFocusOfTabSwt(textFieldSwt);
   }
 

@@ -375,7 +375,7 @@ public class FcmdFileProps
 
   EventConsumer callbackChgProps = new EventConsumer()
   { @Override public boolean processEvent(Event ev)
-    { GralButton src = (GralButton)ev.getSrc();
+    { GralButton src = (GralButton)ev.getRefData();
       if(ev.id == FileRemoteAccessor.kFinishOk){
         showFileInfos(actFile);
         src.setText(main.idents.buttonFilePropsOk);
@@ -407,7 +407,7 @@ public class FcmdFileProps
   
   EventConsumer callbackCntLen = new EventConsumer()
   { @Override public boolean processEvent(Event evP)
-    { GralButton src = (GralButton)evP.getSrc();
+    { GralButton src = (GralButton)evP.getRefData();
       if(evP.id == FileRemoteAccessor.kFinishOk){
         FileRemote.Callback ev = (FileRemote.Callback)evP; 
         String sLen = "" + ev.nrofBytesAll;

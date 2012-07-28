@@ -24,6 +24,9 @@ import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.util.Event;
+import org.vishia.util.EventConsumer;
+import org.vishia.util.FileAccessZip;
 import org.vishia.util.FileRemote;
 import org.vishia.util.FileRemoteAccessor;
 import org.vishia.util.FileRemoteAccessorLocalFile;
@@ -51,6 +54,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2012-07-28 Hartmut improved zipfile access.
+   * <li>2012-07-29 Hartmut improved access to the file system using the new capabilities of FileRemote.
+   *  TODO consequently writing 'wait for response' in table and access to the file in another thread.
    * <li>2012-07-01 Hartmut new {@link #setActionOnEnterPathNewFile(GralUserAction)}.
    *   Now this widget is used to select a file to read and save in an application other than the.File.commander.
    * <li>2012-07-01 Hartmut Refactoring usage of FileRemote: Normally the java.io.File is used.
@@ -296,9 +302,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
     public void actionRightZip(Object userData, GralTableLine_ifc line)
     {
       File currentFile = (File)userData;
-      FileZip fileZip = new FileZip(currentFile);
-      //fileZip.listFiles();
-      fillIn(fileZip);
+      File fileZipAsDir = FileAccessZip.openZipFile(FileRemote.fromFile(currentFile));
+      //FileZip fileZip = new FileZip(currentFile);
+      fillIn(fileZipAsDir);
     }
     
     
@@ -670,6 +676,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     }
   }
   
+
   
   /**Fills the content with given directory.
    * @param dir The directory which's files are shown.
@@ -677,8 +684,22 @@ public class GralFileSelector implements Removeable //extends GralWidget
   public void fillIn(File fileIn) //String path)
   {
     selectList.wdgdTable.clearTable(); //setValue(GralMng_ifc.cmdClear, -1, null, null);
-    //FileRemote dir = new FileRemote(path);
-    //FileRemote rdir = (FileRemote)dir;
+    if(fileIn instanceof FileRemote){
+      FileRemote.Callback eventFillIn = new FileRemote.Callback(fileIn, callbackFillIn);
+      ((FileRemote) fileIn).refreshPropertiesAndChildren(eventFillIn);
+    } else {
+      //a local file
+      fillInRefreshed(fileIn);
+    }
+  }
+  
+  
+  /**Fills the content with given directory.
+   * @param dir The directory which's files are shown.
+   */
+  private void fillInRefreshed(File fileIn) //String path)
+  {
+    //selectList.wdgdTable.clearTable(); //setValue(GralMng_ifc.cmdClear, -1, null, null);
     File dir = null;
     if(fileIn.exists()){
       if(fileIn.isDirectory()){
@@ -767,7 +788,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
           sortFiles.put(sort, file);
         }
         int lineCt = 0; //count lines to select the line number with equal sFileSelect.
-        if(dir.getParent() !=null){
+        if(dir.getParentFile() !=null){
           String[] line = new String[zColumns];
           line[kColDesignation] = "<";
           line[kColFilename] = "..";
@@ -917,7 +938,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   /**Sets the focus of the associated table widget.
    * @return true if focused.
    */
-  public boolean setFocus(){ return selectList.wdgdTable.setFocus(); }
+  public void setFocus(){ selectList.wdgdTable.setFocus(); }
   
   void stop(){}
 
@@ -944,6 +965,25 @@ public class GralFileSelector implements Removeable //extends GralWidget
   }
 
 
+  
+  EventConsumer callbackFillIn = new EventConsumer(){
+    @Override public boolean processEvent(Event ev) {
+      ///
+      FileRemote.Callback callback = (FileRemote.Callback)ev;
+      FileRemote dir = (FileRemote)callback.getRefData();  //it is completed meanwhile
+      ev.consumed();
+      fillInRefreshed(dir);
+      setFocus();
+      return true;
+    }
+  };
+  
+  
+  
+
+  
+  
+  
   /**Action on [Enter]-key on the path text field.
    * <ul>
    * <li>If the text represents an existing directory, it is used as current.

@@ -118,7 +118,7 @@ public class SwtButton extends GralButton
   { widgetSwt.setBounds(x,y,dx,dy);
   }
   
-  @Override public boolean setFocus()
+  @Override public boolean setFocusGThread()
   { SwtWidgetHelper.setFocusOfTabSwt(widgetSwt);
     widgetSwt.forceFocus();
     return widgetSwt.setFocus();

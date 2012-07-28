@@ -129,7 +129,7 @@ public class SwtTabbedPanel extends GralTabbedPanel
 
   
 	
-	/**See {@link GralWidget#setFocus()}
+	/**See {@link GralWidget#setFocusGThread()}
 	 * @see org.vishia.gral.base.GralTabbedPanel#selectTab(java.lang.String)
 	 */
 	@Override public GralPanelContent selectTab(String name)
@@ -258,7 +258,7 @@ public class SwtTabbedPanel extends GralTabbedPanel
 
 
   
-  @Override public boolean setFocus(){ return widgetSwt.setFocus(); }
+  @Override public boolean setFocusGThread(){ return widgetSwt.setFocus(); }
 
   @Override
   public GralColor setBackgroundColor(GralColor color)

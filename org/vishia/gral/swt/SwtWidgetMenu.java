@@ -61,7 +61,7 @@ public class SwtWidgetMenu extends GralWidget
   }
 
   @Override
-  public boolean setFocus()
+  public boolean setFocusGThread()
   {
     // TODO Auto-generated method stub
     return false;
