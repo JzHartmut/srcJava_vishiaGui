@@ -54,6 +54,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2012-07-30 Hartmut improved using of extra thread on refreshing file properties. Write first 'waiting',
+   *   the other thread writes the content maybe delayed. The user can abort the access if a response is not kept.
    * <li>2012-07-28 Hartmut improved zipfile access.
    * <li>2012-07-29 Hartmut improved access to the file system using the new capabilities of FileRemote.
    *  TODO consequently writing 'wait for response' in table and access to the file in another thread.
@@ -683,8 +685,14 @@ public class GralFileSelector implements Removeable //extends GralWidget
    */
   public void fillIn(File fileIn) //String path)
   {
-    selectList.wdgdTable.clearTable(); //setValue(GralMng_ifc.cmdClear, -1, null, null);
     if(fileIn instanceof FileRemote){
+      selectList.wdgdTable.clearTable(); 
+      String[] line = new String[zColumns];
+      line[kColDesignation] = "";
+      line[kColFilename] = "--waiting--";
+      line[kColDate] = "";
+      selectList.wdgdTable.insertLine(null, -1, line, null);
+      setFocus();
       FileRemote.Callback eventFillIn = new FileRemote.Callback(fileIn, callbackFillIn);
       ((FileRemote) fileIn).refreshPropertiesAndChildren(eventFillIn);
     } else {
@@ -699,9 +707,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
    */
   private void fillInRefreshed(File fileIn) //String path)
   {
-    //selectList.wdgdTable.clearTable(); //setValue(GralMng_ifc.cmdClear, -1, null, null);
+    selectList.wdgdTable.clearTable(); 
     File dir = null;
-    if(fileIn.exists()){
+    if(fileIn !=null && fileIn.exists()){
       if(fileIn.isDirectory()){
         dir =fileIn;
       } else {
@@ -709,20 +717,28 @@ public class GralFileSelector implements Removeable //extends GralWidget
         String sDir = FileSystem.getCanonicalPath(dir); //with / as separator!
         String sFile = fileIn.getName();
         indexSelection.put(sDir, sFile);
-  
       }
       this.currentDir = dir;
       if(originDir == null){
         originDir = dir; //path;      //sets on the first invocation. 
       }
-      //this.sCurrentDir = FileSystem.getCanonicalPath(dir) + "/";
       this.sCurrentDir = dir.getPath();
       if(sCurrentDir.endsWith("/"))
         stop();
-      //widgdPath.setValue(GralPanelMngWorking_ifc.cmdSet, 0, sCurrentDir);
       widgdPath.setText(sCurrentDir, -1);
     } else {
       widgdPath.setText("?? " + fileIn.getAbsolutePath()); 
+      this.currentDir = fileIn;  //though it does not exist, store it for refresh (may be exist later).
+      if(originDir == null){
+        originDir = fileIn; //path;      //sets on the first invocation. 
+      }
+      //special case: no files:
+      String[] line = new String[zColumns];
+      line[kColDesignation] = "";
+      line[kColFilename] = "--not found--";
+      line[kColDate] = "";
+      selectList.wdgdTable.insertLine(null, -1, line, null);
+      //lineCt +=1;
     }
     //widgdPath.setSelection("|..<");
     long timeNow = System.currentTimeMillis();
