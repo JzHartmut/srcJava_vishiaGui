@@ -100,6 +100,7 @@ public class FcmdFavorCard  extends GralSelectList
   @Override public boolean setFocus(){ 
     mainPanel.bFavorCardHasFocus = true;
     mainPanel.bFavorThemeCardHasFocus = false;
+    main.setLastSelectedPanel(mainPanel);
     //setActFilePanel_setColorCurrLine();
     return super.setFocus(); 
   }
@@ -243,6 +244,7 @@ public class FcmdFavorCard  extends GralSelectList
         mainPanel.bFavorCardHasFocus = true;
         mainPanel.bFavorThemeCardHasFocus = false;
         main.lastFavorCard = FcmdFavorCard.this;
+        main.setLastSelectedPanel(mainPanel);
         GralTableLine_ifc line = (GralTableLine_ifc) params[0];
         Object oData = line.getUserData();
         //System.out.println("FcmdFavorCard.actionFavorSelected: " + fileTable.label);

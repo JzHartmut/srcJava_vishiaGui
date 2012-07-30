@@ -200,6 +200,7 @@ public class FcmdFileCard extends GralFileSelector
     setOriginDir(favorPathInfo.getOriginDir());
     widgLabel.setText(favorPathInfo.selectName);
     fillIn(dir);
+    setFocus();
   }
   
   void setFocusFavorOrFile(){
@@ -393,7 +394,8 @@ public class FcmdFileCard extends GralFileSelector
     System.out.println("FcmdFileCard " + mainPanel.cc + ":" + sFileName);
     FcmdFileCard otherFileCard;
     if(mainPanel.cc == 'm'){ otherFileCard = main.favorPathSelector.panelRight.actFileCard; }
-    else if(mainPanel.cc == 'm'){ otherFileCard = main.favorPathSelector.panelMid.actFileCard;  }
+    else if(mainPanel.cc == 'r'){ otherFileCard = main.favorPathSelector.panelMid.actFileCard;  }
+    else if(mainPanel.cc == 'l'){ otherFileCard = main.favorPathSelector.panelMid.actFileCard;  }
     else { otherFileCard = null; }
     if(otherFileCard !=null){  //NOTE: though mid and right is selected, the otherFileCard may be null because no tab is open.
       String sDirName = getCurrentDir().getName();

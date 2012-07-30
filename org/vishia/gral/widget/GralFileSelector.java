@@ -692,7 +692,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       line[kColFilename] = "--waiting--";
       line[kColDate] = "";
       selectList.wdgdTable.insertLine(null, -1, line, null);
-      setFocus();
+      //setFocus();
       FileRemote.Callback eventFillIn = new FileRemote.Callback(fileIn, callbackFillIn);
       ((FileRemote) fileIn).refreshPropertiesAndChildren(eventFillIn);
     } else {
@@ -989,7 +989,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       FileRemote dir = (FileRemote)callback.getRefData();  //it is completed meanwhile
       ev.consumed();
       fillInRefreshed(dir);
-      setFocus();
+      //setFocus();    //don't set the focus, it may be false. Only fill.
       return true;
     }
   };

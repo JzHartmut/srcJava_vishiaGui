@@ -135,10 +135,10 @@ public class FcmdLeftMidRightPanel
   
 
   void setFocus(){
+    main.setLastSelectedPanel(this);
     if(actFileCard !=null){
       actFileCard.setFocusFavorOrFile();
     } else {
-      main.setLastSelectedPanel(this);
       cardFavorThemes.setFocus();
     }
   }
