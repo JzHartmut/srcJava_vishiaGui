@@ -152,7 +152,7 @@ public class FcmdCopyCmd
     public boolean userActionGui(int key, GralWidget infos,
         Object... params)
     { //String sSrc, sDstName, sDstDir;
-      if(widgButtonOk.sCmd.equals("check")) {
+      if(widgButtonOk.getCmd().equals("check")) {
         //only if it is ready to check, get the files.
         filesToCopy.clear();
         listEvCheck.clear();
@@ -194,7 +194,7 @@ public class FcmdCopyCmd
         widgCopyDirDst.setText(sDstDir);
         widgCopyNameDst.setText(sDstName);
         widgButtonOk.setText("check");
-        widgButtonOk.sCmd = "check";
+        widgButtonOk.setCmd("check");
         widgCopyState.setText("check?", 0);
         widgdMove.setValue(GralMng_ifc.cmdSet, 0, 0);
         zFiles = zBytes = 0;
@@ -234,8 +234,9 @@ public class FcmdCopyCmd
         if(widgg.sCmd.equals("check")){
           widgCopyState.setText("busy-check");
           widgButtonOk.setText("busy-check");
-          widgButtonOk.sCmd="busy";
+          widgButtonOk.setCmd("busy");
           widgButtonEsc.setText("abort");
+          widgButtonEsc.setCmd("abort");
           
           for(FileRemote fileSrc : filesToCopy){
             FileRemote.FileRemoteEvent callback = new FileRemote.FileRemoteEvent(fileSrc, success);
@@ -245,8 +246,9 @@ public class FcmdCopyCmd
         } else if(widgg.sCmd.equals("copy")) {
           widgCopyState.setText("busy-copy");
           widgButtonOk.setText("busy-copy");
-          widgButtonOk.sCmd="busy";
+          widgButtonOk.setCmd("busy");
           widgButtonEsc.setText("abort");
+          widgButtonEsc.setCmd("abort");
           sDstName = widgCopyNameDst.getText();
           sDstDir = widgCopyDirDst.getText();
           if(!FileSystem.isAbsolutePathOrDrive(sDstDir)) {
@@ -283,20 +285,20 @@ public class FcmdCopyCmd
                   
           }
         } else if(widgg.sCmd.startsWith("abort")) {
-          filesToCopy.clear();
-          for(FileRemote.FileRemoteEvent ev: listEvCheck){
+          for(FileRemote.FileRemoteEvent ev: listEvCopy){
             ev.setCmd(FileRemote.cmdAbortAll);
             ev.sendEvent();
           }
           listEvCheck.clear();
           listEvCopy.clear();
+          filesToCopy.clear();
           widgButtonOk.setText("check");
-          widgButtonOk.sCmd="check";
+          widgButtonOk.setCmd("check");
             
         } else if(widgg.sCmd.startsWith("quit")) {
           filesToCopy.clear();
           widgButtonOk.setText("check");
-          widgButtonOk.sCmd="check";
+          widgButtonOk.setCmd("check");
             
         } else if(widgg.sCmd.equals("esc")){
           //it is an abort too!
@@ -307,8 +309,9 @@ public class FcmdCopyCmd
           listEvCheck.clear();
           listEvCopy.clear();
           widgButtonOk.setText("check");
-          widgButtonOk.sCmd="check";
+          widgButtonOk.setCmd("check");
           widgButtonEsc.setText("close");
+          widgButtonEsc.setCmd("close");
           main.gralMng.setWindowsVisible(windConfirmCopy, null); //set it invisible.
         }
       }
@@ -324,14 +327,14 @@ public class FcmdCopyCmd
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if(widgdMove.isOn()){
           widgButtonOk.setText("move");
-          widgButtonOk.sCmd="copy";
+          widgButtonOk.setCmd("copy");
         } else {
           if(widgCopyState.getText().equals("check")){
             widgButtonOk.setText("check");
-            widgButtonOk.sCmd="check";
+            widgButtonOk.setCmd("check");
           } else {
             widgButtonOk.setText("copy");
-            widgButtonOk.sCmd="copy";
+            widgButtonOk.setCmd("copy");
           }
         }
         return true; 
@@ -350,7 +353,7 @@ public class FcmdCopyCmd
         //TODO check dst space
         widgCopyState.setText("files:" + zFiles + ", size:" + zBytes);
         widgButtonOk.setText("copy");
-        widgButtonOk.sCmd = "copy";
+        widgButtonOk.setCmd("copy");
       }
     }
   }
@@ -377,12 +380,13 @@ public class FcmdCopyCmd
       if(!ok){
         widgCopyState.setText("error");
         widgButtonOk.setText("quit");
-        widgButtonOk.sCmd="quit";
+        widgButtonOk.setCmd("quit");
       } else {
         widgButtonOk.setText("check");
-        widgButtonOk.sCmd = "check";
+        widgButtonOk.setCmd("check");
       }
       widgButtonEsc.setText("close");
+      widgButtonEsc.setCmd("close");
       windConfirmCopy.setWindowVisible(false);      
     }
   }
