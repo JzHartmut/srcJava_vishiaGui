@@ -198,10 +198,9 @@ class FcmdFavorPathSelector
 
     windSearchFiles = GralFileSelector.createWindowConfirmSearchGthread(mng);
     
-    main.gui.addMenuItemGThread("menuFileNaviOriginDir", main.idents.menuFileNaviOriginDirBar, actionSetDirOrigin); // /
     //main.gui.addMenuItemGThread("menuFileNaviRefresh", main.idents.menuFileNaviRefreshBar, actionRefreshFileTable); // /
     //main.gui.addMenuItemGThread("menubarFolderCreate", main.idents.menuConfirmMkdirFileBar, main.mkCmd.actionOpenDialog); // /
-    main.gui.addMenuItemGThread("menubarFolderSearch", main.idents.menuBarSearchFiles, actionSearchFiles); // /
+    //main.gui.addMenuItemGThread("menubarFolderSearch", main.idents.menuBarSearchFiles, actionSearchFiles); // /
     main.gui.addMenuItemGThread("menuBarFolderSyncMidRight", main.idents.menuBarFolderSyncMidRight, actionSyncMidRight); // /
     //main.gui.addMenuItemGThread("menubarFileProps", main.idents.menuFilePropsBar, main.filePropsCmd.actionOpenDialog);
     //main.gui.addMenuItemGThread("test", main.idents.menuFileViewBar, main.viewCmd.actionOpenView);

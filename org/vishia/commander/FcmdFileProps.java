@@ -98,15 +98,15 @@ public class FcmdFileProps
   /**
    * 
    */
-  final FileRemote.Callback evChg;
+  final FileRemote.FileRemoteEvent evChg;
   
-  final FileRemote.Callback evCntLen;
+  final FileRemote.FileRemoteEvent evCntLen;
   
   public FcmdFileProps(Fcmd main)
   { this.main = main;
     this.formatDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-    evChg = new FileRemote.Callback(null, callbackChgProps);
-    evCntLen = new FileRemote.Callback(null, callbackCntLen);
+    evChg = new FileRemote.FileRemoteEvent(null, callbackChgProps);
+    evCntLen = new FileRemote.FileRemoteEvent(null, callbackCntLen);
   }
   
   
@@ -376,7 +376,7 @@ public class FcmdFileProps
   EventConsumer callbackChgProps = new EventConsumer()
   { @Override public boolean processEvent(Event ev)
     { GralButton src = (GralButton)ev.getRefData();
-      if(ev.id == FileRemoteAccessor.kFinishOk){
+      if(ev.cmd() == FileRemoteAccessor.kFinishOk){
         showFileInfos(actFile);
         src.setText(main.idents.buttonFilePropsOk);
       } else {
@@ -408,8 +408,8 @@ public class FcmdFileProps
   EventConsumer callbackCntLen = new EventConsumer()
   { @Override public boolean processEvent(Event evP)
     { GralButton src = (GralButton)evP.getRefData();
-      if(evP.id == FileRemoteAccessor.kFinishOk){
-        FileRemote.Callback ev = (FileRemote.Callback)evP; 
+      if(evP.cmd() == FileRemoteAccessor.kFinishOk){
+        FileRemote.FileRemoteEvent ev = (FileRemote.FileRemoteEvent)evP; 
         String sLen = "" + ev.nrofBytesAll;
         widgLength.setText(sLen);
       } else {

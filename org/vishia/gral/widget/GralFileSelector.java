@@ -693,7 +693,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       line[kColDate] = "";
       selectList.wdgdTable.insertLine(null, -1, line, null);
       //setFocus();
-      FileRemote.Callback eventFillIn = new FileRemote.Callback(fileIn, callbackFillIn);
+      FileRemote.FileRemoteEvent eventFillIn = new FileRemote.FileRemoteEvent(fileIn, callbackFillIn);
       ((FileRemote) fileIn).refreshPropertiesAndChildren(eventFillIn);
     } else {
       //a local file
@@ -985,7 +985,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   EventConsumer callbackFillIn = new EventConsumer(){
     @Override public boolean processEvent(Event ev) {
       ///
-      FileRemote.Callback callback = (FileRemote.Callback)ev;
+      FileRemote.FileRemoteEvent callback = (FileRemote.FileRemoteEvent)ev;
       FileRemote dir = (FileRemote)callback.getRefData();  //it is completed meanwhile
       ev.consumed();
       fillInRefreshed(dir);

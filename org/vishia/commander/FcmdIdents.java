@@ -26,17 +26,21 @@ public class FcmdIdents
   String menuContextShowSlash = "slash path (compatible)";
   
   
-  String menuFileNaviOriginDirBar = "fol&Der/set &Origin dir [c<]";
-  
   String menuBarFolderSyncMidRight = "fol&Der/s&Ync mid - right";
   
 
   
-  String menuFileNaviOriginDirContext = "set Origin dir [c<]";
-  
+  String menuBarSetOriginDir = "fol&Der/set &Origin dir [c<] [cHome]";
+  String menuContextSetOriginDir = "set Origin dir [c<] [cHome]";
+  String buttonSetOriginDir = null; //"cF2:origin";
   /**Show files in the start dir of the selection. Go to the origin dir.*/
-  int keyOriginDir = KeyCode.ctrl + '<';  //like total commander: jump to the root directory
+  int keyOriginDir1 = KeyCode.ctrl + '<';  //like total commander: jump to the root directory
+  int keyOriginDir2 = KeyCode.ctrl + KeyCode.home;  //like total commander: jump to the root directory
 
+  
+  
+  
+  
   String menuFileNaviRefreshBar = "fol&Der/&Refresh [cR]";
   String menuFileNaviRefreshContext = "Refresh [cR]";
   String buttonRefereshFiles = "F5:refresh";

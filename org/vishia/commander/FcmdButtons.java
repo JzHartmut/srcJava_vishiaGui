@@ -184,6 +184,7 @@ public class FcmdButtons
     setBtnMenuAndKeys(main.mkCmd.actionOpenDialog, main.idents.buttonMkdirFile, main.idents.keyFileCreate, main.idents.menuConfirmMkdirFileBar);
     setBtnMenuAndKeys(main.deleteCmd.actionConfirmDelete, main.idents.buttonFileDel, main.idents.keyFileDel1, main.idents.menuConfirmFileDelBar);
     setBtnMenuAndKeys(main.deleteCmd.actionConfirmDelete, null, main.idents.keyFileDel2, null);
+    setBtnMenuAndKeys(main.favorPathSelector.actionSetDirOrigin, main.idents.buttonSetOriginDir, main.idents.keyOriginDir1, main.idents.keyOriginDir1, main.idents.menuBarSetOriginDir);
     setBtnMenuAndKeys(main.executer.actionExecuteFileByExtension, main.idents.buttonExecute, main.idents.keyExecuteExt, main.idents.menuExecuteBar);
     setBtnMenuAndKeys(main.favorPathSelector.actionRefreshFileTable, main.idents.buttonRefereshFiles, main.idents.keyRefresh1, main.idents.menuFileNaviRefreshBar);
     setBtnMenuAndKeys(main.favorPathSelector.actionRefreshFileTable, null, main.idents.keyRefresh2, null);

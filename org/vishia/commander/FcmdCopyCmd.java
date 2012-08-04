@@ -70,9 +70,9 @@ public class FcmdCopyCmd
   
   //List<String> listFileSrc;
   
-  final List<FileRemote.Callback> listEvCheck = new LinkedList<FileRemote.Callback>();
+  final List<FileRemote.FileRemoteEvent> listEvCheck = new LinkedList<FileRemote.FileRemoteEvent>();
   
-  final List<FileRemote.Callback> listEvCopy = new LinkedList<FileRemote.Callback>();
+  final List<FileRemote.FileRemoteEvent> listEvCopy = new LinkedList<FileRemote.FileRemoteEvent>();
   
   final List<FileRemote> filesToCopy = new LinkedList<FileRemote>();
   
@@ -238,7 +238,7 @@ public class FcmdCopyCmd
           widgButtonEsc.setText("abort");
           
           for(FileRemote fileSrc : filesToCopy){
-            FileRemote.Callback callback = new FileRemote.Callback(fileSrc, success);
+            FileRemote.FileRemoteEvent callback = new FileRemote.FileRemoteEvent(fileSrc, success);
             listEvCheck.add(callback);
             fileSrc.check(callback);   //callback.use() will be called on response
           }
@@ -268,7 +268,7 @@ public class FcmdCopyCmd
 
             
             if(fileSrc.sameDevice(fileDst)){
-              FileRemote.Callback callback = new FileRemote.Callback(fileSrc, success);
+              FileRemote.FileRemoteEvent callback = new FileRemote.FileRemoteEvent(fileSrc, success);
               listEvCopy.add(callback);
               if(widgdMove.isOn()){
                 fileSrc.moveTo(fileDst, callback);  //callback.use() will be called on response
@@ -284,8 +284,9 @@ public class FcmdCopyCmd
           }
         } else if(widgg.sCmd.startsWith("abort")) {
           filesToCopy.clear();
-          for(Event ev: listEvCheck){
-            //TODO aabort given cmd  
+          for(FileRemote.FileRemoteEvent ev: listEvCheck){
+            ev.setCmd(FileRemote.cmdAbortAll);
+            ev.sendEvent();
           }
           listEvCheck.clear();
           listEvCopy.clear();
@@ -338,7 +339,7 @@ public class FcmdCopyCmd
   } };
   
   
-  private void eventCheckOk(FileRemote.Callback ev){
+  private void eventCheckOk(FileRemote.FileRemoteEvent ev){
     if(listEvCheck.remove(ev)){
       zBytes += ev.nrofBytesAll;
       zFiles += ev.nrofFiles;
@@ -392,14 +393,16 @@ public class FcmdCopyCmd
   EventConsumer success = new EventConsumer(){
     @Override public boolean processEvent(Event ev)
     {
-      FileRemote.Callback ev1 = (FileRemote.Callback)ev;
-      switch(ev.id){
+      FileRemote.FileRemoteEvent ev1 = (FileRemote.FileRemoteEvent)ev;
+      switch(ev.cmd()){
         case FileRemoteAccessor.kNrofFilesAndBytes:{
           eventCheckOk(ev1);
         } break;
         case FileRemoteAccessor.kOperation: {
           int percent = ev.data2 / 10;
           widgProgressAll.setValue(percent);
+          widgCopyNameDst.setText(String.copyValueOf(ev1.fileName));
+          widgCopyState.setText("" + ev1.nrofBytesInFile/1000000 + " Mbyte");
         }break;
         case FileRemoteAccessor.kFinishError: {
           widgCopyState.setText("error");
