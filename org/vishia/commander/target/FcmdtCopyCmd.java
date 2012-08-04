@@ -23,7 +23,7 @@ public class FcmdtCopyCmd implements Closeable
   Thread threadMng = new Thread(threadRun, "CopyCmd");
 
   FcmdtCopyCmd(){
-    threadMng.start();    
+    //threadMng.start();    
   }
   
   void startCopy(int cmd, String sParam){

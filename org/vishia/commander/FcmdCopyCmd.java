@@ -49,7 +49,7 @@ public class FcmdCopyCmd
   
   GralTextField_ifc widgCopyFrom, widgCopyDirDst, widgCopyNameDst, widgCopyState;
   
-  GralWidget widgdOverwrite, widgdOverwriteReadOnly, widgdOverwriteHidden;
+  GralButton widgdOverwrite, widgdOverwriteReadOnly, widgSkipFile, widgSkipDir;
   
   GralButton widgdMove;
 
@@ -75,6 +75,14 @@ public class FcmdCopyCmd
   final List<FileRemote.FileRemoteEvent> listEvCopy = new LinkedList<FileRemote.FileRemoteEvent>();
   
   final List<FileRemote> filesToCopy = new LinkedList<FileRemote>();
+  
+  /**This reference is set with the callback of operation cmd. 
+   * The event can be used to affect the copying process.
+   */
+  FileRemote.FileRemoteEvent evCurrentFile;
+  
+  boolean bSkipFile, bSkipDir;
+  
   
   FcmdCopyCmd(Fcmd main)
   { this.main = main;
@@ -115,9 +123,9 @@ public class FcmdCopyCmd
     widgdOverwrite = main.gralMng.addSwitchButton("copyOverwriteReadonly", null, null, null, null, "overwr all readonly", "wh", "gn");
 
     main.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size -3, 1, 15, 0, 'r');
-    widgdOverwrite = main.gralMng.addButton("copyOverwrite", null, null, null, null, "skip");
+    widgSkipFile = main.gralMng.addButton("copyskip", actionButtonSkipFile, null, null, null, "skip");
     main.gralMng.setPosition(GralPos.same, GralPos.size -3, 16, GralPos.size +14, 0, 'r', 1);
-    widgdOverwrite = main.gralMng.addButton("copyOverwrite", null, null, null, null, "skip dir");
+    widgSkipDir = main.gralMng.addButton("copySkipDir", actionButtonSkipDir, null, null, null, "skip dir");
     widgdMove = main.gralMng.addSwitchButton("copyMove", "Copy/ ?move", "Move/ ?copy", GralColor.getColor("wh"), GralColor.getColor("gn"));
     widgdMove.setActionChange(actionSwitchButtonMove);
     
@@ -292,6 +300,7 @@ public class FcmdCopyCmd
           listEvCheck.clear();
           listEvCopy.clear();
           filesToCopy.clear();
+          FcmdCopyCmd.this.evCurrentFile = null;
           widgButtonOk.setText("check");
           widgButtonOk.setCmd("check");
             
@@ -317,6 +326,36 @@ public class FcmdCopyCmd
       }
       return true;
     }
+  };
+  
+
+  
+  
+  /**This action is used to skip over the current showed file while copying. Copying of the selected file
+   * should be aborted and that file should be deleted.
+   * 
+   */
+  protected GralUserAction actionButtonSkipFile = new GralUserAction()
+  { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        bSkipFile = true;  
+      }
+      return true;
+    } 
+  };
+  
+  
+  /**This action is used to skip over the current showed file while copying. Copying of the selected file
+   * should be aborted and that file should be deleted.
+   * 
+   */
+  protected GralUserAction actionButtonSkipDir = new GralUserAction()
+  { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        bSkipDir = true;  
+      }
+      return true;
+    } 
   };
   
   
@@ -400,24 +439,47 @@ public class FcmdCopyCmd
       FileRemote.FileRemoteEvent ev1 = (FileRemote.FileRemoteEvent)ev;
       switch(ev.cmd()){
         case FileRemoteAccessor.kNrofFilesAndBytes:{
+          FcmdCopyCmd.this.evCurrentFile = ev1;
+          if(bSkipDir){
+            ev1.setCmd(FileRemote.cmdAbortDir);
+            ev1.sendEvent();
+            bSkipDir = false;
+          } 
+          bSkipFile = false;
           eventCheckOk(ev1);
         } break;
         case FileRemoteAccessor.kOperation: {
+          FcmdCopyCmd.this.evCurrentFile = ev1;
           int percent = ev.data2 / 10;
           widgProgressAll.setValue(percent);
           widgCopyNameDst.setText(String.copyValueOf(ev1.fileName));
           widgCopyState.setText("" + ev1.nrofBytesInFile/1000000 + " Mbyte");
+          if(bSkipFile){
+            ev1.setCmd(FileRemote.cmdAbortFile);
+            ev1.sendEvent();
+            bSkipFile = false;
+          } else if(bSkipDir){
+            ev1.setCmd(FileRemote.cmdAbortDir);
+            ev1.sendEvent();
+            bSkipDir = false;
+          } 
         }break;
         case FileRemoteAccessor.kFinishError: {
+          FcmdCopyCmd.this.evCurrentFile = null;
           widgCopyState.setText("error");
+          bSkipDir = bSkipFile = false;
           eventConsumed(ev, false);
         }break;
         case FileRemoteAccessor.kFinishNok: {
+          FcmdCopyCmd.this.evCurrentFile = null;
           widgCopyState.setText("nok");
+          bSkipDir = bSkipFile = false;
           eventConsumed(ev, false);
         }break;
         case FileRemoteAccessor.kFinishOk: {
+          FcmdCopyCmd.this.evCurrentFile = null;
           widgCopyState.setText("ok");
+          bSkipDir = bSkipFile = false;
           eventConsumed(ev, true);
         }break;
       }
