@@ -3,6 +3,7 @@ package org.vishia.gral.swt;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -35,6 +36,7 @@ public class SwtCurveView extends GralCurveView
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-08-11 Hartmut now grid with  timestamps
    * <li>2012-03-25 Hartmut improved zoom
    * <li>2012-03-17 Hartmut some improvements in paint routine.
    * <li>2012-02-26 Hartmut A lot of details, see {@link GralCurveView}
@@ -160,9 +162,9 @@ public class SwtCurveView extends GralCurveView
     //private final Color[] lineColors;
     
     
-    private Color gridColor = new Color(getDisplay(), 0, 255, 255);
+    private Color gridColor = new Color(getDisplay(), 192, 255, 255);
     
-    private Color gridColorStrong = new Color(getDisplay(), 0, 255, 255);
+    private Color gridColorStrong = new Color(getDisplay(), 128, 255, 255);
     
     private Color colorBack = new Color(getDisplay(), 0xff, 0xff, 0xff);
     
@@ -438,6 +440,8 @@ public class SwtCurveView extends GralCurveView
     @Override public void drawBackground(GC g, int xView, int yView, int dxView, int dyView) {
       //NOTE: forces stack overflow because calling of this routine recursively: super.paint(g);
       try{
+        boolean redrawBecauseNewData1 = SwtCurveView.super.redrawBecauseNewData;
+        SwtCurveView.super.redrawBecauseNewData = false;  //it is done.
         //
         //detect how many new data are given. Because the data are written in another thread,
         //the number of data, the write index are accessed only one time from this
@@ -445,14 +449,14 @@ public class SwtCurveView extends GralCurveView
         int ixDataRight = SwtCurveView.super.ixDataShowRight; 
         Point size = getSize(); //size of the widget.
         nrofValuesShow = size.x;
-        timePerPixel = timeSpread / (size.x +1); //nr of time units per pixel. 
-        pixel7time = (float)(size.x +1) / timeSpread; //nr of pixel per time unit.
+        timeorg.timePerPixel = (float)timeorg.timeSpread / (size.x +1); //nr of time units per pixel. 
+        timeorg.pixel7time = (float)(size.x +1) / timeorg.timeSpread; //nr of pixel per time unit.
         int xViewPart = -1;   //nr of new pixel if only a part is drawn
         final int xp0;  //left point to draw.
         final int timeDiff; //time for new values.
         testHelp.xView =xView; testHelp.yView =yView; testHelp.dxView =dxView; testHelp.dyView =dyView;
         //
-        if(!bFreeze && !paintAllCmd && redrawBecauseNewData) {
+        if(!bFreeze && !paintAllCmd && redrawBecauseNewData1) {
           //paint only a part of the curve to save calculation time.
           //The curve will be shifted to left.
           //
@@ -467,12 +471,12 @@ public class SwtCurveView extends GralCurveView
           int timeLast = timeValues[(ixDataDraw >> shIxiData) & mIxiData];
           int timeNow = timeValues[(ixDataRight >> shIxiData) & mIxiData];
           timeDiff = timeNow - timeLast + timeCaryOverNewValue;  //0 if nothing was written.
-          xViewPart = (int)(pixel7time * timeDiff + 0.0f);
+          xViewPart = (int)(timeorg.pixel7time * timeDiff + 0.0f);
           //
           //Shift the graphic if the reason of redraw is only increment samples
           //and the number the values are shifted at least by that number, which is mapped to 1 pixel.
           if(xViewPart >0 && xViewPart < size.x){
-            timeCaryOverNewValue = (int)(timeDiff - xViewPart * timePerPixel);
+            timeCaryOverNewValue = (int)(timeDiff - xViewPart * timeorg.timePerPixel);
             xViewLastF -= xViewPart;
             if(xView != 0){
               //TODO what is if only a part of control is shown
@@ -488,6 +492,9 @@ public class SwtCurveView extends GralCurveView
               g.drawImage(cursorStore2, size.x - xpCursor2, 0);
             }
             g.copyArea(xView + xViewPart, yView, dxView - xViewPart , dyView -5, xView, yView, false);
+            //
+            timeorg.pixelWrittenAfterStrongDiv += xViewPart;
+            
             //System.out.println("SwtCurveView - draw - shift graphic;" + xViewPart);
             //System.arraycopy(ixDataShown, 0, ixDataShown, xViewPart, size.x - xViewPart);
             testHelp.ctRedrawPart +=1;
@@ -505,9 +512,11 @@ public class SwtCurveView extends GralCurveView
             xp0 = size.x;
           }
         } else { //paintall
+          timeorg.calc();
+          System.out.println("SwtCurveView - paintall;" + bFreeze + paintAllCmd + redrawBecauseNewData1);
           xViewPart = size.x;
           timeCaryOverNewValue = 0;
-          timeDiff = (int)(timePerPixel * xViewPart);
+          timeDiff = (int)(timeorg.timePerPixel * xViewPart);
           xp0 = 0;
           paintAllCmd = false; //accepted, done
           testHelp.ctRedrawAll +=1;
@@ -547,7 +556,37 @@ public class SwtCurveView extends GralCurveView
           //prepare indices of data.
           int ixixDataLast = prepareIndicesDataForDrawing(ixDataRight, xViewPart, timeDiff);
           // 
+          //write time divisions:
+          g.setForeground(gridColor);
+          g.setLineWidth(1);
+          g.setLineStyle(SWT.LINE_DOT);
+          for(int ii=1; ii <=9; ++ii){
+            int y = (int)(size.y /10.0f * ii);
+            g.drawLine(size.x - xViewPart, y, size.x, y);
+            
+          }
+          //
+          int ixPixelTimeDiv =-1;
+          int xPixelTimeDiv1;
+          while((xPixelTimeDiv1 = timeorg.xPixelTimeDivFine[++ixPixelTimeDiv]) >=0) {
+            g.drawLine(size.x - xPixelTimeDiv1, 0, size.x - xPixelTimeDiv1, size.y);
+            //System.out.println("draw " + xPixelTimeDiv);
+          }
+          g.setForeground(gridColorStrong);
+          g.setLineWidth(1);
+          ixPixelTimeDiv =-1;
+          while((xPixelTimeDiv1 = timeorg.xPixelTimeDiv[++ixPixelTimeDiv]) >=0) {
+            g.drawLine(size.x - xPixelTimeDiv1, 0, size.x - xPixelTimeDiv1, size.y);
+            if(xPixelTimeDiv1 > 30){
+              g.setForeground((Color)itsMng.getColorImpl(GralColor.getColor("bk")));
+              g.drawText(timeorg.sTimeAbsDiv[ixPixelTimeDiv], size.x - 6 - xPixelTimeDiv1, size.y - 25);
+              g.setForeground(gridColorStrong);
+              timeorg.pixelWrittenAfterStrongDiv = Integer.MIN_VALUE;
+            }
+            //System.out.println("draw " + xPixelTimeDiv);
+          }
           //write all tracks.
+          g.setLineStyle(SWT.LINE_SOLID);
           int iTrack = 0;
           int ixData;
           for(Track track: listTracks){
@@ -556,8 +595,11 @@ public class SwtCurveView extends GralCurveView
             iTrack +=1;
           } //for listlines
           ixDataDraw = ixDataRight;
-          
-          
+          //
+          if(timeorg.pixelWrittenAfterStrongDiv > 30){
+            g.drawText(timeorg.sTimeAbsDiv[0], size.x - 6 - timeorg.pixelWrittenAfterStrongDiv, size.y - 25);
+            timeorg.pixelWrittenAfterStrongDiv = Integer.MIN_VALUE;
+          }
           //set the cursors
           if(xpCursor1 >=0){
             int xpCursor = size.x - xpCursor1;
@@ -590,6 +632,9 @@ public class SwtCurveView extends GralCurveView
           int iPixRange1 = size.x * ixDataRel1 / maxNrofXValues;
           int ixDWr = (ixDataWr >> shIxiData) & mIxiData;
           //System.out.println("SwtCurveView.spread; " + ixDataRel1 + ".." + ixDataRel2 + " ->" +  ixDWr);
+          if((timeValues[200] %1000 ==0)){
+            g.drawText("2012-08-09-15h33-45.456", 300, size.y - 20);
+          }
           g.setLineWidth(5);
           g.setForeground((Color)itsMng.getColorImpl(GralColor.getColor("ye")));
           g.drawLine(0, size.y -3, size.x - iPixRange1, size.y -3);
@@ -605,7 +650,6 @@ public class SwtCurveView extends GralCurveView
       //g.drawString("xx", 200, dyView-16);
       focusChanged = false; //paint only last area by next paint event without focus event.
       testStopWr = false;
-      redrawBecauseNewData = false;  //it is done.
     } 
     
   }

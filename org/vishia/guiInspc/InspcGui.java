@@ -34,6 +34,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
   /**Version, history and license
    * <ul>
+   * <li>2012-08-10 Hartmut A default directory for curve config files given with argument "-dirCurves=".
    * <li>2012-04-17 Hartmut new: Parameter {@link CallingArguments#bUseGetValueByIndex} for downward compatibility
    * 
    * <li>2011-04-20 Don't derive this class from {@link GuiCfg}, instead uses the inner class {@link InspcGuiCfg}.
@@ -122,9 +123,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     
     //this.XXXinspcComm = new InspcGuiComm(this, guiCfg.gralMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
     //composites.add(XXXinspcComm);
-    curveA = new InspcCurveView(variableMng, cmdgui.gralMng);
-    curveB = new InspcCurveView(variableMng, cmdgui.gralMng);
-    curveC = new InspcCurveView(variableMng, cmdgui.gralMng);
+    curveA = new InspcCurveView(variableMng, cmdgui.gralMng, cargs.sDefaultDirForCurves);
+    curveB = new InspcCurveView(variableMng, cmdgui.gralMng, cargs.sDefaultDirForCurves);
+    curveC = new InspcCurveView(variableMng, cmdgui.gralMng, cargs.sDefaultDirForCurves);
 
   }
   
@@ -195,6 +196,8 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     //protected String sFileOamValues;
 
     boolean bUseGetValueByIndex;
+    
+    String sDefaultDirForCurves = "C:/";
 
   }
   
@@ -235,6 +238,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
         }
         else if(arg.startsWith("-ownIpc=")) 
         { cargs.sOwnIpcAddr = getArgument(8);   //an example for default output
+        }
+        else if(arg.startsWith("-dirCurves=")) 
+        { cargs.sDefaultDirForCurves = getArgument(11);   //an example for default output
         }
         else { bOk = super.testArgument(arg, nArg); }
       } catch(Exception exc){ bOk = false; }

@@ -62,6 +62,20 @@ public interface GralCurveView_ifc extends GralWidget_ifc, GralSetValue_ifc, Get
    */
   void setSample(float[] values, int timeshort);
 
+  
+  
+  /**Sets a point of absolute time. This routine should be called at least 2 times in an wrapping area of timeshort.
+   * If timeshort are milliseconds, this is about 2000000 seconds. It means, it isn't often. You should call this routine 
+   * cyclically in an slower cycle. Then the graphic can showt the
+   * 
+   * @param date The absolute time appropriate to the timeshort value.
+   * @param timeshort The wrapping short time at this moment of data.
+   * @param millisecPerTimeshort Number of milliseconds per step of timeshort.
+   */
+  void setTimePoint(long date, int timeshort, float millisecPerTimeshort);
+  
+  
+  
   /**Activates or deactivates. Only if the curve view is activated, it writes in time. If it is not active,
    * than the curve can be watched, zoomed etc. 
    * @param activate true to activate, false to deactivate.

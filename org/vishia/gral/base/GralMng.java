@@ -734,6 +734,8 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
    *        0 means, insert on top.  Integer.MAXVALUE means, insert after the last element (append).
    * @param content The content to insert.
    * @return
+   * @deprecated because the {@link #setInfo(GralWidget, int, int, Object, Object)} is deprecated.
+   * Use {@link GralWidget#setBackgroundColor(GralColor)}
    */
   @Override public void setBackColor(GralWidget descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
@@ -742,6 +744,11 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   } 
   
   
+  /**(non-Javadoc)
+   * @see org.vishia.gral.ifc.GralMng_ifc#setLineColor(org.vishia.gral.base.GralWidget, int, int)
+   * @deprecated because the {@link #setInfo(GralWidget, int, int, Object, Object)} is deprecated.
+   * Use {@link GralWidget#setForegroundColor(GralColor)}
+   */
   @Override public void setLineColor(GralWidget descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
     GralWidget descr = (GralWidget) descr1;
@@ -749,6 +756,10 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   } 
   
   
+  /**(non-Javadoc)
+   * @see org.vishia.gral.ifc.GralMng_ifc#setTextColor(org.vishia.gral.base.GralWidget, int, int)
+   * @deprecated because the {@link #setInfo(GralWidget, int, int, Object, Object)} is deprecated.
+   */
   @Override public void setTextColor(GralWidget descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
     GralWidget descr = (GralWidget) descr1;

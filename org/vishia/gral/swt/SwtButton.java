@@ -104,6 +104,8 @@ public class SwtButton extends GralButton
   public GralColor setBackgroundColor(GralColor color)
   {
     // TODO Auto-generated method stub
+    colorOff = color;
+    repaint(100, 100);
     return null;
   }
 

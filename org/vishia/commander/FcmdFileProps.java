@@ -347,7 +347,7 @@ public class FcmdFileProps
             if(!name.equals(actFile.getName())){
               widgCopyFile.setText(main.idents.buttonFilePropsCopying);
               FileRemote fileNew = new FileRemote(actFileRemote.getParentFile(), name);
-              actFileRemote.copyTo(fileNew, evChg);
+              actFileRemote.copyTo(fileNew, evChg, FileRemote.modeCopyReadOnlyOverwrite | FileRemote.modeCopyCreateYes | FileRemote.modeCopyExistAll);
             } else {
               widgCopyFile.setText("copy - name?");
             }

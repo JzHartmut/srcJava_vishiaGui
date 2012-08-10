@@ -33,6 +33,7 @@ public class InspcCurveView
   /**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
    * Changes:
    * <ul>
+   * <li>2012-08-10 Hartmut now uses a default directory for config file given in constructor.
    * <li>2012-07-06 Hartmut now read and save of the file works.
    * <li>2012-06-29 Hartmut new open file dialog
    * <li>2012-06-08 Hartmut: new Buttons for read and save the configuration (setting). Yet only a simple file is used.
@@ -139,16 +140,17 @@ public class InspcCurveView
   GralButton widgBtnOff;
   
   /**The currently loaded file for curve settings. */
-  File fileCurve = new File("D:/");
+  File fileCurve;
   
   //final InspcGuiComm comm;
   
   GralCurveView widgCurve;
   
-  InspcCurveView(VariableContainer_ifc variables, GralMng gralMng){
+  InspcCurveView(VariableContainer_ifc variables, GralMng gralMng, String defaultDir){
     //this.comm = comm;
     this.variables = variables;
     this.gralMng = gralMng;
+    fileCurve = new File(defaultDir);
   }
   
   
