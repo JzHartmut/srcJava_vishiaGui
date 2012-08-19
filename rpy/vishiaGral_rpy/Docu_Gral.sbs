@@ -38720,7 +38720,7 @@ application";
 							- _subsystem = "GeneratedFromJava::base";
 							- _class = "GralPrimaryWindow";
 							- _name = "GuiThread";
-							- _id = GUID 0a78f5ac-31ad-4587-bf89-6218439fa893;
+							- _id = GUID e14a9de6-01e7-48cf-81ad-453f31de2cae;
 						}
 						- m_instance = { IHandle 
 							- _m2Class = "";
@@ -38860,7 +38860,7 @@ application";
 							- _subsystem = "GeneratedFromJava::swt";
 							- _class = "SwtPrimaryWindow";
 							- _name = "Init";
-							- _id = GUID f196a012-037b-4634-8f55-c6547407a368;
+							- _id = GUID beac77c3-14a3-49c0-8634-9076eda04d0e;
 						}
 						- m_instance = { IHandle 
 							- _m2Class = "";
@@ -40013,7 +40013,7 @@ application";
 						- _id = GUID 39030252-728e-4bd3-95b9-cfb2d0bd3dd3;
 						- _myState = 2048;
 						- _name = "keyListener";
-						- m_szSequence = "43.";
+						- m_szSequence = "42.";
 						- m_szActualArgs = "";
 						- m_szReturnVal = "";
 						- m_pCommunicationConnection = { IHandle 
@@ -40244,7 +40244,7 @@ application";
 					{ IMessage 
 						- _id = GUID 6e9ae26a-0996-4305-9124-e2177b843d62;
 						- _myState = 2048;
-						- m_szSequence = "42.";
+						- m_szSequence = "43.";
 						- m_szActualArgs = "";
 						- m_szReturnVal = "";
 						- m_pCommunicationConnection = { IHandle 
@@ -45723,7 +45723,7 @@ doBeforeDispatching(...){
 						- _subsystem = "GeneratedFromJava::swt";
 						- _class = "SwtMenu";
 						- _name = "Item";
-						- _id = GUID f1975d21-91e0-45a1-9ae0-1dfe54f8bc77;
+						- _id = GUID c9a03ac0-cd88-4795-841b-ec036590eb2e;
 					}
 					- m_pParent = GUID 2f024c93-cea8-4da9-94f5-61bdc20c29dc;
 					- m_name = { CGIText 
@@ -45874,7 +45874,7 @@ doBeforeDispatching(...){
 						- _subsystem = "GeneratedFromJava::swt";
 						- _class = "SwtMenu";
 						- _name = "Item";
-						- _id = GUID f1975d21-91e0-45a1-9ae0-1dfe54f8bc77;
+						- _id = GUID c9a03ac0-cd88-4795-841b-ec036590eb2e;
 					}
 					- m_pParent = GUID 32f3f3d5-cdc2-4670-b58e-4c2fc5649a39;
 					- m_name = { CGIText 
@@ -49173,7 +49173,7 @@ doBeforeDispatching(...){
 						- _subsystem = "GeneratedFromJava::guiInspc";
 						- _class = "InspcGuiComm";
 						- _name = "WidgetCommAction";
-						- _id = GUID 62b386fb-9c5d-49f1-8045-4d96ad2f20de;
+						- _id = GUID 9bf761a7-98e1-4961-8aee-3d211ee080c1;
 					}
 					- m_pParent = GUID c831f956-dcbf-42c3-bf98-aad55aa83b2f;
 					- m_name = { CGIText 
@@ -51917,7 +51917,7 @@ doBeforeDispatching(...){
 						- _subsystem = "GeneratedFromJava::inspectorAccessor";
 						- _class = "InspcAccessEvaluatorRxTelg";
 						- _name = "InspcAccessExecAnswerTelg_ifc";
-						- _id = GUID d25dc493-af8f-416b-914f-a6346d960ff2;
+						- _id = GUID fed961cb-dfb8-4495-b501-c32f102b8844;
 					}
 					- m_pParent = GUID 42f57308-d779-4d23-9aa9-e8bb78c1ab47;
 					- m_name = { CGIText 
@@ -53441,8 +53441,8 @@ doBeforeDispatching(...){
 			- _id = GUID e8698c85-5713-4885-a416-c0441b78d2a4;
 			- _myState = 40960;
 			- _name = "TopLevel";
-			- weakCGTime = 4.8.2012::20:22:59;
-			- strongCGTime = 4.8.2012::8:39:35;
+			- weakCGTime = 7.14.2012::20:18:21;
+			- strongCGTime = 7.14.2012::20:18:21;
 			- _multiplicity = "";
 			- _itsStateChart = { IHandle 
 				- _m2Class = "";

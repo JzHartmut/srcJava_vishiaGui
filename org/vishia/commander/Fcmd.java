@@ -64,7 +64,7 @@ public class Fcmd extends GuiCfg
   public static final int version = 20120729;
 
   /**Version visible in about info */
-  public static final String sVersion = "Version 1.04 - 2012-07-29";
+  public static final String sVersion = "Version 1.05 - 2012-08-12";
   
   static class CallingArgs extends GuiCallingArgs
   {
@@ -206,7 +206,6 @@ public class Fcmd extends GuiCfg
     gralMng.selectPanel("primaryWindow");
     panelButtons = gralMng.createGridPanel("Buttons", gralMng.getColor("gr"), 1, 1, 10, 10);
     gui.addFrameArea("A3C3", panelButtons); // dialogPanel);
-    fButtons.initPanelButtons();
 
     filesCp.buildGraphic();
     filePropsCmd.buildWindowConfirmMk();  //F2
@@ -217,6 +216,8 @@ public class Fcmd extends GuiCfg
     executer.buildWindowConfirmExec();
     deleteCmd.buildWindowConfirmDelete(); //F8
     favorPathSelector.buildWindowAddFavorite();
+
+    fButtons.initPanelButtons();
     
     gui.addMenuItemGThread("MenuSetWorkingDir", "&Command/Set&WorkingDir", executer.actionSetCmdWorkingDir); // /
     gui.addMenuItemGThread("MenuCommandAbort", "&Command/&Abort", executer.actionCmdAbort); // /

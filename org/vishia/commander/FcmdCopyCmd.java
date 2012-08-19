@@ -80,16 +80,16 @@ public class FcmdCopyCmd
   
   //List<String> listFileSrc;
   
-  final List<FileRemote.FileRemoteEvent> listEvCheck = new LinkedList<FileRemote.FileRemoteEvent>();
+  final List<FileRemote.CallbackEvent> listEvCheck = new LinkedList<FileRemote.CallbackEvent>();
   
-  final List<FileRemote.FileRemoteEvent> listEvCopy = new LinkedList<FileRemote.FileRemoteEvent>();
+  final List<FileRemote.CallbackEvent> listEvCopy = new LinkedList<FileRemote.CallbackEvent>();
   
   final List<FileRemote> filesToCopy = new LinkedList<FileRemote>();
   
   /**This reference is set with the callback of operation cmd. 
    * The event can be used to affect the copying process.
    */
-  FileRemote.FileRemoteEvent evCurrentFile;
+  FileRemote.CallbackEvent evCurrentFile;
   
   boolean bSkipFile, bSkipDir;
   
@@ -353,7 +353,7 @@ public class FcmdCopyCmd
           widgButtonEsc.setCmd("abort");
           
           for(FileRemote fileSrc : filesToCopy){
-            FileRemote.FileRemoteEvent callback = new FileRemote.FileRemoteEvent(fileSrc, success);
+            FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(fileSrc, success, null);
             listEvCheck.add(callback);
             fileSrc.check(callback);   //callback.use() will be called on response
           }
@@ -384,7 +384,7 @@ public class FcmdCopyCmd
 
             
             if(fileSrc.sameDevice(fileDst)){
-              FileRemote.FileRemoteEvent callback = new FileRemote.FileRemoteEvent(fileSrc, success);
+              FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(fileSrc, success, null);
               listEvCopy.add(callback);
               int mode = 0;
               switch(modeCreateCopy){
@@ -416,9 +416,8 @@ public class FcmdCopyCmd
                   
           }
         } else if(widgg.sCmd.startsWith("abort")) {
-          for(FileRemote.FileRemoteEvent ev: listEvCopy){
-            ev.setCmd(FileRemote.cmdAbortAll);
-            ev.sendEvent();
+          for(FileRemote.CallbackEvent ev: listEvCopy){
+            ev.sendEvent(FileRemote.cmdAbortAll);
           }
           listEvCheck.clear();
           listEvCopy.clear();
@@ -504,7 +503,7 @@ public class FcmdCopyCmd
   } };
   
   
-  private void eventCheckOk(FileRemote.FileRemoteEvent ev){
+  private void eventCheckOk(FileRemote.CallbackEvent ev){
     if(listEvCheck.remove(ev)){
       zBytes += ev.nrofBytesAll;
       zFiles += ev.nrofFiles;
@@ -559,13 +558,12 @@ public class FcmdCopyCmd
   EventConsumer success = new EventConsumer(){
     @Override public boolean processEvent(Event ev)
     {
-      FileRemote.FileRemoteEvent ev1 = (FileRemote.FileRemoteEvent)ev;
+      FileRemote.CallbackEvent ev1 = (FileRemote.CallbackEvent)ev;
       switch(ev.cmd()){
         case FileRemoteAccessor.kNrofFilesAndBytes:{
           FcmdCopyCmd.this.evCurrentFile = ev1;
           if(bSkipDir){
-            ev1.setCmd(FileRemote.cmdAbortDir);
-            ev1.sendEvent();
+            ev1.sendEvent(FileRemote.cmdAbortDir);
             bSkipDir = false;
           } 
           bSkipFile = false;
@@ -578,12 +576,10 @@ public class FcmdCopyCmd
           widgCopyNameDst.setText(String.copyValueOf(ev1.fileName));
           widgCopyState.setText("" + ev1.nrofBytesInFile/1000000 + " Mbyte");
           if(bSkipFile){
-            ev1.setCmd(FileRemote.cmdAbortFile);
-            ev1.sendEvent();
+            ev1.sendEvent(FileRemote.cmdAbortFile);
             bSkipFile = false;
           } else if(bSkipDir){
-            ev1.setCmd(FileRemote.cmdAbortDir);
-            ev1.sendEvent();
+            ev1.sendEvent(FileRemote.cmdAbortDir);
             bSkipDir = false;
           } 
         }break;

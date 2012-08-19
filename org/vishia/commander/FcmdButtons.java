@@ -175,7 +175,6 @@ public class FcmdButtons
   void initPanelButtons()
   {
     //This calls creates the menu entries in the menu bar. The order determines the order in menu bar. It registeres the button strings and keys.
-    setBtnMenuAndKeys(main.gui.getActionHelp(), main.idents.buttonHelp, main.idents.keyHelp,main.idents.menuHelpBar);
     setBtnMenuAndKeys(main.filePropsCmd.actionOpenDialog, main.idents.buttonFileProps, main.idents.keyFileProps, main.idents.menuFilePropsBar);
     setBtnMenuAndKeys(main.viewCmd.actionOpenView, main.idents.buttonFileView, main.idents.keyFileView, main.idents.menuFileViewBar);
     setBtnMenuAndKeys(main.editWind.actionOpenEdit, main.idents.buttonEditIntern, main.idents.keyEditIntern, main.idents.menuBarEditIntern);
@@ -223,6 +222,8 @@ public class FcmdButtons
     setBtnMenuAndKeys(actionViewButtons, main.idents.buttonViewButtons, main.idents.keyViewButtons, main.idents.menuBarViewButtons);
     setBtnMenuAndKeys(main.windMng.actionWindFullOut, main.idents.buttonWindowOutput, main.idents.keyWindowOutput, main.idents.keyWindowOutput2, main.idents.menuBarWindowOutput);
     main.gui.addMenuItemGThread("menuBarViewButtons", main.idents.menuBarViewButtons, actionViewButtons);
+
+    setBtnMenuAndKeys(main.gui.getActionHelp(), main.idents.buttonHelp, main.idents.keyHelp,main.idents.menuHelpBar);
     
     Iterator<Map.Entry<String, ButtonAction>> iterButtonAction = idxButtons.entrySet().iterator();
     

@@ -3154,7 +3154,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::swt";
 						- _class = "SwtTable";
 						- _name = "TableItemWidget";
-						- _id = GUID 7b2d346f-ca4f-4222-ae9f-d93bb00b9153;
+						- _id = GUID 71951a39-81fe-4ebf-88b0-f9a315da13ad;
 					}
 					- m_pParent = GUID 4cd44d81-d204-4396-b4b6-3ac17c619419;
 					- m_name = { CGIText 
@@ -7827,8 +7827,8 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 			- _id = GUID 5fb8d566-a916-42e7-9f43-9a8d3a971f75;
 			- _myState = 40960;
 			- _name = "TopLevel";
-			- weakCGTime = 4.8.2012::8:38:20;
-			- strongCGTime = 4.8.2012::8:38:20;
+			- weakCGTime = 7.14.2012::20:18:21;
+			- strongCGTime = 7.14.2012::20:18:21;
 			- _multiplicity = "";
 			- _itsStateChart = { IHandle 
 				- _m2Class = "";

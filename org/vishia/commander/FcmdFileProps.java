@@ -98,15 +98,15 @@ public class FcmdFileProps
   /**
    * 
    */
-  final FileRemote.FileRemoteEvent evChg;
+  final FileRemote.CallbackEvent evChg;
   
-  final FileRemote.FileRemoteEvent evCntLen;
+  final FileRemote.CallbackEvent evCntLen;
   
   public FcmdFileProps(Fcmd main)
   { this.main = main;
     this.formatDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-    evChg = new FileRemote.FileRemoteEvent(null, callbackChgProps);
-    evCntLen = new FileRemote.FileRemoteEvent(null, callbackCntLen);
+    evChg = new FileRemote.CallbackEvent(null, callbackChgProps, null);
+    evCntLen = new FileRemote.CallbackEvent(null, callbackCntLen, null);
   }
   
   
@@ -322,28 +322,28 @@ public class FcmdFileProps
         mChg &= ~noMask;
         boolean bAbort = false;
         if(infos.sCmd.equals(sCmdAbort)){
-          if(evChg.forceRelease()){
+          if(evChg.forceRelinquish()){
             widgChgFile.setText(main.idents.buttonFilePropsChg);
             infos.sCmd = sCmdChg;
           } else {
             System.err.println("chg properties hangs");
           }
         } else if(infos.sCmd.equals(sCmdChg)){
-          if(evChg.use(0, 0, widgChgFile, callbackChgProps)){
+          if(evChg.occupy(widgChgFile, callbackChgProps, null)){
             //cmds with callback
             widgChgFile.setText(main.idents.buttonFilePropsChanging);
             actFileRemote.chgProps(name, mChg, val, 0, evChg);
           } else { bAbort = true; }
           //
         } else if(infos.sCmd.equals(sCmdChgRecurs)){
-          if(evChg.use(0, 0, widgChrRecurs, callbackChgProps)){
+          if(evChg.occupy(widgChrRecurs, callbackChgProps, null)){
             //cmds with callback
             widgChrRecurs.setText(main.idents.buttonFilePropsChanging);
             actFileRemote.chgPropsRecursive(mChg, val, 0, evChg);
           } else { bAbort = true; }
           //
         } else if(infos.sCmd.equals(sCmdCopy)){
-          if(evChg.use(0, 0, widgCopyFile, callbackChgProps)){
+          if(evChg.occupy(widgCopyFile, callbackChgProps, null)){
             if(!name.equals(actFile.getName())){
               widgCopyFile.setText(main.idents.buttonFilePropsCopying);
               FileRemote fileNew = new FileRemote(actFileRemote.getParentFile(), name);
@@ -382,7 +382,7 @@ public class FcmdFileProps
       } else {
         src.setText(main.idents.buttonFilePropsRetry);
       }
-      ev.consumed();
+      ev.consumedRetain();
       return true;
     } 
   };
@@ -397,8 +397,8 @@ public class FcmdFileProps
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         widgBtnDirBytes.setText("counting ...");
-        evCntLen.forceRelease();
-        if(evCntLen.use(0, 0, null, callbackCntLen)){
+        evCntLen.forceRelinquish();
+        if(evCntLen.occupy(null, callbackCntLen, null)){
           FileRemote.fromFile(actFile).countAllFileLength(evCntLen);
         }
       }
@@ -409,14 +409,14 @@ public class FcmdFileProps
   { @Override public boolean processEvent(Event evP)
     { GralButton src = (GralButton)evP.getRefData();
       if(evP.cmd() == FileRemoteAccessor.kFinishOk){
-        FileRemote.FileRemoteEvent ev = (FileRemote.FileRemoteEvent)evP; 
+        FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP; 
         String sLen = "" + ev.nrofBytesAll;
         widgLength.setText(sLen);
       } else {
         widgLength.setText("error count bytes");
       }
       widgBtnDirBytes.setText(main.idents.buttonFilePropsCntLen);
-      evP.consumed();
+      evP.consumedRetain();
       return true;
     } 
   };
