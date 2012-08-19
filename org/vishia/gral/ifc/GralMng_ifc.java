@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralPos;
@@ -27,6 +28,8 @@ public interface GralMng_ifc
 
   /**The version history of this interface:
    * <ul>
+   * <li>2012-08-20 Hartmut new: {@link #getWidgetsPermanentlyUpdating()} created but not used yet because 
+   *   {@link #refreshCurvesFromVariable(VariableContainer_ifc)} has the necessary functionality.
    * <li>2012-01-07 Hartmut new: {@link #setInfoDelayed(GralWidgetChangeRequ, int)}
    * <li>2011-05-08 Hartmut new; {@link #cmdClear} used to clear a whole swt.Table, commonly using: clear a content of widget.
    * <li>2011-05-01 Hartmut new: {@link #cmdInsert} etc now here. 
@@ -295,10 +298,19 @@ public interface GralMng_ifc
   
   
   /**Gets the list of all panels which are visible yet and should be updated with values therefore. 
-   * @return The list.
+   * @return The list of widget list.
    */
   ConcurrentLinkedQueue<GralVisibleWidgets_ifc> getVisiblePanels();
 	
+  
+  /**refresh all curve views. */
+  void refreshCurvesFromVariable(VariableContainer_ifc container);
+  
+  /**Gets a list of widgets which should be updated permanently because they store data in any time.
+   * @return List of widgets which are permanently to update 
+   */
+  GralVisibleWidgets_ifc getWidgetsPermanentlyUpdating();
+  
   
   /**Returns true if the current thread is the graphical thread.
    * This routine is used internally firstly. The graphical thread is that thread, which dispatches

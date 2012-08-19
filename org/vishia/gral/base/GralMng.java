@@ -54,6 +54,8 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Changes:
    * <ul>
+   * <li>2012-08-20 Hartmut new: {@link #getWidgetsPermanentlyUpdating()} created but not used yet because 
+   *   {@link #refreshCurvesFromVariable(VariableContainer_ifc)} has the necessary functionality.
    * <li>2012-06-30 Hartmut new: Composition {@link #widgetHelper} The widget helper is implemented in the graphic system
    *   for example as {@link org.vishia.gral.swt.SwtWidgetHelper} to do some widget specific things.
    * <li>2012-06-30 Hartmut new: Composition {@link #_impl}.{@link InternalPublic#gralKeyListener}
@@ -205,6 +207,10 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * The list can be iterated. Therefore it is lock-free multi-threading accessible.
    */
   protected final ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listVisiblePanels = new ConcurrentLinkedQueue<GralVisibleWidgets_ifc>();
+  
+  
+  Queue<GralWidget> listWidgetsPermanentUpdating = new LinkedList<GralWidget>();
+  
   
   /**It is possible to write any message via this class to a logging system.
    * All internal methods of gral writes exceptions to that logging system instead abort the execution of the application.
@@ -825,6 +831,10 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
     return listVisiblePanels;
   }
 
+  @Override public GralVisibleWidgets_ifc getWidgetsPermanentlyUpdating(){
+    ///
+    return null;
+  }
 
   
   
@@ -1072,10 +1082,10 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
   
-  public void refreshCurvesFromVariable(VariableContainer_ifc container){
+  @Override public void refreshCurvesFromVariable(VariableContainer_ifc container){
     for(GralCurveView_ifc curve : curveContainer){
       if(curve.isActiv()){
-        curve.refreshFromVariable(variableContainer);
+        curve.refreshFromVariable(container);
       }
     }
   }

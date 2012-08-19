@@ -693,7 +693,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       line[kColDate] = "";
       selectList.wdgdTable.insertLine(null, -1, line, null);
       //setFocus();
-      FileRemote.FileRemoteEvent eventFillIn = new FileRemote.FileRemoteEvent(fileIn, callbackFillIn);
+      FileRemote.CallbackEvent eventFillIn = new FileRemote.CallbackEvent(fileIn, callbackFillIn, null);
       ((FileRemote) fileIn).refreshPropertiesAndChildren(eventFillIn);
     } else {
       //a local file
@@ -985,9 +985,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
   EventConsumer callbackFillIn = new EventConsumer(){
     @Override public boolean processEvent(Event ev) {
       ///
-      FileRemote.FileRemoteEvent callback = (FileRemote.FileRemoteEvent)ev;
+      FileRemote.CallbackEvent callback = (FileRemote.CallbackEvent)ev;
       FileRemote dir = (FileRemote)callback.getRefData();  //it is completed meanwhile
-      ev.consumed();
+      ev.consumedRetain();
       fillInRefreshed(dir);
       //setFocus();    //don't set the focus, it may be false. Only fill.
       return true;
