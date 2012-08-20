@@ -32,10 +32,25 @@ public class SwtLed extends GralLed{
    * 
    */
   private SwtLedImpl widgSwt;
+
   
+  Color borderColor, innerColor;
+
+  final SwtMng mng;
+  
+  boolean round;
+  
+  
+
   SwtLed(String name, SwtMng mng){
     super(name, mng);
-    widgSwt = new SwtLedImpl(mng, 'r');
+    this.mng = mng;
+    switch('r'){ 
+    case 'r': round = true; break;
+    case 'q': round = false; break;
+    default: throw new IllegalArgumentException("param size must be r or q");
+    }
+    widgSwt = new SwtLedImpl();
     widgSwt.setBackground(mng.propertiesGuiSwt.colorBackground);
     widgSwt.addFocusListener(mng.focusListener);
     widgSwt.setForeground(mng.propertiesGuiSwt.colorSwt(0xff00));
@@ -51,6 +66,14 @@ public class SwtLed extends GralLed{
   public void XXXsetColor(int nBorderColor, int nInnerColor){
     widgSwt.XXXsetColor(nBorderColor, nInnerColor);
   }
+  
+  
+  private void setColors(){
+    if(dyda.lineColor !=null){ borderColor = mng.getColorImpl(dyda.lineColor); }
+    if(dyda.backColor !=null){ innerColor = mng.getColorImpl(dyda.backColor); }
+    
+  }
+  
   
   
   @Override public GralWidgetGthreadSet_ifc getGthreadSetifc(){ return gThreadSet; }
@@ -87,28 +110,16 @@ public class SwtLed extends GralLed{
   
 private class SwtLedImpl extends Canvas
   {
-  	final SwtMng mng;
-  
-  	boolean round;
-  	
-  	Color borderColor, innerColor;
-  	
-  	/**Creates a LED.
+  		/**Creates a LED.
   	 * @param mng The Gui-panel-manager contains information about the graphic frame and properties.
   	 * @param kind Use 'r' or 'q' for a round or a square LED.
   	 */
-  	public SwtLedImpl(SwtMng mng, char kind)
+  	public SwtLedImpl()
   	{
   		
   		super(((SwtPanel)mng.pos.panel).getPanelImpl(), 0);
-  		switch(kind){ 
-  		case 'r': round = true; break;
-  		case 'q': round = false; break;
-  		default: throw new IllegalArgumentException("param size must be r or q");
-  		}
   		borderColor = mng.propertiesGuiSwt.color("yellow");
   		innerColor = mng.propertiesGuiSwt.color("green");
-  		this.mng = mng;
   		
   	  addPaintListener(paintListener);	
   	}
@@ -120,8 +131,7 @@ private class SwtLedImpl extends Canvas
   			GC gc = e.gc;
   			//gc.d
   			//drawBackground(e.gc, e.x, e.y, e.width, e.height);
-  			if(colorBorder !=null){ borderColor = mng.getColorImpl(colorBorder); }
-  			if(colorInner !=null){ innerColor = mng.getColorImpl(colorInner); }
+  			setColors();
         gc.setBackground(innerColor); 
   			gc.fillOval(3,3, e.width-4, e.height-4);
   			gc.setForeground(borderColor); 

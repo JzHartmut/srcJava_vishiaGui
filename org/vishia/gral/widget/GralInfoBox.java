@@ -324,4 +324,22 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     if(htmlBox !=null){ htmlBox.setDataPath(sDataPath); }
   }
 
+  @Override public void setBackColor(GralColor color, int ix)
+  { 
+    if(textBox !=null){ textBox.setBackColor(color, ix); }
+    if(htmlBox !=null){ htmlBox.setBackColor(color, ix); }
+  }
+
+  @Override public void setLineColor(GralColor color, int ix)
+  { 
+    if(textBox !=null){ textBox.setLineColor(color, ix); }
+    if(htmlBox !=null){ htmlBox.setLineColor(color, ix); }
+  }
+
+  @Override public void setTextColor(GralColor color)
+  { 
+    if(textBox !=null){ textBox.setTextColor(color); }
+    if(htmlBox !=null){ htmlBox.setTextColor(color); }
+  }
+
 }

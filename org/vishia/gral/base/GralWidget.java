@@ -97,6 +97,11 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-08-21 Hartmut new {@link DynamicData} and {@link #dyda} for all non-static widget properties, the dynamic data
+   *   are that data which are used for all widget types in runtime. TODO: store the configuration data (all other) in an
+   *   inner class CfgData or in a common class cfgdata see {@link org.vishia.gral.cfg.GralCfgData}.
+   * <li>2012-08-21 The method {@link #setBackColor(GralColor, int)}, {@link #setLineColor(GralColor, int)} and {@link #setTextColor(GralColor)}
+   *  are declared in the {@link GralWidget_ifc} yet and implemented here using {@link #dyda}.  
    * <li>2012-07-29 Hartmut chg: {@link #setFocus()} and {@link #setFocus(int, int)} can be called in any thread yet.
    * <li>2012-04-25 Hartmut some enhancements
    * <li>2012-04-07 Hartmut chg: {@link #refreshFromVariable(VariableContainer_ifc)} regards int16, int8
@@ -326,6 +331,15 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 
 	/**The time when the bVisible state was changed. */
 	private long lastTimeSetVisible;
+	
+	
+	protected final static class DynamicData {
+	  public GralColor backColor, lineColor, textColor;
+	  public Object backColorImpl, lineColorImpl;
+	}
+	
+	
+	protected final DynamicData dyda = new DynamicData();
 	
 	
 	//protected GralWidget(char whatIs)
@@ -679,48 +693,57 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   	    }
 	    }
 	  }
-	  if(variable !=null){
-	    long timeVariable = variable.getLastRefreshTime();
-	    boolean bOld = timeVariable > 0 && (System.currentTimeMillis() - timeVariable) > 2000;
-	    if(bOld ){
-	      //TODO setBackgroundColor(GralColor.getColor("cy"));
-	    } else {
-	      //TODO setBackgroundColor(GralColor.getColor("wh"));
-	    }
-	    char cType = variable.getType();
-	    String sValue = null;
-	    switch(cType){
-	      case 'S': case 'B':
-	      case 'I': setValue(variable.getInt()); break;
-        case 'F': setValue(variable.getFloat()); break;
-	      case 's': setText(variable.getString()); break;
-        default:  sValue = "?" + cType; //variable.getInt());  //at least request newly if type is faulty
-	    }
-	    if(sValue !=null){
-	      if(bOld){ setText("? " + sValue); }
-	      else { setText(sValue); }
-	    }
-	  } else if(variables !=null){
-	    if(variables.size() == 0){ variables = null; }
-	    else {
-        Object[] values = new Object[variables.size()];
-        int ixVal = -1;
-        for(VariableAccessWithIdx variable1: variables){
-  	      char cType = variable1.getType();
-  	      switch(cType){
-  	        case 'S': case 'B':
-  	        case 'I': values[++ixVal] = variable1.getInt(); break;
-  	        case 'F': values[++ixVal] = variable1.getFloat(); break;
-  	        case 's': values[++ixVal] = variable1.getString(); break;
-  	        default:  setText("?" + cType); //variable.getInt());  //at least request newly
-  	      } //switch
-          
-        }
-	      setValue(values);
-	    }
-	  } else if(sDataPath !=null){
-	    setText("?? " + sDataPath);
+	  if(actionShow !=null){
+	    //The users method to influence how the widget is presented in view:
+      if(!actionShow.exec(0, this, variable !=null ? variable : variables)){
+        System.err.println("GralWidget fault actionShow in " + name + "; returns false; sShowMethod = " + sShowMethod);
+      }
+	  } else {
+	    //standard behaviour to show: call setValue or setText which may overridden by the widget type.
+  	  if(variable !=null){
+  	    long timeVariable = variable.getLastRefreshTime();
+  	    boolean bOld = timeVariable > 0 && (System.currentTimeMillis() - timeVariable) > 2000;
+  	    if(bOld ){
+  	      //TODO setBackgroundColor(GralColor.getColor("cy"));
+  	    } else {
+  	      //TODO setBackgroundColor(GralColor.getColor("wh"));
+  	    }
+  	    char cType = variable.getType();
+  	    String sValue = null;
+  	    switch(cType){
+  	      case 'S': case 'B':
+  	      case 'I': setValue(variable.getInt()); break;
+          case 'F': setValue(variable.getFloat()); break;
+  	      case 's': setText(variable.getString()); break;
+          default:  sValue = "?" + cType; //variable.getInt());  //at least request newly if type is faulty
+  	    }
+  	    if(sValue !=null){
+  	      if(bOld){ setText("? " + sValue); }
+  	      else { setText(sValue); }
+  	    }
+  	  } else if(variables !=null){
+  	    if(variables.size() == 0){ variables = null; }
+  	    else {
+          Object[] values = new Object[variables.size()];
+          int ixVal = -1;
+          for(VariableAccessWithIdx variable1: variables){
+    	      char cType = variable1.getType();
+    	      switch(cType){
+    	        case 'S': case 'B':
+    	        case 'I': values[++ixVal] = variable1.getInt(); break;
+    	        case 'F': values[++ixVal] = variable1.getFloat(); break;
+    	        case 's': values[++ixVal] = variable1.getString(); break;
+    	        default:  setText("?" + cType); //variable.getInt());  //at least request newly
+    	      } //switch
+            
+          }
+  	      setValue(values);
+  	    }
+  	  } else if(sDataPath !=null){
+  	    setText("?? " + sDataPath);
+  	  }
 	  }
+    
 	}
 	
 	
@@ -765,9 +788,11 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   }
   
   
-  public void setBackColor(GralColor color, int ix){ itsMng.setBackColor(this, ix, color.getColorValue()); }
+  @Override public void setBackColor(GralColor color, int ix){ dyda.backColor = color; repaint(100, 100); }
   
-  public void setLineColor(GralColor color, int ix){ itsMng.setLineColor(this, ix, color.getColorValue()); }
+  @Override public void setLineColor(GralColor color, int ix){ dyda.lineColor = color; repaint(100, 100);  }
+  
+  @Override public void setTextColor(GralColor color){ dyda.textColor = color; repaint(100, 100);  }
   
   
   

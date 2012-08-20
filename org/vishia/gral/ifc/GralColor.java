@@ -181,6 +181,7 @@ public class GralColor
    * <li>"orange",  0xffa000);
    * <li>"pink",   0xff0080);
    * <li>"violet",  0x6000ff);
+   * <li>"purple",  0xff00ff);
    * </ul>
       
    * <br>saturated colors: The same as full name colors. All colors are designated with 2 letters.
@@ -197,6 +198,7 @@ public class GralColor
    * <li>"bn", brown, 0x600020);
    * <li>"am", amber, 0xffe000);
    * <li>"or", orange, 0xffa000);
+   * <li>"pk", orange, 0xff0080);
    * <li>"vi", violet 0x6000ff);
    * <li>"pu", purple, de: purpurfarben 0xff0060);
    * </ul>

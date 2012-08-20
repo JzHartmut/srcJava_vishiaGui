@@ -95,11 +95,13 @@ public abstract class GralUserAction
    * @return true if the user action is done, false if the sIntension or any other parameter
    *        doesn't much to that implementation. It is possible to build a queue of user action invocations.
    *        The first invocation which returns true may finish the invocations.
-   * @deprecated use {@link #userActionGui(int, GralWidget, Object...)}.
+   * @deprecated use {@link #exec(int, GralWidget, Object...)}.
    */
   @Deprecated public boolean userActionGui(String sIntension, GralWidget widgd, Object... params){ return false; }
   
-  /**@deprecated use {@link #userActionGui(int, GralWidget_ifc, Object...)} instead.
+  /**@deprecated use {@link #exec(int, GralWidget_ifc, Object...)} instead.
+   * The new method exec works with a {@link GralWidget_ifc} instead {@link GralWidget} as reference for parameter
+   * and is more universal therefore. The method is deprecated to force usage of only one method type.
    * If any class overrides this method and does not override the non deprecated method, this method is called
    * if the non deprecated method is called. It is for compatibility. 
    * @param actionCode
@@ -118,7 +120,7 @@ public abstract class GralUserAction
   
   /**Call of users method while any user action on the gui is done.
    * If this method is not overridden from the {@link GralUserAction} super class, it tries to call 
-   * the deprecated {@link #userActionGui(int, GralWidget, Object...)} because this method may be overridden. 
+   * the deprecated {@link #userActionGui(int, GralWidget, Object...)} because that method may be overridden. 
    * @param actionCode See {@link KeyCode}. Any special action is designated with 0.
    * @param widgd The Gral widget
    * @param params Some optional values, depending on special user designation. In most cases no parameter.

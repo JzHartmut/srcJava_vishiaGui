@@ -155,9 +155,12 @@ public class GralCfgBuilder
         cfge.widgetType.setFromType(typeData);
       }
     }
-      //
+    
     GralWidget widgd = null;
     String sName = cfge.widgetType.name;
+    if(sName !=null && sName.equals("msgOfDay"))
+      stop();
+    
     if(sName ==null && cfge.widgetType.text !=null ){ sName = cfge.widgetType.text; }  //text of button etc.
     if(sName ==null && cfge.widgetType.prompt !=null){ sName = cfgData.actPanel.name + "/" + cfge.widgetType.prompt; } //the prompt as name
     //the name may be null, then the widget is not registered.
@@ -236,6 +239,15 @@ public class GralCfgBuilder
         dirMask = replaceAlias(widgt.info);
       } else { dirMask = ""; }
       widgd = gralMng.addFileSelectField(sName, null, dirMask, null, "t");
+      widgd.setDataPath(sDataPath);
+    } else if(cfge.widgetType instanceof GralCfgData.GuiCfgTable){
+      GralCfgData.GuiCfgTable widgt = (GralCfgData.GuiCfgTable)cfge.widgetType;
+      List<Integer> columns = widgt.getColumnWidths();
+      int zColumn = columns.size();
+      int[] aCol = new int[zColumn];
+      int ix = -1;
+      for(Integer column: columns){ aCol[++ix] = column; }
+      widgd = gralMng.addTable(sName, widgt.height, aCol);
       widgd.setDataPath(sDataPath);
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgCurveview){
       GralCfgData.GuiCfgCurveview widgt = (GralCfgData.GuiCfgCurveview)cfge.widgetType;

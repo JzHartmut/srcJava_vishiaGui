@@ -253,6 +253,8 @@ public final class GralCfgData
     public void set_columnWidth(int val){ columnWidths.add(val); }
     
     public void set_text(String value){ super.text = value; }
+    
+    public List<Integer> getColumnWidths(){ return columnWidths; } 
   }
   
   

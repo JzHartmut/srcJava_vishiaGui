@@ -37,6 +37,8 @@ public interface GralWidget_ifc extends Removeable
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-08-21 The method {@link #setBackColor(GralColor, int)}, {@link #setLineColor(GralColor, int)} and {@link #setTextColor(GralColor)}
+   *  are declared here. What methods are deprecated? I thing {@link #setBackgroundColor(GralColor)}.  
    * <li>2012-07-29 Hartmut chg: {@link #setFocus()} and {@link #setFocus(int, int)} can be called in any thread yet.
    * <li>2012-07-13 Hartmut new. {@link #getWidgetMultiImplementations()}. This method is not used in any widget yet,
    *   but it may be necessary for complex widgets.
@@ -110,6 +112,13 @@ public interface GralWidget_ifc extends Removeable
   public abstract GralColor setBackgroundColor(GralColor color);
   
   public abstract GralColor setForegroundColor(GralColor color);
+  
+  
+  void setBackColor(GralColor color, int ix);
+  
+  void setLineColor(GralColor color, int ix);
+  
+  void setTextColor(GralColor color);
   
   
   /**Sets the html help url for this widget. That information will be used if the widget is focused

@@ -48,7 +48,7 @@ public abstract class GralLed extends GralWidget
   
   
   /**The colors which are used for repaint (if not null). */
-  protected GralColor colorBorder, colorInner;
+  //protected GralColor colorBorder, colorInner;
   
   protected GralLed(String name, GralMng mng)
   { super(name, 'D', mng);
@@ -68,8 +68,8 @@ public abstract class GralLed extends GralWidget
       int val2 = ObjectValue.getInt(values[1]);
       if(val1 >= colorBorderSelectable.length){ val1 = colorBorderSelectable.length -1; }
       if(val2 >= colorInnerSelectable.length){ val2 = colorInnerSelectable.length -1; }
-      colorBorder = colorBorderSelectable[val1];
-      colorInner = colorInnerSelectable[val2];
+      dyda.lineColor = colorBorderSelectable[val1];
+      dyda.backColor = colorInnerSelectable[val2];
       repaint(repaintDelay, repaintDelayMax);
     }
   }

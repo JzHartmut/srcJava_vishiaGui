@@ -764,6 +764,27 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
       return color;
     }
 
+    
+    @Override public void setBackColor(GralColor color, int ix)
+    { 
+      colorBackground = color;
+      repaint(50, 50);
+    }
+
+    @Override public void setLineColor(GralColor color, int ix)
+    { 
+      colorForground = color;
+      repaint(50, 50);
+    }
+
+    @Override public void setTextColor(GralColor color)
+    { 
+      colorForground = color;
+      repaint(50, 50);
+    }
+
+    
+    
     @Override
     public void repaint() {
       ctRepaintLine.addAndGet(1);
