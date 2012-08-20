@@ -749,6 +749,17 @@ public class Fcmd extends GuiCfg
 
   
   
+  void openExtEditor(File file){
+    CmdStore.CmdBlock cmdBlock = buttonCmds.getCmd("edit");
+    if (cmdBlock == null) {
+      mainCmd.writeError("internal problem - don't find 'edit' command. ");
+    } else {
+      File[] files = new File[3]; 
+      files[0] = file;
+      executer.cmdQueue.addCmd(cmdBlock, files, file.getParentFile()); // to execute.
+    }
+    
+  }
   
   
 

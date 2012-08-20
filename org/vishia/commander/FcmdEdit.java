@@ -109,9 +109,8 @@ public class FcmdEdit
   /**Opens the view window and fills its content.
    * @param src The path which is selected as source. It may be a directory or a file.
    */
-  void openEdit(FileRemote src)
-  { String sSrc, sTrash;
-    src = FileRemote.fromFile(main.currentFile);
+  void openEdit(File srcFile)
+  { FileRemote src = FileRemote.fromFile(srcFile);
     if(src !=null){
       long len = src.length();
       if(len > 1000000){ len = 1000000; } //nor more than 1MByte, 
@@ -194,7 +193,7 @@ public class FcmdEdit
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
-        openEdit(null);
+        openEdit(main.currentFile);
         return true;
       } else return false; 
       // /

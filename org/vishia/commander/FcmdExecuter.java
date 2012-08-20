@@ -196,9 +196,44 @@ public class FcmdExecuter
    */
   GralUserAction actionSetCmdCfg = new GralUserAction() { 
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
-      if (main.currentFile != null) {
-        main.cmdSelector.cmdStore.readCmdCfg(main.currentFile);
-        main.cmdSelector.fillIn();
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+          if (main.currentFile != null) {
+          main.cmdSelector.cmdStore.readCmdCfg(main.currentFile);
+          main.cmdSelector.fillIn();
+        }
+      }
+      return true;
+    }
+
+  };
+
+
+  
+  /**Action to set the command list from actual file. It is called from menu.
+   */
+  GralUserAction actionSetCmdCfgAct = new GralUserAction() { 
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        String sError = main.cmdSelector.cmdStore.readCmdCfg(main.cargs.fileCfgCmds);
+      
+        if(sError ==null){
+          main.cmdSelector.fillIn();
+        } else {
+          System.err.println("readCmdCfg; from file " + main.cargs.fileCfgButtonCmds.getAbsolutePath()+ "; error: " + sError);
+        }
+      }
+      return true;
+    }
+
+  };
+
+
+  /**Action to open an editor for the command list from actual file. It is called from menu.
+   */
+  GralUserAction actionEditCmdCfgAct = new GralUserAction() { 
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        main.openExtEditor(main.cargs.fileCfgCmds);
       }
       return true;
     }

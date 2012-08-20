@@ -199,6 +199,21 @@ public class FcmdIdents
   String buttonExecuteCmdWithFile = "cF9:exeCmd file";
   
   
+  String menuBarEditCmdCfg = "&Command/cmdcfg - &Edit act file";
+  String menuContextEditCmdCfg = "cmdcfg - &Edit act file";
+  String buttonEditCmdCfg = null;
+  int keyEditCmdCfg = 0;
+  
+  
+  /**
+   * 
+   */
+  String menuBarReadCmdCfgAct = "&Command/cmdcfg - &Read act file";
+  String menuContextReadCmdCfgAct = "cmdcfg - &Read act file";
+  String buttonReadCmdCfgAct = null;
+  int keyReadCmdCfgAct = 0;
+  
+  
   String menuBarNavigationLeft = "&Navigation/themes left [aF1]";
   String buttonFavorLeft = "aF1:fav-left";
   int keyFavorLeft = KeyCode.alt + KeyCode.F1;
