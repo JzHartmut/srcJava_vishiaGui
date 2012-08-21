@@ -10,6 +10,7 @@ public abstract class GralButton extends GralWidget
 {
   /**Version, history and license
    * <ul>
+   * <li>2012-08-22 Hartmut new implements {@link #setBackColor(GralColor, int)}
    * <li>2012-03-09 Hartmut new Some functionality from SwtButton moved to this, some enhancement of 
    *   functionality: Three states, 
    * <li>2011 Hartmut created
@@ -177,6 +178,23 @@ public abstract class GralButton extends GralWidget
   }
   
   
+  
+  
+  /**Implementing for 
+   * @see org.vishia.gral.base.GralWidget#setBackColor(org.vishia.gral.ifc.GralColor, int)
+   * @param ix=0: off-color ix=1: on-color, ix=2 or ix=-1: disable color.
+   */
+  @Override public void setBackColor(GralColor color, int ix){ 
+    switch(ix){
+    case 0: colorOff = color; dyda.backColor = color; break;
+    case 1: colorOn = color; break;
+    case -1: case2: colorDisabled = color; break;
+    default: throw new IllegalArgumentException("fault ix, allowed -1, 0, 1, 2, ix=" + ix);
+    }//switch
+     
+    repaint(100, 100); 
+  }
+
   
   /**Sets the disable text and color. A Button can be shown disabled anytime, independent of its role
    * of switch button or check button.
