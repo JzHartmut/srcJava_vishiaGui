@@ -7,6 +7,8 @@ public interface GralTable_ifc extends GralWidget_ifc
 {
   /**Version and history:
    * <ul>
+   * <li>2012-08-22 Hartmut new {@link #setCurrentLine(int)} with int, it isn't new because it was able to set with
+   *   {@link #setCurrentCell(int, int)} with -1 as second parameter.
    * <ul>2011-11-20 Hartmut new {@link #getSelectedLines()}
    * <li>2011-10-01 Hartmut new: {@link #clearTable()}
    * <li>2011-09-03 Hartmut chg: method {@link #insertLine(String, int)} returns now the instance of {@link GralTableLine_ifc}
@@ -43,16 +45,29 @@ public interface GralTable_ifc extends GralWidget_ifc
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120303;
+  public static final int version = 20120822;
 
   public abstract GralTableLine_ifc getCurrentLine();
   
   
+  /**Sets the line which is the current one. The current row is unchanged.
+   * @param key The key of the line, given by {@link #insertLine(String, int, String[], Object)}.
+   * @return true if found.
+   */
   boolean setCurrentLine(String key);
   
-  /**Sets the cell which is selected in the line.
+  /**Sets the line which is the current one. The current row is unchanged.
    * @param line from 0 for the first (top) line
-   * @param column from 0 for the left column
+   *   A number greater than the number of lines, especially Integer.MAX_VALUE selects the last line.
+   *   The value -1 let the current line in the table unchanged.
+   * @return true if found.
+   */
+  boolean setCurrentLine(int line);
+  
+  /**Sets the cell which is the current one in the line.
+   * @param line from 0 for the first (top) line. 
+   *   A number greater than the number of lines, especially Integer.MAX_VALUE selects the last line.
+   * @param column from 0 for the left column, if -1 then let the current row of table unchanged.
    */
   boolean setCurrentCell(int line, int column);
   

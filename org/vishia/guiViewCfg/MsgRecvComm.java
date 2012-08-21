@@ -81,8 +81,11 @@ public class MsgRecvComm implements InterProcessComm
 	}
 
 	@Override public int open(Address_InterProcessComm ownAddress, boolean shouldBlock) {
-		// TODO Auto-generated method stub
-		return 0;
+		if(shouldBlock){
+		  return -1; //not supported.
+		} else {
+	    return 0;
+		}
 	}
 
 	@Override

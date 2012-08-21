@@ -49,10 +49,12 @@ public class MsgItems_h
 
 
 
+    @Override
     public int specifyLengthElementHead()
     { return kIdxAfterLast;  //NOTE all are head bytes, no dynamic!
     }
 
+    @Override
     protected void specifyEmptyDefaultData()
     {
       for(int ii=idxBegin; ii < idxEnd; ii++)
@@ -60,6 +62,7 @@ public class MsgItems_h
       }
     }
 
+    @Override
     protected int specifyLengthElement() throws IllegalArgumentException
     {
       return kIdxAfterLast;
@@ -83,7 +86,7 @@ public class MsgItems_h
 	      
       public short get_timeMillisec()
       { //type of struct-attribut is int16
-        return (short)getInt16(kIdxtimeMillisec);
+        return getInt16(kIdxtimeMillisec);
       }
         
 	    public void set_mode_typeVal(short val)
@@ -93,7 +96,7 @@ public class MsgItems_h
 	      
       public short get_mode_typeVal()
       { //type of struct-attribut is int16
-        return (short)getInt16(kIdxmode_typeVal);
+        return getInt16(kIdxmode_typeVal);
       }
         
 	    public void set_ident(int val)
@@ -138,11 +141,11 @@ public class MsgItems_h
 
     /**Index of the data element*/
     public static final int
-      kIdxfileHead = 0
-      , kIdxnrofMsg = 0 
-      , kIdxdummy = 0 + 2
-      , kIdxmsgItems = 0 + 2 + 2
-      , kIdxAfterLast = 0 + 2 + 2 + MsgItem.kIdxAfterLast * 20;
+      kIdxfileHead = 32
+      , kIdxnrofMsg = 32 
+      , kIdxdummy = 32 + 2
+      , kIdxmsgItems = 32 + 2 + 2
+      , kIdxAfterLast =32 + 2 + 2 + MsgItem.kIdxAfterLast * 20;
     ; /*xsl: all Data from struct in headerfile converted to position indices */
 
     
@@ -169,10 +172,12 @@ public class MsgItems_h
 
 
 
+    @Override
     public int specifyLengthElementHead()
     { return kIdxAfterLast;  //NOTE all are head bytes, no dynamic!
     }
 
+    @Override
     protected void specifyEmptyDefaultData()
     {
       for(int ii=idxBegin; ii < idxEnd; ii++)
@@ -180,6 +185,7 @@ public class MsgItems_h
       }
     }
 
+    @Override
     protected int specifyLengthElement() throws IllegalArgumentException
     {
       return kIdxAfterLast;
@@ -198,7 +204,7 @@ public class MsgItems_h
 	      
       public short get_nrofMsg()
       { //type of struct-attribut is int16
-        return (short)getInt16(kIdxnrofMsg);
+        return getInt16(kIdxnrofMsg);
       }
         
 	    public void set_dummy(short val)
@@ -208,7 +214,7 @@ public class MsgItems_h
 	      
       public short get_dummy()
       { //type of struct-attribut is int16
-        return (short)getInt16(kIdxdummy);
+        return getInt16(kIdxdummy);
       }
         
     public final MsgItem msgItems = new MsgItem(); //(this, kIdxmsgItems);  //embedded structure

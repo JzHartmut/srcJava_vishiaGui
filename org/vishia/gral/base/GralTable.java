@@ -24,6 +24,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   /**Version and history
    * <ul>
+   * <li>2012-08-22 Hartmut new {@link #setCurrentLine(int)} with int, it isn't new because it was able to set with
+   *   {@link #setCurrentCell(int, int)} with -1 as second parameter.
    * <li>2012-07-15 Hartmut new: search functionality: The implementation should/may have a text field 
    *   which shows the search string. While up and down keys the that lines are selected which text in the {@link #ixColumn}
    *   starts whith the search string.
@@ -240,7 +242,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     }
   }
   
-  
+  @Override public boolean setCurrentLine(int nLine){ return setCurrentCell(nLine, -1); }
+
   
   public void setColors(){
     colorBackSelect = GralColor.getColor("am");
@@ -539,7 +542,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    * If a navigation key is released, the table navigation should be stopped immediately.
    * 
    */
-  private GralDispatchCallbackWorker keyActionDone = new GralDispatchCallbackWorker("GralTableKeyDone") {
+  private final GralDispatchCallbackWorker keyActionDone = new GralDispatchCallbackWorker("GralTableKeyDone") {
     @Override
     public void doBeforeDispatching(boolean onlyWakeup) {
       bFocused = true;  //to focus while repainting
