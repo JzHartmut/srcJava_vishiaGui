@@ -10,7 +10,6 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralSetValue_ifc;
-import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidgetCfg_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -201,34 +200,34 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    */
   private GralWidgetCfg_ifc itsCfgElement;
   
-	/**Name of the widget in the panel. */
-	public String name;
-	
-	/**The position of the widget. It may be null if the widget should not be resized. */
-	public final GralPos pos;  
-	
-	
-	/**Panel where the widget is member of. */
-	//public final GralPanelContent itsPanel;
-	
-	/**The graphical widget. It is untyped because it depends on the underlying graphic system. 
-	 * It may be a wrapper class arround a graphical widget too. 
-	 * This element is used for setting operations, which depends from the graphic system
-	 * and the type of the widget. It is only used in the graphic-system-special implementation.
-	 * */
-	//protected GralWidget_ifc widget;
-	
-	/**numeric info what to do (kind of widget). 
-	 * <ul>
-	 * <li>B: a Button: has a color, has an action method.
+  /**Name of the widget in the panel. */
+  public String name;
+  
+  /**The position of the widget. It may be null if the widget should not be resized. */
+  public final GralPos pos;  
+  
+  
+  /**Panel where the widget is member of. */
+  //public final GralPanelContent itsPanel;
+  
+  /**The graphical widget. It is untyped because it depends on the underlying graphic system. 
+   * It may be a wrapper class arround a graphical widget too. 
+   * This element is used for setting operations, which depends from the graphic system
+   * and the type of the widget. It is only used in the graphic-system-special implementation.
+   * */
+  //protected GralWidget_ifc widget;
+  
+  /**numeric info what to do (kind of widget). 
+   * <ul>
+   * <li>B: a Button: has a color, has an action method.
    * <li>c: curve view
    * <li>C: traCk of curve view
-	 * <li>D: a LED
-	 * <li>xxx E: an edit field, 1 line
-	 * <li>xxx e: an edit area
-	 * <li>F: input file selection field
-	 * <li>h; HTML text  box (browser)
-	 * <li>I: a line
+   * <li>D: a LED
+   * <li>xxx E: an edit field, 1 line
+   * <li>xxx e: an edit area
+   * <li>F: input file selection field
+   * <li>h; HTML text  box (browser)
+   * <li>I: a line
    * <li>i: an image
    * <li>k: a tree node
    * <li>K: a tree leafe
@@ -238,44 +237,44 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * <li>r: a rectangle area 
    * <li>R: a rectangle line 
    * <li>S: a text field to show
-	 * <li>s: a text area.
-	 * <li>T: a text input field
-	 * <li>t: a text input area.
-	 * <li>U: a graphical value representation (bar etc)
-	 * <li>V: a graphical value enter representation (slider etc)
-	 * <li>w: A window.
+   * <li>s: a text area.
+   * <li>T: a text input field
+   * <li>t: a text input area.
+   * <li>U: a graphical value representation (bar etc)
+   * <li>V: a graphical value enter representation (slider etc)
+   * <li>w: A window.
    * <li>@: A Tabbed Panel
    * <li>$: Any Panel (composite)
    * <li>+: A canvas panel
-	 * <li>*: A type (not a widget, common information) See {@link org.vishia.gral.cfg.GralCfgData#new_Type()}
-	 * </ul>
-	 * */
-	public char whatIs;
-	
-	public String sToolTip;
-	
-	/**Textual description of the showing method. */
-	private String sShowMethod;
+   * <li>*: A type (not a widget, common information) See {@link org.vishia.gral.cfg.GralCfgData#new_Type()}
+   * </ul>
+   * */
+  public char whatIs;
+  
+  public String sToolTip;
+  
+  /**Textual description of the showing method. */
+  private String sShowMethod;
 
-	private String[] sShowParam;
-	
-	/**Textual informations about content. It may be a data path or adequate. */
-	private String sDataPath;
-	
-	/**If not null, it is the right-mouse-button menu for this widget. */
-	protected GralMenu contextMenu;
-	
-	
-	/**An index associated to the data. */
-	private int dataIx;
-	
+  private String[] sShowParam;
+  
+  /**Textual informations about content. It may be a data path or adequate. */
+  private String sDataPath;
+  
+  /**If not null, it is the right-mouse-button menu for this widget. */
+  protected GralMenu contextMenu;
+  
+  
+  /**An index associated to the data. */
+  private int dataIx;
+  
 
-	/**Textual info about representation format. */
-	protected String sFormat;
-	
-	/**Numeric informations about the content. */
-	//int[] indices;
-	
+  /**Textual info about representation format. */
+  protected String sFormat;
+  
+  /**Numeric informations about the content. */
+  //int[] indices;
+  
   /**One variable which is associated with this widget. This reference may be null.
    * Alternatively {@link #variables} may be set.
    * See {@link #getVariableFromContentInfo(VariableContainer_ifc)}.
@@ -292,7 +291,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    */
   private List<VariableAccessWithIdx> variables;
   
-	
+  
   /**Action method on activating, changing or release the widget-focus. */
   protected GralUserAction actionChanging;
 
@@ -301,78 +300,78 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   protected GralUserAction actionShow;
 
   protected GralUserAction actionDrag, actionDrop;
-	
+  
   /**This action will be called if the widget gets the focus. */
   protected GralUserAction actionFocused;
   
-	/**command string given by the action as parameter. */
-	public String sCmd;
-	
-	
-	/**The relative path to a html help label (maybe an URL, or file, or file with label). */
-	protected String htmlHelp;
-	
-	/**Any special info, may be set from any user class. It should help to present the content. 
-	 * This info can be set and changed after registration. */
-	private Object oContentInfo;
-	
-	
-	
-	
-	/**Set true if its shell, tab card etc is be activated. Set false if it is deactivated.
-	 * It is an estimation whether this widget is be shown yet. 
-	 */
-	private boolean bVisible;
-	
-	/**Delay to repaint.
-	 * 
-	 */
-	protected int repaintDelay = 100, repaintDelayMax = 100;
+  /**command string given by the action as parameter. */
+  public String sCmd;
+  
+  
+  /**The relative path to a html help label (maybe an URL, or file, or file with label). */
+  protected String htmlHelp;
+  
+  /**Any special info, may be set from any user class. It should help to present the content. 
+   * This info can be set and changed after registration. */
+  private Object oContentInfo;
+  
+  
+  
+  
+  /**Set true if its shell, tab card etc is be activated. Set false if it is deactivated.
+   * It is an estimation whether this widget is be shown yet. 
+   */
+  private boolean bVisible;
+  
+  /**Delay to repaint.
+   * 
+   */
+  protected int repaintDelay = 100, repaintDelayMax = 100;
 
-	/**The time when the bVisible state was changed. */
-	private long lastTimeSetVisible;
-	
-	
-	protected final static class DynamicData {
-	  public GralColor backColor, lineColor, textColor;
-	  public Object backColorImpl, lineColorImpl;
-	}
-	
-	
-	protected final DynamicData dyda = new DynamicData();
-	
-	
-	//protected GralWidget(char whatIs)
+  /**The time when the bVisible state was changed. */
+  private long lastTimeSetVisible;
+  
+  
+  protected final static class DynamicData {
+    public GralColor backColor, lineColor, textColor;
+    public Object backColorImpl, lineColorImpl;
+  }
+  
+  
+  protected final DynamicData dyda = new DynamicData();
+  
+  
+  //protected GralWidget(char whatIs)
   //{ this.whatIs = whatIs;
   //}
 
-	
-	public GralWidget(String sName, char whatIs, GralMng mng)
-	{ this.name = sName;
-		//this.widget = null;
-		this.whatIs = whatIs;
+  
+  public GralWidget(String sName, char whatIs, GralMng mng)
+  { this.name = sName;
+    //this.widget = null;
+    this.whatIs = whatIs;
     this.itsCfgElement = null;
     this.itsMng = mng;
     this.pos = mng.getPositionInPanel();  //Note: makes a clone because the pos in panel is reused. 
-	}
-	
-	
-	@Override public GralWidget getGralWidget(){ return this; }
-	
-	
+  }
+  
+  
+  @Override public GralWidget getGralWidget(){ return this; }
+  
+  
   /**Default implementation:Most of widgets may have only one implementation widget. This returns null.
    * @see org.vishia.gral.ifc.GralWidget_ifc#getWidgetMultiImplementations()
    */
   public Object[] getWidgetMultiImplementations(){ return null; }
 
-	
-	
-	public void setPrimaryWidgetOfPanel(){
-	  pos.panel.setPrimaryWidget(this);
-	}
+  
+  
+  public void setPrimaryWidgetOfPanel(){
+    pos.panel.setPrimaryWidget(this);
+  }
 
-	
-	@Override public String getName(){ return name; }
+  
+  @Override public String getName(){ return name; }
   
   /**Sets the graphical widget. It is a wrapper around the widget of the graphic implementation base.
    * This method shouldn't invoke by an user's application. It is only invoked by the gral itself. 
@@ -387,21 +386,22 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * @return The gral graphical widget. Note: The type can be instanceof some derived interfaces of the gral.
    * @deprecated
    */
-  public GralWidget_ifc getGraphicWidgetWrapper(){ return (GralWidget_ifc)this; }
+  @Deprecated
+  public GralWidget_ifc getGraphicWidgetWrapper(){ return this; }
   
-	
-	/**Sets a application specific info. 
-	 * It should help to present user data which are associated to this widget. 
+  
+  /**Sets a application specific info. 
+   * It should help to present user data which are associated to this widget. 
    * This info can be set and changed anytime. */
-  public void setContentInfo(Object content){	oContentInfo = content;}
+  public void setContentInfo(Object content){  oContentInfo = content;}
   
   /**Gets the application specific info. See {@link #setContentInfo(Object)}. */
   public Object getContentInfo(){ return oContentInfo; }
-	
+  
   /**Sets the data path. It is a String in application context.
    * @param sDataPath
    */
-  @Override public void setDataPath(String sDataPath){	
+  @Override public void setDataPath(String sDataPath){  
     this.sDataPath = sDataPath;
     variable = null;
     variables = null;
@@ -412,7 +412,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * @return the last one.
    */
   public String getDataPath(String sDataPath)
-  {	String sDataPathLast = this.sDataPath;
+  {  String sDataPathLast = this.sDataPath;
     this.sDataPath = sDataPath;
     return sDataPathLast;
   }
@@ -425,7 +425,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   /**Gets the data path. It is a String in application context.
    */
   public String getDataPath(){ return sDataPath; }
-	
+  
   /**Sets the action in application context for processing of user handling for the widget.
    * Handling means, pressing button, user inputs of text fields
    * @param action any instance. Its action method is invoked depending of the type of widget
@@ -473,18 +473,18 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   public GralUserAction getActionFocused(){ return actionFocused; }
   
   
-	public String getsToolTip()
-	{
-		return sToolTip;
-	}
+  public String getsToolTip()
+  {
+    return sToolTip;
+  }
 
 
-	public void setToolTip(String sToolTip)
-	{
-		this.sToolTip = sToolTip;
-	}
+  public void setToolTip(String sToolTip)
+  {
+    this.sToolTip = sToolTip;
+  }
 
-	
+  
   /**Sets the action to receive a drop event and initializes the drop feature of the widget.
    * For drag file the 'drag get action' method will be offered in the params[0] a String[][] reference. 
    * This String reference array has to be filled with the absolute path of the file using String[0][0]. 
@@ -534,151 +534,154 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   public GralUserAction getActionDrop(){ return actionDrop; }
   
   
-	public String getShowMethod()
-	{
-		return sShowMethod;
-	}
+  public String getShowMethod()
+  {
+    return sShowMethod;
+  }
 
-	
-	public int getDataIx(){ return dataIx; }
-
-	public void setDataIx(int dataIx){ this.dataIx = dataIx; }
-
-	
-	/**Returns the parameter of the show method.
-	 * The parameters for the show-method are given as "showMethod(param, param, ...)"
-	 * while calling {@link #setShowMethod(String)}. They are split in extra Strings,
-	 * this  
-	 * @return
-	 */
-	public String[] getShowParam(){ return sShowParam; }
-	
-	/**Clear the parameter if they are over-taken already.
-	*/
-	public void clearShowParam(){ sShowParam = null; }
-
-	/**
-	 * @param sShowMethod
-	 * @deprecated use {@link #setActionShow(GralUserAction)}.
-	 */
-	public void setShowMethod(String sShowMethod)
-	{ if(sShowMethod == null){
-			this.sShowMethod = null;
-		  this.sShowParam = null;
-		} else {
-			int posParanthesis = sShowMethod.indexOf("("); 
-			if(posParanthesis >0){
-				int posParanthesisEnd = sShowMethod.indexOf(")");
-				String sParam1 = sShowMethod.substring(posParanthesis+1, posParanthesisEnd);
-				String[] sParamA = sParam1.split(",");
-				this.sShowParam = new String[sParamA.length];
-				for(int ix=0; ix < sParamA.length; ++ix){
-					this.sShowParam[ix] = sParamA[ix].trim();
-				}
-				this.sShowMethod = sShowMethod.substring(0, posParanthesis).trim();
-				
-			} else {
-			  this.sShowMethod = sShowMethod;
-			  this.sShowParam = null;
-			}
-		}
-	}
-
-
-	public String getFormat()
-	{
-		return sFormat;
-	}
-
-
-	public void setFormat(String sFormat)
-	{
-		this.sFormat = sFormat;
-	}
-
-	
-	/**Gets the context menu to add a menu item. If this widget hasn't a gral context menu, then an empty menu
-	 * is assigned and that is returned. It calls {@link GralMng#addContextMenu(GralWidget)} and uses
-	 * the element {@link #contextMenu}.
-	 * @return the context menu root for this widget.
-	 */
-	public GralMenu getContextMenu(){
-	  if(contextMenu == null){
-	    contextMenu = itsMng.addContextMenu(this);   //delegation, the widget mng knows the implementation platform.
-	  }
-	  return contextMenu;
-	}
-	
-	
-	public void setHtmlHelp(String url){ htmlHelp = url; }
   
-	public String getHtmlHelp(){ return htmlHelp; }
+  public int getDataIx(){ return dataIx; }
+
+  public void setDataIx(int dataIx){ this.dataIx = dataIx; }
+
+  
+  /**Returns the parameter of the show method.
+   * The parameters for the show-method are given as "showMethod(param, param, ...)"
+   * while calling {@link #setShowMethod(String)}. They are split in extra Strings,
+   * this  
+   * @return
+   */
+  public String[] getShowParam(){ return sShowParam; }
+  
+  /**Clear the parameter if they are over-taken already.
+  */
+  public void clearShowParam(){ sShowParam = null; }
+
+  /**
+   * @param sShowMethod
+   * @deprecated use {@link #setActionShow(GralUserAction)}.
+   */
+  @Deprecated
+  public void setShowMethod(String sShowMethod)
+  { if(sShowMethod == null){
+      this.sShowMethod = null;
+      this.sShowParam = null;
+    } else {
+      int posParanthesis = sShowMethod.indexOf("("); 
+      if(posParanthesis >0){
+        int posParanthesisEnd = sShowMethod.indexOf(")");
+        String sParam1 = sShowMethod.substring(posParanthesis+1, posParanthesisEnd);
+        String[] sParamA = sParam1.split(",");
+        this.sShowParam = new String[sParamA.length];
+        for(int ix=0; ix < sParamA.length; ++ix){
+          this.sShowParam[ix] = sParamA[ix].trim();
+        }
+        this.sShowMethod = sShowMethod.substring(0, posParanthesis).trim();
+        
+      } else {
+        this.sShowMethod = sShowMethod;
+        this.sShowParam = null;
+      }
+    }
+  }
+
+
+  public String getFormat()
+  {
+    return sFormat;
+  }
+
+
+  public void setFormat(String sFormat)
+  {
+    this.sFormat = sFormat;
+  }
+
+  
+  /**Gets the context menu to add a menu item. If this widget hasn't a gral context menu, then an empty menu
+   * is assigned and that is returned. It calls {@link GralMng#addContextMenu(GralWidget)} and uses
+   * the element {@link #contextMenu}.
+   * @return the context menu root for this widget.
+   */
+  public GralMenu getContextMenu(){
+    if(contextMenu == null){
+      contextMenu = itsMng.addContextMenu(this);   //delegation, the widget mng knows the implementation platform.
+    }
+    return contextMenu;
+  }
   
   
-	
-	
-	public void setPanelMng(GralMng panel)
-	{ this.itsMng = panel; 
-	}
-	
-	
-	
-	/**Gets the info to access the values for this widget in the users context.
-	 * If this method is called the first time for the widget after start the application, the access info
-	 * is searched in the container calling {@link VariableContainer_ifc#getVariable(String, int[])}
-	 * with the stored textual info {@link #setDataPath(String)} and {@link #setDataIx(int)}.
-	 * This operation may need a little bit of calculation time, which were to expensive if a lot of widgets
-	 * should be provided with user values. Therefore the returned {@link VariableAccess_ifc} instance is stored
-	 * in the {@link #oContentInfo} of the widget and returned on the further calls.
-	 * <br>
-	 * The returned {@link VariableAccess_ifc} should be allow the fast access to users values.
-	 *  
-	 * @param container The container where all {@link VariableAccess_ifc} should be found.
-	 * @return The access to a user variable in the user's context, null if the data path is empty.
-	 */
-	public VariableAccessWithIdx getVariableFromContentInfo(VariableContainer_ifc container)
-	{
-		//DBbyteMap.Variable variable;
-		VariableAccessWithIdx variable;
-		Object oContentInfo = this.getContentInfo();
-		if(oContentInfo == null){
-			//first usage:
-		  String sPath1 = this.getDataPath();
-		  if(sPath1 !=null && (sPath1 = sPath1.trim()).length()>0){
+  public void setHtmlHelp(String url){ htmlHelp = url; }
+  
+  public String getHtmlHelp(){ return htmlHelp; }
+  
+  
+  
+  
+  public void setPanelMng(GralMng panel)
+  { this.itsMng = panel; 
+  }
+  
+  
+  
+  /**Gets the info to access the values for this widget in the users context.
+   * If this method is called the first time for the widget after start the application, the access info
+   * is searched in the container calling {@link VariableContainer_ifc#getVariable(String, int[])}
+   * with the stored textual info {@link #setDataPath(String)} and {@link #setDataIx(int)}.
+   * This operation may need a little bit of calculation time, which were to expensive if a lot of widgets
+   * should be provided with user values. Therefore the returned {@link VariableAccess_ifc} instance is stored
+   * in the {@link #oContentInfo} of the widget and returned on the further calls.
+   * <br>
+   * The returned {@link VariableAccess_ifc} should be allow the fast access to users values.
+   *  
+   * @param container The container where all {@link VariableAccess_ifc} should be found.
+   * @return The access to a user variable in the user's context, null if the data path is empty.
+   */
+  public VariableAccessWithIdx getVariableFromContentInfo(VariableContainer_ifc container)
+  {
+    //DBbyteMap.Variable variable;
+    VariableAccessWithIdx variable;
+    Object oContentInfo = this.getContentInfo();
+    if(oContentInfo == null){
+      //first usage:
+      String sPath1 = this.getDataPath();
+      if(sPath1 !=null && (sPath1 = sPath1.trim()).length()>0){
         String sPath = itsMng.replaceDataPathPrefix(sPath1);
         variable = container.getVariable(sPath1);
-			  this.setContentInfo(variable);
-		  } else {
-		    variable = null;
-		  }
-		} else if(oContentInfo instanceof VariableAccess_ifc){
-			variable = (VariableAccessWithIdx)oContentInfo;
-		} else {
-			variable = null;  //other info in widget, not a variable.
-		}
-	  return variable; 
-	}
-	
-	
-	/**Refreshes the graphical content with the content of the variables.
-	 * First time if a variables is not associated the variable is searched in the container
-	 * by the given {@link #setDataPath(String)}. The next times the variable is used independent of
-	 * the reference to the container and independent of the data path. If {@link #setDataPath(String)}
-	 * was called again, the variables are searched in the container newly.
-	 * <br><br>
-	 * If the data path contains ',' as separator, more as one variable is associated.
-	 * 
-	 * @param container contains variables able to search by string.
-	 */
-	@Override public void refreshFromVariable(VariableContainer_ifc container){
-	  if(variable ==null && variables == null){ //no variable known, get it.
-	    final int[] ixArrayA = new int[1];
-	    String sDataPath = this.getDataPath();
-	    if(sDataPath !=null){  //only refresh widgets with a data path.
-  	    if(sDataPath.contains(",")){
+        this.setContentInfo(variable);
+      } else {
+        variable = null;
+      }
+    } else if(oContentInfo instanceof VariableAccess_ifc){
+      variable = (VariableAccessWithIdx)oContentInfo;
+    } else {
+      variable = null;  //other info in widget, not a variable.
+    }
+    return variable; 
+  }
+  
+  
+  /**Refreshes the graphical content with the content of the variables.
+   * First time if a variables is not associated the variable is searched in the container
+   * by the given {@link #setDataPath(String)}. The next times the variable is used independent of
+   * the reference to the container and independent of the data path. If {@link #setDataPath(String)}
+   * was called again, the variables are searched in the container newly.
+   * <br><br>
+   * If the data path contains ',' as separator, more as one variable is associated.
+   * 
+   * @param container contains variables able to search by string.
+   */
+  @Override public void refreshFromVariable(VariableContainer_ifc container){
+    if(variable ==null && variables == null){ //no variable known, get it.
+      //final int[] ixArrayA = new int[1];
+      String sDataPath = this.getDataPath();
+      if(sDataPath !=null){  //only refresh widgets with a data path.
+        if(sDataPath.contains(",")){
           String[] sDataPaths = sDataPath.split(",");
           variables = new LinkedList<VariableAccessWithIdx>();
           for(String sPath1: sDataPaths){
+            if(sPath1.contains("["))
+              stop();
             String sPath2 = sPath1.trim();
             String sPath = itsMng.replaceDataPathPrefix(sPath2);
             VariableAccessWithIdx variable1 = container.getVariable(sPath);
@@ -686,83 +689,85 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
               variables.add(variable1);
             }
           }
-  	    } else {
-  	      String sPath2 = sDataPath.trim();
+        } else {
+          if(sDataPath.contains("["))
+            stop();
+          String sPath2 = sDataPath.trim();
           String sPath = itsMng.replaceDataPathPrefix(sPath2);
           variable = container.getVariable(sPath);
-  	    }
-	    }
-	  }
-	  if(actionShow !=null){
-	    //The users method to influence how the widget is presented in view:
+        }
+      }
+    }
+    if(actionShow !=null){
+      //The users method to influence how the widget is presented in view:
       if(!actionShow.exec(0, this, variable !=null ? variable : variables)){
         System.err.println("GralWidget fault actionShow in " + name + "; returns false; sShowMethod = " + sShowMethod);
       }
-	  } else {
-	    //standard behaviour to show: call setValue or setText which may overridden by the widget type.
-  	  if(variable !=null){
-  	    long timeVariable = variable.getLastRefreshTime();
-  	    boolean bOld = timeVariable > 0 && (System.currentTimeMillis() - timeVariable) > 2000;
-  	    if(bOld ){
-  	      //TODO setBackgroundColor(GralColor.getColor("cy"));
-  	    } else {
-  	      //TODO setBackgroundColor(GralColor.getColor("wh"));
-  	    }
-  	    char cType = variable.getType();
-  	    String sValue = null;
-  	    switch(cType){
-  	      case 'S': case 'B':
-  	      case 'I': setValue(variable.getInt()); break;
+    } else {
+      //standard behaviour to show: call setValue or setText which may overridden by the widget type.
+      if(variable !=null){
+        long timeVariable = variable.getLastRefreshTime();
+        boolean bOld = timeVariable > 0 && (System.currentTimeMillis() - timeVariable) > 2000;
+        if(bOld ){
+          //TODO setBackgroundColor(GralColor.getColor("cy"));
+        } else {
+          //TODO setBackgroundColor(GralColor.getColor("wh"));
+        }
+        char cType = variable.getType();
+        String sValue = null;
+        switch(cType){
+          case 'S': case 'B':
+          case 'I': setValue(variable.getInt()); break;
           case 'F': setValue(variable.getFloat()); break;
-  	      case 's': setText(variable.getString()); break;
+          case 's': setText(variable.getString()); break;
           default:  sValue = "?" + cType; //variable.getInt());  //at least request newly if type is faulty
-  	    }
-  	    if(sValue !=null){
-  	      if(bOld){ setText("? " + sValue); }
-  	      else { setText(sValue); }
-  	    }
-  	  } else if(variables !=null){
-  	    if(variables.size() == 0){ variables = null; }
-  	    else {
+        }
+        if(sValue !=null){
+          if(bOld){ setText("? " + sValue); }
+          else { setText(sValue); }
+        }
+      } else if(variables !=null){
+        if(variables.size() == 0){ variables = null; }
+        else {
           Object[] values = new Object[variables.size()];
           int ixVal = -1;
           for(VariableAccessWithIdx variable1: variables){
-    	      char cType = variable1.getType();
-    	      switch(cType){
-    	        case 'S': case 'B':
-    	        case 'I': values[++ixVal] = variable1.getInt(); break;
-    	        case 'F': values[++ixVal] = variable1.getFloat(); break;
-    	        case 's': values[++ixVal] = variable1.getString(); break;
-    	        default:  setText("?" + cType); //variable.getInt());  //at least request newly
-    	      } //switch
+            char cType = variable1.getType();
+            switch(cType){
+              case 'S': case 'B':
+              case 'I': values[++ixVal] = variable1.getInt(); break;
+              case 'F': values[++ixVal] = variable1.getFloat(); break;
+              case 's': values[++ixVal] = variable1.getString(); break;
+              default:  setText("?" + cType); //variable.getInt());  //at least request newly
+            } //switch
             
           }
-  	      setValue(values);
-  	    }
-  	  } else if(sDataPath !=null){
-  	    setText("?? " + sDataPath);
-  	  }
-	  }
+          setValue(values);
+        }
+      } else if(sDataPath !=null){
+        setText("?? " + sDataPath);
+      }
+    }
     
-	}
-	
-	
-	
-	/**Requests new values for all variables which are associated to this widget. This method is usefull
-	 * if the variables are filled by a communication with any remote device and that filling
-	 * should be requested for the current visible variables.
-	 */
-	public void requestNewValueForVariable(long timeRequested){
-	  if(variable !=null){ variable.getVariable().requestValue(timeRequested); }
-	  else if(variables !=null){
-	    for(VariableAccessWithIdx variable1: variables){
-	      variable1.getVariable().requestValue(timeRequested);
-	    }
-	  }
-	}
-	
-	
-	
+  }
+  
+  
+  
+  /**Requests new values for all variables which are associated to this widget. This method is usefull
+   * if the variables are filled by a communication with any remote device and that filling
+   * should be requested for the current visible variables.
+   */
+  public void requestNewValueForVariable(long timeRequested){
+    if(variable !=null){ variable.getVariable().requestValue(timeRequested); }
+    else if(variables !=null){
+      for(VariableAccessWithIdx variable1: variables){
+        variable1.getVariable().requestValue(timeRequested);
+      }
+    }
+  }
+  
+  
+  
   /**Gets the current value of the content of the widget in the given context.
    * @param mng The context.
    * @return The value in String representation, null if the widget has no possibility of input.
@@ -934,19 +939,19 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   
   
-	/**Especially for test and debug, short info about widget.
-	 * @see java.lang.Object#toString()
-	 */
-	@Override public String toString()
-	{ if(pos !=null && pos.panel !=null){
-		  return whatIs + "-" + name + ":" + sDataPath + "@" + pos.panel.namePanel + "\n";
-	  } else {
-	    return whatIs + "-" + name + ":" + sDataPath + "@?" + "\n";
-	  }
-	}
+  /**Especially for test and debug, short info about widget.
+   * @see java.lang.Object#toString()
+   */
+  @Override public String toString()
+  { if(pos !=null && pos.panel !=null){
+      return whatIs + "-" + name + ":" + sDataPath + "@" + pos.panel.namePanel + "\n";
+    } else {
+      return whatIs + "-" + name + ":" + sDataPath + "@?" + "\n";
+    }
+  }
 
   
-	/**This method should be implemented in all Widget implementations of the adapter for the
+  /**This method should be implemented in all Widget implementations of the adapter for the
    * underlying graphic system. 
    * <br>Implementation hints: In SWT it should call redraw(). 
    * <br>It is possible that the widget
@@ -1004,7 +1009,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * It is used with delay and wind up whenever {@link #repaint(int, int)} with an delay is called.
    * If its callback method was run, it is dequeued till the next request of {@link #repaint()}.
    */
-  private GralDispatchCallbackWorker repaintRequ = new GralDispatchCallbackWorker("GralWidget.repaintRequ"){
+  private final GralDispatchCallbackWorker repaintRequ = new GralDispatchCallbackWorker("GralWidget.repaintRequ"){
     @Override public void doBeforeDispatching(boolean onlyWakeup) {
       //first remove from queue to force add new, if a new request is given.
       //thread safety: If a new request is given, it is not add yet, because it isn't execute.
@@ -1026,7 +1031,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * It is used with delay and wind up whenever {@link #repaint(int, int)} with an delay is called.
    * If its callback method was run, it is dequeued till the next request of {@link #repaint()}.
    */
-  private GralDispatchCallbackWorker setFocusRequ = new GralDispatchCallbackWorker("GralWidget.setFocusRequ"){
+  private final GralDispatchCallbackWorker setFocusRequ = new GralDispatchCallbackWorker("GralWidget.setFocusRequ"){
     @Override public void doBeforeDispatching(boolean onlyWakeup) {
       //first remove from queue to force add new, if a new request is given.
       //thread safety: If a new request is given, it is not add yet, because it isn't execute.
@@ -1043,6 +1048,11 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
     }
     @Override public String toString(){ return name + ":" + GralWidget.this.name; }
   };
+
+  void stop(){
+    
+  }
+  
   
 }
 
