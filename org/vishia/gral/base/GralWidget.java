@@ -181,7 +181,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120425;
+  public static final int version = 20120823;
 
   
   /**The widget manager from where the widget is organized. Most of methods need the information
@@ -672,9 +672,11 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * @param container contains variables able to search by string.
    */
   @Override public void refreshFromVariable(VariableContainer_ifc container){
+    String sDataPath = this.getDataPath();
+    if(sDataPath !=null && sDataPath.startsWith("intern."))
+      stop();
     if(variable ==null && variables == null){ //no variable known, get it.
       //final int[] ixArrayA = new int[1];
-      String sDataPath = this.getDataPath();
       if(sDataPath !=null){  //only refresh widgets with a data path.
         if(sDataPath.contains(",")){
           String[] sDataPaths = sDataPath.split(",");

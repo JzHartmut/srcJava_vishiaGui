@@ -154,6 +154,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     
     /**Action is called if the button search is pressed. */
     GralUserAction actionFileSearch = new GralUserAction(){
+      @Override
       public boolean userActionGui(int key, GralWidget widgd, Object... params){ 
         if(widgd.sCmd.equals("search") && key == KeyCode.mouse1Up){
           boolean subDirs = widgSubdirs.isOn();
@@ -188,7 +189,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Action to show the file properties in the info line. This action is called anytime if a line
    * was changed in the file view table. */
-  private GralUserAction actionOnFileSelection = new GralUserAction(){
+  private final GralUserAction actionOnFileSelection = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
       if(actionCode == KeyCode.tableLineSelect){
         GralTableLine_ifc line = (GralTableLine_ifc) params[0];
@@ -447,7 +448,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * <li>The value is the name of the file in this directory.   
    * </ul>
    */
-  private Map<String, String> indexSelection = new TreeMap<String, String>(); 
+  private final Map<String, String> indexSelection = new TreeMap<String, String>(); 
   
   
   /**The widget for showing the path. */
@@ -982,12 +983,11 @@ public class GralFileSelector implements Removeable //extends GralWidget
 
 
   
-  EventConsumer callbackFillIn = new EventConsumer(){
+  EventConsumer callbackFillIn = new EventConsumer("GralFileSelector - callback fillin"){
     @Override public boolean processEvent(Event ev) {
       ///
       FileRemote.CallbackEvent callback = (FileRemote.CallbackEvent)ev;
       FileRemote dir = (FileRemote)callback.getRefData();  //it is completed meanwhile
-      ev.consumedRetain();
       fillInRefreshed(dir);
       //setFocus();    //don't set the focus, it may be false. Only fill.
       return true;
@@ -1014,6 +1014,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * </ul>
    */
   GralUserAction actionSetPath = new GralUserAction(){
+    @Override
     public boolean userActionGui(int key, GralWidget widg, Object... params)
     {
       if(key == KeyCode.enter){

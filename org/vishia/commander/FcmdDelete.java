@@ -154,7 +154,7 @@ public class FcmdDelete
                   if(!file.canWrite()){
                     //file.setWritable();
                   }
-                  Event callback = new Event(file, success, null);  //NOTE: store file as src to get its name for report in callback.
+                  FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(file, success, null);  //NOTE: store file as src to get its name for report in callback.
                   listEvDel.add(callback);
                   //
                   //The delete action:
@@ -171,7 +171,7 @@ public class FcmdDelete
               }
             } else { //user has changed the path
               FileRemote dirRemote = FileRemote.fromFile(currentDirWhereDelete);
-              Event callback = new Event(dirRemote, success, null);  
+              FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(dirRemote, success, null);  
               dirRemote.delete(sPathDelete, true, callback);
             }
           } else if(widgg.sCmd.equals("esc")){
@@ -185,7 +185,7 @@ public class FcmdDelete
 
   
   
-  EventConsumer success = new EventConsumer(){
+  EventConsumer success = new EventConsumer("FcmdDelete - success"){
     @Override public boolean processEvent(Event ev)
     {
       if(ev.data1 !=0){

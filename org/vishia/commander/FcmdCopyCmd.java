@@ -417,7 +417,8 @@ public class FcmdCopyCmd
           }
         } else if(widgg.sCmd.startsWith("abort")) {
           for(FileRemote.CallbackEvent ev: listEvCopy){
-            ev.sendEvent(FileRemote.cmdAbortAll);
+            ev.abort(FileRemote.Cmd.abortAll);
+            //ev.sendEvent(FileRemote.cmdAbortAll);
           }
           listEvCheck.clear();
           listEvCopy.clear();
@@ -428,8 +429,8 @@ public class FcmdCopyCmd
             
         } else if(widgg.sCmd.startsWith("quit")) {
           filesToCopy.clear();
-          widgButtonOk.setText("check");
-          widgButtonOk.setCmd("check");
+          widgButtonOk.setText("close");
+          widgButtonOk.setCmd("close");
             
         } else if(widgg.sCmd.equals("esc")){
           //it is an abort too!
@@ -443,6 +444,11 @@ public class FcmdCopyCmd
           widgButtonOk.setCmd("check");
           widgButtonEsc.setText("close");
           widgButtonEsc.setCmd("close");
+          main.gralMng.setWindowsVisible(windConfirmCopy, null); //set it invisible.
+        } else if(widgg.sCmd.equals("close")){
+          filesToCopy.clear();
+          listEvCheck.clear();
+          listEvCopy.clear();
           main.gralMng.setWindowsVisible(windConfirmCopy, null); //set it invisible.
         }
       }
@@ -543,8 +549,8 @@ public class FcmdCopyCmd
         widgButtonOk.setText("quit");
         widgButtonOk.setCmd("quit");
       } else {
-        widgButtonOk.setText("check");
-        widgButtonOk.setCmd("check");
+        widgButtonOk.setText("close");
+        widgButtonOk.setCmd("close");
       }
       widgButtonEsc.setText("close");
       widgButtonEsc.setCmd("close");
@@ -555,47 +561,47 @@ public class FcmdCopyCmd
   
   
   
-  EventConsumer success = new EventConsumer(){
+  /**The method which is invoked on callback of any action copy, check, move
+   * and their intermediate message. 
+   * 
+   */
+  EventConsumer success = new EventConsumer("FcmdCopy-success"){
     @Override public boolean processEvent(Event ev)
     {
       FileRemote.CallbackEvent ev1 = (FileRemote.CallbackEvent)ev;
-      switch(ev.cmd()){
-        case FileRemoteAccessor.kNrofFilesAndBytes:{
-          FcmdCopyCmd.this.evCurrentFile = ev1;
-          if(bSkipDir){
-            ev1.sendEvent(FileRemote.cmdAbortDir);
-            bSkipDir = false;
-          } 
-          bSkipFile = false;
+      switch(ev1.getCmd()){
+        case doneCheck: {
           eventCheckOk(ev1);
         } break;
-        case FileRemoteAccessor.kOperation: {
+        case nrofFilesAndBytes:{
           FcmdCopyCmd.this.evCurrentFile = ev1;
           int percent = ev.data2 / 10;
           widgProgressAll.setValue(percent);
           widgCopyNameDst.setText(String.copyValueOf(ev1.fileName));
           widgCopyState.setText("" + ev1.nrofBytesInFile/1000000 + " Mbyte");
           if(bSkipFile){
-            ev1.sendEvent(FileRemote.cmdAbortFile);
+            ev1.abort(FileRemote.Cmd.abortCopyFile );
+            //ev1.sendEvent(FileRemote.cmdAbortFile);
             bSkipFile = false;
           } else if(bSkipDir){
-            ev1.sendEvent(FileRemote.cmdAbortDir);
+            ev1.abort(FileRemote.Cmd.abortCopyDir);
+            //ev1.sendEvent(FileRemote.cmdAbortDir);
             bSkipDir = false;
           } 
         }break;
-        case FileRemoteAccessor.kFinishError: {
+        case error: {
           FcmdCopyCmd.this.evCurrentFile = null;
           widgCopyState.setText("error");
           bSkipDir = bSkipFile = false;
           eventConsumed(ev, false);
         }break;
-        case FileRemoteAccessor.kFinishNok: {
+        case nok: {
           FcmdCopyCmd.this.evCurrentFile = null;
           widgCopyState.setText("nok");
           bSkipDir = bSkipFile = false;
           eventConsumed(ev, false);
         }break;
-        case FileRemoteAccessor.kFinishOk: {
+        case done: {
           FcmdCopyCmd.this.evCurrentFile = null;
           widgCopyState.setText("ok");
           bSkipDir = bSkipFile = false;

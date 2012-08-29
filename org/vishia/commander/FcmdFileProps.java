@@ -17,6 +17,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
+import org.vishia.util.EventSource;
 import org.vishia.util.FileRemote;
 import org.vishia.util.FileRemoteAccessor;
 import org.vishia.util.FileSystem;
@@ -284,6 +285,13 @@ public class FcmdFileProps
   };
 
 
+  EventSource evSrc = new EventSource("FcmdFileProps"){
+    @Override public void notifyDequeued(){}
+    @Override public void notifyConsumed(int ctConsumed){}
+    @Override public void notifyRelinquished(int ctConsumed){}
+  };
+
+
 
   /**Action for Key F2 for view command. 
    */
@@ -322,28 +330,28 @@ public class FcmdFileProps
         mChg &= ~noMask;
         boolean bAbort = false;
         if(infos.sCmd.equals(sCmdAbort)){
-          if(evChg.forceRelinquish()){
+          if(evChg.occupy(evSrc, widgChgFile, callbackChgProps, null, true)){
             widgChgFile.setText(main.idents.buttonFilePropsChg);
             infos.sCmd = sCmdChg;
           } else {
             System.err.println("chg properties hangs");
           }
         } else if(infos.sCmd.equals(sCmdChg)){
-          if(evChg.occupy(widgChgFile, callbackChgProps, null)){
+          if(evChg.occupy(evSrc, widgChgFile, callbackChgProps, null, true)){
             //cmds with callback
             widgChgFile.setText(main.idents.buttonFilePropsChanging);
             actFileRemote.chgProps(name, mChg, val, 0, evChg);
           } else { bAbort = true; }
           //
         } else if(infos.sCmd.equals(sCmdChgRecurs)){
-          if(evChg.occupy(widgChrRecurs, callbackChgProps, null)){
+          if(evChg.occupy(evSrc, widgChrRecurs, callbackChgProps, null, true)){
             //cmds with callback
             widgChrRecurs.setText(main.idents.buttonFilePropsChanging);
             actFileRemote.chgPropsRecursive(mChg, val, 0, evChg);
           } else { bAbort = true; }
           //
         } else if(infos.sCmd.equals(sCmdCopy)){
-          if(evChg.occupy(widgCopyFile, callbackChgProps, null)){
+          if(evChg.occupy(evSrc, widgCopyFile, callbackChgProps, null, true)){
             if(!name.equals(actFile.getName())){
               widgCopyFile.setText(main.idents.buttonFilePropsCopying);
               FileRemote fileNew = new FileRemote(actFileRemote.getParentFile(), name);
@@ -373,16 +381,17 @@ public class FcmdFileProps
   };
 
 
-  EventConsumer callbackChgProps = new EventConsumer()
-  { @Override public boolean processEvent(Event ev)
-    { GralButton src = (GralButton)ev.getRefData();
-      if(ev.cmd() == FileRemoteAccessor.kFinishOk){
+  EventConsumer callbackChgProps = new EventConsumer("FcmdFileProps-callbackChgProps")
+  { @Override public boolean processEvent(Event evP)
+    { FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
+      GralButton src = (GralButton)ev.getRefData();
+      if(ev.getCmd() == FileRemote.CallbackCmd.done){
         showFileInfos(actFile);
         src.setText(main.idents.buttonFilePropsOk);
       } else {
         src.setText(main.idents.buttonFilePropsRetry);
       }
-      ev.consumedRetain();
+      ev.relinquish();
       return true;
     } 
   };
@@ -397,26 +406,25 @@ public class FcmdFileProps
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         widgBtnDirBytes.setText("counting ...");
-        evCntLen.forceRelinquish();
-        if(evCntLen.occupy(null, callbackCntLen, null)){
+        if(evCntLen.occupyRecall(100, evSrc, null, callbackCntLen, null, true)){
           FileRemote.fromFile(actFile).countAllFileLength(evCntLen);
         }
       }
       return true;
   } };
   
-  EventConsumer callbackCntLen = new EventConsumer()
+  EventConsumer callbackCntLen = new EventConsumer("FcmdFileProps - callback cnt length")
   { @Override public boolean processEvent(Event evP)
     { GralButton src = (GralButton)evP.getRefData();
-      if(evP.cmd() == FileRemoteAccessor.kFinishOk){
-        FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP; 
+      FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
+      if(ev.getCmd() == FileRemote.CallbackCmd.done){
         String sLen = "" + ev.nrofBytesAll;
         widgLength.setText(sLen);
       } else {
         widgLength.setText("error count bytes");
       }
       widgBtnDirBytes.setText(main.idents.buttonFilePropsCntLen);
-      evP.consumedRetain();
+      evP.relinquish();
       return true;
     } 
   };
