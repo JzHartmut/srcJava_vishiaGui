@@ -74,6 +74,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.Assert;
 
 
 
@@ -1280,6 +1281,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
    * throws GuiDialogZbnfControlled.NotExistException if the field with the given name isn't found.
    * @deprecated it doesn't work yet. It isn't threadsafe. Use {@link #setInfo(GralWidget, int, int, Object, Object)}
    */
+  @Deprecated
   public String setFieldContent(String name, String content)
   throws NotExistException
   {
@@ -1341,6 +1343,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   //past: insertInfo
   @Override public String setInfo(GralWidget descr, int cmd, int ident, Object visibleInfo, Object userData)
   {
+    Assert.checkMsg(false, "deprecated setInfo");
     if(currThreadIsGraphic()){
       setInfoGthread(descr, cmd, ident, visibleInfo, userData);
     } else {
@@ -1500,6 +1503,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
    * throws GuiDialogZbnfControlled.NotExistException if the field with the given name isn't found.
    * @deprecated it doesn't work yet. It isn't threadsafe. Use {@link #setInfo(GralWidget, int, int, Object, Object)}
    */
+  @Deprecated
   public String getFieldContent(String name)
   throws NotExistException
   {
@@ -1696,7 +1700,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 	 * to set a variable when an input field is leaved.
 	 * TODO it isn't Text
 	 */
-	private GralUserAction syncVariableOnFocus = new GralUserAction()
+	private final GralUserAction syncVariableOnFocus = new GralUserAction()
 	{	/**Writes the value to the named variable on leaving the focus.
 		 * The name of the variable is contained in the {@link GralWidget}.
 		 * @see org.vishia.gral.ifc.GralUserAction#userActionGui(java.lang.String, org.vishia.gral.base.GralWidget, java.lang.Object[])

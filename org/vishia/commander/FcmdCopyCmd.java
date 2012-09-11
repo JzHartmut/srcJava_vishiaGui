@@ -155,7 +155,7 @@ public class FcmdCopyCmd
     widgProgressFile = main.gralMng.addValueBar("copyProgressFile", null, null);
     widgProgressAll = main.gralMng.addValueBar("copyProgressAll", null, null);
     main.gralMng.setPosition(-4, GralPos.size+3, -13, -1, 0, 'r');
-    widgButtonOk = main.gralMng.addButton("copyOk", actionButtonCopy, "check", null, null, "check");
+    widgButtonOk = main.gralMng.addButton("copyOk", actionButtonCopy, "close", null, null, "close");
   
   }
   
@@ -266,8 +266,11 @@ public class FcmdCopyCmd
     @Override public boolean userActionGui(int key, GralWidget infos,
         Object... params)
     { //String sSrc, sDstName, sDstDir;
-      if(widgButtonOk.getCmd().equals("check")) {
+      if(widgButtonOk.getCmd().equals("close")) {
         //only if it is ready to check, get the files.
+        widgButtonOk.setText("check");
+        widgButtonOk.setCmd("check");
+
         filesToCopy.clear();
         listEvCheck.clear();
         listEvCopy.clear();

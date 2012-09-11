@@ -5,20 +5,22 @@
  *   but there are some differences. If a user works for example in Java-Swing, ones sources are not compatible
  *   with SWT or another graphic system for example from QT. There are too may special knowledge necessary 
  *   and dependencies existing of the graphic platform.
- * <li>A user software should be independently of the graphic platform if only standard requirements are used.
+ * <li>A user software should be independent of the graphic platform if only standard requirements are used.
  *   Only for high-specific solutions the full bandwidth of the graphical base system may be need.
  * <li>The graphic programming should be easy to do.
  * </ul>
  * The gral supports some independent concepts to fit that requests:
  * <ul>
  * <li>A frame for a standard GUI application, which supports up to 9 areas in the application window for input, output etc.
- *   {@link GralArea9Window}, {@link org.vishia.gral.area9._PackageDocu}
+ *   {@link org.vishia.gral.area9.GralArea9Window}, {@link org.vishia.gral.area9}
  * <li>A System to place widgets with grid coordinates, allowing larger and smaller presentation with proper fonts etc.
  *   The user should not deal with pixel positions.
- *   {@link org.vishia.gral.gridPanel._PackageDocu}
- * <li>A system to build the graphic from a script. {@link GralCfgZbnf}
- * <li>The possibility to edit the appearance of GUI on runtime: {@link GralCfgDesigner}
- * <li>Animated graphic, especially for process data viewing: {@link InspcGui}
+ *   {@link org.vishia.gral.base.GralPos}
+ * <li>A system to build the graphic from a script. {@link org.vishia.gral.cfg}
+ * <li>The possibility to edit the appearance of GUI on runtime: {@link org.vishia.gral.cfg.GralCfgDesigner}
+ * <li>Set values for all widgets in another thread than the graphic thread and invoke repaint:
+ *   {@link org.vishia.gral.ifc.GralWidget_ifc}.
+ * <li>Animated graphic, especially for process data viewing: {@link org.vishia.guiInspc.InspcGui}
  * <li> 
  * </ul>     
  * <b>Overview</b>:

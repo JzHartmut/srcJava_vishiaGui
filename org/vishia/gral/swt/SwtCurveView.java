@@ -75,7 +75,7 @@ public class SwtCurveView extends GralCurveView
 
   private final CurveView curveSwt;
   
-  private Image cursorStore1, cursorStore2;
+  private final Image cursorStore1, cursorStore2;
   
   public SwtCurveView(String sName, GralPos pos, SwtMng mng, int nrofXvalues, int nrofTracks)
   {
@@ -166,7 +166,7 @@ public class SwtCurveView extends GralCurveView
     
     private Color gridColorStrong = new Color(getDisplay(), 128, 255, 255);
     
-    private Color colorBack = new Color(getDisplay(), 0xff, 0xff, 0xff);
+    private final Color colorBack = new Color(getDisplay(), 0xff, 0xff, 0xff);
     
     public CurveView(Composite parent, int xPixel, int yPixel, int nrofXvalues,
         int nrofTracks){
@@ -632,9 +632,6 @@ public class SwtCurveView extends GralCurveView
           int iPixRange1 = size.x * ixDataRel1 / maxNrofXValues;
           int ixDWr = (ixDataWr >> shIxiData) & mIxiData;
           //System.out.println("SwtCurveView.spread; " + ixDataRel1 + ".." + ixDataRel2 + " ->" +  ixDWr);
-          if((timeValues[200] %1000 ==0)){
-            g.drawText("2012-08-09-15h33-45.456", 300, size.y - 20);
-          }
           g.setLineWidth(5);
           g.setForeground((Color)itsMng.getColorImpl(GralColor.getColor("ye")));
           g.drawLine(0, size.y -3, size.x - iPixRange1, size.y -3);
@@ -644,7 +641,9 @@ public class SwtCurveView extends GralCurveView
           g.drawLine(size.x - iPixRange1, size.y -3, size.x - iPixRange2, size.y -3);
         }
       } catch(Exception exc){
-        System.err.println("SwtCurveView-paint; " + exc.getMessage());
+        StackTraceElement[] stack = exc.getStackTrace();
+        System.err.println("SwtCurveView-paint; " + exc.getMessage() + ";" + stack[0].getFileName() + ":" + stack[0].getLineNumber());
+        stop();
       }
       //g.drawString(""+xShift+ ":"+ xViewLast + ":" + nrofDataShift.get(), 200, dyView-28);
       //g.drawString("xx", 200, dyView-16);

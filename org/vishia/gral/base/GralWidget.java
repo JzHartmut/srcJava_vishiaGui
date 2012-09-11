@@ -13,6 +13,7 @@ import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidgetCfg_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
 
@@ -718,7 +719,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
         char cType = variable.getType();
         String sValue = null;
         switch(cType){
-          case 'S': case 'B':
+          case 'Z': case 'S': case 'B':
           case 'I': setValue(variable.getInt()); break;
           case 'F': setValue(variable.getFloat()); break;
           case 's': setText(variable.getString()); break;
@@ -736,7 +737,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
           for(VariableAccessWithIdx variable1: variables){
             char cType = variable1.getType();
             switch(cType){
-              case 'S': case 'B':
+              case 'Z': case 'S': case 'B':
               case 'I': values[++ixVal] = variable1.getInt(); break;
               case 'F': values[++ixVal] = variable1.getFloat(); break;
               case 's': values[++ixVal] = variable1.getString(); break;
@@ -835,7 +836,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * @see org.vishia.gral.ifc.GralSetValue_ifc#setText(java.lang.CharSequence)
    */
   @Override public void setText(CharSequence text){
-    System.err.println("GralWidget - non overridden setText called; Widget = " + name + "; text=" + text);
+    System.err.println(Assert.stackInfo("GralWidget - non overridden setText called; Widget = " + name + "; text=" + text, 5));
   }
   
   
@@ -916,6 +917,10 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   @Override public void repaint(){ repaint(0, 0); }
   
   
+  /**The Implementation of repaint calls {@link #repaintGthread()} if it is the graphic thread and the delay is 0.
+   * Elsewhere the {@link #repaintRequ} is added as request to the graphic thread. 
+   * @see org.vishia.gral.ifc.GralWidget_ifc#repaint(int, int)
+   */
   @Override public void repaint(int delay, int latest){
     if(delay == 0 && itsMng.currThreadIsGraphic()){
       repaintGthread();
@@ -961,6 +966,8 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * It is possible that some data are set in another thread, they should be applied to the widgets firstly.
    * It is possible that the widget is removed though a repaintGthread-order is pending from the time before deleting,
    * for example if the graphic layout is changed. 
+   * <br><br>
+   * See {@link #repaintRequ}
    * 
    */
   protected abstract void repaintGthread();
