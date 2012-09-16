@@ -109,15 +109,34 @@ public interface GralWidget_ifc extends Removeable
    */
   boolean isVisible();
   
+  /**
+   * @deprecated use {@link #setBackColor(GralColor, int)}
+   */
+  @Deprecated
   public abstract GralColor setBackgroundColor(GralColor color);
   
+  /**
+   * @deprecated use {@link #setLineColor(GralColor, int)}
+   */
+  @Deprecated
   public abstract GralColor setForegroundColor(GralColor color);
   
   
+  /**Sets the background color for the widget.
+   * @param color Any color
+   * @param ix 0 if only one color is supported, 1, ... if the widget has more as one background.
+   */
   void setBackColor(GralColor color, int ix);
   
+  /**Sets the line color for the widget.
+   * @param color Any color
+   * @param ix 0 if only one color is supported, 1, ... if the widget has more as one line.
+   */
   void setLineColor(GralColor color, int ix);
   
+  /**Sets the text color for the widget.
+   * @param color Any color
+   */
   void setTextColor(GralColor color);
   
   

@@ -229,12 +229,14 @@ public class SwtTextFieldWrapper extends GralTextField
 
 
   
+  @Override
   protected void setDropEnable(int dropType)
   {
     new SwtDropListener(dropType, textFieldSwt); //associated with textFieldSwt.
   }
   
   
+  @Override
   protected void setDragEnable(int dragType)
   {
     new SwtDragListener(dragType, textFieldSwt); //associated with textFieldSwt.
@@ -262,7 +264,7 @@ public class SwtTextFieldWrapper extends GralTextField
     int chg;
     if(textFieldSwt !=null){ //do nothing if the graphic implementation widget is removed.
       do{
-        chg = this.whatIsChanged.get();
+        chg = this.dyda.whatIsChanged.get();
         if(++catastrophicalCount > 10000) 
           throw new RuntimeException("atomic failed");
         if((chg & chgText) !=0){ 
@@ -283,11 +285,11 @@ public class SwtTextFieldWrapper extends GralTextField
             textFieldSwt.setSelection(selectionStart, selectionEnd);
           }
         }
-        if((chg & chgColorText) !=0){ textFieldSwt.setForeground(((SwtMng)itsMng).getColorImpl(colorText)); }
-        if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(((SwtMng)itsMng).getColorImpl(colorBack)); }
+        if((chg & chgColorText) !=0){ textFieldSwt.setForeground(((SwtMng)itsMng).getColorImpl(dyda.textColor)); }
+        if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(((SwtMng)itsMng).getColorImpl(dyda.backColor)); }
         textFieldSwt.redraw();
       //System.out.println("SwtTextField " + name + ":" + text);
-      } while(!whatIsChanged.compareAndSet(chg, 0));
+      } while(!dyda.whatIsChanged.compareAndSet(chg, 0));
     }
   }
 

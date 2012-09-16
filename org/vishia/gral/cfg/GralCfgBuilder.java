@@ -19,6 +19,7 @@ import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralPoint;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.CalculatorExpr;
 import org.vishia.util.KeyCode;
 
 public class GralCfgBuilder
@@ -26,6 +27,9 @@ public class GralCfgBuilder
 
   /**Version and history
    * <ul>
+   * <li>2012-09-17 Hartmut chg: showMethod now split functionName and parameters. The function name is used to get
+   *   the {@link GralUserAction} for {@link GralWidget#setActionShow(GralUserAction, String[])}. The parameter are stored
+   *   in {@link GralWidget#cfg} as {@link GralWidget.ConfigData#showParam}.
    * <li>2011-05-00 Hartmut created, the old ZbnfCfg.. class is obsolte now.
    * </ul>
    *
@@ -62,7 +66,7 @@ public class GralCfgBuilder
    * It is used if other files are given with relative path.*/
   private final File currentDir;
 
-  private Map<String, String> indexAlias = new TreeMap<String, String>();
+  private final Map<String, String> indexAlias = new TreeMap<String, String>();
   
   
   public GralCfgBuilder(GralCfgData cfgData, GralMngBuild_ifc gui, File currentDir)
@@ -289,13 +293,16 @@ public class GralCfgBuilder
     if(widgd !=null){
       //set common attributes for widgets:
       //widgd.pos = gui.getPositionInPanel();
-      String sShowMethod = cfge.widgetType.showMethod;
-      if(sShowMethod !=null && sShowMethod.length() >0){
-        GralUserAction actionShow = gralMng.getRegisteredUserAction(sShowMethod);
+      String sShowMethod1 = cfge.widgetType.showMethod;
+      if(sShowMethod1 !=null){
+        String[] sShowMethod = CalculatorExpr.splitFnNameAndParams(sShowMethod1);
+       
+        GralUserAction actionShow = gralMng.getRegisteredUserAction(sShowMethod[0]);
         if(actionShow == null){
           sError = "GuiCfgBuilder - show method not found: " + sShowMethod;
         } else {
-          widgd.setActionShow(actionShow);
+          String[] param = sShowMethod[1] == null ? null : CalculatorExpr.splitFnParams(sShowMethod[1]);
+          widgd.setActionShow(actionShow, param);
         }
       }
       widgd.sCmd = cfge.widgetType.cmd;

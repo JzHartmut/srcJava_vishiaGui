@@ -382,7 +382,7 @@ public class FcmdFileProps
 
 
   EventConsumer callbackChgProps = new EventConsumer("FcmdFileProps-callbackChgProps")
-  { @Override public boolean processEvent(Event evP)
+  { @Override protected boolean processEvent_(Event evP)
     { FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
       GralButton src = (GralButton)ev.getRefData();
       if(ev.getCmd() == FileRemote.CallbackCmd.done){
@@ -414,7 +414,7 @@ public class FcmdFileProps
   } };
   
   EventConsumer callbackCntLen = new EventConsumer("FcmdFileProps - callback cnt length")
-  { @Override public boolean processEvent(Event evP)
+  { @Override protected boolean processEvent_(Event evP)
     { GralButton src = (GralButton)evP.getRefData();
       FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
       if(ev.getCmd() == FileRemote.CallbackCmd.done){

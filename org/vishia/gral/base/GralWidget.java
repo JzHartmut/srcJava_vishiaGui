@@ -2,6 +2,7 @@ package org.vishia.gral.base;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.vishia.byteData.VariableAccessWithIdx;
 import org.vishia.byteData.VariableAccess_ifc;
@@ -97,6 +98,11 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-09-17 Hartmut new {@link ConfigData} and {@link #cfg}, used yet only for {@link ConfigData#showParam}.
+   * <li>2012-09-17 Hartmut chg whatIsChanged#whatIsChanged} moved from {@link GralTextField}. The concept is valid for all widgets
+   *   in cohesion with the concept of the whatIsChanged}.
+   * <li>2012-09-17 Hartmut chg {@link #setActionShow(GralUserAction, String[])} now with parameters.  
+   *   
    * <li>2012-08-21 Hartmut new {@link DynamicData} and {@link #dyda} for all non-static widget properties, the dynamic data
    *   are that data which are used for all widget types in runtime. TODO: store the configuration data (all other) in an
    *   inner class CfgData or in a common class cfgdata see {@link org.vishia.gral.cfg.GralCfgData}.
@@ -200,6 +206,14 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * It is created directly without configuration data. 
    */
   private GralWidgetCfg_ifc itsCfgElement;
+
+  
+  public static class ConfigData
+  {
+    public Object[] showParam;
+  }
+  
+  public ConfigData cfg = new ConfigData();
   
   /**Name of the widget in the panel. */
   public String name;
@@ -332,10 +346,44 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   /**The time when the bVisible state was changed. */
   private long lastTimeSetVisible;
   
+  /**What is changed in the dynamic data, see {@link GralWidget.DynamicData#whatIsChanged}. */  
+  protected static final int chgText = 1, chgColorBack=2, chgColorText=4, chgFont = 8, chgColorLine = 0x10;
   
+  /**This inner class holds the dynamic data of a widget.
+   * This data are existent for any widget independent of its type.
+   * It can be used in a specific way depending on the widget type.
+   */
   protected final static class DynamicData {
+    
+    public AtomicInteger whatIsChanged = new AtomicInteger();
+    
+    public void setChanged(int mask){
+      int catastrophicalCount = 1000;
+      boolean bOk;
+      do {
+        int act =whatIsChanged.get();
+        int newValue = act | mask;
+        bOk = whatIsChanged.compareAndSet(act, newValue);
+      } while(!bOk && --catastrophicalCount >= 0);
+    }
+    
+    /**Three colors for background, line and text should be convert to the platforms color and used in the paint routine. 
+     * If this elements are null, the standard color should be used. */
     public GralColor backColor, lineColor, textColor;
-    public Object backColorImpl, lineColorImpl;
+    
+    /**A text to display. */
+    public String displayedText;
+    
+    /**Any specific value. */
+    public Object[] oValues;
+    
+    public float fValue, minValue, maxValue;
+    
+    public Object visibleInfo;
+    
+    public Object userData;
+    
+    public float[] fValues;
   }
   
   
@@ -456,8 +504,9 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * in the {@link org.vishia.gral.cfg.GralCfgBuilder}.
    * 
    * @param action The action instance.
+   * @param param maybe param for the show method.
    */
-  public void setActionShow(GralUserAction action){ actionShow = action; }
+  public void setActionShow(GralUserAction action, String[] param){ actionShow = action; sShowParam = param; }
   
   /**Gets the action to show the widget. This method is helpfully to invoke showing after receiving data
    * in the users context. Invoke {@link GralUserAction#userActionGui(String, GralWidget, Object...)}
@@ -720,15 +769,15 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
         String sValue = null;
         switch(cType){
           case 'Z': case 'S': case 'B':
-          case 'I': setValue(variable.getInt()); break;
+            case 'I': setValue(variable.getInt()); break;
           case 'F': setValue(variable.getFloat()); break;
           case 's': setText(variable.getString()); break;
           default:  sValue = "?" + cType; //variable.getInt());  //at least request newly if type is faulty
-        }
-        if(sValue !=null){
-          if(bOld){ setText("? " + sValue); }
-          else { setText(sValue); }
-        }
+          }
+          if(sValue !=null){
+            if(bOld){ setText("? " + sValue); }
+            else { setText(sValue); }
+          }
       } else if(variables !=null){
         if(variables.size() == 0){ variables = null; }
         else {
@@ -748,7 +797,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
           setValue(values);
         }
       } else if(sDataPath !=null){
-        setText("?? " + sDataPath);
+        setText("?? " + sDataPath); //called on fault variable path.
       }
     }
     
@@ -792,15 +841,29 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * @param value The value in the necessary representation.
    */
   public void setValue(int cmd, int ident, Object visibleInfo)
-  { itsMng.setInfo(this, cmd, ident, visibleInfo, null);
+  { dyda.visibleInfo = visibleInfo;
+    repaint(100,100);
+    //itsMng.setInfo(this, cmd, ident, visibleInfo, null);
   }
   
   
-  @Override public void setBackColor(GralColor color, int ix){ dyda.backColor = color; repaint(100, 100); }
+  @Override public void setBackColor(GralColor color, int ix){ 
+    dyda.backColor = color; 
+    dyda.setChanged(chgColorBack); 
+    repaint(100, 100); 
+  }
   
-  @Override public void setLineColor(GralColor color, int ix){ dyda.lineColor = color; repaint(100, 100);  }
+  @Override public void setLineColor(GralColor color, int ix){ 
+    dyda.lineColor = color; 
+    dyda.setChanged(chgColorLine); 
+    repaint(100, 100);  
+  }
   
-  @Override public void setTextColor(GralColor color){ dyda.textColor = color; repaint(100, 100);  }
+  @Override public void setTextColor(GralColor color){ 
+    dyda.textColor = color; 
+    dyda.setChanged(chgColorText); 
+    repaint(100, 100);  
+  }
   
   
   
@@ -810,7 +873,10 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * @param value The value in the necessary representation.
    */
   public void setValue(int cmd, int ident, Object visibleInfo, Object userData)
-  { itsMng.setInfo(this, cmd, ident, visibleInfo, userData);
+  { dyda.visibleInfo = visibleInfo;
+    dyda.userData = userData;
+    repaint(100,100);
+    //itsMng.setInfo(this, cmd, ident, visibleInfo, userData);
   }
   
   /**Sets a value to show.
@@ -818,7 +884,9 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * This routine may be overridden by some specialized widgets.
    */
   @Override public void setValue(float value){
-    itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, value, null);
+    dyda.fValue = value;
+    repaint(100,100);
+    //itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, value, null);
   }
   
   
@@ -827,7 +895,9 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * This routine may be overridden by some specialized widgets.
    */
   @Override public void setValue(Object[] value){
-    itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, value, null);
+    dyda.oValues = value;
+    repaint(100,100);
+    //itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, value, null);
   }
   
   
@@ -836,18 +906,11 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * @see org.vishia.gral.ifc.GralSetValue_ifc#setText(java.lang.CharSequence)
    */
   @Override public void setText(CharSequence text){
-    System.err.println(Assert.stackInfo("GralWidget - non overridden setText called; Widget = " + name + "; text=" + text, 5));
+    dyda.displayedText = text.toString(); 
+    repaint(100, 100);
+    //System.err.println(Assert.stackInfo("GralWidget - non overridden setText called; Widget = " + name + "; text=" + text, 5));
   }
   
-  
-  /**Sets the visible value given as String. Usual it is applicable if the widget is a text field.
-   * This method can or should be overridden for some widgets to optimize calculation time.
-   * The default implementation uses the {@link GralMng#setInfo(GralWidget, int, int, Object, Object)}.
-   * @param sValue String given value.
-   */
-  public void XXXsetValue(String sValue){
-    itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, sValue, null);
-  }
   
   
   /**Sets the border of the value range for showing. 
@@ -856,7 +919,12 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * @param minValue
    * @param maxValue
    */
-  @Override public void setMinMax(float minValue, float maxValue){}
+  @Override public void setMinMax(float minValue, float maxValue){
+    dyda.minValue = minValue;
+    dyda.maxValue = maxValue;
+    repaint(100,100);
+    //
+  }
 
   
   

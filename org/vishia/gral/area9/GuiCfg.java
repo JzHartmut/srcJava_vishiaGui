@@ -7,6 +7,7 @@ import java.io.Writer;
 
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralShowMethods;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
@@ -46,7 +47,8 @@ public class GuiCfg
 
   /**The version.
    * <ul>
-   * <li>2012-10-12 Hartmut chg: ctor needs a {@link GralPlugUser_ifc} which may be null: A plugin may be instantiated
+   * <li>2012-09-17 Hartmut new: {@link #showMethods}
+   * <li>2011-10-12 Hartmut chg: ctor needs a {@link GralPlugUser_ifc} which may be null: A plugin may be instantiated
    *   by reflection with String given class name. It may be possible to give it as parameter too.
    * <li>2011-10-20 Hartmut chg: ctor needs a {@link GralPlugUser2Gral_ifc} which may be null.
    *   Idea: a derived class should support it. Other Idea: either both via reflection or both maybe direct. 
@@ -144,7 +146,10 @@ public final GralArea9Window guiW;
 
 public final MainCmd_ifc mainCmd;
 
+private final GralShowMethods showMethods = new GralShowMethods();
+
 public GralMng gralMng;
+
 
 /**Panel-Management-interface for the panels. */
 public GralMngBuild_ifc panelBuildIfc;
@@ -213,6 +218,7 @@ public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui, GralPlugUser_ifc pl
 
   //Register any user action. This should be done before the GUI-configuration is read.
   panelBuildIfc.registerUserAction("cmdInvoke", cmdInvoke);
+  showMethods.registerShowMethods(panelBuildIfc);
   
 }
 
@@ -385,6 +391,7 @@ private final GralUserAction cmdInvoke = new GralUserAction()
   StringBuilder output = new StringBuilder();
   StringBuilder error = new StringBuilder();
    
+  @Override
   public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
   {
     if(sCmd != null){

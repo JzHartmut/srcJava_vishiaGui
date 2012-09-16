@@ -259,7 +259,7 @@ public class InspcCurveView
     { if(actionCode == KeyCode.menuEntered){
         GralWidget variableWidget = gralMng.getWidgetOnMouseDown();
         //GralTextField widgText = (GralTextField)widgd;
-        GralWidget widgText = (GralWidget)widgd;
+        GralWidget widgText = widgd;
         String sVariable = variableWidget.name;
         Object oContentInfo = widgd.getContentInfo();
         TrackValues input = (TrackValues)oContentInfo;
@@ -267,7 +267,7 @@ public class InspcCurveView
         input.min = Float.MAX_VALUE;
         input.max = -Float.MAX_VALUE;
         input.mid = 0.0f;
-        String sShowMethod = variableWidget.getShowMethod();
+        //String sShowMethod = variableWidget.getShowMethod();
         String sPath = variableWidget.getDataPath();
         input.trackView.setDataPath(sPath);
         input.widgVarPath.setText(variableWidget.name);

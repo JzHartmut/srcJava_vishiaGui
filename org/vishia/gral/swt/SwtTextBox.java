@@ -119,10 +119,10 @@ public class SwtTextBox extends GralTextBox
 
   
   @Override public void repaintGthread(){  
-    int whatisChanged1 = whatIsChanged.get();
+    int whatisChanged1 = dyda.whatIsChanged.get();
     int catastrophicCount = 0;
-    while( !whatIsChanged.compareAndSet(whatisChanged1, 0)){ 
-      whatisChanged1 = whatIsChanged.get();  //maybe new requests
+    while( !dyda.whatIsChanged.compareAndSet(whatisChanged1, 0)){ 
+      whatisChanged1 = dyda.whatIsChanged.get();  //maybe new requests
       if(++catastrophicCount > 10000) throw new RuntimeException("");
     }
     if((whatisChanged1 & chgText) !=0){

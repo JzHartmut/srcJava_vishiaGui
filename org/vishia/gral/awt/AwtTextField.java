@@ -163,17 +163,17 @@ public static class AwtTextFieldImpl extends TextField implements AwtWidget
 
 
   @Override protected void repaintGthread(){
-    int chg = this.whatIsChanged.get();
+    int chg = dyda.whatIsChanged.get();
     int catastrophicalCount = 0;
     do{
       if(++catastrophicalCount > 10000) throw new RuntimeException("atomic failed");
       if((chg & chgText) !=0){ 
         widgetAwt.setText(text); 
       }
-      if((chg & chgColorText) !=0){ widgetAwt.setForeground(((AwtWidgetMng)itsMng).getColorImpl(colorText)); }
-      if((chg & chgColorBack) !=0){ widgetAwt.setBackground(((AwtWidgetMng)itsMng).getColorImpl(colorBack)); }
+      if((chg & chgColorText) !=0){ widgetAwt.setForeground(((AwtWidgetMng)itsMng).getColorImpl(dyda.textColor)); }
+      if((chg & chgColorBack) !=0){ widgetAwt.setBackground(((AwtWidgetMng)itsMng).getColorImpl(dyda.backColor)); }
       widgetAwt.repaint();
-    } while(!whatIsChanged.compareAndSet(chg, 0));
+    } while(!dyda.whatIsChanged.compareAndSet(chg, 0));
   }
 
   

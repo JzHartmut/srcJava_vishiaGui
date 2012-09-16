@@ -186,7 +186,7 @@ public class FcmdDelete
   
   
   EventConsumer success = new EventConsumer("FcmdDelete - success"){
-    @Override public boolean processEvent(Event ev)
+    @Override protected boolean processEvent_(Event ev)
     {
       if(ev.data1 !=0){
         main.mainCmd.writeError("can't delete " + ((FileRemote)(ev.getRefData())).getCanonicalPath());

@@ -61,7 +61,7 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   
   protected int caretPos;
   
-  protected GralColor colorBack = GralColor.getColor("wh"), colorText = GralColor.getColor("bk");
+  //protected GralColor colorBack = GralColor.getColor("wh"), colorText = GralColor.getColor("bk");
   
   protected GralFont fontText;
   
@@ -72,10 +72,6 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   
   protected GralTextFieldUser_ifc user;
   
-  protected AtomicInteger whatIsChanged = new AtomicInteger();
-  
-  protected static final int chgText = 1, chgColorBack=2, chgColorText=4, chgFont = 8;
-  
   /**It is used for some operations. */
   protected final GralGraphicThread windowMng;
   
@@ -83,6 +79,8 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   
   public GralTextField(String name, char whatis, GralMng mng){
     super(name, whatis, mng);
+    setBackColor(GralColor.getColor("wh"),0);
+    setTextColor(GralColor.getColor("bl"));
     this.windowMng = mng.gralDevice;
   }
   
@@ -126,7 +124,7 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
     float value;
     String sShow;
     if(calculator !=null){
-      value = (float)calculator.calc(valueP);
+      value = calculator.calc(valueP);
       sFormat1 = this.sFormat2;
     } else if(sFormat !=null){
       if(sFormat.startsWith("!")){
@@ -143,7 +141,7 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
             }
           }
           if(calculator !=null){
-            value = (float)calculator.calc(valueP);
+            value = calculator.calc(valueP);
           } else {
             value = valueP;
           }
@@ -203,9 +201,9 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   {
     text = arg.toString();
     this.caretPos = caretPos;
-    int yet = whatIsChanged.get();
+    int yet = dyda.whatIsChanged.get();
     int catastrophicCount = 0;
-    while( !whatIsChanged.compareAndSet(yet, yet | chgText)){ 
+    while( !dyda.whatIsChanged.compareAndSet(yet, yet | chgText)){ 
       if(++catastrophicCount > 10000) throw new RuntimeException("");
     }
     if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){

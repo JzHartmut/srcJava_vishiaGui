@@ -984,7 +984,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
 
   
   EventConsumer callbackFillIn = new EventConsumer("GralFileSelector - callback fillin"){
-    @Override public boolean processEvent(Event ev) {
+    @Override protected boolean processEvent_(Event ev) {
       ///
       FileRemote.CallbackEvent callback = (FileRemote.CallbackEvent)ev;
       FileRemote dir = (FileRemote)callback.getRefData();  //it is completed meanwhile

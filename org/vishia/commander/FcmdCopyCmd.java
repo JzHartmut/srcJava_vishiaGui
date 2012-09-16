@@ -569,7 +569,7 @@ public class FcmdCopyCmd
    * 
    */
   EventConsumer success = new EventConsumer("FcmdCopy-success"){
-    @Override public boolean processEvent(Event ev)
+    @Override protected boolean processEvent_(Event ev)
     {
       FileRemote.CallbackEvent ev1 = (FileRemote.CallbackEvent)ev;
       switch(ev1.getCmd()){

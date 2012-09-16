@@ -147,8 +147,9 @@ public interface GralMng_ifc
    *   this data are referenced from the element of the widget (the table line, the leaf in the tree). 
    *   Which element it is, it is given by param ident.
    * @return
+   * @deprecated
    */
-  String setInfo(GralWidget widgd, int cmd, int ident, Object visibleInfo, Object userData);
+  @Deprecated String setInfo(GralWidget widgd, int cmd, int ident, Object visibleInfo, Object userData);
   
   String setInfoDelayed(GralWidget_ifc widgd, int cmd, int ident, Object visibleInfo, Object userData, int delay);
   
