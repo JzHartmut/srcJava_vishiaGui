@@ -66,13 +66,13 @@ public class GuiFilesDiffPanel
     widgdTableFilesCmpn = panelBuildifc.addTable("selectFile", 20, columnWidths);
     widgdTableFilesCmpn.setActionChange(actionTableLineFile);
     panelBuildifc.setPositionSize(2, 61, 3, 9, 'd');
-    panelBuildifc.addButton("refresh", actionRefresh, "","","","&refresh");
-    panelBuildifc.addButton("view", actionView, "","","","&view");
-    panelBuildifc.addButton("diff", actionViewdiff, "","","","view &diff");
-    //panelBuildifc.addButton("add", actionAdd, "","","","&add");
+    panelBuildifc.addButton("refresh", actionRefresh, "&refresh");
+    panelBuildifc.addButton("view", actionView, "&view");
+    panelBuildifc.addButton("diff", actionViewdiff, "view &diff");
+    //panelBuildifc.addButton("add", actionAdd, "&add");
     panelBuildifc.setPositionSize(13, 61, 3, 9, 'd');
-    panelBuildifc.addButton("rename", actionRename, "","","","&rename");
-    panelBuildifc.addButton("commit", actionCommit, "","","","&commit");
+    panelBuildifc.addButton("rename", actionRename, "&rename");
+    panelBuildifc.addButton("commit", actionCommit, "&commit");
     
   }
     
@@ -211,11 +211,13 @@ public class GuiFilesDiffPanel
    * */
   private final GralUserAction actionTableLineFile = new GralUserAction()
   { 
+    @Override
     public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     { boolean bDone = false;
       return bDone;
     }
     
+    @Override
     public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     { boolean bDone = true;
       if(key == KeyCode.enter || key == ' '){
@@ -241,6 +243,7 @@ public class GuiFilesDiffPanel
 
   private final GralUserAction actionAdd = new GralUserAction()
   { 
+    @Override
     public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     {
       return true;
@@ -250,6 +253,7 @@ public class GuiFilesDiffPanel
   
   private final GralUserAction actionRename = new GralUserAction()
   { 
+    @Override
     public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         String sFileOld =null, sFileNew =null;
@@ -391,6 +395,7 @@ public class GuiFilesDiffPanel
   
   private final GralUserAction actionCommit = new GralUserAction()
   { 
+    @Override
     public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     { boolean bDone = true;
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
@@ -405,6 +410,7 @@ public class GuiFilesDiffPanel
   
   private final GralUserAction actionRefresh = new GralUserAction()
   { 
+    @Override
     public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     { boolean bDone = true;
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
@@ -418,6 +424,7 @@ public class GuiFilesDiffPanel
   
   private final GralUserAction actionView = new GralUserAction()
   { 
+    @Override
     public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     {
       return true;
@@ -427,6 +434,7 @@ public class GuiFilesDiffPanel
   
   private final GralUserAction actionViewdiff = new GralUserAction()
   { 
+    @Override
     public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     {
       StringBuilder uCmd = new StringBuilder(200);

@@ -239,13 +239,21 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     return null;
   }
   
+  @Override public GralButton addButton(
+      String sName
+    , GralUserAction action
+    , String sButtonText
+    )
+  { return addButton(sName, action, null, null, sButtonText);
+  }  
   
+
   
   @Override public GralButton addButton(
     String sName
   , GralUserAction action
   , String sCmd
-  , String sShowMethod
+  //, String sShowMethod
   , String sDataPath
   , String sButtonText
     //, int height, int width
@@ -261,7 +269,7 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     widgButton.setText(sButtonText);
     widgButton.setPanelMng(this);
     widgButton.sCmd = sCmd;
-    widgButton.setShowMethod(sShowMethod);
+    //widgButton.setShowMethod(sShowMethod);
     widgButton.setDataPath(sDataPath);
     registerWidget(widgButton);
     return widgButton;
@@ -340,7 +348,7 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
   }
 
   @Override
-  public GralLed addLed(String sName, String sShowMethod, String sDataPath)
+  public GralLed addLed(String sName,  String sDataPath)
   {
     // TODO Auto-generated method stub
     return null;
@@ -356,7 +364,7 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
 
   @Override
   public GralButton addSwitchButton(String sName, GralUserAction action, String sCmd,
-    String sShowMethod, String sDataPath, String sButtonText, String color0, String color1)
+   String sDataPath, String sButtonText, String color0, String color1)
   {
     // TODO Auto-generated method stub
     return null;
@@ -384,7 +392,7 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
   }
 
   @Override
-  public GralValueBar addValueBar(String sName, String sShowMethod, String sDataPath)
+  public GralValueBar addValueBar(String sName, String sDataPath)
   {
     // TODO Auto-generated method stub
     return null;

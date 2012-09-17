@@ -200,7 +200,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
 
   //private final IndexMultiTable showFieldsM;
 
-  private List<GralWidget> widgetsInFocus = new LinkedList<GralWidget>();
+  private final List<GralWidget> widgetsInFocus = new LinkedList<GralWidget>();
  
   
   /**List of all panels which may be visible yet. 
@@ -743,9 +743,10 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @deprecated because the {@link #setInfo(GralWidget, int, int, Object, Object)} is deprecated.
    * Use {@link GralWidget#setBackgroundColor(GralColor)}
    */
+  @Deprecated
   @Override public void setBackColor(GralWidget descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
-    GralWidget descr = (GralWidget) descr1;
+    GralWidget descr = descr1;
     setInfo(descr, GralMng_ifc.cmdBackColor, ix, color, null);
   } 
   
@@ -755,9 +756,10 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @deprecated because the {@link #setInfo(GralWidget, int, int, Object, Object)} is deprecated.
    * Use {@link GralWidget#setForegroundColor(GralColor)}
    */
+  @Deprecated
   @Override public void setLineColor(GralWidget descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
-    GralWidget descr = (GralWidget) descr1;
+    GralWidget descr = descr1;
     setInfo(descr, GralMng_ifc.cmdLineColor, ix, color, null);
   } 
   
@@ -766,9 +768,10 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @see org.vishia.gral.ifc.GralMng_ifc#setTextColor(org.vishia.gral.base.GralWidget, int, int)
    * @deprecated because the {@link #setInfo(GralWidget, int, int, Object, Object)} is deprecated.
    */
+  @Deprecated
   @Override public void setTextColor(GralWidget descr1, int ix, int color)
   { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
-    GralWidget descr = (GralWidget) descr1;
+    GralWidget descr = descr1;
     setInfo(descr, GralMng_ifc.cmdTextColor, ix, color, null);
   } 
   
@@ -820,7 +823,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   @Override public void setLed(GralWidget widgetDescr, int colorBorder, int colorInner)
   {
     @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
-    GralWidget descr = (GralWidget) widgetDescr;
+    GralWidget descr = widgetDescr;
     setInfo(descr, GralMng_ifc.cmdColor, colorBorder, colorInner, null);
     
   }
@@ -942,7 +945,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
     setSize(posAll.height(), 2.0F);
     //xPos += xSize;
     //xSize = ySize;
-    GralWidget widgdSelect = addButton(name + "<", actionFileSelect, "", null, null, "<");
+    GralWidget widgdSelect = addButton(name + "<", actionFileSelect,  "<");
     FileSelectInfo fileSelectInfo = new FileSelectInfo(name, listRecentFiles, startDirMask, widgd);
     widgdSelect.setContentInfo(fileSelectInfo); 
     //xSize = xSize1;

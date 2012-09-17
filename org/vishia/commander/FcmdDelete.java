@@ -80,13 +80,13 @@ public class FcmdDelete
     
     main.gralMng.setPosition(-6, GralPos.size +1, 7, -11, 0, 'd', 1);
     //widgProgressFile = main.gralMng.addValueBar("copyProgressFile", null, null);
-    widgProgress = main.gralMng.addValueBar("copyProgressAll", null, null);
+    widgProgress = main.gralMng.addValueBar("copyProgressAll", null);
     main.gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
-    main.gralMng.addButton("deleteEsc", actionDelete, "esc", null, null, "esc");
+    main.gralMng.addButton("deleteEsc", actionDelete, "esc", null, "esc");
     main.gralMng.setPosition(-1, GralPos.size-3, -19,-11, 0, 'r');
-    widgRemoveToTrash = main.gralMng.addButton("deleteToTrash", actionDelete, "trash", null, null, "trash");
+    widgRemoveToTrash = main.gralMng.addButton("deleteToTrash", actionDelete, "trash", null,  "trash");
     main.gralMng.setPosition(-1, GralPos.size-3, -9, -1, 0, 'r');
-    widgButtonOk = main.gralMng.addButton("deleteOk", actionDelete, "delete", null, null, "delete");
+    widgButtonOk = main.gralMng.addButton("deleteOk", actionDelete, "delete", null,  "delete");
     widgButtonOk.setPrimaryWidgetOfPanel();
   }
   

@@ -118,10 +118,11 @@ public class ExampleSimpleButton
    * is sought, the button changes its appearance, it is marked. 
    * That actions are done by the gral implementation independing of the implementation layer.
    */
-  private GralUserAction actionButtonCode = new GralUserAction()
+  private final GralUserAction actionButtonCode = new GralUserAction()
   { 
     int ctKeyStroke = 0;
     
+    @Override
     public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         String textOfField = gui.widgInput.getText();
@@ -180,7 +181,7 @@ public class ExampleSimpleButton
       //Sets the position of the next widget, the button, relative to the last one, 5 lines deeper.
       //Use size instead an line position. 
       gui.gralMng.setPosition(GralPos.same+5, GralPos.size +3, 2, GralPos.size +10, 0, '.');
-      gui.widgButton = gui.gralMng.addButton("button", actionButtonCode, "test", null, null, "Hello");
+      gui.widgButton = gui.gralMng.addButton("button", actionButtonCode, "test", null, "Hello");
       //
       //The button can be presented with colors. Use named colors 'Pastel GreeN' and 'Pastel YEllow'.
       //The button is a switching button then. 

@@ -1010,7 +1010,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   @Override public GralValueBar addValueBar(
   	String sName
-  , String sShowMethod
+  //, String sShowMethod
   , String sDataPath
   )
   {
@@ -1019,7 +1019,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   	Rectangle rect = widget.widgetSwt.getBounds();
   	widget.horizontal = rect.width > rect.height;
   	widget.setPanelMng(this);
-    widget.setShowMethod(sShowMethod);
+  //  widget.setShowMethod(sShowMethod);
   	widget.setDataPath(sDataPath);
     //widget.widget.setData(widgetInfos);
     widget.widgetSwt.addMouseListener(mouseClickForInfo);
@@ -1052,13 +1052,19 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
   
-  
+  @Override public GralButton addButton(
+      String sName
+    , GralUserAction action
+    , String sButtonText
+    )
+  { return addButton(sName, action, null, null, sButtonText);
+  }  
   
   @Override public GralButton addButton(
   	String sName
   , GralUserAction action
   , String sCmd
-  , String sShowMethod
+  //, String sShowMethod
   , String sDataPath
   , String sButtonText
   	//, int height, int width
@@ -1082,7 +1088,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     //button.setSize(propertiesGui.xPixelUnit() * xSize -2, propertiesGui.yPixelUnit() * ySize -2);
     //setBounds_(button);
     widgButton.sCmd = sCmd;
-    widgButton.setShowMethod(sShowMethod);
+    //widgButton.setShowMethod(sShowMethod);
     widgButton.setDataPath(sDataPath);
     //pos.panel.widgetIndex.put(sName, widgButton);
     registerWidget(widgButton);
@@ -1105,7 +1111,6 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     String sName
   , GralUserAction action
   , String sCmd
-  , String sShowMethod
   , String sDataPath
   , String sButtonText
   , String sColor0
@@ -1127,7 +1132,6 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     widgButton.setText(sButtonText);
     widgButton.setPanelMng(this);
     widgButton.sCmd = sCmd;
-    widgButton.setShowMethod(sShowMethod);
     widgButton.setDataPath(sDataPath);
     registerWidget(widgButton);
     return widgButton;
@@ -1190,7 +1194,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   @Override public GralLed addLed(
   	String sName
-  , String sShowMethod
+  //, String sShowMethod
   , String sDataPath
   )
   {
@@ -1200,7 +1204,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     GralLed widgetInfos = new SwtLed(sName, this);
     widgetInfos.setPanelMng(this);
     widgetInfos.setDataPath(sDataPath);
-    widgetInfos.setShowMethod(sShowMethod);
+    //widgetInfos.setShowMethod(sShowMethod);
     registerWidget(widgetInfos);
     return widgetInfos;
   }

@@ -56,7 +56,7 @@ public class GuiStatusPanel
   
   /**Any component has its PanelManager. It is one line with some widgets.
    */
-  private GralPanelContent[] bzrComponentBox = new GralPanelContent[100]; 
+  private final GralPanelContent[] bzrComponentBox = new GralPanelContent[100]; 
 
   private GralWindow_ifc testDialogBox;
 
@@ -88,12 +88,12 @@ public class GuiStatusPanel
     //widgdProjektpath = panelBuildifc.addTextField("projectPath", true, "Project path", 't');
     widgdProjektpath = panelBuildifc.addFileSelectField("projectPath", null, "D:/:/", "Project path", "t");
     panelBuildifc.setPositionSize(-1, -1, -2, 2, 'r');
-    panelBuildifc.addButton("selectProjectPath", selectProjectPath, "c", "s", "d", "?");
+    panelBuildifc.addButton("selectProjectPath", selectProjectPath, "c", "f", "?");
     ///
     //WidgetDescriptor widgdRefresh = new WidgetDescriptor("refresh", 'B');
     //widgdRefresh.setAction(refreshProjectBzrComponents);
     panelBuildifc.setPositionSize(-1, -1, -3, 10, 'r');
-    panelBuildifc.addButton("Brefresh", refreshProjectBzrComponents, "c", "s", "d", "Get/Refresh");
+    panelBuildifc.addButton("Brefresh", refreshProjectBzrComponents, "c", "d", "Get/Refresh");
 
     String[] lines = {"1", "2"};
     
@@ -107,7 +107,7 @@ public class GuiStatusPanel
     selectorProjectPathTable = panelBuildifc.addTable("selectProjectPath", 20, columnWidths);
     selectorProjectPathTable.setActionChange(actionSelectorProjectPathTable);
     panelBuildifc.setPositionSize(20, 0, -3, 10, 'r');
-    panelBuildifc.addButton("closeProjectBzrComponents", actionCloseProjectBzrComponents, "","","","ok");
+    panelBuildifc.addButton("closeProjectBzrComponents", actionCloseProjectBzrComponents, "ok");
     String sPrjPath = null;
     for(String sPrjPath1: mainData.cfg.listSwPrjs){
       if(sPrjPath ==null){ sPrjPath = sPrjPath1; } //The first is offered.
@@ -182,7 +182,7 @@ public class GuiStatusPanel
     if(switchButtons[iComponent] !=null){
       switchExcluder.remove(switchButtons[iComponent]);
     }
-    GralWidget widgdButton = panelBuildifc.addSwitchButton("selectMain", actionSelectCmpn, "", null, data.sNameCmpn, "", "wh", "rd");
+    GralWidget widgdButton = panelBuildifc.addSwitchButton("selectMain", actionSelectCmpn, "", data.sNameCmpn, "", "wh", "rd");
     switchExcluder.add(widgdButton);
     widgdButton.setContentInfo(widgds);
     switchButtons[iComponent] = widgdButton;
@@ -243,6 +243,7 @@ public class GuiStatusPanel
    */
   private final GralUserAction actionSelectorProjectPathTable = new GralUserAction()
   { 
+    @Override
     public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     { boolean bDone = true;
       if(key == KeyCode.enter){
@@ -259,6 +260,7 @@ public class GuiStatusPanel
   
   private final GralUserAction actionCloseProjectBzrComponents = new GralUserAction()
   { 
+    @Override
     public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     {
       selectorProjectPath.setWindowVisible(false);
@@ -269,6 +271,7 @@ public class GuiStatusPanel
   
   private final GralUserAction refreshProjectBzrComponents = new GralUserAction()
   { 
+    @Override
     public boolean userActionGui(int key, GralWidget widgetInfos, Object... values)
     { buildComponentsInfoSelectBoxes();
       return true;
@@ -279,6 +282,7 @@ public class GuiStatusPanel
   
   private final GralUserAction actionSelectCmpn = new GralUserAction()
   { 
+    @Override
     public boolean userActionGui(int key, GralWidget widgd, Object... values)
     {
       mainData.currCmpn = mainData.currPrj.selectComponent(widgd.getDataPath());

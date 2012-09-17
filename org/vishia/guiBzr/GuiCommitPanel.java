@@ -36,7 +36,7 @@ public class GuiCommitPanel
     widgdCommitText = panelBuildifc.addTextBox("commitText", true, null, ' '); // "commit Text", 't');
     
     panelBuildifc.setPositionSize(33,0, 3, 10, 'r');
-    panelBuildifc.addButton("commit", actionCommit, "commit", null, null, "commit");
+    panelBuildifc.addButton("commit", actionCommit, "commit", null, "commit");
     
   }
     
@@ -45,6 +45,7 @@ public class GuiCommitPanel
   
   private final GralUserAction actionCommit = new GralUserAction()
   { 
+    @Override
     public boolean userActionGui(String sCmdGui, GralWidget widgetInfos, Object... values)
     {
       File fileCommitText = mainData.mainAction.getContentofCommitText();

@@ -323,11 +323,29 @@ public interface GralMngBuild_ifc
    */
   //Object addButton(String sButtonText, int height, int width, String sCmd, String sUserAction, String sName);
   public GralButton addButton(
-  	String sName
+    String sName
   , GralUserAction action
   , String sCmd
-  , String sShowMethod
+  //, String sShowMethod
   , String sDataPath
+  , String sButtonText
+  );
+  
+  
+  /**Adds a button
+   * @param sButtonText text in the button
+   * @param height in grid-units
+   * @param width in grid-unigs
+   * @param sCmd The command string will be transfered to the action-method
+   * @param sUserAction The user action shoult be registered before 
+   *         calling {@link #registerUserAction(String, GralUserAction)}
+   * @param sName
+   * @return
+   */
+  //Object addButton(String sButtonText, int height, int width, String sCmd, String sUserAction, String sName);
+  public GralButton addButton(
+    String sName
+  , GralUserAction action
   , String sButtonText
   );
   
@@ -346,7 +364,7 @@ public interface GralMngBuild_ifc
     String sName
   , GralUserAction action
   , String sCmd
-  , String sShowMethod
+  //, String sShowMethod
   , String sDataPath
   , String sButtonText
   , String color0
@@ -405,13 +423,13 @@ public interface GralMngBuild_ifc
   //Object addButton(String sButtonText, int height, int width, String sCmd, String sUserAction, String sName);
   GralLed addLed(
   	String sName
-  , String sShowMethod
+  //, String sShowMethod
   , String sDataPath
   );
   
   GralValueBar addValueBar(
   	String sName
-  , String sShowMethod
+  //, String sShowMethod
   , String sDataPath
   );
   
@@ -461,6 +479,7 @@ public interface GralMngBuild_ifc
    * @return
    * @deprecated
    */
+  @Deprecated
   GralWidget addText(String sText, char size, int color);
  
   

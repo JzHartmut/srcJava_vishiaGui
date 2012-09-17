@@ -58,6 +58,7 @@ public class GralCommandSelector extends GralSelectList
   }
   
   
+  @Override
   public void setToPanel(GralMngBuild_ifc gralMng, String name, int rows, int[] columns, char size){
     super.setToPanel(gralMng, name, rows, columns, size);
     wdgdTable.setActionOnLineSelected(actionOnLineSelected);
@@ -80,10 +81,12 @@ public class GralCommandSelector extends GralSelectList
   
   public void fillIn()
   {
-    wdgdTable.setValue(GralMng_ifc.cmdClear, -1, null, null);
+    wdgdTable.clearTable();
     for(CmdStore.CmdBlock data: cmdStore.getListCmds()){
-      
-      wdgdTable.setValue(GralMng_ifc.cmdInsert, -1, data.name, data);
+      GralTableLine_ifc line = wdgdTable.insertLine(data.name, -1, null, data);
+      line.setCellText(data.name, 0);
+      line.setCellText(data.title, 1);
+      //wdgdTable.setValue(GralMng_ifc.cmdInsert, -1, data.name, data);
     }
     wdgdTable.repaint();
   }
@@ -148,7 +151,7 @@ public class GralCommandSelector extends GralSelectList
   }
 
   
-  private GralUserAction actionOnLineSelected = new GralUserAction(){
+  private final GralUserAction actionOnLineSelected = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
       GralTableLine_ifc line = (GralTableLine_ifc)params[0];
       if(line !=null){

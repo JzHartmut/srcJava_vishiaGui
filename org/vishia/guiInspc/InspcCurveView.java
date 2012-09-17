@@ -194,13 +194,13 @@ public class InspcCurveView
     widgScale0 = gralMng.addTextField("scale0", true, "mid", "t");
     widgline0 = gralMng.addTextField("line0", true, "line-%", "t");
     gralMng.setPosition(32, GralPos.size +2, -10, GralPos.size +2, 0, 'r', 1);
-    widgBtnDn = gralMng.addButton("btnDn", actionSetScaleValues2Track, "-", null, null, "-");
-    widgBtnUp = gralMng.addButton("btnUp", actionSetScaleValues2Track, "+", null, null, "+");
+    widgBtnDn = gralMng.addButton("btnDn", actionSetScaleValues2Track, "-", null,  "-");
+    widgBtnUp = gralMng.addButton("btnUp", actionSetScaleValues2Track, "+", null, "+");
     gralMng.setPosition(GralPos.same, GralPos.size +2, GralPos.next, GralPos.size +4, 0, 'r', 1);
-    widgBtnScale = gralMng.addButton("btnScale", actionSetScaleValues2Track, "!", null, null, "set");
+    widgBtnScale = gralMng.addButton("btnScale", actionSetScaleValues2Track, "!", null,  "set");
     gralMng.setPosition(35, GralPos.size +2, -10, GralPos.size +4, 0, 'r', 2);
-    widgBtnRead = gralMng.addButton("btnRead", actionOpenFileDialog, "read", null, null, "read");
-    widgBtnSave = gralMng.addButton("btnSave", actionOpenFileDialog, "save", null, null, "save");
+    widgBtnRead = gralMng.addButton("btnRead", actionOpenFileDialog, "read", null, "read");
+    widgBtnSave = gralMng.addButton("btnSave", actionOpenFileDialog, "save", null, "save");
     
     gralMng.setPosition(-3, GralPos.size +2, -9, -1, 0, 'd', 0);
     widgBtnOff = gralMng.addSwitchButton(sName + "btnOff", "off / ?on", "on / ?off", GralColor.getColor("lgn"), GralColor.getColor("am"));

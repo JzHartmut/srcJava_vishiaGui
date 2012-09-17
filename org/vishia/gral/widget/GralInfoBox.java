@@ -74,7 +74,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     mng.setPosition(0, -4, -4, -2, 0, '.');
     GralTextField infoLine = mng.addTextField("info", false, null, null);
     mng.setPosition(-3, 0, -6, 0, 0, '.');
-    GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "", null, null, "OK");
+    GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "OK");
     GralInfoBox box = new GralInfoBox(window, text, infoLine, buttonOk);
     box.buttonOk.setActionChange(box.actionOkButton);
     return box; 
@@ -91,7 +91,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     mng.setPosition(-2.5f, -0.5f, 0, -7, 0, '.');
     GralTextField infoLine = mng.addTextField("info", false, null, null);
     mng.setPosition(-3, 0, -6, 0, 0, '.');
-    GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "", null, null, "OK");
+    GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "OK");
     GralInfoBox box = new GralInfoBox(window, text, infoLine, buttonOk);
     box.implWidgets[0] = text.getWidgetImplementation();
     box.implWidgets[1] = infoLine.getWidgetImplementation();

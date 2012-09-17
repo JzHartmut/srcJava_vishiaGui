@@ -202,10 +202,10 @@ public class GralCfgBuilder
     if(cfge.widgetType instanceof GralCfgData.GuiCfgButton){
       GralCfgData.GuiCfgButton wButton = (GralCfgData.GuiCfgButton) cfge.widgetType;
       if(wButton.bSwitch){
-        widgd = gralMng.addSwitchButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd, null
+        widgd = gralMng.addSwitchButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd
           , cfge.widgetType.info, cfge.widgetType.text, cfge.widgetType.color0.color, cfge.widgetType.color1.color);
       } else {
-        widgd = gralMng.addButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd, null, cfge.widgetType.info, cfge.widgetType.text);
+        widgd = gralMng.addButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd, cfge.widgetType.info, cfge.widgetType.text);
       }
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgText){
       GralCfgData.GuiCfgText wText = (GralCfgData.GuiCfgText)cfge.widgetType;
@@ -217,7 +217,7 @@ public class GralCfgBuilder
       widgd = gralMng.addText(cfge.widgetType.text, wText.size.charAt(0), colorValue);
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgLed){
       GralCfgData.GuiCfgLed ww = (GralCfgData.GuiCfgLed)cfge.widgetType;
-      widgd = gralMng.addLed(sName, ww.showMethod, sDataPath);
+      widgd = gralMng.addLed(sName, sDataPath);
       
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgImage){
       GralCfgData.GuiCfgImage wImage = (GralCfgData.GuiCfgImage)cfge.widgetType;

@@ -239,11 +239,11 @@ class FcmdFavorPathSelector
     windAddFavorite.widgPath.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.dir.");
     
     main.gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
-    main.gralMng.addButton("addFavoriteEsc", actionAddFavorite, "esc", null, null, "esc");
+    main.gralMng.addButton("addFavoriteEsc", actionAddFavorite, "esc", null, "esc");
     main.gralMng.setPosition(-4, -1, -14, GralPos.size +6, 0, 'r',1);
-    GralWidget widg = main.gralMng.addButton("addFavoriteOk", actionAddFavorite, "temp", null, null, "temp");
+    GralWidget widg = main.gralMng.addButton("addFavoriteOk", actionAddFavorite, "temp", null, "temp");
     widg.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.temp.");
-    widg = main.gralMng.addButton("addFavoriteOk", actionAddFavorite, "ok", null, null, "Save");
+    widg = main.gralMng.addButton("addFavoriteOk", actionAddFavorite, "ok", null, "Save");
     widg.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.save.");
   
   }

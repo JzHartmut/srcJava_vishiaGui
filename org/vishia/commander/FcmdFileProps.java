@@ -148,7 +148,7 @@ public class FcmdFileProps
     String textOn = "X", textOff = " ", textDis = "?";
     
     main.gralMng.setPosition(17, GralPos.size -2, 1, 20, 0, 'r', 0.2f);
-    widgBtnDirBytes = main.gralMng.addButton("dirBytes", actionBtnCntLen, "dirBytes", null, null, main.idents.buttonFilePropsCntLen);
+    widgBtnDirBytes = main.gralMng.addButton("dirBytes", actionBtnCntLen, "dirBytes", null, main.idents.buttonFilePropsCntLen);
     widgBtnDirBytes.setDisableColorText(colorDis, " (file) ");
     //widgDirectory = main.gralMng.addCheckButton("FileProp:btndir", textOn, textOff, textDis, colorOn, colorOff, colorDis);
     //main.gralMng.addText("directory"); 
@@ -159,7 +159,7 @@ public class FcmdFileProps
     //bUnixSystem = true;
     if(bUnixSystem){
       main.gralMng.setPosition(20, GralPos.size -2, 10, 28, 0, 'd');
-      widGetAllProps = main.gralMng.addButton("buttonFilePropsGetAll", actionButton, "getAll", null, null, main.idents.buttonFilePropsGetAll);
+      widGetAllProps = main.gralMng.addButton("buttonFilePropsGetAll", actionButton, "getAll", null, main.idents.buttonFilePropsGetAll);
 
       main.gralMng.setPosition(20, GralPos.size -2, 1, GralPos.size +2, 0, 'd');
       main.gralMng.addText("rd");
@@ -209,9 +209,9 @@ public class FcmdFileProps
       
     }
     main.gralMng.setPosition(-12, GralPos.size +3, -16, -1, 0, 'd',1);
-    widgCopyFile =  main.gralMng.addButton("buttonFilePropsCopy", actionButton, sCmdCopy, null, null, main.idents.buttonFilePropsCopy);
-    widgChrRecurs =   main.gralMng.addButton("buttonFilePropsChgRecursive", actionButton, sCmdChgRecurs, null, null, main.idents.buttonFilePropsChgRecurisve);
-    widgChgFile = main.gralMng.addButton("buttonFilePropsChg", actionButton, sCmdChg, null, null, main.idents.buttonFilePropsChg);
+    widgCopyFile =  main.gralMng.addButton("buttonFilePropsCopy", actionButton, sCmdCopy, null,  main.idents.buttonFilePropsCopy);
+    widgChrRecurs =   main.gralMng.addButton("buttonFilePropsChgRecursive", actionButton, sCmdChgRecurs, null,  main.idents.buttonFilePropsChgRecurisve);
+    widgChgFile = main.gralMng.addButton("buttonFilePropsChg", actionButton, sCmdChg, null,  main.idents.buttonFilePropsChg);
   }
   
   

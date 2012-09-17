@@ -116,9 +116,9 @@ public class GralCfgDesigner
     dialogFieldWidth = mng.addTextField("width", true, "size-x", "t");
     dialogFieldPromptPos = mng.addTextField("promptPos", true, "promptPos", "t");
     mng.setPositionSize(25, 2, 3, 8, 'r');
-    dialogButtonEsc = mng.addButton("esc", actionEsc, null, null, null, "esc");
-    dialogButtonOk = mng.addButton("del", actionDel, null, null, null, "del");
-    dialogButtonOk = mng.addButton("OK", actionOk, null, null, null, "OK");
+    dialogButtonEsc = mng.addButton("esc", actionEsc, null, null, "esc");
+    dialogButtonOk = mng.addButton("del", actionDel, null, null, "del");
+    dialogButtonOk = mng.addButton("OK", actionOk, null, null, "OK");
   }
   
   
@@ -219,7 +219,7 @@ public class GralCfgDesigner
     mng.setWindowsVisible(dialogWindowProps, dialogWindowProps.pos);
   }
   
-  private GralUserAction actionOk = new GralUserAction()
+  private final GralUserAction actionOk = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
     { //note widgd is the OK-button!
       if(widgdInDialog !=null){
@@ -272,7 +272,7 @@ public class GralCfgDesigner
   
   
   
-  private GralUserAction actionDel = new GralUserAction()
+  private final GralUserAction actionDel = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
     { //note widgd is the OK-button!
       if(widgdInDialog !=null){
@@ -294,7 +294,7 @@ public class GralCfgDesigner
   
   
   
-  private GralUserAction actionEsc = new GralUserAction()
+  private final GralUserAction actionEsc = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
     { dialogWindowProps.setWindowVisible(false);
       widgdInDialog = null;

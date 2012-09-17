@@ -94,7 +94,7 @@ public class FcmdView
   
   
   /**Instance to prepare the text especially for hex view. */
-  private StringFormatter formatterHex = new StringFormatter(120);
+  private final StringFormatter formatterHex = new StringFormatter(120);
   
   public FcmdView(Fcmd main)
   { this.main = main;
@@ -123,7 +123,7 @@ public class FcmdView
     main.gralMng.setPosition(0.5f, 2.5f, 1, 20, 0, 'r');
     widgFindText = main.gralMng.addTextField(null, true, null, null);
     main.gralMng.setPosition(0.5f, 2.5f, 22, GralPos.size + 10, 0, 'r', 1);
-    btnFind = main.gralMng.addButton(null, actionFind, null, null, null, "Search (ctrl-F)");
+    btnFind = main.gralMng.addButton(null, actionFind, null, null, "Search (ctrl-F)");
     btnWholeword = main.gralMng.addSwitchButton(null, "wholeWord - no", "wholeWord- yes", GralColor.getColor("wh"), GralColor.getColor("gn"));
     btnCase = main.gralMng.addSwitchButton(null, "case - no", "case - yes", GralColor.getColor("wh"), GralColor.getColor("gn"));
     main.gralMng.setPosition(3, 0, 0, 0, 1, 'r');

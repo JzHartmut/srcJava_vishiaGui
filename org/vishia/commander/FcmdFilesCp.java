@@ -102,12 +102,12 @@ public final class FcmdFilesCp {
     widgPath2.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.folderCmp.");
     
     main.gralMng.setPosition(-1, GralPos.size - 3, 1, GralPos.size + 8, 0, 'r',2);
-    main.gralMng.addButton(null, actionFilesCp, "esc", null, null, "esc");
+    main.gralMng.addButton(null, actionFilesCp, "esc", null, "esc");
     //widgSyncWalk = main.gralMng.addSwitchButton(null, null, "sync", null, null, "sync", "wh", "gn");
     //widgSyncWalk.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.folderCmp.");
-    widgGetDir = main.gralMng.addButton(null, actionFilesCp, "get", null, null, "get dir");
+    widgGetDir = main.gralMng.addButton(null, actionFilesCp, "get", null, "get dir");
     widgGetDir.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.folderCmp.");
-    widgCompare = main.gralMng.addButton(null, actionFilesCp, "cp", null, null, "compare");
+    widgCompare = main.gralMng.addButton(null, actionFilesCp, "cp", null, "compare");
     widgCompare.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.folderCmp.");
     widgCompare.setPrimaryWidgetOfPanel();
   }

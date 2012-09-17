@@ -166,7 +166,7 @@ public class FcmdButtons
    */
   private void addButton(int idx, Iterator<Map.Entry<String, ButtonAction>> iterButtonAction){
     ButtonAction button = getNext(idx, iterButtonAction);
-    GralButton gralButton = main.gralMng.addButton(button.button, button.action, "", null, null, button.text);
+    GralButton gralButton = main.gralMng.addButton(button.button, button.action, button.text);
     gralButton.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.Button." + button.text + ".");
     //keyAction[idx] = button.action;
   }

@@ -597,7 +597,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   /**Returns the parameter of the show method.
    * The parameters for the show-method are given as "showMethod(param, param, ...)"
-   * while calling {@link #setShowMethod(String)}. They are split in extra Strings,
+   * while calling {@link #setActionShow(GralUserAction, String[])}. They are split in extra Strings,
    * this  
    * @return
    */
@@ -606,34 +606,6 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   /**Clear the parameter if they are over-taken already.
   */
   public void clearShowParam(){ sShowParam = null; }
-
-  /**
-   * @param sShowMethod
-   * @deprecated use {@link #setActionShow(GralUserAction)}.
-   */
-  @Deprecated
-  public void setShowMethod(String sShowMethod)
-  { if(sShowMethod == null){
-      this.sShowMethod = null;
-      this.sShowParam = null;
-    } else {
-      int posParanthesis = sShowMethod.indexOf("("); 
-      if(posParanthesis >0){
-        int posParanthesisEnd = sShowMethod.indexOf(")");
-        String sParam1 = sShowMethod.substring(posParanthesis+1, posParanthesisEnd);
-        String[] sParamA = sParam1.split(",");
-        this.sShowParam = new String[sParamA.length];
-        for(int ix=0; ix < sParamA.length; ++ix){
-          this.sShowParam[ix] = sParamA[ix].trim();
-        }
-        this.sShowMethod = sShowMethod.substring(0, posParanthesis).trim();
-        
-      } else {
-        this.sShowMethod = sShowMethod;
-        this.sShowParam = null;
-      }
-    }
-  }
 
 
   public String getFormat()

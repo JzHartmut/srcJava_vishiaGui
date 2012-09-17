@@ -362,7 +362,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       wind.fileSelector = new GralFileSelector();
       wind.fileSelector.setToPanel(mng, "selectFile", 100, new int[]{2,19,6,10}, 'C');
       mng.setPosition(-1, GralPos.size - 3, 1, GralPos.size + 8, 0, 'r',2);
-      //mng.addButton(null, wind.actionFileSearch, "esc", null, null, "esc");
+      //mng.addButton(null, wind.actionFileSearch, "esc", null, "esc");
       return wind;
     }
 
@@ -570,11 +570,11 @@ public class GralFileSelector implements Removeable //extends GralWidget
     wind.widgText = mng.addTextField("containsText", true, "contains text:", "t");
     
     mng.setPosition(-5, GralPos.size - 1, 1, -1, 0, 'r',2);
-    wind.widgProgression = mng.addValueBar(null, null, null);
+    wind.widgProgression = mng.addValueBar(null, null);
     mng.setPosition(-1, GralPos.size - 3, 1, GralPos.size + 8, 0, 'r',2);
-    mng.addButton(null, wind.actionFileSearch, "esc", null, null, "esc");
-    wind.widgSubdirs = mng.addSwitchButton(null, null, "subdirs", null, null, "subdirs", "wh", "gn");
-    wind.widgSearch = mng.addButton(null, wind.actionFileSearch, "search", null, null, "search");
+    mng.addButton(null, wind.actionFileSearch, "esc", null, "esc");
+    wind.widgSubdirs = mng.addSwitchButton(null, null, "subdirs", null, "subdirs", "wh", "gn");
+    wind.widgSearch = mng.addButton(null, wind.actionFileSearch, "search", null, "search");
     wind.widgSearch.setPrimaryWidgetOfPanel();
     return wind;
   }
@@ -750,59 +750,63 @@ public class GralFileSelector implements Removeable //extends GralWidget
       if(files !=null){ 
         Map<String, File> sortFiles = new TreeMap<String, File>();
         for(File file: files){
-          String sort;
-          switch(sortOrder){
-          case kSortName: {
-            String sName = file.getName();
-            if(file.isDirectory()){ sName += "/"; }
-            sort = (file.isDirectory()? "D" : "F") + sName;
-          } break;
-          case kSortNameNonCase: {
-            String sName = file.getName().toLowerCase();
-            if(file.isDirectory()){ sName += "/"; }
-            sort = (file.isDirectory()? "D" : "F") + sName;
-          } break;
-          case kSortExtension: {
-            String sName = file.getName();
-            int posDot = sName.lastIndexOf('.');
-            String sExt = sName.substring(posDot+1);
-            if(file.isDirectory()){ sName += "/"; }
-            sort = (file.isDirectory()? "D" : "F") + sExt + sName;
-          } break;
-          case kSortExtensionNonCase: {
-            String sName = file.getName().toLowerCase();
-            int posDot = sName.lastIndexOf('.');
-            String sExt = sName.substring(posDot+1);
-            if(file.isDirectory()){ sName += "/"; }
-            sort = (file.isDirectory()? "D" : "F") + sExt + sName;
-          } break;
-          case kSortDateNewest: {
-            long nDate = -file.lastModified();
-            String sDate = String.format("%016X", nDate);
-            String sName = file.getName().toLowerCase();
-            sort = (file.isDirectory()? "D" : "F") + sDate + sName;
-          } break;
-          case kSortDateOldest: {
-            long nDate = file.lastModified();
-            String sDate = String.format("%016X", nDate);
-            String sName = file.getName().toLowerCase();
-            sort = (file.isDirectory()? "D" : "F") + sDate + sName;
-          } break;
-          case kSortSizeLargest: {
-            long nSize = 0x7fffffffffffffffL - file.length();
-            String sSize = String.format("%016d", nSize);
-            String sName = file.getName().toLowerCase();
-            sort = (file.isDirectory()? "D" : "F") + sSize + sName;
-          } break;
-          case kSortSizeSmallest: {
-            long nSize = file.length();
-            String sSize = String.format("%016d", nSize);
-            String sName = file.getName().toLowerCase();
-            sort = (file.isDirectory()? "D" : "F") + sSize + sName;
-          } break;
-          default: { sort = file.getName(); }
+          if(file ==null){
+            System.err.println("GralFileSelector.fillInRefreshedFiles() - file is null;");
+          } else {
+            String sort;
+            switch(sortOrder){
+            case kSortName: {
+              String sName = file.getName();
+              if(file.isDirectory()){ sName += "/"; }
+              sort = (file.isDirectory()? "D" : "F") + sName;
+            } break;
+            case kSortNameNonCase: {
+              String sName = file.getName().toLowerCase();
+              if(file.isDirectory()){ sName += "/"; }
+              sort = (file.isDirectory()? "D" : "F") + sName;
+            } break;
+            case kSortExtension: {
+              String sName = file.getName();
+              int posDot = sName.lastIndexOf('.');
+              String sExt = sName.substring(posDot+1);
+              if(file.isDirectory()){ sName += "/"; }
+              sort = (file.isDirectory()? "D" : "F") + sExt + sName;
+            } break;
+            case kSortExtensionNonCase: {
+              String sName = file.getName().toLowerCase();
+              int posDot = sName.lastIndexOf('.');
+              String sExt = sName.substring(posDot+1);
+              if(file.isDirectory()){ sName += "/"; }
+              sort = (file.isDirectory()? "D" : "F") + sExt + sName;
+            } break;
+            case kSortDateNewest: {
+              long nDate = -file.lastModified();
+              String sDate = String.format("%016X", nDate);
+              String sName = file.getName().toLowerCase();
+              sort = (file.isDirectory()? "D" : "F") + sDate + sName;
+            } break;
+            case kSortDateOldest: {
+              long nDate = file.lastModified();
+              String sDate = String.format("%016X", nDate);
+              String sName = file.getName().toLowerCase();
+              sort = (file.isDirectory()? "D" : "F") + sDate + sName;
+            } break;
+            case kSortSizeLargest: {
+              long nSize = 0x7fffffffffffffffL - file.length();
+              String sSize = String.format("%016d", nSize);
+              String sName = file.getName().toLowerCase();
+              sort = (file.isDirectory()? "D" : "F") + sSize + sName;
+            } break;
+            case kSortSizeSmallest: {
+              long nSize = file.length();
+              String sSize = String.format("%016d", nSize);
+              String sName = file.getName().toLowerCase();
+              sort = (file.isDirectory()? "D" : "F") + sSize + sName;
+            } break;
+            default: { sort = file.getName(); }
+            }
+            sortFiles.put(sort, file);
           }
-          sortFiles.put(sort, file);
         }
         int lineCt = 0; //count lines to select the line number with equal sFileSelect.
         if(dir.getParentFile() !=null){

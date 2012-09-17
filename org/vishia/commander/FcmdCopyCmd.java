@@ -133,29 +133,29 @@ public class FcmdCopyCmd
     main.gralMng.addText("Create new file");
     
     main.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size -3, 1, 20, 0, 'r',1);
-    //widgdOverwrite = main.gralMng.addButton("copyOverwrite", null, null, null, null, "overwr file");
+    //widgdOverwrite = main.gralMng.addButton("copyOverwrite", null, "overwr file");
     //main.gralMng.setPosition(GralPos.same, GralPos.size -3, 16, 35, 0, 'r');
-    widgdOverwrReadOnly = main.gralMng.addButton("overwritero", actionOverwrReadonly, null, null, null, "ask ?no ?yes");
+    widgdOverwrReadOnly = main.gralMng.addButton("overwritero", actionOverwrReadonly, null, null,"ask ?no ?yes");
     //main.gralMng.setPosition(GralPos.same, GralPos.size -3, 33, -1, 0, 'r');
-    widgdOverwrDate = main.gralMng.addButton("copyOverwriteReadonly", actionOverwrDate, null, null, null, "older ?no ?newer ?all");
-    widgdCreateNew = main.gralMng.addButton("copyCreate", actionCreateCopy, null, null, null, "only overwr ? yes");
+    widgdOverwrDate = main.gralMng.addButton("copyOverwriteReadonly", actionOverwrDate, null, null, "older ?no ?newer ?all");
+    widgdCreateNew = main.gralMng.addButton("copyCreate", actionCreateCopy, null, null, "only overwr ? yes");
 
     main.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size -3, 1, 15, 0, 'r', 1);
-    widgOverwrFile = main.gralMng.addButton("copyOverwrite", null, null, null, null, "overwr file");
-    widgSkipFile = main.gralMng.addButton("copyskip", actionButtonSkipFile, null, null, null, "skip file");
+    widgOverwrFile = main.gralMng.addButton("copyOverwrite", null, null, null, "overwr file");
+    widgSkipFile = main.gralMng.addButton("copyskip", actionButtonSkipFile, null, null, "skip file");
     //main.gralMng.setPosition(GralPos.same, GralPos.size -3, 16, GralPos.size +14, 0, 'r', 1);
-    widgSkipDir = main.gralMng.addButton("copySkipDir", actionButtonSkipDir, null, null, null, "skip dir");
+    widgSkipDir = main.gralMng.addButton("copySkipDir", actionButtonSkipDir, null, null, "skip dir");
     main.gralMng.setPosition(GralPos.same, GralPos.size -3, -13, -1, 0, 'd', 1);
     widgdMove = main.gralMng.addSwitchButton("copyMove", "Copy/ ?move", "Move/ ?copy", GralColor.getColor("wh"), GralColor.getColor("gn"));
     widgdMove.setActionChange(actionSwitchButtonMove);
     
     main.gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
-    widgButtonEsc = main.gralMng.addButton("copyEsc", actionButtonCopy, "esc", null, null, "close");
+    widgButtonEsc = main.gralMng.addButton("copyEsc", actionButtonCopy, "esc", null, "close");
     main.gralMng.setPosition(-4, GralPos.size +1, 7, -14, 0, 'd', 1);
-    widgProgressFile = main.gralMng.addValueBar("copyProgressFile", null, null);
-    widgProgressAll = main.gralMng.addValueBar("copyProgressAll", null, null);
+    widgProgressFile = main.gralMng.addValueBar("copyProgressFile", null);
+    widgProgressAll = main.gralMng.addValueBar("copyProgressAll", null);
     main.gralMng.setPosition(-4, GralPos.size+3, -13, -1, 0, 'r');
-    widgButtonOk = main.gralMng.addButton("copyOk", actionButtonCopy, "close", null, null, "close");
+    widgButtonOk = main.gralMng.addButton("copyOk", actionButtonCopy, "close", null, "close");
   
   }
   

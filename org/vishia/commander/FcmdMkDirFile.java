@@ -45,9 +45,9 @@ public class FcmdMkDirFile
     widgParentPath = main.gralMng.addTextField("mkParentPath", false, "parent path:", "t");
     widgName = main.gralMng.addTextField("mkName", true, "name:", "t");
     main.gralMng.setPosition(-3.5f, -0.5f, 1, GralPos.size + 10, 0, 'r', 2);
-    widgButtonClose = main.gralMng.addButton(null, actionButton, "c", null, null, "close");
-    widgButtonMkFile = main.gralMng.addButton(null, actionButton, "f", null, null, "create file");
-    widgButtonMkDir = main.gralMng.addButton(null, actionButton, "d", null, null, "mkdir");
+    widgButtonClose = main.gralMng.addButton(null, actionButton, "c", null, "close");
+    widgButtonMkFile = main.gralMng.addButton(null, actionButton, "f", null, "create file");
+    widgButtonMkDir = main.gralMng.addButton(null, actionButton, "d", null, "mkdir");
     
     windMk = window; 
  
