@@ -1,6 +1,5 @@
 package org.vishia.gral.base;
 
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
@@ -80,7 +79,7 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   public GralTextField(String name, char whatis, GralMng mng){
     super(name, whatis, mng);
     setBackColor(GralColor.getColor("wh"),0);
-    setTextColor(GralColor.getColor("bl"));
+    setTextColor(GralColor.getColor("bk"));
     this.windowMng = mng.gralDevice;
   }
   

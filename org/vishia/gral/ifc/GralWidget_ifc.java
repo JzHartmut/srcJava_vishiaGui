@@ -82,7 +82,7 @@ public interface GralWidget_ifc extends Removeable
   
   /**Returns the implementation class of more as one widget. If the widget has only one implementation widget,
    * this method returns null. You should call {@link #getWidgetImplementation()} instead. */
-  public Object[] getWidgetMultiImplementations();
+  //public Object[] XXXgetWidgetMultiImplementations();
   
   GralWidgetGthreadSet_ifc getGthreadSetifc();
   

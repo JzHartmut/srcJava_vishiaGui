@@ -405,13 +405,16 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   }
   
   
+  /**Returns this.
+   * @see org.vishia.gral.base.GetGralWidget_ifc#getGralWidget()
+   */
   @Override public GralWidget getGralWidget(){ return this; }
   
   
   /**Default implementation:Most of widgets may have only one implementation widget. This returns null.
    * @see org.vishia.gral.ifc.GralWidget_ifc#getWidgetMultiImplementations()
    */
-  public Object[] getWidgetMultiImplementations(){ return null; }
+  //public Object[] getWidgetMultiImplementations(){ return null; }
 
   
   
@@ -435,8 +438,8 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * @return The gral graphical widget. Note: The type can be instanceof some derived interfaces of the gral.
    * @deprecated
    */
-  @Deprecated
-  public GralWidget_ifc getGraphicWidgetWrapper(){ return this; }
+  //@Deprecated
+  //public GralWidget_ifc getGraphicWidgetWrapper(){ return this; }
   
   
   /**Sets a application specific info. 

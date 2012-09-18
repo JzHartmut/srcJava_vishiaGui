@@ -827,7 +827,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
       return null;
     }
 
-    @Override public Object[] getWidgetMultiImplementations(){ return null; }
+    //@Override public Object[] getWidgetMultiImplementations(){ return null; }
 
     
     @Override

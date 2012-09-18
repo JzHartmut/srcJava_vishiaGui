@@ -1223,11 +1223,11 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 	@Override public GralWidget addFocusAction(String sName, GralUserAction action, String sCmdEnter, String sCmdRelease)
 	{
     GralWidget widget = indexNameWidgets.get(sName);
-  	if(widget == null || !(widget.getGraphicWidgetWrapper() instanceof Control)){
+  	if(widget == null || !(widget.getWidgetImplementation() instanceof Control)){
   		log.sendMsg(0, "GuiMainDialog:addClickAction: unknown widget %s", sName);
   	} else {
     	/**The class ButtonUserAction implements the general button action, which class the registered user action. */
-      ((Control)(widget.getGraphicWidgetWrapper())).addFocusListener( new SwtFocusAction(this, action, sCmdEnter, sCmdRelease));
+      ((Control)(widget.getWidgetImplementation())).addFocusListener( new SwtFocusAction(this, action, sCmdEnter, sCmdRelease));
       
   	}
   	return widget;
@@ -1236,7 +1236,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 	
 	@Override public void addFocusAction(GralWidget widgetInfo, GralUserAction action, String sCmdEnter, String sCmdRelease)
 	{
-    ((Control)(widgetInfo.getGraphicWidgetWrapper())).addFocusListener( new SwtFocusAction(this, action, sCmdEnter, sCmdRelease));
+    ((Control)(widgetInfo.getWidgetImplementation())).addFocusListener( new SwtFocusAction(this, action, sCmdEnter, sCmdRelease));
   }
 
 	
@@ -1277,26 +1277,6 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   
-  /**Sets the content of any field during operation. The GUI should be created already.
-   * @param name Name of the field, corresponding with the <code>name</code>-designation of the field 
-   *             in the configuration.
-   * @param content The new content.
-   * @return The old content of the field.
-   * throws GuiDialogZbnfControlled.NotExistException if the field with the given name isn't found.
-   * @deprecated it doesn't work yet. It isn't threadsafe. Use {@link #setInfo(GralWidget, int, int, Object, Object)}
-   */
-  @Deprecated
-  public String setFieldContent(String name, String content)
-  throws NotExistException
-  {
-    GralWidget descr = indexNameWidgets.get(name);
-    if(descr == null) throw new NotExistException(name);
-    assert(descr.getGraphicWidgetWrapper() instanceof Text);
-    Text field = (Text)descr.getGraphicWidgetWrapper();
-    String oldContent = field.getText();
-    field.setText(content);
-    return oldContent;
-  }
   
   /**Inserts a textual information at any widget. The widget may be for example:
    * <ul>
@@ -1500,25 +1480,6 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   
-  /**Gets the content of any field during operation. The GUI should be created already.
-   * @param name Name of the field, corresponding with the <code>name</code>-designation of the field 
-   *             in the configuration.
-   * @return The content of the field.
-   * throws GuiDialogZbnfControlled.NotExistException if the field with the given name isn't found.
-   * @deprecated it doesn't work yet. It isn't threadsafe. Use {@link #setInfo(GralWidget, int, int, Object, Object)}
-   */
-  @Deprecated
-  public String getFieldContent(String name)
-  throws NotExistException
-  {
-    GralWidget descr = indexNameWidgets.get(name);
-    if(descr == null) throw new NotExistException(name);
-    Text field = (Text)descr.getGraphicWidgetWrapper();
-    String content = field.getText();
-    return content;
-  }
-  
-  
   /**Returns a Set of all fields, which are created to show.
    * @return the set, never null, possible an empty set.
    */
@@ -1612,20 +1573,6 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 	    GralRectangle posSize = calcWidgetPosAndSize(widgd.pos, size.dx, size.dy, 0, 0);
   	  swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
   	  swtWidget.redraw();
-	  } else if( (owidg = widgd.getWidgetMultiImplementations())!=null){
-	    Control[] swtWidgets = (Control[])owidg;
-	    //TODO that is not comparable with one implementation widget.
-	    //The gral position and size should be known for implementation widgets to resize!
-	    //But the size is a property of GralWidget.
-	    //The resizing can be done only for one implementation widget.
-	    for( Control swtWidget: swtWidgets){
-	      Point size = swtWidget.getParent().getSize();
-	      //Composite parent = swtWidget.
-	      GralRectangle posSize = calcWidgetPosAndSize(widgd.pos, size.x, size.y, 0, 0);
-	      swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
-	      swtWidget.redraw();
-	      
-	    }
 	  }
 	}
 	
@@ -1637,7 +1584,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 	{ String sValue;
   	sValue = super.getValueFromWidget(widgd);  //platform independent getting of value
   	if(sValue == null){
-  	  GralWidget_ifc widget = widgd.getGraphicWidgetWrapper();
+  	  GralWidget_ifc widget = widgd;
       Control swtWidget = (Control)widget.getWidgetImplementation();
   		if(swtWidget instanceof Text){
     	  sValue = ((Text)swtWidget).getText();
@@ -1709,12 +1656,12 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 		 * The name of the variable is contained in the {@link GralWidget}.
 		 * @see org.vishia.gral.ifc.GralUserAction#userActionGui(java.lang.String, org.vishia.gral.base.GralWidget, java.lang.Object[])
 		 */
-		@Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
+		@Override public boolean userActionGui(String sIntension, GralWidget widg, Object... params)
 		{
 		  
-			Object oWidget = infos.getGraphicWidgetWrapper();  
-			final VariableAccessWithIdx variable = infos.getVariableFromContentInfo(variableContainer);
-			final int ixData = infos.getDataIx();
+			Object oWidget = widg.getWidgetImplementation();  
+			final VariableAccessWithIdx variable = widg.getVariableFromContentInfo(variableContainer);
+			final int ixData = widg.getDataIx();
 			final String sValue;
 			if(variable !=null){
 				if(sIntension.equals("o")){
@@ -1724,7 +1671,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 					if(oWidget instanceof Text){ sValue = variable.getString(); ((Text)oWidget).setText(sValue == null ? "" : sValue); }
 					else { sValue = null; }
 				} else throw new IllegalArgumentException("GuiPanelMng.syncVariableOnFocus: unexpected intension on focus: " + sIntension); 
-			} else throw new IllegalArgumentException("GuiPanelMng.syncVariableOnFocus: variable not found: " + infos.getDataPath()); 
+			} else throw new IllegalArgumentException("GuiPanelMng.syncVariableOnFocus: variable not found: " + widg.getDataPath()); 
       return true;
 		}
 	};

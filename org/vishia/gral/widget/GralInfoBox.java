@@ -202,7 +202,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     return null;
   }
 
-  @Override public Object[] getWidgetMultiImplementations(){ return implWidgets; }
+  //@Override public Object[] getWidgetMultiImplementations(){ return implWidgets; }
   
   
   @Override
