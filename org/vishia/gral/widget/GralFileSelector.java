@@ -54,6 +54,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2012-09-24 Hartmut new.jar files opened as zip file.
    * <li>2012-07-30 Hartmut improved using of extra thread on refreshing file properties. Write first 'waiting',
    *   the other thread writes the content maybe delayed. The user can abort the access if a response is not kept.
    * <li>2012-07-28 Hartmut improved zipfile access.
@@ -227,6 +228,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     @Override public boolean actionOk(Object userData, GralTableLine_ifc line)
     { boolean done = true;
       File file = (File)userData;
+      String fileName;
       //File dir = data.file.getParentFile();
       //String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir) + "/";
       String sName = line.getCellText(1);
@@ -238,7 +240,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
         //}
       } else if(file.isDirectory()){
         actionRight(userData, line);
-      } else if(file.getName().endsWith(".zip")){
+      } else if((fileName = file.getName()).endsWith(".zip") || fileName.endsWith(".jar")){
         actionRightZip(userData, line);
       } else {
         if(actionOnEnterFile !=null){

@@ -299,7 +299,7 @@ public class GralCfgBuilder
        
         GralUserAction actionShow = gralMng.getRegisteredUserAction(sShowMethod[0]);
         if(actionShow == null){
-          sError = "GuiCfgBuilder - show method not found: " + sShowMethod;
+          sError = "GuiCfgBuilder - show method not found: " + sShowMethod[0];
         } else {
           String[] param = sShowMethod[1] == null ? null : CalculatorExpr.splitFnParams(sShowMethod[1]);
           widgd.setActionShow(actionShow, param);

@@ -24,7 +24,8 @@ public class GralShowMethods
 
   private String getParams;
   
-  /**Shows the back color of the widget depending on the boolean value of params. params of exec is a boolean value. */
+  /**Shows the back color of the widget depending on the boolean value of a variable.
+   * param of exec should be a VariableAccessWithIdx-instance. The variable value 0, 1, ... is used to select one of the back colors. */
   public final GralUserAction showBackColor = new GralUserAction("showBackColor"){
     
     //Note: don't save data here. It is a common instance.
@@ -52,7 +53,8 @@ public class GralShowMethods
         if(value>=0 && value < widgg.cfg.showParam.length){ widgd.setBackColor((GralColor)widgg.cfg.showParam[value], 0); }
         else { widgd.setBackColor((GralColor)widgg.cfg.showParam[0], 0); }
       } else {
-        System.err.println("GralShowMethods.showBackColor parameter error; ");
+        String name = widgd.getName();
+        System.err.println("GralShowMethods.showBackColor parameter error; widget=" + name);
       }
       return true;
     }

@@ -16,6 +16,7 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
 {
   /**Version, history and license.
    * <ul>
+   * <li>2012-09-24 Hartmut new: {@link #setValue(double)} and {@link #setValue(Object[])} for double values. 
    * <li>2012-04-17 Hartmut new: {@link #sFormat2} etc: Now format "int16AngleDegree" etc. are recognized
    *   as special format. Improved calling {@link #calculator} in {@link #setValue(float)}.
    * <li>2012-04-16 Hartmut new: {@link #isChanged()}, {@link #setUser(GralTextFieldUser_ifc)}
@@ -191,6 +192,108 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
     }
     setText(sShow);
   }
+  
+  
+  
+  /**Sets a float value into a text field.
+   * The float value may be formatted:
+   * <ul>
+   * <li>If the {@link #setFormat(String)} of this widget starts with '!' and contains a second '!',
+   *   the String between that is used as expression to calculate the float value
+   *   using {@link CalculatorExpr}. Therewith any calculation can be done.
+   * <li>The rest after the "!expression!" or the given format is used for String.format(sFormat, value)
+   *   to determine the output appearance.
+   * <li>If no format is given, the value will be shown in proper readable appearance. That assures
+   *   that the value is able to present in a short text field, using maximal 9 digits. 
+   * <li>If no format is given and the absolute of the value is less 0.000001 but not 0, 
+   *   a "0.000001" with the correct sign will be shown. It shows, there is a less value, but not null.
+   * <li>If no format is given and the value is in range up to 1 Billion, it is shown with "k", "M"
+   *   for kilo and Mega with max 3 digits before dot and 3 digits after the dot.
+   * <li>if no format is given and the value is greater than 1 Billion, it is shown with exponent.
+   * <ul>      
+   *   
+   * @see org.vishia.gral.base.GralWidget#setValue(float)
+   */
+  public void setValue(final double valueP){
+    final String sFormat1;
+    double value;
+    String sShow;
+    if(calculator !=null){
+      value = calculator.calc(valueP);
+      sFormat1 = this.sFormat2;
+    } else if(sFormat !=null){
+      if(sFormat.startsWith("!")){
+        int posEnd = sFormat.indexOf('!',1);
+        if(posEnd >=0){
+          String sExpr = sFormat.substring(1, posEnd);
+          this.sFormat2 = sFormat1 = sFormat.substring(posEnd+1);
+          if(calculator ==null){
+            calculator = new CalculatorExpr();
+            String sError = calculator.setExpr(sExpr);
+            if(sError !=null){ 
+              //console.writeError(sError);
+              calculator = null;
+            }
+          }
+          if(calculator !=null){
+            value = calculator.calc(valueP);
+          } else {
+            value = valueP;
+          }
+        } else {
+          sFormat1 = sFormat;
+          value = valueP;
+        }
+      } else {
+        sFormat1 = sFormat;
+        value = valueP;
+      }
+        
+    } else { //sFormat == null
+      sFormat1 = null;  //no expression
+      value = valueP;
+    }
+    if(sFormat1 !=null && sFormat.length() >0){
+      try{ sShow = String.format(sFormat1, value); }
+      catch(java.util.IllegalFormatException exc){ 
+        sShow = null;  //maybe integer 
+      }
+      if(sShow == null){
+        try{ sShow = String.format(sFormat, (int)value); }
+        catch(java.util.IllegalFormatException exc){ 
+          sShow = "?format";  
+        }
+      }
+    } else { //no format given
+      double valueAbs = Math.abs(value); 
+      if(value == 0.0f){ sShow = "0.0"; }
+      else if(valueAbs < 1.0e-7f){ sShow = value < 0 ? "-0.0000001" : "0.0000001"; }  //shorten output, don't show exponent.
+      else if(valueAbs < 1.0f){ sShow = String.format("%1.12f", value); }  //shorten output, don't show exponent.
+      else if(valueAbs < 1.0e3f){ sShow = String.format("%3.9f", value); }  //shorten output, don't show exponent.
+      else if(valueAbs < 1.0e6f){ sShow = String.format("%3.8f k", value/1000); }  //shorten output, don't show exponent.
+      else if(valueAbs < 1.0e9f){ sShow = String.format("%3.8f M", value/1000000); }  //shorten output, don't show exponent.
+      else if(valueAbs >= 1.0e9f){ sShow = String.format("%3.8g", value); }  //shorten output, don't show exponent.
+      //else if(valueAbs >= 1e6){ sShow = Float.toString(value/1000000) + " M"; }  //shorten output, don't show exponent.
+      else { sShow = Double.toString(value); }
+      
+    }
+    setText(sShow);
+  }
+  
+  
+  
+  
+  @Override public void setValue(Object[] value){
+    if(value !=null && value.length ==1 && value[0] instanceof Double){
+      double val = ((Double)value[0]).doubleValue();
+      setValue(val);
+    } else {
+      setText("?" + value);
+    }
+  }
+
+  
+  
   
   @Override public void setText(CharSequence arg)
   { setText(arg, 0);

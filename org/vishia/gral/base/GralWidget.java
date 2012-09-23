@@ -98,6 +98,8 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-09-24 Hartmut chg: {@link #getName()} now returns {@link #sDataPath} or {@link #sCmd} if the other info are null.
+   * <li>2012-09-24 Hartmut chg: {@link #refreshFromVariable(VariableContainer_ifc)} for long and double values.
    * <li>2012-09-17 Hartmut new {@link ConfigData} and {@link #cfg}, used yet only for {@link ConfigData#showParam}.
    * <li>2012-09-17 Hartmut chg whatIsChanged#whatIsChanged} moved from {@link GralTextField}. The concept is valid for all widgets
    *   in cohesion with the concept of the whatIsChanged}.
@@ -355,6 +357,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    */
   protected final static class DynamicData {
     
+    /**32 bit what is changed, see {@link GralWidget#chgColorText} etc. */
     public AtomicInteger whatIsChanged = new AtomicInteger();
     
     public void setChanged(int mask){
@@ -423,7 +426,12 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   }
 
   
-  @Override public String getName(){ return name; }
+  @Override public String getName(){ 
+    if(name !=null) return name;
+    else if(sDataPath !=null) return sDataPath;
+    else if(sCmd !=null) return sCmd;
+    else return toString();
+  }
   
   /**Sets the graphical widget. It is a wrapper around the widget of the graphic implementation base.
    * This method shouldn't invoke by an user's application. It is only invoked by the gral itself. 
@@ -698,7 +706,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    */
   @Override public void refreshFromVariable(VariableContainer_ifc container){
     String sDataPath = this.getDataPath();
-    if(sDataPath !=null && sDataPath.startsWith("intern."))
+    if(sDataPath !=null && sDataPath.startsWith("intern/energyTotalLineOut"))
       stop();
     if(variable ==null && variables == null){ //no variable known, get it.
       //final int[] ixArrayA = new int[1];
@@ -745,7 +753,13 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
         switch(cType){
           case 'Z': case 'S': case 'B':
             case 'I': setValue(variable.getInt()); break;
+          case 'L': setValue(variable.getLong()); break;
           case 'F': setValue(variable.getFloat()); break;
+          case 'D': 
+            Object[] value = new Double[1]; 
+            value[0] = new Double(variable.getDouble()); 
+            setValue(value);
+            break;
           case 's': setText(variable.getString()); break;
           default:  sValue = "?" + cType; //variable.getInt());  //at least request newly if type is faulty
           }
@@ -762,7 +776,8 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
             char cType = variable1.getType();
             switch(cType){
               case 'Z': case 'S': case 'B':
-              case 'I': values[++ixVal] = variable1.getInt(); break;
+                case 'I': values[++ixVal] = variable1.getInt(); break;
+              case 'L': setValue(variable.getFloat()); break;
               case 'F': values[++ixVal] = variable1.getFloat(); break;
               case 's': values[++ixVal] = variable1.getString(); break;
               default:  setText("?" + cType); //variable.getInt());  //at least request newly

@@ -1,18 +1,13 @@
 package org.vishia.gral.swt;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Canvas;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.vishia.gral.base.GralLed;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
-import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
 
 /**This class represents a LED, which is able to show a state with its color. 
@@ -63,15 +58,28 @@ public class SwtLed extends GralLed{
 
   
 
-  public void XXXsetColor(int nBorderColor, int nInnerColor){
+  @Override public void XXXsetColor(int nBorderColor, int nInnerColor){
     widgSwt.XXXsetColor(nBorderColor, nInnerColor);
   }
   
   
   private void setColors(){
-    if(dyda.lineColor !=null){ borderColor = mng.getColorImpl(dyda.lineColor); }
-    if(dyda.backColor !=null){ innerColor = mng.getColorImpl(dyda.backColor); }
-    
+    int changedAckn = 0;
+    if(dyda.backColor !=null && (dyda.whatIsChanged.get() & GralWidget.chgColorBack)!=0){ 
+      innerColor = mng.getColorImpl(dyda.backColor);
+      changedAckn |= GralWidget.chgColorBack; 
+    }
+    if(dyda.lineColor !=null){ 
+      if((dyda.whatIsChanged.get() & GralWidget.chgColorLine)!=0){
+        borderColor = mng.getColorImpl(dyda.lineColor); 
+        changedAckn |= GralWidget.chgColorLine; 
+      }
+    } else {
+      borderColor = innerColor;
+    }
+    if(changedAckn !=0){
+      dyda.setChanged(changedAckn);
+    }
   }
   
   

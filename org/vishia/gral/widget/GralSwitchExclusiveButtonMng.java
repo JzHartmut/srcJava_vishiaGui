@@ -13,7 +13,7 @@ public class GralSwitchExclusiveButtonMng implements VariableAccess_ifc
   
   //final GuiPanelMngWorkingIfc mng;
 
-  private List<GralWidget> listSwitchButtons = new LinkedList<GralWidget>();
+  private final List<GralWidget> listSwitchButtons = new LinkedList<GralWidget>();
   
   String currentButtonText;
   
@@ -53,6 +53,9 @@ public class GralSwitchExclusiveButtonMng implements VariableAccess_ifc
 
   @Override public int getInt(int... ixArray){ return 0; }
   @Override public int setInt(int value, int... ixArray){ return 0; }
+
+  @Override public long getLong(int... ixArray){ return 0; }
+  @Override public long setLong(long value, int... ixArray){ return 0; }
 
   @Override
   public float getFloat(int... ixArray)
