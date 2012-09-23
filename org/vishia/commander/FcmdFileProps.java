@@ -298,7 +298,7 @@ public class FcmdFileProps
   GralUserAction actionButton = new GralUserAction()
   {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
-    { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){  //not on mouse down but on mouse up.
         String name = widgName.getText();
         if(name.equals(actFile.getName())){ name = null; } //don't change it.
         int noMask = 0;

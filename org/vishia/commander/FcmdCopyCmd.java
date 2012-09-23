@@ -427,8 +427,8 @@ public class FcmdCopyCmd
           listEvCopy.clear();
           filesToCopy.clear();
           FcmdCopyCmd.this.evCurrentFile = null;
-          widgButtonOk.setText("check");
-          widgButtonOk.setCmd("check");
+          widgButtonOk.setText("close");
+          widgButtonOk.setCmd("close");
             
         } else if(widgg.sCmd.startsWith("quit")) {
           filesToCopy.clear();
