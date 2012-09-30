@@ -708,6 +708,8 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
     String sDataPath = this.getDataPath();
     if(sDataPath !=null && sDataPath.startsWith("intern/energyTotalLineOut"))
       stop();
+    if(this instanceof GralLed)
+      stop();
     if(variable ==null && variables == null){ //no variable known, get it.
       //final int[] ixArrayA = new int[1];
       if(sDataPath !=null){  //only refresh widgets with a data path.

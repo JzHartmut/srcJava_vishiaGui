@@ -69,7 +69,10 @@ public abstract class GralUserAction
   
   public GralUserAction(String ident){ name = ident; }
   
-  public GralUserAction(){ name = ""; }
+  public GralUserAction(){ 
+    System.out.println("GralUserAction - without name;");
+    name = ""; 
+  }
   
   /**Call of users method while a widget is activated.
    * Usual intensions:
@@ -109,6 +112,7 @@ public abstract class GralUserAction
    * @param params
    * @return
    */
+  @Deprecated
   public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
     if(bCallDeprecated) return false;
     else return exec(actionCode, widgd, params); 

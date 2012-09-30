@@ -44,7 +44,7 @@ public abstract class GralLed extends GralWidget
    * or {@link #setValue(float)}.
    * 
    */
-  private GralColor[] colorBorderSelectable, colorInnerSelectable;
+  private final GralColor[] colorBorderSelectable, colorInnerSelectable;
   
   
   /**The colors which are used for repaint (if not null). */
@@ -62,6 +62,11 @@ public abstract class GralLed extends GralWidget
 
   public abstract void XXXsetColor(int nBorderColor, int nInnerColor);
 
+  /**This method is invoked if more as one variable is assigned to the widget.
+   * It sets the line and the back color which is the inner color (back) and border (line).
+   * The values should be integer-readable. 
+   * @see org.vishia.gral.base.GralWidget#setValue(java.lang.Object[])
+   */
   @Override public void setValue(Object[] values){
     if(values.length >=2){
       int val1 = ObjectValue.getInt(values[0]);
@@ -70,6 +75,7 @@ public abstract class GralLed extends GralWidget
       if(val2 >= colorInnerSelectable.length){ val2 = colorInnerSelectable.length -1; }
       dyda.lineColor = colorBorderSelectable[val1];
       dyda.backColor = colorInnerSelectable[val2];
+      dyda.setChanged(GralWidget.chgColorBack | GralWidget.chgColorLine);
       repaint(repaintDelay, repaintDelayMax);
     }
   }
