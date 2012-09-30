@@ -899,6 +899,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    */
   @Override public void setText(CharSequence text){
     dyda.displayedText = text.toString(); 
+    dyda.setChanged(GralWidget.chgText);
     repaint(100, 100);
     //System.err.println(Assert.stackInfo("GralWidget - non overridden setText called; Widget = " + name + "; text=" + text, 5));
   }
