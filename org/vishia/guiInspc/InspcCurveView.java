@@ -207,7 +207,7 @@ public class InspcCurveView
     wind.addMenuItemGThread("menuBarCurveView", "&Window/open " + sName, actionOpenWindow);
   
     windFile = GralFileSelector.WindowFileSelection.create(gralMng);
-    windFile.fileSelector.fillIn(new File("D:/SFC/SBOX/ReflexAccess/curve2.inspc"));
+    windFile.fileSelector.fillIn(new File("D:/SFC/SBOX/ReflexAccess/curve2.inspc"), true);
   }
 
   
@@ -336,7 +336,7 @@ public class InspcCurveView
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(actionCode == KeyCode.mouse1Up){
         try{
-          windFile.fileSelector.fillIn(fileCurve);
+          windFile.fileSelector.fillIn(fileCurve, true);
           if(widgd.getCmd().equals("read")){
             windFile.fileSelector.setActionOnEnterFile(actionRead);
             windFile.fileSelector.setActionOnEnterPathNewFile(null);

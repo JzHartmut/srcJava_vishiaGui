@@ -199,7 +199,7 @@ public class FcmdFileCard extends GralFileSelector
     favorCard.add(favorPathInfo);  //only it is a new one, it will be checked.
     setOriginDir(favorPathInfo.getOriginDir());
     widgLabel.setText(favorPathInfo.selectName);
-    fillIn(dir);
+    fillIn(dir, false);
     setFocus();
   }
   
@@ -403,7 +403,7 @@ public class FcmdFileCard extends GralFileSelector
       GralTableLine_ifc line = otherFileCard.selectList.wdgdTable.getLine(sDirName);
       if(line !=null){
         File dir = (File)line.getUserData();
-        otherFileCard.fillIn(dir);    //use that directory.
+        otherFileCard.fillIn(dir, true);    //use that directory.
       }
       boolean bSameFile = otherFileCard.selectFile(sFileName);  //".." also
       if(!bSameFile){
@@ -416,7 +416,7 @@ public class FcmdFileCard extends GralFileSelector
             if(bToRoot = sDirPath.equals(sFileName)){
               //the directory of other is the current selected dir of this:
               File otherParent = otherDir.getParentFile();
-              otherFileCard.fillIn(otherParent);
+              otherFileCard.fillIn(otherParent, true);
               otherFileCard.selectFile(sFileName);
             }
           }
@@ -425,7 +425,7 @@ public class FcmdFileCard extends GralFileSelector
           //check whether a sub dir is selected:
           String sOtherSelectedFile = otherFileCard.currentFile.getName();
           if(sOtherSelectedFile.equals(sDirName)){
-            otherFileCard.fillIn(otherFileCard.currentFile);
+            otherFileCard.fillIn(otherFileCard.currentFile,true);
             otherFileCard.selectFile(sFileName);
           }
         }

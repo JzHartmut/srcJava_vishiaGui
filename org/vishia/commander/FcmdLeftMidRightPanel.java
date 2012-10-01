@@ -385,7 +385,7 @@ public class FcmdLeftMidRightPanel
       mainPanel.actFileCard.favorCard.fillFavorPaths(favorTabInfo);
       if(currentDir !=null){
         mainPanel.indexActualDir.put(mainPanel.actFileCard.favorPathInfo.selectName, currentDir.getPath());
-        mainPanel.actFileCard.fillIn(currentDir);
+        mainPanel.actFileCard.fillIn(currentDir, false);
       } 
       mainPanel.actFileCard.favorCard.setFocus();
       return true;
