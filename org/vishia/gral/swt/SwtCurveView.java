@@ -166,6 +166,8 @@ public class SwtCurveView extends GralCurveView
     
     private Color gridColorStrong = new Color(getDisplay(), 128, 255, 255);
     
+    private final Color colorCursor = new Color(getDisplay(), 64, 64, 64);
+    
     private final Color colorBack = new Color(getDisplay(), 0xff, 0xff, 0xff);
     
     public CurveView(Composite parent, int xPixel, int yPixel, int nrofXvalues,
@@ -436,6 +438,147 @@ public class SwtCurveView extends GralCurveView
     
     
     
+    /**Shifts the left draw area to left because only a right part of the curve should be drawn.
+     * It is to save calculation time
+     */
+    private int drawShiftAreaToLeft(GC g, Point size, int xView, int dxView, int yView, int dyView, int xViewPart, int timeDiff){
+      final int xp0;
+      testHelp.ctRedrawBecauseNewData +=1;
+      paintAllExec = false;
+      //
+      //calculate the number of x-pixel to shift in graphic to left and the width of the range to paint new:
+      //
+      //Shift the graphic if the reason of redraw is only increment samples
+      //and the number the values are shifted at least by that number, which is mapped to 1 pixel.
+      if(xViewPart >0 && xViewPart < size.x){
+        timeCaryOverNewValue = (int)(timeDiff - xViewPart * timeorg.timePerPixel);
+        xViewLastF -= xViewPart;
+        if(xView != 0){
+          //TODO what is if only a part of control is shown
+          stop();
+        }
+        xp0 = xView + dxView - xViewPart;
+        if(xpCursor1 >= xViewPart){  //only if the cursor is in the shifted area:
+          //restore graphic under cursor
+          g.drawImage(cursorStore1, size.x - xpCursor1, 0);
+        }
+        if(xpCursor2 >= xViewPart){  //only if the cursor is in the shifted area:
+          //restore graphic under cursor
+          g.drawImage(cursorStore2, size.x - xpCursor2, 0);
+        }
+        g.copyArea(xView + xViewPart, yView, dxView - xViewPart , dyView -5, xView, yView, false);
+        //
+        timeorg.pixelWrittenAfterStrongDiv += xViewPart;
+        
+        //System.out.println("SwtCurveView - draw - shift graphic;" + xViewPart);
+        //System.arraycopy(ixDataShown, 0, ixDataShown, xViewPart, size.x - xViewPart);
+        testHelp.ctRedrawPart +=1;
+      } else if(xViewPart >=size.x){ 
+        //too many new values. Show all
+        xViewPart = size.x;
+        xp0 = 0;
+        paintAllExec = true;
+        testHelp.ctRedrawAllShift +=1;
+        xViewLastF = 0.0F;
+      } else { //xViewPart <=0
+        //don't paint.
+        //System.out.println("SwtCurveView - draw - don't shift graphic;" + xViewPart);
+        xViewPart = 0;
+        xp0 = size.x;
+      }
+      return xp0;
+    }
+    
+    
+    
+    private void drawRightOrAll(GC g, Point size, int xView, int dxView, int yView, int dyView, int ixDataRight, int xViewPart, int timeDiff, int xp0){
+      g.setBackground(colorBack);
+      //fill, clear the area either from 0 to end or from size.x - xView to end,
+      g.fillRectangle(xp0, yView, xViewPart, dyView);  //fill the current background area
+      { //draw horizontal grid
+        float yG = dyView / gridDistanceX;
+        int yS = gridStrongPeriodX;
+        /*TODO
+        while(yGridF < dyView){
+          int yGrid = (int)yGridF;
+          if(--yS1 <=0){
+            yS1 = yS; g.setForeground(gridColorStrong);
+          } else { g.setForeground(gridColor);
+          }
+          g.drawLine(xViewLast, yGrid, dxView, yGrid);
+          yGridF += yG;
+        }
+        */
+      } 
+      //  
+      //prepare indices of data.
+      int ixixDataLast = prepareIndicesDataForDrawing(ixDataRight, xViewPart, timeDiff);
+      // 
+      //write time divisions:
+      g.setForeground(gridColor);
+      g.setLineWidth(1);
+      g.setLineStyle(SWT.LINE_DOT);
+      for(int ii=1; ii <=9; ++ii){
+        int y = (int)(size.y /10.0f * ii);
+        g.drawLine(size.x - xViewPart, y, size.x, y);
+        
+      }
+      //
+      int ixPixelTimeDiv =-1;
+      int xPixelTimeDiv1;
+      while((xPixelTimeDiv1 = timeorg.xPixelTimeDivFine[++ixPixelTimeDiv]) >=0) {
+        g.drawLine(size.x - xPixelTimeDiv1, 0, size.x - xPixelTimeDiv1, size.y);
+        //System.out.println("draw " + xPixelTimeDiv);
+      }
+      g.setForeground(gridColorStrong);
+      g.setLineWidth(1);
+      ixPixelTimeDiv =-1;
+      while((xPixelTimeDiv1 = timeorg.xPixelTimeDiv[++ixPixelTimeDiv]) >=0) {
+        g.drawLine(size.x - xPixelTimeDiv1, 0, size.x - xPixelTimeDiv1, size.y);
+        if(xPixelTimeDiv1 > 30){
+          g.setForeground((Color)itsMng.getColorImpl(GralColor.getColor("bk")));
+          g.drawText(timeorg.sTimeAbsDiv[ixPixelTimeDiv], size.x - 6 - xPixelTimeDiv1, size.y - 25);
+          g.setForeground(gridColorStrong);
+          timeorg.pixelWrittenAfterStrongDiv = Integer.MIN_VALUE;
+        }
+        //System.out.println("draw " + xPixelTimeDiv);
+      }
+      //write all tracks.
+      g.setLineStyle(SWT.LINE_SOLID);
+      int iTrack = 0;
+      int ixData;
+      for(Track track: listTracks){
+        //draw line per track
+        drawTrack(g, size, track, iTrack, ixixDataLast);
+        iTrack +=1;
+      } //for listlines
+      ixDataDraw = ixDataRight;
+      //
+      if(timeorg.pixelWrittenAfterStrongDiv > 30){
+        g.drawText(timeorg.sTimeAbsDiv[0], size.x - 6 - timeorg.pixelWrittenAfterStrongDiv, size.y - 25);
+        timeorg.pixelWrittenAfterStrongDiv = Integer.MIN_VALUE;
+      }
+      //set the cursors
+      if(xpCursor1 >=0){
+        int xpCursor = size.x - xpCursor1;
+        g.copyArea(cursorStore1, xpCursor, 0);
+        g.setForeground(colorCursor);
+        g.setLineWidth(1);
+        g.drawLine(xpCursor, 0, xpCursor, size.y);
+      }
+      if(xpCursor2 >=0){
+        int xpCursor = size.x - xpCursor2;
+        g.copyArea(cursorStore2, xpCursor, 0);
+        //if(xViewPart >= size.x){
+          g.setForeground(colorCursor);
+          g.setLineWidth(1);
+          g.drawLine(xpCursor, 0, xpCursor, size.y);
+        //}
+      }
+
+    }
+    
+    
     
     @Override public void drawBackground(GC g, int xView, int yView, int dxView, int dyView) {
       //NOTE: forces stack overflow because calling of this routine recursively: super.paint(g);
@@ -460,57 +603,15 @@ public class SwtCurveView extends GralCurveView
           //paint only a part of the curve to save calculation time.
           //The curve will be shifted to left.
           //
-          testHelp.ctRedrawBecauseNewData +=1;
           if(ixDataRight != ixDataDraw){
             testStopWr = true;
             stop();
           }  
-          paintAllExec = false;
-          //
-          //calculate the number of x-pixel to shift in graphic to left and the width of the range to paint new:
           int timeLast = timeValues[(ixDataDraw >> shIxiData) & mIxiData];
           int timeNow = timeValues[(ixDataRight >> shIxiData) & mIxiData];
           timeDiff = timeNow - timeLast + timeCaryOverNewValue;  //0 if nothing was written.
           xViewPart = (int)(timeorg.pixel7time * timeDiff + 0.0f);
-          //
-          //Shift the graphic if the reason of redraw is only increment samples
-          //and the number the values are shifted at least by that number, which is mapped to 1 pixel.
-          if(xViewPart >0 && xViewPart < size.x){
-            timeCaryOverNewValue = (int)(timeDiff - xViewPart * timeorg.timePerPixel);
-            xViewLastF -= xViewPart;
-            if(xView != 0){
-              //TODO what is if only a part of control is shown
-              stop();
-            }
-            xp0 = xView + dxView - xViewPart;
-            if(xpCursor1 >= xViewPart){  //only if the cursor is in the shifted area:
-              //restore graphic under cursor
-              g.drawImage(cursorStore1, size.x - xpCursor1, 0);
-            }
-            if(xpCursor2 >= xViewPart){  //only if the cursor is in the shifted area:
-              //restore graphic under cursor
-              g.drawImage(cursorStore2, size.x - xpCursor2, 0);
-            }
-            g.copyArea(xView + xViewPart, yView, dxView - xViewPart , dyView -5, xView, yView, false);
-            //
-            timeorg.pixelWrittenAfterStrongDiv += xViewPart;
-            
-            //System.out.println("SwtCurveView - draw - shift graphic;" + xViewPart);
-            //System.arraycopy(ixDataShown, 0, ixDataShown, xViewPart, size.x - xViewPart);
-            testHelp.ctRedrawPart +=1;
-          } else if(xViewPart >=size.x){ 
-            //too many new values. Show all
-            xViewPart = size.x;
-            xp0 = 0;
-            paintAllExec = true;
-            testHelp.ctRedrawAllShift +=1;
-            xViewLastF = 0.0F;
-          } else { //xViewPart <=0
-            //don't paint.
-            //System.out.println("SwtCurveView - draw - don't shift graphic;" + xViewPart);
-            xViewPart = 0;
-            xp0 = size.x;
-          }
+          xp0 = drawShiftAreaToLeft(g, size, xView, dxView, yView, dyView, xViewPart, timeDiff);
         } else { //paintall
           timeorg.calc();
           System.out.println("SwtCurveView - paintall;" + bFreeze + paintAllCmd + redrawBecauseNewData1);
@@ -531,93 +632,8 @@ public class SwtCurveView extends GralCurveView
         if(xViewPart >0) { //only if anything is to draw
           //only if a new point should be drawn.
           try{Thread.sleep(2);} catch(InterruptedException exc){}
-          int nrofTrack = listTracks.size();
-          g.setBackground(colorBack);
-          //fill, clear the area either from 0 to end or from size.x - xView to end,
-          g.fillRectangle(xp0, yView, xViewPart, dyView);  //fill the current background area
-          { //draw horizontal grid
-            float yG = dyView / gridDistanceX;
-            int yS = gridStrongPeriodX;
-            float yGridF = yG;
-            int yS1 = yS;
-            /*TODO
-            while(yGridF < dyView){
-              int yGrid = (int)yGridF;
-              if(--yS1 <=0){
-                yS1 = yS; g.setForeground(gridColorStrong);
-              } else { g.setForeground(gridColor);
-              }
-              g.drawLine(xViewLast, yGrid, dxView, yGrid);
-              yGridF += yG;
-            }
-            */
-          } 
-          //  
-          //prepare indices of data.
-          int ixixDataLast = prepareIndicesDataForDrawing(ixDataRight, xViewPart, timeDiff);
-          // 
-          //write time divisions:
-          g.setForeground(gridColor);
-          g.setLineWidth(1);
-          g.setLineStyle(SWT.LINE_DOT);
-          for(int ii=1; ii <=9; ++ii){
-            int y = (int)(size.y /10.0f * ii);
-            g.drawLine(size.x - xViewPart, y, size.x, y);
-            
-          }
-          //
-          int ixPixelTimeDiv =-1;
-          int xPixelTimeDiv1;
-          while((xPixelTimeDiv1 = timeorg.xPixelTimeDivFine[++ixPixelTimeDiv]) >=0) {
-            g.drawLine(size.x - xPixelTimeDiv1, 0, size.x - xPixelTimeDiv1, size.y);
-            //System.out.println("draw " + xPixelTimeDiv);
-          }
-          g.setForeground(gridColorStrong);
-          g.setLineWidth(1);
-          ixPixelTimeDiv =-1;
-          while((xPixelTimeDiv1 = timeorg.xPixelTimeDiv[++ixPixelTimeDiv]) >=0) {
-            g.drawLine(size.x - xPixelTimeDiv1, 0, size.x - xPixelTimeDiv1, size.y);
-            if(xPixelTimeDiv1 > 30){
-              g.setForeground((Color)itsMng.getColorImpl(GralColor.getColor("bk")));
-              g.drawText(timeorg.sTimeAbsDiv[ixPixelTimeDiv], size.x - 6 - xPixelTimeDiv1, size.y - 25);
-              g.setForeground(gridColorStrong);
-              timeorg.pixelWrittenAfterStrongDiv = Integer.MIN_VALUE;
-            }
-            //System.out.println("draw " + xPixelTimeDiv);
-          }
-          //write all tracks.
-          g.setLineStyle(SWT.LINE_SOLID);
-          int iTrack = 0;
-          int ixData;
-          for(Track track: listTracks){
-            //draw line per track
-            drawTrack(g, size, track, iTrack, ixixDataLast);
-            iTrack +=1;
-          } //for listlines
-          ixDataDraw = ixDataRight;
-          //
-          if(timeorg.pixelWrittenAfterStrongDiv > 30){
-            g.drawText(timeorg.sTimeAbsDiv[0], size.x - 6 - timeorg.pixelWrittenAfterStrongDiv, size.y - 25);
-            timeorg.pixelWrittenAfterStrongDiv = Integer.MIN_VALUE;
-          }
-          //set the cursors
-          if(xpCursor1 >=0){
-            int xpCursor = size.x - xpCursor1;
-            g.copyArea(cursorStore1, xpCursor, 0);
-            g.setForeground(gridColor);
-            g.setLineWidth(1);
-            g.drawLine(xpCursor, 0, xpCursor, size.y);
-          }
-          if(xpCursor2 >=0){
-            int xpCursor = size.x - xpCursor2;
-            g.copyArea(cursorStore2, xpCursor, 0);
-            //if(xViewPart >= size.x){
-              g.setForeground(gridColor);
-              g.setLineWidth(1);
-              g.drawLine(xpCursor, 0, xpCursor, size.y);
-            //}
-          }
-  
+          drawRightOrAll(g, size, xView, dxView, yView, dyView, ixDataRight, xViewPart, timeDiff, xp0);
+          
         } else { //xViewPart == 0
           //This is is normal case if a new value in data has a too less new timestamp.
           //It can't be shown. Await the next values. Any value will be have a more newer timestamp
