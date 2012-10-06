@@ -458,13 +458,15 @@ public class SwtCurveView extends GralCurveView
           stop();
         }
         xp0 = xView + dxView - xViewPart;
-        if(xpCursor1 >= xViewPart){  //only if the cursor is in the shifted area:
+        if(xpCursor1 >= 0){ //xViewPart){  //only if the cursor is in the shifted area:
           //restore graphic under cursor
           g.drawImage(cursorStore1, size.x - xpCursor1, 0);
+          //System.out.println("cursor1 " + xpCursor1);
         }
-        if(xpCursor2 >= xViewPart){  //only if the cursor is in the shifted area:
+        if(xpCursor2 >= 0){ //xViewPart){  //only if the cursor is in the shifted area:
           //restore graphic under cursor
           g.drawImage(cursorStore2, size.x - xpCursor2, 0);
+          //System.out.println("cursor2 " + xpCursor2);
         }
         g.copyArea(xView + xViewPart, yView, dxView - xViewPart , dyView -5, xView, yView, false);
         //
@@ -641,20 +643,22 @@ public class SwtCurveView extends GralCurveView
           SwtCurveView.super.nrofValuesLessViewPart +=1;
           //System.out.println("SwtCurveView - xViewPart=0");
         }
-        if(nrofValues >0){
-          int ixDataRel2 = ((ixDataWr - ixDataDraw)  >> shIxiData) & mIxiData;
-          int ixDataRel1 = ((ixDataWr - ixDataShown[size.x])  >> shIxiData) & mIxiData;
-          int iPixRange2 = size.x * ixDataRel2 / maxNrofXValues;
-          int iPixRange1 = size.x * ixDataRel1 / maxNrofXValues;
-          int ixDWr = (ixDataWr >> shIxiData) & mIxiData;
-          //System.out.println("SwtCurveView.spread; " + ixDataRel1 + ".." + ixDataRel2 + " ->" +  ixDWr);
+        if(nrofValues >0){  //don't work if no data are stored.
+          int ixDataShow2 = ((ixDataWr - ixDataDraw)  >> shIxiData) & mIxiData;  //index of data which are shown right
+          int ixDataShow1 = ((ixDataWr - ixDataShown[size.x])  >> shIxiData) & mIxiData; //index of data which are shown left
+          float ixDataRel2 = (float)ixDataShow2 / maxNrofXValues;  //value 0..1 which range of buffer is shown 
+          float ixDataRel1 = (float)ixDataShow1 / maxNrofXValues;
+          int iPixRange2 = size.x - (int)(size.x * ixDataRel2);  //Position shown range right in pixel
+          int iPixRange1 = size.x - (int)(size.x * ixDataRel1);  //left
+          //int ixDWr = (ixDataWr >> shIxiData) & mIxiData;
+          //System.out.println("SwtCurveView.spread; " + ixDataRel1 + ".." + ixDataRel2);
           g.setLineWidth(5);
           g.setForeground((Color)itsMng.getColorImpl(GralColor.getColor("ye")));
-          g.drawLine(0, size.y -3, size.x - iPixRange1, size.y -3);
-          g.drawLine(size.x - iPixRange2, size.y -3, 0, size.y -3);
+          g.drawLine(0, size.y -3, iPixRange1, size.y -3);  //left not shown range.
+          g.drawLine(iPixRange2, size.y -3, size.x, size.y -3);  //right non shown range.
           g.setForeground((Color)itsMng.getColorImpl(GralColor.getColor("dgr")));
           //g.setAlpha(128);
-          g.drawLine(size.x - iPixRange1, size.y -3, size.x - iPixRange2, size.y -3);
+          g.drawLine(iPixRange1, size.y -3, iPixRange2, size.y -3);  //shown range
         }
       } catch(Exception exc){
         StackTraceElement[] stack = exc.getStackTrace();

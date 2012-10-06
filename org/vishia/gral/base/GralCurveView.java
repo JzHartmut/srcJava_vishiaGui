@@ -206,6 +206,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     
   }
   
+  /**Inner class for time organisation. */
   protected static class TimeOrganisation{
     
     /**The shorttime-stamp to the {@link #absTime} timestamp. Set with {@link GralCurveView#setTimePoint(long, int, float)}. */
@@ -218,7 +219,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     public float absTime_Millisec7short = 1.0f;
     
     
-    public int lastTimeWrittenDateInCurve;
+    public int lastShortTimeDateInCurve;
+    
+    /**Short time stamp of the oldest stored point. */
+    public int firstShortTimeDateInCurve;
     
     public int nrofPixelForTimestep;
     
@@ -374,6 +378,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    * [0] is right. 2000 are enough for a large representation.
    * It is the number of pixel.
    * This array is filled newly whenever any draw or paint action is done. It is prepared in the routine
+   * The field contains old indices if the size of drawing is less then the size of window.
    * {@link #prepareIndicesDataForDrawing(int, int, int)} and used in the drawTrack routine of the implementation level.
    */
   protected final int[] ixDataShown = new int[2000];
@@ -682,11 +687,6 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     }
     */
     if(testStopWr) return;  //only for debug test.
-    if(nrofValues < maxNrofXValues){
-      this.nrofValues +=1;
-    } else {
-      nrofDataShift.incrementAndGet(); //shift data in graphic.
-    }
     //if(++ixDataWr >= maxNrofXValues){ ixDataWr = 0; } //wrap arround.
     ixDataWr += adIxData;
     if(!bFreeze){
@@ -702,7 +702,20 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     for(Track track: tracks){
       track.values[ixWr] = newValues[++ixSource];  //write in the values.
     }
+    int timeLast = timeValues[ixWr];
     timeValues[ixWr] = timeshort;
+    
+    timeorg.lastShortTimeDateInCurve = timeshort;
+    if(nrofValues < maxNrofXValues){
+      if(nrofValues ==0){
+        timeorg.firstShortTimeDateInCurve = timeshort;
+      }
+      this.nrofValues +=1;
+    } else {
+      timeorg.firstShortTimeDateInCurve = timeLast;
+      nrofDataShift.incrementAndGet(); //shift data in graphic.
+    }
+
     if(!bFreeze){
       redrawBecauseNewData = true;
       repaint(20,50);
@@ -864,7 +877,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
           }
         }
       } while( ixp == ixp2   //all values for the same 1 pixel
-            && dtime2 <00     //stop at time crack to newer values.
+            && dtime2 <0     //stop at time crack to newer values.
           //&& nrofValues >0
             //&& ixData != ixDataRight  //no more as one wrap around, if dtime == 0 or is less
              );
@@ -877,6 +890,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       }
       ixData2 = ixData;
     } 
+    if(ixp < xViewPart){
+      System.out.println("GralCurveView large xViewPart");
+    }
     //ixDataShown[++ixp2] = -1;      //the last
     return ixp;
   }
@@ -1004,6 +1020,13 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    * If the curve presentation is running yet, a finer solution in the present is given. 
    * Note that in this case the right index is the actual write index.*/
   protected void zoomToPresent(){
+    if(xpCursor1 >=0){
+      ixDataCursor1 = ixDataShown[xpCursor1];
+    }
+    if(xpCursor2 >=0){
+      ixDataCursor2 = ixDataShown[xpCursor2];
+    }
+    xpCursor1 = xpCursor2 = cmdSetCursor;  
     timeorg.timeSpread /=2;    //half timespread
     System.out.println("right-top");
   }
@@ -1016,6 +1039,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    * Note that in this case the right index is the actual write index.*/
   protected void zoomToPast(){
     //zoom out
+    int maxTimeSpread = timeorg.lastShortTimeDateInCurve - timeorg.firstShortTimeDateInCurve;
     if(xpCursor1 >=0){
       ixDataCursor1 = ixDataShown[xpCursor1];
     }
@@ -1041,8 +1065,12 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     int ixiData2 = (ixDataShown[xpCursor2] >> shIxiData) & mIxiData;
     int time1 = timeValues[ixiData1];
     int time2 = timeValues[ixiData2];
-    timeorg.timeSpread = (time2 - time1) * 10/8;
-    assert(timeorg.timeSpread >0);
+    if((time2 - time1)>0){
+      timeorg.timeSpread = (time2 - time1) * 10/8;
+      assert(timeorg.timeSpread >0);
+    } else {
+      stop();
+    }
     xpCursor1 = xpCursor2 = cmdSetCursor;  
 
   }
