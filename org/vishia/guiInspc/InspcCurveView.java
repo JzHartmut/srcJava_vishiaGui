@@ -33,6 +33,7 @@ public class InspcCurveView
   /**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
    * Changes:
    * <ul>
+   * <li>2012-10-09 Hartmut now ctrl-mouse down sets the scale settings for the selected channel. Faster user operation.
    * <li>2012-08-10 Hartmut now uses a default directory for config file given in constructor.
    * <li>2012-07-06 Hartmut now read and save of the file works.
    * <li>2012-06-29 Hartmut new open file dialog
@@ -165,7 +166,7 @@ public class InspcCurveView
     gralMng.setPosition(4, 0, 4, 0, 0, '.');
     //int windProps = GralWindow.windConcurrently | GralWindow.windOnTop | GralWindow.windResizeable;
     int windProps = GralWindow.windConcurrently ; // | GralWindow.windResizeable;
-    windCurve = gralMng.createWindow("windMapVariables", "Curve A", windProps);
+    windCurve = gralMng.createWindow("windMapVariables", sName, windProps);
     //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 0, 'd');
     gralMng.setPosition(0, -2, 0, -10, 0, 'd');
     widgCurve = gralMng.addCurveViewY(sName, 3000, 10);
@@ -309,11 +310,11 @@ public class InspcCurveView
   
   
   /**
-   * 
+   *  ///
    */
   GralUserAction actionSetTrackForScale = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
-    { if(actionCode == KeyCode.mouse1Down){
+    { if((actionCode) == KeyCode.mouse1Down){
         if(trackScale !=null){
           //last variable
           trackScale.widgVarPath.setBackgroundColor(GralColor.getColor("wh"));
@@ -326,6 +327,30 @@ public class InspcCurveView
         widgScale.setText("" + trackScale.trackView.getScale7div());
         widgScale0.setText("" + trackScale.trackView.getOffset());
         widgline0.setText("" + trackScale.trackView.getLinePercent());
+        widgCurve.repaint();
+      }
+      else if(actionCode == (KeyCode.mouse1Down | KeyCode.ctrl)){
+        if(trackScale !=null){
+          //last variable
+          trackScale.widgVarPath.setBackgroundColor(GralColor.getColor("wh"));
+          trackScale.trackView.setLineProperties(colorLineTrackSelected, 1, 0);
+        }
+        trackScale = (TrackValues)widgd.getContentInfo();
+        colorLineTrackSelected = trackScale.trackView.getLineColor();
+        trackScale.trackView.setLineProperties(colorLineTrackSelected, 2, 0);
+        trackScale.widgVarPath.setBackgroundColor(GralColor.getColor("lam"));
+        try{
+          String s1 = widgScale.getText();
+          float scale = Float.parseFloat(s1);
+          s1 = widgScale0.getText();
+          float scale0 = Float.parseFloat(s1);
+          s1 = widgline0.getText();
+          int line0 = (int)Float.parseFloat(s1);
+          //widgCurve.setMinMax(trackScale.scale, -trackScale.scale);
+          trackScale.trackView.setTrackScale(scale, scale0, line0);
+        } catch(NumberFormatException exc){
+          System.err.println("InspcCurveView - read scale values format error.");
+        }
       }
       return true;
   } };
