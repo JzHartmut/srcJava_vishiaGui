@@ -24,6 +24,12 @@ public class AwtSubWindow extends GralWindow
     // TODO Auto-generated constructor stub
   }
 
+  @Override public void setTitle(String sTitle){
+    window.setTitle(sTitle);
+  }
+
+
+  
   @Override
   public void setMouseAction(GralUserAction action)
   {

@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.communication.InspcDataExchangeAccess;
+import org.vishia.curves.WriteCurve_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralMenu;
@@ -19,7 +20,6 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralCurveViewTrack_ifc;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWindowMng_ifc;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.inspectorAccessor.InspcAccessEvaluatorRxTelg;
 import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
@@ -67,15 +67,22 @@ public class InspcCurveView
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  @SuppressWarnings("hiding")
+  //@SuppressWarnings("hiding")
   public final static int version = 20120907;
 
+  public static String sBtnReadCfg = "read cfg";
+  
+  public static String sBtnSaveCfg = "save cfg";
+  
+  public static String sBtnReadValues = "read values";
+  
+  public static String sBtnSaveValues = "save values";
   
   
   /**Three windows for curve view. */
   GralWindow windCurve;
   
-  GralFileSelector.WindowFileSelection windFile;
+  GralFileSelector.WindowFileSelection windFileCfg, windFileValues;
   
   final GralMng gralMng;
   
@@ -90,9 +97,9 @@ public class InspcCurveView
     
     //GralTextField widgScale;
     
-    GralTextField widgBit;
+    //GralTextField widgBit;
     
-    GralTextField widgComment;
+    //GralTextField widgComment;
 
     
     GralWidget widgetVariable;
@@ -130,7 +137,9 @@ public class InspcCurveView
   
   GralTextField widgScale, widgScale0, widgline0;
   
-  GralButton widgBtnUp, widgBtnDn, widgBtnScale, widgBtnRead,widgBtnSave;
+  GralButton widgBtnUp, widgBtnDn, widgBtnScale, widgBtnReadCfg, widgBtnSaveCfg;
+  
+  GralButton widgBtnReadValues, widgBtnSaveValues; 
   
   
   /**
@@ -141,7 +150,9 @@ public class InspcCurveView
   GralButton widgBtnOff;
   
   /**The currently loaded file for curve settings. */
-  File fileCurve;
+  File fileCurveCfg;
+  
+  File fileCurveSave;
   
   //final InspcGuiComm comm;
   
@@ -151,7 +162,8 @@ public class InspcCurveView
     //this.comm = comm;
     this.variables = variables;
     this.gralMng = gralMng;
-    fileCurve = new File(defaultDir);
+    fileCurveCfg = new File(defaultDir);
+    fileCurveSave = new File(defaultDir);
   }
   
   
@@ -161,16 +173,16 @@ public class InspcCurveView
    */
   public void buildGraphic(GralPrimaryWindow_ifc wind, String sName)
   {
-    
+    int posright = -20;
     gralMng.selectPanel("primaryWindow");
     gralMng.setPosition(4, 0, 4, 0, 0, '.');
     //int windProps = GralWindow.windConcurrently | GralWindow.windOnTop | GralWindow.windResizeable;
     int windProps = GralWindow.windConcurrently ; // | GralWindow.windResizeable;
     windCurve = gralMng.createWindow("windMapVariables", sName, windProps);
     //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 0, 'd');
-    gralMng.setPosition(0, -2, 0, -10, 0, 'd');
+    gralMng.setPosition(0, -2, 0, posright, 0, 'd');
     widgCurve = gralMng.addCurveViewY(sName, 3000, 10);
-    gralMng.setPosition(0, GralPos.size +2, -10, 0, 0, 'd', 0);
+    gralMng.setPosition(0, GralPos.size +2, posright, 0, 0, 'd', 0);
     gralMng.addText("curve variable");
     for(int ii=0; ii<10; ++ii){
       TrackValues track = new TrackValues();
@@ -199,16 +211,20 @@ public class InspcCurveView
     widgBtnUp = gralMng.addButton("btnUp", actionSetScaleValues2Track, "+", null, "+");
     gralMng.setPosition(GralPos.same, GralPos.size +2, GralPos.next, GralPos.size +4, 0, 'r', 1);
     widgBtnScale = gralMng.addButton("btnScale", actionSetScaleValues2Track, "!", null,  "set");
-    gralMng.setPosition(35, GralPos.size +2, -10, GralPos.size +4, 0, 'r', 2);
-    widgBtnRead = gralMng.addButton("btnRead", actionOpenFileDialog, "read", null, "read");
-    widgBtnSave = gralMng.addButton("btnSave", actionOpenFileDialog, "save", null, "save");
+    gralMng.setPosition(23, GralPos.size +2, posright, GralPos.size +8, 0, 'd', 1);
+    widgBtnReadCfg = gralMng.addButton("btnReadCfg", actionOpenFileDialog, sBtnReadCfg, null, sBtnReadCfg);
+    widgBtnSaveCfg = gralMng.addButton("btnSaveCfg", actionOpenFileDialog, sBtnSaveCfg, null, sBtnSaveCfg);
+    widgBtnReadValues = gralMng.addButton("btnReadValues", actionOpenFileDialog, sBtnReadValues, null, sBtnReadValues);
+    widgBtnSaveValues = gralMng.addButton("btnSaveValues", actionOpenFileDialog, sBtnSaveValues, null, sBtnSaveValues);
     
     gralMng.setPosition(-3, GralPos.size +2, -9, -1, 0, 'd', 0);
     widgBtnOff = gralMng.addSwitchButton(sName + "btnOff", "off / ?on", "on / ?off", GralColor.getColor("lgn"), GralColor.getColor("am"));
     wind.addMenuItemGThread("menuBarCurveView", "&Window/open " + sName, actionOpenWindow);
   
-    windFile = GralFileSelector.WindowFileSelection.create(gralMng);
-    windFile.fileSelector.fillIn(new File("D:/SFC/SBOX/ReflexAccess/curve2.inspc"), true);
+    windFileCfg = GralFileSelector.WindowFileSelection.create(gralMng);
+    windFileCfg.fileSelector.fillIn(new File("D:/SFC/SBOX/ReflexAccess/curve2.inspc"), true);
+    windFileValues = GralFileSelector.WindowFileSelection.create(gralMng);
+    windFileValues.fileSelector.fillIn(new File("D:/SFC/SBOX/ReflexAccess"), true);
   }
 
   
@@ -299,9 +315,9 @@ public class InspcCurveView
             int line0 = (int)Float.parseFloat(s1);
             //widgCurve.setMinMax(trackScale.scale, -trackScale.scale);
             trackScale.trackView.setTrackScale(scale, scale0, line0);
-            widgBtnScale.setForegroundColor(GralColor.getColor("lgn"));
+            widgBtnScale.setLineColor(GralColor.getColor("lgn"),0);
           } catch(NumberFormatException exc){
-            widgBtnScale.setForegroundColor(GralColor.getColor("lrd"));
+            widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
           }
         }
       }
@@ -317,13 +333,13 @@ public class InspcCurveView
     { if((actionCode) == KeyCode.mouse1Down){
         if(trackScale !=null){
           //last variable
-          trackScale.widgVarPath.setBackgroundColor(GralColor.getColor("wh"));
+          trackScale.widgVarPath.setBackColor(GralColor.getColor("wh"),0);
           trackScale.trackView.setLineProperties(colorLineTrackSelected, 1, 0);
         }
         trackScale = (TrackValues)widgd.getContentInfo();
         colorLineTrackSelected = trackScale.trackView.getLineColor();
         trackScale.trackView.setLineProperties(colorLineTrackSelected, 2, 0);
-        trackScale.widgVarPath.setBackgroundColor(GralColor.getColor("lam"));
+        trackScale.widgVarPath.setBackColor(GralColor.getColor("lam"),0);
         widgScale.setText("" + trackScale.trackView.getScale7div());
         widgScale0.setText("" + trackScale.trackView.getOffset());
         widgline0.setText("" + trackScale.trackView.getLinePercent());
@@ -332,13 +348,13 @@ public class InspcCurveView
       else if(actionCode == (KeyCode.mouse1Down | KeyCode.ctrl)){
         if(trackScale !=null){
           //last variable
-          trackScale.widgVarPath.setBackgroundColor(GralColor.getColor("wh"));
+          trackScale.widgVarPath.setBackColor(GralColor.getColor("wh"),0);
           trackScale.trackView.setLineProperties(colorLineTrackSelected, 1, 0);
         }
         trackScale = (TrackValues)widgd.getContentInfo();
         colorLineTrackSelected = trackScale.trackView.getLineColor();
         trackScale.trackView.setLineProperties(colorLineTrackSelected, 2, 0);
-        trackScale.widgVarPath.setBackgroundColor(GralColor.getColor("lam"));
+        trackScale.widgVarPath.setBackColor(GralColor.getColor("lam"),0);
         try{
           String s1 = widgScale.getText();
           float scale = Float.parseFloat(s1);
@@ -361,17 +377,29 @@ public class InspcCurveView
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(actionCode == KeyCode.mouse1Up){
         try{
-          windFile.fileSelector.fillIn(fileCurve, true);
-          if(widgd.getCmd().equals("read")){
-            windFile.fileSelector.setActionOnEnterFile(actionRead);
-            windFile.fileSelector.setActionOnEnterPathNewFile(null);
-          } else {
-            windFile.fileSelector.setActionOnEnterFile(actionSave);
-            windFile.fileSelector.setActionOnEnterPathNewFile(actionSave);
+          if(widgd.getCmd().equals(sBtnReadCfg)){
+            windFileCfg.fileSelector.fillIn(fileCurveCfg, true);
+            windFileCfg.fileSelector.setActionOnEnterFile(actionReadCfg);
+            windFileCfg.fileSelector.setActionOnEnterPathNewFile(null);
+            windFileCfg.openDialog(".", widgd.getCmd());
+          } else if(widgd.getCmd().equals(sBtnSaveCfg)){
+            windFileCfg.fileSelector.fillIn(fileCurveCfg, true);
+            windFileCfg.fileSelector.setActionOnEnterFile(actionSaveCfg);
+            windFileCfg.fileSelector.setActionOnEnterPathNewFile(actionSaveCfg);
+            windFileCfg.openDialog(".", widgd.getCmd());
+          } else if(widgd.getCmd().equals(sBtnReadValues)){
+            windFileValues.fileSelector.fillIn(fileCurveSave, true);
+            windFileValues.fileSelector.setActionOnEnterFile(actionSaveCfg);
+            windFileValues.fileSelector.setActionOnEnterPathNewFile(actionSaveCfg);
+            windFileValues.openDialog(".", widgd.getCmd());
+          } else if(widgd.getCmd().equals(sBtnSaveValues)){
+            windFileValues.fileSelector.fillIn(fileCurveSave, true);
+            windFileValues.fileSelector.setActionOnEnterFile(actionSaveValues);
+            windFileValues.fileSelector.setActionOnEnterPathNewFile(actionSaveValues);
+            windFileValues.openDialog(".", widgd.getCmd());
           }
-          windFile.openDialog(".");
         } catch(Exception exc){
-          widgBtnScale.setForegroundColor(GralColor.getColor("lrd"));
+          widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
         }
       }
       return true;
@@ -379,15 +407,15 @@ public class InspcCurveView
   
   
   
-  GralUserAction actionRead = new GralUserAction(){
+  GralUserAction actionReadCfg = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
-          fileCurve = (File)params[0];
-          System.out.println("InspcCurveView - read curve view from; " + fileCurve.getAbsolutePath());
-          String in = FileSystem.readFile(fileCurve);
+          fileCurveCfg = (File)params[0];
+          System.out.println("InspcCurveView - read curve view from; " + fileCurveCfg.getAbsolutePath());
+          String in = FileSystem.readFile(fileCurveCfg);
           if(in ==null){
-            System.err.println("InspcCurveView - actionRead, file not found;" + fileCurve.getAbsolutePath());
+            System.err.println("InspcCurveView - actionRead, file not found;" + fileCurveCfg.getAbsolutePath());
           } else {
             if(widgCurve.applySettings(in)){ 
               List<? extends GralCurveViewTrack_ifc> listTracks = widgCurve.getTrackInfo();
@@ -402,9 +430,9 @@ public class InspcCurveView
             }
           }
         } catch(Exception exc){
-          widgBtnScale.setForegroundColor(GralColor.getColor("lrd"));
+          widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
         }
-        windFile.wind.closeWindow();
+        windFileCfg.wind.closeWindow();
       }
       return true;
   } };
@@ -412,22 +440,46 @@ public class InspcCurveView
   
   
 
-  GralUserAction actionSave = new GralUserAction(){
+  GralUserAction actionSaveCfg = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
-          fileCurve = (File)params[0];
+          fileCurveCfg = (File)params[0];
           //File file = new File("curve.save");
-          System.out.println("InspcCurveView - save curve view to; " + fileCurve.getAbsolutePath());
-          Writer out = new FileWriter(fileCurve);
+          System.out.println("InspcCurveView - save curve view to; " + fileCurveCfg.getAbsolutePath());
+          Writer out = new FileWriter(fileCurveCfg);
           widgCurve.writeSettings(out);
           out.close();
         } catch(Exception exc){
-          widgBtnScale.setForegroundColor(GralColor.getColor("lrd"));
+          widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
         }
       }
       return true;
   } };
+  
+  
+  
+  
+  GralUserAction actionSaveValues = new GralUserAction(){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        try{
+          fileCurveSave = (File)params[0];
+          //File file = new File("curve.save");
+          System.out.println("InspcCurveView - save curve data to; " + fileCurveSave.getAbsolutePath());
+          Class clazzCurveWriter = Class.forName("org.vishia.curves.WriteCurveCsv");
+          
+          WriteCurve_ifc writerCurve = (WriteCurve_ifc)clazzCurveWriter.newInstance();
+          writerCurve.setFile(fileCurveSave);
+          widgCurve.writeCurve(writerCurve);
+        } catch(Exception exc){
+          widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
+        }
+      }
+      return true;
+  } };
+  
+
   
   
 

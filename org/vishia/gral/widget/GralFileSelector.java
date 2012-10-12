@@ -55,6 +55,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2012-10-12 Hartmut chg {@link WindowFileSelection#openDialog(String, String)} with title.
    * <li>2012-10-01 Hartmut new now {@link #fillIn(File, boolean)} doesn't get the file properties if it is called with false.
    *   This makes it faster to show large content of folders on remote devices (in PC-network). If a file is selected
    *   it replaces its properties. 
@@ -380,7 +381,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
     /**Shows the window.
      * @param fileSelector
      */
-    public void openDialog(String path){
+    public void openDialog(String sStartPath, String sPrompt){
+      wind.setTitle(sPrompt);
       wind.setWindowVisible(true);
     }
     

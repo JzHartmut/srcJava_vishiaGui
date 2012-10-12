@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.vishia.byteData.VariableAccessWithIdx;
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.curves.WriteCurve_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralCurveViewTrack_ifc;
 import org.vishia.gral.ifc.GralCurveView_ifc;
@@ -218,6 +219,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     /**Milliseconds for 1 step of shorttime. */
     public float absTime_Millisec7short = 1.0f;
     
+    /**It is counted while the pair {@link #absTime_short} and {@link #absTime} is set newly.
+     * The pair is consistent only if this counter is the same before and after read.
+     */
+    private volatile int ctTimeSet;
     
     public int lastShortTimeDateInCurve;
     
@@ -343,13 +348,11 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   protected TimeOrganisation timeorg = new TimeOrganisation();
   
   
-  protected Track[] tracks;
-  
   
   /**All tracks. */
   protected final List<Track> listTracks = new LinkedList<Track>();
   
-  /**All tracks to return for filling. */
+  /**All tracks to return for filling. It has the same members in the same order like {@link #listTracks}*/
   protected final List<GralSetValue_ifc> listTrackSet = new LinkedList<GralSetValue_ifc>();
   
   /**A short timestamp for the values in {@link GralCurveView.Track#values}.
@@ -389,7 +392,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    */
   protected final int[] nrofPixel4data = new int[2000];
   
-  protected int ixLineInit = 0;
+  //protected int ixLineInit = 0;
   
   //protected final float[][] values;
   
@@ -543,7 +546,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
 
 
 
-  public GralCurveView(String sName, GralMng mng, int maxNrofXvaluesP, int nrofTracks)
+  public GralCurveView(String sName, GralMng mng, int maxNrofXvaluesP, int XXXnrofTracks)
   {
     super(sName, 'c', mng);
     
@@ -561,7 +564,6 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     this.ixDataWr = -adIxData; //initial write position, first increment to 0.
     //
     this.nrofValuesShow = 0;
-    tracks = new Track[nrofTracks];
     timeValues = new int[maxNrofXValues];
     for(int ix = 0; ix < maxNrofXValues; ++ix){
       timeValues[ix] = ix;  //store succession of time values to designate it as empty.  
@@ -586,7 +588,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   public GralCurveViewTrack_ifc initTrack(String sNameTrack, String sDataPath, GralColor color, int style
       , int nullLine, float scale, float offset)
   {
-    Track track = tracks[ixLineInit] = new Track(sNameTrack);
+    Track track = new Track(sNameTrack);
     track.values = new float[this.maxNrofXValues];
     listTracks.add(track);
     listTrackSet.add(track);
@@ -597,7 +599,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     track.yScale = scale;
     //yScale[ixLineInit] = scale;
     track.lineColor = color;
-    ixLineInit +=1;
+    //ixLineInit +=1;
     return track;
   }
 
@@ -641,9 +643,11 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   @Override public void setTimePoint(long date, int timeshort, float millisecPerTimeshort){
     timeorg.absTime = 0;   //graphic thread: don't use values
+    timeorg.ctTimeSet +=1;
     timeorg.absTime_short = timeshort;
     timeorg.absTime_Millisec7short = millisecPerTimeshort;
     timeorg.absTime = date; //graphic thread: now complete and consistent.
+    timeorg.ctTimeSet +=1;
   }
 
   
@@ -699,8 +703,12 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     }
     int ixSource = -1;
     int ixWr = (ixDataWr >> shIxiData) & mIxiData;
-    for(Track track: tracks){
-      track.values[ixWr] = newValues[++ixSource];  //write in the values.
+    for(Track track: listTracks){
+      if(ixSource < newValues.length -1){
+        track.values[ixWr] = newValues[++ixSource];  //write in the values.
+      } else {
+        track.values[ixWr] = 0;
+      }
     }
     int timeLast = timeValues[ixWr];
     timeValues[ixWr] = timeshort;
@@ -728,9 +736,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   @Override public void refreshFromVariable(VariableContainer_ifc container){
     if(bActive){
-      float[] values = new float[tracks.length];
+      float[] values = new float[listTracks.size()];
       int ixTrack = -1;
-      for(Track track: tracks){
+      for(Track track: listTracks){
         if(track.variable ==null ){ //no variable known, get it.
           String sDataPath = track.getDataPath();
           if(sDataPath !=null){
@@ -949,7 +957,6 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       if(!bOk){
         console.writeError(parser.getSyntaxErrorReport());
       } else {
-        ixLineInit = 0;
         listTracks.clear();
         listTrackSet.clear();
         ZbnfJavaOutput setData = new ZbnfJavaOutput(console);
@@ -982,6 +989,56 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     }
   }
   
+  
+  
+  @Override public void writeCurve(WriteCurve_ifc out){
+    int catastrophicCt = 1000;
+    boolean bOk = false;
+    do{
+      int ctTime = timeorg.ctTimeSet;
+      long absTime = timeorg.absTime;
+      int absTimeshort = timeorg.absTime_short;
+      float absTime_Millisec7short = timeorg.absTime_Millisec7short;
+      ctTime = timeorg.ctTimeSet;  //Note: it is volatile.
+      if(ctTime == timeorg.ctTimeSet && absTime != 0){
+        out.writeCurveTimestamp(absTimeshort, absTime, absTime_Millisec7short);
+        bOk = true;
+        break;
+      }
+    } while(--catastrophicCt >0);  //break
+    try{
+      if(!bOk){
+        out.writeCurveError("absolute time error");
+      } else {
+        int ctValues = this.nrofValues -1;  //read first, may be increment in next step
+        int ixData = ixDataWr - (ctValues << shIxiData);  //read only one time, the index start from.
+        float[] record = new float[listTracks.size()];
+        int ix = (ixData >> shIxiData) & mIxiData;
+        int timeshortLast = timeValues[ix];
+        out.writeCurveStart(timeshortLast);
+        
+        while((ixData != ixDataWr && --ctValues >=0)){
+          ix = (ixData >> shIxiData) & mIxiData;
+          int ixTrack = -1;
+          for(Track track: listTracks){
+            record[++ixTrack] = track.values[ix];
+          }
+          int timeshort = timeValues[ix];
+          if((timeshort - timeshortLast)<0){
+            //This is a older value since the last one,
+            //it means it is the first value, all others are overwritten.
+            out.writeCurveStart(timeshort);
+          }
+          out.writeCurveRecord(timeshort, record);
+          timeshortLast = timeshort;
+          ixData += adIxData;
+        }
+        out.writeCurveFinish();
+      }
+    }catch(IOException exc){
+      System.err.println(Assert.exceptionInfo("", exc, 0, 4));
+    }
+  }
   
   
   

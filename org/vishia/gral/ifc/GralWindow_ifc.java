@@ -96,7 +96,10 @@ public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc
    *   without parameter.
    */
   public abstract void setActionOnSettingInvisible(GralUserAction action);
+
   
   
+  public abstract void setTitle(String sTitle);
+
 
 }

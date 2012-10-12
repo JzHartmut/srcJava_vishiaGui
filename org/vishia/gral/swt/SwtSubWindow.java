@@ -103,7 +103,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
   
   /**The resizeListener will be activated if {@link #setResizeAction(GralUserAction)} will be called.
    * It calls this user action on resize. */
-  private ControlListener resizeListener = new ControlListener()
+  private final ControlListener resizeListener = new ControlListener()
   { @Override public void controlMoved(ControlEvent e) 
     { //do nothing if moved.
     }
@@ -165,10 +165,13 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
     
   }
   
-  
+  @Override public void setTitle(String sTitle){
+    window.setText(sTitle);
+  }
 
   
   //@Override
+  @Override
   public boolean setFocusGThread()
   { return window.setFocus();
   }
@@ -196,6 +199,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
   }
   
   
+  @Override
   public void removeWidgetImplementation()
   {
     window.dispose();
@@ -249,7 +253,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
 
   @Override public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction gralAction){
     if(menuBar == null){
-      menuBar = new SwtMenu("menubar", window, (GralMng)itsMng);
+      menuBar = new SwtMenu("menubar", window, itsMng);
     }
     menuBar.addMenuItemGthread(nameWidg, sMenuPath, gralAction);
   }

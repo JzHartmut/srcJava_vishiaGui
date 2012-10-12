@@ -1,6 +1,7 @@
 package org.vishia.gral.ifc;
 
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.curves.WriteCurve_ifc;
 import org.vishia.gral.base.GetGralWidget_ifc;
 
 /**This interface describes the capabilities of a curve view as application interface.
@@ -84,6 +85,9 @@ public interface GralCurveView_ifc extends GralWidget_ifc, GralSetValue_ifc, Get
   
   /**Returns true if the curve view is active. See {@link #activate(boolean)}. */
   boolean isActiv();
+  
+  void writeCurve(WriteCurve_ifc out);
+  
   
   /**The ZBNF-syntax of a setting for curve view. */
   static String syntaxSettings = "curveSettings::= { <Track> } \\e."
