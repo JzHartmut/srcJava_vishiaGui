@@ -123,9 +123,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     
     //this.XXXinspcComm = new InspcGuiComm(this, guiCfg.gralMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
     //composites.add(XXXinspcComm);
-    curveA = new InspcCurveView(variableMng, cmdgui.gralMng, cargs.sDefaultDirForCurves);
-    curveB = new InspcCurveView(variableMng, cmdgui.gralMng, cargs.sDefaultDirForCurves);
-    curveC = new InspcCurveView(variableMng, cmdgui.gralMng, cargs.sDefaultDirForCurves);
+    curveA = new InspcCurveView("curve_A", variableMng, cmdgui.gralMng, cargs.sDefaultDirForCurves, cargs.curveExporterClasses);
+    curveB = new InspcCurveView("curve_B", variableMng, cmdgui.gralMng, cargs.sDefaultDirForCurves, cargs.curveExporterClasses);
+    curveC = new InspcCurveView("curve_C", variableMng, cmdgui.gralMng, cargs.sDefaultDirForCurves, cargs.curveExporterClasses);
 
   }
   
@@ -192,6 +192,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
      */
     Map<String, String> indexTargetIpcAddr = new TreeMap<String, String>();
 
+    /**Cohesion between file extension and exporter java class path for curve output.*/
+    Map<String, String> curveExporterClasses = new TreeMap<String, String>();
+
     /**File with the values from the S7 to show. */
     //protected String sFileOamValues;
 
@@ -236,6 +239,18 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
             cargs.indexTargetIpcAddr.put(sKey, sValue);
           }
         }
+        else if(arg.startsWith("-curve-export=")) 
+        { String sArg = getArgument(14);
+          int posSep = sArg.indexOf('=');
+          if(posSep < 0){
+            writeError("argument -curve-export=EXT=java.class.path");
+            bOk = false;
+          } else {
+            String sKey = sArg.substring(0, posSep);
+            String sValue = sArg.substring(posSep+1);
+            cargs.curveExporterClasses.put(sKey, sValue);
+          }
+        }
         else if(arg.startsWith("-ownIpc=")) 
         { cargs.sOwnIpcAddr = getArgument(8);   //an example for default output
         }
@@ -274,9 +289,9 @@ private class InspcGuiCfg extends GuiCfg
     super.gralMng.setPosition(5, GralPos.size -3, 0, GralPos.size +10 , 0, 'r');
     btnSwitchOnLog = super.gralMng.addSwitchButton("log", "log telg ?", "log telg", GralColor.getColor("wh"), GralColor.getColor("am") );
     btnSwitchOnLog.setActionChange(actionEnableLog);
-    curveA.buildGraphic(gui, "curve A");
-    curveB.buildGraphic(gui, "curve B");
-    curveC.buildGraphic(gui, "curve C");
+    curveA.buildGraphic(gui);
+    curveB.buildGraphic(gui);
+    curveC.buildGraphic(gui);
     
     if(user !=null){
       user.initGui(gralMng);
@@ -322,7 +337,7 @@ private class InspcGuiCfg extends GuiCfg
 } //class InspcGuiCfg
   
 
-  private UserInspcPlug userInspcPlug = new UserInspcPlug();
+  private final UserInspcPlug userInspcPlug = new UserInspcPlug();
   
   
   

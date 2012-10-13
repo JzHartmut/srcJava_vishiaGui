@@ -17,6 +17,7 @@ import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.mainCmd.Report;
 import org.vishia.mainCmd.ReportWrapperLog;
 import org.vishia.util.Assert;
+import org.vishia.util.Timeshort;
 import org.vishia.zbnf.ZbnfJavaOutput;
 import org.vishia.zbnf.ZbnfParser;
 
@@ -210,14 +211,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   /**Inner class for time organisation. */
   protected static class TimeOrganisation{
     
-    /**The shorttime-stamp to the {@link #absTime} timestamp. Set with {@link GralCurveView#setTimePoint(long, int, float)}. */
-    public int absTime_short;
-    
-    /**Any absolute  timestamp to the {@link #absTime_short}. Set with {@link GralCurveView#setTimePoint(long, int, float)}. */
-    public long absTime;
-    
-    /**Milliseconds for 1 step of shorttime. */
-    public float absTime_Millisec7short = 1.0f;
+    Timeshort absTime = new Timeshort();
     
     /**It is counted while the pair {@link #absTime_short} and {@link #absTime} is set newly.
      * The pair is consistent only if this counter is the same before and after read.
@@ -301,7 +295,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
      * It sets {@link #divType}, {@link #pixelPerTimeFineDiv}, {@link #millisecPerFineDiv}
      */
     public void calc(){
-      int millisec20pixel = (int)(12 * timePerPixel * absTime_Millisec7short);
+      int millisec20pixel = (int)(12 * timePerPixel * absTime.absTime_Millisec7short);
       for(int ii = 0; ii < millisecPerDivVariants.length; ++ii){
         if(millisecPerFineDivVariants[ii] >= millisec20pixel){
           millisecPerDiv = millisecPerDivVariants[ii];
@@ -639,15 +633,20 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    */
   public List<? extends GralCurveViewTrack_ifc> getTrackInfo(){ return listTracks; }
   
-  
+  public long timeAtCursorLeft(){
+    int ixData;
+    if(xpCursor1 >=0 && xpCursor1 < ixDataShown.length){
+      ixData = ixDataShown[xpCursor1];
+    } else {
+      ixData = ixDataWr - (nrofValues << shIxiData);  //read only one time, the index start from.
+    }
+    int timeShort1 = timeValues[(ixData >> shIxiData) & mIxiData];
+    //synchronized()
+    return timeorg.absTime.absTimeshort(timeShort1);
+  }
   
   @Override public void setTimePoint(long date, int timeshort, float millisecPerTimeshort){
-    timeorg.absTime = 0;   //graphic thread: don't use values
-    timeorg.ctTimeSet +=1;
-    timeorg.absTime_short = timeshort;
-    timeorg.absTime_Millisec7short = millisecPerTimeshort;
-    timeorg.absTime = date; //graphic thread: now complete and consistent.
-    timeorg.ctTimeSet +=1;
+    timeorg.absTime.setTimePoint(date, timeshort, millisecPerTimeshort);
   }
 
   
@@ -807,11 +806,11 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       timeorg.timeLeftShowing = timeRight - (int)((xViewPart +1) * timeorg.timePerPixel);
     }
     //calculate absolute time from shorttime:
-    long millisecAbs = (long)((timeRight - timeorg.absTime_short) * timeorg.absTime_Millisec7short) + timeorg.absTime;
+    long millisecAbs = timeorg.absTime.absTimeshort(timeRight);
     int milliSec2Div = (int)(millisecAbs % timeorg.millisecPerDiv);
     int milliSec2FineDiv = milliSec2Div % (timeorg.millisecPerFineDiv);
-    float pixel2FineDiv = milliSec2FineDiv * timeorg.pixel7time / timeorg.absTime_Millisec7short;
-    float pixel2Div = milliSec2Div * timeorg.pixel7time / timeorg.absTime_Millisec7short;
+    float pixel2FineDiv = milliSec2FineDiv * timeorg.pixel7time / timeorg.absTime.millisec7short();
+    float pixel2Div = milliSec2Div * timeorg.pixel7time / timeorg.absTime.millisec7short();
     int ixPixelTimeDiv =-1;
     int ixPixelTimeDivFine =-1;
     while(pixel2FineDiv < xViewPart){
@@ -992,34 +991,41 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   
   @Override public void writeCurve(WriteCurve_ifc out){
-    int catastrophicCt = 1000;
-    boolean bOk = false;
-    do{
-      int ctTime = timeorg.ctTimeSet;
-      long absTime = timeorg.absTime;
-      int absTimeshort = timeorg.absTime_short;
-      float absTime_Millisec7short = timeorg.absTime_Millisec7short;
-      ctTime = timeorg.ctTimeSet;  //Note: it is volatile.
-      if(ctTime == timeorg.ctTimeSet && absTime != 0){
-        out.writeCurveTimestamp(absTimeshort, absTime, absTime_Millisec7short);
-        bOk = true;
-        break;
-      }
-    } while(--catastrophicCt >0);  //break
+    boolean bOk = true;
+    out.writeCurveTimestamp(new Timeshort(timeorg.absTime));
     try{
       if(!bOk){
         out.writeCurveError("absolute time error");
       } else {
+        int ixTrack = -1;
+        int nrofTracks = listTracks.size();
+        for(Track track: listTracks){
+          String sName = track.name;
+          String sPath = track.getDataPath();
+          out.setTrackInfo(nrofTracks, ++ixTrack, sPath, sName);
+        }
         int ctValues = this.nrofValues -1;  //read first, may be increment in next step
-        int ixData = ixDataWr - (ctValues << shIxiData);  //read only one time, the index start from.
+        int ixData;
+        if(xpCursor1 >=0 && xpCursor1 < ixDataShown.length){
+          ixData = ixDataShown[xpCursor1];
+        } else {
+          ixData = ixDataWr - (ctValues << shIxiData);  //read only one time, the index start from.
+        }
+        int ixDataEnd;
+        if(xpCursor2 >=0 && xpCursor2 < ixDataShown.length){
+          ixDataEnd = ixDataShown[xpCursor2];
+        } else {
+          ixDataEnd = ixDataWr; 
+        }
+        
         float[] record = new float[listTracks.size()];
         int ix = (ixData >> shIxiData) & mIxiData;
         int timeshortLast = timeValues[ix];
         out.writeCurveStart(timeshortLast);
         
-        while((ixData != ixDataWr && --ctValues >=0)){
+        while((ixData != ixDataEnd && --ctValues >=0)){
           ix = (ixData >> shIxiData) & mIxiData;
-          int ixTrack = -1;
+          ixTrack = -1;
           for(Track track: listTracks){
             record[++ixTrack] = track.values[ix];
           }

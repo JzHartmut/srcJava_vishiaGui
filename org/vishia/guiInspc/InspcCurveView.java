@@ -3,7 +3,11 @@ package org.vishia.guiInspc;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.communication.InspcDataExchangeAccess;
@@ -78,6 +82,10 @@ public class InspcCurveView
   
   public static String sBtnSaveValues = "save values";
   
+  
+  private final String sName;
+  
+  private final Map<String, String> curveExporterClasses;
   
   /**Three windows for curve view. */
   GralWindow windCurve;
@@ -158,8 +166,10 @@ public class InspcCurveView
   
   GralCurveView widgCurve;
   
-  InspcCurveView(VariableContainer_ifc variables, GralMng gralMng, String defaultDir){
+  InspcCurveView(String sName, VariableContainer_ifc variables, GralMng gralMng, String defaultDir, Map<String, String> curveExporterClasses){
     //this.comm = comm;
+    this.sName = sName;
+    this.curveExporterClasses = curveExporterClasses;
     this.variables = variables;
     this.gralMng = gralMng;
     fileCurveCfg = new File(defaultDir);
@@ -171,7 +181,7 @@ public class InspcCurveView
    * @param wind The main window where the menu to open will be added
    * @param sName The name, used for menu entry too, sample "curve A"
    */
-  public void buildGraphic(GralPrimaryWindow_ifc wind, String sName)
+  public void buildGraphic(GralPrimaryWindow_ifc wind)
   {
     int posright = -20;
     gralMng.selectPanel("primaryWindow");
@@ -464,14 +474,31 @@ public class InspcCurveView
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
-          fileCurveSave = (File)params[0];
-          //File file = new File("curve.save");
+          File fileParam = (File)params[0];
+          File dirCurveSave = fileParam.getParentFile();
+          long dateStart = widgCurve.timeAtCursorLeft();
+          DateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+          String sNameFile = format.format(new Date(dateStart)) + "_" + sName;
+          fileCurveSave = new File(dirCurveSave, sNameFile + ".csv");
+            //File file = new File("curve.save");
           System.out.println("InspcCurveView - save curve data to; " + fileCurveSave.getAbsolutePath());
-          Class clazzCurveWriter = Class.forName("org.vishia.curves.WriteCurveCsv");
+          Class<?> clazzCurveWriter = Class.forName("org.vishia.curves.WriteCurveCsv");
           
           WriteCurve_ifc writerCurve = (WriteCurve_ifc)clazzCurveWriter.newInstance();
           writerCurve.setFile(fileCurveSave);
           widgCurve.writeCurve(writerCurve);
+          
+          String sClassExportDat = curveExporterClasses.get("dat");
+          if(sClassExportDat !=null){
+            Class<?> clazzCurveWriter2 = Class.forName(sClassExportDat);
+            
+            WriteCurve_ifc writerCurve2 = (WriteCurve_ifc)clazzCurveWriter2.newInstance();
+            File fileDat = new File(dirCurveSave, sNameFile + ".dat");
+            
+            writerCurve2.setFile(fileDat);
+            widgCurve.writeCurve(writerCurve2);
+          }
+          
         } catch(Exception exc){
           widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
         }

@@ -47,7 +47,7 @@ public interface GralCurveView_ifc extends GralWidget_ifc, GralSetValue_ifc, Get
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    */
-  public static final int version = 20120426;
+  public static final int version = 20120608;
   
   /**Adds a sampling value set.
    * <br><br> 
@@ -86,6 +86,9 @@ public interface GralCurveView_ifc extends GralWidget_ifc, GralSetValue_ifc, Get
   /**Returns true if the curve view is active. See {@link #activate(boolean)}. */
   boolean isActiv();
   
+  /**Writes the curve to the given interface, it is an exporter class.
+   * @param out
+   */
   void writeCurve(WriteCurve_ifc out);
   
   
