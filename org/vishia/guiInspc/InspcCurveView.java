@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.communication.InspcDataExchangeAccess;
+import org.vishia.curves.WriteCurveCsv;
 import org.vishia.curves.WriteCurve_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralCurveView;
@@ -28,6 +29,7 @@ import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.inspectorAccessor.InspcAccessEvaluatorRxTelg;
 import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.Assert;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
@@ -86,6 +88,8 @@ public class InspcCurveView
   private final String sName;
   
   private final Map<String, String> curveExporterClasses;
+  
+  private final WriteCurve_ifc writerCurveCsv = new WriteCurveCsv();
   
   /**Three windows for curve view. */
   GralWindow windCurve;
@@ -482,11 +486,9 @@ public class InspcCurveView
           fileCurveSave = new File(dirCurveSave, sNameFile + ".csv");
             //File file = new File("curve.save");
           System.out.println("InspcCurveView - save curve data to; " + fileCurveSave.getAbsolutePath());
-          Class<?> clazzCurveWriter = Class.forName("org.vishia.curves.WriteCurveCsv");
           
-          WriteCurve_ifc writerCurve = (WriteCurve_ifc)clazzCurveWriter.newInstance();
-          writerCurve.setFile(fileCurveSave);
-          widgCurve.writeCurve(writerCurve);
+          writerCurveCsv.setFile(fileCurveSave);
+          widgCurve.writeCurve(writerCurveCsv);
           
           String sClassExportDat = curveExporterClasses.get("dat");
           if(sClassExportDat !=null){
@@ -501,6 +503,7 @@ public class InspcCurveView
           
         } catch(Exception exc){
           widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
+          System.err.println(Assert.exceptionInfo("InspcCurveView", exc, 1, 2));
         }
       }
       return true;
