@@ -242,7 +242,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     //int divPerBoldDiv = 10;
     
     /**Number of millisec between 2 fine divisions. It is a number of millisec able to divide by 10, 5 or 2. */
-    int millisecPerDiv, millisecPerFineDiv;
+    int millisecPerDiv = 100, millisecPerFineDiv =10;
     
     /**Number of shorttime units for 1 pixel.
      * A time unit may be 1 millisecond for currently showing curves.
@@ -250,11 +250,11 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
      * This value may be given in another unit for example 1 microseconds. It should be the same value unit
      * as used in {@link #setSample(float[], int)}.
      */
-    public float timePerPixel;
+    public float timePerPixel = 1.0f;
     
     
     /**The reciprocal of {@link #timePerPixel}. The number of pixel for 1 short time step. It is less 1.0 often. */
-    public float pixel7time;
+    public float pixel7time = 1.0f;
     
     /**Number of time shorttime steps for the whole curve.
      * If this value is given (>=0) then the {@link #timePerPixel} will be calculated from this

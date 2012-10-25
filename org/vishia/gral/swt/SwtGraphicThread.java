@@ -225,6 +225,9 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
     windowSwt.addShellListener(mainComponentListerner);
 
     
+    if(xSize == -1 || ySize == -1){
+      windowSwt.setFullScreen(true);
+    }
     //The propertiesGuiSwt needs the Display instance for Font and Color. Therefore the graphic thread with creation of Display should be executed before. 
     SwtProperties propertiesGui = new SwtProperties(this.displaySwt, sizeCharProperties);
     gralMng = new SwtMng(this, displaySwt, propertiesGui, null, log);
@@ -237,15 +240,18 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
   
 
   
+  @Override
   protected boolean dispatchOsEvents()
   { return displaySwt.readAndDispatch();
   }
 
+  @Override
   protected void graphicThreadSleep()
   {
     displaySwt.sleep ();
   }
   
+  @Override
   public void wakeup(){
     displaySwt.wake();
     extEventSet.set(true);

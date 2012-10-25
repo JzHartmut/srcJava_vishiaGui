@@ -26,10 +26,10 @@ public class GralMsgOutputList  implements LogMessage
   private final Locale localization;
   
 
-  public GralMsgOutputList(GralMng_ifc guiAccess, String sTimeZoneShow){
+  public GralMsgOutputList(GralMng_ifc guiAccess, String sTimeZoneShow, String sTimeFormat){
     this.localization = Locale.ROOT;
     this.guiAccess = guiAccess;
-    this.dateFormat = new SimpleDateFormat("HH:mm:ss.SSS", localization);
+    this.dateFormat = new SimpleDateFormat(sTimeFormat, localization);
     this.dateFormat.setTimeZone(TimeZone.getTimeZone(sTimeZoneShow));
 
 

@@ -138,7 +138,9 @@ public class GralArea9MainCmd extends MainCmd
     }
 
     if(sOutputArea == null){ sOutputArea = "A3C3"; }
-    if("\0 .".indexOf(sizeShow) >=0){  sizeShow = cargs.sizeShow; }  //undefined per parameter, use args 
+    if("\0 .".indexOf(sizeShow) >=0){ //undefined per parameter, use args  
+      sizeShow = cargs.sizeShow; 
+    }   
     if(left < 0){  left = cargs.xLeftPixelWindow; }  //undefined per parameter, use args 
     if(top < 0){  top = cargs.yTopPixelWindow; }  //undefined per parameter, use args 
     if(xSize < 0){  xSize = cargs.dxPixelWindow; }  //undefined per parameter, use args 
@@ -192,6 +194,9 @@ public class GralArea9MainCmd extends MainCmd
         } else {
           bOk = false;
         }
+      }
+      else if(arg.startsWith("-fullscreen")) 
+      { cargs.dxPixelWindow = cargs.dyPixelWindow = -1;
       }
       else if(arg.startsWith("-syntax=")) 
       { cargs.sPathZbnf = getArgument(8);   //an example for default output
