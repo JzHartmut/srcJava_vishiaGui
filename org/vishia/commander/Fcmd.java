@@ -110,6 +110,10 @@ public class Fcmd extends GuiCfg
 
   final FcmdIdents idents = new FcmdIdents();
   
+  final FcmdSettings settings = new FcmdSettings(this);
+  
+  final FcmdStatus status = new FcmdStatus(this);
+  
   final FcmdFileProps filePropsCmd = new FcmdFileProps(this);
   
   final FcmdView viewCmd = new FcmdView(this);
@@ -208,7 +212,9 @@ public class Fcmd extends GuiCfg
     gui.addFrameArea("A3C3", panelButtons); // dialogPanel);
 
     filesCp.buildGraphic();
-    filePropsCmd.buildWindowConfirmMk();  //F2
+    settings.buildWindow();  //F2
+    status.buildWindow();  //F2
+    filePropsCmd.buildWindow();  //F2
     viewCmd.buildWindowView();   //F3
     editWind.buildWindow();   //F3
     copyCmd.buildWindowConfirmCopy();

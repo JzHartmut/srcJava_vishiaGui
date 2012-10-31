@@ -1,6 +1,6 @@
 
-set DST=..\..\docuSrcJava_vishiaGUI
-set DST_priv=..\..\docuSrcJava_vishiaGUI_priv
+set DST=..\..\docuSrcJava_vishiaGui
+set DST_priv=..\..\docuSrcJava_vishiaGui_priv
 
 echo set SRC
 set SRC=-subpackages org.vishia.gral org.vishia.commander 

@@ -111,9 +111,9 @@ public class FcmdFileProps
   }
   
   
-  /**Builds the content of the confirm-delete window. The window is created static. It is shown
+  /**Builds the content of the file property window. The window is created static. It is shown
    * whenever it is used.  */
-  void buildWindowConfirmMk()
+  void buildWindow()
   { String sUnix = System.getenv("OS");
     if(sUnix !=null){
       sUnix = sUnix.toUpperCase();

@@ -1,6 +1,6 @@
 
-export DST="../../docuSrcJava_vishiaGUI"
-export DST_priv="../../docuSrcJava_vishiaGUI_priv"
+export DST="../../docuSrcJava_vishiaGui"
+export DST_priv="../../docuSrcJava_vishiaGui_priv"
 
 echo set SRC
 export SRC="-subpackages org.vishia.commander:org.vishia.gral"

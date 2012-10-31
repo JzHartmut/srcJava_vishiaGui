@@ -461,6 +461,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    */
   private final Map<String, String> indexSelection = new TreeMap<String, String>(); 
   
+  private final RefreshTimed refreshTimed = new RefreshTimed();
   
   /**The widget for showing the path. */
   protected GralTextField widgdPath;
@@ -695,7 +696,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
 
   
   /**Fills the content with given directory.
-   * @param dir The directory which's files are shown.
+   * @param fileIn The directory which's files are shown.
+   * @param bCompleteWithFileInfo false then write only file names, without information about the file.
    */
   public void fillIn(File fileIn, boolean bCompleteWithFileInfo) //String path)
   {
@@ -846,8 +848,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
                   String sExt = sName.substring(posDot+1);
                   sort = sExt + sName;
                 } break;
-                default: { sort = file.getName(); }
-                }
+                default: { sort = file.getName().toLowerCase(); }
+              }
               
             }
             sortFiles.put(sort, file);
@@ -925,6 +927,10 @@ public class GralFileSelector implements Removeable //extends GralWidget
     }
     selectList.wdgdTable.setCurrentCell(lineSelect, 1);
     selectList.wdgdTable.repaint(200,200);
+    if(!bCompleteWithFileInfo){
+      refreshTimed.delayedFillin(2500);
+    }
+    
   }
   
 
@@ -1057,6 +1063,48 @@ public class GralFileSelector implements Removeable //extends GralWidget
     return false;
   }
 
+  
+  /**This class organized a one time or cyclic refreshing of the current content.
+   */
+  final class RefreshTimed implements Runnable
+  {
+    Thread thread;
+    
+    int timeRepeat = 2000;
+    
+    long timeStampRepeat;
+    
+    boolean bRepeat = false;
+    //boolean isRunning = false;
+    
+    void delayedFillin(int delayMillisec){
+      timeStampRepeat = System.currentTimeMillis() + delayMillisec;
+      if(thread ==null){
+        thread = new Thread(this, "FileRefresh");
+        //isRunning = true;
+        thread.start();
+      }
+    }
+    
+    @Override public void run()
+    { long timeWait;
+      do {
+        timeWait = timeStampRepeat - System.currentTimeMillis();
+        if(timeWait >0){
+          synchronized(this){ 
+            try{ wait(timeWait);} catch(InterruptedException exc){}
+          }
+        } else {
+          System.out.println("GralFileSelector - delayedFillin");
+          fillInCurrentDir();
+          timeStampRepeat += timeRepeat;
+        }
+      } while(timeWait > 0 || bRepeat);
+      thread = null;
+    }
+  }
+  
+  
   final EventConsumer callbackFillIn = new EventConsumer("GralFileSelector - callback fillin"){
     @Override protected boolean processEvent_(Event ev) {
       ///

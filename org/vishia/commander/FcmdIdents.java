@@ -12,6 +12,18 @@ import org.vishia.util.KeyCode;
  */
 public class FcmdIdents
 {
+  String menuBarSettings = "&Help/&Settings [cP]";
+  String menuContextSettings = "Settings [cP]";
+  String buttonSettings = "gF1:settings";
+  int key1Settings = KeyCode.ctrl + 'p';
+  int key2Settings = KeyCode.ctrl + 'P';
+
+  String menuBarStatus = "&Help/s&Tatus [cü]";
+  String menuContextStatus = "Status [cü]";
+  String buttonStatus = "gF9:status";
+  int key1Status = KeyCode.ctrl + 'ü';
+  int key2Status = KeyCode.ctrl + 'Ü';
+
   String menuSaveFavoriteSel = "fa&Vors/&Save favorite paths";
   String menuReadFavoriteSel = "fa&Vors/&Read favorite paths";
   

@@ -18,6 +18,7 @@ import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.mainCmd.MainCmd_ifc;
@@ -623,7 +624,7 @@ class FcmdFavorPathSelector
   
   
   GralUserAction actionReadFavoritePathes = new GralUserAction()
-  { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
+  { @Override public boolean exec(int key, GralWidget_ifc widg, Object... params) { 
       readCfg(fileCfg);
       panelLeft.fillCards();
       panelMid.fillCards();

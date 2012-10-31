@@ -223,6 +223,9 @@ public class FcmdButtons
     setBtnMenuAndKeys(main.executer.actionSetCmdCfgAct, main.idents.buttonReadCmdCfgAct, main.idents.keyReadCmdCfgAct, 0, main.idents.menuBarReadCmdCfgAct);
     setBtnMenuAndKeys(actionViewButtons, main.idents.buttonViewButtons, main.idents.keyViewButtons, main.idents.menuBarViewButtons);
     setBtnMenuAndKeys(main.windMng.actionWindFullOut, main.idents.buttonWindowOutput, main.idents.keyWindowOutput, main.idents.keyWindowOutput2, main.idents.menuBarWindowOutput);
+
+    setBtnMenuAndKeys(main.settings.actionOpenDialog, main.idents.buttonSettings, main.idents.key1Settings, main.idents.key2Settings, main.idents.menuBarSettings);
+    setBtnMenuAndKeys(main.status.actionOpenDialog, main.idents.buttonStatus, main.idents.key1Status, main.idents.key2Status, main.idents.menuBarStatus);
     main.gui.addMenuItemGThread("menuBarViewButtons", main.idents.menuBarViewButtons, actionViewButtons);
 
     setBtnMenuAndKeys(main.gui.getActionHelp(), main.idents.buttonHelp, main.idents.keyHelp,main.idents.menuHelpBar);
