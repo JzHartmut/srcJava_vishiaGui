@@ -421,7 +421,7 @@ public class FcmdFileCard extends GralFileSelector
             }
           }
         }
-        if(!bToRoot){
+        if(!bToRoot && otherFileCard !=null && otherFileCard.currentFile !=null){
           //check whether a sub dir is selected:
           String sOtherSelectedFile = otherFileCard.currentFile.getName();
           if(sOtherSelectedFile.equals(sDirName)){
