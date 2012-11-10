@@ -29,10 +29,7 @@ import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
 import org.vishia.util.FileAccessZip;
 import org.vishia.util.FileRemote;
-import org.vishia.util.FileRemoteAccessor;
-import org.vishia.util.FileRemoteAccessorLocalFile;
 import org.vishia.util.FileSystem;
-import org.vishia.util.FileZip;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
 
@@ -55,6 +52,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2012-11-11 Hartmut bugfix: {@link #fillInRefreshed(File, boolean)}: If all files are complete with file info,
+   *   nevertheless the {@link RefreshTimed#delayedFillin(int) was called because the whole routine was called with false 
+   *   as bCompleteWithFileInfo-argument. Now that is prevented if all files were tested already.
    * <li>2012-10-12 Hartmut chg {@link WindowFileSelection#openDialog(String, String)} with title.
    * <li>2012-10-01 Hartmut new now {@link #fillIn(File, boolean)} doesn't get the file properties if it is called with false.
    *   This makes it faster to show large content of folders on remote devices (in PC-network). If a file is selected
@@ -723,10 +723,14 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   /**Fills the content with given directory.
-   * @param dir The directory which's files are shown.
+   * @param fileIn Either a directory which's files are shown or a file inside a directory.
+   *   In the second case the directory is shown and the file is selected.
+   * @param bCompleteWithFileInfo true if alle files in the directory is completed. 
+   *   If false then any file is tested.  
    */
   private void fillInRefreshed(File fileIn, boolean bCompleteWithFileInfo) //String path)
   {
+    boolean bAllFilesCompleteWithFileInfo = true;
     selectList.wdgdTable.clearTable(); 
     File dir = null;
     if(fileIn !=null && fileIn.exists()){
@@ -831,22 +835,28 @@ public class GralFileSelector implements Removeable //extends GralWidget
               //without file properties
               switch(sortOrder){
                 case kSortName: {
-                  sort = file.getName();
+                  String sName = file.getName();
+                  if(file.isDirectory()){ sName += "/"; }
+                  sort = (file.isDirectory()? "D" : "F") + sName;
                 } break;
                 case kSortNameNonCase: {
-                  sort = file.getName().toLowerCase();
+                  String sName = file.getName().toLowerCase();
+                  if(file.isDirectory()){ sName += "/"; }
+                  sort = (file.isDirectory()? "D" : "F") + sName;
                 } break;
                 case kSortExtension: {
                   String sName = file.getName();
                   int posDot = sName.lastIndexOf('.');
                   String sExt = sName.substring(posDot+1);
-                  sort = sExt + sName;
+                  if(file.isDirectory()){ sName += "/"; }
+                  sort = (file.isDirectory()? "D" : "F") + sExt + sName;
                 } break;
                 case kSortExtensionNonCase: {
                   String sName = file.getName().toLowerCase();
                   int posDot = sName.lastIndexOf('.');
                   String sExt = sName.substring(posDot+1);
-                  sort = sExt + sName;
+                  if(file.isDirectory()){ sName += "/"; }
+                  sort = (file.isDirectory()? "D" : "F") + sExt + sName;
                 } break;
                 default: { sort = file.getName().toLowerCase(); }
               }
@@ -886,9 +896,11 @@ public class GralFileSelector implements Removeable //extends GralWidget
             completeLine(tline, file, timeNow);
           } 
           else { //!bCompleteFileWithInfo
-            tline.setCellText("?", kColDesignation);
-            tline.setCellText("", kColDate);
-            tline.setCellText("", kColLength);
+            bAllFilesCompleteWithFileInfo = false;
+            String sDesignation = file.isDirectory() ? "/" : "";
+            tline.setCellText(sDesignation, kColDesignation);
+            tline.setCellText("?", kColDate);
+            tline.setCellText("?", kColLength);
             //line[kColDate] = "?";
             //line[kColLength] = "?";
           }
@@ -927,8 +939,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
     }
     selectList.wdgdTable.setCurrentCell(lineSelect, 1);
     selectList.wdgdTable.repaint(200,200);
-    if(!bCompleteWithFileInfo){
-      refreshTimed.delayedFillin(2500);
+    if(!bAllFilesCompleteWithFileInfo){
+      refreshTimed.delayedFillin(1500);
     }
     
   }
