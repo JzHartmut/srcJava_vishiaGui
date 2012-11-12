@@ -64,7 +64,7 @@ public class Fcmd extends GuiCfg
   public static final int version = 20120729;
 
   /**Version visible in about info */
-  public static final String sVersion = "Version 1.06 - 2012-09-28";
+  public static final String sVersion = "Version 1.07 - 2012-11-11";
   
   static class CallingArgs extends GuiCallingArgs
   {

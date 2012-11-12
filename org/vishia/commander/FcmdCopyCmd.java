@@ -443,12 +443,14 @@ public class FcmdCopyCmd
           filesToCopy.clear();
           listEvCheck.clear();
           listEvCopy.clear();
-          widgButtonOk.setText("check");
-          widgButtonOk.setCmd("check");
+          widgButtonOk.setText("close");
+          widgButtonOk.setCmd("close");
           widgButtonEsc.setText("close");
           widgButtonEsc.setCmd("close");
           main.gralMng.setWindowsVisible(windConfirmCopy, null); //set it invisible.
         } else if(widgg.sCmd.equals("close")){
+          widgButtonOk.setText("close");
+          widgButtonOk.setCmd("close");
           filesToCopy.clear();
           listEvCheck.clear();
           listEvCopy.clear();
