@@ -1,6 +1,7 @@
 package org.vishia.commander;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,9 +14,11 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
+import org.vishia.util.EventSource;
 import org.vishia.util.FileCompare;
 import org.vishia.util.FileRemote;
 import org.vishia.util.FileRemoteAccessor;
@@ -52,6 +55,8 @@ public class FcmdCopyCmd
   GralButton widgdCreateNew, widgdOverwrDate, widgdOverwrReadOnly, widgOverwrFile, widgSkipFile, widgSkipDir;
   
   GralButton widgdMove;
+  
+  GralButton widgLastSrc, widgGetPath;
 
   GralValueBar widgProgressFile;
   GralValueBar widgProgressAll;
@@ -80,11 +85,30 @@ public class FcmdCopyCmd
   
   //List<String> listFileSrc;
   
+  /**This list is filled with some callback Events for files which are checked before copying.
+   * If the callback of the check process occurs, the events will be removed from this list.
+   * Only events which are found in this list are considered to build the list of files to copy.
+   * This list is definitive cleared if the "abort" button is pressing. A current running check process
+   * cannot be aborted because it runs in another unknown thread. But the usage of the callback is prevented then.
+   */
   final List<FileRemote.CallbackEvent> listEvCheck = new LinkedList<FileRemote.CallbackEvent>();
+  
+  int nrofFilesCheck;
   
   final List<FileRemote.CallbackEvent> listEvCopy = new LinkedList<FileRemote.CallbackEvent>();
   
+  /**Current files which are in copy process. Typical contains one file only. 
+   * This list will be filled in {@link #actionConfirmCopy}.
+   * If the copy process is finished, this list will be empty.
+   */
   final List<FileRemote> filesToCopy = new LinkedList<FileRemote>();
+  
+  /**Last files which are in copy process. Typical contains one file only. 
+   * This list will be filled in {@link #actionButtonCopy} if the copy process will be started.
+   * It is used in {@link #actionLastSrc} to fill the {@link #filesToCopy}.
+   * This list remains after copy process to supply "last files".
+   */
+  //final List<FileRemote> filesToCopyLast = new LinkedList<FileRemote>();
   
   /**This reference is set with the callback of operation cmd. 
    * The event can be used to affect the copying process.
@@ -93,6 +117,10 @@ public class FcmdCopyCmd
   
   boolean bSkipFile, bSkipDir;
   
+  
+  EventSource evSrc = new EventSource("FcmdCopy"){
+    
+  };
   
   FcmdCopyCmd(Fcmd main)
   { this.main = main;
@@ -116,15 +144,24 @@ public class FcmdCopyCmd
     main.gralMng.setPosition(0.5f, GralPos.size +3.2f, 1, -1, 0, 'd', 0.3f);
     //main.gralMng.addText("source:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
     widgCopyFrom = main.gralMng.addTextField("copyFrom", false, "source path", "t");
-    widgCopyFrom.setBackgroundColor(GralColor.getColor("am"));
-    widgFromConditions = main.gralMng.addTextField("copyCond", false, "select src files: mask*:*.ext / 2012-08-05..06", "t");
-    //main.gralMng.addText("destination dir path:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    //main.gralMng.setPosition(8, GralPos.size +3.2f, 1, -1, 0, 'd', 0.3f);
+    widgCopyFrom.setBackColor(GralColor.getColor("am"),0);
+    main.gralMng.setPosition(GralPos.refer + 3.5f, GralPos.size +3.2f, 1, -10, 0, 'd', 0.3f);
+    widgFromConditions = main.gralMng.addTextField("copyCond",true, "select src files: mask*:*.ext / 2012-08-05..06", "t");
+    
+    main.gralMng.setPosition(GralPos.same, GralPos.size +3.2f, -9, -1, 0, 'r',1);
+    widgLastSrc = main.gralMng.addSwitchButton("lastSrc", "last src", "lock src", GralColor.getColor("wh"), GralColor.getColor("lgn"));
+    widgLastSrc.setActionChange(actionLastSrc);
+    
+    main.gralMng.setPosition(GralPos.refer + 3.5f, GralPos.size +3.2f, 1, -1, 0, 'd', 0.3f);
     widgCopyDirDst = main.gralMng.addTextField("copyDirDst", true, "destination directory:", "t");
-    widgCopyDirDst.setBackgroundColor(GralColor.getColor("am"));
-    //main.gralMng.addText("destination filename:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    //main.gralMng.setPosition(GralPos.refer + 4, GralPos.size -3.5f, 1, 25, 0, 'r', 1);
+    //widgCopyDirDst.setBackColor(GralColor.getColor("am"),0);
+    main.gralMng.setPosition(GralPos.refer + 3.5f, GralPos.size +3.2f, 1, -14, 0, 'r', 1);
     widgCopyNameDst = main.gralMng.addTextField("copyNameDst", true, "destination filename:", "t");
+    
+    main.gralMng.setPosition(GralPos.same, GralPos.size +3.2f, -13, -1, 0, 'r',1);
+    widgGetPath = main.gralMng.addButton("getPath", actionConfirmCopy, "set src+dst" );
+    
+    main.gralMng.setPosition(GralPos.refer + 3.5f, GralPos.size +3.2f, 1, -1, 0, 'd', 0.3f);
     widgCopyState = main.gralMng.addTextField("copyStatus", false, "state", "t");
     
     main.gralMng.setPosition(GralPos.refer+1.5f, GralPos.size -1.5f, 1, 20, 0, 'r', 1);
@@ -164,7 +201,44 @@ public class FcmdCopyCmd
     
   }
 
-  
+  protected GralUserAction actionLastSrc = new GralUserAction() ///
+  { @Override public boolean exec(int key, GralWidget_ifc widgP, Object... params)
+    { if(false && KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        GralButton widgb = (GralButton)(widgP);
+        if(widgButtonOk.sCmd.equals("check")){ //only if check phase
+          if(widgb.isOn()){
+            int nrofSrcFiles = filesToCopy.size();
+            if(nrofSrcFiles >=1){
+              FcmdFileCard[] lastFileCards = main.getLastSelectedFileCards();
+              fileCardDst = lastFileCards[0]; //the current file card is destination!
+              if(fileCardDst !=null){
+                fileDstDir = FileRemote.fromFile(fileCardDst.getCurrentDir());
+                sDstDir = fileDstDir.getAbsolutePath();
+                widgCopyDirDst.setText(sDstDir);
+                File src1 = filesToCopy.get(0);
+                if(nrofSrcFiles == 1){
+                  widgCopyFrom.setText(src1.getAbsolutePath());
+                  widgCopyNameDst.setText(src1.getName());
+                } else {
+                  File dir = src1.getParentFile();
+                  widgCopyFrom.setText(dir.getAbsolutePath() + "/*");
+                  widgCopyNameDst.setText("*");
+                }
+              }
+            }
+            else { //no src files given
+              //widgb.setState(GralButton.kDisabled);  //set state to off, "copy src"
+            }
+          } else {
+            //off or inactive:
+            
+          }
+        }
+        //else don't do anything.
+      }
+      return true;
+    }
+  };
   
   
   GralUserAction actionOverwrReadonly = new GralUserAction()
@@ -266,59 +340,77 @@ public class FcmdCopyCmd
     @Override public boolean userActionGui(int key, GralWidget infos,
         Object... params)
     { //String sSrc, sDstName, sDstDir;
-      if(widgButtonOk.getCmd().equals("close")) {
-        //only if it is ready to check, get the files.
-        widgButtonOk.setText("check");
-        widgButtonOk.setCmd("check");
-
-        filesToCopy.clear();
-        listEvCheck.clear();
-        listEvCopy.clear();
-        FcmdFileCard[] lastFileCards = main.getLastSelectedFileCards();
-        fileCardSrc = lastFileCards[0];
-        fileCardDst = lastFileCards[1];
-        
-        if(fileCardSrc !=null){
-          fileSrcDir = FileRemote.fromFile(fileCardSrc.getCurrentDir());
-          List<File> listFileSrc = fileCardSrc.getSelectedFiles();
-          if(listFileSrc.size()==0){ //nothing selected
-            listFileSrc.add(fileCardSrc.currentFile);  
-          }
-          for(File srcFile : listFileSrc){
-            FileRemote fileSrc = FileRemote.fromFile(srcFile);
-            filesToCopy.add(fileSrc);
-          }
-          sDstName = listFileSrc.size() >1 ? "*" 
-                     : listFileSrc.size() ==1 ? listFileSrc.get(0).getName() : "??";
-          sSrc = fileSrcDir.getAbsolutePath() + "/" + sDstName;
-          if(fileCardDst !=null){
-            fileDstDir = FileRemote.fromFile(fileCardDst.getCurrentDir());
-            sDstDir = fileDstDir.getAbsolutePath();
+      String state = widgButtonOk.getCmd();
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        if(state.equals("close") || state.equals("check")) {
+          //only if it is ready to check, get the files.
+          widgButtonOk.setText("check");
+          widgButtonOk.setCmd("check");
+  
+          filesToCopy.clear();
+          listEvCheck.clear();
+          listEvCopy.clear();
+          FcmdFileCard[] lastFileCards = main.getLastSelectedFileCards();
+          if(lastFileCards[0] !=null){ ///
+            if(widgLastSrc.isOn()){  //state src lock
+              fileCardDst = lastFileCards[0];
+              fileDstDir = FileRemote.fromFile(fileCardDst.getCurrentDir());
+              sDstDir = fileDstDir.getAbsolutePath();
+              widgCopyDirDst.setText(sDstDir);
+            } else {
+              fileCardSrc = lastFileCards[0];
+              fileCardDst = lastFileCards[1];
+              
+              StringBuilder uFileSrc = new StringBuilder();
+              widgLastSrc.setState(GralButton.kOff);  //maybe disabled, set off.
+              fileSrcDir = FileRemote.fromFile(fileCardSrc.getCurrentDir());
+              String sDirSrc = fileSrcDir.getAbsolutePath();
+              List<File> listFileSrc = fileCardSrc.getSelectedFiles();
+              if(listFileSrc.size()==0){ //nothing selected
+                listFileSrc.add(fileCardSrc.currentFile);  
+              }
+              String sSep = "";
+              for(File srcFile : listFileSrc){
+                uFileSrc.append(sSep).append(srcFile.getName());
+                sSep = ", "; //For next one.
+                FileRemote fileSrc = FileRemote.fromFile(srcFile);
+                //filesToCopy.add(fileSrc);
+              }
+              sDstName = listFileSrc.size() >1 ? "*" 
+                         : listFileSrc.size() ==1 ? listFileSrc.get(0).getName() : "??";
+              sSrc = fileSrcDir.getAbsolutePath() + "/" + sDstName;
+              if(fileCardDst !=null){
+                fileDstDir = FileRemote.fromFile(fileCardDst.getCurrentDir());
+                sDstDir = fileDstDir.getAbsolutePath();
+              } else {
+                fileDstDir = null;
+                sDstDir = "??";
+              }
+              widgCopyFrom.setText(sDirSrc);
+              widgFromConditions.setText(uFileSrc);
+            }
           } else {
+            fileSrcDir = null;
             fileDstDir = null;
+            
+            //listFileSrc = null;
+            sSrc = "???";
+            sDstName = "??";
             sDstDir = "??";
+            widgCopyFrom.setText(sSrc);
           }
-        } else {
-          fileSrcDir = null;
-          fileDstDir = null;
-          
-          //listFileSrc = null;
-          sSrc = "???";
-          sDstName = "??";
-          sDstDir = "??";
+          widgCopyDirDst.setText(sDstDir);
+          widgCopyNameDst.setText(sDstName);
+          widgButtonOk.setText("check");
+          widgButtonOk.setCmd("check");
+          widgCopyState.setText("check?", 0);
+          widgdMove.setValue(GralMng_ifc.cmdSet, 0, 0);
+          zFiles = zBytes = 0;
         }
-        widgCopyFrom.setText(sSrc);
-        widgCopyDirDst.setText(sDstDir);
-        widgCopyNameDst.setText(sDstName);
-        widgButtonOk.setText("check");
-        widgButtonOk.setCmd("check");
-        widgCopyState.setText("check?", 0);
-        widgdMove.setValue(GralMng_ifc.cmdSet, 0, 0);
-        zFiles = zBytes = 0;
+        windConfirmCopy.setWindowVisible(true);
+        //main.gralMng.setWindowsVisible(windConfirmCopy, posWindConfirmCopy);
+        main.gui.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.");
       }
-      windConfirmCopy.setWindowVisible(true);
-      //main.gralMng.setWindowsVisible(windConfirmCopy, posWindConfirmCopy);
-      main.gui.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.");
       return true;
    }  };
   
@@ -355,12 +447,44 @@ public class FcmdCopyCmd
           widgButtonEsc.setText("abort");
           widgButtonEsc.setCmd("abort");
           
+          String sDirSrc = widgCopyFrom.getText();
+          FileRemote dirSrc = new FileRemote(sDirSrc);
+          String sFilesSrc= widgFromConditions.getText();
+          List<File> listFileSrc = new LinkedList<File>();
+          //
+          //check the amount of files in field widgFromConditions
+          if(sFilesSrc.contains("*")){
+            try{ FileSystem.addFileToList(dirSrc, sFilesSrc, listFileSrc);}
+            catch(FileNotFoundException exc){
+              System.err.println(exc.getMessage());
+            }
+          } else if(sFilesSrc.contains(", ")){
+            String[] sFilesSrc1 = sFilesSrc.split(", ");
+            for(String sFileSrc: sFilesSrc1){
+              listFileSrc.add(new FileRemote(sDirSrc, sFileSrc));
+            }
+          } else { //a simple file name
+            listFileSrc.add(new FileRemote(dirSrc, sFilesSrc));
+          }
+          //
+          //
+          nrofFilesCheck = 0;
+          for(File fileSrc1: listFileSrc){
+            FileRemote fileSrc = FileRemote.fromFile(fileSrc1);
+            FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackCheck, null);
+            listEvCheck.add(callback);
+            fileSrc.check(callback);   //callback.use() will be called on response
+            nrofFilesCheck +=1;
+          }
+          /*
           for(FileRemote fileSrc : filesToCopy){
             FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(fileSrc, success, null);
             listEvCheck.add(callback);
             fileSrc.check(callback);   //callback.use() will be called on response
           }
+          */
         } else if(widgg.sCmd.equals("copy")) {
+          //Starts the copy process (not move)
           widgCopyState.setText("busy-copy");
           widgButtonOk.setText("busy-copy");
           widgButtonOk.setCmd("busy");
@@ -373,9 +497,11 @@ public class FcmdCopyCmd
             String sSrcDir = sSrc.substring(0, posSrcDir +1);  //inclusive /
             sDstDir = sSrcDir + sDstDir;
           }
+          //filesToCopyLast.clear();
           //
           //loop calls FileRemote.copyTo(dst) for any selected file. 
           for(FileRemote fileSrc : filesToCopy){
+            //filesToCopyLast.add(fileSrc);
             int posWildcard = sDstName.indexOf('*');
             final String nameDst1;
             if(posWildcard >=0){
@@ -386,8 +512,10 @@ public class FcmdCopyCmd
             FileRemote fileDst = new FileRemote(sDstDir, nameDst1);
 
             
-            if(fileSrc.sameDevice(fileDst)){
-              FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(fileSrc, success, null);
+            if(fileSrc.sameDevice(fileDst)){  //all files in the standard file system of the computer, network files too!
+              //Note: create a callback event without source, it is not occupied yet!
+              //The callback event contains a command event.
+              FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, fileDst, success, null);
               listEvCopy.add(callback);
               int mode = 0;
               switch(modeCreateCopy){
@@ -412,7 +540,7 @@ public class FcmdCopyCmd
                 //The copy:
                 fileSrc.copyTo(fileDst, callback, mode);  //callback.use() will be called on response
               }
-            } else {
+            } else { //Only if special driver for FileRemote.
               //TODO.
               //read content and write content.
             }
@@ -514,21 +642,27 @@ public class FcmdCopyCmd
   } };
   
   
-  private void eventCheckOk(FileRemote.CallbackEvent ev){
-    if(listEvCheck.remove(ev)){
-      zBytes += ev.nrofBytesAll;
-      zFiles += ev.nrofFiles;
-      int nrofPendingFiles = listEvCheck.size();
-      int percent = nrofPendingFiles * 100 / filesToCopy.size();
-      widgProgressAll.setValue(percent);
-      if(nrofPendingFiles == 0){
-        //TODO check dst space
-        widgCopyState.setText("files:" + zFiles + ", size:" + zBytes);
-        widgButtonOk.setText("copy");
-        widgButtonOk.setCmd("copy");
+  EventConsumer callbackCheck = new EventConsumer("FcmdCopy-check"){
+    @Override protected boolean processEvent_(Event evP)
+    {
+      FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
+      if(listEvCheck.remove(ev)){
+        filesToCopy.add(ev.getFileSrc());
+        zBytes += ev.nrofBytesAll;
+        zFiles += ev.nrofFiles;
+        int nrofPendingFiles = listEvCheck.size();
+        int percent = nrofPendingFiles * 100 / nrofFilesCheck;
+        widgProgressAll.setValue(percent);
+        if(nrofPendingFiles == 0){
+          //TODO check dst space
+          widgCopyState.setText("files:" + zFiles + ", size:" + zBytes);
+          widgButtonOk.setText("copy");
+          widgButtonOk.setCmd("copy");
+        }
       }
+      return true;
     }
-  }
+  };
   
   
   
@@ -575,9 +709,6 @@ public class FcmdCopyCmd
     {
       FileRemote.CallbackEvent ev1 = (FileRemote.CallbackEvent)ev;
       switch(ev1.getCmd()){
-        case doneCheck: {
-          eventCheckOk(ev1);
-        } break;
         case nrofFilesAndBytes:{
           FcmdCopyCmd.this.evCurrentFile = ev1;
           int percent = ev.data2 / 10;

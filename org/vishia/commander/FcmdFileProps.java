@@ -102,12 +102,14 @@ public class FcmdFileProps
   final FileRemote.CallbackEvent evChg;
   
   final FileRemote.CallbackEvent evCntLen;
+ 
+  
   
   public FcmdFileProps(Fcmd main)
   { this.main = main;
     this.formatDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-    evChg = new FileRemote.CallbackEvent(null, callbackChgProps, null);
-    evCntLen = new FileRemote.CallbackEvent(null, callbackCntLen, null);
+    evChg = new FileRemote.CallbackEvent(evSrc, null, null, callbackChgProps, null);
+    evCntLen = new FileRemote.CallbackEvent(evSrc, null, null, callbackCntLen, null);
   }
   
   

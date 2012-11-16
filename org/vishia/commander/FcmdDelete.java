@@ -14,6 +14,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
+import org.vishia.util.EventSource;
 import org.vishia.util.FileRemote;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
@@ -56,6 +57,10 @@ public class FcmdDelete
   File currentDirWhereDelete;
   
   //File dirDelete;
+  
+  EventSource evSrc = new EventSource("FcmdDelete"){
+    
+  };
   
   FcmdDelete(Fcmd main)
   { this.main = main;
@@ -154,7 +159,7 @@ public class FcmdDelete
                   if(!file.canWrite()){
                     //file.setWritable();
                   }
-                  FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(file, success, null);  //NOTE: store file as src to get its name for report in callback.
+                  FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, FileRemote.fromFile(file), null, success, null);  //NOTE: store file as src to get its name for report in callback.
                   listEvDel.add(callback);
                   //
                   //The delete action:
@@ -171,7 +176,7 @@ public class FcmdDelete
               }
             } else { //user has changed the path
               FileRemote dirRemote = FileRemote.fromFile(currentDirWhereDelete);
-              FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(dirRemote, success, null);  
+              FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, dirRemote, null, success, null);  
               dirRemote.delete(sPathDelete, true, callback);
             }
           } else if(widgg.sCmd.equals("esc")){

@@ -27,6 +27,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
+import org.vishia.util.EventSource;
 import org.vishia.util.FileAccessZip;
 import org.vishia.util.FileRemote;
 import org.vishia.util.FileSystem;
@@ -516,6 +517,13 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   private GralInfoBox questionWindow;
+  
+  
+  EventSource evSrc = new EventSource("GralFileSelector"){
+    
+  };
+  
+
   
   public GralFileSelector()
   {
@@ -1132,7 +1140,10 @@ public class GralFileSelector implements Removeable //extends GralWidget
   /**Only one event instance for fillIn-callback. It should be called only one time. */
   final class FillinCallback extends FileRemote.CallbackEvent{
     boolean bCompleteWithFileInfo;
-    FillinCallback(){ super(null, callbackFillIn, null); }
+    FillinCallback(){ 
+      //note: call without source because it is not occupied.
+      super(callbackFillIn, null); 
+    }
   }
   
   FillinCallback callbackEventFillIn = new FillinCallback();
