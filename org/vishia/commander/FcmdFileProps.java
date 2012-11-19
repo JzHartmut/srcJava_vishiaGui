@@ -288,7 +288,9 @@ public class FcmdFileProps
 
 
   EventSource evSrc = new EventSource("FcmdFileProps"){
-    @Override public void notifyDequeued(){}
+    @Override public void notifyDequeued(){
+      
+    }
     @Override public void notifyConsumed(int ctConsumed){}
     @Override public void notifyRelinquished(int ctConsumed){}
   };
@@ -307,29 +309,66 @@ public class FcmdFileProps
         FileRemote actFileRemote;
         if(actFile instanceof FileRemote){ actFileRemote = (FileRemote)actFile; }
         else { actFileRemote = FileRemote.fromFile(actFile); }
-        int mask = 0; int val = actFileRemote.getFlags();
+        int val = 0; //actFileRemote.getFlags();
+        int mask;
+        if(bUnixSystem){
+          mask = FileRemote.mCanRead | FileRemote.mCanWrite | FileRemote.mExecute;
+        } else {
+          mask = FileRemote.mCanWrite | FileRemote.mHidden;
+        }
         switch(widgRd[0].getState()){
           case GralButton.kOff:       val &= ~FileRemote.mCanRead; break;
           case GralButton.kOn:       val |= FileRemote.mCanRead; break;
-          case GralButton.kDisabled: noMask |= FileRemote.mCanRead; break;
+          case GralButton.kDisabled: mask &= ~FileRemote.mCanRead; break;
         }
         switch(widgWr[0].getState()){
           case GralButton.kOff:       val &= ~FileRemote.mCanWrite; break;
           case GralButton.kOn:       val |= FileRemote.mCanWrite; break;
-          case GralButton.kDisabled: noMask |= FileRemote.mCanWrite; break;
+          case GralButton.kDisabled: mask &= ~FileRemote.mCanWrite; break;
         }
         switch(widgEx[0].getState()){
           case GralButton.kOff:       val &= ~FileRemote.mExecute; break;
           case GralButton.kOn:       val |= FileRemote.mExecute; break;
-          case GralButton.kDisabled: noMask |= FileRemote.mExecute; break;
+          case GralButton.kDisabled: mask &= ~FileRemote.mExecute; break;
+        }
+        if(bUnixSystem){
+          switch(widgRd[1].getState()){
+            case GralButton.kOff:       val &= ~FileRemote.mCanReadGrp; break;
+            case GralButton.kOn:       val |= FileRemote.mCanReadGrp; break;
+            case GralButton.kDisabled: mask &= ~FileRemote.mCanReadGrp; break;
+          }
+          switch(widgWr[1].getState()){
+            case GralButton.kOff:       val &= ~FileRemote.mCanWriteGrp; break;
+            case GralButton.kOn:       val |= FileRemote.mCanWriteGrp; break;
+            case GralButton.kDisabled: mask &= ~FileRemote.mCanWriteGrp; break;
+          }
+          switch(widgEx[1].getState()){
+            case GralButton.kOff:       val &= ~FileRemote.mExecuteGrp; break;
+            case GralButton.kOn:       val |= FileRemote.mExecuteGrp; break;
+            case GralButton.kDisabled: mask &= ~FileRemote.mExecuteGrp; break;
+          }
+          switch(widgRd[2].getState()){
+            case GralButton.kOff:       val &= ~FileRemote.mCanReadAny; break;
+            case GralButton.kOn:       val |= FileRemote.mCanReadAny; break;
+            case GralButton.kDisabled: mask &= ~FileRemote.mCanReadAny; break;
+          }
+          switch(widgWr[2].getState()){
+            case GralButton.kOff:       val &= ~FileRemote.mCanWriteAny; break;
+            case GralButton.kOn:       val |= FileRemote.mCanWriteAny; break;
+            case GralButton.kDisabled: mask &= ~FileRemote.mCanWriteAny; break;
+          }
+          switch(widgEx[2].getState()){
+            case GralButton.kOff:       val &= ~FileRemote.mExecuteAny; break;
+            case GralButton.kOn:       val |= FileRemote.mExecuteAny; break;
+            case GralButton.kDisabled: mask &= ~FileRemote.mExecuteAny; break;
+          }
         }
         switch(widgHidden.getState()){
           case GralButton.kOff:       val &= ~FileRemote.mHidden; break;
           case GralButton.kOn:        val |=  FileRemote.mHidden; break;
-          case GralButton.kDisabled: noMask |= FileRemote.mHidden; break;
+          case GralButton.kDisabled: mask &= ~FileRemote.mHidden; break;
         }
-        int mChg = actFileRemote.getFlags() ^ val;
-        mChg &= ~noMask;
+        val &= mask;   //only used bits.
         boolean bAbort = false;
         if(infos.sCmd.equals(sCmdAbort)){
           if(evChg.occupy(evSrc, widgChgFile, callbackChgProps, null, true)){
@@ -342,14 +381,14 @@ public class FcmdFileProps
           if(evChg.occupy(evSrc, widgChgFile, callbackChgProps, null, true)){
             //cmds with callback
             widgChgFile.setText(main.idents.buttonFilePropsChanging);
-            actFileRemote.chgProps(name, mChg, val, 0, evChg);
+            actFileRemote.chgProps(name, mask, val, 0, evChg);
           } else { bAbort = true; }
           //
         } else if(infos.sCmd.equals(sCmdChgRecurs)){
           if(evChg.occupy(evSrc, widgChrRecurs, callbackChgProps, null, true)){
             //cmds with callback
             widgChrRecurs.setText(main.idents.buttonFilePropsChanging);
-            actFileRemote.chgPropsRecursive(mChg, val, 0, evChg);
+            actFileRemote.chgPropsRecursive(mask, val, 0, evChg);
           } else { bAbort = true; }
           //
         } else if(infos.sCmd.equals(sCmdCopy)){

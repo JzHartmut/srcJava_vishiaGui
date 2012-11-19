@@ -33,6 +33,8 @@ public class FcmdCopyCmd
 {
   /**Version and History
    * <ul>
+   * <li>2012-11-16 Hartmut chg: Copy: The {@link #filesToCopy} will be filled after callback of check. The files which are used
+   *   are read only from the input fields of the GUI. The user can change it.
    * <li>2012-02-26 Hartmut chg: Strategy for button texts and abort behavior improved. Problem was: 
    *   The 'check' phase needs some calculation time for a slow network connection. 
    * <li>2012-02-04 Hartmut new: If a file was copied and a comparison result exists, it is set to equal.
@@ -149,7 +151,7 @@ public class FcmdCopyCmd
     widgFromConditions = main.gralMng.addTextField("copyCond",true, "select src files: mask*:*.ext / 2012-08-05..06", "t");
     
     main.gralMng.setPosition(GralPos.same, GralPos.size +3.2f, -9, -1, 0, 'r',1);
-    widgLastSrc = main.gralMng.addSwitchButton("lastSrc", "last src", "lock src", GralColor.getColor("wh"), GralColor.getColor("lgn"));
+    widgLastSrc = main.gralMng.addSwitchButton("lastSrc", "? lock src", "lock src", GralColor.getColor("wh"), GralColor.getColor("lgn"));
     widgLastSrc.setActionChange(actionLastSrc);
     
     main.gralMng.setPosition(GralPos.refer + 3.5f, GralPos.size +3.2f, 1, -1, 0, 'd', 0.3f);
@@ -203,8 +205,14 @@ public class FcmdCopyCmd
 
   protected GralUserAction actionLastSrc = new GralUserAction() ///
   { @Override public boolean exec(int key, GralWidget_ifc widgP, Object... params)
-    { if(false && KeyCode.isControlFunctionMouseUpOrMenu(key)){
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         GralButton widgb = (GralButton)(widgP);
+        if(widgb.isOn()){
+          widgGetPath.setText("get dst");
+        } else {
+          widgGetPath.setText("get src+dst");
+        }
+        /*
         if(widgButtonOk.sCmd.equals("check")){ //only if check phase
           if(widgb.isOn()){
             int nrofSrcFiles = filesToCopy.size();
@@ -234,6 +242,7 @@ public class FcmdCopyCmd
             
           }
         }
+        */
         //else don't do anything.
       }
       return true;
