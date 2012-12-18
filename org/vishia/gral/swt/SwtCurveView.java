@@ -613,6 +613,9 @@ public class SwtCurveView extends GralCurveView
           int timeNow = timeValues[(ixDataRight >> shIxiData) & mIxiData];
           timeDiff = timeNow - timeLast + timeCaryOverNewValue;  //0 if nothing was written.
           xViewPart = (int)(timeorg.pixel7time * timeDiff + 0.0f);
+          if(xViewPart > size.x){
+            xViewPart = size.x;   //for example if no data were received in the past, then timeDiff is hi.
+          }
           xp0 = drawShiftAreaToLeft(g, size, xView, dxView, yView, dyView, xViewPart, timeDiff);
         } else { //paintall
           timeorg.calc();
