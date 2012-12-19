@@ -37,6 +37,11 @@ public interface GralTableLine_ifc extends GralWidget_ifc, SelectMask_ifc
    */
   public static final int version = 20120303;
 
+  /**Returns the text which is assigned to the cell of the table.
+   * @param column The column of table.
+   * @return If the cell text, an empty text "" if the cell has not any text assigned.
+   * @throws IndexOutOfBoundsException on fault column.
+   */
   String getCellText(int column);
   
   String[] getCellTexts();

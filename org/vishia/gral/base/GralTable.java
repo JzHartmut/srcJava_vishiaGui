@@ -719,7 +719,10 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     @Override public String getName(){ return name; }
     
 
-    @Override public String getCellText(int column) { return cellTexts[column]; }
+    @Override public String getCellText(int column) { 
+      String text = cellTexts[column]; 
+      return text == null ? "" : text;
+    }
 
     @Override public String[] getCellTexts() { return cellTexts; }
 
