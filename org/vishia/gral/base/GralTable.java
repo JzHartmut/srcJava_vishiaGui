@@ -565,6 +565,13 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     Assert.check(itsMng.currThreadIsGraphic());
     int iCellLine;
     //calculate number of lines to show:
+    if(tableLines.size() != zLine){
+      //any multithread problem? this routine detects it firstly.
+      zLine = tableLines.size();
+      if(ixLine1 >= zLine){ 
+        ixLine1 = zLine -1;
+      }
+    }
     zLineVisible = getVisibleLinesTableImpl();
     if(zLineVisible > zLineVisibleMax){ 
       zLineVisible = zLineVisibleMax;   //no more lines existing.

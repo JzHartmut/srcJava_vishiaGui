@@ -252,7 +252,7 @@ public class FcmdFileCard extends GralFileSelector
     if(sDirSync !=null){
       zDirSync = sDirSync.length();
       String sPath = file.getAbsolutePath();
-      if(sPath.startsWith(sDirSync)){
+      if(sPath.startsWith(sDirSync) && sPath.length() > zDirSync){
         String sLocalPath = sPath.substring(sDirSync.length()+1);
         result = main.filesCp.idxFilepath4Result.get(sLocalPath);
       } else {

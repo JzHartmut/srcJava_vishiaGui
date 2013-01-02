@@ -151,7 +151,7 @@ public class FcmdView
     if(file !=null){
       long len = file.length();
       if(len > 1000000){ len = 1000000; } //nor more than 1MByte, 
-      uContent = new byte[(int)len];
+      uContent = new byte[(int)len + 10000];
       int iBuffer = 0;
       ReadableByteChannel reader = file.openRead(0);
       try{
