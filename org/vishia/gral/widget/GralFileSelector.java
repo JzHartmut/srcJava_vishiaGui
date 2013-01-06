@@ -316,7 +316,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     public void actionRightZip(Object userData, GralTableLine_ifc line)
     {
       File currentFile = (File)userData;
-      File fileZipAsDir = FileAccessZip.openZipFile(FileRemote.fromFile(currentFile));
+      File fileZipAsDir = FileAccessZip.examineZipFile(FileRemote.fromFile(currentFile));
       //FileZip fileZip = new FileZip(currentFile);
       fillIn(fileZipAsDir, true);
     }
