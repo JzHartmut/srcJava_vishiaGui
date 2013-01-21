@@ -568,7 +568,9 @@ class FcmdFavorPathSelector
       FcmdFileCard lastTab = main.getLastSelectedFileCards()[0];
       if(lastTab !=null){
         File dir = lastTab.getCurrentDir();
-        lastTab.fillIn(dir, true);
+        if(dir !=null){
+          lastTab.fillIn(dir, true);
+        }
       } else {
         throw new IllegalArgumentException("last file tab not able to found");
       }

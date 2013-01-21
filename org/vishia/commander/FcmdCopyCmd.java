@@ -660,7 +660,12 @@ public class FcmdCopyCmd
         zBytes += ev.nrofBytesAll;
         zFiles += ev.nrofFiles;
         int nrofPendingFiles = listEvCheck.size();
-        int percent = nrofPendingFiles * 100 / nrofFilesCheck;
+        int percent;
+        if(nrofFilesCheck >0){
+          percent = nrofPendingFiles * 100 / nrofFilesCheck;
+        } else {
+          percent = 100; 
+        }
         widgProgressAll.setValue(percent);
         if(nrofPendingFiles == 0){
           //TODO check dst space

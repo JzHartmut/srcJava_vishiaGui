@@ -814,7 +814,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     float pixel2Div = milliSec2Div * timeorg.pixel7time / timeorg.absTime.millisec7short();
     int ixPixelTimeDiv =-1;
     int ixPixelTimeDivFine =-1;
-    while(pixel2FineDiv < xViewPart){
+    while(pixel2FineDiv < xViewPart ){ //&& nrofPixel4Data >=0){
       if(Math.abs(pixel2Div - pixel2FineDiv) < 3){
         //strong division
         int xPixel = (int)(pixel2Div + 1.5); //  (xTimeDiv * timeorg.pixel7time + 0.5f) ;
@@ -860,7 +860,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     //ixp1 counts from 0... right to left
     //int nrofValues1 = nrofValues;
     while(ixp < xViewPart
-         && dtime2 <=0
+         && dtime2 <=0 //&& nrofPixel4Data >=0
          ){ // && ixp1 >= ixp2){ //singularly: ixp1 < ixp2 if a faulty timestamp is found.
       do{ //all values per 1 pixel
         ixData -= adIxData; //decrement to older values in the data
