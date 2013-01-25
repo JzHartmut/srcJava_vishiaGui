@@ -29,6 +29,10 @@ public class GralArea9MainCmd extends MainCmd
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-01-26 Hartmut chg: The MsgDispatchSystemOutErr.create(file) was invoked in this constructor. Therefore
+   *   all Applications redirect the System.out and System.err outputs to the message system. The outputs were completed
+   *   with the timestamp and a number, the {@link org.vishia.msgDispatch.MsgDispatcher} was prepared to use. 
+   *   This capability is removed from here yet. It should be a part of the application. See {@link GuiCfg#main(String[])}. 
    * <li>2012-07-09 Hartmut new: The {@link Inspector} will be initialized only if the command line argument 
    *   "-inspectorPort=" is given. That parameter in form "UDP:ip:port" is used.
    * <li>2012-04-22 Hartmut new: {@link #parseArgumentsAndInitGraphic(String, String, int, int, int, int)}
@@ -62,12 +66,12 @@ public class GralArea9MainCmd extends MainCmd
    * 
    * 
    */
-  public final static int version = 20120422;
+  public final static int version = 20130126;
   
   public GralArea9_ifc gui;
   
   //final MsgPrintStream systemErrAdapter;
-  final MsgDispatchSystemOutErr msgDisp;
+  //final MsgDispatchSystemOutErr msgDisp;
   
   
   final LogMessage log;
@@ -92,12 +96,8 @@ public class GralArea9MainCmd extends MainCmd
     super(args);
     this.cargs = cargs;
     this.log = getLogMessageErrorConsole();
-    //this.systemErrAdapter = new MsgPrintStream(log);
-    this.msgDisp = MsgDispatchSystemOutErr.create("D:/DATA/msg/log$yyyy-MMM-dd-HH_mm$.log");
+    //this.msgDisp = MsgDispatchSystemOutErr.create("D:/DATA/msg/log$yyyy-MMM-dd-HH_mm$.log");
     
-    System.err.println("GralArea9MainCmd - test message; test");
-    System.err.println("GralArea9MainCmd - test message; test2");
-    System.out.println("GralArea9MainCmd - test message; out");
     
   }
 

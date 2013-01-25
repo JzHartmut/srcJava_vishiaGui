@@ -866,7 +866,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
 
   
 
-	GralUserAction actionShowWidgetInfos = new GralUserAction()
+	GralUserAction actionShowWidgetInfos = new GralUserAction("actionShowWidgetInfos")
 	{
 
 		@Override public boolean userActionGui(
@@ -955,7 +955,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
 
   
   
-  GralUserAction actionFileSelect = new GralUserAction()
+  GralUserAction actionFileSelect = new GralUserAction("actionFileSelect")
   { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     { assert(false);
       return userActionGui(null, infos);
@@ -986,7 +986,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
 
   /**Action to edit the properties of one widget in the graphic. */
-  public GralUserAction actionDesignEditField = new GralUserAction()
+  public GralUserAction actionDesignEditField = new GralUserAction("actionDesignEditField")
   { 
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     {
@@ -1011,7 +1011,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
 
   /**Action to edit the properties of one widget in the graphic. */
-  public GralUserAction actionReadPanelCfg = new GralUserAction()
+  public GralUserAction actionReadPanelCfg = new GralUserAction("actionReadPanelCfg")
   { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     {
       //GralPanelContent currPanel = 

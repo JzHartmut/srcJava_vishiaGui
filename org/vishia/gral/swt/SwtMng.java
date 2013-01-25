@@ -1651,7 +1651,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 	 * to set a variable when an input field is leaved.
 	 * TODO it isn't Text
 	 */
-	private final GralUserAction syncVariableOnFocus = new GralUserAction()
+	private final GralUserAction syncVariableOnFocus = new GralUserAction("syncVariableOnFocus")
 	{	/**Writes the value to the named variable on leaving the focus.
 		 * The name of the variable is contained in the {@link GralWidget}.
 		 * @see org.vishia.gral.ifc.GralUserAction#userActionGui(java.lang.String, org.vishia.gral.base.GralWidget, java.lang.Object[])

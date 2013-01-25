@@ -2,6 +2,7 @@ package org.vishia.gral.ifc;
 
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.widget.GralFileSelector;
+import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
 
@@ -70,7 +71,8 @@ public abstract class GralUserAction
   public GralUserAction(String ident){ name = ident; }
   
   public GralUserAction(){ 
-    System.out.println("GralUserAction - without name;");
+    CharSequence info = Assert.stackInfo("", 2, 1);
+    System.out.printf("GralUserAction - without name; %s;\n", info);
     name = ""; 
   }
   

@@ -23,6 +23,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.inspector.Inspector;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
+import org.vishia.msgDispatch.MsgDispatchSystemOutErr;
 
 /**This class is the basic class for configurable GUI applications with 9-Area Main window.
  * It works without any derivation, if only simple widgets are necessary.
@@ -384,7 +385,7 @@ public final void execute()
 /**Registered as user action.
  * 
  */
-private final GralUserAction cmdInvoke = new GralUserAction()
+private final GralUserAction cmdInvoke = new GralUserAction("cmdInvoke")
 { 
   ProcessBuilder processBuilder = new ProcessBuilder("pwd");
   
@@ -407,7 +408,7 @@ private final GralUserAction cmdInvoke = new GralUserAction()
 };
 
 
-protected GralUserAction actionFile = new GralUserAction()
+protected GralUserAction actionFile = new GralUserAction("actionFile")
 { @Override public boolean userActionGui(int key, GralWidget widg, Object... params)
   {
     if(widg.name.equals("menuFileSave")){
@@ -437,6 +438,9 @@ public static void main(String[] args){
   //
   //Uses the commonly GuiCallingArgs class because here are not extra arguments.
   GuiCallingArgs cargs = new GuiCallingArgs();
+  
+  //Redirect all outputs from System.out
+  MsgDispatchSystemOutErr.create("D:/DATA/msg/log$yyyy-MMM-dd-HH_mm$.log");
   //Initializes the GUI till a output window to show information.
   GralArea9MainCmd cmdGui = new GralArea9MainCmd(cargs, args);  //implements MainCmd, parses calling arguments
   //Initializes the graphic window and parse the parameter of args (command line parameter).

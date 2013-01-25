@@ -85,7 +85,7 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
    * It calls {@link GralMng_ifc#resizeWidget(GralWidget, int, int)} 
    * for all widgets in the {@link GralPanelContent#widgetsToResize}
    */
-  protected GralUserAction actionResizeOnePanel = new GralUserAction()
+  protected GralUserAction actionResizeOnePanel = new GralUserAction("actionResizeOnePanel")
   { @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { for(GralWidget widgd: widgetsToResize){
         widgd.getMng().resizeWidget(widgd, 0, 0);

@@ -14,9 +14,50 @@ import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.Assert;
 
+/**This class supports output of messages in a GralTable to view and scroll.
+ * The table contains only a defined maximum of messages, older messages will be removed if the capacity is used.
+ * It is recommended to write messages in a persistent medium additionally 
+ * (usual a {@link org.vishia.msgDispatch.LogMessageFile}). 
+ *   
+ * @author Hartmut Schorrig
+ *
+ */
 public class GralMsgOutputList  implements LogMessage
 {
+
+  /**Version, history and license.
+   * <ul>
+   * <li>2013-01-26 Hartmut:fine tuning while adapt message system in component javaSrc_vishiaRun.
+   * <li>2011-04-05 Hartmut creation
+   * </ul>
+   * <br><br>
+   * <b>Copyright/Copyleft</b>:
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL ist not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but don't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you are intent to use this sources without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   * 
+   */
+  public static final int version = 20130126;
 
   /**The access to the gui, to change data to show. */
   private final GralMng_ifc guiAccess;
@@ -77,7 +118,7 @@ public class GralMsgOutputList  implements LogMessage
 
     GralWidget oTable = guiAccess.getWidget("msgOfDay");
     if(oTable == null){
-      System.out.println("GuiMainDialog:insertInfo: unknown widget; %s" + "msgOfDay");
+      Assert.consoleErr("GuiMainDialog:insertInfo: unknown widget; %s; message:%d;%s;\n", "msgOfDay", identNumber, sText);
     } else {
       GralTable_ifc table = (GralTable)oTable;
       GralTableLine_ifc line = table.insertLine(null, Integer.MAX_VALUE, sInfoLine, null);

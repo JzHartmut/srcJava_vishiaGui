@@ -131,20 +131,20 @@ public class GralArea9Window implements GralArea9_ifc
    * than this value, this value is used. Note that a given minimal value of all areas cannot required
    * if the window's size is lesser. Then the middle area will 
    */
-  private short[] xMinGralSize = new short[3], yMinGralSize = new short[3]; 
+  private final short[] xMinGralSize = new short[3], yMinGralSize = new short[3]; 
   
   /**requested maximal size of each window area in GralPos units. If the maximal value is greater than 
    * the size calculated from percent always, the percent value is used. 
    * Note that a given maximal value of all areas cannot regarded
    * if the window's size is greater. Then the middle area will be presented  
    */
-  private short[] xMaxGralSize = new short[3], yMaxGralSize = new short[3];
+  private final short[] xMaxGralSize = new short[3], yMaxGralSize = new short[3];
   
   /**Calculated borders of areas. 
    * [0] is always 0, [1] and [2] are the given borders, [3] is always 100.
    * It is because lower and higher bound should be accessed always without tests.
    * Use area +1, because it is a Off-by-one problem */
-  private int[] xPixArea = new int[4], yPixArea = new int[4];
+  private final int[] xPixArea = new int[4], yPixArea = new int[4];
   
   /**Number of pixels per percent unit of size, set if {@link #validateFrameAreas()} was called. */
   protected float pixelPerXpercent = 1, pixelPerYpercent =1;  
@@ -600,7 +600,7 @@ public class GralArea9Window implements GralArea9_ifc
   
   
   
-  private GralDispatchCallbackWorker writeOutputTextDirectly = new GralDispatchCallbackWorker("GralArea9Window.writeOutputTextDirectly")
+  private final GralDispatchCallbackWorker writeOutputTextDirectly = new GralDispatchCallbackWorker("GralArea9Window.writeOutputTextDirectly")
   { @Override public void doBeforeDispatching(boolean onlyWakeup)
     { String line;
       while((line = outputTexts.poll())!=null){
@@ -689,7 +689,7 @@ public class GralArea9Window implements GralArea9_ifc
   
 
 
-  private GralUserAction mouseAction = new GralUserAction()
+  private final GralUserAction mouseAction = new GralUserAction("mouseAction")
   { int captureAreaDivider;
   
   
@@ -711,7 +711,7 @@ return true;
   } };
   
   
-  private GralUserAction resizeAction = new GralUserAction()
+  private final GralUserAction resizeAction = new GralUserAction("resizeAction")
   { @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { validateFrameAreas();  //calculates the size of the areas newly and redraw.
       return true;
@@ -734,7 +734,7 @@ return true;
   } }
 
 
-  private GralUserAction actionHelp = new  GralUserAction()
+  private final GralUserAction actionHelp = new  GralUserAction("actionHelp")
   { 
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { infoHelp.activate();
@@ -743,7 +743,7 @@ return true;
   } };
 
 
-  private GralUserAction actionAbout = new  GralUserAction()
+  private final GralUserAction actionAbout = new  GralUserAction("actionAbout")
   { //final InfoBox infoHelp;
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { try{

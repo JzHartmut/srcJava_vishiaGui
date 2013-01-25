@@ -269,7 +269,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   
 
   
-  GralUserAction actionOkButton = new GralUserAction(){
+  GralUserAction actionOkButton = new GralUserAction("actionOkButton"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
       //if(textBox !=null) {textBox.setText(""); }  //'I have seen it, therefore delete.
       if(actionOk !=null){ actionOk.userActionGui(KeyCode.enter, widgd); }
