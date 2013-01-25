@@ -2,6 +2,7 @@ package org.vishia.gral.base;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +33,11 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-01-25 Hartmut improved: Error message in {@link #refreshFromVariable(VariableContainer_ifc)} only on
+   *   paint-complete of the view. If the implementation receives a paintAll command by mouseClick on the graphic
+   *   or because the graphic is shown the first time, the {@link #setPaintAllCmd()} is invoked there. The variable
+   *   {@link #bNewGetVariables} is set, that causes the error message.
+   *   Before: no error message was created, the error was obscure. 
    * <li>2012-08-11 Hartmut now grid with  timestamps
    * <li>2012-06-08 Hartmut new: {@link #applySettings(String)} and {@link #writeSettings(Appendable)} for saving
    *   and getting the configuration of curve view from a file or another text.
@@ -344,7 +350,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   
   /**All tracks. */
-  protected final List<Track> listTracks = new LinkedList<Track>();
+  protected final List<Track> listTracks = new ArrayList<Track>();
   
   /**All tracks to return for filling. It has the same members in the same order like {@link #listTracks}*/
   protected final List<GralSetValue_ifc> listTrackSet = new LinkedList<GralSetValue_ifc>();
@@ -513,7 +519,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   protected boolean focusChanged = false;  //it doesn't work
   
   /**Set to true to force a paint all. */
-  protected boolean paintAllCmd = false;
+  protected boolean bPaintAllCmd = false;
+  
+  private boolean bNewGetVariables = true;
   
   protected int newSamples;
   
@@ -739,14 +747,18 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       float[] values = new float[listTracks.size()];
       int ixTrack = -1;
       for(Track track: listTracks){
-        if(track.variable ==null ){ //no variable known, get it.
+        if(track.variable ==null && bNewGetVariables){ //no variable known, get it.
           String sDataPath = track.getDataPath();
           if(sDataPath !=null){
             String sPath2 = sDataPath.trim();
             String sPath = itsMng.replaceDataPathPrefix(sPath2);
             track.variable = container.getVariable(sPath);
+            if(track.variable == null){
+              System.err.println("GralCurveView - variable not found; in " + super.name + "; datapath=" + sPath);
+            }
           }
         }
+        bNewGetVariables = false;
         final float value;
         if(track.variable !=null ){
           value = track.variable.getFloat();
@@ -1045,6 +1057,14 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     }catch(IOException exc){
       System.err.println(Assert.exceptionInfo("", exc, 0, 4));
     }
+  }
+  
+  
+  
+  
+  protected void setPaintAllCmd(){
+    bPaintAllCmd = true;      //used in implementation level to force a paint of the whole curves.
+    bNewGetVariables= true;   //used to get faulty variables newly with an error message.
   }
   
   

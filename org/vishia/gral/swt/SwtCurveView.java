@@ -289,7 +289,7 @@ public class SwtCurveView extends GralCurveView
             } else if(e.x > size.x * 3 / 4){          //edge right top
               zoomToPresent();
             } else {
-              System.out.println("mid-top");
+              //System.out.println("mid-top");
             }
           } else if(e.y > size.y * 7/8 ) {            //bottom range 
             int xr = size.x - e.x;
@@ -301,12 +301,12 @@ public class SwtCurveView extends GralCurveView
             } else if(e.x > size.x * 3 / 4){    //edge right bottom
               viewToPresent();
             } else {
-              System.out.println("mid-bottom");
+              //System.out.println("mid-bottom");
             }
           } else { //middle range y
             moveCursors(e.x);
           }
-          paintAllCmd = true;
+          SwtCurveView.super.setPaintAllCmd();   //
         } catch(Exception exc){
           System.err.println("SwtCurveView.mouseDown; unexpected; " + exc.getMessage());
         }
@@ -318,7 +318,7 @@ public class SwtCurveView extends GralCurveView
        */
       @Override public void mouseUp(MouseEvent e) {
         bMouseDownCursor1 = bMouseDownCursor2 = false;
-        System.out.println("SwtCurveView.mouseUp");
+        //System.out.println("SwtCurveView.mouseUp");
       }
       
     };
@@ -493,6 +493,18 @@ public class SwtCurveView extends GralCurveView
     
     
     
+    /**Draws the curves.
+     * @param g
+     * @param size
+     * @param xView
+     * @param dxView
+     * @param yView
+     * @param dyView
+     * @param ixDataRight
+     * @param xViewPart
+     * @param timeDiff
+     * @param xp0
+     */
     private void drawRightOrAll(GC g, Point size, int xView, int dxView, int yView, int dyView, int ixDataRight, int xViewPart, int timeDiff, int xp0){
       g.setBackground(colorBack);
       //fill, clear the area either from 0 to end or from size.x - xView to end,
@@ -520,21 +532,21 @@ public class SwtCurveView extends GralCurveView
       g.setForeground(gridColor);
       g.setLineWidth(1);
       g.setLineStyle(SWT.LINE_DOT);
-      for(int ii=1; ii <=9; ++ii){
+      for(int ii=1; ii <=9; ++ii){  //draw the horizontal grid
         int y = (int)(size.y /10.0f * ii);
         g.drawLine(size.x - xViewPart, y, size.x, y);
         
       }
       //
       int ixPixelTimeDiv =-1;
-      int xPixelTimeDiv1;
+      int xPixelTimeDiv1;                     //draw the vertical fine grid, the time divisions
       while((xPixelTimeDiv1 = timeorg.xPixelTimeDivFine[++ixPixelTimeDiv]) >=0) {
         g.drawLine(size.x - xPixelTimeDiv1, 0, size.x - xPixelTimeDiv1, size.y);
         //System.out.println("draw " + xPixelTimeDiv);
       }
       g.setForeground(gridColorStrong);
       g.setLineWidth(1);
-      ixPixelTimeDiv =-1;
+      ixPixelTimeDiv =-1;                     //draw the vertical grid, strong lines.
       while((xPixelTimeDiv1 = timeorg.xPixelTimeDiv[++ixPixelTimeDiv]) >=0) {
         g.drawLine(size.x - xPixelTimeDiv1, 0, size.x - xPixelTimeDiv1, size.y);
         if(xPixelTimeDiv1 > 30){
@@ -582,6 +594,16 @@ public class SwtCurveView extends GralCurveView
     
     
     
+    /**This routine overrides 
+     * @see org.eclipse.swt.widgets.Canvas#drawBackground(org.eclipse.swt.graphics.GC, int, int, int, int)
+     * It is called in this class in {@link #paintListener} in the {@link PaintListener#paintControl(PaintEvent)} method.
+     * It draws the whole content.
+     * <br><br>
+     * Because of saving calculation time there will be drawn only a small peace on right side of the area
+     * with the new data normally. The rest inclusive grid lines, curves, text is moved to left. But if the whole
+     * window should be refreshed, the whole widget is drawn newly.
+     * 
+     */
     @Override public void drawBackground(GC g, int xView, int yView, int dxView, int dyView) {
       //NOTE: forces stack overflow because calling of this routine recursively: super.paint(g);
       try{
@@ -601,7 +623,7 @@ public class SwtCurveView extends GralCurveView
         final int timeDiff; //time for new values.
         testHelp.xView =xView; testHelp.yView =yView; testHelp.dxView =dxView; testHelp.dyView =dyView;
         //
-        if(!bFreeze && !paintAllCmd && redrawBecauseNewData1) {
+        if(!bFreeze && !SwtCurveView.super.bPaintAllCmd && redrawBecauseNewData1) {
           //paint only a part of the curve to save calculation time.
           //The curve will be shifted to left.
           //
@@ -619,12 +641,12 @@ public class SwtCurveView extends GralCurveView
           xp0 = drawShiftAreaToLeft(g, size, xView, dxView, yView, dyView, xViewPart, timeDiff);
         } else { //paintall
           timeorg.calc();
-          System.out.println("SwtCurveView - paintall;" + bFreeze + paintAllCmd + redrawBecauseNewData1);
+          System.out.println("SwtCurveView - paintall;" + bFreeze + bPaintAllCmd + redrawBecauseNewData1);
           xViewPart = size.x;
           timeCaryOverNewValue = 0;
           timeDiff = (int)(timeorg.timePerPixel * xViewPart);
           xp0 = 0;
-          paintAllCmd = false; //accepted, done
+          SwtCurveView.super.bPaintAllCmd = false; //accepted, done
           testHelp.ctRedrawAll +=1;
           paintAllExec = true;
           //xViewLast = 0;
