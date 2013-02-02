@@ -181,7 +181,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
               }catch(IOException exc){}
             }
           } 
-          catch(FileNotFoundException exc){}
+          catch(Exception exc){}
         }
         return true;
       }

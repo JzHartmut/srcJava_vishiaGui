@@ -758,7 +758,6 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
             }
           }
         }
-        bNewGetVariables = false;
         final float value;
         if(track.variable !=null ){
           value = track.variable.getFloat();
@@ -768,6 +767,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
         }
         values[++ixTrack] = value;
       }  
+      bNewGetVariables = false;
       long timeyet = System.currentTimeMillis();
       int timeshort = (int)timeyet;
       setTimePoint(timeyet, timeshort, 1.0f);

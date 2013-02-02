@@ -11,6 +11,7 @@ import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
 public class FcmdSettings
@@ -126,7 +127,7 @@ public class FcmdSettings
   
   /**Action for OK. 
    */
-  GralUserAction actionButton = new GralUserAction()
+  GralUserAction actionButton = new GralUserAction("FcmdSettings-close")
   {
     @Override public boolean exec(int keyCode, GralWidget_ifc widg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
@@ -140,9 +141,9 @@ public class FcmdSettings
   
   /**Action for open the dialog window. It fills the value of the fields from internal variable. 
    */
-  GralUserAction actionOpenDialog = new GralUserAction()
+  GralUserAction actionOpenDialog = new GralUserAction("FcmdSettings-actionOpenDialog")
   {
-    @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params){ 
+    @Override public boolean exec(int keyCode, GralWidget_ifc infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         openDialog(main.currentFile);
       }
@@ -151,8 +152,9 @@ public class FcmdSettings
   };
 
 
-  /**Action for open the editor for the cmd configuration file. */
-  GralUserAction actionEditCfgFile = new GralUserAction()
+  /**Action for open the editor for the configuration file. 
+   * The name of the configuration file is contained in the widget. */
+  GralUserAction actionEditCfgFile = new GralUserAction("FcmdSettings-actionEditCfgFile")
   {
     @Override public boolean exec(int keyCode, GralWidget_ifc widg, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
@@ -162,7 +164,8 @@ public class FcmdSettings
         } else {
           File[] files = new File[1];
           files[0] = new File(main.cargs.dirCfg, ((GralWidget)widg).getCmd());
-          main.executer.cmdQueue.addCmd(cmdBlock, files, null); // to execute.
+          File dir = FileSystem.getDir(files[0]);
+          main.executer.cmdQueue.addCmd(cmdBlock, files, dir); // to execute.
         }
       }
       return true;
@@ -171,9 +174,9 @@ public class FcmdSettings
 
 
   /**Action to set the content of the cmd configuration file. */
-  GralUserAction actionApplyCfgCmd = new GralUserAction()
+  GralUserAction actionApplyCfgCmd = new GralUserAction("FcmdSettings-actionApplyCfgCmd")
   {
-    @Override public boolean userActionGui(int keyCode, GralWidget widg, Object... params){ 
+    @Override public boolean exec(int keyCode, GralWidget_ifc widg, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         main.cmdSelector.cmdStore.readCmdCfg(new File(main.cargs.dirCfg, ((GralWidget)widg).getCmd()));
         main.cmdSelector.fillIn();
@@ -184,9 +187,9 @@ public class FcmdSettings
 
 
   /**Action to set the content of the extension configuration file. */
-  GralUserAction actionApplyCfgExt = new GralUserAction()
+  GralUserAction actionApplyCfgExt = new GralUserAction("FcmdSettings-actionApplyCfgExt")
   {
-    @Override public boolean userActionGui(int keyCode, GralWidget widg, Object... params){ 
+    @Override public boolean exec(int keyCode, GralWidget_ifc widg, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         main.executer.readCmdFile(new File(main.cargs.dirCfg, ((GralWidget)widg).getCmd()));
       }
@@ -196,9 +199,9 @@ public class FcmdSettings
 
 
   /**Action to set the content of the favor path file. */
-  GralUserAction actionApplyCfgPath = new GralUserAction()
+  GralUserAction actionApplyCfgPath = new GralUserAction("FcmdSettings-actionApplyCfgPath")
   {
-    @Override public boolean userActionGui(int keyCode, GralWidget widg, Object... params){ 
+    @Override public boolean exec(int keyCode, GralWidget_ifc widg, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         main.favorPathSelector.actionReadFavoritePathes.exec(KeyCode.menuEntered, null);
       }

@@ -308,7 +308,7 @@ public class Fcmd extends GuiCfg
       
     };
     
-    executer.cmdQueue.execCmds(writeStatusCmd, null);
+    executer.cmdQueue.execCmds(writeStatusCmd);
   }
   
   

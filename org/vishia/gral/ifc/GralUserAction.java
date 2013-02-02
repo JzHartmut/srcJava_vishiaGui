@@ -70,6 +70,10 @@ public abstract class GralUserAction
   
   public GralUserAction(String ident){ name = ident; }
   
+  /**
+   * @deprecated use {@link #GralUserAction(String)} with a name. The name helps while debugging.
+   */
+  @Deprecated
   public GralUserAction(){ 
     CharSequence info = Assert.stackInfo("", 2, 1);
     System.out.printf("GralUserAction - without name; %s;\n", info);
@@ -124,11 +128,17 @@ public abstract class GralUserAction
   
   
   
-  /**Call of users method while any user action on the gui is done.
+  /**This method should be override by the users class.
+   * In the implementation the user can cast from the widgd given as interface to the known implementation widget type
+   * because the {@link GralUserAction} is associated to a specific widget. 
+   * <br><br>
    * If this method is not overridden from the {@link GralUserAction} super class, it tries to call 
    * the deprecated {@link #userActionGui(int, GralWidget, Object...)} because that method may be overridden. 
+   * 
    * @param actionCode See {@link KeyCode}. Any special action is designated with 0.
-   * @param widgd The Gral widget
+   * @param widgd The Gral which calls this method in any of its implementation methods. 
+   *   This parameter designates the source of the call with some specific properties in the widget.
+   *   For example ((GralWidget)widgd).getCmd() can be invoked.
    * @param params Some optional values, depending on special user designation. In most cases no parameter.
    *   The user may be test the type of parameter for complex usage.
    * @return true if execution is succeed. false if the users application can't deal with the actionCode or the widget. 

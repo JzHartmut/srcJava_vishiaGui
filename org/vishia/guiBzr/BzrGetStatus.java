@@ -30,7 +30,7 @@ public class BzrGetStatus
   private final DateFormat logDateFormat= new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
   
   
-  private List<DataFile> listUnknownFiles = new LinkedList<DataFile>();
+  private final List<DataFile> listUnknownFiles = new LinkedList<DataFile>();
   
   public BzrGetStatus(MainCmd_ifc mainCmdifc, MainData mainData)
   { this.mainCmdifc = mainCmdifc;
@@ -49,7 +49,7 @@ public class BzrGetStatus
   {
     listBzrDirs.clear();
     try{ FileSystem.addFileToList(sProjectPath + "/**/.bzr", listBzrDirs);
-    } catch(FileNotFoundException exc){ }
+    } catch(Exception exc){ }
     int zCmpn = listBzrDirs.size();
     mainData.currPrj.init(zCmpn);
     //int ixCmpn = 0;

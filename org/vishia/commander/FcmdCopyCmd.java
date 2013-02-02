@@ -464,7 +464,7 @@ public class FcmdCopyCmd
           //check the amount of files in field widgFromConditions
           if(sFilesSrc.contains("*")){
             try{ FileSystem.addFileToList(dirSrc, sFilesSrc, listFileSrc);}
-            catch(FileNotFoundException exc){
+            catch(Exception exc){
               System.err.println(exc.getMessage());
             }
           } else if(sFilesSrc.contains(", ")){
