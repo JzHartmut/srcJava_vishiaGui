@@ -24,6 +24,7 @@ import org.vishia.util.FileRemote;
 import org.vishia.util.FileRemoteAccessor;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
+import org.vishia.util.StringFunctions;
 
 /**This class contains all functionality to execute copy and move for The.file.Commander.
  * @author Hartmut Schorrig
@@ -33,6 +34,8 @@ public class FcmdCopyCmd
 {
   /**Version and History
    * <ul>
+   * <li>2013-02-03 Hartmut new: Copy exception (on file open to write) cases a message, the key {@link #widgOverwrFile}
+   *   works together with the Ask state.
    * <li>2012-11-16 Hartmut chg: Copy: The {@link #filesToCopy} will be filled after callback of check. The files which are used
    *   are read only from the input fields of the GUI. The user can change it.
    * <li>2012-02-26 Hartmut chg: Strategy for button texts and abort behavior improved. Problem was: 
@@ -180,7 +183,7 @@ public class FcmdCopyCmd
     widgdCreateNew = main.gralMng.addButton("copyCreate", actionCreateCopy, null, null, "only overwr ? yes");
 
     main.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size -3, 1, 15, 0, 'r', 1);
-    widgOverwrFile = main.gralMng.addButton("copyOverwrite", null, null, null, "overwr file");
+    widgOverwrFile = main.gralMng.addButton("copyOverwrite", actionOverwriteFile, "overwr file");
     widgSkipFile = main.gralMng.addButton("copyskip", actionButtonSkipFile, null, null, "skip file");
     //main.gralMng.setPosition(GralPos.same, GralPos.size -3, 16, GralPos.size +14, 0, 'r', 1);
     widgSkipDir = main.gralMng.addButton("copySkipDir", actionButtonSkipDir, null, null, "skip dir");
@@ -599,6 +602,26 @@ public class FcmdCopyCmd
   };
   
 
+  /**This action is used to skip over the current showed file while copying. Copying of the selected file
+   * should be aborted and that file should be deleted.
+   * 
+   */
+  protected GralUserAction actionOverwriteFile = new GralUserAction("overwr file")
+  { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        if(evCurrentFile !=null){
+          FileRemote.CmdEvent evcmd = evCurrentFile.getOpponent();
+          if(evcmd.occupy(evSrc, true)){
+            evcmd.sendEvent(FileRemote.Cmd.overwr);
+          }
+        }
+        widgOverwrFile.setBackColor(GralColor.getColor("wh"), 0);
+      }
+      return true;
+    } 
+  };
+  
+  
   
   
   /**This action is used to skip over the current showed file while copying. Copying of the selected file
@@ -608,7 +631,13 @@ public class FcmdCopyCmd
   protected GralUserAction actionButtonSkipFile = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        bSkipFile = true;  
+        if(evCurrentFile !=null){
+          FileRemote.CmdEvent evcmd = evCurrentFile.getOpponent();
+          if(evcmd.occupy(evSrc, true)){
+            evcmd.sendEvent(FileRemote.Cmd.abortCopyFile);
+          }
+        }
+        widgOverwrFile.setBackColor(GralColor.getColor("wh"), 0);
       }
       return true;
     } 
@@ -622,7 +651,13 @@ public class FcmdCopyCmd
   protected GralUserAction actionButtonSkipDir = new GralUserAction()
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        bSkipDir = true;  
+        if(evCurrentFile !=null){
+          FileRemote.CmdEvent evcmd = evCurrentFile.getOpponent();
+          if(evcmd.occupy(evSrc, true)){
+            evcmd.sendEvent(FileRemote.Cmd.abortCopyDir);
+          }
+        }
+        widgOverwrFile.setBackColor(GralColor.getColor("wh"), 0);
       }
       return true;
     } 
@@ -739,6 +774,11 @@ public class FcmdCopyCmd
             bSkipDir = false;
           } 
         }break;
+        case askErrorDstCreate: {
+          FcmdCopyCmd.this.evCurrentFile = ev1;
+          widgCopyState.setText("read only: " + StringFunctions.z_StringJc(ev1.fileName));
+          widgOverwrFile.setBackColor(GralColor.getColor("lrd"), 0);
+        } break;
         case error: {
           FcmdCopyCmd.this.evCurrentFile = null;
           widgCopyState.setText("error");
