@@ -911,7 +911,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       ixData2 = ixData;
     } 
     if(ixp < xViewPart){
-      System.out.println("GralCurveView large xViewPart");
+      //System.out.println("GralCurveView large xViewPart");
     }
     //ixDataShown[++ixp2] = -1;      //the last
     return ixp;
@@ -1055,7 +1055,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
         out.writeCurveFinish();
       }
     }catch(IOException exc){
-      System.err.println(Assert.exceptionInfo("", exc, 0, 4));
+      System.err.println(Assert.exceptionInfo("GralCurveView- exception", exc, 0, 4));
     }
   }
   
@@ -1070,7 +1070,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   
   protected void moveCursors(int xPos){
-    System.out.println("middle");
+    //System.out.println("middle");
     int xr = nrofValuesShow - xPos;  //from right
     if(xpCursor1 < 0){
       xpCursor1 = xr;
@@ -1088,11 +1088,11 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       if(xr > xm){ //more left
         xpCursor1 = xr;
         bMouseDownCursor1 = true;
-        System.out.println("SwtCurveView.mouseDown; cursor1");
+        //System.out.println("SwtCurveView.mouseDown; cursor1");
       } else {
         xpCursor2 = xr;
         bMouseDownCursor2 = true;
-        System.out.println("SwtCurveView.mouseDown; cursor1");
+        //System.out.println("SwtCurveView.mouseDown; cursor1");
       }
     }
 
@@ -1112,7 +1112,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     }
     xpCursor1 = xpCursor2 = cmdSetCursor;  
     timeorg.timeSpread /=2;    //half timespread
-    System.out.println("right-top");
+    //System.out.println("right-top");
   }
   
   
@@ -1132,7 +1132,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     }
     xpCursor1 = xpCursor2 = cmdSetCursor;  
     timeorg.timeSpread *=2;    //double timespread
-    System.out.println("left-top");
+    //System.out.println("left-top");
 
   }
   
@@ -1219,7 +1219,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       //}
       //ixDataShowRight += ixDataShown[0] - ixDataShown[nrofValuesShow-1]; 
     }
-    System.out.println("right-bottom");
+    //System.out.println("right-bottom");
   }
   
   /**Shifts the curve presentation to the past. If the presentation is running, it is stopped firstly.
@@ -1241,7 +1241,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
         ixDataShowRight = ixDataWr + ixdDataSpread;
       }
     }
-    System.out.println("left-bottom");
+    //System.out.println("left-bottom");
 
   }
   

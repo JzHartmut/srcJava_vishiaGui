@@ -333,11 +333,11 @@ public class SwtCurveView extends GralCurveView
       {
         if(bMouseDownCursor1){
           xpCursor1 = nrofValuesShow - e.x;  //from right;
-          System.out.println("SwtCurveView.mouseMove cursor1 x,y=" + e.x + ", " + e.y);
+          //System.out.println("SwtCurveView.mouseMove cursor1 x,y=" + e.x + ", " + e.y);
           repaint(50,50);
         } else if(bMouseDownCursor2){
           xpCursor2 = nrofValuesShow - e.x;  //from right;
-          System.out.println("SwtCurveView.mouseMove cursor2 x,y=" + e.x + ", " + e.y + ", cursor2=" + xpCursor2);
+          //System.out.println("SwtCurveView.mouseMove cursor2 x,y=" + e.x + ", " + e.y + ", cursor2=" + xpCursor2);
           repaint(50,50);
         } else {
           //System.out.println("SwtCurveView.mouseMove x,y=" + e.x + ", " + e.y);
@@ -641,7 +641,7 @@ public class SwtCurveView extends GralCurveView
           xp0 = drawShiftAreaToLeft(g, size, xView, dxView, yView, dyView, xViewPart, timeDiff);
         } else { //paintall
           timeorg.calc();
-          System.out.println("SwtCurveView - paintall;" + bFreeze + bPaintAllCmd + redrawBecauseNewData1);
+          //System.out.println("SwtCurveView - paintall;" + bFreeze + bPaintAllCmd + redrawBecauseNewData1);
           xViewPart = size.x;
           timeCaryOverNewValue = 0;
           timeDiff = (int)(timeorg.timePerPixel * xViewPart);
@@ -687,7 +687,7 @@ public class SwtCurveView extends GralCurveView
         }
       } catch(Exception exc){
         StackTraceElement[] stack = exc.getStackTrace();
-        System.err.println("SwtCurveView-paint; " + exc.getMessage() + ";" + stack[0].getFileName() + ":" + stack[0].getLineNumber());
+        System.err.println("SwtCurveView-paint-exception; " + exc.getMessage() + ";" + stack[0].getFileName() + ":" + stack[0].getLineNumber());
         stop();
       }
       //g.drawString(""+xShift+ ":"+ xViewLast + ":" + nrofDataShift.get(), 200, dyView-28);

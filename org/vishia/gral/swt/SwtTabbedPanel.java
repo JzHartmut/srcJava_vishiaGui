@@ -176,7 +176,7 @@ public class SwtTabbedPanel extends GralTabbedPanel
   					focusedTab = panelContent;
   					focusedTab.implMethodPanel_.setVisible(true);   //the currently focused tab.
             focusedTab.setFocus();
-  					System.out.printf("Fcmd-selectTab; %s", panelContent.toString());
+  					//System.out.printf("Fcmd-selectTab; %s", panelContent.toString());
             //mng.log.sendMsg(0, "Fcmd-selectTab %s", panelContent.toString());
   					if(notifyingUserInstanceWhileSelectingTab !=null){
               notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);

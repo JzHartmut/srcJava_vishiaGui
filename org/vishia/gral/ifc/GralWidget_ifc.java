@@ -109,6 +109,19 @@ public interface GralWidget_ifc extends Removeable
    */
   boolean isVisible();
   
+  /**Sets whether it is able to edit the content of the text field or text box.
+   * If a content is not able to edit, it is a showing field or box. The user can't change the
+   * content. But the user can set the cursor, select any text and copy to the systems clipboard.
+   * If the content is able to edit, the change should be notified and the content should be gotten.
+   * To do that TODO
+   * @param editable true then the content is going to be able to change. 
+   *   False then the edit functionality is disabled. 
+   */
+  void setEditable(boolean editable);
+  
+  /**Query whether this widget is able to change from user handling. */
+  boolean isEditable();
+  
   /**
    * @deprecated use {@link #setBackColor(GralColor, int)}
    */
@@ -174,6 +187,15 @@ public interface GralWidget_ifc extends Removeable
    */
   void setDataPath(String sDataPath);
   
+  
+  /**Returns true if the content is changed.
+   * @param setUnchanged If true then set to unchanged with this call.
+   * @return true if the content was changed since last setUnchanged.
+   */
+  boolean isChanged(boolean setUnchanged);
+  
+  
+
   /**Capability for any widget to update its content from its associated variables described in its sDataPath.
    * @param container The container is used only if the variable is not known by direct reference
    *   in the private {@link GralWidget#variable} or {@link GralWidget#variables}. If the variable(s) is/are

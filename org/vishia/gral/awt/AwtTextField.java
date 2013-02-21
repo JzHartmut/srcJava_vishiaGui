@@ -167,7 +167,7 @@ public static class AwtTextFieldImpl extends TextField implements AwtWidget
     int catastrophicalCount = 0;
     do{
       if(++catastrophicalCount > 10000) throw new RuntimeException("atomic failed");
-      if((chg & chgText) !=0){ 
+      if((chg & chgText) !=0  && text!=null){ 
         widgetAwt.setText(text); 
       }
       if((chg & chgColorText) !=0){ widgetAwt.setForeground(((AwtWidgetMng)itsMng).getColorImpl(dyda.textColor)); }

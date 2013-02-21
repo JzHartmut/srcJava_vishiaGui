@@ -65,10 +65,10 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
   public AwtWidgetMng(GralGraphicThread device, Frame window, AwtProperties propertiesGui
-    , VariableContainer_ifc variableContainer
+    //, VariableContainer_ifc variableContainer
     , LogMessage log
     )
-  { super(device, null, propertiesGui, variableContainer, log);
+  { super(device, null, propertiesGui, log);
     mainWindowAwt = window;
     this.propertiesGuiAwt = propertiesGui;
     mainWindowAwt.addKeyListener(mainKeyListener);

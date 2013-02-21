@@ -147,7 +147,6 @@ public final GralArea9Window guiW;
 
 public final MainCmd_ifc mainCmd;
 
-private final GralShowMethods showMethods = new GralShowMethods();
 
 public GralMng gralMng;
 
@@ -174,7 +173,9 @@ protected GralTabbedPanel mainTabPanel;
  *   This instance may be defined in the context which calls this constructor.
  *   Note: A user instance may be instantiated with the cmd line calling argument "-plugin=JAVACLASSPATH"  
  */
-public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui, GralPlugUser_ifc plugUser, GralPlugUser2Gral_ifc plugUser2Gui) 
+public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui
+    , GralPlugUser_ifc plugUser, GralPlugUser2Gral_ifc plugUser2Gui
+    ) 
 { this.mainCmd = cmdGui;
   this.gui = cmdGui.gui;
   guiW = (GralArea9Window)gui;
@@ -219,7 +220,6 @@ public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui, GralPlugUser_ifc pl
 
   //Register any user action. This should be done before the GUI-configuration is read.
   panelBuildIfc.registerUserAction("cmdInvoke", cmdInvoke);
-  showMethods.registerShowMethods(panelBuildIfc);
   
 }
 

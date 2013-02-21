@@ -81,7 +81,7 @@ public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, A
   //@Override public void setSelection(String how){ textAreaOutput.setSelection(how); }
   
 
-  @Override public boolean isChanged(){ return textAreaOutput.isChanged(); }
+  @Override public boolean isChanged(boolean setUnchanged){ return textAreaOutput.isChanged(setUnchanged); }
   
 
   

@@ -340,6 +340,19 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    */
   private boolean bVisible;
   
+  
+  /**Set to true on {@link #setEditable(boolean)}. 
+   * With that designation the cyclically refresh of the text field can be prevented. 
+   * */
+  protected boolean bEditable;
+  
+  
+  /**Set to true from any listener of the implementation level if the data of the widget was changed.
+   * For example key listener on a text edit field. */
+  protected boolean bTextChanged;
+  
+
+
   /**Delay to repaint.
    * 
    */
@@ -457,6 +470,17 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   /**Gets the application specific info. See {@link #setContentInfo(Object)}. */
   public Object getContentInfo(){ return oContentInfo; }
+  
+ 
+  
+  @Override public void setEditable(boolean editable){
+    bEditable = editable;
+  }
+
+  @Override public boolean isEditable(){ return bEditable; }
+  
+
+  
   
   /**Sets the data path. It is a String in application context.
    * @param sDataPath
@@ -685,7 +709,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
       } else {
         variable = null;
       }
-    } else if(oContentInfo instanceof VariableAccess_ifc){
+    } else if(oContentInfo instanceof VariableAccessWithIdx){
       variable = (VariableAccessWithIdx)oContentInfo;
     } else {
       variable = null;  //other info in widget, not a variable.
@@ -826,6 +850,16 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
     return bVisible;
   }
   
+  
+  @Override public boolean isChanged(boolean setUnchanged){ 
+    boolean bChanged = this.bTextChanged;
+    if(setUnchanged){ 
+      this.bTextChanged = false; 
+    }
+    return bChanged; 
+  }
+  
+
   
   /**Sets the current value of the content of the widget in the given context.
    * @param cmd see {@link GralMng_ifc#cmdSet} etc. It is possible to set the color etc.

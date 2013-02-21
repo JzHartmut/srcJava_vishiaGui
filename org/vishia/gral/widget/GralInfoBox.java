@@ -164,8 +164,18 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     else throw new IllegalArgumentException("it is not a html box."); 
   }
   
+  
+  /**Query whether the table line is able to edit: Return from the whole table.
+   * @see org.vishia.gral.ifc.GralWidget_ifc#isEditable()
+   */
+  @Override public boolean isEditable(){ 
+    return textBox.isEditable(); 
+  }
+  
 
-  @Override public boolean isChanged(){ return textBox.isChanged(); }
+  
+
+  @Override public boolean isChanged(boolean setUnchanged){ return textBox.isChanged(setUnchanged); }
   
   @Override public String getText(){ return textBox.getText(); }
   

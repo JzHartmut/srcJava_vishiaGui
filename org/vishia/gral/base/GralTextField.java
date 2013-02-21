@@ -57,8 +57,6 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   
   protected String text = "";
   
-  protected boolean bTextChanged;
-  
   protected int caretPos;
   
   //protected GralColor colorBack = GralColor.getColor("wh"), colorText = GralColor.getColor("bk");
@@ -299,20 +297,33 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   { setText(arg, 0);
   }
   
+  /**Sets the textual content. This method sets the text and invokes a {@link #repaint(int, int)} in 100 ms 
+   * if the content is changed in another thread than the graphical thread. It invokes a {@link #repaintGthread()}
+   * if the content was changed in the graphical thread.
+   * Note: If the current content is equals with the new one, a repaint request is not forced.
+   * Therewith the cursor can be positioned inside. But if the content is changed, it is set with this given one.
+   * @see org.vishia.gral.ifc.GralTextField_ifc#setText(java.lang.CharSequence, int)
+   */
   @Override public void setText(CharSequence arg, int caretPos)
   {
-    text = arg.toString();
-    this.caretPos = caretPos;
-    int yet = dyda.whatIsChanged.get();
-    int catastrophicCount = 0;
-    while( !dyda.whatIsChanged.compareAndSet(yet, yet | chgText)){ 
-      if(++catastrophicCount > 10000) throw new RuntimeException("");
-    }
-    if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
-      repaintGthread();
-    } else {
-      repaint(100,0);
-    }
+    String textnew = arg.toString();
+    if(  dyda.displayedText == null   //set the text if no text is stored. Initially!
+      || !bTextChanged                 //don't set the text if it is changed by user yet.  
+         && (!text.equals(textnew) || caretPos != this.caretPos)  //set the text only if it is changed.
+      ){                               //prevent invocation of setText() on non changed values to help move cursor, select etc.
+      text = dyda.displayedText = arg.toString();
+      this.caretPos = caretPos;
+      int yet = dyda.whatIsChanged.get();
+      int catastrophicCount = 0;
+      while( !dyda.whatIsChanged.compareAndSet(yet, yet | chgText)){ 
+        if(++catastrophicCount > 10000) throw new RuntimeException("");
+      }
+      if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
+        repaintGthread();
+      } else {
+        repaint(100,0);
+      }
+    } //else: no change, do nothing. Therewith the field is able to edit on unchanged texts.
   }
   
   
@@ -325,9 +336,7 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   abstract public void setMouseAction(GralUserAction action);
   
   
-  @Override public boolean isChanged(){ return bTextChanged; }
-  
-  @Override public String getText(){ return text; }
+  @Override public String getText(){ return text == null? "" : text; }
    
 
 

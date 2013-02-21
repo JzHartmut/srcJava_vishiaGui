@@ -52,7 +52,7 @@ public interface GralTextField_ifc extends GralWidget_ifc
   void setText(CharSequence text);
   
   /**Sets the textual content and show it with the given caret position.
-   * It is adequate {@link #setText(CharSequence)}.
+   * It is adequate {@link #setText(CharSequence)} if caretPos = 0.
    * @param text The text to show in the widget.
    * @param caretPos 0 for left, -1 for right, 0 to Integer.MAXINT for a given position.
    *   If the caret position is greater then the number of chars, it is set right.
@@ -61,6 +61,7 @@ public interface GralTextField_ifc extends GralWidget_ifc
    */
   void setText(CharSequence text, int caretPos);
   
+  /**Returns the text of this field. Returns always a valid String object, "" if the text was never set. */
   String getText();
   
   int getCursorPos();
@@ -74,20 +75,6 @@ public interface GralTextField_ifc extends GralWidget_ifc
   void setTextStyle(GralColor color, GralFont font);
   
   
-  /**Sets whether it is able to edit the content of the text field or text box.
-   * If a content is not able to edit, it is a showing field or box. The user can't change the
-   * content. But the user can set the cursor, select any text and copy to the systems clipboard.
-   * If the content is able to edit, the change should be notified and the content should be gotten.
-   * To do that TODO
-   * @param editable true then the content is going to be able to change. 
-   *   False then the edit functionality is disabled. 
-   */
-  void setEditable(boolean editable);
-  
-  
-  /**Returns true if the content was changed after last setText.
-   */
-  boolean isChanged();
   
   /**Sets the selection of the text.
    * <ul>

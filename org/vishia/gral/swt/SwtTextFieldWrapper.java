@@ -5,9 +5,6 @@ import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.events.DragDetectEvent;
 import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Font;
@@ -16,6 +13,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+import org.vishia.byteData.VariableAccessWithIdx;
 import org.vishia.gral.base.GralMouseWidgetAction_ifc;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
@@ -164,7 +162,7 @@ public class SwtTextFieldWrapper extends GralTextField
       mng.setPosAndSize_(textFieldSwt);
     }
     textFieldSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
-    textFieldSwt.setEditable(editable);
+    this.setEditable(editable);
     if(editable)
       //textFieldSwt.setDragDetect(true);
       //textFieldSwt.addDragDetectListener(dragListener);
@@ -183,6 +181,8 @@ public class SwtTextFieldWrapper extends GralTextField
     if(editable){
       TextFieldModifyListener modifyListener = new TextFieldModifyListener();
       textFieldSwt.addModifyListener(modifyListener);
+      TextFieldFocusListener focusListener = new TextFieldFocusListener(mng);
+      textFieldSwt.addFocusListener(focusListener);
     }
     if(prompt != null && promptStylePosition !=null && promptStylePosition.startsWith("r")){
       Rectangle swtField = textFieldSwt.getBounds();
@@ -224,6 +224,7 @@ public class SwtTextFieldWrapper extends GralTextField
 
 
   @Override public void setEditable(boolean editable){
+    super.setEditable(editable);
     textFieldSwt.setEditable(editable);
   }
 
@@ -267,7 +268,7 @@ public class SwtTextFieldWrapper extends GralTextField
         chg = this.dyda.whatIsChanged.get();
         if(++catastrophicalCount > 10000) 
           throw new RuntimeException("atomic failed");
-        if((chg & chgText) !=0){ 
+        if((chg & chgText) !=0 && text!=null){ 
           textFieldSwt.setText(text);
           final int selectionStart, selectionEnd;
           final int zText = text.length();
@@ -401,7 +402,7 @@ public class SwtTextFieldWrapper extends GralTextField
 
   
   
-  @SuppressWarnings("unused")
+  //@SuppressWarnings("unused")
   private class TextFieldFocusListener extends SwtMng.SwtMngFocusListener
   {
     
@@ -410,13 +411,24 @@ public class SwtTextFieldWrapper extends GralTextField
     }
 
     @Override public void focusLost(FocusEvent ev){
-      SwtTextFieldWrapper.super.text = textFieldSwt.getText();
+      String text = textFieldSwt.getText();
+      SwtTextFieldWrapper.super.text = text;
+      dyda.displayedText = text;
       SwtTextFieldWrapper.super.caretPos = textFieldSwt.getCaretPosition();
+      if(actionChanging != null){
+        actionChanging.exec(KeyCode.focusLost, SwtTextFieldWrapper.this, dyda.displayedText);
+      }
     }
 
     
     @Override public void focusGained(FocusEvent ev)
     { super.focusGained(ev);
+      if(actionChanging != null){
+        actionChanging.exec(KeyCode.focusGained, SwtTextFieldWrapper.this, dyda.displayedText);
+      }
+      if(dyda.displayedText !=null){
+        textFieldSwt.setText(dyda.displayedText);
+      }
     }
   }
   

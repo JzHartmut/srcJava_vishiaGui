@@ -75,6 +75,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Assert;
+import org.vishia.util.KeyCode;
 
 
 
@@ -295,10 +296,10 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
   protected SwtMng(GralGraphicThread graldevice, Display display /*, Composite graphicFrame */
-  , char displaySize, VariableContainer_ifc variableContainer
+  , char displaySize//, VariableContainer_ifc variableContainer
 	, LogMessage log)
   { //super(sTitle); 
-  	this(graldevice, display, new SwtProperties(display, displaySize), variableContainer, log);
+  	this(graldevice, display, new SwtProperties(display, displaySize), log);
   	
   }
 
@@ -311,16 +312,14 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
    */
   public SwtMng(GralGraphicThread device, Display display 
     , SwtProperties propertiesGui
-  	, VariableContainer_ifc variableContainer
+  	//, VariableContainer_ifc variableContainer
   	, LogMessage log
   	)
-  { super(device, new SwtWidgetHelper(), propertiesGui, variableContainer, log);
+  { super(device, new SwtWidgetHelper(), propertiesGui, log);
     this.propertiesGuiSwt = propertiesGui;
     pos.x.p1 = 0; //start-position
     pos.y.p1 = 4 * propertiesGui.yPixelUnit();
 
-    //its a user action able to use in scripts.
-		userActions.put("syncVariableOnFocus", this.syncVariableOnFocus);
 		
 		displaySwt = display;
 		//displaySwt.addFilter(SWT.KeyDown, mainKeyListener);
@@ -1645,38 +1644,6 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 	{ return propertiesGuiSwt.colorSwt(colorGral);
 	}
 
-	
-	
-	/**This userAction can be used by name (calling {@link #addFocusAction(String, GralUserAction, String, String)} 
-	 * to set a variable when an input field is leaved.
-	 * TODO it isn't Text
-	 */
-	private final GralUserAction syncVariableOnFocus = new GralUserAction("syncVariableOnFocus")
-	{	/**Writes the value to the named variable on leaving the focus.
-		 * The name of the variable is contained in the {@link GralWidget}.
-		 * @see org.vishia.gral.ifc.GralUserAction#userActionGui(java.lang.String, org.vishia.gral.base.GralWidget, java.lang.Object[])
-		 */
-		@Override public boolean userActionGui(String sIntension, GralWidget widg, Object... params)
-		{
-		  
-			Object oWidget = widg.getWidgetImplementation();  
-			final VariableAccessWithIdx variable = widg.getVariableFromContentInfo(variableContainer);
-			final int ixData = widg.getDataIx();
-			final String sValue;
-			if(variable !=null){
-				if(sIntension.equals("o")){
-					if(oWidget instanceof Text){ sValue = ((Text)oWidget).getText(); variable.setString(sValue); }
-					else { sValue = null; }
-				} else if(sIntension.equals("i")){
-					if(oWidget instanceof Text){ sValue = variable.getString(); ((Text)oWidget).setText(sValue == null ? "" : sValue); }
-					else { sValue = null; }
-				} else throw new IllegalArgumentException("GuiPanelMng.syncVariableOnFocus: unexpected intension on focus: " + sIntension); 
-			} else throw new IllegalArgumentException("GuiPanelMng.syncVariableOnFocus: variable not found: " + widg.getDataPath()); 
-      return true;
-		}
-	};
-	
-	
 	
 	
 	

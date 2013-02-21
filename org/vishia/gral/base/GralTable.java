@@ -723,6 +723,25 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
       cellTexts = new String[zColumn];
     }
     
+    
+    @Override public void setEditable(boolean editable){
+      throw new IllegalArgumentException("a table line can't be set edit able");
+      //TODO set a table line to able to edit?
+    }
+
+    /**Query whether the table line is able to edit: Return from the whole table.
+     * @see org.vishia.gral.ifc.GralWidget_ifc#isEditable()
+     */
+    @Override public boolean isEditable(){ 
+      return (GralTable.this).bEditable; 
+    }
+    
+    @Override public boolean isChanged(boolean setUnchanged){ 
+      return false; 
+    }
+
+
+    
     @Override public String getName(){ return name; }
     
 

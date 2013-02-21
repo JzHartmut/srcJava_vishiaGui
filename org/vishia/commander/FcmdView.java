@@ -249,7 +249,7 @@ public class FcmdView
   void syncTextFromWidg(Charset charset){
     int posInWidg = widgContent.getCursorPos();
     cursorPos = posInWidg;
-    if(widgContent.isChanged()){
+    if(widgContent.isChanged(true)){
       String sContent = widgContent.getText();
       uContent = sContent.getBytes(utf8);
     }

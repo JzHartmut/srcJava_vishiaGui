@@ -11,6 +11,7 @@ import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.byteData.VariableAccessWithIdx;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.cfg.GralCfgData;
@@ -220,9 +221,6 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   protected GralMngApplAdapter_ifc applAdapter;
   
-	/**Aggregation to variables set on construction. */
-	protected final VariableContainer_ifc variableContainer;
-	
 	/**Composition of some curve view widgets, which should be filled indepentent of there visibility. */
 	protected final List<GralCurveView_ifc> curveContainer = new LinkedList<GralCurveView_ifc>();
 	
@@ -410,15 +408,16 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
 
 
 	
-  public GralMng(GralGraphicThread device, GralWidgetHelper widgetHelper, GralGridProperties props, VariableContainer_ifc variableContainer, LogMessage log)
+  public GralMng(GralGraphicThread device, GralWidgetHelper widgetHelper, GralGridProperties props, LogMessage log)
 	{ this.gralDevice = device;
 	  this.widgetHelper = widgetHelper;
 	  widgetHelper.setMng(this);
     this.parent = null;
 	  this.propertiesGui = props;
 		this.log = log;
-		this.variableContainer = variableContainer;
+    //its a user action able to use in scripts.
 		userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
+
 	}
   
   
@@ -430,6 +429,8 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
     this.userMainKeyAction = userMainKeyAction;
     return last;
   }
+  
+  
   
   /**package private*/ GralUserAction userMainKeyAction(){ return userMainKeyAction; }
   
@@ -886,6 +887,16 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
 		}
 		
 	};
+	
+	
+	
+	
+  
+  
+  
+  
+
+	
 	
 	
   
