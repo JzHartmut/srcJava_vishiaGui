@@ -387,7 +387,9 @@ public class FcmdLeftMidRightPanel
         mainPanel.indexActualDir.put(mainPanel.actFileCard.favorPathInfo.selectName, currentDir.getPath());
         mainPanel.actFileCard.fillIn(currentDir, false);
       } 
-      mainPanel.actFileCard.favorCard.setFocus();
+      mainPanel.actFileCard.setFocus();
+      
+      //mainPanel.actFileCard.favorCard.setFocus();
       return true;
     }
 
