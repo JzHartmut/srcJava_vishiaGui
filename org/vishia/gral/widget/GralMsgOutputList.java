@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.IllegalFormatConversionException;
 import java.util.IllegalFormatPrecisionException;
 import java.util.Locale;
+import java.util.MissingFormatArgumentException;
 import java.util.TimeZone;
 
 import org.vishia.bridgeC.OS_TimeStamp;
@@ -108,10 +109,12 @@ public class GralMsgOutputList  implements LogMessage
     //The configuration for this msg ident.
     String sText;
     try{ sText = String.format(localization, text,args.get());
-    } catch(IllegalFormatConversionException exc){
-      sText = "error in text format: " + text;
     }catch(IllegalFormatPrecisionException exc){
       sText = "error-precision in text format: " + text;
+    } catch(IllegalFormatConversionException exc){
+      sText = "error in text format: " + text;
+    } catch(MissingFormatArgumentException exc){
+      sText = "missing value: "+ text;
     }
     //String sInfoLine = sTime + '\t' + identNumber + '\t' + state + '\t' + sText;
     String[] sInfoLine = {sTime, "" + identNumber, state, "" + sText};

@@ -754,7 +754,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
             String sPath = itsMng.replaceDataPathPrefix(sPath2);
             track.variable = container.getVariable(sPath);
             if(track.variable == null){
-              System.err.println("GralCurveView - variable not found; in " + super.name + "; datapath=" + sPath);
+              System.err.printf("GralCurveView - variable not found; %s in curveview: %s\n", sPath, super.name);
             }
           }
         }
