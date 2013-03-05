@@ -20,6 +20,7 @@ import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
@@ -38,9 +39,15 @@ public class FcmdView
   /**The widget to show content. */
   private GralTextBox widgContent;
   
-  private GralTextField widgFindText;
+  private GralTextField widgFindText, widgShowInfo;
   
-  private GralButton btnFind, btnWholeword, btnCase;
+  private GralButton btnFind, btnWholeword, btnCase, btnQuickview;
+  
+  boolean bVisible;
+  
+  int nrQuickview;
+  
+  private GralTextBox widgQuickView;
   
   FileRemote file;
   
@@ -55,12 +62,12 @@ public class FcmdView
   private final ByteBuffer tmpReadTransmissionBuffer = ByteBuffer.allocate(1200);
 
   /**Number of read bytes. */
-  private int nrofBytes;
+  private int zContent;
 
 
   /**The gotten bytes from bytebuffer. This buffer is set to the size of the file, if the file
    * is less than a maximal size. */
-  private byte[] uContent;
+  private final byte[] uContent = new byte[10000000];
   
   
   private Charset encodingContent;
@@ -126,10 +133,13 @@ public class FcmdView
     btnFind = main.gralMng.addButton(null, actionFind, null, null, "Search (ctrl-F)");
     btnWholeword = main.gralMng.addSwitchButton(null, "wholeWord - no", "wholeWord- yes", GralColor.getColor("wh"), GralColor.getColor("gn"));
     btnCase = main.gralMng.addSwitchButton(null, "case - no", "case - yes", GralColor.getColor("wh"), GralColor.getColor("gn"));
+    btnQuickview = main.gralMng.addSwitchButton("qview", "qview", "qview", GralColor.getColor("wh"), GralColor.getColor("gn"));
+    widgShowInfo = main.gralMng.addTextField(null,false, null, null);
     main.gralMng.setPosition(3, 0, 0, 0, 1, 'r');
     widgContent = main.gralMng.addTextBox("view-content", false, null, '.');
     widgContent.setTextStyle(GralColor.getColor("bk"), main.gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));
     windView = wind; 
+    windView.setActionOnSettingInvisible(actionOnSetInvisible);
     windView.setWindowVisible(false);
     //windView1.
   }
@@ -150,24 +160,30 @@ public class FcmdView
     file = FileRemote.fromFile(main.currentFile);
     if(file !=null){
       long len = file.length();
-      if(len > 1000000){ len = 1000000; } //nor more than 1MByte, 
-      uContent = new byte[(int)len + 10000];
-      int iBuffer = 0;
+      //if(len > 1000000){ len = 1000000; } //nor more than 1MByte, 
+      //uContent = new byte[(int)len + 10000];
+      zContent = 0;
       ReadableByteChannel reader = file.openRead(0);
       try{
         if(reader == null){
           widgContent.setText("File is not able to read:\n");
           widgContent.append(file.getAbsolutePath());
         } else {
+          int nrofBytesRead;
           do{
             tmpReadTransmissionBuffer.clear();
-            nrofBytes = reader.read(tmpReadTransmissionBuffer);
-            if(nrofBytes >0){
+            nrofBytesRead = reader.read(tmpReadTransmissionBuffer);
+            if(nrofBytesRead >0){
               tmpReadTransmissionBuffer.rewind();
-              tmpReadTransmissionBuffer.get(uContent, iBuffer, nrofBytes);
-              iBuffer += nrofBytes;
+              if(zContent + nrofBytesRead > uContent.length){
+                nrofBytesRead = uContent.length - zContent;
+              }
+              if(nrofBytesRead > 0){
+                tmpReadTransmissionBuffer.get(uContent, zContent, nrofBytesRead);
+                zContent += nrofBytesRead;
+              }
             }
-          } while(nrofBytes >0);
+          } while(nrofBytesRead >0); //Stop if no bytes read or uContent is full.
           reader.close();
           //byteBuffer.rewind();
           detectEncoding();
@@ -177,13 +193,37 @@ public class FcmdView
         
       }
     }
-    windView.setWindowVisible(true);
-
+    if(!bVisible){
+      windView.setWindowVisible(true);
+      bVisible = true;
+    }
+  }
+  
+  
+  
+  /**This routine will be called whenever a file is selected newly, it checks quickview.
+   * 
+   * 
+   */
+  public void quickView(){
+    if(btnQuickview.isOn()){
+      nrQuickview +=1;
+      widgShowInfo.setText("" + nrQuickview);
+      view(null);
+    }
   }
   
 
   
   void detectEncoding(){
+    for(int ii =0; ii<zContent; ++ii){
+      byte cc = uContent[ii];
+      if(cc < 0x20 && "\r\n\t".indexOf(cc) <0){
+        //non-text character
+        encodingContent = null;
+        return;
+      }
+    }
     encodingContent = iso8859_1;
   }
   
@@ -191,10 +231,14 @@ public class FcmdView
   
   void presentContent() throws IOException
   {
-    widgContent.setText("file ...\n");
-    cursorPos = 0;
-    format = 'h';
-    presentContentHex();  
+    if(encodingContent!=null){
+      presentContentText(encodingContent);
+    } else {
+      widgContent.setText("file ...\n");
+      cursorPos = 0;
+      format = 'h';
+      presentContentHex();
+    }
   }
   
   
@@ -226,7 +270,7 @@ public class FcmdView
   void presentContentText(Charset charset) throws UnsupportedEncodingException
   {
     encodingContent = charset;
-    String content = new String(uContent, charset);
+    String content = new String(uContent, 0, zContent, charset);
     widgContent.setText(content, 0);
     widgContent.setCursorPos(cursorPos);
   }
@@ -251,7 +295,7 @@ public class FcmdView
     cursorPos = posInWidg;
     if(widgContent.isChanged(true)){
       String sContent = widgContent.getText();
-      uContent = sContent.getBytes(utf8);
+      //uContent = sContent.getBytes(utf8);
     }
     
   }
@@ -302,6 +346,52 @@ public class FcmdView
     }
     
   }
+  
+  
+  
+  void openQuickView(FileRemote src){
+    if(widgQuickView == null){
+      //creates an grid panel and select its in gralMng:
+      main.favorPathSelector.panelRight.tabbedPanelFileCards.addGridPanel("qview", "qview",1,1,10,10);
+      main.gralMng.setPosition(1, -1, 0, 0, 1, 'd');
+      //adds a textBox in that grid panel.
+      widgQuickView = main.gralMng.addTextBox("qview-content", false, null, '.');
+      widgQuickView.setText("quick view");
+      widgQuickView.setFocus();
+    }
+    else {
+      closeQuickView();
+    }
+  }
+  
+  
+  
+  void closeQuickView(){
+    main.favorPathSelector.panelRight.tabbedPanelFileCards.removePanel("qview");
+    widgQuickView.remove();
+    widgQuickView = null;
+  }
+  
+  
+
+  
+  
+  /**Action for Key crl-Q for quick view command. Its like Norton Commander.
+   */
+  GralUserAction actionQuickView = new GralUserAction("quick view")
+  {
+    @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params)
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        openQuickView(null);
+        return true;
+      } else return false; 
+      // /
+    }
+  };
+
+
+  
+
   
   
   
@@ -468,6 +558,16 @@ public class FcmdView
   GralUserAction actionSaveTextAsISO8859_1_unix = new GralUserAction()
   { @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { saveTextAs(iso8859_1, endl_0d0a);
+      return true;
+    }
+  };
+
+
+  GralUserAction actionOnSetInvisible = new GralUserAction("view-setInvisible")
+  { @Override public boolean exec(int keyCode, GralWidget_ifc widgi, Object... params)
+    { bVisible = false;
+      nrQuickview = 0;
+      btnQuickview.setState(GralButton.kOff);
       return true;
     }
   };

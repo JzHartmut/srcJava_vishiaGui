@@ -14,8 +14,16 @@ import org.vishia.util.CalculatorExpr;
  */
 public abstract class GralTextField extends GralWidget implements GralTextField_ifc
 {
-  /**Version, history and license.
+  /**Version, history and license .
    * <ul>
+   * <li>2013-03-04 Hartmut chg: The {@link #setText(CharSequence, int)} overwriting concept is faulty.
+   *   Because an accidentally change of text prevents setting the correct text. Check of {@link #bTextChg}
+   *   removed. The preventing of overwriting an edit field should be prevented outside as condition of
+   *   call of {@link #setText(CharSequence)}. 
+   * <li>2013-02-22 GralTextField: edit field now works with GralShowMethods syncVariableOnFocus,
+   *   {@link #bTextChg} detects whether any input is taken. {@link #isChanged(boolean)} returns this information
+   *   and resets {@link #bTextChg}. {@link #setText(CharSequence, int)} only sets if the text is unchanged.
+   *   Therefore a changed text won't be over-written by an setText().
    * <li>2012-09-24 Hartmut new: {@link #setValue(double)} and {@link #setValue(Object[])} for double values. 
    * <li>2012-04-17 Hartmut new: {@link #sFormat2} etc: Now format "int16AngleDegree" etc. are recognized
    *   as special format. Improved calling {@link #calculator} in {@link #setValue(float)}.
@@ -308,8 +316,9 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   {
     String textnew = arg.toString();
     if(  dyda.displayedText == null   //set the text if no text is stored. Initially!
-      || !bTextChanged                 //don't set the text if it is changed by user yet.  
-         && (!text.equals(textnew) || caretPos != this.caretPos)  //set the text only if it is changed.
+      //|| !bTextChanged                 //don't set the text if it is changed by user yet.  
+         //&& 
+        || (!text.equals(textnew) || caretPos != this.caretPos)  //set the text only if it is changed.
       ){                               //prevent invocation of setText() on non changed values to help move cursor, select etc.
       text = dyda.displayedText = arg.toString();
       this.caretPos = caretPos;

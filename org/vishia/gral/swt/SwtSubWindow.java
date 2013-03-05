@@ -138,6 +138,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
     window = new Shell(display, props);
     window.addShellListener(shellListener);
     window.addDisposeListener(disposeListener);
+    //window.add
     if((windProps & GralWindow.windHasMenu) !=0){
       Menu menuBar = new Menu(window, SWT.BAR);
       window.setMenuBar(menuBar);
@@ -307,7 +308,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
   
   
   
-  DisposeListener disposeListener = new DisposeListener(){
+  private final DisposeListener disposeListener = new DisposeListener(){
     
     
     @Override

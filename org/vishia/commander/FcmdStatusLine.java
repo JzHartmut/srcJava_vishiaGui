@@ -106,6 +106,7 @@ public class FcmdStatusLine
     if(main.filePropsCmd.isVisible){
       main.filePropsCmd.showFileInfos(file);
     }
+    main.viewCmd.quickView();
     
   }
   

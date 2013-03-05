@@ -121,6 +121,17 @@ public class FcmdIdents
   int keyFileView = KeyCode.F3;
 
   
+  
+  String menuBarQuickView = "&File/&Quick view";
+  String menuContextQuickView = "&Quick view";
+  String buttonQuickView = "cQ:qview";
+  int key1QuickView = KeyCode.ctrl + 'q';
+  int key2QuickView = KeyCode.ctrl + 'Q';
+
+
+  
+  
+  
   String menuFileEditBar = "&File/&Edit [F4]";
 
   String menuFileEditContext = "Edit [F4]";

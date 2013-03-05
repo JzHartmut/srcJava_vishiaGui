@@ -22,7 +22,8 @@ import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringFormatter;
 
-/**All functionality of view (F3-Key) and quick view. 
+/**All functionality of view (F3-Key) and quick view.
+ * @deprecated. The {@link FcmdView} have more capabilities. It contains adequates. 
  * @author Hartmut Schorrig
  * */
 public class FcmdEdit
@@ -63,7 +64,7 @@ public class FcmdEdit
    * <li>F: contains, float values, shows it
    * </ul>  
    */
-  private char format = 't';
+  private final char format = 't';
   
   
   private static Charset ascii7 = Charset.forName("US-ASCII");
@@ -72,7 +73,7 @@ public class FcmdEdit
   
   
   /**Instance to prepare the text especially for hex view. */
-  private StringFormatter formatterHex = new StringFormatter(120);
+  private final StringFormatter formatterHex = new StringFormatter(120);
   
   public FcmdEdit(Fcmd main)
   { this.main = main;
