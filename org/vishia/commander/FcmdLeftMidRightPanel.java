@@ -386,10 +386,10 @@ public class FcmdLeftMidRightPanel
       if(currentDir !=null){
         mainPanel.indexActualDir.put(mainPanel.actFileCard.favorPathInfo.selectName, currentDir.getPath());
         mainPanel.actFileCard.fillIn(currentDir, false);
-      } 
-      mainPanel.actFileCard.setFocus();
-      
-      //mainPanel.actFileCard.favorCard.setFocus();
+        mainPanel.actFileCard.setFocus();
+      } else { 
+        mainPanel.actFileCard.favorCard.setFocus();
+      }
       return true;
     }
 

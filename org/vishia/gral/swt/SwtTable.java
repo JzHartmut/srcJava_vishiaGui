@@ -40,6 +40,7 @@ public class SwtTable  extends GralTable {
 
   /**Version and history
    * <ul>
+   * <li>2013-10-08 Hartmut chg: 
    * <li>2012-07-15 Hartmut new: search functionality: This implementation have a text field 
    *   which shows the search string. While up and down keys the that lines are selected which text in the {@link #ixColumn}
    *   starts whith the search string.
@@ -81,7 +82,7 @@ public class SwtTable  extends GralTable {
   /**The widget manager is stored in the base class too, but here as SWT-type reference. */
   private final SwtMng mng;
   
-  private Text[][] cellsSwt;
+  private final Text[][] cellsSwt;
   
   private Text swtSearchText;
   
@@ -248,6 +249,7 @@ public class SwtTable  extends GralTable {
       if(ixLine < 0 && zLine >0){ ixLineNew = 0;}
       bFocused = true;
       table.redraw();
+      table.setFocus();
       return true;
     }
     /*
@@ -411,7 +413,7 @@ public class SwtTable  extends GralTable {
       Font font = mng.propertiesGuiSwt.getTextFontSwt(2, whatIs, whatIs);
       Color colorBackTableSwt = mng.getColorImpl(colorBackTable);
       for(int iCol = 0; iCol < zColumns; ++iCol){
-        menuColumns[iCol] = new SwtMenu(name + "_menu" + iCol, this, (GralMng)itsMng);
+        menuColumns[iCol] = new SwtMenu(name + "_menu" + iCol, this, itsMng);
       }
       //NOTE: only if the swtSelectText is created first, it will drawn in in the foreground of the other cells.
       swtSearchText = new Text(this, SWT.LEFT | SWT.SINGLE | SWT.READ_ONLY);
@@ -706,6 +708,7 @@ public class SwtTable  extends GralTable {
      * Therefore the {@link GralTable#colorBackSelectNonFocused} is set.
      * @deprecated unnecessary yet.
      */
+    @Deprecated
     @Override public void focusLost(FocusEvent ev){ 
       //System.out.println("Cell focus lost");
       if(!bRedrawPending){
