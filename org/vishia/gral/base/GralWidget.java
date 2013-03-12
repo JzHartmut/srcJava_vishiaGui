@@ -211,11 +211,17 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   private GralWidgetCfg_ifc itsCfgElement;
 
   
+  /**This class holds common configuration data for widgets.
+   */
   public static class ConfigData
   {
+    /**Parameter which are used from a {@link GralWidget#setActionShow(GralUserAction, String[])} method.
+     * The parameter are converted from a String given form.
+     */
     public Object[] showParam;
   }
   
+  /**Reference to the common configuration data for widgets. */
   public ConfigData cfg = new ConfigData();
   
   /**Name of the widget in the panel. */
