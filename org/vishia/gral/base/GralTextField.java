@@ -6,6 +6,7 @@ import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTextField_ifc;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.CalculatorExpr;
 
 /**This is the base class for all widgets which represents a simple text.
@@ -16,6 +17,8 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
 {
   /**Version, history and license .
    * <ul>
+   * <li>2013-03-13 Hartmut new {@link #setText(CharSequence, int)}: supports {@link GralWidget_ifc#isNotEditableOrShouldInitialize()} to support 
+   *   edit field handling.
    * <li>2013-03-04 Hartmut chg: The {@link #setText(CharSequence, int)} overwriting concept is faulty.
    *   Because an accidentally change of text prevents setting the correct text. Check of {@link #bTextChg}
    *   removed. The preventing of overwriting an edit field should be prevented outside as condition of
@@ -57,11 +60,9 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
    * a second license subscribing a special contract with the author. 
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
-   * 
-   * 
    */
   @SuppressWarnings("hiding")
-  public final static int version = 20120416;
+  public final static int version = 20130313;
   
   protected String text = "";
   
@@ -315,6 +316,7 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   @Override public void setText(CharSequence arg, int caretPos)
   {
     String textnew = arg.toString();
+    bShouldInitialize= false;  //it is done.
     if(  dyda.displayedText == null   //set the text if no text is stored. Initially!
       //|| !bTextChanged                 //don't set the text if it is changed by user yet.  
          //&& 

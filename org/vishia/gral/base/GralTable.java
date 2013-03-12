@@ -736,6 +736,12 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
       return (GralTable.this).bEditable; 
     }
     
+    
+    @Override public boolean isNotEditableOrShouldInitialize(){ return (GralTable.this).isNotEditableOrShouldInitialize(); }
+
+    
+    
+    
     @Override public boolean isChanged(boolean setUnchanged){ 
       return false; 
     }

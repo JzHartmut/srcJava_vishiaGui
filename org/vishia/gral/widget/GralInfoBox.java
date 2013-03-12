@@ -168,9 +168,9 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   /**Query whether the table line is able to edit: Return from the whole table.
    * @see org.vishia.gral.ifc.GralWidget_ifc#isEditable()
    */
-  @Override public boolean isEditable(){ 
-    return textBox.isEditable(); 
-  }
+  @Override public boolean isEditable(){ return textBox.isEditable(); }
+  
+  @Override public boolean isNotEditableOrShouldInitialize(){ return textBox.isNotEditableOrShouldInitialize(); }
   
 
   

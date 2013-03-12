@@ -37,6 +37,7 @@ public interface GralWidget_ifc extends Removeable
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-03-13 Hartmut new {@link #isNotEditableOrShouldInitialize()} to support edit fields.
    * <li>2012-08-21 The method {@link #setBackColor(GralColor, int)}, {@link #setLineColor(GralColor, int)} and {@link #setTextColor(GralColor)}
    *  are declared here. What methods are deprecated? I thing {@link #setBackgroundColor(GralColor)}.  
    * <li>2012-07-29 Hartmut chg: {@link #setFocus()} and {@link #setFocus(int, int)} can be called in any thread yet.
@@ -72,7 +73,7 @@ public interface GralWidget_ifc extends Removeable
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120713;
+  public static final int version = 20130313;
 
   
   /**Returns the implementation class of the widget. If the widget has more as one implementation widgets,
@@ -121,6 +122,12 @@ public interface GralWidget_ifc extends Removeable
   
   /**Query whether this widget is able to change from user handling. */
   boolean isEditable();
+  
+  
+  /**Query whether this field should be written from any initial or actual data. */
+  public boolean isNotEditableOrShouldInitialize();
+
+  
   
   /**
    * @deprecated use {@link #setBackColor(GralColor, int)}

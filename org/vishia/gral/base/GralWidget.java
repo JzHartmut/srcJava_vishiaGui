@@ -98,6 +98,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-03-13 Hartmut new {@link #bShouldInitialize}
    * <li>2012-09-24 Hartmut chg: {@link #getName()} now returns {@link #sDataPath} or {@link #sCmd} if the other info are null.
    * <li>2012-09-24 Hartmut chg: {@link #refreshFromVariable(VariableContainer_ifc)} for long and double values.
    * <li>2012-09-17 Hartmut new {@link ConfigData} and {@link #cfg}, used yet only for {@link ConfigData#showParam}.
@@ -190,7 +191,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120823;
+  public static final int version = 20130313;
 
   
   /**The widget manager from where the widget is organized. Most of methods need the information
@@ -347,8 +348,18 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   protected boolean bEditable;
   
   
-  /**Set to true from any listener of the implementation level if the data of the widget was changed.
-   * For example key listener on a text edit field. */
+  /**If this bit is true on an edit field, it should be initialized.
+   * 
+   */
+  protected boolean bShouldInitialize = true;
+  
+  
+  /**Set to true from any listener of the implementation level if the data of the widget was changed from Gui handling.
+   * If the data are changed from any Gral method invocation, this bit should not set to true.
+   * For example a key listener changes the content of a text edit field, then this bit should be set.
+   * This bit should be cleared if the GUI-content of the widget is synchronized with the widget data cells. 
+   * Note that the GUI-content of a widget can be changed only in the GUI thread, whereby the content of the 
+   * {@link #dyda} can be read and write in any threat. This bit helps to synchronize. */
   protected boolean bTextChanged;
   
 
@@ -480,7 +491,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   @Override public boolean isEditable(){ return bEditable; }
   
 
-  
+  @Override public boolean isNotEditableOrShouldInitialize(){ return !bEditable || bShouldInitialize; }
   
   /**Sets the data path. It is a String in application context.
    * @param sDataPath
