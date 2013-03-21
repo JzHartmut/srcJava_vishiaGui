@@ -11,7 +11,6 @@ import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.vishia.byteData.VariableAccessWithIdx;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.cfg.GralCfgData;
@@ -55,6 +54,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Changes:
    * <ul>
+   * <li>2013-03-20 Hartmut adap: {@link #actionFileSelect} with setText(...), now the file select field was filled.
    * <li>2012-08-20 Hartmut new: {@link #getWidgetsPermanentlyUpdating()} created but not used yet because 
    *   {@link #refreshCurvesFromVariable(VariableContainer_ifc)} has the necessary functionality.
    * <li>2012-06-30 Hartmut new: Composition {@link #widgetHelper} The widget helper is implemented in the graphic system
@@ -982,7 +982,8 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
           , fileSelectInfo.sMask, fileSelectInfo.sTitle);
         String fileSelect = fileSelectInfo.dialogFile.getSelection(); 
         if(fileSelect !=null){
-          fileSelectInfo.dstWidgd.setValue(cmdSet, 0, fileSelect);
+          fileSelectInfo.dstWidgd.setText(fileSelect);
+          //fileSelectInfo.dstWidgd.setValue(cmdSet, 0, fileSelect);
           GralUserAction actionSelect = fileSelectInfo.dstWidgd.getActionChange();
           if(actionSelect !=null){
             actionSelect.userActionGui(KeyCode.menuEntered, fileSelectInfo.dstWidgd, fileSelect);
