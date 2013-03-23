@@ -440,7 +440,7 @@ public static void main(String[] args){
   GuiCallingArgs cargs = new GuiCallingArgs();
   
   //Redirect all outputs from System.out
-  MsgDispatchSystemOutErr.create("D:/DATA/msg/log$yyyy-MMM-dd-HH_mm$.log");
+  MsgDispatchSystemOutErr.create("D:/DATA/msg/log$yyyy-MMM-dd-HH_mm$.log", 10000, 40000, 10000, 100);
   //Initializes the GUI till a output window to show information.
   GralArea9MainCmd cmdGui = new GralArea9MainCmd(cargs, args);  //implements MainCmd, parses calling arguments
   //Initializes the graphic window and parse the parameter of args (command line parameter).

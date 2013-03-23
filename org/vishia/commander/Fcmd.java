@@ -24,6 +24,9 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.widget.GralCommandSelector;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.msgDispatch.MsgDispatchSystemOutErr;
+import org.vishia.msgDispatch.MsgDispatcher;
+import org.vishia.msgDispatch.MsgPrintStream;
+import org.vishia.msgDispatch.MsgRedirectConsole;
 import org.vishia.util.FileRemoteAccessorLocalFile;
 import org.vishia.util.KeyCode;
 
@@ -84,6 +87,8 @@ public class Fcmd extends GuiCfg
   //MsgDispatchSystemOutErr msgDisp;
   
   final CallingArgs cargs;
+  
+  final MsgDispatcher msgDisp;
 
   // GralTabbedPanel tabbedPanelsLeft, tabbedPanelsMid, tabbedPanelsRight;
 
@@ -166,6 +171,11 @@ public class Fcmd extends GuiCfg
   {
     super(cargs, cmdgui, null, null);
     this.cargs = cargs;
+    //redirect all outputs to System.out, System.err and MainCmd to System.out and System.err with timestamp.
+    msgDisp = new MsgRedirectConsole(cmdgui, 0, null);
+    //msgDisp.msgDispatcher.setOutputRoutine(4, "MainLogFile", true, true, cmdgui.getLogMessageOutputFile());
+    //msgDisp.msgDispatcher.setOutputRange(0, 100000, 4, MsgDispatcher.mAdd, 0);
+    
     target = new FcmdtTarget();  //create the target itself, one process TODO experience with remote target.
     buttonCmds = new CmdStore();
     executer.cmdQueue.setOutput(gui.getOutputBox(), null);

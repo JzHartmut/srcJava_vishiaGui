@@ -114,7 +114,8 @@ public class FcmdView
   {
     main.gralMng.selectPanel("primaryWindow");
     main.gralMng.setPosition(10, 0, 10, 0, 1, 'r'); //right buttom, about half less display width and hight.
-    int windProps = GralWindow.windConcurrently | GralWindow.windHasMenu | GralWindow.windResizeable;
+    int windProps = GralWindow.windConcurrently | GralWindow.windHasMenu | GralWindow.windResizeable
+                  | GralWindow.windOnTop;
     GralWindow wind =  main.gralMng.createWindow("windView", "view - The.file.Commander", windProps);
     wind.addMenuItemGThread(null, "&File/&Save", actionSave);
     wind.addMenuItemGThread(null, "&File/Save-as &UTF8-Unix-lf", actionSaveTextAsUTF8unix);
