@@ -1079,9 +1079,9 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
 
   
-  @Override public GralInfoBox createHtmlInfoBox(String name, String title)
+  @Override public GralInfoBox createHtmlInfoBox(String name, String title, boolean onTop)
   {
-    return GralInfoBox.createHtmlInfoBox(this, name, title);
+    return GralInfoBox.createHtmlInfoBox(this, name, title, onTop);
   }
 
   

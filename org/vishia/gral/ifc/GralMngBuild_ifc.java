@@ -798,7 +798,7 @@ public interface GralMngBuild_ifc
 	
   GralInfoBox createTextInfoBox(String name, String title);
 
-  GralInfoBox createHtmlInfoBox(String name, String title);
+  GralInfoBox createHtmlInfoBox(String name, String title, boolean onTop);
 
   /**Sets the builder for content configuration.
    * @param cfgBuilder

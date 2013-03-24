@@ -628,7 +628,7 @@ public class FcmdCopyCmd
    * should be aborted and that file should be deleted.
    * 
    */
-  protected GralUserAction actionButtonSkipFile = new GralUserAction()
+  protected GralUserAction actionButtonSkipFile = new GralUserAction("actionButtonSkipFile")
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if(evCurrentFile !=null){

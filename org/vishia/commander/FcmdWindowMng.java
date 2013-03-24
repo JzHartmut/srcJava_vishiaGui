@@ -19,7 +19,7 @@ public class FcmdWindowMng
   
   
   
-  GralUserAction actionWindFullOut = new GralUserAction()
+  GralUserAction actionWindFullOut = new GralUserAction("actionWindFullOut")
   { 
     boolean isFullOut = false;
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)

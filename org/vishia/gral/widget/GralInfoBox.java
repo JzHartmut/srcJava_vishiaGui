@@ -3,30 +3,78 @@ package org.vishia.gral.widget;
 import java.io.IOException;
 
 import org.eclipse.swt.widgets.Control;
+import org.vishia.byteData.VariableAccessWithIdx;
+import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralHtmlBox;
+import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWindow_setifc;
+import org.vishia.gral.base.SwtWidgetSimpleWrapper;
+import org.vishia.gral.base.GralWidget.ConfigData;
+import org.vishia.gral.base.GralWidget.DynamicData;
+import org.vishia.gral.base.GralWidget.MethodsCalledbackFromImplementation;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_getifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
 import org.vishia.util.KeyCode;
 
 /**This class presents a sub window which is used as info box for any messages.
+ * A Text info box and a html info box is supported. The html info box is used especially for help.
+ * The HTML text is navigable with internal links, maybe with external too.
+ * The HTML text 
  * @author Hartmut Schorrig
  *
  */
 public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, GralWindow_getifc
 {
+
+  /**Version, history and license.
+   * <ul>
+   * <li>2013-03-24 Hartmut chg: {@link #createHtmlInfoBox(GralMngBuild_ifc, String, String, boolean)}
+   *   with Parameter onTop: Especially a help window should able to stay on top.
+   * <li>2011-10-00 Hartmut created
+   * </ul>
+   * 
+   * <b>Copyright/Copyleft</b>:<br>
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL is not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but doesn't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you intent to use this source without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   */
+  public static final int version = 20130324;
 
   /**The window is created invoking the {@link GralMngBuild_ifc#createWindow(String, boolean)}. 
    * It has its implementation in the underlying graphic system.  */
@@ -39,6 +87,8 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   private final GralHtmlBox htmlBox;
   
   private final GralWidget buttonOk;
+  
+  private GralButton buttonLock;
   
   Object[] implWidgets = new Object[3];
 
@@ -81,18 +131,22 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
 
   }
   
-  public static GralInfoBox createHtmlInfoBox(GralMngBuild_ifc mng, String name, String title)
+  public static GralInfoBox createHtmlInfoBox(GralMngBuild_ifc mng, String name, String title, boolean onTop)
   {
     int props = GralWindow.windConcurrently | GralWindow.windResizeable;
+    if(onTop){ props |= GralWindow.windOnTop; }
     GralWindow window = mng.createWindow(name, title, props);
     //TODO the position frame (size) regards the title bar, it should not do so!
     mng.setPosition(0, -3, 0, 0, 0, '.');
     GralHtmlBox text = mng.addHtmlBox(name);
-    mng.setPosition(-2.5f, -0.5f, 0, -7, 0, '.');
+    mng.setPosition(-2.5f, -0.5f, 0, -14, 0, '.');
     GralTextField infoLine = mng.addTextField("info", false, null, null);
-    mng.setPosition(-3, 0, -6, 0, 0, '.');
+    mng.setPosition(-3, GralPos.size+3, -13, GralPos.size+6, 0, 'r', 0.5f);
+    GralButton buttonLock = mng.addSwitchButton(name + "-Info-ok", "follow", "lock", GralColor.getColor("wh"), GralColor.getColor("gn"));
+    mng.setPosition(-3, GralPos.size+3, -6, GralPos.size+6, 0, 'r', 0.5f);
     GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "OK");
     GralInfoBox box = new GralInfoBox(window, text, infoLine, buttonOk);
+    box.buttonLock = buttonLock;
     box.implWidgets[0] = text.getWidgetImplementation();
     box.implWidgets[1] = infoLine.getWidgetImplementation();
     box.implWidgets[2] = buttonOk.getWidgetImplementation();
@@ -157,11 +211,13 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   
   
   public void setUrl(String url){
-    infoLine.setText(url);
-    if(htmlBox !=null){ 
-      htmlBox.setUrl(url); 
+    if(buttonLock == null || !buttonLock.isOn()){
+      infoLine.setText(url);
+      if(htmlBox !=null){ 
+        htmlBox.setUrl(url); 
+      }
+      else throw new IllegalArgumentException("it is not a html box.");
     }
-    else throw new IllegalArgumentException("it is not a html box."); 
   }
   
   
