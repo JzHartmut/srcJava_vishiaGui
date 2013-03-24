@@ -250,17 +250,17 @@ public class FcmdIdents
   int keyFavorRight = KeyCode.alt + KeyCode.F3;
   
   
-  String menuBarSelectPanelLeft = "&Navigation/select left [shF1]";
+  String menuBarSelectPanelLeft = "&Navigation/select left [shAlt-F1]";
   String buttonSelectPanelLeft = "sF1:left";
   int keySelectPanelLeft = KeyCode.shift + KeyCode.F1;
   int keySelectPanelLeft2 = KeyCode.shiftAlt + KeyCode.F1;
 
-  String menuBarSelectPanelMiddle = "&Navigation/select mid [shF2]";
+  String menuBarSelectPanelMiddle = "&Navigation/select mid [shAlt-F2]";
   String buttonSelectPanelMiddle = "sF2:middle";
   int keySelectPanelMiddle = KeyCode.shift + KeyCode.F2;
   int keySelectPanelMiddle2 = KeyCode.shiftAlt + KeyCode.F2;
 
-  String menuBarSelectPanelRight = "&Navigation/select right [shF3]";
+  String menuBarSelectPanelRight = "&Navigation/select right [shAlt-F3]";
   String buttonSelectPanelRight = "sF3:right";
   int keySelectPanelRight = KeyCode.shift + KeyCode.F3;
   int keySelectPanelRight2 = KeyCode.shiftAlt + KeyCode.F3;
@@ -270,20 +270,28 @@ public class FcmdIdents
   String buttonSelectPanelOther = "cTab:other";
   int keySelectPanelOther = KeyCode.ctrl + '\t';
   
-  
-  String menuBarFocusLeftCard = "&Navigation/focus to left card [sh-alt-left]";
+  ////
+  String menuBarFocusLeftCard = "&Navigation/focus to left card [shAlt-left]";
   String buttonFocusLeftCard = null;
   int keyFocusLeftCard = KeyCode.shiftAlt + KeyCode.left;
   
-  String menuBarFocusRightCard = "&Navigation/focus to right card [sh-alt-right]";
+  String menuBarFocusRightCard = "&Navigation/focus to right card [shAlt-right]";
   String buttonFocusRightCard = null;
   int keyFocusRightCard = KeyCode.shiftAlt + KeyCode.right;
   
-  String menuBarFocusPaneltoLeft = "&Navigation/focus to left panel [sh-alt-pgup]";
+  String menuBarFocusFileCard = "&Navigation/focus to file card [shAlt-up]";
+  String buttonFocusFileCard = null;
+  int keyFocusFileCard = KeyCode.shiftAlt + KeyCode.up;
+  
+  String menuBarFocusThemeCard = "&Navigation/focus to theme card [shAlt-dn]";
+  String buttonFocusThemeCard = null;
+  int keyFocusThemeCard = KeyCode.shiftAlt + KeyCode.dn;
+  
+  String menuBarFocusPaneltoLeft = "&Navigation/focus to left panel [shAlt-pgup]";
   String buttonFocusPanelToLeft = null;
   int keyFocusPanelToLeft = KeyCode.shiftAlt + KeyCode.pgup;
   
-  String menuBarFocusPanelToRight = "&Navigation/focus to right panel [sh-alt-pgdn]";
+  String menuBarFocusPanelToRight = "&Navigation/focus to right panel [shAlt-pgdn]";
   String buttonFocusPanelToRight = null;
   int keyFocusPanelToRight = KeyCode.shiftAlt + KeyCode.pgdn;
   

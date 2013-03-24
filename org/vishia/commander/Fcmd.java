@@ -729,6 +729,20 @@ public class Fcmd extends GuiCfg
   };
   
 
+  GralUserAction actionFocusFileCard = new GralUserAction("FcmdLeftMidRightPanel.actionFileCard"){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
+      return true; 
+    }
+  };
+  
+
+  GralUserAction actionFocusThemeCard = new GralUserAction("FcmdLeftMidRightPanel.actionThemeCard"){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
+      return true; 
+    }
+  };
+  
+
   
   
 

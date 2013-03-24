@@ -2,14 +2,9 @@ package org.vishia.gral.widget;
 
 import java.io.IOException;
 
-import org.eclipse.swt.widgets.Control;
-import org.vishia.byteData.VariableAccessWithIdx;
-import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
-import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralHtmlBox;
-import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
@@ -17,20 +12,12 @@ import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWindow_setifc;
-import org.vishia.gral.base.SwtWidgetSimpleWrapper;
-import org.vishia.gral.base.GralWidget.ConfigData;
-import org.vishia.gral.base.GralWidget.DynamicData;
-import org.vishia.gral.base.GralWidget.MethodsCalledbackFromImplementation;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
-import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralRectangle;
-import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_getifc;
-import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
 import org.vishia.util.KeyCode;
 

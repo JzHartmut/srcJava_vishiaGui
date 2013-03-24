@@ -204,6 +204,8 @@ public class FcmdButtons
 
     setBtnMenuAndKeys(main.actionFocusCardInPanelToLeft, main.idents.buttonFocusLeftCard,   main.idents.keyFocusLeftCard,  main.idents.menuBarFocusLeftCard);
     setBtnMenuAndKeys(main.actionFocusCardInPanelToRight, main.idents.buttonFocusRightCard,   main.idents.keyFocusRightCard,  main.idents.menuBarFocusRightCard);
+    setBtnMenuAndKeys(main.actionFocusFileCard, main.idents.buttonFocusFileCard,   main.idents.keyFocusFileCard,  main.idents.menuBarFocusFileCard);
+    setBtnMenuAndKeys(main.actionFocusThemeCard, main.idents.buttonFocusThemeCard,   main.idents.keyFocusThemeCard,  main.idents.menuBarFocusThemeCard);
     setBtnMenuAndKeys(main.actionFocusPanelToLeft, main.idents.buttonFocusPanelToLeft,   main.idents.keyFocusPanelToLeft,  main.idents.menuBarFocusPaneltoLeft);
     setBtnMenuAndKeys(main.actionFocusPanelToRight, main.idents.buttonFocusPanelToRight,   main.idents.keyFocusPanelToRight,  main.idents.menuBarFocusPanelToRight);
 
