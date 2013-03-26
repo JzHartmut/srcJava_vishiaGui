@@ -39,6 +39,10 @@ public class InspcCurveView
   /**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
    * Changes:
    * <ul>
+   * <li>2013-03-27 Hartmut improved/bugfix: The {@link TrackValues#trackView} is the reference to the track in the 
+   *   {@link GralCurveView} instance. If a new config is loaded all tracks in {@link GralCurveView#getTrackInfo()}
+   *   arec reated newly using {@link GralCurveView#initTrack(String, String, GralColor, int, int, float, float)}.
+   *   Therefore the {@link TrackValues#trackView} should be updated. 
    * <li>2012-10-09 Hartmut now ctrl-mouse down sets the scale settings for the selected channel. Faster user operation.
    * <li>2012-08-10 Hartmut now uses a default directory for config file given in constructor.
    * <li>2012-07-06 Hartmut now read and save of the file works.
@@ -74,7 +78,7 @@ public class InspcCurveView
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public final static int version = 20120907;
+  public final static int version = 20130327;
 
   public static String sBtnReadCfg = "read cfg";
   
@@ -102,9 +106,11 @@ public class InspcCurveView
   
   private static class TrackValues{
 
-    /**The track description in the view. */
+    /**The reference to the track in {@link GralCurveView#initTrack(String, String, GralColor, int, int, float, float)}.
+     * If this field is null, there is no track associated to this field. */
     GralCurveViewTrack_ifc trackView;
     
+    /**Visible information about the shown variable. The path may be the closest presentation what are shown. */
     GralTextField widgVarPath;
     
     //GralTextField widgScale;
@@ -114,7 +120,7 @@ public class InspcCurveView
     //GralTextField widgComment;
 
     
-    GralWidget widgetVariable;
+    GralWidget XXXwidgetVariable;
     
     /**The value for this curve. */
     float val;
@@ -291,16 +297,20 @@ public class InspcCurveView
         GralWidget variableWidget = gralMng.getWidgetOnMouseDown();
         //GralTextField widgText = (GralTextField)widgd;
         GralWidget widgText = widgd;
-        String sVariable = variableWidget.name;
+        //String sVariable = variableWidget.name;
         Object oContentInfo = widgd.getContentInfo();
         TrackValues input = (TrackValues)oContentInfo;
-        input.widgetVariable = variableWidget;
+        //input.widgetVariable = variableWidget;
         input.min = Float.MAX_VALUE;
         input.max = -Float.MAX_VALUE;
         input.mid = 0.0f;
         //String sShowMethod = variableWidget.getShowMethod();
         String sPath = variableWidget.getDataPath();
-        input.trackView.setDataPath(sPath);
+        if(input.trackView == null){
+          input.trackView = widgCurve.initTrack(sName, sPath, input.colorCurve, 0, 50, 5000.0f, 0.0f);
+        } else {
+          input.trackView.setDataPath(sPath);
+        }
         input.widgVarPath.setText(variableWidget.name);
       }
       return true;
@@ -328,6 +338,9 @@ public class InspcCurveView
             s1 = widgline0.getText();
             int line0 = (int)Float.parseFloat(s1);
             //widgCurve.setMinMax(trackScale.scale, -trackScale.scale);
+            if(trackScale.trackView == null){
+              trackScale.trackView = widgCurve.initTrack(sName, null, trackScale.colorCurve, 0, 50, 5000.0f, 0.0f);
+            }
             trackScale.trackView.setTrackScale(scale, scale0, line0);
             widgBtnScale.setLineColor(GralColor.getColor("lgn"),0);
           } catch(NumberFormatException exc){
@@ -348,9 +361,14 @@ public class InspcCurveView
         if(trackScale !=null){
           //last variable
           trackScale.widgVarPath.setBackColor(GralColor.getColor("wh"),0);
-          trackScale.trackView.setLineProperties(colorLineTrackSelected, 1, 0);
+          if(trackScale.trackView !=null){
+            trackScale.trackView.setLineProperties(colorLineTrackSelected, 1, 0);
+          }
         }
         trackScale = (TrackValues)widgd.getContentInfo();
+        if(trackScale.trackView == null){
+          trackScale.trackView = widgCurve.initTrack(sName, null, trackScale.colorCurve, 0, 50, 5000.0f, 0.0f);
+        }
         colorLineTrackSelected = trackScale.trackView.getLineColor();
         trackScale.trackView.setLineProperties(colorLineTrackSelected, 2, 0);
         trackScale.widgVarPath.setBackColor(GralColor.getColor("lam"),0);
@@ -363,9 +381,14 @@ public class InspcCurveView
         if(trackScale !=null){
           //last variable
           trackScale.widgVarPath.setBackColor(GralColor.getColor("wh"),0);
-          trackScale.trackView.setLineProperties(colorLineTrackSelected, 1, 0);
+          if(trackScale.trackView !=null){
+            trackScale.trackView.setLineProperties(colorLineTrackSelected, 1, 0);
+          }
         }
         trackScale = (TrackValues)widgd.getContentInfo();
+        if(trackScale.trackView == null){
+          trackScale.trackView = widgCurve.initTrack(sName, null, trackScale.colorCurve, 0, 50, 5000.0f, 0.0f);
+        }
         colorLineTrackSelected = trackScale.trackView.getLineColor();
         trackScale.trackView.setLineProperties(colorLineTrackSelected, 2, 0);
         trackScale.widgVarPath.setBackColor(GralColor.getColor("lam"),0);
@@ -431,14 +454,22 @@ public class InspcCurveView
           if(in ==null){
             System.err.println("InspcCurveView - actionRead, file not found;" + fileCurveCfg.getAbsolutePath());
           } else {
-            if(widgCurve.applySettings(in)){ 
+            if(widgCurve.applySettings(in)){ //apply the content of the config file to the GralCurveView
+              //and transfer the names into the variable text fields of this widget. 
               List<? extends GralCurveViewTrack_ifc> listTracks = widgCurve.getTrackInfo();
               int iTrack = 0;
               for(GralCurveViewTrack_ifc track: listTracks){
                 TrackValues trackValue = tracks[iTrack];
-                trackValue.trackView = track;
+                trackValue.trackView = track;   //sets the new Track to the text field's data association.
                 String sDataPath = track.getDataPath();
                 trackValue.widgVarPath.setText(sDataPath !=null ? sDataPath : "?dataPath?");
+                iTrack +=1;
+              }
+              while(iTrack < tracks.length){
+                //this trackvalue has not a associated track in the curve because it is removed.
+                TrackValues trackValue = tracks[iTrack];
+                trackValue.trackView = null;
+                trackValue.widgVarPath.setText("");
                 iTrack +=1;
               }
             }
@@ -517,6 +548,7 @@ public class InspcCurveView
   private void showValues(){
     float[] values = new float[tracks.length];
     int ix = 0;
+    assert(false);
     for(TrackValues inp: tracks){
       values[ix] = inp.val;
       ix +=1;
@@ -550,7 +582,7 @@ public class InspcCurveView
       int cmd = info.getCmd();
       assert(false);
       if(cmd == InspcDataExchangeAccess.Info.kAnswerValue){
-        GralWidget widgd = inp.widgetVariable;
+        //GralWidget widgd = inp.widgetVariable;
         int typeInspc = InspcAccessEvaluatorRxTelg.getInspcTypeFromRxValue(info);
         
         float val = inp.val = InspcAccessEvaluatorRxTelg.valueFloatFromRxValue(info, typeInspc);

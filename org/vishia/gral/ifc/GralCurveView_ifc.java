@@ -99,7 +99,7 @@ public interface GralCurveView_ifc extends GralWidget_ifc, GralSetValue_ifc, Get
     + "? , } ; .";
 
   
-  /**Reads the settings from the given String (maybe read from a file)
+  /**Applies the settings from the given String (maybe read from a file)
    * and sets all tracks newly.
    * @param in Input, syntax see {@link #syntaxSettings}
    * @return true on success.

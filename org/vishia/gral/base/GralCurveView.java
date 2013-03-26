@@ -33,6 +33,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-03-27 Hartmut bugfix: The {@link #bNewGetVariables} have to be set in {@link #setDataPath(String)} and 
+   *   {@link #applySettings(String)} because this methods sets a new variable which should be searched. 
+   *   All other changes are gardening and comments.
    * <li>2013-01-25 Hartmut improved: Error message in {@link #refreshFromVariable(VariableContainer_ifc)} only on
    *   paint-complete of the view. If the implementation receives a paintAll command by mouseClick on the graphic
    *   or because the graphic is shown the first time, the {@link #setPaintAllCmd()} is invoked there. The variable
@@ -78,38 +81,61 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    */
-  public final static int version = 20120317;
+  public final static int version = 20130327;
   
   
   
-  public class ZbnfSetTrack {
+  /**Instances of this class were be created only temporary while transfer a parse result of {@link GralCurveView#applySettings(String)}
+   * The instance holds values for {@link ZbnfJavaOutput} to apply to a track 
+   * calling {@link GralCurveView#initTrack(String, String, GralColor, int, int, float, float)}
+   * inside {@link GralCurveView.ZbnfSetCurve#add_Track(ZbnfSetTrack)}.
+   */
+  public static class ZbnfSetTrack {
+    /**From Zbnf component with semantic <?name>. */
     public String name;
+    /**From Zbnf component with semantic <?datapath>. */
     public String datapath;
+    /**Color and style from Zbnf component with semantic <?color>. */
     GralColor color_; int style_ = 0;
+    /**From Zbnf component with semantic <?nullLine>. */
     public int nullLine;
+    /**From Zbnf component with semantic <?scale>. */
     public float scale;
+    /**From Zbnf component with semantic <?offset>. */
     public float offset;
-    
+    /**From Zbnf component with semantic <?color>. */
     public void set_color(String color){ color_ = GralColor.getColor(color.trim()); }
   }
   
   
+  
+  /**The instance of this class {@link GralCurveView#zbnfSetCurve} will be used only temporary while transfer a parse result 
+   * of {@link GralCurveView#applySettings(String)}
+   * The instance contains only the capabilty to get the track info from the parse result
+   * and to call {@link GralCurveView#initTrack(String, String, GralColor, int, int, float, float)}
+   * inside {@link #add_Track(ZbnfSetTrack)}.
+   */
   public class ZbnfSetCurve{
+    /**From Zbnf component with semantic <?Track>. */
     public ZbnfSetTrack new_Track(){
       return new ZbnfSetTrack();
     }
+    /**From Zbnf component with semantic <?Track>. */
     public void add_Track(ZbnfSetTrack track){
       initTrack(track.name, track.datapath, track.color_, track.style_, track.nullLine, track.scale, track.offset);
     }
     
   }
   
-  ZbnfSetCurve zbnfSetCurve = new ZbnfSetCurve();
+  final ZbnfSetCurve zbnfSetCurve = new ZbnfSetCurve();
   
   /**The describing and the actual data of one track (one curve)
    */
   protected static class Track implements GralCurveViewTrack_ifc, GralSetValue_ifc {
     public final String name;
+    
+    private final GralCurveView outer;
+    
     public String sDataPath;
     
     public VariableAccessWithIdx variable;
@@ -154,7 +180,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     /**The value from last draw, do not calculate twice. */
     public int ypixLast;
     
-    public Track(String name){ this.name = name; }
+    public Track(GralCurveView outer, String name){ this.outer = outer; this.name = name; }
 
     @Override public void setContentInfo(Object content) { oContent = content; }
 
@@ -163,6 +189,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     @Override public void setDataPath(String sDataPath) { 
       this.sDataPath = sDataPath; 
       this.variable = null;
+      outer.bNewGetVariables= true;  //force searching the variable
     }
 
     @Override public String getDataPath() { return sDataPath; }
@@ -591,17 +618,19 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   public GralCurveViewTrack_ifc initTrack(String sNameTrack, String sDataPath, GralColor color, int style
       , int nullLine, float scale, float offset)
   {
-    Track track = new Track(sNameTrack);
+    Track track = new Track(this, sNameTrack);
     track.values = new float[this.maxNrofXValues];
     listTracks.add(track);
     listTrackSet.add(track);
     //listDataPaths.add(sDataPath);
     track.sDataPath =sDataPath;
+    track.variable = null;
     track.y0Line = nullLine;
     track.yOffset = offset;
     track.yScale = scale;
     //yScale[ixLineInit] = scale;
     track.lineColor = color;
+    bNewGetVariables = true;  //to force re-read of all variables.
     //ixLineInit +=1;
     return track;
   }
@@ -953,18 +982,16 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
 
   
+  /* (non-Javadoc)
+   * @see org.vishia.gral.ifc.GralCurveView_ifc#applySettings(java.lang.String)
+   */
   @Override public boolean applySettings(String in){
     boolean bOk;
     try{
       //variate syntax in test... 
-      String syntax1 = "curveSettings::= { <Track> } \\e."
-                    + "Track::= track <*:?name> : { datapath = <* ,;?datapath> | color = <* ,;?color> | "
-                    + "scale = <#f?scale> | offset = <#f?offset> | 0-line-percent = <#?nullLine> "
-                    + "? , } ; .";
-      syntax1 = syntaxSettings;
       Report console = new ReportWrapperLog(itsMng.log());
       ZbnfParser parser = new ZbnfParser(console);
-      parser.setSyntax(syntax1);
+      parser.setSyntax(syntaxSettings);
       bOk = parser.parse(in);
       if(!bOk){
         console.writeError(parser.getSyntaxErrorReport());
@@ -973,6 +1000,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
         listTrackSet.clear();
         ZbnfJavaOutput setData = new ZbnfJavaOutput(console);
         setData.setContent(zbnfSetCurve.getClass(), zbnfSetCurve, parser.getFirstParseResult());
+        bNewGetVariables = true;  //to force searching variables.
       }
     } catch(Exception exc){
       System.err.println("GralCurveView.writeSettings() - unexpected IOException;" + exc.getMessage());
