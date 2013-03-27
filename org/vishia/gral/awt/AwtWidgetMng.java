@@ -669,8 +669,7 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
 
 
 
-  @Override
-  protected String setInfoGthread(GralWidget_ifc widget, int cmd, int ident,
+  @Override public String setInfoGthread(GralWidget_ifc widget, int cmd, int ident,
       Object info, Object data) {
     // TODO Auto-generated method stub
     return null;

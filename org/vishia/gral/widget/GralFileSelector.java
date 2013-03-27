@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import org.vishia.commander.Fcmd;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMenu;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralValueBar;
@@ -23,6 +24,7 @@ import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTableLine_ifc;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.Event;
@@ -53,6 +55,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2013-03-28 Hartmut chg: {@link #setToPanel(GralMngBuild_ifc, String, int, int[], char)} preserves the panel
+   *   before calling.
    * <li>2012-11-11 Hartmut bugfix: {@link #fillInRefreshed(File, boolean)}: If all files are complete with file info,
    *   nevertheless the {@link RefreshTimed#delayedFillin(int) was called because the whole routine was called with false 
    *   as bCompleteWithFileInfo-argument. Now that is prevented if all files were tested already.
@@ -340,56 +344,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   
-  /**A window for search-in-file dialogue.
-   * It is instantiated calling {@link GralFileSelector#createWindowConfirmSearchGthread(GralMngBuild_ifc)}.
-   * The user can invoke {@link #confirmSearchInFiles(GralFileSelector, Appendable)} to open that window. 
-   *
-   */
-  public static class WindowFileSelection {
-    
-    public GralWindow_ifc wind;
-
-    public GralFileSelector fileSelector;
-    
-        
-    /**Use {@link GralFileSelector#createWindowConfirmSearchGthread(GralMngBuild_ifc)} to create.
-    */
-    protected WindowFileSelection(){}
-    
-    
-    
-    /**Creates the window to confirm search in files. This window can be created only one time
-     * for all file panels, if the application has more as one. On activating the directory
-     * and the file panel to show results should be given. But only one search process can be run
-     * simultaneously.
-     * @return The created window.
-     */
-    public static WindowFileSelection create(GralMngBuild_ifc mng){
-      WindowFileSelection wind = new WindowFileSelection();
-      mng.selectPanel("primaryWindow");
-      mng.setPosition(-24, 0, -67, 0, 1, 'r'); //right buttom, about half less display width and hight.
-      wind.wind = mng.createWindow("windSelectFile", "select file", GralWindow.windExclusive | GralWindow.windResizeable );
-      mng.setPosition(0, 0, 0, -2, 0, 'd', 0.0f);
-      wind.fileSelector = new GralFileSelector();
-      wind.fileSelector.setToPanel(mng, "selectFile", 100, new int[]{2,19,6,10}, 'C');
-      mng.setPosition(-1, GralPos.size - 3, 1, GralPos.size + 8, 0, 'r',2);
-      //mng.addButton(null, wind.actionFileSearch, "esc", null, "esc");
-      return wind;
-    }
-
-    
-    
-    /**Shows the window.
-     * @param fileSelector
-     */
-    public void openDialog(String sStartPath, String sPrompt){
-      wind.setTitle(sPrompt);
-      wind.setWindowVisible(true);
-    }
-    
-    
-  }
-  
   
   
   
@@ -555,13 +509,17 @@ public class GralFileSelector implements Removeable //extends GralWidget
   {
     //The macro widget consists of more as one widget. Position the inner widgets:
     GralPos posAll = panelMng.getPositionInPanel();
+    GralPanelContent panel = posAll.panel;
+    String sPanel = panel.getName();
     //Text field for path above list
-    panelMng.setPosition(posAll, GralPos.same, GralPos.size + 2.0F, GralPos.same, GralPos.same, 1, 'd');
+    panelMng.setPosition(posAll, GralPos.same, GralPos.size + 2.0F, GralPos.same, GralPos.same-6, 1, 'r');
     widgdPath = panelMng.addTextField(name + "-Path", true, null, null);
     widgdPath.setActionChange(actionSetPath);
     widgdPath.setBackColor(panelMng.getColor("pye"), 0xeeffff);  //color pastel yellow
     GralMenu menuFolder = widgdPath.getContextMenu();
     menuFolder.addMenuItemGthread(null, "refresh [cR]", actionRefreshFileTable);
+    panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
+    panelMng.addButton("xxx", null, "favor");
     //the list
     panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
     selectList.setToPanel(panelMng, name, rows, columns, size);
@@ -571,7 +529,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     selectList.wdgdTable.setActionOnLineSelected(actionOnFileSelection);
     panelMng.setPosition(5, 0, 10, GralPos.size + 40, 1, 'd');
     questionWindow = GralInfoBox.createTextInfoBox(panelMng, "questionInfoBox", "question");  
-
+    panelMng.selectPanel(sPanel);
   }
   
   
@@ -1176,7 +1134,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
         if(posWildcard >=0){
           
         } else {
-          File file = new FileRemote(sPath);
+          FileRemote file = new FileRemote(sPath);
+          file.refreshProperties(null);
           if(file.isDirectory()){
             fillIn(file, false);
           } else if(file.isFile()){

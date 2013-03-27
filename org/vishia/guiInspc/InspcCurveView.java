@@ -25,6 +25,7 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralCurveViewTrack_ifc;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.widget.GralFileSelectWindow;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.inspectorAccessor.InspcAccessEvaluatorRxTelg;
 import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
@@ -39,6 +40,7 @@ public class InspcCurveView
   /**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
    * Changes:
    * <ul>
+   * <li>2013-03-28 Harmut adapt new {@link GralFileSelectWindow}
    * <li>2013-03-27 Hartmut improved/bugfix: The {@link TrackValues#trackView} is the reference to the track in the 
    *   {@link GralCurveView} instance. If a new config is loaded all tracks in {@link GralCurveView#getTrackInfo()}
    *   arec reated newly using {@link GralCurveView#initTrack(String, String, GralColor, int, int, float, float)}.
@@ -98,7 +100,7 @@ public class InspcCurveView
   /**Three windows for curve view. */
   GralWindow windCurve;
   
-  GralFileSelector.WindowFileSelection windFileCfg, windFileValues;
+  GralFileSelectWindow windFileCfg, windFileValues;
   
   final GralMng gralMng;
   
@@ -241,10 +243,8 @@ public class InspcCurveView
     widgBtnOff = gralMng.addSwitchButton(sName + "btnOff", "off / ?on", "on / ?off", GralColor.getColor("lgn"), GralColor.getColor("am"));
     wind.addMenuItemGThread("menuBarCurveView", "&Window/open " + sName, actionOpenWindow);
   
-    windFileCfg = GralFileSelector.WindowFileSelection.create(gralMng);
-    windFileCfg.fileSelector.fillIn(new File("D:/SFC/SBOX/ReflexAccess/curve2.inspc"), true);
-    windFileValues = GralFileSelector.WindowFileSelection.create(gralMng);
-    windFileValues.fileSelector.fillIn(new File("D:/SFC/SBOX/ReflexAccess"), true);
+    windFileCfg = new GralFileSelectWindow("windFileCfg", gralMng);
+    windFileValues = new GralFileSelectWindow("windFileValues", gralMng);
   }
 
   
@@ -415,25 +415,13 @@ public class InspcCurveView
     { if(actionCode == KeyCode.mouse1Up){
         try{
           if(widgd.getCmd().equals(sBtnReadCfg)){
-            windFileCfg.fileSelector.fillIn(fileCurveCfg, true);
-            windFileCfg.fileSelector.setActionOnEnterFile(actionReadCfg);
-            windFileCfg.fileSelector.setActionOnEnterPathNewFile(null);
-            windFileCfg.openDialog(".", widgd.getCmd());
+            windFileCfg.openDialog(fileCurveCfg, widgd.getCmd(), false, actionReadCfg);
           } else if(widgd.getCmd().equals(sBtnSaveCfg)){
-            windFileCfg.fileSelector.fillIn(fileCurveCfg, true);
-            windFileCfg.fileSelector.setActionOnEnterFile(actionSaveCfg);
-            windFileCfg.fileSelector.setActionOnEnterPathNewFile(actionSaveCfg);
-            windFileCfg.openDialog(".", widgd.getCmd());
+            windFileCfg.openDialog(fileCurveCfg, widgd.getCmd(), true, actionSaveCfg);
           } else if(widgd.getCmd().equals(sBtnReadValues)){
-            windFileValues.fileSelector.fillIn(fileCurveSave, true);
-            windFileValues.fileSelector.setActionOnEnterFile(actionSaveCfg);
-            windFileValues.fileSelector.setActionOnEnterPathNewFile(actionSaveCfg);
-            windFileValues.openDialog(".", widgd.getCmd());
+            windFileCfg.openDialog(fileCurveSave, "read values- not implemented yet", false, null);
           } else if(widgd.getCmd().equals(sBtnSaveValues)){
-            windFileValues.fileSelector.fillIn(fileCurveSave, true);
-            windFileValues.fileSelector.setActionOnEnterFile(actionSaveValues);
-            windFileValues.fileSelector.setActionOnEnterPathNewFile(actionSaveValues);
-            windFileValues.openDialog(".", widgd.getCmd());
+            windFileCfg.openDialog(fileCurveSave, "write values", true, actionSaveValues);
           }
         } catch(Exception exc){
           widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
@@ -477,7 +465,7 @@ public class InspcCurveView
         } catch(Exception exc){
           widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
         }
-        windFileCfg.wind.closeWindow();
+        windFileCfg.closeWindow();
       }
       return true;
   } };
