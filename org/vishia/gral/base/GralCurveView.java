@@ -901,7 +901,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     //ixp1 counts from 0... right to left
     //int nrofValues1 = nrofValues;
     while(ixp < xViewPart
-         && dtime2 <=0 //&& nrofPixel4Data >=0
+         && dtime2 <=0 
+         && nrofPixel4Data >=0  //130328
          ){ // && ixp1 >= ixp2){ //singularly: ixp1 < ixp2 if a faulty timestamp is found.
       do{ //all values per 1 pixel
         ixData -= adIxData; //decrement to older values in the data
