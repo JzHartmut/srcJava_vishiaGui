@@ -76,19 +76,45 @@ public class BzrGetStatus
     data.uBzrError.setLength(0);
     data.uBzrLastVersion.setLength(0);
     data.uBzrStatusOutput.setLength(0);
-    mainData.cmdExec.setCurrentDir(data.fileBzrLocation);
+    mainData.cmdExec.setCurrentDir(data.dirWorkingtree);
     String sCmdStatus = mainData.cfg.indexCmds.get("status");
     String sCmdheadRevision = mainData.cfg.indexCmds.get("headRevision");
+    mainCmdifc.writeInfo(sCmdStatus);
     mainData.cmdExec.execute(sCmdStatus, null, data.uBzrStatusOutput, data.uBzrError);
+    mainCmdifc.writeInfo(sCmdheadRevision);
     mainData.cmdExec.execute(sCmdheadRevision, null, data.uBzrLastVersion, data.uBzrError);
-    getVersionFromLogOutput(data.uBzrLastVersion, data, false);
-    File fileBzrVersion = new File(data.fileBzrLocation, "_bzrVersion.txt");
+    mainCmdifc.writeInfo(" done.\n");
+    getVersionFromLogOutput(data.uBzrLastVersion, data, data.revisionWorkingTreeTop);
+    File fileBzrVersion = new File(data.dirWorkingtree, "_bzrVersion.txt");
     if(fileBzrVersion.exists()){ 
       String lastLogfile = FileSystem.readFile(fileBzrVersion);
       StringBuilder uLog = new StringBuilder(lastLogfile);
-      getVersionFromLogOutput(uLog, data, true);
+      getVersionFromLogOutput(uLog, data, data.revisionSbox);
     }
   }
+  
+  
+  
+  void captureStatusAllArchives(DataCmpn data){
+    captureStatus(data);
+    //
+    data.uBzrLastVersion.setLength(0);
+    String sCmdheadRevision = mainData.cfg.indexCmds.get("headRevision");
+    
+    mainCmdifc.writeInfoln(sCmdheadRevision + " archive");
+    mainData.cmdExec.setCurrentDir(data.dirArchive);
+    mainData.cmdExec.execute(sCmdheadRevision, null, data.uBzrLastVersion, data.uBzrError);
+    getVersionFromLogOutput(data.uBzrLastVersion, data, data.revisionArchive);
+    if(data.dirRemoteArchive !=null){
+      mainCmdifc.writeInfoln(sCmdheadRevision + " remote archive");
+      mainData.cmdExec.setCurrentDir(data.dirRemoteArchive);
+      mainData.cmdExec.execute(sCmdheadRevision, null, data.uBzrLastVersion, data.uBzrError);
+      getVersionFromLogOutput(data.uBzrLastVersion, data, data.revisionRemoteArchive);
+    }
+      
+  }
+  
+  
   
   
   /**Reads the status output and fills the {@link #listUnknownFiles},
@@ -141,7 +167,7 @@ public class BzrGetStatus
           sFilePath = sFilePath.substring(posSep+2).trim();
         }
         sFilePath = sFilePath.replace('\\', '/');
-        File file = new File(mainData.currCmpn.fileBzrLocation, sFilePath);
+        File file = new File(mainData.currCmpn.dirWorkingtree, sFilePath);
         DataFile fileData = new DataFile(file, sFilePath, sType);
         listFiles.add(fileData);
         data.indexFiles.put(sFilePath, fileData);
@@ -153,7 +179,7 @@ public class BzrGetStatus
   
   
   
-  void getVersionFromLogOutput(StringBuilder uLog, DataCmpn data, boolean sbox)
+  void getVersionFromLogOutput(StringBuilder uLog, DataCmpn data, DataCmpn.Revision revision)
   {
     
     try{ 
@@ -167,15 +193,13 @@ public class BzrGetStatus
           //line: revno: <#?revision>
           String sRevision = sLine.substring(pos + 6).trim();
           //int nrRev = Integer.parseInt(sRevision);
-          if(sbox){ data.nrSboxRev = sRevision; } 
-          else    { data.nrTopRev= sRevision; } 
+          revision.nr = sRevision;
           bRevnrOk = true;
         } else if( (pos = sLine.indexOf("timestamp:"))>=0){
           //line: timestamp: <timestamp>
           String sDate = sLine.substring(pos + 15, pos+34).trim();
           long dateVersion = logDateFormat.parse(sDate).getTime();
-          if(sbox){ data.dateSboxRevSbox = dateVersion; } 
-          else    { data.dateTopRev = dateVersion; } 
+          revision.date = dateVersion;
           bRevDateOk = true;
         }
         posLine = posLineEnd +1;    

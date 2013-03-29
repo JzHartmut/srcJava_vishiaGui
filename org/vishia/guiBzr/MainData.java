@@ -11,6 +11,7 @@ import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
+import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 
@@ -20,6 +21,9 @@ public class MainData
   final MainCmd_ifc mainCmdifc;
 
   final CmdExecuter cmdExec = new CmdExecuter();
+  
+  /**Access to all panels of this application. */
+  final BzrGui panels;
   
   MainAction mainAction;
   
@@ -35,6 +39,11 @@ public class MainData
   /**The current selected component. */
   DataCmpn currCmpn;
   
+  
+  /**The current selected line. */
+  GralTableLine_ifc currTableline;
+  
+
   final BzrGetStatus getterStatus;
   
   final DateFormat dateFormatShowingFull =      new SimpleDateFormat("yy-MM-dd  HH:mm");
@@ -59,9 +68,10 @@ public class MainData
   
 
   
-  MainData(MainCmd_ifc mainCmd)
+  MainData(MainCmd_ifc mainCmd, BzrGui panels)
   {
     this.mainCmdifc = mainCmd;
+    this.panels = panels;
     getterStatus = new BzrGetStatus(mainCmd, this);
 
   }

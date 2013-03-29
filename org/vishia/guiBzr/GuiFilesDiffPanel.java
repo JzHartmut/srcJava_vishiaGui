@@ -369,7 +369,7 @@ public class GuiFilesDiffPanel
           uCmdCommit.append(" ").append(sFile);
         }
       }
-      mainData.cmdExec.setCurrentDir(mainData.currCmpn.fileBzrLocation);
+      mainData.cmdExec.setCurrentDir(mainData.currCmpn.dirWorkingtree);
       if(bAdd){
         //mainData.log 
       	uCmdAdd.append(uFilesAdd);

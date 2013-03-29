@@ -930,7 +930,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     } else if(diffTime < 18*3600000){
       //files today
       sDate = sDatePrefixToday + dateFormatToday.format(timestamp);
-    } else if(diffTime < 320 * 24* 3600000){
+    } else if(diffTime < 320 * 24* 3600000L){
       sDate = sDatePrefixYear + dateFormatYear.format(timestamp);
     } else {
       sDate = sDatePrefixOlder + dateFormatOlder.format(timestamp);

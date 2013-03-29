@@ -57,7 +57,7 @@ public class GuiCommitPanel
       	//what todo
       }
       //String sCmd = "bzr commit -F " + fileCommitText.getAbsolutePath();
-      mainData.cmdExec.setCurrentDir(mainData.currCmpn.fileBzrLocation);
+      mainData.cmdExec.setCurrentDir(mainData.currCmpn.dirWorkingtree);
       String sCmdStatus = mainData.cfg.indexCmds.get("status");
       mainData.cmdExec.execute(sCmdStatus, null, uCommitOut, uCommitOut);
       uCommitOut.setLength(0);

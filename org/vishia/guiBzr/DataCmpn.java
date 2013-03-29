@@ -12,11 +12,26 @@ import java.util.TreeMap;
 public class DataCmpn
 {
   
+  static class Revision{
+    /**The version number String. */
+    String nr;
+    
+    /**The timestamp of the version. */
+    long date;
+  }
+  
   /**Name of the component. It is the directory name of the directory 
    * where the archive is contained in. */
   final String sNameCmpn;
   
-  final File fileBzrLocation;
+  /**Directory where the .bzr of the working tree is contained. */
+  final File dirWorkingtree;
+
+  /**Directory where the .bzr of the archive (without working tree) is contained. */
+  final File dirArchive;
+
+  /**Directory where the .bzr of any remote .bzr is contained. */
+  final File dirRemoteArchive;
 
   /**The version number form the last commit or revert in this sandbox 
    * and the top version number in the branch. If the branch was updated in another Sandbox,
@@ -27,11 +42,8 @@ public class DataCmpn
    * <li>Or the sandbox version is stored in the bzr data file of the project.
    * </ul>  
    */
-  String nrSboxRev, nrTopRev;
-  
-  /**The timestamp of the version in the sandbox and in the branch. */
-  long dateSboxRevSbox, dateTopRev;
-  
+  final Revision revisionSbox = new Revision(), revisionWorkingTreeTop = new Revision(), revisionArchive = new Revision(), revisionRemoteArchive = new Revision();
+
   /**Output of bzr status invocation of the working box. */
   StringBuilder uBzrStatusOutput = new StringBuilder();
   /**Output of bzr log -l 1 to get the last version number. */
@@ -51,13 +63,15 @@ public class DataCmpn
   
   final Map<String, DataFile> indexFiles = new TreeMap<String, DataFile>();
   
-  public File getBzrLocationDir(){ return fileBzrLocation; }
+  public File getBzrLocationDir(){ return dirWorkingtree; }
   
 
-  DataCmpn(File dirComponent)
+  DataCmpn(File dirComponent, File dirArchive, File dirRemoteArchive)
   {
-    fileBzrLocation = dirComponent;
-    sNameCmpn = dirComponent.getName();
+    this.dirWorkingtree = dirComponent;
+    this.dirArchive = dirArchive;
+    this.dirRemoteArchive = dirRemoteArchive;
+    this.sNameCmpn = dirComponent.getName();
       
   }
   

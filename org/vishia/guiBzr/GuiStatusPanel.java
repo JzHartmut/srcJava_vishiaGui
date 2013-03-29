@@ -83,7 +83,7 @@ public class GuiStatusPanel
   void initGui()
   { int xposProjectPath = 0, yposProjectPath=5; 
   
-    panelBuildifc.selectPanel("Select");
+    panelBuildifc.selectPanel("Select-old");
     panelBuildifc.setPositionSize(yposProjectPath, xposProjectPath, -3, 70, 'r');
     //widgdProjektpath = panelBuildifc.addTextField("projectPath", true, "Project path", 't');
     widgdProjektpath = panelBuildifc.addFileSelectField("projectPath", null, "D:/:/", "Project path", "t");
@@ -147,6 +147,7 @@ public class GuiStatusPanel
   private void buildComponentsInfoSelectBoxes()
   {
     String sProjectPath = widgdProjektpath.getValue();
+    sProjectPath = "d:/Bzr/D/vishia";
     //
     mainData.getterStatus.getBzrLocations(FileSystem.absolutePath(sProjectPath, null));
     //
@@ -201,10 +202,10 @@ public class GuiStatusPanel
     panelBuildifc.remove(widgds.widgdTextStatus);
     panelBuildifc.setPositionSize(0, 21, 2, 15, 'r');
     String sRev = "Rev. ";
-    if(widgds.data.nrTopRev == widgds.data.nrSboxRev){
-      sRev = "Rev. " + widgds.data.nrSboxRev + " uptodate ";
+    if(widgds.data.revisionWorkingTreeTop.nr == widgds.data.revisionSbox.nr){
+      sRev = "Rev. " + widgds.data.revisionSbox.nr + " uptodate ";
     } else {
-      sRev = "Rev. " + widgds.data.nrSboxRev + " / "+ widgds.data.nrTopRev;
+      sRev = "Rev. " + widgds.data.revisionSbox.nr + " / "+ widgds.data.revisionWorkingTreeTop.nr;
     }
     widgds.widgdTextRevision = panelBuildifc.addText(sRev, 'B', 0x0);
     String sBzrStatus = widgds.data.uBzrStatusOutput.toString();

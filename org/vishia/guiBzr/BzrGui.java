@@ -42,7 +42,8 @@ public class BzrGui extends GuiCfg
 
   final MainData mainData;
 
-
+  final BzrIdents idents;
+  
   /**This instance helps to create the Dialog Widget as part of the whole window. It is used only in the constructor.
    * Therewith it may be defined stack-locally. But it is better to show and explain if it is access-able at class level. */
   //GuiDialogZbnfControlled dialogZbnfConfigurator;   
@@ -65,6 +66,8 @@ public class BzrGui extends GuiCfg
   
   final GuiStatusPanel guiStatusPanel;
 
+  final GuiSelectPanel guiSelectPanel;
+  
   final GuiCommitPanel guiCommitPanel;
   
   final PanelOutput panelOutput;
@@ -89,7 +92,7 @@ public class BzrGui extends GuiCfg
     //boolean bOk = true;
     
     
-    mainData = new MainData(cmdgui);
+    mainData = new MainData(cmdgui, this);
     String sError = mainData.cfg.readConfig(cargs.fileCfg);
     if(sError !=null){
       cmdgui.writeError(sError);
@@ -100,6 +103,7 @@ public class BzrGui extends GuiCfg
     mainData.guifc = this.gui;
     
     //creates the panel classes in constructor, don't initialize the GUI yet.
+    guiSelectPanel = new GuiSelectPanel(mainData, panelBuildIfc);
     guiStatusPanel = new GuiStatusPanel(mainData, panelBuildIfc);
     guiCommitPanel = new GuiCommitPanel(mainData, panelBuildIfc);
     guiFilesDiffPanel = new GuiFilesDiffPanel(mainData, panelBuildIfc);
@@ -109,8 +113,9 @@ public class BzrGui extends GuiCfg
     mainData.mainAction = new MainAction(mainData, guiStatusPanel, guiCommitPanel, guiFilesDiffPanel, panelOutput);
     
 
-    //gui.addDispatchListener(configGui);
-
+    idents = new BzrIdents();
+    idents.initIdents(mainData);
+    
     
     
   }
@@ -149,6 +154,7 @@ public class BzrGui extends GuiCfg
         mainTabPanel.addGridPanel("FilesDiff", "&Files && Diff",1,1,10,10);
         mainTabPanel.addGridPanel("Output", "&Output",1,1,10,10);
 
+        guiSelectPanel.initGui();
         guiStatusPanel.initGui();
         guiCommitPanel.initGui();
         guiFilesDiffPanel.initGui();

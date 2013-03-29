@@ -58,7 +58,7 @@ public class DataProject
    */
   int createComponentsData(File dirComponent)
   {
-    DataCmpn data1 = new DataCmpn(dirComponent);
+    DataCmpn data1 = new DataCmpn(dirComponent,null, null);
     indexCmpn.put(data1.sNameCmpn, data1);
     data[++ixDataInit] = data1;
     return ixDataInit;
