@@ -1,5 +1,6 @@
 package org.vishia.commander;
 
+import org.vishia.gral.ifc.GralButtonKeyMenu;
 import org.vishia.util.KeyCode;
 
 /**This class contains all texts and keys which are used in any menu, hot key etc.
@@ -12,6 +13,9 @@ import org.vishia.util.KeyCode;
  */
 public class FcmdIdents
 {
+  
+  GralButtonKeyMenu readMsg = new GralButtonKeyMenu(null, "&Help/read &MsgCfg", null, null, null, 0, 0);
+  
   String menuBarSettings = "&Help/&Settings [cP]";
   String menuContextSettings = "Settings [cP]";
   String buttonSettings = "gF1:settings";

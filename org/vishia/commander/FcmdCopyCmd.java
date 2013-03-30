@@ -758,12 +758,16 @@ public class FcmdCopyCmd
     {
       FileRemote.CallbackEvent ev1 = (FileRemote.CallbackEvent)ev;
       switch(ev1.getCmd()){
+        case copyDir:{
+          String sPath = String.copyValueOf(ev1.fileName);
+          widgCopyState.setText(sPath);
+        } break;
         case nrofFilesAndBytes:{
           FcmdCopyCmd.this.evCurrentFile = ev1;
           int percent = ev.data2 / 10;
           widgProgressAll.setValue(percent);
-          widgCopyNameDst.setText(String.copyValueOf(ev1.fileName));
-          widgCopyState.setText("" + ev1.nrofBytesInFile/1000000 + " Mbyte");
+          widgCopyState.setText(String.copyValueOf(ev1.fileName));
+          widgCopyNameDst.setText("" + ev1.nrofBytesInFile/1000000 + " Mbyte");
           if(bSkipFile){
             ev1.abort(FileRemote.Cmd.abortCopyFile );
             //ev1.sendEvent(FileRemote.cmdAbortFile);

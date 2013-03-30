@@ -21,6 +21,7 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralCommandSelector;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.msgDispatch.MsgDispatchSystemOutErr;
@@ -82,13 +83,15 @@ public class Fcmd extends GuiCfg
     File dirCfg;
 
     File dirHtmlHelp;
+    
+    File msgConfig;
   }
 
   //MsgDispatchSystemOutErr msgDisp;
   
   final CallingArgs cargs;
   
-  final MsgDispatcher msgDisp;
+  final MsgRedirectConsole msgDisp;
 
   // GralTabbedPanel tabbedPanelsLeft, tabbedPanelsMid, tabbedPanelsRight;
 
@@ -175,6 +178,7 @@ public class Fcmd extends GuiCfg
     msgDisp = new MsgRedirectConsole(cmdgui, 0, null);
     //msgDisp.msgDispatcher.setOutputRoutine(4, "MainLogFile", true, true, cmdgui.getLogMessageOutputFile());
     //msgDisp.msgDispatcher.setOutputRange(0, 100000, 4, MsgDispatcher.mAdd, 0);
+    actionReadMsgConfig.exec(KeyCode.menuEntered, null);
     
     target = new FcmdtTarget();  //create the target itself, one process TODO experience with remote target.
     buttonCmds = new CmdStore();
@@ -453,6 +457,8 @@ public class Fcmd extends GuiCfg
         File file1 = new File(arg.substring(5));
         String sPathHelpAbs = file1.getAbsolutePath();
         cargs.dirHtmlHelp = new File(sPathHelpAbs);  //should be absolute because browser.
+      } else if (arg.startsWith("msgcfg:")) {
+        cargs.msgConfig = new File(arg.substring(7));
       } else if (arg.startsWith("cmdcfg:")) {
         cargs.fileCfgCmds = new File(arg.substring(7));
       } else if (arg.startsWith("cmdext:")) {
@@ -617,7 +623,23 @@ public class Fcmd extends GuiCfg
    * left panel. The original Norton Commander approach is to select a drive
    * letter for windows. Selection of paths instead are adequate.
    */
-  GralUserAction selectCardThemesLeft = new GralUserAction()
+  GralUserAction actionReadMsgConfig = new GralUserAction("actionReadMsgConfig")
+  {
+    @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){ 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
+        if(cargs.msgConfig !=null && cargs.msgConfig.exists()){
+          msgDisp.readConfig(cargs.msgConfig);
+        }
+        return true;
+      } else return false;
+    }
+  };
+
+  /**Key alt-F1 to select a directory/cmd list in a list of directories for the
+   * left panel. The original Norton Commander approach is to select a drive
+   * letter for windows. Selection of paths instead are adequate.
+   */
+  GralUserAction selectCardThemesLeft = new GralUserAction("selectCardThemesLeft")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction

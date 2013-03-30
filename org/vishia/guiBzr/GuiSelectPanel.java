@@ -165,14 +165,18 @@ public class GuiSelectPanel
           mainData.currTableline.setCellText(formatter.getContent(), 1);
           
           formatter.reset();
-          sDate = formatter.convertTimestampToday(mainData.currCmpn.revisionArchive.date);
-          formatter.add(sDate).add(": rev=").add(mainData.currCmpn.revisionWorkingTreeTop.nr);
-          mainData.currTableline.setCellText(formatter.getContent(), 2);
+          if(mainData.currCmpn.revisionArchive.nr !=null){
+            sDate = formatter.convertTimestampToday(mainData.currCmpn.revisionArchive.date);
+            formatter.add(sDate).add(": rev=").add(mainData.currCmpn.revisionArchive.nr);
+            mainData.currTableline.setCellText(formatter.getContent(), 2);
+          } else {
+            mainData.currTableline.setCellText("not available", 2);
+          }
           
           if(mainData.currCmpn.dirRemoteArchive !=null){
             formatter.reset();
-            sDate = formatter.convertTimestampToday(mainData.currCmpn.revisionArchive.date);
-            formatter.add(sDate).add(": rev=").add(mainData.currCmpn.revisionWorkingTreeTop.nr);
+            sDate = formatter.convertTimestampToday(mainData.currCmpn.revisionRemoteArchive.date);
+            formatter.add(sDate).add(": rev=").add(mainData.currCmpn.revisionRemoteArchive.nr);
             mainData.currTableline.setCellText(formatter.getContent(), 3);
           } else {
             mainData.currTableline.setCellText("not available", 3);
