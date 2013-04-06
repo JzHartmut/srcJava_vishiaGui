@@ -1,7 +1,6 @@
 package org.vishia.commander;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -119,8 +118,6 @@ public class FcmdCopyCmd
    */
   FileRemote.CallbackEvent evCurrentFile;
   
-  boolean bSkipFile, bSkipDir;
-  
   
   int modeCopy(){
     int mode = 0;
@@ -228,7 +225,7 @@ public class FcmdCopyCmd
     
   }
 
-  protected GralUserAction actionLastSrc = new GralUserAction() ///
+  protected GralUserAction actionLastSrc = new GralUserAction("actionLastSource") ///
   { @Override public boolean exec(int key, GralWidget_ifc widgP, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         GralButton widgb = (GralButton)(widgP);
@@ -283,17 +280,17 @@ public class FcmdCopyCmd
         case '?': 
           modeOverwrReadonly= 'y'; 
           widgdOverwrReadOnly.setText("yes ?no ?ask");
-          widgdOverwrReadOnly.setBackgroundColor(GralColor.getColor("lgn"));
+          widgdOverwrReadOnly.setBackColor(GralColor.getColor("lgn"), 0);
           break;
         case 'n': 
           modeOverwrReadonly= '?'; 
           widgdOverwrReadOnly.setText("ask ?yes ?no");
-          widgdOverwrReadOnly.setBackgroundColor(GralColor.getColor("lam"));
+          widgdOverwrReadOnly.setBackColor(GralColor.getColor("lam"), 0);
           break;
         default:
           modeOverwrReadonly= 'n'; 
           widgdOverwrReadOnly.setText("no ?ask ?yes");
-          widgdOverwrReadOnly.setBackgroundColor(GralColor.getColor("lrd"));
+          widgdOverwrReadOnly.setBackColor(GralColor.getColor("lrd"), 0);
           break;
         }
       }
@@ -339,7 +336,7 @@ public class FcmdCopyCmd
   
   
   
-  GralUserAction actionCreateCopy = new GralUserAction()
+  GralUserAction actionCreateCopy = new GralUserAction("actionButtonCreateCopy")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
@@ -347,17 +344,17 @@ public class FcmdCopyCmd
         case 'n': 
           modeCreateCopy= 'y'; 
           widgdCreateNew.setText("yes ?no ?ask");
-          widgdCreateNew.setBackgroundColor(GralColor.getColor("lgn"));
+          widgdCreateNew.setBackColor(GralColor.getColor("lgn"), 0);
           break;
         case '?': 
           modeCreateCopy= 'n'; 
           widgdCreateNew.setText("no ?ask ?yes");
-          widgdCreateNew.setBackgroundColor(GralColor.getColor("lrd"));
+          widgdCreateNew.setBackColor(GralColor.getColor("lrd"), 0);
           break;
         default:
           modeCreateCopy= '?'; 
           widgdCreateNew.setText("ask ?yes ?no");
-          widgdCreateNew.setBackgroundColor(GralColor.getColor("lam"));
+          widgdCreateNew.setBackColor(GralColor.getColor("lam"), 0);
           break;
         }
       }
@@ -370,7 +367,7 @@ public class FcmdCopyCmd
    * The OK-key is designated to "check". On button pressed the {@link #actionButtonCopy} is called,
    * with the "check" case.
    */
-  GralUserAction actionConfirmCopy = new GralUserAction()
+  GralUserAction actionConfirmCopy = new GralUserAction("actionConfirmCopy")
   {
     /**Opens the confirm-copy window and fills its fields to ask the user whether confirm.
      * @param dst The path which is selected as destination. It may be a directory or a file
@@ -476,7 +473,7 @@ public class FcmdCopyCmd
    * progression. The operator on this machine sees this situation because the progression bar stands.
    * The operator can abort the copy process to preset to a default empty state.  
    */
-  protected GralUserAction actionButtonCopy = new GralUserAction()
+  protected GralUserAction actionButtonCopy = new GralUserAction("actionButtonCopy")
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if(widgg.sCmd.equals("check")){
@@ -510,7 +507,7 @@ public class FcmdCopyCmd
           nrofFilesCheck = 0;
           for(File fileSrc1: listFileSrc){
             FileRemote fileSrc = FileRemote.fromFile(fileSrc1);
-            FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackCheck, null);
+            FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackCheck, null, evSrc);
             listEvCheck.add(callback);
             fileSrc.check(callback);   //callback.use() will be called on response
             nrofFilesCheck +=1;
@@ -554,7 +551,7 @@ public class FcmdCopyCmd
             if(fileSrc.sameDevice(fileDst)){  //all files in the standard file system of the computer, network files too!
               //Note: create a callback event without source, it is not occupied yet!
               //The callback event contains a command event.
-              FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, fileDst, callbackCopy, null);
+              FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, fileDst, callbackCopy, null, evSrc);
               listEvCopy.add(callback);
               if(widgdMove.isOn()){
                 fileSrc.moveTo(fileDst, callback);  //callback.use() will be called on response
@@ -570,7 +567,7 @@ public class FcmdCopyCmd
           }
         } else if(widgg.sCmd.startsWith("abort")) {
           for(FileRemote.CallbackEvent ev: listEvCopy){
-            ev.abort(FileRemote.Cmd.abortAll);
+            ev.copyAbortAll();
             //ev.sendEvent(FileRemote.cmdAbortAll);
           }
           listEvCheck.clear();
@@ -620,11 +617,8 @@ public class FcmdCopyCmd
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if(evCurrentFile !=null){
-          FileRemote.CmdEvent evcmd = evCurrentFile.getOpponent();
-          if(evcmd.occupy(evSrc, true)){
-            evcmd.modeCopyOper = modeCopy();
-            evcmd.sendEvent(FileRemote.Cmd.overwr);
-          }
+          int modeCopyOper = modeCopy();
+          evCurrentFile.copyOverwriteFile(modeCopyOper);
         }
         widgSkipFile.setBackColor(GralColor.getColor("wh"), 0);
         widgOverwrFile.setBackColor(GralColor.getColor("wh"), 0);
@@ -644,11 +638,8 @@ public class FcmdCopyCmd
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if(evCurrentFile !=null){
-          FileRemote.CmdEvent evcmd = evCurrentFile.getOpponent();
-          if(evcmd.occupy(evSrc, true)){
-            evcmd.modeCopyOper = modeCopy();
-            evcmd.sendEvent(FileRemote.Cmd.abortCopyFile);
-          }
+          int modeCopyOper = modeCopy();
+          evCurrentFile.copySkipFile(modeCopyOper);
         }
         widgSkipFile.setBackColor(GralColor.getColor("wh"), 0);
         widgOverwrFile.setBackColor(GralColor.getColor("wh"), 0);
@@ -662,15 +653,12 @@ public class FcmdCopyCmd
    * should be aborted and that file should be deleted.
    * 
    */
-  protected GralUserAction actionButtonSkipDir = new GralUserAction()
+  protected GralUserAction actionButtonSkipDir = new GralUserAction("actionButtonSkipDir")
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if(evCurrentFile !=null){
-          FileRemote.CmdEvent evcmd = evCurrentFile.getOpponent();
-          if(evcmd.occupy(evSrc, true)){
-            evcmd.modeCopyOper = modeCopy();
-            evcmd.sendEvent(FileRemote.Cmd.abortCopyDir);
-          }
+          int modeCopyOper = modeCopy();
+          evCurrentFile.copySkipDir(modeCopyOper);
         }
         widgSkipFile.setBackColor(GralColor.getColor("wh"), 0);
         widgOverwrFile.setBackColor(GralColor.getColor("wh"), 0);
@@ -680,7 +668,7 @@ public class FcmdCopyCmd
   };
   
   
-  GralUserAction actionSwitchButtonMove = new GralUserAction()
+  GralUserAction actionSwitchButtonMove = new GralUserAction("actionButtonMoveCopy")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { 
@@ -703,7 +691,7 @@ public class FcmdCopyCmd
   
   
   EventConsumer callbackCheck = new EventConsumer("FcmdCopy-check"){
-    @Override protected boolean processEvent_(Event evP)
+    @Override protected boolean processEvent_(Event<?,?> evP)
     {
       FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
       if(listEvCheck.remove(ev)){
@@ -785,15 +773,6 @@ public class FcmdCopyCmd
           widgProgressAll.setValue(percent);
           widgCopyState.setText(StringFunctions.z_StringJc(ev1.fileName));
           widgCopyNameDst.setText("" + ev1.nrofBytesInFile/1000000 + " Mbyte");
-          if(bSkipFile){
-            ev1.abort(FileRemote.Cmd.abortCopyFile );
-            //ev1.sendEvent(FileRemote.cmdAbortFile);
-            bSkipFile = false;
-          } else if(bSkipDir){
-            ev1.abort(FileRemote.Cmd.abortCopyDir);
-            //ev1.sendEvent(FileRemote.cmdAbortDir);
-            bSkipDir = false;
-          } 
         }break;
         case askDstOverwr: {
           FcmdCopyCmd.this.evCurrentFile = ev1;
@@ -827,19 +806,16 @@ public class FcmdCopyCmd
         case error: {
           FcmdCopyCmd.this.evCurrentFile = null;
           widgCopyState.setText("error");
-          bSkipDir = bSkipFile = false;
           eventConsumed(ev, false);
         }break;
         case nok: {
           FcmdCopyCmd.this.evCurrentFile = null;
           widgCopyState.setText("nok");
-          bSkipDir = bSkipFile = false;
           eventConsumed(ev, false);
         }break;
         case done: {
           FcmdCopyCmd.this.evCurrentFile = null;
           widgCopyState.setText("ok");
-          bSkipDir = bSkipFile = false;
           eventConsumed(ev, true);
         }break;
         default:

@@ -60,7 +60,21 @@ public class MainAction
   
 
   
+  String findBazaarExe(){
+    String sBzrExe = "D:/Progs/Bazaar/bzr.exe";
+    File bzrExe = new File(sBzrExe);
+    if(bzrExe.exists()) return sBzrExe;
+    sBzrExe = "D:/Programme/Bazaar/bzr.exe";
+    bzrExe = new File(sBzrExe);
+    if(bzrExe.exists()) return sBzrExe;
+    throw new IllegalArgumentException("BzrGui.MainAction - findBazaarExe; don't find bazaar.exe");
+  }
+  
+  
+  
+  
   void revertWithTimestamps(){
+    String sBazaarExe = findBazaarExe();
     try{
       File dirWorkingTree = mainData.currCmpn.dirWorkingtree;
       File fileBzr = new File(dirWorkingTree, ".bzr");
@@ -90,7 +104,7 @@ public class MainAction
       }
       //call the bazaar mainData.cmdExec:
       String[] cmdarg = new String[5];
-      cmdarg[0] = "D:/Progs/Bazaar/bzr.exe";
+      cmdarg[0] = sBazaarExe;
       cmdarg[1] = "export";
       cmdarg[2] = dirWorkingTree.getAbsolutePath();
       cmdarg[3] = tempBzrDir.getAbsolutePath();

@@ -473,7 +473,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   private GralInfoBox questionWindow;
   
   
-  EventSource evSrc = new EventSource("GralFileSelector"){
+  private final EventSource evSrc = new EventSource("GralFileSelector"){
     
   };
   
@@ -1100,7 +1100,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     boolean bCompleteWithFileInfo;
     FillinCallback(){ 
       //note: call without source because it is not occupied.
-      super(callbackFillIn, null); 
+      super(callbackFillIn, null, evSrc); 
     }
   }
   
