@@ -192,10 +192,10 @@ public class FcmdDelete
   
   
   EventConsumer success = new EventConsumer("FcmdDelete - success"){
-    @Override protected boolean processEvent_(Event ev)
-    {
-      if(ev.data1 !=0){
-        main.mainCmd.writeError("can't delete " + ((FileRemote)(ev.getRefData())).getCanonicalPath());
+    @Override protected boolean processEvent_(Event<?,?> ev)
+    { FileRemote.CallbackEvent callback = (FileRemote.CallbackEvent)ev;
+      if(callback.successCode !=0){
+        main.mainCmd.writeError("can't delete " + callback.getFileSrc().getCanonicalPath());
       }
       listEvDel.remove(ev);
       int nrofPendingFiles = listEvDel.size();

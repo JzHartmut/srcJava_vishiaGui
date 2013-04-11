@@ -371,28 +371,28 @@ public class FcmdFileProps
         val &= mask;   //only used bits.
         boolean bAbort = false;
         if(infos.sCmd.equals(sCmdAbort)){
-          if(evChg.occupy(evSrc, widgChgFile, callbackChgProps, null, true)){
+          if(evChg.occupy(evSrc, callbackChgProps, null, true)){
             widgChgFile.setText(main.idents.buttonFilePropsChg);
             infos.sCmd = sCmdChg;
           } else {
             System.err.println("chg properties hangs");
           }
         } else if(infos.sCmd.equals(sCmdChg)){
-          if(evChg.occupy(evSrc, widgChgFile, callbackChgProps, null, true)){
+          if(evChg.occupy(evSrc, callbackChgProps, null, true)){
             //cmds with callback
             widgChgFile.setText(main.idents.buttonFilePropsChanging);
             actFileRemote.chgProps(name, mask, val, 0, evChg);
           } else { bAbort = true; }
           //
         } else if(infos.sCmd.equals(sCmdChgRecurs)){
-          if(evChg.occupy(evSrc, widgChrRecurs, callbackChgProps, null, true)){
+          if(evChg.occupy(evSrc, callbackChgProps, null, true)){
             //cmds with callback
             widgChrRecurs.setText(main.idents.buttonFilePropsChanging);
             actFileRemote.chgPropsRecursive(mask, val, 0, evChg);
           } else { bAbort = true; }
           //
         } else if(infos.sCmd.equals(sCmdCopy)){
-          if(evChg.occupy(evSrc, widgCopyFile, callbackChgProps, null, true)){
+          if(evChg.occupy(evSrc, callbackChgProps, null, true)){
             if(!name.equals(actFile.getName())){
               widgCopyFile.setText(main.idents.buttonFilePropsCopying);
               FileRemote fileNew = new FileRemote(actFileRemote.getParentFile(), name);
@@ -425,12 +425,11 @@ public class FcmdFileProps
   EventConsumer callbackChgProps = new EventConsumer("FcmdFileProps-callbackChgProps")
   { @Override protected boolean processEvent_(Event evP)
     { FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
-      GralButton src = (GralButton)ev.getRefData();
       if(ev.getCmd() == FileRemote.CallbackCmd.done){
         showFileInfos(actFile);
-        src.setText(main.idents.buttonFilePropsOk);
+        widgChgFile.setText(main.idents.buttonFilePropsOk);
       } else {
-        src.setText(main.idents.buttonFilePropsRetry);
+        widgChgFile.setText(main.idents.buttonFilePropsRetry);
       }
       ev.relinquish();
       return true;
@@ -447,7 +446,7 @@ public class FcmdFileProps
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         widgBtnDirBytes.setText("counting ...");
-        if(evCntLen.occupyRecall(100, evSrc, null, callbackCntLen, null, true)){
+        if(evCntLen.occupyRecall(100, evSrc, callbackCntLen, null, true)){
           FileRemote.fromFile(actFile).countAllFileLength(evCntLen);
         }
       }
@@ -456,8 +455,7 @@ public class FcmdFileProps
   
   EventConsumer callbackCntLen = new EventConsumer("FcmdFileProps - callback cnt length")
   { @Override protected boolean processEvent_(Event evP)
-    { GralButton src = (GralButton)evP.getRefData();
-      FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
+    { FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
       if(ev.getCmd() == FileRemote.CallbackCmd.done){
         String sLen = "" + ev.nrofBytesAll;
         widgLength.setText(sLen);

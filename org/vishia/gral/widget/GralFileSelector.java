@@ -1,7 +1,6 @@
 package org.vishia.gral.widget;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,7 +23,6 @@ import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTableLine_ifc;
-import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.Event;
@@ -55,6 +53,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2013-04-12 Hartmut adapt Event, FileRemote: The attributes Event.data1, data2, oData, refData are removed. Any special data should be defined in any derived instance of the event. A common universal data concept may be error-prone  because unspecified types and meanings.
+   *   FileRemote: Dedicated attributes for {@link CallbackCmd#successCode} etc.
    * <li>2013-03-28 Hartmut chg: {@link #setToPanel(GralMngBuild_ifc, String, int, int[], char)} preserves the panel
    *   before calling.
    * <li>2012-11-11 Hartmut bugfix: {@link #fillInRefreshed(File, boolean)}: If all files are complete with file info,
@@ -120,7 +120,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120617;
+  public static final int version = 20130412;
   
   //FileRemoteAccessor localFileAccessor = FileRemoteAccessorLocalFile.getInstance();
   
@@ -1084,10 +1084,10 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   final EventConsumer callbackFillIn = new EventConsumer("GralFileSelector - callback fillin"){
-    @Override protected boolean processEvent_(Event ev) {
+    @Override protected boolean processEvent_(Event evP) {
       ///
-      FillinCallback callback = (FillinCallback)ev;
-      FileRemote dir = (FileRemote)callback.getRefData();  //it is completed meanwhile
+      FillinCallback callback = (FillinCallback)evP;
+      FileRemote dir = callback.getFileSrc();  //it is completed meanwhile
       fillInRefreshed(dir, callback.bCompleteWithFileInfo);
       //setFocus();    //don't set the focus, it may be false. Only fill.
       return true;

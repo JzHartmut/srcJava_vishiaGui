@@ -719,13 +719,14 @@ public class FcmdCopyCmd
   
   
   
-  private void eventConsumed(Event ev, boolean ok){
+  private void eventConsumed(Event<?,?> evp, boolean ok){
+    FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evp;
     listEvCopy.remove(ev);
     int nrofPendingFiles = listEvCopy.size();
     int percent = nrofPendingFiles * 100 / filesToCopy.size();
     widgProgressAll.setValue(percent);
     if(ok){
-      File file = (File)ev.getRefData();
+      File file = ev.getFileSrc();
       FileCompare.Result cmprResult = fileCardSrc.searchCompareResult(file);
       if(cmprResult !=null){
         cmprResult.setToEqual();  
@@ -769,7 +770,7 @@ public class FcmdCopyCmd
         } break;
         case nrofFilesAndBytes:{
           FcmdCopyCmd.this.evCurrentFile = ev1;
-          int percent = ev.data2 / 10;
+          int percent = ev1.promilleCopiedBytes / 10;
           widgProgressAll.setValue(percent);
           widgCopyState.setText(StringFunctions.z_StringJc(ev1.fileName));
           widgCopyNameDst.setText("" + ev1.nrofBytesInFile/1000000 + " Mbyte");
