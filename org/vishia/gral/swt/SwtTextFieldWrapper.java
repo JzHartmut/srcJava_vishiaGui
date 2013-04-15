@@ -218,8 +218,12 @@ public class SwtTextFieldWrapper extends GralTextField
   @Override public void setTextStyle(GralColor color, GralFont font)
   {
     SwtProperties props = ((SwtMng)itsMng).propertiesGuiSwt;
-    textFieldSwt.setForeground(props.colorSwt(color));
-    textFieldSwt.setFont(props.fontSwt(font));
+    if(color !=null){
+      textFieldSwt.setForeground(props.colorSwt(color));
+    }
+    if(font !=null){
+      textFieldSwt.setFont(props.fontSwt(font));
+    }
   }
 
 

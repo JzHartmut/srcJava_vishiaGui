@@ -68,13 +68,13 @@ public class FcmdCopyCmd
 
   /**Mode overwrite readonly. '?'-ask, y-overwrite n-skip, don't ask
    */
-  char modeOverwrReadonly;
+  int modeOverwrReadonly = FileRemote.modeCopyReadOnlyAks;
   
   /**Mode overwrite with timestamp. 'w'-newer, o-older, n-never, ?-ask. */
-  char modeOverwrDate;
+  int modeOverwrDate = FileRemote.modeCopyExistAsk;
   
   /**Mode create new file while copying. 'n'-no, y-yes, a-ask. */
-  char modeCreateCopy;
+  int modeCreateCopy = FileRemote.modeCopyCreateYes;
   
   /**The file card where the directory content is shown where the files will be copied to, the destination. */
   FcmdFileCard fileCardSrc, fileCardDst;
@@ -120,24 +120,7 @@ public class FcmdCopyCmd
   
   
   int modeCopy(){
-    int mode = 0;
-    switch(modeCreateCopy){
-    case 'n': mode |= FileRemote.modeCopyCreateNever; break;
-    case 'y': mode |= FileRemote.modeCopyCreateYes; break;
-    case '?': mode |= FileRemote.modeCopyCreateAsk; break;
-    }
-    switch(modeOverwrReadonly){
-    case 'n': mode |= FileRemote.modeCopyReadOnlyNever; break;
-    case 'y': mode |= FileRemote.modeCopyReadOnlyOverwrite; break;
-    case '?': mode |= FileRemote.modeCopyReadOnlyAks; break;
-    }
-    switch(modeOverwrDate){
-    case 's': mode |= FileRemote.modeCopyExistSkip; break;
-    case 'n': mode |= FileRemote.modeCopyExistNewer; break;
-    case 'o': mode |= FileRemote.modeCopyExistOlder; break;
-    case 'a': mode |= FileRemote.modeCopyExistAll; break;
-    case '?': mode |= FileRemote.modeCopyExistAsk; break;
-    }
+    int mode = modeCreateCopy | modeOverwrReadonly |modeOverwrDate;
     return mode;            
   }
   
@@ -167,8 +150,10 @@ public class FcmdCopyCmd
     
     main.gralMng.setPosition(0.5f, GralPos.size +3.2f, 1, -1, 0, 'd', 0.3f);
     //main.gralMng.addText("source:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    widgCopyFrom = main.gralMng.addTextField("copyFrom", false, "source path", "t");
+    widgCopyFrom = main.gralMng.addTextField("copyFrom", false, "source directory", "t");
     widgCopyFrom.setBackColor(GralColor.getColor("am"),0);
+    widgCopyDirDst = main.gralMng.addTextField("copyDirDst", true, "destination directory:", "t");
+
     main.gralMng.setPosition(GralPos.refer + 3.5f, GralPos.size +3.2f, 1, -10, 0, 'd', 0.3f);
     widgFromConditions = main.gralMng.addTextField("copyCond",true, "select src files: mask*:*.ext / 2012-08-05..06", "t");
     
@@ -176,8 +161,6 @@ public class FcmdCopyCmd
     widgLastSrc = main.gralMng.addSwitchButton("lastSrc", "? lock src", "lock src", GralColor.getColor("wh"), GralColor.getColor("lgn"));
     widgLastSrc.setActionChange(actionLastSrc);
     
-    main.gralMng.setPosition(GralPos.refer + 3.5f, GralPos.size +3.2f, 1, -1, 0, 'd', 0.3f);
-    widgCopyDirDst = main.gralMng.addTextField("copyDirDst", true, "destination directory:", "t");
     //widgCopyDirDst.setBackColor(GralColor.getColor("am"),0);
     main.gralMng.setPosition(GralPos.refer + 3.5f, GralPos.size +3.2f, 1, -14, 0, 'r', 1);
     widgCopyNameDst = main.gralMng.addTextField("copyNameDst", true, "destination filename:", "t");
@@ -187,19 +170,22 @@ public class FcmdCopyCmd
     
     main.gralMng.setPosition(GralPos.refer + 3.5f, GralPos.size +3.2f, 1, -1, 0, 'd', 0.3f);
     widgCopyState = main.gralMng.addTextField("copyStatus", false, "state", "t");
+    widgCopyState.setBackColor(GralColor.getColor("am"),0);
     
-    main.gralMng.setPosition(GralPos.refer+1.5f, GralPos.size -1.5f, 1, 20, 0, 'r', 1);
-    main.gralMng.addText("Overwrite readonly");
-    main.gralMng.addText("Overwrite - date");
-    main.gralMng.addText("Create new file");
+    main.gralMng.setPosition(GralPos.refer+1.5f, GralPos.size -1.5f, 1, 24, 0, 'r', 1);
+    main.gralMng.addText("Overwr read only ?");
+    main.gralMng.addText("Overwr exists ?");
+    main.gralMng.addText("Create ?");
     
-    main.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size -3, 1, 20, 0, 'r',1);
-    //widgdOverwrite = main.gralMng.addButton("copyOverwrite", null, "overwr file");
-    //main.gralMng.setPosition(GralPos.same, GralPos.size -3, 16, 35, 0, 'r');
-    widgdOverwrReadOnly = main.gralMng.addButton("overwritero", actionOverwrReadonly, null, null,"ask ?no ?yes");
-    //main.gralMng.setPosition(GralPos.same, GralPos.size -3, 33, -1, 0, 'r');
-    widgdOverwrDate = main.gralMng.addButton("copyOverwriteReadonly", actionOverwrDate, null, null, "older ?no ?newer ?all");
-    widgdCreateNew = main.gralMng.addButton("copyCreate", actionCreateCopy, null, null, "only overwr ? yes");
+    main.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size -3, 1, GralPos.size + 15, 0, 'r',1);
+    widgdOverwrReadOnly = main.gralMng.addButton("overwritero", actionOverwrReadonly, null, null,"ask ?yes ?no");
+    widgdOverwrReadOnly.setBackColor(GralColor.getColor("lam"), 0);
+    main.gralMng.setPosition(GralPos.same, GralPos.size -3, 18, GralPos.size + 23, 0, 'r',1);
+    widgdOverwrDate = main.gralMng.addButton("copyOverwriteReadonly", actionOverwrDate, null, null, "ask ?newer?older?all ?no");
+    widgdOverwrDate.setBackColor(GralColor.getColor("lam"), 0);
+    main.gralMng.setPosition(GralPos.same, GralPos.size -3, 43, GralPos.size + 15, 0, 'r',1);
+    widgdCreateNew = main.gralMng.addButton("copyCreate", actionCreateCopy, null, null, "yes ?no ?ask");
+    widgdCreateNew.setBackColor(GralColor.getColor("lgn"), 0);
 
     main.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size -3, 1, 15, 0, 'r', 1);
     widgOverwrFile = main.gralMng.addButton("copyOverwrite", actionOverwriteFile, "overwr file");
@@ -277,18 +263,18 @@ public class FcmdCopyCmd
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         switch(modeOverwrReadonly){
-        case '?': 
-          modeOverwrReadonly= 'y'; 
+        case FileRemote.modeCopyReadOnlyAks: 
+          modeOverwrReadonly= FileRemote.modeCopyReadOnlyOverwrite; 
           widgdOverwrReadOnly.setText("yes ?no ?ask");
           widgdOverwrReadOnly.setBackColor(GralColor.getColor("lgn"), 0);
           break;
-        case 'n': 
-          modeOverwrReadonly= '?'; 
+        case FileRemote.modeCopyReadOnlyNever: 
+          modeOverwrReadonly= FileRemote.modeCopyReadOnlyAks; 
           widgdOverwrReadOnly.setText("ask ?yes ?no");
           widgdOverwrReadOnly.setBackColor(GralColor.getColor("lam"), 0);
           break;
         default:
-          modeOverwrReadonly= 'n'; 
+          modeOverwrReadonly= FileRemote.modeCopyReadOnlyNever; 
           widgdOverwrReadOnly.setText("no ?ask ?yes");
           widgdOverwrReadOnly.setBackColor(GralColor.getColor("lrd"), 0);
           break;
@@ -304,29 +290,29 @@ public class FcmdCopyCmd
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         switch(modeOverwrDate){
-        case '?': 
-          modeOverwrDate= 'n'; 
-          widgdOverwrDate.setText("newer ?older?skip?all?ask");
+        case FileRemote.modeCopyExistAsk: 
+          modeOverwrDate= FileRemote.modeCopyExistNewer; 
+          widgdOverwrDate.setText("newer ?older?all ?no?ask");
           widgdOverwrDate.setBackColor(GralColor.getColor("lpk"),0);
           break;
-        case 'n': 
-          modeOverwrDate= 'o'; 
-          widgdOverwrDate.setText("older ?skip?all?ask?newer");
+        case FileRemote.modeCopyExistNewer: 
+          modeOverwrDate= FileRemote.modeCopyExistOlder; 
+          widgdOverwrDate.setText("older ?all ?no?ask?newer");
           widgdOverwrDate.setBackColor(GralColor.getColor("lbl"),0);
           break;
-        case 'o':
-          modeOverwrDate= 's'; 
-          widgdOverwrDate.setText("skip ? all?ask?newer?older");
+        case FileRemote.modeCopyExistOlder:
+          modeOverwrDate= FileRemote.modeCopyExistAll; 
+          widgdOverwrDate.setText("all ? no?ask?newer?older");
           widgdOverwrDate.setBackColor(GralColor.getColor("lgn"),0);
           break;
-        case 's':
-          modeOverwrDate= 'a'; 
-          widgdOverwrDate.setText("all ?ask?newer?older?skip");
-          widgdOverwrDate.setBackColor(GralColor.getColor("lgn"),0);
+        case FileRemote.modeCopyExistAll:
+          modeOverwrDate= FileRemote.modeCopyExistSkip; 
+          widgdOverwrDate.setText("no ?ask?newer?older?all");
+          widgdOverwrDate.setBackColor(GralColor.getColor("lrd"),0);
           break;
         default:
-          modeOverwrDate= '?'; 
-          widgdOverwrDate.setText("ask ?newer?older?skip?all");
+          modeOverwrDate= FileRemote.modeCopyExistAsk; 
+          widgdOverwrDate.setText("ask ?newer?older?all ?no");
           widgdOverwrDate.setBackColor(GralColor.getColor("lam"),0);
           break;
         }
@@ -341,18 +327,18 @@ public class FcmdCopyCmd
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         switch(modeCreateCopy){
-        case 'n': 
-          modeCreateCopy= 'y'; 
+        case FileRemote.modeCopyCreateAsk: 
+          modeCreateCopy = FileRemote.modeCopyCreateYes; 
           widgdCreateNew.setText("yes ?no ?ask");
           widgdCreateNew.setBackColor(GralColor.getColor("lgn"), 0);
           break;
-        case '?': 
-          modeCreateCopy= 'n'; 
+        case FileRemote.modeCopyCreateYes: 
+          modeCreateCopy = FileRemote.modeCopyCreateNever; 
           widgdCreateNew.setText("no ?ask ?yes");
           widgdCreateNew.setBackColor(GralColor.getColor("lrd"), 0);
           break;
         default:
-          modeCreateCopy= '?'; 
+          modeCreateCopy = FileRemote.modeCopyCreateAsk; 
           widgdCreateNew.setText("ask ?yes ?no");
           widgdCreateNew.setBackColor(GralColor.getColor("lam"), 0);
           break;
@@ -457,7 +443,7 @@ public class FcmdCopyCmd
    * in a loop FileRemote.copyTo(dst) is called for any selected file. It may be one file, 
    * or more files in more selected lines.
    * The copy process itself is executed in an own thread in management of the FileRemote implementation,
-   * see {@link org.vishia.util.FileRemoteAccessorLocalFile#addCommission(org.vishia.util.FileRemoteAccessor.Commission)}
+   * see {@link org.vishia.fileLocalAccessor.FileRemoteAccessorLocalFile#addCommission(org.vishia.util.FileRemoteAccessor.Commission)}
    * for local files. The copy process can be executed in an remote device without copying of data
    * between this device (PC) and the remote device, if the commission is organized in the remote device itself.
    * <br><br>
@@ -503,22 +489,34 @@ public class FcmdCopyCmd
             listFileSrc.add(new FileRemote(dirSrc, sFilesSrc));
           }
           //
-          //
+          sDstName = widgCopyNameDst.getText();
+          sDstDir = widgCopyDirDst.getText();
+          if(!FileSystem.isAbsolutePathOrDrive(sDstDir)) {
+            int posSrcDir = sSrc.lastIndexOf('/');
+            String sSrcDir = sSrc.substring(0, posSrcDir +1);  //inclusive /
+            sDstDir = sSrcDir + sDstDir;
+          }
+         //
           nrofFilesCheck = 0;
           for(File fileSrc1: listFileSrc){
             FileRemote fileSrc = FileRemote.fromFile(fileSrc1);
-            FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackCheck, null, evSrc);
-            listEvCheck.add(callback);
-            fileSrc.check(callback);   //callback.use() will be called on response
-            nrofFilesCheck +=1;
+            int posWildcard = sDstName.indexOf('*');
+            final String nameDst1;
+            if(posWildcard >=0){
+              nameDst1 = sDstName.substring(0, posWildcard) + fileSrc.getName() + sDstName.substring(posWildcard +1); 
+            } else {
+              nameDst1 = sDstName;
+            }
+            FileRemote fileDst = new FileRemote(sDstDir, nameDst1);
+
+            
+            if(fileSrc.sameDevice(fileDst)){  //all files in the standard file system of the computer, network files too!
+              FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, fileDst, callbackCopy, null, evSrc);
+              listEvCheck.add(callback);
+              fileSrc.check(fileDst, callback);   //callback.use() will be called on response
+              nrofFilesCheck +=1;
+            }
           }
-          /*
-          for(FileRemote fileSrc : filesToCopy){
-            FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(fileSrc, success, null);
-            listEvCheck.add(callback);
-            fileSrc.check(callback);   //callback.use() will be called on response
-          }
-          */
         } else if(widgg.sCmd.equals("copy")) {
           //Starts the copy process (not move)
           widgCopyState.setText("busy-copy");
@@ -570,6 +568,9 @@ public class FcmdCopyCmd
             ev.copyAbortAll();
             //ev.sendEvent(FileRemote.cmdAbortAll);
           }
+          String sDirSrc = widgCopyFrom.getText();
+          FileRemote dirSrc = new FileRemote(sDirSrc);
+          dirSrc.abortAction();
           listEvCheck.clear();
           listEvCopy.clear();
           filesToCopy.clear();
@@ -694,7 +695,7 @@ public class FcmdCopyCmd
     @Override protected boolean processEvent_(Event<?,?> evP)
     {
       FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
-      if(listEvCheck.remove(ev)){
+      if(listEvCheck.remove(ev)){  ///
         filesToCopy.add(ev.getFileSrc());
         zBytes += ev.nrofBytesAll;
         zFiles += ev.nrofFiles;
@@ -759,10 +760,25 @@ public class FcmdCopyCmd
    * 
    */
   EventConsumer callbackCopy = new EventConsumer("FcmdCopy-success"){
-    @Override protected boolean processEvent_(Event ev)
+    @Override protected boolean processEvent_(Event<?,?> ev)
     {
       FileRemote.CallbackEvent ev1 = (FileRemote.CallbackEvent)ev;
       switch(ev1.getCmd()){
+        case doneCheck:{ ///
+          if(listEvCheck.remove(ev)){  ///
+            int nrofPendingFiles = listEvCheck.size();
+            if(nrofPendingFiles == 0){
+              //TODO check dst space
+              widgCopyState.setText("files:" + zFiles + ", size:" + zBytes);
+              widgButtonOk.setText("copy");
+              widgButtonOk.setCmd("copy");
+            }
+            
+          } else {
+            //unexpected doneCheck:
+          }
+
+        } break;
         case copyDir:{
           FcmdCopyCmd.this.evCurrentFile = ev1;
           String sPath = StringFunctions.z_StringJc(ev1.fileName);

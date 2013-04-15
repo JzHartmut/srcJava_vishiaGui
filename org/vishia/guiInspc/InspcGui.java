@@ -21,6 +21,7 @@ import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
+import org.vishia.gral.widget.GralColorSelector;
 import org.vishia.inspectorAccessor.InspcMng;
 import org.vishia.inspectorAccessor.InspcPlugUser_ifc;
 import org.vishia.inspectorAccessor.UserInspcPlug_ifc;
@@ -99,6 +100,10 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   GralButton btnSwitchOnLog;
   
   InspcCurveView curveA, curveB, curveC;
+  
+  public GralColorSelector colorSelector;
+  
+
 
   InspcGui(CallingArguments cargs, GralArea9MainCmd cmdgui)
   {
@@ -289,10 +294,10 @@ private class InspcGuiCfg extends GuiCfg
     super.gralMng.setPosition(5, GralPos.size -3, 0, GralPos.size +10 , 0, 'r');
     btnSwitchOnLog = super.gralMng.addSwitchButton("log", "log telg ?", "log telg", GralColor.getColor("wh"), GralColor.getColor("am") );
     btnSwitchOnLog.setActionChange(actionEnableLog);
-    curveA.buildGraphic(gui);
-    curveB.buildGraphic(gui);
-    curveC.buildGraphic(gui);
-    
+    colorSelector = new GralColorSelector("colorSelector", super.gralMng);
+    curveA.buildGraphic(gui, colorSelector);
+    curveB.buildGraphic(gui, colorSelector);
+    curveC.buildGraphic(gui, colorSelector);
     if(user !=null){
       user.initGui(gralMng);
       user.addGuiMenu(gui);

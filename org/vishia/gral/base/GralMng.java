@@ -29,6 +29,7 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindowMng_ifc;
+import org.vishia.gral.widget.GralColorSelector;
 import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
