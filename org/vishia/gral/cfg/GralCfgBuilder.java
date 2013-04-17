@@ -275,6 +275,11 @@ public class GralCfgBuilder
           widgd = gralMng.addTextField(sName, true, cfge.widgetType.prompt, cfge.widgetType.promptPosition);
           widgd.setDataPath(sDataPath);
         } break;
+        case 't':{
+          char promptPosition = cfge.widgetType.promptPosition == null ? '.' : cfge.widgetType.promptPosition.charAt(0);
+          widgd = gralMng.addTextBox(sName, true, cfge.widgetType.prompt, promptPosition);
+          widgd.setDataPath(sDataPath);
+        } break;
         case 'U':{
           widgd = gralMng.addValueBar(sName, sDataPath);
         } break;

@@ -14,7 +14,6 @@ import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
-import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.KeyCode;
 
@@ -56,7 +55,7 @@ public class SwtMenu extends GralMenu
           widgg = (GralWidget)oGralWidg;
         } else { widgg = null; }
       } else { widgg = null; }
-      action.userActionGui(KeyCode.menuEntered, widgg);
+      action.exec(KeyCode.menuEntered, widgg);
     }
   }
   
@@ -163,6 +162,7 @@ public class SwtMenu extends GralMenu
   }
 
 
+  @Override
   public void setVisible(){
     menuSwt.setVisible(true);
   }

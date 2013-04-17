@@ -201,7 +201,7 @@ public interface GralWidget_ifc extends Removeable
    */
   boolean isChanged(boolean setUnchanged);
   
-  
+  Object getContentInfo();
 
   /**Capability for any widget to update its content from its associated variables described in its sDataPath.
    * @param container The container is used only if the variable is not known by direct reference

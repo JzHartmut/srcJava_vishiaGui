@@ -82,6 +82,7 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   { this.itsCfgData = itsCfgData;
   }
   
+  @Override
   public GralCfgElement clone(){ 
     GralCfgElement newObj = new GralCfgElement(this.itsCfgData);
     newObj.widgetType = widgetType.clone(); ///use a new cloned instance (use data).
@@ -232,6 +233,14 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   
   /**ZBNF: Text::= */
   public void set_Text(GuiCfgText data){  }
+  
+  public WidgetTypeBase new_InputTextbox()
+  { GralCfgData.WidgetTypeBase widgt = new GralCfgData.WidgetTypeBase(this, 't');
+    this.widgetType = widgt;
+    return widgt;
+  }
+  
+  public void set_InputTextbox(WidgetTypeBase data) {  }
   
   public WidgetTypeBase new_InputTextline()
   { GralCfgData.WidgetTypeBase widgt = new GralCfgData.WidgetTypeBase(this, 'T');

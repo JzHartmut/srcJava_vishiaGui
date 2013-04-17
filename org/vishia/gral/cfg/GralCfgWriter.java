@@ -99,6 +99,12 @@ public class GralCfgWriter
       writer.append(");\n");
 
     }
+    else if(cfge.widgetType.whatIs == 't'){ 
+      writer.append("InputBox(");
+      writeParam(cfge.widgetType);
+      writer.append(");\n");
+
+    }
     else { 
       writeUnknown(cfge.widgetType); 
     }

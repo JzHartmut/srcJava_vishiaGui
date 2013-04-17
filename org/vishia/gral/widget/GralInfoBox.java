@@ -19,6 +19,7 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWindow_getifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.KeyCode;
 
 /**This class presents a sub window which is used as info box for any messages.
@@ -104,7 +105,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   
   public static GralInfoBox createTextInfoBox(GralMngBuild_ifc mng, String name, String title)
   {
-    GralWindow window = mng.createWindow(name, title, GralWindow.windConcurrently);
+    GralWindow window = mng.createWindow(name, title, GralWindow_ifc.windConcurrently);
     //TODO the position frame (size) regards the title bar, it should not do so!
     mng.setPosition(0, -3, 0, 0, 0, '.');
     GralTextBox text = mng.addTextBox(name, false, null, '.');
@@ -120,8 +121,8 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   
   public static GralInfoBox createHtmlInfoBox(GralMngBuild_ifc mng, String name, String title, boolean onTop)
   {
-    int props = GralWindow.windConcurrently | GralWindow.windResizeable;
-    if(onTop){ props |= GralWindow.windOnTop; }
+    int props = GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable;
+    if(onTop){ props |= GralWindow_ifc.windOnTop; }
     GralWindow window = mng.createWindow(name, title, props);
     //TODO the position frame (size) regards the title bar, it should not do so!
     mng.setPosition(0, -3, 0, 0, 0, '.');
@@ -325,7 +326,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   GralUserAction actionOkButton = new GralUserAction("actionOkButton"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
       //if(textBox !=null) {textBox.setText(""); }  //'I have seen it, therefore delete.
-      if(actionOk !=null){ actionOk.userActionGui(KeyCode.enter, widgd); }
+      if(actionOk !=null){ actionOk.exec(KeyCode.enter, widgd); }
       window.setWindowVisible(false);
       return true;
     }
@@ -395,4 +396,6 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     if(htmlBox !=null){ htmlBox.setTextColor(color); }
   }
 
+  @Override public Object getContentInfo(){ return null; }
+  
 }

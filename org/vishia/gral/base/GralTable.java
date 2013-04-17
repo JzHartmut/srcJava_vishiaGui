@@ -909,7 +909,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     @Override public void setHtmlHelp(String url) { GralTable.this.setHtmlHelp(url); }
     
     
-    
+    @Override public Object getContentInfo(){ return userData; }
+
 
     
     
