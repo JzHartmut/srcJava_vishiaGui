@@ -24,6 +24,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   /**Version and history
    * <ul>
+   * <li>2013-04-21 Hartmut chg: {@link #processKeys(int)}: input of a text key starts searching for a line with this key
+   *   immediately, better handling for usage.
    * <li>2012-08-22 Hartmut new {@link #setCurrentLine(int)} with int, it isn't new because it was able to set with
    *   {@link #setCurrentCell(int, int)} with -1 as second parameter.
    * <li>2012-07-15 Hartmut new: search functionality: The implementation should/may have a text field 
@@ -83,7 +85,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    * 
    */
   @SuppressWarnings("hiding")
-  public final static int version = 20120715;
+  public final static int version = 20130421;
 
   
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
@@ -426,6 +428,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
       default:
         if(KeyCode.isTextKey(keyCode)){
           searchChars.appendCodePoint(keyCode);
+          searchContent(false);
           repaint();
         } else if(keyCode == KeyCode.esc){
           searchChars.setLength(0);

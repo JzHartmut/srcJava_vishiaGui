@@ -524,6 +524,7 @@ public class FcmdCopyCmd
           widgButtonOk.setCmd("busy");
           widgButtonEsc.setText("abort");
           widgButtonEsc.setCmd("abort");
+          /*
           sDstName = widgCopyNameDst.getText();
           sDstDir = widgCopyDirDst.getText();
           if(!FileSystem.isAbsolutePathOrDrive(sDstDir)) {
@@ -531,9 +532,12 @@ public class FcmdCopyCmd
             String sSrcDir = sSrc.substring(0, posSrcDir +1);  //inclusive /
             sDstDir = sSrcDir + sDstDir;
           }
+          */
+          FileRemote.copyChecked(evCurrentFile, modeCopy());
           //filesToCopyLast.clear();
           //
           //loop calls FileRemote.copyTo(dst) for any selected file. 
+          /*
           for(FileRemote fileSrc : filesToCopy){
             //filesToCopyLast.add(fileSrc);
             int posWildcard = sDstName.indexOf('*');
@@ -563,6 +567,7 @@ public class FcmdCopyCmd
             }
                   
           }
+          */
         } else if(widgg.sCmd.startsWith("abort")) {
           for(FileRemote.CallbackEvent ev: listEvCopy){
             ev.copyAbortAll();
@@ -724,7 +729,7 @@ public class FcmdCopyCmd
     FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evp;
     listEvCopy.remove(ev);
     int nrofPendingFiles = listEvCopy.size();
-    int percent = nrofPendingFiles * 100 / filesToCopy.size();
+    int percent = (int)(nrofPendingFiles * 100 / zFiles);  //- filesToCopy.size();
     widgProgressAll.setValue(percent);
     if(ok){
       File file = ev.getFileSrc();
@@ -766,13 +771,16 @@ public class FcmdCopyCmd
       switch(ev1.getCmd()){
         case doneCheck:{ ///
           if(listEvCheck.remove(ev)){  ///
-            int nrofPendingFiles = listEvCheck.size();
-            if(nrofPendingFiles == 0){
+            FcmdCopyCmd.this.evCurrentFile = ev1;
+            zFiles = ev1.nrofFiles;
+            zBytes = ev1.nrofBytesAll;
+            //int nrofPendingFiles = listEvCheck.size();
+            //if(nrofPendingFiles == 0){
               //TODO check dst space
               widgCopyState.setText("files:" + zFiles + ", size:" + zBytes);
               widgButtonOk.setText("copy");
               widgButtonOk.setCmd("copy");
-            }
+            //}
             
           } else {
             //unexpected doneCheck:
