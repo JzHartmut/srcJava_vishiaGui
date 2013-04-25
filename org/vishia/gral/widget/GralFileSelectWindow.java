@@ -12,6 +12,7 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
 
@@ -111,7 +112,7 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
    * @param actionSelect Action which is called on Button ok. The first Object of exec(...,object) is the selected File
    *   or a File[] or List<File> if more as one file is selected. 
    */
-  public void openDialog(File startDir, String sTitle, boolean bForWrite, GralUserAction actionSelect){
+  public void openDialog(FileRemote startDir, String sTitle, boolean bForWrite, GralUserAction actionSelect){
     wind.setTitle(sTitle);
     actionOkForUser = actionSelect;
     if(bForWrite){

@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.communication.InterProcessCommFactorySocket;
+import org.vishia.fileRemote.FileCluster;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GralArea9MainCmd;
@@ -28,6 +29,7 @@ import org.vishia.inspectorAccessor.UserInspcPlug_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageFile;
 import org.vishia.util.CompleteConstructionAndStart;
+import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
 public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
@@ -103,7 +105,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   
   public GralColorSelector colorSelector;
   
-
+  private final FileCluster fileCluster = new FileCluster();
 
   InspcGui(CallingArguments cargs, GralArea9MainCmd cmdgui)
   {
@@ -128,9 +130,12 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     
     //this.XXXinspcComm = new InspcGuiComm(this, guiCfg.gralMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
     //composites.add(XXXinspcComm);
-    curveA = new InspcCurveView("curve_A", variableMng, cmdgui.gralMng, cargs.sDefaultDirForCurves, cargs.curveExporterClasses);
-    curveB = new InspcCurveView("curve_B", variableMng, cmdgui.gralMng, cargs.sDefaultDirForCurves, cargs.curveExporterClasses);
-    curveC = new InspcCurveView("curve_C", variableMng, cmdgui.gralMng, cargs.sDefaultDirForCurves, cargs.curveExporterClasses);
+    
+    FileRemote defaultDir = fileCluster.get(cargs.sDefaultDirForCurves, null);
+    
+    curveA = new InspcCurveView("curve_A", variableMng, cmdgui.gralMng, defaultDir, cargs.curveExporterClasses);
+    curveB = new InspcCurveView("curve_B", variableMng, cmdgui.gralMng, defaultDir, cargs.curveExporterClasses);
+    curveC = new InspcCurveView("curve_C", variableMng, cmdgui.gralMng, defaultDir, cargs.curveExporterClasses);
 
   }
   

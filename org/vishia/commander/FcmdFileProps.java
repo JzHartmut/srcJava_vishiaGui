@@ -395,7 +395,7 @@ public class FcmdFileProps
           if(evChg.occupy(evSrc, callbackChgProps, null, true)){
             if(!name.equals(actFile.getName())){
               widgCopyFile.setText(main.idents.buttonFilePropsCopying);
-              FileRemote fileNew = new FileRemote(actFileRemote.getParentFile(), name);
+              FileRemote fileNew = actFileRemote.getParentFile().child(name);
               actFileRemote.copyTo(fileNew, evChg, FileRemote.modeCopyReadOnlyOverwrite | FileRemote.modeCopyCreateYes | FileRemote.modeCopyExistAll);
             } else {
               widgCopyFile.setText("copy - name?");

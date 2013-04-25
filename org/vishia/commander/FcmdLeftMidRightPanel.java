@@ -339,7 +339,7 @@ public class FcmdLeftMidRightPanel
     {
       FcmdFavorPathSelector.FavorFolder favorTabInfo = null;
       final String label;
-      final File currentDir;
+      final FileRemote currentDir;
       Object oLineData = line.getUserData();
       if(oLineData instanceof FcmdFavorPathSelector.FavorFolder){
         favorTabInfo = (FcmdFavorPathSelector.FavorFolder)line.getUserData();

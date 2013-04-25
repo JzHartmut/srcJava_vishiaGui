@@ -92,7 +92,7 @@ public class FcmdMkDirFile
           case 'f':{
             String path = widgParentPath.getText();
             String name = widgName.getText();
-            FileRemote file = new FileRemote(path, name);
+            FileRemote file = main.fileCluster.get(path, name);
             boolean bOk = false;
             try{ bOk = file.createNewFile(); }
             catch(IOException exc){ main.mainCmd.writeError(exc.getLocalizedMessage()); }
@@ -102,7 +102,7 @@ public class FcmdMkDirFile
           case 'd':{
             String path = widgParentPath.getText();
             String name = widgName.getText();
-            FileRemote dir = new FileRemote(path, name);
+            FileRemote dir = main.fileCluster.get(path, name);
             boolean bOk = false;
             try{ bOk = dir.mkdir(); }
             catch(SecurityException exc){ main.mainCmd.writeError(exc.getLocalizedMessage()); }

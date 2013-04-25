@@ -483,10 +483,10 @@ public class FcmdCopyCmd
           } else if(sFilesSrc.contains(", ")){
             String[] sFilesSrc1 = sFilesSrc.split(", ");
             for(String sFileSrc: sFilesSrc1){
-              listFileSrc.add(new FileRemote(sDirSrc, sFileSrc));
+              listFileSrc.add(main.fileCluster.get(sDirSrc, sFileSrc));
             }
           } else { //a simple file name
-            FileRemote fileSrc = FileRemote.get(dirSrc, sFilesSrc);
+            FileRemote fileSrc = dirSrc.child( sFilesSrc);
             listFileSrc.add(fileSrc);  //new FileRemote(dirSrc, sFilesSrc)
           }
           //
@@ -508,7 +508,7 @@ public class FcmdCopyCmd
             } else {
               nameDst1 = sDstName;
             }
-            FileRemote fileDst = new FileRemote(sDstDir, nameDst1);
+            FileRemote fileDst = main.fileCluster.get(sDstDir, nameDst1);
 
             
             if(fileSrc.sameDevice(fileDst)){  //all files in the standard file system of the computer, network files too!

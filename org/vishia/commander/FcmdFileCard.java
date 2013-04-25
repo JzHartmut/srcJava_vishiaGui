@@ -93,7 +93,7 @@ public class FcmdFileCard extends GralFileSelector
   FcmdFavorPathSelector.FavorPath favorPathInfo;
   
   /**The last selected file. */
-  File currentFile;
+  FileRemote currentFile;
   
   /**If not null, then should synchronize with this file card. */
   FcmdFileCard otherFileCardtoSync; 
@@ -341,7 +341,7 @@ public class FcmdFileCard extends GralFileSelector
    * @param file The currently selected file.
    * @param sFileName Text in the cell, especially ".." for the parent dir entry.
    */
-  private void actionOnFileSelection(File file, String sFileName){
+  private void actionOnFileSelection(FileRemote file, String sFileName){
     //note the file, able to use for some actions.
     currentFile = file;
     main.currentFile = file;
@@ -403,7 +403,7 @@ public class FcmdFileCard extends GralFileSelector
       //check whether the other file card contains a entry with this directory name
       GralTableLine_ifc line = otherFileCard.selectList.wdgdTable.getLine(sDirName);
       if(line !=null){
-        File dir = (File)line.getUserData();
+        FileRemote dir = (FileRemote)line.getUserData();
         otherFileCard.fillIn(dir, true);    //use that directory.
       }
       boolean bSameFile = otherFileCard.selectFile(sFileName);  //".." also
@@ -411,12 +411,12 @@ public class FcmdFileCard extends GralFileSelector
         //check whether the file is a directory and it is the directory of the other panel:
         boolean bToRoot = false;
         if(currentFile.isDirectory()){
-          File otherDir = otherFileCard.getCurrentDir();
+          FileRemote otherDir = otherFileCard.getCurrentDir();
           if(otherDir != null){
             String sDirPath = otherDir.getName();
             if(bToRoot = sDirPath.equals(sFileName)){
               //the directory of other is the current selected dir of this:
-              File otherParent = otherDir.getParentFile();
+              FileRemote otherParent = otherDir.getParentFile();
               otherFileCard.fillIn(otherParent, true);
               otherFileCard.selectFile(sFileName);
             }
@@ -476,7 +476,7 @@ public class FcmdFileCard extends GralFileSelector
       String sFileCell = line.getCellText(GralFileSelector.kColFilename);
       Object oData = line.getUserData();
       if(oData instanceof File){
-        actionOnFileSelection((File)oData, sFileCell);
+        actionOnFileSelection((FileRemote)oData, sFileCell);
       }
       return true;
     }

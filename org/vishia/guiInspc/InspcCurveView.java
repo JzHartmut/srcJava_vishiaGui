@@ -34,6 +34,7 @@ import org.vishia.inspectorAccessor.InspcAccessEvaluatorRxTelg;
 import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Assert;
+import org.vishia.util.FileRemote;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
@@ -175,9 +176,9 @@ public class InspcCurveView
   GralButton widgBtnOff;
   
   /**The currently loaded file for curve settings. */
-  File fileCurveCfg;
+  FileRemote fileCurveCfg;
   
-  File fileCurveSave;
+  FileRemote fileCurveSave;
   
   /**Common ColorSelector for all curve views. */
   GralColorSelector colorSelector;
@@ -186,14 +187,14 @@ public class InspcCurveView
   
   GralCurveView widgCurve;
   
-  InspcCurveView(String sName, VariableContainer_ifc variables, GralMng gralMng, String defaultDir, Map<String, String> curveExporterClasses){
+  InspcCurveView(String sName, VariableContainer_ifc variables, GralMng gralMng, FileRemote defaultDir, Map<String, String> curveExporterClasses){
     //this.comm = comm;
     this.sName = sName;
     this.curveExporterClasses = curveExporterClasses;
     this.variables = variables;
     this.gralMng = gralMng;
-    fileCurveCfg = new File(defaultDir);
-    fileCurveSave = new File(defaultDir);
+    fileCurveCfg = defaultDir;
+    fileCurveSave = defaultDir;
   }
   
   
@@ -452,7 +453,7 @@ public class InspcCurveView
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
-          fileCurveCfg = (File)params[0];
+          fileCurveCfg = (FileRemote)params[0];
           System.out.println("InspcCurveView - read curve view from; " + fileCurveCfg.getAbsolutePath());
           String in = FileSystem.readFile(fileCurveCfg);
           if(in ==null){
@@ -493,7 +494,7 @@ public class InspcCurveView
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
-          fileCurveCfg = (File)params[0];
+          fileCurveCfg = (FileRemote)params[0];
           //File file = new File("curve.save");
           System.out.println("InspcCurveView - save curve view to; " + fileCurveCfg.getAbsolutePath());
           Writer out = new FileWriter(fileCurveCfg);
@@ -513,12 +514,12 @@ public class InspcCurveView
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
-          File fileParam = (File)params[0];
-          File dirCurveSave = fileParam.getParentFile();
+          FileRemote fileParam = (FileRemote)params[0];
+          FileRemote dirCurveSave = fileParam.getParentFile();
           long dateStart = widgCurve.timeAtCursorLeft();
           DateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
           String sNameFile = format.format(new Date(dateStart)) + "_" + sName;
-          fileCurveSave = new File(dirCurveSave, sNameFile + ".csv");
+          fileCurveSave = dirCurveSave.child(sNameFile + ".csv");
             //File file = new File("curve.save");
           System.out.println("InspcCurveView - save curve data to; " + fileCurveSave.getAbsolutePath());
           

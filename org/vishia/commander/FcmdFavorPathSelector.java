@@ -571,7 +571,7 @@ class FcmdFavorPathSelector
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
       FcmdFileCard lastTab = main.getLastSelectedFileCards()[0];
       if(lastTab !=null){
-        File dir = lastTab.getCurrentDir();
+        FileRemote dir = lastTab.getCurrentDir();
         if(dir !=null){
           lastTab.fillIn(dir, true);
         }

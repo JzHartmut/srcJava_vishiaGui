@@ -292,7 +292,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       if(currentDir !=null){
         String sDir = currentDir.getParent();
         String sName = currentDir.getName();
-        File parentDir = currentDir.getParentFile();
+        FileRemote parentDir = currentDir.getParentFile();
         if(parentDir !=null){
           indexSelection.put(sDir, currentDir.getName());
           //System.out.println("GralFileSelector: " + sDir + ":" + sName);
@@ -304,7 +304,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     
     @Override public void actionRight(Object userData, GralTableLine_ifc line)
     {
-      File currentFile = (File)userData;
+      FileRemote currentFile = (FileRemote)userData;
       //File dir = data.file.getParentFile();
       //String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir);
       //String sName = line.getCellText(1);
@@ -319,8 +319,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
     
     public void actionRightZip(Object userData, GralTableLine_ifc line)
     {
-      File currentFile = (File)userData;
-      File fileZipAsDir = FileAccessZip.examineZipFile(FileRemote.fromFile(currentFile));
+      FileRemote currentFile = (FileRemote)userData;
+      FileRemote fileZipAsDir = FileAccessZip.examineZipFile(FileRemote.fromFile(currentFile));
       //FileZip fileZip = new FileZip(currentFile);
       fillIn(fileZipAsDir, true);
     }
@@ -436,13 +436,13 @@ public class GralFileSelector implements Removeable //extends GralWidget
   //final MainCmd_ifc mainCmd;
 
   /**The current shown directory. */
-  File currentDir;
+  FileRemote currentDir;
   
   String sCurrentDir;
   
   
   /**The directory which was used on start. */
-  File originDir;
+  FileRemote originDir;
   
   
   
@@ -570,7 +570,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
 
   public String getCurrentDirPath(){ return sCurrentDir; }
   
-  public void setOriginDir(File dir){ originDir = dir; }
+  public void setOriginDir(FileRemote dir){ originDir = dir; }
 
   
   /**Sets the sort order of entries.
@@ -665,9 +665,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * @param fileIn The directory which's files are shown.
    * @param bCompleteWithFileInfo false then write only file names, without information about the file.
    */
-  public void fillIn(File fileIn, boolean bCompleteWithFileInfo) //String path)
+  public void fillIn(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
   {
-    if(fileIn instanceof FileRemote && (bCompleteWithFileInfo || !((FileRemote) fileIn).isTested())){
+    if(fileIn instanceof FileRemote && (bCompleteWithFileInfo || !(fileIn).isTested())){
       //only refresh if it is necessary (not tested) or it should be refreshed, it means complete.
       if(callbackEventFillIn.occupy(null, fileIn, false)){ //prevent more as one invocation in the same time.
         selectList.wdgdTable.clearTable(); 
@@ -677,7 +677,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
         line[kColDate] = "";
         selectList.wdgdTable.insertLine(null, -1, line, null);
         callbackEventFillIn.bCompleteWithFileInfo = bCompleteWithFileInfo;
-        ((FileRemote) fileIn).refreshPropertiesAndChildren(callbackEventFillIn);
+        (fileIn).refreshPropertiesAndChildren(callbackEventFillIn);
       } else {
         System.err.println(Assert.stackInfo("GralFileSelector.fillIn - second call is not advisable.", 4));
       }
@@ -694,11 +694,11 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * @param bCompleteWithFileInfo true if alle files in the directory is completed. 
    *   If false then any file is tested.  
    */
-  private void fillInRefreshed(File fileIn, boolean bCompleteWithFileInfo) //String path)
+  private void fillInRefreshed(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
   {
     boolean bAllFilesCompleteWithFileInfo = true;
     selectList.wdgdTable.clearTable(); 
-    File dir = null;
+    FileRemote dir = null;
     if(fileIn !=null && fileIn.exists()){
       if(fileIn.isDirectory()){
         dir =fileIn;
@@ -961,7 +961,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   }
   
   
-  public File getCurrentDir(){ return currentDir; }
+  public FileRemote getCurrentDir(){ return currentDir; }
 
   
   /**Gets the selected file from this panel.
@@ -1134,12 +1134,12 @@ public class GralFileSelector implements Removeable //extends GralWidget
         if(posWildcard >=0){
           
         } else {
-          FileRemote file = new FileRemote(sPath);
+          FileRemote file = originDir.itsCluster.get(sPath);
           file.refreshProperties(null);
           if(file.isDirectory()){
             fillIn(file, false);
           } else if(file.isFile()){
-            File dir = file.getParentFile();
+            FileRemote dir = file.getParentFile();
             String sDir = FileSystem.getCanonicalPath(dir);
             String sFile = file.getName();
             indexSelection.put(sDir, sFile);
