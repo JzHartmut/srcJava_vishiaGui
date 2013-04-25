@@ -93,7 +93,7 @@ class FcmdFavorPathSelector
      */
     public FileRemote getOriginDir(){
       if(dir == null){ //build it only one time, but only if it is necessary.
-        dir = new FileRemote(path);
+        dir = FileRemote.get(path, null);  //new FileRemote(path);
       }
       return dir;
     }

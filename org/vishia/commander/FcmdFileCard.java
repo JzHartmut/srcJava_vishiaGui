@@ -12,6 +12,7 @@ import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.widget.GralFileSelector;
 
+import org.vishia.util.Assert;
 import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
 import org.vishia.util.FileCompare;
@@ -488,6 +489,17 @@ public class FcmdFileCard extends GralFileSelector
       try{
         GralTableLine_ifc line = (GralTableLine_ifc)(params[0]);
         File file = (File)line.getUserData();
+        if(file instanceof FileRemote){
+          if(file.getName().equals("exe"))
+            Assert.stop();
+          if(file.getName().equals("Fcmd.jar"))
+            Assert.stop();
+          FileRemote file2 = (FileRemote)file;
+          int flags = file2.getFlags();
+          if((flags & FileRemote.mChecked)!=0){
+            line.setBackColor(GralColor.getColor("am"), 1);
+          }
+        }
         FileCompare.Result result = searchCompareResult(file);
         if(result !=null){
           if(!result.equal){ line.setCellText("#", 0); }

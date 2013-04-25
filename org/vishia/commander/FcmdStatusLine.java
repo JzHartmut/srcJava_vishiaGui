@@ -96,7 +96,12 @@ public class FcmdStatusLine
       file.length() >= (1024 * 1024) ? String.format("%2.3f MByte = %d Byte", file.length()/(1024 * 1024.0), file.length()) :
       file.length() >=    1024 ? String.format("%3.2f kByte = %d Byte", file.length()/1024.0, file.length()) :
       String.format("%3d Byte", file.length());  
-    String info = sDate + " = " + lastModified + ", length= " + sLenShort;        
+    StringBuilder info = new StringBuilder(100);
+    info.append(sDate).append(" = ").append(lastModified).append(", length= ").append(sLenShort);
+    if(file instanceof FileRemote){
+      FileRemote filer = (FileRemote)file;
+      info.append(" @").append(filer.ident()).append(" flags=0x").append(Integer.toHexString(filer.getFlags()));  
+    }
     main.statusLine.widgFileInfo.setText(info);
     sPath = file.getAbsolutePath();
     if(showBackslash){
