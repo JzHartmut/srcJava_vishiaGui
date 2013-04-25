@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.vishia.fileRemote.FileCluster;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
@@ -71,6 +72,8 @@ class FcmdFavorPathSelector
     final String path;
     /**The name shown in the list. */
     final String selectName;
+    
+    final FileCluster fileCluster;
     /**The label on the tab in tabbed panel. */
     //String label;
     /**bit 0..2 present this favorite on the designated main panel 1..3 or l, m, r,
@@ -81,8 +84,9 @@ class FcmdFavorPathSelector
      * {@link #getOriginDir()}. */
     private FileRemote dir;
     
-    public FavorPath(String selectName, String path)
-    { this.path = path;
+    public FavorPath(String selectName, String path, FileCluster fileCluster)
+    { this.fileCluster = fileCluster;
+      this.path = path;
       this.selectName = selectName;
     }
 
@@ -93,7 +97,7 @@ class FcmdFavorPathSelector
      */
     public FileRemote getOriginDir(){
       if(dir == null){ //build it only one time, but only if it is necessary.
-        dir = FileRemote.get(path, null);  //new FileRemote(path);
+        dir = fileCluster.get(path, null);  //new FileRemote(path);
       }
       return dir;
     }
@@ -319,7 +323,7 @@ class FcmdFavorPathSelector
                 //info. = sParts[0].trim();
                 String selectName = sParts[0].trim();
                 String path = sParts[1].trim();
-                FavorPath favorPathInfo = new FavorPath(selectName, path);
+                FavorPath favorPathInfo = new FavorPath(selectName, path, main.fileCluster);
                 if(sParts.length >2){
                   final String actTabEntry = sParts[2].trim();
                   //final String actTab;
@@ -587,7 +591,7 @@ class FcmdFavorPathSelector
         if(infos.sCmd.equals("ok") || infos.sCmd.equals("temp")){
           String path = windAddFavorite.widgPath.getText();
           String selectName = windAddFavorite.widgShortName.getText();
-          FavorPath favorite = new FavorPath(selectName, path);
+          FavorPath favorite = new FavorPath(selectName, path, main.fileCluster);
           String tablabel = windAddFavorite.widgLabel.getText();
           favorite.mMainPanel = 1<< (windAddFavorite.panelInvocation.cNr - '1');
           FcmdFavorPathSelector.FavorFolder tabDst = null;

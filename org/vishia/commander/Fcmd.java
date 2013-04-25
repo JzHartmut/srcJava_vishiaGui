@@ -15,6 +15,7 @@ import org.vishia.commander.target.FcmdtTarget;
 import org.vishia.commander.target.FcmdtTarget_ifc;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.fileLocalAccessor.FileRemoteAccessorLocalFile;
+import org.vishia.fileRemote.FileCluster;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GralArea9MainCmd;
@@ -92,6 +93,8 @@ public class Fcmd extends GuiCfg
   final CallingArgs cargs;
   
   final MsgRedirectConsole msgDisp;
+  
+  final FileCluster fileCluster = new FileCluster();
 
   // GralTabbedPanel tabbedPanelsLeft, tabbedPanelsMid, tabbedPanelsRight;
 

@@ -470,7 +470,7 @@ public class FcmdCopyCmd
           widgButtonEsc.setCmd("abort");
           
           String sDirSrc = widgCopyFrom.getText();
-          FileRemote dirSrc = FileRemote.get(sDirSrc, null); //new FileRemote(sDirSrc);
+          FileRemote dirSrc = main.fileCluster.get(sDirSrc, null); //new FileRemote(sDirSrc);
           String sFilesSrc= widgFromConditions.getText();
           List<File> listFileSrc = new LinkedList<File>();
           //
@@ -575,7 +575,7 @@ public class FcmdCopyCmd
             //ev.sendEvent(FileRemote.cmdAbortAll);
           }
           String sDirSrc = widgCopyFrom.getText();
-          FileRemote dirSrc = FileRemote.get(sDirSrc, null); //new FileRemote(sDirSrc);
+          FileRemote dirSrc = main.fileCluster.get(sDirSrc, null); //new FileRemote(sDirSrc);
           dirSrc.abortAction();
           listEvCheck.clear();
           listEvCopy.clear();
