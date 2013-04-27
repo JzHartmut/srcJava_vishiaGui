@@ -299,7 +299,7 @@ public class FcmdLeftMidRightPanel
     
     public void setToPanel(GralMngBuild_ifc panel, String name, char size){
       super.setToPanel(panel, name, 20, widthSelecttableMain, size);
-      wdgdTable.setActionOnLineSelected(actionFavorThemeLineSelected);
+      wdgdTable.specifyActionOnLineSelected(actionFavorThemeLineSelected);
       wdgdTable.setHtmlHelp(mainPanel.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.tabSelect.");
     }
 

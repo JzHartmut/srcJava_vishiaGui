@@ -33,6 +33,7 @@ import org.vishia.util.FileRemote;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
+import org.vishia.util.SelectMask_ifc;
 
 /**This class is a large widget which contains a list to select files in a directory, 
  * supports navigation in the directory tree and shows the current path in an extra text field.
@@ -53,6 +54,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2013-04-28 Hartmut new: {@link #actionOnMarkLine} changes the select status of {@link FileRemote#setSelected(int)}
    * <li>2013-04-12 Hartmut adapt Event, FileRemote: The attributes Event.data1, data2, oData, refData are removed. Any special data should be defined in any derived instance of the event. A common universal data concept may be error-prone  because unspecified types and meanings.
    *   FileRemote: Dedicated attributes for {@link CallbackCmd#successCode} etc.
    * <li>2013-03-28 Hartmut chg: {@link #setToPanel(GralMngBuild_ifc, String, int, int[], char)} preserves the panel
@@ -223,6 +225,28 @@ public class GralFileSelector implements Removeable //extends GralWidget
       }
       return true;
     }
+  };
+  
+  
+  
+  private final SelectMask_ifc actionOnMarkLine = new SelectMask_ifc(){
+
+    @Override public int getSelection()
+    {return 0;
+    }
+
+    @Override public int setDeselect(int mask, Object oData)
+    { assert(oData instanceof FileRemote);
+      FileRemote file = (FileRemote)oData;
+      return file.resetSelected(mask);
+    }
+
+    @Override public int setSelect(int mask, Object oData)
+    { assert(oData instanceof FileRemote);
+      FileRemote file = (FileRemote)oData;
+      return file.setSelected(mask);
+    }
+    
   };
 
   
@@ -526,7 +550,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
     //store this in the GralWidgets to get back from widgets later.
     widgdPath.setContentInfo(this);
     selectList.wdgdTable.setContentInfo(this);
-    selectList.wdgdTable.setActionOnLineSelected(actionOnFileSelection);
+    selectList.wdgdTable.specifyActionOnLineSelected(actionOnFileSelection);
+    selectList.wdgdTable.specifyActionOnLineMarked(actionOnMarkLine);
     panelMng.setPosition(5, 0, 10, GralPos.size + 40, 1, 'd');
     questionWindow = GralInfoBox.createTextInfoBox(panelMng, "questionInfoBox", "question");  
     panelMng.selectPanel(sPanel);

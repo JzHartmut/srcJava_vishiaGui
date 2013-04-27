@@ -182,7 +182,7 @@ public class FcmdFileCard extends GralFileSelector
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmFileDelContext, main.deleteCmd.actionConfirmDelete);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteContext, main.executer.actionExecuteFileByExtension);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteCmdContext, main.cmdSelector.actionExecCmdWithFiles);
-    favorCard.wdgdTable.setActionOnLineSelected(favorCard.actionFavorSelected);
+    favorCard.wdgdTable.specifyActionOnLineSelected(favorCard.actionFavorSelected);
     //
     //sets the action for Select a file: open the execute menu
     setActionOnEnterFile(main.executer.actionOnEnterFile);
@@ -496,8 +496,10 @@ public class FcmdFileCard extends GralFileSelector
             Assert.stop();
           FileRemote file2 = (FileRemote)file;
           int flags = file2.getFlags();
-          if((flags & FileRemote.mChecked)!=0){
-            line.setBackColor(GralColor.getColor("am"), 1);
+          if(file2.isSelected(0xffff)){
+            line.setSelect(1, null);
+            line.setBackColor(GralColor.getColor("pbl"), 1);
+            line.setLineColor(GralColor.getColor("rd"), 1);
           }
         }
         FileCompare.Result result = searchCompareResult(file);

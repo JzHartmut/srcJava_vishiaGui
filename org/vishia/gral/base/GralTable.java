@@ -15,6 +15,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 import org.vishia.util.SelectMask;
+import org.vishia.util.SelectMask_ifc;
 
 /**
  * @author Hartmut Schorrig
@@ -24,13 +25,16 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   /**Version and history
    * <ul>
+   * <li>2013-04-28 Hartmut new: {@link #specifyKeysMarkUpDn(int, int)}
+   * <li>2013-04-28 Hartmut new: {@link #specifyActionOnLineMarked(SelectMask_ifc)}
+   * <li>2013-04-28 Hartmut renamed: {@link #specifyActionOnLineSelected(GralUserAction)}
    * <li>2013-04-21 Hartmut chg: {@link #processKeys(int)}: input of a text key starts searching for a line with this key
    *   immediately, better handling for usage.
    * <li>2012-08-22 Hartmut new {@link #setCurrentLine(int)} with int, it isn't new because it was able to set with
    *   {@link #setCurrentCell(int, int)} with -1 as second parameter.
    * <li>2012-07-15 Hartmut new: search functionality: The implementation should/may have a text field 
    *   which shows the search string. While up and down keys the that lines are selected which text in the {@link #ixColumn}
-   *   starts whith the search string.
+   *   starts with the search string.
    * <li>2012-03-09 Hartmut bugfix: The {@link #idxLine} was not cleared if the table was cleared.
    * <li>2012-02-19 Hartmut new: mouseWheel and double click
    * <li>2012-01-30 Hartmut new: {@link #setColorCurrLine(GralColor)}
@@ -43,7 +47,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    *   It seems better to have one table concept with independent features, which based on simple widgets.
    *   is not  
    * <li>2011-12-30 Hartmut chg {@link #procStandardKeys(int, GralTableLine_ifc, int)} returns true if standard keys are used. 
-   * <li>2011-11-27 Hartmut new {@link #setActionOnLineSelected(GralUserAction)}: The user action is called
+   * <li>2011-11-27 Hartmut new {@link #specifyActionOnLineSelected(GralUserAction)}: The user action is called
    *   anytime if a line is selected by user operation. It can be show any associated content anywhere
    *   additionally. It is used for example in "The.file.Commander" to show date, time and maybe content 
    *   while the user selects any files. The graphical implementation should be call {@link #actionOnLineSelected(GralTableLine_ifc)}
@@ -69,7 +73,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    * <li> You can redistribute copies of this source to everybody.
    * <li> Every user of this source, also the user of redistribute copies
    *    with or without payment, must accept this license for further using.
-   * <li> But the LPGL ist not appropriate for a whole software product,
+   * <li> But the LPGL is not appropriate for a whole software product,
    *    if this source is only a part of them. It means, the user
    *    must publish this part of source,
    *    but don't need to publish the whole source of the own product.
@@ -85,7 +89,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    * 
    */
   @SuppressWarnings("hiding")
-  public final static int version = 20130421;
+  public final static int version = 20130428;
 
   
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
@@ -192,6 +196,14 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   
   protected GralColor colorSelectCharsBack, colorSelectChars;
 
+  
+  /**This action will be called if any line is marked. It may be null, see 
+   * 
+   */
+  protected SelectMask_ifc actionMarkOnLine;
+  
+  
+  
   public GralTable(String name, GralMng mng, int[] columnWidths) {
     super(name, 'L', mng);
     this.columnWidthsGral = columnWidths;
@@ -221,8 +233,23 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    * with the line as Object.
    * @param actionOnLineSelected The action, null to switch off this functionality.
    */
-  public void setActionOnLineSelected(GralUserAction actionOnLineSelected){
+  public void specifyActionOnLineSelected(GralUserAction actionOnLineSelected){
     this.actionOnLineSelected = actionOnLineSelected;
+  }
+  
+  
+  public void specifyActionOnLineMarked(SelectMask_ifc action){
+    actionMarkOnLine = action;
+  }
+  
+  /**Specifies the keys to mark lines in the table.
+   * Without invocation of this method the keys {@link KeyCode#shift} + {@link KeyCode#up}
+   * respectively shift+dn are specified.
+   * @param up Any code defined in {@link KeyCode} which marks a line and selects the next line after them.
+   * @param dn Any code defined in {@link KeyCode} which marks a line and selects the previous line after them.
+   */
+  public void specifyKeysMarkUpDn(int up, int dn){
+    keyMarkUp = up; keyMarkDn = dn;
   }
   
   
@@ -444,11 +471,11 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
         GralTableLine_ifc line = tableLines.get(ixLine);
         if((line.getSelection() & 1)!=0){
           //it is selected yet
-          line.setForegroundColor(GralColor.getColor("bk"));
-          line.setDeselect(1);
+          line.setTextColor(GralColor.getColor("bk"));
+          line.setDeselect(1, line.getUserData());
         } else {
           line.setForegroundColor(GralColor.getColor("rd"));
-          line.setSelect(1);
+          line.setSelect(1, line.getUserData());
         }
         if(ixLine < zLine -1){
           ixLineNew = ixLine + 1;
@@ -678,7 +705,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   /**It is called whenever another line is selected, if the focus is gotten by mouse click
    * or a navigation key is pressed. 
    * This method calls the {@link GralUserAction#userActionGui(int, GralWidget, Object...)}.
-   * The {@link #setActionOnLineSelected(GralUserAction)} can be set with any user instantiation
+   * The {@link #specifyActionOnLineSelected(GralUserAction)} can be set with any user instantiation
    * of that interface. The params[0] of that routine are filled with the {@link GralTableLine_ifc}
    * of the selected line.
    *  
@@ -915,7 +942,34 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     @Override public Object getContentInfo(){ return userData; }
 
 
+    /**Sets the mark status of the line.
+     * It invokes the method given with {@link GralTable#specifyActionOnLineMarked(SelectMask_ifc)}
+     * with the given {@link #setUserData(Object)} of this line. It means a selection with the user data
+     * may be done too. This method will be called especially on pressing the mark key specified with  
+     * {@link GralTable#specifyKeysMarkUpDn(int, int)}
+     * @param mask This bits of the {@link SelectMask#selectMask} will be reseted.
+     * @param data if null then don't invoke {@link GralTable#specifyActionOnLineMarked(SelectMask_ifc)}
+     * @see org.vishia.util.SelectMask#setDeselect(int, java.lang.Object)
+     */
+    @Override public int setDeselect(int mask, Object data)
+    { if(actionMarkOnLine !=null && data !=null){ actionMarkOnLine.setDeselect(mask, data); }
+      return super.setDeselect(mask, data);
+    }
     
+    /**Sets the mark status of the line.
+     * It invokes the method given with {@link GralTable#specifyActionOnLineMarked(SelectMask_ifc)}
+     * with the given {@link #setUserData(Object)} of this line. It means a selection with the user data
+     * may be done too. This method will be called especially on pressing the mark key specified with  
+     * {@link GralTable#specifyKeysMarkUpDn(int, int)}
+     * @param mask This bits of the {@link SelectMask#selectMask} will be set.
+     * @param data if null then don't invoke {@link GralTable#specifyActionOnLineMarked(SelectMask_ifc)}
+     * @see org.vishia.util.SelectMask#setDeselect(int, java.lang.Object)
+     */
+    @Override public int setSelect(int mask, Object data)
+    { if(actionMarkOnLine !=null && data !=null){ actionMarkOnLine.setSelect(mask, data); }
+      return super.setSelect(mask, data);
+    }
+
     
   }
   

@@ -61,7 +61,7 @@ public class GralCommandSelector extends GralSelectList
   @Override
   public void setToPanel(GralMngBuild_ifc gralMng, String name, int rows, int[] columns, char size){
     super.setToPanel(gralMng, name, rows, columns, size);
-    wdgdTable.setActionOnLineSelected(actionOnLineSelected);
+    wdgdTable.specifyActionOnLineSelected(actionOnLineSelected);
   }
 
   

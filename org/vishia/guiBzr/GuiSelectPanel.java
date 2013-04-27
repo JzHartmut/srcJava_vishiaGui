@@ -75,7 +75,7 @@ public class GuiSelectPanel
     mng.setPosition(2,-3,0,0,0,'.',0);
     int[] columns = {30,30,30,30};
     tableSelect = mng.addTable("selectTable", 100, columns);
-    tableSelect.setActionOnLineSelected(actionOnSelectedLine);
+    tableSelect.specifyActionOnLineSelected(actionOnSelectedLine);
     mng.setPosition(-3,0,0,9,0,'.',1);
     //
     String fnkey = "cleanSelectTable";
