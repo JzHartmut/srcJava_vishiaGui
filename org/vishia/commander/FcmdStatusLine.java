@@ -89,7 +89,7 @@ public class FcmdStatusLine
   }
   
   
-  void setFileInfo(File file){
+  void setFileInfo(FileRemote file){
     long lastModified = file.lastModified();
     String sDate = formatDateInfo.format(new Date(lastModified));
     String sLenShort = //String.format("", file.length)
@@ -99,7 +99,7 @@ public class FcmdStatusLine
     StringBuilder info = new StringBuilder(100);
     info.append(sDate).append(" = ").append(lastModified).append(", length= ").append(sLenShort);
     if(file instanceof FileRemote){
-      FileRemote filer = (FileRemote)file;
+      FileRemote filer = file;
       info.append(" @").append(filer.ident()).append(" flags=0x").append(Integer.toHexString(filer.getFlags()));  
     }
     main.statusLine.widgFileInfo.setText(info);

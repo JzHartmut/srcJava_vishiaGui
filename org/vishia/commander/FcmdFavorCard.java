@@ -124,7 +124,7 @@ public class FcmdFavorCard  extends GralSelectList
     FileRemote dir = null;
     String currentDir;
     if(fileTable.favorPathInfo !=null){
-      dir = FileRemote.fromFile(fileTable.getCurrentDir());
+      dir = fileTable.getCurrentDir();
       if(dir != null){
         currentDir = dir.getAbsolutePath();
         if(currentDir !=null){

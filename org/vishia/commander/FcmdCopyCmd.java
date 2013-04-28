@@ -388,7 +388,7 @@ public class FcmdCopyCmd
           if(lastFileCards[0] !=null){ ///
             if(widgLastSrc.isOn()){  //state src lock
               fileCardDst = lastFileCards[0];
-              fileDstDir = FileRemote.fromFile(fileCardDst.getCurrentDir());
+              fileDstDir = fileCardDst.getCurrentDir();
               sDstDir = fileDstDir.getAbsolutePath();
               widgCopyDirDst.setText(sDstDir);
             } else {
@@ -396,7 +396,7 @@ public class FcmdCopyCmd
               fileCardDst = lastFileCards[1];
               
               widgLastSrc.setState(GralButton.kOff);  //maybe disabled, set off.
-              List<File> listFileSrc = fileCardSrc.getSelectedFiles();
+              List<FileRemote> listFileSrc = fileCardSrc.getSelectedFiles();
               //String sDirSrc;
               if(listFileSrc == null || listFileSrc.size()==0){ //nothing selected
                 fileSrc = fileCardSrc.currentFile;
@@ -405,7 +405,7 @@ public class FcmdCopyCmd
                 widgCopyFrom.setText(fileSrc.getAbsolutePath());
               } else {
                 StringBuilder uFileSrc = new StringBuilder();
-                dirSrc = fileSrc = FileRemote.fromFile(fileCardSrc.getCurrentDir());
+                dirSrc = fileSrc = fileCardSrc.getCurrentDir();
                 String sSep = "";
                 for(File srcFile : listFileSrc){
                   uFileSrc.append(sSep).append(srcFile.getName());
@@ -421,7 +421,7 @@ public class FcmdCopyCmd
                          : listFileSrc.size() ==1 ? listFileSrc.get(0).getName() : "??";
               //sSrc = fileSrc.getAbsolutePath() + "/" + sDstName;
               if(fileCardDst !=null){
-                fileDstDir = FileRemote.fromFile(fileCardDst.getCurrentDir());
+                fileDstDir = fileCardDst.getCurrentDir();
                 sDstDir = fileDstDir.getAbsolutePath();
               } else {
                 fileDstDir = null;

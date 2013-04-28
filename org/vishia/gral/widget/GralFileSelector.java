@@ -344,7 +344,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     public void actionRightZip(Object userData, GralTableLine_ifc line)
     {
       FileRemote currentFile = (FileRemote)userData;
-      FileRemote fileZipAsDir = FileAccessZip.examineZipFile(FileRemote.fromFile(currentFile));
+      FileRemote fileZipAsDir = FileAccessZip.examineZipFile(currentFile);
       //FileZip fileZip = new FileZip(currentFile);
       fillIn(fileZipAsDir, true);
     }
@@ -1013,14 +1013,14 @@ public class GralFileSelector implements Removeable //extends GralWidget
   /**Gets all selected file from this panel.
    * @return null if no line is selected, for example if the panel isn't used yet.
    */
-  public List<File> getSelectedFiles()
-  { List<File> list = new LinkedList<File>();
+  public List<FileRemote> getSelectedFiles()
+  { List<FileRemote> list = new LinkedList<FileRemote>();
     if(selectList.wdgdTable == null){
       stop();
       return null;
     }
     for(GralTableLine_ifc line: selectList.wdgdTable.getSelectedLines()){
-      File file = (File)line.getUserData();
+      FileRemote file = (FileRemote)line.getUserData();
       list.add(file);
     }
     return list;

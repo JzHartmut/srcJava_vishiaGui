@@ -170,9 +170,9 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
   GralUserAction actionOk = new GralUserAction("GralFileSelector-actionOk"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){  //supress both mouse up and down reaction
-        File dir = fileSelector.getCurrentDir();
+        FileRemote dir = fileSelector.getCurrentDir();
         String sFilename = widgFilename.getText();
-        File file = new File(dir, sFilename);
+        FileRemote file = dir.child(sFilename);
         actionOkForUser.exec(KeyCode.menuEntered, null, file); 
       }
       return true;

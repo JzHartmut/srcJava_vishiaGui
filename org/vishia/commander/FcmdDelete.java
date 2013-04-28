@@ -40,7 +40,7 @@ public class FcmdDelete
   GralWidget widgButtonOk;
 
   /**Name of the file which is attempt to delete. */
-  List<File> listFileDel;
+  List<FileRemote> listFileDel;
   
   /**Content of the widgDeletePath on confirmation invocation, to compare on actionDelete.
    * If the user does not change the field, the listFileDel is valid.
@@ -54,7 +54,7 @@ public class FcmdDelete
    */
   FcmdFileCard fileCard;
   
-  File currentDirWhereDelete;
+  FileRemote currentDirWhereDelete;
   
   //File dirDelete;
   
@@ -110,7 +110,7 @@ public class FcmdDelete
       if(nrofFilesDel >0){
         sFileDelete = "select:" + nrofFilesDel + " Files";
       } else {
-        File currentFile = fileCard.currentFile;
+        FileRemote currentFile = fileCard.currentFile;
         sFileDelete = currentFile.getName();
         listFileDel.add(currentFile);
       }
@@ -155,17 +155,17 @@ public class FcmdDelete
             if(sPathDelete.equals(sFileDelete)){  
               //no user changing:
               if(!sPathDelete.equals("--no files selected--")){
-                for(File file : listFileDel){
+                for(FileRemote file : listFileDel){
                   if(!file.canWrite()){
                     //file.setWritable();
                   }
-                  FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, FileRemote.fromFile(file)
+                  FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, file
                       , null, success, null,  evSrc);  //NOTE: store file as src to get its name for report in callback.
                   listEvDel.add(callback);
                   //
                   //The delete action:
                   if(file instanceof FileRemote){
-                    ((FileRemote)file).delete(callback);
+                    (file).delete(callback);
                   } else {
                     if(!file.delete()){
                       file.setWritable(true);
@@ -176,7 +176,7 @@ public class FcmdDelete
                 }
               }
             } else { //user has changed the path
-              FileRemote dirRemote = FileRemote.fromFile(currentDirWhereDelete);
+              FileRemote dirRemote = currentDirWhereDelete;
               FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, dirRemote, null, success, null, evSrc);  
               dirRemote.delete(sPathDelete, true, callback);
             }

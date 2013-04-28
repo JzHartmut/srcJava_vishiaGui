@@ -94,7 +94,7 @@ public class FcmdFileProps
   /**True while a change commission is send and no answer is received yet. */
   //boolean busyChanging;
   
-  File actFile;
+  FileRemote actFile;
   
   /**
    * 
@@ -220,7 +220,7 @@ public class FcmdFileProps
   /**Opens the view window and fills its content.
    * @param src The path which is selected as source. It may be a directory or a file.
    */
-  void openDialog(File src)
+  void openDialog(FileRemote src)
   { //String sSrc, sTrash;
     isVisible = true;
     showFileInfos(src);
@@ -229,7 +229,7 @@ public class FcmdFileProps
   }
   
   
-  void showFileInfos(File src){
+  void showFileInfos(FileRemote src){
     if(isVisible && !evChg.isOccupied()){
       actFile = src;
       widgChgFile.setText(main.idents.buttonFilePropsChg);
@@ -248,7 +248,7 @@ public class FcmdFileProps
         sLength += " = " + length/1000000 + "M";
       }
       widgLength.setText(sLength);
-      if(src instanceof FileRemote && ((FileRemote)src).isSymbolicLink()){
+      if(src instanceof FileRemote && (src).isSymbolicLink()){
         widgLink.setText(FileSystem.getCanonicalPath(src));
       } else {
         widgLink.setText("");
@@ -306,9 +306,6 @@ public class FcmdFileProps
         String name = widgName.getText();
         if(name.equals(actFile.getName())){ name = null; } //don't change it.
         int noMask = 0;
-        FileRemote actFileRemote;
-        if(actFile instanceof FileRemote){ actFileRemote = (FileRemote)actFile; }
-        else { actFileRemote = FileRemote.fromFile(actFile); }
         int val = 0; //actFileRemote.getFlags();
         int mask;
         if(bUnixSystem){
@@ -381,22 +378,22 @@ public class FcmdFileProps
           if(evChg.occupy(evSrc, callbackChgProps, null, true)){
             //cmds with callback
             widgChgFile.setText(main.idents.buttonFilePropsChanging);
-            actFileRemote.chgProps(name, mask, val, 0, evChg);
+            actFile.chgProps(name, mask, val, 0, evChg);
           } else { bAbort = true; }
           //
         } else if(infos.sCmd.equals(sCmdChgRecurs)){
           if(evChg.occupy(evSrc, callbackChgProps, null, true)){
             //cmds with callback
             widgChrRecurs.setText(main.idents.buttonFilePropsChanging);
-            actFileRemote.chgPropsRecursive(mask, val, 0, evChg);
+            actFile.chgPropsRecursive(mask, val, 0, evChg);
           } else { bAbort = true; }
           //
         } else if(infos.sCmd.equals(sCmdCopy)){
           if(evChg.occupy(evSrc, callbackChgProps, null, true)){
             if(!name.equals(actFile.getName())){
               widgCopyFile.setText(main.idents.buttonFilePropsCopying);
-              FileRemote fileNew = actFileRemote.getParentFile().child(name);
-              actFileRemote.copyTo(fileNew, evChg, FileRemote.modeCopyReadOnlyOverwrite | FileRemote.modeCopyCreateYes | FileRemote.modeCopyExistAll);
+              FileRemote fileNew = actFile.getParentFile().child(name);
+              actFile.copyTo(fileNew, evChg, FileRemote.modeCopyReadOnlyOverwrite | FileRemote.modeCopyCreateYes | FileRemote.modeCopyExistAll);
             } else {
               widgCopyFile.setText("copy - name?");
             }
@@ -447,7 +444,7 @@ public class FcmdFileProps
     { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         widgBtnDirBytes.setText("counting ...");
         if(evCntLen.occupyRecall(100, evSrc, callbackCntLen, null, true)){
-          FileRemote.fromFile(actFile).countAllFileLength(evCntLen);
+          actFile.countAllFileLength(evCntLen);
         }
       }
       return true;

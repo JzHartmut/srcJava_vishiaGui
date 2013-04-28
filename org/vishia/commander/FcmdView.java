@@ -158,7 +158,7 @@ public class FcmdView
    */
   void view(FileRemote XXXsrc)
   { //String sSrc, sTrash;
-    file = FileRemote.fromFile(main.currentFile);
+    file = main.currentFile;
     if(file !=null){
       long len = file.length();
       //if(len > 1000000){ len = 1000000; } //nor more than 1MByte, 
@@ -309,7 +309,7 @@ public class FcmdView
       InputStream inpBytes = new ByteArrayInputStream(uContent);
       InputStreamReader inpText = new InputStreamReader(inpBytes, encodingContent);
       BufferedReader inpLines = new BufferedReader(inpText);
-      FileRemote filedst = FileRemote.fromFile(main.currentFile);
+      FileRemote filedst = main.currentFile;
       WritableByteChannel outchn =filedst.openWrite(0);
       ByteBuffer outBuffer = ByteBuffer.allocate(1200);
       //Writer out = new FileWriter();
@@ -515,7 +515,7 @@ public class FcmdView
         //InputStream inpBytes = new ByteArrayInputStream(uContent);
         //InputStreamReader inpText = new InputStreamReader(inpBytes);
         //BufferedReader inpLines = new BufferedReader(inpText);
-        FileRemote filedst = FileRemote.fromFile(main.currentFile);
+        FileRemote filedst = main.currentFile;
         WritableByteChannel outchn =filedst.openWrite(0);
         ByteBuffer outBuffer = ByteBuffer.allocate(1200);
         //Writer out = new FileWriter();

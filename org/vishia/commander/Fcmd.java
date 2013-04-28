@@ -30,6 +30,7 @@ import org.vishia.msgDispatch.MsgDispatchSystemOutErr;
 import org.vishia.msgDispatch.MsgDispatcher;
 import org.vishia.msgDispatch.MsgPrintStream;
 import org.vishia.msgDispatch.MsgRedirectConsole;
+import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
 public class Fcmd extends GuiCfg
@@ -143,7 +144,7 @@ public class Fcmd extends GuiCfg
 
   
   /**The current directory of the last selected file. */
-  File currentFile;
+  FileRemote currentFile;
 
   /**The last selected files of the three panels, [0] for left .. [2] for right. */
   final File[] selectedFiles123 = new File[3];
@@ -371,9 +372,9 @@ public class Fcmd extends GuiCfg
       //for(FcmdLeftMidRightPanel panel: lastFilePanels){
       FcmdFileCard fileCard = panel.actFileCard;
       if(fileCard !=null){
-        List<File> listFiles = fileCard.getSelectedFiles();
+        List<FileRemote> listFiles = fileCard.getSelectedFiles();
         if(listFiles !=null && listFiles.size() > 0){
-          Iterator<File> iter= listFiles.iterator();
+          Iterator<FileRemote> iter= listFiles.iterator();
           while(ix < 2 && iter.hasNext()){
             ret[++ix] = iter.next();
           }

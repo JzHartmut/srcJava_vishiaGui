@@ -110,9 +110,8 @@ public class FcmdEdit
   /**Opens the view window and fills its content.
    * @param src The path which is selected as source. It may be a directory or a file.
    */
-  void openEdit(File srcFile)
-  { FileRemote src = FileRemote.fromFile(srcFile);
-    if(src !=null){
+  void openEdit(FileRemote src)
+  {if(src !=null){
       long len = src.length();
       if(len > 1000000){ len = 1000000; } //nor more than 1MByte, 
       buffer = new byte[(int)len];
@@ -210,7 +209,7 @@ public class FcmdEdit
         InputStream inpBytes = new ByteArrayInputStream(buffer);
         InputStreamReader inpText = new InputStreamReader(inpBytes);
         BufferedReader inpLines = new BufferedReader(inpText);
-        FileRemote filedst = FileRemote.fromFile(main.currentFile);
+        FileRemote filedst = main.currentFile;
         WritableByteChannel outchn =filedst.openWrite(0);
         ByteBuffer outBuffer = ByteBuffer.allocate(1200);
         //Writer out = new FileWriter();
