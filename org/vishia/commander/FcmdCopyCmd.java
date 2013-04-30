@@ -793,6 +793,9 @@ public class FcmdCopyCmd
     @Override protected boolean processEvent_(Event<?,?> ev)
     {
       FileRemote.CallbackEvent ev1 = (FileRemote.CallbackEvent)ev;
+      FileRemote.CallbackCmd cmd = ev1.getCmd();
+      String sCmd = cmd.name();
+      System.out.println("FcmdCopy - callbackCopy;" + sCmd);
       switch(ev1.getCmd()){
         case doneCheck:{ ///
           //if(listEvCheck.remove(ev)){  ///
@@ -815,41 +818,42 @@ public class FcmdCopyCmd
         case copyDir:{
           FcmdCopyCmd.this.evCurrentFile = ev1;
           String sPath = StringFunctions.z_StringJc(ev1.fileName);
-          widgCopyState.setText(sPath);
+          widgCopyNameDst.setText(sPath);
         } break;
         case nrofFilesAndBytes:{
           FcmdCopyCmd.this.evCurrentFile = ev1;
           int percent = ev1.promilleCopiedBytes / 10;
-          widgProgressAll.setValue(percent);
-          widgCopyState.setText(StringFunctions.z_StringJc(ev1.fileName));
-          widgCopyNameDst.setText("" + ev1.nrofBytesInFile/1000000 + " Mbyte");
+          widgProgressFile.setValue(percent);
+          widgProgressAll.setValue(ev1.promilleCopiedFiles / 10);
+          widgCopyNameDst.setText(StringFunctions.z_StringJc(ev1.fileName));
+          widgCopyState.setText("... " + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
         }break;
         case askDstOverwr: {
           FcmdCopyCmd.this.evCurrentFile = ev1;
-          widgCopyState.setText("exists: " + StringFunctions.z_StringJc(ev1.fileName));
+          widgCopyNameDst.setText("exists: " + StringFunctions.z_StringJc(ev1.fileName));
           widgSkipFile.setBackColor(GralColor.getColor("am"), 0);
           widgOverwrFile.setBackColor(GralColor.getColor("lrd"), 0);
         } break;
         case askDstReadonly: {
             FcmdCopyCmd.this.evCurrentFile = ev1;
-            widgCopyState.setText("read only: " + StringFunctions.z_StringJc(ev1.fileName));
+            widgCopyNameDst.setText("read only: " + StringFunctions.z_StringJc(ev1.fileName));
             widgSkipFile.setBackColor(GralColor.getColor("am"), 0);
             widgOverwrFile.setBackColor(GralColor.getColor("lrd"), 0);
         } break;
         case askDstNotAbletoOverwr: {
           FcmdCopyCmd.this.evCurrentFile = ev1;
-          widgCopyState.setText("can't overwrite: " + StringFunctions.z_StringJc(ev1.fileName));
+          widgCopyNameDst.setText("can't overwrite: " + StringFunctions.z_StringJc(ev1.fileName));
           widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
           widgOverwrFile.setBackColor(GralColor.getColor("am"), 0);
         } break;
         case askErrorDstCreate: {
           FcmdCopyCmd.this.evCurrentFile = ev1;
-          widgCopyState.setText("can't create: " + StringFunctions.z_StringJc(ev1.fileName));
+          widgCopyNameDst.setText("can't create: " + StringFunctions.z_StringJc(ev1.fileName));
           widgOverwrFile.setBackColor(GralColor.getColor("lrd"), 0);
         } break;
         case askErrorCopy: {
           FcmdCopyCmd.this.evCurrentFile = ev1;
-          widgCopyState.setText("copy error: " + StringFunctions.z_StringJc(ev1.fileName));
+          widgCopyNameDst.setText("copy error: " + StringFunctions.z_StringJc(ev1.fileName));
           widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
           widgOverwrFile.setBackColor(GralColor.getColor("am"), 0);
         } break;
@@ -865,7 +869,7 @@ public class FcmdCopyCmd
         }break;
         case done: {
           FcmdCopyCmd.this.evCurrentFile = null;
-          widgCopyState.setText("ok");
+          widgCopyState.setText("ok: " + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
           eventConsumed(ev, true);
         }break;
         default:

@@ -34,6 +34,7 @@ import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
 import org.vishia.util.SelectMask_ifc;
+import org.vishia.util.Timeshort;
 
 /**This class is a large widget which contains a list to select files in a directory, 
  * supports navigation in the directory tree and shows the current path in an extra text field.
@@ -54,6 +55,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2013-04-30 Hartmut chg: {@link #fillIn(FileRemote, boolean)} now uses the {@link FileRemote#timeRefresh}
    * <li>2013-04-28 Hartmut new: {@link #actionOnMarkLine} changes the select status of {@link FileRemote#setSelected(int)}
    * <li>2013-04-12 Hartmut adapt Event, FileRemote: The attributes Event.data1, data2, oData, refData are removed. Any special data should be defined in any derived instance of the event. A common universal data concept may be error-prone  because unspecified types and meanings.
    *   FileRemote: Dedicated attributes for {@link CallbackCmd#successCode} etc.
@@ -238,13 +240,15 @@ public class GralFileSelector implements Removeable //extends GralWidget
     @Override public int setDeselect(int mask, Object oData)
     { assert(oData instanceof FileRemote);
       FileRemote file = (FileRemote)oData;
-      return file.resetSelected(mask);
+      file.resetSelected(mask);
+      return mask;
     }
 
     @Override public int setSelect(int mask, Object oData)
     { assert(oData instanceof FileRemote);
       FileRemote file = (FileRemote)oData;
-      return file.setSelected(mask);
+      file.setSelected(mask);
+      return mask;
     }
     
   };
@@ -691,8 +695,21 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * @param bCompleteWithFileInfo false then write only file names, without information about the file.
    */
   public void fillIn(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
-  {
-    if(fileIn instanceof FileRemote && (bCompleteWithFileInfo || !(fileIn).isTested())){
+  { long timenow = System.currentTimeMillis();
+    FileRemote dir = fileIn, file = null;
+    boolean bRefresh = bCompleteWithFileInfo;
+    if((timenow - fileIn.timeRefresh) < 10000){
+      if(!fileIn.isDirectory()){
+        dir = fileIn.getParentFile(); file = fileIn;
+      }
+    } else { //unknown whether it is a directory
+      bRefresh = true;
+    }
+    if(!bRefresh && (timenow - dir.timeChildren) > 10000){
+      bRefresh = true;
+    }
+    if(bRefresh){
+    //if((bCompleteWithFileInfo || !(fileIn).isTested())){
       //only refresh if it is necessary (not tested) or it should be refreshed, it means complete.
       if(callbackEventFillIn.occupy(null, fileIn, false)){ //prevent more as one invocation in the same time.
         selectList.wdgdTable.clearTable(); 
@@ -702,18 +719,19 @@ public class GralFileSelector implements Removeable //extends GralWidget
         line[kColDate] = "";
         selectList.wdgdTable.insertLine(null, -1, line, null);
         callbackEventFillIn.bCompleteWithFileInfo = bCompleteWithFileInfo;
-        (fileIn).refreshPropertiesAndChildren(callbackEventFillIn);
+        (fileIn).refreshPropertiesAndChildren(callbackEventFillIn);  //fills the wdgdTable in callbackFillIn, calls fillInRefreshed there.
       } else {
-        System.err.println(Assert.stackInfo("GralFileSelector.fillIn - second call is not advisable.", 4));
+        System.err.println(Assert.stackInfo("GralFileSelector.fillIn - second call is not advisable for the same card.", 4));
       }
     } else {
-      //a local file
+      //The file is refreshed in the last time, don't access the file system.
       fillInRefreshed(fileIn, bCompleteWithFileInfo);
     }
   }
   
   
-  /**Fills the content with given directory.
+  /**Fills the content with given directory without accessing the file system. All information are contained
+   * in the fileIn.
    * @param fileIn Either a directory which's files are shown or a file inside a directory.
    *   In the second case the directory is shown and the file is selected.
    * @param bCompleteWithFileInfo true if alle files in the directory is completed. 
@@ -1113,6 +1131,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       ///
       FillinCallback callback = (FillinCallback)evP;
       FileRemote dir = callback.getFileSrc();  //it is completed meanwhile
+      Timeshort.sleep(200); //test
       fillInRefreshed(dir, callback.bCompleteWithFileInfo);
       //setFocus();    //don't set the focus, it may be false. Only fill.
       return true;
@@ -1129,7 +1148,11 @@ public class GralFileSelector implements Removeable //extends GralWidget
     }
   }
   
-  FillinCallback callbackEventFillIn = new FillinCallback();
+  /**Callback event for this file table, re-used but private for the file table. 
+   * It uses {@link GralFileSelector#callbackFillIn} as its {@link EventConsumer}
+   * to execute {@link GralFileSelector#fillInRefreshed(FileRemote, boolean)} as callback routine.
+   * */
+  private final FillinCallback callbackEventFillIn = new FillinCallback();
   
   
 
