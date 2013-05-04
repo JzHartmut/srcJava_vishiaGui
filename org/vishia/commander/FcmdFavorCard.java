@@ -145,7 +145,7 @@ public class FcmdFavorCard  extends GralSelectList
       }
     }
     //dir = new FileRemote(currentDir);  
-    dir = main.fileCluster.get(currentDir, null);
+    dir = main.fileCluster.getFile(currentDir, null);
     fileTable.setNewContent(favorPathInfo, dir);
     return true;
   }

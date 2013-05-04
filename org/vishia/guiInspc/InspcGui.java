@@ -131,7 +131,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     //this.XXXinspcComm = new InspcGuiComm(this, guiCfg.gralMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
     //composites.add(XXXinspcComm);
     
-    FileRemote defaultDir = fileCluster.get(cargs.sDefaultDirForCurves, null);
+    FileRemote defaultDir = fileCluster.getFile(cargs.sDefaultDirForCurves, null);
     
     curveA = new InspcCurveView("curve_A", variableMng, cmdgui.gralMng, defaultDir, cargs.curveExporterClasses);
     curveB = new InspcCurveView("curve_B", variableMng, cmdgui.gralMng, defaultDir, cargs.curveExporterClasses);

@@ -557,7 +557,7 @@ public class FcmdCopyCmd
           if(!FileSystem.isAbsolutePathOrDrive(sDstDir)) {
             sDstDir = dirSrc.getAbsolutePath() + "/" + sDstDir;
           }
-          FileRemote dirDst = main.fileCluster.get(sDstDir, null); //new FileRemote(sDirSrc);
+          FileRemote dirDst = main.fileCluster.getFile(sDstDir, null); //new FileRemote(sDirSrc);
           dirDst.copyChecked(evCurrentFile, modeCopy());
           //filesToCopyLast.clear();
           //
@@ -599,7 +599,7 @@ public class FcmdCopyCmd
             //ev.sendEvent(FileRemote.cmdAbortAll);
           }
           String sDirSrc = widgCopyFrom.getText();
-          FileRemote dirSrc = main.fileCluster.get(sDirSrc, null); //new FileRemote(sDirSrc);
+          FileRemote dirSrc = main.fileCluster.getFile(sDirSrc, null); //new FileRemote(sDirSrc);
           dirSrc.abortAction();
           listEvCheck.clear();
           listEvCopy.clear();

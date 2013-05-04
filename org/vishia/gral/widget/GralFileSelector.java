@@ -1182,7 +1182,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
         if(posWildcard >=0){
           
         } else {
-          FileRemote file = originDir.itsCluster.get(sPath);
+          FileRemote file = originDir.itsCluster.getFile(sPath);
           file.refreshProperties(null);
           if(file.isDirectory()){
             fillIn(file, false);
