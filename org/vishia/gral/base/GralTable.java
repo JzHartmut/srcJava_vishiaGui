@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.eclipse.swt.widgets.TableItem;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTableLine_ifc;
@@ -17,7 +18,37 @@ import org.vishia.util.KeyCode;
 import org.vishia.util.SelectMask;
 import org.vishia.util.SelectMask_ifc;
 
-/**
+/**This is the gral class for a table. Its usage is independent of a graphical implementation layer.
+ * A table consists of some text fields which are arranged in columns and lines. 
+ * <br><br>
+ * <b>Data, text and graphic architecture of the table</b>:<br>
+ * All data wich are managed in this table are contained in an List {@link #tableLines} with a unlimited size. 
+ * That container references instances of {@link TableLineData}. 
+ * Each of that table line contains the texts which are displayed in the cells,
+ * the color etc., a key for searching and a reference to any user data. In that kind a table is a container class
+ * with a graphical touch.
+ * <br>
+ * For presenting the table in a graphic implementation some text fields are arranged in a line and column structure
+ * in any panel or canvas. The number of such fields for the lines is limited, only the maximal number of viewable 
+ * lines should be present, independent of the length of the table. If any part of the table will be shown, that fields
+ * will be filled with the texts from the TableItemWidget of  {@link #tableLines}. If the table content will be shifted
+ * in the visible area, the text content of the fields are shifted. The first field is shown as first anyway, but it may
+ * contain the content of a further line of the table. Each text field refers an instance of {@link CellData} as its
+ * 'user data'. The CellData refers via {@link CellData#tableItem} the line.
+ * <br>
+ * <pre>
+ *   TextField
+ *    |<>------>CellData
+ *    |                |-tableItem--------->{@link TableLineData}
+ *                                                                   |<>---userData--------------->User's data
+ * 
+ * </pre>
+ * <br><br>
+ * <b>Key handling in a table</b>: <br>
+ * The table has its own {@link #processKeys(int)} method which is called from the graphical implementation layer
+ * from any key event. This method processes some keys for navigation and selection in the table. If the key is not
+ * used for that, the key will be offer the {@link GralMng#userMainKeyAction} for a global key usage.
+ * 
  * @author Hartmut Schorrig
  *
  */
@@ -25,6 +56,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   /**Version and history
    * <ul>
+   * <li>2013-05-11 Hartmut chg: {@link TableLineData} instead TableItemWidget.
    * <li>2013-04-28 Hartmut new: {@link #specifyKeysMarkUpDn(int, int)}
    * <li>2013-04-28 Hartmut new: {@link #specifyActionOnLineMarked(SelectMask_ifc)}
    * <li>2013-04-28 Hartmut renamed: {@link #specifyActionOnLineSelected(GralUserAction)}
@@ -155,7 +187,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    * Contains content, color, selection etc. of the lines with there columns.
    * 
    */
-  protected ArrayList<TableItemWidget> tableLines = new ArrayList<TableItemWidget>();
+  protected ArrayList<TableLineData> tableLines = new ArrayList<TableLineData>();
   
   /**True if a line or a column is marked. */
   //protected boolean[] markedLines, markedColumns;
@@ -337,7 +369,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   }
 
   @Override public GralTableLine_ifc insertLine(String key, int row, String[] cellTexts, Object userData) {
-    TableItemWidget line = new TableItemWidget();
+    TableLineData line = new TableLineData();
     if(row > zLine || row < 0){
       row = zLine;
     }
@@ -379,7 +411,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   @Override public List<GralTableLine_ifc> getSelectedLines() {
     List<GralTableLine_ifc> list = new LinkedList<GralTableLine_ifc>();
-    for(TableItemWidget item: tableLines){
+    for(TableLineData item: tableLines){
       if((item.getSelection() & 1) !=0){
           list.add(item);
       }
@@ -631,7 +663,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     iCellLine = 0;
     for(int ixLine3 = ixLine1; ixLine3 <= ixLine2 && iCellLine < zLineVisibleMax; ++ixLine3){
       //cells with content
-      TableItemWidget line = tableLines.get(ixLine3);
+      TableLineData line = tableLines.get(ixLine3);
       int ctredraw = line.ctRepaintLine.get();
       if(ctredraw > 0 || true){
         for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
@@ -694,7 +726,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   }
   
 
-  protected abstract void drawCellContent(int iCellLine, int iCellCol, TableItemWidget tableItem );
+  protected abstract void drawCellContent(int iCellLine, int iCellCol, TableLineData tableItem );
 
   protected abstract CellData drawCellInvisible(int iCellLine, int iCellCol);
 
@@ -728,7 +760,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    * The instance knows its TableSwt and therefore the supports the access to the whole table.
    *
    */
-  protected class TableItemWidget extends SelectMask implements GralTableLine_ifc
+  protected final class TableLineData extends SelectMask implements GralTableLine_ifc
   {
 
     /**If a repaint is necessary, it is changed by increment by 1. If the redraw is executed
@@ -749,7 +781,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     
     //TODO GralColor colorBack, colorText;
     
-    TableItemWidget(){
+    TableLineData(){
       cellTexts = new String[zColumn];
     }
     
@@ -974,14 +1006,14 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   }
   
 
-  /**Data for each Text widget.
+  /**Data for each Text widget of the graphical implementation layer.
    * Note: The class is visible only in the graphic implementation layer, because it is protected.
    * The elements need to set public because there are not visible elsewhere in the derived class
    * of the outer class. 
    */
   protected static class CellData{
     public final int ixCellLine, ixCellColumn;
-    public TableItemWidget tableItem;
+    public TableLineData tableItem;
     public GralColor colorBack, colorText;
     public CellData(int ixCellLine, int ixCellColumn){
       this.ixCellLine = ixCellLine; 

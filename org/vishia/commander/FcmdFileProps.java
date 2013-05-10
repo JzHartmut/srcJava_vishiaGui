@@ -419,8 +419,8 @@ public class FcmdFileProps
   };
 
 
-  EventConsumer callbackChgProps = new EventConsumer("FcmdFileProps-callbackChgProps")
-  { @Override protected boolean processEvent_(Event evP)
+  EventConsumer callbackChgProps = new EventConsumer()
+  { @Override public int processEvent(Event evP)
     { FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
       if(ev.getCmd() == FileRemote.CallbackCmd.done){
         showFileInfos(actFile);
@@ -429,8 +429,10 @@ public class FcmdFileProps
         widgChgFile.setText(main.idents.buttonFilePropsRetry);
       }
       ev.relinquish();
-      return true;
+      return 1;
     } 
+    @Override public String toString(){ return "FcmdFileProps-callbackChgProps"; }
+
   };
 
 
@@ -450,8 +452,8 @@ public class FcmdFileProps
       return true;
   } };
   
-  EventConsumer callbackCntLen = new EventConsumer("FcmdFileProps - callback cnt length")
-  { @Override protected boolean processEvent_(Event evP)
+  EventConsumer callbackCntLen = new EventConsumer()
+  { @Override public int processEvent(Event evP)
     { FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
       if(ev.getCmd() == FileRemote.CallbackCmd.done){
         String sLen = "" + ev.nrofBytesAll;
@@ -461,8 +463,10 @@ public class FcmdFileProps
       }
       widgBtnDirBytes.setText(main.idents.buttonFilePropsCntLen);
       evP.relinquish();
-      return true;
+      return 1;
     } 
+    @Override public String toString(){ return "FcmdFileProps - callback cnt length"; }
+
   };
 
 

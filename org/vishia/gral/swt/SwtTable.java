@@ -314,9 +314,9 @@ public class SwtTable  extends GralTable {
   
   
   /**This routine implements all things to set the content of any table cell to show it.
-   * @see org.vishia.gral.base.GralTable#drawCellContent(int, int, org.vishia.gral.base.GralTable.TableItemWidget)
+   * @see org.vishia.gral.base.GralTable#drawCellContent(int, int, org.vishia.gral.base.GralTable.TableLineData)
    */
-  @Override protected void drawCellContent(int iCellLine, int iCellCol, TableItemWidget tableItem ){
+  @Override protected void drawCellContent(int iCellLine, int iCellCol, TableLineData tableItem ){
     Text cellSwt = cellsSwt[iCellLine][iCellCol]; 
     CellData cellData = (CellData)cellSwt.getData();
     cellData.tableItem = tableItem;

@@ -721,8 +721,8 @@ public class FcmdCopyCmd
   } };
   
   
-  EventConsumer callbackCheck = new EventConsumer("FcmdCopy-check"){
-    @Override protected boolean processEvent_(Event<?,?> evP)
+  EventConsumer callbackCheck = new EventConsumer(){
+    @Override public int processEvent(Event<?,?> evP)
     {
       FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
       if(listEvCheck.remove(ev)){  ///
@@ -744,8 +744,10 @@ public class FcmdCopyCmd
           widgButtonOk.setCmd("copy");
         }
       }
-      return true;
+      return 1;
     }
+    @Override public String toString(){ return "FcmdCopy-check"; }
+
   };
   
   
@@ -789,8 +791,8 @@ public class FcmdCopyCmd
    * and their intermediate message. 
    * 
    */
-  EventConsumer callbackCopy = new EventConsumer("FcmdCopy-success"){
-    @Override protected boolean processEvent_(Event<?,?> ev)
+  EventConsumer callbackCopy = new EventConsumer(){
+    @Override public int processEvent(Event<?,?> ev)
     {
       FileRemote.CallbackEvent ev1 = (FileRemote.CallbackEvent)ev;
       FileRemote.CallbackCmd cmd = ev1.getCmd();
@@ -877,9 +879,10 @@ public class FcmdCopyCmd
 
       }
       //windConfirmCopy.setWindowVisible(false);
-      return true;
+      return 1;
     }
-    
+    @Override public String toString(){ return "FcmdCopy-success"; }
+
   };
 
   

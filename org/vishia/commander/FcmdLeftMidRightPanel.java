@@ -255,6 +255,7 @@ public class FcmdLeftMidRightPanel
     }
     if(found){
       if(fileTableLeft !=null){
+        actFileCard = fileTableLeft;
         fileTableLeft.setFocusFavorOrFile(); 
       } else {  //left from first is the selectAllTable of this panel.
         cardFavorThemes.setFocus();
@@ -273,7 +274,10 @@ public class FcmdLeftMidRightPanel
       if(fileTable == actFileCard) { found = true; }
     }
     if(fileTableRight !=null){
+      actFileCard = fileTableRight;
       fileTableRight.setFocusFavorOrFile(); 
+    } else {
+      //remain the last
     }
     return true; 
   }

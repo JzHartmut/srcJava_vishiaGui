@@ -191,8 +191,8 @@ public class FcmdDelete
 
   
   
-  EventConsumer success = new EventConsumer("FcmdDelete - success"){
-    @Override protected boolean processEvent_(Event<?,?> ev)
+  EventConsumer success = new EventConsumer(){
+    @Override public int processEvent(Event<?,?> ev)
     { FileRemote.CallbackEvent callback = (FileRemote.CallbackEvent)ev;
       if(callback.successCode !=0){
         main.mainCmd.writeError("can't delete " + callback.getFileSrc().getCanonicalPath());
@@ -205,9 +205,11 @@ public class FcmdDelete
         windConfirmDelete.setWindowVisible(false);      
       }
       fileCard.fillInCurrentDir();
-      return true;
+      return 1;
     }
     
+    @Override public String toString(){ return "FcmdDelete - success"; }
+
   };
   
   //XX Event evSuccess = new Event(this, success);

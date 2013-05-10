@@ -1126,16 +1126,18 @@ public class GralFileSelector implements Removeable //extends GralWidget
   }
   
   
-  final EventConsumer callbackFillIn = new EventConsumer("GralFileSelector - callback fillin"){
-    @Override protected boolean processEvent_(Event evP) {
+  final EventConsumer callbackFillIn = new EventConsumer(){
+    @Override public int processEvent(Event evP) {
       ///
       FillinCallback callback = (FillinCallback)evP;
       FileRemote dir = callback.getFileSrc();  //it is completed meanwhile
       Timeshort.sleep(200); //test
       fillInRefreshed(dir, callback.bCompleteWithFileInfo);
       //setFocus();    //don't set the focus, it may be false. Only fill.
-      return true;
+      return 1;
     }
+    @Override public String toString(){ return "GralFileSelector - callback fillin"; }
+
   };
   
   
