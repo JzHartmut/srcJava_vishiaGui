@@ -99,23 +99,30 @@ public class GralColor
       addColor("pink",   0xff0080);
       addColor("purple", 0xff0060);
       
+      addColor("ye", 0xffff00); //
+      addColor("gn", 0x00ff00);
+      addColor("g2", 0x00e020);
+      addColor("cy", 0x00ffff);
+      
       //saturated colors
       addColor("wh", 0xffffff);
       addColor("gr", 0xa0a0a0);
       addColor("bk", 0x000000);
-      addColor("rd", 0xff0000);
-      addColor("gn", 0x00ff00);
-      addColor("bl", 0x0000ff);
-      addColor("ye", 0xffff00);
-      addColor("am", 0xffe000);
-      addColor("or", 0xffa000);
       addColor("ma", 0xff00ff);
-      addColor("cy", 0x00ffff);
+      addColor("pu", 0xff0040);
+      addColor("rd", 0xff0000);
+      addColor("or", 0xffa000);
+      addColor("am", 0xffe000);
+      addColor("sye", 0xc0c000); //saturated yellow
+      addColor("sgn", 0x00d000); //saturated green
+      addColor("sg2", 0x00c020); //saturated green-blue
+      addColor("scy", 0x00c0c0);
+      addColor("bl", 0x0000ff);
+      addColor("vi", 0x6000ff);
+
       addColor("bn", 0x600020);
       addColor("mv", 0xd0d0ff);
-      addColor("vi", 0x6000ff);
       addColor("pk", 0xff0080);
-      addColor("pu", 0xff0040);
       
       //light colors
       addColor("lgr", 0xd0d0d0);

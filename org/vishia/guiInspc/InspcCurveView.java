@@ -28,7 +28,6 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralColorSelector;
 import org.vishia.gral.widget.GralFileSelectWindow;
-import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.gral.widget.GralColorSelector.SetColorFor;
 import org.vishia.inspectorAccessor.InspcAccessEvaluatorRxTelg;
 import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
@@ -44,10 +43,11 @@ public class InspcCurveView
   /**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
    * Changes:
    * <ul>
-   * <li>2013-03-28 Harmut adapt new {@link GralFileSelectWindow}
+   * <li>2013-05-13 Hartmut new: {@link #actionSwapVariable}, {@link #actionSelectOrChgVarPath}
+   * <li>2013-03-28 Hartmut adapt new {@link GralFileSelectWindow}
    * <li>2013-03-27 Hartmut improved/bugfix: The {@link TrackValues#trackView} is the reference to the track in the 
    *   {@link GralCurveView} instance. If a new config is loaded all tracks in {@link GralCurveView#getTrackInfo()}
-   *   arec reated newly using {@link GralCurveView#initTrack(String, String, GralColor, int, int, float, float)}.
+   *   are created newly using {@link GralCurveView#initTrack(String, String, GralColor, int, int, float, float)}.
    *   Therefore the {@link TrackValues#trackView} should be updated. 
    * <li>2012-10-09 Hartmut now ctrl-mouse down sets the scale settings for the selected channel. Faster user operation.
    * <li>2012-08-10 Hartmut now uses a default directory for config file given in constructor.
@@ -69,7 +69,7 @@ public class InspcCurveView
    * <li> You can redistribute copies of this source to everybody.
    * <li> Every user of this source, also the user of redistribute copies
    *    with or without payment, must accept this license for further using.
-   * <li> But the LPGL ist not appropriate for a whole software product,
+   * <li> But the LPGL is not appropriate for a whole software product,
    *    if this source is only a part of them. It means, the user
    *    must publish this part of source,
    *    but don't need to publish the whole source of the own product.
@@ -95,7 +95,7 @@ public class InspcCurveView
   public static String sBtnSaveValues = "save values";
   
   
-  private final String sName;
+  protected final String sName;
   
   private final Map<String, String> curveExporterClasses;
   
@@ -187,6 +187,14 @@ public class InspcCurveView
   
   GralCurveView widgCurve;
   
+  /**Creates the instance. The graphical appearance will not be created. 
+   * Call {@link #buildGraphic(GralPrimaryWindow_ifc, GralColorSelector)} to do that.
+   * @param sName Name shown in title bar
+   * @param variables Container to find variables
+   * @param gralMng The Gral Graphic Manager
+   * @param defaultDir
+   * @param curveExporterClasses Class which is used to export curves.
+   */
   InspcCurveView(String sName, VariableContainer_ifc variables, GralMng gralMng, FileRemote defaultDir, Map<String, String> curveExporterClasses){
     //this.comm = comm;
     this.sName = sName;
@@ -223,20 +231,23 @@ public class InspcCurveView
       if(track.colorCurve ==null){ throw new IllegalArgumentException("InspcCurveView-unknown color; " + sColor); }
       track.rxActionRxValueByPath = new CurveCommRxAction(track);
       this.tracks[ii] = track;
-      track.widgVarPath = gralMng.addTextField(null, false, sName, sName);
+      track.widgVarPath = gralMng.addTextField(null, true, sName, sName);
       track.widgVarPath.setTextColor(track.colorCurve);
       track.widgVarPath.setContentInfo(track);
-      track.widgVarPath.setMouseAction(actionSetTrackForScale);
+      track.widgVarPath.setMouseAction(actionSelectOrChgVarPath);  //used as actionChange too
+      track.widgVarPath.setActionChange(actionSelectOrChgVarPath);
       //input[ii].widgPath.setMouseAction(actionDropVariable);
       tracks[ii].widgVarPath.setDataPath("widgetInfo");  //prevent storing the own widgetInfo.
       //input[ii].widgPath.setContentInfo(input[ii]);
       GralMenu menuWidg = track.widgVarPath.getContextMenu();
       GralWidget widgMenuItem1 = menuWidg.addMenuItemGthread(null, "drop variable", actionDropVariable);
-      GralWidget widgMenuItem2 = menuWidg.addMenuItemGthread(null, "set color", actionColorSelectorOpen);
-      GralWidget widgMenuItem3 = menuWidg.addMenuItemGthread(null, "set scale", actionSetScaleValues2Track);
+      GralWidget widgMenuItem2 = menuWidg.addMenuItemGthread(null, "swap variable", actionSwapVariable);
+      GralWidget widgMenuItem3 = menuWidg.addMenuItemGthread(null, "set color", actionColorSelectorOpen);
+      GralWidget widgMenuItem4 = menuWidg.addMenuItemGthread(null, "set scale", actionSetScaleValues2Track);
       widgMenuItem1.setContentInfo(tracks[ii]);
       widgMenuItem2.setContentInfo(tracks[ii]);
       widgMenuItem3.setContentInfo(tracks[ii]);
+      widgMenuItem4.setContentInfo(tracks[ii]);
       track.trackView = widgCurve.initTrack(sName, null, track.colorCurve, ii, 50, 5000.0f, 0.0f);
     }
     gralMng.setPosition(22, GralPos.size +3, -10, 0, 0, 'd', 0);
@@ -300,6 +311,16 @@ public class InspcCurveView
   
   
   
+
+  
+  GralUserAction actionOpenWindow = new GralUserAction("actionOpenWindow"){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    { windCurve.setWindowVisible(true);
+      return true;
+    }
+
+  };
+  
   
   
   /**This action will be called if the mouse is pressed on the drop field.
@@ -323,24 +344,66 @@ public class InspcCurveView
         input.mid = 0.0f;
         //String sShowMethod = variableWidget.getShowMethod();
         String sPath = variableWidget.getDataPath();
-        if(input.trackView == null){
-          input.trackView = widgCurve.initTrack(sName, sPath, input.colorCurve, 0, 50, 5000.0f, 0.0f);
+        if(sPath !=null){
+          if(input.trackView == null){
+            input.trackView = widgCurve.initTrack(sName, sPath, input.colorCurve, 0, 50, 5000.0f, 0.0f);
+          } else {
+            input.trackView.setDataPath(sPath);
+          }
+          input.widgVarPath.setText(sPath); //variableWidget.name);
         } else {
-          input.trackView.setDataPath(sPath);
+          System.out.printf("InspcCurveView - invalid widget to drop; %s\n", variableWidget.toString());
         }
-        input.widgVarPath.setText(variableWidget.name);
+      }
+      return true;
+    }
+  };
+
+  
+  GralUserAction actionSwapVariable = new GralUserAction("actionSwapVariable"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
+      if(actionCode == KeyCode.menuEntered && trackScale !=null){
+        //read paths
+        Object oContent = widgd.getContentInfo();
+        TrackValues trackDst = (TrackValues)oContent;
+        if(trackDst != trackScale){
+          String sPathSwap = trackDst.widgVarPath.getText();
+          int linePercentSwap = trackDst.trackView.getLinePercent();
+          float offsetSwap = trackDst.trackView.getOffset();
+          float scaleSwap = trackDst.trackView.getScale7div();
+          GralColor colorSwap = trackDst.trackView.getLineColor(); //trackDst.colorCurve; //  
+          String sPathDst = trackScale.widgVarPath.getText();
+          int linePercentDst = trackScale.trackView.getLinePercent();
+          float offsetDst = trackScale.trackView.getOffset();
+          float scaleDst = trackScale.trackView.getScale7div();
+          GralColor colorDst = trackScale.trackView.getLineColor();  //colorCurve; //  
+          //set paths to other.
+          trackScale.colorCurve = colorSwap;
+          trackScale.widgVarPath.setText(sPathSwap);
+          trackScale.widgVarPath.setTextColor(colorSwap);
+          trackScale.trackView.setDataPath(sPathSwap);
+          trackScale.trackView.setLineProperties(colorSwap, 1, 0);
+          trackScale.trackView.setTrackScale(scaleSwap, offsetSwap, linePercentSwap);
+          //the new one can be an empty track:
+          trackDst.colorCurve = colorDst;
+          trackDst.widgVarPath.setText(sPathDst);
+          trackDst.widgVarPath.setTextColor(colorDst);
+          if(trackDst.trackView == null){
+            trackDst.trackView = widgCurve.initTrack(null, sPathDst, trackDst.colorCurve, 0, linePercentDst, scaleDst, offsetDst);
+          } else {
+            trackDst.trackView.setDataPath(sPathDst);
+            trackDst.trackView.setLineProperties(colorDst, 1, 0);
+            trackDst.trackView.setTrackScale(scaleDst, offsetDst, linePercentDst);
+          }
+          //change track for scale. It is the same like mouse1Down on this text field:
+          actionSelectOrChgVarPath.exec(KeyCode.mouse1Down, trackDst.widgVarPath);
+        }
       }
       return true;
     }
   };
   
-  GralUserAction actionOpenWindow = new GralUserAction(){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
-    { windCurve.setWindowVisible(true);
-      return true;
-    }
-
-  };
+  
   
 
   GralUserAction actionSetScaleValues2Track = new GralUserAction("actionSetScaleValues2Track"){
@@ -369,12 +432,15 @@ public class InspcCurveView
   } };
   
   
-  /**
-   *  ///
+  
+  /**called if The text field was entered with mouse 
+   * or the focus lost on a changed variable path field.
+   * 
    */
-  GralUserAction actionSetTrackForScale = new GralUserAction("actionSetTrackForScale"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
-    { if((actionCode) == KeyCode.mouse1Down){
+  GralUserAction actionSelectOrChgVarPath = new GralUserAction("actionSelectOrChgVarPath"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
+      GralWidget widg = (GralWidget)widgd;
+      if(actionCode == KeyCode.mouse1Down || actionCode == KeyCode.menuEntered){
         if(trackScale !=null){
           //last variable
           trackScale.widgVarPath.setBackColor(GralColor.getColor("wh"),0);
@@ -387,7 +453,7 @@ public class InspcCurveView
           trackScale.trackView = widgCurve.initTrack(sName, null, trackScale.colorCurve, 0, 50, 5000.0f, 0.0f);
         }
         //colorLineTrackSelected = trackScale.trackView.getLineColor();
-        trackScale.trackView.setLineProperties(trackScale.colorCurve, 2, 0);
+        trackScale.trackView.setLineProperties(trackScale.colorCurve, 3, 0);
         trackScale.widgVarPath.setBackColor(GralColor.getColor("lam"),0);
         widgScale.setText("" + trackScale.trackView.getScale7div());
         widgScale0.setText("" + trackScale.trackView.getOffset());
@@ -422,12 +488,20 @@ public class InspcCurveView
           System.err.println("InspcCurveView - read scale values format error.");
         }
       }
+      else if(actionCode == KeyCode.focusLost && widgd.isChanged(true)){
+        String sPath = (widg).getValue();
+        if(sPath.length() >0 && !sPath.endsWith(".")){
+          TrackValues track = (TrackValues)widgd.getContentInfo();
+          track.trackView.setDataPath(sPath);
+        }
+      }
       return true;
-  } };
+    }
+  };
   
   
   
-  GralUserAction actionOpenFileDialog = new GralUserAction(){
+  GralUserAction actionOpenFileDialog = new GralUserAction("OpenFileDialog"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(actionCode == KeyCode.mouse1Up){
         try{
@@ -455,6 +529,7 @@ public class InspcCurveView
         try{
           fileCurveCfg = (FileRemote)params[0];
           System.out.println("InspcCurveView - read curve view from; " + fileCurveCfg.getAbsolutePath());
+          windCurve.setTitle(InspcCurveView.this.sName + ": " + fileCurveCfg.getName());
           String in = FileSystem.readFile(fileCurveCfg);
           if(in ==null){
             System.err.println("InspcCurveView - actionRead, file not found;" + fileCurveCfg.getAbsolutePath());

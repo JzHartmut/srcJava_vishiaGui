@@ -60,7 +60,8 @@ public class GralColorSelector
   String[][] colors = {
       { "pma", "prd", "por", "pye", "pam",  "pgn", "pcy", "pbl", "pmv", "pgr", "lgr"}
     , { "lma", "lrd", "lor", "lye", "lam",  "lgn", "lcy", "lbl", "lmv", "gr", "dgr"}
-    , { "ma", "rd", "or", "ye", "am", "gn", "cy", "bl", "mv", "gr", "pbk", "lbk"}
+    , { "ma", "pu", "rd", "or", "am", "ye", "gn", "g2", "cy", "bl", "vi", "gr", "pbk", "lbk"}
+    , { "dma", "pu", "pk", "or", "am", "sye", "sgn", "sg2", "scy", "dbl", "vi", "dgr", "lbk"}
     , { "dma", "pu", "pk", "dye", "wh", "dgn", "dcy", "dbl", "vi", "dgr", "lbk"}
     , { "wh", "drd", "bn", "bk"}
   };
