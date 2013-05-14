@@ -10,6 +10,7 @@ public interface GralCurveViewTrack_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2013-05-14 Hartmut new: {@link #getValueCursorLeft()}
    * <li>2013-05-14 Hartmut new: {@link #getIxTrack()}
    * <li>2012-06-08 Hartmut new: {@link #getDataPath()}, used to write settings.
    * <li>2012-06-08 Hartmut chg: {@link #setLineProperties(GralColor, int)} instead setLineColor() 
@@ -84,4 +85,11 @@ public interface GralCurveViewTrack_ifc
    * @return The index of this track.
    */
   int getIxTrack();
+  
+  float getValueCursorLeft();
+  float getValueCursorRight();
+  float getValueLast();
+  float getValueMin();
+  float getValueMax();
+
 }

@@ -243,6 +243,43 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       y0Line = line0;
     }
 
+    
+    @Override public float getValueCursorLeft(){ 
+      float value;
+      try{
+        int ixDataWrap = outer.ixDataShown[outer.xpCursor1];
+        int ixData = (ixDataWrap >> outer.shIxiData) & outer.mIxiData;
+        value = values[ixData]; 
+      } catch(Exception exc){
+        value = 77777.7f;
+      }
+      return value;
+    }
+    
+    
+    
+    @Override public float getValueCursorRight(){
+      float value;
+      try{
+        int ixDataWrap = outer.ixDataShown[outer.xpCursor2];
+        int ixData = (ixDataWrap >> outer.shIxiData) & outer.mIxiData;
+        value = values[ixData]; 
+      } catch(Exception exc){
+        value = 77777.7f;
+      }
+      return value;
+    }
+    
+    
+    
+    @Override public float getValueLast(){ return 0; }
+    @Override public float getValueMin(){ return 0; }
+    @Override public float getValueMax(){ return 0; }
+
+
+    
+    
+    
     @Override public void setLineProperties(GralColor color, int width, int pattern){ 
       lineColor = color; 
       lineWidth = width;
@@ -420,9 +457,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   protected final int[] timeValues;
   
   
-  /**The index in data for each shown pixel, from right to left.
-   * [0] is right. 2000 are enough for a large representation.
-   * It is the number of pixel.
+  /**The index in data for each shown pixel, from right to left int-wrapping.
+   * [0] is right. Use <code>(ixData >> shIxiData) & mIxiData</code> to calculate the real data index.
+   * the used length is the number of pixel. 2000 are enough for a large representation.
    * This array is filled newly whenever any draw or paint action is done. It is prepared in the routine
    * The field contains old indices if the size of drawing is less then the size of window.
    * {@link #prepareIndicesDataForDrawing(int, int, int)} and used in the drawTrack routine of the implementation level.
