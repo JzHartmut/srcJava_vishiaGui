@@ -37,12 +37,14 @@ import org.vishia.util.FileRemote;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
-public class InspcCurveView
+public final class InspcCurveView
 {
 
   /**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
    * Changes:
    * <ul>
+   * <li>2013-05-14 Hartmut chg: 12 Tracks instead 10. A variableWindowSize cause problems (TODO)
+   * <li>2013-05-14 Hartmut progress: {@link #actionSwapVariable}, {@link #actionShiftVariable}
    * <li>2013-05-13 Hartmut new: {@link #actionSwapVariable}, {@link #actionSelectOrChgVarPath}
    * <li>2013-03-28 Hartmut adapt new {@link GralFileSelectWindow}
    * <li>2013-03-27 Hartmut improved/bugfix: The {@link TrackValues#trackView} is the reference to the track in the 
@@ -84,7 +86,7 @@ public class InspcCurveView
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public final static int version = 20130327;
+  public final static int version = 20130514;
 
   public static String sBtnReadCfg = "read cfg";
   
@@ -110,10 +112,14 @@ public class InspcCurveView
   
   final VariableContainer_ifc variables;
   
-  private static class TrackValues{
+  private static final class TrackValues{
 
     /**The reference to the track in {@link GralCurveView#initTrack(String, String, GralColor, int, int, float, float)}.
-     * If this field is null, there is no track associated to this field. */
+     * If this field is null, there is no track associated to this field. 
+     * The {@link GralCurveViewTrack_ifc#getIxTrack()} may not be equal to the index of this instance
+     * inside the {@link InspcCurveView#tracks} array because the tracks may be swapped and shifted.
+     * See {@link InspcCurveView#actionSwapVariable} and {@link InspcCurveView#actionShiftVariable} 
+     * */
     GralCurveViewTrack_ifc trackView;
     
     /**Visible information about the shown variable. The path may be the closest presentation what are shown. */
@@ -142,20 +148,27 @@ public class InspcCurveView
     
     /**Marked with true if it is the last variable, forces output to graphic. */
     boolean bLast;
+    
+    /**Index in the array where this is member of. */
+    final int ix;
 
+    /**Color of the curve. */
     GralColor colorCurve;
     
-    CurveCommRxAction rxActionRxValueByPath;
+    /**This is the rxAction joined with the track directly. Therefore an 'unused reference' here. */
+    @SuppressWarnings("unused")
+    //CurveCommRxAction rxActionRxValueByPath;
     
-    TrackValues(){}
+    TrackValues(int ix){ this.ix = ix; }
     
   }
   
-  String[] colorCurveDefault = new String[]{"rd", "gn", "lbl", "or", "ma", "bn", "dgn", "drd", "cy", "bl"};
+  private final static String[] colorCurveDefault = new String[]{"rd", "gn", "lbl", "or", "ma", "bn", "dgn", "drd", "cy", "bl", "gn2", "pu"};
   
   
   /**The input field which is the current scaling field. */
   TrackValues trackScale;
+  int ixTrackScale;
   
   //GralColor colorLineTrackSelected;
 
@@ -171,7 +184,7 @@ public class InspcCurveView
   /**
    * 
    */
-  final TrackValues[] tracks = new TrackValues[10];
+  final TrackValues[] tracks = new TrackValues[12];
   
   GralButton widgBtnOff;
   
@@ -215,21 +228,22 @@ public class InspcCurveView
     int posright = -20;
     this.colorSelector = colorSelector;
     gralMng.selectPanel("primaryWindow");
-    gralMng.setPosition(4, 0, 4, 0, 0, '.');
+    //gralMng.setPosition(4, 0, 4, 0, 0, '.');
+    gralMng.setPosition(4, 56, 4, 104, 0, '.');
     //int windProps = GralWindow.windConcurrently | GralWindow.windOnTop | GralWindow.windResizeable;
-    int windProps = GralWindow.windConcurrently ; // | GralWindow.windResizeable;
+    int windProps = GralWindow.windConcurrently; // | GralWindow.windResizeable;
     windCurve = gralMng.createWindow("windMapVariables", sName, windProps);
     //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 0, 'd');
     gralMng.setPosition(0, -2, 0, posright, 0, 'd');
     widgCurve = gralMng.addCurveViewY(sName, 3000, 10);
     gralMng.setPosition(0, GralPos.size +2, posright, 0, 0, 'd', 0);
     gralMng.addText("curve variable");
-    for(int ii=0; ii<10; ++ii){
-      final TrackValues track = new TrackValues();
+    for(int ii=0; ii<tracks.length; ++ii){                 ////
+      final TrackValues track = new TrackValues(ii);
       String sColor = colorCurveDefault[ii];
       track.colorCurve = GralColor.getColor(sColor);
       if(track.colorCurve ==null){ throw new IllegalArgumentException("InspcCurveView-unknown color; " + sColor); }
-      track.rxActionRxValueByPath = new CurveCommRxAction(track);
+      //track.rxActionRxValueByPath = new CurveCommRxAction(track);
       this.tracks[ii] = track;
       track.widgVarPath = gralMng.addTextField(null, true, sName, sName);
       track.widgVarPath.setTextColor(track.colorCurve);
@@ -242,26 +256,39 @@ public class InspcCurveView
       GralMenu menuWidg = track.widgVarPath.getContextMenu();
       GralWidget widgMenuItem1 = menuWidg.addMenuItemGthread(null, "drop variable", actionDropVariable);
       GralWidget widgMenuItem2 = menuWidg.addMenuItemGthread(null, "swap variable", actionSwapVariable);
+      GralWidget widgMenuItem5 = menuWidg.addMenuItemGthread(null, "shift variable", actionShiftVariable);
       GralWidget widgMenuItem3 = menuWidg.addMenuItemGthread(null, "set color", actionColorSelectorOpen);
       GralWidget widgMenuItem4 = menuWidg.addMenuItemGthread(null, "set scale", actionSetScaleValues2Track);
       widgMenuItem1.setContentInfo(tracks[ii]);
       widgMenuItem2.setContentInfo(tracks[ii]);
       widgMenuItem3.setContentInfo(tracks[ii]);
       widgMenuItem4.setContentInfo(tracks[ii]);
+      widgMenuItem5.setContentInfo(tracks[ii]);
       track.trackView = widgCurve.initTrack(sName, null, track.colorCurve, ii, 50, 5000.0f, 0.0f);
     }
-    gralMng.setPosition(22, GralPos.size +3, -10, 0, 0, 'd', 0);
+    gralMng.setPosition(/*22*/-19, GralPos.size +3, -10, 0, 0, 'd', 0);
     widgScale = gralMng.addTextField("scale", true, "scale/div", "t");
     widgScale0 = gralMng.addTextField("scale0", true, "mid", "t");
     widgline0 = gralMng.addTextField("line0", true, "line-%", "t");
-    gralMng.setPosition(32, GralPos.size +2, -10, GralPos.size +2, 0, 'r', 1);
+    gralMng.setPosition(/*32*/-9, GralPos.size +2, -10, GralPos.size +2, 0, 'r', 1);
+    /*
+    gralMng.setPosition(-23, GralPos.size +1, -10, 0, 0, 'd', 2);
+    gralMng.addText("scale/div");
+    gralMng.addText("mid");
+    gralMng.addText("line-%");
+    gralMng.setPosition(-22, GralPos.size +2, -10, 0, 0, 'd', 1);
+    widgScale = gralMng.addTextField("scale", true, null, "t");
+    widgScale0 = gralMng.addTextField("scale0", true, null, "t");
+    widgline0 = gralMng.addTextField("line0", true, null, "t");
+    gralMng.setPosition(-12, GralPos.size +2, -10, GralPos.size +2, 0, 'r', 1);
+    */
     widgBtnDn = gralMng.addButton("btnDn", actionSetScaleValues2Track, "-", null,  "-");
     widgBtnUp = gralMng.addButton("btnUp", actionSetScaleValues2Track, "+", null, "+");
     gralMng.setPosition(GralPos.same, GralPos.size +2, GralPos.next, GralPos.size +4, 0, 'r', 1);
     widgBtnScale = gralMng.addButton("btnScale", actionColorSelectorOpen, "!", null,  "color");  
-    gralMng.setPosition(35, GralPos.size +2, -10, GralPos.size +6, 0, 'r', 1);
+    gralMng.setPosition(/*35*/ -6, GralPos.size +2, -10, GralPos.size +6, 0, 'r', 1);
     widgBtnScale = gralMng.addButton("btnScale", actionSetScaleValues2Track, "!", null,  "set");
-    gralMng.setPosition(23, GralPos.size +2, posright, GralPos.size +8, 0, 'd', 1);
+    gralMng.setPosition(/*23 */-18, GralPos.size +2, posright, GralPos.size +8, 0, 'd', 1);
     widgBtnReadCfg = gralMng.addButton("btnReadCfg", actionOpenFileDialog, sBtnReadCfg, null, sBtnReadCfg);
     widgBtnSaveCfg = gralMng.addButton("btnSaveCfg", actionOpenFileDialog, sBtnSaveCfg, null, sBtnSaveCfg);
     widgBtnReadValues = gralMng.addButton("btnReadValues", actionOpenFileDialog, sBtnReadValues, null, sBtnReadValues);
@@ -395,6 +422,40 @@ public class InspcCurveView
             trackDst.trackView.setLineProperties(colorDst, 1, 0);
             trackDst.trackView.setTrackScale(scaleDst, offsetDst, linePercentDst);
           }
+          //change track for scale. It is the same like mouse1Down on this text field:
+          actionSelectOrChgVarPath.exec(KeyCode.mouse1Down, trackDst.widgVarPath);
+        }
+      }
+      return true;
+    }
+  };
+  
+  
+  
+
+  GralUserAction actionShiftVariable = new GralUserAction("actionShiftVariable"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
+      if(actionCode == KeyCode.menuEntered && trackScale !=null){
+        //read paths                                  ////
+        Object oContent = widgd.getContentInfo();
+        TrackValues trackDst = (TrackValues)oContent;
+        if(trackDst != trackScale){
+          String sPathSwap = trackDst.widgVarPath.getText();
+          GralColor colorSwap = trackDst.trackView.getLineColor(); //trackDst.colorCurve; //  
+          GralCurveViewTrack_ifc trackViewSwap = trackDst.trackView;
+          String sPathDst = trackScale.widgVarPath.getText();
+          GralColor colorDst = trackScale.trackView.getLineColor();  //colorCurve; //  
+          GralCurveViewTrack_ifc trackViewDst = trackScale.trackView;
+          //set paths to other.
+          trackScale.colorCurve = colorSwap;
+          trackScale.widgVarPath.setText(sPathSwap);
+          trackScale.widgVarPath.setTextColor(colorSwap);
+          trackScale.trackView = trackViewSwap;
+          //the new one can be an empty track:
+          trackDst.colorCurve = colorDst;
+          trackDst.widgVarPath.setText(sPathDst);
+          trackDst.widgVarPath.setTextColor(colorDst);
+          trackDst.trackView = trackViewDst;
           //change track for scale. It is the same like mouse1Down on this text field:
           actionSelectOrChgVarPath.exec(KeyCode.mouse1Down, trackDst.widgVarPath);
         }
@@ -649,13 +710,14 @@ public class InspcCurveView
 
   
   
-  private void showValues(){
+  protected void showValues(){
     float[] values = new float[tracks.length];
-    int ix = 0;
+    //int ix = 0;
     assert(false);
     for(TrackValues inp: tracks){
+      int ix = inp.trackView.getIxTrack();
       values[ix] = inp.val;
-      ix +=1;
+      //ix +=1;
     }
     int time = (int)System.currentTimeMillis();
     widgCurve.setSample(values, time);
@@ -666,12 +728,12 @@ public class InspcCurveView
    * It is created for any Curve one time if need and used for the communication after that. 
    * The routine {@link #execInspcRxOrder(Info)} is used to add the received values to the curve.
    */
-  private class CurveCommRxAction implements InspcAccessExecRxOrder_ifc
+  private class XXXCurveCommRxAction implements InspcAccessExecRxOrder_ifc
   {
     final TrackValues inp;
     
     
-    CurveCommRxAction(TrackValues inp)
+    XXXCurveCommRxAction(TrackValues inp)
     { this.inp = inp;
     }
 

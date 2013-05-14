@@ -10,6 +10,7 @@ public interface GralCurveViewTrack_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2013-05-14 Hartmut new: {@link #getIxTrack()}
    * <li>2012-06-08 Hartmut new: {@link #getDataPath()}, used to write settings.
    * <li>2012-06-08 Hartmut chg: {@link #setLineProperties(GralColor, int)} instead setLineColor() 
    * <li>2012-04-01 Hartmut new: {@link #setDataPath(String)}
@@ -77,4 +78,10 @@ public interface GralCurveViewTrack_ifc
   
   void setDataPath(String path);
 
+  
+  /**Returns the index of the track which is substantially for the float parameter array position in  
+   * {@link GralCurveView_ifc#setSample(float[], int)}. 
+   * @return The index of this track.
+   */
+  int getIxTrack();
 }

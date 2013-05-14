@@ -33,6 +33,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-05-14 Hartmut new: {@link Track#getIxTrack()}
    * <li>2013-03-27 Hartmut bugfix: The {@link #bNewGetVariables} have to be set in {@link #setDataPath(String)} and 
    *   {@link #applySettings(String)} because this methods sets a new variable which should be searched. 
    *   All other changes are gardening and comments.
@@ -134,6 +135,11 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   protected static class Track implements GralCurveViewTrack_ifc, GralSetValue_ifc {
     public final String name;
     
+    /**The index of the track in the List of tracks. 
+     * It is the correspondent index in the float parameter for {@link GralCurveView#setSample(float[], int)}
+     */
+    public final int ixList;
+    
     private final GralCurveView outer;
     
     public String sDataPath;
@@ -142,9 +148,12 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     
     private Object oContent;
     
+    /**Index of a variable
+     * 
+     */
     private int dataIx;
     
-    public float actValue;
+    public float YYYactValue;
     
     public float min, max;
     
@@ -180,8 +189,12 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     /**The value from last draw, do not calculate twice. */
     public int ypixLast;
     
-    public Track(GralCurveView outer, String name){ this.outer = outer; this.name = name; }
+    public Track(GralCurveView outer, String name, int ixList){ 
+      this.outer = outer; this.name = name; this.ixList = ixList; }
 
+    @Override public int getIxTrack(){ return ixList; }
+
+    
     @Override public void setContentInfo(Object content) { oContent = content; }
 
     @Override public Object getContentInfo() { return oContent;  }
@@ -198,10 +211,13 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
 
     @Override public void setDataIx(int dataIx) { this.dataIx = dataIx; }
 
-    @Override public void setValue(float value) { this.actValue = value; }
+    @Override public void setValue(float value) { this.YYYactValue = value; }
 
     @Override public void setValue(Object[] value) { } //TODO this.actValue = value[0]; }
 
+    /**Maybe used for scaling, yet unused here.
+     * @see org.vishia.gral.ifc.GralSetValue_ifc#setMinMax(float, float)
+     */
     @Override public void setMinMax(float minValue, float maxValue) {
       this.min = minValue; this.max = maxValue;
     }
@@ -618,7 +634,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   public GralCurveViewTrack_ifc initTrack(String sNameTrack, String sDataPath, GralColor color, int style
       , int nullLine, float scale, float offset)
   {
-    Track track = new Track(this, sNameTrack);
+    Track track = new Track(this, sNameTrack, listTracks.size());
     track.values = new float[this.maxNrofXValues];
     listTracks.add(track);
     listTrackSet.add(track);
@@ -771,6 +787,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
 
   
   
+  /**
+   * @see org.vishia.gral.base.GralWidget#refreshFromVariable(org.vishia.byteData.VariableContainer_ifc)
+   */
   @Override public void refreshFromVariable(VariableContainer_ifc container){
     if(bActive){
       float[] values = new float[listTracks.size()];
