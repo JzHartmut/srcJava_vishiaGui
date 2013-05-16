@@ -86,7 +86,8 @@ public class GralColor
       addColor("gray",   0x808080);
       addColor("black",  0x000000);
       addColor("red",    0xff0000);
-      addColor("green",  0x00ff00);
+      addColor("lime",   0x00ff00);
+      addColor("green",  0x008000);
       addColor("blue",   0x0000ff);
       addColor("yellow", 0xffff00);
       addColor("magenta",0xff00ff);
@@ -97,10 +98,13 @@ public class GralColor
       addColor("violet", 0x6000ff);
       addColor("mauve",  0xd0d0ff);
       addColor("pink",   0xff0080);
-      addColor("purple", 0xff0060);
+      addColor("red-purple", 0xff0060);
+      addColor("purple", 0x800080);
       
       addColor("ye", 0xffff00); //
-      addColor("gn", 0x00ff00);
+      addColor("yg", 0x9ACD32); //yellow green
+      addColor("lm", 0x00ff00); //lime
+      addColor("gn", 0x008000);
       addColor("g2", 0x00e020);
       addColor("cy", 0x00ffff);
       
@@ -109,15 +113,23 @@ public class GralColor
       addColor("gr", 0xa0a0a0);
       addColor("bk", 0x000000);
       addColor("ma", 0xff00ff);
-      addColor("pu", 0xff0040);
+      addColor("rp", 0xff0040);  //red purple
+      addColor("pu", 0x800080);  //purple html
       addColor("rd", 0xff0000);
-      addColor("or", 0xffa000);
+      addColor("or", 0xffa000);  //html: ffa500
+      addColor("cc", 0xd2691e);  //chocolate html
       addColor("am", 0xffe000);
       addColor("sye", 0xc0c000); //saturated yellow
+      addColor("ol", 0x808000); //olive
+      addColor("od", 0x6b8e23); //olive drab html
       addColor("sgn", 0x00d000); //saturated green
+      addColor("fg",  0x228b22);  //forest green html
+      addColor("sg", 0x2E8B57); //sea green html
       addColor("sg2", 0x00c020); //saturated green-blue
       addColor("scy", 0x00c0c0);
+      addColor("tl", 0x008080);  //teal html
       addColor("bl", 0x0000ff);
+      addColor("ubl", 0x000080); //navi html ultramarin blue
       addColor("vi", 0x6000ff);
 
       addColor("bn", 0x600020);
@@ -152,8 +164,10 @@ public class GralColor
       //dark colors for forground
       addColor("dgr", 0x606060);
       addColor("drd", 0x800000);
+      addColor("dor", 0xff8c00);  //dark orange html
       addColor("dbn", 0x400010);
-      addColor("dgn", 0x008000);
+      addColor("dol", 0x556b2f); //dark olive, html
+      addColor("dgn", 0x006400);
       addColor("dbl", 0x000080);
       addColor("dye", 0x606000);
       addColor("dma", 0x600060);

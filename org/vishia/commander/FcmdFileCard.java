@@ -147,10 +147,10 @@ public class FcmdFileCard extends GralFileSelector
     widgLabel = mng.addTextField(nameWidgLabel, false, null, null);
     mng.setPosition(2, 0, 0, 0, 1, 'd');
     //set the base class GralFileSelector to the panel. It contains the path and the table for file selection.
-    setToPanel(mng, namePanelFile, 5, new int[]{2,19,6,10}, 'A');
+    setToPanel(mng, namePanelFile, 5, new int[]{2,0,-6,-12}, 'A');
     //GralPos.Coordinate[] columns = new GralPos.Coordinate[4];
     //Sets the columns for the table.
-    super.selectList.wdgdTable.setColumnWidth(50, new int[]{2,0,-6,-11});
+    //super.selectList.wdgdTable.setColumnWidth(50, new int[]{2,0,-6,-11});
     super.selectList.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.fileSelect.");
     GralMenu menuFolder = super.widgdPath.getContextMenu();
     menuFolder.addMenuItemGthread("contextfolder-setOrigin", main.idents.menuContextSetOriginDir, main.favorPathSelector.actionSetDirOrigin);

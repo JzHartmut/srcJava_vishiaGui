@@ -29,7 +29,7 @@ public class SwtTabbedPanel extends GralTabbedPanel
 
   /**Version, history and license.
    * <ul>
-   * <li>2012-03-31 Hartmut new: supports {@link GralPanelContent.MethodsCalledbackFromImplementation#setVisible(boolean)} 
+   * <li>2012-03-31 Hartmut new: supports {@link GralPanelContent.MethodsCalledbackFromImplementation#setVisibleState(boolean)} 
    * <li>2011-06-00 Hartmut created
    * </ul>
    * 
@@ -171,10 +171,10 @@ public class SwtTabbedPanel extends GralTabbedPanel
   					Queue<GralWidget> widgetInfos = panelContent.widgetList; 
   					newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
   					if(focusedTab !=null){
-  					  focusedTab.implMethodPanel_.setVisible(false);  //the last focused tab.
+  					  focusedTab.implMethodPanel_.setVisibleState(false);  //the last focused tab.
   					}
   					focusedTab = panelContent;
-  					focusedTab.implMethodPanel_.setVisible(true);   //the currently focused tab.
+  					focusedTab.implMethodPanel_.setVisibleState(true);   //the currently focused tab.
             focusedTab.setFocus();
   					//System.out.printf("Fcmd-selectTab; %s", panelContent.toString());
             //mng.log.sendMsg(0, "Fcmd-selectTab %s", panelContent.toString());

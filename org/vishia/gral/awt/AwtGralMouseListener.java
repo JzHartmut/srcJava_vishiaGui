@@ -179,22 +179,22 @@ public class AwtGralMouseListener
       GralWidget widgg = (GralWidget)widgetAwt.getData();
       GralMng guiMng = widgg.getMng();
       try{ 
+        final int keyCode;
+        switch(e.getButton()){ 
+          case 1: keyCode = KeyCode.mouse1Down; break; 
+          case 2: keyCode = KeyCode.mouse2Down; break;
+          case 3: keyCode = KeyCode.mouse3Down; break;
+          default: keyCode = KeyCode.mouse3Down; break;  //other key
+        }
         if(mouseWidgetAction !=null){
           switch(e.getButton()){ 
-            case 1: mouseWidgetAction.mouse1Down(); break;
-            case 2: mouseWidgetAction.mouse2Down(); break;
+            case 1: mouseWidgetAction.mouse1Down(keyCode, xMousePress, yMousePress, widgg); break;
+            case 2: mouseWidgetAction.mouse2Down(keyCode, xMousePress, yMousePress, widgg); break;
           }  
         }
         GralUserAction action = widgg ==null ? null : widgg.getActionChange();
         if(action !=null){
-          final int keyCode;
-          switch(e.getButton()){ 
-            case 1: keyCode = KeyCode.mouse1Down; break; 
-            case 2: keyCode = KeyCode.mouse2Down; break;
-            case 3: keyCode = KeyCode.mouse3Down; break;
-            default: keyCode = KeyCode.mouse3Down; break;  //other key
-          }
-          action.userActionGui(keyCode, widgg);
+          action.exec(keyCode, widgg);
         }
       } catch(Exception exc){ guiMng.writeLog(0, exc); }
     }
@@ -208,28 +208,28 @@ public class AwtGralMouseListener
       if(isPressed){
         Component widget = e.getComponent();
         AwtWidget widgetAwt = (AwtWidget)widget;
+        GralWidget widgg = (GralWidget)widgetAwt.getData();
         widget.removeMouseMotionListener(mouseMoveListener);
         isPressed = false;
+        final int keyCode;
+        switch(e.getButton()){ 
+          case 1: keyCode = KeyCode.mouse1Up; break; 
+          case 2: keyCode = KeyCode.mouse2Up; break;
+          case 3: keyCode = KeyCode.mouse3Up; break;
+          default: keyCode = KeyCode.mouse3Up; break;  //other key
+        }
         if(mouseWidgetAction !=null){
           switch(e.getButton()){ 
-            case 1: mouseWidgetAction.mouse1Up(); break;
-            case 2: mouseWidgetAction.mouse2Up(); break;
+            case 1: mouseWidgetAction.mouse1Up(keyCode, e.getX(), e.getY(), widgg); break;
+            case 2: mouseWidgetAction.mouse2Up(keyCode, e.getX(), e.getY(), widgg); break;
           }  
         }
         backgroundWhilePressed = null;
-        GralWidget widgg = (GralWidget)widgetAwt.getData();
         GralMng guiMng = widgg.getMng();
         try{ 
           GralUserAction action = widgg ==null ? null : widgg.getActionChange();
           if(action !=null){
-            final int keyCode;
-            switch(e.getButton()){ 
-              case 1: keyCode = KeyCode.mouse1Up; break; 
-              case 2: keyCode = KeyCode.mouse2Up; break;
-              case 3: keyCode = KeyCode.mouse3Up; break;
-              default: keyCode = KeyCode.mouse3Up; break;  //other key
-            }
-            action.userActionGui(keyCode, widgg);
+            action.exec(keyCode, widgg);
           }
         } catch(Exception exc){ guiMng.writeLog(0, exc); }
         widgg.repaint();

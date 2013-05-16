@@ -21,7 +21,7 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
    * <li>2012-07-13 Hartmut new:  {@link #getPixelSize()}, chg: {@link #getPixelPositionSize()} in all implementations. 
    *   A swt.widget.Shell now returns the absolute position and the real size of its client area without menu and title bar.
    * <li>2012-04-22 Hartmut new: {@link #canvas} as property maybe null for each panel to support stored graphics.
-   * <li>2012-03-31 Hartmut new: {@link #implMethodPanel_} and {@link MethodsCalledbackFromImplementation#setVisible(boolean)}.
+   * <li>2012-03-31 Hartmut new: {@link #implMethodPanel_} and {@link MethodsCalledbackFromImplementation#setVisibleState(boolean)}.
    * <li>2012-01-14 Hartmut new: {@link #setPrimaryWidget(GralWidget)} for panel focus.
    * <li>2012-01-08 Hartmut new: {@link #remove()}
    * <li>2011-11-19 Hartmut chg: The 'itsTabSwt' is moved to {@link org.vishia.gral.swt.SwtPanel} now.
@@ -214,9 +214,9 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
    */
   public class MethodsCalledbackFromImplementation extends GralWidget.MethodsCalledbackFromImplementation{
     
-    @Override public void setVisible(boolean visible){
+    @Override public void setVisibleState(boolean visible){
       for(GralWidget widget: widgetList){
-        widget.implMethodWidget_.setVisible(visible);
+        widget.implMethodWidget_.setVisibleState(visible);
       }
     }
   } //class MethodsCalledbackFromImplementation

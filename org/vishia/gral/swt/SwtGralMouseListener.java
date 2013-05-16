@@ -24,6 +24,7 @@ public class SwtGralMouseListener
 {
   /**Version, History and copyright
    * <ul>
+   * <li>2013-05-13 Hartmut chg: All methods of {@link GralMouseWidgetAction_ifc} changed, parameter key, position.
    * <li>2012-10-10 Hartmut the keycode for mouse pressed user actions contains pressing ctrl, alt, sh too.
    * <li>2012-03-09 Hartmut The methods {@link GralMouseWidgetAction_ifc#mouse1Up()} etc. are not called
    *   if the cursor was removed from the widget.
@@ -231,25 +232,25 @@ public class SwtGralMouseListener
       widget.addMouseMoveListener(mouseMoveListener);
       GralWidget widgg = (GralWidget)widget.getData();
       GralMng guiMng = widgg.getMng();
+      final int keyMouse;
+      switch(e.button){ 
+        case 1: keyMouse = KeyCode.mouse1Down; break; 
+        case 2: keyMouse = KeyCode.mouse2Down; break;
+        case 3: keyMouse = KeyCode.mouse3Down; break;
+        default: keyMouse = KeyCode.mouse3Down; break;  //other key
+      }
+      final int keyCode = SwtGralKey.convertFromSwt(keyMouse, e.stateMask);
       try{ 
         if(mouseWidgetAction !=null){
           switch(e.button){ 
-            case 1: mouseWidgetAction.mouse1Down(); break;
-            case 2: mouseWidgetAction.mouse2Down(); break;
+            case 1: mouseWidgetAction.mouse1Down(keyMouse, xMousePress, yMousePress, widgg); break;
+            case 2: mouseWidgetAction.mouse2Down(keyMouse, xMousePress, yMousePress, widgg); break;
           }  
         }
         GralUserAction action = widgg ==null ? null : widgg.getActionChange();
         if(action !=null){
-          final int keyCode;
-          switch(e.button){ 
-            case 1: keyCode = KeyCode.mouse1Down; break; 
-            case 2: keyCode = KeyCode.mouse2Down; break;
-            case 3: keyCode = KeyCode.mouse3Down; break;
-            default: keyCode = KeyCode.mouse3Down; break;  //other key
-          }
-          final int keyCode1 = SwtGralKey.convertFromSwt(keyCode, e.stateMask);
           
-          action.exec(keyCode1, widgg);
+          action.exec(keyCode, widgg);
         }
       } catch(Exception exc){ guiMng.writeLog(0, exc); }
     }
@@ -269,27 +270,27 @@ public class SwtGralMouseListener
         GralMng guiMng = widgg.getMng();
         try{ 
           int dx = e.x - xMousePress, dy = e.y - yMousePress;
-          final int keyCode;
+          final int keyMouse;
           int moved = (dx < 10 && dx > -10 && dy < 10 && dy > -10) ? 0: 100;
           switch(e.button + moved){ 
-            case   1: keyCode = KeyCode.mouse1Up; break; 
-            case 101: keyCode = KeyCode.mouse1UpMoved; break; 
-            case   2: keyCode = KeyCode.mouse2Up; break;
-            case 102: keyCode = KeyCode.mouse2UpMoved; break;
-            case   3: keyCode = KeyCode.mouse3Up; break;
-            case 103: keyCode = KeyCode.mouse3Up; break;
-            default: keyCode = KeyCode.mouse3Up; break;  //other key
+            case   1: keyMouse = KeyCode.mouse1Up; break; 
+            case 101: keyMouse = KeyCode.mouse1UpMoved; break; 
+            case   2: keyMouse = KeyCode.mouse2Up; break;
+            case 102: keyMouse = KeyCode.mouse2UpMoved; break;
+            case   3: keyMouse = KeyCode.mouse3Up; break;
+            case 103: keyMouse = KeyCode.mouse3Up; break;
+            default: keyMouse = KeyCode.mouse3Up; break;  //other key
           }
-          //TODO add capture ctrl, alt, sh 
+          final int keyCode = SwtGralKey.convertFromSwt(keyMouse, e.stateMask);
           if(mouseWidgetAction !=null){
             switch(e.button + moved){ 
-              case 1: mouseWidgetAction.mouse1Up(); break;
-              case 2: mouseWidgetAction.mouse2Up(); break;
+              case 1: mouseWidgetAction.mouse1Up(keyCode, e.x, e.y, widgg); break;
+              case 2: mouseWidgetAction.mouse2Up(keyCode, e.x, e.y, widgg); break;
             }  
           }
           GralUserAction action = widgg ==null ? null : widgg.getActionChange();
           if(action !=null){
-            final int keyCode1 = SwtGralKey.convertFromSwt(keyCode, e.stateMask);
+            final int keyCode1 = SwtGralKey.convertFromSwt(keyMouse, e.stateMask);
             action.exec(keyCode1, widgg);
           }
         } catch(Exception exc){ guiMng.writeLog(0, exc); }

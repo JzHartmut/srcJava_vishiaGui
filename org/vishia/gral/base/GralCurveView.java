@@ -428,6 +428,17 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   protected TimeOrganisation timeorg = new TimeOrganisation();
   
   
+  protected static class SizeAndPositions
+  {
+    /**Size of the curve range in pixel. Set at any time on last draw action. */
+    public int xPixelCurve, yPixelCurve;
+  }
+  
+  protected final SizeAndPositions sizepos = new SizeAndPositions();
+  
+  
+  
+  protected final GralCurveViewMouseAction mouseAction = new GralCurveViewMouseAction();
   
   /**All tracks. */
   protected final List<Track> listTracks = new ArrayList<Track>();
@@ -509,7 +520,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   
   /**Number of values to show in graphic. */
-  protected int nrofValuesShow;
+  protected int XXXnrofValuesShow;
   
   /**The cary over of time which is not used for the current point.
    * 
@@ -645,7 +656,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     this.mIxiData = maxNrofXValues -1;  //e.g. from 0x1000 to 0xfff
     this.ixDataWr = -adIxData; //initial write position, first increment to 0.
     //
-    this.nrofValuesShow = 0;
+    this.sizepos.xPixelCurve = 0;
+    this.sizepos.yPixelCurve = 0;
     timeValues = new int[maxNrofXValues];
     for(int ix = 0; ix < maxNrofXValues; ++ix){
       timeValues[ix] = ix;  //store succession of time values to designate it as empty.  
@@ -1156,7 +1168,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   protected void moveCursors(int xPos){
     //System.out.println("middle");
-    int xr = nrofValuesShow - xPos;  //from right
+    int xr = sizepos.xPixelCurve - xPos;  //from right
     if(xpCursor1 < 0){
       xpCursor1 = xr;
       bMouseDownCursor1 = true;
@@ -1317,7 +1329,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       bFreeze = true;
       //now ixDataShow remain unchanged.
     } else {
-      int ixdDataSpread = ixDataShowRight - ixDataShown[nrofValuesShow * 8/10];
+      int ixdDataSpread = ixDataShowRight - ixDataShown[sizepos.xPixelCurve * 8/10];
       //int ixDataShowRight1 = ixDataShown[nrofValuesShow * 7/8];
       //int ixdDataSpread = ixDataShowRight - ixDataShowRight1;
       ixDataShowRight -= ixdDataSpread;
@@ -1331,6 +1343,56 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   }
   
   
+  
+  protected class GralCurveViewMouseAction implements GralMouseWidgetAction_ifc {
+
+    @Override
+    public void mouse1Down(int key, int xMousePixel, int yMousePixel, GralWidget widgg)
+    { ////
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public void mouse1Up(int key, int xMousePixel, int yMousePixel,
+        GralWidget widgg)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public void mouse2Down(int key, int xMousePixel, int yMousePixel,
+        GralWidget widgg)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public void mouse2Up(int key, int xMousePixel, int yMousePixel,
+        GralWidget widgg)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public void mouseAction(int key, int xMousePixel, int yMousePixel,
+        GralWidget widgg)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public void removeMouseCursorFromWidgetWhilePressed()
+    {
+      // TODO Auto-generated method stub
+      
+    }
+    
+  }
   
   
 }

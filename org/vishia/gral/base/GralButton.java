@@ -306,7 +306,7 @@ public abstract class GralButton extends GralWidget
     }
 
     
-    @Override public void mouseAction(int key, GralWidget widgg)
+    @Override public void mouseAction(int keyCode, int xMousePixel, int yMousePixel, GralWidget widgg)
     {
       
     }
@@ -320,13 +320,13 @@ public abstract class GralButton extends GralWidget
 
 
     @Override
-    public void mouse1Down()
+    public void mouse1Down(int keyCode, int xMousePixel, int yMousePixel, GralWidget widgg)
     {
       setActivated(true);
     }
 
 
-    @Override public void mouse1Up()
+    @Override public void mouse1Up(int keyCode, int xMousePixel, int yMousePixel, GralWidget widgg)
     {
       setActivated(false);
       //On -> Off -> Disabled -> On
@@ -339,7 +339,7 @@ public abstract class GralButton extends GralWidget
 
 
     @Override
-    public void mouse2Down()
+    public void mouse2Down(int keyCode, int xMousePixel, int yMousePixel, GralWidget widgg)
     {
       // TODO Auto-generated method stub
       
@@ -347,7 +347,7 @@ public abstract class GralButton extends GralWidget
 
 
     @Override
-    public void mouse2Up()
+    public void mouse2Up(int keyCode, int xMousePixel, int yMousePixel, GralWidget widgg)
     {
       // TODO Auto-generated method stub
       

@@ -22,9 +22,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
-import org.vishia.gral.base.GralDispatchCallbackWorker;
-import org.vishia.gral.base.GralPos;
-import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
@@ -33,10 +30,9 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
-public class SwtTable  extends GralTable {
+public final class SwtTable  extends GralTable {
 
   /**Version and history
    * <ul>
@@ -84,7 +80,7 @@ public class SwtTable  extends GralTable {
   
   private final Text[][] cellsSwt;
   
-  private Text swtSearchText;
+  protected Text swtSearchText;
   
   private final SwtTable.Table table; 
   
@@ -102,7 +98,7 @@ public class SwtTable  extends GralTable {
   
   private final TableKeyListerner myKeyListener;
   
-  private long mousetime, redrawtime, mousect, redrawct;
+  protected long mousetime, redrawtime, mousect, redrawct;
   
   private boolean mouse1isDown, mouse2isDown, mouseDoubleClick;
   
@@ -203,6 +199,15 @@ public class SwtTable  extends GralTable {
     // TODO Auto-generated method stub
     
   }
+  
+  
+  @Override public boolean setVisible(boolean visible){
+    boolean ret = table.isVisible();
+    table.setVisible(visible);
+    implMethodWidget_.setVisibleState(visible);
+    return ret;
+  }
+  
 
 
   @Override protected void repaintGthread(){
@@ -373,7 +378,7 @@ public class SwtTable  extends GralTable {
   }
 
   
-  private void setBoundsCells(){
+  protected void setBoundsCells(){
     Rectangle parentBounds = table.getParent().getBounds();
     GralRectangle pixTable = pos.calcWidgetPosAndSize(itsMng.propertiesGui(), parentBounds.width, parentBounds.height, 0, 0);
     int xPixelUnit = itsMng.propertiesGui().xPixelUnit();
@@ -588,8 +593,11 @@ public class SwtTable  extends GralTable {
   };
   
   
-  private class MousePressedListenerTable implements MouseListener{
+  private final class MousePressedListenerTable implements MouseListener{
 
+    protected MousePressedListenerTable(){}
+    
+    
     @Override
     public void mouseDoubleClick(MouseEvent e)
     {

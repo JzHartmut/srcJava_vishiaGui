@@ -13,6 +13,10 @@ public interface GralMouseWidgetAction_ifc
 {
   /**Version, history and licence
    * 
+   * <ul>
+   * <li>2013-05-13 Hartmut chg: All methods changed, parameter key, position. 
+   * </ul>
+   * 
    * <b>Copyright/Copyleft</b>:
    * For this source the LGPL Lesser General Public License,
    * published by the Free Software Foundation is valid.
@@ -44,16 +48,20 @@ public interface GralMouseWidgetAction_ifc
   /**The action.
    * @param key
    */
-  void mouseAction(int key, GralWidget widgg);
+  void mouseAction(int key, int xMousePixel, int yMousePixel, GralWidget widgg);
   
   
-  void mouse1Down();
+  /**Called from the graphic implementation layer if the standard left mouse button is pressed.
+   * @param xMousePixel
+   * @param yMousePixel
+   */
+  void mouse1Down(int key, int xMousePixel, int yMousePixel, GralWidget widgg);
   
-  void mouse1Up();
+  void mouse1Up(int key, int xMousePixel, int yMousePixel, GralWidget widgg);
   
-  void mouse2Down();
+  void mouse2Down(int key, int xMousePixel, int yMousePixel, GralWidget widgg);
   
-  void mouse2Up();
+  void mouse2Up(int key, int xMousePixel, int yMousePixel, GralWidget widgg);
   
   /**It is called if the mouse button is pressed, and then the mouse cursor is removed from the widget.
    * The mouse-button-up action won't be called then. Usual the user should done its action

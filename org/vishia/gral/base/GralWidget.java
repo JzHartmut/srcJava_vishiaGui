@@ -118,7 +118,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    *   more to a variable via the new {@link VariableAccessWithIdx} and then to any {@link VariableAccess_ifc}.
    *   It is possible to refresh the visible information from the variable.
    * <li>2012-01-04 Hartmut new: {@link #repaintDelay}, use it.  
-   * <li>2012-03-31 Hartmut new: {@link #isVisible()} and {@link MethodsCalledbackFromImplementation#setVisible(boolean)}.
+   * <li>2012-03-31 Hartmut new: {@link #isVisible()} and {@link MethodsCalledbackFromImplementation#setVisibleState(boolean)}.
    *   renamed: {@link #implMethodWidget_} instead old: 'gralWidgetMethod'.
    * <li>2012-03-08 Hartmut chg: {@link #repaintRequ} firstly remove the request from queue before execution,
    *   a new request after that time will be added newly therefore, then execute it.
@@ -345,7 +345,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   /**Set true if its shell, tab card etc is be activated. Set false if it is deactivated.
    * It is an estimation whether this widget is be shown yet. 
    */
-  private boolean bVisible;
+  protected boolean bVisibleState;
   
   
   /**Set to true on {@link #setEditable(boolean)}. 
@@ -864,7 +864,16 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   
   @Override public boolean isVisible(){
-    return bVisible;
+    return bVisibleState;
+  }
+  
+  
+  /**Sets the widget visible or not.
+   * @param visible
+   * @return the old state.
+   */
+  public boolean setVisible(boolean visible){
+    throw new IllegalArgumentException("GralWidget unimplemented method - setVisible;");
   }
   
   
@@ -1113,8 +1122,8 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
      * This method should not be invoked by the application. It is 
      * @param visible
      */
-    public void setVisible(boolean visible){
-      bVisible = visible;
+    public void setVisibleState(boolean visible){
+      bVisibleState = visible;
       lastTimeSetVisible = System.currentTimeMillis();
     }
 
