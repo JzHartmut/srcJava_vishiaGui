@@ -36,6 +36,8 @@ public class SwtCurveView extends GralCurveView
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-05-19 Hartmut new: Usage of the common {@link SwtGralMouseListener} and 
+   *   implementation of the special functionality in the superclass {@link GralCurveView.GralCurveViewMouseAction}. 
    * <li>2012-08-11 Hartmut now grid with  timestamps
    * <li>2012-03-25 Hartmut improved zoom
    * <li>2012-03-17 Hartmut some improvements in paint routine.
@@ -110,7 +112,7 @@ public class SwtCurveView extends GralCurveView
     gridColorStrong = new Color(curveSwt.getDisplay(), 128, 255, 255);
     colorCursor = new Color(curveSwt.getDisplay(), 64, 64, 64);
     colorBack = new Color(curveSwt.getDisplay(), 0xff, 0xff, 0xff);
-    
+    super.initMenuContext();
   }
   
   @Override public GralCurveViewTrack_ifc initTrack(String sNameTrack, String sDataPath, GralColor color, int style
@@ -360,6 +362,14 @@ public class SwtCurveView extends GralCurveView
       timeorg.pixelWrittenAfterStrongDiv = Integer.MIN_VALUE;
     }
     //set the cursors
+    if(xpCursor1New >=0){
+      xpCursor1 = xpCursor1New;
+      xpCursor1New = -1;
+    }
+    if(xpCursor2New >=0){
+      xpCursor2 = xpCursor2New;
+      xpCursor2New = -1;
+    }
     if(xpCursor1 >=0){
       int xpCursor = size.x - xpCursor1;
       g.copyArea(cursorStore1, xpCursor, 0);
@@ -547,8 +557,9 @@ public class SwtCurveView extends GralCurveView
       }
       addPaintListener(paintListener);
       addFocusListener(focusListener);
-      addMouseListener(mouseLeftButtonListener);
-      addMouseMoveListener(mouseMoveListener);
+      addMouseListener(mouseListenerCurve);
+      //addMouseListener(mouseLeftButtonListener);
+      //addMouseMoveListener(mouseMoveListener);
       //widgSwt = this;
     }
     
@@ -667,7 +678,7 @@ public class SwtCurveView extends GralCurveView
               //System.out.println("mid-bottom");
             }
           } else { //middle range y
-            moveCursors(e.x);
+            setCursors(e.x);
           }
           SwtCurveView.super.setPaintAllCmd();   //
         } catch(Exception exc){

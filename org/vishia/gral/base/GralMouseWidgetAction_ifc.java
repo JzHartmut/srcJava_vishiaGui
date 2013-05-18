@@ -55,13 +55,13 @@ public interface GralMouseWidgetAction_ifc
    * @param xMousePixel
    * @param yMousePixel
    */
-  void mouse1Down(int key, int xMousePixel, int yMousePixel, GralWidget widgg);
+  void mouse1Down(int key, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg);
   
-  void mouse1Up(int key, int xMousePixel, int yMousePixel, GralWidget widgg);
+  void mouse1Up(int key, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg);
   
-  void mouse2Down(int key, int xMousePixel, int yMousePixel, GralWidget widgg);
+  void mouse2Down(int key, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg);
   
-  void mouse2Up(int key, int xMousePixel, int yMousePixel, GralWidget widgg);
+  void mouse2Up(int key, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg);
   
   /**It is called if the mouse button is pressed, and then the mouse cursor is removed from the widget.
    * The mouse-button-up action won't be called then. Usual the user should done its action
@@ -69,6 +69,18 @@ public interface GralMouseWidgetAction_ifc
    * because on button-up the hit widget should be marked visible firstly. 
    * 
    */
-  void removeMouseCursorFromWidgetWhilePressed();
+  //void removeMouseCursorFromWidgetWhilePressed();
 
+  
+  
+  /**This routine is called only if a mouse button is pressed while moving the mouse cursor.
+   * @param xMousePixel The current mouse cursor x value
+   * @param yMousePixel The current mouse cursor y value
+   * @param xWidgetSizePixel Width of the associated widget.
+   * @param yWidgetSizePixel Height of the associated widget.
+   * @return true if the mouse should be still accepted as pressed, 
+   *   false if the mouse button up action should be prevented. The mouse is not accepted as pressed any more. 
+   */
+  boolean mouseMoved(int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel);
+  
 }

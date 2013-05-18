@@ -311,22 +311,28 @@ public abstract class GralButton extends GralWidget
       
     }
     
-    @Override
-    public void removeMouseCursorFromWidgetWhilePressed()
-    {
-      setActivated(false);
-      
+
+    @Override public boolean mouseMoved(int xMousePixel, int yMousePixel, int sizex, int sizey){
+      if(  xMousePixel < 0 || xMousePixel > sizex
+          || yMousePixel < 0 || yMousePixel > sizey
+          ){ //the mouse cursor has left the area of the widget:
+        setActivated(false);
+        return false;
+      }
+      else return true;
     }
 
+    
+    
 
     @Override
-    public void mouse1Down(int keyCode, int xMousePixel, int yMousePixel, GralWidget widgg)
+    public void mouse1Down(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
     {
       setActivated(true);
     }
 
 
-    @Override public void mouse1Up(int keyCode, int xMousePixel, int yMousePixel, GralWidget widgg)
+    @Override public void mouse1Up(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
     {
       setActivated(false);
       //On -> Off -> Disabled -> On
@@ -335,11 +341,12 @@ public abstract class GralButton extends GralWidget
         else if(bThreeStateSwitch && switchState == kOff){ switchState = kDisabled; }
         else { switchState = kOn; }
       }
+      widgg.repaint(100, 200);
     }
 
 
     @Override
-    public void mouse2Down(int keyCode, int xMousePixel, int yMousePixel, GralWidget widgg)
+    public void mouse2Down(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
     {
       // TODO Auto-generated method stub
       
@@ -347,7 +354,7 @@ public abstract class GralButton extends GralWidget
 
 
     @Override
-    public void mouse2Up(int keyCode, int xMousePixel, int yMousePixel, GralWidget widgg)
+    public void mouse2Up(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
     {
       // TODO Auto-generated method stub
       

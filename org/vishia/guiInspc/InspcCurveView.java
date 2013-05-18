@@ -44,6 +44,7 @@ public final class InspcCurveView
   /**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
    * Changes:
    * <ul>
+   * <li>2013-05-19 Hartmut new: {@link #actionTrackSelected} with ctrl and left mouse pressed
    * <li>2013-05-15 Hartmut new: Presentation of value on cursor
    * <li>2013-05-14 Hartmut chg: 12 Tracks instead 10. A variableWindowSize cause problems (TODO)
    * <li>2013-05-14 Hartmut progress: {@link #actionSwapVariable}, {@link #actionShiftVariable}
@@ -88,7 +89,7 @@ public final class InspcCurveView
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public final static int version = 20130514;
+  public final static int version = 20130517;
 
   public static String sBtnReadCfg = "read cfg";
   
@@ -178,7 +179,7 @@ public final class InspcCurveView
   
   GralTextField widgScale, widgScale0, widgline0;
   
-  GralTextField widgValCursorLeft, widgValCursorRight;
+  GralTextField widgValCursorLeft, widgValCursorRight; ///
   
   GralButton widgBtnUp, widgBtnDn, widgBtnScale, widgBtnReadCfg, widgBtnSaveCfg;
   
@@ -244,6 +245,8 @@ public final class InspcCurveView
     //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 0, 'd');
     gralMng.setPosition(0, -2, 0, posright, 0, 'd');
     widgCurve = gralMng.addCurveViewY(sName, 3000, 10);
+    widgCurve.setActionMoveCursor(actionShowCursorValues);
+    widgCurve.setActionTrackSelected(actionTrackSelected);
     gralMng.setPosition(0, GralPos.size +2, posright, 0, 0, 'd', 0);
     gralMng.addText("curve variable");
     for(int ii=0; ii<tracks.length; ++ii){                 ////
@@ -320,12 +323,7 @@ public final class InspcCurveView
       widgCurve.activate( state == GralButton.kOn);
       widgCurve.refreshFromVariable(variables);
     }
-    if(trackScale !=null){
-      float valueCursorLeft = trackScale.trackView.getValueCursorLeft();
-      float valueCursorRight = trackScale.trackView.getValueCursorRight();
-      widgValCursorLeft.setText("" + valueCursorLeft);
-      widgValCursorRight.setText("" + valueCursorRight);
-    }
+    actionShowCursorValues.exec(0, widgCurve);
   }
   
   
@@ -528,24 +526,7 @@ public final class InspcCurveView
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       GralWidget widg = (GralWidget)widgd;
       if(actionCode == KeyCode.mouse1Down || actionCode == KeyCode.menuEntered){
-        if(trackScale !=null){
-          //last variable
-          trackScale.widgVarPath.setBackColor(GralColor.getColor("wh"),0);
-          if(trackScale.trackView !=null){
-            trackScale.trackView.setLineProperties(trackScale.colorCurve, 1, 0);
-          }
-        }
-        trackScale = (TrackValues)widgd.getContentInfo();
-        if(trackScale.trackView == null){
-          trackScale.trackView = widgCurve.initTrack(sName, null, trackScale.colorCurve, 0, 50, 5000.0f, 0.0f);
-        }
-        //colorLineTrackSelected = trackScale.trackView.getLineColor();
-        trackScale.trackView.setLineProperties(trackScale.colorCurve, 3, 0);
-        trackScale.widgVarPath.setBackColor(GralColor.getColor("lam"),0);
-        widgScale.setText("" + trackScale.trackView.getScale7div());
-        widgScale0.setText("" + trackScale.trackView.getOffset());
-        widgline0.setText("" + trackScale.trackView.getLinePercent());
-        widgCurve.repaint();
+        chgSelectedTrack((TrackValues)widgd.getContentInfo());
       }
       else if(actionCode == (KeyCode.mouse1Down | KeyCode.ctrl)){
         if(trackScale !=null){
@@ -752,6 +733,66 @@ public final class InspcCurveView
     }
   } };
 
+  
+  public GralUserAction actionShowCursorValues = new GralUserAction("actionShowCursorValues"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
+      if(trackScale !=null){
+        float valueCursorLeft = trackScale.trackView.getValueCursorLeft();
+        float valueCursorRight = trackScale.trackView.getValueCursorRight();
+        widgValCursorLeft.setText("" + valueCursorLeft);
+        widgValCursorRight.setText("" + valueCursorRight);
+      }
+      return true;
+    }
+  };
+ 
+  
+
+  public GralUserAction actionTrackSelected = new GralUserAction("actionTrackSelected"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
+      GralCurveViewTrack_ifc trackNew = (GralCurveViewTrack_ifc)params[0];
+      if(trackScale !=null && trackScale.trackView == trackNew) return true;  //do nothing.
+      else {
+        TrackValues trackValueNew = null;
+        for(TrackValues trackValue: tracks){
+          if(trackValue.trackView == trackNew){
+            trackValueNew = trackValue;
+            break;
+          }
+        }
+        if(trackValueNew !=null){
+          chgSelectedTrack(trackValueNew);
+        }
+      }
+      return true;
+    }
+  };
+ 
+  
+
+  protected void chgSelectedTrack(TrackValues trackNew){
+    if(trackScale !=null){
+      //last variable
+      trackScale.widgVarPath.setBackColor(GralColor.getColor("wh"),0);
+      if(trackScale.trackView !=null){
+        trackScale.trackView.setLineProperties(trackScale.colorCurve, 1, 0);
+      }
+    }
+    trackScale = trackNew; //(TrackValues)widgd.getContentInfo();
+    if(trackScale.trackView == null){
+      trackScale.trackView = widgCurve.initTrack(sName, null, trackScale.colorCurve, 0, 50, 5000.0f, 0.0f);
+    }
+    //colorLineTrackSelected = trackScale.trackView.getLineColor();
+    trackScale.trackView.setLineProperties(trackScale.colorCurve, 3, 0);
+    trackScale.widgVarPath.setBackColor(GralColor.getColor("lam"),0);
+    widgScale.setText("" + trackScale.trackView.getScale7div());
+    widgScale0.setText("" + trackScale.trackView.getOffset());
+    widgline0.setText("" + trackScale.trackView.getLinePercent());
+    widgCurve.repaint(100, 200);
+
+  }
+  
+  
   
   
   protected void showValues(){

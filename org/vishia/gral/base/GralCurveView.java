@@ -15,9 +15,12 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralCurveViewTrack_ifc;
 import org.vishia.gral.ifc.GralCurveView_ifc;
 import org.vishia.gral.ifc.GralSetValue_ifc;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.mainCmd.Report;
 import org.vishia.mainCmd.ReportWrapperLog;
 import org.vishia.util.Assert;
+import org.vishia.util.KeyCode;
 import org.vishia.util.Timeshort;
 import org.vishia.zbnf.ZbnfJavaOutput;
 import org.vishia.zbnf.ZbnfParser;
@@ -33,6 +36,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-05-19 Hartmut new: {@link GralCurveViewMouseAction}
+   * <li>2013-05-19 Hartmut new: {@link #selectTrack(int, int, int, int)} with ctrl and left mouse pressed
    * <li>2013-05-14 Hartmut new: {@link Track#getIxTrack()}
    * <li>2013-03-27 Hartmut bugfix: The {@link #bNewGetVariables} have to be set in {@link #setDataPath(String)} and 
    *   {@link #applySettings(String)} because this methods sets a new variable which should be searched. 
@@ -245,10 +250,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
 
     
     @Override public float getValueCursorLeft(){ 
-      float value;
+      float value; ///
       try{
-        int ixDataWrap = outer.ixDataShown[outer.xpCursor1];
-        int ixData = (ixDataWrap >> outer.shIxiData) & outer.mIxiData;
+        int ixData = outer.getIxDataFromPixelRight(outer.xpCursor1);
         value = values[ixData]; 
       } catch(Exception exc){
         value = 77777.7f;
@@ -261,8 +265,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     @Override public float getValueCursorRight(){
       float value;
       try{
-        int ixDataWrap = outer.ixDataShown[outer.xpCursor2];
-        int ixData = (ixDataWrap >> outer.shIxiData) & outer.mIxiData;
+        int ixData = outer.getIxDataFromPixelRight(outer.xpCursor2);
         value = values[ixData]; 
       } catch(Exception exc){
         value = 77777.7f;
@@ -443,6 +446,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   /**All tracks. */
   protected final List<Track> listTracks = new ArrayList<Track>();
   
+  
+  /**The track which is selected by the last setCursor. */
+  protected Track trackSelected;
+  
   /**All tracks to return for filling. It has the same members in the same order like {@link #listTracks}*/
   protected final List<GralSetValue_ifc> listTrackSet = new LinkedList<GralSetValue_ifc>();
   
@@ -564,9 +571,13 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   
   /**Pixel from right for the cursor1 and cursor2. If -1 then the cursor is unused yet.
-  */
-  protected int xpCursor1 = -1, xpCursor2 = -1;
-  
+   */
+   protected int xpCursor1 = -1, xpCursor2 = -1;
+   
+  /**New Pixel position for a cursor1 and cursor2. If >=0 then a new position is given.
+   */
+  protected int xpCursor1New = -1, xpCursor2New = -1;
+    
   /**During mouse move, internal use. */
   protected boolean bMouseDownCursor1, bMouseDownCursor2;
   
@@ -635,9 +646,16 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   protected boolean redrawBecauseNewData;
   
   
+  /**This action is called whenever a cursor position is changed. */
+  private GralUserAction actionMoveCursor;
 
 
+  /**This action is called whenever a track was selected. */
+  private GralUserAction actionSelectTrack;
 
+
+  
+  
 
   public GralCurveView(String sName, GralMng mng, int maxNrofXvaluesP, int XXXnrofTracks)
   {
@@ -665,9 +683,33 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     //values = new float[maxNrofXvalues][nrofTracks];
     setPanelMng(mng);
     timeorg.calc();
+
     mng.registerWidget(this);
   }
 
+  
+  /**It will be called after construction of the implementation graphic in the derived ctor.
+   * 
+   */
+  protected void initMenuContext(){
+    GralMenu menuCurve = getContextMenu();
+    //menuCurve.addMenuItemGthread("pause", "pause", null);
+    menuCurve.addMenuItemGthread("go", "go", actionGo);
+    //menuCurve.addMenuItemGthread("zoomOut", "zoom in", null);
+    menuCurve.addMenuItemGthread("zoomBetweenCursor", "zoom between Cursors", actionZoomBetweenCursors);
+    menuCurve.addMenuItemGthread("zoomOut", "zoom out", actionZoomOut);
+    //menuCurve.addMenuItemGthread("zoomOut", "to left", null);
+    //menuCurve.addMenuItemGthread("zoomOut", "to right", null);
+    
+  }
+  
+  /**This action will be called whenever a cursor position is changed. */
+  public void setActionMoveCursor(GralUserAction action){ actionMoveCursor = action; }
+  
+  
+  /**This action will be called whenever a track was selected. */
+  public void setActionTrackSelected(GralUserAction action){ actionSelectTrack = action; }
+  
   
   /**Initializes a track of the curve view.
    * This routine should be called after construction, only one time per track
@@ -735,6 +777,14 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    * calling {@link #setSample(float[])}.
    */
   public List<? extends GralCurveViewTrack_ifc> getTrackInfo(){ return listTracks; }
+  
+  
+  
+  /**Returns that track which was selected by set cursor at last.
+   * @return null if a track was not selected up to now, elsewhere one of the created tracks.
+   */
+  public Track getTrackSelected(){ return trackSelected; }
+  
   
   public long timeAtCursorLeft(){
     int ixData;
@@ -828,7 +878,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
 
     if(!bFreeze){
       redrawBecauseNewData = true;
-      repaint(20,50);
+      repaint(50,100);
     }
     //getDisplay().wake();  //wake up the GUI-thread
     //values.notify();
@@ -987,11 +1037,11 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
           }
           nrofPixel4Data += (ixp3 - ixp);
           ixp = ixp3; 
-          if(xpCursor1 == cmdSetCursor && ixData == ixDataCursor1){
-            xpCursor1 = ixp;                  //set cursor xp if the data index is gotten.
+          if(xpCursor1New == cmdSetCursor && ixData == ixDataCursor1){
+            xpCursor1New = ixp;                  //set cursor xp if the data index is gotten.
           }
-          if(xpCursor2 == cmdSetCursor && ixData == ixDataCursor2){
-            xpCursor2 = ixp;
+          if(xpCursor2New == cmdSetCursor && ixData == ixDataCursor2){
+            xpCursor2New = ixp;
           }
         }
       } while( ixp == ixp2   //all values for the same 1 pixel
@@ -1165,36 +1215,104 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   }
   
   
-  
-  protected void moveCursors(int xPos){
-    //System.out.println("middle");
-    int xr = sizepos.xPixelCurve - xPos;  //from right
-    if(xpCursor1 < 0){
-      xpCursor1 = xr;
-      bMouseDownCursor1 = true;
-    } else if(xpCursor2 < 0){
-      xpCursor2 = xr;
-      bMouseDownCursor2 = true;
-    } else { //decide which cursor
-      if(xpCursor1 < xpCursor2){
-        int xp = xpCursor1;      //swap
-        xpCursor1 = xpCursor2;
-        xpCursor2 = xp;
-      }
-      int xm = (xpCursor1 + xpCursor2) /2;
-      if(xr > xm){ //more left
-        xpCursor1 = xr;
-        bMouseDownCursor1 = true;
-        //System.out.println("SwtCurveView.mouseDown; cursor1");
-      } else {
-        xpCursor2 = xr;
-        bMouseDownCursor2 = true;
-        //System.out.println("SwtCurveView.mouseDown; cursor1");
-      }
-    }
-
+  /**Gets the index in data with given pixel position in the graphic.
+   * The wrapping index in the data is contained in {@link #ixDataShown}.
+   * @param ixw pixel position countered from right side.
+   * @return
+   */
+  protected int getIxDataFromPixelRight(int ixPixelFromRight){
+    int ixDataWrap = ixDataShown[ixPixelFromRight];
+    int ixData = (ixDataWrap >> shIxiData) & mIxiData;
+    return ixData;
   }
   
+  
+  protected void selectTrack(int xpos, int ypos, int xsize, int ysize){
+    int ixData = getIxDataFromPixelRight(xsize - xpos);  //index countered from right to left
+    int minFound = Integer.MAX_VALUE;
+    Track foundTrack = null;
+    for(Track track: listTracks){  //NOTE: break inside.
+      float val = track.values[ixData];
+      float yFactor = ysize / -10.0F / track.yScale;  //y-scaling
+      float y0Pix = (1.0F - track.y0Line/100.0F) * ysize; //y0-line
+      
+      int yp = (int)((val - track.yOffset) * yFactor + y0Pix);
+      int diff = Math.abs(yp - ypos);
+      if(diff < minFound){
+        foundTrack = track;
+        minFound = diff;
+      }
+    }
+    if(foundTrack !=null){
+      trackSelected = foundTrack;
+      if(actionSelectTrack !=null){
+        actionSelectTrack.exec(0, this, trackSelected);
+      }
+    }
+  }
+  
+  
+  
+  protected void setCursors(int xPos){
+    //System.out.println("middle");
+    int xr = sizepos.xPixelCurve - xPos;  //from right
+    if(xpCursor1 < 0){  //the right cursor
+      xpCursor1New = xr;
+      bMouseDownCursor1 = true;
+      bMouseDownCursor2 = false;
+    } else if(xpCursor2 < 0){
+      xpCursor2New = xr;
+      bMouseDownCursor2 = true;
+      bMouseDownCursor1 = false;
+    } else { //decide which cursor
+      //use the new changed value if not processed in graphic yet or the current cursor.
+      int x1 = xpCursor1New >=0 ? xpCursor1New: xpCursor1;
+      int x2 = xpCursor2New >=0 ? xpCursor2New: xpCursor2;
+      if(x1 < x2){
+        int xp = x1;      //swap
+        xpCursor1New = x2;
+        xpCursor2New = xp;
+        //System.out.printf("GralCurveView - setCursors - swap; xC1=%d; xC2=%d\n", x2, xp);
+      }
+      int xm = (x1 + x2) /2;
+      if(xr > xm){ //more left
+        xpCursor1New = xr;
+        bMouseDownCursor1 = true;
+        bMouseDownCursor2 = false;
+        //System.out.printf("GralCurveView - setCursors; cursor1=%d\n", xr);
+      } else {
+        xpCursor2New = xr;
+        bMouseDownCursor2 = true;
+        bMouseDownCursor1 = false;
+        //System.out.printf("GralCurveView - setCursors; cursor2=%d\n", xr);
+      }
+    }
+    repaint(50,100);
+    if(actionMoveCursor !=null){
+      actionMoveCursor.exec(0, this);
+    }
+  }
+  
+  
+  
+  protected void moveCursor(int xMousePixel){
+    int xr = sizepos.xPixelCurve - xMousePixel;  //from right
+    if(bMouseDownCursor1){
+      xpCursor1New = xr;  //from right;
+      //System.out.println("SwtCurveView.mouseMove - cursor1; xr=" + xr);
+      repaint(50,100);
+    } else if(bMouseDownCursor2){
+      xpCursor2New = xr;  //from right;
+      //System.out.println("SwtCurveView.mouseMove - cursor2; xr=" + xr);
+      repaint(50,100);
+    } else {
+      //System.out.println("SwtCurveView.mouseMove x,y=" + e.x + ", " + e.y);
+        
+    }
+    if(actionMoveCursor !=null){
+      actionMoveCursor.exec(0, this);
+    }
+  }
 
   
   /**Zooms the curve presentation with same index right with a lesser time spread. 
@@ -1207,9 +1325,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     if(xpCursor2 >=0){
       ixDataCursor2 = ixDataShown[xpCursor2];
     }
-    xpCursor1 = xpCursor2 = cmdSetCursor;  
+    xpCursor1New = xpCursor2New = cmdSetCursor;  
     timeorg.timeSpread /=2;    //half timespread
-    //System.out.println("right-top");
+    bPaintAllCmd = true;
+    repaint(100, 200);
   }
   
   
@@ -1227,9 +1346,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     if(xpCursor2 >=0){
       ixDataCursor2 = ixDataShown[xpCursor2];
     }
-    xpCursor1 = xpCursor2 = cmdSetCursor;  
+    xpCursor1New = xpCursor2New = cmdSetCursor;  
     timeorg.timeSpread *=2;    //double timespread
-    //System.out.println("left-top");
+    bPaintAllCmd = true;
+    repaint(100, 200);
 
   }
   
@@ -1252,7 +1372,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     } else {
       stop();
     }
-    xpCursor1 = xpCursor2 = cmdSetCursor;  
+    xpCursor1New = xpCursor2New = cmdSetCursor;  
+    repaint(100, 200);
 
   }
   
@@ -1289,8 +1410,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     timeSpread = (time2 - time1) * 5;
     */
     Assert.check(timeorg.timeSpread >0);
-    xpCursor1 = xpCursor2 = cmdSetCursor;  
-
+    xpCursor1New = xpCursor2New = cmdSetCursor;  
+    repaint(100, 200);
   }
   
 
@@ -1303,18 +1424,27 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       //assume that the same time is used for actual shown data spread as need
       //for the future.
       
-      int timeRight = timeValues[(ixDataShowRight >> shIxiData) & mIxiData];
-      int timeRightNew = timeRight + timeorg.timeSpread * 7/8;
+      //int timeRight = timeValues[(ixDataShowRight >> shIxiData) & mIxiData];
+      //int timeRightNew = timeRight + timeorg.timeSpread * 7/8;
       
-      //int ixdDataSpread = ixDataShowRight - ixDataShown[nrofValuesShow * 7/8];
-      //ixDataShowRight += ixdDataSpread;
-      //if((ixDataShowRight - ixDataWr) > 0 && (ixDataShowRight - ixDataWr) < ixdDataSpread * 2) {
+      int ixdDataSpread = ixDataShowRight - ixDataShown[sizepos.xPixelCurve * 5/8];
+      if((ixDataShowRight - ixDataWr)<0 && (ixDataShowRight - ixDataWr + ixdDataSpread) >=0){
         //right end reached.
         ixDataShowRight = ixDataWr;
         bFreeze = false;
+      } else {
+        ixDataShowRight += ixdDataSpread;
+      }
+      //ixDataShowRight += ixdDataSpread;
+      //if((ixDataShowRight - ixDataWr) > 0 && (ixDataShowRight - ixDataWr) < ixdDataSpread * 2) {
+        //right end reached.
+        //ixDataShowRight = ixDataWr;
+        //bFreeze = false;
         //ixDataShowRight1 = ixDataWr + ixdDataSpread;
       //}
       //ixDataShowRight += ixDataShown[0] - ixDataShown[nrofValuesShow-1]; 
+      repaint(100, 200);
+  
     }
     //System.out.println("right-bottom");
   }
@@ -1329,7 +1459,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       bFreeze = true;
       //now ixDataShow remain unchanged.
     } else {
-      int ixdDataSpread = ixDataShowRight - ixDataShown[sizepos.xPixelCurve * 8/10];
+      int ixdDataSpread = ixDataShowRight - ixDataShown[sizepos.xPixelCurve * 5/10];
       //int ixDataShowRight1 = ixDataShown[nrofValuesShow * 7/8];
       //int ixdDataSpread = ixDataShowRight - ixDataShowRight1;
       ixDataShowRight -= ixdDataSpread;
@@ -1338,23 +1468,59 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
         ixDataShowRight = ixDataWr + ixdDataSpread;
       }
     }
+    repaint(100, 200);
     //System.out.println("left-bottom");
 
   }
   
   
   
+  protected void mouseSelectCursur(int xMousePixel, int yMousePixel){
+    
+  }
+  
+  
+  
+  
   protected class GralCurveViewMouseAction implements GralMouseWidgetAction_ifc {
 
-    @Override
-    public void mouse1Down(int key, int xMousePixel, int yMousePixel, GralWidget widgg)
-    { ////
-      // TODO Auto-generated method stub
-      
+    @Override public void mouse1Down(int key, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
+    { 
+      if(xMousePixel < xWidgetSizePixel / 20 && yMousePixel > yWidgetSizePixel * 95/100){ 
+        //left side top
+        System.out.println("GralCurveView-Mousedown left bottom");
+        viewToPast(); 
+      } else if(xMousePixel > xWidgetSizePixel * 95 / 100 && yMousePixel > yWidgetSizePixel * 95/100){ 
+        //right side top
+        //System.out.println("GralCurveView-Mousedown rigth bottom");
+        viewToPresent(); 
+      } else if(xMousePixel < xWidgetSizePixel / 20 && yMousePixel < yWidgetSizePixel / 20){ 
+        //left side top
+        System.out.println("GralCurveView-Mousedown left top");
+        zoomToPast(); 
+      } else if(xMousePixel > xWidgetSizePixel * 95 / 100 && yMousePixel < yWidgetSizePixel / 20){ 
+        //right side top
+        //System.out.println("GralCurveView-Mousedown rigth top");
+        zoomToPresent(); 
+      } else if(xMousePixel > xWidgetSizePixel * 95/100){ //right side
+        //System.out.println("GralCurveView-Mousedown right");
+        
+      } else {
+        setCursors(xMousePixel);
+        if((key & KeyCode.mAddKeys) ==KeyCode.ctrl){
+          selectTrack(xMousePixel, yMousePixel, xWidgetSizePixel, yWidgetSizePixel);
+        }
+      }
+    }
+
+    @Override public void mouse1Up(int key, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
+    {
+      bMouseDownCursor1 = bMouseDownCursor2 = false;
+      //System.out.println("GralCurveView - MouseUp; ");
     }
 
     @Override
-    public void mouse1Up(int key, int xMousePixel, int yMousePixel,
+    public void mouse2Down(int key, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel,
         GralWidget widgg)
     {
       // TODO Auto-generated method stub
@@ -1362,15 +1528,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     }
 
     @Override
-    public void mouse2Down(int key, int xMousePixel, int yMousePixel,
-        GralWidget widgg)
-    {
-      // TODO Auto-generated method stub
-      
-    }
-
-    @Override
-    public void mouse2Up(int key, int xMousePixel, int yMousePixel,
+    public void mouse2Up(int key, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel,
         GralWidget widgg)
     {
       // TODO Auto-generated method stub
@@ -1385,14 +1543,42 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       
     }
 
-    @Override
-    public void removeMouseCursorFromWidgetWhilePressed()
+    @Override public boolean mouseMoved(int xMousePixel, int yMousePixel, int xWidgetPixelSize, int yWidgetPixelSize)
     {
-      // TODO Auto-generated method stub
-      
+      moveCursor(xMousePixel);
+      return true;
     }
+
     
   }
   
-  
+  public GralUserAction actionZoomBetweenCursors = new GralUserAction("actionZoomBetweenCursors"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        zoomBetweenCursors();
+      }
+      return true;
+    }
+  };
+
+  public GralUserAction actionZoomOut = new GralUserAction("actionZoomOut"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        cursorUnzoom();
+      }
+      return true;
+    }
+  };
+
+
+  public GralUserAction actionGo = new GralUserAction("actionGo"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        ixDataShowRight = ixDataWr;
+        bFreeze = false;
+      }
+      return true;
+    }
+  };
+
 }

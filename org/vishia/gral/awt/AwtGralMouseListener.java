@@ -2,6 +2,7 @@ package org.vishia.gral.awt;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
@@ -139,7 +140,7 @@ public class AwtGralMouseListener
     
     
     
-    private final GralMouseWidgetAction_ifc mouseWidgetAction;
+    protected final GralMouseWidgetAction_ifc mouseWidgetAction;
     
     
     /**Constructor.
@@ -164,7 +165,7 @@ public class AwtGralMouseListener
       GralWidget widgg = (GralWidget)widget.getData();
       GralUserAction action = widgg ==null ? null : widgg.getActionChange();
       if(action !=null){
-        action.userActionGui(KeyCode.mouse1Double, widgg);
+        action.exec(KeyCode.mouse1Double, widgg);
       }
     }
 
@@ -176,8 +177,8 @@ public class AwtGralMouseListener
       Component widget = e.getComponent();
       AwtWidget widgetAwt = (AwtWidget)widget;
       widget.addMouseMotionListener(mouseMoveListener);
-      GralWidget widgg = (GralWidget)widgetAwt.getData();
-      GralMng guiMng = widgg.getMng();
+      GralWidget widgg = (GralWidget)widgetAwt.getData();  //maybe null
+      Dimension size = widget.getSize();
       try{ 
         final int keyCode;
         switch(e.getButton()){ 
@@ -188,15 +189,15 @@ public class AwtGralMouseListener
         }
         if(mouseWidgetAction !=null){
           switch(e.getButton()){ 
-            case 1: mouseWidgetAction.mouse1Down(keyCode, xMousePress, yMousePress, widgg); break;
-            case 2: mouseWidgetAction.mouse2Down(keyCode, xMousePress, yMousePress, widgg); break;
+            case 1: mouseWidgetAction.mouse1Down(keyCode, xMousePress, yMousePress, size.width, size.height, widgg); break;
+            case 2: mouseWidgetAction.mouse2Down(keyCode, xMousePress, yMousePress, size.width, size.height, widgg); break;
           }  
         }
         GralUserAction action = widgg ==null ? null : widgg.getActionChange();
         if(action !=null){
           action.exec(keyCode, widgg);
         }
-      } catch(Exception exc){ guiMng.writeLog(0, exc); }
+      } catch(Exception exc){ System.err.printf("AwtGralMouseListener - any exception while mouse down; %s\n", exc.getMessage()); }
     }
 
     
@@ -208,6 +209,7 @@ public class AwtGralMouseListener
       if(isPressed){
         Component widget = e.getComponent();
         AwtWidget widgetAwt = (AwtWidget)widget;
+        Dimension size = widget.getSize();
         GralWidget widgg = (GralWidget)widgetAwt.getData();
         widget.removeMouseMotionListener(mouseMoveListener);
         isPressed = false;
@@ -220,19 +222,18 @@ public class AwtGralMouseListener
         }
         if(mouseWidgetAction !=null){
           switch(e.getButton()){ 
-            case 1: mouseWidgetAction.mouse1Up(keyCode, e.getX(), e.getY(), widgg); break;
-            case 2: mouseWidgetAction.mouse2Up(keyCode, e.getX(), e.getY(), widgg); break;
+            case 1: mouseWidgetAction.mouse1Up(keyCode, e.getX(), e.getY(), size.width, size.height, widgg); break;
+            case 2: mouseWidgetAction.mouse2Up(keyCode, e.getX(), e.getY(), size.width, size.height, widgg); break;
           }  
         }
         backgroundWhilePressed = null;
-        GralMng guiMng = widgg.getMng();
         try{ 
           GralUserAction action = widgg ==null ? null : widgg.getActionChange();
           if(action !=null){
             action.exec(keyCode, widgg);
           }
-        } catch(Exception exc){ guiMng.writeLog(0, exc); }
-        widgg.repaint();
+        } catch(Exception exc){ System.err.printf("SwtGralMouseListener - any exception while mouse down; %s\n", exc.getMessage()); }
+        //widgg.repaint();
       }
     }
 
@@ -250,15 +251,13 @@ public class AwtGralMouseListener
           Component widget = e.getComponent();
           AwtWidget widgetAwt = (AwtWidget)widget;
           Rectangle size = widget.getBounds();
-          //xSize = size.x; ySize = size.y;
-          if(  e.getX() < 0 || e.getX() > size.width
-            || e.getY() < 0 || e.getY() > size.height
-            ){
-            isPressed = false;
-            widget.removeMouseMotionListener(mouseMoveListener);
-            if(mouseWidgetAction !=null){
-              mouseWidgetAction.removeMouseCursorFromWidgetWhilePressed();
+          if(mouseWidgetAction !=null){
+            if(!mouseWidgetAction.mouseMoved(e.getX(), e.getY(), size.x, size.y)){
+              isPressed = false;
+              widget.removeMouseMotionListener(mouseMoveListener);
             }
+            mouseWidgetAction.mouseMoved(e.getX(), e.getY(), size.x, size.y);
+            //mouseWidgetAction.removeMouseCursorFromWidgetWhilePressed();
           }
         } 
       }//method mouseDragged

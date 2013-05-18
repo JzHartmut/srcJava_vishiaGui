@@ -55,7 +55,11 @@ public class SwtMenu extends GralMenu
           widgg = (GralWidget)oGralWidg;
         } else { widgg = null; }
       } else { widgg = null; }
-      action.exec(KeyCode.menuEntered, widgg);
+      try{
+        action.exec(KeyCode.menuEntered, widgg);
+      } catch(Exception exc){
+        System.err.printf("GralMenu - unexpected exception; %s\n", exc.getMessage());
+      }
     }
   }
   

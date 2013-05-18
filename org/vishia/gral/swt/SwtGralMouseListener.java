@@ -179,13 +179,13 @@ public class SwtGralMouseListener
     
     /**Used in the implementation level for the paint routine. Therefore it is package private.
      */
-    boolean isPressed;
+    private boolean isPressed;
     
     
     
     /**A standard action for a specific widget for example button, which is executed
      * independently and additional to the user action. */
-    private final GralMouseWidgetAction_ifc mouseWidgetAction;
+    protected final GralMouseWidgetAction_ifc mouseWidgetAction;
     
     
     /**Constructor.
@@ -229,9 +229,10 @@ public class SwtGralMouseListener
       xMousePress = e.x;
       yMousePress = e.y;
       Control widget = (Control) e.widget;  //a widget is a Control always.
+      Point size = widget.getSize();
       widget.addMouseMoveListener(mouseMoveListener);
       GralWidget widgg = (GralWidget)widget.getData();
-      GralMng guiMng = widgg.getMng();
+      //GralMng guiMng = widgg.getMng();
       final int keyMouse;
       switch(e.button){ 
         case 1: keyMouse = KeyCode.mouse1Down; break; 
@@ -243,8 +244,8 @@ public class SwtGralMouseListener
       try{ 
         if(mouseWidgetAction !=null){
           switch(e.button){ 
-            case 1: mouseWidgetAction.mouse1Down(keyMouse, xMousePress, yMousePress, widgg); break;
-            case 2: mouseWidgetAction.mouse2Down(keyMouse, xMousePress, yMousePress, widgg); break;
+            case 1: mouseWidgetAction.mouse1Down(keyCode, xMousePress, yMousePress, size.x, size.y, widgg); break;
+            case 2: mouseWidgetAction.mouse2Down(keyCode, xMousePress, yMousePress, size.x, size.y, widgg); break;
           }  
         }
         GralUserAction action = widgg ==null ? null : widgg.getActionChange();
@@ -252,7 +253,7 @@ public class SwtGralMouseListener
           
           action.exec(keyCode, widgg);
         }
-      } catch(Exception exc){ guiMng.writeLog(0, exc); }
+      } catch(Exception exc){ System.err.printf("SwtGralMouseListener - any exception while mouse down; %s\n", exc.getMessage()); }
     }
 
     
@@ -261,13 +262,15 @@ public class SwtGralMouseListener
     @Override public void mouseUp(MouseEvent e) {
       //set the background color to the originally value again if it was changed.
       super.mouseUp(e);
-      //if(isPressed){
+      if(isPressed){  //prevent any action of mouse up if the mouse is not designated as pressed
+        //especially if the mouse was removed from the widget.
         Control widget = (Control)e.widget;
+        Point size = widget.getSize();
         widget.removeMouseMoveListener(mouseMoveListener);
         isPressed = false;
         backgroundWhilePressed = null;
-        GralWidget widgg = (GralWidget)widget.getData();
-        GralMng guiMng = widgg.getMng();
+        GralWidget widgg = (GralWidget)widget.getData();  //maybe null
+        //GralMng guiMng = widgg.getMng();
         try{ 
           int dx = e.x - xMousePress, dy = e.y - yMousePress;
           final int keyMouse;
@@ -283,19 +286,20 @@ public class SwtGralMouseListener
           }
           final int keyCode = SwtGralKey.convertFromSwt(keyMouse, e.stateMask);
           if(mouseWidgetAction !=null){
-            switch(e.button + moved){ 
-              case 1: mouseWidgetAction.mouse1Up(keyCode, e.x, e.y, widgg); break;
-              case 2: mouseWidgetAction.mouse2Up(keyCode, e.x, e.y, widgg); break;
+            switch(e.button){ 
+              case 1: mouseWidgetAction.mouse1Up(keyCode, e.x, e.y, size.x, size.y, widgg); break;
+              case 2: mouseWidgetAction.mouse2Up(keyCode, e.x, e.y, size.x, size.y, widgg); break;
             }  
           }
           GralUserAction action = widgg ==null ? null : widgg.getActionChange();
           if(action !=null){
-            final int keyCode1 = SwtGralKey.convertFromSwt(keyMouse, e.stateMask);
-            action.exec(keyCode1, widgg);
+            action.exec(keyCode, widgg);
           }
-        } catch(Exception exc){ guiMng.writeLog(0, exc); }
-        widgg.repaint();
-      //}
+        } catch(Exception exc){ System.err.printf("SwtGralMouseListener - any exception while mouse down; %s\n", exc.getMessage()); }
+        if(widgg !=null){
+          //widgg.repaint();
+        }
+      }
     }
 
     protected MouseMoveListener mouseMoveListener = new MouseMoveListener()
@@ -306,15 +310,12 @@ public class SwtGralMouseListener
         if(e.widget instanceof Control){
           Control widget = (Control)e.widget;
           Point size = widget.getSize();
-          //xSize = size.x; ySize = size.y;
-          if(  e.x < 0 || e.x > size.x
-            || e.y < 0 || e.y > size.y
-            ){
-            isPressed = false;
-            widget.removeMouseMoveListener(mouseMoveListener);
-            if(mouseWidgetAction !=null){
-              mouseWidgetAction.removeMouseCursorFromWidgetWhilePressed();
+          if(mouseWidgetAction !=null){
+            if(!mouseWidgetAction.mouseMoved(e.x, e.y, size.x, size.y)){
+              isPressed = false;
+              widget.removeMouseMoveListener(mouseMoveListener);
             }
+            //mouseWidgetAction.removeMouseCursorFromWidgetWhilePressed();
           }
         } 
       }//method mouseMove
