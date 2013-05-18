@@ -1,32 +1,23 @@
 package org.vishia.gral.swt;
 
 
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralCurveViewTrack_ifc;
 import org.vishia.gral.ifc.GralRectangle;
-import org.vishia.util.Assert;
 
 
 
@@ -81,10 +72,6 @@ public class SwtCurveView extends GralCurveView
   private final Image cursorStore1, cursorStore2;
   
   
-  /**Only used in drawBackground, true if a paintAll is executed. 
-   * It is outside because inspector-usage. */
-  private boolean paintAllExec;
-  
 
   protected Color gridColor, gridColorStrong;
   
@@ -104,7 +91,6 @@ public class SwtCurveView extends GralCurveView
     //mng.setBounds_(curveSwt); //, dyGrid, dxGrid);
     curveSwt.setGridVertical(10, 5);   //10 data-points per grid line, 50 data-points per strong line.
     curveSwt.setGridHorizontal(50.0F, 5);  //10%-divisions, with 5 sub-divisions
-    curveSwt.setGridColor(mng.propertiesGuiSwt.colorGrid, mng.propertiesGuiSwt.colorGridStrong);
     cursorStore1 = new Image(panelSwt.getDisplay(), 1, 2000);
     cursorStore2 = new Image(panelSwt.getDisplay(), 1, 2000);
     
@@ -113,15 +99,6 @@ public class SwtCurveView extends GralCurveView
     colorCursor = new Color(curveSwt.getDisplay(), 64, 64, 64);
     colorBack = new Color(curveSwt.getDisplay(), 0xff, 0xff, 0xff);
     super.initMenuContext();
-  }
-  
-  @Override public GralCurveViewTrack_ifc initTrack(String sNameTrack, String sDataPath, GralColor color, int style
-      , int nullLine, float scale, float offset)
-  {
-    GralCurveViewTrack_ifc track = super.initTrack(sNameTrack, sDataPath, color, style, nullLine, scale, offset);
-    Color colorSwt = (Color)itsMng.getColorImpl(color);
-    //curveSwt.lineColors[ixLineInit] = colorSwt; //new Color(curveSwt.getDisplay(), (colorValue >>16) & 0xff, (colorValue >>8) & 0xff, (colorValue) & 0xff);  
-    return track;
   }
   
   
@@ -233,7 +210,6 @@ public class SwtCurveView extends GralCurveView
   private int drawShiftAreaToLeft(GC g, Point size, int xView, int dxView, int yView, int dyView, int xViewPart, int timeDiff){
     final int xp0;
     testHelp.ctRedrawBecauseNewData +=1;
-    paintAllExec = false;
     //
     //calculate the number of x-pixel to shift in graphic to left and the width of the range to paint new:
     //
@@ -268,7 +244,6 @@ public class SwtCurveView extends GralCurveView
       //too many new values. Show all
       xViewPart = size.x;
       xp0 = 0;
-      paintAllExec = true;
       testHelp.ctRedrawAllShift +=1;
       xViewLastF = 0.0F;
     } else { //xViewPart <=0
@@ -349,7 +324,6 @@ public class SwtCurveView extends GralCurveView
     //write all tracks.
     g.setLineStyle(SWT.LINE_SOLID);
     int iTrack = 0;
-    int ixData;
     for(Track track: listTracks){
       //draw line per track
       drawTrack(g, size, track, iTrack, ixixDataLast);
@@ -404,13 +378,13 @@ public class SwtCurveView extends GralCurveView
   protected void drawBackground(GC g, Point size, int xView, int yView, int dxView, int dyView) {
     //NOTE: forces stack overflow because calling of this routine recursively: super.paint(g);
     try{
-      boolean redrawBecauseNewData1 = SwtCurveView.super.redrawBecauseNewData;
-      SwtCurveView.super.redrawBecauseNewData = false;  //it is done.
+      boolean redrawBecauseNewData1 = super.redrawBecauseNewData;
+      super.redrawBecauseNewData = false;  //it is done.
       //
       //detect how many new data are given. Because the data are written in another thread,
       //the number of data, the write index are accessed only one time from this
       //Note that ixDataShowRight is set by ixDataWr if the curve is running.
-      int ixDataRight = SwtCurveView.super.ixDataShowRight; 
+      int ixDataRight = super.ixDataShowRight; 
       sizepos.xPixelCurve = size.x;
       sizepos.yPixelCurve = size.y;
       @SuppressWarnings("hiding")
@@ -422,7 +396,7 @@ public class SwtCurveView extends GralCurveView
       final int timeDiff; //time for new values.
       testHelp.xView =xView; testHelp.yView =yView; testHelp.dxView =dxView; testHelp.dyView =dyView;
       //
-      if(!bFreeze && !SwtCurveView.super.bPaintAllCmd && redrawBecauseNewData1) {
+      if(!bFreeze && !super.bPaintAllCmd && redrawBecauseNewData1) {
         //paint only a part of the curve to save calculation time.
         //The curve will be shifted to left.
         //
@@ -445,9 +419,8 @@ public class SwtCurveView extends GralCurveView
         timeCaryOverNewValue = 0;
         timeDiff = (int)(timeorg.timePerPixel * xViewPart);
         xp0 = 0;
-        SwtCurveView.super.bPaintAllCmd = false; //accepted, done
+        super.bPaintAllCmd = false; //accepted, done
         testHelp.ctRedrawAll +=1;
-        paintAllExec = true;
         //xViewLast = 0;
         xViewLastF = 0.0F;
         nrofDataShift.set(0);
@@ -464,7 +437,7 @@ public class SwtCurveView extends GralCurveView
         //This is is normal case if a new value in data has a too less new timestamp.
         //It can't be shown. Await the next values. Any value will be have a more newer timestamp
         //with a great-enough time difference to show it.
-        SwtCurveView.super.nrofValuesLessViewPart +=1;
+        super.nrofValuesLessViewPart +=1;
         //System.out.println("SwtCurveView - xViewPart=0");
       }
       if(nrofValues >0){  //don't work if no data are stored.
@@ -535,14 +508,6 @@ public class SwtCurveView extends GralCurveView
     //private final Color[] lineColors;
     
     
-    private Color gridColor = new Color(getDisplay(), 192, 255, 255);
-    
-    private Color gridColorStrong = new Color(getDisplay(), 128, 255, 255);
-    
-    private final Color colorCursor = new Color(getDisplay(), 64, 64, 64);
-    
-    private final Color colorBack = new Color(getDisplay(), 0xff, 0xff, 0xff);
-    
     public CurveView(Composite parent, int xPixel, int yPixel, int nrofXvalues,
         int nrofTracks){
       super(parent, org.eclipse.swt.SWT.NO_SCROLL|org.eclipse.swt.SWT.NO_BACKGROUND);
@@ -583,11 +548,6 @@ public class SwtCurveView extends GralCurveView
     }
     
     
-    public void setGridColor(Color gridColor, Color gridStrongColor){
-      this.gridColor = gridColor;
-      this.gridColorStrong = gridStrongColor;
-    }
-    
     
     public void redrawData(){
       redrawBecauseNewData = true;
@@ -621,106 +581,6 @@ public class SwtCurveView extends GralCurveView
         focusChanged = true;
       }
     }; 
-
-    
-    MouseListener mouseLeftButtonListener = new MouseListener()
-    { 
-      /**A mouse double-click may call a dialog box for the curve view. TODO.
-       * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
-       */
-      @Override public void mouseDoubleClick(MouseEvent e) {
-      }
-
-    
-      
-      /**If the left button of the mouse is pressed, then the curve is drawn full.
-       * It is a helper to correct the view, because elsewhere only the new area is drawn.
-       * Sometimes it isn't detect whether a full draw is necessary. 
-       * Then the mouse click at the curve area helps. 
-       * 
-       * The left mouse down in designated ranges executes:
-       * <ul>
-       * <li>left top: view more time spread, to the past
-       * <li>right top: view lesser time spread, finer solution.
-       * <li>TODO: only if the curve is running, 
-       * <li>TODO right click context menu
-       * </ul>
-       * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
-       */
-      @Override public void mouseDown(MouseEvent e) {
-        try{
-          Control widgSwt = (Control)e.widget;
-          //Widget widgSwt = e.widget;
-          Point size = widgSwt.getSize();
-          if(e.y < size.y/8) {                       //top range
-            int xr = size.x - e.x;
-            if(xr < xpCursor1 && xpCursor2 > 0 && xr > xpCursor2){
-              //zoom between cursor
-              zoomBetweenCursors();
-            }
-            else if(e.x < size.x / 4) {              //edge left top
-              zoomToPast();
-            } else if(e.x > size.x * 3 / 4){          //edge right top
-              zoomToPresent();
-            } else {
-              //System.out.println("mid-top");
-            }
-          } else if(e.y > size.y * 7/8 ) {            //bottom range 
-            int xr = size.x - e.x;
-            if(xr < xpCursor1 && xpCursor2 > 0 && xr > xpCursor2){
-              cursorUnzoom();
-            }
-            else if(e.x < size.x / 4) {              //edge left bottom
-              viewToPast();
-            } else if(e.x > size.x * 3 / 4){    //edge right bottom
-              viewToPresent();
-            } else {
-              //System.out.println("mid-bottom");
-            }
-          } else { //middle range y
-            setCursors(e.x);
-          }
-          SwtCurveView.super.setPaintAllCmd();   //
-        } catch(Exception exc){
-          System.err.println("SwtCurveView.mouseDown; unexpected; " + exc.getMessage());
-        }
-        repaint(100,100);
-      }
-
-      /**The mouse up is left empty, because the mouse down has its effect.
-       * @see org.eclipse.swt.events.MouseListener#mouseUp(org.eclipse.swt.events.MouseEvent)
-       */
-      @Override public void mouseUp(MouseEvent e) {
-        bMouseDownCursor1 = bMouseDownCursor2 = false;
-        //System.out.println("SwtCurveView.mouseUp");
-      }
-      
-    };
-    
-    
-    
-    
-    MouseMoveListener mouseMoveListener = new MouseMoveListener(){
-
-      @Override
-      public void mouseMove(MouseEvent e)
-      {
-        if(bMouseDownCursor1){
-          xpCursor1 = sizepos.xPixelCurve - e.x;  //from right;
-          //System.out.println("SwtCurveView.mouseMove cursor1 x,y=" + e.x + ", " + e.y);
-          repaint(50,50);
-        } else if(bMouseDownCursor2){
-          xpCursor2 = sizepos.xPixelCurve - e.x;  //from right;
-          //System.out.println("SwtCurveView.mouseMove cursor2 x,y=" + e.x + ", " + e.y + ", cursor2=" + xpCursor2);
-          repaint(50,50);
-        } else {
-          //System.out.println("SwtCurveView.mouseMove x,y=" + e.x + ", " + e.y);
-            
-        }
-      }
-      
-    };
-    
 
     
     /**This routine overrides 
