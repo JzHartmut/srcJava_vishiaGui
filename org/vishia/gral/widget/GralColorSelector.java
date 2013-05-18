@@ -60,8 +60,10 @@ public class GralColorSelector
   String[][] colors = {
       { "pma", "prd", "por", "pye", "pam",  "pgn", "pcy", "pbl", "pmv", "pgr", "lgr"}
     , { "lma", "lrd", "lor", "lye", "lam",  "lgn", "lcy", "lbl", "lmv", "gr", "dgr"}
-    , { "ma", "pu", "rd", "or", "am", "ye", "gn", "g2", "cy", "bl", "vi", "gr", "pbk", "lbk"}
-    , { "dma", "pu", "pk", "or", "am", "sye", "sgn", "sg2", "scy", "dbl", "vi", "dgr", "lbk"}
+    , { "Ma1", "Ma2", "Rd1", "Rd2", "Rd3", "Ye1", "Ye2", "Ye3", "Ye4", "Gn1", "Gn2", "Gn3", "Gn4", "Cy1", "Cy2", "Cy3", "Bl1", "Bl2", "Bl3"}     
+    , { "sMa1", "sMa2", "sRd1", "sRd2", "sRd3", "sYe1", "sYe2", "sYe3", "sYe4", "sGn1", "sGn2", "sGn3", "sGn4", "sCy1", "sCy2", "sCy3", "sBl1", "sBl2", "sBl3"}     
+    , { "ma", "rp", "rd", "or", "am", "ye", "ygn", "lm", "gn", "sgn", "cy", "bl", "vi", "gr", "pbk", "lbk"}
+    , { "dma", "pu", "pk", "or", "am", "sye", "fgn", "sg2", "scy", "dbl", "vi", "dgr", "lbk"}
     , { "dma", "pu", "pk", "dye", "wh", "dgn", "dcy", "dbl", "vi", "dgr", "lbk"}
     , { "wh", "drd", "bn", "bk"}
   };
@@ -79,18 +81,26 @@ public class GralColorSelector
    public GralColorSelector(String name, GralMngBuild_ifc mng){
      mng.selectPanel("primaryWindow");
      mng.setPosition(-24, 0, -67, 0, 1, 'r'); //right bottom, about half less display width and hight.
-     wind = mng.createWindow("windSelectFile", "select file", GralWindow_ifc.windConcurrently );
-     for(int irow=0; irow < colors.length; ++irow){
-       String[] colorRow = colors[irow];
-       mng.setPosition(0.5f + 3*irow, GralPos.size + 2.5f, 0, GralPos.size + 3.5f, 0, 'r', 0.5f);
-       for(int ix=0; ix < colorRow.length; ++ix){
-         String sColor = colorRow[ix];
+     wind = mng.createWindow("windSelectFile", "select file", GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable );
+     for(int irow=0; irow <= 5 /*colors.length*/; ++irow){
+       //String[] colorRow = colors[irow];
+       mng.setPosition(0.5f + 4*irow, GralPos.size + 2.5f, 0, GralPos.size + 3.5f, 0, 'r', 0.5f);
+       for(int ix=0; ix < 19 /*colorRow.length*/; ++ix){
+         //String sColor = colorRow[ix];
+         GralColor color = GralColor.getStdColor(irow, ix);
+         String sColor = color.getColorName();
          GralButton btn = mng.addButton("", actionSelect_, sColor);
-         GralColor color = GralColor.getColor(sColor);
          btn.setBackColor(color, 0);
          if(irow >=3){
            btn.setLineColor(GralColor.getColor("wh"), 0);
          }
+       }
+       mng.setPosition(0.5f + 4*irow + 2.6f, GralPos.size + 1.2f, 0, GralPos.size + 3.5f, 0, 'r', 0.5f);
+       for(int ix=0; ix < 19 /*colorRow.length*/; ++ix){
+         GralColor color = GralColor.getStdColor(irow, ix);
+         int colorValue = color.getColorValue();
+         String sColorValue = String.format("%06x", new Integer(colorValue));
+         mng.addText(sColorValue);
        }
      }
     // mng.setPosition(0.5f + 3*irow, 3, 0, GralPos.size + 2.5f, 0, 'r', 0.5f);
