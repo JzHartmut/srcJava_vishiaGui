@@ -279,9 +279,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
         //if(sParent !=null){
         //  fillIn(sParent); 
         //}
-      } else if(file.isDirectory()){
+      } else if(file !=null && file.isDirectory()){
         actionRight(userData, line);
-      } else if((fileName = file.getName()).endsWith(".zip") || fileName.endsWith(".jar")){
+      } else if(file !=null && ((fileName = file.getName()).endsWith(".zip") || fileName.endsWith(".jar"))){
         actionRightZip(userData, line);
       } else {
         if(actionOnEnterFile !=null){

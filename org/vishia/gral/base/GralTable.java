@@ -370,13 +370,14 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   @Override public GralTableLine_ifc insertLine(String key, int row, String[] cellTexts, Object userData) {
     TableLineData line = new TableLineData();
+    zLine = tableLines.size();
     if(row > zLine || row < 0){
       row = zLine;
     }
     line.nLineNr = row;
     line.key = key;
     tableLines.add(row, line);
-    zLine = tableLines.size();
+    zLine +=1;
     if(cellTexts !=null){
       for(int ixCol = 0; ixCol < cellTexts.length && ixCol < line.cellTexts.length; ++ixCol){
         line.cellTexts[ixCol] = cellTexts[ixCol];

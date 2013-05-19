@@ -117,7 +117,7 @@ public class GralColor
       addColor("ye", 0xffff00); //
       addColor("ygn", 0x9ACD32); //yellow green
       addColor("lm", 0x00ff00); //lime
-      addColor("gn", 0x008000);
+      addColor("gn", 0x00ff00);
       addColor("g2", 0x00e020);
       addColor("cy", 0x00ffff);
       

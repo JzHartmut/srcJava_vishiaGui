@@ -144,7 +144,7 @@ public class FcmdFileProps
     GralColor colorBack = main.gralMng.propertiesGui.colorBackground_;
     GralColor colorText = GralColor.getColor("bk");
     int ii;
-    GralColor colorOn = GralColor.getColor("gn");
+    GralColor colorOn = GralColor.getColor("lgn");
     GralColor colorOff = GralColor.getColor("wh");
     GralColor colorDis = GralColor.getColor("gr");
     String textOn = "X", textOff = " ", textDis = "?";
@@ -168,7 +168,7 @@ public class FcmdFileProps
       widgRd = new GralButton[3];
       for(ii=0; ii < 3; ++ii){
         widgRd[ii] = main.gralMng.addCheckButton("FileProp:btnro", textOn, textOff, textDis, colorOn, colorOff, colorDis);
-        //widgReadonly[ii] = main.gralMng.addSwitchButton("FileProp:btnro", "X", " ", GralColor.getColor("wh"), GralColor.getColor("gn"));
+        //widgReadonly[ii] = main.gralMng.addSwitchButton("FileProp:btnro", "X", " ", GralColor.getColor("wh"), GralColor.getColor("lgn"));
       }
       main.gralMng.setPosition(20, GralPos.size -2, 4, GralPos.size +2, 0, 'd');
       main.gralMng.addText("wr"); 

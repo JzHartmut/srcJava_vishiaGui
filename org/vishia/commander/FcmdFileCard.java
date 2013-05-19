@@ -121,7 +121,7 @@ public class FcmdFileCard extends GralFileSelector
     this.main = mainPanelP.main;
     this.mainPanel = mainPanelP;
     this.nameFilePanel = label+ "." + mainPanelP.cNr;
-    this.colorSelectFocused123[0] = GralColor.getColor("gn");
+    this.colorSelectFocused123[0] = GralColor.getColor("lgn");
     this.colorSelectFocused123[1] = GralColor.getColor("lbl");
     this.colorSelectFocused123[2] = GralColor.getColor("lgr");
     String namePanelFile = FcmdWidgetNames.tableFile + nameFilePanel;
