@@ -242,6 +242,10 @@ public class FcmdLeftMidRightPanel
   }
     
   
+  void checkRefresh(long since){
+    if(actFileCard !=null) actFileCard.checkRefresh(since);
+  }
+  
   
   @Override public String toString(){ return "panel " + cc; }
   

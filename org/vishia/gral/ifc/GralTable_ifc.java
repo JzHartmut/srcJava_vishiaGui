@@ -112,6 +112,11 @@ public interface GralTable_ifc extends GralWidget_ifc
    */
   public abstract void deleteLine(  GralTableLine_ifc line);
 
+  /**Returns the number of active lines of the table.
+   * @return
+   */
+  int size();
+  
   public abstract void clearTable();
   
   

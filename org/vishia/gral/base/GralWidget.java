@@ -98,6 +98,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-03-13 Hartmut new {@link #getContentIdent()}, {@link #setContentIdent(long)}
    * <li>2013-03-13 Hartmut new {@link #bShouldInitialize}
    * <li>2012-09-24 Hartmut chg: {@link #getName()} now returns {@link #sDataPath} or {@link #sCmd} if the other info are null.
    * <li>2012-09-24 Hartmut chg: {@link #refreshFromVariable(VariableContainer_ifc)} for long and double values.
@@ -377,6 +378,8 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 
   /**The time when the bVisible state was changed. */
   private long lastTimeSetVisible;
+  
+  protected long dateUser;
   
   /**What is changed in the dynamic data, see {@link GralWidget.DynamicData#whatIsChanged}. */  
   protected static final int chgText = 1, chgColorBack=2, chgColorText=4, chgFont = 8, chgColorLine = 0x10;
@@ -981,6 +984,11 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
     repaint(100,100);
     //
   }
+
+  
+  @Override public long setContentIdent(long date){ long last = dateUser; dateUser = date; return last; }
+  
+  @Override public long getContentIdent(){ return dateUser; }
 
   
   

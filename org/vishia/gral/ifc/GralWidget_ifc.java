@@ -37,6 +37,7 @@ public interface GralWidget_ifc extends Removeable
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-03-13 Hartmut new {@link #getContentIdent()}, {@link #setContentIdent(long)}
    * <li>2013-03-13 Hartmut new {@link #isNotEditableOrShouldInitialize()} to support edit fields.
    * <li>2012-08-21 The method {@link #setBackColor(GralColor, int)}, {@link #setLineColor(GralColor, int)} and {@link #setTextColor(GralColor)}
    *  are declared here. What methods are deprecated? I thing {@link #setBackgroundColor(GralColor)}.  
@@ -73,7 +74,7 @@ public interface GralWidget_ifc extends Removeable
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20130313;
+  public static final int version = 20130521;
 
   
   /**Returns the implementation class of the widget. If the widget has more as one implementation widgets,
@@ -200,6 +201,20 @@ public interface GralWidget_ifc extends Removeable
    * @return true if the content was changed since last setUnchanged.
    */
   boolean isChanged(boolean setUnchanged);
+  
+  
+  /**Sets a identification for the shown data. A widget may not need to refresh if the contentIdent
+   * is not changed. A refresh of a widget's content may have side effects
+   * in user handling such as selection of text etc. 
+   * @param ident any number which identifies the value of content.
+   * @return the last stored ident.
+   */
+  long setContentIdent(long ident);
+  
+  /**Gets the content identification of the users data which are set with {@link #setContentIdent(long)}.
+   */
+  long getContentIdent();
+  
   
   Object getContentInfo();
 

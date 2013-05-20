@@ -56,6 +56,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   /**Version and history
    * <ul>
+   * <li>2013-05-11 Hartmut chg: {@link #deleteLine(GralTableLine_ifc)} was not ready, now tested
    * <li>2013-05-11 Hartmut chg: {@link TableLineData} instead TableItemWidget.
    * <li>2013-04-28 Hartmut new: {@link #specifyKeysMarkUpDn(int, int)}
    * <li>2013-04-28 Hartmut new: {@link #specifyActionOnLineMarked(SelectMask_ifc)}
@@ -121,7 +122,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    * 
    */
   @SuppressWarnings("hiding")
-  public final static int version = 20130428;
+  public final static int version = 20130521;
 
   
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
@@ -394,9 +395,24 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   @Override
   public void deleteLine(GralTableLine_ifc line) {
-    // TODO Auto-generated method stub
-    
+    int linenr = line.getLineNr();
+    idxLine.remove(((TableLineData)line).key);
+    tableLines.remove(linenr);
+    for(int ii=linenr; ii < tableLines.size(); ++ii){
+      TableLineData line2 = tableLines.get(ii);
+      line2.nLineNr = ii;
+    }
+    zLine -=1;
+    if(ixLine == linenr){
+      ixLineNew = ixLine = -1;
+      ixGlineSelectedNew = -1;  //deselects ixGlineSelected on redraw!
+    }
+    repaint(200,200);
   }
+  
+  
+  @Override public int size(){ return zLine = tableLines.size(); }
+  
 
   @Override public void clearTable() {
     ixLine1 = ixLine2 = 0;
@@ -653,6 +669,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     }
     if(ixLine2 >= zLine ){
       ixLine2 = zLine-1;
+      ixLine1 = ixLine2 - zLineVisible +1;
+      if(ixLine1 < 0){ ixLine1 = 0; }
     }
     ixGlineSelectedNew = ixLineNew - ixLine1;
     
@@ -780,6 +798,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     
     private Object userData;
     
+    private long dateUser;
+    
     //TODO GralColor colorBack, colorText;
     
     TableLineData(){
@@ -832,6 +852,10 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     @Override public Object getUserData() { return userData;  }
 
     @Override public void setUserData(Object data) {this.userData = data; }
+
+    @Override public long setContentIdent(long date){ long last = dateUser; dateUser = date; return last; }
+    
+    @Override public long getContentIdent(){ return dateUser; }
 
     @Override public int getLineNr()
     { return nLineNr;

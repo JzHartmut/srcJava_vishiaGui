@@ -311,7 +311,7 @@ public class FcmdCopyCmd
       FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackCopy, null, evSrc);
       fileSrc.delete(callback);
     }
-    state = Estate.busy;
+    state = Estate.finit;  //TODO
     ///
   }
   
