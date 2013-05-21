@@ -18,11 +18,11 @@ import org.vishia.util.KeyCode;
 import org.vishia.util.SelectMask;
 import org.vishia.util.SelectMask_ifc;
 
-/**This is the gral class for a table. Its usage is independent of a graphical implementation layer.
+/**This is the Gral class for a table. Its usage is independent of a graphical implementation layer.
  * A table consists of some text fields which are arranged in columns and lines. 
  * <br><br>
  * <b>Data, text and graphic architecture of the table</b>:<br>
- * All data wich are managed in this table are contained in an List {@link #tableLines} with a unlimited size. 
+ * All data which are managed in this table are contained in an List {@link #tableLines} with a unlimited size. 
  * That container references instances of {@link TableLineData}. 
  * Each of that table line contains the texts which are displayed in the cells,
  * the color etc., a key for searching and a reference to any user data. In that kind a table is a container class
@@ -37,10 +37,13 @@ import org.vishia.util.SelectMask_ifc;
  * 'user data'. The CellData refers via {@link CellData#tableItem} the line.
  * <br>
  * <pre>
- *   TextField
- *    |<>------>CellData
- *    |                |-tableItem--------->{@link TableLineData}
- *                                                                   |<>---userData--------------->User's data
+ *   Graphic representation     GralTable
+ *             |                   |---tableLines---*>|
+ *    |<*------+                                      |
+ *   TextField                                        |
+ *    |<>------>CellData                              |
+ *    |            |-tableItem--------->{@link TableLineData}
+ *                                                    |<>---userData--------------->User's data
  * 
  * </pre>
  * <br><br>
@@ -56,6 +59,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   /**Version and history
    * <ul>
+   * <li>2013-05-22 Hartmut new: {@link TableLineData#lineInGraphic} not used yet, but for further usage.
+   *   Maybe for refresh data only if they are in the visible range. 
    * <li>2013-05-11 Hartmut chg: {@link #deleteLine(GralTableLine_ifc)} was not ready, now tested
    * <li>2013-05-11 Hartmut chg: {@link TableLineData} instead TableItemWidget.
    * <li>2013-04-28 Hartmut new: {@link #specifyKeysMarkUpDn(int, int)}
@@ -679,10 +684,16 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     //
     //draw all table cells.
     long dbgtime1 = System.currentTimeMillis() - dbgtime;
+    int ixLine3;
+    for(ixLine3 = 0; ixLine3 < ixLine1; ++ixLine3){
+      TableLineData line = tableLines.get(ixLine3);
+      line.lineInGraphic = -1;
+    }
     iCellLine = 0;
-    for(int ixLine3 = ixLine1; ixLine3 <= ixLine2 && iCellLine < zLineVisibleMax; ++ixLine3){
+    for(ixLine3 = ixLine1; ixLine3 <= ixLine2 && iCellLine < zLineVisibleMax; ++ixLine3){
       //cells with content
       TableLineData line = tableLines.get(ixLine3);
+      line.lineInGraphic = iCellLine;
       int ctredraw = line.ctRepaintLine.get();
       if(ctredraw > 0 || true){
         for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
@@ -697,6 +708,11 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
         //Only then the text isn't changed.
         line.ctRepaintLine.compareAndSet(ctredraw, 0);  
       }
+    }
+    while(ixLine3 < zLine){
+      TableLineData line = tableLines.get(ixLine3);
+      line.lineInGraphic = -1;
+      ixLine3 +=1;
     }
     long dbgtime2 = System.currentTimeMillis() - dbgtime;
     while( iCellLine < zLineVisible) { //Max){
@@ -788,8 +804,13 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
      */
     public AtomicInteger ctRepaintLine = new AtomicInteger();  //NOTE should be public to see it from derived outer class
     
+    /**The line visible in graphic. -1 if not visible.*/
+    int lineInGraphic = -1;
+    
+    /**The index number in the container {@link GralTable#tableLines} */
     public int nLineNr;
     
+    /**The index value in {@link GralTable#idxLine}.*/
     String key;
     
     public String[] cellTexts;
@@ -797,8 +818,6 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     public GralColor colorForground, colorBackground;
     
     private Object userData;
-    
-    private long dateUser;
     
     //TODO GralColor colorBack, colorText;
     

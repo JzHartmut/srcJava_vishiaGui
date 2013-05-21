@@ -923,6 +923,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
             tline.setCellText(sDesignation, kColDesignation);
             tline.setCellText(sFileName, kColFilename);
             tline.setUserData(file);
+            tline.setDeselect(1, null);
           } else { //same file, don't change line.
             long dateFile = file.lastModified();
             isChanged = tline.setContentIdent(dateFile) != dateFile;
@@ -943,14 +944,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
               tline.setCellText("?", kColDate);
               tline.setContentIdent(0);
             }
-          }
-          //line[kColFilename] = sFileName;
-          //GralTableLine_ifc tline = selectList.wdgdTable.insertLine(line[1], -1, null, file);
-          //
-          //GralTableLine_ifc tline = selectList.wdgdTable.insertLine(line[1], -1, line, file);
-          //selectList.wdgdTable.setValue(GralPanelMngWorking_ifc.cmdInsert, -1, line, file);
-          if(bCompleteFileWithInfo && actionSetFileAttribs !=null){
-            actionSetFileAttribs.exec(0, selectList.wdgdTable, tline);
+            if(bCompleteFileWithInfo && actionSetFileAttribs !=null){
+              actionSetFileAttribs.exec(0, selectList.wdgdTable, tline);  //color for the line.
+            }
           }
           lineCt +=1;
         }

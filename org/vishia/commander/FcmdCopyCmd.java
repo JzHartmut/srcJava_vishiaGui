@@ -312,6 +312,7 @@ public class FcmdCopyCmd
       fileSrc.delete(callback);
     }
     state = Estate.finit;  //TODO
+    setTexts();
     ///
   }
   
@@ -328,9 +329,11 @@ public class FcmdCopyCmd
     listEvCopy.clear();
     filesToCopy.clear();
     FcmdCopyCmd.this.evCurrentFile = null;
-    widgButtonOk.setText("close");
-    widgButtonOk.setCmd("close");
-
+    bLockSrc = false;
+    //widgButtonOk.setText("close");
+    //widgButtonOk.setCmd("close");
+    state = Estate.finit; 
+    setTexts();
   }
   
   
@@ -347,6 +350,8 @@ public class FcmdCopyCmd
     { { "set src + dst", "set src + dst", "busy check", "set src + dst", "busy", "set src + dst" }
     , { "set dst", "set dst", "busy check", "set dst", "busy", "set dst" }
     };
+    String[] textAbort = 
+    { "abort", "abort", "abort", "abort", "abort", "close" };
     int ix1;
     if(widgButtonDel.isOn()){ ix1=0; cmd = Ecmd.delete; }
     else if(widgButtonMove.isOn()) { ix1 = 1; cmd = Ecmd.move; }
@@ -356,7 +361,10 @@ public class FcmdCopyCmd
       case start: ix2= bFineSelect? 1 : 0; break;
       case busyCheck: ix2=2; break;
       case checked: ix2=3; break;
+      case quest:
       case busy: ix2=4; break;
+      case error:
+      case inactive:
       case finit: ix2=5; break;
       default: ix2=0;
     }
@@ -364,6 +372,9 @@ public class FcmdCopyCmd
     widgButtonOk.setText(sTextBtnOk);
     String sTextSrc = textSrc[bLockSrc? 1: 0][ix2];
     widgButtonSrc.setText(sTextSrc);
+    String sTextAbort = textAbort[ix2];
+    widgButtonEsc.setText(sTextAbort);
+    
   }
   
   
@@ -550,6 +561,7 @@ public class FcmdCopyCmd
               //String sDirSrc;
               if(listFileSrc == null || listFileSrc.size()==0){ //nothing selected
                 fileSrc = fileCardSrc.currentFile;
+                fileSrc.resetSelected(1);
                 dirSrc = fileSrc.getParentFile();
                 sFilesSrc = "";
                 widgCopyFrom.setText(fileSrc.getAbsolutePath());
@@ -557,7 +569,8 @@ public class FcmdCopyCmd
                 StringBuilder uFileSrc = new StringBuilder();
                 dirSrc = fileSrc = fileCardSrc.getCurrentDir();
                 String sSep = "";
-                for(File srcFile : listFileSrc){
+                for(FileRemote srcFile : listFileSrc){
+                  srcFile.resetSelected(1);
                   uFileSrc.append(sSep).append(srcFile.getName());
                   sSep = " : "; //For next one.
                   //FileRemote fileSrc = FileRemote.fromFile(srcFile);
@@ -578,7 +591,7 @@ public class FcmdCopyCmd
                 sDstDir = "??";
               }
               bLockSrc = true;
-              widgFromConditions.setText("");
+              //widgFromConditions.setText("");
             }
           } else { //FileCard not found:
             fileSrc = null;
@@ -688,14 +701,17 @@ public class FcmdCopyCmd
   { @Override public boolean exec(int key, GralWidget_ifc widgg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         switch(state){ //inactive, start, checked, busyCheck, busy, quest, error, finit
+          case start: {
+            state = Estate.finit; 
+            setTexts();
+          } break;
           case inactive:
-          case start:
           case error:
           case finit: closeWindow(); break;
           case quest:
           case busy: abortCopy(); break;
-          case checked: break;
-          case busyCheck: break;
+          case checked: abortCopy(); break;
+          case busyCheck: abortCopy(); break;
         }
       }
       return true;

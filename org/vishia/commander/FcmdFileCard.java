@@ -10,6 +10,7 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralFileSelector;
 
 import org.vishia.util.Assert;
@@ -483,8 +484,12 @@ public class FcmdFileCard extends GralFileSelector
   };
   
   
-  GralUserAction actionSetFileLineAttrib = new GralUserAction(){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
+  /**Sets the color of the table line adequate to the select state of the file. */
+  GralUserAction actionSetFileLineAttrib = new GralUserAction("actionSetFileLineAttrib"){
+    /**@param params [0] the table line. It contains the file.
+     * @see org.vishia.gral.ifc.GralUserAction#exec(int, org.vishia.gral.ifc.GralWidget_ifc, java.lang.Object[])
+     */
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
       //check whether any of the 2 compare directories are base for the current file:
       try{
         GralTableLine_ifc line = (GralTableLine_ifc)(params[0]);
@@ -500,6 +505,9 @@ public class FcmdFileCard extends GralFileSelector
             line.setSelect(1, null);
             line.setBackColor(GralColor.getColor("pbl"), 1);
             line.setLineColor(GralColor.getColor("rd"), 1);
+          } else {
+            line.setBackColor(GralColor.getColor("wh"), 1);
+            line.setLineColor(GralColor.getColor("bk"), 1);
           }
         }
         FileCompare.Result result = searchCompareResult(file);
