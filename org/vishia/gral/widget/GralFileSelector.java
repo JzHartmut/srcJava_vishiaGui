@@ -23,6 +23,7 @@ import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTableLine_ifc;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.Event;
@@ -55,6 +56,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2013-04-30 Hartmut new: context menu now available. Sort, refresh, deselect
    * <li>2013-04-30 Hartmut new: {@link #checkRefresh(long)}, chg: Don't change the content in the table
    *   if the content is identical with the current presentation in table, for refreshing. 
    * <li>2013-04-30 Hartmut chg: {@link #fillIn(FileRemote, boolean)} now uses the {@link FileRemote#timeRefresh}
@@ -211,8 +213,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
       if(actionCode == KeyCode.tableLineSelect){
         GralTableLine_ifc line = (GralTableLine_ifc) params[0];
         Object oData = line.getUserData();
-        if(oData instanceof File){
-          File file = (File)oData;
+        if(oData instanceof FileRemote){
+          FileRemote file = (FileRemote)oData;  ////
+          currentFile = file;
           if(file.exists()){
             String sDir = file.getParent();
             String sName = file.getName();
@@ -426,7 +429,11 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   public static final char kSortSizeSmallest = 's';
   
-  private char sortOrder = 'x';
+  
+  public static MenuTexts contextMenuTexts = new MenuTexts();
+  
+  
+  private char sortOrder = kSortName;
   
   /**The implementation of SelectList. */
   protected FileSelectList selectList;
@@ -469,6 +476,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
 
   /**The current shown directory. */
   FileRemote currentDir;
+  
+  FileRemote currentFile;
   
   String sCurrentDir;
   
@@ -555,6 +564,17 @@ public class GralFileSelector implements Removeable //extends GralWidget
     //the list
     panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
     selectList.setToPanel(panelMng, name, rows, columns, size);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refresh, actionRefreshFileTable);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortNameCase, actionSortFilePerNameCase);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortNameNonCase, actionSortFilePerNameNonCase);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortExtCase, actionSortFilePerExtensionCase);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortExtNonCase, actionSortFilePerExtensionNonCase);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortDateNewest, actionSortFilePerTimestamp);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortOldest, actionSortFilePerTimestampOldestFirst);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sizeLarge, actionSortFilePerLenghLargestFirst);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortSizeSmall, actionSortFilesPerLenghSmallestFirst);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.deselectRecursFiles, actionDeselectDirtree);
+
     //store this in the GralWidgets to get back from widgets later.
     widgdPath.setContentInfo(this);
     selectList.wdgdTable.setContentInfo(this);
@@ -562,7 +582,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     selectList.wdgdTable.specifyActionOnLineMarked(actionOnMarkLine);
     panelMng.setPosition(5, 0, 10, GralPos.size + 40, 1, 'd');
     questionWindow = GralInfoBox.createTextInfoBox(panelMng, "questionInfoBox", "question");  
-    panelMng.selectPanel(sPanel);
+    panelMng.selectPanel(sPanel);  //if finished this panel is selected for like entry.
   }
   
   
@@ -1276,6 +1296,77 @@ public class GralFileSelector implements Removeable //extends GralWidget
   };
   
 
+  public void setSortOrderFiles(char order){
+    setSortOrder(order);
+    fillInCurrentDir();
+  }
+  
+
+  
+  GralUserAction actionSortFilePerNameCase = new GralUserAction("actionSortFilePerNameCase")
+  { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
+      setSortOrderFiles(GralFileSelector.kSortName);
+      return true;
+  } };
+
+
+  GralUserAction actionSortFilePerNameNonCase = new GralUserAction("actionSortFilePerNameNonCase")
+  { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
+      setSortOrderFiles(GralFileSelector.kSortNameNonCase);
+      return true;
+  } };
+
+
+  GralUserAction actionSortFilePerExtensionCase = new GralUserAction("actionSortFilePerExtensionCase")
+  { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
+      setSortOrderFiles(GralFileSelector.kSortExtension);
+      return true;
+  } };
+
+  GralUserAction actionSortFilePerExtensionNonCase = new GralUserAction("actionSortFilePerExtensionNonCase")
+  { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
+      setSortOrderFiles(GralFileSelector.kSortExtensionNonCase);
+      return true;
+  } };
+
+  GralUserAction actionSortFilePerTimestamp = new GralUserAction("actionSortFilePerTimestamp")
+  { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
+      setSortOrderFiles(GralFileSelector.kSortDateNewest);
+      return true;
+  } };
+
+  GralUserAction actionSortFilePerTimestampOldestFirst = new GralUserAction("actionSortFilePerTimestampOldestFirst")
+  { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
+      setSortOrderFiles(GralFileSelector.kSortDateOldest);
+      return true;
+  } };
+
+  GralUserAction actionSortFilePerLenghLargestFirst = new GralUserAction("actionSortFilePerLenghLargestFirst")
+  { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
+      setSortOrderFiles(GralFileSelector.kSortSizeLargest);
+      return true;
+  } };
+
+  GralUserAction actionSortFilesPerLenghSmallestFirst = new GralUserAction("actionSortFilesPerLenghSmallestFirst")
+  { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
+      setSortOrderFiles(GralFileSelector.kSortSizeSmallest);
+      return true;
+  } };
+
+
+  GralUserAction actionDeselectDirtree = new GralUserAction("actionDeselectDirtree")
+  { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
+    //if(fileCard !=null){
+    if(currentFile !=null){
+      currentFile.resetSelectedRecurs(1, null);
+      //fileCard.f  //TODO refresh
+    }
+    return true;
+} };
+
+
+
+  
   
   /**Sets the origin dir of the last focused file table.
    * <br>
@@ -1296,5 +1387,24 @@ public class GralFileSelector implements Removeable //extends GralWidget
       return true;
     }
   };
+  
+  
+  /**This class is instantiated static and contains English menu texts. The user can change it
+   * touching the public static instance {@link GralFileSelector#contextMenuTexts}
+   * before calling {@link GralFileSelector#setToPanel(GralMngBuild_ifc, String, int, int[], char)}. 
+   */
+  public static class MenuTexts{
+    public String refresh = "&Refresh [F5]";
+    public String sortNameCase = "&Sort/&Name case sensit";
+    public String sortNameNonCase = "&Sort/&Name non-case";
+    public String sortExtCase = "&Sort/e&Xt case sensit";
+    public String sortExtNonCase = "&Sort/e&Xt non-case";
+    public String sortOldest = "&Sort/date &Oldest";
+    public String sortDateNewest = "&Sort/&Date newest";
+    public String sizeLarge = "&Sort/size &Largest";
+    public String sortSizeSmall = "&Sort/size &Smallest";
+    public String deselectRecursFiles = "actionDeselectDirtree";
+  }
+  
   
 }

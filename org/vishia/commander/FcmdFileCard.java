@@ -165,16 +165,7 @@ public class FcmdFileCard extends GralFileSelector
     //sets the action for a simple table: what to do on line selected: Show file names. 
     this.setActionOnFileSelected(actionOnFileSelection);
     selectList.wdgdTable.setActionFocused(actionFocused);
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", main.idents.menuContextFileSortNameCase, main.favorPathSelector.actionSortFilePerNameCase);
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", main.idents.menuContextFileSortNameNonCase, main.favorPathSelector.actionSortFilePerNameNonCase);
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", main.idents.menuContextFileSortExtCase, main.favorPathSelector.actionSortFilePerExtensionCase);
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", main.idents.menuContextFileSortExtNonCase, main.favorPathSelector.actionSortFilePerExtensionNonCase);
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", main.idents.menuContextFileSortOldest, main.favorPathSelector.actionSortFilePerTimestampOldestFirst);
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", main.idents.menuContextFileSortDateNewest, main.favorPathSelector.actionSortFilePerTimestamp);
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", main.idents.menuContextFileSortSizeLarge, main.favorPathSelector.actionSortFilePerLenghLargestFirst);
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", main.idents.menuContextFileSortSizeSmall, main.favorPathSelector.actionSortFilePerLenghSmallestFirst);
-
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", main.idents.menuContextFileSortExtCase, main.favorPathSelector.actionSortFilePerExtensionCase);
+    //Note: some menu entries are set in the super class already.
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFilePropsContext, main.filePropsCmd.actionOpenDialog);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFileViewContext, main.viewCmd.actionOpenView);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuContextEditIntern, main.editWind.actionOpenEdit);
@@ -183,6 +174,7 @@ public class FcmdFileCard extends GralFileSelector
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmFileDelContext, main.deleteCmd.actionConfirmDelete);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteContext, main.executer.actionExecuteFileByExtension);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteCmdContext, main.cmdSelector.actionExecCmdWithFiles);
+    //selectList.wdgdTable.addContextMenuEntryGthread(1, "deSelDir", main.idents.deselectRecursFiles.menuContext, main.favorPathSelector.actionDeselectDirtree);
     favorCard.wdgdTable.specifyActionOnLineSelected(favorCard.actionFavorSelected);
     //
     //sets the action for Select a file: open the execute menu

@@ -1,6 +1,7 @@
 package org.vishia.commander;
 
 import org.vishia.gral.ifc.GralButtonKeyMenu;
+import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.util.KeyCode;
 
 /**This class contains all texts and keys which are used in any menu, hot key etc.
@@ -14,7 +15,8 @@ import org.vishia.util.KeyCode;
 public class FcmdIdents
 {
   
-  GralButtonKeyMenu readMsg = new GralButtonKeyMenu(null, "&Help/read &MsgCfg", null, null, null, 0, 0);
+  final GralButtonKeyMenu readMsg = new GralButtonKeyMenu(null, "&Help/read &MsgCfg", null, null, null, 0, 0);  ////
+  final GralButtonKeyMenu deselectRecursFiles = new GralButtonKeyMenu(null, "&File/&Deselect dirtree", "&Deselect dirtree", null, null, 0, 0);
   
   String menuBarSettings = "&Help/&Settings [cP]";
   String menuContextSettings = "Settings [cP]";
@@ -86,7 +88,7 @@ public class FcmdIdents
   
   
   
-  String menuFilePropsBar = "&File/&Properties [F2]";
+  String menuFilePropsBar = "&File/&Properties [F2]";  ////
 
   String menuFilePropsContext = "Properties [F2]";
   
@@ -378,4 +380,17 @@ public class FcmdIdents
   int keyFileSortSizeSmall = KeyCode.shiftCtrl + KeyCode.F6;
 
 
+  FcmdIdents(){
+    GralFileSelector.contextMenuTexts.deselectRecursFiles = deselectRecursFiles.menuContext;
+    
+    GralFileSelector.contextMenuTexts.sortNameCase = menuContextFileSortNameCase;
+    GralFileSelector.contextMenuTexts.sortNameNonCase = menuContextFileSortNameNonCase;
+    GralFileSelector.contextMenuTexts.sizeLarge = menuContextFileSortSizeLarge;
+    GralFileSelector.contextMenuTexts.sizeLarge = menuContextFileSortSizeLarge;
+    GralFileSelector.contextMenuTexts.sizeLarge = menuContextFileSortSizeLarge;
+    GralFileSelector.contextMenuTexts.sizeLarge = menuContextFileSortSizeLarge;
+    GralFileSelector.contextMenuTexts.sizeLarge = menuContextFileSortSizeLarge;
+    GralFileSelector.contextMenuTexts.sizeLarge = menuContextFileSortSizeLarge;
+  }
+  
 }

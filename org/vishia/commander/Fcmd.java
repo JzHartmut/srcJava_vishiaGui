@@ -367,8 +367,8 @@ public class Fcmd extends GuiCfg
    *   The returned instance is a new one, not referenced elsewhere. It can be stored
    *   and it remains the situation of selection files independently of further user actions.
    */
-  File[] getLastSelectedFiles(){
-    File[] ret = new File[3];
+  FileRemote[] getLastSelectedFiles(){
+    FileRemote[] ret = new FileRemote[3];
     int ix = -1;
     Iterator<FcmdLeftMidRightPanel> iterPanel = lastFilePanels.iterator();
     while(ix < 2 && iterPanel.hasNext() ){
