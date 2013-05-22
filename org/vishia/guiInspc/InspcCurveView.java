@@ -319,8 +319,8 @@ public final class InspcCurveView
   
   void refreshCurve(){
     if(widgCurve !=null && widgBtnOff !=null){
-      int state = widgBtnOff.getState();
-      widgCurve.activate( state == GralButton.kOn);
+      GralButton.State state = widgBtnOff.getState();
+      widgCurve.activate( state == GralButton.State.On);
       widgCurve.refreshFromVariable(variables);
     }
     actionShowCursorValues.exec(0, widgCurve);

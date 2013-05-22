@@ -1,15 +1,14 @@
 package org.vishia.gral.base;
 
-import org.vishia.bridgeC.IllegalArgumentExceptionJc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralImageBase;
-import org.vishia.gral.ifc.GralWindowMng_ifc;
-import org.vishia.gral.swt.SwtGralMouseListener;
 
 public abstract class GralButton extends GralWidget
 {
   /**Version, history and license
    * <ul>
+   * <li>2013-05-23 Hartmut new color of text able to change (not only black)
+   * <li>2013-05-23 Hartmut chg: {@link #setState(State)} with an enum, not int, used for showing active/inactive
    * <li>2012-08-22 Hartmut new implements {@link #setBackColor(GralColor, int)}
    * <li>2012-03-09 Hartmut new Some functionality from SwtButton moved to this, some enhancement of 
    *   functionality: Three states, 
@@ -58,18 +57,25 @@ public abstract class GralButton extends GralWidget
   /**The state of switch and check button
    * 1=on 2=off 3=disabled. 0=initial, see {@link #kOn} etc.
    */
-  protected int switchState;
+  //protected int switchState;
   //protected boolean switchedOn;
 
   
-  public static final int kOn = 1, kOff=2, kDisabled=3;
+  public enum State{ On, Off, Disabled}
   
-  protected String sButtonTextOff, sButtonTextOn, sButtonTextDisabled = "-";
+  protected State switchState;
+  
+  //public static final int kOn = 1, kOff=2, kDisabled=3;
+  
+  protected String sButtonTextOff, sButtonTextOn, sButtonTextDisabled;
   
   protected GralImageBase imageOff, imageOn, imageDisabled;
   
   /**Color of button. If colorOff is null, then it is not a switch button. */
-  protected GralColor colorOff, colorOn, colorDisabled = GralColor.getColor("gr");
+  protected GralColor colorBackOff, colorBackOn, colorBackDisabled = GralColor.getColor("gr");
+  
+  /**Color of button. If colorOff is null, then it is not a switch button. */
+  protected GralColor colorLineOff = GralColor.getColor("bk"), colorLineOn = GralColor.getColor("bk"), colorLineDisabled = GralColor.getColor("lgr");
   
   /**Currently pressed, show it in graphic. */
   protected boolean isPressed;
@@ -79,7 +85,7 @@ public abstract class GralButton extends GralWidget
   protected boolean shouldSwitched;
   
   /**True if the switch is in disable state. Show it in graphic. */
-  protected boolean isDisabled;
+  //protected boolean isDisabled;
   
   /**True if the button has three states: on, off, disabled. */
   protected boolean bThreeStateSwitch;
@@ -129,8 +135,8 @@ public abstract class GralButton extends GralWidget
    * @param colorOn
    */
   public void setSwitchMode(GralColor colorOff, GralColor colorOn){ 
-    this.colorOn = colorOn;
-    this.colorOff = colorOff;
+    this.colorBackOn = colorOn;
+    this.colorBackOff = colorOff;
     bThreeStateSwitch = false;
     shouldSwitched = true; 
   }
@@ -143,9 +149,9 @@ public abstract class GralButton extends GralWidget
    * @param colorOn
    */
   public void setSwitchMode(GralColor colorOff, GralColor colorOn, GralColor colorDisabled){ 
-    this.colorOn = colorOn;
-    this.colorOff = colorOff;
-    this.colorDisabled = colorDisabled;
+    this.colorBackOn = colorOn;
+    this.colorBackOff = colorOff;
+    this.colorBackDisabled = colorDisabled;
     bThreeStateSwitch = true;
     shouldSwitched = true; 
   }
@@ -186,9 +192,9 @@ public abstract class GralButton extends GralWidget
    */
   @Override public void setBackColor(GralColor color, int ix){ 
     switch(ix){
-    case 0: colorOff = color; dyda.backColor = color; break;
-    case 1: colorOn = color; break;
-    case -1: case2: colorDisabled = color; break;
+    case 0: colorBackOff = color; dyda.backColor = color; break;
+    case 1: colorBackOn = color; break;
+    case -1: case2: colorBackDisabled = color; break;
     default: throw new IllegalArgumentException("fault ix, allowed -1, 0, 1, 2, ix=" + ix);
     }//switch
      
@@ -202,7 +208,7 @@ public abstract class GralButton extends GralWidget
    * @param text
    */
   public void setDisableColorText(GralColor color, String text){
-    this.colorDisabled = color;
+    this.colorBackDisabled = color;
     this.sButtonTextDisabled = text;
   }
   
@@ -213,7 +219,12 @@ public abstract class GralButton extends GralWidget
    * @param sButtonText
    */
   public void setText(String sButtonText){ 
-    this.sButtonTextOff = sButtonText; 
+    this.sButtonTextOff = sButtonText;
+    sButtonTextDisabled = sButtonText;
+    sButtonTextOff = sButtonText;
+    
+    if(sButtonTextDisabled == null){ sButtonTextDisabled = sButtonText; }
+    if(sButtonTextOn == null){ sButtonTextOn = sButtonText; }
     repaint(100, 100);
   }
   
@@ -227,14 +238,16 @@ public abstract class GralButton extends GralWidget
   
   
   
-  public void setDisabled(boolean value){
-    this.isDisabled = value;
+  public void XXXsetDisabled(boolean value){
+    this.switchState = value ? State.Disabled: State.On; //kDisabled : kOn;
     repaint(100, 100);
   }
   
   
+  public boolean isDisabled(){ return switchState == State.Disabled; }
   
-  public boolean isOn(){ return switchState == kOn; }
+  
+  public boolean isOn(){ return switchState == State.On; }
 
   /**Sets the appearance of the button
    * <ul> 
@@ -257,20 +270,20 @@ public abstract class GralButton extends GralWidget
   public void setState(Object val)
   {
     if(val instanceof GralColor){
-      if(switchState == kOn){
-        colorOn = (GralColor)val;
+      if(switchState == State.On){
+        colorBackOn = (GralColor)val;
       } else {
-        colorOff = (GralColor)val;
+        colorBackOff = (GralColor)val;
       }
     } else {
       String sVal = (val instanceof String) ? (String)val : null;
       int nVal = val instanceof Integer ? ((Integer)val).intValue(): -1;
       if(sVal !=null && (sVal.equals("1") || sVal.equals("true") || sVal.equals("on"))
         || sVal == null && nVal !=0){
-        switchState = kOn;
+        switchState = State.On;
       } else if(sVal !=null && (sVal.equals("0") || sVal.equals("false") || sVal.equals("off"))
           || nVal == 0){
-        switchState = kOff;
+        switchState = State.Off;
       }
     }
     repaint(100,100);
@@ -282,17 +295,17 @@ public abstract class GralButton extends GralWidget
    * @param state one of {@link #kOn}, {@value #kOff}, {@value #kDisabled}.
    * @throws IllegalArgumentException if the state is faulty.
    */
-  public void setState(int state){
-    if(state == kOn || state == kOff || state ==kDisabled){
+  public void setState(State state){
+    //if(state == kOn || state == kOff || state ==kDisabled){
       switchState = state;
       repaint(100,100);
-    } else {
-      throw new IllegalArgumentException("faulty state: " + state);
-    }
+    //} else {
+    //  throw new IllegalArgumentException("faulty state: " + state);
+    //}
   }
   
   
-  public int getState(){ return switchState; }
+  public State getState(){ return switchState; }
   
   
   /**Inner class to implement the mouse actions called from the gral implementing layer.
@@ -337,9 +350,9 @@ public abstract class GralButton extends GralWidget
       setActivated(false);
       //On -> Off -> Disabled -> On
       if(shouldSwitched){
-        if( switchState == kOn) { switchState = kOff; }
-        else if(bThreeStateSwitch && switchState == kOff){ switchState = kDisabled; }
-        else { switchState = kOn; }
+        if( switchState == State.On) { switchState = State.Off; }
+        else if(bThreeStateSwitch && switchState == State.Off){ switchState = State.Disabled; }
+        else { switchState = State.On; }
       }
       widgg.repaint(100, 200);
     }

@@ -568,7 +568,7 @@ public class FcmdView
   { @Override public boolean exec(int keyCode, GralWidget_ifc widgi, Object... params)
     { bVisible = false;
       nrQuickview = 0;
-      btnQuickview.setState(GralButton.kOff);
+      btnQuickview.setState(GralButton.State.Off);
       return true;
     }
   };

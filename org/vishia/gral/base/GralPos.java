@@ -413,7 +413,7 @@ public class GralPos implements Cloneable
     if(f < 0){
       i -=1; f +=10;
     }
-    assert(f >=0 && f < 9);
+    assert(f >=0 && f <= 9);
     pos[ix] = i; pos[ix+1]= f;
     //return f;
   }
@@ -871,14 +871,18 @@ public class GralPos implements Cloneable
       if(!(q1 > -1000 && q1 < 1000 && ((q2 > -1000 && q2 < 1000) || ((q2 - useNatSize) >=0 && (q2 - useNatSize) < 8192)))){
         throw new IllegalArgumentException("positions out of range" + q1 + ", " + q2);
       }
-      if(q1Frac >= 10){
-        this.p1 = q1 +1; this.p1Frac = q1Frac -10;
+      if(q1Frac >= 20){  //can be on adding distance
+        this.p1 = q1 +1; this.p1Frac = q1Frac -20;
+      } else if(q1Frac >= 10){
+          this.p1 = q1 +1; this.p1Frac = q1Frac -10;
       } else if(q1Frac < 0){
         this.p1 = q1 - 1; this.p1Frac = q1Frac +10;
       } else {
         this.p1 = q1; this.p1Frac = q1Frac;   
       }
-      if(q2Frac >= 10){
+      if(q2Frac >= 20){
+        this.p2 = q2 +1; this.p2Frac = q2Frac -20;
+      } else if(q2Frac >= 10){
         this.p2 = q2 +1; this.p2Frac = q2Frac -10;
       } else if(q2Frac < 0){
         this.p2 = q2 - 1; this.p2Frac = q2Frac +10;

@@ -439,10 +439,17 @@ public class SwtTextFieldWrapper extends GralTextField
 
   
   private class TextFieldModifyListener implements ModifyListener{
-
     @Override public void modifyText(ModifyEvent ev) {
-      SwtTextFieldWrapper.super.text = textFieldSwt.getText();
+      String text = textFieldSwt.getText();
+      SwtTextFieldWrapper.super.text = text;
+      //System.out.println("actionText");
       //SwtTextFieldWrapper.super.caretPos = textFieldSwt.getCaretPosition();
+      if(actionChanging != null){
+        actionChanging.exec(KeyCode.valueChanged, SwtTextFieldWrapper.this, dyda.displayedText);
+      }
+      //if(dyda.displayedText !=null){
+        //textFieldSwt.setText(dyda.displayedText);
+      //}
     }
     
   };

@@ -86,6 +86,7 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
      fileSelector = new GralFileSelector();
      fileSelector.setToPanel(mng, "selectFile", 100, new int[]{2,0,-6,-12}, 'C');
      fileSelector.setActionOnFileSelected(actionSelectFile);
+     fileSelector.setActionOnEnterFile(actionOk);
      mng.setPosition(-2, 0, 0, -7, 0, 'r',1);
      widgFilename = mng.addTextField(name+"-name", true, null, null);
      mng.setPosition(-3, 0, -8, GralPos.size + 7, 0, 'r',1);

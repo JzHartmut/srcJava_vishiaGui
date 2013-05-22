@@ -410,7 +410,7 @@ class FcmdFavorPathSelector
   
   
   
-  private void writeCfgLine(FavorPath favorPathInfo) throws IOException
+  private void XXXwriteCfgLine(FavorPath favorPathInfo) throws IOException
   {
     writerCfg.append(favorPathInfo.selectName).append(", ").append(favorPathInfo.path);
     /*

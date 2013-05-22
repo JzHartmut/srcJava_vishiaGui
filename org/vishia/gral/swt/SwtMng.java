@@ -1070,7 +1070,8 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   	//, String sCmd, String sUserAction, String sName)
   )
   {
-    int ySize = (int)pos.height();
+    setNextPositionUnused();  //since 130523 it should be the valid one.
+    float ySize = pos.height();
     int xSize = (int)pos.width();
     
     char size = ySize > 3? 'B' : 'A';

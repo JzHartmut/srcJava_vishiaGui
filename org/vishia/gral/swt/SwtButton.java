@@ -63,19 +63,22 @@ public class SwtButton extends GralButton
   public SwtButton(String sName, SwtMng mng, Composite parent, int styleSwt, char size)
   {
     super(sName, mng);
-    switch(size){ 
+    //Control xx = mng.pos.panel.panelComposite;
+    black = mng.propertiesGuiSwt.colorSwt(0x202020);
+    white = mng.propertiesGuiSwt.colorSwt(0xefefff);
+    widgetSwt = new SwtButtonImpl(parent, styleSwt);
+    widgetSwt.setData(this);
+    widgetSwt.setBackground(mng.propertiesGuiSwt.colorBackground);
+    widgetSwt.addMouseListener(mouseListener);
+    setBoundsGraphic(mng);
+    float ySize = mng.pos.height();
+    char size1 = ySize > 3? 'B' : 'A';
+    switch(size1){ 
       case 'A': fontText = mng.propertiesGuiSwt.stdInputFont; break;
       case 'B': fontText = mng.propertiesGuiSwt.stdButtonFont; break;
       default: throw new IllegalArgumentException("param size must be A or B");
-      }
-      //Control xx = mng.pos.panel.panelComposite;
-      black = mng.propertiesGuiSwt.colorSwt(0x202020);
-      white = mng.propertiesGuiSwt.colorSwt(0xefefff);
-      widgetSwt = new SwtButtonImpl(parent, styleSwt);
-      widgetSwt.setData(this);
-      widgetSwt.setBackground(mng.propertiesGuiSwt.colorBackground);
-      widgetSwt.addMouseListener(mouseListener);
-      setBoundsGraphic(mng);
+    }
+      
   }
 
   
@@ -104,7 +107,7 @@ public class SwtButton extends GralButton
   public GralColor setBackgroundColor(GralColor color)
   {
     // TODO Auto-generated method stub
-    colorOff = color;
+    colorBackOff = color;
     repaint(100, 100);
     return null;
   }
@@ -185,28 +188,32 @@ public class SwtButton extends GralButton
         GC gc = e.gc;
         //gc.d
         Rectangle dim = getBounds();
-        if(colorOff == null){ 
+        if(colorBackOff == null){ 
           //it isn't initalize
-          colorOff = GralColor.getColor("wh");  //white background
+          colorBackOff = GralColor.getColor("wh");  //white background
         }
         final String sButtonText;
-        final GralColor colorgback;
-        if(switchState == kOn){ 
+        final GralColor colorgback, colorgline;
+        if(switchState == State.On){ 
           sButtonText = sButtonTextOn != null ? sButtonTextOn : sButtonTextOff;
-          colorgback = colorOn !=null ? colorOn: colorOff;
-        } else if(switchState == kDisabled){ 
+          colorgback = colorBackOn !=null ? colorBackOn: colorBackOff;
+          colorgline = colorLineOn !=null ? colorLineOn: colorLineOff;
+        } else if(switchState == State.Disabled){ 
           sButtonText = sButtonTextDisabled;
-          colorgback = colorDisabled;
+          colorgback = colorBackDisabled;
+          colorgline = colorLineDisabled;
         } else { 
           sButtonText = sButtonTextOff;
-          colorgback = colorOff;
+          colorgback = colorBackOff;
+          colorgline = colorLineOff;
         }
         
         Color colorBack = (Color)getMng().getColorImpl(colorgback);
+        Color colorLine = (Color)getMng().getColorImpl(colorgline);
         gc.setBackground(colorBack);
         drawBackground(e.gc, dim.x+1, dim.y+1, dim.width-1, dim.height-1);
         Color color = getForeground(); //of the widget.
-        gc.setForeground(color);  //black
+        gc.setForeground(colorLine);  //black
         gc.setFont(fontText);
         //FontData fontData = mng.propertiesGui.stdButtonFont.getFontData();
         //fontData.
@@ -222,7 +229,7 @@ public class SwtButton extends GralButton
           ypText = fontMetrics.getHeight();
           int halfHeightButtonText = ypText /2;
           int yText = dim.height / 2 - halfHeightButtonText;
-          gc.setForeground(black);
+          gc.setForeground(colorLine);
           gc.drawString(sButtonText, xText, yText);
         } else {
           ypText = 0;

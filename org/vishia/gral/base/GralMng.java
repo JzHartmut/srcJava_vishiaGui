@@ -367,6 +367,15 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
     posUsed = true;
   }  
   
+  /**Not for user: Checks whether the position is used, sets the next position then, markes the position as used.
+   * See @link GralPos#setNextPosition(), {@link #posUsed}. */
+  public void setNextPositionUnused()
+  { if(posUsed){
+      pos.setNextPosition();
+    }
+    posUsed = false;
+  }  
+  
   public void registerShowField(GralWidget widg){
     //link the widget with is information together.
     if(widg.name !=null){

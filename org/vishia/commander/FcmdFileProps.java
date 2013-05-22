@@ -253,23 +253,23 @@ public class FcmdFileProps
       } else {
         widgLink.setText("");
       }
-      widgRd[0].setState(src.canRead() ? GralButton.kOn : GralButton.kOff);
-      widgEx[0].setState(src.canExecute() ? GralButton.kOn : GralButton.kOff);
-      widgWr[0].setState(src.canWrite() ? GralButton.kOn : GralButton.kOff);
+      widgRd[0].setState(src.canRead() ? GralButton.State.On : GralButton.State.Off);
+      widgEx[0].setState(src.canExecute() ? GralButton.State.On : GralButton.State.Off);
+      widgWr[0].setState(src.canWrite() ? GralButton.State.On : GralButton.State.Off);
       if(bUnixSystem){
-        widgRd[1].setState(GralButton.kDisabled);
-        widgRd[2].setState(GralButton.kDisabled);
-        widgWr[1].setState(GralButton.kDisabled);
-        widgWr[2].setState(GralButton.kDisabled);
-        widgEx[1].setState(GralButton.kDisabled);
-        widgEx[2].setState(GralButton.kDisabled);
-        widgSticky.setState(GralButton.kDisabled);
-        widgUID.setState(GralButton.kDisabled);
-        widgGID.setState(GralButton.kDisabled);
+        widgRd[1].setState(GralButton.State.Disabled);
+        widgRd[2].setState(GralButton.State.Disabled);
+        widgWr[1].setState(GralButton.State.Disabled);
+        widgWr[2].setState(GralButton.State.Disabled);
+        widgEx[1].setState(GralButton.State.Disabled);
+        widgEx[2].setState(GralButton.State.Disabled);
+        widgSticky.setState(GralButton.State.Disabled);
+        widgUID.setState(GralButton.State.Disabled);
+        widgGID.setState(GralButton.State.Disabled);
       }
-      widgHidden.setState(src.isHidden() ? GralButton.kOn : GralButton.kOff);
-      widgBtnDirBytes.setState(src.isDirectory() ? GralButton.kOn : GralButton.kDisabled);
-      //widgDirectory.setState(src.isDirectory() ? GralButton.kOn : GralButton.kOff);
+      widgHidden.setState(src.isHidden() ? GralButton.State.On : GralButton.State.Off);
+      widgBtnDirBytes.setState(src.isDirectory() ? GralButton.State.On : GralButton.State.Disabled);
+      //widgDirectory.setState(src.isDirectory() ? GralButton.State.On : GralButton.State.Off);
     }
   }
   
@@ -314,56 +314,56 @@ public class FcmdFileProps
           mask = FileRemote.mCanWrite | FileRemote.mHidden;
         }
         switch(widgRd[0].getState()){
-          case GralButton.kOff:       val &= ~FileRemote.mCanRead; break;
-          case GralButton.kOn:       val |= FileRemote.mCanRead; break;
-          case GralButton.kDisabled: mask &= ~FileRemote.mCanRead; break;
+          case Off:       val &= ~FileRemote.mCanRead; break;
+          case On:       val |= FileRemote.mCanRead; break;
+          case Disabled: mask &= ~FileRemote.mCanRead; break;
         }
         switch(widgWr[0].getState()){
-          case GralButton.kOff:       val &= ~FileRemote.mCanWrite; break;
-          case GralButton.kOn:       val |= FileRemote.mCanWrite; break;
-          case GralButton.kDisabled: mask &= ~FileRemote.mCanWrite; break;
+          case Off:       val &= ~FileRemote.mCanWrite; break;
+          case On:       val |= FileRemote.mCanWrite; break;
+          case Disabled: mask &= ~FileRemote.mCanWrite; break;
         }
         switch(widgEx[0].getState()){
-          case GralButton.kOff:       val &= ~FileRemote.mExecute; break;
-          case GralButton.kOn:       val |= FileRemote.mExecute; break;
-          case GralButton.kDisabled: mask &= ~FileRemote.mExecute; break;
+          case Off:       val &= ~FileRemote.mExecute; break;
+          case On:       val |= FileRemote.mExecute; break;
+          case Disabled: mask &= ~FileRemote.mExecute; break;
         }
         if(bUnixSystem){
           switch(widgRd[1].getState()){
-            case GralButton.kOff:       val &= ~FileRemote.mCanReadGrp; break;
-            case GralButton.kOn:       val |= FileRemote.mCanReadGrp; break;
-            case GralButton.kDisabled: mask &= ~FileRemote.mCanReadGrp; break;
+            case Off:       val &= ~FileRemote.mCanReadGrp; break;
+            case On:       val |= FileRemote.mCanReadGrp; break;
+            case Disabled: mask &= ~FileRemote.mCanReadGrp; break;
           }
           switch(widgWr[1].getState()){
-            case GralButton.kOff:       val &= ~FileRemote.mCanWriteGrp; break;
-            case GralButton.kOn:       val |= FileRemote.mCanWriteGrp; break;
-            case GralButton.kDisabled: mask &= ~FileRemote.mCanWriteGrp; break;
+            case Off:       val &= ~FileRemote.mCanWriteGrp; break;
+            case On:       val |= FileRemote.mCanWriteGrp; break;
+            case Disabled: mask &= ~FileRemote.mCanWriteGrp; break;
           }
           switch(widgEx[1].getState()){
-            case GralButton.kOff:       val &= ~FileRemote.mExecuteGrp; break;
-            case GralButton.kOn:       val |= FileRemote.mExecuteGrp; break;
-            case GralButton.kDisabled: mask &= ~FileRemote.mExecuteGrp; break;
+            case Off:       val &= ~FileRemote.mExecuteGrp; break;
+            case On:       val |= FileRemote.mExecuteGrp; break;
+            case Disabled: mask &= ~FileRemote.mExecuteGrp; break;
           }
           switch(widgRd[2].getState()){
-            case GralButton.kOff:       val &= ~FileRemote.mCanReadAny; break;
-            case GralButton.kOn:       val |= FileRemote.mCanReadAny; break;
-            case GralButton.kDisabled: mask &= ~FileRemote.mCanReadAny; break;
+            case Off:       val &= ~FileRemote.mCanReadAny; break;
+            case On:       val |= FileRemote.mCanReadAny; break;
+            case Disabled: mask &= ~FileRemote.mCanReadAny; break;
           }
           switch(widgWr[2].getState()){
-            case GralButton.kOff:       val &= ~FileRemote.mCanWriteAny; break;
-            case GralButton.kOn:       val |= FileRemote.mCanWriteAny; break;
-            case GralButton.kDisabled: mask &= ~FileRemote.mCanWriteAny; break;
+            case Off:       val &= ~FileRemote.mCanWriteAny; break;
+            case On:       val |= FileRemote.mCanWriteAny; break;
+            case Disabled: mask &= ~FileRemote.mCanWriteAny; break;
           }
           switch(widgEx[2].getState()){
-            case GralButton.kOff:       val &= ~FileRemote.mExecuteAny; break;
-            case GralButton.kOn:       val |= FileRemote.mExecuteAny; break;
-            case GralButton.kDisabled: mask &= ~FileRemote.mExecuteAny; break;
+            case Off:       val &= ~FileRemote.mExecuteAny; break;
+            case On:       val |= FileRemote.mExecuteAny; break;
+            case Disabled: mask &= ~FileRemote.mExecuteAny; break;
           }
         }
         switch(widgHidden.getState()){
-          case GralButton.kOff:       val &= ~FileRemote.mHidden; break;
-          case GralButton.kOn:        val |=  FileRemote.mHidden; break;
-          case GralButton.kDisabled: mask &= ~FileRemote.mHidden; break;
+          case Off:       val &= ~FileRemote.mHidden; break;
+          case On:        val |=  FileRemote.mHidden; break;
+          case Disabled: mask &= ~FileRemote.mHidden; break;
         }
         val &= mask;   //only used bits.
         boolean bAbort = false;
