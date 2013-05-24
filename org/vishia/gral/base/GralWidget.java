@@ -1123,6 +1123,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
       }
       if(actionFocused !=null){ actionFocused.userActionGui(KeyCode.focusGained, GralWidget.this); }
       //notify GralWidgetMng about focused widget.
+      System.out.println("GralWidget - FocusGained;" /* %s; %s;\n",*/ + name + "; " + htmlHelp);
       itsMng.notifyFocus(GralWidget.this);
     }
     

@@ -1675,8 +1675,8 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 	
 	
   
-  /**Universal focus listener to register which widgets were in focus in its order.
-   * and to set htmlHelp
+  /**Universal focus listener to register which widgets were in focus in its order,
+   * to set htmlHelp and to invoke the {@link GralWidget#setActionFocused(GralUserAction)}.
    */
   class SwtMngFocusListener implements FocusListener
   {

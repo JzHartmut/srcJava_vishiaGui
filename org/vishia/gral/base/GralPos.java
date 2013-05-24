@@ -139,6 +139,7 @@ public class GralPos implements Cloneable
 {
   /**Version, history and license.
    * <ul>
+   * <li>2013-05-24 Hartmut bugfix fine position can be greater 20 if positions are add and sizes are add too. 
    * <li>2011-10-01 Hartmut corr: Calculation of next position or refer + value if the size was negative and sameSize is selected.
    *                Then the new input value should calculate from the bottom or left value because the size is negative furthermore.
    * <li>2011-10-01 Hartmut bugfix: if(qf >= 10)... instead >10 
@@ -872,7 +873,7 @@ public class GralPos implements Cloneable
         throw new IllegalArgumentException("positions out of range" + q1 + ", " + q2);
       }
       if(q1Frac >= 20){  //can be on adding distance
-        this.p1 = q1 +1; this.p1Frac = q1Frac -20;
+        this.p1 = q1 +2; this.p1Frac = q1Frac -20;
       } else if(q1Frac >= 10){
           this.p1 = q1 +1; this.p1Frac = q1Frac -10;
       } else if(q1Frac < 0){
@@ -881,7 +882,7 @@ public class GralPos implements Cloneable
         this.p1 = q1; this.p1Frac = q1Frac;   
       }
       if(q2Frac >= 20){
-        this.p2 = q2 +1; this.p2Frac = q2Frac -20;
+        this.p2 = q2 +2; this.p2Frac = q2Frac -20;
       } else if(q2Frac >= 10){
         this.p2 = q2 +1; this.p2Frac = q2Frac -10;
       } else if(q2Frac < 0){

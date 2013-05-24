@@ -18,6 +18,7 @@ public class SwtButton extends GralButton
 {
   /**The version of this interface:
    * <ul>
+   * <li>2012-03-09 Hartmut new setFocus on press button
    * <li>2012-03-09 Hartmut new 3-state-Button.
    * <li>2012-03-09 Hartmut improved: appearance of the buttons.
    * <li>All other changes in 2010, 2011
@@ -46,7 +47,8 @@ public class SwtButton extends GralButton
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120309;
+  @SuppressWarnings("hiding")
+  public static final int version = 20130524;
 
   Canvas widgetSwt;
   
@@ -70,6 +72,7 @@ public class SwtButton extends GralButton
     widgetSwt.setData(this);
     widgetSwt.setBackground(mng.propertiesGuiSwt.colorBackground);
     widgetSwt.addMouseListener(mouseListener);
+    widgetSwt.addFocusListener(mng.focusListener);  //common focus listener 
     setBoundsGraphic(mng);
     float ySize = mng.pos.height();
     char size1 = ySize > 3? 'B' : 'A';
@@ -235,6 +238,7 @@ public class SwtButton extends GralButton
           ypText = 0;
         }
         if(isPressed){
+          ((Canvas)e.widget).forceFocus();
           /*
           gc.setLineWidth(3);
           gc.drawRectangle(1,1,dim.width-2, dim.height-2);
