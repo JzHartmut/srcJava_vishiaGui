@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
@@ -20,7 +21,6 @@ import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
 import org.vishia.util.EventSource;
 import org.vishia.util.FileCompare;
-import org.vishia.util.FileRemote;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringFunctions;

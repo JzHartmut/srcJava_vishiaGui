@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.commander.Fcmd;
+import org.vishia.fileRemote.FileAccessZip;
+import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelContent;
@@ -29,8 +31,6 @@ import org.vishia.util.Assert;
 import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
 import org.vishia.util.EventSource;
-import org.vishia.util.FileAccessZip;
-import org.vishia.util.FileRemote;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;

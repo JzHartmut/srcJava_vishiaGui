@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.fileRemote.FileCluster;
+import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GralArea9MainCmd;
@@ -29,7 +30,6 @@ import org.vishia.inspectorAccessor.UserInspcPlug_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageFile;
 import org.vishia.util.CompleteConstructionAndStart;
-import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
 public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg

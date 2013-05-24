@@ -5,6 +5,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.vishia.fileRemote.FileRemote;
+import org.vishia.fileRemote.FileRemoteAccessor;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralLed;
 import org.vishia.gral.base.GralPos;
@@ -18,8 +20,6 @@ import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
 import org.vishia.util.EventSource;
-import org.vishia.util.FileRemote;
-import org.vishia.util.FileRemoteAccessor;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 

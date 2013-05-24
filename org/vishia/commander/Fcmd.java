@@ -16,6 +16,7 @@ import org.vishia.commander.target.FcmdtTarget_ifc;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.fileLocalAccessor.FileRemoteAccessorLocalFile;
 import org.vishia.fileRemote.FileCluster;
+import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GralArea9MainCmd;
@@ -30,7 +31,6 @@ import org.vishia.msgDispatch.MsgDispatchSystemOutErr;
 import org.vishia.msgDispatch.MsgDispatcher;
 import org.vishia.msgDispatch.MsgPrintStream;
 import org.vishia.msgDispatch.MsgRedirectConsole;
-import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
 public class Fcmd extends GuiCfg

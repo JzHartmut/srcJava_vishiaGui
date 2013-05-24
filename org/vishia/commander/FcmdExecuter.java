@@ -10,6 +10,7 @@ import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
 import org.vishia.cmd.PrepareCmd;
 import org.vishia.cmd.CmdStore.CmdBlock;
+import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
@@ -20,7 +21,6 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.mainCmd.MainCmd_ifc;
-import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
 public class FcmdExecuter

@@ -4,12 +4,12 @@ import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.gral.widget.GralSelectList;
-import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
 /**This is one table of favorite pathes in the file commander.  

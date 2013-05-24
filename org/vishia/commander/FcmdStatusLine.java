@@ -5,11 +5,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
 public class FcmdStatusLine

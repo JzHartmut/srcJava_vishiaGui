@@ -2,6 +2,7 @@ package org.vishia.commander;
 
 import java.io.File;
 
+import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidget;
@@ -17,7 +18,6 @@ import org.vishia.util.Assert;
 import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
 import org.vishia.util.FileCompare;
-import org.vishia.util.FileRemote;
 
 /**This is one file table in the Java commander. Each main panel (left, middle, right)
  * has maybe more as one tabs, each tab has exactly one file table. The file table is reused

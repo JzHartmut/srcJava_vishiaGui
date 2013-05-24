@@ -2,6 +2,7 @@ package org.vishia.gral.widget;
 
 import java.io.File;
 
+import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
@@ -12,7 +13,6 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
 

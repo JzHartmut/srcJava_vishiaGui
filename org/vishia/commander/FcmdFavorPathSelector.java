@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.vishia.fileRemote.FileCluster;
+import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
@@ -23,7 +24,6 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.mainCmd.MainCmd_ifc;
-import org.vishia.util.FileRemote;
 import org.vishia.util.FileWriter;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringPart;

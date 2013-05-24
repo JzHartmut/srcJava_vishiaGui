@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
@@ -15,7 +16,6 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.widget.GralSelectList;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.util.Assert;
-import org.vishia.util.FileRemote;
 import org.vishia.util.KeyCode;
 
 /**Data for one panel left, middle or right.
