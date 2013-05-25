@@ -369,15 +369,15 @@ public class FcmdCopyCmd
   
   
   protected void execDel(){
-    if(bFineSelect){
+    if(state == Estate.checked){
       assert(evCurrentFile !=null);
       assert(state == Estate.checked);
       fileSrc.deleteChecked(evCurrentFile, 0);      
-    } else {
+    } else if(state == Estate.start){
       FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackCopy, null, evSrc);
-      fileSrc.deleteChecked(callback, 0);
+      //fileSrc.deleteChecked(callback, 0);
     }
-    setTexts(Estate.finit);  //TODO
+    //setTexts(Estate.finit);  //TODO
     ///
   }
   
@@ -388,8 +388,8 @@ public class FcmdCopyCmd
       //ev.sendEvent(FileRemote.cmdAbortAll);
     }
     String sDirSrc = widgCopyFrom.getText();
-    FileRemote dirSrc = main.fileCluster.getFile(sDirSrc, null); //new FileRemote(sDirSrc);
-    dirSrc.abortAction();
+    //FileRemote dirSrc = main.fileCluster.getFile(sDirSrc, null); //new FileRemote(sDirSrc);
+    if(dirSrc !=null) { dirSrc.abortAction(); }  //to set stateMachine of copy in ready state 
     listEvCheck.clear();
     listEvCopy.clear();
     filesToCopy.clear();
@@ -407,7 +407,7 @@ public class FcmdCopyCmd
     { { "delete", "move", "check copy" }
     , { "check del", "check move", "check copy" }
     , { "busy check", "busy check", "busy check" }
-    , { "delete", "move", "copy" } 
+    , { "del checked", "move checked", "copy checked" } 
     , { "pause del", "pause move", "pause copy" }
     , { "close del", "close move", "close copy" }
     };
