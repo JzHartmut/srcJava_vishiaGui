@@ -756,8 +756,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   }
   
   
-  /**Fills the content with given directory without accessing the file system. All information are contained
-   * in the fileIn.
+  /**Fills the content with given directory without accessing the file system. 
+   * All information are contained in the fileIn.
    * @param fileIn Either a directory which's files are shown or a file inside a directory.
    *   In the second case the directory is shown and the file is selected.
    * @param bCompleteWithFileInfo true if alle files in the directory is completed. 
@@ -776,6 +776,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
         String sDir = FileSystem.getCanonicalPath(dir); //with / as separator!
         String sFile = fileIn.getName();
         indexSelection.put(sDir, sFile);
+      }
+      if(this.currentDir !=dir){
+        Assert.stop();
       }
       this.currentDir = dir;
       if(originDir == null){
@@ -916,8 +919,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
             line.setCellText("..", kColFilename);
             line.setCellText("", kColLength);
             line.setCellText("", kColDate);
+            selectList.wdgdTable.replaceLineKey(line, null);
           }
-          line.setUserData(dir);
+          line.setUserData(dir);  //The ".." represents the directory which is shown (instead ".")
           lineCt +=1;
         }
         //The file or directory which was the current one while this directory was shown lastly:
@@ -945,6 +949,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
             tline.setCellText(sFileName, kColFilename);
             tline.setUserData(file);
             tline.setDeselect(1, null);
+            selectList.wdgdTable.replaceLineKey(tline, sFileName);
           } else { //same file, don't change line.
             long dateFile = file.lastModified();
             isChanged = tline.setContentIdent(dateFile) != dateFile;

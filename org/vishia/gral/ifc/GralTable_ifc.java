@@ -7,6 +7,7 @@ public interface GralTable_ifc extends GralWidget_ifc
 {
   /**Version and history:
    * <ul>
+   * <li>2013-05-28 Hartmut new {@link #replaceLineKey(GralTableLine_ifc, String)}
    * <li>2012-08-22 Hartmut new {@link #setCurrentLine(int)} with int, it isn't new because it was able to set with
    *   {@link #setCurrentCell(int, int)} with -1 as second parameter.
    * <ul>2011-11-20 Hartmut new {@link #getSelectedLines()}
@@ -45,7 +46,7 @@ public interface GralTable_ifc extends GralWidget_ifc
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120822;
+  public static final int version = 20130528;
 
   public abstract GralTableLine_ifc getCurrentLine();
   
@@ -112,6 +113,15 @@ public interface GralTable_ifc extends GralWidget_ifc
    */
   public abstract void deleteLine(  GralTableLine_ifc line);
 
+  
+  /**Replaces the key associated to the given line.
+   * It replaces the key stored in the line data and additional the map key-line
+   * in the table's key-line-index {@link #idxLine}.
+   * @param line The line, not a new line, an existing one.
+   * @param keyNew The new key for this line.
+   */
+  public void replaceLineKey(GralTableLine_ifc line, String keyNew);
+  
   /**Returns the number of active lines of the table.
    * @return
    */

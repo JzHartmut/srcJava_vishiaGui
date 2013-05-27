@@ -24,7 +24,12 @@ import org.vishia.util.Removeable;
  * should be created as final compositions in the main thread before the table can be presented 
  * in the graphic thread. Therefore the aggregation {@link #wdgdTable} cannot be final. It is set 
  * only when {@link #setToPanel(GralMngBuild_ifc, String, int, int[], char)} is called.  
- * 
+ * <pre>
+ *  GralSelectList
+ *        |--{@link #wdgdTable}--->GralTable         TableLineData
+ *                                     |---idxLine------*>|
+ *                                     |---tableLines---*>|
+ * </pre>
  * @author Hartmut Schorrig
  *
  */
@@ -161,7 +166,7 @@ public abstract class GralSelectList implements Removeable //extends GralWidget
   protected abstract boolean actionUserKey(int key, Object userData, GralTableLine_ifc line);
   
   
-  private GralUserAction actionTable = new GralUserAction()
+  private final GralUserAction actionTable = new GralUserAction()
   {
 
     @Override public boolean userActionGui(int keyCode, GralWidget widgdTable, Object... params)

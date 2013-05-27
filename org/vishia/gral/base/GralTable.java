@@ -38,9 +38,12 @@ import org.vishia.util.SelectMask_ifc;
  * <br>
  * <pre>
  *   Graphic representation     GralTable
- *             |                   |---tableLines---*>|
- *    |<*------+                                      |
- *   TextField                                        |
+ *             |                   |
+ *             |                   |--idxLine-->Map<key, GralTableLine_ifc>
+ *             |                   |                         +------|
+ *             |                   |                         |
+ *    |<*------+                   |                         |
+ *   TextField                     |---tableLines---*>|<*----+
  *    |<>------>CellData                              |
  *    |            |-tableItem--------->{@link TableLineData}
  *                                                    |<>---userData--------------->User's data
@@ -398,8 +401,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     return line;
   }
 
-  @Override
-  public void deleteLine(GralTableLine_ifc line) {
+  @Override public void deleteLine(GralTableLine_ifc line) {
     int linenr = line.getLineNr();
     idxLine.remove(((TableLineData)line).key);
     tableLines.remove(linenr);
@@ -414,6 +416,25 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     }
     repaint(200,200);
   }
+  
+  
+  
+  @Override public void replaceLineKey(GralTableLine_ifc line, String keyNew){
+    TableLineData lineData = (TableLineData)line;
+    String keyOld = lineData.key;
+    if(keyOld !=null){
+      GralTableLine_ifc lineOld = idxLine.remove(keyOld);
+      if(lineOld != line){ //multiple keys, it was another line:
+        idxLine.put(keyOld, lineOld);  //put it back again, don't remove.
+      }
+    }
+    if(keyNew !=null){
+      idxLine.put(keyNew, line);
+    }
+    lineData.key = keyNew;  //maybe null 
+  }
+  
+  
   
   
   @Override public int size(){ return zLine = tableLines.size(); }

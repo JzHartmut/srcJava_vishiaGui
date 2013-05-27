@@ -334,7 +334,7 @@ public class FcmdFileCard extends GralFileSelector
    * @param file The currently selected file.
    * @param sFileName Text in the cell, especially ".." for the parent dir entry.
    */
-  private void actionOnFileSelection(FileRemote file, String sFileName){
+  protected void actionOnFileSelection(FileRemote file, String sFileName){
     //note the file, able to use for some actions.
     currentFile = file;
     main.currentFile = file;
@@ -385,7 +385,7 @@ public class FcmdFileCard extends GralFileSelector
   
   void syncWithSecondPanel(String sFileName){
     //String fileName = currentFile.getName();
-    System.out.println("FcmdFileCard " + mainPanel.cc + ":" + sFileName);
+    System.out.println("FcmdFileCard -SyncWithSecondPanel;" + mainPanel.cc + ";" + sFileName);
     FcmdFileCard otherFileCard;
     if(mainPanel.cc == 'm'){ otherFileCard = main.favorPathSelector.panelRight.actFileCard; }
     else if(mainPanel.cc == 'r'){ otherFileCard = main.favorPathSelector.panelMid.actFileCard;  }
@@ -455,7 +455,7 @@ public class FcmdFileCard extends GralFileSelector
   
   /**Action to show the file properties in the info line. This action is called anytime if a line
    * was changed in the file view table. */
-  GralUserAction actionOnFileSelection = new GralUserAction(){
+  GralUserAction actionOnFileSelection = new GralUserAction("FcmdFileCard-actionOnFileSelection"){
     /**The action called from {@link GralTable}.
      * @param params [0] is the Table line. The content of table cells are known here,
      *   because it is the file table itself. The {@link GralTableLine_ifc#getUserData()}
