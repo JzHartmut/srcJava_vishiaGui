@@ -123,6 +123,7 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
     }
     fileSelector.fillIn(startDir, false);
     wind.setWindowVisible(true);
+    fileSelector.setFocus();
   }
   
   
@@ -168,12 +169,23 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
   }
   
   
+  /**Action of OK button or enter button. It returns the file in the shown directory
+   * with the name written in the widgFilename-textfield.
+   * It is not the selected file. But the textfield is filled with the name of the selected file 
+   * if a file was selected in the table.
+   * 
+   */
   GralUserAction actionOk = new GralUserAction("GralFileSelector-actionOk"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){  //supress both mouse up and down reaction
         FileRemote dir = fileSelector.getCurrentDir();
         String sFilename = widgFilename.getText();
-        FileRemote file = dir.child(sFilename);
+        FileRemote file;
+        if(sFilename.length()==0 || sFilename.equals("..")){
+          file = dir;
+        } else {
+          file = dir.child(sFilename);
+        }
         actionOkForUser.exec(KeyCode.menuEntered, null, file); 
       }
       return true;
@@ -193,9 +205,11 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
       GralTableLine_ifc line = (GralTableLine_ifc) params[0];
       String sFileCell = line.getCellText(GralFileSelector.kColFilename);
       Object oData = line.getUserData();
-      if(oData instanceof File){
+      if(false && oData instanceof File){
         String sName = ((File)oData).getName();
         widgFilename.setText(sName);
+      } else {
+        widgFilename.setText(sFileCell);
       }
       return true;
     }

@@ -131,11 +131,12 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     //this.XXXinspcComm = new InspcGuiComm(this, guiCfg.gralMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
     //composites.add(XXXinspcComm);
     
-    FileRemote defaultDir = fileCluster.getFile(cargs.sDefaultDirForCurves, null);
+    FileRemote defaultDirCfg = fileCluster.getFile(cargs.sDefaultDirCfgForCurves, null);
+    FileRemote defaultDirSave = fileCluster.getFile(cargs.sDefaultDirSaveForCurves, null);
     
-    curveA = new InspcCurveView("curve_A", variableMng, cmdgui.gralMng, defaultDir, cargs.curveExporterClasses);
-    curveB = new InspcCurveView("curve_B", variableMng, cmdgui.gralMng, defaultDir, cargs.curveExporterClasses);
-    curveC = new InspcCurveView("curve_C", variableMng, cmdgui.gralMng, defaultDir, cargs.curveExporterClasses);
+    curveA = new InspcCurveView("curve_A", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, cargs.curveExporterClasses);
+    curveB = new InspcCurveView("curve_B", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, cargs.curveExporterClasses);
+    curveC = new InspcCurveView("curve_C", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, cargs.curveExporterClasses);
 
   }
   
@@ -210,7 +211,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
     boolean bUseGetValueByIndex;
     
-    String sDefaultDirForCurves = "C:/";
+    String sDefaultDirCfgForCurves = "C:/";
+
+    String sDefaultDirSaveForCurves = "C:/";
 
   }
   
@@ -265,7 +268,13 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
         { cargs.sOwnIpcAddr = getArgument(8);   //an example for default output
         }
         else if(arg.startsWith("-dirCurves=")) 
-        { cargs.sDefaultDirForCurves = getArgument(11);   //an example for default output
+        { cargs.sDefaultDirCfgForCurves = getArgument(11);   //an example for default output
+        }
+        else if(arg.startsWith("-dirCurveCfg=")) 
+        { cargs.sDefaultDirCfgForCurves = getArgument(13);   //an example for default output
+        }
+        else if(arg.startsWith("-dirCurveSave=")) 
+        { cargs.sDefaultDirSaveForCurves = getArgument(14);   //an example for default output
         }
         else { bOk = super.testArgument(arg, nArg); }
       } catch(Exception exc){ bOk = false; }

@@ -917,6 +917,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
             line.setCellText("", kColLength);
             line.setCellText("", kColDate);
           }
+          line.setUserData(dir);
           lineCt +=1;
         }
         //The file or directory which was the current one while this directory was shown lastly:

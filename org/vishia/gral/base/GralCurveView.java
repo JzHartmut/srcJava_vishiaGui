@@ -249,26 +249,24 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     }
 
     
-    @Override public float getValueCursorLeft(){ 
+    @Override public float getValueCursorLeft(){ return getValueCursor(outer.xpCursor1); }
+    
+    
+    
+    @Override public float getValueCursorRight(){ return getValueCursor(outer.xpCursor2); }
+    
+    
+    private float getValueCursor(int cursor){ 
       float value; ///
-      try{
-        int ixData = outer.getIxDataFromPixelRight(outer.xpCursor1);
-        value = values[ixData]; 
-      } catch(Exception exc){
-        value = 77777.7f;
-      }
-      return value;
-    }
-    
-    
-    
-    @Override public float getValueCursorRight(){
-      float value;
-      try{
-        int ixData = outer.getIxDataFromPixelRight(outer.xpCursor2);
-        value = values[ixData]; 
-      } catch(Exception exc){
-        value = 77777.7f;
+      if(cursor >=0 && cursor < outer.ixDataShown.length){
+        try{
+          int ixData = outer.getIxDataFromPixelRight(cursor);
+          value = values[ixData]; 
+        } catch(Exception exc){
+          value = 77777.7f;
+        }
+      } else {
+        value = 777777.7f;
       }
       return value;
     }
@@ -1162,20 +1160,24 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
         for(Track track: listTracks){
           String sName = track.name;
           String sPath = track.getDataPath();
-          out.setTrackInfo(nrofTracks, ++ixTrack, sPath, sName);
+          GralColor color = track.getLineColor();
+          String sColor = color.getColorName();
+          out.setTrackInfo(nrofTracks, ++ixTrack, sPath, sName, sColor, track.getScale7div(), track.getOffset(), track.getLinePercent());
         }
         int ctValues = this.nrofValues -1;  //read first, may be increment in next step
         int ixData;
-        if(xpCursor1 >=0 && xpCursor1 < ixDataShown.length){
-          ixData = ixDataShown[xpCursor1];
+        int xRight = 0; //xpCursor2
+        int xLeft = sizepos.xPixelCurve;  //xpCursor1
+        if(xLeft >=0 && xLeft < ixDataShown.length){
+          ixData = ixDataShown[xLeft];
         } else {
           ixData = ixDataWr - (ctValues << shIxiData);  //read only one time, the index start from.
         }
         int ixDataEnd;
-        if(xpCursor2 >=0 && xpCursor2 < ixDataShown.length){
-          ixDataEnd = ixDataShown[xpCursor2];
+        if(xRight >=0 && xRight < ixDataShown.length){
+          ixDataEnd = ixDataShown[xRight];
         } else {
-          ixDataEnd = ixDataWr; 
+          ixDataEnd = ixDataWr;   //never used.
         }
         
         float[] record = new float[listTracks.size()];

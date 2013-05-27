@@ -217,14 +217,14 @@ public final class InspcCurveView
    * @param defaultDir
    * @param curveExporterClasses Class which is used to export curves.
    */
-  InspcCurveView(String sName, VariableContainer_ifc variables, GralMng gralMng, FileRemote defaultDir, Map<String, String> curveExporterClasses){
+  InspcCurveView(String sName, VariableContainer_ifc variables, GralMng gralMng, FileRemote defaultDirCfg, FileRemote defaultDirSave, Map<String, String> curveExporterClasses){
     //this.comm = comm;
     this.sName = sName;
     this.curveExporterClasses = curveExporterClasses;
     this.variables = variables;
     this.gralMng = gralMng;
-    fileCurveCfg = defaultDir;
-    fileCurveSave = defaultDir;
+    fileCurveCfg = defaultDirCfg;
+    fileCurveSave = defaultDirSave;
   }
   
   
@@ -244,7 +244,7 @@ public final class InspcCurveView
     windCurve = gralMng.createWindow("windMapVariables", sName, windProps);
     //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 0, 'd');
     gralMng.setPosition(0, -2, 0, posright, 0, 'd');
-    widgCurve = gralMng.addCurveViewY(sName, 3000, 10);
+    widgCurve = gralMng.addCurveViewY(sName, 15000, 10);
     widgCurve.setActionMoveCursor(actionShowCursorValues);
     widgCurve.setActionTrackSelected(actionTrackSelected);
     gralMng.setPosition(0, GralPos.size +2, posright, 0, 0, 'd', 0);
@@ -580,7 +580,7 @@ public final class InspcCurveView
           } else if(widgd.getCmd().equals(sBtnReadValues)){
             windFileCfg.openDialog(fileCurveSave, "read values- not implemented yet", false, null);
           } else if(widgd.getCmd().equals(sBtnSaveValues)){
-            windFileCfg.openDialog(fileCurveSave, "write values", true, actionSaveValues);
+            windFileCfg.openDialog(fileCurveSave.getParentFile(), "write values", true, actionSaveValues);
           }
         } catch(Exception exc){
           widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
@@ -664,6 +664,7 @@ public final class InspcCurveView
         } catch(Exception exc){
           widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
         }
+        windFileCfg.closeWindow();
       }
       return true;
   } };
@@ -671,19 +672,25 @@ public final class InspcCurveView
   
   
   
-  GralUserAction actionSaveValues = new GralUserAction(){
+  /**Action invoked if the write file was selected in the {@link GralFileSelectWindow}
+   */
+  GralUserAction actionSaveValues = new GralUserAction("actionSaveValues"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
-          FileRemote fileParam = (FileRemote)params[0];
-          FileRemote dirCurveSave = fileParam.getParentFile();
+          FileRemote dirCurveSave = (FileRemote)params[0];
+          if(dirCurveSave.exists() && !dirCurveSave.isDirectory()){
+            dirCurveSave = dirCurveSave.getParentFile();
+          }
+          //FileRemote dirCurveSave = fileParam.getParentFile();
           long dateStart = widgCurve.timeAtCursorLeft();
           DateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
           String sNameFile = format.format(new Date(dateStart)) + "_" + sName;
+          FileSystem.mkDirPath(fileCurveSave);
+          //fileCurveSave.mkdirs();
           fileCurveSave = dirCurveSave.child(sNameFile + ".csv");
             //File file = new File("curve.save");
           System.out.println("InspcCurveView - save curve data to; " + fileCurveSave.getAbsolutePath());
-          
           writerCurveCsv.setFile(fileCurveSave);
           widgCurve.writeCurve(writerCurveCsv);
           
@@ -702,6 +709,7 @@ public final class InspcCurveView
           widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
           System.err.println(Assert.exceptionInfo("InspcCurveView", exc, 1, 2));
         }
+        windFileCfg.closeWindow();
       }
       return true;
   } };
