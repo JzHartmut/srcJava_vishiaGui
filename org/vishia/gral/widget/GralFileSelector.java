@@ -457,6 +457,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   private final RefreshTimed refreshTimed = new RefreshTimed();
   
+  boolean donotCheckRefresh;
+  
   /**The widget for showing the path. */
   protected GralTextField widgdPath;
   
@@ -565,6 +567,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
     panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
     selectList.setToPanel(panelMng, name, rows, columns, size);
     selectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refresh, actionRefreshFileTable);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refreshCyclicOff, actionSwitchoffCheckRefresh);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refreshCyclicOn, actionSwitchonCheckRefresh);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortNameCase, actionSortFilePerNameCase);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortNameNonCase, actionSortFilePerNameNonCase);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortExtCase, actionSortFilePerExtensionCase);
@@ -998,7 +1002,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
         line[kColDesignation] = "";
         line[kColFilename] = "--not found-1--";
         line[kColDate] = "";
-        selectList.wdgdTable.setValue(GralMng_ifc.cmdInsert, -1, line, currentDir);
+        selectList.wdgdTable.insertLine(null, -1, line, null);
       }
     } else {
       //faulty directory
@@ -1007,7 +1011,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       line[kColDesignation] = "";
       line[kColFilename] = "--not found--";
       line[kColDate] = "";
-      selectList.wdgdTable.setValue(GralMng_ifc.cmdInsert, -1, line, currentDir);
+      selectList.wdgdTable.insertLine(null, -1, line, null);
     }
     GralTableLine_ifc currentLine = selectList.wdgdTable.getCurrentLine();
     if(currentLine == null || lineSelect1 != currentLine.getLineNr()){
@@ -1076,7 +1080,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   public void checkRefresh(long since){
-    if(currentDir !=null && !currentDir.isTested(since)){
+    if(!donotCheckRefresh && currentDir !=null && !currentDir.isTested(since)){
       fillIn(currentDir, true);
     }
   }
@@ -1368,7 +1372,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       //fileCard.f  //TODO refresh
     }
     return true;
-} };
+  } };
 
 
 
@@ -1382,6 +1386,30 @@ public class GralFileSelector implements Removeable //extends GralWidget
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
         fillInCurrentDir();
+        return true;
+      } else return false;
+    }
+  };
+  
+  /**Sets the check refresh mode to off.
+   * <br>
+   */
+  GralUserAction actionSwitchoffCheckRefresh = new GralUserAction("actionSwitchoffCheckRefresh"){
+    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){ 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
+        donotCheckRefresh = true;
+        return true;
+      } else return false;
+    }
+  };
+  
+  /**Sets the check refresh mode to on.
+   * <br>
+   */
+  GralUserAction actionSwitchonCheckRefresh = new GralUserAction("actionSwitchoffCheckRefresh"){
+    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){ 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
+        donotCheckRefresh = false;
         return true;
       } else return false;
     }
@@ -1410,6 +1438,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
     public String sizeLarge = "&Sort/size &Largest";
     public String sortSizeSmall = "&Sort/size &Smallest";
     public String deselectRecursFiles = "actionDeselectDirtree";
+    public String refreshCyclicOff = "&Cyclic refresh/o&ff";
+    public String refreshCyclicOn = "&Cyclic refresh/&on";
   }
   
   
