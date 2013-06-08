@@ -61,6 +61,7 @@ public class FcmdFileCard extends GralFileSelector
    * 
    * 
    */
+  @SuppressWarnings("hiding")
   public static final int version = 0x20120309;
   
   /**Table widget for the select table of the file tab.*/

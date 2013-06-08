@@ -161,7 +161,11 @@ public class GuiSelectPanel
           
           formatter.reset();
           String sDate = formatter.convertTimestampToday(mainData.currCmpn.revisionWorkingTreeTop.date);
-          formatter.add(sDate).add(": rev=").add(mainData.currCmpn.revisionWorkingTreeTop.nr);
+          if(mainData.currCmpn.revisionWorkingTreeTop.nr !=null){
+            formatter.add(sDate).add(": rev=").add(mainData.currCmpn.revisionWorkingTreeTop.nr);
+          } else {
+            formatter.add("not found");
+          }
           mainData.currTableline.setCellText(formatter.getContent(), 1);
           
           formatter.reset();

@@ -56,6 +56,11 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2013-05-30 Hartmut new: switch refresh mode on and off
+   * <li>2013-05-20 Hartmut chg: {@link #fillInRefreshed(FileRemote, boolean)} now does not clear
+   *   the table but writes only lines if the data are changed. This method can be called 
+   *   in a higher frequency without disturbing the appearance of the table. Used for cyclically refresh.
+   * <li>2013-05-20 Hartmut new: Context menu for sort etc. It was part of Fcmd, now here.
    * <li>2013-04-30 Hartmut new: context menu now available. Sort, refresh, deselect
    * <li>2013-04-30 Hartmut new: {@link #checkRefresh(long)}, chg: Don't change the content in the table
    *   if the content is identical with the current presentation in table, for refreshing. 
@@ -457,6 +462,16 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   private final RefreshTimed refreshTimed = new RefreshTimed();
   
+  /**The time after 1970 when the fillin was invoked and finished at last.
+   * timeFillinFinished=0, then pending.
+   */
+  protected long timeFillinInvoked, timeFilesRefreshed, timeFillinFinished;
+  
+  /**Duration of last fillin. */
+  protected int durationRefresh, durationFillin;
+  
+  protected int refreshCount;
+  
   boolean donotCheckRefresh;
   
   /**The widget for showing the path. */
@@ -719,21 +734,27 @@ public class GralFileSelector implements Removeable //extends GralWidget
 
   
   /**Fills the content with given directory.
+   * If the same directory was refreshed in a short time before, it is not refreshed here.
+   * That is while fast navigation in a tree. 
    * @param fileIn The directory which's files are shown.
    * @param bCompleteWithFileInfo false then write only file names, without information about the file.
    */
   public void fillIn(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
   { long timenow = System.currentTimeMillis();
+    timeFillinInvoked = timenow;
     FileRemote dir = fileIn, file = null;
     boolean bRefresh = bCompleteWithFileInfo;
-    if((timenow - fileIn.timeRefresh) < 10000){
+    if((timenow - fileIn.timeRefresh) < 4000){
+      //any access in a short time to the same directory.
+      //It may be able to assume that the content is not changed since a short time
+      //if the user navigates in some directories.
       if(!fileIn.isDirectory()){
         dir = fileIn.getParentFile(); file = fileIn;
       }
     } else { //unknown whether it is a directory
       bRefresh = true;
     }
-    if(!bRefresh && (timenow - dir.timeChildren) > 10000){
+    if(!bRefresh && (timenow - dir.timeChildren) > 4000){
       bRefresh = true;
     }
     if(bRefresh){
@@ -749,12 +770,15 @@ public class GralFileSelector implements Removeable //extends GralWidget
           selectList.wdgdTable.insertLine(null, -1, line, null);
         }
         callbackEventFillIn.bCompleteWithFileInfo = bCompleteWithFileInfo;
-        (fileIn).refreshPropertiesAndChildren(callbackEventFillIn);  //fills the wdgdTable in callbackFillIn, calls fillInRefreshed there.
+        (fileIn).refreshPropertiesAndChildren(callbackEventFillIn);  
+        //fills the wdgdTable in callbackFillIn, calls fillInRefreshed there.
       } else {
         System.err.println(Assert.stackInfo("GralFileSelector.fillIn - second call is not advisable for the same card.", 4));
       }
     } else {
       //The file is refreshed in the last time, don't access the file system.
+      timeFilesRefreshed = timeFillinInvoked;
+      durationRefresh = 0;
       fillInRefreshed(fileIn, bCompleteWithFileInfo);
     }
   }
@@ -767,10 +791,13 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * @param bCompleteWithFileInfo true if alle files in the directory is completed. 
    *   If false then any file is tested.  
    */
-  private void fillInRefreshed(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
+  protected void fillInRefreshed(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
   {
     boolean bAllFilesCompleteWithFileInfo = true;
     //selectList.wdgdTable.clearTable(); 
+    int zLines = selectList.wdgdTable.size();
+    int lineCt = 0; //count lines to select the line number with equal sFileSelect.
+    GralTableLine_ifc tline;
     FileRemote dir = null;
     if(fileIn !=null && fileIn.exists()){
       if(fileIn.isDirectory()){
@@ -808,7 +835,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
     }
     //widgdPath.setSelection("|..<");
     long timeNow = System.currentTimeMillis();
-    
     int lineSelect1 = 0;  
     if(dir !=null && dir.exists() && dir.isDirectory()){
       File[] files = dir.listFiles();
@@ -907,25 +933,21 @@ public class GralFileSelector implements Removeable //extends GralWidget
             sortFiles.put(sort, file);
           }
         }
-        int zLines = selectList.wdgdTable.size();
-        int lineCt = 0; //count lines to select the line number with equal sFileSelect.
         if(dir.getParentFile() !=null){
           //write < .. line for parent seletion.
-          
-          GralTableLine_ifc line;
-          if(lineCt < zLines){ line = selectList.wdgdTable.getLine(lineCt); }
+          if(lineCt < zLines){ tline = selectList.wdgdTable.getLine(lineCt); }
           else {
-            line = selectList.wdgdTable.insertLine("..", -1, null, null);
+            tline = selectList.wdgdTable.insertLine("..", -1, null, null);
             zLines +=1;
           }
-          if(!line.getCellText(kColFilename).equals("..")){
-            line.setCellText("<", kColDesignation);
-            line.setCellText("..", kColFilename);
-            line.setCellText("", kColLength);
-            line.setCellText("", kColDate);
-            selectList.wdgdTable.replaceLineKey(line, null);
+          if(!tline.getCellText(kColFilename).equals("..")){
+            tline.setCellText("<", kColDesignation);
+            tline.setCellText("..", kColFilename);
+            tline.setCellText("", kColLength);
+            tline.setCellText("", kColDate);
+            selectList.wdgdTable.replaceLineKey(tline, null);
           }
-          line.setUserData(dir);  //The ".." represents the directory which is shown (instead ".")
+          tline.setUserData(dir);  //The ".." represents the directory which is shown (instead ".")
           lineCt +=1;
         }
         //The file or directory which was the current one while this directory was shown lastly:
@@ -936,7 +958,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
           boolean bCompleteFileWithInfo = bCompleteWithFileInfo 
             || (file instanceof FileRemote && ((FileRemote)file).isTested());
           String sFileName = file.getName();
-          GralTableLine_ifc tline;
           if(lineCt < zLines){ 
             tline = selectList.wdgdTable.getLine(lineCt);
           }
@@ -981,7 +1002,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
           lineCt +=1;
         }
         while(lineCt < zLines){
-          GralTableLine_ifc tline = selectList.wdgdTable.getLine(lineCt);
+          tline = selectList.wdgdTable.getLine(lineCt);
           selectList.wdgdTable.deleteLine(tline);
           zLines = selectList.wdgdTable.size();
         }
@@ -1023,7 +1044,23 @@ public class GralFileSelector implements Removeable //extends GralWidget
     if(!bAllFilesCompleteWithFileInfo){
       refreshTimed.delayedFillin(1500);
     }
-    
+    timeFillinFinished = System.currentTimeMillis();
+    durationFillin = (int)(timeFillinFinished - timeFillinInvoked);
+    if(lineCt < zLines){ tline = selectList.wdgdTable.getLine(lineCt); }
+    else {
+      tline = selectList.wdgdTable.insertLine("..", -1, null, null);
+      zLines +=1;
+    }
+    StringBuilder sDuration = new StringBuilder(100);
+    if(++refreshCount >=10){ refreshCount = 1; }
+    sDuration.append(refreshCount).append(" refr:").append(durationRefresh).append(" ms, fillin:").append(durationFillin);
+    tline.setCellText("i", kColDesignation);
+    tline.setCellText(sDuration.toString(), kColFilename);
+    tline.setCellText("", kColLength);
+    tline.setCellText("", kColDate);
+    selectList.wdgdTable.replaceLineKey(tline, null);
+    lineCt +=1;
+
   }
   
 
@@ -1213,6 +1250,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
       ///
       FillinCallback callback = (FillinCallback)evP;
       FileRemote dir = callback.getFileSrc();  //it is completed meanwhile
+      timeFilesRefreshed = System.currentTimeMillis();
+      durationRefresh = (int)(timeFilesRefreshed - timeFillinInvoked);
       //Timeshort.sleep(200); //test
       fillInRefreshed(dir, callback.bCompleteWithFileInfo);
       //setFocus();    //don't set the focus, it may be false. Only fill.

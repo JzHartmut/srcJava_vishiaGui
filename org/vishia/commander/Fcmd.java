@@ -328,9 +328,9 @@ public class Fcmd extends GuiCfg
     
     executer.cmdQueue.execCmds(writeStatusCmd);
     long time = System.currentTimeMillis() - 5000;
-    favorPathSelector.panelLeft.checkRefresh(time);
-    favorPathSelector.panelMid.checkRefresh(time);
-    favorPathSelector.panelRight.checkRefresh(time);
+    //favorPathSelector.panelLeft.checkRefresh(time);
+    //favorPathSelector.panelMid.checkRefresh(time);
+    //favorPathSelector.panelRight.checkRefresh(time);
   }
   
   

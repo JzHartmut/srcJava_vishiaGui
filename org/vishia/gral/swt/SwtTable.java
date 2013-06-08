@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
@@ -111,7 +112,7 @@ public final class SwtTable  extends GralTable {
     focusListenerCell = this.new FocusListenerCell();
     setColorsSwt();    
     this.cellsSwt = new Text[zLineVisibleMax][zColumn];
-    this.menuColumns = new SwtMenu[zColumn];
+    //this.menuColumns = new SwtMenu[zColumn];
     this.table = new SwtTable.Table(parent, zColumn);
     table.addKeyListener(myKeyListener);
     //table.addSelectionListener(selectionListener);
@@ -378,6 +379,39 @@ public final class SwtTable  extends GralTable {
   }
 
   
+  @Override protected GralMenu createColumnMenu(int column){
+    GralMenu menuColumn = new SwtMenu(name + "_menu" + column, table, itsMng);
+    for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){
+      cellsSwt[iRow][column].setMenu((Menu)menuColumn.getMenuImpl());
+    }    
+    return menuColumn;
+  }
+  
+  
+  /**Called internal from mouse event only.
+   * @param ev
+   */
+  protected void mouseDown(MouseEvent ev){
+    Text widgSwt = (Text)ev.widget;  //it is only associated to a cell.
+    cellDataOnMousePressed = (CellData)widgSwt.getData();
+    if(true || !hasFocus){
+      SwtTable.this.implMethodWidget_.focusGained();  //from GralWidget.
+      hasFocus = true;
+      //System.out.println("focusTable");
+    }
+    //redrawTableWithFocusedCell(ev.widget);
+    mousetime = System.currentTimeMillis();
+    
+    if((ev.button & SWT.BUTTON1)!=0){ mouse1isDown = true; }
+    else if((ev.button & SWT.BUTTON2)!=0){ 
+      mouse2isDown = true; 
+    }
+    //System.out.println("SwtTable-mouse dn end");
+    
+    
+  }
+  
+
   protected void setBoundsCells(){
     Rectangle parentBounds = table.getParent().getBounds();
     GralRectangle pixTable = pos.calcWidgetPosAndSize(itsMng.propertiesGui(), parentBounds.width, parentBounds.height, 0, 0);
@@ -418,7 +452,7 @@ public final class SwtTable  extends GralTable {
       Font font = mng.propertiesGuiSwt.getTextFontSwt(2, whatIs, whatIs);
       Color colorBackTableSwt = mng.getColorImpl(colorBackTable);
       for(int iCol = 0; iCol < zColumns; ++iCol){
-        menuColumns[iCol] = new SwtMenu(name + "_menu" + iCol, this, itsMng);
+        //menuColumns[iCol] = new SwtMenu(name + "_menu" + iCol, this, itsMng);
       }
       //NOTE: only if the swtSelectText is created first, it will drawn in in the foreground of the other cells.
       swtSearchText = new Text(this, SWT.LEFT | SWT.SINGLE | SWT.READ_ONLY);
@@ -437,7 +471,7 @@ public final class SwtTable  extends GralTable {
           int xdPixCol = columnPixel[iCol+1] - columnPixel[iCol];
           cell.setBounds(columnPixel[iCol], yPix, xdPixCol, linePixel);
           cell.setBackground(colorBackTableSwt);
-          cell.setMenu((Menu)menuColumns[iCol].getMenuImpl());
+          //cell.setMenu((Menu)menuColumns[iCol].getMenuImpl());
           cellsSwt[iRow][iCol] = cell;
         }
         yPix += linePixel;
@@ -610,20 +644,8 @@ public final class SwtTable  extends GralTable {
     @Override
     public void mouseDown(MouseEvent ev)
     {
+      SwtTable.this.mouseDown(ev);
       //System.out.println("SwtTable-mouse dn start" + ++mousect);
-      Text widgSwt = (Text)ev.widget;  //it is only associated to a cell.
-      CellData cellData = (CellData)widgSwt.getData();
-      if(true || !hasFocus){
-        SwtTable.this.implMethodWidget_.focusGained();  //from GralWidget.
-        hasFocus = true;
-        //System.out.println("focusTable");
-      }
-      //redrawTableWithFocusedCell(ev.widget);
-      mousetime = System.currentTimeMillis();
-      if((ev.button & SWT.BUTTON1)!=0){ mouse1isDown = true; }
-      else if((ev.button & SWT.BUTTON2)!=0){ mouse2isDown = true; }
-      //System.out.println("SwtTable-mouse dn end");
-      
     }
 
     @Override

@@ -13,6 +13,7 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 import org.vishia.util.SelectMask;
@@ -136,7 +137,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
   
   
-  protected final Map<String, GralTableLine_ifc> idxLine = new TreeMap<String, GralTableLine_ifc>();
+  protected final Map<String, TableLineData> idxLine = new TreeMap<String, TableLineData>();
   
   /**This action will be called any time when the selection of the current line is changed. 
    * The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called
@@ -229,6 +230,9 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   
 
   
+  /**Data of that cell which was pointered while any mouse button is pressed. */
+  protected CellData cellDataOnMousePressed;
+  
   /**The colors. */
   protected GralColor colorBackSelect, colorBackMarked, colorBackTable
   //, colorBackSelectNonFocused, colorBackMarkedNonFocused, colorBackTableNonFocused
@@ -294,8 +298,65 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   }
   
   
-  public void addContextMenuEntryGthread(int col, String name, String sMenuPath, GralUserAction action){
-    menuColumns[col].addMenuItemGthread(name, sMenuPath, action);
+  /**Adds a context menu entry for the given column.
+   * It is an abbreviation for {@link #getContextMenuColumn(int)} 
+   * and {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}.
+   *  
+   * @param col The column, see {@link #getContextMenuColumn(int)}
+   * @param name The name of the entry, see {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
+   * @param sMenuPath same like {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
+   * @param action same like {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
+   *   Note that the {@link GralWidget_ifc}-parameter of the {@link GralUserAction#exec(int, GralWidget_ifc, Object...)}
+   *   is given with the whole table, instance of this {@link GralTable}.
+   */
+  public void addContextMenuEntryGthread(int col, String menuname, String sMenuPath, GralUserAction action){
+    GralMenu menu = getContextMenuColumn(col);
+    GralWidget menuitem = menu.addMenuItemGthread(menuname, sMenuPath, action);
+    menuitem.setContentInfo(this);  //the table
+  }
+  
+
+  /**Returns the same context menu for all cells of the designated column. Each cells of the column gets the same context menu.
+   * It means the action has not any knowledge about the cell which has used to start the context menu.
+   * Only the whole table is associated. The advantage of this in comparison to {@link #getContextMenuColumnCells(int)}
+   * is: Some resources are saved, because there is only one menu item instance in the implementation layer
+   * of the graphic for all cells.<br>
+   * See {@link #getContextMenuColumnCells(int)}. Note that the {@link GralWidget_ifc}-parameter of the 
+   *   {@link GralUserAction#exec(int, GralWidget_ifc, Object...)} methods of all added menu entries
+   *   are given with the whole table, instance of this {@link GralTable}.
+   *
+   *  
+   * @param col The column of the table, count from 0,1,...
+   * @return The menu to add {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}.
+   */
+  public GralMenu getContextMenuColumn(int col){
+    if(menuColumns == null){
+      menuColumns = new GralMenu[zColumn];
+    }
+    if(menuColumns[col] == null){
+      menuColumns[col] = createColumnMenu(col); //for all cells of this column
+    }
+    return menuColumns[col];
+  }
+  
+  
+  /**Adds a context menu entries to all cells of the designated column. This method can't be used 
+   * if either {@link #getContextMenuColumn(int)} or {@link #addContextMenuEntryGthread(int, String, String, GralUserAction)}
+   * are called before. That is because either only one context menu can be added to all cells of a column
+   * (saves resources) or internal an extra context menu with the same appearance can be addes to all cells
+   * of the column. Using this method creates a context menu and its entry for all cells of the column
+   * with an extra menu instance. The reason of the extra instance is: The menu instance associates the cell, 
+   * and the cell associates the table line via {@link GralTableLine_ifc}. Because that the 
+   * {@link GralWidget_ifc}-parameter of the {@link GralUserAction#exec(int, GralWidget_ifc, Object...)}
+   * of the action parameter refers the cell. Use the following template for the action:
+   * <pre>
+   * </pre>
+   *  
+   * @param col The column of the table, count from 0,1,...
+   * @return The menu to add {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}.
+   */
+  public GralMenu getContextMenuColumnCells(int col, String name, String sMenuPath, GralUserAction action){
+    return null;
   }
   
   
@@ -316,7 +377,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   
   public void setColors(){
-    colorBackSelect = GralColor.getColor("am");
+    colorBackSelect = GralColor.getColor("lam");
     colorBackMarked = GralColor.getColor("rd");
     colorBackTable = GralColor.getColor("wh");
     //colorBackSelectNonFocused = GralColor.getColor("am");
@@ -403,7 +464,13 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   @Override public void deleteLine(GralTableLine_ifc line) {
     int linenr = line.getLineNr();
-    idxLine.remove(((TableLineData)line).key);
+    TableLineData tline = (TableLineData)line;
+    if(tline.key !=null){ 
+      TableLineData kline = idxLine.remove(tline.key);
+      if(kline != tline){
+        idxLine.put(kline.key, kline);
+      }
+    }
     tableLines.remove(linenr);
     for(int ii=linenr; ii < tableLines.size(); ++ii){
       TableLineData line2 = tableLines.get(ii);
@@ -423,13 +490,14 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     TableLineData lineData = (TableLineData)line;
     String keyOld = lineData.key;
     if(keyOld !=null){
-      GralTableLine_ifc lineOld = idxLine.remove(keyOld);
+      TableLineData lineOld = idxLine.remove(keyOld);
       if(lineOld != line){ //multiple keys, it was another line:
         idxLine.put(keyOld, lineOld);  //put it back again, don't remove.
       }
     }
     if(keyNew !=null){
-      idxLine.put(keyNew, line);
+      assert(line instanceof TableLineData);
+      idxLine.put(keyNew, (TableLineData)line);
     }
     lineData.key = keyNew;  //maybe null 
   }
@@ -463,6 +531,12 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   }
 
   
+  
+  /**Returns the line on that any mouse button was pressed. It is either the left, mid or right button.
+   * Able to use for context menu (right button).
+   * @return
+   */
+  public TableLineData getLineOnMousePressed(){ return cellDataOnMousePressed.tableItem; }
   
   /**Handle all standard keys of table. 
    * It should call in the key event handler from the implementation class.
@@ -692,6 +766,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     } else if (ixLineNew < ixLine1 +2){
       dLine = ixLineNew - (ixLine1 +2);  //negative
       ixLine1 += dLine; ixLine2 += dLine;
+    } else {
+      dLine = 99998;  //unused, debug
     }
     if(ixLine2 >= zLine ){
       ixLine2 = zLine-1;
@@ -701,6 +777,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     ixGlineSelectedNew = ixLineNew - ixLine1;
     
     Assert.check(ixLine2 < zLine && ixLineNew < zLine);
+    Assert.check(dLine < 99999);
     //Assert.check(ixGlineSelectedNew < zLineVisible);
     //
     //draw all table cells.
@@ -788,7 +865,10 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   protected abstract int getVisibleLinesTableImpl();
   
+  protected abstract GralMenu createColumnMenu(int column);
   
+  
+  //protected void setCellDataOnMousePressed(CellData data){ cellDataOnMousePressed = data; } 
   
   /**It is called whenever another line is selected, if the focus is gotten by mouse click
    * or a navigation key is pressed. 

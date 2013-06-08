@@ -705,7 +705,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   public void setActionMoveCursor(GralUserAction action){ actionMoveCursor = action; }
   
   
-  /**This action will be called whenever a track was selected. */
+  /**This action will be called whenever a track was selected. The selection will be done by
+   * pressing the left mouse with ctrl on a curve view point. */
   public void setActionTrackSelected(GralUserAction action){ actionSelectTrack = action; }
   
   
@@ -1167,7 +1168,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
         int ctValues = this.nrofValues -1;  //read first, may be increment in next step
         int ixData;
         int xRight = 0; //xpCursor2
-        int xLeft = sizepos.xPixelCurve;  //xpCursor1
+        int xLeft = sizepos.xPixelCurve-1;  //xpCursor1
         if(xLeft >=0 && xLeft < ixDataShown.length){
           ixData = ixDataShown[xLeft];
         } else {
