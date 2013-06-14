@@ -3,14 +3,21 @@ package org.vishia.gral.ifc;
 import java.util.List;
 
 
-public interface GralTable_ifc extends GralWidget_ifc
+/**Interface to a table widget.
+ * @author hartmut
+ *
+ * @param <UserData> Type of the data which is associated with a table line.
+ */
+public interface GralTable_ifc<UserData> extends GralWidget_ifc
 {
   /**Version and history:
    * <ul>
+   * <li>2013-06-11 Hartmut new Now the {@link GralTable}, the {@link GralTable.TableLineData} and this
+   *   interface are marked with the generic type UserData.
    * <li>2013-05-28 Hartmut new {@link #replaceLineKey(GralTableLine_ifc, String)}
    * <li>2012-08-22 Hartmut new {@link #setCurrentLine(int)} with int, it isn't new because it was able to set with
    *   {@link #setCurrentCell(int, int)} with -1 as second parameter.
-   * <ul>2011-11-20 Hartmut new {@link #getSelectedLines()}
+   * <ul>2011-11-20 Hartmut new {@link #getMarkedLines()}
    * <li>2011-10-01 Hartmut new: {@link #clearTable()}
    * <li>2011-09-03 Hartmut chg: method {@link #insertLine(String, int)} returns now the instance of {@link GralTableLine_ifc}
    *   The user doesn't create a line instance, an extra factory isn't necessary. The implementing instance
@@ -48,7 +55,7 @@ public interface GralTable_ifc extends GralWidget_ifc
    */
   public static final int version = 20130528;
 
-  public abstract GralTableLine_ifc getCurrentLine();
+  public abstract GralTableLine_ifc<UserData> getCurrentLine();
   
   
   /**Sets the line which is the current one. The current row is unchanged.
@@ -76,7 +83,7 @@ public interface GralTable_ifc extends GralWidget_ifc
    * @param row 0 is the first row. Must not be negative.
    * @return null if the row isn't exists.
    */
-  public abstract GralTableLine_ifc getLine(int row);
+  public abstract GralTableLine_ifc<UserData> getLine(int row);
   
   /**Get the line which is designated with the requested key.
    * Background: The lines of a table can be sorted in view. To get a line
@@ -86,7 +93,7 @@ public interface GralTable_ifc extends GralWidget_ifc
    * @param key The key to find out the row.
    * @return null if such line isn't found.
    */
-  public abstract GralTableLine_ifc getLine(String key);
+  public abstract GralTableLine_ifc<UserData> getLine(String key);
   
   /**Inserts a line in the table.
    * @param key The key to get it.
@@ -106,12 +113,12 @@ public interface GralTable_ifc extends GralWidget_ifc
    * @return instance to add info.
    * @see {@link GralTableLine_ifc} to add content.
    */
-  public abstract GralTableLine_ifc insertLine(String key, int row, String[] cellTexts, Object userData);
+  public abstract GralTableLine_ifc<UserData> insertLine(String key, int row, String[] cellTexts, UserData userData);
   
   /**Deletes a line in the table.
    * 
    */
-  public abstract void deleteLine(  GralTableLine_ifc line);
+  public abstract void deleteLine(  GralTableLine_ifc<UserData> line);
 
   
   /**Replaces the key associated to the given line.
@@ -120,7 +127,7 @@ public interface GralTable_ifc extends GralWidget_ifc
    * @param line The line, not a new line, an existing one.
    * @param keyNew The new key for this line.
    */
-  public void replaceLineKey(GralTableLine_ifc line, String keyNew);
+  public void replaceLineKey(GralTableLine_ifc<UserData> line, String keyNew);
   
   /**Returns the number of active lines of the table.
    * @return
@@ -138,10 +145,34 @@ public interface GralTable_ifc extends GralWidget_ifc
   
   
   
-  /**Returns all selected lines.
+  /**Returns all marked lines. It returns an empty list if no line is marked. 
    */
-  List<GralTableLine_ifc> getSelectedLines();
+  List<GralTableLine_ifc<UserData>> getMarkedLines();
   
 
+  /**Returns all lines. Note: This returns the original container of lines without backup.
+   * It means the list will be changed if any {@link #insertLine(String, int, String[], Object)}
+   * or {@link #deleteLine(GralTableLine_ifc)} will be called. Do not call any modification of this list
+   * for example {@link java.util.List#add(Object)} or {@link java.util.List#remove(int)}, use the methods
+   * of this interface to change the content of the table. Elsewhere the graphical presentation of the data
+   * may be corrupted.
+   * 
+   * See {@link #getListContent()}.
+   */
+  List<? extends GralTableLine_ifc<UserData>> getAllLines();
+  
+  /**Returns all content of lines. This makes a snapshot of the lines in calling time. If the table 
+   * will be changed in another thread while this routine runs, a {@link java.util.ConcurrentModificationException}
+   * will be thrown. But after them the list is able to use independently. 
+   */
+  List<UserData> getListContent();
+  
+
+  /**Returns the first line from top of the table which is marked or null if no line is marked.   */
+  GralTableLine_ifc<UserData> getFirstMarkedLine();
+  
+
+  
+  
   
 }

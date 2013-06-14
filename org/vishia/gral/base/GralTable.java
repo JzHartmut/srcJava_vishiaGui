@@ -40,13 +40,13 @@ import org.vishia.util.SelectMask_ifc;
  * <pre>
  *   Graphic representation     GralTable
  *             |                   |
- *             |                   |--idxLine-->Map<key, GralTableLine_ifc>
- *             |                   |                         +------|
- *             |                   |                         |
- *    |<*------+                   |                         |
- *   TextField                     |---tableLines---*>|<*----+
+ *             |                   |--idxLine-------------->Map<key, GralTableLine_ifc>
+ *             |                   |                                +------|
+ *             |                   |      {@link TableLineData}     |
+ *    |<*------+                   |                  |             |
+ *   TextField                     |---tableLines---*>|<*-----------+
  *    |<>------>CellData                              |
- *    |            |-tableItem--------->{@link TableLineData}
+ *    |            |-tableItem----------------------->|
  *                                                    |<>---userData--------------->User's data
  * 
  * </pre>
@@ -59,10 +59,16 @@ import org.vishia.util.SelectMask_ifc;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralTable extends GralWidget implements GralTable_ifc {
+public abstract class GralTable<UserData> extends GralWidget implements GralTable_ifc<UserData> {
 
   /**Version and history
    * <ul>
+   * <li>2014-06-12 Hartmut chg: On right mouse pressing the current line will be selected, because
+   *   the context menu should have an association to that line.
+   * <li>2013-06-12 Hartmut chg: A marked line is now designated with a background color. 
+   *   A selected marked line has another background than a selected non marked line (to see it).
+   * <li>2013-06-11 Hartmut new: Now the {@link GralTable}, the {@link GralTable.TableLineData} and this
+   *   interface are marked with the generic type UserData.
    * <li>2013-05-22 Hartmut new: {@link TableLineData#lineInGraphic} not used yet, but for further usage.
    *   Maybe for refresh data only if they are in the visible range. 
    * <li>2013-05-11 Hartmut chg: {@link #deleteLine(GralTableLine_ifc)} was not ready, now tested
@@ -137,7 +143,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
   
   
-  protected final Map<String, TableLineData> idxLine = new TreeMap<String, TableLineData>();
+  protected final Map<String, TableLineData<UserData>> idxLine = new TreeMap<String, TableLineData<UserData>>();
   
   /**This action will be called any time when the selection of the current line is changed. 
    * The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called
@@ -197,7 +203,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    * Contains content, color, selection etc. of the lines with there columns.
    * 
    */
-  protected ArrayList<TableLineData> tableLines = new ArrayList<TableLineData>();
+  protected ArrayList<TableLineData<UserData>> tableLines = new ArrayList<TableLineData<UserData>>();
   
   /**True if a line or a column is marked. */
   //protected boolean[] markedLines, markedColumns;
@@ -231,10 +237,10 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
 
   
   /**Data of that cell which was pointered while any mouse button is pressed. */
-  protected CellData cellDataOnMousePressed;
+  //protected CellData cellDataOnMousePressed;
   
   /**The colors. */
-  protected GralColor colorBackSelect, colorBackMarked, colorBackTable
+  protected GralColor colorBackSelect, colorBackMarked, colorBackSelectMarked, colorBackTable
   //, colorBackSelectNonFocused, colorBackMarkedNonFocused, colorBackTableNonFocused
   , colorTextSelect, colorTextMarked, colorTextTable;
   
@@ -378,7 +384,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   
   public void setColors(){
     colorBackSelect = GralColor.getColor("lam");
-    colorBackMarked = GralColor.getColor("rd");
+    colorBackMarked = GralColor.getColor("pcy");
+    colorBackSelectMarked = GralColor.getColor("lgn");
     colorBackTable = GralColor.getColor("wh");
     //colorBackSelectNonFocused = GralColor.getColor("am");
     //colorBackMarkedNonFocused = GralColor.getColor("lrd");
@@ -391,7 +398,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   
   
   @Override
-  public GralTableLine_ifc getCurrentLine() {
+  public GralTableLine_ifc<UserData> getCurrentLine() {
     if(ixLine >=0 && ixLine < tableLines.size()){
       return tableLines.get(ixLine);
     }
@@ -427,19 +434,19 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   }
 
   
-  @Override public GralTableLine_ifc getLine(int row) {
+  @Override public GralTableLine_ifc<UserData> getLine(int row) {
     if(row > tableLines.size()) return null;
     else return tableLines.get(row);
   }
 
   @Override
-  public GralTableLine_ifc getLine(String key) {
+  public GralTableLine_ifc<UserData> getLine(String key) {
     // TODO Auto-generated method stub
     return idxLine.get(key);
   }
 
-  @Override public GralTableLine_ifc insertLine(String key, int row, String[] cellTexts, Object userData) {
-    TableLineData line = new TableLineData();
+  @Override public GralTableLine_ifc<UserData> insertLine(String key, int row, String[] cellTexts, UserData userData) {
+    TableLineData<UserData> line = new TableLineData<UserData>();
     zLine = tableLines.size();
     if(row > zLine || row < 0){
       row = zLine;
@@ -457,6 +464,10 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     bFillCells = true;
     if(key !=null){
       idxLine.put(key, line);
+    }
+    for(int ii=row+1; ii < zLine; ++ii){
+      TableLineData line2 = tableLines.get(ii);
+      line2.nLineNr = ii;
     }
     repaint(100, 0);
     return line;
@@ -520,9 +531,9 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     repaint(200,200);
   }
 
-  @Override public List<GralTableLine_ifc> getSelectedLines() {
-    List<GralTableLine_ifc> list = new LinkedList<GralTableLine_ifc>();
-    for(TableLineData item: tableLines){
+  @Override public List<GralTableLine_ifc<UserData>> getMarkedLines() {
+    List<GralTableLine_ifc<UserData>> list = new LinkedList<GralTableLine_ifc<UserData>>();
+    for(TableLineData<UserData> item: tableLines){
       if((item.getSelection() & 1) !=0){
           list.add(item);
       }
@@ -531,12 +542,34 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   }
 
   
+  @Override public List<? extends GralTableLine_ifc<UserData>> getAllLines() { return tableLines; }
+  
+  
+  @Override public List<UserData> getListContent() {
+    List<UserData> list = new LinkedList<UserData>();
+    for(TableLineData<UserData> item: tableLines){
+      list.add(item.getUserData());
+    }
+    return list;
+  }
+
+  
+  @Override public GralTableLine_ifc getFirstMarkedLine() {
+    for(TableLineData item: tableLines){
+      if((item.getSelection() & 1) !=0){
+        return item;
+      }
+    }
+    return null;
+  }
+
+  
   
   /**Returns the line on that any mouse button was pressed. It is either the left, mid or right button.
    * Able to use for context menu (right button).
    * @return
    */
-  public TableLineData getLineOnMousePressed(){ return cellDataOnMousePressed.tableItem; }
+  //public TableLineData getLineOnMousePressed(){ return cellDataOnMousePressed.tableItem; }
   
   /**Handle all standard keys of table. 
    * It should call in the key event handler from the implementation class.
@@ -620,10 +653,10 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
         GralTableLine_ifc line = tableLines.get(ixLine);
         if((line.getSelection() & 1)!=0){
           //it is selected yet
-          line.setTextColor(GralColor.getColor("bk"));
+          line.setBackColor(colorBackTable,0);
           line.setDeselect(1, line.getUserData());
         } else {
-          line.setForegroundColor(GralColor.getColor("rd"));
+          line.setBackColor(colorBackMarked,0);
           line.setSelect(1, line.getUserData());
         }
         if(ixLine < zLine -1){
@@ -881,7 +914,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    */
   protected void actionOnLineSelected(GralTableLine_ifc line){
     if(actionOnLineSelected !=null){
-      actionOnLineSelected.userActionGui(KeyCode.tableLineSelect, this, line);
+      actionOnLineSelected.exec(KeyCode.tableLineSelect, this, line);
     }
   }
   
@@ -896,7 +929,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
    * The instance knows its TableSwt and therefore the supports the access to the whole table.
    *
    */
-  protected final class TableLineData extends SelectMask implements GralTableLine_ifc
+  protected final class TableLineData<UserData> extends SelectMask implements GralTableLine_ifc<UserData>
   {
 
     /**If a repaint is necessary, it is changed by increment by 1. If the redraw is executed
@@ -908,7 +941,8 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     /**The line visible in graphic. -1 if not visible.*/
     int lineInGraphic = -1;
     
-    /**The index number in the container {@link GralTable#tableLines} */
+    /**The index number in the container {@link GralTable#tableLines}. It is necessary to find out
+     * the line in the container if the line is given. Conclusion from line to tableLines.get(line.nLineNr). */
     public int nLineNr;
     
     /**The index value in {@link GralTable#idxLine}.*/
@@ -918,7 +952,7 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
     
     public GralColor colorForground, colorBackground;
     
-    private Object userData;
+    private UserData userData;
     
     //TODO GralColor colorBack, colorText;
     
@@ -969,9 +1003,9 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
       return oldText;
     }
 
-    @Override public Object getUserData() { return userData;  }
+    @Override public UserData getUserData() { return userData;  }
 
-    @Override public void setUserData(Object data) {this.userData = data; }
+    @Override public void setUserData(UserData data) {this.userData = data; }
 
     @Override public long setContentIdent(long date){ long last = dateUser; dateUser = date; return last; }
     
@@ -1151,15 +1185,26 @@ public abstract class GralTable extends GralWidget implements GralTable_ifc {
   }
   
 
-  /**Data for each Text widget of the graphical implementation layer.
+  /**Data for each Text widget of the graphical implementation layer. It refers the data of the 
+   * {@link GralTable#tableLines}.
    * Note: The class is visible only in the graphic implementation layer, because it is protected.
    * The elements need to set public because there are not visible elsewhere in the derived class
    * of the outer class. 
    */
-  protected static class CellData{
+  protected class CellData<UserData>{
+    
+    /**The row and column in the graphical presentation. */
     public final int ixCellLine, ixCellColumn;
-    public TableLineData tableItem;
+    
+    /**The line data which are presented in this cell. */
+    public TableLineData<UserData> tableItem;
+    
+    /**The color in the graphical presentation. It is the color of the text field. 
+     * Note that the color of the text field is only changed if this colors and the 
+     * {@link TableLineData#colorBackground} and {@link TableLineData#colorForground} are different. 
+     * It saves some calculation time if the color of the text field is set only if it is necessary. */
     public GralColor colorBack, colorText;
+    
     public CellData(int ixCellLine, int ixCellColumn){
       this.ixCellLine = ixCellLine; 
       this.ixCellColumn = ixCellColumn;

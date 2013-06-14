@@ -181,7 +181,7 @@ public final class InspcCurveView
 
   final GralColor colorBlack = GralColor.getColor("bk");
   
-  GralTable widgTableVariables;
+  GralTable<TrackValues> widgTableVariables;
   
   GralTextField widgScale, widgScale0, widgline0;
   
@@ -361,7 +361,7 @@ public final class InspcCurveView
       TrackValues input;
       if(bTabWidget){
         GralTable table = (GralTable)oContentInfo;
-        GralTableLine_ifc refline = table.getLineOnMousePressed();
+        GralTableLine_ifc refline = table.getCurrentLine();
         int refLineNr;
         if(refline == null){ //end of table of empty table
           refLineNr = -1;  //on end
@@ -573,7 +573,18 @@ public final class InspcCurveView
       return true;
   } };
   
+
   
+  
+  GralUserAction actionScaleFromMarkedTrack = new GralUserAction("actionScaleFromMarkedTrack"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
+      GralTableLine_ifc markedLine = widgTableVariables.getFirstMarkedLine();
+      if(markedLine !=null){
+        //float scale = markedLine.
+      }
+      return true;
+  } };
+
 
   
   /**called if The text field was entered with mouse 
@@ -739,7 +750,7 @@ public final class InspcCurveView
           Writer out = new FileWriter(fileCurveCfg);
           //don't use: widgCurve.writeSettings(out);
           //because it writes the order of curves in the view.
-          for(TrackValues trackValue: tracks){
+          for(TrackValues trackValue: widgTableVariables.getListContent()){
             GralCurveViewTrack_ifc track = trackValue.trackView;
             String sDataPath;
             int ix = 0;
@@ -830,7 +841,7 @@ public final class InspcCurveView
           trackScale.trackView.setLineProperties(color, 3, 0);  //change color immediately to see what happen
           trackScale.colorCurve = color;
           */
-          GralTableLine_ifc line = widgTableVariables.getLineOnMousePressed();
+          GralTableLine_ifc line = widgTableVariables.getCurrentLine();
           line.setTextColor(color);
           TrackValues track = (TrackValues)line.getContentInfo();
           if(track == trackScale){

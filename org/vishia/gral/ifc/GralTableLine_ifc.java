@@ -4,7 +4,7 @@ import org.vishia.util.SelectMask_ifc;
 
 
 
-public interface GralTableLine_ifc extends GralWidget_ifc, SelectMask_ifc
+public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, SelectMask_ifc
 {
 
   /**Version, history and license.
@@ -48,9 +48,9 @@ public interface GralTableLine_ifc extends GralWidget_ifc, SelectMask_ifc
   
   String setCellText(String text, int column);
   
-  void setUserData(Object data);
+  void setUserData(UserData data);
   
-  Object getUserData();
+  UserData getUserData();
   
   int getLineNr();
   

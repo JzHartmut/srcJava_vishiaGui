@@ -56,6 +56,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2013-06-15 Hartmut chg: {@link #fillIn(FileRemote, boolean)} modi of refresh.
    * <li>2013-05-30 Hartmut new: switch refresh mode on and off
    * <li>2013-05-20 Hartmut chg: {@link #fillInRefreshed(FileRemote, boolean)} now does not clear
    *   the table but writes only lines if the data are changed. This method can be called 
@@ -266,7 +267,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Implementation of the base widget.
    */
-  protected class FileSelectList extends GralSelectList
+  protected class FileSelectList extends GralSelectList<FileRemote>
   {
     final GralFileSelector outer;
     
@@ -732,6 +733,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   }
   
 
+  private enum ERefresh{ doNothing, refreshAll, refreshChildren};
+
   
   /**Fills the content with given directory.
    * If the same directory was refreshed in a short time before, it is not refreshed here.
@@ -742,299 +745,272 @@ public class GralFileSelector implements Removeable //extends GralWidget
   public void fillIn(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
   { long timenow = System.currentTimeMillis();
     timeFillinInvoked = timenow;
-    FileRemote dir = fileIn, file = null;
-    boolean bRefresh = bCompleteWithFileInfo;
-    if((timenow - fileIn.timeRefresh) < 4000){
-      //any access in a short time to the same directory.
-      //It may be able to assume that the content is not changed since a short time
-      //if the user navigates in some directories.
-      if(!fileIn.isDirectory()){
-        dir = fileIn.getParentFile(); file = fileIn;
-      }
-    } else { //unknown whether it is a directory
-      bRefresh = true;
+    final FileRemote dir, file;
+    if(!fileIn.isDirectory()){
+      dir = fileIn.getParentFile(); file = fileIn;
+      String sDir = FileSystem.getCanonicalPath(dir); //with / as separator!
+      String sFile = fileIn.getName();
+      indexSelection.put(sDir, sFile);
+    } else {
+      dir = fileIn; file = null;
     }
-    if(!bRefresh && (timenow - dir.timeChildren) > 4000){
-      bRefresh = true;
+    boolean bSameDirectory = dir == currentDir;
+    if(!bSameDirectory){
+      currentDir = dir;
+      this.sCurrentDir = dir.getAbsolutePath();  //though it may not exist, store it for refresh (may be exist later).
     }
-    if(bRefresh){
-    //if((bCompleteWithFileInfo || !(fileIn).isTested())){
-      //only refresh if it is necessary (not tested) or it should be refreshed, it means complete.
-      if(callbackEventFillIn.occupy(null, fileIn, false)){ //prevent more as one invocation in the same time.
-        //selectList.wdgdTable.clearTable(); 
-        if(selectList.wdgdTable.size()==0){
-          String[] line = new String[zColumns];
-          line[kColDesignation] = "";
-          line[kColFilename] = "--waiting--";
-          line[kColDate] = "";
-          selectList.wdgdTable.insertLine(null, -1, line, null);
-        }
-        callbackEventFillIn.bCompleteWithFileInfo = bCompleteWithFileInfo;
-        (fileIn).refreshPropertiesAndChildren(callbackEventFillIn);  
-        //fills the wdgdTable in callbackFillIn, calls fillInRefreshed there.
+    final ERefresh eRefresh;
+    if(bSameDirectory){
+      //it is a refresh.
+      if(true || (timenow - dir.timeChildren) > 4000){
+        eRefresh = ERefresh.refreshAll; //needs to refresh
       } else {
-        System.err.println(Assert.stackInfo("GralFileSelector.fillIn - second call is not advisable for the same card.", 4));
+        eRefresh = ERefresh.doNothing;  //do nothing, it is actual
       }
     } else {
-      //The file is refreshed in the last time, don't access the file system.
-      timeFilesRefreshed = timeFillinInvoked;
-      durationRefresh = 0;
-      fillInRefreshed(fileIn, bCompleteWithFileInfo);
+      //other directory
+      if(dir.timeChildren >0){
+        //another directory with known content.
+        //any access in a short time to a known directory.
+        //It may be able to assume that the content is not changed since a short time
+        //if the user navigates in some directories.
+        execFillIn(true);
+        eRefresh = ERefresh.doNothing;  //do nothing, it is shown and refreshed in execFillIn
+      } else {
+        //the directory is unknown yet.
+        selectList.wdgdTable.clearTable();
+        GralTableLine_ifc<FileRemote> tline = selectList.wdgdTable.insertLine(null, 0, null, null);
+        tline.setCellText("--waiting--", kColFilename);
+        eRefresh = ERefresh.refreshChildren;  //do nothing, it is shown and refreshed in execFillIn
+      }
+    }
+    if(eRefresh != ERefresh.doNothing){
+      //Note: a refresh can be pending yet.
+      boolean bOccupied;
+      if(bSameDirectory){
+        bOccupied = callbackEventFillIn.occupy(null, false);
+        if(!bOccupied) {
+          System.err.println(Assert.stackInfo("GralFileSelector.fillIn - second call is not advisable for the same card.", 4));
+        }
+      } else {
+        bOccupied = callbackEventFillIn.occupyRecall(4000, null, true); 
+        if(!bOccupied) {
+          System.err.println(Assert.stackInfo("GralFileSelector.fillIn - hangs.", 4));
+        }
+      }
+      if(bOccupied){ //prevent more as one invocation in the same time.
+        //it needs some time, fillIn after refresh
+        callbackEventFillIn.setFileSrc(currentDir);
+        if(eRefresh == ERefresh.refreshAll){
+          callbackEventFillIn.bCompleteWithFileInfo = true;
+          (fileIn).refreshPropertiesAndChildren(callbackEventFillIn);  
+        } else {
+          callbackEventFillIn.bCompleteWithFileInfo = false;
+          (fileIn).refreshPropertiesAndChildren(callbackEventFillIn);  
+        }
+        //fills the wdgdTable in callbackFillIn, calls fillInRefreshed there.
+      } 
+      
     }
   }
   
   
-  /**Fills the content with given directory without accessing the file system. 
-   * All information are contained in the fileIn.
-   * @param fileIn Either a directory which's files are shown or a file inside a directory.
-   *   In the second case the directory is shown and the file is selected.
-   * @param bCompleteWithFileInfo true if alle files in the directory is completed. 
-   *   If false then any file is tested.  
+  /**Fills the table content with the currentDirectory without accessing the file system. 
+   * This routine is called either if some information about the currentDirectory and its files
+   * are known already or a refresh was done. In the second case this routine is called in the callbac,
+   * of the refresh. 
+   * 
+   * @param bIsCompleteWithFileInfo true the it was called in the callback with complete refresh. 
+   * false then a refresh is forced and this routine was called a second one if some file information
+   * are not available or the information are to old.
    */
-  protected void fillInRefreshed(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
+  protected void execFillIn(boolean bIsCompleteWithFileInfo) //String path)
   {
     boolean bAllFilesCompleteWithFileInfo = true;
     //selectList.wdgdTable.clearTable(); 
     int zLines = selectList.wdgdTable.size();
     int lineCt = 0; //count lines to select the line number with equal sFileSelect.
-    GralTableLine_ifc tline;
-    FileRemote dir = null;
-    if(fileIn !=null && fileIn.exists()){
-      if(fileIn.isDirectory()){
-        dir =fileIn;
-      } else {
-        dir = fileIn.getParentFile(); 
-        String sDir = FileSystem.getCanonicalPath(dir); //with / as separator!
-        String sFile = fileIn.getName();
-        indexSelection.put(sDir, sFile);
-      }
-      if(this.currentDir !=dir){
-        Assert.stop();
-      }
-      this.currentDir = dir;
-      if(originDir == null){
-        originDir = dir; //path;      //sets on the first invocation. 
-      }
-      this.sCurrentDir = dir.getPath();
-      if(sCurrentDir.endsWith("/"))
-        stop();
-      widgdPath.setText(sCurrentDir, -1);
-    } else {
-      widgdPath.setText("?? " + fileIn.getAbsolutePath()); 
-      this.currentDir = fileIn;  //though it does not exist, store it for refresh (may be exist later).
-      if(originDir == null){
-        originDir = fileIn; //path;      //sets on the first invocation. 
-      }
-      //special case: no files:
-      String[] line = new String[zColumns];
-      line[kColDesignation] = "";
-      line[kColFilename] = "--not found--";
-      line[kColDate] = "";
-      selectList.wdgdTable.insertLine(null, -1, line, null);
-      //lineCt +=1;
-    }
+    GralTableLine_ifc<FileRemote> tline;
+    widgdPath.setText(sCurrentDir, -1);
     //widgdPath.setSelection("|..<");
     long timeNow = System.currentTimeMillis();
     int lineSelect1 = 0;  
-    if(dir !=null && dir.exists() && dir.isDirectory()){
-      File[] files = dir.listFiles();
-      if(files !=null){ 
-        Map<String, File> sortFiles = new TreeMap<String, File>();
-        for(File file: files){
-          if(file ==null){
-            System.err.println("GralFileSelector.fillInRefreshedFiles() - file is null;");
-          } else {
-            String sort;
-            boolean bCompleteFileWithInfo = bCompleteWithFileInfo 
-                     || (file instanceof FileRemote && ((FileRemote)file).isTested());
-            if(bCompleteFileWithInfo){
-              switch(sortOrder){
-              case kSortName: {
-                String sName = file.getName();
-                if(file.isDirectory()){ sName += "/"; }
-                sort = (file.isDirectory()? "D" : "F") + sName;
-              } break;
-              case kSortNameNonCase: {
-                String sName = file.getName().toLowerCase();
-                if(file.isDirectory()){ sName += "/"; }
-                sort = (file.isDirectory()? "D" : "F") + sName;
-              } break;
-              case kSortExtension: {
-                String sName = file.getName();
-                int posDot = sName.lastIndexOf('.');
-                String sExt = sName.substring(posDot+1);
-                if(file.isDirectory()){ sName += "/"; }
-                sort = (file.isDirectory()? "D" : "F") + sExt + sName;
-              } break;
-              case kSortExtensionNonCase: {
-                String sName = file.getName().toLowerCase();
-                int posDot = sName.lastIndexOf('.');
-                String sExt = sName.substring(posDot+1);
-                if(file.isDirectory()){ sName += "/"; }
-                sort = (file.isDirectory()? "D" : "F") + sExt + sName;
-              } break;
-              case kSortDateNewest: {
-                long nDate = -file.lastModified();
-                String sDate = String.format("%016X", nDate);
-                String sName = file.getName().toLowerCase();
-                sort = (file.isDirectory()? "D" : "F") + sDate + sName;
-              } break;
-              case kSortDateOldest: {
-                long nDate = file.lastModified();
-                String sDate = String.format("%016X", nDate);
-                String sName = file.getName().toLowerCase();
-                sort = (file.isDirectory()? "D" : "F") + sDate + sName;
-              } break;
-              case kSortSizeLargest: {
-                long nSize = 0x7fffffffffffffffL - file.length();
-                String sSize = String.format("%016d", nSize);
-                String sName = file.getName().toLowerCase();
-                sort = (file.isDirectory()? "D" : "F") + sSize + sName;
-              } break;
-              case kSortSizeSmallest: {
-                long nSize = file.length();
-                String sSize = String.format("%016d", nSize);
-                String sName = file.getName().toLowerCase();
-                sort = (file.isDirectory()? "D" : "F") + sSize + sName;
-              } break;
-              default: { sort = file.getName(); }
-              }
-            } else {
-              //without file properties
-              switch(sortOrder){
-                case kSortName: {
-                  String sName = file.getName();
-                  if(file.isDirectory()){ sName += "/"; }
-                  sort = (file.isDirectory()? "D" : "F") + sName;
-                } break;
-                case kSortNameNonCase: {
-                  String sName = file.getName().toLowerCase();
-                  if(file.isDirectory()){ sName += "/"; }
-                  sort = (file.isDirectory()? "D" : "F") + sName;
-                } break;
-                case kSortExtension: {
-                  String sName = file.getName();
-                  int posDot = sName.lastIndexOf('.');
-                  String sExt = sName.substring(posDot+1);
-                  if(file.isDirectory()){ sName += "/"; }
-                  sort = (file.isDirectory()? "D" : "F") + sExt + sName;
-                } break;
-                case kSortExtensionNonCase: {
-                  String sName = file.getName().toLowerCase();
-                  int posDot = sName.lastIndexOf('.');
-                  String sExt = sName.substring(posDot+1);
-                  if(file.isDirectory()){ sName += "/"; }
-                  sort = (file.isDirectory()? "D" : "F") + sExt + sName;
-                } break;
-                default: { sort = file.getName().toLowerCase(); }
-              }
-              
-            }
+    boolean bAllCompleteWithFileInfo = bIsCompleteWithFileInfo;
+    FileRemote[] files = currentDir.listFiles();
+    if(files !=null){ 
+      Map<String, FileRemote> sortFiles = new TreeMap<String, FileRemote>();
+      Map<String, FileRemote> sortFilesName = new TreeMap<String, FileRemote>();
+      for(FileRemote file: files){
+        if(file ==null){
+          System.err.println("GralFileSelector.fillInRefreshedFiles() - file is null;");
+        } else {
+          String sort, sortName;
+          if(!file.isTested()){
+            bAllCompleteWithFileInfo = false;
+          }
+          switch(sortOrder){
+          case kSortName: {
+            String sName = file.getName();
+            if(file.isDirectory()){ sName += "/"; }
+            sortName = sort = (file.isDirectory()? "D" : "F") + sName;
+          } break;
+          case kSortNameNonCase: {
+            String sName = file.getName().toLowerCase();
+            if(file.isDirectory()){ sName += "/"; }
+            sortName = sort = (file.isDirectory()? "D" : "F") + sName;
+          } break;
+          case kSortExtension: {
+            String sName = file.getName();
+            int posDot = sName.lastIndexOf('.');
+            String sExt = sName.substring(posDot+1);
+            if(file.isDirectory()){ sName += "/"; }
+            sortName = sort = (file.isDirectory()? "D" : "F") + sExt + sName;
+          } break;
+          case kSortExtensionNonCase: {
+            String sName = file.getName().toLowerCase();
+            int posDot = sName.lastIndexOf('.');
+            String sExt = sName.substring(posDot+1);
+            if(file.isDirectory()){ sName += "/"; }
+            sortName = sort = (file.isDirectory()? "D" : "F") + sExt + sName;
+          } break;
+          case kSortDateNewest: {
+            String sName = file.getName().toLowerCase();
+            if(bAllCompleteWithFileInfo){
+              long nDate = -file.lastModified();
+              String sDate = String.format("%016X", new Long(nDate));
+              sort = (file.isDirectory()? "D" : "F") + sDate + sName;
+            } else { sort = ""; }
+            sortName = (file.isDirectory()? "D" : "F") + sName;
+          } break;
+          case kSortDateOldest: {
+            String sName = file.getName().toLowerCase();
+            if(bAllCompleteWithFileInfo){
+              long nDate = file.lastModified();
+              String sDate = String.format("%016X", new Long(nDate));
+              sort = (file.isDirectory()? "D" : "F") + sDate + sName;
+            } else { sort = ""; }
+            sortName = (file.isDirectory()? "D" : "F") + sName;
+          } break;
+          case kSortSizeLargest: {
+            String sName = file.getName().toLowerCase();
+            if(bAllCompleteWithFileInfo){
+              long nSize = 0x7fffffffffffffffL - file.length();
+              String sSize = String.format("%016d", new Long(nSize));
+              sort = (file.isDirectory()? "D" : "F") + sSize + sName;
+            } else { sort = ""; }
+            sortName = (file.isDirectory()? "D" : "F") + sName;
+          } break;
+          case kSortSizeSmallest: {
+            String sName = file.getName().toLowerCase();
+            if(bAllCompleteWithFileInfo){
+              long nSize = file.length();
+              String sSize = String.format("%016d", new Long(nSize));
+              sort = (file.isDirectory()? "D" : "F") + sSize + sName;
+            } else { sort = ""; }
+            sortName = (file.isDirectory()? "D" : "F") + sName;
+          } break;
+          default: { sortName = sort = file.getName(); }
+          }
+          sortFilesName.put(sortName, file);
+          if(bAllCompleteWithFileInfo){
             sortFiles.put(sort, file);
           }
         }
-        if(dir.getParentFile() !=null){
-          //write < .. line for parent seletion.
-          if(lineCt < zLines){ tline = selectList.wdgdTable.getLine(lineCt); }
-          else {
-            tline = selectList.wdgdTable.insertLine("..", -1, null, null);
-            zLines +=1;
-          }
-          if(!tline.getCellText(kColFilename).equals("..")){
-            tline.setCellText("<", kColDesignation);
-            tline.setCellText("..", kColFilename);
-            tline.setCellText("", kColLength);
-            tline.setCellText("", kColDate);
-            selectList.wdgdTable.replaceLineKey(tline, null);
-          }
-          tline.setUserData(dir);  //The ".." represents the directory which is shown (instead ".")
-          lineCt +=1;
+      }
+      if(currentDir.getParentFile() !=null){
+        //write < .. line for parent seletion.
+        if(lineCt < zLines){ tline = selectList.wdgdTable.getLine(lineCt); }
+        else {
+          tline = selectList.wdgdTable.insertLine("..", -1, null, null);
+          zLines +=1;
         }
-        //The file or directory which was the current one while this directory was shown lastly:
-        String sFileCurrentline = indexSelection.get(sCurrentDir);
-        for(Map.Entry<String, File> entry: sortFiles.entrySet()){
-          //String[] line = new String[zColumns];
-          File file = entry.getValue();
-          boolean bCompleteFileWithInfo = bCompleteWithFileInfo 
-            || (file instanceof FileRemote && ((FileRemote)file).isTested());
-          String sFileName = file.getName();
-          if(lineCt < zLines){ 
-            tline = selectList.wdgdTable.getLine(lineCt);
-          }
-          else {
-            tline = selectList.wdgdTable.insertLine(sFileName, -1, null, null);
-            zLines +=1;
-          }
-          String sCell = tline.getCellText(kColFilename);
-          boolean botherfile = sCell == null || !sCell.equals(sFileName);
-          boolean isChanged = botherfile;
-          if(botherfile){
-            String sDesignation = file.isDirectory() ? "/" : "";
-            tline.setCellText(sDesignation, kColDesignation);
-            tline.setCellText(sFileName, kColFilename);
-            tline.setUserData(file);
-            tline.setDeselect(1, null);
-            selectList.wdgdTable.replaceLineKey(tline, sFileName);
-          } else { //same file, don't change line.
-            long dateFile = file.lastModified();
-            isChanged = tline.setContentIdent(dateFile) != dateFile;
-          }
-          if(sFileCurrentline != null && sFileName.equals(sFileCurrentline)){
-            lineSelect1 = lineCt;
-            if(isChanged){
-              //this.lineSelected = -1;  //remove info about selection, select newly because content is changed.
-            }
-          }
-          if(isChanged){
-            if(bCompleteFileWithInfo){
-              completeLine(tline, file, timeNow);
-            } 
-            else { //!bCompleteFileWithInfo
-              bAllFilesCompleteWithFileInfo = false;
-              tline.setCellText("?", kColLength);
-              tline.setCellText("?", kColDate);
-              tline.setContentIdent(0);
-            }
-            if(bCompleteFileWithInfo && actionSetFileAttribs !=null){
-              actionSetFileAttribs.exec(0, selectList.wdgdTable, tline);  //color for the line.
-            }
-          }
-          lineCt +=1;
+        if(!tline.getCellText(kColFilename).equals("..")){
+          tline.setCellText("<", kColDesignation);
+          tline.setCellText("..", kColFilename);
+          tline.setCellText("", kColLength);
+          tline.setCellText("", kColDate);
+          selectList.wdgdTable.replaceLineKey(tline, null);
         }
-        while(lineCt < zLines){
+        tline.setUserData(currentDir);  //The ".." represents the directory which is shown (instead ".")
+        lineCt +=1;
+      }
+      //The file or directory which was the current one while this directory was shown lastly:
+      String sFileCurrentline = indexSelection.get(sCurrentDir);
+      //
+      //List files
+      Map<String, FileRemote> sortFilesUsed = bAllCompleteWithFileInfo ? sortFiles: sortFilesName;
+      for(Map.Entry<String, FileRemote> entry: sortFilesUsed.entrySet()){
+        //String[] line = new String[zColumns];
+        FileRemote file = entry.getValue();
+        String sFileName = file.getName();
+        if(lineCt < zLines){ 
           tline = selectList.wdgdTable.getLine(lineCt);
-          selectList.wdgdTable.deleteLine(tline);
-          zLines = selectList.wdgdTable.size();
         }
-        if(lineCt ==0){
-          //special case: no files:
-          selectList.wdgdTable.clearTable(); 
-          String[] line = new String[zColumns];
-          line[kColDesignation] = "";
-          line[kColFilename] = "--empty--";
-          line[kColDate] = "";
-          selectList.wdgdTable.insertLine(null, -1, line, null);
-          lineCt +=1;
+        else {
+          tline = selectList.wdgdTable.insertLine(sFileName, -1, null, null);
+          zLines +=1;
         }
-      } else {
-        //faulty directory
+        String sCell = tline.getCellText(kColFilename);
+        boolean botherfile = sCell == null || !sCell.equals(sFileName);
+        boolean isChanged = botherfile;
+        if(botherfile){
+          String sDesignation = file.isDirectory() ? "/" : "";
+          tline.setCellText(sDesignation, kColDesignation);
+          tline.setCellText(sFileName, kColFilename);
+          tline.setUserData(file);
+          tline.setDeselect(1, null);
+          selectList.wdgdTable.replaceLineKey(tline, sFileName);
+        } else { //same file, don't change line.
+          long dateFile = file.lastModified();
+          isChanged = tline.setContentIdent(dateFile) != dateFile;
+        }
+        if(sFileCurrentline != null && sFileName.equals(sFileCurrentline)){
+          lineSelect1 = lineCt;
+          if(isChanged){
+            //this.lineSelected = -1;  //remove info about selection, select newly because content is changed.
+          }
+        }
+        if(isChanged){
+          if(bAllCompleteWithFileInfo){
+            completeLine(tline, file, timeNow);
+          } 
+          else { //!bCompleteFileWithInfo
+            bAllFilesCompleteWithFileInfo = false;
+            tline.setCellText("?", kColLength);
+            tline.setCellText("?", kColDate);
+            tline.setContentIdent(0);
+          }
+          if(bAllCompleteWithFileInfo && actionSetFileAttribs !=null){
+            actionSetFileAttribs.exec(0, selectList.wdgdTable, tline);  //color for the line.
+          }
+        }
+        lineCt +=1;
+      }
+      while(lineCt < zLines){
+        tline = selectList.wdgdTable.getLine(lineCt);
+        selectList.wdgdTable.deleteLine(tline);
+        zLines = selectList.wdgdTable.size();
+      }
+      if(lineCt ==0){
+        //special case: no files:
         selectList.wdgdTable.clearTable(); 
         String[] line = new String[zColumns];
         line[kColDesignation] = "";
-        line[kColFilename] = "--not found-1--";
+        line[kColFilename] = "--empty--";
         line[kColDate] = "";
         selectList.wdgdTable.insertLine(null, -1, line, null);
+        lineCt +=1;
       }
     } else {
       //faulty directory
       selectList.wdgdTable.clearTable(); 
       String[] line = new String[zColumns];
       line[kColDesignation] = "";
-      line[kColFilename] = "--not found--";
+      line[kColFilename] = "--not found-1--";
       line[kColDate] = "";
       selectList.wdgdTable.insertLine(null, -1, line, null);
     }
-    GralTableLine_ifc currentLine = selectList.wdgdTable.getCurrentLine();
+    GralTableLine_ifc<FileRemote> currentLine = selectList.wdgdTable.getCurrentLine();
     if(currentLine == null || lineSelect1 != currentLine.getLineNr()){
       //HINT: setCurrentCell refreshes the line. a current marking action from GUI-user will be aborted therefore.
       selectList.wdgdTable.setCurrentCell(lineSelect1, 1);
@@ -1065,8 +1041,10 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
 
   
+
+  
   @SuppressWarnings("boxing")
-  private void completeLine(GralTableLine_ifc tline, File file, long timeNow){
+  private void completeLine(GralTableLine_ifc<FileRemote> tline, File file, long timeNow){
     final String sDesign;
     if(file instanceof FileRemote && ((FileRemote)file).isSymbolicLink()){ 
       sDesign =  file.isDirectory() ? ">" : "s"; 
@@ -1135,9 +1113,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
       stop();
       return null;
     }
-    GralTableLine_ifc line = selectList.wdgdTable.getCurrentLine();
+    GralTableLine_ifc<FileRemote> line = selectList.wdgdTable.getCurrentLine();
     if(line !=null){
-      File data = (File)line.getUserData();
+      File data = line.getUserData();
       return data;
     } else {
       return null;
@@ -1156,8 +1134,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
       stop();
       return null;
     }
-    for(GralTableLine_ifc line: selectList.wdgdTable.getSelectedLines()){
-      FileRemote file = (FileRemote)line.getUserData();
+    for(GralTableLine_ifc<FileRemote> line: selectList.wdgdTable.getMarkedLines()){
+      FileRemote file = line.getUserData();
       list.add(file);
     }
     return list;
@@ -1198,7 +1176,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * @param line The table line.
    * @return true if is was relevant for the key.
    */
-  public boolean actionUserKey(int keyCode, Object userDataOfLine, GralTableLine_ifc line)
+  public boolean actionUserKey(int keyCode, Object userDataOfLine, GralTableLine_ifc<FileRemote> line)
   { 
     return false;
   }
@@ -1236,7 +1214,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
           }
         } else {
           System.out.println("GralFileSelector - delayedFillin");
-          fillInCurrentDir();
+          execFillIn(true);
+          //fillInCurrentDir();
           timeStampRepeat += timeRepeat;
         }
       } while(timeWait > 0 || bRepeat);
@@ -1246,14 +1225,18 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   final EventConsumer callbackFillIn = new EventConsumer(){
-    @Override public int processEvent(Event evP) {
+    @Override public int processEvent(Event<?,?> evP) {
       ///
       FillinCallback callback = (FillinCallback)evP;
       FileRemote dir = callback.getFileSrc();  //it is completed meanwhile
       timeFilesRefreshed = System.currentTimeMillis();
       durationRefresh = (int)(timeFilesRefreshed - timeFillinInvoked);
       //Timeshort.sleep(200); //test
-      fillInRefreshed(dir, callback.bCompleteWithFileInfo);
+      if(currentDir == dir){
+        GralFileSelector.this.execFillIn(callback.bCompleteWithFileInfo);
+      } else {
+        //this is an obsolete order, do nothing.
+      }
       //setFocus();    //don't set the focus, it may be false. Only fill.
       return 1;
     }

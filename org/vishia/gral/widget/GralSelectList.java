@@ -33,7 +33,7 @@ import org.vishia.util.Removeable;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralSelectList implements Removeable //extends GralWidget
+public abstract class GralSelectList<UserData> implements Removeable //extends GralWidget
 {
   /**Version and history:
    * <ul>
@@ -72,7 +72,7 @@ public abstract class GralSelectList implements Removeable //extends GralWidget
   
 
   /**The table which is showing in the widget. */
-  public GralTable wdgdTable;
+  public GralTable<UserData> wdgdTable;
   
 
   /**The keys for left and right navigation. Default it is shift + left and right arrow key.

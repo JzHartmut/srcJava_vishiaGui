@@ -301,7 +301,7 @@ public final class SwtTable  extends GralTable {
   private void redrawTableWithFocusedCell(Widget cell){
     CellData data = (CellData)cell.getData();
     if(data.tableItem !=null){ //don't do any action if the cell isn't use.
-      ixLineNew = data.ixCellLine + ixLine1;
+      ixLineNew = data.tableItem.nLineNr; //data.ixCellLine + ixLine1;
       if(ixLineNew >=zLine){ //files may be deleted 
         ixLineNew = zLine >0 ? 0 : -1;  //select the first line or select nothing.
       }
@@ -335,7 +335,7 @@ public final class SwtTable  extends GralTable {
     if(ixLineNew >=0 ? tableItem.nLineNr == ixLineNew  //a new line 
       : tableItem.nLineNr == ixLine) { //the current line, but only if ixLineNew <0
     //if(ixGlineSelectedNew == iCellLine){
-      colorBack = colorBackSelect;
+      colorBack = (tableItem.getSelection() & 1)!=0 ? colorBackSelectMarked : colorBackSelect;
     } else if(tableItem.colorBackground !=null){
       colorBack = tableItem.colorBackground;
     } else {
@@ -393,7 +393,11 @@ public final class SwtTable  extends GralTable {
    */
   protected void mouseDown(MouseEvent ev){
     Text widgSwt = (Text)ev.widget;  //it is only associated to a cell.
-    cellDataOnMousePressed = (CellData)widgSwt.getData();
+    redrawTableWithFocusedCell(widgSwt);
+    //cellDataOnMousePressed = (CellData)widgSwt.getData();
+    //TableLineData line = cellDataOnMousePressed.tableItem;
+    //ixLineNew = line.nLineNr;  //select this line.
+    
     if(true || !hasFocus){
       SwtTable.this.implMethodWidget_.focusGained();  //from GralWidget.
       hasFocus = true;
