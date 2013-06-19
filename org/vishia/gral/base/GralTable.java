@@ -1097,11 +1097,6 @@ public abstract class GralTable<UserData> extends GralWidget implements GralTabl
 
     
     
-    @Override
-    public Object getWidgetImplementation() {
-      // TODO Auto-generated method stub
-      return null;
-    }
 
     //@Override public Object[] getWidgetMultiImplementations(){ return null; }
 

@@ -254,13 +254,6 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     
   }
 
-  @Override
-  public Object getWidgetImplementation()
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
   //@Override public Object[] getWidgetMultiImplementations(){ return implWidgets; }
   
   

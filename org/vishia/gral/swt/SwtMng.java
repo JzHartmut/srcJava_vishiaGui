@@ -654,8 +654,10 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     }
     widget.setSize(textSize);
     //guiContent.add(widget);
-    GralWidget widgd = new SwtWidgetSimpleWrapper("labelText-" + sText, 'S', widget, this);
-    return widgd;
+    GralWidget widg = new GralWidget("labelText-" + sText, 'S', this);
+    SwtWidgetSimpleWrapper widgswt = new SwtWidgetSimpleWrapper(widget, this);
+    widg.implMethodWidget_.setWidgetImpl(widgswt);
+    return widg;
   }
 
   
@@ -694,8 +696,10 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     }
     widget.setSize(textSize);
     //guiContent.add(widget);
-    GralWidget widgd = new SwtWidgetSimpleWrapper("", 'S', widget, this);
-    return widgd;
+    GralWidget widg = new GralWidget("labelText-" + sText, 'S', this);
+    SwtWidgetSimpleWrapper widgswt = new SwtWidgetSimpleWrapper(widget, this);
+    widg.implMethodWidget_.setWidgetImpl(widgswt);
+    return widg;
   }
 
   
@@ -986,25 +990,6 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
 
   
-  
-  //@Override 
-  public Object XXXaddImage(String sName, InputStream imageStream, int height, int width, String sCmd)
-  {
-    ImageData imageData = new ImageData(imageStream);
-    byte[] data = imageData.data;
-    Label widget = new Label(((SwtPanel)pos.panel).getPanelImpl(), 0);
-    Image image = new Image((((SwtPanel)pos.panel).getPanelImpl()).getDisplay(), imageData); 
-    widget.setImage(image);
-    widget.setSize(propertiesGui.xPixelUnit() * width, propertiesGui.yPixelUnit() * height);
-    setBounds_(widget);
-    if(sCmd != null){
-      widget.setData(sCmd);
-    } 
-    GralWidget widgd = new SwtWidgetSimpleWrapper(sName, 'i', widget, this);
-    widgd.setPanelMng(this);
-    registerWidget(widgd);
-    return widget;
-  }
 
   
   
@@ -1038,16 +1023,18 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   	Slider control = new Slider(((SwtPanel)pos.panel).getPanelImpl(), SWT.VERTICAL);
   	control.setBackground(propertiesGuiSwt.colorBackground);
   	setPosAndSize_(control);
-   	GralWidget widgetInfos = new SwtWidgetSimpleWrapper(sName, 'V', control, this);
-   	widgetInfos.setPanelMng(this);
+    GralWidget widg = new GralWidget(sName, 'V', this);
+    SwtWidgetSimpleWrapper widgswt = new SwtWidgetSimpleWrapper(control, this);
+    widg.implMethodWidget_.setWidgetImpl(widgswt);
+    widg.setPanelMng(this);
     if(action != null){
-  		SelectionListenerForSlider actionSlider = new SelectionListenerForSlider(widgetInfos, action);
+  		SelectionListenerForSlider actionSlider = new SelectionListenerForSlider(widg, action);
   		control.addSelectionListener(actionSlider);
   	}
-    widgetInfos.setDataPath(sDataPath);
-    control.setData(widgetInfos);
+    widg.setDataPath(sDataPath);
+    control.setData(widg);
     control.addMouseListener(mouseClickForInfo);
-    return widgetInfos;
+    return widg;
   	
   }
   
@@ -1348,7 +1335,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   @Override protected String setInfoGthread(GralWidget_ifc widget, int cmd, int ident, Object info, Object data)
-  { final Object oSwtWidget = widget.getWidgetImplementation();
+  { final Object oSwtWidget = ((GralWidget)widget).getWidgetImplementation();
     final Control swtWidget;
     String sError = null;
     boolean done = false;
@@ -1392,7 +1379,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
         }//switch
       }
       else if( !done &&  widget !=null 
-        && ( swtWidget = (Control)widget.getWidgetImplementation()) !=null
+        && ( swtWidget = (Control)((GralWidget)widget).getWidgetImplementation()) !=null
         ){
         //common methods for all swt.Control
         int colorValue;
@@ -1588,7 +1575,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   	sValue = super.getValueFromWidget(widgd);  //platform independent getting of value
   	if(sValue == null){
   	  GralWidget_ifc widget = widgd;
-      Control swtWidget = (Control)widget.getWidgetImplementation();
+      Control swtWidget = (Control)widgd.getWidgetImplementation();
   		if(swtWidget instanceof Text){
     	  sValue = ((Text)swtWidget).getText();
     	} else if(widgd instanceof GralButton){

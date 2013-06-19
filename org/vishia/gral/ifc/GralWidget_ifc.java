@@ -1,6 +1,7 @@
 package org.vishia.gral.ifc;
 
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.util.Removeable;
@@ -78,10 +79,6 @@ public interface GralWidget_ifc extends Removeable
    */
   public static final int version = 20130521;
 
-  
-  /**Returns the implementation class of the widget. If the widget has more as one implementation widgets,
-   * this method returns null. You should call {@link #getWidgetMultiImplementations()} instead. */
-  public abstract Object getWidgetImplementation();
   
   
   /**Returns the implementation class of more as one widget. If the widget has only one implementation widget,

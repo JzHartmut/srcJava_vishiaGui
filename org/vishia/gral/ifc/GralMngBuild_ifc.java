@@ -17,6 +17,7 @@ import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralValueBar;
+import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
@@ -38,50 +39,6 @@ import org.vishia.util.KeyCode;
 /**This is a unique interface for the GUI-panel-manager to build its content.
  * To work with the graphical application see {@link GralMng_ifc}. 
  * <br><br>
- * Any widget is represented in the user's level by a derived instance of a {@link GralWidget}. 
- * There are 2 strategies yet to create widgets in respect to the graphical implementation.
- * Either the Widget is created independent of the graphic implementation first 
- * and then taken as parameter for the graphic widget-creating method. In this case the GralWidget 
- * contains nothing of the graphic implementation but has a reference to it.
- * The second strategy yet is, the Widget is returned by the graphic-implementation widget-creating method
- * as a instance which has {@link GralWidget} and its non-graphic specializations as super class
- * and the graphic depending parts in the created instance.
- * <br><br>
- * The first form is more universal. Especially generic can be used for the class definition if necessary.
- * It us used yet only (2013-06) for {@link #addHorizontalSelector(GralHorizontalSelector)}
- * but it may be used more and more in the future.<br>
- * For the UML presentation see {@link org.vishia.util.Docu_UML_simpleNotation}:
- * <pre>
- * 
- *   GralHorizontalSelector<UserType> <-------<*>UserCanCreate_GraphicIndependent
- *                 |
- *                 |
- *                 |<>------------>Object<|--------SwtHorizontalSelector<|-----swt.Canvas
- *                 |                                         |
- *    - some special non-graphic data                 -paintRoutine
- *                                                    -mouseListener 
- *                                                    -etc.        
- * 
- * </pre>
- * The Gral widget can be created in any thread maybe as composite independent of the graphic itself.
- * To use a Gral widget in the graphic the graphic appearance should created with this interface
- * as factory. Invoke:<br>
- * {@link #addHorizontalSelector(GralHorizontalSelector)} to create it. 
- * <br><br>
- * The platform-specific Widget Object (Swing: javax.swing.JComponent, org.eclipse.swt.widgets.Control etc.)
- * is stored as Object-reference in the {@link GralWidget#wdgImpl}.   
- * If necessary it can be casted to the expected class if some special operations 
- * using the graphic platform are need.  
- * <br><br> 
- * The second form takes most of the characteristics as parameters for the creating method. 
- * It needs inheritance.
- * <pre>
- *   GralButton <-------UserCanAssociate it but can't create the instance with constructor.
- *       |
- *       |-------------|>SwtButton
- * </pre> 
- * The instance is Graphic-Implementation-specific and it is created with this interface as factory:<br>
- * {@link #addButton(String, GralUserAction, String)}.
  * <br><br>
  * For the most
  * simple applications, the capability of this interface and its given implementation 
@@ -111,6 +68,8 @@ import org.vishia.util.KeyCode;
  * <b>Concept of positioning</b>: see method {@link #setPosition(float, float, float, float, char, int)}
  * and {@link GralWidget_ifc}.
  * <br><br>
+ * <br><br>
+ * <b>Concept for widgets</b>: see {@link GralWidget}
  *  
  * @author Hartmut Schorrig
  *

@@ -6,12 +6,12 @@ public interface GralWidgImpl_ifc
    * See {@link GralMng_ifc#setFocus(GralWidget)}.
    * @return true if the focus is set really.
    */
-  public abstract boolean setFocusGThread();
+  boolean setFocusGThread();
   
   
 
   /**Removes the graphical widget in the graphic. */
-  public abstract void removeWidgetImplementation();
+  void removeWidgetImplementation();
   
   
   /**This method should be implemented in all Widget implementations of the adapter for the
@@ -26,9 +26,18 @@ public interface GralWidgImpl_ifc
    * See {@link #repaintRequ}
    * 
    */
-  public abstract void repaintGthread();
-
+  void repaintGthread();
 
   
+  /**Returns the implementation class of the widget. If the widget has more as one implementation widgets,
+   * this method returns null. You should call {@link #getWidgetMultiImplementations()} instead. */
+  Object getWidgetImplementation();
+  
+  void setBoundsPixel(int x, int y, int dx, int dy);
+ 
+  GralWidgetGthreadSet_ifc getGthreadSetifc();
+  
+  
+
   
 }

@@ -22,8 +22,68 @@ import org.vishia.util.KeyCode;
 /**This class is the base class of representative of a graphical widget in the gral concept. 
  * All widgets in the gral concept have this base data.
  * The widget of the implementation layer graphic is referred in the derived class of this 
- * with a proper association. 
- * <br>
+ * with a proper association.
+ * <br><br> 
+ * Any widget is represented in the user's level by a derived instance of a {@link GralWidget}. 
+ * There are 2 strategies yet to create widgets in respect to the graphical implementation.
+ * Either the Widget is created independent of the graphic implementation first 
+ * and then taken as parameter for the graphic widget-creating method. In this case the GralWidget 
+ * contains nothing of the graphic implementation but has a reference to it.
+ * The second strategy yet is, the Widget is returned by the graphic-implementation widget-creating method
+ * as a instance which has {@link GralWidget} and its non-graphic specializations as super class
+ * and the graphic depending parts in the created instance.
+ * <br><br>
+ * The first form is more universal. Especially generic can be used for the class definition if necessary.
+ * It us used yet only (2013-06) for {@link #addHorizontalSelector(GralHorizontalSelector)}
+ * but it may be used more and more in the future.<br>
+ * For the UML presentation see {@link org.vishia.util.Docu_UML_simpleNotation}:
+ * <pre>
+ * 
+ *   GralHorizontalSelector<UserType> <-----<*>UserCanCreate_GraphicIndependent
+ *   - some special non-graphic data
+ *     |
+ *     |<--------------------------------------------+
+ *     +---|>GralWidget                              |
+ *           |                                       |
+ *           |<>--->GralWidgImpl_ifc<|------SwtHorizontalSelector--|>SwtWidgetSimpleWrapper
+ *                                                   |                   |
+ *                                                   |                   |-->Control<|---SwtImpl-----|>swt.Canvas
+ *                                                   |                                     |
+ *                                                   |<----outer---------------------------|
+ *                                                -paintRoutine                            |
+ *                                                -mouseListener                  implements the start
+ *                                                -etc.                           of paintRoutine etc.
+ *                                      
+ * </pre>
+ * Links of schema: {@link GralWidgImpl_ifc}, 
+ * {@link org.vishia.gral.swt.SwtWidgetSimpleWrapper}
+ * <br><br>
+ * The GralWidget knows the implementation widget via the {@link GralWidgImpl_ifc}. That is independent
+ * of the implementation itself. The implementor of this interface for this example 
+ * is the {@link org.vishia.gral.swt.SwtHorizontalSelector}. It is not the instance which extends
+ * the swt widget itself, but the swt widget (in this case a derivation of {@link org.eclipse.swt.widgets.Canvas})
+ * is realized as an inner class of that.  
+ * <br><br>
+ * The Gral widget can be created in any thread maybe as composite independent of the graphic itself.
+ * To use a Gral widget in the graphic the graphic appearance should created with this interface
+ * as factory. Invoke:<br>
+ * {@link #addHorizontalSelector(GralHorizontalSelector)} to create it. 
+ * <br><br>
+ * The platform-specific Widget Object (Swing: javax.swing.JComponent, org.eclipse.swt.widgets.Control etc.)
+ * is stored as Object-reference in the {@link GralWidget#wdgImpl}.   
+ * If necessary it can be casted to the expected class if some special operations 
+ * using the graphic platform are need.  
+ * <br><br> 
+ * The second form takes most of the characteristics as parameters for the creating method. 
+ * It needs inheritance.
+ * <pre>
+ *   GralButton <-------UserCanAssociate it but can't create the instance with constructor.
+ *       |
+ *       |-------------|>SwtButton
+ * </pre> 
+ * The instance is Graphic-Implementation-specific and it is created with this interface as factory:<br>
+ * {@link #addButton(String, GralUserAction, String)}.
+ * <br><br>
  * The ObjectModelDiagram may shown the relations:<br>
  * <img src="../../../../img/Widget_gral.png"><br>
  * In this graphic the relationship between this class and the graphical implementation layer widget
@@ -93,7 +153,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidget_ifc, GralWidgImpl_ifc
+public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidget_ifc, GralWidgImpl_ifc
 {
   
   /**Version, history and license.
@@ -1185,6 +1245,70 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
 
   void stop(){
     
+  }
+
+
+  @Override
+  public GralWidgetGthreadSet_ifc getGthreadSetifc()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+  @Override
+  public GralColor setBackgroundColor(GralColor color)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+  @Override
+  public void setBoundsPixel(int x, int y, int dx, int dy)
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+
+  @Override
+  public GralColor setForegroundColor(GralColor color)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+  @Override
+  public Object getWidgetImplementation()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+  @Override
+  public void removeWidgetImplementation()
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+
+  @Override
+  public void repaintGthread()
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+
+  @Override
+  public boolean setFocusGThread()
+  {
+    // TODO Auto-generated method stub
+    return false;
   }
   
   

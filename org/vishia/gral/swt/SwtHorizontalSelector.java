@@ -9,11 +9,8 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWidgImpl_ifc;
-import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
 
 /**This class is a selector in one text field. You can set the cursor into the field 
@@ -21,7 +18,7 @@ import org.vishia.gral.widget.GralHorizontalSelector;
  * @author Hartmut Schorrig
  *
  */
-public class SwtHorizontalSelector implements GralWidgImpl_ifc
+public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements GralWidgImpl_ifc
 {
   /**Version, history and copyright/copyleft.
    * <ul>
@@ -56,17 +53,13 @@ public class SwtHorizontalSelector implements GralWidgImpl_ifc
 
   private final GralHorizontalSelector<?> wdgGral;
   
-  protected final SwtMng mng;
-  
-  private final Canvas wdgSwt;
-  
   private Font fontText;
 
   
   GralColor colorText, colorSelect, colorBack, colorLine;
   
   public SwtHorizontalSelector(SwtMng mng, GralHorizontalSelector<?> wdgGral)
-  {
+  { super(null, mng);
     //super(name, mng);
     this.wdgGral = wdgGral;
     wdgGral.implMethodWidget_.setWidgetImpl(this);
@@ -77,8 +70,8 @@ public class SwtHorizontalSelector implements GralWidgImpl_ifc
     colorLine = GralColor.getColor("bk");
 
     Composite panel = (Composite)mng.pos.panel.getPanelImpl();
-    wdgSwt = new SwtImpl(panel);
-    mng.setBounds_(wdgSwt);
+    widgetSwt = new SwtImpl(panel);
+    mng.setBounds_(widgetSwt);
     float ySize = mng.pos.height();
     char size1 = ySize > 3? 'B' : 'A';
     switch(size1){ 
@@ -131,6 +124,11 @@ public class SwtHorizontalSelector implements GralWidgImpl_ifc
   }
 
   
+  /**Implementation hint: Use an extra class for the graphic widget implementation. It seems to have
+   * a better overview over data and dependencies. Extend only necessary things in this derived class.
+   * Do all others in the environment class, which is graphic implementation specific, but independent
+   * of the graphical widget things.
+   */
   private class SwtImpl extends Canvas
   {
     
@@ -148,30 +146,6 @@ public class SwtHorizontalSelector implements GralWidgImpl_ifc
       }
     };
     
-  }
-
-
-  @Override
-  public void removeWidgetImplementation()
-  {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  @Override
-  public void repaintGthread()
-  {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  @Override
-  public boolean setFocusGThread()
-  {
-    // TODO Auto-generated method stub
-    return false;
   }
 
 

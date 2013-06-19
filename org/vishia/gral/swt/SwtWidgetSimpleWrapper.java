@@ -1,6 +1,7 @@
 package org.vishia.gral.swt;
 
 import org.eclipse.swt.widgets.Control;
+import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralMng;
@@ -11,12 +12,14 @@ import org.vishia.gral.ifc.GralWidget_ifc;
  * @author Hartmut Schorrig
  *
  */
-public class SwtWidgetSimpleWrapper extends GralWidget
+public class SwtWidgetSimpleWrapper implements GralWidgImpl_ifc
 {
-  public Control widgetSwt;
+  protected Control widgetSwt;
 
-  public SwtWidgetSimpleWrapper(String name, char whatis, Control widgetSwt, GralMng mng)
-  { super(name, whatis, mng);
+  protected final SwtMng mng;
+  
+  public SwtWidgetSimpleWrapper(Control widgetSwt, SwtMng mng)
+  { this.mng = mng;
     this.widgetSwt = widgetSwt;
   }
 
@@ -31,20 +34,6 @@ public class SwtWidgetSimpleWrapper extends GralWidget
   }
   
   @Override public boolean setFocusGThread(){ return widgetSwt.setFocus(); }
-
-  @Override
-  public GralColor setBackgroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public GralColor setForegroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
 
   @Override public void removeWidgetImplementation()
   {
