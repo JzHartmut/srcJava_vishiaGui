@@ -92,7 +92,7 @@ public class SwtHtmlBox extends GralHtmlBox
   
   
   @Override
-  protected void removeWidgetImplementation()
+  public void removeWidgetImplementation()
   {
     // TODO Auto-generated method stub
     
@@ -105,7 +105,7 @@ public class SwtHtmlBox extends GralHtmlBox
     return false;
   }
 
-  @Override protected void repaintGthread(){
+  @Override public void repaintGthread(){
     if(boxSwt !=null){ boxSwt.redraw(); }
   }
 

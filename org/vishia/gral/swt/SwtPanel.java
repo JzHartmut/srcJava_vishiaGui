@@ -105,7 +105,7 @@ public class SwtPanel extends GralPanelContent
   
   
   
-  @Override protected void repaintGthread(){
+  @Override public void repaintGthread(){
     if(panelComposite !=null){
       ((Composite)panelComposite).redraw();
     }
@@ -114,7 +114,7 @@ public class SwtPanel extends GralPanelContent
 
 
 
-  @Override protected void removeWidgetImplementation()
+  @Override public void removeWidgetImplementation()
   { if(panelComposite !=null){
       ((Composite)panelComposite).dispose();
       panelComposite = null;

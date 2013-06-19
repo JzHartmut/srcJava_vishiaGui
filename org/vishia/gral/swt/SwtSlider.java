@@ -14,13 +14,13 @@ public class SwtSlider extends GralSlider
   }
 
   @Override
-  protected void removeWidgetImplementation() {
+  public void removeWidgetImplementation() {
     // TODO Auto-generated method stub
     
   }
 
   @Override
-  protected void repaintGthread() {
+  public void repaintGthread() {
     // TODO Auto-generated method stub
     
   }

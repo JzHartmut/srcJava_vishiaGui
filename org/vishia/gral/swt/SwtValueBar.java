@@ -57,7 +57,7 @@ public class SwtValueBar extends GralValueBar implements GralSetValue_ifc, GralW
   }
 	
   
-  @Override protected void repaintGthread(){
+  @Override public void repaintGthread(){
     widgetSwt.redraw();
   }
 

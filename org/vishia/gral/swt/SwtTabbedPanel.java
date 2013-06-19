@@ -283,7 +283,7 @@ public class SwtTabbedPanel extends GralTabbedPanel
 
   @Override public Composite getPanelImpl() { return widgetSwt; }
 
-  @Override protected void removeWidgetImplementation()
+  @Override public void removeWidgetImplementation()
   { widgetSwt.dispose();
     widgetSwt = null;
   }

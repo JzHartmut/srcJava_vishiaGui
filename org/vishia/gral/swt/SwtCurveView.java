@@ -102,7 +102,7 @@ public class SwtCurveView extends GralCurveView
   }
   
   
-  @Override protected void repaintGthread(){
+  @Override public void repaintGthread(){
     curveSwt.redraw();
   }
 

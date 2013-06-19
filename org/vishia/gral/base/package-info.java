@@ -1,11 +1,8 @@
-/**This package contains base classes which are used as super classes for the implementation level.
- * The implementation should derive this classes. Usual the implementation should contain 
- * inner non-static classes maybe derived from the graphic base classes too. Don't mix it!
+/**This package contains base classes which are used as super classes for some widgets 
+ * and some other working detail instances. The user should not use this classes as reference directly,
+ * use references of type of {@link org.vishia.gral.ifc.package-info}. But in some special cases
+ * the user can use this references too.
  * <br><br>
- * The user may use refer this base classes only or their interfaces. The user should not refer
- * any implementation classes. To create instances of the derived implementation, use the 
- * {@link GralMng} which is derived too and which is instantiated from the factory for the correct
- * graphic implementation.
  *   
  * @author Hartmut Schorrig
  *

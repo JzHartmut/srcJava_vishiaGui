@@ -93,11 +93,15 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidget_ifc
+public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidget_ifc, GralWidgImpl_ifc
 {
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-06-16 Hartmut new {@link #wdgImpl}. This instance was present in the past but removed. The concept is re-activated
+   *   because a graphic-implementation-independent GralWidget instance can have any generic types
+   *   and can be created as composite (with final type name = new Type(...)). 
+   *   See comments of class {@link GralMngBuild_ifc}.
    * <li>2013-03-13 Hartmut new {@link #getContentIdent()}, {@link #setContentIdent(long)}
    * <li>2013-03-13 Hartmut new {@link #bShouldInitialize}
    * <li>2012-09-24 Hartmut chg: {@link #getName()} now returns {@link #sDataPath} or {@link #sCmd} if the other info are null.
@@ -259,6 +263,7 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
    * <li>l: a list or table
    * <li>L: a list or table line
    * <li>M: a Menu entry
+   * <li>n: a Horizontal Selector
    * <li>r: a rectangle area 
    * <li>R: a rectangle line 
    * <li>S: a text field to show
@@ -380,6 +385,17 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   private long lastTimeSetVisible;
   
   protected long dateUser;
+  
+  /**The implementation specific widget. The instance is derived from the graphic implementation-specific
+   * super class of all widgets such as {@link org.eclipse.swt.widgets.Control} or {@link java.awt.Component}. 
+   * The user can check and cast this instance if some special operations may be need graphic-implementation-dependent.
+   * It is recommended that implementation specific features should not used if they are not necessary
+   * and the application should be held graphic implementation independent.
+   * <br><br>
+   * This reference is null if the GralWidgets extends the Graphic specific implementation widget.
+   * It should be used in the future (2013-06).
+   */
+  public GralWidgImpl_ifc wdgImpl;
   
   /**What is changed in the dynamic data, see {@link GralWidget.DynamicData#whatIsChanged}. */  
   protected static final int chgText = 1, chgColorBack=2, chgColorText=4, chgFont = 8, chgColorLine = 0x10;
@@ -1003,13 +1019,6 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   }
   
   
-  /**Sets the focus to the widget.
-   * See {@link GralMng_ifc#setFocus(GralWidget)}.
-   * @return true if the focus is set really.
-   */
-  public abstract boolean setFocusGThread();
-  
-  
   public final void setFocus(){ setFocus(0,0); }
 
   
@@ -1062,10 +1071,6 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
     //itsMng.setInfoDelayed(repaintRequ, delay);
   }
   
-
-  /**Removes the graphical widget in the graphic. */
-  protected abstract void removeWidgetImplementation();
-  
   /**Removes the widget from the lists in its panel and from the graphical representation.
    * It calls the protected {@link #removeWidgetImplementation()} which is implemented in the adaption.
    */
@@ -1090,20 +1095,6 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
   }
 
   
-  /**This method should be implemented in all Widget implementations of the adapter for the
-   * underlying graphic system. 
-   * <br>Implementation hints: In SWT it should call redraw(). 
-   * <br>It is possible that the widget
-   * consists of more as one graphical widget, then all of it should be redrawn. 
-   * It is possible that some data are set in another thread, they should be applied to the widgets firstly.
-   * It is possible that the widget is removed though a repaintGthread-order is pending from the time before deleting,
-   * for example if the graphic layout is changed. 
-   * <br><br>
-   * See {@link #repaintRequ}
-   * 
-   */
-  protected abstract void repaintGthread();
-
   /**Methods which should be called back by events of the implementation layer.
    * This class is used only for the implementation level of the graphic. It is not intent to use
    * by any application. It is public because the implementation level should accesses it.
@@ -1136,7 +1127,8 @@ public abstract class GralWidget implements GralWidget_ifc, GralSetValue_ifc, Ge
       lastTimeSetVisible = System.currentTimeMillis();
     }
 
-    
+    public void setWidgetImpl(GralWidgImpl_ifc widg){ wdgImpl = widg; }
+
     
     
   }

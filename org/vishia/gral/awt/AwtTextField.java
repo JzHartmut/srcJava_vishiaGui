@@ -29,7 +29,7 @@ public class AwtTextField extends GralTextField
   }
 
   @Override
-  protected void removeWidgetImplementation()
+  public void removeWidgetImplementation()
   {
       // TODO Auto-generated method stub
     
@@ -162,7 +162,7 @@ public static class AwtTextFieldImpl extends TextField implements AwtWidget
 
 
 
-  @Override protected void repaintGthread(){
+  @Override public void repaintGthread(){
     int chg = dyda.whatIsChanged.get();
     int catastrophicalCount = 0;
     do{

@@ -265,7 +265,7 @@ public class SwtTextFieldWrapper extends GralTextField
 
   
   
-  @Override protected void repaintGthread(){
+  @Override public void repaintGthread(){
     int catastrophicalCount = 0;
     int chg;
     if(textFieldSwt !=null){ //do nothing if the graphic implementation widget is removed.

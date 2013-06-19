@@ -13,6 +13,7 @@ import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralFileSelector;
+import org.vishia.gral.widget.GralHorizontalSelector;
 
 import org.vishia.util.Assert;
 import org.vishia.util.Event;
@@ -89,6 +90,8 @@ public class FcmdFileCard extends GralFileSelector
   
   final GralTextField_ifc widgLabel; /// 
   
+  final GralHorizontalSelector<Object> wdgCardSelector;
+  
   /**Association to the current used favor path selection.
    * Note that this instance is re-used for more as one selection.
    */
@@ -144,9 +147,14 @@ public class FcmdFileCard extends GralFileSelector
     //to show the properties of the selected file in the info line:
     //
     //sets this Widget to the selected panel, it is the grid panel which was created even yet.
-    mng.setPosition(0, 2, 0, 0, 1, 'd');
+    mng.setPosition(0, 2, 0, 20, 1, 'd');
     String nameWidgLabel = FcmdWidgetNames.labelWidgFile + nameFilePanel;
     widgLabel = mng.addTextField(nameWidgLabel, false, null, null);
+    mng.setPosition(0, 2, 20, 0, 1, 'd');
+    wdgCardSelector = new GralHorizontalSelector<Object>("cards", mng);
+    wdgCardSelector.addItem("test1", 0, null);
+    wdgCardSelector.addItem("test2", 0, null);
+    mng.addHorizontalSelector(wdgCardSelector);
     mng.setPosition(2, 0, 0, 0, 1, 'd');
     //set the base class GralFileSelector to the panel. It contains the path and the table for file selection.
     setToPanel(mng, namePanelFile, 5, new int[]{2,0,-6,-12}, 'A');

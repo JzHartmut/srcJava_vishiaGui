@@ -73,6 +73,7 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
@@ -1187,8 +1188,10 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
 
-  
-  
+  @Override public void addHorizontalSelector(GralHorizontalSelector<?> sel){
+    SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, sel);
+    sel.implMethodWidget_.setWidgetImpl(swtSel);
+  }
   
   
   

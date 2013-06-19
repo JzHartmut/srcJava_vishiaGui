@@ -211,7 +211,7 @@ public final class SwtTable  extends GralTable {
   
 
 
-  @Override protected void repaintGthread(){
+  @Override public void repaintGthread(){
     if(!table.isDisposed()){
       setAllCellContentGthread();
       Color colorSelectBack =  mng.getColorImpl(super.colorSelectCharsBack);
@@ -272,7 +272,7 @@ public final class SwtTable  extends GralTable {
   /**Removes the graphical widgets.
    * @see org.vishia.gral.base.GralWidget#removeWidgetImplementation()
    */
-  @Override protected void removeWidgetImplementation() {
+  @Override public void removeWidgetImplementation() {
     // TODO Auto-generated method stub
     if(!table.isDisposed()){
       for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){

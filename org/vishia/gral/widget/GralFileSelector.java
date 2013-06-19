@@ -532,6 +532,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   private GralInfoBox questionWindow;
   
   
+  private enum ERefresh{ doNothing, refreshAll, refreshChildren}
+
   private final EventSource evSrc = new EventSource("GralFileSelector"){
     
   };
@@ -733,9 +735,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
   }
   
 
-  private enum ERefresh{ doNothing, refreshAll, refreshChildren};
-
-  
   /**Fills the content with given directory.
    * If the same directory was refreshed in a short time before, it is not refreshed here.
    * That is while fast navigation in a tree. 
@@ -824,7 +823,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * false then a refresh is forced and this routine was called a second one if some file information
    * are not available or the information are to old.
    */
-  protected void execFillIn(boolean bIsCompleteWithFileInfo) //String path)
+  protected synchronized void execFillIn(boolean bIsCompleteWithFileInfo) //String path)
   {
     boolean bAllFilesCompleteWithFileInfo = true;
     //selectList.wdgdTable.clearTable(); 

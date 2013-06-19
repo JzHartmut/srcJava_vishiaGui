@@ -27,7 +27,9 @@ import org.vishia.util.Removeable;
  *   The queue is processed in the graphic thread. The commission
  *   to change the widget is stored in an instance of {@link org.vishia.gral.base.GralWidgetChangeRequ}
  *   with a cmd, an index, the value.
- * </ul>     
+ * </ul>   
+ * <br><br>
+ * <b>Strategy to create widgets and positioning</b>: see {@link GralMngBuild_ifc}.  
  *  
  * @author Hartmut Schorrig
  *

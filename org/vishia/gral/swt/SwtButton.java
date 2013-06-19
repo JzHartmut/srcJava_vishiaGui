@@ -96,7 +96,7 @@ public class SwtButton extends GralButton
   
   
   @Override
-  protected void removeWidgetImplementation()
+  public void removeWidgetImplementation()
   {
     // TODO Auto-generated method stub
     
@@ -133,7 +133,7 @@ public class SwtButton extends GralButton
   }
 
   
-  @Override protected void repaintGthread(){
+  @Override public void repaintGthread(){
     widgetSwt.redraw();
   }
 

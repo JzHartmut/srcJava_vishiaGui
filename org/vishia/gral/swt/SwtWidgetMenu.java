@@ -19,7 +19,7 @@ public class SwtWidgetMenu extends GralWidget
   }
 
   @Override
-  protected void removeWidgetImplementation()
+  public void removeWidgetImplementation()
   {
     // TODO Auto-generated method stub
     
@@ -33,7 +33,7 @@ public class SwtWidgetMenu extends GralWidget
   }
 
   
-  @Override protected void repaintGthread(){
+  @Override public void repaintGthread(){
     //NOTE: do nothing, a Menu isn't able to redraw, it isn't a Control.
     //widgSwt.redraw();
   }

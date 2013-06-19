@@ -185,7 +185,7 @@ private class SwtLedImpl extends Canvas
   }
 
   @Override
-  protected void removeWidgetImplementation()
+  public void removeWidgetImplementation()
   { if(widgSwt !=null){
       widgSwt.dispose();
       widgSwt = null;
@@ -198,7 +198,7 @@ private class SwtLedImpl extends Canvas
   }
 
   
-  @Override protected void repaintGthread(){
+  @Override public void repaintGthread(){
     widgSwt.redraw();
   }
 

@@ -21,7 +21,7 @@ public class SwtWidgetSimpleWrapper extends GralWidget
   }
 
   
-  @Override protected void repaintGthread(){
+  @Override public void repaintGthread(){
     widgetSwt.redraw();
   }
 
@@ -46,7 +46,7 @@ public class SwtWidgetSimpleWrapper extends GralWidget
     return null;
   }
 
-  @Override protected void removeWidgetImplementation()
+  @Override public void removeWidgetImplementation()
   {
     widgetSwt.dispose();
     widgetSwt = null;
