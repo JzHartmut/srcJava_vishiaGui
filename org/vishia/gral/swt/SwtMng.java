@@ -1178,6 +1178,8 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   @Override public void addHorizontalSelector(GralHorizontalSelector<?> sel){
     SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, sel);
     sel.implMethodWidget_.setWidgetImpl(swtSel);
+    sel.pos = getPositionInPanel();
+    registerWidget(sel);
   }
   
   

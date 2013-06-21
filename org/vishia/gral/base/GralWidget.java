@@ -41,12 +41,13 @@ import org.vishia.util.KeyCode;
  * 
  *   GralHorizontalSelector<UserType> <-----<*>UserCanCreate_GraphicIndependent
  *   - some special non-graphic data
- *     |
- *     |<--------------------------------------------+
- *     +---|>GralWidget                              |
- *           |                                       |
- *           |<>--->GralWidgImpl_ifc<|------SwtHorizontalSelector--|>SwtWidgetSimpleWrapper
- *                                                   |                   |
+ *     |<-------------------------------------------------------------------------------------+
+ *     |<--------------------------------------------+                                        |
+ *     +---|>GralWidget                              |                                        |
+ *           |                                       |                                        |
+ *           |<>--->GralWidgImpl_ifc<|------SwtHorizontalSelector--|>SwtWidgetSimpleWrapper   |
+ *                                                   |                   |                    |
+ *                                                   |                   |      |-------------+
  *                                                   |                   |-->Control<|---SwtImpl-----|>swt.Canvas
  *                                                   |                                     |
  *                                                   |<----outer---------------------------|
@@ -293,7 +294,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   public String name;
   
   /**The position of the widget. It may be null if the widget should not be resized. */
-  public final GralPos pos;  
+  public GralPos pos;  
   
   
   /**Panel where the widget is member of. */
@@ -1250,15 +1251,14 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
 
   @Override
   public GralWidgetGthreadSet_ifc getGthreadSetifc()
-  {
-    // TODO Auto-generated method stub
-    return null;
+  { if(wdgImpl !=null) return wdgImpl.getGthreadSetifc();
+    else  return null;
   }
 
 
   @Override
   public GralColor setBackgroundColor(GralColor color)
-  {
+  { 
     // TODO Auto-generated method stub
     return null;
   }
@@ -1266,49 +1266,41 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
 
   @Override
   public void setBoundsPixel(int x, int y, int dx, int dy)
-  {
-    // TODO Auto-generated method stub
-    
+  { if(wdgImpl !=null) wdgImpl.setBoundsPixel(x, y, dx, dy);
   }
 
 
   @Override
   public GralColor setForegroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
+  { // TODO Auto-generated method stub
     return null;
   }
 
 
   @Override
   public Object getWidgetImplementation()
-  {
-    // TODO Auto-generated method stub
-    return null;
+  { if(wdgImpl !=null) return wdgImpl.getWidgetImplementation();
+    else return null;
   }
 
 
   @Override
   public void removeWidgetImplementation()
-  {
-    // TODO Auto-generated method stub
-    
+  { if(wdgImpl !=null) wdgImpl.removeWidgetImplementation();
   }
 
 
   @Override
   public void repaintGthread()
   {
-    // TODO Auto-generated method stub
-    
+    if(wdgImpl !=null) wdgImpl.repaintGthread();
   }
 
 
   @Override
   public boolean setFocusGThread()
-  {
-    // TODO Auto-generated method stub
-    return false;
+  { if(wdgImpl !=null) return wdgImpl.setFocusGThread();
+    else return false;
   }
   
   

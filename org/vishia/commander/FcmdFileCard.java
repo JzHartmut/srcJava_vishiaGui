@@ -151,9 +151,9 @@ public class FcmdFileCard extends GralFileSelector
     String nameWidgLabel = FcmdWidgetNames.labelWidgFile + nameFilePanel;
     widgLabel = mng.addTextField(nameWidgLabel, false, null, null);
     mng.setPosition(0, 2, 20, 0, 1, 'd');
-    wdgCardSelector = new GralHorizontalSelector<Object>("cards", mng);
-    wdgCardSelector.addItem("test1", 0, null);
-    wdgCardSelector.addItem("test2", 0, null);
+    wdgCardSelector = new GralHorizontalSelector<Object>("cards", actionSetFromTabSelection, mng);
+    //wdgCardSelector.addItem("test1", 0, null);
+    //wdgCardSelector.setActItem("test1");
     mng.addHorizontalSelector(wdgCardSelector);
     mng.setPosition(2, 0, 0, 0, 1, 'd');
     //set the base class GralFileSelector to the panel. It contains the path and the table for file selection.
@@ -197,6 +197,11 @@ public class FcmdFileCard extends GralFileSelector
   }
   
   
+  /**Sets a new content for this file table because another favor or tab is selected
+   * @param favorPathInfoP
+   * @param dir
+   * @param mode 0 no tab, 1 -temporary tab, 2 - new tab
+   */
   void setNewContent(FcmdFavorPathSelector.FavorPath favorPathInfoP, FileRemote dir){
     favorPathInfo = favorPathInfoP;
     favorCard.add(favorPathInfo);  //only it is a new one, it will be checked.
@@ -530,12 +535,27 @@ public class FcmdFileCard extends GralFileSelector
    * Twice the {@link Fcmd#lastFilePanels} list is ordered with this panel as first one. 
    * 
    */
-  GralUserAction actionFocused = new GralUserAction(){
+  GralUserAction actionFocused = new GralUserAction("actionFocused"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
       setActFilePanel_setColorCurrLine();
       return true;      
   } };
   
+
+  GralUserAction actionSetFromTabSelection = new GralUserAction("actionSetFromTabSelection"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
+      FcmdFavorPathSelector.FavorPath favorPathInfo = (FcmdFavorPathSelector.FavorPath)params[0];
+      main.favorPathSelector.actFavorPathInfo = favorPathInfo; //The last used selection (independent of tab left, middle, right)
+      String currentDir  = mainPanel.indexActualDir.get(favorPathInfo.selectName);
+      if(currentDir == null){
+        currentDir = favorPathInfo.path;
+      }
+      //dir = new FileRemote(currentDir);  
+      FileRemote dir = main.fileCluster.getFile(currentDir, null);
+      FcmdFileCard.this.setNewContent(favorPathInfo, dir);
+      return true;      
+  } };
+
   
   @Override public String toString(){ return label + "/" + nameFilePanel; }
   

@@ -133,6 +133,7 @@ public class FcmdFavorCard  extends GralSelectList
     //
     //Now switch to the new favor in the file panel: 
     FcmdFavorPathSelector.FavorPath favorPathInfo = (FcmdFavorPathSelector.FavorPath)line.getUserData();
+    //new: fileTable.actionSetFromTabSelection.exec(KeyCode.menuEntered, null, favorPathInfo);
     main.favorPathSelector.actFavorPathInfo = favorPathInfo; //The last used selection (independent of tab left, middle, right)
     this.sActSelectedFavorPath = favorPathInfo.selectName;
     if(  wdgdTable.name.startsWith(FcmdWidgetNames.tableFavoritesMain)) {
@@ -147,6 +148,10 @@ public class FcmdFavorCard  extends GralSelectList
     //dir = new FileRemote(currentDir);  
     dir = main.fileCluster.getFile(currentDir, null);
     fileTable.setNewContent(favorPathInfo, dir);
+    
+    if(!fileTable.wdgCardSelector.setActItem(favorPathInfo.selectName)){
+      fileTable.wdgCardSelector.addItem(favorPathInfo.selectName, -1, favorPathInfo);
+    }
     return true;
   }
 

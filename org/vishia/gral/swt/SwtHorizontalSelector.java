@@ -1,5 +1,9 @@
 package org.vishia.gral.swt;
 
+import java.util.List;
+
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -9,6 +13,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.widget.GralHorizontalSelector;
@@ -53,6 +58,10 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
 
   private final GralHorizontalSelector<?> wdgGral;
   
+  public final GralWidgetAccess wdgGralAccess;
+  
+
+  
   private Font fontText;
 
   
@@ -60,17 +69,19 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
   
   public SwtHorizontalSelector(SwtMng mng, GralHorizontalSelector<?> wdgGral)
   { super(null, mng);
-    //super(name, mng);
     this.wdgGral = wdgGral;
+    this.wdgGralAccess = new GralWidgetAccess(wdgGral);
     wdgGral.implMethodWidget_.setWidgetImpl(this);
-    this.mng = mng;
     colorText = GralColor.getColor("bk");
     colorSelect = GralColor.getColor("lbl");
     colorBack = GralColor.getColor("wh");
     colorLine = GralColor.getColor("bk");
 
     Composite panel = (Composite)mng.pos.panel.getPanelImpl();
-    widgetSwt = new SwtImpl(panel);
+    widgetSwt = new Canvas(panel,0);
+    widgetSwt.setData(wdgGral);
+    widgetSwt.addPaintListener(paintListener);
+    widgetSwt.addMouseListener(mouseListener);
     mng.setBounds_(widgetSwt);
     float ySize = mng.pos.height();
     char size1 = ySize > 3? 'B' : 'A';
@@ -82,12 +93,14 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
   }
 
   
+  
   @SuppressWarnings("unchecked")
   protected void paintControl(Canvas swt, PaintEvent e){
     GC gc = e.gc;
     //gc.d
     Rectangle dim = swt.getBounds();
-    Object actItem = wdgGral.guiImplAccess.items().get(1);
+    GralHorizontalSelector.Item<?> actItem = wdgGralAccess.actItem();
+    int nrActItem = wdgGralAccess.nrItem();
     Color swtColorBack = mng.getColorImpl(colorBack);
     Color swtColorText = mng.getColorImpl(colorText);
     Color swtColorSelect = mng.getColorImpl(colorSelect);
@@ -98,41 +111,120 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
     //fontData.
     gc.setForeground(swtColorBack);
     gc.fillRectangle(1,0,dim.width-1, dim.height);
+    int xArrow = 20;
+    wdgGralAccess.calcLeftTab(dim.width, xArrow);
     int xText = 2;
     int yText = 0;
-    for(Object item1: wdgGral.guiImplAccess.items()){
-      //@SuppressWarnings("unchecked")
-      GralHorizontalSelector.Item item = (GralHorizontalSelector.Item)item1;
+    int nrItem1 = wdgGralAccess.nrLeftTab();
+    if(nrItem1 >0){
+      gc.setForeground(swtColorText);
+      gc.drawString("<<", xText+4, yText); 
+      xText += 20;
+    }
+    //
+    //paint tabs
+    //
+    int ixItem = nrItem1;
+    List items = wdgGralAccess.items();
+    int zItem = wdgGralAccess.nrofTabs();
+    do {
+      GralHorizontalSelector.Item item = wdgGralAccess.tab(ixItem); //(GralHorizontalSelector.Item)items.get(ixItem);
       if(item.xSize == 0){
         item.xSize = 50; //TODO
       }
-      if(item1 == actItem){
-        gc.setForeground(swtColorSelect);  //black
-      } else {
-        gc.setForeground(swtColorText);  //black
-      }
-      gc.drawString(item.text, xText+4, yText);
-      gc.drawLine(xText+1, 3, xText+1, dim.height);
-      gc.drawLine(xText+1, 3, xText+4, 0);
-      xText += item.xSize;
-      gc.drawLine(xText-1, 3, xText-1, dim.height);
-      gc.drawLine(xText-1, 3, xText-4, 0);
-      gc.drawLine(xText-4, 0, xText-item.xSize+4, 0);
-      
+      int xEnd = xText + item.xSize;
+      if(xEnd < (dim.width - (ixItem == (zItem-1) ? xArrow +4 : 4))){
+        if(ixItem == nrActItem){
+          gc.setForeground(swtColorSelect);  //black
+        } else {
+          gc.setForeground(swtColorText);
+        }
+        gc.drawString(item.text, xText+4, yText);
+        gc.drawLine(xText+1, 3, xText+1, dim.height);
+        gc.drawLine(xText+1, 3, xText+4, 0);
+        gc.drawLine(xEnd-1, 3, xEnd-1, dim.height);
+        gc.drawLine(xEnd-1, 3, xEnd-4, 0);
+        gc.drawLine(xEnd-4, 0, xEnd-item.xSize+4, 0);
+        xText = xEnd;
+        ixItem +=1;
+      } else break;
+    } while(ixItem < zItem);
+    if(ixItem < zItem){
+      gc.setForeground(swtColorText);
+      gc.drawString(">>", dim.width-16, yText); 
     }
     
   }
 
+  
+  
+  
+  PaintListener paintListener = new PaintListener(){
+    @Override public void paintControl(PaintEvent e) {
+      SwtHorizontalSelector.this.paintControl((Canvas)widgetSwt, e);
+    }
+  };
+  
+  
+  
+  MouseListener mouseListener = new MouseListener(){
+
+    @Override
+    public void mouseDoubleClick(MouseEvent e)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public void mouseDown(MouseEvent e)
+    {
+      wdgGralAccess.findTab(e.x);
+      widgetSwt.redraw();
+      
+    }
+
+    @Override
+    public void mouseUp(MouseEvent e)
+    {
+      Rectangle dim = widgetSwt.getBounds();
+      if(e.y >0 && e.y < dim.height){
+        wdgGralAccess.setDstToActItem();
+      } else {
+        wdgGralAccess.clearDstItem();
+      }
+      widgetSwt.redraw();  //because selection is changed.
+    }
+    
+  };
+
+  
+  
+  private static class GralWidgetAccess extends GralHorizontalSelector<?>.GraphicImplAccess{
+
+    GralWidgetAccess(GralHorizontalSelector<?> wdgGral)
+    {
+      wdgGral.super();
+    }
+    
+    @Override protected void findTab(int xMouse){ super.findTab(xMouse); }
+    
+    @Override protected void setDstToActItem(){ super.setDstToActItem(); }
+
+    @Override protected void clearDstItem(){ super.clearDstItem(); }
+
+  }
+  
   
   /**Implementation hint: Use an extra class for the graphic widget implementation. It seems to have
    * a better overview over data and dependencies. Extend only necessary things in this derived class.
    * Do all others in the environment class, which is graphic implementation specific, but independent
    * of the graphical widget things.
    */
-  private class SwtImpl extends Canvas
+  private class XXXSwtImpl extends Canvas
   {
     
-    SwtImpl(Composite parent){
+    XXXSwtImpl(Composite parent){
       super(parent, 0);
       //setForeground(black);
       
@@ -140,11 +232,7 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
       
     }
     
-    PaintListener paintListener = new PaintListener(){
-      @Override public void paintControl(PaintEvent e) {
-        SwtHorizontalSelector.this.paintControl(SwtImpl.this, e);
-      }
-    };
+   
     
   }
 
