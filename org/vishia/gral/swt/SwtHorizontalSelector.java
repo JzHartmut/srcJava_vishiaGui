@@ -14,9 +14,13 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
+import org.vishia.util.KeyCode;
 
 /**This class is a selector in one text field. You can set the cursor into the field 
  * and select between Parts which are separated with a given character sequence.
@@ -90,6 +94,8 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
       case 'B': fontText = mng.propertiesGuiSwt.stdButtonFont; break;
       default: throw new IllegalArgumentException("param size must be A or B");
     }
+    wdgGralAccess.execAfterCreationImplWidget();
+
   }
 
   
@@ -115,8 +121,8 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
     wdgGralAccess.calcLeftTab(dim.width, xArrow);
     int xText = 2;
     int yText = 0;
-    int nrItem1 = wdgGralAccess.nrLeftTab();
-    if(nrItem1 >0){
+    int ixLeftItem = wdgGralAccess.nrLeftTab();
+    if(ixLeftItem >0){
       gc.setForeground(swtColorText);
       gc.drawString("<<", xText+4, yText); 
       xText += 20;
@@ -124,36 +130,37 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
     //
     //paint tabs
     //
-    int ixItem = nrItem1;
-    List items = wdgGralAccess.items();
-    int zItem = wdgGralAccess.nrofTabs();
-    do {
-      GralHorizontalSelector.Item item = wdgGralAccess.tab(ixItem); //(GralHorizontalSelector.Item)items.get(ixItem);
-      if(item.xSize == 0){
-        item.xSize = 50; //TODO
-      }
-      int xEnd = xText + item.xSize;
-      if(xEnd < (dim.width - (ixItem == (zItem-1) ? xArrow +4 : 4))){
-        if(ixItem == nrActItem){
-          gc.setForeground(swtColorSelect);  //black
-        } else {
-          gc.setForeground(swtColorText);
+    if(ixLeftItem >=0){
+      int ixItem = ixLeftItem;
+      List items = wdgGralAccess.items();
+      int zItem = wdgGralAccess.nrofTabs();
+      do {
+        GralHorizontalSelector.Item item = wdgGralAccess.tab(ixItem); //(GralHorizontalSelector.Item)items.get(ixItem);
+        if(item.xSize == 0){
+          item.xSize = 50; //TODO
         }
-        gc.drawString(item.text, xText+4, yText);
-        gc.drawLine(xText+1, 3, xText+1, dim.height);
-        gc.drawLine(xText+1, 3, xText+4, 0);
-        gc.drawLine(xEnd-1, 3, xEnd-1, dim.height);
-        gc.drawLine(xEnd-1, 3, xEnd-4, 0);
-        gc.drawLine(xEnd-4, 0, xEnd-item.xSize+4, 0);
-        xText = xEnd;
-        ixItem +=1;
-      } else break;
-    } while(ixItem < zItem);
-    if(ixItem < zItem){
-      gc.setForeground(swtColorText);
-      gc.drawString(">>", dim.width-16, yText); 
-    }
-    
+        int xEnd = xText + item.xSize;
+        if(xEnd < (dim.width - (ixItem == (zItem-1) ? xArrow +4 : 4))){
+          if(ixItem == nrActItem){
+            gc.setForeground(swtColorSelect);  //black
+          } else {
+            gc.setForeground(swtColorText);
+          }
+          gc.drawString(item.text, xText+4, yText);
+          gc.drawLine(xText+1, 3, xText+1, dim.height);
+          gc.drawLine(xText+1, 3, xText+4, 0);
+          gc.drawLine(xEnd-1, 3, xEnd-1, dim.height);
+          gc.drawLine(xEnd-1, 3, xEnd-4, 0);
+          gc.drawLine(xEnd-4, 0, xEnd-item.xSize+4, 0);
+          xText = xEnd;
+          ixItem +=1;
+        } else break;
+      } while(ixItem < zItem);
+      if(ixItem < zItem){
+        gc.setForeground(swtColorText);
+        gc.drawString(">>", dim.width-16, yText); 
+      }
+    }    
   }
 
   
@@ -188,12 +195,15 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
     public void mouseUp(MouseEvent e)
     {
       Rectangle dim = widgetSwt.getBounds();
-      if(e.y >0 && e.y < dim.height){
-        wdgGralAccess.setDstToActItem();
-      } else {
-        wdgGralAccess.clearDstItem();
+      if(e.button == 1){
+        if(e.y >0 && e.y < dim.height){
+          wdgGralAccess.setDstToActItem();
+        } else {
+          wdgGralAccess.clearDstItem();
+        }
+        widgetSwt.redraw();  //because selection is changed.
       }
-      widgetSwt.redraw();  //because selection is changed.
+      //else: contect menu does the action.
     }
     
   };
@@ -213,30 +223,11 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
 
     @Override protected void clearDstItem(){ super.clearDstItem(); }
 
+    @Override protected void removeDstItem(){ super.removeDstItem(); }
+
   }
   
   
-  /**Implementation hint: Use an extra class for the graphic widget implementation. It seems to have
-   * a better overview over data and dependencies. Extend only necessary things in this derived class.
-   * Do all others in the environment class, which is graphic implementation specific, but independent
-   * of the graphical widget things.
-   */
-  private class XXXSwtImpl extends Canvas
-  {
-    
-    XXXSwtImpl(Composite parent){
-      super(parent, 0);
-      //setForeground(black);
-      
-      addPaintListener(paintListener);  
-      
-    }
-    
-   
-    
-  }
-
-
 
   
 }

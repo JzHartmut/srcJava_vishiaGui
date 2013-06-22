@@ -380,7 +380,7 @@ public final class SwtTable  extends GralTable {
 
   
   @Override protected GralMenu createColumnMenu(int column){
-    GralMenu menuColumn = new SwtMenu(name + "_menu" + column, table, itsMng);
+    GralMenu menuColumn = new SwtMenu(this, table, itsMng);
     for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){
       cellsSwt[iRow][column].setMenu((Menu)menuColumn.getMenuImpl());
     }    

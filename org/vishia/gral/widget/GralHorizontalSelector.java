@@ -3,12 +3,14 @@ package org.vishia.gral.widget;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.KeyCode;
 
 /**This class is a selector in one text field. You can set the cursor into the field 
@@ -145,6 +147,32 @@ public class GralHorizontalSelector<UserData> extends GralWidget
 
   
   
+  
+  GralUserAction actionRemoveTab = new GralUserAction("actionRemoveTab"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        boolean actItemRemoved = ixDstItem == ixActItem;
+        items.remove(ixDstItem);
+        if(ixDstItem < ixActItem){ ixActItem -=1; }
+        if(actItemRemoved){
+          if(ixActItem >= items.size()){
+            ixDstItem = ixActItem-1;
+          }
+          setDstToActItem();
+        } else {
+          ixDstItem = ixActItem; //unchanged
+        }
+        repaint(100, 300);
+      }
+      return true;
+    }
+    
+  };
+
+
+
+  
+  
   /**This class is not intent to use from an application, it is a helper to access all necessary data 
    * with protected methods from the graphic implementation.
    * A derived class of this is defined in the graphic implementation class. Via this derived class
@@ -172,18 +200,22 @@ public class GralHorizontalSelector<UserData> extends GralWidget
       //
       //search what tab should be shown left as first:
       //
-      ixLeftItem = 0;
-      while(ixLeftItem ==0 && ixItem >=0){
-        GralHorizontalSelector.Item<UserData> item = items.get(ixItem);
-        if(item.xSize == 0){
-          item.xSize = 50; //TODO
+      if(items.size() >0){
+        ixLeftItem = 0;
+        while(ixLeftItem ==0 && ixItem >=0){
+          GralHorizontalSelector.Item<UserData> item = items.get(ixItem);
+          if(item.xSize == 0){
+            item.xSize = 50; //TODO
+          }
+          if(xArrow + xBefore + item.xSize + xArrow +4 > gwidth){  //to much yet
+            ixLeftItem = ixItem +1;
+          } else{ 
+            xBefore += item.xSize;
+            ixItem -=1;
+          }
         }
-        if(xArrow + xBefore + item.xSize + xArrow +4 > gwidth){  //to much yet
-          ixLeftItem = ixItem +1;
-        } else{ 
-          xBefore += item.xSize;
-          ixItem -=1;
-        }
+      } else {
+        ixLeftItem = -1;  //not given
       }
     }
 
@@ -218,6 +250,17 @@ public class GralHorizontalSelector<UserData> extends GralWidget
     /**Removes a different choice of a destination item, because the mouse was released 
      * outside of the area where it is pressed and outside of the widget. */
     protected void clearDstItem(){ ixDstItem = ixActItem; }
+    
+    protected void removeDstItem(){ 
+      items.remove(ixDstItem);
+      if(ixDstItem < ixActItem){ ixActItem -=1; }
+      clearDstItem();
+    }
+    
+    public void execAfterCreationImplWidget(){
+      GralMenu menu = getContextMenu();
+      menu.addMenuItemGthread("&Close tab", actionRemoveTab);
+    }
     
 
     public int nrLeftTab(){ return ixLeftItem; }

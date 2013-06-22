@@ -285,11 +285,11 @@ public final class InspcCurveView
           tracks[ii].widgVarPath.setDataPath("widgetInfo");  //prevent storing the own widgetInfo.
           //input[ii].widgPath.setContentInfo(input[ii]);
           GralMenu menuWidg = track.widgVarPath.getContextMenu();
-          GralWidget widgMenuItem1 = menuWidg.addMenuItemGthread(null, "drop variable", actionReplaceVariable);
-          GralWidget widgMenuItem2 = menuWidg.addMenuItemGthread(null, "swap variable", actionSwapVariable);
-          GralWidget widgMenuItem5 = menuWidg.addMenuItemGthread(null, "shift variable", actionShiftVariable);
-          GralWidget widgMenuItem3 = menuWidg.addMenuItemGthread(null, "set color", actionColorSelectorOpen);
-          GralWidget widgMenuItem4 = menuWidg.addMenuItemGthread(null, "set scale", actionSetScaleValues2Track);
+          GralWidget widgMenuItem1 = menuWidg.addMenuItemGthread("x", "drop variable", actionReplaceVariable);
+          GralWidget widgMenuItem2 = menuWidg.addMenuItemGthread("x", "swap variable", actionSwapVariable);
+          GralWidget widgMenuItem5 = menuWidg.addMenuItemGthread("x", "shift variable", actionShiftVariable);
+          GralWidget widgMenuItem3 = menuWidg.addMenuItemGthread("x", "set color", actionColorSelectorOpen);
+          GralWidget widgMenuItem4 = menuWidg.addMenuItemGthread("x", "set scale", actionSetScaleValues2Track);
           widgMenuItem1.setContentInfo(tracks[ii]);
           widgMenuItem2.setContentInfo(tracks[ii]);
           widgMenuItem3.setContentInfo(tracks[ii]);

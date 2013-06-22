@@ -80,9 +80,9 @@ public class SwtMenu extends GralMenu
    * @param parent
    * @param mng
    */
-  public SwtMenu(String sName, Control parent, GralMng mng)
+  public SwtMenu(GralWidget widgg, Control parent, GralMng mng)
   {
-    super(sName, mng);
+    super(widgg, mng);
     this.window = parent.getShell();
     this.menuSwt = new Menu(parent);
   }
@@ -93,9 +93,9 @@ public class SwtMenu extends GralMenu
    * @param window
    * @param mng
    */
-  public SwtMenu(String sName, Shell window, GralMng mng)
+  public SwtMenu(GralWidget widgg, Shell window, GralMng mng)
   {
-    super(sName, mng);
+    super(widgg, mng);
     this.window = window;
     Menu menuWindow = window.getMenuBar();
     if(menuWindow == null){
@@ -107,11 +107,28 @@ public class SwtMenu extends GralMenu
   }
 
   
+  /**
+   * @see org.vishia.gral.base.GralMenu#addMenuItemGthread(java.lang.String, java.lang.String, org.vishia.gral.ifc.GralUserAction)
+   * @deprecated
+   */
+  @Deprecated
   @Override public GralWidget addMenuItemGthread(String nameWidg, String sMenuPath, GralUserAction gralAction)
   {
     SelectionListener action = new ActionUserMenuItem(gralAction);
-    return addMenuItemGthread(nameWidg, sMenuPath, action);
+    return addMenuItemGthread(null, nameWidg, sMenuPath, action);
   }  
+  
+  
+  @Override public void addMenuItemGthread(String sMenuPath, GralUserAction gralAction)
+  {
+    SelectionListener action = new ActionUserMenuItem(gralAction);
+    addMenuItemGthread(widgg, null, sMenuPath, action);
+  }  
+  
+  
+  
+  
+  
   
   /**Adds an action with the menu path to this menu.
    * This method is package private. It is used by {@link SwtTable} to add a context menu with a special
@@ -120,7 +137,8 @@ public class SwtMenu extends GralMenu
    * @param sMenuPath
    * @param action
    */
-  /*package private*/ GralWidget addMenuItemGthread(String nameWidg, String sMenuPath, SelectionListener action)
+  /*package private*/ private GralWidget addMenuItemGthread(GralWidget widgg, String nameWidg, 
+      String sMenuPath, SelectionListener action)
   {
     String[] names = sMenuPath.split("/");
     Map<String, MenuEntry> menustore = menus;
@@ -157,12 +175,16 @@ public class SwtMenu extends GralMenu
       parentMenu = (Menu)menuEntry.menuImpl;
     }
     String name = names[ii];
-    MenuItem item = new MenuItem(parentMenu, SWT.None); 
-    GralWidget widgMenu = new SwtWidgetMenu(nameWidg, item, sMenuPath, gralMng);
+    MenuItem item = new MenuItem(parentMenu, SWT.None);
+    if(widgg == null){
+      widgg = new SwtWidgetMenu(nameWidg, item, sMenuPath, gralMng);
+    } else {
+      item.setData(widgg);
+    }
     item.setText(name);
     //item.setAccelerator(SWT.CONTROL | 'S');
     item.addSelectionListener(action);
-    return widgMenu;
+    return widgg;
   }
 
 

@@ -18,9 +18,9 @@ public class AwtMenu extends GralMenu
   
   
 
-  public AwtMenu(String sName, Component parent, GralMng mng)
+  public AwtMenu(GralWidget widgg, Component parent, GralMng mng)
   {
-    super(sName, mng);
+    super(widgg, mng);
     menuAwt = new PopupMenu("test");
     MenuItem item = new MenuItem("Test1");
     menuAwt.add(item);
@@ -35,14 +35,22 @@ public class AwtMenu extends GralMenu
     return null;
   }
 
+  @Override public void addMenuItemGthread(String sMenuPath,
+      GralUserAction gralAction)
+  {
+    // TODO Auto-generated method stub
+    
+  }
+  
 
+  @Override
   public void setVisible(){
     //menuAwt.setVisible(true);
   }
   
   
   @Override public Menu getMenuImpl(){ return menuAwt; }
-  
+
   
   
 }

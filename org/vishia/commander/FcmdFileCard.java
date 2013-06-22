@@ -19,6 +19,7 @@ import org.vishia.util.Assert;
 import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
 import org.vishia.util.FileCompare;
+import org.vishia.util.KeyCode;
 
 /**This is one file table in the Java commander. Each main panel (left, middle, right)
  * has maybe more as one tabs, each tab has exactly one file table. The file table is reused
@@ -155,6 +156,7 @@ public class FcmdFileCard extends GralFileSelector
     //wdgCardSelector.addItem("test1", 0, null);
     //wdgCardSelector.setActItem("test1");
     mng.addHorizontalSelector(wdgCardSelector);
+
     mng.setPosition(2, 0, 0, 0, 1, 'd');
     //set the base class GralFileSelector to the panel. It contains the path and the table for file selection.
     setToPanel(mng, namePanelFile, 5, new int[]{2,0,-6,-12}, 'A');
@@ -544,17 +546,29 @@ public class FcmdFileCard extends GralFileSelector
 
   GralUserAction actionSetFromTabSelection = new GralUserAction("actionSetFromTabSelection"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
-      FcmdFavorPathSelector.FavorPath favorPathInfo = (FcmdFavorPathSelector.FavorPath)params[0];
-      main.favorPathSelector.actFavorPathInfo = favorPathInfo; //The last used selection (independent of tab left, middle, right)
-      String currentDir  = mainPanel.indexActualDir.get(favorPathInfo.selectName);
-      if(currentDir == null){
-        currentDir = favorPathInfo.path;
+      FcmdFavorPathSelector.FavorPath favorPathNew = (FcmdFavorPathSelector.FavorPath)params[0];
+      //before changing the content of this fileTable, store the current directory
+      //to restore if this favor respectively selection is used ones more.
+      FileRemote dir = null;
+      String sCurrentDir;
+      if(favorPathInfo !=null){
+        dir = getCurrentDir();
+        if(dir != null){
+          sCurrentDir = dir.getAbsolutePath();
+          if(sCurrentDir !=null){
+            mainPanel.indexActualDir.put(favorPathInfo.selectName, sCurrentDir);
+      } } }
+      main.favorPathSelector.actFavorPathInfo = favorPathNew; //The last used selection (independent of tab left, middle, right)
+      sCurrentDir  = mainPanel.indexActualDir.get(favorPathNew.selectName);
+      if(sCurrentDir == null){
+        sCurrentDir = favorPathNew.path;
       }
       //dir = new FileRemote(currentDir);  
-      FileRemote dir = main.fileCluster.getFile(currentDir, null);
-      FcmdFileCard.this.setNewContent(favorPathInfo, dir);
+      dir = main.fileCluster.getFile(sCurrentDir, null);
+      FcmdFileCard.this.setNewContent(favorPathNew, dir);
       return true;      
   } };
+  
 
   
   @Override public String toString(){ return label + "/" + nameFilePanel; }

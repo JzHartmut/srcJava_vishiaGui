@@ -254,7 +254,7 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
 
   @Override public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction gralAction){
     if(menuBar == null){
-      menuBar = new SwtMenu("menubar", window, itsMng);
+      menuBar = new SwtMenu(this, window, itsMng);
     }
     menuBar.addMenuItemGthread(nameWidg, sMenuPath, gralAction);
   }

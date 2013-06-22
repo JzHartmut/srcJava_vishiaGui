@@ -417,7 +417,7 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
   
   @Override public GralMenu addContextMenu(GralWidget widg){
     Component widgSwt = (Component)widg.getWidgetImplementation();
-    GralMenu menu = new AwtMenu(widg.name + "_menu", widgSwt, this);
+    GralMenu menu = new AwtMenu(widg, widgSwt, this);
     PopupMenu menuAwt = (PopupMenu)menu.getMenuImpl();
     widgSwt.add(menuAwt);
     menuAwt.show(widgSwt, 10, 10);
