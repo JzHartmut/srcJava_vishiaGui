@@ -337,6 +337,9 @@ private class InspcGuiCfg extends GuiCfg
   {
     try{
       synchronized(this){ wait(100); }
+      curveA.stepSaveCurve();
+      curveB.stepSaveCurve();
+      curveC.stepSaveCurve();
       //inspcComm.procComm();  
       //oamRcvUdpValue.sendRequest();
     } catch(Exception exc){

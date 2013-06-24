@@ -49,6 +49,8 @@ public interface GralCurveView_ifc extends GralWidget_ifc, GralSetValue_ifc, Get
    */
   public static final int version = 20120608;
   
+  enum ModeWrite {currentView, autoSave};
+  
   /**Adds a sampling value set.
    * <br><br> 
    * This method can be called in any thread. It updates only data,
@@ -86,10 +88,25 @@ public interface GralCurveView_ifc extends GralWidget_ifc, GralSetValue_ifc, Get
   /**Returns true if the curve view is active. See {@link #activate(boolean)}. */
   boolean isActiv();
   
-  /**Writes the curve to the given interface, it is an exporter class.
-   * @param out
+  /**Returns true if the curve view is active but freezed in presentation. */
+  boolean isFreezed();
+  
+  
+  /**Initializes an auto-save data write process. The time range will be set from the last autosave
+   * or from the start of recording to the actual last value of curve yet written.
+   * After them some invocations of {@link #writeCurve(WriteCurve_ifc, org.vishia.gral.ifc.GralCurveView_ifc.ModeWrite)}
+   * with {@link GralCurveView_ifc.ModeWrite#autoSave} can be done with this current time range.
+   * @return The absolute time of start of curve.
    */
-  void writeCurve(WriteCurve_ifc out);
+  CharSequence timeInitAutoSave();
+  
+  
+  /**Writes the curve to the given interface, it is an exporter class.
+   * @param out exporter class reference
+   * @param mode autosave: Then the data range from {@link #timeInitAutoSave()} is used. 
+   *   currentView: Then the data range visible in window will be used.
+   */
+  void writeCurve(WriteCurve_ifc out, ModeWrite mode);
   
   
   /**The ZBNF-syntax of a setting for curve view. */

@@ -269,7 +269,8 @@ public class SwtCurveView extends GralCurveView
    * @param timeDiff
    * @param xp0
    */
-  private void drawRightOrAll(GC g, Point size, int xView, int dxView, int yView, int dyView, int ixDataRight, int xViewPart, int timeDiff, int xp0){
+  private void drawRightOrAll(GC g, Point size, int xView, int dxView, int yView, int dyView
+      , int ixDataRight, int xViewPart, int timeDiff, int xp0, boolean bPaintAll){
     g.setBackground(colorBack);
     //fill, clear the area either from 0 to end or from size.x - xView to end,
     g.fillRectangle(xp0, yView, xViewPart, dyView);  //fill the current background area
@@ -290,7 +291,7 @@ public class SwtCurveView extends GralCurveView
     } 
     //  
     //prepare indices of data.
-    int ixixDataLast = prepareIndicesDataForDrawing(ixDataRight, xViewPart, timeDiff);
+    int ixixDataLast = prepareIndicesDataForDrawing(ixDataRight, xViewPart, timeDiff, bPaintAll);
     // 
     //write time divisions:
     g.setForeground(gridColor);
@@ -385,8 +386,8 @@ public class SwtCurveView extends GralCurveView
       //the number of data, the write index are accessed only one time from this
       //Note that ixDataShowRight is set by ixDataWr if the curve is running.
       int ixDataRight = super.ixDataShowRight; 
-      sizepos.xPixelCurve = size.x;
-      sizepos.yPixelCurve = size.y;
+      pixelOrg.xPixelCurve = size.x;
+      pixelOrg.yPixelCurve = size.y;
       @SuppressWarnings("hiding")
       TimeOrganisation timeorg = SwtCurveView.this.timeorg;
       timeorg.timePerPixel = (float)timeorg.timeSpread / (size.x +1); //nr of time units per pixel. 
@@ -396,10 +397,12 @@ public class SwtCurveView extends GralCurveView
       final int timeDiff; //time for new values.
       testHelp.xView =xView; testHelp.yView =yView; testHelp.dxView =dxView; testHelp.dyView =dyView;
       //
+      final boolean bPaintAll;
       if(!bFreeze && !super.bPaintAllCmd && redrawBecauseNewData1) {
         //paint only a part of the curve to save calculation time.
         //The curve will be shifted to left.
         //
+        bPaintAll = false;
         if(ixDataRight != ixDataDraw){
           testStopWr = true;
           stop();
@@ -413,6 +416,7 @@ public class SwtCurveView extends GralCurveView
         }
         xp0 = drawShiftAreaToLeft(g, size, xView, dxView, yView, dyView, xViewPart, timeDiff);
       } else { //paintall
+        bPaintAll = true;
         timeorg.calc();
         //System.out.println("SwtCurveView - paintall;" + bFreeze + bPaintAllCmd + redrawBecauseNewData1);
         xViewPart = size.x;
@@ -431,7 +435,7 @@ public class SwtCurveView extends GralCurveView
       if(xViewPart >0) { //only if anything is to draw
         //only if a new point should be drawn.
         try{Thread.sleep(2);} catch(InterruptedException exc){}
-        drawRightOrAll(g, size, xView, dxView, yView, dyView, ixDataRight, xViewPart, timeDiff, xp0);
+        drawRightOrAll(g, size, xView, dxView, yView, dyView, ixDataRight, xViewPart, timeDiff, xp0, bPaintAll);
         
       } else { //xViewPart == 0
         //This is is normal case if a new value in data has a too less new timestamp.

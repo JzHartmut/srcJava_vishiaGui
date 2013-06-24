@@ -25,6 +25,7 @@ import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralCurveViewTrack_ifc;
+import org.vishia.gral.ifc.GralCurveView_ifc;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -189,7 +190,7 @@ public final class InspcCurveView
   
   GralButton widgBtnUp, widgBtnDn, widgBtnScale, widgBtnReadCfg, widgBtnSaveCfg;
   
-  GralButton widgBtnReadValues, widgBtnSaveValues, widgBtnColor; 
+  GralButton widgBtnReadValues, widgBtnSaveValues, wdgButtonAutosave, widgBtnColor; 
   
   
   /**
@@ -202,8 +203,13 @@ public final class InspcCurveView
   /**The currently loaded file for curve settings. */
   FileRemote fileCurveCfg;
   
-  FileRemote fileCurveSave;
+  FileRemote dirCurveSave;
   
+  //long timeLastSave;
+  
+  //long timePeriodSave = 1000L * 60 * 2;
+  
+  //boolean hasDataTosave;
   
   /**Temporary used formatter. */
   StringFormatter sFormatter = new StringFormatter(50);
@@ -230,7 +236,7 @@ public final class InspcCurveView
     this.variables = variables;
     this.gralMng = gralMng;
     fileCurveCfg = defaultDirCfg;
-    fileCurveSave = defaultDirSave;
+    dirCurveSave = defaultDirSave;
   }
   
   
@@ -321,14 +327,15 @@ public final class InspcCurveView
     widgBtnScale = gralMng.addButton("btnScale", actionColorSelectorOpen, "!", null,  "color");  
     gralMng.setPosition(/*35*/ -6, GralPos.size +2, -10, GralPos.size +6, 0, 'r', 1);
     widgBtnScale = gralMng.addButton("btnScale", actionSetScaleValues2Track, "!", null,  "set");
-    gralMng.setPosition(-19, GralPos.size +3, posright, GralPos.size +11, 0, 'd', 0);
+    gralMng.setPosition(-22, GralPos.size +3, posright, GralPos.size +11, 0, 'd', 0);
     widgValCursorLeft = gralMng.addTextField(null, true, "cursor left", "t");
     widgValCursorRight = gralMng.addTextField(null, true, "cursor right", "t");
-    gralMng.setPosition(-12, GralPos.size +2, posright, GralPos.size +8, 0, 'd', 1);
+    gralMng.setPosition(-15, GralPos.size +2, posright, GralPos.size +8, 0, 'd', 1);
     widgBtnReadCfg = gralMng.addButton("btnReadCfg", actionOpenFileDialog, sBtnReadCfg, null, sBtnReadCfg);
     widgBtnSaveCfg = gralMng.addButton("btnSaveCfg", actionOpenFileDialog, sBtnSaveCfg, null, sBtnSaveCfg);
     widgBtnReadValues = gralMng.addButton("btnReadValues", actionOpenFileDialog, sBtnReadValues, null, sBtnReadValues);
     widgBtnSaveValues = gralMng.addButton("btnSaveValues", actionOpenFileDialog, sBtnSaveValues, null, sBtnSaveValues);
+    wdgButtonAutosave = gralMng.addSwitchButton("btnAutoSaveValues", "off-autosave", "on-autosave", GralColor.getColor("lgn"), GralColor.getColor("am") );
     
     gralMng.setPosition(-3, GralPos.size +2, -9, -1, 0, 'd', 0);
     widgBtnOff = gralMng.addSwitchButton(sName + "btnOff", "off / ?on", "on / ?off", GralColor.getColor("lgn"), GralColor.getColor("am"));
@@ -342,8 +349,12 @@ public final class InspcCurveView
   void refreshCurve(){
     if(widgCurve !=null && widgBtnOff !=null){
       GralButton.State state = widgBtnOff.getState();
-      widgCurve.activate( state == GralButton.State.On);
-      widgCurve.refreshFromVariable(variables);
+      boolean bActive = state == GralButton.State.On;
+      widgCurve.activate( bActive);
+      if(bActive){
+        //hasDataTosave = true;
+        widgCurve.refreshFromVariable(variables);
+      }
     }
     actionShowCursorValues.exec(0, widgCurve);
   }
@@ -399,6 +410,62 @@ public final class InspcCurveView
     return true;
     
   }
+  
+  
+  /**Step routine to save a curve. A curve will be saved only if the time has expired and the autoSave button is on.
+   * 
+   */
+  public void stepSaveCurve(){
+    //long timeNextSave = timeLastSave + timePeriodSave;
+    //long timeNow = System.currentTimeMillis();
+    if(wdgButtonAutosave !=null && wdgButtonAutosave.isOn() && widgCurve.shouldAutosave()) { //xx hasDataTosave && timeNextSave <= timeNow){
+      saveCurve(GralCurveView_ifc.ModeWrite.autoSave);
+    }
+  }
+  
+  
+  
+  /**Saves a curve ///
+   * 
+   */
+  protected void saveCurve(GralCurveView_ifc.ModeWrite mode){
+    try{
+      //long dateStart;
+      CharSequence sDate;
+      if(mode == GralCurveView_ifc.ModeWrite.autoSave){
+        sDate = widgCurve.timeInitAutoSave(); 
+      } else {
+        sDate = widgCurve.timeInitSaveViewArea(); 
+       // widgCurve.
+      }
+      String sNameFile = sDate + "_" + sName;
+      //fileCurveSave.mkdirs();
+      FileRemote fileCurveSave = dirCurveSave.child(sNameFile + ".csv");
+      FileSystem.mkDirPath(fileCurveSave);
+      System.out.println("InspcCurveView - save curve data to; " + fileCurveSave.getAbsolutePath());
+      writerCurveCsv.setFile(fileCurveSave);
+      widgCurve.writeCurve(writerCurveCsv, mode);
+      
+      String sClassExportDat = curveExporterClasses.get("dat");
+      if(sClassExportDat !=null){
+        Class<?> clazzCurveWriter2 = Class.forName(sClassExportDat);
+        
+        WriteCurve_ifc writerCurve2 = (WriteCurve_ifc)clazzCurveWriter2.newInstance();
+        File fileDat = new File(dirCurveSave, sNameFile + ".dat");
+        
+        writerCurve2.setFile(fileDat);
+        widgCurve.writeCurve(writerCurve2, mode);
+      }
+      System.out.println("InspcCurveView - data saved; " + fileCurveSave.getAbsolutePath());
+
+      //timeLastSave = System.currentTimeMillis();
+    } catch(Exception exc){
+      widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
+      System.err.println(Assert.exceptionInfo("InspcCurveView-save", exc, 1, 2));
+    }
+    
+  }
+  
   
   
   /**Adds an info block to the request telegram to get values. This routine is called
@@ -462,7 +529,7 @@ public final class InspcCurveView
   GralUserAction actionSwapVariable = new GralUserAction("actionSwapVariable"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       if(actionCode == KeyCode.menuEntered && trackScale !=null){
-        //read paths                                  ////
+        //read paths                                  
         Object oContent = widgd.getContentInfo();
         TrackValues trackDst = (TrackValues)oContent;
         if(trackDst != trackScale){
@@ -496,7 +563,7 @@ public final class InspcCurveView
   GralUserAction actionShiftVariable = new GralUserAction("actionShiftVariable"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       if(actionCode == KeyCode.menuEntered && trackScale !=null){
-        //read paths                                  ////
+        //read paths                                  
         Object oContent = widgd.getContentInfo();
         TrackValues trackDst = (TrackValues)oContent;
         //save values of the current selected.
@@ -673,9 +740,9 @@ public final class InspcCurveView
           } else if(widgd.getCmd().equals(sBtnSaveCfg)){
             windFileCfg.openDialog(fileCurveCfg, widgd.getCmd(), true, actionSaveCfg);
           } else if(widgd.getCmd().equals(sBtnReadValues)){
-            windFileCfg.openDialog(fileCurveSave, "read values- not implemented yet", false, null);
+            windFileCfg.openDialog(dirCurveSave, "read values- not implemented yet", false, null);
           } else if(widgd.getCmd().equals(sBtnSaveValues)){
-            windFileCfg.openDialog(fileCurveSave.getParentFile(), "write values", true, actionSaveValues);
+            windFileCfg.openDialog(dirCurveSave, "write values", true, actionSaveValues);
           }
         } catch(Exception exc){
           widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
@@ -783,36 +850,16 @@ public final class InspcCurveView
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
-          FileRemote dirCurveSave = (FileRemote)params[0];
+          dirCurveSave = (FileRemote)params[0];
           if(dirCurveSave.exists() && !dirCurveSave.isDirectory()){
             dirCurveSave = dirCurveSave.getParentFile();
           }
-          //FileRemote dirCurveSave = fileParam.getParentFile();
-          long dateStart = widgCurve.timeAtCursorLeft();
-          DateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-          String sNameFile = format.format(new Date(dateStart)) + "_" + sName;
-          FileSystem.mkDirPath(fileCurveSave);
-          //fileCurveSave.mkdirs();
-          fileCurveSave = dirCurveSave.child(sNameFile + ".csv");
-            //File file = new File("curve.save");
-          System.out.println("InspcCurveView - save curve data to; " + fileCurveSave.getAbsolutePath());
-          writerCurveCsv.setFile(fileCurveSave);
-          widgCurve.writeCurve(writerCurveCsv);
-          
-          String sClassExportDat = curveExporterClasses.get("dat");
-          if(sClassExportDat !=null){
-            Class<?> clazzCurveWriter2 = Class.forName(sClassExportDat);
-            
-            WriteCurve_ifc writerCurve2 = (WriteCurve_ifc)clazzCurveWriter2.newInstance();
-            File fileDat = new File(dirCurveSave, sNameFile + ".dat");
-            
-            writerCurve2.setFile(fileDat);
-            widgCurve.writeCurve(writerCurve2);
-          }
+          saveCurve(GralCurveView_ifc.ModeWrite.currentView);
+          ///
           
         } catch(Exception exc){
           widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
-          System.err.println(Assert.exceptionInfo("InspcCurveView", exc, 1, 2));
+          System.err.println(Assert.exceptionInfo("InspcCurveView - dirCurveSave", exc, 1, 2));
         }
         windFileCfg.closeWindow();
       }

@@ -156,20 +156,22 @@ public class FcmdDelete
               //no user changing:
               if(!sPathDelete.equals("--no files selected--")){
                 for(FileRemote file : listFileDel){
-                  if(!file.canWrite()){
-                    //file.setWritable();
-                  }
-                  FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, file
-                      , null, success, null,  evSrc);  //NOTE: store file as src to get its name for report in callback.
-                  listEvDel.add(callback);
-                  //
-                  //The delete action:
-                  if(file instanceof FileRemote){
-                    (file).delete(callback);
-                  } else {
-                    if(!file.delete()){
-                      file.setWritable(true);
-                      file.delete();
+                  if(file !=null){
+                    if(!file.canWrite()){
+                      //file.setWritable();
+                    }
+                    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, file
+                        , null, success, null,  evSrc);  //NOTE: store file as src to get its name for report in callback.
+                    listEvDel.add(callback);
+                    //
+                    //The delete action:
+                    if(file instanceof FileRemote){
+                      (file).delete(callback);
+                    } else {
+                      if(!file.delete()){
+                        file.setWritable(true);
+                        file.delete();
+                      }
                     }
                   }
                   //      
