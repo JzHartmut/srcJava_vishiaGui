@@ -878,8 +878,6 @@ public abstract class GralTable<UserData> extends GralWidget implements GralTabl
     dbgtime = timeLastRedraw;
     dbgtime1 = System.currentTimeMillis() - dbgtime;
     //System.out.print(", redraw2: " + dbgtime1);
-    if(name.equals("tableSelect-doc.3"))
-      dbgtime = 0;
     //System.out.println("GralTable.repaint; " + name);
     //Thread.dumpStack();
     bFocused = false;

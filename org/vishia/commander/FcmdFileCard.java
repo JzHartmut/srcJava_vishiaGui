@@ -64,7 +64,7 @@ public class FcmdFileCard extends GralFileSelector
    * 
    */
   @SuppressWarnings("hiding")
-  public static final int version = 0x20120309;
+  public static final int version = 0x20120626;
   
   /**Table widget for the select table of the file tab.*/
   FcmdFavorCard favorCard;
@@ -568,7 +568,7 @@ public class FcmdFileCard extends GralFileSelector
       FcmdFileCard.this.setNewContent(favorPathNew, dir);
       return true;      
   } };
-  
+
 
   
   @Override public String toString(){ return label + "/" + nameFilePanel; }

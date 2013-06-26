@@ -16,6 +16,7 @@ import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
+import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidget;
@@ -444,6 +445,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   /**The implementation of SelectList. */
   protected FileSelectList selectList;
   
+  protected GralTable favorList;
+  
   /**This action will be called any time when the selection of a current file is changed. */
   GralUserAction actionOnFileSelected;
   
@@ -580,8 +583,14 @@ public class GralFileSelector implements Removeable //extends GralWidget
     GralMenu menuFolder = widgdPath.getContextMenu();
     menuFolder.addMenuItemGthread("x", "refresh [cR]", actionRefreshFileTable);
     panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
-    panelMng.addButton("xxx", null, "favor");
+    panelMng.addButton(null, actionFavorButton, "favor");
     //the list
+    panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
+    favorList = panelMng.addTable(null, rows, new int[]{15,0});
+    favorList.insertLine(null, 0, new String[]{"test", "path"}, null);
+    favorList.setVisible(false);
+    //
+    //at same position as favor table: the file list.
     panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
     selectList.setToPanel(panelMng, name, rows, columns, size);
     selectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refresh, actionRefreshFileTable);
@@ -1443,6 +1452,25 @@ public class GralFileSelector implements Removeable //extends GralWidget
     }
   };
   
+  
+  
+  
+  GralUserAction actionFavorButton = new GralUserAction("actionFavorButton"){
+    @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params){ 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
+        if(selectList.wdgdTable.isVisible()){
+          selectList.wdgdTable.setVisible(false);
+          favorList.setVisible(true);
+        } else {
+          selectList.wdgdTable.setVisible(true);
+          favorList.setVisible(false);
+        }
+        return true;
+      } else return false;
+    }
+  };
+  
+
   
   /**This class is instantiated static and contains English menu texts. The user can change it
    * touching the public static instance {@link GralFileSelector#contextMenuTexts}
