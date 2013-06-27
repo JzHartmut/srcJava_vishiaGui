@@ -67,12 +67,20 @@ public class GralHorizontalSelector<UserData> extends GralWidget
   
   protected int minSize;
 
+  public GralColor colorText, colorSelect, colorBack, colorLine;
+
+  
   /**The constructor creates the instance but does nothing with the graphic appearance.
    * @param name
    * @param mng
    */
   public GralHorizontalSelector(String name, GralUserAction actionOnSelect, GralMng mng){
     super(name, 'n', mng);
+    colorText = GralColor.getColor("bk");
+    colorSelect = GralColor.getColor("rd");
+    colorBack = GralColor.getColor("wh");
+    colorLine = GralColor.getColor("bk");
+
     setActionChange(actionOnSelect);
   }
   
@@ -126,10 +134,14 @@ public class GralHorizontalSelector<UserData> extends GralWidget
   
   
   protected void setDstToActItem(){ 
-    ixActItem = ixDstItem; 
-    actItem = items.get(ixActItem);
-    if(actionChanging !=null){
-      actionChanging.exec(KeyCode.menuEntered, GralHorizontalSelector.this, actItem.data);
+    if(ixDstItem >=0){
+      ixActItem = ixDstItem; 
+      actItem = items.get(ixActItem);
+      if(actionChanging !=null){
+        actionChanging.exec(KeyCode.menuEntered, GralHorizontalSelector.this, actItem.data);
+      }
+    } else {
+      actionChanging.exec(KeyCode.menuEntered, GralHorizontalSelector.this, (UserData)null);
     }
   }
   
@@ -205,7 +217,7 @@ public class GralHorizontalSelector<UserData> extends GralWidget
         while(ixLeftItem ==0 && ixItem >=0){
           GralHorizontalSelector.Item<UserData> item = items.get(ixItem);
           if(item.xSize == 0){
-            item.xSize = 50; //TODO
+            //item.xSize = 50; //TODO
           }
           if(xArrow + xBefore + item.xSize + xArrow +4 > gwidth){  //to much yet
             ixLeftItem = ixItem +1;

@@ -89,7 +89,7 @@ public class FcmdFileCard extends GralFileSelector
    */
   final String label;
   
-  final GralTextField_ifc widgLabel; /// 
+  //final GralTextField_ifc widgLabel; /// 
   
   final GralHorizontalSelector<Object> wdgCardSelector;
   
@@ -148,10 +148,12 @@ public class FcmdFileCard extends GralFileSelector
     //to show the properties of the selected file in the info line:
     //
     //sets this Widget to the selected panel, it is the grid panel which was created even yet.
+    /*
     mng.setPosition(0, 2, 0, 20, 1, 'd');
     String nameWidgLabel = FcmdWidgetNames.labelWidgFile + nameFilePanel;
     widgLabel = mng.addTextField(nameWidgLabel, false, null, null);
-    mng.setPosition(0, 2, 20, 0, 1, 'd');
+    */
+    mng.setPosition(0, 2, 0, 0, 1, 'd');
     wdgCardSelector = new GralHorizontalSelector<Object>("cards", actionSetFromTabSelection, mng);
     //wdgCardSelector.addItem("test1", 0, null);
     //wdgCardSelector.setActItem("test1");
@@ -208,7 +210,7 @@ public class FcmdFileCard extends GralFileSelector
     favorPathInfo = favorPathInfoP;
     favorCard.add(favorPathInfo);  //only it is a new one, it will be checked.
     setOriginDir(favorPathInfo.getOriginDir());
-    widgLabel.setText(favorPathInfo.selectName);
+    //widgLabel.setText(favorPathInfo.selectName);
     fillIn(dir, false);
     setFocus();
   }
@@ -559,13 +561,17 @@ public class FcmdFileCard extends GralFileSelector
             mainPanel.indexActualDir.put(favorPathInfo.selectName, sCurrentDir);
       } } }
       main.favorPathSelector.actFavorPathInfo = favorPathNew; //The last used selection (independent of tab left, middle, right)
-      sCurrentDir  = mainPanel.indexActualDir.get(favorPathNew.selectName);
-      if(sCurrentDir == null){
-        sCurrentDir = favorPathNew.path;
+      if(favorPathNew == null){
+        //TODO clear filecard
+      } else {
+        sCurrentDir  = mainPanel.indexActualDir.get(favorPathNew.selectName);
+        if(sCurrentDir == null){
+          sCurrentDir = favorPathNew.path;
+        }
+        //dir = new FileRemote(currentDir);  
+        dir = main.fileCluster.getFile(sCurrentDir, null);
+        FcmdFileCard.this.setNewContent(favorPathNew, dir);
       }
-      //dir = new FileRemote(currentDir);  
-      dir = main.fileCluster.getFile(sCurrentDir, null);
-      FcmdFileCard.this.setNewContent(favorPathNew, dir);
       return true;      
   } };
 
