@@ -10,6 +10,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -69,18 +70,12 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
   private Font fontText;
 
   
-  GralColor colorText, colorSelect, colorBack, colorLine;
   
   public SwtHorizontalSelector(SwtMng mng, GralHorizontalSelector<?> wdgGral)
   { super(null, mng);
     this.wdgGral = wdgGral;
     this.wdgGralAccess = new GralWidgetAccess(wdgGral);
     wdgGral.implMethodWidget_.setWidgetImpl(this);
-    colorText = GralColor.getColor("bk");
-    colorSelect = GralColor.getColor("lbl");
-    colorBack = GralColor.getColor("wh");
-    colorLine = GralColor.getColor("bk");
-
     Composite panel = (Composite)mng.pos.panel.getPanelImpl();
     widgetSwt = new Canvas(panel,0);
     widgetSwt.setData(wdgGral);
@@ -107,9 +102,9 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
     Rectangle dim = swt.getBounds();
     GralHorizontalSelector.Item<?> actItem = wdgGralAccess.actItem();
     int nrActItem = wdgGralAccess.nrItem();
-    Color swtColorBack = mng.getColorImpl(colorBack);
-    Color swtColorText = mng.getColorImpl(colorText);
-    Color swtColorSelect = mng.getColorImpl(colorSelect);
+    Color swtColorBack = mng.getColorImpl(wdgGral.colorBack);
+    Color swtColorText = mng.getColorImpl(wdgGral.colorText);
+    Color swtColorSelect = mng.getColorImpl(wdgGral.colorSelect);
     gc.setBackground(swtColorBack);
     swt.drawBackground(e.gc, dim.x+1, dim.y+1, dim.width-1, dim.height-1);
     gc.setFont(fontText);
@@ -137,14 +132,18 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
       do {
         GralHorizontalSelector.Item item = wdgGralAccess.tab(ixItem); //(GralHorizontalSelector.Item)items.get(ixItem);
         if(item.xSize == 0){
-          item.xSize = 50; //TODO
+          Point size = gc.stringExtent(item.text);
+          if(size.x < 150 - 10){ item.xSize = size.x + 10;}
+          else { item.xSize = 150; }
         }
         int xEnd = xText + item.xSize;
         if(xEnd < (dim.width - (ixItem == (zItem-1) ? xArrow +4 : 4))){
           if(ixItem == nrActItem){
             gc.setForeground(swtColorSelect);  //black
+            gc.setLineWidth(2);
           } else {
             gc.setForeground(swtColorText);
+            gc.setLineWidth(1);
           }
           gc.drawString(item.text, xText+4, yText);
           gc.drawLine(xText+1, 3, xText+1, dim.height);
