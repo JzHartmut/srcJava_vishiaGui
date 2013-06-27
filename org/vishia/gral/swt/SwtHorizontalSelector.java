@@ -8,27 +8,23 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralWidgImpl_ifc;
+import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
-import org.vishia.util.KeyCode;
 
 /**This class is a selector in one text field. You can set the cursor into the field 
  * and select between Parts which are separated with a given character sequence.
  * @author Hartmut Schorrig
  *
  */
-public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements GralWidgImpl_ifc
+public class SwtHorizontalSelector extends GralHorizontalSelector<?>.GraphicImplAccess implements GralWidgImpl_ifc
 {
   /**Version, history and copyright/copyleft.
    * <ul>
@@ -58,12 +54,16 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  @SuppressWarnings("hiding")
+  //@SuppressWarnings("hiding")
   public static final int version = 20130618;
 
-  private final GralHorizontalSelector<?> wdgGral;
+  //private final GralHorizontalSelector<?> wdgGral;
   
-  public final GralWidgetAccess wdgGralAccess;
+  //public final GralWidgetAccess wdgGralAccess;
+  
+  protected Canvas widgetSwt;
+
+  protected final SwtMng mng;
   
 
   
@@ -72,9 +72,10 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
   
   
   public SwtHorizontalSelector(SwtMng mng, GralHorizontalSelector<?> wdgGral)
-  { super(null, mng);
-    this.wdgGral = wdgGral;
-    this.wdgGralAccess = new GralWidgetAccess(wdgGral);
+  { wdgGral.super();
+    this.mng = mng;
+    //this.wdgGral = wdgGral;
+    //this.wdgGralAccess = new GralWidgetAccess(wdgGral);
     wdgGral.implMethodWidget_.setWidgetImpl(this);
     Composite panel = (Composite)mng.pos.panel.getPanelImpl();
     widgetSwt = new Canvas(panel,0);
@@ -89,10 +90,33 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
       case 'B': fontText = mng.propertiesGuiSwt.stdButtonFont; break;
       default: throw new IllegalArgumentException("param size must be A or B");
     }
-    wdgGralAccess.execAfterCreationImplWidget();
+    super.execAfterCreationImplWidget();
 
   }
 
+  
+  
+  @Override public void repaintGthread(){
+    widgetSwt.redraw();
+  }
+
+  
+  @Override public Object getWidgetImplementation()
+  { return widgetSwt;
+  }
+  
+  @Override public boolean setFocusGThread(){ return widgetSwt.setFocus(); }
+
+  @Override public void removeWidgetImplementation()
+  {
+    widgetSwt.dispose();
+    widgetSwt = null;
+  }
+
+
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  { widgetSwt.setBounds(x,y,dx,dy);
+  }
   
   
   @SuppressWarnings("unchecked")
@@ -100,11 +124,11 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
     GC gc = e.gc;
     //gc.d
     Rectangle dim = swt.getBounds();
-    GralHorizontalSelector.Item<?> actItem = wdgGralAccess.actItem();
-    int nrActItem = wdgGralAccess.nrItem();
-    Color swtColorBack = mng.getColorImpl(wdgGral.colorBack);
-    Color swtColorText = mng.getColorImpl(wdgGral.colorText);
-    Color swtColorSelect = mng.getColorImpl(wdgGral.colorSelect);
+    GralHorizontalSelector.Item<?> actItem = super.actItem();
+    int nrActItem = super.nrItem();
+    Color swtColorBack = mng.getColorImpl(super.outer.colorBack);
+    Color swtColorText = mng.getColorImpl(super.outer.colorText);
+    Color swtColorSelect = mng.getColorImpl(super.outer.colorSelect);
     gc.setBackground(swtColorBack);
     swt.drawBackground(e.gc, dim.x+1, dim.y+1, dim.width-1, dim.height-1);
     gc.setFont(fontText);
@@ -113,10 +137,10 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
     gc.setForeground(swtColorBack);
     gc.fillRectangle(1,0,dim.width-1, dim.height);
     int xArrow = 20;
-    wdgGralAccess.calcLeftTab(dim.width, xArrow);
+    super.calcLeftTab(dim.width, xArrow);
     int xText = 2;
     int yText = 0;
-    int ixLeftItem = wdgGralAccess.nrLeftTab();
+    int ixLeftItem = super.nrLeftTab();
     if(ixLeftItem >0){
       gc.setForeground(swtColorText);
       gc.drawString("<<", xText+4, yText); 
@@ -127,10 +151,9 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
     //
     if(ixLeftItem >=0){
       int ixItem = ixLeftItem;
-      List items = wdgGralAccess.items();
-      int zItem = wdgGralAccess.nrofTabs();
+      int zItem = super.nrofTabs();
       do {
-        GralHorizontalSelector.Item item = wdgGralAccess.tab(ixItem); //(GralHorizontalSelector.Item)items.get(ixItem);
+        GralHorizontalSelector.Item item = super.tab(ixItem); 
         if(item.xSize == 0){
           Point size = gc.stringExtent(item.text);
           if(size.x < 150 - 10){ item.xSize = size.x + 10;}
@@ -164,10 +187,33 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
 
   
   
+  protected void mouseDown(MouseEvent e)
+  {
+    super.findTab(e.x);
+    widgetSwt.redraw();
+    
+  }
+
+  
+  public void mouseUp(MouseEvent e)
+  {
+    Rectangle dim = widgetSwt.getBounds();
+    if(e.button == 1){
+      if(e.y >0 && e.y < dim.height){
+        super.setDstToActItem();
+      } else {
+        super.clearDstItem();
+      }
+      widgetSwt.redraw();  //because selection is changed.
+    }
+    //else: content menu does the action.
+  }
+
+  
   
   PaintListener paintListener = new PaintListener(){
     @Override public void paintControl(PaintEvent e) {
-      SwtHorizontalSelector.this.paintControl((Canvas)widgetSwt, e);
+      SwtHorizontalSelector.this.paintControl(widgetSwt, e);
     }
   };
   
@@ -184,47 +230,47 @@ public class SwtHorizontalSelector extends SwtWidgetSimpleWrapper implements Gra
 
     @Override
     public void mouseDown(MouseEvent e)
-    {
-      wdgGralAccess.findTab(e.x);
-      widgetSwt.redraw();
-      
+    { SwtHorizontalSelector.this.mouseDown(e);
     }
 
     @Override
     public void mouseUp(MouseEvent e)
-    {
-      Rectangle dim = widgetSwt.getBounds();
-      if(e.button == 1){
-        if(e.y >0 && e.y < dim.height){
-          wdgGralAccess.setDstToActItem();
-        } else {
-          wdgGralAccess.clearDstItem();
-        }
-        widgetSwt.redraw();  //because selection is changed.
-      }
-      //else: contect menu does the action.
+    { SwtHorizontalSelector.this.mouseUp(e);
     }
     
   };
 
   
   
-  private static class GralWidgetAccess extends GralHorizontalSelector<?>.GraphicImplAccess{
+  @Override public GralWidgetGthreadSet_ifc getGthreadSetifc(){ return gThreadSet; }
 
-    GralWidgetAccess(GralHorizontalSelector<?> wdgGral)
-    {
-      wdgGral.super();
+  /**Implementation of the graphic thread widget set interface. */
+  GralWidgetGthreadSet_ifc gThreadSet = new GralWidgetGthreadSet_ifc(){
+
+    @Override public void clearGthread()
+    { // TODO Auto-generated method stub
     }
-    
-    @Override protected void findTab(int xMouse){ super.findTab(xMouse); }
-    
-    @Override protected void setDstToActItem(){ super.setDstToActItem(); }
 
-    @Override protected void clearDstItem(){ super.clearDstItem(); }
+    @Override public void insertGthread(int pos, Object visibleInfo, Object data)
+    { // TODO Auto-generated method stub
+    }
 
-    @Override protected void removeDstItem(){ super.removeDstItem(); }
+    @Override public void redrawGthread()
+    { // TODO Auto-generated method stub
+    }
 
-  }
+    @Override public void setBackGroundColorGthread(GralColor color)
+    { // TODO Auto-generated method stub
+    }
+
+    @Override public void setForeGroundColorGthread(GralColor color)
+    { // TODO Auto-generated method stub
+    }
+
+    @Override public void setTextGthread(String text, Object data)
+    { // TODO Auto-generated method stub
+    }
+  };
   
   
 

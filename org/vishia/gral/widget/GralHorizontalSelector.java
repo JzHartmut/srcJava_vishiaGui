@@ -13,8 +13,21 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.KeyCode;
 
-/**This class is a selector in one text field. You can set the cursor into the field 
- * and select between Parts which are separated with a given character sequence.
+/**This widget is a selector with tabs. It can be placed like a text field. 
+ * Selecting a tab the {@link GralWidget#setActionChange(GralUserAction)} is called with the associated
+ * UserData of the tab is third parameter of {@link GralUserAction#exec(int, GralWidget_ifc, Object...)} 
+ * with {@link KeyCode#activated}.
+ * That can focus, show or select some widgets, panels etc. With them a tab-panel is able to build,
+ * but in a more possibilities than usual implementations of such tab-panels.
+ * <br><br>
+ * The tabs are shift to left and right if the spaces is to less. 
+ * <br><br>
+ * Tabs can be closed with right-mouse context menu. Then the {@link GralUserAction#exec(int, GralWidget_ifc, Object...)} 
+ * will be called a last time for the barely known UserData the last time with {@link KeyCode#removed}.
+ * If the current selected tab will be removed, the tab left of them or the next if it was the first
+ * will be activated with calling of {@link GralUserAction#exec(int, GralWidget_ifc, Object...)}
+ * for the yet current selected tab if there is any one yet. 
+ * <br><br>
  * @author Hartmut Schorrig
  *
  */
@@ -138,12 +151,35 @@ public class GralHorizontalSelector<UserData> extends GralWidget
       ixActItem = ixDstItem; 
       actItem = items.get(ixActItem);
       if(actionChanging !=null){
-        actionChanging.exec(KeyCode.menuEntered, GralHorizontalSelector.this, actItem.data);
+        actionChanging.exec(KeyCode.activated, GralHorizontalSelector.this, actItem.data);
       }
-    } else {
-      actionChanging.exec(KeyCode.menuEntered, GralHorizontalSelector.this, (UserData)null);
     }
   }
+  
+
+  
+  
+  /**Called on mouse action in context menu.
+   * 
+   */
+  protected void removeTab(){
+    boolean actItemRemoved = ixDstItem == ixActItem;
+    Item<UserData> removed = items.remove(ixDstItem);
+    if(actionChanging !=null){
+      actionChanging.exec(KeyCode.removed, GralHorizontalSelector.this, removed.data);
+    }
+    if(ixDstItem < ixActItem){ ixActItem -=1; }
+    if(actItemRemoved){
+      if(ixActItem >= items.size()){
+        ixDstItem = ixActItem-1;
+      }
+      setDstToActItem();  //calls activation of the yet actual item.
+    } else {
+      ixDstItem = ixActItem; //unchanged
+    }
+    repaint(100, 300);
+  }
+  
   
 
   
@@ -157,25 +193,9 @@ public class GralHorizontalSelector<UserData> extends GralWidget
   }
 
 
-  
-  
-  
   GralUserAction actionRemoveTab = new GralUserAction("actionRemoveTab"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
-      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        boolean actItemRemoved = ixDstItem == ixActItem;
-        items.remove(ixDstItem);
-        if(ixDstItem < ixActItem){ ixActItem -=1; }
-        if(actItemRemoved){
-          if(ixActItem >= items.size()){
-            ixDstItem = ixActItem-1;
-          }
-          setDstToActItem();
-        } else {
-          ixDstItem = ixActItem; //unchanged
-        }
-        repaint(100, 300);
-      }
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ removeTab(); }
       return true;
     }
     
@@ -185,28 +205,32 @@ public class GralHorizontalSelector<UserData> extends GralWidget
 
   
   
-  /**This class is not intent to use from an application, it is a helper to access all necessary data 
-   * with protected methods from the graphic implementation.
-   * A derived class of this is defined in the graphic implementation class. Via this derived class
-   * the graphic implementation can access this methods.
+  /**This class is not intent to use from an application, it is the super class for the implementation layer
+   * to access all necessary data and methods with protected access rights.
    * The methods are protected because an application should not use it. This class is public because
    * it should be visible from the graphic implementation which is located in another package. 
    */
-  public class GraphicImplAccess{
+  public class GraphicImplAccess {
     
     //public void setWidgetImpl(GralWidgImpl_ifc widg){ wdgImpl = widg; }
 
-    public List<Item<UserData>> items(){ return items; }
+    protected final GralHorizontalSelector<?> outer;
     
-    public Item<?> actItem(){ return actItem; }
+    protected GraphicImplAccess(){
+      outer = GralHorizontalSelector.this;
+    }
     
-    public Item<?> tab(int ix){ return items.get(ix); }
+    protected List<Item<UserData>> items(){ return items; }
     
-    public int nrItem(){ return ixDstItem; }
+    protected Item<?> actItem(){ return actItem; }
+    
+    protected Item<?> tab(int ix){ return items.get(ix); }
+    
+    protected int nrItem(){ return ixDstItem; }
 
-    public int nrofTabs(){ return items.size(); }
+    protected int nrofTabs(){ return items.size(); }
     
-    public void calcLeftTab(int gwidth, int xArrow){
+    protected void calcLeftTab(int gwidth, int xArrow){
       int xBefore = 0;
       int ixItem = ixDstItem;
       //
@@ -269,13 +293,13 @@ public class GralHorizontalSelector<UserData> extends GralWidget
       clearDstItem();
     }
     
-    public void execAfterCreationImplWidget(){
+    protected void execAfterCreationImplWidget(){
       GralMenu menu = getContextMenu();
       menu.addMenuItemGthread("&Close tab", actionRemoveTab);
     }
     
 
-    public int nrLeftTab(){ return ixLeftItem; }
+    protected int nrLeftTab(){ return ixLeftItem; }
     
 
   

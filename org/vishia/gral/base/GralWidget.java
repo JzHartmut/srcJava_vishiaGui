@@ -14,6 +14,7 @@ import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidgetCfg_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
@@ -34,46 +35,50 @@ import org.vishia.util.KeyCode;
  * and the graphic depending parts in the created instance.
  * <br><br>
  * The first form is more universal. Especially generic can be used for the class definition if necessary.
- * It us used yet only (2013-06) for {@link #addHorizontalSelector(GralHorizontalSelector)}
+ * It us used yet only (2013-06) for {@link GralMng#addHorizontalSelector(org.vishia.gral.widget.GralHorizontalSelector)}
  * but it may be used more and more in the future.<br>
  * For the UML presentation see {@link org.vishia.util.Docu_UML_simpleNotation}:
  * <pre>
  * 
- *   GralHorizontalSelector<UserType> <-----<*>UserCanCreate_GraphicIndependent
+ *   GralHorizontalSelector< UserType > <-----<*>UserCanCreate_GraphicIndependent
  *   - some special non-graphic data
- *     |<-------------------------------------------------------------------------------------+
- *     |<--------------------------------------------+                                        |
- *     +---|>GralWidget                              |                                        |
- *           |                                       |                                        |
- *           |<>--->GralWidgImpl_ifc<|------SwtHorizontalSelector--|>SwtWidgetSimpleWrapper   |
- *                                                   |                   |                    |
- *                                                   |                   |      |-------------+
- *                                                   |                   |-->Control<|---SwtImpl-----|>swt.Canvas
- *                                                   |                                     |
- *                                                   |<----outer---------------------------|
- *                                                -paintRoutine                            |
- *                                                -mouseListener                  implements the start
- *                                                -etc.                           of paintRoutine etc.
+ *     |
+ *     |<------------------------------------------------------------------data---|
+ *     |                                                                          |
+ *     |&<--------&GraphicImplAccess<|---+                                        |   
+ *     |                                 |                                        |
+ *     +--|>GralWidget                   |                                        |
+ *     |     |                           |                                        |
+ *     |     |<>--->GralWidgImpl_ifc<|---+--SwtHorizontalSelector                 |
+ *     |     |                                 |                                  |      
+ *     |     |                                 |                                  |     
+ *                                             |<*>------------------------>swt.Canvas
+ *                                             |                                  |
+ *                                             |                                  |
+ *                                          -paintRoutine <-------paintListener---|
+ *                                          -mouseListener<-------mouseListener---|
+ *                                          -etc.                          
  *                                      
  * </pre>
- * Links of schema: {@link GralWidgImpl_ifc}, 
- * {@link org.vishia.gral.swt.SwtWidgetSimpleWrapper}
  * <br><br>
- * The GralWidget knows the implementation widget via the {@link GralWidgImpl_ifc}. That is independent
+ * The user creates an instance of {@link GralHorizontalSelector} in any thread maybe as composite 
+ * independent of the graphic itself.
+ * Then the user builds its graphic appearance with an derived instance of {@link GralMng} which is returned
+ * by the factory via calling {@link GralMng#addHorizontalSelector(GralHorizontalSelector)}. This method 
+ * is the factory method of the {@link org.vishia.gral.swt.SwtHorizontalSelector}.
+ * <br><br>  
+ * The GralWidget knows the graphic implementation via the {@link GralWidgImpl_ifc} to invoke some methods
+ * for the graphical appearance. The interface is independent
  * of the implementation itself. The implementor of this interface for this example 
- * is the {@link org.vishia.gral.swt.SwtHorizontalSelector}. It is not the instance which extends
- * the swt widget itself, but the swt widget (in this case a derivation of {@link org.eclipse.swt.widgets.Canvas})
- * is realized as an inner class of that.  
+ * is the {@link org.vishia.gral.swt.SwtHorizontalSelector} implements this methods. 
  * <br><br>
- * The Gral widget can be created in any thread maybe as composite independent of the graphic itself.
- * To use a Gral widget in the graphic the graphic appearance should created with this interface
- * as factory. Invoke:<br>
- * {@link #addHorizontalSelector(GralHorizontalSelector)} to create it. 
+ * The SwtHorizontalSelector refers the platform-specific widget Object (Swing: javax.swing.JComponent, 
+ * org.eclipse.swt.widgets.Control etc.), in this case a {@link org.eclipse.swt.widgets.Canvas}. 
+ * It contains the special paint routines, mouse handling etc. 
  * <br><br>
- * The platform-specific Widget Object (Swing: javax.swing.JComponent, org.eclipse.swt.widgets.Control etc.)
- * is stored as Object-reference in the {@link GralWidget#wdgImpl}.   
- * If necessary it can be casted to the expected class if some special operations 
- * using the graphic platform are need.  
+ * The platform-specific widget has a reference to the GralWidget, in this case the {@link GralHorizontalSelector}
+ * stored as Object-reference. This reference can be used in the paintRoutine, mouseListerner etc. to get
+ * information about the GralWidget.  
  * <br><br> 
  * The second form takes most of the characteristics as parameters for the creating method. 
  * It needs inheritance.
