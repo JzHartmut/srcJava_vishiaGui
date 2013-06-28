@@ -348,7 +348,7 @@ public interface GralMngBuild_ifc
   );
   
   
-  public void addHorizontalSelector(GralHorizontalSelector<?> sel);
+  public void add(GralHorizontalSelector<?> sel);
 
   
   /**Adds a button which saves its state, pressed or non-pressed.

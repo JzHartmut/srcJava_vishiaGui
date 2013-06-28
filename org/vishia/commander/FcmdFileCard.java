@@ -156,10 +156,9 @@ public class FcmdFileCard extends GralFileSelector
     widgLabel = mng.addTextField(nameWidgLabel, false, null, null);
     */
     mng.setPosition(0, 2, 0, 0, 1, 'd');
-    wdgCardSelector = new GralHorizontalSelector<Object>("cards", actionSetFromTabSelection, mng);
-    //wdgCardSelector.addItem("test1", 0, null);
-    //wdgCardSelector.setActItem("test1");
-    mng.addHorizontalSelector(wdgCardSelector);
+    wdgCardSelector = new GralHorizontalSelector<Object>("cards", actionSetFromTabSelection);
+    wdgCardSelector.setToPanel(mng);
+    //mng.addHorizontalSelector(wdgCardSelector);
 
     mng.setPosition(2, 0, 0, 0, 1, 'd');
     //set the base class GralFileSelector to the panel. It contains the path and the table for file selection.

@@ -319,7 +319,7 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     return null;  
   }
 
-  @Override public void addHorizontalSelector(GralHorizontalSelector<?> sel){
+  @Override public void add(GralHorizontalSelector<?> sel){
     //SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, sel);
     //sel.guiImplAccess.setWidgetImpl(swtSel);
   }

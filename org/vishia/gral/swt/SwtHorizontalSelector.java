@@ -74,6 +74,7 @@ public class SwtHorizontalSelector extends GralHorizontalSelector<?>.GraphicImpl
   public SwtHorizontalSelector(SwtMng mng, GralHorizontalSelector<?> wdgGral)
   { wdgGral.super();
     this.mng = mng;
+    super.outer.setPanelMng(mng);
     super.outer.pos = mng.getPositionInPanel();
     //this.wdgGral = wdgGral;
     //this.wdgGralAccess = new GralWidgetAccess(wdgGral);

@@ -164,6 +164,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-06-29 Hartmut new: {@link #setToPanel(GralMngBuild_ifc)} as common method.
    * <li>2013-06-16 Hartmut new {@link #wdgImpl}. This instance was present in the past but removed. The concept is re-activated
    *   because a graphic-implementation-independent GralWidget instance can have any generic types
    *   and can be created as composite (with final type name = new Type(...)). 
@@ -522,6 +523,21 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     if(mng !=null){
       this.pos = mng.getPositionInPanel();  //Note: makes a clone because the pos in panel is reused. 
     }
+  }
+  
+  
+  
+  /**Sets this widget to any panel. It creates the graphical appearance using the capabilities
+   * of the derivation of the mng for the systems graphic level.
+   * 
+   * @param mng
+   * @throws IllegalStateException This routine can be called only if the graphic widget is not 
+   *   existing. It is one time. It may be more as one time if {@link #removeWidgetImplementation()}
+   *   was called. 
+   * @throws IllegalArgumentException if the routine is not overridden.  
+   */
+  public void setToPanel(GralMngBuild_ifc mng) throws IllegalStateException {
+    throw new IllegalArgumentException("GralWidget - setToPanel should be overridden");
   }
   
   

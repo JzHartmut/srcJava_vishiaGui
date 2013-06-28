@@ -225,7 +225,8 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
 
   
   
-  public void setToPanel(GralMngBuild_ifc mng){
+  @Override public void setToPanel(GralMngBuild_ifc mng) throws IllegalStateException {
+    if(wdgImpl !=null) throw new IllegalStateException("setToPanel faulty call - GralTable;");
     mng.add(this);
   }
   

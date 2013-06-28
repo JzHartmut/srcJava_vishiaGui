@@ -9,6 +9,7 @@ import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.KeyCode;
@@ -87,8 +88,8 @@ public class GralHorizontalSelector<UserData> extends GralWidget
    * @param name
    * @param mng
    */
-  public GralHorizontalSelector(String name, GralUserAction actionOnSelect, GralMng mng){
-    super(name, 'n', mng);
+  public GralHorizontalSelector(String name, GralUserAction actionOnSelect){
+    super(name, 'n', null);
     colorText = GralColor.getColor("bk");
     colorSelect = GralColor.getColor("rd");
     colorBack = GralColor.getColor("wh");
@@ -98,7 +99,9 @@ public class GralHorizontalSelector<UserData> extends GralWidget
   }
   
   
-  
+  @Override public void setToPanel(GralMngBuild_ifc mng) throws IllegalStateException {
+    mng.add(this);
+  }
   
   /**Adds a item to show.
    * @param text
