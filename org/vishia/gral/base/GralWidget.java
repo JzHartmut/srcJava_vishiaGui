@@ -958,7 +958,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @return the old state.
    */
   public boolean setVisible(boolean visible){
-    throw new IllegalArgumentException("GralWidget unimplemented method - setVisible;");
+    if(wdgImpl !=null) return wdgImpl.setVisible(visible);
+    else throw new IllegalArgumentException("GralWidget unimplemented method - setVisible;");
   }
   
   

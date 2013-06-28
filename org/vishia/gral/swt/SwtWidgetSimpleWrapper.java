@@ -46,7 +46,12 @@ public class SwtWidgetSimpleWrapper implements GralWidgImpl_ifc
   { widgetSwt.setBounds(x,y,dx,dy);
   }
   
+  @Override public boolean setVisible(boolean visible)
+  { widgetSwt.setVisible(visible);
+    return widgetSwt.isVisible();
+  }
   
+
   @Override public GralWidgetGthreadSet_ifc getGthreadSetifc(){ return gThreadSet; }
 
   /**Implementation of the graphic thread widget set interface. */

@@ -16,6 +16,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
+import org.vishia.util.Removeable;
 import org.vishia.util.SelectMask;
 import org.vishia.util.SelectMask_ifc;
 
@@ -59,11 +60,14 @@ import org.vishia.util.SelectMask_ifc;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralTable<UserData> extends GralWidget implements GralTable_ifc<UserData> {
+public class GralTable<UserData> extends GralWidget implements GralTable_ifc<UserData> {
 
   /**Version and history
    * <ul>
-   * <li>2014-06-12 Hartmut chg: On right mouse pressing the current line will be selected, because
+   * <li>2013-06-29 Hartmut chg: refactoring. Now a GralTable<generic> can be created before the graphic is build. It is the new schema of GralWidget.
+   *   The inner class {@link GraphicImplAccess} is provided as super class for the graphic implementation class,
+   *   for example {@link org.vishia.gral.swt.SwtTable}.
+   * <li>2013-06-12 Hartmut chg: On right mouse pressing the current line will be selected, because
    *   the context menu should have an association to that line.
    * <li>2013-06-12 Hartmut chg: A marked line is now designated with a background color. 
    *   A selected marked line has another background than a selected non marked line (to see it).
@@ -153,9 +157,6 @@ public abstract class GralTable<UserData> extends GralWidget implements GralTabl
   /**Width of each column in GralUnits. */
   protected int[] columnWidthsGral;
   
-  /**Start position of each column in pixel. */
-  protected int[] columnPixel;
-
   protected GralMenu[] menuColumns;
   
 
@@ -164,37 +165,17 @@ public abstract class GralTable<UserData> extends GralWidget implements GralTabl
    */
   //private GralColor[] colorBack, colorText;
   
-
-  /**Pixel per line. */
-  protected int linePixel;
   
-  protected final int[] xpixelCell;
+  GraphicImplAccess gi;
 
-  
   /**Index (subscript) of the current line and current column. 0 is the left column or top line.
    * -1 means that nothing is selected. */
   protected int ixLine, ixLineNew, ixColumn;
 
-  /**Index of {@link #texts} of the cell left top for presentation. */
-  protected int ixLine1, ixCol1;
-  
-  /**Index of {@link #texts} of the cell right bottom for presentation. It depends of the size of presentation. */
-  protected int ixLine2, ixCol2;
-  
-  
   /**Number of lines and columns of data. */
   protected int zLine, zColumn;
   
-  /**Current number of visible lines in the view. */
-  protected int zLineVisible;
-  
-  /**maximum number of visible lines. it is the static amount of line-cells for displaying. */
-  protected int zLineVisibleMax = 20;  
-  
-  /**Index (subscript) of the graphical line (not lines of the table)
-   * which has the selection color and which should be gotten the selection color.
-   */
-  protected int ixGlineSelected = -1, ixGlineSelectedNew = -1;
+
   
   
   protected final StringBuilder searchChars = new StringBuilder(20);
@@ -210,31 +191,6 @@ public abstract class GralTable<UserData> extends GralWidget implements GralTabl
   
   /**If true then the graphic implementation fields for cells should be filled newly with the text. */
   protected boolean bFillCells;
-  
-  /**Check the last time of redrawing. */
-  protected long timeLastRedraw;
-  
-  /**If set, then a next key will be processed. It is set to false if a key event is executed
-   * and it is set to true in {@link #keyActionDone}. */
-  private boolean keyDone = true;
-  
-  /**The last key which was pressed  */
-  private int lastKey;
-  
-  /**Number of key repetitions if a key was not used because the redraw was pending yet. */
-  private int keyRepetition;
-  
-  
-  /**Set to true while {@link #table}.{@link Table#redrawGthread()} is running.
-   * It prevents recursive invocation of redraw() while setFocus() is invoked. */
-  protected boolean bRedrawPending;
-
-  /**Set true if the focus is gained by mouse click. It causes color set and 
-   * invocation of {@link #actionOnLineSelected(GralTableLine_ifc)}. 
-   */
-  protected boolean bFocused;
-  
-
   
   /**Data of that cell which was pointered while any mouse button is pressed. */
   //protected CellData cellDataOnMousePressed;
@@ -258,22 +214,10 @@ public abstract class GralTable<UserData> extends GralWidget implements GralTabl
   public GralTable(String name, GralMng mng, int[] columnWidths) {
     super(name, 'L', mng);
     this.columnWidthsGral = columnWidths;
-    this.xpixelCell = new int[columnWidthsGral.length+1];
     this.zColumn = columnWidths.length;
     //this.colorBack = new GralColor[zLineVisibleMax];
     //this.colorText = new GralColor[zLineVisibleMax];
-    int xdPix = itsMng.propertiesGui().xPixelUnit();
-    columnPixel = new int[columnWidthsGral.length+1];
-    int xPix = 0;
-    columnPixel[0] = xPix;
-    for(int iCol = 0; iCol < columnWidthsGral.length; ++iCol){
-      xPix += columnWidthsGral[iCol] * xdPix;
-      columnPixel[iCol+1] = xPix;
-    }
-    int ydPix = itsMng.propertiesGui().yPixelUnit();
-    linePixel = 2 * ydPix;
     ixLineNew = ixLine = -1;
-    ixGlineSelectedNew = ixGlineSelected = -1;  
 
     setColors();
   }
@@ -340,7 +284,7 @@ public abstract class GralTable<UserData> extends GralWidget implements GralTabl
       menuColumns = new GralMenu[zColumn];
     }
     if(menuColumns[col] == null){
-      menuColumns[col] = createColumnMenu(col); //for all cells of this column
+      menuColumns[col] = gi.createColumnMenu(col); //for all cells of this column
     }
     return menuColumns[col];
   }
@@ -490,7 +434,7 @@ public abstract class GralTable<UserData> extends GralWidget implements GralTabl
     zLine -=1;
     if(ixLine == linenr){
       ixLineNew = ixLine = -1;
-      ixGlineSelectedNew = -1;  //deselects ixGlineSelected on redraw!
+      gi.ixGlineSelectedNew = -1;  //deselects ixGlineSelected on redraw!
     }
     repaint(200,200);
   }
@@ -520,12 +464,12 @@ public abstract class GralTable<UserData> extends GralWidget implements GralTabl
   
 
   @Override public void clearTable() {
-    ixLine1 = ixLine2 = 0;
+    gi.ixLine1 = gi.ixLine2 = 0;
     ixColumn = 0;
     zLine = 0;
     tableLines.clear();
     ixLineNew = ixLine = -1;
-    ixGlineSelectedNew = -1;  //deselects ixGlineSelected on redraw!
+    gi.ixGlineSelectedNew = -1;  //deselects ixGlineSelected on redraw!
     idxLine.clear();
     searchChars.setLength(0);
     repaint(200,200);
@@ -563,135 +507,6 @@ public abstract class GralTable<UserData> extends GralWidget implements GralTabl
     return null;
   }
 
-  
-  
-  /**Returns the line on that any mouse button was pressed. It is either the left, mid or right button.
-   * Able to use for context menu (right button).
-   * @return
-   */
-  //public TableLineData getLineOnMousePressed(){ return cellDataOnMousePressed.tableItem; }
-  
-  /**Handle all standard keys of table. 
-   * It should call in the key event handler from the implementation class.
-   * <br>Keys:
-   * <ul>
-   * <li>pgup: 
-   * <li>up
-   * <li>dn
-   * <li>pgdn
-   * <li>{@link #keyMarkUp}
-   * <li>{@link #keyMarkDn}
-   * <li>calls {@link GralMng#getRegisteredUserAction(String what)} with what="KeyAction"
-   *   and invokes the returned action method. With them all standard key actions of this application
-   *   may be done if a {@link GralUserAction} is registered for that.  
-   * </ul>
-   * @param keyCode Encoding see {@link KeyCode}.
-   * @return true if the key is processed, false if the key is not processed here. Maybe processed after them.
-   */
-  protected boolean processKeys(int keyCode){
-    boolean done = true;
-    long time = System.currentTimeMillis();
-    if(lastKey == keyCode){ keyRepetition +=1;  //same key
-    } else {
-      keyRepetition = 1; //other key.
-    }
-    //NOTE: prevent to fast key action if the last redraw is yet finished.
-    //The draw needs to much time in Linux-GTK with an Atom processor (Lenovo)
-    if( keyDone || keyCode == KeyCode.mouse1Double || (time - timeLastRedraw) > 350){  //use 350 ms for timeout if keyDone isn't set.  
-      keyDone = false;
-      switch(keyCode){
-      case KeyCode.pgup: {
-        if(ixLine > zLineVisible){
-          ixLineNew = ixLine - zLineVisible;
-        } else {
-          ixLineNew = 0;
-        }
-        keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
-      } break;
-      case KeyCode.mouseWheelUp:
-      case KeyCode.up: {
-        if(ixLine > 0){
-          //ixLineNew = ixLine - keyRepetition;
-          searchContent(true);
-          if(ixLineNew <0){ ixLineNew = 0; }
-        }
-        keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
-      } break;
-      case KeyCode.mouseWheelDn:
-      case KeyCode.dn: {
-        if(ixLine < zLine -1){
-          //ixLineNew = ixLine + keyRepetition;
-          searchContent(false);
-          if(ixLineNew >= zLine ){ ixLineNew = zLine -1; }
-        }
-        keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
-      } break;
-      case KeyCode.pgdn: {
-        if(ixLine < zLine - zLineVisible){
-          ixLineNew = ixLine + zLineVisible;
-        } else {
-          ixLineNew = zLine -1;
-        }
-        keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
-      } break;
-      default:
-        if(KeyCode.isTextKey(keyCode)){
-          searchChars.appendCodePoint(keyCode);
-          searchContent(false);
-          repaint();
-        } else if(keyCode == KeyCode.esc){
-          searchChars.setLength(0);
-          repaint();
-        } else if(keyCode == KeyCode.back && searchChars.length() >0){
-          searchChars.setLength(searchChars.length()-1);
-          repaint();
-        } else {
-          done = false;
-        }
-      }//switch
-      if(done == false && keyCode == keyMarkDn && ixLine >=0){
-        GralTableLine_ifc line = tableLines.get(ixLine);
-        if((line.getSelection() & 1)!=0){
-          //it is selected yet
-          line.setBackColor(colorBackTable,0);
-          line.setDeselect(1, line.getUserData());
-        } else {
-          line.setBackColor(colorBackMarked,0);
-          line.setSelect(1, line.getUserData());
-        }
-        if(ixLine < zLine -1){
-          ixLineNew = ixLine + 1;
-        }
-        keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
-        done = true;
-      }
-      if(!done && ixLine >=0){
-        GralTableLine_ifc lineGral = tableLines.get(ixLine);
-        if(actionChanging !=null){
-          //all other keys: call actionChanging.
-          done = actionChanging.userActionGui(keyCode, this, lineGral);
-        }
-      } //if(table.)
-      if(!done && itsMng.userMainKeyAction() !=null){
-        done = itsMng.userMainKeyAction().exec(keyCode, getCurrentLine());
-      }
-      if(!done){
-        //if actionChanging.userAction() returns false 
-        GralUserAction mainKeyAction = itsMng.getRegisteredUserAction("KeyAction");
-        if(mainKeyAction !=null){
-          //old form called because compatibility, if new for with int-parameter returns false.
-          if(!mainKeyAction.userActionGui(keyCode, this)){
-            done = mainKeyAction.userActionGui("key", this, new Integer(keyCode));
-          }
-        }
-      }
-      keyRepetition = 0;  //because it was done.
-    }//if not redraw pending.
-    lastKey = keyCode;
-    return done;
-  }
-
-  
   
   
   /**Increments or decrements ixLineNew in [up] or [dn] situation until the {@link #searchChars} are found
@@ -757,150 +572,14 @@ public abstract class GralTable<UserData> extends GralWidget implements GralTabl
   private final GralDispatchCallbackWorker keyActionDone = new GralDispatchCallbackWorker("GralTableKeyDone") {
     @Override
     public void doBeforeDispatching(boolean onlyWakeup) {
-      bFocused = true;  //to focus while repainting
+      gi.bFocused = true;  //to focus while repainting
       repaintGthread();
-      keyDone = true;
+      gi.keyDone = true;
       //System.out.println("Key done");
       removeFromQueue(itsMng.gralDevice());
     }
   };
 
-
-  /**Redraws the whole table because the current line is changed or the focus is changed
-   * or the content is changed and #re
-   * TODO
-   * {@link GralWidgetGthreadSet_ifc#redrawGthread()}
-   */
-  protected void setAllCellContentGthread(){
-    long dbgtime = System.currentTimeMillis();
-    bRedrawPending = true;
-    Assert.check(itsMng.currThreadIsGraphic());
-    int iCellLine;
-    //calculate number of lines to show:
-    if(tableLines.size() != zLine){
-      //any multithread problem? this routine detects it firstly.
-      zLine = tableLines.size();
-      if(ixLine1 >= zLine){ 
-        ixLine1 = zLine -1;
-      }
-    }
-    zLineVisible = getVisibleLinesTableImpl();
-    if(zLineVisible > zLineVisibleMax){ 
-      zLineVisible = zLineVisibleMax;   //no more lines existing.
-    }
-    ixLine2 = ixLine1 + zLineVisible -1;
-    final int dLine;  //Hint: defined outside to see in debugging.
-    if(ixLineNew < 2){
-      ixLine1 = 0; ixLine2 = zLineVisible -1;
-      dLine = 0;
-    } else if(ixLineNew > ixLine2 -2){
-      dLine = ixLineNew - (ixLine2 -2);
-      ixLine1 += dLine; ixLine2 += dLine;
-    } else if (ixLineNew < ixLine1 +2){
-      dLine = ixLineNew - (ixLine1 +2);  //negative
-      ixLine1 += dLine; ixLine2 += dLine;
-    } else {
-      dLine = 99998;  //unused, debug
-    }
-    if(ixLine2 >= zLine ){
-      ixLine2 = zLine-1;
-      ixLine1 = ixLine2 - zLineVisible +1;
-      if(ixLine1 < 0){ ixLine1 = 0; }
-    }
-    ixGlineSelectedNew = ixLineNew - ixLine1;
-    
-    Assert.check(ixLine2 < zLine && ixLineNew < zLine);
-    Assert.check(dLine < 99999);
-    //Assert.check(ixGlineSelectedNew < zLineVisible);
-    //
-    //draw all table cells.
-    long dbgtime1 = System.currentTimeMillis() - dbgtime;
-    int ixLine3;
-    for(ixLine3 = 0; ixLine3 < ixLine1; ++ixLine3){
-      TableLineData line = tableLines.get(ixLine3);
-      line.lineInGraphic = -1;
-    }
-    iCellLine = 0;
-    for(ixLine3 = ixLine1; ixLine3 <= ixLine2 && iCellLine < zLineVisibleMax; ++ixLine3){
-      //cells with content
-      TableLineData line = tableLines.get(ixLine3);
-      line.lineInGraphic = iCellLine;
-      int ctredraw = line.ctRepaintLine.get();
-      if(ctredraw > 0 || true){
-        for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
-          //
-          //draw the content of the cell in the graphic implementation.
-          //CellData widgiData = 
-            drawCellContent(iCellLine, iCellCol, line);
-          //widgiData.tableItem = line;  //The widgiData are assigned to the implementation graphic cell.
-        }
-        iCellLine +=1;
-        //Thread safety: set to 0 only if it isn't changed between quest and here.
-        //Only then the text isn't changed.
-        line.ctRepaintLine.compareAndSet(ctredraw, 0);  
-      }
-    }
-    while(ixLine3 < zLine){
-      TableLineData line = tableLines.get(ixLine3);
-      line.lineInGraphic = -1;
-      ixLine3 +=1;
-    }
-    long dbgtime2 = System.currentTimeMillis() - dbgtime;
-    while( iCellLine < zLineVisible) { //Max){
-      for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
-        CellData widgiData = drawCellInvisible(iCellLine, iCellCol);
-        widgiData.tableItem = null;  //The widgiData are assigned to the implementation graphic cell.
-      }
-      iCellLine +=1;
-    }
-    long dbgtime3 = System.currentTimeMillis() - dbgtime;
-    
-    //mark current line
-    if(ixLineNew >=0 && (ixLineNew != ixLine || bFocused)){
-      actionOnLineSelected(tableLines.get(ixLineNew));
-      ixLine = ixLineNew;
-      ixLine = ixLineNew;
-      if(ixGlineSelectedNew != ixGlineSelected){ //note: if the table scrolls, the same cell is used as current.
-        //set background color for non-selected line.
-        if(ixGlineSelected >=0){
-          Assert.check(ixGlineSelected < zLineVisibleMax);
-          for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
-            ////Text cellSwt = cellsSwt[ixGlineSelected][iCellCol];
-            ////cellSwt.setBackground(colorBackTableSwt);
-          }
-        }
-        ixGlineSelected = ixGlineSelectedNew;
-      }
-    }
-    //long dbgtime4 = System.currentTimeMillis() - dbgtime;
-    //System.out.print("\nSwtTable2-redraw1: " + dbgtime1 + " + " + dbgtime2 + " + " + dbgtime3 + " + " + dbgtime4);
-    timeLastRedraw = System.currentTimeMillis();
-    dbgtime = timeLastRedraw;
-    dbgtime1 = System.currentTimeMillis() - dbgtime;
-    //System.out.print(", redraw2: " + dbgtime1);
-    //System.out.println("GralTable.repaint; " + name);
-    //Thread.dumpStack();
-    bFocused = false;
-       
-  }
-
-  
-  protected void resizeTable(int xpixel, int ypixel) {
-    
-  }
-  
-
-  protected abstract void drawCellContent(int iCellLine, int iCellCol, TableLineData tableItem );
-
-  protected abstract CellData drawCellInvisible(int iCellLine, int iCellCol);
-
-  protected abstract int getVisibleLinesTableImpl();
-  
-  protected abstract GralMenu createColumnMenu(int column);
-  
-  
-  //protected void setCellDataOnMousePressed(CellData data){ cellDataOnMousePressed = data; } 
-  
   /**It is called whenever another line is selected, if the focus is gotten by mouse click
    * or a navigation key is pressed. 
    * This method calls the {@link GralUserAction#userActionGui(int, GralWidget, Object...)}.
@@ -918,8 +597,458 @@ public abstract class GralTable<UserData> extends GralWidget implements GralTabl
   
   
   
-  
-  
+  /**This is the super class for all implementers. It has protected access to all elements in the 
+   * environment class. Via access methods the implementor class has protected access to all of it.
+   * 
+   */
+  public static abstract class GraphicImplAccess implements Removeable
+  {
+    protected final GralTable<?> outer;
+    
+    /**Set to true while {@link #table}.{@link Table#redrawGthread()} is running.
+     * It prevents recursive invocation of redraw() while setFocus() is invoked. */
+    protected boolean bRedrawPending;
+
+    
+    
+    
+    /**Pixel per line. */
+    protected int linePixel;
+    
+    protected final int[] xpixelCell;
+
+    /**Start position of each column in pixel. */
+    protected int[] columnPixel;
+
+    /**Index of {@link #texts} of the cell left top for presentation. */
+    protected int ixLine1, ixCol1;
+    
+    /**Index of {@link #texts} of the cell right bottom for presentation. It depends of the size of presentation. */
+    protected int ixLine2, ixCol2;
+    
+    
+    /**Current number of visible lines in the view. */
+    protected int zLineVisible;
+    
+    /**maximum number of visible lines. it is the static amount of line-cells for displaying. */
+    protected int zLineVisibleMax = 20;  
+    
+    /**Index (subscript) of the graphical line (not lines of the table)
+     * which has the selection color and which should be gotten the selection color.
+     */
+    protected int ixGlineSelected = -1, ixGlineSelectedNew = -1;
+    
+    /**Check the last time of redrawing. */
+    protected long timeLastRedraw;
+    
+    /**If set, then a next key will be processed. It is set to false if a key event is executed
+     * and it is set to true in {@link #keyActionDone}. */
+    private boolean keyDone = true;
+    
+    /**The last key which was pressed  */
+    private int lastKey;
+    
+    /**Number of key repetitions if a key was not used because the redraw was pending yet. */
+    private int keyRepetition;
+    
+    
+    /**Set true if the focus is gained by mouse click. It causes color set and 
+     * invocation of {@link #actionOnLineSelected(GralTableLine_ifc)}. 
+     */
+    protected boolean bFocused;
+    
+
+    
+
+    protected GraphicImplAccess(GralTable<?> outer){ 
+      this.outer = outer; 
+      outer.gi = this; 
+      int xdPix = outer.itsMng.propertiesGui().xPixelUnit();
+      columnPixel = new int[outer.columnWidthsGral.length+1];
+      int xPix = 0;
+      columnPixel[0] = xPix;
+      for(int iCol = 0; iCol < outer.columnWidthsGral.length; ++iCol){
+        xPix += outer.columnWidthsGral[iCol] * xdPix;
+        columnPixel[iCol+1] = xPix;
+      }
+
+      this.xpixelCell = new int[outer.columnWidthsGral.length+1];
+      int ydPix = outer.itsMng.propertiesGui().yPixelUnit();
+      linePixel = 2 * ydPix;
+      ixGlineSelectedNew = ixGlineSelected = -1;  
+    }
+    
+    protected GralMng itsMng(){ return outer.itsMng; }
+    
+    protected int ixColumn(){ return outer.ixColumn; }
+    
+    protected int ixLine(){ return outer.ixLine; }
+    
+    protected int[] columnWidthsGral(){ return outer.columnWidthsGral; }
+    
+    
+    
+    protected int zColumn(){ return outer.zColumn; }
+    
+    protected GralColor colorSelectCharsBack(){ return outer.colorSelectCharsBack; }
+    
+    protected GralColor colorSelectChars(){ return outer.colorSelectChars; }
+    
+    protected GralColor colorBackTable(){ return outer.colorBackTable; }
+    
+    protected GralColor colorBackSelect(){ return outer.colorBackSelect; }
+    
+    protected GralColor colorBackMarked(){ return outer.colorBackMarked; }
+    
+    protected GralColor colorBackSelectMarked(){ return outer.colorBackSelectMarked; }
+    
+    protected GralColor colorTextTable(){ return outer.colorTextTable; }
+    
+    protected GralColor colorTextSelect(){ return outer.colorTextSelect; }
+    
+    protected GralColor colorTextMarked(){ return outer.colorTextMarked; }
+    
+    protected StringBuilder searchChars(){ return outer.searchChars; }
+    
+    
+    protected void correctIxLineColumn(){
+    
+      if(outer.ixColumn < 0){ outer.ixColumn = 0;}
+      if(outer.ixLine < 0 && outer.zLine >0){ outer.ixLineNew = 0;}
+    }
+    
+    
+    protected boolean isCurrentLine(int nLineNr){
+      return outer.ixLineNew >=0 ? nLineNr == outer.ixLineNew  //a new line 
+          : nLineNr == outer.ixLine;
+    }
+    
+    
+    /**Returns the line on that any mouse button was pressed. It is either the left, mid or right button.
+     * Able to use for context menu (right button).
+     * @return
+     */
+    //public TableLineData getLineOnMousePressed(){ return cellDataOnMousePressed.tableItem; }
+    
+
+    
+    /**Handle all standard keys of table. 
+     * It should call in the key event handler from the implementation class.
+     * <br>Keys:
+     * <ul>
+     * <li>pgup: 
+     * <li>up
+     * <li>dn
+     * <li>pgdn
+     * <li>{@link #keyMarkUp}
+     * <li>{@link #keyMarkDn}
+     * <li>calls {@link GralMng#getRegisteredUserAction(String what)} with what="KeyAction"
+     *   and invokes the returned action method. With them all standard key actions of this application
+     *   may be done if a {@link GralUserAction} is registered for that.  
+     * </ul>
+     * @param keyCode Encoding see {@link KeyCode}.
+     * @return true if the key is processed, false if the key is not processed here. Maybe processed after them.
+     */
+    protected boolean processKeys(int keyCode){
+      boolean done = true;
+      long time = System.currentTimeMillis();
+      if(lastKey == keyCode){ keyRepetition +=1;  //same key
+      } else {
+        keyRepetition = 1; //other key.
+      }
+      //NOTE: prevent to fast key action if the last redraw is yet finished.
+      //The draw needs to much time in Linux-GTK with an Atom processor (Lenovo)
+      if( keyDone || keyCode == KeyCode.mouse1Double || (time - timeLastRedraw) > 350){  //use 350 ms for timeout if keyDone isn't set.  
+        keyDone = false;
+        switch(keyCode){
+        case KeyCode.pgup: {
+          if(outer.ixLine > zLineVisible){
+            outer.ixLineNew = outer.ixLine - zLineVisible;
+          } else {
+            outer.ixLineNew = 0;
+          }
+          outer.keyActionDone.addToGraphicThread(outer.itsMng.gralDevice(), 0);
+        } break;
+        case KeyCode.mouseWheelUp:
+        case KeyCode.up: {
+          if(outer.ixLine > 0){
+            //ixLineNew = ixLine - keyRepetition;
+            outer.searchContent(true);
+            if(outer.ixLineNew <0){ outer.ixLineNew = 0; }
+          }
+          outer.keyActionDone.addToGraphicThread(outer.itsMng.gralDevice(), 0);
+        } break;
+        case KeyCode.mouseWheelDn:
+        case KeyCode.dn: {
+          if(outer.ixLine < outer.zLine -1){
+            //ixLineNew = ixLine + keyRepetition;
+            outer.searchContent(false);
+            if(outer.ixLineNew >= outer.zLine ){ outer.ixLineNew = outer.zLine -1; }
+          }
+          outer.keyActionDone.addToGraphicThread(outer.itsMng.gralDevice(), 0);
+        } break;
+        case KeyCode.pgdn: {
+          if(outer.ixLine < outer.zLine - zLineVisible){
+            outer.ixLineNew = outer.ixLine + zLineVisible;
+          } else {
+            outer.ixLineNew = outer.zLine -1;
+          }
+          outer.keyActionDone.addToGraphicThread(outer.itsMng.gralDevice(), 0);
+        } break;
+        default:
+          if(KeyCode.isTextKey(keyCode)){
+            outer.searchChars.appendCodePoint(keyCode);
+            outer.searchContent(false);
+            outer.repaint();
+          } else if(keyCode == KeyCode.esc){
+            outer.searchChars.setLength(0);
+            outer.repaint();
+          } else if(keyCode == KeyCode.back && outer.searchChars.length() >0){
+            outer.searchChars.setLength(outer.searchChars.length()-1);
+            outer.repaint();
+          } else {
+            done = false;
+          }
+        }//switch
+        if(done == false && keyCode == outer.keyMarkDn && outer.ixLine >=0){
+          GralTableLine_ifc line = outer.tableLines.get(outer.ixLine);
+          if((line.getSelection() & 1)!=0){
+            //it is selected yet
+            line.setBackColor(outer.colorBackTable,0);
+            line.setDeselect(1, line.getUserData());
+          } else {
+            line.setBackColor(outer.colorBackMarked,0);
+            line.setSelect(1, line.getUserData());
+          }
+          if(outer.ixLine < outer.zLine -1){
+            outer.ixLineNew = outer.ixLine + 1;
+          }
+          outer.keyActionDone.addToGraphicThread(outer.itsMng.gralDevice(), 0);
+          done = true;
+        }
+        if(!done && outer.ixLine >=0){
+          GralTableLine_ifc lineGral = outer.tableLines.get(outer.ixLine);
+          if(outer.actionChanging !=null){
+            //all other keys: call actionChanging.
+            done = outer.actionChanging.exec(keyCode, outer, lineGral);
+          }
+        } //if(table.)
+        if(!done && outer.itsMng.userMainKeyAction() !=null){
+          done = outer.itsMng.userMainKeyAction().exec(keyCode, outer.getCurrentLine());
+        }
+        if(!done){
+          //if actionChanging.userAction() returns false 
+          GralUserAction mainKeyAction = outer.itsMng.getRegisteredUserAction("KeyAction");
+          if(mainKeyAction !=null){
+            //old form called because compatibility, if new for with int-parameter returns false.
+            if(!mainKeyAction.userActionGui(keyCode, outer)){
+              done = mainKeyAction.userActionGui("key", outer, new Integer(keyCode));
+            }
+          }
+        }
+        keyRepetition = 0;  //because it was done.
+      }//if not redraw pending.
+      lastKey = keyCode;
+      return done;
+    }
+
+    
+
+    /**Redraws the whole table because the current line is changed or the focus is changed
+     * or the content is changed and #re
+     * TODO
+     * {@link GralWidgetGthreadSet_ifc#redrawGthread()}
+     */
+    protected void setAllCellContentGthread(){
+      long dbgtime = System.currentTimeMillis();
+      bRedrawPending = true;
+
+      Assert.check(outer.itsMng.currThreadIsGraphic());
+      int iCellLine;
+      //calculate number of lines to show:
+      if(outer.tableLines.size() != outer.zLine){
+        //any multithread problem? this routine detects it firstly.
+        outer.zLine = outer.tableLines.size();
+        if(ixLine1 >= outer.zLine){ 
+          ixLine1 = outer.zLine -1;
+        }
+      }
+      zLineVisible = getVisibleLinesTableImpl();
+      if(zLineVisible > zLineVisibleMax){ 
+        zLineVisible = zLineVisibleMax;   //no more lines existing.
+      }
+      ixLine2 = ixLine1 + zLineVisible -1;
+      final int dLine;  //Hint: defined outside to see in debugging.
+      if(outer.ixLineNew < 2){
+        ixLine1 = 0; ixLine2 = zLineVisible -1;
+        dLine = 0;
+      } else if(outer.ixLineNew > ixLine2 -2){
+        dLine = outer.ixLineNew - (ixLine2 -2);
+        ixLine1 += dLine; ixLine2 += dLine;
+      } else if (outer.ixLineNew < ixLine1 +2){
+        dLine = outer.ixLineNew - (ixLine1 +2);  //negative
+        ixLine1 += dLine; ixLine2 += dLine;
+      } else {
+        dLine = 99998;  //unused, debug
+      }
+      if(ixLine2 >= outer.zLine ){
+        ixLine2 = outer.zLine-1;
+        ixLine1 = ixLine2 - zLineVisible +1;
+        if(ixLine1 < 0){ ixLine1 = 0; }
+      }
+      ixGlineSelectedNew = outer.ixLineNew - ixLine1;
+      
+      Assert.check(ixLine2 < outer.zLine && outer.ixLineNew < outer.zLine);
+      Assert.check(dLine < 99999);
+      //Assert.check(ixGlineSelectedNew < zLineVisible);
+      //
+      //draw all table cells.
+      long dbgtime1 = System.currentTimeMillis() - dbgtime;
+      int ixLine3;
+      for(ixLine3 = 0; ixLine3 < ixLine1; ++ixLine3){ //mark invsible lines with -1
+        GralTable.TableLineData line = outer.tableLines.get(ixLine3);
+        line.lineInGraphic = -1;
+      }
+      iCellLine = 0;
+      for(ixLine3 = ixLine1; ixLine3 <= ixLine2 && iCellLine < zLineVisibleMax; ++ixLine3){
+        //cells with content
+        GralTable.TableLineData line = outer.tableLines.get(ixLine3);
+        line.lineInGraphic = iCellLine;
+        int ctredraw = line.ctRepaintLine.get();
+        if(ctredraw > 0 || true){
+          for(int iCellCol = 0; iCellCol < outer.zColumn; ++iCellCol){
+            //
+            //draw the content of the cell in the graphic implementation.
+            //CellData widgiData = 
+              drawCellContent(iCellLine, iCellCol, line);
+            //widgiData.tableItem = line;  //The widgiData are assigned to the implementation graphic cell.
+          }
+          iCellLine +=1;
+          //Thread safety: set to 0 only if it isn't changed between quest and here.
+          //Only then the text isn't changed.
+          line.ctRepaintLine.compareAndSet(ctredraw, 0);  
+        }
+      }
+      while(ixLine3 < outer.zLine){
+        GralTable.TableLineData line = outer.tableLines.get(ixLine3);
+        line.lineInGraphic = -1;
+        ixLine3 +=1;
+      }
+      long dbgtime2 = System.currentTimeMillis() - dbgtime;
+      while( iCellLine < zLineVisible) { //Max){
+        for(int iCellCol = 0; iCellCol < outer.zColumn; ++iCellCol){
+          CellData widgiData = drawCellInvisible(iCellLine, iCellCol);
+          widgiData.tableItem = null;  //The widgiData are assigned to the implementation graphic cell.
+        }
+        iCellLine +=1;
+      }
+      long dbgtime3 = System.currentTimeMillis() - dbgtime;
+      
+      //mark current line
+      if(outer.ixLineNew >=0 && (outer.ixLineNew != outer.ixLine || bFocused)){
+        outer.actionOnLineSelected(outer.tableLines.get(outer.ixLineNew));
+        outer.ixLine = outer.ixLineNew;
+        outer.ixLine = outer.ixLineNew;
+        if(ixGlineSelectedNew != ixGlineSelected){ //note: if the table scrolls, the same cell is used as current.
+          //set background color for non-selected line.
+          if(ixGlineSelected >=0){
+            Assert.check(ixGlineSelected < zLineVisibleMax);
+            for(int iCellCol = 0; iCellCol < outer.zColumn; ++iCellCol){
+              ////Text cellSwt = cellsSwt[ixGlineSelected][iCellCol];
+              ////cellSwt.setBackground(colorBackTableSwt);
+            }
+          }
+          ixGlineSelected = ixGlineSelectedNew;
+        }
+      }
+      //long dbgtime4 = System.currentTimeMillis() - dbgtime;
+      //System.out.print("\nSwtTable2-redraw1: " + dbgtime1 + " + " + dbgtime2 + " + " + dbgtime3 + " + " + dbgtime4);
+      timeLastRedraw = System.currentTimeMillis();
+      dbgtime = timeLastRedraw;
+      dbgtime1 = System.currentTimeMillis() - dbgtime;
+      //System.out.print(", redraw2: " + dbgtime1);
+      //System.out.println("GralTable.repaint; " + name);
+      //Thread.dumpStack();
+      bFocused = false;
+         
+    }
+
+    
+
+    protected void resizeTable(int xpixel, int ypixel) {
+      
+    }
+
+    @Override public boolean remove(){
+      outer.tableLines.clear();
+      return true;
+    }
+
+    
+    /**Sets the current cell as focused with the focus color. It causes
+     * a redraw of the whole table because the cell may be shifted in table position.
+     * TODO this method must call in the graphic thread yet, queue it with {@link GralMng#setInfo(GralWidget, int, int, Object, Object)}.
+     * @param cell The cell 
+     */
+    protected boolean redrawTableWithFocusedCell(CellData data){
+      if(data.tableItem !=null){ //don't do any action if the cell isn't use.
+        outer.ixLineNew = data.tableItem.nLineNr; //data.ixCellLine + ixLine1;
+        if(outer.ixLineNew >= outer.zLine){ //files may be deleted 
+          outer.ixLineNew = outer.zLine >0 ? 0 : -1;  //select the first line or select nothing.
+        }
+        outer.ixColumn = data.ixCellColumn;
+        bFocused = true;
+        return true;
+      }
+      else return false;
+    }
+
+
+    
+
+
+    protected abstract void drawCellContent(int iCellLine, int iCellCol, GralTable.TableLineData tableItem );
+
+    protected abstract CellData drawCellInvisible(int iCellLine, int iCellCol);
+
+    protected abstract int getVisibleLinesTableImpl();
+    
+    protected abstract GralMenu createColumnMenu(int column);
+    
+    
+    //protected void setCellDataOnMousePressed(CellData data){ cellDataOnMousePressed = data; } 
+    
+    /**Data for each Text widget of the graphical implementation layer. It refers the data of the 
+     * {@link GralTable#tableLines}.
+     * Note: The class is visible only in the graphic implementation layer, because it is protected.
+     * The elements need to set public because there are not visible elsewhere in the derived class
+     * of the outer class. 
+     */
+    protected class CellData{
+      
+      /**The row and column in the graphical presentation. */
+      public final int ixCellLine, ixCellColumn;
+      
+      /**The line data which are presented in this cell. */
+      public GralTable.TableLineData tableItem;
+      
+      /**The color in the graphical presentation. It is the color of the text field. 
+       * Note that the color of the text field is only changed if this colors and the 
+       * {@link TableLineData#colorBackground} and {@link TableLineData#colorForground} are different. 
+       * It saves some calculation time if the color of the text field is set only if it is necessary. */
+      public GralColor colorBack, colorText;
+      
+      public CellData(int ixCellLine, int ixCellColumn){
+        this.ixCellLine = ixCellLine; 
+        this.ixCellColumn = ixCellColumn;
+      }
+    }
+    
+    
+
+
+ 
+  }
 
   
   /**An instance of this class is assigned to any TableItem.
@@ -927,7 +1056,7 @@ public abstract class GralTable<UserData> extends GralWidget implements GralTabl
    * The instance knows its TableSwt and therefore the supports the access to the whole table.
    *
    */
-  protected final class TableLineData<UserData> extends SelectMask implements GralTableLine_ifc<UserData>
+  public final class TableLineData<UserData> extends SelectMask implements GralTableLine_ifc<UserData>
   {
 
     /**If a repaint is necessary, it is changed by increment by 1. If the redraw is executed
@@ -1101,9 +1230,7 @@ public abstract class GralTable<UserData> extends GralWidget implements GralTabl
     
     @Override
     public boolean remove()
-    {
-      // TODO Auto-generated method stub
-      return false;
+    { return gi.remove();
     }
 
     
@@ -1176,34 +1303,6 @@ public abstract class GralTable<UserData> extends GralWidget implements GralTabl
 
     
   }
-  
-
-  /**Data for each Text widget of the graphical implementation layer. It refers the data of the 
-   * {@link GralTable#tableLines}.
-   * Note: The class is visible only in the graphic implementation layer, because it is protected.
-   * The elements need to set public because there are not visible elsewhere in the derived class
-   * of the outer class. 
-   */
-  protected class CellData<UserData>{
-    
-    /**The row and column in the graphical presentation. */
-    public final int ixCellLine, ixCellColumn;
-    
-    /**The line data which are presented in this cell. */
-    public TableLineData<UserData> tableItem;
-    
-    /**The color in the graphical presentation. It is the color of the text field. 
-     * Note that the color of the text field is only changed if this colors and the 
-     * {@link TableLineData#colorBackground} and {@link TableLineData#colorForground} are different. 
-     * It saves some calculation time if the color of the text field is set only if it is necessary. */
-    public GralColor colorBack, colorText;
-    
-    public CellData(int ixCellLine, int ixCellColumn){
-      this.ixCellLine = ixCellLine; 
-      this.ixCellColumn = ixCellColumn;
-    }
-  }
-  
   
 
   

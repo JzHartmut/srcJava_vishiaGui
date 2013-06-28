@@ -1234,7 +1234,8 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 	
   @Override public GralTable addTable(String sName, int height, int[] columnWidths)
   {
-    return SwtTable.addTable(this, sName, height, columnWidths);
+    GralTable table = new GralTable(sName, this, columnWidths);
+    return SwtTable.addTable(table, this, sName, height, columnWidths);
 
   }
   
@@ -1563,7 +1564,8 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 	    GralPanelContent panel = widgd.pos.panel;
 	    GralRectangle size = panel.getPixelSize();
 	    GralRectangle posSize = calcWidgetPosAndSize(widgd.pos, size.dx, size.dy, 0, 0);
-  	  swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
+  	  //Note: the swtWidget may have a resizeListener, see there.
+	    swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
   	  swtWidget.redraw();
 	  }
 	}

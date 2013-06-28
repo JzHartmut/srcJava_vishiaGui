@@ -119,6 +119,15 @@ public class SwtHorizontalSelector extends GralHorizontalSelector<?>.GraphicImpl
   }
   
   
+  @Override public boolean setVisible(boolean visible)
+  { widgetSwt.setVisible(visible);
+    return widgetSwt.isVisible();
+  }
+  
+  
+
+  
+  
   @SuppressWarnings("unchecked")
   protected void paintControl(Canvas swt, PaintEvent e){
     GC gc = e.gc;
@@ -271,8 +280,9 @@ public class SwtHorizontalSelector extends GralHorizontalSelector<?>.GraphicImpl
     { // TODO Auto-generated method stub
     }
   };
-  
-  
+
+
+
 
   
 }

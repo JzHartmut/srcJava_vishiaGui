@@ -1,6 +1,7 @@
 package org.vishia.gral.swt;
 
 
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -24,6 +25,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralMng;
@@ -33,13 +36,17 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.KeyCode;
 
-public final class SwtTable  extends GralTable {
+public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgImpl_ifc 
+{
 
   /**Version and history
    * <ul>
+   * <li>2013-06-29 Hartmut chg: refactoring. Now a GralTable<generic> can be created before the graphic is build. It is the new schema of GralWidget.
+   *   The inner class {@link GraphicImplAccess} is provided as super class for the graphic implementation class,
+   *   for example {@link org.vishia.gral.swt.SwtTable}.
    * <li>2013-10-08 Hartmut chg: 
    * <li>2012-07-15 Hartmut new: search functionality: This implementation have a text field 
-   *   which shows the search string. While up and down keys the that lines are selected which text in the {@link #ixColumn}
+   *   which shows the search string. While up and down keys the that lines are selected which text in the {@link #ixColumn()}
    *   starts whith the search string.
    * <li>2012-01-06 Hartmut new: concept of a table which is independent of the table implementation 
    *   of the table implementations in the graphic system layer or in operation system: 
@@ -103,17 +110,19 @@ public final class SwtTable  extends GralTable {
   
   private boolean mouse1isDown, mouse2isDown, mouseDoubleClick;
   
-  public SwtTable(SwtMng mng, String name, Composite parent,  int height
+  public SwtTable(GralTable gralTable, SwtMng mng, String name, Composite parent,  int height
       , int[] columnWidths) //, int selectionColumn, CharSequence selectionText)
-  { super(name, mng, columnWidths);
+  { super(gralTable);
+    //super(name, mng, columnWidths);
     this.mng = mng;
+    gralTable.implMethodWidget_.setWidgetImpl(this);
     this.myKeyListener = this.new TableKeyListerner(null);
     focusListenerTable = this.new FocusListenerTable(mng);
     focusListenerCell = this.new FocusListenerCell();
     setColorsSwt();    
-    this.cellsSwt = new Text[zLineVisibleMax][zColumn];
+    this.cellsSwt = new Text[zLineVisibleMax][zColumn()];
     //this.menuColumns = new SwtMenu[zColumn];
-    this.table = new SwtTable.Table(parent, zColumn);
+    this.table = new SwtTable.Table(parent, zColumn());
     table.addKeyListener(myKeyListener);
     //table.addSelectionListener(selectionListener);
     table.addControlListener(resizeListener);
@@ -143,20 +152,20 @@ public final class SwtTable  extends GralTable {
 
   
   
-  public static GralTable addTable(SwtMng mng, String sName, int height, int[] columnWidths
+  public static GralTable addTable(GralTable gralTable, SwtMng mng, String sName, int height, int[] columnWidths
   //, int selectionColumn, CharSequence selectionText    
   ) {
     
     boolean TEST = false;
     final SwtTable table;
     Composite parent = (Composite)mng.pos.panel.getPanelImpl();
-    table = new SwtTable(mng, sName, parent, height, columnWidths); //, selectionColumn, selectionText);
-    table.setDataPath(sName);
-    table.setPanelMng(mng);
+    table = new SwtTable(gralTable, mng, sName, parent, height, columnWidths); //, selectionColumn, selectionText);
+    table.outer.setDataPath(sName);
+    table.outer.setPanelMng(mng);
     table.table.setData(table);
-    mng.registerWidget(table);
+    mng.registerWidget(gralTable);
     //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
-    return table;
+    return gralTable;
 
   }
   
@@ -178,18 +187,17 @@ public final class SwtTable  extends GralTable {
   }
   
 
-
   @Override public Object getWidgetImplementation() {
     return table;
   }
 
-  @Override
+  //@Override
   public GralColor setBackgroundColor(GralColor color) {
     // TODO Auto-generated method stub
     return null;
   }
 
-  @Override
+  //@Override
   public GralColor setForegroundColor(GralColor color) {
     // TODO Auto-generated method stub
     return null;
@@ -201,11 +209,11 @@ public final class SwtTable  extends GralTable {
     
   }
   
-  
-  @Override public boolean setVisible(boolean visible){
+  //@Override 
+  public boolean setVisible(boolean visible){
     boolean ret = table.isVisible();
     table.setVisible(visible);
-    implMethodWidget_.setVisibleState(visible);
+    outer.implMethodWidget_.setVisibleState(visible);
     return ret;
   }
   
@@ -214,15 +222,15 @@ public final class SwtTable  extends GralTable {
   @Override public void repaintGthread(){
     if(!table.isDisposed()){
       setAllCellContentGthread();
-      Color colorSelectBack =  mng.getColorImpl(super.colorSelectCharsBack);
-      Color colorSelect =  mng.getColorImpl(super.colorSelectChars);
-      if(searchChars.length() >0){
+      Color colorSelectBack =  mng.getColorImpl(super.colorSelectCharsBack());
+      Color colorSelect =  mng.getColorImpl(super.colorSelectChars());
+      if(super.searchChars().length() >0){
         swtSearchText.setBackground(colorSelectBack);
         swtSearchText.setForeground(colorSelect);
         //swtSearchText.
-        swtSearchText.setText(searchChars.toString());
+        swtSearchText.setText(searchChars().toString());
         Point tabSize = table.getSize();
-        swtSearchText.setBounds(xpixelCell[ixColumn] + 10, tabSize.y - linePixel, xpixelCell[ixColumn+1] - xpixelCell[ixColumn] - 10, linePixel);
+        swtSearchText.setBounds(xpixelCell[ixColumn()] + 10, tabSize.y - linePixel, xpixelCell[ixColumn()+1] - xpixelCell[ixColumn()] - 10, linePixel);
         swtSearchText.setVisible(true);
         
       } else {
@@ -245,14 +253,13 @@ public final class SwtTable  extends GralTable {
    * TODO this method must call in the graphic thread yet, queue it with {@link GralMng#setInfo(GralWidget, int, int, Object, Object)}.
    */
   @Override public boolean setFocusGThread()
-  { if(ixGlineSelectedNew >=0 && ixColumn >=0){
+  { if(ixGlineSelectedNew >=0 && ixColumn() >=0){
       //System.out.println("test SwtTable.setFocus-1");
-      redrawTableWithFocusedCell(cellsSwt[ixGlineSelectedNew][ixColumn]);
+      redrawTableWithFocusedCell(cellsSwt[ixGlineSelectedNew][ixColumn()]);
       return true;
     } else {
       //System.out.println("test SwtTable.setFocus-2");
-      if(ixColumn < 0){ ixColumn = 0;}
-      if(ixLine < 0 && zLine >0){ ixLineNew = 0;}
+      correctIxLineColumn();
       bFocused = true;
       table.redraw();
       table.setFocus();
@@ -276,7 +283,7 @@ public final class SwtTable  extends GralTable {
     // TODO Auto-generated method stub
     if(!table.isDisposed()){
       for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){
-        for(int iCol = 0; iCol < zColumn; ++iCol){
+        for(int iCol = 0; iCol < zColumn(); ++iCol){
           Text cell = cellsSwt[iRow][iCol];
           cell.dispose();
           cellsSwt[iRow][iCol] = null;  
@@ -288,7 +295,6 @@ public final class SwtTable  extends GralTable {
 
   @Override public boolean remove(){
     super.remove(); //removes the widget implementation.
-    tableLines.clear();
     return true;
   }
   
@@ -300,13 +306,7 @@ public final class SwtTable  extends GralTable {
    */
   private void redrawTableWithFocusedCell(Widget cell){
     CellData data = (CellData)cell.getData();
-    if(data.tableItem !=null){ //don't do any action if the cell isn't use.
-      ixLineNew = data.tableItem.nLineNr; //data.ixCellLine + ixLine1;
-      if(ixLineNew >=zLine){ //files may be deleted 
-        ixLineNew = zLine >0 ? 0 : -1;  //select the first line or select nothing.
-      }
-      ixColumn = data.ixCellColumn;
-      bFocused = true;
+    if(super.redrawTableWithFocusedCell(data)){
       table.redraw();
     }
   }
@@ -322,7 +322,7 @@ public final class SwtTable  extends GralTable {
   /**This routine implements all things to set the content of any table cell to show it.
    * @see org.vishia.gral.base.GralTable#drawCellContent(int, int, org.vishia.gral.base.GralTable.TableLineData)
    */
-  @Override protected void drawCellContent(int iCellLine, int iCellCol, TableLineData tableItem ){
+  @Override protected void drawCellContent(int iCellLine, int iCellCol, GralTable.TableLineData tableItem ){
     Text cellSwt = cellsSwt[iCellLine][iCellCol]; 
     CellData cellData = (CellData)cellSwt.getData();
     cellData.tableItem = tableItem;
@@ -332,26 +332,25 @@ public final class SwtTable  extends GralTable {
     //
     cellSwt.setText(text);
     GralColor colorBack;
-    if(ixLineNew >=0 ? tableItem.nLineNr == ixLineNew  //a new line 
-      : tableItem.nLineNr == ixLine) { //the current line, but only if ixLineNew <0
-    //if(ixGlineSelectedNew == iCellLine){
-      colorBack = (tableItem.getSelection() & 1)!=0 ? colorBackSelectMarked : colorBackSelect;
+    if(isCurrentLine(tableItem.nLineNr)) { //the current line, but only if ixLineNew <0
+    //if(ixGlineSelectedNew() == iCellLine){
+      colorBack = (tableItem.getSelection() & 1)!=0 ? colorBackSelectMarked() : colorBackSelect();
     } else if(tableItem.colorBackground !=null){
       colorBack = tableItem.colorBackground;
     } else {
-      colorBack = colorBackTable;
+      colorBack = colorBackTable();
     }
     if(cellData.colorBack != colorBack){
       Color colorSwt =  mng.getColorImpl(colorBack);
       cellSwt.setBackground(colorSwt);
       cellData.colorBack = colorBack;
     }
-    GralColor colorText = tableItem.colorForground !=null ? tableItem.colorForground : colorTextTable;
+    GralColor colorText = tableItem.colorForground !=null ? tableItem.colorForground : colorTextTable();
     if(colorText != cellData.colorText){
       cellSwt.setForeground(mng.getColorImpl(colorText));
       cellData.colorText = colorText;
     }
-    if(ixGlineSelectedNew == iCellLine && iCellCol == ixColumn && bFocused){
+    if(ixGlineSelectedNew == iCellLine && iCellCol == ixColumn() && bFocused){
       SwtWidgetHelper.setFocusOfTabSwt(cellSwt);
     }
 
@@ -369,10 +368,10 @@ public final class SwtTable  extends GralTable {
     CellData cellData = (CellData)cellSwt.getData();
     cellData.tableItem = null;
     cellSwt.setText("");
-    if(cellData.colorBack != colorBackTable){
-      Color colorSwt =  mng.getColorImpl(colorBackTable);
+    if(cellData.colorBack != colorBackTable()){
+      Color colorSwt =  mng.getColorImpl(colorBackTable());
       cellSwt.setBackground(colorSwt);
-      cellData.colorBack = colorBackTable;
+      cellData.colorBack = colorBackTable();
     }
     cellSwt.setVisible(true);
     return (cellData);
@@ -380,7 +379,7 @@ public final class SwtTable  extends GralTable {
 
   
   @Override protected GralMenu createColumnMenu(int column){
-    GralMenu menuColumn = new SwtMenu(this, table, itsMng);
+    GralMenu menuColumn = new SwtMenu(outer, table, itsMng());
     for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){
       cellsSwt[iRow][column].setMenu((Menu)menuColumn.getMenuImpl());
     }    
@@ -399,7 +398,7 @@ public final class SwtTable  extends GralTable {
     //ixLineNew = line.nLineNr;  //select this line.
     
     if(true || !hasFocus){
-      SwtTable.this.implMethodWidget_.focusGained();  //from GralWidget.
+      outer.implMethodWidget_.focusGained();  //from GralWidget.
       hasFocus = true;
       //System.out.println("focusTable");
     }
@@ -418,19 +417,20 @@ public final class SwtTable  extends GralTable {
 
   protected void setBoundsCells(){
     Rectangle parentBounds = table.getParent().getBounds();
-    GralRectangle pixTable = pos.calcWidgetPosAndSize(itsMng.propertiesGui(), parentBounds.width, parentBounds.height, 0, 0);
-    int xPixelUnit = itsMng.propertiesGui().xPixelUnit();
+    GralRectangle pixTable = outer.pos.calcWidgetPosAndSize(itsMng().propertiesGui(), parentBounds.width, parentBounds.height, 0, 0);
+    int xPixelUnit = itsMng().propertiesGui().xPixelUnit();
     int xPixel1 = 0;
     xpixelCell[0] = xPixel1;
     int ixPixelCell;
     int xPos;
-    for(ixPixelCell = 0; ixPixelCell < columnWidthsGral.length && (xPos = columnWidthsGral[ixPixelCell]) > 0; ++ixPixelCell){
+    //Columns from left with positive width
+    for(ixPixelCell = 0; ixPixelCell < columnWidthsGral().length && (xPos = columnWidthsGral()[ixPixelCell]) > 0; ++ixPixelCell){
       xPixel1 += xPos * xPixelUnit;
       xpixelCell[ixPixelCell+1] = xPixel1;
     }
     xPixel1 = pixTable.dx;
-    xpixelCell[columnWidthsGral.length] = xPixel1;  //right position.
-    for(ixPixelCell = columnWidthsGral.length-1; ixPixelCell >=0  && (xPos = columnWidthsGral[ixPixelCell]) < 0; --ixPixelCell){
+    xpixelCell[columnWidthsGral().length] = xPixel1;  //right position.
+    for(ixPixelCell = columnWidthsGral().length-1; ixPixelCell >=0  && (xPos = columnWidthsGral()[ixPixelCell]) < 0; --ixPixelCell){
       xPixel1 += xPos * xPixelUnit;
       xpixelCell[ixPixelCell] = xPixel1;
     }
@@ -453,10 +453,10 @@ public final class SwtTable  extends GralTable {
     public Table(Composite parent, int zColumns) {
       super(parent, 0);
       int yPix = 0;
-      Font font = mng.propertiesGuiSwt.getTextFontSwt(2, whatIs, whatIs);
-      Color colorBackTableSwt = mng.getColorImpl(colorBackTable);
+      Font font = mng.propertiesGuiSwt.getTextFontSwt(2, outer.whatIs, outer.whatIs);
+      Color colorBackTableSwt = mng.getColorImpl(colorBackTable());
       for(int iCol = 0; iCol < zColumns; ++iCol){
-        //menuColumns[iCol] = new SwtMenu(name + "_menu" + iCol, this, itsMng);
+        //menuColumns[iCol] = new SwtMenu(name + "_menu" + iCol, this, itsMng());
       }
       //NOTE: only if the swtSelectText is created first, it will drawn in in the foreground of the other cells.
       swtSearchText = new Text(this, SWT.LEFT | SWT.SINGLE | SWT.READ_ONLY);
@@ -472,7 +472,7 @@ public final class SwtTable  extends GralTable {
           cell.addMouseWheelListener(mouseWheelListener);
           CellData cellData = new CellData(iRow, iCol);
           cell.setData(cellData);
-          int xdPixCol = columnPixel[iCol+1] - columnPixel[iCol];
+          int xdPixCol = SwtTable.super.columnPixel[iCol+1] - columnPixel[iCol];
           cell.setBounds(columnPixel[iCol], yPix, xdPixCol, linePixel);
           cell.setBackground(colorBackTableSwt);
           //cell.setMenu((Menu)menuColumns[iCol].getMenuImpl());
@@ -508,10 +508,10 @@ public final class SwtTable  extends GralTable {
     private void superRedraw(){
       super.update(); 
       super.redraw();
-      if(searchChars.length() >0){
+      //if(searchChars.length() >0){
         //swtSelectText.update();
         //swtSelectText.redraw();
-      }
+      //}
     }
     
     
@@ -547,18 +547,18 @@ public final class SwtTable  extends GralTable {
 
     @Override public void insertGthread(int pos, Object visibleInfo, Object data) {
       if(visibleInfo instanceof String[]){
-        insertLine(null, pos, (String[])visibleInfo, data);
+        //outer.insertLine(null, pos, (String[])visibleInfo, data);
       } else if(visibleInfo instanceof String){
         String[] text = ((String)visibleInfo).split("\t");
         //String[] text = new String[1];
         //text[0] = (String)visibleInfo;
-        insertLine(null, pos, text, data);
+        //outer.insertLine(null, pos, text, data);
       }
     }
 
 
     @Override public void clearGthread() {
-      clearTable();  
+      outer.clearTable();  
     }
     
 
@@ -714,7 +714,7 @@ public final class SwtTable  extends GralTable {
     
     @Override public void focusGained(FocusEvent ev)
     { //super.focusGained(ev);
-      SwtTable.this.implMethodWidget_.focusGained();
+      outer.implMethodWidget_.focusGained();
       //System.out.println("table focus gained. ");
       //assert(false);
       int row = 1; //table.getSelectionIndex();
@@ -750,7 +750,7 @@ public final class SwtTable  extends GralTable {
         Control widgSwt = (Control)ev.widget;
         //widgSwt.setBackground(colorBackSelectNonFocusedSwt); 
         int iCellLine = data.ixCellLine; //ixLineNew - ixLine1;
-        for(int iCellCol = 0; iCellCol < zColumn; ++iCellCol){
+        for(int iCellCol = 0; iCellCol < zColumn(); ++iCellCol){
           Text cellSwt = cellsSwt[iCellLine][iCellCol];
     
           //cellSwt.setBackground(colorBackSelectNonFocusedSwt);
@@ -770,7 +770,7 @@ public final class SwtTable  extends GralTable {
         if(!bRedrawPending){ 
           //The focusGained for the table invokes the GralWidget.focusAction for this table.
           if(true || !hasFocus){
-            SwtTable.this.implMethodWidget_.focusGained();  //from GralWidget.
+            outer.implMethodWidget_.focusGained();  //from GralWidget.
             hasFocus = true;
             //System.out.println("focusTable");
           }
@@ -778,7 +778,7 @@ public final class SwtTable  extends GralTable {
           //System.out.println("focusCell");
         }
       } catch(Exception exc){
-        itsMng.log().sendMsg(0, "Exception in SwtTable.focusGained");
+        itsMng().log().sendMsg(0, "Exception in SwtTable.focusGained");
       }
     }
     
