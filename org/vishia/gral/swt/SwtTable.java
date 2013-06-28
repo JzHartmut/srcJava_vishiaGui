@@ -25,7 +25,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralTable;
-import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
@@ -110,9 +109,8 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   
   private boolean mouse1isDown, mouse2isDown, mouseDoubleClick;
   
-  public SwtTable(GralTable gralTable, SwtMng mng, String name, Composite parent,  int height
-      , int[] columnWidths) //, int selectionColumn, CharSequence selectionText)
-  { super(gralTable);
+  public SwtTable(GralTable<?> gralTable, SwtMng mng, Composite parent)
+  { super(gralTable, mng);
     //super(name, mng, columnWidths);
     this.mng = mng;
     gralTable.implMethodWidget_.setWidgetImpl(this);
@@ -132,44 +130,59 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
     //table.setColumnSelectionAllowed(true);
     //table.setRowHeight(2 * this.propertiesGui.xPixelUnit());
     //Container widget = new Container();
-    int width=0;
-    int xPixel = mng.propertiesGui.xPixelUnit();
-    for(int ixw=0; ixw<columnWidths.length; ++ixw){
-      int columnWidth = columnWidths[ixw];
-      width += columnWidth;
-      int columnWidthPixel = columnWidth * xPixel;
-      //TableColumn tColumn = new TableColumn(table, 0, ixw);
-      //tColumn.setWidth(columnWidthPixel);
-      //tColumn.setHeaderValue("Test"+ixw);
-      //tColumn.setWidth(columnWidthPixel);
-    }
-    int widthPixel = width * xPixel;
-    int heightPixel = height * mng.propertiesGui.yPixelUnit();
-    table.setSize(widthPixel, heightPixel);
+    //int width=0;
+    //int xPixel = mng.propertiesGui.xPixelUnit();
+    //int widthPixel = width * xPixel;
+    //int heightPixel = height * mng.propertiesGui.yPixelUnit();
+    //table.setSize(widthPixel, heightPixel);
     resizeTable();
   }
 
 
   
   
+  /**
+   * @param gralTable
+   * @param mng
+   * @param sName
+   * @param height
+   * @param columnWidths
+   * @return
+   * @deprecated Create an instance of {@link GralTable} and call 
+   */
+  @Deprecated
   public static GralTable addTable(GralTable gralTable, SwtMng mng, String sName, int height, int[] columnWidths
-  //, int selectionColumn, CharSequence selectionText    
-  ) {
-    
-    boolean TEST = false;
-    final SwtTable table;
-    Composite parent = (Composite)mng.pos.panel.getPanelImpl();
-    table = new SwtTable(gralTable, mng, sName, parent, height, columnWidths); //, selectionColumn, selectionText);
-    table.outer.setDataPath(sName);
-    table.outer.setPanelMng(mng);
-    table.table.setData(table);
-    mng.registerWidget(gralTable);
-    //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
-    return gralTable;
+      //, int selectionColumn, CharSequence selectionText    
+      ) {
+        
+        boolean TEST = false;
+        final SwtTable table;
+        Composite parent = mng.getCurrentPanel();
+        table = new SwtTable(gralTable, mng, parent); //, selectionColumn, selectionText);
+        table.outer.setDataPath(sName);
+        table.outer.setPanelMng(mng);
+        table.table.setData(table);
+        mng.registerWidget(gralTable);
+        //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
+        return gralTable;
 
-  }
-  
-  
+      }
+      
+      
+  /*package private*/ static void addTable(GralTable gralTable, SwtMng mng) {
+        
+        boolean TEST = false;
+        final SwtTable table;
+        Composite parent = mng.getCurrentPanel();
+        table = new SwtTable(gralTable, mng, parent); //, selectionColumn, selectionText);
+        table.outer.setPanelMng(mng);
+        table.table.setData(table);
+        mng.registerWidget(gralTable);
+        //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
+
+      }
+      
+      
   private void setColorsSwt(){
     //colorBackSelectSwt = mng.getColorImpl(colorBackSelect);
     //colorBackMarkedSwt = mng.getColorImpl(colorBackMarked);

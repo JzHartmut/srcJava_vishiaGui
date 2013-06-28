@@ -230,7 +230,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * But the position can be set.
    * The values inside the position are positive in any case, so that the calculation of size is simple.
    */
-  public GralPos pos = new GralPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
+  protected GralPos pos = new GralPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
   
   /**False if the position is given newly. True if it is used. Then the next add-widget invocation 
    * calculates the next position in direction see {@link GralPos#setNextPosition()}. */
@@ -688,6 +688,9 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   public GralPanelContent getPanel(String name){
     return panels.get(name);
   }
+  
+  
+  public abstract Object getCurrentPanel();
   
   
   public GralPanelActivated_ifc actionPanelActivate = new GralPanelActivated_ifc()

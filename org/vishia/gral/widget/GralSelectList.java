@@ -9,6 +9,7 @@ import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTableLine_ifc;
+import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
 
@@ -85,9 +86,12 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
   /**Not used yet, register actions? */
   protected Map<String, GralUserAction> actions;
   
-  protected GralSelectList() //String name, GralWidgetMng mng)
+  protected GralSelectList(String name, int rows, int[] columns, char size) //String name, GralWidgetMng mng)
   {
-    //super(name, 'l', mng);
+    if(name == null){
+      Assert.stop();
+    }
+    wdgdTable = new GralTable<UserData>(name, columns);
   }
 
   
@@ -113,9 +117,10 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
    * @param columns
    * @param size
    */
-  public void setToPanel(GralMngBuild_ifc gralMng, String name, int rows, int[] columns, char size)
+  public void setToPanel(GralMngBuild_ifc gralMng)
   {
-    wdgdTable = gralMng.addTable(name, rows, columns);
+    wdgdTable.setToPanel(gralMng);
+    //wdgdTable = gralMng.addTable(name, rows, columns);
     wdgdTable.setActionChange(actionTable);
   }
   

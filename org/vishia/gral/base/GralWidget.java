@@ -519,7 +519,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     this.whatIs = whatIs;
     this.itsCfgElement = null;
     this.itsMng = mng;
-    this.pos = mng.getPositionInPanel();  //Note: makes a clone because the pos in panel is reused. 
+    if(mng !=null){
+      this.pos = mng.getPositionInPanel();  //Note: makes a clone because the pos in panel is reused. 
+    }
   }
   
   

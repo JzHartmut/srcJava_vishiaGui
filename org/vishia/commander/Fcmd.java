@@ -118,7 +118,7 @@ public class Fcmd extends GuiCfg
 
   final FcmdExecuter executer = new FcmdExecuter(mainCmd, this);
 
-  final GralCommandSelector cmdSelector = new GralCommandSelector("cmdSelector", executer.cmdQueue, gralMng);
+  final GralCommandSelector cmdSelector = new GralCommandSelector("cmdSelector", 5, new int[]{0,-10}, 'A', executer.cmdQueue, gralMng);
 
   final FcmdIdents idents = new FcmdIdents();
   

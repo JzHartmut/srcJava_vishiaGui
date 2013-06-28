@@ -125,7 +125,7 @@ private class SwtLedImpl extends Canvas
   	public SwtLedImpl()
   	{
   		
-  		super(((SwtPanel)mng.pos.panel).getPanelImpl(), 0);
+  		super(((SwtPanel)pos.panel).getPanelImpl(), 0);
   		borderColor = mng.propertiesGuiSwt.color("yellow");
   		innerColor = mng.propertiesGuiSwt.color("green");
   		

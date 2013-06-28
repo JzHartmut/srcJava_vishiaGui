@@ -462,9 +462,13 @@ public interface GralMngBuild_ifc
    *        It may or may not a fix widht, it may able to change by mouse actions,
    *        adequate to the possibilities of the used graphic base system. 
    * @return
+   * @deprecated Create an instance of {@link GralTable} and call 
    */
+  @Deprecated
   GralTable addTable(String sName, int height, int[] columnWidths);
 
+  void add(GralTable<?> table);
+  
 
   /**Adds a text to the current panel at given position with standard colors, left origin.
    * The size of text is calculated using the height of positioning values.

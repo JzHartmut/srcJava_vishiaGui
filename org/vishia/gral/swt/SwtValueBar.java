@@ -116,7 +116,7 @@ public class BarWidget extends Canvas
 	{
 		BarWidget()
 		{
-			super((Composite)mng.pos.panel.getPanelImpl(), 0);  //Canvas
+			super(mng.getCurrentPanel(), 0);  //Canvas
 			addPaintListener(paintListener);	
 			
 		}

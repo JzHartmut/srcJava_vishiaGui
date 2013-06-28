@@ -330,6 +330,10 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 
   
   
+  @Override public Composite getCurrentPanel(){ return (Composite)pos.panel.getPanelImpl(); }
+
+  
+  
   @Override public GralPanelContent createCompositeBox(String name)
   {
     //Composite box = new Composite(graphicFrame, 0);
@@ -1234,10 +1238,15 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 	
   @Override public GralTable addTable(String sName, int height, int[] columnWidths)
   {
-    GralTable table = new GralTable(sName, this, columnWidths);
+    GralTable table = new GralTable(sName, columnWidths);
     return SwtTable.addTable(table, this, sName, height, columnWidths);
 
   }
+  
+  @Override public void add(GralTable<?> table){
+    SwtTable.addTable(table, this);
+  }
+
   
   
   @Override public GralMenu addPopupMenu(String sName){

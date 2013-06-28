@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.swt.widgets.TableItem;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -211,8 +212,8 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
   
   
   
-  public GralTable(String name, GralMng mng, int[] columnWidths) {
-    super(name, 'L', mng);
+  public GralTable(String name, int[] columnWidths) {
+    super(name, 'L', null);
     this.columnWidthsGral = columnWidths;
     this.zColumn = columnWidths.length;
     //this.colorBack = new GralColor[zLineVisibleMax];
@@ -222,6 +223,13 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
     setColors();
   }
 
+  
+  
+  public void setToPanel(GralMngBuild_ifc mng){
+    mng.add(this);
+  }
+  
+  
   /**Sets an action which is called any time when another line is selected.
    * This action will be called any time when the selection of the current line is changed. 
    * The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called
@@ -660,8 +668,10 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
 
     
 
-    protected GraphicImplAccess(GralTable<?> outer){ 
+    protected GraphicImplAccess(GralTable<?> outer, GralMng mng){ 
       this.outer = outer; 
+      outer.setPanelMng(mng);
+      outer.pos = mng.getPositionInPanel();
       outer.gi = this; 
       int xdPix = outer.itsMng.propertiesGui().xPixelUnit();
       columnPixel = new int[outer.columnWidthsGral.length+1];

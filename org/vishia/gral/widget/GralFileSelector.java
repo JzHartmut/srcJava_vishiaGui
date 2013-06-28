@@ -272,8 +272,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
   {
     final GralFileSelector outer;
     
-    FileSelectList(GralFileSelector outer){
+    FileSelectList(GralFileSelector outer, String name, int rows, int[] columns, char size){
       //super(name, mng);
+      super(name, rows, columns, size);
       this.outer = outer;
       super.setLeftRightKeys(KeyCode.ctrl + KeyCode.pgup, KeyCode.pgdn);
     }
@@ -445,7 +446,12 @@ public class GralFileSelector implements Removeable //extends GralWidget
   /**The implementation of SelectList. */
   protected FileSelectList selectList;
   
-  protected GralTable favorList;
+  protected final GralTable<?> favorList;
+  
+  //String name; 
+  //final int rows; 
+  //final int[] columns; 
+  //final char size;
   
   /**This action will be called any time when the selection of a current file is changed. */
   GralUserAction actionOnFileSelected;
@@ -543,12 +549,21 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
 
   
-  public GralFileSelector()
-  {
-    selectList = new FileSelectList(this);
+  public GralFileSelector(String name, int rows, int[] columns, char size)
+  { //this.name = name; this.rows = rows; this.columns = columns; this.size = size;
+    favorList = new GralTable(null, new int[]{15,0});
+    selectList = new FileSelectList(this, name, rows, columns, size);
     //this.mainCmd = mainCmd;
   }
   
+  
+  /**Maybe called after construction, should be called before {@link #setToPanel(GralMngBuild_ifc)}
+   * @param name
+   */
+  public void setNameWidget(String name){ 
+    //this.name = name;
+    selectList.wdgdTable.name = name;
+  }
   
   
   public void setDateFormat(String sFormat){
@@ -569,7 +584,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * @param size Presentation size. It is a character 'A'..'E', where 'A' is a small size. The size determines
    *        the font size especially. 
    */
-  public void setToPanel(GralMngBuild_ifc panelMng, String name, int rows, int[] columns, char size)
+  public void setToPanel(GralMngBuild_ifc panelMng)
   {
     //The macro widget consists of more as one widget. Position the inner widgets:
     GralPos posAll = panelMng.getPositionInPanel();
@@ -577,7 +592,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     String sPanel = panel.getName();
     //Text field for path above list
     panelMng.setPosition(posAll, GralPos.same, GralPos.size + 2.0F, GralPos.same, GralPos.same-6, 1, 'r');
-    widgdPath = panelMng.addTextField(name + "-Path", true, null, null);
+    widgdPath = panelMng.addTextField(null, true, null, null);
     widgdPath.setActionChange(actionSetPath);
     widgdPath.setBackColor(panelMng.getColor("pye"), 0xeeffff);  //color pastel yellow
     GralMenu menuFolder = widgdPath.getContextMenu();
@@ -586,13 +601,13 @@ public class GralFileSelector implements Removeable //extends GralWidget
     panelMng.addButton(null, actionFavorButton, "favor");
     //the list
     panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
-    favorList = panelMng.addTable(null, rows, new int[]{15,0});
+    favorList.setToPanel(panelMng);
     favorList.insertLine(null, 0, new String[]{"test", "path"}, null);
     favorList.setVisible(false);
     //
     //at same position as favor table: the file list.
     panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
-    selectList.setToPanel(panelMng, name, rows, columns, size);
+    selectList.setToPanel(panelMng);
     selectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refresh, actionRefreshFileTable);
     selectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refreshCyclicOff, actionSwitchoffCheckRefresh);
     selectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refreshCyclicOn, actionSwitchonCheckRefresh);

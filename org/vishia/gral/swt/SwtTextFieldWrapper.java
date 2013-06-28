@@ -97,7 +97,7 @@ public class SwtTextFieldWrapper extends GralTextField
    */
   public SwtTextFieldWrapper(String name, boolean editable, String prompt, String promptStylePosition, SwtMng mng){
     super(name, editable ? 'T' : 'S', mng);
-    Composite panelSwt = (Composite)mng.pos.panel.getPanelImpl();
+    Composite panelSwt = mng.getCurrentPanel();
     setPanelMng(mng);
     //Text widgetSwt;
     //
@@ -135,9 +135,9 @@ public class SwtTextFieldWrapper extends GralTextField
             heightText = ySize * 0.5f;
           }
           //from top, size of prompt
-          posPrompt.setPosition(mng.pos, GralPos.same - ySize + yPosPrompt, GralPos.size - heightPrompt, GralPos.same, GralPos.same, 0, '.');
+          posPrompt.setPosition(pos, GralPos.same - ySize + yPosPrompt, GralPos.size - heightPrompt, GralPos.same, GralPos.same, 0, '.');
           //from bottom line, size of text
-          posField.setPosition(mng.pos, GralPos.same, GralPos.size - heightText, GralPos.same, GralPos.same, 0, '.');
+          posField.setPosition(pos, GralPos.same, GralPos.size - heightText, GralPos.same, GralPos.same, 0, '.');
         //} break;
       //}
       promptFont = mng.propertiesGuiSwt.getTextFontSwt(heightPrompt, GralFont.typeSansSerif, GralFont.styleNormal); //.smallPromptFont;
@@ -188,14 +188,14 @@ public class SwtTextFieldWrapper extends GralTextField
     if(prompt != null && promptStylePosition !=null && promptStylePosition.startsWith("r")){
       Rectangle swtField = textFieldSwt.getBounds();
       Rectangle swtPrompt = new Rectangle(swtField.x + swtField.width, swtField.y, 0, swtField.height);
-      float hight = mng.pos.height();
+      float hight = pos.height();
       final Font promptFont;
       if(hight <2.0){
         promptFont = mng.propertiesGuiSwt.smallPromptFont;  
       } else { 
         promptFont = mng.propertiesGuiSwt.stdInputFont;  
       }
-      promptSwt = new SwtTransparentLabel((Composite)mng.pos.panel.getPanelImpl(), SWT.TRANSPARENT);
+      promptSwt = new SwtTransparentLabel(mng.getCurrentPanel(), SWT.TRANSPARENT);
       promptSwt.setFont(promptFont);
       promptSwt.setText(prompt);
       Point promptSize = promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);

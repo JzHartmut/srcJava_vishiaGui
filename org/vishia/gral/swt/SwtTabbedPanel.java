@@ -90,7 +90,6 @@ public class SwtTabbedPanel extends GralTabbedPanel
   
 	@Override public GralPanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
 	{ ///
-	  mng.pos.panel = this;  //add the grid panel to this, 
 	  Rectangle sizeTabFolder = widgetSwt.getBounds();
 	  TabItem tabItem = new TabItem(widgetSwt, SWT.None);
 	  tabItem.setText(sLabel);
@@ -111,8 +110,7 @@ public class SwtTabbedPanel extends GralTabbedPanel
 		mng.registerWidget(panel);
     panels.put(sName, panel);   //register the tab panel in the TabbedPanel
 	  mng.setPosition(0, 0, 0, 0, 0, '.');
-	  mng.pos.panel = panel;   //use the new panel as default
-    return panel;
+	  return panel;
   }
 
   

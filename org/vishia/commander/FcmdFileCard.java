@@ -122,7 +122,7 @@ public class FcmdFileCard extends GralFileSelector
    * @param label The label of the tab, it builds the name of all widgets.
    */
   FcmdFileCard(FcmdLeftMidRightPanel mainPanelP, String label){
-    super();
+    super(null, 5, new int[]{2,0,-6,-12}, 'A');
     this.label = label;
     this.main = mainPanelP.main;
     this.mainPanel = mainPanelP;
@@ -131,15 +131,17 @@ public class FcmdFileCard extends GralFileSelector
     this.colorSelectFocused123[1] = GralColor.getColor("lbl");
     this.colorSelectFocused123[2] = GralColor.getColor("lgr");
     String namePanelFile = FcmdWidgetNames.tableFile + nameFilePanel;
+    
+    this.setNameWidget(namePanelFile);
     main.idxFileSelector.put(namePanelFile, this); //it is WidgetNames.tableFile + label +.123, see super(...) 
     GralMng mng = main.gralMng;
     //
     //The favorite paths card
-    favorCard = new FcmdFavorCard(main, this, mainPanel);
     String nameTableSelection = FcmdWidgetNames.tableFavorites + nameFilePanel;
+    favorCard = new FcmdFavorCard(main, nameTableSelection, this, mainPanel);
     GralPanelContent panelFavors = mainPanel.tabbedPanelFavorCards.addGridPanel(FcmdWidgetNames.tabFavorites + nameFilePanel, label,1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd');  
-    favorCard.setToPanel(mng, nameTableSelection, 5, mainPanel.widthSelecttableSub, 'A');
+    favorCard.setToPanel(mng);
     favorCard.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorSelect.");
     panelFavors.setPrimaryWidget(favorCard.wdgdTable);
     //
@@ -161,7 +163,7 @@ public class FcmdFileCard extends GralFileSelector
 
     mng.setPosition(2, 0, 0, 0, 1, 'd');
     //set the base class GralFileSelector to the panel. It contains the path and the table for file selection.
-    setToPanel(mng, namePanelFile, 5, new int[]{2,0,-6,-12}, 'A');
+    setToPanel(mng);
     //GralPos.Coordinate[] columns = new GralPos.Coordinate[4];
     //Sets the columns for the table.
     //super.selectList.wdgdTable.setColumnWidth(50, new int[]{2,0,-6,-11});

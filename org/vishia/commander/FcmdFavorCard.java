@@ -32,8 +32,9 @@ public class FcmdFavorCard  extends GralSelectList
   /**Index of all entries in the visible list. */
   Map<String, FcmdFavorPathSelector.FavorPath> indexFavorPaths = new TreeMap<String, FcmdFavorPathSelector.FavorPath>();
   
-  public FcmdFavorCard(Fcmd main, FcmdFileCard fileTable, FcmdLeftMidRightPanel panel)
+  public FcmdFavorCard(Fcmd main, String name, FcmdFileCard fileTable, FcmdLeftMidRightPanel panel)
   { //super(name, mng);
+    super(name, 20, new int[]{2,15,0}, 'C');
     this.main = main;
     this.mainPanel = panel;
     this.fileTable = fileTable;

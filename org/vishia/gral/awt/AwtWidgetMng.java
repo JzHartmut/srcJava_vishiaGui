@@ -75,6 +75,10 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     mainWindowAwt.addKeyListener(mainKeyListener);
   }
 
+  
+  
+  @Override public Container getCurrentPanel(){ return (Container)pos.panel.getPanelImpl(); }
+
 
   
   /** Adds a text field for showing or editing a text value.
@@ -89,7 +93,7 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
    * @return
    */
   @Override public GralTextField addTextField(String name, boolean editable, String prompt, String promptStylePosition)
-  { Container parent = (Container)pos.panel.getPanelImpl();
+  { Container parent = getCurrentPanel();
     AwtTextField widg = new AwtTextField(name, editable ? 'T' : 'S', this, parent);
     widg.setPanelMng(this);
     widg.widgetAwt.setFont(propertiesGuiAwt.stdInputFont);
@@ -382,6 +386,9 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     // TODO Auto-generated method stub
     return null;
   }
+  
+  public void add(GralTable<?> table){}
+
 
   @Override
   public GralWidget addText(String sText, char size, int color)

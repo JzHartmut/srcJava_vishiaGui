@@ -91,7 +91,7 @@ public class FcmdLeftMidRightPanel
     this.cc = cc;
     this.cNr = cNr;
     this.ixMainPanel = cNr - '1';
-    cardFavorThemes = new FcmdFavorThemeCard(main, this);
+    cardFavorThemes = new FcmdFavorThemeCard(main, FcmdWidgetNames.tableFavoritesMain + cNr, this);
     
   }
   
@@ -120,13 +120,13 @@ public class FcmdLeftMidRightPanel
     mng.setPosition(0, 0, 0, 0, 1, 'd');
     tabbedPanelFavorCards.addGridPanel(nameGridPanel, tabLabelGridPanel, 1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd');
-    cardFavorThemes.setToPanel(mng, FcmdWidgetNames.tableFavoritesMain + cNr, 'A');
+    cardFavorThemes.setToPanel(mng);
     fillCards();  //build the rest of all tabs and panels depending on content of favorites.
     
     if(cNr == '1'){ //commands only in the left panel.
       tabbedPanelFileCards.addGridPanel("cmd", "Cmd",1,1,10,10);
       mng.setPosition(2, -2, 0, -0, 1, 'd');
-      main.cmdSelector.setToPanel(mng, "cmds", 5, new int[]{0,-10}, 'A');
+      main.cmdSelector.setToPanel(mng);
       main.cmdSelector.fillIn();
       main.cmdSelector.setGetterFiles(main.getterFiles);
     }
@@ -296,17 +296,20 @@ public class FcmdLeftMidRightPanel
     /**Index of all entries in the visible list. */
     Map<String, FcmdFavorPathSelector.FavorFolder> indexFavorFolders = new TreeMap<String, FcmdFavorPathSelector.FavorFolder>();
     
-    final int[] widthSelecttableMain = new int[]{10, 30};
+    //final int[] widthSelecttableMain = new int[]{10, 30};
 
-    public FcmdFavorThemeCard(Fcmd main, FcmdLeftMidRightPanel panel)
+    public FcmdFavorThemeCard(Fcmd main, String name, FcmdLeftMidRightPanel panel)
     { //super(name, mng);
+      super(name, 20, new int[]{10, 30}, 'C');
+
       mainPanel = panel;
     }
 
     
     
-    public void setToPanel(GralMngBuild_ifc panel, String name, char size){
-      super.setToPanel(panel, name, 20, widthSelecttableMain, size);
+    @Override
+    public void setToPanel(GralMngBuild_ifc panel){
+      super.setToPanel(panel);
       wdgdTable.specifyActionOnLineSelected(actionFavorThemeLineSelected);
       wdgdTable.setHtmlHelp(mainPanel.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.tabSelect.");
     }

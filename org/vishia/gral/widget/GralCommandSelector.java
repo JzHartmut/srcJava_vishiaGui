@@ -51,16 +51,16 @@ public class GralCommandSelector extends GralSelectList
   protected CmdStore.CmdBlock selectedCmd;
   
   
-  public GralCommandSelector(String name, CmdQueue cmdQueue, GralMng mng)
-  { super();
+  public GralCommandSelector(String name, int rows, int[] columns, char size, CmdQueue cmdQueue, GralMng mng)
+  { super(name, rows, columns, size);
     this.cmdStore = new CmdStore();
     this.cmdQueue = cmdQueue;
   }
   
   
   @Override
-  public void setToPanel(GralMngBuild_ifc gralMng, String name, int rows, int[] columns, char size){
-    super.setToPanel(gralMng, name, rows, columns, size);
+  public void setToPanel(GralMngBuild_ifc gralMng){
+    super.setToPanel(gralMng);
     wdgdTable.specifyActionOnLineSelected(actionOnLineSelected);
   }
 
