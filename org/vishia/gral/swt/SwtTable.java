@@ -160,7 +160,6 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
         Composite parent = mng.getCurrentPanel();
         table = new SwtTable(gralTable, mng, parent); //, selectionColumn, selectionText);
         table.outer.setDataPath(sName);
-        table.outer.setPanelMng(mng);
         table.table.setData(table);
         mng.registerWidget(gralTable);
         //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
@@ -175,7 +174,6 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
         final SwtTable table;
         Composite parent = mng.getCurrentPanel();
         table = new SwtTable(gralTable, mng, parent); //, selectionColumn, selectionText);
-        table.outer.setPanelMng(mng);
         table.table.setData(table);
         mng.registerWidget(gralTable);
         //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
@@ -430,7 +428,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
 
   protected void setBoundsCells(){
     Rectangle parentBounds = table.getParent().getBounds();
-    GralRectangle pixTable = outer.pos.calcWidgetPosAndSize(itsMng().propertiesGui(), parentBounds.width, parentBounds.height, 0, 0);
+    GralRectangle pixTable = outer.pos().calcWidgetPosAndSize(itsMng().propertiesGui(), parentBounds.width, parentBounds.height, 0, 0);
     int xPixelUnit = itsMng().propertiesGui().xPixelUnit();
     int xPixel1 = 0;
     xpixelCell[0] = xPixel1;

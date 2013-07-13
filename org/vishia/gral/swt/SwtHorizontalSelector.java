@@ -75,17 +75,16 @@ public class SwtHorizontalSelector extends GralHorizontalSelector<?>.GraphicImpl
   { wdgGral.super();
     this.mng = mng;
     super.outer.setPanelMng(mng);
-    super.outer.pos = mng.getPositionInPanel();
     //this.wdgGral = wdgGral;
     //this.wdgGralAccess = new GralWidgetAccess(wdgGral);
     wdgGral.implMethodWidget_.setWidgetImpl(this);
-    Composite panel = (Composite)outer.pos.panel.getPanelImpl();
+    Composite panel = (Composite)outer.pos().panel.getPanelImpl();
     widgetSwt = new Canvas(panel,0);
     widgetSwt.setData(wdgGral);
     widgetSwt.addPaintListener(paintListener);
     widgetSwt.addMouseListener(mouseListener);
     mng.setBounds_(widgetSwt);
-    float ySize = outer.pos.height();
+    float ySize = outer.pos().height();
     char size1 = ySize > 3? 'B' : 'A';
     switch(size1){ 
       case 'A': fontText = mng.propertiesGuiSwt.stdInputFont; break;
@@ -163,6 +162,9 @@ public class SwtHorizontalSelector extends GralHorizontalSelector<?>.GraphicImpl
     if(ixLeftItem >=0){
       int ixItem = ixLeftItem;
       int zItem = super.nrofTabs();
+      if(ixItem >= zItem){ 
+        ixItem = zItem -1; 
+      }
       do {
         GralHorizontalSelector.Item item = super.tab(ixItem); 
         if(item.xSize == 0){

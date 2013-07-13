@@ -67,7 +67,7 @@ public class SwtTabbedPanel extends GralTabbedPanel
 	SwtTabbedPanel(String namePanel, SwtMng mng, GralPanelActivated_ifc user, int property)
 	{ super(namePanel, mng, user, property);  //initializes as GralWidget and as GralPanel
 		this.mng = mng;
-		Object oParent = this.pos.panel.getPanelImpl();
+		Object oParent = this.pos().panel.getPanelImpl();
     if(oParent == null || !(oParent instanceof Composite) ){ throw new IllegalArgumentException("Software error. You must select a panel before."); }
 		Composite parent = (Composite)oParent;
 		

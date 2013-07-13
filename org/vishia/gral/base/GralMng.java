@@ -386,6 +386,14 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   @Override public GralPos getPositionInPanel(){ return pos.clone(); }
+  
+  public GralPos getPosCheckNext(){ 
+    if(posUsed){
+      pos.setNextPosition();
+      posUsed = false;
+    }
+    return pos.clone(); 
+  }
 	
   /**Map of all panels. A panel may be a dialog box etc. */
   protected final Map<String,GralPanelContent> panels = new TreeMap<String,GralPanelContent>();
@@ -573,7 +581,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
     sCurrPanel = sName;
     if(pos.panel == null && currTabPanel !=null) {
       //use the position of the current tab panel for the WidgetMng. Its panel is the parent.
-      pos.set(currTabPanel.pos);  
+      pos.set(currTabPanel.pos());  
       pos.panel = currTabPanel.addGridPanel(sName, /*"&" + */sName,1,1,10,10);
       panels.put(sName, pos.panel);  //TODO unnecessay, see addGridPanel
       log.sendMsg(0, "GuiPanelMng:selectPanel: unknown panel name %s", sName);
@@ -660,7 +668,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   @Override public void registerWidget(GralWidget widgd)
   {
-    GralPanelContent panel = widgd.pos !=null ? widgd.pos.panel : this.pos.panel;
+    GralPanelContent panel = widgd.pos() !=null ? widgd.pos().panel : this.pos.panel;
     if(widgd.name != null){
       indexNameWidgets.put(widgd.name, widgd);
     }
@@ -1042,7 +1050,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
       //GralPanelContent currPanel = 
       GralWidget widgd = getWidgetInFocus();
       if(widgd !=null){
-        GralPanelContent panel = widgd.pos.panel;
+        GralPanelContent panel = widgd.pos().panel;
         String namePanel = panel.namePanel;
         cfgBuilder.buildGui(log, 0);
         //designer.editFieldProperties(widgd, null);

@@ -98,7 +98,7 @@ public class SwtTextFieldWrapper extends GralTextField
   public SwtTextFieldWrapper(String name, boolean editable, String prompt, String promptStylePosition, SwtMng mng){
     super(name, editable ? 'T' : 'S', mng);
     Composite panelSwt = mng.getCurrentPanel();
-    setPanelMng(mng);
+    //in ctor: setPanelMng(mng);
     //Text widgetSwt;
     //
     if(prompt != null && promptStylePosition !=null && promptStylePosition.startsWith("t")){
@@ -109,7 +109,7 @@ public class SwtTextFieldWrapper extends GralTextField
       final GralPos posPrompt = new GralPos(), posField = new GralPos();
 
       //boundsAll = mng.calcWidgetPosAndSize(this.pos, 800, 600, 100, 20);
-      float ySize = pos.height();
+      float ySize = pos().height();
       //float xSize = pos.width();
       //posPrompt from top, 
       float yPosPrompt, heightPrompt, heightText;
@@ -135,9 +135,9 @@ public class SwtTextFieldWrapper extends GralTextField
             heightText = ySize * 0.5f;
           }
           //from top, size of prompt
-          posPrompt.setPosition(pos, GralPos.same - ySize + yPosPrompt, GralPos.size - heightPrompt, GralPos.same, GralPos.same, 0, '.');
+          posPrompt.setPosition(pos(), GralPos.same - ySize + yPosPrompt, GralPos.size - heightPrompt, GralPos.same, GralPos.same, 0, '.');
           //from bottom line, size of text
-          posField.setPosition(pos, GralPos.same, GralPos.size - heightText, GralPos.same, GralPos.same, 0, '.');
+          posField.setPosition(pos(), GralPos.same, GralPos.size - heightText, GralPos.same, GralPos.same, 0, '.');
         //} break;
       //}
       promptFont = mng.propertiesGuiSwt.getTextFontSwt(heightPrompt, GralFont.typeSansSerif, GralFont.styleNormal); //.smallPromptFont;
@@ -188,7 +188,7 @@ public class SwtTextFieldWrapper extends GralTextField
     if(prompt != null && promptStylePosition !=null && promptStylePosition.startsWith("r")){
       Rectangle swtField = textFieldSwt.getBounds();
       Rectangle swtPrompt = new Rectangle(swtField.x + swtField.width, swtField.y, 0, swtField.height);
-      float hight = pos.height();
+      float hight = pos().height();
       final Font promptFont;
       if(hight <2.0){
         promptFont = mng.propertiesGuiSwt.smallPromptFont;  

@@ -74,7 +74,7 @@ public class SwtButton extends GralButton
     widgetSwt.addMouseListener(mouseListener);
     widgetSwt.addFocusListener(mng.focusListener);  //common focus listener 
     setBoundsGraphic(mng);
-    float ySize = pos.height();
+    float ySize = pos().height();
     char size1 = ySize > 3? 'B' : 'A';
     switch(size1){ 
       case 'A': fontText = mng.propertiesGuiSwt.stdInputFont; break;

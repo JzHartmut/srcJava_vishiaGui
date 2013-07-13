@@ -70,7 +70,7 @@ public class Fcmd extends GuiCfg
   public static final int version = 20130626;
 
   /**Version visible in about info */
-  public static final String sVersion = "Version 1.10 - 2013-06-26";
+  public static final String sVersion = "Version 1.10 - 2013-07-04";
   
   static class CallingArgs extends GuiCallingArgs
   {
@@ -354,7 +354,10 @@ public class Fcmd extends GuiCfg
   
   void setLastSelectedPanel(FcmdLeftMidRightPanel panel){
     if(lastFilePanels.size() == 0 || lastFilePanels.get(0) != panel){
-      lastFilePanels.remove(panel);  //if it is in list on higher position
+      if(!lastFilePanels.remove(panel)){  //if it is in list on higher position
+        System.err.println("Fcmd - setLastSelectedPanel() faulty; try remove panel=" + panel.toString());
+        //The file panel should be known!
+      }
       lastFilePanels.add(0, panel);
     }
 
@@ -411,6 +414,7 @@ public class Fcmd extends GuiCfg
       } else {
         ret[++ix] = null;  //the panel hasn't a file selected now.
       }
+      if(ix >=2) break;  //prevent exception because older error
     }
     //Note: There may be less than 3 file panels, rest of files are null.
     return ret;

@@ -378,7 +378,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   {
     SwtGraphicThread swtDevice = (SwtGraphicThread)gralDevice;
     SwtSubWindow window = new SwtSubWindow(name, swtDevice.displaySwt, title, windProps, this);
-    GralRectangle rect = calcPositionOfWindow(window.pos);
+    GralRectangle rect = calcPositionOfWindow(window.pos());
     window.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
     //window.window.redraw();
     //window.window.update();
@@ -906,8 +906,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 @Override public GralTextBox addTextBox(String name, boolean editable, String prompt, char promptStylePosition)
 { SwtTextBox widgetSwt = new SwtTextBox(name, (Composite)pos.panel.getPanelImpl(), SWT.MULTI|SWT.H_SCROLL|SWT.V_SCROLL, this);
   GralWidget widgetInfo = widgetSwt;
-  widgetInfo.setPanelMng(this);
-  //Text widgetSwt = new Text(((PanelSwt)pos.panel).getPanelImpl(), SWT.MULTI);
+  //in ctor: widgetInfo.setPanelMng(this);
   widgetSwt.textFieldSwt.setFont(propertiesGuiSwt.stdInputFont);
   widgetSwt.textFieldSwt.setEditable(editable);
   if(editable)
@@ -1007,7 +1006,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   	setPosAndSize_(widget.widgetSwt);
   	Rectangle rect = widget.widgetSwt.getBounds();
   	widget.horizontal = rect.width > rect.height;
-  	widget.setPanelMng(this);
+  	//widget.setPanelMng(this);
   //  widget.setShowMethod(sShowMethod);
   	widget.setDataPath(sDataPath);
     //widget.widget.setData(widgetInfos);
@@ -1073,27 +1072,10 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
       stop();
     widgButton.setActionChange(action);  //maybe null
   	widgButton.setText(sButtonText);
-    //ButtonSwt button = new ButtonSwt(this, null, size);
-  	//GralWidget widgetInfos = new WidgetSimpleWrapperSwt(sName, 'B', button);
-    widgButton.setPanelMng(this);
-    //button.setForeground(propertiesGuiSwt.colorSwt(0xff00));
-    //button.setSize(propertiesGui.xPixelUnit() * xSize -2, propertiesGui.yPixelUnit() * ySize -2);
-    //setBounds_(button);
+    //in ctor: widgButton.setPanelMng(this);
     widgButton.sCmd = sCmd;
-    //widgButton.setShowMethod(sShowMethod);
     widgButton.setDataPath(sDataPath);
-    //pos.panel.widgetIndex.put(sName, widgButton);
     registerWidget(widgButton);
-    /*
-    if(action != null){
-    	widgButton.widgetSwt.addMouseListener( new MouseClickActionForUserActionSwt(this, action, null, "Button-up", null));
-    } else {
-      widgButton.widgetSwt.addMouseListener(mouseClickForInfo);
-    }
-    if(sName != null){
-      indexNameWidgets.put(sName, widgButton);
-    }
-    */
     return widgButton;
   }
   
@@ -1122,7 +1104,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     widgButton.setSwitchMode(colorOff, colorOn);
     widgButton.setActionChange(action);  //maybe null
     widgButton.setText(sButtonText);
-    widgButton.setPanelMng(this);
+    //widgButton.setPanelMng(this);
     widgButton.sCmd = sCmd;
     widgButton.setDataPath(sDataPath);
     registerWidget(widgButton);
@@ -1147,7 +1129,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     SwtButton widgButton = new SwtButton(sName, this, (Composite)pos.panel.getPanelImpl(), 0, size);
     widgButton.setSwitchMode(colorOff, colorOn);
     widgButton.setSwitchMode(sButtonTextOff, sButtonTextOn);
-    widgButton.setPanelMng(this);
+    //in ctor: widgButton.setPanelMng(this);
     if(sName !=null){ registerWidget(widgButton); }
     return widgButton;
   }
@@ -1171,7 +1153,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     SwtButton widgButton = new SwtButton(sName, this, (Composite)pos.panel.getPanelImpl(), 0, size);
     widgButton.setSwitchMode(colorOff, colorOn, colorDisabled);
     widgButton.setSwitchMode(sButtonTextOff, sButtonTextOn, sButtonTextDisabled);
-    widgButton.setPanelMng(this);
+    //widgButton.setPanelMng(this);
     if(sName !=null){ registerWidget(widgButton); }
     return widgButton;
   }
@@ -1197,7 +1179,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     int xSize = (int)(pos.width());
 
     GralLed widgetInfos = new SwtLed(sName, this);
-    widgetInfos.setPanelMng(this);
+    //widgetInfos.setPanelMng(this);
     widgetInfos.setDataPath(sDataPath);
     //widgetInfos.setShowMethod(sShowMethod);
     registerWidget(widgetInfos);
@@ -1569,9 +1551,9 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 	  
 	  if(owidg !=null){
 	    Control swtWidget = (Control)owidg;
-	    GralPanelContent panel = widgd.pos.panel;
+	    GralPanelContent panel = widgd.pos().panel;
 	    GralRectangle size = panel.getPixelSize();
-	    GralRectangle posSize = calcWidgetPosAndSize(widgd.pos, size.dx, size.dy, 0, 0);
+	    GralRectangle posSize = calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
   	  //Note: the swtWidget may have a resizeListener, see there.
 	    swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
   	  swtWidget.redraw();

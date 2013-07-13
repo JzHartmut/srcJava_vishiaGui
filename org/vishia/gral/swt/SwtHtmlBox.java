@@ -54,7 +54,7 @@ public class SwtHtmlBox extends GralHtmlBox
   {
     super(name, mng);
     SwtMng mngSwt = (SwtMng)mng;
-    Composite parent = (Composite)(pos.panel.getPanelImpl());
+    Composite parent = (Composite)(pos().panel.getPanelImpl());
     try {
       boxSwt = new Browser(parent,0);
       mng.registerWidget(this);

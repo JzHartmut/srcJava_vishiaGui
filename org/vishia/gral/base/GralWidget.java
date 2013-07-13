@@ -300,7 +300,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   public String name;
   
   /**The position of the widget. It may be null if the widget should not be resized. */
-  public GralPos pos;  
+  private GralPos pos;  
   
   
   /**Panel where the widget is member of. */
@@ -521,7 +521,16 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     this.itsCfgElement = null;
     this.itsMng = mng;
     if(mng !=null){
+      //sets the mng and the pos of Window in that cases
+      //where the mng is present on ctor. (not in new form)
+      setPanelMng(mng);   
+      /*
+      if(mng.posUsed){
+        mng.pos.setNextPosition();
+        mng.posUsed = false;
+      }
       this.pos = mng.getPositionInPanel();  //Note: makes a clone because the pos in panel is reused. 
+      */
     }
   }
   
@@ -539,6 +548,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   public void setToPanel(GralMngBuild_ifc mng) throws IllegalStateException {
     throw new IllegalArgumentException("GralWidget - setToPanel should be overridden");
   }
+  
+  
+  public GralPos pos(){ return pos; } 
   
   
   /**Returns this.
@@ -795,8 +807,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   
-  public void setPanelMng(GralMng panel)
-  { this.itsMng = panel; 
+  public void setPanelMng(GralMng mng)
+  { this.itsMng = mng; 
+    if(this.pos !=null) 
+      throw new IllegalStateException("GralWidget - setPos() is set already.");
+    this.pos = mng.getPosCheckNext();  //always clone it from the central pos 
+
   }
   
   
@@ -1323,8 +1339,15 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
 
   @Override
   public boolean setFocusGThread()
-  { if(wdgImpl !=null) return wdgImpl.setFocusGThread();
-    else return false;
+  { boolean ret;
+    try{
+      if(wdgImpl !=null) ret = wdgImpl.setFocusGThread();
+      else ret = false;
+    } catch(Exception exc){
+      System.err.println("GralWidget - setFocusGThread fails");
+      ret = false;
+    }
+    return ret;
   }
   
   

@@ -672,7 +672,6 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
     protected GraphicImplAccess(GralTable<?> outer, GralMng mng){ 
       this.outer = outer; 
       outer.setPanelMng(mng);
-      outer.pos = mng.getPositionInPanel();
       outer.gi = this; 
       int xdPix = outer.itsMng.propertiesGui().xPixelUnit();
       columnPixel = new int[outer.columnWidthsGral.length+1];

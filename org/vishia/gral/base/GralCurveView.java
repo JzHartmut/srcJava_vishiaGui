@@ -723,7 +723,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     }
     saveOrg.nrofValuesAutoSave = (int)(maxNrofXValues * 0.75);
     //values = new float[maxNrofXvalues][nrofTracks];
-    setPanelMng(mng);
+    //setPanelMng(mng);
     timeorg.calc();
 
     mng.registerWidget(this);
