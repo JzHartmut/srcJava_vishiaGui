@@ -968,6 +968,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
         String sFileName = file.getName();
         if(lineCt < zLines){ 
           tline = selectList.wdgdTable.getLine(lineCt);
+          if(tline == null)
+            Assert.stop();
         }
         else {
           tline = selectList.wdgdTable.insertLine(sFileName, -1, null, null);

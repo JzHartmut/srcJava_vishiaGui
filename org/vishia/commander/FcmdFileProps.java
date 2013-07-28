@@ -232,6 +232,7 @@ public class FcmdFileProps
   void showFileInfos(FileRemote src){
     if(isVisible && !evChg.isOccupied()){
       actFile = src;
+      //TODO don't access the file system without user activity!!! need: a refresh button!!
       widgChgFile.setText(main.idents.buttonFilePropsChg);
       widgChrRecurs.setText(main.idents.buttonFilePropsChgRecurisve);
       widgCopyFile.setText(main.idents.buttonFilePropsCopy);
