@@ -462,6 +462,9 @@ public class FcmdFileCard extends GralFileSelector
     main.setLastSelectedPanel(mainPanel);
     int ixMainPanel = -1;
     for(FcmdLeftMidRightPanel panel: main.lastFilePanels){
+      if(ixMainPanel >=2) {
+        break;
+      }
       if(panel.actFileCard !=null){
         panel.actFileCard.selectList.wdgdTable.setColorCurrLine(colorSelectFocused123[++ixMainPanel]);
         panel.orderMainPanel = ixMainPanel +1;

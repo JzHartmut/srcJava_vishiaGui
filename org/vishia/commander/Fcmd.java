@@ -150,7 +150,9 @@ public class Fcmd extends GuiCfg
   final File[] selectedFiles123 = new File[3];
   
   
-  /**The last selected file panels in its order of selection. The panel knows the last used file card there. 
+  /**The last selected file panels in its order of selection.
+   * This list contains max 3 entries. 
+   * To get the last selected files: The panel knows the last used file card there. 
    * The selected file1, file2 are anytime in one and the other panel. */
   List<FcmdLeftMidRightPanel> lastFilePanels = new LinkedList<FcmdLeftMidRightPanel>();
   
@@ -255,6 +257,7 @@ public class Fcmd extends GuiCfg
     guiW.outputBox.setActionChange(executer.actionCmdFromOutputBox);
     String sHelpUrlDir = cargs.dirHtmlHelp.getAbsolutePath();
     gui.setHelpUrl(sHelpUrlDir + "/Fcmd.html");
+    lastFilePanels.clear();
     lastFilePanels.add(favorPathSelector.panelMid);
     lastFilePanels.add(favorPathSelector.panelRight);
     lastFilePanels.add(favorPathSelector.panelLeft);
