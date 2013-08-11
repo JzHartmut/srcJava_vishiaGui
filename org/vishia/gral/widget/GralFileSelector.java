@@ -578,7 +578,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * The instance has more as one widget, all widgets are set in the area of the given position.
    * The position area should be a range of at least 3 lines.
    * @param panelMng The panelManager. 
-   * @param name The name of the table widget. The Text-widget for the path gets the name * "-Path".
+   * @param identArgJbat The name of the table widget. The Text-widget for the path gets the name * "-Path".
    * @param rows Number of rows to show
    * @param columns Array with column width.
    * @param size Presentation size. It is a character 'A'..'E', where 'A' is a small size. The size determines

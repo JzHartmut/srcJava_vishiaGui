@@ -112,7 +112,7 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
 
   /**
    * @param panel
-   * @param name
+   * @param identArgJbat
    * @param rows
    * @param columns
    * @param size

@@ -65,6 +65,9 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
 
   /**Version and history
    * <ul>
+   * <li>2013-08-11 Hartmut chg: {@link #getMarkedLines()} now checkes the {@link TableLineData#userData}
+   *   whether that is instanceof {@link SelectMask_ifc}. If true then uses its selection state
+   *   instead the selection state of the {@link TableLineData}.
    * <li>2013-06-29 Hartmut chg: refactoring. Now a GralTable<generic> can be created before the graphic is build. It is the new schema of GralWidget.
    *   The inner class {@link GraphicImplAccess} is provided as super class for the graphic implementation class,
    *   for example {@link org.vishia.gral.swt.SwtTable}.
@@ -262,7 +265,7 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
    * and {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}.
    *  
    * @param col The column, see {@link #getContextMenuColumn(int)}
-   * @param name The name of the entry, see {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
+   * @param identArgJbat The name of the entry, see {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
    * @param sMenuPath same like {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
    * @param action same like {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
    *   Note that the {@link GralWidget_ifc}-parameter of the {@link GralUserAction#exec(int, GralWidget_ifc, Object...)}
@@ -487,8 +490,13 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
   @Override public List<GralTableLine_ifc<UserData>> getMarkedLines() {
     List<GralTableLine_ifc<UserData>> list = new LinkedList<GralTableLine_ifc<UserData>>();
     for(TableLineData<UserData> item: tableLines){
-      if((item.getSelection() & 1) !=0){
+      if(item.userData instanceof SelectMask_ifc){
+        if(((SelectMask_ifc)item.userData).getSelection() !=0){
           list.add(item);
+        }
+      }
+      else if((item.getSelection() & 1) !=0){
+        list.add(item);
       }
     }
     return list;
@@ -1089,7 +1097,7 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
     
     public GralColor colorForground, colorBackground;
     
-    private UserData userData;
+    protected UserData userData;
     
     //TODO GralColor colorBack, colorText;
     

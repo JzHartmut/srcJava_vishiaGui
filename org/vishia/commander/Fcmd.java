@@ -39,7 +39,7 @@ public class Fcmd extends GuiCfg
 
   /**Version, history and license.
    * <ul>
-   * <li>1011-2012 some changes, see source files.
+   * <li>1011-2013 some changes, see source files.
    * <li>2011-10-00 Hartmut created
    * </ul>
    * 
@@ -367,6 +367,9 @@ public class Fcmd extends GuiCfg
   }
 
   /**Get the last selected files in order of selection of the file panels.
+   * If the current file of any panel is marked, then all other marked files (but not directories)
+   * of this panel are taken as next files. But only 3 at all.
+   * It is possible to mark two files in one file panel to execute an application with them.
    * New method since 2011-12-23
    * @return array[3] of the last selected files in the file panels. It has always a length of 3
    *   but not all elements are set ( they are ==null) if no files were selected before.
@@ -382,14 +385,18 @@ public class Fcmd extends GuiCfg
       //for(FcmdLeftMidRightPanel panel: lastFilePanels){
       FcmdFileCard fileCard = panel.actFileCard;
       if(fileCard !=null){
-        List<FileRemote> listFiles = fileCard.getSelectedFiles();
-        if(listFiles !=null && listFiles.size() > 0){
+        ret[++ix] = fileCard.currentFile;
+        if(fileCard.currentFile !=null && fileCard.currentFile.isSelected(0x1)){
+          //if the current file is marked, use all marked files.
+          List<FileRemote> listFiles = fileCard.getSelectedFiles();
+          assert(listFiles !=null && listFiles.size() > 0);  //at least the current file is marked.
           Iterator<FileRemote> iter= listFiles.iterator();
           while(ix < 2 && iter.hasNext()){
-            ret[++ix] = iter.next();
+            FileRemote file = iter.next();
+            if(file != fileCard.currentFile && !file.isDirectory()){
+              ret[++ix] = file;
+            }
           }
-        } else {
-          ret[++ix] = fileCard.currentFile;
         }
       } else {
         //ret[++ix] = null;  //the panel hasn't a file selected now.
