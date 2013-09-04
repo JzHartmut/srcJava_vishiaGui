@@ -718,10 +718,10 @@ class FcmdFavorPathSelector
   GralUserAction actionDeselectDirtree = new GralUserAction("actionDeselectDirtree")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
       FcmdFileCard fileCard = main.getLastSelectedFileCard();
-      FileRemote[] lastFiles = main.getLastSelectedFiles();
+      FileRemote[] lastFiles = main.getLastSelectedFiles(true, 1);
       //if(fileCard !=null){
       if(lastFiles[0] !=null){
-        lastFiles[0].resetSelectedRecurs(1, null);
+        lastFiles[0].resetMarkedRecurs(1, null);
         //fileCard.f  //TODO refresh
       }
       return true;

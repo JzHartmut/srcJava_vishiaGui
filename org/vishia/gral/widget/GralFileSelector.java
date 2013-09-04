@@ -35,7 +35,7 @@ import org.vishia.util.EventSource;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
-import org.vishia.util.SelectMask_ifc;
+import org.vishia.util.MarkMask_ifc;
 import org.vishia.util.Timeshort;
 
 /**This class is a large widget which contains a list to select files in a directory, 
@@ -57,6 +57,12 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2013-09-05 Hartmut chg: {@link #getSelectedFiles(boolean, int)} now has that 2 arguments for directory and mark mask.
+   *   Now it is possible and necessary for the application to choice whether directories are gotten too.
+   *   The usage is improved. If some files are marked but not visible, it was able that the user does not know about
+   *   this situation and an unexpected behavior for the user is done. Now only marked files are returned
+   *   if the current file is marked too. The method is correct named 'selected' because the selection is returned,
+   *   either the current file or all marked. 
    * <li>2013-06-15 Hartmut chg: {@link #fillIn(FileRemote, boolean)} modi of refresh.
    * <li>2013-05-30 Hartmut new: switch refresh mode on and off
    * <li>2013-05-20 Hartmut chg: {@link #fillInRefreshed(FileRemote, boolean)} now does not clear
@@ -67,7 +73,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * <li>2013-04-30 Hartmut new: {@link #checkRefresh(long)}, chg: Don't change the content in the table
    *   if the content is identical with the current presentation in table, for refreshing. 
    * <li>2013-04-30 Hartmut chg: {@link #fillIn(FileRemote, boolean)} now uses the {@link FileRemote#timeRefresh}
-   * <li>2013-04-28 Hartmut new: {@link #actionOnMarkLine} changes the select status of {@link FileRemote#setSelected(int)}
+   * <li>2013-04-28 Hartmut new: {@link #actionOnMarkLine} changes the select status of {@link FileRemote#setMarked(int)}
    * <li>2013-04-12 Hartmut adapt Event, FileRemote: The attributes Event.data1, data2, oData, refData are removed. Any special data should be defined in any derived instance of the event. A common universal data concept may be error-prone  because unspecified types and meanings.
    *   FileRemote: Dedicated attributes for {@link CallbackCmd#successCode} etc.
    * <li>2013-03-28 Hartmut chg: {@link #setToPanel(GralMngBuild_ifc, String, int, int[], char)} preserves the panel
@@ -243,23 +249,23 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   
-  private final SelectMask_ifc actionOnMarkLine = new SelectMask_ifc(){
+  private final MarkMask_ifc actionOnMarkLine = new MarkMask_ifc(){
 
-    @Override public int getSelection()
+    @Override public int getMark()
     {return 0;
     }
 
-    @Override public int setDeselect(int mask, Object oData)
+    @Override public int setNonMarked(int mask, Object oData)
     { assert(oData instanceof FileRemote);
       FileRemote file = (FileRemote)oData;
-      file.resetSelected(mask);
+      file.resetMarked(mask);
       return mask;
     }
 
-    @Override public int setSelect(int mask, Object oData)
+    @Override public int setMarked(int mask, Object oData)
     { assert(oData instanceof FileRemote);
       FileRemote file = (FileRemote)oData;
-      file.setSelected(mask);
+      file.setMarked(mask);
       return mask;
     }
     
@@ -983,7 +989,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
           tline.setCellText(sDesignation, kColDesignation);
           tline.setCellText(sFileName, kColFilename);
           tline.setUserData(file);
-          tline.setDeselect(1, null);
+          tline.setNonMarked(1, null);
           selectList.wdgdTable.replaceLineKey(tline, sFileName);
         } else { //same file, don't change line.
           long dateFile = file.lastModified();
@@ -1150,20 +1156,46 @@ public class GralFileSelector implements Removeable //extends GralWidget
 
 
   
-  /**Gets all selected file from this panel.
-   * @return null if no line is selected, for example if the panel isn't used yet.
+  /**Gets the selected file from this panel.
+   * If the current file of this panel is marked, then all other marked files and directories
+   * of this panel are returned too. If the current file is not marked, then only this current file
+   * is returned as selected file.
+   * <br><br>
+   * Strategy changed since 2013-09-05: Before, the marked files are returned. But it is possible
+   * that some files are marked outside of the visible area, and the user does not know that there are
+   * marked files.
+   * In this case an unexpected behavior from the user's view occurs. 
+   * If the user selects a marked file, then one should be sure that there are other marked files 
+   * in non visible areas too.
+   * 
+   * @param bAlsoDirs false then returns never a directory. If the current selected file is a directory
+   *   then return null. 
+   * @return null if no line is selected, for example if the panel isn't used yet. 
+   *   If the current file is non-marked, then returns a list of only 1 element, that current file.
+   *   If the current file is marked, return all marked files. 
    */
-  public List<FileRemote> getSelectedFiles()
-  { List<FileRemote> list = new LinkedList<FileRemote>();
-    if(selectList.wdgdTable == null){
+  public List<FileRemote> getSelectedFiles(boolean bAlsoDirs, int mask)
+  { if(selectList.wdgdTable == null){
       stop();
       return null;
+    } else if(currentFile == null){
+      return null;
+    } else if(currentFile.isMarked(0x1)){
+      List<FileRemote> list = new LinkedList<FileRemote>();
+      for(GralTableLine_ifc<FileRemote> line: selectList.wdgdTable.getMarkedLines(mask)){
+        FileRemote file = line.getUserData();
+        if(bAlsoDirs || !file.isDirectory()){
+          list.add(file);
+        }
+      }
+      return list;
+    } else if(bAlsoDirs || !currentFile.isDirectory()) {
+      List<FileRemote> list = new LinkedList<FileRemote>();
+      list.add(currentFile);
+      return list;
+    } else { //no mark file selected, current file is a directory.
+      return null;
     }
-    for(GralTableLine_ifc<FileRemote> line: selectList.wdgdTable.getMarkedLines()){
-      FileRemote file = line.getUserData();
-      list.add(file);
-    }
-    return list;
   }
   
   
@@ -1415,7 +1447,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
     //if(fileCard !=null){
     if(currentFile !=null){
-      currentFile.resetSelectedRecurs(1, null);
+      currentFile.resetMarkedRecurs(1, null);
       //fileCard.f  //TODO refresh
     }
     return true;

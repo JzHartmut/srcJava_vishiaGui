@@ -19,7 +19,7 @@ import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
 import org.vishia.util.SelectMask;
-import org.vishia.util.SelectMask_ifc;
+import org.vishia.util.MarkMask_ifc;
 
 /**This is the Gral class for a table. Its usage is independent of a graphical implementation layer.
  * A table consists of some text fields which are arranged in columns and lines. 
@@ -66,7 +66,7 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
   /**Version and history
    * <ul>
    * <li>2013-08-11 Hartmut chg: {@link #getMarkedLines()} now checkes the {@link TableLineData#userData}
-   *   whether that is instanceof {@link SelectMask_ifc}. If true then uses its selection state
+   *   whether that is instanceof {@link MarkMask_ifc}. If true then uses its selection state
    *   instead the selection state of the {@link TableLineData}.
    * <li>2013-06-29 Hartmut chg: refactoring. Now a GralTable<generic> can be created before the graphic is build. It is the new schema of GralWidget.
    *   The inner class {@link GraphicImplAccess} is provided as super class for the graphic implementation class,
@@ -82,7 +82,7 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
    * <li>2013-05-11 Hartmut chg: {@link #deleteLine(GralTableLine_ifc)} was not ready, now tested
    * <li>2013-05-11 Hartmut chg: {@link TableLineData} instead TableItemWidget.
    * <li>2013-04-28 Hartmut new: {@link #specifyKeysMarkUpDn(int, int)}
-   * <li>2013-04-28 Hartmut new: {@link #specifyActionOnLineMarked(SelectMask_ifc)}
+   * <li>2013-04-28 Hartmut new: {@link #specifyActionOnLineMarked(MarkMask_ifc)}
    * <li>2013-04-28 Hartmut renamed: {@link #specifyActionOnLineSelected(GralUserAction)}
    * <li>2013-04-21 Hartmut chg: {@link #processKeys(int)}: input of a text key starts searching for a line with this key
    *   immediately, better handling for usage.
@@ -111,7 +111,7 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
    * <li>2011-11-20 Hartmut new The capability of selection of lines is moved from the 
    *   {@link org.vishia.gral.widget.GralSelectList} to this class. It means any table has the capability
    *   of selection of multiple lines. This capability is supported with a extension of the
-   *   {@link GralTableLine_ifc} with {@link org.vishia.util.SelectMask_ifc}. The selection of a line
+   *   {@link GralTableLine_ifc} with {@link org.vishia.util.MarkMask_ifc}. The selection of a line
    *   is notificated in the users data which are associated with the table line, not in the graphic
    *   representation of the table. This is differenced to SWT Table implementation. The capability
    *   of selection in an SWT table isn't used. The selection is done by default with shift-key up/down
@@ -211,7 +211,7 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
   /**This action will be called if any line is marked. It may be null, see 
    * 
    */
-  protected SelectMask_ifc actionMarkOnLine;
+  protected MarkMask_ifc actionMarkOnLine;
   
   
   
@@ -245,7 +245,7 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
   }
   
   
-  public void specifyActionOnLineMarked(SelectMask_ifc action){
+  public void specifyActionOnLineMarked(MarkMask_ifc action){
     actionMarkOnLine = action;
   }
   
@@ -487,15 +487,15 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
     repaint(200,200);
   }
 
-  @Override public List<GralTableLine_ifc<UserData>> getMarkedLines() {
+  @Override public List<GralTableLine_ifc<UserData>> getMarkedLines(int mask) {
     List<GralTableLine_ifc<UserData>> list = new LinkedList<GralTableLine_ifc<UserData>>();
     for(TableLineData<UserData> item: tableLines){
-      if(item.userData instanceof SelectMask_ifc){
-        if(((SelectMask_ifc)item.userData).getSelection() !=0){
+      if(item.userData instanceof MarkMask_ifc){
+        if(((MarkMask_ifc)item.userData).getMark() !=0){
           list.add(item);
         }
       }
-      else if((item.getSelection() & 1) !=0){
+      else if((item.getMark() & mask) !=0){
         list.add(item);
       }
     }
@@ -515,9 +515,9 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
   }
 
   
-  @Override public GralTableLine_ifc getFirstMarkedLine() {
+  @Override public GralTableLine_ifc getFirstMarkedLine(int mask) {
     for(TableLineData item: tableLines){
-      if((item.getSelection() & 1) !=0){
+      if((item.getMark() & mask) !=0){
         return item;
       }
     }
@@ -830,13 +830,13 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
         }//switch
         if(done == false && keyCode == outer.keyMarkDn && outer.ixLine >=0){
           GralTableLine_ifc line = outer.tableLines.get(outer.ixLine);
-          if((line.getSelection() & 1)!=0){
+          if((line.getMark() & 1)!=0){
             //it is selected yet
             line.setBackColor(outer.colorBackTable,0);
-            line.setDeselect(1, line.getUserData());
+            line.setNonMarked(1, line.getUserData());
           } else {
             line.setBackColor(outer.colorBackMarked,0);
-            line.setSelect(1, line.getUserData());
+            line.setMarked(1, line.getUserData());
           }
           if(outer.ixLine < outer.zLine -1){
             outer.ixLineNew = outer.ixLine + 1;
@@ -1292,31 +1292,31 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
 
 
     /**Sets the mark status of the line.
-     * It invokes the method given with {@link GralTable#specifyActionOnLineMarked(SelectMask_ifc)}
+     * It invokes the method given with {@link GralTable#specifyActionOnLineMarked(MarkMask_ifc)}
      * with the given {@link #setUserData(Object)} of this line. It means a selection with the user data
      * may be done too. This method will be called especially on pressing the mark key specified with  
      * {@link GralTable#specifyKeysMarkUpDn(int, int)}
      * @param mask This bits of the {@link SelectMask#selectMask} will be reseted.
-     * @param data if null then don't invoke {@link GralTable#specifyActionOnLineMarked(SelectMask_ifc)}
-     * @see org.vishia.util.SelectMask#setDeselect(int, java.lang.Object)
+     * @param data if null then don't invoke {@link GralTable#specifyActionOnLineMarked(MarkMask_ifc)}
+     * @see org.vishia.util.SelectMask#setNonMarked(int, java.lang.Object)
      */
-    @Override public int setDeselect(int mask, Object data)
-    { if(actionMarkOnLine !=null && data !=null){ actionMarkOnLine.setDeselect(mask, data); }
-      return super.setDeselect(mask, data);
+    @Override public int setNonMarked(int mask, Object data)
+    { if(actionMarkOnLine !=null && data !=null){ actionMarkOnLine.setNonMarked(mask, data); }
+      return super.setNonMarked(mask, data);
     }
     
     /**Sets the mark status of the line.
-     * It invokes the method given with {@link GralTable#specifyActionOnLineMarked(SelectMask_ifc)}
+     * It invokes the method given with {@link GralTable#specifyActionOnLineMarked(MarkMask_ifc)}
      * with the given {@link #setUserData(Object)} of this line. It means a selection with the user data
      * may be done too. This method will be called especially on pressing the mark key specified with  
      * {@link GralTable#specifyKeysMarkUpDn(int, int)}
      * @param mask This bits of the {@link SelectMask#selectMask} will be set.
-     * @param data if null then don't invoke {@link GralTable#specifyActionOnLineMarked(SelectMask_ifc)}
-     * @see org.vishia.util.SelectMask#setDeselect(int, java.lang.Object)
+     * @param data if null then don't invoke {@link GralTable#specifyActionOnLineMarked(MarkMask_ifc)}
+     * @see org.vishia.util.SelectMask#setNonMarked(int, java.lang.Object)
      */
-    @Override public int setSelect(int mask, Object data)
-    { if(actionMarkOnLine !=null && data !=null){ actionMarkOnLine.setSelect(mask, data); }
-      return super.setSelect(mask, data);
+    @Override public int setMarked(int mask, Object data)
+    { if(actionMarkOnLine !=null && data !=null){ actionMarkOnLine.setMarked(mask, data); }
+      return super.setMarked(mask, data);
     }
 
     

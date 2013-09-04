@@ -345,7 +345,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
     GralColor colorBack;
     if(isCurrentLine(tableItem.nLineNr)) { //the current line, but only if ixLineNew <0
     //if(ixGlineSelectedNew() == iCellLine){
-      colorBack = (tableItem.getSelection() & 1)!=0 ? colorBackSelectMarked() : colorBackSelect();
+      colorBack = (tableItem.getMark() & 1)!=0 ? colorBackSelectMarked() : colorBackSelect();
     } else if(tableItem.colorBackground !=null){
       colorBack = tableItem.colorBackground;
     } else {

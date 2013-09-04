@@ -515,8 +515,8 @@ public class FcmdFileCard extends GralFileSelector
             Assert.stop();
           FileRemote file2 = (FileRemote)file;
           int flags = file2.getFlags();
-          if(file2.isSelected(0xffff)){
-            line.setSelect(1, null);
+          if(file2.isMarked(0xffff)){
+            line.setMarked(1, null);
             line.setBackColor(GralColor.getColor("pbl"), 1);
             line.setLineColor(GralColor.getColor("rd"), 1);
           } else {

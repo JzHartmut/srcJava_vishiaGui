@@ -12,6 +12,7 @@ public interface GralTable_ifc<UserData> extends GralWidget_ifc
 {
   /**Version and history:
    * <ul>
+   * <li>2013-09-05 Hartmut chg: {@link #getMarkedLines(int)} now has that 1 argument for mark mask.
    * <li>2013-06-11 Hartmut new Now the {@link GralTable}, the {@link GralTable.TableLineData} and this
    *   interface are marked with the generic type UserData.
    * <li>2013-05-28 Hartmut new {@link #replaceLineKey(GralTableLine_ifc, String)}
@@ -147,7 +148,7 @@ public interface GralTable_ifc<UserData> extends GralWidget_ifc
   
   /**Returns all marked lines. It returns an empty list if no line is marked. 
    */
-  List<GralTableLine_ifc<UserData>> getMarkedLines();
+  List<GralTableLine_ifc<UserData>> getMarkedLines(int mask);
   
 
   /**Returns all lines. Note: This returns the original container of lines without backup.
@@ -169,7 +170,7 @@ public interface GralTable_ifc<UserData> extends GralWidget_ifc
   
 
   /**Returns the first line from top of the table which is marked or null if no line is marked.   */
-  GralTableLine_ifc<UserData> getFirstMarkedLine();
+  GralTableLine_ifc<UserData> getFirstMarkedLine(int mask);
   
 
   

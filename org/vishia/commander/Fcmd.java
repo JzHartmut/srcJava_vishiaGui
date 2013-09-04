@@ -376,7 +376,7 @@ public class Fcmd extends GuiCfg
    *   The returned instance is a new one, not referenced elsewhere. It can be stored
    *   and it remains the situation of selection files independently of further user actions.
    */
-  FileRemote[] getLastSelectedFiles(){
+  FileRemote[] getLastSelectedFiles(boolean bAlsoDirs, int mask){
     FileRemote[] ret = new FileRemote[3];
     int ix = -1;
     Iterator<FcmdLeftMidRightPanel> iterPanel = lastFilePanels.iterator();
@@ -386,14 +386,14 @@ public class Fcmd extends GuiCfg
       FcmdFileCard fileCard = panel.actFileCard;
       if(fileCard !=null){
         ret[++ix] = fileCard.currentFile;
-        if(fileCard.currentFile !=null && fileCard.currentFile.isSelected(0x1)){
+        if(fileCard.currentFile !=null && fileCard.currentFile.isMarked(0x1)){
           //if the current file is marked, use all marked files.
-          List<FileRemote> listFiles = fileCard.getSelectedFiles();
+          List<FileRemote> listFiles = fileCard.getSelectedFiles(bAlsoDirs, mask);
           assert(listFiles !=null && listFiles.size() > 0);  //at least the current file is marked.
           Iterator<FileRemote> iter= listFiles.iterator();
           while(ix < 2 && iter.hasNext()){
             FileRemote file = iter.next();
-            if(file != fileCard.currentFile && !file.isDirectory()){
+            if(file != fileCard.currentFile){
               ret[++ix] = file;
             }
           }
@@ -527,7 +527,7 @@ public class Fcmd extends GuiCfg
     @Override
     public void prepareFileSelection()
     {
-      selectedFiles = getLastSelectedFiles(); //  getCurrentFileInLastPanels();
+      selectedFiles = getLastSelectedFiles(true, 1); //  getCurrentFileInLastPanels();
     }
 
     @Override
@@ -848,7 +848,7 @@ public class Fcmd extends GuiCfg
         if (cmdBlock == null) {
           mainCmd.writeError("internal problem - don't find 'edit' command. ");
         } else {
-          File[] lastSelected = getLastSelectedFiles(); 
+          File[] lastSelected = getLastSelectedFiles(false, 1); 
           //create a new instance of array of files because the selection may be changed
           //till the command is invoked. The files are stored in a queue and executed in another thread. 
           File[] files = new File[1];

@@ -324,7 +324,7 @@ public class FcmdExecuter
             } else {
               //the extension determines the command.
               console.writeInfoln("FcmdExecuter - add cmd by extension;" + cmd.name);
-              File[] files = main.getLastSelectedFiles();
+              File[] files = main.getLastSelectedFiles(true, 1);
               File currentDir = files[0].getParentFile();
               cmdQueue.addCmd(cmd, files, currentDir);
             }

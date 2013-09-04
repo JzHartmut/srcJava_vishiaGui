@@ -1,10 +1,10 @@
 package org.vishia.gral.ifc;
 
-import org.vishia.util.SelectMask_ifc;
+import org.vishia.util.MarkMask_ifc;
 
 
 
-public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, SelectMask_ifc
+public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, MarkMask_ifc
 {
 
   /**Version, history and license.

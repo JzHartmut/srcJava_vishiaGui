@@ -645,7 +645,7 @@ public final class InspcCurveView
   
   GralUserAction actionScaleFromMarkedTrack = new GralUserAction("actionScaleFromMarkedTrack"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
-      GralTableLine_ifc markedLine = widgTableVariables.getFirstMarkedLine();
+      GralTableLine_ifc markedLine = widgTableVariables.getFirstMarkedLine(1);
       if(markedLine !=null){
         //float scale = markedLine.
       }

@@ -490,7 +490,7 @@ public class FcmdCopyCmd
             fileCardDst = lastFileCards[1];
             
             //widgButtonDst.setState(GralButton.kOff);  //maybe disabled, set off.
-            List<FileRemote> listFileSrc = fileCardSrc.getSelectedFiles();
+            List<FileRemote> listFileSrc = fileCardSrc.getSelectedFiles(true, 1);
             //String sDirSrc;
             if(listFileSrc == null || listFileSrc.size()==0){ //nothing selected
               fileSrc = fileCardSrc.currentFile;
@@ -505,7 +505,7 @@ public class FcmdCopyCmd
               dirSrc = fileSrc = fileCardSrc.getCurrentDir();
               String sSep = "";
               for(FileRemote srcFile : listFileSrc){
-                srcFile.resetSelected(1);
+                srcFile.resetMarked(1);
                 uFileSrc.append(sSep).append(srcFile.getName());
                 sSep = " : "; //For next one.
                 //FileRemote fileSrc = FileRemote.fromFile(srcFile);

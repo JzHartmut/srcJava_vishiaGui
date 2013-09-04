@@ -105,7 +105,7 @@ public class FcmdDelete
     sFileDelete = null;
     currentDirWhereDelete = fileCard.getCurrentDir();
     if(fileCard !=null){
-      listFileDel = fileCard.getSelectedFiles();
+      listFileDel = fileCard.getSelectedFiles(true, 1);
       int nrofFilesDel = listFileDel.size();
       if(nrofFilesDel >0){
         sFileDelete = "select:" + nrofFilesDel + " Files";
