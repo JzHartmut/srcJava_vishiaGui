@@ -3,6 +3,7 @@ package org.vishia.commander;
 import java.io.File;
 
 import org.vishia.cmd.CmdStore;
+import org.vishia.cmd.JbatchScript;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
@@ -178,7 +179,17 @@ public class FcmdSettings
   {
     @Override public boolean exec(int keyCode, GralWidget_ifc widg, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
-        main.cmdSelector.cmdStore.readCmdCfg(new File(main.cargs.dirCfg, ((GralWidget)widg).getCmd()));
+        String sFileCfg = ((GralWidget)widg).getCmd();
+        main.cmdSelector.cmdStore.readCmdCfg(new File(main.cargs.dirCfg, sFileCfg));
+        File cmdCfgJbat = new File(main.cargs.dirCfg, sFileCfg + ".jbat");
+        if(cmdCfgJbat.exists()){
+          try{ 
+            JbatchScript script = main.cmdSelector.cmdStore.readCmdCfgJbat(cmdCfgJbat, main.console);
+            main.cmdSelector.initExecuter(script);
+          } catch(Exception exc){
+            main.console.writeError("Fcmd-Jbat;", exc);
+          }
+        }
         main.cmdSelector.fillIn();
       }
       return true;

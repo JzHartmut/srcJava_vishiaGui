@@ -5,6 +5,7 @@ import java.io.File;
 import org.vishia.cmd.CmdGetFileArgs_ifc;
 import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
+import org.vishia.cmd.JbatchScript;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
@@ -36,6 +37,7 @@ public class GralCommandSelector extends GralSelectList
    * See {@link CmdStore#readCmdCfg(File)} */
   public final CmdStore cmdStore;
   
+  /**Execution instance in another thread. */
   protected final CmdQueue cmdQueue;
   
   /**Gets in graphical thread!
@@ -55,6 +57,11 @@ public class GralCommandSelector extends GralSelectList
   { super(name, rows, columns, size);
     this.cmdStore = new CmdStore();
     this.cmdQueue = cmdQueue;
+  }
+  
+  
+  public void initExecuter(JbatchScript jbatchScript){
+    cmdQueue.initExecuter(jbatchScript);
   }
   
   
