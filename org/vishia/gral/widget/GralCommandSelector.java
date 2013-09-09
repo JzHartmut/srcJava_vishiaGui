@@ -1,6 +1,7 @@
 package org.vishia.gral.widget;
 
 import java.io.File;
+import java.util.Map;
 
 import org.vishia.cmd.CmdGetFileArgs_ifc;
 import org.vishia.cmd.CmdQueue;
@@ -40,8 +41,8 @@ public class GralCommandSelector extends GralSelectList
   /**Execution instance in another thread. */
   protected final CmdQueue cmdQueue;
   
-  /**Gets in graphical thread!
-   * 
+  /**This is an agent which gets some files in the application, controlled by this class.
+   * Depending on the commmand several files should be provided.
    */
   protected CmdGetFileArgs_ifc getterFiles;
   
@@ -127,21 +128,30 @@ public class GralCommandSelector extends GralSelectList
   @Override protected boolean actionOk(Object userData, GralTableLine_ifc line)
   {
     CmdStore.CmdBlock cmdBlock = (CmdStore.CmdBlock)userData;
-    File[] files = new File[3];
-    
-    getterFiles.prepareFileSelection();
-    files[0] = getterFiles.getFile1();
-    files[1] = getterFiles.getFile2();
-    files[2] = getterFiles.getFile3();
-    File currDir;
-    if(files[0] !=null){
-      currDir = files[0].getParentFile();
-    } else {
-      currDir = new File("/");
+    Object args;
+    Map<String, Object> jargs = cmdBlock.getArguments(getterFiles);
+
+    if(jargs != null){ args = jargs; }
+    else {
+      File[] files = new File[3];
+      
+      getterFiles.prepareFileSelection();
+      files[0] = getterFiles.getFile1();
+      files[1] = getterFiles.getFile2();
+      files[2] = getterFiles.getFile3();
+      File currDir;
+      if(files[0] !=null){
+        currDir = files[0].getParentFile();
+      } else {
+        currDir = new File("/");
+      }
     }
+    File currFile = getterFiles.getFile1();
+    
+    File currDir = currFile !=null? currFile.getParentFile(): null;
     String sMsg = "GralCommandSelector - put cmd;" + cmdBlock.toString();
     System.out.println(sMsg);
-    cmdQueue.addCmd(cmdBlock, files, currDir);  //to execute.
+    cmdQueue.addCmd(cmdBlock, jargs, currDir);  //to execute.
     return true;
   }
   

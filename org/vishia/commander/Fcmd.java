@@ -538,7 +538,8 @@ public class Fcmd extends GuiCfg
 
     @Override
     public File getFile1()
-    { if(selectedFiles.length >0) return selectedFiles[0];
+    { if(selectedFiles == null){ prepareFileSelection(); }
+      if(selectedFiles !=null && selectedFiles.length >0) return selectedFiles[0];
       else return null;
     }
 
