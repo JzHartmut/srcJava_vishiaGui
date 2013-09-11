@@ -131,7 +131,15 @@ public class GralCommandSelector extends GralSelectList
     Object args;
     Map<String, Object> jargs = cmdBlock.getArguments(getterFiles);
 
-    if(jargs != null){ args = jargs; }
+    if(jargs != null){ 
+      args = jargs; 
+      File currFile = getterFiles.getFile1();
+      
+      File currDir = currFile !=null? currFile.getParentFile(): null;
+      String sMsg = "GralCommandSelector - put cmd;" + cmdBlock.toString();
+      System.out.println(sMsg);
+      cmdQueue.addCmd(cmdBlock, jargs, currDir);  //to execute.
+    }
     else {
       File[] files = new File[3];
       
@@ -145,13 +153,12 @@ public class GralCommandSelector extends GralSelectList
       } else {
         currDir = new File("/");
       }
+      File currFile = getterFiles.getFile1();
+      
+      String sMsg = "GralCommandSelector - put cmd;" + cmdBlock.toString();
+      System.out.println(sMsg);
+      cmdQueue.addCmd(cmdBlock, files, currDir);
     }
-    File currFile = getterFiles.getFile1();
-    
-    File currDir = currFile !=null? currFile.getParentFile(): null;
-    String sMsg = "GralCommandSelector - put cmd;" + cmdBlock.toString();
-    System.out.println(sMsg);
-    cmdQueue.addCmd(cmdBlock, jargs, currDir);  //to execute.
     return true;
   }
   

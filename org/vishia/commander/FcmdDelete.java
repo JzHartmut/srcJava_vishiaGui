@@ -107,21 +107,28 @@ public class FcmdDelete
     if(fileCard !=null){
       listFileDel = fileCard.getSelectedFiles(true, 1);
       int nrofFilesDel = listFileDel.size();
-      if(nrofFilesDel >0){
-        sFileDelete = "select:" + nrofFilesDel + " Files";
+      if(nrofFilesDel >1){
+        sFileDelete = "" + nrofFilesDel + " Files";
+        for(FileRemote file: listFileDel){
+          sFileDelete += " : " + file.getName();
+        }
+      } else if(nrofFilesDel >0){
+        FileRemote file = listFileDel.get(0);
+        sFileDelete = file.getName();
       } else {
-        FileRemote currentFile = fileCard.currentFile;
-        sFileDelete = currentFile.getName();
-        listFileDel.add(currentFile);
+        sFileDelete = "??No files";
       }
+      if(sFileDelete == null){ //NOTE: 
+        sFileDelete = "--no files selected--";
+      }
+      widgDeleteDir.setText(FileSystem.getCanonicalPath(currentDirWhereDelete));
+      widgDeletePath.setText(sFileDelete);
+      widgTrashPath.setText("TODO");
     }
-    if(sFileDelete == null){ //NOTE: 
-      sFileDelete = "--no files selected--";
+    else {
+      widgDeleteDir.setText("??No filecard active");
+      widgDeletePath.setText("?? abort");
     }
-    widgDeleteDir.setText(FileSystem.getCanonicalPath(currentDirWhereDelete));
-    widgDeletePath.setText(sFileDelete);
-    widgTrashPath.setText("TODO");
-    
     windConfirmDelete.setWindowVisible(true);
 
   }

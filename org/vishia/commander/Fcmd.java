@@ -67,10 +67,10 @@ public class Fcmd extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   @SuppressWarnings("hiding")
-  public static final int version = 20130626;
+  public static final int version = 20130915;
 
   /**Version visible in about info */
-  public static final String sVersion = "Version 1.11 - 2013-07-29";
+  public static final String sVersion = "Version 1.12 - 2013-09-15";
   
   static class CallingArgs extends GuiCallingArgs
   {
@@ -538,8 +538,7 @@ public class Fcmd extends GuiCfg
 
     @Override
     public File getFile1()
-    { if(selectedFiles == null){ prepareFileSelection(); }
-      if(selectedFiles !=null && selectedFiles.length >0) return selectedFiles[0];
+    { if(selectedFiles !=null && selectedFiles.length >0) return selectedFiles[0];
       else return null;
     }
 
