@@ -42,7 +42,7 @@ import org.vishia.util.MarkMask_ifc;
  * <pre>
  *   Graphic representation     GralTable
  *             |                   |
- *             |                   |--idxLine-------------->Map<key, GralTableLine_ifc>
+ *             |                   |--idxLine-------------->Map< key, GralTableLine_ifc>
  *             |                   |                                +------|
  *             |                   |      {@link TableLineData}     |
  *    |<*------+                   |                  |             |
@@ -54,17 +54,23 @@ import org.vishia.util.MarkMask_ifc;
  * </pre>
  * <br><br>
  * <b>Key handling in a table</b>: <br>
- * The table has its own {@link #processKeys(int)} method which is called from the graphical implementation layer
- * from any key event. This method processes some keys for navigation and selection in the table. If the key is not
+ * The table has its own {@link GraphicImplAccess#processKeys(int)} method which is called 
+ * from the graphical implementation layer in an key event handler.
+ * This method processes some keys for navigation and selection in the table. If the key is not
  * used for that, the key will be offer the {@link GralMng#userMainKeyAction} for a global key usage.
  * 
  * @author Hartmut Schorrig
  *
  */
-public class GralTable<UserData> extends GralWidget implements GralTable_ifc<UserData> {
+public final class GralTable<UserData> extends GralWidget implements GralTable_ifc<UserData> {
 
   /**Version and history
    * <ul>
+   * <li>2013-09-14 Hartmut chg: {@link GraphicImplAccess} implements now {@link GralWidgImpl_ifc} without any other
+   *   changes (was proper) and sets {@link GralWidget#wdgImpl}. Therefore all routines which works from the
+   *   GralWidget calls the methods of the implement of the GralTable immediately without special overridden methods
+   *   in this class. It is the concept.
+   * <li>2013-09-14 Hartmut chg: uses the {@link GralWidget.DynamicData#backColor} etc.
    * <li>2013-08-11 Hartmut chg: {@link #getMarkedLines()} now checkes the {@link TableLineData#userData}
    *   whether that is instanceof {@link MarkMask_ifc}. If true then uses its selection state
    *   instead the selection state of the {@link TableLineData}.
@@ -200,9 +206,9 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
   //protected CellData cellDataOnMousePressed;
   
   /**The colors. */
-  protected GralColor colorBackSelect, colorBackMarked, colorBackSelectMarked, colorBackTable
+  protected GralColor colorBackSelect, colorBackMarked, colorBackSelectMarked //, colorBackTable
   //, colorBackSelectNonFocused, colorBackMarkedNonFocused, colorBackTableNonFocused
-  , colorTextSelect, colorTextMarked, colorTextTable;
+  , colorTextSelect, colorTextMarked;
   
   
   protected GralColor colorSelectCharsBack, colorSelectChars;
@@ -342,11 +348,11 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
     colorBackSelect = GralColor.getColor("lam");
     colorBackMarked = GralColor.getColor("pcy");
     colorBackSelectMarked = GralColor.getColor("lgn");
-    colorBackTable = GralColor.getColor("wh");
+    dyda.backColor = GralColor.getColor("wh");
     //colorBackSelectNonFocused = GralColor.getColor("am");
     //colorBackMarkedNonFocused = GralColor.getColor("lrd");
     //colorBackTableNonFocused = GralColor.getColor("gr");
-    colorTextTable = GralColor.getColor("bk");
+    dyda.textColor = GralColor.getColor("bk");
     colorSelectCharsBack = GralColor.getColor("lgr");
     colorSelectChars = GralColor.getColor("wh");
   }
@@ -388,6 +394,8 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
     colorBackSelect = color; 
     repaint(100, 0);
   }
+
+  
 
   
   @Override public GralTableLine_ifc<UserData> getLine(int row) {
@@ -618,7 +626,7 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
    * environment class. Via access methods the implementor class has protected access to all of it.
    * 
    */
-  public static abstract class GraphicImplAccess implements Removeable
+  public static abstract class GraphicImplAccess implements GralWidgImpl_ifc, Removeable
   {
     protected final GralTable<?> outer;
     
@@ -678,7 +686,8 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
     
 
     protected GraphicImplAccess(GralTable<?> outer, GralMng mng){ 
-      this.outer = outer; 
+      this.outer = outer;
+      outer.wdgImpl = this;
       outer.setPanelMng(mng);
       outer.gi = this; 
       int xdPix = outer.itsMng.propertiesGui().xPixelUnit();
@@ -712,7 +721,7 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
     
     protected GralColor colorSelectChars(){ return outer.colorSelectChars; }
     
-    protected GralColor colorBackTable(){ return outer.colorBackTable; }
+    protected GralColor colorBackTable(){ return outer.dyda.backColor; }
     
     protected GralColor colorBackSelect(){ return outer.colorBackSelect; }
     
@@ -720,7 +729,7 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
     
     protected GralColor colorBackSelectMarked(){ return outer.colorBackSelectMarked; }
     
-    protected GralColor colorTextTable(){ return outer.colorTextTable; }
+    protected GralColor colorTextTable(){ return outer.dyda.textColor; }
     
     protected GralColor colorTextSelect(){ return outer.colorTextSelect; }
     
@@ -832,7 +841,7 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
           GralTableLine_ifc line = outer.tableLines.get(outer.ixLine);
           if((line.getMark() & 1)!=0){
             //it is selected yet
-            line.setBackColor(outer.colorBackTable,0);
+            line.setBackColor(outer.dyda.backColor,0);
             line.setNonMarked(1, line.getUserData());
           } else {
             line.setBackColor(outer.colorBackMarked,0);
@@ -1172,16 +1181,14 @@ public class GralTable<UserData> extends GralWidget implements GralTable_ifc<Use
     @Override public boolean isVisible(){ return GralTable.this.isVisible(); }
     
 
-    @Override
-    public GralColor setBackgroundColor(GralColor color) {
+    @Override public GralColor setBackgroundColor(GralColor color) {
       GralColor ret = colorBackground;
       colorBackground = color;
       repaint(50, 50);
       return color;
     }
 
-    @Override
-    public GralColor setForegroundColor(GralColor color) {
+    @Override public GralColor setForegroundColor(GralColor color) {
       GralColor ret = colorForground;
       colorForground = color;
       repaint(50, 50);

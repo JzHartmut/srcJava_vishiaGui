@@ -1296,7 +1296,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   }
 
 
-  @Override
+  @Override @Deprecated
   public GralColor setBackgroundColor(GralColor color)
   { 
     // TODO Auto-generated method stub

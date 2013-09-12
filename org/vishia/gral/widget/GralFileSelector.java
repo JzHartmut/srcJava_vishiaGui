@@ -21,6 +21,7 @@ import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
@@ -57,6 +58,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2013-09-14 Hartmut chg: Sets the background to magenta while refreshing.
    * <li>2013-09-05 Hartmut chg: {@link #getSelectedFiles(boolean, int)} now has that 2 arguments for directory and mark mask.
    *   Now it is possible and necessary for the application to choice whether directories are gotten too.
    *   The usage is improved. If some files are marked but not visible, it was able that the user does not know about
@@ -828,6 +830,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
         }
       }
       if(bOccupied){ //prevent more as one invocation in the same time.
+        ////
+        selectList.wdgdTable.setBackColor(GralColor.getColor("pma"),0);
         //it needs some time, fillIn after refresh
         callbackEventFillIn.setFileSrc(currentDir);
         if(eRefresh == ERefresh.refreshAll){
@@ -993,7 +997,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
           selectList.wdgdTable.replaceLineKey(tline, sFileName);
         } else { //same file, don't change line.
           long dateFile = file.lastModified();
-          isChanged = tline.setContentIdent(dateFile) != dateFile;
+          isChanged = tline.setContentIdent(dateFile) != dateFile || tline.getCellText(kColDate).equals("?");
         }
         if(sFileCurrentline != null && sFileName.equals(sFileCurrentline)){
           lineSelect1 = lineCt;
@@ -1058,6 +1062,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       tline = selectList.wdgdTable.insertLine("..", -1, null, null);
       zLines +=1;
     }
+    selectList.wdgdTable.setBackColor(GralColor.getColor("white"),0);
     StringBuilder sDuration = new StringBuilder(100);
     if(++refreshCount >=10){ refreshCount = 1; }
     sDuration.append(refreshCount).append(" refr:").append(durationRefresh).append(" ms, fillin:").append(durationFillin);

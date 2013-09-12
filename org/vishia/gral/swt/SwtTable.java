@@ -33,6 +33,7 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
 public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgImpl_ifc 
@@ -350,6 +351,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
       colorBack = tableItem.colorBackground;
     } else {
       colorBack = colorBackTable();
+      System.out.println("SwtTable - ColorBackTable;" + text);
     }
     if(cellData.colorBack != colorBack){
       Color colorSwt =  mng.getColorImpl(colorBack);
@@ -577,6 +579,24 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   
 
   
+  protected void keyPressed(KeyEvent keyEv){
+    try{
+      if((keyEv.keyCode & 0xffff) !=0){
+        final int keyCode = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
+        processKeys(keyCode);
+      }
+    } catch(Exception exc){
+      mng.log.sendMsg(0, "Exception in SwtTable-KeyEvent; %s", exc.getLocalizedMessage());
+      CharSequence stackInfo = Assert.exceptionInfo("Gral - SwtTable;", exc, 1, 5);
+      System.err.append(stackInfo);
+      //exc.printStackTrace(System.out);
+    }
+    
+  }
+
+  
+  
+  
   /**A Table is completed with a special key listener. On all keys 
    * the {@link GralUserAction} given in the {@link GralWidget#getActionChange()} is called
    * <ul>
@@ -601,16 +621,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
 
     @Override
     public void keyPressed(KeyEvent keyEv)
-    {
-      try{
-        if((keyEv.keyCode & 0xffff) !=0){
-          final int keyCode = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
-          processKeys(keyCode);
-        }
-      } catch(Exception exc){
-        mng.log.sendMsg(0, "Exception in SwtTable-KeyEvent; %s", exc.getLocalizedMessage());
-        exc.printStackTrace(System.out);
-      }
+    { SwtTable.this.keyPressed(keyEv);
     }
 
     @Override
