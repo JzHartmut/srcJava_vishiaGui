@@ -61,7 +61,7 @@ public class GralCommandSelector extends GralSelectList
   }
   
   
-  public void initExecuter(JbatchScript jbatchScript){
+  public void XXXinitExecuter(JbatchScript jbatchScript){
     cmdQueue.initExecuter(jbatchScript);
   }
   

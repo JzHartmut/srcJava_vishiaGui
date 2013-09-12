@@ -173,6 +173,8 @@ public class FcmdSettings
     }
   };
 
+  
+  
 
   /**Action to set the content of the cmd configuration file. */
   GralUserAction actionApplyCfgCmd = new GralUserAction("FcmdSettings-actionApplyCfgCmd")
@@ -180,16 +182,7 @@ public class FcmdSettings
     @Override public boolean exec(int keyCode, GralWidget_ifc widg, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         String sFileCfg = ((GralWidget)widg).getCmd();
-        main.cmdSelector.cmdStore.readCmdCfg(new File(main.cargs.dirCfg, sFileCfg));
-        File cmdCfgJbat = new File(main.cargs.dirCfg, sFileCfg + ".jbat");
-        if(cmdCfgJbat.exists()){
-          try{ 
-            JbatchScript script = main.cmdSelector.cmdStore.readCmdCfgJbat(cmdCfgJbat, main.console);
-            main.cmdSelector.initExecuter(script);
-          } catch(Exception exc){
-            main.console.writeError("Fcmd-Jbat;", exc);
-          }
-        }
+        main.cmdSelector.cmdStore.readCmdCfg(new File(main.cargs.dirCfg, sFileCfg), main.console, main.executer.cmdQueue);
         main.cmdSelector.fillIn();
       }
       return true;

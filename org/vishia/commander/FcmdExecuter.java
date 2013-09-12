@@ -86,7 +86,7 @@ public class FcmdExecuter
   
   String readCmdFile(File cfgFileCmdsForExt)
   {
-    String error = cmdStore.readCmdCfg(cfgFileCmdsForExt);
+    String error = cmdStore.readCmdCfg(cfgFileCmdsForExt, console, main.executer.cmdQueue);
     if(error == null){
       //fill in the extension - cmd - assignments
       extCmds.clear();
@@ -198,7 +198,7 @@ public class FcmdExecuter
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
           if (main.currentFile != null) {
-          main.cmdSelector.cmdStore.readCmdCfg(main.currentFile);
+          main.cmdSelector.cmdStore.readCmdCfg(main.currentFile, main.console, main.executer.cmdQueue);
           main.cmdSelector.fillIn();
         }
       }
@@ -214,7 +214,7 @@ public class FcmdExecuter
   GralUserAction actionSetCmdCfgAct = new GralUserAction() { 
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        String sError = main.cmdSelector.cmdStore.readCmdCfg(main.cargs.fileCfgCmds);
+        String sError = main.cmdSelector.cmdStore.readCmdCfg(main.cargs.fileCfgCmds, console, main.executer.cmdQueue);
       
         if(sError ==null){
           main.cmdSelector.fillIn();

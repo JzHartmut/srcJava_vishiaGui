@@ -282,12 +282,12 @@ public class Fcmd extends GuiCfg
     } else {
       String sError;
       File fileCfg;
-      sError = cmdSelector.cmdStore.readCmdCfg(fileCfg = cargs.fileCfgCmds);
+      sError = cmdSelector.cmdStore.readCmdCfg(fileCfg = cargs.fileCfgCmds, console, executer.cmdQueue);
       if (sError == null) {
         sError = executer.readCmdFile(fileCfg = cargs.fileCmdsForExt);
       }
       if (sError == null) {
-        sError = buttonCmds.readCmdCfg(fileCfg = cargs.fileCfgButtonCmds);
+        sError = buttonCmds.readCmdCfg(fileCfg = cargs.fileCfgButtonCmds, console, executer.cmdQueue);
       }
       if (sError == null) {
         sError = favorPathSelector.readCfg(fileCfg = cargs.fileSelectTabPaths);
