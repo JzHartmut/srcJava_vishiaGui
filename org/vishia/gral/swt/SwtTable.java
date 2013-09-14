@@ -344,14 +344,14 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
     //
     cellSwt.setText(text);
     GralColor colorBack;
+    boolean marked = (tableItem.getMark() & 1)!=0;
     if(isCurrentLine(tableItem.nLineNr)) { //the current line, but only if ixLineNew <0
     //if(ixGlineSelectedNew() == iCellLine){
-      colorBack = (tableItem.getMark() & 1)!=0 ? colorBackSelectMarked() : colorBackSelect();
+      colorBack = marked ? colorBackSelectMarked() : colorBackSelect();
     } else if(tableItem.colorBackground !=null){
-      colorBack = tableItem.colorBackground;
+      colorBack = marked ? colorBackMarked() : tableItem.colorBackground;
     } else {
-      colorBack = colorBackTable();
-      System.out.println("SwtTable - ColorBackTable;" + text);
+      colorBack = marked ? colorBackMarked() : colorBackTable();
     }
     if(cellData.colorBack != colorBack){
       Color colorSwt =  mng.getColorImpl(colorBack);

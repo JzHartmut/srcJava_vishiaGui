@@ -12,6 +12,9 @@ public interface GralTable_ifc<UserData> extends GralWidget_ifc
 {
   /**Version and history:
    * <ul>
+   * <li>2013-09-15 Hartmut new: Definition of {@link #setBackColor(GralColor, int)} parallel to the
+   *   {@link GralWidget_ifc#getBackColor(int)} with special comments for usage of the int parameter.
+   *   See {@link #kAllLines}, {@link #kEmptyArea}. Adequate {@link #getBackColor(int)}. 
    * <li>2013-09-05 Hartmut chg: {@link #getMarkedLines(int)} now has that 1 argument for mark mask.
    * <li>2013-06-11 Hartmut new Now the {@link GralTable}, the {@link GralTable.TableLineData} and this
    *   interface are marked with the generic type UserData.
@@ -56,6 +59,30 @@ public interface GralTable_ifc<UserData> extends GralWidget_ifc
    */
   public static final int version = 20130528;
 
+  
+  /**Identify number for some methods which have a line number parameter.
+   * Execute for all lines and the empty area.
+   */
+  public static final int kAllLines = -1;
+  
+  /**Identify number for some methods which have a line number parameter.
+   * Execute only for the empty area (not existing lines)
+   */
+  public static final int kEmptyArea = -2;
+  
+  /**Sets the background color of the table or one line.
+   * @param ix >=0 sets for one line only, 
+   *   {@link #kAllLines}: Sets for all lines and the table background, 
+   *   {@link #kEmptyArea}: Only for table background. 
+   * @see org.vishia.gral.ifc.GralWidget_ifc#setBackColor(org.vishia.gral.ifc.GralColor, int)
+   */
+  @Override void setBackColor(GralColor color, int ix);
+  
+  
+  @Override GralColor getBackColor(int ix);
+  
+
+  /**Returns the currently selected line or null if nothing is selected. */
   public abstract GralTableLine_ifc<UserData> getCurrentLine();
   
   

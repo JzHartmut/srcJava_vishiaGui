@@ -148,6 +148,12 @@ public interface GralWidget_ifc extends Removeable
    */
   void setBackColor(GralColor color, int ix);
   
+  /**Gets the background color for the widget.
+   * @param ix 0 if only one color is supported, 1, ... if the widget has more as one background.
+   * @return color Any color
+   */
+  GralColor getBackColor(int ix);
+  
   /**Sets the line color for the widget.
    * @param color Any color
    * @param ix 0 if only one color is supported, 1, ... if the widget has more as one line.

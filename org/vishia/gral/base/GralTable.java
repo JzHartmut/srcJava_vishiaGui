@@ -66,6 +66,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version and history
    * <ul>
+   * <li>2013-09-15 Hartmut new: Implementation of {@link #setBackColor(GralColor, int)}  
+   *   with special comments for usage of the int parameter.
+   *   See {@link GralTable_ifc#setBackColor(GralColor, int)}, Adequate {@link #getBackColor(int)}. 
    * <li>2013-09-14 Hartmut chg: {@link GraphicImplAccess} implements now {@link GralWidgImpl_ifc} without any other
    *   changes (was proper) and sets {@link GralWidget#wdgImpl}. Therefore all routines which works from the
    *   GralWidget calls the methods of the implement of the GralTable immediately without special overridden methods
@@ -265,6 +268,33 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     keyMarkUp = up; keyMarkDn = dn;
   }
   
+  
+  
+  @Override public void setBackColor(GralColor color, int ix){ 
+    if(ix >=0){
+      if(ix < tableLines.size()){
+        tableLines.get(ix).setBackColor(color, -1);
+      }
+    } else {
+      if(ix == kAllLines){
+        for(TableLineData<UserData> line: tableLines){
+          line.setBackColor(color, -1);
+        }
+      }
+      super.setBackColor(color, ix);
+    }
+  }
+  
+  
+  @Override public GralColor getBackColor(int ix){ 
+    if(ix >=0 && ix < tableLines.size()){
+      return tableLines.get(ix).getBackColor(-1);
+    } else {
+      return dyda.backColor;
+    }
+  }
+  
+
   
   /**Adds a context menu entry for the given column.
    * It is an abbreviation for {@link #getContextMenuColumn(int)} 
@@ -1196,11 +1226,21 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
 
     
+    /**Sets the background color of the whole line or one cell.
+     * @param ix -1 for the whole line, >=0 for one cell. (TODO)
+     */
     @Override public void setBackColor(GralColor color, int ix)
     { 
       colorBackground = color;
       repaint(50, 50);
     }
+    
+    @Override public GralColor getBackColor(int ix)
+    { 
+      return colorBackground;
+    }
+    
+    
 
     @Override public void setLineColor(GralColor color, int ix)
     { 

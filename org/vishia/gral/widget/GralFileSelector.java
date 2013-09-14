@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
+import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTableLine_ifc;
@@ -34,6 +36,7 @@ import org.vishia.util.Event;
 import org.vishia.util.EventConsumer;
 import org.vishia.util.EventSource;
 import org.vishia.util.FileSystem;
+import org.vishia.util.IndexMultiTable;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
 import org.vishia.util.MarkMask_ifc;
@@ -58,6 +61,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2013-09-15 Hartmut chg: New implementation of {@link #fillIn(FileRemote, boolean)}
+   *   using the new {@link FileRemote#getChildren(org.vishia.fileRemote.FileRemote.ChildrenEvent).} 
    * <li>2013-09-14 Hartmut chg: Sets the background to magenta while refreshing.
    * <li>2013-09-05 Hartmut chg: {@link #getSelectedFiles(boolean, int)} now has that 2 arguments for directory and mark mask.
    *   Now it is possible and necessary for the application to choice whether directories are gotten too.
@@ -229,12 +234,12 @@ public class GralFileSelector implements Removeable //extends GralWidget
         GralTableLine_ifc line = (GralTableLine_ifc) params[0];
         Object oData = line.getUserData();
         if(oData instanceof FileRemote){
-          FileRemote file = (FileRemote)oData;  ////
+          FileRemote file = (FileRemote)oData;  
           currentFile = file;
           if(file.exists()){
             String sDir = file.getParent();
             String sName = file.getName();
-            indexSelection.put(sDir, sName);
+            indexSelection.put(sDir, file);
             //System.out.println("GralFileSelector: " + sDir + ":" + sName);
             if(actionOnFileSelected !=null){
               actionOnFileSelected.userActionGui(0, selectList.wdgdTable, line, file);
@@ -343,7 +348,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
         String sName = currentDir.getName();
         FileRemote parentDir = currentDir.getParentFile();
         if(parentDir !=null){
-          indexSelection.put(sDir, currentDir.getName());
+          indexSelection.put(sDir, currentDir); //currentDir.getName());
           //System.out.println("GralFileSelector: " + sDir + ":" + sName);
           fillIn(parentDir, false); 
         }
@@ -449,10 +454,16 @@ public class GralFileSelector implements Removeable //extends GralWidget
   public static MenuTexts contextMenuTexts = new MenuTexts();
   
   
-  private char sortOrder = kSortName;
+  private char sortOrder = kSortName, sortOrderLast = '0';
   
   /**The implementation of SelectList. */
   protected FileSelectList selectList;
+  
+  
+  GralColor colorBack, colorBackPending;
+  
+  private final IndexMultiTable<String, GralTableLine_ifc<FileRemote>> idxLines = 
+    new IndexMultiTable<String, GralTableLine_ifc<FileRemote>>(IndexMultiTable.providerString);
   
   protected final GralTable<?> favorList;
   
@@ -474,11 +485,11 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * <li>The value is the name of the file in this directory.   
    * </ul>
    */
-  private final Map<String, String> indexSelection = new TreeMap<String, String>(); 
+  private final Map<String, FileRemote> indexSelection = new TreeMap<String, FileRemote>(); 
   
   //int lineSelected;
   
-  private final RefreshTimed refreshTimed = new RefreshTimed();
+  private final XXXRefreshTimed XXXrefreshTimed = new XXXRefreshTimed();
   
   /**The time after 1970 when the fillin was invoked and finished at last.
    * timeFillinFinished=0, then pending.
@@ -512,9 +523,15 @@ public class GralFileSelector implements Removeable //extends GralWidget
   /**The current shown directory. */
   FileRemote currentDir;
   
+  /**Currently selected file in the table.*/
   FileRemote currentFile;
   
   String sCurrentDir;
+  
+  /**Name of the current file.
+   * 
+   */
+  //String sCurrentFile;
   
   
   /**The directory which was used on start. */
@@ -555,12 +572,25 @@ public class GralFileSelector implements Removeable //extends GralWidget
     
   };
   
+  
+  
+  /**This event is used for callback of children of the current directory.
+   * It is invoked for some children at least for 300 ms.
+   * Its {@link EventConsumer} is {@link #callbackChildren}.
+   */
+  final FileRemote.ChildrenEvent evBackChildren;
+  
+  /**Set to true if a fillin is pending. */
+  boolean fillinPending;
 
   
   public GralFileSelector(String name, int rows, int[] columns, char size)
   { //this.name = name; this.rows = rows; this.columns = columns; this.size = size;
     favorList = new GralTable(null, new int[]{15,0});
     selectList = new FileSelectList(this, name, rows, columns, size);
+    evBackChildren = new FileRemote.ChildrenEvent(callbackChildren, null, evSrc);
+    colorBack = GralColor.getColor("wh");
+    colorBackPending = GralColor.getColor("pma");
     //this.mainCmd = mainCmd;
   }
   
@@ -718,7 +748,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    */
   public GralUserAction setActionOnEnterDirectory(GralUserAction newAction)
   { GralUserAction oldAction = actionOnEnterDirectory;
-  actionOnEnterDirectory = newAction;
+    actionOnEnterDirectory = newAction;
     return oldAction;
   }
   
@@ -767,6 +797,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   }
   
 
+  
+  
   /**Fills the content with given directory.
    * If the same directory was refreshed in a short time before, it is not refreshed here.
    * That is while fast navigation in a tree. 
@@ -781,7 +813,78 @@ public class GralFileSelector implements Removeable //extends GralWidget
       dir = fileIn.getParentFile(); file = fileIn;
       String sDir = FileSystem.getCanonicalPath(dir); //with / as separator!
       String sFile = fileIn.getName();
-      indexSelection.put(sDir, sFile);
+      indexSelection.put(sDir, fileIn); //sFile);
+    } else {
+      dir = fileIn; file = null;
+    }
+    boolean bSameDirectory = dir == currentDir;
+    if(!bSameDirectory){
+      currentDir = dir;
+      this.sCurrentDir = dir.getAbsolutePath();  //though it may not exist, store it for refresh (may be exist later).
+    }
+    final ERefresh eRefresh;
+    if(bSameDirectory){
+      //it is a refresh.
+      if(true || (timenow - dir.timeChildren) > 4000){
+        eRefresh = ERefresh.refreshAll; //needs to refresh
+      } else {
+        eRefresh = ERefresh.doNothing;  //do nothing, it is actual
+      }
+    } else {
+      //other directory
+      currentFile = null;
+      if(false && dir.timeChildren >0){
+        //another directory with known content.
+        //any access in a short time to a known directory.
+        //It may be able to assume that the content is not changed since a short time
+        //if the user navigates in some directories.
+        XXXexecFillIn(true);
+        eRefresh = ERefresh.doNothing;  //do nothing, it is shown and refreshed in execFillIn
+      } else {
+        //the directory is unknown yet.
+        //GralTableLine_ifc<FileRemote> tline = selectList.wdgdTable.insertLine(null, 0, null, null);
+        //tline.setCellText("--waiting--", kColFilename);
+        eRefresh = ERefresh.refreshChildren;  //do nothing, it is shown and refreshed in execFillIn
+      }
+    }
+    if(!bSameDirectory || sortOrder != sortOrderLast){
+      selectList.wdgdTable.clearTable();
+      idxLines.clear();
+    }
+    widgdPath.setText(sCurrentDir, -1);
+    sortOrderLast = sortOrder;
+    selectList.wdgdTable.setBackColor(colorBackPending, -1);  //for all cells.
+    ////
+    if(!fillinPending){
+      fillinPending = true;  //prevent hustle and bustle fillin requests in the graphic thread.
+      evBackChildren.depth = 1;
+      evBackChildren.filter = null;
+      dir.getChildren(evBackChildren);
+    } else {
+      //a fillin is pending yet.
+    }
+    
+
+  }
+  
+  
+  
+  
+  /**Fills the content with given directory.
+   * If the same directory was refreshed in a short time before, it is not refreshed here.
+   * That is while fast navigation in a tree. 
+   * @param fileIn The directory which's files are shown.
+   * @param bCompleteWithFileInfo false then write only file names, without information about the file.
+   */
+  public void XXXfillInX(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
+  { long timenow = System.currentTimeMillis();
+    timeFillinInvoked = timenow;
+    final FileRemote dir, file;
+    if(!fileIn.isDirectory()){
+      dir = fileIn.getParentFile(); file = fileIn;
+      String sDir = FileSystem.getCanonicalPath(dir); //with / as separator!
+      String sFile = fileIn.getName();
+      indexSelection.put(sDir, fileIn);
     } else {
       dir = fileIn; file = null;
     }
@@ -805,7 +908,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
         //any access in a short time to a known directory.
         //It may be able to assume that the content is not changed since a short time
         //if the user navigates in some directories.
-        execFillIn(true);
+        XXXexecFillIn(true);
         eRefresh = ERefresh.doNothing;  //do nothing, it is shown and refreshed in execFillIn
       } else {
         //the directory is unknown yet.
@@ -816,30 +919,31 @@ public class GralFileSelector implements Removeable //extends GralWidget
       }
     }
     if(eRefresh != ERefresh.doNothing){
+      
       //Note: a refresh can be pending yet.
       boolean bOccupied;
       if(bSameDirectory){
-        bOccupied = callbackEventFillIn.occupy(null, false);
+        bOccupied = XXXcallbackEventFillIn.occupy(null, false);
         if(!bOccupied) {
           System.err.println(Assert.stackInfo("GralFileSelector.fillIn - second call is not advisable for the same card.", 4));
         }
       } else {
-        bOccupied = callbackEventFillIn.occupyRecall(4000, null, true); 
+        bOccupied = XXXcallbackEventFillIn.occupyRecall(4000, null, true); 
         if(!bOccupied) {
           System.err.println(Assert.stackInfo("GralFileSelector.fillIn - hangs.", 4));
         }
       }
       if(bOccupied){ //prevent more as one invocation in the same time.
         ////
-        selectList.wdgdTable.setBackColor(GralColor.getColor("pma"),0);
+        selectList.wdgdTable.setBackColor(colorBackPending,0);
         //it needs some time, fillIn after refresh
-        callbackEventFillIn.setFileSrc(currentDir);
+        XXXcallbackEventFillIn.setFileSrc(currentDir);
         if(eRefresh == ERefresh.refreshAll){
-          callbackEventFillIn.bCompleteWithFileInfo = true;
-          (fileIn).refreshPropertiesAndChildren(callbackEventFillIn);  
+          XXXcallbackEventFillIn.bCompleteWithFileInfo = true;
+          (fileIn).refreshPropertiesAndChildren(XXXcallbackEventFillIn);  
         } else {
-          callbackEventFillIn.bCompleteWithFileInfo = false;
-          (fileIn).refreshPropertiesAndChildren(callbackEventFillIn);  
+          XXXcallbackEventFillIn.bCompleteWithFileInfo = false;
+          (fileIn).refreshPropertiesAndChildren(XXXcallbackEventFillIn);  
         }
         //fills the wdgdTable in callbackFillIn, calls fillInRefreshed there.
       } 
@@ -857,7 +961,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * false then a refresh is forced and this routine was called a second one if some file information
    * are not available or the information are to old.
    */
-  protected synchronized void execFillIn(boolean bIsCompleteWithFileInfo) //String path)
+  protected synchronized void XXXexecFillIn(boolean bIsCompleteWithFileInfo) //String path)
   {
     boolean bAllFilesCompleteWithFileInfo = true;
     //selectList.wdgdTable.clearTable(); 
@@ -968,7 +1072,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
         lineCt +=1;
       }
       //The file or directory which was the current one while this directory was shown lastly:
-      String sFileCurrentline = indexSelection.get(sCurrentDir);
+      String sFileCurrentline = ""; //indexSelection.get(sCurrentDir);
       //
       //List files
       Map<String, FileRemote> sortFilesUsed = bAllCompleteWithFileInfo ? sortFiles: sortFilesName;
@@ -976,7 +1080,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
         //String[] line = new String[zColumns];
         FileRemote file = entry.getValue();
         String sFileName = file.getName();
-        if(lineCt < zLines){ 
+        if(lineCt < zLines){ //// 
           tline = selectList.wdgdTable.getLine(lineCt);
           if(tline == null)
             Assert.stop();
@@ -1053,7 +1157,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     }
     //selectList.wdgdTable.repaint(200,200);
     if(!bAllFilesCompleteWithFileInfo){
-      refreshTimed.delayedFillin(1500);
+      XXXrefreshTimed.delayedFillin(1500);
     }
     timeFillinFinished = System.currentTimeMillis();
     durationFillin = (int)(timeFillinFinished - timeFillinInvoked);
@@ -1062,7 +1166,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       tline = selectList.wdgdTable.insertLine("..", -1, null, null);
       zLines +=1;
     }
-    selectList.wdgdTable.setBackColor(GralColor.getColor("white"),0);
+    selectList.wdgdTable.setBackColor(colorBack,0);
     StringBuilder sDuration = new StringBuilder(100);
     if(++refreshCount >=10){ refreshCount = 1; }
     sDuration.append(refreshCount).append(" refr:").append(durationRefresh).append(" ms, fillin:").append(durationFillin);
@@ -1128,6 +1232,98 @@ public class GralFileSelector implements Removeable //extends GralWidget
     
   }
   
+  
+  ////
+  protected String buildKey(FileRemote file, boolean bAllCompleteWithFileInfo, String[] retSortName){
+    String sort, sortName;
+    if(!file.isTested()){
+      bAllCompleteWithFileInfo = false;
+    }
+    switch(sortOrder){
+    case kSortName: {
+      String sName = file.getName();
+      if(file.isDirectory()){ sName += "/"; }
+      sortName = sort = (file.isDirectory()? "D" : "F") + sName;
+    } break;
+    case kSortNameNonCase: {
+      String sName = file.getName().toLowerCase();
+      if(file.isDirectory()){ sName += "/"; }
+      sortName = sort = (file.isDirectory()? "D" : "F") + sName;
+    } break;
+    case kSortExtension: {
+      String sName = file.getName();
+      int posDot = sName.lastIndexOf('.');
+      String sExt = sName.substring(posDot+1);
+      if(file.isDirectory()){ sName += "/"; }
+      sortName = sort = (file.isDirectory()? "D" : "F") + sExt + sName;
+    } break;
+    case kSortExtensionNonCase: {
+      String sName = file.getName().toLowerCase();
+      int posDot = sName.lastIndexOf('.');
+      String sExt = sName.substring(posDot+1);
+      if(file.isDirectory()){ sName += "/"; }
+      sortName = sort = (file.isDirectory()? "D" : "F") + sExt + sName;
+    } break;
+    case kSortDateNewest: {
+      String sName = file.getName().toLowerCase();
+      if(bAllCompleteWithFileInfo){
+        long nDate = -file.lastModified();
+        String sDate = String.format("%016X", new Long(nDate));
+        sort = (file.isDirectory()? "D" : "F") + sDate + sName;
+      } else { sort = ""; }
+      sortName = (file.isDirectory()? "D" : "F") + sName;
+    } break;
+    case kSortDateOldest: {
+      String sName = file.getName().toLowerCase();
+      if(bAllCompleteWithFileInfo){
+        long nDate = file.lastModified();
+        String sDate = String.format("%016X", new Long(nDate));
+        sort = (file.isDirectory()? "D" : "F") + sDate + sName;
+      } else { sort = ""; }
+      sortName = (file.isDirectory()? "D" : "F") + sName;
+    } break;
+    case kSortSizeLargest: {
+      String sName = file.getName().toLowerCase();
+      if(bAllCompleteWithFileInfo){
+        long nSize = 0x7fffffffffffffffL - file.length();
+        String sSize = String.format("%016d", new Long(nSize));
+        sort = (file.isDirectory()? "D" : "F") + sSize + sName;
+      } else { sort = ""; }
+      sortName = (file.isDirectory()? "D" : "F") + sName;
+    } break;
+    case kSortSizeSmallest: {
+      String sName = file.getName().toLowerCase();
+      if(bAllCompleteWithFileInfo){
+        long nSize = file.length();
+        String sSize = String.format("%016d", new Long(nSize));
+        sort = (file.isDirectory()? "D" : "F") + sSize + sName;
+      } else { sort = ""; }
+      sortName = (file.isDirectory()? "D" : "F") + sName;
+    } break;
+    default: { sortName = sort = file.getName(); }
+    }
+    if(retSortName !=null){ retSortName[0] = sortName; }
+    return sort;
+  }
+  
+  
+  protected void fillin1File(FileRemote file){
+    String key = buildKey(file, true, null);
+    boolean[] found = new boolean[1];
+    GralTableLine_ifc<FileRemote> tline = idxLines.search(key, false, found);
+    
+    if(!found[0]){ //no such line with this file
+      int row = tline == null ? 0 : tline.getLineNr()+1;
+      tline = selectList.wdgdTable.insertLine(key, row, null, file);
+      tline.setCellText(file.getName(), kColFilename);
+      idxLines.add(key, tline);
+    }
+    completeLine(tline, file, System.currentTimeMillis());
+    tline.setBackColor(colorBack, -1); //set for the whole line.
+    ////
+    //System.out.println(file.getAbsolutePath());
+    
+  }
   
   
   public void checkRefresh(long since){
@@ -1246,7 +1442,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**This class organized a one time or cyclic refreshing of the current content.
    */
-  final class RefreshTimed implements Runnable
+  final class XXXRefreshTimed implements Runnable
   {
     Thread thread;
     
@@ -1276,7 +1472,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
           }
         } else {
           System.out.println("GralFileSelector - delayedFillin");
-          execFillIn(true);
+          XXXexecFillIn(true);
           //fillInCurrentDir();
           timeStampRepeat += timeRepeat;
         }
@@ -1286,16 +1482,83 @@ public class GralFileSelector implements Removeable //extends GralWidget
   }
   
   
-  final EventConsumer callbackFillIn = new EventConsumer(){
+  /**This callback class fills the {@link GralFileSelector#selectList}.{@link GralSelectList#wdgdTable}
+   * with the results of a {@link FileRemote.ChildrenEvent}, see {@link GralFileSelector#evBackChildren}.
+   * Its {@link EventConsumer#processEvent(Event)} regards the sort, checks whether the line is present,
+   * removes unnecessary lines, sets the color of filled lines to {@link GralFileSelector#colorBack}.  
+   */
+  final EventConsumer callbackChildren = new EventConsumer(){
     @Override public int processEvent(Event<?,?> evP) {
       ///
-      FillinCallback callback = (FillinCallback)evP;
+      FileRemote.ChildrenEvent evBack = (FileRemote.ChildrenEvent)evP;
+      //System.out.println("callbackChildren");
+      FileRemote file1;
+      while((file1 = evBack.poll())!=null){
+        fillin1File(file1);
+      }
+      if(evBack.finished){
+        fillinPending = false;
+        Iterator<Map.Entry<String, GralTableLine_ifc<FileRemote>>> iter = idxLines.entrySet().iterator();
+        while(iter.hasNext()){
+          Map.Entry<String, GralTableLine_ifc<FileRemote>> entry = iter.next();
+          GralTableLine_ifc<FileRemote> tline = entry.getValue();
+          if(tline.getBackColor(-1) == colorBackPending){
+            selectList.wdgdTable.deleteLine(tline);  //it is a non existing one yet.
+            iter.remove();
+          }
+        }
+        /*
+        for(Map.Entry<String, GralTableLine_ifc<FileRemote>> entry: idxLines.entrySet()){
+          GralTableLine_ifc<FileRemote> tline = entry.getValue();
+          if(tline.getBackColor(-1) == colorBackPending){
+            selectList.wdgdTable.deleteLine(tline);  //it is a non existing one yet.
+            
+          }
+        }
+        */
+        if(currentFile ==null){
+          
+        }
+        selectList.wdgdTable.setBackColor(colorBack, GralTable_ifc.kEmptyArea);
+        if(currentFile == null){
+          currentFile = indexSelection.get(sCurrentDir);
+        }
+        GralTableLine_ifc<FileRemote> tline;
+        if(currentFile !=null){
+          String key = buildKey(currentFile, true, null);
+          tline = idxLines.search(key); //maybe line before
+        } else {
+          tline = selectList.wdgdTable.getLine(1);
+          if(tline == null){
+            tline = selectList.wdgdTable.getLine(0);
+          }
+        }
+        if(tline !=null){
+          int lineSelect1 = tline.getLineNr();
+          selectList.wdgdTable.setCurrentCell(lineSelect1, 1);
+          currentFile = tline.getUserData();  //adjust the file if the currentFile was not found exactly.
+        }
+      }
+      return 1;
+    }
+    @Override public String toString(){ return "GralFileSelector - callback fillin"; }
+
+  };
+  
+  
+  
+  
+  
+  final EventConsumer XXXcallbackFillIn = new EventConsumer(){
+    @Override public int processEvent(Event<?,?> evP) {
+      ///
+      XXXFillinCallback callback = (XXXFillinCallback)evP;
       FileRemote dir = callback.getFileSrc();  //it is completed meanwhile
       timeFilesRefreshed = System.currentTimeMillis();
       durationRefresh = (int)(timeFilesRefreshed - timeFillinInvoked);
       //Timeshort.sleep(200); //test
       if(currentDir == dir){
-        GralFileSelector.this.execFillIn(callback.bCompleteWithFileInfo);
+        GralFileSelector.this.XXXexecFillIn(callback.bCompleteWithFileInfo);
       } else {
         //this is an obsolete order, do nothing.
       }
@@ -1308,11 +1571,11 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   /**Only one event instance for fillIn-callback. It should be called only one time. */
-  final class FillinCallback extends FileRemote.CallbackEvent{
+  final class XXXFillinCallback extends FileRemote.CallbackEvent{
     boolean bCompleteWithFileInfo;
-    FillinCallback(){ 
+    XXXFillinCallback(){ 
       //note: call without source because it is not occupied.
-      super(callbackFillIn, null, evSrc); 
+      super(XXXcallbackFillIn, null, evSrc); 
     }
   }
   
@@ -1320,7 +1583,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * It uses {@link GralFileSelector#callbackFillIn} as its {@link EventConsumer}
    * to execute {@link GralFileSelector#fillInRefreshed(FileRemote, boolean)} as callback routine.
    * */
-  private final FillinCallback callbackEventFillIn = new FillinCallback();
+  private final XXXFillinCallback XXXcallbackEventFillIn = new XXXFillinCallback();
   
   
 
@@ -1358,7 +1621,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
             FileRemote dir = file.getParentFile();
             String sDir = FileSystem.getCanonicalPath(dir);
             String sFile = file.getName();
-            indexSelection.put(sDir, sFile);
+            indexSelection.put(sDir, file);
             fillIn(dir, false);
           } else {
             File parent = file.getParentFile();

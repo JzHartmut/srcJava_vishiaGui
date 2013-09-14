@@ -1025,8 +1025,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     repaint(100, 100); 
   }
   
-  
-  public GralColor getBackColor(int ix){ return dyda.backColor; }
+  @Override public GralColor getBackColor(int ix){ 
+    return dyda.backColor; 
+  }
   
   @Override public void setLineColor(GralColor color, int ix){ 
     dyda.lineColor = color; 
