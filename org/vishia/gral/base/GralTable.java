@@ -182,7 +182,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   GraphicImplAccess gi;
 
   /**Index (subscript) of the current line and current column. 0 is the left column or top line.
-   * -1 means that nothing is selected. */
+   * -1 means that nothing is selected. 
+   * ixLineNew == ixLine if the selection is not changed. ixLineNew will be changed outside
+   * the graphic thread, the change will be recognize in {@link #repaintGthread()}
+   * and then in {@link GraphicImplAccess#setAllCellContentGthread()}. 
+   * */
   protected int ixLine, ixLineNew, ixColumn;
 
   /**Number of lines and columns of data. */
@@ -429,7 +433,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   
   @Override public GralTableLine_ifc<UserData> getLine(int row) {
-    if(row > tableLines.size()) return null;
+    if(row >= tableLines.size()) return null;
     else return tableLines.get(row);
   }
 
@@ -482,7 +486,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       line2.nLineNr = ii;
     }
     zLine -=1;
-    if(ixLine == linenr){
+    if(ixLine == linenr){  //TODO correct???
       ixLineNew = ixLine = -1;
       gi.ixGlineSelectedNew = -1;  //deselects ixGlineSelected on redraw!
     }
@@ -871,10 +875,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           GralTableLine_ifc line = outer.tableLines.get(outer.ixLine);
           if((line.getMark() & 1)!=0){
             //it is selected yet
-            line.setBackColor(outer.dyda.backColor,0);
             line.setNonMarked(1, line.getUserData());
           } else {
-            line.setBackColor(outer.colorBackMarked,0);
             line.setMarked(1, line.getUserData());
           }
           if(outer.ixLine < outer.zLine -1){
@@ -1005,7 +1007,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       if(outer.ixLineNew >=0 && (outer.ixLineNew != outer.ixLine || bFocused)){
         outer.actionOnLineSelected(outer.tableLines.get(outer.ixLineNew));
         outer.ixLine = outer.ixLineNew;
-        outer.ixLine = outer.ixLineNew;
         if(ixGlineSelectedNew != ixGlineSelected){ //note: if the table scrolls, the same cell is used as current.
           //set background color for non-selected line.
           if(ixGlineSelected >=0){
@@ -1027,7 +1028,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       //System.out.println("GralTable.repaint; " + name);
       //Thread.dumpStack();
       bFocused = false;
-         
+      //??? outer.ixLineNew = -1;   
     }
 
     
@@ -1231,6 +1232,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      */
     @Override public void setBackColor(GralColor color, int ix)
     { 
+      if(color.getColorName().equals("pma"))
+        Assert.stop();
       colorBackground = color;
       repaint(50, 50);
     }

@@ -131,7 +131,12 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
     float value;
     String sShow;
     if(calculator !=null){
-      value = calculator.calc(valueP);
+      try {
+        CalculatorExpr.Value value1 = calculator.calcDataAccess(null, valueP);
+        value = (float)value1.doubleValue();
+      } catch (Exception e) {
+        value = 7777777.777f;
+      }
       sFormat1 = this.sFormat2;
     } else if(sFormat !=null){
       if(sFormat.startsWith("!")){

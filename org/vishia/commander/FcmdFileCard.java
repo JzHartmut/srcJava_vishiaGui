@@ -16,14 +16,21 @@ import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.gral.widget.GralHorizontalSelector;
 
 import org.vishia.util.Assert;
-import org.vishia.util.Event;
-import org.vishia.util.EventConsumer;
 import org.vishia.util.FileCompare;
-import org.vishia.util.KeyCode;
 
-/**This is one file table in the Java commander. Each main panel (left, middle, right)
+/**This is one file table in the the.File.commander. Each main panel (left, middle, right)
  * has maybe more as one tabs, each tab has exactly one file table. The file table is reused
  * for the several tabs of the main panel, and they are reused too if the directory is changed.
+ * <br><br>
+ * <b>Synchronization of 2 file cards</b>:<br>
+ * If the synchronization is switch on with {@link FcmdFavorPathSelector#bSyncMidRight} then 
+ * {@link #syncWithSecondPanel(String)} is called with the filename. Therewith the same file 
+ * in the second panel (middle or right) will be selected if it exists. If an existing directory
+ * is selected, the other file card follows it if it exists. So the user can walk through two file trees
+ * which have the same structure, but maybe some different content. It is proper for comparison.  
+ * <br><br>
+ * <br><br>
+ * 
  * @author Hartmut Schorrig
  *
  */
@@ -101,7 +108,7 @@ public class FcmdFileCard extends GralFileSelector
   /**The last selected file. */
   FileRemote currentFile;
   
-  /**If not null, then should synchronize with this file card. */
+  /**If not null, then should synchronize with this file card. Used in */
   FcmdFileCard otherFileCardtoSync; 
   
   /**If not null, then it is the base dir for synchronization with the {@link #otherFileCardtoSync}. 
@@ -177,7 +184,7 @@ public class FcmdFileCard extends GralFileSelector
     panelFiles.setPrimaryWidget(super.selectList.wdgdTable);
     //
     //sets the action for a simple table: what to do on line selected: Show file names. 
-    this.setActionOnFileSelected(actionOnFileSelection);
+    this.specifyActionOnFileSelected(actionOnFileSelection);
     selectList.wdgdTable.setActionFocused(actionFocused);
     //Note: some menu entries are set in the super class already.
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFilePropsContext, main.filePropsCmd.actionOpenDialog);
@@ -368,7 +375,9 @@ public class FcmdFileCard extends GralFileSelector
       main.statusLine.setFileInfo(file);
       
       String sPath = file.getAbsolutePath();
-      if(main.favorPathSelector.bSyncMidRight){
+      if(  main.favorPathSelector.bSyncMidRight 
+        && mainPanel.actFileCard == this    //from actFileCard to the second one!
+      ){
         syncWithSecondPanel(sFileName);
       }
       /*

@@ -46,11 +46,19 @@ import org.vishia.util.Timeshort;
  * supports navigation in the directory tree and shows the current path in an extra text field.
  * Additional 'search in files' is supported.
  * <br><br>
- * The type of a file is either a java.io.File or {@link FileRemote}. 
- * The last one is an derivation of java.io.File. It means that
- * the files may be existing on any remote device. The local file system is a special case,
- * whereby it's the usual case mostly.
- * 
+ * The type of a file is a {@link FileRemote}. This type inherits from {@link java.io.File}
+ * and is supported for a local file system on PC. It is possible to work with any remote file system. 
+ * <br><br>
+ * The graphical user interface allows some action to do with the right mouse menu:
+ * <ul>
+ * <li>Refresh content
+ * <li>sort files by date latest, newest, by size largest, smallest, by name and by extension.
+ * <li>Search content in files with a dialog window.
+ * </ul>
+ * <b>Callback to users program</b>:<br>
+ * The method {@link #specifyActionOnFileSelected(GralUserAction)} allows any action while the user
+ * select any file. For example a user's program can show the content of the file.
+ * <br><br> 
  * @author Hartmut Schorrig
  *
  */
@@ -242,7 +250,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
             indexSelection.put(sDir, file);
             //System.out.println("GralFileSelector: " + sDir + ":" + sName);
             if(actionOnFileSelected !=null){
-              actionOnFileSelected.userActionGui(0, selectList.wdgdTable, line, file);
+              actionOnFileSelected.exec(0, selectList.wdgdTable, line, file);
             }
             if(line.getCellText(kColDesignation).startsWith("?")){
               completeLine(line, file, System.currentTimeMillis());
@@ -472,9 +480,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
   //final int[] columns; 
   //final char size;
   
-  /**This action will be called any time when the selection of a current file is changed. */
-  GralUserAction actionOnFileSelected;
-  
 
   /**This index stores the last selected file for any directory path which was used.
    * If the directory path is reused later, the same file will be selected initially.
@@ -539,7 +544,10 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   
+  /**This action will be called any time when the selection of a current file is changed. */
+  protected GralUserAction actionOnFileSelected;
   
+
   /**This action will be called on pressing enter or mouse-click on a simple file.
    */
   private GralUserAction actionOnEnterFile;
@@ -699,7 +707,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   /**Sets an action which is called any time when another line is selected.
    * @param actionOnLineSelected The action, null to switch off this functionality.
    */
-  public void setActionOnFileSelected(GralUserAction actionOnLineSelected){
+  public void specifyActionOnFileSelected(GralUserAction actionOnLineSelected){
     this.actionOnFileSelected = actionOnLineSelected;
   }
   
@@ -806,56 +814,66 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * @param bCompleteWithFileInfo false then write only file names, without information about the file.
    */
   public void fillIn(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
-  { long timenow = System.currentTimeMillis();
-    timeFillinInvoked = timenow;
-    final FileRemote dir, file;
-    if(!fileIn.isDirectory()){
-      dir = fileIn.getParentFile(); file = fileIn;
-      String sDir = FileSystem.getCanonicalPath(dir); //with / as separator!
-      String sFile = fileIn.getName();
-      indexSelection.put(sDir, fileIn); //sFile);
-    } else {
-      dir = fileIn; file = null;
-    }
-    boolean bSameDirectory = dir == currentDir;
-    if(!bSameDirectory){
-      currentDir = dir;
-      this.sCurrentDir = dir.getAbsolutePath();  //though it may not exist, store it for refresh (may be exist later).
-    }
-    final ERefresh eRefresh;
-    if(bSameDirectory){
-      //it is a refresh.
-      if(true || (timenow - dir.timeChildren) > 4000){
-        eRefresh = ERefresh.refreshAll; //needs to refresh
+  { if(!fillinPending){
+      long timenow = System.currentTimeMillis();
+      timeFillinInvoked = timenow;
+      final FileRemote dir, file;
+      if(!fileIn.isDirectory()){
+        dir = fileIn.getParentFile(); file = fileIn;
+        String sDir = FileSystem.getCanonicalPath(dir); //with / as separator!
+        String sFile = fileIn.getName();
+        indexSelection.put(sDir, fileIn); //sFile);
       } else {
-        eRefresh = ERefresh.doNothing;  //do nothing, it is actual
+        dir = fileIn; file = null;
       }
-    } else {
-      //other directory
-      currentFile = null;
-      if(false && dir.timeChildren >0){
-        //another directory with known content.
-        //any access in a short time to a known directory.
-        //It may be able to assume that the content is not changed since a short time
-        //if the user navigates in some directories.
-        XXXexecFillIn(true);
-        eRefresh = ERefresh.doNothing;  //do nothing, it is shown and refreshed in execFillIn
+      boolean bSameDirectory = dir == currentDir;
+      if(!bSameDirectory){
+        currentDir = dir;
+        this.sCurrentDir = dir.getAbsolutePath();  //though it may not exist, store it for refresh (may be exist later).
+      }
+      System.out.println("FcmdFileCard - start fillin; " + sCurrentDir + (bSameDirectory ? "; same" : "; new"));
+      final ERefresh eRefresh;
+      if(bSameDirectory){
+        //it is a refresh.
+        if(true || (timenow - dir.timeChildren) > 4000){
+          eRefresh = ERefresh.refreshAll; //needs to refresh
+        } else {
+          eRefresh = ERefresh.doNothing;  //do nothing, it is actual
+        }
       } else {
-        //the directory is unknown yet.
-        //GralTableLine_ifc<FileRemote> tline = selectList.wdgdTable.insertLine(null, 0, null, null);
-        //tline.setCellText("--waiting--", kColFilename);
-        eRefresh = ERefresh.refreshChildren;  //do nothing, it is shown and refreshed in execFillIn
+        //other directory
+        currentFile = null;
+        if(false && dir.timeChildren >0){
+          //another directory with known content.
+          //any access in a short time to a known directory.
+          //It may be able to assume that the content is not changed since a short time
+          //if the user navigates in some directories.
+          XXXexecFillIn(true);
+          eRefresh = ERefresh.doNothing;  //do nothing, it is shown and refreshed in execFillIn
+        } else {
+          //the directory is unknown yet.
+          //GralTableLine_ifc<FileRemote> tline = selectList.wdgdTable.insertLine(null, 0, null, null);
+          //tline.setCellText("--waiting--", kColFilename);
+          eRefresh = ERefresh.refreshChildren;  //do nothing, it is shown and refreshed in execFillIn
+        }
       }
-    }
-    if(!bSameDirectory || sortOrder != sortOrderLast){
-      selectList.wdgdTable.clearTable();
-      idxLines.clear();
-    }
-    widgdPath.setText(sCurrentDir, -1);
-    sortOrderLast = sortOrder;
-    selectList.wdgdTable.setBackColor(colorBackPending, -1);  //for all cells.
-    ////
-    if(!fillinPending){
+      selectList.wdgdTable.setBackColor(colorBackPending, -1);  //for all cells.
+      if(!bSameDirectory || sortOrder != sortOrderLast){
+        selectList.wdgdTable.clearTable();
+        idxLines.clear();
+        if(dir.getParentFile() !=null){
+          GralTableLine_ifc<FileRemote> tline = selectList.wdgdTable.insertLine("..", 0, null, dir);
+          tline.setCellText("<", kColDesignation);
+          tline.setCellText("..", kColFilename);
+          tline.setCellText("", kColLength);
+          tline.setCellText("", kColDate);
+          tline.setBackColor(colorBack, -1);
+          idxLines.put("..", tline);
+        }
+      }
+      widgdPath.setText(sCurrentDir, -1);
+      sortOrderLast = sortOrder;
+      ////
       fillinPending = true;  //prevent hustle and bustle fillin requests in the graphic thread.
       evBackChildren.depth = 1;
       evBackChildren.filter = null;
@@ -863,8 +881,71 @@ public class GralFileSelector implements Removeable //extends GralWidget
     } else {
       //a fillin is pending yet.
     }
-    
-
+  }
+  
+  
+  
+  
+  /**Callback method if the file system offers one file after cal of {@link #fillIn(FileRemote, boolean)}.
+   * This routine is executed in another thread than the graphic thread. The table will be filled,
+   * a refresh of the graphic presentation will be invoked with about 100 ms delay. 
+   * @param evBack The callback event.
+   * @return
+   */
+  protected int show1file(FileRemote.ChildrenEvent evBack){
+    ////
+    FileRemote file1;
+    while((file1 = evBack.poll())!=null){
+      String key = buildKey(file1, true, null);
+      boolean[] found = new boolean[1];
+      GralTableLine_ifc<FileRemote> tline = idxLines.search(key, false, found);
+      
+      if(!found[0]){ //no such line with this file
+        int row = tline == null ? 0 : tline.getLineNr()+1;
+        String name = file1.getName();  //use the file name as key in the table for the table line.
+        tline = selectList.wdgdTable.insertLine(name, row, null, file1);
+        tline.setCellText(file1.getName(), kColFilename);
+        idxLines.add(key, tline);
+      }
+      completeLine(tline, file1, System.currentTimeMillis());
+      tline.setBackColor(colorBack, -1); //set for the whole line.
+      ////
+      //System.out.println(file.getAbsolutePath());
+      
+    }
+    if(evBack.finished){
+      fillinPending = false;
+      System.out.println("FcmdFileCard - finish fillin; " + sCurrentDir);
+      Iterator<Map.Entry<String, GralTableLine_ifc<FileRemote>>> iter = idxLines.entrySet().iterator();
+      while(iter.hasNext()){
+        Map.Entry<String, GralTableLine_ifc<FileRemote>> entry = iter.next();
+        GralTableLine_ifc<FileRemote> tline = entry.getValue();
+        if(tline.getBackColor(-1) == colorBackPending){
+          selectList.wdgdTable.deleteLine(tline);  //it is a non existing one yet.
+          iter.remove();
+        }
+      }
+      selectList.wdgdTable.setBackColor(colorBack, GralTable_ifc.kEmptyArea);
+      if(currentFile == null){
+        currentFile = indexSelection.get(sCurrentDir);
+      }
+      GralTableLine_ifc<FileRemote> tline;
+      if(currentFile !=null){
+        String key = buildKey(currentFile, true, null);
+        tline = idxLines.search(key); //maybe line before
+      } else {
+        tline = selectList.wdgdTable.getLine(1);
+        if(tline == null){
+          tline = selectList.wdgdTable.getLine(0);
+        }
+      }
+      if(tline !=null){
+        int lineSelect1 = tline.getLineNr();
+        selectList.wdgdTable.setCurrentCell(lineSelect1, 1);
+        currentFile = tline.getUserData();  //adjust the file if the currentFile was not found exactly.
+      }
+    }
+    return 1;
   }
   
   
@@ -1307,23 +1388,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
   }
   
   
-  protected void fillin1File(FileRemote file){
-    String key = buildKey(file, true, null);
-    boolean[] found = new boolean[1];
-    GralTableLine_ifc<FileRemote> tline = idxLines.search(key, false, found);
-    
-    if(!found[0]){ //no such line with this file
-      int row = tline == null ? 0 : tline.getLineNr()+1;
-      tline = selectList.wdgdTable.insertLine(key, row, null, file);
-      tline.setCellText(file.getName(), kColFilename);
-      idxLines.add(key, tline);
-    }
-    completeLine(tline, file, System.currentTimeMillis());
-    tline.setBackColor(colorBack, -1); //set for the whole line.
-    ////
-    //System.out.println(file.getAbsolutePath());
-    
-  }
   
   
   public void checkRefresh(long since){
@@ -1489,57 +1553,10 @@ public class GralFileSelector implements Removeable //extends GralWidget
    */
   final EventConsumer callbackChildren = new EventConsumer(){
     @Override public int processEvent(Event<?,?> evP) {
-      ///
+      ////
       FileRemote.ChildrenEvent evBack = (FileRemote.ChildrenEvent)evP;
+      return show1file(evBack);
       //System.out.println("callbackChildren");
-      FileRemote file1;
-      while((file1 = evBack.poll())!=null){
-        fillin1File(file1);
-      }
-      if(evBack.finished){
-        fillinPending = false;
-        Iterator<Map.Entry<String, GralTableLine_ifc<FileRemote>>> iter = idxLines.entrySet().iterator();
-        while(iter.hasNext()){
-          Map.Entry<String, GralTableLine_ifc<FileRemote>> entry = iter.next();
-          GralTableLine_ifc<FileRemote> tline = entry.getValue();
-          if(tline.getBackColor(-1) == colorBackPending){
-            selectList.wdgdTable.deleteLine(tline);  //it is a non existing one yet.
-            iter.remove();
-          }
-        }
-        /*
-        for(Map.Entry<String, GralTableLine_ifc<FileRemote>> entry: idxLines.entrySet()){
-          GralTableLine_ifc<FileRemote> tline = entry.getValue();
-          if(tline.getBackColor(-1) == colorBackPending){
-            selectList.wdgdTable.deleteLine(tline);  //it is a non existing one yet.
-            
-          }
-        }
-        */
-        if(currentFile ==null){
-          
-        }
-        selectList.wdgdTable.setBackColor(colorBack, GralTable_ifc.kEmptyArea);
-        if(currentFile == null){
-          currentFile = indexSelection.get(sCurrentDir);
-        }
-        GralTableLine_ifc<FileRemote> tline;
-        if(currentFile !=null){
-          String key = buildKey(currentFile, true, null);
-          tline = idxLines.search(key); //maybe line before
-        } else {
-          tline = selectList.wdgdTable.getLine(1);
-          if(tline == null){
-            tline = selectList.wdgdTable.getLine(0);
-          }
-        }
-        if(tline !=null){
-          int lineSelect1 = tline.getLineNr();
-          selectList.wdgdTable.setCurrentCell(lineSelect1, 1);
-          currentFile = tline.getUserData();  //adjust the file if the currentFile was not found exactly.
-        }
-      }
-      return 1;
     }
     @Override public String toString(){ return "GralFileSelector - callback fillin"; }
 
@@ -1625,7 +1642,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
             fillIn(dir, false);
           } else {
             File parent = file.getParentFile();
-            if(parent.exists()){
+            if(parent !=null && parent.exists()){
               if(actionOnEnterPathNewFile !=null){
                 actionOnEnterPathNewFile.userActionGui(KeyCode.enter, widgdPath, file);
               } else {
