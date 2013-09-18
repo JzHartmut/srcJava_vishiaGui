@@ -81,7 +81,7 @@ public final class FcmdFilesCp {
   FcmdFileCard card1, card2;
   
   /**The both directories where the comparison was started. */
-  File file1, file2;
+  FileRemote file1, file2;
   
   FcmdFilesCp(Fcmd main){
     this.main = main;
@@ -121,13 +121,17 @@ public final class FcmdFilesCp {
       widgCompare.setText("stop");
       file1 = card1.currentFile;
       file2 = card2.currentFile;
-      result.clear();
-      idxFilepath4Result.clear();
-      FileCompare.Result result1 = new FileCompare.Result(null, file1, file2);
-      comparer.compare(result1, null, 0);
-      result = result1.subFiles;
-      for(FileCompare.Result item: result){
-        buildIdxResult(item, 0);
+      if(true){
+        FileRemote.cmpFiles(file1, file2); 
+      } else {
+        result.clear();
+        idxFilepath4Result.clear();
+        FileCompare.Result result1 = new FileCompare.Result(null, file1, file2);
+        comparer.compare(result1, null, 0);
+        result = result1.subFiles;
+        for(FileCompare.Result item: result){
+          buildIdxResult(item, 0);
+        }
       }
       //let the window open to set sync or see results there (TODO)
       //windConfirmCompare.setWindowVisible(false);

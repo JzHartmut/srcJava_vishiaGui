@@ -533,7 +533,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     List<GralTableLine_ifc<UserData>> list = new LinkedList<GralTableLine_ifc<UserData>>();
     for(TableLineData<UserData> item: tableLines){
       if(item.userData instanceof MarkMask_ifc){
-        if(((MarkMask_ifc)item.userData).getMark() !=0){
+        if((((MarkMask_ifc)item.userData).getMark() & mask) !=0){
           list.add(item);
         }
       }

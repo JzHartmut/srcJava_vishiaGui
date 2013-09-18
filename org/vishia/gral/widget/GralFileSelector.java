@@ -1265,12 +1265,25 @@ public class GralFileSelector implements Removeable //extends GralWidget
 
   
   @SuppressWarnings("boxing")
-  private void completeLine(GralTableLine_ifc<FileRemote> tline, File file, long timeNow){
+  private void completeLine(GralTableLine_ifc<FileRemote> tline, FileRemote file, long timeNow){
     final String sDesign;
-    if(file instanceof FileRemote && ((FileRemote)file).isSymbolicLink()){ 
+    int mark = file.cmprResult ==null ? 0 : file.cmprResult.getMark();
+    if(file.isSymbolicLink()){ 
       sDesign =  file.isDirectory() ? ">" : "s"; 
     }
     else if(file.isDirectory()){ sDesign = "/"; }
+    else if(mark != 0){
+      if((mark & FileRemote.cmpAlone ) !=0){ sDesign = "!"; }
+      else if((mark & FileRemote.mCmpContent) !=0){
+        switch(mark & FileRemote.mCmpContent){
+          case FileRemote.cmpContentEqual: sDesign = "=";break;
+          case FileRemote.cmpContentNotEqual: sDesign = "#";break;
+          default: sDesign = " ";
+        }
+      } else {
+        sDesign = " ";
+      }
+    }
     else { sDesign = " ";}
     tline.setCellText(sDesign, kColDesignation);
     long fileTime = file.lastModified();
@@ -1732,7 +1745,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
     //if(fileCard !=null){
     if(currentFile !=null){
-      currentFile.resetMarkedRecurs(1, null);
+      currentFile.resetMarkedRecurs(0xffffffff, null);
       //fileCard.f  //TODO refresh
     }
     return true;
