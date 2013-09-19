@@ -102,11 +102,11 @@ public class FcmdStatusLine
       FileRemote filer = file;
       info.append(" ").append(filer.ident()).append(" flags=0x")
       .append(Integer.toHexString(filer.getFlags()));
-      if(file.cmprResult !=null){
+      if(file.mark !=null){
         if(file.isDirectory()){
-          info.append(" selfiles=").append(file.cmprResult.nrofFilesSelected());
+          info.append(" selfiles=").append(file.mark.nrofFilesSelected());
         } else {
-          info.append(" sel=").append(Integer.toHexString(file.cmprResult.getMark()));
+          info.append(" sel=").append(Integer.toHexString(file.mark.getMark()));
         }
       }
     }

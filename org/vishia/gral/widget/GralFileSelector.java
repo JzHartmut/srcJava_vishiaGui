@@ -12,6 +12,7 @@ import java.util.TreeMap;
 
 import org.vishia.commander.Fcmd;
 import org.vishia.fileRemote.FileAccessZip;
+import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMenu;
@@ -1267,17 +1268,17 @@ public class GralFileSelector implements Removeable //extends GralWidget
   @SuppressWarnings("boxing")
   private void completeLine(GralTableLine_ifc<FileRemote> tline, FileRemote file, long timeNow){
     final String sDesign;
-    int mark = file.cmprResult ==null ? 0 : file.cmprResult.getMark();
+    int mark = file.mark ==null ? 0 : file.mark.getMark();
     if(file.isSymbolicLink()){ 
       sDesign =  file.isDirectory() ? ">" : "s"; 
     }
     else if(file.isDirectory()){ sDesign = "/"; }
     else if(mark != 0){
-      if((mark & FileRemote.cmpAlone ) !=0){ sDesign = "!"; }
+      if((mark & FileMark.cmpAlone ) !=0){ sDesign = "!"; }
       else if((mark & FileRemote.mCmpContent) !=0){
         switch(mark & FileRemote.mCmpContent){
-          case FileRemote.cmpContentEqual: sDesign = "=";break;
-          case FileRemote.cmpContentNotEqual: sDesign = "#";break;
+          case FileMark.cmpContentEqual: sDesign = "=";break;
+          case FileMark.cmpContentNotEqual: sDesign = "#";break;
           default: sDesign = " ";
         }
       } else {
