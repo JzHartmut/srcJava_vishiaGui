@@ -174,7 +174,7 @@ public class FcmdFileCard extends GralFileSelector
     //Sets the columns for the table.
     //super.selectList.wdgdTable.setColumnWidth(50, new int[]{2,0,-6,-11});
     super.selectList.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.fileSelect.");
-    GralMenu menuFolder = super.widgdPath.getContextMenu();
+    GralMenu menuFolder = super.widgdPathDir.getContextMenu();
     menuFolder.addMenuItemGthread("contextfolder-setOrigin", main.idents.menuContextSetOriginDir, main.favorPathSelector.actionSetDirOrigin);
     menuFolder.addMenuItemGthread("menuContextCreateFavor", main.idents.menuContextCreateFavor, main.favorPathSelector.actionCreateFavor);
     menuFolder.addMenuItemGthread("context-filescp", main.idents.menuFilesCpContext, main.filesCp.actionConfirmCp);

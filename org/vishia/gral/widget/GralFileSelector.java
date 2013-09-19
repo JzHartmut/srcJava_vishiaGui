@@ -320,7 +320,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
         actionRightZip(userData, line);
       } else {
         if(actionOnEnterFile !=null){
-          actionOnEnterFile.userActionGui(KeyCode.enter, widgdPath, file);
+          actionOnEnterFile.userActionGui(KeyCode.enter, widgdPathDir, file);
         } else {
           done = false;
         }
@@ -510,7 +510,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   boolean donotCheckRefresh;
   
   /**The widget for showing the path. */
-  protected GralTextField widgdPath;
+  protected GralTextField widgdPathDir;
   
   String sDatePrefixNewer = "";
   SimpleDateFormat dateFormatNewer = new SimpleDateFormat("?yy-MM-dd HH:mm:ss"); 
@@ -639,10 +639,10 @@ public class GralFileSelector implements Removeable //extends GralWidget
     String sPanel = panel.getName();
     //Text field for path above list
     panelMng.setPosition(posAll, GralPos.same, GralPos.size + 2.0F, GralPos.same, GralPos.same-6, 1, 'r');
-    widgdPath = panelMng.addTextField(null, true, null, null);
-    widgdPath.setActionChange(actionSetPath);
-    widgdPath.setBackColor(panelMng.getColor("pye"), 0xeeffff);  //color pastel yellow
-    GralMenu menuFolder = widgdPath.getContextMenu();
+    widgdPathDir = panelMng.addTextField(null, true, null, null);
+    widgdPathDir.setActionChange(actionSetPath);
+    widgdPathDir.setBackColor(panelMng.getColor("pye"), 0xeeffff);  //color pastel yellow
+    GralMenu menuFolder = widgdPathDir.getContextMenu();
     menuFolder.addMenuItemGthread("x", "refresh [cR]", actionRefreshFileTable);
     panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
     panelMng.addButton(null, actionFavorButton, "favor");
@@ -669,7 +669,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.deselectRecursFiles, actionDeselectDirtree);
 
     //store this in the GralWidgets to get back from widgets later.
-    widgdPath.setContentInfo(this);
+    widgdPathDir.setContentInfo(this);
     selectList.wdgdTable.setContentInfo(this);
     selectList.wdgdTable.specifyActionOnLineSelected(actionOnFileSelection);
     selectList.wdgdTable.specifyActionOnLineMarked(actionOnMarkLine);
@@ -872,7 +872,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
           idxLines.put("..", tline);
         }
       }
-      widgdPath.setText(sCurrentDir, -1);
+      widgdPathDir.setText(sCurrentDir, -1);
       sortOrderLast = sortOrder;
       ////
       fillinPending = true;  //prevent hustle and bustle fillin requests in the graphic thread.
@@ -1050,7 +1050,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     int zLines = selectList.wdgdTable.size();
     int lineCt = 0; //count lines to select the line number with equal sFileSelect.
     GralTableLine_ifc<FileRemote> tline;
-    widgdPath.setText(sCurrentDir, -1);
+    widgdPathDir.setText(sCurrentDir, -1);
     //widgdPath.setSelection("|..<");
     long timeNow = System.currentTimeMillis();
     int lineSelect1 = 0;  
@@ -1267,17 +1267,23 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   @SuppressWarnings("boxing")
   private void completeLine(GralTableLine_ifc<FileRemote> tline, FileRemote file, long timeNow){
-    final String sDesign;
+    final String sDesign, sDir;
     int mark = file.mark ==null ? 0 : file.mark.getMark();
     if(file.isSymbolicLink()){ 
-      sDesign =  file.isDirectory() ? ">" : "s"; 
+      sDir =  file.isDirectory() ? ">" : "s"; 
     }
-    else if(file.isDirectory()){ sDesign = "/"; }
-    else if(mark != 0){
-      if((mark & FileMark.cmpAlone ) !=0){ sDesign = "!"; }
+    else if(file.isDirectory()){
+      sDir = "/";
+    } else {
+      sDir = "";
+    }
+    if(mark != 0){
+      if((mark & FileMark.cmpFileDifferences ) !=0){ sDesign = "#"; }
+      else if((mark & FileMark.cmpMissingFiles ) !=0){ sDesign = "*"; }  //directory contains more files
+      else if((mark & FileMark.cmpAlone ) !=0){ sDesign = "+"; }
       else if((mark & FileRemote.mCmpContent) !=0){
         switch(mark & FileRemote.mCmpContent){
-          case FileMark.cmpContentEqual: sDesign = "=";break;
+          case FileMark.cmpContentEqual: sDesign = " ";break;
           case FileMark.cmpContentNotEqual: sDesign = "#";break;
           default: sDesign = " ";
         }
@@ -1286,7 +1292,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       }
     }
     else { sDesign = " ";}
-    tline.setCellText(sDesign, kColDesignation);
+    tline.setCellText(sDir + sDesign, kColDesignation);
     long fileTime = file.lastModified();
     long diffTime = timeNow - fileTime;
     Date timestamp = new Date(fileTime);
@@ -1497,7 +1503,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
 
   @Override public boolean remove(){ 
     selectList.remove();
-    widgdPath.remove();
+    widgdPathDir.remove();
     indexSelection.clear();
     currentDir = null;
     return true;
@@ -1658,7 +1664,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
             File parent = file.getParentFile();
             if(parent !=null && parent.exists()){
               if(actionOnEnterPathNewFile !=null){
-                actionOnEnterPathNewFile.userActionGui(KeyCode.enter, widgdPath, file);
+                actionOnEnterPathNewFile.userActionGui(KeyCode.enter, widgdPathDir, file);
               } else {
                 String question = "Do you want to create file\n"
                   +file.getName()
