@@ -465,6 +465,12 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   private char sortOrder = kSortName, sortOrderLast = '0';
   
+  /**Determines which time are present in the date/time column.
+   * m a c for last modified, last access, creation
+   */
+  protected char showTime = 'm';
+  
+  
   /**The implementation of SelectList. */
   protected FileSelectList selectList;
   
@@ -664,6 +670,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
     selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortExtNonCase, actionSortFilePerExtensionNonCase);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortDateNewest, actionSortFilePerTimestamp);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortOldest, actionSortFilePerTimestampOldestFirst);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.showLastModifiedTime, actionShowLastModifiedTime);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.showLastAccessTime, actionShowLastAccessTime);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.showCreationTime, actionShowCreationTime);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sizeLarge, actionSortFilePerLenghLargestFirst);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortSizeSmall, actionSortFilesPerLenghSmallestFirst);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.deselectRecursFiles, actionDeselectDirtree);
@@ -1293,7 +1302,14 @@ public class GralFileSelector implements Removeable //extends GralWidget
     }
     else { sDesign = " ";}
     tline.setCellText(sDir + sDesign, kColDesignation);
-    long fileTime = file.lastModified();
+    long fileTime;
+    switch(showTime){
+      case 'm': fileTime = file.lastModified(); break;
+      case 'c': fileTime = file.creationTime(); break;
+      case 'a': fileTime = file.lastAccessTime(); break;
+      default: fileTime = -1; //error
+    }
+    
     long diffTime = timeNow - fileTime;
     Date timestamp = new Date(fileTime);
     String sDate;
@@ -1735,6 +1751,24 @@ public class GralFileSelector implements Removeable //extends GralWidget
       return true;
   } };
 
+  GralUserAction actionShowLastModifiedTime = new GralUserAction("actionSortFilePerTimestamp")
+  { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
+      showTime = 'm';
+      return true;
+  } };
+
+  GralUserAction actionShowLastAccessTime = new GralUserAction("actionSortFilePerTimestamp")
+  { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
+      showTime = 'a';
+      return true;
+  } };
+
+  GralUserAction actionShowCreationTime = new GralUserAction("actionSortFilePerTimestamp")
+  { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
+      showTime = 'c';
+      return true;
+  } };
+
   GralUserAction actionSortFilePerLenghLargestFirst = new GralUserAction("actionSortFilePerLenghLargestFirst")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
       setSortOrderFiles(GralFileSelector.kSortSizeLargest);
@@ -1841,8 +1875,11 @@ public class GralFileSelector implements Removeable //extends GralWidget
     public String sizeLarge = "&Sort/size &Largest";
     public String sortSizeSmall = "&Sort/size &Smallest";
     public String deselectRecursFiles = "actionDeselectDirtree";
-    public String refreshCyclicOff = "&Cyclic refresh/o&ff";
-    public String refreshCyclicOn = "&Cyclic refresh/&on";
+    public String refreshCyclicOff = "Cyclic refresh/o&ff";
+    public String refreshCyclicOn = "Cyclic refresh/&on";
+    public String showLastAccessTime = "show date last &Access";
+    public String showLastModifiedTime = "show date last &Modified";
+    public String showCreationTime = "show date &Creation";
   }
   
   

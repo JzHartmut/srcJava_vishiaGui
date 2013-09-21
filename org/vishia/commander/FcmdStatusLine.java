@@ -109,6 +109,16 @@ public class FcmdStatusLine
         }
       }
     }
+    long creationTime = file.creationTime();
+    if(creationTime !=0){
+      sDate = formatDateInfo.format(new Date(creationTime));
+      info.append("; creation=").append(sDate);
+    }
+    long lastAccess = file.lastAccessTime();
+    if(lastAccess !=0){
+      sDate = formatDateInfo.format(new Date(lastAccess));
+      info.append("; lastAccess=").append(sDate);
+    }
     main.statusLine.widgFileInfo.setText(info);
     sPath = file.getAbsolutePath();
     if(showBackslash){
