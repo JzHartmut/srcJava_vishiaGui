@@ -513,7 +513,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   protected int refreshCount;
   
-  boolean donotCheckRefresh;
+  boolean donotCheckRefresh = true;
   
   /**The widget for showing the path. */
   protected GralTextField widgdPathDir;
@@ -1427,7 +1427,10 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   public void checkRefresh(long since){
-    if(!donotCheckRefresh && currentDir !=null && !currentDir.isTested(since)){
+    if(currentDir !=null 
+      && (  !donotCheckRefresh && !currentDir.isTested(since - 5000)
+         || currentDir.shouldRefresh()
+       )   ){
       fillIn(currentDir, true);
     }
   }
@@ -1787,7 +1790,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     //if(fileCard !=null){
     if(currentFile !=null){
       currentFile.resetMarkedRecurs(0xffffffff, null);
-      //fileCard.f  //TODO refresh
+      currentFile.setDirShouldRefresh();
     }
     return true;
   } };

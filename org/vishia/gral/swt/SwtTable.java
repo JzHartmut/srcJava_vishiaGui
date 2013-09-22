@@ -356,7 +356,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
     if(cellData.colorBack != colorBack){
       Color colorSwt =  mng.getColorImpl(colorBack);
       cellSwt.setBackground(colorSwt);
-      cellData.colorBack = colorBack;
+      cellData.colorBack = colorBack;  //for the visible cell swt widget, not for the table line!
     }
     GralColor colorText = tableItem.colorForground !=null ? tableItem.colorForground : colorTextTable();
     if(colorText != cellData.colorText){

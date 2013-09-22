@@ -1340,6 +1340,17 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     @Override public Object getContentInfo(){ return userData; }
 
+    
+    
+    @Override public int getMark(){
+      if(userData instanceof MarkMask_ifc){
+        return ((MarkMask_ifc)userData).getMark();
+      } else {
+        return super.getMark();
+      }
+
+    }
+    
 
     /**Sets the mark status of the line.
      * It invokes the method given with {@link GralTable#specifyActionOnLineMarked(MarkMask_ifc)}
@@ -1352,6 +1363,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      */
     @Override public int setNonMarked(int mask, Object data)
     { if(actionMarkOnLine !=null && data !=null){ actionMarkOnLine.setNonMarked(mask, data); }
+      if(userData instanceof MarkMask_ifc){
+        ((MarkMask_ifc)userData).setNonMarked(mask, data);
+      }
       return super.setNonMarked(mask, data);
     }
     
@@ -1366,6 +1380,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      */
     @Override public int setMarked(int mask, Object data)
     { if(actionMarkOnLine !=null && data !=null){ actionMarkOnLine.setMarked(mask, data); }
+      if(userData instanceof MarkMask_ifc){
+        ((MarkMask_ifc)userData).setMarked(mask, data);
+      }
       return super.setMarked(mask, data);
     }
 
