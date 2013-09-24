@@ -359,7 +359,7 @@ public class FcmdCopyCmd
     sDstDir = widgCopyDirDst.getText();
     FileRemote fileDst;
     if(FileSystem.isAbsolutePathOrDrive(sDstDir)) {
-      fileDst = main.fileCluster.getFile(sDstDir);  //maybe a file or directory
+      fileDst = main.fileCluster.getDir(sDstDir);  //maybe a file or directory
     } else {
       fileDst = dirSrc.child(sDstDir);  //relative to source
     }

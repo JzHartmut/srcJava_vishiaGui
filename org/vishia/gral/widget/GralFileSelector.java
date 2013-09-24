@@ -836,6 +836,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       } else {
         dir = fileIn; file = null;
       }
+      fileIn.internalAccess().setRefreshed();
       boolean bSameDirectory = dir == currentDir;
       if(!bSameDirectory){
         currentDir = dir;
@@ -1669,7 +1670,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
         if(posWildcard >=0){
           
         } else {
-          FileRemote file = originDir.itsCluster.getFile(sPath);
+          FileRemote file = originDir.itsCluster.getDir(sPath);
           file.refreshProperties(null);
           if(file.isDirectory()){
             fillIn(file, false);
