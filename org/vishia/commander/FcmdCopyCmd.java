@@ -457,15 +457,10 @@ public class FcmdCopyCmd
 
   
   /**Opens the confirm-copy window, prepares the list of src files.
-   * It is Key F5 for copy command from the classic NortonCommander.
-   * The OK-key is designated to "check". On button pressed the {@link #actionButtonCopy} is called,
-   * with the "check" case.
    */
   GralUserAction actionConfirmCopy = new GralUserAction("actionConfirmCopy")
   {
     /**Opens the confirm-copy window and fills its fields to ask the user whether confirm.
-     * @param dst The path which is selected as destination. It may be a directory or a file
-     * @param src The path which is selected as source. It may be a directory or a file.
      */
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params)
     { //String sSrc, sDstName, sDstDir;
@@ -492,14 +487,13 @@ public class FcmdCopyCmd
             //widgButtonDst.setState(GralButton.kOff);  //maybe disabled, set off.
             List<FileRemote> listFileSrc = fileCardSrc.getSelectedFiles(true, 1);
             //String sDirSrc;
-            if(listFileSrc == null || listFileSrc.size()==0){ //nothing selected
-              fileSrc = fileCardSrc.currentFile;
-              if(fileSrc !=null) { 
-                //fileSrc.resetSelected(1); 
-                dirSrc = fileSrc.getParentFile();
-                sFilesSrc = "";  //only one file, 
-                widgCopyFrom.setText(fileSrc.getAbsolutePath());
-              }
+            if(listFileSrc.size() ==1){
+              //only one file is selected:
+              fileSrc = listFileSrc.get(0);
+              dirSrc = fileSrc.getParentFile();
+              sFilesSrc = "";  //only one file, 
+              widgCopyFrom.setText(fileSrc.getAbsolutePath());
+              
             } else {
               StringBuilder uFileSrc = new StringBuilder();
               dirSrc = fileSrc = fileCardSrc.getCurrentDir();
@@ -594,8 +588,12 @@ public class FcmdCopyCmd
         FcmdFileCard[] lastFileCards = main.getLastSelectedFileCards();
         fileCardDst = lastFileCards[0];
         fileDstDir = fileCardDst.getCurrentDir();
-        sDstDir = fileDstDir.getAbsolutePath();
-        widgCopyDirDst.setText(sDstDir);
+        CharSequence sText = sDstDir = fileDstDir.getAbsolutePath();
+        if(sFilesSrc == null || sFilesSrc.isEmpty()){
+          StringBuilder u = new StringBuilder(sText);
+          sText = u.append("/").append( fileSrc.getName());
+        }
+        widgCopyDirDst.setText(sText);
       }
       return true;
     }

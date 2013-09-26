@@ -33,9 +33,9 @@ public class Bzr
     File currDir = startDir;
     //search whether a .bzr or .bzr.bat exists and change to parent dir till it is found.
     do{
-      fBzr = new File(currDir, ".bzr");
+      fBzr = new File(currDir, ".bzr.bat");
       if(!fBzr.exists()){
-        fBzr = new File(currDir, ".bzr.bat");
+        fBzr = new File(currDir, ".bzr");
         if(!fBzr.exists()){
           try{
             currDir = FileSystem.getDirectory(currDir);  //NOTE: currDir.getParent() is not successfully on relative dir "."
@@ -48,7 +48,7 @@ public class Bzr
     } else {
       String sBzrDir = FileSystem.getCanonicalPath(currDir);
       dst.put(bzrdir, sBzrDir);
-      if(!fBzr.getName().equals(".bzr")){
+      if(fBzr.getName().equals(".bzr.bat")){
         String sLine = FileSystem.grep1line(fBzr, "bzr_mvExpl.bat");
         if(sLine !=null){
           int pos = sLine.indexOf("bzr_mvExpl.bat");
@@ -59,7 +59,7 @@ public class Bzr
           throw new IOException("Bzr.searchRepository - .bzr.bat found but does not contain \"bzr_mvExpl.bat\"");
         }
       } else {
-        dst.put(bzrsrc, "$");  
+        dst.put(bzrsrc, null);  
       }
     }
   }

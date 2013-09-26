@@ -28,16 +28,29 @@ import org.vishia.msgDispatch.MsgDispatchSystemOutErr;
 /**This class is the basic class for configurable GUI applications with 9-Area Main window.
  * It works without any derivation, if only simple widgets are necessary.
  * If additional capabilities are need, this class can uses as the super class.
- * Some protected methods support overriding.
+ * Some protected methods support overriding, especially:
+ * <ul>
+ * <li>{@link #initMain()}: initializes the GUI
+ * <li>{@link #stepMain()}: Will be invoked in the main loop.
+ * <li>{@link #finishMain()}: invoked on exit.
+ * </ul>
+ * Hint: call super.stepMain() etc. in an overridden method if necessary.
  * <br><br>
  * The class contains a {@link #main(String[])}. It is a complete ready to run application. 
  * The content of the GUI can be controlled by a script. The command line arguments are parsed in
  * {@link GralArea9MainCmd}, the universal or basic MainCmd for gral-GUI applications.
+ * <br><br>
+ * The configuration is done with {@link GralCfgZbnf} in the {@link #initMain()} routine.
+ * 
+ * <br><br>
+ * <br><br>
+ * <br><br>
+ * 
  * <br>
  * Registered user action can be used by script.
  * <ul>
  * <li>"cmdInvoke": The given parameter 'cmd' of the widget will be executed as command line.
- *   It is usefull to start commands from this GUI.
+ *   It is usefull to start commands from this GUI for example with a button.
  * </ul>
  * A user plugin class can be plugged which can register some more user actions etc.
  * @author Hartmut Schorrig.
@@ -322,8 +335,9 @@ protected void initMain()
     {
       File fileSyntax = new File(cargs.sPathZbnf + "/dialog.zbnf");
       GralCfgZbnf cfgZbnf = new GralCfgZbnf(console, fileSyntax);
-      
+      System.out.println("GuiCfg - start parsing cfg file; " + cargs.fileGuiCfg.getAbsolutePath());
       String sError = cfgZbnf.configureWithZbnf(cargs.fileGuiCfg, guiCfgData);
+      System.out.println("GuiCfg - finish parsing cfg file; ");
       if(sError !=null){
         console.writeError(sError);
       } else {
