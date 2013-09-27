@@ -93,6 +93,7 @@ public class GralCfgZbnf
   public String configureWithZbnf(File fileConfigurationZbnf, GralCfgData destination)
   { String sError = null;
     File dirOfconfig = fileConfigurationZbnf.getParentFile();
+    System.out.println("GralCfgZbnf - start parse cfg file; " + fileConfigurationZbnf.getAbsolutePath());
     //parses the configuration file and fill the configuration data.
     //Note: The building of the graphic appearance will be done in the graphic thread with this data later.
     sError = ZbnfJavaOutput.parseFileAndFillJavaObject(destination.getClass(), destination

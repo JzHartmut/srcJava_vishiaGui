@@ -371,12 +371,16 @@ public class GralArea9Window implements GralArea9_ifc
   
   
   
+  /**Set the bounds of all areas.
+   * Calls {@link GralWindow#getPixelPositionSize()} to get the size of working area of the whole window
+   * 
+   */
   protected void validateFrameAreas()
   {
     GralRectangle posSize = window.getPixelPositionSize();
     //Point size = swtWindow.graphicThreadSwt.windowSwt.getSize();
-    int xWidth = posSize.dx -6; //swtWindow.graphicThreadSwt.getWidth();
-    int yWidth = posSize.dy  -50; //swtWindow.graphicThreadSwt.getHeight() - 50;  //height of title and menu TODO calculate correctly
+    int xWidth = posSize.dx; // -6; //swtWindow.graphicThreadSwt.getWidth();
+    int yWidth = posSize.dy; //  -50; //swtWindow.graphicThreadSwt.getHeight() - 50;  //height of title and menu TODO calculate correctly
     //Control content = swtWindow.graphicThreadSwt.getContentPane();
     //xWidth = content.getWidth();
     //yWidth = content.getHeight();

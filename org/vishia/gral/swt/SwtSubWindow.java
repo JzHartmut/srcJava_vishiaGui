@@ -118,6 +118,14 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
   
 
   
+  /**Constructs a sub window (dialog window etc.). It is not used for the main window.
+   * For Main window see {@link SwtPrimaryWindow} which extends this.
+   * @param name
+   * @param display
+   * @param title
+   * @param windProps
+   * @param gralMng
+   */
   SwtSubWindow(String name, Display display, String title, int windProps, GralMng gralMng)
   { super(name, windProps, gralMng, null);
     int props = 0; ////|SWT.CLOSE;
@@ -223,6 +231,9 @@ public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
   }
 
 
+  /**Returns the size of the working area without border, menu and title of the window.
+   * Uses {@link org.eclipse.swt.widgets.Scrollable#getClientArea()}  to get the size.
+   */
   @Override public GralRectangle getPixelSize(){
     Rectangle r = ((Composite)panelComposite).getClientArea();
     GralRectangle posSize = new GralRectangle(0, 0, r.width, r.height);

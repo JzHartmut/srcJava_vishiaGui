@@ -129,6 +129,7 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   
   
   
+  @Override
   void stop()
   { //to set breakpoint
   }
@@ -192,6 +193,7 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   @Override public void repaint(){  graphicThreadSwt.windowSwt.redraw(); graphicThreadSwt.windowSwt.update(); }
 
   
+  @Override
   public void removeWidgetImplementation()
   {
     graphicThreadSwt.windowSwt.dispose();
@@ -201,9 +203,23 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
 
   @Override public Composite getPanelImpl() { return graphicThreadSwt.windowSwt; }
 
+  /**Returns the position and the size of the working area of the window on the screen.
+   * The title, borders and menu bar are not regarded.
+   * It uses {@link org.eclipse.swt.widgets.Shell#getBounds()} to get the position of the window
+   * inclusive title, border and menu bar and {@link org.eclipse.swt.widgets.Decorations#getClientArea()}
+   * to get the width and heigth of the working area. With them the position of the working area is calculated.
+   * Whereby the border left, right and bottom are taken as same.  
+   * @since Algorithm tuned on 2013-09-28.
+   * */
   @Override public GralRectangle getPixelPositionSize(){
-    Rectangle r = graphicThreadSwt.windowSwt.getBounds();
-    GralRectangle posSize = new GralRectangle(r.x, r.y, r.width, r.height);
+    Rectangle w = graphicThreadSwt.windowSwt.getBounds();
+    Rectangle r = graphicThreadSwt.windowSwt.getClientArea();
+    int pixelBorder = (w.width - r.width) /2;   
+    int pixelTitleMenu = w.height - r.height - pixelBorder;
+    int x = w.x + pixelBorder;
+    int y = w.y + pixelTitleMenu;
+    //returns position and size of the working area.
+    GralRectangle posSize = new GralRectangle(x, y, r.width, r.height);
     return posSize;
   }
 
