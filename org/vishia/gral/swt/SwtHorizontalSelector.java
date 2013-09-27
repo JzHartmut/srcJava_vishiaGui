@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Control;
 import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.widget.GralHorizontalSelector;
 
 /**This class is a selector in one text field. You can set the cursor into the field 
@@ -61,9 +62,13 @@ public class SwtHorizontalSelector extends GralHorizontalSelector<?>.GraphicImpl
   
   //public final GralWidgetAccess wdgGralAccess;
   
-  protected Canvas widgetSwt;
+  
+  SwtWidgetSimpleWrapper swtWidg;
 
-  protected final SwtMng mng;
+  
+  //protected Canvas widgetSwt;
+
+  //protected final SwtMng mng;
   
 
   
@@ -73,17 +78,18 @@ public class SwtHorizontalSelector extends GralHorizontalSelector<?>.GraphicImpl
   
   public SwtHorizontalSelector(SwtMng mng, GralHorizontalSelector<?> wdgGral)
   { wdgGral.super();
-    this.mng = mng;
+    //this.mng = mng;
     super.outer.setPanelMng(mng);
     //this.wdgGral = wdgGral;
     //this.wdgGralAccess = new GralWidgetAccess(wdgGral);
     wdgGral.implMethodWidget_.setWidgetImpl(this);
     Composite panel = (Composite)outer.pos().panel.getPanelImpl();
-    widgetSwt = new Canvas(panel,0);
-    widgetSwt.setData(wdgGral);
-    widgetSwt.addPaintListener(paintListener);
-    widgetSwt.addMouseListener(mouseListener);
-    mng.setBounds_(widgetSwt);
+    //widgetSwt = new Canvas(panel,0);
+    this.swtWidg = new SwtWidgetSimpleWrapper(new Canvas(panel,0), mng);
+    swtWidg.widgetSwt.setData(wdgGral);
+    swtWidg.widgetSwt.addPaintListener(paintListener);
+    swtWidg.widgetSwt.addMouseListener(mouseListener);
+    mng.setBounds_(swtWidg.widgetSwt);
     float ySize = outer.pos().height();
     char size1 = ySize > 3? 'B' : 'A';
     switch(size1){ 
@@ -97,33 +103,22 @@ public class SwtHorizontalSelector extends GralHorizontalSelector<?>.GraphicImpl
 
   
   
-  @Override public void repaintGthread(){
-    widgetSwt.redraw();
-  }
+  @Override public void repaintGthread(){ swtWidg.repaintGthread(); }
 
   
-  @Override public Object getWidgetImplementation()
-  { return widgetSwt;
-  }
+  @Override public Object getWidgetImplementation(){ return swtWidg.getWidgetImplementation(); }
   
-  @Override public boolean setFocusGThread(){ return widgetSwt.setFocus(); }
+  @Override public boolean setFocusGThread(){ return swtWidg.setFocusGThread(); }
 
-  @Override public void removeWidgetImplementation()
-  {
-    widgetSwt.dispose();
-    widgetSwt = null;
-  }
+  @Override public void removeWidgetImplementation(){ swtWidg.removeWidgetImplementation(); }
 
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy){ swtWidg.setBoundsPixel(x, y, dx, dy); }
 
-  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
-  { widgetSwt.setBounds(x,y,dx,dy);
-  }
   
+  @Override public GralRectangle getPixelPositionSize(){ return swtWidg.getPixelPositionSize(); }
+
   
-  @Override public boolean setVisible(boolean visible)
-  { widgetSwt.setVisible(visible);
-    return widgetSwt.isVisible();
-  }
+  @Override public boolean setVisible(boolean visible){ return swtWidg.setVisible(visible); }
   
   
 
@@ -136,9 +131,9 @@ public class SwtHorizontalSelector extends GralHorizontalSelector<?>.GraphicImpl
     Rectangle dim = swt.getBounds();
     GralHorizontalSelector.Item<?> actItem = super.actItem();
     int nrActItem = super.nrItem();
-    Color swtColorBack = mng.getColorImpl(super.outer.colorBack);
-    Color swtColorText = mng.getColorImpl(super.outer.colorText);
-    Color swtColorSelect = mng.getColorImpl(super.outer.colorSelect);
+    Color swtColorBack = swtWidg.mng.getColorImpl(super.outer.colorBack);
+    Color swtColorText = swtWidg.mng.getColorImpl(super.outer.colorText);
+    Color swtColorSelect = swtWidg.mng.getColorImpl(super.outer.colorSelect);
     gc.setBackground(swtColorBack);
     swt.drawBackground(e.gc, dim.x+1, dim.y+1, dim.width-1, dim.height-1);
     gc.setFont(fontText);
@@ -203,21 +198,21 @@ public class SwtHorizontalSelector extends GralHorizontalSelector<?>.GraphicImpl
   protected void mouseDown(MouseEvent e)
   {
     super.findTab(e.x);
-    widgetSwt.redraw();
+    swtWidg.widgetSwt.redraw();
     
   }
 
   
   public void mouseUp(MouseEvent e)
   {
-    Rectangle dim = widgetSwt.getBounds();
+    Rectangle dim = swtWidg.widgetSwt.getBounds();
     if(e.button == 1){
       if(e.y >0 && e.y < dim.height){
         super.setDstToActItem();
       } else {
         super.clearDstItem();
       }
-      widgetSwt.redraw();  //because selection is changed.
+      swtWidg.widgetSwt.redraw();  //because selection is changed.
     }
     //else: content menu does the action.
   }
@@ -226,7 +221,7 @@ public class SwtHorizontalSelector extends GralHorizontalSelector<?>.GraphicImpl
   
   PaintListener paintListener = new PaintListener(){
     @Override public void paintControl(PaintEvent e) {
-      SwtHorizontalSelector.this.paintControl(widgetSwt, e);
+      SwtHorizontalSelector.this.paintControl((Canvas)swtWidg.widgetSwt, e);
     }
   };
   

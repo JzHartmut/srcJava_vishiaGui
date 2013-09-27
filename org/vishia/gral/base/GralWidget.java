@@ -10,6 +10,7 @@ import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidgetCfg_ifc;
@@ -991,9 +992,15 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @param visible
    * @return the old state.
    */
-  public boolean setVisible(boolean visible){
+  @Override public boolean setVisible(boolean visible){
     if(wdgImpl !=null) return wdgImpl.setVisible(visible);
-    else throw new IllegalArgumentException("GralWidget unimplemented method - setVisible;");
+    else throw new IllegalArgumentException("GralWidget - does not know its implementation widget; ");
+  }
+  
+  
+  @Override public GralRectangle getPixelPositionSize(){
+    if(wdgImpl !=null) return wdgImpl.getPixelPositionSize();
+    else throw new IllegalArgumentException("GralWidget - does not know its implementation widget; ");
   }
   
   

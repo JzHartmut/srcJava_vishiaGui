@@ -409,7 +409,6 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 
   
   
-  
   /**Calculates the position as absolute value on screen from a given position inside a panel.
    * @param posWindow contains any {@link GralPos#panel}. Its absolute position will be determined.
    *   from that position and size the absolute postion will be calculate, with this given grid positions

@@ -36,7 +36,55 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
+/**Implementation of the GralTable for Swt graphic.
+ * The following schema shows the aggregation relations, see {@link org.vishia.util.Docu_UML_simpleNotation}:
+ * <pre>
+ *    |------|>GralWidgImpl_ifc<--------widgImpl-------GralWidget<|-----GralTable
+ *    |                                                                     |
+ *    |                                                                     |
+ * SwtTable----------|>GralTable.GraphicImplAccess<-----------------gi------|
+ *    |                           |                                         |
+ *    |                           |------->access to all protected methods and fields of GralTable
+ *    |
+ *    |
+ *    |
+ *    |---swtWidg----->SwtWidgetSimpleWrapper
+ *    |                       |----------------|>GralWidgImpl_ifc    //uses delegation from SwtTable
+ *    |                       |
+ *    |                       |--widgetSwt--->Control<|---Composite<|---SwtTable.Table
+ *    |                                                      |                    |
+ *    |----------cellsSwt-------*>Text<*---------------------+                    |    
+ *    |                                                                           |
+ *    |
+ * </pre>
+ * <ul>
+ * <li>The {@link GralTable} contains some implementation-non-specific things, most of table structure.
+ * <li>To access from this class to the GralTable, the inner class {@link GralTable.GraphicImplAccess}
+ *   is used as super class of SwtTable with protected access.
+ * <li>The GralTable knows this class via the interface {@link GralWidgImpl_ifc} in its superclass
+ *   association {@link GralWidget#wdgImpl}.
+ * <li>The GralTable knows this class via {@link GralTable#gi} association with the proper type.
+ * <li>The {@link GralTable.GraphicImplAccess} defines some abstract methods which are implemented here.  
+ * <li>But some implementations of {@link GralWidgImpl_ifc} is found in {@link SwtWidgetSimpleWrapper}.
+ *   That are unique implementations, reuse it!
+ * <li>Therefore for reused implementations this class delegates the interface to {@link #swtWidg}.
+ * <li>The Swt widget core implementation is {@link Table} which is derived from 
+ *   {@link org.eclipse.swt.widgets.Composite}. That Composite contains some text fields
+ *   which are the visible rows and columns of the table.
+ * <li>The text fields are created as children of the swt.widgets.Composite but associated 
+ *   in this class: {@link #cellsSwt}. Therefore this class can access the visible rows and columns
+ *   directly, using as {@link org.eclipse.swt.widgets.Text}.
+ * <li>The inner class {@link Table} is necessary only as implementor of {@link GralWidgetGthreadSet_ifc}.
+ *   But that is an {@link Deprecated} interface. It is possible to replace it later with an simple
+ *   instance of Composite.
+ * <li>The content of the table itself is stored in an array of {@link GralTable#tableLines},
+ *   see description of {@link GralTable}.
+ * </ul>
+ * @author Hartmut Schorrig
+ *
+ */
 public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgImpl_ifc 
+//public class SwtTable  implements GralWidgImpl_ifc 
 {
 
   /**Version and history
@@ -83,14 +131,16 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   @SuppressWarnings("hiding")
   public final static int version = 20120715;
 
+  SwtWidgetSimpleWrapper swtWidg;
+  
   /**The widget manager is stored in the base class too, but here as SWT-type reference. */
-  private final SwtMng mng;
+  //private final SwtMng mng;
   
   private final Text[][] cellsSwt;
   
   protected Text swtSearchText;
   
-  private final SwtTable.Table table; 
+  //private final SwtTable.Table table; 
   
   /**Set to true if the table has the focus in window.
    */
@@ -113,29 +163,29 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   public SwtTable(GralTable<?> gralTable, SwtMng mng, Composite parent)
   { super(gralTable, mng);
     //super(name, mng, columnWidths);
-    this.mng = mng;
-    gralTable.implMethodWidget_.setWidgetImpl(this);
     this.myKeyListener = this.new TableKeyListerner(null);
     focusListenerTable = this.new FocusListenerTable(mng);
     focusListenerCell = this.new FocusListenerCell();
     setColorsSwt();    
     this.cellsSwt = new Text[zLineVisibleMax][zColumn()];
+    Control swtTable = new SwtTable.Table(parent, zColumn(), mng);
+    this.swtWidg = new SwtWidgetSimpleWrapper(swtTable, mng);
+    gralTable.implMethodWidget_.setWidgetImpl(this);
     //this.menuColumns = new SwtMenu[zColumn];
-    this.table = new SwtTable.Table(parent, zColumn());
-    table.addKeyListener(myKeyListener);
+    swtWidg.widgetSwt.addKeyListener(myKeyListener);
     //table.addSelectionListener(selectionListener);
-    table.addControlListener(resizeListener);
-    table.addFocusListener(focusListenerTable);
+    swtWidg.widgetSwt.addControlListener(resizeListener);
+    swtWidg.widgetSwt.addFocusListener(focusListenerTable);
     
-    table.setFont(mng.propertiesGuiSwt.stdInputFont);
-    //table.setColumnSelectionAllowed(true);
-    //table.setRowHeight(2 * this.propertiesGui.xPixelUnit());
+    swtWidg.widgetSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
+    //swtWidg.widgetSwt.setColumnSelectionAllowed(true);
+    //swtWidg.widgetSwt.setRowHeight(2 * this.propertiesGui.xPixelUnit());
     //Container widget = new Container();
     //int width=0;
     //int xPixel = mng.propertiesGui.xPixelUnit();
     //int widthPixel = width * xPixel;
     //int heightPixel = height * mng.propertiesGui.yPixelUnit();
-    //table.setSize(widthPixel, heightPixel);
+    //swtWidg.widgetSwt.setSize(widthPixel, heightPixel);
     resizeTable();
   }
 
@@ -161,7 +211,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
         Composite parent = mng.getCurrentPanel();
         table = new SwtTable(gralTable, mng, parent); //, selectionColumn, selectionText);
         table.outer.setDataPath(sName);
-        table.table.setData(table);
+        table.swtWidg.widgetSwt.setData(table);
         mng.registerWidget(gralTable);
         //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
         return gralTable;
@@ -175,7 +225,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
         final SwtTable table;
         Composite parent = mng.getCurrentPanel();
         table = new SwtTable(gralTable, mng, parent); //, selectionColumn, selectionText);
-        table.table.setData(table);
+        table.swtWidg.widgetSwt.setData(table);
         mng.registerWidget(gralTable);
         //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
 
@@ -194,13 +244,13 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   
   void resizeTable()
   {
-    mng.setBounds_(table);
+    swtWidg.mng.setBounds_(swtWidg.widgetSwt);
     
   }
   
 
   @Override public Object getWidgetImplementation() {
-    return table;
+    return swtWidg.widgetSwt;
   }
 
   //@Override
@@ -221,10 +271,15 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
     
   }
   
+  
+  
+  @Override public GralRectangle getPixelPositionSize(){ return swtWidg.getPixelPositionSize(); }
+
+  
   //@Override 
   public boolean setVisible(boolean visible){
-    boolean ret = table.isVisible();
-    table.setVisible(visible);
+    boolean ret = swtWidg.widgetSwt.isVisible();
+    swtWidg.widgetSwt.setVisible(visible);
     outer.implMethodWidget_.setVisibleState(visible);
     return ret;
   }
@@ -232,16 +287,16 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
 
 
   @Override public void repaintGthread(){
-    if(!table.isDisposed()){
+    if(!swtWidg.widgetSwt.isDisposed()){
       setAllCellContentGthread();
-      Color colorSelectBack =  mng.getColorImpl(super.colorSelectCharsBack());
-      Color colorSelect =  mng.getColorImpl(super.colorSelectChars());
+      Color colorSelectBack =  swtWidg.mng.getColorImpl(super.colorSelectCharsBack());
+      Color colorSelect =  swtWidg.mng.getColorImpl(super.colorSelectChars());
       if(super.searchChars().length() >0){
         swtSearchText.setBackground(colorSelectBack);
         swtSearchText.setForeground(colorSelect);
         //swtSearchText.
         swtSearchText.setText(searchChars().toString());
-        Point tabSize = table.getSize();
+        Point tabSize = swtWidg.widgetSwt.getSize();
         swtSearchText.setBounds(xpixelCell[ixColumn()] + 10, tabSize.y - linePixel, xpixelCell[ixColumn()+1] - xpixelCell[ixColumn()] - 10, linePixel);
         swtSearchText.setVisible(true);
         
@@ -249,7 +304,9 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
         swtSearchText.setVisible(false);
       }
       //System.out.println("swtTable redrawed");
-      table.superRedraw();  //this is the core-redraw
+      swtWidg.widgetSwt.update();  //this is the core-redraw
+      swtWidg.widgetSwt.redraw();
+      //((Table)swtWidg.widgetSwt).super.redraw();
       redrawtime = System.currentTimeMillis();
       //System.out.println("test SwtTable redraw " + ++redrawct);
     } else {
@@ -273,27 +330,29 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
       //System.out.println("test SwtTable.setFocus-2");
       correctIxLineColumn();
       bFocused = true;
-      table.redraw();
-      table.setFocus();
+      ((Table)swtWidg.widgetSwt).redrawGthread();
+      swtWidg.widgetSwt.setFocus();
       return true;
     }
     /*
     if(ixLineNew >=0){ ///
       return SwtWidgetHelper.setFocusOfTabSwt(cellsSwt[ixLineNew][0]);
     } else {
-      return SwtWidgetHelper.setFocusOfTabSwt(table);
+      return SwtWidgetHelper.setFocusOfTabSwt(swtWidg.widgetSwt);
     }
     */
   }
 
 
+  
+  
 
   /**Removes the graphical widgets.
    * @see org.vishia.gral.base.GralWidget#removeWidgetImplementation()
    */
   @Override public void removeWidgetImplementation() {
     // TODO Auto-generated method stub
-    if(!table.isDisposed()){
+    if(!swtWidg.widgetSwt.isDisposed()){
       for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){
         for(int iCol = 0; iCol < zColumn(); ++iCol){
           Text cell = cellsSwt[iRow][iCol];
@@ -301,7 +360,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
           cellsSwt[iRow][iCol] = null;  
         }
       }
-      table.dispose();  //it may be sufficient to dispose table only becaust it is the container....
+      swtWidg.widgetSwt.dispose();  //it may be sufficient to dispose table only becaust it is the container....
     }
   }
 
@@ -319,14 +378,14 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   private void redrawTableWithFocusedCell(Widget cell){
     CellData data = (CellData)cell.getData();
     if(super.redrawTableWithFocusedCell(data)){
-      table.redraw();
+      ((Table)swtWidg.widgetSwt).redrawGthread();
     }
   }
 
 
   
   @Override protected int getVisibleLinesTableImpl(){
-    Rectangle size = table.getBounds();  
+    Rectangle size = swtWidg.widgetSwt.getBounds();  
     return size.height / linePixel;
   }  
   
@@ -354,13 +413,13 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
       colorBack = marked ? colorBackMarked() : colorBackTable();
     }
     if(cellData.colorBack != colorBack){
-      Color colorSwt =  mng.getColorImpl(colorBack);
+      Color colorSwt =  swtWidg.mng.getColorImpl(colorBack);
       cellSwt.setBackground(colorSwt);
       cellData.colorBack = colorBack;  //for the visible cell swt widget, not for the table line!
     }
     GralColor colorText = tableItem.colorForground !=null ? tableItem.colorForground : colorTextTable();
     if(colorText != cellData.colorText){
-      cellSwt.setForeground(mng.getColorImpl(colorText));
+      cellSwt.setForeground(swtWidg.mng.getColorImpl(colorText));
       cellData.colorText = colorText;
     }
     if(ixGlineSelectedNew == iCellLine && iCellCol == ixColumn() && bFocused){
@@ -372,7 +431,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   }
 
   
-  @Override public GralWidgetGthreadSet_ifc getGthreadSetifc(){ return table; }
+  @Override public GralWidgetGthreadSet_ifc getGthreadSetifc(){ return (Table)swtWidg.widgetSwt; }
   
   
   
@@ -382,7 +441,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
     cellData.tableItem = null;
     cellSwt.setText("");
     if(cellData.colorBack != colorBackTable()){
-      Color colorSwt =  mng.getColorImpl(colorBackTable());
+      Color colorSwt =  swtWidg.mng.getColorImpl(colorBackTable());
       cellSwt.setBackground(colorSwt);
       cellData.colorBack = colorBackTable();
     }
@@ -392,7 +451,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
 
   
   @Override protected GralMenu createColumnMenu(int column){
-    GralMenu menuColumn = new SwtMenu(outer, table, itsMng());
+    GralMenu menuColumn = new SwtMenu(outer, swtWidg.widgetSwt, itsMng());
     for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){
       cellsSwt[iRow][column].setMenu((Menu)menuColumn.getMenuImpl());
     }    
@@ -429,7 +488,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   
 
   protected void setBoundsCells(){
-    Rectangle parentBounds = table.getParent().getBounds();
+    Rectangle parentBounds = swtWidg.widgetSwt.getParent().getBounds();
     GralRectangle pixTable = outer.pos().calcWidgetPosAndSize(itsMng().propertiesGui(), parentBounds.width, parentBounds.height, 0, 0);
     int xPixelUnit = itsMng().propertiesGui().xPixelUnit();
     int xPixel1 = 0;
@@ -463,7 +522,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   
   private class Table extends Composite implements GralWidgetGthreadSet_ifc {
 
-    public Table(Composite parent, int zColumns) {
+    public Table(Composite parent, int zColumns, SwtMng mng) {
       super(parent, 0);
       int yPix = 0;
       Font font = mng.propertiesGuiSwt.getTextFontSwt(2, outer.whatIs, outer.whatIs);
@@ -511,7 +570,8 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
      * because this class and the built composition with it is private.
      * @see org.eclipse.swt.widgets.Control#redraw()
      */
-    @Override public void redraw(){
+    //@Override 
+    public void XXXredraw(){
       redrawGthread();
     }
     
@@ -586,7 +646,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
         processKeys(keyCode);
       }
     } catch(Exception exc){
-      mng.log.sendMsg(0, "Exception in SwtTable-KeyEvent; %s", exc.getLocalizedMessage());
+      swtWidg.mng.log.sendMsg(0, "Exception in SwtTable-KeyEvent; %s", exc.getLocalizedMessage());
       CharSequence stackInfo = Assert.exceptionInfo("Gral - SwtTable;", exc, 1, 5);
       System.err.append(stackInfo);
       //exc.printStackTrace(System.out);

@@ -48,8 +48,11 @@ public interface GralWidgetGthreadSet_ifc {
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
+   * @deprecated it is an older concept.
+   * 
    * 
    */
+  @Deprecated
   public final static int version = 0x20120303;
 
   

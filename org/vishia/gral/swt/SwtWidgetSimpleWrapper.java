@@ -1,11 +1,15 @@
 package org.vishia.gral.swt;
 
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWidget_ifc;
 
 /**This class wraps a SWT widget. In this form it is able to reference in the SWT-independent GRAL
@@ -28,6 +32,13 @@ public class SwtWidgetSimpleWrapper implements GralWidgImpl_ifc
     widgetSwt.redraw();
   }
 
+  
+  public void swtUpdateRedraw(){
+    widgetSwt.update();
+    widgetSwt.redraw();
+  }
+  
+  
   
   @Override public Object getWidgetImplementation()
   { return widgetSwt;
@@ -52,6 +63,45 @@ public class SwtWidgetSimpleWrapper implements GralWidgImpl_ifc
   }
   
 
+  
+  @Override public GralRectangle getPixelPositionSize(){
+    int posx = 0, posy = 0;
+    Rectangle r = widgetSwt.getBounds();
+    Composite parent;
+    if(widgetSwt instanceof Composite){
+      parent = (Composite) widgetSwt; //start with them, maybe the shell itself
+    } else {
+      parent = widgetSwt.getParent();
+    }
+    Rectangle pos;
+    while( !( parent instanceof Shell ) ){
+      pos = parent.getBounds();
+      posx += pos.x; posy += pos.y;
+      parent = parent.getParent();
+    }
+    assert(parent instanceof Shell);
+    Rectangle s = parent.getClientArea();
+    pos = parent.getBounds();
+    int dframe = (pos.width - s.width) /2;   //width of the frame line.
+    posx += r.x + dframe;               //absolute position of the client area!
+    posy += r.y + (pos.height - s.height) - dframe;
+    int dx, dy;
+    if(parent == widgetSwt){
+      dx = s.width;
+      dy = s.height;
+    } else {
+      dx = r.width;
+      dy = r.height;
+    }
+    GralRectangle posSize = new GralRectangle(posx, posy, dx, dy);
+    return posSize;
+  }
+
+
+
+
+  
+  
   @Override public GralWidgetGthreadSet_ifc getGthreadSetifc(){ return gThreadSet; }
 
   /**Implementation of the graphic thread widget set interface. */

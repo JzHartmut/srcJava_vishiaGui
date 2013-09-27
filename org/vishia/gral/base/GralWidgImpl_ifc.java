@@ -1,5 +1,7 @@
 package org.vishia.gral.base;
 
+import org.vishia.gral.ifc.GralRectangle;
+
 public interface GralWidgImpl_ifc
 {
   /**Sets the focus to the widget.
@@ -35,6 +37,8 @@ public interface GralWidgImpl_ifc
   
   void setBoundsPixel(int x, int y, int dx, int dy);
  
+  GralRectangle getPixelPositionSize();
+  
   GralWidgetGthreadSet_ifc getGthreadSetifc();
   
   
