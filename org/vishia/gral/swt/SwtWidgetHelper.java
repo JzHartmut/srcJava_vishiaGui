@@ -109,6 +109,13 @@ public class SwtWidgetHelper implements GralWidgetHelper
   }
 
   
+  /**
+   * @param widg
+   * @return
+   * @deprecated this routine is implemented in {@link SwtWidgetSimpleWrapper}
+   *   which can be used for all widgets (new concept).
+   */
+  @Deprecated
   public static GralRectangle getPixelPositionSize(Control widg){
     int posx = 0, posy = 0;
     Rectangle r = widg.getBounds();
