@@ -113,48 +113,6 @@ public interface GralMng_ifc
 	 */
 	Queue<GralWidget> getListCurrWidgets();
 	
-  /**Inserts a textual information to any widget. Calls {@link #setInfo(GralWidget, int, int, Object, Object)}
-   * with {@link #cmdInsert}.
-   * @param name The name of the widget, which was given by the add...()-Operation
-   * @param ident A identifying number. It meaning depends on the kind of widget.
-   *        0 means, insert on top.  Integer.MAXVALUE means, insert after the last element (append).
-   * @param content The content to insert.
-   * @return
-   */
-  String insertInfo(String name, int ident, String content);
-
-  
-  /**Sets any information to the given widget.
-   * The widget may be for example:
-   * <ul>
-   * <li>a Table: Than a new line will be inserted or appended. 
-   *     The content associated to the cells are separated with a tab-char <code>'\t'</code>.
-   *     The line number is identified by the ident. 
-   * <li>a Tree: Than a new leaf may be inserted after the leaf, which is identified by the ident.
-   * <li>a Text-edit-widget: Than a text can be set or inserted to the field.
-   * </ul>
-   * The insertion is written into a queue, which is red in another thread. 
-   * It may be possible too, that the GUI is realized in another module, maybe remote.
-   * It means, that a few milliseconds should be planned before the change appears.
-   * If the thread doesn't run or the remote receiver isn't present, 
-   * than the queue may be overflowed or the request may be lost.
-   *    
-   * @param widgd The widget
-   * @param cmd See {@link #cmdBackColor} etc.
-   * @param ident A value, widget-specific.
-   * @param visibleInfo The data which should be shown. It is a String in most of cases.
-   * @param userData Any user data. If the widget consist of elements like a table or a tree,
-   *   this data are referenced from the element of the widget (the table line, the leaf in the tree). 
-   *   Which element it is, it is given by param ident.
-   * @return
-   * @deprecated
-   */
-  @Deprecated String setInfo(GralWidget widgd, int cmd, int ident, Object visibleInfo, Object userData);
-  
-  String setInfoDelayed(GralWidget_ifc widgd, int cmd, int ident, Object visibleInfo, Object userData, int delay);
-  
-  //String setInfoDelayed(GralWidgetChangeRequ changeRequ, int delay);
-  
   /**Sets the color of background of the widget, if possible.
    * @param name The name of the widget, which was given by the add...()-Operation
    * @ix may be a line number of table or an position identifier. 0 if unused for the kind of widget. 
@@ -163,12 +121,29 @@ public interface GralMng_ifc
    */
   void setBackColor(String name, int ix, int colorValue);
   
+  
+  
+  /**Sets the text into a named widget.
+   * @param widget
+   * @param text The text is not stored by reference, it can be changed after them.
+   */
+  void setText(String widget, CharSequence text);
+  
+  /**Appends the text into a named widget. The widget can be especially a text area.
+   * @param widget
+   * @param text The text is not stored by reference, it can be changed after them.
+   */
+  void addText(String widget, CharSequence text);
+  
+  
   /**Sets the color of background of the widget, if possible.
    * @param name The name of the widget, which was given by the add...()-Operation
    * @ix may be a line number of table or an position identifier. 0 if unused for the kind of widget. 
    * @param colorValue blue, green and red in the bits 23..16, 15..8 and 7..0. 
    *        opaque in bits 31..24 if possible. 
+   * @deprecated use {@link GralWidget#setBackColor(GralColor, int)
    */
+  @Deprecated
   void setBackColor(GralWidget widgetDescr, int ix, int colorValue);
   
   
@@ -177,7 +152,9 @@ public interface GralMng_ifc
    * @ix may be a line number of table or an position identifier. 0 if unused for the kind of widget. 
    * @param colorValue blue, green and red in the bits 23..16, 15..8 and 7..0. 
    *        opaque in bits 31..24 if possible. 
+   * @deprecated use {@link GralWidget#setLineColor(GralColor, int)
    */
+  @Deprecated
   void setLineColor(GralWidget widgetDescr, int ix, int colorValue);
   
   
@@ -186,10 +163,19 @@ public interface GralMng_ifc
    * @ix may be a line number of table or an position identifier. 0 if unused for the kind of widget. 
    * @param colorValue blue, green and red in the bits 23..16, 15..8 and 7..0. 
    *        opaque in bits 31..24 if possible. 
+   * @deprecated use {@link GralWidget#setTextColor(GralColor)
    */
+  @Deprecated
   void setTextColor(GralWidget widgetDescr, int ix, int colorValue);
   
   
+  /**
+   * @param widgetDescr
+   * @param colorBorder
+   * @param colorInner
+   * @deprecated use {@link org.vishia.gral.base.GralLed#setColor(GralColor, GralColor)}.
+   */
+  @Deprecated
   void setLed(GralWidget widgetDescr, int colorBorder, int colorInner);
   
   /**Adds a sampling value set.

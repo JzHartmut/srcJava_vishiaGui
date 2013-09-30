@@ -3,6 +3,7 @@ package org.vishia.guiBzr;
 import java.io.File;
 
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
@@ -51,7 +52,7 @@ public class GuiStatusPanel
   private GralWindow selectorProjectPath;
   
   /**The table (list) which contains the selectable project paths. */
-  private GralWidget selectorProjectPathTable;
+  private GralTable selectorProjectPathTable;
   
   
   /**Any component has its PanelManager. It is one line with some widgets.
@@ -111,7 +112,8 @@ public class GuiStatusPanel
     String sPrjPath = null;
     for(String sPrjPath1: mainData.cfg.listSwPrjs){
       if(sPrjPath ==null){ sPrjPath = sPrjPath1; } //The first is offered.
-    	mainData.panelAccess.setInfo(selectorProjectPathTable, GralMng_ifc.cmdInsert, 0, sPrjPath1, null);
+      GralTableLine_ifc<Object> line = selectorProjectPathTable.insertLine(sPrjPath1, 0, null, null);
+      line.setCellText(sPrjPath1, 0);
     }
     if(sPrjPath==null){ 
       sPrjPath = "??no project directories found.";

@@ -489,12 +489,6 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     return null;
   }
 
-  @Override
-  public GralDispatchCallbackWorker getTheGuiChangeWorker()
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
 
   @Override
   public boolean remove(GralPanelContent compositeBox)
@@ -548,12 +542,6 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     return null;
   }
 
-  @Override
-  public String insertInfo(String name, int ident, String content)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
 
   @Override
   public void redrawWidget(String sName)
@@ -567,13 +555,6 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
   {
     // TODO Auto-generated method stub
     
-  }
-
-  @Override
-  public String setInfo(GralWidget widgd, int cmd, int ident, Object visibleInfo, Object userData)
-  {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   @Override
@@ -682,10 +663,5 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
 
 
 
-  @Override public String setInfoGthread(GralWidget_ifc widget, int cmd, int ident,
-      Object info, Object data) {
-    // TODO Auto-generated method stub
-    return null;
-  }
   
 }

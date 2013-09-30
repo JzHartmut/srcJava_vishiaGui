@@ -36,12 +36,18 @@ import org.vishia.util.KeyCode;
  * and the graphic depending parts in the created instance.
  * <br><br>
  * The first form is more universal. Especially generic can be used for the class definition if necessary.
- * It us used yet only (2013-06) for {@link GralMng#addHorizontalSelector(org.vishia.gral.widget.GralHorizontalSelector)}
- * but it may be used more and more in the future.<br>
+ * It us used yet only (2013-06) for
+ * <ul> 
+ * <li>{@link org.vishia.gral.widget.GralHorizontalSelector#setToPanel(GralMngBuild_ifc)}
+ * <li>{@link GralTable#setToPanel(GralMngBuild_ifc)}.
+ * </ul>
+ * but it may be used more and more in the future. The <code>setToPanel(GralMng)</code> method
+ * invokes the graphic implementation specific derivation of the {@link GralMng}, which creates
+ * the implementation widgets. <br>
  * For the UML presentation see {@link org.vishia.util.Docu_UML_simpleNotation}:
  * <pre>
  * 
- *   GralHorizontalSelector< UserType > <-----<*>UserCanCreate_GraphicIndependent
+ *   GralHorizontalSelector< UserType > <-----<*>UserCanCreateIt_GraphicIndependently
  *   - some special non-graphic data
  *     |
  *     |<------------------------------------------------------------------data---|
@@ -62,13 +68,12 @@ import org.vishia.util.KeyCode;
  *                                      
  * </pre>
  * <br><br>
- * The user creates an instance of {@link GralHorizontalSelector} in any thread maybe as composite 
- * independent of the graphic itself.
- * Then the user builds its graphic appearance with an derived instance of {@link GralMng} which is returned
- * by the factory via calling {@link GralMng#addHorizontalSelector(GralHorizontalSelector)}. This method 
- * is the factory method of the {@link org.vishia.gral.swt.SwtHorizontalSelector}.
+ * The user creates an instance of {@link GralHorizontalSelector} in any thread maybe as composite, 
+ * it is independent of the graphic itself.
+ * Then the user builds its graphic appearance with invocation of {@link GralHorizontalSelector#setToPanel(GralMngBuild_ifc)}
+ * with the derived instance of {@link GralMng} as parameter. 
  * <br><br>  
- * The GralWidget knows the graphic implementation via the {@link GralWidgImpl_ifc} to invoke some methods
+ * The <code>GralWidget</code> knows the graphic implementation via the {@link GralWidgImpl_ifc} to invoke some methods
  * for the graphical appearance. The interface is independent
  * of the implementation itself. The implementor of this interface for this example 
  * is the {@link org.vishia.gral.swt.SwtHorizontalSelector} implements this methods. 
@@ -92,7 +97,7 @@ import org.vishia.util.KeyCode;
  * {@link #addButton(String, GralUserAction, String)}.
  * <br><br>
  * The ObjectModelDiagram may shown the relations:<br>
- * <img src="../../../../img/Widget_gral.png"><br>
+ * <img src="../../../../../img/Widget_gral.png"><br>
  * In this graphic the relationship between this class and the graphical implementation layer widget
  * is shown with the example 'text field' in SWT:
  * <ul>
@@ -132,7 +137,7 @@ import org.vishia.util.KeyCode;
  * <b>Concept of data binding</b><br>
  * 2012-05-19
  * <br>
- * <img src="../../../../img/WidgetVariable_gral.png"><br>
+ * <img src="../../../../../img/WidgetVariable_gral.png"><br>
  * A widget has 2 associations: {@link #variable} and {@link #variables} to a management class {@link VariableAccessWithIdx}
  * which knows the user data via a commonly {@link VariableAccess_ifc}. The data can be existing in the 
  * user space with this interface. That part of user software doesn't know the graphical view of the data.
@@ -157,6 +162,46 @@ import org.vishia.util.KeyCode;
  * </ol>
  * For the second approach a time of actuality and a time of requesting are used. The method {@link #requestNewValueForVariable(long)}
  * can be used to force communication.     
+ * <br><br>
+ * <b>Strategy of changing the graphical content of a widget</b>:<br>
+ * 2013-09-30<br>
+ * The SWT graphical implementation prohibits changing the graphical appearance, for example setText(newText),  
+ * in another thread. Other graphical implementations are not threadsafe. Often a graphic application
+ * runs in only one thread, so that isn't a problem. But applications with complex data gathering processes
+ * needs to run in several threads. It may be fine to set the widgets in that threads immediately,
+ * seen from the programmers perspective. For multithread usage see {@link org.vishia.gral.base.GralGraphicThread}.
+ * <br><br>
+ * The solution of setting any content in a Widget in any thread in Gral is:
+ * <ul>
+ * <li>The thread invokes methods of this <code>GralWidget</code> or methods of an derived <code>GralWidget</code>
+ *   such as {@link GralTable}, for example {@link #setText(CharSequence)}, {@link #setTextColor(GralColor)}
+ *   or {@link GralTable#setColorCurrLine(GralColor)}.
+ * <li>That methods store the given data either in the common {@link DynamicData} {@link #dyda} of the widget
+ *   or in specific data of a GralWidget implementation.
+ * <li>That method calls {@link #repaint(int, int)} with a proper millisecond delay (usual 100).
+ *   The graphic implementation widget is not touched in this time. Usual it is not necessary to show information
+ *   in a faster time than 100 ms if it is not a high speed animated graphic. The delayed repaint request
+ *   saves calculation time if more as one property should be changed in one widget.
+ * <li>The delayed repaint request queues the instance {@link #repaintRequ} (only private visible)
+ *   of {@link GralDispatchCallbackWorker} in the central queue of requests using 
+ *   {@link GralGraphicThread#addDispatchOrder(GralDispatchCallbackWorker)}. The {@link GralGraphicThread}
+ *   is known by {@link #itsMng}.
+ * <li>If for example 20 widgets are changed in maybe 40 properties, that queue contains the 20 instances of
+ *   {@link GralDispatchCallbackWorker}. Any of them has a specific delay. The graphicthread organizes it in a proper kind
+ *   of time.
+ * <li>If a {@link GralDispatchCallbackWorker} is dequeued in the graphic thread, 
+ *   its method {@link GralDispatchCallbackWorker#doBeforeDispatching(boolean)} is invoked. 
+ *   This method calls {@link GralWidgImpl_ifc#repaintGthread()} via the association {@link #wdgImpl}.
+ * <li>The <code>rerepaintGthread()</code> method is overridden in the implementation layer
+ *   with the necessary statements to transfer the non-graphic data of this {@link GralWidget} especially
+ *   stored in {@link #dyda} to the special implementation widget method invocations
+ *   such as {@link org.eclipse.swt.widgets.Text#setText(String)} which touchs the graphic widget.
+ *   Then a {@link org.eclipse.swt.widgets.Control#update()} and {@link org.eclipse.swt.widgets.Control#redraw()}
+ *   is invoked to show the content.         
+ * </ul>
+ * It is a complex approach. But it is simple for usage. The user can change the content in any thread.
+ * The user does not need to organize a queue for the graphic thread by itself. The queue is a part of Gral.
+ *
  * @author Hartmut Schorrig
  *
  */

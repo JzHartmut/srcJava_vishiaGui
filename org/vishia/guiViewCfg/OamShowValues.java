@@ -166,7 +166,7 @@ public class OamShowValues
     		//other format
     		sValue = "?type=" + varType;
     	}
-		guiAccess.insertInfo(sName, 0, sValue);
+		  guiAccess.setText(sName, sValue);
 		}
 		
 	}
@@ -292,7 +292,7 @@ public class OamShowValues
     			guiAccess.setBackColor(sName, 0, 0xffffff);
       	}
     		String sValue = "" + value;
-    		guiAccess.insertInfo(sName, 0, sValue);
+    		guiAccess.setText(sName, sValue);
     	} 
 		  else if(sMethodName.equals("showBinManValue")){
 		  	int value= accessOamVariable.getInt(sVariablePath);
@@ -544,7 +544,8 @@ public class OamShowValues
 
 	
 	final GralUserAction actionSetValueTestInInput = new GralUserAction()
-  { public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+  { @Override
+  public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     { 
   		final int[] ixArrayA = new int[1];
   		ByteDataSymbolicAccess.Variable variable = getVariable(widgetInfos.getDataPath(), ixArrayA);

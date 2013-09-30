@@ -58,10 +58,6 @@ public class SwtLed extends GralLed{
 
   
 
-  @Override public void XXXsetColor(int nBorderColor, int nInnerColor){
-    widgSwt.XXXsetColor(nBorderColor, nInnerColor);
-  }
-  
   
   private void setColors(){
     int changedAckn = 0;

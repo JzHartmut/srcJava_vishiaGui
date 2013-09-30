@@ -80,6 +80,7 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
   
   protected boolean visibleFirst;
   
+  protected boolean bVisible;
   
   /**Standard action for resizing, used if the window contains one panel.
    * It calls {@link GralMng_ifc#resizeWidget(GralWidget, int, int)} 
@@ -120,23 +121,18 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
 
   
   @Override public void setWindowVisible(boolean visible){
-    itsMng.setInfo(this, GralMng_ifc.cmdSetWindowVisible, visible? 1: 0, null, null);
+    this.bVisible = visible;
+    repaint(repaintDelay, repaintDelayMax);
   }
   
 
   @Override public void closeWindow(){
-    itsMng.setInfo(this, GralMng_ifc.cmdCloseWindow, 0, null, null);
+    this.bVisible = false;
+    repaint(repaintDelay, repaintDelayMax);
   }
   
   
-  @Override public void repaint(){
-    itsMng.setInfo(this, GralMng_ifc.cmdRedraw, 0, null, null);
-  }
   
-  
-  @Override public void repaint(int delay, int latest){
-    itsMng.setInfoDelayed(this, GralMng_ifc.cmdRedraw, 0, null, null, delay);
-  }
   
 
   

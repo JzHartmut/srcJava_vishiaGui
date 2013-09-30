@@ -60,7 +60,16 @@ public abstract class GralLed extends GralWidget
     colorInnerSelectable[1] = GralColor.getColor("gn");
   }
 
-  public abstract void XXXsetColor(int nBorderColor, int nInnerColor);
+  /**Sets the LED's color. The border can be another than the inner color.
+   * The effect of {@link #setValue(Object[])} is independent from this method.
+   * @param colorBorder assign to {@link GralWidget#setLineColor(GralColor, int)} or {@link GralWidget.DynamicData#lineColor}. 
+   * @param colorInner assign to {@link GralWidget#setBackColor(GralColor, int)} {@link GralWidget.DynamicData#backColor}.
+   */
+  public void setColor(GralColor colorBorder, GralColor colorInner){
+    dyda.lineColor = colorBorder;
+    dyda.backColor = colorInner;
+    repaint(repaintDelay, repaintDelayMax);
+  }
 
   /**This method is invoked if more as one variable is assigned to the widget.
    * It sets the line and the back color which is the inner color (back) and border (line).

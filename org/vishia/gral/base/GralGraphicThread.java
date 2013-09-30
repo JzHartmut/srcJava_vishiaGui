@@ -176,14 +176,14 @@ public abstract class GralGraphicThread implements Runnable
    * is woken up and before the dispatching of graphic-system-event will be started.
    * An order may be run only one time, than it should delete itself from this queue in its run-method.
    * */
-  private ConcurrentLinkedQueue<GralDispatchCallbackWorker> queueGraphicOrders = new ConcurrentLinkedQueue<GralDispatchCallbackWorker>();
+  private final ConcurrentLinkedQueue<GralDispatchCallbackWorker> queueGraphicOrders = new ConcurrentLinkedQueue<GralDispatchCallbackWorker>();
   
   /**Queue of orders which are executed with delay yet. */
-  private ConcurrentLinkedQueue<GralDispatchCallbackWorker> queueDelayedGraphicOrders = new ConcurrentLinkedQueue<GralDispatchCallbackWorker>();
+  private final ConcurrentLinkedQueue<GralDispatchCallbackWorker> queueDelayedGraphicOrders = new ConcurrentLinkedQueue<GralDispatchCallbackWorker>();
   
   /**Temporary used instance of delayed orders while {@link #runTimer} organizes the delayed orders.
    * This queue is empty outside running one step of runTimer(). */
-  private ConcurrentLinkedQueue<GralDispatchCallbackWorker> queueDelayedTempGraphicOrders = new ConcurrentLinkedQueue<GralDispatchCallbackWorker>();
+  private final ConcurrentLinkedQueue<GralDispatchCallbackWorker> queueDelayedTempGraphicOrders = new ConcurrentLinkedQueue<GralDispatchCallbackWorker>();
   
   /**Mutex mechanism: This variable is set true under mutex while the timer waits. Then it should
    * be notified in {@link #addDispatchOrder(GralDispatchCallbackWorker)} with delayed order. */
@@ -331,7 +331,7 @@ public abstract class GralGraphicThread implements Runnable
       boolean bContinueDispatch;
       do{
         try{ bContinueDispatch = dispatchOsEvents();}
-        catch(Exception exc){
+        catch(Throwable exc){
           System.out.println(exc.getMessage());
           exc.printStackTrace(System.out);
           bContinueDispatch = true; //false;

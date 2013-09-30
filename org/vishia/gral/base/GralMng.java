@@ -1,6 +1,7 @@
 package org.vishia.gral.base;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -23,6 +24,7 @@ import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMngApplAdapter_ifc;
 import org.vishia.gral.ifc.GralPoint;
 import org.vishia.gral.ifc.GralTableLine_ifc;
+import org.vishia.gral.ifc.GralTextBox_ifc;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralRectangle;
@@ -37,19 +39,16 @@ import org.vishia.util.KeyCode;
 
 /**This is the base class of the GuiPanelMng for several Graphic-Adapters (Swing, SWT etc.). 
  * It contains the independent parts. 
- * The GuiPanelMng is a common approach to work with graphical interface simply, 
+ * This class <code>GralMng</code> is a common approach to work with graphical interface simply, 
  * it is implemented by the several graphic-system-supporting classes
  * <ul>
  * <li>{@link org.vishia.gral.swt.SwtMng}
- * <li>{@link org.vishia.gral.swt.SwtMng.GuiPanelMngSwt}
  * </ul>
  * to offer a unique interface to work with simple graphic applications.
  * <br><br>
  * 
  * @author Hartmut Schorrig
  *
- * @param <WidgetTYPE> The special base type of the composed widgets in the underlying graphic adapter specialization.
- *                     (SWT: Composite)
  */
 public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
@@ -113,7 +112,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
    */
   public final static int version = 20120422;
   
-	/**This class is used for a selection field for file names and pathes. */
+	/**This class is used for a selection field for file names and paths. */
   protected class FileSelectInfo
   {
     public List<String> listRecentFiles;
@@ -240,8 +239,6 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * The Position values may be negative which means measurement from right or bottom.
    */
   protected GralPos posWidget = new GralPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
-  
-  protected final WidgetChangeRequExecuter widgetChangeRequExecuter = new WidgetChangeRequExecuter();
   
 
   
@@ -531,45 +528,6 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
     }
   }
   
-  public void XXXsetGralDevice(GralGraphicThread device)
-  {
-    //this.gralDevice = device;
-  }
-  
- 
-  /**This is the central routine of the widget manager to set any graphical information
-   * in the graphical thread. It is called from {@link #setInfo(GralWidget, int, int, Object, Object)}
-   * immediately if the calling thread is the graphic thread. 
-   * The implementation should be done for the graphic system.
-   * @param widget
-   * @param cmd
-   * @param ident
-   * @param info
-   * @param data
-   * @return
-   */
-  protected abstract String setInfoGthread(GralWidget_ifc widget, int cmd, int ident, Object info, Object data);
-  
-  @Override public String setInfoDelayed(GralWidget_ifc widgd, int cmd, int ident, Object visibleInfo, Object userData, int delay){
-    if(delay == 0 && currThreadIsGraphic()){
-      return setInfoGthread(widgd, cmd, ident, visibleInfo, userData);
-    } else {
-      GralWidgetChangeRequ requ = new GralWidgetChangeRequ(widgd, cmd, ident, visibleInfo, userData);
-      return setInfoDelayed(requ, delay);
-    }
-  }
-  
-  public String setInfoDelayed(GralWidgetChangeRequ changeRequ, int delay){
-    if(delay == 0 && currThreadIsGraphic()){
-      return setInfoGthread(changeRequ.widg, changeRequ.cmd, changeRequ.ident, changeRequ.visibleInfo, changeRequ.userData);
-    } else {
-      //TODO check admissibility
-      changeRequ.delayExecution(delay);
-      widgetChangeRequExecuter.addRequ(changeRequ);
-      return null;
-    }
-  }
-  
 
 
   
@@ -716,6 +674,15 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
   
+  private GralWidget findWidget(String name){
+    GralWidget widg = indexNameWidgets.get(name);
+    if(widg == null){
+      log.sendMsg(0, "GuiMainDialog:setBackColor: unknown widget %s", name);
+    }
+    return widg;
+  }
+  
+  
   /**Sets the background color of any widget. The widget may be for example:
    * <ul>
    * <li>a Table: Then a new line will be colored. 
@@ -734,67 +701,49 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @param content The content to insert.
    * @return
    */
-  public void setBackColor(String name, int ix, int color)
+  @Override public void setBackColor(String name, int ix, int color)
   {
-    GralWidget descr = indexNameWidgets.get(name);
-    if(descr == null){
-      log.sendMsg(0, "GuiMainDialog:setBackColor: unknown widget %s", name);
-    } else {
-      setBackColor(descr, ix, color);
+    GralWidget widg;
+    if( (widg = findWidget(name)) !=null){
+      widg.setBackColor(GralColor.getColor(color), ix);
     }
   } 
   
   
-  /**Sets the background color of any widget. The widget may be for example:
-   * <ul>
-   * <li>a Table: Then a new line will be colored. 
-   * <li>a Tree: Then a new leaf is colored.
-   * <li>a Text-edit-widget: Then the field background color is set.
-   * </ul>
-   * The color is written into a queue, which is red in another thread. 
-   * It may be possible too, that the GUI is realized in another module, maybe remote.
-   * It means, that a few milliseconds should be planned before the change appears.
-   * If the thread doesn't run or the remote receiver isn't present, 
-   * than the queue may be overflowed or the request may be lost.
-   *    
-   * @param key The name of the widget, which was given by the add...()-Operation
-   * @param ident A identifying number. It meaning depends on the kind of widget.
-   *        0 means, insert on top.  Integer.MAXVALUE means, insert after the last element (append).
-   * @param content The content to insert.
-   * @return
-   * @deprecated because the {@link #setInfo(GralWidget, int, int, Object, Object)} is deprecated.
-   * Use {@link GralWidget#setBackgroundColor(GralColor)}
-   */
-  @Deprecated
-  @Override public void setBackColor(GralWidget descr1, int ix, int color)
-  { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
-    GralWidget descr = descr1;
-    setInfo(descr, GralMng_ifc.cmdBackColor, ix, color, null);
+  @Override public void setText(String name, CharSequence text){
+    GralWidget widg;
+    if( (widg = findWidget(name)) !=null){
+      widg.setText(text);
+    }
+  }
+
+  
+  @Override public void addText(String name, CharSequence text){
+    GralWidget widg;
+    if( (widg = findWidget(name)) !=null){
+      if(widg instanceof GralTextBox_ifc){
+        try{ ((GralTextBox)widg).append(text); }
+        catch(IOException exc){ System.err.println("TODO"); }
+      }
+      else {
+        System.err.println("GralMng - addText not possible;" + name);
+      }
+    }
+  }
+
+  
+  @Deprecated @Override public void setBackColor(GralWidget widg, int ix, int color)
+  { widg.setBackColor(GralColor.getColor(color), ix);
   } 
   
   
-  /**(non-Javadoc)
-   * @see org.vishia.gral.ifc.GralMng_ifc#setLineColor(org.vishia.gral.base.GralWidget, int, int)
-   * @deprecated because the {@link #setInfo(GralWidget, int, int, Object, Object)} is deprecated.
-   * Use {@link GralWidget#setForegroundColor(GralColor)}
-   */
-  @Deprecated
-  @Override public void setLineColor(GralWidget descr1, int ix, int color)
-  { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
-    GralWidget descr = descr1;
-    setInfo(descr, GralMng_ifc.cmdLineColor, ix, color, null);
+  @Deprecated @Override public void setLineColor(GralWidget widg, int ix, int color)
+  { widg.setLineColor(GralColor.getColor(color), ix);
   } 
   
   
-  /**(non-Javadoc)
-   * @see org.vishia.gral.ifc.GralMng_ifc#setTextColor(org.vishia.gral.base.GralWidget, int, int)
-   * @deprecated because the {@link #setInfo(GralWidget, int, int, Object, Object)} is deprecated.
-   */
-  @Deprecated
-  @Override public void setTextColor(GralWidget descr1, int ix, int color)
-  { @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
-    GralWidget descr = descr1;
-    setInfo(descr, GralMng_ifc.cmdTextColor, ix, color, null);
+  @Deprecated @Override public void setTextColor(GralWidget widg, int ix, int color)
+  { widg.setTextColor(GralColor.getColor(color));
   } 
   
   
@@ -842,12 +791,9 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
 
   
-  @Override public void setLed(GralWidget widgetDescr, int colorBorder, int colorInner)
+  @Override public void setLed(GralWidget widg, int colorBorder, int colorInner)
   {
-    @SuppressWarnings("unchecked") //casting from common to specialized: only one type of graphic system is used.
-    GralWidget descr = widgetDescr;
-    setInfo(descr, GralMng_ifc.cmdColor, colorBorder, colorInner, null);
-    
+    ((GralLed)widg).setColor(GralColor.getColor(colorBorder), GralColor.getColor(colorInner));
   }
   
 
@@ -964,6 +910,9 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
 
   
   
+  /* (non-Javadoc)
+   * @see org.vishia.gral.ifc.GralMngBuild_ifc#addFileSelectField(java.lang.String, java.util.List, java.lang.String, java.lang.String, java.lang.String)
+   */
   @Override public GralTextField addFileSelectField(String name, List<String> listRecentFiles
     , String startDirMask, String prompt, String promptStylePosition)
   { //int xSize1 = xSize;
@@ -1134,137 +1083,6 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
     String sWhere = stackTrace[0].getFileName() + ":" + stackTrace[0].getLineNumber();
     log.sendMsg(msgId, sMsg + " @" + sWhere);
   }
-  
-  
-  
-  /**The dispatch listener should be included in the dispatch loop in the SWT-Thread.
-   * It should be called any time if the Graphic is updated and cyclically too.
-   * <br><br>
-   * The run-method of this class is called one time in any dispatch loop process.
-   * It has to be returned immediately (not like the run-method of the thread),
-   * after it may be changed the graphic appearance. The graphic appearance is changed
-   * if any command is set in the {@link #guiChangeRequests}-Queue, see 
-   * <ul>
-   * <li>{@link #insertInfo(String, int, String)} 
-   * </ul>
-   */
-  protected class WidgetChangeRequExecuter extends GralDispatchCallbackWorker
-  {
-    
-    /**List of all requests to change the graphical presentation of values. The list can be filled in some Threads.
-     * It is processed in the {@link #dispatch()} routine.  */
-    protected ConcurrentLinkedQueue<GralWidgetChangeRequ> guiChangeRequests = new ConcurrentLinkedQueue<GralWidgetChangeRequ>();
-    
-    /**List of all requests to change the graphical presentation of values. The list can be filled in some Threads.
-     * It is processed in the {@link #dispatch()} routine.  */
-    protected ConcurrentLinkedQueue<GralWidgetChangeRequ> delayedChangeRequests = new ConcurrentLinkedQueue<GralWidgetChangeRequ>()
-          , delayedTempChangeRequests = new ConcurrentLinkedQueue<GralWidgetChangeRequ>();
-    
-    
-
-    
-    
-    WidgetChangeRequExecuter(){
-      super("SwtWidgetMng.widgetChangeRequExecuter");
-    }
-    
-    
-    /**Adds any change request of the graphic appearance in any other thread.
-     * The graphic thread will be poll it.
-     * @param requ
-     */
-    public void addRequ(GralWidgetChangeRequ requ)
-    {
-      if(requ.timeToExecution() >=0){
-        delayedChangeRequests.offer(requ);
-        //TODO is it okay? test
-        //todo the timer should check this queue too!
-        gralDevice.notifyTimer();
-      } else {
-        guiChangeRequests.add(requ);
-        synchronized(guiChangeRequests){ 
-          guiChangeRequests.notify();   //to wake up waiting on guiChangeRequests.
-        }
-        gralDevice.wakeup();
-      }
-    }
-    
-
-
-    /**Polls one change request. This method should be called in the graphic thread from any class,
-     * which knows details about the graphic. That class is {@link org.vishia.gral.base.GralMng}.
-     * 
-     * Hint: The method is public only because it will be invoked from the graphical implementation.
-     * @return null if the queue is empty.
-     */
-    public GralWidgetChangeRequ pollRequ()
-    {
-      GralWidgetChangeRequ changeReq = guiChangeRequests.poll();
-      while (changeReq != null){
-        int timeToExecution = changeReq.timeToExecution();
-        if(timeToExecution >=0){
-          //not yet to proceed
-          delayedChangeRequests.offer(changeReq);
-          gralDevice.notifyTimer();
-          changeReq = guiChangeRequests.poll();  //check if there is another.
-        } else {
-          return changeReq;  //take this
-        }
-      }
-      return null;  //nothing found.
-    }
-    
-
-    
-
-    
-    
-    /**This method is called in the GUI-thread. 
-     * 
-     */
-    @Override public void doBeforeDispatching(boolean onlyWakeup)
-    { if(designer !=null && !bDesignerIsInitialized){
-        designer.initGui();
-        bDesignerIsInitialized = true;
-      }
-      GralWidgetChangeRequ changeReq;
-      while( (changeReq = widgetChangeRequExecuter.pollRequ()) != null){
-        GralWidget_ifc widg = changeReq.widg;
-        setInfoGthread(widg, changeReq.cmd, changeReq.ident, changeReq.visibleInfo, changeReq.userData);
-
-      }
-    }  
-
-    @Override public int runTimer(int timeWait){  
-      GralWidgetChangeRequ requ;
-      boolean bWake = false;
-      while( (requ = delayedChangeRequests.poll()) !=null){
-        int timeToExecution = requ.timeToExecution();
-        if(timeToExecution >=0){
-          //not yet to proceed
-          if(timeWait > timeToExecution){ timeWait = timeToExecution; }
-          delayedTempChangeRequests.offer(requ);
-        } else {
-          guiChangeRequests.offer(requ);
-          bWake = true;
-        }
-      }
-      //delayedChangeRequest is tested and empty now.
-      //offer the requ back from the temp queue
-      while( (requ = delayedTempChangeRequests.poll()) !=null){
-        delayedChangeRequests.offer(requ); 
-      }
-      if(bWake){
-        gralDevice.wakeup(); //process changeRequests in the graphic thread.
-      }
-      
-      return timeWait;
-    }
-  
-
-  
-  
-  };
   
   
   

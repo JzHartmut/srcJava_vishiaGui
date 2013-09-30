@@ -462,7 +462,7 @@ public interface GralMngBuild_ifc
    *        It may or may not a fix widht, it may able to change by mouse actions,
    *        adequate to the possibilities of the used graphic base system. 
    * @return
-   * @deprecated Create an instance of {@link GralTable} and call 
+   * @deprecated Create an instance of {@link GralTable} and call {@link GralTable#setToPanel(GralMngBuild_ifc)} 
    */
   @Deprecated
   GralTable addTable(String sName, int height, int[] columnWidths);
@@ -730,12 +730,6 @@ public interface GralMngBuild_ifc
    */
   public Set< Map.Entry <String, GralWidget>> getShowFields();
 
-  
-  /**The GUI-change-listener should be called in the dispatch-loop of the GUI-(SWT)-Thread.
-   * @return The instance to call run(). 
-   * Hint: run() returns after checking orders and should be called any time in the loop. 
-   */
-  public GralDispatchCallbackWorker getTheGuiChangeWorker();
   
   
   /**Creates a box inside the current panel to hold some widgets.

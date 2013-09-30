@@ -356,7 +356,6 @@ protected void initMain()
   }    
   try{ Thread.sleep(10);} catch(InterruptedException exc){}
   //The GUI-dispatch-loop should know the change worker of the panel manager. Connect both:
-  gralMng.gralDevice.addDispatchOrder(panelBuildIfc.getTheGuiChangeWorker());
   try{ Thread.sleep(10);} catch(InterruptedException exc){}
   //gets all prepared fields to show informations.
   //oamShowValues.setFieldsToShow(panelBuildIfc.getShowFields());
@@ -414,7 +413,7 @@ private final GralUserAction cmdInvoke = new GralUserAction("cmdInvoke")
       error.setLength(0);
       mainCmd.executeCmdLine(processBuilder, widgetInfos.sCmd, null, Report.info, output, error);
       stop();
-      guiAccess.insertInfo("output", 0, output.toString());
+      guiAccess.addText("output", output);  //adds the result to any widget with name "output"
       //gui.executeCmdLine(widgetInfos.sCmd, 0, null, null);
       return true;
     } else return false;
