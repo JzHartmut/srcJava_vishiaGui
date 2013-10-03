@@ -116,24 +116,18 @@ import org.vishia.util.KeyCode;
  * <br><br>
  * The Widget knows its {@link GralPos} at its panel where it is placed. The panel knows all widgets
  * which are placed there (widgetList).
- * <br><br>
+ * 
+ * 
+ * <br>
+ * <br>
+ * <b>Change a widget from application in any thread</b>:<br> 
  * The user can invoke the methods of the widget to animate it in a GUI etc, for example {@link #setBackColor(GralColor, int)}
- * or {@link #setValue(int, int, Object)}. This methods can be called in any thread. There are thread safe. 
- * The organization of this actions are done in the implementation of the {@link org.vishia.gral.base.GralMng}
- * like {@link org.vishia.gral.swt.SwtMng}. This implementation adapts the basic graphic and knows their methods
- * to set colors, values etc. The user need deal only with this widget class. The thread safe  capability is organized
- * with a ConcurrentLinkedQueue which contains requests of type {@link org.vishia.gral.base.GralWidgetChangeRequ}.
- * <br><br>
- * The widget may know any user data with its association oContentInfo, see {@link #getContentInfo()} and {@link #setContentInfo(Object)}.
- * Mostly there are classes to support getting of values, formatting etc. The type of this classes depends on the user's application.
- * <br><br>
- * This class may contain associations to methods of {@link GralUserAction} to animate (change viewable content) and get values from this widget.
- * An independent part of the user application can invoke the methods {@link GralUserAction#userActionGui(String, GralWidget, Object...)}
- * which maybe implemented in another part of the user's application.
- * <br><br>
- * Last and least the properties of widget are able to change. The widget may know its {@link GralWidgetCfg_ifc} which provides
- * data for design the GUI.
- * <br><br>
+ * or {@link #setValue(int, int, Object)}. This methods can be called in any thread. This concept is described with the
+ * method {@link #setText(CharSequence)}, appropriate for all set methods.
+ * 
+ * 
+ * <br>
+ * <br>
  * <b>Concept of data binding</b><br>
  * 2012-05-19
  * <br>
@@ -271,7 +265,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    *     It is used for resizing of large widgets.
    *     A large widget is a widget, which lengthens over the panel and it is changed in size with panel size change. 
    *     A typical example is a text-area-widget.
-   * <li>2011-06-20 Hartmut new: method {@link #getMng()} It is the panel manager!
+   * <li>2011-06-20 Hartmut new: method {@link #gralMng()} It is the panel manager!
    * <li>2011-05-26 Hartmut new: separate action in {@link #actionChanging} and {@link #actionShow}.
    *     The actionChanging was the old action. It was called from the listener of the widgets of the underlying graphic
    *     if any changing is done on the widget (mouse click etc). But the actionShow is necessary too 
@@ -596,6 +590,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   }
   
   
+  
   public GralPos pos(){ return pos; } 
   
   
@@ -853,6 +848,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   
+  /**Sets the GralMng.
+   * @deprecated it should be set by the MethodsCalledbackFromImplementation ctor. 
+   */
+  @Deprecated
   public void setPanelMng(GralMng mng)
   { this.itsMng = mng; 
     if(this.pos !=null) 
@@ -1130,8 +1129,27 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   
-  /**Default implementation calls an log message. It should be overridden.
-   * @see org.vishia.gral.ifc.GralSetValue_ifc#setText(java.lang.CharSequence)
+  /**Set the text of the widget. If the widget is a button, the standard button text is changed.
+   * If it is a window, its title is changed.
+   * <br><br>
+   * <b>Concept of changing a widget from application</b>:<br>
+   * Here the generally approach is described, appropriate for this method, but in the same kind
+   * for all methods to set something like {@link #setBackColor(GralColor, int)} etc.
+   * <br><br>
+   * With the set methods the user stores the text, color etc. in graphic-independent attributes. Then the method
+   * {@link #repaint(int, int)} is invoked with the standard delay of {@link #repaintDelay} and {@link #repaintDelayMax}.
+   * With that the widget-specific private instance of {@link #repaintRequ} is added to the queue of requests
+   * in the {@link GralGraphicThread#addDispatchOrder(GralDispatchCallbackWorker)}. In the requested time that 
+   * dispatch order is executed in the graphic thread. It calls {@link GralWidgImpl_ifc#repaintGthread()}. 
+   * That method is implemented in the graphic implementation layer of the widget. It sets the appropriate values 
+   * from the independent Gral attributes to the implementation specifics and invoke a redraw of the graphic layer.
+   * <br><br>
+   * If more as one attribute is changed one after another, only one instance of the {@link GralDispatchCallbackWorker}
+   * is queued. All changed attributes are stored in {@link DynamicData#whatIsChanged} and the
+   * {@link GralWidgImpl_ifc#repaintGthread()} quests all changes one after another. 
+   * It means that a thread switch is invoked only one time per widget for more as one change.
+   * <br>
+   * See {@link DynamicData}. That composite part of a widget stores all standard dynamic data of a widget. 
    */
   @Override public void setText(CharSequence text){
     dyda.displayedText = text.toString(); 
@@ -1140,6 +1158,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     //System.err.println(Assert.stackInfo("GralWidget - non overridden setText called; Widget = " + name + "; text=" + text, 5));
   }
   
+  
+  public String getText(){
+    return dyda.displayedText;
+  }
   
   
   /**Sets the border of the value range for showing. 
@@ -1200,7 +1222,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * to get and set values and properties of this widgets non-symbolic.
    * @return The manager.
    */
-  public GralMng getMng(){ return itsMng; }
+  @Override public GralMng gralMng(){ return itsMng; }
   
   
   /**Gets the panel where the widget is member of. 
@@ -1253,8 +1275,18 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * This class is used only for the implementation level of the graphic. It is not intent to use
    * by any application. It is public because the implementation level should accesses it.
    */
-  public class MethodsCalledbackFromImplementation{
+  public abstract static class MethodsCalledbackFromImplementation implements GralWidgImpl_ifc {
     
+    private final GralWidget widgg;
+    
+    protected MethodsCalledbackFromImplementation(GralWidget widgg, GralMng mng){
+      this.widgg = widgg;
+      widgg.itsMng = mng;
+      widgg.wdgImpl = this; 
+      if(widgg.pos !=null) 
+        throw new IllegalStateException("GralWidget - setPos() is set already.");
+      widgg.pos = mng.getPosCheckNext();  //always clone it from the central pos 
+    }
     /**This method in not intent to call by user. It may be called from all widget implementation 
      * if the focus of the widget is gained. Use {@link #setFocus()} to set a widget in the focus.
      * 
@@ -1263,13 +1295,13 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
      * It should be overridden only in a Gral widget inheritance only if necessary.
      */
     public void focusGained(){
-      if(htmlHelp !=null){
-        itsMng.setHtmlHelp(htmlHelp);
+      if(widgg.htmlHelp !=null){
+        widgg.itsMng.setHtmlHelp(widgg.htmlHelp);
       }
-      if(actionFocused !=null){ actionFocused.userActionGui(KeyCode.focusGained, GralWidget.this); }
+      if(widgg.actionFocused !=null){ widgg.actionFocused.exec(KeyCode.focusGained, widgg); }
       //notify GralWidgetMng about focused widget.
-      System.out.println("GralWidget - FocusGained;" /* %s; %s;\n",*/ + name + "; " + htmlHelp);
-      itsMng.notifyFocus(GralWidget.this);
+      System.out.println("GralWidget - FocusGained;" /* %s; %s;\n",*/ + widgg.name + "; " + widgg.htmlHelp);
+      widgg.itsMng.notifyFocus(widgg);
     }
     
     /**Sets the state of the widget whether it seams to be visible.
@@ -1277,11 +1309,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
      * @param visible
      */
     public void setVisibleState(boolean visible){
-      bVisibleState = visible;
-      lastTimeSetVisible = System.currentTimeMillis();
+      widgg.bVisibleState = visible;
+      widgg.lastTimeSetVisible = System.currentTimeMillis();
     }
 
-    public void setWidgetImpl(GralWidgImpl_ifc widg){ wdgImpl = widg; }
+    //public void setWidgetImpl(GralWidgImpl_ifc widg, GralMng mng){ widgg.wdgImpl = widg; widgg.itsMng = mng; }
 
     
     
@@ -1290,7 +1322,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   /**Not intent to get from user: The instance which's methods can be called from an event method of the implementation of the GralWidget. 
    * Note: This Method is public only because the implementation in another package need to use it.
    * It should not be used by any application. */
-  public MethodsCalledbackFromImplementation implMethodWidget_ = new MethodsCalledbackFromImplementation();
+  //public MethodsCalledbackFromImplementation implMethodWidget_ = new MethodsCalledbackFromImplementation();
   
   
   /**This callback worker calls the {@link #repaintGthread()} if it is invoked in the graphical thread.
@@ -1336,6 +1368,17 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     }
     @Override public String toString(){ return name + ":" + GralWidget.this.name; }
   };
+
+  
+  
+  /**Sets the state of the widget whether it seams to be visible.
+   * This method should not be invoked by the application. It is 
+   * @param visible
+   */
+  public void setVisibleState(boolean visible){
+    bVisibleState = visible;
+    lastTimeSetVisible = System.currentTimeMillis();
+  }
 
   void stop(){
     

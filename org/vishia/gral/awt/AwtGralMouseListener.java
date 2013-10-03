@@ -42,7 +42,7 @@ public class AwtGralMouseListener
       Object oInfo = widget.getData();
       if(oInfo instanceof GralWidget){
         GralWidget widgetInfo = (GralWidget)oInfo;
-        GralMng guiMng = widgetInfo.getMng();
+        GralMng guiMng = widgetInfo.gralMng();
         try{
           if(widgetInfo ==null || widgetInfo.getDataPath() ==null || !widgetInfo.getDataPath().equals("widgetInfo")){
             guiMng.setLastClickedWidgetInfo(widgetInfo );
@@ -68,7 +68,7 @@ public class AwtGralMouseListener
       Object oInfo = widget.getData();
       if(oInfo instanceof GralWidget){
         GralWidget widgetInfo = (GralWidget)oInfo;
-        GralMng guiMng = widgetInfo.getMng();
+        GralMng guiMng = widgetInfo.gralMng();
         try{
           GralWidget widgd = (GralWidget)oInfo;
           int dx = ev.getX() - xDown, dy = ev.getY() - yDown;

@@ -1,8 +1,11 @@
 package org.vishia.gral.base;
 
 import org.vishia.gral.ifc.GralMng_ifc;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.impl.GralWindowImpl_ifc;
 
 /**This class represents a window of an application.
  * The {@link GralPos#pos} of the baseclass is the position of the window derived from any other 
@@ -10,7 +13,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralWindow extends GralPanelContent implements GralWindow_ifc
+public class GralWindow extends GralPanelContent implements GralWindow_ifc
 {
 
   /**Version, history and license.
@@ -66,11 +69,29 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
   @SuppressWarnings("hiding")
   public static final int version = 20120416;
   
+  /**Standard action for resizing, used if the window contains one panel.
+   * It calls {@link GralMng_ifc#resizeWidget(GralWidget, int, int)} 
+   * for all widgets in the {@link GralPanelContent#widgetsToResize}
+   */
+  protected class ActionResizeOnePanel extends GralUserAction 
+  { 
+    ActionResizeOnePanel(){ super("actionResizeOnePanel - window: " + name); }
+    @Override public boolean exec(int keyCode, GralWidget_ifc widgi, Object... params)
+    { for(GralWidget widgd: widgetsToResize){
+        widgd.gralMng().resizeWidget(widgd, 0, 0);
+      }
+      return true;
+    }
+  };
+
   /**Or of some wind... constants.
    */
   final int windProps;  
   
-  /**See {@link GralWindow_ifc#setResizeAction(GralUserAction)}. */
+  /**This action is called whenever the window is resized by user handling on GUI
+   * and the window is determined as {@link GralWindow_ifc#windResizeable}.
+   * Per default an instance of {@link ActionResizeOnePanel} is called. 
+   * See {@link GralWindow_ifc#setResizeAction(GralUserAction)}. */
   protected GralUserAction resizeAction;
   
   protected GralUserAction invisibleSetAction;  
@@ -80,22 +101,11 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
   
   protected boolean visibleFirst;
   
-  protected boolean bVisible;
+  /**State of visible, fullScreen, close set by {@link #setVisible(boolean)}, {@link #setFullScreen(boolean)},
+   * {@link #closeWindow()} called in another thread than the graphic thread. It is stored here
+   * and executed in the {@link GralWidgImpl_ifc#repaintGthread()}. */
+  protected boolean bVisible, bFullScreen, bShouldClose;
   
-  /**Standard action for resizing, used if the window contains one panel.
-   * It calls {@link GralMng_ifc#resizeWidget(GralWidget, int, int)} 
-   * for all widgets in the {@link GralPanelContent#widgetsToResize}
-   */
-  protected GralUserAction actionResizeOnePanel = new GralUserAction("actionResizeOnePanel")
-  { @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
-    { for(GralWidget widgd: widgetsToResize){
-        widgd.getMng().resizeWidget(widgd, 0, 0);
-      }
-      return true;
-    }
-  };
-
-
 
   
   /**Constructs a window. 
@@ -105,10 +115,14 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
    * @param mng
    * @param panelComposite The implementing instance for a panel.
    */
-  public GralWindow(String nameWindow, int windProps, GralMng mng, Object panelComposite)
+  public GralWindow(String nameWindow, String sTitle, int windProps, GralMng mng, Object panelComposite)
   {
     super( nameWindow, mng, panelComposite);
+    dyda.displayedText = sTitle;  //maybe null
     this.windProps = windProps;
+    if((windProps & windResizeable)!=0){
+      resizeAction = new ActionResizeOnePanel();
+    }
 
   }
 
@@ -132,7 +146,133 @@ public abstract class GralWindow extends GralPanelContent implements GralWindow_
   }
   
   
+  /**This class is not intent to use from an application, it is the super class for the implementation layer
+   * to access all necessary data and methods with protected access rights.
+   * The methods are protected because an application should not use it. This class is public because
+   * it should be visible from the graphic implementation which is located in another package. 
+   */
+  public abstract static class GraphicImplAccess 
+  extends GralWidget.MethodsCalledbackFromImplementation //access to GralWidget
+  implements GralWidgImpl_ifc
+  {
+    
+    protected final GralWindow gralWindow;  //its outer class.
+    
+    protected GraphicImplAccess(GralWindow gralWdg, GralMng mng){
+      super(gralWdg, mng);
+      this.gralWindow = gralWdg;  //References the environment class
+    }
+    
+    /**The title is stored in the {@link GralWidget.DynamicData#displayedText}. */
+    protected String getTitle(){ return gralWindow.dyda.displayedText; }
+    
+    /**Window properties as Gral bits given on ctor of GralWindow. */
+    protected int getWindowProps(){ return gralWindow.windProps; }
+    
+    
+    
+    protected boolean isVisible(){ return gralWindow.bVisible; }
+    
+    protected boolean isFullScreen(){ return gralWindow.bFullScreen; }
+    
+    protected boolean shouldClose(){ return gralWindow.bShouldClose; }
+    
+    /**The resizeAction from the {@link GralWindow_ifc#setResizeAction(GralUserAction)} */
+    protected GralUserAction resizeAction(){ return gralWindow.resizeAction; }  
+
+    /**The mouseAction from the {@link GralWindow_ifc#setMouseAction(GralUserAction)} */
+    protected GralUserAction mouseAction(){ return gralWindow.mouseAction; }  
+
+    /**The invisibleSetAction from the {@link GralWindow_ifc#setActionOnSettingInvisible(GralUserAction)} */
+    protected GralUserAction invisibleSetAction(){ return gralWindow.invisibleSetAction; }  
+
   
+
+
+  
+  
+  }
+
+
+  @Override
+  public Object getPanelImpl()
+  {
+    // TODO Auto-generated method stub
+    return wdgImpl.getWidgetImplementation();
+  }
+
+
+
+  @Override
+  public GralRectangle getPixelPositionSize()
+  {
+    return wdgImpl.getPixelPositionSize();
+  }
+
+
+
+  @Override
+  public GralRectangle getPixelSize()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+
+  /**It assumes that the window implementation is present. 
+   * It calls {@link GralWindowImpl_ifc#addMenuItemGThread(String, String, GralUserAction)}
+   * with the known {@link GralWidget#wdgImpl} instance
+   * to invoke the graphic implementation layer method for the window. */
+  @Override
+  public void addMenuItemGThread(String nameMenu, String sMenuPath, GralUserAction action)
+  { ((GralWindowImpl_ifc)wdgImpl).addMenuItemGThread(nameMenu, sMenuPath, action);
+  }
+
+
+
+  @Override
+  public void setMouseAction(GralUserAction action)
+  {
+    mouseAction = action;
+    repaint(repaintDelay, repaintDelayMax);
+  }
+
+
+
+  @Override
+  public void setResizeAction(GralUserAction action)
+  { resizeAction = action;
+    repaint(repaintDelay, repaintDelayMax);
+  }
+
+
+
+  @Override
+  public void setTitle(String sTitle)
+  {
+    dyda.displayedText = sTitle;
+    dyda.setChanged(chgText); 
+    repaint(repaintDelay, repaintDelayMax);
+  }
+
+
+
+  @Override
+  public boolean isWindowsVisible()
+  {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+
+
+  @Override
+  public void setFullScreen(boolean full)
+  {
+    // TODO Auto-generated method stub
+    
+  }
   
 
   

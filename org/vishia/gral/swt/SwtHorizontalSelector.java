@@ -24,7 +24,7 @@ import org.vishia.gral.widget.GralHorizontalSelector;
  * @author Hartmut Schorrig
  *
  */
-public class SwtHorizontalSelector extends GralHorizontalSelector<?>.GraphicImplAccess implements GralWidgImpl_ifc
+public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAccess implements GralWidgImpl_ifc
 {
   /**Version, history and copyright/copyleft.
    * <ul>
@@ -79,12 +79,8 @@ public class SwtHorizontalSelector extends GralHorizontalSelector<?>.GraphicImpl
   
   
   public SwtHorizontalSelector(SwtMng mng, GralHorizontalSelector<?> wdgGral)
-  { wdgGral.super();
+  { super(wdgGral, mng);  //Invoke constructor of the super class, with knowledge of its outer class.
     //this.mng = mng;
-    super.outer.setPanelMng(mng);
-    //this.wdgGral = wdgGral;
-    //this.wdgGralAccess = new GralWidgetAccess(wdgGral);
-    wdgGral.implMethodWidget_.setWidgetImpl(this);
     Composite panel = (Composite)outer.pos().panel.getPanelImpl();
     //widgetSwt = new Canvas(panel,0);
     this.swtWidgWrapper = new SwtWidgetSimpleWrapper(new Canvas(panel,0), mng);

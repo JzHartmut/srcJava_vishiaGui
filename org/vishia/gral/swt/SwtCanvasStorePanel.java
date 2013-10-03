@@ -99,7 +99,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
     	for(GralCanvasStorage.PaintOrder order: storeMng.canvas.paintOrders){
     		switch(order.paintWhat){
       		case GralCanvasStorage.paintLine: {
-      			g.setForeground(((SwtMng)storeMng.gralMng).getColorImpl(order.color));
+      			g.setForeground(((SwtMng)storeMng.gralMng()).getColorImpl(order.color));
       	  	g.drawLine(order.x1, order.y1, order.x2, order.y2);
       	  
       	  } break;

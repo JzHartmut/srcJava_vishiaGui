@@ -76,7 +76,7 @@ public interface GralPlugUser_ifc extends Closeable
   /**This routine can be implemented to add some specific menu entries.
    * @param wind The main window access
    */
-  void addGuiMenu(GralPrimaryWindow_ifc wind);
+  void addGuiMenu(GralWindow_ifc wind);
   
 
 }

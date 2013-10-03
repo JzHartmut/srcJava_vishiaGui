@@ -282,8 +282,10 @@ public interface GralMngBuild_ifc
    * This operation returns an independent instance of GralGridPos. 
    * Note that the {@link GralMng#pos} is reused there. Therefore the implementation of the method
    * returns a cloned instance.   
-   * @return An independent instance with current data of {@link GralMng#pos}. 
+   * @return An independent instance with current data of {@link GralMng#pos}.
+   * @deprecated see {@link GralWidget.MethodsCalledbackFromImplementation}. 
    */
+  @Deprecated
   GralPos getPositionInPanel();
   
   

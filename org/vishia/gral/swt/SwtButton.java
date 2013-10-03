@@ -211,8 +211,8 @@ public class SwtButton extends GralButton
           colorgline = colorLineOff;
         }
         
-        Color colorBack = (Color)getMng().getColorImpl(colorgback);
-        Color colorLine = (Color)getMng().getColorImpl(colorgline);
+        Color colorBack = (Color)gralMng().getColorImpl(colorgback);
+        Color colorLine = (Color)gralMng().getColorImpl(colorgline);
         gc.setBackground(colorBack);
         drawBackground(e.gc, dim.x+1, dim.y+1, dim.width-1, dim.height-1);
         Color color = getForeground(); //of the widget.

@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralHtmlBox;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
@@ -118,6 +119,13 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     return box; 
 
   }
+  
+  
+  @Override public void setToPanel(GralMngBuild_ifc mng){
+    throw new IllegalArgumentException("TODO, new concept is not implemented yet.");
+  }
+
+
   
   public static GralInfoBox createHtmlInfoBox(GralMngBuild_ifc mng, String name, String title, boolean onTop)
   {
@@ -403,4 +411,6 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
 
   @Override public Object getContentInfo(){ return null; }
   
+  
+  @Override public GralMng gralMng(){ return window.gralMng(); }
 }

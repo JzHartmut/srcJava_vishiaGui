@@ -660,7 +660,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * environment class. Via access methods the implementor class has protected access to all of it.
    * 
    */
-  public static abstract class GraphicImplAccess implements GralWidgImpl_ifc, Removeable
+  public static abstract class GraphicImplAccess extends GralWidget.MethodsCalledbackFromImplementation
+  implements GralWidgImpl_ifc, Removeable
   {
     protected final GralTable<?> outer;
     
@@ -720,9 +721,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
 
     protected GraphicImplAccess(GralTable<?> outer, GralMng mng){ 
+      super(outer, mng);
       this.outer = outer;
-      outer.wdgImpl = this;
-      outer.setPanelMng(mng);
+      //outer.wdgImpl = this;
+      //outer.setPanelMng(mng);
       outer.gi = this; 
       int xdPix = outer.itsMng.propertiesGui().xPixelUnit();
       columnPixel = new int[outer.columnWidthsGral.length+1];
@@ -1384,6 +1386,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         ((MarkMask_ifc)userData).setMarked(mask, data);
       }
       return super.setMarked(mask, data);
+    }
+
+    @Override public GralMng gralMng(){ return GralTable.this.gralMng(); }
+    
+    @Override public void setToPanel(GralMngBuild_ifc mng){
+      throw new IllegalArgumentException("GralTableLine.setToPanel - is illegal; Use GralTable.setToPanel(...)");
     }
 
     

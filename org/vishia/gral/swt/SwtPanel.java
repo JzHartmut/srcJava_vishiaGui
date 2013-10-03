@@ -174,7 +174,7 @@ public class SwtPanel extends GralPanelContent
       Widget wparent = e.widget; //it is the SwtCanvas because this method is assigned only there.
       //Control parent = wparent;
       for(GralWidget widgd: widgetsToResize){
-        widgd.getMng().resizeWidget(widgd, 0, 0);
+        widgd.gralMng().resizeWidget(widgd, 0, 0);
       }
       //validateFrameAreas();  //calculates the size of the areas newly and redraw.
     }

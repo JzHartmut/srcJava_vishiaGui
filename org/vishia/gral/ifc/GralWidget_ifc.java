@@ -1,6 +1,7 @@
 package org.vishia.gral.ifc;
 
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
@@ -88,6 +89,19 @@ public interface GralWidget_ifc extends Removeable
   GralWidgetGthreadSet_ifc getGthreadSetifc();
   
   public String getName();
+  
+  /**This routine should be called only one time after the Gral widget was created. It is overridden by the 
+   * implementation widget. It invokes the proper method of the {@link GralMngBuild_ifc} to set and show 
+   * the graphical implementation layer widgets.
+   * @param mng This instance knows the graphical implementation layer.
+   */
+  void setToPanel(GralMngBuild_ifc mng);
+  
+  /**Returns the associated singleton GralMng. The GralMng is associated only if the widget is setToPanel,
+   * see {@link #setToPanel(GralMngBuild_ifc)}.
+   * @return null if the Widget is created yet without connection to the graphical implementation layer
+   */
+  GralMng gralMng();
   
   /**Sets the focus to the widget. . It can be called in any thread. If it is called in the graphic thread,
    * the repaint action is executed immediately in the thread. Elsewhere the graphic thread will be woken up.

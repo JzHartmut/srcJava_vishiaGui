@@ -14,6 +14,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
 
 /**This class is the implementation class of a simple graphic implementation for SWT.
@@ -66,9 +68,11 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
   
   SwtPrimaryWindow instance;
   
+  public final GralWindow mainWindow;
+  
   LogMessage log;
   
-  GralMng gralMng;
+  SwtMng gralMng;
   
   /**The windows-closing event handler. It is used private only, but public set because documentation. 
    * The close event will be fired also when a SubWindow is closed. Therefore test the Shell instance.
@@ -182,27 +186,45 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
   
   
   
-  final String sTitle; final int xPos, yPos, xSize, ySize;
+  //final String sTitle; 
+  final int xPos, yPos, xSize, ySize;
   
-  SwtGraphicThread(String sTitle, char sizeShow, int left, int top, int xSize, int ySize, LogMessage log)
+  SwtGraphicThread(GralWindow windowGral, char sizeShow, int left, int top, int xSize, int ySize, LogMessage log)
   { super(sizeShow);
     this.log = log;
-    this.sTitle = sTitle; this.xPos = left; this.yPos = top; this.xSize = xSize; this.ySize = ySize; 
+    this.mainWindow = windowGral;
+    //this.sTitle = sTitle; 
+    this.xPos = left; this.yPos = top; this.xSize = xSize; this.ySize = ySize; 
     threadGuiDispatch.start();
   }
   
+  
+  
+  
+  
+  
+  /**
+   * @see org.vishia.gral.base.GralGraphicThread#initGraphic()
+   */
   @Override protected void initGraphic(){
     displaySwt = new Display();
     displaySwt.addFilter(SWT.Close, windowsCloseListener);
     displaySwt.addFilter(SWT.Traverse, traverseKeyFilter);
-    windowSwt = new Shell(displaySwt); //, SWT.ON_TOP | SWT.MAX | SWT.TITLE);
-    windowSwt.addKeyListener(keyListener);
+    SwtProperties propertiesGui = new SwtProperties(this.displaySwt, sizeCharProperties);
+    gralMng = new SwtMng(this, displaySwt, propertiesGui, log);
+    
+    SwtSubWindow windSwt = new SwtSubWindow(gralMng, mainWindow);
+    
+    gralMng.registerPanel(mainWindow);
+    
+    windowSwt = windSwt.window; //, SWT.ON_TOP | SWT.MAX | SWT.TITLE);
+    //windowSwt.addKeyListener(keyListener);
     //windowSwt.addTraverseListener(keyTraverse);
     
     //graphicFramePos = new Position(graphicFrame.getContentPane());
     //graphicFramePos.set(0,0,xSize,ySize);
     // main = this;
-    windowSwt.setText(sTitle);
+    //windowSwt.setText(mainWindow.getText());
     //
     //set a menu bar anyway. Otherwise the calculation of used area of the window may be faulty
     //if it is calculated first, and after them menu items are added.
@@ -218,22 +240,20 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
       windowSwt.setBounds(xPos,yPos, xSize, ySize );  //Start position.
     }
     windowSwt.open();
-    windowSwt.setVisible( true ); 
 
     //graphicFrame.getContentPane().setLayout(new FlowLayout());
     windowSwt.setLayout(null);
     windowSwt.addShellListener(mainComponentListerner);
 
     
-    if(xSize == -1 || ySize == -1){
-      windowSwt.setFullScreen(true);
-    }
     //The propertiesGuiSwt needs the Display instance for Font and Color. Therefore the graphic thread with creation of Display should be executed before. 
-    SwtProperties propertiesGui = new SwtProperties(this.displaySwt, sizeCharProperties);
-    gralMng = new SwtMng(this, displaySwt, propertiesGui, log);
+    //mainWindow.setPanelMng(gralMng);
+    mainWindow.setWindowVisible( true ); 
+    //int windProps = GralWindow_ifc.windResizeable;
+    //GralWindow windowGral = new GralWindow("main", sTitle, windProps, gralMng, null );
     
     //The PrimaryWindowSwt is a derivation of the GralPrimaryWindow. It is more as only a SWT Shell.
-    instance = new SwtPrimaryWindow(gralMng, this, this.displaySwt);
+    //instance = new SwtPrimaryWindow(windowGral, gralMng, this, this.displaySwt);
     ///
   }
 

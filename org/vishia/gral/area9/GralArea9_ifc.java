@@ -11,6 +11,7 @@ import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 
 
@@ -49,7 +50,7 @@ import org.vishia.mainCmd.MainCmd_ifc;
  * @author Hartmut Schorrig
  *
  */
-public interface GralArea9_ifc extends GralPrimaryWindow_ifc, GralMngApplAdapter_ifc
+public interface GralArea9_ifc extends GralMngApplAdapter_ifc
 {
   /**Version history:
    * <ul>
@@ -123,6 +124,17 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc, GralMngApplAdapter
   void initGraphic(String outputArea);
 
   
+  /**It is like {@link GralWindow_ifc#addMenuItemGThread(String, String, GralUserAction)}.
+   */
+  void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction action);
+
+  
+  /**Adds a Menu for file open and save only. All other menu items are not set because the order of menus. 
+   * @param openStandardDirectory
+   * @param actionFile
+   */
+  void setStandardMenusGThread(File openStandardDirectory, GralUserAction actionFile);
+  
   /**Returns the outputArea, which was created by the graphic thread. 
    */
   GralPanelContent getOutputPanel();
@@ -178,6 +190,7 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc, GralMngApplAdapter
    * @throws IndexOutOfBoundsException if the arguments are false or the area is occupied already.
    * @deprecated use {@link #addFrameArea(String, GralPanelContent)}.
    */
+  @Deprecated
   void addFrameArea(int xArea, int yArea, int dxArea, int dyArea, GralPanelContent component)
   throws IndexOutOfBoundsException;
   
@@ -200,5 +213,8 @@ public interface GralArea9_ifc extends GralPrimaryWindow_ifc, GralMngApplAdapter
    * to install the help menu.  */
   GralUserAction getActionAbout();
   
+  GralWindow_ifc mainWindow();
+  
+  MainCmd_ifc getMainCmd();
   
 }

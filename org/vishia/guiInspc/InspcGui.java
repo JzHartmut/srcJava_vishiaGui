@@ -309,12 +309,12 @@ private class InspcGuiCfg extends GuiCfg
     btnSwitchOnLog = super.gralMng.addSwitchButton("log", "log telg ?", "log telg", GralColor.getColor("wh"), GralColor.getColor("am") );
     btnSwitchOnLog.setActionChange(actionEnableLog);
     colorSelector = new GralColorSelector("colorSelector", super.gralMng);
-    curveA.buildGraphic(gui, colorSelector);
-    curveB.buildGraphic(gui, colorSelector);
-    curveC.buildGraphic(gui, colorSelector);
+    curveA.buildGraphic(gui.mainWindow(), colorSelector);
+    curveB.buildGraphic(gui.mainWindow(), colorSelector);
+    curveC.buildGraphic(gui.mainWindow(), colorSelector);
     if(user !=null){
       user.initGui(gralMng);
-      user.addGuiMenu(gui);
+      user.addGuiMenu(gui.mainWindow());
     }
     gui.addMenuItemGThread("menuHelp", "&Help/&Help", gui.getActionHelp());
     gui.addMenuItemGThread("menuAbout", "&Help/&About", gui.getActionAbout());

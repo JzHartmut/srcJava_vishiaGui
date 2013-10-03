@@ -637,7 +637,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
   /**Registers a panel to place the widgets. 
-   * After registration, the panel can be selected
+   * After registration, this panel is the current one, stored in {@link #pos}. the panel can be selected
    * with its name calling the {@link #selectPanel(String)} -routine
    * @param key Name of the panel.
    * @param panel The panel.

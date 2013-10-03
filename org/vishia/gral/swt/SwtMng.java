@@ -197,7 +197,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   public  final SwtProperties propertiesGuiSwt;
   
   
-  private final Display displaySwt;
+  final Display displaySwt;
   
   //public final SwtWidgetHelper widgetHelper = new SwtWidgetHelper(this);
   
@@ -376,16 +376,18 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   @Override public GralWindow createWindow(String name, String title, int windProps)
   {
+    GralWindow windowGral = new GralWindow(name, title, windProps, null, null);
     SwtGraphicThread swtDevice = (SwtGraphicThread)gralDevice;
-    SwtSubWindow window = new SwtSubWindow(name, swtDevice.displaySwt, title, windProps, this);
-    GralRectangle rect = calcPositionOfWindow(window.pos());
-    window.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
+    SwtSubWindow windowSwt = new SwtSubWindow(this, windowGral);
+      //new SwtSubWindow(name, swtDevice.displaySwt, title, windProps, this);
+    GralRectangle rect = calcPositionOfWindow(windowGral.pos());
+    windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
     //window.window.redraw();
     //window.window.update();
-    this.pos.panel = window; //it is selected.
+    this.pos.panel = windowGral; //it is selected.
     
     //this.pos.set(0,0,0,0,'r');
-    return window;
+    return windowGral;
 
   }
   
@@ -420,6 +422,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     Control parentFrame = (Control)posWindow.panel.getPanelImpl();
     Point loc;
     Shell window = parentFrame.getShell();
+    int x = 6;
     GralRectangle windowFrame = getPixelUseableAreaOfWindow(posWindow.panel);
     int dxFrame, dyFrame;  //need if posWindow has coordinates from right or in percent
     Rectangle rectParent;
@@ -659,7 +662,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     //guiContent.add(widget);
     GralWidget widg = new GralWidget("labelText-" + sText, 'S', this);
     SwtWidgetSimpleWrapper widgswt = new SwtWidgetSimpleWrapper(widget, this);
-    widg.implMethodWidget_.setWidgetImpl(widgswt);
+    //widg.implMethodWidget_.setWidgetImpl(widgswt);
     return widg;
   }
 
@@ -701,7 +704,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     //guiContent.add(widget);
     GralWidget widg = new GralWidget("labelText-" + sText, 'S', this);
     SwtWidgetSimpleWrapper widgswt = new SwtWidgetSimpleWrapper(widget, this);
-    widg.implMethodWidget_.setWidgetImpl(widgswt);
+    //widg.implMethodWidget_.setWidgetImpl(widgswt);
     return widg;
   }
 
@@ -1027,7 +1030,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   	setPosAndSize_(control);
     GralWidget widg = new GralWidget(sName, 'V', this);
     SwtWidgetSimpleWrapper widgswt = new SwtWidgetSimpleWrapper(control, this);
-    widg.implMethodWidget_.setWidgetImpl(widgswt);
+    //widg.implMethodWidget_.setWidgetImpl(widgswt);
     widg.setPanelMng(this);
     if(action != null){
   		SelectionListenerForSlider actionSlider = new SelectionListenerForSlider(widg, action);
@@ -1162,7 +1165,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 
   @Override public void add(GralHorizontalSelector<?> sel){
     SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, sel);
-    sel.implMethodWidget_.setWidgetImpl(swtSel);
+    //sel.implMethodWidget_.setWidgetImpl(swtSel);
     registerWidget(sel);
   }
   
@@ -1339,11 +1342,11 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 	{
 	  //GralWidget_ifc widget = widgd.getGraphicWidgetWrapper();
 	  Object owidg = widgd.getWidgetImplementation();
-	  
+	  int test = 6;
 	  if(owidg !=null){
 	    Control swtWidget = (Control)owidg;
 	    GralPanelContent panel = widgd.pos().panel;
-	    GralRectangle size = panel.getPixelSize();
+	    GralRectangle size = panel.getPixelPositionSize(); //PixelSize();
 	    GralRectangle posSize = calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
   	  //Note: the swtWidget may have a resizeListener, see there.
 	    swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
@@ -1462,7 +1465,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     
     @Override public void focusGained(FocusEvent ev)
     { GralWidget widgd = (GralWidget)ev.widget.getData();
-      widgd.implMethodWidget_.focusGained();
+      //widgd.wdgImpl.focusGained();
       /*
       widgd.getMng().notifyFocus(widgd);
       String htmlHelp = widgd.getHtmlHelp();

@@ -267,9 +267,9 @@ public abstract class GralGraphicThread implements Runnable
   
 
   
-  /**This method should be implemented by the graphical base. It should build the graphic main window
+  /**This method should be implemented by the graphical implementation layer. It should build the graphic main window
    * and returned when finished. This routine is called as the first routine in the Graphic thread's
-   * method {@link #run()}. */
+   * method {@link #run()}. See {@link org.vishia.gral.swt.SwtGraphicThread}. */
   protected abstract void initGraphic();
   
   /**Calls the dispatch routine of the implementation graphic.

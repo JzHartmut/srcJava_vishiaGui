@@ -237,7 +237,7 @@ public class ExampleSimpleButton
     GralWindow primaryWindow = graphicFactory.createWindow(log, "Example Simple Button", 'C', 50,50,400, 300);
     //
     //The widget manager is created with the primary window. Use it.
-    GralMng gralMng = primaryWindow.gralMng;
+    GralMng gralMng = primaryWindow.gralMng();
     //
     //An empty graphic window is present now. It is time to create this application class now. 
     //In an complexer application the graphic window can contain an output window, so information

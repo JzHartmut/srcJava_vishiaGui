@@ -12,7 +12,7 @@ import org.vishia.mainCmd.MainCmd_ifc;
  * @author Hartmut Schorrig
  *
  */
-public interface GralPrimaryWindow_ifc extends GralWindow_setifc, GralWindow_getifc //, GralWindowMng_ifc
+public interface GralPrimaryWindow_ifc //extends GralWindow_setifc, GralWindow_getifc //, GralWindowMng_ifc
 {
   /**Version, history and license.
    * <ul>

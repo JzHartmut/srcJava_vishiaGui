@@ -78,7 +78,7 @@ public class SwtGralMouseListener
       Object oInfo = widget.getData();
       if(oInfo instanceof GralWidget){
         GralWidget widgetInfo = (GralWidget)oInfo;
-        GralMng guiMng = widgetInfo.getMng();
+        GralMng guiMng = widgetInfo.gralMng();
         try{
           guiMng.log.sendMsg(0, "Info widget: %s / %s", widgetInfo.name, widgetInfo.getDataPath());
         } catch(Exception exc){ guiMng.writeLog(0, exc); }
@@ -96,7 +96,7 @@ public class SwtGralMouseListener
       Object oInfo = widget.getData();
       if(oInfo instanceof GralWidget){
         GralWidget widgetInfo = (GralWidget)oInfo;
-        GralMng guiMng = widgetInfo.getMng();
+        GralMng guiMng = widgetInfo.gralMng();
         try{
           String sDataPath = widgetInfo.getDataPath();
           if( sDataPath ==null  //no datapath given, write info! 
@@ -125,7 +125,7 @@ public class SwtGralMouseListener
       Object oInfo = widget.getData();
       if(oInfo instanceof GralWidget){
         GralWidget widgetInfo = (GralWidget)oInfo;
-        GralMng guiMng = widgetInfo.getMng();
+        GralMng guiMng = widgetInfo.gralMng();
         try{
           GralWidget widgd = (GralWidget)oInfo;
           int dx = ev.x - xDown, dy = ev.y - yDown;

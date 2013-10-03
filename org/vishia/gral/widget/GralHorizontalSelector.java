@@ -213,48 +213,52 @@ public class GralHorizontalSelector<UserData> extends GralWidget
    * The methods are protected because an application should not use it. This class is public because
    * it should be visible from the graphic implementation which is located in another package. 
    */
-  public class GraphicImplAccess {
+  public static abstract class GraphicImplAccess<UserData> 
+  extends GralWidget.MethodsCalledbackFromImplementation //access to GralWidget
+  implements GralWidgImpl_ifc
+  {
     
     //public void setWidgetImpl(GralWidgImpl_ifc widg){ wdgImpl = widg; }
 
-    protected final GralHorizontalSelector<?> outer;
+    protected final GralHorizontalSelector<UserData> outer;
     
-    protected GraphicImplAccess(){
-      outer = GralHorizontalSelector.this;
+    protected GraphicImplAccess(GralHorizontalSelector<UserData> widgg, GralMng mng){
+      super(widgg, mng);
+      outer = widgg;
     }
     
-    protected List<Item<UserData>> items(){ return items; }
+    protected List<Item<UserData>> items(){ return outer.items; }
     
-    protected Item<?> actItem(){ return actItem; }
+    protected Item<?> actItem(){ return outer.actItem; }
     
-    protected Item<?> tab(int ix){ return items.get(ix); }
+    protected Item<?> tab(int ix){ return outer.items.get(ix); }
     
-    protected int nrItem(){ return ixDstItem; }
+    protected int nrItem(){ return outer.ixDstItem; }
 
-    protected int nrofTabs(){ return items.size(); }
+    protected int nrofTabs(){ return outer.items.size(); }
     
     protected void calcLeftTab(int gwidth, int xArrow){
       int xBefore = 0;
-      int ixItem = ixDstItem;
+      int ixItem = outer.ixDstItem;
       //
       //search what tab should be shown left as first:
       //
-      if(items.size() >0){
-        ixLeftItem = 0;
-        while(ixLeftItem ==0 && ixItem >=0){
-          GralHorizontalSelector.Item<UserData> item = items.get(ixItem);
+      if(outer.items.size() >0){
+        outer.ixLeftItem = 0;
+        while(outer.ixLeftItem ==0 && ixItem >=0){
+          GralHorizontalSelector.Item<UserData> item = outer.items.get(ixItem);
           if(item.xSize == 0){
             //item.xSize = 50; //TODO
           }
           if(xArrow + xBefore + item.xSize + xArrow +4 > gwidth){  //to much yet
-            ixLeftItem = ixItem +1;
+            outer.ixLeftItem = ixItem +1;
           } else{ 
             xBefore += item.xSize;
             ixItem -=1;
           }
         }
       } else {
-        ixLeftItem = -1;  //not given
+        outer.ixLeftItem = -1;  //not given
       }
     }
 
@@ -263,10 +267,10 @@ public class GralHorizontalSelector<UserData> extends GralWidget
      * @param xMouse x-position from mouse button pressed in the implementation widget area.
      */
     protected void findTab(int xMouse){
-      int ixTab = ixLeftItem;
+      int ixTab = outer.ixLeftItem;
       int xPos = (ixTab == 0) ? 2: 22;
       boolean found = false;
-      int zTabs = items.size();
+      int zTabs = outer.items.size();
       GralHorizontalSelector.Item<?> tab;
       do {
         tab = tab(ixTab);
@@ -278,31 +282,31 @@ public class GralHorizontalSelector<UserData> extends GralWidget
         }
       } while(ixTab < zTabs && !found);
       if(found){
-        ixDstItem = ixTab;
+        outer.ixDstItem = ixTab;
         //setActItem(tab.text);
       }
     }
 
     /**Sets a chosen item to the current one, because the mouse was released inside this item. */
-    protected void setDstToActItem(){ GralHorizontalSelector.this.setDstToActItem(); }
+    protected void setDstToActItem(){ outer.setDstToActItem(); }
     
     /**Removes a different choice of a destination item, because the mouse was released 
      * outside of the area where it is pressed and outside of the widget. */
-    protected void clearDstItem(){ ixDstItem = ixActItem; }
+    protected void clearDstItem(){ outer.ixDstItem = outer.ixActItem; }
     
     protected void removeDstItem(){ 
-      items.remove(ixDstItem);
-      if(ixDstItem < ixActItem){ ixActItem -=1; }
+      outer.items.remove(outer.ixDstItem);
+      if(outer.ixDstItem < outer.ixActItem){ outer.ixActItem -=1; }
       clearDstItem();
     }
     
     protected void execAfterCreationImplWidget(){
-      GralMenu menu = getContextMenu();
-      menu.addMenuItemGthread("&Close tab", actionRemoveTab);
+      GralMenu menu = outer.getContextMenu();
+      menu.addMenuItemGthread("&Close tab", outer.actionRemoveTab);
     }
     
 
-    protected int nrLeftTab(){ return ixLeftItem; }
+    protected int nrLeftTab(){ return outer.ixLeftItem; }
     
 
   

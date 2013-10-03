@@ -109,9 +109,7 @@ public class SwtMenu extends GralMenu
   
   /**
    * @see org.vishia.gral.base.GralMenu#addMenuItemGthread(java.lang.String, java.lang.String, org.vishia.gral.ifc.GralUserAction)
-   * @deprecated
    */
-  @Deprecated
   @Override public GralWidget addMenuItemGthread(String nameWidg, String sMenuPath, GralUserAction gralAction)
   {
     SelectionListener action = new ActionUserMenuItem(gralAction);

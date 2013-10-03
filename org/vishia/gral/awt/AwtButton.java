@@ -156,7 +156,7 @@ public class AwtButton extends GralButton
         }
         GralColor colorgback = switchState == State.On && colorBackOn != null ? colorBackOn : colorBackOff;
         
-        Color colorBack = (Color)getMng().getColorImpl(colorgback);
+        Color colorBack = (Color)gralMng().getColorImpl(colorgback);
         setBackground(colorBack);
         //drawBackground(gc, dim.x+1, dim.y+1, dim.width-1, dim.height-1);
         Color color = getForeground(); //of the widget.

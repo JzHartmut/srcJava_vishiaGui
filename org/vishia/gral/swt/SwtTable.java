@@ -173,7 +173,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
     this.cellsSwt = new Text[zLineVisibleMax][zColumn()];
     Control swtTable = new SwtTable.Table(parent, zColumn(), mng);
     this.swtWidgWrapper = new SwtWidgetSimpleWrapper(swtTable, mng);
-    gralTable.implMethodWidget_.setWidgetImpl(this);
+    //gralTable.implMethodWidget_.setWidgetImpl(this);
     //this.menuColumns = new SwtMenu[zColumn];
     swtWidgWrapper.widgetSwt.addKeyListener(myKeyListener);
     //table.addSelectionListener(selectionListener);
@@ -283,7 +283,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   public boolean setVisible(boolean visible){
     boolean ret = swtWidgWrapper.widgetSwt.isVisible();
     swtWidgWrapper.widgetSwt.setVisible(visible);
-    outer.implMethodWidget_.setVisibleState(visible);
+    ((GralWidget.MethodsCalledbackFromImplementation)this).setVisibleState(visible);
     return ret;
   }
   
@@ -473,7 +473,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
     //ixLineNew = line.nLineNr;  //select this line.
     
     if(true || !hasFocus){
-      outer.implMethodWidget_.focusGained();  //from GralWidget.
+      ((GralWidget.MethodsCalledbackFromImplementation)this).focusGained();  //from GralWidget.
       hasFocus = true;
       //System.out.println("focusTable");
     }
@@ -492,6 +492,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
 
   protected void setBoundsCells(){
     Rectangle parentBounds = swtWidgWrapper.widgetSwt.getParent().getBounds();
+    int test=7;
     GralRectangle pixTable = outer.pos().calcWidgetPosAndSize(itsMng().propertiesGui(), parentBounds.width, parentBounds.height, 0, 0);
     int xPixelUnit = itsMng().propertiesGui().xPixelUnit();
     int xPixel1 = 0;
@@ -799,7 +800,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
     
     @Override public void focusGained(FocusEvent ev)
     { //super.focusGained(ev);
-      outer.implMethodWidget_.focusGained();
+      ((GralWidget.MethodsCalledbackFromImplementation)SwtTable.this).focusGained();
       //System.out.println("table focus gained. ");
       //assert(false);
       int row = 1; //table.getSelectionIndex();
@@ -855,7 +856,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
         if(!bRedrawPending){ 
           //The focusGained for the table invokes the GralWidget.focusAction for this table.
           if(true || !hasFocus){
-            outer.implMethodWidget_.focusGained();  //from GralWidget.
+            ((GralWidget.MethodsCalledbackFromImplementation)SwtTable.this).focusGained();  //from GralWidget.
             hasFocus = true;
             //System.out.println("focusTable");
           }

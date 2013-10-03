@@ -19,7 +19,7 @@ public class AwtSubWindow extends GralWindow
 
   public AwtSubWindow(String name, Frame window, String title, int windStyle, GralMng gralMng)
   {
-    super(name, windStyle, gralMng, window);
+    super(name, title, windStyle, gralMng, window);
     this.window = window;
     // TODO Auto-generated constructor stub
   }

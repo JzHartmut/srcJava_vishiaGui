@@ -24,6 +24,7 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.KeyCode;
@@ -64,15 +65,19 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   
 
   
-  SwtPrimaryWindow(GralMng gralMng, SwtGraphicThread graphicThread, Display displaySwt)
-  { super("primaryWindow", GralWindow.windHasMenu, graphicThread.windowSwt, gralMng);
+  SwtPrimaryWindow(GralWindow windowGral, SwtMng mng, SwtGraphicThread graphicThread, Display displaySwt)
+  { super(mng, windowGral);
+    //super("primaryWindow", GralWindow.windHasMenu, graphicThread.windowSwt, gralMng);
     //super(gralMng, graphicThread);
     this.graphicThreadSwt = graphicThread;  //refers SWT type
   }  
   
   
-  public static SwtPrimaryWindow create(LogMessage log, String sTitle, char sizeShow, int left, int top, int xSize, int ySize)
-  { SwtGraphicThread graphicThread = new SwtGraphicThread(sTitle, sizeShow, left, top, xSize, ySize, log);
+  public static GralWindow create(LogMessage log, String sTitle, char sizeShow, int left, int top, int xSize, int ySize)
+  { int windProps = GralWindow_ifc.windResizeable;
+    GralWindow windowGral = new GralWindow("main", sTitle, windProps, null, null );
+    SwtGraphicThread graphicThread = new SwtGraphicThread(windowGral, sizeShow, left, top, xSize, ySize, log);
+    SwtPrimaryWindow windowSwt = new SwtPrimaryWindow(windowGral, graphicThread.gralMng, graphicThread, graphicThread.displaySwt);
     //GuiThread graphicThread = startGraphicThread(init);  
 
     synchronized(graphicThread){
@@ -80,9 +85,9 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
         try{ graphicThread.wait(1000);} catch(InterruptedException exc){}
       }
     }
-    graphicThread.gralMng.registerPanel(graphicThread.instance);
+    graphicThread.gralMng.registerPanel(windowGral);
     //gralMng = graphicThread.gralMng;
-    return graphicThread.instance;
+    return windowGral;
   }
   
   
@@ -113,18 +118,6 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
     }  
 
   }
-  
-  @Override public boolean isWindowsVisible()
-  { return graphicThreadSwt.windowSwt.isVisible();
-  }
-
-
-  @Override
-  public void setWindowVisible(boolean visible)
-  {
-    graphicThreadSwt.windowSwt.setVisible(visible);
-  }
-  
   
   
   
@@ -165,13 +158,6 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
 
 
 
-  @Override
-  public GralColor setBackgroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
 
 
   @Override
@@ -183,14 +169,6 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
 
 
 
-  @Override
-  public GralColor setForegroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override public void repaint(){  graphicThreadSwt.windowSwt.redraw(); graphicThreadSwt.windowSwt.update(); }
 
   
   @Override
@@ -201,7 +179,6 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   }
 
 
-  @Override public Composite getPanelImpl() { return graphicThreadSwt.windowSwt; }
 
   /**Returns the position and the size of the working area of the window on the screen.
    * The title, borders and menu bar are not regarded.
@@ -228,23 +205,10 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   }
   
 
-  @Override public void closeWindow()
+  public void closeWindow()
   { 
     terminate();
   }
-  
-  
-  ControlListener XXXresizeListener = new ControlListener()
-  { @Override public void controlMoved(ControlEvent e) 
-    { //do nothing if moved.
-    }
-
-    @Override public void controlResized(ControlEvent e) 
-    { if(resizeAction !=null){
-        resizeAction.userActionGui(0, null);
-      }
-    }
-  };
   
   
 

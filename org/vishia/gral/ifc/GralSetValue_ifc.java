@@ -1,5 +1,7 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.gral.base.GralWidget;
+
 /**Interface for all widgets which can represent a float value maybe showing or regarding a minimal and maximal value.
  * It is applicable commonly.
  * @author Hartmut Schorrig
@@ -82,6 +84,9 @@ public interface GralSetValue_ifc
    */
   void setValue(Object[] value);
   
+  /**See {@link GralWidget#setText(CharSequence)}.
+   * @param text
+   */
   void setText(CharSequence text);
   
   

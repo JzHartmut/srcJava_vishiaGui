@@ -54,18 +54,24 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
   @SuppressWarnings("hiding")
   public final static int version = 20120713;
 
+  /**
+   * @deprecated use {@link GralWidget#getName()}
+   */
+  @Deprecated
   public final String namePanel;
 
   /**The GUI-Widget of the panel.   
    *   (Swing:  Device guiDevice, SWT: Composite based on Control);
    * Note: can't be final because it may be unknown on calling constructor  
+   * @deprecated use {@link GralWidget#wdgImpl}
    */
+  @Deprecated
   protected Object panelComposite; 
   
 	
 	//public GralPrimaryWindow_ifc mainWindow;
 	
-	public final GralMng gralMng;
+	//public final GralMng gralMng;
 	
 
 	/**The widget which should be focused if the panel is focused. 
@@ -101,7 +107,6 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
 	{ super(namePanel, '$', mng);
 	  this.namePanel = namePanel;
 		this.panelComposite = panelComposite;
-		this.gralMng = mng;
 		if(mng !=null){
 		  mng.registerPanel(this);
 		}
@@ -128,7 +133,8 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
 	 * If it is a main window, the useable area of the window without title and menu bar is returned.
 	 * @return
 	 */
-	public abstract   GralRectangle getPixelPositionSize();
+	@Override
+  public abstract   GralRectangle getPixelPositionSize();
 	
 	
 	
@@ -193,7 +199,7 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
   
 
   @Override public Object getWidgetImplementation()
-  { return panelComposite;
+  { return wdgImpl.getWidgetImplementation(); //panelComposite;
   }
 	
   
@@ -212,11 +218,19 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
    * That methods are not intent to be called by the application. 
    * It is public because the implementation level in another package should accesses it.
    */
-  public class MethodsCalledbackFromImplementation extends GralWidget.MethodsCalledbackFromImplementation{
+  public abstract static class MethodsCalledbackFromImplementation 
+  extends GralWidget.MethodsCalledbackFromImplementation
+  {
     
+    private final GralPanelContent panelg;
+    
+    MethodsCalledbackFromImplementation(GralPanelContent panelg, GralMng mng){
+      super(panelg, mng);
+      this.panelg = panelg;
+    }
     @Override public void setVisibleState(boolean visible){
-      for(GralWidget widget: widgetList){
-        widget.implMethodWidget_.setVisibleState(visible);
+      for(GralWidget widget: panelg.widgetList){
+        widget.setVisibleState(visible);
       }
     }
   } //class MethodsCalledbackFromImplementation
@@ -225,8 +239,13 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
    * That methods are not intent to be called by the application. 
    * It is public because the implementation level in another package should accesses it.
    */
-  public MethodsCalledbackFromImplementation implMethodPanel_ = new MethodsCalledbackFromImplementation();
+  //public MethodsCalledbackFromImplementation implMethodPanel_ = new MethodsCalledbackFromImplementation(this);
   
+  @Override public void setVisibleState(boolean visible){
+    for(GralWidget widget: widgetList){
+      widget.setVisibleState(visible);
+    }
+  }
 
   
 }

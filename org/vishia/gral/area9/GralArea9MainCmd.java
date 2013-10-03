@@ -157,7 +157,7 @@ public class GralArea9MainCmd extends MainCmd
     return bOk;
   }
 
-  public void setFullScreen(boolean full){ gui.setFullScreen(full); }
+  //public void setFullScreen(boolean full){ gui.setFullScreen(full); }
 
   /*---------------------------------------------------------------------------------------------*/
   /** Tests one argument. This method is invoked from parseArgument. It is abstract in the superclass MainCmd
@@ -249,7 +249,7 @@ public class GralArea9MainCmd extends MainCmd
 
   
   @Override public void exit()
-  { gui.closeWindow();
+  { gui.mainWindow().closeWindow();
   }
   
 }

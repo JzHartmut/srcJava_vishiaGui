@@ -17,6 +17,7 @@ import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTextBox_ifc;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmd_ifc;
@@ -202,9 +203,9 @@ public class GralArea9Window implements GralArea9_ifc
    */
   @Override public void initGraphic(String sOutputArea){
     this.outputArea = sOutputArea;
-    window.gralMng.gralDevice.addDispatchOrder(initGraphic); 
+    window.gralMng().gralDevice.addDispatchOrder(initGraphic); 
     initGraphic.awaitExecution(1, 0);
-    window.gralMng.gralDevice.addDispatchOrder(writeOutputTextDirectly);
+    window.gralMng().gralDevice.addDispatchOrder(writeOutputTextDirectly);
     
   }
   
@@ -213,47 +214,48 @@ public class GralArea9Window implements GralArea9_ifc
   GralDispatchCallbackWorker initGraphic = new GralDispatchCallbackWorker("GralArea9Window.initGraphic"){
     @Override public void doBeforeDispatching(boolean onlyWakeup)
     {
-      window.setResizeAction(resizeAction);
+      window.setResizeAction(resizeAction);   //sets the resize action from this instead a standard window for the primaryWindow.
       setFrameAreaBorders(30,70,30,70);
       if(bSetStandardMenus){
         //setStandardMenusGThread(currentDirectory, actionFile);
       }
-      window.gralMng.setPosition(-40, 0, 10, 0, 0, 'd');
-      infoBox = window.gralMng.createTextInfoBox("infoBox", "Info");
+      window.gralMng().setPosition(-40, 0, 10, 0, 0, 'd');
+      infoBox = window.gralMng().createTextInfoBox("infoBox", "Info");
       //
-      window.gralMng.selectPanel("primaryWindow");
-      window.gralMng.setPosition(0,40,10,0,0,'.');
-      infoHelp = window.gralMng.createHtmlInfoBox("Help", "Help", true);
+      window.gralMng().selectPanel("primaryWindow");
+      window.gralMng().setPosition(0,40,10,0,0,'.');
+      infoHelp = window.gralMng().createHtmlInfoBox("Help", "Help", true);
       try{
         for(String line: mainCmd.listHelpInfo){
           infoHelp.append(line).append("\n");
         }
-      } catch(Exception exc){ window.gralMng.writeLog(0, exc); }
+      } catch(Exception exc){ window.gralMng().writeLog(0, exc); }
       //
-      window.gralMng.selectPanel("primaryWindow");
-      window.gralMng.setPosition(0,20,15,GralPos.size + 50,0,'.');
-      infoAbout = window.gralMng.createTextInfoBox("About", "About");
+      window.gralMng().selectPanel("primaryWindow");
+      window.gralMng().setPosition(0,20,15,GralPos.size + 50,0,'.');
+      infoAbout = window.gralMng().createTextInfoBox("About", "About");
       try{
         for(String line: mainCmd.listAboutInfo){
           infoAbout.append(line).append("\n");
         }
-      } catch(Exception exc){ window.gralMng.writeLog(0, exc); }
+      } catch(Exception exc){ window.gralMng().writeLog(0, exc); }
       //
       
       
       if(outputArea != null){
         outputPanel = addOutputFrameArea(outputArea);
-        window.gralMng.registerPanel(outputPanel);
+        window.gralMng().registerPanel(outputPanel);
       }
-      window.gralMng.gralDevice.removeDispatchListener(this);
+      window.gralMng().gralDevice.removeDispatchListener(this);
       countExecution();
     }
   };
 
   
-  @Override public void setFullScreen(boolean full){ window.setFullScreen(full); }
   
   @Override public MainCmd_ifc getMainCmd(){ return mainCmd; }
+  
+  @Override public GralWindow_ifc mainWindow(){ return window; }
   
   @Override public GralPanelContent getOutputPanel(){ return outputPanel; } ///
   
@@ -387,8 +389,8 @@ public class GralArea9Window implements GralArea9_ifc
     pixelPerXpercent = xWidth / 100.0F;
     pixelPerYpercent = yWidth / 100.0F;
     
-    int xPixUnit = window.gralMng.propertiesGui().xPixelUnit();
-    int yPixUnit = window.gralMng.propertiesGui().yPixelUnit();
+    int xPixUnit = window.gralMng().propertiesGui().xPixelUnit();
+    int yPixUnit = window.gralMng().propertiesGui().yPixelUnit();
     pixelPerXpercent = xWidth / 100.0F;
     pixelPerYpercent = yWidth / 100.0F;
     
@@ -508,8 +510,8 @@ public class GralArea9Window implements GralArea9_ifc
     int yp = (int)(yf1  * pixelPerYpercent);
     int dxp = (int) ((xf2-xf1) * pixelPerXpercent);
     int dyp = (int) ((yf2-yf1) * pixelPerYpercent);
-    int xPixUnit = window.gralMng.propertiesGui().xPixelUnit();
-    int yPixUnit = window.gralMng.propertiesGui().yPixelUnit();
+    int xPixUnit = window.gralMng().propertiesGui().xPixelUnit();
+    int yPixUnit = window.gralMng().propertiesGui().yPixelUnit();
     int xMax = xPixUnit * xMaxGralSize[idxArea];
     int xMin = xPixUnit * xMinGralSize[idxArea];
     int yMax = xPixUnit * yMaxGralSize[idyArea];
@@ -571,10 +573,10 @@ public class GralArea9Window implements GralArea9_ifc
       //swtWindow.addMenuItemGThread("&File/E&xit", this.new ActionFileOpen());
       //swtWindow.graphicThreadSwt.setJMenuBar(menuBar);
       //swtWindow.graphicThreadSwt.setVisible( true );
-      pWindow.repaintGthread();
+      window.repaint();
     } else {
       throw new IllegalArgumentException("Error: can't apply menus in a sub window");
-      //window.gralMng.writeLog(0, "Error: can't apply menus in a sub window");
+      //window.getMng().writeLog(0, "Error: can't apply menus in a sub window");
     }
     
   }
@@ -592,11 +594,11 @@ public class GralArea9Window implements GralArea9_ifc
   protected GralPanelContent addOutputFrameArea(String area)
   {
     GralRectangle areaR = convertArea(area);
-    window.gralMng.selectPanel("primaryWindow");
-    GralPanelContent outputPanel = window.gralMng.createCompositeBox("outputArea");
-    window.gralMng.setPosition(0,0,0,0,0,'b');
+    window.gralMng().selectPanel("primaryWindow");
+    GralPanelContent outputPanel = window.gralMng().createCompositeBox("outputArea");
+    window.gralMng().setPosition(0,0,0,0,0,'b');
     //NOTE: it is a edit-able box. It may be usefully to edit the content by user sometimes. 
-    outputBox = window.gralMng.addTextBox("output", true, null, '.');  
+    outputBox = window.gralMng().addTextBox("output", true, null, '.');  
     try{ outputBox.append("output...\n"); } catch(IOException exc){}
     addFrameArea(areaR.x, areaR.y, areaR.dx, areaR.dy, outputPanel);
     return outputPanel;
@@ -621,7 +623,7 @@ public class GralArea9Window implements GralArea9_ifc
    * if it has a better way to show infos.*/
   protected void writeDirectly(String sInfo, short kind)  //##a
   { if(textAreaOutput != null){
-      if(Thread.currentThread().getId() == window.gralMng.gralDevice.getThreadIdGui()){
+      if(Thread.currentThread().getId() == window.gralMng().gralDevice.getThreadIdGui()){
         try{
           if((kind & MainCmd.mNewln_writeInfoDirectly) != 0)
           { textAreaOutput.append("\n");
@@ -635,7 +637,7 @@ public class GralArea9Window implements GralArea9_ifc
       } else {  
         //queue the text
         outputTexts.add(sInfo);
-        window.gralMng.gralDevice.wakeup();
+        window.gralMng().gralDevice.wakeup();
       }
     }  
     else mainCmd.writeDirectly(sInfo, kind);     
@@ -648,19 +650,11 @@ public class GralArea9Window implements GralArea9_ifc
   
 
 
-  @Override
-  public boolean isWindowsVisible()
-  { return window.isWindowsVisible();
-  }
 
 
 
   @Override public void setHelpUrl(String url){ infoHelp.setUrl(url); }
   
-
-  @Override  public void setWindowVisible(boolean visible)
-  { window.setWindowVisible(visible);
-  }
 
 
 
@@ -670,22 +664,15 @@ public class GralArea9Window implements GralArea9_ifc
 
   
   /** Gets the graphical frame. */
-  @Override public Object getitsGraphicFrame(){ return window.getWidgetImplementation(); }
+  //@Override public Object getitsGraphicFrame(){ return window.getWidgetImplementation(); }
 
 
 
   
   @Override public GralMng getGralMng()
-  { return window.gralMng;
+  { return window.gralMng();
   }
   
-  @Override public GralRectangle getPixelPositionSize(){ return window.getPixelPositionSize(); }
-
-  
-  @Override public void closeWindow()
-  { 
-    window.closeWindow();
-  }
 
 
 
@@ -729,7 +716,7 @@ return true;
   { private final GralFileDialog_ifc fileDialog;
   
     public GralActionFileOpen(){
-      fileDialog = window.gralMng.createFileDialog();
+      fileDialog = window.gralMng().createFileDialog();
       fileDialog.open("FileDialog", 0);
     }
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
@@ -754,7 +741,7 @@ return true;
         for(String line: mainCmd.listAboutInfo){
           //infoAbout.append(line).append("\n");
         }
-      } catch(Exception exc){ window.gralMng.writeLog(0, exc); }
+      } catch(Exception exc){ window.gralMng().writeLog(0, exc); }
       infoAbout.setWindowVisible(true);
       return true; 
   } };
@@ -774,7 +761,6 @@ return true;
   { return actionHelp;
   }
 
-  @Override public void repaintGthread() {  window.repaintGthread(); }
 
 
 }

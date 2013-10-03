@@ -30,6 +30,7 @@ import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralColorSelector;
 import org.vishia.gral.widget.GralFileSelectWindow;
 import org.vishia.gral.widget.GralColorSelector.SetColorFor;
@@ -244,7 +245,7 @@ public final class InspcCurveView
    * @param wind The main window where the menu to open will be added
    * @param sName The name, used for menu entry too, sample "curve A"
    */
-  public void buildGraphic(GralPrimaryWindow_ifc wind, GralColorSelector colorSelector)
+  public void buildGraphic(GralWindow_ifc wind, GralColorSelector colorSelector)
   {
     int posright = -20;
     this.colorSelector = colorSelector;
