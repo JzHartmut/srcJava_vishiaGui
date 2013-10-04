@@ -679,7 +679,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     selectList.wdgdTable.specifyActionOnLineSelected(actionOnFileSelection);
     selectList.wdgdTable.specifyActionOnLineMarked(actionOnMarkLine);
     
-    panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, -5, 1, 'd');
+    panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, 0, 1, 'd');
     //on same position as favor table: the file list.
     favorList.setToPanel(panelMng);
     favorList.insertLine(null, 0, new String[]{"test", "path"}, null);

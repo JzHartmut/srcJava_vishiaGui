@@ -295,16 +295,18 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
       if((chg & chgVisible)!=0){
         acknChg |= chgVisible;
         setVisibleState(true);
-        for(Text[] lines: cellsSwt){
-          for(Text cell: lines){ cell.setVisible(true); }
-        }
+        swtWidgWrapper.widgetSwt.setVisible(true);  //the composite.
+        //for(Text[] lines: cellsSwt){
+        //  for(Text cell: lines){ cell.setVisible(true); }
+        //}
       }
       if((chg & chgInvisible)!=0){
         acknChg |= chgInvisible;
         setVisibleState(false);
-        for(Text[] lines: cellsSwt){
-          for(Text cell: lines){ cell.setVisible(false); }
-        }
+        swtWidgWrapper.widgetSwt.setVisible(false);  //the composite.
+        //for(Text[] lines: cellsSwt){
+        //  for(Text cell: lines){ cell.setVisible(false); }
+        //}
       }
       acknChanged(acknChg);
       if(widgg.isVisible()){   

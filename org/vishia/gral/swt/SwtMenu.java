@@ -175,7 +175,8 @@ public class SwtMenu extends GralMenu
     String name = names[ii];
     MenuItem item = new MenuItem(parentMenu, SWT.None);
     if(widgg == null){
-      widgg = new SwtWidgetMenu(nameWidg, item, sMenuPath, gralMng);
+      //An associated GralWidget
+      widgg = new GralWidget(nameWidg, 'M', null); //SwtWidgetMenu(nameWidg, item, sMenuPath, gralMng);
     } else {
       item.setData(widgg);
     }
