@@ -384,6 +384,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
     //window.window.redraw();
     //window.window.update();
+    this.registerPanel(windowGral);
     this.pos.panel = windowGral; //it is selected.
     this.pos.setPosition(null, 0,0,0,0,0,'r');  //per default the whole window as position and size.
     return windowGral;

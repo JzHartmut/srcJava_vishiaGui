@@ -81,7 +81,7 @@ public class GralColorSelector
    public GralColorSelector(String name, GralMngBuild_ifc mng){
      mng.selectPanel("primaryWindow");
      mng.setPosition(-24, 0, -67, 0, 1, 'r'); //right bottom, about half less display width and hight.
-     wind = mng.createWindow("windSelectFile", "select file", GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable );
+     wind = mng.createWindow("windSelectColor", "select file", GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable );
      for(int irow=0; irow <= 5 /*colors.length*/; ++irow){
        //String[] colorRow = colors[irow];
        mng.setPosition(0.5f + 4*irow, GralPos.size + 2.5f, 0, GralPos.size + 3.5f, 0, 'r', 0.5f);
