@@ -583,9 +583,9 @@ public class GralArea9Window implements GralArea9_ifc
   
   
   @Override public void addMenuItemGThread(String name, String sMenuPath, GralUserAction action)
-  { if(window instanceof GralPrimaryWindow_ifc)
-    { GralPrimaryWindow_ifc pWindow = (GralPrimaryWindow_ifc) window;
-      pWindow.addMenuItemGThread(name, sMenuPath, action);
+  { //if(window instanceof GralPrimaryWindow_ifc)
+    { //GralPrimaryWindow_ifc pWindow = (GralPrimaryWindow_ifc) window;
+      window.addMenuItemGThread(name, sMenuPath, action);
     }
   }
   
