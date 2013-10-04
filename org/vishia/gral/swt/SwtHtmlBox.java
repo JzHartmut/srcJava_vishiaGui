@@ -6,7 +6,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralHtmlBox;
-import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
 
@@ -137,36 +136,6 @@ public class SwtHtmlBox extends GralHtmlBox
     return null;
   }
 
-  @Override public GralWidgetGthreadSet_ifc getGthreadSetifc(){ return gThreadSet; }
-
-  /**Implementation of the graphic thread widget set interface. */
-  GralWidgetGthreadSet_ifc gThreadSet = new GralWidgetGthreadSet_ifc(){
-
-    @Override public void clearGthread()
-    { // TODO Auto-generated method stub
-    }
-
-    @Override public void insertGthread(int pos, Object visibleInfo, Object data)
-    { // TODO Auto-generated method stub
-    }
-
-    @Override public void redrawGthread()
-    { // TODO Auto-generated method stub
-    }
-
-    @Override public void setBackGroundColorGthread(GralColor color)
-    { // TODO Auto-generated method stub
-    }
-
-    @Override public void setForeGroundColorGthread(GralColor color)
-    { // TODO Auto-generated method stub
-    }
-
-    @Override public void setTextGthread(String text, Object data)
-    { // TODO Auto-generated method stub
-    }
-  };
-  
   
   
 

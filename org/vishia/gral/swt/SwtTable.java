@@ -27,7 +27,6 @@ import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
@@ -352,7 +351,8 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
       //System.out.println("test SwtTable.setFocus-2");
       correctIxLineColumn();
       bFocused = true;
-      ((Table)swtWidgWrapper.widgetSwt).redrawGthread();
+      repaintGthread();
+      //((Table)swtWidgWrapper.widgetSwt).redrawGthread();
       swtWidgWrapper.widgetSwt.setFocus();
       return true;
     }
@@ -400,7 +400,8 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   private void redrawTableWithFocusedCell(Widget cell){
     CellData data = (CellData)cell.getData();
     if(super.redrawTableWithFocusedCell(data)){
-      ((Table)swtWidgWrapper.widgetSwt).redrawGthread();
+      repaintGthread();
+      //((Table)swtWidgWrapper.widgetSwt).redrawGthread();
     }
   }
 
@@ -453,7 +454,6 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   }
 
   
-  @Override public GralWidgetGthreadSet_ifc getGthreadSetifc(){ return (Table)swtWidgWrapper.widgetSwt; }
   
   
   
@@ -543,7 +543,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   }
   
   
-  private class Table extends Composite implements GralWidgetGthreadSet_ifc {
+  private class Table extends Composite {
 
     public Table(Composite parent, int zColumns, SwtMng mng) {
       super(parent, 0);
@@ -586,18 +586,6 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
     //}
     
     
-    /**Prepares the cells, then redraw. It overrides the super method,
-     * and calls super.redraw() internally. This method is only called
-     * from the graphic system itself in the graphic thread.
-     * It can't be called from the user (in any other thread)
-     * because this class and the built composition with it is private.
-     * @see org.eclipse.swt.widgets.Control#redraw()
-     */
-    //@Override 
-    public void XXXredraw(){
-      redrawGthread();
-    }
-    
     
     /**Does call the super redraw method called inside {@link #redrawGthread()} from the overridden
      * {@link #redraw()} method. */
@@ -611,51 +599,6 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
     }
     
     
-    /**Redraws the whole table because the current line is changed or the focus is changed
-     * or the content is changed and #re
-     * TODO
-     * {@link GralWidgetGthreadSet_ifc#redrawGthread()}
-     */
-    @Override public void redrawGthread(){ 
-      SwtTable.this.repaintGthread();
-    }
-    
-    
-    @Override
-    public void setBackGroundColorGthread(GralColor color) {
-      // TODO Auto-generated method stub
-      
-    }
-
-    @Override
-    public void setForeGroundColorGthread(GralColor color) {
-      // TODO Auto-generated method stub
-      
-    }
-
-
-    @Override
-    public void setTextGthread(String text, Object data) {
-      // TODO Auto-generated method stub
-      
-    }
-
-
-    @Override public void insertGthread(int pos, Object visibleInfo, Object data) {
-      if(visibleInfo instanceof String[]){
-        //outer.insertLine(null, pos, (String[])visibleInfo, data);
-      } else if(visibleInfo instanceof String){
-        String[] text = ((String)visibleInfo).split("\t");
-        //String[] text = new String[1];
-        //text[0] = (String)visibleInfo;
-        //outer.insertLine(null, pos, text, data);
-      }
-    }
-
-
-    @Override public void clearGthread() {
-      outer.clearTable();  
-    }
     
 
   }

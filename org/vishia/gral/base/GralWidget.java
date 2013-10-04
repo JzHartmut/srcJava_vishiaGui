@@ -1409,13 +1409,6 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   }
 
 
-  @Override
-  public GralWidgetGthreadSet_ifc getGthreadSetifc()
-  { if(wdgImpl !=null) return wdgImpl.getGthreadSetifc();
-    else  return null;
-  }
-
-
   @Override @Deprecated
   public GralColor setBackgroundColor(GralColor color)
   { 

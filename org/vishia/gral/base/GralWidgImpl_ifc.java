@@ -66,7 +66,6 @@ public interface GralWidgImpl_ifc
  
   GralRectangle getPixelPositionSize();
   
-  GralWidgetGthreadSet_ifc getGthreadSetifc();
   
   
 

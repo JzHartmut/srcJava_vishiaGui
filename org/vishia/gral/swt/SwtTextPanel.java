@@ -9,7 +9,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralColor;
@@ -133,10 +132,6 @@ public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, A
 
 
 
-  @Override public GralWidgetGthreadSet_ifc getGthreadSetifc()
-  { return textAreaOutput.getGthreadSetifc(); }
-
-  
 
   
   @Override public void removeWidgetImplementation()

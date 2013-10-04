@@ -9,7 +9,6 @@ import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWindow_setifc;
@@ -342,9 +341,6 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   { window.setBoundsPixel(x,y,dx,dy);
   }
   
-  @Override public GralWidgetGthreadSet_ifc getGthreadSetifc()
-  { return textBox.getGthreadSetifc(); }
-
   
 
   

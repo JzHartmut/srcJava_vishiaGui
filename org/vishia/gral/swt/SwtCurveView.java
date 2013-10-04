@@ -15,7 +15,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralPos;
-import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 
@@ -106,7 +105,6 @@ public class SwtCurveView extends GralCurveView
     curveSwt.redraw();
   }
 
-  @Override public GralWidgetGthreadSet_ifc getGthreadSetifc(){ return gThreadSet; }
 
   @Override public Object getWidgetImplementation(){ return curveSwt; }
   
@@ -472,34 +470,6 @@ public class SwtCurveView extends GralCurveView
     testStopWr = false;
   } 
 
-  
-  /**Implementation of the graphic thread widget set interface. */
-  GralWidgetGthreadSet_ifc gThreadSet = new GralWidgetGthreadSet_ifc(){
-
-    @Override public void clearGthread()
-    { // TODO Auto-generated method stub
-    }
-
-    @Override public void insertGthread(int pos, Object visibleInfo, Object data)
-    { // TODO Auto-generated method stub
-    }
-
-    @Override public void redrawGthread()
-    { // TODO Auto-generated method stub
-    }
-
-    @Override public void setBackGroundColorGthread(GralColor color)
-    { // TODO Auto-generated method stub
-    }
-
-    @Override public void setForeGroundColorGthread(GralColor color)
-    { // TODO Auto-generated method stub
-    }
-
-    @Override public void setTextGthread(String text, Object data)
-    { // TODO Auto-generated method stub
-    }
-  };
   
   
   private class CurveView extends Canvas

@@ -7,7 +7,6 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Canvas;
 import org.vishia.gral.base.GralLed;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.ifc.GralColor;
 
 /**This class represents a LED, which is able to show a state with its color. 
@@ -79,36 +78,6 @@ public class SwtLed extends GralLed{
   }
   
   
-  
-  @Override public GralWidgetGthreadSet_ifc getGthreadSetifc(){ return gThreadSet; }
-
-  /**Implementation of the graphic thread widget set interface. */
-  GralWidgetGthreadSet_ifc gThreadSet = new GralWidgetGthreadSet_ifc(){
-
-    @Override public void clearGthread()
-    { // TODO Auto-generated method stub
-    }
-
-    @Override public void insertGthread(int pos, Object visibleInfo, Object data)
-    { // TODO Auto-generated method stub
-    }
-
-    @Override public void redrawGthread()
-    { // TODO Auto-generated method stub
-    }
-
-    @Override public void setBackGroundColorGthread(GralColor color)
-    { // TODO Auto-generated method stub
-    }
-
-    @Override public void setForeGroundColorGthread(GralColor color)
-    { // TODO Auto-generated method stub
-    }
-
-    @Override public void setTextGthread(String text, Object data)
-    { // TODO Auto-generated method stub
-    }
-  };
   
   
   

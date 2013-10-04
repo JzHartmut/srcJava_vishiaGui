@@ -4,7 +4,6 @@ import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.util.Removeable;
 
 
@@ -86,7 +85,6 @@ public interface GralWidget_ifc extends Removeable
    * this method returns null. You should call {@link #getWidgetImplementation()} instead. */
   //public Object[] XXXgetWidgetMultiImplementations();
   
-  GralWidgetGthreadSet_ifc getGthreadSetifc();
   
   public String getName();
   

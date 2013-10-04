@@ -1,6 +1,5 @@
 package org.vishia.gral.swt;
 
-import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.base.GralWindow_setifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 
@@ -14,5 +13,4 @@ public interface SwtSetValue_ifc
 {
   GralWindow_setifc getSwtWindow_ifc();
   
-  GralWidgetGthreadSet_ifc getSwtWidget_ifc();
 }

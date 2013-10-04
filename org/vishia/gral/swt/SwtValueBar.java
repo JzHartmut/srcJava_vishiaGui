@@ -8,7 +8,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.vishia.gral.base.GralValueBar;
-import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -75,44 +74,9 @@ public class SwtValueBar extends GralValueBar implements GralSetValue_ifc, GralW
   @Override public Object getWidgetImplementation() { return widgetSwt; }
   @Override public boolean setFocusGThread(){ return widgetSwt.setFocus(); }
 
-  @Override public GralWidgetGthreadSet_ifc getGthreadSetifc(){ return gThreadSet; }
-
-  /**Implementation of the graphic thread widget set interface. */
-  GralWidgetGthreadSet_ifc gThreadSet = new GralWidgetGthreadSet_ifc(){
-
-    @Override public void clearGthread()
-    { // TODO Auto-generated method stub
-    }
-
-    /**This method is used to set the position of the bar.
-     * @see org.vishia.gral.base.GralWidgetGthreadSet_ifc#insertGthread(int, java.lang.Object, java.lang.Object)
-     */
-    @Override public void insertGthread(int pos, Object visibleInfo, Object data){ 
-      if(visibleInfo == null){
-        setValue(pos);
-        widgetSwt.redraw();
-      }
-      if(data !=null) { setContentInfo(data); }
-    }
-
-    @Override public void redrawGthread(){ widgetSwt.redraw(); }
-
-    @Override public void setBackGroundColorGthread(GralColor color)
-    { // TODO Auto-generated method stub
-    }
-
-    @Override public void setForeGroundColorGthread(GralColor color)
-    { // TODO Auto-generated method stub
-    }
-
-    @Override public void setTextGthread(String text, Object data)
-    { // TODO Auto-generated method stub
-    }
-  };
   
   
-  
-public class BarWidget extends Canvas
+  public class BarWidget extends Canvas
 	{
 		BarWidget()
 		{

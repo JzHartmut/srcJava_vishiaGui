@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralWidgetChangeRequ;
 
 
 /**This interface can be implemented by any user classes which are associated to 

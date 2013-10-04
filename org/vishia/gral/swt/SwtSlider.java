@@ -2,7 +2,6 @@ package org.vishia.gral.swt;
 
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralSlider;
-import org.vishia.gral.base.GralWidgetGthreadSet_ifc;
 import org.vishia.gral.ifc.GralColor;
 
 public class SwtSlider extends GralSlider
@@ -31,11 +30,6 @@ public class SwtSlider extends GralSlider
     return false;
   }
 
-  @Override
-  public GralWidgetGthreadSet_ifc getGthreadSetifc() {
-    // TODO Auto-generated method stub
-    return null;
-  }
 
   @Override
   public Object getWidgetImplementation() {
