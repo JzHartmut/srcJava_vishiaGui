@@ -30,7 +30,13 @@ public interface GralWidgImpl_ifc
    */
   boolean setFocusGThread();
   
-  boolean setVisible(boolean visible);
+  /**
+   * @param visible
+   * @return
+   * @deprecated
+   */
+  @Deprecated
+  //boolean setVisible(boolean visible);
 
   /**Removes the graphical widget in the graphic. */
   void removeWidgetImplementation();

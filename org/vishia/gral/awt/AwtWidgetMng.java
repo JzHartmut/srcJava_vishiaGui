@@ -564,13 +564,6 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     
   }
 
-  @Override
-  public boolean setWindowsVisible(GralWindow_ifc window, GralPos atPos)
-  {
-    // TODO Auto-generated method stub
-    return false;
-  }
-  
   
   
   /**Places a current component with knowledge of the current positions and the spreads of the component on graphic.
@@ -660,6 +653,15 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
 
 
   void stop(){}
+
+
+
+  @Override
+  public boolean XXXsetWindowsVisible(GralWindow_ifc window, GralPos atPos)
+  {
+    // TODO Auto-generated method stub
+    return false;
+  }
 
 
 

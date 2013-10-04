@@ -372,6 +372,13 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   }
 
   
+  @Override public boolean setVisible(boolean visible){
+    if(textBox !=null){ return textBox.setVisible(visible); }
+    if(htmlBox !=null){ return htmlBox.setVisible(visible); }
+    else return false;
+    
+  }
+
   @Override public void refreshFromVariable(VariableContainer_ifc container){
     if(textBox !=null){ textBox.refreshFromVariable(container); }
     if(htmlBox !=null){ htmlBox.refreshFromVariable(container); }

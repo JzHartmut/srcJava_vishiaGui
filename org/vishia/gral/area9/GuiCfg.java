@@ -279,7 +279,8 @@ GralDispatchCallbackWorker configGuiWithZbnf = new GralDispatchCallbackWorker("G
   
   @Override public void doBeforeDispatching(boolean onlyWakeup){
     panelBuildIfc.buildCfg(guiCfgData, cargs.fileGuiCfg);
-    
+    gralMng.initCfgDesigner();
+
     gralMng.gralDevice.removeDispatchListener(this);    
     
     countExecution();

@@ -613,7 +613,7 @@ class FcmdFavorPathSelector
             writeCfg(fileCfg);
           }
         }
-        main.gralMng.setWindowsVisible(windAddFavorite.window, null); //set it invisible.
+        windAddFavorite.window.setVisible(false);
       }
       return true;
     }

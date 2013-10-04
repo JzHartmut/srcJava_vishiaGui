@@ -219,7 +219,7 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
    * It is public because the implementation level in another package should accesses it.
    */
   public abstract static class MethodsCalledbackFromImplementation 
-  extends GralWidget.MethodsCalledbackFromImplementation
+  extends GralWidget.ImplAccess
   {
     
     private final GralPanelContent panelg;

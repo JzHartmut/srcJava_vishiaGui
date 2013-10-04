@@ -104,7 +104,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   /**State of visible, fullScreen, close set by {@link #setVisible(boolean)}, {@link #setFullScreen(boolean)},
    * {@link #closeWindow()} called in another thread than the graphic thread. It is stored here
    * and executed in the {@link GralWidgImpl_ifc#repaintGthread()}. */
-  protected boolean bVisible, bFullScreen, bShouldClose;
+  protected boolean XXXbVisible, bFullScreen, bShouldClose;
   
 
   
@@ -135,14 +135,12 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
 
   
   @Override public void setWindowVisible(boolean visible){
-    this.bVisible = visible;
-    repaint(repaintDelay, repaintDelayMax);
+    setVisible(visible);
   }
   
 
   @Override public void closeWindow(){
-    this.bVisible = false;
-    repaint(repaintDelay, repaintDelayMax);
+    setVisible(false);
   }
   
   
@@ -152,7 +150,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    * it should be visible from the graphic implementation which is located in another package. 
    */
   public abstract static class GraphicImplAccess 
-  extends GralWidget.MethodsCalledbackFromImplementation //access to GralWidget
+  extends GralWidget.ImplAccess //access to GralWidget
   implements GralWidgImpl_ifc
   {
     
@@ -171,7 +169,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
     
     
     
-    protected boolean isVisible(){ return gralWindow.bVisible; }
+    //protected boolean isVisible(){ return gralWindow.bVisible; }
     
     protected boolean isFullScreen(){ return gralWindow.bFullScreen; }
     
@@ -252,7 +250,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   public void setTitle(String sTitle)
   {
     dyda.displayedText = sTitle;
-    dyda.setChanged(chgText); 
+    dyda.setChanged(ImplAccess.chgText); 
     repaint(repaintDelay, repaintDelayMax);
   }
 

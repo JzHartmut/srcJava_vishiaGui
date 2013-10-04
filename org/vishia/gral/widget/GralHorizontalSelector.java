@@ -214,7 +214,7 @@ public class GralHorizontalSelector<UserData> extends GralWidget
    * it should be visible from the graphic implementation which is located in another package. 
    */
   public static abstract class GraphicImplAccess<UserData> 
-  extends GralWidget.MethodsCalledbackFromImplementation //access to GralWidget
+  extends GralWidget.ImplAccess //access to GralWidget
   implements GralWidgImpl_ifc
   {
     

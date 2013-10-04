@@ -394,17 +394,8 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   
-  @Override public boolean setWindowsVisible(GralWindow_ifc window, GralPos atPos)
-  { SwtSubWindow windowSwt = (SwtSubWindow)window;
-    if(atPos ==null){
-      window.setWindowVisible(false); 
-    } else {
-      GralRectangle rect = calcPositionOfWindow(atPos);
-      windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
-      window.setWindowVisible(true); 
-    }
-    return windowSwt.window.isVisible();
-  }
+  @Override public boolean XXXsetWindowsVisible(GralWindow_ifc window, GralPos atPos)
+  {return false;  }
 
   
 
@@ -1465,13 +1456,12 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     @Override public void focusGained(FocusEvent ev)
     { GralWidget widgd = (GralWidget)ev.widget.getData();
       //widgd.wdgImpl.focusGained();
-      /*
-      widgd.getMng().notifyFocus(widgd);
+      notifyFocus(widgd);
       String htmlHelp = widgd.getHtmlHelp();
+      
       if(htmlHelp !=null && applAdapter !=null){
         applAdapter.setHelpUrl(htmlHelp);
       }
-      */
     }
   }
   

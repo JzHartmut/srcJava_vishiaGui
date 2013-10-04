@@ -331,7 +331,7 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
       this.caretPos = caretPos;
       int yet = dyda.whatIsChanged.get();
       int catastrophicCount = 0;
-      while( !dyda.whatIsChanged.compareAndSet(yet, yet | chgText)){ 
+      while( !dyda.whatIsChanged.compareAndSet(yet, yet | ImplAccess.chgText)){ 
         if(++catastrophicCount > 10000) throw new RuntimeException("");
       }
       if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){

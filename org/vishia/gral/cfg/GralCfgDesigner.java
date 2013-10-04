@@ -89,10 +89,10 @@ public class GralCfgDesigner
   }
 
   
-  /**Initializes the graphic, especially the context menu of right mouse button 
-   * It will be called in the GUI-Thread.
+  /**Initializes the dialog box of the field properties. 
+   * It should be called in the GUI-Thread.
    */
-  public void initGui()
+  public void setToPanel()
   {
     assert(dialogWindowProps == null); //check call only one time.
     mng.setPosition(-32, GralPos.size +32, -40, GralPos.size +40, 1, 'r');
@@ -216,7 +216,9 @@ public class GralCfgDesigner
     //dialogWindowProps.posWindow.setPosition(widgd.pos, widgd.pos.y +2, GralGridPos.size+30, widgd.pos.x, GralGridPos.size+40, 1, 'r' );
     //dialogWindowProps.setWindowVisible(true);
     //use manager to position.
-    mng.setWindowsVisible(dialogWindowProps, dialogWindowProps.pos());
+    dialogWindowProps.setVisible(true);
+    //dialogWindowProps.chgPos(dialogWindowProps.pos());
+    //mng.setWindowsVisible(dialogWindowProps, dialogWindowProps.pos());
   }
   
   private final GralUserAction actionOk = new GralUserAction()

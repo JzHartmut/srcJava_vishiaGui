@@ -57,12 +57,6 @@ public class SwtWidgetSimpleWrapper implements GralWidgImpl_ifc
   { widgetSwt.setBounds(x,y,dx,dy);
   }
   
-  @Override public boolean setVisible(boolean visible)
-  { widgetSwt.setVisible(visible);
-    return widgetSwt.isVisible();
-  }
-  
-
   
   @Override public GralRectangle getPixelPositionSize(){
     int posx = 0, posy = 0;

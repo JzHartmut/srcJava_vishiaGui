@@ -273,7 +273,7 @@ public class SwtTextFieldWrapper extends GralTextField
         chg = this.dyda.whatIsChanged.get();
         if(++catastrophicalCount > 10000) 
           throw new RuntimeException("atomic failed");
-        if((chg & chgText) !=0 && text!=null){ 
+        if((chg & ImplAccess.chgText) !=0 && text!=null){ 
           textFieldSwt.setText(text);
           final int selectionStart, selectionEnd;
           final int zText = text.length();
@@ -291,8 +291,8 @@ public class SwtTextFieldWrapper extends GralTextField
             textFieldSwt.setSelection(selectionStart, selectionEnd);
           }
         }
-        if((chg & chgColorText) !=0){ textFieldSwt.setForeground(((SwtMng)itsMng).getColorImpl(dyda.textColor)); }
-        if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(((SwtMng)itsMng).getColorImpl(dyda.backColor)); }
+        if((chg & ImplAccess.chgColorText) !=0){ textFieldSwt.setForeground(((SwtMng)itsMng).getColorImpl(dyda.textColor)); }
+        if((chg & ImplAccess.chgColorBack) !=0){ textFieldSwt.setBackground(((SwtMng)itsMng).getColorImpl(dyda.backColor)); }
         textFieldSwt.redraw();
       //System.out.println("SwtTextField " + name + ":" + text);
       } while(!dyda.whatIsChanged.compareAndSet(chg, 0));
@@ -407,7 +407,8 @@ public class SwtTextFieldWrapper extends GralTextField
 
   
   
-  //@SuppressWarnings("unused")
+  /**For edit able fields.
+   */
   private class TextFieldFocusListener extends SwtMng.SwtMngFocusListener
   {
     

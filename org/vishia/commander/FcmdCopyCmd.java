@@ -315,7 +315,8 @@ public class FcmdCopyCmd
     listEvCheck.clear();
     listEvCopy.clear();
     state = Estate.inactive;
-    main.gralMng.setWindowsVisible(windConfirmCopy, null); //set it invisible.
+    windConfirmCopy.setVisible(false);
+    //main.gralMng.setWindowsVisible(windConfirmCopy, null); //set it invisible.
   }
   
   
@@ -543,7 +544,7 @@ public class FcmdCopyCmd
           //widgButtonOk.setCmd("check");
           widgCopyState.setText("check?", 0);
           if(setVisible){
-            windConfirmCopy.setWindowVisible(true);
+            windConfirmCopy.setVisible(true);
             //main.gralMng.setWindowsVisible(windConfirmCopy, posWindConfirmCopy);
             main.gui.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.");
           }
@@ -943,7 +944,7 @@ public class FcmdCopyCmd
       }
       widgButtonEsc.setText("close");
       //widgButtonEsc.setCmd("close");
-      windConfirmCopy.setWindowVisible(false);      
+      windConfirmCopy.setVisible(false);      
     }
   }
   

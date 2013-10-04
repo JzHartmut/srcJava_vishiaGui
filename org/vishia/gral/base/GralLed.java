@@ -84,7 +84,7 @@ public abstract class GralLed extends GralWidget
       if(val2 >= colorInnerSelectable.length){ val2 = colorInnerSelectable.length -1; }
       dyda.lineColor = colorBorderSelectable[val1];
       dyda.backColor = colorInnerSelectable[val2];
-      dyda.setChanged(GralWidget.chgColorBack | GralWidget.chgColorLine);
+      dyda.setChanged(ImplAccess.chgColorBack | ImplAccess.chgColorLine);
       repaint(repaintDelay, repaintDelayMax);
     }
   }

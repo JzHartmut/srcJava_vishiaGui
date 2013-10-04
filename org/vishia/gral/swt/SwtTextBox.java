@@ -125,7 +125,7 @@ public class SwtTextBox extends GralTextBox
       whatisChanged1 = dyda.whatIsChanged.get();  //maybe new requests
       if(++catastrophicCount > 10000) throw new RuntimeException("");
     }
-    if((whatisChanged1 & chgText) !=0 && text!=null){
+    if((whatisChanged1 & ImplAccess.chgText) !=0 && text!=null){
       textFieldSwt.setText(text);
     }
     textFieldSwt.redraw(); textFieldSwt.update(); 

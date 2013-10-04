@@ -61,14 +61,14 @@ public class SwtLed extends GralLed{
   
   private void setColors(){
     int changedAckn = 0;
-    if(dyda.backColor !=null && (dyda.whatIsChanged.get() & GralWidget.chgColorBack)!=0){ 
+    if(dyda.backColor !=null && (dyda.whatIsChanged.get() & ImplAccess.chgColorBack)!=0){ 
       innerColor = mng.getColorImpl(dyda.backColor);
-      changedAckn |= GralWidget.chgColorBack; 
+      changedAckn |= ImplAccess.chgColorBack; 
     }
     if(dyda.lineColor !=null){ 
-      if((dyda.whatIsChanged.get() & GralWidget.chgColorLine)!=0){
+      if((dyda.whatIsChanged.get() & ImplAccess.chgColorLine)!=0){
         borderColor = mng.getColorImpl(dyda.lineColor); 
-        changedAckn |= GralWidget.chgColorLine; 
+        changedAckn |= ImplAccess.chgColorLine; 
       }
     } else {
       borderColor = innerColor;

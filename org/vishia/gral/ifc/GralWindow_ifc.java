@@ -9,7 +9,7 @@ import org.vishia.gral.base.GralWindow_setifc;
  * This interface contains the get and set access-interfaces (the base ones)
  * and contains the build-method-definition for windows.
  */
-public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc 
+public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc, GralWidget_ifc 
 {
   /**Version, history and license.
    * <ul>

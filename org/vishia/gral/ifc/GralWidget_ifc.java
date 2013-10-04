@@ -115,6 +115,16 @@ public interface GralWidget_ifc extends Removeable
    */
   public abstract void setFocus(int delay, int latest);
   
+  /**Sets this widget visible on graphic or invisible. Any widget can be visible or not. More as one widgets
+   * can use the same position, only one of them may set visible. 
+   * For a {@link GralWindow}, its the visibility of the whole window. 
+   * Note that a window which is invisible is not shown in the task bar of the operation system. 
+   * Note that an application can have more as one window. 
+   * Note that a dialog window can be set to invisible if it is not need yet instead destroy and build newly.
+   * @param visible
+   * @return
+   */
+  boolean setVisible(boolean visible);
   
   /**Returns whether the widget is visible or not. This method can be invoked in any thread.
    * It is an estimation because the state of the widget may be changed in the last time or a window

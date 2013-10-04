@@ -199,11 +199,6 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   @Override public Object getWidgetImplementation(){ return window; }
   
   
-  @Override public boolean setVisible(boolean visible){
-    window.setVisible(visible);
-    return true;
-  }
-  
   
   
   
@@ -372,6 +367,8 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   void stop(){}
 
   @Override public void repaintGthread() {
+    int chg = getChanged();
+    int acknChg = 0;
     if(!bHasResizeAction && resizeAction() != null){
       window.addControlListener(resizeListener);
     }
@@ -380,14 +377,20 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     }
     if(super.shouldClose()){
       window.close();
-    }
-    else if(window.isVisible() != super.isVisible()){
-      window.setVisible(super.isVisible());
+    } 
+    if((chg & chgVisible)!=0){
+      acknChg |= chgVisible;
+      window.setVisible(true);
       window.setFocus();
+    }
+    if((chg & chgInvisible)!=0){
+      acknChg |= chgInvisible;
+      window.setVisible(false);
     }
     if(bFullScreen != super.isFullScreen()){
       window.setFullScreen(super.isFullScreen());
     }
+    acknChanged(acknChg);
     window.update();
     window.redraw();
     //swtWindow_setifc.repaintGthread(); 

@@ -230,7 +230,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    *   more to a variable via the new {@link VariableAccessWithIdx} and then to any {@link VariableAccess_ifc}.
    *   It is possible to refresh the visible information from the variable.
    * <li>2012-01-04 Hartmut new: {@link #repaintDelay}, use it.  
-   * <li>2012-03-31 Hartmut new: {@link #isVisible()} and {@link MethodsCalledbackFromImplementation#setVisibleState(boolean)}.
+   * <li>2012-03-31 Hartmut new: {@link #isVisible()} and {@link ImplAccess#setVisibleState(boolean)}.
    *   renamed: {@link #implMethodWidget_} instead old: 'gralWidgetMethod'.
    * <li>2012-03-08 Hartmut chg: {@link #repaintRequ} firstly remove the request from queue before execution,
    *   a new request after that time will be added newly therefore, then execute it.
@@ -458,7 +458,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   /**Set true if its shell, tab card etc is be activated. Set false if it is deactivated.
    * It is an estimation whether this widget is be shown yet. 
    */
-  protected boolean bVisibleState;
+  protected boolean bVisibleState = true;
   
   
   /**Set to true on {@link #setEditable(boolean)}. 
@@ -504,9 +504,6 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   public GralWidgImpl_ifc wdgImpl;
   
-  /**What is changed in the dynamic data, see {@link GralWidget.DynamicData#whatIsChanged}. */  
-  protected static final int chgText = 1, chgColorBack=2, chgColorText=4, chgFont = 8, chgColorLine = 0x10;
-  
   /**This inner class holds the dynamic data of a widget.
    * This data are existent for any widget independent of its type.
    * It can be used in a specific way depending on the widget type.
@@ -522,6 +519,16 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       do {
         int act =whatIsChanged.get();
         int newValue = act | mask;
+        bOk = whatIsChanged.compareAndSet(act, newValue);
+      } while(!bOk && --catastrophicalCount >= 0);
+    }
+    
+    public void acknChanged(int mask){
+      int catastrophicalCount = 1000;
+      boolean bOk;
+      do {
+        int act =whatIsChanged.get();
+        int newValue = act & ~mask;
         bOk = whatIsChanged.compareAndSet(act, newValue);
       } while(!bOk && --catastrophicalCount >= 0);
     }
@@ -593,6 +600,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   public GralPos pos(){ return pos; } 
   
+  
+  
+  public void chgPos(GralPos newPos){
+    dyda.setChanged(ImplAccess.chgPos);
+    pos = newPos;
+  }
   
   /**Returns this.
    * @see org.vishia.gral.base.GetGralWidget_ifc#getGralWidget()
@@ -1030,16 +1043,19 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   @Override public boolean isVisible(){
     return bVisibleState;
   }
-  
+
   
   /**Sets the widget visible or not.
    * @param visible
    * @return the old state.
    */
   @Override public boolean setVisible(boolean visible){
-    if(wdgImpl !=null) return wdgImpl.setVisible(visible);
-    else throw new IllegalArgumentException("GralWidget - does not know its implementation widget; ");
+    dyda.setChanged(visible ? ImplAccess.chgVisible : ImplAccess.chgInvisible);
+    repaint(repaintDelay, repaintDelayMax);
+    return bVisibleState;
   }
+  
+
   
   
   @Override public GralRectangle getPixelPositionSize(){
@@ -1072,7 +1088,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   @Override public void setBackColor(GralColor color, int ix){ 
     dyda.backColor = color; 
-    dyda.setChanged(chgColorBack); 
+    dyda.setChanged(ImplAccess.chgColorBack); 
     repaint(100, 100); 
   }
   
@@ -1082,13 +1098,13 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   @Override public void setLineColor(GralColor color, int ix){ 
     dyda.lineColor = color; 
-    dyda.setChanged(chgColorLine); 
+    dyda.setChanged(ImplAccess.chgColorLine); 
     repaint(100, 100);  
   }
   
   @Override public void setTextColor(GralColor color){ 
     dyda.textColor = color; 
-    dyda.setChanged(chgColorText); 
+    dyda.setChanged(ImplAccess.chgColorText); 
     repaint(100, 100);  
   }
   
@@ -1153,7 +1169,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   @Override public void setText(CharSequence text){
     dyda.displayedText = text.toString(); 
-    dyda.setChanged(GralWidget.chgText);
+    dyda.setChanged(ImplAccess.chgText);
     repaint(100, 100);
     //System.err.println(Assert.stackInfo("GralWidget - non overridden setText called; Widget = " + name + "; text=" + text, 5));
   }
@@ -1275,11 +1291,17 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * This class is used only for the implementation level of the graphic. It is not intent to use
    * by any application. It is public because the implementation level should accesses it.
    */
-  public abstract static class MethodsCalledbackFromImplementation implements GralWidgImpl_ifc {
+  public abstract static class ImplAccess implements GralWidgImpl_ifc {
     
-    private final GralWidget widgg;
+    /**What is changed in the dynamic data, see {@link GralWidget.DynamicData#whatIsChanged}. */  
+    public static final int chgText = 1, chgColorBack=2, chgColorText=4, chgFont = 8, chgColorLine = 0x10;
     
-    protected MethodsCalledbackFromImplementation(GralWidget widgg, GralMng mng){
+    public static final int chgPos = 0x20000000, chgVisible = 0x40000000, chgInvisible = 0x80000000;
+    
+
+    protected final GralWidget widgg;
+    
+    protected ImplAccess(GralWidget widgg, GralMng mng){
       this.widgg = widgg;
       widgg.itsMng = mng;
       widgg.wdgImpl = this; 
@@ -1315,7 +1337,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
 
     //public void setWidgetImpl(GralWidgImpl_ifc widg, GralMng mng){ widgg.wdgImpl = widg; widgg.itsMng = mng; }
 
+    public int getChanged(){ return widgg.dyda.whatIsChanged.get(); }
     
+    public void acknChanged(int mask){ widgg.dyda.acknChanged(mask); }
     
   }
   

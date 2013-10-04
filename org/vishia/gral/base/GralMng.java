@@ -1043,6 +1043,11 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
   
+  
+  public void initCfgDesigner(){
+    designer.setToPanel();
+  }
+  
   @Override public GralInfoBox createTextInfoBox(String name, String title)
   {
     return GralInfoBox.createTextInfoBox(this, name, title);

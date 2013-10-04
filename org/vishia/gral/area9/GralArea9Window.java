@@ -564,18 +564,18 @@ public class GralArea9Window implements GralArea9_ifc
   public final void setStandardMenusGThread(File openStandardDirectory, GralUserAction actionFile)
   { this.currentDirectory = openStandardDirectory;
     this.actionFile = actionFile;
-    if(window instanceof GralPrimaryWindow_ifc)
-    { GralPrimaryWindow_ifc pWindow = (GralPrimaryWindow_ifc) window;
+    //if(window instanceof GralPrimaryWindow_ifc)
+    { //GralPrimaryWindow_ifc pWindow = (GralPrimaryWindow_ifc) window;
       //create the menue
-      pWindow.addMenuItemGThread("menuFileOpen", "&File/&Open", this.new GralActionFileOpen());
+      window.addMenuItemGThread("menuFileOpen", "&File/&Open", this.new GralActionFileOpen());
       //swtWindow.addMenuItemGThread("&File/&Close", this.new ActionFileClose());
-      pWindow.addMenuItemGThread("menuFileSave", "&File/&Save", actionFile);
+      window.addMenuItemGThread("menuFileSave", "&File/&Save", actionFile);
       //swtWindow.addMenuItemGThread("&File/E&xit", this.new ActionFileOpen());
       //swtWindow.graphicThreadSwt.setJMenuBar(menuBar);
       //swtWindow.graphicThreadSwt.setVisible( true );
       window.repaint();
-    } else {
-      throw new IllegalArgumentException("Error: can't apply menus in a sub window");
+    //} else {
+    //  throw new IllegalArgumentException("Error: can't apply menus in a sub window");
       //window.getMng().writeLog(0, "Error: can't apply menus in a sub window");
     }
     

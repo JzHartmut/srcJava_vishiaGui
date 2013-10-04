@@ -283,32 +283,51 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   public boolean setVisible(boolean visible){
     boolean ret = swtWidgWrapper.widgetSwt.isVisible();
     swtWidgWrapper.widgetSwt.setVisible(visible);
-    ((GralWidget.MethodsCalledbackFromImplementation)this).setVisibleState(visible);
+    ((GralWidget.ImplAccess)this).setVisibleState(visible);
     return ret;
   }
   
 
 
   @Override public void repaintGthread(){
-    if(!swtWidgWrapper.widgetSwt.isDisposed()){
-      setAllCellContentGthread();
-      Color colorSelectBack =  swtWidgWrapper.mng.getColorImpl(super.colorSelectCharsBack());
-      Color colorSelect =  swtWidgWrapper.mng.getColorImpl(super.colorSelectChars());
-      if(super.searchChars().length() >0){
-        swtSearchText.setBackground(colorSelectBack);
-        swtSearchText.setForeground(colorSelect);
-        //swtSearchText.
-        swtSearchText.setText(searchChars().toString());
-        Point tabSize = swtWidgWrapper.widgetSwt.getSize();
-        swtSearchText.setBounds(xpixelCell[ixColumn()] + 10, tabSize.y - linePixel, xpixelCell[ixColumn()+1] - xpixelCell[ixColumn()] - 10, linePixel);
-        swtSearchText.setVisible(true);
-        
-      } else {
-        swtSearchText.setVisible(false);
+    if(swtWidgWrapper.widgetSwt !=null && !swtWidgWrapper.widgetSwt.isDisposed()){
+      int chg = getChanged();
+      int acknChg = 0;
+      if((chg & chgVisible)!=0){
+        acknChg |= chgVisible;
+        setVisibleState(true);
+        for(Text[] lines: cellsSwt){
+          for(Text cell: lines){ cell.setVisible(true); }
+        }
       }
-      //System.out.println("swtTable redrawed");
-      swtWidgWrapper.widgetSwt.update();  //this is the core-redraw
-      swtWidgWrapper.widgetSwt.redraw();
+      if((chg & chgInvisible)!=0){
+        acknChg |= chgInvisible;
+        setVisibleState(false);
+        for(Text[] lines: cellsSwt){
+          for(Text cell: lines){ cell.setVisible(false); }
+        }
+      }
+      acknChanged(acknChg);
+      if(widgg.isVisible()){   
+        setAllCellContentGthread();
+        Color colorSelectBack =  swtWidgWrapper.mng.getColorImpl(super.colorSelectCharsBack());
+        Color colorSelect =  swtWidgWrapper.mng.getColorImpl(super.colorSelectChars());
+        if(super.searchChars().length() >0){
+          swtSearchText.setBackground(colorSelectBack);
+          swtSearchText.setForeground(colorSelect);
+          //swtSearchText.
+          swtSearchText.setText(searchChars().toString());
+          Point tabSize = swtWidgWrapper.widgetSwt.getSize();
+          swtSearchText.setBounds(xpixelCell[ixColumn()] + 10, tabSize.y - linePixel, xpixelCell[ixColumn()+1] - xpixelCell[ixColumn()] - 10, linePixel);
+          swtSearchText.setVisible(true);
+          
+        } else {
+          swtSearchText.setVisible(false);
+        }
+        //System.out.println("swtTable redrawed");
+        swtWidgWrapper.widgetSwt.update();  //this is the core-redraw
+        swtWidgWrapper.widgetSwt.redraw();
+      }
       //((Table)swtWidg.widgetSwt).super.redraw();
       redrawtime = System.currentTimeMillis();
       //System.out.println("test SwtTable redraw " + ++redrawct);
@@ -473,7 +492,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
     //ixLineNew = line.nLineNr;  //select this line.
     
     if(true || !hasFocus){
-      ((GralWidget.MethodsCalledbackFromImplementation)this).focusGained();  //from GralWidget.
+      ((GralWidget.ImplAccess)this).focusGained();  //from GralWidget.
       hasFocus = true;
       //System.out.println("focusTable");
     }
@@ -800,7 +819,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
     
     @Override public void focusGained(FocusEvent ev)
     { //super.focusGained(ev);
-      ((GralWidget.MethodsCalledbackFromImplementation)SwtTable.this).focusGained();
+      ((GralWidget.ImplAccess)SwtTable.this).focusGained();
       //System.out.println("table focus gained. ");
       //assert(false);
       int row = 1; //table.getSelectionIndex();
@@ -856,7 +875,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
         if(!bRedrawPending){ 
           //The focusGained for the table invokes the GralWidget.focusAction for this table.
           if(true || !hasFocus){
-            ((GralWidget.MethodsCalledbackFromImplementation)SwtTable.this).focusGained();  //from GralWidget.
+            ((GralWidget.ImplAccess)SwtTable.this).focusGained();  //from GralWidget.
             hasFocus = true;
             //System.out.println("focusTable");
           }

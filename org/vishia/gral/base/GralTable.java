@@ -660,7 +660,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * environment class. Via access methods the implementor class has protected access to all of it.
    * 
    */
-  public static abstract class GraphicImplAccess extends GralWidget.MethodsCalledbackFromImplementation
+  public static abstract class GraphicImplAccess extends GralWidget.ImplAccess
   implements GralWidgImpl_ifc, Removeable
   {
     protected final GralTable<?> outer;
@@ -1209,6 +1209,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
     @Override public void setFocus() { GralTable.this.setFocus(); }
 
+    @Override public boolean setVisible(boolean visible) 
+    { return false;  //TODO line visible. 
+    }
+
+    
+    
     @Override public void setFocus(int delay, int latest) { GralTable.this.setFocus(delay, latest); }
 
     @Override public boolean isVisible(){ return GralTable.this.isVisible(); }

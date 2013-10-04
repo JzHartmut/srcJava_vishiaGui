@@ -223,8 +223,10 @@ public interface GralMng_ifc
    *        The position and size of the window is given related to any panel of any other window. 
    *         
    * @return true if it is visible.
+   * @deprecated
    */
-  boolean setWindowsVisible(GralWindow_ifc window, GralPos atPos);
+  @Deprecated
+  boolean XXXsetWindowsVisible(GralWindow_ifc window, GralPos atPos);
   
   
 	/**Gets the value to the named color. It is a method of the graphic.

@@ -653,14 +653,10 @@ public class GralFileSelector implements Removeable //extends GralWidget
     panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
     panelMng.addButton(null, actionFavorButton, "favor");
     //the list
-    panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
-    favorList.setToPanel(panelMng);
-    favorList.insertLine(null, 0, new String[]{"test", "path"}, null);
-    favorList.setVisible(false);
-    //
-    //at same position as favor table: the file list.
+    //on same position as favor table: the file list.
     panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
     selectList.setToPanel(panelMng);
+    selectList.wdgdTable.setVisible(true);
     selectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refresh, actionRefreshFileTable);
     selectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refreshCyclicOff, actionSwitchoffCheckRefresh);
     selectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refreshCyclicOn, actionSwitchonCheckRefresh);
@@ -682,6 +678,13 @@ public class GralFileSelector implements Removeable //extends GralWidget
     selectList.wdgdTable.setContentInfo(this);
     selectList.wdgdTable.specifyActionOnLineSelected(actionOnFileSelection);
     selectList.wdgdTable.specifyActionOnLineMarked(actionOnMarkLine);
+    
+    panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, -5, 1, 'd');
+    //on same position as favor table: the file list.
+    favorList.setToPanel(panelMng);
+    favorList.insertLine(null, 0, new String[]{"test", "path"}, null);
+    favorList.setVisible(false);
+    //
     panelMng.setPosition(5, 0, 10, GralPos.size + 40, 1, 'd');
     questionWindow = GralInfoBox.createTextInfoBox(panelMng, "questionInfoBox", "question");  
     panelMng.selectPanel(sPanel);  //if finished this panel is selected for like entry.

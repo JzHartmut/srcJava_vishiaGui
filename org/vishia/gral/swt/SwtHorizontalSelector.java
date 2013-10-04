@@ -116,7 +116,7 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
   @Override public GralRectangle getPixelPositionSize(){ return swtWidgWrapper.getPixelPositionSize(); }
 
   
-  @Override public boolean setVisible(boolean visible){ return swtWidgWrapper.setVisible(visible); }
+  //@Override public boolean setVisible(boolean visible){ return swtWidgWrapper.setVisible(visible); }
   
   
 
