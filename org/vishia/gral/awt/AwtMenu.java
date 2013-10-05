@@ -29,11 +29,17 @@ public class AwtMenu extends GralMenu
     
   }
 
-  @Override public GralWidget addMenuItemGthread(String nameWidg, String sMenuPath, GralUserAction action)
+  @Override public void addMenuItemGthread(String nameWidg, String sMenuPath, GralUserAction action)
   {
     // TODO Auto-generated method stub
-    return null;
   }
+  
+  @Override public void addMenuItemGthread(GralWidget widggMenu, String nameWidg, String sMenuPath, GralUserAction gralAction)
+  {
+    // TODO Auto-generated method stub
+    return;
+  }
+
 
   @Override public void addMenuItemGthread(String sMenuPath,
       GralUserAction gralAction)

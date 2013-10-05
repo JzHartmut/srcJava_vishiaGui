@@ -4,8 +4,20 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.util.Assert;
 
 /**Super class of Menu wrappers independent of the implementation graphic.
+ * The basic idea for menus is: A path is used instead a tree of menus.
+ * To add any new menu item to a window's pull-down menu bar, use
+ * {@link GralWindow#addMenuItemGThread(String, String, GralUserAction)}.
+ * You needn't have knowledge about the tree structure of the menu.
+ * The String sMenuPath should consist of the parts of the menu tree,
+ * for example "&File/&Check/rest&Ore". For this example a menu bar entry "File" is created
+ * or the yet existing is used. Then the sub menu entry "Check" is created or the existing is used.
+ * There the entry "restOre" is created with 'O' as hot-key.
+ * 
+ * 
+ * 
  * @author Hartmut Schorrig
  *
  */
@@ -90,7 +102,10 @@ public abstract class GralMenu //extends GralWidget
   public GralMenu(GralWidget widgg, GralMng mng)
   {
     this.widgg = widgg;
-    //super(sName, 'M', mng);
+    if(widgg == null)
+      Assert.stop();
+    else 
+      Assert.stop();
     this.gralMng = mng;
   }
 
@@ -104,11 +119,24 @@ public abstract class GralMenu //extends GralWidget
    *   then creates the search menu item as pull down in menu bar, and then 'continue' with 'n' as hot key as sub-menu. 
    *   It is stored in {@link GralWidget#sDataPath}  
    * @param action called on menu activation.
-   * @return the widget can be used to add any {@link GralWidget#setContentInfo(Object)} etc. 
+   */
+  public abstract void addMenuItemGthread(String name, String sMenuPath, GralUserAction action);
+  
+  
+  /**Adds with a given widget.
+   * Note the widget is in difference with the {@link #widgg} of the constructor. 
+   * Check what is happen. Therefore:
+   * @deprecated
+   * @param widggMenu the widget can be used to add any {@link GralWidget#setContentInfo(Object)} etc. 
    *   It is provided in the action method.
+   * @param name
+   * @param sMenuPath
+   * @param action
    */
   @Deprecated
-  public abstract GralWidget addMenuItemGthread(String name, String sMenuPath, GralUserAction action);
+  public abstract void addMenuItemGthread(GralWidget widggMenu, String name, String sMenuPath, GralUserAction action);
+  
+  
   
   
   

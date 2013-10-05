@@ -313,7 +313,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    */
   public void addContextMenuEntryGthread(int col, String menuname, String sMenuPath, GralUserAction action){
     GralMenu menu = getContextMenuColumn(col);
-    GralWidget menuitem = menu.addMenuItemGthread(menuname, sMenuPath, action);
+    GralWidget menuitem = new GralWidget(menuname, 'M', null);
+    menu.addMenuItemGthread(menuitem, menuname, sMenuPath, action);
     menuitem.setContentInfo(this);  //the table
   }
   

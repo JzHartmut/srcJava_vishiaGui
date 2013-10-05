@@ -110,10 +110,20 @@ public class SwtMenu extends GralMenu
   /**
    * @see org.vishia.gral.base.GralMenu#addMenuItemGthread(java.lang.String, java.lang.String, org.vishia.gral.ifc.GralUserAction)
    */
-  @Override public GralWidget addMenuItemGthread(String nameWidg, String sMenuPath, GralUserAction gralAction)
+  @Override public void addMenuItemGthread(String nameWidg, String sMenuPath, GralUserAction gralAction)
   {
     SelectionListener action = new ActionUserMenuItem(gralAction);
-    return addMenuItemGthread(null, nameWidg, sMenuPath, action);
+    addMenuItemGthread(widgg, nameWidg, sMenuPath, action);
+  }  
+  
+  
+  /* (non-Javadoc)
+   * @see org.vishia.gral.base.GralMenu#addMenuItemGthread(org.vishia.gral.base.GralWidget, java.lang.String, java.lang.String, org.vishia.gral.ifc.GralUserAction)
+   */
+  @Override public void addMenuItemGthread(GralWidget widggMenu, String nameWidg, String sMenuPath, GralUserAction gralAction)
+  {
+    SelectionListener action = new ActionUserMenuItem(gralAction);
+    addMenuItemGthread(widggMenu, nameWidg, sMenuPath, action);
   }  
   
   
@@ -135,7 +145,7 @@ public class SwtMenu extends GralMenu
    * @param sMenuPath
    * @param action
    */
-  /*package private*/ private GralWidget addMenuItemGthread(GralWidget widgg, String nameWidg, 
+  /*package private*/ private void addMenuItemGthread(GralWidget widgg, String nameWidg, 
       String sMenuPath, SelectionListener action)
   {
     String[] names = sMenuPath.split("/");
@@ -174,16 +184,13 @@ public class SwtMenu extends GralMenu
     }
     String name = names[ii];
     MenuItem item = new MenuItem(parentMenu, SWT.None);
-    if(widgg == null){
+    if(widgg != null){
       //An associated GralWidget
-      widgg = new GralWidget(nameWidg, 'M', null); //SwtWidgetMenu(nameWidg, item, sMenuPath, gralMng);
-    } else {
       item.setData(widgg);
     }
     item.setText(name);
     //item.setAccelerator(SWT.CONTROL | 'S');
     item.addSelectionListener(action);
-    return widgg;
   }
 
 
