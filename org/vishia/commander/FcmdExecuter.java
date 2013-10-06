@@ -32,7 +32,7 @@ public class FcmdExecuter
     List<CmdBlock> listCmd = new LinkedList<CmdBlock>();
     
     
-    GralMenu menuSelectExe;
+    //GralMenu menuSelectExe;
     
     /**Creates with given extension. @param name the extension. It is the name from a {@link CmdBlock}. */
     ExtCmd(String name){ this.ext = name; }
@@ -102,15 +102,6 @@ public class FcmdExecuter
     return error;
   }
   
-  
-  
-  private void showPopupMenuToChoiceExec(ExtCmd extCmd){
-    if(extCmd.menuSelectExe ==null){
-      extCmd.menuSelectExe = main.gralMng.addPopupMenu("menuTest");
-    }
-    extCmd.menuSelectExe.setVisible();
-    
-  }
   
   
   

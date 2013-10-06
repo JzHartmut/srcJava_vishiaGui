@@ -415,14 +415,14 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
   
 
   
-  @Override public GralMenu addPopupMenu(String sName){
+  @Override protected GralMenu XXXaddPopupMenu(String sName){
     //Control panelSwt = (Control)pos.panel.getPanelImpl();
     //SwtMenu menu = new SwtMenu(sName, panelSwt, this);
     return null; //menu;
   }
 
   
-  @Override public GralMenu addContextMenu(GralWidget widg){
+  @Override protected GralMenu addContextMenu(GralWidget widg){
     Component widgSwt = (Component)widg.getWidgetImplementation();
     GralMenu menu = new AwtMenu(widg, widgSwt, this);
     PopupMenu menuAwt = (PopupMenu)menu.getMenuImpl();
@@ -433,7 +433,15 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
  
   
   
+  @Override protected GralMenu createMenuBar(GralWindow windg){
+    Frame windowAwt = (Frame)windg.getWidgetImplementation();
+    GralMenu menu = new AwtMenu(windg, windowAwt, this);
+    return menu;
+  }
+ 
   
+  
+
 
   
   

@@ -9,26 +9,45 @@ import org.vishia.util.Removeable;
 
 /**It is a basic interface for any widget of the Graphic Adaption Layer (gral).
  * <br>
- * <b>Strategy of changing the graphical content of a widget</b>:
+ * <b>Strategy of changing the graphical content of a widget</b>:<br>
+ * 2013-09-30<br>
  * The SWT graphical implementation prohibits changing the graphical appearance, for example setText(newText),  
- * in another thread. Other graphical implementations are not threadsafe. Often a graphic application
+ * in another thread. Other graphical implementations are not thread-safe. Often a graphic application
  * runs in only one thread, so that isn't a problem. But applications with complex data gathering processes
  * needs to run in several threads. It may be fine to set the widgets in that threads immediately,
  * seen from the programmers perspective. For multithread usage see {@link org.vishia.gral.base.GralGraphicThread}.
  * <br><br>
- * The solution in gral is:
+ * The solution of setting any content in a Widget in any thread in Gral is:
  * <ul>
- * <li>A {@link GralWidget} can be invoked with methods to set its content from any thread.
- * <li>If it is the graphic thread and the operation is not delayed, it is executed immediately.
- *   Therefore the {@link #getGthreadSetifc()} method from any widget implementation is called to get
- *   the set interface for the graphic thread, and the proper method is invoked. The implementation of the widget
- *   executes the correct steps.
- * <li>If a set method is invoked in any other thread, the request is queued internally. 
- *   The queue is residently in the {@link org.vishia.gral.base.GralMng}. 
- *   The queue is processed in the graphic thread. The commission
- *   to change the widget is stored in an instance of {@link org.vishia.gral.base.GralWidgetChangeRequ}
- *   with a cmd, an index, the value.
- * </ul>   
+ * <li>The thread invokes methods of this <code>GralWidget_ifc</code> or methods of an derived <code>GralWidget</code>
+ *   such as {@link GralTable}, for example {@link #setText(CharSequence)}, {@link #setTextColor(GralColor)}
+ *   or {@link org.vishia.gral.base.GralTable#setColorCurrLine(GralColor)}.
+ * <li>That methods store the given data either in the common {@link GralWidget.DynamicData} {@link GralWidget#dyda} of the widget
+ *   or in specific data of a GralWidget implementation.
+ * <li>That method calls {@link #repaint(int, int)} with a proper millisecond delay (usual 100).
+ *   The graphic implementation widget is not touched in this time. Usual it is not necessary to show information
+ *   in a faster time than 100 ms if it is not a high speed animated graphic. The delayed repaint request
+ *   saves calculation time if more as one property should be changed in one widget.
+ * <li>The delayed repaint request queues the instance {@link GralWidget#repaintRequ} (only private visible)
+ *   of {@link org.vishia.gral.base.GralDispatchCallbackWorker} in the central queue of requests using 
+ *   {@link org.vishia.gral.base.GralGraphicThread#addDispatchOrder(org.vishia.gral.base.GralDispatchCallbackWorker)}. 
+ *   The {@link org.vishia.gral.base.GralGraphicThread} is known by {@link org.vishia.gral.base.GralWidget#itsMng}.
+ * <li>If for example 20 widgets are changed in maybe 40 properties, that queue contains the 20 instances of
+ *   {@link org.vishia.gral.base.GralDispatchCallbackWorker}. Any of them has a specific delay. 
+ *   The graphic thread organizes it in a proper kind of time.
+ * <li>If a {@link org.vishia.gral.base.GralDispatchCallbackWorker} is dequeued in the graphic thread, 
+ *   its method {@link org.vishia.gral.base.GralDispatchCallbackWorker#doBeforeDispatching(boolean)} is invoked. 
+ *   This method calls {@link GralWidgImpl_ifc#repaintGthread()} via the association {@link org.vishia.gral.base.GralWidget#wdgImpl}.
+ * <li>The <code>rerepaintGthread()</code> method is overridden in the implementation layer
+ *   with the necessary statements to transfer the non-graphic data of this {@link GralWidget} especially
+ *   stored in {@link org.vishia.gral.base.GralWidget#dyda} to the special implementation widget method invocations
+ *   such as {@link org.eclipse.swt.widgets.Text#setText(String)} which touchs the graphic widget.
+ *   Then a {@link org.eclipse.swt.widgets.Control#update()} and {@link org.eclipse.swt.widgets.Control#redraw()}
+ *   is invoked to show the content.         
+ * </ul>
+ * It is a complex approach. But it is simple for usage. The user can change the content in any thread.
+ * The user does not need to organize a queue for the graphic thread by itself. The queue is a part of Gral.
+ * 
  * <br><br>
  * <b>Strategy to create widgets and positioning</b>: see {@link GralMngBuild_ifc}.  
  *  
@@ -187,6 +206,31 @@ public interface GralWidget_ifc extends Removeable
    */
   void setTextColor(GralColor color);
   
+
+  /**Set the text of the widget. If the widget is a button, the standard button text is changed.
+   * If it is a window, its title is changed.
+   * <br><br>
+   * <b>Concept of changing a widget from application</b>:<br>
+   * Here the generally approach is described, appropriate for this method, but in the same kind
+   * for all methods to set something like {@link #setBackColor(GralColor, int)} etc.
+   * <br><br>
+   * With the set methods the user stores the text, color etc. in graphic-independent attributes. Then the method
+   * {@link #repaint(int, int)} is invoked with the standard delay of {@link #repaintDelay} and {@link #repaintDelayMax}.
+   * With that the widget-specific private instance of {@link #repaintRequ} is added to the queue of requests
+   * in the {@link GralGraphicThread#addDispatchOrder(GralDispatchCallbackWorker)}. In the requested time that 
+   * dispatch order is executed in the graphic thread. It calls {@link GralWidgImpl_ifc#repaintGthread()}. 
+   * That method is implemented in the graphic implementation layer of the widget. It sets the appropriate values 
+   * from the independent Gral attributes to the implementation specifics and invoke a redraw of the graphic layer.
+   * <br><br>
+   * If more as one attribute is changed one after another, only one instance of the {@link GralDispatchCallbackWorker}
+   * is queued. All changed attributes are stored in {@link DynamicData#whatIsChanged} and the
+   * {@link GralWidgImpl_ifc#repaintGthread()} quests all changes one after another. 
+   * It means that a thread switch is invoked only one time per widget for more as one change.
+   * <br>
+   * See {@link DynamicData}. That composite part of a widget stores all standard dynamic data of a widget. 
+   */
+  void setText(CharSequence text);
+
   
   /**Sets the html help url for this widget. That information will be used if the widget is focused
    * to control the help window output.
@@ -223,7 +267,7 @@ public interface GralWidget_ifc extends Removeable
   void setDataPath(String sDataPath);
   
   
-  /**Returns true if the content is changed.
+  /**Returns true if the content is changed from a user action on GUI.
    * @param setUnchanged If true then set to unchanged with this call.
    * @return true if the content was changed since last setUnchanged.
    */
@@ -232,7 +276,7 @@ public interface GralWidget_ifc extends Removeable
   
   /**Sets a identification for the shown data. A widget may not need to refresh if the contentIdent
    * is not changed. A refresh of a widget's content may have side effects
-   * in user handling such as selection of text etc. 
+   * in user handling such as selection of text etc. See {@link #getContentIdent()}.
    * @param ident any number which identifies the value of content.
    * @return the last stored ident.
    */

@@ -80,11 +80,12 @@ public class SwtMenu extends GralMenu
    * @param parent
    * @param mng
    */
-  public SwtMenu(GralWidget widgg, Control parent, GralMng mng)
+  protected SwtMenu(GralWidget widgg, Control parent, GralMng mng)
   {
     super(widgg, mng);
     this.window = parent.getShell();
     this.menuSwt = new Menu(parent);
+    parent.setMenu(menuSwt);
   }
 
 
@@ -93,7 +94,7 @@ public class SwtMenu extends GralMenu
    * @param window
    * @param mng
    */
-  public SwtMenu(GralWidget widgg, Shell window, GralMng mng)
+  protected SwtMenu(GralWidget widgg, Shell window, GralMng mng)
   {
     super(widgg, mng);
     this.window = window;
@@ -145,7 +146,7 @@ public class SwtMenu extends GralMenu
    * @param sMenuPath
    * @param action
    */
-  /*package private*/ private void addMenuItemGthread(GralWidget widgg, String nameWidg, 
+  /*package private*/ private void addMenuItemGthread(GralWidget widggP, String nameWidg, 
       String sMenuPath, SelectionListener action)
   {
     String[] names = sMenuPath.split("/");
@@ -186,6 +187,8 @@ public class SwtMenu extends GralMenu
     MenuItem item = new MenuItem(parentMenu, SWT.None);
     if(widgg != null){
       //An associated GralWidget
+      item.setData(widggP);
+    } else {
       item.setData(widgg);
     }
     item.setText(name);

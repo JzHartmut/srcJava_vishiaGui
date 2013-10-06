@@ -310,9 +310,9 @@ protected void initGuiAreas(String sMainArea)
 
 protected void initMenuGralDesigner()
 {
-  gui.addMenuItemGThread("GralDesignEnable", "&Design/e&Nable", gralMng.actionDesignEditField);  
-  gui.addMenuItemGThread("GralDesignEditField", "&Design/Edit &field", gralMng.actionDesignEditField);  
-  gui.addMenuItemGThread("GralDesignUpdatePanel", "&Design/update &Panel from cfg-file", gralMng.actionReadPanelCfg);  
+  gui.addMenuBarArea9ItemGThread("GralDesignEnable", "&Design/e&Nable", gralMng.actionDesignEditField);  
+  gui.addMenuBarArea9ItemGThread("GralDesignEditField", "&Design/Edit &field", gralMng.actionDesignEditField);  
+  gui.addMenuBarArea9ItemGThread("GralDesignUpdatePanel", "&Design/update &Panel from cfg-file", gralMng.actionReadPanelCfg);  
   
 }
 

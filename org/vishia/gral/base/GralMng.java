@@ -831,8 +831,25 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   @Override public GralColor getColor(String sColorName){ return propertiesGui.color(getColorValue(sColorName)); }
 
 
-
+  /**Creates the context menu for the given widget for right-mouse pressing.
+   * This method is invoked only in {@link GralWidget#getContextMenu()} whereby an existing
+   * context menu is stored in the {@link GralWidget#contextMenu} association. 
+   * @param widg The widget
+   */
+  protected abstract GralMenu addContextMenu(GralWidget widgg);
   
+  
+  /**Creates the menu bar for the given window.
+   * This method is invoked only in {@link GralWindow#getMenuBar()} whereby an existing
+   * menu bar is stored in the {@link GralWindow#menuBarGral} association. 
+   * @param windg The window
+   */
+  protected abstract GralMenu createMenuBar(GralWindow windg);
+  
+  
+  protected abstract GralMenu XXXaddPopupMenu(String sName);
+  
+
 
 	GralUserAction actionShowWidgetInfos = new GralUserAction("actionShowWidgetInfos")
 	{

@@ -316,9 +316,9 @@ private class InspcGuiCfg extends GuiCfg
       user.initGui(gralMng);
       user.addGuiMenu(gui.mainWindow());
     }
-    gui.addMenuItemGThread("menuHelp", "&Help/&Help", gui.getActionHelp());
-    gui.addMenuItemGThread("menuAbout", "&Help/&About", gui.getActionAbout());
-    gui.addMenuItemGThread("menuAbout", "&Help/e&Xit", gui.getActionAbout());
+    gui.addMenuBarArea9ItemGThread("menuHelp", "&Help/&Help", gui.getActionHelp());
+    gui.addMenuBarArea9ItemGThread("menuAbout", "&Help/&About", gui.getActionAbout());
+    gui.addMenuBarArea9ItemGThread("menuAbout", "&Help/e&Xit", gui.getActionAbout());
 
   }
 

@@ -20,6 +20,7 @@ import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GralArea9MainCmd;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
@@ -244,16 +245,16 @@ public class Fcmd extends GuiCfg
     favorPathSelector.buildWindowAddFavorite();
 
     fButtons.initPanelButtons();
-    
-    gui.addMenuItemGThread("MenuSetWorkingDir", "&Command/Set&WorkingDir", executer.actionSetCmdWorkingDir); // /
-    gui.addMenuItemGThread("MenuCommandAbort", "&Command/&Abort", executer.actionCmdAbort); // /
+    GralMenu menu = gui.getMenuBar();
+    menu.addMenuItemGthread("MenuSetWorkingDir", "&Command/Set&WorkingDir", executer.actionSetCmdWorkingDir); // /
+    menu.addMenuItemGthread("MenuCommandAbort", "&Command/&Abort", executer.actionCmdAbort); // /
     // gui.addMenuItemGThread("&Command/E&xecute", actionSetCmdCurrentDir); ///
-    gui.addMenuItemGThread("MenuCmdCfgSet", "&Command/CmdCf&g - read current file", executer.actionSetCmdCfg); // /
-    gui.addMenuItemGThread("menuReadCmdiCfg", "&Command/&ExtCfg - read cfg file", executer.actionReadExtensionCmd);
+    menu.addMenuItemGthread("MenuCmdCfgSet", "&Command/CmdCf&g - read current file", executer.actionSetCmdCfg); // /
+    menu.addMenuItemGthread("menuReadCmdiCfg", "&Command/&ExtCfg - read cfg file", executer.actionReadExtensionCmd);
 
-    gui.addMenuItemGThread("menuHelp", idents.menuHelpBar, gui.getActionHelp());
-    gui.addMenuItemGThread("menuAbout", idents.menuBarAbout, gui.getActionAbout());
-    gui.addMenuItemGThread("MenuTestInfo", "&Help/&Infobox", actionTest); 
+    menu.addMenuItemGthread("menuHelp", idents.menuHelpBar, gui.getActionHelp());
+    menu.addMenuItemGthread("menuAbout", idents.menuBarAbout, gui.getActionAbout());
+    menu.addMenuItemGthread("MenuTestInfo", "&Help/&Infobox", actionTest); 
     guiW.outputBox.setActionChange(executer.actionCmdFromOutputBox);
     String sHelpUrlDir = cargs.dirHtmlHelp.getAbsolutePath();
     gui.setHelpUrl(sHelpUrlDir + "/Fcmd.html");

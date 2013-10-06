@@ -158,43 +158,7 @@ import org.vishia.util.KeyCode;
  * can be used to force communication.     
  * <br><br>
  * <b>Strategy of changing the graphical content of a widget</b>:<br>
- * 2013-09-30<br>
- * The SWT graphical implementation prohibits changing the graphical appearance, for example setText(newText),  
- * in another thread. Other graphical implementations are not threadsafe. Often a graphic application
- * runs in only one thread, so that isn't a problem. But applications with complex data gathering processes
- * needs to run in several threads. It may be fine to set the widgets in that threads immediately,
- * seen from the programmers perspective. For multithread usage see {@link org.vishia.gral.base.GralGraphicThread}.
- * <br><br>
- * The solution of setting any content in a Widget in any thread in Gral is:
- * <ul>
- * <li>The thread invokes methods of this <code>GralWidget</code> or methods of an derived <code>GralWidget</code>
- *   such as {@link GralTable}, for example {@link #setText(CharSequence)}, {@link #setTextColor(GralColor)}
- *   or {@link GralTable#setColorCurrLine(GralColor)}.
- * <li>That methods store the given data either in the common {@link DynamicData} {@link #dyda} of the widget
- *   or in specific data of a GralWidget implementation.
- * <li>That method calls {@link #repaint(int, int)} with a proper millisecond delay (usual 100).
- *   The graphic implementation widget is not touched in this time. Usual it is not necessary to show information
- *   in a faster time than 100 ms if it is not a high speed animated graphic. The delayed repaint request
- *   saves calculation time if more as one property should be changed in one widget.
- * <li>The delayed repaint request queues the instance {@link #repaintRequ} (only private visible)
- *   of {@link GralDispatchCallbackWorker} in the central queue of requests using 
- *   {@link GralGraphicThread#addDispatchOrder(GralDispatchCallbackWorker)}. The {@link GralGraphicThread}
- *   is known by {@link #itsMng}.
- * <li>If for example 20 widgets are changed in maybe 40 properties, that queue contains the 20 instances of
- *   {@link GralDispatchCallbackWorker}. Any of them has a specific delay. The graphicthread organizes it in a proper kind
- *   of time.
- * <li>If a {@link GralDispatchCallbackWorker} is dequeued in the graphic thread, 
- *   its method {@link GralDispatchCallbackWorker#doBeforeDispatching(boolean)} is invoked. 
- *   This method calls {@link GralWidgImpl_ifc#repaintGthread()} via the association {@link #wdgImpl}.
- * <li>The <code>rerepaintGthread()</code> method is overridden in the implementation layer
- *   with the necessary statements to transfer the non-graphic data of this {@link GralWidget} especially
- *   stored in {@link #dyda} to the special implementation widget method invocations
- *   such as {@link org.eclipse.swt.widgets.Text#setText(String)} which touchs the graphic widget.
- *   Then a {@link org.eclipse.swt.widgets.Control#update()} and {@link org.eclipse.swt.widgets.Control#redraw()}
- *   is invoked to show the content.         
- * </ul>
- * It is a complex approach. But it is simple for usage. The user can change the content in any thread.
- * The user does not need to organize a queue for the graphic thread by itself. The queue is a part of Gral.
+ * See {@link GralWidget_ifc} 
  *
  * @author Hartmut Schorrig
  *
@@ -841,9 +805,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   }
 
   
-  /**Gets the context menu to add a menu item. If this widget hasn't a gral context menu, then an empty menu
-   * is assigned and that is returned. It calls {@link GralMng#addContextMenu(GralWidget)} and uses
-   * the element {@link #contextMenu}.
+  /**Gets the context menu to add a menu item. If this widget hasn't a gral context menu, then 
+   * the context menu is created by calling {@link GralMng#addContextMenu(GralWidget)}.
+   * If the widget has a context menu already, it is stored in the reference {@link #contextMenu}.
    * @return the context menu root for this widget.
    */
   public GralMenu getContextMenu(){
@@ -1145,28 +1109,6 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   
-  /**Set the text of the widget. If the widget is a button, the standard button text is changed.
-   * If it is a window, its title is changed.
-   * <br><br>
-   * <b>Concept of changing a widget from application</b>:<br>
-   * Here the generally approach is described, appropriate for this method, but in the same kind
-   * for all methods to set something like {@link #setBackColor(GralColor, int)} etc.
-   * <br><br>
-   * With the set methods the user stores the text, color etc. in graphic-independent attributes. Then the method
-   * {@link #repaint(int, int)} is invoked with the standard delay of {@link #repaintDelay} and {@link #repaintDelayMax}.
-   * With that the widget-specific private instance of {@link #repaintRequ} is added to the queue of requests
-   * in the {@link GralGraphicThread#addDispatchOrder(GralDispatchCallbackWorker)}. In the requested time that 
-   * dispatch order is executed in the graphic thread. It calls {@link GralWidgImpl_ifc#repaintGthread()}. 
-   * That method is implemented in the graphic implementation layer of the widget. It sets the appropriate values 
-   * from the independent Gral attributes to the implementation specifics and invoke a redraw of the graphic layer.
-   * <br><br>
-   * If more as one attribute is changed one after another, only one instance of the {@link GralDispatchCallbackWorker}
-   * is queued. All changed attributes are stored in {@link DynamicData#whatIsChanged} and the
-   * {@link GralWidgImpl_ifc#repaintGthread()} quests all changes one after another. 
-   * It means that a thread switch is invoked only one time per widget for more as one change.
-   * <br>
-   * See {@link DynamicData}. That composite part of a widget stores all standard dynamic data of a widget. 
-   */
   @Override public void setText(CharSequence text){
     dyda.displayedText = text.toString(); 
     dyda.setChanged(ImplAccess.chgText);

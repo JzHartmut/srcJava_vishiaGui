@@ -1,5 +1,6 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow_setifc;
 
@@ -88,8 +89,17 @@ public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc, Gr
    *   then creates the search menu item as pull down in menu bar, and then 'continue' with 'n' as hot key as sub-menu. 
    *   It is stored in {@link GralWidget#sDataPath}  
    * @param action called on menu activation.
+   * @deprecated use {@link #getMenuBar()} and then {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
    */
-  abstract public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction action);
+  @Deprecated abstract public void addMenuBarItemGThread(String nameWidg, String sMenuPath, GralUserAction action);
+  
+  
+  /**Gets the menu bar to add a menu item. If this window hasn't a gral menu bar, then the menu bar
+   * is created by calling {@link GralMng#createMenuBar(GralWindow)}.
+   * If the window has a menu bar already, it is stored in the reference {@link #menuBarGral}.
+   * @return the menu root for this window.
+   */
+  GralMenu getMenuBar();
   
   /**Sets an action which is invoked if the window is set invisible.
    * @param action The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called

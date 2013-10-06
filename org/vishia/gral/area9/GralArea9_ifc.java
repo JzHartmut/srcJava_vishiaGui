@@ -3,6 +3,7 @@ package org.vishia.gral.area9;
 import java.io.File;
 
 import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTextBox;
@@ -124,10 +125,17 @@ public interface GralArea9_ifc extends GralMngApplAdapter_ifc
   void initGraphic(String outputArea);
 
   
-  /**It is like {@link GralWindow_ifc#addMenuItemGThread(String, String, GralUserAction)}.
+  /**It is like {@link GralWindow_ifc#addMenuBarItemGThread(String, String, GralUserAction)}.
+   * @deprecated use {@link #getMenuBar()} and then {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
    */
-  void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction action);
+  @Deprecated
+  void addMenuBarArea9ItemGThread(String nameWidg, String sMenuPath, GralUserAction action);
 
+  
+  /**Gets the menu bar for the window, see {@link org.vishia.gral.base.GralWindow#getMenuBar()}.
+   * @return The menu bar of the window.
+   */
+  GralMenu getMenuBar();
   
   /**Adds a Menu for file open and save only. All other menu items are not set because the order of menus. 
    * @param openStandardDirectory
@@ -204,12 +212,12 @@ public interface GralArea9_ifc extends GralMngApplAdapter_ifc
   GralMng getGralMng();
   
   /**Returns the prepared action help which opens the help window.
-   * It should be used for the users call of {@link #addMenuItemGThread(String, String, GralUserAction) }
+   * It should be used for the users call of {@link #addMenuBarArea9ItemGThread(String, String, GralUserAction) }
    * to install the help menu.  */
   GralUserAction getActionHelp();
   
   /**Returns the prepared action about which opens the help window.
-   * It should be used for the users call of {@link #addMenuItemGThread(String, String, GralUserAction) }
+   * It should be used for the users call of {@link #addMenuBarArea9ItemGThread(String, String, GralUserAction) }
    * to install the help menu.  */
   GralUserAction getActionAbout();
   

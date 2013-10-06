@@ -35,9 +35,9 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
 
   /**Version and history.
    * <ul>
-   * <li>2011-11-27 Hartmut chg: {@link #addMenuItemGThread(String, String, GralUserAction)} moved from
+   * <li>2011-11-27 Hartmut chg: {@link #addMenuBarArea9ItemGThread(String, String, GralUserAction)} moved from
    *   {@link SwtPrimaryWindow} to this, because the capability to have a menu bar may needed on a sub-window too.
-   * <li>2011-11-12 Hartmut chg: {@link #addMenuItemGThread(String, String, GralUserAction)} now only
+   * <li>2011-11-12 Hartmut chg: {@link #addMenuBarArea9ItemGThread(String, String, GralUserAction)} now only
    *   with a GralUserAction. The Swt-internal SelectionListener action is not supported up to now.
    * <li>2011-11-10 Hartmut chg: move all files from mainGuiSwt to gral.swt, dissolve of package mainGuiSwt
    * <li>2011-11-09 Hartmut chg: Renamed from PrimaryWindowSwt to SwtPrimaryWindow

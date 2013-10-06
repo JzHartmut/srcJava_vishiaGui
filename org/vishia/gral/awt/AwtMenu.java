@@ -2,7 +2,9 @@ package org.vishia.gral.awt;
 
 import java.awt.Component;
 import java.awt.Composite;
+import java.awt.Frame;
 import java.awt.Menu;
+import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 
@@ -16,17 +18,25 @@ public class AwtMenu extends GralMenu
   
   private final Menu menuAwt;
   
-  
+  private final MenuBar menuBar;
 
   public AwtMenu(GralWidget widgg, Component parent, GralMng mng)
   {
     super(widgg, mng);
+    menuBar = null;
     menuAwt = new PopupMenu("test");
     MenuItem item = new MenuItem("Test1");
     menuAwt.add(item);
     MenuItem item2 = new MenuItem("Test2");
     menuAwt.add(item2);
-    
+  }
+
+  public AwtMenu(GralWidget widgg, Frame window, GralMng mng)
+  {
+    super(widgg, mng);
+    menuAwt = null;
+    menuBar = new MenuBar();
+    window.setMenuBar(menuBar);   
   }
 
   @Override public void addMenuItemGthread(String nameWidg, String sMenuPath, GralUserAction action)

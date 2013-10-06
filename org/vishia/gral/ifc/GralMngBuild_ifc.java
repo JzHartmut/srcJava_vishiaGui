@@ -653,14 +653,6 @@ public interface GralMngBuild_ifc
   void addFocusAction(GralWidget widgetInfo, GralUserAction action, String sCmdEnter, String sCmdRelease);
 
   
-  /**Sets the context menu for the given widget for right-mouse pressing.
-   * @param widg The widget
-   * @param menu The menu.
-   */
-  GralMenu addContextMenu(GralWidget widg);
-  
-  GralMenu addPopupMenu(String sName);
-  
   /**Register all widgets, which are created in its own classes, not add here.
    * The widgets are stored in the index of names.
    * @param widgd

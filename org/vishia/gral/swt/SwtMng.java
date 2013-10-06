@@ -1221,20 +1221,27 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 
   
   
-  @Override public GralMenu addPopupMenu(String sName){
+  @Override protected GralMenu XXXaddPopupMenu(String sName){
     Control panelSwt = (Control)pos.panel.getPanelImpl();
-    SwtMenu menu = new SwtMenu(null, panelSwt, this);
+    GralMenu menu = new SwtMenu(null, panelSwt, this);
     return menu;
   }
   
   
-  @Override public GralMenu addContextMenu(GralWidget widg){
+  @Override protected GralMenu addContextMenu(GralWidget widg){
     Control widgSwt = (Control)widg.getWidgetImplementation();
     GralMenu menu = new SwtMenu(widg, widgSwt, this);
-    widgSwt.setMenu((Menu)menu.getMenuImpl());
     return menu;
   }
  
+  
+  @Override protected GralMenu createMenuBar(GralWindow windg){
+    Shell windowSwt = (Shell)windg.getWidgetImplementation();
+    GralMenu menu = new SwtMenu(windg, windowSwt, this);
+    return menu;
+  }
+ 
+  
   
   @Override public void repaint()
   {

@@ -117,17 +117,17 @@ public class FcmdView
     int windProps = GralWindow.windConcurrently | GralWindow.windHasMenu | GralWindow.windResizeable
                   | GralWindow.windOnTop;
     GralWindow wind =  main.gralMng.createWindow("windView", "view - The.file.Commander", windProps);
-    wind.addMenuItemGThread(null, "&File/&Save", actionSave);
-    wind.addMenuItemGThread(null, "&File/Save-as &UTF8-Unix-lf", actionSaveTextAsUTF8unix);
-    wind.addMenuItemGThread(null, "&File/Save-as &Windows (ISO-8859-1)", actionSaveTextAsWindows);
-    wind.addMenuItemGThread(null, "&File/Save-as &ISO-8859-1-Unix-lf", actionSaveTextAsISO8859_1_unix);
-    wind.addMenuItemGThread("view-Search", "&View/&Hex-Byte", actionSetHexView);
-    wind.addMenuItemGThread("view-Search", "&View/text-&Windows", actionSetTextViewISO8859_1);
-    wind.addMenuItemGThread("view-Search", "&View/text-&UTF", actionSetTextViewUTF8);
-    wind.addMenuItemGThread("view-Search", "&View/text-&ASCII-7", actionSetTextViewISO8859_1);
-    wind.addMenuItemGThread("view-Search", "&View/text-&Encoding", actionSetTextViewISO8859_1);
-    wind.addMenuItemGThread("view-Search", "&Edit/&Search", actionSetTextViewISO8859_1);
-    wind.addMenuItemGThread("view-Search", "&Edit/set &Writeable", actionSetEditable);
+    wind.addMenuBarItemGThread(null, "&File/&Save", actionSave);
+    wind.addMenuBarItemGThread(null, "&File/Save-as &UTF8-Unix-lf", actionSaveTextAsUTF8unix);
+    wind.addMenuBarItemGThread(null, "&File/Save-as &Windows (ISO-8859-1)", actionSaveTextAsWindows);
+    wind.addMenuBarItemGThread(null, "&File/Save-as &ISO-8859-1-Unix-lf", actionSaveTextAsISO8859_1_unix);
+    wind.addMenuBarItemGThread("view-Search", "&View/&Hex-Byte", actionSetHexView);
+    wind.addMenuBarItemGThread("view-Search", "&View/text-&Windows", actionSetTextViewISO8859_1);
+    wind.addMenuBarItemGThread("view-Search", "&View/text-&UTF", actionSetTextViewUTF8);
+    wind.addMenuBarItemGThread("view-Search", "&View/text-&ASCII-7", actionSetTextViewISO8859_1);
+    wind.addMenuBarItemGThread("view-Search", "&View/text-&Encoding", actionSetTextViewISO8859_1);
+    wind.addMenuBarItemGThread("view-Search", "&Edit/&Search", actionSetTextViewISO8859_1);
+    wind.addMenuBarItemGThread("view-Search", "&Edit/set &Writeable", actionSetEditable);
     main.gralMng.setPosition(0.5f, 2.5f, 1, 20, 0, 'r');
     widgFindText = main.gralMng.addTextField(null, true, null, null);
     main.gralMng.setPosition(0.5f, 2.5f, 22, GralPos.size + 10, 0, 'r', 1);

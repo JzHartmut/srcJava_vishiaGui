@@ -6,6 +6,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
@@ -567,9 +568,9 @@ public class GralArea9Window implements GralArea9_ifc
     //if(window instanceof GralPrimaryWindow_ifc)
     { //GralPrimaryWindow_ifc pWindow = (GralPrimaryWindow_ifc) window;
       //create the menue
-      window.addMenuItemGThread("menuFileOpen", "&File/&Open", this.new GralActionFileOpen());
+      window.addMenuBarItemGThread("menuFileOpen", "&File/&Open", this.new GralActionFileOpen());
       //swtWindow.addMenuItemGThread("&File/&Close", this.new ActionFileClose());
-      window.addMenuItemGThread("menuFileSave", "&File/&Save", actionFile);
+      window.addMenuBarItemGThread("menuFileSave", "&File/&Save", actionFile);
       //swtWindow.addMenuItemGThread("&File/E&xit", this.new ActionFileOpen());
       //swtWindow.graphicThreadSwt.setJMenuBar(menuBar);
       //swtWindow.graphicThreadSwt.setVisible( true );
@@ -582,13 +583,15 @@ public class GralArea9Window implements GralArea9_ifc
   }
   
   
-  @Override public void addMenuItemGThread(String name, String sMenuPath, GralUserAction action)
+  @Deprecated @Override public void addMenuBarArea9ItemGThread(String name, String sMenuPath, GralUserAction action)
   { //if(window instanceof GralPrimaryWindow_ifc)
     { //GralPrimaryWindow_ifc pWindow = (GralPrimaryWindow_ifc) window;
-      window.addMenuItemGThread(name, sMenuPath, action);
+      window.addMenuBarItemGThread(name, sMenuPath, action);
     }
   }
   
+  
+  @Override public GralMenu getMenuBar(){ return window.getMenuBar(); }
 
   
   protected GralPanelContent addOutputFrameArea(String area)

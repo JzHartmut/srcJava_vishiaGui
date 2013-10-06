@@ -347,7 +347,7 @@ public final class InspcCurveView
     
     gralMng.setPosition(-3, GralPos.size +2, -9, -1, 0, 'd', 0);
     widgBtnOff = gralMng.addSwitchButton(sName + "btnOff", "off / ?on", "on / ?off", GralColor.getColor("lgn"), GralColor.getColor("am"));
-    wind.addMenuItemGThread("menuBarCurveView", "&Window/open " + sName, actionOpenWindow);
+    wind.addMenuBarItemGThread("menuBarCurveView", "&Window/open " + sName, actionOpenWindow);
   
     windFileCfg = new GralFileSelectWindow("windFileCfg", gralMng);
     windFileValues = new GralFileSelectWindow("windFileValues", gralMng);

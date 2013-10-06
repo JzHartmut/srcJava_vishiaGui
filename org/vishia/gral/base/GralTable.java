@@ -1266,7 +1266,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       repaint(50, 50);
     }
 
-    
+    @Override public void setText(CharSequence text){
+      throw new IllegalArgumentException("GralTable-TableLineData - setText is not implemented;");
+    }
     
     @Override
     public void repaint() {

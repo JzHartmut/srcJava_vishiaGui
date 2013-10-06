@@ -6,10 +6,24 @@ import java.util.TreeMap;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.Assert;
 
-/**Super class of Menu wrappers independent of the implementation graphic.
+/**Super class of Menu root wrappers of the graphic implementation layer independent of the implementation graphic.
+ * This class is the super class either for the menu bar of a window
+ * or for the context menu for any widget.
+ * <br><br>
+ * It refers the window or the widget. The graphical implementation layer associates
+ * an event listener to any menu item created with {@link #addMenuItemGthread(String, String, GralUserAction)}.
+ * That event listener invokes the {@link GralUserAction} given as parameter.  
+ * <ul>
+ * <li>To add a menu bar to a window call {@link GralWindow#addMenuBarItemGThread(String, String, GralUserAction)}.
+ * <li>To get or create a context menu to a widget call {@link GralWidget#getContextMenu()}
+ * <li>To add a menu item to the context menu or any menu item call
+ *   {@link #addMenuItemGthread(String, String, GralUserAction)}.
+ * </ul>
+ * One should call this methods only in the graphic thread in the initalizing phase.
+ * <br><br>  
  * The basic idea for menus is: A path is used instead a tree of menus.
  * To add any new menu item to a window's pull-down menu bar, use
- * {@link GralWindow#addMenuItemGThread(String, String, GralUserAction)}.
+ * {@link GralWindow#addMenuBarItemGThread(String, String, GralUserAction)}.
  * You needn't have knowledge about the tree structure of the menu.
  * The String sMenuPath should consist of the parts of the menu tree,
  * for example "&File/&Check/rest&Ore". For this example a menu bar entry "File" is created
@@ -94,12 +108,13 @@ public abstract class GralMenu //extends GralWidget
   
 
   
-  /**Creates a new menu wrapper.
-   * @param widgg The gral widget which is the parent. If it is a context menu it should be that
-   *   widget where {@link GralWidget#getContextMenu()} was called. It is is a menu bar, the window are used.
-   * @param mng
+  /**Creates a new menu wrapper. This is called as super(widgg, mng) in the derived class. 
+   * @param widgg The gral widget which is the parent. If it is a context menu it is that
+   *   widget where {@link GralWidget#getContextMenu()} was called. 
+   *   If it is is a menu bar, the window is used.
+   * @param mng The mng
    */
-  public GralMenu(GralWidget widgg, GralMng mng)
+  protected GralMenu(GralWidget widgg, GralMng mng)
   {
     this.widgg = widgg;
     if(widgg == null)
@@ -151,6 +166,7 @@ public abstract class GralMenu //extends GralWidget
   
   public abstract void setVisible();
   
+  /**Returns the implementation instance for the menu. */
   public abstract Object getMenuImpl();
   
 }

@@ -31,12 +31,11 @@ import org.vishia.gral.base.GralWindow_setifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.impl.GralWindowImpl_ifc;
 import org.vishia.util.KeyCode;
 
 //public class SubWindowSwt extends GralPanelContent implements WidgetCmpnifc
 //public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
-public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWindowImpl_ifc
+public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWidgImpl_ifc
 {
 
   
@@ -47,7 +46,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
    * <li>2012-06-29 Hartmut new: {@link #setResizeAction(GralUserAction)} now for both ctors, resize on subwindow works.
    * <li>2012-03-10 Hartmut new: calls invisibleSetAction.userActionGui if the window is set invisible by pressing the X closing icon.
    * <li>2012-02-11 Hartmut chg: The menu of the window is managed now in {@link SwtMenu}. Instance refered with {@link #menuBar}
-   * <li>2011-11-27 Hartmut chg: {@link #addMenuItemGThread(String, String, GralUserAction)} moved from
+   * <li>2011-11-27 Hartmut chg: {@link #addMenuBarArea9ItemGThread(String, String, GralUserAction)} moved from
    *   {@link SwtPrimaryWindow} to this, because the capability to have a menu bar may needed on a sub-window too.
    * <li>2011-11-18 Hartmut chg: {@link SwtSubWindow#SwtSubWindow(String, Display, String, int, GralMng)}
    *   now gets an int-property instead boolean 'exclusive'. A window has more as one property. Constants
@@ -166,8 +165,8 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     window.addDisposeListener(disposeListener);
     //window.add
     if((windProps & GralWindow.windHasMenu) !=0){
-      Menu menuBar = new Menu(window, SWT.BAR);
-      window.setMenuBar(menuBar);
+      Menu menuBarSwt = new Menu(window, SWT.BAR);
+      window.setMenuBar(menuBarSwt);
     }
     //super.panelComposite = window;
     if(sTitle !=null){ window.setText(sTitle); }
@@ -234,14 +233,6 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   { window.setBounds(x,y,dx,dy);
   }
   
-  
-  
-  @Override public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction gralAction){
-    if(menuBar == null){
-      menuBar = new SwtMenu(null, window, swtWidgWrapper.mng);
-    }
-    menuBar.addMenuItemGthread(nameWidg, sMenuPath, gralAction);
-  }
   
   
   

@@ -88,14 +88,14 @@ public class FcmdEdit
     main.gralMng.setPosition(10, 0, 10, 0, 1, 'r'); //right buttom, about half less display width and hight.
     int windProps = GralWindow.windConcurrently | GralWindow.windHasMenu;
     GralWindow wind =  main.gralMng.createWindow("windView", "view - The.file.Commander", windProps);
-    wind.addMenuItemGThread("view-Search", "&Edit/&Search", actionOpenEdit);
-    wind.addMenuItemGThread("view-Search", "&Edit/set &Writeable", actionOpenEdit);
-    wind.addMenuItemGThread("view-Search", "&View/&Hex-Byte", actionOpenEdit);
-    wind.addMenuItemGThread("view-Search", "&View/text-&Windows", actionOpenEdit);
-    wind.addMenuItemGThread("view-Search", "&View/text-&UTF", actionOpenEdit);
-    wind.addMenuItemGThread("view-Search", "&View/text-&ASCII-7", actionOpenEdit);
-    wind.addMenuItemGThread("view-Search", "&View/text-&Encoding", actionOpenEdit);
-    wind.addMenuItemGThread(null, "&Save-as/UTF8-Unix-lf", actionConvertUTF8unix);
+    wind.addMenuBarItemGThread("view-Search", "&Edit/&Search", actionOpenEdit);
+    wind.addMenuBarItemGThread("view-Search", "&Edit/set &Writeable", actionOpenEdit);
+    wind.addMenuBarItemGThread("view-Search", "&View/&Hex-Byte", actionOpenEdit);
+    wind.addMenuBarItemGThread("view-Search", "&View/text-&Windows", actionOpenEdit);
+    wind.addMenuBarItemGThread("view-Search", "&View/text-&UTF", actionOpenEdit);
+    wind.addMenuBarItemGThread("view-Search", "&View/text-&ASCII-7", actionOpenEdit);
+    wind.addMenuBarItemGThread("view-Search", "&View/text-&Encoding", actionOpenEdit);
+    wind.addMenuBarItemGThread(null, "&Save-as/UTF8-Unix-lf", actionConvertUTF8unix);
     main.gralMng.setPosition(0, 0, 0, 0, 1, 'r');
     widgContent = main.gralMng.addTextBox("view-content", false, null, '.');
     widgContent.setTextStyle(GralColor.getColor("bk"), main.gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));

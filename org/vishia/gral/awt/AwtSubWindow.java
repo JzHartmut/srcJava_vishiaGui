@@ -140,7 +140,7 @@ public class AwtSubWindow extends GralWindow
   }
 
   @Override
-  public void addMenuItemGThread(String nameWidg, String sMenuPath, GralUserAction action)
+  public void addMenuBarItemGThread(String nameWidg, String sMenuPath, GralUserAction action)
   {
     // TODO Auto-generated method stub
     

@@ -5,7 +5,6 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.gral.impl.GralWindowImpl_ifc;
 
 /**This class represents a window of an application.
  * The {@link GralPos#pos} of the baseclass is the position of the window derived from any other 
@@ -24,7 +23,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    *   {@link GralMng_ifc#setInfo(GralWidget, int, int, Object, Object)}. This methods
    *   can be called in any thread, it may be stored using 
    *   {@link GralGraphicThread#addRequ(org.vishia.gral.base.GralWidgetChangeRequ)}.
-   * <li>2011-11-27 Hartmut new: {@link #addMenuItemGThread(String, String, GralUserAction)} copied
+   * <li>2011-11-27 Hartmut new: {@link #addMenuBarItemGThread(String, String, GralUserAction)} copied
    *   from {@link org.vishia.gral.ifc.GralPrimaryWindow_ifc}. The capability to have a menu bar
    *   should be enabled for sub-windows too. To support regularity, the property bit {@link #windHasMenu}
    *   is created. The property whether a window has a menu bar or not should be given on creation already.
@@ -98,6 +97,8 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   
   /**See {@link GralWindow_ifc#setMouseAction(GralUserAction)}. */
   protected GralUserAction mouseAction;
+  
+  protected GralMenu menuBarGral;
   
   protected boolean visibleFirst;
   
@@ -219,13 +220,33 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
 
 
   /**It assumes that the window implementation is present. 
-   * It calls {@link GralWindowImpl_ifc#addMenuItemGThread(String, String, GralUserAction)}
+   * It calls {@link GralWindowImpl_ifc#addMenuBarArea9ItemGThread(String, String, GralUserAction)}
    * with the known {@link GralWidget#wdgImpl} instance
-   * to invoke the graphic implementation layer method for the window. */
-  @Override
-  public void addMenuItemGThread(String nameMenu, String sMenuPath, GralUserAction action)
-  { ((GralWindowImpl_ifc)wdgImpl).addMenuItemGThread(nameMenu, sMenuPath, action);
+   * to invoke the graphic implementation layer method for the window. 
+   * @deprecated use {@link #getMenuBar()} and then {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
+   * */
+  @Override @Deprecated
+  public void addMenuBarItemGThread(String nameMenu, String sMenuPath, GralUserAction action)
+  { GralMenu menu = getMenuBar();
+    menu.addMenuItemGthread(nameMenu, sMenuPath, action);
+    //((GralWindowImpl_ifc)wdgImpl).addMenuItemGThread(nameMenu, sMenuPath, action);
   }
+
+  
+  
+  /**Gets the menu bar to add a menu item. If this window hasn't a gral menu bar, then the menu bar
+   * is created by calling {@link GralMng#createMenuBar(GralWindow)}.
+   * If the window has a menu bar already, it is stored in the reference {@link #menuBarGral}.
+   * @return the menu root for this window.
+   */
+  public GralMenu getMenuBar(){
+    if(menuBarGral == null){
+      menuBarGral = itsMng.createMenuBar(this);   //delegation, the widget mng knows the implementation platform.
+    }
+    return menuBarGral;
+  }
+  
+  
 
 
 
