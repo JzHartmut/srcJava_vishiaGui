@@ -718,6 +718,15 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
 
   
+  
+  @Override public void setValue(String widget, Object visibleInfo, Object userData){
+    GralWidget widg;
+    if( (widg = findWidget(widget)) !=null){
+      widg.setValue(0,0, visibleInfo, userData);
+    }
+    
+  }
+  
   @Override public void addText(String name, CharSequence text){
     GralWidget widg;
     if( (widg = findWidget(name)) !=null){

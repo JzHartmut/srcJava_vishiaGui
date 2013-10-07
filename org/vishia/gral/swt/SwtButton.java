@@ -133,6 +133,32 @@ public class SwtButton extends GralButton
 
   
   @Override public void repaintGthread(){
+    int catastrophicalCount = 0;
+    int chg, chgAckn=0;
+    int state1 = -1;
+    do{
+      chg = this.dyda.whatIsChanged.get() & ~chgAckn;  //don't handle a bit twice if re-read.
+      if(++catastrophicalCount > 10000) 
+        throw new RuntimeException("atomic failed");
+      if((chg & ImplAccess.chgVisibleInfo) !=0 && dyda.visibleInfo !=null){ 
+        chgAckn |= ImplAccess.chgVisibleInfo;
+        if(dyda.visibleInfo instanceof Integer){
+          state1 = ((Integer)dyda.visibleInfo).intValue();
+        }
+      }
+      if((chg & ImplAccess.chgIntg) !=0 ){ 
+        chgAckn |= ImplAccess.chgIntg;
+        state1 = 0; //TODO dyda.intValue
+      }
+    } while(!dyda.whatIsChanged.compareAndSet(chg, 0));  //repeat if chg is changed in that time.
+
+    switch(state1){
+      case 0: switchState = State.Off;
+      case 1: switchState = State.On;
+      case 2: switchState = State.Disabled;
+      default: ; //don't change state.
+    }
+
     widgetSwt.redraw();
   }
 

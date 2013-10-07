@@ -129,6 +129,12 @@ public interface GralMng_ifc
    */
   void setText(String widget, CharSequence text);
   
+  /**Sets the text into a named widget.
+   * @param widget
+   * @param text The text is not stored by reference, it can be changed after them.
+   */
+  void setValue(String widget, Object visibleInfo, Object userData);
+  
   /**Appends the text into a named widget. The widget can be especially a text area.
    * @param widget
    * @param text The text is not stored by reference, it can be changed after them.

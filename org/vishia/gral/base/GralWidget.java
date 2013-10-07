@@ -1045,6 +1045,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   public void setValue(int cmd, int ident, Object visibleInfo)
   { dyda.visibleInfo = visibleInfo;
+    dyda.setChanged(ImplAccess.chgVisibleInfo);
     repaint(100,100);
     //itsMng.setInfo(this, cmd, ident, visibleInfo, null);
   }
@@ -1237,6 +1238,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     
     /**What is changed in the dynamic data, see {@link GralWidget.DynamicData#whatIsChanged}. */  
     public static final int chgText = 1, chgColorBack=2, chgColorText=4, chgFont = 8, chgColorLine = 0x10;
+    
+    public static final int chgVisibleInfo = 0x10000, chgObjects = 0x20000, chgFloat = 0x40000, chgIntg = 0x80000;
     
     public static final int chgPos = 0x20000000, chgVisible = 0x40000000, chgInvisible = 0x80000000;
     

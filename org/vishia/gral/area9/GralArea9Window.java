@@ -594,6 +594,11 @@ public class GralArea9Window implements GralArea9_ifc
   @Override public GralMenu getMenuBar(){ return window.getMenuBar(); }
 
   
+  
+  @Override public void setFullScreen(boolean full){ window.setFullScreen(full); }
+
+  
+  
   protected GralPanelContent addOutputFrameArea(String area)
   {
     GralRectangle areaR = convertArea(area);

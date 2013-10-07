@@ -208,7 +208,8 @@ public interface GralArea9_ifc extends GralMngApplAdapter_ifc
    */
   GralTextBox getOutputBox();
   
-  
+  void setFullScreen(boolean full);
+
   GralMng getGralMng();
   
   /**Returns the prepared action help which opens the help window.

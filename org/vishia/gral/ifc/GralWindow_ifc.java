@@ -107,7 +107,9 @@ public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc, Gr
    */
   public abstract void setActionOnSettingInvisible(GralUserAction action);
 
-  
+  void setFullScreen(boolean full);
+
+
   
   public abstract void setTitle(String sTitle);
 
