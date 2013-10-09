@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.swt.widgets.TableItem;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
@@ -66,6 +65,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version and history
    * <ul>
+   * <li>2013-10-06 Hartmut chg: call {@link #actionOnLineSelected(GralTableLine_ifc)} only if the line is changed, not on focus without changed line.
    * <li>2013-09-15 Hartmut new: Implementation of {@link #setBackColor(GralColor, int)}  
    *   with special comments for usage of the int parameter.
    *   See {@link GralTable_ifc#setBackColor(GralColor, int)}, Adequate {@link #getBackColor(int)}. 
@@ -1008,8 +1008,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       
       //mark current line
       if(outer.ixLineNew >=0 && (outer.ixLineNew != outer.ixLine || bFocused)){
-        outer.actionOnLineSelected(outer.tableLines.get(outer.ixLineNew));
-        outer.ixLine = outer.ixLineNew;
+        if(outer.ixLine != outer.ixLineNew){
+          outer.actionOnLineSelected(outer.tableLines.get(outer.ixLineNew));
+          outer.ixLine = outer.ixLineNew;
+        }
         if(ixGlineSelectedNew != ixGlineSelected){ //note: if the table scrolls, the same cell is used as current.
           //set background color for non-selected line.
           if(ixGlineSelected >=0){

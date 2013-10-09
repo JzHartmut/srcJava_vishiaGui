@@ -111,6 +111,7 @@ public class FcmdFileCard extends GralFileSelector
   /**If not null, then should synchronize with this file card. Used in */
   FcmdFileCard otherFileCardtoSync; 
   
+  
   /**If not null, then it is the base dir for synchronization with the {@link #otherFileCardtoSync}. 
    * It will be set in {@link FcmdFilesCp#setDirs()}. */
   String sDirSync;
@@ -377,8 +378,10 @@ public class FcmdFileCard extends GralFileSelector
       String sPath = file.getAbsolutePath();
       if(  main.favorPathSelector.bSyncMidRight 
         && mainPanel.actFileCard == this    //from actFileCard to the second one!
+        && mainPanel.orderMainPanel == 1
       ){
         syncWithSecondPanel(sFileName);
+        System.out.println("FcmdFileCard - syncWithSecondPanel; " + toString());
       }
       /*
       else {
@@ -415,6 +418,7 @@ public class FcmdFileCard extends GralFileSelector
     //String fileName = currentFile.getName();
     System.out.println("FcmdFileCard -SyncWithSecondPanel;" + mainPanel.cc + ";" + sFileName);
     FcmdFileCard otherFileCard;
+    boolean bFillInReq = false;
     if(mainPanel.cc == 'm'){ otherFileCard = main.favorPathSelector.panelRight.actFileCard; }
     else if(mainPanel.cc == 'r'){ otherFileCard = main.favorPathSelector.panelMid.actFileCard;  }
     else if(mainPanel.cc == 'l'){ otherFileCard = main.favorPathSelector.panelMid.actFileCard;  }
@@ -425,6 +429,7 @@ public class FcmdFileCard extends GralFileSelector
       GralTableLine_ifc line = otherFileCard.selectList.wdgdTable.getLine(sDirName);
       if(line !=null){
         FileRemote dir = (FileRemote)line.getUserData();
+        bFillInReq = true;
         otherFileCard.fillIn(dir, true);    //use that directory.
       }
       boolean bSameFile = otherFileCard.selectFile(sFileName);  //".." also
@@ -438,15 +443,18 @@ public class FcmdFileCard extends GralFileSelector
             if(bToRoot = sDirPath.equals(sFileName)){
               //the directory of other is the current selected dir of this:
               FileRemote otherParent = otherDir.getParentFile();
-              otherFileCard.fillIn(otherParent, true);
-              otherFileCard.selectFile(sFileName);
+              if(!bFillInReq){
+                otherFileCard.fillIn(otherParent, true);
+                otherFileCard.selectFile(sFileName);
+                bFillInReq = true;
+              }
             }
           }
         }
         if(!bToRoot && otherFileCard !=null && otherFileCard.currentFile !=null){
           //check whether a sub dir is selected:
           String sOtherSelectedFile = otherFileCard.currentFile.getName();
-          if(sOtherSelectedFile.equals(sDirName)){
+          if(sOtherSelectedFile.equals(sDirName) && !bFillInReq){
             otherFileCard.fillIn(otherFileCard.currentFile,true);
             otherFileCard.selectFile(sFileName);
           }
@@ -476,7 +484,7 @@ public class FcmdFileCard extends GralFileSelector
       }
       if(panel.actFileCard !=null){
         panel.actFileCard.selectList.wdgdTable.setColorCurrLine(colorSelectFocused123[++ixMainPanel]);
-        panel.orderMainPanel = ixMainPanel +1;
+        panel.orderMainPanel = ixMainPanel +1;   //order in list 1, 2, 3
       } else {
         panel.orderMainPanel = 0; //not used.
       }
