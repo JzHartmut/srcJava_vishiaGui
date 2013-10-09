@@ -446,7 +446,7 @@ public class FcmdFileProps
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         widgBtnDirBytes.setText("counting ...");
-        if(evCntLen.occupyRecall(100, evSrc, callbackCntLen, null, true)){
+        if(0 != evCntLen.occupyRecall(100, evSrc, callbackCntLen, null, true)){
           actFile.countAllFileLength(evCntLen);
         }
       }

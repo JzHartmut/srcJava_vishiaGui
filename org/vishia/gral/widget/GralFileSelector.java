@@ -70,6 +70,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2013-09-06 Hartmut chg: Now a new request of fillIn can be executed with aborting the old one.
    * <li>2013-09-15 Hartmut chg: New implementation of {@link #fillIn(FileRemote, boolean)}
    *   using the new {@link FileRemote#getChildren(org.vishia.fileRemote.FileRemote.ChildrenEvent).} 
    * <li>2013-09-14 Hartmut chg: Sets the background to magenta while refreshing.
@@ -596,7 +597,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   final FileRemote.ChildrenEvent evBackChildren;
   
   /**Set to true if a fillin is pending. */
-  boolean fillinPending;
+  //boolean fillinPending;
 
   
   public GralFileSelector(String name, int rows, int[] columns, char size)
@@ -827,86 +828,85 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * @param bCompleteWithFileInfo false then write only file names, without information about the file.
    */
   public void fillIn(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
-  { if(!fillinPending){
-      long timenow = System.currentTimeMillis();
-      timeFillinInvoked = timenow;
-      final FileRemote dir, file;
-      if(!fileIn.isDirectory()){
-        dir = fileIn.getParentFile(); file = fileIn;
-        String sDir = FileSystem.getCanonicalPath(dir); //with / as separator!
-        String sFile = fileIn.getName();
-        indexSelection.put(sDir, fileIn); //sFile);
-      } else {
-        dir = fileIn; file = null;
-      }
-      fileIn.internalAccess().setRefreshed();
-      boolean bSameDirectory = dir == currentDir;
-      if(!bSameDirectory){
-        currentDir = dir;
-        this.sCurrentDir = dir.getAbsolutePath();  //though it may not exist, store it for refresh (may be exist later).
-      }
-      System.out.println("FcmdFileCard - start fillin; " + sCurrentDir + (bSameDirectory ? "; same" : "; new"));
-      final ERefresh eRefresh;
-      if(bSameDirectory){
-        //it is a refresh.
-        if(true || (timenow - dir.timeChildren) > 4000){
-          eRefresh = ERefresh.refreshAll; //needs to refresh
-        } else {
-          eRefresh = ERefresh.doNothing;  //do nothing, it is actual
-        }
-      } else {
-        //other directory
-        currentFile = null;
-        if(false && dir.timeChildren >0){
-          //another directory with known content.
-          //any access in a short time to a known directory.
-          //It may be able to assume that the content is not changed since a short time
-          //if the user navigates in some directories.
-          XXXexecFillIn(true);
-          eRefresh = ERefresh.doNothing;  //do nothing, it is shown and refreshed in execFillIn
-        } else {
-          //the directory is unknown yet.
-          //GralTableLine_ifc<FileRemote> tline = selectList.wdgdTable.insertLine(null, 0, null, null);
-          //tline.setCellText("--waiting--", kColFilename);
-          eRefresh = ERefresh.refreshChildren;  //do nothing, it is shown and refreshed in execFillIn
-        }
-      }
-      selectList.wdgdTable.setBackColor(colorBackPending, -1);  //for all cells.
-      if(!bSameDirectory || sortOrder != sortOrderLast){
-        selectList.wdgdTable.clearTable();
-        idxLines.clear();
-        if(dir.getParentFile() !=null){
-          GralTableLine_ifc<FileRemote> tline = selectList.wdgdTable.insertLine("..", 0, null, dir);
-          tline.setCellText("<", kColDesignation);
-          tline.setCellText("..", kColFilename);
-          tline.setCellText("", kColLength);
-          tline.setCellText("", kColDate);
-          tline.setBackColor(colorBack, -1);
-          idxLines.put("..", tline);
-        }
-      }
-      widgdPathDir.setText(sCurrentDir, -1);
-      sortOrderLast = sortOrder;
-      ////
-      fillinPending = true;  //prevent hustle and bustle fillin requests in the graphic thread.
-      evBackChildren.depth = 1;
-      evBackChildren.filter = null;
-      dir.getChildren(evBackChildren);
+  { long timenow = System.currentTimeMillis();
+    timeFillinInvoked = timenow;
+    final FileRemote dir, file;
+    if(!fileIn.isDirectory()){
+      dir = fileIn.getParentFile(); file = fileIn;
+      String sDir = FileSystem.getCanonicalPath(dir); //with / as separator!
+      String sFile = fileIn.getName();
+      indexSelection.put(sDir, fileIn); //sFile);
     } else {
-      //a fillin is pending yet.
+      dir = fileIn; file = null;
     }
+    fileIn.internalAccess().setRefreshed();
+    boolean bSameDirectory = dir == currentDir;
+    if(!bSameDirectory){
+      currentDir = dir;
+      this.sCurrentDir = dir.getAbsolutePath();  //though it may not exist, store it for refresh (may be exist later).
+    }
+    System.out.println("FcmdFileCard - start fillin; " + sCurrentDir + (bSameDirectory ? "; same" : "; new"));
+    final ERefresh eRefresh;
+    if(bSameDirectory){
+      //it is a refresh.
+      if(true || (timenow - dir.timeChildren) > 4000){
+        eRefresh = ERefresh.refreshAll; //needs to refresh
+      } else {
+        eRefresh = ERefresh.doNothing;  //do nothing, it is actual
+      }
+    } else {
+      //other directory
+      currentFile = null;
+      if(false && dir.timeChildren >0){
+        //another directory with known content.
+        //any access in a short time to a known directory.
+        //It may be able to assume that the content is not changed since a short time
+        //if the user navigates in some directories.
+        XXXexecFillIn(true);
+        eRefresh = ERefresh.doNothing;  //do nothing, it is shown and refreshed in execFillIn
+      } else {
+        //the directory is unknown yet.
+        //GralTableLine_ifc<FileRemote> tline = selectList.wdgdTable.insertLine(null, 0, null, null);
+        //tline.setCellText("--waiting--", kColFilename);
+        eRefresh = ERefresh.refreshChildren;  //do nothing, it is shown and refreshed in execFillIn
+      }
+    }
+    selectList.wdgdTable.setBackColor(colorBackPending, -1);  //for all cells.
+    if(!bSameDirectory || sortOrder != sortOrderLast){
+      selectList.wdgdTable.clearTable();
+      idxLines.clear();
+      if(dir.getParentFile() !=null){
+        GralTableLine_ifc<FileRemote> tline = selectList.wdgdTable.insertLine("..", 0, null, dir);
+        tline.setCellText("<", kColDesignation);
+        tline.setCellText("..", kColFilename);
+        tline.setCellText("", kColLength);
+        tline.setCellText("", kColDate);
+        tline.setBackColor(colorBack, -1);
+        idxLines.put("..", tline);
+      }
+    }
+    widgdPathDir.setText(sCurrentDir, -1);
+    sortOrderLast = sortOrder;
+    ////
+    evBackChildren.depth = 1;
+    evBackChildren.filter = null;
+    if(!dir.getChildren(evBackChildren)){
+      System.err.println("GralFileSelector - fillIn hangs;");
+      return;
+    }
+
   }
   
   
   
   
-  /**Callback method if the file system offers one file after cal of {@link #fillIn(FileRemote, boolean)}.
+  /**Callback method if the file system offers one or some file after call of {@link #fillIn(FileRemote, boolean)}.
    * This routine is executed in another thread than the graphic thread. The table will be filled,
    * a refresh of the graphic presentation will be invoked with about 100 ms delay. 
    * @param evBack The callback event.
    * @return
    */
-  protected int show1file(FileRemote.ChildrenEvent evBack){
+  protected int showfiles(FileRemote.ChildrenEvent evBack){
     ////
     FileRemote file1;
     while((file1 = evBack.poll())!=null){
@@ -927,8 +927,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
       //System.out.println(file.getAbsolutePath());
       
     }
-    if(evBack.finished){
-      fillinPending = false;
+    if(evBack.isFinished()){
+      evBack.srcFile = null;  //it is free for reuse.
       System.out.println("FcmdFileCard - finish fillin; " + sCurrentDir);
       Iterator<Map.Entry<String, GralTableLine_ifc<FileRemote>>> iter = idxLines.entrySet().iterator();
       while(iter.hasNext()){
@@ -1023,7 +1023,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
           System.err.println(Assert.stackInfo("GralFileSelector.fillIn - second call is not advisable for the same card.", 4));
         }
       } else {
-        bOccupied = XXXcallbackEventFillIn.occupyRecall(4000, null, true); 
+        bOccupied = 0 != XXXcallbackEventFillIn.occupyRecall(4000, null, true); 
         if(!bOccupied) {
           System.err.println(Assert.stackInfo("GralFileSelector.fillIn - hangs.", 4));
         }
@@ -1598,7 +1598,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     @Override public int processEvent(Event<?,?> evP) {
       ////
       FileRemote.ChildrenEvent evBack = (FileRemote.ChildrenEvent)evP;
-      return show1file(evBack);
+      return showfiles(evBack);
       //System.out.println("callbackChildren");
     }
     @Override public String toString(){ return "GralFileSelector - callback fillin"; }

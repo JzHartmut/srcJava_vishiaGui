@@ -1166,9 +1166,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   public final void setFocus(int delay, int latest){
     if(delay == 0 && itsMng.currThreadIsGraphic()){
+      setVisibleState(true);  //has focus, 
       setFocusGThread();
     } else {
-      setFocusRequ.addToGraphicThread(itsMng.gralDevice(), delay);
+      dyda.setChanged(ImplAccess.chgVisible);
+      repaint(delay, latest);
+      //setFocusRequ.addToGraphicThread(itsMng.gralDevice(), delay);
     }
   }
   
@@ -1320,7 +1323,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * It is used with delay and wind up whenever {@link #repaint(int, int)} with an delay is called.
    * If its callback method was run, it is dequeued till the next request of {@link #repaint()}.
    */
-  private final GralDispatchCallbackWorker setFocusRequ = new GralDispatchCallbackWorker("GralWidget.setFocusRequ"){
+  private final GralDispatchCallbackWorker XXXsetFocusRequ = new GralDispatchCallbackWorker("GralWidget.setFocusRequ"){
     @Override public void doBeforeDispatching(boolean onlyWakeup) {
       //first remove from queue to force add new, if a new request is given.
       //thread safety: If a new request is given, it is not add yet, because it isn't execute.
