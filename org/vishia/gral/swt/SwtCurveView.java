@@ -596,7 +596,7 @@ public class SwtCurveView extends GralCurveView
   TestHelp testHelp = new TestHelp();
 
   
-  SwtGralMouseListener.MouseListenerUserAction mouseListenerCurve = new SwtGralMouseListener.MouseListenerUserAction( super.mouseAction);
+  SwtGralMouseListener.MouseListenerGralAction mouseListenerCurve = new SwtGralMouseListener.MouseListenerGralAction( super.mouseAction, 0);
   
 
   void stop(){}  

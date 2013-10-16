@@ -57,7 +57,7 @@ public class SwtButton extends GralButton
   final Font fontText;
   
   
-  final SwtGralMouseListener.MouseListenerUserAction mouseListener = new SwtGralMouseListener.MouseListenerUserAction(mouseWidgetAction);
+  final SwtGralMouseListener.MouseListenerGralAction mouseListener = new SwtGralMouseListener.MouseListenerGralAction(mouseWidgetAction, 0);
   
 
   

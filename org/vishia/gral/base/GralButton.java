@@ -309,21 +309,11 @@ public abstract class GralButton extends GralWidget
   
   
   /**Inner class to implement the mouse actions called from the gral implementing layer.
+   * If the mouse was moved from the widget's area while a button is pressed, the mouse action on release
+   * is not invoked.
    */
   private class MouseActionButton implements GralMouseWidgetAction_ifc
   {
-    /**Constructor.
-     */
-    public MouseActionButton()
-    { //super(this);
-    }
-
-    
-    @Override public void mouseAction(int keyCode, int xMousePixel, int yMousePixel, GralWidget widgg)
-    {
-      
-    }
-    
 
     @Override public boolean mouseMoved(int xMousePixel, int yMousePixel, int sizex, int sizey){
       if(  xMousePixel < 0 || xMousePixel > sizex
@@ -335,13 +325,13 @@ public abstract class GralButton extends GralWidget
       else return true;
     }
 
-    
-    
 
-    @Override
-    public void mouse1Down(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
+    @Override public void mouse1Down(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
     {
       setActivated(true);
+      if(widgg.actionChanging !=null){
+        widgg.actionChanging.exec(keyCode, widgg, new Integer(xMousePixel), new Integer(yMousePixel));
+      }
     }
 
 
@@ -354,26 +344,34 @@ public abstract class GralButton extends GralWidget
         else if(bThreeStateSwitch && switchState == State.Off){ switchState = State.Disabled; }
         else { switchState = State.On; }
       }
+      if(widgg.actionChanging !=null){
+        widgg.actionChanging.exec(keyCode, widgg, new Integer(xMousePixel), new Integer(yMousePixel));
+      }
       widgg.repaint(100, 200);
     }
 
 
-    @Override
-    public void mouse2Down(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
+    @Override public void mouse2Down(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
     {
-      // TODO Auto-generated method stub
-      
+      if(widgg.actionChanging !=null){
+        widgg.actionChanging.exec(keyCode, widgg, new Integer(xMousePixel), new Integer(yMousePixel));
+      }
     }
 
 
-    @Override
-    public void mouse2Up(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
+    @Override public void mouse2Up(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
     {
-      // TODO Auto-generated method stub
-      
+      if(widgg.actionChanging !=null){
+        widgg.actionChanging.exec(keyCode, widgg, new Integer(xMousePixel), new Integer(yMousePixel));
+      }
     }
 
-    
+    @Override public void mouse1Double(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
+    {
+      if(widgg.actionChanging !=null){
+        widgg.actionChanging.exec(keyCode, widgg, new Integer(xMousePixel), new Integer(yMousePixel));
+      }
+    }
     
     
     

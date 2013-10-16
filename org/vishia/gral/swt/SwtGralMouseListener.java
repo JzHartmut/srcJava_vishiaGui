@@ -165,7 +165,7 @@ public class SwtGralMouseListener
   
   
   
-  public static class MouseListenerUserAction extends MouseListenerNoAction
+  public static class MouseListenerGralAction extends MouseListenerNoAction
   implements MouseListener
   {
     
@@ -175,11 +175,9 @@ public class SwtGralMouseListener
      */
     private int xMousePress, yMousePress;
     
-    private Color backgroundWhilePressed;
-    
     /**Used in the implementation level for the paint routine. Therefore it is package private.
      */
-    private boolean isPressed;
+    protected boolean isPressed;
     
     
     
@@ -188,16 +186,19 @@ public class SwtGralMouseListener
     protected final GralMouseWidgetAction_ifc mouseWidgetAction;
     
     
+    /**Bits see {@link GralMouseWidgetAction_ifc#mUser1down} etc. */
+    final protected int mUser;
+    
     /**Constructor.
-     * @param guiMng The Gui-manager
-     * @param userCmdGui The users method for the action. 
-     * @param sCmdPress command string provided as first parameter on mouse button press.
-     * @param sCmdRelease
-     * @param sCmdDoubleClick
+     * @param mouseWidgetAction Action invoked, maybe null
+     * @param mUser 0 or or-combinations of bits in {@link GralMouseWidgetAction_ifc#mUser1down} 
+     *   and all other mUser... If one of this bits is set, the {@link GralWidget#setActionChange(GralUserAction)}
+     *   is invoked on the appropriate mouse action after and independent of the mouseWidgetAction.
      */
-    public MouseListenerUserAction(GralMouseWidgetAction_ifc mouseWidgetAction)
+    public MouseListenerGralAction(GralMouseWidgetAction_ifc mouseWidgetAction, int mUser)
     { super();
       this.mouseWidgetAction = mouseWidgetAction;
+      this.mUser = mUser;
     }
     
     
@@ -208,8 +209,7 @@ public class SwtGralMouseListener
       yMousePress = e.y;
       Control widget = (Control) e.widget;  //a widget is a Control always.
       GralWidget widgg = (GralWidget)widget.getData();
-      GralUserAction action = widgg ==null ? null : widgg.getActionChange();
-      if(action !=null){
+      try{
         final int keyCode;
         switch(e.button){ 
           case 1: keyCode = KeyCode.mouse1Double; break; 
@@ -218,9 +218,18 @@ public class SwtGralMouseListener
           default: keyCode = KeyCode.mouse3Down; break;  //other key
         }
         final int keyCode1 = SwtGralKey.convertFromSwt(keyCode, e.stateMask);
-        
-        action.userActionGui(keyCode1, widgg);
-      }
+        Control widgetSwt = (Control) e.widget;  //a widget is a Control always.
+        if(mouseWidgetAction !=null){
+          Point size = widgetSwt.getSize();
+          mouseWidgetAction.mouse1Double(keyCode1, xMousePress, yMousePress, size.x, size.y, widgg);
+        } 
+        if( (mUser & GralMouseWidgetAction_ifc.mUserDouble) !=0) {
+          GralUserAction action = widgg ==null ? null : widgg.getActionChange();
+          if(action !=null){
+            action.exec(keyCode, widgg, new Integer(e.x), new Integer(e.y));
+          }
+        }
+      } catch(Exception exc){ System.err.printf("SwtGralMouseListener - any exception while mouse double; %s\n", exc.getMessage()); }
     }
 
     @Override public void mouseDown(MouseEvent e) {
@@ -229,10 +238,8 @@ public class SwtGralMouseListener
       xMousePress = e.x;
       yMousePress = e.y;
       Control widget = (Control) e.widget;  //a widget is a Control always.
-      Point size = widget.getSize();
       widget.addMouseMoveListener(mouseMoveListener);
       GralWidget widgg = (GralWidget)widget.getData();
-      //GralMng guiMng = widgg.getMng();
       final int keyMouse;
       switch(e.button){ 
         case 1: keyMouse = KeyCode.mouse1Down; break; 
@@ -242,16 +249,25 @@ public class SwtGralMouseListener
       }
       final int keyCode = SwtGralKey.convertFromSwt(keyMouse, e.stateMask);
       try{ 
+        int mUser1 = 0;
         if(mouseWidgetAction !=null){
+          Point size = widget.getSize();
           switch(e.button){ 
-            case 1: mouseWidgetAction.mouse1Down(keyCode, xMousePress, yMousePress, size.x, size.y, widgg); break;
-            case 2: mouseWidgetAction.mouse2Down(keyCode, xMousePress, yMousePress, size.x, size.y, widgg); break;
+            case 1: 
+              mUser1 = GralMouseWidgetAction_ifc.mUser1down; 
+              mouseWidgetAction.mouse1Down(keyCode, xMousePress, yMousePress, size.x, size.y, widgg); 
+              break;
+            case 2: 
+              mUser1 = GralMouseWidgetAction_ifc.mUser1down; 
+              mouseWidgetAction.mouse2Down(keyCode, xMousePress, yMousePress, size.x, size.y, widgg); 
+              break;
           }  
-        }
-        GralUserAction action = widgg ==null ? null : widgg.getActionChange();
-        if(action !=null){
-          
-          action.exec(keyCode, widgg);
+        } 
+        if( (mUser & mUser1) !=0) {
+          GralUserAction action = widgg ==null ? null : widgg.getActionChange();
+          if(action !=null){
+            action.exec(keyCode, widgg, new Integer(e.x), new Integer(e.y));
+          }
         }
       } catch(Exception exc){ System.err.printf("SwtGralMouseListener - any exception while mouse down; %s\n", exc.getMessage()); }
     }
@@ -265,16 +281,14 @@ public class SwtGralMouseListener
       if(isPressed){  //prevent any action of mouse up if the mouse is not designated as pressed
         //especially if the mouse was removed from the widget.
         Control widget = (Control)e.widget;
-        Point size = widget.getSize();
         widget.removeMouseMoveListener(mouseMoveListener);
         isPressed = false;
-        backgroundWhilePressed = null;
+        Point size = widget.getSize();
         GralWidget widgg = (GralWidget)widget.getData();  //maybe null
-        //GralMng guiMng = widgg.getMng();
         try{ 
           int dx = e.x - xMousePress, dy = e.y - yMousePress;
           final int keyMouse;
-          int moved = (dx < 10 && dx > -10 && dy < 10 && dy > -10) ? 0: 100;
+          int moved = (e.x < 0 || e.x > size.x || e.y < 0 || e.y > size.y) ? 0: 100;
           switch(e.button + moved){ 
             case   1: keyMouse = KeyCode.mouse1Up; break; 
             case 101: keyMouse = KeyCode.mouse1UpMoved; break; 
@@ -285,23 +299,35 @@ public class SwtGralMouseListener
             default: keyMouse = KeyCode.mouse3Up; break;  //other key
           }
           final int keyCode = SwtGralKey.convertFromSwt(keyMouse, e.stateMask);
+          int mUser1 = 0;
           if(mouseWidgetAction !=null){
             switch(e.button){ 
-              case 1: mouseWidgetAction.mouse1Up(keyCode, e.x, e.y, size.x, size.y, widgg); break;
-              case 2: mouseWidgetAction.mouse2Up(keyCode, e.x, e.y, size.x, size.y, widgg); break;
+              case 1: 
+                mUser1 = GralMouseWidgetAction_ifc.mUser1up; 
+                mouseWidgetAction.mouse1Up(keyCode, e.x, e.y, size.x, size.y, widgg); 
+                break;
+              case 2:
+                mUser1 = GralMouseWidgetAction_ifc.mUser2up; 
+                mouseWidgetAction.mouse2Up(keyCode, e.x, e.y, size.x, size.y, widgg); 
+                break;
             }  
-          }
-          GralUserAction action = widgg ==null ? null : widgg.getActionChange();
-          if(action !=null){
-            action.exec(keyCode, widgg);
+          } 
+          if( (mUser & mUser1) !=0) {
+            GralUserAction action = widgg ==null ? null : widgg.getActionChange();
+            if(action !=null){
+              action.exec(keyCode, widgg);
+            }
           }
         } catch(Exception exc){ System.err.printf("SwtGralMouseListener - any exception while mouse down; %s\n", exc.getMessage()); }
-        if(widgg !=null){
-          //widgg.repaint();
-        }
       }
     }
 
+    
+    
+    
+    /**TODO invoke user action if mouse releases the area
+     * 
+     */
     protected MouseMoveListener mouseMoveListener = new MouseMoveListener()
     {
 

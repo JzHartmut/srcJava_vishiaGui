@@ -1,6 +1,8 @@
 package org.vishia.gral.base;
 
 
+import java.util.Map;
+
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralTextFieldUser_ifc;
@@ -122,6 +124,11 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
    * <li>If no format is given and the value is in range up to 1 Billion, it is shown with "k", "M"
    *   for kilo and Mega with max 3 digits before dot and 3 digits after the dot.
    * <li>if no format is given and the value is greater than 1 Billion, it is shown with exponent.
+   * <li>As special feature a format <code>int32AngleDegree</code> and <code>int16AngleDegree</code>
+   *   is supported, if that text is contained in the format string. The value should come from an integer,
+   *   which contains an angle value with wrap-around-presentation: 0x7fffffff is 1 less 180 degree and
+   *   0x80000000 is exactly 180 degree. This format helps to calculate with angle values in range
+   *   of -180...+179.99999 degree. The presentation in the text field is shown as degree angle value. 
    * <ul>      
    *   
    * @see org.vishia.gral.base.GralWidget#setValue(float)
@@ -179,12 +186,12 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
       value = valueP;
     }
     if(sFormat1 !=null && sFormat.length() >0){
-      try{ sShow = String.format(sFormat1, value); }
+      try{ sShow = String.format(sFormat1, new Float(value)); }
       catch(java.util.IllegalFormatException exc){ 
         sShow = null;  //maybe integer 
       }
       if(sShow == null){
-        try{ sShow = String.format(sFormat, (int)value); }
+        try{ sShow = String.format(sFormat, new Integer((int)value)); }
         catch(java.util.IllegalFormatException exc){ 
           sShow = "?format";  
         }
@@ -193,11 +200,11 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
       float valueAbs = Math.abs(value); 
       if(value == 0.0f){ sShow = "0.0"; }
       else if(valueAbs < 1.0e-7f){ sShow = value < 0 ? "-0.0000001" : "0.0000001"; }  //shorten output, don't show exponent.
-      else if(valueAbs < 1.0f){ sShow = String.format("%1.7f", value); }  //shorten output, don't show exponent.
-      else if(valueAbs < 1.0e3f){ sShow = String.format("%3.4f", value); }  //shorten output, don't show exponent.
-      else if(valueAbs < 1.0e6f){ sShow = String.format("%3.3f k", value/1000); }  //shorten output, don't show exponent.
-      else if(valueAbs < 1.0e9f){ sShow = String.format("%3.3f M", value/1000000); }  //shorten output, don't show exponent.
-      else if(valueAbs >= 1.0e9f){ sShow = String.format("%3.3g", value); }  //shorten output, don't show exponent.
+      else if(valueAbs < 1.0f){ sShow = String.format("%1.7f", new Float(value)); }  //shorten output, don't show exponent.
+      else if(valueAbs < 1.0e3f){ sShow = String.format("%3.4f", new Float(value)); }  //shorten output, don't show exponent.
+      else if(valueAbs < 1.0e6f){ sShow = String.format("%3.3f k", new Float(value/1000)); }  //shorten output, don't show exponent.
+      else if(valueAbs < 1.0e9f){ sShow = String.format("%3.3f M", new Float(value/1000000)); }  //shorten output, don't show exponent.
+      else if(valueAbs >= 1.0e9f){ sShow = String.format("%3.3g", new Float(value)); }  //shorten output, don't show exponent.
       //else if(valueAbs >= 1e6){ sShow = Float.toString(value/1000000) + " M"; }  //shorten output, don't show exponent.
       else { sShow = Float.toString(value); }
       
@@ -266,12 +273,12 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
       value = valueP;
     }
     if(sFormat1 !=null && sFormat.length() >0){
-      try{ sShow = String.format(sFormat1, value); }
+      try{ sShow = String.format(sFormat1, new Double(value)); }
       catch(java.util.IllegalFormatException exc){ 
         sShow = null;  //maybe integer 
       }
       if(sShow == null){
-        try{ sShow = String.format(sFormat, (int)value); }
+        try{ sShow = String.format(sFormat, new Integer((int)value)); }
         catch(java.util.IllegalFormatException exc){ 
           sShow = "?format";  
         }
@@ -280,11 +287,11 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
       double valueAbs = Math.abs(value); 
       if(value == 0.0f){ sShow = "0.0"; }
       else if(valueAbs < 1.0e-7f){ sShow = value < 0 ? "-0.0000001" : "0.0000001"; }  //shorten output, don't show exponent.
-      else if(valueAbs < 1.0f){ sShow = String.format("%1.12f", value); }  //shorten output, don't show exponent.
-      else if(valueAbs < 1.0e3f){ sShow = String.format("%3.9f", value); }  //shorten output, don't show exponent.
-      else if(valueAbs < 1.0e6f){ sShow = String.format("%3.8f k", value/1000); }  //shorten output, don't show exponent.
-      else if(valueAbs < 1.0e9f){ sShow = String.format("%3.8f M", value/1000000); }  //shorten output, don't show exponent.
-      else if(valueAbs >= 1.0e9f){ sShow = String.format("%3.8g", value); }  //shorten output, don't show exponent.
+      else if(valueAbs < 1.0f){ sShow = String.format("%1.12f", new Double(value)); }  //shorten output, don't show exponent.
+      else if(valueAbs < 1.0e3f){ sShow = String.format("%3.9f", new Double(value)); }  //shorten output, don't show exponent.
+      else if(valueAbs < 1.0e6f){ sShow = String.format("%3.8f k", new Double(value/1000)); }  //shorten output, don't show exponent.
+      else if(valueAbs < 1.0e9f){ sShow = String.format("%3.8f M", new Double(value/1000000)); }  //shorten output, don't show exponent.
+      else if(valueAbs >= 1.0e9f){ sShow = String.format("%3.8g", new Double(value)); }  //shorten output, don't show exponent.
       //else if(valueAbs >= 1e6){ sShow = Float.toString(value/1000000) + " M"; }  //shorten output, don't show exponent.
       else { sShow = Double.toString(value); }
       
@@ -369,6 +376,11 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
     @Override public float calc(float input){
       return input * (180.0f / 32768.0f);   
     }
+    @Override public Value calcDataAccess(Map<String, Object> javaVariables, Object... args) throws Exception{
+      Float value = (Float)args[0];  //always true, this special class is only used in this context.
+      CalculatorExpr.Value valueRet = new CalculatorExpr.Value(calc(value.floatValue()));
+      return valueRet;
+    }
   } //class CalculatorAngle16
   
   
@@ -377,6 +389,12 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
     @Override public float calc(float input){
       return input * (180.0f / 0x7fffffff);   
     }
+    @Override public Value calcDataAccess(Map<String, Object> javaVariables, Object... args) throws Exception{
+      Float value = (Float)args[0];  //always true, this special class is only used in this context.
+      CalculatorExpr.Value valueRet = new CalculatorExpr.Value(calc(value.floatValue()));
+      return valueRet;
+    }
+
   } //class CalculatorAngle32
   
   

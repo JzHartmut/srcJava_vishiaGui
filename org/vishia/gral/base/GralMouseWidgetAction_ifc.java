@@ -14,6 +14,8 @@ public interface GralMouseWidgetAction_ifc
   /**Version, history and licence
    * 
    * <ul>
+   * <li>2013-10-13 Hartmut new: {@link #mouse1Double(int, int, int, int, int, GralWidget)}.
+   *   #new 
    * <li>2013-05-13 Hartmut chg: All methods changed, parameter key, position. 
    * </ul>
    * 
@@ -45,11 +47,14 @@ public interface GralMouseWidgetAction_ifc
   public final static int version = 0x20120303;
 
   
-  /**The action.
-   * @param key
+  /**Bit mask to determine which mouse action should invoke the {@link GralWidget#getActionChange()}.
+   * It is the second parameter of constructor. Use an | of this conditions.
+   * m..All... includes any key of mouse.
    */
-  void mouseAction(int key, int xMousePixel, int yMousePixel, GralWidget widgg);
-  
+  public final static int mUser1down = 1, mUser2down = 0x2, mUserAlldown = 0xf
+    , mUser1up = 0x10, mUser2up = 0x20, mUserAllup = 0xf
+    , mUserDouble = 0x100
+    , mUserAll = 0xffff; 
   
   /**Called from the graphic implementation layer if the standard left mouse button is pressed.
    * @param xMousePixel
@@ -62,6 +67,11 @@ public interface GralMouseWidgetAction_ifc
   void mouse2Down(int key, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg);
   
   void mouse2Up(int key, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg);
+  
+
+  void mouse1Double(int key, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg);
+
+  
   
   /**It is called if the mouse button is pressed, and then the mouse cursor is removed from the widget.
    * The mouse-button-up action won't be called then. Usual the user should done its action

@@ -311,8 +311,8 @@ public class SwtTextFieldWrapper extends GralTextField
   @Override public void setMouseAction(GralUserAction action)
   {
     if(action !=null){ setActionChange(action); }
-    GralMouseWidgetAction_ifc actionMouse = null;  //TODO it should be the action.
-    SwtGralMouseListener.MouseListenerUserAction mouseListener = new SwtGralMouseListener.MouseListenerUserAction(actionMouse);
+    SwtGralMouseListener.MouseListenerGralAction mouseListener = 
+      new SwtGralMouseListener.MouseListenerGralAction(null, GralMouseWidgetAction_ifc.mUserAll);
     textFieldSwt.addMouseListener(mouseListener);  
   }
   

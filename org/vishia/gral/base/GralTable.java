@@ -915,6 +915,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
 
     
+    
+    
+    protected void setFocusCellMousePressed(){
+      
+    }
+    
 
     /**Redraws the whole table because the current line is changed or the focus is changed
      * or the content is changed and #re

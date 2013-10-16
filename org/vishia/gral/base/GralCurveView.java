@@ -1665,11 +1665,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     }
 
     @Override
-    public void mouseAction(int key, int xMousePixel, int yMousePixel,
-        GralWidget widgg)
+    public void mouse1Double(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
     {
-      // TODO Auto-generated method stub
-      
     }
 
     @Override public boolean mouseMoved(int xMousePixel, int yMousePixel, int xWidgetPixelSize, int yWidgetPixelSize)
