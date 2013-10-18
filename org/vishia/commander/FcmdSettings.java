@@ -3,7 +3,7 @@ package org.vishia.commander;
 import java.io.File;
 
 import org.vishia.cmd.CmdStore;
-import org.vishia.cmd.JbatchScript;
+import org.vishia.cmd.ZGenScript;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;

@@ -5,6 +5,8 @@ package org.vishia.gral.base;
  * It should not be known by the user, except the user creates new widget types.
  * The interface is the connection from Mouse listeners in the graphic implementation layer (swt, swing)
  * to the gral widgets.
+ * See {@link org.vishia.gral.swt.SwtGralMouseListener} for an usage in graphic implementation layer.
+ * 
  * 
  * @author Hartmut Schorrig
  *

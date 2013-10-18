@@ -288,7 +288,7 @@ public class SwtGralMouseListener
         try{ 
           int dx = e.x - xMousePress, dy = e.y - yMousePress;
           final int keyMouse;
-          int moved = (e.x < 0 || e.x > size.x || e.y < 0 || e.y > size.y) ? 0: 100;
+          int moved = (e.x < 0 || e.x > size.x || e.y < 0 || e.y > size.y) ? 100: 0;
           switch(e.button + moved){ 
             case   1: keyMouse = KeyCode.mouse1Up; break; 
             case 101: keyMouse = KeyCode.mouse1UpMoved; break; 
