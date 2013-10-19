@@ -1309,7 +1309,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       //now a new request will be added.
       try{ repaintGthread();
       
-      } catch(Exception exc){
+      } catch(Throwable exc){
         System.err.println("unexpected exception " + exc.getMessage());
         exc.printStackTrace(System.err);
         //NOTE: removeFromQueue should invoked on exception too.

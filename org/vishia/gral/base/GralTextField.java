@@ -10,6 +10,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.CalculatorExpr;
+import org.vishia.util.DataAccess;
 
 /**This is the base class for all widgets which represents a simple text.
  * @author Hartmut Schorrig
@@ -376,7 +377,7 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
     @Override public float calc(float input){
       return input * (180.0f / 32768.0f);   
     }
-    @Override public Value calcDataAccess(Map<String, Object> javaVariables, Object... args) throws Exception{
+    @Override public Value calcDataAccess(Map<String, DataAccess.Variable> javaVariables, Object... args) throws Exception{
       Float value = (Float)args[0];  //always true, this special class is only used in this context.
       CalculatorExpr.Value valueRet = new CalculatorExpr.Value(calc(value.floatValue()));
       return valueRet;
@@ -389,7 +390,7 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
     @Override public float calc(float input){
       return input * (180.0f / 0x7fffffff);   
     }
-    @Override public Value calcDataAccess(Map<String, Object> javaVariables, Object... args) throws Exception{
+    @Override public Value calcDataAccess(Map<String, DataAccess.Variable> javaVariables, Object... args) throws Exception{
       Float value = (Float)args[0];  //always true, this special class is only used in this context.
       CalculatorExpr.Value valueRet = new CalculatorExpr.Value(calc(value.floatValue()));
       return valueRet;
