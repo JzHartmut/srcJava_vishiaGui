@@ -27,7 +27,11 @@ import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 public abstract class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ implements GralVisibleWidgets_ifc
 {
   /**The version and history:
-   * <ul>2012-01-08 Hartmut new: {@link #removePanel(String)}
+   * <ul>
+   * <li>2013-10-22 Hartmut bugfix: {@link #setMngToTabbedPanel()} necessary because a new Tab should refer to this parent.
+   *   On {@link #addCanvasPanel(String, String)} or {@link #addGridPanel(String, String, int, int, int, int)} the mng
+   *   should refer this as {@link GralMng#pos}.parent. 
+   * <li>2012-01-08 Hartmut new: {@link #removePanel(String)}
    * <li>2011-11-07 Hartmut chg: a TabbedPanel is a GralWidget too, 
    * <li>2011-10-01 Hartmut new: abstract method {@link #selectTab(String)}.
    * <li>2011-09-10 Hartmut chg: move this class from gral/gridPanel/TabPanel to gral/base/GralTabbedPanel
@@ -113,7 +117,7 @@ public abstract class GralTabbedPanel extends GralPanelContent /*extends GralWid
 	
 	abstract public GralPanelContent addCanvasPanel(String sName, String sLabel);
 	
-	
+	protected void setMngToTabbedPanel(){ itsMng.setTabbedPanel(this); }
 	
 	//abstract public GralPanelContent getGuiComponent();
 	
@@ -129,7 +133,8 @@ public abstract class GralTabbedPanel extends GralPanelContent /*extends GralWid
 	 * @return
 	 * @deprecated use {@link GralWidget#setFocus()}
 	 */
-	abstract public GralPanelContent selectTab(String name);
+	@Deprecated
+  abstract public GralPanelContent selectTab(String name);
 	
 	
   @Override public Queue<GralWidget> getWidgetsVisible()

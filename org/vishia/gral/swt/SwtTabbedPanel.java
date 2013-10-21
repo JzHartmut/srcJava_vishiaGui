@@ -89,7 +89,8 @@ public class SwtTabbedPanel extends GralTabbedPanel
   
 	@Override public GralPanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
 	{ ///
-	  Rectangle sizeTabFolder = widgetSwt.getBounds();
+	  setMngToTabbedPanel();
+    Rectangle sizeTabFolder = widgetSwt.getBounds();
 	  TabItem tabItem = new TabItem(widgetSwt, SWT.None);
 	  tabItem.setText(sLabel);
 	  //tabItem.addFocusListener(SWT.FocusIn, focusTabListener);
@@ -114,7 +115,8 @@ public class SwtTabbedPanel extends GralTabbedPanel
 
   
 	@Override public GralPanelContent addCanvasPanel(String sName, String sLabel)
-	{ TabItem tabItemOperation = new TabItem(widgetSwt, SWT.None);
+	{ setMngToTabbedPanel();
+	  TabItem tabItemOperation = new TabItem(widgetSwt, SWT.None);
 		tabItemOperation.setText(sLabel);
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
 	  SwtCanvasStorePanel panel = new SwtCanvasStorePanel(sName, widgetSwt, 0, colorBackground, mng);

@@ -651,6 +651,16 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
   
+  /**It is a special routine for tabbedPanel.
+   * The reason: If a new tab should add in {@link GralTabbedPanel#addGridPanel(String, String, int, int, int, int)}
+   * then the mng is set to the tabbed panel.
+   * @param tabbedPanel
+   */
+  /*package private*/ void setTabbedPanel(GralPanelContent tabbedPanel){
+    pos.panel = tabbedPanel;
+  }
+  
+  
   public GralPanelContent getPanel(String name){
     return panels.get(name);
   }
