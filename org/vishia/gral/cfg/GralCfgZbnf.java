@@ -3,15 +3,11 @@ package org.vishia.gral.cfg;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.ParseException;
 
-import org.vishia.gral.base.GralPos;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.mainCmd.Report;
-import org.vishia.util.StringPartOld;
 import org.vishia.util.StringPartFromFileLines;
 import org.vishia.zbnf.ZbnfJavaOutput;
-import org.vishia.zbnf.ZbnfParseResultItem;
 import org.vishia.zbnf.ZbnfParser;
 
 /**Class to read the configuration script for a Graphical User Interface. The syntax of the configuration

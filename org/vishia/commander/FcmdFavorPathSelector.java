@@ -26,7 +26,7 @@ import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.FileWriter;
 import org.vishia.util.KeyCode;
-import org.vishia.util.StringPartOld;
+import org.vishia.util.StringPart;
 
 /**This class implements the selection functionality of tabs and paths for the whole Java commander. 
  * It contains all actions which are instantiated one time but affects a special (the current) file panel.
@@ -276,7 +276,7 @@ class FcmdFavorPathSelector
         int posSep;
         //List<FavorPath> list = null;
         FcmdFavorPathSelector.FavorFolder favorTabInfo = null;
-        StringPartOld spLine = new StringPartOld();
+        StringPart spLine = new StringPart();
         StringBuilder uLine = new StringBuilder(1000);
         //boolean bAll = true;
         while( sError == null && (sLine = reader.readLine()) !=null){
