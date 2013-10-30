@@ -13,6 +13,7 @@ import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTableLine_ifc;
+import org.vishia.util.DataAccess;
 
 /**This class is a widget to select commands from a table list.
  * It can be used in any application in a window, which is opened on demand 
@@ -128,11 +129,8 @@ public class GralCommandSelector extends GralSelectList
   @Override protected boolean actionOk(Object userData, GralTableLine_ifc line)
   {
     CmdStore.CmdBlock cmdBlock = (CmdStore.CmdBlock)userData;
-    Object args;
-    Map<String, Object> jargs = cmdBlock.getArguments(getterFiles);
-
+    Map<String, DataAccess.Variable> jargs = cmdBlock.getArguments(getterFiles);
     if(jargs != null){ 
-      args = jargs; 
       File currFile = getterFiles.getFile1();
       
       File currDir = currFile !=null? currFile.getParentFile(): null;

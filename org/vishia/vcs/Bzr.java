@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
+import org.vishia.util.DataAccess;
 import org.vishia.util.FileSystem;
 
 public class Bzr
@@ -27,7 +28,7 @@ public class Bzr
    * @return null if success, an error message if ".bzr" or ".bzr.bat" was not found.
    * @throws IOException on any unexpected exception.
    */
-  public static void searchRepository(File startDir, Map<String, Object> dst, String bzrdir, String bzrsrc) 
+  public static void searchRepository(File startDir, Map<String, DataAccess.Variable> dst, String bzrdir, String bzrsrc) 
   throws IOException
   { File fBzr;
     File currDir = startDir;
@@ -35,11 +36,14 @@ public class Bzr
     do{
       fBzr = new File(currDir, ".bzr.bat");
       if(!fBzr.exists()){
-        fBzr = new File(currDir, ".bzr");
+        fBzr = new File(currDir, "_bzr.bat");
         if(!fBzr.exists()){
-          try{
-            currDir = FileSystem.getDirectory(currDir);  //NOTE: currDir.getParent() is not successfully on relative dir "."
-          } catch(FileNotFoundException exc){ currDir = null;}
+          fBzr = new File(currDir, ".bzr");
+          if(!fBzr.exists()){
+            try{
+              currDir = FileSystem.getDirectory(currDir);  //NOTE: currDir.getParent() is not successfully on relative dir "."
+            } catch(FileNotFoundException exc){ currDir = null;}
+          }
         }
       }
     } while(!fBzr.exists() && currDir !=null);
@@ -47,13 +51,15 @@ public class Bzr
       throw new IOException("Bzr.searchRepository - not found ;" + startDir.getAbsolutePath());
     } else {
       String sBzrDir = FileSystem.getCanonicalPath(currDir);
-      dst.put(bzrdir, sBzrDir);
+      DataAccess.setVariable(dst, bzrdir, 'S', sBzrDir);
+      //dst.put(bzrdir, sBzrDir);
       if(fBzr.getName().equals(".bzr.bat")){
         String sLine = FileSystem.grep1line(fBzr, "bzr_mvExpl.bat");
         if(sLine !=null){
           int pos = sLine.indexOf("bzr_mvExpl.bat");
           String sBzrSrc = sLine.substring(pos + 15).trim();
-          dst.put(bzrsrc, sBzrSrc);
+          DataAccess.setVariable(dst, bzrsrc, 'S', sBzrSrc);
+          //dst.put(bzrsrc, sBzrSrc);
         }
         if(sLine == null) {
           throw new IOException("Bzr.searchRepository - .bzr.bat found but does not contain \"bzr_mvExpl.bat\"");
