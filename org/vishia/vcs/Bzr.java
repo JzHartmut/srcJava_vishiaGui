@@ -31,7 +31,7 @@ public class Bzr
   public static void searchRepository(File startDir, Map<String, DataAccess.Variable> dst, String bzrdir, String bzrsrc) 
   throws IOException
   { File fBzr;
-    File currDir = startDir;
+    File currDir = startDir.isDirectory() ? startDir : startDir.getParentFile();
     //search whether a .bzr or .bzr.bat exists and change to parent dir till it is found.
     do{
       fBzr = new File(currDir, ".bzr.bat");

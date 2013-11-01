@@ -3,7 +3,7 @@ package org.vishia.gral.base;
 import org.vishia.gral.ifc.GralRectangle;
 
 /**This interface is used as reference to the implementation layer for all widgets.
- * It defines all possible calls from the application to the implementaation widget.
+ * It defines all possible calls from the application to the implementation widget.
  * <br><br>
  * Note that most of user requirements are done by the {@link GralWidget} capability and the
  * capabilities of its derived classes, for example {@link GralWidget#setText(CharSequence)}
@@ -15,6 +15,7 @@ import org.vishia.gral.ifc.GralRectangle;
  * There is no needing of methods such as <code>setText(String)</code> etc. because the user
  * should able to set the text in any thread. See concept of data set described on {@link GralWidget#setText(CharSequence)} 
  * See {@link GralWidget#wdgImpl}. 
+ * @since 2013-06
  * @author Hartmut Schorrig
  *
  */

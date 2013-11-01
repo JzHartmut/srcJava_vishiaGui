@@ -513,38 +513,24 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   }
   
 
-  protected void setBoundsCells(){
-    Rectangle parentBounds = swtWidgWrapper.widgetSwt.getParent().getBounds();
-    int test=7;
-    GralRectangle pixTable = outer.pos().calcWidgetPosAndSize(itsMng().propertiesGui(), parentBounds.width, parentBounds.height, 0, 0);
-    int xPixelUnit = itsMng().propertiesGui().xPixelUnit();
-    int xPixel1 = 0;
-    xpixelCell[0] = xPixel1;
-    int ixPixelCell;
-    int xPos;
-    //Columns from left with positive width
-    for(ixPixelCell = 0; ixPixelCell < columnWidthsGral().length && (xPos = columnWidthsGral()[ixPixelCell]) > 0; ++ixPixelCell){
-      xPixel1 += xPos * xPixelUnit;
-      xpixelCell[ixPixelCell+1] = xPixel1;
-    }
-    xPixel1 = pixTable.dx;
-    xpixelCell[columnWidthsGral().length] = xPixel1;  //right position.
-    for(ixPixelCell = columnWidthsGral().length-1; ixPixelCell >=0  && (xPos = columnWidthsGral()[ixPixelCell]) < 0; --ixPixelCell){
-      xPixel1 += xPos * xPixelUnit;
-      xpixelCell[ixPixelCell] = xPixel1;
-    }
+  
+  @Override protected void setBoundsCells(int treeDepthBase){
     int yPix = 0;
-    
+    int xPixelUnit = swtWidgWrapper.mng.propertiesGui.xPixelUnit();
     for(Text[] row: cellsSwt){
       int ixColumn = 0;
       for(Text cell: row){
-        cell.setBounds(xpixelCell[ixColumn], yPix, xpixelCell[ixColumn+1] - xpixelCell[ixColumn], linePixel);
+        CellData celldata = (CellData)cell.getData();
+        int xleft = celldata.tableItem !=null ? (celldata.tableItem.treeDepth - treeDepthBase) * xPixelUnit : 0;
+        cell.setBounds(xleft + xpixelCell[ixColumn], yPix, xpixelCell[ixColumn+1] - xpixelCell[ixColumn], linePixel);
         ixColumn +=1;
       }
       yPix += linePixel;
     }
-      
+
   }
+  
+  
   
   
   private class Table extends Composite {
@@ -675,8 +661,10 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
       Rectangle boundsTable = ((Control)e.widget).getBounds();
       int borderTable = ((Control)e.widget).getBorderWidth();
       //it calls repaint with delay.
-      SwtTable.this.resizeTable(boundsTable.width, boundsTable.height);
-      SwtTable.this.setBoundsCells();
+      Rectangle parentBounds = ((Control)e.widget).getParent().getBounds();
+      GralRectangle pixTable = outer.pos().calcWidgetPosAndSize(itsMng().propertiesGui(), parentBounds.width, parentBounds.height, 0, 0);
+      SwtTable.this.resizeTable(pixTable);
+      //SwtTable.this.setBoundsCells();
       
     }
     
