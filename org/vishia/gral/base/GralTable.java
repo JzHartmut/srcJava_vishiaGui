@@ -1084,8 +1084,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           line.ctRepaintLine.compareAndSet(ctredraw, 0);  
         }
         ix +=1;
-        if(line.childLines !=null){
-          iCellLine += setCellContentChild(line.childLines, 0, iCellLine, zShowLinesRest);
+        if(line.childNodes !=null){
+          iCellLine += setCellContentChild(line.childNodes, 0, iCellLine, zShowLinesRest);
         }
         
       }
@@ -1243,9 +1243,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     /**Lines of a children, a tree structure. null for a non-treed table.
      * null it the children are unknown or there are not children.
      */
-    protected ArrayList<TableLineData<UserData>> childLines;
+    //protected ArrayList<TableLineData<UserData>> childLines;
     
-    protected TableLineData<UserData> parentLine;
+    //protected TableLineData<UserData> parentLine;
 
     /**True if it is known that the node has children. They may be unknown, then {@link #childLines} are null. */
     boolean hasChildren;
@@ -1287,18 +1287,19 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     
     public GralTableLine_ifc<UserData> insertChildLine(String childKey, int rowP, String[] childTexts, UserData data){
-      if(childLines == null){ 
+      if(childNodes == null){ 
         hasChildren = true;
-        childLines = new ArrayList<TableLineData<UserData>>(); 
+        //childNodes = new ArrayList<TableLineData<UserData>>(); 
       }
       TableLineData<UserData> line = new TableLineData<UserData>(outer);
-      line.parentLine = this;
+      super.addNode(line, rowP);
+      //line.parentLine = this;
       line.treeDepth = this.treeDepth +1;
-      int zLine = childLines.size();
+      int zLine = childNodes.size();
       int row =  rowP > zLine || rowP < 0 ? zLine : rowP;
       line.nLineNr = row;
       line.key = childKey;
-      childLines.add(row, line);
+      //childLines.add(row, line);
       if(childTexts !=null){
         for(int ixCol = 0; ixCol < childTexts.length && ixCol < line.cellTexts.length; ++ixCol){
           line.cellTexts[ixCol] = childTexts[ixCol];
@@ -1310,7 +1311,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         //outer.idxLine.put(this.key + '.' + key, line);
       }
       for(int ii=row+1; ii < zLine; ++ii){
-        TableLineData<UserData> line2 = childLines.get(ii);
+        TableLineData<UserData> line2 = childNodes.get(ii);
         line2.nLineNr = ii;
       }
       if(this.showChildren){
@@ -1321,12 +1322,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
     
     
+    /*
     @Override
     public void removeChildren(){
       if(childLines !=null){
         childLines = null;
       }
     }
+    */
     
     
     @Override public void setEditable(boolean editable){
@@ -1353,7 +1356,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
 
     
-    public TableLineData<UserData> parentNode(){ return parentLine; }
+    public TableLineData<UserData> parentNode(){ return (TableLineData<UserData>)super.getParent(); }
     
     @Override public String getName(){ return outer.name; }
     
