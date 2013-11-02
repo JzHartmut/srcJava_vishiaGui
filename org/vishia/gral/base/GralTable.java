@@ -20,6 +20,8 @@ import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
 import org.vishia.util.SelectMask;
 import org.vishia.util.MarkMask_ifc;
+import org.vishia.util.SortedTree;
+import org.vishia.util.TreeNodeBase;
 
 /**This is the Gral class for a table. Its usage is independent of a graphical implementation layer.
  * A table consists of some text fields which are arranged in columns and lines. 
@@ -66,6 +68,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version and history
    * <ul>
+   * <li>2013-10-03 Hartmut new: {@link TableLineData} now extends {@link TreeNodeBase}. It is a tree.
    * <li>2013-10-03 Hartmut new: {@link GraphicImplAccess#cells}, the {@link GraphicImplAccess.CellData} are able to access
    *   elsewhere only in the implementation layer via the text widget.
    * <li>2013-11-02 Hartmut chg: {@link GralTable.TableLineData} is static now with outer reference, more transparent
@@ -578,6 +581,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   
   
+  
+  
+  
+
+  
+  
   /**Increments or decrements ixLineNew in [up] or [dn] situation until the {@link #searchChars} are found
    * or one time if searchChars are not given.
    * If the searchChars are not found, either the first or last line will be selected. It is because
@@ -1085,6 +1094,18 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     
     
+    
+    protected void setCellContentNew(int dLine){
+      if(dLine <0){
+        
+      } else if(dLine >=0){
+        TableLineData<?> lineStart = cells[dLine][0].tableItem;
+        
+      }
+    }
+    
+    
+
 
     /**This routine will be called inside a resize listener of the implementation graphic.
      * It calculates the width of the columns with the given width of the table's canvas.
@@ -1209,11 +1230,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * The instance knows its TableSwt and therefore the supports the access to the whole table.
    *
    */
-  public final static class TableLineData<UserData> extends SelectMask implements GralTableLine_ifc<UserData>
+  public final static class TableLineData<UserData> 
+  extends TreeNodeBase<TableLineData<UserData>, UserData, GralTableLine_ifc<UserData>> implements MarkMask_ifc, GralTableLine_ifc<UserData>
   {
 
     /**The aggregated table. */
     final GralTable<UserData> outer;
+    
+    SelectMask markMask;
     
     
     /**Lines of a children, a tree structure. null for a non-treed table.
@@ -1256,6 +1280,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     //TODO GralColor colorBack, colorText;
     
     TableLineData(GralTable<UserData> outer){
+      super(null, null);  //key, data
       this.outer = outer;
       cellTexts = new String[outer.zColumn];
     }
@@ -1296,6 +1321,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
     
     
+    @Override
     public void removeChildren(){
       if(childLines !=null){
         childLines = null;
@@ -1481,8 +1507,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     @Override public int getMark(){
       if(userData instanceof MarkMask_ifc){
         return ((MarkMask_ifc)userData).getMark();
+      } else if(markMask == null){
+        return 0;
       } else {
-        return super.getMark();
+        return markMask.getMark();
       }
 
     }
@@ -1502,7 +1530,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       if(userData instanceof MarkMask_ifc){
         ((MarkMask_ifc)userData).setNonMarked(mask, data);
       }
-      return super.setNonMarked(mask, data);
+      if(markMask ==null) return 0;
+      else return markMask.setNonMarked(mask, data);
     }
     
     /**Sets the mark status of the line.
@@ -1519,7 +1548,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       if(userData instanceof MarkMask_ifc){
         ((MarkMask_ifc)userData).setMarked(mask, data);
       }
-      return super.setMarked(mask, data);
+      if(markMask ==null){ markMask = new SelectMask(); }
+      return markMask.setMarked(mask, data);
     }
 
     @Override public GralMng gralMng(){ return outer.gralMng(); }

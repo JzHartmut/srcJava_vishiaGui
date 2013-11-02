@@ -1,10 +1,11 @@
 package org.vishia.gral.ifc;
 
 import org.vishia.util.MarkMask_ifc;
+import org.vishia.util.SortedTree;
 
 
 
-public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, MarkMask_ifc
+public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, MarkMask_ifc, SortedTree<GralTableLine_ifc<UserData>>
 {
 
   /**Version, history and license.
