@@ -170,6 +170,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
     focusListenerCell = this.new FocusListenerCell();
     setColorsSwt();    
     this.cellsSwt = new Text[zLineVisibleMax][zColumn()];
+    this.cells = new CellData[zLineVisibleMax][zColumn()];
     Control swtTable = new SwtTable.Table(parent, zColumn(), mng);
     this.swtWidgWrapper = new SwtWidgetSimpleWrapper(swtTable, mng);
     //gralTable.implMethodWidget_.setWidgetImpl(this);
@@ -533,41 +534,49 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   
   
   
+  protected void initSwtTable(Composite swtTable, int zColumns, SwtMng mng){
+    int yPix = 0;
+    Font font = mng.propertiesGuiSwt.getTextFontSwt(2, outer.whatIs, outer.whatIs);
+    Color colorBackTableSwt = mng.getColorImpl(colorBackTable());
+    for(int iCol = 0; iCol < zColumns; ++iCol){
+      //menuColumns[iCol] = new SwtMenu(name + "_menu" + iCol, this, itsMng());
+    }
+    //NOTE: only if the swtSelectText is created first, it will drawn in in the foreground of the other cells.
+    swtSearchText = new Text(swtTable, SWT.LEFT | SWT.SINGLE | SWT.READ_ONLY);
+    swtSearchText.setFont(font);
+    swtSearchText.setVisible(false);
+    for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){
+      for(int iCol = 0; iCol < zColumns; ++iCol){
+        Text cell = new Text(swtTable, SWT.LEFT | SWT.SINGLE | SWT.READ_ONLY);
+        cell.setFont(font);
+        cell.addKeyListener(myKeyListener);
+        cell.addFocusListener(focusListenerCell);
+        cell.addMouseListener(mousePressedListener);
+        cell.addMouseWheelListener(mouseWheelListener);
+        CellData cellData = new CellData(iRow, iCol);
+        cell.setData(cellData);
+        cells[iRow][iCol] = cellData;
+        int xdPixCol = super.columnPixel[iCol+1] - columnPixel[iCol];
+        cell.setBounds(columnPixel[iCol], yPix, xdPixCol, linePixel);
+        cell.setBackground(colorBackTableSwt);
+        //cell.setMenu((Menu)menuColumns[iCol].getMenuImpl());
+        cellsSwt[iRow][iCol] = cell;
+      }
+      yPix += linePixel;
+    }
+    //The text field for selection string
+
+    
+    
+  }
+  
+  
+  
   private class Table extends Composite {
 
     public Table(Composite parent, int zColumns, SwtMng mng) {
       super(parent, 0);
-      int yPix = 0;
-      Font font = mng.propertiesGuiSwt.getTextFontSwt(2, outer.whatIs, outer.whatIs);
-      Color colorBackTableSwt = mng.getColorImpl(colorBackTable());
-      for(int iCol = 0; iCol < zColumns; ++iCol){
-        //menuColumns[iCol] = new SwtMenu(name + "_menu" + iCol, this, itsMng());
-      }
-      //NOTE: only if the swtSelectText is created first, it will drawn in in the foreground of the other cells.
-      swtSearchText = new Text(this, SWT.LEFT | SWT.SINGLE | SWT.READ_ONLY);
-      swtSearchText.setFont(font);
-      swtSearchText.setVisible(false);
-      for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){
-        for(int iCol = 0; iCol < zColumns; ++iCol){
-          Text cell = new Text(this, SWT.LEFT | SWT.SINGLE | SWT.READ_ONLY);
-          cell.setFont(font);
-          cell.addKeyListener(myKeyListener);
-          cell.addFocusListener(focusListenerCell);
-          cell.addMouseListener(mousePressedListener);
-          cell.addMouseWheelListener(mouseWheelListener);
-          CellData cellData = new CellData(iRow, iCol);
-          cell.setData(cellData);
-          int xdPixCol = SwtTable.super.columnPixel[iCol+1] - columnPixel[iCol];
-          cell.setBounds(columnPixel[iCol], yPix, xdPixCol, linePixel);
-          cell.setBackground(colorBackTableSwt);
-          //cell.setMenu((Menu)menuColumns[iCol].getMenuImpl());
-          cellsSwt[iRow][iCol] = cell;
-        }
-        yPix += linePixel;
-      }
-      //The text field for selection string
-
-      
+      initSwtTable(this, zColumns, mng);
     }
 
     

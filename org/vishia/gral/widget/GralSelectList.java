@@ -79,7 +79,7 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
   /**The keys for left and right navigation. Default it is shift + left and right arrow key.
    * 
    */
-  private int keyLeft = KeyCode.alt + KeyCode.left, keyRight = KeyCode.alt + KeyCode.right;
+  protected int keyLeft = KeyCode.alt + KeyCode.left, keyRight = KeyCode.alt + KeyCode.right;
   
   
   
@@ -149,17 +149,17 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
    * or click of OK (Enter) button.
    * @param userData The user data stored in the line of table.
    */
-  protected abstract boolean actionOk(Object userData, GralTableLine_ifc line);
+  protected abstract boolean actionOk(Object userData, GralTableLine_ifc<UserData> line);
   
   /**Action if a table line is selected and ctrl-left is pressed or the release button is pressed.
    * @param userData The user data stored in the line of table.
    */
-  protected abstract void actionLeft(Object userData, GralTableLine_ifc line);
+  protected abstract void actionLeft(Object userData, GralTableLine_ifc<UserData> line);
   
   /**Action if a table line is selected and ctrl-right is pressed or the release button is pressed.
    * @param userData The user data stored in the line of table.
    */
-  protected abstract void actionRight(Object userData, GralTableLine_ifc line);
+  protected abstract void actionRight(Object userData, GralTableLine_ifc<UserData> line);
   
   
   /**Action if a table line is selected and any other key is pressed or the context menu is invoked.
@@ -168,16 +168,17 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
    * @param line The table line.
    * @return true if is was relevant for the key.
    */
-  protected abstract boolean actionUserKey(int key, Object userData, GralTableLine_ifc line);
+  protected abstract boolean actionUserKey(int key, Object userData, GralTableLine_ifc<UserData> line);
   
   
-  private final GralUserAction actionTable = new GralUserAction()
+  private final GralUserAction actionTable = new GralUserAction("actionTable")
   {
 
     @Override public boolean userActionGui(int keyCode, GralWidget widgdTable, Object... params)
     {
       //assert(sIntension.equals("table-key"));
-      GralTableLine_ifc line = (GralTableLine_ifc)params[0];
+      @SuppressWarnings("unchecked")
+      GralTableLine_ifc<UserData> line = (GralTableLine_ifc<UserData>)params[0];
       Object data = line.getUserData();
       //int keyCode = (Integer)params[1];
       boolean done = true;

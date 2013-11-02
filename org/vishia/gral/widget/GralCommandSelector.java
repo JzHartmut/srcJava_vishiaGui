@@ -32,7 +32,7 @@ import org.vishia.util.DataAccess;
  * @author Hartmut Schorrig
  *
  */
-public class GralCommandSelector extends GralSelectList
+public class GralCommandSelector extends GralSelectList<CmdStore.CmdBlock>
 {
 
   /**Store of all possible commands given in the command file. 
@@ -91,14 +91,32 @@ public class GralCommandSelector extends GralSelectList
   public void fillIn()
   {
     wdgdTable.clearTable();
+    int level = 1;
+    GralTableLine_ifc<CmdStore.CmdBlock> line = null;
     for(CmdStore.CmdBlock data: cmdStore.getListCmds()){
-      GralTableLine_ifc line = wdgdTable.insertLine(data.name, -1, null, data);
-      line.setCellText(data.name, 0);
-      line.setCellText(data.title, 1);
-      //wdgdTable.setValue(GralMng_ifc.cmdInsert, -1, data.name, data);
+      if(data.level == level || line == null){
+        line = wdgdTable.insertLine(data.name, -1, null, data);
+        line.setCellText(data.name, 0);
+        line.setCellText(data.title, 1);
+      } else if(data.level < level){
+        level = data.level;
+        GralTableLine_ifc<CmdStore.CmdBlock> parent = line.parentNode();
+        if(parent !=null){ line = parent;}
+        line = wdgdTable.insertLine(data.name, -1, null, data);
+        line.setCellText(data.name, 0);
+        line.setCellText(data.title, 1);
+      } else {
+        level = data.level;
+        line = line.insertChildLine(data.name, -1, null, data);
+        line.setCellText(data.name, 0);
+        line.setCellText(data.title, 1);
+      }
     }
     wdgdTable.repaint();
   }
+  
+  
+  
   
   
   /**Returns the currently selected command. */
@@ -126,7 +144,7 @@ public class GralCommandSelector extends GralSelectList
    * @param line isn't used here. It can be null in direct invocations.  
    * @see org.vishia.gral.widget.GralSelectList#actionOk(java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
    */
-  @Override protected boolean actionOk(Object userData, GralTableLine_ifc line)
+  @Override protected boolean actionOk(Object userData, GralTableLine_ifc<CmdStore.CmdBlock> line)
   {
     CmdStore.CmdBlock cmdBlock = (CmdStore.CmdBlock)userData;
     Map<String, DataAccess.Variable> jargs = cmdBlock.getArguments(getterFiles);

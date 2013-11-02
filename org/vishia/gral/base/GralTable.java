@@ -66,6 +66,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version and history
    * <ul>
+   * <li>2013-10-03 Hartmut new: {@link GraphicImplAccess#cells}, the {@link GraphicImplAccess.CellData} are able to access
+   *   elsewhere only in the implementation layer via the text widget.
    * <li>2013-11-02 Hartmut chg: {@link GralTable.TableLineData} is static now with outer reference, more transparent
    * <li>2013-11-02 Hartmut chg: {@link GralTable.GraphicImplAccess#resizeTable(GralRectangle)} moved from SWT implementation,
    *   preparing tree view. {@link GralTable.TableLineData#treeDepth}, {@link GralTable.TableLineData#childLines} for tree view.
@@ -93,7 +95,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * <li>2013-06-11 Hartmut new: Now the {@link GralTable}, the {@link GralTable.TableLineData} and this
    *   interface are marked with the generic type UserData.
    * <li>2013-05-22 Hartmut new: {@link TableLineData#lineInGraphic} not used yet, but for further usage.
-   *   Maybe for refresh data only if they are in the visible range. 
+   *   Maybe for refresh data only if they are in the visible range. 2013-10-03 removed, too many effort on tree view.
+   *   To detect visible lines iterate over {@link GraphicImplAccess#cells}
    * <li>2013-05-11 Hartmut chg: {@link #deleteLine(GralTableLine_ifc)} was not ready, now tested
    * <li>2013-05-11 Hartmut chg: {@link TableLineData} instead TableItemWidget.
    * <li>2013-04-28 Hartmut new: {@link #specifyKeysMarkUpDn(int, int)}
@@ -672,6 +675,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   {
     protected final GralTable<?> outer;
     
+    
+    
+    protected CellData[][] cells;
+    
+    
+    
     /**Set to true while {@link #table}.{@link Table#redrawGthread()} is running.
      * It prevents recursive invocation of redraw() while setFocus() is invoked. */
     protected boolean bRedrawPending;
@@ -979,15 +988,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       //draw all table cells.
       long dbgtime1 = System.currentTimeMillis() - dbgtime;
       int ixLine3;
-      for(ixLine3 = 0; ixLine3 < ixLine1; ++ixLine3){ //mark invsible lines with -1
-        GralTable.TableLineData<?> line = outer.tableLines.get(ixLine3);
-        line.lineInGraphic = -1;
-      }
       iCellLine = 0;
-      for(ixLine3 = ixLine1; ixLine3 <= ixLine2 && iCellLine < zLineVisibleMax; ++ixLine3){
+      iCellLine += setCellContentChild(outer.tableLines, ixLine1, iCellLine, zLineVisible);
+      /*
+      for(ixLine3 = ixLine1; ixLine3 <= ixLine2 && iCellLine < zLineVisible; ++ixLine3){
         //cells with content
         GralTable.TableLineData<?> line = outer.tableLines.get(ixLine3);
-        line.lineInGraphic = iCellLine;
         int ctredraw = line.ctRepaintLine.get();
         if(ctredraw > 0 || true){
           for(int iCellCol = 0; iCellCol < outer.zColumn; ++iCellCol){
@@ -1003,11 +1009,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           line.ctRepaintLine.compareAndSet(ctredraw, 0);  
         }
       }
-      while(ixLine3 < outer.zLine){
-        GralTable.TableLineData<?> line = outer.tableLines.get(ixLine3);
-        line.lineInGraphic = -1;
-        ixLine3 +=1;
-      }
+      */
       long dbgtime2 = System.currentTimeMillis() - dbgtime;
       while( iCellLine < zLineVisible) { //Max){
         for(int iCellCol = 0; iCellCol < outer.zColumn; ++iCellCol){
@@ -1049,6 +1051,40 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
 
     
+    
+    
+    private int setCellContentChild(List<?> lines, int ixBegin, int iShowLineBegin, int zShowLines){
+      int zShowLinesRest = zShowLines;
+      int iCellLine = iShowLineBegin;
+      int zLines = lines.size();
+      int ix = ixBegin;
+      while(ix < zLines && --zShowLinesRest >0 ){
+        GralTable.TableLineData<?> line = (GralTable.TableLineData<?>)lines.get(ix);
+        int ctredraw = line.ctRepaintLine.get();
+        if(ctredraw > 0 || true){
+          for(int iCellCol = 0; iCellCol < outer.zColumn; ++iCellCol){
+            //
+            //draw the content of the cell in the graphic implementation.
+            //CellData widgiData = 
+              drawCellContent(iCellLine, iCellCol, line);
+            //widgiData.tableItem = line;  //The widgiData are assigned to the implementation graphic cell.
+          }
+          iCellLine +=1;
+          //Thread safety: set to 0 only if it isn't changed between quest and here.
+          //Only then the text isn't changed.
+          line.ctRepaintLine.compareAndSet(ctredraw, 0);  
+        }
+        ix +=1;
+        if(line.childLines !=null){
+          iCellLine += setCellContentChild(line.childLines, 0, iCellLine, zShowLinesRest);
+        }
+        
+      }
+      return iCellLine - iShowLineBegin;
+    }
+    
+    
+    
 
     /**This routine will be called inside a resize listener of the implementation graphic.
      * It calculates the width of the columns with the given width of the table's canvas.
@@ -1058,7 +1094,13 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      */
     protected void resizeTable(GralRectangle pixTable) {
       int xPixelUnit = itsMng().propertiesGui().xPixelUnit();
-      int xPixel1 = 0;
+      int yPixelUnit = itsMng().propertiesGui().yPixelUnit();
+      zLineVisible = pixTable.dy / yPixelUnit;
+      if(zLineVisible > zLineVisibleMax){ zLineVisible = zLineVisibleMax; }
+      for(int ii=0; ii<zLineVisible; ++ii){
+        TableLineData<?> line = cells[ii][0].tableItem;
+      }
+      int xPixel1 = 20;
       xpixelCell[0] = xPixel1;
       int ixPixelCell;
       int xPos;
@@ -1178,6 +1220,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * null it the children are unknown or there are not children.
      */
     protected ArrayList<TableLineData<UserData>> childLines;
+    
+    protected TableLineData<UserData> parentLine;
 
     /**True if it is known that the node has children. They may be unknown, then {@link #childLines} are null. */
     boolean hasChildren;
@@ -1190,9 +1234,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * redraw runs but isn't finished, it should be executed a second time. Therefore it isn't reset to 0. 
      */
     public AtomicInteger ctRepaintLine = new AtomicInteger();  //NOTE should be public to see it from derived outer class
-    
-    /**The line visible in graphic. -1 if not visible.*/
-    int lineInGraphic = -1;
     
     /**The deepness in the tree presentation of the data.
      * 
@@ -1226,13 +1267,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         childLines = new ArrayList<TableLineData<UserData>>(); 
       }
       TableLineData<UserData> line = new TableLineData<UserData>(outer);
+      line.parentLine = this;
       line.treeDepth = this.treeDepth +1;
       int zLine = childLines.size();
       int row =  rowP > zLine || rowP < 0 ? zLine : rowP;
       line.nLineNr = row;
       line.key = childKey;
       childLines.add(row, line);
-      if(cellTexts !=null){
+      if(childTexts !=null){
         for(int ixCol = 0; ixCol < childTexts.length && ixCol < line.cellTexts.length; ++ixCol){
           line.cellTexts[ixCol] = childTexts[ixCol];
         }
@@ -1284,6 +1326,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
 
 
+    
+    public TableLineData<UserData> parentNode(){ return parentLine; }
     
     @Override public String getName(){ return outer.name; }
     
