@@ -832,7 +832,12 @@ public final class InspcCurveView
             if(track !=null && (sDataPath = track.getDataPath()) !=null && sDataPath.length() >0){
               out.append("track ").append("Track").append(Integer.toString(ix)).append(":");
               out.append(" datapath=").append(sDataPath);
-              out.append(", color=").append(track.getLineColor().toString());
+              GralColor lineColor = track.getLineColor();
+              if(lineColor !=null){
+                out.append(", color=").append(track.getLineColor().toString());
+              } else {
+                out.append(", color=0x000000");
+              }
               out.append(", scale=").append(Float.toString(track.getScale7div()));
               out.append(", offset=").append(Float.toString(track.getOffset()));
               out.append(", 0-line-percent=").append(Integer.toString(track.getLinePercent()));

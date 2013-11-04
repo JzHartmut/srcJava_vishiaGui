@@ -311,6 +311,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
       }
       acknChanged(acknChg);
       if(widgg.isVisible()){   
+        //setCellContentNew();
         setAllCellContentGthread();
         Color colorSelectBack =  swtWidgWrapper.mng.getColorImpl(super.colorSelectCharsBack());
         Color colorSelect =  swtWidgWrapper.mng.getColorImpl(super.colorSelectChars());

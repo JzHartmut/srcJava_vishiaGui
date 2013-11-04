@@ -53,7 +53,7 @@ public class Bzr
       String sBzrDir = FileSystem.getCanonicalPath(currDir);
       DataAccess.setVariable(dst, bzrdir, 'S', sBzrDir);
       //dst.put(bzrdir, sBzrDir);
-      if(fBzr.getName().equals(".bzr.bat")){
+      if(!fBzr.getName().equals(".bzr")){   //one of the batch files found
         String sLine = FileSystem.grep1line(fBzr, "bzr_mvExpl.bat");
         if(sLine !=null){
           int pos = sLine.indexOf("bzr_mvExpl.bat");
