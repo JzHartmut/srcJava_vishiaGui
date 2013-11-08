@@ -57,7 +57,7 @@ public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, MarkMask_if
   
   int getSelectedColumn();
   
-  GralTableLine_ifc<UserData> insertChildLine(String childKey, int rowP, String[] childTexts, UserData data);
+  GralTableLine_ifc<UserData> addChildLine(String childKey, String[] childTexts, UserData data);
 
   GralTableLine_ifc<UserData> parentNode();  
 }

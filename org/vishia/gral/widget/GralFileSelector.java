@@ -839,6 +839,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
     } else {
       dir = fileIn; file = null;
     }
+    if(originDir == null){ 
+      originDir = dir;    //should exist in any case.
+    }
     fileIn.internalAccess().setRefreshed();
     boolean bSameDirectory = dir == currentDir;
     if(!bSameDirectory || !fillinPending){  //new request anytime if other directory, or if it is not pending.

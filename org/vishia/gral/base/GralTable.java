@@ -1,6 +1,7 @@
 package org.vishia.gral.base;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -223,7 +224,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   protected ArrayList<TableLineData<UserData>> tableLines = new ArrayList<TableLineData<UserData>>();
   
   
-  
+  TreeNodeBase<TableLineData<UserData>, UserData, GralTableLine_ifc<UserData>> rootLine;
   
   /**True if a line or a column is marked. */
   //protected boolean[] markedLines, markedColumns;
@@ -250,6 +251,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   
+  @SuppressWarnings({ "unchecked", "cast" })
   public GralTable(String name, int[] columnWidths) {
     super(name, 'L', null);
     this.columnWidthsGral = columnWidths;
@@ -257,8 +259,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     //this.colorBack = new GralColor[zLineVisibleMax];
     //this.colorText = new GralColor[zLineVisibleMax];
     ixLineNew = ixLine = -1;
-
-    cellLines = new TableLineData[50];
+    
+    rootLine = new TreeNodeBase<TableLineData<UserData>, UserData, GralTableLine_ifc<UserData>>("", null);
+    
+    TableLineData[] array1 = new TableLineData[50];
+    cellLines = (TableLineData<UserData>[])array1;
     setColors();
   }
 
@@ -1037,7 +1042,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       long dbgtime1 = System.currentTimeMillis() - dbgtime;
       int ixLine3;
       iCellLine = 0;
-      iCellLine += setCellContentChild(outer.tableLines, ixLine1, iCellLine, zLineVisible);
+      iCellLine += setCellContentChild(outer.tableLines.iterator(), ixLine1, iCellLine, zLineVisible);
       /*
       for(ixLine3 = ixLine1; ixLine3 <= ixLine2 && iCellLine < zLineVisible; ++ixLine3){
         //cells with content
@@ -1101,13 +1106,13 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     
     
-    private int setCellContentChild(List<?> lines, int ixBegin, int iShowLineBegin, int zShowLines){
+    private int setCellContentChild(Iterator<?> lines, int ixBegin, int iShowLineBegin, int zShowLines){
       int zShowLinesRest = zShowLines;
       int iCellLine = iShowLineBegin;
-      int zLines = lines.size();
+      //int zLines = lines.size();
       int ix = ixBegin;
-      while(ix < zLines && --zShowLinesRest >0 ){
-        GralTable.TableLineData<?> line = (GralTable.TableLineData<?>)lines.get(ix);
+      while(lines.hasNext() && --zShowLinesRest >0 ){
+        GralTable.TableLineData<?> line = (GralTable.TableLineData<?>)lines.next();
         int ctredraw = line.ctRepaintLine.get();
         if(ctredraw > 0 || true){
           for(int iCellCol = 0; iCellCol < outer.zColumn; ++iCellCol){
@@ -1123,8 +1128,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           line.ctRepaintLine.compareAndSet(ctredraw, 0);  
         }
         ix +=1;
-        if(line.childNodes !=null){
-          iCellLine += setCellContentChild(line.childNodes, 0, iCellLine, zShowLinesRest);
+        if(line.hasChildren()){
+          iCellLine += setCellContentChild(line.iterator(), 0, iCellLine, zShowLinesRest);
         }
         
       }
@@ -1388,18 +1393,13 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
     
     
-    public GralTableLine_ifc<UserData> insertChildLine(String childKey, int rowP, String[] childTexts, UserData data){
-      if(childNodes == null){ 
-        hasChildren = true;
-        //childNodes = new ArrayList<TableLineData<UserData>>(); 
-      }
+    public GralTableLine_ifc<UserData> addChildLine(String childKey, String[] childTexts, UserData data){
+      hasChildren = hasChildren();
       TableLineData<UserData> line = new TableLineData<UserData>(outer);
-      super.addNode(line, rowP);
+      super.addNode(line);
       //line.parentLine = this;
       line.treeDepth = this.treeDepth +1;
-      int zLine = childNodes.size();
-      int row =  rowP > zLine || rowP < 0 ? zLine : rowP;
-      line.nLineNr = row;
+      line.nLineNr = 0;
       line.key = childKey;
       //childLines.add(row, line);
       if(childTexts !=null){
@@ -1412,10 +1412,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       if(key !=null){
         //outer.idxLine.put(this.key + '.' + key, line);
       }
+      /*
       for(int ii=row+1; ii < zLine; ++ii){
         TableLineData<UserData> line2 = childNodes.get(ii);
         line2.nLineNr = ii;
       }
+      */
       if(this.showChildren){
         repaint(100, 0);
       }

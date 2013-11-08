@@ -107,7 +107,7 @@ public class GralCommandSelector extends GralSelectList<CmdStore.CmdBlock>
         line.setCellText(data.title, 1);
       } else {
         level = data.level;
-        line = line.insertChildLine(data.name, -1, null, data);
+        line = line.addChildLine(data.name, null, data);
         line.setCellText(data.name, 0);
         line.setCellText(data.title, 1);
       }

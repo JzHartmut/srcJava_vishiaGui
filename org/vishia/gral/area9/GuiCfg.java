@@ -24,6 +24,7 @@ import org.vishia.inspector.Inspector;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.MsgDispatchSystemOutErr;
+import org.vishia.util.KeyCode;
 
 /**This class is the basic class for configurable GUI applications with 9-Area Main window.
  * It works without any derivation, if only simple widgets are necessary.
@@ -425,7 +426,7 @@ private final GralUserAction cmdInvoke = new GralUserAction("cmdInvoke")
 protected GralUserAction actionFile = new GralUserAction("actionFile")
 { @Override public boolean userActionGui(int key, GralWidget widg, Object... params)
   {
-    if(widg.name.equals("menuFileSave")){
+    if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
       String sError = null;
       try{
         Writer writer = new FileWriter(cargs.fileGuiCfg); //"save.cfg");
