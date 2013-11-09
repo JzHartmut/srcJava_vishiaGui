@@ -1,11 +1,16 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.gral.base.GralTable;
 import org.vishia.util.MarkMask_ifc;
 import org.vishia.util.SortedTree;
+import org.vishia.util.TreeNode_ifc;
 
 
 
-public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, MarkMask_ifc, SortedTree<GralTableLine_ifc<UserData>>
+public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, MarkMask_ifc
+, SortedTree<GralTableLine_ifc<UserData>>
+//, TreeNode_ifc<GralTable.TableLineData<UserData>, UserData>
+, TreeNode_ifc<GralTable.TableLineData<UserData>, UserData>
 {
 
   /**Version, history and license.
@@ -59,5 +64,11 @@ public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, MarkMask_if
   
   GralTableLine_ifc<UserData> addChildLine(String childKey, String[] childTexts, UserData data);
 
+  
+  GralTableLine_ifc<UserData> addNextLine(String childKey, String[] childTexts, UserData data);
+
+  
+  
+  
   GralTableLine_ifc<UserData> parentNode();  
 }

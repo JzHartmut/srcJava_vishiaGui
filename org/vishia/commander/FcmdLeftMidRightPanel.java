@@ -435,8 +435,8 @@ public class FcmdLeftMidRightPanel
       @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
         if(actionCode == KeyCode.tableLineSelect){
           mainPanel.bFavorThemeCardHasFocus = true;
-          GralTableLine_ifc line = (GralTableLine_ifc) params[0];
-          Object oData = line.getUserData();
+          //GralTableLine_ifc line = (GralTableLine_ifc) params[0];
+          //Object oData = line.getUserData();
           //System.out.println("FcmdFavorCard.actionFavorSelected: " + fileTable.label);
         }
         return true;

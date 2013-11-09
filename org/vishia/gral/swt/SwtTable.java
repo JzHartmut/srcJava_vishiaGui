@@ -543,7 +543,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
       int ixColumn = 0;
       for(Text cell: row){
         CellData celldata = (CellData)cell.getData();
-        int xleft = celldata.tableItem !=null ? (celldata.tableItem.treeDepth - treeDepthBase) * xPixelUnit : 0;
+        int xleft = celldata.tableItem !=null ? (celldata.tableItem.treeDepth() - treeDepthBase) * xPixelUnit : 0;
         cell.setBounds(xleft + xpixelCell[ixColumn], yPix, xpixelCell[ixColumn+1] - xpixelCell[ixColumn], linePixel);
         ixColumn +=1;
       }

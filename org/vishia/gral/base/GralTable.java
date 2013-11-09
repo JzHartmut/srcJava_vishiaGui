@@ -512,7 +512,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   
-  @Override public GralTableLine_ifc<UserData> insertLine(String key, int row, String[] cellTexts, UserData userData) {
+  @Override public TableLineData<UserData> insertLine(String key, int row, String[] cellTexts, UserData userData) {
     TableLineData<UserData> line = new TableLineData<UserData>(this);
     
     zLine = tableLines.size();
@@ -551,7 +551,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   
   
-  @Override public GralTableLine_ifc<UserData> addLine(String key, String[] cellTexts, UserData userData) {
+  @Override public TableLineData<UserData> addLine(String key, String[] cellTexts, UserData userData) {
     TableLineData<UserData> line = new TableLineData<UserData>(this);
     if(selectLine == null){ 
       selectLine = line;
@@ -599,6 +599,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       ixLineNew = ixLine = -1;
       gi.ixGlineSelectedNew = -1;  //deselects ixGlineSelected on redraw!
     }
+    bFillCells = true;
     prepareVisibleArea();
     repaint(200,200);
   }
@@ -642,6 +643,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       cellLines[ix] = null;
     }
     rootLine.removeChildren();
+    bFillCells = true;
     prepareVisibleArea();
     repaint(200,200);
   }
@@ -1433,7 +1435,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
       Assert.check(outer.itsMng.currThreadIsGraphic());
       TableLineData<?> line;
-      //outer.prepareVisibleArea();
+      
+      if(outer.bFillCells){
+        outer.prepareVisibleArea();
+        outer.bFillCells = false;
+      }
       ////
       //Now draw:
       //
@@ -1575,7 +1581,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    *
    */
   public final static class TableLineData<UserData> 
-  extends TreeNodeBase<TableLineData<UserData>, UserData, GralTableLine_ifc<UserData>> implements MarkMask_ifc, GralTableLine_ifc<UserData>
+  extends TreeNodeBase<TableLineData<UserData>, UserData, GralTableLine_ifc<UserData>> 
+  implements MarkMask_ifc, GralTableLine_ifc<UserData>
   {
 
     /**The aggregated table. */
@@ -1606,7 +1613,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     /**The deepness in the tree presentation of the data.
      * 
      */
-    public int treeDepth;
+    private int treeDepth;
     
     /**The index number in the container {@link GralTable#tableLines}. It is necessary to find out
      * the line in the container if the line is given. Conclusion from line to tableLines.get(line.nLineNr). */
@@ -1630,7 +1637,28 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
     
     
-    public GralTableLine_ifc<UserData> addChildLine(String childKey, String[] childTexts, UserData data){
+    public GralTableLine_ifc<UserData> addNextLine(String keyP, String[] texts, UserData userDataP){
+      //hasChildren = hasChildren();
+      TableLineData<UserData> line = new TableLineData<UserData>(outer);
+      line.key = keyP;
+      super.addSiblingNext(line);
+      //line.parentLine = this;
+      line.treeDepth = this.treeDepth;
+      line.nLineNr = 0;
+      //childLines.add(row, line);
+      if(texts !=null){
+        for(int ixCol = 0; ixCol < texts.length && ixCol < line.cellTexts.length; ++ixCol){
+          line.cellTexts[ixCol] = texts[ixCol];
+        }
+      }
+      line.userData = userDataP;
+      outer.bFillCells = true;
+      return line;
+
+    }
+    
+    
+    public GralTableLine_ifc<UserData> addChildLine(String childKey, String[] childTexts, UserData userDataP){
       hasChildren = hasChildren();
       TableLineData<UserData> line = new TableLineData<UserData>(outer);
       line.key = childKey;
@@ -1644,7 +1672,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           line.cellTexts[ixCol] = childTexts[ixCol];
         }
       }
-      line.userData = userData;
+      line.userData = userDataP;
       outer.bFillCells = true;
       if(key !=null){
         //outer.idxLine.put(this.key + '.' + key, line);
@@ -1709,6 +1737,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
     @Override public String[] getCellTexts() { return cellTexts; }
 
+    
+    public int treeDepth(){ return treeDepth; }
+    
     @Override
     public String setCellText(String text, int column) {
       String oldText = cellTexts[column];

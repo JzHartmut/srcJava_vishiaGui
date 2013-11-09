@@ -924,7 +924,13 @@ public class GralFileSelector implements Removeable //extends GralWidget
       if(!found[0]){ //no such line with this file
         int row = tline == null ? 0 : tline.getLineNr()+1;
         String name = file1.getName();  //use the file name as key in the table for the table line.
-        tline = selectList.wdgdTable.addLine(name, null, file1);
+        if(tline ==null){
+          //on empty table, first line.
+          tline = selectList.wdgdTable.insertLine(name, 0, null, file1);
+        }else {
+          //insert after found line.
+          tline = tline.addNextLine(name, null, file1);
+        }
         tline.setCellText(file1.getName(), kColFilename);
         idxLines.add(key, tline);
       }
@@ -965,6 +971,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
         selectList.wdgdTable.setCurrentCell(lineSelect1, 1);
         currentFile = tline.getUserData();  //adjust the file if the currentFile was not found exactly.
       }
+      selectList.wdgdTable.repaint(100, 200);
       fillinPending = false;
     }
     return 1;

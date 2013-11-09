@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.fileRemote.FileRemote;
+import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -252,8 +253,8 @@ public class FcmdFavorCard  extends GralSelectList
         mainPanel.bFavorThemeCardHasFocus = false;
         main.lastFavorCard = FcmdFavorCard.this;
         main.setLastSelectedPanel(mainPanel);
-        GralTableLine_ifc line = (GralTableLine_ifc) params[0];
-        Object oData = line.getUserData();
+        GralTable.TableLineData line = (GralTable.TableLineData) params[0];
+        //Object oData = line.getUserData();
         //System.out.println("FcmdFavorCard.actionFavorSelected: " + fileTable.label);
       }
       return true;

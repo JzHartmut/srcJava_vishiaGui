@@ -50,7 +50,7 @@ public class FcmdExecuter
   
   GralWindow_ifc windConfirmExec;
 
-  GralTable widgSelectExec;
+  GralTable<CmdBlock> widgSelectExec;
 
   /**Store of all possible commands given in the command file. */
   final CmdStore cmdStore = new CmdStore();
@@ -261,7 +261,7 @@ public class FcmdExecuter
       if(extensionCmd !=null){
         widgSelectExec.clearTable();
         for(CmdBlock block: extensionCmd.listCmd){
-          GralTableLine_ifc line = widgSelectExec.insertLine(block.name, 0, null, null);
+          GralTable.TableLineData line = widgSelectExec.insertLine(block.name, 0, null, null);
           line.setCellText(block.title, 0);
           line.setUserData(block);
         }
