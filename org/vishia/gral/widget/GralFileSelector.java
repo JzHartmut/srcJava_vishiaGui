@@ -242,20 +242,22 @@ public class GralFileSelector implements Removeable //extends GralWidget
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
       if(actionCode == KeyCode.tableLineSelect){
         GralTableLine_ifc line = (GralTableLine_ifc) params[0];
-        Object oData = line.getUserData();
-        if(oData instanceof FileRemote){
-          FileRemote file = (FileRemote)oData;  
-          currentFile = file;
-          if(file.exists()){
-            String sDir = file.getParent();
-            String sName = file.getName();
-            indexSelection.put(sDir, file);
-            //System.out.println("GralFileSelector: " + sDir + ":" + sName);
-            if(actionOnFileSelected !=null){
-              actionOnFileSelected.exec(0, selectList.wdgdTable, line, file);
-            }
-            if(line.getCellText(kColDesignation).startsWith("?")){
-              completeLine(line, file, System.currentTimeMillis());
+        if(line != null){
+          Object oData = line.getUserData();
+          if(oData instanceof FileRemote){
+            FileRemote file = (FileRemote)oData;  
+            currentFile = file;
+            if(file.exists()){
+              String sDir = file.getParent();
+              String sName = file.getName();
+              indexSelection.put(sDir, file);
+              //System.out.println("GralFileSelector: " + sDir + ":" + sName);
+              if(actionOnFileSelected !=null){
+                actionOnFileSelected.exec(0, selectList.wdgdTable, line, file);
+              }
+              if(line.getCellText(kColDesignation).startsWith("?")){
+                completeLine(line, file, System.currentTimeMillis());
+              }
             }
           }
         }
@@ -922,7 +924,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       if(!found[0]){ //no such line with this file
         int row = tline == null ? 0 : tline.getLineNr()+1;
         String name = file1.getName();  //use the file name as key in the table for the table line.
-        tline = selectList.wdgdTable.insertLine(name, row, null, file1);
+        tline = selectList.wdgdTable.addLine(name, null, file1);
         tline.setCellText(file1.getName(), kColFilename);
         idxLines.add(key, tline);
       }
@@ -1159,7 +1161,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
         //write < .. line for parent seletion.
         if(lineCt < zLines){ tline = selectList.wdgdTable.getLine(lineCt); }
         else {
-          tline = selectList.wdgdTable.insertLine("..", -1, null, null);
+          tline = selectList.wdgdTable.addLine("..", null, null);
           zLines +=1;
         }
         if(!tline.getCellText(kColFilename).equals("..")){
@@ -1187,7 +1189,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
             Assert.stop();
         }
         else {
-          tline = selectList.wdgdTable.insertLine(sFileName, -1, null, null);
+          tline = selectList.wdgdTable.addLine(sFileName, null, null);
           zLines +=1;
         }
         String sCell = tline.getCellText(kColFilename);
@@ -1238,7 +1240,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
         line[kColDesignation] = "";
         line[kColFilename] = "--empty--";
         line[kColDate] = "";
-        selectList.wdgdTable.insertLine(null, -1, line, null);
+        selectList.wdgdTable.addLine(null, line, null);
         lineCt +=1;
       }
     } else {
@@ -1248,7 +1250,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       line[kColDesignation] = "";
       line[kColFilename] = "--not found-1--";
       line[kColDate] = "";
-      selectList.wdgdTable.insertLine(null, -1, line, null);
+      selectList.wdgdTable.addLine(null, line, null);
     }
     GralTableLine_ifc<FileRemote> currentLine = selectList.wdgdTable.getCurrentLine();
     if(currentLine == null || lineSelect1 != currentLine.getLineNr()){
@@ -1264,7 +1266,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     durationFillin = (int)(timeFillinFinished - timeFillinInvoked);
     if(lineCt < zLines){ tline = selectList.wdgdTable.getLine(lineCt); }
     else {
-      tline = selectList.wdgdTable.insertLine("..", -1, null, null);
+      tline = selectList.wdgdTable.addLine("..", null, null);
       zLines +=1;
     }
     selectList.wdgdTable.setBackColor(colorBack,0);

@@ -130,7 +130,7 @@ public class GuiSelectPanel
       cellTexts[2] = "?";
       cellTexts[3] = "?";
       DataCmpn dataCmpn = new DataCmpn(dirWorkingTree, dirArchive, dirRemoteArchive);
-      tableSelect.insertLine(nameCmpn, -1, cellTexts, dataCmpn);
+      tableSelect.addLine(nameCmpn, cellTexts, dataCmpn);
     }
   }
 

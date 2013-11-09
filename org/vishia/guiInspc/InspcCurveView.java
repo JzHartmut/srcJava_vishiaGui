@@ -280,7 +280,7 @@ public final class InspcCurveView
         if(track.colorCurve ==null){ throw new IllegalArgumentException("InspcCurveView-unknown color; " + sColor); }
         this.tracks[ii] = track;
         if(bTabWidget){
-          GralTableLine_ifc line = widgTableVariables.insertLine(null, -1, new String[]{""}, track);
+          GralTableLine_ifc line = widgTableVariables.addLine(null, new String[]{""}, track);
           line.setTextColor(track.colorCurve);
         } else {
           track.widgVarPath = gralMng.addTextField(null, true, sName, sName);
@@ -785,7 +785,7 @@ public final class InspcCurveView
                 sCellTexts[0] = sDataPath;
                 trackValue.colorCurve = track.getLineColor();
                 if(bTabWidget){
-                  GralTableLine_ifc line = widgTableVariables.insertLine(sDataPath, -1, sCellTexts, trackValue);
+                  GralTableLine_ifc line = widgTableVariables.addLine(sDataPath, sCellTexts, trackValue);
                   line.setTextColor(trackValue.colorCurve);
                 }
                 if(!bTabWidget){

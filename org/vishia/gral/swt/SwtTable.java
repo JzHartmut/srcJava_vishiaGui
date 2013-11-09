@@ -169,6 +169,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
     focusListenerTable = this.new FocusListenerTable(mng);
     focusListenerCell = this.new FocusListenerCell();
     setColorsSwt();    
+    int zLineVisibleMax = gralTable.nrofLinesVisibleMax();
     this.cellsSwt = new Text[zLineVisibleMax][zColumn()];
     this.cells = new CellData[zLineVisibleMax][zColumn()];
     Control swtTable = new SwtTable.Table(parent, zColumn(), mng);
@@ -311,8 +312,8 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
       }
       acknChanged(acknChg);
       if(widgg.isVisible()){   
-        //setCellContentNew();
-        setAllCellContentGthread();
+        setCellContentNew();
+        //setAllCellContentGthread();
         Color colorSelectBack =  swtWidgWrapper.mng.getColorImpl(super.colorSelectCharsBack());
         Color colorSelect =  swtWidgWrapper.mng.getColorImpl(super.colorSelectChars());
         if(super.searchChars().length() >0){
@@ -379,7 +380,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   @Override public void removeWidgetImplementation() {
     // TODO Auto-generated method stub
     if(!swtWidgWrapper.widgetSwt.isDisposed()){
-      for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){
+      for(int iRow = 0; iRow < cellsSwt.length; ++iRow){
         for(int iCol = 0; iCol < zColumn(); ++iCol){
           Text cell = cellsSwt[iRow][iCol];
           cell.dispose();
@@ -420,41 +421,60 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   /**This routine implements all things to set the content of any table cell to show it.
    * @see org.vishia.gral.base.GralTable#drawCellContent(int, int, org.vishia.gral.base.GralTable.TableLineData)
    */
-  @Override protected void drawCellContent(int iCellLine, int iCellCol, GralTable.TableLineData tableItem ){
-    Text cellSwt = cellsSwt[iCellLine][iCellCol]; 
-    CellData cellData = (CellData)cellSwt.getData();
-    cellData.tableItem = tableItem;
-    //
-    String text = tableItem.cellTexts[iCellCol];
-    if(text == null){ text = ""; }
-    //
-    cellSwt.setText(text);
-    GralColor colorBack;
-    boolean marked = (tableItem.getMark() & 1)!=0;
-    if(isCurrentLine(tableItem.nLineNr)) { //the current line, but only if ixLineNew <0
-    //if(ixGlineSelectedNew() == iCellLine){
-      colorBack = marked ? colorBackSelectMarked() : colorBackSelect();
-    } else if(tableItem.colorBackground !=null){
-      colorBack = marked ? colorBackMarked() : tableItem.colorBackground;
+  @Override protected void drawCellContent(int iCellLine, GralTable.TableLineData<?> tableItem ){
+    Text[] textlineSwt = cellsSwt[iCellLine];
+    if(tableItem !=null){
+      for(int col=0; col < cells[0].length; ++col){
+        Text cellSwt = textlineSwt[col]; 
+        CellData cellData = (CellData)cellSwt.getData();
+        cellData.tableItem = tableItem;
+        //
+        String text = tableItem.cellTexts[col];
+        if(text == null){ text = ""; }
+        //
+        cellSwt.setText(text);
+        GralColor colorBack;
+        boolean marked = (tableItem.getMark() & 1)!=0;
+        if(isCurrentLine(tableItem)) { //the current line, but only if ixLineNew <0
+        //if(ixGlineSelectedNew() == iCellLine){
+          colorBack = marked ? colorBackSelectMarked() : colorBackSelect();
+        } else if(tableItem.colorBackground !=null){
+          colorBack = marked ? colorBackMarked() : tableItem.colorBackground;
+        } else {
+          colorBack = marked ? colorBackMarked() : colorBackTable();
+        }
+        if(cellData.colorBack != colorBack){
+          Color colorSwt =  swtWidgWrapper.mng.getColorImpl(colorBack);
+          cellSwt.setBackground(colorSwt);
+          cellData.colorBack = colorBack;  //for the visible cell swt widget, not for the table line!
+        }
+        GralColor colorText = tableItem.colorForground !=null ? tableItem.colorForground : colorTextTable();
+        if(colorText != cellData.colorText){
+          cellSwt.setForeground(swtWidgWrapper.mng.getColorImpl(colorText));
+          cellData.colorText = colorText;
+        }
+        if(ixGlineSelectedNew == iCellLine && col == ixColumn() && bFocused){
+          SwtWidgetHelper.setFocusOfTabSwt(cellSwt);
+        }
+    
+        cellSwt.setVisible(true);
+        cellSwt.redraw();
+      }
     } else {
-      colorBack = marked ? colorBackMarked() : colorBackTable();
+      //empty lines:
+      GralColor colorBack = colorBackTable();
+      for(int col=0; col < cells[0].length; ++col){
+        Text cellSwt = textlineSwt[col]; 
+        CellData cellData = (CellData)cellSwt.getData();
+        cellData.tableItem = tableItem;
+        cellSwt.setText("");
+        if(cellData.colorBack != colorBack){
+          Color colorSwt =  swtWidgWrapper.mng.getColorImpl(colorBack);
+          cellSwt.setBackground(colorSwt);
+          cellData.colorBack = colorBack;  //for the visible cell swt widget, not for the table line!
+        }
+      }
     }
-    if(cellData.colorBack != colorBack){
-      Color colorSwt =  swtWidgWrapper.mng.getColorImpl(colorBack);
-      cellSwt.setBackground(colorSwt);
-      cellData.colorBack = colorBack;  //for the visible cell swt widget, not for the table line!
-    }
-    GralColor colorText = tableItem.colorForground !=null ? tableItem.colorForground : colorTextTable();
-    if(colorText != cellData.colorText){
-      cellSwt.setForeground(swtWidgWrapper.mng.getColorImpl(colorText));
-      cellData.colorText = colorText;
-    }
-    if(ixGlineSelectedNew == iCellLine && iCellCol == ixColumn() && bFocused){
-      SwtWidgetHelper.setFocusOfTabSwt(cellSwt);
-    }
-
-    cellSwt.setVisible(true);
-    cellSwt.redraw();
   }
 
   
@@ -479,7 +499,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   @Override protected GralMenu createColumnMenu(int column){
     //GralMenu menuColumn = new SwtMenu(outer, swtWidgWrapper.widgetSwt, itsMng());
     GralMenu menuColumn = new SwtMenu(outer, cellsSwt[0][column], itsMng());
-    for(int iRow = 1; iRow < zLineVisibleMax; ++iRow){
+    for(int iRow = 1; iRow < cellsSwt.length; ++iRow){
       //uses the same menu instance in all cells of the column.
       cellsSwt[iRow][column].setMenu((Menu)menuColumn.getMenuImpl());
     }    
@@ -546,7 +566,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
     swtSearchText = new Text(swtTable, SWT.LEFT | SWT.SINGLE | SWT.READ_ONLY);
     swtSearchText.setFont(font);
     swtSearchText.setVisible(false);
-    for(int iRow = 0; iRow < zLineVisibleMax; ++iRow){
+    for(int iRow = 0; iRow < cellsSwt.length; ++iRow){
       for(int iCol = 0; iCol < zColumns; ++iCol){
         Text cell = new Text(swtTable, SWT.LEFT | SWT.SINGLE | SWT.READ_ONLY);
         cell.setFont(font);

@@ -92,29 +92,31 @@ public class GralCommandSelector extends GralSelectList<CmdStore.CmdBlock>
   {
     wdgdTable.clearTable();
     int level = 1;
-    GralTableLine_ifc<CmdStore.CmdBlock> line = null;
+    GralTableLine_ifc<CmdStore.CmdBlock> parentline = null, line = null;
     for(CmdStore.CmdBlock data: cmdStore.getListCmds()){
-      if(data.level == level || line == null){
-        line = wdgdTable.insertLine(data.name, -1, null, data);
+      if(data.level > level){
+        parentline = line;
+        level = data.level;
+      }
+      if(data.level == 1 || line == null){
+        line = wdgdTable.addLine(data.name, null, data);
         line.setCellText(data.name, 0);
         line.setCellText(data.title, 1);
       } else if(data.level < level){
         level = data.level;
         GralTableLine_ifc<CmdStore.CmdBlock> parent = line.parentNode();
         if(parent !=null){ line = parent;}
-        line = wdgdTable.insertLine(data.name, -1, null, data);
+        line = wdgdTable.addLine(data.name, null, data);
         line.setCellText(data.name, 0);
         line.setCellText(data.title, 1);
-      } else {
-        level = data.level;
-        line = line.addChildLine(data.name, null, data);
+      } else {  //level >=2
+        line = parentline.addChildLine(data.name, null, data);
         line.setCellText(data.name, 0);
         line.setCellText(data.title, 1);
       }
     }
     wdgdTable.repaint();
   }
-  
   
   
   

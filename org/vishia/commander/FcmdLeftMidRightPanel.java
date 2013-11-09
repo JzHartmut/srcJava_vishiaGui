@@ -184,9 +184,9 @@ public class FcmdLeftMidRightPanel
     final String[] cells = new String[2];
     cells[0] = "";
     cells[1] = from1;
-    cardFavorThemes.wdgdTable.insertLine(null, -1, cells, favorFolderFrom1);
+    cardFavorThemes.wdgdTable.addLine(null, cells, favorFolderFrom1);
     cells[1] = from2;
-    cardFavorThemes.wdgdTable.insertLine(null, -1, cells, favorFolderFrom2);
+    cardFavorThemes.wdgdTable.addLine(null, cells, favorFolderFrom2);
 
     //List of favor pathes for this main panel
     for(FcmdFavorPathSelector.FavorFolder favorFolder: main.favorPathSelector.listAllFavorPathFolders){ //panel specific favorites
@@ -326,7 +326,7 @@ public class FcmdLeftMidRightPanel
         String[] cells = new String[2];
         cells[0] = favorTabInfo.label;
         cells[1] = favorTabInfo.selectNameTab;
-        GralTableLine_ifc line = wdgdTable.insertLine(null, -1, cells, favorTabInfo);
+        GralTableLine_ifc line = wdgdTable.addLine(null, cells, favorTabInfo);
         //line.setUserData(favorTabInfo);
         //line.setCellText(favorTabInfo.label, 0);
         //line.setCellText(favorTabInfo.selectNameTab, 1);

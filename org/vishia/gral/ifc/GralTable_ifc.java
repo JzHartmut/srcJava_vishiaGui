@@ -143,6 +143,19 @@ public interface GralTable_ifc<UserData> extends GralWidget_ifc
    */
   public abstract GralTableLine_ifc<UserData> insertLine(String key, int row, String[] cellTexts, UserData userData);
   
+  /**Inserts a line in the table with given content.
+   * @param key The key to get it.
+   * @param row The row where the line should be inserted before. 0 - insert on top. 
+   *        negative or Integer.MAXINT or number greater as number of rows: append on end.
+   * @param cellTexts texts of the cells. May be null.
+   * @param userData data assigned to the line, able to get with {@link GralTableLine_ifc#getUserData()}.
+   * @return instance to add info.
+   * @see {@link GralTableLine_ifc} to add content.
+   */
+  public abstract GralTableLine_ifc<UserData> addLine(String key, String[] cellTexts, UserData userData);
+  
+
+  
   /**Deletes a line in the table.
    * 
    */

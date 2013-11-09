@@ -124,7 +124,7 @@ public class GralMsgOutputList  implements LogMessage
       Assert.consoleErr("GuiMainDialog:insertInfo: unknown widget; %s; message:%d;%s;\n", "msgOfDay", identNumber, sText);
     } else {
       GralTable_ifc table = (GralTable)oTable;
-      GralTableLine_ifc line = table.insertLine(null, Integer.MAX_VALUE, sInfoLine, null);
+      GralTableLine_ifc line = table.addLine(null, sInfoLine, null);
       int nLine = line.getLineNr();
       table.setCurrentLine(nLine);
     }
