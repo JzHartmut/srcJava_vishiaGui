@@ -1411,7 +1411,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         GralTable.TableLineData<?> line = (GralTable.TableLineData<?>)lines.next();
         int ctredraw = line.ctRepaintLine.get();
         if(ctredraw > 0 || true){
-          drawCellContent(iCellLine, line);
+          drawCellContent(iCellLine, line, -1);
           iCellLine +=1;
           //Thread safety: set to 0 only if it isn't changed between quest and here.
           //Only then the text isn't changed.
@@ -1446,7 +1446,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       int ix = -1;
       while(++ix < outer.zLineVisible) {
         line = outer.cellLines[ix];
-        drawCellContent(ix, line);
+        int focusCell = line == outer.selectLine ? 1: -1;
+        drawCellContent(ix, line, focusCell);
       }
       outer.timeLastRedraw = System.currentTimeMillis();
       //System.out.println("GralTable - redraw;" + timeLastRedraw - dbgTime);
@@ -1521,7 +1522,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
 
 
-    protected abstract void drawCellContent(int iCellLine, GralTable.TableLineData<?> tableItem );
+    protected abstract void drawCellContent(int iCellLine, GralTable.TableLineData<?> tableItem, int focusCell );
 
     protected abstract CellData drawCellInvisible(int iCellLine, int iCellCol);
 

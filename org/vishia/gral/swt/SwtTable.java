@@ -2,6 +2,9 @@ package org.vishia.gral.swt;
 
 
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -312,7 +315,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
       }
       acknChanged(acknChg);
       if(widgg.isVisible()){   
-        setCellContentNew();
+        setCellContentNew();  //invokes drawCellContent(...) with the correct lines.
         //setAllCellContentGthread();
         Color colorSelectBack =  swtWidgWrapper.mng.getColorImpl(super.colorSelectCharsBack());
         Color colorSelect =  swtWidgWrapper.mng.getColorImpl(super.colorSelectChars());
@@ -348,9 +351,10 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
    * TODO this method must call in the graphic thread yet, queue it with {@link GralMng#setInfo(GralWidget, int, int, Object, Object)}.
    */
   @Override public boolean setFocusGThread()
-  { if(ixGlineSelectedNew >=0 && ixColumn() >=0){
+  { if(true || ixGlineSelectedNew >=0 && ixColumn() >=0){
       //System.out.println("test SwtTable.setFocus-1");
-      redrawTableWithFocusedCell(cellsSwt[ixGlineSelectedNew][ixColumn()]);
+      //redrawTableWithFocusedCell(cellsSwt[ixGlineSelectedNew][ixColumn()]);
+      redrawTableWithFocusedCell(cellsSwt[0][ixColumn()]);
       return true;
     } else {
       //System.out.println("test SwtTable.setFocus-2");
@@ -421,7 +425,7 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
   /**This routine implements all things to set the content of any table cell to show it.
    * @see org.vishia.gral.base.GralTable#drawCellContent(int, int, org.vishia.gral.base.GralTable.TableLineData)
    */
-  @Override protected void drawCellContent(int iCellLine, GralTable.TableLineData<?> tableItem ){
+  @Override protected void drawCellContent(int iCellLine, GralTable.TableLineData<?> tableItem, int focusCell ){
     Text[] textlineSwt = cellsSwt[iCellLine];
     if(tableItem !=null){
       for(int col=0; col < cells[0].length; ++col){
@@ -456,7 +460,22 @@ public class SwtTable  extends GralTable.GraphicImplAccess  implements GralWidgI
         if(ixGlineSelectedNew == iCellLine && col == ixColumn() && bFocused){
           SwtWidgetHelper.setFocusOfTabSwt(cellSwt);
         }
-    
+        if(focusCell == col){
+          cellSwt.setFocus();
+          System.out.println("Table-setFocus" + tableItem);
+          /*
+          List<Control> parents = new LinkedList<Control>();
+          Control parent = cellSwt;
+          while(parent !=null) {
+            parents.add(parent);
+            parent = parent.getParent();
+          }
+          while( parents.size() >0){
+            parent = parents.remove(parents.size()-1);
+            parent.setFocus();
+          }
+          */
+        }
         cellSwt.setVisible(true);
         cellSwt.redraw();
       }

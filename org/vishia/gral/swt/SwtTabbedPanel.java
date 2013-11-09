@@ -132,7 +132,8 @@ public class SwtTabbedPanel extends GralTabbedPanel
 	 * @see org.vishia.gral.base.GralTabbedPanel#selectTab(java.lang.String)
 	 */
 	@Override public GralPanelContent selectTab(String name)
-	{ assert(false);
+	{ //assert(false);
+	  
 	  GralPanelContent panel = mng.getPanel(name);
 	  if(panel instanceof SwtPanel){
   	  SwtPanel swtPanel = (SwtPanel)panel;

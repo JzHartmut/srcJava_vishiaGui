@@ -168,6 +168,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-11-11 Hartmut chg: {@link #setFocus()} searches the {@link GralTabbedPanel} where the widget is
+   *   member of and invokes its {@link GralTabbedPanel#selectTab(String)}. It is not correct that the graphic
+   *   implementation layer does that itself. 
    * <li>2013-06-29 Hartmut new: {@link #setToPanel(GralMngBuild_ifc)} as common method.
    * <li>2013-06-16 Hartmut new {@link #wdgImpl}. This instance was present in the past but removed. The concept is re-activated
    *   because a graphic-implementation-independent GralWidget instance can have any generic types
@@ -1165,6 +1168,18 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @param latest 
    */
   public final void setFocus(int delay, int latest){
+    
+    GralPanelContent panel1 = pos.panel;
+    while(panel1 !=null && panel1.pos() !=null){
+      GralPanelContent panel2 = panel1.pos().panel;
+      if(panel2 instanceof GralTabbedPanel){
+        GralTabbedPanel panelTabbed = (GralTabbedPanel)panel2;
+        
+        String name = panel1.getName();
+        panelTabbed.selectTab(name);
+      }
+      panel1 = panel2;
+    }
     if(delay == 0 && itsMng.currThreadIsGraphic()){
       setVisibleState(true);  //has focus, 
       setFocusGThread();
