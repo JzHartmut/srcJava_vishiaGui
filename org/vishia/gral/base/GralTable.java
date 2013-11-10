@@ -1446,7 +1446,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       int ix = -1;
       while(++ix < outer.zLineVisible) {
         line = outer.cellLines[ix];
-        int focusCell = line == outer.selectLine ? 1: -1;
+        int focusCell = -1; //line == outer.selectLine ? 1: -1;
         drawCellContent(ix, line, focusCell);
       }
       outer.timeLastRedraw = System.currentTimeMillis();
@@ -1507,6 +1507,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      */
     protected boolean redrawTableWithFocusedCell(CellData data){
       if(data.tableItem !=null){ //don't do any action if the cell isn't use.
+        //TODO outer.selectLine = data.tableItem;
         outer.ixLineNew = data.tableItem.nLineNr; //data.ixCellLine + ixLine1;
         if(outer.ixLineNew >= outer.zLine){ //files may be deleted 
           outer.ixLineNew = outer.zLine >0 ? 0 : -1;  //select the first line or select nothing.

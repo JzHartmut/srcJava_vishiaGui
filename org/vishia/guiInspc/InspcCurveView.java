@@ -669,17 +669,21 @@ public final class InspcCurveView
   GralUserAction actionSelectVariableInTable = new GralUserAction("actionSelectOrChgVarPath"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       GralTableLine_ifc line = (GralTableLine_ifc)params[0];
-      TrackValues track = (TrackValues)line.getContentInfo();
-      if(trackScale !=null){
-        trackScale.trackView.setLineProperties(trackScale.colorCurve, 1, 0);
+      if(line !=null){
+        TrackValues track = (TrackValues)line.getContentInfo();
+        if(track !=null){
+          if(trackScale !=null){
+            trackScale.trackView.setLineProperties(trackScale.colorCurve, 1, 0);
+          }
+          InspcCurveView.this.trackScale = track;
+          trackScale.trackView.setLineProperties(trackScale.colorCurve, 3, 0);
+          widgScale.setText("" + track.trackView.getScale7div());
+          widgScale0.setText("" + track.trackView.getOffset());
+          widgline0.setText("" + track.trackView.getLinePercent());
+          System.out.println("InspcCurveView.action - SelectVariableInTable");
+          widgCurve.repaint(100, 200);
+        }
       }
-      InspcCurveView.this.trackScale = track;
-      trackScale.trackView.setLineProperties(trackScale.colorCurve, 3, 0);
-      widgScale.setText("" + track.trackView.getScale7div());
-      widgScale0.setText("" + track.trackView.getOffset());
-      widgline0.setText("" + track.trackView.getLinePercent());
-      System.out.println("InspcCurveView.action - SelectVariableInTable");
-      widgCurve.repaint(100, 200);
       return true;
     }
   };
