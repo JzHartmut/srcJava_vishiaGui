@@ -21,7 +21,6 @@ import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
 import org.vishia.util.SelectMask;
 import org.vishia.util.MarkMask_ifc;
-import org.vishia.util.SortedTree;
 import org.vishia.util.TreeNodeBase;
 
 /**This is the Gral class for a table. Its usage is independent of a graphical implementation layer.
@@ -67,7 +66,7 @@ import org.vishia.util.TreeNodeBase;
  */
 public final class GralTable<UserData> extends GralWidget implements GralTable_ifc<UserData> {
 
-  /**Version and history
+  /**Version, history and license
    * <ul>
    * <li>2013-10-03 Hartmut new: {@link TableLineData} now extends {@link TreeNodeBase}. It is a tree.
    * <li>2013-10-03 Hartmut new: {@link GraphicImplAccess#cells}, the {@link GraphicImplAccess.CellData} are able to access
@@ -167,7 +166,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * 
    */
   @SuppressWarnings("hiding")
-  public final static int version = 20130521;
+  public final static int version = 20131116;
 
   
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
@@ -196,11 +195,27 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   
   /**The currently selected cell. */
-  protected int ixCellLineSelect, ixCellColSelect;
+  protected int lineSelectedixCell, colSelectedixCellC;
   
+  protected int lineSelectedNewixCell;
   
-  protected TableLineData<UserData>[] cellLines;
+  /**Array of lines which are currently associated to the cells of the implementation layer.
+   * It means they are the showing lines. Note that the TableLineData referred with the {@link #rootLine}
+   * are all of the lines of the table. They are not associated to any graphic widget any time.
+   * Whether they are associated to a graphic widget or not is able to evaluate with this array.
+   * The cellLines[0] is the TableLineData of the first visible line in any case etc.
+   */
+  protected TableLineData<UserData>[] linesForCell;
 
+  /**The current line. */
+  protected TableLineData<UserData> lineSelected;
+  
+  
+  /**The line which is selected by mouse pressing, for right mouse menu. */
+  protected TableLineData<UserData> lineSelectedNew;
+  
+  
+  
   /**Index (subscript) of the current line and current column. 0 is the left column or top line.
    * -1 means that nothing is selected. 
    * ixLineNew == ixLine if the selection is not changed. ixLineNew will be changed outside
@@ -231,9 +246,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   TreeNodeBase<TableLineData<UserData>, UserData, GralTableLine_ifc<UserData>> rootLine;
   
-  
-  /**The current line. */
-  protected TableLineData<UserData> selectLine;
   
   /**True if a line or a column is marked. */
   //protected boolean[] markedLines, markedColumns;
@@ -267,7 +279,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   //protected CellData cellDataOnMousePressed;
   
   /**The colors. */
-  protected GralColor colorBackSelect, colorBackMarked, colorBackSelectMarked //, colorBackTable
+  protected GralColor colorBackSelect, colorBackMarked, colorBackSelectMarked, colorBackSelectNew, colorBackSelectNewMarked  //, colorBackTable
   //, colorBackSelectNonFocused, colorBackMarkedNonFocused, colorBackTableNonFocused
   , colorTextSelect, colorTextMarked;
   
@@ -294,8 +306,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     rootLine = new TreeNodeBase<TableLineData<UserData>, UserData, GralTableLine_ifc<UserData>>("", null);
     
     TableLineData[] array1 = new TableLineData[50];
-    cellLines = (TableLineData<UserData>[])array1;
-    zLineVisibleMax = cellLines.length;
+    linesForCell = (TableLineData<UserData>[])array1;
+    zLineVisibleMax = linesForCell.length;
     setColors();
   }
 
@@ -443,8 +455,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   public void setColors(){
     colorBackSelect = GralColor.getColor("lam");
+    colorBackSelectNew = GralColor.getColor("lbl");
     colorBackMarked = GralColor.getColor("pcy");
     colorBackSelectMarked = GralColor.getColor("lgn");
+    colorBackSelectNewMarked = GralColor.getColor("lpu");
     dyda.backColor = GralColor.getColor("wh");
     //colorBackSelectNonFocused = GralColor.getColor("am");
     //colorBackMarkedNonFocused = GralColor.getColor("lrd");
@@ -458,7 +472,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   @Override
   public GralTableLine_ifc<UserData> getCurrentLine() {
-    return selectLine;
+    return lineSelected;
     /*
     if(ixLine >=0 && ixLine < tableLines.size()){
       return tableLines.get(ixLine);
@@ -524,9 +538,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     if(row == 0){
       rootLine.addNodeFirst(line);  //addOnTop
     }
-    if(selectLine == null){ 
-      selectLine = line;
-      actionOnLineSelected(selectLine);
+    if(lineSelected == null){ 
+      lineSelected = line;
+      actionOnLineSelected(lineSelected);
     }
     tableLines.add(row, line);
     zLine +=1;
@@ -553,9 +567,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   @Override public TableLineData<UserData> addLine(String key, String[] cellTexts, UserData userData) {
     TableLineData<UserData> line = new TableLineData<UserData>(this);
-    if(selectLine == null){ 
-      selectLine = line;
-      actionOnLineSelected(selectLine);
+    if(lineSelected == null){ 
+      lineSelected = line;
+      actionOnLineSelected(lineSelected);
     }
     zLine = tableLines.size();
     line.key = key;
@@ -633,14 +647,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     ixColumn = 0;
     zLine = 0;
     tableLines.clear();
-    selectLine = null;
-    actionOnLineSelected(selectLine);
+    lineSelected = null;
+    actionOnLineSelected(lineSelected);
     ixLineNew = ixLine = -1;
     gi.ixGlineSelectedNew = -1;  //deselects ixGlineSelected on redraw!
     idxLine.clear();
     searchChars.setLength(0);
-    for(int ix = 0; ix < cellLines.length; ++ix){
-      cellLines[ix] = null;
+    for(int ix = 0; ix < linesForCell.length; ++ix){
+      linesForCell[ix] = null;
     }
     rootLine.removeChildren();
     bFillCells = true;
@@ -692,7 +706,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     TableLineData<UserData> line;
     TreeNodeBase<?,?,?> line2;
     if(dLineForCells <=0){
-      line2 = line = cellLines[0];  //the new start line
+      line2 = line = linesForCell[0];  //the new start line
       if(line == null){
         line2 = line = rootLine.firstChild(); //outer.tableLines.size() ==0 ? null : outer.tableLines.get(0);  //on init
       }
@@ -713,8 +727,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             }
           } else {
             line2 = null;  //on root as first entry
-            ixCellLineSelect += ctLine;  //decrement
-            if(ixCellLineSelect <0){ ixCellLineSelect = 0; }
+            lineSelectedixCell += ctLine;  //decrement
+            if(lineSelectedixCell <0){ lineSelectedixCell = 0; }
           }
         } else {
           line = (TableLineData<UserData>)line2;
@@ -723,9 +737,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       }
       
     } else if(dLineForCells >=0 && dLineForCells < zLineVisible){
-      line = cellLines[dLineForCells];  //the new start line 
+      line = linesForCell[dLineForCells];  //the new start line 
     } else {
-      line = cellLines[zLineVisible -1];  //the new start line 
+      line = linesForCell[zLineVisible -1];  //the new start line 
     }
     dLineForCells = 0;
     return line;
@@ -767,9 +781,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         }
       }
     }
-    if(selectLine != cellLines[ixCellLineSelect]){
-      selectLine = cellLines[ixCellLineSelect];
-      actionOnLineSelected(selectLine);
+    if(lineSelected != linesForCell[lineSelectedixCell]){
+      lineSelected = linesForCell[lineSelectedixCell];
+      actionOnLineSelected(lineSelected);
     }
   }
   
@@ -780,11 +794,44 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   protected void setCellLine(int ix, TableLineData<?> line){
     @SuppressWarnings("unchecked")  //The generic type of line is correct, but not known in GraphicImplAccess
     TableLineData<UserData> line1 = (TableLineData<UserData>) line;
-    cellLines[ix] = line1;
+    linesForCell[ix] = line1;
   }
   
   
-  
+  /**Invoked in the graphic thread from mouse listener in {@link GraphicImplAccess#mouseDown(int, CellData)}
+   * @param key
+   * @param cell
+   */
+  protected void mouseDown(int key, CellData<UserData> cell){
+    lineSelectedNew = cell.tableItem; 
+    repaint(0,0);  //immediately, it is in the graphic thread.
+  }
+
+
+  /**Invoked in the graphic thread from mouse listener in {@link GraphicImplAccess#mouseUp(int, CellData)}
+   * @param key
+   * @param cell
+   */
+  protected void mouseUp(int key, CellData<UserData> cell){
+    if(key == KeyCode.mouse1Up){
+      lineSelected = lineSelectedNew;
+      lineSelectedNew = null;
+      lineSelectedixCell = cell.ixCellLine;  //used for key handling.
+      repaint(0,0);
+    }
+  }
+
+
+
+  /**Invoked in the graphic thread from mouse listener in {@link GraphicImplAccess#mouseDouble(int, CellData)}
+   * @param key
+   * @param cell
+   */
+  protected void mouseDouble(int key, CellData<UserData> cell){
+    processKeys(KeyCode.mouse1Double);
+  }
+
+
 
   
   
@@ -858,6 +905,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     protected boolean processKeys(int keyCode){
       boolean done = true;
       long time = System.currentTimeMillis();
+      lineSelectedNew = null;  //on any key, clear highlighted mouse down cell, if it is set yet.
       if(lastKey == keyCode){ keyRepetition +=1;  //same key
       } else {
         keyRepetition = 1; //other key.
@@ -883,10 +931,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             if(ixLineNew <0){ ixLineNew = 0; }
           }
           
-          if(ixCellLineSelect > 3){
-            ixCellLineSelect -=1;
-            selectLine = cellLines[ixCellLineSelect];
-            actionOnLineSelected(selectLine);
+          if(lineSelectedixCell > 3){
+            lineSelectedixCell -=1;
+            lineSelected = linesForCell[lineSelectedixCell];
+            actionOnLineSelected(lineSelected);
           } else {
             dLineForCells = -1;  //move up in visible area of tree.  
             prepareVisibleArea();
@@ -902,10 +950,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             if(ixLineNew >= zLine ){ ixLineNew = zLine -1; }
           }
           
-          if(ixCellLineSelect < zLineVisible -3){
-            ixCellLineSelect +=1;
-            selectLine = cellLines[ixCellLineSelect];
-            actionOnLineSelected(selectLine);
+          if(lineSelectedixCell < zLineVisible -3){
+            lineSelectedixCell +=1;
+            lineSelected = linesForCell[lineSelectedixCell];
+            actionOnLineSelected(lineSelected);
           } else {
             dLineForCells =1;  //move down in visible area of tree.
             prepareVisibleArea();
@@ -950,10 +998,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
           done = true;
         }
-        if(!done && selectLine !=null){
+        if(!done && lineSelected !=null){
           if(actionChanging !=null){
             //all other keys: call actionChanging.
-            done = actionChanging.exec(keyCode, this, selectLine);
+            done = actionChanging.exec(keyCode, this, lineSelected);
           }
         } //if(table.)
         if(!done && itsMng.userMainKeyAction() !=null){
@@ -1021,14 +1069,26 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * environment class. Via access methods the implementor class has protected access to all of it.
    * 
    */
-  public static abstract class GraphicImplAccess extends GralWidget.ImplAccess
+  public static abstract class GraphicImplAccess<User2Data> extends GralWidget.ImplAccess
   implements GralWidgImpl_ifc, Removeable
   {
+    
+    protected final static class LinePresentation
+    {
+      public GralColor colorBack, colorText;
+    }
+    
+    
+    /**Only used on invocation of {@link #drawCellContent}
+     * 
+     */
+    private final LinePresentation linePresentation = new LinePresentation();
+    
     protected final GralTable<?> outer;
     
     
     
-    protected CellData[][] cells;
+    protected CellData<User2Data>[][] cells;
     
     
     
@@ -1063,7 +1123,15 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      */
     protected boolean bFocused;
     
+    /**Set to true if the table has the focus in window.
+     */
+    protected boolean XXXhasFocus;
+    
 
+    protected long mousetime, redrawtime, mousect, redrawct;
+    
+    private boolean mouseDoubleClick;
+    
     
 
     protected GraphicImplAccess(GralTable<?> outer, GralMng mng){ 
@@ -1132,8 +1200,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     
     protected boolean isCurrentLine(TableLineData<?> line){
-      return outer.selectLine == line;
+      return outer.lineSelected == line;
     }
+    
+    
     
     
     /**Returns the line on that any mouse button was pressed. It is either the left, mid or right button.
@@ -1411,7 +1481,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         GralTable.TableLineData<?> line = (GralTable.TableLineData<?>)lines.next();
         int ctredraw = line.ctRepaintLine.get();
         if(ctredraw > 0 || true){
-          drawCellContent(iCellLine, line, -1);
+          setLinePresentation(line);
+          drawCellContent(iCellLine, line, linePresentation);
           iCellLine +=1;
           //Thread safety: set to 0 only if it isn't changed between quest and here.
           //Only then the text isn't changed.
@@ -1445,16 +1516,34 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       //
       int ix = -1;
       while(++ix < outer.zLineVisible) {
-        line = outer.cellLines[ix];
-        int focusCell = -1; //line == outer.selectLine ? 1: -1;
-        drawCellContent(ix, line, focusCell);
+        line = outer.linesForCell[ix];
+        setLinePresentation(line);
+        drawCellContent(ix, line, linePresentation);
       }
       outer.timeLastRedraw = System.currentTimeMillis();
       //System.out.println("GralTable - redraw;" + timeLastRedraw - dbgTime);
       ////
       outer.dLineForCells = 0;  //it is done.
     }
+
     
+    
+    private void setLinePresentation(TableLineData<?> line){
+      boolean marked = line !=null && (line.getMark() & 1)!=0;
+      if(line == outer.lineSelected){
+        linePresentation.colorBack = marked ? outer.colorBackSelectMarked : outer.colorBackSelect;
+      } else if(line == outer.lineSelectedNew){
+        linePresentation.colorBack = marked ? outer.colorBackSelectNewMarked : outer.colorBackSelectNew;
+      } else {
+        if(marked){
+          linePresentation.colorBack = outer.colorBackMarked;
+        } else {
+          linePresentation.colorBack = line !=null && line.colorBackground !=null ? line.colorBackground : outer.dyda.backColor;
+        }
+      }
+      linePresentation.colorText = line !=null && line.colorForground !=null ? line.colorForground : outer.dyda.textColor;
+      
+    }
     
 
 
@@ -1520,10 +1609,41 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
 
 
-    
+    protected void mouseDown(int key, CellData cell){
+      mousetime = System.currentTimeMillis();
+      redrawTableWithFocusedCell(cell);
+      //cellDataOnMousePressed = (CellData)widgSwt.getData();
+      //TableLineData line = cellDataOnMousePressed.tableItem;
+      //ixLineNew = line.nLineNr;  //select this line.
+      
+      if(true || !XXXhasFocus){
+        ((GralWidget.ImplAccess)this).focusGained();  //from GralWidget.
+        XXXhasFocus = true;
+        //System.out.println("focusTable");
+      }
+      //redrawTableWithFocusedCell(ev.widget);
+      mousetime = System.currentTimeMillis();
+      outer.mouseDown(key, cell);
+    }
 
 
-    protected abstract void drawCellContent(int iCellLine, GralTable.TableLineData<?> tableItem, int focusCell );
+    protected void mouseUp(int key, CellData cell){
+      if(mouseDoubleClick){
+        mouseDoubleClick = false;
+      } else {
+        outer.mouseUp(key, cell);
+      }
+    }
+
+
+    protected void mouseDouble(int key, CellData cell){
+      mousetime = System.currentTimeMillis();
+      mouseDoubleClick = true;
+      outer.mouseDouble(key, cell);
+    }
+
+
+    protected abstract void drawCellContent(int iCellLine, GralTable.TableLineData<?> tableItem, LinePresentation linePresentationP);
 
     protected abstract CellData drawCellInvisible(int iCellLine, int iCellCol);
 
@@ -1534,61 +1654,61 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     //protected void setCellDataOnMousePressed(CellData data){ cellDataOnMousePressed = data; } 
     
-    /**Data for each Text widget of the graphical implementation layer.
-     * An instance is created on creating the text field for the cell in the implementation layer.
-     * The instance is referenced only by the text field,
-     * It refers the data of the {@link GralTable#tableLines}.
-     * <pre>
-     * swt.Canvas
-     *      |--*>swt.Text
-     *               |--data-->CellData
-     *                           |---tableItem-->TableLineData
-     * 
-     * </pre>
-     * 
-     * Note: The class is visible only in the graphic implementation layer, because it is protected.
-     * The elements need to set public because there are not visible elsewhere in the derived class
-     * of the outer class. 
-     */
-    protected static class CellData{
-      
-      /**The row and column in the graphical presentation. */
-      public final int ixCellLine, ixCellColumn;
-      
-      /**The line data which are presented in this cell. */
-      public GralTable.TableLineData<?> tableItem;
-      
-      /**The color in the graphical presentation. It is the color of the text field. 
-       * Note that the color of the text field is only changed if this colors and the 
-       * {@link TableLineData#colorBackground} and {@link TableLineData#colorForground} are different. 
-       * It saves some calculation time if the color of the text field is set only if it is necessary. */
-      public GralColor colorBack, colorText;
-      
-      public CellData(int ixCellLine, int ixCellColumn){
-        this.ixCellLine = ixCellLine; 
-        this.ixCellColumn = ixCellColumn;
-      }
-    }
-    
-    
 
 
  
   }
 
   
+  /**Data for each Text widget of the graphical implementation layer.
+   * An instance is created on creating the text field for the cell in the implementation layer.
+   * The instance is referenced only by the text field,
+   * It refers the data of the {@link GralTable#tableLines}.
+   * <pre>
+   * swt.Canvas
+   *      |--*>swt.Text
+   *               |--data-->CellData
+   *                           |---tableItem-->TableLineData
+   * 
+   * </pre>
+   * 
+   * Note: The class is visible only in the graphic implementation layer, because it is protected.
+   * The elements need to set public because there are not visible elsewhere in the derived class
+   * of the outer class. 
+   */
+  public static class CellData<UserData>{
+    
+    /**The row and column in the graphical presentation. */
+    public final int ixCellLine, ixCellColumn;
+    
+    /**The line data which are presented in this cell. */
+    public GralTable.TableLineData<UserData> tableItem;
+    
+    /**The color in the graphical presentation. It is the color of the text field. 
+     * Note that the color of the text field is only changed if this colors and the 
+     * {@link TableLineData#colorBackground} and {@link TableLineData#colorForground} are different. 
+     * It saves some calculation time if the color of the text field is set only if it is necessary. */
+    public GralColor colorBack, colorText;
+    
+    public CellData(int ixCellLine, int ixCellColumn){
+      this.ixCellLine = ixCellLine; 
+      this.ixCellColumn = ixCellColumn;
+    }
+  }
+  
+  
   /**An instance of this class is assigned to any TableItem.
    * It supports the access to the TableItem (it is a table line) via the SWT-independent interface.
    * The instance knows its TableSwt and therefore the supports the access to the whole table.
    *
    */
-  public final static class TableLineData<UserData> 
-  extends TreeNodeBase<TableLineData<UserData>, UserData, GralTableLine_ifc<UserData>> 
-  implements MarkMask_ifc, GralTableLine_ifc<UserData>
+  public final static class TableLineData<User1Data> 
+  extends TreeNodeBase<TableLineData<User1Data>, User1Data, GralTableLine_ifc<User1Data>> 
+  implements MarkMask_ifc, GralTableLine_ifc<User1Data>
   {
 
     /**The aggregated table. */
-    final GralTable<UserData> outer;
+    final GralTable<User1Data> outer;
     
     SelectMask markMask;
     
@@ -1628,20 +1748,20 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     public GralColor colorForground, colorBackground;
     
-    protected UserData userData;
+    protected User1Data userData;
     
     //TODO GralColor colorBack, colorText;
     
-    TableLineData(GralTable<UserData> outer){
+    TableLineData(GralTable<User1Data> outer){
       super(null, null);  //key, data
       this.outer = outer;
       cellTexts = new String[outer.zColumn];
     }
     
     
-    public GralTableLine_ifc<UserData> addNextLine(String keyP, String[] texts, UserData userDataP){
+    public GralTableLine_ifc<User1Data> addNextLine(String keyP, String[] texts, User1Data userDataP){
       //hasChildren = hasChildren();
-      TableLineData<UserData> line = new TableLineData<UserData>(outer);
+      TableLineData<User1Data> line = new TableLineData<User1Data>(outer);
       line.key = keyP;
       super.addSiblingNext(line);
       //line.parentLine = this;
@@ -1660,9 +1780,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
     
     
-    public GralTableLine_ifc<UserData> addChildLine(String childKey, String[] childTexts, UserData userDataP){
+    public GralTableLine_ifc<User1Data> addChildLine(String childKey, String[] childTexts, User1Data userDataP){
       hasChildren = hasChildren();
-      TableLineData<UserData> line = new TableLineData<UserData>(outer);
+      TableLineData<User1Data> line = new TableLineData<User1Data>(outer);
       line.key = childKey;
       super.addNode(line);
       //line.parentLine = this;
@@ -1727,7 +1847,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
 
     
-    public TableLineData<UserData> parentNode(){ return (TableLineData<UserData>)super.getParent(); }
+    public TableLineData<User1Data> parentNode(){ return (TableLineData<User1Data>)super.getParent(); }
     
     @Override public String getName(){ return outer.name; }
     
@@ -1750,9 +1870,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       return oldText;
     }
 
-    @Override public UserData getUserData() { return userData;  }
+    @Override public User1Data getUserData() { return userData;  }
 
-    @Override public void setUserData(UserData data) {this.userData = data; }
+    @Override public void setUserData(User1Data data) {this.userData = data; }
 
     @Override public long setContentIdent(long date){ long last = outer.dateUser; outer.dateUser = date; return last; }
     

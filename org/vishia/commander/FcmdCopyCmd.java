@@ -551,6 +551,9 @@ public class FcmdCopyCmd
           //widgButtonMove.setValue(GralMng_ifc.cmdSet, 0, 0);
           zFiles = zBytes = 0;
         }
+        windConfirmCopy.setVisible(true);
+        //main.gralMng.setWindowsVisible(windConfirmCopy, posWindConfirmCopy);
+        main.gui.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.");
       }
       return true;
    }  };

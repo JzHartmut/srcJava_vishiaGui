@@ -119,7 +119,7 @@ public class SwtGralMouseListener
       
     }
 
-    /**The default behaviour for mouse up is used for design mode. */
+    /**The default behavior for mouse up is used for design mode. */
     @Override public void mouseUp(MouseEvent ev)
   {   Widget widget = ev.widget;
       Object oInfo = widget.getData();
@@ -210,18 +210,11 @@ public class SwtGralMouseListener
       Control widget = (Control) e.widget;  //a widget is a Control always.
       GralWidget widgg = (GralWidget)widget.getData();
       try{
-        final int keyCode;
-        switch(e.button){ 
-          case 1: keyCode = KeyCode.mouse1Double; break; 
-          case 2: keyCode = KeyCode.mouse2Double; break;
-          case 3: keyCode = KeyCode.mouse3Down; break;
-          default: keyCode = KeyCode.mouse3Down; break;  //other key
-        }
-        final int keyCode1 = SwtGralKey.convertFromSwt(keyCode, e.stateMask);
+        final int keyCode = SwtGralKey.convertMouseKey(e.button, SwtGralKey.MouseAction.doubleClick, e.stateMask);
         Control widgetSwt = (Control) e.widget;  //a widget is a Control always.
         if(mouseWidgetAction !=null){
           Point size = widgetSwt.getSize();
-          mouseWidgetAction.mouse1Double(keyCode1, xMousePress, yMousePress, size.x, size.y, widgg);
+          mouseWidgetAction.mouse1Double(keyCode, xMousePress, yMousePress, size.x, size.y, widgg);
         } 
         if( (mUser & GralMouseWidgetAction_ifc.mUserDouble) !=0) {
           GralUserAction action = widgg ==null ? null : widgg.getActionChange();
@@ -240,15 +233,8 @@ public class SwtGralMouseListener
       Control widget = (Control) e.widget;  //a widget is a Control always.
       widget.addMouseMoveListener(mouseMoveListener);
       GralWidget widgg = (GralWidget)widget.getData();
-      final int keyMouse;
-      switch(e.button){ 
-        case 1: keyMouse = KeyCode.mouse1Down; break; 
-        case 2: keyMouse = KeyCode.mouse2Down; break;
-        case 3: keyMouse = KeyCode.mouse3Down; break;
-        default: keyMouse = KeyCode.mouse3Down; break;  //other key
-      }
-      final int keyCode = SwtGralKey.convertFromSwt(keyMouse, e.stateMask);
       try{ 
+        final int keyCode = SwtGralKey.convertMouseKey(e.button, SwtGralKey.MouseAction.down, e.stateMask);
         int mUser1 = 0;
         if(mouseWidgetAction !=null){
           Point size = widget.getSize();
@@ -286,19 +272,10 @@ public class SwtGralMouseListener
         Point size = widget.getSize();
         GralWidget widgg = (GralWidget)widget.getData();  //maybe null
         try{ 
-          int dx = e.x - xMousePress, dy = e.y - yMousePress;
-          final int keyMouse;
-          int moved = (e.x < 0 || e.x > size.x || e.y < 0 || e.y > size.y) ? 100: 0;
-          switch(e.button + moved){ 
-            case   1: keyMouse = KeyCode.mouse1Up; break; 
-            case 101: keyMouse = KeyCode.mouse1UpMoved; break; 
-            case   2: keyMouse = KeyCode.mouse2Up; break;
-            case 102: keyMouse = KeyCode.mouse2UpMoved; break;
-            case   3: keyMouse = KeyCode.mouse3Up; break;
-            case 103: keyMouse = KeyCode.mouse3Up; break;
-            default: keyMouse = KeyCode.mouse3Up; break;  //other key
-          }
-          final int keyCode = SwtGralKey.convertFromSwt(keyMouse, e.stateMask);
+          //int dx = e.x - xMousePress, dy = e.y - yMousePress;
+          boolean moved = e.x < 0 || e.x > size.x || e.y < 0 || e.y > size.y;
+          SwtGralKey.MouseAction mouseAction = moved ? SwtGralKey.MouseAction.upMovedOutside : SwtGralKey.MouseAction.up;
+          final int keyCode = SwtGralKey.convertMouseKey(e.button, mouseAction, e.stateMask);
           int mUser1 = 0;
           if(mouseWidgetAction !=null){
             switch(e.button){ 
