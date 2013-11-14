@@ -85,7 +85,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class SwtTable<UserData>  extends GralTable.GraphicImplAccess<UserData>  implements GralWidgImpl_ifc 
+public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWidgImpl_ifc 
 //public class SwtTable  implements GralWidgImpl_ifc 
 {
 
@@ -158,7 +158,7 @@ public class SwtTable<UserData>  extends GralTable.GraphicImplAccess<UserData>  
   private final TableKeyListerner myKeyListener;
   
   public SwtTable(GralTable<?> gralTable, SwtMng mng, Composite parent)
-  { super(gralTable, mng);
+  { gralTable.super(gralTable, mng);
     //super(name, mng, columnWidths);
     this.myKeyListener = this.new TableKeyListerner(null);
     focusListenerTable = this.new FocusListenerTable(mng);
@@ -218,17 +218,17 @@ public class SwtTable<UserData>  extends GralTable.GraphicImplAccess<UserData>  
       }
       
       
-  /*package private*/ static void addTable(GralTable gralTable, SwtMng mng) {
-        
-        boolean TEST = false;
-        final SwtTable table;
-        Composite parent = mng.getCurrentPanel();
-        table = new SwtTable(gralTable, mng, parent); //, selectionColumn, selectionText);
-        table.swtWidgWrapper.widgetSwt.setData(table);
-        mng.registerWidget(gralTable);
-        //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
+  /*package private*/ 
+  static void addTable(GralTable<?> gralTable, SwtMng mng) {
+    
+    Composite parent = mng.getCurrentPanel();
+    @SuppressWarnings("unchecked")
+    final SwtTable table = new SwtTable(gralTable, mng, parent); //, selectionColumn, selectionText);
+    table.swtWidgWrapper.widgetSwt.setData(table);
+    mng.registerWidget(gralTable);
+    //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
 
-      }
+  }
       
       
   private void setColorsSwt(){
@@ -419,13 +419,12 @@ public class SwtTable<UserData>  extends GralTable.GraphicImplAccess<UserData>  
   /**This routine implements all things to set the content of any table cell to show it.
    * @see org.vishia.gral.base.GralTable#drawCellContent(int, int, org.vishia.gral.base.GralTable.TableLineData)
    */
-  @Override protected void drawCellContent(int iCellLine, GralTable.TableLineData<?> tableItem, LinePresentation linePresentationP){
+  @Override protected void drawCellContent(int iCellLine, GralTable<?>.TableLineData tableItem, GralTable.LinePresentation linePresentationP){
     Text[] textlineSwt = cellsSwt[iCellLine];
     if(tableItem !=null){
       for(int col=0; col < cells[0].length; ++col){
         Text cellSwt = textlineSwt[col]; 
-        GralTable.CellData cellData = (GralTable.CellData)cellSwt.getData();
-        cellData.tableItem = tableItem;
+        GralTable.CellData<?> cellData = (GralTable.CellData<?>)cellSwt.getData();
         //
         String text = tableItem.cellTexts[col];
         if(text == null){ text = ""; }
@@ -454,7 +453,6 @@ public class SwtTable<UserData>  extends GralTable.GraphicImplAccess<UserData>  
       for(int col=0; col < cells[0].length; ++col){
         Text cellSwt = textlineSwt[col]; 
         GralTable.CellData cellData = (GralTable.CellData)cellSwt.getData();
-        cellData.tableItem = tableItem;
         cellSwt.setText("");
         if(cellData.colorBack != colorBack){
           Color colorSwt =  swtWidgWrapper.mng.getColorImpl(colorBack);
@@ -472,7 +470,6 @@ public class SwtTable<UserData>  extends GralTable.GraphicImplAccess<UserData>  
   @Override protected GralTable.CellData drawCellInvisible(int iCellLine, int iCellCol){
     Text cellSwt = cellsSwt[iCellLine][iCellCol]; 
     GralTable.CellData cellData = (GralTable.CellData)cellSwt.getData();
-    cellData.tableItem = null;
     cellSwt.setText("");
     if(cellData.colorBack != colorBackTable()){
       Color colorSwt =  swtWidgWrapper.mng.getColorImpl(colorBackTable());
@@ -538,7 +535,7 @@ public class SwtTable<UserData>  extends GralTable.GraphicImplAccess<UserData>  
       int ixColumn = 0;
       for(Text cell: row){
         GralTable.CellData celldata = (GralTable.CellData)cell.getData();
-        int xleft = celldata.tableItem !=null ? (celldata.tableItem.treeDepth() - treeDepthBase) * xPixelUnit : 0;
+        int xleft = 0; //celldata.tableItem !=null ? (celldata.tableItem.treeDepth() - treeDepthBase) * xPixelUnit : 0;
         cell.setBounds(xleft + xpixelCell[ixColumn], yPix, xpixelCell[ixColumn+1] - xpixelCell[ixColumn], linePixel);
         ixColumn +=1;
       }

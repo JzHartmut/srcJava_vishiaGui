@@ -10,7 +10,7 @@ import org.vishia.util.TreeNode_ifc;
 public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, MarkMask_ifc
 , SortedTree<GralTableLine_ifc<UserData>>
 //, TreeNode_ifc<GralTable.TableLineData<UserData>, UserData>
-, TreeNode_ifc<GralTable.TableLineData<UserData>, UserData>
+, TreeNode_ifc<GralTable<UserData>.TableLineData, UserData>
 {
 
   /**Version, history and license.
