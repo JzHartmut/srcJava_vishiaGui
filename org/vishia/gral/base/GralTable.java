@@ -865,7 +865,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @param key
    * @param cell
    */
-  protected void mouseDown(int key, CellData cell){
+  protected void mouseDown(int key, GraphicImplAccess.CellData cell){
     lineSelectedNew = linesForCell[cell.ixCellLine]; 
     repaint(0,0);  //immediately, it is in the graphic thread.
   }
@@ -875,7 +875,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @param key
    * @param cell
    */
-  protected void mouseUp(int key, CellData cell){
+  protected void mouseUp(int key, GraphicImplAccess.CellData cell){
     if(key == KeyCode.mouse1Up){
       lineSelected = lineSelectedNew;
       lineSelectedNew = null;
@@ -890,7 +890,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @param key
    * @param cell
    */
-  protected void mouseDouble(int key, CellData cell){
+  protected void mouseDouble(int key, GraphicImplAccess.CellData cell){
     processKeys(KeyCode.mouse1Double);
   }
 
@@ -1664,6 +1664,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * @param cell The cell 
      */
     protected boolean redrawTableWithFocusedCell(CellData data){
+      if(bPrepareVisibleArea){
+        fillVisibleArea(lineSelected, 3);  //show the selected line at line 3 in graphic or before 0..2
+        bPrepareVisibleArea = false;
+      }
       TableLineData line = outer.linesForCell[data.ixCellLine];
       if( line !=null){ //don't do any action if the cell isn't use.
         outer.lineSelectedNewixCell = data.ixCellLine;
@@ -1723,45 +1727,52 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     //protected void setCellDataOnMousePressed(CellData data){ cellDataOnMousePressed = data; } 
     
 
+    /**Data for each Text widget of the graphical implementation layer.
+     * An instance is created on creating the text field for the cell in the implementation layer.
+     * The instance is referenced only by the text field,
+     * It refers the data of the {@link GralTable#tableLines}.
+     * <pre>
+     * swt.Canvas
+     *      |--*>swt.Text
+     *               |--data-->CellData
+     *                           -ixCellLine
+     *                           -ixCellColumn
+     * 
+     * </pre>
+     * 
+     * Note: The class is visible only in the graphic implementation layer, because it is protected.
+     * The elements need to set public because there are not visible elsewhere in the derived class
+     * of the outer class. 
+     */
+    protected class CellData{
+      
+      /**The row and column in the graphical presentation. With the information about the row, the
+       * associated {@link TableLineData} can be found via the {@link GralTable#linesForCell}. */
+      public final int ixCellLine, ixCellColumn;
+      
+      /**The color in the graphical presentation. It is the color of the text field. 
+       * Note that the color of the text field is only changed if this colors and the 
+       * {@link TableLineData#colorBackground} and {@link TableLineData#colorForground} are different. 
+       * It saves some calculation time if the color of the text field is set only if it is necessary. */
+      public GralColor colorBack, colorText;
+      
+      
+      /**temporary set to true to set the focus of this cell.
+       * 
+       */
+      public boolean bSetFocus;
+      
+      public CellData(int ixCellLine, int ixCellColumn){
+        this.ixCellLine = ixCellLine; 
+        this.ixCellColumn = ixCellColumn;
+      }
+    }
+    
+    
 
  
   }
 
-  
-  /**Data for each Text widget of the graphical implementation layer.
-   * An instance is created on creating the text field for the cell in the implementation layer.
-   * The instance is referenced only by the text field,
-   * It refers the data of the {@link GralTable#tableLines}.
-   * <pre>
-   * swt.Canvas
-   *      |--*>swt.Text
-   *               |--data-->CellData
-   *                           |---tableItem-->TableLineData
-   * 
-   * </pre>
-   * 
-   * Note: The class is visible only in the graphic implementation layer, because it is protected.
-   * The elements need to set public because there are not visible elsewhere in the derived class
-   * of the outer class. 
-   */
-  public static class CellData{
-    
-    /**The row and column in the graphical presentation. With the information about the row, the
-     * associated {@link TableLineData} can be found via the {@link GralTable#linesForCell}. */
-    public final int ixCellLine, ixCellColumn;
-    
-    /**The color in the graphical presentation. It is the color of the text field. 
-     * Note that the color of the text field is only changed if this colors and the 
-     * {@link TableLineData#colorBackground} and {@link TableLineData#colorForground} are different. 
-     * It saves some calculation time if the color of the text field is set only if it is necessary. */
-    public GralColor colorBack, colorText;
-    
-    public CellData(int ixCellLine, int ixCellColumn){
-      this.ixCellLine = ixCellLine; 
-      this.ixCellColumn = ixCellColumn;
-    }
-  }
-  
   
   /**An instance of this class is assigned to any TableItem.
    * It supports the access to the TableItem (it is a table line) via the SWT-independent interface.
