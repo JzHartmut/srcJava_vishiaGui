@@ -195,7 +195,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   }
   
   
-  private static class CallingArguments extends GuiCallingArgs
+  static class CallingArguments extends GuiCallingArgs
   {
     /**The target ipc-address for Interprocess-Communication with the target.
      * It is a string, which determines the kind of communication.

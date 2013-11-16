@@ -312,7 +312,7 @@ public abstract class GralButton extends GralWidget
    * If the mouse was moved from the widget's area while a button is pressed, the mouse action on release
    * is not invoked.
    */
-  private class MouseActionButton implements GralMouseWidgetAction_ifc
+  class MouseActionButton implements GralMouseWidgetAction_ifc
   {
 
     @Override public boolean mouseMoved(int xMousePixel, int yMousePixel, int sizex, int sizey){

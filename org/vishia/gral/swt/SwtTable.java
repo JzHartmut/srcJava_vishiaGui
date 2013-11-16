@@ -424,7 +424,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
     if(tableItem !=null){
       for(int col=0; col < cells[0].length; ++col){
         Text cellSwt = textlineSwt[col]; 
-        GralTable.CellData<?> cellData = (GralTable.CellData<?>)cellSwt.getData();
+        GralTable.CellData cellData = (GralTable.CellData)cellSwt.getData();
         //
         String text = tableItem.cellTexts[col];
         if(text == null){ text = ""; }
