@@ -504,8 +504,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   //int lineSelected;
   
-  private final XXXRefreshTimed XXXrefreshTimed = new XXXRefreshTimed();
-  
   /**The time after 1970 when the fillin was invoked and finished at last.
    * timeFillinFinished=0, then pending.
    */
@@ -864,19 +862,10 @@ public class GralFileSelector implements Removeable //extends GralWidget
       } else {
         //other directory
         currentFile = null;
-        if(false && dir.timeChildren >0){
-          //another directory with known content.
-          //any access in a short time to a known directory.
-          //It may be able to assume that the content is not changed since a short time
-          //if the user navigates in some directories.
-          XXXexecFillIn(true);
-          eRefresh = ERefresh.doNothing;  //do nothing, it is shown and refreshed in execFillIn
-        } else {
-          //the directory is unknown yet.
+              //the directory is unknown yet.
           //GralTableLine_ifc<FileRemote> tline = selectList.wdgdTable.insertLine(null, 0, null, null);
           //tline.setCellText("--waiting--", kColFilename);
           eRefresh = ERefresh.refreshChildren;  //do nothing, it is shown and refreshed in execFillIn
-        }
       }
       selectList.wdgdTable.setBackColor(colorBackPending, -1);  //for all cells.
       if(!bSameDirectory || sortOrder != sortOrderLast){
@@ -968,7 +957,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       }
       if(tline !=null){
         int lineSelect1 = tline.getLineNr();
-        selectList.wdgdTable.setCurrentCell(lineSelect1, 1);
+        selectList.wdgdTable.setCurrentLine(tline, -3, 1);  
         currentFile = tline.getUserData();  //adjust the file if the currentFile was not found exactly.
       }
       selectList.wdgdTable.repaint(100, 200);
@@ -980,316 +969,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   
-  /**Fills the content with given directory.
-   * If the same directory was refreshed in a short time before, it is not refreshed here.
-   * That is while fast navigation in a tree. 
-   * @param fileIn The directory which's files are shown.
-   * @param bCompleteWithFileInfo false then write only file names, without information about the file.
-   */
-  public void XXXfillInX(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
-  { long timenow = System.currentTimeMillis();
-    timeFillinInvoked = timenow;
-    final FileRemote dir, file;
-    if(!fileIn.isDirectory()){
-      dir = fileIn.getParentFile(); file = fileIn;
-      String sDir = FileSystem.getCanonicalPath(dir); //with / as separator!
-      String sFile = fileIn.getName();
-      indexSelection.put(sDir, fileIn);
-    } else {
-      dir = fileIn; file = null;
-    }
-    boolean bSameDirectory = dir == currentDir;
-    if(!bSameDirectory){
-      currentDir = dir;
-      this.sCurrentDir = dir.getAbsolutePath();  //though it may not exist, store it for refresh (may be exist later).
-    }
-    final ERefresh eRefresh;
-    if(bSameDirectory){
-      //it is a refresh.
-      if(true || (timenow - dir.timeChildren) > 4000){
-        eRefresh = ERefresh.refreshAll; //needs to refresh
-      } else {
-        eRefresh = ERefresh.doNothing;  //do nothing, it is actual
-      }
-    } else {
-      //other directory
-      if(dir.timeChildren >0){
-        //another directory with known content.
-        //any access in a short time to a known directory.
-        //It may be able to assume that the content is not changed since a short time
-        //if the user navigates in some directories.
-        XXXexecFillIn(true);
-        eRefresh = ERefresh.doNothing;  //do nothing, it is shown and refreshed in execFillIn
-      } else {
-        //the directory is unknown yet.
-        selectList.wdgdTable.clearTable();
-        GralTableLine_ifc<FileRemote> tline = selectList.wdgdTable.insertLine(null, 0, null, null);
-        tline.setCellText("--waiting--", kColFilename);
-        eRefresh = ERefresh.refreshChildren;  //do nothing, it is shown and refreshed in execFillIn
-      }
-    }
-    if(eRefresh != ERefresh.doNothing){
-      
-      //Note: a refresh can be pending yet.
-      boolean bOccupied;
-      if(bSameDirectory){
-        bOccupied = XXXcallbackEventFillIn.occupy(null, false);
-        if(!bOccupied) {
-          System.err.println(Assert.stackInfo("GralFileSelector.fillIn - second call is not advisable for the same card.", 4));
-        }
-      } else {
-        bOccupied = 0 != XXXcallbackEventFillIn.occupyRecall(4000, null, true); 
-        if(!bOccupied) {
-          System.err.println(Assert.stackInfo("GralFileSelector.fillIn - hangs.", 4));
-        }
-      }
-      if(bOccupied){ //prevent more as one invocation in the same time.
-        ////
-        selectList.wdgdTable.setBackColor(colorBackPending,0);
-        //it needs some time, fillIn after refresh
-        XXXcallbackEventFillIn.setFileSrc(currentDir);
-        if(eRefresh == ERefresh.refreshAll){
-          XXXcallbackEventFillIn.bCompleteWithFileInfo = true;
-          (fileIn).refreshPropertiesAndChildren(XXXcallbackEventFillIn);  
-        } else {
-          XXXcallbackEventFillIn.bCompleteWithFileInfo = false;
-          (fileIn).refreshPropertiesAndChildren(XXXcallbackEventFillIn);  
-        }
-        //fills the wdgdTable in callbackFillIn, calls fillInRefreshed there.
-      } 
-      
-    }
-  }
-  
-  
-  /**Fills the table content with the currentDirectory without accessing the file system. 
-   * This routine is called either if some information about the currentDirectory and its files
-   * are known already or a refresh was done. In the second case this routine is called in the callbac,
-   * of the refresh. 
-   * 
-   * @param bIsCompleteWithFileInfo true the it was called in the callback with complete refresh. 
-   * false then a refresh is forced and this routine was called a second one if some file information
-   * are not available or the information are to old.
-   */
-  protected synchronized void XXXexecFillIn(boolean bIsCompleteWithFileInfo) //String path)
-  {
-    boolean bAllFilesCompleteWithFileInfo = true;
-    //selectList.wdgdTable.clearTable(); 
-    int zLines = selectList.wdgdTable.size();
-    int lineCt = 0; //count lines to select the line number with equal sFileSelect.
-    GralTableLine_ifc<FileRemote> tline;
-    widgdPathDir.setText(sCurrentDir, -1);
-    //widgdPath.setSelection("|..<");
-    long timeNow = System.currentTimeMillis();
-    int lineSelect1 = 0;  
-    boolean bAllCompleteWithFileInfo = bIsCompleteWithFileInfo;
-    FileRemote[] files = currentDir.listFiles();
-    if(files !=null){ 
-      Map<String, FileRemote> sortFiles = new TreeMap<String, FileRemote>();
-      Map<String, FileRemote> sortFilesName = new TreeMap<String, FileRemote>();
-      for(FileRemote file: files){
-        if(file ==null){
-          System.err.println("GralFileSelector.fillInRefreshedFiles() - file is null;");
-        } else {
-          String sort, sortName;
-          if(!file.isTested()){
-            bAllCompleteWithFileInfo = false;
-          }
-          switch(sortOrder){
-          case kSortName: {
-            String sName = file.getName();
-            if(file.isDirectory()){ sName += "/"; }
-            sortName = sort = (file.isDirectory()? "D" : "F") + sName;
-          } break;
-          case kSortNameNonCase: {
-            String sName = file.getName().toLowerCase();
-            if(file.isDirectory()){ sName += "/"; }
-            sortName = sort = (file.isDirectory()? "D" : "F") + sName;
-          } break;
-          case kSortExtension: {
-            String sName = file.getName();
-            int posDot = sName.lastIndexOf('.');
-            String sExt = sName.substring(posDot+1);
-            if(file.isDirectory()){ sName += "/"; }
-            sortName = sort = (file.isDirectory()? "D" : "F") + sExt + sName;
-          } break;
-          case kSortExtensionNonCase: {
-            String sName = file.getName().toLowerCase();
-            int posDot = sName.lastIndexOf('.');
-            String sExt = sName.substring(posDot+1);
-            if(file.isDirectory()){ sName += "/"; }
-            sortName = sort = (file.isDirectory()? "D" : "F") + sExt + sName;
-          } break;
-          case kSortDateNewest: {
-            String sName = file.getName().toLowerCase();
-            if(bAllCompleteWithFileInfo){
-              long nDate = -file.lastModified();
-              String sDate = String.format("%016X", new Long(nDate));
-              sort = (file.isDirectory()? "D" : "F") + sDate + sName;
-            } else { sort = ""; }
-            sortName = (file.isDirectory()? "D" : "F") + sName;
-          } break;
-          case kSortDateOldest: {
-            String sName = file.getName().toLowerCase();
-            if(bAllCompleteWithFileInfo){
-              long nDate = file.lastModified();
-              String sDate = String.format("%016X", new Long(nDate));
-              sort = (file.isDirectory()? "D" : "F") + sDate + sName;
-            } else { sort = ""; }
-            sortName = (file.isDirectory()? "D" : "F") + sName;
-          } break;
-          case kSortSizeLargest: {
-            String sName = file.getName().toLowerCase();
-            if(bAllCompleteWithFileInfo){
-              long nSize = 0x7fffffffffffffffL - file.length();
-              String sSize = String.format("%016d", new Long(nSize));
-              sort = (file.isDirectory()? "D" : "F") + sSize + sName;
-            } else { sort = ""; }
-            sortName = (file.isDirectory()? "D" : "F") + sName;
-          } break;
-          case kSortSizeSmallest: {
-            String sName = file.getName().toLowerCase();
-            if(bAllCompleteWithFileInfo){
-              long nSize = file.length();
-              String sSize = String.format("%016d", new Long(nSize));
-              sort = (file.isDirectory()? "D" : "F") + sSize + sName;
-            } else { sort = ""; }
-            sortName = (file.isDirectory()? "D" : "F") + sName;
-          } break;
-          default: { sortName = sort = file.getName(); }
-          }
-          sortFilesName.put(sortName, file);
-          if(bAllCompleteWithFileInfo){
-            sortFiles.put(sort, file);
-          }
-        }
-      }
-      if(currentDir.getParentFile() !=null){
-        //write < .. line for parent seletion.
-        if(lineCt < zLines){ tline = selectList.wdgdTable.getLine(lineCt); }
-        else {
-          tline = selectList.wdgdTable.addLine("..", null, null);
-          zLines +=1;
-        }
-        if(!tline.getCellText(kColFilename).equals("..")){
-          tline.setCellText("<", kColDesignation);
-          tline.setCellText("..", kColFilename);
-          tline.setCellText("", kColLength);
-          tline.setCellText("", kColDate);
-          selectList.wdgdTable.replaceLineKey(tline, null);
-        }
-        tline.setUserData(currentDir);  //The ".." represents the directory which is shown (instead ".")
-        lineCt +=1;
-      }
-      //The file or directory which was the current one while this directory was shown lastly:
-      String sFileCurrentline = ""; //indexSelection.get(sCurrentDir);
-      //
-      //List files
-      Map<String, FileRemote> sortFilesUsed = bAllCompleteWithFileInfo ? sortFiles: sortFilesName;
-      for(Map.Entry<String, FileRemote> entry: sortFilesUsed.entrySet()){
-        //String[] line = new String[zColumns];
-        FileRemote file = entry.getValue();
-        String sFileName = file.getName();
-        if(lineCt < zLines){ //// 
-          tline = selectList.wdgdTable.getLine(lineCt);
-          if(tline == null)
-            Assert.stop();
-        }
-        else {
-          tline = selectList.wdgdTable.addLine(sFileName, null, null);
-          zLines +=1;
-        }
-        String sCell = tline.getCellText(kColFilename);
-        boolean botherfile = sCell == null || !sCell.equals(sFileName);
-        boolean isChanged = botherfile;
-        if(botherfile){
-          String sDesignation = file.isDirectory() ? "/" : "";
-          tline.setCellText(sDesignation, kColDesignation);
-          tline.setCellText(sFileName, kColFilename);
-          tline.setUserData(file);
-          tline.setNonMarked(1, null);
-          selectList.wdgdTable.replaceLineKey(tline, sFileName);
-        } else { //same file, don't change line.
-          long dateFile = file.lastModified();
-          isChanged = tline.setContentIdent(dateFile) != dateFile || tline.getCellText(kColDate).equals("?");
-        }
-        if(sFileCurrentline != null && sFileName.equals(sFileCurrentline)){
-          lineSelect1 = lineCt;
-          if(isChanged){
-            //this.lineSelected = -1;  //remove info about selection, select newly because content is changed.
-          }
-        }
-        if(isChanged){
-          if(bAllCompleteWithFileInfo){
-            completeLine(tline, file, timeNow);
-          } 
-          else { //!bCompleteFileWithInfo
-            bAllFilesCompleteWithFileInfo = false;
-            tline.setCellText("?", kColLength);
-            tline.setCellText("?", kColDate);
-            tline.setContentIdent(0);
-          }
-          if(bAllCompleteWithFileInfo && actionSetFileAttribs !=null){
-            actionSetFileAttribs.exec(0, selectList.wdgdTable, tline);  //color for the line.
-          }
-        }
-        lineCt +=1;
-      }
-      while(lineCt < zLines){
-        tline = selectList.wdgdTable.getLine(lineCt);
-        selectList.wdgdTable.deleteLine(tline);
-        zLines = selectList.wdgdTable.size();
-      }
-      if(lineCt ==0){
-        //special case: no files:
-        selectList.wdgdTable.clearTable(); 
-        String[] line = new String[zColumns];
-        line[kColDesignation] = "";
-        line[kColFilename] = "--empty--";
-        line[kColDate] = "";
-        selectList.wdgdTable.addLine(null, line, null);
-        lineCt +=1;
-      }
-    } else {
-      //faulty directory
-      selectList.wdgdTable.clearTable(); 
-      String[] line = new String[zColumns];
-      line[kColDesignation] = "";
-      line[kColFilename] = "--not found-1--";
-      line[kColDate] = "";
-      selectList.wdgdTable.addLine(null, line, null);
-    }
-    GralTableLine_ifc<FileRemote> currentLine = selectList.wdgdTable.getCurrentLine();
-    if(currentLine == null || lineSelect1 != currentLine.getLineNr()){
-      //HINT: setCurrentCell refreshes the line. a current marking action from GUI-user will be aborted therefore.
-      selectList.wdgdTable.setCurrentCell(lineSelect1, 1);
-      //this.lineSelected = lineSelect1; 
-    }
-    //selectList.wdgdTable.repaint(200,200);
-    if(!bAllFilesCompleteWithFileInfo){
-      XXXrefreshTimed.delayedFillin(1500);
-    }
-    timeFillinFinished = System.currentTimeMillis();
-    durationFillin = (int)(timeFillinFinished - timeFillinInvoked);
-    if(lineCt < zLines){ tline = selectList.wdgdTable.getLine(lineCt); }
-    else {
-      tline = selectList.wdgdTable.addLine("..", null, null);
-      zLines +=1;
-    }
-    selectList.wdgdTable.setBackColor(colorBack,0);
-    StringBuilder sDuration = new StringBuilder(100);
-    if(++refreshCount >=10){ refreshCount = 1; }
-    sDuration.append(refreshCount).append(" refr:").append(durationRefresh).append(" ms, fillin:").append(durationFillin);
-    tline.setCellText("i", kColDesignation);
-    tline.setCellText(sDuration.toString(), kColFilename);
-    tline.setCellText("", kColLength);
-    tline.setCellText("", kColDate);
-    selectList.wdgdTable.replaceLineKey(tline, null);
-    lineCt +=1;
-
-  }
-  
-
   
 
   
@@ -1562,47 +1241,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
   }
 
   
-  /**This class organized a one time or cyclic refreshing of the current content.
-   */
-  final class XXXRefreshTimed implements Runnable
-  {
-    Thread thread;
-    
-    int timeRepeat = 2000;
-    
-    long timeStampRepeat;
-    
-    boolean bRepeat = false;
-    //boolean isRunning = false;
-    
-    void delayedFillin(int delayMillisec){
-      timeStampRepeat = System.currentTimeMillis() + delayMillisec;
-      if(thread ==null){
-        thread = new Thread(this, "FileRefresh");
-        //isRunning = true;
-        thread.start();
-      }
-    }
-    
-    @Override public void run()
-    { long timeWait;
-      do {
-        timeWait = timeStampRepeat - System.currentTimeMillis();
-        if(timeWait >0){
-          synchronized(this){ 
-            try{ wait(timeWait);} catch(InterruptedException exc){}
-          }
-        } else {
-          System.out.println("GralFileSelector - delayedFillin");
-          XXXexecFillIn(true);
-          //fillInCurrentDir();
-          timeStampRepeat += timeRepeat;
-        }
-      } while(timeWait > 0 || bRepeat);
-      thread = null;
-    }
-  }
-  
   
   /**This callback class fills the {@link GralFileSelector#selectList}.{@link GralSelectList#wdgdTable}
    * with the results of a {@link FileRemote.ChildrenEvent}, see {@link GralFileSelector#evBackChildren}.
@@ -1623,45 +1261,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   
-  
-  final EventConsumer XXXcallbackFillIn = new EventConsumer(){
-    @Override public int processEvent(Event<?,?> evP) {
-      ///
-      XXXFillinCallback callback = (XXXFillinCallback)evP;
-      FileRemote dir = callback.getFileSrc();  //it is completed meanwhile
-      timeFilesRefreshed = System.currentTimeMillis();
-      durationRefresh = (int)(timeFilesRefreshed - timeFillinInvoked);
-      //Timeshort.sleep(200); //test
-      if(currentDir == dir){
-        GralFileSelector.this.XXXexecFillIn(callback.bCompleteWithFileInfo);
-      } else {
-        //this is an obsolete order, do nothing.
-      }
-      //setFocus();    //don't set the focus, it may be false. Only fill.
-      return 1;
-    }
-    @Override public String toString(){ return "GralFileSelector - callback fillin"; }
-
-  };
-  
-  
-  /**Only one event instance for fillIn-callback. It should be called only one time. */
-  final class XXXFillinCallback extends FileRemote.CallbackEvent{
-    boolean bCompleteWithFileInfo;
-    XXXFillinCallback(){ 
-      //note: call without source because it is not occupied.
-      super(XXXcallbackFillIn, null, evSrc); 
-    }
-  }
-  
-  /**Callback event for this file table, re-used but private for the file table. 
-   * It uses {@link GralFileSelector#callbackFillIn} as its {@link EventConsumer}
-   * to execute {@link GralFileSelector#fillInRefreshed(FileRemote, boolean)} as callback routine.
-   * */
-  private final XXXFillinCallback XXXcallbackEventFillIn = new XXXFillinCallback();
-  
-  
-
   
   
   

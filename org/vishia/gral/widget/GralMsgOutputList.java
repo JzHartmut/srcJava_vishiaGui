@@ -102,10 +102,11 @@ public class GralMsgOutputList  implements LogMessage
    * @see org.vishia.msgDispatch.LogMessage#sendMsgVaList(int, org.vishia.bridgeC.OS_TimeStamp, java.lang.String, org.vishia.bridgeC.Va_list)
    */
   @Override public boolean sendMsgVaList(int identNumber, OS_TimeStamp creationTime,
-      String text, Va_list args) {
+    
+    String text, Va_list args) {
     String sTime = dateFormat.format(creationTime);
     String state = identNumber <0 ? "-" : "+'";  //going/coming
-    if(identNumber < 0){ identNumber = -identNumber; }
+    int identNumber1 = identNumber < 0 ? -identNumber :identNumber;
     //The configuration for this msg ident.
     String sText;
     try{ sText = String.format(localization, text,args.get());
@@ -117,16 +118,16 @@ public class GralMsgOutputList  implements LogMessage
       sText = "missing value: "+ text;
     }
     //String sInfoLine = sTime + '\t' + identNumber + '\t' + state + '\t' + sText;
-    String[] sInfoLine = {sTime, "" + identNumber, state, "" + sText};
+    String[] sInfoLine = {sTime, "" + identNumber1, state, "" + sText};
 
     GralWidget oTable = guiAccess.getWidget("msgOfDay");
     if(oTable == null){
-      Assert.consoleErr("GuiMainDialog:insertInfo: unknown widget; %s; message:%d;%s;\n", "msgOfDay", identNumber, sText);
+      Assert.consoleErr("GuiMainDialog:insertInfo: unknown widget; %s; message:%d;%s;\n", "msgOfDay", new Integer(identNumber), sText);
     } else {
-      GralTable_ifc table = (GralTable)oTable;
-      GralTableLine_ifc line = table.addLine(null, sInfoLine, null);
-      int nLine = line.getLineNr();
-      table.setCurrentLine(nLine);
+      @SuppressWarnings("unchecked")
+      GralTable_ifc<Object> table = (GralTable<Object>)oTable;
+      GralTableLine_ifc<Object> line = table.addLine(null, sInfoLine, null);
+      table.setCurrentLine(line, -1, 0);
     }
     //guiAccess.insertInfo("msgOfDay", Integer.MAX_VALUE, sInfoLine);
     return true;

@@ -69,6 +69,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license
    * <ul>
+   * <li>2013-11-16 Hartmut chg: setCurrentCell(int, int) removed because the line number without respect to a line
+   *   is not able to handle. Only a line is given. New method {@link #setCurrentLine(GralTableLine_ifc, int, int)}
+   *   can set the given line to any location in the visible area of table.  
    * <li>2013-11-15 Hartmut new: {@link TableLineData} and {@link GraphicImplAccess} are non-static yet
    *   because the generic type should be the same without additional effort. This is the reason.
    *   Nevertheless the non-static property was given already, but deployed by the outer aggregation 
@@ -451,11 +454,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     if(line == null) return false;
     else {
       int nLine = line.getLineNr();
-      return setCurrentCell(nLine, -1);
+      setCurrentLine(line, lineSelectedixCell, -1);
+      return true;
     }
   }
   
-  @Override public boolean setCurrentLine(int nLine){ return setCurrentCell(nLine, -1); }
+  //@Override public boolean setCurrentLine(int nLine){ return setCurrentCell(nLine, -1); }
 
   
   public void setColors(){
@@ -491,7 +495,22 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   @Override
-  public boolean setCurrentCell(int line, int column) {
+  public void setCurrentLine(GralTableLine_ifc<UserData> line, int ixline, int ixcolumn) {
+    lineSelected = (TableLineData)line;
+    if(ixLine < 0){
+      lineSelectedixCell = zLineVisible + ixLine;  //-1 is the last.
+      if(lineSelectedixCell < 0){
+        lineSelectedixCell = 0;
+      }
+    } else {
+      lineSelectedixCell = ixLine;
+      if(lineSelectedixCell >= zLineVisible){
+        lineSelectedixCell = zLineVisible -1;
+      }
+    }
+    this.ixColumn = ixcolumn;
+    bPrepareVisibleArea = true;
+    /*
     if(line < -1 || line > zLine-1){ line = zLine -1; }
     if(column < -1 || column > zColumn-1){ column = 0; }
     if(line >=0){
@@ -500,8 +519,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     if(column >=0){
       ixColumn = column;
     }
+    */
     repaint(50,200);
-    return true;
   }
 
   
@@ -751,19 +770,25 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   
-  protected void fillVisibleArea(TableLineData lineStart, int ixStart){
-    TableLineData line = lineStart;
-    int ix = ixStart;
+  protected void fillVisibleArea(){
+    TableLineData line = lineSelected;
+    int ix = lineSelectedixCell;
     while(ix >0 && line !=null){
       line = prevLine(line);
       if(line !=null){
         linesForCell[--ix] = line;
       }
     }
-    int nLinesBefore = ixStart - ix;  //==lineStart if all lines are present.
+    int nLinesBefore = lineSelectedixCell - ix;  //==lineStart if all lines are present.
+    if(ix > 0){
+      System.arraycopy(linesForCell, ix, linesForCell, 0, nLinesBefore);
+      lineSelectedixCell = nLinesBefore;
+    }
     
-    fillVisibleAreaBehind(lineStart, nLinesBefore);
+    fillVisibleAreaBehind(lineSelected, nLinesBefore);
   }
+  
+  
   
   protected void fillVisibleAreaBehind(TableLineData lineStart, int ixStart){
     int ix = ixStart;
@@ -1581,7 +1606,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       GralTable<UserData>.TableLineData/*<?>*/ line;
       
       if(outer.bPrepareVisibleArea){
-        outer.fillVisibleArea(lineSelected, 3);  //show the selected line at line 3 in graphic or before 0..2
+        outer.fillVisibleArea();  //show the selected line at line 3 in graphic or before 0..2
         outer.bPrepareVisibleArea = false;
       }
       ////
@@ -1665,7 +1690,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      */
     protected boolean redrawTableWithFocusedCell(CellData data){
       if(bPrepareVisibleArea){
-        fillVisibleArea(lineSelected, 3);  //show the selected line at line 3 in graphic or before 0..2
+        fillVisibleArea();  //show the selected line at line 3 in graphic or before 0..2
         bPrepareVisibleArea = false;
       }
       TableLineData line = outer.linesForCell[data.ixCellLine];
@@ -1839,8 +1864,25 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       super.addSiblingNext(line);
       //line.parentLine = this;
       line.treeDepth = this.treeDepth;
-      line.nLineNr = 0;
-      //childLines.add(row, line);
+      if(texts !=null){
+        for(int ixCol = 0; ixCol < texts.length && ixCol < line.cellTexts.length; ++ixCol){
+          line.cellTexts[ixCol] = texts[ixCol];
+        }
+      }
+      line.userData = userDataP;
+      GralTable.this.bPrepareVisibleArea = true;
+      return line;
+
+    }
+    
+    
+    public GralTableLine_ifc<UserData> addPrevLine(String keyP, String[] texts, UserData userDataP){
+      //hasChildren = hasChildren();
+      TableLineData line = GralTable.this.new TableLineData();
+      line.key = keyP;
+      super.addSiblingPrev(line);
+      //line.parentLine = this;
+      line.treeDepth = this.treeDepth;
       if(texts !=null){
         for(int ixCol = 0; ixCol < texts.length && ixCol < line.cellTexts.length; ++ixCol){
           line.cellTexts[ixCol] = texts[ixCol];

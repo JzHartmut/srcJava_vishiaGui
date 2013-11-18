@@ -15,7 +15,7 @@ import org.vishia.util.KeyCode;
 
 /**This is one table of favorite pathes in the file commander.  
  */
-public class FcmdFavorCard  extends GralSelectList
+public class FcmdFavorCard  extends GralSelectList<FcmdFavorPathSelector.FavorPath>
 {
   /**The component */
   final Fcmd main;
@@ -48,11 +48,11 @@ public class FcmdFavorCard  extends GralSelectList
    *   than show the label in the left cell (column)
    * @param favorPathInfo The favorite info
    */
-  void add(FcmdFavorPathSelector.FavorPath favorPathInfo)
+  GralTableLine_ifc<FcmdFavorPathSelector.FavorPath> add(FcmdFavorPathSelector.FavorPath favorPathInfo)
   {
     if(indexFavorPaths.get(favorPathInfo.selectName) == null){
       indexFavorPaths.put(favorPathInfo.selectName, favorPathInfo);
-      GralTableLine_ifc line = wdgdTable.addLine(null, null, null);
+      GralTableLine_ifc<FcmdFavorPathSelector.FavorPath> line = wdgdTable.addLine(null, null, null);
       line.setUserData(favorPathInfo);
       /*
       if(info.label !=null){
@@ -62,7 +62,9 @@ public class FcmdFavorCard  extends GralSelectList
       line.setCellText(favorPathInfo.selectName, 1);
       line.setCellText(favorPathInfo.path, 2);
       line.repaint(100,0);
+      return line;
     }
+    else return null;
   }
   
   
@@ -82,15 +84,16 @@ public class FcmdFavorCard  extends GralSelectList
     clear();
     int lineCt =0;
 
-    int currentLine = 0;
+    GralTableLine_ifc<FcmdFavorPathSelector.FavorPath> currentLine = null;
     for( FcmdFavorPathSelector.FavorPath favorPathInfo: favorTabInfo.listfavorPaths){
-      add(favorPathInfo);
+      GralTableLine_ifc<FcmdFavorPathSelector.FavorPath> line = add(favorPathInfo);
+      if(currentLine == null){ currentLine = line; }  //first line
       if(favorPathInfo.selectName.equals(sActSelectedFavorPath)){
-        currentLine = lineCt;
+        currentLine = line;  //or the last selected one.
       }
       lineCt +=1;
     }
-    wdgdTable.setCurrentCell(currentLine, 1);
+    wdgdTable.setCurrentLine(currentLine, 3, 1);
 
   }
   

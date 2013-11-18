@@ -98,14 +98,17 @@ public interface GralTable_ifc<UserData> extends GralWidget_ifc
    *   The value -1 let the current line in the table unchanged.
    * @return true if found.
    */
-  boolean setCurrentLine(int line);
+  //boolean setCurrentLine(int line);
   
-  /**Sets the cell which is the current one in the line.
-   * @param line from 0 for the first (top) line. 
-   *   A number greater than the number of lines, especially Integer.MAX_VALUE selects the last line.
-   * @param column from 0 for the left column, if -1 then let the current row of table unchanged.
+  /**Sets the cell which is the current one in the given line.
+   * @param line The line which should be selected.
+   * @param ixline the index in the visible are of table where the line should be present. 
+   *   If the index is negative, the lines from end of visible are are countered.
+   *   if the index is outside of the area, it will be set inside.  
+   * @param ixcolumn from 0 for the left column, if -1 then let the current row of table unchanged.
    */
-  boolean setCurrentCell(int line, int column);
+  void setCurrentLine(GralTableLine_ifc<UserData> line, int ixline, int ixcolumn);
+  //boolean setCurrentCell(int line, int column);
   
   /**Returns the line at row.
    * @param row 0 is the first row. Must not be negative.
