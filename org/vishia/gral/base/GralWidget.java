@@ -815,7 +815,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   public GralMenu getContextMenu(){
     if(contextMenu == null){
-      contextMenu = itsMng.addContextMenu(this);   //delegation, the widget mng knows the implementation platform.
+      contextMenu = itsMng.createContextMenu(this);   //delegation, the widget mng knows the implementation platform.
     }
     return contextMenu;
   }

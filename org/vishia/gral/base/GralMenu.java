@@ -141,7 +141,11 @@ public abstract class GralMenu //extends GralWidget
   /**Adds with a given widget.
    * Note the widget is in difference with the {@link #widgg} of the constructor. 
    * Check what is happen. Therefore:
-   * @deprecated
+   * @deprecated The {@link GralWidget#getContextMenu()} creates a menu for the graphic implementation layer widget
+   *   and assigns it to the widget as GralMenu. The GralMenu has the association {@link #widgg} to the widget already.
+   *   In the adequate case {@link GralWindow#getMenuBar()} adds the menu to the window and stores the window's reference 
+   *   in {@link #widgg}. That is proper to use. This method was create before the {@link #widgg} are set
+   *   in this constructor.  
    * @param widggMenu the widget can be used to add any {@link GralWidget#setContentInfo(Object)} etc. 
    *   It is provided in the action method.
    * @param name

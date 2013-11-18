@@ -37,6 +37,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-11-19 Hartmut new: {@link #repaint(int, int)} overridden forces paint of the whole curve
+   *   by setting {@link #bPaintAllCmd}, whereby in {@link #setSample(float[], int)} super.repaint is invoked, 
+   *   which does not set {@link #bPaintAllCmd} and paints therefore only the new data. 
    * <li>2013-07-25 Hartmut new AutoSave capabilities.
    * <li>2013-05-19 Hartmut new: {@link GralCurveViewMouseAction}
    * <li>2013-05-19 Hartmut new: {@link #selectTrack(int, int, int, int)} with ctrl and left mouse pressed
@@ -912,7 +915,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
 
     if(!bFreeze){
       redrawBecauseNewData = true;
-      repaint(50,100);
+      super.repaint(50,100);
     }
   }
 
@@ -1336,10 +1339,26 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   }
   
   
+  /**Forces repaint of the whole curves. It sets the internal flag {@link #bPaintAllCmd} which is checked
+   * in the paint event routine. In opposite {@link #setSample(float[], int)} invokes
+   * super.repaint of {@link GralWidget#repaint(int, int)} without setting that flag. Therefore the graphic
+   * will be shifted to left only with paint of only the new data.
+   * @see org.vishia.gral.base.GralWidget#repaint(int, int)
+   */
+  @Override public void repaint(int delay, int latest){
+    System.out.println("GralCurveView.Info - repaint all Trigger;");
+    bPaintAllCmd = true;      //used in implementation level to force a paint of the whole curves.
+    bNewGetVariables= true;   //used to get faulty variables newly with an error message.
+    super.repaint(delay, latest);
+  }
   
   
-  
+  /**Forces that the next repaint paints the whole graphic.
+   * This method should be invoked if the conditions for the graphic are changed, for example
+   * changed colors for lines. 
+   */
   protected void setPaintAllCmd(){
+    System.out.println("GralCurveView.Info - paintallTrigger;");
     bPaintAllCmd = true;      //used in implementation level to force a paint of the whole curves.
     bNewGetVariables= true;   //used to get faulty variables newly with an error message.
   }

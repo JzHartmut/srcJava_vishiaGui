@@ -373,25 +373,26 @@ public final class InspcCurveView
     if(actionCode == KeyCode.menuEntered){
       GralWidget variableWidget = gralMng.getWidgetOnMouseDown();
       //GralTextField widgText = (GralTextField)widgd;
-      GralWidget widgText = widgd;
       //String sVariable = variableWidget.name;
       Object oContentInfo = widgd.getContentInfo();
       String sPath = variableWidget.getDataPath();
       TrackValues input;
       if(bTabWidget){
-        GralTable table = (GralTable)oContentInfo;
-        GralTableLine_ifc refline = table.getCurrentLine();
-        int refLineNr;
-        if(refline == null){ //end of table of empty table
-          refLineNr = -1;  //on end
-        } else {
-          refLineNr = refline.getLineNr();
-        }
-        if(bInsert || refline == null){
+        assert(widgd instanceof GralTable<?>);  //NOTE: context menu to table lines, has GralTable as widget.
+        @SuppressWarnings("unchecked")
+        GralTable<TrackValues> table = (GralTable<TrackValues>)widgd; //oContentInfo;
+        GralTableLine_ifc<TrackValues> refline = table.getCurrentLine();
+        if(bInsert || refline == null){  //insert a line, build a new one
           input = new TrackValues(-1);
-          GralTableLine_ifc newline = table.insertLine(sPath, refLineNr, new String[]{""}, input);
+          GralTableLine_ifc<?> newline;
+          if(refline ==null){
+            newline = table.addLine(sPath, new String[]{""}, input);  //add on end
+          } else {
+            newline = refline.addNextLine(sPath, new String[]{""}, input);
+          }
           newline.setCellText(sPath, 0);
-        } else {
+        } 
+        else {
           input = (TrackValues)refline.getContentInfo();
           refline.setCellText(sPath, 0);
         }
@@ -668,7 +669,8 @@ public final class InspcCurveView
    */
   GralUserAction actionSelectVariableInTable = new GralUserAction("actionSelectOrChgVarPath"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
-      GralTableLine_ifc line = (GralTableLine_ifc)params[0];
+      @SuppressWarnings("unchecked")
+      GralTableLine_ifc<TrackValues> line = (GralTableLine_ifc<TrackValues>)params[0];
       if(line !=null){
         TrackValues track = (TrackValues)line.getContentInfo();
         if(track !=null){

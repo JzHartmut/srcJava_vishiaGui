@@ -853,9 +853,13 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   /**Creates the context menu for the given widget for right-mouse pressing.
    * This method is invoked only in {@link GralWidget#getContextMenu()} whereby an existing
    * context menu is stored in the {@link GralWidget#contextMenu} association. 
+   * The widget have to be set to panel already, an implementation widget have to be existing.
+   * It means {@link GralWidget#getWidgetImplementation()} should be return that instance
+   * where the menu is to be added.
+   * This method is package protected because it should only be called internally.
    * @param widg The widget
    */
-  protected abstract GralMenu addContextMenu(GralWidget widgg);
+  protected abstract GralMenu createContextMenu(GralWidget widgg);
   
   
   /**Creates the menu bar for the given window.
