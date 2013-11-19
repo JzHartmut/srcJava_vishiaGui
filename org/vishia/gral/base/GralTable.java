@@ -453,7 +453,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     GralTableLine_ifc<UserData> line = idxLine.get(key);
     if(line == null) return false;
     else {
-      int nLine = line.getLineNr();
       setCurrentLine(line, lineSelectedixCell, -1);
       return true;
     }
@@ -477,19 +476,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     colorSelectChars = GralColor.getColor("wh");
   }
   
-  
-  
-  @Override
-  public GralTableLine_ifc<UserData> getCurrentLine() {
-    return lineSelected;
-    /*
-    if(ixLine >=0 && ixLine < tableLines.size()){
-      return tableLines.get(ixLine);
-    }
-    else return null;
-    */
-  }
-
   
   
   
@@ -536,6 +522,23 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
 
   
+  /**Returns the current selected line. */
+  @Override
+  public GralTableLine_ifc<UserData> getCurrentLine() {
+    return lineSelected;
+  }
+
+  
+  /**Returns the temporary selected line while pressing the mouse button.
+   * This method is able to use especially in mouse actions of user level.
+   * On pressing any mouse button the line on mouse position is set independent of the current line.
+   * The {@link #lineSelected()} is unchanged in this moment. 
+   * @return The line where the mouse button is pressed.
+   */
+  public TableLineData getLineMousePressed(){ return lineSelectedNew; }
+  
+  
+  
   @Override public GralTableLine_ifc<UserData> getLine(int row) {
     if(row >= tableLines.size()) return null;
     else return tableLines.get(row);
@@ -547,7 +550,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     return idxLine.get(key);
   }
 
-  
   
   
   @Override public TableLineData insertLine(String key, int row, String[] cellTexts, UserData userData) {
@@ -905,6 +907,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       lineSelected = lineSelectedNew;
       lineSelectedNew = null;
       lineSelectedixCell = cell.ixCellLine;  //used for key handling.
+      actionOnLineSelected(lineSelected);
       repaint(0,0);
     }
   }

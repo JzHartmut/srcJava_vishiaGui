@@ -187,6 +187,11 @@ public final class InspcCurveView
   
   GralTextField widgScale, widgScale0, widgline0;
   
+  /**The one of {@link #widgScale0}, {@link #widgScale0} or {@link #widgline0} which was focused lastly.
+   * To use for [+] and [-] button.
+   */
+  GralTextField scalingWidg = widgScale;
+  
   GralTextField widgValCursorLeft, widgValCursorRight; ///
   
   GralButton widgBtnUp, widgBtnDn, widgBtnScale, widgBtnReadCfg, widgBtnSaveCfg;
@@ -263,8 +268,9 @@ public final class InspcCurveView
     gralMng.setPosition(0, GralPos.size +2, posright, 0, 0, 'd', 0);
     gralMng.addText("curve variable");
     if(bTabWidget){
+      widgTableVariables = new GralTable<TrackValues>("variables", new int[]{-posright});
       gralMng.setPosition(2, GralPos.size +20, posright, 0, 0, 'd', 0);
-      widgTableVariables = gralMng.addTable("variables", 12, new int[]{-posright});
+      widgTableVariables.setToPanel(gralMng);
       widgTableVariables.specifyActionOnLineSelected(actionSelectVariableInTable);
       widgTableVariables.addContextMenuEntryGthread(0, null, "insert variable", actionInsertVariable);
       widgTableVariables.addContextMenuEntryGthread(0, null, "replace variable", actionReplaceVariable);
@@ -279,44 +285,18 @@ public final class InspcCurveView
         track.colorCurve = GralColor.getColor(sColor);
         if(track.colorCurve ==null){ throw new IllegalArgumentException("InspcCurveView-unknown color; " + sColor); }
         this.tracks[ii] = track;
-        if(bTabWidget){
-          GralTableLine_ifc line = widgTableVariables.addLine(null, new String[]{""}, track);
-          line.setTextColor(track.colorCurve);
-        } else {
-          track.widgVarPath = gralMng.addTextField(null, true, sName, sName);
-          track.widgVarPath.setTextColor(track.colorCurve);
-          track.widgVarPath.setContentInfo(track);
-          track.widgVarPath.setMouseAction(actionSelectOrChgVarPath);  //used as actionChange too
-          track.widgVarPath.setActionChange(actionSelectOrChgVarPath);
-          //input[ii].widgPath.setMouseAction(actionDropVariable);
-          tracks[ii].widgVarPath.setDataPath("widgetInfo");  //prevent storing the own widgetInfo.
-          //input[ii].widgPath.setContentInfo(input[ii]);
-          
-          GralMenu menuWidg = track.widgVarPath.getContextMenu();
-          GralWidget widgMenuItem1 = new GralWidget("x", 'M', null);
-          menuWidg.addMenuItemGthread(widgMenuItem1, "x", "drop variable", actionReplaceVariable);
-          GralWidget widgMenuItem2 = new GralWidget("x", 'M', null);
-          menuWidg.addMenuItemGthread(widgMenuItem2, "x", "swap variable", actionSwapVariable);
-          GralWidget widgMenuItem5 = new GralWidget("x", 'M', null);
-          menuWidg.addMenuItemGthread(widgMenuItem5, "x", "shift variable", actionShiftVariable);
-          GralWidget widgMenuItem3 = new GralWidget("x", 'M', null);
-          menuWidg.addMenuItemGthread(widgMenuItem3, "x", "set color", actionColorSelectorOpen);
-          GralWidget widgMenuItem4 = new GralWidget("x", 'M', null);
-          menuWidg.addMenuItemGthread(widgMenuItem4, "x", "set scale", actionSetScaleValues2Track);
-          
-          widgMenuItem1.setContentInfo(tracks[ii]);
-          widgMenuItem2.setContentInfo(tracks[ii]);
-          widgMenuItem3.setContentInfo(tracks[ii]);
-          widgMenuItem4.setContentInfo(tracks[ii]);
-          widgMenuItem5.setContentInfo(tracks[ii]);
-        }
+        GralTableLine_ifc<TrackValues> line = widgTableVariables.addLine(null, new String[]{""}, track);
+        line.setTextColor(track.colorCurve);
         track.trackView = widgCurve.initTrack(sName, null, track.colorCurve, ii, 50, 5000.0f, 0.0f);
       }
     }
     gralMng.setPosition(/*22*/-19, GralPos.size +3, -8, 0, 0, 'd', 0);
     widgScale = gralMng.addTextField("scale", true, "scale/div", "t");
+    widgScale.setActionFocused(actionFocusScaling);
     widgScale0 = gralMng.addTextField("scale0", true, "mid", "t");
+    widgScale0.setActionFocused(actionFocusScaling);
     widgline0 = gralMng.addTextField("line0", true, "line-%", "t");
+    widgline0.setActionFocused(actionFocusScaling);
     gralMng.setPosition(/*32*/-9, GralPos.size +2, -10, GralPos.size +2, 0, 'r', 1);
     /*
     gralMng.setPosition(-23, GralPos.size +1, -10, 0, 0, 'd', 2);
@@ -381,14 +361,14 @@ public final class InspcCurveView
         assert(widgd instanceof GralTable<?>);  //NOTE: context menu to table lines, has GralTable as widget.
         @SuppressWarnings("unchecked")
         GralTable<TrackValues> table = (GralTable<TrackValues>)widgd; //oContentInfo;
-        GralTableLine_ifc<TrackValues> refline = table.getCurrentLine();
+        GralTable<TrackValues>.TableLineData refline = (GralTable<TrackValues>.TableLineData)table.getCurrentLine();
         if(bInsert || refline == null){  //insert a line, build a new one
           input = new TrackValues(-1);
           GralTableLine_ifc<?> newline;
           if(refline ==null){
             newline = table.addLine(sPath, new String[]{""}, input);  //add on end
           } else {
-            newline = refline.addNextLine(sPath, new String[]{""}, input);
+            newline = refline.addPrevLine(sPath, new String[]{""}, input);
           }
           newline.setCellText(sPath, 0);
         } 
@@ -539,8 +519,14 @@ public final class InspcCurveView
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       if(actionCode == KeyCode.menuEntered && trackScale !=null){
         //read paths                                  
-        Object oContent = widgd.getContentInfo();
-        TrackValues trackDst = (TrackValues)oContent;
+        //Object oContent = widgd.getContentInfo();
+        assert(widgd instanceof GralTable<?>);
+        @SuppressWarnings("unchecked")
+        GralTable<TrackValues> table = (GralTable<TrackValues>) widgd;
+        GralTable<TrackValues>.TableLineData linedst = table.getLineMousePressed();
+        GralTableLine_ifc<TrackValues> linesrc = table.getCurrentLine();
+        
+        TrackValues trackDst = table.getLineMousePressed().getUserData();  //(TrackValues)oContent;
         if(trackDst != trackScale){
           String sPathSwap = trackDst.widgVarPath.getText();
           GralColor colorSwap = trackDst.trackView.getLineColor(); //trackDst.colorCurve; //  
@@ -627,7 +613,36 @@ public final class InspcCurveView
   GralUserAction actionSetScaleValues2Track = new GralUserAction("actionSetScaleValues2Track"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode) && trackScale !=null){
-        if(widgd.sCmd == "!"){
+        boolean setScale = false;
+        if(widgd.sCmd == "-"){
+          try{
+            String s1 = widgScale.getText();
+            float value = Float.parseFloat(s1);
+            int exp = (int)Math.log10(value);
+            float base = (float)Math.pow(10.0, exp);
+            value = value/2;
+            s1 = Float.toString(value);
+            widgScale.setText(s1);
+            setScale = true;
+          } catch(NumberFormatException exc){
+            widgScale.setBackColor(GralColor.getColor("lrd"),0);
+          }
+        }
+        else if(widgd.sCmd == "+"){
+          try{
+            String s1 = widgScale.getText();
+            float value = Float.parseFloat(s1);
+            int exp = (int)Math.log10(value);
+            float base = (float)Math.pow(10.0, exp);
+            value = value*2;
+            s1 = Float.toString(value);
+            widgScale.setText(s1);
+            setScale = true;
+          } catch(NumberFormatException exc){
+            widgScale.setBackColor(GralColor.getColor("lrd"),0);
+          }
+        }
+        if(setScale || widgd.sCmd == "!"){
           try{
             String s1 = widgScale.getText();
             float scale = Float.parseFloat(s1);
@@ -791,7 +806,7 @@ public final class InspcCurveView
                 sCellTexts[0] = sDataPath;
                 trackValue.colorCurve = track.getLineColor();
                 if(bTabWidget){
-                  GralTableLine_ifc line = widgTableVariables.addLine(sDataPath, sCellTexts, trackValue);
+                  GralTableLine_ifc<TrackValues> line = widgTableVariables.addLine(sDataPath, sCellTexts, trackValue);
                   line.setTextColor(trackValue.colorCurve);
                 }
                 if(!bTabWidget){
@@ -886,6 +901,16 @@ public final class InspcCurveView
   } };
   
 
+  public GralUserAction actionFocusScaling = new GralUserAction("actionSetFocusScaling"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
+      scalingWidg.setBackColor(GralColor.getColor("wh"), 0);   //current, old  
+      scalingWidg = (GralTextField)widgd;
+      scalingWidg.setBackColor(GralColor.getColor("lam"), 0);  //the new one
+      return true;
+    }
+  };
+ 
+  
   public GralUserAction actionColorSelectorOpen = new GralUserAction("GralColorSelector-open"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
@@ -907,7 +932,7 @@ public final class InspcCurveView
           trackScale.trackView.setLineProperties(color, 3, 0);  //change color immediately to see what happen
           trackScale.colorCurve = color;
           */
-          GralTableLine_ifc line = widgTableVariables.getCurrentLine();
+          GralTableLine_ifc<TrackValues> line = widgTableVariables.getCurrentLine();
           line.setTextColor(color);
           TrackValues track = (TrackValues)line.getContentInfo();
           if(track == trackScale){
