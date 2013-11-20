@@ -125,9 +125,8 @@ public class FcmdExecuter
       if(extensionCmd !=null){
         widgSelectExec.clearTable();
         for(CmdBlock block: extensionCmd.listCmd){
-          GralTableLine_ifc line = widgSelectExec.insertLine(block.name, 0, null, null);
+          GralTableLine_ifc line = widgSelectExec.insertLine(block.name, 0, null, block);
           line.setCellText(block.title, 0);
-          line.setUserData(block);
         }
         windConfirmExec.setWindowVisible(true);
       /*  
@@ -261,9 +260,8 @@ public class FcmdExecuter
       if(extensionCmd !=null){
         widgSelectExec.clearTable();
         for(CmdBlock block: extensionCmd.listCmd){
-          GralTable.TableLineData line = widgSelectExec.insertLine(block.name, 0, null, null);
+          GralTable.TableLineData line = widgSelectExec.insertLine(block.name, 0, null, block);
           line.setCellText(block.title, 0);
-          line.setUserData(block);
         }
         windConfirmExec.setWindowVisible(true);
       } else {

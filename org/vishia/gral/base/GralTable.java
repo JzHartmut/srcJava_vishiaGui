@@ -23,6 +23,7 @@ import org.vishia.util.Removeable;
 import org.vishia.util.SelectMask;
 import org.vishia.util.MarkMask_ifc;
 import org.vishia.util.TreeNodeBase;
+import org.vishia.util.TreeNode_ifc;
 
 /**This is the Gral class for a table. Its usage is independent of a graphical implementation layer.
  * A table consists of some text fields which are arranged in columns and lines. 
@@ -179,13 +180,21 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
   
+  protected int keyOpenChild = KeyCode.shift + KeyCode.right, keyCloseChild = KeyCode.shift + KeyCode.left;
   
-  protected final Map<String, TableLineData> idxLine = new TreeMap<String, TableLineData>();
+  protected String keySeparator = "/";
+  
+  //protected final Map<String, TableLineData> idxLine = new TreeMap<String, TableLineData>();
   
   /**This action will be called any time when the selection of the current line is changed. 
-   * The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called
+   * The {@link GralUserAction#exec(int, GralWidget_ifc, Object...)} will be called
    * with the line as Object. */
   GralUserAction actionOnLineSelected;
+  
+  /**This action will be called any time when children of a tree node line should be refreshed. 
+   * The {@link GralUserAction#exec(int, GralWidget_ifc, Object...)} will be called
+   * with the line as Object. */
+  GralUserAction actionOnRefreshChildren;
   
   /**Width of each column in GralUnits. */
   protected int[] columnWidthsGral;
@@ -249,7 +258,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * Contains content, color, selection etc. of the lines with there cells.
    * 
    */
-  protected ArrayList<TableLineData> tableLines = new ArrayList<TableLineData>();
+  //protected ArrayList<TableLineData> tableLines = new ArrayList<TableLineData>();
   
   
   TreeNodeBase<TableLineData, UserData, GralTableLine_ifc<UserData>> rootLine;
@@ -344,6 +353,17 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     actionMarkOnLine = action;
   }
   
+  /**Sets an action which is called any time when another line is selected.
+   * This action will be called any time when the selection of the current line is changed. 
+   * The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called
+   * with the line as Object.
+   * @param actionOnLineSelected The action, null to switch off this functionality.
+   */
+  public void specifyActionOnRefreshChildren(GralUserAction action){
+    this.actionOnRefreshChildren = action;
+  }
+  
+  
   /**Specifies the keys to mark lines in the table.
    * Without invocation of this method the keys {@link KeyCode#shift} + {@link KeyCode#up}
    * respectively shift+dn are specified.
@@ -355,30 +375,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   }
   
   
-  
-  @Override public void setBackColor(GralColor color, int ix){ 
-    if(ix >=0){
-      if(ix < tableLines.size()){
-        tableLines.get(ix).setBackColor(color, -1);
-      }
-    } else {
-      if(ix == kAllLines){
-        for(TableLineData line: tableLines){
-          line.setBackColor(color, -1);
-        }
-      }
-      super.setBackColor(color, ix);
-    }
-  }
-  
-  
-  @Override public GralColor getBackColor(int ix){ 
-    if(ix >=0 && ix < tableLines.size()){
-      return tableLines.get(ix).getBackColor(-1);
-    } else {
-      return dyda.backColor;
-    }
-  }
   
 
   
@@ -450,7 +446,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   }
   
   @Override public boolean setCurrentLine(String key){
-    GralTableLine_ifc<UserData> line = idxLine.get(key);
+    GralTableLine_ifc<UserData> line = rootLine.getNode(key, keySeparator);
     if(line == null) return false;
     else {
       setCurrentLine(line, lineSelectedixCell, -1);
@@ -539,28 +535,21 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   
-  @Override public GralTableLine_ifc<UserData> getLine(int row) {
-    if(row >= tableLines.size()) return null;
-    else return tableLines.get(row);
-  }
 
   @Override
   public GralTableLine_ifc<UserData> getLine(String key) {
-    // TODO Auto-generated method stub
-    return idxLine.get(key);
+    return rootLine.getNode(key, keySeparator);
   }
 
   
   
   @Override public TableLineData insertLine(String key, int row, String[] cellTexts, UserData userData) {
-    TableLineData line = this.new TableLineData();
+    TableLineData line = this.new TableLineData(key, userData);
     
-    zLine = tableLines.size();
     if(row > zLine || row < 0){
       row = zLine;
     }
     line.nLineNr = row;
-    line.key = key;
     if(row == 0){
       rootLine.addNodeFirst(line);  //addOnTop
     }
@@ -568,20 +557,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       lineSelected = line;
       actionOnLineSelected(lineSelected);
     }
-    tableLines.add(row, line);
     zLine +=1;
     if(cellTexts !=null){
       for(int ixCol = 0; ixCol < cellTexts.length && ixCol < line.cellTexts.length; ++ixCol){
         line.cellTexts[ixCol] = cellTexts[ixCol];
       }
-    }
-    line.userData = userData;
-    if(key !=null){
-      idxLine.put(key, line);
-    }
-    for(int ii=row+1; ii < zLine; ++ii){
-      TableLineData line2 = tableLines.get(ii);
-      line2.nLineNr = ii;
     }
     bPrepareVisibleArea = true;
     repaint(100, 0);
@@ -591,24 +571,17 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   @Override public TableLineData addLine(String key, String[] cellTexts, UserData userData) {
-    TableLineData line = this.new TableLineData();
+    TableLineData line = this.new TableLineData(key, userData);
     if(lineSelected == null){ 
       lineSelected = line;
       actionOnLineSelected(lineSelected);
     }
-    zLine = tableLines.size();
-    line.key = key;
+    zLine += 1;
     rootLine.addNode(line);
-    tableLines.add(zLine, line);
-    zLine +=1;
     if(cellTexts !=null){
       for(int ixCol = 0; ixCol < cellTexts.length && ixCol < line.cellTexts.length; ++ixCol){
         line.cellTexts[ixCol] = cellTexts[ixCol];
       }
-    }
-    line.userData = userData;
-    if(key !=null){
-      idxLine.put(key, line);
     }
     bPrepareVisibleArea = true;
     repaint(100, 0);
@@ -621,61 +594,32 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   @Override public void deleteLine(GralTableLine_ifc<UserData> line) {
     int linenr = line.getLineNr();
     TableLineData tline = (TableLineData)line;
-    if(tline.key !=null){ 
-      TableLineData kline = idxLine.remove(tline.key);
-      if(kline != tline){
-        idxLine.put(kline.key, kline);
-      }
-    }
-    tableLines.remove(linenr);
-    for(int ii=linenr; ii < tableLines.size(); ++ii){
-      TableLineData line2 = tableLines.get(ii);
-      line2.nLineNr = ii;
-    }
     zLine -=1;
     if(ixLine == linenr){  //TODO correct???
       ixLineNew = ixLine = -1;
       gi.ixGlineSelectedNew = -1;  //deselects ixGlineSelected on redraw!
     }
     bPrepareVisibleArea = true;
-    bPrepareVisibleArea = true;
+    line.detach();
     repaint(200,200);
   }
   
   
   
-  @Override public void replaceLineKey(GralTableLine_ifc<UserData> line, String keyNew){
-    TableLineData lineData = (TableLineData)line;
-    String keyOld = lineData.key;
-    if(keyOld !=null){
-      TableLineData lineOld = idxLine.remove(keyOld);
-      if(lineOld != line){ //multiple keys, it was another line:
-        idxLine.put(keyOld, lineOld);  //put it back again, don't remove.
-      }
-    }
-    if(keyNew !=null){
-      //assert(line instanceof GralTable<UserData>.TableLineData);
-      idxLine.put(keyNew, (TableLineData)line);
-    }
-    lineData.key = keyNew;  //maybe null 
-  }
   
   
   
-  
-  @Override public int size(){ return zLine = tableLines.size(); }
+  @Override public int size(){ return zLine; }
   
 
   @Override public void clearTable() {
     gi.ixLine1 = gi.ixLine2 = 0;
     ixColumn = 0;
     zLine = 0;
-    tableLines.clear();
     lineSelected = null;
     actionOnLineSelected(lineSelected);
     ixLineNew = ixLine = -1;
     gi.ixGlineSelectedNew = -1;  //deselects ixGlineSelected on redraw!
-    idxLine.clear();
     searchChars.setLength(0);
     for(int ix = 0; ix < linesForCell.length; ++ix){
       linesForCell[ix] = null;
@@ -688,9 +632,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   @Override public List<GralTableLine_ifc<UserData>> getMarkedLines(int mask) {
     List<GralTableLine_ifc<UserData>> list = new LinkedList<GralTableLine_ifc<UserData>>();
-    for(TableLineData item: tableLines){
-      if(item.userData instanceof MarkMask_ifc){
-        if((((MarkMask_ifc)item.userData).getMark() & mask) !=0){
+    
+    for(TableLineData item: rootLine.iterator()){
+      if(item.data instanceof MarkMask_ifc){
+        if((((MarkMask_ifc)item.data).getMark() & mask) !=0){
           list.add(item);
         }
       }
@@ -702,12 +647,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   }
 
   
-  @Override public List<? extends GralTableLine_ifc<UserData>> getAllLines() { return tableLines; }
+  @Override public TreeNode_ifc<?, UserData> getAllLines() { return rootLine; }
   
   
   @Override public List<UserData> getListContent() {
     List<UserData> list = new LinkedList<UserData>();
-    for(TableLineData item: tableLines){
+    for(TableLineData item: rootLine.iterator()){
       list.add(item.getUserData());
     }
     return list;
@@ -715,7 +660,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   
   @Override public GralTableLine_ifc<UserData> getFirstMarkedLine(int mask) {
-    for(TableLineData item: tableLines){
+    for(TableLineData item: rootLine.iterator()){
       if((item.getMark() & mask) !=0){
         return item;
       }
@@ -845,25 +790,23 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   TableLineData nextLine(TableLineData lineP){
-    TableLineData line2 = lineP, line = lineP;
-    while(line2 !=null && line2.showChildren){
-      line2 = line.firstChild();         //deeper to any children
-      if(line2 !=null){ line = line2; }
+    TableLineData line = lineP;
+    TableLineData linenext = null;
+    if(line.showChildren){
+      linenext = line.firstChild();         //deeper to any children
     }
-    if(line == line2){ //no children found
-      line2 = line.nextSibling();
-      if(line2 != null){
-        line = line2;
-      } else if( !line.parentEquals(rootLine)) {
-        line2 = line.parent();
-        //TODO continue with next child from parent.
-        line = line2;
-      } else {
-        //end of table
-        line = null;
+    if(linenext == null){ //no children found
+      linenext = line.nextSibling();  //may go to next root
+    }
+    while(linenext == null //no sibling found
+      && !line.parentEquals(rootLine)) 
+    {
+      linenext = line.parent();
+      if(linenext !=null){
+        linenext = linenext.nextSibling();  //may null, then repeat for next parent
       }
     }
-    return line;
+    return linenext;  //maybe null
   }
   
   
@@ -935,40 +878,36 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @return
    */
   protected void searchContent(boolean bUp){
-    if(searchChars.length() >0){
-      String search = searchChars.toString();
-      int ixLineNewAct = ixLineNew;
-      boolean contSearch = true;
-      do{
-        if(bUp && ixLineNew > 0){        //up
-          ixLineNew -=1;
-        } else if(!bUp && ixLineNew < zLine-1){ //down
-          ixLineNew +=1;
+    String search = searchChars.toString();
+    boolean contSearch = true;
+    TableLineData line2, line = lineSelected;
+    do{
+      if(bUp && line !=null){        //up
+        line2 = prevLine(line);
+      } else if(!bUp && line !=null){ //down
+        line2 = nextLine(line);
+      } else {
+        //ixLineNew = ixLineNewAct;
+        line2 = null;                 //eand reached
+      }
+      if(line2 ==null){
+        contSearch = false;  //without change the lineSelected
+      } else {
+        line = line2;
+        String sText = line.getCellText(ixColumn).toLowerCase();
+        if(search.length() > 0 && searchChars.charAt(0) == '*'){
+          contSearch = false;  //TODO search content contains
         } else {
-          //ixLineNew = ixLineNewAct;
-          contSearch = false;                 //eand reached
-        }
-        if(contSearch){
-          GralTableLine_ifc<?> lineGral = tableLines.get(ixLineNew);
-          String sText = lineGral.getCellText(ixColumn).toLowerCase();
-          if(searchChars.charAt(0) == '*'){
-            contSearch = false;  //TODO
+          if( search.length() == 0   //always found if no searchchar is given.
+            || !sText.startsWith(search)){  //found
           } else {
-            if(!sText.startsWith(search)){
-            } else {
-              contSearch = false;                   //found
-            }
+            lineSelected = line;
+            bPrepareVisibleArea = true;
+            contSearch = false;                   //found
           }
         }
-      } while(contSearch);
-      
-    } else {
-      if(bUp && ixLineNew > 0){        //up
-        ixLineNew -=1;
-      } else if(!bUp && ixLineNew < zLine-1){ //down
-        ixLineNew +=1;
       }
-    }
+    } while(contSearch);
   }
   
   
@@ -1082,12 +1021,27 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           } else if(keyCode == KeyCode.back && searchChars.length() >0){
             searchChars.setLength(searchChars.length()-1);
             repaint();
+          } else if(keyCode == keyOpenChild){
+            if(lineSelected.lineCanHaveChildren){
+              actionOnRefreshChildren(lineSelected);  //may get or refresh children, callback in user.
+            }
+            if(lineSelected.hasChildren()){           //only if it has children currently really.
+              lineSelected.showChildren = true;
+              fillVisibleAreaBehind(lineSelected, lineSelectedixCell);
+              repaint();
+            }
+          } else if(keyCode == keyCloseChild){
+            if(lineSelected.showChildren){
+              lineSelected.showChildren = false;
+              fillVisibleAreaBehind(lineSelected, lineSelectedixCell);
+              repaint();
+            }
           } else {
             done = false;
           }
         }//switch
         if(done == false && keyCode == keyMarkDn && ixLine >=0){
-          GralTableLine_ifc<?> line = tableLines.get(ixLine);
+          GralTableLine_ifc<?> line = lineSelected; //tableLines.get(ixLine);
           if((line.getMark() & 1)!=0){
             //it is selected yet
             line.setNonMarked(1, line.getUserData());
@@ -1162,6 +1116,22 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   protected void actionOnLineSelected(GralTableLine_ifc<?> line){
     if(actionOnLineSelected !=null){
       actionOnLineSelected.exec(KeyCode.tableLineSelect, this, line);
+    }
+  }
+  
+  
+  /**It is called whenever another line is selected, if the focus is gotten by mouse click
+   * or a navigation key is pressed. 
+   * This method calls the {@link GralUserAction#userActionGui(int, GralWidget, Object...)}.
+   * The {@link #specifyActionOnLineSelected(GralUserAction)} can be set with any user instantiation
+   * of that interface. The params[0] of that routine are filled with the {@link GralTableLine_ifc}
+   * of the selected line.
+   *  
+   * @param line
+   */
+  protected void actionOnRefreshChildren(GralTableLine_ifc<?> line){
+    if(actionOnRefreshChildren !=null){
+      actionOnRefreshChildren.exec(KeyCode.tableLineSelect, this, line);
     }
   }
   
@@ -1458,148 +1428,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
     
 
-    /**Redraws the whole table because the current line is changed or the focus is changed
-     * or the content is changed and #re
-     * TODO
-     * {@link GralWidgetGthreadSet_ifc#redrawGthread()}
-     */
-    protected void setAllCellContentGthread(){
-      long dbgtime = System.currentTimeMillis();
-      bRedrawPending = true;
-
-      Assert.check(outer.itsMng.currThreadIsGraphic());
-      int iCellLine;
-      //calculate number of lines to show:
-      if(outer.tableLines.size() != outer.zLine){
-        //any multithread problem? this routine detects it firstly.
-        outer.zLine = outer.tableLines.size();
-        if(ixLine1 >= outer.zLine){ 
-          ixLine1 = outer.zLine -1;
-        }
-      }
-      outer.zLineVisible = getVisibleLinesTableImpl();
-      if(outer.zLineVisible > outer.zLineVisibleMax){ 
-        outer.zLineVisible = outer.zLineVisibleMax;   //no more lines existing.
-      }
-      ixLine2 = ixLine1 + outer.zLineVisible -1;
-      final int dLine;  //Hint: defined outside to see in debugging.
-      if(outer.ixLineNew < 2){
-        ixLine1 = 0; ixLine2 = outer.zLineVisible -1;
-        dLine = 0;
-      } else if(outer.ixLineNew > ixLine2 -2){
-        dLine = outer.ixLineNew - (ixLine2 -2);
-        ixLine1 += dLine; ixLine2 += dLine;
-      } else if (outer.ixLineNew < ixLine1 +2){
-        dLine = outer.ixLineNew - (ixLine1 +2);  //negative
-        ixLine1 += dLine; ixLine2 += dLine;
-      } else {
-        dLine = 99998;  //unused, debug
-      }
-      if(ixLine2 >= outer.zLine ){
-        ixLine2 = outer.zLine-1;
-        ixLine1 = ixLine2 - outer.zLineVisible +1;
-        if(ixLine1 < 0){ ixLine1 = 0; }
-      }
-      ixGlineSelectedNew = outer.ixLineNew - ixLine1;
-      
-      Assert.check(ixLine2 < outer.zLine && outer.ixLineNew < outer.zLine);
-      Assert.check(dLine < 99999);
-      //Assert.check(ixGlineSelectedNew < zLineVisible);
-      //
-      //draw all table cells.
-      long dbgtime1 = System.currentTimeMillis() - dbgtime;
-      int ixLine3;
-      iCellLine = 0;
-      iCellLine += setCellContentChild(outer.tableLines.iterator(), ixLine1, iCellLine, outer.zLineVisible);
-      /*
-      for(ixLine3 = ixLine1; ixLine3 <= ixLine2 && iCellLine < zLineVisible; ++ixLine3){
-        //cells with content
-        GralTable.TableLineData/*<?>* / line = outer.tableLines.get(ixLine3);
-        int ctredraw = line.ctRepaintLine.get();
-        if(ctredraw > 0 || true){
-          for(int iCellCol = 0; iCellCol < outer.zColumn; ++iCellCol){
-            //
-            //draw the content of the cell in the graphic implementation.
-            //CellData widgiData = 
-              drawCellContent(iCellLine, iCellCol, line);
-            //widgiData.tableItem = line;  //The widgiData are assigned to the implementation graphic cell.
-          }
-          iCellLine +=1;
-          //Thread safety: set to 0 only if it isn't changed between quest and here.
-          //Only then the text isn't changed.
-          line.ctRepaintLine.compareAndSet(ctredraw, 0);  
-        }
-      }
-      */
-      long dbgtime2 = System.currentTimeMillis() - dbgtime;
-      while( iCellLine < outer.zLineVisible) { //Max){
-        for(int iCellCol = 0; iCellCol < outer.zColumn; ++iCellCol){
-          CellData widgiData = drawCellInvisible(iCellLine, iCellCol);
-        }
-        iCellLine +=1;
-      }
-      long dbgtime3 = System.currentTimeMillis() - dbgtime;
-      
-      //mark current line
-      if(outer.ixLineNew >=0 && (outer.ixLineNew != outer.ixLine || bFocused)){
-        if(outer.ixLine != outer.ixLineNew){
-          outer.actionOnLineSelected(outer.tableLines.get(outer.ixLineNew));
-          outer.ixLine = outer.ixLineNew;
-        }
-        if(ixGlineSelectedNew != ixGlineSelected){ //note: if the table scrolls, the same cell is used as current.
-          //set background color for non-selected line.
-          if(ixGlineSelected >=0){
-            Assert.check(ixGlineSelected < outer.zLineVisibleMax);
-            for(int iCellCol = 0; iCellCol < outer.zColumn; ++iCellCol){
-              //Text cellSwt = cellsSwt[ixGlineSelected][iCellCol];
-              //cellSwt.setBackground(colorBackTableSwt);
-            }
-          }
-          ixGlineSelected = ixGlineSelectedNew;
-        }
-      }
-      //long dbgtime4 = System.currentTimeMillis() - dbgtime;
-      //System.out.print("\nSwtTable2-redraw1: " + dbgtime1 + " + " + dbgtime2 + " + " + dbgtime3 + " + " + dbgtime4);
-      outer.timeLastRedraw = System.currentTimeMillis();
-      dbgtime = outer.timeLastRedraw;
-      dbgtime1 = System.currentTimeMillis() - dbgtime;
-      //System.out.print(", redraw2: " + dbgtime1);
-      //System.out.println("GralTable.repaint; " + name);
-      //Thread.dumpStack();
-      bFocused = false;
-      //??? outer.ixLineNew = -1;   
-    }
-
-    
-    
-    
-    private int setCellContentChild(Iterator<?> lines, int ixBegin, int iShowLineBegin, int zShowLines){
-      int zShowLinesRest = zShowLines;
-      int iCellLine = iShowLineBegin;
-      //int zLines = lines.size();
-      int ix = ixBegin;
-      while(lines.hasNext() && --zShowLinesRest >0 ){
-        GralTable.TableLineData/*<?>*/ line = (GralTable.TableLineData/*<?>*/)lines.next();
-        int ctredraw = line.ctRepaintLine.get();
-        if(ctredraw > 0 || true){
-          setLinePresentation(line);
-          drawCellContent(iCellLine, line, linePresentation);
-          iCellLine +=1;
-          //Thread safety: set to 0 only if it isn't changed between quest and here.
-          //Only then the text isn't changed.
-          line.ctRepaintLine.compareAndSet(ctredraw, 0);  
-        }
-        ix +=1;
-        if(line.hasChildren()){
-          iCellLine += setCellContentChild(line.iterator(), 0, iCellLine, zShowLinesRest);
-        }
-        
-      }
-      return iCellLine - iShowLineBegin;
-    }
-    
-    
-    
     
     protected void setCellContentNew(){
       long dbgtime = System.currentTimeMillis();
@@ -1681,7 +1509,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     abstract protected void setBoundsCells(int treeDepthBase);
 
     @Override public boolean remove(){
-      outer.tableLines.clear();
+      outer.rootLine.removeChildren();
       return true;
     }
 
@@ -1823,7 +1651,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     //protected TableLineData parentLine;
 
     /**True if it is known that the node has children. They may be unknown, then {@link #childLines} are null. */
-    boolean hasChildren;
+    boolean lineCanHaveChildren;
     
     /**True if the children are shown in representation. */
     boolean showChildren;
@@ -1843,27 +1671,23 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * the line in the container if the line is given. Conclusion from line to tableLines.get(line.nLineNr). */
     public int nLineNr;
     
-    /**The index value in {@link GralTable#idxLine}.*/
-    String key;
-    
     public String[] cellTexts;
     
     public GralColor colorForground, colorBackground;
     
-    protected UserData userData;
+    //protected UserData userData;
     
     //TODO GralColor colorBack, colorText;
     
-    TableLineData(){
-      super(null, null);  //key, data
+    TableLineData(String key, UserData data){
+      super(key, data);  //key, data
       cellTexts = new String[GralTable.this.zColumn];
     }
     
     
     public GralTableLine_ifc<UserData> addNextLine(String keyP, String[] texts, UserData userDataP){
       //hasChildren = hasChildren();
-      TableLineData line = GralTable.this.new TableLineData();
-      line.key = keyP;
+      TableLineData line = GralTable.this.new TableLineData(keyP, userDataP);
       super.addSiblingNext(line);
       //line.parentLine = this;
       line.treeDepth = this.treeDepth;
@@ -1872,7 +1696,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           line.cellTexts[ixCol] = texts[ixCol];
         }
       }
-      line.userData = userDataP;
       GralTable.this.bPrepareVisibleArea = true;
       return line;
 
@@ -1881,8 +1704,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     public GralTableLine_ifc<UserData> addPrevLine(String keyP, String[] texts, UserData userDataP){
       //hasChildren = hasChildren();
-      TableLineData line = GralTable.this.new TableLineData();
-      line.key = keyP;
+      TableLineData line = GralTable.this.new TableLineData(keyP, userDataP);
       super.addSiblingPrev(line);
       //line.parentLine = this;
       line.treeDepth = this.treeDepth;
@@ -1891,7 +1713,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           line.cellTexts[ixCol] = texts[ixCol];
         }
       }
-      line.userData = userDataP;
       GralTable.this.bPrepareVisibleArea = true;
       return line;
 
@@ -1899,9 +1720,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     
     public GralTableLine_ifc<UserData> addChildLine(String childKey, String[] childTexts, UserData userDataP){
-      hasChildren = hasChildren();
-      TableLineData line = GralTable.this.new TableLineData();
-      line.key = childKey;
+      lineCanHaveChildren = true; //hasChildren();
+      TableLineData line = GralTable.this.new TableLineData(childKey, userDataP);
       super.addNode(line);
       //line.parentLine = this;
       line.treeDepth = this.treeDepth +1;
@@ -1912,7 +1732,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           line.cellTexts[ixCol] = childTexts[ixCol];
         }
       }
-      line.userData = userDataP;
       GralTable.this.bPrepareVisibleArea = true;
       if(key !=null){
         //GralTable.this.idxLine.put(this.key + '.' + key, line);
@@ -1988,9 +1807,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       return oldText;
     }
 
-    @Override public UserData getUserData() { return userData;  }
+    @Override public UserData getUserData() { return data;  }
 
-    @Override public void setUserData(UserData data) {this.userData = data; }
+    //@Override public void setUserData(UserData data) {this.userData = data; }
 
     @Override public long setContentIdent(long date){ long last = GralTable.this.dateUser; GralTable.this.dateUser = date; return last; }
     
@@ -2115,13 +1934,13 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     @Override public void setHtmlHelp(String url) { GralTable.this.setHtmlHelp(url); }
     
     
-    @Override public Object getContentInfo(){ return userData; }
+    @Override public Object getContentInfo(){ return data; }
 
     
     
     @Override public int getMark(){
-      if(userData instanceof MarkMask_ifc){
-        return ((MarkMask_ifc)userData).getMark();
+      if(data instanceof MarkMask_ifc){
+        return ((MarkMask_ifc)data).getMark();
       } else if(markMask == null){
         return 0;
       } else {
@@ -2142,8 +1961,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      */
     @Override public int setNonMarked(int mask, Object data)
     { if(GralTable.this.actionMarkOnLine !=null && data !=null){ GralTable.this.actionMarkOnLine.setNonMarked(mask, data); }
-      if(userData instanceof MarkMask_ifc){
-        ((MarkMask_ifc)userData).setNonMarked(mask, data);
+      if(data instanceof MarkMask_ifc){
+        ((MarkMask_ifc)data).setNonMarked(mask, data);
       }
       if(markMask ==null) return 0;
       else return markMask.setNonMarked(mask, data);
@@ -2151,7 +1970,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     /**Sets the mark status of the line.
      * It invokes the method given with {@link GralTable#specifyActionOnLineMarked(MarkMask_ifc)}
-     * with the given {@link #setUserData(Object)} of this line. It means a selection with the user data
+     * with the given {@link #getUserData()} of this line. It means a selection with the user data
      * may be done too. This method will be called especially on pressing the mark key specified with  
      * {@link GralTable#specifyKeysMarkUpDn(int, int)}
      * @param mask This bits of the {@link SelectMask#selectMask} will be set.
@@ -2160,8 +1979,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      */
     @Override public int setMarked(int mask, Object data)
     { if(GralTable.this.actionMarkOnLine !=null && data !=null){ GralTable.this.actionMarkOnLine.setMarked(mask, data); }
-      if(userData instanceof MarkMask_ifc){
-        ((MarkMask_ifc)userData).setMarked(mask, data);
+      if(data instanceof MarkMask_ifc){
+        ((MarkMask_ifc)data).setMarked(mask, data);
       }
       if(markMask ==null){ markMask = new SelectMask(); }
       return markMask.setMarked(mask, data);

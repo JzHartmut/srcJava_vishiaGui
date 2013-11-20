@@ -2,6 +2,8 @@ package org.vishia.gral.ifc;
 
 import java.util.List;
 
+import org.vishia.util.TreeNode_ifc;
+
 
 /**Interface to a table widget.
  * @author hartmut
@@ -18,7 +20,6 @@ public interface GralTable_ifc<UserData> extends GralWidget_ifc
    * <li>2013-09-05 Hartmut chg: {@link #getMarkedLines(int)} now has that 1 argument for mark mask.
    * <li>2013-06-11 Hartmut new Now the {@link GralTable}, the {@link GralTable.TableLineData} and this
    *   interface are marked with the generic type UserData.
-   * <li>2013-05-28 Hartmut new {@link #replaceLineKey(GralTableLine_ifc, String)}
    * <li>2012-08-22 Hartmut new {@link #setCurrentLine(int)} with int, it isn't new because it was able to set with
    *   {@link #setCurrentCell(int, int)} with -1 as second parameter.
    * <ul>2011-11-20 Hartmut new {@link #getMarkedLines()}
@@ -114,7 +115,7 @@ public interface GralTable_ifc<UserData> extends GralWidget_ifc
    * @param row 0 is the first row. Must not be negative.
    * @return null if the row isn't exists.
    */
-  public abstract GralTableLine_ifc<UserData> getLine(int row);
+  //public abstract GralTableLine_ifc<UserData> getLine(int row);
   
   /**Get the line which is designated with the requested key.
    * Background: The lines of a table can be sorted in view. To get a line
@@ -171,7 +172,7 @@ public interface GralTable_ifc<UserData> extends GralWidget_ifc
    * @param line The line, not a new line, an existing one.
    * @param keyNew The new key for this line.
    */
-  public void replaceLineKey(GralTableLine_ifc<UserData> line, String keyNew);
+  //public void replaceLineKey(GralTableLine_ifc<UserData> line, String keyNew);
   
   /**Returns the number of active lines of the table.
    * @return
@@ -203,7 +204,7 @@ public interface GralTable_ifc<UserData> extends GralWidget_ifc
    * 
    * See {@link #getListContent()}.
    */
-  List<? extends GralTableLine_ifc<UserData>> getAllLines();
+  TreeNode_ifc<?, UserData> getAllLines();
   
   /**Returns all content of lines. This makes a snapshot of the lines in calling time. If the table 
    * will be changed in another thread while this routine runs, a {@link java.util.ConcurrentModificationException}

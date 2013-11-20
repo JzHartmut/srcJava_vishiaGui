@@ -54,7 +54,7 @@ public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, MarkMask_if
   
   String setCellText(String text, int column);
   
-  void setUserData(UserData data);
+  //void setUserData(UserData data);
   
   UserData getUserData();
   

@@ -52,13 +52,7 @@ public class FcmdFavorCard  extends GralSelectList<FcmdFavorPathSelector.FavorPa
   {
     if(indexFavorPaths.get(favorPathInfo.selectName) == null){
       indexFavorPaths.put(favorPathInfo.selectName, favorPathInfo);
-      GralTableLine_ifc<FcmdFavorPathSelector.FavorPath> line = wdgdTable.addLine(null, null, null);
-      line.setUserData(favorPathInfo);
-      /*
-      if(info.label !=null){
-        line.setCellText(info.label, 0);
-      }
-      */
+      GralTableLine_ifc<FcmdFavorPathSelector.FavorPath> line = wdgdTable.addLine(null, null, favorPathInfo);
       line.setCellText(favorPathInfo.selectName, 1);
       line.setCellText(favorPathInfo.path, 2);
       line.repaint(100,0);

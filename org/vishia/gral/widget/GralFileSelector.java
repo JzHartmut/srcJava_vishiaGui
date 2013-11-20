@@ -950,13 +950,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
         String key = buildKey(currentFile, true, null);
         tline = idxLines.search(key); //maybe line before
       } else {
-        tline = selectList.wdgdTable.getLine(1);
-        if(tline == null){
-          tline = selectList.wdgdTable.getLine(0);
-        }
+        tline = null;  //first line is selected
       }
       if(tline !=null){
-        int lineSelect1 = tline.getLineNr();
         selectList.wdgdTable.setCurrentLine(tline, -3, 1);  
         currentFile = tline.getUserData();  //adjust the file if the currentFile was not found exactly.
       }
