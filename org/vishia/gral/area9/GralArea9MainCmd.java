@@ -29,6 +29,7 @@ public class GralArea9MainCmd extends MainCmd
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-11-22 Hartmut chg: title of main window as argument -title= 
    * <li>2013-01-26 Hartmut chg: The MsgDispatchSystemOutErr.create(file) was invoked in this constructor. Therefore
    *   all Applications redirect the System.out and System.err outputs to the message system. The outputs were completed
    *   with the timestamp and a number, the {@link org.vishia.msgDispatch.MsgDispatcher} was prepared to use. 
@@ -118,7 +119,7 @@ public class GralArea9MainCmd extends MainCmd
   
   /**Builds the graphic and parses the command line parameters. Possible command line argument errors
    * or help texts are outputted to the window in the output box.
-   * @param sTitle Title for window
+   * @param sTitle Title for window as default if -title= is not given as arg
    * @param sOutputArea Use 1..3 for row and A..C for column in form for example "3A3C".
    *   In this example the output box occupies all 3 columns (A to C) from the 3. (= bottom) row
    *   of the 9 areas.  If null is used, the default selection is "3A3C".
@@ -146,7 +147,9 @@ public class GralArea9MainCmd extends MainCmd
     if(xSize < 0){  xSize = cargs.dxPixelWindow; }  //undefined per parameter, use args 
     if(ySize < 0){  ySize = cargs.dyPixelWindow; }  //undefined per parameter, use args 
     
-    GralWindow primaryWindow = cargs.graphicFactory.createWindow(getLogMessageOutputConsole(), sTitle, sizeShow, left, top, xSize, ySize);
+    String sTitle1 = cargs.sTitle !=null ? cargs.sTitle : sTitle;
+    
+    GralWindow primaryWindow = cargs.graphicFactory.createWindow(getLogMessageOutputConsole(), sTitle1, sizeShow, left, top, xSize, ySize);
     gui = new GralArea9Window(this, primaryWindow);
     gui.getGralMng().setApplicationAdapter(gui);
     gui.initGraphic(sOutputArea);
@@ -174,7 +177,10 @@ public class GralArea9MainCmd extends MainCmd
   @Override protected boolean testArgument(String arg, int nArg)
   { boolean bOk = true;  //set to false if the argc is not passed
     try {
-      if(arg.startsWith("-gui="))      
+      if(arg.startsWith("-title="))      
+      { cargs.sTitle = getArgument(7);  //the graphic GUI-appearance
+      }
+      else if(arg.startsWith("-gui="))      
       { cargs.fileGuiCfg = new File(getArgument(5));  //the graphic GUI-appearance
       
       }

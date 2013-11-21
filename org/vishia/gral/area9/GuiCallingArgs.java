@@ -14,6 +14,7 @@ public class GuiCallingArgs
 {
   /**Version, history and licence
    * <ul>
+   * <li>2013-11-22 Hartmut new {@link #sTitle}
    * <li>2012-04-22 Hartmut chg {@link #sizeShow} instead sSize, new {@link #xLeftPixelWindow} etc.
    * <li>2011-06-00 Hartmut creation, commonly arguments for each GUI application.
    * </ul>
@@ -43,8 +44,12 @@ public class GuiCallingArgs
    * 
    * 
    */
-  public final static int version = 20120422;
+  public final static int version = 20131122;
 
+  
+  
+  /**String for title bar. */
+  String sTitle;
   
   /**The graphic base factory can be detected from command line arguments
    * or set directly from the calling level. */

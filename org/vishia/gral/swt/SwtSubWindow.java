@@ -146,7 +146,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     String sTitle = super.getTitle();
     int windProps = super.getWindowProps();
     if(sTitle !=null){ 
-      props |= SWT.TITLE | SWT.BORDER | SWT.CLOSE; 
+      props |= SWT.TITLE | SWT.BORDER | SWT.CLOSE | SWT.MIN | SWT.MAX; 
     } else {
       if((windProps & GralWindow.windHasMenu) !=0) throw new IllegalArgumentException("Window without title but with menu is not supported");
     }

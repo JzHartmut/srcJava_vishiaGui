@@ -330,7 +330,15 @@ public abstract class GralGraphicThread implements Runnable
     while (!bExit) {
       boolean bContinueDispatch;
       do{
-        try{ bContinueDispatch = dispatchOsEvents();}
+        try{ bContinueDispatch = dispatchOsEvents();
+        /*  
+        try {
+            Thread.sleep(10);
+          } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }*/
+        }
         catch(Throwable exc){
           System.out.println(exc.getMessage());
           exc.printStackTrace(System.out);
