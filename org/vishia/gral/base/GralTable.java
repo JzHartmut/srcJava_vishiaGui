@@ -70,6 +70,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license
    * <ul>
+   * <li>2013-11-23 Hartmut chg: use {@link KeyCode#userSelect} etc. for calling {@link #actionOnLineSelected(int, GralTableLine_ifc)}
    * <li>2013-11-16 Hartmut chg: setCurrentCell(int, int) removed because the line number without respect to a line
    *   is not able to handle. Only a line is given. New method {@link #setCurrentLine(GralTableLine_ifc, int, int)}
    *   can set the given line to any location in the visible area of table.  
@@ -85,7 +86,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    *   preparing tree view. {@link GralTable.TableLineData#treeDepth}, {@link GralTable.TableLineData#childLines} for tree view.
    * <li>2013-11-02 Hartmut chg: {@link GralTable.TableLineData} is static now with outer reference, more transparent
    * 
-   * <li>2013-10-06 Hartmut chg: call {@link #actionOnLineSelected(GralTableLine_ifc)} only if the line is changed, not on focus without changed line.
+   * <li>2013-10-06 Hartmut chg: call {@link #actionOnLineSelected(int, GralTableLine_ifc)} only if the line is changed, not on focus without changed line.
    * <li>2013-09-15 Hartmut new: Implementation of {@link #setBackColor(GralColor, int)}  
    *   with special comments for usage of the int parameter.
    *   See {@link GralTable_ifc#setBackColor(GralColor, int)}, Adequate {@link #getBackColor(int)}. 
@@ -113,7 +114,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * <li>2013-05-11 Hartmut chg: {@link TableLineData} instead TableItemWidget.
    * <li>2013-04-28 Hartmut new: {@link #specifyKeysMarkUpDn(int, int)}
    * <li>2013-04-28 Hartmut new: {@link #specifyActionOnLineMarked(MarkMask_ifc)}
-   * <li>2013-04-28 Hartmut renamed: {@link #specifyActionOnLineSelected(GralUserAction)}
+   * <li>2013-04-28 Hartmut renamed: {@link #actionOnLineSelected(int, GralTableLine_ifc)}
    * <li>2013-04-21 Hartmut chg: {@link #processKeys(int)}: input of a text key starts searching for a line with this key
    *   immediately, better handling for usage.
    * <li>2012-08-22 Hartmut new {@link #setCurrentLine(int)} with int, it isn't new because it was able to set with
@@ -133,10 +134,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    *   It seems better to have one table concept with independent features, which based on simple widgets.
    *   is not  
    * <li>2011-12-30 Hartmut chg {@link #procStandardKeys(int, GralTableLine_ifc, int)} returns true if standard keys are used. 
-   * <li>2011-11-27 Hartmut new {@link #specifyActionOnLineSelected(GralUserAction)}: The user action is called
+   * <li>2011-11-27 Hartmut new {@link #actionOnLineSelected(int, GralTableLine_ifc)}: The user action is called
    *   anytime if a line is selected by user operation. It can be show any associated content anywhere
    *   additionally. It is used for example in "The.file.Commander" to show date, time and maybe content 
-   *   while the user selects any files. The graphical implementation should be call {@link #actionOnLineSelected(GralTableLine_ifc)}
+   *   while the user selects any files. The graphical implementation should be call {@link #actionOnLineSelected(int, GralTableLine_ifc)}
    *   in its Selection listener. 
    * <li>2011-11-20 Hartmut new The capability of selection of lines is moved from the 
    *   {@link org.vishia.gral.widget.GralSelectList} to this class. It means any table has the capability
@@ -341,7 +342,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   /**Sets an action which is called any time when another line is selected.
    * This action will be called any time when the selection of the current line is changed. 
    * The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called
-   * with the line as Object.
+   * with the line as Object and the following keys:
+   * <ul>
+   * <li>{@link KeyCode#removed} if the table was cleard.
+   * <li>{@link KeyCode#defaultSelect} if the table was filled and firstly the {@link #lineSelected} is set.
+   * <li>{@link KeyCode#userSelect} if the user acts with keyboard or mouse
+   * </ul>
    * @param actionOnLineSelected The action, null to switch off this functionality.
    */
   public void specifyActionOnLineSelected(GralUserAction action){
@@ -555,7 +561,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
     if(lineSelected == null){ 
       lineSelected = line;
-      actionOnLineSelected(lineSelected);
+      actionOnLineSelected(KeyCode.defaultSelect, lineSelected);
     }
     zLine +=1;
     if(cellTexts !=null){
@@ -574,7 +580,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     TableLineData line = this.new TableLineData(key, userData);
     if(lineSelected == null){ 
       lineSelected = line;
-      actionOnLineSelected(lineSelected);
+      actionOnLineSelected(KeyCode.defaultSelect, lineSelected);
     }
     zLine += 1;
     rootLine.addNode(line);
@@ -617,7 +623,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     ixColumn = 0;
     zLine = 0;
     lineSelected = null;
-    actionOnLineSelected(lineSelected);
+    actionOnLineSelected(KeyCode.removed, lineSelected);
     ixLineNew = ixLine = -1;
     gi.ixGlineSelectedNew = -1;  //deselects ixGlineSelected on redraw!
     searchChars.setLength(0);
@@ -850,7 +856,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       lineSelected = lineSelectedNew;
       lineSelectedNew = null;
       lineSelectedixCell = cell.ixCellLine;  //used for key handling.
-      actionOnLineSelected(lineSelected);
+      actionOnLineSelected(KeyCode.userSelect, lineSelected);
       repaint(0,0);
     }
   }
@@ -972,7 +978,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             }
           }
           lineSelected = linesForCell[lineSelectedixCell];
-          actionOnLineSelected(lineSelected);
+          actionOnLineSelected(KeyCode.userSelect, lineSelected);
           keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
         } break;
         case KeyCode.mouseWheelDn:
@@ -998,7 +1004,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             ){
             lineSelectedixCell -=1;
           }
-          actionOnLineSelected(lineSelected);
+          actionOnLineSelected(KeyCode.userSelect, lineSelected);
           
           keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
         } break;
@@ -1113,9 +1119,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    *  
    * @param line
    */
-  protected void actionOnLineSelected(GralTableLine_ifc<?> line){
+  protected void actionOnLineSelected(int key, GralTableLine_ifc<?> line){
     if(actionOnLineSelected !=null){
-      actionOnLineSelected.exec(KeyCode.tableLineSelect, this, line);
+      actionOnLineSelected.exec(key, this, line);
     }
   }
   
@@ -1131,7 +1137,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    */
   protected void actionOnRefreshChildren(GralTableLine_ifc<?> line){
     if(actionOnRefreshChildren !=null){
-      actionOnRefreshChildren.exec(KeyCode.tableLineSelect, this, line);
+      actionOnRefreshChildren.exec(KeyCode.userSelect, this, line);
     }
   }
   

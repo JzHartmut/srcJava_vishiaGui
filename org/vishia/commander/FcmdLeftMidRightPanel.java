@@ -433,7 +433,7 @@ public class FcmdLeftMidRightPanel
     /**Action is called any time if a line was focused in the favor theme table. */
     GralUserAction actionFavorThemeLineSelected = new GralUserAction(){
       @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
-        if(actionCode == KeyCode.tableLineSelect){
+        if(actionCode == KeyCode.userSelect){
           mainPanel.bFavorThemeCardHasFocus = true;
           //GralTableLine_ifc line = (GralTableLine_ifc) params[0];
           //Object oData = line.getUserData();

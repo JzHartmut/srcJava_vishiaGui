@@ -245,7 +245,7 @@ public class FcmdFavorCard  extends GralSelectList<FcmdFavorPathSelector.FavorPa
   /**Action is called any time if a line was focused in the favor table. */
   GralUserAction actionFavorSelected = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
-      if(actionCode == KeyCode.tableLineSelect){
+      if(actionCode == KeyCode.userSelect){
         mainPanel.bFavorCardHasFocus = true;
         mainPanel.bFavorThemeCardHasFocus = false;
         main.lastFavorCard = FcmdFavorCard.this;

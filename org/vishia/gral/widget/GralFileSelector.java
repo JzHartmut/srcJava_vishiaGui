@@ -240,7 +240,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * was changed in the file view table. */
   private final GralUserAction actionOnFileSelection = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
-      if(actionCode == KeyCode.tableLineSelect){
+      if(actionCode == KeyCode.userSelect){
         GralTableLine_ifc line = (GralTableLine_ifc) params[0];
         if(line != null){
           Object oData = line.getUserData();
