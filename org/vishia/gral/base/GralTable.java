@@ -180,7 +180,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
   
-  protected int keyOpenChild = KeyCode.shift + KeyCode.right, keyCloseChild = KeyCode.shift + KeyCode.left;
+  protected int keyOpenChild = KeyCode.right, keyCloseChild = KeyCode.left;
   
   protected String keySeparator = "/";
   
@@ -1178,6 +1178,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
     /**Start position of each column in pixel. */
     protected int[] columnPixel;
+    
+    protected final int xPixelUnit;
+        
+    /**number of columns which should be shift to rigth on tree indent. 0. don't shift. Usual 1 */
+    protected int nrofColumnTreeShift;
 
     /**Index of {@link #texts} of the cell left top for presentation. */
     protected int ixLine1, ixCol1;
@@ -1208,6 +1213,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
     protected GraphicImplAccess(GralTable<UserData> outer, GralMng mng){ 
       super(outer, mng);
+      xPixelUnit = mng.propertiesGui.xPixelUnit();
       this.outer = outer;
       outer.gi = this; 
       int xdPix = outer.itsMng.propertiesGui().xPixelUnit();
@@ -1447,7 +1453,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       while(++ix < outer.zLineVisible) {
         line = outer.linesForCell[ix];
         setLinePresentation(line);
-        drawCellContent(ix, line, linePresentation);
+        drawCellContent(ix, cells[ix], line, linePresentation);
+      }
+      if(++ix < outer.zLineVisibleMax){  //a half visible line
+        drawCellContent(ix, cells[ix], null, linePresentation);
       }
       outer.timeLastRedraw = System.currentTimeMillis();
       //System.out.println("GralTable - redraw;" + timeLastRedraw - dbgTime);
@@ -1495,6 +1504,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         xPixel1 += xPos * xPixelUnit;
         xpixelCell[ixPixelCell+1] = xPixel1;
       }
+      nrofColumnTreeShift = ixPixelCell +1;
+      System.out.println("GralTable - resizeTable; nrofColumnTreeShift =" + nrofColumnTreeShift);
       xPixel1 = pixTable.dx;
       xpixelCell[columnWidthsGral().length] = xPixel1;  //right position.
       for(ixPixelCell = columnWidthsGral().length-1; ixPixelCell >=0  && (xPos = columnWidthsGral()[ixPixelCell]) < 0; --ixPixelCell){
@@ -1571,7 +1582,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
 
 
-    protected abstract void drawCellContent(int iCellLine, GralTable<?>.TableLineData/*<?>*/ tableItem, LinePresentation linePresentationP);
+    protected abstract void drawCellContent(int iCellLine, CellData[] cellData, GralTable<?>.TableLineData line, LinePresentation linePresentationP);
 
     protected abstract CellData drawCellInvisible(int iCellLine, int iCellCol);
 
@@ -1617,6 +1628,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
        * 
        */
       public boolean bSetFocus;
+      
+      /**The currently tree depth of this cell. Invoke setBounds if it is different of line. */
+      public int treeDepth;
       
       public CellData(int ixCellLine, int ixCellColumn){
         this.ixCellLine = ixCellLine; 

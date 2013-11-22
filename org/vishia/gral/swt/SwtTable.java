@@ -420,14 +420,24 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
   /**This routine implements all things to set the content of any table cell to show it.
    * @see org.vishia.gral.base.GralTable#drawCellContent(int, int, org.vishia.gral.base.GralTable.TableLineData)
    */
-  @Override protected void drawCellContent(int iCellLine, GralTable<?>.TableLineData tableItem, GralTable.LinePresentation linePresentationP){
+  @Override protected void drawCellContent(int iCellLine, CellData[] cellLine, GralTable<?>.TableLineData line, GralTable.LinePresentation linePresentationP){
     Text[] textlineSwt = cellsSwt[iCellLine];
-    if(tableItem !=null){
+    int treeDepth = -1;
+    if(line !=null && line.treeDepth() != cellLine[0].treeDepth){
+      treeDepth =  cellLine[0].treeDepth = line.treeDepth();
+    }
+    if(line !=null){
       for(int col=0; col < cells[0].length; ++col){
         Text cellSwt = textlineSwt[col]; 
-        CellData cellData = (CellData)cellSwt.getData();
+        CellData cellData = cellLine[col]; //(CellData)cellSwt.getData();
+        if(treeDepth >=0 && col < super.nrofColumnTreeShift){
+          int xleft = xpixelCell[col] + treeDepth * xPixelUnit; 
+          int xRight = xpixelCell[col+1] + (col < (super.nrofColumnTreeShift-1) ?  treeDepth * xPixelUnit : 0);
+          int yTop = cellData.ixCellLine * linePixel;
+          cellSwt.setBounds(xleft, yTop, xRight - xleft, linePixel);
+        }
         //
-        String text = tableItem.cellTexts[col];
+        String text = line.cellTexts[col];
         if(text == null){ text = ""; }
         //
         cellSwt.setText(text);
@@ -457,7 +467,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
       GralColor colorBack = colorBackTable();
       for(int col=0; col < cells[0].length; ++col){
         Text cellSwt = textlineSwt[col]; 
-        CellData cellData = (CellData)cellSwt.getData();
+        CellData cellData = cellLine[col]; //(CellData)cellSwt.getData();
         cellSwt.setText("");
         if(cellData.colorBack != colorBack){
           Color colorSwt =  swtWidgWrapper.mng.getColorImpl(colorBack);

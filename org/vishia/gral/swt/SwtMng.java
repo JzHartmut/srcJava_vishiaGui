@@ -545,6 +545,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   void setPosAndSizeSwt(GralPos posP, Control component, int widthwidgetNat, int heigthWidgetNat)
   {
     GralRectangle rectangle = calcWidgetPosAndSizeSwt(posP, component, widthwidgetNat, heigthWidgetNat);
+    //on SWT it invokes the resize listener if given.
     component.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
        
   }
