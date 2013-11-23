@@ -356,30 +356,8 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
    * TODO this method must call in the graphic thread yet, queue it with {@link GralMng#setInfo(GralWidget, int, int, Object, Object)}.
    */
   @Override public boolean setFocusGThread()
-  { if(true || ixGlineSelectedNew >=0 && ixColumn() >=0){
-      //System.out.println("test SwtTable.setFocus-1");
-      //redrawTableWithFocusedCell(cellsSwt[ixGlineSelectedNew][ixColumn()]);
-      //redrawTableWithFocusedCell(cellsSwt[0][ixColumn()]);
-      repaintGthread();  //to set the focus of the cell
-    
-      System.out.println("SwtTable - setFocusGthread;");
-      return true;
-    } else {
-      //System.out.println("test SwtTable.setFocus-2");
-      correctIxLineColumn();
-      bFocused = true;
-      repaintGthread();
-      //((Table)swtWidgWrapper.widgetSwt).redrawGthread();
-      swtWidgWrapper.widgetSwt.setFocus();
-      return true;
-    }
-    /*
-    if(ixLineNew >=0){ ///
-      return SwtWidgetHelper.setFocusOfTabSwt(cellsSwt[ixLineNew][0]);
-    } else {
-      return SwtWidgetHelper.setFocusOfTabSwt(swtWidg.widgetSwt);
-    }
-    */
+  { repaintGthread();  //to set the focus of the cell
+    return true;
   }
 
 
@@ -469,9 +447,6 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
           //only change color of the SWT Text field if it is necessary, comparison set color with cellData.color.
           cellSwt.setForeground(swtWidgWrapper.mng.getColorImpl(linePresentationP.colorText));
           cellData.colorText = linePresentationP.colorText;
-        }
-        if(ixGlineSelectedNew == iCellLine && col == ixColumn() && bFocused){
-          SwtWidgetHelper.setFocusOfTabSwt(cellSwt);
         }
         cellSwt.setVisible(true);
         cellSwt.redraw();
@@ -775,28 +750,11 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
     }
     
     @Override public void focusLost(FocusEvent e){ 
-      //System.out.println("table focus lost. ");
-      //assert(false);
-      XXXhasFocus = false;
-      int row = 1; //table.getSelectionIndex();
-      if(row >=1){
-        //TableItem tableLineSwt = table.getItem(row-1);
-        //tableLineSwt.setGrayed(true);
-        //tableLineSwt.setBackground(mng.getColorImpl(mng.propertiesGui.color(0x80ffff)));
-      }
+      System.out.println("SwtTable - debug;table composite focus lost. ");
     }
     
     @Override public void focusGained(FocusEvent ev)
-    { //super.focusGained(ev);
-      ((GralWidget.ImplAccess)SwtTable.this).focusGained();
-      //System.out.println("table focus gained. ");
-      //assert(false);
-      int row = 1; //table.getSelectionIndex();
-      if(row >=0){
-        //TableItem tableLineSwt = table.getItem(row);
-        //tableLineSwt.setGrayed(false);
-        //tableLineSwt.setBackground(mng.getColorImpl(mng.propertiesGui.color(0x00ff00)));
-      }
+    { System.out.println("SwtTable - debug;table composite focus gained. ");
     }
     
   };

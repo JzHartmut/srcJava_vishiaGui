@@ -911,7 +911,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
       GralTableLine_ifc<FileRemote> tline = idxLines.search(key, false, found);
       
       if(!found[0]){ //no such line with this file
-        int row = tline == null ? 0 : tline.getLineNr()+1;
         String name = file1.getName();  //use the file name as key in the table for the table line.
         if(tline ==null){
           //on empty table, first line.
