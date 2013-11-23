@@ -2,8 +2,6 @@ package org.vishia.gral.swt;
 
 
 
-import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -41,22 +39,27 @@ import org.vishia.util.KeyCode;
 /**Implementation of the GralTable for Swt graphic.
  * The following schema shows the aggregation relations, see {@link org.vishia.util.Docu_UML_simpleNotation}:
  * <pre>
- *    |------|>GralWidgImpl_ifc<--------widgImpl-------GralWidget<|-----GralTable
- *    |                                                                     |
- *    |                                                                     |
- * SwtTable----------|>GralTable.GraphicImplAccess<-----------------gi------|
- *    |                           |                                         |
- *    |                           |------->access to all protected methods and fields of GralTable
- *    |
- *    |
- *    |
+ *                                                       GralWidget<|-----GralTable
+ *    |------i|>GralWidgImpl_ifc<-------widgImpl--------------|              |
+ *    |              .                                        |              |
+ *    |              .                            |--widgg--->|              |
+ *    |              .                            |                          |
+ * SwtTable---|>GralTable.GraphicImplAccess---|>GralWidget.ImplAccess        |
+ *    |              .            |                                          |
+ *    |              .            |<-------------------------------------gi--|
+ *    |              .            |                                          |
+ *    |              .            |<&>-------------------------------------&>|
+ *    |              .                     access to all protected methods and fields of GralTable
+ *    |              .
+ *    |        GralWidgImpl_ifc<|i--|    //uses delegation from SwtTable
+ *    |                             |
  *    |---swtWidg----->SwtWidgetSimpleWrapper
- *    |                       |----------------|>GralWidgImpl_ifc    //uses delegation from SwtTable
+ *    |                       |
  *    |                       |
  *    |                       |--widgetSwt--->Control<|---Composite<|---SwtTable.Table
- *    |                                                      |                    |
- *    |----------cellsSwt-------*>Text<*---------------------+                    |    
- *    |                                                                           |
+ *    |                                                      |               |      
+ *    |---cellsSwt--------------*>Text<*---------------------|            some Listener             
+ *    |                                                                           
  *    |
  * </pre>
  * <ul>
@@ -168,7 +171,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
     this.cellsSwt = new Text[zLineVisibleMax][zColumn()];
     this.cells = new CellData[zLineVisibleMax][zColumn()];
     Control swtTable = new SwtTable.Table(parent, zColumn(), mng);
-    this.swtWidgWrapper = new SwtWidgetSimpleWrapper(swtTable, mng);
+    super.implWidgWrapper = this.swtWidgWrapper = new SwtWidgetSimpleWrapper(swtTable, mng);
     //gralTable.implMethodWidget_.setWidgetImpl(this);
     //this.menuColumns = new SwtMenu[zColumn];
     swtWidgWrapper.widgetSwt.addKeyListener(myKeyListener);
@@ -285,7 +288,15 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
   
 
 
+  /** TODO implement in {@link GralTable.GraphicImplAccess}
+   * @see org.vishia.gral.base.GralWidgImpl_ifc#repaintGthread()
+   */
   @Override public void repaintGthread(){
+    if(bFocusLost){
+      //this is about 50 ms after focus lost, the focus has lost really.
+      bFocused = false;
+      bFocusLost = false;
+    }
     if(swtWidgWrapper.widgetSwt !=null && !swtWidgWrapper.widgetSwt.isDisposed()){
       int chg = getChanged();
       int acknChg = 0;
@@ -348,7 +359,10 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
   { if(true || ixGlineSelectedNew >=0 && ixColumn() >=0){
       //System.out.println("test SwtTable.setFocus-1");
       //redrawTableWithFocusedCell(cellsSwt[ixGlineSelectedNew][ixColumn()]);
-      redrawTableWithFocusedCell(cellsSwt[0][ixColumn()]);
+      //redrawTableWithFocusedCell(cellsSwt[0][ixColumn()]);
+      repaintGthread();  //to set the focus of the cell
+    
+      System.out.println("SwtTable - setFocusGthread;");
       return true;
     } else {
       //System.out.println("test SwtTable.setFocus-2");
@@ -805,7 +819,9 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
     @Deprecated
     @Override public void focusLost(FocusEvent ev){ 
       //System.out.println("Cell focus lost");
+      SwtTable.this.focusLost();
       if(!bRedrawPending){
+        System.out.println("SwtTable - cell focus lost;" + (SwtTable.this).outer.toString());
         CellData data = (CellData)ev.widget.getData();
         Control widgSwt = (Control)ev.widget;
         //widgSwt.setBackground(colorBackSelectNonFocusedSwt); 
@@ -825,22 +841,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
      * it should not done anything. The variable #bRedrawPending guards it.
      * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
      */
-    @Override public void focusGained(FocusEvent ev) { 
-      try{
-        if(!bRedrawPending){ 
-          //The focusGained for the table invokes the GralWidget.focusAction for this table.
-          if(true || !XXXhasFocus){
-            ((GralWidget.ImplAccess)SwtTable.this).focusGained();  //from GralWidget.
-            XXXhasFocus = true;
-            //System.out.println("focusTable");
-          }
-          redrawTableWithFocusedCell(ev.widget);
-          //System.out.println("focusCell");
-        }
-      } catch(Exception exc){
-        itsMng().log().sendMsg(0, "Exception in SwtTable.focusGained");
-      }
-    }
+    @Override public void focusGained(FocusEvent ev) { SwtTable.this.focusGained(); }
     
   };
   

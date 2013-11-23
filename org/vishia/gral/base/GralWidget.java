@@ -502,7 +502,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     
     /**Three colors for background, line and text should be convert to the platforms color and used in the paint routine. 
      * If this elements are null, the standard color should be used. */
-    public GralColor backColor, lineColor, textColor;
+    public GralColor backColor, backColorNoFocus, lineColor, textColor;
     
     /**A text to display. */
     public String displayedText;
@@ -1167,7 +1167,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @param delay Delay in ms for invoking the focus request 
    * @param latest 
    */
-  public final void setFocus(int delay, int latest){
+  public void setFocus(int delay, int latest){
     
     GralPanelContent panel1 = pos.panel;
     while(panel1 !=null && panel1.pos() !=null){
@@ -1272,7 +1272,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
         throw new IllegalStateException("GralWidget - setPos() is set already.");
       widgg.pos = mng.getPosCheckNext();  //always clone it from the central pos 
     }
-    /**This method in not intent to call by user. It may be called from all widget implementation 
+    
+    
+    /**This method is not intent to call by user. It may be called from all widget implementation 
      * if the focus of the widget is gained. Use {@link #setFocus()} to set a widget in the focus.
      * 
      * It sets the html help for the widget and notifies the widgets in focus for the GralWidgetMng. 
@@ -1280,12 +1282,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
      * It should be overridden only in a Gral widget inheritance only if necessary.
      */
     public void focusGained(){
+      System.out.println(Assert.stackInfo("GralWidget - Debuginfo; focusgained", 1, 10));
       if(widgg.htmlHelp !=null){
         widgg.itsMng.setHtmlHelp(widgg.htmlHelp);
       }
       if(widgg.actionFocused !=null){ widgg.actionFocused.exec(KeyCode.focusGained, widgg); }
       //notify GralWidgetMng about focused widget.
-      System.out.println("GralWidget - FocusGained;" /* %s; %s;\n",*/ + widgg.name + "; " + widgg.htmlHelp);
       widgg.itsMng.notifyFocus(widgg);
     }
     

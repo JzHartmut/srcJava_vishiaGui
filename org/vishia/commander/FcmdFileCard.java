@@ -477,6 +477,7 @@ public class FcmdFileCard extends GralFileSelector
     main.lastFavorCard = favorCard;
     mainPanel.actFileCard = FcmdFileCard.this;
     main.setLastSelectedPanel(mainPanel);
+    System.out.println(Assert.stackInfo("FcmdFileCard - setActFilePanel_setColorLine;",10));
     int ixMainPanel = -1;
     for(FcmdLeftMidRightPanel panel: main.lastFilePanels){
       if(ixMainPanel >=2) {

@@ -18,6 +18,7 @@ import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Assert;
+import org.vishia.util.Docu_UML_simpleNotation;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
 import org.vishia.util.SelectMask;
@@ -26,10 +27,11 @@ import org.vishia.util.TreeNodeBase;
 import org.vishia.util.TreeNode_ifc;
 
 /**This is the Gral class for a table. Its usage is independent of a graphical implementation layer.
- * A table consists of some text fields which are arranged in columns and lines. 
+ * A table consists of some text fields which are arranged in columns and lines. The lines can be associated
+ * to any user data.
  * <br><br>
  * <b>Data, text and graphic architecture of the table</b>:<br>
- * All data which are managed in this table are contained in an List {@link #tableLines} with a unlimited size. 
+ * All data which are managed in this table are contained in an Tree node {@link #rootLine} with a unlimited size. 
  * That container references instances of {@link TableLineData}. 
  * Each of that table line contains the texts which are displayed in the cells,
  * the color etc., a key for searching and a reference to any user data. In that kind a table is a container class
@@ -37,31 +39,45 @@ import org.vishia.util.TreeNode_ifc;
  * <br>
  * For presenting the table in a graphic implementation some text fields are arranged in a line and column structure
  * in any panel or canvas. The number of such fields for the lines is limited, only the maximal number of viewable 
- * lines should be present, independent of the length of the table. If any part of the table will be shown, that fields
- * will be filled with the texts from the TableItemWidget of  {@link #tableLines}. If the table content will be shifted
- * in the visible area, the text content of the fields are shifted. The first field is shown as first anyway, but it may
- * contain the content of a further line of the table. Each text field refers an instance of {@link CellData} as its
+ * lines should be present (about 20 to 50), independent of the length of the table. 
+ * If any part of the table will be shown, that fields
+ * will be filled with the texts from the {@link TableLineData#cellTexts} of the corresponding line.
+ * If the table content will be shifted in the visible area, the text content of the fields are replaced. 
+ * <br>
+ * Each text field refers an instance of {@link CellData} as its
  * 'user data'. The CellData refers via {@link CellData#tableItem} the line.
  * <br>
  * <pre>
- *   Graphic representation     GralTable
- *             |                   |
- *             |                   |--idxLine-------------->Map< key, GralTableLine_ifc>
- *             |                   |                                +------|
- *             |                   |      {@link TableLineData}     |
- *    |<*------+                   |                  |             |
- *   TextField                     |---tableLines---*>|<*-----------+
- *    |<>------>CellData                              |
+ *   Graphic representation     GralTable        {@link TableLineData}
+ *             |                   |<--------------<#>|           
+ *    |<*------+                   |                  |<>--userData--->User's data                    
+ *   TextField                     |---rootLine-----*>|
+ *    |<>------>CellData           |---lineSelected-->|
  *    |            |-tableItem----------------------->|
- *                                                    |<>---userData--------------->User's data
+ *                                                    |
  * 
  * </pre>
+ * UML presentation, see {@link Docu_UML_simpleNotation}.
  * <br><br>
  * <b>Key handling in a table</b>: <br>
  * The table has its own {@link GraphicImplAccess#processKeys(int)} method which is called 
  * from the graphical implementation layer in an key event handler.
  * This method processes some keys for navigation and selection in the table. If the key is not
  * used for that, the key will be offer the {@link GralMng#userMainKeyAction} for a global key usage.
+ * 
+ * <br><br>
+ * <b>Focus handling in a table</b>: <br>
+ * The focus events of the graphic representation layer are not used:
+ * <ul>
+ * <li>If a cell gets the focus by mouse click, whereby another cell of the table has lost the focus before,
+ *   the focus state of the table is not changed. Only the {@link #specifyActionOnLineSelected(GralUserAction)}
+ *   is called.
+ * <li>If a cell gets the focus by mouse click, whereby the table has not the focus before,
+ *   the {@link GralWidget#setActionFocused(GralUserAction)} is called from the focus action of the presentation graphic layer.
+ * <li>If {@link #setFocus()} is called from outside, the selected cell is marked with 
+ *   {@link GraphicImplAccess.CellData#bSetFocus}. The following repaint sets the focus for that cell.  
+ * </ul>
+ * 
  * 
  * @author Hartmut Schorrig
  *
@@ -70,6 +86,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license
    * <ul>
+   * <li>2013-11-24 Hartmut chg: {@link GralTable.GraphicImplAccess#focusGained()} etc. refactored. 
    * <li>2013-11-23 Hartmut chg: use {@link KeyCode#userSelect} etc. for calling {@link #actionOnLineSelected(int, GralTableLine_ifc)}
    * <li>2013-11-16 Hartmut chg: setCurrentCell(int, int) removed because the line number without respect to a line
    *   is not able to handle. Only a line is given. New method {@link #setCurrentLine(GralTableLine_ifc, int, int)}
@@ -85,8 +102,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * <li>2013-11-02 Hartmut chg: {@link GralTable.GraphicImplAccess#resizeTable(GralRectangle)} moved from SWT implementation,
    *   preparing tree view. {@link GralTable.TableLineData#treeDepth}, {@link GralTable.TableLineData#childLines} for tree view.
    * <li>2013-11-02 Hartmut chg: {@link GralTable.TableLineData} is static now with outer reference, more transparent
-   * 
-   * <li>2013-10-06 Hartmut chg: call {@link #actionOnLineSelected(int, GralTableLine_ifc)} only if the line is changed, not on focus without changed line.
+   * <li>2013-10-06 Hartmut chg: call {@link #actionOnLineSelected(int, GralTableLine_ifc)} only if the line is changed, 
+   *   not on focus without changed line.
    * <li>2013-09-15 Hartmut new: Implementation of {@link #setBackColor(GralColor, int)}  
    *   with special comments for usage of the int parameter.
    *   See {@link GralTable_ifc#setBackColor(GralColor, int)}, Adequate {@link #getBackColor(int)}. 
@@ -297,9 +314,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   //protected CellData cellDataOnMousePressed;
   
   /**The colors. */
-  protected GralColor colorBackSelect, colorBackMarked, colorBackSelectMarked, colorBackSelectNew, colorBackSelectNewMarked  //, colorBackTable
+  protected GralColor colorBackSelect, colorBackMarked, colorBackSelectMarked
+    , colorBackSelectNew, colorBackSelectNewMarked  //, colorBackTable
   //, colorBackSelectNonFocused, colorBackMarkedNonFocused, colorBackTableNonFocused
-  , colorTextSelect, colorTextMarked;
+    , colorTextSelect, colorTextMarked;
   
   
   protected GralColor colorSelectCharsBack, colorSelectChars;
@@ -470,6 +488,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     colorBackSelectMarked = GralColor.getColor("lgn");
     colorBackSelectNewMarked = GralColor.getColor("lpu");
     dyda.backColor = GralColor.getColor("wh");
+    dyda.backColorNoFocus = GralColor.getColor("pgr");
     //colorBackSelectNonFocused = GralColor.getColor("am");
     //colorBackMarkedNonFocused = GralColor.getColor("lrd");
     //colorBackTableNonFocused = GralColor.getColor("gr");
@@ -479,7 +498,23 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   }
   
   
+  /**Sets the focus of the table.
+   * It sets an information that the selected cell should focused while drawing ({@link GraphicImplAccess.CellData#bSetFocus}).
+   * Than it invokes the overridden super.{@link GralWidget#setFocus(int, int)}. 
+   * That method asserts the visibility of the table and calls {@link GralWidgImpl_ifc#setFocusGThread()}
+   * That method is implemented in the implementation widget layer and causes a redraw which focused
+   * the correct cell. 
+   * @see org.vishia.gral.base.GralWidget#setFocus(int, int)
+   */
+  @Override public void setFocus(int delay, int latest){
+    if(gi !=null){
+      gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true;  //will be processed on redraw
+      super.setFocus(delay, latest);
+    }
+  }
   
+  
+
   
   
   @Override
@@ -764,8 +799,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    */
   protected int shiftVisibleArea(int dLine){
     int dLine1 = dLine;
-    TreeNodeBase<?,?,?> line2;
-    //line = adjustVisibleArea();
     if(dLine >0){ //forward in lines
       TableLineData line = linesForCell[zLineVisible -1];  //the last line
       while(line !=null && dLine1 >0){
@@ -778,9 +811,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       }
     } else if(dLine < 0){ //backward in lines
       TableLineData line;
-      line2 = line = linesForCell[0];  //the new start line
+      line = linesForCell[0];  //the new start line
       if(line == null){
-        line2 = line = rootLine.firstChild(); //outer.tableLines.size() ==0 ? null : outer.tableLines.get(0);  //on init
+        line = rootLine.firstChild(); //outer.tableLines.size() ==0 ? null : outer.tableLines.get(0);  //on init
       }
       while(line !=null && dLine1 < 0){
         line = prevLine(line);
@@ -856,6 +889,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       lineSelected = lineSelectedNew;
       lineSelectedNew = null;
       lineSelectedixCell = cell.ixCellLine;  //used for key handling.
+      colSelectedixCellC = cell.ixCellColumn;
       actionOnLineSelected(KeyCode.userSelect, lineSelected);
       repaint(0,0);
     }
@@ -978,6 +1012,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             }
           }
           lineSelected = linesForCell[lineSelectedixCell];
+          //the table has the focus, because the key action is done only if it is so.
+          //set the new cell focused, in the paint routine.
+          gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
           actionOnLineSelected(KeyCode.userSelect, lineSelected);
           keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
         } break;
@@ -1004,6 +1041,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             ){
             lineSelectedixCell -=1;
           }
+          //the table has the focus, because the key action is done only if it is so.
+          //set the new cell focused, in the paint routine.
+          gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
           actionOnLineSelected(KeyCode.userSelect, lineSelected);
           
           keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
@@ -1164,7 +1204,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     protected final GralTable<UserData> outer;
     
-    
+    protected GralWidgImpl_ifc implWidgWrapper;
+
     
     protected CellData[][] cells;
     
@@ -1205,6 +1246,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * invocation of {@link #actionOnLineSelected(GralTableLine_ifc)}. 
      */
     protected boolean bFocused;
+    
+    
+    /**Sets temporary between focus lost and redraw.
+     * 
+     */
+    protected boolean bFocusLost;
     
     /**Set to true if the table has the focus in window.
      */
@@ -1255,18 +1302,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     protected GralColor colorBackTable(){ return outer.dyda.backColor; }
     
-    protected GralColor colorBackSelect(){ return outer.colorBackSelect; }
-    
-    protected GralColor colorBackMarked(){ return outer.colorBackMarked; }
-    
-    protected GralColor colorBackSelectMarked(){ return outer.colorBackSelectMarked; }
-    
-    protected GralColor colorTextTable(){ return outer.dyda.textColor; }
-    
-    protected GralColor colorTextSelect(){ return outer.colorTextSelect; }
-    
-    protected GralColor colorTextMarked(){ return outer.colorTextMarked; }
-    
     protected StringBuilder searchChars(){ return outer.searchChars; }
     
     
@@ -1274,17 +1309,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
       if(outer.ixColumn < 0){ outer.ixColumn = 0;}
       if(outer.ixLine < 0 && outer.zLine >0){ outer.ixLineNew = 0;}
-    }
-    
-    
-    protected boolean XXXisCurrentLine(int nLineNr){
-      return outer.ixLineNew >=0 ? nLineNr == outer.ixLineNew  //a new line 
-          : nLineNr == outer.ixLine;
-    }
-    
-    
-    protected boolean isCurrentLine(TableLineData/*<?>*/ line){
-      return outer.lineSelected == line;
     }
     
     
@@ -1436,10 +1460,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     
     protected void setFocusCellMousePressed(){
-      
+     
     }
-    
 
+    
+    
     
     protected void setCellContentNew(){
       long dbgtime = System.currentTimeMillis();
@@ -1480,6 +1505,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       } else {
         if(marked){
           linePresentation.colorBack = outer.colorBackMarked;
+        } else if(!bFocused){
+          linePresentation.colorBack = dyda.backColorNoFocus;
         } else {
           linePresentation.colorBack = line !=null && line.colorBackground !=null ? line.colorBackground : outer.dyda.backColor;
         }
@@ -1554,6 +1581,52 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
 
 
+    
+    /**This routine is invoked if any cell of the table gets the focus. It is if the window gets the focus
+     * from view of the whole operation system, if the mouse is landing on a cell Text-field with click
+     * or if setFocus() for the graphic presentation layer was called. 
+     * <ul>
+     * <li>If {@link #bFocusLost} is true, another cell of this table has lost the focus
+     *   in the last 50 ms before the repaint() was invoked. Then the super.{@link GralWidget#setFocus()}
+     *   will not be called.
+     * <li>If {@link #bRedrawPending} is set, it means that the focus gained is invoked by a setFocus()-call
+     *   of the graphic representation layer. Then the {@link GralWidget#setFocus()} will not be called.  
+     * <li>If both conditions are false, it is a focusGained either by mouse click, whereby this table 
+     *   has not have the focus before, or by any other action of focusing. 
+     *   Then {@link GralWidget#setFocus()} is called to designate, that the table is focused.   
+     * </ul>
+     */
+    @Override public void focusGained(){ 
+      if(bFocusLost){  
+        //focus is lost from another cell of this table yet now, repaint is not invoked,
+        bFocusLost = false;  //ignore focus lost.
+      } else {
+        //Any cell has got the focus, it means the table has gotten the focus.
+        bFocused = true; 
+        if(!bRedrawPending){
+          super.focusGained();
+          System.out.println("GralTable - debugInfo; focusGained " + GralTable.this.toString() );
+          repaint(50,100);
+        }
+      }
+    }
+    
+    /**Invoked if any cell has lost the focus.
+     * If the table has lost the focus, the repaint will established this state after 50 milliseconds
+     * because the flag {@link #bFocused} = false.
+     * But if another cell of the table has gotten the focus in this time, the bFocus = true is set. 
+     * 
+     */
+    protected void focusLost(){ 
+      bFocusLost = true;
+      repaint(50,100);
+    }
+    
+
+    
+    
+    
+    
     protected void mouseDown(int key, CellData cell){
       mousetime = System.currentTimeMillis();
       redrawTableWithFocusedCell(cell);
@@ -1562,7 +1635,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       //ixLineNew = line.nLineNr;  //select this line.
       
       if(true || !XXXhasFocus){
-        ((GralWidget.ImplAccess)this).focusGained();  //from GralWidget.
+        //((GralWidget.ImplAccess)this).focusGained();  //from GralWidget.
         XXXhasFocus = true;
         //System.out.println("focusTable");
       }
