@@ -380,6 +380,13 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     if(htmlBox !=null){ htmlBox.refreshFromVariable(container); }
     
   }
+  
+  
+  @Override public void refreshFromVariable(VariableContainer_ifc container, long timeAtleast, GralColor colorRefreshed, GralColor colorOld){
+    if(textBox !=null){ textBox.refreshFromVariable(container, timeAtleast, colorRefreshed, colorOld); }
+    if(htmlBox !=null){ htmlBox.refreshFromVariable(container, timeAtleast, colorRefreshed, colorOld); }
+  }
+
 
   @Override public void setDataPath(String sDataPath)
   { 

@@ -1889,6 +1889,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       GralTable.this.refreshFromVariable(container);
     }
 
+    @Override public void refreshFromVariable(VariableContainer_ifc container, long timeAtleast, GralColor colorRefreshed, GralColor colorOld){
+      GralTable.this.refreshFromVariable(container, timeAtleast, colorRefreshed, colorOld);
+    }
+
+
     
     @Override public void setDataPath(String sDataPath){
       GralTable.this.setDataPath(sDataPath);

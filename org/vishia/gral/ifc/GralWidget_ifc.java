@@ -297,4 +297,8 @@ public interface GralWidget_ifc extends Removeable
    *   The variables are searched in the container calling {@link VariableContainer_ifc#getVariable(String)}. 
    */
   void refreshFromVariable(VariableContainer_ifc container);
+  
+  
+  
+  void refreshFromVariable(VariableContainer_ifc container, long timeAtleast, GralColor colorRefreshed, GralColor colorOld);
 }

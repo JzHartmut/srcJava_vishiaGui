@@ -168,6 +168,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-11-11 Hartmut new: {@link #refreshFromVariable(VariableContainer_ifc, long, GralColor, GralColor)}
+   *   which shows old values grayed. 
    * <li>2013-11-11 Hartmut chg: {@link #setFocus()} searches the {@link GralTabbedPanel} where the widget is
    *   member of and invokes its {@link GralTabbedPanel#selectTab(String)}. It is not correct that the graphic
    *   implementation layer does that itself. 
@@ -503,7 +505,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     /**Three colors for background, line and text should be convert to the platforms color and used in the paint routine. 
      * If this elements are null, the standard color should be used. */
     public GralColor backColor, backColorNoFocus, lineColor, textColor;
-    
+    //public GralColor backColor = GralColor.getColor("wh"), backColorNoFocus = GralColor.getColor("lgr"), 
+    //lineColor = GralColor.getColor("dbl"), textColor = GralColor.getColor("bk");
+  
     /**A text to display. */
     public String displayedText;
     
@@ -878,6 +882,17 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     return variable; 
   }
   
+
+  
+  
+  @Override public void refreshFromVariable(VariableContainer_ifc container){
+    refreshFromVariable(container, -1, null, null);
+  }
+
+  
+  
+  
+  
   
   /**Refreshes the graphical content with the content of the variables.
    * First time if a variables is not associated the variable is searched in the container
@@ -889,7 +904,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * 
    * @param container contains variables able to search by string.
    */
-  @Override public void refreshFromVariable(VariableContainer_ifc container){
+  @Override public void refreshFromVariable(VariableContainer_ifc container
+      , long timeLatest, GralColor colorRefreshed, GralColor colorOld
+  ){
     String sDataPath = this.getDataPath();
     if(sDataPath !=null && sDataPath.startsWith("intern/energyTotalLineOut"))
       stop();
@@ -928,18 +945,22 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     } else {
       //standard behaviour to show: call setValue or setText which may overridden by the widget type.
       if(variable !=null){
-        long timeVariable = variable.getLastRefreshTime();
-        boolean bOld = timeVariable > 0 && (System.currentTimeMillis() - timeVariable) > 2000;
-        if(bOld ){
-          //TODO setBackgroundColor(GralColor.getColor("cy"));
-        } else {
-          //TODO setBackgroundColor(GralColor.getColor("wh"));
+        if(sDataPath !=null && sDataPath.equals("intern.rxS7Counter"))
+          Assert.stop();
+        if(colorRefreshed !=null && colorOld !=null){
+          long timeVariable = variable.getLastRefreshTime();
+          boolean bOld = timeVariable > 0 && (timeVariable - timeLatest) < 0;
+          if(bOld ){
+            setBackColor(colorOld, 0);
+          } else {
+            setBackColor(colorRefreshed, 0);
+          }
         }
         char cType = variable.getType();
         String sValue = null;
         switch(cType){
           case 'Z': case 'S': case 'B':
-            case 'I': setValue(variable.getInt()); break;
+          case 'I': setValue(variable.getInt()); break;
           case 'L': setValue(variable.getLong()); break;
           case 'F': setValue(variable.getFloat()); break;
           case 'D': 
@@ -951,8 +972,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
           default:  sValue = "?" + cType; //variable.getInt());  //at least request newly if type is faulty
           }
           if(sValue !=null){
-            if(bOld){ setText("? " + sValue); }
-            else { setText(sValue); }
+            //if(bOld){ setText("? " + sValue); }
+            //else 
+            { setText(sValue); }
           }
       } else if(variables !=null){
         if(variables.size() == 0){ variables = null; }
@@ -1049,15 +1071,17 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   public void setValue(int cmd, int ident, Object visibleInfo)
   { dyda.visibleInfo = visibleInfo;
     dyda.setChanged(ImplAccess.chgVisibleInfo);
-    repaint(100,100);
+    repaint(repaintDelay, repaintDelayMax);
     //itsMng.setInfo(this, cmd, ident, visibleInfo, null);
   }
   
   
   @Override public void setBackColor(GralColor color, int ix){ 
-    dyda.backColor = color; 
-    dyda.setChanged(ImplAccess.chgColorBack); 
-    repaint(100, 100); 
+    if(dyda.backColor == null || !dyda.backColor.equals(color)){
+      dyda.backColor = color; 
+      dyda.setChanged(ImplAccess.chgColorBack); 
+      repaint(repaintDelay, repaintDelayMax);
+    }
   }
   
   @Override public GralColor getBackColor(int ix){ 
@@ -1065,15 +1089,19 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   }
   
   @Override public void setLineColor(GralColor color, int ix){ 
-    dyda.lineColor = color; 
-    dyda.setChanged(ImplAccess.chgColorLine); 
-    repaint(100, 100);  
+    if(dyda.lineColor == null || !dyda.lineColor.equals(color)){
+      dyda.lineColor = color; 
+      dyda.setChanged(ImplAccess.chgColorLine); 
+      repaint(repaintDelay, repaintDelayMax);
+    }
   }
   
   @Override public void setTextColor(GralColor color){ 
-    dyda.textColor = color; 
-    dyda.setChanged(ImplAccess.chgColorText); 
-    repaint(100, 100);  
+    if(dyda.textColor == null || !dyda.textColor.equals(color)){
+      dyda.textColor = color; 
+      dyda.setChanged(ImplAccess.chgColorText); 
+      repaint(repaintDelay, repaintDelayMax);
+    }
   }
   
   
@@ -1086,7 +1114,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   public void setValue(int cmd, int ident, Object visibleInfo, Object userData)
   { dyda.visibleInfo = visibleInfo;
     dyda.userData = userData;
-    repaint(100,100);
+    repaint(repaintDelay, repaintDelayMax);
     //itsMng.setInfo(this, cmd, ident, visibleInfo, userData);
   }
   
@@ -1096,7 +1124,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   @Override public void setValue(float value){
     dyda.fValue = value;
-    repaint(100,100);
+    repaint(repaintDelay, repaintDelayMax);
     //itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, value, null);
   }
   
@@ -1107,7 +1135,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   @Override public void setValue(Object[] value){
     dyda.oValues = value;
-    repaint(100,100);
+    repaint(repaintDelay, repaintDelayMax);
     //itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, value, null);
   }
   
@@ -1116,7 +1144,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   @Override public void setText(CharSequence text){
     dyda.displayedText = text.toString(); 
     dyda.setChanged(ImplAccess.chgText);
-    repaint(100, 100);
+    repaint(repaintDelay, repaintDelayMax);
     //System.err.println(Assert.stackInfo("GralWidget - non overridden setText called; Widget = " + name + "; text=" + text, 5));
   }
   
@@ -1135,7 +1163,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   @Override public void setMinMax(float minValue, float maxValue){
     dyda.minValue = minValue;
     dyda.maxValue = maxValue;
-    repaint(100,100);
+    repaint(repaintDelay, repaintDelayMax);
     //
   }
 

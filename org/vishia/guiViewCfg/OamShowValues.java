@@ -14,6 +14,7 @@ import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -27,6 +28,7 @@ public class OamShowValues
   
   /**Version and history
    * <ul>
+   * <li>2012-02-25 Hartmut new: OamShowValues: with time, grayed if old
    * <li>2012-02-25 Hartmut new: CurveView: All data have a short timestamp. 
    * <li>2012-02-21 Hartmut chg Now a curve view can be accessed symbolically.
    * <li>2010-06-00 Hartmut created
@@ -55,9 +57,20 @@ public class OamShowValues
 	 */
 	ByteDataSymbolicAccess.Variable varTimeMilliSecFromBaseyear;
 	
+	
+  GralColor colorBackValueOk = GralColor.getColor("wh");
+  
+  GralColor colorBackValueOld = GralColor.getColor("lgr");
+  
 	long timeMilliSecFromBaseyear;
 	
-	private final float[] valueUserCurves = new float[6];  
+	/**Set in {@link #writeValuesOfTab()} to check newless. */
+	private long timeNow;
+	
+	/**Time for valid values. */
+	private final long milliSecondsOk = 3000; 
+	
+	//private final float[] valueUserCurves = new float[6];  
 
 	public OamShowValues(
 		Report log
@@ -70,7 +83,7 @@ public class OamShowValues
 		//assign an empty array, it is necessary for local test or without data receive.
 		//elsewhere a null-pointer-exception is thrown if the tab-pane is shown.
 		//If data are received, this empty array isn't referenced any more.
-		accessOamVariable.assignData(new byte[1500]);
+		accessOamVariable.assignData(new byte[1500], System.currentTimeMillis());
 		dataValid = true;   //it can be set because empty data are present, see above, use to test.
 	}
 	
@@ -103,7 +116,7 @@ public class OamShowValues
 	 */
 	public void show(byte[] binData, int nrofBytes, int from)
 	{
-		accessOamVariable.assignData(binData, nrofBytes, from);
+		accessOamVariable.assignData(binData, nrofBytes, from, System.currentTimeMillis());
 		dataValid = true;
 		if(varTimeMilliSecFromBaseyear !=null){
 		  //read the time stamp from the record:
@@ -144,7 +157,7 @@ public class OamShowValues
 		if(variable == null){
 			sValue = "XXXXX";
 		} else {
-  		char varType = variable.getTypeChar();
+		  char varType = variable.getTypeChar();
   		if(varType == 'F'){
     		float value= variable.bytes.getFloat(variable, widgetInfo.getDataIx());
     		if(sFormat ==null){
@@ -166,7 +179,15 @@ public class OamShowValues
     		//other format
     		sValue = "?type=" + varType;
     	}
-		  guiAccess.setText(sName, sValue);
+  	  GralWidget widg = guiAccess.getWidget(sName);	
+      widg.setText(sValue);
+  	  //guiAccess.setText(sName, sValue);
+      long timeLastRefresh = variable.getLastRefreshTime();
+      if( (timeNow - timeLastRefresh) < milliSecondsOk){
+        widg.setBackColor(colorBackValueOk, 0);
+      } else {
+        widg.setBackColor(colorBackValueOld, 0);
+      }
 		}
 		
 	}
@@ -175,8 +196,12 @@ public class OamShowValues
 	
 	
 
-	private void writeValuesOfTab()
+	/**
+	 * 
+	 */
+	@Deprecated void writeValuesOfTab()
 	{ if(dataValid){
+	    timeNow = System.currentTimeMillis();
   	  ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = guiAccess.getVisiblePanels();
       //GralWidget widgdRemove = null;
       try{
@@ -543,7 +568,7 @@ public class OamShowValues
 	
 
 	
-	final GralUserAction actionSetValueTestInInput = new GralUserAction()
+	final GralUserAction actionSetValueTestInInput = new GralUserAction("actionSetValueTestInInput")
   { @Override
   public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     { 
@@ -551,7 +576,7 @@ public class OamShowValues
   		ByteDataSymbolicAccess.Variable variable = getVariable(widgetInfos.getDataPath(), ixArrayA);
   		int value = 0; //TODO Integer.parseInt(sParam);
   		if(variable.bytes.lengthData() == 0){
-  			variable.bytes.assignData(new byte[1500]);
+  			variable.bytes.assignData(new byte[1500], System.currentTimeMillis());
   		}
   		variable.bytes.setFloat(variable, -1, 2.5F* value -120);
   		dataValid = true;
