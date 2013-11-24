@@ -246,13 +246,12 @@ public final class InspcCurveView
   }
   
   
-  /**Builds the graphic, it should be called only one time on startupt in the graphic thread
+  /**Builds the graphic, it should be called only one time on startup in the graphic thread
    * @param wind The main window where the menu to open will be added
    * @param sName The name, used for menu entry too, sample "curve A"
    */
   public void buildGraphic(GralWindow_ifc wind, GralColorSelector colorSelector)
   {
-    int posright = -20;
     this.colorSelector = colorSelector;
     gralMng.selectPanel("primaryWindow");
     //gralMng.setPosition(4, 0, 4, 0, 0, '.');
@@ -261,6 +260,15 @@ public final class InspcCurveView
     int windProps = GralWindow.windConcurrently; // | GralWindow.windResizeable;
     windCurve = gralMng.createWindow("windMapVariables", sName, windProps);
     //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 0, 'd');
+    buildGraphicInCurveWindow();
+    wind.addMenuBarItemGThread("menuBarCurveView", "&Window/open " + sName, actionOpenWindow);
+  }
+
+  
+  
+  void buildGraphicInCurveWindow()
+  {
+    int posright = -20;
     gralMng.setPosition(0, -2, 0, posright, 0, 'd');
     widgCurve = gralMng.addCurveViewY(sName, 15000, 10);
     widgCurve.setActionMoveCursor(actionShowCursorValues);
@@ -327,12 +335,13 @@ public final class InspcCurveView
     
     gralMng.setPosition(-3, GralPos.size +2, -9, -1, 0, 'd', 0);
     widgBtnOff = gralMng.addSwitchButton(sName + "btnOff", "off / ?on", "on / ?off", GralColor.getColor("lgn"), GralColor.getColor("am"));
-    wind.addMenuBarItemGThread("menuBarCurveView", "&Window/open " + sName, actionOpenWindow);
   
     windFileCfg = new GralFileSelectWindow("windFileCfg", gralMng);
     windFileValues = new GralFileSelectWindow("windFileValues", gralMng);
+    
   }
-
+  
+  
   
   void refreshCurve(){
     if(widgCurve !=null && widgBtnOff !=null){
@@ -876,6 +885,12 @@ public final class InspcCurveView
   } };
   
   
+  public GralUserAction actionReadValues = new GralUserAction("actionReadValues"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
+      return true;
+    }
+  };
+ 
   
   
   /**Action invoked if the write file was selected in the {@link GralFileSelectWindow}
@@ -1078,7 +1093,5 @@ public final class InspcCurveView
       }
     }
   }
-  
-  
   
 }
