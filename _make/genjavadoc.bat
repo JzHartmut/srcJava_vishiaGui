@@ -4,9 +4,9 @@ set DST=docuSrcJava_vishiaGui
 set DST_priv=docuSrcJava_vishiaGui_priv
 
 echo set SRC
-set SRC=-subpackages org.vishia.gral org.vishia.commander 
+set SRC=-subpackages org.vishia.gral org.vishia.commander org\vishia\guiInspc
 set SRC=%SRC% ..\org\vishia\guiBzr\*.java
-set SRC=%SRC% ..\org\vishia\guiInspc\*.java
+::set SRC=%SRC% ..\org\vishia\guiInspc\*.java
 set SRC=%SRC% ..\org\vishia\guiViewCfg\*.java
 set SRC=%SRC% ..\org\vishia\windows\*.java
 

@@ -549,7 +549,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   /**Returns the current selected line. */
   @Override
-  public GralTableLine_ifc<UserData> getCurrentLine() {
+  public TableLineData getCurrentLine() {
     return lineSelected;
   }
 

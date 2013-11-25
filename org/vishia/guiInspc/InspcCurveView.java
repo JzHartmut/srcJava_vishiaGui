@@ -370,7 +370,7 @@ public final class InspcCurveView
         assert(widgd instanceof GralTable<?>);  //NOTE: context menu to table lines, has GralTable as widget.
         @SuppressWarnings("unchecked")
         GralTable<TrackValues> table = (GralTable<TrackValues>)widgd; //oContentInfo;
-        GralTable<TrackValues>.TableLineData refline = (GralTable<TrackValues>.TableLineData)table.getCurrentLine();
+        GralTable<TrackValues>.TableLineData refline = table.getCurrentLine();
         if(bInsert || refline == null){  //insert a line, build a new one
           input = new TrackValues(-1);
           GralTableLine_ifc<?> newline;
