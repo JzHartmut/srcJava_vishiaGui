@@ -219,7 +219,7 @@ public class FcmdView
   void detectEncoding(){
     for(int ii =0; ii<zContent; ++ii){
       byte cc = uContent[ii];
-      if(cc < 0x20 && "\r\n\t".indexOf(cc) <0){
+      if(cc < 0x20 && cc >=0 && "\r\n\t".indexOf(cc) <0){
         //non-text character
         encodingContent = null;
         return;
