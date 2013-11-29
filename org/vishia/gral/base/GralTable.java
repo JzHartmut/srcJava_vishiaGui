@@ -928,13 +928,27 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         keyDone = false;
         switch(keyCode){
         case KeyCode.pgup: {
+          if(lineSelectedixCell > 2){
+            lineSelectedixCell = 2;
+          } else {
+            int shifted = shiftVisibleArea(-zLineVisible);  //shifted = -1 if all shifted
+            lineSelectedixCell -= zLineVisible + shifted;
+            if(lineSelectedixCell <0){
+              lineSelectedixCell = 0;  //limit it on top.
+            }
+          }
+          lineSelected = linesForCell[lineSelectedixCell];
+          //the table has the focus, because the key action is done only if it is so.
+          //set the new cell focused, in the paint routine.
+          gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
+          actionOnLineSelected(KeyCode.userSelect, lineSelected);
           keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
         } break;
         case KeyCode.mouseWheelUp:
         case KeyCode.up: {
           searchContent(true);
           ////
-          if(lineSelectedixCell > 3){
+          if(lineSelectedixCell > 2){
             lineSelectedixCell -=1;
           } else {
             int shifted = shiftVisibleArea(-1);  //shifted = -1 if all shifted
@@ -976,6 +990,24 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
         } break;
         case KeyCode.pgdn: {
+          if(lineSelectedixCell < zLineVisible -3){
+            lineSelectedixCell = zLineVisible -3;
+          } else {
+            int shifted = shiftVisibleArea(zLineVisible);
+            lineSelectedixCell += zLineVisible - shifted;
+            if(lineSelectedixCell >= zLineVisible){
+              lineSelectedixCell = zLineVisible -1;  //limit it on top.
+            }
+          }
+          while( (lineSelected = linesForCell[lineSelectedixCell]) ==null
+               && lineSelectedixCell >0    
+            ){
+            lineSelectedixCell -=1;
+          }
+          //the table has the focus, because the key action is done only if it is so.
+          //set the new cell focused, in the paint routine.
+          gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
+          actionOnLineSelected(KeyCode.userSelect, lineSelected);
           keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
         } break;
         default:
