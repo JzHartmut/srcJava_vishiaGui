@@ -301,7 +301,7 @@ public class FcmdButtons
   
   /**The main key action registered in the {@link GralMng#setMainKeyAction(GralUserAction)}.
    */
-  GralUserAction actionMainKeys = new GralUserAction()
+  GralUserAction actionMainKeys = new GralUserAction("actionMainKeys")
   {
     @Override public boolean exec(int key, GralWidget_ifc widg, Object... params){ 
       return processKey(key, widg);
@@ -313,7 +313,7 @@ public class FcmdButtons
   
   /**Action to focus the cmd card.
    */
-  GralUserAction actionViewButtons = new GralUserAction()
+  GralUserAction actionViewButtons = new GralUserAction("actionViewButtons")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction

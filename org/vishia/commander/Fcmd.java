@@ -615,7 +615,7 @@ public class Fcmd extends GuiCfg
    * key and switches to the concretely action for the pressed key. General keys
    * are [F1] for help, [F4] for edit etc.
    */
-  GralUserAction actionTest = new GralUserAction()
+  GralUserAction actionTest = new GralUserAction("actionTest")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     {
@@ -631,7 +631,7 @@ public class Fcmd extends GuiCfg
    * key and switches to the concretely action for the pressed key. General keys
    * are [F1] for help, [F4] for edit etc.
    */
-  GralUserAction actionKey = new GralUserAction()
+  GralUserAction actionKey = new GralUserAction("actionKey")
   {
     @Override
     public boolean userActionGui(String sIntension, GralWidget infos,
@@ -675,7 +675,7 @@ public class Fcmd extends GuiCfg
   /**Key alt-F2 to select a directory/cmd list in a list of directories for the
    * middle panel.
    */
-  GralUserAction selectCardThemesMiddle = new GralUserAction()
+  GralUserAction selectCardThemesMiddle = new GralUserAction("selectCardThemesMiddle")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
@@ -688,7 +688,7 @@ public class Fcmd extends GuiCfg
   /**Key alt-F3 to select a directory/cmd list in a list of directories for the
    * right panel.
    */
-  GralUserAction selectCardThemesRight = new GralUserAction()
+  GralUserAction selectCardThemesRight = new GralUserAction("selectCardThemesRight")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
@@ -701,7 +701,7 @@ public class Fcmd extends GuiCfg
   /**Key sh-F1 to select a directory/cmd list in a list of directories for the
    * right panel.
    */
-  GralUserAction selectFileCardLeft = new GralUserAction()
+  GralUserAction selectFileCardLeft = new GralUserAction("selectFileCardLeft")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
@@ -714,7 +714,7 @@ public class Fcmd extends GuiCfg
   /**Key sh-F2 to select a directory/cmd list in a list of directories for the
    * right panel.
    */
-  GralUserAction selectFileCardMid = new GralUserAction()
+  GralUserAction selectFileCardMid = new GralUserAction("selectFileCardMid")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
@@ -727,7 +727,7 @@ public class Fcmd extends GuiCfg
   /**Key sh-F3 to select a directory/cmd list in a list of directories for the
    * right panel.
    */
-  GralUserAction selectFileCardRight = new GralUserAction()
+  GralUserAction selectFileCardRight = new GralUserAction("selectFileCardRight")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
@@ -740,7 +740,7 @@ public class Fcmd extends GuiCfg
   /**Key sh-F3 to select a directory/cmd list in a list of directories for the
    * right panel.
    */
-  GralUserAction selectFileCardOther = new GralUserAction()
+  GralUserAction selectFileCardOther = new GralUserAction("selectFileCardOther")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
@@ -793,7 +793,7 @@ public class Fcmd extends GuiCfg
 
   /**Action to focus the cmd card.
    */
-  GralUserAction actionFocusCmdCard = new GralUserAction()
+  GralUserAction actionFocusCmdCard = new GralUserAction("actionFocusCmdCard")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
@@ -841,7 +841,7 @@ public class Fcmd extends GuiCfg
   /**
    * Key F4 for edit command. Its like Norton Commander.
    */
-  GralUserAction actionEdit = new GralUserAction()
+  GralUserAction actionEdit = new GralUserAction("actionEdit")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params) {
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
@@ -868,7 +868,7 @@ public class Fcmd extends GuiCfg
   
   /**This callback will be invoked in the drag event while the mouse is released in the destination. 
    */
-  GralUserAction actionDragFileFromStatusLine = new GralUserAction(){
+  GralUserAction actionDragFileFromStatusLine = new GralUserAction("actionDragFileFromStatusLine"){
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params) {
       if(key == KeyCode.dragFiles){
         String path = widgd.getValue();

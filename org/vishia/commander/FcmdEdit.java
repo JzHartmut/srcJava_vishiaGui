@@ -189,7 +189,7 @@ public class FcmdEdit
   
   /**Action for Key F3 for view command. Its like Norton Commander.
    */
-  GralUserAction actionOpenEdit = new GralUserAction()
+  GralUserAction actionOpenEdit = new GralUserAction("actionOpenEdit")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
@@ -201,7 +201,7 @@ public class FcmdEdit
   };
 
 
-  GralUserAction actionConvertUTF8unix = new GralUserAction()
+  GralUserAction actionConvertUTF8unix = new GralUserAction("actionConvertUTF8unix")
   {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { 

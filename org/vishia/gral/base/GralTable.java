@@ -19,6 +19,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.Docu_UML_simpleNotation;
+import org.vishia.util.IterableIterator;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
 import org.vishia.util.SelectMask;
@@ -469,7 +470,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   //@Override public boolean setCurrentLine(int nLine){ return setCurrentCell(nLine, -1); }
 
   
-  public void setColors(){
+  void setColors(){
     colorBackSelect = GralColor.getColor("lam");
     colorBackSelectNew = GralColor.getColor("lbl");
     colorBackMarked = GralColor.getColor("pcy");
@@ -484,6 +485,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     colorSelectCharsBack = GralColor.getColor("lgr");
     colorSelectChars = GralColor.getColor("wh");
   }
+  
+  
   
   
   /**Sets the focus of the table.
@@ -636,7 +639,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   }
   
   
-  
+  public IterableIterator<TableLineData> iterLines(){
+    return rootLine.iterator();
+  }
   
   
   

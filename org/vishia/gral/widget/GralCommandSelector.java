@@ -198,7 +198,7 @@ public class GralCommandSelector extends GralSelectList<CmdStore.CmdBlock>
   }
 
   
-  private final GralUserAction actionOnLineSelected = new GralUserAction(){
+  private final GralUserAction actionOnLineSelected = new GralUserAction("actionOnLineSelected"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
       GralTableLine_ifc line = (GralTableLine_ifc)params[0];
       if(line !=null){
@@ -208,7 +208,7 @@ public class GralCommandSelector extends GralSelectList<CmdStore.CmdBlock>
     }
   };
   
-  public GralUserAction actionExecCmdWithFiles = new GralUserAction(){
+  public GralUserAction actionExecCmdWithFiles = new GralUserAction("actionExecCmdWithFiles"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
       executeCurrCmdWithFiles();
       return true;

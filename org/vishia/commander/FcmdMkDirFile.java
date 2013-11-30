@@ -72,7 +72,7 @@ public class FcmdMkDirFile
 
   /**Action for Key F7 for open dialog. Its like Norton Commander.
    */
-  GralUserAction actionOpenDialog = new GralUserAction()
+  GralUserAction actionOpenDialog = new GralUserAction("actionOpenDialog")
   {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { dialogMkDirFile(null);
@@ -84,7 +84,7 @@ public class FcmdMkDirFile
 
 
   /**Action for Buttons */
-  GralUserAction actionButton = new GralUserAction()
+  GralUserAction actionButton = new GralUserAction("actionButton")
   {
     @Override public boolean userActionGui(int keyCode, GralWidget widg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){

@@ -11,6 +11,10 @@ public abstract class GralDispatchCallbackWorker
   
   /**Version and history:
    * <ul>
+   * <li>2012-02-14 Hartmut corr: {@link #addToGraphicThread(GralGraphicThread, int)}:
+   *   For time saving: If an instance is added already and its new execution time
+   *   is up to 5 ms later, nothing is done. It saves time for more as one call of this routine
+   *   in a fast loop.
    * <li>2012-02-14 Hartmut corr: It was happen that an instance was designated with {@link #bAdded}==true
    *   but it wasn't added, Therefore on {@link #addToGraphicThread(GralGraphicThread, int)} it is removed
    *   from list and added newly. It is more save. 
@@ -93,11 +97,17 @@ public abstract class GralDispatchCallbackWorker
 	
 	
 	/**Adds to the graphic thread or sets a new delay if is added already.
+	 * If it is added already and the new time to execution is in range max 5 ms later, this routine does nothing.
 	 * @param dst The graphic thread.
 	 * @param delay time in milliseconds for delayed execution or 0.
 	 */
 	synchronized public void addToGraphicThread(GralGraphicThread dst, int delay){
+	  long timeExecution1 = System.currentTimeMillis() + delay;
 	  if(bAdded){
+	    long timediff = timeExecution1 - timeExecution;
+	    if(timediff >0 && timediff < 5){ //later, max 5 ms difference,
+	      return;            //do nothing, it is added already.
+	    }
 	    //remove and add new, because its state added in queue or not may be false.
 	    dst.removeDispatchListener(this);
 	  }
@@ -160,8 +170,8 @@ public abstract class GralDispatchCallbackWorker
   /**Sets the delay to execute. It can be set newly whenever this instance isn't used to execute yet.
    * @param millisec delay.
    */
-  public void delayExecution(int millisec){
-    timeExecution = System.currentTimeMillis() + millisec;
+  private long delayExecution(int millisec){
+    return System.currentTimeMillis() + millisec;
   }
   
 

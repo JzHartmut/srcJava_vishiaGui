@@ -48,7 +48,7 @@ public class Bzr
       }
     } while(!fBzr.exists() && currDir !=null);
     if(currDir ==null){
-      throw new IOException("Bzr.searchRepository - not found ;" + startDir.getAbsolutePath());
+      throw new IOException("Bzr.searchRepository - .bzr... not found ;" + startDir.getAbsolutePath());
     } else {
       String sBzrDir = FileSystem.getCanonicalPath(currDir);
       DataAccess.setVariable(dst, bzrdir, 'S', sBzrDir);

@@ -93,7 +93,7 @@ public class FcmdStatus
   
   /**Action for OK. 
    */
-  GralUserAction actionButton = new GralUserAction()
+  GralUserAction actionButton = new GralUserAction("actionButton")
   {
     @Override public boolean exec(int keyCode, GralWidget_ifc widg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
@@ -107,7 +107,7 @@ public class FcmdStatus
   
   /**Action for Key F2 for view command. 
    */
-  GralUserAction actionOpenDialog = new GralUserAction()
+  GralUserAction actionOpenDialog = new GralUserAction("actionOpenDialog")
   {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){

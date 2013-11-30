@@ -137,7 +137,7 @@ public class FcmdDelete
   /**
    * Key F8 for delete command. Its like Norton Commander.
    */
-  GralUserAction actionConfirmDelete = new GralUserAction()
+  GralUserAction actionConfirmDelete = new GralUserAction("actionConfirmDelete")
   {
     @Override
     public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
@@ -153,7 +153,7 @@ public class FcmdDelete
   };
 
   
-  GralUserAction actionDelete = new GralUserAction()
+  GralUserAction actionDelete = new GralUserAction("actionDelete")
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
     { try{ 
         if(KeyCode.isControlFunctionMouseUpOrMenu(key)){

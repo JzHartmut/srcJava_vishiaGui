@@ -132,7 +132,7 @@ public class FcmdStatusLine
     
   }
   
-  GralUserAction actionShowBackslash = new GralUserAction(){
+  GralUserAction actionShowBackslash = new GralUserAction("actionShowBackslash"){
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params) {
       showBackslash = true;
       sPath = sPath.replace('/', '\\');
@@ -141,7 +141,7 @@ public class FcmdStatusLine
     }    
   };
 
-  GralUserAction actionShowSlash = new GralUserAction(){
+  GralUserAction actionShowSlash = new GralUserAction("actionShowSlash"){
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params) {
       showBackslash = false;
       sPath = sPath.replace('\\', '/');

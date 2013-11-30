@@ -193,7 +193,7 @@ public final class FcmdFilesCp {
   
   
   
-  GralUserAction actionConfirmCp = new GralUserAction() {
+  GralUserAction actionConfirmCp = new GralUserAction("actionConfirmCp") {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     {
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
@@ -204,7 +204,7 @@ public final class FcmdFilesCp {
   } };
 
   
-  GralUserAction actionFilesCp = new GralUserAction() {
+  GralUserAction actionFilesCp = new GralUserAction("actionFilesCp") {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     {
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){

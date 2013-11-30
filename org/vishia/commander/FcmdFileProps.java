@@ -277,7 +277,7 @@ public class FcmdFileProps
   
   /**Action for Key F2 for view command. 
    */
-  GralUserAction actionOpenDialog = new GralUserAction()
+  GralUserAction actionOpenDialog = new GralUserAction("actionOpenDialog")
   {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
@@ -300,7 +300,7 @@ public class FcmdFileProps
 
   /**Action for Key F2 for view command. 
    */
-  GralUserAction actionButton = new GralUserAction()
+  GralUserAction actionButton = new GralUserAction("actionBtnCntLen")
   {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){  //not on mouse down but on mouse up.
@@ -412,7 +412,7 @@ public class FcmdFileProps
 
 
 
-  GralUserAction actionInvisible = new GralUserAction()
+  GralUserAction actionInvisible = new GralUserAction("actionInvisible")
   { @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { isVisible = false;
       return true;
@@ -441,7 +441,7 @@ public class FcmdFileProps
   
   /**Action for Key F2 for view command. 
    */
-  GralUserAction actionBtnCntLen = new GralUserAction()
+  GralUserAction actionBtnCntLen = new GralUserAction("actionBtnCntLen")
   {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){

@@ -398,7 +398,7 @@ public class FcmdView
   
   /**Action for Key F3 for view command. Its like Norton Commander.
    */
-  GralUserAction actionFind = new GralUserAction()
+  GralUserAction actionFind = new GralUserAction("actionFind")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
@@ -420,7 +420,7 @@ public class FcmdView
   
   /**Action for Key F3 for view command. Its like Norton Commander.
    */
-  GralUserAction actionOpenView = new GralUserAction()
+  GralUserAction actionOpenView = new GralUserAction("actionOpenView")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
@@ -434,7 +434,7 @@ public class FcmdView
 
   /**Action for Key F3 for view command. Its like Norton Commander.
    */
-  GralUserAction actionSetTextViewUTF8 = new GralUserAction()
+  GralUserAction actionSetTextViewUTF8 = new GralUserAction("actionSetTextViewUTF8")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { if(key != KeyCode.mouse1Down){  //supress both mouse up and down reaction
@@ -454,7 +454,7 @@ public class FcmdView
 
   /**Action for Key F3 for view command. Its like Norton Commander.
    */
-  GralUserAction actionSetHexView = new GralUserAction()
+  GralUserAction actionSetHexView = new GralUserAction("actionSetHexView")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     {  if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
@@ -475,7 +475,7 @@ public class FcmdView
 
   /**Action for Key F3 for view command. Its like Norton Commander.
    */
-  GralUserAction actionSetTextViewISO8859_1 = new GralUserAction()
+  GralUserAction actionSetTextViewISO8859_1 = new GralUserAction("actionSetTextViewISO8859_1")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { if(key != KeyCode.mouse1Down){  //supress both mouse up and down reaction
@@ -495,7 +495,7 @@ public class FcmdView
 
   /**Action for Key F3 for view command. Its like Norton Commander.
    */
-  GralUserAction actionSetEditable = new GralUserAction()
+  GralUserAction actionSetEditable = new GralUserAction("actionSetEditable")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
@@ -507,7 +507,7 @@ public class FcmdView
   };
 
 
-  GralUserAction actionSave = new GralUserAction()
+  GralUserAction actionSave = new GralUserAction("actionSave")
   {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { 
@@ -540,7 +540,7 @@ public class FcmdView
   };
 
 
-  GralUserAction actionSaveTextAsUTF8unix = new GralUserAction()
+  GralUserAction actionSaveTextAsUTF8unix = new GralUserAction("actionSaveTextAsUTF8unix")
   { @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { saveTextAs(utf8, endl_0a);
       return true;
@@ -548,7 +548,7 @@ public class FcmdView
   };
 
 
-  GralUserAction actionSaveTextAsWindows = new GralUserAction()
+  GralUserAction actionSaveTextAsWindows = new GralUserAction("actionSaveTextAsWindows")
   { @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { saveTextAs(iso8859_1, endl_0d0a);
       return true;
@@ -556,7 +556,7 @@ public class FcmdView
   };
 
 
-  GralUserAction actionSaveTextAsISO8859_1_unix = new GralUserAction()
+  GralUserAction actionSaveTextAsISO8859_1_unix = new GralUserAction("actionSaveTextAsISO8859_1_unix")
   { @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { saveTextAs(iso8859_1, endl_0d0a);
       return true;

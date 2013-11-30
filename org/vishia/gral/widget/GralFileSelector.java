@@ -867,7 +867,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
           //tline.setCellText("--waiting--", kColFilename);
           eRefresh = ERefresh.refreshChildren;  //do nothing, it is shown and refreshed in execFillIn
       }
-      selectList.wdgdTable.setBackColor(colorBackPending, -1);  //for all cells.
+      //selectList.wdgdTable.setBackColor(colorBackPending, -1);  //for all cells.
       if(!bSameDirectory || sortOrder != sortOrderLast){
         selectList.wdgdTable.clearTable();
         idxLines.clear();
@@ -879,6 +879,12 @@ public class GralFileSelector implements Removeable //extends GralWidget
           tline.setCellText("", kColDate);
           tline.setBackColor(colorBack, -1);
           idxLines.put("..", tline);
+        }
+      } else {
+        for(GralTable<?>.TableLineData line: selectList.wdgdTable.iterLines()){
+          if(!line.getCellText(kColFilename).equals("..")){
+            line.setBackColor(colorBackPending, -1);
+          }
         }
       }
       widgdPathDir.setText(sCurrentDir, -1);

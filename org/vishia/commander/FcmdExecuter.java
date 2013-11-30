@@ -157,7 +157,7 @@ public class FcmdExecuter
    * working directory is the directory in the focused file tab.
    * 
    */
-  GralUserAction actionSetCmdWorkingDir = new GralUserAction()
+  GralUserAction actionSetCmdWorkingDir = new GralUserAction("actionSetCmdWorkingDir")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     {
@@ -184,7 +184,7 @@ public class FcmdExecuter
    * Action to set the command list from file. It is called from menu.
    * 
    */
-  GralUserAction actionSetCmdCfg = new GralUserAction() { 
+  GralUserAction actionSetCmdCfg = new GralUserAction("actionSetCmdCfg") { 
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
           if (main.currentFile != null) {
@@ -201,7 +201,7 @@ public class FcmdExecuter
   
   /**Action to set the command list from actual file. It is called from menu.
    */
-  GralUserAction actionSetCmdCfgAct = new GralUserAction() { 
+  GralUserAction actionSetCmdCfgAct = new GralUserAction("actionSetCmdCfgAct") { 
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         String sError = main.cmdSelector.cmdStore.readCmdCfg(main.cargs.fileCfgCmds, console, main.executer.cmdQueue);
@@ -220,7 +220,7 @@ public class FcmdExecuter
 
   /**Action to open an editor for the command list from actual file. It is called from menu.
    */
-  GralUserAction actionEditCmdCfgAct = new GralUserAction() { 
+  GralUserAction actionEditCmdCfgAct = new GralUserAction("actionEditCmdCfgAct") { 
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         main.openExtEditor(main.cargs.fileCfgCmds);
@@ -235,7 +235,7 @@ public class FcmdExecuter
   
   /**User action to re-read the configuration file for extension assignments.
    */
-  GralUserAction actionReadExtensionCmd = new GralUserAction()
+  GralUserAction actionReadExtensionCmd = new GralUserAction("actionReadExtensionCmd")
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
     { readCmdFile(main.cargs.fileCmdsForExt);
       return true;
@@ -272,7 +272,7 @@ public class FcmdExecuter
   
   
   
-  GralUserAction actionExecuteFileByExtension = new GralUserAction()
+  GralUserAction actionExecuteFileByExtension = new GralUserAction("actionExecuteFileByExtension")
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         File file = main.currentFile;
@@ -284,7 +284,7 @@ public class FcmdExecuter
   /**This action is associated to any {@link FcmdFileCard} as action on enter file.
    * The file is given as parameter then.
    */
-  GralUserAction actionOnEnterFile = new GralUserAction()
+  GralUserAction actionOnEnterFile = new GralUserAction("actionOnEnterFile")
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
     { FileRemote file = (FileRemote)params[0]; 
       executeFileByExtension(file);  
@@ -297,7 +297,7 @@ public class FcmdExecuter
   /**Instance to execute any command selected in the 'ConfirmExec' sub window.
    * The class's method is invoked if any line was selected.
    */
-  GralUserAction actionExecCmdAfterChoice = new GralUserAction()
+  GralUserAction actionExecCmdAfterChoice = new GralUserAction("actionExecCmdAfterChoice")
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
     { 
       if(key == KeyCode.enter || key == KeyCode.mouse1Up || key == KeyCode.mouse1Double){
@@ -329,7 +329,7 @@ public class FcmdExecuter
   
   
   
-  GralUserAction actionCmdFromOutputBox = new GralUserAction()
+  GralUserAction actionCmdFromOutputBox = new GralUserAction("actionCmdFromOutputBox")
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
     { final char kindOfExecution = checkKeyOfExecution(key);
       if(kindOfExecution !=0){
@@ -368,7 +368,7 @@ public class FcmdExecuter
   /**User action to abort a running command.
    * 
    */
-  GralUserAction actionCmdAbort = new GralUserAction()
+  GralUserAction actionCmdAbort = new GralUserAction("actionCmdAbort")
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
     { cmdQueue.abortCmd();
       return true;

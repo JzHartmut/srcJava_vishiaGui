@@ -724,6 +724,7 @@ return true;
   { private final GralFileDialog_ifc fileDialog;
   
     public GralActionFileOpen(){
+      super("GralActionFileOpen");
       fileDialog = window.gralMng().createFileDialog();
       fileDialog.open("FileDialog", 0);
     }
