@@ -27,9 +27,10 @@ public class Bzr
    *   This variable is put with "$" if a ".bzr" is found in bzrdir.
    * @return null if success, an error message if ".bzr" or ".bzr.bat" was not found.
    * @throws IOException on any unexpected exception.
+   * @throws IllegalAccessException 
    */
   public static void searchRepository(File startDir, Map<String, DataAccess.Variable> dst, String bzrdir, String bzrsrc) 
-  throws IOException
+  throws IOException, IllegalAccessException
   { File fBzr;
     File currDir = startDir.isDirectory() ? startDir : startDir.getParentFile();
     //search whether a .bzr or .bzr.bat exists and change to parent dir till it is found.

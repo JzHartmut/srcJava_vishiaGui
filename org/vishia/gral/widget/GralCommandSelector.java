@@ -62,11 +62,6 @@ public class GralCommandSelector extends GralSelectList<CmdStore.CmdBlock>
   }
   
   
-  public void XXXinitExecuter(ZGenScript jbatchScript){
-    cmdQueue.initExecuter(jbatchScript);
-  }
-  
-  
   @Override
   public void setToPanel(GralMngBuild_ifc gralMng){
     super.setToPanel(gralMng);
