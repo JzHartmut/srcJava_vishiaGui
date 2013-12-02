@@ -1,6 +1,8 @@
 package org.vishia.gral.area9;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.vishia.gral.ifc.GralFactory_ifc;
 
@@ -79,6 +81,10 @@ public class GuiCallingArgs
    * For example "UDP:0.0.0.0:60099" to create a socket port for UDP-communication.
    */
   public String sOwnIpcAddr;
+  
+  public List<String> cfgConditions = new ArrayList<String>();
+  
+  
   
   /**A class which is used as plugin for user specifies. It is of interface {@link PlugUser_ifc}. */
   String sPluginClass;

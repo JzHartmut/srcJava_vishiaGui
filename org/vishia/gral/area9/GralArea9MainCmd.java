@@ -1,6 +1,7 @@
 package org.vishia.gral.area9;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.vishia.gral.awt.AwtFactory;
 import org.vishia.gral.base.GralGridProperties;
@@ -183,6 +184,13 @@ public class GralArea9MainCmd extends MainCmd
       else if(arg.startsWith("-gui="))      
       { cargs.fileGuiCfg = new File(getArgument(5));  //the graphic GUI-appearance
       
+      }
+      else if(arg.startsWith("-cfg="))      
+      { String sCfg = getArgument(5);  //the graphic GUI-appearance
+        if(cargs.cfgConditions == null){
+          cargs.cfgConditions = new ArrayList<String>();
+        }
+        cargs.cfgConditions.add(sCfg);
       }
       else if(arg.startsWith("-ownIpc=")) 
       { cargs.sOwnIpcAddr = getArgument(8);   //an example for default output

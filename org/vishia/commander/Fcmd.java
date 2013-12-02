@@ -179,7 +179,7 @@ public class Fcmd extends GuiCfg
   
   public Fcmd(CallingArgs cargs, GralArea9MainCmd cmdgui)
   {
-    super(cargs, cmdgui, null, null);
+    super(cargs, cmdgui, null, null, null);
     this.cargs = cargs;
     //redirect all outputs to System.out, System.err and MainCmd to System.out and System.err with timestamp.
     msgDisp = new MsgRedirectConsole(cmdgui, 0, null);

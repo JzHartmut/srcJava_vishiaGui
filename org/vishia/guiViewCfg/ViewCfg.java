@@ -30,7 +30,7 @@ public class ViewCfg extends GuiCfg
    */
   //private final OamOutFileReader oamOutValues;
   
-  private boolean showValuesOk;
+  private final boolean showValuesOk;
   
   private final OamRcvValue oamRcvUdpValue;
   
@@ -84,7 +84,8 @@ public class ViewCfg extends GuiCfg
   
   
   private final GralUserAction actionKeyboard = new GralUserAction()
-  { public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+  { @Override
+  public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
     {
   		if(sCmd != null){  
   			//String sCmd1 = "TouchInputPc.exe";
@@ -172,7 +173,7 @@ public class ViewCfg extends GuiCfg
    * @param gui The GUI-organization.
    */
   ViewCfg(CallingArguments cargs, GralArea9MainCmd cmdgui) 
-  { super(cargs, cmdgui, null, null);
+  { super(cargs, cmdgui, null, null, null);
     this.callingArguments = cargs;
     
     oamShowValues = new OamShowValues(cmdgui, guiAccess);

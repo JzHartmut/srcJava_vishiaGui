@@ -293,7 +293,7 @@ private class InspcGuiCfg extends GuiCfg
 {
   
   InspcGuiCfg(CallingArguments cargs, GralArea9MainCmd cmdgui, GralPlugUser2Gral_ifc plugUser2Gui)
-  { super(cargs, cmdgui, null, plugUser2Gui); 
+  { super(cargs, cmdgui, null, plugUser2Gui, null); 
   }
   
   

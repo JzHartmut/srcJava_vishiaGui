@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
 
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.base.GralDispatchCallbackWorker;
@@ -62,6 +63,8 @@ public class GuiCfg
 
   /**The version.
    * <ul>
+   * <li>2013-12-02 Hartmut new Parameter for {@link #GuiCfg(GuiCallingArgs, GralArea9MainCmd, GralPlugUser_ifc, GralPlugUser2Gral_ifc, List)}:
+   *    cfgConditions.
    * <li>2012-09-17 Hartmut new: {@link #showMethods}
    * <li>2011-10-12 Hartmut chg: ctor needs a {@link GralPlugUser_ifc} which may be null: A plugin may be instantiated
    *   by reflection with String given class name. It may be possible to give it as parameter too.
@@ -134,7 +137,7 @@ public class GuiCfg
 final GuiCallingArgs cargs;
 
 /**The configuration data for graphical appearance. */
-public final GralCfgData guiCfgData = new GralCfgData();
+public final GralCfgData guiCfgData;
 
 
 
@@ -189,14 +192,15 @@ protected GralTabbedPanel mainTabPanel;
  */
 public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui
     , GralPlugUser_ifc plugUser, GralPlugUser2Gral_ifc plugUser2Gui
-    ) 
+    , List<String> cfgConditions) 
 { this.mainCmd = cmdGui;
   this.gui = cmdGui.gui;
   guiW = (GralArea9Window)gui;
   this.cargs = cargs;
   this.plugUser2Gui = plugUser2Gui;
   this.console = gui.getMainCmd();  
-
+  this.guiCfgData = new GralCfgData(cfgConditions);
+  
   if(plugUser !=null){
     this.user = plugUser;
   } else  if(cargs.sPluginClass !=null){
@@ -467,7 +471,7 @@ public static void main(String[] args){
     new InterProcessCommFactorySocket();
     //
     //the third parameter may be a plugin, use it in your application if necessary.
-    GuiCfg main = new GuiCfg(cargs, cmdGui, null, null);
+    GuiCfg main = new GuiCfg(cargs, cmdGui, null, null, null);
     //
     //starts execution.
     main.execute();

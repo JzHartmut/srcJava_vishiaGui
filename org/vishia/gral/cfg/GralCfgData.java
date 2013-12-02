@@ -22,6 +22,7 @@ public final class GralCfgData
   
   /**Version and history
    * <ul>
+   * <li>2013-12-02 Hartmut new conditional configuration. 
    * <li>2012-04-22 Hartmut support {@link #new_Type()}.
    * <li>2012-02-25 Hartmut chg {@link GuiCfgCurveLine#colorValue} = -1 initially to check whether it is given,
    *   see {@link GralCfgBuilder#buildWidget(GralCfgElement)}
@@ -53,6 +54,24 @@ public final class GralCfgData
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   public static final int version = 20120422;
+ 
+  
+  
+  public final class Conditional
+  {
+    public boolean condition;
+    
+    
+    final Conditional parentLevel;
+    
+    public Conditional(GralCfgData cfgData, Conditional parent){
+      //super(cfgData);
+      parentLevel = parent;
+    }
+    
+  }
+  
+  
   
   /**ZBNF: DataReplace::= <$?key> = <$-/\.?string> ;
    * Class for temporary instance to capture key and string. */
@@ -108,6 +127,7 @@ public final class GralCfgData
     
     public void set_color1(GuiCfgColor value){}
 
+    @Override
     protected WidgetTypeBase clone()
     { WidgetTypeBase clone = null;
       try{ clone = (WidgetTypeBase)super.clone(); } 
@@ -323,10 +343,14 @@ public final class GralCfgData
   }
   
   
+  final List<String> cfgConditions;
+  
   
   GralCfgElement firstElement = null;
   
   private GralCfgElement actualElement = null;
+  
+  private Conditional actualConditional;
   
   /**ZBNF: DataReplace::= <$?key> = <$-/\.?string> ;
    * Temporary instance to capture key and string. */
@@ -354,9 +378,9 @@ public final class GralCfgData
   private final Map<String, GralCfgPanel> idxPanels = new TreeMap<String,GralCfgPanel>();
 
   
-  public GralCfgData()
+  public GralCfgData(List<String> conditions)
   {
-    
+    this.cfgConditions = conditions;
   }
   
   
@@ -384,20 +408,94 @@ public final class GralCfgData
   } 
   
   
+  
+  
+  
+  /**ZBNF: DataReplace: < ?Element >[ | | ] */
+  public GralCfgData new_Conditional()
+  { Conditional conditional = new Conditional(this, actualConditional);
+    actualConditional = conditional;
+    return this; 
+  }  
+
+  
+  /**ZBNF: DataReplace: < ?Element >[ | | ] */
+  public GralCfgData new_ElseConditional()
+  { Conditional conditional = new Conditional(this, actualConditional);
+    actualConditional = conditional;
+    return this; 
+  }  
+
+  
+  /**It is called on end of conditional block.
+   * @param val
+   */
+  public void add_Conditional(GralCfgData val){
+    actualConditional = actualConditional.parentLevel;
+  }
+  
+  
+  public void set_ifCondition(String cond){ 
+    
+    actualConditional.condition = cfgConditions.contains(cond);
+  }
+
+  
+  public void set_elseCondition(){ 
+    
+    actualConditional.condition = !actualConditional.condition;
+  }
+
+  
+  
   /**ZBNF: DataReplace: < ?Element >[ | | ] */
   public GralCfgElement new_Element()
   { 
     if(newGuiElement == null){ newGuiElement = new GralCfgElement(this); }
-    if(firstElement ==null){
-      firstElement = newGuiElement;
+    //
+    if(actualConditional ==null || actualConditional.condition){
+      if(firstElement ==null){
+        firstElement = newGuiElement;
+      }
+      //GralCfgElement actual1 = actualConditional == null ? actualElement : actualConditional.actualElement;
+      if(actualElement !=null){
+        actualElement.next = newGuiElement;
+      }
+      newGuiElement.previous = actualElement;  //may be null
+      actualElement = newGuiElement;
     }
-    if(actualElement !=null){
-      actualElement.next = newGuiElement;
-    }
-    newGuiElement.previous = actualElement;  //may be null
-    actualElement = newGuiElement;
     return newGuiElement; 
   }  
+
+  
+  /**From ZBNF: DataReplace: < DataReplace> */
+  public void add_Element(GralCfgElement value)
+  { 
+    if(actualConditional ==null || actualConditional.condition){
+      String sPanel = value.positionInput.panel;
+      if(value.widgetType != null && value.widgetType.text !=null && value.widgetType.text.equals("wd:yCos"))
+        stop();
+      if(sPanel == null){ //the last panel is used furthermore.
+        if(actPanel == null){ 
+          actPanel = new GralCfgPanel("$");
+        }
+        sPanel = actPanel.name;
+        value.setPanel(sPanel);
+      } else { //a panel is given.
+        actPanel = idxPanels.get(sPanel); 
+        if(actPanel == null){ //first time use that:
+          actPanel = new GralCfgPanel(sPanel);
+          idxPanels.put(sPanel, actPanel);
+        }
+      }
+      actPanel.listElements.add(value);      //list of elements in panels   
+      listElementsInTextfileOrder.add(value);  //list of elements in text file
+    }
+    newGuiElement = null;
+  } 
+  
+  
+
   
   /**ZBNF: DataReplace: < Element> */
   public void set_Element(String val)
@@ -420,30 +518,6 @@ public final class GralCfgData
   }
   
 
-  
-  /**From ZBNF: DataReplace: < DataReplace> */
-  public void set_Element(GralCfgElement value)
-  { String sPanel = value.positionInput.panel;
-    if(value.widgetType != null && value.widgetType.text !=null && value.widgetType.text.equals("wd:yCos"))
-      stop();
-    if(sPanel == null){ //the last panel is used furthermore.
-      if(actPanel == null){ 
-        actPanel = new GralCfgPanel("$");
-      }
-      sPanel = actPanel.name;
-      value.setPanel(sPanel);
-    } else { //a panel is given.
-      actPanel = idxPanels.get(sPanel); 
-      if(actPanel == null){ //first time use that:
-        actPanel = new GralCfgPanel(sPanel);
-        idxPanels.put(sPanel, actPanel);
-      }
-    }
-    actPanel.listElements.add(value);      //list of elements in panels   
-    listElementsInTextfileOrder.add(value);  //list of elements in text file
-    newGuiElement = null;
-  } 
-  
   
   
   
