@@ -29,6 +29,7 @@ import org.vishia.inspectorAccessor.InspcPlugUser_ifc;
 import org.vishia.inspectorAccessor.UserInspcPlug_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageFile;
+import org.vishia.util.Assert;
 import org.vishia.util.CompleteConstructionAndStart;
 import org.vishia.util.KeyCode;
 
@@ -343,8 +344,7 @@ private class InspcGuiCfg extends GuiCfg
       //inspcComm.procComm();  
       //oamRcvUdpValue.sendRequest();
     } catch(Exception exc){
-      //tread-Problem: console.writeError("unexpected Exception", exc);
-      System.out.println("unexpected Exception: " + exc.getMessage());
+      System.out.println(Assert.exceptionInfo("InspcGui - unexpected Exception; ", exc, 0, 7));
       exc.printStackTrace();
     }
 

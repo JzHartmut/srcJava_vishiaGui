@@ -1355,7 +1355,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       try{ repaintGthread();
       
       } catch(Throwable exc){
-        System.err.println("unexpected exception " + exc.getMessage());
+        System.out.println(Assert.exceptionInfo("GralWidget - unexpected Exception; ", exc, 0, 7));
         exc.printStackTrace(System.err);
         //NOTE: removeFromQueue should invoked on exception too.
       }
@@ -1377,7 +1377,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       try{ 
         setFocusGThread();
       } catch(Exception exc){
-        System.err.println("unexpected exception " + exc.getMessage());
+        System.out.println(Assert.exceptionInfo("GralWidget - unexpected Exception; ", exc, 0, 7));
         exc.printStackTrace(System.err);
         //NOTE: removeFromQueue should invoked on exception too.
       }

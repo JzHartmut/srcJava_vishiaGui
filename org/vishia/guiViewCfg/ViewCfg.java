@@ -10,6 +10,7 @@ import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.base.GralWidget;
 //import org.vishia.gral.gui.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.util.Assert;
 
 /**Class contains main, it is able to use for a GUI without any programming in Java.*/
 public class ViewCfg extends GuiCfg 
@@ -209,7 +210,7 @@ public class ViewCfg extends GuiCfg
       oamRcvUdpValue.sendRequest();
     } catch(Exception exc){
       //tread-Problem: console.writeError("unexpected Exception", exc);
-      System.out.println("unexpected Exception: " + exc.getMessage());
+      System.out.println(Assert.exceptionInfo("ViewCfg - unexpected Exception; ", exc, 0, 7));
       exc.printStackTrace();
     }
 

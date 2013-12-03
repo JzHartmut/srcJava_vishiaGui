@@ -15,6 +15,7 @@ import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
 /**This class describes either the menu bar of a window or a context menu of any widget.
@@ -58,7 +59,7 @@ public class SwtMenu extends GralMenu
       try{
         action.exec(KeyCode.menuEntered, widgg);
       } catch(Exception exc){
-        System.err.printf("GralMenu - unexpected exception; %s\n", exc.getMessage());
+        System.out.println(Assert.exceptionInfo("GralMenu - unexpected Exception; ", exc, 0, 7));
       }
     }
   }
