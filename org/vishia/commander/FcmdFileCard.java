@@ -426,9 +426,9 @@ public class FcmdFileCard extends GralFileSelector
     if(otherFileCard !=null){  //NOTE: though mid and right is selected, the otherFileCard may be null because no tab is open.
       String sDirName = getCurrentDir().getName();
       //check whether the other file card contains a entry with this directory name
-      GralTableLine_ifc line = otherFileCard.selectList.wdgdTable.getLine(sDirName);
+      GralTableLine_ifc<FileRemote> line = otherFileCard.selectList.wdgdTable.getLine(sDirName);
       if(line !=null){
-        FileRemote dir = (FileRemote)line.getUserData();
+        FileRemote dir = line.getUserData();
         bFillInReq = true;
         otherFileCard.fillIn(dir, true);    //use that directory.
       }
@@ -440,7 +440,8 @@ public class FcmdFileCard extends GralFileSelector
           FileRemote otherDir = otherFileCard.getCurrentDir();
           if(otherDir != null){
             String sDirPath = otherDir.getName();
-            if(bToRoot = sDirPath.equals(sFileName)){
+            bToRoot = sDirPath.equals(sFileName);
+            if(bToRoot){
               //the directory of other is the current selected dir of this:
               FileRemote otherParent = otherDir.getParentFile();
               if(!bFillInReq){

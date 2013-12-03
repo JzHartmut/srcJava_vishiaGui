@@ -511,6 +511,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   @Override
   public void setCurrentLine(GralTableLine_ifc<UserData> line, int ixline, int ixcolumn) {
     lineSelected = (TableLineData)line;
+    actionOnLineSelected(KeyCode.userSelect, lineSelected);
     if(ixline < 0){
       lineSelectedixCell = zLineVisible + ixline;  //-1 is the last.
       if(lineSelectedixCell < 0){
@@ -864,9 +865,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @param bUp direction
    * @return
    */
-  protected void searchContent(boolean bUp){
+  protected boolean searchContent(boolean bUp){
     String search = searchChars.toString();
     boolean contSearch = true;
+    boolean found = false;
     TableLineData line2, line = lineSelected;
     do{
       if(bUp && line !=null){        //up
@@ -877,8 +879,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         //ixLineNew = ixLineNewAct;
         line2 = null;                 //eand reached
       }
-      if(line2 ==null){
+      if(line2 ==null){ //end of search
         contSearch = false;  //without change the lineSelected
+        lineSelected = line;  //show the first or last line
+        found = search.length() >0;
       } else {
         line = line2;
         String sText = line.getCellText(colSelectedixCellC).toLowerCase();
@@ -887,7 +891,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         } else {
           if( search.length() == 0   //always found if no searchchar is given.
             || !sText.startsWith(search)){  //found
+            found = false;
           } else {
+            found = true;
             lineSelected = line;
             bPrepareVisibleArea = true;
             contSearch = false;                   //found
@@ -895,6 +901,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         }
       }
     } while(contSearch);
+    return found;
   }
   
   
@@ -951,18 +958,18 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         } break;
         case KeyCode.mouseWheelUp:
         case KeyCode.up: {
-          searchContent(true);
-          ////
-          if(lineSelectedixCell > 2){
-            lineSelectedixCell -=1;
-          } else {
-            int shifted = shiftVisibleArea(-1);  //shifted = -1 if all shifted
-            lineSelectedixCell -= 1 + shifted;
-            if(lineSelectedixCell <0){
-              lineSelectedixCell = 0;  //limit it on top.
+          if(!searchContent(true)){
+            if(lineSelectedixCell > 2){
+              lineSelectedixCell -=1;
+            } else {
+              int shifted = shiftVisibleArea(-1);  //shifted = -1 if all shifted
+              lineSelectedixCell -= 1 + shifted;
+              if(lineSelectedixCell <0){
+                lineSelectedixCell = 0;  //limit it on top.
+              }
             }
+            lineSelected = linesForCell[lineSelectedixCell];
           }
-          lineSelected = linesForCell[lineSelectedixCell];
           //the table has the focus, because the key action is done only if it is so.
           //set the new cell focused, in the paint routine.
           gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
@@ -971,21 +978,21 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         } break;
         case KeyCode.mouseWheelDn:
         case KeyCode.dn: {
-          searchContent(false);
-          ////
-          if(lineSelectedixCell < zLineVisible -3){
-            lineSelectedixCell +=1;
-          } else {
-            int shifted = shiftVisibleArea(1);
-            lineSelectedixCell += 1 - shifted;
-            if(lineSelectedixCell >= zLineVisible){
-              lineSelectedixCell = zLineVisible -1;  //limit it on top.
+          if(!searchContent(false)){
+            if(lineSelectedixCell < zLineVisible -3){
+              lineSelectedixCell +=1;
+            } else {
+              int shifted = shiftVisibleArea(1);
+              lineSelectedixCell += 1 - shifted;
+              if(lineSelectedixCell >= zLineVisible){
+                lineSelectedixCell = zLineVisible -1;  //limit it on top.
+              }
             }
-          }
-          while( (lineSelected = linesForCell[lineSelectedixCell]) ==null
-               && lineSelectedixCell >0    
-            ){
-            lineSelectedixCell -=1;
+            while( (lineSelected = linesForCell[lineSelectedixCell]) ==null
+                 && lineSelectedixCell >0    
+              ){
+              lineSelectedixCell -=1;
+            }
           }
           //the table has the focus, because the key action is done only if it is so.
           //set the new cell focused, in the paint routine.
