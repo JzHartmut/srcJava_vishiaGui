@@ -548,7 +548,12 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
 
   }
   
-  
+  /**Invoked on {@link #swtKeyListener} if enter. */
+  void setTextToLine(Text widgSwt){
+    String text = widgSwt.getText();
+    CellData data = (CellData)widgSwt.getData();
+    SwtTable.this.setCellText(data, text);
+  }
   
   
   protected void initSwtTable(Composite swtTable, int zColumns, SwtMng mng){
@@ -564,7 +569,11 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
     swtSearchText.setVisible(false);
     for(int iRow = 0; iRow < cellsSwt.length; ++iRow){
       for(int iCol = 0; iCol < zColumns; ++iCol){
-        Text cell = new Text(swtTable, SWT.LEFT | SWT.SINGLE | SWT.READ_ONLY);
+        boolean editable = super.bColumnEditable(iCol);
+        Text cell = new Text(swtTable, SWT.LEFT | SWT.SINGLE | (editable  ? 0 : SWT.READ_ONLY));
+        if(editable){ 
+          cell.addKeyListener(swtKeyListener);
+        }
         cell.setFont(font);
         cell.addKeyListener(myKeyListener);
         cell.addFocusListener(focusListenerCell);
@@ -838,6 +847,42 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
   
 
   
+  protected SwtKeyListener swtKeyListener = new SwtKeyListener(widgg.gralMng()._impl.gralKeyListener)
+  {
+
+    @Override public final boolean specialKeysOfWidgetType(int key, GralWidget widgg, Object widgImpl){ 
+      boolean bDone = true;
+      if(KeyCode.isWritingKey(key)){
+        //bTextChanged = true;
+      }
+      if(key == KeyCode.enter) { // && KeyCode.isWritingOrTextNavigationKey(key)){
+        bDone = true;
+        assert(widgImpl instanceof Text);
+        Text widgSwt = (Text)widgImpl;
+        setTextToLine(widgSwt);
+      } else {
+        /*
+        boolean bUserOk;
+        if(user !=null){
+          Point selection = textFieldSwt.getSelection();
+          bUserOk = user.userKey(key
+              , textFieldSwt.getText()
+              , textFieldSwt.getCaretPosition()
+              , selection.x, selection.y);
+        } else bUserOk = false;
+        if(!bUserOk ){
+          switch(key){
+            case KeyCode.ctrl + 'a': { 
+              textFieldSwt.selectAll();
+            } break;
+            default: bDone = false;
+          }
+        }
+        */
+      }
+      return bDone; 
+    }
+  };
 
   
   

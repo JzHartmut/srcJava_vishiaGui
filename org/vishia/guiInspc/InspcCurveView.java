@@ -278,8 +278,10 @@ public final class InspcCurveView
     if(bTabWidget){
       widgTableVariables = new GralTable<TrackValues>("variables", new int[]{-posright});
       gralMng.setPosition(2, GralPos.size +20, posright, 0, 0, 'd', 0);
+      widgTableVariables.setColumnEditable(0, true);
       widgTableVariables.setToPanel(gralMng);
       widgTableVariables.specifyActionOnLineSelected(actionSelectVariableInTable);
+      widgTableVariables.setActionChange(actionEnterDatapath);
       widgTableVariables.addContextMenuEntryGthread(0, null, "insert variable", actionInsertVariable);
       widgTableVariables.addContextMenuEntryGthread(0, null, "replace variable", actionReplaceVariable);
       widgTableVariables.addContextMenuEntryGthread(0, null, "swap variable", actionSwapVariable);
@@ -410,6 +412,20 @@ public final class InspcCurveView
   }
   
   
+  
+  void setDatapath(GralTable<TrackValues>.TableLineData line, String sDatapath){
+    TrackValues input = line.data;
+    if(input.trackView == null){
+      input.trackView = widgCurve.initTrack(sName, sDatapath, input.colorCurve, 0, 50, 5000.0f, 0.0f);
+    } else {
+      input.trackView.setDataPath(sDatapath);
+    }
+    
+  }
+  
+  
+  
+  
   /**Step routine to save a curve. A curve will be saved only if the time has expired and the autoSave button is on.
    * 
    */
@@ -523,7 +539,21 @@ public final class InspcCurveView
     }
   };
 
-  
+
+  public GralUserAction actionEnterDatapath = new GralUserAction("actionEnterDatapath"){
+    @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params){
+      if(key == KeyCode.enter){
+        GralTable<TrackValues>.TableLineData line = (GralTable<TrackValues>.TableLineData)params[0];
+        String sDatapath = line.getCellText(0);
+        InspcCurveView.this.setDatapath(line, sDatapath);
+      }
+      return true;
+    }
+  };
+
+
+
+
   GralUserAction actionSwapVariable = new GralUserAction("actionSwapVariable"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       if(actionCode == KeyCode.menuEntered && trackScale !=null){
@@ -534,27 +564,29 @@ public final class InspcCurveView
         GralTable<TrackValues> table = (GralTable<TrackValues>) widgd;
         GralTable<TrackValues>.TableLineData linedst = table.getLineMousePressed();
         GralTableLine_ifc<TrackValues> linesrc = table.getCurrentLine();
-        
-        TrackValues trackDst = table.getLineMousePressed().getUserData();  //(TrackValues)oContent;
-        if(trackDst != trackScale){
-          String sPathSwap = trackDst.widgVarPath.getText();
-          GralColor colorSwap = trackDst.trackView.getLineColor(); //trackDst.colorCurve; //  
-          GralCurveViewTrack_ifc trackViewSwap = trackDst.trackView;
-          String sPathDst = trackScale.widgVarPath.getText();
-          GralColor colorDst = trackScale.trackView.getLineColor();  //colorCurve; //  
-          GralCurveViewTrack_ifc trackViewDst = trackScale.trackView;
-          //set paths to other.
-          trackScale.colorCurve = colorSwap;
-          trackScale.widgVarPath.setText(sPathSwap);
-          trackScale.widgVarPath.setTextColor(colorSwap);
-          trackScale.trackView = trackViewSwap;
-          //the new one can be an empty track:
-          trackDst.colorCurve = colorDst;
-          trackDst.widgVarPath.setText(sPathDst);
-          trackDst.widgVarPath.setTextColor(colorDst);
-          trackDst.trackView = trackViewDst;
-          //change track for scale. It is the same like mouse1Down on this text field:
-          actionSelectOrChgVarPath.exec(KeyCode.mouse1Down, trackDst.widgVarPath);
+        GralTableLine_ifc<TrackValues> lineMouse = table.getLineMousePressed();
+        if(lineMouse !=null){
+          TrackValues trackDst = lineMouse.getUserData();  //(TrackValues)oContent;
+          if(trackDst != trackScale){
+            String sPathSwap = trackDst.widgVarPath.getText();
+            GralColor colorSwap = trackDst.trackView.getLineColor(); //trackDst.colorCurve; //  
+            GralCurveViewTrack_ifc trackViewSwap = trackDst.trackView;
+            String sPathDst = trackScale.widgVarPath.getText();
+            GralColor colorDst = trackScale.trackView.getLineColor();  //colorCurve; //  
+            GralCurveViewTrack_ifc trackViewDst = trackScale.trackView;
+            //set paths to other.
+            trackScale.colorCurve = colorSwap;
+            trackScale.widgVarPath.setText(sPathSwap);
+            trackScale.widgVarPath.setTextColor(colorSwap);
+            trackScale.trackView = trackViewSwap;
+            //the new one can be an empty track:
+            trackDst.colorCurve = colorDst;
+            trackDst.widgVarPath.setText(sPathDst);
+            trackDst.widgVarPath.setTextColor(colorDst);
+            trackDst.trackView = trackViewDst;
+            //change track for scale. It is the same like mouse1Down on this text field:
+            actionSelectOrChgVarPath.exec(KeyCode.mouse1Down, trackDst.widgVarPath);
+          }
         }
       }
       return true;
@@ -615,8 +647,7 @@ public final class InspcCurveView
       return true;
     }
   };
-  
-  
+
   
 
   GralUserAction actionSetScaleValues2Track = new GralUserAction("actionSetScaleValues2Track"){
@@ -698,7 +729,7 @@ public final class InspcCurveView
       if(line !=null){
         TrackValues track = (TrackValues)line.getContentInfo();
         if(track !=null){
-          if(trackScale !=null){
+          if(trackScale !=null && trackScale.trackView !=null){
             trackScale.trackView.setLineProperties(trackScale.colorCurve, 1, 0);
           }
           InspcCurveView.this.trackScale = track;

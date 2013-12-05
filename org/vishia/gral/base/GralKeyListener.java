@@ -96,12 +96,12 @@ public class GralKeyListener implements GralKeySpecial_ifc
   
   
   
-  public boolean keyPressed(int keyCode, GralWidget widgetDescr){
+  public boolean keyPressed(int keyCode, GralWidget widgetDescr, Object widgImpl){
     boolean actionDone;
     final GralUserAction action = widgetDescr.getActionChange();
     final GralMng mng = widgetDescr.itsMng;
     try{
-      actionDone = specialKeysOfWidgetType(keyCode, widgetDescr);
+      actionDone = specialKeysOfWidgetType(keyCode, widgetDescr, widgImpl);
       if(!actionDone && action !=null){ 
           actionDone = action.userActionGui(keyCode, widgetDescr);
       } //if(table.)
@@ -125,7 +125,7 @@ public class GralKeyListener implements GralKeySpecial_ifc
   }
   
   
-  @Override public boolean specialKeysOfWidgetType(int key, GralWidget widgg){ return false; }
+  @Override public boolean specialKeysOfWidgetType(int key, GralWidget widgg, Object widgImpl){ return false; }
 
   
 }

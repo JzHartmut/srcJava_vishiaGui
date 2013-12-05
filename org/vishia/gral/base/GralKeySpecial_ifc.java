@@ -12,6 +12,6 @@ public interface GralKeySpecial_ifc
    * 
    * 
    * */
-  boolean specialKeysOfWidgetType(int key, GralWidget widgg);
+  boolean specialKeysOfWidgetType(int key, GralWidget widgg, Object widgImpl);
 
 }

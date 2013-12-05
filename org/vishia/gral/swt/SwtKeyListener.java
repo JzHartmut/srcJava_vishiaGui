@@ -65,8 +65,8 @@ public class SwtKeyListener implements GralKeySpecial_ifc, KeyListener// extends
     }
     if((keyEv.keyCode & 0xffff) !=0){
       final int keyCode = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
-      if(! specialKeysOfWidgetType(keyCode, widgetDescr)){
-        keyAction.keyPressed(keyCode, widgetDescr);
+      if(! specialKeysOfWidgetType(keyCode, widgetDescr, swtControl)){
+        keyAction.keyPressed(keyCode, widgetDescr, swtControl);
       }
     }
     if(swtControl !=null){
@@ -85,7 +85,7 @@ public class SwtKeyListener implements GralKeySpecial_ifc, KeyListener// extends
     
   }
   
-  @Override public boolean specialKeysOfWidgetType(int key, GralWidget widgg){ return false; }
+  @Override public boolean specialKeysOfWidgetType(int key, GralWidget widgg, Object widgImpl){ return false; }
 
 
 }

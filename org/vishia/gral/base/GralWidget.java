@@ -482,6 +482,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     /**32 bit what is changed, see {@link GralWidget#chgColorText} etc. */
     public AtomicInteger whatIsChanged = new AtomicInteger();
     
+    /**Sets what is changed, Bits defined in {@link GralWidget.ImplAccess#chgColorBack} etc.
+     * @param mask one bit or some bits. ImplAccess.chgXYZ
+     */
     public void setChanged(int mask){
       int catastrophicalCount = 1000;
       boolean bOk;
@@ -492,6 +495,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       } while(!bOk && --catastrophicalCount >= 0);
     }
     
+    /**Resets what is changed, Bits defined in {@link GralWidget.ImplAccess#chgColorBack} etc.
+     * This routine should be called in the paint routine whenever the change was succeeded.
+     * @param mask one bit or some bits. ImplAccess.chgXYZ
+     */
     public void acknChanged(int mask){
       int catastrophicalCount = 1000;
       boolean bOk;
@@ -1289,6 +1296,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     
     public static final int chgPos = 0x20000000, chgVisible = 0x40000000, chgInvisible = 0x80000000;
     
+    /**This is only documentation. These bits are used specialized in derived classes.*/
+    public static final int chgBitsDerived = 0x0ff00000;
 
     protected final GralWidget widgg;
     

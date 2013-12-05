@@ -1,12 +1,8 @@
 package org.vishia.gral.base;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.vishia.byteData.VariableContainer_ifc;
@@ -26,6 +22,7 @@ import org.vishia.util.SelectMask;
 import org.vishia.util.MarkMask_ifc;
 import org.vishia.util.TreeNodeBase;
 import org.vishia.util.TreeNode_ifc;
+
 
 /**This is the Gral class for a table. Its usage is independent of a graphical implementation layer.
  * A table consists of some text fields which are arranged in columns and lines. The lines can be associated
@@ -87,6 +84,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license
    * <ul>
+   * <li>2013-12-06 Hartmut new: {@link #setColumnEditable(int, boolean)}, supports editing in cells. 
    * <li>2013-11-24 Hartmut chg: {@link GralTable.GraphicImplAccess#focusGained()} etc. refactored. 
    * <li>2013-11-23 Hartmut chg: use {@link KeyCode#userSelect} etc. for calling {@link #actionOnLineSelected(int, GralTableLine_ifc)}
    * <li>2013-11-16 Hartmut chg: setCurrentCell(int, int) removed because the line number without respect to a line
@@ -218,6 +216,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   /**Width of each column in GralUnits. */
   protected int[] columnWidthsGral;
   
+  protected boolean[] bColumnEditable;
+  
   protected GralMenu[] menuColumns;
   
 
@@ -326,6 +326,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     super(name, 'L', null);
     this.columnWidthsGral = columnWidths;
     this.zColumn = columnWidths.length;
+    this.bColumnEditable = new boolean[this.zColumn];  //all false.
     
     rootLine = new TreeNodeBase<TableLineData, UserData, GralTableLine_ifc<UserData>>("", null);
     
@@ -456,6 +457,15 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   public void setColumnWidth(int width, int[] columnWidths){
     columnWidthsGral = columnWidths;
+  }
+  
+  
+  public void setColumnEditable(int column, boolean val){
+    bColumnEditable[column] = val;
+    if(((GralWidget)this).wdgImpl !=null){
+      dyda.setChanged(GraphicImplAccess.chgEditableColumn);
+      repaint(repaintDelay, repaintDelayMax);
+    }
   }
   
   @Override public boolean setCurrentLine(String key){
@@ -977,30 +987,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
         } break;
         case KeyCode.mouseWheelDn:
-        case KeyCode.dn: {
-          if(!searchContent(false)){
-            if(lineSelectedixCell < zLineVisible -3){
-              lineSelectedixCell +=1;
-            } else {
-              int shifted = shiftVisibleArea(1);
-              lineSelectedixCell += 1 - shifted;
-              if(lineSelectedixCell >= zLineVisible){
-                lineSelectedixCell = zLineVisible -1;  //limit it on top.
-              }
-            }
-            while( (lineSelected = linesForCell[lineSelectedixCell]) ==null
-                 && lineSelectedixCell >0    
-              ){
-              lineSelectedixCell -=1;
-            }
-          }
-          //the table has the focus, because the key action is done only if it is so.
-          //set the new cell focused, in the paint routine.
-          gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
-          actionOnLineSelected(KeyCode.userSelect, lineSelected);
-          
-          keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
-        } break;
         case KeyCode.pgdn: {
           if(lineSelectedixCell < zLineVisible -3){
             lineSelectedixCell = zLineVisible -3;
@@ -1023,7 +1009,39 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
         } break;
         default:
-          if(KeyCode.isTextKey(keyCode)){
+          if(keyCode == KeyCode.dn || keyCode == keyMarkDn) {
+            if(keyCode == keyMarkDn && lineSelected !=null){
+              GralTableLine_ifc<?> line = lineSelected; //tableLines.get(ixLine);
+              if((line.getMark() & 1)!=0){
+                //it is selected yet
+                line.setNonMarked(1, line.getUserData());
+              } else {
+                line.setMarked(1, line.getUserData());
+              }
+            }
+            if(!searchContent(false)){
+              if(lineSelectedixCell < zLineVisible -3){
+                lineSelectedixCell +=1;
+              } else {
+                int shifted = shiftVisibleArea(1);
+                lineSelectedixCell += 1 - shifted;
+                if(lineSelectedixCell >= zLineVisible){
+                  lineSelectedixCell = zLineVisible -1;  //limit it on top.
+                }
+              }
+              while( (lineSelected = linesForCell[lineSelectedixCell]) ==null
+                   && lineSelectedixCell >0    
+                ){
+                lineSelectedixCell -=1;
+              }
+            }
+            //the table has the focus, because the key action is done only if it is so.
+            //set the new cell focused, in the paint routine.
+            gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
+            actionOnLineSelected(KeyCode.userSelect, lineSelected);
+            
+            keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
+          } else if(KeyCode.isTextKey(keyCode) && !bColumnEditable[colSelectedixCellC]){
             searchChars.appendCodePoint(keyCode);
             searchContent(false);
             repaint();
@@ -1060,6 +1078,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           } else {
             line.setMarked(1, line.getUserData());
           }
+          ////
           keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
           done = true;
         }
@@ -1159,7 +1178,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   implements GralWidgImpl_ifc, Removeable
   {
     
-    
+    public static final int chgEditableColumn = 0x00100000;
+
     /**Only used on invocation of {@link #drawCellContent}
      * 
      */
@@ -1240,6 +1260,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
     
     protected GralMng itsMng(){ return outer.itsMng; }
+    
+    protected boolean bColumnEditable(int ix){ return GralTable.this.bColumnEditable[ix]; }
     
     protected int ixColumn(){ return outer.colSelectedixCellC; }
     
@@ -1410,7 +1432,16 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
 
     
-    
+    /**Invoked on editing a text field
+     * @param cell
+     * @param text
+     */
+    protected void setCellText(CellData cell, String text){
+      TableLineData line = GralTable.this.linesForCell[cell.ixCellLine];
+      if(line != null){
+        line.setCellText(text, cell.ixCellColumn);
+      }
+    }
     
     protected void setCellContentNew(){
       long dbgtime = System.currentTimeMillis();

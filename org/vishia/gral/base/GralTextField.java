@@ -402,7 +402,7 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   
   protected GralKeyListener gralKeyListener = new GralKeyListener(itsMng)
   {
-    @Override public boolean specialKeysOfWidgetType(int key, GralWidget widgg){ return false; }
+    @Override public boolean specialKeysOfWidgetType(int key, GralWidget widgg, Object widgImpl){ return false; }
   };
   
   

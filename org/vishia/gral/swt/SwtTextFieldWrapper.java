@@ -430,7 +430,7 @@ public class SwtTextFieldWrapper extends GralTextField
   protected SwtKeyListener swtKeyListener = new SwtKeyListener(itsMng._impl.gralKeyListener)
   {
 
-    @Override public final boolean specialKeysOfWidgetType(int key, GralWidget widgg){ 
+    @Override public final boolean specialKeysOfWidgetType(int key, GralWidget widgg, Object widgImpl){ 
       boolean bDone = true;
       if(KeyCode.isWritingKey(key)){
         bTextChanged = true;
