@@ -82,7 +82,7 @@ import org.vishia.util.TreeNode_ifc;
  */
 public final class GralTable<UserData> extends GralWidget implements GralTable_ifc<UserData> {
 
-  /**Version, history and license
+  /**Version, history and license.
    * <ul>
    * <li>2013-12-06 Hartmut new: {@link #setColumnEditable(int, boolean)}, supports editing in cells. 
    * <li>2013-11-24 Hartmut chg: {@link GralTable.GraphicImplAccess#focusGained()} etc. refactored. 
@@ -192,7 +192,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * 
    */
   @SuppressWarnings("hiding")
-  public final static int version = 20131116;
+  public final static int version = 0x20131206;
 
   
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;

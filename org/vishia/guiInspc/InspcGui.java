@@ -265,6 +265,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
             cargs.curveExporterClasses.put(sKey, sValue);
           }
         }
+        else if(arg.startsWith("-targetbyIndex")) 
+        { cargs.bUseGetValueByIndex = true;   //an example for default output
+        }
         else if(arg.startsWith("-ownIpc=")) 
         { cargs.sOwnIpcAddr = getArgument(8);   //an example for default output
         }
