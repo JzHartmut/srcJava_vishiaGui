@@ -1089,7 +1089,7 @@ public final class InspcCurveView
   
   /**This class joins the InputFields with the inspector communication info block.
    * It is created for any Curve one time if need and used for the communication after that. 
-   * The routine {@link #execInspcRxOrder(Info)} is used to add the received values to the curve.
+   * The routine {@link #execInspcRxOrder(Reflitem)} is used to add the received values to the curve.
    */
   private class XXXCurveCommRxAction implements InspcAccessExecRxOrder_ifc
   {
@@ -1103,14 +1103,14 @@ public final class InspcCurveView
     /**This method is called for any info block in the received telegram from target,
      * if this implementing instance is stored on the order.
      * It prepares the value presentation.
-     * @see org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc#execInspcRxOrder(org.vishia.communication.InspcDataExchangeAccess.Info)
+     * @see org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc#execInspcRxOrder(org.vishia.communication.InspcDataExchangeAccess.Reflitem)
      */
-    @Override public void execInspcRxOrder(InspcDataExchangeAccess.Info info, LogMessage log, int identLog)
+    @Override public void execInspcRxOrder(InspcDataExchangeAccess.Reflitem info, LogMessage log, int identLog)
     {
       int order = info.getOrder();
       int cmd = info.getCmd();
       assert(false);
-      if(cmd == InspcDataExchangeAccess.Info.kAnswerValue){
+      if(cmd == InspcDataExchangeAccess.Reflitem.kAnswerValue){
         //GralWidget widgd = inp.widgetVariable;
         int typeInspc = InspcAccessEvaluatorRxTelg.getInspcTypeFromRxValue(info);
         
