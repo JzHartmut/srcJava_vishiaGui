@@ -51,47 +51,47 @@ public class GralSwitchExclusiveButtonMng implements VariableAccess_ifc
     }
   };
 
-  @Override public int getInt(int... ixArray){ return 0; }
-  @Override public int setInt(int value, int... ixArray){ return 0; }
+  @Override public int getInt(){ return 0; }
+  @Override public int setInt(int value){ return 0; }
 
-  @Override public long getLong(int... ixArray){ return 0; }
-  @Override public long setLong(long value, int... ixArray){ return 0; }
+  @Override public long getLong(){ return 0; }
+  @Override public long setLong(long value){ return 0; }
 
   @Override
-  public float getFloat(int... ixArray)
+  public float getFloat()
   {
     // TODO Auto-generated method stub
     return 0;
   }
 
   @Override
-  public float setFloat(float value, int... ixArray)
+  public float setFloat(float value)
   {
     // TODO Auto-generated method stub
     return 0;
   }
 
   @Override
-  public double getDouble(int... ixArray)
+  public double getDouble()
   {
     // TODO Auto-generated method stub
     return 0;
   }
 
   @Override
-  public double setDouble(double value, int... ixArray)
+  public double setDouble(double value)
   {
     // TODO Auto-generated method stub
     return 0;
   }
 
   @Override
-  public String getString(int ...ixArray)
+  public String getString()
   { return currentButtonText;
   }
 
   @Override
-  public String setString(String value, int ...ixArray)
+  public String setString(String value)
   {
     // TODO Auto-generated method stub
     return null;
@@ -99,9 +99,6 @@ public class GralSwitchExclusiveButtonMng implements VariableAccess_ifc
   
   @Override public char getType(){ return 'I'; } 
   
-  @Override public int getDimension(int dimension){
-    return 0; //no dimension
-  }
 
   @Override
   public long getLastRefreshTime()

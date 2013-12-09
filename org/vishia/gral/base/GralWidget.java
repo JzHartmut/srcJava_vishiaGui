@@ -387,7 +387,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * See {@link #setValue(float)}, {@link #setValue(String)}.
    * See {@link #indices} to use an array- or bit-variable.
    */
-  private VariableAccessWithIdx variable;
+  private VariableAccess_ifc variable;
   
   /**More as one variable which are associated with this widget. This reference may be null.
    * Alternatively {@link #variable} may be set.
@@ -395,7 +395,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * See {@link #setValue(float)}, {@link #setValue(String)}.
    * See {@link #indices} to use an array- or bit-variable.
    */
-  private List<VariableAccessWithIdx> variables;
+  private List<VariableAccess_ifc> variables;
   
   
   /**Action method on activating, changing or release the widget-focus. */
@@ -866,10 +866,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @param container The container where all {@link VariableAccess_ifc} should be found.
    * @return The access to a user variable in the user's context, null if the data path is empty.
    */
-  public VariableAccessWithIdx getVariableFromContentInfo(VariableContainer_ifc container)
+  public VariableAccess_ifc getVariableFromContentInfo(VariableContainer_ifc container)
   {
     //DBbyteMap.Variable variable;
-    VariableAccessWithIdx variable;
+    VariableAccess_ifc variable;
     Object oContentInfo = this.getContentInfo();
     if(oContentInfo == null){
       //first usage:
@@ -924,13 +924,13 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       if(sDataPath !=null){  //only refresh widgets with a data path.
         if(sDataPath.contains(",")){
           String[] sDataPaths = sDataPath.split(",");
-          variables = new LinkedList<VariableAccessWithIdx>();
+          variables = new LinkedList<VariableAccess_ifc>();
           for(String sPath1: sDataPaths){
             if(sPath1.contains("["))
               stop();
             String sPath2 = sPath1.trim();
             String sPath = itsMng.replaceDataPathPrefix(sPath2);
-            VariableAccessWithIdx variable1 = container.getVariable(sPath);
+            VariableAccess_ifc variable1 = container.getVariable(sPath);
             if(variable1 !=null){
               variables.add(variable1);
             }
@@ -988,7 +988,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
         else {
           Object[] values = new Object[variables.size()];
           int ixVal = -1;
-          for(VariableAccessWithIdx variable1: variables){
+          for(VariableAccess_ifc variable1: variables){
             char cType = variable1.getType();
             switch(cType){
               case 'Z': case 'S': case 'B':
@@ -1016,10 +1016,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * should be requested for the current visible variables.
    */
   public void requestNewValueForVariable(long timeRequested){
-    if(variable !=null){ variable.getVariable().requestValue(timeRequested); }
+    if(variable !=null){ variable.requestValue(timeRequested); }
     else if(variables !=null){
-      for(VariableAccessWithIdx variable1: variables){
-        variable1.getVariable().requestValue(timeRequested);
+      for(VariableAccess_ifc variable1: variables){
+        variable1.requestValue(timeRequested);
       }
     }
   }

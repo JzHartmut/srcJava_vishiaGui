@@ -1,6 +1,7 @@
 package org.vishia.gral.base;
 
 import org.vishia.byteData.VariableAccessWithIdx;
+import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
@@ -150,7 +151,7 @@ public class GralShowMethods
     @Override public boolean exec(int actionCode, GralWidget_ifc widgi, Object... params)
     {
       GralWidget widg = (GralWidget)widgi;
-      final VariableAccessWithIdx variable = widg.getVariableFromContentInfo(variableContainer);
+      final VariableAccess_ifc variable = widg.getVariableFromContentInfo(variableContainer);
       if(variable !=null){
         if(actionCode == KeyCode.focusGained){
           widg.setText(variable.getString());

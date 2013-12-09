@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.vishia.byteData.VariableAccessWithIdx;
+import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.curves.WriteCurve_ifc;
 import org.vishia.gral.ifc.GralColor;
@@ -154,7 +155,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     
     public String sDataPath;
     
-    public VariableAccessWithIdx variable;
+    public VariableAccess_ifc variable;
     
     private Object oContent;
     
@@ -943,7 +944,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
         final float value;
         if(track.variable !=null ){
           value = track.variable.getFloat();
-          track.variable.getVariable().requestValue(System.currentTimeMillis());
+          track.variable.requestValue(System.currentTimeMillis());
         } else {
           value = 0;
         }
