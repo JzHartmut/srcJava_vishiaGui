@@ -1,6 +1,5 @@
 package org.vishia.gral.base;
 
-import org.vishia.byteData.VariableAccessWithIdx;
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.ifc.GralColor;
@@ -96,8 +95,8 @@ public class GralShowMethods
         }
       }
       int value;
-      if(params[0] instanceof VariableAccessWithIdx){
-        VariableAccessWithIdx variable = (VariableAccessWithIdx)params[0];
+      if(params[0] instanceof VariableAccess_ifc){
+        VariableAccess_ifc variable = (VariableAccess_ifc)params[0];
         value = variable.getInt();
         if(value>=0 && value < widgg.cfg.showParam.length){ widgd.setBackColor((GralColor)widgg.cfg.showParam[value], 0); }
         else { widgd.setBackColor((GralColor)widgg.cfg.showParam[0], 0); }
@@ -125,8 +124,8 @@ public class GralShowMethods
         String[] sShowParam = wdg.getShowParam();
         wdg.setBorderAndColors(sShowParam);
       }
-      if(params[0] instanceof VariableAccessWithIdx){
-        VariableAccessWithIdx variable = (VariableAccessWithIdx)params[0];
+      if(params[0] instanceof VariableAccess_ifc){
+        VariableAccess_ifc variable = (VariableAccess_ifc)params[0];
         float value = variable.getFloat();
         wdg.setValue(value);
       } else {
