@@ -102,6 +102,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
   GralButton btnSwitchOnLog;
   
+  static final GralColor colorRefreshed = GralColor.getColor("wh");
+  static final GralColor colorOldValue = GralColor.getColor("lgr");
+  
   InspcCurveView curveA, curveB, curveC;
   
   public GralColorSelector colorSelector;
@@ -168,6 +171,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     long time = System.currentTimeMillis();
     ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = guiCfg.gralMng.getVisiblePanels();
     //GralWidget widgdRemove = null;
+    long timeAtleast = System.currentTimeMillis() - 3000;
     try{
       for(GralVisibleWidgets_ifc panel: listPanels){
         Queue<GralWidget> widgetsVisible = panel.getWidgetsVisible();
@@ -175,7 +179,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
           try{
             String sShowMethod;
             if((sShowMethod = widget.getShowMethod()) ==null || !sShowMethod.equals("stc_cmd")){
-              widget.refreshFromVariable(inspcMng);
+              widget.refreshFromVariable(inspcMng, timeAtleast, colorRefreshed, colorOldValue);
               widget.requestNewValueForVariable(time);
             }
           }catch(Exception exc){
@@ -411,12 +415,12 @@ private class InspcGuiCfg extends GuiCfg
           if(logTelg == null){
             logTelg = new LogMessageFile("telgLog", 10, 1, null, null, null);
           }
-          inspcMng.inspcAccessor.setLog(logTelg, 1000);
+          inspcMng.setLogForTargetComm(logTelg, 1000);
         } else {
           if(logTelg !=null){
             logTelg.close();
           }
-          inspcMng.inspcAccessor.setLog(null, 0);
+          inspcMng.setLogForTargetComm(null, 0);
         }
       }
       return true;

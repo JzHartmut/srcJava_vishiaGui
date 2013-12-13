@@ -1087,42 +1087,5 @@ public final class InspcCurveView
   }
   
   
-  /**This class joins the InputFields with the inspector communication info block.
-   * It is created for any Curve one time if need and used for the communication after that. 
-   * The routine {@link #execInspcRxOrder(Reflitem)} is used to add the received values to the curve.
-   */
-  private class XXXCurveCommRxAction implements InspcAccessExecRxOrder_ifc
-  {
-    final TrackValues inp;
-    
-    
-    XXXCurveCommRxAction(TrackValues inp)
-    { this.inp = inp;
-    }
-
-    /**This method is called for any info block in the received telegram from target,
-     * if this implementing instance is stored on the order.
-     * It prepares the value presentation.
-     * @see org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc#execInspcRxOrder(org.vishia.communication.InspcDataExchangeAccess.Reflitem)
-     */
-    @Override public void execInspcRxOrder(InspcDataExchangeAccess.Reflitem info, LogMessage log, int identLog)
-    {
-      int order = info.getOrder();
-      int cmd = info.getCmd();
-      assert(false);
-      if(cmd == InspcDataExchangeAccess.Reflitem.kAnswerValue){
-        //GralWidget widgd = inp.widgetVariable;
-        int typeInspc = InspcAccessEvaluatorRxTelg.getInspcTypeFromRxValue(info);
-        
-        float val = inp.val = InspcAccessEvaluatorRxTelg.valueFloatFromRxValue(info, typeInspc);
-        if(inp.min > val){ inp.min = val; }
-        if(inp.max < val){ inp.max = val; }
-        inp.mid += 0.01f * (val - inp.mid);
-        if(inp.bLast){
-          showValues();
-        }
-      }
-    }
-  }
   
 }
