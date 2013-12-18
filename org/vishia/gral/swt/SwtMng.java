@@ -51,6 +51,7 @@ import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralValueBar;
+import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
@@ -372,12 +373,28 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   
+  /* (non-Javadoc)
+   * @see org.vishia.gral.ifc.GralMngBuild_ifc#createWindow(java.lang.String, java.lang.String, int)
+   */
+  @Deprecated
   @Override public GralWindow createWindow(String name, String title, int windProps)
   {
     GralWindow windowGral = new GralWindow(name, title, windProps, null, null);
-    SwtGraphicThread swtDevice = (SwtGraphicThread)gralDevice;
+    //SwtGraphicThread swtDevice = (SwtGraphicThread)gralDevice;
+    createWindow(windowGral);
+    return windowGral;
+
+  }
+  
+  
+  
+  
+  /* (non-Javadoc)
+   * @see org.vishia.gral.ifc.GralMngBuild_ifc#createWindow(org.vishia.gral.base.GralWindow)
+   */
+  @Override public void createWindow(GralWindow windowGral){
     SwtSubWindow windowSwt = new SwtSubWindow(this, windowGral);
-      //new SwtSubWindow(name, swtDevice.displaySwt, title, windProps, this);
+    //new SwtSubWindow(name, swtDevice.displaySwt, title, windProps, this);
     GralRectangle rect = calcPositionOfWindow(windowGral.pos());
     windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
     //window.window.redraw();
@@ -385,11 +402,9 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     this.registerPanel(windowGral);
     this.pos.panel = windowGral; //it is selected.
     this.pos.setPosition(null, 0,0,0,0,0,'r');  //per default the whole window as position and size.
-    return windowGral;
-
+    windowGral.wdgImpl = windowSwt;
   }
-  
-  
+
   
   
   

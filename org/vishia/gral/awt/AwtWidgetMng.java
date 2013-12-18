@@ -490,6 +490,11 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     return null;
   }
 
+  
+  @Override public void createWindow(GralWindow windowGral){
+  }
+  
+  
   @Override
   public Set<Entry<String, GralWidget>> getShowFields()
   {

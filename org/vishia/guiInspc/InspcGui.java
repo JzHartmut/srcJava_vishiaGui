@@ -15,6 +15,7 @@ import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
@@ -107,6 +108,8 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   
   InspcCurveView curveA, curveB, curveC;
   
+  InspcFieldTable fieldsA, fieldsB;
+  
   public GralColorSelector colorSelector;
   
   private final FileCluster fileCluster = new FileCluster();
@@ -142,6 +145,10 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     curveB = new InspcCurveView("curve_B", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, cargs.curveExporterClasses);
     curveC = new InspcCurveView("curve_C", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, cargs.curveExporterClasses);
 
+    fieldsA = new InspcFieldTable();
+    fieldsB = new InspcFieldTable();
+    
+    
   }
   
   @Override public void completeConstruction(){
@@ -320,6 +327,17 @@ private class InspcGuiCfg extends GuiCfg
     curveA.buildGraphic(gui.mainWindow(), colorSelector);
     curveB.buildGraphic(gui.mainWindow(), colorSelector);
     curveC.buildGraphic(gui.mainWindow(), colorSelector);
+    //
+    gralMng.selectPanel("primaryWindow");
+    gralMng.setPosition(14, 84, 4, 64, 0, '.');
+    fieldsA.setToPanel(gralMng);
+    GralMenu menu = super.guiW.getMenuBar();
+    gralMng.selectPanel("primaryWindow");
+    gralMng.setPosition(24, 94, 14, 74, 0, '.');
+    fieldsB.setToPanel(gralMng);
+    menu.addMenuItemGthread("menuBarFieldsA", "&Window/open Fields A", fieldsA.actionOpenWindow);
+    menu.addMenuItemGthread("menuBarFieldsB", "&Window/open Fields B", fieldsB.actionOpenWindow);
+    //
     if(user !=null){
       user.initGui(gralMng);
       user.addGuiMenu(gui.mainWindow());

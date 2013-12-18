@@ -1,5 +1,6 @@
 package org.vishia.gral.base;
 
+import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
@@ -17,6 +18,8 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
 
   /**Version, history and license.
    * <ul>
+   * <li>2013-12-19 Hartmut new: Now it is able to instantiate without Graphic Layer and {@link #setToPanel(GralMngBuild_ifc)}
+   *   is supported.  
    * <li>2012-04-16 Hartmut new: {@link #actionResizeOnePanel}
    * <li>2012-03-13 Hartmut chg: Some abstract method declarations moved to its interface.
    * <li>2011-12-31 Hartmut chg: Implements the set-methods of {@link GralWindow_ifc} in form of calling
@@ -66,7 +69,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    * 
    */
   @SuppressWarnings("hiding")
-  public static final int version = 20120416;
+  public static final int version = 20121219;
   
   /**Standard action for resizing, used if the window contains one panel.
    * It calls {@link GralMng_ifc#resizeWidget(GralWidget, int, int)} 
@@ -119,6 +122,24 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   public GralWindow(String nameWindow, String sTitle, int windProps, GralMng mng, Object panelComposite)
   {
     super( nameWindow, mng, panelComposite);
+    dyda.displayedText = sTitle;  //maybe null
+    this.windProps = windProps;
+    if((windProps & windResizeable)!=0){
+      resizeAction = new ActionResizeOnePanel();
+    }
+
+  }
+
+  
+  
+  /**Constructs a window. 
+   * @param nameWindow
+   * @param sTitle
+   * @param windProps See {@link GralWindow_ifc#windResizeable} etc.
+   */
+  public GralWindow(String nameWindow, String sTitle, int windProps)
+  {
+    super( nameWindow, null, null);
     dyda.displayedText = sTitle;  //maybe null
     this.windProps = windProps;
     if((windProps & windResizeable)!=0){
@@ -190,6 +211,13 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
 
   
   
+  }
+
+  
+  
+  
+  @Override public void setToPanel(GralMngBuild_ifc mng) throws IllegalStateException {
+    mng.createWindow(this);
   }
 
 
