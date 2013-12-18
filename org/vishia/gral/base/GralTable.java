@@ -84,6 +84,13 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2013-12-18 Hartmut chg: {@link CellData} is defined now public and as part of GralTable. There were a problem
+   *   using the Java7-Compiler with difficult Generic parameter mismatches. The CellData is a simple data class without
+   *   generic, but the compiler has interpreted a generic parameter. May the compiler wrong? The structure of a program
+   *   should be simple! The only one disadvantage is, {@link CellData} has to be public, not protected,
+   *   because it is not seen from the implementation class of {@link GraphicImplAccess}. Another problem was
+   *   {@link GraphicImplAccess#mouseDownGral()} etc. The compiler has a problem it was named 'mouseDown'
+   *   and 'super.mouseDown(ev)' was called from the derivated class. Keep it simple. It does not need the same name. 
    * <li>2013-12-06 Hartmut new: {@link #setColumnEditable(int, boolean)}, supports editing in cells. 
    * <li>2013-11-24 Hartmut chg: {@link GralTable.GraphicImplAccess#focusGained()} etc. refactored. 
    * <li>2013-11-23 Hartmut chg: use {@link KeyCode#userSelect} etc. for calling {@link #actionOnLineSelected(int, GralTableLine_ifc)}
@@ -192,7 +199,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * 
    */
   @SuppressWarnings("hiding")
-  public final static int version = 0x20131206;
+  protected final static int version = 0x20131206;
 
   
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
@@ -520,6 +527,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   @Override
   public void setCurrentLine(GralTableLine_ifc<UserData> line, int ixline, int ixcolumn) {
+    assert(ixline > - zLineVisible && ixline < zLineVisible);
+    assert(ixcolumn < gi.cells[0].length);
     lineSelected = (TableLineData)line;
     actionOnLineSelected(KeyCode.userSelect, lineSelected);
     if(ixline < 0){
@@ -533,7 +542,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         lineSelectedixCell = zLineVisible -1;
       }
     }
-    this.colSelectedixCellC = ixcolumn;
+    if(ixcolumn >=0){
+      this.colSelectedixCellC = ixcolumn;
+    }
     bPrepareVisibleArea = true;
     /*
     if(line < -1 || line > zLine-1){ line = zLine -1; }
@@ -828,21 +839,21 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   }  
   
   
-  /**Invoked in the graphic thread from mouse listener in {@link GraphicImplAccess#mouseDown(int, CellData)}
+  /**Invoked in the graphic thread from mouse listener in {@link GraphicImplAccess#mouseDownGral(int, CellData)}
    * @param key
    * @param cell
    */
-  protected void mouseDown(int key, GraphicImplAccess.CellData cell){
+  protected void mouseDown(int key, CellData cell){
     lineSelectedNew = linesForCell[cell.ixCellLine]; 
     repaint(0,0);  //immediately, it is in the graphic thread.
   }
 
 
-  /**Invoked in the graphic thread from mouse listener in {@link GraphicImplAccess#mouseUp(int, CellData)}
+  /**Invoked in the graphic thread from mouse listener in {@link GraphicImplAccess#mouseUpGral(int, CellData)}
    * @param key
    * @param cell
    */
-  protected void mouseUp(int key, GraphicImplAccess.CellData cell){
+  protected void mouseUp(int key, CellData cell){
     if(key == KeyCode.mouse1Up){
       lineSelected = lineSelectedNew;
       lineSelectedNew = null;
@@ -855,11 +866,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
 
 
-  /**Invoked in the graphic thread from mouse listener in {@link GraphicImplAccess#mouseDouble(int, CellData)}
+  /**Invoked in the graphic thread from mouse listener in {@link GraphicImplAccess#mouseDoubleGral(int, CellData)}
    * @param key
    * @param cell
    */
-  protected void mouseDouble(int key, GraphicImplAccess.CellData cell){
+  protected void mouseDouble(int key, CellData cell){
     processKeys(KeyCode.mouse1Double);
   }
 
@@ -986,7 +997,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           actionOnLineSelected(KeyCode.userSelect, lineSelected);
           keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
         } break;
-        case KeyCode.mouseWheelDn:
         case KeyCode.pgdn: {
           if(lineSelectedixCell < zLineVisible -3){
             lineSelectedixCell = zLineVisible -3;
@@ -1009,7 +1019,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
         } break;
         default:
-          if(keyCode == KeyCode.dn || keyCode == keyMarkDn) {
+          if(keyCode == KeyCode.dn || keyCode == keyMarkDn || keyCode == KeyCode.mouseWheelDn
+            ) {
             if(keyCode == keyMarkDn && lineSelected !=null){
               GralTableLine_ifc<?> line = lineSelected; //tableLines.get(ixLine);
               if((line.getMark() & 1)!=0){
@@ -1603,13 +1614,13 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     
     
-    protected void mouseDown(int key, CellData cell){
+    protected void mouseDownGral(int key, CellData cell){
       mousetime = System.currentTimeMillis();
       outer.mouseDown(key, cell);
     }
 
 
-    protected void mouseUp(int key, CellData cell){
+    protected void mouseUpGral(int key, CellData cell){
       if(mouseDoubleClick){
         mouseDoubleClick = false;
       } else {
@@ -1618,7 +1629,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
 
 
-    protected void mouseDouble(int key, CellData cell){
+    protected void mouseDoubleGral(int key, CellData cell){
       mousetime = System.currentTimeMillis();
       mouseDoubleClick = true;
       outer.mouseDouble(key, cell);
@@ -1637,50 +1648,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     //protected void setCellDataOnMousePressed(CellData data){ cellDataOnMousePressed = data; } 
     
 
-    /**Data for each Text widget of the graphical implementation layer.
-     * An instance is created on creating the text field for the cell in the implementation layer.
-     * The instance is referenced only by the text field,
-     * It refers the data of the {@link GralTable#tableLines}.
-     * <pre>
-     * swt.Canvas
-     *      |--*>swt.Text
-     *               |--data-->CellData
-     *                           -ixCellLine
-     *                           -ixCellColumn
-     * 
-     * </pre>
-     * 
-     * Note: The class is visible only in the graphic implementation layer, because it is protected.
-     * The elements need to set public because there are not visible elsewhere in the derived class
-     * of the outer class. 
-     */
-    protected class CellData{
-      
-      /**The row and column in the graphical presentation. With the information about the row, the
-       * associated {@link TableLineData} can be found via the {@link GralTable#linesForCell}. */
-      public final int ixCellLine, ixCellColumn;
-      
-      /**The color in the graphical presentation. It is the color of the text field. 
-       * Note that the color of the text field is only changed if this colors and the 
-       * {@link TableLineData#colorBackground} and {@link TableLineData#colorForground} are different. 
-       * It saves some calculation time if the color of the text field is set only if it is necessary. */
-      public GralColor colorBack, colorText;
-      
-      
-      /**temporary set to true to set the focus of this cell.
-       * 
-       */
-      public boolean bSetFocus;
-      
-      /**The currently tree depth of this cell. Invoke setBounds if it is different of line. */
-      public int treeDepth;
-      
-      public CellData(int ixCellLine, int ixCellColumn){
-        this.ixCellLine = ixCellLine; 
-        this.ixCellColumn = ixCellColumn;
-      }
-    }
-    
     
 
  
@@ -2055,6 +2022,50 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         u.append(cellTexts[ii]).append('|');
       }
       return u.toString(); 
+    }
+  }
+  
+  /**Data for each Text widget of the graphical implementation layer.
+   * An instance is created on creating the text field for the cell in the implementation layer.
+   * The instance is referenced only by the text field,
+   * It refers the data of the {@link GralTable#tableLines}.
+   * <pre>
+   * swt.Canvas
+   *      |--*>swt.Text
+   *               |--data-->CellData
+   *                           -ixCellLine
+   *                           -ixCellColumn
+   * 
+   * </pre>
+   * 
+   * Note: The class is visible only in the graphic implementation layer, because it is protected.
+   * The elements need to set public because there are not visible elsewhere in the derived class
+   * of the outer class. 
+   */
+  public static class CellData{
+    
+    /**The row and column in the graphical presentation. With the information about the row, the
+     * associated {@link TableLineData} can be found via the {@link GralTable#linesForCell}. */
+    public final int ixCellLine, ixCellColumn;
+    
+    /**The color in the graphical presentation. It is the color of the text field. 
+     * Note that the color of the text field is only changed if this colors and the 
+     * {@link TableLineData#colorBackground} and {@link TableLineData#colorForground} are different. 
+     * It saves some calculation time if the color of the text field is set only if it is necessary. */
+    public GralColor colorBack, colorText;
+    
+    
+    /**temporary set to true to set the focus of this cell.
+     * 
+     */
+    public boolean bSetFocus;
+    
+    /**The currently tree depth of this cell. Invoke setBounds if it is different of line. */
+    public int treeDepth;
+    
+    public CellData(int ixCellLine, int ixCellColumn){
+      this.ixCellLine = ixCellLine; 
+      this.ixCellColumn = ixCellColumn;
     }
   }
   

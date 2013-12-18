@@ -169,7 +169,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
     setColorsSwt();    
     int zLineVisibleMax = gralTable.nrofLinesVisibleMax();
     this.cellsSwt = new Text[zLineVisibleMax][zColumn()];
-    this.cells = new CellData[zLineVisibleMax][zColumn()];
+    this.cells = new GralTable.CellData[zLineVisibleMax][zColumn()];
     Control swtTable = new SwtTable.Table(parent, zColumn(), mng);
     super.implWidgWrapper = this.swtWidgWrapper = new SwtWidgetSimpleWrapper(swtTable, mng);
     //gralTable.implMethodWidget_.setWidgetImpl(this);
@@ -393,7 +393,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
    * @param cell The cell 
    */
   private void redrawTableWithFocusedCell(Widget cell){
-    CellData data = (CellData)cell.getData();
+    GralTable.CellData data = (GralTable.CellData)cell.getData();
     data.bSetFocus = true;
     if(super.redrawTableWithFocusedCell(data)){
       repaintGthread();
@@ -412,7 +412,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
   /**This routine implements all things to set the content of any table cell to show it.
    * @see org.vishia.gral.base.GralTable#drawCellContent(int, int, org.vishia.gral.base.GralTable.TableLineData)
    */
-  @Override protected void drawCellContent(int iCellLine, CellData[] cellLine, GralTable<?>.TableLineData line, GralTable.LinePresentation linePresentationP){
+  @Override protected void drawCellContent(int iCellLine, GralTable.CellData[] cellLine, GralTable<?>.TableLineData line, GralTable.LinePresentation linePresentationP){
     Text[] textlineSwt = cellsSwt[iCellLine];
     int treeDepth = -1;
     if(line !=null && line.treeDepth() != cellLine[0].treeDepth){
@@ -421,7 +421,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
     if(line !=null){
       for(int col=0; col < cells[0].length; ++col){
         Text cellSwt = textlineSwt[col]; 
-        CellData cellData = cellLine[col]; //(CellData)cellSwt.getData();
+        GralTable.CellData cellData = cellLine[col]; //(GralTable.CellData)cellSwt.getData();
         if(treeDepth >=0 && col < super.nrofColumnTreeShift){
           int xleft = xpixelCell[col] + treeDepth * xPixelUnit; 
           int xRight = xpixelCell[col+1] + (col < (super.nrofColumnTreeShift-1) ?  treeDepth * xPixelUnit : 0);
@@ -456,7 +456,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
       GralColor colorBack = colorBackTable();
       for(int col=0; col < cells[0].length; ++col){
         Text cellSwt = textlineSwt[col]; 
-        CellData cellData = cellLine[col]; //(CellData)cellSwt.getData();
+        GralTable.CellData cellData = cellLine[col]; //(GralTable.CellData)cellSwt.getData();
         cellSwt.setText("");
         if(cellData.colorBack != colorBack){
           Color colorSwt =  swtWidgWrapper.mng.getColorImpl(colorBack);
@@ -471,9 +471,9 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
   
   
   
-  @Override protected CellData drawCellInvisible(int iCellLine, int iCellCol){
+  @Override protected GralTable.CellData drawCellInvisible(int iCellLine, int iCellCol){
     Text cellSwt = cellsSwt[iCellLine][iCellCol]; 
-    CellData cellData = (CellData)cellSwt.getData();
+    GralTable.CellData cellData = (GralTable.CellData)cellSwt.getData();
     cellSwt.setText("");
     if(cellData.colorBack != colorBackTable()){
       Color colorSwt =  swtWidgWrapper.mng.getColorImpl(colorBackTable());
@@ -501,9 +501,9 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
    */
   protected void mouseDown(MouseEvent ev){
     Text widgSwt = (Text)ev.widget;  //it is only associated to a cell.
-    CellData cell = (CellData)widgSwt.getData();
+    GralTable.CellData cell = (GralTable.CellData)widgSwt.getData();
     int key = SwtGralKey.convertMouseKey(ev.button, SwtGralKey.MouseAction.down, ev.stateMask);
-    super.mouseDown(key, cell);  //To independent GRAL layer  
+    super.mouseDownGral(key, cell);  //To independent GRAL layer  
   }
   
 
@@ -513,9 +513,9 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
    */
   protected void mouseUp(MouseEvent ev){
     Text widgSwt = (Text)ev.widget;  //it is only associated to a cell.
-    CellData cell = (CellData)widgSwt.getData();
+    GralTable.CellData cell = (GralTable.CellData)widgSwt.getData();
     int key = SwtGralKey.convertMouseKey(ev.button, SwtGralKey.MouseAction.up, ev.stateMask);
-    super.mouseUp(key, cell);    //To independent GRAL layer
+    super.mouseUpGral(key, cell);    //To independent GRAL layer
   }
   
 
@@ -525,9 +525,9 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
    */
   protected void mouseDouble(MouseEvent ev){
     Text widgSwt = (Text)ev.widget;  //it is only associated to a cell.
-    CellData cell = (CellData)widgSwt.getData();
+    GralTable.CellData cell = (GralTable.CellData)widgSwt.getData();
     int key = SwtGralKey.convertMouseKey(ev.button, SwtGralKey.MouseAction.down, ev.stateMask);
-    super.mouseDouble(key, cell);    //To independent GRAL layer
+    super.mouseDoubleGral(key, cell);    //To independent GRAL layer
   }
   
 
@@ -538,7 +538,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
     for(Text[] row: cellsSwt){
       int ixColumn = 0;
       for(Text cell: row){
-        CellData celldata = (CellData)cell.getData();
+        GralTable.CellData celldata = (GralTable.CellData)cell.getData();
         int xleft = 0; //celldata.tableItem !=null ? (celldata.tableItem.treeDepth() - treeDepthBase) * xPixelUnit : 0;
         cell.setBounds(xleft + xpixelCell[ixColumn], yPix, xpixelCell[ixColumn+1] - xpixelCell[ixColumn], linePixel);
         ixColumn +=1;
@@ -551,7 +551,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
   /**Invoked on {@link #swtKeyListener} if enter. */
   void setTextToLine(Text widgSwt){
     String text = widgSwt.getText();
-    CellData data = (CellData)widgSwt.getData();
+    GralTable.CellData data = (GralTable.CellData)widgSwt.getData();
     SwtTable.this.setCellText(data, text);
   }
   
@@ -579,7 +579,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
         cell.addFocusListener(focusListenerCell);
         cell.addMouseListener(mousePressedListener);
         cell.addMouseWheelListener(mouseWheelListener);
-        CellData cellData = new CellData(iRow, iCol);
+        GralTable.CellData cellData = new GralTable.CellData(iRow, iCol);
         cell.setData(cellData);
         cells[iRow][iCol] = cellData;
         int xdPixCol = super.columnPixel[iCol+1] - columnPixel[iCol];
@@ -789,7 +789,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
       SwtTable.this.focusLost();
       if(!bRedrawPending){
         System.out.println("SwtTable - cell focus lost;" + (SwtTable.this).outer.toString());
-        CellData data = (CellData)ev.widget.getData();
+        GralTable.CellData data = (GralTable.CellData)ev.widget.getData();
         Control widgSwt = (Control)ev.widget;
         //widgSwt.setBackground(colorBackSelectNonFocusedSwt); 
         int iCellLine = data.ixCellLine; //ixLineNew - ixLine1;
