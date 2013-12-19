@@ -145,8 +145,8 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     curveB = new InspcCurveView("curve_B", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, cargs.curveExporterClasses);
     curveC = new InspcCurveView("curve_C", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, cargs.curveExporterClasses);
 
-    fieldsA = new InspcFieldTable();
-    fieldsB = new InspcFieldTable();
+    fieldsA = new InspcFieldTable(variableMng);
+    fieldsB = new InspcFieldTable(variableMng);
     
     
   }

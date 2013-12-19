@@ -1,11 +1,18 @@
 package org.vishia.guiInspc;
 
+import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.inspectorAccessor.InspcMng;
+import org.vishia.inspectorAccessor.InspcStruct;
+import org.vishia.inspectorAccessor.InspcVariable;
+import org.vishia.util.KeyCode;
 
 /**This class presents a window with one table and some buttons to view and edit all fields in one instance
  * in a target system.
@@ -50,16 +57,19 @@ public class InspcFieldTable
   
   
   /**The window to present. */
-  GralWindow wind;
+  private final GralWindow wind;
   
   /**Table of fields, type and value. */
-  GralTable<Object> widgTable;
+  private final GralTable<Object> widgTable;
 
-  public InspcFieldTable()
+  private final InspcMng variableMng;
+  
+  public InspcFieldTable(InspcMng variableMng)
   {
     super();
     this.wind = new GralWindow("InspcFieldTableWind", "Fields of ...", GralWindow_ifc.windOnTop);
     this.widgTable = new GralTable<Object>("InspcFieldTable", new int[]{20, 0, -10});
+    this.variableMng = variableMng;
   }
   
   
@@ -70,10 +80,45 @@ public class InspcFieldTable
   }
   
   
+  
+  void fillTableWithFields(){
+    GralWidget widgd = wind.gralMng().getWidgetInFocus();
+    if(widgd !=null){
+      String sDatapathWithPrefix = widgd.getDataPath();
+      String sDatapath = widgd.gralMng().replaceDataPathPrefix(sDatapathWithPrefix);
+      VariableAccess_ifc vari = variableMng.getVariable(sDatapath);
+      if(vari instanceof InspcVariable){
+        InspcVariable var = (InspcVariable)vari;
+        InspcStruct struct = var.struct();
+        widgTable.clearTable();
+        if(struct.isUpdated()){
+          for(String field: struct.fieldIter()){
+            GralTableLine_ifc<Object> line = widgTable.addLine(field, null, field);
+            line.setCellText(field, 0);
+          }
+        } else {
+          GralTableLine_ifc<Object> line = widgTable.addLine("$", null, null);
+          line.setCellText("pending request", 0);
+        }
+      }
+    }
+
+    wind.setVisible(true);
+    
+  }
+  
+  
+  
+  
+  
   GralUserAction actionOpenWindow = new GralUserAction("InspcFieldTable - open window"){
-    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
-      wind.setVisible(true);
-      return true;
+    @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        fillTableWithFields();
+        return true;
+      } else { 
+        return false;
+      }
     }
   };
   

@@ -1,4 +1,4 @@
-echo off
+echo on
 
 REM The TMP_JAVAC is a directory, which contains only this compiling results. It will be clean in the batch processing.
 set TMP_JAVAC=..\..\..\tmp_javac
@@ -46,5 +46,7 @@ set CLASSPATH_JAVAC=%SWTJAR%
 REM Sets the src-path for further necessary sources:
 set SRCPATH_JAVAC=..;../../srcJava_vishiaBase;../../srcJava_Zbnf;../../srcJava_vishiaRun
 
-..\..\srcJava_vishiaBase\_make\+javacjarbase.bat
+call ..\..\srcJava_vishiaBase\_make\+javacjarbase.bat
 
+set PATH_FCMD=D:\vishia\Fcmd\sf\Fcmd\exe
+if exist %PATH_FCMD% copy %OUTDIR_JAVAC%\%JAR_JAVAC% %PATH_FCMD%\%JAR_JAVAC% 
