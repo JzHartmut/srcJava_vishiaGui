@@ -240,8 +240,10 @@ public interface GralWidget_ifc extends Removeable
   
   //public abstract GralWidget getGralWidget();
 
-  /**Immediately repaint. It can be called in any thread. If it is called in the graphic thread,
-   * the repaint action is executed immediately in the thread. Elsewhere the graphic thread will be woken up.
+  /**repaint request. It can be called in any thread. If it is called in the graphic thread,
+   * the repaint action is executed immediately in the thread. Elsewhere the graphic thread will be waken up
+   * in the repaint time. If this routine is invoked more as one time in a short time not in the graphic thread,
+   * the repaint is executed only one time after the given delay.
    */
   public void repaint();
   

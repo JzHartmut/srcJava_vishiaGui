@@ -78,7 +78,6 @@ public class AwtTextBox extends GralTextBox
   { return textFieldSwt;
   }
 
-  @Override public String getPromptLabelImpl(){ return promptSwt.getText(); }
 
   @Override public GralColor setBackgroundColor(GralColor color)
   { return AwtWidgetHelper.setBackgroundColor(color, textFieldSwt);
@@ -169,14 +168,7 @@ public static class AwtTextAreaImpl extends TextArea implements AwtWidget
   }
 
 
-  @Override
-  public void setMouseAction(GralUserAction action)
-  {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
+   @Override
   public void setTextStyle(GralColor color, GralFont font)
   {
     // TODO Auto-generated method stub

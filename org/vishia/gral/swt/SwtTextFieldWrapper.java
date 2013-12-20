@@ -5,6 +5,7 @@ import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.events.DragDetectEvent;
 import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Font;
@@ -14,6 +15,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.vishia.byteData.VariableAccessWithIdx;
+import org.vishia.gral.base.GralKeyListener;
 import org.vishia.gral.base.GralMouseWidgetAction_ifc;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
@@ -22,13 +24,20 @@ import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.KeyCode;
 
-public class SwtTextFieldWrapper extends GralTextField
+public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
 {
+
+
+
   /**Version, history and license.
    * <ul>
+   * <li>2013-12-22 Hartmut chg: Now {@link GralTextField} uses the new concept of instantiation: It is not
+   *   the super class of the implementation class. But it provides {@link GralTextField.GraphicImplAccess}
+   *   as the super class. 
    * <li>2012-06-30 Hartmut new actionChange called on typing inside a field.
    * <li>2012-06-30 Hartmut new {@link #swtKeyListener}. The [Enter] key will be send to the User
    *   in opposite to {@link SwtTextBox}.
@@ -68,6 +77,11 @@ public class SwtTextFieldWrapper extends GralTextField
   @SuppressWarnings("hiding")
   public static final int version = 20120317;
   
+  /**It contains the association to the swt widget (Control) and the {@link SwtMng}
+   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   */
+  SwtWidgetSimpleWrapper swtWidgWrapper;
+  
   protected Text textFieldSwt;
   
   /**A possible prompt for the text field or null. */
@@ -77,30 +91,16 @@ public class SwtTextFieldWrapper extends GralTextField
   
   private DropTarget drop;
   
-  public SwtTextFieldWrapper(String name, Composite parent, char whatis, GralMng mng)
-  { super(name, whatis, mng);
-  }
+  
+  private SwtTextFieldWrapper(GralTextField widgg, SwtMng mng)
+  {
+    widgg.super(widgg, mng); //NOTE: superclass is a non static inner class of GralTextField. 
 
-  /**Creates a new GralTextField for Swt and registers it.
-   * <br>
-   * <b>Prompting</b>: The parameter promptStylePosition determines where a prompt is showing.
-   * <ul>
-   * <li>"t": prompt above, calculates inside position
-   * <li>"r": prompt right, calculates outside position.
-   * </ul>
-   * @param name The name to register it.
-   * @param editable false then show field
-   * @param prompt maybe null, propmt text
-   * @param promptStylePosition maybe null, prompt position
-   * @param mng
-   */
-  public SwtTextFieldWrapper(String name, boolean editable, String prompt, String promptStylePosition, SwtMng mng){
-    super(name, editable ? 'T' : 'S', mng);
     Composite panelSwt = mng.getCurrentPanel();
     //in ctor: setPanelMng(mng);
     //Text widgetSwt;
     //
-    if(prompt != null && promptStylePosition !=null && promptStylePosition.startsWith("t")){
+    if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("t")){
       mng.setNextPosition();
       final Font promptFont;
       char sizeFontPrompt;
@@ -108,7 +108,7 @@ public class SwtTextFieldWrapper extends GralTextField
       final GralPos posPrompt = new GralPos(), posField = new GralPos();
 
       //boundsAll = mng.calcWidgetPosAndSize(this.pos, 800, 600, 100, 20);
-      float ySize = pos().height();
+      float ySize = widgg.pos().height();
       //float xSize = pos.width();
       //posPrompt from top, 
       float yPosPrompt, heightPrompt, heightText;
@@ -134,9 +134,9 @@ public class SwtTextFieldWrapper extends GralTextField
             heightText = ySize * 0.5f;
           }
           //from top, size of prompt
-          posPrompt.setPosition(pos(), GralPos.same - ySize + yPosPrompt, GralPos.size - heightPrompt, GralPos.same, GralPos.same, 0, '.');
+          posPrompt.setPosition(widgg.pos(), GralPos.same - ySize + yPosPrompt, GralPos.size - heightPrompt, GralPos.same, GralPos.same, 0, '.');
           //from bottom line, size of text
-          posField.setPosition(pos(), GralPos.same, GralPos.size - heightText, GralPos.same, GralPos.same, 0, '.');
+          posField.setPosition(widgg.pos(), GralPos.same, GralPos.size - heightText, GralPos.same, GralPos.same, 0, '.');
         //} break;
       //}
       promptFont = mng.propertiesGuiSwt.getTextFontSwt(heightPrompt, GralFont.typeSansSerif, GralFont.styleNormal); //.smallPromptFont;
@@ -144,7 +144,7 @@ public class SwtTextFieldWrapper extends GralTextField
       //boundsField = mng.calcWidgetPosAndSize(posField, boundsAll.dx, boundsAll.dy, 10,100);
       promptSwt = new SwtTransparentLabel(panelSwt, SWT.TRANSPARENT);
       promptSwt.setFont(promptFont);
-      promptSwt.setText(prompt);
+      promptSwt.setText(prompt());
       promptSwt.setBackground(null);
       Point promptSize = promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
       boundsPrompt = mng.calcWidgetPosAndSizeSwt(posPrompt, promptSwt, 10,100);
@@ -162,14 +162,10 @@ public class SwtTextFieldWrapper extends GralTextField
       mng.setPosAndSize_(textFieldSwt);
     }
     textFieldSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
-    this.setEditable(editable);
-    if(editable)
-      //textFieldSwt.setDragDetect(true);
-      //textFieldSwt.addDragDetectListener(dragListener);
-      
-      stop();
+    textFieldSwt.setEditable(widgg.isEditable());
     textFieldSwt.setBackground(mng.propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));
     textFieldSwt.addFocusListener(mng.focusListener);
+    KeyListener swtKeyListener = new TextFieldKeyListener(mng._impl.gralKeyListener);
     textFieldSwt.addKeyListener(swtKeyListener);
     
     Listener[] oldMouseListener = textFieldSwt.getListeners(SWT.MouseDown);
@@ -178,16 +174,16 @@ public class SwtTextFieldWrapper extends GralTextField
     }
     textFieldSwt.addMouseListener(mng.mouseClickForInfo);
     textFieldSwt.addFocusListener(mng.focusListener);
-    if(editable){
+    if(widgg.isEditable()){
       TextFieldModifyListener modifyListener = new TextFieldModifyListener();
       textFieldSwt.addModifyListener(modifyListener);
       TextFieldFocusListener focusListener = new TextFieldFocusListener(mng);
       textFieldSwt.addFocusListener(focusListener);
     }
-    if(prompt != null && promptStylePosition !=null && promptStylePosition.startsWith("r")){
+    if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("r")){
       Rectangle swtField = textFieldSwt.getBounds();
       Rectangle swtPrompt = new Rectangle(swtField.x + swtField.width, swtField.y, 0, swtField.height);
-      float hight = pos().height();
+      float hight = widgg.pos().height();
       final Font promptFont;
       if(hight <2.0){
         promptFont = mng.propertiesGuiSwt.smallPromptFont;  
@@ -196,7 +192,7 @@ public class SwtTextFieldWrapper extends GralTextField
       }
       promptSwt = new SwtTransparentLabel(mng.getCurrentPanel(), SWT.TRANSPARENT);
       promptSwt.setFont(promptFont);
-      promptSwt.setText(prompt);
+      promptSwt.setText(prompt());
       Point promptSize = promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
       swtPrompt.width = promptSize.x;
       promptSwt.setBounds(swtPrompt);
@@ -205,32 +201,38 @@ public class SwtTextFieldWrapper extends GralTextField
     }
     //
     textFieldSwt.setData(this);
-    if(!editable){
-      mng.registerShowField(this);
+    if(!widgg.isEditable()){
+      mng.registerShowField(widgg);
     }
-    mng.registerWidget(this);
+    swtWidgWrapper = new SwtWidgetSimpleWrapper(textFieldSwt, mng);
 
+    mng.registerWidget(widgg);
+    
+  }
+
+  
+  
+  /**Creates a SwtTextField. It is package private, only called from the {@link SwtMng}.
+   * @param widgg
+   * <br>
+   * <b>Prompting</b>: The parameter promptStylePosition determines where a prompt is showing.
+   * <ul>
+   * <li>"t": prompt above, calculates inside position
+   * <li>"r": prompt right, calculates outside position.
+   * </ul>
+   * @param name The name to register it.
+   * @param editable false then show field
+   * @param prompt maybe null, propmt text
+   * @param promptStylePosition maybe null, prompt position
+   * @param mng
+   */
+  static void createTextField(GralTextField widgg, GralMng mng){
+    SwtTextFieldWrapper widgswt = new SwtTextFieldWrapper(widgg, (SwtMng)mng);
   }
   
   
-  
-  
-  @Override public void setTextStyle(GralColor color, GralFont font)
-  {
-    SwtProperties props = ((SwtMng)itsMng).propertiesGuiSwt;
-    if(color !=null){
-      textFieldSwt.setForeground(props.colorSwt(color));
-    }
-    if(font !=null){
-      textFieldSwt.setFont(props.fontSwt(font));
-    }
-  }
+  @Override public GralRectangle getPixelPositionSize(){ return swtWidgWrapper.getPixelPositionSize(); }
 
-
-  @Override public void setEditable(boolean editable){
-    super.setEditable(editable);
-    textFieldSwt.setEditable(editable);
-  }
 
 
   
@@ -259,8 +261,6 @@ public class SwtTextFieldWrapper extends GralTextField
   }
   */
   
-  @Override public int getCursorPos(){ return textFieldSwt.getCaretPosition(); }
-
 
   
   
@@ -268,33 +268,46 @@ public class SwtTextFieldWrapper extends GralTextField
     int catastrophicalCount = 0;
     int chg;
     if(textFieldSwt !=null){ //do nothing if the graphic implementation widget is removed.
-      do{
-        chg = this.dyda.whatIsChanged.get();
+      GralWidget.DynamicData dyda = dyda();
+      while( (chg = getChanged()) !=0){ //widgg.dyda.whatIsChanged.get();
         if(++catastrophicalCount > 10000) 
           throw new RuntimeException("atomic failed");
-        if((chg & ImplAccess.chgText) !=0 && text!=null){ 
-          textFieldSwt.setText(text);
+        if((chg & chgText) !=0 && dyda.displayedText !=null){ 
+          textFieldSwt.setText(dyda.displayedText);
           final int selectionStart, selectionEnd;
-          final int zText = text.length();
-          if(caretPos <0){
-            selectionEnd = text.length(); selectionStart = selectionEnd; // -1;
+          final int zText = dyda.displayedText.length();
+          if(caretPos() <0){
+            selectionEnd = dyda.displayedText.length(); selectionStart = selectionEnd; // -1;
           }
-          else if(caretPos >0){
-            selectionEnd = caretPos > zText ? zText : caretPos;
+          else if(caretPos() >0){
+            selectionEnd = caretPos() > zText ? zText : caretPos();
             selectionStart = selectionEnd; // -1;
           } else {
-            assert(caretPos ==0);
+            assert(caretPos() ==0);
             selectionEnd = selectionStart =-1;  //dont call
           }
           if(selectionStart >=0){
             textFieldSwt.setSelection(selectionStart, selectionEnd);
           }
         }
-        if((chg & ImplAccess.chgColorText) !=0){ textFieldSwt.setForeground(((SwtMng)itsMng).getColorImpl(dyda.textColor)); }
-        if((chg & ImplAccess.chgColorBack) !=0){ textFieldSwt.setBackground(((SwtMng)itsMng).getColorImpl(dyda.backColor)); }
+        if((chg & chgColorText)!=0){
+          SwtProperties props = swtWidgWrapper.mng.propertiesGuiSwt;
+          if(dyda.textColor !=null){
+            textFieldSwt.setForeground(props.colorSwt(dyda.textColor));
+          }
+          if(fontText() !=null){
+            textFieldSwt.setFont(props.fontSwt(fontText()));
+          }
+
+        }
+        if((chg & chgCursor) !=0){ 
+          textFieldSwt.setSelection(caretPos());
+        }
+        if((chg & chgColorText) !=0){ textFieldSwt.setForeground(swtWidgWrapper.mng.getColorImpl(dyda().textColor)); }
+        if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(swtWidgWrapper.mng.getColorImpl(dyda().backColor)); }
         textFieldSwt.redraw();
-      //System.out.println("SwtTextField " + name + ":" + text);
-      } while(!dyda.whatIsChanged.compareAndSet(chg, 0));
+        acknChanged(chg);
+      }
     }
   }
 
@@ -308,9 +321,11 @@ public class SwtTextFieldWrapper extends GralTextField
 
    * @see org.vishia.gral.base.GralTextField#setMouseAction(org.vishia.gral.ifc.GralUserAction)
    */
-  @Override public void setMouseAction(GralUserAction action)
+  //@Override 
+  @Deprecated
+  public void setMouseAction(GralUserAction action)
   {
-    if(action !=null){ setActionChange(action); }
+    if(action !=null){ widgg.setActionChange(action); }
     SwtGralMouseListener.MouseListenerGralAction mouseListener = 
       new SwtGralMouseListener.MouseListenerGralAction(null, GralMouseWidgetAction_ifc.mUserAll);
     textFieldSwt.addMouseListener(mouseListener);  
@@ -321,29 +336,14 @@ public class SwtTextFieldWrapper extends GralTextField
   }
 
   
-  @Override public String getPromptLabelImpl(){ return promptSwt.getText(); }
 
 
-  @Override public GralColor setBackgroundColor(GralColor color)
-  { return SwtWidgetHelper.setBackgroundColor(color, textFieldSwt);
-  }
-  
-
-  @Override public GralColor setForegroundColor(GralColor color)
-  { return SwtWidgetHelper.setForegroundColor(color, textFieldSwt);
-  }
-  
   
   @Override public boolean setFocusGThread()
   { return SwtWidgetHelper.setFocusOfTabSwt(textFieldSwt);
   }
 
   
-  @Override public int setCursorPos(int pos){
-    int oldPos = textFieldSwt.getCaretPosition();
-    textFieldSwt.setSelection(pos);
-    return oldPos;
-  }
 
   @Override public void removeWidgetImplementation()
   {
@@ -364,16 +364,26 @@ public class SwtTextFieldWrapper extends GralTextField
   }
   
   
-  
-  
-  DragDetectListener dragListener = new DragDetectListener()
-  { @Override public void dragDetected(DragDetectEvent e)
-    {
-      // TODO Auto-generated method stub
-      stop();
+  protected void textFieldFocusGained(){
+    super.focusGained();  //set HtmlHelp etc.
+    if(actionChanging() != null){
+      actionChanging().exec(KeyCode.focusGained, widgg, dyda().displayedText);
     }
-  };
-
+    if(dyda().displayedText !=null){
+      textFieldSwt.setText(dyda().displayedText);
+    }
+  }
+  
+  
+  protected void focusLost(){
+    String text = textFieldSwt.getText();
+    dyda().displayedText = text;  //transfer the current text
+    dyda().displayedText = text;
+    caretPos(textFieldSwt.getCaretPosition());
+    if(actionChanging() != null){
+      actionChanging().exec(KeyCode.focusLost, widgg, text);
+    }
+  }
   
   
   /**For edit able fields.
@@ -386,24 +396,14 @@ public class SwtTextFieldWrapper extends GralTextField
     }
 
     @Override public void focusLost(FocusEvent ev){
-      String text = textFieldSwt.getText();
-      SwtTextFieldWrapper.super.text = text;
-      dyda.displayedText = text;
-      SwtTextFieldWrapper.super.caretPos = textFieldSwt.getCaretPosition();
-      if(actionChanging != null){
-        actionChanging.exec(KeyCode.focusLost, SwtTextFieldWrapper.this, dyda.displayedText);
-      }
+      super.focusLost(ev);
+      SwtTextFieldWrapper.this.focusLost();
     }
 
     
     @Override public void focusGained(FocusEvent ev)
     { super.focusGained(ev);
-      if(actionChanging != null){
-        actionChanging.exec(KeyCode.focusGained, SwtTextFieldWrapper.this, dyda.displayedText);
-      }
-      if(dyda.displayedText !=null){
-        textFieldSwt.setText(dyda.displayedText);
-      }
+      SwtTextFieldWrapper.this.textFieldFocusGained();
     }
   }
   
@@ -412,11 +412,11 @@ public class SwtTextFieldWrapper extends GralTextField
   private class TextFieldModifyListener implements ModifyListener{
     @Override public void modifyText(ModifyEvent ev) {
       String text = textFieldSwt.getText();
-      SwtTextFieldWrapper.super.text = text;
+      SwtTextFieldWrapper.super.dyda().displayedText = text;
       //System.out.println("actionText");
       //SwtTextFieldWrapper.super.caretPos = textFieldSwt.getCaretPosition();
-      if(actionChanging != null){
-        actionChanging.exec(KeyCode.valueChanged, SwtTextFieldWrapper.this, dyda.displayedText);
+      if(actionChanging() != null){
+        actionChanging().exec(KeyCode.valueChanged, widgg, text);
       }
       //if(dyda.displayedText !=null){
         //textFieldSwt.setText(dyda.displayedText);
@@ -427,18 +427,23 @@ public class SwtTextFieldWrapper extends GralTextField
   
  
   
-  protected SwtKeyListener swtKeyListener = new SwtKeyListener(itsMng._impl.gralKeyListener)
+  protected class TextFieldKeyListener extends SwtKeyListener
   {
+
+    public TextFieldKeyListener(GralKeyListener keyAction)
+    { super(keyAction);
+    }
 
     @Override public final boolean specialKeysOfWidgetType(int key, GralWidget widgg, Object widgImpl){ 
       boolean bDone = true;
       if(KeyCode.isWritingKey(key)){
-        bTextChanged = true;
+        setTextChanged();
       }
       if(key != KeyCode.enter && KeyCode.isWritingOrTextNavigationKey(key)){
         bDone = true;
       } else {
         boolean bUserOk;
+        GralTextFieldUser_ifc user = user();
         if(user !=null){
           Point selection = textFieldSwt.getSelection();
           bUserOk = user.userKey(key

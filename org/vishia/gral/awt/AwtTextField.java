@@ -50,8 +50,6 @@ public class AwtTextField extends GralTextField
     return widgetAwt;
   }
 
-  @Override public String getPromptLabelImpl(){ return promptSwt.getText(); }
-
 
   
   @Override public boolean setFocusGThread()
@@ -109,12 +107,6 @@ public static class AwtTextFieldImpl extends TextField implements AwtWidget
     
   }
 
-  @Override
-  public void setMouseAction(GralUserAction action)
-  {
-    // TODO Auto-generated method stub
-    
-  }
 
   @Override
   public void setTextStyle(GralColor color, GralFont font)
@@ -135,8 +127,8 @@ public static class AwtTextFieldImpl extends TextField implements AwtWidget
     int catastrophicalCount = 0;
     do{
       if(++catastrophicalCount > 10000) throw new RuntimeException("atomic failed");
-      if((chg & ImplAccess.chgText) !=0  && text!=null){ 
-        widgetAwt.setText(text); 
+      if((chg & ImplAccess.chgText) !=0  && dyda.displayedText !=null){ 
+        widgetAwt.setText(dyda.displayedText); 
       }
       if((chg & ImplAccess.chgColorText) !=0){ widgetAwt.setForeground(((AwtWidgetMng)itsMng).getColorImpl(dyda.textColor)); }
       if((chg & ImplAccess.chgColorBack) !=0){ widgetAwt.setBackground(((AwtWidgetMng)itsMng).getColorImpl(dyda.backColor)); }

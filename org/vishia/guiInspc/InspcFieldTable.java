@@ -3,6 +3,7 @@ package org.vishia.guiInspc;
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralTableLine_ifc;
@@ -59,6 +60,8 @@ public class InspcFieldTable
   /**The window to present. */
   private final GralWindow wind;
   
+  private final GralTextField widgPath;
+  
   /**Table of fields, type and value. */
   private final GralTable<Object> widgTable;
 
@@ -68,6 +71,7 @@ public class InspcFieldTable
   {
     super();
     this.wind = new GralWindow("InspcFieldTableWind", "Fields of ...", GralWindow_ifc.windOnTop);
+    this.widgPath = new GralTextField("InspcFieldTableWind");
     this.widgTable = new GralTable<Object>("InspcFieldTable", new int[]{20, 0, -10});
     this.variableMng = variableMng;
   }

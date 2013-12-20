@@ -80,6 +80,17 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
   @Override public Container getCurrentPanel(){ return (Container)pos.panel.getPanelImpl(); }
 
 
+  @Override public void setToPanel(GralWidget widgg){
+    if(widgg instanceof GralHorizontalSelector<?>){
+      //SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, (GralHorizontalSelector<?>)widgg);
+      registerWidget(widgg);
+    } else if(widgg instanceof GralTable<?>){
+      //AwtTable.addTable((GralTable<?>)widgg, this);
+    }
+  }
+  
+
+  
   
   /** Adds a text field for showing or editing a text value.
    * 
@@ -318,12 +329,6 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
   {
     return null;  
   }
-
-  @Override public void add(GralHorizontalSelector<?> sel){
-    //SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, sel);
-    //sel.guiImplAccess.setWidgetImpl(swtSel);
-  }
-  
 
   
   

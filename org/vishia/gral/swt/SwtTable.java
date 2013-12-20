@@ -222,7 +222,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
       
       
   /*package private*/ 
-  static void addTable(GralTable<?> gralTable, SwtMng mng) {
+  static void createTable(GralTable<?> gralTable, SwtMng mng) {
     
     Composite parent = mng.getCurrentPanel();
     @SuppressWarnings("unchecked")

@@ -346,11 +346,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   
   
-  @Override public void setToPanel(GralMngBuild_ifc mng) throws IllegalStateException {
-    if(wdgImpl !=null) throw new IllegalStateException("setToPanel faulty call - GralTable;");
-    mng.add(this);
-  }
-  
   
   public int nrofLinesVisibleMax(){ return zLineVisibleMax; }
   

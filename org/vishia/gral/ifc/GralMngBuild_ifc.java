@@ -350,7 +350,7 @@ public interface GralMngBuild_ifc
   );
   
   
-  public void add(GralHorizontalSelector<?> sel);
+  //public void add(GralHorizontalSelector<?> sel);
 
   
   /**Adds a button which saves its state, pressed or non-pressed.
@@ -469,8 +469,11 @@ public interface GralMngBuild_ifc
   @Deprecated
   GralTable addTable(String sName, int height, int[] columnWidths);
 
-  void add(GralTable<?> table);
+  //void add(GralTable<?> table);
   
+  
+  
+  void setToPanel(GralWidget widgg);
 
   /**Adds a text to the current panel at given position with standard colors, left origin.
    * The size of text is calculated using the height of positioning values.

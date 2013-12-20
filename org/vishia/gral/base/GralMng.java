@@ -54,6 +54,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Changes:
    * <ul>
+   * <li>2013-12-21 Hartmut new: {@link #setToPanel(GralWidget)} for all set to panel actions. That method handles all widget types. 
    * <li>2013-03-20 Hartmut adap: {@link #actionFileSelect} with setText(...), now the file select field was filled.
    * <li>2012-08-20 Hartmut new: {@link #getWidgetsPermanentlyUpdating()} created but not used yet because 
    *   {@link #refreshCurvesFromVariable(VariableContainer_ifc)} has the necessary functionality.

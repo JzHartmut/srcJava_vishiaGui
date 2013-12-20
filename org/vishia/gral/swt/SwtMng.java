@@ -120,6 +120,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 	/**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
 	 * Changes:
 	 * <ul>
+   * <li>2013-12-21 Hartmut new: {@link #setToPanel(GralWidget)} instanciates all widget types. 
 	 * <li>2012-07-13 Hartmut chg: {@link #resizeWidget(GralWidget, int, int)} can work with more as one widget implementation.
 	 *   But it isn't test and used yet. Size of any implementation widget?
 	 * <li>2012-03-17 Hartmut chg: some changes for {@link #setPosAndSizeSwt(Control, int, int)} etc.
@@ -330,6 +331,23 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   @Override public Composite getCurrentPanel(){ return (Composite)pos.panel.getPanelImpl(); }
+
+  
+  @Override public void setToPanel(GralWidget widgg){
+    if(widgg instanceof GralTextField){
+      SwtTextFieldWrapper.createTextField((GralTextField)widgg, this);  //This may be the best variant.
+    } else if(widgg instanceof GralHorizontalSelector<?>){
+      SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, (GralHorizontalSelector<?>)widgg);
+      registerWidget(widgg);
+    } else if(widgg instanceof GralTable<?>){
+      SwtTable.createTable((GralTable<?>)widgg, this);  //This may be the best variant.
+    } else if(widgg instanceof GralWindow){
+      createWindow((GralWindow)widgg);
+    }
+  }
+  
+
+  
 
   
   
@@ -763,139 +781,15 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     if(name !=null && name.charAt(0) == '$'){
       name = sCurrPanel + name.substring(1);
     }
-    return new SwtTextFieldWrapper(name, editable, prompt, promptStylePosition, this);
+    GralTextField widgg = new GralTextField(name);
+    widgg.setPrompt(prompt, promptStylePosition);
+    widgg.setEditable(editable);
+    SwtTextFieldWrapper.createTextField(widgg, this);   
+    return widgg;
+    //return new SwtTextFieldWrapper(name, editable, prompt, promptStylePosition, this);
   }
 
   
-  
-  /** Adds a text field for showing or editing a text value.
-   * 
-   * @param sName The registering name
-   * @param width Number of grid units for length
-   * @param editable true than edit-able, false to show content 
-   * @param prompt If not null, than a description label is shown
-   * @param promptStylePosition Position and size of description label:
-   *   upper case letter: normal font, lower case letter: small font
-   *   'l' left, 't' top (above field) 
-   * @return
-   */
-  public GralTextField XXXaddTextField(String name, boolean editable, String prompt, String promptStylePosition)
-  { Composite panelSwt = (Composite)pos.panel.getPanelImpl();
-    SwtTextFieldWrapper widgetInfo = new SwtTextFieldWrapper(name, panelSwt, editable ? 'T' : 'S', this);
-    //SwtStyledTextFieldWrapper widgetInfo = new SwtStyledTextFieldWrapper(name, (Composite)pos.panel.getPanelImpl(), editable ? 'T' : 'S', this);
-    //StyledText widgetSwt = widgetInfo.textFieldSwt;
-    ///
-    widgetInfo.setPanelMng(this);
-    Text widgetSwt;
-    //
-    if(prompt != null && promptStylePosition.startsWith("t")){
-      setNextPosition();
-      final Font promptFont;
-      char sizeFontPrompt;
-      GralRectangle boundsAll, boundsPrompt, boundsField;
-      final GralPos posPrompt = new GralPos(), posField = new GralPos();
-      boundsAll = calcWidgetPosAndSize(this.pos, 800, 600, 100, 20);
-      float ySize = pos.height();
-      //float xSize = pos.width();
-      //posPrompt from top, 
-      float yPosPrompt, heightPrompt, heightText;
-      //switch(promptStylePosition){
-        //case 't':{
-          if(ySize <= 2.5){ //it is very small for top-prompt:
-            yPosPrompt = 1.0f;  //no more less than 1/2 normal line. 
-            heightPrompt = 1.0f;
-            heightText = ySize - 0.7f;
-            if(heightText < 1.0f){ heightText = 1.0f; }
-          } else if(ySize <=4.0){ //it is normally
-            heightPrompt = ySize - 2.0f + (4.0f - ySize) * 0.5f; 
-            if(heightPrompt < 1.0f){ heightPrompt = 1.0f; }
-            yPosPrompt = ySize - heightPrompt + 0.2f;  //no more less than 1/2 normal line. 
-            heightText = 2.0f;
-          } else { //greater then 4.0
-            yPosPrompt = ySize * 0.5f;
-            heightPrompt = ySize * 0.4f;;
-            heightText = ySize * 0.5f;
-          }
-          //from top, size of prompt
-          posPrompt.setPosition(this.pos, GralPos.same - ySize + yPosPrompt, GralPos.size - heightPrompt, GralPos.same, GralPos.same, 0, '.');
-          //from bottom line, size of text
-          posField.setPosition(this.pos, GralPos.same, GralPos.size - heightText, GralPos.same, GralPos.same, 0, '.');
-        //} break;
-      //}
-      promptFont = propertiesGuiSwt.getTextFontSwt(heightPrompt, GralFont.typeSansSerif, GralFont.styleNormal); //.smallPromptFont;
-      boundsPrompt = calcWidgetPosAndSize(posPrompt, boundsAll.dx, boundsAll.dy, 10,100);
-      boundsField = calcWidgetPosAndSize(posField, boundsAll.dx, boundsAll.dy, 10,100);
-      widgetInfo.promptSwt = new SwtTransparentLabel(panelSwt, SWT.TRANSPARENT);
-      widgetInfo.promptSwt.setFont(promptFont);
-      widgetInfo.promptSwt.setText(prompt);
-      widgetInfo.promptSwt.setBackground(null);
-      Point promptSize = widgetInfo.promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-      if(promptSize.x > boundsPrompt.dx){
-        boundsPrompt.dx = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
-      }
-      widgetSwt =  new Text(panelSwt, SWT.SINGLE);
-      widgetInfo.textFieldSwt = widgetSwt;
-      widgetSwt.setBounds(boundsField.x, boundsField.y, boundsField.dx, boundsField.dy);
-      widgetInfo.promptSwt.setBounds(boundsPrompt.x, boundsPrompt.y, boundsPrompt.dx, boundsPrompt.dy+1);
-      posUsed = true;
-      
-    } else {
-      //without prompt
-      widgetSwt =  new Text(panelSwt, SWT.SINGLE);
-      widgetInfo.textFieldSwt = widgetSwt;
-      setPosAndSize_(widgetSwt);
-    }
-    widgetSwt.setFont(propertiesGuiSwt.stdInputFont);
-    widgetSwt.setEditable(editable);
-    if(editable)
-      //widgetSwt.setDragDetect(true);
-      //widgetSwt.addDragDetectListener(widgetInfo.dragListener);
-      
-      stop();
-    widgetSwt.setBackground(propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));
-    widgetSwt.addFocusListener(focusListener);
-
-    Listener[] oldMouseListener = widgetSwt.getListeners(SWT.MouseDown);
-    for(Listener lst: oldMouseListener){
-      widgetSwt.removeListener(SWT.MouseDown, lst);
-    }
-    widgetSwt.addMouseListener(mouseClickForInfo);
-    
-    
-    if(prompt != null && promptStylePosition.startsWith("r")){
-      Rectangle swtField = widgetSwt.getBounds();
-      Rectangle swtPrompt = new Rectangle(swtField.x + swtField.width, swtField.y, 0, swtField.height);
-      float hight = this.pos.height();
-      final Font promptFont;
-      if(hight <2.0){
-        promptFont = propertiesGuiSwt.smallPromptFont;  
-      } else { 
-        promptFont = propertiesGuiSwt.stdInputFont;  
-      }
-      widgetInfo.promptSwt = new SwtTransparentLabel((Composite)pos.panel.getPanelImpl(), SWT.TRANSPARENT);
-      widgetInfo.promptSwt.setFont(promptFont);
-      widgetInfo.promptSwt.setText(prompt);
-      Point promptSize = widgetInfo.promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-      swtPrompt.width = promptSize.x;
-      widgetInfo.promptSwt.setBounds(swtPrompt);
-      
-      
-    }
-    //
-    if(widgetInfo.name !=null && widgetInfo.name.charAt(0) == '$'){
-    	widgetInfo.name = sCurrPanel + widgetInfo.name.substring(1);
-    }
-    //link the widget with is information together.
-    widgetSwt.setData(widgetInfo);
-    if(widgetInfo.name !=null){
-      if(!editable){
-    	  showFields.put(widgetInfo.name, widgetInfo);
-    	}
-    }
-    registerWidget(widgetInfo);
-    return widgetInfo; 
-  
-  }
   
 
   
@@ -1167,14 +1061,6 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 
   
   
-
-  @Override public void add(GralHorizontalSelector<?> sel){
-    SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, sel);
-    //sel.implMethodWidget_.setWidgetImpl(swtSel);
-    registerWidget(sel);
-  }
-  
-  
   
   @Override public GralLed addLed(
   	String sName
@@ -1230,11 +1116,6 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     return SwtTable.addTable(table, this, sName, height, columnWidths);
 
   }
-  
-  @Override public void add(GralTable<?> table){
-    SwtTable.addTable(table, this);
-  }
-
   
   
   @Override protected GralMenu XXXaddPopupMenu(String sName){

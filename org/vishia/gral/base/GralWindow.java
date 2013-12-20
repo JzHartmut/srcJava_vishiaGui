@@ -216,10 +216,6 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   
   
   
-  @Override public void setToPanel(GralMngBuild_ifc mng) throws IllegalStateException {
-    mng.createWindow(this);
-  }
-
 
   @Override
   public Object getPanelImpl()

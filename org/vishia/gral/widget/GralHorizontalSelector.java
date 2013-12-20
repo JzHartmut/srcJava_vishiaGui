@@ -98,10 +98,6 @@ public class GralHorizontalSelector<UserData> extends GralWidget
   }
   
   
-  @Override public void setToPanel(GralMngBuild_ifc mng) throws IllegalStateException {
-    mng.add(this);
-  }
-  
   /**Adds a item to show.
    * @param text
    * @param position

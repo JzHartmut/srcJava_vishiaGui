@@ -81,8 +81,6 @@ public class SwtTextBox extends GralTextBox
   { return textFieldSwt;
   }
 
-  @Override public String getPromptLabelImpl(){ return promptSwt.getText(); }
-
 
   @Override public GralColor setBackgroundColor(GralColor color)
   { return SwtWidgetHelper.setBackgroundColor(color, textFieldSwt);
@@ -124,8 +122,8 @@ public class SwtTextBox extends GralTextBox
       whatisChanged1 = dyda.whatIsChanged.get();  //maybe new requests
       if(++catastrophicCount > 10000) throw new RuntimeException("");
     }
-    if((whatisChanged1 & ImplAccess.chgText) !=0 && text!=null){
-      textFieldSwt.setText(text);
+    if((whatisChanged1 & ImplAccess.chgText) !=0 && dyda.displayedText !=null){
+      textFieldSwt.setText(dyda.displayedText);
     }
     textFieldSwt.redraw(); textFieldSwt.update(); 
   }
@@ -153,15 +151,6 @@ public class SwtTextBox extends GralTextBox
     }
   }
 
-  @Override
-  public void setMouseAction(GralUserAction action)
-  {
-    // TODO Auto-generated method stub
-    
-  }
-
-
-  
   
   protected SwtKeyListener swtKeyListener = new SwtKeyListener(itsMng._impl.gralKeyListener)
   {

@@ -168,6 +168,14 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-12-21 Hartmut chg: {@link #repaint()} invokes redraw immediately if it is in graphic thread.
+   *   It invokes {@link #repaint(int, int)} with the {@link #repaintDelay} if it is not in graphic thread.
+   *   It does nothing if the implementation layer widget is not created yet. It means it can invoked
+   *   without parameter in any case.
+   * <li>2013-12-21 Hartmut chg: {@link ImplAccess#setDragEnable(int)} and setDropEnable moved from the core class.
+   *   It is adapt after change {@link GralTextField}. 
+   * <li>2013-12-21 Hartmut new: {@link #setToPanel(GralMngBuild_ifc)} is final now and invokes 
+   *   {@link GralMngBuild_ifc#setToPanel(GralWidget)}. That method handles all widget types. 
    * <li>2013-11-11 Hartmut new: {@link #refreshFromVariable(VariableContainer_ifc, long, GralColor, GralColor)}
    *   which shows old values grayed. 
    * <li>2013-11-11 Hartmut chg: {@link #setFocus()} searches the {@link GralTabbedPanel} where the widget is
@@ -442,7 +450,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   protected boolean bShouldInitialize = true;
   
   
-  /**Set to true from any listener of the implementation level if the data of the widget was changed from Gui handling.
+  /**Set to true from any listener of the implementation level if the data of the widget was changed from GUI handling.
    * If the data are changed from any Gral method invocation, this bit should not set to true.
    * For example a key listener changes the content of a text edit field, then this bit should be set.
    * This bit should be cleared if the GUI-content of the widget is synchronized with the widget data cells. 
@@ -471,16 +479,17 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * This reference is null if the GralWidgets extends the Graphic specific implementation widget.
    * It should be used in the future (2013-06).
    */
-  public GralWidgImpl_ifc wdgImpl;
+  public ImplAccess wdgImpl;
   
   /**This inner class holds the dynamic data of a widget.
    * This data are existent for any widget independent of its type.
    * It can be used in a specific way depending on the widget type.
    */
-  protected final static class DynamicData {
+  public final static class DynamicData {
     
-    /**32 bit what is changed, see {@link GralWidget#chgColorText} etc. */
-    public AtomicInteger whatIsChanged = new AtomicInteger();
+    /**32 bit what is changed, see {@link GralWidget#chgColorText} etc. 
+     * TODO should be protected. */
+    public AtomicInteger whatIsChanged = new AtomicInteger(); 
     
     /**Sets what is changed, Bits defined in {@link GralWidget.ImplAccess#chgColorBack} etc.
      * @param mask one bit or some bits. ImplAccess.chgXYZ
@@ -561,20 +570,21 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   
-  /**Sets this widget to any panel. It creates the graphical appearance using the capabilities
-   * of the derivation of the mng for the systems graphic level.
+  /**Sets this widget to the current panel at the current given position. 
+   * It creates the graphical appearance using the capabilities of the derived GralMng for the systems graphic level.
+   * The type of the derived GralWidget is tested (instanceof) to create the correct graphical widget.
    * 
-   * @param mng
-   * @throws IllegalStateException This routine can be called only if the graphic widget is not 
-   *   existing. It is one time. It may be more as one time if {@link #removeWidgetImplementation()}
+   * @param mng The instance of derived Graphic Manager
+   * @throws IllegalStateException This routine can be called only if the graphic implementation widget is not 
+   *   existing. It is one time after startup or more as one time if {@link #removeWidgetImplementation()}
    *   was called. 
-   * @throws IllegalArgumentException if the routine is not overridden.  
    */
-  public void setToPanel(GralMngBuild_ifc mng) throws IllegalStateException {
-    throw new IllegalArgumentException("GralWidget - setToPanel should be overridden");
+  public final void setToPanel(GralMngBuild_ifc mng) throws IllegalStateException {
+    if(wdgImpl !=null) throw new IllegalStateException("setToPanel faulty call - GralTable;");
+    mng.setToPanel(this);
   }
   
-  
+
   
   public GralPos pos(){ return pos; } 
   
@@ -745,20 +755,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   public void setDragEnable(GralUserAction action, int dragType)
   {
     actionDrag = action;
-    setDragEnable(dragType);  // call implementation specific drop handling. 
+    if(wdgImpl !=null) wdgImpl.setDragEnable(dragType);  // call implementation specific drop handling. 
   }
 
-  /**Implementation routine to set receiving a drag event and initializes the drag feature of the widget.
-   * A overridden routine should be implemented for the implementation graphic layer widget.
-   * This routine is invoked when it isn't overridden, it throws an exception because the drag feature
-   * isn't supported for the implementation.
-   * @param dragType one of {@link org.vishia.util.KeyCode#dragFiles} or ..dragText
-   */
-  protected void setDragEnable(int dragType)
-  { //default implementation: causes an exception. The type must override it.
-    throw new IllegalArgumentException("drag not supported for this widget type");
-  }
-  
   public GralUserAction getActionDrag(){ return actionDrag; }
   
   
@@ -769,17 +768,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   public void setDropEnable(GralUserAction action, int dropType)
   {
     actionDrop = action;
-    setDropEnable(dropType);  // call implementation specific drop handling. 
+    if(wdgImpl !=null) wdgImpl.setDropEnable(dropType);  // call implementation specific drop handling. 
   }
 
-  /**Implementation routine to set receiving a drop event and initializes the drop feature of the widget.
-   * @param dropType one of {@link org.vishia.util.KeyCode#dropFiles} or ..dropText
-   */
-  protected void setDropEnable(int dropType)
-  { //default implementation: causes an exception. The type must override it.
-    throw new IllegalArgumentException("drop not supported for this widget type");
-  }
-  
   public GralUserAction getActionDrop(){ return actionDrop; }
   
   
@@ -1156,10 +1147,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     //System.err.println(Assert.stackInfo("GralWidget - non overridden setText called; Widget = " + name + "; text=" + text, 5));
   }
   
-  
-  public String getText(){
-    return dyda.displayedText;
-  }
+  /**Get the text of this widget. It can be invoked in any thread. 
+   * If it is a edit able text field, it returns the current text after focus lost 
+   * or pressing any control key.
+   * @return The current text.
+   */
+  public String getText(){ return dyda.displayedText == null? "" : dyda.displayedText; }
   
   
   /**Sets the border of the value range for showing. 
@@ -1244,7 +1237,15 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   public GralPanelContent getItsPanel(){ return pos.panel; }
   
   
-  @Override public void repaint(){ repaint(0, 0); }
+  @Override public void repaint(){ 
+    if(itsMng !=null){ //NOTE: set of changes is possible before setToPanel was called. 
+      if(itsMng.currThreadIsGraphic()){
+        repaintGthread();     //do it immediately if no thread switch is necessary.
+      } else {
+        repaintRequ.addToGraphicThread(itsMng.gralDevice(), repaintDelay);  //TODO repaintDelayMax
+      }
+    }
+  }
   
   
   /**The Implementation of repaint calls {@link #repaintGthread()} if it is the graphic thread and the delay is 0.
@@ -1252,12 +1253,13 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @see org.vishia.gral.ifc.GralWidget_ifc#repaint(int, int)
    */
   @Override public void repaint(int delay, int latest){
-    if(delay == 0 && itsMng.currThreadIsGraphic()){
-      repaintGthread();
-    } else {
-      repaintRequ.addToGraphicThread(itsMng.gralDevice(), delay);
+    if(itsMng !=null){ //NOTE: set of changes is possible before setToPanel was called. 
+      if(delay == 0 && itsMng.currThreadIsGraphic()){
+        repaintGthread();
+      } else {
+        repaintRequ.addToGraphicThread(itsMng.gralDevice(), delay);
+      }
     }
-    //itsMng.setInfoDelayed(repaintRequ, delay);
   }
   
   /**Removes the widget from the lists in its panel and from the graphical representation.
@@ -1298,7 +1300,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     public static final int chgPos = 0x20000000, chgVisible = 0x40000000, chgInvisible = 0x80000000;
     
     /**This is only documentation. These bits are used specialized in derived classes.*/
-    public static final int chgBitsDerived = 0x0ff00000;
+    public static final int chgBitsDerived = 0x0ff0ff00;
 
     protected final GralWidget widgg;
     
@@ -1338,8 +1340,39 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       widgg.lastTimeSetVisible = System.currentTimeMillis();
     }
 
+    protected GralUserAction actionShow(){ return widgg.actionShow; }
+    
+    protected GralUserAction actionChanging(){ return widgg.actionChanging; }
+    
+    
+    protected GralWidget.DynamicData dyda(){ return widgg.dyda; }
+    
     //public void setWidgetImpl(GralWidgImpl_ifc widg, GralMng mng){ widgg.wdgImpl = widg; widgg.itsMng = mng; }
 
+    protected void setTextChanged(){ widgg.bTextChanged = true; }
+    
+    
+    /**Implementation routine to set receiving a drag event and initializes the drag feature of the widget.
+     * A overridden routine should be implemented for the implementation graphic layer widget.
+     * This routine is invoked when it isn't overridden, it throws an exception because the drag feature
+     * isn't supported for the implementation.
+     * @param dragType one of {@link org.vishia.util.KeyCode#dragFiles} or ..dragText
+     */
+    protected void setDragEnable(int dragType)
+    { //default implementation: causes an exception. The type must override it.
+      throw new IllegalArgumentException("drag not supported for this widget type");
+    }
+    
+    /**Implementation routine to set receiving a drop event and initializes the drop feature of the widget.
+     * @param dropType one of {@link org.vishia.util.KeyCode#dropFiles} or ..dropText
+     */
+    protected void setDropEnable(int dropType)
+    { //default implementation: causes an exception. The type must override it.
+      throw new IllegalArgumentException("drop not supported for this widget type");
+    }
+    
+
+    
     public int getChanged(){ return widgg.dyda.whatIsChanged.get(); }
     
     public void acknChanged(int mask){ widgg.dyda.acknChanged(mask); }

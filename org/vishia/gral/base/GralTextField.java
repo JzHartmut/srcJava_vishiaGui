@@ -11,15 +11,19 @@ import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.CalculatorExpr;
 import org.vishia.util.DataAccess;
+import org.vishia.util.Removeable;
 
 /**This is the base class for all widgets which represents a simple text.
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralTextField extends GralWidget implements GralTextField_ifc
+public class GralTextField extends GralWidget implements GralTextField_ifc
 {
   /**Version, history and license .
    * <ul>
+   * <li>2013-12-22 Hartmut chg: Now {@link GralTextField} uses the new concept of instantiation: It is not
+   *   the super class of the implementation class. But it provides {@link GralTextField.GraphicImplAccess}
+   *   as the super class. 
    * <li>2013-03-13 Hartmut new {@link #setText(CharSequence, int)}: supports {@link GralWidget_ifc#isNotEditableOrShouldInitialize()} to support 
    *   edit field handling.
    * <li>2013-03-04 Hartmut chg: The {@link #setText(CharSequence, int)} overwriting concept is faulty.
@@ -67,9 +71,12 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   @SuppressWarnings("hiding")
   public final static int version = 20130313;
   
-  protected String text = "";
+  //protected String text = "";
   
   protected int caretPos;
+  
+  /**The prompt to the text field. */
+  protected String sPrompt, sPromptStylePosition;
   
   //protected GralColor colorBack = GralColor.getColor("wh"), colorText = GralColor.getColor("bk");
   
@@ -87,6 +94,14 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   
   
   
+  public GralTextField(String name){
+    super(name, 't', null);
+    windowMng = null;
+    setBackColor(GralColor.getColor("wh"),0);
+    setTextColor(GralColor.getColor("bk"));
+  }
+  
+  
   public GralTextField(String name, char whatis, GralMng mng){
     super(name, whatis, mng);
     setBackColor(GralColor.getColor("wh"),0);
@@ -94,6 +109,16 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
     this.windowMng = mng.gralDevice;
   }
   
+  
+  
+  public void setPrompt(String sPrompt, String sPromptStylePosition){
+    this.sPrompt = sPrompt;
+    this.sPromptStylePosition = sPromptStylePosition;
+    if(wdgImpl !=null){
+      dyda.setChanged(GraphicImplAccess.chgPrompt);
+      repaint();
+    }
+  }
   
   void setUser(GralTextFieldUser_ifc user){
     this.user = user;
@@ -333,20 +358,12 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
     if(  dyda.displayedText == null   //set the text if no text is stored. Initially!
       //|| !bTextChanged                 //don't set the text if it is changed by user yet.  
          //&& 
-        || (!text.equals(textnew) || caretPos != this.caretPos)  //set the text only if it is changed.
+        || (!dyda.displayedText.equals(textnew) || caretPos != this.caretPos)  //set the text only if it is changed.
       ){                               //prevent invocation of setText() on non changed values to help move cursor, select etc.
-      text = dyda.displayedText = arg.toString();
+      dyda.displayedText = arg.toString();
       this.caretPos = caretPos;
-      int yet = dyda.whatIsChanged.get();
-      int catastrophicCount = 0;
-      while( !dyda.whatIsChanged.compareAndSet(yet, yet | ImplAccess.chgText)){ 
-        if(++catastrophicCount > 10000) throw new RuntimeException("");
-      }
-      if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
-        repaintGthread();
-      } else {
-        repaint(100,0);
-      }
+      dyda.setChanged(GralWidget.ImplAccess.chgText);
+      repaint();
     } //else: no change, do nothing. Therewith the field is able to edit on unchanged texts.
   }
   
@@ -357,18 +374,44 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
    * Implementation hint: It installs a mouse listener.
    * TODO: use GralMouseWidgetAction_ifc instead GralUserAction, use another action for mouse than change.
    */
-  abstract public void setMouseAction(GralUserAction action);
+  //abstract public void setMouseAction(GralUserAction action);
   
   
-  @Override public String getText(){ return text == null? "" : text; }
-   
 
+
+
+  @Override
+  public int getCursorPos(){ return caretPos; }
+
+
+  @Override
+  public int setCursorPos(int pos)
+  { int pos9 = caretPos;
+    if(pos != caretPos){
+      caretPos = pos;
+      dyda.setChanged(GraphicImplAccess.chgCursor);
+      repaint(repaintDelay, repaintDelayMax);
+    }
+    return pos9;  //the old
+  }
+
+
+  @Override public void setTextStyle(GralColor color, GralFont font)
+  {
+    fontText = font;
+    dyda.textColor = color;
+    dyda.setChanged(GralWidget.ImplAccess.chgColorText);
+    if(wdgImpl !=null){
+      repaint();
+    }
+  }
+  
 
   
   
   /**Returns the Label for a prompt or null if there isn't used a prompt
    */
-  abstract public String getPromptLabelImpl();
+  public final String getPromptLabelImpl(){ return sPrompt; }
   
   
   
@@ -404,7 +447,33 @@ public abstract class GralTextField extends GralWidget implements GralTextField_
   {
     @Override public boolean specialKeysOfWidgetType(int key, GralWidget widgg, Object widgImpl){ return false; }
   };
+
   
+  
+  public abstract class GraphicImplAccess extends GralWidget.ImplAccess
+  implements GralWidgImpl_ifc
+  {
+
+    public static final int chgPrompt = 0x100, chgCursor = 0x200;
+    
+    protected GraphicImplAccess(GralWidget widgg, GralMng mng)
+    {
+      super(widgg, mng);
+    }
+    
+    protected GralFont fontText(){ return GralTextField.this.fontText; }
+    
+    protected String prompt(){ return GralTextField.this.sPrompt; }
+    
+    protected String promptStylePosition(){ return GralTextField.this.sPromptStylePosition; }
+ 
+    protected int caretPos(){ return GralTextField.this.caretPos; }
+    
+    protected void caretPos(int newPos){ GralTextField.this.caretPos = newPos; }
+    
+    protected GralTextFieldUser_ifc user(){ return GralTextField.this.user; }
+    
+  }
   
   
 }
