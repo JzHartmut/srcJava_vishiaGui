@@ -331,19 +331,19 @@ private class InspcGuiCfg extends GuiCfg
     gralMng.selectPanel("primaryWindow");
     gralMng.setPosition(14, 84, 4, 64, 0, '.');
     fieldsA.setToPanel(gralMng);
-    GralMenu menu = super.guiW.getMenuBar();
     gralMng.selectPanel("primaryWindow");
     gralMng.setPosition(24, 94, 14, 74, 0, '.');
     fieldsB.setToPanel(gralMng);
-    menu.addMenuItemGthread("menuBarFieldsA", "&Window/open Fields A", fieldsA.actionOpenWindow);
-    menu.addMenuItemGthread("menuBarFieldsB", "&Window/open Fields B", fieldsB.actionOpenWindow);
+    GralMenu menu = super.guiW.getMenuBar();
+    menu.addMenuItemGthread("menuBarFieldsA", "&Window/open Fields &A", fieldsA.actionOpenWindow);
+    menu.addMenuItemGthread("menuBarFieldsB", "&Window/open Fields &B", fieldsB.actionOpenWindow);
     //
     if(user !=null){
       user.initGui(gralMng);
       user.addGuiMenu(gui.mainWindow());
     }
-    gui.addMenuBarArea9ItemGThread("menuHelp", "&Help/&Help", gui.getActionHelp());
-    gui.addMenuBarArea9ItemGThread("menuAbout", "&Help/&About", gui.getActionAbout());
+    menu.addMenuItemGthread("menuHelp", "&Help/&Help", gui.getActionHelp());
+    menu.addMenuItemGthread("menuAbout", "&Help/&About", gui.getActionAbout());
     gui.addMenuBarArea9ItemGThread("menuAbout", "&Help/e&Xit", gui.getActionAbout());
 
   }

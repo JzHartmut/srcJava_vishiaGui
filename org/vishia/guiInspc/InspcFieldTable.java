@@ -1,11 +1,13 @@
 package org.vishia.guiInspc;
 
 import org.vishia.byteData.VariableAccess_ifc;
+import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.base.GralTable.TableLineData;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -13,6 +15,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.inspectorAccessor.InspcMng;
 import org.vishia.inspectorAccessor.InspcStruct;
 import org.vishia.inspectorAccessor.InspcVariable;
+import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
 /**This class presents a window with one table and some buttons to view and edit all fields in one instance
@@ -60,19 +63,30 @@ public class InspcFieldTable
   /**The window to present. */
   private final GralWindow wind;
   
+  /**Shows the path in target to this struct. */
   private final GralTextField widgPath;
   
   /**Table of fields, type and value. */
-  private final GralTable<Object> widgTable;
+  private final GralTable<InspcStruct.Field> widgTable;
 
+  
+  private final GralButton btnBack, btnRefresh, btnShowAll;
+  
   private final InspcMng variableMng;
+  
+  
+  private String sPathStruct;
   
   public InspcFieldTable(InspcMng variableMng)
   {
     super();
     this.wind = new GralWindow("InspcFieldTableWind", "Fields of ...", GralWindow_ifc.windOnTop);
     this.widgPath = new GralTextField("InspcFieldTableWind");
-    this.widgTable = new GralTable<Object>("InspcFieldTable", new int[]{20, 0, -10});
+    this.widgTable = new GralTable<InspcStruct.Field>("InspcFieldTable", new int[]{20, 0, -10});
+    this.widgTable.setActionChange(actionChgTable);
+    this.btnBack = null; //new GralButton("@InspcFieldBack", null);
+    this.btnRefresh = null; //new GralButton("@InspcFieldRefresh", null);
+    this.btnShowAll = null; //new GralButton("@InspcFieldShowAll", null);
     this.variableMng = variableMng;
   }
   
@@ -87,27 +101,59 @@ public class InspcFieldTable
   
   
   
+  void chgTable(int key, GralTableLine_ifc<InspcStruct.Field> line){
+    if(key == KeyCode.enter){
+      InspcStruct.Field field = line.getUserData();
+      InspcVariable var = field.variable();
+      if(var == null){
+        String sPathVar = sPathStruct + '.' + field.name;
+        var = (InspcVariable)variableMng.getVariable(sPathVar);
+        if(var !=null){
+          field.setVariable(var);
+        }
+      }
+      if(var !=null){
+        var.requestValue(System.currentTimeMillis());
+        char cType = var.getType();
+        String sVal;
+        switch(cType){
+          case 'F': { float val = var.getFloat(); sVal = Float.toString(val); } break;
+          case 'I': { int val = var.getInt(); sVal = Integer.toHexString(val); } break;
+          default: { float val = var.getFloat(); sVal = Float.toString(val); }
+        }
+        line.setCellText(sVal, 1);
+      }
+      Assert.stop();
+    }
+    
+  }
+  
+  
   void fillTableWithFields(){
     GralWidget widgd = wind.gralMng().getWidgetInFocus();
     if(widgd !=null){
       String sDatapathWithPrefix = widgd.getDataPath();
       String sDatapath = widgd.gralMng().replaceDataPathPrefix(sDatapathWithPrefix);
-      widgPath.setText(sDatapath);
+      int posLastDot = sDatapath.lastIndexOf('.');
+      sPathStruct = sDatapath.substring(0, posLastDot);  //With device:path
       VariableAccess_ifc vari = variableMng.getVariable(sDatapath);
       if(vari instanceof InspcVariable){
         InspcVariable var = (InspcVariable)vari;
         InspcStruct struct = var.struct();
+        //- sPathStruct = struct.path();  //NOTE it is without device.
         widgTable.clearTable();
         if(struct.isUpdated()){
-          for(String field: struct.fieldIter()){
-            GralTableLine_ifc<Object> line = widgTable.addLine(field, null, field);
-            line.setCellText(field, 0);
+          for(InspcStruct.Field field: struct.fieldIter()){
+            GralTableLine_ifc<InspcStruct.Field> line = widgTable.addLine(field.name, null, field);
+            line.setCellText(field.name, 0);
+            line.setCellText(field.type, 2);
           }
         } else {
-          GralTableLine_ifc<Object> line = widgTable.addLine("$", null, null);
+          GralTableLine_ifc<InspcStruct.Field> line = widgTable.addLine("$", null, null);
           line.setCellText("pending request", 0);
         }
       }
+      widgPath.setText(sPathStruct);
     }
 
     wind.setVisible(true);
@@ -128,6 +174,27 @@ public class InspcFieldTable
       }
     }
   };
+
+  
+  
+  GralUserAction actionChgTable = new GralUserAction("InspcFieldTable - change Table"){
+    @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        assert(params[0] instanceof GralTableLine_ifc<?>);
+        @SuppressWarnings("unchecked")
+        GralTableLine_ifc<InspcStruct.Field> line = (GralTableLine_ifc<InspcStruct.Field>)params[0];
+        chgTable(key, line);
+        return true;
+      } else { 
+        return false;
+      }
+    }
+  };
+
+  
+  
+  
+  
   
   
 }

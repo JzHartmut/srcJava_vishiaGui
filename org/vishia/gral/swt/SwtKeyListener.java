@@ -5,6 +5,7 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Control;
 import org.vishia.gral.base.GralKeyListener;
 import org.vishia.gral.base.GralKeySpecial_ifc;
+import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralUserAction;
 
@@ -56,8 +57,9 @@ public class SwtKeyListener implements GralKeySpecial_ifc, KeyListener// extends
     if(source instanceof Control){
       swtControl = ((Control)source);
       Object oData = swtControl.getData();
-      if(oData instanceof GralWidget){
-        widgetDescr = (GralWidget)oData;
+      if(oData instanceof GralTextField.GraphicImplAccess){
+        GralTextField.GraphicImplAccess widgi = (GralTextField.GraphicImplAccess) oData;
+        widgetDescr = widgi.widgg;
       } else { widgetDescr = null;  }
     } else { 
       widgetDescr = null; 

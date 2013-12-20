@@ -1302,7 +1302,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     /**This is only documentation. These bits are used specialized in derived classes.*/
     public static final int chgBitsDerived = 0x0ff0ff00;
 
-    protected final GralWidget widgg;
+    public final GralWidget widgg;
     
     protected ImplAccess(GralWidget widgg, GralMng mng){
       this.widgg = widgg;
