@@ -175,10 +175,10 @@ public class GralCfgDesigner
 
   
   public void editFieldProperties(GralWidget widgd, GralRectangle xy)
-  { widgd = widgdInDialog = widggForDialog;
-    //widgdInDialog = widgd;
+  { //widgd = widgdInDialog = widggForDialog;
+    widgdInDialog = widggForDialog = widgd;
     if(widgdInDialog != null){
-      widgd = widgdInDialog = widggForDialog;
+      //widgd = widgdInDialog;
       GralCfgElement cfge = (GralCfgElement)widgd.getCfgElement();
       String sName, sDataPath, sText, sFormat, sShowMethod,  sActionMethod;
       String sPrompt, sPromptPos;

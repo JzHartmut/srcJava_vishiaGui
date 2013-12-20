@@ -1357,13 +1357,18 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     }
     
     @Override public void focusGained(FocusEvent ev)
-    { GralWidget widgd = (GralWidget)ev.widget.getData();
-      //widgd.wdgImpl.focusGained();
-      notifyFocus(widgd);
-      String htmlHelp = widgd.getHtmlHelp();
-      
-      if(htmlHelp !=null && applAdapter !=null){
-        applAdapter.setHelpUrl(htmlHelp);
+    { Object widgo = ev.widget.getData();
+      GralWidget widgd;
+      if(widgo instanceof GralWidget){ //the old form:
+        widgd = (GralWidget)widgo;  
+        notifyFocus(widgd);
+        String htmlHelp = widgd.getHtmlHelp();
+        
+        if(htmlHelp !=null && applAdapter !=null){
+          applAdapter.setHelpUrl(htmlHelp);
+        }
+      } else if(widgo instanceof GralWidget.ImplAccess){
+        ((GralWidget.ImplAccess)widgo).focusGained();
       }
     }
   }

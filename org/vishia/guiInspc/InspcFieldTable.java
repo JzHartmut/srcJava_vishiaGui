@@ -79,6 +79,8 @@ public class InspcFieldTable
   
   public void setToPanel(GralMng mng){
     wind.setToPanel(mng);
+    mng.setPosition(0, 2, 3, -5, 0, 'd');
+    widgPath.setToPanel(mng);
     mng.setPosition(2, -2, 0, 0, 0, 'd');
     widgTable.setToPanel(mng);
   }
@@ -90,6 +92,7 @@ public class InspcFieldTable
     if(widgd !=null){
       String sDatapathWithPrefix = widgd.getDataPath();
       String sDatapath = widgd.gralMng().replaceDataPathPrefix(sDatapathWithPrefix);
+      widgPath.setText(sDatapath);
       VariableAccess_ifc vari = variableMng.getVariable(sDatapath);
       if(vari instanceof InspcVariable){
         InspcVariable var = (InspcVariable)vari;

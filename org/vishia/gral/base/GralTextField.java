@@ -12,6 +12,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.CalculatorExpr;
 import org.vishia.util.DataAccess;
 import org.vishia.util.Removeable;
+import org.vishia.util.StringFunctions;
 
 /**This is the base class for all widgets which represents a simple text.
  * @author Hartmut Schorrig
@@ -353,12 +354,11 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
    */
   @Override public void setText(CharSequence arg, int caretPos)
   {
-    String textnew = arg.toString();
     bShouldInitialize= false;  //it is done.
     if(  dyda.displayedText == null   //set the text if no text is stored. Initially!
       //|| !bTextChanged                 //don't set the text if it is changed by user yet.  
          //&& 
-        || (!dyda.displayedText.equals(textnew) || caretPos != this.caretPos)  //set the text only if it is changed.
+        || (!StringFunctions.equals(dyda.displayedText,arg) || caretPos != this.caretPos)  //set the text only if it is changed.
       ){                               //prevent invocation of setText() on non changed values to help move cursor, select etc.
       dyda.displayedText = arg.toString();
       this.caretPos = caretPos;

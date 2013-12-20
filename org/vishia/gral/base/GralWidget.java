@@ -1322,7 +1322,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
      * It should be overridden only in a Gral widget inheritance only if necessary.
      */
     public void focusGained(){
-      System.out.println(Assert.stackInfo("GralWidget - Debuginfo; focusgained", 1, 10));
+      //System.out.println(Assert.stackInfo("GralWidget - Debuginfo; focusgained", 1, 10));
       if(widgg.htmlHelp !=null){
         widgg.itsMng.setHtmlHelp(widgg.htmlHelp);
       }
