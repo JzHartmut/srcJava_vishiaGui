@@ -2,6 +2,7 @@ package org.vishia.gral.base;
 
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralImageBase;
+import org.vishia.gral.ifc.GralUserAction;
 
 public class GralButton extends GralWidget
 {
@@ -86,12 +87,16 @@ public class GralButton extends GralWidget
   /**True if the button has three states: on, off, disabled. */
   protected boolean bThreeStateSwitch;
   
-  //public GralButton(String sName, GralWindowMng_ifc mainWindow, GralGridMngBase mng)
   public GralButton(String sName)
   {
     super(sName, 'B', null);  //GralWidget
-    //this.mng = mng;
-    //this.mainWindow = mainWindow;
+  }
+  
+  public GralButton(String sName, String sText, GralUserAction action)
+  {
+    super(sName, 'B', null);  //GralWidget
+    setText(sText);
+    setActionChange(action);
   }
   
   /**Declares the button to a switch button (switching on/off) with the given texts.

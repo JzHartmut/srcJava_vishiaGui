@@ -74,6 +74,7 @@ public class InspcFieldTable
   
   private final InspcMng variableMng;
   
+  private InspcStruct struct;
   
   private String sPathStruct;
   
@@ -84,26 +85,80 @@ public class InspcFieldTable
     this.widgPath = new GralTextField("InspcFieldTableWind");
     this.widgTable = new GralTable<InspcStruct.Field>("InspcFieldTable", new int[]{20, 0, -10});
     this.widgTable.setActionChange(actionChgTable);
-    this.btnBack = null; //new GralButton("@InspcFieldBack", null);
-    this.btnRefresh = null; //new GralButton("@InspcFieldRefresh", null);
-    this.btnShowAll = null; //new GralButton("@InspcFieldShowAll", null);
+    this.btnBack = new GralButton("@InspcFieldBack", "<<", actionBack);
+    this.btnRefresh = new GralButton("@InspcFieldRefresh", "refresh", actionRefresh);
+    this.btnShowAll = new GralButton("@InspcFieldShowAll", "show all", actionShowAll);
     this.variableMng = variableMng;
   }
   
   
   public void setToPanel(GralMng mng){
     wind.setToPanel(mng);
+    mng.setPosition(0, 2, 0, 3, 0, 'd');
+    btnBack.setToPanel(mng);
     mng.setPosition(0, 2, 3, -5, 0, 'd');
     widgPath.setToPanel(mng);
+    mng.setPosition(0, 2, -5, 0, 0, 'd');
+    btnRefresh.setToPanel(mng);
     mng.setPosition(2, -2, 0, 0, 0, 'd');
     widgTable.setToPanel(mng);
+    mng.setPosition(-2, 0, -5, 0, 0, 'r');
+    btnShowAll.setToPanel(mng);
   }
   
   
   
-  void chgTable(int key, GralTableLine_ifc<InspcStruct.Field> line){
-    if(key == KeyCode.enter){
-      InspcStruct.Field field = line.getUserData();
+  void fillTableWithFields(){
+    GralWidget widgd = wind.gralMng().getWidgetInFocus();
+    if(widgd !=null){
+      String sDatapathWithPrefix = widgd.getDataPath();
+      String sDatapath = widgd.gralMng().replaceDataPathPrefix(sDatapathWithPrefix);
+      int posLastDot = sDatapath.lastIndexOf('.');
+      sPathStruct = sDatapath.substring(0, posLastDot);  //With device:path
+      VariableAccess_ifc vari = variableMng.getVariable(sDatapath);
+      if(vari instanceof InspcVariable){
+        InspcVariable var = (InspcVariable)vari;
+        struct = var.struct();
+        //- sPathStruct = struct.path();  //NOTE it is without device.
+        //
+        fillTableStruct();
+        //
+      } else { //NOTE: fillTableStruct sets the widgPath too.
+        widgPath.setText(sPathStruct);
+      }
+    }
+    widgTable.setFocus(); 
+    wind.setVisible(true);
+    
+  }
+  
+  
+  
+  void fillTableStruct(){
+    widgTable.clearTable();
+    if(struct.isUpdated()){
+      //
+      //fill with all fields
+      //
+      for(InspcStruct.Field field: struct.fieldIter()){
+        GralTableLine_ifc<InspcStruct.Field> line = widgTable.addLine(field.name, null, field);
+        line.setCellText(field.name, 0);
+        line.setCellText(field.type, 2);
+      }
+    } else {
+      GralTableLine_ifc<InspcStruct.Field> line = widgTable.addLine("$", null, null);
+      line.setCellText("pending request", 0);
+      variableMng.requestFields(struct);
+      struct.requestFields(actionUpdated);
+    }
+    widgPath.setText(sPathStruct);
+  }
+  
+  
+  
+  void showValue(GralTableLine_ifc<InspcStruct.Field> line){
+    InspcStruct.Field field = line.getUserData();
+    if(field !=null){
       InspcVariable var = field.variable();
       if(var == null){
         String sPathVar = sPathStruct + '.' + field.name;
@@ -123,45 +178,26 @@ public class InspcFieldTable
         }
         line.setCellText(sVal, 1);
       }
-      Assert.stop();
     }
     
   }
   
   
-  void fillTableWithFields(){
-    GralWidget widgd = wind.gralMng().getWidgetInFocus();
-    if(widgd !=null){
-      String sDatapathWithPrefix = widgd.getDataPath();
-      String sDatapath = widgd.gralMng().replaceDataPathPrefix(sDatapathWithPrefix);
-      int posLastDot = sDatapath.lastIndexOf('.');
-      sPathStruct = sDatapath.substring(0, posLastDot);  //With device:path
-      VariableAccess_ifc vari = variableMng.getVariable(sDatapath);
-      if(vari instanceof InspcVariable){
-        InspcVariable var = (InspcVariable)vari;
-        InspcStruct struct = var.struct();
-        //- sPathStruct = struct.path();  //NOTE it is without device.
-        widgTable.clearTable();
-        if(struct.isUpdated()){
-          for(InspcStruct.Field field: struct.fieldIter()){
-            GralTableLine_ifc<InspcStruct.Field> line = widgTable.addLine(field.name, null, field);
-            line.setCellText(field.name, 0);
-            line.setCellText(field.type, 2);
-          }
-        } else {
-          GralTableLine_ifc<InspcStruct.Field> line = widgTable.addLine("$", null, null);
-          line.setCellText("pending request", 0);
-        }
-      }
-      widgPath.setText(sPathStruct);
+  void showAll(){
+    fillTableStruct();
+    for(GralTableLine_ifc<InspcStruct.Field> line: widgTable.iterLines()){
+      showValue(line);
     }
-
-    wind.setVisible(true);
-    
   }
   
-  
-  
+  void actionBack(){
+    InspcStruct parent = struct.parent();
+    if(parent !=null){
+      this.struct = parent;
+      this.sPathStruct = parent.path();
+      fillTableStruct();
+    }
+  }
   
   
   GralUserAction actionOpenWindow = new GralUserAction("InspcFieldTable - open window"){
@@ -183,7 +219,22 @@ public class InspcFieldTable
         assert(params[0] instanceof GralTableLine_ifc<?>);
         @SuppressWarnings("unchecked")
         GralTableLine_ifc<InspcStruct.Field> line = (GralTableLine_ifc<InspcStruct.Field>)params[0];
-        chgTable(key, line);
+        if(key == KeyCode.enter){
+          showValue(line);
+        }
+        return true;
+      } else { 
+        return false;
+      }
+    }
+  };
+
+  
+  
+  GralUserAction actionBack = new GralUserAction("InspcFieldTable - back"){
+    @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        actionBack();
         return true;
       } else { 
         return false;
@@ -194,7 +245,35 @@ public class InspcFieldTable
   
   
   
+  GralUserAction actionRefresh = new GralUserAction("InspcFieldTable - refresh"){
+    @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        return true;
+      } else { 
+        return false;
+      }
+    }
+  };
+
   
+  
+  GralUserAction actionShowAll = new GralUserAction("InspcFieldTable - show all"){
+    @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        showAll();
+        return true;
+      } else { 
+        return false;
+      }
+    }
+  };
+
+  
+  
+  Runnable actionUpdated = new Runnable(){
+    @Override public void run(){ fillTableStruct(); }
+  };
+
   
   
 }
