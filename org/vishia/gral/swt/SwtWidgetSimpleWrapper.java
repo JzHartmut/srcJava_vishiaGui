@@ -5,11 +5,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralWidgImpl_ifc;
-import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralMng;
-import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
-import org.vishia.gral.ifc.GralWidget_ifc;
 
 /**This class wraps a SWT widget. In this form it is able to reference in the SWT-independent GRAL
  * @author Hartmut Schorrig

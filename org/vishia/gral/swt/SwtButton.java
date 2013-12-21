@@ -11,12 +11,15 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.vishia.gral.base.GralButton;
-import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralRectangle;
 
-public class SwtButton extends GralButton
+public class SwtButton extends GralButton.GraphicImplAccess
 {
-  /**The version of this interface:
+  /**Version, history and license.
    * <ul>
+   * <li>2013-12-22 Hartmut chg: Now {@link GralButton} uses the new concept of instantiation: It is not
+   *   the super class of the implementation class. But it provides {@link GralButton.GraphicImplAccess}
+   *   as the super class. 
    * <li>2012-03-09 Hartmut new setFocus on press button
    * <li>2012-03-09 Hartmut new 3-state-Button.
    * <li>2012-03-09 Hartmut improved: appearance of the buttons.
@@ -46,9 +49,14 @@ public class SwtButton extends GralButton
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  @SuppressWarnings("hiding")
+  //@SuppressWarnings("hiding")
   public static final int version = 20130524;
 
+  /**It contains the association to the swt widget (Control) and the {@link SwtMng}
+   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   */
+  SwtWidgetSimpleWrapper swtWidgWrapper;
+  
   Canvas widgetSwt;
   
   final Color black;
@@ -57,31 +65,39 @@ public class SwtButton extends GralButton
   final Font fontText;
   
   
-  final SwtGralMouseListener.MouseListenerGralAction mouseListener = new SwtGralMouseListener.MouseListenerGralAction(mouseWidgetAction, 0);
+  final SwtGralMouseListener.MouseListenerGralAction mouseListener;
   
 
   
-  public SwtButton(String sName, SwtMng mng, Composite parent, int styleSwt, char size)
+  //public SwtButton(String sName, SwtMng mng, Composite parent, int styleSwt, char size)
+  SwtButton(GralButton widgg, SwtMng mng)
   {
-    super(sName, mng);
+    widgg.super(widgg, mng);
+    mouseListener = new SwtGralMouseListener.MouseListenerGralAction(mouseWidgetAction, 0);
     //Control xx = mng.pos.panel.panelComposite;
     black = mng.propertiesGuiSwt.colorSwt(0x202020);
     white = mng.propertiesGuiSwt.colorSwt(0xefefff);
-    widgetSwt = new SwtButtonImpl(parent, styleSwt);
+    Composite panelSwt = mng.getCurrentPanel();
+    int styleSwt = 0;
+    widgetSwt = new SwtButtonImpl(panelSwt, styleSwt);
     widgetSwt.setData(this);
     widgetSwt.setBackground(mng.propertiesGuiSwt.colorBackground);
     widgetSwt.addMouseListener(mouseListener);
     widgetSwt.addFocusListener(mng.focusListener);  //common focus listener 
     setBoundsGraphic(mng);
-    float ySize = pos().height();
+    float ySize = widgg.pos().height();
     char size1 = ySize > 3? 'B' : 'A';
     switch(size1){ 
       case 'A': fontText = mng.propertiesGuiSwt.stdInputFont; break;
       case 'B': fontText = mng.propertiesGuiSwt.stdButtonFont; break;
       default: throw new IllegalArgumentException("param size must be A or B");
     }
-      
+    swtWidgWrapper = new SwtWidgetSimpleWrapper(widgetSwt, mng);  
   }
+
+
+  
+  @Override public GralRectangle getPixelPositionSize(){ return swtWidgWrapper.getPixelPositionSize(); }
 
   
   void setBoundsGraphic(SwtMng mng)
@@ -105,22 +121,6 @@ public class SwtButton extends GralButton
   public Object getWidgetImplementation()
   { return widgetSwt; }
 
-  @Override
-  public GralColor setBackgroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    colorBackOff = color;
-    repaint(100, 100);
-    return null;
-  }
-
-  @Override
-  public GralColor setForegroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
   { widgetSwt.setBounds(x,y,dx,dy);
   }
@@ -133,35 +133,106 @@ public class SwtButton extends GralButton
 
   
   @Override public void repaintGthread(){
-    int catastrophicalCount = 0;
-    int chg, chgAckn=0;
-    int state1 = -1;
-    do{
-      chg = this.dyda.whatIsChanged.get() & ~chgAckn;  //don't handle a bit twice if re-read.
-      if(++catastrophicalCount > 10000) 
-        throw new RuntimeException("atomic failed");
-      if((chg & ImplAccess.chgVisibleInfo) !=0 && dyda.visibleInfo !=null){ 
-        chgAckn |= ImplAccess.chgVisibleInfo;
-        if(dyda.visibleInfo instanceof Integer){
-          state1 = ((Integer)dyda.visibleInfo).intValue();
-        }
-      }
-      if((chg & ImplAccess.chgIntg) !=0 ){ 
-        chgAckn |= ImplAccess.chgIntg;
-        state1 = 0; //TODO dyda.intValue
-      }
-    } while(!dyda.whatIsChanged.compareAndSet(chg, 0));  //repeat if chg is changed in that time.
-
-    switch(state1){
-      case 0: switchState = State.Off;
-      case 1: switchState = State.On;
-      case 2: switchState = State.Disabled;
-      default: ; //don't change state.
-    }
-
+    super.prepareWidget();
     widgetSwt.redraw();
   }
 
+  
+  protected void paintRoutine(PaintEvent e, Canvas canvas){
+    GC gc = e.gc;
+    //gc.d
+    Rectangle dim = canvas.getBounds();
+    SwtButton.this.paint1();
+    
+    Color colorBack = swtWidgWrapper.mng.getColorImpl(colorgback);
+    Color colorLine = swtWidgWrapper.mng.getColorImpl(colorgline);
+    gc.setBackground(colorBack);
+    canvas.drawBackground(e.gc, dim.x+1, dim.y+1, dim.width-1, dim.height-1);
+    Color color = canvas.getForeground(); //of the widget.
+    gc.setForeground(colorLine);  //black
+    gc.setFont(fontText);
+    //FontData fontData = mng.propertiesGui.stdButtonFont.getFontData();
+    //fontData.
+    gc.setForeground(colorBack);
+    gc.fillRectangle(1,1,dim.width-1, dim.height-1);
+    int ypText;
+    if(sButtonText !=null){
+      FontMetrics fontMetrics = gc.getFontMetrics();
+      int charWidth = fontMetrics.getAverageCharWidth();
+      int halfWidthButtonText = charWidth * sButtonText.length() /2;
+      int xText = dim.width / 2 - halfWidthButtonText;
+      if(xText < 2){ xText = 2; }
+      ypText = fontMetrics.getHeight();
+      int halfHeightButtonText = ypText /2;
+      int yText = dim.height / 2 - halfHeightButtonText;
+      gc.setForeground(colorLine);
+      gc.drawString(sButtonText, xText, yText);
+    } else {
+      ypText = 0;
+    }
+    if(isPressed()){
+      ((Canvas)e.widget).forceFocus();
+      /*
+      gc.setLineWidth(3);
+      gc.drawRectangle(1,1,dim.width-2, dim.height-2);
+      gc.setLineStyle(SWT.LINE_DOT);
+      gc.drawRectangle(3,3,dim.width-6, dim.height-6);
+      */
+      if(ypText < dim.height -4){
+        //normal button
+        gc.setForeground(black);
+        gc.setLineWidth(3);
+        gc.drawRectangle(0,0,dim.width-1, dim.height-1);
+        gc.setForeground(white); 
+        gc.setLineWidth(1);
+        gc.drawLine(2, dim.height-2,dim.width-1, dim.height-2);
+        gc.drawLine(1, dim.height-1,dim.width-1, dim.height-1);
+        gc.drawLine(0, dim.height-0,dim.width-1, dim.height-0);
+        gc.drawLine(dim.width-2, 0, dim.width-2, dim.height-1);
+        gc.drawLine(dim.width-1, 0, dim.width-1, dim.height-1);
+        gc.drawLine(dim.width-0, 0, dim.width-0, dim.height-1);
+      } else {
+        //small button
+        gc.setLineWidth(1);
+        gc.setForeground(black);
+        gc.setLineWidth(1);
+        gc.drawRectangle(0,0,dim.width-1, dim.height-1);
+        gc.setForeground(white); 
+        gc.setLineWidth(1);
+        gc.drawLine(0, dim.height-1,dim.width-1, dim.height-1);
+        gc.drawLine(dim.width-1, 0, dim.width-1, dim.height-1);
+      }
+    } else {
+      if(ypText < dim.height -4){
+        //normal button
+        gc.setForeground(white);
+        gc.setLineWidth(3);
+        gc.drawRectangle(0,0,dim.width-1, dim.height-1);
+        gc.setForeground(black); 
+        gc.setLineWidth(1);
+        gc.drawLine(2, dim.height-2,dim.width-1, dim.height-2);
+        gc.drawLine(1, dim.height-1,dim.width-1, dim.height-1);
+        gc.drawLine(0, dim.height-0,dim.width-1, dim.height-0);
+        gc.drawLine(dim.width-2, 0, dim.width-2, dim.height-1);
+        gc.drawLine(dim.width-1, 0, dim.width-1, dim.height-1);
+        gc.drawLine(dim.width-0, 0, dim.width-0, dim.height-1);
+      } else {
+        //small button
+        gc.setLineWidth(1);
+        gc.setForeground(white);
+        gc.setLineWidth(1);
+        gc.drawRectangle(0,0,dim.width-1, dim.height-1);
+        gc.setForeground(black); 
+        gc.setLineWidth(1);
+        gc.drawLine(0, dim.height-1,dim.width-1, dim.height-1);
+        gc.drawLine(dim.width-1, 0, dim.width-1, dim.height-1);
+      }
+    }
+    
+  }
+  
+  
+  
   
   private class SwtButtonImpl extends Canvas
   {
@@ -176,114 +247,7 @@ public class SwtButton extends GralButton
     
     PaintListener paintListener = new PaintListener(){
       @Override public void paintControl(PaintEvent e) {
-        // TODO Auto-generated method stub
-        GC gc = e.gc;
-        //gc.d
-        Rectangle dim = getBounds();
-        if(colorBackOff == null){ 
-          //it isn't initalize
-          colorBackOff = GralColor.getColor("wh");  //white background
-        }
-        final String sButtonText;
-        final GralColor colorgback, colorgline;
-        if(switchState == State.On){ 
-          sButtonText = sButtonTextOn != null ? sButtonTextOn : sButtonTextOff;
-          colorgback = colorBackOn !=null ? colorBackOn: colorBackOff;
-          colorgline = colorLineOn !=null ? colorLineOn: colorLineOff;
-        } else if(switchState == State.Disabled){ 
-          sButtonText = sButtonTextDisabled;
-          colorgback = colorBackDisabled;
-          colorgline = colorLineDisabled;
-        } else { 
-          sButtonText = sButtonTextOff;
-          colorgback = colorBackOff;
-          colorgline = colorLineOff;
-        }
-        
-        Color colorBack = (Color)gralMng().getColorImpl(colorgback);
-        Color colorLine = (Color)gralMng().getColorImpl(colorgline);
-        gc.setBackground(colorBack);
-        drawBackground(e.gc, dim.x+1, dim.y+1, dim.width-1, dim.height-1);
-        Color color = getForeground(); //of the widget.
-        gc.setForeground(colorLine);  //black
-        gc.setFont(fontText);
-        //FontData fontData = mng.propertiesGui.stdButtonFont.getFontData();
-        //fontData.
-        gc.setForeground(colorBack);
-        gc.fillRectangle(1,1,dim.width-1, dim.height-1);
-        int ypText;
-        if(sButtonText !=null){
-          FontMetrics fontMetrics = gc.getFontMetrics();
-          int charWidth = fontMetrics.getAverageCharWidth();
-          int halfWidthButtonText = charWidth * sButtonText.length() /2;
-          int xText = dim.width / 2 - halfWidthButtonText;
-          if(xText < 2){ xText = 2; }
-          ypText = fontMetrics.getHeight();
-          int halfHeightButtonText = ypText /2;
-          int yText = dim.height / 2 - halfHeightButtonText;
-          gc.setForeground(colorLine);
-          gc.drawString(sButtonText, xText, yText);
-        } else {
-          ypText = 0;
-        }
-        if(isPressed){
-          ((Canvas)e.widget).forceFocus();
-          /*
-          gc.setLineWidth(3);
-          gc.drawRectangle(1,1,dim.width-2, dim.height-2);
-          gc.setLineStyle(SWT.LINE_DOT);
-          gc.drawRectangle(3,3,dim.width-6, dim.height-6);
-          */
-          if(ypText < dim.height -4){
-            //normal button
-            gc.setForeground(black);
-            gc.setLineWidth(3);
-            gc.drawRectangle(0,0,dim.width-1, dim.height-1);
-            gc.setForeground(white); 
-            gc.setLineWidth(1);
-            gc.drawLine(2, dim.height-2,dim.width-1, dim.height-2);
-            gc.drawLine(1, dim.height-1,dim.width-1, dim.height-1);
-            gc.drawLine(0, dim.height-0,dim.width-1, dim.height-0);
-            gc.drawLine(dim.width-2, 0, dim.width-2, dim.height-1);
-            gc.drawLine(dim.width-1, 0, dim.width-1, dim.height-1);
-            gc.drawLine(dim.width-0, 0, dim.width-0, dim.height-1);
-          } else {
-            //small button
-            gc.setLineWidth(1);
-            gc.setForeground(black);
-            gc.setLineWidth(1);
-            gc.drawRectangle(0,0,dim.width-1, dim.height-1);
-            gc.setForeground(white); 
-            gc.setLineWidth(1);
-            gc.drawLine(0, dim.height-1,dim.width-1, dim.height-1);
-            gc.drawLine(dim.width-1, 0, dim.width-1, dim.height-1);
-          }
-        } else {
-          if(ypText < dim.height -4){
-            //normal button
-            gc.setForeground(white);
-            gc.setLineWidth(3);
-            gc.drawRectangle(0,0,dim.width-1, dim.height-1);
-            gc.setForeground(black); 
-            gc.setLineWidth(1);
-            gc.drawLine(2, dim.height-2,dim.width-1, dim.height-2);
-            gc.drawLine(1, dim.height-1,dim.width-1, dim.height-1);
-            gc.drawLine(0, dim.height-0,dim.width-1, dim.height-0);
-            gc.drawLine(dim.width-2, 0, dim.width-2, dim.height-1);
-            gc.drawLine(dim.width-1, 0, dim.width-1, dim.height-1);
-            gc.drawLine(dim.width-0, 0, dim.width-0, dim.height-1);
-          } else {
-            //small button
-            gc.setLineWidth(1);
-            gc.setForeground(white);
-            gc.setLineWidth(1);
-            gc.drawRectangle(0,0,dim.width-1, dim.height-1);
-            gc.setForeground(black); 
-            gc.setLineWidth(1);
-            gc.drawLine(0, dim.height-1,dim.width-1, dim.height-1);
-            gc.drawLine(dim.width-1, 0, dim.width-1, dim.height-1);
-          }
-        }
+        SwtButton.this.paintRoutine(e, SwtButtonImpl.this);
       }
     };
     

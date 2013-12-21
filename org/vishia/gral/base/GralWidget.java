@@ -520,7 +520,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     
     /**Three colors for background, line and text should be convert to the platforms color and used in the paint routine. 
      * If this elements are null, the standard color should be used. */
-    public GralColor backColor, backColorNoFocus, lineColor, textColor;
+    public GralColor backColor = GralColor.getColor("wh"), backColorNoFocus = GralColor.getColor("lgr")
+      , lineColor = GralColor.getColor("bk"), textColor = GralColor.getColor("bk");
     //public GralColor backColor = GralColor.getColor("wh"), backColorNoFocus = GralColor.getColor("lgr"), 
     //lineColor = GralColor.getColor("dbl"), textColor = GralColor.getColor("bk");
   
@@ -1376,6 +1377,14 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     public int getChanged(){ return widgg.dyda.whatIsChanged.get(); }
     
     public void acknChanged(int mask){ widgg.dyda.acknChanged(mask); }
+    
+    
+    public static GralWidget gralWidgetFromImplData(Object data){
+      if(data instanceof GralWidget) return (GralWidget)data;
+      else if(data instanceof GralWidget.ImplAccess) {
+        return ((GralWidget.ImplAccess)data).widgg;
+      } else return null;
+    }
     
   }
   

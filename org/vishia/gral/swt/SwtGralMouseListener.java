@@ -76,11 +76,11 @@ public class SwtGralMouseListener
     {
       Widget widget = arg0.widget;
       Object oInfo = widget.getData();
-      if(oInfo instanceof GralWidget){
-        GralWidget widgetInfo = (GralWidget)oInfo;
-        GralMng guiMng = widgetInfo.gralMng();
+      GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(oInfo);
+      if(widgg !=null){
+        GralMng guiMng = widgg.gralMng();
         try{
-          guiMng.log.sendMsg(0, "Info widget: %s / %s", widgetInfo.name, widgetInfo.getDataPath());
+          guiMng.log.sendMsg(0, "Info widget: %s / %s", widgg.name, widgg.getDataPath());
         } catch(Exception exc){ guiMng.writeLog(0, exc); }
           
       }
@@ -94,21 +94,21 @@ public class SwtGralMouseListener
     {
       Widget widget = ev.widget;
       Object oInfo = widget.getData();
-      if(oInfo instanceof GralWidget){
-        GralWidget widgetInfo = (GralWidget)oInfo;
-        GralMng guiMng = widgetInfo.gralMng();
+      GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(oInfo);
+      if(widgg !=null){
+        GralMng guiMng = widgg.gralMng();
         try{
-          String sDataPath = widgetInfo.getDataPath();
+          String sDataPath = widgg.getDataPath();
           if( sDataPath ==null  //no datapath given, write info! 
             || !sDataPath.equals("widgetInfo")  //don't write info if it is a widgetInfo widget itself.
             ){
-            guiMng.setLastClickedWidgetInfo(widgetInfo );
+            guiMng.setLastClickedWidgetInfo(widgg );
           }
           if(guiMng.bDesignMode){
             GralRectangle rr = new GralRectangle(ev.x, ev.y, 0, 0);
             if(ev.button == 1){ //left
               xDown = ev.x; yDown = ev.y;
-              guiMng.pressedLeftMouseDownForDesign(widgetInfo, rr);  
+              guiMng.pressedLeftMouseDownForDesign(widgg, rr);  
             } else if(ev.button == 3){ //right
               //guiMng.pressedRightMouseDownForDesign(widgetInfo, rr);
             }
@@ -123,19 +123,18 @@ public class SwtGralMouseListener
     @Override public void mouseUp(MouseEvent ev)
   {   Widget widget = ev.widget;
       Object oInfo = widget.getData();
-      if(oInfo instanceof GralWidget){
-        GralWidget widgetInfo = (GralWidget)oInfo;
-        GralMng guiMng = widgetInfo.gralMng();
+      GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(oInfo);
+      if(widgg !=null){
+        GralMng guiMng = widgg.gralMng();
         try{
-          GralWidget widgd = (GralWidget)oInfo;
           int dx = ev.x - xDown, dy = ev.y - yDown;
           if(guiMng.bDesignMode && ev.button == 1){
             if((ev.stateMask & SWT.ALT)!=0){
               boolean bCopy = (ev.stateMask & org.eclipse.swt.SWT.CTRL) !=0;
               GralRectangle rr = new GralRectangle(ev.x, ev.y, 0, 0);
-              guiMng.releaseLeftMouseForDesign(widgd, rr, bCopy);  
+              guiMng.releaseLeftMouseForDesign(widgg, rr, bCopy);  
             } else {
-              guiMng.markWidgetForDesign(widgd);
+              guiMng.markWidgetForDesign(widgg);
             }
           } 
           //widgd.redraw();
@@ -208,7 +207,7 @@ public class SwtGralMouseListener
       xMousePress = e.x;
       yMousePress = e.y;
       Control widget = (Control) e.widget;  //a widget is a Control always.
-      GralWidget widgg = (GralWidget)widget.getData();
+      GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(widget.getData());
       try{
         final int keyCode = SwtGralKey.convertMouseKey(e.button, SwtGralKey.MouseAction.doubleClick, e.stateMask);
         Control widgetSwt = (Control) e.widget;  //a widget is a Control always.
@@ -232,7 +231,7 @@ public class SwtGralMouseListener
       yMousePress = e.y;
       Control widget = (Control) e.widget;  //a widget is a Control always.
       widget.addMouseMoveListener(mouseMoveListener);
-      GralWidget widgg = (GralWidget)widget.getData();
+      GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(widget.getData());
       try{ 
         final int keyCode = SwtGralKey.convertMouseKey(e.button, SwtGralKey.MouseAction.down, e.stateMask);
         int mUser1 = 0;
@@ -270,7 +269,7 @@ public class SwtGralMouseListener
         widget.removeMouseMoveListener(mouseMoveListener);
         isPressed = false;
         Point size = widget.getSize();
-        GralWidget widgg = (GralWidget)widget.getData();  //maybe null
+        GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(widget.getData());
         try{ 
           //int dx = e.x - xMousePress, dy = e.y - yMousePress;
           boolean moved = e.x < 0 || e.x > size.x || e.y < 0 || e.y > size.y;

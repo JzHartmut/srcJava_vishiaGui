@@ -86,6 +86,10 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
       registerWidget(widgg);
     } else if(widgg instanceof GralTable<?>){
       //AwtTable.addTable((GralTable<?>)widgg, this);
+    } else if(widgg instanceof GralWindow){
+      createWindow((GralWindow)widgg);
+    } else if(widgg instanceof GralButton){
+      new AwtButton((GralButton)widgg, this);
     }
   }
   
@@ -280,14 +284,14 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     int xSize = (int)pos.width();
     char size = ySize > 3? 'B' : 'A';
     if(sName == null){ sName = sButtonText; }
-    AwtButton widgButton = new AwtButton(sName, this, (Container)pos.panel.getPanelImpl(), 0, size);
+    GralButton widgButton = new GralButton(sName);
     widgButton.setActionChange(action);  //maybe null
     widgButton.setText(sButtonText);
-    widgButton.setPanelMng(this);
     widgButton.sCmd = sCmd;
     //widgButton.setShowMethod(sShowMethod);
     widgButton.setDataPath(sDataPath);
     registerWidget(widgButton);
+    
     return widgButton;
   }
   
@@ -307,11 +311,11 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     int xSize = (int)pos.width();
     
     char size = ySize > 3? 'B' : 'A';
-    AwtButton widgButton = new AwtButton(sName, this, (Container)pos.panel.getPanelImpl(), 0, size);
+    GralButton widgButton = new GralButton(sName);
     widgButton.setSwitchMode(colorOff, colorOn);
     widgButton.setSwitchMode(sButtonTextOff, sButtonTextOn);
-    widgButton.setPanelMng(this);
     if(sName !=null){ registerWidget(widgButton); }
+    setToPanel(widgButton);
     return widgButton;
   }
   

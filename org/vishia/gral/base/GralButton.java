@@ -3,10 +3,13 @@ package org.vishia.gral.base;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralImageBase;
 
-public abstract class GralButton extends GralWidget
+public class GralButton extends GralWidget
 {
-  /**Version, history and license
+  /**Version, history and license.
    * <ul>
+   * <li>2013-12-22 Hartmut chg: Now {@link GralButton} uses the new concept of instantiation: It is not
+   *   the super class of the implementation class. But it provides {@link GralButton.GraphicImplAccess}
+   *   as the super class. 
    * <li>2013-05-23 Hartmut new color of text able to change (not only black)
    * <li>2013-05-23 Hartmut chg: {@link #setState(State)} with an enum, not int, used for showing active/inactive
    * <li>2012-08-22 Hartmut new implements {@link #setBackColor(GralColor, int)}
@@ -45,13 +48,6 @@ public abstract class GralButton extends GralWidget
   
   //final GralWindowMng_ifc mainWindow;
   
-  /**That action effects that the internal variable {@link #switchedOn} is set for a switching button.
-   * The user action will be called by the standard mouse action of the implementation graphic
-   * AWT: {@link org.vishia.gral.awt.AwtGralMouseListener.MouseListenerUserAction}.
-   */
-  final protected GralMouseWidgetAction_ifc mouseWidgetAction = new MouseActionButton();
-  
-
   protected boolean pressed;
   
   /**The state of switch and check button
@@ -72,7 +68,7 @@ public abstract class GralButton extends GralWidget
   protected GralImageBase imageOff, imageOn, imageDisabled;
   
   /**Color of button. If colorOff is null, then it is not a switch button. */
-  protected GralColor colorBackOff, colorBackOn, colorBackDisabled = GralColor.getColor("gr");
+  protected GralColor colorBackOn, colorBackDisabled = GralColor.getColor("gr");
   
   /**Color of button. If colorOff is null, then it is not a switch button. */
   protected GralColor colorLineOff = GralColor.getColor("bk"), colorLineOn = GralColor.getColor("bk"), colorLineDisabled = GralColor.getColor("lgr");
@@ -91,9 +87,9 @@ public abstract class GralButton extends GralWidget
   protected boolean bThreeStateSwitch;
   
   //public GralButton(String sName, GralWindowMng_ifc mainWindow, GralGridMngBase mng)
-  public GralButton(String sName, GralMng mng)
+  public GralButton(String sName)
   {
-    super(sName, 'B', mng);  //GralWidget
+    super(sName, 'B', null);  //GralWidget
     //this.mng = mng;
     //this.mainWindow = mainWindow;
   }
@@ -136,7 +132,7 @@ public abstract class GralButton extends GralWidget
    */
   public void setSwitchMode(GralColor colorOff, GralColor colorOn){ 
     this.colorBackOn = colorOn;
-    this.colorBackOff = colorOff;
+    dyda.backColor = colorOff;
     bThreeStateSwitch = false;
     shouldSwitched = true; 
   }
@@ -150,7 +146,7 @@ public abstract class GralButton extends GralWidget
    */
   public void setSwitchMode(GralColor colorOff, GralColor colorOn, GralColor colorDisabled){ 
     this.colorBackOn = colorOn;
-    this.colorBackOff = colorOff;
+    dyda.backColor = colorOff;
     this.colorBackDisabled = colorDisabled;
     bThreeStateSwitch = true;
     shouldSwitched = true; 
@@ -192,7 +188,7 @@ public abstract class GralButton extends GralWidget
    */
   @Override public void setBackColor(GralColor color, int ix){ 
     switch(ix){
-    case 0: colorBackOff = color; dyda.backColor = color; break;
+    case 0: dyda.backColor = color; break;
     case 1: colorBackOn = color; break;
     case -1: case2: colorBackDisabled = color; break;
     default: throw new IllegalArgumentException("fault ix, allowed -1, 0, 1, 2, ix=" + ix);
@@ -273,7 +269,7 @@ public abstract class GralButton extends GralWidget
       if(switchState == State.On){
         colorBackOn = (GralColor)val;
       } else {
-        colorBackOff = (GralColor)val;
+        dyda.backColor = (GralColor)val;
       }
     } else {
       String sVal = (val instanceof String) ? (String)val : null;
@@ -378,5 +374,83 @@ public abstract class GralButton extends GralWidget
   }
   
   
+  
+  public abstract class GraphicImplAccess extends GralWidget.ImplAccess
+  implements GralWidgImpl_ifc
+  {
+
+    /**That action effects that the internal variable {@link #switchedOn} is set for a switching button.
+     * The user action will be called by the standard mouse action of the implementation graphic
+     * AWT: {@link org.vishia.gral.awt.AwtGralMouseListener.MouseListenerUserAction}.
+     */
+    final protected GralMouseWidgetAction_ifc mouseWidgetAction = new MouseActionButton();
+    
+
+    /**Set in {@link #paint1()}, used for paint routine. */
+    protected String sButtonText;
+    /**Set in {@link #paint1()}, used for paint routine. */
+    protected GralColor colorgback, colorgline;
+
+    protected GraphicImplAccess(GralWidget widgg, GralMng mng)
+    {
+      super(widgg, mng);
+    }
+    
+    
+    protected boolean isPressed(){ return GralButton.this.isPressed; }
+    
+    
+    protected void prepareWidget(){
+      int catastrophicalCount = 0;
+      int chg, chgAckn=0;
+      int state1 = -1;
+      do{
+        chg = dyda().whatIsChanged.get() & ~chgAckn;  //don't handle a bit twice if re-read.
+        if(++catastrophicalCount > 10000) 
+          throw new RuntimeException("atomic failed");
+        if((chg & chgVisibleInfo) !=0 && dyda().visibleInfo !=null){ 
+          chgAckn |= chgVisibleInfo;
+          if(dyda().visibleInfo instanceof Integer){
+            state1 = ((Integer)dyda().visibleInfo).intValue();
+          }
+        }
+        if((chg & chgIntg) !=0 ){ 
+          chgAckn |= chgIntg;
+          state1 = 0; //TODO dyda.intValue
+        }
+      } while(!dyda().whatIsChanged.compareAndSet(chg, 0));  //repeat if chg is changed in that time.
+
+      switch(state1){
+        case 0: switchState = State.Off; break;
+        case 1: switchState = State.On; break;
+        case 2: switchState = State.Disabled; break;
+        default: ; //don't change state.
+      }
+    }
+
+    
+    
+    protected void paint1(){
+      if(switchState == State.On){ 
+        sButtonText = sButtonTextOn != null ? sButtonTextOn : sButtonTextOff;
+        colorgback = colorBackOn !=null ? colorBackOn: dyda().backColor;
+        colorgline = colorLineOn !=null ? colorLineOn: colorLineOff;
+      } else if(switchState == State.Disabled){ 
+        sButtonText = sButtonTextDisabled;
+        colorgback = colorBackDisabled;
+        colorgline = colorLineDisabled;
+      } else { 
+        sButtonText = sButtonTextOff;
+        colorgback = dyda().backColor;
+        colorgline = colorLineOff;
+      }
+
+    }
+    
+    
+  }
+  
+  
+
   
 }
