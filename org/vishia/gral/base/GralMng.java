@@ -1132,6 +1132,58 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   
+  /**This standard Gral focus listener is the base class for the common implementation layer focus listener.
+   * The both methods {@link #focusGainedGral(GralWidget)} and {@link #focusLostGral(GralWidget)} will be invoked
+   * with that GralWidget, which is referred by the implementation layer widgets data.
+   * <br><br>
+   * The GralMng implementation classes should offer a focus listener for common usage, see 
+   * {@link org.vishia.gral.swt.SwtMng.SwtMngFocusListener} and its instance {@link org.vishia.gral.swt.SwtMng.focusListener}. 
+   * That reference and class is protected and therewith package visible because only swt implementations needs it. 
+   * An implementation widget class can use this instance of SwtMng.focusListener immediately for standard behavior.
+   * The standard behavior is realized in this class, see {@link GralMngFocusListener#focusGainedGral(GralWidget)}.
+   * <br><br>
+   * For enhanced functionality of a focus listener the implementation layer SwtFocusListener class can be enhanced.
+   * That is realized for example in {@link org.vishia.gral.swt.SwtTextFieldWrapper}. That's focus listener should 
+   * update the text in the widget with the gral text store {@link GralWidget.DynamicData#displayedText}
+   * on focus gained, and overtake a changed content on focus lost. Adequate it is on all edit-able widgets.
+   * The SwtTextFieldWrapper.TextFieldFocusListener.focusGained(...) and focusLost(...) methods executes the special
+   * functionality. After them 'super.focusGained/Lost(ev);' is in called to execute the standard behavior.
+   */
+  protected class GralMngFocusListener
+  {
+    
+    /**Standard action on focus lost:
+     * @param widgg
+     */
+    protected void focusLostGral(GralWidget widgg){
+    }
+
+    /**Standard action on focus gained:
+     * <ul>
+     * <li>Sets the html help into the {@link GralMng#setApplicationAdapter(GralMngApplAdapter_ifc)} if given.
+     * <li> invokes the {@link GralWidget#setActionFocused(GralUserAction)} if given.
+     * <li>invokes {@link GralMng#notifyFocus(GralWidget)} to detect the {@link GralMng#getWidgetInFocus()}.
+     * </ul>
+     * @param widgg
+     */
+    protected void focusGainedGral(GralWidget widgg){
+      GralMng.this.notifyFocus(widgg);
+      String htmlHelp = widgg.getHtmlHelp();
+      if(htmlHelp !=null && applAdapter !=null){
+        applAdapter.setHelpUrl(htmlHelp);
+      }
+      if(widgg.actionFocused !=null){ widgg.actionFocused.exec(KeyCode.focusGained, widgg); }
+    }
+  }
+  
+  
+  /**This instance can be used if any other focus listener is necessary for any implementation widget.
+   * The standard behavior for GralWidget is supported using this aggregate.
+   * In Opposite a full ready to use focus listener based on this class in the implementation layer,
+   * see {@link org.vishia.gral.swt.SwtMng.SwtMngFocusListener}.
+   */
+  public GralMngFocusListener gralFocusListener = new GralMngFocusListener();
+  
   /**This inner class is public only because the implementation uses it. It is not public for applications.
    *
    *

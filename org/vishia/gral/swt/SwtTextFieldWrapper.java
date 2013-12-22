@@ -365,7 +365,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   
   
   protected void textFieldFocusGained(){
-    super.focusGained();  //set HtmlHelp etc.
+    //- done in GralMng.GralMngFocusListener! super.focusGained();  //set HtmlHelp etc.
     if(actionChanging() != null){
       actionChanging().exec(KeyCode.focusGained, widgg, dyda().displayedText);
     }
@@ -375,7 +375,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   }
   
   
-  protected void focusLost(){
+  protected void textFieldFocusLost(){
     String text = textFieldSwt.getText();
     dyda().displayedText = text;  //transfer the current text
     dyda().displayedText = text;
@@ -396,14 +396,14 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     }
 
     @Override public void focusLost(FocusEvent ev){
+      SwtTextFieldWrapper.this.textFieldFocusLost();
       super.focusLost(ev);
-      SwtTextFieldWrapper.this.focusLost();
     }
 
     
     @Override public void focusGained(FocusEvent ev)
-    { super.focusGained(ev);
-      SwtTextFieldWrapper.this.textFieldFocusGained();
+    { SwtTextFieldWrapper.this.textFieldFocusGained();
+      super.focusGained(ev);
     }
   }
   

@@ -159,6 +159,8 @@ import org.vishia.util.KeyCode;
  * <br><br>
  * <b>Strategy of changing the graphical content of a widget</b>:<br>
  * See {@link GralWidget_ifc} 
+ * <br><br>
+ * <b>Strategy to create widgets and positioning</b>: see {@link GralMng.GralMngFocusListener}.  
  *
  * @author Hartmut Schorrig
  *
@@ -1322,7 +1324,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
      * Don't override this method in the graphic implementation!
      * It should be overridden only in a Gral widget inheritance only if necessary.
      */
-    public void focusGained(){
+    public void XXXfocusGained(){
       //System.out.println(Assert.stackInfo("GralWidget - Debuginfo; focusgained", 1, 10));
       if(widgg.htmlHelp !=null){
         widgg.itsMng.setHtmlHelp(widgg.htmlHelp);

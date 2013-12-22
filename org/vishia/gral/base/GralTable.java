@@ -462,6 +462,13 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   }
   
   
+  /**Sets the specified column to edit-able or not. This routine can be invoked before the graphic implementation
+   * is created (before {@link #setToPanel(GralMngBuild_ifc)} or after them in running mode. 
+   * 
+   * @param column the number, starting by 0. 
+   * @param val true then edit-able, false then read only.
+   * @throws IndexOutOfBoundsException on faulty column.
+   */
   public void setColumnEditable(int column, boolean val){
     bColumnEditable[column] = val;
     if(((GralWidget)this).wdgImpl !=null){
@@ -819,15 +826,16 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     if(line2 == null){
       //check parent
       if(!line.parentEquals(rootLine)){
-        line2 = line.parent();
-        while(line2 !=null && (line = line2).showChildren){
-          //it has children
-          line2 = line2.lastChild();  //last of all showing levels
-        }
+        line = line.parent();
       } else {
         line = null;  //on root as first entry
       }
     } else {
+      //if(line2 !=null){ line2 = line2.prevSibling(); } //the parent is the current parent, use previous.
+      while(line2 !=null && line2.showChildren){
+        //it has children
+        line2 = line2.lastChild();  //last of all showing levels
+      }
       line = line2;
     }
     return line;
@@ -877,9 +885,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * or one time if searchChars are not given.
    * If the searchChars are not found, either the first or last line will be selected. It is because
    * any key operation should have an effect for the user. Paradigm: Not the search and found is prior,
-   * the response of operation is prior. The user may see wheter anything is found. 
+   * the response of operation is prior. The user may see whether anything is found. 
    * @param bUp direction
-   * @return
+   * @return true if found
    */
   protected boolean searchContent(boolean bUp){
     String search = searchChars.toString();
@@ -905,8 +913,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         if(search.length() > 0 && searchChars.charAt(0) == '*'){
           contSearch = false;  //TODO search content contains
         } else {
-          if( search.length() == 0   //always found if no searchchar is given.
-            || !sText.startsWith(search)){  //found
+          if( search.length() == 0){   //always found if no searchchar is given.
+            found = false;
+            contSearch = false;
+          } else if(!sText.startsWith(search)){  //found
             found = false;
           } else {
             found = true;
@@ -974,7 +984,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         } break;
         case KeyCode.mouseWheelUp:
         case KeyCode.up: {
-          if(!searchContent(true)){
+          if(!searchContent(true)) {
             if(lineSelectedixCell > 2){
               lineSelectedixCell -=1;
             } else {
@@ -1025,7 +1035,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
                 line.setMarked(1, line.getUserData());
               }
             }
-            if(!searchContent(false)){
+            if(!searchContent(false)) {
               if(lineSelectedixCell < zLineVisible -3){
                 lineSelectedixCell +=1;
               } else {
@@ -1578,7 +1588,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      *   Then {@link GralWidget#setFocus()} is called to designate, that the table is focused.   
      * </ul>
      */
-    @Override public void focusGained(){ 
+    public void focusGainedTable(){ 
       if(bFocusLost){  
         //focus is lost from another cell of this table yet now, repaint is not invoked,
         bFocusLost = false;  //ignore focus lost.
@@ -1586,7 +1596,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         //Any cell has got the focus, it means the table has gotten the focus.
         bFocused = true; 
         if(!bRedrawPending){
-          super.focusGained();
+          itsMng.gralFocusListener.focusGainedGral(GralTable.this);
+          //super.focusGained();
           System.out.println("GralTable - debugInfo; focusGained " + GralTable.this.toString() );
           repaint(50,100);
         }
@@ -1599,9 +1610,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * But if another cell of the table has gotten the focus in this time, the bFocus = true is set. 
      * 
      */
-    protected void focusLost(){ 
+    protected void focusLostTable(){ 
       bFocusLost = true;
-      repaint(50,100);
+      repaint(50,100);  //NOTE: bFocusLost =false will be set in repaint.
     }
     
 

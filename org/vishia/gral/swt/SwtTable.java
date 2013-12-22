@@ -88,7 +88,8 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWidgImpl_ifc 
+public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWidgImpl_ifc
+, FocusListener  //for the cells
 //public class SwtTable  implements GralWidgImpl_ifc 
 {
 
@@ -152,7 +153,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
   
   private final FocusListener focusListenerTable;
   
-  private final FocusListener focusListenerCell;
+  //private final FocusListener focusListenerCell;
   
   private final MousePressedListenerTable mousePressedListener = new MousePressedListenerTable();
   
@@ -165,7 +166,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
     //super(name, mng, columnWidths);
     this.myKeyListener = this.new TableKeyListerner(null);
     focusListenerTable = this.new FocusListenerTable(mng);
-    focusListenerCell = this.new FocusListenerCell();
+    //focusListenerCell = this;
     setColorsSwt();    
     int zLineVisibleMax = gralTable.nrofLinesVisibleMax();
     this.cellsSwt = new Text[zLineVisibleMax][zColumn()];
@@ -556,6 +557,48 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
   }
   
   
+  /**Focus listener implementation for all cells.
+   * This routine is invoked whenever the focus of any Text field of the table will be lost the focus. 
+   * It invokes {@link GralTable.GraphicImplAccess#focusLostTable()} but only if 
+   * {@link GralTable.GraphicImplAccess#bRedrawPending} is not set. That prevents invocation while
+   * {@link GralTable.GraphicImplAccess#setCellContentNew()} sets the focus while updating the graphic cells.
+   * 
+   */
+  @Override public void focusLost(FocusEvent ev){ 
+    //System.out.println("Cell focus lost");
+    super.focusLostTable();
+    if(!bRedrawPending){
+      //System.out.println("SwtTable - cell focus lost;" + (SwtTable.this).outer.toString());
+      GralTable.CellData data = (GralTable.CellData)ev.widget.getData();
+      Control widgSwt = (Control)ev.widget;
+      //widgSwt.setBackground(colorBackSelectNonFocusedSwt); 
+      System.out.println("SwtTableCell - focus lost;");
+      int iCellLine = data.ixCellLine; //ixLineNew - ixLine1;
+      for(int iCellCol = 0; iCellCol < zColumn(); ++iCellCol){
+        Text cellSwt = cellsSwt[iCellLine][iCellCol];
+  
+        //cellSwt.setBackground(colorBackSelectNonFocusedSwt);
+      }
+    }
+  }
+  
+  /**Focus listener implementation for all cells.
+   * This routine is invoked especially if the mouse is landing 
+   * on a Text-field with click. Then this table line and column
+   * should be selected as currently. <br>
+   * This routine is invoked on setFocus()-call too. In this case
+   * it should not done anything. The variable #bRedrawPending guards it.
+   * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
+   */
+  @Override public void focusGained(FocusEvent ev) { 
+    SwtTable.this.focusGainedTable(); 
+    System.out.println("SwtTableCell - focus gained;");
+  }
+  
+
+  
+  
+  
   protected void initSwtTable(Composite swtTable, int zColumns, SwtMng mng){
     int yPix = 0;
     Font font = mng.propertiesGuiSwt.getTextFontSwt(2, outer.whatIs, outer.whatIs);
@@ -576,7 +619,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
         }
         cell.setFont(font);
         cell.addKeyListener(myKeyListener);
-        cell.addFocusListener(focusListenerCell);
+        cell.addFocusListener(this);
         cell.addMouseListener(mousePressedListener);
         cell.addMouseWheelListener(mouseWheelListener);
         GralTable.CellData cellData = new GralTable.CellData(iRow, iCol);
@@ -773,7 +816,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
    * The focus gained method is used to set the current cell of the table and to invoke redraw
    * to show the new selection. That focus event is invoked if the mouse button is pressed on that cell.
    */
-  private class FocusListenerCell implements FocusListener
+  private class XXXFocusListenerCell implements FocusListener
   {
     
     /**This method does nothing. A lost focus color showing may be forced from redraw of another 
@@ -786,12 +829,13 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
     @Deprecated
     @Override public void focusLost(FocusEvent ev){ 
       //System.out.println("Cell focus lost");
-      SwtTable.this.focusLost();
+      SwtTable.this.focusLostTable();
       if(!bRedrawPending){
-        System.out.println("SwtTable - cell focus lost;" + (SwtTable.this).outer.toString());
+        //System.out.println("SwtTable - cell focus lost;" + (SwtTable.this).outer.toString());
         GralTable.CellData data = (GralTable.CellData)ev.widget.getData();
         Control widgSwt = (Control)ev.widget;
         //widgSwt.setBackground(colorBackSelectNonFocusedSwt); 
+        System.out.println("SwtTableCell - focus lost;");
         int iCellLine = data.ixCellLine; //ixLineNew - ixLine1;
         for(int iCellCol = 0; iCellCol < zColumn(); ++iCellCol){
           Text cellSwt = cellsSwt[iCellLine][iCellCol];
@@ -808,7 +852,10 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess  implements GralWi
      * it should not done anything. The variable #bRedrawPending guards it.
      * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
      */
-    @Override public void focusGained(FocusEvent ev) { SwtTable.this.focusGained(); }
+    @Override public void focusGained(FocusEvent ev) { 
+      SwtTable.this.focusGainedTable(); 
+      System.out.println("SwtTableCell - focus gained;");
+    }
     
   };
   

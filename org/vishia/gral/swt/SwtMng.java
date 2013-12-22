@@ -1356,37 +1356,27 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   /**Universal focus listener to register which widgets were in focus in its order,
    * to set htmlHelp and to invoke the {@link GralWidget#setActionFocused(GralUserAction)}.
    */
-  class SwtMngFocusListener implements FocusListener
+  protected class SwtMngFocusListener extends GralMngFocusListener implements FocusListener
   {
     
-    @Override public void focusLost(FocusEvent e)
-    { //empty, don't register lost focus. Only the last widget in focus is registered.
+    @Override public void focusLost(FocusEvent ev)
+    { GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(ev.widget.getData());
+      super.focusLostGral(widgg);
     }
     
     @Override public void focusGained(FocusEvent ev)
-    { Object widgo = ev.widget.getData();
-      GralWidget widgd;
-      if(widgo instanceof GralWidget){ //the old form:
-        widgd = (GralWidget)widgo;  
-        notifyFocus(widgd);
-        String htmlHelp = widgd.getHtmlHelp();
-        
-        if(htmlHelp !=null && applAdapter !=null){
-          applAdapter.setHelpUrl(htmlHelp);
-        }
-      } else if(widgo instanceof GralWidget.ImplAccess){
-        ((GralWidget.ImplAccess)widgo).focusGained();
-      }
+    { GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(ev.widget.getData());
+      super.focusGainedGral(widgg);
     }
   }
   
   /**The package private universal focus listener. */
-  SwtMngFocusListener focusListener = new SwtMngFocusListener();
+  protected SwtMngFocusListener focusListener = new SwtMngFocusListener();
 
 
   /**Universal context menu listener
    */
-  class SwtMngMouseMenuListener implements MenuDetectListener
+  protected class SwtMngMouseMenuListener implements MenuDetectListener
   {
 
     @Override

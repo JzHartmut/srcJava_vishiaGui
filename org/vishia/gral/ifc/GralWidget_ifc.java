@@ -27,13 +27,13 @@ import org.vishia.util.Removeable;
  * <li>That method calls {@link #repaint(int, int)} with a proper millisecond delay (usual 100).
  *   The graphic implementation widget is not touched in this time. Usual it is not necessary to show information
  *   in a faster time than 100 ms if it is not a high speed animated graphic. The delayed repaint request
- *   saves calculation time if more as one property should be changed in one widget.
+ *   saves calculation time if more as one property is changed on the same widget.
  * <li>The delayed repaint request queues the instance {@link GralWidget#repaintRequ} (only private visible)
  *   of {@link org.vishia.gral.base.GralDispatchCallbackWorker} in the central queue of requests using 
  *   {@link org.vishia.gral.base.GralGraphicThread#addDispatchOrder(org.vishia.gral.base.GralDispatchCallbackWorker)}. 
  *   The {@link org.vishia.gral.base.GralGraphicThread} is known by {@link org.vishia.gral.base.GralWidget#itsMng}.
  * <li>If for example 20 widgets are changed in maybe 40 properties, that queue contains the 20 instances of
- *   {@link org.vishia.gral.base.GralDispatchCallbackWorker}. Any of them has a specific delay. 
+ *   {@link org.vishia.gral.base.GralDispatchCallbackWorker}. Any of them may have a specific delay. 
  *   The graphic thread organizes it in a proper kind of time.
  * <li>If a {@link org.vishia.gral.base.GralDispatchCallbackWorker} is dequeued in the graphic thread, 
  *   its method {@link org.vishia.gral.base.GralDispatchCallbackWorker#doBeforeDispatching(boolean)} is invoked. 
@@ -41,7 +41,7 @@ import org.vishia.util.Removeable;
  * <li>The <code>rerepaintGthread()</code> method is overridden in the implementation layer
  *   with the necessary statements to transfer the non-graphic data of this {@link GralWidget} especially
  *   stored in {@link org.vishia.gral.base.GralWidget#dyda} to the special implementation widget method invocations
- *   such as {@link org.eclipse.swt.widgets.Text#setText(String)} which touchs the graphic widget.
+ *   such as {@link org.eclipse.swt.widgets.Text#setText(String)} which touches the graphic widget.
  *   Then a {@link org.eclipse.swt.widgets.Control#update()} and {@link org.eclipse.swt.widgets.Control#redraw()}
  *   is invoked to show the content.         
  * </ul>

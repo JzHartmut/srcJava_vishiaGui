@@ -67,7 +67,7 @@ public class InspcFieldTable
   private final GralTextField widgPath;
   
   /**Table of fields, type and value. */
-  private final GralTable<InspcStruct.Field> widgTable;
+  private final GralTable<InspcStruct.FieldOfStruct> widgTable;
 
   
   private final GralButton btnBack, btnRefresh, btnShowAll;
@@ -83,7 +83,8 @@ public class InspcFieldTable
     super();
     this.wind = new GralWindow("InspcFieldTableWind", "Fields of ...", GralWindow_ifc.windOnTop);
     this.widgPath = new GralTextField("InspcFieldTableWind");
-    this.widgTable = new GralTable<InspcStruct.Field>("InspcFieldTable", new int[]{20, 0, -10});
+    this.widgTable = new GralTable<InspcStruct.FieldOfStruct>("InspcFieldTable", new int[]{20, 0, -10});
+    this.widgTable.setColumnEditable(1, true);
     this.widgTable.setActionChange(actionChgTable);
     this.btnBack = new GralButton("@InspcFieldBack", "<<", actionBack);
     this.btnRefresh = new GralButton("@InspcFieldRefresh", "refresh", actionRefresh);
@@ -108,7 +109,7 @@ public class InspcFieldTable
   
   
   
-  void fillTableWithFields(){
+  void fillTableFromFocusedVariable(){
     GralWidget widgd = wind.gralMng().getWidgetInFocus();
     if(widgd !=null){
       String sDatapathWithPrefix = widgd.getDataPath();
@@ -140,13 +141,14 @@ public class InspcFieldTable
       //
       //fill with all fields
       //
-      for(InspcStruct.Field field: struct.fieldIter()){
-        GralTableLine_ifc<InspcStruct.Field> line = widgTable.addLine(field.name, null, field);
-        line.setCellText(field.name, 0);
+      for(InspcStruct.FieldOfStruct field: struct.fieldIter()){
+        GralTableLine_ifc<InspcStruct.FieldOfStruct> line = widgTable.addLine(field.name, null, field);
+        String sField1 = field.hasSubstruct ? "+ " + field.name : field.name;
+        line.setCellText(sField1, 0);
         line.setCellText(field.type, 2);
       }
     } else {
-      GralTableLine_ifc<InspcStruct.Field> line = widgTable.addLine("$", null, null);
+      GralTableLine_ifc<InspcStruct.FieldOfStruct> line = widgTable.addLine("$", null, null);
       line.setCellText("pending request", 0);
       variableMng.requestFields(struct);
       struct.requestFields(actionUpdated);
@@ -156,8 +158,8 @@ public class InspcFieldTable
   
   
   
-  void showValue(GralTableLine_ifc<InspcStruct.Field> line){
-    InspcStruct.Field field = line.getUserData();
+  void showValue(GralTableLine_ifc<InspcStruct.FieldOfStruct> line){
+    InspcStruct.FieldOfStruct field = line.getUserData();
     if(field !=null){
       InspcVariable var = field.variable();
       if(var == null){
@@ -185,7 +187,7 @@ public class InspcFieldTable
   
   void showAll(){
     fillTableStruct();
-    for(GralTableLine_ifc<InspcStruct.Field> line: widgTable.iterLines()){
+    for(GralTableLine_ifc<InspcStruct.FieldOfStruct> line: widgTable.iterLines()){
       showValue(line);
     }
   }
@@ -200,10 +202,21 @@ public class InspcFieldTable
   }
   
   
+  void getSubStruct(GralTableLine_ifc<InspcStruct.FieldOfStruct> line){
+    InspcStruct.FieldOfStruct field = line.getUserData();
+    InspcStruct substruct = field.substruct();
+    if(substruct != null){
+      struct = substruct;
+      sPathStruct = struct.path();
+      fillTableStruct();
+    }
+  }
+  
+  
   GralUserAction actionOpenWindow = new GralUserAction("InspcFieldTable - open window"){
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        fillTableWithFields();
+        fillTableFromFocusedVariable();
         return true;
       } else { 
         return false;
@@ -218,9 +231,13 @@ public class InspcFieldTable
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         assert(params[0] instanceof GralTableLine_ifc<?>);
         @SuppressWarnings("unchecked")
-        GralTableLine_ifc<InspcStruct.Field> line = (GralTableLine_ifc<InspcStruct.Field>)params[0];
+        GralTableLine_ifc<InspcStruct.FieldOfStruct> line = (GralTableLine_ifc<InspcStruct.FieldOfStruct>)params[0];
         if(key == KeyCode.enter){
           showValue(line);
+        } else if(key == KeyCode.ctrl + KeyCode.pgup) {
+          actionBack();
+        } else if(key == KeyCode.ctrl + KeyCode.pgdn) {
+          getSubStruct(line);
         }
         return true;
       } else { 
