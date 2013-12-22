@@ -100,7 +100,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
    * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
    */
-  SwtWidgetSimpleWrapper swtWidgWrapper;
+  SwtWidgetHelper swtWidgWrapper;
 
   protected Shell window;
   
@@ -160,7 +160,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     if((windProps & GralWindow.windOnTop) !=0){ props |= SWT.ON_TOP; }
     if((windProps & GralWindow.windResizeable) !=0){ props |= SWT.RESIZE; }
     window = new Shell(mng.displaySwt, props);
-    swtWidgWrapper = new SwtWidgetSimpleWrapper(window, mng);
+    swtWidgWrapper = new SwtWidgetHelper(window, mng);
     window.addShellListener(shellListener);
     window.addDisposeListener(disposeListener);
     //window.add

@@ -46,7 +46,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
    * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
    */
-  SwtWidgetSimpleWrapper swtWidgWrapper;
+  private final SwtWidgetHelper swtWidgHelper;
   
   protected Label labelSwt;
 
@@ -57,6 +57,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
     Composite panelSwt = mng.getCurrentPanel();
     int styleSwt = 0;
     labelSwt = new Label(panelSwt, styleSwt);
+    swtWidgHelper = new SwtWidgetHelper(labelSwt, mng);
     int mode;
     switch(origin()){
     case 1: mode = SWT.LEFT; break;
@@ -78,7 +79,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
 
 
   @Override
-  public GralRectangle getPixelPositionSize(){ return swtWidgWrapper.getPixelPositionSize(); }
+  public GralRectangle getPixelPositionSize(){ return swtWidgHelper.getPixelPositionSize(); }
 
 
   @Override
@@ -86,7 +87,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
 
 
   @Override public void removeWidgetImplementation()
-  { swtWidgWrapper.removeWidgetImplementation();
+  { swtWidgHelper.removeWidgetImplementation();
     labelSwt = null;
   }
 
@@ -114,7 +115,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
           //labelSwt.setSize(textSize);
         }
         if((chg & chgColorText)!=0){
-          SwtProperties props = swtWidgWrapper.mng.propertiesGuiSwt;
+          SwtProperties props = swtWidgHelper.mng.propertiesGuiSwt;
           if(dyda.textColor !=null){
             labelSwt.setForeground(props.colorSwt(dyda.textColor));
           }
@@ -134,10 +135,10 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
 
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
-  { swtWidgWrapper.setBoundsPixel(x, y, dx, dy); 
+  { swtWidgHelper.setBoundsPixel(x, y, dx, dy); 
   }
 
 
   @Override public boolean setFocusGThread()
-  { return swtWidgWrapper.setFocusGThread(); }
+  { return swtWidgHelper.setFocusGThread(); }
 }

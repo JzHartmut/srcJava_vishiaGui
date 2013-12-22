@@ -64,7 +64,7 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
    * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
    */
-  SwtWidgetSimpleWrapper swtWidgWrapper;
+  private final SwtWidgetHelper swtWidgWrapper;
 
   
   //protected Canvas widgetSwt;
@@ -82,7 +82,7 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
     //this.mng = mng;
     Composite panel = (Composite)outer.pos().panel.getPanelImpl();
     //widgetSwt = new Canvas(panel,0);
-    this.swtWidgWrapper = new SwtWidgetSimpleWrapper(new Canvas(panel,0), mng);
+    this.swtWidgWrapper = new SwtWidgetHelper(new Canvas(panel,0), mng);
     swtWidgWrapper.widgetSwt.setData(wdgGral);
     swtWidgWrapper.widgetSwt.addPaintListener(paintListener);
     swtWidgWrapper.widgetSwt.addMouseListener(mouseListener);
@@ -100,10 +100,10 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
 
   
   
-  @Override public void repaintGthread(){ swtWidgWrapper.repaintGthread(); }
+  @Override public void repaintGthread(){ swtWidgWrapper.swtUpdateRedraw(); }
 
   
-  @Override public Object getWidgetImplementation(){ return swtWidgWrapper.getWidgetImplementation(); }
+  @Override public Object getWidgetImplementation(){ return swtWidgWrapper.widgetSwt; }
   
   @Override public boolean setFocusGThread(){ return swtWidgWrapper.setFocusGThread(); }
 

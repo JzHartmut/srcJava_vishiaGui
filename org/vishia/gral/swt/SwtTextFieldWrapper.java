@@ -80,7 +80,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
    * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
    */
-  SwtWidgetSimpleWrapper swtWidgWrapper;
+  private final SwtWidgetHelper swtWidgHelper;
   
   protected Text textFieldSwt;
   
@@ -204,7 +204,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     if(!widgg.isEditable()){
       mng.registerShowField(widgg);
     }
-    swtWidgWrapper = new SwtWidgetSimpleWrapper(textFieldSwt, mng);
+    swtWidgHelper = new SwtWidgetHelper(textFieldSwt, mng);
 
     mng.registerWidget(widgg);
     
@@ -231,7 +231,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   }
   
   
-  @Override public GralRectangle getPixelPositionSize(){ return swtWidgWrapper.getPixelPositionSize(); }
+  @Override public GralRectangle getPixelPositionSize(){ return swtWidgHelper.getPixelPositionSize(); }
 
 
 
@@ -291,7 +291,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
           }
         }
         if((chg & chgColorText)!=0){
-          SwtProperties props = swtWidgWrapper.mng.propertiesGuiSwt;
+          SwtProperties props = swtWidgHelper.mng.propertiesGuiSwt;
           if(dyda.textColor !=null){
             textFieldSwt.setForeground(props.colorSwt(dyda.textColor));
           }
@@ -305,8 +305,8 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
         if((chg & chgCursor) !=0){ 
           textFieldSwt.setSelection(caretPos());
         }
-        if((chg & chgColorText) !=0){ textFieldSwt.setForeground(swtWidgWrapper.mng.getColorImpl(dyda().textColor)); }
-        if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(swtWidgWrapper.mng.getColorImpl(dyda().backColor)); }
+        if((chg & chgColorText) !=0){ textFieldSwt.setForeground(swtWidgHelper.mng.getColorImpl(dyda().textColor)); }
+        if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(swtWidgHelper.mng.getColorImpl(dyda().backColor)); }
         textFieldSwt.redraw();
         acknChanged(chg);
       }

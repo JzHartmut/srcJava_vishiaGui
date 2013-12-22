@@ -23,7 +23,7 @@ import org.vishia.gral.ifc.GralRectangle;
  * @author Hartmut Schorrig
  *
  */
-public class SwtWidgetHelper implements GralWidgetHelper
+public class SwtWidgetHelper //implements GralWidgetHelper
 {
 
   /**Version and history
@@ -37,18 +37,22 @@ public class SwtWidgetHelper implements GralWidgetHelper
   public final static int version = 0x20111119;
   
   
-  private static SwtMng mng;
+  private static SwtMng mngs;
   
+  public final SwtMng mng;
   
-  @Override public void setMng(GralMng mng)
-  { this.mng = (SwtMng)mng;
+  public Control widgetSwt;
+
+
+
+  public SwtWidgetHelper(Control widgetSwt, SwtMng mng)
+  { if(SwtWidgetHelper.mngs !=null){ assert(SwtWidgetHelper.mngs == mng); }
+    else {SwtWidgetHelper.mngs = mng; }
+    this.widgetSwt = widgetSwt;
+    this.mng = mng;
   }
 
 
-  public SwtWidgetHelper()
-  { 
-    
-  }
 
 
   public static GralColor getColor(Color swtColor)
@@ -58,7 +62,7 @@ public class SwtWidgetHelper implements GralWidgetHelper
   }
   
   
-  public static Color getColor(GralColor color){ return mng.propertiesGuiSwt.colorSwt(color); }
+  public static Color getColor(GralColor color){ return mngs.propertiesGuiSwt.colorSwt(color); }
   
   public static GralColor setBackgroundColor(GralColor color, Control swtWidget)
   { Color colorSwt = getColor(color);
@@ -109,10 +113,69 @@ public class SwtWidgetHelper implements GralWidgetHelper
   }
 
   
+  
+  public void swtUpdateRedraw(){
+    widgetSwt.update();
+    widgetSwt.redraw();
+  }
+  
+  
+  
+  public boolean setFocusGThread(){ return widgetSwt.setFocus(); }
+
+  public void removeWidgetImplementation()
+  {
+    if(widgetSwt !=null){ 
+      widgetSwt.dispose();
+      widgetSwt = null;
+    }
+  }
+
+
+  public void setBoundsPixel(int x, int y, int dx, int dy)
+  { widgetSwt.setBounds(x,y,dx,dy);
+  }
+  
+  
+  public GralRectangle getPixelPositionSize(){
+    int posx = 0, posy = 0;
+    Rectangle r = widgetSwt.getBounds();
+    Composite parent;
+    if(widgetSwt instanceof Composite){
+      parent = (Composite) widgetSwt; //start with them, maybe the shell itself
+    } else {
+      parent = widgetSwt.getParent();
+    }
+    Rectangle pos;
+    while( !( parent instanceof Shell ) ){
+      pos = parent.getBounds();
+      posx += pos.x; posy += pos.y;
+      parent = parent.getParent();
+    }
+    assert(parent instanceof Shell);
+    Rectangle s = parent.getClientArea();
+    pos = parent.getBounds();
+    int dframe = (pos.width - s.width) /2;   //width of the frame line.
+    posx += r.x + dframe;               //absolute position of the client area!
+    posy += r.y + (pos.height - s.height) - dframe;
+    int dx, dy;
+    if(parent == widgetSwt){
+      dx = s.width;
+      dy = s.height;
+    } else {
+      dx = r.width;
+      dy = r.height;
+    }
+    GralRectangle posSize = new GralRectangle(posx, posy, dx, dy);
+    return posSize;
+  }
+
+
+  
   /**
    * @param widg
    * @return
-   * @deprecated this routine is implemented in {@link SwtWidgetSimpleWrapper}
+   * @deprecated this routine is implemented in {@link SwtWidgetHelper}
    *   which can be used for all widgets (new concept).
    */
   @Deprecated
@@ -150,24 +213,6 @@ public class SwtWidgetHelper implements GralWidgetHelper
   }
 
 
-
-  @Override public boolean showContextMenu(GralWidget widg) {
-    boolean bOk;
-    Control swtWidg = (Control)widg.getWidgetImplementation();
-    Menu contextMenu = swtWidg.getMenu();
-    if(contextMenu == null){
-      bOk = false;
-    } else {
-      //Rectangle pos = swtWidg.getBounds();
-      GralRectangle pos = getPixelPositionSize(swtWidg);
-      contextMenu.setLocation(pos.x + pos.dx, pos.y + pos.dy);
-      contextMenu.setVisible(true);
-      bOk = true;
-    }
-    return bOk;
-  }
-  
-  
   
   
 }

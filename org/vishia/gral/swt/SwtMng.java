@@ -317,7 +317,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   	//, VariableContainer_ifc variableContainer
   	, LogMessage log
   	)
-  { super(device, new SwtWidgetHelper(), propertiesGui, log);
+  { super(device, propertiesGui, log);
     this.propertiesGuiSwt = propertiesGui;
     pos.x.p1 = 0; //start-position
     pos.y.p1 = 4 * propertiesGui.yPixelUnit();
@@ -1295,7 +1295,26 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 	{ return propertiesGuiSwt.colorSwt(colorGral);
 	}
 
-	
+
+
+  @Override public boolean showContextMenuGthread(GralWidget widg) {
+    boolean bOk;
+    Control swtWidg = (Control)widg.getWidgetImplementation();
+    Menu contextMenu = swtWidg.getMenu();
+    if(contextMenu == null){
+      bOk = false;
+    } else {
+      //Rectangle pos = swtWidg.getBounds();
+      GralRectangle pos = SwtWidgetHelper.getPixelPositionSize(swtWidg);
+      contextMenu.setLocation(pos.x + pos.dx, pos.y + pos.dy);
+      contextMenu.setVisible(true);
+      bOk = true;
+    }
+    return bOk;
+  }
+  
+  
+
 	
 	
   /**This routine is invoked on any key event.

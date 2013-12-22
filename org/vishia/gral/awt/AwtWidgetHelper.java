@@ -27,8 +27,14 @@ public class AwtWidgetHelper
     this.mng = mng;
   }
   
+
   
   public GralRectangle getPixelPositionSize(){
+    return getPixelPositionSize(widga);
+  }
+  
+  
+  public static GralRectangle getPixelPositionSize(Component widga){
     int posx = 0, posy = 0;
     Rectangle r = widga.getBounds();
     Container parent;

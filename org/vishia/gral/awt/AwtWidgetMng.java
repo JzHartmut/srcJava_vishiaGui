@@ -69,7 +69,7 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     //, VariableContainer_ifc variableContainer
     , LogMessage log
     )
-  { super(device, null, propertiesGui, log);
+  { super(device, propertiesGui, log);
     mainWindowAwt = window;
     this.propertiesGuiAwt = propertiesGui;
     mainWindowAwt.addKeyListener(mainKeyListener);
@@ -648,7 +648,25 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     return pos.calcWidgetPosAndSize(propertiesGui, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
   }
   
+
+  @Override public boolean showContextMenuGthread(GralWidget widg) {
+    boolean bOk;
+    Component awtWidg = (Component)widg.getWidgetImplementation();
+    Menu contextMenu = null; //awtWidg.get;
+    if(contextMenu == null){
+      bOk = false;
+    } else {
+      //Rectangle pos = swtWidg.getBounds();
+      GralRectangle pos = AwtWidgetHelper.getPixelPositionSize(awtWidg);
+      //contextMenu.setLocation(pos.x + pos.dx, pos.y + pos.dy);
+      //contextMenu.setVisible(true);
+      bOk = true;
+    }
+    return bOk;
+  }
   
+  
+
 
   KeyListener mainKeyListener = new KeyListener(){
 

@@ -55,7 +55,7 @@ public class SwtButton extends GralButton.GraphicImplAccess
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
    * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
    */
-  SwtWidgetSimpleWrapper swtWidgWrapper;
+  private final SwtWidgetHelper swtWidgHelper;
   
   Canvas widgetSwt;
   
@@ -92,12 +92,12 @@ public class SwtButton extends GralButton.GraphicImplAccess
       case 'B': fontText = mng.propertiesGuiSwt.stdButtonFont; break;
       default: throw new IllegalArgumentException("param size must be A or B");
     }
-    swtWidgWrapper = new SwtWidgetSimpleWrapper(widgetSwt, mng);  
+    swtWidgHelper = new SwtWidgetHelper(widgetSwt, mng);  
   }
 
 
   
-  @Override public GralRectangle getPixelPositionSize(){ return swtWidgWrapper.getPixelPositionSize(); }
+  @Override public GralRectangle getPixelPositionSize(){ return swtWidgHelper.getPixelPositionSize(); }
 
   
   void setBoundsGraphic(SwtMng mng)
@@ -111,7 +111,7 @@ public class SwtButton extends GralButton.GraphicImplAccess
   
   
   @Override public void removeWidgetImplementation()
-  { swtWidgWrapper.removeWidgetImplementation();
+  { swtWidgHelper.removeWidgetImplementation();
     widgetSwt = null;
   }
 
@@ -142,8 +142,8 @@ public class SwtButton extends GralButton.GraphicImplAccess
     Rectangle dim = canvas.getBounds();
     SwtButton.this.paint1();
     
-    Color colorBack = swtWidgWrapper.mng.getColorImpl(colorgback);
-    Color colorLine = swtWidgWrapper.mng.getColorImpl(colorgline);
+    Color colorBack = swtWidgHelper.mng.getColorImpl(colorgback);
+    Color colorLine = swtWidgHelper.mng.getColorImpl(colorgline);
     gc.setBackground(colorBack);
     canvas.drawBackground(e.gc, dim.x+1, dim.y+1, dim.width-1, dim.height-1);
     Color color = canvas.getForeground(); //of the widget.

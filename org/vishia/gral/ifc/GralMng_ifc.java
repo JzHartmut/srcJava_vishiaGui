@@ -113,6 +113,15 @@ public interface GralMng_ifc
 	 */
 	Queue<GralWidget> getListCurrWidgets();
 	
+	
+	
+	/**Shows the context menu of any widget independent of the internal right-mouse invocation.
+	 * @param widg The widget.
+	 * @return true if the widget have a context menu.
+	 */
+	boolean showContextMenuGthread(GralWidget widg);
+	
+	
   /**Sets the color of background of the widget, if possible.
    * @param name The name of the widget, which was given by the add...()-Operation
    * @ix may be a line number of table or an position identifier. 0 if unused for the kind of widget. 

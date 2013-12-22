@@ -1203,7 +1203,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     protected final GralTable<UserData> outer;
     
-    protected GralWidgImpl_ifc implWidgWrapper;
+    //protected GralWidgImpl_ifc implWidgWrapper;
 
     
     protected CellData[][] cells;
