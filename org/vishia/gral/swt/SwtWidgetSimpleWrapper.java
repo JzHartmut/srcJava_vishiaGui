@@ -43,8 +43,10 @@ public class SwtWidgetSimpleWrapper implements GralWidgImpl_ifc
 
   @Override public void removeWidgetImplementation()
   {
-    widgetSwt.dispose();
-    widgetSwt = null;
+    if(widgetSwt !=null){ 
+      widgetSwt.dispose();
+      widgetSwt = null;
+    }
   }
 
 

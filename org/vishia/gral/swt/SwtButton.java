@@ -110,11 +110,9 @@ public class SwtButton extends GralButton.GraphicImplAccess
 
   
   
-  @Override
-  public void removeWidgetImplementation()
-  {
-    // TODO Auto-generated method stub
-    
+  @Override public void removeWidgetImplementation()
+  { swtWidgWrapper.removeWidgetImplementation();
+    widgetSwt = null;
   }
 
   @Override

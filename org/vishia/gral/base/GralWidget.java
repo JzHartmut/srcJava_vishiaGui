@@ -8,6 +8,7 @@ import org.vishia.byteData.VariableAccessWithIdx;
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralRectangle;
@@ -524,9 +525,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
      * If this elements are null, the standard color should be used. */
     public GralColor backColor = GralColor.getColor("wh"), backColorNoFocus = GralColor.getColor("lgr")
       , lineColor = GralColor.getColor("bk"), textColor = GralColor.getColor("bk");
-    //public GralColor backColor = GralColor.getColor("wh"), backColorNoFocus = GralColor.getColor("lgr"), 
-    //lineColor = GralColor.getColor("dbl"), textColor = GralColor.getColor("bk");
-  
+
+    /**It depends of the pixel size. Therefore set after setToPanel, if GralMng is known. */
+    public GralFont textFont;
+    
     /**A text to display. */
     public String displayedText;
     
@@ -584,6 +586,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   public final void setToPanel(GralMngBuild_ifc mng) throws IllegalStateException {
     if(wdgImpl !=null) throw new IllegalStateException("setToPanel faulty call - GralTable;");
+    if(dyda.textFont == null) { //maybe set with knowledge of the GralMng before.
+      GralMng mngg = (GralMng)mng;
+      dyda.textFont = mngg.propertiesGui.getTextFont(mngg.pos.height()); 
+    }
     mng.setToPanel(this);
   }
   

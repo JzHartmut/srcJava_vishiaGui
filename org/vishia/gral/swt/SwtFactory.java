@@ -6,7 +6,7 @@ import org.vishia.gral.ifc.GralFactory_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
 
-public class FactorySwt implements GralFactory_ifc
+public class SwtFactory implements GralFactory_ifc
 {
   
   GralArea9Window gui;

@@ -399,7 +399,7 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
   public void add(GralTable<?> table){}
 
 
-  @Override
+  @Override @Deprecated
   public GralWidget addText(String sText, char size, int color)
   {
     // TODO Auto-generated method stub
@@ -408,7 +408,7 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
 
   @Override
   public GralWidget addText(String sText, int origin, GralColor textColor, GralColor BackColor)
-  {
+  { new Label();
     // TODO Auto-generated method stub
     return null;
   }

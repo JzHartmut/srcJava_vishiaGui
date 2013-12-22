@@ -6,7 +6,7 @@ import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralFactory_ifc;
-import org.vishia.gral.swt.FactorySwt;
+import org.vishia.gral.swt.SwtFactory;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.msgDispatch.MsgRedirectConsole;
@@ -25,7 +25,7 @@ public class InspcCurveViewApp
   }
   
   private void execute(){
-    GralFactory_ifc gralFactory = new FactorySwt();
+    GralFactory_ifc gralFactory = new SwtFactory();
     LogMessage log = new LogMessageStream(System.out);
     GralWindow wind = gralFactory.createWindow(log, "Curve View", 'C', 100, 50, 800, 600);
     FileCluster fileCluster = new FileCluster();

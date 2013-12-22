@@ -1459,7 +1459,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       }
     }
     
-    protected void setCellContentNew(){
+    /**Updates the cell text fields which presents the content of the table.
+     * After them update() of the graphic level should be called.
+     * To execute the update of the cells in the graphic layer the {@link #drawCellContent(int, CellData[], TableLineData, LinePresentation)}
+     * is called inside for any cell. This method is implemented in the implementation layer.
+     */
+    protected void updateGraphicCellContent(){
       long dbgtime = System.currentTimeMillis();
       bRedrawPending = true;
 

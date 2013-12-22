@@ -320,7 +320,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       acknChanged(acknChg);
       if(widgg.isVisible()){   
         //
-        setCellContentNew();  //invokes drawCellContent(...) with the correct lines.
+        updateGraphicCellContent();  //invokes drawCellContent(...) with the correct lines.
         //^^^^^^^^^^^^^^^^^
         //setAllCellContentGthread();
         Color colorSelectBack =  swtWidgWrapper.mng.getColorImpl(super.colorSelectCharsBack());
@@ -561,7 +561,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
    * This routine is invoked whenever the focus of any Text field of the table will be lost the focus. 
    * It invokes {@link GralTable.GraphicImplAccess#focusLostTable()} but only if 
    * {@link GralTable.GraphicImplAccess#bRedrawPending} is not set. That prevents invocation while
-   * {@link GralTable.GraphicImplAccess#setCellContentNew()} sets the focus while updating the graphic cells.
+   * {@link GralTable.GraphicImplAccess#updateGraphicCellContent()} sets the focus while updating the graphic cells.
    * 
    */
   @Override public void focusLost(FocusEvent ev){ 

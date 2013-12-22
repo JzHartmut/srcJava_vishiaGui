@@ -14,7 +14,7 @@ import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFactory_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.swt.FactorySwt;
+import org.vishia.gral.swt.SwtFactory;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.KeyCode;

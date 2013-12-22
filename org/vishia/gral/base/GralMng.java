@@ -427,7 +427,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   public GralMng(GralGraphicThread device, GralWidgetHelper widgetHelper, GralGridProperties props, LogMessage log)
 	{ this.gralDevice = device;
 	  this.widgetHelper = widgetHelper;
-	  widgetHelper.setMng(this);
+	  if(widgetHelper !=null) { widgetHelper.setMng(this); }
     this.parent = null;
 	  this.propertiesGui = props;
 		this.log = log;

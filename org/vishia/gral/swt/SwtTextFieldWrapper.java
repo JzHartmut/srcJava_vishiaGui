@@ -295,10 +295,12 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
           if(dyda.textColor !=null){
             textFieldSwt.setForeground(props.colorSwt(dyda.textColor));
           }
-          if(fontText() !=null){
-            textFieldSwt.setFont(props.fontSwt(fontText()));
+          if(dyda.backColor !=null){
+            textFieldSwt.setBackground(props.colorSwt(dyda.backColor));
           }
-
+          if(dyda.textFont !=null){
+            textFieldSwt.setFont(props.fontSwt(dyda.textFont));
+          }
         }
         if((chg & chgCursor) !=0){ 
           textFieldSwt.setSelection(caretPos());

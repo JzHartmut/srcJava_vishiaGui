@@ -1,6 +1,9 @@
 package org.vishia.gral.ifc;
 
-public class GralFont
+import java.util.Map;
+import java.util.TreeMap;
+
+public final class GralFont
 {
   /**Version, history and license.
    * <ul>
@@ -66,6 +69,9 @@ public class GralFont
    */
   public char style;
 
+  
+  private static Map<String, GralFont> fonts = new TreeMap<String, GralFont>();
+  
   public GralFont(String fontName, int size, char style)
   { this.fontName = fontName;
     this.size = size;
@@ -73,6 +79,22 @@ public class GralFont
   }
   
   
+  
+  /**Not yet ready. Therefore protected yet.
+   * @param fontName
+   * @param size Use the grid size!
+   * @param style
+   * @return
+   */
+  protected static GralFont getFont(String fontName, int size, char style){
+    String key = fontName + "." + style + size;
+    GralFont ret = fonts.get(key);
+    if(ret == null){
+      ret = new GralFont(fontName, size, style);
+      fonts.put(key, ret);
+    }
+    return ret;
+  }
   
   
 }

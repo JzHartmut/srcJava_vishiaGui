@@ -81,7 +81,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   
   //protected GralColor colorBack = GralColor.getColor("wh"), colorText = GralColor.getColor("bk");
   
-  protected GralFont fontText;
+  //protected GralFont fontText;
   
   /**A calculator to show calculated float values. It is null if it isn't used. */
   private CalculatorExpr calculator;
@@ -398,7 +398,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
 
   @Override public void setTextStyle(GralColor color, GralFont font)
   {
-    fontText = font;
+    dyda.textFont = font;
     dyda.textColor = color;
     dyda.setChanged(GralWidget.ImplAccess.chgColorText);
     if(wdgImpl !=null){
@@ -461,7 +461,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
       super(widgg, mng);
     }
     
-    protected GralFont fontText(){ return GralTextField.this.fontText; }
+    //protected GralFont fontText(){ return GralTextField.this.fontText; }
     
     protected String prompt(){ return GralTextField.this.sPrompt; }
     

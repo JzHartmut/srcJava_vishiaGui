@@ -73,6 +73,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
+import org.vishia.gral.widget.GralLabel;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
@@ -345,6 +346,9 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
       createWindow((GralWindow)widgg);
     } else if(widgg instanceof GralButton){
       new SwtButton((GralButton)widgg, this);
+    } else if(widgg instanceof GralLabel){
+      new SwtLabel((GralLabel)widgg, this);
+      
     }
   }
   
@@ -663,7 +667,7 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   
-  @Override public GralWidget addText(String sText, char size, int color)
+  @Override @Deprecated public GralWidget addText(String sText, char size, int color)
   {
     Label widget = new Label(((SwtPanel)pos.panel).getPanelImpl(), 0);
     widget.setForeground(propertiesGuiSwt.colorSwt(color));
@@ -694,43 +698,11 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   @Override public GralWidget addText(String sText, int origin, GralColor textColor, GralColor backColor)
   {
-    int mode;
-    switch(origin){
-    case 1: mode = SWT.LEFT; break;
-    case 2: mode = SWT.CENTER; break;
-    case 3: mode = SWT.RIGHT; break;
-    case 4: mode = SWT.LEFT; break;
-    case 5: mode = SWT.CENTER; break;
-    case 6: mode = SWT.RIGHT; break;
-    case 7: mode = SWT.LEFT; break;
-    case 8: mode = SWT.CENTER; break;
-    case 9: mode = SWT.RIGHT; break;
-    default: mode = 0;
-    }
-    Label widget = new Label((Composite)pos.panel.getPanelImpl(), mode);
-    widget.setForeground(propertiesGuiSwt.colorSwt(textColor));
-    widget.setBackground(propertiesGuiSwt.colorSwt(backColor));
-    widget.setText(sText);
-    //Font font = propertiesGui.stdInputFont;
-    Font font = propertiesGuiSwt.getSwtFont(pos.height());
-    widget.setFont(font);
-    //font.getFontData()[0].
-    Point textSize = widget.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-    //int width = sText.length();
-    //widget.setSize(sizePixel);
-    
-    setPosAndSize_(widget);
-    
-    Point widgetSize = widget.getSize();
-    if(widgetSize.x < textSize.x){
-      widget.setSize(textSize);
-    }
-    widget.setSize(textSize);
-    //guiContent.add(widget);
-    GralWidget widg = new GralWidget("labelText-" + sText, 'S', this);
-    SwtWidgetSimpleWrapper widgswt = new SwtWidgetSimpleWrapper(widget, this);
-    //widg.implMethodWidget_.setWidgetImpl(widgswt);
-    return widg;
+    GralLabel widgg = new GralLabel(null, sText, origin);
+    widgg.setTextColor(textColor);
+    widgg.setBackColor(backColor, 0);
+    widgg.setToPanel(this); //Note: sets TextFont, don't call this.setToPanel
+    return widgg;
   }
 
   
@@ -786,9 +758,9 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     GralTextField widgg = new GralTextField(name);
     widgg.setPrompt(prompt, promptStylePosition);
     widgg.setEditable(editable);
-    SwtTextFieldWrapper.createTextField(widgg, this);   
+    setToPanel(widgg);
+    //SwtTextFieldWrapper.createTextField(widgg, this);   
     return widgg;
-    //return new SwtTextFieldWrapper(name, editable, prompt, promptStylePosition, this);
   }
 
   

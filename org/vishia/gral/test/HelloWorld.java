@@ -1,11 +1,12 @@
 package org.vishia.gral.test;
 
+import org.vishia.gral.awt.AwtFactory;
 import org.vishia.gral.base.GralDispatchCallbackWorker;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralFactory_ifc;
-import org.vishia.gral.swt.FactorySwt;
+import org.vishia.gral.swt.SwtFactory;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 
@@ -20,7 +21,7 @@ public class HelloWorld
   }
   
   private void execute(){
-    GralFactory_ifc gralFactory = new FactorySwt();
+    GralFactory_ifc gralFactory = new SwtFactory();
     LogMessage log = new LogMessageStream(System.out);
     GralWindow wind = gralFactory.createWindow(log, "Hello World", 'C', 100, 50, 600, 400);
     gralMng = wind.gralMng();

@@ -7,7 +7,7 @@ import org.vishia.gral.awt.AwtFactory;
 import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralMng;
-import org.vishia.gral.swt.FactorySwt;
+import org.vishia.gral.swt.SwtFactory;
 import org.vishia.inspector.Inspector;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.msgDispatch.LogMessage;
@@ -136,7 +136,7 @@ public class GralArea9MainCmd extends MainCmd
       bOk = false;
     }
     if(cargs.graphicFactory == null){
-      cargs.graphicFactory = new FactorySwt();
+      cargs.graphicFactory = new SwtFactory();
     }
 
     if(sOutputArea == null){ sOutputArea = "A3C3"; }
@@ -220,7 +220,7 @@ public class GralArea9MainCmd extends MainCmd
       }
       
       else if(arg.startsWith("-SWT")) 
-      { cargs.graphicFactory = new FactorySwt();   //an example for default output
+      { cargs.graphicFactory = new SwtFactory();   //an example for default output
       }
       
       else if(arg.startsWith("-AWT")) 
