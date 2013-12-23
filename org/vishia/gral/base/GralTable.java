@@ -84,6 +84,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2013-12-23 Hartmut chg: {@link #checkAndUpdateText(String, CellData)} supports update text on edit cells.
    * <li>2013-12-18 Hartmut chg: {@link CellData} is defined now public and as part of GralTable. There were a problem
    *   using the Java7-Compiler with difficult Generic parameter mismatches. The CellData is a simple data class without
    *   generic, but the compiler has interpreted a generic parameter. May the compiler wrong? The structure of a program
@@ -932,8 +933,17 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   
-  
-  
+  /**Invoked from focus lost of any table cell implementation, checks whether the line is changed.
+   * @param sText The text in the cell from the implementation widget.
+   * @param celldata The cell, the line is gotten from {@link #linesForCell}[{@link CellData#ixCellLine}].
+   */
+  protected void checkAndUpdateText(String sText, CellData celldata){
+    TableLineData line = linesForCell[celldata.ixCellLine];
+    if(!sText.equals(line.cellTexts[celldata.ixCellColumn])){
+      line.cellTexts[celldata.ixCellColumn] = sText;
+      line.bChanged = true;
+    }
+  }  
   
       /**Handle all standard keys of table. 
      * It should call in the key event handler from the implementation class.
@@ -1278,6 +1288,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     protected GralMng itsMng(){ return outer.itsMng; }
     
     protected boolean bColumnEditable(int ix){ return GralTable.this.bColumnEditable[ix]; }
+    
+    
+    protected void checkAndUpdateText(String sText, CellData celldata){
+      GralTable.this.checkAndUpdateText(sText, celldata);
+    }
     
     protected int ixColumn(){ return outer.colSelectedixCellC; }
     
@@ -1702,11 +1717,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      */
     private int treeDepth;
     
-    /**The index number in the container {@link GralTable#tableLines}. It is necessary to find out
-     * the line in the container if the line is given. Conclusion from line to tableLines.get(line.nLineNr). */
-    //public int nLineNr;
     
     public String[] cellTexts;
+    
+    /**True if any of a cell text was changed. */
+    protected boolean bChanged;
     
     public GralColor colorForground, colorBackground;
     
@@ -1813,7 +1828,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     
     @Override public boolean isChanged(boolean setUnchanged){ 
-      return false; 
+      boolean ret = bChanged;
+      if(setUnchanged){
+        bChanged = false;
+      }
+      return ret; 
     }
 
 

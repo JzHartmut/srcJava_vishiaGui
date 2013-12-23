@@ -571,16 +571,19 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     super.focusLostTable();
     if(!bRedrawPending){
       //System.out.println("SwtTable - cell focus lost;" + (SwtTable.this).outer.toString());
-      GralTable.CellData data = (GralTable.CellData)ev.widget.getData();
-      Control widgSwt = (Control)ev.widget;
+      GralTable.CellData celldata = (GralTable.CellData)ev.widget.getData();
+      Text widgSwt = (Text)ev.widget;
+      if(super.bColumnEditable(celldata.ixCellColumn)){
+        String sText = widgSwt.getText();
+        super.checkAndUpdateText(sText, celldata);
+      }
       //widgSwt.setBackground(colorBackSelectNonFocusedSwt); 
       System.out.println("SwtTableCell - focus lost;");
-      int iCellLine = data.ixCellLine; //ixLineNew - ixLine1;
-      for(int iCellCol = 0; iCellCol < zColumn(); ++iCellCol){
-        Text cellSwt = cellsSwt[iCellLine][iCellCol];
-  
+      //int iCellLine = data.ixCellLine; //ixLineNew - ixLine1;
+      //for(int iCellCol = 0; iCellCol < zColumn(); ++iCellCol){
+        
         //cellSwt.setBackground(colorBackSelectNonFocusedSwt);
-      }
+      //}
     }
   }
   

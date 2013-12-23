@@ -1,5 +1,7 @@
 package org.vishia.guiInspc;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMng;
@@ -24,7 +26,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class InspcFieldTable
+public class InspcFieldTable implements Runnable
 {
   /**Version, history and license.
    * <ul>
@@ -58,7 +60,7 @@ public class InspcFieldTable
   //@SuppressWarnings("hiding")
   protected final static int version = 0x20131218;
 
-  
+  private static final int sizeName = 20, sizeType = 10;
   
   /**The window to present. */
   private final GralWindow wind;
@@ -70,7 +72,7 @@ public class InspcFieldTable
   private final GralTable<InspcStruct.FieldOfStruct> widgTable;
 
   
-  private final GralButton btnBack, btnRefresh, btnShowAll;
+  private final GralButton btnBack, btnRefresh, btnShowAll, btnSetValue;
   
   private final InspcMng variableMng;
   
@@ -78,17 +80,20 @@ public class InspcFieldTable
   
   private String sPathStruct;
   
+  /**Set in graphic thread with {@link #btnSetValue}, ask and reset in the InspcMng-thread. */
+  protected AtomicBoolean bSetValue = new AtomicBoolean();
+  
   public InspcFieldTable(InspcMng variableMng)
-  {
-    super();
+  { variableMng.addUserOrder(this);  //invoke run in any communication step.
     this.wind = new GralWindow("InspcFieldTableWind", "Fields of ...", GralWindow_ifc.windOnTop);
     this.widgPath = new GralTextField("InspcFieldTableWind");
-    this.widgTable = new GralTable<InspcStruct.FieldOfStruct>("InspcFieldTable", new int[]{20, 0, -10});
+    this.widgTable = new GralTable<InspcStruct.FieldOfStruct>("InspcFieldTable", new int[]{sizeName, 0, -sizeType});
     this.widgTable.setColumnEditable(1, true);
-    this.widgTable.setActionChange(actionChgTable);
+    this.widgTable.setActionChange(this.actionChgTable);
     this.btnBack = new GralButton("@InspcFieldBack", "<<", actionBack);
     this.btnRefresh = new GralButton("@InspcFieldRefresh", "refresh", actionRefresh);
     this.btnShowAll = new GralButton("@InspcFieldShowAll", "show all", actionShowAll);
+    this.btnSetValue = new GralButton("@InspcFieldSetValue", "set values", actionSetValues);
     this.variableMng = variableMng;
   }
   
@@ -103,7 +108,9 @@ public class InspcFieldTable
     btnRefresh.setToPanel(mng);
     mng.setPosition(2, -2, 0, 0, 0, 'd');
     widgTable.setToPanel(mng);
-    mng.setPosition(-2, 0, -5, 0, 0, 'r');
+    mng.setPosition(-2, 0, sizeName, sizeName + 15, 0, 'r');
+    btnSetValue.setToPanel(mng);
+    mng.setPosition(-2, 0, -sizeType, 0, 0, 'r');
     btnShowAll.setToPanel(mng);
   }
   
@@ -158,17 +165,11 @@ public class InspcFieldTable
   
   
   
+  
   void showValue(GralTableLine_ifc<InspcStruct.FieldOfStruct> line){
     InspcStruct.FieldOfStruct field = line.getUserData();
     if(field !=null){
-      InspcVariable var = field.variable();
-      if(var == null){
-        String sPathVar = sPathStruct + '.' + field.name;
-        var = (InspcVariable)variableMng.getVariable(sPathVar);
-        if(var !=null){
-          field.setVariable(var);
-        }
-      }
+      InspcVariable var = variableMng.getOrCreateVariable(struct, field);
       if(var !=null){
         var.requestValue(System.currentTimeMillis());
         char cType = var.getType();
@@ -209,6 +210,28 @@ public class InspcFieldTable
       struct = substruct;
       sPathStruct = struct.path();
       fillTableStruct();
+    }
+  }
+  
+  
+  
+  void actionSetValues(){
+    for(GralTableLine_ifc<InspcStruct.FieldOfStruct> line: widgTable.iterLines()){
+      if(line.isChanged(true)){
+        InspcStruct.FieldOfStruct field = line.getUserData();
+        String value = line.getCellText(1);
+        variableMng.cmdSetValueOfField(struct, field, value);
+      }
+    }
+  }
+  
+  
+  /**This method is invoked in {@link InspcMng#procComm()} because it is registered there.
+   * It prepares set value.
+   */
+  @Override public void run(){
+    if(bSetValue.compareAndSet(true, false)){
+      actionSetValues();
     }
   }
   
@@ -278,6 +301,20 @@ public class InspcFieldTable
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         showAll();
+        return true;
+      } else { 
+        return false;
+      }
+    }
+  };
+
+  
+  
+  GralUserAction actionSetValues = new GralUserAction("InspcFieldTable - set values"){
+    @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        bSetValue.set(true);
+        InspcFieldTable.this.variableMng.addUserOrder(InspcFieldTable.this);
         return true;
       } else { 
         return false;
