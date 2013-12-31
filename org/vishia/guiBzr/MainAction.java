@@ -109,7 +109,7 @@ public class MainAction
       cmdarg[2] = dirWorkingTree.getAbsolutePath();
       cmdarg[3] = tempBzrDir.getAbsolutePath();
       cmdarg[4] = "--per-file-timestamps";
-      mainData.cmdExec.execute(cmdarg, null, System.err, System.err, false);
+      mainData.cmdExec.execute(cmdarg, null, System.err, System.err);
       //it is reverted.
       boolean bMovedBack = fileBzrTmp.renameTo(fileBzr);
       if(!bMovedBack){

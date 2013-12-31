@@ -52,14 +52,14 @@ public class Bzr
       throw new IOException("Bzr.searchRepository - .bzr... not found ;" + startDir.getAbsolutePath());
     } else {
       String sBzrDir = FileSystem.getCanonicalPath(currDir);
-      DataAccess.setVariable(dst, bzrdir, 'S', sBzrDir);
+      DataAccess.createOrReplaceVariable(dst, bzrdir, 'S', sBzrDir, true);
       //dst.put(bzrdir, sBzrDir);
       if(!fBzr.getName().equals(".bzr")){   //one of the batch files found
         String sLine = FileSystem.grep1line(fBzr, "bzr_mvExpl.bat");
         if(sLine !=null){
           int pos = sLine.indexOf("bzr_mvExpl.bat");
           String sBzrSrc = sLine.substring(pos + 15).trim();
-          DataAccess.setVariable(dst, bzrsrc, 'S', sBzrSrc);
+          DataAccess.createOrReplaceVariable(dst, bzrsrc, 'S', sBzrSrc, true);
           //dst.put(bzrsrc, sBzrSrc);
         }
         if(sLine == null) {
