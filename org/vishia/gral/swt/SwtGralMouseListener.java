@@ -13,6 +13,7 @@ import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralMouseWidgetAction_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
 /**This class contains the functionality of mouse button and move listening for Gral adaption of SWT.
@@ -294,7 +295,11 @@ public class SwtGralMouseListener
               action.exec(keyCode, widgg);
             }
           }
-        } catch(Exception exc){ System.err.printf("SwtGralMouseListener - any exception while mouse down; %s\n", exc.getMessage()); }
+        } catch(Exception exc){ 
+          CharSequence text = Assert.exceptionInfo("SwtGralMouseListener - any exception while mouse down;", exc, 0, 20);
+          //System.err.append(text).append('\n'); 
+          System.err.printf(text.toString()); 
+        }
       }
     }
 

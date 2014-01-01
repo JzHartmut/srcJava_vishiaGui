@@ -913,12 +913,39 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   @Override public void refreshFromVariable(VariableContainer_ifc container
       , long timeLatest, GralColor colorRefreshed, GralColor colorOld
-  ){
-    String sDataPath = this.getDataPath();
+  ){    
     if(sDataPath !=null && sDataPath.startsWith("#"))
       stop();
     if(this instanceof GralLed)
       stop();
+    //
+    //check and search the variable(s):
+    //
+    if(variable ==null && variables == null && sDataPath !=null && !sDataPath.startsWith("#")){ //no variable known, get it.
+      if(sDataPath.contains(",")){
+        String[] sDataPaths = sDataPath.split(",");
+        variables = new LinkedList<VariableAccess_ifc>();
+        for(String sPath1: sDataPaths){
+          if(sPath1.contains("["))
+            stop();
+          String sPath2 = sPath1.trim();
+          String sPath = itsMng.replaceDataPathPrefix(sPath2);
+          VariableAccess_ifc variable1 = container.getVariable(sPath);
+          if(variable1 !=null){
+            variables.add(variable1);
+          }
+        }
+      } else {
+        if(sDataPath.contains("["))
+          stop();
+        String sPath2 = sDataPath.trim();
+        String sPath = itsMng.replaceDataPathPrefix(sPath2);
+        variable = container.getVariable(sPath);
+      }
+    }
+    //
+    //
+    //
     if(actionShow !=null){
       //The users method to influence how the widget is presented in view:
       if(!actionShow.exec(0, this, variable !=null ? variable : variables)){
@@ -926,31 +953,6 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       }
     } else {
       //standard behaviour to show: call setValue or setText which may overridden by the widget type.
-      if(variable ==null && variables == null){ //no variable known, get it.
-        //final int[] ixArrayA = new int[1];
-        if(sDataPath !=null && !sDataPath.startsWith("#")){  //only refresh widgets with a data path.
-          if(sDataPath.contains(",")){
-            String[] sDataPaths = sDataPath.split(",");
-            variables = new LinkedList<VariableAccess_ifc>();
-            for(String sPath1: sDataPaths){
-              if(sPath1.contains("["))
-                stop();
-              String sPath2 = sPath1.trim();
-              String sPath = itsMng.replaceDataPathPrefix(sPath2);
-              VariableAccess_ifc variable1 = container.getVariable(sPath);
-              if(variable1 !=null){
-                variables.add(variable1);
-              }
-            }
-          } else {
-            if(sDataPath.contains("["))
-              stop();
-            String sPath2 = sDataPath.trim();
-            String sPath = itsMng.replaceDataPathPrefix(sPath2);
-            variable = container.getVariable(sPath);
-          }
-        }
-      }
       if(variable !=null){
         if(sDataPath !=null && sDataPath.contains("#dEB:activeDamping.i1intg"))
           Assert.stop();

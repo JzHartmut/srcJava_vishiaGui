@@ -70,6 +70,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2014-01-02 Hartmut chg: does not call 'file.refreshProperties(null);' in {@link #actionSetPath}
+   *   because the property whether it is a directory or not should be known. Prevents a timeout waiting in graphic thread!!! 
    * <li>2013-09-06 Hartmut chg: Now a new request of fillIn can be executed with aborting the old one.
    * <li>2013-09-15 Hartmut chg: New implementation of {@link #fillIn(FileRemote, boolean)}
    *   using the new {@link FileRemote#getChildren(org.vishia.fileRemote.FileRemote.ChildrenEvent).} 
@@ -1289,7 +1291,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
           
         } else {
           FileRemote file = originDir.itsCluster.getDir(sPath);
-          file.refreshProperties(null);
+          //file.refreshProperties(null);
           if(file.isDirectory()){
             fillIn(file, false);
           } else if(file.isFile()){
