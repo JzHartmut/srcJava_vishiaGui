@@ -132,6 +132,12 @@ public interface GralWidget_ifc extends Removeable
    */
   public abstract void setFocus(int delay, int latest);
   
+  
+  
+  /**Returns true if this widget is the focused one.
+   */
+  boolean isInFocus();
+  
   /**Sets this widget visible on graphic or invisible. Any widget can be visible or not. More as one widgets
    * can use the same position, only one of them may set visible. 
    * For a {@link GralWindow}, its the visibility of the whole window. 

@@ -35,6 +35,7 @@ import org.vishia.gral.widget.GralColorSelector;
 import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
 /**This is the base class of the GuiPanelMng for several Graphic-Adapters (Swing, SWT etc.). 
@@ -1156,6 +1157,9 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
      * @param widgg
      */
     protected void focusLostGral(GralWidget widgg){
+      GralWidget.ImplAccess.setFocused(widgg, false);
+      //CharSequence text = Assert.stackInfo("", 1, 5);
+      //System.out.println("GralMng - widget focus lost;" + widgg.name + text);
     }
 
     /**Standard action on focus gained:
@@ -1168,6 +1172,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
      */
     protected void focusGainedGral(GralWidget widgg){
       GralMng.this.notifyFocus(widgg);
+      GralWidget.ImplAccess.setFocused(widgg, true);
       String htmlHelp = widgg.getHtmlHelp();
       if(htmlHelp !=null && applAdapter !=null){
         applAdapter.setHelpUrl(htmlHelp);

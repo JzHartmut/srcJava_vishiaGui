@@ -171,6 +171,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2014-01-03 Hartmut new: {@link #isInFocus()} 
    * <li>2013-12-21 Hartmut chg: {@link #repaint()} invokes redraw immediately if it is in graphic thread.
    *   It invokes {@link #repaint(int, int)} with the {@link #repaintDelay} if it is not in graphic thread.
    *   It does nothing if the implementation layer widget is not created yet. It means it can invoked
@@ -446,6 +447,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * */
   protected boolean bEditable;
   
+  
+  /**Set on focus gained, false on focus lost. */
+  protected boolean bHasFocus;
   
   /**If this bit is true on an edit field, it should be initialized.
    * 
@@ -914,7 +918,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   @Override public void refreshFromVariable(VariableContainer_ifc container
       , long timeLatest, GralColor colorRefreshed, GralColor colorOld
   ){    
-    if(sDataPath !=null && sDataPath.startsWith("#"))
+    if(sDataPath !=null && sDataPath.startsWith("intern"))
       stop();
     if(this instanceof GralLed)
       stop();
@@ -1041,6 +1045,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   @Override public boolean isVisible(){
     return bVisibleState;
+  }
+
+  
+  @Override public boolean isInFocus(){
+    return bHasFocus;
   }
 
   
@@ -1396,6 +1405,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       } else return null;
     }
     
+    
+    public static void setFocused(GralWidget widgg, boolean focus){
+      widgg.bHasFocus = focus;
+    }
   }
   
   /**Not intent to get from user: The instance which's methods can be called from an event method of the implementation of the GralWidget. 

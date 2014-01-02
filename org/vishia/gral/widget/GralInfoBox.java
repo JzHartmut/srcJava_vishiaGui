@@ -280,6 +280,16 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   { if(textBox !=null){ textBox.setFocus(delay, latest); }
     else if(htmlBox !=null){ htmlBox.setFocus(delay, latest);}
   }
+  
+  
+  @Override public boolean isInFocus()
+  { if(textBox !=null){ return textBox.isInFocus(); }
+    else if(htmlBox !=null){ return htmlBox.isInFocus();}
+    else return false;
+  }
+  
+  
+  
 
   @Override public void setFullScreen(boolean full){ window.setFullScreen(full); }
 

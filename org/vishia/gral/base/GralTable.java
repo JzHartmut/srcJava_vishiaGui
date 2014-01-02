@@ -1873,15 +1873,17 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     { return GralTable.this.colSelectedixCellC;
     }
 
-    @Override public void setFocus() { GralTable.this.setFocus(); }
-
     @Override public boolean setVisible(boolean visible) 
     { return false;  //TODO line visible. 
     }
 
     
     
+    @Override public void setFocus() { GralTable.this.setFocus(); }
+
     @Override public void setFocus(int delay, int latest) { GralTable.this.setFocus(delay, latest); }
+
+    @Override public boolean isInFocus(){ return GralTable.this.isInFocus(); } 
 
     @Override public boolean isVisible(){ return GralTable.this.isVisible(); }
     

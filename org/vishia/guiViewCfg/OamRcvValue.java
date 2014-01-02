@@ -37,9 +37,9 @@ public class OamRcvValue implements Runnable
 	
 	private final Map<String, String> indexUnknownVariable = new TreeMap<String, String>();
 	
-	InspcDataExchangeAccess.ReflDatagram datagramRcv = new InspcDataExchangeAccess.ReflDatagram();
+	InspcDataExchangeAccess.InspcDatagram datagramRcv = new InspcDataExchangeAccess.InspcDatagram();
 	
-	InspcDataExchangeAccess.Reflitem infoEntity = new InspcDataExchangeAccess.Reflitem();
+	InspcDataExchangeAccess.Inspcitem infoEntity = new InspcDataExchangeAccess.Inspcitem();
 	
 	final Report log;
 
