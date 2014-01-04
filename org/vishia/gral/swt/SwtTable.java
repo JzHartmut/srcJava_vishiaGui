@@ -33,6 +33,7 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
@@ -364,7 +365,10 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   }
 
 
-  
+  @Override
+  protected void setDragEnable(int dragType)
+  { throw new IllegalArgumentException("drag not supported for this widget type");
+  }
   
 
   /**Removes the graphical widgets.
@@ -902,7 +906,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   protected SwtKeyListener swtKeyListener = new SwtKeyListener(widgg.gralMng()._impl.gralKeyListener)
   {
 
-    @Override public final boolean specialKeysOfWidgetType(int key, GralWidget widgg, Object widgImpl){ 
+    @Override public final boolean specialKeysOfWidgetType(int key, GralWidget_ifc widgg, Object widgImpl){ 
       boolean bDone = true;
       if(KeyCode.isWritingKey(key)){
         //bTextChanged = true;

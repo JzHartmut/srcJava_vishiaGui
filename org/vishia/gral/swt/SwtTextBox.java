@@ -14,6 +14,7 @@ import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.KeyCode;
 
 public class SwtTextBox extends GralTextBox
@@ -155,7 +156,7 @@ public class SwtTextBox extends GralTextBox
   protected SwtKeyListener swtKeyListener = new SwtKeyListener(itsMng._impl.gralKeyListener)
   {
 
-    @Override public final boolean specialKeysOfWidgetType(int key, GralWidget widgg, Object widgImpl){ 
+    @Override public final boolean specialKeysOfWidgetType(int key, GralWidget_ifc widgg, Object widgImpl){ 
       boolean bDone = true;
       if(KeyCode.isWritingKey(key)){
         bTextChanged = true;

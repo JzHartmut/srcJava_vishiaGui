@@ -695,7 +695,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Gets the data path. It is a String in application context.
    */
-  public String getDataPath(){ return sDataPath; }
+  @Override public String getDataPath(){ return sDataPath; }
   
   /**Sets the action in application context for processing of user handling for the widget.
    * Handling means, pressing button, user inputs of text fields

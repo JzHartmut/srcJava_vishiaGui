@@ -362,7 +362,7 @@ public final class InspcCurveView
   
   protected boolean dropVariable(int actionCode, GralWidget widgd, boolean bInsert){
     if(actionCode == KeyCode.menuEntered){
-      GralWidget variableWidget = gralMng.getWidgetOnMouseDown();
+      GralWidget_ifc variableWidget = gralMng.getLastClickedWidget();
       //GralTextField widgText = (GralTextField)widgd;
       //String sVariable = variableWidget.name;
       Object oContentInfo = widgd.getContentInfo();
@@ -522,7 +522,7 @@ public final class InspcCurveView
   
   /**This action will be called if the mouse is pressed on the drop field.
    * It is not drag and drop because drag'ndrop doesn't works on a field which content is not be able to select.
-   * That is on show fields. Therefore the {@link GralMng#getWidgetOnMouseDown()} is used to detect
+   * That is on show fields. Therefore the {@link GralMng#getLastClickedWidget()} is used to detect
    * which show field was clicked last.
    * 
    */

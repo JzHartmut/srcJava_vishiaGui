@@ -70,7 +70,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * <li>2012-01-14 Hartmut chg: {@link #registerWidget(GralWidget)}: uses {@link GralPanelContent#addWidget(GralWidget, boolean)}.
    * <li>2012-01-14 Hartmut new {@link #getValueFromWidget(GralWidget)} implementing here for non-platform depending values, especially GralTable.
    * <li>2011-12-26 Hartmut new {@link #setApplicationAdapter(GralMngApplAdapter_ifc)} to support context sensitive help by focusGained of widgets.
-   * <li>2011-11-18 Hartmut new {@link #getWidgetOnMouseDown()} to get the last clicked widget in any user routine.
+   * <li>2011-11-18 Hartmut new {@link #getLastClickedWidget()} to get the last clicked widget in any user routine.
    *   The information about the widget can be used to capture widgets for any script.
    * <li>2011-11-17 Hartmut new addText(String) as simple variant.  
    * <li>2011-11-14 Hartmut bugfix: copy values of GralTabbedPanel.pos to this.pos instead set the reference from GralWidgetMng to GralTabbedPanel.pos 
@@ -405,7 +405,11 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   protected String sCurrPanel;
   
-  protected GralWidget lastClickedWidgetInfo;
+  /**Last focused widget or last selected line in a table. 
+   * This info can be used to get the last widget on a context menu etc. on another widget.
+   * See {@link #getLastClickedWidget()}
+   */
+  private GralWidget_ifc lastClickedWidget;
   
 
 	@Override public Queue<GralWidget> getListCurrWidgets(){ return pos.panel.widgetList; }
@@ -594,9 +598,9 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
 	/**This method is called whenever the left mouse is pressed on a widget, whiches 
 	 * @param lastClickedWidgetInfo
 	 */
-	public void setLastClickedWidgetInfo(GralWidget lastClickedWidgetInfo)
+	public void setLastClickedWidget(GralWidget_ifc lastClickedWidgetInfo)
 	{
-		this.lastClickedWidgetInfo = lastClickedWidgetInfo;
+		this.lastClickedWidget = lastClickedWidgetInfo;
 	}
 	
 	
@@ -607,7 +611,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
 	 * <b>setDataPath("widgetInfo");</b> to prevent getting its own widget info.  
 	 * @return The last clicked widget
 	 */
-	public GralWidget getWidgetOnMouseDown(){ return lastClickedWidgetInfo; }
+	public GralWidget_ifc getLastClickedWidget(){ return lastClickedWidget; }
 	
 	
   /**Registers all user actions, which are able to use in Button etc.
@@ -884,10 +888,10 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
 		, GralWidget infos, Object... params
 		)
 		{ 
-			if(lastClickedWidgetInfo !=null){
+			if(lastClickedWidget !=null){
 				log.sendMsg(Report.info, "widget %s, datapath=%s"
-					, GralMng.this.lastClickedWidgetInfo.name
-					, GralMng.this.lastClickedWidgetInfo.getDataPath());
+					, GralMng.this.lastClickedWidget.getName()
+					, GralMng.this.lastClickedWidget.getDataPath());
 	      return true;
 			} else {
 				log.sendMsg(0, "widgetInfo - no widget selected");

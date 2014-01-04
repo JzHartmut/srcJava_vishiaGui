@@ -45,7 +45,7 @@ public class AwtGralMouseListener
         GralMng guiMng = widgetInfo.gralMng();
         try{
           if(widgetInfo ==null || widgetInfo.getDataPath() ==null || !widgetInfo.getDataPath().equals("widgetInfo")){
-            guiMng.setLastClickedWidgetInfo(widgetInfo );
+            guiMng.setLastClickedWidget(widgetInfo );
           }
           if(guiMng.bDesignMode){
             GralRectangle rr = new GralRectangle(ev.getX(), ev.getY(), 0, 0);

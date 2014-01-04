@@ -1,6 +1,7 @@
 package org.vishia.gral.base;
 
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.KeyCode;
 
 /**The main key listener.
@@ -96,24 +97,24 @@ public class GralKeyListener implements GralKeySpecial_ifc
   
   
   
-  public boolean keyPressed(int keyCode, GralWidget widgetDescr, Object widgImpl){
+  public boolean keyPressed(int keyCode, GralWidget_ifc widgetDescr, Object widgImpl){
     boolean actionDone;
     final GralUserAction action = widgetDescr.getActionChange();
-    final GralMng mng = widgetDescr.itsMng;
+    final GralMng mng = widgetDescr.gralMng();
     try{
       actionDone = specialKeysOfWidgetType(keyCode, widgetDescr, widgImpl);
       if(!actionDone && action !=null){ 
-          actionDone = action.userActionGui(keyCode, widgetDescr);
+          actionDone = action.exec(keyCode, widgetDescr);
       } //if(table.)
       if(!actionDone && mng.userMainKeyAction() !=null){
-        actionDone = mng.userMainKeyAction().userActionGui(keyCode, widgetDescr);
+        actionDone = mng.userMainKeyAction().exec(keyCode, widgetDescr);
       }
       if(!actionDone){
         GralUserAction mainKeyAction = mng.getRegisteredUserAction("KeyAction");
         if(mainKeyAction !=null){
           //old form called because compatibility, if new for with int-parameter returns false.
-          if(!mainKeyAction.userActionGui(keyCode, widgetDescr)){
-            mainKeyAction.userActionGui("key", widgetDescr, new Integer(keyCode));
+          if(!mainKeyAction.exec(keyCode, widgetDescr)){
+            mainKeyAction.exec(keyCode, widgetDescr, new Integer(keyCode));
           }
         }
       }
@@ -125,7 +126,7 @@ public class GralKeyListener implements GralKeySpecial_ifc
   }
   
   
-  @Override public boolean specialKeysOfWidgetType(int key, GralWidget widgg, Object widgImpl){ return false; }
+  @Override public boolean specialKeysOfWidgetType(int key, GralWidget_ifc widgg, Object widgImpl){ return false; }
 
   
 }

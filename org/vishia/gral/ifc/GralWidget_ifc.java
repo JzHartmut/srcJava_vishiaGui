@@ -107,6 +107,11 @@ public interface GralWidget_ifc extends Removeable
   
   public String getName();
   
+  public String getDataPath();
+  
+  
+  public GralUserAction getActionChange();
+  
   /**This routine should be called only one time after the Gral widget was created. It is overridden by the 
    * implementation widget. It invokes the proper method of the {@link GralMngBuild_ifc} to set and show 
    * the graphical implementation layer widgets.

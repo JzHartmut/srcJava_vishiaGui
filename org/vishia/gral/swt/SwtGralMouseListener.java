@@ -103,7 +103,7 @@ public class SwtGralMouseListener
           if( sDataPath ==null  //no datapath given, write info! 
             || !sDataPath.equals("widgetInfo")  //don't write info if it is a widgetInfo widget itself.
             ){
-            guiMng.setLastClickedWidgetInfo(widgg );
+            guiMng.setLastClickedWidget(widgg );
           }
           if(guiMng.bDesignMode){
             GralRectangle rr = new GralRectangle(ev.x, ev.y, 0, 0);

@@ -8,6 +8,7 @@ import org.vishia.gral.base.GralKeySpecial_ifc;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 
 /**A common key listener implementation for SWT. It is applied to all widgets.
  * Derived forms exists for special SWT-widgets.
@@ -49,7 +50,7 @@ public class SwtKeyListener implements GralKeySpecial_ifc, KeyListener// extends
   @Override
   public void keyPressed(KeyEvent keyEv)
   {
-    final GralWidget widgetDescr;
+    final GralWidget_ifc widgetDescr;
     //System.out.println("" + keyEv.character + Integer.toHexString(keyEv.keyCode));
     
     final Object source = keyEv.getSource();
@@ -60,6 +61,8 @@ public class SwtKeyListener implements GralKeySpecial_ifc, KeyListener// extends
       if(oData instanceof GralTextField.GraphicImplAccess){
         GralTextField.GraphicImplAccess widgi = (GralTextField.GraphicImplAccess) oData;
         widgetDescr = widgi.widgg;
+      } else if(oData instanceof GralWidget_ifc){
+        widgetDescr = (GralWidget_ifc)oData;
       } else { widgetDescr = null;  }
     } else { 
       widgetDescr = null; 
@@ -87,7 +90,7 @@ public class SwtKeyListener implements GralKeySpecial_ifc, KeyListener// extends
     
   }
   
-  @Override public boolean specialKeysOfWidgetType(int key, GralWidget widgg, Object widgImpl){ return false; }
+  @Override public boolean specialKeysOfWidgetType(int key, GralWidget_ifc widgg, Object widgImpl){ return false; }
 
 
 }

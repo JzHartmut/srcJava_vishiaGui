@@ -1,5 +1,7 @@
 package org.vishia.gral.base;
 
+import org.vishia.gral.ifc.GralWidget_ifc;
+
 public interface GralKeySpecial_ifc 
 {
 
@@ -12,6 +14,6 @@ public interface GralKeySpecial_ifc
    * 
    * 
    * */
-  boolean specialKeysOfWidgetType(int key, GralWidget widgg, Object widgImpl);
+  boolean specialKeysOfWidgetType(int key, GralWidget_ifc widgg, Object widgImpl);
 
 }

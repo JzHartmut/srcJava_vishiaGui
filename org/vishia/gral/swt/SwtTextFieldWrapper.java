@@ -26,6 +26,7 @@ import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.KeyCode;
 
 public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
@@ -436,7 +437,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     { super(keyAction);
     }
 
-    @Override public final boolean specialKeysOfWidgetType(int key, GralWidget widgg, Object widgImpl){ 
+    @Override public final boolean specialKeysOfWidgetType(int key, GralWidget_ifc widgg, Object widgImpl){ 
       boolean bDone = true;
       if(KeyCode.isWritingKey(key)){
         setTextChanged();

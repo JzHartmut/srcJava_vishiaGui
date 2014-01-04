@@ -810,6 +810,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       linenext = line.nextSibling();  //may go to next root
     }
     while(linenext == null //no sibling found
+      && line.parent() !=null  
       && !line.parentEquals(rootLine)) 
     {
       linenext = line.parent();
@@ -972,7 +973,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       }
       //NOTE: prevent to fast key action if the last redraw is yet finished.
       //The draw needs to much time in Linux-GTK with an Atom processor (Lenovo)
-      if( keyDone || keyCode == KeyCode.mouse1Double || (time - timeLastRedraw) > 350){  //use 350 ms for timeout if keyDone isn't set.  
+      if( keyDone || keyCode == KeyCode.mouse1Double || (time - timeLastRedraw) > 50){  //use 50 ms for timeout if keyDone isn't set.  
         keyDone = false;
         switch(keyCode){
         case KeyCode.pgup: {
@@ -1167,7 +1168,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    *  
    * @param line
    */
-  protected void actionOnLineSelected(int key, GralTableLine_ifc<?> line){
+  private void actionOnLineSelected(int key, GralTableLine_ifc<?> line){
+    itsMng.setLastClickedWidget(lineSelected);
     if(actionOnLineSelected !=null){
       actionOnLineSelected.exec(key, this, line);
     }
@@ -1720,6 +1722,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     public String[] cellTexts;
     
+    /**A line may have its datapath adequate a {@link GralWidget}, only used for
+     * {@link #getDataPath()} and {@link #setDataPath(String)}.
+     */
+    private String sDataPath;
+    
     /**True if any of a cell text was changed. */
     protected boolean bChanged;
     
@@ -1860,6 +1867,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       return oldText;
     }
 
+    
+    
+    
     @Override public UserData getUserData() { return data;  }
 
     //@Override public void setUserData(UserData data) {this.userData = data; }
@@ -1970,10 +1980,15 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
     
     @Override public void setDataPath(String sDataPath){
-      GralTable.this.setDataPath(sDataPath);
+      this.sDataPath = sDataPath;
     }
 
     
+    
+    @Override public String getDataPath(){ return this.sDataPath; }
+
+    @Override public GralUserAction getActionChange(){ return GralTable.this.getActionChange(); }
+
     
 
     //@Override public Object[] getWidgetMultiImplementations(){ return null; }

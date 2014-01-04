@@ -445,7 +445,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   
   protected GralKeyListener gralKeyListener = new GralKeyListener(itsMng)
   {
-    @Override public boolean specialKeysOfWidgetType(int key, GralWidget widgg, Object widgImpl){ return false; }
+    @Override public boolean specialKeysOfWidgetType(int key, GralWidget_ifc widgg, Object widgImpl){ return false; }
   };
 
   

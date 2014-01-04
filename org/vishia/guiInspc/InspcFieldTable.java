@@ -1,5 +1,7 @@
 package org.vishia.guiInspc;
 
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.vishia.byteData.VariableAccess_ifc;
@@ -30,6 +32,7 @@ public class InspcFieldTable implements Runnable
 {
   /**Version, history and license.
    * <ul>
+   * <li>2014-01-05 indexSelection
    * <li>2013-12-18 Created.
    * </ul>
    * 
@@ -58,7 +61,7 @@ public class InspcFieldTable implements Runnable
    * 
    */
   //@SuppressWarnings("hiding")
-  protected final static int version = 0x20131218;
+  protected final static String sVersion = "2014-01-06";
 
   private static final int sizeName = 20, sizeType = 10;
   
@@ -76,9 +79,29 @@ public class InspcFieldTable implements Runnable
   
   private final InspcMng variableMng;
   
+  /**This index stores the last selected file for any component which was used.
+   * If the component path is reused later, the same field will be selected initially.
+   * It helps by navigation through the file tree.
+   * <ul>
+   * <li>The key is the path in canonical form with '/' as separator (in windows too!) 
+   *   but without terminating '/'.
+   * <li>The value is the name of the file in this directory.   
+   * </ul>
+   */
+  private final Map<String, String> indexSelection = new TreeMap<String, String>(); 
+  
+
+  
   private InspcStruct struct;
   
+  /**Path in target to the struct which is shown in table.  */
   private String sPathStruct;
+  
+  
+  /**Name and path to the current selected field. */
+  private String sFieldCurrent, sPathCurrent;
+  
+  private long timeLineSelected;
   
   /**Set in graphic thread with {@link #btnSetValue}, ask and reset in the InspcMng-thread. */
   protected AtomicBoolean bSetValue = new AtomicBoolean();
@@ -90,6 +113,7 @@ public class InspcFieldTable implements Runnable
     this.widgTable = new GralTable<InspcStruct.FieldOfStruct>("InspcFieldTable", new int[]{sizeName, 0, -sizeType});
     this.widgTable.setColumnEditable(1, true);
     this.widgTable.setActionChange(this.actionChgTable);
+    this.widgTable.specifyActionOnLineSelected(actionLineSelected);
     this.btnBack = new GralButton("@InspcFieldBack", "<<", actionBack);
     this.btnRefresh = new GralButton("@InspcFieldRefresh", "refresh", actionRefresh);
     this.btnShowAll = new GralButton("@InspcFieldShowAll", "show all", actionShowAll);
@@ -153,6 +177,14 @@ public class InspcFieldTable implements Runnable
         String sField1 = field.hasSubstruct ? "+ " + field.name : field.name;
         line.setCellText(sField1, 0);
         line.setCellText(field.type, 2);
+        line.setDataPath(sPathStruct + "." + field.name);
+      }
+      //
+      //Select last line:
+      //
+      String key = indexSelection.get(sPathStruct);
+      if(key !=null){
+        widgTable.setCurrentLine(key);
       }
     } else {
       GralTableLine_ifc<InspcStruct.FieldOfStruct> line = widgTable.addLine("$", null, null);
@@ -161,6 +193,7 @@ public class InspcFieldTable implements Runnable
       struct.requestFields(actionUpdated);
     }
     widgPath.setText(sPathStruct);
+    
   }
   
   
@@ -193,17 +226,42 @@ public class InspcFieldTable implements Runnable
     }
   }
   
+  
+  
+  public String getCurrentPathField(){ return sPathCurrent; }
+  
+  
+  
+  
+  
+  void setCurrentFieldInfo(GralTable<InspcStruct.FieldOfStruct>.TableLineData line){
+    sFieldCurrent = line.getKey();
+    sPathCurrent = line.getDataPath();
+    timeLineSelected = System.currentTimeMillis();
+  }
+  
+  
   void actionBack(){
+    GralTable<InspcStruct.FieldOfStruct>.TableLineData line = widgTable.getCurrentLine();
+    String key = line.getKey();
+    indexSelection.put(sPathStruct, key);  //select the current field if the view goes back to this table
+    
     InspcStruct parent = struct.parent();
     if(parent !=null){
+      int posNameInPath = sPathStruct.lastIndexOf('.')+1; 
+      key = sPathStruct.substring(posNameInPath);   //it is the field name of this table in the parent.
       this.struct = parent;
       this.sPathStruct = parent.path();
+      indexSelection.put(sPathStruct, key);  //select the field of the leaved table in its parent!
       fillTableStruct();
     }
   }
   
   
   void getSubStruct(GralTableLine_ifc<InspcStruct.FieldOfStruct> line){
+    String key = line.getKey();
+    indexSelection.put(sPathStruct, key);
+    
     InspcStruct.FieldOfStruct field = line.getUserData();
     InspcStruct substruct = field.substruct();
     if(substruct != null){
@@ -249,6 +307,9 @@ public class InspcFieldTable implements Runnable
 
   
   
+  /**This action is invoked on any keyboard hits which are not handled in the GralTable.
+   * 
+   */
   GralUserAction actionChgTable = new GralUserAction("InspcFieldTable - change Table"){
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
@@ -257,6 +318,8 @@ public class InspcFieldTable implements Runnable
         GralTableLine_ifc<InspcStruct.FieldOfStruct> line = (GralTableLine_ifc<InspcStruct.FieldOfStruct>)params[0];
         if(key == KeyCode.enter){
           showValue(line);
+        } else if(key == KeyCode.ctrl + KeyCode.enter){
+          showAll();
         } else if(key == KeyCode.ctrl + KeyCode.pgup) {
           actionBack();
         } else if(key == KeyCode.ctrl + KeyCode.pgdn) {
@@ -269,6 +332,22 @@ public class InspcFieldTable implements Runnable
     }
   };
 
+  
+  
+  GralUserAction actionLineSelected = new GralUserAction("InspcFieldTable - line selected"){
+    @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
+      if(key == KeyCode.defaultSelect || key == KeyCode.userSelect){
+        GralTable<InspcStruct.FieldOfStruct>.TableLineData line;
+        line = (GralTable<InspcStruct.FieldOfStruct>.TableLineData)params[0];
+        setCurrentFieldInfo(line);
+        return true;
+      } else { 
+        return false;
+      }
+    }
+  };
+
+  
   
   
   GralUserAction actionBack = new GralUserAction("InspcFieldTable - back"){

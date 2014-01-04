@@ -158,7 +158,11 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     if(htmlBox !=null){ htmlBox.activate(); }
   }
   
-  @Override public String getName(){ return textBox.getName(); }
+  @Override public String getName(){ return textBox !=null ? textBox.getName() : htmlBox.getName(); }
+  
+  @Override public String getDataPath(){ return textBox !=null ? textBox.getDataPath() : htmlBox.getDataPath(); }
+  
+  @Override public GralUserAction getActionChange(){ return textBox !=null ? textBox.getActionChange() : htmlBox.getActionChange(); }
   
 
   
