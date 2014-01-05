@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
 import org.vishia.cmd.PrepareCmd;
+import org.vishia.cmd.ZGenScript;
 import org.vishia.cmd.CmdStore.CmdBlock;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralMenu;
@@ -20,8 +21,10 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralFileSelector;
+import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.KeyCode;
+import org.vishia.zgen.ZGen;
 
 public class FcmdExecuter
 {
@@ -86,7 +89,7 @@ public class FcmdExecuter
   
   String readCmdFile(File cfgFileCmdsForExt)
   {
-    String error = cmdStore.readCmdCfg(cfgFileCmdsForExt, console, main.executer.cmdQueue);
+    String error = readCmdCfg(cmdStore, cfgFileCmdsForExt, console, main.executer.cmdQueue);
     if(error == null){
       //fill in the extension - cmd - assignments
       extCmds.clear();
@@ -101,6 +104,29 @@ public class FcmdExecuter
     }
     return error;
   }
+  
+  
+  
+  public static String readCmdCfg(CmdStore dst, File cfgFile, MainCmdLogging_ifc log, CmdQueue executerToInit)
+  { String error = dst.readCmdCfgOld(cfgFile);
+    if(error ==null){
+      File cmdCfgJbat = new File(cfgFile.getParentFile(), cfgFile.getName() + ".jbat");
+      if(cmdCfgJbat.exists()){
+        try{ 
+          ZGenScript script = ZGen.translateAndSetGenCtrl(cmdCfgJbat, new File(cmdCfgJbat.getParentFile(), cmdCfgJbat.getName() + ".check.xml"), log);
+          dst.addSubOfZgenclass(script.scriptClass(), 1);
+          executerToInit.initExecuter(script);
+          //main.cmdSelector.initExecuter(script);
+        } catch(Exception exc){
+          log.writeError("CmdStore - JbatScript;", exc);
+        }
+      }
+
+    }
+    return error;
+  }  
+  
+
   
   
   
@@ -188,7 +214,7 @@ public class FcmdExecuter
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
           if (main.currentFile != null) {
-          main.cmdSelector.cmdStore.readCmdCfg(main.currentFile, main.console, main.executer.cmdQueue);
+          readCmdCfg(main.cmdSelector.cmdStore, main.currentFile, main.console, main.executer.cmdQueue);
           main.cmdSelector.fillIn();
         }
       }
@@ -204,7 +230,7 @@ public class FcmdExecuter
   GralUserAction actionSetCmdCfgAct = new GralUserAction("actionSetCmdCfgAct") { 
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        String sError = main.cmdSelector.cmdStore.readCmdCfg(main.cargs.fileCfgCmds, console, main.executer.cmdQueue);
+        String sError = readCmdCfg(main.cmdSelector.cmdStore, main.cargs.fileCfgCmds, console, main.executer.cmdQueue);
       
         if(sError ==null){
           main.cmdSelector.fillIn();
