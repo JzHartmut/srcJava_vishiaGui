@@ -144,7 +144,7 @@ public class GralCommandSelector extends GralSelectList<CmdStore.CmdBlock>
   @Override protected boolean actionOk(Object userData, GralTableLine_ifc<CmdStore.CmdBlock> line)
   {
     CmdStore.CmdBlock cmdBlock = (CmdStore.CmdBlock)userData;
-    Map<String, DataAccess.Variable> jargs = cmdBlock.getArguments(getterFiles);
+    Map<String, DataAccess.Variable<Object>> jargs = cmdBlock.getArguments(getterFiles);
     if(jargs != null){ 
       File currFile = getterFiles.getFile1();
       

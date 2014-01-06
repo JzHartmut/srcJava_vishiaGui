@@ -29,7 +29,7 @@ public class Bzr
    * @throws IOException on any unexpected exception.
    * @throws IllegalAccessException 
    */
-  public static void searchRepository(File startDir, Map<String, DataAccess.Variable> dst, String bzrdir, String bzrsrc) 
+  public static void searchRepository(File startDir, Map<String, DataAccess.Variable<Object>> dst, String bzrdir, String bzrsrc) 
   throws IOException, IllegalAccessException
   { File fBzr;
     File currDir = startDir.isDirectory() ? startDir : startDir.getParentFile();
