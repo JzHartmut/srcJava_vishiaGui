@@ -204,13 +204,18 @@ public class InspcFieldTable implements Runnable
     if(field !=null){
       InspcVariable var = variableMng.getOrCreateVariable(struct, field);
       if(var !=null){
-        var.requestValue(System.currentTimeMillis());
+        long time = System.currentTimeMillis();
+        long timelast = var.getLastRefreshTime();
+        var.requestValue(time);
         char cType = var.getType();
         String sVal;
         switch(cType){
           case 'F': { float val = var.getFloat(); sVal = Float.toString(val); } break;
-          case 'I': { int val = var.getInt(); sVal = Integer.toHexString(val); } break;
+          case 'I': { int val = var.getInt(); sVal = "0x" + Integer.toHexString(val); } break;
           default: { float val = var.getFloat(); sVal = Float.toString(val); }
+        }
+        if(timelast == 0 || (time - timelast) > 10000){ //10 sec
+          sVal = "? " + sVal;
         }
         line.setCellText(sVal, 1);
       }
@@ -324,6 +329,18 @@ public class InspcFieldTable implements Runnable
           actionBack();
         } else if(key == KeyCode.ctrl + KeyCode.pgdn) {
           getSubStruct(line);
+        }
+        return true;
+      } else if(key == KeyCode.mouse1Double){
+        assert(params[0] instanceof GralTableLine_ifc<?>);
+        @SuppressWarnings("unchecked")
+        GralTableLine_ifc<InspcStruct.FieldOfStruct> line = (GralTableLine_ifc<InspcStruct.FieldOfStruct>)params[0];
+        InspcStruct.FieldOfStruct field = line.getUserData();
+        InspcStruct substruct = field.substruct();
+        if(substruct != null){
+          getSubStruct(line);
+        } else {
+          showValue(line);
         }
         return true;
       } else { 

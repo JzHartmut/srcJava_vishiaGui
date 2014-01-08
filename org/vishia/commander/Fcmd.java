@@ -183,6 +183,7 @@ public class Fcmd extends GuiCfg
     this.cargs = cargs;
     //redirect all outputs to System.out, System.err and MainCmd to System.out and System.err with timestamp.
     msgDisp = new MsgRedirectConsole(cmdgui, 0, null);
+    msgDisp.setIdThreadForMsgDispatching(Thread.currentThread().getId());
     //msgDisp.msgDispatcher.setOutputRoutine(4, "MainLogFile", true, true, cmdgui.getLogMessageOutputFile());
     //msgDisp.msgDispatcher.setOutputRange(0, 100000, 4, MsgDispatcher.mAdd, 0);
     actionReadMsgConfig.exec(KeyCode.menuEntered, null);

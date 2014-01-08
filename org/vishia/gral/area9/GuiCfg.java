@@ -326,9 +326,14 @@ protected void initMenuGralDesigner()
 protected void initMain()
 {
   //create the basic appearance of the GUI. The execution sets dlgAccess:
+  System.out.println("GuiCfg.initMain() - addDispatchOrder initGraphic, wait for execution;");
   gralMng.gralDevice.addDispatchOrder(initGraphic);
   
-  if(!initGraphic.awaitExecution(1, 0)) throw new RuntimeException("unexpected fail of execution initGuiDialog");
+  if(!initGraphic.awaitExecution(1, 0)){
+    System.out.println("GuiCfg.initMain() - initGraphic does not respond;");
+    throw new RuntimeException("unexpected fail of execution initGuiDialog");
+  }
+  System.out.println("GuiCfg.initMain() - await initGraphic ok;");
       
       
   /**Creates the dialog elements while reading a config-file. */

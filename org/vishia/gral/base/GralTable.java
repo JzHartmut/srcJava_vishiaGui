@@ -61,7 +61,11 @@ import org.vishia.util.TreeNode_ifc;
  * The table has its own {@link GraphicImplAccess#processKeys(int)} method which is called 
  * from the graphical implementation layer in an key event handler.
  * This method processes some keys for navigation and selection in the table. If the key is not
- * used for that, the key will be offer the {@link GralMng#userMainKeyAction} for a global key usage.
+ * used for that, first the action of {@link GralWidget#setActionChange(GralUserAction)}
+ * will be invoked with the key. If that method returns false,
+ * the key will be offer the {@link GralMng#userMainKeyAction} for a global key usage.
+ * <br>
+ * Especially Mouse double click etc. can be handled in the change action.
  * 
  * <br><br>
  * <b>Focus handling in a table</b>: <br>
@@ -865,7 +869,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       lineSelectedixCell = cell.ixCellLine;  //used for key handling.
       colSelectedixCellC = cell.ixCellColumn;
       actionOnLineSelected(KeyCode.userSelect, lineSelected);
-      repaint(0,0);
+      repaint();
     }
   }
 
@@ -1863,7 +1867,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     public String setCellText(String text, int column) {
       String oldText = cellTexts[column];
       cellTexts[column] = text;
-      GralTable.this.repaint(100, 0);
+      GralTable.this.repaint();
       return oldText;
     }
 
