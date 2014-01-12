@@ -45,8 +45,7 @@ import org.vishia.util.StringFormatter;
 public final class InspcCurveView
 {
 
-  /**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
-   * Changes:
+  /**Version, history and license. 
    * <ul>
    * <li>2013-05-19 Hartmut new: {@link #actionTrackSelected} with ctrl and left mouse pressed
    * <li>2013-05-15 Hartmut new: Presentation of value on cursor
@@ -93,7 +92,7 @@ public final class InspcCurveView
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public final static int version = 20130517;
+  public final static String sVersion = "2014-01-10";
 
   boolean bTabWidget = true;
 

@@ -425,7 +425,7 @@ private class InspcGuiCfg extends GuiCfg
   
   /**Action for button log. It switches on or off the logging functionality to log the telegram traffic
    * for debugging. */
-  GralUserAction actionEnableLog = new GralUserAction(){
+  GralUserAction actionEnableLog = new GralUserAction("InspcGui - enableLog"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) { 
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         GralButton widgButton = (GralButton)widgd;
@@ -451,7 +451,7 @@ private class InspcGuiCfg extends GuiCfg
     
     UserInspcPlug(){}
     
-    @Override public String replacePathPrefix(String path, String[] target)
+    @Override public String XXXreplacePathPrefix(String path, String[] target)
     {
       // TODO Auto-generated method stub
       String pathRet = guiCfg.guiCfgData.XXXreplacePathPrefix(path, target);
@@ -461,6 +461,13 @@ private class InspcGuiCfg extends GuiCfg
       }
       return pathRet;
     }
+    
+    
+    @Override public InspcMng.PathStructAccessor getTargetFromPath(String sDataPath){
+      return InspcGui.this.inspcMng.getTargetFromPath(sDataPath);
+    }
+
+    
     
   } //class UserInspcPlug
 

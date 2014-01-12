@@ -21,6 +21,39 @@ import org.vishia.zbnf.ZbnfJavaOutput;
  */
 public class InspcGuiFieldsFromFile
 {
+  /**Version, history and license. 
+   * <ul>
+   * <li>2013-03-17 Hartmut creating 
+   * </ul>
+   * <br><br> 
+   * 
+   * <b>Copyright/Copyleft</b>:
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL is not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but don't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you are intent to use this sources without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   */
+  //@SuppressWarnings("hiding")
+  public final static String sVersion = "2013-05-10";
+
+  
   /**ZBNF result:
    */
   public static class MappingItem
@@ -177,30 +210,7 @@ public class InspcGuiFieldsFromFile
       if(sChn.length()>0 && "12345678".indexOf(sChn.charAt(0))>=0  //channel 1...8
         && sVariable.length()>0 && sVariable.charAt(0) != '-'){   //- in variable field prevent usage.
         hsi.append("@K").append(sChn).append(": ");
-        /*
-        if(variable.widgetVariable !=null){
-          //
-          String sShowMethod = variable.widgetVariable.getShowMethod(); 
-          if(sShowMethod !=null && sShowMethod.equals("stc_cmd")){
-            String mask = variable.widgetVariable.getDataPath();
-            int ix = "abcd".indexOf(mask.charAt(0));
-            
-            hsi.append("stc_cmdW:[").append(ix).append("] = bit ");
-            hsi.append(mask.substring(1));
-            hsi.append(" ? ").append(sScale).append(" : 0; //");
-            hsi.append(variable.widgetVariable.name);
-          } else if(sBits.startsWith(":")){
-            hsi.append(variable.widgetVariable.getDataPath()).append(" = bit ");
-            hsi.append(sBits.substring(1));
-            hsi.append(" ? ").append(sScale).append(" : 0");
-          } else if(sBits.length()>0){
-            hsi.append(variable.widgetVariable.getDataPath()).append(" = intBits ");
-            hsi.append(sBits);
-          } else {
-            hsi.append(variable.widgetVariable.getDataPath());
-            hsi.append(" = float ").append(sScale);
-          }
-        } else */{
+        {
           ///
           hsi.append(sVariable);
           if(sBits.startsWith(":")){

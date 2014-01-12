@@ -19,6 +19,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.inspectorAccessor.InspcMng;
 import org.vishia.inspectorAccessor.InspcStruct;
 import org.vishia.inspectorAccessor.InspcVariable;
+import org.vishia.inspectorAccessor.InspcStruct.FieldOfStruct;
 import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
@@ -63,6 +64,21 @@ public class InspcFieldTable implements Runnable
   //@SuppressWarnings("hiding")
   protected final static String sVersion = "2014-01-06";
 
+  class RunOnReceive implements Runnable {
+    //GralTable<FieldOfStruct>.TableLineData line;
+    GralTableLine_ifc<FieldOfStruct> line;
+    
+    RunOnReceive(GralTableLine_ifc<FieldOfStruct> line){
+      this.line = line;
+    }
+    
+    @Override public void run(){
+      InspcFieldTable.this.showValue(line, false);
+    }
+  }
+  
+  
+  
   private static final int sizeName = 20, sizeType = 10;
   
   /**The window to present. */
@@ -199,14 +215,14 @@ public class InspcFieldTable implements Runnable
   
   
   
-  void showValue(GralTableLine_ifc<InspcStruct.FieldOfStruct> line){
+  void showValue(GralTableLine_ifc<InspcStruct.FieldOfStruct> line, boolean request){
     InspcStruct.FieldOfStruct field = line.getUserData();
     if(field !=null){
       InspcVariable var = variableMng.getOrCreateVariable(struct, field);
       if(var !=null){
         long time = System.currentTimeMillis();
         long timelast = var.getLastRefreshTime();
-        var.requestValue(time);
+        if(request){ var.requestValue(time, this.new RunOnReceive(line)); }
         char cType = var.getType();
         String sVal;
         switch(cType){
@@ -227,7 +243,7 @@ public class InspcFieldTable implements Runnable
   void showAll(){
     fillTableStruct();
     for(GralTableLine_ifc<InspcStruct.FieldOfStruct> line: widgTable.iterLines()){
-      showValue(line);
+      showValue(line, true);
     }
   }
   
@@ -299,6 +315,10 @@ public class InspcFieldTable implements Runnable
   }
   
   
+  
+  
+  
+  
   GralUserAction actionOpenWindow = new GralUserAction("InspcFieldTable - open window"){
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
@@ -322,7 +342,7 @@ public class InspcFieldTable implements Runnable
         @SuppressWarnings("unchecked")
         GralTableLine_ifc<InspcStruct.FieldOfStruct> line = (GralTableLine_ifc<InspcStruct.FieldOfStruct>)params[0];
         if(key == KeyCode.enter){
-          showValue(line);
+          showValue(line, true);
         } else if(key == KeyCode.ctrl + KeyCode.enter){
           showAll();
         } else if(key == KeyCode.ctrl + KeyCode.pgup) {
@@ -340,7 +360,7 @@ public class InspcFieldTable implements Runnable
         if(substruct != null){
           getSubStruct(line);
         } else {
-          showValue(line);
+          showValue(line, true);
         }
         return true;
       } else { 

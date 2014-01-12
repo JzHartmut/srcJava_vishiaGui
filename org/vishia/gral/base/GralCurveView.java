@@ -1656,9 +1656,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
         zoomToPresent(); 
       } else {
         setCursors(xMousePixel);
-        if((key & KeyCode.mAddKeys) ==KeyCode.ctrl){
+        //if((key & KeyCode.mAddKeys) ==KeyCode.ctrl){
           selectTrack(xMousePixel, yMousePixel, xWidgetSizePixel, yWidgetSizePixel);
-        }
+        //}
       }
     }
 
