@@ -948,10 +948,12 @@ public final class InspcCurveView
 
   public GralUserAction actionFocusScaling = new GralUserAction("actionSetFocusScaling"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
-      scalingWidg.setBackColor(GralColor.getColor("wh"), 0);   //current, old  
+      if(scalingWidg !=null){
+        scalingWidg.setBackColor(GralColor.getColor("wh"), 0);   //current, old  
+      }
       scalingWidg = (GralTextField)widgd;
       scalingWidg.setBackColor(GralColor.getColor("lam"), 0);  //the new one
-      return true;
+      return true; 
     }
   };
  

@@ -89,7 +89,7 @@ public class SwtWidgetHelper //implements GralWidgetHelper
   {
     List<Control> parents = new LinkedList<Control>();
     Control parent = control;
-    while( (parent = parent.getParent())!=null){
+    while( parent !=null && (parent = parent.getParent())!=null){
       parents.add(parent);
     }
     for(Control parent1: parents){
@@ -105,6 +105,9 @@ public class SwtWidgetHelper //implements GralWidgetHelper
         TabFolder tf = (TabFolder)parent1;
         tf.setFocus();
       }
+    }
+    if(control == null){
+      return false;         //TODO should not be.
     }
     control.forceFocus();
     return control.setFocus();
