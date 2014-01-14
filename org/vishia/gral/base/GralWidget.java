@@ -171,6 +171,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2014-01-15 Hartmut new: {@link #getCmd(int)} with options.
    * <li>2014-01-03 Hartmut new: {@link #isInFocus()} 
    * <li>2013-12-21 Hartmut chg: {@link #repaint()} invokes redraw immediately if it is in graphic thread.
    *   It invokes {@link #repaint(int, int)} with the {@link #repaintDelay} if it is not in graphic thread.
@@ -690,6 +691,29 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   public String getCmd(){ return sCmd; }
   
+  
+  /**Get the command string from the {@link #setCmd(String)} with choice of an option.
+   * The command string should have the form "base[Option1|Option2|Option3]End" 
+   * whereby base and end can be empty. if option is <0 an IndexOutOfBoundsException is thrown.
+   * If option is >= the given number of options, the option part is replaced by "??".
+   * That may be more helpfull to detect errors. 
+   * @param option number >=0
+   * @return "baseOptionEnd"
+   */
+  public String getCmd(int option){
+    int pos1 = sCmd.indexOf('[');
+    int pos2 = sCmd.indexOf(']', pos1+1);
+    if(pos1 >=0 && pos2 > pos1){
+      String sBase = sCmd.substring(0, pos1);
+      String sEnd = sCmd.substring(pos2+1);  //maybe ""
+      String[] sOptions = sCmd.substring(pos1+1, pos2).split("\\|");
+      if(option >= sOptions.length){ return sBase + "??" + sEnd; }
+      else{ return sBase + sOptions[option] + sEnd; }
+    } else {
+      return sCmd;
+    }
+  }
+  
   public void setCmd(String cmd){ sCmd = cmd; }
   
   
@@ -1146,6 +1170,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     repaint(repaintDelay, repaintDelayMax);
     //itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, value, null);
   }
+  
+  
+  
+  /**Gets the float attribute value of this widget. Returns 0.0 if a float value is never used.
+   */
+  public float getFloatValue(){ return dyda.fValue; }
   
   
   /**Sets some value to show any content.

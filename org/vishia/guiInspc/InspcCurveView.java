@@ -732,10 +732,12 @@ public final class InspcCurveView
             trackScale.trackView.setLineProperties(trackScale.colorCurve, 1, 0);
           }
           InspcCurveView.this.trackScale = track;
-          trackScale.trackView.setLineProperties(trackScale.colorCurve, 3, 0);
-          widgScale.setText("" + track.trackView.getScale7div());
-          widgScale0.setText("" + track.trackView.getOffset());
-          widgline0.setText("" + track.trackView.getLinePercent());
+          if(trackScale.trackView !=null){
+            trackScale.trackView.setLineProperties(trackScale.colorCurve, 3, 0);
+            widgScale.setText("" + track.trackView.getScale7div());
+            widgScale0.setText("" + track.trackView.getOffset());
+            widgline0.setText("" + track.trackView.getLinePercent());
+          }
           System.out.println("InspcCurveView.action - SelectVariableInTable");
           widgCurve.repaint(100, 200);
         }

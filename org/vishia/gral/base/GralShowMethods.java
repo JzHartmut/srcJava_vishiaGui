@@ -27,6 +27,7 @@ public class GralShowMethods
   
   /**Version, history and license.
    * <ul>
+   * <li>2014-01-15 Hartmut chg: {@link #showBackColor} stores the value which is used in {@link GralWidget#getFloatValue()} (dyda).
    * <li>2013-03-13 Hartmut new {@link #setBar} for a {@link GralValueBar}
    * <li>2012-06-00 Hartmut created as common container for methods for different widgets.
    * </ul>
@@ -72,8 +73,17 @@ public class GralShowMethods
   }
   
   
-  /**Shows the back color of the widget depending on the boolean value of a variable.
-   * param of exec should be a VariableAccessWithIdx-instance. The variable value 0, 1, ... is used to select one of the back colors. */
+  /**Shows the back color of the widget depending on the boolean value of the associated variable.
+   * The params[0] of exec should be an {@link VariableAccess_ifc} instance from which the value is read.
+   * It is because the routine is called as show method in {@link GralWidget#refreshFromVariable(VariableContainer_ifc)}.
+   * The colors should be part of the textual arguments of the show method given in {@link GralWidget#setActionShow(GralUserAction, String[])}.
+   * That textual colors are converted and stored in {@link GralWidget.ConfigData#showParam}.
+   * <br><br>
+   * The value which is read from the variable is stored in {@link GralWidget.DynamicData#fValue} for further using,
+   * for example for a change action (on mouse pressed etc. ).
+   *  
+   * param of exec should be a VariableAccess_ifc-instance. The int value 0, 1, ... is used to select one of the back colors. 
+   */
   public final GralUserAction showBackColor = new GralUserAction("showBackColor"){
     
     //Note: don't save data here. It is a common instance.
@@ -98,6 +108,7 @@ public class GralShowMethods
       if(params[0] instanceof VariableAccess_ifc){
         VariableAccess_ifc variable = (VariableAccess_ifc)params[0];
         value = variable.getInt();
+        widgg.dyda.fValue = value;        //store the value from variable.
         if(value>=0 && value < widgg.cfg.showParam.length){ widgd.setBackColor((GralColor)widgg.cfg.showParam[value], 0); }
         else { widgd.setBackColor((GralColor)widgg.cfg.showParam[0], 0); }
       } else {
