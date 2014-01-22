@@ -196,6 +196,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
      */
     protected final int[] XXXlastValueY = new int[2];
 
+    int identLastSelect;
     
     /**The value from last draw, do not calculate twice. */
     public int ypixLast;
@@ -690,6 +691,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    */
   protected boolean redrawBecauseNewData;
   
+  
+  
+  private int ctLastSelected;
   
   /**This action is called whenever a cursor position is changed. */
   private GralUserAction actionMoveCursor;
@@ -1377,10 +1381,25 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   }
   
   
-  protected void selectTrack(int xpos, int ypos, int xsize, int ysize){
+  /**Determines and switches a curve to select by mouse click.
+   * The curve should be at least 10 pixel near the mouse position.
+   * <br>
+   * Algorithm: From mouse position the index in the data are calculated: {@link #getIxDataFromPixelRight(int)}.
+   * Any track  is checked: The value (float) is read, the scaling is used to calculate the y-Position.
+   * Then the distance between mouse and track is calculated.
+   *   
+   * @param xpos Mouse position on click in pixel
+   * @param ypos
+   * @param xsize size of the curve view widget.
+   * @param ysize
+   * @return true if a track is selected. false if the position is more as 10 pixels far of any track.
+   */
+  protected boolean selectTrack(int xpos, int ypos, int xsize, int ysize){
     int ixData = getIxDataFromPixelRight(xsize - xpos);  //index countered from right to left
-    int minFound = Integer.MAX_VALUE;
+    int minFound = 10;           //at least 10 pixel near found curve.
+    int maxDiffLastSelected = 0;
     Track foundTrack = null;
+    ctLastSelected +=1;
     for(Track track: listTracks){  //NOTE: break inside.
       float val = track.values[ixData];
       float yFactor = ysize / -10.0F / track.yScale;  //y-scaling
@@ -1388,17 +1407,21 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       
       int yp = (int)((val - track.yOffset) * yFactor + y0Pix);
       int diff = Math.abs(yp - ypos);
-      if(diff < minFound){
+      int diffLastSelected = ctLastSelected - track.identLastSelect;
+      if(diff < minFound && diffLastSelected > maxDiffLastSelected){
         foundTrack = track;
-        minFound = diff;
+        maxDiffLastSelected = diffLastSelected;
+        //minFound = diff;
       }
     }
     if(foundTrack !=null){
+      foundTrack.identLastSelect = ctLastSelected;
       trackSelected = foundTrack;
       if(actionSelectTrack !=null){
         actionSelectTrack.exec(0, this, trackSelected);
       }
     }
+    return foundTrack !=null;
   }
   
   
@@ -1655,9 +1678,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
         //System.out.println("GralCurveView-Mousedown rigth top");
         zoomToPresent(); 
       } else {
-        setCursors(xMousePixel);
+        if(!selectTrack(xMousePixel, yMousePixel, xWidgetSizePixel, yWidgetSizePixel)){
+          setCursors(xMousePixel);
+        }
         //if((key & KeyCode.mAddKeys) ==KeyCode.ctrl){
-          selectTrack(xMousePixel, yMousePixel, xWidgetSizePixel, yWidgetSizePixel);
         //}
       }
     }

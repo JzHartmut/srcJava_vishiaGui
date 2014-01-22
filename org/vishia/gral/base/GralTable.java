@@ -944,7 +944,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    */
   protected void checkAndUpdateText(String sText, CellData celldata){
     TableLineData line = linesForCell[celldata.ixCellLine];
-    if(!sText.equals(line.cellTexts[celldata.ixCellColumn])){
+    if(line !=null && !sText.equals(line.cellTexts[celldata.ixCellColumn])){
       line.cellTexts[celldata.ixCellColumn] = sText;
       line.bChanged = true;
     }
@@ -977,7 +977,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       }
       //NOTE: prevent to fast key action if the last redraw is yet finished.
       //The draw needs to much time in Linux-GTK with an Atom processor (Lenovo)
-      if( keyDone || keyCode == KeyCode.mouse1Double || (time - timeLastRedraw) > 50){  //use 50 ms for timeout if keyDone isn't set.  
+      long timeDiff = time - timeLastRedraw;
+      if( keyDone || keyCode == KeyCode.mouse1Double || timeDiff > -11110){  //use 50 ms for timeout if keyDone isn't set.  
         keyDone = false;
         switch(keyCode){
         case KeyCode.pgup: {
@@ -1674,6 +1675,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
     protected abstract int getVisibleLinesTableImpl();
     
+    /**Should be implemented by the implementation class.
+     * @param column The column
+     * @return The menu.
+     */
     protected abstract GralMenu createColumnMenu(int column);
     
     
