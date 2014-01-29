@@ -38,6 +38,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   /**Version, history and license.
    * <ul>
+   * <li>2014-01-29 Hartmut new: Comment in Datapath supported. For nice presentation in list on long variable paths. 
    * <li>2013-11-19 Hartmut new: {@link #repaint(int, int)} overridden forces paint of the whole curve
    *   by setting {@link #bPaintAllCmd}, whereby in {@link #setSample(float[], int)} super.repaint is invoked, 
    *   which does not set {@link #bPaintAllCmd} and paints therefore only the new data. 
@@ -937,16 +938,24 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
         if(track.variable ==null && bNewGetVariables){ //no variable known, get it.
           String sDataPath = track.getDataPath();
           if(sDataPath !=null){
+            if(sDataPath.startsWith("-")){ //it is a comment
+              int posEnd = sDataPath.indexOf('-',1) +1;
+              sDataPath = sDataPath.substring(posEnd);  //after second '-', inclusive first '-' if no second found.
+            }
             String sPath2 = sDataPath.trim();
-            String sPath = itsMng.replaceDataPathPrefix(sPath2);
-            track.variable = container.getVariable(sPath);
-            if(track.variable == null){
-              System.err.printf("GralCurveView - variable not found; %s in curveview: %s\n", sPath, super.name);
+            if(!sDataPath.startsWith("#")){ //don't regard commented line
+              String sPath = itsMng.replaceDataPathPrefix(sPath2);  //replaces only the alias:
+              track.variable = container.getVariable(sPath);
+              if(track.variable == null){
+                System.err.printf("GralCurveView - variable not found; %s in curveview: %s\n", sPath, super.name);
+              }
             }
           }
         }
         final float value;
         if(track.variable !=null ){
+          if(track.getDataPath().startsWith("CCS:"))
+            stop();
           value = track.variable.getFloat();
           track.variable.requestValue(System.currentTimeMillis());
         } else {
