@@ -193,7 +193,7 @@ public class FcmdEdit
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { if(key == KeyCode.mouse1Up || key == KeyCode.menuEntered){
-        openEdit(main.currentFile);
+        openEdit(main.currentFile());
         return true;
       } else return false; 
       // /
@@ -209,7 +209,7 @@ public class FcmdEdit
         InputStream inpBytes = new ByteArrayInputStream(buffer);
         InputStreamReader inpText = new InputStreamReader(inpBytes);
         BufferedReader inpLines = new BufferedReader(inpText);
-        FileRemote filedst = main.currentFile;
+        FileRemote filedst = main.currentFile();
         WritableByteChannel outchn =filedst.openWrite(0);
         ByteBuffer outBuffer = ByteBuffer.allocate(1200);
         //Writer out = new FileWriter();

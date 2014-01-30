@@ -376,7 +376,8 @@ public class FcmdLeftMidRightPanel
         label = fileCard.label;   
         mainPanel.actFileCard = mainPanel.searchOrCreateFileCard(label);     //search or create such filecard with this label here.
         mainPanel.actFileCard.favorPathInfo = fileCard.favorPathInfo;  //copy it, it is the same instance for all 3 panels.
-        mainPanel.actFileCard.currentFile = fileCard.currentFile;      //select the same file.
+        //mainPanel.actFileCard.currentFile = fileCard.currentFile();      //select the same file.
+        mainPanel.actFileCard.fillIn(fileCard.currentDir(), true);      //select the same file.
         currentDir = fileCard.getCurrentDir(); //.getAbsolutePath();
         if(mainPanel.actFileCard == null){
           Assert.check(false);

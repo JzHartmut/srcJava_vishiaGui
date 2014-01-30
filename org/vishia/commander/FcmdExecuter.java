@@ -189,14 +189,14 @@ public class FcmdExecuter
     {
       GralWidget widgdFocus = main.gralMng.getWidgetInFocus();
       //FileSelector fileSel = idxFileSelector.get(widgdFocus.name);
-      if (main.currentFile != null) { // is a FileSelector focused yet?
+      if (main.currentDir() != null) { // is a FileSelector focused yet?
         // if(widgdFocus.name.startsWith("file")){
         // int ixFilePanel = widgdFocus.name.charAt(4) - '0';
         // assert(ixFilePanel >=0 && ixFilePanel < fileSelector.length); //only
         // such names are registered.
         // FileSelector fileSel = fileSelector[ixFilePanel];
         //FileRemote file = fileSel.getSelectedFile();
-        cmdQueue.setWorkingDir(main.currentFile.getParentFile());
+        cmdQueue.setWorkingDir(main.currentDir());
       }
       return true;
     }
@@ -213,8 +213,8 @@ public class FcmdExecuter
   GralUserAction actionSetCmdCfg = new GralUserAction("actionSetCmdCfg") { 
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-          if (main.currentFile != null) {
-          readCmdCfg(main.cmdSelector.cmdStore, main.currentFile, main.console, main.executer.cmdQueue);
+          if (main.currentFile() != null) {
+          readCmdCfg(main.cmdSelector.cmdStore, main.currentFile(), main.console, main.executer.cmdQueue);
           main.cmdSelector.fillIn();
         }
       }
@@ -301,7 +301,7 @@ public class FcmdExecuter
   GralUserAction actionExecuteFileByExtension = new GralUserAction("actionExecuteFileByExtension")
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        File file = main.currentFile;
+        File file = main.currentFile();
         executeFileByExtension(file);  
         return true;
       } else return false;
@@ -335,7 +335,7 @@ public class FcmdExecuter
             //PrepareCmd cmdp = cmd.getCmds().get(0);
             if(cmd.name.startsWith(">")){
               console.writeInfoln("FcmdExecuter - add cmd by extension;" + cmd.name);
-              cmdQueue.addCmd(cmd.name, null, main.currentFile.getParentFile(), '>');
+              cmdQueue.addCmd(cmd.name, null, main.currentDir(), '>');
             } else {
               //the extension determines the command.
               console.writeInfoln("FcmdExecuter - add cmd by extension;" + cmd.name);
@@ -367,9 +367,9 @@ public class FcmdExecuter
         int start = start2 > start1 ? start2+1 : start1+1;  //note: on -1 it is 0, start of box
         String sCmd = text.substring(start+1, cursorPos);
         final File currentDir;
-        if(main.currentFile !=null){
+        if(main.currentDir() !=null){
           //note: executes it local:
-          currentDir = new File(main.currentFile.getParent());
+          currentDir = main.currentDir();
         } else {
           currentDir = null;  //use any standard
         }

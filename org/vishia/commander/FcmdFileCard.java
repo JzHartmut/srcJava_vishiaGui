@@ -105,8 +105,8 @@ public class FcmdFileCard extends GralFileSelector
    */
   FcmdFavorPathSelector.FavorPath favorPathInfo;
   
-  /**The last selected file. */
-  FileRemote currentFile;
+  /**The last selected file and its directory. */
+  //FileRemote currentFile, currentDir;
   
   /**If not null, then should synchronize with this file card. Used in */
   FcmdFileCard otherFileCardtoSync; 
@@ -255,7 +255,6 @@ public class FcmdFileCard extends GralFileSelector
     favorCard.remove();
     favorCard = null;
     favorPathInfo = null;
-    currentFile = null;
     return super.remove();
   }
  
@@ -363,8 +362,6 @@ public class FcmdFileCard extends GralFileSelector
    */
   protected void actionOnFileSelection(FileRemote file, String sFileName){
     //note the file, able to use for some actions.
-    currentFile = file;
-    main.currentFile = file;
     main.selectedFiles123[mainPanel.ixMainPanel] = file;
     
     if(mainPanel.orderMainPanel == 1){
@@ -372,6 +369,7 @@ public class FcmdFileCard extends GralFileSelector
       //note the file card in order of usage.
       
       main.lastFavorCard = favorCard;
+      main.currentFileCard = this;
       mainPanel.actFileCard = this;
       main.statusLine.setFileInfo(file);
       
@@ -476,6 +474,7 @@ public class FcmdFileCard extends GralFileSelector
    */
   private void setActFilePanel_setColorCurrLine(){
     main.lastFavorCard = favorCard;
+    main.currentFileCard = this;
     mainPanel.actFileCard = FcmdFileCard.this;
     main.setLastSelectedPanel(mainPanel);
     System.out.println(Assert.stackInfo("FcmdFileCard - setActFilePanel_setColorLine;",10));

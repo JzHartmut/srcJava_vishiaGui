@@ -146,7 +146,7 @@ public class FcmdSettings
   {
     @Override public boolean exec(int keyCode, GralWidget_ifc infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
-        openDialog(main.currentFile);
+        openDialog(main.currentFile());
       }
       return true;
     }

@@ -249,6 +249,7 @@ public class FcmdFavorCard  extends GralSelectList<FcmdFavorPathSelector.FavorPa
         mainPanel.bFavorCardHasFocus = true;
         mainPanel.bFavorThemeCardHasFocus = false;
         main.lastFavorCard = FcmdFavorCard.this;
+        main.currentFileCard = FcmdFavorCard.this.fileTable;
         main.setLastSelectedPanel(mainPanel);
         GralTable.TableLineData line = (GralTable.TableLineData) params[0];
         //Object oData = line.getUserData();

@@ -243,23 +243,28 @@ public class GralFileSelector implements Removeable //extends GralWidget
   private final GralUserAction actionOnFileSelection = new GralUserAction(){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
       if(actionCode == KeyCode.userSelect){
-        GralTableLine_ifc line = (GralTableLine_ifc) params[0];
+        @SuppressWarnings("unchecked")
+        GralTableLine_ifc<FileRemote> line = (GralTableLine_ifc<FileRemote>) params[0];
         if(line != null){
-          Object oData = line.getUserData();
-          if(oData instanceof FileRemote){
-            FileRemote file = (FileRemote)oData;  
-            currentFile = file;
-            if(file.exists()){
+          FileRemote file = line.getUserData();
+          String sName = line.getCellText(kColFilename);
+          if(file.exists()){
+            if(sName.equals("..")){
+              currentFile = file.getParentFile();
+              currentDir = file;
+                
+            } else {
+              currentDir = file.getParentFile();
+              currentFile = file;
               String sDir = file.getParent();
-              String sName = file.getName();
               indexSelection.put(sDir, file);
-              //System.out.println("GralFileSelector: " + sDir + ":" + sName);
-              if(actionOnFileSelected !=null){
-                actionOnFileSelected.exec(0, selectList.wdgdTable, line, file);
-              }
-              if(line.getCellText(kColDesignation).startsWith("?")){
-                completeLine(line, file, System.currentTimeMillis());
-              }
+            }
+            //System.out.println("GralFileSelector: " + sDir + ":" + sName);
+            if(actionOnFileSelected !=null){
+              actionOnFileSelected.exec(0, selectList.wdgdTable, line, file);
+            }
+            if(line.getCellText(kColDesignation).startsWith("?")){
+              completeLine(line, file, System.currentTimeMillis());
             }
           }
         }
@@ -536,10 +541,10 @@ public class GralFileSelector implements Removeable //extends GralWidget
   //final MainCmd_ifc mainCmd;
 
   /**The current shown directory. */
-  FileRemote currentDir;
+  protected FileRemote currentDir;
   
   /**Currently selected file in the table.*/
-  FileRemote currentFile;
+  protected FileRemote currentFile;
   
   String sCurrentDir;
   
@@ -1212,6 +1217,23 @@ public class GralFileSelector implements Removeable //extends GralWidget
     return selectList.wdgdTable.setCurrentLine(name);
     
   }
+  
+  
+  /**Gets the current selected file. 
+   * Note: If the .. is selected, the current file is the parent directory.
+   * If any directory is selected, this is the currentFile(). Check with {@link java.io.File#isDirectory()}.
+   */
+  public FileRemote currentFile(){ return currentFile; }
+  
+  /**Gets the directory which is currently shown.
+   * Note: If the .. is selected, the current directory is the directory where the .. is located,
+   * whereby the {@link #currentFile()} is the parent. Elsewhere this method returns the parent of
+   * {@link #currentFile()}.
+   */
+  public FileRemote currentDir(){ return currentDir; }
+  
+  
+  
   
   
   /**Sets the focus of the associated table widget.

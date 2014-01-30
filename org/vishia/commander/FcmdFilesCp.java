@@ -119,8 +119,8 @@ public final class FcmdFilesCp {
     card2 = lastFileCards[1];
     if(card1 !=null && card2 !=null){
       widgCompare.setText("stop");
-      file1 = card1.currentFile;
-      file2 = card2.currentFile;
+      file1 = card1.currentFile();
+      file2 = card2.currentFile();
       if(true){
         FileRemote.cmpFiles(file1, file2); 
       } else {
@@ -170,8 +170,8 @@ public final class FcmdFilesCp {
     if(card1 !=null && card2 !=null){
       card1.otherFileCardtoSync = card2;  //cross connect this file cards.
       card2.otherFileCardtoSync = card1;
-      file1 = card1.currentFile;
-      file2 = card2.currentFile;
+      file1 = card1.currentFile();
+      file2 = card2.currentFile();
       card1.sDirSync = file1.getAbsolutePath();
       card2.sDirSync = file2.getAbsolutePath();
       card1.zDirSync = card1.sDirSync.length();

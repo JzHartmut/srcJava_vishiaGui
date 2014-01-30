@@ -145,7 +145,7 @@ public class Fcmd extends GuiCfg
 
   
   /**The current directory of the last selected file. */
-  FileRemote currentFile;
+  //FileRemote currentFile;
 
   /**The last selected files of the three panels, [0] for left .. [2] for right. */
   final File[] selectedFiles123 = new File[3];
@@ -160,6 +160,8 @@ public class Fcmd extends GuiCfg
   /**The last used favor card or its last used file card.
    * It is used for delete tab. */
   FcmdFavorCard lastFavorCard;
+  
+  FcmdFileCard currentFileCard;
   
 
   final Map<String, GralFileSelector> idxFileSelector = new TreeMap<String, GralFileSelector>();
@@ -387,15 +389,15 @@ public class Fcmd extends GuiCfg
       //for(FcmdLeftMidRightPanel panel: lastFilePanels){
       FcmdFileCard fileCard = panel.actFileCard;
       if(fileCard !=null){
-        ret[++ix] = fileCard.currentFile;
-        if(fileCard.currentFile !=null && fileCard.currentFile.isMarked(0x1)){
+        ret[++ix] = fileCard.currentFile();
+        if(fileCard.currentFile() !=null && fileCard.currentFile().isMarked(0x1)){
           //if the current file is marked, use all marked files.
           List<FileRemote> listFiles = fileCard.getSelectedFiles(bAlsoDirs, mask);
           assert(listFiles !=null && listFiles.size() > 0);  //at least the current file is marked.
           Iterator<FileRemote> iter= listFiles.iterator();
           while(ix < 2 && iter.hasNext()){
             FileRemote file = iter.next();
-            if(file != fileCard.currentFile){
+            if(file != fileCard.currentFile()){
               ret[++ix] = file;
             }
           }
@@ -450,7 +452,16 @@ public class Fcmd extends GuiCfg
   
   
   
+  FileRemote currentFile(){
+    if(this.currentFileCard == null) return null;
+    else return this.currentFileCard.currentFile();
+  }
   
+
+  FileRemote currentDir(){
+    if(this.currentFileCard == null) return null;
+    else return this.currentFileCard.currentDir();
+  }
   
 
   /**
