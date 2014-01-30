@@ -357,7 +357,7 @@ public final class InspcCurveView
       assert(widgd instanceof GralTable<?>);  //NOTE: context menu to table lines, has GralTable as widget.
       @SuppressWarnings("unchecked")
       GralTable<TrackValues> table = (GralTable<TrackValues>)widgd; //oContentInfo;
-      GralTable<TrackValues>.TableLineData refline = table.getCurrentLine();
+      GralTable<TrackValues>.TableLineData refline = table.getLineMousePressed();
       if(bInsert || refline == null){  //insert a line, build a new one
         input = new TrackValues(-1);
         GralTableLine_ifc<?> newline;
@@ -372,7 +372,6 @@ public final class InspcCurveView
         input = (TrackValues)refline.getContentInfo();
         refline.setCellText(sPath, 0);
       }
-      table.repaint(100, 100);
       input.min = Float.MAX_VALUE;
       input.max = -Float.MAX_VALUE;
       input.mid = 0.0f;
@@ -386,6 +385,7 @@ public final class InspcCurveView
       } else {
         System.out.printf("InspcCurveView - invalid widget to drop; %s\n", variableWidget.toString());
       }
+      table.repaint();
     }
     return true;
     
@@ -644,6 +644,14 @@ public final class InspcCurveView
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode) && trackScale !=null){
         boolean setScale = false;
+        TrackValues dst;
+        if(widgd.sCmd == null){ //from menu
+          GralTable<TrackValues>.TableLineData refline = widgTableVariables.getLineMousePressed();
+          dst = refline.getUserData();
+          setScale = true;
+        } else {
+          dst = trackScale;
+        }
         if(widgd.sCmd == "-"){
           try{
             String s1 = widgScale.getText();
@@ -672,7 +680,9 @@ public final class InspcCurveView
             widgScale.setBackColor(GralColor.getColor("lrd"),0);
           }
         }
-        if(setScale || widgd.sCmd == "!"){
+        else if(dst !=null && (  setScale   //maybe cmd '+' or '-', maybe menu 
+                               || widgd.sCmd == "!"  //set key
+                )              ){  
           try{
             String s1 = widgScale.getText();
             float scale = Float.parseFloat(s1);
@@ -681,10 +691,10 @@ public final class InspcCurveView
             s1 = widgline0.getText();
             int line0 = (int)Float.parseFloat(s1);
             //widgCurve.setMinMax(trackScale.scale, -trackScale.scale);
-            if(trackScale.trackView == null){
-              trackScale.trackView = widgCurve.initTrack(sName, null, trackScale.colorCurve, 0, 50, 5000.0f, 0.0f);
+            if(dst.trackView == null){
+              dst.trackView = widgCurve.initTrack(sName, null, trackScale.colorCurve, 0, 50, 5000.0f, 0.0f);
             }
-            trackScale.trackView.setTrackScale(scale, scale0, line0);
+            dst.trackView.setTrackScale(scale, scale0, line0);
             widgBtnScale.setLineColor(GralColor.getColor("lgn"),0);
           } catch(NumberFormatException exc){
             widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
