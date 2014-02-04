@@ -337,7 +337,7 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
   
   
   
-  @Override public GralCurveView addCurveViewY(String sName, int nrofXvalues, int nrofTracks)
+  @Override public GralCurveView addCurveViewY(String sName, int nrofXvalues, GralCurveView.CommonCurve common)
   {
     // TODO Auto-generated method stub
     return null;

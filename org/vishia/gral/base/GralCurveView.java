@@ -38,6 +38,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   /**Version, history and license.
    * <ul>
+   * <li>2014-02-03 Hartmut new: {@link CommonCurve#bFreeze}: freeze as common property of more as one GralCurveView. Constructor argument.
    * <li>2014-01-29 Hartmut new: Comment in Datapath supported. For nice presentation in list on long variable paths. 
    * <li>2013-11-19 Hartmut new: {@link #repaint(int, int)} overridden forces paint of the whole curve
    *   by setting {@link #bPaintAllCmd}, whereby in {@link #setSample(float[], int)} super.repaint is invoked, 
@@ -95,6 +96,22 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    * 
    */
   public final static int version = 20130327;
+  
+  
+  
+  
+  public class CommonCurve {
+
+    /**If true, then the display is freezed.
+     */
+    public boolean bFreeze = false;
+    
+
+    
+  }
+  
+  
+  
   
   
   
@@ -494,6 +511,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   protected final List<Track> listTracks = new ArrayList<Track>();
   
   
+  protected final CommonCurve common;
+  
   /**The track which is selected by the last setCursor. */
   protected Track trackSelected;
   
@@ -599,10 +618,6 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    * The index refers to the last drawn value. */
   protected int ixDataDraw = 0;
   
-  /**If true, then the display is freezed.
-   */
-  protected boolean bFreeze = false;
-  
   /**True then saves values.  */
   protected boolean bActive;
   
@@ -707,10 +722,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   
 
-  public GralCurveView(String sName, GralMng mng, int maxNrofXvaluesP, int XXXnrofTracks)
+  public GralCurveView(String sName, GralMng mng, int maxNrofXvaluesP, CommonCurve common)
   {
     super(sName, 'c', mng);
-    
+    this.common = common == null ? new CommonCurve() : common;
     int maxNrofXvalues1 = 1;
     int shIxData1 = 32;
     while(maxNrofXvalues1 < maxNrofXvaluesP){
@@ -754,6 +769,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     //menuCurve.addMenuItemGthread("zoomOut", "to right", null);
     
   }
+  
+  
+  public CommonCurve getCommonData(){ return common; }
   
   /**This action will be called whenever a cursor position is changed. */
   public void setActionMoveCursor(GralUserAction action){ actionMoveCursor = action; }
@@ -888,7 +906,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     if(ixDataWr == -adIxData ){  //store to the last position in the data array
       dataOrg.bWrappedInBuffer = true;
     }
-    if(!bFreeze){
+    if(!common.bFreeze){
       ixDataShowRight = ixDataWr;
     }
     this.newSamples +=1;  //information for paint event
@@ -919,7 +937,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       nrofDataShift.incrementAndGet(); //shift data in graphic.
     }
 
-    if(!bFreeze){
+    if(!common.bFreeze){
       redrawBecauseNewData = true;
       super.repaint(50,100);
     }
@@ -1163,7 +1181,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   @Override public boolean isActiv(){ return bActive; }
   
-  @Override public boolean isFreezed(){ return bFreeze; }
+  @Override public boolean isFreezed(){ return common.bFreeze; }
   
 
   
@@ -1222,7 +1240,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     dataOrg.ixDataStartSave = ixDataShown[dataOrg.zPixelDataShown-1];
     int timeShort1 = timeValues[(dataOrg.ixDataStartSave >> shIxiData) & mIxiData];
     dataOrg.ixDataEndSave = ixDataShown[0];
-    if(!bFreeze){
+    if(!common.bFreeze){
       //running curve, autosave starts after it.
       dataOrg.ixDataEndAutoSave = dataOrg.ixDataEndSave;  //atomic access, the actual write pointer.
       saveOrg.ctValuesAutoSave = 0;
@@ -1602,7 +1620,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    */
   protected void viewToPresentOrGoIrRefresh()
   {
-    if(bFreeze){
+    if(common.bFreeze){
       //assume that the same time is used for actual shown data spread as need
       //for the future.
       
@@ -1613,7 +1631,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       if((ixDataShowRight - ixDataWr)<0 && (ixDataShowRight - ixDataWr + ixdDataSpread) >=0){
         //right end reached.
         ixDataShowRight = ixDataWr;
-        bFreeze = false;
+        common.bFreeze = false;
       } else {
         ixDataShowRight += ixdDataSpread;
       }
@@ -1621,7 +1639,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       //if((ixDataShowRight - ixDataWr) > 0 && (ixDataShowRight - ixDataWr) < ixdDataSpread * 2) {
         //right end reached.
         //ixDataShowRight = ixDataWr;
-        //bFreeze = false;
+        //common.bFreeze = false;
         //ixDataShowRight1 = ixDataWr + ixdDataSpread;
       //}
       //ixDataShowRight += ixDataShown[0] - ixDataShown[nrofValuesShow-1]; 
@@ -1639,8 +1657,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    */
   protected void stopAndViewToPast()
   {
-    if(!bFreeze){ 
-      bFreeze = true;
+    if(!common.bFreeze){ 
+      common.bFreeze = true;
       //now ixDataShow remain unchanged.
     } else {
       int ixdDataSpread = ixDataShowRight - ixDataShown[pixelOrg.xPixelCurve * 5/10];
@@ -1754,7 +1772,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         ixDataShowRight = ixDataWr;
-        bFreeze = false;
+        common.bFreeze = false;
       }
       return true;
     }

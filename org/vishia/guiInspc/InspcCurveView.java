@@ -249,7 +249,7 @@ public final class InspcCurveView
    * @param wind The main window where the menu to open will be added
    * @param sName The name, used for menu entry too, sample "curve A"
    */
-  public void buildGraphic(GralWindow_ifc wind, GralColorSelector colorSelector)
+  public void buildGraphic(GralWindow_ifc wind, GralColorSelector colorSelector, GralCurveView.CommonCurve common)
   {
     this.colorSelector = colorSelector;
     gralMng.selectPanel("primaryWindow");
@@ -259,17 +259,17 @@ public final class InspcCurveView
     int windProps = GralWindow.windConcurrently; // | GralWindow.windResizeable;
     windCurve = gralMng.createWindow("windMapVariables", sName, windProps);
     //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 0, 'd');
-    buildGraphicInCurveWindow();
+    buildGraphicInCurveWindow(common);
     wind.addMenuBarItemGThread("menuBarCurveView", "&Window/open " + sName, actionOpenWindow);
   }
 
   
   
-  void buildGraphicInCurveWindow()
+  void buildGraphicInCurveWindow(GralCurveView.CommonCurve common)
   {
     int posright = -20;
     gralMng.setPosition(0, -2, 0, posright, 0, 'd');
-    widgCurve = gralMng.addCurveViewY(sName, 15000, 10);
+    widgCurve = gralMng.addCurveViewY(sName, 15000, common);
     widgCurve.setActionMoveCursor(actionShowCursorValues);
     widgCurve.setActionTrackSelected(actionTrackSelectedFromGralCurveViewCtrlMousePressed);
     gralMng.setPosition(0, GralPos.size +2, posright, 0, 0, 'd', 0);

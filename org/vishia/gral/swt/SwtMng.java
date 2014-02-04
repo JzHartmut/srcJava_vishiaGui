@@ -1058,9 +1058,9 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     return widgetInfos;
   }
   
-	@Override public GralCurveView addCurveViewY(String sName, int nrofXvalues, int nrofTracks) {
+	@Override public GralCurveView addCurveViewY(String sName, int nrofXvalues, GralCurveView.CommonCurve common) {
     //setNextPosition();
-	  GralCurveView widgd = new SwtCurveView(sName, this.pos, this, nrofXvalues, nrofTracks); //, curveView, 'c', sName, null);
+	  GralCurveView widgd = new SwtCurveView(sName, this.pos, this, nrofXvalues, common); //, curveView, 'c', sName, null);
 		super.curveContainer.add(widgd);
 	  //CurveView curveView = new CurveView(((SwtPanel)pos.panel).getPanelImpl(), dxWidget, dyWidget, nrofXvalues, nrofTracks);
 		testHelp.curveView = widgd; //store to inspect.

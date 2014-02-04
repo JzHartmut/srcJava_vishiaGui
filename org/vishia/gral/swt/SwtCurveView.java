@@ -26,6 +26,7 @@ public class SwtCurveView extends GralCurveView
   
   /**Version, history and license.
    * <ul>
+   * <li>2014-02-03 Hartmut new: {@link CommonCurve#bFreeze}: freeze as common property of more as one GralCurveView. Constructor argument.
    * <li>2013-05-19 Hartmut new: Usage of the common {@link SwtGralMouseListener} and 
    *   implementation of the special functionality in the superclass {@link GralCurveView.GralCurveViewMouseAction}. 
    * <li>2012-08-11 Hartmut now grid with  timestamps
@@ -78,13 +79,13 @@ public class SwtCurveView extends GralCurveView
   
 
   
-  public SwtCurveView(String sName, GralPos pos, SwtMng mng, int nrofXvalues, int nrofTracks)
+  public SwtCurveView(String sName, GralPos pos, SwtMng mng, int nrofXvalues, GralCurveView.CommonCurve common)
   {
-    super(sName, mng, nrofXvalues, nrofTracks);
+    super(sName, mng, nrofXvalues, common);
     
     GralRectangle bounds = mng.calcWidgetPosAndSize(pos, 800, 600);
     Composite panelSwt = (Composite)pos.panel.getPanelImpl();
-    curveSwt = this.new CurveView(panelSwt, bounds.dx, bounds.dy, nrofXvalues, nrofTracks);
+    curveSwt = this.new CurveView(panelSwt, bounds.dx, bounds.dy, nrofXvalues);
     curveSwt.setSize(bounds.dx, bounds.dy);
     curveSwt.setBounds(bounds.x, bounds.y, bounds.dx, bounds.dy);
     //mng.setBounds_(curveSwt); //, dyGrid, dxGrid);
@@ -396,7 +397,7 @@ public class SwtCurveView extends GralCurveView
       testHelp.xView =xView; testHelp.yView =yView; testHelp.dxView =dxView; testHelp.dyView =dyView;
       //
       final boolean bPaintAll;
-      if(!bFreeze && !super.bPaintAllCmd && redrawBecauseNewData1) {
+      if(!common.bFreeze && !super.bPaintAllCmd && redrawBecauseNewData1) {
         //paint only a part of the curve to save calculation time.
         //The curve will be shifted to left.
         //
@@ -482,8 +483,7 @@ public class SwtCurveView extends GralCurveView
     //private final Color[] lineColors;
     
     
-    public CurveView(Composite parent, int xPixel, int yPixel, int nrofXvalues,
-        int nrofTracks){
+    public CurveView(Composite parent, int xPixel, int yPixel, int nrofXvalues){
       super(parent, org.eclipse.swt.SWT.NO_SCROLL|org.eclipse.swt.SWT.NO_BACKGROUND);
       setData("Control", this);
       setSize(xPixel, yPixel);  //the size may be changed later by drag the window.
@@ -491,9 +491,6 @@ public class SwtCurveView extends GralCurveView
       //this.yPixel = yPixel;
       //lineColors = new Color[nrofTracks];
       Color defaultColor = new Color(getDisplay(), 255,0,0);
-      for(int iTrack=0; iTrack < nrofTracks; ++iTrack){
-        //lineColors[iTrack] = defaultColor;
-      }
       addPaintListener(paintListener);
       addFocusListener(focusListener);
       addMouseListener(mouseListenerCurve);
