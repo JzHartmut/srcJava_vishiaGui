@@ -1,5 +1,7 @@
 package org.vishia.gral.base;
 
+import java.lang.ref.Reference;
+
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralImageBase;
 import org.vishia.gral.ifc.GralUserAction;
@@ -192,14 +194,18 @@ public class GralButton extends GralWidget
    * @param ix=0: off-color ix=1: on-color, ix=2 or ix=-1: disable color.
    */
   @Override public void setBackColor(GralColor color, int ix){ 
+    GralColor[] ref = new GralColor[1];
+    boolean bChanged;
     switch(ix){
-    case 0: dyda.backColor = color; break;
-    case 1: colorBackOn = color; break;
-    case -1: case2: colorBackDisabled = color; break;
-    default: throw new IllegalArgumentException("fault ix, allowed -1, 0, 1, 2, ix=" + ix);
+      case 0:          bChanged = !color.equals(dyda.backColor);     if(bChanged){ dyda.backColor = color; } break;
+      case 1:          bChanged = !color.equals(colorBackOn);        if(bChanged){ colorBackOn = color; } break;
+      case -1: case 2: bChanged = !color.equals(colorBackDisabled);  if(bChanged){ colorBackDisabled = color; } break;
+      default: throw new IllegalArgumentException("fault ix, allowed -1, 0, 1, 2, ix=" + ix);
     }//switch
-     
-    repaint(100, 100); 
+    if(bChanged){
+      dyda.setChanged(ImplAccess.chgColorBack); 
+      repaint();
+    }
   }
 
   

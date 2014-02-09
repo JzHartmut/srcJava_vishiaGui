@@ -58,14 +58,26 @@ public class SwtLed extends GralLed{
   
 
   
+  /**Called in the paint routine, corrects the colors for SWT depending on {@link GralWidget.DynamicData#backColor}
+   * and {@link GralWidget.DynamicData#lineColor}.
+   * <ul>
+   * <li>lineColor is the border color
+   * <li>backColor is the inner color.
+   * </ul>
+   */
   private void setColors(){
     int changedAckn = 0;
-    if(dyda.backColor !=null && (dyda.whatIsChanged.get() & ImplAccess.chgColorBack)!=0){ 
+    if(dyda.backColor !=null 
+      && ( (dyda.whatIsChanged.get() & ImplAccess.chgColorBack)!=0
+         ||innerColor == null   //uninitialized: start with dyda.backColor
+      )  ){ 
       innerColor = mng.getColorImpl(dyda.backColor);
       changedAckn |= ImplAccess.chgColorBack; 
     }
-    if(dyda.lineColor !=null){ 
-      if((dyda.whatIsChanged.get() & ImplAccess.chgColorLine)!=0){
+    if(dyda.lineColor !=null){  //use backColor if lineColor is not set! 
+      if( (dyda.whatIsChanged.get() & ImplAccess.chgColorLine)!=0
+        || borderColor == null
+        ){
         borderColor = mng.getColorImpl(dyda.lineColor); 
         changedAckn |= ImplAccess.chgColorLine; 
       }
@@ -91,9 +103,6 @@ private class SwtLedImpl extends Canvas
   	{
   		
   		super(((SwtPanel)pos().panel).getPanelImpl(), 0);
-  		borderColor = mng.propertiesGuiSwt.color("yellow");
-  		innerColor = mng.propertiesGuiSwt.color("green");
-  		
   	  addPaintListener(paintListener);	
   	}
   
@@ -105,11 +114,17 @@ private class SwtLedImpl extends Canvas
   			//gc.d
   			//drawBackground(e.gc, e.x, e.y, e.width, e.height);
   			setColors();
-        gc.setBackground(innerColor); 
-  			gc.fillOval(3,3, e.width-4, e.height-4);
-  			gc.setForeground(borderColor); 
-  			gc.setLineWidth(3);
-  			gc.drawOval(2,2,e.width-3,e.height-3);
+        gc.setBackground(borderColor); 
+        gc.fillOval(2,2,e.width-3,e.height-3);
+  			gc.setBackground(innerColor); 
+  			int dx = (e.width+1) / 2;  //size of inner point, calculate 1 if width = 1,2
+  			int dy = (e.height+1) / 2;  //size of inner point, calculate 1 if height = 1,2
+        int x1 = (e.width - dx) /2 +1;
+        int y1 = (e.height - dy) /2 +1;
+        gc.fillOval(x1,y1, dx, dy);
+  			//gc.setForeground(borderColor); 
+  			//gc.setLineWidth(3);
+  			//gc.drawOval(2,2,e.width-3,e.height-3);
   		}
     };
     

@@ -58,6 +58,7 @@ public abstract class GralLed extends GralWidget
     colorInnerSelectable = new GralColor[2];
     colorInnerSelectable[0] = GralColor.getColor("wh");
     colorInnerSelectable[1] = GralColor.getColor("gn");
+    setValue(0);  //initializes dyda.colors
   }
 
   /**Sets the LED's color. The border can be another than the inner color.
@@ -71,6 +72,20 @@ public abstract class GralLed extends GralWidget
     repaint(repaintDelay, repaintDelayMax);
   }
 
+  /**Sets the color both inner and border with the given value
+   * using the {@link #colorInnerSelectable}
+   * @see org.vishia.gral.base.GralWidget#setValue(float)
+   */
+  @Override public void setValue(float value){
+    int ival = (int)value;
+    if(ival < 0){ ival = 0; }
+    else if(ival >= colorInnerSelectable.length){ ival = colorInnerSelectable.length -1;}
+    dyda.lineColor = dyda.backColor = colorInnerSelectable[ival];
+    dyda.setChanged(ImplAccess.chgColorBack | ImplAccess.chgColorLine);
+    super.setValue(value);  //stores and calls repaint.
+  }
+  
+  
   /**This method is invoked if more as one variable is assigned to the widget.
    * It sets the line and the back color which is the inner color (back) and border (line).
    * The values should be integer-readable. 
@@ -85,7 +100,8 @@ public abstract class GralLed extends GralWidget
       dyda.lineColor = colorBorderSelectable[val1];
       dyda.backColor = colorInnerSelectable[val2];
       dyda.setChanged(ImplAccess.chgColorBack | ImplAccess.chgColorLine);
-      repaint(repaintDelay, repaintDelayMax);
+      super.setValue(values);  //stores and calls repaint.
+      //repaint(repaintDelay, repaintDelayMax);
     }
   }
 }
