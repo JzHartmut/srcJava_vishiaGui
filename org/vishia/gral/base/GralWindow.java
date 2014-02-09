@@ -18,6 +18,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
 
   /**Version, history and license.
    * <ul>
+   * <li>2013-12-19 Hartmut bugfix: {@link #setFullScreen(boolean)} now works. 
    * <li>2013-12-19 Hartmut new: Now it is able to instantiate without Graphic Layer and {@link #setToPanel(GralMngBuild_ifc)}
    *   is supported.  
    * <li>2012-04-16 Hartmut new: {@link #actionResizeOnePanel}
@@ -299,6 +300,14 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
     repaint(repaintDelay, repaintDelayMax);
   }
 
+  
+  @Override
+  public void setFullScreen(boolean val){
+    if(bFullScreen !=val){
+      bFullScreen = val;
+      repaint();
+    }
+  }
 
 
   @Override
@@ -310,12 +319,6 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
 
 
 
-  @Override
-  public void setFullScreen(boolean full)
-  {
-    // TODO Auto-generated method stub
-    
-  }
   
 
   

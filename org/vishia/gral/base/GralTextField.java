@@ -22,6 +22,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
 {
   /**Version, history and license .
    * <ul>
+   * <li>2014-02-10 Hartmut chg: Constructor with Parameter {@link Type}, supports password field. 
    * <li>2013-12-22 Hartmut chg: Now {@link GralTextField} uses the new concept of instantiation: It is not
    *   the super class of the implementation class. But it provides {@link GralTextField.GraphicImplAccess}
    *   as the super class. 
@@ -72,7 +73,8 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   @SuppressWarnings("hiding")
   public final static int version = 20130313;
   
-  //protected String text = "";
+
+  public enum Type{ password, editable};
   
   protected int caretPos;
   
@@ -93,10 +95,24 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   /**It is used for some operations. */
   protected final GralGraphicThread windowMng;
   
+  final boolean bPassword;
   
-  
-  public GralTextField(String name){
+  /**Constructs a text field with given properties
+   * @param name Name of the field. Maybe null if it is not need in management by name
+   * @param property password, editable, maybe left empty.
+   */
+  public GralTextField(String name, Type... property){
     super(name, 't', null);
+    boolean bPassword1 = false;
+    if(property !=null){
+      for(int ii=0; ii<property.length; ++ii){
+        switch(property[ii]){
+          case password: bPassword1 = true; break;
+          case editable: setEditable(true);
+        }
+      }
+    }
+    bPassword = bPassword1;
     windowMng = null;
     setBackColor(GralColor.getColor("wh"),0);
     setTextColor(GralColor.getColor("bk"));
@@ -105,6 +121,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   
   public GralTextField(String name, char whatis, GralMng mng){
     super(name, whatis, mng);
+    bPassword = false;
     setBackColor(GralColor.getColor("wh"),0);
     setTextColor(GralColor.getColor("bk"));
     this.windowMng = mng.gralDevice;
@@ -120,6 +137,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
       repaint();
     }
   }
+  
   
   void setUser(GralTextFieldUser_ifc user){
     this.user = user;
@@ -472,6 +490,8 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     protected void caretPos(int newPos){ GralTextField.this.caretPos = newPos; }
     
     protected GralTextFieldUser_ifc user(){ return GralTextField.this.user; }
+    
+    protected boolean isPasswordField(){ return GralTextField.this.bPassword; }
     
   }
   

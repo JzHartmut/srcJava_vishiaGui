@@ -378,7 +378,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
       window.setVisible(false);
     }
     if(bFullScreen != super.isFullScreen()){
-      window.setFullScreen(super.isFullScreen());
+      window.setFullScreen(bFullScreen = super.isFullScreen());
     }
     acknChanged(acknChg);
     window.update();

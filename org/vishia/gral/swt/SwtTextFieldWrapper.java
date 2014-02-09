@@ -101,6 +101,10 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     //in ctor: setPanelMng(mng);
     //Text widgetSwt;
     //
+    int textProperties = SWT.SINGLE;
+    if(isPasswordField()){ 
+      textProperties |= SWT.PASSWORD; 
+    }
     if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("t")){
       mng.setNextPosition();
       final Font promptFont;
@@ -153,13 +157,13 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
         boundsPrompt.dx = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
       }
       promptSwt.setBounds(boundsPrompt.x, boundsPrompt.y, boundsPrompt.dx, boundsPrompt.dy+1);
-      textFieldSwt =  new Text(panelSwt, SWT.SINGLE);
+      textFieldSwt =  new Text(panelSwt, textProperties);
       mng.setPosAndSizeSwt(posField,textFieldSwt, 800, 600);
       //textFieldSwt.setBounds(boundsField.x, boundsField.y, boundsField.dx, boundsField.dy);
       
     } else {
       //without prompt
-      textFieldSwt =  new Text(panelSwt, SWT.SINGLE);
+      textFieldSwt =  new Text(panelSwt, textProperties);
       mng.setPosAndSize_(textFieldSwt);
     }
     textFieldSwt.setFont(mng.propertiesGuiSwt.stdInputFont);

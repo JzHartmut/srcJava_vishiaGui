@@ -235,7 +235,7 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
     //graphicFrame.addWindowListener(new WindowClosingAdapter(true));
     //graphicFrame.setSize( xSize, ySize );
     if(xSize == -1 || ySize == -1){
-      windowSwt.setFullScreen(true);
+      windowSwt.setMaximized(true);
     } else {
       windowSwt.setBounds(xPos,yPos, xSize, ySize );  //Start position.
     }
@@ -249,6 +249,9 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
     //The propertiesGuiSwt needs the Display instance for Font and Color. Therefore the graphic thread with creation of Display should be executed before. 
     //mainWindow.setPanelMng(gralMng);
     mainWindow.setWindowVisible( true ); 
+    if(xSize == -1 || ySize == -1){
+      mainWindow.setFullScreen(true);  
+    }
     //int windProps = GralWindow_ifc.windResizeable;
     //GralWindow windowGral = new GralWindow("main", sTitle, windProps, gralMng, null );
     
