@@ -346,9 +346,12 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
       createWindow((GralWindow)widgg);
     } else if(widgg instanceof GralButton){
       new SwtButton((GralButton)widgg, this);
-    } else if(widgg instanceof GralLabel){
+    } 
+    else if(widgg instanceof GralLabel){
       new SwtLabel((GralLabel)widgg, this);
-      
+    }
+    else if(widgg instanceof GralValueBar){
+      new SwtValueBar((GralValueBar)widgg, this);
     }
   }
   
@@ -876,18 +879,11 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
   //, String sShowMethod
   , String sDataPath
   )
-  {
-  	SwtValueBar widget = new SwtValueBar(sName, this);
-  	setPosAndSize_(widget.widgetSwt);
-  	Rectangle rect = widget.widgetSwt.getBounds();
-  	widget.horizontal = rect.width > rect.height;
-  	//widget.setPanelMng(this);
-  //  widget.setShowMethod(sShowMethod);
-  	widget.setDataPath(sDataPath);
-    //widget.widget.setData(widgetInfos);
-    widget.widgetSwt.addMouseListener(mouseClickForInfo);
-    registerWidget(widget);
-    return widget;
+  { 
+    GralValueBar wdgg = new GralValueBar(sName);
+    wdgg.setDataPath(sDataPath);
+    wdgg.setToPanel(this);
+    return wdgg;
   }
   
   

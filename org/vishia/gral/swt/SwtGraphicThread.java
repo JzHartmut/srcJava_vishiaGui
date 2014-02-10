@@ -274,6 +274,14 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
     displaySwt.sleep ();
   }
   
+  
+  /**Yet Experience: SWT knows the {@link Display#asyncExec(Runnable)}.
+   * @param exec
+   */
+  protected void addToGraphicImplThread(Runnable exec){
+    displaySwt.asyncExec(exec);
+  }
+  
   @Override
   public void wakeup(){
     displaySwt.wake();

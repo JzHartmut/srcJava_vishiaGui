@@ -1354,6 +1354,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
 
     public final GralWidget widgg;
     
+    /**Bounds of the implementation widget in its container. null if not used. */
+    public GralRectangle pixBounds;
+    
     protected ImplAccess(GralWidget widgg, GralMng mng){
       this.widgg = widgg;
       widgg.itsMng = mng;

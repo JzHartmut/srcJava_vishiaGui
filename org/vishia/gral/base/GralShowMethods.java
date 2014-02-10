@@ -131,7 +131,7 @@ public class GralShowMethods
     @Override public boolean exec(int actionCode, GralWidget_ifc wdgi, Object... params){ 
       if(!(wdgi instanceof GralValueBar)) return false;
       GralValueBar wdg = (GralValueBar) wdgi;
-      if(wdg.floatBorder == null){ //not configurated yet:
+      if(wdg.fLevels == null){ //not configurated yet:
         String[] sShowParam = wdg.getShowParam();
         wdg.setBorderAndColors(sShowParam);
       }

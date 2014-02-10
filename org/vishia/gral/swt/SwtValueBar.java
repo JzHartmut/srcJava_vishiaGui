@@ -9,13 +9,19 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 
-public class SwtValueBar extends GralValueBar implements GralSetValue_ifc, GralWidget_ifc
+public class SwtValueBar extends GralValueBar.GraphicImplAccess // implements GralSetValue_ifc, GralWidget_ifc
 {
 
-	final SwtMng mng;
+  /**It contains the association to the swt widget (Control) and the {@link SwtMng}
+   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   */
+  private final SwtWidgetHelper wdgh;
+  
+	//final SwtMng mng;
 
 	protected BarWidget widgetSwt;
 	
@@ -29,11 +35,11 @@ public class SwtValueBar extends GralValueBar implements GralSetValue_ifc, GralW
 	 * @param mng The Gui-panel-manager contains information about the graphic frame and properties.
 	 * @param size The size of text in button, use 'A' or 'B' for small - bold
 	 */
-	public SwtValueBar(String name, SwtMng mng)
+	public SwtValueBar(GralValueBar widgg, SwtMng mng)
 	{
-    super(name, mng);
-    this.mng = mng;
-		this.widgetSwt = this.new BarWidget();
+    widgg.super(mng);
+    wdgh = new SwtWidgetHelper(widgetSwt, mng);
+    this.widgetSwt = this.new BarWidget();
 		this.widgetSwt.setData(this);
 		this.widgetSwt.setBackground(mng.propertiesGuiSwt.colorBackgroundSwt());
   	//Control xx = mng.currPanel.panelComposite;
@@ -44,30 +50,39 @@ public class SwtValueBar extends GralValueBar implements GralSetValue_ifc, GralW
 		//colorValueMaxLimit = mng.propertiesGui.color(0xff4000);
 		colorBorder = new Color[1];  //at least 1 color, if not parametrized
 		colorBorder[0] = mng.propertiesGuiSwt.color("red");
+    //widget.setPanelMng(this);
+  //  widget.setShowMethod(sShowMethod);
+    //widget.widget.setData(widgetInfos);
+    widgetSwt.addMouseListener(mng.mouseClickForInfo);
+    setBounds();
+    
+    mng.registerWidget(widgg);
 	}
 
-  @Override public void repaint()
-  {
-    if(itsMng.currThreadIsGraphic()){
-      widgetSwt.redraw();
-    } else {
-		  this.widgetSwt.getDisplay().asyncExec(widgetSwt.redraw);
-    }
-  }
-	
   
+	
+	public void setBounds(){
+    pixBounds = wdgh.mng.calcWidgetPosAndSizeSwt(widgg.pos(), widgetSwt, 10, 100);
+    //mng.setPosAndSize_(widgetSwt);
+    widgetSwt.setBounds(pixBounds.x, pixBounds.y, pixBounds.dx, pixBounds.dy);
+    horizontal = pixBounds.dx > pixBounds.dy;
+	  
+	}
+	
+	
+	
   @Override public void repaintGthread(){
     widgetSwt.redraw();
   }
 
   
-  @Override public void setBorderAndColors(String[] sParam)
+  @Override
+  public void setBorderAndColorsImpl(String[] sColorLevels)
   {
-  	super.setBorderAndColors(sParam);
-  	colorBorder = new Color[sColorBorder.length];
+  	colorBorder = new Color[sColorLevels.length];
   	int ix = -1;
-  	for(String sColor: sColorBorder){
-  		colorBorder[++ix] = mng.propertiesGuiSwt.color(sColor);
+  	for(String sColor: sColorLevels){
+  		colorBorder[++ix] = wdgh.mng.propertiesGuiSwt.color(sColor);
   	}
   }
 	
@@ -76,11 +91,72 @@ public class SwtValueBar extends GralValueBar implements GralSetValue_ifc, GralW
 
   
   
+  protected void paintRoutine(BarWidget wdgs, PaintEvent e){
+    // TODO Auto-generated method stub
+    GC gc = e.gc;
+    //gc.d
+    Rectangle dim = wdgs.getBounds();
+    int valuePixelMax = horizontal() ? dim.width -2: dim.height -2;
+    if(valuePixelMax != 106)
+      stop();  
+    /*
+    if((SwtValueBar.this.valueMax != valuePixelMax || pixLevel == null)
+      && fLevels !=null && fLevels.length >1) {  //at least one medium border
+      pixLevel = new int[fLevels.length-1];
+      for(int ix = 0; ix < pixLevel.length; ++ix){
+        pixLevel[ix] = dim.height -1 - (int)(valueMax * ((fLevels[ix] - minRange) / (maxRange - minRange)));
+      }
+    }
+    SwtValueBar.this.valueMax = valuePixelMax;
+    */
+    wdgs.drawBackground(e.gc, dim.x, dim.y, dim.width, dim.height);
+    gc.setForeground(black);  //black
+    //FontData fontData = mng.propertiesGui.stdButtonFont.getFontData();
+    //fontData.
+    gc.setLineWidth(1);
+    gc.setForeground(black);  //black
+    gc.drawRectangle(0,0,dim.width-1, dim.height-1);
+    //The bar, colored:
+    gc.setBackground(colorBorder[ixColor()]);  //black
+    //gc.fillRectangle(1,dim.height -1 - value1 ,dim.width-2, value2 - value1);
+    int start, size;
+    if(pix0line() < pixvalue()){
+      start = 1 + pix0line();
+      size = pixvalue() - pix0line();  //difference start bar, end bar
+    } else { //negative value
+      start = pixvalue();
+      size = pix0line() - pixvalue();
+    }
+    if(size > 150 && size < 230)
+      stop();
+    if(horizontal()){
+      gc.fillRectangle(start,1 ,size, dim.height-2);
+    } else {
+      gc.fillRectangle(1,start ,dim.width-2, size);
+    }
+    //division lines for borders.
+    if(pixLevel !=null){
+      if(horizontal()){
+        for(int pixel : pixLevel){
+          gc.drawLine(pixel, 0, pixel, dim.height-1);
+        }
+      } else {
+        for(int pixel : pixLevel){
+          gc.drawLine(0, pixel, dim.width-1, pixel);
+        }
+      }
+    }
+    //gc.drawLine(3,dim.height-2,dim.width, dim.height-2);
+  }
+    
+  
+  
+  
   public class BarWidget extends Canvas
 	{
 		BarWidget()
 		{
-			super(mng.getCurrentPanel(), 0);  //Canvas
+			super(wdgh.mng.getCurrentPanel(), 0);  //Canvas
 			addPaintListener(paintListener);	
 			
 		}
@@ -88,61 +164,7 @@ public class SwtValueBar extends GralValueBar implements GralSetValue_ifc, GralW
 		
 	  final PaintListener paintListener = new PaintListener(){
 			@Override
-			public void paintControl(PaintEvent e) {
-				// TODO Auto-generated method stub
-				GC gc = e.gc;
-				//gc.d
-				Rectangle dim = BarWidget.this.getBounds();
-				int valuePixelMax = horizontal ? dim.width -2: dim.height -2;
-				if(valuePixelMax != 106)
-					stop();  
-				if((SwtValueBar.this.valueMax != valuePixelMax || valPixelBorder == null)
-					&& floatBorder !=null && floatBorder.length >1) {  //at least one medium border
-					valPixelBorder = new int[floatBorder.length-1];
-					for(int ix = 0; ix < valPixelBorder.length; ++ix){
-						valPixelBorder[ix] = dim.height -1 - (int)(valueMax * ((floatBorder[ix] - minRange) / (maxRange - minRange)));
-					}
-				}
-				SwtValueBar.this.valueMax = valuePixelMax;
-				drawBackground(e.gc, dim.x, dim.y, dim.width, dim.height);
-				gc.setForeground(black);  //black
-				//FontData fontData = mng.propertiesGui.stdButtonFont.getFontData();
-				//fontData.
-				gc.setLineWidth(1);
-				gc.setForeground(black);  //black
-				gc.drawRectangle(0,0,dim.width-1, dim.height-1);
-				//The bar, colored:
-				gc.setBackground(colorBorder[ixColor]);  //black
-				//gc.fillRectangle(1,dim.height -1 - value1 ,dim.width-2, value2 - value1);
-        int start, size;
-        if(value1 < value2){
-          start = 1 + value1;
-          size = value2 - value1;  //difference start bar, end bar
-        } else {
-          start = value2;
-          size = value1 - value2;
-        }
-        if(size > 150 && size < 230)
-          stop();
-        if(horizontal){
-          gc.fillRectangle(start,1 ,size, dim.height-2);
-        } else {
-  				gc.fillRectangle(1,start ,dim.width-2, size);
-        }
-				//division lines for borders.
-				if(valPixelBorder !=null){
-					if(horizontal){
-						for(int pixel : valPixelBorder){
-							gc.drawLine(pixel, 0, pixel, dim.height-1);
-						}
-					} else {
-						for(int pixel : valPixelBorder){
-							gc.drawLine(0, pixel, dim.width-1, pixel);
-						}
-					}
-				}
-				//gc.drawLine(3,dim.height-2,dim.width, dim.height-2);
-			}
+			public void paintControl(PaintEvent e) { paintRoutine(BarWidget.this,e); }
 	  };
 
 	  final Runnable redraw = new Runnable(){
@@ -156,19 +178,6 @@ public class SwtValueBar extends GralValueBar implements GralSetValue_ifc, GralW
 	  
 	void stop(){}
 
-  @Override
-  public GralColor setBackgroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public GralColor setForegroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
   { widgetSwt.setBounds(x,y,dx,dy);
@@ -180,6 +189,14 @@ public class SwtValueBar extends GralValueBar implements GralSetValue_ifc, GralW
   {
     widgetSwt.dispose();
     widgetSwt = null;
+  }
+
+
+  @Override
+  public GralRectangle getPixelPositionSize()
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 
