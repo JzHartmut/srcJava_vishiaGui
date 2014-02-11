@@ -98,11 +98,16 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
 	}
 	
 	
-	@Override public void setValue(float valueP)
+	/**Sets the bar and its color. A refresh of graphic is only done if the value change forces 
+	 * a change of pixel positions of the value bar. Less changes of value does not force refresh.
+	 * @see org.vishia.gral.base.GralWidget#setValue(float)
+	 */
+	@Override public void setValue(float value)
 	{
 		if(wdgImpl !=null){
-		  ((GraphicImplAccess)wdgImpl).setValue(valueP);
-      this.repaint();
+		  if(((GraphicImplAccess)wdgImpl).setValue(value)) {
+        this.repaint();
+		  }
 		}
 	}
   
@@ -138,9 +143,13 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
     }
     
     
-    protected void setValue(float valueP)
+    /**Sets the pixel values
+     * @param valueP
+     * @return true if a pixel value is changed. Only then refresh is necessary.
+     */
+    protected boolean setValue(float valueP)
     {
-      
+      final boolean chg;
       int value1, value2;
       int pixMax = horizontal ? pixBounds.dx : pixBounds.dy;
       value1 = (int)(pixMax * ((0.0F - minRange)/ (maxRange - minRange)));  //the 0-value
@@ -149,24 +158,23 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
       if(value1 > pixMax){ value1 = pixMax; }
       if(value2 < 0){ value2 = 0;}
       if(value2 > pixMax){ value2 = pixMax; }
-      if(false && value1 < value2){
-        this.pixvalue = value1;
-        this.pix0line = value2;
-      } else {
+      chg = this.pix0line !=value1 || this.pixvalue !=value2;
+      if(chg) {
         this.pix0line = value1;
         this.pixvalue = value2;
+        float level1 = minRange;
+        //check in which range the value is assigned, set ixColor 
+        if(fLevels !=null)
+        for(ixColor = 0; ixColor < fLevels.length -1; ++ixColor){
+          float level2 = fLevels[ixColor];
+          if(  level1 < level2 && level1 <= valueP && valueP < level2
+            || level1 > level2 && level2 <= valueP && valueP < level1
+            )
+          break; //found
+          level1 = level2;
+        }
       }
-      float level1 = minRange;
-      //check in which range the value is assigned, set ixColor 
-      if(fLevels !=null)
-      for(ixColor = 0; ixColor < fLevels.length -1; ++ixColor){
-        float level2 = fLevels[ixColor];
-        if(  level1 < level2 && level1 <= valueP && valueP < level2
-          || level1 > level2 && level2 <= valueP && valueP < level1
-          )
-        break; //found
-        level1 = level2;
-      }
+      return chg;
     }
 
     
