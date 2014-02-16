@@ -115,7 +115,7 @@ public class FcmdExecuter
         try{ 
           ZGenScript script = ZGen.translateAndSetGenCtrl(cmdCfgJbat, new File(cmdCfgJbat.getParentFile(), cmdCfgJbat.getName() + ".check.xml"), log);
           dst.addSubOfZgenclass(script.scriptClass(), 1);
-          executerToInit.initExecuter(script);
+          executerToInit.initExecuter(script, null);  //NOTE: currdir is not determined.
           //main.cmdSelector.initExecuter(script);
         } catch(Exception exc){
           log.writeError("CmdStore - JbatScript;", exc);

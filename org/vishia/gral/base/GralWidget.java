@@ -980,13 +980,14 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
         System.err.println("GralWidget fault actionShow in " + name + "; returns false; sShowMethod = " + sShowMethod);
       }
     } else {
-      //standard behaviour to show: call setValue or setText which may overridden by the widget type.
+      //standard behavior to show: call setValue or setText which may overridden by the widget type.
       if(variable !=null){
         if(sDataPath !=null && sDataPath.contains("#dEB:activeDamping.i1intg"))
           Assert.stop();
         if(colorRefreshed !=null && colorOld !=null){
           long timeVariable = variable.getLastRefreshTime();
-          boolean bOld = timeVariable == 0 || (timeVariable - timeLatest) < 0;
+          long timediff = timeVariable - timeLatest;
+          boolean bOld = timeVariable == 0 || timediff < 0;
           if(bOld ){
             setBackColor(colorOld, 0);
           } else {
