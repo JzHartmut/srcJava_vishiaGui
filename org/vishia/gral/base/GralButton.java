@@ -245,6 +245,21 @@ public class GralButton extends GralWidget
   
   
   
+  @Override public void setValue(int cmd, int ident, Object visibleInfo, Object userData){
+    if(visibleInfo instanceof Integer){
+      int value = ((Integer)visibleInfo).intValue();
+      if(shouldSwitched){
+        switch(value){
+          case 0: switchState = State.Off; break;
+          case 1: switchState = State.On; break;
+          default: switchState = State.Disabled; break;
+        }
+      }
+    }
+  }
+
+  
+  
   public void XXXsetDisabled(boolean value){
     this.switchState = value ? State.Disabled: State.On; //kDisabled : kOn;
     repaint(100, 100);

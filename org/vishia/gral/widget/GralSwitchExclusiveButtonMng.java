@@ -100,6 +100,8 @@ public class GralSwitchExclusiveButtonMng implements VariableAccess_ifc
   @Override public char getType(){ return 'I'; } 
   
 
+  @Override public void setRefreshed(long time){ }
+  
   @Override
   public long getLastRefreshTime()
   {
