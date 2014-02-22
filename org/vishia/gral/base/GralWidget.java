@@ -1293,7 +1293,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       if(itsMng.currThreadIsGraphic()){
         repaintGthread();     //do it immediately if no thread switch is necessary.
       } else {
-        repaintRequ.addToGraphicThread(itsMng.gralDevice(), repaintDelay);  //TODO repaintDelayMax
+        repaintRequ.addToList(itsMng.gralDevice().orderList(), repaintDelay);  //TODO repaintDelayMax
       }
     }
   }
@@ -1308,7 +1308,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       if(delay == 0 && itsMng.currThreadIsGraphic()){
         repaintGthread();
       } else {
-        repaintRequ.addToGraphicThread(itsMng.gralDevice(), delay);
+        repaintRequ.addToList(itsMng.gralDevice().orderList(), delay);
       }
     }
   }
@@ -1459,7 +1459,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     @Override public void doBeforeDispatching(boolean onlyWakeup) {
       //first remove from queue to force add new, if a new request is given.
       //thread safety: If a new request is given, it is not add yet, because it isn't execute.
-      removeFromQueue(itsMng.gralDevice());
+      removeFromList(itsMng.gralDevice().orderList());
       //now a new request will be added.
       try{ repaintGthread();
       
@@ -1472,29 +1472,6 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     }
     @Override public String toString(){ return name + ":" + GralWidget.this.name; }
   };
-  
-  /**This callback worker calls the {@link #repaintGthread()} if it is invoked in the graphical thread.
-   * It is used with delay and wind up whenever {@link #repaint(int, int)} with an delay is called.
-   * If its callback method was run, it is dequeued till the next request of {@link #repaint()}.
-   */
-  private final GralDispatchCallbackWorker XXXsetFocusRequ = new GralDispatchCallbackWorker("GralWidget.setFocusRequ"){
-    @Override public void doBeforeDispatching(boolean onlyWakeup) {
-      //first remove from queue to force add new, if a new request is given.
-      //thread safety: If a new request is given, it is not add yet, because it isn't execute.
-      removeFromQueue(itsMng.gralDevice());
-      //now a new request will be added.
-      try{ 
-        setFocusGThread();
-      } catch(Exception exc){
-        System.out.println(Assert.exceptionInfo("GralWidget - unexpected Exception; ", exc, 0, 7));
-        exc.printStackTrace(System.err);
-        //NOTE: removeFromQueue should invoked on exception too.
-      }
-      countExecution();
-    }
-    @Override public String toString(){ return name + ":" + GralWidget.this.name; }
-  };
-
   
   
   /**Sets the state of the widget whether it seams to be visible.

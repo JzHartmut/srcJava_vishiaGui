@@ -996,7 +996,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           //set the new cell focused, in the paint routine.
           gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
           actionOnLineSelected(KeyCode.userSelect, lineSelected);
-          keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
+          keyActionDone.addToList(itsMng.gralDevice().orderList(), 0);
         } break;
         case KeyCode.mouseWheelUp:
         case KeyCode.up: {
@@ -1016,7 +1016,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           //set the new cell focused, in the paint routine.
           gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
           actionOnLineSelected(KeyCode.userSelect, lineSelected);
-          keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
+          keyActionDone.addToList(itsMng.gralDevice().orderList(), 0);
         } break;
         case KeyCode.pgdn: {
           if(lineSelectedixCell < zLineVisible -3){
@@ -1037,7 +1037,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           //set the new cell focused, in the paint routine.
           gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
           actionOnLineSelected(KeyCode.userSelect, lineSelected);
-          keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
+          keyActionDone.addToList(itsMng.gralDevice().orderList(), 0);
         } break;
         default:
           if(keyCode == KeyCode.dn || keyCode == keyMarkDn || keyCode == KeyCode.mouseWheelDn
@@ -1072,7 +1072,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
             actionOnLineSelected(KeyCode.userSelect, lineSelected);
             
-            keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
+            keyActionDone.addToList(itsMng.gralDevice().orderList(), 0);
           } else if(KeyCode.isTextKey(keyCode) && !bColumnEditable[colSelectedixCellC]){
             searchChars.appendCodePoint(keyCode);
             searchContent(false);
@@ -1111,7 +1111,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             line.setMarked(1, line.getUserData());
           }
           ////
-          keyActionDone.addToGraphicThread(itsMng.gralDevice(), 0);
+          keyActionDone.addToList(itsMng.gralDevice().orderList(), 0);
           done = true;
         }
         if(!done && lineSelected !=null){
@@ -1160,7 +1160,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       repaintGthread();
       keyDone = true;
       //System.out.println("Key done");
-      removeFromQueue(itsMng.gralDevice());
+      removeFromList(itsMng.gralDevice().orderList());
     }
   };
 

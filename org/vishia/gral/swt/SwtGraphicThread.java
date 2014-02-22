@@ -285,7 +285,7 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
   @Override
   public void wakeup(){
     displaySwt.wake();
-    extEventSet.set(true);
+    //extEventSet.set(true);
     isWakedUpOnly = true;
   }
 

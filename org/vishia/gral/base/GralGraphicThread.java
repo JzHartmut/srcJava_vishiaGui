@@ -3,7 +3,9 @@ package org.vishia.gral.base;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.vishia.util.Assert;
 import org.vishia.util.MinMaxTime;
+import org.vishia.util.OrderListRun;
 
 /**This class is the base for implementation of graphic threading. It is implemented for SWT and Swing yet.
  * <br><br>
@@ -54,7 +56,7 @@ import org.vishia.util.MinMaxTime;
  *    {@link #graphicThreadSleep()} let this thread sleeping, its all done. 
  *    <br><br>
  *    The instance of {@link GralDispatchCallbackWorker} will be remain in the queue. For single activities
- *    it should be queued out by itself calling its own {@link GralDispatchCallbackWorker#removeFromQueue(GralGraphicThread)}
+ *    it should be queued out by itself calling its own {@link GralDispatchCallbackWorker#removeFromList(GralGraphicThread)}
  *    method in its {@link GralDispatchCallbackWorker#doBeforeDispatching(boolean)}-routine.
  *    Another possibility is to have instances of {@link GralDispatchCallbackWorker} which are queued
  *    for any time. They are invoked whenever {@link #wakeup()} is called. 
@@ -109,7 +111,7 @@ import org.vishia.util.MinMaxTime;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralGraphicThread implements Runnable
+public abstract class GralGraphicThread implements Runnable, OrderListRun.ConnectionExecThread
 {
   
   /**Version and history:
@@ -163,54 +165,27 @@ public abstract class GralGraphicThread implements Runnable
   /**The thread which runs all graphical activities. */
   protected Thread threadGuiDispatch;
 
-  /**The thread which executes delayed wake up. */
-  protected Thread threadTimer;
-
   /**The thread id of the managing thread for graphic actions. */
   protected long graphicThreadId;
-
-  /**Queue of orders to execute in the graphic thread before dispatching system events. 
-   * Any instance will be invoked in the dispatch-loop.
-   * See {@link #addDispatchOrder(Runnable)}. 
-   * An order can be stayed in this queue for ever. It is invoked any time after the graphic thread 
-   * is woken up and before the dispatching of graphic-system-event will be started.
-   * An order may be run only one time, than it should delete itself from this queue in its run-method.
-   * */
-  private final ConcurrentLinkedQueue<GralDispatchCallbackWorker> queueGraphicOrders = new ConcurrentLinkedQueue<GralDispatchCallbackWorker>();
-  
-  /**Queue of orders which are executed with delay yet. */
-  private final ConcurrentLinkedQueue<GralDispatchCallbackWorker> queueDelayedGraphicOrders = new ConcurrentLinkedQueue<GralDispatchCallbackWorker>();
-  
-  /**Temporary used instance of delayed orders while {@link #runTimer} organizes the delayed orders.
-   * This queue is empty outside running one step of runTimer(). */
-  private final ConcurrentLinkedQueue<GralDispatchCallbackWorker> queueDelayedTempGraphicOrders = new ConcurrentLinkedQueue<GralDispatchCallbackWorker>();
-  
-  /**Mutex mechanism: This variable is set true under mutex while the timer waits. Then it should
-   * be notified in {@link #addDispatchOrder(GralDispatchCallbackWorker)} with delayed order. */
-  private boolean bTimeIsWaiting;
-  
-  /**True if the startup of the main window is done and the main window is visible. */
-  protected boolean bStarted = false; 
 
   
   protected boolean isWakedUpOnly;
   
   protected final char sizeCharProperties;
   
+  /**True if the startup of the main window is done and the main window is visible. */
+  protected boolean bStarted = false; 
+
   /** set to true to exit in main*/
   protected boolean bExit = false;
   
-  /**Set if any external event is set. Then the dispatcher shouldn't sleep after finishing dispatching. 
-   * This is important if the external event occurs while the GUI is busy in the operation-system-dispatching loop.
-   */
-  protected AtomicBoolean extEventSet = new AtomicBoolean(false);
-
-
   /**Instance to measure execution times.
    * 
    */
   protected MinMaxTime checkTimes = new MinMaxTime();
   
+  
+  OrderListRun orderList = new OrderListRun(this);
 
   /**Constructs this class as superclass.
    * The constructor of the inheriting class has some more parameter to build the 
@@ -222,50 +197,8 @@ public abstract class GralGraphicThread implements Runnable
   protected GralGraphicThread(char size)
   { sizeCharProperties = size;
     threadGuiDispatch = new Thread(this, "graphic");
-    threadTimer = new Thread(runTimer, "graphictime");
-    threadTimer.start();
   }
   
-  
-  /** Adds a method which will be called in anytime in the dispatch loop until the listener will remove itself.
-   * @deprecated: This method sholdn't be called by user, see {@link GralDispatchCallbackWorker#addToGraphicThread(GralGraphicThread, int)}. 
-   * @see org.vishia.gral.ifc.GralWindowMng_ifc#addDispatchListener(org.vishia.gral.base.GralDispatchCallbackWorker)
-   * @param order
-   */
-  public void addDispatchOrder(GralDispatchCallbackWorker order){ 
-    if(order.timeToExecution() >=0){
-      queueDelayedGraphicOrders.offer(order);
-      synchronized(runTimer){
-        if(bTimeIsWaiting){
-          runTimer.notify();  
-        }
-      }
-    } else {
-      queueGraphicOrders.add(order);
-      //it is possible that the GUI is busy with dispatching and doesn't sleep yet.
-      //therefore:
-      extEventSet.getAndSet(true);
-      if(bStarted){
-        
-        wakeup();  //to wake up the GUI-thread, to run the listener at least one time.
-      }
-  
-    }
-  }
-  
-  
-  /**Removes a order, which was called in the dispatch loop.
-   * Hint: Use {@link GralDispatchCallbackWorker#removeFromQueue(GralGraphicThread)}
-   * to remove thread safe with signification. Don't call this routine yourself.
-   * @param listener
-   */
-  public void removeDispatchListener(GralDispatchCallbackWorker listener)
-  { queueGraphicOrders.remove(listener);
-    queueDelayedGraphicOrders.remove(listener);
-  }
-  
-  
-
   
   /**This method should be implemented by the graphical implementation layer. It should build the graphic main window
    * and returned when finished. This routine is called as the first routine in the Graphic thread's
@@ -282,6 +215,12 @@ public abstract class GralGraphicThread implements Runnable
    * if {@link #wakeup()} is called or this routine returns if the operation system wakes up the graphic thread. */
   protected abstract void graphicThreadSleep();
   
+  public OrderListRun orderList(){ return orderList; }
+  
+  public void addDispatchOrder(GralDispatchCallbackWorker order){ orderList.addDispatchOrder(order); }
+
+  public void removeDispatchListener(GralDispatchCallbackWorker listener){ orderList.removeDispatchListener(listener); }
+
   /**This method should be implemented by the graphical base. It should be waked up the execution 
    * of the graphic thread because some actions are registered.. */
   public abstract void wakeup();
@@ -322,6 +261,7 @@ public abstract class GralGraphicThread implements Runnable
     synchronized(this){
       this.graphicThreadId = guiThreadId1;
       bStarted = true;
+      orderList.start();
       notify();      //wakeup the waiting calling thread.
     }
     checkTimes.init();
@@ -349,26 +289,17 @@ public abstract class GralGraphicThread implements Runnable
       checkTimes.calcTime();
       isWakedUpOnly = false;
       //System.out.println("dispatched");
-      if(!extEventSet.get()) {
-        graphicThreadSleep();
-      }
       if(!bExit){
-        extEventSet.set(false); //the list will be tested!
-        if(isWakedUpOnly)
+        if(isWakedUpOnly){
+          Assert.stop();
+        }
         //it may be waked up by the operation system or by calling Display.wake().
         //if wakeUp() is called, isWakedUpOnly is set.
         checkTimes.cyclTime();
         
-        GralDispatchCallbackWorker listener;
-        while( (listener = queueGraphicOrders.poll()) !=null){
-        //for(GralDispatchCallbackWorker listener: queueGraphicOrders){
-              //use isWakedUpOnly for run as parameter?
-          try{
-            listener.doBeforeDispatching(isWakedUpOnly);
-          } catch(Exception exc){
-            System.err.println("GralGraphicThread-" + exc.getMessage());
-            exc.printStackTrace();
-          }
+        boolean bNotSleep = orderList.step(-1, System.currentTimeMillis());
+        if(!bNotSleep){
+          graphicThreadSleep();
         }
       } 
     }
@@ -380,55 +311,5 @@ public abstract class GralGraphicThread implements Runnable
   
   
   
-  /**Wakes up the {@link #runTimer} queue to execute delayed requests.
-   * 
-   */
-  public void notifyTimer(){
-    synchronized(runTimer){
-      if(bTimeIsWaiting){
-        runTimer.notify();  
-      }
-    }
-  }
-  
-  
-  Runnable runTimer = new Runnable(){
-    @Override public void run(){
-      while(!bExit){
-        int timeWait = 1000;
-        boolean bWake = false;
-        { GralDispatchCallbackWorker order;
-          while( (order = queueDelayedGraphicOrders.poll()) !=null){
-            int timeToExecution = order.timeToExecution();
-            if(timeToExecution >=0){
-              //not yet to proceed
-              if(timeWait > timeToExecution){ timeWait = timeToExecution; }
-              queueDelayedTempGraphicOrders.offer(order);
-            } else {
-              queueGraphicOrders.offer(order);
-              bWake = true;
-            }
-          }
-          //delayedChangeRequest is tested and empty now.
-          //offer the requ back from the temp queue
-          while( (order = queueDelayedTempGraphicOrders.poll()) !=null){
-            queueDelayedGraphicOrders.offer(order); 
-          }
-        }
-        if(bWake){
-          wakeup(); //process changeRequests in the graphic thread.
-        }
-        synchronized(this){
-          bTimeIsWaiting = true;
-          if(timeWait < 10){
-            timeWait = 10; //at least 10 ms, especially prevent usage of 0 and negative values.
-          }
-          try{ wait(timeWait);} catch(InterruptedException exc){}
-          bTimeIsWaiting = false;
-        }
-      }
-    }
-  };
-
 }
 
