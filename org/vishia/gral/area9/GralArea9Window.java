@@ -32,6 +32,7 @@ public class GralArea9Window implements GralArea9_ifc
   
   /**Version and History
    * <ul>
+   * <li>2014-02-24 Hartmut new {@link #setHelpBase(String)} used in {@link #setHelpUrl(String)}.
    * <li>2012-05-17 Hartmut new: {@link #setMinMaxSizeArea(String, int, int, int, int)}: The size can be given 
    *   with gral units, as min, max or absolute (min, max are equal). The size of a area border can be changed on runtime.
    * <li>2012-04-22 Hartmut new: {@link #setFullScreen(boolean)}
@@ -657,11 +658,17 @@ public class GralArea9Window implements GralArea9_ifc
   
   
   
+  /* (non-Javadoc)
+   * @see org.vishia.gral.area9.GralArea9_ifc#setHelpBase(java.lang.String)
+   */
   @Override public void setHelpBase(String path){ sHelpBase = path; }
 
 
 
 
+  /* (non-Javadoc)
+   * @see org.vishia.gral.ifc.GralMngApplAdapter_ifc#setHelpUrl(java.lang.String)
+   */
   @Override public void setHelpUrl(String url){ 
     String sUrl;
     if(url.startsWith("+")){
