@@ -225,5 +225,11 @@ public interface GralArea9_ifc extends GralMngApplAdapter_ifc
   GralWindow_ifc mainWindow();
   
   MainCmd_ifc getMainCmd();
+
+
+  /**Set a path which is used as help url base path, if an widget starts with "+" in its help url.
+   * @param path An absolute drive, or html page in internet.
+   */
+  void setHelpBase(String path);
   
 }

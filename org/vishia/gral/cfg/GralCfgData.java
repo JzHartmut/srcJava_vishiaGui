@@ -22,6 +22,7 @@ public final class GralCfgData
   
   /**Version and history
    * <ul>
+   * <li>2014-02-24 Hartmut new element help now also in config.
    * <li>2013-12-02 Hartmut new conditional configuration. 
    * <li>2012-04-22 Hartmut support {@link #new_Type()}.
    * <li>2012-02-25 Hartmut chg {@link GuiCfgCurveLine#colorValue} = -1 initially to check whether it is given,
@@ -100,7 +101,7 @@ public final class GralCfgData
 
 
     /**From ZBNF-parser param::=<?> ...name = <""?name> etc. values are set if it is parsed. */
-    public String name, text, cmd, userAction, info, showMethod, format, type, prompt, promptPosition;
+    public String name, text, cmd, userAction, data, showMethod, format, type, prompt, promptPosition, help;
     
     /**From ZBNF-parser param::=<?> ...dropFiles = <""?name> etc. values are set if it is parsed. */
     public String dragFiles, dropFiles, dragText, dropText;
@@ -114,6 +115,8 @@ public final class GralCfgData
       this.itsElement = itsElement; 
       this.whatIs = whatIs;
     }
+    
+    public void set_help(String sHelp){ this.help = sHelp; }
     
     public GuiCfgColor new_colorName(){ return color0 = new GuiCfgColor(); }
     
@@ -143,7 +146,7 @@ public final class GralCfgData
       if(text ==null){ text = src.text; }
       if(cmd ==null){ cmd = src.cmd; }
       if(userAction ==null){ userAction = src.userAction; }
-      if(info ==null){ info = src.info; }
+      if(data ==null){ data = src.data; }
       if(showMethod ==null){ showMethod = src.showMethod; }
       if(prompt ==null){ prompt = src.prompt; }
       if(promptPosition !=null){ promptPosition = src.promptPosition;}

@@ -164,6 +164,7 @@ public class GralArea9Window implements GralArea9_ifc
   protected GralTextBox_ifc textAreaOutput = null;
   
 
+  private String sHelpBase;
 
   /**Sets the output window to a defined area. .
    * Adds the edit-menu too. 
@@ -656,12 +657,20 @@ public class GralArea9Window implements GralArea9_ifc
   
   
   
+  @Override public void setHelpBase(String path){ sHelpBase = path; }
 
 
 
 
-
-  @Override public void setHelpUrl(String url){ infoHelp.setUrl(url); }
+  @Override public void setHelpUrl(String url){ 
+    String sUrl;
+    if(url.startsWith("+")){
+      sUrl = sHelpBase + url.substring(1);
+    } else {
+      sUrl = url;  //should be absolute
+    }
+    infoHelp.setUrl(sUrl); 
+  }
   
 
 

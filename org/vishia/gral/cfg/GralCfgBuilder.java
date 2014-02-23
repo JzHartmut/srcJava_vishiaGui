@@ -27,6 +27,7 @@ public class GralCfgBuilder
 
   /**Version and history
    * <ul>
+   * <li>2014-02-24 Hartmut new element help now also in config.
    * <li>2012-09-17 Hartmut chg: showMethod now split functionName and parameters. The function name is used to get
    *   the {@link GralUserAction} for {@link GralWidget#setActionShow(GralUserAction, String[])}. The parameter are stored
    *   in {@link GralWidget#cfg} as {@link GralWidget.ConfigData#showParam}.
@@ -169,7 +170,8 @@ public class GralCfgBuilder
     if(sName ==null && cfge.widgetType.prompt !=null){ sName = cfgData.actPanel.name + "/" + cfge.widgetType.prompt; } //the prompt as name
     //the name may be null, then the widget is not registered.
     //
-    String sDataPath = cfge.widgetType.info;
+    
+    String sDataPath = cfge.widgetType.data;
     //text is the default for a datapath.
     if(sDataPath ==null && cfge.widgetType.text !=null){ sDataPath = cfge.widgetType.text; }
     /*
@@ -203,9 +205,9 @@ public class GralCfgBuilder
       GralCfgData.GuiCfgButton wButton = (GralCfgData.GuiCfgButton) cfge.widgetType;
       if(wButton.bSwitch){
         widgd = gralMng.addSwitchButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd
-          , cfge.widgetType.info, cfge.widgetType.text, cfge.widgetType.color0.color, cfge.widgetType.color1.color);
+          , cfge.widgetType.data, cfge.widgetType.text, cfge.widgetType.color0.color, cfge.widgetType.color1.color);
       } else {
-        widgd = gralMng.addButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd, cfge.widgetType.info, cfge.widgetType.text);
+        widgd = gralMng.addButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd, cfge.widgetType.data, cfge.widgetType.text);
       }
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgText){
       GralCfgData.GuiCfgText wText = (GralCfgData.GuiCfgText)cfge.widgetType;
@@ -239,8 +241,8 @@ public class GralCfgBuilder
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgInputFile){
       GralCfgData.GuiCfgInputFile widgt = (GralCfgData.GuiCfgInputFile)cfge.widgetType;
       final String dirMask;
-      if(widgt.info !=null){
-        dirMask = replaceAlias(widgt.info);
+      if(widgt.data !=null){
+        dirMask = replaceAlias(widgt.data);
       } else { dirMask = ""; }
       widgd = gralMng.addFileSelectField(sName, null, dirMask, null, "t");
       widgd.setDataPath(sDataPath);
@@ -259,7 +261,7 @@ public class GralCfgBuilder
       GralCurveView widgc = gralMng.addCurveViewY(sName, widgt.nrofPoints, null);
       widgc.activate(widgt.activate);
       for(GralCfgData.GuiCfgCurveLine line: widgt.lines){
-        String sDataPathLine = line.info;
+        String sDataPathLine = line.data;
         final GralColor colorLine;
         if(line.color0 !=null){
           colorLine = GralColor.getColor(line.color0.color);
@@ -330,6 +332,9 @@ public class GralCfgBuilder
       String sFormat = cfge.widgetType.format;
       if(sFormat !=null){
          widgd.setFormat(sFormat);
+      }
+      if(cfge.widgetType.help!=null){
+        widgd.setHtmlHelp(cfge.widgetType.help);
       }
       if(cfge.widgetType.color0 != null){
         widgd.setBackColor(GralColor.getColor(cfge.widgetType.color0.color), 0);

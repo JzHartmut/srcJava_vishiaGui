@@ -38,7 +38,8 @@ public interface GralMngApplAdapter_ifc
   public static final int version = 20120303;
 
   /**For context sensitive help, it assigns an URL to the widget which has the focus gained.
-   * @param url It msy be a relative path.
+   * @param url It is often an absolute path. may be a relative path??
+   *   If it starts with "+", a base path is used as prefix.
    */
   void setHelpUrl(String url);
 }

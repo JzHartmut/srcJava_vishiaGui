@@ -96,4 +96,8 @@ public class GuiCallingArgs
    */
   String sInspectorOwnPort;
 
+  /**Returns that directory where the configuration file is found. That directory may contain some more files
+   * for the application. */
+  public File getDirCfg(){ return fileGuiCfg.getAbsoluteFile().getParentFile(); }
+  
 }

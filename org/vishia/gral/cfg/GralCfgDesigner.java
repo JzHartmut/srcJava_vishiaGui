@@ -185,7 +185,7 @@ public class GralCfgDesigner
       String sLine, sColumn, sWidth, sHeight;
       if(cfge !=null){
         sName = cfge.widgetType.name;
-        sDataPath = cfge.widgetType.info;
+        sDataPath = cfge.widgetType.data;
         sText = cfge.widgetType.text;
         sFormat = cfge.widgetType.format;
         sShowMethod = cfge.widgetType.showMethod;
@@ -246,7 +246,7 @@ public class GralCfgDesigner
           if(sFormat.trim().length() >0) { cfge.widgetType.format = sFormat; }
           */
           cfge.widgetType.name = sName.trim().length() >0 ? sName : null;
-          cfge.widgetType.info = sDataPath.trim().length() >0 ? sDataPath : null;
+          cfge.widgetType.data = sDataPath.trim().length() >0 ? sDataPath : null;
           cfge.widgetType.text = sText.trim().length() >0 ? sText : null;
           cfge.widgetType.format = sFormat.trim().length() >0 ? sFormat : null;
           cfge.widgetType.showMethod = sShowMethod.trim().length() >0 ? sShowMethod : null;
