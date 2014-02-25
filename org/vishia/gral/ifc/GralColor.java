@@ -100,7 +100,7 @@ public class GralColor
       addColor("black",  0x000000);
       addColor("red",    0xff0000);
       addColor("lime",   0x00ff00);
-      addColor("green",  0x008000);
+      addColor("green",  0x00e000);
       addColor("blue",   0x0000ff);
       addColor("yellow", 0xffff00);
       addColor("magenta",0xff00ff);
@@ -117,7 +117,7 @@ public class GralColor
       addColor("ye", 0xffff00); //
       addColor("ygn", 0x9ACD32); //yellow green
       addColor("lm", 0x00ff00); //lime
-      addColor("gn", 0x00ff00);
+      addColor("gn", 0x00e000);
       addColor("g2", 0x00e020);
       addColor("cy", 0x00ffff);
       
@@ -182,7 +182,7 @@ public class GralColor
       addColor("dor", 0xff8c00);  //dark orange html
       addColor("dbn", 0x400010);
       addColor("dol", 0x556b2f); //dark olive, html
-      addColor("dgn", 0x006400);
+      addColor("dgn", 0x008000);
       addColor("dbl", 0x000080);
       addColor("dye", 0x606000);
       addColor("dma", 0x600060);
@@ -363,7 +363,7 @@ public class GralColor
    * <li>"gr", gray, 0xa0a0a0);
    * <li>"bk", black, 0x000000);
    * <li>"rd", red, 0xff0000);
-   * <li>"gn", green, 0x00ff00);
+   * <li>"gn", green, 0x00e000);
    * <li>"bl", blue, 0x0000ff);
    * <li>"ye", yellow, 0xffff00);
    * <li>"ma", magenta, 0xff00ff);

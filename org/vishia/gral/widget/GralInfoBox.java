@@ -137,9 +137,9 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     mng.setPosition(-2.5f, -0.5f, 0, -14, 0, '.');
     GralTextField infoLine = mng.addTextField("info", false, null, null);
     mng.setPosition(-3, GralPos.size+3, -13, GralPos.size+6, 0, 'r', 0.5f);
-    GralButton buttonLock = mng.addSwitchButton(name + "-Info-ok", "follow", "lock", GralColor.getColor("wh"), GralColor.getColor("gn"));
+    GralButton buttonLock = mng.addSwitchButton(name + "-Info-ok", "following", "locked", GralColor.getColor("wh"), GralColor.getColor("gn"));
     mng.setPosition(-3, GralPos.size+3, -6, GralPos.size+6, 0, 'r', 0.5f);
-    GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "OK");
+    GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "close");
     GralInfoBox box = new GralInfoBox(window, text, infoLine, buttonOk);
     box.buttonLock = buttonLock;
     box.implWidgets[0] = text.getWidgetImplementation();
