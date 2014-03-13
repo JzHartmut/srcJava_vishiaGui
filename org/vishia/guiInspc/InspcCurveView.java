@@ -872,6 +872,10 @@ public final class InspcCurveView
           //File file = new File("curve.save");
           System.out.println("InspcCurveView - save curve view to; " + fileCurveCfg.getAbsolutePath());
           Writer out = new FileWriter(fileCurveCfg);
+          String sTimeVariable = widgCurve.getTimeVariable();
+          if(sTimeVariable !=null){
+            out.append("timeVariable = ").append(sTimeVariable).append(";\n");
+          }
           //don't use: widgCurve.writeSettings(out);
           //because it writes the order of curves in the view.
           List<TrackValues> listTable = widgTableVariables.getListContent();

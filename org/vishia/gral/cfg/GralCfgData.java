@@ -116,6 +116,8 @@ public final class GralCfgData
       this.whatIs = whatIs;
     }
     
+    public void set_data(String val){ this.data = val; }
+    
     public void set_help(String sHelp){ this.help = sHelp; }
     
     public GuiCfgColor new_colorName(){ return color0 = new GuiCfgColor(); }
@@ -190,6 +192,10 @@ public final class GralCfgData
   {
     //public String size = "B";
     public GuiCfgLed(GralCfgElement itsElement){ super(itsElement, 'D'); }
+    
+    @Override
+    public void set_data(String val){ this.data = val; }
+
   }
   
   

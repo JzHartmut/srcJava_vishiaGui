@@ -110,7 +110,7 @@ public interface GralCurveView_ifc extends GralWidget_ifc, GralSetValue_ifc, Get
   
   
   /**The ZBNF-syntax of a setting for curve view. */
-  static String syntaxSettings = "curveSettings::= { <Track> } \\e."
+  static String syntaxSettings = "curveSettings::= [ timeVariable = <* ;?timeDatapath> ; ] { <Track> } \\e."
     + "Track::= track <*:?name> : { datapath = <* ,;?datapath> | color = <* ,;?color> | "
     + "scale = <#f?scale> | offset = <#f?offset> | 0-line-percent = <#?nullLine> "
     + "? , } ; .";

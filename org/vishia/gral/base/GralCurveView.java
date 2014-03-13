@@ -38,6 +38,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   /**Version, history and license.
    * <ul>
+   * <li>2014-03-14 Hartmut new: {@link CommonCurve#timeVariable} for time from target. 
    * <li>2014-02-03 Hartmut new: {@link CommonCurve#bFreeze}: freeze as common property of more as one GralCurveView. Constructor argument.
    * <li>2014-01-29 Hartmut new: Comment in Datapath supported. For nice presentation in list on long variable paths. 
    * <li>2013-11-19 Hartmut new: {@link #repaint(int, int)} overridden forces paint of the whole curve
@@ -107,6 +108,16 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     public boolean bFreeze = false;
     
 
+    /**If set, then use this variable to get the short time.
+     * 
+     */
+    public VariableAccess_ifc timeVariable;
+    
+    /**If set, the {@link #timeVariable} will be initialized.
+     * 
+     */
+    public String timeDatapath;
+
     
   }
   
@@ -153,6 +164,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     /**From Zbnf component with semantic <?Track>. */
     public void add_Track(ZbnfSetTrack track){
       initTrack(track.name, track.datapath, track.color_, track.style_, track.nullLine, track.scale, track.offset);
+    }
+    
+    public void set_timeDatapath(String val){
+      GralCurveView.this.common.timeDatapath = val;
     }
     
   }
@@ -837,6 +852,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   }
   
   
+  /**Returns the path of the time variable if given or null.
+   */
+  public String getTimeVariable(){ return common.timeDatapath; }
+  
   
   /**This list describes the data paths in that order, which should be regard
    * calling {@link #setSample(float[])}.
@@ -982,7 +1001,18 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
         values[++ixTrack] = value;
       }  
       bNewGetVariables = false;
-      long timeyet = System.currentTimeMillis();
+      final long timeyet;
+      if(this.common.timeDatapath !=null && this.common.timeVariable ==null){
+        String sPath = itsMng.replaceDataPathPrefix(this.common.timeDatapath);  //replaces only the alias:
+        this.common.timeVariable = container.getVariable(sPath);
+      }
+      if(this.common.timeVariable !=null){
+        
+        timeyet = this.common.timeVariable.getLong();
+        this.common.timeVariable.requestValue(System.currentTimeMillis());
+      } else {
+        timeyet = System.currentTimeMillis();
+      }
       int timeshort = (int)timeyet;
       setTimePoint(timeyet, timeshort, 1.0f);
       setSample(values, timeshort);
@@ -1201,6 +1231,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       if(!bOk){
         console.writeError(parser.getSyntaxErrorReport());
       } else {
+        this.common.timeDatapath = null;
         listTracks.clear();
         listTrackSet.clear();
         ZbnfJavaOutput setData = new ZbnfJavaOutput(console);
