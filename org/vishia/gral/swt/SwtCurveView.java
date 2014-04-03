@@ -17,6 +17,7 @@ import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.util.Debugutil;
 
 
 
@@ -378,8 +379,16 @@ public class SwtCurveView extends GralCurveView
   protected void drawBackground(GC g, Point size, int xView, int yView, int dxView, int dyView) {
     //NOTE: forces stack overflow because calling of this routine recursively: super.paint(g);
     try{
-      boolean redrawBecauseNewData1 = super.redrawBecauseNewData;
-      super.redrawBecauseNewData = false;  //it is done.
+      boolean redrawBecauseNewData1, redrawAll;
+      synchronized(this){
+        redrawBecauseNewData1 = super.redrawBecauseNewData;
+        redrawAll = super.bRedrawAll;
+        if(!redrawBecauseNewData1){
+          Debugutil.stop();
+        }
+        super.bRedrawAll = false;  //it is done
+        super.redrawBecauseNewData = false;  //it is done.
+      }
       //
       //detect how many new data are given. Because the data are written in another thread,
       //the number of data, the write index are accessed only one time from this
@@ -397,7 +406,7 @@ public class SwtCurveView extends GralCurveView
       testHelp.xView =xView; testHelp.yView =yView; testHelp.dxView =dxView; testHelp.dyView =dyView;
       //
       final boolean bPaintAll;
-      if(!common.bFreeze && !super.bPaintAllCmd && redrawBecauseNewData1) {
+      if(!common.bFreeze && !super.bPaintAllCmd && !redrawAll ) { //redrawBecauseNewData1) {
         //paint only a part of the curve to save calculation time.
         //The curve will be shifted to left.
         //

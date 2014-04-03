@@ -75,6 +75,56 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   
   private final List<CompleteConstructionAndStart> composites = new LinkedList<CompleteConstructionAndStart>();
   
+  /**Action for button log. It switches on or off the logging functionality to log the telegram traffic
+   * for debugging. */
+  GralUserAction actionEnableLog = new GralUserAction("InspcGui - enableLog"){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) { 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        GralButton widgButton = (GralButton)widgd;
+        if(widgButton.isOn()){
+          if(logTelg == null){
+            logTelg = new LogMessageFile("telgLog", 10, 1, null, null, null);
+          }
+          inspcMng.setLogForTargetComm(logTelg, 1000);
+        } else {
+          if(logTelg !=null){
+            logTelg.close();
+          }
+          inspcMng.setLogForTargetComm(null, 0);
+        }
+      }
+      return true;
+    }
+  };
+  
+
+  /**Action for button log. It switches on or off the logging functionality to log the telegram traffic
+   * for debugging. */
+  GralUserAction actionSetRetryDisabledVariable = new GralUserAction("InspcGui - setRetryDisabledVariable"){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) { 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        GralButton widgButton = (GralButton)widgd;
+        inspcMng.setmodeRetryDisabledVariables(widgButton.isOn());
+      }
+      return true;
+    }
+  };
+  
+
+  /**Action for button log. It switches on or off the logging functionality to log the telegram traffic
+   * for debugging. */
+  GralUserAction actionUseGetValueByIndex = new GralUserAction("InspcGui - UseGetValueByIndex"){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) { 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        GralButton widgButton = (GralButton)widgd;
+        inspcMng.setmodeGetValueByIndex(widgButton.isOn());
+      }
+      return true;
+    }
+  };
+  
+
+  
   /**The communication manager. */
   //final InspcGuiComm XXXinspcComm;
   
@@ -102,6 +152,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   LogMessage logTelg;
 
   GralButton btnSwitchOnLog;
+  final GralButton btnRetryDisableVariables = new GralButton(null, "retry vars", actionSetRetryDisabledVariable);
+
+  final GralButton btnUseGetByIndex = new GralButton(null, "get value by index", actionUseGetValueByIndex);
   
   static final GralColor colorRefreshed = GralColor.getColor("wh");
   static final GralColor colorOldValue = GralColor.getColor("lgr");
@@ -320,9 +373,11 @@ private class InspcGuiCfg extends GuiCfg
   {
     super.initGuiAreas("A1C2");
     super.gralMng.selectPanel("test");
-    super.gralMng.setPosition(5, GralPos.size -3, 0, GralPos.size +10 , 0, 'r');
+    super.gralMng.setPosition(5, GralPos.size -3, 0, GralPos.size +10 , 0, 'd',1);
     btnSwitchOnLog = super.gralMng.addSwitchButton("log", "log telg ?", "log telg", GralColor.getColor("wh"), GralColor.getColor("am") );
     btnSwitchOnLog.setActionChange(actionEnableLog);
+    btnRetryDisableVariables.setToPanel(super.gralMng);
+    btnUseGetByIndex.setToPanel(super.gralMng);
     colorSelector = new GralColorSelector("colorSelector", super.gralMng);
     curveA.buildGraphic(gui.mainWindow(), colorSelector, null);
     curveB.buildGraphic(gui.mainWindow(), colorSelector, curveA.widgCurve.getCommonData());
@@ -422,28 +477,6 @@ private class InspcGuiCfg extends GuiCfg
   }
 
 
-  
-  /**Action for button log. It switches on or off the logging functionality to log the telegram traffic
-   * for debugging. */
-  GralUserAction actionEnableLog = new GralUserAction("InspcGui - enableLog"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) { 
-      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        GralButton widgButton = (GralButton)widgd;
-        if(widgButton.isOn()){
-          if(logTelg == null){
-            logTelg = new LogMessageFile("telgLog", 10, 1, null, null, null);
-          }
-          inspcMng.setLogForTargetComm(logTelg, 1000);
-        } else {
-          if(logTelg !=null){
-            logTelg.close();
-          }
-          inspcMng.setLogForTargetComm(null, 0);
-        }
-      }
-      return true;
-    }
-  };
   
 
   private class UserInspcPlug implements UserInspcPlug_ifc, GralPlugUser2Gral_ifc 

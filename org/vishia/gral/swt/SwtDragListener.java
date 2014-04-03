@@ -66,9 +66,9 @@ public class SwtDragListener extends DragSourceAdapter
   {
     DragSource drag = (DragSource)event.getSource();
     Control widgetSwt = drag.getControl();
-    Object oData = widgetSwt.getData();  //the associated text field, should be identical with event.getSource()
-    if(oData!=null && oData instanceof GetGralWidget_ifc){
-      GralWidget widgg = ((GetGralWidget_ifc)oData).getGralWidget();
+    //the associated text field, should be identical with event.getSource()
+    GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(widgetSwt.getData());
+    if(widgg!=null){
       GralUserAction action = widgg.getActionDrag();
       if(action !=null){
         //call the action to get the data from drag

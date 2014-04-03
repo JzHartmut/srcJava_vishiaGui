@@ -722,7 +722,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    */
   protected boolean redrawBecauseNewData;
   
-  
+  protected boolean bRedrawAll;
   
   private int ctLastSelected;
   
@@ -957,7 +957,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     }
 
     if(!common.bFreeze){
-      redrawBecauseNewData = true;
+      synchronized(this){
+        redrawBecauseNewData = true;
+      }
       super.repaint(50,100);
     }
   }
@@ -1518,6 +1520,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
         //System.out.printf("GralCurveView - setCursors; cursor2=%d\n", xr);
       }
     }
+    bRedrawAll = true;
     repaint(50,100);
     if(actionMoveCursor !=null){
       actionMoveCursor.exec(0, this);
