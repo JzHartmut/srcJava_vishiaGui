@@ -33,6 +33,7 @@ import org.vishia.gral.cfg.GralCfgData;
 import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.util.KeyCode;
+import org.vishia.util.ReplaceAlias_ifc;
 
 
 
@@ -74,7 +75,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public interface GralMngBuild_ifc 
+public interface GralMngBuild_ifc extends ReplaceAlias_ifc 
 {
   
   /**The version of this interface:
@@ -288,27 +289,6 @@ public interface GralMngBuild_ifc
   @Deprecated
   GralPos getPositionInPanel();
   
-  
-  
-  /**It supports usage of an alias in the data path. See {@link #replaceDataPathPrefix(String)}.
-   * @param src this map will added to the existing one.
-   */
-  void addDataReplace(final Map<String, String> src);
-  
-  /**It supports usage of an alias in the data path. See {@link #replaceDataPathPrefix(String)}.
-   * @param alias Any shorter alias
-   * @param value The complete value.
-   */
-  void addDataReplace(String alias, String value);
-  
-  /**It supports usage of an alias in the data path.
-   * @param path may contain "alias:restOfPath"
-   * @return if "alias" is found in {@link #addDataReplace(String, String)} the it is replaced
-   *   inclusively ":". If alias is not found, it is not replaced.
-   *   Note that another meaning of "prefix:restOfPath" is possible.
-   */
-  String replaceDataPathPrefix(final String path);
-
   
   
   /**Adds a button

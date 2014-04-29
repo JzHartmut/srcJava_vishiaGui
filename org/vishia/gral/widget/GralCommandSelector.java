@@ -6,7 +6,7 @@ import java.util.Map;
 import org.vishia.cmd.CmdGetFileArgs_ifc;
 import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
-import org.vishia.cmd.ZGenScript;
+import org.vishia.cmd.JZcmdScript;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralMngBuild_ifc;

@@ -9,7 +9,7 @@ import java.util.TreeMap;
 import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
 import org.vishia.cmd.PrepareCmd;
-import org.vishia.cmd.ZGenScript;
+import org.vishia.cmd.JZcmdScript;
 import org.vishia.cmd.CmdStore.CmdBlock;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralMenu;
@@ -24,7 +24,7 @@ import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.KeyCode;
-import org.vishia.zgen.ZGen;
+import org.vishia.zcmd.JZcmd;
 
 public class FcmdExecuter
 {
@@ -113,7 +113,7 @@ public class FcmdExecuter
       File cmdCfgJbat = new File(cfgFile.getParentFile(), cfgFile.getName() + ".jbat");
       if(cmdCfgJbat.exists()){
         try{ 
-          ZGenScript script = ZGen.translateAndSetGenCtrl(cmdCfgJbat, new File(cmdCfgJbat.getParentFile(), cmdCfgJbat.getName() + ".check.xml"), log);
+          JZcmdScript script = JZcmd.translateAndSetGenCtrl(cmdCfgJbat, new File(cmdCfgJbat.getParentFile(), cmdCfgJbat.getName() + ".check.xml"), log);
           dst.addSubOfZgenclass(script.scriptClass(), 1);
           executerToInit.initExecuter(script, null);  //NOTE: currdir is not determined.
           //main.cmdSelector.initExecuter(script);

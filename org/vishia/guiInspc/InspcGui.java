@@ -205,6 +205,8 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   }
   
   @Override public void completeConstruction(){
+    this.inspcMng.complete_ReplaceAlias_ifc(guiCfg.gralMng);
+
     for(CompleteConstructionAndStart composite: composites){
       composite.completeConstruction();
     }
