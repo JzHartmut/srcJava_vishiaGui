@@ -16,6 +16,8 @@ REM Input for javac, only choice of primary sources, relativ path from current (
 set INPUT_JAVAC=
 ::set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/guiViewCfg/ViewCfg.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/commander/Fcmd.java
+set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/vcs/*.java
+set INPUT_JAVAC=%INPUT_JAVAC% ../../srcJava_Zbnf/org/vishia/zcmd/*.java
 ::set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/*.java
 ::set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/cfg/*.java
 ::set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/area9/*.java
@@ -25,6 +27,8 @@ set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/commander/Fcmd.java
 REM Sets the CLASSPATH variable for compilation (used jar-libraries). do not leaf empty also it aren't needed:
 REM This component based on the ZBNF and the vishiaRun.
 
+set SWTJAR=d:\Programs\XML_Tools\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+if exist %SWTJAR% goto :swtOk
 set SWTJAR=d:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
 if exist %SWTJAR% goto :swtOk
 set SWTJAR=c:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
