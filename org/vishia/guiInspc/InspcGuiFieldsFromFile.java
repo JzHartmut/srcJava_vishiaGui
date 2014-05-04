@@ -24,6 +24,7 @@ public class InspcGuiFieldsFromFile
 {
   /**Version, history and license. 
    * <ul>
+   * <li>2014-04-29 Hartmut cleanup, now really used in a professional application. 
    * <li>2013-03-17 Hartmut creating 
    * </ul>
    * <br><br> 
@@ -52,7 +53,7 @@ public class InspcGuiFieldsFromFile
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public final static String sVersion = "2013-05-10";
+  public final static String sVersion = "2014-04-30";
 
   
   /**ZBNF result:

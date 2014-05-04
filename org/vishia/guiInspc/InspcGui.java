@@ -27,6 +27,7 @@ import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.widget.GralColorSelector;
 import org.vishia.inspectorAccessor.InspcMng;
 import org.vishia.inspectorAccessor.InspcPlugUser_ifc;
+import org.vishia.inspectorAccessor.InspcVarPathStructAcc;
 import org.vishia.inspectorAccessor.UserInspcPlug_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageFile;
@@ -498,7 +499,7 @@ private class InspcGuiCfg extends GuiCfg
     }
     
     
-    @Override public InspcMng.PathStructAccessor getTargetFromPath(String sDataPath){
+    @Override public InspcVarPathStructAcc getTargetFromPath(String sDataPath){
       return InspcGui.this.inspcMng.getTargetFromPath(sDataPath);
     }
 
