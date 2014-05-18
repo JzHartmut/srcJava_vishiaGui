@@ -84,12 +84,13 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
         GralButton widgButton = (GralButton)widgd;
         if(widgButton.isOn()){
           if(logTelg == null){
-            logTelg = new LogMessageFile("telgLog", 10, 1, null, null, null);
+            logTelg = new LogMessageFile("telgLog.csv", 10, 1, null, null, null);
           }
           inspcMng.setLogForTargetComm(logTelg, 1000);
         } else {
           if(logTelg !=null){
             logTelg.close();
+            logTelg = null;
           }
           inspcMng.setLogForTargetComm(null, 0);
         }
