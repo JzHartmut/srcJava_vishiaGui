@@ -29,6 +29,10 @@ import org.vishia.zbnf.ZbnfParser;
 
 
 /**Curve representation for timed values. It is the base class for all implementation.
+ * 
+ * <ul>
+ * <li> {@link #setSample(float[], int)}: Write out with new measured values.
+ * </ul>
  * @see GralCurveViewTrack_ifc.
  * @author Hartmut Schorrig
  *
@@ -38,6 +42,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   /**Version, history and license.
    * <ul>
+   * <li>2014-05-20 Hartmut new in {@link #setSample(float[], int)}: write a point only if at least one variable was refreshed.
    * <li>2014-03-14 Hartmut new: {@link CommonCurve#timeVariable} for time from target. 
    * <li>2014-02-03 Hartmut new: {@link CommonCurve#bFreeze}: freeze as common property of more as one GralCurveView. Constructor argument.
    * <li>2014-01-29 Hartmut new: Comment in Datapath supported. For nice presentation in list on long variable paths. 
@@ -973,6 +978,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     if(bActive){
       float[] values = new float[listTracks.size()];
       int ixTrack = -1;
+      boolean bRefreshed = false; //set to true if at least one variable is refreshed.
       for(Track track: listTracks){
         if(track.variable ==null && bNewGetVariables){ //no variable known, get it.
           String sDataPath = track.getDataPath();
@@ -992,7 +998,11 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
           }
         }
         final float value;
+        
         if(track.variable !=null ){
+          if(track.variable.isRefreshed()){
+            bRefreshed = true;
+          }
           if(track.getDataPath().startsWith("CCS:"))
             stop();
           value = track.variable.getFloat();
@@ -1015,9 +1025,11 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       } else {
         timeyet = System.currentTimeMillis();
       }
-      int timeshort = (int)timeyet;
-      setTimePoint(timeyet, timeshort, 1.0f);
-      setSample(values, timeshort);
+      if(bRefreshed){
+        int timeshort = (int)timeyet;
+        setTimePoint(timeyet, timeshort, 1.0f);
+        setSample(values, timeshort);
+      }
     }
   }
   
@@ -1313,6 +1325,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
 
   
+  /* (non-Javadoc) Writes the curve to the given interface, it is an exporter class.
+   * @see org.vishia.gral.ifc.GralCurveView_ifc#writeCurve(org.vishia.curves.WriteCurve_ifc, org.vishia.gral.ifc.GralCurveView_ifc.ModeWrite)
+   */
   @Override public void writeCurve(WriteCurve_ifc out, ModeWrite mode){
     //int ctValues = this.nrofValues -1;  //read first, may be increment in next step
     int ixDataStart, ixDataEnd;

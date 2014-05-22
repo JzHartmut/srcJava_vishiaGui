@@ -109,6 +109,9 @@ public class GralSwitchExclusiveButtonMng implements VariableAccess_ifc
     return 0;
   }
 
+  
+  @Override public boolean isRefreshed(){ return true; }
+
   @Override
   public void requestValue(long timeRequested) { }
   
