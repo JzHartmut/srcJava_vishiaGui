@@ -18,6 +18,7 @@ set INPUT_JAVAC=
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/commander/Fcmd.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/vcs/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../../srcJava_Zbnf/org/vishia/zcmd/*.java
+set INPUT_JAVAC=%INPUT_JAVAC% ../../srcJava_vishiaBase/org/vishia/cmd/*.java
 ::set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/*.java
 ::set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/cfg/*.java
 ::set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/area9/*.java

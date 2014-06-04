@@ -117,8 +117,8 @@ public class FcmdExecuter
           dst.addSubOfZgenclass(script.scriptClass(), 1);
           executerToInit.initExecuter(script, null);  //NOTE: currdir is not determined.
           //main.cmdSelector.initExecuter(script);
-        } catch(Exception exc){
-          log.writeError("CmdStore - JbatScript;", exc);
+        } catch(Throwable exc){
+          log.writeError("CmdStore - JZcmdScript;", exc);
         }
       }
 

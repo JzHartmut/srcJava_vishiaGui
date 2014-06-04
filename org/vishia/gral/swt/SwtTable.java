@@ -601,7 +601,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
    */
   @Override public void focusGained(FocusEvent ev) { 
     SwtTable.this.focusGainedTable(); 
-    System.out.println("SwtTableCell - focus gained;");
+    //System.out.println("SwtTableCell - focus gained;");
   }
   
 
@@ -863,7 +863,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
      */
     @Override public void focusGained(FocusEvent ev) { 
       SwtTable.this.focusGainedTable(); 
-      System.out.println("SwtTableCell - focus gained;");
+      //System.out.println("SwtTableCell - focus gained;");
     }
     
   };
