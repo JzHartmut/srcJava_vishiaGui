@@ -45,11 +45,12 @@ exit
 ::set CLASSPATH_JAVAC=d:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
 ::set CLASSPATH_JAVAC=d:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
 ::set CLASSPATH_JAVAC=Z:\V\vishia\Fcmd\sf\Fcmd\exe\windows\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
-set CLASSPATH_JAVAC=%SWTJAR%
-::;../../zbnfjax/zbnf.jar;../../exe/vishiaRun.jar
+set CLASSPATH_JAVAC=%SWTJAR%;../../exe/zbnf.jar
+::;../../exe/vishiaRun.jar
 
 REM Sets the src-path for further necessary sources:
-set SRCPATH_JAVAC=..;../../srcJava_vishiaBase;../../srcJava_Zbnf;../../srcJava_vishiaRun
+::set SRCPATH_JAVAC=..;../../srcJava_vishiaBase;../../srcJava_Zbnf;../../srcJava_vishiaRun
+set SRCPATH_JAVAC=..;../../srcJava_vishiaRun
 
 call ..\..\srcJava_vishiaBase\_make\+javacjarbase.bat
 
