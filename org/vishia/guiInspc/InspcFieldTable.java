@@ -124,7 +124,7 @@ public class InspcFieldTable implements Runnable
   
   public InspcFieldTable(InspcMng variableMng)
   { variableMng.addUserOrder(this);  //invoke run in any communication step.
-    this.wind = new GralWindow("InspcFieldTableWind", "Fields of ...", GralWindow_ifc.windOnTop);
+    this.wind = new GralWindow("InspcFieldTableWind", "Fields of ...", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
     this.widgPath = new GralTextField("InspcFieldTableWind");
     this.widgTable = new GralTable<InspcStruct.FieldOfStruct>("InspcFieldTable", new int[]{sizeName, 0, -sizeType});
     this.widgTable.setColumnEditable(1, true);
@@ -142,15 +142,15 @@ public class InspcFieldTable implements Runnable
     wind.setToPanel(mng);
     mng.setPosition(0, 2, 0, 3, 0, 'd');
     btnBack.setToPanel(mng);
-    mng.setPosition(0, 2, 3, -5, 0, 'd');
+    mng.setPosition(0, 2, 3, 0, 0, 'd');
     widgPath.setToPanel(mng);
-    mng.setPosition(0, 2, -5, 0, 0, 'd');
-    btnRefresh.setToPanel(mng);
     mng.setPosition(2, -2, 0, 0, 0, 'd');
     widgTable.setToPanel(mng);
-    mng.setPosition(-2, 0, sizeName, sizeName + 15, 0, 'r');
+    mng.setPosition(-2, 0, 0, 7, 0, 'd');
+    btnRefresh.setToPanel(mng);
+    mng.setPosition(-2, 0, sizeName, sizeName + 12, 0, 'r');
     btnSetValue.setToPanel(mng);
-    mng.setPosition(-2, 0, -sizeType, 0, 0, 'r');
+    mng.setPosition(-2, 0, sizeName + 13, sizeName + 23, 0, 'r');
     btnShowAll.setToPanel(mng);
   }
   
@@ -208,7 +208,6 @@ public class InspcFieldTable implements Runnable
       variableMng.requestFields(struct);
       struct.requestFields(actionUpdated);
     }
-    widgPath.setText(sPathStruct);
     
   }
   
@@ -228,6 +227,7 @@ public class InspcFieldTable implements Runnable
         switch(cType){
           case 'F': { float val = var.getFloat(); sVal = Float.toString(val); } break;
           case 'I': { int val = var.getInt(); sVal = "0x" + Integer.toHexString(val); } break;
+          case 'c': case 's': { sVal = var.getString(); } break;
           default: { float val = var.getFloat(); sVal = Float.toString(val); }
         }
         if(timelast == 0 || (time - timelast) > 10000){ //10 sec
@@ -259,6 +259,8 @@ public class InspcFieldTable implements Runnable
     sFieldCurrent = line.getKey();
     sPathCurrent = line.getDataPath();
     timeLineSelected = System.currentTimeMillis();
+    widgPath.setText(sPathCurrent + " : " + line.getCellText(2));
+
   }
   
   
@@ -374,8 +376,8 @@ public class InspcFieldTable implements Runnable
   GralUserAction actionLineSelected = new GralUserAction("InspcFieldTable - line selected"){
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
       if(key == KeyCode.defaultSelect || key == KeyCode.userSelect){
-        GralTable<InspcStruct.FieldOfStruct>.TableLineData line;
-        line = (GralTable<InspcStruct.FieldOfStruct>.TableLineData)params[0];
+        @SuppressWarnings("unchecked")
+        GralTable<InspcStruct.FieldOfStruct>.TableLineData line = (GralTable<InspcStruct.FieldOfStruct>.TableLineData)params[0];
         setCurrentFieldInfo(line);
         return true;
       } else { 
