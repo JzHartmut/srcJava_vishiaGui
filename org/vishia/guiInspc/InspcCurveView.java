@@ -522,7 +522,8 @@ public final class InspcCurveView
   public GralUserAction actionEnterDatapath = new GralUserAction("actionEnterDatapath"){
     @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params){
       if(key == KeyCode.enter){
-        GralTable<TrackValues>.TableLineData line = (GralTable<TrackValues>.TableLineData)params[0];
+        @SuppressWarnings("unchecked")  //compatible to Java-6
+        GralTable<TrackValues>.TableLineData line = (GralTable.TableLineData)params[0];
         String sDatapath = line.getCellText(0);
         InspcCurveView.this.setDatapath(line, sDatapath);
       }

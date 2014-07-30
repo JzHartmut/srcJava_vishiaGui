@@ -14,7 +14,7 @@ import org.vishia.cmd.CmdStore;
 import org.vishia.commander.target.FcmdtTarget;
 import org.vishia.commander.target.FcmdtTarget_ifc;
 import org.vishia.communication.InterProcessCommFactorySocket;
-import org.vishia.fileLocalAccessor.FileAccessorLocalJava7;
+import org.vishia.fileLocalAccessor.FileAccessorLocalJava6;
 import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.area9.GuiCallingArgs;
@@ -352,7 +352,7 @@ public class Fcmd extends GuiCfg
     try{
       executer.cmdQueue.close();  //finishes threads.
       target.close();
-      FileAccessorLocalJava7.getInstance().close();
+      FileAccessorLocalJava6.getInstance().close();
     } catch(IOException exc){
       
     }

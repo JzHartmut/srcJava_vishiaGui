@@ -11,7 +11,6 @@ import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.base.GralTable.TableLineData;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -20,7 +19,6 @@ import org.vishia.inspectorAccessor.InspcMng;
 import org.vishia.inspectorAccessor.InspcStruct;
 import org.vishia.inspectorAccessor.InspcVariable;
 import org.vishia.inspectorAccessor.InspcStruct.FieldOfStruct;
-import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
 /**This class presents a window with one table and some buttons to view and edit all fields in one instance
@@ -377,7 +375,7 @@ public class InspcFieldTable implements Runnable
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
       if(key == KeyCode.defaultSelect || key == KeyCode.userSelect){
         @SuppressWarnings("unchecked")
-        GralTable<InspcStruct.FieldOfStruct>.TableLineData line = (GralTable<InspcStruct.FieldOfStruct>.TableLineData)params[0];
+        GralTable<InspcStruct.FieldOfStruct>.TableLineData line = (GralTable.TableLineData)params[0];
         setCurrentFieldInfo(line);
         return true;
       } else { 
