@@ -3,15 +3,19 @@ package org.vishia.gral.base;
 import java.io.IOException;
 
 import org.eclipse.swt.graphics.Point;
+import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
+import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.util.KeyCode;
 
-public abstract class GralTextBox extends GralTextField implements Appendable, GralTextBox_ifc
+public class GralTextBox extends GralTextField implements Appendable, GralTextBox_ifc
 {
   
   /**Version and history
    * <ul>
+   * <li>2014-08-16 Hartmut chg: GrapTextBox not abstract, using GraphicImplAccess like new concept of all GralWidgets. 
    * <li>2012-01-06 Hartmut chg: The {@link #append(CharSequence)} etc. methods are implemented
    *   in this super class instead in the graphic layer implementation classes. Therefore
    *   the methods {@link #appendTextInGThread(CharSequence)} and {@link #setTextInGThread(CharSequence)}
@@ -27,7 +31,7 @@ public abstract class GralTextBox extends GralTextField implements Appendable, G
    * <li> You can redistribute copies of this source to everybody.
    * <li> Every user of this source, also the user of redistribute copies
    *    with or without payment, must accept this license for further using.
-   * <li> But the LPGL ist not appropriate for a whole software product,
+   * <li> But the LPGL is not appropriate for a whole software product,
    *    if this source is only a part of them. It means, the user
    *    must publish this part of source,
    *    but don't need to publish the whole source of the own product.
@@ -44,7 +48,7 @@ public abstract class GralTextBox extends GralTextField implements Appendable, G
    * 
    */
   @SuppressWarnings("hiding")
-  public final static int version = 0x20120106;
+  public final static String sVersion = "2014-08-16";
   
   /**Buffer for new text which is set or appended in another thread than the graphic thread.
    * This buffer is empty if the graphic thread has processed the {@link GralDispatchCallbackWorker}
@@ -53,21 +57,21 @@ public abstract class GralTextBox extends GralTextField implements Appendable, G
    */
   private StringBuffer newText = new StringBuffer();
   
-  protected GralTextBox(String name, char whatis, GralMng mng)
-  { super(name, whatis, mng);
+  public GralTextBox(String name)
+  { super(name);
   }
 
   /**Sets the text to the widget, invoked only in the graphic thread.
    * This method have to be implemented in the Graphic implementation layer.
    * @param text The text which should be shown in the widget.
    */
-  protected abstract void setTextInGThread(CharSequence text);
+  //protected abstract void setTextInGThread(CharSequence text);
   
   /**Appends the text to the current text in the widget, invoked only in the graphic thread.
    * This method have to be implemented in the Graphic implementation layer.
    * @param text The text which should be appended and shown in the widget.
    */
-  protected abstract void appendTextInGThread(CharSequence text);
+  //protected abstract void appendTextInGThread(CharSequence text);
 
   /**Append the text, able to call threadsafe in any thread.
    * If the thread is the graphic thread, the text will be appended to the current text
@@ -78,16 +82,10 @@ public abstract class GralTextBox extends GralTextField implements Appendable, G
    * @see java.lang.Appendable#append(java.lang.CharSequence)
    */
   @Override public final Appendable append(CharSequence arg0) throws IOException
-  { if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
-      appendTextInGThread(arg0);
-    } else {
-      synchronized(newText){
-        boolean hasText = newText.length() >0;
-        newText.append(arg0);
-        if(!hasText){  //elsewhere it is added already.
-          windowMng.addDispatchOrder(appendTextViewTrail);
-        }
-      }
+  { synchronized(newText) {
+      newText.append(arg0);
+      dyda.setChanged(GraphicImplAccess.chgAddText | GraphicImplAccess.chgViewTrail);
+      repaint();
     }
     return this;
   }
@@ -98,20 +96,13 @@ public abstract class GralTextBox extends GralTextField implements Appendable, G
    * @see java.lang.Appendable#append(java.lang.CharSequence)
    */
   @Override public final Appendable append(char arg0) throws IOException
-  { if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
-      String ss = "" + arg0;
-      appendTextInGThread(ss);
-    } else {
-      synchronized(newText){
-        boolean hasText = newText.length() >0;
-        newText.append(arg0);
-        if(!hasText){  //elsewhere it is added already.
-          windowMng.addDispatchOrder(appendTextViewTrail);
-        }
-      }
-    }
-    return this;
+  { synchronized(newText) {
+    newText.append(arg0);
+    dyda.setChanged(GraphicImplAccess.chgAddText | GraphicImplAccess.chgViewTrail);
+    repaint();
   }
+  return this;
+}
 
   /**Append a sub char sequence, able to call threadsafe in any thread.
    * @see #append(CharSequence)
@@ -124,62 +115,63 @@ public abstract class GralTextBox extends GralTextField implements Appendable, G
     return this;
   }
 
-  /**Sets the text, able to call threadsafe in any thread.
-   * If the thread is the graphic thread, the text will be set in the widget immediately. 
-   * But if the thread is any other one, the text will be stored
-   * in a StringBuilder and the graphic thread will be waked up with the {@link #setText}
-   * dispatch listener.
-   * 
-   * @see org.vishia.gral.ifc.GralTextField_ifc#setText(java.lang.CharSequence)
-   */
-  @Override public final void setText(CharSequence arg)
+
+  
+  @Override public void setTextStyle(GralColor color, GralFont font)
   {
-    if(Thread.currentThread().getId() == windowMng.getThreadIdGui()){
-      setTextInGThread(arg);
-    } else {
-      synchronized(newText){
-        newText.setLength(0);
-        newText.append(arg);
-        windowMng.addDispatchOrder(setText);
-      }//synchronized
+    dyda.textFont = font;
+    dyda.textColor = color;
+    dyda.setChanged(GralWidget.ImplAccess.chgColorText);
+    if(wdgImpl !=null){
+      repaint();
+    }
+  }
+  
+
+  
+  @Override public void setEditable(boolean editable){
+    dyda.setChanged(editable ? GraphicImplAccess.chgEditable : GraphicImplAccess.chgEditable);
+    if(wdgImpl !=null){
+      repaint();
     }
   }
 
-  /**Offers the method to append the stored text in the graphic thread.
-   * The text is stored in {@link #newText}. The {@link #appendTextInGThread(CharSequence)}
-   * is called with the content of {@link #newText}. The content of newText is delete then.
-   * It is invoked under mutex.
-   */
-  private final GralDispatchCallbackWorker appendTextViewTrail = new GralDispatchCallbackWorker("GralTextBox.appendTextViewTrail")
-  { @Override public final void doBeforeDispatching(boolean onlyWakeup)
-    { synchronized(newText){
-        if(newText.length() >0){
-          appendTextInGThread(newText);
-          viewTrail();
-          newText.setLength(0);
-        }
-        windowMng.removeDispatchListener(this);
-      }
+
+  
+  @Override public int getNrofLines(){ return 0; }  //TODO
+
+
+  @Override public void viewTrail()
+  {
+    dyda.setChanged(GraphicImplAccess.chgViewTrail);
+    if(wdgImpl !=null){
+      repaint();
     }
-  };
+    
+  }
+
   
   
-  /**Offers the method to set the stored text in the graphic thread.
-   * The text is stored in {@link #newText}. The {@link #setTextInGThread(CharSequence)}
-   * is called with the content of {@link #newText}. The content of newText is delete then.
-   * It is invoked under mutex.
-   */
-  private final GralDispatchCallbackWorker setText = new GralDispatchCallbackWorker("GralTextBox.setText")
-  { @Override public final void doBeforeDispatching(boolean onlyWakeup)
-    { synchronized(newText){
-        if(newText.length() >0){
-          setTextInGThread(newText);
-          newText.setLength(0);
-        }
-        windowMng.removeDispatchListener(this);
-      }
+  public abstract class GraphicImplAccess extends GralTextField.GraphicImplAccess  //GralWidget.ImplAccess
+  implements GralWidgImpl_ifc
+  {
+    public static final int chgCursor = 0x200, chgEditable = 0x400, chgNonEditable = 0x800
+        , chgViewTrail = 0x1000, chgAddText = 0x2000;
+
+    
+    protected GraphicImplAccess(GralWidget widgg, GralMng mng)
+    {
+      super(widgg, mng);
     }
-  };
-  
+    
+    protected String getAndClearNewText(){ String ret; synchronized(newText){ ret = newText.toString(); newText.setLength(0); } return ret; }
+    
+    protected int caretPos(){ return GralTextBox.this.caretPos; }
+    
+    protected void caretPos(int newPos){ GralTextBox.this.caretPos = newPos; }
+    
+    protected GralTextFieldUser_ifc user(){ return GralTextBox.this.user; }
+
+  }
 
 }

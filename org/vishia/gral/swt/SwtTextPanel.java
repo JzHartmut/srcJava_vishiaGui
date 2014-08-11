@@ -9,8 +9,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
@@ -20,15 +22,17 @@ import org.vishia.gral.ifc.GralTextBox_ifc;
 public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, Appendable
 {
   
-  SwtTextBox textAreaOutput;
+  GralTextBox textAreaOutput;
   
   SwtTextPanel(String namePanel, Shell shell, int style, SwtMng mng) //GralPrimaryWindow_ifc mainWindow)
   { super(namePanel, mng, shell);
     Display device = shell.getDisplay();
     //Composite panel = (Composite) panelComposite;
-    textAreaOutput = new SwtTextBox(namePanel + "-widg", shell, style, mng);
-    textAreaOutput.textFieldSwt.setFont(new Font(device, "Monospaced",11, SWT.NORMAL));
-    panelComposite = textAreaOutput.textFieldSwt;  //it is a control,    
+    textAreaOutput = new GralTextBox(namePanel + "-widg");
+    textAreaOutput.setToPanel(mng);
+    Text swtText = (Text) textAreaOutput.getWidgetImplementation();
+    swtText.setFont(new Font(device, "Monospaced",11, SWT.NORMAL));
+    panelComposite = swtText;  //it is a control,    
   }
 
   
@@ -115,7 +119,7 @@ public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, A
   
   @Override public Control getPanelImpl() { return (Control)panelComposite; }
 
-  @Override public GralRectangle getPixelPositionSize(){ return SwtWidgetHelper.getPixelPositionSize(textAreaOutput.textFieldSwt); }
+  @Override public GralRectangle getPixelPositionSize(){ return textAreaOutput.getPixelPositionSize(); }
 
 
   @Override public GralRectangle getPixelSize(){

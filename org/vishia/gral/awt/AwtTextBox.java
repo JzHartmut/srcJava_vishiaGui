@@ -25,7 +25,7 @@ public class AwtTextBox extends GralTextBox
   
   
   public AwtTextBox(String name, Container parent, int style, AwtWidgetMng mng)
-  { super(name, 't', mng);
+  { super(name);
     textFieldSwt = new AwtTextAreaImpl();
     parent.add(textFieldSwt);
   }
@@ -53,6 +53,7 @@ public class AwtTextBox extends GralTextBox
   @Override public int getCursorPos(){ return textFieldSwt.getCaretPosition(); }
 
 
+  /*
   
   @Override public void setTextInGThread(CharSequence text){ 
     textFieldSwt.setText(text.toString()); 
@@ -65,7 +66,7 @@ public class AwtTextBox extends GralTextBox
   }
   
   
-
+*/
   
   
   @Override public String getText()

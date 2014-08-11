@@ -335,7 +335,9 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 
   
   @Override public void setToPanel(GralWidget widgg){
-    if(widgg instanceof GralTextField){
+    if(widgg instanceof GralTextBox) {  //NOTE: before GralTextField because a GralTextBox is a GralTextField (derived)
+      SwtTextBox.createTextBox((GralTextBox)widgg, this);  //This may be the best variant.
+    } else if(widgg instanceof GralTextField){
       SwtTextFieldWrapper.createTextField((GralTextField)widgg, this);  //This may be the best variant.
     } else if(widgg instanceof GralHorizontalSelector<?>){
       SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, (GralHorizontalSelector<?>)widgg);
@@ -782,65 +784,18 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
  * @return
  */
 @Override public GralTextBox addTextBox(String name, boolean editable, String prompt, char promptStylePosition)
-{ SwtTextBox widgetSwt = new SwtTextBox(name, (Composite)pos.panel.getPanelImpl(), SWT.MULTI|SWT.H_SCROLL|SWT.V_SCROLL, this);
-  GralWidget widgetInfo = widgetSwt;
-  //in ctor: widgetInfo.setPanelMng(this);
-  widgetSwt.textFieldSwt.setFont(propertiesGuiSwt.stdInputFont);
-  widgetSwt.textFieldSwt.setEditable(editable);
-  if(editable)
-    stop();
-  widgetSwt.textFieldSwt.setBackground(propertiesGuiSwt.colorSwt(0xFFFFFF));
-  widgetSwt.textFieldSwt.addMouseListener(mouseClickForInfo);
-  setPosAndSize_(widgetSwt.textFieldSwt);
-  if(prompt != null && promptStylePosition == 't'){
-    final int yPixelField;
-    final Font promptFont;
-    int ySize = (int)(pos.height());
-    switch(ySize){
-    case 3:  promptFont = propertiesGuiSwt.smallPromptFont;
-             yPixelField = propertiesGuiSwt.yPixelUnit() * 2 -3;
-             break;
-    case 2:  promptFont = propertiesGuiSwt.smallPromptFont;
-             yPixelField = (int)(1.5F * propertiesGui.yPixelUnit());
-             break;
-    default: promptFont = propertiesGuiSwt.smallPromptFont;
-             yPixelField = propertiesGui.yPixelUnit() * 2 -3;
-    }//switch
-    Rectangle boundsField = widgetSwt.textFieldSwt.getBounds();
-    Rectangle boundsPrompt = new Rectangle(boundsField.x, boundsField.y-3  //occupy part of field above, only above the normal letters
-      , boundsField.width, boundsField.height );
-    
-    if(promptStylePosition == 't'){ 
-      boundsPrompt.height -= (yPixelField -4);
-      boundsPrompt.y -= 1;
-      
-      boundsField.y += (boundsField.height - yPixelField );
-      boundsField.height = yPixelField;
-    }
-    Label wgPrompt = new Label(((SwtPanel)pos.panel).getPanelImpl(), 0);
-    //Text wgPrompt = new Text(((SwtPanel)pos.panel).getPanelImpl(), 0);
-    wgPrompt.setFont(promptFont);
-    wgPrompt.setText(prompt);
-    Point promptSize = wgPrompt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-    if(promptSize.x > boundsPrompt.width){
-      boundsPrompt.width = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
-    }
-    widgetSwt.textFieldSwt.setBounds(boundsField);
-    wgPrompt.setBounds(boundsPrompt);
-  } 
-  //
-  if(widgetInfo.name !=null && widgetInfo.name.charAt(0) == '$'){
-    widgetInfo.name = sCurrPanel + widgetInfo.name.substring(1);
+{ 
+  if(name !=null && name.charAt(0) == '$'){
+    name = sCurrPanel + name.substring(1);
   }
-  //link the widget with is information together.
-  widgetSwt.textFieldSwt.setData(widgetInfo);
-  if(widgetInfo.name !=null){
-    if(!editable){
-      showFields.put(widgetInfo.name, widgetInfo);
-    }
-  }
-  registerWidget(widgetInfo);
-  return widgetSwt; 
+  GralTextBox widgg = new GralTextBox(name);
+  char[] prompt1 = new char[1];
+  prompt1[0] = promptStylePosition;
+  widgg.setPrompt(prompt, new String(prompt1));
+  widgg.setEditable(editable);
+  setToPanel(widgg);
+  //SwtTextFieldWrapper.createTextField(widgg, this);   
+  return widgg;
 
 }
 
