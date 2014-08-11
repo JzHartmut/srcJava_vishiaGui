@@ -139,7 +139,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   }
   
   
-  void setUser(GralTextFieldUser_ifc user){
+  public void setUser(GralTextFieldUser_ifc user){
     this.user = user;
   }
   

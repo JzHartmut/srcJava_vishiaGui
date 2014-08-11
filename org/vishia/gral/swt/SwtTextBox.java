@@ -161,7 +161,6 @@ public class SwtTextBox extends GralTextBox
       if(KeyCode.isWritingKey(key)){
         bTextChanged = true;
       }
-      if(KeyCode.isWritingOrTextNavigationKey(key)) return true;
       boolean bUserOk;
       if(user !=null){
         Point selection = textFieldSwt.getSelection();
@@ -169,8 +168,10 @@ public class SwtTextBox extends GralTextBox
             , textFieldSwt.getText()
             , textFieldSwt.getCaretPosition()
             , selection.x, selection.y);
-      } else bUserOk = false;
-      if(!bUserOk ){
+      } else { bUserOk = false; }
+      //
+      if(!bUserOk ){  //user has not accept the key
+        if(KeyCode.isWritingOrTextNavigationKey(key)) return true;
         switch(key){
           case KeyCode.ctrl + 'a': { 
             textFieldSwt.selectAll();

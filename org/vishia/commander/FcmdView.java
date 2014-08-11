@@ -45,6 +45,8 @@ public class FcmdView
   
   boolean bVisible;
   
+  boolean bEditable;
+  
   int nrQuickview;
   
   private GralTextBox widgQuickView;
@@ -138,6 +140,7 @@ public class FcmdView
     widgShowInfo = main.gralMng.addTextField(null,false, null, null);
     main.gralMng.setPosition(3, 0, 0, 0, 1, 'r');
     widgContent = main.gralMng.addTextBox("view-content", false, null, '.');
+    widgContent.setUser(userKeys);
     widgContent.setTextStyle(GralColor.getColor("bk"), main.gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));
     windView = wind; 
     windView.setActionOnSettingInvisible(actionOnSetInvisible);
@@ -187,7 +190,6 @@ public class FcmdView
           } while(nrofBytesRead >0); //Stop if no bytes read or uContent is full.
           reader.close();
           //byteBuffer.rewind();
-          detectEncoding();
           presentContent();
         }
       } catch(IOException exc){
@@ -217,6 +219,8 @@ public class FcmdView
 
   
   void detectEncoding(){
+    encodingContent = iso8859_1;
+    format = 'w';
     for(int ii =0; ii<zContent; ++ii){
       byte cc = uContent[ii];
       if(cc < 0x20 && cc >=0 && "\r\n\t".indexOf(cc) <0){
@@ -225,13 +229,15 @@ public class FcmdView
         return;
       }
     }
-    encodingContent = iso8859_1;
   }
   
   
   
   void presentContent() throws IOException
   {
+    widgContent.setEditable(false);
+    bEditable = false;
+    detectEncoding();
     if(encodingContent!=null){
       presentContentText(encodingContent);
     } else {
@@ -294,9 +300,22 @@ public class FcmdView
   void syncTextFromWidg(Charset charset){
     int posInWidg = widgContent.getCursorPos();
     cursorPos = posInWidg;
-    if(widgContent.isChanged(true)){
+    ////
+    if(bEditable) {
+    //if(widgContent.isChanged(true)){    //TODO isChanged does not work yet. It may better.
       String sContent = widgContent.getText();
-      //uContent = sContent.getBytes(utf8);
+      int zContentnew = sContent.length();
+      int pos = -1;
+      
+      byte[] bytes = sContent.getBytes(charset);  //TODO portions of substring with size about 4096 ...16000
+      for(byte bb: bytes){
+        uContent[++pos] = bb;
+      }
+      int end = zContent -1;  //to set 0-bytes
+      zContent = ++pos;       //new size
+      while(pos < end){
+        uContent[++pos] = 0;  //remove rest, let it clean.
+      }
     }
     
   }
@@ -306,7 +325,7 @@ public class FcmdView
   void saveTextAs(Charset encoding, byte[] lineEnd){
     try{
       //read the content in the given encoding:
-      InputStream inpBytes = new ByteArrayInputStream(uContent);
+      InputStream inpBytes = new ByteArrayInputStream(uContent, 0, zContent);
       InputStreamReader inpText = new InputStreamReader(inpBytes, encodingContent);
       BufferedReader inpLines = new BufferedReader(inpText);
       FileRemote filedst = main.currentFile();
@@ -319,14 +338,18 @@ public class FcmdView
         if(sLine !=null){
           byte[] bytes = sLine.getBytes(encoding);
           if(outBuffer.remaining() < bytes.length+1){
+            int zOut = outBuffer.position();
+            outBuffer.limit(zOut);
             outBuffer.rewind();
             outchn.write(outBuffer);
+            outBuffer.limit(outBuffer.capacity());
             outBuffer.clear();  
           }
           int posBytes = 0;
           int zOutBuffer;
           while( (zOutBuffer = outBuffer.remaining()) < (bytes.length - posBytes +1)){
             outBuffer.put(bytes, posBytes, zOutBuffer);
+            outBuffer.limit(zOutBuffer);
             outBuffer.rewind();
             outchn.write(outBuffer);
             outBuffer.clear();
@@ -337,6 +360,8 @@ public class FcmdView
           //outText.append(sLine).append('\n');
         }
       } while(sLine !=null);
+      int zOut = outBuffer.position();
+      outBuffer.limit(zOut);
       outBuffer.rewind();
       outchn.write(outBuffer);
       outBuffer.clear(); 
@@ -500,7 +525,8 @@ public class FcmdView
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
         widgContent.setEditable(true);
-      return true;
+        bEditable = true;
+        return true;
       } else return false; 
       // /
     }
@@ -511,28 +537,34 @@ public class FcmdView
   {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { 
-      try{
+      if(FcmdView.this.bEditable){
+        try{
         //InputStream inpBytes = new ByteArrayInputStream(uContent);
         //InputStreamReader inpText = new InputStreamReader(inpBytes);
         //BufferedReader inpLines = new BufferedReader(inpText);
-        FileRemote filedst = main.currentFile();
-        WritableByteChannel outchn =filedst.openWrite(0);
-        ByteBuffer outBuffer = ByteBuffer.allocate(1200);
-        //Writer out = new FileWriter();
-        int nrofBytes = uContent.length;
-        int posBytes = 0;
-        while(nrofBytes > 0){
-          int zWrite = nrofBytes >=1200 ? 1200 : nrofBytes;
-          outBuffer.put(uContent, posBytes, zWrite);
-          nrofBytes -= zWrite;
-          outBuffer.rewind();
-          outchn.write(outBuffer);
-          outBuffer.clear();
+          FileRemote filedst = main.currentFile();
+          WritableByteChannel outchn =filedst.openWrite(0);  //use Channel-io to support remote files. 
+          ByteBuffer outBuffer = ByteBuffer.allocate(1200);
+          //Writer out = new FileWriter();
+          syncContentFromWidg();
+          int nrofBytes = zContent; //uContent.length;
+          int posBytes = 0;
+          while(nrofBytes > 0){
+            int zWrite = nrofBytes >=1200 ? 1200 : nrofBytes;
+            outBuffer.put(uContent, posBytes, zWrite);
+            nrofBytes -= zWrite;
+            posBytes += zWrite;
+            outBuffer.limit(zWrite);
+            outBuffer.rewind();
+            outchn.write(outBuffer);
+            outBuffer.limit(outBuffer.capacity());
+            outBuffer.clear();
+          }
+          outchn.close();
+          
+        } catch(Exception exc){
+          main.gralMng.writeLog(0, exc);
         }
-        outchn.close();
-        
-      } catch(Exception exc){
-        main.gralMng.writeLog(0, exc);
       }
       return true;
       // /
@@ -578,9 +610,9 @@ public class FcmdView
   GralTextFieldUser_ifc userKeys = new GralTextFieldUser_ifc() {
     
     @Override
-    public boolean userKey(int keyCode, String content, int cursorPos,
-        int selectStart, int selectEnd) {
+    public boolean userKey(int keyCode, String content, int cursorPos, int selectStart, int selectEnd) {
       boolean bDone = true;
+      widgShowInfo.setText("" + cursorPos);
       switch(keyCode){
       case KeyCode.ctrl + 'F': actionFind.userActionGui(KeyCode.menuEntered, null); break;
         default: bDone = false;
