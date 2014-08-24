@@ -130,7 +130,7 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
 
   
   @Override public void setEditable(boolean editable){
-    dyda.setChanged(editable ? GraphicImplAccess.chgEditable : GraphicImplAccess.chgEditable);
+    dyda.setChanged(editable ? GraphicImplAccess.chgEditable : GraphicImplAccess.chgNonEditable);
     if(wdgImpl !=null){
       repaint();
     }

@@ -103,7 +103,7 @@ public class OamRcvValue implements Runnable
 	
 	private void evalTelg(byte[] recvData, int nrofBytes) throws ParseException
 	{ 
-		datagramRcv.assignData(recvData, nrofBytes);
+		datagramRcv.assign(recvData, nrofBytes);
 		datagramRcv.setBigEndian(true);
 		int nrofBytesInfoHead = infoEntity.getLengthHead();
 		int catastrophicalCount = 1000;

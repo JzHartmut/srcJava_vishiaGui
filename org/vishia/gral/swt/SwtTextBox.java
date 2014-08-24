@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -24,6 +26,7 @@ import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.swt.SwtTextFieldWrapper.TextFieldKeyListener;
+import org.vishia.gral.swt.SwtTextFieldWrapper.TextFieldModifyListener;
 import org.vishia.util.KeyCode;
 
 public class SwtTextBox extends GralTextBox.GraphicImplAccess
@@ -31,7 +34,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
 
   /**Version and history
    * <ul>
-   * <li>2014-08-16 Hartmut chg: GrapTextBox not abstract, using GraphicImplAccess like new concept of all GralWidgets. 
+   * <li>2014-08-16 Hartmut chg: GralTextBox not abstract, using GraphicImplAccess like new concept of all GralWidgets. 
    * <li>2012-01-06 Hartmut chg: The {@link #append(CharSequence)} etc. methods are implemented
    *   in this super class instead in the graphic layer implementation classes. Therefore
    *   the methods {@link #appendTextInGThread(CharSequence)} and {@link #setTextInGThread(CharSequence)}
@@ -88,6 +91,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
   { widgg.super(widgg, mng); //NOTE: superclass is a non static inner class of GralTextField. 
     Composite panelSwt = mng.getCurrentPanel();
     textFieldSwt = new Text(panelSwt, SWT.MULTI|SWT.H_SCROLL|SWT.V_SCROLL); //;style);
+    textFieldSwt.setData(this);
     swtWidgHelper = new SwtWidgetHelper(textFieldSwt, mng);
 
     textFieldSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
@@ -96,6 +100,9 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
     textFieldSwt.addMouseListener(mng.mouseClickForInfo);
     KeyListener swtKeyListener = new TextBoxKeyListener(mng._impl.gralKeyListener);
     textFieldSwt.addKeyListener(swtKeyListener);
+    TextBoxModifyListener modifyListener = new TextBoxModifyListener();
+    textFieldSwt.addModifyListener(modifyListener);
+    
     mng.setPosAndSize_(textFieldSwt);
     if(prompt() != null && promptStylePosition().equals("t")){
       final int yPixelField;
@@ -242,8 +249,12 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
             textFieldSwt.setFont(props.fontSwt(dyda.textFont));
           }
         }
-        if((chg & chgEditable)!=0){ textFieldSwt.setEditable(true); }
-        if((chg & chgNonEditable)!=0){ textFieldSwt.setEditable(false); }
+        if((chg & chgEditable)!=0){ 
+          textFieldSwt.setEditable(true); 
+        }
+        if((chg & chgNonEditable)!=0){ 
+          textFieldSwt.setEditable(false); 
+        }
         
         if((chg & chgViewTrail)!=0) {
           ScrollBar scroll = textFieldSwt.getVerticalBar();
@@ -319,8 +330,27 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
     
     
     
-  };
+  }
 
+
+  
+  
+  protected class TextBoxModifyListener implements ModifyListener{
+    @Override public void modifyText(ModifyEvent ev) {
+      String text = textFieldSwt.getText();
+      SwtTextBox.super.dyda().displayedText = text;
+      //System.out.println("actionText");
+      //SwtTextFieldWrapper.super.caretPos = textFieldSwt.getCaretPosition();
+      if(actionChanging() != null){
+        actionChanging().exec(KeyCode.valueChanged, widgg, text);
+      }
+      //if(dyda.displayedText !=null){
+        //textFieldSwt.setText(dyda.displayedText);
+      //}
+    }
+    
+  }
+  
 
   
 }

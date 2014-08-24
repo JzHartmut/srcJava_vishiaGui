@@ -421,6 +421,38 @@ public final class InspcCurveView
   /**Saves a curve ///
    * 
    */
+  protected void readCurve(GralCurveView_ifc.ModeWrite mode){
+    try{
+      //long dateStart;
+      CharSequence sDate;
+      if(mode == GralCurveView_ifc.ModeWrite.autoSave){
+        sDate = widgCurve.timeInitAutoSave(); 
+      } else {
+        sDate = widgCurve.timeInitSaveViewArea(); 
+       // widgCurve.
+      }
+      String sNameFile = sDate + "_" + sName;
+      //fileCurveSave.mkdirs();
+      FileRemote fileCurveRead = dirCurveSave.child(sNameFile + ".csv");
+      System.out.println("InspcCurveView - read curve data from; " + fileCurveRead.getAbsolutePath());
+      //writerCurveCsv.setFile(fileCurveSave);
+      //widgCurve.writeCurve(writerCurveCsv, mode);
+      
+      System.out.println("InspcCurveView - data successfull read; " + fileCurveRead.getAbsolutePath());
+
+      //timeLastSave = System.currentTimeMillis();
+    } catch(Exception exc){
+      widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
+      System.err.println(Assert.exceptionInfo("InspcCurveView-save", exc, 1, 2));
+    }
+    
+  }
+  
+  
+  
+  /**Saves a curve ///
+   * 
+   */
   protected void saveCurve(GralCurveView_ifc.ModeWrite mode){
     try{
       //long dateStart;
@@ -811,7 +843,7 @@ public final class InspcCurveView
           } else if(widgd.getCmd().equals(sBtnSaveCfg)){
             windFileCfg.openDialog(fileCurveCfg, widgd.getCmd(), true, actionSaveCfg);
           } else if(widgd.getCmd().equals(sBtnReadValues)){
-            windFileCfg.openDialog(dirCurveSave, "read values- not implemented yet", false, null);
+            windFileCfg.openDialog(dirCurveSave, "read values", false, actionReadValues);
           } else if(widgd.getCmd().equals(sBtnSaveValues)){
             windFileCfg.openDialog(dirCurveSave, "write values", true, actionSaveValues);
           }
@@ -909,14 +941,28 @@ public final class InspcCurveView
   } };
   
   
-  public GralUserAction actionReadValues = new GralUserAction("actionReadValues"){
-    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
+  
+  
+  /**Action invoked if the write file was selected in the {@link GralFileSelectWindow}
+   */
+  GralUserAction actionReadValues = new GralUserAction("actionReadValues"){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        try{
+          dirCurveSave = (FileRemote)params[0];
+          readCurve(GralCurveView_ifc.ModeWrite.currentView);
+          ///
+          
+        } catch(Exception exc){
+          widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
+          System.err.println(Assert.exceptionInfo("InspcCurveView - Read Curve", exc, 1, 2));
+        }
+        windFileCfg.closeWindow();
+      }
       return true;
-    }
-  };
- 
+  } };
   
-  
+
   /**Action invoked if the write file was selected in the {@link GralFileSelectWindow}
    */
   GralUserAction actionSaveValues = new GralUserAction("actionSaveValues"){

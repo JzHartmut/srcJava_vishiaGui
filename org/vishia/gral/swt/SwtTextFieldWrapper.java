@@ -416,7 +416,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   
 
   
-  private class TextFieldModifyListener implements ModifyListener{
+  protected class TextFieldModifyListener implements ModifyListener{
     @Override public void modifyText(ModifyEvent ev) {
       String text = textFieldSwt.getText();
       SwtTextFieldWrapper.super.dyda().displayedText = text;

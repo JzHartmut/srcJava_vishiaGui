@@ -449,7 +449,8 @@ public class FcmdView
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-        view(null);
+      btnQuickview.setState(GralButton.State.On);
+      view(null);
         return true;
       } else return false; 
       // /
