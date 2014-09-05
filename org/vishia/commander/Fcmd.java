@@ -393,7 +393,8 @@ public class Fcmd extends GuiCfg
         if(fileCard.currentFile() !=null && fileCard.currentFile().isMarked(0x1)){
           //if the current file is marked, use all marked files.
           List<FileRemote> listFiles = fileCard.getSelectedFiles(bAlsoDirs, mask);
-          assert(listFiles !=null && listFiles.size() > 0);  //at least the current file is marked.
+          //NOTE: the currentFile was marked, but it was not existing after delete. In this case all is okay but listFiles is empty.
+          assert(listFiles !=null); // && listFiles.size() > 0);  //at least the current file is marked.
           Iterator<FileRemote> iter= listFiles.iterator();
           while(ix < 2 && iter.hasNext()){
             FileRemote file = iter.next();
