@@ -8,6 +8,9 @@ REM The output dir is exe usually but zbnfjax if this file is compiled in the ZB
 set OUTDIR_JAVAC=..\..\exe
 set JAR_JAVAC=Fcmd.jar
 
+REM to search swt library and copy jar-result:
+set FCMD_DST=D:\vishia\Fcmd\sf\Fcmd\exe
+
 
 REM Manifest-file for jar building relativ path from current dir:
 set MANIFEST_JAVAC=Fcmd.manifest
@@ -36,15 +39,12 @@ set SWTJAR=c:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v35
 if exist %SWTJAR% goto :swtOk
 set SWTJAR=d:\Programme\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
 if exist %SWTJAR% goto :swtOk
-set SWTJAR=Z:\V\vishia\Fcmd\sf\Fcmd\exe\windows\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+set SWTJAR=%FCMD_DST%\windows\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
 if exist %SWTJAR% goto :swtOk
 echo SWT library not found
 pause
 exit
 :swtOk
-::set CLASSPATH_JAVAC=d:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
-::set CLASSPATH_JAVAC=d:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
-::set CLASSPATH_JAVAC=Z:\V\vishia\Fcmd\sf\Fcmd\exe\windows\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
 set CLASSPATH_JAVAC=%SWTJAR%;../../exe/zbnf.jar
 ::;../../exe/vishiaRun.jar
 
@@ -54,5 +54,4 @@ set SRCPATH_JAVAC=..;../../srcJava_vishiaRun
 
 call ..\..\srcJava_vishiaBase\_make\+javacjarbase.bat
 
-set PATH_FCMD=D:\vishia\Fcmd\sf\Fcmd\exe
-if exist %PATH_FCMD% copy %OUTDIR_JAVAC%\%JAR_JAVAC% %PATH_FCMD%\%JAR_JAVAC% 
+if exist %FCMD_DST% copy %OUTDIR_JAVAC%\%JAR_JAVAC% %FCMD_DST%\%JAR_JAVAC% 

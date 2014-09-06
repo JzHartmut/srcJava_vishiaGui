@@ -68,7 +68,7 @@ public class Fcmd extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   @SuppressWarnings("hiding")
-  public static final String sVersion = "2014-05-16";
+  public static final String sVersion = "2014-09-05";
 
   /**Version visible in about info */
   //public static final String sVersion = "Version 1.15 - 2014-02-21";
@@ -481,7 +481,7 @@ public class Fcmd extends GuiCfg
       this.cargs = cargs;
       super.addAboutInfo("The.file.Commander");
       super.addAboutInfo("made by Hartmut Schorrig, www.vishia.org, hartmut.schorrig@vishia.de");
-      super.addAboutInfo(sVersion);
+      super.addAboutInfo("Version-date: " + Fcmd.sVersion);
     }
 
     @Override protected boolean testArgument(String arg, int nArg)
