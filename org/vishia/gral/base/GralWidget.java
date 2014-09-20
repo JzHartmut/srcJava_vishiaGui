@@ -1329,11 +1329,19 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @see java.lang.Object#toString()
    */
   @Override public String toString()
-  { if(pos !=null && pos.panel !=null){
-      return whatIs + "-" + name + ":" + sDataPath + "@" + pos.panel.namePanel + "\n";
+  { StringBuilder u = new StringBuilder(240);
+    u.append(whatIs).append(" - ").append(name).append(": ").append(sDataPath);
+    if(pos !=null && pos.panel !=null){
+      u.append(" @").append(pos.panel.namePanel);
     } else {
-      return whatIs + "-" + name + ":" + sDataPath + "@?" + "\n";
+      u.append(" @?");
     }
+    if(variable !=null){
+      String vString = variable.toString();
+      u.append(" var=").append(vString);
+    }
+    u.append('\n');
+    return u.toString();
   }
 
   

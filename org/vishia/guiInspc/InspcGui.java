@@ -154,9 +154,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   LogMessage logTelg;
 
   GralButton btnSwitchOnLog;
-  final GralButton btnRetryDisableVariables = new GralButton(null, "retry vars", actionSetRetryDisabledVariable);
+  final GralButton btnRetryDisableVariables = new GralButton(null, "retry variable", actionSetRetryDisabledVariable);
 
-  final GralButton btnUseGetByIndex = new GralButton(null, "get value by index", actionUseGetValueByIndex);
+  final GralButton btnUseGetByIndex = new GralButton(null, "get value by handle", actionUseGetValueByIndex);
   
   static final GralColor colorRefreshed = GralColor.getColor("wh");
   static final GralColor colorOldValue = GralColor.getColor("lgr");
@@ -377,10 +377,11 @@ private class InspcGuiCfg extends GuiCfg
   {
     super.initGuiAreas("A1C2");
     super.gralMng.selectPanel("test");
-    super.gralMng.setPosition(5, GralPos.size -3, 0, GralPos.size +10 , 0, 'd',1);
+    super.gralMng.setPosition(5, GralPos.size -3, 0, GralPos.size +18 , 0, 'd',1);
     btnSwitchOnLog = super.gralMng.addSwitchButton("log", "log telg ?", "log telg", GralColor.getColor("wh"), GralColor.getColor("am") );
     btnSwitchOnLog.setActionChange(actionEnableLog);
     btnRetryDisableVariables.setToPanel(super.gralMng);
+    btnUseGetByIndex.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
     btnUseGetByIndex.setToPanel(super.gralMng);
     colorSelector = new GralColorSelector("colorSelector", super.gralMng);
     curveA.buildGraphic(gui.mainWindow(), colorSelector, null);

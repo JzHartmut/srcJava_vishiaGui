@@ -25,6 +25,7 @@ public class SwtGralMouseListener
 {
   /**Version, History and copyright
    * <ul>
+   * <li>2014-09-21 Hartmut chg: Using of {@link GralWidget#toString()} for double click info.
    * <li>2013-05-13 Hartmut chg: All methods of {@link GralMouseWidgetAction_ifc} changed, parameter key, position.
    * <li>2012-10-10 Hartmut the keycode for mouse pressed user actions contains pressing ctrl, alt, sh too.
    * <li>2012-03-09 Hartmut The methods {@link GralMouseWidgetAction_ifc#mouse1Up()} etc. are not called
@@ -81,7 +82,9 @@ public class SwtGralMouseListener
       if(widgg !=null){
         GralMng guiMng = widgg.gralMng();
         try{
-          guiMng.log.sendMsg(0, "Info widget: %s / %s", widgg.name, widgg.getDataPath());
+          String widggInfo = widgg.toString();
+          guiMng.log.sendMsg(0, "Info widget: %s", widggInfo);
+          //guiMng.log.sendMsg(0, "Info widget: %s / %s", widgg.name, widgg.getDataPath());
         } catch(Exception exc){ guiMng.writeLog(0, exc); }
           
       }

@@ -376,7 +376,7 @@ public class InspcFieldTable implements Runnable
       if(key == KeyCode.defaultSelect || key == KeyCode.userSelect){
         @SuppressWarnings("unchecked")
         GralTable<InspcStruct.FieldOfStruct>.TableLineData line = (GralTable.TableLineData)params[0];
-        setCurrentFieldInfo(line);
+        if(line !=null) { setCurrentFieldInfo(line); }
         return true;
       } else { 
         return false;
