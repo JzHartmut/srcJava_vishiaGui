@@ -1,7 +1,12 @@
 package org.vishia.guiInspc;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -418,36 +423,18 @@ public final class InspcCurveView
   
   
   
-  /**Saves a curve ///
+  /**Reads a curve ///
    * 
    */
-  protected void readCurve(GralCurveView_ifc.ModeWrite mode){
+  protected void readCurve(File file){
     try{
-      //long dateStart;
-      CharSequence sDate;
-      if(mode == GralCurveView_ifc.ModeWrite.autoSave){
-        sDate = widgCurve.timeInitAutoSave(); 
-      } else {
-        sDate = widgCurve.timeInitSaveViewArea(); 
-       // widgCurve.
-      }
-      String sNameFile = sDate + "_" + sName;
-      //fileCurveSave.mkdirs();
-      FileRemote fileCurveRead = dirCurveSave.child(sNameFile + ".csv");
-      System.out.println("InspcCurveView - read curve data from; " + fileCurveRead.getAbsolutePath());
-      //writerCurveCsv.setFile(fileCurveSave);
-      //widgCurve.writeCurve(writerCurveCsv, mode);
-      
-      System.out.println("InspcCurveView - data successfull read; " + fileCurveRead.getAbsolutePath());
-
-      //timeLastSave = System.currentTimeMillis();
+      widgCurve.readCurve(file);
     } catch(Exception exc){
       widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
-      System.err.println(Assert.exceptionInfo("InspcCurveView-save", exc, 1, 2));
+      System.err.println(Assert.exceptionInfo("InspcCurveView-read", exc, 1, 2));
     }
     
   }
-  
   
   
   /**Saves a curve ///
@@ -949,8 +936,10 @@ public final class InspcCurveView
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
-          dirCurveSave = (FileRemote)params[0];
-          readCurve(GralCurveView_ifc.ModeWrite.currentView);
+          assert(params[0] instanceof File);
+          File file = (File)params[0];
+          
+          readCurve(file);
           ///
           
         } catch(Exception exc){

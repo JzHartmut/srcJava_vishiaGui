@@ -1,6 +1,11 @@
 package org.vishia.gral.base;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -901,25 +906,6 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   }
 
   
-  /**Adds a sampling value set.
-   * <br><br> 
-   * This method can be called in any thread. It updates only data,
-   * a GUI-call isn't done. But the method is not thread-safe. 
-   * If more as one threads writes data, an external synchronization should be done
-   * which may encapsulate more as only this call.
-   * <br><br> 
-   * The forcing redraw should be triggered outside. It may be triggered only
-   * if more as one samples are set. The redraw-call have to be execute in the GUI-thread.
-   * Hint: use {@link org.vishia.mainGuiSwt.MainCmdSwt#addDispatchOrder(Runnable)}
-   * to force redraw for this component. The Runnable-method should call widget.redraw().
-   * @param sName The registered name
-   * @param values The values.
-   * @param timeshort relative time-stamp as currently wrapping time in the users unit. See .
-   */
-  //public abstract void setSample(float[] newValues, int timeshort);
-  /**
-   * @see org.vishia.gral.base.GralCurveView#setSample(float[], int)
-   */
   @Override public void setSample(float[] newValues, int timeshort) {
     if(testStopWr) return;  //only for debug test.
     //if(++ixDataWr >= maxNrofXValues){ ixDataWr = 0; } //wrap arround.
@@ -1324,6 +1310,69 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   }
   
 
+  
+  
+  
+  /**Reads a curve ///
+   * 
+   */
+  public void readCurve(File file)
+  throws IOException
+  {
+    InputStream ifile = new FileInputStream(file);
+    //read first bytes to detect format
+    byte[] buffer = new byte[256];
+    int zBytes = ifile.read(buffer);
+    ifile.close();
+    String firstLine = new String(buffer,0, zBytes);
+    if(firstLine.startsWith("csv-headline.curve;")){
+      readCurveCsvHeadline(file);
+    }
+    //timeLastSave = System.currentTimeMillis();
+    
+  }
+  
+
+  
+  private void readCurveCsvHeadline(File file)
+  throws IOException
+  {
+    String sLine;
+    BufferedReader ifile = new BufferedReader(new FileReader(file));
+    //first head line
+    sLine = ifile.readLine();
+    setTimePoint(System.currentTimeMillis(), 0, 0.156f);
+    //line with channels
+    sLine = ifile.readLine();
+    listTracks.clear();
+    listTrackSet.clear();
+    int ixInList = -1;
+    String[] signals = sLine.split(";");
+    
+    for(String signal1: signals){
+      String signal = signal1.trim();
+      Track track = new Track(this, signal, ++ixInList);
+      listTracks.add(track);
+    }
+    float[] fvalues = new float[listTracks.size()];
+    int timeshort = 0;
+    while( (sLine = ifile.readLine())!=null){
+      String[] values = sLine.split(";");
+      int ixCol = -1;
+      for(String value1: values){
+        String sValue = value1.trim();
+        float value;
+        try{ value = Float.valueOf(sValue); }
+        catch(NumberFormatException exc){ value = 0.0f; }
+        fvalues[++ixCol] = value;
+      }
+      setSample(fvalues, ++timeshort);
+    }
+  }
+  
+
+  
+  
   
   /* (non-Javadoc) Writes the curve to the given interface, it is an exporter class.
    * @see org.vishia.gral.ifc.GralCurveView_ifc#writeCurve(org.vishia.curves.WriteCurve_ifc, org.vishia.gral.ifc.GralCurveView_ifc.ModeWrite)
