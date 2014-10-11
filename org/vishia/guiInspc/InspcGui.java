@@ -150,6 +150,8 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   
   final private Runnable callbackOnReceivedData = new Runnable(){ @Override public void run(){ callbackOnReceivedData(); } };
   
+  final private Runnable callbackShowTargetCommState = new Runnable(){ @Override public void run(){ callbackShowTargetCommState(); } };
+  
   
   LogMessage logTelg;
 
@@ -164,6 +166,8 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   InspcCurveView curveA, curveB, curveC;
   
   InspcFieldTable fieldsA, fieldsB;
+  
+  InspcViewTargetComm viewTargetComm;
   
   public GralColorSelector colorSelector;
   
@@ -189,6 +193,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     composites.add(variableMng);
     this.inspcMng = variableMng;
     variableMng.setCallbackOnReceivedData(callbackOnReceivedData);
+    variableMng.setCallbackShowingState(callbackShowTargetCommState);
     
     //this.XXXinspcComm = new InspcGuiComm(this, guiCfg.gralMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
     //composites.add(XXXinspcComm);
@@ -203,7 +208,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     fieldsA = new InspcFieldTable(variableMng);
     fieldsB = new InspcFieldTable(variableMng);
     
-    
+    viewTargetComm = new InspcViewTargetComm("id");
   }
   
   @Override public void completeConstruction(){
@@ -231,6 +236,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   
 
   
+  /**This method is invoked by callback if a receive cycle is finished.
+   * Shows values.
+   */
   private void callbackOnReceivedData(){
     long time = System.currentTimeMillis();
     ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = guiCfg.gralMng.getVisiblePanels();
@@ -261,6 +269,24 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
       exc.printStackTrace(System.out);
     }
     
+  }
+  
+  
+  /**This method is invoked by callback if a receive cycle is finished.
+   * Shows values.
+   */
+  private void callbackShowTargetCommState(){
+    if(viewTargetComm.isVisible()) {
+      try{
+        for(int ix = 0; ix < 5; ++ix){
+          int state = inspcMng.getStateOfTargetComm(ix);
+          viewTargetComm.step(ix, state);
+        }
+      } catch(Exception exc){ 
+        System.err.println("InspcGui-receivedData; " + exc.getMessage()); 
+        exc.printStackTrace(System.out);
+      }
+    }
   }
   
   
@@ -394,9 +420,13 @@ private class InspcGuiCfg extends GuiCfg
     gralMng.selectPanel("primaryWindow");
     gralMng.setPosition(24, 94, 14, 74, 0, '.');
     fieldsB.setToPanel(gralMng);
+    gralMng.selectPanel("primaryWindow");
+    gralMng.setPosition(10, 30, 50, 74, 0, '.');
+    viewTargetComm.setToPanel(gralMng);
     GralMenu menu = super.guiW.getMenuBar();
     menu.addMenuItemGthread("menuBarFieldsA", "&Window/open Fields &A", fieldsA.actionOpenWindow);
     menu.addMenuItemGthread("menuBarFieldsB", "&Window/open Fields &B", fieldsB.actionOpenWindow);
+    menu.addMenuItemGthread("menuBarViewTargetComm", "&Window/view &TargetComm", viewTargetComm.actionOpenWindow);
     //
     if(user !=null){
       user.initGui(gralMng);

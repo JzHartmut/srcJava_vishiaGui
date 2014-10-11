@@ -7,6 +7,7 @@ public class GralLed extends GralWidget
 {
   /**Version and history
    * <ul>
+   * <li>2014-10-12 chg: now instantiable. New concept. 
    * <li>2012-04-01 new: {@link #colorBorder}, {@link #colorBorderSelectable}, {@link #setValue(Object[])}
    * <li>2011-12-03 new Baseclass for LED visualization.
    *   It is the concept of specialized {@link GralWidget}.
