@@ -355,6 +355,10 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     else if(widgg instanceof GralValueBar){
       new SwtValueBar((GralValueBar)widgg, this);
     }
+    else if(widgg instanceof GralLed){
+      new SwtLed((GralLed)widgg, this);
+      registerWidget(widgg);
+    }
   }
   
 
@@ -1001,12 +1005,12 @@ public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
     int ySize = (int)(pos.height());
     int xSize = (int)(pos.width());
 
-    GralLed widgetInfos = new SwtLed(sName, this);
-    //widgetInfos.setPanelMng(this);
-    widgetInfos.setDataPath(sDataPath);
-    //widgetInfos.setShowMethod(sShowMethod);
-    registerWidget(widgetInfos);
-    return widgetInfos;
+    GralLed gralLed = new GralLed(sName);
+    //SwtLed swtLed = new SwtLed(gralLed, this);
+    gralLed.setDataPath(sDataPath);
+    //registerWidget(gralLed);
+    gralLed.setToPanel(this);
+    return gralLed;
   }
   
 	@Override public GralCurveView addCurveViewY(String sName, int nrofXvalues, GralCurveView.CommonCurve common) {

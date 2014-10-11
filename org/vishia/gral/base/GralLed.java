@@ -3,7 +3,7 @@ package org.vishia.gral.base;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.util.ObjectValue;
 
-public abstract class GralLed extends GralWidget
+public class GralLed extends GralWidget
 {
   /**Version and history
    * <ul>
@@ -50,6 +50,11 @@ public abstract class GralLed extends GralWidget
   /**The colors which are used for repaint (if not null). */
   //protected GralColor colorBorder, colorInner;
   
+  /**
+   * @param name
+   * @param mng
+   * @deprecated use {@link #GralLed(String)}
+   */
   protected GralLed(String name, GralMng mng)
   { super(name, 'D', mng);
     colorBorderSelectable = new GralColor[2];
@@ -61,6 +66,12 @@ public abstract class GralLed extends GralWidget
     setValue(0);  //initializes dyda.colors
   }
 
+  
+  public GralLed(String name)
+  { this(name, null);
+  }
+  
+  
   /**Sets the LED's color. The border can be another than the inner color.
    * The effect of {@link #setValue(Object[])} is independent from this method.
    * @param colorBorder assign to {@link GralWidget#setLineColor(GralColor, int)} or {@link GralWidget.DynamicData#lineColor}. 
@@ -104,4 +115,20 @@ public abstract class GralLed extends GralWidget
       //repaint(repaintDelay, repaintDelayMax);
     }
   }
+  
+  
+  
+  public abstract class GraphicImplAccess extends GralWidget.ImplAccess
+  implements GralWidgImpl_ifc
+  {
+
+    
+    protected GraphicImplAccess(GralWidget widgg, GralMng mng)
+    {
+      super(widgg, mng);
+    }
+    
+    protected GralWidget.DynamicData dyda(){ return dyda; }
+  }    
+
 }

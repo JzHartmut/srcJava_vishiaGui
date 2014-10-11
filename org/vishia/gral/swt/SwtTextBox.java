@@ -79,7 +79,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
    * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
    */
-  private final SwtWidgetHelper swtWidgHelper;
+  private final SwtWidgetHelper wdgh;
   
   /*package private*/ Text textFieldSwt;
   
@@ -92,7 +92,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
     Composite panelSwt = mng.getCurrentPanel();
     textFieldSwt = new Text(panelSwt, SWT.MULTI|SWT.H_SCROLL|SWT.V_SCROLL); //;style);
     textFieldSwt.setData(this);
-    swtWidgHelper = new SwtWidgetHelper(textFieldSwt, mng);
+    wdgh = new SwtWidgetHelper(textFieldSwt, mng);
 
     textFieldSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
     textFieldSwt.setEditable(widgg.isEditable());
@@ -155,7 +155,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
   //@Override public Widget getWidgetImplementation(){ return textFieldSwt; } 
   //@Override public boolean setFocus(){ return textFieldSwt.setFocus(); }
 
-  @Override public GralRectangle getPixelPositionSize(){ return swtWidgHelper.getPixelPositionSize(); }
+  @Override public GralRectangle getPixelPositionSize(){ return wdgh.getPixelPositionSize(); }
 
 
 
@@ -238,7 +238,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
           textFieldSwt.append(getAndClearNewText());
         }
         if((chg & chgColorText)!=0){
-          SwtProperties props = swtWidgHelper.mng.propertiesGuiSwt;
+          SwtProperties props = wdgh.mng.propertiesGuiSwt;
           if(dyda.textColor !=null){
             textFieldSwt.setForeground(props.colorSwt(dyda.textColor));
           }
@@ -265,8 +265,8 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
         if((chg & chgCursor) !=0){ 
           textFieldSwt.setSelection(caretPos());
         }
-        if((chg & chgColorText) !=0){ textFieldSwt.setForeground(swtWidgHelper.mng.getColorImpl(dyda().textColor)); }
-        if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(swtWidgHelper.mng.getColorImpl(dyda().backColor)); }
+        if((chg & chgColorText) !=0){ textFieldSwt.setForeground(wdgh.mng.getColorImpl(dyda().textColor)); }
+        if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(wdgh.mng.getColorImpl(dyda().backColor)); }
         textFieldSwt.redraw();
         acknChanged(chg);
       }

@@ -5,15 +5,19 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Composite;
 import org.vishia.gral.base.GralLed;
+import org.vishia.gral.base.GralLed.GraphicImplAccess;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralRectangle;
 
 /**This class represents a LED, which is able to show a state with its color. 
  * The LED may have a inner light and a border light. In that case to state,
  * which may have any association, can presented.
  */
-public class SwtLed extends GralLed{
+public class SwtLed extends GralLed.GraphicImplAccess
+{
 
   /**Version and history
    * <ul>
@@ -28,6 +32,12 @@ public class SwtLed extends GralLed{
   private SwtLedImpl widgSwt;
 
   
+  /**It contains the association to the swt widget (Control) and the {@link SwtMng}
+   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   */
+  private final SwtWidgetHelper wdgh;
+
+  
   Color borderColor, innerColor;
 
   final SwtMng mng;
@@ -35,16 +45,22 @@ public class SwtLed extends GralLed{
   boolean round;
   
   
-
   SwtLed(String name, SwtMng mng){
-    super(name, mng);
+    this(new GralLed(name), mng);
+  }
+  
+  SwtLed(GralLed widgg, SwtMng mng){
+    widgg.super(widgg, mng);
+    //super(name, mng);
     this.mng = mng;
     switch('r'){ 
     case 'r': round = true; break;
     case 'q': round = false; break;
     default: throw new IllegalArgumentException("param size must be r or q");
     }
-    widgSwt = new SwtLedImpl();
+    Composite panel = mng.getCurrentPanel();
+    widgSwt = new SwtLedImpl(panel);
+    wdgh = new SwtWidgetHelper(widgSwt, mng);
     widgSwt.setBackground(mng.propertiesGuiSwt.colorBackground);
     widgSwt.addFocusListener(mng.focusListener);
     widgSwt.setForeground(mng.propertiesGuiSwt.colorSwt(0xff00));
@@ -67,19 +83,20 @@ public class SwtLed extends GralLed{
    */
   private void setColors(){
     int changedAckn = 0;
+    GralWidget.DynamicData dyda = dyda(); //GralLed.GraphicImplAccess.this.dyda();
     if(dyda.backColor !=null 
-      && ( (dyda.whatIsChanged.get() & ImplAccess.chgColorBack)!=0
+      && ( (dyda.whatIsChanged.get() & GralWidget.ImplAccess.chgColorBack)!=0
          ||innerColor == null   //uninitialized: start with dyda.backColor
       )  ){ 
       innerColor = mng.getColorImpl(dyda.backColor);
-      changedAckn |= ImplAccess.chgColorBack; 
+      changedAckn |= GralWidget.ImplAccess.chgColorBack; 
     }
     if(dyda.lineColor !=null){  //use backColor if lineColor is not set! 
-      if( (dyda.whatIsChanged.get() & ImplAccess.chgColorLine)!=0
+      if( (dyda.whatIsChanged.get() & GralWidget.ImplAccess.chgColorLine)!=0
         || borderColor == null
         ){
         borderColor = mng.getColorImpl(dyda.lineColor); 
-        changedAckn |= ImplAccess.chgColorLine; 
+        changedAckn |= GralWidget.ImplAccess.chgColorLine; 
       }
     } else {
       borderColor = innerColor;
@@ -99,10 +116,10 @@ private class SwtLedImpl extends Canvas
   	 * @param mng The Gui-panel-manager contains information about the graphic frame and properties.
   	 * @param kind Use 'r' or 'q' for a round or a square LED.
   	 */
-  	public SwtLedImpl()
+  	public SwtLedImpl(Composite panel)
   	{
   		
-  		super(((SwtPanel)pos().panel).getPanelImpl(), 0);
+      super(panel, 0);
   	  addPaintListener(paintListener);	
   	}
   
@@ -164,6 +181,9 @@ private class SwtLedImpl extends Canvas
   	
   }
 
+  @Override public GralRectangle getPixelPositionSize(){ return wdgh.getPixelPositionSize(); }
+
+
   @Override
   public void removeWidgetImplementation()
   { if(widgSwt !=null){
@@ -190,8 +210,8 @@ private class SwtLedImpl extends Canvas
   }
 
 
-  @Override
-  public GralColor setBackgroundColor(GralColor color)
+  //@Override
+  public GralColor XXXsetBackgroundColor(GralColor color)
   {
     // TODO Auto-generated method stub
     return SwtWidgetHelper.setBackgroundColor(color, widgSwt);
@@ -204,8 +224,8 @@ private class SwtLedImpl extends Canvas
     
   }
 
-  @Override
-  public GralColor setForegroundColor(GralColor color)
+  //@Override
+  public GralColor XXXsetForegroundColor(GralColor color)
   {
     // TODO Auto-generated method stub
     return null;
