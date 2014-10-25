@@ -28,12 +28,13 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralCommandSelector;
 import org.vishia.gral.widget.GralFileSelector;
-import org.vishia.msgDispatch.MsgDispatchSystemOutErr;
-import org.vishia.msgDispatch.MsgDispatcher;
-import org.vishia.msgDispatch.MsgPrintStream;
 import org.vishia.msgDispatch.MsgRedirectConsole;
 import org.vishia.util.KeyCode;
 
+/**This class is the main class of the-File-commander.
+ * @author Hartmut Schorrig
+ *
+ */
 public class Fcmd extends GuiCfg
 {
 
@@ -67,8 +68,8 @@ public class Fcmd extends GuiCfg
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  @SuppressWarnings("hiding")
-  public static final String sVersion = "2014-09-05";
+  //@SuppressWarnings("hiding")
+  public static final String sVersion = "2014-10-26";
 
   /**Version visible in about info */
   //public static final String sVersion = "Version 1.15 - 2014-02-21";

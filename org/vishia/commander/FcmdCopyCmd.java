@@ -407,8 +407,8 @@ public class FcmdCopyCmd
   void setTexts( Estate newState){
     state = newState;
     String[][] textOk = 
-    { { "delete", "move", "check copy" }
-    , { "check del", "check move", "check copy" }
+    { { "check del", "move", "check copy" }
+    , { "check del", "move", "check copy" }
     , { "busy check", "busy check", "busy check" }
     , { "del checked", "move checked", "copy checked" } 
     , { "pause del", "pause move", "pause copy" }
@@ -745,7 +745,7 @@ public class FcmdCopyCmd
           } else if(cmd == Ecmd.move){
             execMove();
           } else if(cmd == Ecmd.delete){
-            execDel();
+            execCheck();
           }
         } else if(state == Estate.checked) { //widgg.sCmd.equals("copy")) {
           switch(cmd){
