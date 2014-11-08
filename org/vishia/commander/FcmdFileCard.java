@@ -252,7 +252,9 @@ public class FcmdFileCard extends GralFileSelector
   
   /**Removes this file card with its widgets and data. It is 'close tab'. */
   @Override public boolean remove(){
-    favorCard.remove();
+    if(favorCard !=null) {
+      favorCard.remove();
+    }
     favorCard = null;
     favorPathInfo = null;
     return super.remove();

@@ -529,9 +529,11 @@ class FcmdFavorPathSelector
         FcmdFavorCard favorCard = main.lastFavorCard;
         FcmdFileCard fileCard = favorCard.fileTable;
         FcmdLeftMidRightPanel panel = fileCard.mainPanel;
-        fileCard.remove();
-        panel.actFileCard = null;
-        panel.listTabs.remove(fileCard);
+        if(fileCard !=null){
+          fileCard.remove();
+          panel.actFileCard = null;
+          panel.listTabs.remove(fileCard);
+        }
         String nameWidgFavorCard = FcmdWidgetNames.tabFavorites + fileCard.nameFilePanel;
         String nameWidgFileCard = FcmdWidgetNames.tabFile + fileCard.nameFilePanel;
         panel.tabbedPanelFavorCards.removePanel(nameWidgFavorCard);

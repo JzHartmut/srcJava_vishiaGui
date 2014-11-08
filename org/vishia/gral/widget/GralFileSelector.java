@@ -248,7 +248,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
         if(line != null){
           FileRemote file = line.getUserData();
           String sName = line.getCellText(kColFilename);
-          if(file.exists()){
+          if(file.exists()) {                       //TODO: if the file is not refreshed, new network access, the GUI hangs a long time.
             if(sName.equals("..")){
               currentFile = file.getParentFile();
               currentDir = file;

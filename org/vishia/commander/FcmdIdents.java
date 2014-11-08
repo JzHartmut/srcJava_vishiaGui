@@ -88,13 +88,13 @@ public class FcmdIdents
   
   
   
-  String menuFilePropsBar = "&File/&Properties [F2]";  ////
+  String menuFilePropsBar = "&File/&Properties [F9]";  ////
 
-  String menuFilePropsContext = "Properties [F2]";
+  String menuFilePropsContext = "Properties [F9]";
   
-  String buttonFileProps = "F2:props";
+  String buttonFileProps = "F9:props";
 
-  int keyFileProps = KeyCode.F2;
+  int keyFileProps = KeyCode.F9;
   
   final String buttonFilePropsChg = "change file";
 
@@ -221,11 +221,11 @@ public class FcmdIdents
   /**execute with currently selected cmd.  */
   //String menuExecuteCmdBar = "&File/&Execute [cF9]";
 
-  String menuExecuteCmdContext = "exec [cF9]";
+  String menuExecuteCmdContext = "exec [cF2]";
   String menuBarExecuteCmdWithFile = "&Command/e~Xecute cmd with file [cEnter]";
-  int keyExecuteCmdWithFile = KeyCode.ctrl + KeyCode.F9;
+  int keyExecuteCmdWithFile = KeyCode.ctrl + KeyCode.F2;
   int keyExecuteCmdWithFile2 = KeyCode.ctrl + KeyCode.enter;
-  String buttonExecuteCmdWithFile = "cF9:exeCmd file";
+  String buttonExecuteCmdWithFile = "cF2:exeCmd file";
   
   
   String menuBarEditCmdCfg = "&Command/cmdcfg - &Edit act file";
@@ -310,9 +310,9 @@ public class FcmdIdents
   
   
   
-  String menuBarNavigatonCmd = "&Navigation/cmd [F9]";
-  String buttonFocusCmd = "F9:cmdTable";
-  int keyFocusCmd = KeyCode.F9;
+  String menuBarNavigatonCmd = "&Navigation/cmd [F2]";
+  String buttonFocusCmd = "F2:cmdTable";
+  int keyFocusCmd = KeyCode.F2;
   
   
 
