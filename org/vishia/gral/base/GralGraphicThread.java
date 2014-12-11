@@ -1,11 +1,9 @@
 package org.vishia.gral.base;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.vishia.util.Assert;
 import org.vishia.util.MinMaxTime;
-import org.vishia.util.OrderListRun;
+import org.vishia.util.OrderListExecuter;
 
 /**This class is the base for implementation of graphic threading. It is implemented for SWT and Swing yet.
  * <br><br>
@@ -111,7 +109,7 @@ import org.vishia.util.OrderListRun;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralGraphicThread implements Runnable, OrderListRun.ConnectionExecThread
+public abstract class GralGraphicThread implements Runnable, OrderListExecuter.ConnectionExecThread
 {
   
   /**Version and history:
@@ -185,7 +183,7 @@ public abstract class GralGraphicThread implements Runnable, OrderListRun.Connec
   protected MinMaxTime checkTimes = new MinMaxTime();
   
   
-  OrderListRun orderList = new OrderListRun(this);
+  OrderListExecuter orderList = new OrderListExecuter(this);
 
   /**Constructs this class as superclass.
    * The constructor of the inheriting class has some more parameter to build the 
@@ -215,7 +213,7 @@ public abstract class GralGraphicThread implements Runnable, OrderListRun.Connec
    * if {@link #wakeup()} is called or this routine returns if the operation system wakes up the graphic thread. */
   protected abstract void graphicThreadSleep();
   
-  public OrderListRun orderList(){ return orderList; }
+  public OrderListExecuter orderList(){ return orderList; }
   
   public void addDispatchOrder(GralDispatchCallbackWorker order){ orderList.addDispatchOrder(order); }
 

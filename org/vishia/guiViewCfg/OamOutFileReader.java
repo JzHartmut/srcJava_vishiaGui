@@ -61,9 +61,9 @@ public class OamOutFileReader
 	{ this.log = log;
 		//this.showValues = showValues;
 		accessOamVariable = new ByteDataSymbolicAccessReadConfig(log);
-	  dataAccess.assignEmpty(binData);
+	  dataAccess.assignClear(binData);
 		dataAccess.setBigEndian(true);
-		dataAccessUcell.assignEmpty(binDataUcell);
+		dataAccessUcell.assignClear(binDataUcell);
 		dataAccessUcell.setBigEndian(true);
 		fileOam = new File(sFileOamValues);
 	
