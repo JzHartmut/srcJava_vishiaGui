@@ -100,7 +100,7 @@ public class FcmdStatusLine
     info.append(sDate)/*.append(" = ").append(lastModified)*/.append(", length= ").append(sLenShort);
     if(file instanceof FileRemote){
       FileRemote filer = file;
-      info.append(" ").append(filer.ident()).append(" flags=0x")
+      info.append(" #").append(filer.ident()).append(" flags=0x")
       .append(Integer.toHexString(filer.getFlags()));
       if(file.mark !=null){
         info.append(" sel=").append(Integer.toHexString(file.mark.getMark()));

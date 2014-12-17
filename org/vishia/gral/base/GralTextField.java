@@ -129,12 +129,22 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   
   
   
-  public void setPrompt(String sPrompt, String sPromptStylePosition){
+  public void setPrompt(String sPrompt){
     this.sPrompt = sPrompt;
-    this.sPromptStylePosition = sPromptStylePosition;
     if(wdgImpl !=null){
       dyda.setChanged(GraphicImplAccess.chgPrompt);
       repaint();
+    } else {
+      this.sPromptStylePosition = "t";
+    }
+  }
+  
+  
+  public void setPrompt(String sPrompt, String sPromptPos){
+    this.sPrompt = sPrompt;
+    this.sPromptStylePosition = sPromptPos;
+    if(wdgImpl !=null){
+      throw new IllegalStateException("setPrompt(prompt, style) can only applied on creation, use setPrompt(text) to change the prompt.");
     }
   }
   

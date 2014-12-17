@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.vishia.byteData.VariableAccessWithIdx;
+import org.vishia.gral.base.GralButton.GraphicImplAccess;
 import org.vishia.gral.base.GralKeyListener;
 import org.vishia.gral.base.GralMouseWidgetAction_ifc;
 import org.vishia.gral.base.GralPos;
@@ -309,6 +310,10 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
         }
         if((chg & chgCursor) !=0){ 
           textFieldSwt.setSelection(caretPos());
+        }
+        if((chg & chgPrompt) !=0){ 
+          promptSwt.setText(this.prompt());
+          promptSwt.redraw();
         }
         if((chg & chgColorText) !=0){ textFieldSwt.setForeground(swtWidgHelper.mng.getColorImpl(dyda().textColor)); }
         if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(swtWidgHelper.mng.getColorImpl(dyda().backColor)); }

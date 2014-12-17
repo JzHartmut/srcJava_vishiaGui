@@ -20,6 +20,7 @@ import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.widget.GralSwitchExclusiveButtonMng;
 import org.vishia.util.FileCompare;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
@@ -293,14 +294,14 @@ public class FcmdCopyCmd
 
     main.gralMng.setPosition(-13, GralPos.size+2.5f, -13f, -1, 0, 'd', 0.3f);
     widgButtonCmpr = main.gralMng.addSwitchButton(null, "compare ?", "Compare", GralColor.getColor("wh"), GralColor.getColor("lgn"));
-    widgButtonCmpr.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.ok.");
+    widgButtonCmpr.setActionChange(actionButtonCmprDelMove);
+    widgButtonCmpr.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.fn.");
     widgButtonDel = main.gralMng.addSwitchButton("buttonDel", "delete ?", "Delete", GralColor.getColor("wh"), GralColor.getColor("lgn"));
-    widgButtonDel.setActionChange(actionButtonDelMove);
-    widgButtonDel.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.ok.");
+    widgButtonDel.setActionChange(actionButtonCmprDelMove);
+    widgButtonDel.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.fn.");
     widgButtonMove = main.gralMng.addSwitchButton("copyMove", "move ?", "Move/ ?copy", GralColor.getColor("wh"), GralColor.getColor("lgn"));
-    widgButtonMove.setActionChange(actionButtonDelMove);
-    widgButtonMove.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.ok.");
-    widgButtonMove.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.ok.");
+    widgButtonMove.setActionChange(actionButtonCmprDelMove);
+    widgButtonMove.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.fn.");
     main.gralMng.setPosition(-4, GralPos.size+3.5f, -13f, -1, 0, 'd', 0.4f);
     widgButtonOk = main.gralMng.addButton("copyOk", actionButtonOk, "close", null, "close");
     widgButtonOk.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.ok.");
@@ -331,7 +332,7 @@ public class FcmdCopyCmd
     widgButtonEsc.setText("abort");
     //widgButtonEsc.setCmd("abort");
     String sSrcMask= widgFromConditions.getText();
-    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackCopy, null, evSrc);
+    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackFromFileMachine, null, evSrc);
     //listEvCheck.add(callback);
     fileSrc.check(sFilesSrc, sSrcMask, callback);   //callback.use() will be called on response
   }
@@ -356,6 +357,22 @@ public class FcmdCopyCmd
   } 
   
   
+  protected void execCompare(){
+    sDstDir = widgCopyDirDst.getText();
+    FileRemote fileDst;
+    if(FileSystem.isAbsolutePathOrDrive(sDstDir)) {
+      fileDst = main.fileCluster.getDir(sDstDir);  //maybe a file or directory
+    } else {
+      fileDst = dirSrc.child(sDstDir);  //relative to source
+    }
+    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackFromFileMachine, null, evSrc);
+    //fileSrc.moveTo(sFilesSrc, fileDst, callback);
+    FileRemote.cmpFiles(fileSrc, fileDst, callback); ////
+    setTexts(Estate.busy);
+    ///
+  }
+  
+  
   protected void execMove(){
     sDstDir = widgCopyDirDst.getText();
     FileRemote fileDst;
@@ -364,7 +381,7 @@ public class FcmdCopyCmd
     } else {
       fileDst = dirSrc.child(sDstDir);  //relative to source
     }
-    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackCopy, null, evSrc);
+    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackFromFileMachine, null, evSrc);
     fileSrc.moveTo(sFilesSrc, fileDst, callback);
     setTexts(Estate.busy);
     ///
@@ -377,7 +394,7 @@ public class FcmdCopyCmd
       assert(state == Estate.checked);
       fileSrc.deleteChecked(evCurrentFile, 0);      
     } else if(state == Estate.start){
-      FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackCopy, null, evSrc);
+      FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackFromFileMachine, null, evSrc);
       //fileSrc.deleteChecked(callback, 0);
     }
     //setTexts(Estate.finit);  //TODO
@@ -404,26 +421,44 @@ public class FcmdCopyCmd
   }
   
   
+  /**Set the texts to any widgets depending on the state of execution and the activated switch key.
+   * @param newState
+   */
   void setTexts( Estate newState){
     state = newState;
+    //Texts depending from pressed command button:
     String[][] textOk = 
-    { { "check del", "move", "check copy" }
-    , { "check del", "move", "check copy" }
-    , { "busy check", "busy check", "busy check" }
-    , { "del checked", "move checked", "copy checked" } 
-    , { "pause del", "pause move", "pause copy" }
-    , { "close del", "close move", "close copy" }
+    { { "check del"  , "move"        , "check copy", "compare" }
+    , { "check del"  , "move"        , "check copy", "compare" }
+    , { "busy check" , "busy check"  , "busy check", "compare" }
+    , { "del checked", "move checked", "copy checked", "compare" } 
+    , { "pause del"  , "pause move"  , "pause copy", "pause cmpr" }
+    , { "close del"  , "close move"  , "close copy", "close cmpr"  }
     };
     String[][] textSrc = 
     { { "set src + dst", "set src + dst", "busy check", "set src + dst", "busy", "set src + dst" }
     , { "set dst", "set dst", "busy check", "set dst", "busy", "set dst" }
     };
-    String[] textAbort = 
-    { "abort", "abort", "abort", "abort", "abort", "close" };
+    String[] textAbort = { "abort"      , "abort"       , "abort"      , "abort", "abort", "close" };
+    String[] textDest =  { "---"        , "---"         , "destination", "to compare with"  };
+    
     int ix1;
-    if(widgButtonDel.isOn()){ ix1=0; cmd = Ecmd.delete; }
-    else if(widgButtonMove.isOn()) { ix1 = 1; cmd = Ecmd.move; }
-    else { ix1 = 2; cmd = Ecmd.copy; }
+    if(widgButtonCmpr.isOn()){ 
+      ix1 = 3; cmd = Ecmd.compare; 
+      widgButtonDel.setState(GralButton.State.Off);
+      widgButtonMove.setState(GralButton.State.Off);
+      widgCopyDirDst.setPrompt(textDest[ix1]);
+    } else if(widgButtonDel.isOn()){ 
+      ix1=0; cmd = Ecmd.delete; 
+      widgButtonMove.setState(GralButton.State.Off);
+      widgCopyDirDst.setPrompt(textDest[ix1]);
+    } else if(widgButtonMove.isOn()) { 
+      ix1 = 1; cmd = Ecmd.move; 
+      widgCopyDirDst.setPrompt(textDest[ix1]);
+    } else { 
+      ix1 = 2; cmd = Ecmd.copy; 
+      widgCopyDirDst.setPrompt(textDest[ix1]);
+    }
     int ix2;
     GralButton.State checkDisable;
     boolean setSrcPossible;
@@ -699,7 +734,7 @@ public class FcmdCopyCmd
     * The OK-key is designated to "check". On button pressed the {@link #actionButtonCopy} is called,
     * with the "check" case.
     */
-   GralUserAction actionButtonDelMove = new GralUserAction("actionButtonDel")
+   GralUserAction actionButtonCmprDelMove = new GralUserAction("actionButtonDel")
    {
      /**Opens the confirm-copy window and fills its fields to ask the user whether confirm.
       * @param dst The path which is selected as destination. It may be a directory or a file
@@ -746,12 +781,15 @@ public class FcmdCopyCmd
             execMove();
           } else if(cmd == Ecmd.delete){
             execCheck();
+          }else if(cmd == Ecmd.compare){
+            execCompare();
           }
         } else if(state == Estate.checked) { //widgg.sCmd.equals("copy")) {
           switch(cmd){
             case copy: execCopy(); break;
             case move: execMove(); break; 
             case delete: execDel(); break;
+            case compare: execCompare(); break;
           }//switch
         } else if(state == Estate.finit) { //widgg.sCmd.equals("close")){
           closeWindow();
@@ -954,11 +992,14 @@ public class FcmdCopyCmd
   
   
   
-  /**The method which is invoked on callback of any action copy, check, move
-   * and their intermediate message. 
-   * 
+  /**Instance of an event consumer which is used for all callback actions from the FileRemote machine.
+   * The given event contains a command which depends on the action which is done by the file state machine or the file process.
+   * Especially
+   * <ul>
+   * <li>{@link FileRemote.CallbackCmd#nrofFilesAndBytes}: shows the progress of the action. 
+   * </ul>
    */
-  EventConsumer callbackCopy = new EventConsumer(){
+  EventConsumer callbackFromFileMachine = new EventConsumer(){
     @Override public int processEvent(Event<?,?> ev)
     {
       FileRemote.CallbackEvent ev1 = (FileRemote.CallbackEvent)ev;
@@ -1059,7 +1100,7 @@ public class FcmdCopyCmd
 
   enum Estate{ inactive, start, checked, busyCheck, busy, quest, error, finit};
   
-  enum Ecmd{ copy, move, delete};
+  enum Ecmd{ copy, move, delete, compare};
   
   void stop(){}
   

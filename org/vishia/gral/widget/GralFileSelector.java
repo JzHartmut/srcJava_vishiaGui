@@ -1432,8 +1432,12 @@ public class GralFileSelector implements Removeable //extends GralWidget
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
     //if(fileCard !=null){
     if(currentFile !=null){
-      currentFile.resetMarkedRecurs(0xffffffff, null);
-      currentFile.setDirShouldRefresh();
+      Thread run1 = new Thread("actionDeselectDirtree") {
+        @Override public void run() {
+          currentFile.resetMarkedRecurs(0xffffffff, null);
+          currentFile.setDirShouldRefresh();
+      } };
+      run1.start();
     }
     return true;
   } };
