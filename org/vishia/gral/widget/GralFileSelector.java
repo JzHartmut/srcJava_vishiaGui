@@ -18,6 +18,7 @@ import org.vishia.fileRemote.FileAccessZip;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.fileRemote.FileRemoteAccessor;
+import org.vishia.fileRemote.FileRemoteCallback;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelContent;
@@ -1291,7 +1292,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   
-  public FileRemoteAccessor.CallbackFile callbackChildren1 = new FileRemoteAccessor.CallbackFile()
+  public FileRemoteCallback callbackChildren1 = new FileRemoteCallback()
   {
 
     @Override public void start(){}
