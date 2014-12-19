@@ -17,6 +17,7 @@ import org.vishia.event.EventSource;
 import org.vishia.fileRemote.FileAccessZip;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
+import org.vishia.fileRemote.FileRemoteAccessor;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelContent;
@@ -826,7 +827,11 @@ public class GralFileSelector implements Removeable //extends GralWidget
   }
   
 
-  
+  public void forcefillIn(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
+  {
+    fillinPending = false;
+    fillIn(fileIn, bCompleteWithFileInfo);
+  }
   
   /**Fills the content with given directory.
    * If the same directory was refreshed in a short time before, it is not refreshed here.
@@ -899,7 +904,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
       ////
       evBackChildren.depth = 1;
       evBackChildren.filter = null;
-      if(!dir.getChildren(evBackChildren)){
+      dir.refreshPropertiesAndChildren(callbackChildren1);
+      if(false && !dir.getChildren(evBackChildren)){
         System.err.println("GralFileSelector - fillIn hangs;");
         return;
       }
@@ -907,6 +913,67 @@ public class GralFileSelector implements Removeable //extends GralWidget
   }
   
   
+  
+  /**This routine is invoked in callback.
+   * @param file1
+   */
+  void showFile(FileRemote file1)
+  {
+    String key = buildKey(file1, true, null);
+    boolean[] found = new boolean[1];
+    GralTableLine_ifc<FileRemote> tline = idxLines.search(key, false, found);
+    
+    if(!found[0]){ //no such line with this file
+      String name = file1.getName();  //use the file name as key in the table for the table line.
+      if(tline ==null){
+        //on empty table, first line.
+        tline = selectList.wdgdTable.insertLine(name, 0, null, file1);
+      }else {
+        //insert after found line.
+        tline = tline.addNextLine(name, null, file1);
+      }
+      tline.setCellText(file1.getName(), kColFilename);
+      idxLines.add(key, tline);
+    }
+    completeLine(tline, file1, System.currentTimeMillis());
+    tline.setBackColor(colorBack, -1); //set for the whole line.
+    ////
+    //System.out.println(file.getAbsolutePath());
+  }
+  
+  
+  
+  void finishCallback()
+  {
+    System.out.println("FcmdFileCard - finish fillin; " + sCurrentDir);
+    Iterator<Map.Entry<String, GralTableLine_ifc<FileRemote>>> iter = idxLines.entrySet().iterator();
+    while(iter.hasNext()){
+      Map.Entry<String, GralTableLine_ifc<FileRemote>> entry = iter.next();
+      GralTableLine_ifc<FileRemote> tline = entry.getValue();
+      if(tline.getBackColor(-1) == colorBackPending){
+        selectList.wdgdTable.deleteLine(tline);  //it is a non existing one yet.
+        iter.remove();
+      }
+    }
+    selectList.wdgdTable.setBackColor(colorBack, GralTable_ifc.kEmptyArea);
+    if(currentFile == null){
+      currentFile = indexSelection.get(sCurrentDir);
+    }
+    GralTableLine_ifc<FileRemote> tline;
+    if(currentFile !=null){
+      String key = buildKey(currentFile, true, null);
+      tline = idxLines.search(key); //maybe line before
+    } else {
+      tline = null;  //first line is selected
+    }
+    if(tline !=null){
+      selectList.wdgdTable.setCurrentLine(tline, -3, 1);  
+      currentFile = tline.getUserData();  //adjust the file if the currentFile was not found exactly.
+    }
+    selectList.wdgdTable.repaint(100, 200);
+    fillinPending = false;
+    
+  }
   
   
   /**Callback method if the file system offers one or some file after call of {@link #fillIn(FileRemote, boolean)}.
@@ -919,57 +986,12 @@ public class GralFileSelector implements Removeable //extends GralWidget
     ////
     FileRemote file1;
     while((file1 = evBack.poll())!=null){
-      String key = buildKey(file1, true, null);
-      boolean[] found = new boolean[1];
-      GralTableLine_ifc<FileRemote> tline = idxLines.search(key, false, found);
-      
-      if(!found[0]){ //no such line with this file
-        String name = file1.getName();  //use the file name as key in the table for the table line.
-        if(tline ==null){
-          //on empty table, first line.
-          tline = selectList.wdgdTable.insertLine(name, 0, null, file1);
-        }else {
-          //insert after found line.
-          tline = tline.addNextLine(name, null, file1);
-        }
-        tline.setCellText(file1.getName(), kColFilename);
-        idxLines.add(key, tline);
-      }
-      completeLine(tline, file1, System.currentTimeMillis());
-      tline.setBackColor(colorBack, -1); //set for the whole line.
-      ////
-      //System.out.println(file.getAbsolutePath());
+      showFile(file1);
       
     }
     if(evBack.isFinished()){
       evBack.srcFile = null;  //it is free for reuse.
-      System.out.println("FcmdFileCard - finish fillin; " + sCurrentDir);
-      Iterator<Map.Entry<String, GralTableLine_ifc<FileRemote>>> iter = idxLines.entrySet().iterator();
-      while(iter.hasNext()){
-        Map.Entry<String, GralTableLine_ifc<FileRemote>> entry = iter.next();
-        GralTableLine_ifc<FileRemote> tline = entry.getValue();
-        if(tline.getBackColor(-1) == colorBackPending){
-          selectList.wdgdTable.deleteLine(tline);  //it is a non existing one yet.
-          iter.remove();
-        }
-      }
-      selectList.wdgdTable.setBackColor(colorBack, GralTable_ifc.kEmptyArea);
-      if(currentFile == null){
-        currentFile = indexSelection.get(sCurrentDir);
-      }
-      GralTableLine_ifc<FileRemote> tline;
-      if(currentFile !=null){
-        String key = buildKey(currentFile, true, null);
-        tline = idxLines.search(key); //maybe line before
-      } else {
-        tline = null;  //first line is selected
-      }
-      if(tline !=null){
-        selectList.wdgdTable.setCurrentLine(tline, -3, 1);  
-        currentFile = tline.getUserData();  //adjust the file if the currentFile was not found exactly.
-      }
-      selectList.wdgdTable.repaint(100, 200);
-      fillinPending = false;
+      finishCallback();
     }
     return 1;
   }
@@ -1142,7 +1164,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   }
   
   
-  public FileRemote getCurrentDir(){ return currentDir; }
+  //public FileRemote getCurrentDir(){ return currentDir; }
 
   
   /**Gets the selected file from this panel.
@@ -1232,7 +1254,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
    */
   public FileRemote currentDir(){ return currentDir; }
   
-  
+  /**same as {@link #currentDir()}. */
+  public FileRemote getCurrentDir(){ return currentDir; }
   
   
   
@@ -1265,6 +1288,35 @@ public class GralFileSelector implements Removeable //extends GralWidget
     return false;
   }
 
+  
+  
+  
+  public FileRemoteAccessor.CallbackFile callbackChildren1 = new FileRemoteAccessor.CallbackFile()
+  {
+
+    @Override public void start(){}
+
+    @Override public Result offerDir(FileRemote file) {
+      //showFile(file);
+      return Result.cont; 
+    }
+
+    @Override public Result finishedDir(FileRemote file) {return Result.cont; }
+
+    @Override public Result offerFile(FileRemote file)
+    {  showFile(file);
+      return Result.cont;
+    }
+
+    @Override public void finished()
+    {
+      finishCallback();
+    }
+
+    @Override public boolean shouldAborted()
+    { return false;
+    }
+  };
   
   
   /**This callback class fills the {@link GralFileSelector#selectList}.{@link GralSelectList#wdgdTable}

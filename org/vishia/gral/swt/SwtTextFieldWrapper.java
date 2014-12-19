@@ -170,7 +170,6 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     textFieldSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
     textFieldSwt.setEditable(widgg.isEditable());
     textFieldSwt.setBackground(mng.propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));
-    textFieldSwt.addFocusListener(mng.focusListener);
     KeyListener swtKeyListener = new TextFieldKeyListener(mng._impl.gralKeyListener);
     textFieldSwt.addKeyListener(swtKeyListener);
     
@@ -308,6 +307,9 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
             textFieldSwt.setFont(props.fontSwt(dyda.textFont));
           }
         }
+        if((chg & chgEditable) !=0){ 
+          textFieldSwt.setEditable(widgg.isEditable());
+        }
         if((chg & chgCursor) !=0){ 
           textFieldSwt.setSelection(caretPos());
         }
@@ -424,11 +426,14 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   protected class TextFieldModifyListener implements ModifyListener{
     @Override public void modifyText(ModifyEvent ev) {
       String text = textFieldSwt.getText();
-      SwtTextFieldWrapper.super.dyda().displayedText = text;
-      //System.out.println("actionText");
-      //SwtTextFieldWrapper.super.caretPos = textFieldSwt.getCaretPosition();
-      if(actionChanging() != null){
-        actionChanging().exec(KeyCode.valueChanged, widgg, text);
+      GralWidget.DynamicData dyda = SwtTextFieldWrapper.super.dyda();
+      if(! text.equals(dyda.displayedText)) {
+        dyda.displayedText = text;
+        //System.out.println("actionText");
+        //SwtTextFieldWrapper.super.caretPos = textFieldSwt.getCaretPosition();
+        if(actionChanging() != null){
+          actionChanging().exec(KeyCode.valueChanged, widgg, text);
+        }
       }
       //if(dyda.displayedText !=null){
         //textFieldSwt.setText(dyda.displayedText);

@@ -21,6 +21,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralSwitchExclusiveButtonMng;
+import org.vishia.util.Debugutil;
 import org.vishia.util.FileCompare;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
@@ -57,7 +58,7 @@ public class FcmdCopyCmd
   
   //GralWidget widgdCopyFrom, widgdCopyTo;
   
-  GralTextField widgCopyFrom, widgFromConditions, widgCopyDirDst, widgCopyNameDst, widgCopyState;
+  GralTextField widgShowSrc, widgFromConditions, widgInputDst, widgCopyNameDst, widgCopyState;
   
   GralButton widgdChoiceCreateNew, widgdChoiceOverwrExists, widgdChoiceOverwrReadOnly;
   
@@ -73,6 +74,12 @@ public class FcmdCopyCmd
   
   GralButton widgButtonEsc;
 
+  GralColor colorNoChangedText = GralColor.getColor("am");
+  
+  GralColor colorChangedText = GralColor.getColor("wh");
+  
+  GralColor colorGrayed = GralColor.getColor("gr");
+  
   /**Mode overwrite readonly. '?'-ask, y-overwrite n-skip, don't ask
    */
   int modeOverwrReadonly = FileRemote.modeCopyReadOnlyAks;
@@ -96,12 +103,21 @@ public class FcmdCopyCmd
    * Elsewhere it is "". */
   String sFilesSrc;
   
-  /**The destination directory where the source files should copy to. 
+  /**The destination selected directory and file as destination for compare and move or second tree for comparison. 
+   * The fileDst is build with the name of the source file for copy and move and with the real dst file for compare
    */
-  FileRemote fileDstDir;
+  FileRemote dirDst; //, dirDstCmpr;
+
+  /**Name of the file for dst. */
+  CharSequence sFileDstCopy;
+  
+  StringBuilder bufferDstChars = new StringBuilder(100);
+  
+  /**If true then the {@link #widgInputDst} was changed for this session. Not automatically change the content. */
+  boolean bDstChanged;
 
   /**Content from the input fields while copy is pending. */
-  String sDstDir, sDstName;
+  //String sDstDir, sDstName;
   
   long zBytes, zFiles;
   
@@ -180,7 +196,7 @@ public class FcmdCopyCmd
 
     posWindConfirmCopy = main.gralMng.getPositionInPanel();
     int windprops = GralWindow.windConcurrently; // + GralWindow.windResizeable;
-    windConfirmCopy = main.gralMng.createWindow("copyWindow", "confirm copy", windprops);
+    windConfirmCopy = main.gralMng.createWindow("copyWindow", "confirm copy / move / delete / compare", windprops);
     //System.out.println(" window: " + main.gralMng.pos.panel.getPixelPositionSize().toString());
     
     //source path and check:
@@ -195,9 +211,9 @@ public class FcmdCopyCmd
     
     main.gralMng.setPosition(2.5f, GralPos.size +3.2f, 1, -4, 0, 'd', 0);
     //main.gralMng.addText("source:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    widgCopyFrom = main.gralMng.addTextField("copyFrom", false, "source root path", "t");
-    widgCopyFrom.setBackColor(GralColor.getColor("am"),0);
-    widgCopyFrom.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.pathSrc.");
+    widgShowSrc = main.gralMng.addTextField("copyFrom", false, "source root path", "t");
+    widgShowSrc.setBackColor(GralColor.getColor("am"),0);
+    widgShowSrc.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.pathSrc.");
     main.gralMng.setPosition(GralPos.refer+0.9f, GralPos.size +2.5f, -4f, -1, 0, 'r', 1);
     widgButtonShowSrc = main.gralMng.addButton(null, null, "showSrc", null, "=>" );
     widgButtonShowSrc.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.show.");
@@ -221,8 +237,9 @@ public class FcmdCopyCmd
     
     //dst path, set dst
     main.gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size +3.2f, 1, -4, 0, 'r', 0);
-    widgCopyDirDst = main.gralMng.addTextField("copyDirDst", true, "destination:", "t");
-    widgCopyDirDst.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.setDst.");
+    widgInputDst = main.gralMng.addTextField("copyDirDst", true, "destination:", "t");
+    widgInputDst.setActionChange(actionEnterTextInDst);
+    widgInputDst.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.setDst.");
     main.gralMng.setPosition(GralPos.refer+0.9f, GralPos.size +2.5f, -4, -1, 0, 'r', 1);
     widgButtonShowDst = main.gralMng.addButton(null, null, "showDst", null, "=>" );
     widgButtonShowDst.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.show.");
@@ -233,13 +250,13 @@ public class FcmdCopyCmd
     
     //widgButtonShowDst = main.gralMng.addButton(null, null, "show" );
 
-    //status
+    //field for showing the current action or state, not for input:
     main.gralMng.setPosition(GralPos.refer+2.6f, GralPos.size +3.2f, 1, -1, 0, 'd', 0.3f); //same line as del
     widgCopyState = main.gralMng.addTextField("copyStatus", false, "current state:", "t");
     widgCopyState.setBackColor(GralColor.getColor("lam"),0);
     widgCopyState.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.copy.state.");
     
-    //widgCopyDirDst.setBackColor(GralColor.getColor("am"),0);
+    //field for showing the current name, not for input:
     main.gralMng.setPosition(GralPos.refer + 3.5f, GralPos.size +3.2f, 1, -4.5f, 0, 'r', 1);
     widgCopyNameDst = main.gralMng.addTextField("copyNameDst", false, "current file:", "t");
     widgCopyNameDst.setBackColor(GralColor.getColor("lam"),0);
@@ -346,19 +363,29 @@ public class FcmdCopyCmd
     //widgButtonOk.setCmd("busy");
     widgButtonEsc.setText("abort");
     //widgButtonEsc.setCmd("abort");
-    sDstName = widgCopyNameDst.getText();
-    sDstDir = widgCopyDirDst.getText();
+    //sDstName = widgCopyNameDst.getText();
+    String sDst = widgInputDst.getText();
+    String sDstDir, sDstMask;
+    int posWildcard = sDst.indexOf('*');
+    if(posWildcard >0) {
+      int posSep = sDst.lastIndexOf('/', posWildcard);
+      sDstDir = sDst.substring(0, posSep+1);
+      sDstMask = sDst.substring(posSep+1);
+    } else {
+      sDstDir = sDst;
+      sDstMask = null;
+    }
     if(!FileSystem.isAbsolutePathOrDrive(sDstDir)) {
       sDstDir = dirSrc.getAbsolutePath() + "/" + sDstDir;
     }
     FileRemote dirDst = main.fileCluster.getFile(sDstDir, null); //new FileRemote(sDirSrc);
-    dirDst.copyChecked(evCurrentFile, modeCopy());
+    dirDst.copyChecked(evCurrentFile, sDstMask, modeCopy());
     setTexts(Estate.busy);
   } 
   
   
   protected void execCompare(){
-    sDstDir = widgCopyDirDst.getText();
+    String sDstDir = widgInputDst.getText();
     FileRemote fileDst;
     if(FileSystem.isAbsolutePathOrDrive(sDstDir)) {
       fileDst = main.fileCluster.getDir(sDstDir);  //maybe a file or directory
@@ -374,7 +401,7 @@ public class FcmdCopyCmd
   
   
   protected void execMove(){
-    sDstDir = widgCopyDirDst.getText();
+    String sDstDir = widgInputDst.getText();
     FileRemote fileDst;
     if(FileSystem.isAbsolutePathOrDrive(sDstDir)) {
       fileDst = main.fileCluster.getDir(sDstDir);  //maybe a file or directory
@@ -407,7 +434,7 @@ public class FcmdCopyCmd
       ev.copyAbortAll();
       //ev.sendEvent(FileRemote.cmdAbortAll);
     }
-    String sDirSrc = widgCopyFrom.getText();
+    String sDirSrc = widgShowSrc.getText();
     //FileRemote dirSrc = main.fileCluster.getFile(sDirSrc, null); //new FileRemote(sDirSrc);
     if(dirSrc !=null) { dirSrc.abortAction(); }  //to set stateMachine of copy in ready state 
     listEvCheck.clear();
@@ -439,26 +466,33 @@ public class FcmdCopyCmd
     { { "set src + dst", "set src + dst", "busy check", "set src + dst", "busy", "set src + dst" }
     , { "set dst", "set dst", "busy check", "set dst", "busy", "set dst" }
     };
-    String[] textAbort = { "abort"      , "abort"       , "abort"      , "abort", "abort", "close" };
-    String[] textDest =  { "---"        , "---"         , "destination", "to compare with"  };
+    String[] textAbort = { "abort"         , "abort"       , "abort"        , "abort", "abort", "close" };
+    String[] textDest =  { "---"           , "move to"     , "copy to"      , "compare with"  };
+    String[] sTitle =    { "processing ...", "confirm move", "confirm copy ", "confirm compare", "close"  };
     
     int ix1;
     if(widgButtonCmpr.isOn()){ 
       ix1 = 3; cmd = Ecmd.compare; 
       widgButtonDel.setState(GralButton.State.Off);
       widgButtonMove.setState(GralButton.State.Off);
-      widgCopyDirDst.setPrompt(textDest[ix1]);
+      widgInputDst.setEditable(true);
+      widgInputDst.setBackColor(bDstChanged ? colorChangedText : colorNoChangedText, 0);
     } else if(widgButtonDel.isOn()){ 
       ix1=0; cmd = Ecmd.delete; 
       widgButtonMove.setState(GralButton.State.Off);
-      widgCopyDirDst.setPrompt(textDest[ix1]);
+      widgInputDst.setEditable(false);
+      widgInputDst.setBackColor(colorGrayed, 0);
     } else if(widgButtonMove.isOn()) { 
       ix1 = 1; cmd = Ecmd.move; 
-      widgCopyDirDst.setPrompt(textDest[ix1]);
+      widgInputDst.setEditable(true);
+      widgInputDst.setBackColor(bDstChanged ? colorChangedText : colorNoChangedText, 0);
     } else { 
       ix1 = 2; cmd = Ecmd.copy; 
-      widgCopyDirDst.setPrompt(textDest[ix1]);
+      widgInputDst.setEditable(true);
+      widgInputDst.setBackColor(bDstChanged ? colorChangedText : colorNoChangedText, 0);
     }
+    windConfirmCopy.setTitle(sTitle[ix1]);
+    widgInputDst.setPrompt(textDest[ix1]);
     int ix2;
     GralButton.State checkDisable;
     boolean setSrcPossible;
@@ -528,11 +562,17 @@ public class FcmdCopyCmd
               fileSrc = listFileSrc.get(0);
               dirSrc = fileSrc.getParentFile();
               sFilesSrc = "";  //only one file, 
-              widgCopyFrom.setText(fileSrc.getAbsolutePath());
-              
+              widgShowSrc.setText(fileSrc.getAbsolutePath());
+              if(fileSrc.isDirectory()) {
+                sFileDstCopy = "*";
+              } else {
+                sFileDstCopy = fileSrc.getName();  //name of source file as default for destination.
+              }
             } else {
+              //more as one file:
+              sFileDstCopy = "*";
               StringBuilder uFileSrc = new StringBuilder();
-              dirSrc = fileSrc = fileCardSrc.getCurrentDir();
+              dirSrc = fileSrc = fileCardSrc.currentDir();
               String sSep = "";
               for(FileRemote srcFile : listFileSrc){
                 srcFile.resetMarked(1);
@@ -543,37 +583,53 @@ public class FcmdCopyCmd
               }
               sFilesSrc = uFileSrc.toString();
               uFileSrc.insert(0, " : ").insert(0, fileSrc.getAbsolutePath());
-              widgCopyFrom.setText(uFileSrc);
+              widgShowSrc.setText(uFileSrc);
             }
-            sDstName = listFileSrc.size() >1 ? "*" 
-                       : listFileSrc.size() ==1 ? listFileSrc.get(0).getName() : "??";
+            //sDstName = listFileSrc.size() >1 ? "*" 
+            //           : listFileSrc.size() ==1 ? listFileSrc.get(0).getName() : "??";
             //sSrc = fileSrc.getAbsolutePath() + "/" + sDstName;
             if(fileCardDst !=null){
-              fileDstDir = fileCardDst.getCurrentDir();
-              sDstDir = fileDstDir.getAbsolutePath();
+              dirDst = fileCardDst.currentFile();
+              if(!dirDst.isDirectory()) {
+                dirDst = dirDst.getParentFile();  //a file selected, use the directory of the panel.
+              } else {
+                //dirDst.getPathChars(bufferDstChars);
+              }
+              dirDst.getPathChars(bufferDstChars).append('/').append(sFileDstCopy);
+              //dirDstCmpr = fileCardDst.currentFile();  //should be a directory, check later before compare.
+              //sDstDir = dirDst.getAbsolutePath();
             } else {
-              fileDstDir = null;
-              sDstDir = "??";
+              dirDst = null;
+              bufferDstChars.setLength(0); bufferDstChars.append("??");
+              //sDstDir = "??";
             }
             //bLockSrc = true;
             //widgFromConditions.setText("");
           } else { //FileCard not found:
             fileSrc = null;
-            fileDstDir = null;
+            dirDst = null;
+            bufferDstChars.setLength(0); bufferDstChars.append("??");
             
             //listFileSrc = null;
             //sSrc = "???";
-            sDstName = "??";
-            sDstDir = "??";
-            widgCopyFrom.setText("??");
+            //sDstName = "??";
+            //sDstDir = "??";
+            widgShowSrc.setText("??");
           }
+          /*
           String sTextDst = widgCopyDirDst.getText().trim();
           if(!sCmd.equals("setSrc") || sTextDst.length() == 0){
             //set the destination only if it is not set on button setSrc
             widgCopyDirDst.setText(sDstDir);
+            widgCopyDirDst.setBackColor(colorNoChangedText, 0);
+            bDstChanged = false;
             widgCopyNameDst.setText(sDstName);
           }
+          */
           boolean setVisible = true; //state == Estate.inactive;
+          bDstChanged = false;
+          widgInputDst.setBackColor(colorNoChangedText, 0);
+          widgInputDst.setText(bufferDstChars);
           setTexts(Estate.start);
           //widgButtonOk.setText("check");
           //widgButtonOk.setCmd("check");
@@ -626,19 +682,38 @@ public class FcmdCopyCmd
         GralButton widgb = (GralButton)(widgP);
         FcmdFileCard[] lastFileCards = main.getLastSelectedFileCards();
         fileCardDst = lastFileCards[0];
-        fileDstDir = fileCardDst.getCurrentDir();
-        CharSequence sText = sDstDir = fileDstDir.getAbsolutePath();
+        dirDst = fileCardDst.currentDir();
+        CharSequence sText = dirDst.getAbsolutePath();
         if(sFilesSrc == null || sFilesSrc.isEmpty()){
           StringBuilder u = new StringBuilder(sText);
           sText = u.append("/").append( fileSrc.getName());
         }
-        widgCopyDirDst.setText(sText);
+        widgInputDst.setText(sText);
       }
       return true;
     }
   };
   
   
+  protected GralUserAction actionEnterTextInDst = new GralUserAction("actionSelectMask")
+  { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params)
+    { if(key == KeyCode.valueChanged) {
+        String text = widgInputDst.getText();
+        if(StringFunctions.compare(text, bufferDstChars) ==0) {
+          //unchanged text or the original text again:
+          widgInputDst.setBackColor(colorNoChangedText, 0);
+          bDstChanged = false;
+        } else {
+          widgInputDst.setBackColor(colorChangedText, 0);
+          bDstChanged = true;
+        }
+      } else {
+        Debugutil.stop();
+      }
+      return true;
+    }
+  };
+
   GralUserAction actionOverwrReadonly = new GralUserAction("actionOverwrReadonly")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){

@@ -662,7 +662,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
  
   
   @Override public void setEditable(boolean editable){
-    bEditable = editable;
+    if(bEditable != editable) {
+      bEditable = editable;
+      dyda.setChanged(ImplAccess.chgEditable); 
+      repaint(repaintDelay, repaintDelayMax);
+    }
   }
 
   @Override public boolean isEditable(){ return bEditable; }
@@ -723,8 +727,16 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Sets the action in application context for processing of user handling for the widget.
    * Handling means, pressing button, user inputs of text fields
+   * The method {@link GralUserAction#exec(int, GralWidget_ifc, Object...)} will be called with following key codes:
+   * <ul>
+   * <li>{@link KeyCode#focusGained}, {@link KeyCode#focusLost} on enter and leave a text field.
+   * <li>{@link KeyCode#mouse1Down} etc, any mouse events on any widget.
+   * <li>{@link KeyCode#valueChanged} if the content of a text field is changed.
+   * <li>Some more TODO, set breakpoint in the routine.
+   * </ul> 
    * @param action any instance. Its action method is invoked depending of the type of widget
    *        usual if the user takes an action on screen, press button etc.
+   *        
    */
   public void setActionChange(GralUserAction action){ actionChanging = action; }
   
@@ -1353,6 +1365,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     
     /**What is changed in the dynamic data, see {@link GralWidget.DynamicData#whatIsChanged}. */  
     public static final int chgText = 1, chgColorBack=2, chgColorText=4, chgFont = 8, chgColorLine = 0x10;
+    
+    public static final int chgEditable = 0x20;
     
     public static final int chgVisibleInfo = 0x10000, chgObjects = 0x20000, chgFloat = 0x40000, chgIntg = 0x80000;
     

@@ -103,7 +103,7 @@ public class FcmdDelete
   void confirmDelete(File src111)
   { fileCard = main.getLastSelectedFileCards()[0];
     sFileDelete = null;
-    currentDirWhereDelete = fileCard.getCurrentDir();
+    currentDirWhereDelete = fileCard.currentDir();
     if(fileCard !=null){
       listFileDel = fileCard.getSelectedFiles(true, 1);
       int nrofFilesDel = listFileDel.size();
