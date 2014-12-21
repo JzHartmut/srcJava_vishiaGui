@@ -252,14 +252,14 @@ public class GralFileSelector implements Removeable //extends GralWidget
           String sName = line.getCellText(kColFilename);
           if(file.exists()) {                       //TODO: if the file is not refreshed, new network access, the GUI hangs a long time.
             if(sName.equals("..")){
-              currentFile = file.getParentFile();
-              currentDir = file;
+              currentFile = file; //.getParentFile();
+              currentDir = file;  //the same, the directory of this panel.
                 
             } else {
               currentDir = file.getParentFile();
               currentFile = file;
               String sDir = file.getParent();
-              indexSelection.put(sDir, file);
+              indexSelection.put(sDir, file);    //store the last selection.
             }
             //System.out.println("GralFileSelector: " + sDir + ":" + sName);
             if(actionOnFileSelected !=null){
@@ -915,7 +915,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   
-  /**This routine is invoked in callback.
+  /**This routine is invoked in callback of {@link #callbackChildren1} for {@link #fillIn(FileRemote, boolean)} in the refresh thread.
    * @param file1
    */
   void showFile(FileRemote file1)
@@ -1302,14 +1302,14 @@ public class GralFileSelector implements Removeable //extends GralWidget
       return Result.cont; 
     }
 
-    @Override public Result finishedDir(FileRemote file) {return Result.cont; }
+    @Override public Result finishedDir(FileRemote file, FileRemoteCallback.Counters cnt) {return Result.cont; }
 
     @Override public Result offerFile(FileRemote file)
     {  showFile(file);
       return Result.cont;
     }
 
-    @Override public void finished()
+    @Override public void finished(long nrofBytes, int nrofFiles)
     {
       finishCallback();
     }

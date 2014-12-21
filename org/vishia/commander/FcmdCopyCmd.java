@@ -7,7 +7,10 @@ import java.util.List;
 import org.vishia.event.Event;
 import org.vishia.event.EventConsumer;
 import org.vishia.event.EventSource;
+import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
+import org.vishia.fileRemote.FileRemoteCallback;
+import org.vishia.fileRemote.FileRemoteCallback.Result;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
@@ -116,6 +119,8 @@ public class FcmdCopyCmd
   /**If true then the {@link #widgInputDst} was changed for this session. Not automatically change the content. */
   boolean bDstChanged;
 
+  boolean bFirstSelect;
+  
   /**Content from the input fields while copy is pending. */
   //String sDstDir, sDstName;
   
@@ -355,6 +360,41 @@ public class FcmdCopyCmd
   }
   
   
+  void execMark(){
+    setTexts(Estate.busyCheck);
+    widgCopyState.setText("busy-check");
+    widgButtonOk.setText("busy-check");
+    widgButtonCheck.setState(GralButton.State.Disabled);
+    widgButtonEsc.setText("abort");
+    String sSrcMask= widgFromConditions.getText();
+    fileSrc.refreshAndMark(0, bFirstSelect, sSrcMask, FileMark.cmpFileDifferences, 0, callbackFromFilesCheck);
+    bFirstSelect = false;
+  }
+  
+  
+  protected void execDel(){
+    if(state == Estate.checked){
+      fileSrc.deleteMarked(FileMark.cmpFileDifferences, callbackFromFilesExec);      
+    } else if(state == Estate.start){
+    }
+  }
+  
+  
+  
+  protected void XXXexecDel(){
+    if(state == Estate.checked){
+      assert(evCurrentFile !=null);
+      assert(state == Estate.checked);
+      fileSrc.deleteChecked(evCurrentFile, 0);      
+    } else if(state == Estate.start){
+      FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackFromFileMachine, null, evSrc);
+      //fileSrc.deleteChecked(callback, 0);
+    }
+    //setTexts(Estate.finit);  //TODO
+    ///
+  }
+  
+  
   
   protected void execCopy(){
     //Starts the copy process (not move)
@@ -413,21 +453,6 @@ public class FcmdCopyCmd
     setTexts(Estate.busy);
     ///
   }
-  
-  
-  protected void execDel(){
-    if(state == Estate.checked){
-      assert(evCurrentFile !=null);
-      assert(state == Estate.checked);
-      fileSrc.deleteChecked(evCurrentFile, 0);      
-    } else if(state == Estate.start){
-      FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackFromFileMachine, null, evSrc);
-      //fileSrc.deleteChecked(callback, 0);
-    }
-    //setTexts(Estate.finit);  //TODO
-    ///
-  }
-  
   
   protected void abortCopy(){
     for(FileRemote.CallbackEvent ev: listEvCopy){
@@ -546,6 +571,7 @@ public class FcmdCopyCmd
         //if(state == Estate.start || state == Estate.checked || state == Estate.finit || state == Estate.error) {
         if(!widgButtonSetSrc.isDisabled()) {
           //only if it is ready to check, get the files.
+          bFirstSelect = true;
           filesToCopy.clear();
           listEvCheck.clear();
           listEvCopy.clear();
@@ -557,45 +583,55 @@ public class FcmdCopyCmd
             //widgButtonDst.setState(GralButton.kOff);  //maybe disabled, set off.
             List<FileRemote> listFileSrc = fileCardSrc.getSelectedFiles(true, 1);
             //String sDirSrc;
-            if(listFileSrc.size() ==1){
-              //only one file is selected:
-              fileSrc = listFileSrc.get(0);
-              dirSrc = fileSrc.getParentFile();
-              sFilesSrc = "";  //only one file, 
-              widgShowSrc.setText(fileSrc.getAbsolutePath());
-              if(fileSrc.isDirectory()) {
-                sFileDstCopy = "*";
-              } else {
-                sFileDstCopy = fileSrc.getName();  //name of source file as default for destination.
-              }
+            if(listFileSrc == null){
+              widgShowSrc.setText("??? listFileSrc==null");
+              
             } else {
-              //more as one file:
-              sFileDstCopy = "*";
-              StringBuilder uFileSrc = new StringBuilder();
-              dirSrc = fileSrc = fileCardSrc.currentDir();
-              String sSep = "";
-              for(FileRemote srcFile : listFileSrc){
-                srcFile.resetMarked(1);
-                uFileSrc.append(sSep).append(srcFile.getName());
-                sSep = " : "; //For next one.
-                //FileRemote fileSrc = FileRemote.fromFile(srcFile);
-                //filesToCopy.add(fileSrc);
+              if(listFileSrc.size() ==1){
+                //only one file is selected:
+                fileSrc = listFileSrc.get(0);
+                dirSrc = fileSrc.getParentFile();
+                sFilesSrc = "";  //only one file, 
+                widgShowSrc.setText(fileSrc.getAbsolutePath());
+                if(fileSrc.isDirectory()) {
+                  sFileDstCopy = "*";
+                } else {
+                  sFileDstCopy = fileSrc.getName();  //name of source file as default for destination.
+                }
+              } else {
+                //more as one file:
+                sFileDstCopy = "*";
+                StringBuilder uFileSrc = new StringBuilder();
+                dirSrc = fileSrc = fileCardSrc.currentDir();
+                String sSep = "";
+                for(FileRemote srcFile : listFileSrc){
+                  srcFile.resetMarked(1);
+                  uFileSrc.append(sSep).append(srcFile.getName());
+                  sSep = " : "; //For next one.
+                  //FileRemote fileSrc = FileRemote.fromFile(srcFile);
+                  //filesToCopy.add(fileSrc);
+                }
+                sFilesSrc = uFileSrc.toString();
+                uFileSrc.insert(0, " : ").insert(0, fileSrc.getAbsolutePath());
+                widgShowSrc.setText(uFileSrc);
               }
-              sFilesSrc = uFileSrc.toString();
-              uFileSrc.insert(0, " : ").insert(0, fileSrc.getAbsolutePath());
-              widgShowSrc.setText(uFileSrc);
             }
             //sDstName = listFileSrc.size() >1 ? "*" 
             //           : listFileSrc.size() ==1 ? listFileSrc.get(0).getName() : "??";
             //sSrc = fileSrc.getAbsolutePath() + "/" + sDstName;
             if(fileCardDst !=null){
               dirDst = fileCardDst.currentFile();
-              if(!dirDst.isDirectory()) {
-                dirDst = dirDst.getParentFile();  //a file selected, use the directory of the panel.
+              if(dirDst !=null) {
+                if(!dirDst.isDirectory()) {
+                  dirDst = dirDst.getParentFile();  //a file selected, use the directory of the panel.
+                } else {
+                  //dirDst.getPathChars(bufferDstChars);
+                }
+                bufferDstChars = dirDst.getPathChars(bufferDstChars).append('/').append(sFileDstCopy);
               } else {
-                //dirDst.getPathChars(bufferDstChars);
+                //not active filecard, only favorcard selected.
+                bufferDstChars.setLength(0); bufferDstChars.append("?? currFile==null");
               }
-              dirDst.getPathChars(bufferDstChars).append('/').append(sFileDstCopy);
               //dirDstCmpr = fileCardDst.currentFile();  //should be a directory, check later before compare.
               //sDstDir = dirDst.getAbsolutePath();
             } else {
@@ -667,7 +703,7 @@ public class FcmdCopyCmd
        if(KeyCode.isControlFunctionMouseUpOrMenu(key)){ 
          if(!widgButtonCheck.isDisabled()){
          //if(state == Estate.start || state == Estate.checked) { //widgg.sCmd.equals("check")){    
-           execCheck();
+           execMark();
          }
        }
        return true;
@@ -850,13 +886,13 @@ public class FcmdCopyCmd
   { @Override public boolean exec(int key, GralWidget_ifc widgg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if(state == Estate.start) { //widgg.sCmd.equals("check")){    
-          if(cmd == Ecmd.copy || bFineSelect){
+          if(cmd == Ecmd.delete){
+            execMark();
+          } else if(cmd == Ecmd.copy || bFineSelect){
             execCheck();
           } else if(cmd == Ecmd.move){
             execMove();
-          } else if(cmd == Ecmd.delete){
-            execCheck();
-          }else if(cmd == Ecmd.compare){
+          } else if(cmd == Ecmd.compare){
             execCompare();
           }
         } else if(state == Estate.checked) { //widgg.sCmd.equals("copy")) {
@@ -1173,6 +1209,71 @@ public class FcmdCopyCmd
 
   };
 
+  
+  
+  FileRemoteCallback callbackFromFilesCheck = new FileRemoteCallback() {
+    @Override public void start() {  }
+    @Override public Result offerDir(FileRemote file) {
+      return Result.cont;      
+    }
+    
+    @Override public Result finishedDir(FileRemote file, FileRemoteCallback.Counters cnt) {
+      return Result.cont;      
+    }
+    
+    
+
+    @Override public Result offerFile(FileRemote file) {
+      return Result.cont;
+    }
+
+    
+    @Override public boolean shouldAborted(){
+      return false;
+    }
+
+    @Override public void finished(long nrofBytes, int nrofFiles) {  
+      FcmdCopyCmd.this.zFiles = nrofFiles;
+      FcmdCopyCmd.this.zBytes = nrofBytes;
+      widgCopyState.setText("files:" + zFiles + ", size:" + zBytes);
+      setTexts(Estate.checked);
+    }
+
+
+  };
+  
+  
+  
+  FileRemoteCallback callbackFromFilesExec = new FileRemoteCallback() {
+    @Override public void start() {  }
+    @Override public Result offerDir(FileRemote file) {
+      return Result.cont;      
+    }
+    
+    @Override public Result finishedDir(FileRemote file, FileRemoteCallback.Counters cnt) {
+      return Result.cont;      
+    }
+    
+    
+
+    @Override public Result offerFile(FileRemote file) {
+      return Result.cont;
+    }
+
+    
+    @Override public boolean shouldAborted(){
+      return false;
+    }
+
+    @Override public void finished(long nrofBytes, int nrofFiles) {  
+      widgCopyState.setText("ok: " + nrofBytes/1000000 + " M / "  + nrofFiles + " Files");
+      setTexts(Estate.finit);
+    }
+
+
+  };
+  
+  
   enum Estate{ inactive, start, checked, busyCheck, busy, quest, error, finit};
   
   enum Ecmd{ copy, move, delete, compare};
