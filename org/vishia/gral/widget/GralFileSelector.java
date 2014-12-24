@@ -43,6 +43,7 @@ import org.vishia.util.IndexMultiTable;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
 import org.vishia.util.MarkMask_ifc;
+import org.vishia.util.SortedTreeWalkerCallback;
 import org.vishia.util.Timeshort;
 
 /**This class is a large widget which contains a list to select files in a directory, 
@@ -1297,21 +1298,21 @@ public class GralFileSelector implements Removeable //extends GralWidget
 
     @Override public void start(FileRemote startDir){}
 
-    @Override public Result offerDir(FileRemote file) {
+    @Override public Result offerParentNode(FileRemote file) {
       return Result.cont; 
     }
 
-    @Override public Result finishedDir(FileRemote file, FileRemoteCallback.Counters cnt) {
+    @Override public Result finishedParentNode(FileRemote file, FileRemoteCallback.Counters cnt) {
       //don't call showFile(file) because it is the parent which should be shown.
       return Result.cont; 
     }
 
-    @Override public Result offerFile(FileRemote file)
+    @Override public Result offerLeafNode(FileRemote file)
     { showFile(file);  //invoked also for dirs because depth=1
       return Result.cont;
     }
 
-    @Override public void finished(long nrofBytes, int nrofFiles)
+    @Override public void finished(FileRemote startDir, SortedTreeWalkerCallback.Counters cnt)
     {
       finishCallback();
     }

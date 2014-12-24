@@ -27,6 +27,7 @@ import org.vishia.util.Debugutil;
 import org.vishia.util.FileCompare;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
+import org.vishia.util.SortedTreeWalkerCallback;
 import org.vishia.util.StringFunctions;
 
 /**This class contains all functionality to execute copy and move for The.file.Commander.
@@ -1212,17 +1213,17 @@ public class FcmdCopyCmd
   
   FileRemoteCallback callbackFromFilesCheck = new FileRemoteCallback() {
     @Override public void start(FileRemote startDir) {  }
-    @Override public Result offerDir(FileRemote file) {
+    @Override public Result offerParentNode(FileRemote file) {
       return Result.cont;      
     }
     
-    @Override public Result finishedDir(FileRemote file, FileRemoteCallback.Counters cnt) {
+    @Override public Result finishedParentNode(FileRemote file, FileRemoteCallback.Counters cnt) {
       return Result.cont;      
     }
     
     
 
-    @Override public Result offerFile(FileRemote file) {
+    @Override public Result offerLeafNode(FileRemote file) {
       return Result.cont;
     }
 
@@ -1231,9 +1232,9 @@ public class FcmdCopyCmd
       return false;
     }
 
-    @Override public void finished(long nrofBytes, int nrofFiles) {  
-      FcmdCopyCmd.this.zFiles = nrofFiles;
-      FcmdCopyCmd.this.zBytes = nrofBytes;
+    @Override public void finished(FileRemote startDir, SortedTreeWalkerCallback.Counters cnt) {  
+      FcmdCopyCmd.this.zFiles = cnt.nrofLeafss;
+      FcmdCopyCmd.this.zBytes = cnt.nrofBytes;
       widgCopyState.setText("files:" + zFiles + ", size:" + zBytes);
       setTexts(Estate.checked);
     }
@@ -1246,17 +1247,17 @@ public class FcmdCopyCmd
   FileRemoteCallback callbackFromFilesExec = new FileRemoteCallback() {
     @Override public void start(FileRemote startDir) {  }
     
-    @Override public Result offerDir(FileRemote file) {
+    @Override public Result offerParentNode(FileRemote file) {
       return Result.cont;      
     }
     
-    @Override public Result finishedDir(FileRemote file, FileRemoteCallback.Counters cnt) {
+    @Override public Result finishedParentNode(FileRemote file, FileRemoteCallback.Counters cnt) {
       return Result.cont;      
     }
     
     
 
-    @Override public Result offerFile(FileRemote file) {
+    @Override public Result offerLeafNode(FileRemote file) {
       return Result.cont;
     }
 
@@ -1265,8 +1266,8 @@ public class FcmdCopyCmd
       return false;
     }
 
-    @Override public void finished(long nrofBytes, int nrofFiles) {  
-      widgCopyState.setText("ok: " + nrofBytes/1000000 + " M / "  + nrofFiles + " Files");
+    @Override public void finished(FileRemote startDir, SortedTreeWalkerCallback.Counters cnt) {  
+      widgCopyState.setText("ok: " + cnt.nrofBytes/1000000 + " M / "  + cnt.nrofLeafss + " Files");
       setTexts(Estate.finit);
     }
 
