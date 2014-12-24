@@ -689,9 +689,10 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         processKeys(keyCode);
       }
     } catch(Exception exc){
-      swtWidgHelper.mng.log.sendMsg(0, "Exception in SwtTable-KeyEvent; %s", exc.getLocalizedMessage());
-      CharSequence stackInfo = Assert.exceptionInfo("Gral - SwtTable;", exc, 1, 5);
-      System.err.append(stackInfo);
+      String txt = Assert.exceptionInfo("SwtTable - keyPressed Exception", exc, 0, 20, true).toString();
+      swtWidgHelper.mng.log.sendMsg(0, txt);
+      //CharSequence stackInfo = Assert.exceptionInfo("Gral - SwtTable;", exc, 1, 5);
+      //System.err.append(stackInfo);
       //exc.printStackTrace(System.out);
     }
     

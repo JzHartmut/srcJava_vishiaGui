@@ -1295,17 +1295,19 @@ public class GralFileSelector implements Removeable //extends GralWidget
   public FileRemoteCallback callbackChildren1 = new FileRemoteCallback()
   {
 
-    @Override public void start(){}
+    @Override public void start(FileRemote startDir){}
 
     @Override public Result offerDir(FileRemote file) {
-      //showFile(file);
       return Result.cont; 
     }
 
-    @Override public Result finishedDir(FileRemote file, FileRemoteCallback.Counters cnt) {return Result.cont; }
+    @Override public Result finishedDir(FileRemote file, FileRemoteCallback.Counters cnt) {
+      //don't call showFile(file) because it is the parent which should be shown.
+      return Result.cont; 
+    }
 
     @Override public Result offerFile(FileRemote file)
-    {  showFile(file);
+    { showFile(file);  //invoked also for dirs because depth=1
       return Result.cont;
     }
 

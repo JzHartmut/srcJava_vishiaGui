@@ -379,7 +379,7 @@ public class GralColor
    * <br>light colors: The more light version is designated with a "l" before the 2-letter color name.
    * <ul>
    * <li>"lgr", 0xd0d0d0);
-   * <li>"lrd", 0xff8080);
+   * <li>"lrd", 0xffa0a0);
    * <li>"lgn", 0x80ff80);
    * <li>"lbl", 0x8080ff);
    * <li>"lye", 0xffff00);
@@ -391,7 +391,7 @@ public class GralColor
    * <br>pastel colors, especially for background color. They are designates with "p" before the 2-letter color name.
    * <ul>
    * <li>"pgr", 0xf0f0f0);
-   * <li>"prd", 0xffe0e0);
+   * <li>"prd", 0xffd0d0);
    * <li>"pgn", 0xe0ffe0);
    * <li>"pbl", 0xe0e0ff);
    * <li>"pye", 0xffffa0);

@@ -10,7 +10,6 @@ import org.vishia.event.EventSource;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.fileRemote.FileRemoteCallback;
-import org.vishia.fileRemote.FileRemoteCallback.Result;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
@@ -367,14 +366,14 @@ public class FcmdCopyCmd
     widgButtonCheck.setState(GralButton.State.Disabled);
     widgButtonEsc.setText("abort");
     String sSrcMask= widgFromConditions.getText();
-    fileSrc.refreshAndMark(0, bFirstSelect, sSrcMask, FileMark.cmpFileDifferences, 0, callbackFromFilesCheck);
+    fileSrc.refreshAndMark(0, bFirstSelect, sSrcMask, FileMark.select, 0, callbackFromFilesCheck);
     bFirstSelect = false;
   }
   
   
   protected void execDel(){
     if(state == Estate.checked){
-      fileSrc.deleteMarked(FileMark.cmpFileDifferences, callbackFromFilesExec);      
+      fileSrc.deleteMarkedInThread(FileMark.select, callbackFromFilesExec);      
     } else if(state == Estate.start){
     }
   }
@@ -1212,7 +1211,7 @@ public class FcmdCopyCmd
   
   
   FileRemoteCallback callbackFromFilesCheck = new FileRemoteCallback() {
-    @Override public void start() {  }
+    @Override public void start(FileRemote startDir) {  }
     @Override public Result offerDir(FileRemote file) {
       return Result.cont;      
     }
@@ -1245,7 +1244,8 @@ public class FcmdCopyCmd
   
   
   FileRemoteCallback callbackFromFilesExec = new FileRemoteCallback() {
-    @Override public void start() {  }
+    @Override public void start(FileRemote startDir) {  }
+    
     @Override public Result offerDir(FileRemote file) {
       return Result.cont;      
     }

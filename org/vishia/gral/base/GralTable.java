@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.fileRemote.FileMark;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralRectangle;
@@ -88,6 +89,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2013-12-23 Hartmut chg: Rename {@link #setColorBackSelectedLine(GralColor)} instead setColorCurrLine(): 
+   *   It is not the current line which is changed but the color setting for all current (= selected) lines. 
    * <li>2013-12-23 Hartmut chg: {@link #checkAndUpdateText(String, CellData)} supports update text on edit cells.
    * <li>2013-12-18 Hartmut chg: {@link CellData} is defined now public and as part of GralTable. There were a problem
    *   using the Java7-Compiler with difficult Generic parameter mismatches. The CellData is a simple data class without
@@ -497,8 +500,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   void setColors(){
     colorBackSelect = GralColor.getColor("lam");
     colorBackSelectNew = GralColor.getColor("lbl");
-    colorBackMarked = GralColor.getColor("pcy");
-    colorBackSelectMarked = GralColor.getColor("lgn");
+    
+    colorBackMarked = GralColor.getColor("prd");
+    colorBackSelectMarked = GralColor.getColor("lrd");
+    
     colorBackSelectNewMarked = GralColor.getColor("lpu");
     dyda.backColor = GralColor.getColor("wh");
     dyda.backColorNoFocus = GralColor.getColor("pgr");
@@ -568,10 +573,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   
   
-  /**Sets the color of the current line. 
+  /**Sets the color of the currently selected line. 
    * @param color
    */
-  public void setColorCurrLine(GralColor color){ 
+  public void setColorBackSelectedLine(GralColor color){ 
     colorBackSelect = color; 
     repaint(100, 0);
   }
@@ -1044,11 +1049,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             ) {
             if(keyCode == keyMarkDn && lineSelected !=null){
               GralTableLine_ifc<?> line = lineSelected; //tableLines.get(ixLine);
-              if((line.getMark() & 1)!=0){
+              if((line.getMark() & FileMark.select)!=0){
                 //it is selected yet
-                line.setNonMarked(1, line.getUserData());
+                line.setNonMarked(FileMark.select, line.getUserData());
               } else {
-                line.setMarked(1, line.getUserData());
+                line.setMarked(FileMark.select, line.getUserData());
               }
             }
             if(!searchContent(false)) {

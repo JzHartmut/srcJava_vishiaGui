@@ -486,7 +486,7 @@ public class FcmdFileCard extends GralFileSelector
         break;
       }
       if(panel.actFileCard !=null){
-        panel.actFileCard.selectList.wdgdTable.setColorCurrLine(colorSelectFocused123[++ixMainPanel]);
+        panel.actFileCard.selectList.wdgdTable.setColorBackSelectedLine(colorSelectFocused123[++ixMainPanel]);
         panel.orderMainPanel = ixMainPanel +1;   //order in list 1, 2, 3
       } else {
         panel.orderMainPanel = 0; //not used.
