@@ -73,6 +73,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2014-12-26 Hartmut chg: {@link #fillIn(FileRemote, boolean)} now with new meaning of boolean: show newly without refresh with the file system.
+   *   This is used in callback routines which does a refresh but does not invoke {@link #showFile(FileRemote)}
+   *   especially called from {@link org.vishia.commander.Fcmd#refreshFilePanel(FileRemote)}. 
    * <li>2014-01-02 Hartmut chg: does not call 'file.refreshProperties(null);' in {@link #actionSetPath}
    *   because the property whether it is a directory or not should be known. Prevents a timeout waiting in graphic thread!!! 
    * <li>2013-09-06 Hartmut chg: Now a new request of fillIn can be executed with aborting the old one.
@@ -163,7 +166,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20130521;
+  public static final String sVersion = "2014-12-27";
   
   //FileRemoteAccessor localFileAccessor = FileRemoteAccessorLocalFile.getInstance();
   
@@ -398,7 +401,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       FileRemote currentFile = (FileRemote)userData;
       FileRemote fileZipAsDir = FileAccessZip.examineZipFile(currentFile);
       //FileZip fileZip = new FileZip(currentFile);
-      fillIn(fileZipAsDir, true);
+      fillIn(fileZipAsDir, false);
     }
     
     
@@ -814,7 +817,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    */
   public void fillInOriginDir()
   {
-    fillIn(originDir, true);
+    fillIn(originDir, false);
   }
   
   
@@ -824,7 +827,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
    */
   public void fillInCurrentDir(){
     if(currentDir !=null){
-      fillIn(currentDir, true);
+      fillIn(currentDir, false);
     }
   }
   
@@ -839,9 +842,12 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * If the same directory was refreshed in a short time before, it is not refreshed here.
    * That is while fast navigation in a tree. 
    * @param fileIn The directory which's files are shown.
-   * @param bCompleteWithFileInfo false then write only file names, without information about the file.
+   * @param bDonotRefrehs false then invoke an extra thread to walk through the file system, 
+   *   see @{@link FileRemote#refreshPropertiesAndChildren(FileRemoteCallback)} and {@link #callbackChildren1}.
+   *   If true then it is presumed that the FileRemote children are refreshed in the last time already.
+   *   The fill the table newly with given content in this thread.
    */
-  public void fillIn(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
+  public void fillIn(FileRemote fileIn, boolean bDonotRefrehs) //String path)
   { long timenow = System.currentTimeMillis();
     timeFillinInvoked = timenow;
     final FileRemote dir, file;
@@ -894,6 +900,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
           tline.setBackColor(colorBack, -1);
           idxLines.put("..", tline);
         }
+        //Build the table lines newly.
       } else {
         for(GralTable<?>.TableLineData line: selectList.wdgdTable.iterLines()){
           if(!line.getCellText(kColFilename).equals("..")){
@@ -906,7 +913,22 @@ public class GralFileSelector implements Removeable //extends GralWidget
       ////
       evBackChildren.depth = 1;
       evBackChildren.filter = null;
-      dir.refreshPropertiesAndChildren(callbackChildren1);
+      if(bDonotRefrehs) {
+        //do not refresh, show given files.
+        Map<String, FileRemote> files = dir.children();
+        if(files !=null) {
+          for(Map.Entry<String,FileRemote> entry: files.entrySet()) {
+            FileRemote file1 = entry.getValue();
+            showFile(file1);
+          }
+        }
+        finishShowFileTable();   //removed lines with not existing files, 
+        ////
+      } else {
+        //refresh it in an extra thread therefore show all lines with colorBackPending. 
+        //Remove lines which remains the colorBackPending after refreshing.
+        dir.refreshPropertiesAndChildren(callbackChildren1);
+      }
       if(false && !dir.getChildren(evBackChildren)){
         System.err.println("GralFileSelector - fillIn hangs;");
         return;
@@ -939,13 +961,16 @@ public class GralFileSelector implements Removeable //extends GralWidget
     }
     completeLine(tline, file1, System.currentTimeMillis());
     tline.setBackColor(colorBack, -1); //set for the whole line.
-    ////
-    //System.out.println(file.getAbsolutePath());
   }
   
   
   
-  void finishCallback()
+  /**Finishes a newly showed file table.
+   * Removes all lines which have the {@link #colorBackPending} yet, they are not refreshed because that files don't exist furthermore.
+   * Gets the {@link #currentFile()} of this table from the {@link #indexSelection} if the {@link #currentFile} is null,
+   * sets the current line and repaint the table.
+   */
+  void finishShowFileTable()
   {
     System.out.println("FcmdFileCard - finish fillin; " + sCurrentDir);
     Iterator<Map.Entry<String, GralTableLine_ifc<FileRemote>>> iter = idxLines.entrySet().iterator();
@@ -993,7 +1018,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     }
     if(evBack.isFinished()){
       evBack.srcFile = null;  //it is free for reuse.
-      finishCallback();
+      finishShowFileTable();
     }
     return 1;
   }
@@ -1161,7 +1186,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       && (  !donotCheckRefresh && !currentDir.isTested(since - 5000)
          || currentDir.shouldRefresh()
        )   ){
-      fillIn(currentDir, true);
+      fillIn(currentDir, false);
     }
   }
   
@@ -1314,7 +1339,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
 
     @Override public void finished(FileRemote startDir, SortedTreeWalkerCallback.Counters cnt)
     {
-      finishCallback();
+      finishShowFileTable();
     }
 
     @Override public boolean shouldAborted()

@@ -383,7 +383,7 @@ public class GralColor
    * <li>"lgn", 0x80ff80);
    * <li>"lbl", 0x8080ff);
    * <li>"lye", 0xffff00);
-   * <li>"lma", 0xff00ff);
+   * <li>"lma", 0xff00ff); 
    * <li>"lcy", 0x00ffff);
    * <li>"lbk", 0x404040);  a black which is lighter, but darker as dark gray
    * </ul>

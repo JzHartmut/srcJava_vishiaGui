@@ -89,6 +89,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2014-12-26 Hartmut chg: {@link #colorBackSelectSomeMarked} etc.  
    * <li>2013-12-23 Hartmut chg: Rename {@link #setColorBackSelectedLine(GralColor)} instead setColorCurrLine(): 
    *   It is not the current line which is changed but the color setting for all current (= selected) lines. 
    * <li>2013-12-23 Hartmut chg: {@link #checkAndUpdateText(String, CellData)} supports update text on edit cells.
@@ -320,14 +321,26 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   /**Data of that cell which was pointered while any mouse button is pressed. */
   //protected CellData cellDataOnMousePressed;
   
-  /**The colors. */
-  protected GralColor colorBackSelect, colorBackMarked, colorBackSelectMarked
-    , colorBackSelectNew, colorBackSelectNewMarked  //, colorBackTable
-  //, colorBackSelectNonFocused, colorBackMarkedNonFocused, colorBackTableNonFocused
-    , colorTextSelect, colorTextMarked;
+  /**The color of the current line. It is the selected line */
+  protected GralColor colorBackSelect;
+  /**The color of that lines which are marked. */
+  protected GralColor colorBackMarked;
+  /**The color of the current, the selected line if it is marked. */
+  protected GralColor colorBackSelectMarked;
+  /**The color of that lines which's some children are marked. */
+  protected GralColor colorBackSomeMarked;
+  /**The color of the current selected line if some children of it are marked. */
+  protected GralColor colorBackSelectSomeMarked;
+  
+  protected GralColor colorBackSelectNew;
+  protected GralColor colorBackSelectNewMarked;
+  
+  protected GralColor colorTextSelect;
+  protected GralColor colorTextMarked;
   
   
-  protected GralColor colorSelectCharsBack, colorSelectChars;
+  protected GralColor colorSelectCharsBack;
+  protected GralColor colorSelectChars;
 
   
   /**This action will be called if any line is marked. It may be null, see 
@@ -503,6 +516,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     colorBackMarked = GralColor.getColor("prd");
     colorBackSelectMarked = GralColor.getColor("lrd");
+    
+    colorBackSomeMarked = GralColor.getColor("pma");
+    colorBackSelectSomeMarked = GralColor.getColor("lma");
     
     colorBackSelectNewMarked = GralColor.getColor("lpu");
     dyda.backColor = GralColor.getColor("wh");
@@ -1522,13 +1538,16 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     private void setLinePresentation(TableLineData/*<?>*/ line){
       boolean marked = line !=null && (line.getMark() & 1)!=0;
+      boolean childrenMarked = line !=null && (line.getMark() & 2)!=0;
       if(line == outer.lineSelected){
-        linePresentation.colorBack = marked ? outer.colorBackSelectMarked : outer.colorBackSelect;
+        linePresentation.colorBack = marked ? outer.colorBackSelectMarked : childrenMarked ? outer.colorBackSelectSomeMarked : outer.colorBackSelect;
       } else if(line == outer.lineSelectedNew){
         linePresentation.colorBack = marked ? outer.colorBackSelectNewMarked : outer.colorBackSelectNew;
       } else {
         if(marked){
           linePresentation.colorBack = outer.colorBackMarked;
+        } else if(childrenMarked){
+          linePresentation.colorBack = outer.colorBackSomeMarked;
         } else if(!bFocused){
           linePresentation.colorBack = dyda.backColorNoFocus;
         } else {

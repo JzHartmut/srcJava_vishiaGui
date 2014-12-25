@@ -430,7 +430,7 @@ public class FcmdFileCard extends GralFileSelector
       if(line !=null){
         FileRemote dir = line.getUserData();
         bFillInReq = true;
-        otherFileCard.fillIn(dir, true);    //use that directory.
+        otherFileCard.fillIn(dir, false);    //use that directory.
       }
       boolean bSameFile = otherFileCard.selectFile(sFileName);  //".." also
       if(!bSameFile){
@@ -445,7 +445,7 @@ public class FcmdFileCard extends GralFileSelector
               //the directory of other is the current selected dir of this:
               FileRemote otherParent = otherDir.getParentFile();
               if(!bFillInReq){
-                otherFileCard.fillIn(otherParent, true);
+                otherFileCard.fillIn(otherParent, false);
                 otherFileCard.selectFile(sFileName);
                 bFillInReq = true;
               }
@@ -456,7 +456,7 @@ public class FcmdFileCard extends GralFileSelector
           //check whether a sub dir is selected:
           String sOtherSelectedFile = otherFileCard.currentFile.getName();
           if(sOtherSelectedFile.equals(sDirName) && !bFillInReq){
-            otherFileCard.fillIn(otherFileCard.currentFile,true);
+            otherFileCard.fillIn(otherFileCard.currentFile,false);
             otherFileCard.selectFile(sFileName);
           }
         }

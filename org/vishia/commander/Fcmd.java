@@ -41,7 +41,8 @@ public class Fcmd extends GuiCfg
 
   /**Version, history and license.
    * <ul>
-   * <li>1011-2013 some changes, see source files.
+   * <li>2014-12-26 Hartmut new: {@link #refreshFilePanel(FileRemote)} can be called in any callback thread. 
+   * <li>2011-2013 some changes, see source files.
    * <li>2011-10-00 Hartmut created
    * </ul>
    * 
@@ -464,6 +465,22 @@ public class Fcmd extends GuiCfg
     if(this.currentFileCard == null) return null;
     else return this.currentFileCard.currentDir();
   }
+  
+  
+  /**Refreshes the {@link FcmdFileCard} if the dir is the current one.
+   * This method can be invoked in any for example callback routine in any thread, which changes the content of directories.
+   * Note: It starts {@link GralFileSelector#fillIn(FileRemote, boolean)} which refreshes the files 
+   * @param dir
+   */
+  protected void refreshFilePanel(FileRemote dir)
+  {
+    for(FcmdLeftMidRightPanel panel: lastFilePanels) {
+      if(panel !=null && panel.actFileCard !=null && panel.actFileCard.currentDir() == dir) {
+        panel.actFileCard.fillIn(dir, false);
+      }
+    }
+  }
+  
   
 
   /**

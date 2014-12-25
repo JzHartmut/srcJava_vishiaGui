@@ -28,6 +28,7 @@ import org.vishia.util.FileCompare;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.SortedTreeWalkerCallback;
+import org.vishia.util.StringFormatter;
 import org.vishia.util.StringFunctions;
 
 /**This class contains all functionality to execute copy and move for The.file.Commander.
@@ -115,6 +116,8 @@ public class FcmdCopyCmd
   CharSequence sFileDstCopy;
   
   StringBuilder bufferDstChars = new StringBuilder(100);
+  
+  StringFormatter formatShow = new StringFormatter(100);
   
   /**If true then the {@link #widgInputDst} was changed for this session. Not automatically change the content. */
   boolean bDstChanged;
@@ -544,7 +547,28 @@ public class FcmdCopyCmd
   }
   
   
-
+  void showFinishState(CharSequence start, SortedTreeWalkerCallback.Counters cnt)
+  {
+    FcmdCopyCmd.this.zFiles = cnt.nrofLeafss;
+    FcmdCopyCmd.this.zBytes = cnt.nrofBytes;
+    formatShow.reset();
+    formatShow.add(start);
+    formatShow.add(" Files:").addint(cnt.nrofLeafSelected, "3333333331");
+    //StringBuilder u = new StringBuilder();
+    //u.append("Files:").append(Integer.toString(cnt.nrofLeafSelected));
+    if(cnt.nrofLeafSelected != cnt.nrofLeafss){  //u.append(" (").append(Integer.toString(cnt.nrofLeafSelected)).append(")"); }
+      formatShow.add(" /").addint(cnt.nrofLeafss, "3333333331");
+    }
+    if(cnt.nrofBytes > 1000000){
+      formatShow.addint(cnt.nrofBytes/1000, ", 33331.111 MByte");
+    }
+    else if(cnt.nrofBytes > 1000){
+      formatShow.addint(cnt.nrofBytes, ", 331.111 kByte");
+    } else {
+      formatShow.addint(cnt.nrofBytes, ", 331 Byte");
+    }
+    widgCopyState.setText(formatShow.toString());
+  }
   
   void actionConfirmCopy(){
     
@@ -1217,7 +1241,11 @@ public class FcmdCopyCmd
       return Result.cont;      
     }
     
-    @Override public Result finishedParentNode(FileRemote file, FileRemoteCallback.Counters cnt) {
+    /**Finish a directory, check whether a file panel should be refreshed.
+     * @see org.vishia.util.SortedTreeWalkerCallback#finishedParentNode(java.lang.Object, org.vishia.util.SortedTreeWalkerCallback.Counters)
+     */
+    @Override public Result finishedParentNode(FileRemote dir, FileRemoteCallback.Counters cnt) {
+      main.refreshFilePanel(dir);
       return Result.cont;      
     }
     
@@ -1232,10 +1260,9 @@ public class FcmdCopyCmd
       return false;
     }
 
-    @Override public void finished(FileRemote startDir, SortedTreeWalkerCallback.Counters cnt) {  
-      FcmdCopyCmd.this.zFiles = cnt.nrofLeafss;
-      FcmdCopyCmd.this.zBytes = cnt.nrofBytes;
-      widgCopyState.setText("files:" + zFiles + ", size:" + zBytes);
+    @Override public void finished(FileRemote startFile, SortedTreeWalkerCallback.Counters cnt) {  
+      showFinishState("checked ", cnt);
+      main.refreshFilePanel(startFile.getParentFile());  //The start file is any file or directory in parent. A directory is refreshed by finishParentNode already.
       setTexts(Estate.checked);
     }
 
@@ -1251,7 +1278,10 @@ public class FcmdCopyCmd
       return Result.cont;      
     }
     
-    @Override public Result finishedParentNode(FileRemote file, FileRemoteCallback.Counters cnt) {
+    @Override public Result finishedParentNode(FileRemote dir, FileRemoteCallback.Counters cnt) {
+      String path = dir.getAbsolutePath();
+      showFinishState(path, cnt);
+      main.refreshFilePanel(dir);
       return Result.cont;      
     }
     
@@ -1266,9 +1296,10 @@ public class FcmdCopyCmd
       return false;
     }
 
-    @Override public void finished(FileRemote startDir, SortedTreeWalkerCallback.Counters cnt) {  
-      widgCopyState.setText("ok: " + cnt.nrofBytes/1000000 + " M / "  + cnt.nrofLeafss + " Files");
+    @Override public void finished(FileRemote startFile, SortedTreeWalkerCallback.Counters cnt) {  
+      showFinishState("done", cnt);
       setTexts(Estate.finit);
+      main.refreshFilePanel(startFile.getParentFile());  //The start file is any file or directory in parent. A directory is refreshed by finishParentNode already.
     }
 
 

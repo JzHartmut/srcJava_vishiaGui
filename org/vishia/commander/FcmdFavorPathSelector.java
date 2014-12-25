@@ -575,7 +575,7 @@ class FcmdFavorPathSelector
       if(lastTab !=null){
         FileRemote dir = lastTab.getCurrentDir();
         if(dir !=null){
-          lastTab.forcefillIn(dir, true);
+          lastTab.forcefillIn(dir, false);
         }
       } else {
         throw new IllegalArgumentException("last file tab not able to found");
