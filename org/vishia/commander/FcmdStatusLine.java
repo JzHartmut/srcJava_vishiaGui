@@ -103,7 +103,8 @@ public class FcmdStatusLine
       info.append(" #").append(filer.ident()).append(" flags=0x")
       .append(Integer.toHexString(filer.getFlags()));
       if(file.mark !=null){
-        info.append(" sel=").append(Integer.toHexString(file.mark.getMark()));
+        int mark = file.mark.getMark();
+        info.append(" sel=").append(Integer.toHexString((mark >>16) & 0xffff)).append('\'').append(Integer.toHexString(mark & 0xffff));
         if(file.isDirectory()){
           info.append("; files=").append(file.mark.nrofFilesSelected());
         }

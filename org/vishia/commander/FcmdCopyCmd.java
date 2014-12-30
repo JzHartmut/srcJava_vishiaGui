@@ -171,10 +171,6 @@ public class FcmdCopyCmd
    */
   //final List<FileRemote> filesToCopyLast = new LinkedList<FileRemote>();
   
-  /**This reference is set with the callback of operation cmd. 
-   * The event can be used to affect the copying process.
-   */
-  FileRemote.CallbackEvent evCurrentFile;
   
   
   int modeCopy(){
@@ -186,6 +182,17 @@ public class FcmdCopyCmd
   EventSource evSrc = new EventSource("FcmdCopy"){
     
   };
+  
+
+  
+  
+  /**This reference is set with the callback of operation cmd. 
+   * The event can be used to affect the copying process.
+   */
+  FileRemote.CallbackEvent evCurrentFile;
+  
+  
+
   
   FcmdCopyCmd(Fcmd main)
   { this.main = main;
@@ -346,7 +353,7 @@ public class FcmdCopyCmd
   }
   
   
-  protected void execCheck(){
+  protected void XXXexecCheck(){
     setTexts(Estate.busyCheck);
     widgCopyState.setText("busy-check");
     widgButtonOk.setText("busy-check");
@@ -357,7 +364,7 @@ public class FcmdCopyCmd
     widgButtonEsc.setText("abort");
     //widgButtonEsc.setCmd("abort");
     String sSrcMask= widgFromConditions.getText();
-    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackFromFileMachine, null, evSrc);
+    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, evConsumerCallbackFromFileMachine, null, evSrc);
     //listEvCheck.add(callback);
     fileSrc.check(sFilesSrc, sSrcMask, callback);   //callback.use() will be called on response
   }
@@ -390,7 +397,7 @@ public class FcmdCopyCmd
       assert(state == Estate.checked);
       fileSrc.deleteChecked(evCurrentFile, 0);      
     } else if(state == Estate.start){
-      FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackFromFileMachine, null, evSrc);
+      FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, evConsumerCallbackFromFileMachine, null, evSrc);
       //fileSrc.deleteChecked(callback, 0);
     }
     //setTexts(Estate.finit);  //TODO
@@ -427,23 +434,50 @@ public class FcmdCopyCmd
   } 
   
   
+  /**Starts the execution of compare in another thread.*/
   protected void execCompare(){
-    String sDstDir = widgInputDst.getText();
+    String sDst = widgInputDst.getText();
+    int posSep = sDst.lastIndexOf('/');
+    int posSep2 = sDst.lastIndexOf('\\');
+    if(posSep2 >=0 && posSep2 > posSep){ posSep = posSep2; }
+    int posWildcard = sDst.indexOf('*');
+    String sDstDir;
+    if(posWildcard > posSep){
+      sDstDir = sDst.substring(0, posSep);
+    } else {
+      //no asterisk, either it is one file or it is the destination dir:
+      sDstDir = sDst;
+    }
     FileRemote fileDst;
     if(FileSystem.isAbsolutePathOrDrive(sDstDir)) {
       fileDst = main.fileCluster.getDir(sDstDir);  //maybe a file or directory
     } else {
       fileDst = dirSrc.child(sDstDir);  //relative to source
     }
-    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackFromFileMachine, null, evSrc);
-    //fileSrc.moveTo(sFilesSrc, fileDst, callback);
-    FileRemote.cmpFiles(fileSrc, fileDst, callback); ////
-    setTexts(Estate.busy);
+    if(fileDst.isDirectory()){ dirDst = fileDst; } 
+    else { dirDst = fileDst.getParentFile(); } 
+    boolean bOk = true;
+    //check whether the event is able to occupy, use it to check.
+    if(evCallback.occupyRecall(100, evSrc, evConsumerCallbackFromFileMachine, null, true) == 0){
+      if(evCallback.occupyRecall(1000, evSrc, evConsumerCallbackFromFileMachine, null, true) == 0){
+        System.err.println("FcmdCopyCmd event occupy hangs");
+        bOk = false;
+      }
+    }
+    if(bOk) {
+      String sSrcMask= widgFromConditions.getText();
+      evCallback.sendEvent(FileRemote.CallbackCmd.start);
+      fileSrc.refreshAndCompare(dirDst, 0, sSrcMask, 0, evCallback);
+      //setTexts(Estate.busy);
+    } else {
+      widgCopyState.setText("evCallback hangs");
+      setTexts(Estate.quest);
+    }
     ///
   }
   
   
-  protected void execMove(){
+  protected void execMove() {
     String sDstDir = widgInputDst.getText();
     FileRemote fileDst;
     if(FileSystem.isAbsolutePathOrDrive(sDstDir)) {
@@ -451,7 +485,7 @@ public class FcmdCopyCmd
     } else {
       fileDst = dirSrc.child(sDstDir);  //relative to source
     }
-    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, callbackFromFileMachine, null, evSrc);
+    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, fileSrc, null, evConsumerCallbackFromFileMachine, null, evSrc);
     fileSrc.moveTo(sFilesSrc, fileDst, callback);
     setTexts(Estate.busy);
     ///
@@ -590,7 +624,7 @@ public class FcmdCopyCmd
         //
         if(state == Estate.inactive){
           setTexts(Estate.finit);
-        } ////
+        } 
         //if(state.equals("close") || state.equals("check")) {
         //if(state == Estate.start || state == Estate.checked || state == Estate.finit || state == Estate.error) {
         if(!widgButtonSetSrc.isDisabled()) {
@@ -651,7 +685,7 @@ public class FcmdCopyCmd
                 } else {
                   //dirDst.getPathChars(bufferDstChars);
                 }
-                bufferDstChars = dirDst.getPathChars(bufferDstChars).append('/').append(sFileDstCopy);
+                bufferDstChars = dirDst.setPathTo(bufferDstChars).append('/').append(sFileDstCopy);
               } else {
                 //not active filecard, only favorcard selected.
                 bufferDstChars.setLength(0); bufferDstChars.append("?? currFile==null");
@@ -913,7 +947,7 @@ public class FcmdCopyCmd
           if(cmd == Ecmd.delete){
             execMark();
           } else if(cmd == Ecmd.copy || bFineSelect){
-            execCheck();
+            XXXexecCheck();
           } else if(cmd == Ecmd.move){
             execMove();
           } else if(cmd == Ecmd.compare){
@@ -1134,7 +1168,7 @@ public class FcmdCopyCmd
    * <li>{@link FileRemote.CallbackCmd#nrofFilesAndBytes}: shows the progress of the action. 
    * </ul>
    */
-  EventConsumer callbackFromFileMachine = new EventConsumer(){
+  EventConsumer evConsumerCallbackFromFileMachine = new EventConsumer(){
     @Override public int processEvent(Event<?,?> ev)
     {
       FileRemote.CallbackEvent ev1 = (FileRemote.CallbackEvent)ev;
@@ -1142,6 +1176,9 @@ public class FcmdCopyCmd
       String sCmd = cmd.name();
       System.out.println("FcmdCopy - callbackCopy;" + sCmd);
       switch(ev1.getCmd()){
+        case start: {
+          setTexts(Estate.busy);
+        } break;
         case doneCheck:{ ///
           //if(listEvCheck.remove(ev)){  ///
             FcmdCopyCmd.this.evCurrentFile = ev1;
@@ -1232,6 +1269,24 @@ public class FcmdCopyCmd
     @Override public String toString(){ return "FcmdCopy-success"; }
 
   };
+
+  
+ 
+  
+  /**This event instance with back event and a possible command event as opponent is generally used for invoke and callback to routines
+   * for file handling. That methods should be execute in another thread. Only one process can be run for one of this window for
+   * mark, move, copy, compare and delete. Therefore only one event instance is necessary which is reused. 
+   * For hanging processes there is an "abort" button which sends the abort event at last. Usual the hanging is forced by an
+   * Exception while handling files or while communication with an device. In that cases the exception had terminate the other process already,
+   * so the abort command for this event is not used and not necessary. But if the process does not hang and it should be aborted
+   * that event is essential. 
+   * <br><br>
+   * If the event will be reused the "abort" was send for a longer time (at least 1 second for manual handling, pressing buttons). 
+   * Therefore it can be occupied usual without waiting, at least with thread switch to finish execution of the event.
+   * See {@link Event#occupyRecall(int, EventSource, EventConsumer, org.vishia.event.EventThread, boolean)}  
+   */
+  FileRemote.CallbackEvent evCallback = new FileRemote.CallbackEvent(evConsumerCallbackFromFileMachine, null, evSrc); ////
+  
 
   
   

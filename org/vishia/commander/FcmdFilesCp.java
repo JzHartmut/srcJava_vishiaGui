@@ -122,7 +122,7 @@ public final class FcmdFilesCp {
       file1 = card1.currentFile();
       file2 = card2.currentFile();
       if(true){
-        FileRemote.cmpFiles(file1, file2, null); 
+        FileRemote.XXXXXXXXcmpFiles(file1, file2, null); 
       } else {
         //the old stuff should be deleted. It has worked with an extra result tree. Note: maybe remove FileComplare class???
         result.clear();
