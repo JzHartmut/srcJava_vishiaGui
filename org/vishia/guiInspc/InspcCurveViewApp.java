@@ -29,8 +29,8 @@ public class InspcCurveViewApp
     LogMessage log = new LogMessageStream(System.out);
     GralWindow wind = gralFactory.createWindow(log, "Curve View", 'C', 100, 50, 800, 600);
     FileCluster fileCluster = new FileCluster();
-    FileRemote dirCfg = fileCluster.getDir("D:/SFC/SBOX/EDIT-XRPT/data/XRPT/ReflexAccess/curves");
-    FileRemote dirSave = fileCluster.getDir("D:/SFC/Docu/Messungen/130417_KBtest");
+    FileRemote dirCfg = fileCluster.getDir("D:/");
+    FileRemote dirSave = fileCluster.getDir("D:/");
     curveView = new InspcCurveView("curves", null, wind.gralMng(), dirCfg, dirSave, null);
     curveView.windCurve = wind;
     gralMng = wind.gralMng();

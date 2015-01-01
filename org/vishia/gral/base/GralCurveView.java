@@ -393,9 +393,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     /**The reciprocal of {@link #timePerPixel}. The number of pixel for 1 short time step. It is less 1.0 often. */
     public float pixel7time = 1.0f;
     
-    /**Number of time shorttime steps for the whole curve.
+    /**Number of time shortTime steps to showing the curve in the current view.
      * If this value is given (>=0) then the {@link #timePerPixel} will be calculated from this
-     * regarding the current size.
+     * regarding the current graphic size.
      * This value should be given in the same value unit as used for {@link #setSample(float[], int)}.
      */
     public int timeSpread = 50000;
@@ -417,32 +417,45 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
      * This array is filled newly whenever any draw or paint action is done. It is prepared in the routine
      * {@link #prepareIndicesDataForDrawing(int, int, int)} and used in the draw routine of the implementation level.
      */
-    public final int[] xPixelTimeDiv = new int[20], xPixelTimeDivFine = new int[200];
+    public final int[] xPixelTimeDiv = new int[50], xPixelTimeDivFine = new int[200];
     
     
     /**The text written at the time divisions. It is a mm:ss, ss.SSS or hh::mm */
-    public final String[] sTimeAbsDiv = new String[20];
+    public final String[] sTimeAbsDiv = new String[50];
     
     
     int[] millisecPerFineDivVariants = new int[]{  1,  2,  5,  10,  20,  50,  100,  200,  500,  1000,  2000,  5000,  10000,  20000,  60000,  120000,  600000, 1200000,  3600000, 18000000};
+    
+    
+    
+    /**Milliseconds per division for number of pixel per fine division between 12..30. 
+     *
+     */
     int[] millisecPerDivVariants =     new int[]{  5, 10, 20,  50, 100, 200,  500, 1000, 2000,  5000, 10000, 20000,  60000, 120000, 300000,  600000, 3600000, 7200000, 18000000, 72000000};
     
-    /**Calculates The divisions with known {@link #timePerPixel}.
+    /**Calculates the divisions with known {@link #timePerPixel}.
      * This routine should be called whenever the display zoom will be changed.
      * It sets {@link #divType}, {@link #pixelPerTimeFineDiv}, {@link #millisecPerFineDiv}
      */
     public void calc(){
-      int millisec20pixel = (int)(12 * timePerPixel * absTime.absTime_Millisec7short);
+      int millisec20pixel = (int)(12 * timePerPixel * absTime.absTime_Millisec7short);  //millisec for 12 pixel
+      boolean bFound = false;
       for(int ii = 0; ii < millisecPerDivVariants.length; ++ii){
         if(millisecPerFineDivVariants[ii] >= millisec20pixel){
           millisecPerDiv = millisecPerDivVariants[ii];
           millisecPerFineDiv = millisecPerFineDivVariants[ii];
+          bFound = true;
           break;
         }
       }
-      pixelPerTimeDiv =     millisecPerDiv     / timePerPixel;
-      pixelPerTimeFineDiv = millisecPerFineDiv / timePerPixel;
-      
+      if(bFound) {
+        pixelPerTimeDiv =     millisecPerDiv     / (timePerPixel * absTime.absTime_Millisec7short);  //number of pixel per division, should be appropriate 48..150
+        pixelPerTimeFineDiv = millisecPerFineDiv / (timePerPixel * absTime.absTime_Millisec7short);  //number of pixel per division, should be appropriate 12..30
+      } else {
+        //use a fix value to prevent any failure calculations.
+        pixelPerTimeDiv = 150;
+        pixelPerTimeFineDiv = 30;
+      }
       /*
       double millisecExp20pixel = Math.log10(millisec20pixel);
       int millisecExpInt20pixel = (int)millisecExp20pixel;
@@ -846,6 +859,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   
   public void setTimeSpread(int time){
+    if(time <= 0) throw new IllegalArgumentException("GralCurveView.setTimeSpread - value should >0");
     timeorg.timeSpread = time; 
   }
   
@@ -928,7 +942,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     int ixWr = (ixDataWr >> shIxiData) & mIxiData;
     for(Track track: listTracks){
       if(ixSource < newValues.length -1){
-        track.values[ixWr] = newValues[++ixSource];  //write in the values.
+        float val = newValues[++ixSource];  //write in the values.
+        track.values[ixWr] = val;  //write in the values.
+        if(track.min > val ){ track.min = val; }
+        if(track.max < val ){ track.max = val; }
       } else {
         track.values[ixWr] = 0;
       }
@@ -1071,10 +1088,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     }
     //calculate absolute time from shorttime:
     long millisecAbs = timeorg.absTime.absTimeshort(timeRight);
-    int milliSec2Div = (int)(millisecAbs % timeorg.millisecPerDiv);
+    int milliSec2Div = (int)(millisecAbs % timeorg.millisecPerDiv);                                 //how many millisec to the next division
     int milliSec2FineDiv = milliSec2Div % (timeorg.millisecPerFineDiv);
-    float pixel2FineDiv = milliSec2FineDiv * timeorg.pixel7time / timeorg.absTime.millisec7short();
-    float pixel2Div = milliSec2Div * timeorg.pixel7time / timeorg.absTime.millisec7short();
+    float pixel2FineDiv = milliSec2FineDiv * timeorg.pixel7time / timeorg.absTime.millisec7short(); //how many pixel to the next fine division line
+    float pixel2Div = milliSec2Div * timeorg.pixel7time / timeorg.absTime.millisec7short();         //how many pixel to the next division line 
     int ixPixelTimeDiv =-1;
     int ixPixelTimeDivFine =-1;
     while(pixel2FineDiv < xViewPart ){ //&& nrofPixel4Data >=0){
@@ -1349,11 +1366,15 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     int ixInList = -1;
     String[] signals = sLine.split(";");
     
+    String[] colors = {"bk","rd","gn","bl","or","gr","gr","gr","gr"};
+    int ix = 0;
     for(String signal1: signals){
       String signal = signal1.trim();
-      Track track = new Track(this, signal, ++ixInList);
-      listTracks.add(track);
+      GralColor color = GralColor.getColor(colors[ix]);
+      initTrack(signal, signal, color, 1, 50, 1.0f, 0.0f);
+      ix +=1;
     }
+    this.ixDataWr = -adIxData; //initial write position, first increment to 0.
     float[] fvalues = new float[listTracks.size()];
     int timeshort = 0;
     while( (sLine = ifile.readLine())!=null){
@@ -1361,9 +1382,12 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       int ixCol = -1;
       for(String value1: values){
         String sValue = value1.trim();
+        sValue = sValue.replace(',', '.');  //accept , as fractional separator, convert to .
         float value;
         try{ value = Float.valueOf(sValue); }
-        catch(NumberFormatException exc){ value = 0.0f; }
+        catch(NumberFormatException exc){ 
+          value = 0.099999999f; 
+        }
         fvalues[++ixCol] = value;
       }
       setSample(fvalues, ++timeshort);
@@ -1585,7 +1609,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       }
     }
     bRedrawAll = true;
-    repaint(50,100);
+    repaint(0,0);
+    //repaint(50,100);
     if(actionMoveCursor !=null){
       actionMoveCursor.exec(0, this);
     }
@@ -1624,7 +1649,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       ixDataCursor2 = ixDataShown[xpCursor2];
     }
     xpCursor1New = xpCursor2New = cmdSetCursor;  
-    timeorg.timeSpread /=2;    //half timespread
+    if(timeorg.timeSpread > 100) { timeorg.timeSpread /=2; }
+    else { timeorg.timeSpread = 100; }
     bPaintAllCmd = true;
     repaint(100, 200);
   }
@@ -1645,7 +1671,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       ixDataCursor2 = ixDataShown[xpCursor2];
     }
     xpCursor1New = xpCursor2New = cmdSetCursor;  
-    timeorg.timeSpread *=2;    //double timespread
+    if(timeorg.timeSpread < 0x3fffffff) { timeorg.timeSpread *=2; }
+    else { timeorg.timeSpread = 0x7fffffff; }
     bPaintAllCmd = true;
     repaint(100, 200);
 
@@ -1700,7 +1727,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     //ixDataCursor1 = ixDataShown[xpCursor1];  //from Pixel value of cursor to data index
     //ixDataCursor2 = ixDataShown[xpCursor2];
     //ixDataShowRight = ixDataCursor2 + (((ixDataCursor2 - ixDataCursor1)));
-    timeorg.timeSpread *=5;
+    if(timeorg.timeSpread < (0x7ffffff5/5)) { timeorg.timeSpread *=5; }
+    else { timeorg.timeSpread = 0x7fffffff; }
     /*
     int ixiData2 = (ixDataCursor2 >> shIxiData) & mIxiData;
     int time1 = timeValues[(ixDataCursor1 >> shIxiData) & mIxiData];

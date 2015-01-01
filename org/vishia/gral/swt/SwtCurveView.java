@@ -17,6 +17,7 @@ import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
 
 
@@ -470,9 +471,8 @@ public class SwtCurveView extends GralCurveView
         g.drawLine(iPixRange1, size.y -3, iPixRange2, size.y -3);  //shown range
       }
     } catch(Exception exc){
-      StackTraceElement[] stack = exc.getStackTrace();
-      System.err.println("SwtCurveView-paint-exception; " + exc.getMessage() + ";" + stack[0].getFileName() + ":" + stack[0].getLineNumber());
-      stop();
+      CharSequence sError = Assert.exceptionInfo("SwtCurveView.draw - exception", exc, 0, 20, true);
+      System.err.append(sError);
     }
     //g.drawString(""+xShift+ ":"+ xViewLast + ":" + nrofDataShift.get(), 200, dyView-28);
     //g.drawString("xx", 200, dyView-16);

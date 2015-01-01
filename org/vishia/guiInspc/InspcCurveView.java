@@ -104,9 +104,9 @@ public final class InspcCurveView
   
   public static String sBtnSaveCfg = "save cfg";
   
-  public static String sBtnReadValues = "read values";
+  public static String sBtnReadValues = "read data";
   
-  public static String sBtnSaveValues = "save values";
+  public static String sBtnSaveValues = "save data";
   
   
   protected final String sName;
@@ -930,14 +930,15 @@ public final class InspcCurveView
   
   
   
-  /**Action invoked if the write file was selected in the {@link GralFileSelectWindow}
+  /**Action invoked if the read file was selected in the {@link GralFileSelectWindow}
    */
   GralUserAction actionReadValues = new GralUserAction("actionReadValues"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
           assert(params[0] instanceof File);
-          File file = (File)params[0];
+          FileRemote file = (FileRemote)params[0];
+          dirCurveSave = file.getParentFile();
           
           readCurve(file);
           ///
