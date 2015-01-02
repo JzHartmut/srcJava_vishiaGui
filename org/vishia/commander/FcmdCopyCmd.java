@@ -4,7 +4,8 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.vishia.event.Event;
+import org.vishia.event.EventMsg;
+import org.vishia.event.EventMsg2;
 import org.vishia.event.EventConsumer;
 import org.vishia.event.EventSource;
 import org.vishia.fileRemote.FileMark;
@@ -930,7 +931,7 @@ public class FcmdCopyCmd
    * <br><br>
    * To notify for success or progression of the copy process some events are used.
    * See the {@link #success} {@link EventConsumer} in this class. The event instance is given to the 
-   * {@link FileRemote#copyTo(FileRemote, Event)} invocation. It is used to callback either from the thread
+   * {@link FileRemote#copyTo(FileRemote, EventMsg2)} invocation. It is used to callback either from the thread
    * which copies local or from the thread which receives the copy response telegrams for remote communication.
    * <br><br>
    * All Events which are created are stored in the {@link #listEvCopy}. If the callback occurs, the event 
@@ -1093,7 +1094,7 @@ public class FcmdCopyCmd
   
   
   EventConsumer XXXcallbackCheck = new EventConsumer(){
-    @Override public int processEvent(Event<?,?> evP)
+    @Override public int processEvent(EventMsg<?> evP)
     {
       FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
       if(listEvCheck.remove(ev)){  ///
@@ -1123,7 +1124,7 @@ public class FcmdCopyCmd
   
   
   
-  private void eventConsumed(Event<?,?> evp, boolean ok){
+  private void eventConsumed(EventMsg<?> evp, boolean ok){
     FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evp;
     listEvCopy.remove(ev);
     int nrofPendingFiles = listEvCopy.size();
@@ -1169,7 +1170,7 @@ public class FcmdCopyCmd
    * </ul>
    */
   EventConsumer evConsumerCallbackFromFileMachine = new EventConsumer(){
-    @Override public int processEvent(Event<?,?> ev)
+    @Override public int processEvent(EventMsg<?> ev)
     {
       FileRemote.CallbackEvent ev1 = (FileRemote.CallbackEvent)ev;
       FileRemote.CallbackCmd cmd = ev1.getCmd();
@@ -1283,7 +1284,7 @@ public class FcmdCopyCmd
    * <br><br>
    * If the event will be reused the "abort" was send for a longer time (at least 1 second for manual handling, pressing buttons). 
    * Therefore it can be occupied usual without waiting, at least with thread switch to finish execution of the event.
-   * See {@link Event#occupyRecall(int, EventSource, EventConsumer, org.vishia.event.EventThread, boolean)}  
+   * See {@link EventMsg2#occupyRecall(int, EventSource, EventConsumer, org.vishia.event.EventThread, boolean)}  
    */
   FileRemote.CallbackEvent evCallback = new FileRemote.CallbackEvent(evConsumerCallbackFromFileMachine, null, evSrc); ////
   

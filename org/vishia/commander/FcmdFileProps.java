@@ -5,7 +5,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.vishia.event.Event;
+import org.vishia.event.EventMsg;
+import org.vishia.event.EventMsg2;
 import org.vishia.event.EventConsumer;
 import org.vishia.event.EventSource;
 import org.vishia.fileRemote.FileRemote;
@@ -421,7 +422,7 @@ public class FcmdFileProps
 
 
   EventConsumer callbackChgProps = new EventConsumer()
-  { @Override public int processEvent(Event evP)
+  { @Override public int processEvent(EventMsg<?> evP)
     { FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
       if(ev.getCmd() == FileRemote.CallbackCmd.done){
         showFileInfos(actFile);
@@ -454,7 +455,7 @@ public class FcmdFileProps
   } };
   
   EventConsumer callbackCntLen = new EventConsumer()
-  { @Override public int processEvent(Event evP)
+  { @Override public int processEvent(EventMsg<?> evP)
     { FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
       if(ev.getCmd() == FileRemote.CallbackCmd.done){
         String sLen = "" + ev.nrofBytesAll;

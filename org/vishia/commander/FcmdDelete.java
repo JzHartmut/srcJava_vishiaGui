@@ -4,7 +4,8 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.vishia.event.Event;
+import org.vishia.event.EventMsg;
+import org.vishia.event.EventMsg2;
 import org.vishia.event.EventConsumer;
 import org.vishia.event.EventSource;
 import org.vishia.fileRemote.FileRemote;
@@ -47,7 +48,7 @@ public class FcmdDelete
    */
   String sFileDelete;
  
-  final List<Event> listEvDel = new LinkedList<Event>();
+  final List<EventMsg2> listEvDel = new LinkedList<EventMsg2>();
 
   
   /**The file card where the directory content is shown where the file will be deleted.
@@ -201,7 +202,7 @@ public class FcmdDelete
   
   
   EventConsumer success = new EventConsumer(){
-    @Override public int processEvent(Event<?,?> ev)
+    @Override public int processEvent(EventMsg<?> ev)
     { FileRemote.CallbackEvent callback = (FileRemote.CallbackEvent)ev;
       if(callback.successCode !=0){
         main.mainCmd.writeError("can't delete " + callback.getFileSrc().getCanonicalPath());

@@ -11,7 +11,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.commander.Fcmd;
-import org.vishia.event.Event;
+import org.vishia.event.EventMsg;
+import org.vishia.event.EventMsg2;
 import org.vishia.event.EventConsumer;
 import org.vishia.event.EventSource;
 import org.vishia.fileRemote.FileAccessZip;
@@ -1350,11 +1351,11 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**This callback class fills the {@link GralFileSelector#selectList}.{@link GralSelectList#wdgdTable}
    * with the results of a {@link FileRemote.ChildrenEvent}, see {@link GralFileSelector#evBackChildren}.
-   * Its {@link EventConsumer#processEvent(Event)} regards the sort, checks whether the line is present,
+   * Its {@link EventConsumer#processEvent(EventMsg2)} regards the sort, checks whether the line is present,
    * removes unnecessary lines, sets the color of filled lines to {@link GralFileSelector#colorBack}.  
    */
   final EventConsumer callbackChildren = new EventConsumer(){
-    @Override public int processEvent(Event<?,?> evP) {
+    @Override public int processEvent(EventMsg<?> evP) {
       ////
       FileRemote.ChildrenEvent evBack = (FileRemote.ChildrenEvent)evP;
       return showfiles(evBack);
