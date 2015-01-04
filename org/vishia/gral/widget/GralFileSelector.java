@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.EventObject;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -1355,12 +1356,15 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * removes unnecessary lines, sets the color of filled lines to {@link GralFileSelector#colorBack}.  
    */
   final EventConsumer callbackChildren = new EventConsumer(){
-    @Override public int processEvent(EventMsg<?> evP) {
+    @Override public int processEvent(EventObject evP) {
       ////
       FileRemote.ChildrenEvent evBack = (FileRemote.ChildrenEvent)evP;
       return showfiles(evBack);
       //System.out.println("callbackChildren");
     }
+    
+    @Override public String getStateInfo(){ return "no-state"; }
+
     @Override public String toString(){ return "GralFileSelector - callback fillin"; }
 
   };

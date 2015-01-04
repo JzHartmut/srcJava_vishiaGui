@@ -1,6 +1,7 @@
 package org.vishia.commander;
 
 import java.io.File;
+import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -202,7 +203,7 @@ public class FcmdDelete
   
   
   EventConsumer success = new EventConsumer(){
-    @Override public int processEvent(EventMsg<?> ev)
+    @Override public int processEvent(EventObject ev)
     { FileRemote.CallbackEvent callback = (FileRemote.CallbackEvent)ev;
       if(callback.successCode !=0){
         main.mainCmd.writeError("can't delete " + callback.getFileSrc().getCanonicalPath());
@@ -217,7 +218,9 @@ public class FcmdDelete
       fileCard.fillInCurrentDir();
       return 1;
     }
-    
+
+    @Override public String getStateInfo(){ return "no-state"; }
+
     @Override public String toString(){ return "FcmdDelete - success"; }
 
   };

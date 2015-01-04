@@ -4,6 +4,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.EventObject;
 
 import org.vishia.event.EventMsg;
 import org.vishia.event.EventMsg2;
@@ -422,7 +423,7 @@ public class FcmdFileProps
 
 
   EventConsumer callbackChgProps = new EventConsumer()
-  { @Override public int processEvent(EventMsg<?> evP)
+  { @Override public int processEvent(EventObject evP)
     { FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
       if(ev.getCmd() == FileRemote.CallbackCmd.done){
         showFileInfos(actFile);
@@ -433,6 +434,9 @@ public class FcmdFileProps
       ev.relinquish();
       return 1;
     } 
+  
+    @Override public String getStateInfo(){ return "no-state"; }
+
     @Override public String toString(){ return "FcmdFileProps-callbackChgProps"; }
 
   };
@@ -455,7 +459,7 @@ public class FcmdFileProps
   } };
   
   EventConsumer callbackCntLen = new EventConsumer()
-  { @Override public int processEvent(EventMsg<?> evP)
+  { @Override public int processEvent(EventObject evP)
     { FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
       if(ev.getCmd() == FileRemote.CallbackCmd.done){
         String sLen = "" + ev.nrofBytesAll;
@@ -464,9 +468,12 @@ public class FcmdFileProps
         widgLength.setText("error count bytes");
       }
       widgBtnDirBytes.setText(main.idents.buttonFilePropsCntLen);
-      evP.relinquish();
+      ev.relinquish();
       return 1;
     } 
+  
+    @Override public String getStateInfo(){ return "no-state"; }
+
     @Override public String toString(){ return "FcmdFileProps - callback cnt length"; }
 
   };
