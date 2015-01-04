@@ -676,8 +676,10 @@ public class FcmdCopyCmd
   GralUserAction actionShowState = new GralUserAction("actionConfirmCopy")
   {
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){ 
-      if(fileSrc !=null) { widgCopyState.setText(fileSrc.getStateDevice()); }
-      else { widgCopyState.setText("no source file"); }
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        if(fileSrc !=null) { widgCopyState.setText(fileSrc.getStateDevice()); }
+        else { widgCopyState.setText("no source file"); }
+      }
       return true;
     }
   };
