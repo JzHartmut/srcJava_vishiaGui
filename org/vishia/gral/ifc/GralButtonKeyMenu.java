@@ -1,5 +1,7 @@
 package org.vishia.gral.ifc;
 
+import java.util.List;
+
 import org.vishia.util.KeyCode;
 
 /**This class contains Strings and keys for functions of an application
@@ -56,7 +58,7 @@ public class GralButtonKeyMenu
   /**Text for the button*/
   public String buttontext;
   
-  /**One ot two {@link KeyCode} for the keys. */
+  /**One of two possible {@link KeyCode} for this functionality. */
   public int key1, key2;
 
   /**The action which is associated to all the functions. */
@@ -64,8 +66,20 @@ public class GralButtonKeyMenu
 
 
 
+  /**Constructs and adds the instance to a given list.
+   * @param action
+   * @param menu
+   * @param menuContext
+   * @param buttonId
+   * @param buttontext
+   * @param key1
+   * @param key2
+   * @param addToList add to this list if not null.
+   */
   public GralButtonKeyMenu(GralUserAction action, String menu, String menuContext
-      , String buttonId, String buttontext, int key1, int key2){
+      , String buttonId, String buttontext, int key1, int key2
+      , List<GralButtonKeyMenu> addToList
+      ){
     this.action = action;
     this.menu = menu;
     this.menuContext = menuContext;
@@ -73,6 +87,17 @@ public class GralButtonKeyMenu
     this.buttontext = buttontext;
     this.key1 = key1;
     this.key2 = key2;
+    if(addToList !=null) {
+      addToList.add(this);
+    }
   }
 
+  
+  public GralButtonKeyMenu(GralUserAction action, String menu, String menuContext
+      , String buttonId, String buttontext, int key1, int key2
+      ){
+    this(action, menu, menuContext, buttonId, buttontext, key1, key2, null);
+  }
+  
+  
 }

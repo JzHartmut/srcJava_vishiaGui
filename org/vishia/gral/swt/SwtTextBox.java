@@ -284,8 +284,10 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
   
   @Override public void removeWidgetImplementation()
   {
-    textFieldSwt.dispose();
-    textFieldSwt = null;
+    if(textFieldSwt !=null) {
+      textFieldSwt.dispose();
+      textFieldSwt = null;
+    }
     if(promptSwt !=null){
       promptSwt.dispose();
       promptSwt = null;

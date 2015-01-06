@@ -825,10 +825,11 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   /**It is the refresh operation.
-   * 
+   * If {@link #fillinPending} is set yet this operation does nothing. It means it is possible to call in a short cycle
+   * more as one time after another, for example for all files of a directory without calculation effort.
    */
   public void fillInCurrentDir(){
-    if(currentDir !=null){
+    if(currentDir !=null && !fillinPending){
       fillIn(currentDir, false);
     }
   }
@@ -868,6 +869,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     boolean bSameDirectory = dir == currentDir;
     if(!bSameDirectory || !fillinPending){  //new request anytime if other directory, or if it is not pending.
       fillinPending = true;
+      //selectList.wdgdTable.setBackColor(colorBackPending, -1);  //for all cells.
       if(!bSameDirectory){
         currentDir = dir;
         this.sCurrentDir = dir.getAbsolutePath();  //though it may not exist, store it for refresh (may be exist later).
@@ -889,7 +891,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
           //tline.setCellText("--waiting--", kColFilename);
           eRefresh = ERefresh.refreshChildren;  //do nothing, it is shown and refreshed in execFillIn
       }
-      //selectList.wdgdTable.setBackColor(colorBackPending, -1);  //for all cells.
       if(!bSameDirectory || sortOrder != sortOrderLast){
         selectList.wdgdTable.clearTable();
         idxLines.clear();
@@ -905,9 +906,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
         //Build the table lines newly.
       } else {
         for(GralTable<?>.TableLineData line: selectList.wdgdTable.iterLines()){
-          if(!line.getCellText(kColFilename).equals("..")){
+          //if(!line.getCellText(kColFilename).equals("..")){
             line.setBackColor(colorBackPending, -1);
-          }
+          //}
         }
       }
       widgdPathDir.setText(sCurrentDir, -1);
@@ -979,7 +980,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
     while(iter.hasNext()){
       Map.Entry<String, GralTableLine_ifc<FileRemote>> entry = iter.next();
       GralTableLine_ifc<FileRemote> tline = entry.getValue();
-      if(tline.getBackColor(-1) == colorBackPending){
+      if(tline.getKey().equals("..")){
+        tline.setBackColor(colorBack, -1); //set for the whole line.
+      } else if(tline.getBackColor(-1) == colorBackPending){
         selectList.wdgdTable.deleteLine(tline);  //it is a non existing one yet.
         iter.remove();
       }

@@ -8,6 +8,7 @@ import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.ifc.GralButtonKeyMenu;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.KeyCode;
@@ -229,7 +230,12 @@ public class FcmdButtons
 
     setBtnMenuAndKeys(main.settings.actionOpenDialog, main.idents.buttonSettings, main.idents.key1Settings, main.idents.key2Settings, main.idents.menuBarSettings);
     setBtnMenuAndKeys(main.status.actionOpenDialog, main.idents.buttonStatus, main.idents.key1Status, main.idents.key2Status, main.idents.menuBarStatus);
-    setBtnMenuAndKeys(main.actionReadMsgConfig, main.idents.readMsg.buttontext, main.idents.readMsg.key1, main.idents.readMsg.key2, main.idents.readMsg.menu);
+    //setBtnMenuAndKeys(main.actionReadMsgConfig, main.idents.readMsg.buttontext, main.idents.readMsg.key1, main.idents.readMsg.key2, main.idents.readMsg.menu);
+    for(GralButtonKeyMenu entry: main.idents.entries){
+      if(entry.action !=null){
+        setBtnMenuAndKeys(entry.action, entry.buttontext, entry.key1, entry.key2, entry.menu);
+      }
+    }
     main.gui.addMenuBarArea9ItemGThread("menuBarViewButtons", main.idents.menuBarViewButtons, actionViewButtons);
 
     setBtnMenuAndKeys(main.gui.getActionHelp(), main.idents.buttonHelp, main.idents.keyHelp,main.idents.menuHelpBar);

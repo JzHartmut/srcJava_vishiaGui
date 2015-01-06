@@ -1,5 +1,8 @@
 package org.vishia.commander;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.vishia.gral.ifc.GralButtonKeyMenu;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.util.KeyCode;
@@ -12,11 +15,12 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class FcmdIdents
+public class FcmdIdents extends FcmdIdentsBase
 {
+  List<GralButtonKeyMenu> entries = new LinkedList<GralButtonKeyMenu>();
   
-  final GralButtonKeyMenu readMsg = new GralButtonKeyMenu(null, "&Help/read &MsgCfg", null, null, null, 0, 0);  ////
-  final GralButtonKeyMenu deselectRecursFiles = new GralButtonKeyMenu(null, "&File/&Deselect dirtree", "&Deselect dirtree", null, null, 0, 0);
+  final GralButtonKeyMenu readMsg = new GralButtonKeyMenu(main.actionReadMsgConfig, "&Help/read &MsgCfg", null, null, null, 0, 0, entries);  ////
+  final GralButtonKeyMenu deselectRecursFiles = new GralButtonKeyMenu(main.favorPathSelector.actionDeselectDirtree, "&File/&Deselect dirtree", "&Deselect dirtree", null, null, KeyCode.ctrl + 'd', KeyCode.ctrl + 'D', entries);
   
   String menuBarSettings = "&Help/&Settings [cP]";
   String menuContextSettings = "Settings [cP]";
@@ -380,7 +384,9 @@ public class FcmdIdents
   int keyFileSortSizeSmall = KeyCode.shiftCtrl + KeyCode.F6;
 
 
-  FcmdIdents(){
+  FcmdIdents(Fcmd main){
+    super(main);  //firstly the superclass ctor is called.
+    //after them all statements in the class body, main is known.
     GralFileSelector.contextMenuTexts.deselectRecursFiles = deselectRecursFiles.menuContext;
     
     GralFileSelector.contextMenuTexts.sortNameCase = menuContextFileSortNameCase;
@@ -393,4 +399,13 @@ public class FcmdIdents
     GralFileSelector.contextMenuTexts.sizeLarge = menuContextFileSortSizeLarge;
   }
   
+  
+  
 }
+
+
+class FcmdIdentsBase {
+  protected Fcmd main;
+  FcmdIdentsBase(Fcmd main){ this.main = main; }
+}
+

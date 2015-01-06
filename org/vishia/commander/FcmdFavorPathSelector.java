@@ -586,6 +586,9 @@ class FcmdFavorPathSelector
   };
   
   
+
+  
+  
   
   GralUserAction actionAddFavorite = new GralUserAction("")
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
@@ -723,7 +726,8 @@ class FcmdFavorPathSelector
       FileRemote[] lastFiles = main.getLastSelectedFiles(true, 1);
       //if(fileCard !=null){
       if(lastFiles[0] !=null){
-        lastFiles[0].resetMarkedRecurs(1, null);
+        lastFiles[0].resetMarkedRecurs(0xffffffff, null);
+        main.refreshFilePanel(lastFiles[0].getParentFile());
         //fileCard.f  //TODO refresh
       }
       return true;
