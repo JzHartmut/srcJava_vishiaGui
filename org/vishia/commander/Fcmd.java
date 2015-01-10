@@ -411,7 +411,11 @@ public class Fcmd extends GuiCfg
   
   final FcmdEdit editWind = new FcmdEdit(this);
   
-  final FcmdCopyCmd copyCmd = new FcmdCopyCmd(this);
+  final FcmdCopyCmd copyCmd = new FcmdCopyCmd(this, FcmdCopyCmd.Ecmd.copy);
+  
+  final FcmdCopyCmd delCmd = new FcmdCopyCmd(this, FcmdCopyCmd.Ecmd.delete);
+  
+  final FcmdCopyCmd compareCmd = new FcmdCopyCmd(this, FcmdCopyCmd.Ecmd.compare);
   
   final FcmdMkDirFile mkCmd = new FcmdMkDirFile(this);
 
@@ -537,7 +541,9 @@ public class Fcmd extends GuiCfg
     filePropsCmd.buildWindow();  //F2
     viewCmd.buildWindowView();   //F3
     editWind.buildWindow();   //F3
-    copyCmd.buildWindowConfirmCopy();
+    copyCmd.buildWindowConfirmCopy("confirm copy / move / compare");
+    delCmd.buildWindowConfirmCopy("confirm delete");
+    compareCmd.buildWindowConfirmCopy("confirm compare");
     mkCmd.buildWindowConfirmMk();
     executer.buildWindowConfirmExec();
     deleteCmd.buildWindowConfirmDelete(); //F8

@@ -102,7 +102,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
    * @param property password, editable, maybe left empty.
    */
   public GralTextField(String name, Type... property){
-    super(name, 't', null);
+    super(name, 't');
     boolean bPassword1 = false;
     if(property !=null){
       for(int ii=0; ii<property.length; ++ii){
@@ -119,7 +119,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   }
   
   
-  public GralTextField(String name, char whatis, GralMng mng){
+  @Deprecated public GralTextField(String name, char whatis, GralMng mng){
     super(name, whatis, mng);
     bPassword = false;
     setBackColor(GralColor.getColor("wh"),0);

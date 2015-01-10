@@ -14,12 +14,12 @@ public class GralLabel extends GralWidget
 
   public GralLabel(String sName)
   {
-    super(sName, 'S', null);
+    super(sName, 'S');
   }
   
   public GralLabel(String sName, String sText, int origin)
   {
-    super(sName, 'S', null);
+    super(sName, 'S');
     this.origin = origin;
     super.setText(sText);
   }

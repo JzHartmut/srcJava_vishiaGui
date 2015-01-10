@@ -88,7 +88,7 @@ public class GralHorizontalSelector<UserData> extends GralWidget
    * @param mng
    */
   public GralHorizontalSelector(String name, GralUserAction actionOnSelect){
-    super(name, 'n', null);
+    super(name, 'n');
     colorText = GralColor.getColor("bk");
     colorSelect = GralColor.getColor("rd");
     colorBack = GralColor.getColor("wh");

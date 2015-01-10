@@ -156,7 +156,7 @@ public class GralColorShow
   }
   
   GralDispatchCallbackWorker initGraphic = new GralDispatchCallbackWorker("GralArea9Window.initGraphic"){
-    @Override public void doBeforeDispatching(boolean onlyWakeup)
+    @Override public void executeOrder()
     {
       gralMng.setPosition(4, -2, 2, -2, 0, 'd');
       //gralMng.addTextField();

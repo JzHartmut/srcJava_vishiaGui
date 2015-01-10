@@ -3,7 +3,7 @@ package org.vishia.gral.base;
 
 import org.vishia.util.Assert;
 import org.vishia.util.MinMaxTime;
-import org.vishia.util.OrderListExecuter;
+import org.vishia.util.TimeOrderMng;
 
 /**This class is the base for implementation of graphic threading. It is implemented for SWT and Swing yet.
  * <br><br>
@@ -36,7 +36,7 @@ import org.vishia.util.OrderListExecuter;
  * The information which should be presented should be queued. That is the mechanism:
  * <ul>
  * <li><b>Version 1:</b> An execution sequence for the graphic thread is written in a derived instance of
- *    <ul><li>{@link GralDispatchCallbackWorker#doBeforeDispatching(boolean)}.
+ *    <ul><li>{@link GralDispatchCallbackWorker#executeOrder(boolean)}.
  *    </ul> 
  *    That instance should be queued calling
  *    <ul><li>{@link #addDispatchOrder(GralDispatchCallbackWorker)}. 
@@ -46,7 +46,7 @@ import org.vishia.util.OrderListExecuter;
  *    <br><br>
  *    In the graphic thread execution loop the {@link #queueGraphicOrders} queue is checked 
  *    and all queued method are invoked. That executes the 'widget.setText(text)' or the other routines
- *    from the users programm in the {@link GralDispatchCallbackWorker#doBeforeDispatching(boolean)}.
+ *    from the users programm in the {@link GralDispatchCallbackWorker#executeOrder(boolean)}.
  *    <br><br>
  *    After the queue is checked the {@link #dispatchOsEvents()} is called. In SWT it calls the operation system
  *    dispatching loop. If the underlying graphic system has its own graphic dispatching thread that thread
@@ -55,7 +55,7 @@ import org.vishia.util.OrderListExecuter;
  *    <br><br>
  *    The instance of {@link GralDispatchCallbackWorker} will be remain in the queue. For single activities
  *    it should be queued out by itself calling its own {@link GralDispatchCallbackWorker#removeFromList(GralGraphicThread)}
- *    method in its {@link GralDispatchCallbackWorker#doBeforeDispatching(boolean)}-routine.
+ *    method in its {@link GralDispatchCallbackWorker#executeOrder(boolean)}-routine.
  *    Another possibility is to have instances of {@link GralDispatchCallbackWorker} which are queued
  *    for any time. They are invoked whenever {@link #wakeup()} is called. 
  * <li><b>Version 2</b>: The order or commission can be instructed to the <code>setInfo(cmd, ...data)</code>-method
@@ -64,7 +64,7 @@ import org.vishia.util.OrderListExecuter;
  *   </ul>
  *   This method fills a queue of the {@link GralMng}:
  *   <ul><li>{@link GralMng.WidgetChangeRequExecuter#guiChangeRequests}
- *     <li>{@link GralMng.WidgetChangeRequExecuter#doBeforeDispatching(boolean)} polls that queue.
+ *     <li>{@link GralMng.WidgetChangeRequExecuter#executeOrder(boolean)} polls that queue.
  *     <li>{@link GralMng#widgetChangeRequExecuter}: The instance in the GralWidgetManager.
  *   </ul>
  *   The instance is a permanent member of the {@link #queueGraphicOrders} queue, it is executed 
@@ -109,7 +109,7 @@ import org.vishia.util.OrderListExecuter;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralGraphicThread implements Runnable, OrderListExecuter.ConnectionExecThread
+public abstract class GralGraphicThread implements Runnable, TimeOrderMng.ConnectionExecThread
 {
   
   /**Version and history:
@@ -183,7 +183,7 @@ public abstract class GralGraphicThread implements Runnable, OrderListExecuter.C
   protected MinMaxTime checkTimes = new MinMaxTime();
   
   
-  OrderListExecuter orderList = new OrderListExecuter(this);
+  TimeOrderMng orderList = new TimeOrderMng(this);
 
   /**Constructs this class as superclass.
    * The constructor of the inheriting class has some more parameter to build the 
@@ -213,11 +213,11 @@ public abstract class GralGraphicThread implements Runnable, OrderListExecuter.C
    * if {@link #wakeup()} is called or this routine returns if the operation system wakes up the graphic thread. */
   protected abstract void graphicThreadSleep();
   
-  public OrderListExecuter orderList(){ return orderList; }
+  public TimeOrderMng orderList(){ return orderList; }
   
-  public void addDispatchOrder(GralDispatchCallbackWorker order){ orderList.addDispatchOrder(order); }
+  public void addDispatchOrder(GralDispatchCallbackWorker order){ orderList.addTimeOrder(order); }
 
-  public void removeDispatchListener(GralDispatchCallbackWorker listener){ orderList.removeDispatchListener(listener); }
+  public void removeDispatchListener(GralDispatchCallbackWorker listener){ orderList.removeTimeOrder(listener); }
 
   /**This method should be implemented by the graphical base. It should be waked up the execution 
    * of the graphic thread because some actions are registered.. */

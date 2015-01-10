@@ -215,7 +215,7 @@ public class GralArea9Window implements GralArea9_ifc
 
   
   GralDispatchCallbackWorker initGraphic = new GralDispatchCallbackWorker("GralArea9Window.initGraphic"){
-    @Override public void doBeforeDispatching(boolean onlyWakeup)
+    @Override public void executeOrder()
     {
       window.setResizeAction(resizeAction);   //sets the resize action from this instead a standard window for the primaryWindow.
       setFrameAreaBorders(30,70,30,70);
@@ -617,7 +617,7 @@ public class GralArea9Window implements GralArea9_ifc
   
   
   private final GralDispatchCallbackWorker writeOutputTextDirectly = new GralDispatchCallbackWorker("GralArea9Window.writeOutputTextDirectly")
-  { @Override public void doBeforeDispatching(boolean onlyWakeup)
+  { @Override public void executeOrder()
     { String line;
       while((line = outputTexts.poll())!=null){
         writeDirectly(line, MainCmd.kInfoln_writeInfoDirectly);

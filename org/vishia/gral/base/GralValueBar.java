@@ -52,7 +52,7 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
 	
 	
 	public GralValueBar(String name)
-	{ super(name, 'U', null);
+	{ super(name, 'U');
 	}
 
 

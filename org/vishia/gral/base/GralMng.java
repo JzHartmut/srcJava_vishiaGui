@@ -391,6 +391,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
       pos.setNextPosition();
       posUsed = false;
     }
+    //posUsed = true;
     return pos.clone(); 
   }
 	

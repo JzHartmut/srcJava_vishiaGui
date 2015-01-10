@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
@@ -132,7 +133,9 @@ public class FcmdButtons
       idxKeyAction.put(key2, action);
     }
     if(menu !=null){
-      main.gui.addMenuBarArea9ItemGThread(null, menu, action);
+      GralMenu menuBar = main.gui.getMenuBar();
+      menuBar.addMenuItemGthread(menu, action);
+      //main.gui.addMenuBarArea9ItemGThread(null, menu, action);
     }
   }
   

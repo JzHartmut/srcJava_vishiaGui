@@ -558,13 +558,18 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   //}
 
   
-  public GralWidget(String sName, char whatIs, GralMng mng)
+  public GralWidget(String sName, char whatIs)
   { this.name = sName;
     //this.widget = null;
     this.whatIs = whatIs;
     this.itsCfgElement = null;
-    this.itsMng = mng;
+  }
+  
+  
+  public GralWidget(String sName, char whatIs, GralMng mng)
+  { this(sName, whatIs);
     if(mng !=null){
+      this.itsMng = mng;
       //sets the mng and the pos of Window in that cases
       //where the mng is present on ctor. (not in new form)
       setPanelMng(mng);   
@@ -1478,7 +1483,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * If its callback method was run, it is dequeued till the next request of {@link #repaint()}.
    */
   private final GralDispatchCallbackWorker repaintRequ = new GralDispatchCallbackWorker("GralWidget.repaintRequ"){
-    @Override public void doBeforeDispatching(boolean onlyWakeup) {
+    @Override public void executeOrder() {
       //first remove from queue to force add new, if a new request is given.
       //thread safety: If a new request is given, it is not add yet, because it isn't execute.
       removeFromList(itsMng.gralDevice().orderList());

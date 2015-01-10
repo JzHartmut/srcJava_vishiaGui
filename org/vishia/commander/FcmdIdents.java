@@ -20,7 +20,11 @@ public class FcmdIdents extends FcmdIdentsBase
   List<GralButtonKeyMenu> entries = new LinkedList<GralButtonKeyMenu>();
   
   final GralButtonKeyMenu readMsg = new GralButtonKeyMenu(main.actionReadMsgConfig, "&Help/read &MsgCfg", null, null, null, 0, 0, entries);  ////
-  final GralButtonKeyMenu deselectRecursFiles = new GralButtonKeyMenu(main.favorPathSelector.actionDeselectDirtree, "&File/&Deselect dirtree", "&Deselect dirtree", null, null, KeyCode.ctrl + 'd', KeyCode.ctrl + 'D', entries);
+  final GralButtonKeyMenu deselectRecursFiles = new GralButtonKeyMenu(main.favorPathSelector.actionDeselectDirtree, "&File/&Deselect dirtree  [ctrl-d]", "&Deselect dirtree [ctrl-d]", null, null, KeyCode.ctrl + 'd', KeyCode.ctrl + 'D', entries);
+  
+  final GralButtonKeyMenu openConfirmDelete = new GralButtonKeyMenu(main.delCmd.actionConfirmCopy, "&File/&Delete [sh-F8]", "&Delete", null, null, KeyCode.shift + KeyCode.F8, 0, entries);
+  
+  final GralButtonKeyMenu openConfirmCompare = new GralButtonKeyMenu(main.compareCmd.actionConfirmCopy, "&File/&Compare [sh-F7]", "&Compare", null, null, KeyCode.shift + KeyCode.F7, 0, entries);
   
   String menuBarSettings = "&Help/&Settings [cP]";
   String menuContextSettings = "Settings [cP]";

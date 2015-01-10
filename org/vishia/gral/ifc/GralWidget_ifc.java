@@ -36,7 +36,7 @@ import org.vishia.util.Removeable;
  *   {@link org.vishia.gral.base.GralDispatchCallbackWorker}. Any of them may have a specific delay. 
  *   The graphic thread organizes it in a proper kind of time.
  * <li>If a {@link org.vishia.gral.base.GralDispatchCallbackWorker} is dequeued in the graphic thread, 
- *   its method {@link org.vishia.gral.base.GralDispatchCallbackWorker#doBeforeDispatching(boolean)} is invoked. 
+ *   its method {@link org.vishia.gral.base.GralDispatchCallbackWorker#executeOrder(boolean)} is invoked. 
  *   This method calls {@link GralWidgImpl_ifc#repaintGthread()} via the association {@link org.vishia.gral.base.GralWidget#wdgImpl}.
  * <li>The <code>rerepaintGthread()</code> method is overridden in the implementation layer
  *   with the necessary statements to transfer the non-graphic data of this {@link GralWidget} especially
@@ -228,7 +228,7 @@ public interface GralWidget_ifc extends Removeable
    * With the set methods the user stores the text, color etc. in graphic-independent attributes. Then the method
    * {@link #repaint(int, int)} is invoked with the standard delay of {@link #repaintDelay} and {@link #repaintDelayMax}.
    * With that the widget-specific private instance of {@link #repaintRequ} is added to the queue of requests
-   * in the {@link GralGraphicThread#addDispatchOrder(GralDispatchCallbackWorker)}. In the requested time that 
+   * in the {@link GralGraphicThread#addTimeOrder(GralDispatchCallbackWorker)}. In the requested time that 
    * dispatch order is executed in the graphic thread. It calls {@link GralWidgImpl_ifc#repaintGthread()}. 
    * That method is implemented in the graphic implementation layer of the widget. It sets the appropriate values 
    * from the independent Gral attributes to the implementation specifics and invoke a redraw of the graphic layer.

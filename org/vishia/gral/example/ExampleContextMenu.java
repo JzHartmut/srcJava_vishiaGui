@@ -56,8 +56,8 @@ public class ExampleContextMenu extends ExampleSimpleButton
 
  
   protected class InitGuiCodeContextMenu extends ExampleSimpleButton.InitGuiCodeSimpleButton{
-    @Override public void doBeforeDispatching(boolean onlyWakeup){
-      super.doBeforeDispatching(onlyWakeup);
+    @Override public void executeOrder(){
+      super.executeOrder();
       //GralMenu menuInput = gui.gralMng.createContextMenu("menu-test", gui.widgInput);
       GralMenu menuInput = gui.widgInput.getContextMenu();
     }

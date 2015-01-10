@@ -91,12 +91,12 @@ public class GralButton extends GralWidget
   
   public GralButton(String sName)
   {
-    super(sName, 'B', null);  //GralWidget
+    super(sName, 'B');  //GralWidget
   }
   
   public GralButton(String sName, String sText, GralUserAction action)
   {
-    super(sName, 'B', null);  //GralWidget
+    super(sName, 'B');  //GralWidget
     setText(sText);
     setActionChange(action);
   }

@@ -166,9 +166,9 @@ public class ExampleSimpleButton
     }
     
     /**This routine is called in the graphic thread if it was added.
-     * @see org.vishia.gral.base.GralDispatchCallbackWorker#doBeforeDispatching(boolean)
+     * @see org.vishia.gral.base.GralDispatchCallbackWorker#executeOrder(boolean)
      */
-    @Override public void doBeforeDispatching(boolean onlyWakeup)
+    @Override public void executeOrder()
     {
       //we have only one panel. But if there are more as one, select which.
       gui.gralMng.selectPanel("primaryWindow");

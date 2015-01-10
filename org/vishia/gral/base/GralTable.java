@@ -351,7 +351,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   public GralTable(String name, int[] columnWidths) {
-    super(name, 'L', null);
+    super(name, 'L');
     this.columnWidthsGral = columnWidths;
     this.zColumn = columnWidths.length;
     this.bColumnEditable = new boolean[this.zColumn];  //all false.
@@ -1176,7 +1176,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    */
   protected final GralDispatchCallbackWorker keyActionDone = new GralDispatchCallbackWorker("GralTableKeyDone") {
     @Override
-    public void doBeforeDispatching(boolean onlyWakeup) {
+    public void executeOrder() {
       gi.bFocused = true;  //to focus while repainting
       repaintGthread();
       keyDone = true;

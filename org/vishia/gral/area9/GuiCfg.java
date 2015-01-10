@@ -265,7 +265,7 @@ protected void userInit()
  */
 GralDispatchCallbackWorker initGraphic = new GralDispatchCallbackWorker("GuiCfg.initGraphic")
 {
-  @Override public void doBeforeDispatching(boolean onlyWakeup)
+  @Override public void executeOrder()
   {
     gralMng.selectPanel("primaryWindow");
     gralMng.setPosition(10, 16,5,20,0,'.');
@@ -282,7 +282,7 @@ GralDispatchCallbackWorker initGraphic = new GralDispatchCallbackWorker("GuiCfg.
 GralDispatchCallbackWorker configGuiWithZbnf = new GralDispatchCallbackWorker("GuiCfg.configGuiWithZbnf")
 {
   
-  @Override public void doBeforeDispatching(boolean onlyWakeup){
+  @Override public void executeOrder(){
     panelBuildIfc.buildCfg(guiCfgData, cargs.fileGuiCfg);
     gralMng.initCfgDesigner();
 

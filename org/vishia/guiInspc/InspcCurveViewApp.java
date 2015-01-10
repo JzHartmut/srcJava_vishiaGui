@@ -47,7 +47,7 @@ public class InspcCurveViewApp
   
   
   GralDispatchCallbackWorker initGraphic = new GralDispatchCallbackWorker("GralArea9Window.initGraphic"){
-    @Override public void doBeforeDispatching(boolean onlyWakeup)
+    @Override public void executeOrder()
     {
       curveView.buildGraphicInCurveWindow(null);
   } };

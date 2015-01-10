@@ -1,6 +1,6 @@
 package org.vishia.gral.base;
 
-import org.vishia.util.OrderForList;
+import org.vishia.util.TimeOrderBase;
 
 
 /**This is the base class for user classes, which contains code, that is executed in the graphic thread,
@@ -8,7 +8,7 @@ import org.vishia.util.OrderForList;
  * @author Hartmut Schorrig.
  *
  */
-public abstract class GralDispatchCallbackWorker extends OrderForList
+public abstract class GralDispatchCallbackWorker extends TimeOrderBase
 {
   
   
