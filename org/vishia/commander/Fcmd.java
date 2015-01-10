@@ -411,11 +411,11 @@ public class Fcmd extends GuiCfg
   
   final FcmdEdit editWind = new FcmdEdit(this);
   
-  final FcmdCopyCmd copyCmd = new FcmdCopyCmd(this, FcmdCopyCmd.Ecmd.copy);
+  final FcmdCopyCmprDel copyCmd = new FcmdCopyCmprDel(this, FcmdCopyCmprDel.Ecmd.copy);
   
-  final FcmdCopyCmd delCmd = new FcmdCopyCmd(this, FcmdCopyCmd.Ecmd.delete);
+  final FcmdCopyCmprDel delCmd = new FcmdCopyCmprDel(this, FcmdCopyCmprDel.Ecmd.delete);
   
-  final FcmdCopyCmd compareCmd = new FcmdCopyCmd(this, FcmdCopyCmd.Ecmd.compare);
+  final FcmdCopyCmprDel compareCmd = new FcmdCopyCmprDel(this, FcmdCopyCmprDel.Ecmd.compare);
   
   final FcmdMkDirFile mkCmd = new FcmdMkDirFile(this);
 

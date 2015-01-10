@@ -113,32 +113,6 @@ public final class FcmdFilesCp {
   }
   
   
-  void filesCp(){
-    FcmdFileCard[] lastFileCards = main.getLastSelectedFileCards();
-    card1 = lastFileCards[0];
-    card2 = lastFileCards[1];
-    if(card1 !=null && card2 !=null){
-      widgCompare.setText("stop");
-      file1 = card1.currentFile();
-      file2 = card2.currentFile();
-      if(true){
-        FileRemote.XXXXXXXXcmpFiles(file1, file2, null); 
-      } else {
-        //the old stuff should be deleted. It has worked with an extra result tree. Note: maybe remove FileComplare class???
-        result.clear();
-        idxFilepath4Result.clear();
-        FileCompare.Result result1 = new FileCompare.Result(null, file1, file2);
-        comparer.compare(result1, null, 0);
-        result = result1.subFiles;
-        for(FileCompare.Result item: result){
-          buildIdxResult(item, 0);
-        }
-      }
-      //let the window open to set sync or see results there (TODO)
-      //windConfirmCompare.setWindowVisible(false);
-    }
-  }
-  
   
   
   
@@ -217,7 +191,7 @@ public final class FcmdFilesCp {
           setDirs();
         } else
         if(infos.sCmd.equals("cp")){
-          filesCp();
+          //filesCp();
         } else if(infos.sCmd.equals("stop")){
           widgCompare.setText("stopped");
           widgCompare.sCmd = "stop";
