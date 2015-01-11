@@ -17,6 +17,8 @@ public abstract class GralDispatchCallbackWorker extends TimeOrderBase
   { super(name);
   }
   
-	
+  @Override protected void activateTimeOrder(){
+    //is the manager known application global?
+  }
 
 }

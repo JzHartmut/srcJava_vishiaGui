@@ -697,17 +697,42 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       widgCopyState.setText("ok: "); // + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
       setTexts(Estate.finit);
     }
-    switch(order.cmd){
-      case askDstOverwr: widgCopyState.setText("overwrite file? "); break;
-      case askDstNotAbletoOverwr: widgCopyState.setText("cannot overwrite file? "); break;
-      case askErrorCopy: widgCopyState.setText("error copy? "); break;
-      case askErrorDstCreate: widgCopyState.setText("cannot create? "); break;
-      case askDstReadonly: widgCopyState.setText("overwrite readonly file? "); break;
-      case askErrorSrcOpen: widgCopyState.setText("cannot open sourcefile "); break;
-      case done:       widgCopyState.setText("ok: "); // + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
-        setTexts(Estate.finit);
-        break;
-      
+    if(order.cmd !=null) {
+      switch(order.cmd){
+        case askDstOverwr: 
+          widgCopyState.setText("overwrite file? "); 
+          widgOverwrFile.setBackColor(GralColor.getColor("lng"), 0);
+          widgSkipFile.setBackColor(GralColor.getColor("lgn"), 0);
+          break;
+        case askDstNotAbletoOverwr: 
+          widgCopyState.setText("cannot overwrite file? "); 
+          widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
+          break;
+        case askErrorCopy: 
+          widgCopyState.setText("error copy? "); 
+          widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
+          break;
+        case askErrorDstCreate: 
+          widgCopyState.setText("cannot create? "); 
+          widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
+          break;
+        case askDstReadonly: 
+          widgCopyState.setText("overwrite readonly file? "); 
+          widgOverwrFile.setBackColor(GralColor.getColor("lng"), 0);
+          widgSkipFile.setBackColor(GralColor.getColor("lgn"), 0);
+          break;
+        case askErrorSrcOpen: 
+          widgCopyState.setText("cannot open sourcefile "); 
+          widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
+          break;
+        case done:       
+          widgCopyState.setText("ok: "); // + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
+          widgOverwrFile.setBackColor(GralColor.getColor("lgr"), 0);
+          widgSkipFile.setBackColor(GralColor.getColor("lgr"), 0);
+          setTexts(Estate.finit);
+          break;
+        
+      }
     }
   }
   
@@ -1187,11 +1212,14 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
           int modeCopyOper = modeCopy();
           evCurrentFile.copyOverwriteFile(modeCopyOper);
         }
-        else if(action.showFilesProcessing.cmd == FileRemote.CallbackCmd.askDstOverwr) {
+        else if(action.showFilesProcessing.cmd == FileRemote.CallbackCmd.askDstOverwr
+             || action.showFilesProcessing.cmd == FileRemote.CallbackCmd.askDstReadonly) {
           action.showFilesProcessing.modeCopyOper = modeCopy();
           action.showFilesProcessing.answer(FileRemote.Cmd.overwr);
           
         }
+        widgCopyNameDst.setText("");
+        widgCopyState.setText("skipped");
         widgSkipFile.setBackColor(GralColor.getColor("wh"), 0);
         widgOverwrFile.setBackColor(GralColor.getColor("wh"), 0);
       }
@@ -1213,6 +1241,13 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
           int modeCopyOper = modeCopy();
           evCurrentFile.copySkipFile(modeCopyOper);
         }
+        else if(action.showFilesProcessing !=null) {
+          action.showFilesProcessing.modeCopyOper = modeCopy();
+          action.showFilesProcessing.answer(FileRemote.Cmd.abortCopyFile);
+         
+        }
+        widgCopyNameDst.setText("");
+        widgCopyState.setText("skipped");
         widgSkipFile.setBackColor(GralColor.getColor("wh"), 0);
         widgOverwrFile.setBackColor(GralColor.getColor("wh"), 0);
       }

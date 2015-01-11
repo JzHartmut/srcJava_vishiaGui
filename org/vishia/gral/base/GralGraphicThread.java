@@ -1,8 +1,12 @@
 package org.vishia.gral.base;
 
 
+import java.util.EventObject;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.vishia.util.Assert;
 import org.vishia.util.MinMaxTime;
+import org.vishia.util.TimeOrderBase;
 import org.vishia.util.TimeOrderMng;
 
 /**This class is the base for implementation of graphic threading. It is implemented for SWT and Swing yet.
@@ -183,6 +187,16 @@ public abstract class GralGraphicThread implements Runnable, TimeOrderMng.Connec
   protected MinMaxTime checkTimes = new MinMaxTime();
   
   
+  /**Queue of orders to execute in the graphic thread before dispatching system events. 
+   * Any instance will be invoked in the dispatch-loop.
+   * See {@link #addTimeOrder(Runnable)}. 
+   * An order can be stayed in this queue for ever. It is invoked any time after the graphic thread 
+   * is woken up and before the dispatching of graphic-system-event will be started.
+   * An order may be run only one time, than it should delete itself from this queue in its run-method.
+   * */
+  private final ConcurrentLinkedQueue<TimeOrderBase> queueOrdersToExecute = new ConcurrentLinkedQueue<TimeOrderBase>();
+
+  
   TimeOrderMng orderList = new TimeOrderMng(this);
 
   /**Constructs this class as superclass.
@@ -219,6 +233,13 @@ public abstract class GralGraphicThread implements Runnable, TimeOrderMng.Connec
 
   public void removeDispatchListener(GralDispatchCallbackWorker listener){ orderList.removeTimeOrder(listener); }
 
+  
+  public void addEvent(EventObject event) {
+    assert(event instanceof TimeOrderBase);  //should be
+    queueOrdersToExecute.add((TimeOrderBase)event);
+  }
+  
+  
   /**This method should be implemented by the graphical base. It should be waked up the execution 
    * of the graphic thread because some actions are registered.. */
   public abstract void wakeup();
@@ -294,9 +315,23 @@ public abstract class GralGraphicThread implements Runnable, TimeOrderMng.Connec
         //it may be waked up by the operation system or by calling Display.wake().
         //if wakeUp() is called, isWakedUpOnly is set.
         checkTimes.cyclTime();
-        
-        boolean bNotSleep = orderList.step(-1, System.currentTimeMillis());
-        if(!bNotSleep){
+        //execute stored orders.
+        TimeOrderBase order;
+        boolean bSleep = true;
+        while( (order = queueOrdersToExecute.poll()) !=null) {
+          try{
+            order.processEvent(null);
+          } catch(Exception exc){
+            System.err.println("GralGraphicThread-" + exc.getMessage());
+            exc.printStackTrace();
+          }
+          bSleep = false;
+        }
+        if(orderList.step(-1, System.currentTimeMillis())){  //deprecated.
+          bSleep = false;
+        }
+        if(bSleep){ //if any order is executed, don't sleep yet because some os events may forced therefore. Dispatch it!
+          //no order executed. It sleeps. An os event which arrives in this time wakes up the graphic thread.
           graphicThreadSleep();
         }
       } 
