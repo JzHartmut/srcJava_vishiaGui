@@ -4,9 +4,10 @@ import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.vishia.event.EventMsg2;
+import org.vishia.event.EventCmdPingPongType;
 import org.vishia.event.EventConsumer;
 import org.vishia.event.EventSource;
+import org.vishia.event.TimeOrderBase;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.fileRemote.FileRemoteCallback;
@@ -29,7 +30,6 @@ import org.vishia.util.KeyCode;
 import org.vishia.util.SortedTreeWalkerCallback;
 import org.vishia.util.StringFormatter;
 import org.vishia.util.StringFunctions;
-import org.vishia.util.TimeOrderBase;
 
 
 /**Base class for initializing some class variables before the variables with only code in the class body are executed. */
@@ -1136,7 +1136,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    * <br><br>
    * To notify for success or progression of the copy process some events are used.
    * See the {@link #success} {@link EventConsumer} in this class. The event instance is given to the 
-   * {@link FileRemote#copyTo(FileRemote, EventMsg2)} invocation. It is used to callback either from the thread
+   * {@link FileRemote#copyTo(FileRemote, EventCmdPingPongType)} invocation. It is used to callback either from the thread
    * which copies local or from the thread which receives the copy response telegrams for remote communication.
    * <br><br>
    * All Events which are created are stored in the {@link #listEvCopy}. If the callback occurs, the event 
@@ -1456,7 +1456,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    * <br><br>
    * If the event will be reused the "abort" was send for a longer time (at least 1 second for manual handling, pressing buttons). 
    * Therefore it can be occupied usual without waiting, at least with thread switch to finish execution of the event.
-   * See {@link EventMsg2#occupyRecall(int, EventSource, EventConsumer, org.vishia.event.EventThread, boolean)}  
+   * See {@link EventCmdPingPongType#occupyRecall(int, EventSource, EventConsumer, org.vishia.event.EventThread, boolean)}  
    */
   FileRemote.CallbackEvent evCallback = new FileRemote.CallbackEvent(evConsumerCallbackFromFileMachine, null, evSrc); 
   

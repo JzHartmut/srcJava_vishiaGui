@@ -184,7 +184,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   protected boolean bDesignerIsInitialized = false;
   
-  final GralMng parent;
+  //final GralMng parent;
   
   /**Base class for managing all panels and related windows.
    * This base class contains all common resources to manage panels and windows.
@@ -429,19 +429,23 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   private final Map<String, String> dataReplace = new TreeMap<String,String>();
 
 
+  private static GralMng singleton;
 	
   public GralMng(GralGraphicThread device, GralGridProperties props, LogMessage log)
 	{ this.gralDevice = device;
 	  //this.widgetHelper = widgetHelper;
 	  //if(widgetHelper !=null) { widgetHelper.setMng(this); }
-    this.parent = null;
+    //this.parent = null;
 	  this.propertiesGui = props;
 		this.log = log;
     //its a user action able to use in scripts.
 		userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
-
+    GralMng.singleton = this; 
 	}
   
+  
+  /**Returns the singleton or null if the GralMng is not instantiated yet.*/
+  public static GralMng get(){ return singleton; }
   
   /* (non-Javadoc)
    * @see org.vishia.gral.ifc.GralMngBuild_ifc#setMainKeyAction(org.vishia.gral.ifc.GralUserAction)

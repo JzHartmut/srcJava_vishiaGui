@@ -4,10 +4,11 @@ package org.vishia.gral.base;
 import java.util.EventObject;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.event.EventThreadIfc;
+import org.vishia.event.TimeOrderBase;
+import org.vishia.event.TimeOrderMng;
 import org.vishia.util.Assert;
 import org.vishia.util.MinMaxTime;
-import org.vishia.util.TimeOrderBase;
-import org.vishia.util.TimeOrderMng;
 
 /**This class is the base for implementation of graphic threading. It is implemented for SWT and Swing yet.
  * <br><br>
@@ -113,7 +114,7 @@ import org.vishia.util.TimeOrderMng;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralGraphicThread implements Runnable, TimeOrderMng.ConnectionExecThread
+public abstract class GralGraphicThread implements EventThreadIfc, Runnable, TimeOrderMng.ConnectionExecThread
 {
   
   /**Version and history:
@@ -197,7 +198,7 @@ public abstract class GralGraphicThread implements Runnable, TimeOrderMng.Connec
   private final ConcurrentLinkedQueue<TimeOrderBase> queueOrdersToExecute = new ConcurrentLinkedQueue<TimeOrderBase>();
 
   
-  TimeOrderMng orderList = new TimeOrderMng(this);
+  TimeOrderMng orderList = new TimeOrderMng(true); //this);
 
   /**Constructs this class as superclass.
    * The constructor of the inheriting class has some more parameter to build the 
@@ -227,6 +228,31 @@ public abstract class GralGraphicThread implements Runnable, TimeOrderMng.Connec
    * if {@link #wakeup()} is called or this routine returns if the operation system wakes up the graphic thread. */
   protected abstract void graphicThreadSleep();
   
+  
+  /**Stores an event in the queue, able to invoke from any thread.
+   * @param ev
+   */
+  @Override public void storeEvent(EventObject ev){
+    if(ev instanceof TimeOrderBase) { 
+      queueOrdersToExecute.add((TimeOrderBase)ev);
+      wakeup();
+   } else {
+      throw new IllegalArgumentException("can only store events of type TimeOrderBase");
+    }
+  }
+
+  
+  /**Removes this event from its queue if it is in the queue.
+   * If the element is found in the queue, it is designated with stateOfEvent = 'a'
+   * @param ev
+   * @return true if found.
+   */
+  public boolean removeFromQueue(EventObject ev){
+    return queueOrdersToExecute.remove(ev);
+  }
+
+  
+  
   public TimeOrderMng orderList(){ return orderList; }
   
   public void addDispatchOrder(GralDispatchCallbackWorker order){ orderList.addTimeOrder(order); }
@@ -237,6 +263,7 @@ public abstract class GralGraphicThread implements Runnable, TimeOrderMng.Connec
   public void addEvent(EventObject event) {
     assert(event instanceof TimeOrderBase);  //should be
     queueOrdersToExecute.add((TimeOrderBase)event);
+    wakeup();
   }
   
   
@@ -320,7 +347,7 @@ public abstract class GralGraphicThread implements Runnable, TimeOrderMng.Connec
         boolean bSleep = true;
         while( (order = queueOrdersToExecute.poll()) !=null) {
           try{
-            order.processEvent(null);
+            order.executeOrder();
           } catch(Exception exc){
             System.err.println("GralGraphicThread-" + exc.getMessage());
             exc.printStackTrace();
@@ -336,6 +363,7 @@ public abstract class GralGraphicThread implements Runnable, TimeOrderMng.Connec
         }
       } 
     }
+    orderList.close();
     //displaySwt.dispose ();
     //bExit = true;
     //synchronized(this){ notify(); }  //to weak up waiting on configGrafic().

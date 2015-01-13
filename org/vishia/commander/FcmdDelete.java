@@ -5,8 +5,8 @@ import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.vishia.event.EventMsg;
-import org.vishia.event.EventMsg2;
+import org.vishia.event.EventCmdType;
+import org.vishia.event.EventCmdPingPongType;
 import org.vishia.event.EventConsumer;
 import org.vishia.event.EventSource;
 import org.vishia.fileRemote.FileRemote;
@@ -49,7 +49,7 @@ public class FcmdDelete
    */
   String sFileDelete;
  
-  final List<EventMsg2> listEvDel = new LinkedList<EventMsg2>();
+  final List<EventCmdPingPongType> listEvDel = new LinkedList<EventCmdPingPongType>();
 
   
   /**The file card where the directory content is shown where the file will be deleted.
