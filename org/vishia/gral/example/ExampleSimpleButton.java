@@ -195,7 +195,8 @@ public class ExampleSimpleButton
       //counts its execution because await...() is called for it.
       countExecution();
       //remove itself, it should be executed only one time.
-      gui.gralMng.gralDevice.removeDispatchListener(this);
+      countExecution();
+      //gui.gralMng.gralDevice.removeDispatchListener(this);
     }
   };
 

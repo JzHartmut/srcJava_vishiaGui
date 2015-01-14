@@ -279,7 +279,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   public void setMouseAction(GralUserAction action)
   {
     mouseAction = action;
-    repaint(repaintDelay, repaintDelayMax);
+    //repaint(repaintDelay, repaintDelayMax);
   }
 
 
@@ -287,7 +287,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   @Override
   public void setResizeAction(GralUserAction action)
   { resizeAction = action;
-    repaint(repaintDelay, repaintDelayMax);
+    //repaint(repaintDelay, repaintDelayMax);
   }
 
 

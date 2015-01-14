@@ -1180,8 +1180,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       gi.bFocused = true;  //to focus while repainting
       repaintGthread();
       keyDone = true;
-      //System.out.println("Key done");
-      removeFromList(itsMng.gralDevice().orderList());
+      countExecution();
+      ////System.out.println("Key done");
+      //removeFromList(itsMng.gralDevice().orderList());
     }
   };
 

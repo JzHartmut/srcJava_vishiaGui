@@ -691,14 +691,16 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   void showCurrentProcessedFileAndDir(FileRemoteProgressTimeOrder order) //FileRemote fileProcessed, int zFiles, boolean bDone) {
   { StringBuilder u = new StringBuilder(100);
     u.append(Integer.toString(zFiles)).append(": ");
-    order.currFile.setPathTo(u);
+    if(order.currFile !=null) {
+      order.currFile.setPathTo(u);
+    }
     widgCopyNameDst.setText(u);
     if(order.bDone) {
       widgCopyState.setText("ok: "); // + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
       setTexts(Estate.finit);
     }
-    if(order.cmd !=null) {
-      switch(order.cmd){
+    if(order.quest() !=null) {
+      switch(order.quest()){
         case askDstOverwr: 
           widgCopyState.setText("overwrite file? "); 
           widgOverwrFile.setBackColor(GralColor.getColor("lng"), 0);
@@ -1168,6 +1170,9 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
           }//switch
         } else if(state == Estate.finit) { //widgg.sCmd.equals("close")){
           closeWindow();
+        } else {
+          //should be state pause
+          action.showFilesProcessing.triggerStateMachine(FileRemote.Cmd.docontinue);
         }
       }
       return true;
@@ -1212,8 +1217,8 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
           int modeCopyOper = modeCopy();
           evCurrentFile.copyOverwriteFile(modeCopyOper);
         }
-        else if(action.showFilesProcessing.cmd == FileRemote.CallbackCmd.askDstOverwr
-             || action.showFilesProcessing.cmd == FileRemote.CallbackCmd.askDstReadonly) {
+        else if(action.showFilesProcessing.quest() == FileRemote.CallbackCmd.askDstOverwr
+             || action.showFilesProcessing.quest() == FileRemote.CallbackCmd.askDstReadonly) {
           action.showFilesProcessing.modeCopyOper = modeCopy();
           action.showFilesProcessing.answer(FileRemote.Cmd.overwr);
           

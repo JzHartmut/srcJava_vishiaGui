@@ -101,7 +101,8 @@ public class AwtTextBox extends GralTextBox
         viewTrail();
         newText.setLength(0);
       }
-      windowMng.removeDispatchListener(this);
+      countExecution();
+      //windowMng.removeDispatchListener(this);
     }
   };
   
@@ -112,7 +113,8 @@ public class AwtTextBox extends GralTextBox
         textFieldSwt.setText(newText.toString());
         newText.setLength(0);
       }
-      windowMng.removeDispatchListener(this);
+      //countExecution();
+      //windowMng.removeDispatchListener(this);
     }
   };
   

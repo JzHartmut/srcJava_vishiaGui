@@ -270,8 +270,8 @@ GralDispatchCallbackWorker initGraphic = new GralDispatchCallbackWorker("GuiCfg.
     gralMng.selectPanel("primaryWindow");
     gralMng.setPosition(10, 16,5,20,0,'.');
     initGuiAreas("A1C1");
-    gralMng.gralDevice.removeDispatchListener(this);    
-    countExecution();
+    //gralMng.gralDevice.removeDispatchListener(this);    
+    //countExecution();
   }
 };
 
@@ -286,9 +286,9 @@ GralDispatchCallbackWorker configGuiWithZbnf = new GralDispatchCallbackWorker("G
     panelBuildIfc.buildCfg(guiCfgData, cargs.fileGuiCfg);
     gralMng.initCfgDesigner();
 
-    gralMng.gralDevice.removeDispatchListener(this);    
+    //gralMng.gralDevice.removeDispatchListener(this);    
     
-    countExecution();
+    //countExecution();
       
   }
 ////

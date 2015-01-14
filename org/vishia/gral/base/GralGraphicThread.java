@@ -257,7 +257,7 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable, Tim
   
   public void addDispatchOrder(GralDispatchCallbackWorker order){ orderList.addTimeOrder(order); }
 
-  public void removeDispatchListener(GralDispatchCallbackWorker listener){ orderList.removeTimeOrder(listener); }
+  //public void removeDispatchListener(GralDispatchCallbackWorker listener){ orderList.removeTimeOrder(listener); }
 
   
   public void addEvent(EventObject event) {
@@ -347,7 +347,7 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable, Tim
         boolean bSleep = true;
         while( (order = queueOrdersToExecute.poll()) !=null) {
           try{
-            order.executeOrder();
+            order.execute();
           } catch(Exception exc){
             System.err.println("GralGraphicThread-" + exc.getMessage());
             exc.printStackTrace();

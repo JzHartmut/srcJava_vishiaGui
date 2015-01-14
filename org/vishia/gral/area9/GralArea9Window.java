@@ -249,8 +249,8 @@ public class GralArea9Window implements GralArea9_ifc
         outputPanel = addOutputFrameArea(outputArea);
         window.gralMng().registerPanel(outputPanel);
       }
-      window.gralMng().gralDevice.removeDispatchListener(this);
-      countExecution();
+      //window.gralMng().gralDevice.removeDispatchListener(this);
+      //countExecution();
     }
   };
 
@@ -622,6 +622,7 @@ public class GralArea9Window implements GralArea9_ifc
       while((line = outputTexts.poll())!=null){
         writeDirectly(line, MainCmd.kInfoln_writeInfoDirectly);
       }
+      //countExecution();
     }
   };
   
