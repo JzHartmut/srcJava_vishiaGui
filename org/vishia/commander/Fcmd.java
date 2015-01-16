@@ -662,7 +662,10 @@ public class Fcmd extends GuiCfg
   
   
   void setLastSelectedPanel(FcmdLeftMidRightPanel panel){
-    if(lastFilePanels.size() == 0 || lastFilePanels.get(0) != panel){
+    if(lastFilePanels.size() == 0){
+      lastFilePanels.add(0, panel);  //first time only
+    }
+    else if(lastFilePanels.get(0) != panel) {  //do nothing if the panel is the first one.
       if(!lastFilePanels.remove(panel)){  //if it is in list on higher position
         System.err.println("Fcmd - setLastSelectedPanel() faulty; try remove panel=" + panel.toString());
         //The file panel should be known!

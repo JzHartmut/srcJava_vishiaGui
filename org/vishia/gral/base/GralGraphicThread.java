@@ -5,6 +5,7 @@ import java.util.EventObject;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.event.EventThreadIfc;
+import org.vishia.event.EventTimeout;
 import org.vishia.event.TimeOrderBase;
 import org.vishia.event.TimeOrderMng;
 import org.vishia.util.Assert;
@@ -195,10 +196,10 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable, Tim
    * is woken up and before the dispatching of graphic-system-event will be started.
    * An order may be run only one time, than it should delete itself from this queue in its run-method.
    * */
-  private final ConcurrentLinkedQueue<TimeOrderBase> queueOrdersToExecute = new ConcurrentLinkedQueue<TimeOrderBase>();
+  private final ConcurrentLinkedQueue<GralDispatchCallbackWorker> queueOrdersToExecute = new ConcurrentLinkedQueue<GralDispatchCallbackWorker>();
 
   
-  TimeOrderMng orderList = new TimeOrderMng(true); //this);
+  TimeOrderMng orderList = new TimeOrderMng("GraphicOrderTimeMng"); //this);
 
   /**Constructs this class as superclass.
    * The constructor of the inheriting class has some more parameter to build the 
@@ -233,11 +234,11 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable, Tim
    * @param ev
    */
   @Override public void storeEvent(EventObject ev){
-    if(ev instanceof TimeOrderBase) { 
-      queueOrdersToExecute.add((TimeOrderBase)ev);
+    if(ev instanceof GralDispatchCallbackWorker) { 
+      queueOrdersToExecute.add((GralDispatchCallbackWorker)ev);
       wakeup();
    } else {
-      throw new IllegalArgumentException("can only store events of type TimeOrderBase");
+      throw new IllegalArgumentException("can only store events of type GralDispatchCallbackWorker");
     }
   }
 
@@ -247,22 +248,27 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable, Tim
    * @param ev
    * @return true if found.
    */
-  public boolean removeFromQueue(EventObject ev){
-    return queueOrdersToExecute.remove(ev);
+  @Override public boolean removeFromQueue(EventObject ev){
+    assert(ev instanceof GralDispatchCallbackWorker);
+    return ((GralDispatchCallbackWorker)ev).removeFromQueue()
+        || queueOrdersToExecute.remove(ev);
   }
 
   
   
   public TimeOrderMng orderList(){ return orderList; }
   
+  @Override public void addTimeOrder(EventTimeout order){ orderList.addTimeOrder(order); }
   public void addDispatchOrder(GralDispatchCallbackWorker order){ orderList.addTimeOrder(order); }
 
   //public void removeDispatchListener(GralDispatchCallbackWorker listener){ orderList.removeTimeOrder(listener); }
 
   
+
+  
   public void addEvent(EventObject event) {
-    assert(event instanceof TimeOrderBase);  //should be
-    queueOrdersToExecute.add((TimeOrderBase)event);
+    assert(event instanceof GralDispatchCallbackWorker);  //should be
+    queueOrdersToExecute.add((GralDispatchCallbackWorker)event);
     wakeup();
   }
   
@@ -347,7 +353,9 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable, Tim
         boolean bSleep = true;
         while( (order = queueOrdersToExecute.poll()) !=null) {
           try{
+            order.stateOfEvent = 'r';
             order.execute();
+            order.relinquish();
           } catch(Exception exc){
             System.err.println("GralGraphicThread-" + exc.getMessage());
             exc.printStackTrace();

@@ -83,7 +83,9 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   
   GralButton widgButtonModeDst;
   
-  GralTextField widgInputDst, widgCopyNameDst, widgCopyState;
+  GralTextField widgInputDst, widgCopyState;
+  
+  GralTextField widgCopyDirDst, widgCopyNameDst;  //TODO with progress
   
   GralButton widgdChoiceCreateNew, widgdChoiceOverwrExists, widgdChoiceOverwrReadOnly;
   
@@ -317,50 +319,54 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       widgdChoiceCreateNew.setBackColor(GralColor.getColor("lgn"), 0);
       widgdChoiceCreateNew.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.ctrl.createNew.");
     }
-    if(cmdWind != Ecmd.compare){
-      main.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size -3, 1, 12, 0, 'r', 1);
-      widgOverwrFile = main.gralMng.addButton(sTextExecuteForFile, actionOverwriteFile, "copyOverwrite", null, sTextExecuteForFile);
-      widgOverwrFile.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.quest.wr.");
-      widgSkipFile = main.gralMng.addButton("copyskip", actionButtonSkipFile, "copyskip", null, "skip file");
-      widgSkipFile.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.quest.skipFile.");
-      //main.gralMng.setPosition(GralPos.same, GralPos.size -3, 16, GralPos.size +14, 0, 'r', 1);
-      widgSkipDir = main.gralMng.addButton("copySkipDir", actionButtonSkipDir, "copySkipDir", null, "skip dir");
-      widgSkipDir.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.quest.skipDir.");
-      widgBtnPause = main.gralMng.addButton("pause", null, "pause", null, "pause");
-      widgBtnPause.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.pause.");
-      main.gralMng.setPosition(GralPos.same, GralPos.size +3.0f, GralPos.next, GralPos.size+3.0f, 0, 'r', 1);
-      widgState = main.gralMng.addButton(null, actionShowState, "?", null, "?" );
-      widgState.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.state.");
-    }  
     
     //field for showing the current action or state, not for input:
-    main.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size +3.2f, 1, -11, 0, 'd', 0.3f); //same line as del
-    widgCopyState = main.gralMng.addTextField("copyStatus", false, "current state:", "t");
-    widgCopyState.setBackColor(GralColor.getColor("lam"),0);
-    widgCopyState.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.state.");
-    
     //field for showing the current name, not for input:
-    main.gralMng.setPosition(GralPos.refer + 3.5f, GralPos.size +3.2f, 1, -11, 0, 'r', 1);
+    main.gralMng.setPosition(GralPos.refer + 3.5f, GralPos.size +3.2f, 1, -1, 0, 'd');
+    widgCopyDirDst = main.gralMng.addTextField("copyDirDst", false, "current directory:", "t");
+    widgCopyDirDst.setBackColor(GralColor.getColor("lam"),0);
+    widgCopyDirDst.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.currfile.");
     widgCopyNameDst = main.gralMng.addTextField("copyNameDst", false, "current file:", "t");
     widgCopyNameDst.setBackColor(GralColor.getColor("lam"),0);
     widgCopyNameDst.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.currfile.");
     
-    main.gralMng.setPosition(-4, GralPos.size+3.2f, 1, 9, 0, 'r');
-    widgButtonEsc = main.gralMng.addButton("copyEsc", actionButtonAbort, "esc", null, "close");
-    widgButtonEsc.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.escape.");
+    main.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size +3.2f, 1, -15, 0, 'd', 0.3f); //same line as del
+    widgCopyState = main.gralMng.addTextField("copyStatus", false, "current state:", "t");
+    widgCopyState.setBackColor(GralColor.getColor("lam"),0);
+    widgCopyState.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.state.");
     
     main.gralMng.setPosition(-4, GralPos.size +1, 10, -14, 0, 'd', 1);
     if(cmdWind != Ecmd.delete) {
-      widgProgressFile = main.gralMng.addValueBar("copyProgressFile", null);
+      //widgProgressFile = main.gralMng.addValueBar("copyProgressFile", null);
     }
-    widgProgressAll = main.gralMng.addValueBar("copyProgressAll", null);
+    //widgProgressAll = main.gralMng.addValueBar("copyProgressAll", null);
 
     if(cmdWind == Ecmd.copy) {
-      main.gralMng.setPosition(-13, GralPos.size+2.5f, -13f, -1, 0, 'd', 0.3f);
+      main.gralMng.setPosition(-8, GralPos.size+2.5f, -13f, -1, 0, 'd', 0.3f);
       widgButtonMove = main.gralMng.addSwitchButton("copyMove", "move ?", "Move/ ?copy", GralColor.getColor("wh"), GralColor.getColor("lgn"));
       widgButtonMove.setActionChange(actionButtonCmprDelMove);
       widgButtonMove.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.fn.");
     }
+    main.gralMng.setPosition(-4, GralPos.size+3.2f, 1, 9, 0, 'r');
+    widgButtonEsc = main.gralMng.addButton("copyEsc", actionButtonAbort, "esc", null, "close");
+    widgButtonEsc.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.escape.");
+    main.gralMng.setPosition(GralPos.same, GralPos.size +2.5f, GralPos.next, GralPos.size+3.0f, 0, 'r', 1);
+    widgState = main.gralMng.addButton(null, actionShowState, "?", null, "?" );
+    widgState.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.state.");
+    
+    if(cmdWind != Ecmd.compare){
+      //main.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size -3, 1, 12, 0, 'r', 1);
+      main.gralMng.setPosition(GralPos.same, GralPos.size +2.5f, GralPos.next, GralPos.size + 11, 0, 'r', 1);
+      //main.gralMng.setPosition(GralPos.same, GralPos.size -3, 16, GralPos.size +14, 0, 'r', 1);
+      widgSkipDir = main.gralMng.addButton("copySkipDir", actionButtonSkipDir, "copySkipDir", null, "skip dir");
+      widgSkipDir.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.quest.skipDir.");
+      widgSkipFile = main.gralMng.addButton("copyskip", actionButtonSkipFile, "copyskip", null, "skip file");
+      widgSkipFile.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.quest.skipFile.");
+      widgOverwrFile = main.gralMng.addButton(sTextExecuteForFile, actionOverwriteFile, "copyOverwrite", null, sTextExecuteForFile);
+      widgOverwrFile.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.quest.wr.");
+      //widgBtnPause = main.gralMng.addButton("pause", null, "pause", null, "pause");
+      //widgBtnPause.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.pause.");
+    }  
     main.gralMng.setPosition(-4, GralPos.size+3.5f, -13f, -1, 0, 'd', 0.4f);
     widgButtonOk = main.gralMng.addButton("copyOk", actionButtonOk, "close", null, "close");
     widgButtonOk.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.ok.");
@@ -690,11 +696,13 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    */
   void showCurrentProcessedFileAndDir(FileRemoteProgressTimeOrder order) //FileRemote fileProcessed, int zFiles, boolean bDone) {
   { StringBuilder u = new StringBuilder(100);
-    u.append(Integer.toString(zFiles)).append(": ");
     if(order.currFile !=null) {
-      order.currFile.setPathTo(u);
+      widgCopyDirDst.setText(order.currFile.getParent());
+      widgCopyNameDst.setText(order.currFile.getName());
+    } else {
+      widgCopyDirDst.setText("?");
+      widgCopyNameDst.setText("?");
     }
-    widgCopyNameDst.setText(u);
     if(order.bDone) {
       widgCopyState.setText("ok: "); // + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
       setTexts(Estate.finit);
@@ -702,33 +710,33 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     if(order.quest() !=null) {
       switch(order.quest()){
         case askDstOverwr: 
-          widgCopyState.setText("overwrite file? "); 
+          u.append("overwrite file? "); 
           widgOverwrFile.setBackColor(GralColor.getColor("lng"), 0);
           widgSkipFile.setBackColor(GralColor.getColor("lgn"), 0);
           break;
         case askDstNotAbletoOverwr: 
-          widgCopyState.setText("cannot overwrite file? "); 
+          u.append("cannot overwrite file? "); 
           widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
           break;
         case askErrorCopy: 
-          widgCopyState.setText("error copy? "); 
+          u.append("error copy? "); 
           widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
           break;
         case askErrorDstCreate: 
-          widgCopyState.setText("cannot create? "); 
+          u.append("cannot create? "); 
           widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
           break;
         case askDstReadonly: 
-          widgCopyState.setText("overwrite readonly file? "); 
+          u.append("overwrite readonly file? "); 
           widgOverwrFile.setBackColor(GralColor.getColor("lng"), 0);
           widgSkipFile.setBackColor(GralColor.getColor("lgn"), 0);
           break;
         case askErrorSrcOpen: 
-          widgCopyState.setText("cannot open sourcefile "); 
+          u.append("cannot open sourcefile "); 
           widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
           break;
         case done:       
-          widgCopyState.setText("ok: "); // + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
+          u.append("ok: "); // + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
           widgOverwrFile.setBackColor(GralColor.getColor("lgr"), 0);
           widgSkipFile.setBackColor(GralColor.getColor("lgr"), 0);
           setTexts(Estate.finit);
@@ -736,6 +744,8 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
         
       }
     }
+    u.append("; Files:").append(Integer.toString(zFiles)).append(": ");
+    widgCopyState.setText(u.toString());
   }
   
   
@@ -772,8 +782,9 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   private class Actions
   {
     
+    @SuppressWarnings("serial") 
     FileRemoteProgressTimeOrder showFilesProcessing = 
-        new FileRemoteProgressTimeOrder("showFilesProcessing", main.gralMng.gralDevice.orderList(), 300) 
+        new FileRemoteProgressTimeOrder("showFilesProcessing", main.gralMng.gralDevice.orderList(), 100) 
     {
       @Override public void executeOrder() { 
         showCurrentProcessedFileAndDir(this); //this.currFile, this.nrFilesProcessed, this.bDone); 
@@ -1221,12 +1232,13 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
              || action.showFilesProcessing.quest() == FileRemote.CallbackCmd.askDstReadonly) {
           action.showFilesProcessing.modeCopyOper = modeCopy();
           action.showFilesProcessing.answer(FileRemote.Cmd.overwr);
-          
+          widgSkipFile.setBackColor(GralColor.getColor("wh"), 0);
+          widgOverwrFile.setBackColor(GralColor.getColor("wh"), 0);
+        } else {
+          action.showFilesProcessing.triggerStateMachine(FileRemote.Cmd.docontinue);
         }
-        widgCopyNameDst.setText("");
+        //widgCopyNameDst.setText("");
         widgCopyState.setText("skipped");
-        widgSkipFile.setBackColor(GralColor.getColor("wh"), 0);
-        widgOverwrFile.setBackColor(GralColor.getColor("wh"), 0);
       }
       return true;
     } 
