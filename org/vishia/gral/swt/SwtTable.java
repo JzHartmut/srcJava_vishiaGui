@@ -165,7 +165,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   private final TableKeyListerner myKeyListener;
   
   public SwtTable(GralTable<?> gralTable, SwtMng mng, Composite parent)
-  { gralTable.super(gralTable, mng);
+  { gralTable.super(gralTable, mng.mng);
     //super(name, mng, columnWidths);
     this.myKeyListener = this.new TableKeyListerner(null);
     focusListenerTable = this.new FocusListenerTable(mng);
@@ -218,7 +218,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         table = new SwtTable(gralTable, mng, parent); //, selectionColumn, selectionText);
         table.outer.setDataPath(sName);
         table.swtWidgHelper.widgetSwt.setData(table);
-        mng.registerWidget(gralTable);
+        mng.mng.registerWidget(gralTable);
         //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
         return gralTable;
 
@@ -232,7 +232,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     @SuppressWarnings("unchecked")
     final SwtTable table = new SwtTable(gralTable, mng, parent); //, selectionColumn, selectionText);
     table.swtWidgHelper.widgetSwt.setData(table);
-    mng.registerWidget(gralTable);
+    mng.mng.registerWidget(gralTable);
     //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
 
   }
@@ -541,7 +541,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
   @Override protected void setBoundsCells(int treeDepthBase){
     int yPix = 0;
-    int xPixelUnit = swtWidgHelper.mng.propertiesGui.xPixelUnit();
+    int xPixelUnit = swtWidgHelper.mng.mng.propertiesGui.xPixelUnit();
     for(Text[] row: cellsSwt){
       int ixColumn = 0;
       for(Text cell: row){
@@ -690,7 +690,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       }
     } catch(Exception exc){
       String txt = Assert.exceptionInfo("SwtTable - keyPressed Exception", exc, 0, 20, true).toString();
-      swtWidgHelper.mng.log.sendMsg(0, txt);
+      swtWidgHelper.mng.mng.log.sendMsg(0, txt);
       //CharSequence stackInfo = Assert.exceptionInfo("Gral - SwtTable;", exc, 1, 5);
       //System.err.append(stackInfo);
       //exc.printStackTrace(System.out);

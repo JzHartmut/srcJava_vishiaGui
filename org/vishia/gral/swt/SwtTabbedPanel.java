@@ -64,7 +64,7 @@ public class SwtTabbedPanel extends GralTabbedPanel
 	final SwtMng mng;
 	
 	SwtTabbedPanel(String namePanel, SwtMng mng, GralPanelActivated_ifc user, int property)
-	{ super(namePanel, mng, user, property);  //initializes as GralWidget and as GralPanel
+	{ super(namePanel, mng.mng, user, property);  //initializes as GralWidget and as GralPanel
 		this.mng = mng;
 		Object oParent = this.pos().panel.getPanelImpl();
     if(oParent == null || !(oParent instanceof Composite) ){ throw new IllegalArgumentException("Software error. You must select a panel before."); }
@@ -97,19 +97,19 @@ public class SwtTabbedPanel extends GralTabbedPanel
 	  SwtCanvasStorePanel panel;
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
 	  if(yGrid <0 || xGrid <0){
-			panel = new SwtCanvasStorePanel(sName, widgetSwt, 0, colorBackground, mng);
+			panel = new SwtCanvasStorePanel(sName, widgetSwt, 0, colorBackground, mng.mng);
 		} else {
-	  	panel = new SwtGridPanel(sName, widgetSwt, 0, colorBackground, mng.propertiesGui.xPixelUnit(), mng.propertiesGui.yPixelUnit(), 5, 5, mng);
+	  	panel = new SwtGridPanel(sName, widgetSwt, 0, colorBackground, mng.mng.propertiesGui.xPixelUnit(), mng.mng.propertiesGui.yPixelUnit(), 5, 5, mng.mng);
 		}
 	  panel.swtCanvas.setBounds(sizeTabFolder);
 	  panel.itsTabSwt = tabItem;
 		tabItem.setControl(panel.swtCanvas);
 		panel.swtCanvas.addFocusListener(focusTabListener); //unused...
     
-		mng.registerPanel(panel);   //register the panel in the mng.
-		mng.registerWidget(panel);
+		mng.mng.registerPanel(panel);   //register the panel in the mng.
+		mng.mng.registerWidget(panel);
     panels.put(sName, panel);   //register the tab panel in the TabbedPanel
-	  mng.setPosition(0, 0, 0, 0, 0, '.');
+	  mng.mng.setPosition(0, 0, 0, 0, 0, '.');
 	  return panel;
   }
 
@@ -119,8 +119,8 @@ public class SwtTabbedPanel extends GralTabbedPanel
 	  TabItem tabItemOperation = new TabItem(widgetSwt, SWT.None);
 		tabItemOperation.setText(sLabel);
 		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
-	  SwtCanvasStorePanel panel = new SwtCanvasStorePanel(sName, widgetSwt, 0, colorBackground, mng);
-    mng.registerPanel(panel);
+	  SwtCanvasStorePanel panel = new SwtCanvasStorePanel(sName, widgetSwt, 0, colorBackground, mng.mng);
+    mng.mng.registerPanel(panel);
 	  tabItemOperation.setControl(panel.swtCanvas);
     panels.put(sName, panel);
 	  return panel;
@@ -134,7 +134,7 @@ public class SwtTabbedPanel extends GralTabbedPanel
 	@Override public GralPanelContent selectTab(String name)
 	{ //assert(false);
 	  
-	  GralPanelContent panel = mng.getPanel(name);
+	  GralPanelContent panel = mng.mng.getPanel(name);
 	  if(panel instanceof SwtPanel){
   	  SwtPanel swtPanel = (SwtPanel)panel;
   	  if(swtPanel.itsTabSwt !=null){

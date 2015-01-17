@@ -141,7 +141,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   SwtSubWindow(SwtMng mng, GralWindow wdgGral)
   //SwtSubWindow(String name, Display display, String title, int windProps, GralMng gralMng)
   { //super(name, windProps, gralMng, null);
-    super(wdgGral, mng);  //Invoke constructor of the super class, with knowledge of its outer class.
+    super(wdgGral, mng.mng);  //Invoke constructor of the super class, with knowledge of its outer class.
     int props = 0; ////|SWT.CLOSE;
     String sTitle = super.getTitle();
     int windProps = super.getWindowProps();

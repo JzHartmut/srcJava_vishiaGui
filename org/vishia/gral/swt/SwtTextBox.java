@@ -88,7 +88,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
   
   
   protected SwtTextBox(GralTextBox widgg, SwtMng mng)
-  { widgg.super(widgg, mng); //NOTE: superclass is a non static inner class of GralTextField. 
+  { widgg.super(widgg, mng.mng); //NOTE: superclass is a non static inner class of GralTextField. 
     Composite panelSwt = mng.getCurrentPanel();
     textFieldSwt = new Text(panelSwt, SWT.MULTI|SWT.H_SCROLL|SWT.V_SCROLL); //;style);
     textFieldSwt.setData(this);
@@ -98,7 +98,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
     textFieldSwt.setEditable(widgg.isEditable());
     textFieldSwt.setBackground(mng.propertiesGuiSwt.colorSwt(0xFFFFFF));
     textFieldSwt.addMouseListener(mng.mouseClickForInfo);
-    KeyListener swtKeyListener = new TextBoxKeyListener(mng._impl.gralKeyListener);
+    KeyListener swtKeyListener = new TextBoxKeyListener(mng.mng._impl.gralKeyListener);
     textFieldSwt.addKeyListener(swtKeyListener);
     TextBoxModifyListener modifyListener = new TextBoxModifyListener();
     textFieldSwt.addModifyListener(modifyListener);
@@ -113,10 +113,10 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
                yPixelField = mng.propertiesGuiSwt.yPixelUnit() * 2 -3;
                break;
       case 2:  promptFont = mng.propertiesGuiSwt.smallPromptFont;
-               yPixelField = (int)(1.5F * mng.propertiesGui.yPixelUnit());
+               yPixelField = (int)(1.5F * mng.mng.propertiesGui.yPixelUnit());
                break;
       default: promptFont = mng.propertiesGuiSwt.smallPromptFont;
-               yPixelField = mng.propertiesGui.yPixelUnit() * 2 -3;
+               yPixelField = mng.mng.propertiesGui.yPixelUnit() * 2 -3;
       }//switch
       Rectangle boundsField = textFieldSwt.getBounds();
       Rectangle boundsPrompt = new Rectangle(boundsField.x, boundsField.y-3  //occupy part of field above, only above the normal letters
@@ -140,7 +140,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
       textFieldSwt.setBounds(boundsField);
       wgPrompt.setBounds(boundsPrompt);
     } 
-    mng.registerWidget(widgg);
+    mng.mng.registerWidget(widgg);
   }
 
   

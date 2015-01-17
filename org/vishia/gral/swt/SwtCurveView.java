@@ -83,7 +83,7 @@ public class SwtCurveView extends GralCurveView
   
   public SwtCurveView(String sName, GralPos pos, SwtMng mng, int nrofXvalues, GralCurveView.CommonCurve common)
   {
-    super(sName, mng, nrofXvalues, common);
+    super(sName, mng.mng, nrofXvalues, common);
     
     GralRectangle bounds = mng.calcWidgetPosAndSize(pos, 800, 600);
     Composite panelSwt = (Composite)pos.panel.getPanelImpl();
@@ -146,7 +146,7 @@ public class SwtCurveView extends GralCurveView
     int yp2 = yp9;  //right value
     int yp1; //left value
     int ixData1;
-    Color lineColor = track.lineColor !=null ? (Color)itsMng.getColorImpl(track.lineColor) : ((SwtProperties)itsMng.propertiesGui).colorBackground;
+    Color lineColor = track.lineColor !=null ? (Color)itsMng.impl.getColorImpl(track.lineColor) : ((SwtProperties)itsMng.propertiesGui).colorBackground;
     if(iTrack == 0){
       //System.out.println("SwtCurveView-drawTrack-start(y0Pix=" + y0Pix + ", yFactor=" + yFactor + ", y=" + yF + ")");
     }
@@ -316,7 +316,7 @@ public class SwtCurveView extends GralCurveView
     while((xPixelTimeDiv1 = timeorg.xPixelTimeDiv[++ixPixelTimeDiv]) >=0) {
       g.drawLine(size.x - xPixelTimeDiv1, 0, size.x - xPixelTimeDiv1, size.y);
       if(xPixelTimeDiv1 > 30){
-        g.setForeground((Color)itsMng.getColorImpl(GralColor.getColor("bk")));
+        g.setForeground((Color)itsMng.impl.getColorImpl(GralColor.getColor("bk")));
         g.drawText(timeorg.sTimeAbsDiv[ixPixelTimeDiv], size.x - 6 - xPixelTimeDiv1, size.y - 25);
         g.setForeground(gridColorStrong);
         timeorg.pixelWrittenAfterStrongDiv = Integer.MIN_VALUE;
@@ -463,10 +463,10 @@ public class SwtCurveView extends GralCurveView
         //int ixDWr = (ixDataWr >> shIxiData) & mIxiData;
         //System.out.println("SwtCurveView.spread; " + ixDataRel1 + ".." + ixDataRel2);
         g.setLineWidth(5);
-        g.setForeground((Color)itsMng.getColorImpl(GralColor.getColor("ye")));
+        g.setForeground((Color)itsMng.impl.getColorImpl(GralColor.getColor("ye")));
         g.drawLine(0, size.y -3, iPixRange1, size.y -3);  //left not shown range.
         g.drawLine(iPixRange2, size.y -3, size.x, size.y -3);  //right non shown range.
-        g.setForeground((Color)itsMng.getColorImpl(GralColor.getColor("dgr")));
+        g.setForeground((Color)itsMng.impl.getColorImpl(GralColor.getColor("dgr")));
         //g.setAlpha(128);
         g.drawLine(iPixRange1, size.y -3, iPixRange2, size.y -3);  //shown range
       }

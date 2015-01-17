@@ -25,11 +25,11 @@ public class SwtTextPanel extends GralPanelContent implements GralTextBox_ifc, A
   GralTextBox textAreaOutput;
   
   SwtTextPanel(String namePanel, Shell shell, int style, SwtMng mng) //GralPrimaryWindow_ifc mainWindow)
-  { super(namePanel, mng, shell);
+  { super(namePanel, mng.mng, shell);
     Display device = shell.getDisplay();
     //Composite panel = (Composite) panelComposite;
     textAreaOutput = new GralTextBox(namePanel + "-widg");
-    textAreaOutput.setToPanel(mng);
+    textAreaOutput.setToPanel(mng.mng);
     Text swtText = (Text) textAreaOutput.getWidgetImplementation();
     swtText.setFont(new Font(device, "Monospaced",11, SWT.NORMAL));
     panelComposite = swtText;  //it is a control,    

@@ -2,6 +2,7 @@ package org.vishia.gral.base;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -9,10 +10,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.gral.base.GralCurveView.CommonCurve;
 import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.cfg.GralCfgData;
 import org.vishia.gral.cfg.GralCfgDesigner;
@@ -31,14 +34,16 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindowMng_ifc;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralColorSelector;
 import org.vishia.gral.widget.GralInfoBox;
+import org.vishia.gral.widget.GralLabel;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
-/**This is the base class of the GuiPanelMng for several Graphic-Adapters (Swing, SWT etc.). 
+/**This is the Manager for the graphic. 
  * It contains the independent parts. 
  * This class <code>GralMng</code> is a common approach to work with graphical interface simply, 
  * it is implemented by the several graphic-system-supporting classes
@@ -51,10 +56,12 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
+public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
-  /**Changes:
+  /**Version, history and license.
    * <ul>
+   * <li>2015-01-18 Hartmut chg: Now the implementation for any Grahic (SwtMng) and the GralMng are two separated instances.
+   *   The SwtMng extends the {@link GralMng.ImplAccess} which accesses all private data of the GralMng.
    * <li>2013-12-21 Hartmut new: {@link #setToPanel(GralWidget)} for all set to panel actions. That method handles all widget types. 
    * <li>2013-03-20 Hartmut adap: {@link #actionFileSelect} with setText(...), now the file select field was filled.
    * <li>2012-08-20 Hartmut new: {@link #getWidgetsPermanentlyUpdating()} created but not used yet because 
@@ -224,7 +231,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   protected GralMngApplAdapter_ifc applAdapter;
   
 	/**Composition of some curve view widgets, which should be filled indepentent of there visibility. */
-	protected final List<GralCurveView_ifc> curveContainer = new LinkedList<GralCurveView_ifc>();
+  @Deprecated public final List<GralCurveView_ifc> curveContainer = new LinkedList<GralCurveView_ifc>();
 	
   /**Position of the next widget to add. If some widgets are added one after another, 
    * it is similar like a flow-layout.
@@ -428,7 +435,8 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   /**Map of replacements of paths to data. Filled from ZBNF: DataReplace::= <$?key> = <$-/\.?string> */
   private final Map<String, String> dataReplace = new TreeMap<String,String>();
 
-
+  public ImplAccess impl;
+  
   private static GralMng singleton;
 	
   public GralMng(GralGraphicThread device, GralGridProperties props, LogMessage log)
@@ -446,6 +454,10 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   /**Returns the singleton or null if the GralMng is not instantiated yet.*/
   public static GralMng get(){ return singleton; }
+  
+  
+  @Override public void setToPanel(GralWidget widgg){ impl.setToPanel(widgg); }
+  
   
   /* (non-Javadoc)
    * @see org.vishia.gral.ifc.GralMngBuild_ifc#setMainKeyAction(org.vishia.gral.ifc.GralUserAction)
@@ -662,6 +674,39 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
   
+  /**Returns a Set of all fields, which are created to show.
+   * @return the set, never null, possible an empty set.
+   */
+  public Set<Map.Entry<String, GralWidget>> getShowFields()
+  {
+    Set<Map.Entry<String, GralWidget>> set =showFields.entrySet();
+    return set; //(Set<Entry<String, WidgetDescriptor>>)set;
+  }
+
+  
+  public Map<String, String> getAllValues()
+  {
+      Map<String, String> values = new TreeMap<String, String>();
+  for(GralWidget input: indexNameWidgets.values()){
+      String sValue = getValueFromWidget(input);
+    values.put(input.name, sValue);
+  }
+  return values;
+  }
+
+  @Override public String getValue(String sName)
+  { final String sValue;
+      GralWidget widgetDescr = indexNameWidgets.get(sName);
+      if(widgetDescr !=null){
+          sValue = getValueFromWidget(widgetDescr);
+      } else {
+          sValue = null;
+      }
+      return sValue;
+  }
+  
+
+  
   /**It is a special routine for tabbedPanel.
    * The reason: If a new tab should add in {@link GralTabbedPanel#addGridPanel(String, String, int, int, int, int)}
    * then the mng is set to the tabbed panel.
@@ -676,8 +721,6 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
     return panels.get(name);
   }
   
-  
-  public abstract Object getCurrentPanel();
   
   
   public GralPanelActivated_ifc actionPanelActivate = new GralPanelActivated_ifc()
@@ -762,6 +805,227 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
 
   
+  @Override public GralWidget addText(String sText, int origin, GralColor textColor, GralColor backColor)
+  {
+    GralLabel widgg = new GralLabel(null, sText, origin);
+    widgg.setTextColor(textColor);
+    widgg.setBackColor(backColor, 0);
+    widgg.setToPanel(this); //Note: sets TextFont, don't call this.setToPanel
+    return widgg;
+  }
+
+  
+  /** Adds a text field for showing or editing a text value.
+   * 
+   * @param sName The registering name
+   * @param width Number of grid units for length
+   * @param editable true than edit-able, false to show content 
+   * @param prompt If not null, than a description label is shown
+   * @param promptStylePosition Position and size of description label:
+   *   upper case letter: normal font, lower case letter: small font
+   *   'l' left, 't' top (above field) 
+   * @return
+   */
+  @Override public GralTextField addTextField(String name, boolean editable, String prompt, String promptStylePosition){
+    if(name !=null && name.charAt(0) == '$'){
+      name = sCurrPanel + name.substring(1);
+    }
+    GralTextField widgg = new GralTextField(name);
+    widgg.setPrompt(prompt, promptStylePosition);
+    widgg.setEditable(editable);
+    setToPanel(widgg);
+    //SwtTextFieldWrapper.createTextField(widgg, this);   
+    return widgg;
+  }
+
+  
+  
+
+  
+/** Adds a text box for showing or editing a text in multi lines.
+ * 
+ * @param sName The registering name
+ * @param width Number of grid units for length
+ * @param editable true than edit-able, false to show content 
+ * @param prompt If not null, than a description label is shown
+ * @param promptStylePosition Position and size of description label:
+ *   upper case letter: normal font, lower case letter: small font
+ *   'l' left, 't' top (above field) 
+ * @return
+ */
+@Override public GralTextBox addTextBox(String name, boolean editable, String prompt, char promptStylePosition)
+{ 
+  if(name !=null && name.charAt(0) == '$'){
+    name = sCurrPanel + name.substring(1);
+  }
+  GralTextBox widgg = new GralTextBox(name);
+  char[] prompt1 = new char[1];
+  prompt1[0] = promptStylePosition;
+  widgg.setPrompt(prompt, new String(prompt1));
+  widgg.setEditable(editable);
+  setToPanel(widgg);
+  //SwtTextFieldWrapper.createTextField(widgg, this);   
+  return widgg;
+
+}
+
+
+
+@Override public GralValueBar addValueBar(
+  String sName
+//, String sShowMethod
+, String sDataPath
+)
+{ 
+  GralValueBar wdgg = new GralValueBar(sName);
+  wdgg.setDataPath(sDataPath);
+  wdgg.setToPanel(this);
+  return wdgg;
+}
+
+
+@Override public GralButton addButton(
+    String sName
+  , GralUserAction action
+  , String sButtonText
+  )
+{ return addButton(sName, action, null, null, sButtonText);
+}  
+
+@Override public GralButton addButton(
+  String sName
+, GralUserAction action
+, String sCmd
+//, String sShowMethod
+, String sDataPath
+, String sButtonText
+  //, int height, int width
+  //, String sCmd, String sUserAction, String sName)
+)
+{
+  setNextPositionUnused();  //since 130523 it should be the valid one.
+  float ySize = pos.height();
+  int xSize = (int)pos.width();
+  
+  char size = ySize > 3? 'B' : 'A';
+  if(sName == null){ sName = sButtonText; }
+  GralButton widgButton = new GralButton(sName);
+  //SwtButton widgButton = new SwtButton(sName, this, (Composite)pos().panel.getPanelImpl(), 0, size);
+  if(action !=null)
+    stop();
+  widgButton.setActionChange(action);  //maybe null
+  widgButton.setText(sButtonText);
+  //in ctor: widgButton.setPanelMng(this);
+  widgButton.sCmd = sCmd;
+  widgButton.setDataPath(sDataPath);
+  registerWidget(widgButton);
+  setToPanel(widgButton);
+  return widgButton;
+}
+
+
+
+@Override public GralButton addSwitchButton(
+  String sName
+, GralUserAction action
+, String sCmd
+, String sDataPath
+, String sButtonText
+, String sColor0
+, String sColor1
+  //, int height, int width
+  //, String sCmd, String sUserAction, String sName)
+)
+{
+  int ySize = (int)pos.height();
+  int xSize = (int)pos.width();
+  
+  char size = ySize > 3? 'B' : 'A';
+  if(sName == null){ sName = sButtonText; }
+  GralButton widgButton = new GralButton(sName);
+  GralColor colorOff = GralColor.getColor(sColor0);
+  GralColor colorOn = GralColor.getColor(sColor1);
+  widgButton.setSwitchMode(colorOff, colorOn);
+  widgButton.setActionChange(action);  //maybe null
+  widgButton.setText(sButtonText);
+  //widgButton.setPanelMng(this);
+  widgButton.sCmd = sCmd;
+  widgButton.setDataPath(sDataPath);
+  registerWidget(widgButton);
+  setToPanel(widgButton);
+  return widgButton;
+}
+
+
+@Override public GralButton addSwitchButton(
+  String sName
+, String sButtonTextOff
+, String sButtonTextOn
+, GralColor colorOff
+, GralColor colorOn
+  //, int height, int width
+  //, String sCmd, String sUserAction, String sName)
+)
+{
+  int ySize = (int)pos.height();
+  int xSize = (int)pos.width();
+  
+  char size = ySize > 3? 'B' : 'A';
+  GralButton widgButton = new GralButton(sName);
+  widgButton.setSwitchMode(colorOff, colorOn);
+  widgButton.setSwitchMode(sButtonTextOff, sButtonTextOn);
+  //in ctor: widgButton.setPanelMng(this);
+  if(sName !=null){ registerWidget(widgButton); }
+  setToPanel(widgButton);
+  return widgButton;
+}
+
+
+
+public GralButton addCheckButton(
+  String sName
+, String sButtonTextOn
+, String sButtonTextOff
+, String sButtonTextDisabled
+, GralColor colorOn
+, GralColor colorOff
+, GralColor colorDisabled
+)
+{
+  int ySize = (int)pos.height();
+  int xSize = (int)pos.width();
+  
+  char size = ySize > 3? 'B' : 'A';
+  GralButton widgButton = new GralButton(sName);
+  widgButton.setSwitchMode(colorOff, colorOn, colorDisabled);
+  widgButton.setSwitchMode(sButtonTextOff, sButtonTextOn, sButtonTextDisabled);
+  //widgButton.setPanelMng(this);
+  if(sName !=null){ registerWidget(widgButton); }
+  setToPanel(widgButton);
+  return widgButton;
+}
+
+
+
+
+@Override public GralLed addLed(
+  String sName
+//, String sShowMethod
+, String sDataPath
+)
+{
+  int ySize = (int)(pos.height());
+  int xSize = (int)(pos.width());
+
+  GralLed gralLed = new GralLed(sName);
+  //SwtLed swtLed = new SwtLed(gralLed, this);
+  gralLed.setDataPath(sDataPath);
+  //registerWidget(gralLed);
+  gralLed.setToPanel(this);
+  return gralLed;
+}
+
+
   @Deprecated @Override public void setBackColor(GralWidget widg, int ix, int color)
   { widg.setBackColor(GralColor.getColor(color), ix);
   } 
@@ -861,29 +1125,6 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   @Override public GralColor getColor(String sColorName){ return propertiesGui.color(getColorValue(sColorName)); }
 
 
-  /**Creates the context menu for the given widget for right-mouse pressing.
-   * This method is invoked only in {@link GralWidget#getContextMenu()} whereby an existing
-   * context menu is stored in the {@link GralWidget#contextMenu} association. 
-   * The widget have to be set to panel already, an implementation widget have to be existing.
-   * It means {@link GralWidget#getWidgetImplementation()} should be return that instance
-   * where the menu is to be added.
-   * This method is package protected because it should only be called internally.
-   * @param widg The widget
-   */
-  protected abstract GralMenu createContextMenu(GralWidget widgg);
-  
-  
-  /**Creates the menu bar for the given window.
-   * This method is invoked only in {@link GralWindow#getMenuBar()} whereby an existing
-   * menu bar is stored in the {@link GralWindow#menuBarGral} association. 
-   * @param windg The window
-   */
-  protected abstract GralMenu createMenuBar(GralWindow windg);
-  
-  
-  protected abstract GralMenu XXXaddPopupMenu(String sName);
-  
-
 
 	GralUserAction actionShowWidgetInfos = new GralUserAction("actionShowWidgetInfos")
 	{
@@ -940,25 +1181,8 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   
-  
-  
-  
-  
-  /**Calculates the bounds of a widget with a given pos independent of this {@link #pos}.
-   * This method is a part of the implementing GralMng because the GralPos is not implemented for
-   * any underlying graphic system and the {@link #propertiesGuiSwt} are used.
-   * This method is not intent to use from an application, only for implementing methods of Gral.
-   * Therefore it isn't a member of the {@link GralWindowMng_ifc} and {@link GralMngBuild_ifc}
-   * It is possible to tune the bounds after calculation, for example to enhance the width if a text
-   * is larger then the intended position. 
-   * @param pos The position.
-   * @param widthwidgetNat The natural size of the component.
-   * @param heigthWidgetNat The natural size of the component.
-   * @return A rectangle with position and size.
-   */
-  public abstract GralRectangle calcWidgetPosAndSize(GralPos pos, int widthwidgetNat, int heigthWidgetNat);
 
-
+  
   
   
   /* (non-Javadoc)
@@ -1123,6 +1347,26 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
   
+  
+  
+  
+  @Override public void repaint()
+  {
+    assert(false);
+    //gralDevice.redraw();
+  }
+  
+  
+  
+  @Override public void repaintCurrentPanel()
+  {
+    pos.panel.repaint();
+  }
+  
+  
+
+  
+  
   @Override public void refreshCurvesFromVariable(VariableContainer_ifc container){
     for(GralCurveView_ifc curve : curveContainer){
       if(curve.isActiv()){
@@ -1131,7 +1375,14 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
     }
   }
   
+  @Override public boolean remove(GralWidget widget)
+  { widget.remove();  //remove instance by Garbage collector.
+    return true;
+    
+  }
+
   
+
   @Override public void writeLog(int msgId, Exception exc)
   {
     String sMsg = exc.toString();
@@ -1159,13 +1410,13 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * The SwtTextFieldWrapper.TextFieldFocusListener.focusGained(...) and focusLost(...) methods executes the special
    * functionality. After them 'super.focusGained/Lost(ev);' is in called to execute the standard behavior.
    */
-  protected class GralMngFocusListener
+  public class GralMngFocusListener
   {
     
     /**Standard action on focus lost:
      * @param widgg
      */
-    protected void focusLostGral(GralWidget widgg){
+    public void focusLostGral(GralWidget widgg){
       GralWidget.ImplAccess.setFocused(widgg, false);
       //CharSequence text = Assert.stackInfo("", 1, 5);
       //System.out.println("GralMng - widget focus lost;" + widgg.name + text);
@@ -1179,7 +1430,7 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
      * </ul>
      * @param widgg
      */
-    protected void focusGainedGral(GralWidget widgg){
+    public void focusGainedGral(GralWidget widgg){
       GralMng.this.notifyFocus(widgg);
       GralWidget.ImplAccess.setFocused(widgg, true);
       String htmlHelp = widgg.getHtmlHelp();
@@ -1214,17 +1465,322 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   /**This class is used only for the implementation level of the graphic. It is not intent to use
    * by any application. It is public because the implementation level should accesses it.
+   * It is the super class for several Graphic-Adapters (AWT/Swing, SWT etc.).
+   * 
+   * 
    */
   public static abstract class ImplAccess {
-    protected GralMng mng;
+    public GralMng mng;
+    
+    
+    public ImplAccess(GralMng mng){
+      this.mng = mng;
+      mng.impl = this;
+    }
     
     protected GralPos pos(){ return mng.pos; }
+
+    protected String sCurrPanel(){ return mng.sCurrPanel; }
+    
+    protected void listVisiblePanels_add(GralTabbedPanel panel){ mng.listVisiblePanels.add(panel); }
+    
+    public abstract Object getCurrentPanel();
+    
+    protected GralWidget indexNameWidgets(String name){ return mng.indexNameWidgets.get(name); }
+    
+    protected GralUserAction userMainKeyAction(){ return mng.userMainKeyAction; }
+    
+    
+    public abstract void setToPanel(GralWidget widgg);
+    /**Creates the context menu for the given widget for right-mouse pressing.
+     * This method is invoked only in {@link GralWidget#getContextMenu()} whereby an existing
+     * context menu is stored in the {@link GralWidget#contextMenu} association. 
+     * The widget have to be set to panel already, an implementation widget have to be existing.
+     * It means {@link GralWidget#getWidgetImplementation()} should be return that instance
+     * where the menu is to be added.
+     * This method is package protected because it should only be called internally.
+     * @param widg The widget
+     */
+    protected abstract GralMenu createContextMenu(GralWidget widgg);
+    
+    
+    /**Creates a box inside the current panel to hold some widgets.
+     * 
+     * @return
+     * @since 2010-05-01
+     */
+    protected abstract GralPanelContent createCompositeBox(String name);
+   
+    /**Creates an independent grid panel which is managed by this.
+     * The panel can be associated to any graphic frame.
+     * @param namePanel
+     * @param backGround
+     * @param xG
+     * @param yG
+     * @param xS
+     * @param yS
+     * @return
+     */
+    protected abstract GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG, int xS, int yS);
+
+    
+    public abstract boolean remove(GralPanelContent compositeBox);
+    
+    /**Creates the menu bar for the given window.
+     * This method is invoked only in {@link GralWindow#getMenuBar()} whereby an existing
+     * menu bar is stored in the {@link GralWindow#menuBarGral} association. 
+     * @param windg The window
+     */
+    protected abstract GralMenu createMenuBar(GralWindow windg);
+    
+    
+    @Deprecated public abstract GralWindow createWindow(String name, String title, int windProps);
+    
+    
+    public abstract void createWindow(GralWindow windowGral);
+    
+    public abstract GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int property);
+    
+    @Deprecated public abstract GralWidget addText(String sText, char size, int color);
+    
+    
+    public abstract GralHtmlBox addHtmlBox(String name);
+    
+    public abstract Object addImage(String sName, InputStream imageStream, int height, int width, String sCmd);
+    
+    public abstract GralWidget addSlider(
+        String sName
+        , GralUserAction action
+        , String sShowMethod
+        , String sDataPath
+        );
+    
+    
+    public abstract GralCurveView addCurveViewY(String sName, int nrofXvalues, GralCurveView.CommonCurve common);
+    
+    
+    public abstract GralWidget addFocusAction(String sName, GralUserAction action, String sCmdEnter, String sCmdRelease);
+
+    public abstract void addFocusAction(GralWidget widgetInfo, GralUserAction action, String sCmdEnter, String sCmdRelease);
+    
+    
+    @Deprecated public abstract GralTable addTable(String sName, int height, int[] columnWidths);
+    
+    public abstract GralFileDialog_ifc createFileDialog();
+    
+    protected abstract GralMenu XXXaddPopupMenu(String sName);
+    
+
+    /**Calculates the bounds of a widget with a given pos independent of this {@link #pos}.
+     * This method is a part of the implementing GralMng because the GralPos is not implemented for
+     * any underlying graphic system and the {@link #propertiesGuiSwt} are used.
+     * This method is not intent to use from an application, only for implementing methods of Gral.
+     * Therefore it isn't a member of the {@link GralWindowMng_ifc} and {@link GralMngBuild_ifc}
+     * It is possible to tune the bounds after calculation, for example to enhance the width if a text
+     * is larger then the intended position. 
+     * @param pos The position.
+     * @param widthwidgetNat The natural size of the component.
+     * @param heigthWidgetNat The natural size of the component.
+     * @return A rectangle with position and size.
+     */
+    public abstract GralRectangle calcWidgetPosAndSize(GralPos pos, int widthwidgetNat, int heigthWidgetNat);
+
+    @Deprecated public abstract String getValueFromWidget(GralWidget widgd);
+    
+    /**Gets the color of the graphic implementation (swt.Color, swing.TODO)
+     * Either the implementation color instance is stored already in the GralColor,
+     * or it will be created, stored in GralColor and returned here.
+     * @param color The Color.
+     * @return Instance of the implementation color.
+     */
+    public abstract Object getColorImpl(GralColor color);
+    
+    /**Forces the redrawing for all set samples. It should be called after { @link #setSampleCurveViewY(String, float[])}.
+     * @param sName The name of the widget.
+     */
+    protected abstract void redrawWidget(String sName);
+    
+    
+    
+    /**Forces the resizing of the given widged. 
+     * @param widgd the widget
+     */
+    protected abstract void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent);
+    
+    
+    /**Adds a sampling value set.
+     * @param sName The registered name
+     * @param values The values.
+     */
+    protected abstract void setSampleCurveViewY(String sName, float[] values);
+    
+    /**Shows the context menu of any widget independent of the internal right-mouse invocation.
+     * @param widg The widget.
+     * @return true if the widget have a context menu.
+     */
+    protected abstract boolean showContextMenuGthread(GralWidget widg);
+    
+    
+    /**Sets a given and registered window visible at the given position and size or set it invisible.
+     * <br>
+     * A window can be created by invoking {@link org.vishia.gral.ifc.GralMngBuild_ifc#createWindow(String, boolean)}
+     * in the build phase of the gui. It can be hidden because it is not necessary to show and operate with them.
+     * In a adequate phase of operate it can be shown and focused.
+     * <br>
+     * The position is given relative to that panel,
+     * which is stored in {@link GralPos#panel}. To get a position instance,
+     * you can set a position invoking 
+     * <ul>
+     * <li>{@link org.vishia.gral.ifc.GralMngBuild_ifc#selectPanel(String)}
+     * <li>{@link org.vishia.gral.ifc.GralMngBuild_ifc#setPosition(float, float, float, float, int, char)}
+     * <li>GralGridPos pos = {@link org.vishia.gral.ifc.GralMngBuild_ifc#getPositionInPanel()}.
+     * </ul>
+     * That can be done in the build phase of the graphic. The position can be stored. It is possible to adjust
+     * the position relative to the unchanged panel by changing the values of {@link GralPos#x} etc.
+     * It is possible too to change the Panel which relates to the position. Then the grid managing instance 
+     * have to be known via the {@link org.vishia.gral.ifc.GralMngBuild_ifc} to select a panel.
+     * The panels may be moved or resized. With the knowledge of the relative position of the window in respect to a panel
+     * of the parent window, the window can be placed onto a proper position of the whole display.
+     *   
+     * @param window the instance of the window wrapper.
+     * @param atPos If null then hide the window. If not null then show the window. 
+     *        The position and size of the window is given related to any panel of any other window. 
+     *         
+     * @return true if it is visible.
+     * @deprecated
+     */
+    @Deprecated
+    protected abstract boolean XXXsetWindowsVisible(GralWindow_ifc window, GralPos atPos);
+    
   }
   
   
   
 
   void stop(){}
+
+  
+  protected GralMenu createContextMenu(GralWidget widg){ return impl.createContextMenu(widg); }
+  
+  protected GralMenu createMenuBar(GralWindow windg){ return impl.createMenuBar(windg); }
+
+  
+  @Override public GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user,
+      int properties)
+  {
+    return impl.addTabbedPanel(namePanel, user, properties);
+  }
+
+  @Override public GralWidget addSlider(String sName, GralUserAction action, String sShowMethod,
+      String sDataPath)
+  {
+    // TODO Auto-generated method stub
+    return impl.addSlider(sName, action, sShowMethod, sDataPath);
+  }
+
+  @Override @Deprecated public GralTable addTable(String sName, int height, int[] columnWidths)
+  {
+    // TODO Auto-generated method stub
+    return impl.addTable(sName, height, columnWidths);
+  }
+
+  @Override @Deprecated public GralWidget addText(String sText, char size, int color)
+  {
+    // TODO Auto-generated method stub
+    return impl.addText(sText, size, color);
+  }
+
+  @Override public Object addImage(String sName, InputStream imageStream, int height, int width, String sCmd)
+  {
+    // TODO Auto-generated method stub
+    return impl.addImage(sName, imageStream, height, width, sCmd);
+  }
+
+  @Override public GralHtmlBox addHtmlBox(String name)
+  {
+    // TODO Auto-generated method stub
+    return impl.addHtmlBox(name);
+  }
+
+  @Override public GralCurveView addCurveViewY(String sName, int nrofXvalues, CommonCurve common)
+  {
+    // TODO Auto-generated method stub
+    return impl.addCurveViewY(sName, nrofXvalues, common);
+  }
+
+  @Override public GralWidget addFocusAction(String sName, GralUserAction action, String sCmdEnter,
+      String sCmdRelease)
+  {
+    // TODO Auto-generated method stub
+    return addFocusAction(sName, action, sCmdEnter, sCmdRelease);
+  }
+
+  @Override public void addFocusAction(GralWidget widgetInfo, GralUserAction action, String sCmdEnter,
+      String sCmdRelease)
+  {
+    // TODO Auto-generated method stub
+    impl.addFocusAction(widgetInfo, action, sCmdEnter, sCmdRelease);
+  }
+
+  @Override public GralPanelContent createCompositeBox(String name)
+  {
+    // TODO Auto-generated method stub
+    return impl.createCompositeBox(name);
+  }
+
+  @Override public GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG,
+      int xS, int yS)
+  {
+    // TODO Auto-generated method stub
+    return impl.createGridPanel(namePanel, backGround, xG, yG, xS, yS);
+  }
+
+  @Override public boolean remove(GralPanelContent compositeBox)
+  {
+    // TODO Auto-generated method stub
+    return impl.remove(compositeBox);
+  }
+
+  @Override public GralWindow createWindow(String name, String title, int windProps)
+  {
+    // TODO Auto-generated method stub
+    return impl.createWindow(name, title, windProps);
+  }
+
+  @Override public void createWindow(GralWindow windowGral)
+  {
+    // TODO Auto-generated method stub
+    impl.createWindow(windowGral);
+  }
+
+  @Override public GralFileDialog_ifc createFileDialog()
+  {
+    // TODO Auto-generated method stub
+    return impl.createFileDialog();
+  }
+
+  @Override public void redrawWidget(String sName)
+  {
+    // TODO Auto-generated method stub
+    impl.redrawWidget(sName);
+  }
+
+  @Override public void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent)
+  {
+    // TODO Auto-generated method stub
+    impl.resizeWidget(widgd, xSizeParent, ySizeParent);
+  }
+
+  @Override public boolean XXXsetWindowsVisible(GralWindow_ifc window, GralPos atPos)
+  {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override public void setSampleCurveViewY(String sName, float[] values)
+  {
+    impl.setSampleCurveViewY(sName, values);
+  }
 	
 
 	

@@ -90,7 +90,7 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
         try{ gralGraphicThread.wait(1000);} catch(InterruptedException exc){}
       }
     }
-    graphicThread.gralMng.registerPanel(windowGral);
+    graphicThread.gralMng.mng.registerPanel(windowGral);
     //gralMng = graphicThread.gralMng;
     return windowGral;
   }

@@ -99,7 +99,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
     	for(GralCanvasStorage.PaintOrder order: storeMng.canvas.paintOrders){
     		switch(order.paintWhat){
       		case GralCanvasStorage.paintLine: {
-      			g.setForeground(((SwtMng)storeMng.gralMng()).getColorImpl(order.color));
+      			g.setForeground(((SwtMng)storeMng.gralMng().impl).getColorImpl(order.color));
       	  	g.drawLine(order.x1, order.y1, order.x2, order.y2);
       	  
       	  } break;
@@ -115,7 +115,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
       		  SwtPolyLine swtLine;
             { Object oImpl = line.getImplData();
         		  if(oImpl == null){
-                swtLine = new SwtPolyLine(line, (SwtMng)storeMng.itsMng);
+                swtLine = new SwtPolyLine(line, ((SwtMng)storeMng.gralMng().impl));
                 line.setImplData(swtLine);
               } else {
                 swtLine = (SwtPolyLine) oImpl;
@@ -182,12 +182,12 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
     SwtPolyLine(GralCanvasStorage.PolyLine line, SwtMng gralMng){
       nrofPoints = line.points.size();
       points = new int[2 * nrofPoints];
-      GralRectangle rr = gralMng.calcWidgetPosAndSize(line.pos, 0, 0, 800, 600);
+      GralRectangle rr = line.pos.calcWidgetPosAndSize(gralMng.mng.propertiesGui, 0, 0, 800, 600);
       int ix = -1;
       int xf, yf;
       if(line.bPointsAreGralPosUnits){
-        xf = gralMng.propertiesGui.xPixelUnit();  //1.0 is one GralPos unit
-        yf = gralMng.propertiesGui.xPixelUnit();
+        xf = gralMng.mng.propertiesGui.xPixelUnit();  //1.0 is one GralPos unit
+        yf = gralMng.mng.propertiesGui.xPixelUnit();
       } else {
         xf = rr.dx;  //0.0..1.0 is size of line.pos
         yf = rr.dy;

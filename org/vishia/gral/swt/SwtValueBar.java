@@ -37,8 +37,8 @@ public class SwtValueBar extends GralValueBar.GraphicImplAccess // implements Gr
 	 */
 	public SwtValueBar(GralValueBar widgg, SwtMng mng)
 	{
-    widgg.super(mng);
-    mng.setNextPosition();
+    widgg.super(mng.mng);
+    mng.mng.setNextPosition();
     wdgh = new SwtWidgetHelper(widgetSwt, mng);
     this.widgetSwt = this.new BarWidget();
 		this.widgetSwt.setData(this);
@@ -57,7 +57,7 @@ public class SwtValueBar extends GralValueBar.GraphicImplAccess // implements Gr
     widgetSwt.addMouseListener(mng.mouseClickForInfo);
     setBounds();
     
-    mng.registerWidget(widgg);
+    mng.mng.registerWidget(widgg);
 	}
 
   

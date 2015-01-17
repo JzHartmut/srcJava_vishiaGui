@@ -68,7 +68,7 @@ public class AwtButton extends GralButton.GraphicImplAccess
   //public AwtButton(String sName, AwtWidgetMng mng, Container parent, int styleSwt, char size)
   AwtButton(GralButton widgg, AwtWidgetMng mng)
   {
-    widgg.super(widgg, mng);
+    widgg.super(widgg, mng.mng);
     mouseListener = new AwtGralMouseListener.MouseListenerUserAction(mouseWidgetAction);
     float ySize = widgg.pos().height();
     char size1 = ySize > 3? 'B' : 'A';

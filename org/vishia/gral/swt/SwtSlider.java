@@ -8,7 +8,7 @@ public class SwtSlider extends GralSlider
 {
 
   public SwtSlider(String sName, SwtMng mng) {
-    super(sName, mng);
+    super(sName, mng.mng);
     // TODO Auto-generated constructor stub
   }
 

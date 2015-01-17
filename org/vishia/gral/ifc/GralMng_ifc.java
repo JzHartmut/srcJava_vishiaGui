@@ -115,13 +115,6 @@ public interface GralMng_ifc
 	
 	
 	
-	/**Shows the context menu of any widget independent of the internal right-mouse invocation.
-	 * @param widg The widget.
-	 * @return true if the widget have a context menu.
-	 */
-	boolean showContextMenuGthread(GralWidget widg);
-	
-	
   /**Sets the color of background of the widget, if possible.
    * @param name The name of the widget, which was given by the add...()-Operation
    * @ix may be a line number of table or an position identifier. 0 if unused for the kind of widget. 
@@ -250,19 +243,11 @@ public interface GralMng_ifc
 	 */
 	int getColorValue(String sName);
 	
-	/**Gets the color of the graphic implementation (swt.Color, swing.TODO)
-	 * Either the implementation color instance is stored already in the GralColor,
-	 * or it will be created, stored in GralColor and returned here.
-	 * @param color The Color.
-	 * @return Instance of the implementation color.
-	 */
-	Object getColorImpl(GralColor color);
-	
-	/**Gets the value from a widget.
-	 * @param sName The name of the widget. The widget will be searched per name.
-	 * @return null if the named widget isn't found or the widget is not able to input.
-	 */
-	String getValue(String sName);
+  /**Gets the value from a widget.
+   * @param sName The name of the widget. The widget will be searched per name.
+   * @return null if the named widget isn't found or the widget is not able to input.
+   */
+  String getValue(String sName);
 
 	/**Gets the String value from a widget with given descriptor
 	 * <ul>

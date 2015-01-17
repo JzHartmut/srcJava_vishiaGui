@@ -20,7 +20,7 @@ public class AwtTextField extends GralTextField
   
   public AwtTextField(String name, char whatis, AwtWidgetMng mng, Container parent)
   {
-    super(name, whatis, mng);
+    super(name, whatis, mng.mng);
     widgetAwt = new AwtTextFieldImpl();
     //widgetAwt.setForeground(mng.propertiesGuiAwt.colorAwt(GralColor.getColor("rd")));
     //widgetAwt.setBackground(mng.propertiesGuiAwt.colorAwt(GralColor.getColor("gn")));
@@ -130,8 +130,8 @@ public static class AwtTextFieldImpl extends TextField implements AwtWidget
       if((chg & ImplAccess.chgText) !=0  && dyda.displayedText !=null){ 
         widgetAwt.setText(dyda.displayedText); 
       }
-      if((chg & ImplAccess.chgColorText) !=0){ widgetAwt.setForeground(((AwtWidgetMng)itsMng).getColorImpl(dyda.textColor)); }
-      if((chg & ImplAccess.chgColorBack) !=0){ widgetAwt.setBackground(((AwtWidgetMng)itsMng).getColorImpl(dyda.backColor)); }
+      if((chg & ImplAccess.chgColorText) !=0){ widgetAwt.setForeground(((AwtWidgetMng)itsMng.impl).getColorImpl(dyda.textColor)); }
+      if((chg & ImplAccess.chgColorBack) !=0){ widgetAwt.setBackground(((AwtWidgetMng)itsMng.impl).getColorImpl(dyda.backColor)); }
       widgetAwt.repaint();
     } while(!dyda.whatIsChanged.compareAndSet(chg, 0));
   }

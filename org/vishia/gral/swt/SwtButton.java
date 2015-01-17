@@ -72,7 +72,7 @@ public class SwtButton extends GralButton.GraphicImplAccess
   //public SwtButton(String sName, SwtMng mng, Composite parent, int styleSwt, char size)
   SwtButton(GralButton widgg, SwtMng mng)
   {
-    widgg.super(widgg, mng);
+    widgg.super(widgg, mng.mng);
     mouseListener = new SwtGralMouseListener.MouseListenerGralAction(mouseWidgetAction, 0);
     //Control xx = mng.pos.panel.panelComposite;
     black = mng.propertiesGuiSwt.colorSwt(0x202020);

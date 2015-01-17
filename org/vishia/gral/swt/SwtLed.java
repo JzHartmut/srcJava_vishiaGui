@@ -50,7 +50,7 @@ public class SwtLed extends GralLed.GraphicImplAccess
   }
   
   SwtLed(GralLed widgg, SwtMng mng){
-    widgg.super(widgg, mng);
+    widgg.super(widgg, mng.mng);
     //super(name, mng);
     this.mng = mng;
     switch('r'){ 

@@ -81,7 +81,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
     ActionResizeOnePanel(){ super("actionResizeOnePanel - window: " + name); }
     @Override public boolean exec(int keyCode, GralWidget_ifc widgi, Object... params)
     { for(GralWidget widgd: widgetsToResize){
-        widgd.gralMng().resizeWidget(widgd, 0, 0);
+        widgd.gralMng().impl.resizeWidget(widgd, 0, 0);
       }
       return true;
     }

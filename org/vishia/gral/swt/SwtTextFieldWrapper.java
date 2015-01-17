@@ -96,7 +96,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   
   private SwtTextFieldWrapper(GralTextField widgg, SwtMng mng)
   {
-    widgg.super(widgg, mng); //NOTE: superclass is a non static inner class of GralTextField. 
+    widgg.super(widgg, mng.mng); //NOTE: superclass is a non static inner class of GralTextField. 
 
     Composite panelSwt = mng.getCurrentPanel();
     //in ctor: setPanelMng(mng);
@@ -107,7 +107,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
       textProperties |= SWT.PASSWORD; 
     }
     if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("t")){
-      mng.setNextPosition();
+      mng.mng.setNextPosition();
       final Font promptFont;
       char sizeFontPrompt;
       GralRectangle boundsAll, boundsPrompt, boundsField;
@@ -170,7 +170,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     textFieldSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
     textFieldSwt.setEditable(widgg.isEditable());
     textFieldSwt.setBackground(mng.propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));
-    KeyListener swtKeyListener = new TextFieldKeyListener(mng._impl.gralKeyListener);
+    KeyListener swtKeyListener = new TextFieldKeyListener(mng.mng._impl.gralKeyListener);
     textFieldSwt.addKeyListener(swtKeyListener);
     
     Listener[] oldMouseListener = textFieldSwt.getListeners(SWT.MouseDown);
@@ -207,11 +207,11 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     //
     textFieldSwt.setData(this);
     if(!widgg.isEditable()){
-      mng.registerShowField(widgg);
+      mng.mng.registerShowField(widgg);
     }
     swtWidgHelper = new SwtWidgetHelper(textFieldSwt, mng);
 
-    mng.registerWidget(widgg);
+    mng.mng.registerWidget(widgg);
     
   }
 
@@ -232,7 +232,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
    * @param mng
    */
   static void createTextField(GralTextField widgg, GralMng mng){
-    SwtTextFieldWrapper widgswt = new SwtTextFieldWrapper(widgg, (SwtMng)mng);
+    SwtTextFieldWrapper widgswt = new SwtTextFieldWrapper(widgg, (SwtMng)mng.impl);
   }
   
   
@@ -406,7 +406,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   {
     
     TextFieldFocusListener(SwtMng mng){
-      mng.super();
+      mng.super(mng.mng);
     }
 
     @Override public void focusLost(FocusEvent ev){

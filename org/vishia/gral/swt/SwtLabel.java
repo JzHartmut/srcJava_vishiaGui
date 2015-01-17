@@ -53,7 +53,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
   
   SwtLabel(GralLabel widgg, SwtMng mng)
   {
-    widgg.super(widgg, mng);
+    widgg.super(widgg, mng.mng);
     Composite panelSwt = mng.getCurrentPanel();
     int styleSwt = 0;
     labelSwt = new Label(panelSwt, styleSwt);
@@ -73,7 +73,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
     }
     labelSwt.setAlignment(mode);
     mng.setBounds_(labelSwt);
-    mng.registerWidget(widgg);
+    mng.mng.registerWidget(widgg);
     repaintGthread();  //to set text etc.
   }
 

@@ -17,8 +17,6 @@ import java.awt.TextField;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.InputStream;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
@@ -33,25 +31,20 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralTable;
-import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
-import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
-import org.vishia.gral.ifc.GralMngBuild_ifc;
-import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.msgDispatch.LogMessage;
 
-public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
+public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, GralMng_ifc
 {
   
   final AwtProperties propertiesGuiAwt; 
@@ -69,7 +62,7 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     //, VariableContainer_ifc variableContainer
     , LogMessage log
     )
-  { super(device, propertiesGui, log);
+  { super(new GralMng(device, propertiesGui, log));
     mainWindowAwt = window;
     this.propertiesGuiAwt = propertiesGui;
     mainWindowAwt.addKeyListener(mainKeyListener);
@@ -77,13 +70,13 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
 
   
   
-  @Override public Container getCurrentPanel(){ return (Container)pos.panel.getPanelImpl(); }
+  @Override public Container getCurrentPanel(){ return (Container)pos().panel.getPanelImpl(); }
 
 
   @Override public void setToPanel(GralWidget widgg){
     if(widgg instanceof GralHorizontalSelector<?>){
       //SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, (GralHorizontalSelector<?>)widgg);
-      registerWidget(widgg);
+      mng.registerWidget(widgg);
     } else if(widgg instanceof GralTable<?>){
       //AwtTable.addTable((GralTable<?>)widgg, this);
     } else if(widgg instanceof GralWindow){
@@ -107,10 +100,11 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
    *   'l' left, 't' top (above field) 
    * @return
    */
-  @Override public GralTextField addTextField(String name, boolean editable, String prompt, String promptStylePosition)
+  //@Override 
+  public GralTextField addTextField(String name, boolean editable, String prompt, String promptStylePosition)
   { Container parent = getCurrentPanel();
     AwtTextField widg = new AwtTextField(name, editable ? 'T' : 'S', this, parent);
-    widg.setPanelMng(this);
+    widg.setPanelMng(mng);
     widg.widgetAwt.setFont(propertiesGuiAwt.stdInputFont);
     widg.widgetAwt.setEditable(editable);
     widg.widgetAwt.setBackground(propertiesGuiAwt.colorAwt(GralColor.getColor("wh")));
@@ -125,19 +119,19 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     }
     //
     if(prompt != null && promptStylePosition.startsWith("t")){
-      setNextPosition();
+      mng.setNextPosition();
       final Font promptFont;
       char sizeFontPrompt;
       GralRectangle boundsAll, boundsPrompt, boundsField;
       final GralPos posPrompt = new GralPos(), posField = new GralPos();
-      boundsAll = calcWidgetPosAndSize(this.pos, 800, 600, 100, 20);
-      float ySize = pos.height();
+      boundsAll = mng.calcWidgetPosAndSize(this.pos(), 800, 600, 100, 20);
+      float ySize = pos().height();
       //float xSize = pos.width();
-          posPrompt.setPosition(this.pos, GralPos.same, ySize * 0.37f + GralPos.size, GralPos.same, GralPos.same, 0, '.');
-          posField.setPosition(this.pos, GralPos.refer + ySize * 0.37f, GralPos.same, GralPos.same, GralPos.same, 0, '.');
+          posPrompt.setPosition(this.pos(), GralPos.same, ySize * 0.37f + GralPos.size, GralPos.same, GralPos.same, 0, '.');
+          posField.setPosition(this.pos(), GralPos.refer + ySize * 0.37f, GralPos.same, GralPos.same, GralPos.same, 0, '.');
       promptFont = propertiesGuiAwt.smallPromptFont;
-      boundsPrompt = calcWidgetPosAndSize(posPrompt, boundsAll.dx, boundsAll.dy, 10,100);
-      boundsField = calcWidgetPosAndSize(posField, boundsAll.dx, boundsAll.dy, 10,100);
+      boundsPrompt = mng.calcWidgetPosAndSize(posPrompt, boundsAll.dx, boundsAll.dy, 10,100);
+      boundsField = mng.calcWidgetPosAndSize(posField, boundsAll.dx, boundsAll.dy, 10,100);
       Label wgPrompt = new Label();
       parent.add(wgPrompt);
       wgPrompt.setFont(promptFont);
@@ -157,16 +151,16 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     }
     //
     if(widg.name !=null && widg.name.charAt(0) == '$'){
-      widg.name = sCurrPanel + widg.name.substring(1);
+      widg.name = sCurrPanel() + widg.name.substring(1);
     }
     //link the widget with is information together.
     widg.widgetAwt.setData(widg);
     if(widg.name !=null){
       if(!editable){
-        showFields.put(widg.name, widg);
+        mng.registerShowField(widg);
       }
     }
-    registerWidget(widg);
+    mng.registerWidget(widg);
     return widg; 
   
   }
@@ -186,11 +180,12 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
    *   'l' left, 't' top (above field) 
    * @return
    */
-  @Override public GralTextBox addTextBox(String name, boolean editable, String prompt, char promptStylePosition)
-  { Container parent = (Container)pos.panel.getPanelImpl();
+  //@Override 
+  public GralTextBox addTextBox(String name, boolean editable, String prompt, char promptStylePosition)
+  { Container parent = (Container)pos().panel.getPanelImpl();
     AwtTextBox widgetSwt = new AwtTextBox(name, parent, 0, this);
     GralWidget widgetInfo = widgetSwt;
-    widgetInfo.setPanelMng(this);
+    widgetInfo.setPanelMng(mng);
     //Text widgetSwt = new Text(((PanelSwt)pos.panel).getPanelImpl(), SWT.MULTI);
     widgetSwt.textFieldSwt.setFont(propertiesGuiAwt.stdInputFont);
     widgetSwt.textFieldSwt.setEditable(editable);
@@ -202,16 +197,16 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     if(prompt != null && promptStylePosition == 't'){
       final int yPixelField;
       final Font promptFont;
-      int ySize = (int)(pos.height());
+      int ySize = (int)(pos().height());
       switch(ySize){
       case 3:  promptFont = propertiesGuiAwt.smallPromptFont;
                yPixelField = propertiesGuiAwt.yPixelUnit() * 2 -3;
                break;
       case 2:  promptFont = propertiesGuiAwt.smallPromptFont;
-               yPixelField = (int)(1.5F * propertiesGui.yPixelUnit());
+               yPixelField = (int)(1.5F * mng.propertiesGui.yPixelUnit());
                break;
       default: promptFont = propertiesGuiAwt.smallPromptFont;
-               yPixelField = propertiesGui.yPixelUnit() * 2 -3;
+               yPixelField = mng.propertiesGui.yPixelUnit() * 2 -3;
       }//switch
       Rectangle boundsField = widgetSwt.textFieldSwt.getBounds();
       Rectangle boundsPrompt = new Rectangle(boundsField.x, boundsField.y-3  //occupy part of field above, only above the normal letters
@@ -239,16 +234,16 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     } 
     //
     if(widgetInfo.name !=null && widgetInfo.name.charAt(0) == '$'){
-      widgetInfo.name = sCurrPanel + widgetInfo.name.substring(1);
+      widgetInfo.name = sCurrPanel() + widgetInfo.name.substring(1);
     }
     //link the widget with is information together.
     widgetSwt.textFieldSwt.setData(widgetInfo);
     if(widgetInfo.name !=null){
       if(!editable){
-        showFields.put(widgetInfo.name, widgetInfo);
+        mng.registerShowField(widgetInfo);
       }
     }
-    registerWidget(widgetInfo);
+    mng.registerWidget(widgetInfo);
     return widgetSwt; 
 
   }
@@ -258,83 +253,6 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
   @Override public GralHtmlBox addHtmlBox(String name){
     return null;
   }
-  
-  @Override public GralButton addButton(
-      String sName
-    , GralUserAction action
-    , String sButtonText
-    )
-  { return addButton(sName, action, null, null, sButtonText);
-  }  
-  
-
-  
-  @Override public GralButton addButton(
-    String sName
-  , GralUserAction action
-  , String sCmd
-  //, String sShowMethod
-  , String sDataPath
-  , String sButtonText
-    //, int height, int width
-    //, String sCmd, String sUserAction, String sName)
-  )
-  {
-    int ySize = (int)pos.height();
-    int xSize = (int)pos.width();
-    char size = ySize > 3? 'B' : 'A';
-    if(sName == null){ sName = sButtonText; }
-    GralButton widgButton = new GralButton(sName);
-    widgButton.setActionChange(action);  //maybe null
-    widgButton.setText(sButtonText);
-    widgButton.sCmd = sCmd;
-    //widgButton.setShowMethod(sShowMethod);
-    widgButton.setDataPath(sDataPath);
-    registerWidget(widgButton);
-    
-    return widgButton;
-  }
-  
-  
-  
-  @Override public GralButton addSwitchButton(
-    String sName
-  , String sButtonTextOff
-  , String sButtonTextOn
-  , GralColor colorOff
-  , GralColor colorOn
-    //, int height, int width
-    //, String sCmd, String sUserAction, String sName)
-  )
-  {
-    int ySize = (int)pos.height();
-    int xSize = (int)pos.width();
-    
-    char size = ySize > 3? 'B' : 'A';
-    GralButton widgButton = new GralButton(sName);
-    widgButton.setSwitchMode(colorOff, colorOn);
-    widgButton.setSwitchMode(sButtonTextOff, sButtonTextOn);
-    if(sName !=null){ registerWidget(widgButton); }
-    setToPanel(widgButton);
-    return widgButton;
-  }
-  
-
-
-  public GralButton addCheckButton(
-    String sName
-  , String sButtonTextOn
-  , String sButtonTextOff
-  , String sButtonTextDisabled
-  , GralColor colorOn
-  , GralColor colorOff
-  , GralColor colorDisabled
-  )
-  {
-    return null;  
-  }
-
-  
   
   
   @Override public GralCurveView addCurveViewY(String sName, int nrofXvalues, GralCurveView.CommonCurve common)
@@ -367,23 +285,8 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
   }
 
   @Override
-  public GralLed addLed(String sName,  String sDataPath)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
   public GralWidget addSlider(String sName, GralUserAction action, String sShowMethod,
     String sDataPath)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public GralButton addSwitchButton(String sName, GralUserAction action, String sCmd,
-   String sDataPath, String sButtonText, String color0, String color1)
   {
     // TODO Auto-generated method stub
     return null;
@@ -406,20 +309,6 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     return null;
   }
 
-  @Override
-  public GralWidget addText(String sText, int origin, GralColor textColor, GralColor BackColor)
-  { new Label();
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public GralValueBar addValueBar(String sName, String sDataPath)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
   
   
 
@@ -433,7 +322,7 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
   
   @Override protected GralMenu createContextMenu(GralWidget widg){
     Component widgSwt = (Component)widg.getWidgetImplementation();
-    GralMenu menu = new AwtMenu(widg, widgSwt, this);
+    GralMenu menu = new AwtMenu(widg, widgSwt, mng);
     PopupMenu menuAwt = (PopupMenu)menu.getMenuImpl();
     widgSwt.add(menuAwt);
     menuAwt.show(widgSwt, 10, 10);
@@ -444,7 +333,7 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
   
   @Override protected GralMenu createMenuBar(GralWindow windg){
     Frame windowAwt = (Frame)windg.getWidgetImplementation();
-    GralMenu menu = new AwtMenu(windg, windowAwt, this);
+    GralMenu menu = new AwtMenu(windg, windowAwt, mng);
     return menu;
   }
  
@@ -458,13 +347,13 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
   {
       //Composite box = new Composite(graphicFrame, 0);
       Container box = new Container();
-      Container parent = (Container)pos.panel.getPanelImpl();
+      Container parent = (Container)pos().panel.getPanelImpl();
       
       parent.add(box);
       setPosAndSize_(box);
       Dimension size = box.getSize();
-      GralPanelContent panel = new AwtPanel(name, this, box);
-      registerPanel(panel);
+      GralPanelContent panel = new AwtPanel(name, mng, box);
+      mng.registerPanel(panel);
       //GuiPanelMngSwt mng = new GuiPanelMngSwt(gralDevice, size.y, size.x, propertiesGuiSwt, variableContainer, log);
       return panel;
   }
@@ -504,13 +393,6 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
   }
   
   
-  @Override
-  public Set<Entry<String, GralWidget>> getShowFields()
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
 
   @Override
   public boolean remove(GralPanelContent compositeBox)
@@ -519,43 +401,9 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     return false;
   }
 
-  @Override
-  public boolean remove(GralWidget widget)
-  {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public void repaint()
-  {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void repaintCurrentPanel()
-  {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void selectPanel(String sName)
-  {
-    // TODO Auto-generated method stub
-    
-  }
 
 
   @Override public Color getColorImpl(GralColor color) { return propertiesGuiAwt.colorAwt(color); }
-
-  @Override
-  public String getValue(String sName)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
 
   @Override
   public String getValueFromWidget(GralWidget widgetDescr)
@@ -605,15 +453,15 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
   
   protected void setPosAndSize_(Component component, int widthwidgetNat, int heigthWidgetNat)
   {
-    setNextPosition();
+    mng.setNextPosition();
     Component parentComp = component.getParent();
     //Rectangle pos;
     final GralRectangle rectangle;
     if(parentComp == null){
-      rectangle = calcWidgetPosAndSize(pos, 800, 600, widthwidgetNat, heigthWidgetNat);
+      rectangle = mng.calcWidgetPosAndSize(pos(), 800, 600, widthwidgetNat, heigthWidgetNat);
     } else {
       final Rectangle parentSize = parentComp.getBounds();
-      rectangle = calcWidgetPosAndSize(pos, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+      rectangle = mng.calcWidgetPosAndSize(pos(), parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
     }
     component.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
        
@@ -645,7 +493,7 @@ public class AwtWidgetMng extends GralMng implements GralMngBuild_ifc, GralMng_i
     } else {
       parentSize = parentComp.getBounds();
     }
-    return pos.calcWidgetPosAndSize(propertiesGui, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+    return pos.calcWidgetPosAndSize(mng.propertiesGui, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
   }
   
 
