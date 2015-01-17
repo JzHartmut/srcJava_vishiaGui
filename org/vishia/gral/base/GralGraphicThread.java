@@ -6,8 +6,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.event.EventThreadIfc;
 import org.vishia.event.EventTimeout;
-import org.vishia.event.TimeOrderBase;
-import org.vishia.event.TimeOrderMng;
+import org.vishia.event.EventTimeOrderBase;
+import org.vishia.event.EventThread;
 import org.vishia.util.Assert;
 import org.vishia.util.MinMaxTime;
 
@@ -115,7 +115,7 @@ import org.vishia.util.MinMaxTime;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralGraphicThread implements EventThreadIfc, Runnable, TimeOrderMng.ConnectionExecThread
+public abstract class GralGraphicThread implements EventThreadIfc, Runnable
 {
   
   /**Version and history:
@@ -199,7 +199,7 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable, Tim
   private final ConcurrentLinkedQueue<GralDispatchCallbackWorker> queueOrdersToExecute = new ConcurrentLinkedQueue<GralDispatchCallbackWorker>();
 
   
-  TimeOrderMng orderList = new TimeOrderMng("GraphicOrderTimeMng"); //this);
+  EventThread orderList = new EventThread("GraphicOrderTimeMng"); //this);
 
   /**Constructs this class as superclass.
    * The constructor of the inheriting class has some more parameter to build the 
@@ -256,7 +256,7 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable, Tim
 
   
   
-  public TimeOrderMng orderList(){ return orderList; }
+  public EventThread orderList(){ return orderList; }
   
   @Override public void addTimeOrder(EventTimeout order){ orderList.addTimeOrder(order); }
   public void addDispatchOrder(GralDispatchCallbackWorker order){ orderList.addTimeOrder(order); }
@@ -349,7 +349,7 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable, Tim
         //if wakeUp() is called, isWakedUpOnly is set.
         checkTimes.cyclTime();
         //execute stored orders.
-        TimeOrderBase order;
+        EventTimeOrderBase order;
         boolean bSleep = true;
         while( (order = queueOrdersToExecute.poll()) !=null) {
           try{
@@ -360,9 +360,6 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable, Tim
             System.err.println("GralGraphicThread-" + exc.getMessage());
             exc.printStackTrace();
           }
-          bSleep = false;
-        }
-        if(orderList.step(-1, System.currentTimeMillis())){  //deprecated.
           bSleep = false;
         }
         if(bSleep){ //if any order is executed, don't sleep yet because some os events may forced therefore. Dispatch it!

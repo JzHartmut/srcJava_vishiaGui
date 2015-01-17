@@ -7,7 +7,7 @@ import java.util.List;
 import org.vishia.event.EventCmdPingPongType;
 import org.vishia.event.EventConsumer;
 import org.vishia.event.EventSource;
-import org.vishia.event.TimeOrderBase;
+import org.vishia.event.EventTimeOrderBase;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.fileRemote.FileRemoteCallback;

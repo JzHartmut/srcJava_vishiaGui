@@ -3,7 +3,7 @@ package org.vishia.gral.base;
 import java.util.EventObject;
 
 import org.vishia.event.EventConsumer;
-import org.vishia.event.TimeOrderBase;
+import org.vishia.event.EventTimeOrderBase;
 
 
 /**This is the base class for user classes, which contains code, that is executed in the graphic thread,
@@ -11,7 +11,7 @@ import org.vishia.event.TimeOrderBase;
  * @author Hartmut Schorrig.
  *
  */
-public abstract class GralDispatchCallbackWorker extends TimeOrderBase
+public abstract class GralDispatchCallbackWorker extends EventTimeOrderBase
 {
   
   private static final long serialVersionUID = 1L;
