@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Text;
-import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralKeyListener;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTextBox;

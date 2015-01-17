@@ -217,7 +217,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * <li>2012-03-08 Hartmut chg: {@link #repaintRequ} firstly remove the request from queue before execution,
    *   a new request after that time will be added newly therefore, then execute it.
    * <li>2012-02-22 Hartmut new: catch on {@link #repaintGthread()} and continue the calling level
-   *   because elsewhere the repaint order isn't removed from the {@link org.vishia.gral.base.GralGraphicThread#addDispatchOrder(GralDispatchCallbackWorker)}-queue.
+   *   because elsewhere the repaint order isn't removed from the {@link org.vishia.gral.base.GralGraphicThread#addDispatchOrder(GralGraphicTimeOrder)}-queue.
    * <li>2012-02-22 Hartmut new: implements {@link GralSetValue_ifc} now.
    * <li>2012-01-16 Hartmut new Concept {@link #repaint()}, can be invoked in any thread. With delay possible. 
    *   All inherit widgets have to be implement  {@link #repaintGthread()}.
@@ -1482,7 +1482,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * It is used with delay and wind up whenever {@link #repaint(int, int)} with an delay is called.
    * If its callback method was run, it is dequeued till the next request of {@link #repaint()}.
    */
-  private final GralDispatchCallbackWorker repaintRequ = new GralDispatchCallbackWorker("GralWidget.repaintRequ"){
+  private final GralGraphicTimeOrder repaintRequ = new GralGraphicTimeOrder("GralWidget.repaintRequ"){
     @Override public void executeOrder() {
       //first remove from queue to force add new, if a new request is given.
       //thread safety: If a new request is given, it is not add yet, because it isn't execute.

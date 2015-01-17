@@ -1,7 +1,7 @@
 package org.vishia.gral.test;
 
 import org.vishia.gral.awt.AwtFactory;
-import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
@@ -155,7 +155,7 @@ public class GralColorShow
     }
   }
   
-  GralDispatchCallbackWorker initGraphic = new GralDispatchCallbackWorker("GralArea9Window.initGraphic"){
+  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic"){
     @Override public void executeOrder()
     {
       gralMng.setPosition(4, -2, 2, -2, 0, 'd');

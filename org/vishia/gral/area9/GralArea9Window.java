@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
@@ -214,7 +214,7 @@ public class GralArea9Window implements GralArea9_ifc
   
 
   
-  GralDispatchCallbackWorker initGraphic = new GralDispatchCallbackWorker("GralArea9Window.initGraphic"){
+  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic"){
     @Override public void executeOrder()
     {
       window.setResizeAction(resizeAction);   //sets the resize action from this instead a standard window for the primaryWindow.
@@ -616,7 +616,7 @@ public class GralArea9Window implements GralArea9_ifc
   
   
   
-  private final GralDispatchCallbackWorker writeOutputTextDirectly = new GralDispatchCallbackWorker("GralArea9Window.writeOutputTextDirectly")
+  private final GralGraphicTimeOrder writeOutputTextDirectly = new GralGraphicTimeOrder("GralArea9Window.writeOutputTextDirectly")
   { @Override public void executeOrder()
     { String line;
       while((line = outputTexts.poll())!=null){

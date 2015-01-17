@@ -5,7 +5,7 @@ import java.awt.Label;
 import java.awt.TextArea;
 import java.io.IOException;
 
-import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
@@ -94,7 +94,7 @@ public class AwtTextBox extends GralTextBox
 
 
   
-  protected GralDispatchCallbackWorker changeTextBoxTrail = new GralDispatchCallbackWorker("AwtTextBox.changeTextBoxTrail")
+  protected GralGraphicTimeOrder changeTextBoxTrail = new GralGraphicTimeOrder("AwtTextBox.changeTextBoxTrail")
   { @Override public void executeOrder()
     { if(newText.length() >0){
         textFieldSwt.append(newText.toString());
@@ -107,7 +107,7 @@ public class AwtTextBox extends GralTextBox
   };
   
   
-  protected GralDispatchCallbackWorker changeText = new GralDispatchCallbackWorker("AwtTextBox.changeTextB")
+  protected GralGraphicTimeOrder changeText = new GralGraphicTimeOrder("AwtTextBox.changeTextB")
   { @Override public void executeOrder()
     { if(newText.length() >0){
         textFieldSwt.setText(newText.toString());

@@ -1212,6 +1212,17 @@ public abstract class GralMng implements GralMngBuild_ifc, GralMng_ifc
   public final InternalPublic _impl = new InternalPublic();
   
   
+  /**This class is used only for the implementation level of the graphic. It is not intent to use
+   * by any application. It is public because the implementation level should accesses it.
+   */
+  public static abstract class ImplAccess {
+    protected GralMng mng;
+    
+    protected GralPos pos(){ return mng.pos; }
+  }
+  
+  
+  
 
   void stop(){}
 	

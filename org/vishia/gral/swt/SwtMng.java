@@ -42,7 +42,7 @@ import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralCurveView;
-import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralHtmlBox;
@@ -113,6 +113,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
+//GralMng.ImplAccess
 public class SwtMng extends GralMng implements GralMngBuild_ifc, GralMng_ifc
 //GuiShellMngIfc<Control>   
 {

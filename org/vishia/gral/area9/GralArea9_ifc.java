@@ -2,7 +2,7 @@ package org.vishia.gral.area9;
 
 import java.io.File;
 
-import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
@@ -110,7 +110,7 @@ public interface GralArea9_ifc extends GralMngApplAdapter_ifc
    * <li>Creation of all sub windows for InfoBox, InfoLog, Help and About.
    * <li>Creation of the output Area.
    * <li>
-   * <li>Adding the {@link org.vishia.gral.base.GralDispatchCallbackWorker}
+   * <li>Adding the {@link org.vishia.gral.base.GralGraphicTimeOrder}
    *   {@link org.vishia.gral.area9.GralArea9Window#writeOutputTextDirectly} which transfers
    *   text lines stored in {@link org.vishia.gral.area9.GralArea9Window#outputTexts} to the output area.
    * </ul>

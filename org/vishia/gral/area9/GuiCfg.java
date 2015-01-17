@@ -7,7 +7,7 @@ import java.io.Writer;
 import java.util.List;
 
 import org.vishia.communication.InterProcessCommFactorySocket;
-import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralShowMethods;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
@@ -263,7 +263,7 @@ protected void userInit()
 /**Code snippet for initializing the GUI area (panel). This snippet will be executed
  * in the GUI-Thread if the GUI is created. 
  */
-GralDispatchCallbackWorker initGraphic = new GralDispatchCallbackWorker("GuiCfg.initGraphic")
+GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GuiCfg.initGraphic")
 {
   @Override public void executeOrder()
   {
@@ -279,7 +279,7 @@ GralDispatchCallbackWorker initGraphic = new GralDispatchCallbackWorker("GuiCfg.
 /**Code snippet to run the ZBNF-configurator (text controlled GUI)
  * 
  */
-GralDispatchCallbackWorker configGuiWithZbnf = new GralDispatchCallbackWorker("GuiCfg.configGuiWithZbnf")
+GralGraphicTimeOrder configGuiWithZbnf = new GralGraphicTimeOrder("GuiCfg.configGuiWithZbnf")
 {
   
   @Override public void executeOrder(){

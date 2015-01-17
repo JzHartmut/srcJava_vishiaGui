@@ -1,6 +1,6 @@
 package org.vishia.gral.ifc;
 
-import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralGraphicTimeOrder;
 
 /**This interface supports to deal with the graphical implementation, especially the graphic thread.
  * The graphic thread is associated with a graphic device usually. The graphic device handles
@@ -99,13 +99,13 @@ public interface GralWindowMng_ifc
   /**Adds a listener, which will be called in the dispatch loop.
    * @param listener
    */
-  void addDispatchListener(GralDispatchCallbackWorker listener);
+  void addDispatchListener(GralGraphicTimeOrder listener);
   
   
   /**Removes a listener, which was called in the dispatch loop.
    * @param listener
    */
-  public void removeDispatchListener(GralDispatchCallbackWorker listener);
+  public void removeDispatchListener(GralGraphicTimeOrder listener);
   
   
 }

@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
+import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
@@ -63,6 +64,8 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   /** */
   final SwtGraphicThread graphicThreadSwt;
   
+  final GralGraphicThread gralGraphicThread;
+  
 
   
   SwtPrimaryWindow(GralWindow windowGral, SwtMng mng, SwtGraphicThread graphicThread, Display displaySwt)
@@ -70,6 +73,7 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
     //super("primaryWindow", GralWindow.windHasMenu, graphicThread.windowSwt, gralMng);
     //super(gralMng, graphicThread);
     this.graphicThreadSwt = graphicThread;  //refers SWT type
+    this.gralGraphicThread = graphicThread.gralGraphicThread();
   }  
   
   
@@ -77,12 +81,13 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   { int windProps = GralWindow_ifc.windResizeable;
     GralWindow windowGral = new GralWindow("main", sTitle, windProps, null, null );
     SwtGraphicThread graphicThread = new SwtGraphicThread(windowGral, sizeShow, left, top, xSize, ySize, log);
+    GralGraphicThread gralGraphicThread = graphicThread.gralGraphicThread();
     SwtPrimaryWindow windowSwt = new SwtPrimaryWindow(windowGral, graphicThread.gralMng, graphicThread, graphicThread.displaySwt);
     //GuiThread graphicThread = startGraphicThread(init);  
 
-    synchronized(graphicThread){
-      while(graphicThread.getThreadIdGui() == 0){
-        try{ graphicThread.wait(1000);} catch(InterruptedException exc){}
+    synchronized(gralGraphicThread){
+      while(gralGraphicThread.getThreadIdGui() == 0){
+        try{ gralGraphicThread.wait(1000);} catch(InterruptedException exc){}
       }
     }
     graphicThread.gralMng.registerPanel(windowGral);
@@ -113,7 +118,7 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   
   public void terminate()
   {
-    if(graphicThreadSwt.isRunning() && !graphicThreadSwt.displaySwt.isDisposed()){ 
+    if(gralGraphicThread.isRunning() && !graphicThreadSwt.displaySwt.isDisposed()){ 
       graphicThreadSwt.displaySwt.dispose();  //forces windowsCloseListener and exit=true
     }  
 

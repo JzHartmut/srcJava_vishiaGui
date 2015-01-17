@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.vishia.gral.awt.AwtFactory;
 import org.vishia.gral.base.GralButton;
-import org.vishia.gral.base.GralDispatchCallbackWorker;
+import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
@@ -63,7 +63,7 @@ public class ExampleSimpleButton
   protected final GuiElements gui;
   
   /**Instance to initialize the graphic. */
-  private GralDispatchCallbackWorker initGuiCode;
+  private GralGraphicTimeOrder initGuiCode;
   
   ExampleSimpleButton(GralMng gralMng)
   {
@@ -72,7 +72,7 @@ public class ExampleSimpleButton
     
   }
   
-  protected void setInitGuiCode(GralDispatchCallbackWorker initGuiCode)
+  protected void setInitGuiCode(GralGraphicTimeOrder initGuiCode)
   {
     this.initGuiCode = initGuiCode;
   }
@@ -159,14 +159,14 @@ public class ExampleSimpleButton
   /**Code snippet for initializing the GUI. This snippet will be executed
    * in the graphic thread. It is an anonymous inner class. 
    */
-  protected class InitGuiCodeSimpleButton extends GralDispatchCallbackWorker
+  protected class InitGuiCodeSimpleButton extends GralGraphicTimeOrder
   {
     InitGuiCodeSimpleButton(){
       super("ExampleSimpleButton.initGuiCode");
     }
     
     /**This routine is called in the graphic thread if it was added.
-     * @see org.vishia.gral.base.GralDispatchCallbackWorker#executeOrder(boolean)
+     * @see org.vishia.gral.base.GralGraphicTimeOrder#executeOrder(boolean)
      */
     @Override public void executeOrder()
     {

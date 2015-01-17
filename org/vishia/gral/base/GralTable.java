@@ -1174,7 +1174,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * If a navigation key is released, the table navigation should be stopped immediately.
    * 
    */
-  protected final GralDispatchCallbackWorker keyActionDone = new GralDispatchCallbackWorker("GralTableKeyDone") {
+  protected final GralGraphicTimeOrder keyActionDone = new GralGraphicTimeOrder("GralTableKeyDone") {
     @Override
     public void executeOrder() {
       gi.bFocused = true;  //to focus while repainting

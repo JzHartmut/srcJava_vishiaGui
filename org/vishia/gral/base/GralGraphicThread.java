@@ -42,27 +42,27 @@ import org.vishia.util.MinMaxTime;
  * The information which should be presented should be queued. That is the mechanism:
  * <ul>
  * <li><b>Version 1:</b> An execution sequence for the graphic thread is written in a derived instance of
- *    <ul><li>{@link GralDispatchCallbackWorker#executeOrder(boolean)}.
+ *    <ul><li>{@link GralGraphicTimeOrder#executeOrder(boolean)}.
  *    </ul> 
  *    That instance should be queued calling
- *    <ul><li>{@link #addDispatchOrder(GralDispatchCallbackWorker)}. 
+ *    <ul><li>{@link #addDispatchOrder(GralGraphicTimeOrder)}. 
  *    </ul>
  *    With them the graphic thread is woken up
  *    because {@link #wakeup()} is called in the 'addDispatchOrder()'-routine. 
  *    <br><br>
  *    In the graphic thread execution loop the {@link #queueGraphicOrders} queue is checked 
  *    and all queued method are invoked. That executes the 'widget.setText(text)' or the other routines
- *    from the users programm in the {@link GralDispatchCallbackWorker#executeOrder(boolean)}.
+ *    from the users programm in the {@link GralGraphicTimeOrder#executeOrder(boolean)}.
  *    <br><br>
  *    After the queue is checked the {@link #dispatchOsEvents()} is called. In SWT it calls the operation system
  *    dispatching loop. If the underlying graphic system has its own graphic dispatching thread that thread
  *    is woken up only to present the changes in the widgets. If all graphic dispatching is done, 
  *    {@link #graphicThreadSleep()} let this thread sleeping, its all done. 
  *    <br><br>
- *    The instance of {@link GralDispatchCallbackWorker} will be remain in the queue. For single activities
- *    it should be queued out by itself calling its own {@link GralDispatchCallbackWorker#removeFromList(GralGraphicThread)}
- *    method in its {@link GralDispatchCallbackWorker#executeOrder(boolean)}-routine.
- *    Another possibility is to have instances of {@link GralDispatchCallbackWorker} which are queued
+ *    The instance of {@link GralGraphicTimeOrder} will be remain in the queue. For single activities
+ *    it should be queued out by itself calling its own {@link GralGraphicTimeOrder#removeFromList(GralGraphicThread)}
+ *    method in its {@link GralGraphicTimeOrder#executeOrder(boolean)}-routine.
+ *    Another possibility is to have instances of {@link GralGraphicTimeOrder} which are queued
  *    for any time. They are invoked whenever {@link #wakeup()} is called. 
  * <li><b>Version 2</b>: The order or commission can be instructed to the <code>setInfo(cmd, ...data)</code>-method
  *   of a {@link GralWidget}:
@@ -115,13 +115,15 @@ import org.vishia.util.MinMaxTime;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralGraphicThread implements EventThreadIfc, Runnable
+public class GralGraphicThread implements EventThreadIfc, Runnable
 {
   
   /**Version and history:
    * <ul>
    * <li>
-   * <li>2012-04-20 Hartmut bugfix: If a {@link GralDispatchCallbackWorker} throws an exception,
+   * <li>2015-01-17 Hartmut chg: Now it is an own instance able to create before the graphic is established.
+   *   The graphical implementation extends the {@link ImplAccess}. 
+   * <li>2012-04-20 Hartmut bugfix: If a {@link GralGraphicTimeOrder} throws an exception,
    *   it was started again because it was in the queue yet. The proplem occurs on build graphic. It
    *   was repeated till all graphic handles are consumed. Now the {@link #queueGraphicOrders} entries
    *   are deleted first, then executed. TODO use this class only for SWT, use the adequate given mechanism
@@ -160,15 +162,12 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable
    * 
    * 
    */
-  public final static int version = 20120422;
+  public final static String version = "2015-01-17";
   
   //protected GralPrimaryWindow window;
   
   //protected Runnable init;
   
-  /**The thread which runs all graphical activities. */
-  protected Thread threadGuiDispatch;
-
   /**The thread id of the managing thread for graphic actions. */
   protected long graphicThreadId;
 
@@ -196,11 +195,15 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable
    * is woken up and before the dispatching of graphic-system-event will be started.
    * An order may be run only one time, than it should delete itself from this queue in its run-method.
    * */
-  private final ConcurrentLinkedQueue<GralDispatchCallbackWorker> queueOrdersToExecute = new ConcurrentLinkedQueue<GralDispatchCallbackWorker>();
+  private final ConcurrentLinkedQueue<GralGraphicTimeOrder> queueOrdersToExecute = new ConcurrentLinkedQueue<GralGraphicTimeOrder>();
 
   
   EventThread orderList = new EventThread("GraphicOrderTimeMng"); //this);
 
+  
+  private ImplAccess impl;
+  
+  
   /**Constructs this class as superclass.
    * The constructor of the inheriting class has some more parameter to build the 
    * primary window. Therefore the {@link #threadGuiDispatch}.start() to start the {@link #run()}
@@ -208,35 +211,18 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable
    * after all parameter are saved to execute the overridden {@link #initGraphic()} method.
    * @param name Name of the thread.
    */
-  protected GralGraphicThread(char size)
+  public GralGraphicThread(char size)
   { sizeCharProperties = size;
-    threadGuiDispatch = new Thread(this, "graphic");
   }
-  
-  
-  /**This method should be implemented by the graphical implementation layer. It should build the graphic main window
-   * and returned when finished. This routine is called as the first routine in the Graphic thread's
-   * method {@link #run()}. See {@link org.vishia.gral.swt.SwtGraphicThread}. */
-  protected abstract void initGraphic();
-  
-  /**Calls the dispatch routine of the implementation graphic.
-   * @return true if dispatching should be continued.
-   */
-  protected abstract boolean dispatchOsEvents();
-  
-  
-  /**Forces the graphic thread to sleep and wait for any events. Either this routine returns
-   * if {@link #wakeup()} is called or this routine returns if the operation system wakes up the graphic thread. */
-  protected abstract void graphicThreadSleep();
   
   
   /**Stores an event in the queue, able to invoke from any thread.
    * @param ev
    */
   @Override public void storeEvent(EventObject ev){
-    if(ev instanceof GralDispatchCallbackWorker) { 
-      queueOrdersToExecute.add((GralDispatchCallbackWorker)ev);
-      wakeup();
+    if(ev instanceof GralGraphicTimeOrder) { 
+      queueOrdersToExecute.add((GralGraphicTimeOrder)ev);
+      impl.wakeup();
    } else {
       throw new IllegalArgumentException("can only store events of type GralDispatchCallbackWorker");
     }
@@ -249,8 +235,8 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable
    * @return true if found.
    */
   @Override public boolean removeFromQueue(EventObject ev){
-    assert(ev instanceof GralDispatchCallbackWorker);
-    return ((GralDispatchCallbackWorker)ev).removeFromQueue()
+    assert(ev instanceof GralGraphicTimeOrder);
+    return ((GralGraphicTimeOrder)ev).removeFromQueue()
         || queueOrdersToExecute.remove(ev);
   }
 
@@ -259,7 +245,7 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable
   public EventThread orderList(){ return orderList; }
   
   @Override public void addTimeOrder(EventTimeout order){ orderList.addTimeOrder(order); }
-  public void addDispatchOrder(GralDispatchCallbackWorker order){ orderList.addTimeOrder(order); }
+  public void addDispatchOrder(GralGraphicTimeOrder order){ orderList.addTimeOrder(order); }
 
   //public void removeDispatchListener(GralDispatchCallbackWorker listener){ orderList.removeTimeOrder(listener); }
 
@@ -267,18 +253,17 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable
 
   
   public void addEvent(EventObject event) {
-    assert(event instanceof GralDispatchCallbackWorker);  //should be
-    queueOrdersToExecute.add((GralDispatchCallbackWorker)event);
-    wakeup();
+    assert(event instanceof GralGraphicTimeOrder);  //should be
+    queueOrdersToExecute.add((GralGraphicTimeOrder)event);
+    impl.wakeup();
   }
   
   
-  /**This method should be implemented by the graphical base. It should be waked up the execution 
-   * of the graphic thread because some actions are registered.. */
-  public abstract void wakeup();
-  
   public long getThreadIdGui(){ return graphicThreadId; }
   
+  /**This method should wake up the execution of the graphic thread because some actions are registered.. */
+  public void wakeup(){ impl.wakeup(); }
+
   
   public boolean isStarted(){ return bStarted; }
   
@@ -307,14 +292,14 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable
    * @see java.lang.Runnable#run()
    */
   @Override public void run()
-  { initGraphic();
+  { impl.initGraphic();
     //The last action, set the GuiThread
     long guiThreadId1 = Thread.currentThread().getId(); ///
     synchronized(this){
       this.graphicThreadId = guiThreadId1;
       bStarted = true;
       orderList.start();
-      notify();      //wakeup the waiting calling thread.
+      this.notify();      //wakeup the waiting calling thread.
     }
     checkTimes.init();
     checkTimes.adjust();
@@ -322,7 +307,7 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable
     while (!bExit) {
       boolean bContinueDispatch;
       do{
-        try{ bContinueDispatch = dispatchOsEvents();
+        try{ bContinueDispatch = impl.dispatchOsEvents();
         /*  
         try {
             Thread.sleep(10);
@@ -364,7 +349,7 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable
         }
         if(bSleep){ //if any order is executed, don't sleep yet because some os events may forced therefore. Dispatch it!
           //no order executed. It sleeps. An os event which arrives in this time wakes up the graphic thread.
-          graphicThreadSleep();
+          impl.graphicThreadSleep();
         }
       } 
     }
@@ -375,7 +360,55 @@ public abstract class GralGraphicThread implements EventThreadIfc, Runnable
   }
 
   
-  
+  /**This class is used only for the implementation level of the graphic. It is not intent to use
+   * by any application. It is public because the implementation level should accesses it.
+   */
+  public static abstract class ImplAccess
+  {
+    protected final GralGraphicThread gralGraphicThread;
+    
+    /**The thread which runs all graphical activities. */
+    protected final Thread threadGuiDispatch;
+
+    //protected GrapGraphicThread
+
+    protected ImplAccess(GralGraphicThread graphicThread) {
+      this.gralGraphicThread = graphicThread;
+      this.gralGraphicThread.impl = this;
+      threadGuiDispatch = new Thread(gralGraphicThread, "graphic");
+
+    }
+    
+    
+    public GralGraphicThread gralGraphicThread(){ return gralGraphicThread; }
+    
+    /**This method should be implemented by the graphical implementation layer. It should build the graphic main window
+     * and returned when finished. This routine is called as the first routine in the Graphic thread's
+     * method {@link #run()}. See {@link org.vishia.gral.swt.SwtGraphicThread}. */
+    protected abstract void initGraphic();
+    
+    /**Calls the dispatch routine of the implementation graphic.
+     * @return true if dispatching should be continued.
+     */
+    protected abstract boolean dispatchOsEvents();
+    
+    
+    /**Forces the graphic thread to sleep and wait for any events. Either this routine returns
+     * if {@link #wakeup()} is called or this routine returns if the operation system wakes up the graphic thread. */
+    protected abstract void graphicThreadSleep();
+    
+    /**This method should be implemented by the graphical base. It should be waked up the execution 
+     * of the graphic thread because some actions are registered.. */
+    public abstract void wakeup();
+    
+    /**Terminates the run loop if val == true.
+     * @param val
+     */
+    protected void setClosed(boolean val){ gralGraphicThread.bExit = val; }
+    
+    protected char sizeCharProperties(){ return gralGraphicThread.sizeCharProperties; }
+
+  }
   
 }
 

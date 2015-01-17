@@ -51,7 +51,7 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
   public final static String sVersion = "2014-08-16";
   
   /**Buffer for new text which is set or appended in another thread than the graphic thread.
-   * This buffer is empty if the graphic thread has processed the {@link GralDispatchCallbackWorker}
+   * This buffer is empty if the graphic thread has processed the {@link GralGraphicTimeOrder}
    * after calling {@link #append(CharSequence)} or {@link #setText(CharSequence)}.
    * It is filled only temporary.
    */

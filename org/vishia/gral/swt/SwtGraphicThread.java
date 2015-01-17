@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralGraphicThread;
+import org.vishia.gral.base.GralGraphicThread.ImplAccess;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralWindow_ifc;
@@ -22,11 +23,12 @@ import org.vishia.msgDispatch.LogMessage;
  * It doesn't depend of complex functionality of the org.vishia.gral. But that implementations based on this.
  * This class can be used for a simple SWT graphic implementation.
  */
-class SwtGraphicThread extends GralGraphicThread //implements Runnable
+class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnable
 {
-  /**Version, able to read as hex yyyymmdd, history and license.
-   * Changes:
+  /**Version, history and license.
    * <ul>
+   * <li>2015-01-17 Hartmut chg: Now {@link GralGraphicThread} is an own instance able to create before the graphic is established.
+   *   This graphical implementation extends the {@link ImplAccess}. 
    * <li<2012-07-14 Hartmut chg: {@link #traverseKeyFilter} now excludes [ctrl-tab]. Only [tab] is a traversal key.
    * <li>2012-04-16 Hartmut chg: {@link #initGraphic()} now creates the main window, creates the
    *   {@link SwtMng} instead it is doing in the non-graphic thread. 
@@ -42,7 +44,7 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
    * <li> You can redistribute copies of this source to everybody.
    * <li> Every user of this source, also the user of redistribute copies
    *    with or without payment, must accept this license for further using.
-   * <li> But the LPGL ist not appropriate for a whole software product,
+   * <li> But the LPGL is not appropriate for a whole software product,
    *    if this source is only a part of them. It means, the user
    *    must publish this part of source,
    *    but don't need to publish the whole source of the own product.
@@ -57,8 +59,8 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    */
-  @SuppressWarnings("hiding")
-  public final static int version = 20120416;
+  //@SuppressWarnings("hiding")
+  public final static String version = "2015-01-17";
 
   /**The graphical device for the application for all windows of this application. */
   Display displaySwt;
@@ -83,7 +85,7 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
      * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
      */
     @Override public void handleEvent(Event event) {
-      bExit = event.widget == windowSwt; //true;
+      setClosed( event.widget == windowSwt); //close if the main window was closed.
     }
   }
 
@@ -190,7 +192,7 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
   final int xPos, yPos, xSize, ySize;
   
   SwtGraphicThread(GralWindow windowGral, char sizeShow, int left, int top, int xSize, int ySize, LogMessage log)
-  { super(sizeShow);
+  { super(new GralGraphicThread(sizeShow));
     this.log = log;
     this.mainWindow = windowGral;
     //this.sTitle = sTitle; 
@@ -210,8 +212,8 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
     displaySwt = new Display();
     displaySwt.addFilter(SWT.Close, windowsCloseListener);
     displaySwt.addFilter(SWT.Traverse, traverseKeyFilter);
-    SwtProperties propertiesGui = new SwtProperties(this.displaySwt, sizeCharProperties);
-    gralMng = new SwtMng(this, displaySwt, propertiesGui, log);
+    SwtProperties propertiesGui = new SwtProperties(this.displaySwt, sizeCharProperties());
+    gralMng = new SwtMng(gralGraphicThread, displaySwt, propertiesGui, log);
     
     SwtSubWindow windSwt = new SwtSubWindow(gralMng, mainWindow);
     
@@ -286,7 +288,7 @@ class SwtGraphicThread extends GralGraphicThread //implements Runnable
   public void wakeup(){
     displaySwt.wake();
     //extEventSet.set(true);
-    isWakedUpOnly = true;
+    //isWakedUpOnly = true;
   }
 
   

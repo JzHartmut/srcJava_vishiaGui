@@ -3,6 +3,7 @@ package org.vishia.gral.awt;
 import java.awt.Frame;
 import java.io.File;
 
+import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
@@ -26,21 +27,22 @@ public class AwtPrimaryWindow extends AwtSubWindow implements GralPrimaryWindow_
   }  
   
   public static AwtPrimaryWindow create(LogMessage log, String sTitle, char sizeShow, int left, int top, int xSize, int ySize)
-  { AwtGraphicThread init = new AwtGraphicThread(sTitle, sizeShow, left, top, xSize, ySize);
+  { AwtGraphicThread implGraphicThread = new AwtGraphicThread(sTitle, sizeShow, left, top, xSize, ySize);
+    GralGraphicThread gralGraphicThread = implGraphicThread.gralGraphicThread();
     //GuiThread graphicThread = startGraphicThread(init);  
 
-    synchronized(init){
-      while(init.getThreadIdGui() == 0){
-        try{ init.wait(1000);} catch(InterruptedException exc){}
+    synchronized(gralGraphicThread){
+      while(gralGraphicThread.getThreadIdGui() == 0){
+        try{ gralGraphicThread.wait(1000);} catch(InterruptedException exc){}
       }
     }
-    //The propertiesGuiSwt needs the Display instance for Font and Color. Therefore the graphic thread with creation of Display should be executed before. 
+   //The propertiesGuiSwt needs the Display instance for Font and Color. Therefore the graphic thread with creation of Display should be executed before. 
     AwtProperties propertiesGui = new AwtProperties('C');
-    GralMng gralMng = new AwtWidgetMng(init, init.window, propertiesGui, log);
+    GralMng gralMng = new AwtWidgetMng(gralGraphicThread, implGraphicThread.window, propertiesGui, log);
     
     //The PrimaryWindowSwt is a derivation of the GralPrimaryWindow. It is more as only a SWT Shell.
-    AwtPrimaryWindow instance = new AwtPrimaryWindow(gralMng, sTitle, init);
-    instance.panelComposite = init; //window.sTitle, window.xPos, window.yPos, window.xSize, window.ySize);
+    AwtPrimaryWindow instance = new AwtPrimaryWindow(gralMng, sTitle, implGraphicThread);
+    instance.panelComposite = implGraphicThread; //window.sTitle, window.xPos, window.yPos, window.xSize, window.ySize);
     //gralMng.setGralDevice(init);
     gralMng.registerPanel(instance);
     
