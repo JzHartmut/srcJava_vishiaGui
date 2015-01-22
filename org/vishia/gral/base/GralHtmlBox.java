@@ -1,7 +1,7 @@
 package org.vishia.gral.base;
 
 
-public abstract class GralHtmlBox extends GralWidget 
+public class GralHtmlBox extends GralWidget 
 {
   /**Version, history and licence
    * 
@@ -33,12 +33,28 @@ public abstract class GralHtmlBox extends GralWidget
   public final static int version = 0x20120303;
 
   
-  protected GralHtmlBox(String name, GralMng mng)
-  { super(name, 'h', mng);
+  public GralHtmlBox(String name)
+  { super(name, 'h');
   }
 
-  public abstract void setUrl(String url);
+  public void setUrl(String url){ ((ImplAccess)wdgImpl).setUrl(url); }
 
-  public abstract void activate();
+  public void activate(){ ((ImplAccess)wdgImpl).activate(); }
+  
+  
+  public abstract static class ImplAccess extends GralWidget.ImplAccess
+  {
+    
+    protected ImplAccess(GralHtmlBox gralBox){
+      super(gralBox);
+    }
+    
+    protected abstract void setUrl(String url);
+
+    protected abstract void activate();
+    
+    
+  }
+  
   
 }

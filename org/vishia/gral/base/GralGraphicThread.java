@@ -174,8 +174,6 @@ public class GralGraphicThread implements EventThreadIfc, Runnable
   
   protected boolean isWakedUpOnly;
   
-  protected final char sizeCharProperties;
-  
   /**True if the startup of the main window is done and the main window is visible. */
   protected boolean bStarted = false; 
 
@@ -211,8 +209,8 @@ public class GralGraphicThread implements EventThreadIfc, Runnable
    * after all parameter are saved to execute the overridden {@link #initGraphic()} method.
    * @param name Name of the thread.
    */
-  public GralGraphicThread(char size)
-  { sizeCharProperties = size;
+  public GralGraphicThread() //char size)
+  { //sizeCharProperties = size;
   }
   
   
@@ -367,14 +365,17 @@ public class GralGraphicThread implements EventThreadIfc, Runnable
   {
     protected final GralGraphicThread gralGraphicThread;
     
+    protected char sizeCharProperties;
+
     /**The thread which runs all graphical activities. */
     protected final Thread threadGuiDispatch;
 
     //protected GrapGraphicThread
 
-    protected ImplAccess(GralGraphicThread graphicThread) {
-      this.gralGraphicThread = graphicThread;
+    protected ImplAccess(char sizeCharProperties) {
+      this.gralGraphicThread = GralMng.get().gralDevice;
       this.gralGraphicThread.impl = this;
+      this.sizeCharProperties = sizeCharProperties;
       threadGuiDispatch = new Thread(gralGraphicThread, "graphic");
 
     }
@@ -406,7 +407,7 @@ public class GralGraphicThread implements EventThreadIfc, Runnable
      */
     protected void setClosed(boolean val){ gralGraphicThread.bExit = val; }
     
-    protected char sizeCharProperties(){ return gralGraphicThread.sizeCharProperties; }
+    //protected char sizeCharProperties(){ return gralGraphicThread.sizeCharProperties; }
 
   }
   

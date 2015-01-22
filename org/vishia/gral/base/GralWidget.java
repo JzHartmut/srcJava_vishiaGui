@@ -322,7 +322,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   public String name;
   
   /**The position of the widget. It may be null if the widget should not be resized. */
-  private GralPos pos;  
+  private GralPos posWidg;  
   
   
   /**Panel where the widget is member of. */
@@ -557,22 +557,43 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   //{ this.whatIs = whatIs;
   //}
 
+  /**Creates a widget which is not positioned.
+   * @param sName
+   * @param whatIs
+   */
+  @Deprecated public GralWidget(String sName, char whatIs){ this(null, sName, whatIs); }
+
   
-  public GralWidget(String sName, char whatIs)
+  
+  /**Creates a widget.
+   * @param whatIs
+   * @param sName
+   * @param pos If null then the widget is not positioned. !=null then a position string.
+   *   The position is taken relative to the {@link GralMng#pos}, the {@link GralMng#pos} is changed
+   *   using 
+   */
+  protected GralWidget(String posString, String sName, char whatIs)
   { this.name = sName;
     //this.widget = null;
     this.whatIs = whatIs;
     this.itsCfgElement = null;
+    itsMng = GralMng.get();
+    assert(itsMng !=null);  //should be created firstly in the application, since 2015-01-18
+    if(posString !=null) {
+      this.posWidg = itsMng.pos.setNextPos(posString);
+    } //else: don't set the pos, it is done later 
   }
   
   
-  public GralWidget(String sName, char whatIs, GralMng mng)
+  @Deprecated public GralWidget(String sName, char whatIs, GralMng mng)
   { this(sName, whatIs);
+    itsMng = GralMng.get();
+    assert(itsMng !=null);  //should be created firstly in the application, since 2015-01-18
     if(mng !=null){
-      this.itsMng = mng;
+      assert(this.itsMng == mng);
       //sets the mng and the pos of Window in that cases
       //where the mng is present on ctor. (not in new form)
-      setPanelMng(mng);   
+      //setPanelMng(mng);   
       /*
       if(mng.posUsed){
         mng.pos.setNextPosition();
@@ -605,13 +626,13 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
 
   
-  public GralPos pos(){ return pos; } 
+  public GralPos pos(){ return posWidg; } 
   
   
   
   public void chgPos(GralPos newPos){
     dyda.setChanged(ImplAccess.chgPos);
-    pos = newPos;
+    posWidg = newPos;
   }
   
   /**Returns this.
@@ -628,7 +649,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   public void setPrimaryWidgetOfPanel(){
-    pos.panel.setPrimaryWidget(this);
+    posWidg.panel.setPrimaryWidget(this);
   }
 
   
@@ -890,9 +911,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   @Deprecated
   public void setPanelMng(GralMng mng)
   { this.itsMng = mng; 
-    if(this.pos !=null) 
+    if(this.posWidg !=null) 
       throw new IllegalStateException("GralWidget - setPos() is set already.");
-    this.pos = mng.getPosCheckNext();  //always clone it from the central pos 
+    this.posWidg = mng.getPosCheckNext();  //always clone it from the central pos 
 
   }
   
@@ -1266,7 +1287,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   public void setFocus(int delay, int latest){
     
-    GralPanelContent panel1 = pos.panel;
+    GralPanelContent panel1 = posWidg.panel;
     while(panel1 !=null && panel1.pos() !=null){
       GralPanelContent panel2 = panel1.pos().panel;
       if(panel2 instanceof GralTabbedPanel){
@@ -1302,9 +1323,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   /**Gets the panel where the widget is member of. 
    * @return The panel.
    */
-  public GralPanelContent getItsPanel(){ return pos.panel; }
+  public GralPanelContent getItsPanel(){ return posWidg.panel; }
   
   
+  /* (non-Javadoc)
+   * @see org.vishia.gral.ifc.GralWidget_ifc#repaint()
+   */
   @Override public void repaint(){ 
     if(itsMng !=null){ //NOTE: set of changes is possible before setToPanel was called. 
       if(itsMng.currThreadIsGraphic()){
@@ -1336,7 +1360,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   @Override public boolean remove()
   {
     removeWidgetImplementation();
-    pos.panel.removeWidget(this);
+    posWidg.panel.removeWidget(this);
     return true;
   }
   
@@ -1348,8 +1372,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   @Override public String toString()
   { StringBuilder u = new StringBuilder(240);
     u.append(whatIs).append(" - ").append(name).append(": ").append(sDataPath);
-    if(pos !=null && pos.panel !=null){
-      u.append(" @").append(pos.panel.namePanel);
+    if(posWidg !=null && posWidg.panel !=null){
+      u.append(" @").append(posWidg.panel.namePanel);
     } else {
       u.append(" @?");
     }
@@ -1385,13 +1409,31 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     /**Bounds of the implementation widget in its container. null if not used. */
     public GralRectangle pixBounds;
     
-    protected ImplAccess(GralWidget widgg, GralMng mng){
+    @Deprecated protected ImplAccess(GralWidget widgg, GralMng mng){
       this.widgg = widgg;
       widgg.itsMng = mng;
       widgg.wdgImpl = this; 
-      if(widgg.pos !=null) 
+      if(widgg.posWidg !=null) 
         throw new IllegalStateException("GralWidget - setPos() is set already.");
-      widgg.pos = mng.getPosCheckNext();  //always clone it from the central pos 
+      widgg.posWidg = mng.getPosCheckNext();  //always clone it from the central pos 
+      // Note: widgg.posWidg.panel.getWidgetImplementation() ==null yet because it will be initialize after super(widgg); 
+    }
+    
+    
+    /**Constructs the base of the graphic implemantion widget wrapper (SWT, AWT).
+     * Stores the reference to the GralWidget in this.{@link #widgg}
+     * Stores the reference to the graphic implementation widget in {@link GralWidget#wdgImpl}
+     * Initializes the pos() from the given {@link GralMng#pos} if it is not given by construction. 
+     * @param widgg The associated derived class of GralWidget.
+     */
+    protected ImplAccess(GralWidget widgg){
+      this.widgg = widgg;
+      widgg.wdgImpl = this; 
+      if(widgg.posWidg ==null) {
+        //set the position now, because it is given yet.
+        widgg.posWidg = widgg.itsMng.getPosCheckNext();  //always clone it from the central pos 
+      } //else: The position was given by construction already.
+      // Note: widgg.posWidg.panel.getWidgetImplementation() ==null yet because it will be initialize after super(widgg); 
     }
     
     
@@ -1476,6 +1518,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * Note: This Method is public only because the implementation in another package need to use it.
    * It should not be used by any application. */
   //public MethodsCalledbackFromImplementation implMethodWidget_ = new MethodsCalledbackFromImplementation();
+  
+  
+  /**Returns the instance which extends the {@link ImplAccess} of this widget.
+   * @return null if the widget has not an implementation yet.
+   */
+  public ImplAccess getImpl(){ return wdgImpl; }
   
   
   /**This callback worker calls the {@link #repaintGthread()} if it is invoked in the graphical thread.

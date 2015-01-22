@@ -58,11 +58,11 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public AwtWidgetMng(GralGraphicThread device, Frame window, AwtProperties propertiesGui
+  public AwtWidgetMng(Frame window, AwtProperties propertiesGui
     //, VariableContainer_ifc variableContainer
     , LogMessage log
     )
-  { super(new GralMng(device, propertiesGui, log));
+  { super(GralMng.get(), propertiesGui);
     mainWindowAwt = window;
     this.propertiesGuiAwt = propertiesGui;
     mainWindowAwt.addKeyListener(mainKeyListener);
@@ -70,7 +70,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
   
   
-  @Override public Container getCurrentPanel(){ return (Container)pos().panel.getPanelImpl(); }
+  @Override public Container getCurrentPanel(){ return (Container)pos().panel.getWidgetImplementation(); }
 
 
   @Override public void setToPanel(GralWidget widgg){
@@ -182,7 +182,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
    */
   //@Override 
   public GralTextBox addTextBox(String name, boolean editable, String prompt, char promptStylePosition)
-  { Container parent = (Container)pos().panel.getPanelImpl();
+  { Container parent = (Container)pos().panel.getWidgetImplementation();
     AwtTextBox widgetSwt = new AwtTextBox(name, parent, 0, this);
     GralWidget widgetInfo = widgetSwt;
     widgetInfo.setPanelMng(mng);
@@ -347,7 +347,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   {
       //Composite box = new Composite(graphicFrame, 0);
       Container box = new Container();
-      Container parent = (Container)pos().panel.getPanelImpl();
+      Container parent = (Container)pos().panel.getWidgetImplementation();
       
       parent.add(box);
       setPosAndSize_(box);
@@ -480,7 +480,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
    * @return A rectangle with position and size.
    */
   @Override public GralRectangle calcWidgetPosAndSize(GralPos pos, int widthwidgetNat, int heigthWidgetNat){
-    Component parentComp = (Component)pos.panel.getPanelImpl();
+    Component parentComp = (Component)pos.panel.getWidgetImplementation();
     //Rectangle pos;
     final GralRectangle rectangle;
     final Rectangle parentSize;

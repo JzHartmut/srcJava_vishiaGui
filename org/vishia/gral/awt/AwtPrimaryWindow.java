@@ -21,7 +21,7 @@ public class AwtPrimaryWindow extends AwtSubWindow implements GralPrimaryWindow_
 
   
   AwtPrimaryWindow(GralMng gralMng, String sTitle, AwtGraphicThread graphicThread)
-  { super("primaryWindow", graphicThread.window, "title", GralWindow.windHasMenu | GralWindow.windConcurrently, gralMng);
+  { super("!", "primaryWindow", graphicThread.window, "title", GralWindow.windHasMenu | GralWindow.windConcurrently, gralMng);
     //super(gralMng, graphicThread);
     this.graphicThreadAwt = graphicThread;  //refers SWT type
   }  
@@ -43,7 +43,7 @@ public class AwtPrimaryWindow extends AwtSubWindow implements GralPrimaryWindow_
     GralMng gralMng = null; //implGraphicThread.
     //The PrimaryWindowSwt is a derivation of the GralPrimaryWindow. It is more as only a SWT Shell.
     AwtPrimaryWindow instance = new AwtPrimaryWindow(gralMng, sTitle, implGraphicThread);
-    instance.panelComposite = implGraphicThread; //window.sTitle, window.xPos, window.yPos, window.xSize, window.ySize);
+    //??? instance.panelComposite = implGraphicThread; //window.sTitle, window.xPos, window.yPos, window.xSize, window.ySize);
     //gralMng.setGralDevice(init);
     gralMng.registerPanel(instance);
     

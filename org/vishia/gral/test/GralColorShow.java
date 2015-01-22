@@ -19,7 +19,7 @@ import org.vishia.util.KeyCode;
 
 public class GralColorShow
 {
-  GralMng gralMng;
+  GralMng gralMng = GralMng.get();
   
   public static void main(String[] args){
     GralColorShow main = new GralColorShow();

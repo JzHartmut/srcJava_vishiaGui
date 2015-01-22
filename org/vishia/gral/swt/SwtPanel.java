@@ -19,7 +19,7 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 
-public class SwtPanel extends GralPanelContent
+public class SwtPanel extends GralPanelContent.ImplAccess
 {
   
   /**Version history:
@@ -35,6 +35,11 @@ public class SwtPanel extends GralPanelContent
   public final static int version = 0x20111119;
 
   
+  /**It is either a Composite or a SwtCanvas
+   * 
+   */
+  public Composite panelComposite;
+  
   /**The associated tab in a TabFolder if this panel is the main panel of the TabItem, or null 
    * if it isn't a main panel of a tab in a tabbed panel.
    * <br><br>    
@@ -47,9 +52,9 @@ public class SwtPanel extends GralPanelContent
 
   //protected Composite panelSwt;
   
-  private SwtPanel(String name, GralMng mng)
-  {
-    super(name, mng, null);
+  private SwtPanel(GralPanelContent panelg)
+  { super(panelg);
+    panelComposite = null;
   }
 
   /**Constructs a panel
@@ -58,34 +63,21 @@ public class SwtPanel extends GralPanelContent
    * @param panelSwt may be null, then the {@link GralPanelContent#panelComposite} should be set 
    *   after construction of a derived class.
    */
-  public SwtPanel(String name, GralMng mng, Composite panelSwt)
-  {
-    super(name, mng, panelSwt);
+  public SwtPanel(GralPanelContent panelg, Composite panelSwt)
+  { super(panelg);
+    panelComposite = panelSwt;
     if(panelSwt !=null){
       panelSwt.addControlListener(resizeItemListener);
     }
   }
 
+  /*
   @Override public Composite getPanelImpl()
   {
     return (Composite)panelComposite;
-  }
+  }*/
   
 
-  @Override
-  public GralColor setBackgroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public GralColor setForegroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  
 
   
   @Override public GralRectangle getPixelPositionSize(){ return SwtWidgetHelper.getPixelPositionSize((Composite)panelComposite); }
@@ -121,11 +113,16 @@ public class SwtPanel extends GralPanelContent
   }
   
 
-  @Override public boolean remove(){
-    super.remove();
+  //@Override 
+  public boolean remove(){
+    
+    //super.remove();
     if(itsTabSwt !=null){
       itsTabSwt.dispose();
       itsTabSwt = null;
+    }
+    if(panelComposite !=null){
+      panelComposite.dispose();
     }
     return true;
   }
@@ -141,13 +138,26 @@ public class SwtPanel extends GralPanelContent
     { 
       Widget wparent = e.widget; //it is the SwtCanvas because this method is assigned only there.
       //Control parent = wparent;
-      for(GralWidget widgd: widgetsToResize){
-        widgd.gralMng().resizeWidget(widgd, 0, 0);
+      for(GralWidget widg1: ((GralPanelContent)widgg).widgetsToResize){
+        widg1.gralMng().resizeWidget(widg1, 0, 0);
       }
       //validateFrameAreas();  //calculates the size of the areas newly and redraw.
     }
     
   };
+
+
+  @Override public boolean setFocusGThread()
+  {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override public Object getWidgetImplementation()
+  {
+    // TODO Auto-generated method stub
+    return panelComposite;
+  }
 
 
   

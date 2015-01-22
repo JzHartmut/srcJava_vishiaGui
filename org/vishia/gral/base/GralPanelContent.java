@@ -12,7 +12,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 
 
 /**This class describes a panel with its content for managing. */
-public abstract class GralPanelContent extends GralWidget implements GralWidget_ifc
+public class GralPanelContent extends GralWidget implements GralWidget_ifc
 {
 
   /**Version history:
@@ -60,15 +60,6 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
   @Deprecated
   public final String namePanel;
 
-  /**The GUI-Widget of the panel.   
-   *   (Swing:  Device guiDevice, SWT: Composite based on Control);
-   * Note: can't be final because it may be unknown on calling constructor  
-   * @deprecated use {@link GralWidget#wdgImpl}
-   */
-  @Deprecated
-  protected Object panelComposite; 
-  
-	
 	//public GralPrimaryWindow_ifc mainWindow;
 	
 	//public final GralMng gralMng;
@@ -102,19 +93,26 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
   public GralCanvasStorage canvas;
 
   
-	public GralPanelContent(String namePanel, GralMng mng, Object panelComposite)
+  @Deprecated public GralPanelContent(String namePanel, GralMng mng, Object panelComposite)
 	//public PanelContent(CanvasStorePanel panelComposite)
-	{ super(namePanel, '$', mng);
+	{ super(namePanel, '$');
 	  this.namePanel = namePanel;
-		this.panelComposite = panelComposite;
-		if(mng !=null){
-		  mng.registerPanel(this);
-		}
+		//this.panelComposite = panelComposite;
+    GralMng.get().registerPanel(this);
     int property = 0; //TODO parameter
     bZoomed = (property & GralMngBuild_ifc.propZoomedPanel) !=0;
     bGridZoomed = (property & GralMngBuild_ifc.propGridZoomedPanel) !=0;
 	}
 	
+  public GralPanelContent(String posString, String namePanel)
+  //public PanelContent(CanvasStorePanel panelComposite)
+  { super(posString, namePanel, '$');
+    this.namePanel = namePanel;
+    GralMng.get().registerPanel(this);
+    int property = 0; //TODO parameter
+    bZoomed = (property & GralMngBuild_ifc.propZoomedPanel) !=0;
+    bGridZoomed = (property & GralMngBuild_ifc.propGridZoomedPanel) !=0;
+  }
 	/*
   private GralPanelContent(String namePanel, GralPrimaryWindow_ifc mainWindow)
   { super(namePanel, '$', null);
@@ -128,20 +126,6 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
   }
   */
   
-	
-	/**Returns the absolute position of this panel on screen and its size.
-	 * If it is a main window, the useable area of the window without title and menu bar is returned.
-	 * @return
-	 */
-	@Override
-  public abstract   GralRectangle getPixelPositionSize();
-	
-	
-	
-  /**Returns the size of this panel in pixel.
-   * @return the x and y is 0, the dy and dy is the size.
-   */
-	public abstract GralRectangle getPixelSize();
 	
 	
 	public void setPrimaryWidget(GralWidget widg){ primaryWidget = widg; }
@@ -206,7 +190,7 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
   /**Returns the container instance of the panel of the implementing graphic.
    * @return The container.
    */
-  public abstract Object getPanelImpl();
+  //public abstract Object getPanelImpl();
   
   
   
@@ -247,6 +231,32 @@ public abstract class GralPanelContent extends GralWidget implements GralWidget_
     }
   }
 
+  
+  public abstract static class ImplAccess extends GralWidget.ImplAccess
+  {
+
+    protected ImplAccess(GralPanelContent widgg)
+    {
+      super(widgg);
+    }
+    
+    public GralPanelContent gralPanel(){ return (GralPanelContent) widgg; } //It is the correct type.
+    
+    /**Returns the absolute position of this panel on screen and its size.
+     * If it is a main window, the useable area of the window without title and menu bar is returned.
+     * @return
+     */
+    @Override
+  public abstract   GralRectangle getPixelPositionSize();
+    
+    
+    
+  /**Returns the size of this panel in pixel.
+   * @return the x and y is 0, the dy and dy is the size.
+   */
+    public abstract GralRectangle getPixelSize();
+    
+  }
   
 }
 

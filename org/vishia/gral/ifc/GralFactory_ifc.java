@@ -45,6 +45,8 @@ public interface GralFactory_ifc
   public static final int version = 20120303;
 
   GralWindow createWindow(LogMessage log, String sTitle, char sizeShow, int left, int top, int xSize, int ySize);
+
+  void createWindow(GralWindow gralWindow, char sizeShow, int left, int top, int xSize, int ySize);
   
   /*
   GralGridProperties createProperties(char sizePixel);

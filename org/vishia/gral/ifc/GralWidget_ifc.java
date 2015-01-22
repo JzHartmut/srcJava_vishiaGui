@@ -253,8 +253,9 @@ public interface GralWidget_ifc extends Removeable
 
   /**repaint request. It can be called in any thread. If it is called in the graphic thread,
    * the repaint action is executed immediately in the thread. Elsewhere the graphic thread will be waken up
-   * in the repaint time. If this routine is invoked more as one time in a short time not in the graphic thread,
-   * the repaint is executed only one time after the given delay.
+   * in the standard repaint time (about 100 ms). If this routine is invoked more as one time 
+   * before the standard repaint time expires and not in the graphic thread,
+   * then the repaint is executed only one time after the given delay with the last set data.
    * See {@link #repaint(int, int)}
    */
   public void repaint();

@@ -39,6 +39,10 @@ public class AwtPanel  extends GralPanelContent
    */
   public Container itsTabAwt; 
   
+  /**It is either a Composite or a SwtCanvas
+   * 
+   */
+  public Container panelComposite;
 
   //protected Composite panelSwt;
   
@@ -61,10 +65,10 @@ public class AwtPanel  extends GralPanelContent
     }
   }
 
-  @Override public Container getPanelImpl()
+  /*@Override public Container getPanelImpl()
   {
     return (Container)panelComposite;
-  }
+  }*/
   
 
   @Override
@@ -83,22 +87,22 @@ public class AwtPanel  extends GralPanelContent
   
 
   
-  @Override public GralRectangle getPixelPositionSize(){
+  /*@Override public GralRectangle getPixelPositionSize(){
     Rectangle r = ((Component)panelComposite).getBounds();
     GralRectangle posSize = new GralRectangle(r.x, r.y, r.width, r.height);
     return posSize;
-  }
+  }*/
 
 
-  @Override public GralRectangle getPixelSize(){
+  /*@Override public GralRectangle getPixelSize(){
     Dimension r = ((Component)panelComposite).getSize();
     GralRectangle posSize = new GralRectangle(0, 0, r.width, r.height);
     return posSize;
-  }
+  }*/
 
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
-  { ((Container)panelComposite).setBounds(x,y,dx,dy);
+  { panelComposite.setBounds(x,y,dx,dy);
   }
   
   

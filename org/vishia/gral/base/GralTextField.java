@@ -404,7 +404,13 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
    */
   //abstract public void setMouseAction(GralUserAction action);
   
-  
+  /**Gets the current value of the text field thread-independent. 
+   * It is the value stored in the {@link GralWidget.DynamicData#displayedText} which is updated while typing the text
+   * or if the focus is changed (depending on implementation).
+   * @return The value in String representation.
+   */
+  @Override public String getValue() { return dyda.displayedText; }
+
 
 
 

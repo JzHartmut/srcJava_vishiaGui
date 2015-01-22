@@ -2,11 +2,11 @@ package org.vishia.gral.swt;
 
 
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPoint;
 import org.vishia.gral.ifc.GralRectangle;
-
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -47,9 +47,9 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
    * @param style
    * @param backGround
    */
-  public SwtCanvasStorePanel(String namePanel, Composite parent, int style, Color backGround, GralMng gralMng)
-  { super(namePanel, gralMng, null);
-    super.canvas = new GralCanvasStorage();
+  public SwtCanvasStorePanel(GralPanelContent panelg, Composite parent, int style, Color backGround, GralMng gralMng)
+  { super(panelg, null);
+    gralPanel().canvas = new GralCanvasStorage();
     swtCanvas = new SwtCanvas(this,parent, style);
     super.panelComposite = swtCanvas;
     swtCanvas.addControlListener(resizeItemListener);
@@ -63,10 +63,10 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
   /**Constructor called in derived classes. The derived class have to be instantiate the Canvas
    * maybe with other draw routines. 
    */
-  protected SwtCanvasStorePanel(String namePanel, GralMng gralMng)
+  protected SwtCanvasStorePanel(GralPanelContent panelg)
   {
-    super(namePanel, gralMng, null);
-    super.canvas = new GralCanvasStorage();
+    super(panelg, null);
+    gralPanel().canvas = new GralCanvasStorage();
   }
   
 
@@ -93,13 +93,13 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
     public void drawBackground(GC g, int x, int y, int dx, int dy) {
     	//NOTE: forces stack overflow because calling of this routine recursively: super.paint(g);
     	
-      if(storeMng.canvas == null){
+      if(storeMng.gralPanel().canvas == null){
         stop();
       } else 
-    	for(GralCanvasStorage.PaintOrder order: storeMng.canvas.paintOrders){
+    	for(GralCanvasStorage.PaintOrder order: storeMng.gralPanel().canvas.paintOrders){
     		switch(order.paintWhat){
       		case GralCanvasStorage.paintLine: {
-      			g.setForeground(((SwtMng)storeMng.gralMng().impl).getColorImpl(order.color));
+      			g.setForeground(((SwtMng)storeMng.gralPanel().gralMng().impl).getColorImpl(order.color));
       	  	g.drawLine(order.x1, order.y1, order.x2, order.y2);
       	  
       	  } break;
@@ -115,7 +115,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
       		  SwtPolyLine swtLine;
             { Object oImpl = line.getImplData();
         		  if(oImpl == null){
-                swtLine = new SwtPolyLine(line, ((SwtMng)storeMng.gralMng().impl));
+                swtLine = new SwtPolyLine(line, ((SwtMng)storeMng.gralPanel().gralMng().impl));
                 line.setImplData(swtLine);
               } else {
                 swtLine = (SwtPolyLine) oImpl;
@@ -158,21 +158,6 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
   
   void stop(){} //debug
 
-  @Override
-  public GralColor setBackgroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public GralColor setForegroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  
-  
   public static class SwtPolyLine // extends GralCanvasStorage.PolyLine
   {
     int[] points;

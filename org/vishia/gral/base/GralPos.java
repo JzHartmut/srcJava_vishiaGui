@@ -593,6 +593,19 @@ public class GralPos implements Cloneable
   
   
   
+  public GralPos setNextPos(String posString){
+    if(posString.equals("!")) {  //new window, initialize the position without panel because it is top.
+      panel = null;
+      setFinePosition(0,0,0,0,0,0,0,0,0,'d', 0,0, null);
+    } else {
+      //TODO change pos:
+    }
+    return clone();  //return the pos as clone, to use as posWidg  
+  }
+  
+  
+  
+  
   
 
   

@@ -22,6 +22,7 @@ import org.vishia.gral.cfg.GralCfgDesigner;
 import org.vishia.gral.cfg.GralCfgWriter;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralCurveView_ifc;
+import org.vishia.gral.ifc.GralFactory_ifc;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMngApplAdapter_ifc;
@@ -35,7 +36,6 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindowMng_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.gral.widget.GralColorSelector;
 import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.gral.widget.GralLabel;
 import org.vishia.mainCmd.Report;
@@ -199,7 +199,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   public final GralGraphicThread gralDevice;
 
   /**Properties of this Dialog Window. */
-  public  final GralGridProperties propertiesGui;
+  public GralGridProperties propertiesGui;
 
   /**Index of all input fields to access symbolic for all panels. */
   protected final Map<String, GralWidget> indexNameWidgets = new TreeMap<String, GralWidget>();
@@ -439,22 +439,56 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   private static GralMng singleton;
 	
-  public GralMng(GralGraphicThread device, GralGridProperties props, LogMessage log)
-	{ this.gralDevice = device;
-	  //this.widgetHelper = widgetHelper;
-	  //if(widgetHelper !=null) { widgetHelper.setMng(this); }
-    //this.parent = null;
-	  this.propertiesGui = props;
-		this.log = log;
-    //its a user action able to use in scripts.
-		userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
-    GralMng.singleton = this; 
-	}
+  /*
+  public GralMng(GralGraphicThread device, LogMessage log)
+  { this.gralDevice = device;
+    //this.propertiesGui = props;
+      this.log = log;
+  //its a user action able to use in scripts.
+      userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
+  GralMng.singleton = this; 
+  }
+  */
+
+  private GralMng(LogMessage log)
+  { this.gralDevice = new GralGraphicThread();
+    //this.propertiesGui = props;
+      this.log = log;
+  //its a user action able to use in scripts.
+      userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
+  GralMng.singleton = this; 
+  }
+
   
+  /**Creates the singleton instance of the GralMng. If this routine is invoked more as one time, the first invocation
+   * is the correct one. The more-time-invocation is supported because an application may not invoke this routine.
+   * Therefore it is invoked later additional.
+   * <br> See also {@link #get()}.
+   * @param log The first invocation determines the log output.
+   * @return true if created, false if exists already.
+   * 
+   */
+  public static boolean create(LogMessage log){
+    if(singleton !=null) return false;
+    else { 
+      singleton = new GralMng(log);
+      return true;
+    }
+  }
   
+
   /**Returns the singleton or null if the GralMng is not instantiated yet.*/
   public static GralMng get(){ return singleton; }
   
+  
+  public void setProperties(GralGridProperties props) {
+    this.propertiesGui = props;
+  }
+  
+  
+  public static void createMainWindow(GralFactory_ifc factory, GralWindow window, char sizeShow, int left, int top, int xSize, int ySize) {
+    factory.createWindow(window, sizeShow, left, top, xSize, ySize);
+  }
   
   @Override public void setToPanel(GralWidget widgg){ impl.setToPanel(widgg); }
   
@@ -557,7 +591,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   /**selects a registered panel for the next add-operations. 
    */
-  @Override public void selectPanel(String sName){
+  @Override public void selectPanel(String sName){ 
     pos.panel = panels.get(sName);
     sCurrPanel = sName;
     if(pos.panel == null && currTabPanel !=null) {
@@ -666,6 +700,11 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @param panel The panel.
    */
   @Override public void registerPanel(GralPanelContent panel){
+    GralPanelContent exist = panels.get(panel.namePanel);
+    if(exist !=null){
+      if(exist == panel) System.out.println("info: unnecessary registerPanel " + panel.namePanel);
+      else System.err.println("info: faulty registerPanel " + panel.namePanel);
+    }
     panels.put(panel.namePanel, panel);
     pos.panel = panel;
     //initialize the position because its a new panel. The initial position is the whole panel.
@@ -712,7 +751,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * then the mng is set to the tabbed panel.
    * @param tabbedPanel
    */
-  /*package private*/ void setTabbedPanel(GralPanelContent tabbedPanel){
+  /*package private*/public void setTabbedPanel(GralPanelContent tabbedPanel){
     pos.panel = tabbedPanel;
   }
   
@@ -721,7 +760,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     return panels.get(name);
   }
   
-  
+  public GralPanelContent getCurrentPanel(){ return pos.panel; }
   
   public GralPanelActivated_ifc actionPanelActivate = new GralPanelActivated_ifc()
   { @Override public void panelActivatedGui(Queue<GralWidget> widgetsP)
@@ -1329,9 +1368,9 @@ public GralButton addCheckButton(
   }
 
   
-  @Override public GralInfoBox createHtmlInfoBox(String name, String title, boolean onTop)
+  @Override public GralInfoBox createHtmlInfoBox(String posString, String name, String title, boolean onTop)
   {
-    return GralInfoBox.createHtmlInfoBox(this, name, title, onTop);
+    return GralInfoBox.createHtmlInfoBox(posString, this, name, title, onTop);
   }
 
   
@@ -1473,8 +1512,9 @@ public GralButton addCheckButton(
     public GralMng mng;
     
     
-    public ImplAccess(GralMng mng){
+    public ImplAccess(GralMng mng, GralGridProperties props){
       this.mng = mng;
+      mng.setProperties(props);
       mng.impl = this;
     }
     

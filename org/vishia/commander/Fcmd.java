@@ -21,6 +21,7 @@ import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.base.GralMenu;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
@@ -919,7 +920,9 @@ public class Fcmd extends GuiCfg
     // Initializes the GUI till a output window to show information.
     // Uses the commonly GuiMainCmd class because here are not extra arguments.
     GralArea9MainCmd cmdgui = new FcmdMainCmd(cargs, args); // implements MainCmd, parses
-                                                  // calling arguments
+    //new GralMng(null, cmdgui);
+    
+    // calling arguments
     bOk = cmdgui.parseArgumentsAndInitGraphic("The.file.Commander", "2A2C");
 
     /*

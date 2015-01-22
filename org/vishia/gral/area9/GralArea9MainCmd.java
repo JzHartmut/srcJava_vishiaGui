@@ -135,6 +135,8 @@ public class GralArea9MainCmd extends MainCmd
       setExitErrorLevel(exitWithArgumentError);
       bOk = false;
     }
+    GralMng.create(log);
+    gralMng = GralMng.get();
     if(cargs.graphicFactory == null){
       cargs.graphicFactory = new SwtFactory();
     }
@@ -149,12 +151,12 @@ public class GralArea9MainCmd extends MainCmd
     if(ySize < 0){  ySize = cargs.dyPixelWindow; }  //undefined per parameter, use args 
     
     String sTitle1 = cargs.sTitle !=null ? cargs.sTitle : sTitle;
-    
-    GralWindow primaryWindow = cargs.graphicFactory.createWindow(getLogMessageOutputConsole(), sTitle1, sizeShow, left, top, xSize, ySize);
+    GralWindow primaryWindow = new GralWindow("!", "primaryWindow", sTitle1, GralWindow.windResizeable + GralWindow.windHasMenu);
+    //GralWindow primaryWindow = cargs.graphicFactory.createWindow(getLogMessageOutputConsole(), sTitle1, sizeShow, left, top, xSize, ySize);
+    cargs.graphicFactory.createWindow(primaryWindow, sizeShow, left, top, xSize, ySize);
     gui = new GralArea9Window(this, primaryWindow);
     gui.getGralMng().setApplicationAdapter(gui);
     gui.initGraphic(sOutputArea);
-    gralMng = gui.getGralMng();
     if(sArgError !=null){
       writeError(sArgError);
     }

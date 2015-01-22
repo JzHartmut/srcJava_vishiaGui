@@ -13,7 +13,7 @@ public class AwtGraphicThread extends GralGraphicThread.ImplAccess
   
   
   AwtGraphicThread(String sTitle, char sizeShow, int left, int top, int xSize, int ySize)
-  { super(new GralGraphicThread(sizeShow));
+  { super(sizeShow);
     this.sTitle = sTitle; this.xPos = left; this.yPos = top; this.xSize = xSize; this.ySize = ySize; 
     threadGuiDispatch.start();
     

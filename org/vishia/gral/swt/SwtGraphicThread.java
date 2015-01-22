@@ -192,7 +192,7 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
   final int xPos, yPos, xSize, ySize;
   
   SwtGraphicThread(GralWindow windowGral, char sizeShow, int left, int top, int xSize, int ySize, LogMessage log)
-  { super(new GralGraphicThread(sizeShow));
+  { super(sizeShow);
     this.log = log;
     this.mainWindow = windowGral;
     //this.sTitle = sTitle; 
@@ -212,8 +212,8 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
     displaySwt = new Display();
     displaySwt.addFilter(SWT.Close, windowsCloseListener);
     displaySwt.addFilter(SWT.Traverse, traverseKeyFilter);
-    SwtProperties propertiesGui = new SwtProperties(this.displaySwt, sizeCharProperties());
-    gralMng = new SwtMng(gralGraphicThread, displaySwt, propertiesGui, log);
+    SwtProperties propertiesGui = new SwtProperties(this.displaySwt, sizeCharProperties);
+    gralMng = new SwtMng(displaySwt, propertiesGui, log);
     
     SwtSubWindow windSwt = new SwtSubWindow(gralMng, mainWindow);
     

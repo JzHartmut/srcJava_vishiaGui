@@ -24,7 +24,7 @@ import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ implements GralVisibleWidgets_ifc
+public class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ implements GralVisibleWidgets_ifc
 {
   /**The version and history:
    * <ul>
@@ -74,12 +74,12 @@ public abstract class GralTabbedPanel extends GralPanelContent /*extends GralWid
   @SuppressWarnings("hiding")
   public static final int version = 0x20111001;
   
-	final protected GralPanelActivated_ifc notifyingUserInstanceWhileSelectingTab;
+	final public GralPanelActivated_ifc notifyingUserInstanceWhileSelectingTab;
 	
 	final protected Map<String, GralPanelContent> panels = new TreeMap<String, GralPanelContent>();
 
 	/**The currently selected tab. */
-	protected GralPanelContent focusedTab;
+	public GralPanelContent focusedTab;
 	
   /**The actual widgets in the visible panel. It may a sub-panel or changed content. The list can be changed. */
   public Queue<GralWidget> widgetsVisible;
@@ -94,49 +94,51 @@ public abstract class GralTabbedPanel extends GralPanelContent /*extends GralWid
 	/**The constructor can only be invoked from a implementing class.
 	 * @param user
 	 */
-	protected GralTabbedPanel(String sName, GralMng mng, GralPanelActivated_ifc user, int property)
-	{ super(sName, mng, null);
+	public GralTabbedPanel(String posString, String sName, GralPanelActivated_ifc user, int property)
+	{ super(posString, sName);
 	  //super(sName, '@', mng);
 	  this.notifyingUserInstanceWhileSelectingTab = user;
 	}
 	
-	/**Adds a grid-panel in the TabPanel. The panel will be registered in the GuiPanelMng,
-	 * so the access to the panel can be done with its name.
-	 * The position of the widget manager is set to full area of this panel.
-	 * 
-	 * @param sName The name, used in 
-	 * @param sLabel to designate the tab for view. A "&" left from a character determines the hot-key
-	 *               to select the tab.
-	 * @param yGrid   number of units per grid line vertical. It may be 1. 
-	 * @param xGrid   number of units per grid line horizontal. It may be 1. 
-	 * @param yGrid2  Number of grid lines vertical per wider ranges for lines
-	 * @param xGrid2  Number of grid lines horizontal per wider ranges for lines
-	 * @return
-	 */
-	abstract public GralPanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2);
 	
-	abstract public GralPanelContent addCanvasPanel(String sName, String sLabel);
-	
-	protected void setMngToTabbedPanel(){ itsMng.setTabbedPanel(this); }
+	//protected void setMngToTabbedPanel(){ itsMng.setTabbedPanel(this); }
 	
 	//abstract public GralPanelContent getGuiComponent();
 	
 	public GralPanelContent getFocusedTab(){ return focusedTab; }
 	
+	   /**Adds a grid-panel in the TabPanel. The panel will be registered in the GuiPanelMng,
+     * so the access to the panel can be done with its name.
+     * The position of the widget manager is set to full area of this panel.
+     * 
+     * @param sName The name, used in 
+     * @param sLabel to designate the tab for view. A "&" left from a character determines the hot-key
+     *               to select the tab.
+     * @param yGrid   number of units per grid line vertical. It may be 1. 
+     * @param xGrid   number of units per grid line horizontal. It may be 1. 
+     * @param yGrid2  Number of grid lines vertical per wider ranges for lines
+     * @param xGrid2  Number of grid lines horizontal per wider ranges for lines
+     * @return
+     */
+    public GralPanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
+    {
+      GralPanelContent panelg = new GralPanelContent("@", sName);
+      ((ImplAccess)wdgImpl).addGridPanel(panelg, sLabel, yGrid, xGrid, yGrid2, xGrid2);
+      return panelg;
+    }
+    
+    public GralPanelContent addCanvasPanel(String sName, String sLabel){
+      GralPanelContent panelg = new GralPanelContent("@", sName);
+      ((ImplAccess)wdgImpl).addCanvasPanel(panelg, sLabel);
+      return panelg;
+      
+    }
+ 
 	
-	/**The named tab should be focused.
-   * TODO which widget should be focused? It may be a first widget in any GralPanelContent?
-   * In SWT it works if any widget in a tab is focused. The the tab is focused then automatically.
-   * It means this method is not necessary. If selectTab is called, the whole tab has the focus
-   * which means it content is visible. That is able to use.
-	 * @param name
-	 * @return
-	 * @deprecated use {@link GralWidget#setFocus()}
-	 */
-	@Deprecated
-  abstract public GralPanelContent selectTab(String name);
-	
-	
+    public GralPanelContent selectTab(String name){
+      return ((ImplAccess)wdgImpl).selectTab(name);
+    }
+    
   @Override public Queue<GralWidget> getWidgetsVisible()
   {
     if(newWidgetsVisible !=null){
@@ -173,4 +175,46 @@ public abstract class GralTabbedPanel extends GralPanelContent /*extends GralWid
     return bOk;
   }
   
+  
+  public abstract static class ImplAccess extends GralPanelContent.ImplAccess
+  {
+
+    protected final GralTabbedPanel widgg;
+    
+    protected ImplAccess(GralTabbedPanel widgg)
+    {
+      super(widgg);
+      this.widgg = widgg;
+    }
+    
+    /**Adds a grid-panel in the TabPanel. The panel will be registered in the GuiPanelMng,
+     * so the access to the panel can be done with its name.
+     * The position of the widget manager is set to full area of this panel.
+     * 
+     * @param sName The name, used in 
+     * @param sLabel to designate the tab for view. A "&" left from a character determines the hot-key
+     *               to select the tab.
+     * @param yGrid   number of units per grid line vertical. It may be 1. 
+     * @param xGrid   number of units per grid line horizontal. It may be 1. 
+     * @param yGrid2  Number of grid lines vertical per wider ranges for lines
+     * @param xGrid2  Number of grid lines horizontal per wider ranges for lines
+     * @return
+     */
+    abstract public GralPanelContent addGridPanel(GralPanelContent panelg, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2);
+    
+    abstract public GralPanelContent addCanvasPanel(GralPanelContent panelg, String sLabel);
+    /**The named tab should be focused.
+     * TODO which widget should be focused? It may be a first widget in any GralPanelContent?
+     * In SWT it works if any widget in a tab is focused. The the tab is focused then automatically.
+     * It means this method is not necessary. If selectTab is called, the whole tab has the focus
+     * which means it content is visible. That is able to use.
+     * @param name
+     * @return
+     * @deprecated use {@link GralWidget#setFocus()}
+     */
+    @Deprecated
+    abstract public GralPanelContent selectTab(String name);
+    
+  }
+
 }

@@ -23,7 +23,7 @@ import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 
-public class SwtTabbedPanel extends GralTabbedPanel
+public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 {
 
   /**Version, history and license.
@@ -63,16 +63,15 @@ public class SwtTabbedPanel extends GralTabbedPanel
     
 	final SwtMng mng;
 	
-	SwtTabbedPanel(String namePanel, SwtMng mng, GralPanelActivated_ifc user, int property)
-	{ super(namePanel, mng.mng, user, property);  //initializes as GralWidget and as GralPanel
+	SwtTabbedPanel(GralTabbedPanel panelg, SwtMng mng, GralPanelActivated_ifc user, int property)
+	{ super(panelg);  //initializes as GralWidget and as GralPanel
 		this.mng = mng;
-		Object oParent = this.pos().panel.getPanelImpl();
+		Object oParent = widgg.pos().panel.getWidgetImplementation(); //this.pos().panel.getPanelImpl();
     if(oParent == null || !(oParent instanceof Composite) ){ throw new IllegalArgumentException("Software error. You must select a panel before."); }
 		Composite parent = (Composite)oParent;
 		
 		//this.panelComposite = parent;  
     widgetSwt = new TabFolder(parent, SWT.TOP); 
-    this.panelComposite = widgetSwt;  
     
 		
 		widgetSwt.addSelectionListener(tabItemSelectListener);
@@ -80,52 +79,49 @@ public class SwtTabbedPanel extends GralTabbedPanel
   	
 	}
 	
-	//@Override 
-	public GralPanelContent XXXgetGuiComponent()
-	{ return this; //tabMng;
-	}
 	
   
   
-	@Override public GralPanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
+	@Override public GralPanelContent addGridPanel(GralPanelContent panelg, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
 	{ ///
-	  setMngToTabbedPanel();
-    Rectangle sizeTabFolder = widgetSwt.getBounds();
+	  widgg.gralMng().setTabbedPanel(widgg);  //setMngToTabbedPanel();
+	  Rectangle sizeTabFolder = widgetSwt.getBounds();
 	  TabItem tabItem = new TabItem(widgetSwt, SWT.None);
 	  tabItem.setText(sLabel);
 	  //tabItem.addFocusListener(SWT.FocusIn, focusTabListener);
 	  SwtCanvasStorePanel panel;
-		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
+	  Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
 	  if(yGrid <0 || xGrid <0){
-			panel = new SwtCanvasStorePanel(sName, widgetSwt, 0, colorBackground, mng.mng);
-		} else {
-	  	panel = new SwtGridPanel(sName, widgetSwt, 0, colorBackground, mng.mng.propertiesGui.xPixelUnit(), mng.mng.propertiesGui.yPixelUnit(), 5, 5, mng.mng);
-		}
+	    panel = new SwtCanvasStorePanel(panelg, widgetSwt, 0, colorBackground, mng.mng);
+	  } else {
+	    panel = new SwtGridPanel(panelg, widgetSwt, 0, colorBackground, mng.mng.propertiesGui.xPixelUnit(), mng.mng.propertiesGui.yPixelUnit(), 5, 5, mng.mng);
+	  }
 	  panel.swtCanvas.setBounds(sizeTabFolder);
 	  panel.itsTabSwt = tabItem;
-		tabItem.setControl(panel.swtCanvas);
-		panel.swtCanvas.addFocusListener(focusTabListener); //unused...
-    
-		mng.mng.registerPanel(panel);   //register the panel in the mng.
-		mng.mng.registerWidget(panel);
-    panels.put(sName, panel);   //register the tab panel in the TabbedPanel
+	  tabItem.setControl(panel.swtCanvas);
+	  panel.swtCanvas.addFocusListener(focusTabListener); //unused...
+	  GralPanelContent gralPanel = panel.gralPanel();
+	  mng.mng.registerPanel(gralPanel);   //register the panel in the mng.
+	  mng.mng.registerWidget(gralPanel);
+	  //panels.put(sName, gralPanel);   //register the tab panel in the TabbedPanel
 	  mng.mng.setPosition(0, 0, 0, 0, 0, '.');
-	  return panel;
-  }
+	  return gralPanel;
+	}
 
   
-	@Override public GralPanelContent addCanvasPanel(String sName, String sLabel)
-	{ setMngToTabbedPanel();
-	  TabItem tabItemOperation = new TabItem(widgetSwt, SWT.None);
-		tabItemOperation.setText(sLabel);
-		Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
-	  SwtCanvasStorePanel panel = new SwtCanvasStorePanel(sName, widgetSwt, 0, colorBackground, mng.mng);
-    mng.mng.registerPanel(panel);
-	  tabItemOperation.setControl(panel.swtCanvas);
-    panels.put(sName, panel);
-	  return panel;
-  }
-
+	@Override public GralPanelContent addCanvasPanel(GralPanelContent panelg, String sLabel)
+	{ 
+	   widgg.gralMng().setTabbedPanel(widgg);  //setMngToTabbedPanel();
+	   TabItem tabItemOperation = new TabItem(widgetSwt, SWT.None);
+	   tabItemOperation.setText(sLabel);
+	   Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
+	   SwtCanvasStorePanel swtPanel = (new SwtCanvasStorePanel(panelg, widgetSwt, 0, colorBackground, mng.mng));
+	   GralPanelContent panel = swtPanel.gralPanel();
+	   mng.mng.registerPanel(panel);
+	   tabItemOperation.setControl(swtPanel.swtCanvas);
+	   return panel;
+	}
+	
   
 	
 	/**See {@link GralWidget#setFocusGThread()}
@@ -135,12 +131,11 @@ public class SwtTabbedPanel extends GralTabbedPanel
 	{ //assert(false);
 	  
 	  GralPanelContent panel = mng.mng.getPanel(name);
-	  if(panel instanceof SwtPanel){
-  	  SwtPanel swtPanel = (SwtPanel)panel;
-  	  if(swtPanel.itsTabSwt !=null){
+	  Object oSwtPanel = panel.getImpl();  //getWidgetImplementation();
+	  SwtPanel swtPanel = (SwtPanel)oSwtPanel;
+	  if(swtPanel.itsTabSwt !=null){
 	  	  widgetSwt.setSelection(swtPanel.itsTabSwt);
   	  }
-	  }
 	  return panel;
 	}
 	
@@ -167,19 +162,20 @@ public class SwtTabbedPanel extends GralTabbedPanel
   				Object data = container.getData();
   				if(data != null){
   					@SuppressWarnings("unchecked")
-  					GralPanelContent panelContent = (GralPanelContent)(data);
+  					SwtPanel swtPanel = (SwtPanel)data;
+  					GralPanelContent panelContent = (GralPanelContent)(swtPanel.widgg);
   					Queue<GralWidget> widgetInfos = panelContent.widgetList; 
-  					newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
-  					if(focusedTab !=null){
-  					  focusedTab.setVisibleState(false);  //the last focused tab.
+  					widgg.newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
+  					if(widgg.focusedTab !=null){
+  					widgg.focusedTab.setVisibleState(false);  //the last focused tab.
   					}
-  					focusedTab = panelContent;
-  					focusedTab.setVisibleState(true);   //the currently focused tab.
-            focusedTab.setFocus();
+  					widgg.focusedTab = panelContent;
+  					widgg.focusedTab.setVisibleState(true);   //the currently focused tab.
+  					widgg.focusedTab.setFocus();
   					//System.out.printf("Fcmd-selectTab; %s", panelContent.toString());
             //mng.log.sendMsg(0, "Fcmd-selectTab %s", panelContent.toString());
-  					if(notifyingUserInstanceWhileSelectingTab !=null){
-              notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);
+  					if(widgg.notifyingUserInstanceWhileSelectingTab !=null){
+  					widgg.notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);
             }
       		}
   			}
@@ -250,28 +246,16 @@ public class SwtTabbedPanel extends GralTabbedPanel
   @Override public GralRectangle getPixelPositionSize(){ return SwtWidgetHelper.getPixelPositionSize(widgetSwt); }
 
 
+  /*
   @Override public GralRectangle getPixelSize(){
     Rectangle r = ((Composite)panelComposite).getClientArea();
     GralRectangle posSize = new GralRectangle(0, 0, r.width, r.height);
     return posSize;
   }
-
+  */
 
   
   @Override public boolean setFocusGThread(){ return widgetSwt.setFocus(); }
-
-  @Override
-  public GralColor setBackgroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  @Override
-  public GralColor setForegroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
   { widgetSwt.setBounds(x,y,dx,dy);
@@ -281,7 +265,7 @@ public class SwtTabbedPanel extends GralTabbedPanel
 
   @Override public void repaintGthread(){  widgetSwt.redraw(); widgetSwt.update(); }
 
-  @Override public Composite getPanelImpl() { return widgetSwt; }
+  //@Override public Composite getPanelImpl() { return widgetSwt; }
 
   @Override public void removeWidgetImplementation()
   { widgetSwt.dispose();
@@ -291,6 +275,15 @@ public class SwtTabbedPanel extends GralTabbedPanel
   
   
   void stop(){}
+
+
+
+
+  @Override public GralRectangle getPixelSize()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 	
 }

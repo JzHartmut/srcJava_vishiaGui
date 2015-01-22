@@ -647,16 +647,23 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       cmd = Ecmd.compare; 
       widgInputDst.setEditable(true);
       widgInputDst.setBackColor(bDstChanged ? colorChangedText : colorNoChangedText, 0);
-    } else if(widgButtonMove.isOn()) { 
+    } else {
+      //move or copy window:
+      if(state == Estate.finit) {
+        widgOverwrFile.setBackColor(GralColor.getColor("lgr"), 0);
+        widgSkipFile.setBackColor(GralColor.getColor("lgr"), 0);
+      }  
+      if(widgButtonMove.isOn()) { 
       ix1 = 1; 
-      cmd = Ecmd.move; 
-      widgInputDst.setEditable(true);
-      widgInputDst.setBackColor(bDstChanged ? colorChangedText : colorNoChangedText, 0);
-    } else { 
-      ix1 = 2; 
-      cmd = Ecmd.copy; 
-      widgInputDst.setEditable(true);
-      widgInputDst.setBackColor(bDstChanged ? colorChangedText : colorNoChangedText, 0);
+        cmd = Ecmd.move; 
+        widgInputDst.setEditable(true);
+        widgInputDst.setBackColor(bDstChanged ? colorChangedText : colorNoChangedText, 0);
+      } else { 
+        ix1 = 2; 
+        cmd = Ecmd.copy; 
+        widgInputDst.setEditable(true);
+        widgInputDst.setBackColor(bDstChanged ? colorChangedText : colorNoChangedText, 0);
+      }
     }
     if(cmdWind != Ecmd.delete) {
       widgInputDst.setPrompt(textDest[ix1]);
@@ -737,8 +744,6 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
           break;
         case done:       
           u.append("ok: "); // + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
-          widgOverwrFile.setBackColor(GralColor.getColor("lgr"), 0);
-          widgSkipFile.setBackColor(GralColor.getColor("lgr"), 0);
           setTexts(Estate.finit);
           break;
         

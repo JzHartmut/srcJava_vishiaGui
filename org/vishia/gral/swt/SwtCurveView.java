@@ -86,7 +86,7 @@ public class SwtCurveView extends GralCurveView
     super(sName, mng.mng, nrofXvalues, common);
     
     GralRectangle bounds = mng.calcWidgetPosAndSize(pos, 800, 600);
-    Composite panelSwt = (Composite)pos.panel.getPanelImpl();
+    Composite panelSwt = (Composite)pos.panel.getWidgetImplementation();
     curveSwt = this.new CurveView(panelSwt, bounds.dx, bounds.dy, nrofXvalues);
     curveSwt.setSize(bounds.dx, bounds.dy);
     curveSwt.setBounds(bounds.x, bounds.y, bounds.dx, bounds.dy);

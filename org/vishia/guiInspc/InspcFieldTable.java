@@ -122,7 +122,7 @@ public class InspcFieldTable implements Runnable
   
   public InspcFieldTable(InspcMng variableMng)
   { variableMng.addUserOrder(this);  //invoke run in any communication step.
-    this.wind = new GralWindow("InspcFieldTableWind", "Fields of ...", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
+    this.wind = new GralWindow(null, "InspcFieldTableWind", "Fields of ...", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
     this.widgPath = new GralTextField("InspcFieldTableWind");
     this.widgTable = new GralTable<InspcStruct.FieldOfStruct>("InspcFieldTable", new int[]{sizeName, 0, -sizeType});
     this.widgTable.setColumnEditable(1, true);

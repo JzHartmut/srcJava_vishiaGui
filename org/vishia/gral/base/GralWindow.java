@@ -120,9 +120,9 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    * @param mng
    * @param panelComposite The implementing instance for a panel.
    */
-  public GralWindow(String nameWindow, String sTitle, int windProps, GralMng mng, Object panelComposite)
+  @Deprecated public GralWindow(String posString, String nameWindow, String sTitle, int windProps, GralMng mng, Object panelComposite)
   {
-    super( nameWindow, mng, panelComposite);
+    super( posString, nameWindow);  //relative Window position.
     dyda.displayedText = sTitle;  //maybe null
     this.windProps = windProps;
     if((windProps & windResizeable)!=0){
@@ -133,14 +133,15 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
 
   
   
-  /**Constructs a window. 
+  /**Constructs a window.
+   * @param posString the position relative to a given position of the parent window. "!" on top level window. 
    * @param nameWindow
    * @param sTitle
    * @param windProps See {@link GralWindow_ifc#windResizeable} etc.
    */
-  public GralWindow(String nameWindow, String sTitle, int windProps)
+  public GralWindow(String posString, String nameWindow, String sTitle, int windProps)
   {
-    super( nameWindow, null, null);
+    super( posString, nameWindow);  //relative Window position.
     dyda.displayedText = sTitle;  //maybe null
     this.windProps = windProps;
     if((windProps & windResizeable)!=0){
@@ -149,8 +150,6 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
 
   }
 
-  
-  
   @Override public void setActionOnSettingInvisible(GralUserAction action)
   { invisibleSetAction = action;
   }
@@ -180,7 +179,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
     protected final GralWindow gralWindow;  //its outer class.
     
     protected GraphicImplAccess(GralWindow gralWdg, GralMng mng){
-      super(gralWdg, mng);
+      super(gralWdg);
       this.gralWindow = gralWdg;  //References the environment class
     }
     
@@ -219,28 +218,11 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   
 
   @Override
-  public Object getPanelImpl()
-  {
-    // TODO Auto-generated method stub
-    return wdgImpl.getWidgetImplementation();
-  }
-
-
-
-  @Override
   public GralRectangle getPixelPositionSize()
   {
     return wdgImpl.getPixelPositionSize();
   }
 
-
-
-  @Override
-  public GralRectangle getPixelSize()
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
 
 
 

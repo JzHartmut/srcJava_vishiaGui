@@ -79,7 +79,7 @@ public class SwtPrimaryWindow extends SwtSubWindow implements GralPrimaryWindow_
   
   public static GralWindow create(LogMessage log, String sTitle, char sizeShow, int left, int top, int xSize, int ySize)
   { int windProps = GralWindow_ifc.windResizeable;
-    GralWindow windowGral = new GralWindow("main", sTitle, windProps, null, null );
+    GralWindow windowGral = new GralWindow("!", "main", sTitle, windProps, null, null );
     SwtGraphicThread graphicThread = new SwtGraphicThread(windowGral, sizeShow, left, top, xSize, ySize, log);
     GralGraphicThread gralGraphicThread = graphicThread.gralGraphicThread();
     SwtPrimaryWindow windowSwt = new SwtPrimaryWindow(windowGral, graphicThread.gralMng, graphicThread, graphicThread.displaySwt);

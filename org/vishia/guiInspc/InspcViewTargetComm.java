@@ -25,7 +25,7 @@ public class InspcViewTargetComm
   public InspcViewTargetComm(String targetId)
   {
     super();
-    this.wind = new GralWindow("InspcViewTargetComm", "TargetCommunication " + targetId, GralWindow_ifc.windOnTop);
+    this.wind = new GralWindow(null, "InspcViewTargetComm", "TargetCommunication " + targetId, GralWindow_ifc.windOnTop);
     for(int ix = 0; ix < widgLedTarget.length; ++ix) {
       this.widgLedTarget[ix] = new GralLed("State " + ix);
     }

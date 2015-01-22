@@ -227,7 +227,7 @@ public class GralArea9Window implements GralArea9_ifc
       //
       window.gralMng().selectPanel("primaryWindow");
       window.gralMng().setPosition(0,40,10,0,0,'.');
-      infoHelp = window.gralMng().createHtmlInfoBox("Help", "Help", true);
+      //TODO infoHelp = window.gralMng().createHtmlInfoBox("Help", "Help", true);
       try{
         for(String line: mainCmd.listHelpInfo){
           infoHelp.append(line).append("\n");
@@ -677,7 +677,7 @@ public class GralArea9Window implements GralArea9_ifc
     } else {
       sUrl = url;  //should be absolute
     }
-    infoHelp.setUrl(sUrl); 
+    if(infoHelp !=null) infoHelp.setUrl(sUrl); 
   }
   
 

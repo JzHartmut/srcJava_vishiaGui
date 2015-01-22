@@ -16,9 +16,9 @@ public class AwtSubWindow extends GralWindow
   
   protected final Frame window;
 
-  public AwtSubWindow(String name, Frame window, String title, int windStyle, GralMng gralMng)
+  public AwtSubWindow(String posString, String name, Frame window, String title, int windStyle, GralMng gralMng)
   {
-    super(name, title, windStyle, gralMng, window);
+    super(posString, name, title, windStyle, gralMng, window);
     this.window = window;
     // TODO Auto-generated constructor stub
   }
@@ -43,12 +43,12 @@ public class AwtSubWindow extends GralWindow
     
   }
 
-  @Override
+  /*@Override
   public Object getPanelImpl()
   {
     // TODO Auto-generated method stub
     return window;
-  }
+  }*/
 
   @Override
   public void closeWindow()
@@ -66,11 +66,11 @@ public class AwtSubWindow extends GralWindow
   }
 
 
-  @Override public GralRectangle getPixelSize(){
+  /*@Override public GralRectangle getPixelSize(){
     Dimension r = ((Component)panelComposite).getSize();
     GralRectangle posSize = new GralRectangle(0, 0, r.width, r.height);
     return posSize;
-  }
+  }*/
 
 
 

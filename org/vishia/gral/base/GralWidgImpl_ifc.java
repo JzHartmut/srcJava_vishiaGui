@@ -60,7 +60,11 @@ public interface GralWidgImpl_ifc
   
   /**Returns the implementation class of the widget. If the widget has more as one implementation widgets,
    * this method returns one of the widgets, usual the first important one respectively that widget which represents
-   * the implementation layer. */
+   * the implementation layer. A widget of the implementation layer is a SWT.control or a {@link java.awt.Component}.
+   * <br><br>
+   * If more as one widget are part of the GralWidget, use the special {@link GralWidget#wdgImpl} class 
+   * which should contain the references to that implementation widgets.
+   * */
   Object getWidgetImplementation();
   
   void setBoundsPixel(int x, int y, int dx, int dy);

@@ -78,8 +78,6 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   
   private GralButton buttonLock;
   
-  Object[] implWidgets = new Object[3];
-
   
   protected final GralTextField infoLine;
   
@@ -126,11 +124,11 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
 
 
   
-  public static GralInfoBox createHtmlInfoBox(GralMngBuild_ifc mng, String name, String title, boolean onTop)
+  public static GralInfoBox createHtmlInfoBox(String posString, GralMngBuild_ifc mng, String name, String title, boolean onTop)
   {
     int props = GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable;
     if(onTop){ props |= GralWindow_ifc.windOnTop; }
-    GralWindow window = mng.createWindow(name, title, props);
+    GralWindow window = new GralWindow(posString, name, title, props); //mng.createWindow(name, title, props);
     //TODO the position frame (size) regards the title bar, it should not do so!
     mng.setPosition(0, -3, 0, 0, 0, '.');
     GralHtmlBox text = mng.addHtmlBox(name);
@@ -142,9 +140,6 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "close");
     GralInfoBox box = new GralInfoBox(window, text, infoLine, buttonOk);
     box.buttonLock = buttonLock;
-    box.implWidgets[0] = text.getWidgetImplementation();
-    box.implWidgets[1] = infoLine.getWidgetImplementation();
-    box.implWidgets[2] = buttonOk.getWidgetImplementation();
     box.buttonOk.setActionChange(box.actionOkButton);
     //mng.registerWidget(box);
     return box; 

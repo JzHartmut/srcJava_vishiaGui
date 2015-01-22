@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Text;
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralKeyListener;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
@@ -90,6 +91,9 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
   protected SwtTextBox(GralTextBox widgg, SwtMng mng)
   { widgg.super(widgg, mng.mng); //NOTE: superclass is a non static inner class of GralTextField. 
     Composite panelSwt = mng.getCurrentPanel();
+    GralPanelContent gralPanel = mng.mng.getCurrentPanel();
+    
+    assert(panelSwt !=null);
     textFieldSwt = new Text(panelSwt, SWT.MULTI|SWT.H_SCROLL|SWT.V_SCROLL); //;style);
     textFieldSwt.setData(this);
     wdgh = new SwtWidgetHelper(textFieldSwt, mng);

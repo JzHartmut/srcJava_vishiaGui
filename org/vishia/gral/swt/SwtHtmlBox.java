@@ -7,9 +7,11 @@ import org.eclipse.swt.widgets.Text;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralRectangle;
 
-public class SwtHtmlBox extends GralHtmlBox
+public class SwtHtmlBox extends GralHtmlBox.ImplAccess
 {
   
   
@@ -49,14 +51,19 @@ public class SwtHtmlBox extends GralHtmlBox
   
   public boolean bActiv;
   
-  public SwtHtmlBox(String name, GralMng mng)
-  {
-    super(name, mng);
-    SwtMng mngSwt = (SwtMng)mng.impl;
-    Composite parent = (Composite)(pos().panel.getPanelImpl());
+  public SwtHtmlBox(GralHtmlBox box)
+  { super(box);
+    SwtMng mngSwt = (SwtMng)(GralMng.get()).impl;
+    GralPanelContent panel = widgg.pos().panel;
+    Composite parent;
+    if(panel == null){
+      parent = mngSwt.displaySwt.getActiveShell();
+    } else {
+      parent = ((SwtPanel)panel.getWidgetImplementation()).panelComposite; //(Composite)(panel.getPanelImpl());
+    }
     try {
       boxSwt = new Browser(parent,0);
-      mng.registerWidget(this);
+      //mng.registerWidget(this);
       mngSwt.setPosAndSizeSwt(boxSwt, 0, 0);
     } catch(Throwable exc){
       System.err.println("can't create SWT-Browser");
@@ -115,12 +122,6 @@ public class SwtHtmlBox extends GralHtmlBox
   
   
 
-  @Override
-  public GralColor setBackgroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
 
   @Override
   public void setBoundsPixel(int x, int y, int dx, int dy)
@@ -129,12 +130,12 @@ public class SwtHtmlBox extends GralHtmlBox
     
   }
 
-  @Override
-  public GralColor setForegroundColor(GralColor color)
+  @Override public GralRectangle getPixelPositionSize()
   {
     // TODO Auto-generated method stub
     return null;
   }
+
 
   
   
