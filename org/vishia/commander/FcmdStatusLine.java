@@ -69,21 +69,21 @@ public class FcmdStatusLine
   
   
   void buildGraphic(){
-    main.gralMng.setPosition(0, 2, 0, 0, 1, 'r');
-    widgFilePath = main.gralMng.addTextField(main.nameTextFieldFilePath, false, null, null);
+    main._gralMng.setPosition(0, 2, 0, 0, 1, 'r');
+    widgFilePath = main._gralMng.addTextField(main.nameTextFieldFilePath, false, null, null);
     widgFilePath.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.pathCurr.");
     widgFilePath.setDragEnable(main.actionDragFileFromStatusLine, KeyCode.dragFiles);
     GralMenu menuWidg = widgFilePath.getContextMenu();
     menuWidg.addMenuItemGthread("menuContextShowBackslash", main.idents.menuContextShowBackslash, actionShowBackslash);
     menuWidg.addMenuItemGthread("menuContextShowSlash", main.idents.menuContextShowSlash, actionShowSlash);
-    main.gralMng.setPosition(2, 4, 0, 9.8f, 1, 'r');
-    widgRunInfo = main.gralMng.addTextField(main.nameTextFieldRunInfo, false, null, null);
+    main._gralMng.setPosition(2, 4, 0, 9.8f, 1, 'r');
+    widgRunInfo = main._gralMng.addTextField(main.nameTextFieldRunInfo, false, null, null);
     widgRunInfo.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.pathCurr.");
-    main.gralMng.setPosition(2, 4, 10, -8, 1, 'r');
-    widgFileInfo = main.gralMng.addTextField(main.nameTextFieldInfo, false, null, null);
+    main._gralMng.setPosition(2, 4, 10, -8, 1, 'r');
+    widgFileInfo = main._gralMng.addTextField(main.nameTextFieldInfo, false, null, null);
     widgFileInfo.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.pathCurr.");
-    main.gralMng.setPosition(2, 4, -8, 0, 1, 'r');
-    widgSyncInfo = main.gralMng.addTextField(main.nameTextFieldInfo, false, null, null);
+    main._gralMng.setPosition(2, 4, -8, 0, 1, 'r');
+    widgSyncInfo = main._gralMng.addTextField(main.nameTextFieldInfo, false, null, null);
     //widgSyncInfo.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.pathCurr.");
 
   }

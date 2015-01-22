@@ -92,8 +92,8 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
 	    fLevels[ixBorder] = Float.parseFloat(sParam[ix+1]);
 	    ixBorder +=1;
 		}
-		if(wdgImpl !=null){
-		  ((GraphicImplAccess)wdgImpl).setBorderAndColorsImpl(sColorLevels);
+		if(_wdgImpl !=null){
+		  ((GraphicImplAccess)_wdgImpl).setBorderAndColorsImpl(sColorLevels);
 		}
 	}
 	
@@ -104,8 +104,8 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
 	 */
 	@Override public void setValue(float value)
 	{
-		if(wdgImpl !=null){
-		  if(((GraphicImplAccess)wdgImpl).setValue(value)) {
+		if(_wdgImpl !=null){
+		  if(((GraphicImplAccess)_wdgImpl).setValue(value)) {
         this.repaint();
 		  }
 		}

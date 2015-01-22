@@ -37,7 +37,7 @@ import org.vishia.util.Removeable;
  *   The graphic thread organizes it in a proper kind of time.
  * <li>If a {@link org.vishia.gral.base.GralGraphicTimeOrder} is dequeued in the graphic thread, 
  *   its method {@link org.vishia.gral.base.GralGraphicTimeOrder#executeOrder(boolean)} is invoked. 
- *   This method calls {@link GralWidgImpl_ifc#repaintGthread()} via the association {@link org.vishia.gral.base.GralWidget#wdgImpl}.
+ *   This method calls {@link GralWidgImpl_ifc#repaintGthread()} via the association {@link org.vishia.gral.base.GralWidget#_wdgImpl}.
  * <li>The <code>rerepaintGthread()</code> method is overridden in the implementation layer
  *   with the necessary statements to transfer the non-graphic data of this {@link GralWidget} especially
  *   stored in {@link org.vishia.gral.base.GralWidget#dyda} to the special implementation widget method invocations

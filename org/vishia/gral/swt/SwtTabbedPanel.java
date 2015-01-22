@@ -1,5 +1,6 @@
 package org.vishia.gral.swt;
 
+import java.util.List;
 import java.util.Queue;
 
 import org.eclipse.swt.SWT;
@@ -164,7 +165,7 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
   					@SuppressWarnings("unchecked")
   					SwtPanel swtPanel = (SwtPanel)data;
   					GralPanelContent panelContent = (GralPanelContent)(swtPanel.widgg);
-  					Queue<GralWidget> widgetInfos = panelContent.widgetList; 
+  					List<GralWidget> widgetInfos = panelContent.widgetList(); 
   					widgg.newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
   					if(widgg.focusedTab !=null){
   					widgg.focusedTab.setVisibleState(false);  //the last focused tab.

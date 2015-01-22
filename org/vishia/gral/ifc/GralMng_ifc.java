@@ -111,7 +111,7 @@ public interface GralMng_ifc
 	 * If it should be used, the graphic implementation should be known
 	 * and a adequate instanceof-test and cast is necessary. 
 	 */
-	Queue<GralWidget> getListCurrWidgets();
+	List<GralWidget> getListCurrWidgets();
 	
 	
 	

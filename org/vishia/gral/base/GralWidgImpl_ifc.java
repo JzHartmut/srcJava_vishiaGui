@@ -14,7 +14,7 @@ import org.vishia.gral.ifc.GralRectangle;
  * and there quest method {@link GralWidget.DynamicData#whatIsChanged}.
  * There is no needing of methods such as <code>setText(String)</code> etc. because the user
  * should able to set the text in any thread. See concept of data set described on {@link GralWidget#setText(CharSequence)} 
- * See {@link GralWidget#wdgImpl}. 
+ * See {@link GralWidget#_wdgImpl}. 
  * @since 2013-06
  * @author Hartmut Schorrig
  *
@@ -62,7 +62,7 @@ public interface GralWidgImpl_ifc
    * this method returns one of the widgets, usual the first important one respectively that widget which represents
    * the implementation layer. A widget of the implementation layer is a SWT.control or a {@link java.awt.Component}.
    * <br><br>
-   * If more as one widget are part of the GralWidget, use the special {@link GralWidget#wdgImpl} class 
+   * If more as one widget are part of the GralWidget, use the special {@link GralWidget#_wdgImpl} class 
    * which should contain the references to that implementation widgets.
    * */
   Object getWidgetImplementation();

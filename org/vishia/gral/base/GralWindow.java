@@ -220,7 +220,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   @Override
   public GralRectangle getPixelPositionSize()
   {
-    return wdgImpl.getPixelPositionSize();
+    return _wdgImpl.getPixelPositionSize();
   }
 
 
@@ -228,7 +228,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
 
   /**It assumes that the window implementation is present. 
    * It calls {@link GralWindowImpl_ifc#addMenuBarArea9ItemGThread(String, String, GralUserAction)}
-   * with the known {@link GralWidget#wdgImpl} instance
+   * with the known {@link GralWidget#_wdgImpl} instance
    * to invoke the graphic implementation layer method for the window. 
    * @deprecated use {@link #getMenuBar()} and then {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
    * */

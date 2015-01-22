@@ -1,5 +1,6 @@
 package org.vishia.gral.ifc;
 
+import java.util.List;
 import java.util.Queue;
 
 import org.vishia.gral.base.GralWidget;
@@ -46,7 +47,7 @@ public interface GralVisibleWidgets_ifc
   /**Gets the list of all widgets which are visible yet and should be updated with values therefore. 
    * @return The list.
    */
-  Queue<GralWidget> getWidgetsVisible();
+  List<GralWidget> getWidgetsVisible();
   
   
 }

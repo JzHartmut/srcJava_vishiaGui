@@ -123,7 +123,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    *   with special comments for usage of the int parameter.
    *   See {@link GralTable_ifc#setBackColor(GralColor, int)}, Adequate {@link #getBackColor(int)}. 
    * <li>2013-09-14 Hartmut chg: {@link GraphicImplAccess} implements now {@link GralWidgImpl_ifc} without any other
-   *   changes (was proper) and sets {@link GralWidget#wdgImpl}. Therefore all routines which works from the
+   *   changes (was proper) and sets {@link GralWidget#_wdgImpl}. Therefore all routines which works from the
    *   GralWidget calls the methods of the implement of the GralTable immediately without special overridden methods
    *   in this class. It is the concept.
    * <li>2013-09-14 Hartmut chg: uses the {@link GralWidget.DynamicData#backColor} etc.
@@ -492,7 +492,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    */
   public void setColumnEditable(int column, boolean val){
     bColumnEditable[column] = val;
-    if(((GralWidget)this).wdgImpl !=null){
+    if(((GralWidget)this)._wdgImpl !=null){
       dyda.setChanged(GraphicImplAccess.chgEditableColumn);
       repaint(repaintDelay, repaintDelayMax);
     }

@@ -72,28 +72,28 @@ public class FcmdDelete
    * whenever it is used.  */
   void buildWindowConfirmDelete()
   { ///
-    main.gralMng.selectPanel("primaryWindow");
-    main.gralMng.setPosition(-22, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
+    main._gralMng.selectPanel("primaryWindow");
+    main._gralMng.setPosition(-22, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
     
-    windConfirmDelete = main.gralMng.createWindow("windConfirmDelete", main.idents.windConfirmDelete, GralWindow.windConcurrently);
+    windConfirmDelete = main._gralMng.createWindow("windConfirmDelete", main.idents.windConfirmDelete, GralWindow.windConcurrently);
     //System.out.println(" window: " + main.gralMng.pos.panel.getPixelPositionSize().toString());
     
-    main.gralMng.setPosition(4, GralPos.size -3.8f, 1, -1, 0, 'd', 0.2f);
-    widgDeleteDir = main.gralMng.addTextField("deletedirectory", false, "directory", "t");
-    widgDeletePath = main.gralMng.addTextField("deletePath", true, "delete (Note: path/*.ext or path/file* possible)", "t");
+    main._gralMng.setPosition(4, GralPos.size -3.8f, 1, -1, 0, 'd', 0.2f);
+    widgDeleteDir = main._gralMng.addTextField("deletedirectory", false, "directory", "t");
+    widgDeletePath = main._gralMng.addTextField("deletePath", true, "delete (Note: path/*.ext or path/file* possible)", "t");
     
     //main.gralMng.setPosition(12, GralPos.size -3.5f, 1, -1, 0, 'd');
-    widgTrashPath = main.gralMng.addTextField("deleteTrashPath", true, "trash path (Note: left empty to delete forever)", "t");
+    widgTrashPath = main._gralMng.addTextField("deleteTrashPath", true, "trash path (Note: left empty to delete forever)", "t");
     
-    main.gralMng.setPosition(-6, GralPos.size +1, 7, -11, 0, 'd', 1);
+    main._gralMng.setPosition(-6, GralPos.size +1, 7, -11, 0, 'd', 1);
     //widgProgressFile = main.gralMng.addValueBar("copyProgressFile", null, null);
-    widgProgress = main.gralMng.addValueBar("copyProgressAll", null);
-    main.gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
-    main.gralMng.addButton("deleteEsc", actionDelete, "esc", null, "esc");
-    main.gralMng.setPosition(-1, GralPos.size-3, -19,-11, 0, 'r');
-    widgRemoveToTrash = main.gralMng.addButton("deleteToTrash", actionDelete, "trash", null,  "trash");
-    main.gralMng.setPosition(-1, GralPos.size-3, -9, -1, 0, 'r');
-    widgButtonOk = main.gralMng.addButton("deleteOk", actionDelete, "delete", null,  "delete");
+    widgProgress = main._gralMng.addValueBar("copyProgressAll", null);
+    main._gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
+    main._gralMng.addButton("deleteEsc", actionDelete, "esc", null, "esc");
+    main._gralMng.setPosition(-1, GralPos.size-3, -19,-11, 0, 'r');
+    widgRemoveToTrash = main._gralMng.addButton("deleteToTrash", actionDelete, "trash", null,  "trash");
+    main._gralMng.setPosition(-1, GralPos.size-3, -9, -1, 0, 'r');
+    widgButtonOk = main._gralMng.addButton("deleteOk", actionDelete, "delete", null,  "delete");
     widgButtonOk.setPrimaryWidgetOfPanel();
   }
   
@@ -195,7 +195,7 @@ public class FcmdDelete
             windConfirmDelete.setWindowVisible(false);
           }
         }
-      } catch(Exception exc){ main.gralMng.log.sendMsg(0, "FcmdDelete-actionDelete"); }
+      } catch(Exception exc){ main._gralMng.log.sendMsg(0, "FcmdDelete-actionDelete"); }
       return true;
     }
   };

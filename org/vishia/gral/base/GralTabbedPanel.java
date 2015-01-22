@@ -1,5 +1,6 @@
 package org.vishia.gral.base;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
@@ -82,12 +83,12 @@ public class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ imp
 	public GralPanelContent focusedTab;
 	
   /**The actual widgets in the visible panel. It may a sub-panel or changed content. The list can be changed. */
-  public Queue<GralWidget> widgetsVisible;
+  public List<GralWidget> widgetsVisible;
 
   /**A new list of actual widgets, set while select another tab etc. The reference may be set 
    * in the GUI-Thread (GUI-listener). The communication-manager thread reads whether it isn't null,
    * processes it and sets this reference to null if it is processed. */
-  public Queue<GralWidget> newWidgetsVisible;
+  public List<GralWidget> newWidgetsVisible;
   
 
 
@@ -122,24 +123,30 @@ public class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ imp
      */
     public GralPanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
     {
+      if(itsMng.pos.panel != this) {
+        itsMng.pos.setPosition(this, 0, 0, 0, 0, 0, 'd', 0);   //initializes the position of this GralTabbedPanel to have the correct parent for the tab 
+      }
       GralPanelContent panelg = new GralPanelContent("@", sName);
-      ((ImplAccess)wdgImpl).addGridPanel(panelg, sLabel, yGrid, xGrid, yGrid2, xGrid2);
+      ((ImplAccess)_wdgImpl).addGridPanel(panelg, sLabel, yGrid, xGrid, yGrid2, xGrid2);
       return panelg;
     }
     
     public GralPanelContent addCanvasPanel(String sName, String sLabel){
+      if(itsMng.pos.panel != this) {
+        itsMng.pos.setPosition(this, 0, 0, 0, 0, 0, 'd', 0);   //initializes the position of this GralTabbedPanel to have the correct parent for the tab 
+      }
       GralPanelContent panelg = new GralPanelContent("@", sName);
-      ((ImplAccess)wdgImpl).addCanvasPanel(panelg, sLabel);
+      ((ImplAccess)_wdgImpl).addCanvasPanel(panelg, sLabel);
       return panelg;
       
     }
  
 	
     public GralPanelContent selectTab(String name){
-      return ((ImplAccess)wdgImpl).selectTab(name);
+      return ((ImplAccess)_wdgImpl).selectTab(name);
     }
     
-  @Override public Queue<GralWidget> getWidgetsVisible()
+  @Override public List<GralWidget> getWidgetsVisible()
   {
     if(newWidgetsVisible !=null){
       //if(panel.widgetList !=null){

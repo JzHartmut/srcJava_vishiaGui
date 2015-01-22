@@ -70,7 +70,7 @@ import org.vishia.util.KeyCode;
  * <li>To access from this class to the GralTable, the inner class {@link GralTable.GraphicImplAccess}
  *   is used as super class of SwtTable with protected access.
  * <li>The GralTable knows this class via the interface {@link GralWidgImpl_ifc} in its superclass
- *   association {@link GralWidget#wdgImpl}.
+ *   association {@link GralWidget#_wdgImpl}.
  * <li>The GralTable knows this class via {@link GralTable#gi} association with the proper type.
  * <li>The {@link GralTable.GraphicImplAccess} defines some abstract methods which are implemented here.  
  * <li>But some implementations of {@link GralWidgImpl_ifc} is found in {@link SwtWidgetHelper}.

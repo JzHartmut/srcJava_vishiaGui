@@ -1,5 +1,6 @@
 package org.vishia.gral.base;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -60,20 +61,25 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   @Deprecated
   public final String namePanel;
 
-	//public GralPrimaryWindow_ifc mainWindow;
-	
-	//public final GralMng gralMng;
-	
+  //public GralPrimaryWindow_ifc mainWindow;
+  
+  //public final GralMng gralMng;
+  
+  
+  /**The widget which should be focused if the panel is focused. 
+   * It is possible to set any actual widget to store the focus situation,
+   * It is possible too to have only one widget to focus. if the panel gets the focus. */
+  protected GralWidget primaryWidget;
+  
+  /**List of all widgets which are contained in this panel or Window, to refresh the graphic.
+   * This list is used in the communication thread to update the content of all widgets in the panel.
+   */
+  private List<GralWidget> _wdgList = new ArrayList<GralWidget>();
 
-	/**The widget which should be focused if the panel is focused. 
-	 * It is possible to set any actual widget to store the focus situation,
-	 * It is possible too to have only one widget to focus. if the panel gets the focus. */
-	protected GralWidget primaryWidget;
-	
-	/**List of all widgets which are contained in this panel.
-	 * This list is used in the communication thread to update the content of all widgets in the panel.
-	 */
-	public Queue<GralWidget> widgetList = new ConcurrentLinkedQueue<GralWidget>();
+  /**List of all widgets which are contained in this panel.
+   * This list is used in the communication thread to update the content of all widgets in the panel.
+   */
+  protected List<GralWidget> widgetList = new ArrayList<GralWidget>();
 
   public List<GralWidget> widgetsToResize = new LinkedList<GralWidget>();
 
@@ -127,6 +133,12 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   */
   
 	
+  /*package private*/ void addWidget(GralWidget widg){
+    if(_wdgList.remove(widg)){
+      System.err.println("Widget added twice; " + widg.name);
+    }
+    _wdgList.add(widg);
+  }
 	
 	public void setPrimaryWidget(GralWidget widg){ primaryWidget = widg; }
 	
@@ -182,8 +194,10 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   }
   
 
+  public List<GralWidget> widgetList(){ return widgetList; }
+  
   @Override public Object getWidgetImplementation()
-  { return wdgImpl.getWidgetImplementation(); //panelComposite;
+  { return _wdgImpl.getWidgetImplementation(); //panelComposite;
   }
 	
   

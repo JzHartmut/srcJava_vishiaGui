@@ -114,11 +114,11 @@ public class FcmdView
    * whenever it is used.  */
   void buildWindowView()
   {
-    main.gralMng.selectPanel("primaryWindow");
-    main.gralMng.setPosition(10, 0, 10, 0, 1, 'r'); //right buttom, about half less display width and hight.
+    main._gralMng.selectPanel("primaryWindow");
+    main._gralMng.setPosition(10, 0, 10, 0, 1, 'r'); //right buttom, about half less display width and hight.
     int windProps = GralWindow.windConcurrently | GralWindow.windHasMenu | GralWindow.windResizeable
                   | GralWindow.windOnTop;
-    GralWindow wind =  main.gralMng.createWindow("windView", "view - The.file.Commander", windProps);
+    GralWindow wind =  main._gralMng.createWindow("windView", "view - The.file.Commander", windProps);
     wind.addMenuBarItemGThread(null, "&File/&Save", actionSave);
     wind.addMenuBarItemGThread(null, "&File/Save-as &UTF8-Unix-lf", actionSaveTextAsUTF8unix);
     wind.addMenuBarItemGThread(null, "&File/Save-as &Windows (ISO-8859-1)", actionSaveTextAsWindows);
@@ -130,18 +130,18 @@ public class FcmdView
     wind.addMenuBarItemGThread("view-Search", "&View/text-&Encoding", actionSetTextViewISO8859_1);
     wind.addMenuBarItemGThread("view-Search", "&Edit/&Search", actionSetTextViewISO8859_1);
     wind.addMenuBarItemGThread("view-Search", "&Edit/set &Writeable", actionSetEditable);
-    main.gralMng.setPosition(0.5f, 2.5f, 1, 20, 0, 'r');
-    widgFindText = main.gralMng.addTextField(null, true, null, null);
-    main.gralMng.setPosition(0.5f, 2.5f, 22, GralPos.size + 10, 0, 'r', 1);
-    btnFind = main.gralMng.addButton(null, actionFind, null, null, "Search (ctrl-F)");
-    btnWholeword = main.gralMng.addSwitchButton(null, "wholeWord - no", "wholeWord- yes", GralColor.getColor("wh"), GralColor.getColor("gn"));
-    btnCase = main.gralMng.addSwitchButton(null, "case - no", "case - yes", GralColor.getColor("wh"), GralColor.getColor("gn"));
-    btnQuickview = main.gralMng.addSwitchButton("qview", "qview", "qview", GralColor.getColor("wh"), GralColor.getColor("gn"));
-    widgShowInfo = main.gralMng.addTextField(null,false, null, null);
-    main.gralMng.setPosition(3, 0, 0, 0, 1, 'r');
-    widgContent = main.gralMng.addTextBox("view-content", false, null, '.');
+    main._gralMng.setPosition(0.5f, 2.5f, 1, 20, 0, 'r');
+    widgFindText = main._gralMng.addTextField(null, true, null, null);
+    main._gralMng.setPosition(0.5f, 2.5f, 22, GralPos.size + 10, 0, 'r', 1);
+    btnFind = main._gralMng.addButton(null, actionFind, null, null, "Search (ctrl-F)");
+    btnWholeword = main._gralMng.addSwitchButton(null, "wholeWord - no", "wholeWord- yes", GralColor.getColor("wh"), GralColor.getColor("gn"));
+    btnCase = main._gralMng.addSwitchButton(null, "case - no", "case - yes", GralColor.getColor("wh"), GralColor.getColor("gn"));
+    btnQuickview = main._gralMng.addSwitchButton("qview", "qview", "qview", GralColor.getColor("wh"), GralColor.getColor("gn"));
+    widgShowInfo = main._gralMng.addTextField(null,false, null, null);
+    main._gralMng.setPosition(3, 0, 0, 0, 1, 'r');
+    widgContent = main._gralMng.addTextBox("view-content", false, null, '.');
     widgContent.setUser(userKeys);
-    widgContent.setTextStyle(GralColor.getColor("bk"), main.gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));
+    widgContent.setTextStyle(GralColor.getColor("bk"), main._gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));
     windView = wind; 
     windView.setActionOnSettingInvisible(actionOnSetInvisible);
     windView.setWindowVisible(false);
@@ -368,7 +368,7 @@ public class FcmdView
       outchn.close();
       
     } catch(Exception exc){
-      main.gralMng.writeLog(0, exc);
+      main._gralMng.writeLog(0, exc);
     }
     
   }
@@ -379,9 +379,9 @@ public class FcmdView
     if(widgQuickView == null){
       //creates an grid panel and select its in gralMng:
       main.favorPathSelector.panelRight.tabbedPanelFileCards.addGridPanel("qview", "qview",1,1,10,10);
-      main.gralMng.setPosition(1, -1, 0, 0, 1, 'd');
+      main._gralMng.setPosition(1, -1, 0, 0, 1, 'd');
       //adds a textBox in that grid panel.
-      widgQuickView = main.gralMng.addTextBox("qview-content", false, null, '.');
+      widgQuickView = main._gralMng.addTextBox("qview-content", false, null, '.');
       widgQuickView.setText("quick view");
       widgQuickView.setFocus();
     }
@@ -564,7 +564,7 @@ public class FcmdView
           outchn.close();
           
         } catch(Exception exc){
-          main.gralMng.writeLog(0, exc);
+          main._gralMng.writeLog(0, exc);
         }
       }
       return true;

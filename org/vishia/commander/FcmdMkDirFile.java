@@ -37,17 +37,17 @@ public class FcmdMkDirFile
    * whenever it is used.  */
   void buildWindowConfirmMk()
   {
-    main.gralMng.selectPanel("primaryWindow");
-    main.gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
+    main._gralMng.selectPanel("primaryWindow");
+    main._gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
     int windProps = GralWindow.windConcurrently;
-    GralWindow window =  main.gralMng.createWindow("windMk", "mkdir/file - The.file.Commander", windProps);
-    main.gralMng.setPosition(4, GralPos.size -3.8f, 1, -1, 0, 'd', 0.4f);
-    widgParentPath = main.gralMng.addTextField("mkParentPath", false, "parent path:", "t");
-    widgName = main.gralMng.addTextField("mkName", true, "name:", "t");
-    main.gralMng.setPosition(-3.5f, -0.5f, 1, GralPos.size + 10, 0, 'r', 2);
-    widgButtonClose = main.gralMng.addButton(null, actionButton, "c", null, "close");
-    widgButtonMkFile = main.gralMng.addButton(null, actionButton, "f", null, "create file");
-    widgButtonMkDir = main.gralMng.addButton(null, actionButton, "d", null, "mkdir");
+    GralWindow window =  main._gralMng.createWindow("windMk", "mkdir/file - The.file.Commander", windProps);
+    main._gralMng.setPosition(4, GralPos.size -3.8f, 1, -1, 0, 'd', 0.4f);
+    widgParentPath = main._gralMng.addTextField("mkParentPath", false, "parent path:", "t");
+    widgName = main._gralMng.addTextField("mkName", true, "name:", "t");
+    main._gralMng.setPosition(-3.5f, -0.5f, 1, GralPos.size + 10, 0, 'r', 2);
+    widgButtonClose = main._gralMng.addButton(null, actionButton, "c", null, "close");
+    widgButtonMkFile = main._gralMng.addButton(null, actionButton, "f", null, "create file");
+    widgButtonMkDir = main._gralMng.addButton(null, actionButton, "d", null, "mkdir");
     
     windMk = window; 
  

@@ -142,7 +142,7 @@ public class FcmdFileCard extends GralFileSelector
     
     this.setNameWidget(namePanelFile);
     main.idxFileSelector.put(namePanelFile, this); //it is WidgetNames.tableFile + label +.123, see super(...) 
-    GralMng mng = main.gralMng;
+    GralMng mng = main._gralMng;
     //
     //The favorite paths card
     String nameTableSelection = FcmdWidgetNames.tableFavorites + nameFilePanel;
@@ -309,7 +309,7 @@ public class FcmdFileCard extends GralFileSelector
     } else*/ 
     if (keyCode == main.keyActions.keyPanelSelection){
       //focuses the panel which is the selection panel for this file table.
-      GralWidget tableSelection = main.gralMng.getWidget(FcmdWidgetNames.tableFavorites + nameFilePanel);
+      GralWidget tableSelection = main._gralMng.getWidget(FcmdWidgetNames.tableFavorites + nameFilePanel);
       tableSelection.setFocus();
     /*
     } else if (keyCode == main.keyActions.keyPanelLeft){
@@ -551,7 +551,7 @@ public class FcmdFileCard extends GralFileSelector
           else if(result.missingFiles){ line.setCellText("-", 0); }
         }
       } catch(Exception exc){
-        main.gralMng.log.sendMsg(0, "Exception in FcmdFileCard.actionSetFileLineAttrib"); 
+        main._gralMng.log.sendMsg(0, "Exception in FcmdFileCard.actionSetFileLineAttrib"); 
       }
       return true;
   } };  

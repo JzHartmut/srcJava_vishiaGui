@@ -81,35 +81,35 @@ public class FcmdSettings
   /**Builds the content of the file property window. The window is created static. It is shown
    * whenever it is used.  */
   void buildWindow()
-  { main.gralMng.selectPanel("primaryWindow");
-    main.gralMng.setPosition(-30, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
+  { main._gralMng.selectPanel("primaryWindow");
+    main._gralMng.setPosition(-30, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
     int windProps = GralWindow.windConcurrently;
-    GralWindow window =  main.gralMng.createWindow("windSettings", "Settings - The.file.Commander", windProps);
+    GralWindow window =  main._gralMng.createWindow("windSettings", "Settings - The.file.Commander", windProps);
     windSettings = window; 
-    main.gralMng.setPosition(3.5f, GralPos.size -3, 1, -1, 0, 'd');
-    widgRefreshTime = main.gralMng.addTextField(null, true, "refresh time file panel", "t");
-    widgEditorPath = main.gralMng.addTextField(null, true, "standard editor path", "t");
-    widgCfgPath = main.gralMng.addTextField(null, false, "configuration directory path", "t");
+    main._gralMng.setPosition(3.5f, GralPos.size -3, 1, -1, 0, 'd');
+    widgRefreshTime = main._gralMng.addTextField(null, true, "refresh time file panel", "t");
+    widgEditorPath = main._gralMng.addTextField(null, true, "standard editor path", "t");
+    widgCfgPath = main._gralMng.addTextField(null, false, "configuration directory path", "t");
     
-    main.gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
-    widgEditCmd = main.gralMng.addButton("editCmd", actionEditCfgFile, "cmd.cfg", null, "edit");
-    widgApplyCmd = main.gralMng.addButton("applyCmd", actionApplyCfgCmd, "cmd.cfg", null, "apply");
-    main.gralMng.addText("cmd cfg file");
+    main._gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
+    widgEditCmd = main._gralMng.addButton("editCmd", actionEditCfgFile, "cmd.cfg", null, "edit");
+    widgApplyCmd = main._gralMng.addButton("applyCmd", actionApplyCfgCmd, "cmd.cfg", null, "apply");
+    main._gralMng.addText("cmd cfg file");
     
-    main.gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
-    widgEditCmd = main.gralMng.addButton("editCmd", actionEditCfgFile, "ext.cfg", null, "edit");
-    widgApplyCmd = main.gralMng.addButton("applyExt", actionApplyCfgExt, "ext.cfg", null, "apply");
-    main.gralMng.addText(".ext cfg file");
+    main._gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
+    widgEditCmd = main._gralMng.addButton("editCmd", actionEditCfgFile, "ext.cfg", null, "edit");
+    widgApplyCmd = main._gralMng.addButton("applyExt", actionApplyCfgExt, "ext.cfg", null, "apply");
+    main._gralMng.addText(".ext cfg file");
     
-    main.gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
-    widgEditCmd = main.gralMng.addButton("editPaths", actionEditCfgFile, "path.cfg", null, "edit");
-    widgApplyCmd = main.gralMng.addButton("applyPaths", actionApplyCfgPath, "path.cfg", null, "apply");
-    main.gralMng.addText("favor paths file");
+    main._gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
+    widgEditCmd = main._gralMng.addButton("editPaths", actionEditCfgFile, "path.cfg", null, "edit");
+    widgApplyCmd = main._gralMng.addButton("applyPaths", actionApplyCfgPath, "path.cfg", null, "apply");
+    main._gralMng.addText("favor paths file");
     
-    main.gralMng.setPosition(-7, GralPos.size +2.5f, -9, -1, 0, 'd', 0.5f);
-    widgApply = main.gralMng.addButton("dirBytes", actionButton, "apply");
+    main._gralMng.setPosition(-7, GralPos.size +2.5f, -9, -1, 0, 'd', 0.5f);
+    widgApply = main._gralMng.addButton("dirBytes", actionButton, "apply");
     widgApply.setCmd("apply");
-    widgOk = main.gralMng.addButton("dirBytes", actionButton, "ok");
+    widgOk = main._gralMng.addButton("dirBytes", actionButton, "ok");
     widgOk.setCmd("close");
   }
 

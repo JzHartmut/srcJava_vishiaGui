@@ -76,12 +76,12 @@ public class FcmdExecuter
   { 
     
     
-    main.gralMng.selectPanel("primaryWindow");
-    main.gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
+    main._gralMng.selectPanel("primaryWindow");
+    main._gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
     
-    windConfirmExec = main.gralMng.createWindow("execWindow", "confirm execute", GralWindow.windConcurrently);
+    windConfirmExec = main._gralMng.createWindow("execWindow", "confirm execute", GralWindow.windConcurrently);
     //main.gralMng.setPosition(2, GralPos.size -2, 1, -1, 0, 'd');
-    widgSelectExec = main.gralMng.addTable("execChoice", 3, new int[]{50});
+    widgSelectExec = main._gralMng.addTable("execChoice", 3, new int[]{50});
     widgSelectExec.setActionChange(actionExecCmdAfterChoice);
     
   }  
@@ -187,7 +187,7 @@ public class FcmdExecuter
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     {
-      GralWidget widgdFocus = main.gralMng.getWidgetInFocus();
+      GralWidget widgdFocus = main._gralMng.getWidgetInFocus();
       //FileSelector fileSel = idxFileSelector.get(widgdFocus.name);
       if (main.currentDir() != null) { // is a FileSelector focused yet?
         // if(widgdFocus.name.startsWith("file")){

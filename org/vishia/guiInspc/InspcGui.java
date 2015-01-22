@@ -134,7 +134,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   
   GralPanelActivated_ifc panelActivated = new GralPanelActivated_ifc(){
 
-    public void panelActivatedGui(Queue widgets)
+    public void panelActivatedGui(List widgets)
     { panelActivated(widgets); 
     }
     /*
@@ -212,7 +212,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   }
   
   @Override public void completeConstruction(){
-    this.inspcMng.complete_ReplaceAlias_ifc(guiCfg.gralMng);
+    this.inspcMng.complete_ReplaceAlias_ifc(guiCfg._gralMng);
 
     for(CompleteConstructionAndStart composite: composites){
       composite.completeConstruction();
@@ -227,7 +227,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
   
   
-  void panelActivated(Queue<GralWidget> widgets){
+  void panelActivated(List<GralWidget> widgets){
     for(GralWidget widget: widgets){
       
     }
@@ -241,12 +241,12 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
    */
   private void callbackOnReceivedData(){
     long time = System.currentTimeMillis();
-    ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = guiCfg.gralMng.getVisiblePanels();
+    ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = guiCfg._gralMng.getVisiblePanels();
     //GralWidget widgdRemove = null;
     long timeAtleast = System.currentTimeMillis() - 3000;
     try{
       for(GralVisibleWidgets_ifc panel: listPanels){
-        Queue<GralWidget> widgetsVisible = panel.getWidgetsVisible();
+        List<GralWidget> widgetsVisible = panel.getWidgetsVisible();
         if(widgetsVisible !=null) for(GralWidget widget: widgetsVisible){
           try{
             String sShowMethod;
@@ -402,34 +402,34 @@ private class InspcGuiCfg extends GuiCfg
   @Override protected void initGuiAreas(String sAreaMainPanel)
   {
     super.initGuiAreas("A1C2");
-    super.gralMng.selectPanel("test");
-    super.gralMng.setPosition(5, GralPos.size -3, 0, GralPos.size +18 , 0, 'd',1);
-    btnSwitchOnLog = super.gralMng.addSwitchButton("log", "log telg ?", "log telg", GralColor.getColor("wh"), GralColor.getColor("am") );
+    super._gralMng.selectPanel("test");
+    super._gralMng.setPosition(5, GralPos.size -3, 0, GralPos.size +18 , 0, 'd',1);
+    btnSwitchOnLog = super._gralMng.addSwitchButton("log", "log telg ?", "log telg", GralColor.getColor("wh"), GralColor.getColor("am") );
     btnSwitchOnLog.setActionChange(actionEnableLog);
-    btnRetryDisableVariables.setToPanel(super.gralMng);
+    btnRetryDisableVariables.setToPanel(super._gralMng);
     btnUseGetByIndex.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
-    btnUseGetByIndex.setToPanel(super.gralMng);
-    colorSelector = new GralColorSelector("colorSelector", super.gralMng);
+    btnUseGetByIndex.setToPanel(super._gralMng);
+    colorSelector = new GralColorSelector("colorSelector", super._gralMng);
     curveA.buildGraphic(gui.mainWindow(), colorSelector, null);
     curveB.buildGraphic(gui.mainWindow(), colorSelector, curveA.widgCurve.getCommonData());
     curveC.buildGraphic(gui.mainWindow(), colorSelector, curveA.widgCurve.getCommonData());
     //
-    gralMng.selectPanel("primaryWindow");
-    gralMng.setPosition(14, 84, 4, 64, 0, '.');
-    fieldsA.setToPanel(gralMng);
-    gralMng.selectPanel("primaryWindow");
-    gralMng.setPosition(24, 94, 14, 74, 0, '.');
-    fieldsB.setToPanel(gralMng);
-    gralMng.selectPanel("primaryWindow");
-    gralMng.setPosition(10, 30, 50, 74, 0, '.');
-    viewTargetComm.setToPanel(gralMng);
+    _gralMng.selectPanel("primaryWindow");
+    _gralMng.setPosition(14, 84, 4, 64, 0, '.');
+    fieldsA.setToPanel(_gralMng);
+    _gralMng.selectPanel("primaryWindow");
+    _gralMng.setPosition(24, 94, 14, 74, 0, '.');
+    fieldsB.setToPanel(_gralMng);
+    _gralMng.selectPanel("primaryWindow");
+    _gralMng.setPosition(10, 30, 50, 74, 0, '.');
+    viewTargetComm.setToPanel(_gralMng);
     GralMenu menu = super.guiW.getMenuBar();
     menu.addMenuItemGthread("menuBarFieldsA", "&Window/open Fields &A", fieldsA.actionOpenWindow);
     menu.addMenuItemGthread("menuBarFieldsB", "&Window/open Fields &B", fieldsB.actionOpenWindow);
     menu.addMenuItemGthread("menuBarViewTargetComm", "&Window/view &TargetComm", viewTargetComm.actionOpenWindow);
     //
     if(user !=null){
-      user.initGui(gralMng);
+      user.initGui(_gralMng);
       user.addGuiMenu(gui.mainWindow());
     }
     menu.addMenuItemGthread("menuHelp", "&Help/&Help", gui.getActionHelp());

@@ -44,7 +44,7 @@ public class OamShowValues
 
 	boolean dataValid = false;
 	
-	Queue<GralWidget> widgetsInTab;
+	List<GralWidget> widgetsInTab;
 	
 	/**The access to the gui, to change data to show. */
 	protected final GralMng_ifc guiAccess;
@@ -128,7 +128,7 @@ public class OamShowValues
 		//TEST TODO:
 		//accessOamVariable.setFloat("ctrl/energyLoadCapac2Diff", checkWithoutNewdata);
 		//current panel:
-		Queue<GralWidget> listWidgets = guiAccess.getListCurrWidgets();
+		List<GralWidget> listWidgets = guiAccess.getListCurrWidgets();
 		for(GralWidget widgetInfo : listWidgets){
 			@SuppressWarnings("unused")
       String sName = widgetInfo.name;
@@ -206,7 +206,7 @@ public class OamShowValues
       //GralWidget widgdRemove = null;
       try{
         for(GralVisibleWidgets_ifc panel: listPanels){
-          Queue<GralWidget> widgetsVisible = panel.getWidgetsVisible();
+          List<GralWidget> widgetsVisible = panel.getWidgetsVisible();
           if(widgetsVisible !=null) for(GralWidget widget: widgetsVisible){
             if(widget instanceof GralCurveView){
               GralCurveView curve = (GralCurveView)widget;
@@ -558,7 +558,7 @@ public class OamShowValues
 	 */
 	public final GralPanelActivated_ifc tabActivatedImpl = new GralPanelActivated_ifc()
 	{
-		@Override	public void panelActivatedGui(Queue<GralWidget> widgets)
+		@Override	public void panelActivatedGui(List<GralWidget> widgets)
 		{
 			widgetsInTab = widgets;
 			writeValuesOfTab();

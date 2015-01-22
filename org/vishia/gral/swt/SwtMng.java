@@ -421,7 +421,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     mng.registerPanel(windowGral);
     this.pos().panel = windowGral; //it is selected.
     this.pos().setPosition(null, 0,0,0,0,0,'r');  //per default the whole window as position and size.
-    windowGral.wdgImpl = windowSwt;
+    windowGral._wdgImpl = windowSwt;
   }
 
   
@@ -600,7 +600,9 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * @return A rectangle with position and size.
    */
   @Override public GralRectangle calcWidgetPosAndSize(GralPos pos, int widthwidgetNat, int heigthWidgetNat){
-    Composite parentComp = ((SwtPanel)(pos().panel.getWidgetImplementation())).panelComposite; //(Composite)pos().panel.getPanelImpl();
+    
+    Object oParent = pos.panel.getWidgetImplementation();
+    Composite parentComp = (Composite) oParent; //((SwtPanel)(pos().panel.getWidgetImplementation())).panelComposite; //(Composite)pos().panel.getPanelImpl();
     //Rectangle pos;
     final GralRectangle rectangle;
     final Rectangle parentSize;
@@ -669,7 +671,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   @Override @Deprecated public GralWidget addText(String sText, char size, int color)
   {
-    Composite swtPanel = ((SwtPanel)(pos().panel.getWidgetImplementation())).panelComposite;
+    Composite swtPanel = ((Composite)(pos().panel.getWidgetImplementation()));
     Label widget = new Label(swtPanel, 0);
     widget.setForeground(propertiesGuiSwt.colorSwt(color));
     widget.setBackground(propertiesGuiSwt.colorBackground);
@@ -748,7 +750,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   {
     ImageData imageData = new ImageData(imageStream);
     byte[] data = imageData.data;
-    SwtPanel swtPanel = (SwtPanel)pos().panel.getWidgetImplementation();
+    SwtPanel swtPanel = (SwtPanel)pos().panel.getImpl();
     Composite swtWidg = swtPanel.panelComposite;
     Image image = new Image(swtWidg.getDisplay(), imageData); 
     GralImageBase imageGui = new SwtImage(image);

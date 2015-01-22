@@ -84,10 +84,10 @@ public class FcmdEdit
    * whenever it is used.  */
   void buildWindow()
   {
-    main.gralMng.selectPanel("primaryWindow");
-    main.gralMng.setPosition(10, 0, 10, 0, 1, 'r'); //right buttom, about half less display width and hight.
+    main._gralMng.selectPanel("primaryWindow");
+    main._gralMng.setPosition(10, 0, 10, 0, 1, 'r'); //right buttom, about half less display width and hight.
     int windProps = GralWindow.windConcurrently | GralWindow.windHasMenu;
-    GralWindow wind =  main.gralMng.createWindow("windView", "view - The.file.Commander", windProps);
+    GralWindow wind =  main._gralMng.createWindow("windView", "view - The.file.Commander", windProps);
     wind.addMenuBarItemGThread("view-Search", "&Edit/&Search", actionOpenEdit);
     wind.addMenuBarItemGThread("view-Search", "&Edit/set &Writeable", actionOpenEdit);
     wind.addMenuBarItemGThread("view-Search", "&View/&Hex-Byte", actionOpenEdit);
@@ -96,9 +96,9 @@ public class FcmdEdit
     wind.addMenuBarItemGThread("view-Search", "&View/text-&ASCII-7", actionOpenEdit);
     wind.addMenuBarItemGThread("view-Search", "&View/text-&Encoding", actionOpenEdit);
     wind.addMenuBarItemGThread(null, "&Save-as/UTF8-Unix-lf", actionConvertUTF8unix);
-    main.gralMng.setPosition(0, 0, 0, 0, 1, 'r');
-    widgContent = main.gralMng.addTextBox("view-content", false, null, '.');
-    widgContent.setTextStyle(GralColor.getColor("bk"), main.gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));
+    main._gralMng.setPosition(0, 0, 0, 0, 1, 'r');
+    widgContent = main._gralMng.addTextBox("view-content", false, null, '.');
+    widgContent.setTextStyle(GralColor.getColor("bk"), main._gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));
     windView = wind; 
     windView.setWindowVisible(false);
     //windView1.
@@ -243,7 +243,7 @@ public class FcmdEdit
         outchn.close();
         
       } catch(Exception exc){
-        main.gralMng.writeLog(0, exc);
+        main._gralMng.writeLog(0, exc);
       }
       return true;
       // /

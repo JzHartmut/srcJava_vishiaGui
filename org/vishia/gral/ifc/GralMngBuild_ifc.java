@@ -772,7 +772,7 @@ public interface GralMngBuild_ifc extends ReplaceAlias_ifc
 	
 	
   /**Creates a Window for a modal or non modal dialog. The window is described by the returned interface. 
-   * The implementation link will be stored in the {@link GralWidget#wdgImpl} aggregation.
+   * The implementation link will be stored in the {@link GralWidget#_wdgImpl} aggregation.
    * It can be filled with elements. The dialog is able to show and hide calling 
    * {@link GralWindow_ifc#setWindowVisible(boolean)} or 
    * {@link GralMng_ifc#setWindowsVisible(GralWindow_ifc, GralPos)}. 

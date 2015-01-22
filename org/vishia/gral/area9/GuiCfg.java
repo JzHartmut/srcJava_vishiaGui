@@ -72,7 +72,7 @@ public class GuiCfg
    *   Idea: a derived class should support it. Other Idea: either both via reflection or both maybe direct. 
    * <li>2011-10-11 Hartmut new: Switches MainCmd-output to OutputBox.
    * <li>2011-09-30 Hartmut new: menu 'Design/...' to edit fields and work with the {@link GralCfgDesigner}.
-   * <li>2011-09-18 Hartmut new: The main tab panel has the name 'mainTab' and it is registered in the {@link #gralMng} now.
+   * <li>2011-09-18 Hartmut new: The main tab panel has the name 'mainTab' and it is registered in the {@link #_gralMng} now.
    *     Generally an application may have more as one tabbed panels.
    * <li>2011-09-10 Hartmut del: Remove dialogZbnfConfigurator, it was not used. It is the old solution.
    * <li>2011-09-08 Hartmut del: Remove the message panel. It was a special solution. 
@@ -164,8 +164,8 @@ public final GralArea9Window guiW;
 
 public final MainCmd_ifc mainCmd;
 
-
-public GralMng gralMng;
+/**Especially for debug access to the singleton instance, start with _ to present on top of variables. */
+public GralMng _gralMng;
 
 
 /**Panel-Management-interface for the panels. */
@@ -227,9 +227,9 @@ public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui
     inspector = null; //don't use.
   }
   
-  gralMng = cmdGui.gralMng; //cargs.graphicFactory.createPanelMng(null, 120,80, propertiesGui, null, log);
-  panelBuildIfc = gralMng;
-  guiAccess = gralMng;
+  _gralMng = cmdGui.gralMng; //cargs.graphicFactory.createPanelMng(null, 120,80, propertiesGui, null, log);
+  panelBuildIfc = _gralMng;
+  guiAccess = _gralMng;
   userInit();
   //panelContent = new PanelContent(user);
   if(user !=null){
@@ -252,7 +252,7 @@ public GralPlugUser_ifc getPluggedUser(){ return user; }
 protected void userInit()
 {
   if(user !=null){
-    user.init(plugUser2Gui, gralMng, console.getLogMessageOutputConsole());
+    user.init(plugUser2Gui, _gralMng, console.getLogMessageOutputConsole());
   }
   
   
@@ -267,8 +267,8 @@ GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GuiCfg.initGraphic"
 {
   @Override public void executeOrder()
   {
-    gralMng.selectPanel("primaryWindow");
-    gralMng.setPosition(10, 16,5,20,0,'.');
+    _gralMng.selectPanel("primaryWindow");
+    _gralMng.setPosition(10, 16,5,20,0,'.');
     initGuiAreas("A1C1");
     //gralMng.gralDevice.removeDispatchListener(this);    
     //countExecution();
@@ -284,7 +284,7 @@ GralGraphicTimeOrder configGuiWithZbnf = new GralGraphicTimeOrder("GuiCfg.config
   
   @Override public void executeOrder(){
     panelBuildIfc.buildCfg(guiCfgData, cargs.fileGuiCfg);
-    gralMng.initCfgDesigner();
+    _gralMng.initCfgDesigner();
 
     //gralMng.gralDevice.removeDispatchListener(this);    
     
@@ -304,8 +304,8 @@ protected void initGuiAreas(String sMainArea)
   gui.setFrameAreaBorders(20, 80, 60, 85);
   gui.setStandardMenusGThread(new File("."), actionFile);
   initMenuGralDesigner();
-  gralMng.selectPanel("primaryWindow");
-  mainTabPanel = gralMng.addTabbedPanel("mainTab", null, 0);
+  _gralMng.selectPanel("primaryWindow");
+  mainTabPanel = _gralMng.addTabbedPanel("mainTab", null, 0);
   gui.addFrameArea(sMainArea, mainTabPanel); //dialogPanel);
   Appendable out = gui.getOutputBox();
   mainCmd.setOutputChannels(out, out);
@@ -315,9 +315,9 @@ protected void initGuiAreas(String sMainArea)
 
 protected void initMenuGralDesigner()
 {
-  gui.addMenuBarArea9ItemGThread("GralDesignEnable", "&Design/e&Nable", gralMng.actionDesignEditField);  
-  gui.addMenuBarArea9ItemGThread("GralDesignEditField", "&Design/Edit &field", gralMng.actionDesignEditField);  
-  gui.addMenuBarArea9ItemGThread("GralDesignUpdatePanel", "&Design/update &Panel from cfg-file", gralMng.actionReadPanelCfg);  
+  gui.addMenuBarArea9ItemGThread("GralDesignEnable", "&Design/e&Nable", _gralMng.actionDesignEditField);  
+  gui.addMenuBarArea9ItemGThread("GralDesignEditField", "&Design/Edit &field", _gralMng.actionDesignEditField);  
+  gui.addMenuBarArea9ItemGThread("GralDesignUpdatePanel", "&Design/update &Panel from cfg-file", _gralMng.actionReadPanelCfg);  
   
 }
 
@@ -327,7 +327,7 @@ protected void initMain()
 {
   //create the basic appearance of the GUI. The execution sets dlgAccess:
   System.out.println("GuiCfg.initMain() - addDispatchOrder initGraphic, wait for execution;");
-  gralMng.gralDevice.addDispatchOrder(initGraphic);
+  _gralMng.gralDevice.addDispatchOrder(initGraphic);
   
   if(!initGraphic.awaitExecution(1, 0)){
     System.out.println("GuiCfg.initMain() - initGraphic does not respond;");
@@ -355,7 +355,7 @@ protected void initMain()
         //dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
         //cfgBuilder = new GuiCfgBuilder(guiCfgData, panelBuildIfc, fileGui.getParentFile());
         //panelBuildIfc.setCfgBuilder(cfgBuilder);
-        gralMng.gralDevice.addDispatchOrder(configGuiWithZbnf);
+        _gralMng.gralDevice.addDispatchOrder(configGuiWithZbnf);
         bConfigDone = configGuiWithZbnf.awaitExecution(1, 10000);
         if(!bConfigDone){
           console.writeError("No configuration");
@@ -389,7 +389,7 @@ public final void execute()
   initMain();
   //guiAccess.insertInfo("msgOfDay", Integer.MAX_VALUE, "Test\tMsg");
   //msgReceiver.start();
-  while(gralMng.gralDevice.isRunning())
+  while(_gralMng.gralDevice.isRunning())
   { stepMain();
     try{ Thread.sleep(100);} 
     catch (InterruptedException e)
@@ -439,7 +439,7 @@ protected GralUserAction actionFile = new GralUserAction("actionFile")
       String sError = null;
       try{
         Writer writer = new FileWriter(cargs.fileGuiCfg); //"save.cfg");
-        sError = gralMng.saveCfg(writer);
+        sError = _gralMng.saveCfg(writer);
         writer.close();
       } catch(java.io.IOException exc){
         sError = "Problem open file ";

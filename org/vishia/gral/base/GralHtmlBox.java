@@ -37,9 +37,9 @@ public class GralHtmlBox extends GralWidget
   { super(name, 'h');
   }
 
-  public void setUrl(String url){ ((ImplAccess)wdgImpl).setUrl(url); }
+  public void setUrl(String url){ ((ImplAccess)_wdgImpl).setUrl(url); }
 
-  public void activate(){ ((ImplAccess)wdgImpl).activate(); }
+  public void activate(){ ((ImplAccess)_wdgImpl).activate(); }
   
   
   public abstract static class ImplAccess extends GralWidget.ImplAccess

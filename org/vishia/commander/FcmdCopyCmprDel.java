@@ -236,139 +236,139 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   void buildWindowConfirmCopy(String sTitle)
   {
     action = new Actions();
-    main.gralMng.selectPanel("primaryWindow"); //"output"); //position relative to the output panel
+    main._gralMng.selectPanel("primaryWindow"); //"output"); //position relative to the output panel
     //System.out.println("CopyWindow frame: " + main.gralMng.pos.panel.getPixelPositionSize().toString());
     //panelMng.setPosition(1, 30+GralGridPos.size, 1, 40+GralGridPos.size, 1, 'r');
-    main.gralMng.setPosition(10, GralPos.size+37, 10, GralPos.size+70, 1, 'r'); //right buttom, about half less display width and hight.
+    main._gralMng.setPosition(10, GralPos.size+37, 10, GralPos.size+70, 1, 'r'); //right buttom, about half less display width and hight.
     
 
-    posWindConfirmCopy = main.gralMng.getPositionInPanel();
+    posWindConfirmCopy = main._gralMng.getPositionInPanel();
     int windprops = GralWindow.windConcurrently; // + GralWindow.windResizeable;
-    windConfirmCopy = main.gralMng.createWindow("copyWindow", sTitle, windprops);
+    windConfirmCopy = main._gralMng.createWindow("copyWindow", sTitle, windprops);
     //System.out.println(" window: " + main.gralMng.pos.panel.getPixelPositionSize().toString());
     
     //source path and check:
     if(cmdWind != Ecmd.delete) {
-      main.gralMng.setPosition(0.5f, GralPos.size +2, 1, 7.5f, 0, 'r', 0);
-      widgButtonModeDst = main.gralMng.addSwitchButton(null, "dst/..", "dst/dst", GralColor.getColor("gn"), GralColor.getColor("ye") );
+      main._gralMng.setPosition(0.5f, GralPos.size +2, 1, 7.5f, 0, 'r', 0);
+      widgButtonModeDst = main._gralMng.addSwitchButton(null, "dst/..", "dst/dst", GralColor.getColor("gn"), GralColor.getColor("ye") );
       widgButtonModeDst.setActionChange(actionChgModeDst);
     }
-    main.gralMng.setPosition(0.5f, GralPos.size +2.5f, 15, GralPos.size+12, 0, 'r', 1);
-    widgButtonSetSrc = main.gralMng.addButton(null, actionConfirmCopy, "setSrc", null, "set source" );
+    main._gralMng.setPosition(0.5f, GralPos.size +2.5f, 15, GralPos.size+12, 0, 'r', 1);
+    widgButtonSetSrc = main._gralMng.addButton(null, actionConfirmCopy, "setSrc", null, "set source" );
     widgButtonSetSrc.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.setSrc.");
-    widgButtonClearSel = main.gralMng.addButton(null, null, "clrSel", null, "clear selection" );
+    widgButtonClearSel = main._gralMng.addButton(null, null, "clrSel", null, "clear selection" );
     widgButtonClearSel.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.clearSel.");
     if(cmdWind != Ecmd.delete) {
-      main.gralMng.setPosition(GralPos.same, GralPos.samesize, -17, -1, 0, 'r', 1);
-      widgButtonSetDst = main.gralMng.addButton(null, actionSetDst, "setDst", null, "set destination" );
+      main._gralMng.setPosition(GralPos.same, GralPos.samesize, -17, -1, 0, 'r', 1);
+      widgButtonSetDst = main._gralMng.addButton(null, actionSetDst, "setDst", null, "set destination" );
       widgButtonSetDst.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.setDst.");
     }
-    main.gralMng.setPosition(2.5f, GralPos.size +3.2f, 1, -4, 0, 'd', 0);
+    main._gralMng.setPosition(2.5f, GralPos.size +3.2f, 1, -4, 0, 'd', 0);
     //main.gralMng.addText("source:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    widgShowSrc = main.gralMng.addTextField("copyFrom", false, "source root path", "t");
+    widgShowSrc = main._gralMng.addTextField("copyFrom", false, "source root path", "t");
     widgShowSrc.setBackColor(GralColor.getColor("am"),0);
     widgShowSrc.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.pathSrc.");
-    main.gralMng.setPosition(GralPos.refer+0.9f, GralPos.size +2.5f, -4f, -1, 0, 'r', 1);
-    widgButtonShowSrc = main.gralMng.addButton(null, null, "showSrc", null, "=>" );
+    main._gralMng.setPosition(GralPos.refer+0.9f, GralPos.size +2.5f, -4f, -1, 0, 'r', 1);
+    widgButtonShowSrc = main._gralMng.addButton(null, null, "showSrc", null, "=>" );
     widgButtonShowSrc.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.show.");
     
     
-    main.gralMng.setPosition(GralPos.refer + 2.3f, GralPos.size +3.2f, 1, -13, 0, 'r', 0.3f);
-    widgFromConditions = main.gralMng.addTextField("copyCond",true, "select src files: mask*:*.ext / 2012-08-05..06", "t");
+    main._gralMng.setPosition(GralPos.refer + 2.3f, GralPos.size +3.2f, 1, -13, 0, 'r', 0.3f);
+    widgFromConditions = main._gralMng.addTextField("copyCond",true, "select src files: mask*:*.ext / 2012-08-05..06", "t");
     widgFromConditions.setActionChange(actionSelectMask);
     widgFromConditions.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.selcond.");
     
-    main.gralMng.setPosition(GralPos.refer+0.2f, GralPos.size+3.5f, -13, -1, 0, 'd', 0);
-    widgButtonCheck = main.gralMng.addButton("buttonCheck", actionCheck, "check", null, "check" );
+    main._gralMng.setPosition(GralPos.refer+0.2f, GralPos.size+3.5f, -13, -1, 0, 'd', 0);
+    widgButtonCheck = main._gralMng.addButton("buttonCheck", actionCheck, "check", null, "check" );
     widgButtonCheck.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.check.");
     
     //dst path, set dst
     if(cmdWind != Ecmd.delete) {
-      main.gralMng.setPosition(GralPos.refer+3.0f, GralPos.size -3.2f, 1, -4, 0, 'r', 0);
-      widgInputDst = main.gralMng.addTextField("copyDirDst", true, "destination:", "t");
+      main._gralMng.setPosition(GralPos.refer+3.0f, GralPos.size -3.2f, 1, -4, 0, 'r', 0);
+      widgInputDst = main._gralMng.addTextField("copyDirDst", true, "destination:", "t");
       widgInputDst.setActionChange(actionEnterTextInDst);
       widgInputDst.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.setDst.");
-      main.gralMng.setPosition(GralPos.refer+0.9f, GralPos.size +2.5f, -4, -1, 0, 'r', 1);
-      widgButtonShowDst = main.gralMng.addButton(null, null, "showDst", null, "=>" );
+      main._gralMng.setPosition(GralPos.refer+0.9f, GralPos.size +2.5f, -4, -1, 0, 'r', 1);
+      widgButtonShowDst = main._gralMng.addButton(null, null, "showDst", null, "=>" );
       widgButtonShowDst.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.show.");
     }  
     
-    main.gralMng.setPosition(GralPos.refer+1.5f, GralPos.size -1.5f, 1, 18, 0, 'r', 1);
+    main._gralMng.setPosition(GralPos.refer+1.5f, GralPos.size -1.5f, 1, 18, 0, 'r', 1);
     if(cmdWind == Ecmd.delete) {
-      main.gralMng.addText("Del read only ?");
+      main._gralMng.addText("Del read only ?");
     } else if(cmdWind == Ecmd.compare) {
       //nothing such
     } else {
-      main.gralMng.addText("Overwr read only ?");
-      main.gralMng.addText("Overwr exists ?");
-      main.gralMng.addText("Create ?");
+      main._gralMng.addText("Overwr read only ?");
+      main._gralMng.addText("Overwr exists ?");
+      main._gralMng.addText("Create ?");
     }
     if(cmdWind != Ecmd.compare) {
-      main.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size -3, 1, GralPos.size +12, 0, 'r',1);
-      widgdChoiceOverwrReadOnly = main.gralMng.addButton("overwritero", actionOverwrReadonly, "overwritero", null,"ask ?yes ?no");
+      main._gralMng.setPosition(GralPos.refer+3.5f, GralPos.size -3, 1, GralPos.size +12, 0, 'r',1);
+      widgdChoiceOverwrReadOnly = main._gralMng.addButton("overwritero", actionOverwrReadonly, "overwritero", null,"ask ?yes ?no");
       widgdChoiceOverwrReadOnly.setBackColor(GralColor.getColor("lam"), 0);
       widgdChoiceOverwrReadOnly.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.ctrl.overwrRo.");
     }
     if(cmdWind != Ecmd.delete && cmdWind != Ecmd.compare) {
-      main.gralMng.setPosition(GralPos.same, GralPos.size -3, GralPos.next, GralPos.size +20, 0, 'r',1);
-      widgdChoiceOverwrExists = main.gralMng.addButton("copyOverwriteReadonly", actionOverwrDate, "copyOverwriteReadonly", null, "ask ?newer?older?all ?no");
+      main._gralMng.setPosition(GralPos.same, GralPos.size -3, GralPos.next, GralPos.size +20, 0, 'r',1);
+      widgdChoiceOverwrExists = main._gralMng.addButton("copyOverwriteReadonly", actionOverwrDate, "copyOverwriteReadonly", null, "ask ?newer?older?all ?no");
       widgdChoiceOverwrExists.setBackColor(GralColor.getColor("lam"), 0);
       widgdChoiceOverwrExists.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.ctrl.overwrExists.");
-      main.gralMng.setPosition(GralPos.same, GralPos.size -3, GralPos.next, GralPos.size +12, 0, 'r',1);
-      widgdChoiceCreateNew = main.gralMng.addButton("copyCreate", actionCreateCopy, "copyCreate", null, "yes ?no ?ask");
+      main._gralMng.setPosition(GralPos.same, GralPos.size -3, GralPos.next, GralPos.size +12, 0, 'r',1);
+      widgdChoiceCreateNew = main._gralMng.addButton("copyCreate", actionCreateCopy, "copyCreate", null, "yes ?no ?ask");
       widgdChoiceCreateNew.setBackColor(GralColor.getColor("lgn"), 0);
       widgdChoiceCreateNew.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.ctrl.createNew.");
     }
     
     //field for showing the current action or state, not for input:
     //field for showing the current name, not for input:
-    main.gralMng.setPosition(GralPos.refer + 3.5f, GralPos.size +3.2f, 1, -1, 0, 'd');
-    widgCopyDirDst = main.gralMng.addTextField("copyDirDst", false, "current directory:", "t");
+    main._gralMng.setPosition(GralPos.refer + 3.5f, GralPos.size +3.2f, 1, -1, 0, 'd');
+    widgCopyDirDst = main._gralMng.addTextField("copyDirDst", false, "current directory:", "t");
     widgCopyDirDst.setBackColor(GralColor.getColor("lam"),0);
     widgCopyDirDst.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.currfile.");
-    widgCopyNameDst = main.gralMng.addTextField("copyNameDst", false, "current file:", "t");
+    widgCopyNameDst = main._gralMng.addTextField("copyNameDst", false, "current file:", "t");
     widgCopyNameDst.setBackColor(GralColor.getColor("lam"),0);
     widgCopyNameDst.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.currfile.");
     
-    main.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size +3.2f, 1, -15, 0, 'd', 0.3f); //same line as del
-    widgCopyState = main.gralMng.addTextField("copyStatus", false, "current state:", "t");
+    main._gralMng.setPosition(GralPos.refer+3.5f, GralPos.size +3.2f, 1, -15, 0, 'd', 0.3f); //same line as del
+    widgCopyState = main._gralMng.addTextField("copyStatus", false, "current state:", "t");
     widgCopyState.setBackColor(GralColor.getColor("lam"),0);
     widgCopyState.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.state.");
     
-    main.gralMng.setPosition(-4, GralPos.size +1, 10, -14, 0, 'd', 1);
+    main._gralMng.setPosition(-4, GralPos.size +1, 10, -14, 0, 'd', 1);
     if(cmdWind != Ecmd.delete) {
       //widgProgressFile = main.gralMng.addValueBar("copyProgressFile", null);
     }
     //widgProgressAll = main.gralMng.addValueBar("copyProgressAll", null);
 
     if(cmdWind == Ecmd.copy) {
-      main.gralMng.setPosition(-8, GralPos.size+2.5f, -13f, -1, 0, 'd', 0.3f);
-      widgButtonMove = main.gralMng.addSwitchButton("copyMove", "move ?", "Move/ ?copy", GralColor.getColor("wh"), GralColor.getColor("lgn"));
+      main._gralMng.setPosition(-8, GralPos.size+2.5f, -13f, -1, 0, 'd', 0.3f);
+      widgButtonMove = main._gralMng.addSwitchButton("copyMove", "move ?", "Move/ ?copy", GralColor.getColor("wh"), GralColor.getColor("lgn"));
       widgButtonMove.setActionChange(actionButtonCmprDelMove);
       widgButtonMove.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.fn.");
     }
-    main.gralMng.setPosition(-4, GralPos.size+3.2f, 1, 9, 0, 'r');
-    widgButtonEsc = main.gralMng.addButton("copyEsc", actionButtonAbort, "esc", null, "close");
+    main._gralMng.setPosition(-4, GralPos.size+3.2f, 1, 9, 0, 'r');
+    widgButtonEsc = main._gralMng.addButton("copyEsc", actionButtonAbort, "esc", null, "close");
     widgButtonEsc.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.escape.");
-    main.gralMng.setPosition(GralPos.same, GralPos.size +2.5f, GralPos.next, GralPos.size+3.0f, 0, 'r', 1);
-    widgState = main.gralMng.addButton(null, actionShowState, "?", null, "?" );
+    main._gralMng.setPosition(GralPos.same, GralPos.size +2.5f, GralPos.next, GralPos.size+3.0f, 0, 'r', 1);
+    widgState = main._gralMng.addButton(null, actionShowState, "?", null, "?" );
     widgState.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.state.");
     
     if(cmdWind != Ecmd.compare){
       //main.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size -3, 1, 12, 0, 'r', 1);
-      main.gralMng.setPosition(GralPos.same, GralPos.size +2.5f, GralPos.next, GralPos.size + 11, 0, 'r', 1);
+      main._gralMng.setPosition(GralPos.same, GralPos.size +2.5f, GralPos.next, GralPos.size + 11, 0, 'r', 1);
       //main.gralMng.setPosition(GralPos.same, GralPos.size -3, 16, GralPos.size +14, 0, 'r', 1);
-      widgSkipDir = main.gralMng.addButton("copySkipDir", actionButtonSkipDir, "copySkipDir", null, "skip dir");
+      widgSkipDir = main._gralMng.addButton("copySkipDir", actionButtonSkipDir, "copySkipDir", null, "skip dir");
       widgSkipDir.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.quest.skipDir.");
-      widgSkipFile = main.gralMng.addButton("copyskip", actionButtonSkipFile, "copyskip", null, "skip file");
+      widgSkipFile = main._gralMng.addButton("copyskip", actionButtonSkipFile, "copyskip", null, "skip file");
       widgSkipFile.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.quest.skipFile.");
-      widgOverwrFile = main.gralMng.addButton(sTextExecuteForFile, actionOverwriteFile, "copyOverwrite", null, sTextExecuteForFile);
+      widgOverwrFile = main._gralMng.addButton(sTextExecuteForFile, actionOverwriteFile, "copyOverwrite", null, sTextExecuteForFile);
       widgOverwrFile.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.quest.wr.");
       //widgBtnPause = main.gralMng.addButton("pause", null, "pause", null, "pause");
       //widgBtnPause.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.pause.");
     }  
-    main.gralMng.setPosition(-4, GralPos.size+3.5f, -13f, -1, 0, 'd', 0.4f);
-    widgButtonOk = main.gralMng.addButton("copyOk", actionButtonOk, "close", null, "close");
+    main._gralMng.setPosition(-4, GralPos.size+3.5f, -13f, -1, 0, 'd', 0.4f);
+    widgButtonOk = main._gralMng.addButton("copyOk", actionButtonOk, "close", null, "close");
     widgButtonOk.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.confileaction.ok.");
   
   }
@@ -789,7 +789,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     
     @SuppressWarnings("serial") 
     FileRemoteProgressTimeOrder showFilesProcessing = 
-        new FileRemoteProgressTimeOrder("showFilesProcessing", main.gralMng.gralDevice.orderList(), 100) 
+        new FileRemoteProgressTimeOrder("showFilesProcessing", main._gralMng.gralDevice.orderList(), 100) 
     {
       @Override public void executeOrder() { 
         showCurrentProcessedFileAndDir(this); //this.currFile, this.nrFilesProcessed, this.bDone); 

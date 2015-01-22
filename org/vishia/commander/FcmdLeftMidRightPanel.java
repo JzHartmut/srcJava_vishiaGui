@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.fileRemote.FileRemote;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
@@ -35,10 +36,13 @@ public class FcmdLeftMidRightPanel
   
   final Fcmd main;
   
-  /**The container for all tabs of this TabbedPanel. */
+  /**The container for all tabs of this TabbedPanel. It is a {@link GralPanelContent} of the primaryWindow 
+   * associated to one of the frame areas of the GralArea9_ifc. */
   GralTabbedPanel tabbedPanelFileCards;
   
-  /**The container for the tabs for selection. */
+  /**The container for the tabs for selection. 
+   * It is the first {@link GralPanelContent} inside the {@link #tabbedPanelFileCards} designated with "a-F1" etc. 
+   */
   GralTabbedPanel tabbedPanelFavorCards;
   
   /**Table widget for the select table.*/
@@ -102,24 +106,24 @@ public class FcmdLeftMidRightPanel
    */
   void buildInitialTabs()
   {
-    GralMng mng = main.gralMng;
+    GralMng mng = main._gralMng;
     String sName = "Sel" + cNr;
     //inside the left/mid/right tabbed panel: create the panel which contains a tabbed panel for selection
     String nameGridPanel = FcmdWidgetNames.tabFavoritesLeftMidRight + cNr;
     String tabLabelGridPanel = "a-F"+cNr;
-    mng.setPosition(0, 0, 0, 0, 1, 'd');
+    mng.setPosition(tabbedPanelFileCards.pos(), 0, 0, 0, 0, 1, 'd');
     tabbedPanelFileCards.addGridPanel(nameGridPanel, tabLabelGridPanel,1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd');
     //A tabbed panel inside the left, middle or right tab for selection.
     String nameTabPanel = FcmdWidgetNames.panelFavoritesLeftMidRight + cNr;
-    mng.setPosition(0, 0, 0, 0, 1, 'd');
+    mng.setPosition(tabbedPanelFileCards.pos(), 0, 0, 0, 0, 1, 'd');
     tabbedPanelFavorCards = mng.addTabbedPanel(nameTabPanel, null, GralMngBuild_ifc.propZoomedPanel);
     //The panel for selection from all favorites: 
     nameGridPanel = FcmdWidgetNames.tabMainFavorites + cNr;
     tabLabelGridPanel = "a-F"+cNr;
-    mng.setPosition(0, 0, 0, 0, 1, 'd');
+    mng.setPosition(tabbedPanelFavorCards.pos(), 0, 0, 0, 0, 1, 'd');
     tabbedPanelFavorCards.addGridPanel(nameGridPanel, tabLabelGridPanel, 1,1,10,10);
-    mng.setPosition(0, 0, 0, -0, 1, 'd');
+    mng.setPosition(0, 0, 0, -0, 1, 'd'); //inside the new tab
     cardFavorThemes.setToPanel(mng);
     fillCards();  //build the rest of all tabs and panels depending on content of favorites.
     

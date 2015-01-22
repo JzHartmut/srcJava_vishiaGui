@@ -98,7 +98,7 @@ public class BzrGui extends GuiCfg
       cmdgui.writeError(sError);
     }
     
-    mainData.panelAccess = gralMng;
+    mainData.panelAccess = _gralMng;
   
     mainData.guifc = this.gui;
     
@@ -136,17 +136,17 @@ public class BzrGui extends GuiCfg
     //Creates a Tab-Panel:
     //panelMng.tabPanel = panelMng.createTabPanel(panelContent.actionPanelActivate, 0);
     //panelMng.tabPanel.addGridPanel("operation", "&Operation",1,1,10,10);
-    gralMng.selectPanel("primaryWindow");
-    mainTabPanel = gralMng.addTabbedPanel("mainTab", null, 0);
+    _gralMng.selectPanel("primaryWindow");
+    mainTabPanel = _gralMng.addTabbedPanel("mainTab", null, 0);
     gui.addFrameArea("A1C2", mainTabPanel); //dialogPanel);
     
     try { 
-      gralMng.setPosition(5, 0, 5, 0, 1, 'r'); //right buttom, about half less display width and hight.
-      mainData.infoWindow = gralMng.createWindow("windViewdiff", "view difference", GralWindow.windConcurrently | GralWindow.windResizeable);
-      gralMng.setPosition(0, -3, 0, 0, 0, '.');
-      mainData.infoBox = gralMng.addTextBox("boxViewDiff", false, null, '.');
-      gralMng.setPosition(0, -4, -4, -2, 0, '.');
-      mainData.infoLine = gralMng.addTextField("info", false, null, null);
+      _gralMng.setPosition(5, 0, 5, 0, 1, 'r'); //right buttom, about half less display width and hight.
+      mainData.infoWindow = _gralMng.createWindow("windViewdiff", "view difference", GralWindow.windConcurrently | GralWindow.windResizeable);
+      _gralMng.setPosition(0, -3, 0, 0, 0, '.');
+      mainData.infoBox = _gralMng.addTextBox("boxViewDiff", false, null, '.');
+      _gralMng.setPosition(0, -4, -4, -2, 0, '.');
+      mainData.infoLine = _gralMng.addTextField("info", false, null, null);
 
       mainTabPanel.addGridPanel("Select", "&Select",1,1,10,10);
         mainTabPanel.addGridPanel("Commit", "&Commit",1,1,10,10);

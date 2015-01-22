@@ -400,7 +400,7 @@ public class Fcmd extends GuiCfg
 
   final FcmdExecuter executer = new FcmdExecuter(mainCmd, this);
 
-  final GralCommandSelector cmdSelector = new GralCommandSelector("cmdSelector", 5, new int[]{0,-10}, 'A', executer.cmdQueue, gralMng);
+  final GralCommandSelector cmdSelector = new GralCommandSelector("cmdSelector", 5, new int[]{0,-10}, 'A', executer.cmdQueue, _gralMng);
 
   final FcmdSettings settings = new FcmdSettings(this);
   
@@ -517,23 +517,23 @@ public class Fcmd extends GuiCfg
     // gui.set
 
     // Creates tab-Panels for the file lists and command lists.
-    gralMng.selectPanel("primaryWindow");
-    favorPathSelector.panelLeft.tabbedPanelFileCards = gralMng.addTabbedPanel("File0Tab", null, GralMngBuild_ifc.propZoomedPanel);
+    _gralMng.selectPanel("primaryWindow");
+    favorPathSelector.panelLeft.tabbedPanelFileCards = _gralMng.addTabbedPanel("File0Tab", null, GralMngBuild_ifc.propZoomedPanel);
     gui.addFrameArea("A1A1", favorPathSelector.panelLeft.tabbedPanelFileCards); // dialogPanel);
 
     favorPathSelector.panelLeft.buildInitialTabs();
-    gralMng.selectPanel("primaryWindow");
-    favorPathSelector.panelMid.tabbedPanelFileCards = gralMng.addTabbedPanel("File1Tab", null, GralMngBuild_ifc.propZoomedPanel);
+    _gralMng.selectPanel("primaryWindow");
+    favorPathSelector.panelMid.tabbedPanelFileCards = _gralMng.addTabbedPanel("File1Tab", null, GralMngBuild_ifc.propZoomedPanel);
     gui.addFrameArea("B1B1", favorPathSelector.panelMid.tabbedPanelFileCards); // dialogPanel);
     favorPathSelector.panelMid.buildInitialTabs();
 
-    gralMng.selectPanel("primaryWindow");
-    favorPathSelector.panelRight.tabbedPanelFileCards = gralMng.addTabbedPanel("File2Tab", null, GralMngBuild_ifc.propZoomedPanel);
+    _gralMng.selectPanel("primaryWindow");
+    favorPathSelector.panelRight.tabbedPanelFileCards = _gralMng.addTabbedPanel("File2Tab", null, GralMngBuild_ifc.propZoomedPanel);
     gui.addFrameArea("C1C1", favorPathSelector.panelRight.tabbedPanelFileCards); // dialogPanel);
     favorPathSelector.panelRight.buildInitialTabs();
 
-    gralMng.selectPanel("primaryWindow");
-    panelButtons = gralMng.createGridPanel("Buttons", gralMng.getColor("gr"), 1, 1, 10, 10);
+    _gralMng.selectPanel("primaryWindow");
+    panelButtons = _gralMng.createGridPanel("Buttons", _gralMng.getColor("gr"), 1, 1, 10, 10);
     gui.addFrameArea("A3C3", panelButtons); // dialogPanel);
 
     filesCp.buildGraphic();

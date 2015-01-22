@@ -212,6 +212,8 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 
   private final List<GralWidget> widgetsInFocus = new LinkedList<GralWidget>();
  
+  private GralWindow windPrimary;
+  
   
   /**List of all panels which may be visible yet. 
    * The list can be iterated. Therefore it is lock-free multi-threading accessible.
@@ -238,7 +240,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * But the position can be set.
    * The values inside the position are positive in any case, so that the calculation of size is simple.
    */
-  protected GralPos pos = new GralPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
+  protected final GralPos pos = new GralPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
   
   /**False if the position is given newly. True if it is used. Then the next add-widget invocation 
    * calculates the next position in direction see {@link GralPos#setNextPosition()}. */
@@ -420,7 +422,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   private GralWidget_ifc lastClickedWidget;
   
 
-	@Override public Queue<GralWidget> getListCurrWidgets(){ return pos.panel.widgetList; }
+	@Override public List<GralWidget> getListCurrWidgets(){ return pos.panel.widgetList; }
 	
   /**Index of all user actions, which are able to use in Button etc. 
    * The user action "showWidgetInfos" defined here is added initially.
@@ -484,6 +486,12 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   public void setProperties(GralGridProperties props) {
     this.propertiesGui = props;
   }
+  
+  public void setPrimaryWindow(GralWindow primaryWindow){
+    if(this.windPrimary !=null)
+      throw new IllegalStateException("Primary Window should set only one time.");
+    this.windPrimary = primaryWindow; 
+  };
   
   
   public static void createMainWindow(GralFactory_ifc factory, GralWindow window, char sizeShow, int left, int top, int xSize, int ySize) {
@@ -763,7 +771,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   public GralPanelContent getCurrentPanel(){ return pos.panel; }
   
   public GralPanelActivated_ifc actionPanelActivate = new GralPanelActivated_ifc()
-  { @Override public void panelActivatedGui(Queue<GralWidget> widgetsP)
+  { @Override public void panelActivatedGui(List<GralWidget> widgetsP)
     {  //changeWidgets(widgetsP);
     }
   };
@@ -1244,7 +1252,7 @@ public GralButton addCheckButton(
     FileSelectInfo fileSelectInfo = new FileSelectInfo(name, listRecentFiles, startDirMask, widgd);
     widgdSelect.setContentInfo(fileSelectInfo); 
     //xSize = xSize1;
-    pos = posAll;  //the saved position.
+    pos.set(posAll);  //the saved position.
     return widgd;
   }
 

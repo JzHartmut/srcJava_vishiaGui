@@ -131,7 +131,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   
   public void setPrompt(String sPrompt){
     this.sPrompt = sPrompt;
-    if(wdgImpl !=null){
+    if(_wdgImpl !=null){
       dyda.setChanged(GraphicImplAccess.chgPrompt);
       repaint();
     } else {
@@ -143,7 +143,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   public void setPrompt(String sPrompt, String sPromptPos){
     this.sPrompt = sPrompt;
     this.sPromptStylePosition = sPromptPos;
-    if(wdgImpl !=null){
+    if(_wdgImpl !=null){
       throw new IllegalStateException("setPrompt(prompt, style) can only applied on creation, use setPrompt(text) to change the prompt.");
     }
   }
@@ -435,7 +435,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     dyda.textFont = font;
     dyda.textColor = color;
     dyda.setChanged(GralWidget.ImplAccess.chgColorText);
-    if(wdgImpl !=null){
+    if(_wdgImpl !=null){
       repaint();
     }
   }

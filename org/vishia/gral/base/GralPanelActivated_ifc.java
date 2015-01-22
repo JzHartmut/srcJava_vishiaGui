@@ -1,5 +1,6 @@
 package org.vishia.gral.base;
 
+import java.util.List;
 import java.util.Queue;
 
 
@@ -48,6 +49,6 @@ public interface GralPanelActivated_ifc
 	 * @param widgets Information about all widgets in this panel, which should be updated 
 	 *        with correct values for example with data of a running process.
 	 * */
-	void panelActivatedGui(Queue<GralWidget> widgets);
+	void panelActivatedGui(List<GralWidget> widgets);
 	
 }

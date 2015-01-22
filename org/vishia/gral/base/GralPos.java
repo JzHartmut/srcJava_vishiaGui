@@ -363,6 +363,47 @@ public class GralPos implements Cloneable
 
   
   
+  /**Sets the position to the given panel as container.
+   * @param panel The panel which is used as container. Its current {@link GralPanelContent#pos()} is used for relative positions
+   * @param line The line. If the parameter lineEndOrSize is designated with {@link #size} with a negative value,
+   *   it is the bottom line for the position. 
+   *   If it is designated with {@link #same} without offset and the lineEndOrSize is designated with {@link #size} 
+   *   with a negative value, the framePos {@link GralPos#y.p2} is used. If it is designated
+   *   with {@link #same} but with any offset, the {@link GralPos#y} is used as refer position, it is the top line position.
+   *   Elsewhere it is the top position.
+   * 
+   * @param lineEndOrSize Maybe designated with {@link #size} or {@link #samesize}
+   * @param column
+   * @param columnEndOrSize
+   * @param origin
+   * @param direction
+   */
+  public void setPosition(GralPanelContent panel, float line, float lineEndOrSize, float column, float columnEndOrSize
+      , int origin, char direction, float border)
+  {
+    this.panel = panel;
+    int[] pos = new int[10];
+    frac(line, pos, 0);
+    frac(lineEndOrSize, pos, 2);
+    frac(column, pos, 4);
+    frac(columnEndOrSize, pos, 6);
+    frac(border, pos, 8);
+    setFinePosition(pos[0], pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], pos[7], origin, direction, pos[8], pos[9], panel.pos());
+    /*
+    int y1 = (int)(line);
+    int y1f = frac(y1, line);
+    int y2 = (int)(lineEndOrSize);
+    int y2f = frac(y2, lineEndOrSize);
+    int x1 = (int)(column);
+    int x1f = frac(x1, column);  
+    int x2 = (int)(columnEndOrSize);
+    int x2f = frac(x2, columnEndOrSize); 
+    setFinePosition(y1, y1f, y2, y2f, x1, x1f, x2, x2f, origin, direction, framePos);
+    */
+  }
+
+  
+  
   
   /**Sets the position
    * @param framePos The frame or last pos for relative positions.
@@ -420,6 +461,9 @@ public class GralPos implements Cloneable
   }
 
 
+  
+  
+  
   public void setPosition(GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
     , int origin, char direction)
   {
