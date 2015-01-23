@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.event.EventThreadIfc;
 import org.vishia.event.EventTimeout;
-import org.vishia.event.EventTimeOrderBase;
+import org.vishia.event.EventTimeOrder;
 import org.vishia.event.EventThread;
 import org.vishia.util.Assert;
 import org.vishia.util.MinMaxTime;

@@ -7,7 +7,7 @@ import java.util.List;
 import org.vishia.event.EventCmdPingPongType;
 import org.vishia.event.EventConsumer;
 import org.vishia.event.EventSource;
-import org.vishia.event.EventTimeOrderBase;
+import org.vishia.event.EventTimeOrder;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.fileRemote.FileRemoteCallback;
@@ -792,8 +792,9 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
         new FileRemoteProgressTimeOrder("showFilesProcessing", main._gralMng.gralDevice.orderList(), 100) 
     {
       @Override public void executeOrder() { 
+        System.out.println("showFilesProcessing");
         showCurrentProcessedFileAndDir(this); //this.currFile, this.nrFilesProcessed, this.bDone); 
-        this.currFile = null;  //to invoke second time.
+        //this.currFile = null;  //to invoke second time.
       }
     };
   }  

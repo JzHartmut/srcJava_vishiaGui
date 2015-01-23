@@ -42,7 +42,6 @@ public class HelloWorld
     {
       gralMng.setPosition(4, -2, 2, -2, 0, 'd');
       gralMng.addText("Hello World");
-      countExecution();
       //
       //GralTextField input = new GralTextField();
   } };

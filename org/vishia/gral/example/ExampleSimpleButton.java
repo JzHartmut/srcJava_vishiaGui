@@ -192,11 +192,6 @@ public class ExampleSimpleButton
       //The columns are dedicated with 0 (left) and 0 (from right). It means the full window width.
       gui.gralMng.setPosition(-10, 0, 0, 0, 0, '.');
       gui.widgOutput = gui.gralMng.addTextBox("outputText", true, null, '.');
-      //counts its execution because await...() is called for it.
-      countExecution();
-      //remove itself, it should be executed only one time.
-      countExecution();
-      //gui.gralMng.gralDevice.removeDispatchListener(this);
     }
   };
 

@@ -191,7 +191,6 @@ public class GralColorShow
       wdgTest2.setToPanel(gralMng);
       wdgTest1.setText("ABC");
       wdgTest2.setText("XYZ");
-      countExecution();
       //
       /*
       GralTextField[][] colorGen = new GralTextField[11][24];

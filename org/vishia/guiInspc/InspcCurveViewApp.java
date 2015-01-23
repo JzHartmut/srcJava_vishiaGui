@@ -50,7 +50,6 @@ public class InspcCurveViewApp
     @Override public void executeOrder()
     {
       curveView.buildGraphicInCurveWindow(null);
-      countExecution();
       //
   } };
   

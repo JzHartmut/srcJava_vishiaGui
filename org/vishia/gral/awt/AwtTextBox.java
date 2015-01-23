@@ -101,8 +101,6 @@ public class AwtTextBox extends GralTextBox
         viewTrail();
         newText.setLength(0);
       }
-      countExecution();
-      //windowMng.removeDispatchListener(this);
     }
   };
   

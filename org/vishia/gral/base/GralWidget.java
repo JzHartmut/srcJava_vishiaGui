@@ -1348,7 +1348,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       if(itsMng.currThreadIsGraphic()){
         repaintGthread();     //do it immediately if no thread switch is necessary.
       } else {
-        repaintRequ.addToList(itsMng.gralDevice().orderList(), repaintDelay);  //TODO repaintDelayMax
+        repaintRequ.activateAt(System.currentTimeMillis() + repaintDelay);  //TODO repaintDelayMax
       }
     }
   }
@@ -1363,7 +1363,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       if(delay == 0 && itsMng.currThreadIsGraphic()){
         repaintGthread();
       } else {
-        repaintRequ.addToList(itsMng.gralDevice().orderList(), delay);
+        long time = System.currentTimeMillis();
+        repaintRequ.activateAt(time + delay, time + latest);
       }
     }
   }
