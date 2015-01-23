@@ -6,8 +6,10 @@ import org.vishia.event.EventConsumer;
 import org.vishia.event.EventTimeOrderBase;
 
 
-/**This is the base class for user classes, which contains code, that is executed in the graphic thread,
- * any-time when any graphic dispatching occurs. Especially it is used for SWT.  
+/**This is the base class for user classes, which contains code, that should be executed in the graphic thread,
+ * any-time when any graphic dispatching occurs. Especially it is used for SWT.
+ * Override the method {@link #executeOrder()}!
+ *   
  * @author Hartmut Schorrig.
  *
  */
@@ -86,9 +88,25 @@ public abstract class GralGraphicTimeOrder extends EventTimeOrderBase
   
   
 
-  public GralGraphicTimeOrder(String name)
-  { super(name, new EnqueueInGraphicThread());
+  /**Super constructor for all graphic time orders.
+   * Usual a anonymous class is used for the instance: <pre>
+  private final GralGraphicTimeOrder repaintRequ = new GralGraphicTimeOrder("GralWidget.repaintRequ"){
+    QOverride public void executeOrder() {
+      repaintGthread();
+    }
+    QOverride public String toString(){ return name + ":" + GralWidget.this.name; }
+  };
+   * </pre>  
+   * @param name The name is only used for showing in debugging.
+   */
+  protected GralGraphicTimeOrder(String name)
+  { super(name, new EnqueueInGraphicThread(), GralMng.get().gralDevice.orderList);
   }
   
 
+  /**This package private routine is invoked only in the graphic thread. It calls {@link #doExecute()}
+   * which is protected in the super class. */
+  void doExecuteInGraphicThread(){ super.doExecute(); }
+  
+  
 }

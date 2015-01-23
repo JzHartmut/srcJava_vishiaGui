@@ -1540,24 +1540,14 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   public ImplAccess getImpl(){ return _wdgImpl; }
   
   
-  /**This callback worker calls the {@link #repaintGthread()} if it is invoked in the graphical thread.
+  /**This time order calls the {@link #repaintGthread()} in the graphical thread.
    * It is used with delay and wind up whenever {@link #repaint(int, int)} with an delay is called.
-   * If its callback method was run, it is dequeued till the next request of {@link #repaint()}.
+   * If its executeOrder() runs, it is dequeued from timer queue in the {@link GralGraphicThread} 
+   * till the next request of {@link #repaint(int, int)} or {@link #repaint()}.
    */
   private final GralGraphicTimeOrder repaintRequ = new GralGraphicTimeOrder("GralWidget.repaintRequ"){
     @Override public void executeOrder() {
-      //first remove from queue to force add new, if a new request is given.
-      //thread safety: If a new request is given, it is not add yet, because it isn't execute.
-      removeFromList(itsMng.gralDevice().orderList());
-      //now a new request will be added.
-      try{ repaintGthread();
-      
-      } catch(Throwable exc){
-        System.out.println(Assert.exceptionInfo("GralWidget - unexpected Exception; ", exc, 0, 7));
-        exc.printStackTrace(System.err);
-        //NOTE: removeFromQueue should invoked on exception too.
-      }
-      countExecution();
+      repaintGthread(); //Note: exception thrown in GralGraphicThread
     }
     @Override public String toString(){ return name + ":" + GralWidget.this.name; }
   };

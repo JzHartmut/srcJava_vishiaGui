@@ -243,6 +243,10 @@ public class GralGraphicThread implements EventThreadIfc, Runnable
   public EventThread orderList(){ return orderList; }
   
   @Override public void addTimeOrder(EventTimeout order){ orderList.addTimeOrder(order); }
+  
+  @Override public boolean removeTimeOrder(EventTimeout order){ return orderList.removeTimeOrder(order); }
+  
+  
   public void addDispatchOrder(GralGraphicTimeOrder order){ orderList.addTimeOrder(order); }
 
   //public void removeDispatchListener(GralDispatchCallbackWorker listener){ orderList.removeTimeOrder(listener); }
@@ -332,17 +336,17 @@ public class GralGraphicThread implements EventThreadIfc, Runnable
         //if wakeUp() is called, isWakedUpOnly is set.
         checkTimes.cyclTime();
         //execute stored orders.
-        EventTimeOrderBase order;
+        GralGraphicTimeOrder order;
         boolean bSleep = true;
         while( (order = queueOrdersToExecute.poll()) !=null) {
-          try{
-            order.stateOfEvent = 'r';
-            order.execute();
-            order.relinquish();
-          } catch(Exception exc){
-            System.err.println("GralGraphicThread-" + exc.getMessage());
-            exc.printStackTrace();
+          order.stateOfEvent = 'r';
+          try{ 
+            order.doExecuteInGraphicThread();  //calls EventIimeOrderBase.doExecute() with enqueue
+          } catch(Throwable exc){
+            CharSequence excText = Assert.exceptionInfo("GralGraphicThread - unexpected Exception; ", exc, 0, 99);
+            System.err.append(excText);  //contains the stack trace in one line, up to 99 levels.
           }
+          order.relinquish();
           bSleep = false;
         }
         if(bSleep){ //if any order is executed, don't sleep yet because some os events may forced therefore. Dispatch it!
