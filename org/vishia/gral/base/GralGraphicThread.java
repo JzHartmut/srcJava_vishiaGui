@@ -115,7 +115,7 @@ import org.vishia.util.MinMaxTime;
  * @author Hartmut Schorrig
  *
  */
-public class GralGraphicThread implements EventThreadIfc, Runnable
+public class GralGraphicThread implements Runnable
 {
   
   /**Version and history:
@@ -217,7 +217,7 @@ public class GralGraphicThread implements EventThreadIfc, Runnable
   /**Stores an event in the queue, able to invoke from any thread.
    * @param ev
    */
-  @Override public void storeEvent(EventObject ev){
+  /*package private*/ void storeEvent(EventObject ev){
     if(ev instanceof GralGraphicTimeOrder) { 
       queueOrdersToExecute.add((GralGraphicTimeOrder)ev);
       impl.wakeup();
@@ -227,27 +227,18 @@ public class GralGraphicThread implements EventThreadIfc, Runnable
   }
 
   
-  /**Removes this event from its queue if it is in the queue.
-   * If the element is found in the queue, it is designated with stateOfEvent = 'a'
-   * @param ev
-   * @return true if found.
-   */
-  @Override public boolean removeFromQueue(EventObject ev){
-    assert(ev instanceof GralGraphicTimeOrder);
-    return ((GralGraphicTimeOrder)ev).removeFromQueue()
-        || queueOrdersToExecute.remove(ev);
-  }
-
-  
   
   public EventThread orderList(){ return orderList; }
   
-  @Override public void addTimeOrder(EventTimeout order){ orderList.addTimeOrder(order); }
   
-  @Override public boolean removeTimeOrder(EventTimeout order){ return orderList.removeTimeOrder(order); }
-  
-  
-  public void addDispatchOrder(GralGraphicTimeOrder order){ orderList.addTimeOrder(order); }
+  /**Adds the order to execute in the graphic dispatching thread.
+   * It is the same like order.{@link GralGraphicTimeOrder#activate()}.
+   * @param order
+   */
+  public void addDispatchOrder(GralGraphicTimeOrder order){ 
+    order.activate();
+    //orderList.addTimeOrder(order); 
+  }
 
   //public void removeDispatchListener(GralDispatchCallbackWorker listener){ orderList.removeTimeOrder(listener); }
 

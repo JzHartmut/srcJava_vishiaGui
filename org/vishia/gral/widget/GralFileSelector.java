@@ -1366,8 +1366,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
       //System.out.println("callbackChildren");
     }
     
-    @Override public String getStateInfo(){ return "no-state"; }
-
     @Override public String toString(){ return "GralFileSelector - callback fillin"; }
 
   };

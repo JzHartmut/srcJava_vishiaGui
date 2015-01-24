@@ -38,6 +38,7 @@ import org.vishia.gral.ifc.GralWindowMng_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.gral.widget.GralLabel;
+import org.vishia.mainCmd.MainCmdLoggingStream;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Assert;
@@ -480,7 +481,12 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
 
   /**Returns the singleton or null if the GralMng is not instantiated yet.*/
-  public static GralMng get(){ return singleton; }
+  public static GralMng get(){ 
+    if(singleton == null) { //not initialized yet, early invocation:
+      singleton = new GralMng(new MainCmdLoggingStream(System.out));
+    }
+    return singleton; 
+  }
   
   
   public void setProperties(GralGridProperties props) {

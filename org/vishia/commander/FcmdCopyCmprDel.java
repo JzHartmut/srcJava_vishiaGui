@@ -1461,8 +1461,6 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     }
     @Override public String toString(){ return "FcmdCopy-success"; }
 
-    @Override public String getStateInfo(){ return "no-state"; }
-
     
   };
 

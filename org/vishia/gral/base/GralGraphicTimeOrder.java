@@ -66,25 +66,20 @@ public abstract class GralGraphicTimeOrder extends EventTimeOrder
   
   private static final long serialVersionUID = 1L;
 
+  /**To create the instance for the EventConsumer to enqueue time orders in the graphic thread queue.
+   * NOTE: class is need, not an anonymous instance, because initialization in super(..., new Enqueu...)
+   */
   private static class EnqueueInGraphicThread implements EventConsumer {
-
     @Override public int processEvent(EventObject ev)
-    {
-      //the manager is known application global
+    { //the manager is known application global
       GralMng mng = GralMng.get();  //the singleton.
       if(mng !=null) {
         mng.gralDevice().storeEvent(ev);
       }
-      return 1;
+      return mEventConsumed;
     }
 
-    @Override public String getStateInfo()
-    {
-      // TODO Auto-generated method stub
-      return "";
-    }
-    
-  }
+  };
   
   
 

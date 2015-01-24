@@ -435,9 +435,7 @@ public class FcmdFileProps
       return 1;
     } 
   
-    @Override public String getStateInfo(){ return "no-state"; }
-
-    @Override public String toString(){ return "FcmdFileProps-callbackChgProps"; }
+     @Override public String toString(){ return "FcmdFileProps-callbackChgProps"; }
 
   };
 
@@ -472,8 +470,6 @@ public class FcmdFileProps
       return 1;
     } 
   
-    @Override public String getStateInfo(){ return "no-state"; }
-
     @Override public String toString(){ return "FcmdFileProps - callback cnt length"; }
 
   };

@@ -219,9 +219,7 @@ public class FcmdDelete
       return 1;
     }
 
-    @Override public String getStateInfo(){ return "no-state"; }
-
-    @Override public String toString(){ return "FcmdDelete - success"; }
+     @Override public String toString(){ return "FcmdDelete - success"; }
 
   };
   
