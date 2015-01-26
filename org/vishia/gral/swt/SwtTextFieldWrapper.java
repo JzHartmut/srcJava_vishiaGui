@@ -458,6 +458,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
       }
       if(key != KeyCode.enter && KeyCode.isWritingOrTextNavigationKey(key)){
         bDone = true;
+        setTouched();
       } else {
         boolean bUserOk;
         GralTextFieldUser_ifc user = user();

@@ -171,6 +171,14 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2015-01-27 Hartmut new: {@link DynamicData#bTouchedField}, {@link ImplAccess##setTouched()} especially for a text field
+   *   if any editing key was received. Then the GUI-operator may mark a text or make an input etc. The setting of the text
+   *   from a cyclically thread should be prevented then to prevent disturb the GUI-operation. If the focus was lost then this bit
+   *   is reseted. It is an important feature for GUI-handling which was missed up to now. 
+   *   Yet only used for {@link GralTextField#setText(CharSequence, int)}. It may prevent repaint for universally usage for all widgets.
+   * <li>2015-01-27 Hartmut new: method {@link #getVariable(VariableContainer_ifc)} instead {@link #getVariableFromContentInfo(VariableContainer_ifc)}.
+   *   The last one method is used in an application but it does not run well for all requirements. The code of {@link #getVariable(VariableContainer_ifc)}
+   *   is copied from the well tested {@link #refreshFromVariable(VariableContainer_ifc)} as own routine and then used in a new application.    
    * <li>2014-01-15 Hartmut new: {@link #getCmd(int)} with options.
    * <li>2014-01-03 Hartmut new: {@link #isInFocus()} 
    * <li>2013-12-21 Hartmut chg: {@link #repaint()} invokes redraw immediately if it is in graphic thread.
@@ -473,16 +481,6 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   protected boolean bShouldInitialize = true;
   
   
-  /**Set to true from any listener of the implementation level if the data of the widget was changed from GUI handling.
-   * If the data are changed from any Gral method invocation, this bit should not set to true.
-   * For example a key listener changes the content of a text edit field, then this bit should be set.
-   * This bit should be cleared if the GUI-content of the widget is synchronized with the widget data cells. 
-   * Note that the GUI-content of a widget can be changed only in the GUI thread, whereby the content of the 
-   * {@link #dyda} can be read and write in any threat. This bit helps to synchronize. */
-  protected boolean bTextChanged;
-  
-
-
   /**Delay to repaint.
    * 
    */
@@ -530,6 +528,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       } while(!bOk && --catastrophicalCount >= 0);
     }
     
+    
     /**Three colors for background, line and text should be convert to the platforms color and used in the paint routine. 
      * If this elements are null, the standard color should be used. */
     public GralColor backColor = GralColor.getColor("wh"), backColorNoFocus = GralColor.getColor("lgr")
@@ -551,6 +550,19 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     public Object userData;
     
     public float[] fValues;
+
+    /**Set to true from any listener of the implementation level if the cursor in the widget is moved or such GUI handling.
+     * Then the content won't be overridden by {@link #setText(CharSequence)} furthermore till the focus is left.
+     */
+    protected boolean bTouchedField;
+
+    /**Set to true from any listener of the implementation level if the data of the widget was changed from GUI handling.
+     * If the data are changed from any Gral method invocation, this bit should not set to true.
+     * For example a key listener changes the content of a text edit field, then this bit should be set.
+     * This bit should be cleared if the GUI-content of the widget is synchronized with the widget data cells. 
+     * Note that the GUI-content of a widget can be changed only in the GUI thread, whereby the content of the 
+     * {@link #dyda} can be read and write in any threat. This bit helps to synchronize. */
+    protected boolean bTextChanged;
   }
   
   
@@ -946,7 +958,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @param container The container where all {@link VariableAccess_ifc} should be found.
    * @return The access to a user variable in the user's context, null if the data path is empty.
    */
-  public VariableAccess_ifc getVariableFromContentInfo(VariableContainer_ifc container)
+  @Deprecated public VariableAccess_ifc getVariableFromContentInfo(VariableContainer_ifc container)
   {
     //DBbyteMap.Variable variable;
     VariableAccess_ifc variable;
@@ -970,6 +982,35 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   }
   
 
+  
+  public VariableAccess_ifc getVariable(VariableContainer_ifc container) {
+    
+    if(variable ==null && variables == null && sDataPath !=null && !sDataPath.startsWith("#")){ //no variable known, get it.
+      if(sDataPath.contains(",")){
+        String[] sDataPaths = sDataPath.split(",");
+        variables = new LinkedList<VariableAccess_ifc>();
+        for(String sPath1: sDataPaths){
+          if(sPath1.contains("["))
+            stop();
+          String sPath2 = sPath1.trim();
+          String sPath = itsMng.replaceDataPathPrefix(sPath2);
+          VariableAccess_ifc variable1 = container.getVariable(sPath);
+          if(variable1 !=null){
+            variables.add(variable1);
+          }
+        }
+      } else {
+        if(sDataPath.contains("["))
+          stop();
+        String sPath2 = sDataPath.trim();
+        String sPath = itsMng.replaceDataPathPrefix(sPath2);
+        variable = container.getVariable(sPath);
+      }
+    }
+    if(variable !=null) return variable;
+    if(variables !=null && variables.size() >0) return variables.get(0);
+    else return null;
+  }
   
   
   @Override public void refreshFromVariable(VariableContainer_ifc container){
@@ -1001,28 +1042,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     //
     //check and search the variable(s):
     //
-    if(variable ==null && variables == null && sDataPath !=null && !sDataPath.startsWith("#")){ //no variable known, get it.
-      if(sDataPath.contains(",")){
-        String[] sDataPaths = sDataPath.split(",");
-        variables = new LinkedList<VariableAccess_ifc>();
-        for(String sPath1: sDataPaths){
-          if(sPath1.contains("["))
-            stop();
-          String sPath2 = sPath1.trim();
-          String sPath = itsMng.replaceDataPathPrefix(sPath2);
-          VariableAccess_ifc variable1 = container.getVariable(sPath);
-          if(variable1 !=null){
-            variables.add(variable1);
-          }
-        }
-      } else {
-        if(sDataPath.contains("["))
-          stop();
-        String sPath2 = sDataPath.trim();
-        String sPath = itsMng.replaceDataPathPrefix(sPath2);
-        variable = container.getVariable(sPath);
-      }
-    }
+    getVariable(container);
     //
     //
     //
@@ -1150,9 +1170,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   @Override public boolean isChanged(boolean setUnchanged){ 
-    boolean bChanged = this.bTextChanged;
+    boolean bChanged = dyda.bTextChanged;
     if(setUnchanged){ 
-      this.bTextChanged = false; 
+      dyda.bTextChanged = false; 
     }
     return bChanged; 
   }
@@ -1487,7 +1507,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     
     //public void setWidgetImpl(GralWidgImpl_ifc widg, GralMng mng){ widgg.wdgImpl = widg; widgg.itsMng = mng; }
 
-    protected void setTextChanged(){ widgg.bTextChanged = true; }
+    protected void setTextChanged(){ widgg.dyda.bTextChanged = true; }
+    
+    /**Invoked on touching a widget. */
+    protected void setTouched(){ widgg.dyda.bTouchedField = true; }
     
     
     /**Implementation routine to set receiving a drag event and initializes the drag feature of the widget.
@@ -1526,6 +1549,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     
     public static void setFocused(GralWidget widgg, boolean focus){
       widgg.bHasFocus = focus;
+      if(focus == false) { widgg.dyda.bTouchedField = false; }
     }
   }
   

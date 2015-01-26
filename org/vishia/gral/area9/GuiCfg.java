@@ -232,6 +232,7 @@ public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui
   guiAccess = _gralMng;
   userInit();
   //panelContent = new PanelContent(user);
+  
   if(user !=null){
     user.registerMethods(panelBuildIfc);
   }

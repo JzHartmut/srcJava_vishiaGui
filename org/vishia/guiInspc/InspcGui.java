@@ -8,6 +8,7 @@ import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileRemote;
@@ -18,6 +19,7 @@ import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralPos;
+import org.vishia.gral.base.GralShowMethods;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
@@ -39,7 +41,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 {
 
   /**Version, history and license
-   * <ul>
+   * <ul>2015-01-27 Hartmut new: Now initialized the {@link GralShowMethods} for usage on edit fields. An edit field
+   *   can use the {@link GralShowMethods#syncVariableOnFocus} if the text was changed. 
+   *   It invokes {@link VariableAccess_ifc#setString(String)} which changed the content of the variable on their target.
    * <li>2012-08-10 Hartmut A default directory for curve config files given with argument "-dirCurves=".
    * <li>2012-04-17 Hartmut new: Parameter {@link CallingArguments#bUseGetValueByIndex} for downward compatibility
    * 
@@ -57,7 +61,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
    * <li> You can redistribute copies of this source to everybody.
    * <li> Every user of this source, also the user of redistribute copies
    *    with or without payment, must accept this license for further using.
-   * <li> But the LPGL ist not appropriate for a whole software product,
+   * <li> But the LPGL is not appropriate for a whole software product,
    *    if this source is only a part of them. It means, the user
    *    must publish this part of source,
    *    but don't need to publish the whole source of the own product.
@@ -71,8 +75,8 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  @SuppressWarnings("hiding")
-  public final static int version = 20120417;
+  //@SuppressWarnings("hiding")
+  public final static String version = "2015-01-27";
   
   private final List<CompleteConstructionAndStart> composites = new LinkedList<CompleteConstructionAndStart>();
   
@@ -192,6 +196,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     InspcMng variableMng = new InspcMng(cargs.sOwnIpcAddr, cargs.indexTargetIpcAddr, cargs.bUseGetValueByIndex, (InspcPlugUser_ifc)user);
     composites.add(variableMng);
     this.inspcMng = variableMng;
+    (new GralShowMethods(variableMng)).registerShowMethods(cmdgui.gralMng);
     variableMng.setCallbackOnReceivedData(callbackOnReceivedData);
     variableMng.setCallbackShowingState(callbackShowTargetCommState);
     

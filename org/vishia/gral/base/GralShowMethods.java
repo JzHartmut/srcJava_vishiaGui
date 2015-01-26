@@ -153,7 +153,7 @@ public class GralShowMethods
   /**This userAction can be used by name (calling {@link #addFocusAction(String, GralUserAction, String, String)} 
    * to set a variable when an input field is leaved.
    */
-  private final GralUserAction syncVariableOnFocus = new GralUserAction("syncVariableOnFocus")
+  public final GralUserAction syncVariableOnFocus = new GralUserAction("syncVariableOnFocus")
   { /**Writes the value to the named variable on leaving the focus.
      * The name of the variable is contained in the {@link GralWidget}.
      * @see org.vishia.gral.ifc.GralUserAction#userActionGui(java.lang.String, org.vishia.gral.base.GralWidget, java.lang.Object[])
@@ -161,7 +161,7 @@ public class GralShowMethods
     @Override public boolean exec(int actionCode, GralWidget_ifc widgi, Object... params)
     {
       GralWidget widg = (GralWidget)widgi;
-      final VariableAccess_ifc variable = widg.getVariableFromContentInfo(variableContainer);
+      final VariableAccess_ifc variable = widg.getVariable(variableContainer);
       if(variable !=null){
         if(actionCode == KeyCode.focusGained){
           widg.setText(variable.getString());
@@ -174,7 +174,9 @@ public class GralShowMethods
           //if(oWidget instanceof Text){ sValue = variable.getString(); ((Text)oWidget).setText(sValue == null ? "" : sValue); }
           //else { sValue = null; }
         } //else throw new IllegalArgumentException("GralMng.syncVariableOnFocus: unexpected intension on focus: " + actionCode); 
-      } else throw new IllegalArgumentException("GralMng.syncVariableOnFocus: variable not found: " + widg.getDataPath()); 
+      } else {
+        throw new IllegalArgumentException("GralMng.syncVariableOnFocus: variable not found: " + widg.getDataPath()); 
+      }
       return true;
     }
   };

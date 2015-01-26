@@ -1,9 +1,11 @@
 package org.vishia.gral.cfg;
 
+import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
@@ -14,7 +16,9 @@ public class GralCfgDesigner
 {
   
   /**Version, history and license.
-   * <ul>
+   * <ul>2015-27-01 Hartmut new: Now a text field can be set editable. Usage of a boolean {@link GralCfgData#editable} 
+   * instead changing the type of a text field from 'S' to 'T', but in {@link GralCfgWriter#writeShowField(org.vishia.gral.cfg.GralCfgData.GuiCfgShowField)}
+   *  it is written as a "InputTextline(...". It means next read of the config reads it as editable. 
    * <li>2011-12-03 Hartmut chg: Now the current widget is stored by left-mouse-release in the field
    *   {@link #widggForDialog}. Editing of Led works. sFormat is regarded. 
    * <li>2011-09-30 Hartmut chg: rename pressedRightMouseDownForDesign(...) to {@link #editFieldProperties(GralWidget, GralRectangle)}.
@@ -47,7 +51,7 @@ public class GralCfgDesigner
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public final int version = 20110930;
+  public static final String version = "2015-01-27";
   
   protected final LogMessage log;
 
@@ -63,6 +67,8 @@ public class GralCfgDesigner
   GralWidget dialogFieldName, dialogFieldDatapath, dialogFieldText, dialogFieldFormat
     , dialogFieldShow, dialogFieldAction, dialogFieldPrompt, dialogFieldPromptPos 
     , dialogFieldLine, dialogFieldColumn, dialogFieldHeight, dialogFieldWidth;
+  
+  GralButton dialogBtnEditable;
   
   private GralWidget dialogButtonOk, dialogButtonEsc;
   
@@ -115,6 +121,7 @@ public class GralCfgDesigner
     //mng.addText(" x ", 'B', 0);
     dialogFieldWidth = mng.addTextField("width", true, "size-x", "t");
     dialogFieldPromptPos = mng.addTextField("promptPos", true, "promptPos", "t");
+    dialogBtnEditable = mng.addSwitchButton("editable", "view", "edit", GralColor.getColor("wh"), GralColor.getColor("or"));
     mng.setPositionSize(25, 2, 3, 8, 'r');
     dialogButtonEsc = mng.addButton("esc", actionEsc, null, null, "esc");
     dialogButtonOk = mng.addButton("del", actionDel, null, null, "del");
@@ -209,6 +216,7 @@ public class GralCfgDesigner
         dialogFieldColumn.setText( sColumn);
         dialogFieldHeight.setText( sHeight);
         dialogFieldWidth.setText( sWidth);
+        dialogBtnEditable.setValue(cfge.widgetType.editable ? 1 : 0);
       } else {
         dialogFieldName.setText( "ERROR cfge");
       }
@@ -236,6 +244,7 @@ public class GralCfgDesigner
         String sColumn = dialogFieldColumn.getValue();
         String sWidth = dialogFieldWidth.getValue();
         String sHeight = dialogFieldHeight.getValue();
+        boolean editable = dialogBtnEditable.isOn();
         
         GralCfgElement cfge = (GralCfgElement)widgdInDialog.getCfgElement();
         if(cfge !=null){
@@ -245,6 +254,10 @@ public class GralCfgDesigner
           if(sText.trim().length() >0) { cfge.widgetType.text = sText; }
           if(sFormat.trim().length() >0) { cfge.widgetType.format = sFormat; }
           */
+          cfge.widgetType.editable = editable;
+          if(editable && cfge.widgetType.userAction == null) {
+            cfge.widgetType.userAction = "syncVariableOnFocus";
+          }
           cfge.widgetType.name = sName.trim().length() >0 ? sName : null;
           cfge.widgetType.data = sDataPath.trim().length() >0 ? sDataPath : null;
           cfge.widgetType.text = sText.trim().length() >0 ? sText : null;

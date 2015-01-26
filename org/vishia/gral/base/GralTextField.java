@@ -386,7 +386,8 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     if(  dyda.displayedText == null   //set the text if no text is stored. Initially!
       //|| !bTextChanged                 //don't set the text if it is changed by user yet.  
          //&& 
-        || (!StringFunctions.equals(dyda.displayedText,arg) || caretPos != this.caretPos)  //set the text only if it is changed.
+        || (  !dyda.bTouchedField  //don't change the text if the field is in focus and anything was moved. Either any copy to clipboard is pending, or it is in editing. 
+           && !StringFunctions.equals(dyda.displayedText,arg) || caretPos != this.caretPos)  //set the text only if it is changed. Prevent effort.
       ){                               //prevent invocation of setText() on non changed values to help move cursor, select etc.
       dyda.displayedText = arg.toString();
       this.caretPos = caretPos;

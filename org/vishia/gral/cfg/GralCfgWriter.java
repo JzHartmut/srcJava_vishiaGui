@@ -12,6 +12,9 @@ public class GralCfgWriter
   
   /**Version and history
    * <ul>
+   * <ul>2015-27-01 Hartmut new: Now a text field can be set editable. Usage of a boolean {@link GralCfgData#editable} 
+   *  instead changing the type of a text field from 'S' to 'T', but in {@link GralCfgWriter#writeShowField(org.vishia.gral.cfg.GralCfgData.GuiCfgShowField)}
+   *  it is written as a "InputTextline(...". It means next read of the config reads it as editable. 
    * <li>2011-06-00 Hartmut created, 
    * </ul>
    *
@@ -38,7 +41,7 @@ public class GralCfgWriter
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120303;
+  public static final String version = "2015-01-27";
 
   
   final LogMessage log;
@@ -141,7 +144,11 @@ public class GralCfgWriter
   
   void writeShowField(GralCfgData.GuiCfgShowField ee) throws IOException
   { //String sep = "";
-    writer.append("Show(");
+    if(ee.editable){
+      writer.append("InputTextline(");
+    } else {
+      writer.append("Show(");
+    }
     writeParam(ee);
     writer.append("); ");
   }

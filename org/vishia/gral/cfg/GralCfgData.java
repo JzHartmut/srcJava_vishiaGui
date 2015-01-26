@@ -99,7 +99,8 @@ public final class GralCfgData
     /**See {@link org.vishia.gral.base.GralWidget#whatIs}. */
     final char whatIs;
 
-
+    public boolean editable;
+    
     /**From ZBNF-parser param::=<?> ...name = <""?name> etc. values are set if it is parsed. */
     public String name, text, cmd, userAction, data, showMethod, format, type, prompt, promptPosition, help;
     

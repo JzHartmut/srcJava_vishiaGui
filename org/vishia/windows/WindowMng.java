@@ -17,7 +17,7 @@ public class WindowMng
     //NOTE: it isn't used currently, the dll doesn't exists.
 		File fileDll = new File("exe/windowMng.dll");
     if(fileDll.exists()){
-		  System.load(fileDll.getAbsolutePath());
+		  //System.load(fileDll.getAbsolutePath());
     }
 		
 	}

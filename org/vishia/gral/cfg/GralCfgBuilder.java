@@ -236,7 +236,7 @@ public class GralCfgBuilder
       //GuiCfgData.GuiCfgShowField wShow = (GuiCfgData.GuiCfgShowField)cfge.widgetType;
       //char cPromptPosition = cfge.widgetType.promptPosition ==null || cfge.widgetType.promptPosition.length() <1 
       //                     ? '.' :  cfge.widgetType.promptPosition.charAt(0);
-      widgd = gralMng.addTextField(sName, false, cfge.widgetType.prompt, cfge.widgetType.promptPosition);
+      widgd = gralMng.addTextField(sName, cfge.widgetType.editable, cfge.widgetType.prompt, cfge.widgetType.promptPosition);
       widgd.setDataPath(sDataPath);
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgInputFile){
       GralCfgData.GuiCfgInputFile widgt = (GralCfgData.GuiCfgInputFile)cfge.widgetType;
