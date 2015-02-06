@@ -332,7 +332,7 @@ public class GralGraphicThread implements Runnable
         while( (order = queueOrdersToExecute.poll()) !=null) {
           order.stateOfEvent = 'r';
           try{ 
-            order.doExecuteInGraphicThread();  //calls EventIimeOrderBase.doExecute() with enqueue
+            order.doExecute();  //calls EventIimeOrderBase.doExecute() with enqueue
           } catch(Throwable exc){
             CharSequence excText = Assert.exceptionInfo("GralGraphicThread - unexpected Exception; ", exc, 0, 99);
             System.err.append(excText);  //contains the stack trace in one line, up to 99 levels.

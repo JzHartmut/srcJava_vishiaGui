@@ -1344,6 +1344,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     String firstLine = new String(buffer,0, zBytes);
     if(firstLine.startsWith("csv-headline.curve;")){
       readCurveCsvHeadline(file);
+    } else if(firstLine.startsWith("CurveView-CSV version 150120")) {
+      readCurveCsvHeadline(file);
     }
     //timeLastSave = System.currentTimeMillis();
     

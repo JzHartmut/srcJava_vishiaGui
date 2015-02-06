@@ -6,9 +6,9 @@ import org.vishia.event.EventConsumer;
 import org.vishia.event.EventTimeOrder;
 
 
-/**This is the base class for user classes, which contains code, that should be executed in the graphic thread,
- * any-time when any graphic dispatching occurs. Especially it is used for SWT.
- * Override the method {@link #executeOrder()}!
+/**This is the base class for user classes, which contains code, that should be executed in the graphic thread.
+ * The method {@link #executeOrder()} should be overridden with the functionality which should be executed
+ * in the graphic thread before the system's dispatching routine starts.
  *   
  * @author Hartmut Schorrig.
  *
@@ -99,10 +99,6 @@ public abstract class GralGraphicTimeOrder extends EventTimeOrder
   }
   
 
-  /**This package private routine is invoked only in the graphic thread. It calls {@link #doExecute()}
-   * which is protected in the super class. */
-  void doExecuteInGraphicThread(){ super.doExecute(); }
-  
   
   /**Activates the graphic order to execute immediately as next call in the graphic thread. */
   public void activate(){
