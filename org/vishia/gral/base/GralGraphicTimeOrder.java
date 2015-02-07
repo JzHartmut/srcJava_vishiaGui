@@ -3,7 +3,7 @@ package org.vishia.gral.base;
 import java.util.EventObject;
 
 import org.vishia.event.EventConsumer;
-import org.vishia.event.EventTimeOrder;
+import org.vishia.event.TimeOrder;
 
 
 /**This is the base class for user classes, which contains code, that should be executed in the graphic thread.
@@ -13,7 +13,7 @@ import org.vishia.event.EventTimeOrder;
  * @author Hartmut Schorrig.
  *
  */
-public abstract class GralGraphicTimeOrder extends EventTimeOrder
+public abstract class GralGraphicTimeOrder extends TimeOrder
 {
   
   /**Version and history.

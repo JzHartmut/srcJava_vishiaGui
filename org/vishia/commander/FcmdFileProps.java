@@ -6,8 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EventObject;
 
-import org.vishia.event.EventCmdType;
-import org.vishia.event.EventCmdPingPongType;
+import org.vishia.event.EventCmdtype;
 import org.vishia.event.EventConsumer;
 import org.vishia.event.EventSource;
 import org.vishia.fileRemote.FileRemote;

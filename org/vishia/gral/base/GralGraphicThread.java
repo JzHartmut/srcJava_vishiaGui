@@ -4,10 +4,10 @@ package org.vishia.gral.base;
 import java.util.EventObject;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.vishia.event.EventThreadIfc;
+import org.vishia.event.EventTimerThread_ifc;
 import org.vishia.event.EventTimeout;
-import org.vishia.event.EventTimeOrder;
-import org.vishia.event.EventThread;
+import org.vishia.event.TimeOrder;
+import org.vishia.event.EventTimerThread;
 import org.vishia.util.Assert;
 import org.vishia.util.MinMaxTime;
 
@@ -196,7 +196,7 @@ public class GralGraphicThread implements Runnable
   private final ConcurrentLinkedQueue<GralGraphicTimeOrder> queueOrdersToExecute = new ConcurrentLinkedQueue<GralGraphicTimeOrder>();
 
   
-  EventThread orderList = new EventThread("GraphicOrderTimeMng"); //this);
+  EventTimerThread orderList = new EventTimerThread("GraphicOrderTimeMng"); //this);
 
   
   private ImplAccess impl;
@@ -228,7 +228,7 @@ public class GralGraphicThread implements Runnable
 
   
   
-  public EventThread orderList(){ return orderList; }
+  public EventTimerThread orderList(){ return orderList; }
   
   
   /**Adds the order to execute in the graphic dispatching thread.

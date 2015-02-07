@@ -12,8 +12,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.commander.Fcmd;
-import org.vishia.event.EventCmdType;
-import org.vishia.event.EventCmdPingPongType;
+import org.vishia.event.EventCmdtype;
 import org.vishia.event.EventConsumer;
 import org.vishia.event.EventSource;
 import org.vishia.fileRemote.FileAccessZip;
@@ -605,11 +604,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   
   
-  /**This event is used for callback of children of the current directory.
-   * It is invoked for some children at least for 300 ms.
-   * Its {@link EventConsumer} is {@link #callbackChildren}.
-   */
-  final FileRemote.ChildrenEvent evBackChildren;
   
   /**Set to true if a fillin is pending. */
   boolean fillinPending;
@@ -619,7 +613,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
   { //this.name = name; this.rows = rows; this.columns = columns; this.size = size;
     favorList = new GralTable(null, new int[]{15,0});
     selectList = new FileSelectList(this, name, rows, columns, size);
-    evBackChildren = new FileRemote.ChildrenEvent(callbackChildren, null, evSrc);
     colorBack = GralColor.getColor("wh");
     colorBackPending = GralColor.getColor("pma");
     //this.mainCmd = mainCmd;
@@ -914,8 +907,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
       widgdPathDir.setText(sCurrentDir, -1);
       sortOrderLast = sortOrder;
       ////
-      evBackChildren.depth = 1;
-      evBackChildren.filter = null;
       if(bDonotRefrehs) {
         //do not refresh, show given files.
         Map<String, FileRemote> files = dir.children();
@@ -931,10 +922,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
         //refresh it in an extra thread therefore show all lines with colorBackPending. 
         //Remove lines which remains the colorBackPending after refreshing.
         dir.refreshPropertiesAndChildren(callbackChildren1, false);
-      }
-      if(false && !dir.getChildren(evBackChildren)){
-        System.err.println("GralFileSelector - fillIn hangs;");
-        return;
       }
     }
   }
@@ -1006,30 +993,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
     fillinPending = false;
     
   }
-  
-  
-  /**Callback method if the file system offers one or some file after call of {@link #fillIn(FileRemote, boolean)}.
-   * This routine is executed in another thread than the graphic thread. The table will be filled,
-   * a refresh of the graphic presentation will be invoked with about 100 ms delay. 
-   * @param evBack The callback event.
-   * @return
-   */
-  protected int showfiles(FileRemote.ChildrenEvent evBack){
-    ////
-    FileRemote file1;
-    while((file1 = evBack.poll())!=null){
-      showFile(file1);
-      
-    }
-    if(evBack.isFinished()){
-      evBack.srcFile = null;  //it is free for reuse.
-      finishShowFileTable();
-    }
-    return 1;
-  }
-  
-  
-  
   
   
 
@@ -1350,24 +1313,6 @@ public class GralFileSelector implements Removeable //extends GralWidget
     @Override public boolean shouldAborted()
     { return false;
     }
-  };
-  
-  
-  /**This callback class fills the {@link GralFileSelector#selectList}.{@link GralSelectList#wdgdTable}
-   * with the results of a {@link FileRemote.ChildrenEvent}, see {@link GralFileSelector#evBackChildren}.
-   * Its {@link EventConsumer#processEvent(EventCmdPingPongType)} regards the sort, checks whether the line is present,
-   * removes unnecessary lines, sets the color of filled lines to {@link GralFileSelector#colorBack}.  
-   */
-  final EventConsumer callbackChildren = new EventConsumer(){
-    @Override public int processEvent(EventObject evP) {
-      ////
-      FileRemote.ChildrenEvent evBack = (FileRemote.ChildrenEvent)evP;
-      return showfiles(evBack);
-      //System.out.println("callbackChildren");
-    }
-    
-    @Override public String toString(){ return "GralFileSelector - callback fillin"; }
-
   };
   
   
