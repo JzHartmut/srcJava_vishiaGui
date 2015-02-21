@@ -2,6 +2,7 @@ package org.vishia.commander;
 
 import java.io.File;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EventObject;
@@ -108,7 +109,7 @@ public class FcmdFileProps
   
   public FcmdFileProps(Fcmd main)
   { this.main = main;
-    this.formatDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+    this.formatDate = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
     evChg = new FileRemote.CallbackEvent(evSrc, null, null, callbackChgProps, null, evSrc);
     evCntLen = new FileRemote.CallbackEvent(evSrc, null, null, callbackCntLen, null, evSrc);
   }
@@ -310,6 +311,14 @@ public class FcmdFileProps
         int noMask = 0;
         int val = 0; //actFileRemote.getFlags();
         int mask;
+        String sDate = widgDate.getText();
+        long date;
+        try{ 
+          Date date1 = formatDate.parse(sDate);
+          date = date1.getTime();
+        } catch(ParseException exc){
+          date = 0;
+        }
         if(bUnixSystem){
           mask = FileRemote.mCanRead | FileRemote.mCanWrite | FileRemote.mExecute;
         } else {
@@ -380,14 +389,14 @@ public class FcmdFileProps
           if(evChg.occupy(evSrc, callbackChgProps, null, true)){
             //cmds with callback
             widgChgFile.setText(main.idents.buttonFilePropsChanging);
-            actFile.chgProps(name, mask, val, 0, evChg);
+            actFile.chgProps(name, mask, val, date, evChg);
           } else { bAbort = true; }
           //
         } else if(infos.sCmd.equals(sCmdChgRecurs)){
           if(evChg.occupy(evSrc, callbackChgProps, null, true)){
             //cmds with callback
             widgChrRecurs.setText(main.idents.buttonFilePropsChanging);
-            actFile.chgPropsRecursive(mask, val, 0, evChg);
+            actFile.chgPropsRecursive(mask, val, date, evChg);
           } else { bAbort = true; }
           //
         } else if(infos.sCmd.equals(sCmdCopy)){

@@ -1,7 +1,7 @@
 
 set DSTDIR=..\..\
 set DST=docuSrcJava_vishiaGui
-set DST_priv=docuSrcJava_vishiaGui_priv
+set DST_priv=docuSrcJavaPriv_vishiaGui
 
 echo set SRC
 ::set SRC=-subpackages org.vishia.gral org.vishia.commander org\vishia\guiInspc

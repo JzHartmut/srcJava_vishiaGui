@@ -525,9 +525,11 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   final protected void abortCopy(){
     //if(fileSrc !=null ) {fileSrc.abortAction();}
     for(FileRemote.CallbackEvent ev: listEvCopy){
-      ev.copyAbortAll();
+      //ev.copyAbortAll();
       //ev.sendEvent(FileRemote.cmdAbortAll);
     }
+    action.showFilesProcessing.evAnswer.send(FileRemoteProgressTimeOrder.Answer.abortAll, modeCopy() ); //triggerStateMachine(evSrc, FileRemote.Cmd.abortAll);
+
     String sDirSrc = widgShowSrc.getText();
     //FileRemote dirSrc = main.fileCluster.getFile(sDirSrc, null); //new FileRemote(sDirSrc);
     if(srcDir !=null) { srcDir.abortAction(); }  //to set stateMachine of copy in ready state 
@@ -784,10 +786,10 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     
     @SuppressWarnings("serial") 
     FileRemoteProgressTimeOrder showFilesProcessing = 
-        new FileRemoteProgressTimeOrder("showFilesProcessing", main._gralMng.gralDevice.orderList(), 100) 
+        new FileRemoteProgressTimeOrder("showFilesProcessing", evSrc, main._gralMng.gralDevice.orderList(), 100) 
     {
       @Override public void executeOrder() { 
-        System.out.println("showFilesProcessing");
+        //System.out.println("showFilesProcessing");
         showCurrentProcessedFileAndDir(this); //this.currFile, this.nrFilesProcessed, this.bDone); 
         //this.currFile = null;  //to invoke second time.
       }
@@ -1184,7 +1186,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
           closeWindow();
         } else {
           //should be state pause
-          action.showFilesProcessing.triggerStateMachine(evSrc, FileRemote.Cmd.docontinue);
+          action.showFilesProcessing.evAnswer.send(FileRemoteProgressTimeOrder.Answer.cont, modeCopy()); //triggerStateMachine(evSrc, FileRemote.Cmd.docontinue);
         }
       }
       return true;
@@ -1210,7 +1212,6 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
           case busyCheck: abortCopy(); break;
         }
         //trigger a copy statemachine, only effected if in such a state.
-        action.showFilesProcessing.triggerStateMachine(evSrc, FileRemote.Cmd.abortAll);
         
       }
       return true;
@@ -1228,18 +1229,14 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   protected GralUserAction actionOverwriteFile = new GralUserAction(sTextExecuteForFile)
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        if(evCurrentFile !=null){
-          int modeCopyOper = modeCopy();
-          evCurrentFile.copyOverwriteFile(modeCopyOper);
-        }
-        else if(action.showFilesProcessing.quest() == FileRemote.CallbackCmd.askDstOverwr
+        if(action.showFilesProcessing.quest() == FileRemote.CallbackCmd.askDstOverwr
              || action.showFilesProcessing.quest() == FileRemote.CallbackCmd.askDstReadonly) {
           action.showFilesProcessing.modeCopyOper = modeCopy();
-          action.showFilesProcessing.answer(evSrc, FileRemote.Cmd.overwr);
+          action.showFilesProcessing.evAnswer.send(FileRemoteProgressTimeOrder.Answer.overwrite, modeCopy() ); 
           widgSkipFile.setBackColor(GralColor.getColor("wh"), 0);
           widgOverwrFile.setBackColor(GralColor.getColor("wh"), 0);
         } else {
-          action.showFilesProcessing.triggerStateMachine(evSrc, FileRemote.Cmd.docontinue);
+          action.showFilesProcessing.evAnswer.send(FileRemoteProgressTimeOrder.Answer.cont, modeCopy() ); //triggerStateMachine(evSrc, FileRemote.Cmd.docontinue);
         }
         //widgCopyNameDst.setText("");
         widgCopyState.setText("skipped");
@@ -1260,11 +1257,12 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if(evCurrentFile !=null){
           int modeCopyOper = modeCopy();
-          evCurrentFile.copySkipFile(modeCopyOper);
+          //action.showFilesProcessing.answer(FileRemoteProgressTimeOrder.Answer.abortFile);
+          action.showFilesProcessing.evAnswer.send(FileRemoteProgressTimeOrder.Answer.abortFile, modeCopy() ); 
         }
         else if(action.showFilesProcessing !=null) {
           action.showFilesProcessing.modeCopyOper = modeCopy();
-          action.showFilesProcessing.answer(evSrc, FileRemote.Cmd.abortCopyFile);
+          action.showFilesProcessing.evAnswer.send(FileRemoteProgressTimeOrder.Answer.abortFile, modeCopy() ); //;
          
         }
         widgCopyNameDst.setText("");
@@ -1286,8 +1284,9 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if(evCurrentFile !=null){
           int modeCopyOper = modeCopy();
-          evCurrentFile.copySkipDir(modeCopyOper);
+          //evCurrentFile.copySkipDir(modeCopyOper);
         }
+        action.showFilesProcessing.evAnswer.send(FileRemoteProgressTimeOrder.Answer.abortDir, modeCopy() ); //triggerStateMachine(evSrc, FileRemote.Cmd.abortAll);
         widgSkipFile.setBackColor(GralColor.getColor("wh"), 0);
         widgOverwrFile.setBackColor(GralColor.getColor("wh"), 0);
       }
