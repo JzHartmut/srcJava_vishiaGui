@@ -51,15 +51,16 @@ public class SwtHtmlBox extends GralHtmlBox.ImplAccess
   
   public boolean bActiv;
   
-  public SwtHtmlBox(GralHtmlBox box)
+  public SwtHtmlBox(GralHtmlBox box, SwtMng mngSwt)
   { super(box);
-    SwtMng mngSwt = (SwtMng)(GralMng.get()).impl;
+    //SwtMng mngSwt = (SwtMng)(GralMng.get()).impl;
     GralPanelContent panel = widgg.pos().panel;
     Composite parent;
     if(panel == null){
       parent = mngSwt.displaySwt.getActiveShell();
     } else {
-      parent = ((SwtPanel)panel.getWidgetImplementation()).panelComposite; //(Composite)(panel.getPanelImpl());
+      parent = (Composite)(panel.getWidgetImplementation());
+      //parent = ((SwtPanel)panel.getWidgetImplementation()).panelComposite; //(Composite)(panel.getPanelImpl());
     }
     try {
       boxSwt = new Browser(parent,0);
@@ -72,6 +73,15 @@ public class SwtHtmlBox extends GralHtmlBox.ImplAccess
     bActiv = false;
   }
 
+  
+  static SwtHtmlBox createHtmlBox(GralHtmlBox widgg, SwtMng mng){
+    return new SwtHtmlBox(widgg, mng);
+    //
+  }
+
+  
+  
+  
   @Override public void setUrl(String url){
     //this.w
     lastUrl = url;

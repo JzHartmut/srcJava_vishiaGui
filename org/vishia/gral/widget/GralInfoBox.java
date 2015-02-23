@@ -124,14 +124,17 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
 
 
   
-  public static GralInfoBox createHtmlInfoBox(String posString, GralMngBuild_ifc mng, String name, String title, boolean onTop)
+  public static GralInfoBox createHtmlInfoBox(String posString, String name, String title, boolean onTop)
   {
     int props = GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable;
     if(onTop){ props |= GralWindow_ifc.windOnTop; }
     GralWindow window = new GralWindow(posString, name, title, props); //mng.createWindow(name, title, props);
+    GralMng mng = GralMng.get();
+    window.setToPanel(mng);
     //TODO the position frame (size) regards the title bar, it should not do so!
     mng.setPosition(0, -3, 0, 0, 0, '.');
-    GralHtmlBox text = mng.addHtmlBox(name);
+    GralHtmlBox text = new GralHtmlBox(name); //     mng.addHtmlBox(name);
+    text.setToPanel(mng);
     mng.setPosition(-2.5f, -0.5f, 0, -14, 0, '.');
     GralTextField infoLine = mng.addTextField("info", false, null, null);
     mng.setPosition(-3, GralPos.size+3, -13, GralPos.size+6, 0, 'r', 0.5f);

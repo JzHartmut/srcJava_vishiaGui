@@ -1384,7 +1384,7 @@ public GralButton addCheckButton(
   
   @Override public GralInfoBox createHtmlInfoBox(String posString, String name, String title, boolean onTop)
   {
-    return GralInfoBox.createHtmlInfoBox(posString, this, name, title, onTop);
+    return GralInfoBox.createHtmlInfoBox(posString, name, title, onTop);
   }
 
   

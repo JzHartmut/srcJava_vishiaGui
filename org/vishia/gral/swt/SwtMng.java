@@ -326,7 +326,9 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   
   @Override public void setToPanel(GralWidget widgg){
-    if(widgg instanceof GralTextBox) {  //NOTE: before GralTextField because a GralTextBox is a GralTextField (derived)
+    if(widgg instanceof GralHtmlBox) {  //NOTE: before GralTextField because a GralTextBox is a GralTextField (derived)
+      SwtHtmlBox.createHtmlBox((GralHtmlBox)widgg, this);  //This may be the best variant.
+    } else if(widgg instanceof GralTextBox) {  //NOTE: before GralTextField because a GralTextBox is a GralTextField (derived)
       SwtTextBox.createTextBox((GralTextBox)widgg, this);  //This may be the best variant.
     } else if(widgg instanceof GralTextField){
       SwtTextFieldWrapper.createTextField((GralTextField)widgg, mng);  //This may be the best variant.
@@ -735,7 +737,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
 @Override public GralHtmlBox addHtmlBox(String name) {
   GralHtmlBox box = new GralHtmlBox(name);
-  new SwtHtmlBox(box);
+  new SwtHtmlBox(box, this);
   return box;
 }
 

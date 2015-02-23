@@ -40,7 +40,7 @@ public class Fcmd extends GuiCfg
 {
 
 
-  /**Version, history and license.
+  /**Version, history and license. This String is visible in the about info.
    * <ul>
    * <li>2014-12-26 Hartmut new: {@link #refreshFilePanel(FileRemote)} can be called in any callback thread. 
    * <li>2011-2013 some changes, see source files.
@@ -71,10 +71,8 @@ public class Fcmd extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public static final String sVersion = "2015-01-06";
+  public static final String sVersion = "2015-02-23";
 
-  /**Version visible in about info */
-  //public static final String sVersion = "Version 1.15 - 2014-02-21";
   
   static class CallingArgs extends GuiCallingArgs
   {

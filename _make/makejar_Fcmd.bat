@@ -1,4 +1,8 @@
 echo on
+cd ..\..\srcJava_Zbnf\_make
+call makejar_zbnf.bat
+cd ..\..\srcJava_vishiaGui\_make
+pause
 
 REM The TMP_JAVAC is a directory, which contains only this compiling results. It will be clean in the batch processing.
 set TMP_JAVAC=..\..\..\tmp_javac
@@ -55,3 +59,5 @@ set SRCPATH_JAVAC=..;../../srcJava_vishiaRun
 call ..\..\srcJava_vishiaBase\_make\+javacjarbase.bat
 
 if exist %FCMD_DST% copy %OUTDIR_JAVAC%\%JAR_JAVAC% %FCMD_DST%\%JAR_JAVAC% 
+pause
+
