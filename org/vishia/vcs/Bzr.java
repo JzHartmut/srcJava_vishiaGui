@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.vishia.util.DataAccess;
 import org.vishia.util.FileSystem;
+import org.vishia.util.StringPartScan;
 
 public class Bzr
 {
@@ -29,10 +30,11 @@ public class Bzr
    * @throws IOException on any unexpected exception.
    * @throws IllegalAccessException 
    */
-  public static void searchRepository(File startDir, Map<String, DataAccess.Variable<Object>> dst, String bzrdir, String bzrsrc) 
+  public static String searchRepository(File startDir, Map<String, DataAccess.Variable<Object>> dst, String bzrdir, String bzrsrc) 
   throws IOException, IllegalAccessException
   { File fBzr;
     File currDir = startDir.isDirectory() ? startDir : startDir.getParentFile();
+    String ret = null;
     //search whether a .bzr or .bzr.bat exists and change to parent dir till it is found.
     do{
       fBzr = new File(currDir, ".bzr.bat");
@@ -55,6 +57,7 @@ public class Bzr
       DataAccess.createOrReplaceVariable(dst, bzrdir, 'S', sBzrDir, true);
       //dst.put(bzrdir, sBzrDir);
       if(!fBzr.getName().equals(".bzr")){   //one of the batch files found
+        ret = FileSystem.readFile(fBzr);
         String sLine = FileSystem.grep1line(fBzr, "bzr_mvExpl.bat");
         if(sLine !=null){
           int pos = sLine.indexOf("bzr_mvExpl.bat");
@@ -69,5 +72,6 @@ public class Bzr
         dst.put(bzrsrc, null);  
       }
     }
+    return ret;
   }
 }
