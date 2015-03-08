@@ -411,6 +411,7 @@ private class InspcGuiCfg extends GuiCfg
     super._gralMng.setPosition(5, GralPos.size -3, 0, GralPos.size +18 , 0, 'd',1);
     btnSwitchOnLog = super._gralMng.addSwitchButton("log", "log telg ?", "log telg", GralColor.getColor("wh"), GralColor.getColor("am") );
     btnSwitchOnLog.setActionChange(actionEnableLog);
+    btnRetryDisableVariables.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("am"));
     btnRetryDisableVariables.setToPanel(super._gralMng);
     btnUseGetByIndex.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
     btnUseGetByIndex.setToPanel(super._gralMng);

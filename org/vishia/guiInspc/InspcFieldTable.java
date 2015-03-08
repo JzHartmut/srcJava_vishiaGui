@@ -343,7 +343,10 @@ public class InspcFieldTable implements Runnable
         GralTableLine_ifc<InspcStruct.FieldOfStruct> line = (GralTableLine_ifc<InspcStruct.FieldOfStruct>)params[0];
         if(key == KeyCode.enter){
           showValue(line, true);
-        } else if(key == KeyCode.ctrl + KeyCode.enter){
+        } else if(key == KeyCode.ctrl + KeyCode.enter) {
+          bSetValue.set(true);
+          InspcFieldTable.this.variableMng.addUserOrder(InspcFieldTable.this);
+        } else if(key == KeyCode.ctrl + 'R' || key == KeyCode.F5){
           showAll();
         } else if(key == KeyCode.ctrl + KeyCode.pgup) {
           actionBack();

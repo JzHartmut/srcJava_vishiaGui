@@ -217,11 +217,15 @@ public class FcmdFileCard extends GralFileSelector
    */
   void setNewContent(FcmdFavorPathSelector.FavorPath favorPathInfoP, FileRemote dir){
     favorPathInfo = favorPathInfoP;
-    favorCard.add(favorPathInfo);  //only it is a new one, it will be checked.
-    setOriginDir(favorPathInfo.getOriginDir());
-    //widgLabel.setText(favorPathInfo.selectName);
-    fillIn(dir, false);
-    setFocus();
+    if(favorCard == null){
+      System.err.println("FcmdFileCard.setNewContent - favorCard is null; " + favorPathInfo);
+    } else {
+      favorCard.add(favorPathInfo);  //only it is a new one, it will be checked.
+      setOriginDir(favorPathInfo.getOriginDir());
+      //widgLabel.setText(favorPathInfo.selectName);
+      fillIn(dir, false);
+      setFocus();
+    }
   }
   
   void setFocusFavorOrFile(){

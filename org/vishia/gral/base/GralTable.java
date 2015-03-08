@@ -918,8 +918,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    */
   protected boolean searchContent(boolean bUp){
     String search = searchChars.toString();
-    boolean contSearch = true;
     boolean found = false;
+    if(search != null && search.length() !=0) { // return false;
+    boolean contSearch = true;
     TableLineData line2, line = lineSelected;
     do{
       if(bUp && line !=null){        //up
@@ -954,6 +955,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         }
       }
     } while(contSearch);
+    }
     return found;
   }
   
