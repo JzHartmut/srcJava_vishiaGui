@@ -424,8 +424,9 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     //FileSystem: acts in other thread.
     //regards mark in first level ?
     int depths = srcSomeFiles ? -Integer.MAX_VALUE : Integer.MAX_VALUE;
+    long bMarkSelect = srcSomeFiles ? 0x200000000L + FileMark.select : 0;
     //====>
-    srcFile.refreshAndMark(depths, bFirstSelect, sSrcMask, FileMark.select, 0, callbackFromFilesCheck, action.showFilesProcessing);
+    srcFile.refreshAndMark(bFirstSelect, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, action.showFilesProcessing);
     widgCopyNameDst.setText(srcDir.getStateDevice());
     bFirstSelect = false;
   }
@@ -567,7 +568,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       widgShowSrc.setText("--no source--");
     } else {
       if(sFilesSrc == null) {
-        if(srcFile.isDirectory() && cmd == Ecmd.copy) {
+        if(srcFile.isDirectory()) { // && cmd == Ecmd.copy) {
           if(srcSomeFiles){
             widgShowSrc.setText(srcFile.getAbsolutePath() + "/?+");  //copy some files dir/?+ signals, there are more files but add mask into
           } else {
