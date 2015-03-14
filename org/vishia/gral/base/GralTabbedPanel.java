@@ -2,10 +2,8 @@ package org.vishia.gral.base;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.TreeMap;
-
-import org.vishia.gral.ifc.GralMng_ifc;
+import org.vishia.util.Java4C;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 
 
@@ -25,6 +23,7 @@ import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
  * @author Hartmut Schorrig
  *
  */
+@Java4C.ParseError
 public class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ implements GralVisibleWidgets_ifc
 {
   /**The version and history:

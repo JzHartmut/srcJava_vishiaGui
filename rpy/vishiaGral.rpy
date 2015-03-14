@@ -3,7 +3,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 	- _id = GUID 23e5f233-859d-4cc0-9af1-81b883a48118;
 	- _myState = 8192;
 	- _name = "vishiaGral";
-	- _lastID = 1;
+	- _lastID = 2;
 	- _UserColors = { IRPYRawContainer 
 		- size = 16;
 		- value = 16777215; 16777215; 16777215; 16777215; 16777215; 16777215; 16777215; 16777215; 16777215; 16777215; 16777215; 16777215; 16777215; 16777215; 16777215; 16777215; 
@@ -14,7 +14,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 		- _subsystem = "";
 		- _class = "";
 		- _name = "GeneratedFromJava";
-		- _id = GUID 87980ca7-a2cc-4002-8c6d-e0cff273f571;
+		- _id = GUID b18ccd43-b2cb-47b3-a83d-f9c38c60d0ca;
 	}
 	- _component = { IHandle 
 		- _m2Class = "IComponent";
@@ -45,11 +45,11 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 		}
 	}
 	- Subsystems = { IRPYRawContainer 
-		- size = 4;
+		- size = 5;
 		- value = 
 		{ ISubsystem 
 			- fileName = "GeneratedFromJava";
-			- _id = GUID 87980ca7-a2cc-4002-8c6d-e0cff273f571;
+			- _id = GUID b18ccd43-b2cb-47b3-a83d-f9c38c60d0ca;
 		}
 		{ ISubsystem 
 			- fileName = "Docu_Gral";
@@ -62,6 +62,10 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 		{ ISubsystem 
 			- fileName = "Docu_Base";
 			- _id = GUID 99ffa4fc-e84f-480f-9019-e4b30a6d617e;
+		}
+		{ ISubsystem 
+			- fileName = "Docu_InspcAccess";
+			- _id = GUID 48241248-202d-47ab-9f08-f2e9f5cb715f;
 		}
 	}
 	- Diagrams = { IRPYRawContainer 

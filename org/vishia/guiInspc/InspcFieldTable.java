@@ -24,6 +24,9 @@ import org.vishia.util.KeyCode;
 /**This class presents a window with one table and some buttons to view and edit all fields in one instance
  * in a target system.
  * 
+ * 
+ * {@linkplain ../../../img/InspcFieldTable_recv.png}
+ * 
  * @author Hartmut Schorrig
  *
  */
@@ -91,7 +94,8 @@ public class InspcFieldTable implements Runnable
   
   private final GralButton btnBack, btnRefresh, btnShowAll, btnSetValue;
   
-  private final InspcMng variableMng;
+  /**Aggregation. To get variable, send requests etc. */
+  private final InspcMng inspcMng;
   
   /**This index stores the last selected file for any component which was used.
    * If the component path is reused later, the same field will be selected initially.
@@ -120,8 +124,8 @@ public class InspcFieldTable implements Runnable
   /**Set in graphic thread with {@link #btnSetValue}, ask and reset in the InspcMng-thread. */
   protected AtomicBoolean bSetValue = new AtomicBoolean();
   
-  public InspcFieldTable(InspcMng variableMng)
-  { variableMng.addUserOrder(this);  //invoke run in any communication step.
+  public InspcFieldTable(InspcMng inspcMng)
+  { inspcMng.addUserOrder(this);  //invoke run in any communication step.
     this.wind = new GralWindow(null, "InspcFieldTableWind", "Fields of ...", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
     this.widgPath = new GralTextField("InspcFieldTableWind");
     this.widgTable = new GralTable<InspcStruct.FieldOfStruct>("InspcFieldTable", new int[]{sizeName, 0, -sizeType});
@@ -132,7 +136,7 @@ public class InspcFieldTable implements Runnable
     this.btnRefresh = new GralButton("@InspcFieldRefresh", "refresh", actionRefresh);
     this.btnShowAll = new GralButton("@InspcFieldShowAll", "show all", actionShowAll);
     this.btnSetValue = new GralButton("@InspcFieldSetValue", "set values", actionSetValues);
-    this.variableMng = variableMng;
+    this.inspcMng = inspcMng;
   }
   
   
@@ -160,8 +164,12 @@ public class InspcFieldTable implements Runnable
       String sDatapathWithPrefix = widgd.getDataPath();
       String sDatapath = widgd.gralMng().replaceDataPathPrefix(sDatapathWithPrefix);
       int posLastDot = sDatapath.lastIndexOf('.');
-      sPathStruct = sDatapath.substring(0, posLastDot);  //With device:path
-      VariableAccess_ifc vari = variableMng.getVariable(sDatapath);
+      if(posLastDot >=0) {
+        sPathStruct = sDatapath.substring(0, posLastDot);  //With device:path
+      } else {
+        sPathStruct = "";
+      }
+      VariableAccess_ifc vari = inspcMng.getVariable(sDatapath);
       if(vari instanceof InspcVariable){
         InspcVariable var = (InspcVariable)vari;
         struct = var.struct();
@@ -203,7 +211,7 @@ public class InspcFieldTable implements Runnable
     } else {
       GralTableLine_ifc<InspcStruct.FieldOfStruct> line = widgTable.addLine("$", null, null);
       line.setCellText("pending request", 0);
-      variableMng.requestFields(struct);
+      inspcMng.requestFields(struct);
       struct.requestFields(actionUpdated);
     }
     
@@ -212,10 +220,18 @@ public class InspcFieldTable implements Runnable
   
   
   
-  void showValue(GralTableLine_ifc<InspcStruct.FieldOfStruct> line, boolean request){
+  /**Shows the received value inside the target for the specified line.
+   * This routine is called both if the operator requests a refresh of content of the line: {@link #actionChgTable}
+   * or if a new value was received: {@link RunOnReceive#run()} invoked from {@link InspcVariable#requestValue(long, Runnable)}.
+   * The last one method requestValue() is invoked in this routine if the argument request is set to true. 
+   * @param line The line of this table, contains the {@link InspcStruct.FieldOfStruct} as user data , {@link GralTableLine_ifc#getUserData()}.
+   * Therein the variable for this line is stored or will be created with {@link InspcMng#getOrCreateVariable(InspcStruct, FieldOfStruct)}. 
+   * @param request true then a new value for the variable of this line will be requested here. 
+   */
+  private void showValue(GralTableLine_ifc<InspcStruct.FieldOfStruct> line, boolean request){
     InspcStruct.FieldOfStruct field = line.getUserData();
     if(field !=null){
-      InspcVariable var = variableMng.getOrCreateVariable(struct, field);
+      InspcVariable var = inspcMng.getOrCreateVariable(struct, field);
       if(var !=null){
         long time = System.currentTimeMillis();
         long timelast = var.getLastRefreshTime();
@@ -299,7 +315,7 @@ public class InspcFieldTable implements Runnable
       if(line.isChanged(true)){
         InspcStruct.FieldOfStruct field = line.getUserData();
         String value = line.getCellText(1);
-        variableMng.cmdSetValueOfField(struct, field, value);
+        inspcMng.cmdSetValueOfField(struct, field, value);
       }
     }
   }
@@ -345,7 +361,7 @@ public class InspcFieldTable implements Runnable
           showValue(line, true);
         } else if(key == KeyCode.ctrl + KeyCode.enter) {
           bSetValue.set(true);
-          InspcFieldTable.this.variableMng.addUserOrder(InspcFieldTable.this);
+          InspcFieldTable.this.inspcMng.addUserOrder(InspcFieldTable.this);
         } else if(key == KeyCode.ctrl + 'R' || key == KeyCode.F5){
           showAll();
         } else if(key == KeyCode.ctrl + KeyCode.pgup) {
@@ -433,7 +449,7 @@ public class InspcFieldTable implements Runnable
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         bSetValue.set(true);
-        InspcFieldTable.this.variableMng.addUserOrder(InspcFieldTable.this);
+        InspcFieldTable.this.inspcMng.addUserOrder(InspcFieldTable.this);
         return true;
       } else { 
         return false;

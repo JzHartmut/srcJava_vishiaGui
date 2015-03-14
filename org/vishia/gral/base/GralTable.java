@@ -257,7 +257,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * Whether they are associated to a graphic widget or not is able to evaluate with this array.
    * The cellLines[0] is the TableLineData of the first visible line in any case etc.
    */
-  protected GralTable<UserData>.TableLineData[] linesForCell;
+  protected TableLineData[] linesForCell;
 
   /**The current line. */
   protected TableLineData lineSelected;

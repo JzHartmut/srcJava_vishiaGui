@@ -424,7 +424,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 				}
 			}
 			- _name = "Fcmd_overview";
-			- _lastModifiedTime = "10.10.2013::11:46:0";
+			- _lastModifiedTime = "3.15.2015::14:17:23";
 			- _graphicChart = { CGIClassChart 
 				- _id = GUID dd09c86e-31f8-44a7-8e3e-4892a01a754d;
 				- m_type = 0;
@@ -448,7 +448,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 				}
 				- m_drawBehavior = 0;
 				- m_bIsPreferencesInitialized = 0;
-				- elementList = 60;
+				- elementList = 59;
 				{ CGIClass 
 					- _id = GUID fa670a1c-ef81-4758-8f2b-1ecb5fcdc43c;
 					- m_type = 78;
@@ -578,7 +578,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava";
 						- _class = "";
 						- _name = "commander";
-						- _id = GUID ff4ad487-46ea-496a-96b6-ab4ffe09c183;
+						- _id = GUID 43879fe5-4610-42ad-9429-043a170178b3;
 					}
 					- m_pParent = GUID fa670a1c-ef81-4758-8f2b-1ecb5fcdc43c;
 					- m_name = { CGIText 
@@ -672,7 +672,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava";
 						- _class = "";
 						- _name = "widget";
-						- _id = GUID 05edb627-7597-4fca-923b-5b320393797d;
+						- _id = GUID 8302763f-9316-4cf8-8930-bbe73b265b6b;
 					}
 					- m_pParent = GUID fa670a1c-ef81-4758-8f2b-1ecb5fcdc43c;
 					- m_name = { CGIText 
@@ -766,7 +766,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::widget";
 						- _class = "";
 						- _name = "GralFileSelector";
-						- _id = GUID d5c1a297-3d4a-49fb-ba62-e8ef0adb576c;
+						- _id = GUID 2f276a1d-1e88-4f85-a925-dd244bfb93ab;
 					}
 					- m_pParent = GUID 880fb3a9-976b-4bcf-bbc0-e7184e3b807d;
 					- m_name = { CGIText 
@@ -867,7 +867,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::widget";
 						- _class = "";
 						- _name = "GralSelectList";
-						- _id = GUID 00eab025-35ec-4686-9b6d-34d1623519ab;
+						- _id = GUID 5536fa92-a100-40b3-98ae-be6dc4d7d284;
 					}
 					- m_pParent = GUID 880fb3a9-976b-4bcf-bbc0-e7184e3b807d;
 					- m_name = { CGIText 
@@ -968,7 +968,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::widget";
 						- _class = "";
 						- _name = "GralCommandSelector";
-						- _id = GUID 88b080ce-69a0-46d4-bd23-bc0f984ee2e8;
+						- _id = GUID 31335d6d-01d4-4834-8135-c69ad5a1669e;
 					}
 					- m_pParent = GUID 880fb3a9-976b-4bcf-bbc0-e7184e3b807d;
 					- m_name = { CGIText 
@@ -1069,7 +1069,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "";
 						- _name = "FcmdFavorPathSelector";
-						- _id = GUID 4d203111-3426-4abf-8ce7-badbba664d8d;
+						- _id = GUID 796ae46d-ba51-4ddb-b638-d0c9a515d52d;
 					}
 					- m_pParent = GUID 4ae3d925-5c75-4eeb-a958-a469b98dfe09;
 					- m_name = { CGIText 
@@ -1170,7 +1170,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "";
 						- _name = "FcmdLeftMidRightPanel";
-						- _id = GUID 6919fbba-ab7f-4daf-90fb-f37db2622fea;
+						- _id = GUID ee247470-b639-4302-818d-98090579bf18;
 					}
 					- m_pParent = GUID 4ae3d925-5c75-4eeb-a958-a469b98dfe09;
 					- m_name = { CGIText 
@@ -1273,7 +1273,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "";
 						- _name = "FcmdFavorCard";
-						- _id = GUID bc7adc00-f308-43bf-bd4d-239f09b44410;
+						- _id = GUID 1b002fdb-3fe9-46ff-910d-7e3e9c7c289a;
 					}
 					- m_pParent = GUID 4ae3d925-5c75-4eeb-a958-a469b98dfe09;
 					- m_name = { CGIText 
@@ -1397,7 +1397,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "FcmdFavorPathSelector";
 						- _name = "panelRight";
-						- _id = GUID c714a032-04bc-4b4d-a22d-dfcc3785c938;
+						- _id = GUID 49f165ae-3fdb-4e7b-a8f9-6fca8250d21d;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -1618,7 +1618,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "FcmdFavorPathSelector";
 						- _name = "panelLeft";
-						- _id = GUID 76e3fdfd-bfe7-4802-8175-73b58dacfd78;
+						- _id = GUID f7b5f48a-6d4e-479f-bdfc-c901e5f44de6;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -1839,7 +1839,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "FcmdFavorPathSelector";
 						- _name = "panelMid";
-						- _id = GUID 3072e16f-726d-4244-857e-2d3ba5403790;
+						- _id = GUID 949a7a8f-c75e-434a-bb2c-7c569bbab125;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -2042,7 +2042,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::widget";
 						- _class = "GralCommandSelector";
 						- _name = "GralSelectList";
-						- _id = GUID 3332a641-f4bc-4adf-bf7b-a57a3a425140;
+						- _id = GUID 6c58f100-56ae-4577-9d48-beea106dadab;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -2144,7 +2144,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::widget";
 						- _class = "GralFileSelector";
 						- _name = "FileSelectList";
-						- _id = GUID 17db07e6-5862-486c-bff3-75b2150ed336;
+						- _id = GUID be03f090-8d36-484f-80b8-2fcb3cb22a34;
 					}
 					- m_pParent = GUID 880fb3a9-976b-4bcf-bbc0-e7184e3b807d;
 					- m_name = { CGIText 
@@ -2265,7 +2265,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::widget";
 						- _class = "GralFileSelector";
 						- _name = "selectList";
-						- _id = GUID b43ec2b0-1cc6-4e3d-a96c-04991e3dfedf;
+						- _id = GUID cb62a34a-97c4-4286-be8c-d2fd3ad8bfbe;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -2976,7 +2976,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava";
 						- _class = "";
 						- _name = "swt";
-						- _id = GUID 4efe0107-591c-4fad-a0b7-3dcda13107c7;
+						- _id = GUID b68496f3-ad77-4a33-bec0-8b14dea6a8aa;
 					}
 					- m_pParent = GUID fa670a1c-ef81-4758-8f2b-1ecb5fcdc43c;
 					- m_name = { CGIText 
@@ -3051,7 +3051,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::swt";
 						- _class = "";
 						- _name = "SwtTable";
-						- _id = GUID aaa42899-3699-43ff-af17-7c78bf783baf;
+						- _id = GUID 05dfd234-b6d2-41b2-b25f-25b922d8cd77;
 					}
 					- m_pParent = GUID 4cd44d81-d204-4396-b4b6-3ac17c619419;
 					- m_name = { CGIText 
@@ -3154,7 +3154,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::swt";
 						- _class = "SwtTable";
 						- _name = "TableItemWidget";
-						- _id = GUID d9d53338-5598-4466-b2bf-0cdc66951430;
+						- _id = GUID b9cb8e14-d28c-4892-b927-55c66f963b73;
 					}
 					- m_pParent = GUID 4cd44d81-d204-4396-b4b6-3ac17c619419;
 					- m_name = { CGIText 
@@ -3560,7 +3560,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::pkgExtTypes";
 						- _class = "";
 						- _name = "TableItem";
-						- _id = GUID b018dd69-f561-41bf-b8d8-c74ec098f415;
+						- _id = GUID 23ded21a-2342-4a97-9efc-c1719c29ab97;
 					}
 					- m_pParent = GUID fa670a1c-ef81-4758-8f2b-1ecb5fcdc43c;
 					- m_name = { CGIText 
@@ -4039,7 +4039,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::ifc";
 						- _class = "";
 						- _name = "GralTable_ifc";
-						- _id = GUID bd60eec5-abe2-42a3-9f10-84ca6bf929a8;
+						- _id = GUID ae2b6d1c-cb47-4250-b14e-7649cc5be610;
 					}
 					- m_pParent = GUID d6255db2-2295-492f-bef4-a46e766f298d;
 					- m_name = { CGIText 
@@ -4140,7 +4140,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::ifc";
 						- _class = "";
 						- _name = "GralTableLine_ifc";
-						- _id = GUID 2a961b2d-093f-4d3a-8aff-eef9e6931cd3;
+						- _id = GUID 47dfbaf1-ad60-462e-874f-10456e07ef24;
 					}
 					- m_pParent = GUID d6255db2-2295-492f-bef4-a46e766f298d;
 					- m_name = { CGIText 
@@ -4241,7 +4241,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava";
 						- _class = "";
 						- _name = "ifc";
-						- _id = GUID 583e58a3-67f1-403f-bee8-9d3ab97629a1;
+						- _id = GUID 4300824c-3370-4ffc-b893-16f9b090de62;
 					}
 					- m_pParent = GUID fa670a1c-ef81-4758-8f2b-1ecb5fcdc43c;
 					- m_name = { CGIText 
@@ -4335,7 +4335,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::widget";
 						- _class = "GralFileSelector::FileSelectList";
 						- _name = "GralTableLine_ifc";
-						- _id = GUID 3e88074e-ff0c-473c-976b-8cb539e6cfa7;
+						- _id = GUID 801111be-1ecb-456f-affc-33478db3b758;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -4437,7 +4437,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::widget";
 						- _class = "GralFileSelector";
 						- _name = "GralTableLine_ifc";
-						- _id = GUID 89022b11-7010-430a-a1bc-3b62364defeb;
+						- _id = GUID 910d9e53-d266-464e-9621-bf5546f32bcb;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -4539,7 +4539,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::widget";
 						- _class = "GralCommandSelector";
 						- _name = "GralTableLine_ifc";
-						- _id = GUID bdf2509e-217f-4310-b15b-b78a93cf2bc3;
+						- _id = GUID 76e3c83c-4e85-4663-914f-12686083c910;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -4641,7 +4641,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava";
 						- _class = "";
 						- _name = "base";
-						- _id = GUID 435d6153-4b6d-4110-a9c0-d8d802d48520;
+						- _id = GUID 826d67b0-4618-477a-92f3-db044419e474;
 					}
 					- m_pParent = GUID fa670a1c-ef81-4758-8f2b-1ecb5fcdc43c;
 					- m_name = { CGIText 
@@ -4735,7 +4735,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::base";
 						- _class = "";
 						- _name = "GralTable";
-						- _id = GUID d0dd946e-ba6c-4c67-9bd0-6e6d68108910;
+						- _id = GUID 2c1ea7fb-be00-469e-b934-dd875b22cfe5;
 					}
 					- m_pParent = GUID 5e70a432-ffbc-47fe-aeae-a09583583a95;
 					- m_name = { CGIText 
@@ -4777,223 +4777,6 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 					- Operations = { IRPYRawContainer 
 						- size = 0;
 					}
-				}
-				{ CGIAssociationEnd 
-					- _id = GUID 2691635a-f0b7-4ecd-9064-3c9af6274389;
-					- _properties = { IPropertyContainer 
-						- Subjects = { IRPYRawContainer 
-							- size = 2;
-							- value = 
-							{ IPropertySubject 
-								- _Name = "Format";
-								- Metaclasses = { IRPYRawContainer 
-									- size = 1;
-									- value = 
-									{ IPropertyMetaclass 
-										- _Name = "Association";
-										- Properties = { IRPYRawContainer 
-											- size = 6;
-											- value = 
-											{ IProperty 
-												- _Name = "Font.Height";
-												- _Value = "14";
-												- _Type = Int;
-											}
-											{ IProperty 
-												- _Name = "Font.Height@Label.Link_Name";
-												- _Value = "14";
-												- _Type = Int;
-											}
-											{ IProperty 
-												- _Name = "Font.Height@Label.Target_Multiplicity";
-												- _Value = "14";
-												- _Type = Int;
-											}
-											{ IProperty 
-												- _Name = "Font.Size";
-												- _Value = "11";
-												- _Type = Int;
-											}
-											{ IProperty 
-												- _Name = "Font.Size@Label.Link_Name";
-												- _Value = "11";
-												- _Type = Int;
-											}
-											{ IProperty 
-												- _Name = "Font.Size@Label.Target_Multiplicity";
-												- _Value = "11";
-												- _Type = Int;
-											}
-										}
-									}
-								}
-							}
-							{ IPropertySubject 
-								- _Name = "General";
-								- Metaclasses = { IRPYRawContainer 
-									- size = 1;
-									- value = 
-									{ IPropertyMetaclass 
-										- _Name = "Graphics";
-										- Properties = { IRPYRawContainer 
-											- size = 1;
-											- value = 
-											{ IProperty 
-												- _Name = "ShowLabels";
-												- _Value = "False";
-												- _Type = Bool;
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-					- m_type = 92;
-					- m_pModelObject = { IHandle 
-						- _m2Class = "IAssociationEnd";
-						- _filename = "widget.sbs";
-						- _subsystem = "GeneratedFromJava::widget";
-						- _class = "GralSelectList";
-						- _name = "wdgdTable";
-						- _id = GUID f9376b6e-bdd6-42ab-9851-cc7af48078b8;
-					}
-					- m_pParent = ;
-					- m_name = { CGIText 
-						- m_str = "";
-						- m_style = "Arial" 10 0 0 0 1 ;
-						- m_color = { IColor 
-							- m_fgColor = 0;
-							- m_bgColor = 0;
-							- m_bgFlag = 0;
-						}
-						- m_position = 1 0 0  ;
-						- m_nIdent = 0;
-						- m_bImplicitSetRectPoints = 0;
-						- m_nOrientationCtrlPt = 8;
-					}
-					- m_drawBehavior = 0;
-					- m_bIsPreferencesInitialized = 0;
-					- m_pSource = GUID 3ac7df9f-8659-4f7c-9c06-34cf2623dca2;
-					- m_sourceType = 'F';
-					- m_pTarget = GUID 204b1f0d-1615-46ff-b1d2-6c254dd5f051;
-					- m_targetType = 'T';
-					- m_direction = ' ';
-					- m_rpn = { CGIText 
-						- m_str = "wdgdTable";
-						- m_style = "Arial" 10 0 0 0 1 ;
-						- m_color = { IColor 
-							- m_fgColor = 0;
-							- m_bgColor = 0;
-							- m_bgFlag = 0;
-						}
-						- m_position = 1 0 0  ;
-						- m_nIdent = 0;
-						- m_bImplicitSetRectPoints = 0;
-						- m_nOrientationCtrlPt = 7;
-					}
-					- m_arrow = 1 822 268  ;
-					- m_anglePoint1 = 0 0 ;
-					- m_anglePoint2 = 0 0 ;
-					- m_line_style = 2;
-					- m_SourcePort = 910 1017 ;
-					- m_TargetPort = 887 886 ;
-					- m_pInverseModelObject = { IAssociationEndHandle 
-						- _m2Class = "";
-					}
-					- m_pInstance = { IObjectLinkHandle 
-						- _m2Class = "";
-					}
-					- m_pInverseInstance = { IObjectLinkHandle 
-						- _m2Class = "";
-					}
-					- m_bShowSourceMultiplicity = 1;
-					- m_bShowSourceRole = 0;
-					- m_bShowTargetMultiplicity = 1;
-					- m_bShowTargetRole = 0;
-					- m_bShowLinkName = 1;
-					- m_bShowSpecificType = 0;
-					- m_bInstance = 0;
-					- m_bShowQualifier1 = 1;
-					- m_bShowQualifier2 = 1;
-					- m_sourceRole = { CGIText 
-						- m_str = "";
-						- m_style = "Arial" 10 0 0 0 1 ;
-						- m_color = { IColor 
-							- m_fgColor = 0;
-							- m_bgColor = 0;
-							- m_bgFlag = 0;
-						}
-						- m_position = 1 0 0  ;
-						- m_nIdent = 2;
-						- m_bImplicitSetRectPoints = 0;
-					}
-					- m_targetRole = { CGIText 
-						- m_str = "";
-						- m_style = "Arial" 10 0 0 0 1 ;
-						- m_color = { IColor 
-							- m_fgColor = 0;
-							- m_bgColor = 0;
-							- m_bgFlag = 0;
-						}
-						- m_position = 1 0 0  ;
-						- m_nIdent = 3;
-						- m_bImplicitSetRectPoints = 0;
-					}
-					- m_sourceMultiplicity = { CGIText 
-						- m_str = "";
-						- m_style = "Arial" 10 0 0 0 1 ;
-						- m_color = { IColor 
-							- m_fgColor = 0;
-							- m_bgColor = 0;
-							- m_bgFlag = 0;
-						}
-						- m_position = 1 0 0  ;
-						- m_nIdent = 4;
-						- m_bImplicitSetRectPoints = 0;
-						- m_nOrientationCtrlPt = 6;
-					}
-					- m_targetMultiplicity = { CGIText 
-						- m_str = "1";
-						- m_style = "Arial" 10 0 0 0 1 ;
-						- m_color = { IColor 
-							- m_fgColor = 0;
-							- m_bgColor = 0;
-							- m_bgFlag = 0;
-						}
-						- m_position = 1 0 0  ;
-						- m_nIdent = 5;
-						- m_bImplicitSetRectPoints = 0;
-						- m_nHorizontalSpacing = -7;
-						- m_nOrientationCtrlPt = 4;
-					}
-					- m_sourceQualifier = { CGIText 
-						- m_str = "";
-						- m_style = "Arial" 10 0 0 0 1 ;
-						- m_color = { IColor 
-							- m_fgColor = 0;
-							- m_bgColor = 0;
-							- m_bgFlag = 0;
-						}
-						- m_position = 1 0 0  ;
-						- m_nIdent = 6;
-						- m_bImplicitSetRectPoints = 0;
-						- m_nOrientationCtrlPt = 8;
-					}
-					- m_targetQualifier = { CGIText 
-						- m_str = "";
-						- m_style = "Arial" 10 0 0 0 1 ;
-						- m_color = { IColor 
-							- m_fgColor = 0;
-							- m_bgColor = 0;
-							- m_bgFlag = 0;
-						}
-						- m_position = 1 0 0  ;
-						- m_nIdent = 7;
-						- m_bImplicitSetRectPoints = 0;
-						- m_nOrientationCtrlPt = 8;
-					}
-					- m_specificType = type_122;
 				}
 				{ CGIInheritance 
 					- _id = GUID 4620c877-fed9-40b2-8899-3d92c95dbc75;
@@ -5238,7 +5021,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "";
 						- _name = "FcmdFileCard";
-						- _id = GUID 0b7badd1-a952-4b08-9f37-364d28553ecd;
+						- _id = GUID b2142cbf-9bfa-4abe-b78e-0a84419f5464;
 					}
 					- m_pParent = GUID 4ae3d925-5c75-4eeb-a958-a469b98dfe09;
 					- m_name = { CGIText 
@@ -5408,7 +5191,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "";
 						- _name = "Fcmd";
-						- _id = GUID 1f0d4513-51e3-45cd-a40d-02b99866f783;
+						- _id = GUID bcea9c51-7080-4062-bdcf-5f51647af16f;
 					}
 					- m_pParent = GUID 4ae3d925-5c75-4eeb-a958-a469b98dfe09;
 					- m_name = { CGIText 
@@ -5487,7 +5270,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "Fcmd";
 						- _name = "cmdSelector";
-						- _id = GUID aac3403a-6855-49d5-91a3-6b2a5bfcb05d;
+						- _id = GUID ea2d619b-34cb-46b6-81ce-ebadf909d943;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -5661,7 +5444,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "FcmdFavorPathSelector";
 						- _name = "FavorPath";
-						- _id = GUID 67193127-921b-4f5d-a6bc-0f711f9a1ce3;
+						- _id = GUID cec8dcab-74bc-4319-a68e-68289bfe0050;
 					}
 					- m_pParent = GUID 4ae3d925-5c75-4eeb-a958-a469b98dfe09;
 					- m_name = { CGIText 
@@ -5741,7 +5524,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "FcmdFavorCard";
 						- _name = "indexFavorPaths";
-						- _id = GUID 9fa2c300-cef2-4eac-966e-0c76ab4d19ec;
+						- _id = GUID 1cf611f3-7857-4dfe-b1c5-3cc53819b97e;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -5917,7 +5700,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "FcmdFavorPathSelector";
 						- _name = "listAllFavorPaths";
-						- _id = GUID cb0e1e65-57c2-48b2-a28a-6809167ea5d9;
+						- _id = GUID 1a788782-f5f2-4de4-a7c8-aa875d644236;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -6093,7 +5876,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "FcmdFileCard";
 						- _name = "favorPathInfo";
-						- _id = GUID c2dedf64-7f6e-42b7-9209-4fd3b073969a;
+						- _id = GUID 4c0f1df3-cc8d-498d-bb4a-77cc2eafa65e;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -6269,7 +6052,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "FcmdFavorPathSelector";
 						- _name = "actFavorPathInfo";
-						- _id = GUID 690fcca0-0a78-4b2b-a622-b7f1a661ba94;
+						- _id = GUID 717fab1d-2b41-4c5a-87f4-a9383e26026e;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -6451,7 +6234,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "FcmdLeftMidRightPanel";
 						- _name = "listTabs";
-						- _id = GUID 635c3c5b-fdb9-4642-a0b6-c923252c5c6f;
+						- _id = GUID eb73098a-292c-49f9-87da-d01188fca787;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -6627,7 +6410,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "FcmdLeftMidRightPanel";
 						- _name = "actFileCard";
-						- _id = GUID 15d8a70b-a0bb-4a4c-aa22-5cb68caf1d52;
+						- _id = GUID 4e3b57ba-655c-41ed-87d3-334a195e5bc6;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -6803,7 +6586,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "FcmdFileCard";
 						- _name = "otherFileCardtoSync";
-						- _id = GUID 6b2ea519-8154-47a9-9b1d-5c5e2cfef6c4;
+						- _id = GUID 4ac6d138-1488-4853-83c3-5b1e3c67ac6e;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -6976,7 +6759,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "FcmdFavorCard";
 						- _name = "fileTable";
-						- _id = GUID 8fa05271-a7a2-4191-a3cd-463c4a5fc922;
+						- _id = GUID 26c10889-c27e-4c69-8cf1-a13b4efa28c4;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -7152,7 +6935,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "FcmdFileCard";
 						- _name = "favorCard";
-						- _id = GUID 49dfa20a-4e08-43c6-80a1-5727d1613c5d;
+						- _id = GUID aa1c1a36-f9ae-45ab-b118-27f2f9565135;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -7324,7 +7107,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "FcmdFileCard";
 						- _name = "mainPanel";
-						- _id = GUID 8645bc70-c3eb-43a8-a476-422ae820cf81;
+						- _id = GUID a3283a08-1e08-42dd-b98d-b38b14f5e593;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -7501,7 +7284,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "FcmdFavorCard";
 						- _name = "mainPanel";
-						- _id = GUID 3046610c-08dc-4c94-9dcb-f38ed256847a;
+						- _id = GUID edc72728-7867-4d8a-9e8f-91afc023c6ef;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -7675,7 +7458,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "FcmdFavorCard";
 						- _name = "FcmdLeftMidRightPanel";
-						- _id = GUID 269459bd-5fd5-4f5e-bba1-fa76560def94;
+						- _id = GUID 93d47cf9-ee71-4049-adfa-65bc6349d9a3;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -7753,7 +7536,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "FcmdLeftMidRightPanel";
 						- _name = "FcmdLeftMidRightPanel";
-						- _id = GUID b47e518a-8149-482d-9ae3-48b42ca0a9ca;
+						- _id = GUID 136ecc9a-c9ae-4118-9407-be9245848cb1;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -7831,7 +7614,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::commander";
 						- _class = "Fcmd";
 						- _name = "favorPathSelector";
-						- _id = GUID 09591bbe-5857-4514-897a-9bdb8394a8fb;
+						- _id = GUID 45fb4742-6439-44aa-ae49-fa42681ff87a;
 					}
 					- m_pParent = ;
 					- m_name = { CGIText 
@@ -7992,8 +7775,8 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 			}
 		}
 	}
-	- weakCGTime = 10.10.2013::11:45:52;
-	- strongCGTime = 7.14.2012::20:18:21;
+	- weakCGTime = 3.15.2015::14:17:23;
+	- strongCGTime = 3.15.2015::14:17:23;
 	- _defaultComposite = GUID 5fb8d566-a916-42e7-9f43-9a8d3a971f75;
 	- _eventsBaseID = -1;
 	- Classes = { IRPYRawContainer 
@@ -8003,8 +7786,8 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 			- _id = GUID 5fb8d566-a916-42e7-9f43-9a8d3a971f75;
 			- _myState = 40960;
 			- _name = "TopLevel";
-			- weakCGTime = 7.14.2012::20:18:21;
-			- strongCGTime = 7.14.2012::20:18:21;
+			- weakCGTime = 3.15.2015::14:17:23;
+			- strongCGTime = 3.15.2015::14:17:23;
 			- _multiplicity = "";
 			- _itsStateChart = { IHandle 
 				- _m2Class = "";

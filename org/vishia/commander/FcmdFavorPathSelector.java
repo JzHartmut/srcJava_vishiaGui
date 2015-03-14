@@ -578,7 +578,8 @@ class FcmdFavorPathSelector
           lastTab.forcefillIn(dir, false);
         }
       } else {
-        throw new IllegalArgumentException("last file tab not able to found");
+        System.out.println("No filetable found to refresh");
+        //throw new IllegalArgumentException("last file tab not able to found");
       }
       return true;
       } else return false;

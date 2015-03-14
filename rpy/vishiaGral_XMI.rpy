@@ -52,7 +52,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 		}
 		{ ISubsystem 
 			- fileName = "GeneratedFromJava";
-			- _id = GUID 87980ca7-a2cc-4002-8c6d-e0cff273f571;
+			- _id = GUID b18ccd43-b2cb-47b3-a83d-f9c38c60d0ca;
 		}
 	}
 	- Diagrams = { IRPYRawContainer 

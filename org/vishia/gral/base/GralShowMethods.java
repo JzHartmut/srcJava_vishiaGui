@@ -7,6 +7,7 @@ import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.KeyCode;
+import org.vishia.util.Java4C;
 
 /**This class contains some standard {@link GralUserAction} for widgets.
  * The show methods can be used by giving its name with {@link GralWidget#setShowMethod(String)} in the configuration
@@ -21,6 +22,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
+//@Java4C.ParseError
 public class GralShowMethods 
 {
 

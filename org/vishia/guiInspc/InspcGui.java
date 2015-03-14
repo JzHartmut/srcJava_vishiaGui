@@ -203,13 +203,18 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     //this.XXXinspcComm = new InspcGuiComm(this, guiCfg.gralMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
     //composites.add(XXXinspcComm);
     
-    FileRemote defaultDirCfg = fileCluster.getFile(cargs.sDefaultDirCfgForCurves, null);
-    FileRemote defaultDirSave = fileCluster.getFile(cargs.sDefaultDirSaveForCurves, null);
-    
-    curveA = new InspcCurveView("curve_A", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, cargs.curveExporterClasses);
-    curveB = new InspcCurveView("curve_B", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, cargs.curveExporterClasses);
-    curveC = new InspcCurveView("curve_C", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, cargs.curveExporterClasses);
-
+    if(cargs.sDefaultDirCfgForCurves !=null) {
+      FileRemote defaultDirCfg = fileCluster.getFile(cargs.sDefaultDirCfgForCurves, null);
+      FileRemote defaultDirSave;
+      if(cargs.sDefaultDirSaveForCurves !=null) {
+        defaultDirSave = fileCluster.getFile(cargs.sDefaultDirSaveForCurves, null);
+      } else {
+        defaultDirSave = null;
+      }
+      curveA = new InspcCurveView("curve_A", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, cargs.curveExporterClasses);
+      curveB = new InspcCurveView("curve_B", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, cargs.curveExporterClasses);
+      curveC = new InspcCurveView("curve_C", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, cargs.curveExporterClasses);
+    }
     fieldsA = new InspcFieldTable(variableMng);
     fieldsB = new InspcFieldTable(variableMng);
     
