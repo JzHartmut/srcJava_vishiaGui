@@ -46,7 +46,7 @@ import org.vishia.util.KeyCode;
  * <img src="../../../img/guiInspc_getFieldsTableSeq.png">
  * <br>
  * One of the methods {@link #fillTableFromFocusedVariable()},  {@link #actionBack()}, {@link #getSubStruct(GralTableLine_ifc)}
- * are invoked from operator actions. They call 
+ * are invoked from operator GUI actions. They call 
  * <br> {@link #fillTableStruct()}<br>
  * This method checks the {@link InspcStruct} of the variable respectively the shown struct in table whether it is known already, 
  * using {@link InspcStruct#isUpdated()}. It it is not updated, on selection a new variable, the <br>
@@ -157,7 +157,8 @@ public class InspcFieldTable implements Runnable
   
 
   
-  private InspcStruct struct;
+  //private InspcStruct struct;
+  private InspcVariable structVar;
   
   /**Path in target to the struct which is shown in table.  */
   private String sPathStruct;
@@ -218,8 +219,8 @@ public class InspcFieldTable implements Runnable
       }
       VariableAccess_ifc vari = inspcMng.getVariable(sDatapath);
       if(vari instanceof InspcVariable){
-        InspcVariable var = (InspcVariable)vari;
-        struct = var.struct();
+        structVar = (InspcVariable)vari;
+        //struct = var.struct();
         //- sPathStruct = struct.path();  //NOTE it is without device.
         //
         fillTableStruct();
@@ -237,6 +238,7 @@ public class InspcFieldTable implements Runnable
   
   void fillTableStruct(){
     widgTable.clearTable();
+    InspcStruct struct = structVar.struct();
     if(struct.isUpdated()){
       //
       //fill with all fields
@@ -258,11 +260,9 @@ public class InspcFieldTable implements Runnable
     } else {
       GralTableLine_ifc<InspcStruct.FieldOfStruct> line = widgTable.addLine("$", null, null);
       line.setCellText("pending request", 0);
-      InspcTargetAccessor target = struct.targetAccessor();
+      InspcTargetAccessor target = structVar.ds.targetAccessor;
       struct.requestFields();
-      target.requestFields(struct, actionUpdated);
-      //struct.requestFields(actionUpdated);
-      //inspcMng.requestFields(struct);
+      target.requestFields(struct.varOfStruct(inspcMng).ds, struct.rxActionGetFields, actionUpdated);
     }
     
   }
@@ -281,7 +281,7 @@ public class InspcFieldTable implements Runnable
   private void showValue(GralTableLine_ifc<InspcStruct.FieldOfStruct> line, boolean request){
     InspcStruct.FieldOfStruct field = line.getUserData();
     if(field !=null){
-      InspcVariable var = inspcMng.getOrCreateVariable(struct, field);
+      InspcVariable var = field.variable(structVar, inspcMng);  //get or create the variable for the field
       if(var !=null){
         long time = System.currentTimeMillis();
         long timelast = var.getLastRefreshTime();
@@ -333,12 +333,12 @@ public class InspcFieldTable implements Runnable
     String key = line.getKey();
     indexSelection.put(sPathStruct, key);  //select the current field if the view goes back to this table
     
-    InspcStruct parent = struct.parent();
+    InspcVariable parent = structVar.parent;
     if(parent !=null){
       int posNameInPath = sPathStruct.lastIndexOf('.')+1; 
       key = sPathStruct.substring(posNameInPath);   //it is the field name of this table in the parent.
-      this.struct = parent;
-      this.sPathStruct = parent.path();
+      this.structVar = parent;
+      this.sPathStruct = parent.ds.sDataPath;
       indexSelection.put(sPathStruct, key);  //select the field of the leaved table in its parent!
       fillTableStruct();
     }
@@ -350,10 +350,9 @@ public class InspcFieldTable implements Runnable
     indexSelection.put(sPathStruct, key);
     
     InspcStruct.FieldOfStruct field = line.getUserData();
-    InspcStruct substruct = field.substruct();
-    if(substruct != null){
-      struct = substruct;
-      sPathStruct = struct.path();
+    if(field.hasSubstruct){
+      structVar = field.variable(structVar, inspcMng);
+      sPathStruct = structVar.ds.sDataPath;
       fillTableStruct();
     }
   }
@@ -365,7 +364,7 @@ public class InspcFieldTable implements Runnable
       if(line.isChanged(true)){
         InspcStruct.FieldOfStruct field = line.getUserData();
         String value = line.getCellText(1);
-        inspcMng.cmdSetValueOfField(struct, field, value);
+        inspcMng.cmdSetValueOfField(structVar, field, value);
       }
     }
   }
@@ -425,8 +424,7 @@ public class InspcFieldTable implements Runnable
         @SuppressWarnings("unchecked")
         GralTableLine_ifc<InspcStruct.FieldOfStruct> line = (GralTableLine_ifc<InspcStruct.FieldOfStruct>)params[0];
         InspcStruct.FieldOfStruct field = line.getUserData();
-        InspcStruct substruct = field.substruct();
-        if(substruct != null){
+        if(field.hasSubstruct){
           getSubStruct(line);
         } else {
           showValue(line, true);

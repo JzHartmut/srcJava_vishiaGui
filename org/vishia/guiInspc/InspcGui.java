@@ -29,6 +29,7 @@ import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.widget.GralColorSelector;
 import org.vishia.inspectorAccessor.InspcMng;
 import org.vishia.inspectorAccessor.InspcPlugUser_ifc;
+import org.vishia.inspectorAccessor.InspcTargetAccess;
 import org.vishia.inspectorAccessor.InspcVarPathStructAcc;
 import org.vishia.inspectorAccessor.UserInspcPlug_ifc;
 import org.vishia.msgDispatch.LogMessage;
@@ -530,20 +531,9 @@ private class InspcGuiCfg extends GuiCfg
     
     UserInspcPlug(){}
     
-    @Override public String XXXreplacePathPrefix(String path, String[] target)
-    {
-      // TODO Auto-generated method stub
-      String pathRet = guiCfg.guiCfgData.XXXreplacePathPrefix(path, target);
-      if(target[0] !=null){
-        String targetIp = inspcMng.translateDeviceToAddrIp(target[0]);
-        if(targetIp !=null){ target[0] = targetIp; }  //else let it unchanged.
-      }
-      return pathRet;
-    }
     
-    
-    @Override public InspcVarPathStructAcc getTargetFromPath(String sDataPath){
-      return InspcGui.this.inspcMng.getTargetFromPath(sDataPath);
+    @Override public InspcTargetAccess getTargetFromPath(String sDataPath){
+      return InspcGui.this.inspcMng.getTargetAccessFromPath(sDataPath, true);
     }
 
     
