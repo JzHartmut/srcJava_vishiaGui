@@ -15,8 +15,10 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
 import org.vishia.inspectorAccessor.InspcMng;
 import org.vishia.inspectorAccessor.InspcStruct;
+import org.vishia.inspectorAccessor.InspcTargetAccessor;
 import org.vishia.inspectorAccessor.InspcVariable;
 import org.vishia.inspectorAccessor.InspcStruct.FieldOfStruct;
 import org.vishia.util.KeyCode;
@@ -25,7 +27,52 @@ import org.vishia.util.KeyCode;
  * in a target system.
  * 
  * 
- * {@linkplain ../../../img/InspcFieldTable_recv.png}
+ * <img src="../../../img/guiInspc_getFieldsTableOmd.png">
+ * <br>
+ * The InspcFieldTable shows one struct from target data or one instance, all fields of a class of Java reflection view. 
+ * The fields are stored in instances of {@link InspcStruct.FieldOfStruct} which are referenced as data in the {@link GralTable}
+ * of the private composite reference {@link #widgTable}. 
+ * <br><br>
+ * The content of the table is filled with a request {@link InspcMng#requestFields(InspcStruct)} which is invoked via the 
+ * private method {@link #fillTableStruct()} respectively {@link #fillTableFromFocusedVariable()} on opening the window.
+ * If the {@link InspcMng#requestFields(InspcStruct)} was invoked it sets the reference to the requested {@link InspcStruct}
+ * into a private variable InspcMng#requestedFields. If this variable is not null a {@link InspcTargetAccessor#cmdGetFields(String, org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc)}
+ * will be invoked for that struct. On receive the result the assignment to the requested order invokes the {@link InspcStruct.VariableRxAction}
+ * for any filed which fills the struct. 
+ *  
+ * <br><br>
+ * <b>Filling the table with the fields of a reflection target</b>:<br>
+ *   
+ * <img src="../../../img/guiInspc_getFieldsTableSeq.png">
+ * <br>
+ * One of the methods {@link #fillTableFromFocusedVariable()},  {@link #actionBack()}, {@link #getSubStruct(GralTableLine_ifc)}
+ * are invoked from operator actions. They call 
+ * <br> {@link #fillTableStruct()}<br>
+ * This method checks the {@link InspcStruct} of the variable respectively the shown struct in table whether it is known already, 
+ * using {@link InspcStruct#isUpdated()}. It it is not updated, on selection a new variable, the <br>
+ * {@link InspcMng#requestFields(InspcStruct)} <br>
+ * is called. This routine sets only the reference to the {@link InspcStruct} in a variable. This action is done especially in the graphical thread.
+ * <br><br>
+ * If {@link InspcStruct#isUpdated()} returns true, then the struct was updated already. Then it can be shown in the {@link GralTable}
+ * with the names of its elements and the last gotten values.
+ * <br><br>
+ * The organization thread of {@link InspcMng} invokes {@link InspcMng#procComm()} cyclically to show and request values. 
+ * In this thread the requested struct is recognized, for that the {@link InspcTargetAccessor#cmdGetFields(String, org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc)}
+ * is invoked for the path of the struct. That is sent to the target.
+ * <br><br>
+ * The target answers with some items for all fields in one or more datagram but for that request with the same sequence number. 
+ * For any items respectively element of the struct the method {@link InspcStruct#rxActionGetFieldsInspcDataExchangeAccess.Inspcitem, long)}
+ * is invoked which fills the struct.
+ * <br><br>
+ * The {@link InspcMng#requestFields(InspcStruct)} was sent with an {@link InspcAccessExecRxOrder_ifc} which knows an
+ * {@link InspcAccessExecRxOrder_ifc#callbackOnAnswer()}. TODO give direct, be explicitely! This callback is invoked on the last received datagram
+ * for this request, which call {@link #fillTableStruct()} again, now with updated fields. 
+ * 
+ * <ul> 
+ * 
+ * 
+ * The {@link InspcStruct#requestFields(Runnable)} invokes 
+ * 
  * 
  * @author Hartmut Schorrig
  *
@@ -211,8 +258,11 @@ public class InspcFieldTable implements Runnable
     } else {
       GralTableLine_ifc<InspcStruct.FieldOfStruct> line = widgTable.addLine("$", null, null);
       line.setCellText("pending request", 0);
-      inspcMng.requestFields(struct);
-      struct.requestFields(actionUpdated);
+      InspcTargetAccessor target = struct.targetAccessor();
+      struct.requestFields();
+      target.requestFields(struct, actionUpdated);
+      //struct.requestFields(actionUpdated);
+      //inspcMng.requestFields(struct);
     }
     
   }

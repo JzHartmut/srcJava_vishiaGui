@@ -3154,7 +3154,7 @@ I-Logix-RPY-Archive version 8.1.4 C++ 1002329
 						- _subsystem = "GeneratedFromJava::swt";
 						- _class = "SwtTable";
 						- _name = "TableItemWidget";
-						- _id = GUID b9cb8e14-d28c-4892-b927-55c66f963b73;
+						- _id = GUID f53a2057-6d54-4549-9616-f2d42a8163f5;
 					}
 					- m_pParent = GUID 4cd44d81-d204-4396-b4b6-3ac17c619419;
 					- m_name = { CGIText 

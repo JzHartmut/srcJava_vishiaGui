@@ -38720,7 +38720,7 @@ application";
 							- _subsystem = "GeneratedFromJava::base";
 							- _class = "GralPrimaryWindow";
 							- _name = "GuiThread";
-							- _id = GUID 802b2810-8f22-4c97-86aa-bcf4c5e79fa2;
+							- _id = GUID e4f65b49-8f39-47b7-9d3c-be71a47a70ee;
 						}
 						- m_instance = { IHandle 
 							- _m2Class = "";
@@ -38860,7 +38860,7 @@ application";
 							- _subsystem = "GeneratedFromJava::swt";
 							- _class = "SwtPrimaryWindow";
 							- _name = "Init";
-							- _id = GUID e7fe5fd6-3767-4fd6-b267-11f77623fffd;
+							- _id = GUID de496742-fdb2-4596-b361-b5d12fca166c;
 						}
 						- m_instance = { IHandle 
 							- _m2Class = "";
@@ -43028,7 +43028,7 @@ application";
 						- _subsystem = "GeneratedFromJava::base";
 						- _class = "GralWidgetMng";
 						- _name = "WidgetChangeRequExecuter";
-						- _id = GUID f900f502-3f22-4ca9-870a-69695d389b77;
+						- _id = GUID cefeb45f-e14a-4358-a797-6fa31e5dce9d;
 					}
 					- m_pParent = GUID 610472dd-c263-4b8d-9499-c6e751afe504;
 					- m_name = { CGIText 
@@ -45723,7 +45723,7 @@ doBeforeDispatching(...){
 						- _subsystem = "GeneratedFromJava::swt";
 						- _class = "SwtMenu";
 						- _name = "Item";
-						- _id = GUID 059a151e-3ffb-4a78-8b28-609327dc2a21;
+						- _id = GUID 58391696-e172-4cf0-8da4-e0f26e1c3b72;
 					}
 					- m_pParent = GUID 2f024c93-cea8-4da9-94f5-61bdc20c29dc;
 					- m_name = { CGIText 
@@ -45874,7 +45874,7 @@ doBeforeDispatching(...){
 						- _subsystem = "GeneratedFromJava::swt";
 						- _class = "SwtMenu";
 						- _name = "Item";
-						- _id = GUID 059a151e-3ffb-4a78-8b28-609327dc2a21;
+						- _id = GUID 58391696-e172-4cf0-8da4-e0f26e1c3b72;
 					}
 					- m_pParent = GUID 32f3f3d5-cdc2-4670-b58e-4c2fc5649a39;
 					- m_name = { CGIText 
@@ -46952,7 +46952,7 @@ doBeforeDispatching(...){
 				}
 			}
 			- _name = "Accessor_inspc";
-			- _lastModifiedTime = "3.15.2015::20:10:7";
+			- _lastModifiedTime = "3.20.2015::20:30:30";
 			- _graphicChart = { CGIClassChart 
 				- _id = GUID 5ac7d648-fd78-43f5-bedd-9a63cf6b1a01;
 				- m_type = 0;
@@ -47483,7 +47483,7 @@ doBeforeDispatching(...){
 						- _subsystem = "GeneratedFromJava::inspectorAccessor";
 						- _class = "InspcAccessEvaluatorRxTelg";
 						- _name = "OrderWithTime";
-						- _id = GUID 576b0b24-c26a-471d-9be2-c4f134cc01e7;
+						- _id = GUID 06350d2f-b38d-4226-93f7-f3da90c7466a;
 					}
 					- m_pParent = GUID 42f57308-d779-4d23-9aa9-e8bb78c1ab47;
 					- m_name = { CGIText 
@@ -47537,7 +47537,7 @@ doBeforeDispatching(...){
 						- _subsystem = "GeneratedFromJava::inspectorAccessor";
 						- _class = "InspcAccessEvaluatorRxTelg";
 						- _name = "InspcAccessExecAnswerTelg_ifc";
-						- _id = GUID f738e1b1-9470-4880-acc0-65d258cd81cc;
+						- _id = GUID f13a8d6e-e84c-45a0-8a44-5e846ae1108c;
 					}
 					- m_pParent = GUID 42f57308-d779-4d23-9aa9-e8bb78c1ab47;
 					- m_name = { CGIText 
@@ -49050,7 +49050,7 @@ doBeforeDispatching(...){
 			}
 		}
 	}
-	- weakCGTime = 3.15.2015::20:10:7;
+	- weakCGTime = 3.20.2015::20:30:30;
 	- strongCGTime = 3.15.2015::14:17:23;
 	- _defaultComposite = GUID e8698c85-5713-4885-a416-c0441b78d2a4;
 	- _eventsBaseID = -1;
@@ -49061,7 +49061,7 @@ doBeforeDispatching(...){
 			- _id = GUID e8698c85-5713-4885-a416-c0441b78d2a4;
 			- _myState = 40960;
 			- _name = "TopLevel";
-			- weakCGTime = 3.15.2015::14:17:23;
+			- weakCGTime = 3.18.2015::21:24:13;
 			- strongCGTime = 3.15.2015::14:17:23;
 			- _multiplicity = "";
 			- _itsStateChart = { IHandle 

@@ -2,7 +2,6 @@ package org.vishia.gral.base;
 
 import org.vishia.gral.ifc.GralSlider_ifc;
 
-@Java4C.ParseError
 public abstract class GralSlider extends GralWidget implements GralSlider_ifc
 {
   protected float posSlider;
