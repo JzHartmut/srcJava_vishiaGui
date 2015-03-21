@@ -266,7 +266,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   
 	/**This class is only used to store values to inspect. The Inspector is a tool which works with
-	 * reflection and with it internal variable can be visited in runtime. See {@link org.vishia.inspector.Inspector}.
+	 * reflection and with it internal variable can be visited in runtime. See {@link org.vishia.inspectorTarget.Inspector}.
 	 */
 	@SuppressWarnings("unused")
 	private static class TestHelp{

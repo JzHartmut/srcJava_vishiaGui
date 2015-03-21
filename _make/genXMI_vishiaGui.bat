@@ -26,7 +26,8 @@ Fileset src =
 , org/vishia/guiInspc/*.java
 , org/vishia/guiViewCfg/*.java
 , org/vishia/commander/*.java
-, ../srcJava_vishiaRun:org/vishia/inspectorAccessor/*.java
+, ../srcJava_vishiaRun:org/vishia/inspcPC/mng/*.java
+, ../srcJava_vishiaRun:org/vishia/inspcPC/accTarget/*.java
 , ../srcJava_vishiaBase/org/vishia/util/*.java
 , ../srcJava_vishiaBase/org/vishia/byteData/*.java
 );

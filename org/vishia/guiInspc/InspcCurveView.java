@@ -39,7 +39,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralColorSelector;
 import org.vishia.gral.widget.GralFileSelectWindow;
 import org.vishia.gral.widget.GralColorSelector.SetColorFor;
-import org.vishia.inspectorAccessor.InspcAccessExecRxOrder_ifc;
+import org.vishia.inspcPC.accTarget.InspcAccessExecRxOrder_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Assert;
 import org.vishia.util.FileSystem;

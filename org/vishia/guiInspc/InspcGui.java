@@ -27,11 +27,10 @@ import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.widget.GralColorSelector;
-import org.vishia.inspectorAccessor.InspcMng;
-import org.vishia.inspectorAccessor.InspcPlugUser_ifc;
-import org.vishia.inspectorAccessor.InspcTargetAccess;
-import org.vishia.inspectorAccessor.InspcVarPathStructAcc;
-import org.vishia.inspectorAccessor.UserInspcPlug_ifc;
+import org.vishia.inspcPC.accTarget.InspcTargetAccessData;
+import org.vishia.inspcPC.mng.InspcMng;
+import org.vishia.inspcPC.mng.InspcPlugUser_ifc;
+import org.vishia.inspcPC.mng.UserInspcPlug_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageFile;
 import org.vishia.util.Assert;
@@ -532,7 +531,7 @@ private class InspcGuiCfg extends GuiCfg
     UserInspcPlug(){}
     
     
-    @Override public InspcTargetAccess getTargetFromPath(String sDataPath){
+    @Override public InspcTargetAccessData getTargetFromPath(String sDataPath){
       return InspcGui.this.inspcMng.getTargetAccessFromPath(sDataPath, true);
     }
 

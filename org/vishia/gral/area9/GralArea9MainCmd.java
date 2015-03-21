@@ -8,7 +8,7 @@ import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.swt.SwtFactory;
-import org.vishia.inspector.Inspector;
+import org.vishia.inspectorTarget.Inspector;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.MsgDispatchSystemOutErr;
