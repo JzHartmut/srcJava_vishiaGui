@@ -499,12 +499,13 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   }
   
   @Override public boolean setCurrentLine(String key){
-    GralTableLine_ifc<UserData> line = rootLine.getNode(key, keySeparator);
-    if(line == null) return false;
-    else {
+    Object oLine = rootLine.getNode(key, keySeparator);
+    if(oLine instanceof GralTableLine_ifc) {
+      @SuppressWarnings("unchecked") 
+      GralTableLine_ifc<UserData> line = (GralTableLine_ifc<UserData>)oLine;
       setCurrentLine(line, lineSelectedixCell, -1);
       return true;
-    }
+    } else return false;
   }
   
   //@Override public boolean setCurrentLine(int nLine){ return setCurrentCell(nLine, -1); }

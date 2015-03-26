@@ -384,7 +384,11 @@ public class FcmdFileCard extends GralFileSelector
         && mainPanel.actFileCard == this    //from actFileCard to the second one!
         && mainPanel.orderMainPanel == 1
       ){
-        syncWithSecondPanel(sFileName);
+        try{ syncWithSecondPanel(sFileName); }
+        catch(Exception exc){ 
+          CharSequence msg = Assert.exceptionInfo("Fcmd.actionOnFileSelection.syncWithSecondPanel() - exception, ", exc, 0, 20);
+          System.out.append(msg);
+        }
         System.out.println("FcmdFileCard - syncWithSecondPanel; " + toString());
       }
       /*

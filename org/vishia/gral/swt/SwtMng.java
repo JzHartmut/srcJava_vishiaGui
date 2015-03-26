@@ -341,6 +341,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
       createWindow((GralWindow)widgg);
     } else if(widgg instanceof GralButton){
       new SwtButton((GralButton)widgg, this);
+      mng.registerWidget(widgg);
     } 
     else if(widgg instanceof GralLabel){
       new SwtLabel((GralLabel)widgg, this);
