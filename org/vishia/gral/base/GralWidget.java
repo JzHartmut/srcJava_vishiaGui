@@ -582,11 +582,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   /**Creates a widget.
-   * @param whatIs
-   * @param sName
-   * @param pos If null then the widget is not positioned. !=null then a position string.
+   * @param posString If null then the widget is not positioned. !=null then a position string.
    *   The position is taken relative to the {@link GralMng#pos}, the {@link GralMng#pos} is changed
    *   using 
+   * @param sName
+   * @param whatIs
    */
   protected GralWidget(String posString, String sName, char whatIs)
   { this.name = sName;

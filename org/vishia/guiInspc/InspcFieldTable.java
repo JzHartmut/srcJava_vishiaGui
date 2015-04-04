@@ -200,7 +200,7 @@ public class InspcFieldTable implements Runnable
     btnBack.setToPanel(mng);
     mng.setPosition(0, 2, 3, 0, 0, 'd');
     widgPath.setToPanel(mng);
-    mng.setPosition(2, -2, 0, 0, 0, 'd');
+    mng.setPosition(2, -4, 0, 0, 0, 'd');
     widgTable.setToPanel(mng);
     mng.setPosition(-2, 0, 0, 7, 0, 'd');
     btnRefresh.setToPanel(mng);
@@ -259,7 +259,7 @@ public class InspcFieldTable implements Runnable
       while( iter.hasPrevious()) {  //traverse through list from start.
         parent = iter.previous();
         //InspcStruct struct1 = parent.struct();
-        InspcStruct.FieldOfStruct fieldParent = new InspcStruct.FieldOfStruct(parent, null, true);
+        InspcStruct.FieldOfStruct fieldParent = new InspcStruct.FieldOfStruct(parent, null, 0, true);
         GralTableLine_ifc<InspcStruct.FieldOfStruct> line = widgTable.addLine(parent.ds.sName, null, fieldParent);
         line.setCellText("/", 0);
         line.setCellText(parent.ds.sName, 1);
@@ -270,15 +270,15 @@ public class InspcFieldTable implements Runnable
       //fill with all fields
       //
       for(InspcStruct.FieldOfStruct field: struct.fieldIter()){
-        GralTableLine_ifc<InspcStruct.FieldOfStruct> line = widgTable.addLine(field.name, null, field);
+        GralTableLine_ifc<InspcStruct.FieldOfStruct> line = widgTable.addLine(field.nameShow, null, field);
         if(field.hasSubstruct) { 
           line.setCellText("+", 0);
         } else {
           line.setCellText("", 0);
         }
-        line.setCellText(field.name, 1);
+        line.setCellText(field.nameShow, 1);
         line.setCellText(field.type, 3);
-        line.setDataPath(sPathStruct + "." + field.name);
+        line.setDataPath(sPathStruct + "." + field.nameShow);
       }
       //
       //Select last line:
@@ -334,6 +334,13 @@ public class InspcFieldTable implements Runnable
       }
     }
     
+  }
+  
+  
+  void refresh(){
+    InspcStruct struct = structVar.struct();
+    struct.requestFields();
+    fillTableStruct(true);
   }
   
   
@@ -445,7 +452,7 @@ public class InspcFieldTable implements Runnable
           bSetValue.set(true);
           InspcFieldTable.this.inspcMng.addUserOrder(InspcFieldTable.this);
         } else if(key == KeyCode.ctrl + 'R' || key == KeyCode.F5){
-          showAll();
+          refresh();
         } else if(key == KeyCode.ctrl + KeyCode.pgup) {
           actionBack();
         } else if(key == KeyCode.ctrl + KeyCode.pgdn) {

@@ -13,12 +13,16 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
@@ -149,6 +153,11 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
    * of the Composite in {@link SwtWidgetHelper#widgetSwt}. */
   private final Text[][] cellsSwt;
   
+  private Canvas vScrollBar;
+  
+  
+  Color colorBackVscrollbar, colorLineVscrollbar;
+  
   /**SWT Text Control which contains a search text. It is only visible if need. */
   protected Text swtSearchText;
   
@@ -174,7 +183,10 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     int zLineVisibleMax = gralTable.nrofLinesVisibleMax();
     this.cellsSwt = new Text[zLineVisibleMax][zColumn()];
     this.cells = new GralTable.CellData[zLineVisibleMax][zColumn()];
-    Control swtTable = new SwtTable.Table(parent, zColumn(), mng);
+    int zColumn = zColumn();
+    Composite swtTable = new SwtTable.Table(parent, zColumn, mng);
+    initSwtTable(swtTable, zColumn, mng);
+    vScrollBar = new Vscrollbar(swtTable);
     this.swtWidgHelper = new SwtWidgetHelper(swtTable, mng);
     //gralTable.implMethodWidget_.setWidgetImpl(this);
     //this.menuColumns = new SwtMenu[zColumn];
@@ -492,6 +504,26 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   }
 
   
+  
+  
+  private void paintVscrollbar(PaintEvent ev, Canvas canvas)
+  {
+    if(colorBackVscrollbar == null) {
+      colorBackVscrollbar = swtWidgHelper.mng.getColorImpl(colorBackVscrollbar());
+      colorLineVscrollbar = swtWidgHelper.mng.getColorImpl(colorLineVscrollbar());
+    }
+    GC gc = ev.gc;
+    Rectangle dim = canvas.getBounds();
+    gc.setForeground(colorBackVscrollbar);
+    gc.fillRectangle(dim.x, dim.y, dim.width, dim.height);
+    gc.setForeground(colorLineVscrollbar);
+    gc.drawLine(1,1, dim.width-1, dim.height-1);
+    
+  }
+  
+
+  
+  
   @Override protected GralMenu createColumnMenu(int column){
     //GralMenu menuColumn = new SwtMenu(outer, swtWidgWrapper.widgetSwt, itsMng());
     GralMenu menuColumn = new SwtMenu(outer, cellsSwt[0][column], itsMng());
@@ -541,18 +573,18 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
   @Override protected void setBoundsCells(int treeDepthBase){
     int yPix = 0;
-    int xPixelUnit = swtWidgHelper.mng.mng.propertiesGui.xPixelUnit();
+    //int xPixelUnit = swtWidgHelper.mng.mng.propertiesGui.xPixelUnit();
     for(Text[] row: cellsSwt){
       int ixColumn = 0;
       for(Text cell: row){
-        GralTable.CellData celldata = (GralTable.CellData)cell.getData();
+        //GralTable.CellData celldata = (GralTable.CellData)cell.getData();
         int xleft = 0; //celldata.tableItem !=null ? (celldata.tableItem.treeDepth() - treeDepthBase) * xPixelUnit : 0;
         cell.setBounds(xleft + xpixelCell[ixColumn], yPix, xpixelCell[ixColumn+1] - xpixelCell[ixColumn], linePixel);
         ixColumn +=1;
       }
       yPix += linePixel;
     }
-
+    vScrollBar.setBounds(xyVscrollbar.x, xyVscrollbar.y, xyVscrollbar.dx, xyVscrollbar.dy);
   }
   
   /**Invoked on {@link #swtKeyListener} if enter. */
@@ -647,14 +679,36 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     
     
   }
+
   
   
   
+  /**The widget for the vertical scroll bar is a canvas with a special paint routine.
+   * In the paint routine {@link SwtTable#paintVscrollbar(PaintEvent, Canvas)} is called. 
+   */
+  private class Vscrollbar extends Canvas
+  {
+    Vscrollbar(Composite parent) {
+      super(parent, 0);
+      addPaintListener(vScrollbarPainter);  
+      
+    }
+    
+    PaintListener vScrollbarPainter = new PaintListener(){
+      @Override public void paintControl(PaintEvent e) {
+        SwtTable.this.paintVscrollbar(e, Vscrollbar.this);
+      }
+    };
+    
+  }
+  
+  
+  
+  /**The SWT-Composite for the cell texts and the scroll bar. */
   private class Table extends Composite {
 
     public Table(Composite parent, int zColumns, SwtMng mng) {
       super(parent, 0);
-      initSwtTable(this, zColumns, mng);
     }
 
     
@@ -752,8 +806,6 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       Rectangle parentBounds = ((Control)e.widget).getParent().getBounds();
       GralRectangle pixTable = outer.pos().calcWidgetPosAndSize(itsMng().propertiesGui(), parentBounds.width, parentBounds.height, 0, 0);
       SwtTable.this.resizeTable(pixTable);
-      //SwtTable.this.setBoundsCells();
-      
     }
     
   };
