@@ -60,13 +60,44 @@ public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, MarkMask_if
   
   int getSelectedColumn();
   
+  /**Inserts a line as child of this. This method should be used if no child line exists yet.
+   * It adds as last line of children. If child lines are existent, one can use {@link #addPrevLine(String, String[], Object)}
+   * or {@link #addNextLine(String, String[], Object)} in respect to a given child line too.
+   * @param lineKey The key for the line
+   * @param lineTexts maybe null, elsewhere texts for the cells (column texts) of the line.
+   * @param userDataP
+   * @return the added line.
+   */
   GralTableLine_ifc<UserData> addChildLine(String childKey, String[] childTexts, UserData data);
 
   
+  /**Inserts a line behind the current line.
+   * @param lineKey The key for the line
+   * @param lineTexts maybe null, elsewhere texts for the cells (column texts) of the line.
+   * @param userDataP
+   * @return the added line.
+   */
   GralTableLine_ifc<UserData> addNextLine(String childKey, String[] childTexts, UserData data);
+
+  /**Inserts a line before the current line.
+   * @param lineKey The key for the line
+   * @param lineTexts maybe null, elsewhere texts for the cells (column texts) of the line.
+   * @param userDataP
+   * @return the added line.
+   */
+  GralTableLine_ifc<UserData> addPrevLine(String childKey, String[] childTexts, UserData data);
 
   
   
   
   GralTableLine_ifc<UserData> parentNode();  
+  
+  
+  /**Opens or closes showing children of this line. It is for tree view.
+   * @param show true then show, false then close this bough.
+   * @param bLeftGrandChildrenOpen if show==true, false then close sub children boughs of this, true left opened grand children open.
+   *   This is an important behavior of operating with a tree view. Both variants are desirable in different situations. 
+   */
+  void showChildren(boolean show, boolean bLeftGrandChildrenOpen);
+  
 }

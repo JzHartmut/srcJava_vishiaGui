@@ -85,7 +85,7 @@ import org.vishia.util.TreeNode_ifc;
  * @author Hartmut Schorrig
  *
  */
-public final class GralTable<UserData> extends GralWidget implements GralTable_ifc<UserData> {
+@SuppressWarnings("synthetic-access") public final class GralTable<UserData> extends GralWidget implements GralTable_ifc<UserData> {
 
   /**Version, history and license.
    * <ul>
@@ -649,7 +649,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       if(lineBehind ==null){
         return rootLine.addChildLine(lineKey, lineTexts, userData);
       } else {
-        return lineBehind.insertLine(lineKey, lineTexts, userData);
+        return lineBehind.addPrevLine(lineKey, lineTexts, userData);
       }
     } else if(row < 0) {
       return addLine(lineKey, lineTexts, userData);
@@ -902,9 +902,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       && line.parent() !=null  
       && !line.parentEquals(rootLine)) 
     {
-      linenext = line.parent();
-      if(linenext !=null){
-        linenext = linenext.nextSibling();  //may null, then repeat for next parent
+      line = line.parent();
+      if(line !=null){
+        linenext = line.nextSibling();  //may null, then repeat for next parent
       }
     }
     return linenext;  //maybe null
@@ -1024,36 +1024,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   }
   
   
-  
-  
-  /**Counts the children and checks whether their childs should be shown.
-   * It checks and sets {@link TableLineData#showChildren}
-   * @param lineParent
-   * @param bLeftGrandChildrenOpen false then set {@link TableLineData#showChildren} = false, true: count the grand children.  
-   * @param recurs more than 100 - prevent it.
-   */
-  private void countChildren(NodeTableLine lineParent, TableLineData lineCurr, boolean bLeftGrandChildrenOpen, int recurs){
-    if(recurs >100) return;
-    lineParent.zLineUnfolded = 0;
-    TableLineData child = lineParent.firstChild();
-    while(child !=null) {
-      lineParent.zLineUnfolded +=1;
-      if(zLineCurr >=0){ 
-        zLineCurr +=1; 
-        if(child == lineCurr) {
-          nLineCurr = zLineCurr;
-        }
-      }
-      if(child.showChildren && bLeftGrandChildrenOpen) {
-        countChildren(child, lineCurr, true, recurs+1);
-        lineParent.zLineUnfolded += child.zLineUnfolded;
-      } else {
-        child.showChildren = false; //close it.
-        child.zLineUnfolded = 0;
-      }
-      child = child.nextSibling();
-    }
-  }
   
   
   /**Invoked from focus lost of any table cell implementation, checks whether the line is changed.
@@ -1206,14 +1176,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
               actionOnRefreshChildren(lineSelected);  //may get or refresh children, callback in user.
             }
             if(lineSelected.hasChildren()){           //only if it has children currently really.
-              lineSelected.showChildren = true;
-              countChildren(lineSelected, null, true, 100);  //count the children.
+              lineSelected.showChildren(true, true);
+              lineSelected.countChildren(true, nLineCurr);  //count the children.
               fillVisibleAreaBehind(lineSelected, lineSelectedixCell);
               repaint();
             }
           } else if(keyCode == keyCloseChild){
             if(lineSelected.showChildren){
-              lineSelected.showChildren = false;
+              lineSelected.showChildren(false, false);
               fillVisibleAreaBehind(lineSelected, lineSelectedixCell);
               repaint();
             }
@@ -1861,7 +1831,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     NodeTableLine(String key, UserData data){ super(key, data); }
     
     
-    /**Inserts a line a child of this.
+    /**Inserts a line as child of this. This method should be used if no child line exists yet.
+     * It adds as last line of children. If child lines are existent, one can use {@link #addPrevLine(String, String[], Object)}
+     * or {@link #addNextLine(String, String[], Object)} in respect to a given child line too.
      * @param lineKey The key for the line
      * @param lineTexts maybe null, elsewhere texts for the cells (column texts) of the line.
      * @param userDataP
@@ -1884,7 +1856,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * @param userDataP
      * @return the added line.
      */
-    public TableLineData insertLine(String lineKey, String[] lineTexts, UserData userDataP){
+    public TableLineData addPrevLine(String lineKey, String[] lineTexts, UserData userDataP){
       lineCanHaveChildren = true; //hasChildren();
       TableLineData line = GralTable.this.new TableLineData(lineKey, userDataP);
       super.addSiblingPrev(line);  ////
@@ -1895,6 +1867,75 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     
     
+    /**Inserts a line behind the current line.
+     * @param lineKey The key for the line
+     * @param lineTexts maybe null, elsewhere texts for the cells (column texts) of the line.
+     * @param userDataP
+     * @return the added line.
+     */
+    public TableLineData addNextLine(String lineKey, String[] lineTexts, UserData userDataP){
+      lineCanHaveChildren = true; //hasChildren();
+      TableLineData line = GralTable.this.new TableLineData(lineKey, userDataP);
+      super.addSiblingNext(line);  ////
+      line.prepareAddedLine(lineTexts);
+      return line;
+
+    }
+
+    
+    
+    void countChildren(boolean bLeftGrandChildrenOpen, int nrParent){
+      countChildren(bLeftGrandChildrenOpen, nrParent, 0);
+      adjCountChildrenInParent(this.zLineUnfolded);
+    }
+    
+    
+    /**Counts the children and checks whether their childs should be shown.
+     * It checks and sets {@link TableLineData#showChildren}
+     * @param lineParent
+     * @param bLeftGrandChildrenOpen false then set {@link TableLineData#showChildren} = false, true: count the grand children.  
+     * @param recurs more than 100 - prevent it.
+     */
+    void countChildren(boolean bLeftGrandChildrenOpen, int nrParent, int recurs){
+      if(recurs >100) return;
+      this.zLineUnfolded = 0;
+      int ctParent = nrParent;
+      TableLineData child = this.firstChild();
+      while(child !=null) {
+        this.zLineUnfolded +=1;
+        ctParent +=1;
+        if(zLineCurr >=0){ 
+          zLineCurr +=1; 
+          if(lineSelectedNew !=null ? child == lineSelectedNew : child == lineSelected) {
+            nLineCurr = ctParent;
+          }
+        }
+        if(child.showChildren && bLeftGrandChildrenOpen) {
+          child.countChildren(true, ctParent, recurs+1);
+          this.zLineUnfolded += child.zLineUnfolded;
+        } else {
+          child.showChildren = false; //close it.
+          child.zLineUnfolded = 0;
+        }
+        child = child.nextSibling();
+      }
+    }
+    
+    
+    
+    void adjCountChildrenInParent(int nCorr) {
+      ////
+      NodeTableLine parent1 = parent();
+      boolean showChildren1 = showChildren;
+      showChildren1 &= parent1.showChildren;
+      while(parent1 !=null   //stop on root node. 
+          && showChildren1   //stop count zLineUnfolded on nonvisible children.
+        ) {
+        zLineUnfolded += nCorr;
+        parent1 = parent1.parent();   
+      }
+    }
+
     
 
     
@@ -1966,13 +2007,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       if(zLineUnfolded == -1){ 
         zLineUnfolded = 0;
       }
-      TableLineData parent1 = this;
-      showChildren1 &= parent1.showChildren;
-      while(parent1 !=null   //stop on root node. 
-          && showChildren1   //stop count zLineUnfolded on nonvisible children.
-        ) {
+      if(showChildren) {
         zLineUnfolded +=1;
-        parent1 = parent1.parent();   
+        adjCountChildrenInParent(1);
       }
       if(this == lineSelected) {
         nLineCurr = rootLine.zLineUnfolded;  //store the number of current line if given.
@@ -1983,40 +2020,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
     
 
-    
-    
-    public GralTableLine_ifc<UserData> addNextLine(String keyP, String[] texts, UserData userDataP){
-      //hasChildren = hasChildren();
-      TableLineData line = GralTable.this.new TableLineData(keyP, userDataP);
-      super.addSiblingNext(line);
-      //line.parentLine = this;
-      line.treeDepth = this.treeDepth;
-      if(texts !=null){
-        for(int ixCol = 0; ixCol < texts.length && ixCol < line.cellTexts.length; ++ixCol){
-          line.cellTexts[ixCol] = texts[ixCol];
-        }
-      }
-      GralTable.this.bPrepareVisibleArea = true;
-      return line;
-
-    }
-    
-    
-    public GralTableLine_ifc<UserData> addPrevLine(String keyP, String[] texts, UserData userDataP){
-      //hasChildren = hasChildren();
-      TableLineData line = GralTable.this.new TableLineData(keyP, userDataP);
-      super.addSiblingPrev(line);
-      //line.parentLine = this;
-      line.treeDepth = this.treeDepth;
-      if(texts !=null){
-        for(int ixCol = 0; ixCol < texts.length && ixCol < line.cellTexts.length; ++ixCol){
-          line.cellTexts[ixCol] = texts[ixCol];
-        }
-      }
-      GralTable.this.bPrepareVisibleArea = true;
-      return line;
-
-    }
     
     
     /*
@@ -2057,7 +2060,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
 
     
-    public TableLineData parentNode(){ return (TableLineData)super.getParent(); }
+    @Override public TableLineData parentNode(){ return (TableLineData)super.getParent(); }
     
     @Override public String getName(){ return GralTable.this.name; }
     
@@ -2159,6 +2162,29 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     @Override public void setText(CharSequence text){
       throw new IllegalArgumentException("GralTable-TableLineData - setText is not implemented;");
     }
+    
+    
+    @Override public void showChildren(boolean show, boolean bLeftGrandChildrenOpen) {
+      if(show) {
+        if(bLeftGrandChildrenOpen && showChildren) return;  //do nothing because no change
+        else {
+          if(showChildren) {  //it is shown already
+          }
+          showChildren = true;
+          //children are closed yet, open and count it.
+          countChildren(bLeftGrandChildrenOpen, nLineCurr);
+        }
+      } else { //switch off children
+        if(showChildren) {
+          adjCountChildrenInParent(-zLineUnfolded);  //firstly subtract because children are open
+          showChildren = false;
+        }
+        //else: don't change anything.
+      }
+    }
+
+    
+    
     
     @Override
     public void repaint() {

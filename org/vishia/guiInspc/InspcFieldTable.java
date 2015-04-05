@@ -390,7 +390,26 @@ public class InspcFieldTable implements Runnable
     indexSelection.put(sPathStruct, key);
     
     InspcStruct.FieldOfStruct field = line.getUserData();
-    if(field.hasSubstruct){
+    if(field.nrofArrayElements >1){
+      if(!line.hasChildren()){
+        //no array elements yet initialized:
+        //InspcVariable varArray = field.variable(structVar, inspcMng);
+        InspcStruct structArray = field.struct;  //varArray.struct();
+        String[] lineTexts = new String[4];
+        for(int ix = 0; ix < field.nrofArrayElements; ++ix) {
+          String ident = field.identifier + "[" + ix + "]";  //creates a field with index
+          //The field for the array element:
+          InspcStruct.FieldOfStruct fieldElement = new InspcStruct.FieldOfStruct(structArray, ident, ident, field.type, -1, false);
+          lineTexts[0] = "-";
+          lineTexts[1] = ident;
+          lineTexts[2] = "";
+          lineTexts[3] = field.type;
+          line.addChildLine(ident, lineTexts, fieldElement);
+        }
+      }
+      line.showChildren(true, false);
+    }
+    else if(field.hasSubstruct){
       structVar = field.variable(structVar, inspcMng);
       sPathStruct = structVar.ds.sDataPath;
       fillTableStruct(true);
