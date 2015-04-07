@@ -369,6 +369,8 @@ import org.vishia.util.TreeNode_ifc;
     
     rootLine = new NodeTableLine("", null);
     rootLine.showChildren = true;
+    rootLine.treeDepth = -1; //children of rootline are level 0
+    rootLine.zLineUnfolded = 0;  //count added line.
     
     linesForCell = (TableLineData[])Array.newInstance( TableLineData.class, 50 );  
     //Hint: linesForCell = new GralTable<UserData>.TableLineData[50];
@@ -573,6 +575,7 @@ import org.vishia.util.TreeNode_ifc;
     assert(ixline > - zLineVisible && ixline < zLineVisible);
     assert(ixcolumn < gi.cells[0].length);
     lineSelected = (TableLineData)line;
+    nLineCurr = -1;  //get new, undefined elsewhere.
     actionOnLineSelected(KeyCode.userSelect, lineSelected);
     if(ixline < 0){
       lineSelectedixCell = zLineVisible + ixline;  //-1 is the last.
@@ -727,22 +730,7 @@ import org.vishia.util.TreeNode_ifc;
   
   
   @Override public void deleteLine(GralTableLine_ifc<UserData> line) {
-    zLine -=1;
-    if(zLineCurr >0) {
-      zLineCurr = 0;
-    }
-    TableLineData line1 = (TableLineData)line;
-    bPrepareVisibleArea = true;
-    if(lineSelected == line){
-      TableLineData line2 = prevLine(line1);
-      if(line2 == null){
-        lineSelected = nextLine(line1); 
-      } else {
-        lineSelected = line2;
-      }
-    }
-    line.detach();
-    repaint(200,200);
+    line.deleteLine();
   }
   
   
@@ -771,7 +759,7 @@ import org.vishia.util.TreeNode_ifc;
     for(int ix = 0; ix < linesForCell.length; ++ix){
       linesForCell[ix] = null;
     }
-    rootLine.removeChildren();
+    rootLine.clear();
     bPrepareVisibleArea = true;
     bPrepareVisibleArea = true;
     repaint(200,200);
@@ -854,7 +842,8 @@ import org.vishia.util.TreeNode_ifc;
   
 
   
-  /**Shifts the content in {@link #linesForCell}
+  /**Shifts the content in {@link #linesForCell} to show the appropriate part of data 
+   * (e.g. lines of {@link #rootLine})in the table.
    * @param dLine >0 shift up to get next lines, <0 shift down to get previous lines
    * @return nr of lines shifted
    */
@@ -950,6 +939,7 @@ import org.vishia.util.TreeNode_ifc;
   protected void mouseUp(int key, CellData cell){
     if(key == KeyCode.mouse1Up){
       lineSelected = lineSelectedNew;
+      nLineCurr = -1;  //get new
       lineSelectedNew = null;
       lineSelectedixCell = cell.ixCellLine;  //used for key handling.
       colSelectedixCellC = cell.ixCellColumn;
@@ -998,6 +988,7 @@ import org.vishia.util.TreeNode_ifc;
       if(line2 ==null){ //end of search
         contSearch = false;  //without change the lineSelected
         lineSelected = line;  //show the first or last line
+        nLineCurr = -1;  //get new, undefined elsewhere.
         found = search.length() >0;
       } else {
         line = line2;
@@ -1013,6 +1004,7 @@ import org.vishia.util.TreeNode_ifc;
           } else {
             found = true;
             lineSelected = line;
+            nLineCurr = -1;  //get new, undefined elsewhere.
             bPrepareVisibleArea = true;
             contSearch = false;                   //found
           }
@@ -1080,6 +1072,7 @@ import org.vishia.util.TreeNode_ifc;
             }
           }
           lineSelected = linesForCell[lineSelectedixCell];
+          nLineCurr = -1;  //get new, undefined elsewhere.
           //the table has the focus, because the key action is done only if it is so.
           //set the new cell focused, in the paint routine.
           gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
@@ -1099,6 +1092,8 @@ import org.vishia.util.TreeNode_ifc;
               }
             }
             lineSelected = linesForCell[lineSelectedixCell];
+            nLineCurr -= 1;  //
+            
           }
           //the table has the focus, because the key action is done only if it is so.
           //set the new cell focused, in the paint routine.
@@ -1121,6 +1116,7 @@ import org.vishia.util.TreeNode_ifc;
             ){
             lineSelectedixCell -=1;
           }
+          nLineCurr = -1;  //get new, undefined elsewhere.
           //the table has the focus, because the key action is done only if it is so.
           //set the new cell focused, in the paint routine.
           gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
@@ -1154,6 +1150,7 @@ import org.vishia.util.TreeNode_ifc;
                 ){
                 lineSelectedixCell -=1;
               }
+              nLineCurr = -1;  //get new, undefined elsewhere.
             }
             //the table has the focus, because the key action is done only if it is so.
             //set the new cell focused, in the paint routine.
@@ -1637,6 +1634,20 @@ import org.vishia.util.TreeNode_ifc;
     }
     
 
+    /**This method have to be called before the vertical scroll bar is painted
+     * in the {@link GralWidgImpl_ifc#repaintGthread()} routine..
+     * It checks whether the {@link GralTable#nLineCurr} and the shown number of lines
+     * in {@link GralTable#rootLine}. {@link GralTable.NodeTableLine#zLineUnfolded}
+     * is given, e.g. >=0. If one of them is <0 or lines are countered
+     * calling {@link NodeTableLine#countChildren(boolean, int)}. 
+     * Therewith the {@link GralTable#nLineCurr} is set too. Anytime if the situation is not specified
+     * the {@link GralTable#nLineCurr} can be set to -1. This forces new calculation.
+     */
+    protected void determineSizeAndPosition()
+    { if(GralTable.this.nLineCurr <0 || GralTable.this.rootLine.zLineUnfolded <0) {
+        GralTable.this.rootLine.countChildren(true, 0);
+      }
+    }
 
     /**This routine will be called inside a resize listener of the implementation graphic.
      * It calculates the width of the columns with the given width of the table's canvas.
@@ -1831,6 +1842,12 @@ import org.vishia.util.TreeNode_ifc;
     NodeTableLine(String key, UserData data){ super(key, data); }
     
     
+    void clear() {
+      rootLine.removeChildren();
+      rootLine.zLineUnfolded = 0;
+    }
+    
+    
     /**Inserts a line as child of this. This method should be used if no child line exists yet.
      * It adds as last line of children. If child lines are existent, one can use {@link #addPrevLine(String, String[], Object)}
      * or {@link #addNextLine(String, String[], Object)} in respect to a given child line too.
@@ -1882,7 +1899,30 @@ import org.vishia.util.TreeNode_ifc;
 
     }
 
+    public void deleteLine() {
+      zLine -=1;
+      adjCountChildrenInParent(-1);
+      final TableLineData line1 = (TableLineData)this;
+      bPrepareVisibleArea = true;
+      if(lineSelected == this){
+        nLineCurr -=1;
+        TableLineData line2 = prevLine(line1);
+        if(line2 == null){
+          lineSelected = nextLine(line1); 
+          nLineCurr = 0;  //it is the first one.
+        } else {
+          lineSelected = line2;
+          //nLineCurr left unchanged.
+        }
+      } else {
+        nLineCurr = -1;  //get new, undefined elsewhere.
+      }
+      line1.detach();
+      repaint();
+    }
     
+    
+
     
     void countChildren(boolean bLeftGrandChildrenOpen, int nrParent){
       countChildren(bLeftGrandChildrenOpen, nrParent, 0);
@@ -1927,9 +1967,8 @@ import org.vishia.util.TreeNode_ifc;
       ////
       NodeTableLine parent1 = parent();
       boolean showChildren1 = showChildren;
-      showChildren1 &= parent1.showChildren;
       while(parent1 !=null   //stop on root node. 
-          && showChildren1   //stop count zLineUnfolded on nonvisible children.
+          && (showChildren1 &= parent1.showChildren)   //stop count zLineUnfolded on nonvisible children.
         ) {
         zLineUnfolded += nCorr;
         parent1 = parent1.parent();   
@@ -1992,6 +2031,7 @@ import org.vishia.util.TreeNode_ifc;
     
     
     private void prepareAddedLine(String[] lineTexts) {
+      nLineCurr = -1;  //get new, undefined elsewhere.
       if(lineTexts !=null){
         for(int ixCol = 0; ixCol < lineTexts.length && ixCol < cellTexts.length; ++ixCol){
           cellTexts[ixCol] = lineTexts[ixCol];
@@ -2001,6 +2041,7 @@ import org.vishia.util.TreeNode_ifc;
         lineSelected = this;
         actionOnLineSelected(KeyCode.defaultSelect, lineSelected);
       }
+      adjCountChildrenInParent(1);
       zLine += 1;
       GralTable.this.bPrepareVisibleArea = true;
       boolean showChildren1 = this.showChildren; 

@@ -1498,15 +1498,19 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       widgg.lastTimeSetVisible = System.currentTimeMillis();
     }
 
+    /**Access method to GralWidget's method. */
     protected GralUserAction actionShow(){ return widgg.actionShow; }
     
+    /**Access method to GralWidget's method. */
     protected GralUserAction actionChanging(){ return widgg.actionChanging; }
     
     
+    /**Access method to {@link GralWidget#dyda}. */
     protected GralWidget.DynamicData dyda(){ return widgg.dyda; }
     
     //public void setWidgetImpl(GralWidgImpl_ifc widg, GralMng mng){ widgg.wdgImpl = widg; widgg.itsMng = mng; }
 
+    /**Notify that the text is changed in {@link GralWidget.DynamicData#bTextChanged} */
     protected void setTextChanged(){ widgg.dyda.bTextChanged = true; }
     
     /**Invoked on touching a widget. */
@@ -1534,6 +1538,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     
 
     
+    /**Gets the bits what is changed in the widget's data. The bits are all definitions
+     * starting with chg in this class. {@link #chgText} etc.
+     * @return
+     */
     public int getChanged(){ return widgg.dyda.whatIsChanged.get(); }
     
     public void acknChanged(int mask){ widgg.dyda.acknChanged(mask); }

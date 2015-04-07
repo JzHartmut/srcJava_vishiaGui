@@ -314,6 +314,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       bFocusLost = false;
     }
     if(swtWidgHelper.widgetSwt !=null && !swtWidgHelper.widgetSwt.isDisposed()){
+      determineSizeAndPosition();
       int chg = getChanged();
       int acknChg = 0;
       if((chg & chgVisible)!=0){
@@ -694,7 +695,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       
     }
     
-    PaintListener vScrollbarPainter = new PaintListener(){
+    private PaintListener vScrollbarPainter = new PaintListener(){
       @Override public void paintControl(PaintEvent e) {
         SwtTable.this.paintVscrollbar(e, Vscrollbar.this);
       }

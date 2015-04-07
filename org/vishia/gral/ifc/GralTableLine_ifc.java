@@ -88,7 +88,7 @@ public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, MarkMask_if
   GralTableLine_ifc<UserData> addPrevLine(String childKey, String[] childTexts, UserData data);
 
   
-  
+  void deleteLine();
   
   GralTableLine_ifc<UserData> parentNode();  
   
