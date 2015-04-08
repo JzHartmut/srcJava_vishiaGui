@@ -314,7 +314,6 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       bFocusLost = false;
     }
     if(swtWidgHelper.widgetSwt !=null && !swtWidgHelper.widgetSwt.isDisposed()){
-      determineSizeAndPosition();
       int chg = getChanged();
       int acknChg = 0;
       if((chg & chgVisible)!=0){
@@ -354,8 +353,12 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
           swtSearchText.setVisible(false);
         }
         //System.out.println("swtTable redrawed");
-        swtWidgHelper.widgetSwt.update();  //this is the core-redraw
-        swtWidgHelper.widgetSwt.redraw();
+        //see redrawChildren. This redraw don't influences the vScrollbar:
+        //swtWidgHelper.widgetSwt.redraw();
+        //swtWidgHelper.widgetSwt.update();  //this is the core-redraw
+        //redraw command for the:
+        vScrollBar.update();
+        vScrollBar.redraw();
       }
       //((Table)swtWidg.widgetSwt).super.redraw();
       redrawtime = System.currentTimeMillis();
@@ -507,18 +510,22 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
   
   
-  private void paintVscrollbar(PaintEvent ev, Canvas canvas)
+  private void paintVscrollbar(GC gc, Canvas canvas)
   {
     if(colorBackVscrollbar == null) {
       colorBackVscrollbar = swtWidgHelper.mng.getColorImpl(colorBackVscrollbar());
       colorLineVscrollbar = swtWidgHelper.mng.getColorImpl(colorLineVscrollbar());
     }
-    GC gc = ev.gc;
     Rectangle dim = canvas.getBounds();
+    determineSizeAndPositionScrollbar(dim.height);
     gc.setForeground(colorBackVscrollbar);
-    gc.fillRectangle(dim.x, dim.y, dim.width, dim.height);
+    gc.fillRectangle(1, dim.y, dim.width, dim.height);
     gc.setForeground(colorLineVscrollbar);
-    gc.drawLine(1,1, dim.width-1, dim.height-1);
+    //Note: relative coordinates inside the canvas area:
+    //gc.fillRectangle(1, y1Scrollbar, dim.width, y2Scrollbar - y1Scrollbar);
+    gc.drawLine(1, y1Scrollbar+1, dim.width-1, y2Scrollbar); // - y1Scrollbar-1);
+    
+    //gc.drawLine(1,1, dim.width-1, dim.height-1);
     
   }
   
@@ -695,9 +702,16 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       
     }
     
+    @Override
+    public void drawBackground(GC g, int x, int y, int dx, int dy) {
+      System.out.println("VScrollbar - draw");
+      //SwtTable.this.paintVscrollbar(g, Vscrollbar.this);
+    }
+    
     private PaintListener vScrollbarPainter = new PaintListener(){
       @Override public void paintControl(PaintEvent e) {
-        SwtTable.this.paintVscrollbar(e, Vscrollbar.this);
+        System.out.println("VScrollbar - paintlistener");
+        SwtTable.this.paintVscrollbar(e.gc, Vscrollbar.this);
       }
     };
     
@@ -717,18 +731,6 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     //  redrawGthread();
     //}
     
-    
-    
-    /**Does call the super redraw method called inside {@link #redrawGthread()} from the overridden
-     * {@link #redraw()} method. */
-    private void superRedraw(){
-      super.update(); 
-      super.redraw();
-      //if(searchChars.length() >0){
-        //swtSelectText.update();
-        //swtSelectText.redraw();
-      //}
-    }
     
     
     

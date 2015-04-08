@@ -277,7 +277,7 @@ import org.vishia.util.TreeNode_ifc;
   
   /**Number of lines and number of the current line. It is -1 if this numbers should be evaluated from {@link #rootLine}
    */
-  private int zLineCurr = -1, nLineCurr = -1;
+  private int zLineCurr = -1, nLineFirst = -1;
   
   
   protected final StringBuilder searchChars = new StringBuilder(20);
@@ -575,7 +575,7 @@ import org.vishia.util.TreeNode_ifc;
     assert(ixline > - zLineVisible && ixline < zLineVisible);
     assert(ixcolumn < gi.cells[0].length);
     lineSelected = (TableLineData)line;
-    nLineCurr = -1;  //get new, undefined elsewhere.
+    nLineFirst = -1;  //get new, undefined elsewhere.
     actionOnLineSelected(KeyCode.userSelect, lineSelected);
     if(ixline < 0){
       lineSelectedixCell = zLineVisible + ixline;  //-1 is the last.
@@ -708,7 +708,7 @@ import org.vishia.util.TreeNode_ifc;
       actionOnLineSelected(KeyCode.defaultSelect, lineSelected);
       if(zLineCurr == -1){ 
         zLineCurr = 0;
-        nLineCurr = 0;
+        nLineFirst = 0;
       }
     }
     if(zLineCurr >= 0){
@@ -752,7 +752,7 @@ import org.vishia.util.TreeNode_ifc;
     colSelectedixCellC = 0;
     zLine = 0;
     zLineCurr = 0;
-    nLineCurr = -1;
+    nLineFirst = -1;
     lineSelected = null;
     actionOnLineSelected(KeyCode.removed, lineSelected);
     searchChars.setLength(0);
@@ -874,7 +874,11 @@ import org.vishia.util.TreeNode_ifc;
         }
       }
     }
-    return dLine - dLine1;
+    int nLineShift = dLine - dLine1;
+    if(nLineShift !=0){
+      nLineFirst += nLineShift;
+    }
+    return nLineShift;
   }
   
   
@@ -939,7 +943,7 @@ import org.vishia.util.TreeNode_ifc;
   protected void mouseUp(int key, CellData cell){
     if(key == KeyCode.mouse1Up){
       lineSelected = lineSelectedNew;
-      nLineCurr = -1;  //get new
+      nLineFirst = -1;  //get new
       lineSelectedNew = null;
       lineSelectedixCell = cell.ixCellLine;  //used for key handling.
       colSelectedixCellC = cell.ixCellColumn;
@@ -988,7 +992,7 @@ import org.vishia.util.TreeNode_ifc;
       if(line2 ==null){ //end of search
         contSearch = false;  //without change the lineSelected
         lineSelected = line;  //show the first or last line
-        nLineCurr = -1;  //get new, undefined elsewhere.
+        nLineFirst = -1;  //get new, undefined elsewhere.
         found = search.length() >0;
       } else {
         line = line2;
@@ -1004,7 +1008,7 @@ import org.vishia.util.TreeNode_ifc;
           } else {
             found = true;
             lineSelected = line;
-            nLineCurr = -1;  //get new, undefined elsewhere.
+            nLineFirst = -1;  //get new, undefined elsewhere.
             bPrepareVisibleArea = true;
             contSearch = false;                   //found
           }
@@ -1072,7 +1076,7 @@ import org.vishia.util.TreeNode_ifc;
             }
           }
           lineSelected = linesForCell[lineSelectedixCell];
-          nLineCurr = -1;  //get new, undefined elsewhere.
+          nLineFirst = -1;  //get new, undefined elsewhere.
           //the table has the focus, because the key action is done only if it is so.
           //set the new cell focused, in the paint routine.
           gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
@@ -1092,7 +1096,6 @@ import org.vishia.util.TreeNode_ifc;
               }
             }
             lineSelected = linesForCell[lineSelectedixCell];
-            nLineCurr -= 1;  //
             
           }
           //the table has the focus, because the key action is done only if it is so.
@@ -1116,7 +1119,7 @@ import org.vishia.util.TreeNode_ifc;
             ){
             lineSelectedixCell -=1;
           }
-          nLineCurr = -1;  //get new, undefined elsewhere.
+          nLineFirst = -1;  //get new, undefined elsewhere.
           //the table has the focus, because the key action is done only if it is so.
           //set the new cell focused, in the paint routine.
           gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
@@ -1150,7 +1153,7 @@ import org.vishia.util.TreeNode_ifc;
                 ){
                 lineSelectedixCell -=1;
               }
-              nLineCurr = -1;  //get new, undefined elsewhere.
+              nLineFirst = -1;  //get new, undefined elsewhere.
             }
             //the table has the focus, because the key action is done only if it is so.
             //set the new cell focused, in the paint routine.
@@ -1174,7 +1177,7 @@ import org.vishia.util.TreeNode_ifc;
             }
             if(lineSelected.hasChildren()){           //only if it has children currently really.
               lineSelected.showChildren(true, true);
-              lineSelected.countChildren(true, nLineCurr);  //count the children.
+              lineSelected.countChildren(true, nLineFirst);  //count the children.
               fillVisibleAreaBehind(lineSelected, lineSelectedixCell);
               repaint();
             }
@@ -1329,6 +1332,10 @@ import org.vishia.util.TreeNode_ifc;
 
     /**Pixel position of the vertical scroll bar. */
     protected final GralRectangle xyVscrollbar = new GralRectangle(0,0,0,0);
+    
+    /**Position of vScrollBar calculated from {@link GralTable#rootLine}. {@link NodeTableLine#zLineUnfolded} and {@link GralTable#nLineCurr}
+     * written in {@link #determineSizeAndPosition()} used for painting vScrollBar. */
+    protected int y1Scrollbar, y2Scrollbar;
     
     /**Start position of each column in pixel. 
      * @deprecated only used in org.vishia.gral.swt.SwtTable#initSwtTable(...) */
@@ -1643,9 +1650,21 @@ import org.vishia.util.TreeNode_ifc;
      * Therewith the {@link GralTable#nLineCurr} is set too. Anytime if the situation is not specified
      * the {@link GralTable#nLineCurr} can be set to -1. This forces new calculation.
      */
-    protected void determineSizeAndPosition()
-    { if(GralTable.this.nLineCurr <0 || GralTable.this.rootLine.zLineUnfolded <0) {
+    protected void determineSizeAndPositionScrollbar(int yPixel)
+    { if(GralTable.this.nLineFirst <0 || GralTable.this.rootLine.zLineUnfolded <0) {
         GralTable.this.rootLine.countChildren(true, 0);
+      }
+      int zLine = Math.max(1, rootLine.zLineUnfolded);
+      y1Scrollbar = yPixel * nLineFirst / zLine;
+      int zLineShow = Math.min(zLineVisible, zLine);  //less if table is shorter than visible area
+      int ydScrollbar = yPixel * zLineShow / zLine;   //it is <= yPixel
+      if(ydScrollbar < 5){
+        ydScrollbar = 5;
+      }
+      y2Scrollbar = y1Scrollbar + ydScrollbar;
+      if(y2Scrollbar > yPixel) {
+        y2Scrollbar = yPixel;
+        y1Scrollbar = y2Scrollbar - ydScrollbar;
       }
     }
 
@@ -1876,7 +1895,7 @@ import org.vishia.util.TreeNode_ifc;
     public TableLineData addPrevLine(String lineKey, String[] lineTexts, UserData userDataP){
       lineCanHaveChildren = true; //hasChildren();
       TableLineData line = GralTable.this.new TableLineData(lineKey, userDataP);
-      super.addSiblingPrev(line);  ////
+      super.addSiblingPrev(line);  
       line.prepareAddedLine(lineTexts);
       return line;
 
@@ -1893,7 +1912,7 @@ import org.vishia.util.TreeNode_ifc;
     public TableLineData addNextLine(String lineKey, String[] lineTexts, UserData userDataP){
       lineCanHaveChildren = true; //hasChildren();
       TableLineData line = GralTable.this.new TableLineData(lineKey, userDataP);
-      super.addSiblingNext(line);  ////
+      super.addSiblingNext(line);
       line.prepareAddedLine(lineTexts);
       return line;
 
@@ -1901,21 +1920,20 @@ import org.vishia.util.TreeNode_ifc;
 
     public void deleteLine() {
       zLine -=1;
+      nLineFirst = -1;
       adjCountChildrenInParent(-1);
       final TableLineData line1 = (TableLineData)this;
       bPrepareVisibleArea = true;
       if(lineSelected == this){
-        nLineCurr -=1;
         TableLineData line2 = prevLine(line1);
         if(line2 == null){
           lineSelected = nextLine(line1); 
-          nLineCurr = 0;  //it is the first one.
         } else {
           lineSelected = line2;
           //nLineCurr left unchanged.
         }
       } else {
-        nLineCurr = -1;  //get new, undefined elsewhere.
+        nLineFirst = -1;  //get new, undefined elsewhere.
       }
       line1.detach();
       repaint();
@@ -1946,8 +1964,8 @@ import org.vishia.util.TreeNode_ifc;
         ctParent +=1;
         if(zLineCurr >=0){ 
           zLineCurr +=1; 
-          if(lineSelectedNew !=null ? child == lineSelectedNew : child == lineSelected) {
-            nLineCurr = ctParent;
+          if(child == linesForCell[0]) {
+            nLineFirst = ctParent;
           }
         }
         if(child.showChildren && bLeftGrandChildrenOpen) {
@@ -2031,7 +2049,7 @@ import org.vishia.util.TreeNode_ifc;
     
     
     private void prepareAddedLine(String[] lineTexts) {
-      nLineCurr = -1;  //get new, undefined elsewhere.
+      nLineFirst = -1;  //get new, undefined elsewhere.
       if(lineTexts !=null){
         for(int ixCol = 0; ixCol < lineTexts.length && ixCol < cellTexts.length; ++ixCol){
           cellTexts[ixCol] = lineTexts[ixCol];
@@ -2052,8 +2070,8 @@ import org.vishia.util.TreeNode_ifc;
         zLineUnfolded +=1;
         adjCountChildrenInParent(1);
       }
-      if(this == lineSelected) {
-        nLineCurr = rootLine.zLineUnfolded;  //store the number of current line if given.
+      if(this == linesForCell[0]) {
+        nLineFirst = rootLine.zLineUnfolded;  //store the number of current line if given.
       }
       if(showChildren1) {
         repaint();
@@ -2213,7 +2231,7 @@ import org.vishia.util.TreeNode_ifc;
           }
           showChildren = true;
           //children are closed yet, open and count it.
-          countChildren(bLeftGrandChildrenOpen, nLineCurr);
+          countChildren(bLeftGrandChildrenOpen, nLineFirst);
         }
       } else { //switch off children
         if(showChildren) {
