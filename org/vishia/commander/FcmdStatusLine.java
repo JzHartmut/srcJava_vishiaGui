@@ -78,13 +78,13 @@ public class FcmdStatusLine
     menuWidg.addMenuItemGthread("menuContextShowSlash", main.idents.menuContextShowSlash, actionShowSlash);
     main._gralMng.setPosition(2, 4, 0, 9.8f, 1, 'r');
     widgRunInfo = main._gralMng.addTextField(main.nameTextFieldRunInfo, false, null, null);
-    widgRunInfo.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.pathCurr.");
+    widgRunInfo.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.runInfo.");
     main._gralMng.setPosition(2, 4, 10, -8, 1, 'r');
     widgFileInfo = main._gralMng.addTextField(main.nameTextFieldInfo, false, null, null);
-    widgFileInfo.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.pathCurr.");
+    widgFileInfo.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.fileInfo.");
     main._gralMng.setPosition(2, 4, -8, 0, 1, 'r');
     widgSyncInfo = main._gralMng.addTextField(main.nameTextFieldInfo, false, null, null);
-    //widgSyncInfo.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.pathCurr.");
+    widgSyncInfo.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.syncInfo.");
 
   }
   

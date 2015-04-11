@@ -64,17 +64,34 @@ public class GralColor
    * to minimize the effort in dynamic instances.  */
   public Object colorGuimpl;
   
+  /**Deprecated
+   * @param red
+   * @param green
+   * @param blue
+   * @deprecated use {@link #getColor(int, int, int)} because more as one instances for the same color is prevented then
+   *   and the color have a correct name if the value matches to a existent color.
+   */
   public GralColor(int red, int green, int blue){
     this.red = red; this.green = green; this.blue = blue;
     int color = ((red << 16) & 0xff0000) | ((green << 8) & 0xff00) | (blue & 0xff);
     name = String.format("0x%06X",new Integer(color));
   }
   
+  /**
+   * @param color
+   * @deprecated only private using, because more as one instances for the same color is prevented then
+   *   and the color have a correct name if the value matches to a existent color.
+   */
   public GralColor(int color){
     this.red = (color >>16) & 0xff; this.green = (color >>8) & 0xff; this.blue = (color >>0) & 0xff;
     name = String.format("0x%06X", new Integer(color));
   }
   
+  /**Deprecated, only private usage. Use 
+   * @param color
+   * @deprecated only private using, because more as one instances for the same color is prevented then
+   *   and the color have a correct name if the value matches to a existent color.
+   */
   public GralColor(String name, int color){
     this.red = (color >>16) & 0xff; this.green = (color >>8) & 0xff; this.blue = (color >>0) & 0xff;
     this.name = name;
@@ -441,6 +458,16 @@ public class GralColor
   
   public static GralColor getColor(int value)
   { GralColor color = container.colorsByValue.get(new Integer(value));
+    if(color == null){
+      color = new GralColor(value);
+      container.colorsByValue.put(new Integer(value), color);
+    }
+    return color;
+  }
+  
+  public static GralColor getColor(int red, int green, int blue)
+  { int value = ((red << 16) & 0xff0000) | ((green << 8) & 0xff00) | (blue & 0xff);
+    GralColor color = container.colorsByValue.get(new Integer(value));
     if(color == null){
       color = new GralColor(value);
       container.colorsByValue.put(new Integer(value), color);

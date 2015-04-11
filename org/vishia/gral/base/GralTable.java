@@ -346,7 +346,11 @@ import org.vishia.util.TreeNode_ifc;
   protected GralColor colorSelectCharsBack;
   protected GralColor colorSelectChars;
 
-  protected GralColor colorBackVscrollbar, colorLineVscrollbar;
+  /**Background of VscrollBar. */
+  protected GralColor colorBackVscrollbar;
+  
+  /**20 nuances of color for the slider of the vertical scrollBar. The nuances depends on the pixel size. */
+  protected final GralColor[] colorSliderVscrollbar = new GralColor[10];
   
   
   /**This action will be called if any line is marked. It may be null, see 
@@ -544,8 +548,25 @@ import org.vishia.util.TreeNode_ifc;
     dyda.textColor = GralColor.getColor("bk");
     colorSelectCharsBack = GralColor.getColor("lgr");
     colorSelectChars = GralColor.getColor("wh");
-    colorBackVscrollbar = GralColor.getColor("or");
-    colorLineVscrollbar = GralColor.getColor("bl");
+    colorBackVscrollbar = GralColor.getColor("lgr");
+    int rd1,gn1, bl1, rd2, gn2, bl2;
+    bl1 = colorBackVscrollbar.getColorValue();
+    rd1 = (bl1 >>16) & 0xff;
+    gn1 = (bl1 >>8) & 0xff;
+    bl1 = bl1 & 0xff;
+    colorSliderVscrollbar[0] = GralColor.getColor("bl");
+    bl2 = colorSliderVscrollbar[0].getColorValue();
+    rd2 = (bl1 >>16) & 0xff;
+    gn2 = (bl1 >>8) & 0xff;
+    bl2 = bl1 & 0xff;
+    
+    for(int ix=1; ix < colorSliderVscrollbar.length; ++ix){
+      float r = 0.8f * ((float)(ix)) / (colorSliderVscrollbar.length);  //max. 0.8
+      int rd = rd2 + (int)((rd1 - rd2) * r);
+      int gn = gn2 + (int)((gn1 - gn2) * r);
+      int bl = bl2 + (int)((bl1 - bl2) * r);
+      colorSliderVscrollbar[ix] = GralColor.getColor(rd, gn, bl);
+    }
   }
   
   
@@ -1337,6 +1358,12 @@ import org.vishia.util.TreeNode_ifc;
      * written in {@link #determineSizeAndPosition()} used for painting vScrollBar. */
     protected int y1Scrollbar, y2Scrollbar;
     
+    protected boolean bVscrollbarChanged;
+    
+    /**New and last index of the sliderColor. The last index is stored by the implementation and compared with the new one
+     * to desire whether a new implementation color should be gotten. */
+    protected int ixColorScrollbar, ixColorScrollbarLast = -1;
+    
     /**Start position of each column in pixel. 
      * @deprecated only used in org.vishia.gral.swt.SwtTable#initSwtTable(...) */
     protected int[] columnPixel;
@@ -1418,7 +1445,7 @@ import org.vishia.util.TreeNode_ifc;
     
     protected GralColor colorBackVscrollbar(){ return outer.colorBackVscrollbar; }
     
-    protected GralColor colorLineVscrollbar(){ return outer.colorLineVscrollbar; }
+    protected GralColor colorLineVscrollbar(){ return outer.colorSliderVscrollbar[ixColorScrollbar]; }
     
     protected StringBuilder searchChars(){ return outer.searchChars; }
     
@@ -1655,17 +1682,25 @@ import org.vishia.util.TreeNode_ifc;
         GralTable.this.rootLine.countChildren(true, 0);
       }
       int zLine = Math.max(1, rootLine.zLineUnfolded);
-      y1Scrollbar = yPixel * nLineFirst / zLine;
+      int y1 = yPixel * nLineFirst / zLine;
       int zLineShow = Math.min(zLineVisible, zLine);  //less if table is shorter than visible area
-      int ydScrollbar = yPixel * zLineShow / zLine;   //it is <= yPixel
-      if(ydScrollbar < 5){
-        ydScrollbar = 5;
+      int yd = yPixel * zLineShow / zLine;   //it is <= yPixel
+      if(yd < 5){
+        yd = 5;
       }
-      y2Scrollbar = y1Scrollbar + ydScrollbar;
-      if(y2Scrollbar > yPixel) {
-        y2Scrollbar = yPixel;
-        y1Scrollbar = y2Scrollbar - ydScrollbar;
+      int y2 = y1 + yd;
+      if(y2 > yPixel) {
+        y2 = yPixel;
+        y1 = y2 - yd;
       }
+      if(y1 != y1Scrollbar || y2 != y2Scrollbar){ 
+        y1Scrollbar = y1;
+        y2Scrollbar = y2;
+        bVscrollbarChanged = true;
+        ixColorScrollbar = (y2Scrollbar - y1Scrollbar) / 15;
+        if(ixColorScrollbar >= outer.colorSliderVscrollbar.length){ ixColorScrollbar = outer.colorSliderVscrollbar.length -1; }
+      }
+
     }
 
     /**This routine will be called inside a resize listener of the implementation graphic.

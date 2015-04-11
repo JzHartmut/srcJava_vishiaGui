@@ -156,7 +156,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   private Canvas vScrollBar;
   
   
-  Color colorBackVscrollbar, colorLineVscrollbar;
+  Color colorBackVscrollbar, colorSliderVscrollbar;
   
   /**SWT Text Control which contains a search text. It is only visible if need. */
   protected Text swtSearchText;
@@ -357,8 +357,10 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         //swtWidgHelper.widgetSwt.redraw();
         //swtWidgHelper.widgetSwt.update();  //this is the core-redraw
         //redraw command for the:
-        vScrollBar.update();
-        vScrollBar.redraw();
+        if(bVscrollbarChanged){
+          vScrollBar.update();
+          vScrollBar.redraw();
+        }
       }
       //((Table)swtWidg.widgetSwt).super.redraw();
       redrawtime = System.currentTimeMillis();
@@ -512,18 +514,22 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
   private void paintVscrollbar(GC gc, Canvas canvas)
   {
-    if(colorBackVscrollbar == null) {
+    
+    if(ixColorScrollbar != ixColorScrollbarLast) {
+      //only get a new color if necessary.
       colorBackVscrollbar = swtWidgHelper.mng.getColorImpl(colorBackVscrollbar());
-      colorLineVscrollbar = swtWidgHelper.mng.getColorImpl(colorLineVscrollbar());
+      colorSliderVscrollbar = swtWidgHelper.mng.getColorImpl(colorLineVscrollbar());
+      ixColorScrollbarLast = ixColorScrollbar;
     }
     Rectangle dim = canvas.getBounds();
     determineSizeAndPositionScrollbar(dim.height);
     gc.setForeground(colorBackVscrollbar);
     gc.fillRectangle(1, dim.y, dim.width, dim.height);
-    gc.setForeground(colorLineVscrollbar);
+    gc.setForeground(colorSliderVscrollbar);
+    gc.setBackground(colorSliderVscrollbar);
     //Note: relative coordinates inside the canvas area:
-    //gc.fillRectangle(1, y1Scrollbar, dim.width, y2Scrollbar - y1Scrollbar);
-    gc.drawLine(1, y1Scrollbar+1, dim.width-1, y2Scrollbar); // - y1Scrollbar-1);
+    gc.fillRectangle(1, y1Scrollbar, dim.width-1, y2Scrollbar - y1Scrollbar);
+    //gc.drawLine(1, y1Scrollbar+1, dim.width-1, y2Scrollbar); // - y1Scrollbar-1);
     
     //gc.drawLine(1,1, dim.width-1, dim.height-1);
     
