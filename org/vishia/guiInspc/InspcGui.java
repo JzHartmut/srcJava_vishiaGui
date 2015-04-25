@@ -253,7 +253,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     long time = System.currentTimeMillis();
     ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = guiCfg._gralMng.getVisiblePanels();
     //GralWidget widgdRemove = null;
-    long timeAtleast = System.currentTimeMillis() - 3000;
+    long timeAtleast = System.currentTimeMillis() - 5000;
     try{
       for(GralVisibleWidgets_ifc panel: listPanels){
         List<GralWidget> widgetsVisible = panel.getWidgetsVisible();

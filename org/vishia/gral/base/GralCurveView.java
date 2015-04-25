@@ -268,6 +268,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
 
     @Override public void setValue(float value) { this.YYYactValue = value; }
 
+    @Override public void setLongValue(long value) { this.YYYactValue = value; }
+
     @Override public void setValue(Object[] value) { } //TODO this.actValue = value[0]; }
 
     /**Maybe used for scaling, yet unused here.

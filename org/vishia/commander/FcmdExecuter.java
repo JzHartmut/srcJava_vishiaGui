@@ -119,6 +119,7 @@ public class FcmdExecuter
           //main.cmdSelector.initExecuter(script);
         } catch(Throwable exc){
           log.writeError("CmdStore - JZcmdScript;", exc);
+          error = exc.getMessage();
         }
       }
 

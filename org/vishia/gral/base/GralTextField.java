@@ -246,7 +246,18 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
         sShow = null;  //maybe integer 
       }
       if(sShow == null){
-        try{ sShow = String.format(sFormat, new Integer((int)value)); }
+        long value1;
+        if(sFormat.startsWith("+")){
+          if(value <0){
+            value1 = (long)(((int)value) + 0x80000000L);
+          } else {
+            value1 = (int)value;
+          }
+          //if(value1 <0) { value1 += 0x8000000000000000L; }
+        } else {
+          value1 = (int)value;
+        }
+        try{ sShow = String.format(sFormat, new Long(value1)); }  
         catch(java.util.IllegalFormatException exc){ 
           sShow = "?format";  
         }
@@ -263,6 +274,108 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
       //else if(valueAbs >= 1e6){ sShow = Float.toString(value/1000000) + " M"; }  //shorten output, don't show exponent.
       else { sShow = Float.toString(value); }
       
+    }
+    setText(sShow);
+  }
+  
+  
+  
+  /**Sets a float value into a text field.
+   * The float value may be formatted:
+   * <ul>
+   * <li>If the {@link #setFormat(String)} of this widget starts with '!' and contains a second '!',
+   *   the String between that is used as expression to calculate the float value
+   *   using {@link CalculatorExpr}. Therewith any calculation can be done.
+   * <li>The rest after the "!expression!" or the given format is used for String.format(sFormat, value)
+   *   to determine the output appearance.
+   * <li>If no format is given, the value will be shown in proper readable appearance. That assures
+   *   that the value is able to present in a short text field, using maximal 9 digits. 
+   * <li>If no format is given and the absolute of the value is less 0.000001 but not 0, 
+   *   a "0.000001" with the correct sign will be shown. It shows, there is a less value, but not null.
+   * <li>If no format is given and the value is in range up to 1 Billion, it is shown with "k", "M"
+   *   for kilo and Mega with max 3 digits before dot and 3 digits after the dot.
+   * <li>if no format is given and the value is greater than 1 Billion, it is shown with exponent.
+   * <li>As special feature a format <code>int32AngleDegree</code> and <code>int16AngleDegree</code>
+   *   is supported, if that text is contained in the format string. The value should come from an integer,
+   *   which contains an angle value with wrap-around-presentation: 0x7fffffff is 1 less 180 degree and
+   *   0x80000000 is exactly 180 degree. This format helps to calculate with angle values in range
+   *   of -180...+179.99999 degree. The presentation in the text field is shown as degree angle value. 
+   * <ul>      
+   *   
+   * @see org.vishia.gral.base.GralWidget#setValue(float)
+   */
+  @Override public void setLongValue(final long valueP){
+    final String sFormat1;
+    long value;
+    String sShow;
+    if(calculator !=null){
+      try {
+        CalculatorExpr.Value value1 = calculator.calcDataAccess(null, valueP);
+        value = (long)value1.doubleValue();
+      } catch (Exception e) {
+        value = 7777777L;
+      }
+      sFormat1 = this.sFormat2;
+    } else if(sFormat !=null){
+      if(sFormat.startsWith("!")){
+        int posEnd = sFormat.indexOf('!',1);
+        if(posEnd >=0){
+          String sExpr = sFormat.substring(1, posEnd);
+          this.sFormat2 = sFormat1 = sFormat.substring(posEnd+1);
+          if(calculator ==null){
+            calculator = new CalculatorExpr();
+            String sError = calculator.setExpr(sExpr);
+            if(sError !=null){ 
+              //console.writeError(sError);
+              calculator = null;
+            }
+          }
+          if(calculator !=null){
+            value = calculator.calcLong(valueP);
+          } else {
+            value = valueP;
+          }
+        } else {
+          sFormat1 = sFormat;
+          value = valueP;
+        }
+      } else if(sFormat.startsWith("int16AngleDegree")){
+        this.calculator = new CalculatorAngle16();
+        sFormat1 = this.sFormat2 = "%3.3f";
+        value = calculator.calcLong(valueP);
+      } else if(sFormat.startsWith("int32AngleDegree")){
+        this.calculator = new CalculatorAngle32();
+        sFormat1 = this.sFormat2 = "%3.3f";
+        value = calculator.calcLong(valueP);
+      } else {
+        sFormat1 = sFormat;
+        value = valueP;
+      }
+        
+    } else { //sFormat == null
+      sFormat1 = null;  //no expression
+      value = valueP;
+    }
+    if(sFormat1 !=null && sFormat.length() >0){
+      long value1;
+      if(sFormat1.startsWith("+") && value <0) { //special handling. It is an unsigned int, convert it to long 
+        value1 = (value + 0x8000000000000000L) & 0x0ffffffffL;
+        //sFormat1 = sFormat1.substring(1);
+      } else {
+        value1 = value;
+      }
+      try{ sShow = String.format(sFormat1, new Long(value1)); }
+      catch(java.util.IllegalFormatException exc){ 
+        sShow = null;  //maybe integer 
+      }
+      if(sShow == null){
+        try{ sShow = String.format(sFormat, new Long(value)); }  
+        catch(java.util.IllegalFormatException exc){ 
+          sShow = "?format";  
+        }
+      }
+    } else { //no format given
+      sShow = String.format("%d", new Long(value)); 
     }
     setText(sShow);
   }

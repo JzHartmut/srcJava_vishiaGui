@@ -813,7 +813,8 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       int borderTable = ((Control)e.widget).getBorderWidth();
       //it calls repaint with delay.
       Rectangle parentBounds = ((Control)e.widget).getParent().getBounds();
-      GralRectangle pixTable = outer.pos().calcWidgetPosAndSize(itsMng().propertiesGui(), parentBounds.width, parentBounds.height, 0, 0);
+      //GralRectangle pixTable = outer.pos().calcWidgetPosAndSize(itsMng().propertiesGui(), parentBounds.width, parentBounds.height, 0, 0);
+      GralRectangle pixTable = outer.pos().calcWidgetPosAndSize(itsMng().propertiesGui(), boundsTable.width, boundsTable.height, 0, 0);
       SwtTable.this.resizeTable(pixTable);
     }
     

@@ -61,7 +61,7 @@ import org.vishia.util.KeyCode;
 public class GuiCfg 
 {
 
-  /**The version.
+  /**The version, history and license.
    * <ul>
    * <li>2013-12-02 Hartmut new Parameter for {@link #GuiCfg(GuiCallingArgs, GralArea9MainCmd, GralPlugUser_ifc, GralPlugUser2Gral_ifc, List)}:
    *    cfgConditions.
@@ -98,7 +98,7 @@ public class GuiCfg
    * <li> You can redistribute copies of this source to everybody.
    * <li> Every user of this source, also the user of redistribute copies
    *    with or without payment, must accept this license for further using.
-   * <li> But the LPGL ist not appropriate for a whole software product,
+   * <li> But the LPGL is not appropriate for a whole software product,
    *    if this source is only a part of them. It means, the user
    *    must publish this part of source,
    *    but don't need to publish the whole source of the own product.

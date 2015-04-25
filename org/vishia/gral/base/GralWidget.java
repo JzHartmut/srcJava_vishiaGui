@@ -545,6 +545,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     
     public float fValue, minValue, maxValue;
     
+    /**If a long or int value is given, it is stored here. */
+    public long lValue;
+    
     public Object visibleInfo;
     
     public Object userData;
@@ -1070,8 +1073,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
         String sValue = null;
         switch(cType){
           case 'Z': case 'S': case 'B':
-          case 'I': setValue(variable.getInt()); break;
-          case 'L': setValue(variable.getLong()); break;
+          case 'I': setLongValue(variable.getInt()); break;
+          case 'L': setLongValue(variable.getLong()); break;
           case 'F': setValue(variable.getFloat()); break;
           case 'D': 
             Object[] value = new Double[1]; 
@@ -1245,10 +1248,27 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   }
   
   
+  /**Sets a value to show.
+   * @param value
+   * This routine may be overridden by some specialized widgets.
+   */
+  @Override public void setLongValue(long value){
+    dyda.fValue = value; //may be shorten in acceleration
+    dyda.lValue = value;
+    repaint(repaintDelay, repaintDelayMax);
+    //itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, value, null);
+  }
+  
+  
   
   /**Gets the float attribute value of this widget. Returns 0.0 if a float value is never used.
    */
   public float getFloatValue(){ return dyda.fValue; }
+  
+  
+  /**Gets the float attribute value of this widget. Returns 0.0 if a float value is never used.
+   */
+  public float getLongValue(){ return dyda.lValue; }
   
   
   /**Sets some value to show any content.

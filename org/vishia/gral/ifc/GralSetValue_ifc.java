@@ -73,11 +73,16 @@ public interface GralSetValue_ifc
   
 
 
-	/**Sets a value to show.
-	 * @param value
-	 */
-	void setValue(float value);
-	
+  /**Sets a value to show.
+   * @param value
+   */
+  void setValue(float value);
+  
+  /**Sets a value to show.
+   * @param value
+   */
+  void setLongValue(long value);
+  
   /**Sets some values to show any content. Depending from the type of widget more as one value
    * can be used for several functionality.
    * @param value array of floats

@@ -68,7 +68,7 @@ public class BzrGetStatus
    * <li>get status
    * </ul>
    * It fills the indexed instance of {@link DataCmpn}
-   * @param ixData The index of the component, index in {@link #data}
+   * @param ixData The index of the component, index in data
    */
   void captureStatus(DataCmpn data)
   {
