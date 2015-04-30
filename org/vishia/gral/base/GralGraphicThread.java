@@ -8,6 +8,7 @@ import org.vishia.event.EventTimerThread_ifc;
 import org.vishia.event.EventTimeout;
 import org.vishia.event.TimeOrder;
 import org.vishia.event.EventTimerThread;
+import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Assert;
 import org.vishia.util.MinMaxTime;
 
@@ -365,9 +366,16 @@ public class GralGraphicThread implements Runnable
     /**The thread which runs all graphical activities. */
     protected final Thread threadGuiDispatch;
 
+    public final GralWindow mainWindow;
+    
+    protected final LogMessage log;
+    
+
     //protected GrapGraphicThread
 
-    protected ImplAccess(char sizeCharProperties) {
+    protected ImplAccess(char sizeCharProperties, GralWindow mainWindow, LogMessage log) {
+      this.mainWindow = mainWindow;
+      this.log = log;
       this.gralGraphicThread = GralMng.get().gralDevice;
       this.gralGraphicThread.impl = this;
       this.sizeCharProperties = sizeCharProperties;

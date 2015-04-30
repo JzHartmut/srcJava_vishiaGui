@@ -5,10 +5,18 @@ import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.ifc.GralFactory_ifc;
+import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.swt.SwtFactory;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
+
+/*Test with jzcmd: call jzcmd with this java file with its full path:
+D:/vishia/Java/srcJava_vishiaGui/org/vishia/gral/test/HelloWorld.java
+==JZcmd==
+java org.vishia.gral.test.HelloWorld.main(null);                 
+==endJZcmd==
+ */
+
 
 public class HelloWorld
 {
@@ -16,23 +24,36 @@ public class HelloWorld
   
   public static void main(String[] args){
     HelloWorld main = new HelloWorld();
-    main.execute();
-  
+    main.openWindow1();
+    waitForClosePrimaryWindow();
   }
   
-  private void execute(){
-    GralFactory_ifc gralFactory = new SwtFactory();
-    LogMessage log = new LogMessageStream(System.out);
-    GralWindow wind = gralFactory.createWindow(log, "Hello World", 'C', 100, 50, 600, 400);
-    gralMng = wind.gralMng();
-    gralMng.gralDevice.addDispatchOrder(initGraphic);
-    //initGraphic.awaitExecution(1, 0);
-    while(gralMng.gralDevice.isRunning()){
+  
+  public static void openWindow(){
+    HelloWorld main = new HelloWorld();
+    main.openWindow1();
+  }
+
+  
+  public static void waitForClosePrimaryWindow()
+  {
+    while(GralMng.get().gralDevice.isRunning()){
       try{ Thread.sleep(100);} 
       catch (InterruptedException e)
       { //dialogZbnfConfigurator.terminate();
       }
     }
+    
+  }
+  
+  
+  private void openWindow1(){
+    GralFactory gralFactory = new AwtFactory();
+    LogMessage log = new LogMessageStream(System.out);
+    GralWindow wind = gralFactory.createWindow(log, "Hello World", 'C', 100, 50, 600, 400);
+    gralMng = wind.gralMng();
+    gralMng.gralDevice.addDispatchOrder(initGraphic);
+    //initGraphic.awaitExecution(1, 0);
       
   }
   

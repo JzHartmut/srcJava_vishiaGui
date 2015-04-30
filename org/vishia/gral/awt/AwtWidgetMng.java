@@ -9,11 +9,13 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Label;
 import java.awt.Menu;
+import java.awt.MenuBar;
 import java.awt.Point;
 import java.awt.PopupMenu;
 import java.awt.Rectangle;
 import java.awt.TextArea;
 import java.awt.TextField;
+import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.InputStream;
@@ -79,8 +81,6 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
       mng.registerWidget(widgg);
     } else if(widgg instanceof GralTable<?>){
       //AwtTable.addTable((GralTable<?>)widgg, this);
-    } else if(widgg instanceof GralWindow){
-      createWindow((GralWindow)widgg);
     } else if(widgg instanceof GralButton){
       new AwtButton((GralButton)widgg, this);
     }
@@ -390,9 +390,81 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
   
   @Override public void createWindow(GralWindow windowGral){
+    AwtSubWindow windowSwt = new AwtSubWindow(this, windowGral);
+    //new SwtSubWindow(name, swtDevice.displaySwt, title, windProps, this);
+    GralRectangle rect = calcPositionOfWindow(windowGral.pos());
+    windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
+    //window.window.redraw();
+    //window.window.update();
+    windowGral._wdgImpl = windowSwt;
+
   }
   
+  /**Calculates the position as absolute value on screen from a given position inside a panel.
+   * @param posWindow contains any {@link GralPos#panel}. Its absolute position will be determined.
+   *   from that position and size the absolute postion will be calculate, with this given grid positions
+   *   inside the panel. 
+   * @return Absolute pixel coordinate.
+   */
+  GralRectangle calcPositionOfWindow(GralPos posWindow)
+  {
+    Object awtWidg = posWindow.panel.getWidgetImplementation();
+    Window parentFrame = (Frame)awtWidg; //((SwtPanel)(swtWidg)).panelComposite; //(Control)posWindow.panel.getPanelImpl();
+    Point loc;
+    GralRectangle windowFrame = getPixelUseableAreaOfWindow(posWindow.panel);
+    int dxFrame = 400, dyFrame = 300;  //need if posWindow has coordinates from right or in percent
+    Rectangle rectParent = null;
+    /*
+    if(parentFrame == window){
+      dxFrame = windowFrame.dx; dyFrame = windowFrame.dy;
+    } else {
+      rectParent = parentFrame.getBounds();
+      dxFrame = rectParent.width; dyFrame = rectParent.height;
+    }
+    */
+    final GralRectangle rectangle = mng.calcWidgetPosAndSize(posWindow, dxFrame, dyFrame, 400, 300);
+    rectangle.x += windowFrame.x;
+    rectangle.y += windowFrame.y;
+    /*
+    //
+    while ( parentFrame != window){ //The Shell is the last parentFrame
+      //the bounds are relative to its container. Get all parent container and add all positions
+      //until the shell is reached.
+      rectParent = parentFrame.getBounds();
+      rectangle.x += rectParent.x;
+      rectangle.y += rectParent.y;
+      parentFrame = parentFrame.getParent();
+    }
+    */
+    return rectangle;
+  }
   
+
+  
+  GralRectangle getPixelUseableAreaOfWindow(GralWidget widgg)
+  { Object oControl = widgg.getWidgetImplementation();
+    Frame control = (Frame)oControl;
+    Frame window = control;
+    Rectangle rectWindow = window.getBounds();
+    Rectangle rectWindowArea = rectWindow; //window.getClientArea();  //it is inclusive the menu bar.
+    //Problem: the x and y of client are are 0, it may bettet that they are the left top corner
+    //inside the shell window.
+    //assume that the client area is on bottom of the shell. Calculate top position:
+    int dxBorder = rectWindow.width - rectWindowArea.width;
+    int xPos = rectWindow.x + dxBorder/2;
+    int dyTitleMenu = (rectWindow.height - rectWindowArea.height) - dxBorder;  //border and title bar
+    MenuBar menu = window.getMenuBar();
+    if(menu !=null){
+      //assume that the menu has the same hight as title bar, there is not a way to determine it else
+      dyTitleMenu *=2;  
+    }
+    int yPos = rectWindow.y + dxBorder/2 + dyTitleMenu;
+    GralRectangle ret = new GralRectangle(xPos, yPos, rectWindowArea.width, rectWindowArea.height - dyTitleMenu);
+    return ret;
+  }
+  
+
+
 
   @Override
   public boolean remove(GralPanelContent compositeBox)

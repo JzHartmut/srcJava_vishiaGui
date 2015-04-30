@@ -22,7 +22,7 @@ import org.vishia.gral.cfg.GralCfgDesigner;
 import org.vishia.gral.cfg.GralCfgWriter;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralCurveView_ifc;
-import org.vishia.gral.ifc.GralFactory_ifc;
+import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMngApplAdapter_ifc;
@@ -501,11 +501,27 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   };
   
   
-  public static void createMainWindow(GralFactory_ifc factory, GralWindow window, char sizeShow, int left, int top, int xSize, int ySize) {
+  public static void createMainWindow(GralFactory factory, GralWindow window, char sizeShow, int left, int top, int xSize, int ySize) {
     factory.createWindow(window, sizeShow, left, top, xSize, ySize);
   }
   
-  @Override public void setToPanel(GralWidget widgg){ impl.setToPanel(widgg); }
+  /**Not that this routine must not invoked before the {@link GralFactory#createWindow(GralWindow, char, int, int, int, int)}
+   * was not called.
+   * @see org.vishia.gral.ifc.GralMngBuild_ifc#setToPanel(org.vishia.gral.base.GralWidget)
+   */
+  @Override public void setToPanel(GralWidget widgg){ 
+    if(widgg instanceof GralWindow){
+      GralWindow wind1 = (GralWindow)widgg;
+      impl.createWindow(wind1);
+      registerPanel(wind1);
+      //set the current position of the manager to this window, initalize it.
+      this.pos.panel = wind1; //it is selected.
+      this.pos.setPosition(null, 0,0,0,0,0,'r');  //per default the whole window as position and size.
+
+    } else {  
+      impl.setToPanel(widgg); 
+    }
+  }
   
   
   /* (non-Javadoc)
@@ -1620,7 +1636,7 @@ public GralButton addCheckButton(
     @Deprecated public abstract GralWindow createWindow(String name, String title, int windProps);
     
     
-    public abstract void createWindow(GralWindow windowGral);
+    protected abstract void createWindow(GralWindow windowGral);
     
     public abstract GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int property);
     
@@ -1828,12 +1844,6 @@ public GralButton addCheckButton(
   {
     // TODO Auto-generated method stub
     return impl.createWindow(name, title, windProps);
-  }
-
-  @Override public void createWindow(GralWindow windowGral)
-  {
-    // TODO Auto-generated method stub
-    impl.createWindow(windowGral);
   }
 
   @Override public GralFileDialog_ifc createFileDialog()

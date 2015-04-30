@@ -68,11 +68,7 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
   /**The main window. SWT: named as Shell. */
   Shell windowSwt;
   
-  SwtPrimaryWindow instance;
-  
-  public final GralWindow mainWindow;
-  
-  LogMessage log;
+  //SwtPrimaryWindow instance;
   
   SwtMng gralMng;
   
@@ -192,9 +188,7 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
   final int xPos, yPos, xSize, ySize;
   
   SwtGraphicThread(GralWindow windowGral, char sizeShow, int left, int top, int xSize, int ySize, LogMessage log)
-  { super(sizeShow);
-    this.log = log;
-    this.mainWindow = windowGral;
+  { super(sizeShow, windowGral, log);
     //this.sTitle = sTitle; 
     this.xPos = left; this.yPos = top; this.xSize = xSize; this.ySize = ySize; 
     threadGuiDispatch.start();

@@ -1,14 +1,11 @@
 package org.vishia.gral.test;
-
-import org.vishia.gral.awt.AwtFactory;
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralFactory_ifc;
-import org.vishia.gral.ifc.GralFont;
+import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.swt.SwtFactory;
@@ -17,8 +14,54 @@ import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.KeyCode;
 
 
+/*Test with jzcmd: call jzcmd with this java file with its full path:
+D:/vishia/Java/srcJava_vishiaGui/org/vishia/gral/test/GralColorShow.java
+==JZcmd==
+java org.vishia.gral.test.GralColorShow.main(null);                 
+==endJZcmd==
+ */
+
+/**This class opens a window with some colors sorted horizontal with saturation and vertical with color value.
+ * 
+ * @author Hartmut Schorrig
+ *
+ */
 public class GralColorShow
 {
+  
+  /**The version, history and license.
+   * <ul>
+   * <li>2015-01-01 Hartmut created: .
+   * </ul>
+   * 
+   * <b>Copyright/Copyleft</b>:
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL is not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but don't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you are intent to use this sources without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   * 
+   * 
+   */
+  public final static int version = 0x20150426;
+
+  
   GralMng gralMng = GralMng.get();
   
   public static void main(String[] args){
@@ -28,7 +71,7 @@ public class GralColorShow
   }
   
   private void execute(){
-    GralFactory_ifc gralFactory = new SwtFactory();
+    GralFactory gralFactory = new SwtFactory();
     LogMessage log = new LogMessageStream(System.out);
     GralWindow wind = gralFactory.createWindow(log, "Show Colors", 'B', 150, 10,800, 700);
     gralMng = wind.gralMng();

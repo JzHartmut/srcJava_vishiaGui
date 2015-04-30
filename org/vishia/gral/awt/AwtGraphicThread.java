@@ -3,28 +3,31 @@ package org.vishia.gral.awt;
 import java.awt.Frame;
 
 import org.vishia.gral.base.GralGraphicThread;
+import org.vishia.gral.base.GralWindow;
+import org.vishia.msgDispatch.LogMessage;
 
 public class AwtGraphicThread extends GralGraphicThread.ImplAccess
 {
 
   Frame window;
   
-  final String sTitle; final int xPos, yPos, xSize, ySize;
+  //final String sTitle; 
+  final int xPos, yPos, xSize, ySize;
   
+  AwtWidgetMng awtMng;
   
-  AwtGraphicThread(String sTitle, char sizeShow, int left, int top, int xSize, int ySize)
-  { super(sizeShow);
-    this.sTitle = sTitle; this.xPos = left; this.yPos = top; this.xSize = xSize; this.ySize = ySize; 
-    threadGuiDispatch.start();
+  AwtGraphicThread(GralWindow windowGral, char sizeShow, int left, int top, int xSize, int ySize, LogMessage log)
+  { super(sizeShow, windowGral, log);
+    this.xPos = left; this.yPos = top; this.xSize = xSize; this.ySize = ySize; 
+    threadGuiDispatch.start();  //invokes initGraphic()
     
   }
 
   @Override protected void initGraphic()
   {
-    window = new Frame(sTitle);
-    window.setBounds(xPos, yPos, xSize, ySize);
-    window.setVisible(true);
-    window.setLayout(null);
+    AwtSubWindow awtWindow = new AwtSubWindow(awtMng, mainWindow);
+    AwtProperties propertiesGui = new AwtProperties(sizeCharProperties);
+    awtMng = new AwtWidgetMng(awtWindow.window, propertiesGui, log);
     
   }
 

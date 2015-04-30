@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.vishia.gral.ifc.GralFactory_ifc;
+import org.vishia.gral.ifc.GralFactory;
 
 /**The standard command-line-arguments for a graphic application are stored in an extra class. 
  * This class should be the base class for users command line argument storage.
@@ -55,7 +55,7 @@ public class GuiCallingArgs
   
   /**The graphic base factory can be detected from command line arguments
    * or set directly from the calling level. */
-  GralFactory_ifc graphicFactory;
+  GralFactory graphicFactory;
   
   /**Name of the config-file for the Gui-appearance. */
   //String sFileGui;

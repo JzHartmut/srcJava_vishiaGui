@@ -132,8 +132,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   
 
   
-  /**Constructs a sub window (dialog window etc.). It is not used for the main window.
-   * For Main window see {@link SwtPrimaryWindow} which extends this.
+  /**Constructs a window (primary or sub window maybe for dialog etc.).
    * @param name
    * @param display
    * @param title

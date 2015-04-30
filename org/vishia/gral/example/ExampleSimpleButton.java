@@ -12,7 +12,7 @@ import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralFactory_ifc;
+import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.swt.SwtFactory;
 import org.vishia.msgDispatch.LogMessage;
@@ -222,7 +222,7 @@ public class ExampleSimpleButton
     //
     //choose a factory, recomment one of the following:
     //
-    GralFactory_ifc graphicFactory = new AwtFactory();
+    GralFactory graphicFactory = new AwtFactory();
     //GralFactory_ifc graphicFactory = new FactorySwt();
     //
     //A logger is a final thing what is need. This logger writes to the console.

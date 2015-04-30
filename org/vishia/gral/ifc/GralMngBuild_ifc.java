@@ -460,6 +460,12 @@ public interface GralMngBuild_ifc extends ReplaceAlias_ifc
   
   
   
+  /**This routine is called from {@link GralWidget#setToPanel(GralMngBuild_ifc)}.
+   * It is not intent to call from the application immediately. Use {@link GralWidget#setToPanel(GralMngBuild_ifc)} instead.
+   * The implementation of this routine checks the type of the widget and invokes the proper routine
+   * for the implementation graphic in the implementation level of the {@link GralMng}.
+   * @param widgg The widget should be initialized already.
+   */
   void setToPanel(GralWidget widgg);
 
   /**Adds a text to the current panel at given position with standard colors, left origin.
@@ -771,28 +777,12 @@ public interface GralMngBuild_ifc extends ReplaceAlias_ifc
 	 * @param title Title of the window, may be null, then without title bar.
 	 * @param windProps Or of the static variables {@link GralWindow#windExclusive} etc. 
 	 * @return
-	 * @deprecated use {@link GralWindow#GralWindow(String, String, int)} and {@link #createWindow(GralWindow)}.
+	 * @deprecated use {@link GralWindow#GralWindow(String, String, int)} and then {@link GralWidget#setToPanel(GralMngBuild_ifc)}
+	 *   with this window.
 	 */
   @Deprecated 
 	GralWindow createWindow(String name, String title, int windProps);
   
-	
-	
-  /**Creates a Window for a modal or non modal dialog. The window is described by the returned interface. 
-   * The implementation link will be stored in the {@link GralWidget#_wdgImpl} aggregation.
-   * It can be filled with elements. The dialog is able to show and hide calling 
-   * {@link GralWindow_ifc#setWindowVisible(boolean)} or 
-   * {@link GralMng_ifc#setWindowsVisible(GralWindow_ifc, GralPos)}. 
-   * The position and size of the window is set with the adequate strategy like all other widget: 
-   * using {@link #setPositionSize(int, int, int, int, char)}. 
-   * @param windowGral Instance of a GralWindow, which is not {@link GralWidget#setToPanel(GralMngBuild_ifc)} yet.
-   */
-	void createWindow(GralWindow windowGral);
-	
-	
-	//GuiShellMngBuildIfc createWindowOld(String title, boolean exclusive);
-	
-	
 	
   GralInfoBox createTextInfoBox(String name, String title);
 

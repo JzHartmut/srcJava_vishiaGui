@@ -9,6 +9,20 @@ import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 
+/*Test with jzcmd: call jzcmd with this java file with its full path:
+file: D:/vishia/Java/srcJava_vishiaGui/org/vishia/gral/cfg/GralCfgWindow.java
+==JZcmd==
+java org.vishia.gral.test.HelloWorld.openWindow();                 
+String windowTitle = <:>Test GralCfgWindow<.>;
+String gConfig = 
+<:>
+ @2+20,2+60:Show("test");
+<.>;
+java org.vishia.gral.cfg.GralCfgWindow.createWindow("testCfgWind", windowTitle, gConfig, jzcmdsub.currdir, jzcmd.log);                 
+java org.vishia.gral.test.HelloWorld.waitForClosePrimaryWindow();
+==endJZcmd==
+*/
+
 /**This is the class to build a graphic window in any application which is configurable.
  * It uses an existing instance of the {@link GralMng}
  * <br><br>
@@ -53,66 +67,70 @@ public class GralCfgWindow
   public final static int version = 0x20150426;
 
   
-  final MainCmdLogging_ifc log;
+  final private MainCmdLogging_ifc log;
   
   /**The configuration data for graphical appearance. */
-  final GralCfgData guiCfgData;
+  final private GralCfgData guiCfgData;
 
-  
-  GralWindow wind;
-  
-  GralCfgWindow(MainCmdLogging_ifc log) {
-    this.log = log;
-    this.wind = new GralWindow("10+30, 10+50", "GralCfgWindow", "---GralCfgWindow---", GralWindow_ifc.windRemoveOnClose);
-    this.guiCfgData = new GralCfgData(null);  //no config conditions given.
-  }
-  
   /**Directory for images. */
-  File currDir;
+  File imgDir;
+  
+  final public GralWindow window;
+  
+  /**Creates a new Window or opens the existing one with given name.
+   * @param sName Name of the window inside the gral manager to address the window.
+   * @param sTitle text in the title bar
+   * @param sCfg textual given configuration for the window.
+   * @param imgDir start directory path where images are located if given with relative path.
+   * @param log interface for logging output of parser and creation.
+   * @throws ParseException on errors in the sCfg
+   */
+  GralCfgWindow(String sName, String sTitle, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) throws ParseException {
+    this.log = log;
+    this.guiCfgData = new GralCfgData(null);  //no config conditions given.
+    this.imgDir = imgDir;
+    GralCfgZbnf cfgZbnf = new GralCfgZbnf();  //temporary instance for parsing
+    cfgZbnf.configureWithZbnf(sCfg, guiCfgData); //
+    int props = GralWindow_ifc.windRemoveOnClose | GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable;
+    this.window = new GralWindow("10+30, 10+50", sName, sTitle, props);
+    GralMng.get().gralDevice.addDispatchOrder(configGuiWithZbnf);   //runs in graphic thread
+  }
   
   /**Creates a window with a given configuration.
    * The window will be removed on closing.
+   * @param sName Name of the window inside the gral manager to address the window.
+   * @param sTitle text in the title bar
    * @param sCfg textual given configuration for the window.
    * @param imgDir start directory path where images are located if given with relative path.
    * @param log log output for status and parse messages
-   * @throws ParseException
+   * @throws ParseException on errors in the sCfg
    */
-  public static void createWindow(CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) 
+  public static void createWindow(String sName, String sTitle, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) 
   throws ParseException
   {
-    GralCfgWindow thiz= new GralCfgWindow(log);
-    thiz.buildConfig(sCfg, imgDir);
+    new GralCfgWindow(sName, sTitle, sCfg, imgDir, log);
   }
   
   
   
-  
-
-  
-  
-  public void buildConfig(CharSequence sCfg, File currDir) 
-  throws ParseException
-  { this.currDir = currDir;
-    GralCfgZbnf cfgZbnf = new GralCfgZbnf();  //temporary instance for parsing
-    cfgZbnf.configureWithZbnf(sCfg, guiCfgData); //
-    GralMng.get().gralDevice.addDispatchOrder(configGuiWithZbnf);   //runs in graphic thread
-  }
   
 
   
   /**Code snippet to run the ZBNF-configurator (text controlled GUI)
    * 
    */
-  @SuppressWarnings("serial") 
+  @SuppressWarnings("synthetic-access")  
   GralGraphicTimeOrder configGuiWithZbnf = new GralGraphicTimeOrder("GralCfgWindow.config")
   {
     
+    private static final long serialVersionUID = 1L;
+
     @Override public void executeOrder(){
       GralMng mng = GralMng.get();
       mng.selectPanel("primaryWindow");  //window position relative to the primary window.
-      wind.setToPanel(mng);
-      wind.setVisible(true);
-      GralCfgBuilder cfgBuilder = new GralCfgBuilder(guiCfgData, mng, currDir);
+      window.setToPanel(mng);
+      window.setVisible(true);
+      GralCfgBuilder cfgBuilder = new GralCfgBuilder(guiCfgData, mng, imgDir);
       cfgBuilder.buildGui(log, 0);        
     }
   ////

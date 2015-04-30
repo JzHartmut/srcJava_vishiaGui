@@ -337,8 +337,6 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
       mng.registerWidget(widgg);
     } else if(widgg instanceof GralTable<?>){
       SwtTable.createTable((GralTable<?>)widgg, this);  //This may be the best variant.
-    } else if(widgg instanceof GralWindow){
-      createWindow((GralWindow)widgg);
     } else if(widgg instanceof GralButton){
       new SwtButton((GralButton)widgg, this);
       mng.registerWidget(widgg);
@@ -421,9 +419,6 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
     //window.window.redraw();
     //window.window.update();
-    mng.registerPanel(windowGral);
-    this.pos().panel = windowGral; //it is selected.
-    this.pos().setPosition(null, 0,0,0,0,0,'r');  //per default the whole window as position and size.
     windowGral._wdgImpl = windowSwt;
   }
 

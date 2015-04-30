@@ -7,7 +7,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 
-/**This class represents a window of an application.
+/**This class represents a window of an application, either the primary window or any sub window.
  * The {@link GralPos#pos} of the baseclass is the position of the window derived from any other 
  * Position.
  * @author Hartmut Schorrig
@@ -119,6 +119,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    * @param windProps
    * @param mng
    * @param panelComposite The implementing instance for a panel.
+   * @deprecated: the panelComposite is not used. The GralMng is singleton. use {@link GralWindow#GralWindow(String, String, String, int)}.
    */
   @Deprecated public GralWindow(String posString, String nameWindow, String sTitle, int windProps, GralMng mng, Object panelComposite)
   {
