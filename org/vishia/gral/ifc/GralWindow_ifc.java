@@ -14,6 +14,7 @@ public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc, Gr
 {
   /**Version, history and license.
    * <ul>
+   * <li>2015-04-27 Hartmut new {@link #windRemoveOnClose}
    * <li>2012-03-16 Hartmut new: {@value #windResizeable} defined and supported in SWT-implementation.
    * <li>2012-03-13 Hartmut chg: This interface should be used for building the window. Therefore
    *   all building methods should be contained here. Gotten from implementors. 
@@ -47,6 +48,12 @@ public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc, Gr
 
   
   
+  
+  /**Property defines that the window should be removed on closing.
+   * If this is not set the window is set to invisible but remain. It can be set to visible
+   * with its given content anytime again.
+   */
+  public static final int windRemoveOnClose = 1<<5;
   
   /**Property defines that the window is able to resize
    */

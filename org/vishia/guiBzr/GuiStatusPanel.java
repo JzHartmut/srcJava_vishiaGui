@@ -199,7 +199,7 @@ public class GuiStatusPanel
   
   private void setInfoWidgetsInSelectBox(SelectInfoBoxWidgds widgds)
   {
-    panelBuildifc.selectPanel(widgds.box.namePanel);
+    panelBuildifc.selectPanel(widgds.box.name);
     panelBuildifc.remove(widgds.widgdTextRevision);
     panelBuildifc.remove(widgds.widgdTextStatus);
     panelBuildifc.setPositionSize(0, 21, 2, 15, 'r');

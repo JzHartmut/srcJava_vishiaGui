@@ -184,6 +184,13 @@ public interface GralMngBuild_ifc extends ReplaceAlias_ifc
    */
   void selectPanel(String sName);
 
+  /**Selects the given panel as current panel to build some content. */
+  void selectPanel(GralPanelContent panel);
+  
+  /**Selects the primary window as current panel to build some content. */
+  void selectPrimaryWindow();
+  
+  
   /**Sets the position for the next widget to add in the container.
    * @param xpos x-Position in x-Units, count from left of the box.
    * @param ypos y-Position in y-Units, count from top of the box. It is the bottom line of the widget.

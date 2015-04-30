@@ -61,6 +61,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2015-04-27 Hartmut new {@link #selectPanel(GralPanelContent)} not only with String given
    * <li>2015-01-18 Hartmut chg: Now the implementation for any Grahic (SwtMng) and the GralMng are two separated instances.
    *   The SwtMng extends the {@link GralMng.ImplAccess} which accesses all private data of the GralMng.
    * <li>2013-12-21 Hartmut new: {@link #setToPanel(GralWidget)} for all set to panel actions. That method handles all widget types. 
@@ -620,6 +621,16 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
   
+  /**Selects the given panel as current panel to build some content. */
+  @Override public void selectPanel(GralPanelContent panel) {
+    pos.panel = panel;
+    sCurrPanel = panel.name;
+    setPosition(0,0,0,0,0,'d');  //set the position to default, full panel because the panel was selected newly.
+  }
+  
+  /**Selects the primary window as current panel to build some content. */
+  @Override public void selectPrimaryWindow() { selectPanel(windPrimary); } 
+  
   @Override public boolean currThreadIsGraphic(){
     return Thread.currentThread().getId() == gralDevice.getThreadIdGui();
   }
@@ -707,6 +718,15 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     
   }
   
+  
+  public void deregisterWidgetName(GralWidget widg)
+  {
+    if(widg.name != null){
+      indexNameWidgets.remove(widg.name);
+    }
+    
+  }
+  
   /**Registers a panel to place the widgets. 
    * After registration, this panel is the current one, stored in {@link #pos}. the panel can be selected
    * with its name calling the {@link #selectPanel(String)} -routine
@@ -714,16 +734,25 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @param panel The panel.
    */
   @Override public void registerPanel(GralPanelContent panel){
-    GralPanelContent exist = panels.get(panel.namePanel);
+    GralPanelContent exist = panels.get(panel.name);
     if(exist !=null){
-      if(exist == panel) System.out.println("info: unnecessary registerPanel " + panel.namePanel);
-      else System.err.println("info: faulty registerPanel " + panel.namePanel);
+      if(exist == panel) System.out.println("info: unnecessary registerPanel " + panel.name);
+      else System.err.println("info: faulty registerPanel " + panel.name);
     }
-    panels.put(panel.namePanel, panel);
+    panels.put(panel.name, panel);
     pos.panel = panel;
     //initialize the position because its a new panel. The initial position is the whole panel.
     pos.setFinePosition(0,0,0,0,0,0,0,0,0,'d',0,0,pos);
-    sCurrPanel = panel.namePanel;
+    sCurrPanel = panel.name;
+  }
+  
+  
+  
+  /*package private*/ void deregisterPanel(GralPanelContent panel) {
+    if(sCurrPanel.equals(panel.name)) {
+      sCurrPanel = windPrimary.name;
+    }
+    panels.remove(panel.name);
   }
   
   
@@ -1328,7 +1357,7 @@ public GralButton addCheckButton(
       GralWidget widgd = getWidgetInFocus();
       if(widgd !=null){
         GralPanelContent panel = widgd.pos().panel;
-        String namePanel = panel.namePanel;
+        String namePanel = panel.name;
         cfgBuilder.buildGui(log, 0);
         //designer.editFieldProperties(widgd, null);
       }

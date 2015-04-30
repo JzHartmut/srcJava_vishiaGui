@@ -569,7 +569,13 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
       return input * (180.0f / 32768.0f);   
     }
     @Override public Value calcDataAccess(Map<String, DataAccess.Variable<Object>> javaVariables, Object... args) throws Exception{
-      Float value = (Float)args[0];  //always true, this special class is only used in this context.
+      Float value;
+      if(args[0] instanceof Float){
+        value = (Float)args[0];
+      } else {
+        Long lval = (Long)args[0];
+        value = new Float((int)(lval.longValue())); //really an int if it is an angle. 
+      }
       CalculatorExpr.Value valueRet = new CalculatorExpr.Value(calc(value.floatValue()));
       return valueRet;
     }
@@ -582,7 +588,14 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
       return input * (180.0f / 0x7fffffff);   
     }
     @Override public Value calcDataAccess(Map<String, DataAccess.Variable<Object>> javaVariables, Object... args) throws Exception{
-      Float value = (Float)args[0];  //always true, this special class is only used in this context.
+      Float value;
+      if(args[0] instanceof Float){
+        value = (Float)args[0];
+      } else {
+        Long lval = (Long)args[0];
+        value = new Float((int)(lval.longValue())); //really an int if it is an angle. 
+      }
+      //TODO use long value or int for calculation
       CalculatorExpr.Value valueRet = new CalculatorExpr.Value(calc(value.floatValue()));
       return valueRet;
     }

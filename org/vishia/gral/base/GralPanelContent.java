@@ -55,12 +55,6 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   @SuppressWarnings("hiding")
   public final static int version = 20120713;
 
-  /**
-   * @deprecated use {@link GralWidget#getName()}
-   */
-  @Deprecated
-  public final String namePanel;
-
   //public GralPrimaryWindow_ifc mainWindow;
   
   //public final GralMng gralMng;
@@ -102,7 +96,7 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   @Deprecated public GralPanelContent(String namePanel, GralMng mng, Object panelComposite)
 	//public PanelContent(CanvasStorePanel panelComposite)
 	{ super(namePanel, '$');
-	  this.namePanel = namePanel;
+	  this.name = namePanel;
 		//this.panelComposite = panelComposite;
     GralMng.get().registerPanel(this);
     int property = 0; //TODO parameter
@@ -113,7 +107,7 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   public GralPanelContent(String posString, String namePanel)
   //public PanelContent(CanvasStorePanel panelComposite)
   { super(posString, namePanel, '$');
-    this.namePanel = namePanel;
+    this.name = namePanel;
     GralMng.get().registerPanel(this);
     int property = 0; //TODO parameter
     bZoomed = (property & GralMngBuild_ifc.propZoomedPanel) !=0;
@@ -184,12 +178,12 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
    * @return true because it is done.
    */
   @Override public boolean remove(){
-    super.remove();
     for(GralWidget widg: widgetList){
       widg.remove();
     }
     widgetList.clear();      //the lists may be cleared already 
     widgetsToResize.clear(); //because widg.remove() removes the widget from the panel.
+    super.remove();
     return true;
   }
   
@@ -208,7 +202,7 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   
   
   
-  @Override public String toString(){ return "GralPanel:" + namePanel; }
+  @Override public String toString(){ return "GralPanel:" + name; }
 
   
   

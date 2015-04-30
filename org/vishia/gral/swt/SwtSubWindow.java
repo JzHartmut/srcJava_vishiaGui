@@ -31,6 +31,7 @@ import org.vishia.gral.base.GralWindow_setifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.KeyCode;
 
 //public class SubWindowSwt extends GralPanelContent implements WidgetCmpnifc
@@ -41,6 +42,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   
   /**Version, history and license:
    * <ul>
+   * <li>2015-04-27 Hartmut new {@link #windRemoveOnClose}
    * <li>2012-07-13 Hartmut new:  {@link #getPixelSize()}, chg: {@link #getPixelPositionSize()} in all implementations. 
    *   A swt.widget.Shell now returns the absolute position and the real size of its client area without menu and title bar.
    * <li>2012-06-29 Hartmut new: {@link #setResizeAction(GralUserAction)} now for both ctors, resize on subwindow works.
@@ -236,7 +238,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   
   
   
-  
+  @SuppressWarnings("synthetic-access") 
   protected ShellListener shellListener = new ShellListener(){
 
     @Override
@@ -250,12 +252,18 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
      * as static instances. They should be set visible and invisible instead remove and build new.
      * @see org.eclipse.swt.events.ShellListener#shellClosed(org.eclipse.swt.events.ShellEvent)
      */
-    @Override public void shellClosed(ShellEvent e)
-    { e.doit = false;
+    @Override public void shellClosed(ShellEvent e) ////
+    { int windProps = getWindowProps();
       if(invisibleSetAction() !=null){
         invisibleSetAction().exec(KeyCode.menuEntered, SwtSubWindow.this.gralWindow);
       }
-      ((Shell)e.widget).setVisible(false);
+      if((windProps & GralWindow_ifc.windRemoveOnClose)!=0) {
+        gralWindow.remove();  //remove the window as widget.
+        e.doit = true;
+      } else {
+        e.doit = false;
+        ((Shell)e.widget).setVisible(false);
+      }
     }
 
     @Override

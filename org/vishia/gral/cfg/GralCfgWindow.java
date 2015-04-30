@@ -6,6 +6,7 @@ import java.text.ParseException;
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 
 /**This is the class to build a graphic window in any application which is configurable.
@@ -62,18 +63,25 @@ public class GralCfgWindow
   
   GralCfgWindow(MainCmdLogging_ifc log) {
     this.log = log;
-    this.wind = new GralWindow("10+30, 10+50", "GralCfgWindow", "---GralCfgWindow---", 0);
+    this.wind = new GralWindow("10+30, 10+50", "GralCfgWindow", "---GralCfgWindow---", GralWindow_ifc.windRemoveOnClose);
     this.guiCfgData = new GralCfgData(null);  //no config conditions given.
   }
   
   /**Directory for images. */
   File currDir;
   
-  public static void createWindow(CharSequence sCfg, File currdir, MainCmdLogging_ifc log) 
+  /**Creates a window with a given configuration.
+   * The window will be removed on closing.
+   * @param sCfg textual given configuration for the window.
+   * @param imgDir start directory path where images are located if given with relative path.
+   * @param log log output for status and parse messages
+   * @throws ParseException
+   */
+  public static void createWindow(CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) 
   throws ParseException
   {
     GralCfgWindow thiz= new GralCfgWindow(log);
-    thiz.buildConfig(sCfg, currdir);
+    thiz.buildConfig(sCfg, imgDir);
   }
   
   
@@ -85,8 +93,8 @@ public class GralCfgWindow
   public void buildConfig(CharSequence sCfg, File currDir) 
   throws ParseException
   { this.currDir = currDir;
-    GralCfgZbnf cfgZbnf = new GralCfgZbnf();
-    cfgZbnf.configureWithZbnf(sCfg, guiCfgData);
+    GralCfgZbnf cfgZbnf = new GralCfgZbnf();  //temporary instance for parsing
+    cfgZbnf.configureWithZbnf(sCfg, guiCfgData); //
     GralMng.get().gralDevice.addDispatchOrder(configGuiWithZbnf);   //runs in graphic thread
   }
   

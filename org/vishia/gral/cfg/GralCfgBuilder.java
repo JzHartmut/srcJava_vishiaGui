@@ -27,6 +27,7 @@ public class GralCfgBuilder
 
   /**Version and history
    * <ul>
+   * <li>2015-04-27 Hartmut chg: {@link #buildGui(LogMessage, int)} Now regards only one panel in the window, not only tabbed panels.
    * <li>2014-02-24 Hartmut new element help now also in config.
    * <li>2012-09-17 Hartmut chg: showMethod now split functionName and parameters. The function name is used to get
    *   the {@link GralUserAction} for {@link GralWidget#setActionShow(GralUserAction, String[])}. The parameter are stored
@@ -103,21 +104,35 @@ public class GralCfgBuilder
     gralMng.addDataReplace(cfgData.dataReplace);
     
     Set<Map.Entry<String, GralCfgPanel>> setIdxPanels = cfgData.getPanels();
-     
-    for(Map.Entry<String, GralCfgPanel> panelEntry: setIdxPanels){  //cfgData.idxPanels.entrySet()){
-      GralCfgPanel panel = panelEntry.getValue();
-      String sErrorPanel = buildPanel(panel);  
+    if(setIdxPanels.size()==0){
+      //gralMng.selectPanel(cfgData.actPanel);
+      //==================>
+      String sErrorPanel = buildPanel(cfgData.actPanel);  
       if(sErrorPanel !=null){
         if(log !=null){
           log.sendMsg(msgIdent, "GralCfgBuilder - cfg error; %s", sErrorPanel);
         }
         if(sError == null){ sError = sErrorPanel; }
         else { sError += "\n" + sErrorPanel; }
-      } else {
-        stop();
       }
-    }
-    
+    } else {
+      //some panels are given, therefore selects given panels by name or create tabbed panels.
+      for(Map.Entry<String, GralCfgPanel> panelEntry: setIdxPanels){  //cfgData.idxPanels.entrySet()){
+        GralCfgPanel panel = panelEntry.getValue();
+        //==================>
+        gralMng.selectPanel(panel.name);
+        String sErrorPanel = buildPanel(panel);  
+        if(sErrorPanel !=null){
+          if(log !=null){
+            log.sendMsg(msgIdent, "GralCfgBuilder - cfg error; %s", sErrorPanel);
+          }
+          if(sError == null){ sError = sErrorPanel; }
+          else { sError += "\n" + sErrorPanel; }
+        } else {
+          stop();
+        }
+      }
+    }    
     return sError;
   }
   
@@ -129,8 +144,6 @@ public class GralCfgBuilder
   public String buildPanel(GralCfgPanel cfgDataPanel)
   {
     String sError = null;
-    gralMng.selectPanel(cfgDataPanel.name);
-    
     for(GralCfgElement cfge: cfgDataPanel.listElements){
       String sErrorWidgd = buildWidget(cfge);
       if(sErrorWidgd !=null){

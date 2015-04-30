@@ -700,6 +700,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   /**The widget for the vertical scroll bar is a canvas with a special paint routine.
    * In the paint routine {@link SwtTable#paintVscrollbar(PaintEvent, Canvas)} is called. 
    */
+  @SuppressWarnings("synthetic-access") 
   private class Vscrollbar extends Canvas
   {
     Vscrollbar(Composite parent) {
@@ -716,7 +717,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     
     private PaintListener vScrollbarPainter = new PaintListener(){
       @Override public void paintControl(PaintEvent e) {
-        System.out.println("VScrollbar - paintlistener");
+        //System.out.println("VScrollbar - paintlistener");
         SwtTable.this.paintVscrollbar(e.gc, Vscrollbar.this);
       }
     };

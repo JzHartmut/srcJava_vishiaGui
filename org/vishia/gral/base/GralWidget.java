@@ -1409,6 +1409,15 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     }
   }
   
+  
+  
+  /**Registers a widget in its panel and, if it has a name, in the name management of the GralMng.
+   * It invokes {@link GralMng#registerWidget(GralWidget)}.
+   */
+  public void register(){
+    itsMng.registerWidget(this);
+  }
+  
   /**Removes the widget from the lists in its panel and from the graphical representation.
    * It calls the protected {@link #removeWidgetImplementation()} which is implemented in the adaption.
    */
@@ -1416,6 +1425,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   {
     removeWidgetImplementation();
     _wdgPos.panel.removeWidget(this);
+    itsMng.deregisterWidgetName(this);
     return true;
   }
   
@@ -1428,7 +1438,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   { StringBuilder u = new StringBuilder(240);
     u.append(whatIs).append(" - ").append(name).append(": ").append(sDataPath);
     if(_wdgPos !=null && _wdgPos.panel !=null){
-      u.append(" @").append(_wdgPos.panel.namePanel);
+      u.append(" @").append(_wdgPos.panel.name);
     } else {
       u.append(" @?");
     }
