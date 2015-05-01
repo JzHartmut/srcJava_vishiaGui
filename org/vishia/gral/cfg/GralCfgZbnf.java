@@ -132,9 +132,16 @@ public class GralCfgZbnf
  + " | <$-/\\.:?text>\n"
  + " ##| <*,)?text>\n"
  + " ? , \n"
- + " }.\n"
-
-  ;
+ + "}.\n"
+ + "\n"
+ + "Text::= Text ( [<\"\"?text>|<*)?text>]\n" 
+ + "    [ ,{ <!\\[ABC\\]?size> \n"
+ + "       | <colorName> \n"
+ + "         | color = <#x?colorValue> | <colorName>\n"
+ + "       ? , }\n"
+ + "    ]) ; .\n"
+ + "\n"
+ ;
 
   /**The current directory is that directory, where the config file is located. 
    * It is used if other files are given with relative path.*/

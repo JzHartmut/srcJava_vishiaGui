@@ -599,7 +599,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     itsMng = GralMng.get();
     assert(itsMng !=null);  //should be created firstly in the application, since 2015-01-18
     if(posString !=null) {
-      initPos(itsMng.pos.setNextPos(posString));
+      initPos(itsMng.pos().pos.setNextPos(posString));
     } //else: don't set the pos, it is done later 
   }
   
@@ -648,7 +648,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     if(_wdgImpl !=null) throw new IllegalStateException("setToPanel faulty call - GralTable;");
     if(dyda.textFont == null) { //maybe set with knowledge of the GralMng before.
       GralMng mngg = (GralMng)mng;
-      dyda.textFont = mngg.propertiesGui.getTextFont(mngg.pos.height()); 
+      dyda.textFont = mngg.propertiesGui.getTextFont(mngg.pos().pos.height());
+      dyda.setChanged(ImplAccess.chgFont);
     }
     mng.setToPanel(this);
   }

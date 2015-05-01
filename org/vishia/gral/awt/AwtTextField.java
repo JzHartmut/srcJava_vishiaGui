@@ -4,27 +4,38 @@ import java.awt.Container;
 import java.awt.Label;
 import java.awt.TextField;
 
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
-import org.vishia.gral.base.GralMng;
-import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralFont;
-import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.swt.SwtMng;
 
-public class AwtTextField extends GralTextField
+public class AwtTextField extends GralTextField.GraphicImplAccess
 {
-  /*packagePrivate*/ final AwtTextFieldImpl widgetAwt;
+  /*packagePrivate*/ final TextField widgetAwt;
   
   /**A possible prompt for the text field or null. */
   /*packagePrivate*/ Label promptSwt;
   
-  public AwtTextField(String name, char whatis, AwtWidgetMng mng, Container parent)
-  {
-    super(name, whatis, mng.mng);
-    widgetAwt = new AwtTextFieldImpl();
+  /**It contains the association to the swt widget (Control) and the {@link SwtMng}
+   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   */
+  private final AwtWidgetHelper widgHelper;
+  
+  
+  
+  
+  public AwtTextField(GralTextField widgg, AwtWidgetMng mng)
+  { widgg.super(widgg, mng.mng); //NOTE: superclass is a non static inner class of GralTextField. 
+    GralPos pos = widgg.pos();
+    Container panelAwt = (Container)pos.panel.getWidgetImplementation();
+    
+    widgetAwt = new TextField();
+    mng.setPosAndSize_(widgetAwt);
     //widgetAwt.setForeground(mng.propertiesGuiAwt.colorAwt(GralColor.getColor("rd")));
     //widgetAwt.setBackground(mng.propertiesGuiAwt.colorAwt(GralColor.getColor("gn")));
-    parent.add(widgetAwt);
+    panelAwt.add(widgetAwt);
+    widgHelper = new AwtWidgetHelper(widgetAwt, mng);
   }
 
   @Override
@@ -34,15 +45,8 @@ public class AwtTextField extends GralTextField
     
   }
 
-  @Override public int getCursorPos(){ return widgetAwt.getCaretPosition(); }
+  //@Override public int getCursorPos(){ return widgetAwt.getCaretPosition(); }
 
-
-  @Override
-  public void setText(CharSequence text)
-  {
-    // TODO Auto-generated method stub
-    
-  }
 
   @Override
   public Object getWidgetImplementation()
@@ -58,7 +62,7 @@ public class AwtTextField extends GralTextField
 
 
   
-  @Override public int setCursorPos(int pos){
+  public int setCursorPos(int pos){
     int oldPos = widgetAwt.getCaretPosition();
     widgetAwt.setCaretPosition(pos);
     return oldPos;
@@ -68,72 +72,39 @@ public class AwtTextField extends GralTextField
   
 
 
-  @Override
-  public GralColor setBackgroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
 
   @Override
-  public void setBoundsPixel(int x, int y, int dx, int dy)
-  {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public GralColor setForegroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
+  public void setBoundsPixel(int x, int y, int dx, int dy){ widgHelper.setBoundsPixel(x, y, dx, dy); }
 
   
   
   
-public static class AwtTextFieldImpl extends TextField implements AwtWidget
-  {
-    Object data;
-    
-    AwtTextFieldImpl()
-    { super("test");
-      
-    }
-    
-    @Override public Object getData(){ return data; }
   
-    @Override public void setData(Object dataP){ this.data = dataP; }
-    
-  }
-
-
-  @Override
-  public void setTextStyle(GralColor color, GralFont font)
-  {
-    // TODO Auto-generated method stub
-    
-  }
-  
-  
-  @Override public void setEditable(boolean editable){
+  public void setEditable(boolean editable){
     widgetAwt.setEditable(editable);
   }
 
 
 
   @Override public void repaintGthread(){
+    GralWidget.DynamicData dyda = dyda();
     int chg = dyda.whatIsChanged.get();
     int catastrophicalCount = 0;
     do{
       if(++catastrophicalCount > 10000) throw new RuntimeException("atomic failed");
-      if((chg & ImplAccess.chgText) !=0  && dyda.displayedText !=null){ 
+      if((chg & chgText) !=0  && dyda.displayedText !=null){ 
         widgetAwt.setText(dyda.displayedText); 
       }
-      if((chg & ImplAccess.chgColorText) !=0){ widgetAwt.setForeground(((AwtWidgetMng)itsMng.impl).getColorImpl(dyda.textColor)); }
-      if((chg & ImplAccess.chgColorBack) !=0){ widgetAwt.setBackground(((AwtWidgetMng)itsMng.impl).getColorImpl(dyda.backColor)); }
+      if((chg & chgColorText) !=0){ widgetAwt.setForeground(widgHelper.mng.getColorImpl(dyda.textColor)); }
+      if((chg & chgColorBack) !=0){ widgetAwt.setBackground(widgHelper.mng.getColorImpl(dyda.backColor)); }
       widgetAwt.repaint();
     } while(!dyda.whatIsChanged.compareAndSet(chg, 0));
+  }
+
+  @Override public GralRectangle getPixelPositionSize()
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   

@@ -654,7 +654,7 @@ public class GralPos implements Cloneable
 
   
   
-  /**Calculates the position and size of a widget from given {@link #posWidget}.
+  /**Calculates the position and size of a widget from this given Pos.
    * @param propertiesGui The properties for presentation.
    * @param widthParentPixel width of the container. This value will be used if the position is given 
    *   from right with negative numbers.

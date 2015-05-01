@@ -57,6 +57,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
+@SuppressWarnings("synthetic-access") 
 public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
@@ -173,6 +174,36 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   
+  /*package private*/ static final class PosThreadSafe
+  {
+    /**Position of the next widget to add. If some widgets are added one after another, 
+     * it is similar like a flow-layout.
+     * But the position can be set.
+     * The values inside the position are positive in any case, so that the calculation of size is simple.
+     */
+    protected final GralPos pos = new GralPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
+    
+    /**False if the position is given newly. True if it is used. Then the next add-widget invocation 
+     * calculates the next position in direction see {@link GralPos#setNextPosition()}. */
+    protected boolean posUsed;
+    
+    final long threadId;
+    
+    PosThreadSafe() {
+      threadId = Thread.currentThread().getId();
+    }
+    
+  }
+  
+  
+  private PosThreadSafe posCurrent = new PosThreadSafe();
+
+  private final Map<Long, PosThreadSafe> posThreadSafe = new TreeMap<Long, PosThreadSafe>();
+  { //part of construction: safe the first instance.
+    posThreadSafe.put(posCurrent.threadId, posCurrent);
+  }
+  
+  
   /**This instance helps to create the Dialog Widget as part of the whole window. It is used only in the constructor.
    * Therewith it may be defined stack-locally. But it is better to show and explain if it is access-able at class level. */
   //GuiDialogZbnfControlled dialogZbnfConfigurator;   
@@ -242,16 +273,11 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * But the position can be set.
    * The values inside the position are positive in any case, so that the calculation of size is simple.
    */
-  protected final GralPos pos = new GralPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
+  protected final GralPos XXXpos = new GralPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
   
   /**False if the position is given newly. True if it is used. Then the next add-widget invocation 
    * calculates the next position in direction see {@link GralPos#setNextPosition()}. */
-  protected boolean posUsed;
-  
-  /**Position for the next widget to store.
-   * The Position values may be negative which means measurement from right or bottom.
-   */
-  protected GralPos posWidget = new GralPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
+  protected boolean XXXposUsed;
   
 
   
@@ -315,75 +341,95 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 		return mng;
 	}
 	
+  PosThreadSafe pos() 
+  { long threadId1 = Thread.currentThread().getId();
+    PosThreadSafe ret = posCurrent;   //thread safe: atomic access, use ret.
+    if(ret.threadId != threadId1) {   //only access to map if necessary.
+      Long threadId = new Long(threadId1);
+      ret = posThreadSafe.get(threadId);
+      if(ret == null){
+        ret = new PosThreadSafe();
+        posThreadSafe.put(threadId, ret);
+      }
+    }
+    posCurrent = ret;                 //store for next access, it may be faster.
+    return ret;
+  }
+  
+  
   @Override public void setPositionSize(int line, int column, int height, int width, char direction)
-  { if(line < 0){ line = posUsed? GralPos.next: GralPos.same; }
-    if(column < 0){ column = posUsed? GralPos.next: GralPos.same; }
-    setFinePosition(line, 0, height + GralPos.size, 0, column, 0, width + GralPos.size, 0, 1, direction, 0 ,0 , pos);
+  { PosThreadSafe pos = pos();
+    if(line < 0){ line = pos.posUsed? GralPos.next: GralPos.same; }
+    if(column < 0){ column = pos.posUsed? GralPos.next: GralPos.same; }
+    setFinePosition(line, 0, height + GralPos.size, 0, column, 0, width + GralPos.size, 0, 1, direction, 0 ,0 , pos.pos);
   }
 
   @Override public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
     , int origin, char direction)
-  { setPosition(pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
+  { setPosition(pos().pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
   }
 
 
   @Override public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
     , int origin, char direction, float border)
-  {
-    pos.setPosition(pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, border);
-    posUsed = false;
+  { PosThreadSafe pos = pos();
+    pos.pos.setPosition(pos.pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, border);
+    pos.posUsed = false;
   }
 
 
   @Override public void setPosition(GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
     , int origin, char direction)
-  {
-      pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
-      posUsed = false;
+  { PosThreadSafe pos = pos();
+    pos.pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
+    pos.posUsed = false;
   }
   
   @Override public void setPosition(GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
     , int origin, char direction, float border)
-  {
-      pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, border);
-      posUsed = false;
+  { PosThreadSafe pos = pos();
+      pos.pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, border);
+      pos.posUsed = false;
   }
   
   @Override public void setFinePosition(int line, int yPosFrac, int ye, int yef
     , int column, int xPosFrac, int xe, int xef, int origin, char direction, int border, int borderFrac, GralPos frame)
-  {
-    pos.setFinePosition(line, yPosFrac, ye, yef, column, xPosFrac, xe, xef, origin, direction, border, borderFrac, frame);
-    posUsed = false;
+  { PosThreadSafe pos = pos();
+    pos.pos.setFinePosition(line, yPosFrac, ye, yef, column, xPosFrac, xe, xef, origin, direction, border, borderFrac, frame);
+    pos.posUsed = false;
   }
   
   
   @Override public void setSize(int height, int ySizeFrac, int width, int xSizeFrac)
-  {
-    pos.setSize(height, ySizeFrac, width, xSizeFrac);  //NOTE: setSize sets the next pos 
-    posUsed = false;
+  { PosThreadSafe pos = pos();
+    pos.pos.setSize(height, ySizeFrac, width, xSizeFrac);  //NOTE: setSize sets the next pos 
+    pos.posUsed = false;
   }
   
   void setSize(float height, float width)
-  { pos.setSize(height, width, pos);
-    posUsed = false;
+  { PosThreadSafe pos = pos();
+    pos.pos.setSize(height, width, pos.pos);
+    pos.posUsed = false;
   }
   
   /**Not for user: Checks whether the position is used, sets the next position then, markes the position as used.
    * See @link GralPos#setNextPosition(), {@link #posUsed}. */
   public void setNextPosition()
-  { if(posUsed){
-      pos.setNextPosition();
+  { PosThreadSafe pos = pos();
+    if(pos.posUsed){
+      pos.pos.setNextPosition();
     }
-    posUsed = true;
+    pos.posUsed = true;
   }  
   
   /**Not for user: Checks whether the position is used, sets the next position then, markes the position as used.
    * See @link GralPos#setNextPosition(), {@link #posUsed}. */
   public void setNextPositionUnused()
-  { if(posUsed){
-      pos.setNextPosition();
+  { PosThreadSafe pos = pos();
+    if(pos.posUsed){
+      pos.pos.setNextPosition();
     }
-    posUsed = false;
+    pos.posUsed = false;
   }  
   
   public void registerShowField(GralWidget widg){
@@ -395,15 +441,16 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
   
-  @Override public GralPos getPositionInPanel(){ return pos.clone(); }
+  @Override public GralPos getPositionInPanel(){ return pos().pos.clone(); }
   
   public GralPos getPosCheckNext(){ 
-    if(posUsed){
-      pos.setNextPosition();
-      posUsed = false;
+    PosThreadSafe pos = pos();
+    if(pos.posUsed){
+      pos.pos.setNextPosition();
+      pos.posUsed = false;
     }
     //posUsed = true;
-    return pos.clone(); 
+    return pos.pos.clone(); 
   }
 	
   /**Map of all panels. A panel may be a dialog box etc. */
@@ -423,8 +470,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    */
   private GralWidget_ifc lastClickedWidget;
   
-
-	@Override public List<GralWidget> getListCurrWidgets(){ return pos.panel.widgetList; }
+  @Override public List<GralWidget> getListCurrWidgets(){ return pos().pos.panel.widgetList; }
 	
   /**Index of all user actions, which are able to use in Button etc. 
    * The user action "showWidgetInfos" defined here is added initially.
@@ -515,8 +561,9 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
       impl.createSubWindow(wind1);
       registerPanel(wind1);
       //set the current position of the manager to this window, initalize it.
-      this.pos.panel = wind1; //it is selected.
-      this.pos.setPosition(null, 0,0,0,0,0,'r');  //per default the whole window as position and size.
+      PosThreadSafe pos = pos();
+      pos.pos.panel = wind1; //it is selected.
+      pos.pos.setPosition(null, 0,0,0,0,0,'r');  //per default the whole window as position and size.
 
     } else {  
       impl.setToPanel(widgg); 
@@ -623,13 +670,14 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   /**selects a registered panel for the next add-operations. 
    */
   @Override public void selectPanel(String sName){ 
-    pos.panel = panels.get(sName);
+    PosThreadSafe pos = pos();
+    pos.pos.panel = panels.get(sName);
     sCurrPanel = sName;
-    if(pos.panel == null && currTabPanel !=null) {
+    if(pos.pos.panel == null && currTabPanel !=null) {
       //use the position of the current tab panel for the WidgetMng. Its panel is the parent.
-      pos.set(currTabPanel.pos());  
-      pos.panel = currTabPanel.addGridPanel(sName, /*"&" + */sName,1,1,10,10);
-      panels.put(sName, pos.panel);  //TODO unnecessay, see addGridPanel
+      pos.pos.set(currTabPanel.pos());  
+      pos.pos.panel = currTabPanel.addGridPanel(sName, /*"&" + */sName,1,1,10,10);
+      panels.put(sName, pos.pos.panel);  //TODO unnecessay, see addGridPanel
       log.sendMsg(0, "GuiPanelMng:selectPanel: unknown panel name %s", sName);
       //Note: because the pos.panel is null, not placement will be done.
     }
@@ -639,7 +687,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   /**Selects the given panel as current panel to build some content. */
   @Override public void selectPanel(GralPanelContent panel) {
-    pos.panel = panel;
+    pos().pos.panel = panel;
     sCurrPanel = panel.name;
     setPosition(0,0,0,0,0,'d');  //set the position to default, full panel because the panel was selected newly.
   }
@@ -724,12 +772,13 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   @Override public void registerWidget(GralWidget widgd)
   {
-    GralPanelContent panel = widgd.pos() !=null ? widgd.pos().panel : this.pos.panel;
+    PosThreadSafe pos = pos();
+    GralPanelContent panel = widgd.pos() !=null ? widgd.pos().panel : pos.pos.panel;
     if(widgd.name != null){
       indexNameWidgets.put(widgd.name, widgd);
     }
     //only widgets with size from right TODO percent size too.
-    boolean toResize = pos.x.p1 < 0 || pos.x.p2 <= 0 || pos.y.p1< 0 || pos.y.p2 <=0; 
+    boolean toResize = pos.pos.x.p1 < 0 || pos.pos.x.p2 <= 0 || pos.pos.y.p1< 0 || pos.pos.y.p2 <=0; 
     panel.addWidget(widgd, toResize);
     
   }
@@ -755,10 +804,11 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
       if(exist == panel) System.out.println("info: unnecessary registerPanel " + panel.name);
       else System.err.println("info: faulty registerPanel " + panel.name);
     }
+    PosThreadSafe pos = pos();
     panels.put(panel.name, panel);
-    pos.panel = panel;
+    pos.pos.panel = panel;
     //initialize the position because its a new panel. The initial position is the whole panel.
-    pos.setFinePosition(0,0,0,0,0,0,0,0,0,'d',0,0,pos);
+    pos.pos.setFinePosition(0,0,0,0,0,0,0,0,0,'d',0,0, pos.pos);
     sCurrPanel = panel.name;
   }
   
@@ -811,7 +861,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @param tabbedPanel
    */
   /*package private*/public void setTabbedPanel(GralPanelContent tabbedPanel){
-    pos.panel = tabbedPanel;
+    pos().pos.panel = tabbedPanel;
   }
   
   
@@ -819,7 +869,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     return panels.get(name);
   }
   
-  public GralPanelContent getCurrentPanel(){ return pos.panel; }
+  public GralPanelContent getCurrentPanel(){ return pos().pos.panel; }
   
   public GralPanelActivated_ifc actionPanelActivate = new GralPanelActivated_ifc()
   { @Override public void panelActivatedGui(List<GralWidget> widgetsP)
@@ -1002,8 +1052,8 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 )
 {
   setNextPositionUnused();  //since 130523 it should be the valid one.
-  float ySize = pos.height();
-  int xSize = (int)pos.width();
+  float ySize = pos().pos.height();
+  int xSize = (int)pos().pos.width();
   
   char size = ySize > 3? 'B' : 'A';
   if(sName == null){ sName = sButtonText; }
@@ -1035,8 +1085,8 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   //, String sCmd, String sUserAction, String sName)
 )
 {
-  int ySize = (int)pos.height();
-  int xSize = (int)pos.width();
+  int ySize = (int)pos().pos.height();
+  int xSize = (int)pos().pos.width();
   
   char size = ySize > 3? 'B' : 'A';
   if(sName == null){ sName = sButtonText; }
@@ -1065,8 +1115,8 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   //, String sCmd, String sUserAction, String sName)
 )
 {
-  int ySize = (int)pos.height();
-  int xSize = (int)pos.width();
+  int ySize = (int)pos().pos.height();
+  int xSize = (int)pos().pos.width();
   
   char size = ySize > 3? 'B' : 'A';
   GralButton widgButton = new GralButton(sName);
@@ -1090,8 +1140,8 @@ public GralButton addCheckButton(
 , GralColor colorDisabled
 )
 {
-  int ySize = (int)pos.height();
-  int xSize = (int)pos.width();
+  int ySize = (int)pos().pos.height();
+  int xSize = (int)pos().pos.width();
   
   char size = ySize > 3? 'B' : 'A';
   GralButton widgButton = new GralButton(sName);
@@ -1112,8 +1162,8 @@ public GralButton addCheckButton(
 , String sDataPath
 )
 {
-  int ySize = (int)(pos.height());
-  int xSize = (int)(pos.width());
+  int ySize = (int)(pos().pos.height());
+  int xSize = (int)(pos().pos.width());
 
   GralLed gralLed = new GralLed(sName);
   //SwtLed swtLed = new SwtLed(gralLed, this);
@@ -1153,19 +1203,19 @@ public GralButton addCheckButton(
    * @param ye end of line relative to current position in grid units.
    */
   @Override public void addLine(int colorValue, float xa, float ya, float xe, float ye){
-    //if(pos.panel.getPanelImpl() instanceof SwtCanvasStorePanel){
-    if(pos.panel.canvas !=null){
+    //if(pos().pos.panel.getPanelImpl() instanceof SwtCanvasStorePanel){
+    if(pos().pos.panel.canvas !=null){
       GralColor color = propertiesGui.color(colorValue);
       int xgrid = propertiesGui.xPixelUnit();
       int ygrid = propertiesGui.yPixelUnit();
-      int x1 = (int)((pos.x.p1 + xa) * xgrid);
-      int y1 = (int)((pos.y.p1 - ya) * ygrid);
-      int x2 = (int)((pos.x.p1 + xe) * xgrid);
-      int y2 = (int)((pos.y.p1 - ye) * ygrid);
+      int x1 = (int)((pos().pos.x.p1 + xa) * xgrid);
+      int y1 = (int)((pos().pos.y.p1 - ya) * ygrid);
+      int x2 = (int)((pos().pos.x.p1 + xe) * xgrid);
+      int y2 = (int)((pos().pos.y.p1 - ye) * ygrid);
       //Any panel which is created in the SWT-implementation is a CanvasStorePanel.
       //This is because lines should be drawn.
-      //((SwtCanvasStorePanel) pos.panel.getPanelImpl()).store.drawLine(color, x1, y1, x2, y2);
-      pos.panel.canvas.drawLine(color, x1, y1, x2, y2);
+      //((SwtCanvasStorePanel) pos().pos.panel.getPanelImpl()).store.drawLine(color, x1, y1, x2, y2);
+      pos().pos.panel.canvas.drawLine(color, x1, y1, x2, y2);
       //furtherSetPosition((int)(xe + 0.99F), (int)(ye + 0.99F));
     } else {
       log.sendMsg(0, "GuiPanelMng:addLine: panel is not a CanvasStorePanel");
@@ -1174,8 +1224,8 @@ public GralButton addCheckButton(
   
   
   @Override public void addLine(GralColor color, List<GralPoint> points){
-    if(pos.panel.canvas !=null){
-      pos.panel.canvas.drawLine(pos, color, points);
+    if(pos().pos.panel.canvas !=null){
+      pos().pos.panel.canvas.drawLine(pos().pos, color, points);
     } else {
       log.sendMsg(0, "GralMng.addLine - panel is not a CanvasStorePanel;");
     }
@@ -1303,7 +1353,7 @@ public GralButton addCheckButton(
     FileSelectInfo fileSelectInfo = new FileSelectInfo(name, listRecentFiles, startDirMask, widgd);
     widgdSelect.setContentInfo(fileSelectInfo); 
     //xSize = xSize1;
-    pos.set(posAll);  //the saved position.
+    pos().pos.set(posAll);  //the saved position.
     return widgd;
   }
 
@@ -1458,7 +1508,7 @@ public GralButton addCheckButton(
   
   @Override public void repaintCurrentPanel()
   {
-    pos.panel.repaint();
+    pos().pos.panel.repaint();
   }
   
   
@@ -1577,7 +1627,7 @@ public GralButton addCheckButton(
       mng.impl = this;
     }
     
-    protected GralPos pos(){ return mng.pos; }
+    protected GralPos pos(){ return mng.pos().pos; }
 
     protected String sCurrPanel(){ return mng.sCurrPanel; }
     

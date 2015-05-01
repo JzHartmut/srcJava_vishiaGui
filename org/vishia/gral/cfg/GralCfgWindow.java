@@ -16,9 +16,10 @@ java org.vishia.gral.test.HelloWorld.openWindow();
 String windowTitle = <:>Test GralCfgWindow<.>;
 String gConfig = 
 <:>
- @2+20,2+60:Show("test");
+ ##A value to show, following by a label.
+ @2+2,2+20:Show("name"); Text("label");
 <.>;
-##java org.vishia.gral.cfg.GralCfgWindow.createWindow("testCfgWind", windowTitle, gConfig, jzcmdsub.currdir, jzcmd.log);                 
+java org.vishia.gral.cfg.GralCfgWindow.createWindow("testCfgWind", windowTitle, gConfig, jzcmdsub.currdir, jzcmd.log);                 
 java org.vishia.gral.test.HelloWorld.waitForClosePrimaryWindow();
 ==endJZcmd==
 */

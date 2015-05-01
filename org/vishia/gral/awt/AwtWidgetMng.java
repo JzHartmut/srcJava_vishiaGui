@@ -79,7 +79,8 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   @Override public void setToPanel(GralWidget widgg){
     if(widgg instanceof GralLabel){
       new AwtLabel((GralLabel)widgg, this);
-      
+    } else if(widgg instanceof GralTextField){
+      new AwtTextField((GralTextField)widgg, this);
     } else if(widgg instanceof GralHorizontalSelector<?>){
       //SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, (GralHorizontalSelector<?>)widgg);
       mng.registerWidget(widgg);
@@ -103,7 +104,6 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
    *   upper case letter: normal font, lower case letter: small font
    *   'l' left, 't' top (above field) 
    * @return
-   */
   //@Override 
   public GralTextField addTextField(String name, boolean editable, String prompt, String promptStylePosition)
   { Container parent = getCurrentPanel();
@@ -148,7 +148,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
       wgPrompt.setBounds(boundsPrompt.x, boundsPrompt.y, boundsPrompt.dx, boundsPrompt.dy+1);
       widgetSwt.setBounds(boundsField.x, boundsField.y, boundsField.dx, boundsField.dy);
       posUsed = true;
-      */
+      *//*
     } else {
       //without prompt
       setPosAndSize_(widg.widgetAwt);
@@ -168,7 +168,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     return widg; 
   
   }
-  
+  */
   
   
 
