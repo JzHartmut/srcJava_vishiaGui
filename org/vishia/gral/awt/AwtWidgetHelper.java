@@ -28,7 +28,12 @@ public class AwtWidgetHelper
   }
   
 
+  public void setBoundsPixel(int x, int y, int dx, int dy)
+  { widga.setBounds(x,y,dx,dy);
+  }
   
+  
+
   public GralRectangle getPixelPositionSize(){
     return getPixelPositionSize(widga);
   }
@@ -115,6 +120,16 @@ public class AwtWidgetHelper
   }
   
   
+  public boolean setFocusGThread(){ widga.setFocusable(true); return widga.isFocusOwner(); }
+
+  public void removeWidgetImplementation()
+  {
+    if(widga !=null){ 
+      widga.removeNotify();
+      widga = null;
+    }
+  }
+
 
   
 }

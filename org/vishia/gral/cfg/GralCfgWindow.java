@@ -18,7 +18,7 @@ String gConfig =
 <:>
  @2+20,2+60:Show("test");
 <.>;
-java org.vishia.gral.cfg.GralCfgWindow.createWindow("testCfgWind", windowTitle, gConfig, jzcmdsub.currdir, jzcmd.log);                 
+##java org.vishia.gral.cfg.GralCfgWindow.createWindow("testCfgWind", windowTitle, gConfig, jzcmdsub.currdir, jzcmd.log);                 
 java org.vishia.gral.test.HelloWorld.waitForClosePrimaryWindow();
 ==endJZcmd==
 */

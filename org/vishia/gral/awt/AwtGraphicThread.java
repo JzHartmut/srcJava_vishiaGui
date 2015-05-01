@@ -25,7 +25,7 @@ public class AwtGraphicThread extends GralGraphicThread.ImplAccess
 
   @Override protected void initGraphic()
   {
-    AwtSubWindow awtWindow = new AwtSubWindow(awtMng, mainWindow);
+    AwtSubWindow awtWindow = new AwtSubWindow(awtMng, mainWindow, true);
     AwtProperties propertiesGui = new AwtProperties(sizeCharProperties);
     awtMng = new AwtWidgetMng(awtWindow.window, propertiesGui, log);
     

@@ -121,11 +121,11 @@ public class SwtProperties extends GralGridProperties
 
   
   
-  /**Returns a color with given Gui-independent color.
-   * The SWT-Color instance is taken from a pool if the color is used already.
+  /**Returns a implementation font with given Gui-independent font.
+   * The SWT-Font instance is taken from a pool if the font is used already.
    * Elsewhere it is created newly and put into the pool.
-   * @param color The given color in system-indpending form.
-   * @return An instance of SWT-color
+   * @param forn The given Gral font in system-independent form.
+   * @return An instance of SWT-Font
    */
   public Font fontSwt(GralFont font)
   {

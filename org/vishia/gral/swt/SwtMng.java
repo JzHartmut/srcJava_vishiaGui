@@ -401,7 +401,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   {
     GralWindow windowGral = new GralWindow("@", name, title, windProps, null, null);
     //SwtGraphicThread swtDevice = (SwtGraphicThread)gralDevice;
-    createWindow(windowGral);
+    createSubWindow(windowGral);
     return windowGral;
 
   }
@@ -412,7 +412,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   /* (non-Javadoc)
    * @see org.vishia.gral.ifc.GralMngBuild_ifc#createWindow(org.vishia.gral.base.GralWindow)
    */
-  @Override public void createWindow(GralWindow windowGral) {
+  @Override public void createSubWindow(GralWindow windowGral) {
     SwtSubWindow windowSwt = new SwtSubWindow(this, windowGral);
     //new SwtSubWindow(name, swtDevice.displaySwt, title, windProps, this);
     GralRectangle rect = calcPositionOfWindow(windowGral.pos());

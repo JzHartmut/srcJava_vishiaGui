@@ -1,15 +1,16 @@
-package org.vishia.gral.swt;
+package org.vishia.gral.awt;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Label;
+
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.widget.GralLabel;
 
-public class SwtLabel extends GralLabel.GraphicImplAccess
+public class AwtLabel extends GralLabel.GraphicImplAccess
 {
   /**Version, history and license.
    * <ul>
@@ -47,101 +48,108 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
    * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
    */
-  private final SwtWidgetHelper swtWidgHelper;
+  private final AwtWidgetHelper widgHelper;
   
-  protected Label labelSwt;
+  protected Label labelAwt;
 
-  private Font fontSwt;
+  private Font fontAwt;
   
-  SwtLabel(GralLabel widgg, SwtMng mng)
+  
+  AwtLabel(GralLabel widgg, AwtWidgetMng mng)
   {
     widgg.super(widgg, mng.mng);
-    Composite panelSwt = mng.getCurrentPanel();
-    int styleSwt = 0;
-    labelSwt = new Label(panelSwt, styleSwt);
-    swtWidgHelper = new SwtWidgetHelper(labelSwt, mng);
+    //Container panelSwt = mng.getCurrentPanel();
+    //int styleSwt = 0;
     int mode;
     switch(origin()){
-    case 1: mode = SWT.LEFT; break;
-    case 2: mode = SWT.CENTER; break;
-    case 3: mode = SWT.RIGHT; break;
-    case 4: mode = SWT.LEFT; break;
-    case 5: mode = SWT.CENTER; break;
-    case 6: mode = SWT.RIGHT; break;
-    case 7: mode = SWT.LEFT; break;
-    case 8: mode = SWT.CENTER; break;
-    case 9: mode = SWT.RIGHT; break;
+    case 1: mode = Label.LEFT; break;
+    case 2: mode = Label.CENTER; break;
+    case 3: mode = Label.RIGHT; break;
+    case 4: mode = Label.LEFT; break;
+    case 5: mode = Label.CENTER; break;
+    case 6: mode = Label.RIGHT; break;
+    case 7: mode = Label.LEFT; break;
+    case 8: mode = Label.CENTER; break;
+    case 9: mode = Label.RIGHT; break;
     default: mode = 0;
     }
-    labelSwt.setAlignment(mode);
-    mng.setBounds_(labelSwt);
+    labelAwt = new Label(dyda().displayedText, mode);
+    Container panelAwt = (Container)widgg.pos().panel.getWidgetImplementation();
+    panelAwt.add(labelAwt);
+    widgHelper = new AwtWidgetHelper(labelAwt, mng);
+    labelAwt.setAlignment(mode);
+    mng.setBounds_(labelAwt);
     mng.mng.registerWidget(widgg);
     repaintGthread();  //to set text etc.
   }
 
 
   @Override
-  public GralRectangle getPixelPositionSize(){ return swtWidgHelper.getPixelPositionSize(); }
+  public GralRectangle getPixelPositionSize(){ return widgHelper.getPixelPositionSize(); }
 
 
   @Override
-  public Object getWidgetImplementation(){ return labelSwt; }
+  public Object getWidgetImplementation(){ return labelAwt; }
 
 
   @Override public void removeWidgetImplementation()
-  { swtWidgHelper.removeWidgetImplementation();
-    labelSwt = null;
+  { widgHelper.removeWidgetImplementation();
+    labelAwt = null;
   }
 
 
   @Override
   public void repaintGthread()
   {
-    if(labelSwt !=null){ //do nothing if the graphic implementation widget is removed.
+    if(labelAwt !=null){ //do nothing if the graphic implementation widget is removed.
       GralWidget.DynamicData dyda = dyda();
       int chg, catastrophicalCount =0;
       while( (chg = getChanged()) !=0){ //widgg.dyda.whatIsChanged.get();
         if(++catastrophicalCount > 10000) 
           throw new RuntimeException("atomic failed");
-        if((chg & chgColorText)!=0) { //firstly set the font
-          SwtProperties props = swtWidgHelper.mng.propertiesGuiSwt;
+        if((chg & chgColorText)!=0) {  //firstly set the font.
+          AwtProperties props = widgHelper.mng.propertiesGuiAwt;
           if(dyda.textFont !=null){
-            fontSwt = props.fontSwt(dyda.textFont);
-            labelSwt.setFont(fontSwt);
+            fontAwt = props.fontAwt(dyda.textFont);
+            labelAwt.setFont(fontAwt);
           }
           if(dyda.textColor !=null){
-            labelSwt.setForeground(props.colorSwt(dyda.textColor));
+            labelAwt.setForeground(props.colorAwt(dyda.textColor));
           }
           if(dyda.backColor !=null){
-            labelSwt.setBackground(props.colorSwt(dyda.backColor));
+            labelAwt.setBackground(props.colorAwt(dyda.backColor));
           }
         }
         if((chg & chgText) !=0 && dyda.displayedText !=null){ 
-          labelSwt.setText(dyda.displayedText);
+          labelAwt.setText(dyda.displayedText);
           //font.getFontData()[0].
-          Point textSize = labelSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+          //FontMetrics ff; ff.
+          //labelAwt.getFontMetrics(font)
+          Dimension textSize = new Dimension(10* dyda.displayedText.length(), 20);
+              //labelSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
           //int width = sText.length();
           //widget.setSize(sizePixel);
           
-          Point widgetSize = labelSwt.getSize();
-          if(widgetSize.x < textSize.x){
-            labelSwt.setSize(textSize);
+          Dimension widgetSize = labelAwt.getSize();
+          if(widgetSize.width < textSize.width){
+            labelAwt.setSize(textSize);
           }
-          //labelSwt.setSize(textSize);
+          //labelAwt.setSize(textSize);
         }
         acknChanged(chg);
       }
-      labelSwt.redraw();
-      labelSwt.update();
+      labelAwt.repaint();
     }
   }
 
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
-  { swtWidgHelper.setBoundsPixel(x, y, dx, dy); 
+  { widgHelper.setBoundsPixel(x, y, dx, dy); 
   }
 
 
   @Override public boolean setFocusGThread()
-  { return swtWidgHelper.setFocusGThread(); }
+  { return widgHelper.setFocusGThread(); }
+
+  
 }

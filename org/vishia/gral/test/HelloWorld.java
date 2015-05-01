@@ -22,6 +22,8 @@ public class HelloWorld
 {
   GralMng gralMng;
   
+  GralWindow window;
+  
   public static void main(String[] args){
     HelloWorld main = new HelloWorld();
     main.openWindow1();
@@ -50,8 +52,8 @@ public class HelloWorld
   private void openWindow1(){
     GralFactory gralFactory = new AwtFactory();
     LogMessage log = new LogMessageStream(System.out);
-    GralWindow wind = gralFactory.createWindow(log, "Hello World", 'C', 100, 50, 600, 400);
-    gralMng = wind.gralMng();
+    window = gralFactory.createWindow(log, "Hello World", 'C', 100, 50, 600, 400);
+    gralMng = window.gralMng();
     gralMng.gralDevice.addDispatchOrder(initGraphic);
     //initGraphic.awaitExecution(1, 0);
       
@@ -60,7 +62,7 @@ public class HelloWorld
   
   GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic"){
     @Override public void executeOrder()
-    {
+    { gralMng.selectPanel(window);
       gralMng.setPosition(4, -2, 2, -2, 0, 'd');
       gralMng.addText("Hello World");
       //

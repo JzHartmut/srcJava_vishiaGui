@@ -512,7 +512,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   @Override public void setToPanel(GralWidget widgg){ 
     if(widgg instanceof GralWindow){
       GralWindow wind1 = (GralWindow)widgg;
-      impl.createWindow(wind1);
+      impl.createSubWindow(wind1);
       registerPanel(wind1);
       //set the current position of the manager to this window, initalize it.
       this.pos.panel = wind1; //it is selected.
@@ -1636,7 +1636,7 @@ public GralButton addCheckButton(
     @Deprecated public abstract GralWindow createWindow(String name, String title, int windProps);
     
     
-    protected abstract void createWindow(GralWindow windowGral);
+    protected abstract void createSubWindow(GralWindow windowGral);
     
     public abstract GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int property);
     

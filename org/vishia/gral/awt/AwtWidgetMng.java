@@ -44,6 +44,7 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
+import org.vishia.gral.widget.GralLabel;
 import org.vishia.msgDispatch.LogMessage;
 
 public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, GralMng_ifc
@@ -76,7 +77,10 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
 
   @Override public void setToPanel(GralWidget widgg){
-    if(widgg instanceof GralHorizontalSelector<?>){
+    if(widgg instanceof GralLabel){
+      new AwtLabel((GralLabel)widgg, this);
+      
+    } else if(widgg instanceof GralHorizontalSelector<?>){
       //SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, (GralHorizontalSelector<?>)widgg);
       mng.registerWidget(widgg);
     } else if(widgg instanceof GralTable<?>){
@@ -389,8 +393,8 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   }
 
   
-  @Override public void createWindow(GralWindow windowGral){
-    AwtSubWindow windowSwt = new AwtSubWindow(this, windowGral);
+  @Override public void createSubWindow(GralWindow windowGral){
+    AwtSubWindow windowSwt = new AwtSubWindow(this, windowGral, false);
     //new SwtSubWindow(name, swtDevice.displaySwt, title, windProps, this);
     GralRectangle rect = calcPositionOfWindow(windowGral.pos());
     windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );

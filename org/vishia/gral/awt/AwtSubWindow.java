@@ -2,6 +2,7 @@ package org.vishia.gral.awt;
 
 import java.awt.Frame;
 import java.awt.Rectangle;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
@@ -10,21 +11,23 @@ import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralRectangle;
 
-import sun.awt.WindowClosingListener;
 
 public class AwtSubWindow extends GralWindow.GraphicImplAccess implements GralWidgImpl_ifc
 {
   
   protected final Frame window;
 
-  public AwtSubWindow(AwtWidgetMng mng, GralWindow wdgGral)
-  { super(wdgGral, GralMng.get());
+  private final boolean isMainWindow;
   
+  public AwtSubWindow(AwtWidgetMng mng, GralWindow wdgGral, boolean isMainWindow)
+  { super(wdgGral, GralMng.get());
+    this.isMainWindow = isMainWindow;
     window = new Frame(getTitle());
     int xPos = 100; int yPos = 50; int xSize = 640; int ySize = 480;
     window.setBounds(xPos, yPos, xSize, ySize);
     window.setVisible(true);
     window.setLayout(null);
+    window.addWindowListener(windowClosingAdapter);
     window.addWindowListener(windowListener);
     //window.add
     
@@ -88,23 +91,6 @@ public class AwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   }
   
   
-  WindowClosingListener closingListener = new WindowClosingListener()
-  {
-    
-    @Override public RuntimeException windowClosingNotify(WindowEvent arg0)
-    {
-      // TODO Auto-generated method stub
-      return null;
-    }
-    
-    
-    
-    @Override public RuntimeException windowClosingDelivered(WindowEvent arg0)
-    {
-      // TODO Auto-generated method stub
-      return null;
-    }
-  };
   
 
   WindowListener windowListener = new WindowListener()
@@ -152,4 +138,22 @@ public class AwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
       
     }
   };
+  
+  
+  
+  @SuppressWarnings("synthetic-access") 
+  WindowListener windowClosingAdapter = new WindowAdapter()
+  {
+
+    public void windowClosing(WindowEvent event)
+    {
+      event.getWindow().setVisible(false);
+      event.getWindow().dispose();
+      if (isMainWindow)
+      {
+        System.exit(0);
+      }
+    }
+  };
+
 }

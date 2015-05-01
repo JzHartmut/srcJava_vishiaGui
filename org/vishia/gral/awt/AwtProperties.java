@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralFont;
 
 public class AwtProperties extends GralGridProperties
 {
@@ -69,6 +70,41 @@ public class AwtProperties extends GralGridProperties
       throw new IllegalArgumentException("unauthorized color setting");
     }
     return (Color)color.colorGuimpl;
+  }
+  
+  
+  
+  
+  /**Returns a implementation font with given Gui-independent font.
+   * The SWT-Font instance is taken from a pool if the font is used already.
+   * Elsewhere it is created newly and put into the pool.
+   * @param forn The given Gral font in system-independent form.
+   * @return An instance of SWT-Font
+   */
+  public Font fontAwt(GralFont font)
+  {
+    if(font.fontImpl == null){
+      int styleSwt = 0;
+      switch(font.style){
+        case 'b': styleSwt |= Font.BOLD; break;
+        case 'B': styleSwt |= Font.BOLD; break;
+        case 'i': styleSwt |= Font.ITALIC; break;
+        case 'I': styleSwt |= Font.BOLD | Font.ITALIC; break;
+        default: styleSwt = Font.PLAIN;
+      }
+      String fontName;
+      //NOTE: on SWT there are not Java standardfonts, there are platform-depending.
+      if(font.fontName.equals(GralFont.fontMonospacedSansSerif)){ fontName = "Courier"; }
+      else if(font.fontName.equals(GralFont.fontMonospacedSmall)){ fontName = "Courier"; }
+      else if(font.fontName.equals(GralFont.fontMonospacedSerif)){ fontName = "Courier"; }
+      else if(font.fontName.equals(GralFont.fontSansSerif)){ fontName = "Arial"; }
+      else if(font.fontName.equals(GralFont.fontSerif)){ fontName = "Serif"; }
+      else {fontName = font.fontName; }
+      font.fontImpl = new Font(fontName, font.size, styleSwt);
+    } else if(!(font.fontImpl instanceof Font)){
+      throw new IllegalArgumentException("unauthorized font setting");
+    }
+    return (Font)font.fontImpl;
   }
   
 
