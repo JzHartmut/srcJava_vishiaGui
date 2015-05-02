@@ -663,14 +663,14 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    *   existing. It is one time after startup or more as one time if {@link #removeWidgetImplementation()}
    *   was called. 
    */
-  public final void setToPanel(GralMngBuild_ifc mng) throws IllegalStateException {
+  public final void setToPanel(GralMngBuild_ifc mngUnused) throws IllegalStateException {
+    GralMng mngg = GralMng.get();  //The implementation should be instantiated already!
     if(_wdgImpl !=null) throw new IllegalStateException("setToPanel faulty call - GralTable;");
     if(dyda.textFont == null) { //maybe set with knowledge of the GralMng before.
-      GralMng mngg = (GralMng)mng;
       dyda.textFont = mngg.propertiesGui.getTextFont(mngg.pos().pos.height());
       dyda.setChanged(ImplAccess.chgFont);
     }
-    mng.setToPanel(this);
+    mngg.setToPanel(this);
   }
   
 

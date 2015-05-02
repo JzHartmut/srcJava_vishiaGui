@@ -1223,7 +1223,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
           case busyCheck: abortCopy(); break;
         }
         //trigger a copy statemachine, only effected if in such a state.
-        
+        abortCopy();
       }
       return true;
     }

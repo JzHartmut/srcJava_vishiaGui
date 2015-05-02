@@ -45,13 +45,13 @@ import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
 /**This is the Manager for the graphic. 
- * It contains the independent parts. 
- * This class <code>GralMng</code> is a common approach to work with graphical interface simply, 
- * it is implemented by the several graphic-system-supporting classes
+ * It contains the independent parts of graphic organization.
+ * This class <code>GralMng</code> is a common approach to work with graphical interface simply. 
+ * The inner class {@link ImplAccess} is implemented by the several graphic-system-supporting classes.
  * <ul>
  * <li>{@link org.vishia.gral.swt.SwtMng}
+ * <li>{@link org.vishia.gral.awt.AwtWidgetMng}
  * </ul>
- * to offer a unique interface to work with simple graphic applications.
  * <br><br>
  * 
  * @author Hartmut Schorrig
@@ -65,8 +65,6 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * <li>2015-05-02 Hartmut chg: {@link #registerWidget(GralWidget)} is obsolete now, it is empty yet. 
    *   Instead {@link #registerWidget(String, GralWidget)} by given name and {@link #removeWidget(String)} by name.
    *   See description of registering on {@link GralWidget#setToPanel(GralMngBuild_ifc)}. 
-   *   The registering of a widget is done in {@link GralWidget#initPosAndRegisterWidget(GralPos)} which is called either
-   *   on construction of a widget with a String-given position, before 
    * <li>2015-04-27 Hartmut new {@link #selectPanel(GralPanelContent)} not only with String given
    * <li>2015-01-18 Hartmut chg: Now the implementation for any Grahic (SwtMng) and the GralMng are two separated instances.
    *   The SwtMng extends the {@link GralMng.ImplAccess} which accesses all private data of the GralMng.
@@ -111,7 +109,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * <li> You can redistribute copies of this source to everybody.
    * <li> Every user of this source, also the user of redistribute copies
    *    with or without payment, must accept this license for further using.
-   * <li> But the LPGL ist not appropriate for a whole software product,
+   * <li> But the LPGL is not appropriate for a whole software product,
    *    if this source is only a part of them. It means, the user
    *    must publish this part of source,
    *    but don't need to publish the whole source of the own product.
@@ -124,10 +122,8 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * a second license subscribing a special contract with the author. 
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
-   * 
-   * 
    */
-  public final static int version = 20120422;
+  public final static String sVersion = "2015-05-03";
   
 	/**This class is used for a selection field for file names and paths. */
   protected class FileSelectInfo

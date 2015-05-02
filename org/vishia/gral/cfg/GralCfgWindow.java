@@ -10,7 +10,7 @@ import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 
-/*Test with jzcmd: call jzcmd with this java file with its full path:
+/*Test with Jbat: call Jbat with this java file with its full path:
 file: D:/vishia/Java/srcJava_vishiaGui/org/vishia/gral/cfg/GralCfgWindow.java
 ==JZcmd==
 java org.vishia.gral.test.HelloWorld.openWindow();                 
@@ -95,9 +95,11 @@ public class GralCfgWindow
     GralCfgZbnf cfgZbnf = new GralCfgZbnf();  //temporary instance for parsing
     cfgZbnf.configureWithZbnf(sCfg, guiCfgData); //
     int props = GralWindow_ifc.windRemoveOnClose | GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable;
+    GralMng mng = GralMng.get();
+    mng.selectPrimaryWindow();
     this.window = new GralWindow("10+30, 10+50", sName, sTitle, props);
     configInGthread.getCtDone(0);
-    GralMng.get().gralDevice.addDispatchOrder(configInGthread);   //runs in graphic thread
+    mng.gralDevice.addDispatchOrder(configInGthread);   //runs in graphic thread
     configInGthread.awaitExecution(1, 2000);
   }
   
