@@ -5,6 +5,7 @@ import java.text.ParseException;
 
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
@@ -17,9 +18,10 @@ String windowTitle = <:>Test GralCfgWindow<.>;
 String gConfig = 
 <:>
  ##A value to show, following by a label.
- @2+2,2+20:Show("name"); Text("label");
+ @4+2,2+30:Show("name"); Text("label");
 <.>;
-java org.vishia.gral.cfg.GralCfgWindow.createWindow("testCfgWind", windowTitle, gConfig, jzcmdsub.currdir, jzcmd.log);                 
+Obj window = java org.vishia.gral.cfg.GralCfgWindow.createWindow("testCfgWind", windowTitle, gConfig, jzcmdsub.currdir, jzcmd.log);
+window.setTextIn("name", "example");                 
 java org.vishia.gral.test.HelloWorld.waitForClosePrimaryWindow();
 ==endJZcmd==
 */
@@ -94,7 +96,9 @@ public class GralCfgWindow
     cfgZbnf.configureWithZbnf(sCfg, guiCfgData); //
     int props = GralWindow_ifc.windRemoveOnClose | GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable;
     this.window = new GralWindow("10+30, 10+50", sName, sTitle, props);
-    GralMng.get().gralDevice.addDispatchOrder(configGuiWithZbnf);   //runs in graphic thread
+    configInGthread.getCtDone(0);
+    GralMng.get().gralDevice.addDispatchOrder(configInGthread);   //runs in graphic thread
+    configInGthread.awaitExecution(1, 2000);
   }
   
   /**Creates a window with a given configuration.
@@ -106,10 +110,11 @@ public class GralCfgWindow
    * @param log log output for status and parse messages
    * @throws ParseException on errors in the sCfg
    */
-  public static void createWindow(String sName, String sTitle, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) 
+  public static GralPanelContent createWindow(String sName, String sTitle, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) 
   throws ParseException
   {
-    new GralCfgWindow(sName, sTitle, sCfg, imgDir, log);
+    GralCfgWindow thiz = new GralCfgWindow(sName, sTitle, sCfg, imgDir, log);
+    return thiz.window;
   }
   
   
@@ -121,7 +126,7 @@ public class GralCfgWindow
    * 
    */
   @SuppressWarnings("synthetic-access")  
-  GralGraphicTimeOrder configGuiWithZbnf = new GralGraphicTimeOrder("GralCfgWindow.config")
+  GralGraphicTimeOrder configInGthread = new GralGraphicTimeOrder("GralCfgWindow.config")
   {
     
     private static final long serialVersionUID = 1L;

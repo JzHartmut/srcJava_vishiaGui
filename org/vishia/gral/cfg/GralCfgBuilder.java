@@ -145,6 +145,7 @@ public class GralCfgBuilder
   {
     String sError = null;
     for(GralCfgElement cfge: cfgDataPanel.listElements){
+      //=================>>
       String sErrorWidgd = buildWidget(cfge);
       if(sErrorWidgd !=null){
         if(sError == null){ sError = sErrorWidgd; }

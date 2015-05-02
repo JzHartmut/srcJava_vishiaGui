@@ -106,45 +106,10 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     if(isPasswordField()){ 
       textProperties |= SWT.PASSWORD; 
     }
-    if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("t")){
-      mng.mng.setNextPosition();
+    if(posPrompt !=null) {
       final Font promptFont;
-      char sizeFontPrompt;
-      GralRectangle boundsAll, boundsPrompt, boundsField;
-      final GralPos posPrompt = new GralPos(), posField = new GralPos();
-
-      //boundsAll = mng.calcWidgetPosAndSize(this.pos, 800, 600, 100, 20);
-      float ySize = widgg.pos().height();
-      //float xSize = pos.width();
-      //posPrompt from top, 
-      float yPosPrompt, heightPrompt, heightText;
-      //switch(promptStylePosition){
-        //case 't':{
-          if(ySize <= 2.5){ //it is very small for top-prompt:
-            yPosPrompt = 1.0f;  //no more less than 1/2 normal line. 
-            heightPrompt = 1.0f;
-            heightText = ySize - 0.7f;  //max. 1.8
-            if(heightText < 1.0f){ heightText = 1.0f; }
-          } else if(ySize <=3.3){ //it is normally 2.5..4
-            heightPrompt = ySize - 2.0f + 0.5f;   //1 to 1.8
-            yPosPrompt = ySize - heightPrompt - 0.1f;  //no more less than 1/2 normal line. 
-            heightText = 2.0f;
-          } else if(ySize <=4.0){ //it is normally 2.5..4
-            heightPrompt = ySize - 2.0f + (4.0f - ySize) * 0.5f; 
-            if(heightPrompt < 1.0f){ heightPrompt = 1.0f; }
-            yPosPrompt = ySize - heightPrompt + 0.2f;  //no more less than 1/2 normal line. 
-            heightText = 2.0f;
-          } else { //greater then 4.0
-            yPosPrompt = ySize * 0.5f;
-            heightPrompt = ySize * 0.4f;;
-            heightText = ySize * 0.5f;
-          }
-          //from top, size of prompt
-          posPrompt.setPosition(widgg.pos(), GralPos.same - ySize + yPosPrompt, GralPos.size - heightPrompt, GralPos.same, GralPos.same, 0, '.');
-          //from bottom line, size of text
-          posField.setPosition(widgg.pos(), GralPos.same, GralPos.size - heightText, GralPos.same, GralPos.same, 0, '.');
-        //} break;
-      //}
+      GralRectangle boundsPrompt;
+      float heightPrompt = posPrompt.height();
       promptFont = mng.propertiesGuiSwt.getTextFontSwt(heightPrompt, GralFont.typeSansSerif, GralFont.styleNormal); //.smallPromptFont;
       //boundsPrompt = mng.calcWidgetPosAndSize(posPrompt, boundsAll.dx, boundsAll.dy, 10,100);
       //boundsField = mng.calcWidgetPosAndSize(posField, boundsAll.dx, boundsAll.dy, 10,100);
@@ -158,15 +123,10 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
         boundsPrompt.dx = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
       }
       promptSwt.setBounds(boundsPrompt.x, boundsPrompt.y, boundsPrompt.dx, boundsPrompt.dy+1);
-      textFieldSwt =  new Text(panelSwt, textProperties);
-      mng.setPosAndSizeSwt(posField,textFieldSwt, 800, 600);
-      //textFieldSwt.setBounds(boundsField.x, boundsField.y, boundsField.dx, boundsField.dy);
-      
-    } else {
-      //without prompt
-      textFieldSwt =  new Text(panelSwt, textProperties);
-      mng.setPosAndSize_(textFieldSwt);
     }
+    textFieldSwt =  new Text(panelSwt, textProperties);
+    mng.setPosAndSizeSwt(posField,textFieldSwt, 800, 600);
+    //textFieldSwt.setBounds(boundsField.x, boundsField.y, boundsField.dx, boundsField.dy);
     textFieldSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
     textFieldSwt.setEditable(widgg.isEditable());
     textFieldSwt.setBackground(mng.propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));

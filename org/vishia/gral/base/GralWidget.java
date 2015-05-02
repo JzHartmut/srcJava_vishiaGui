@@ -599,15 +599,16 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     itsMng = GralMng.get();
     assert(itsMng !=null);  //should be created firstly in the application, since 2015-01-18
     if(posString !=null) {
-      initPos(itsMng.pos().pos.setNextPos(posString));
+      initPosAndRegisterWidget(itsMng.pos().pos.setNextPos(posString));
     } //else: don't set the pos, it is done later 
   }
   
   
-  void initPos(GralPos pos) {
+  void initPosAndRegisterWidget(GralPos pos) {
     this._wdgPos = pos;
     if(_wdgPos.panel !=null){
-      _wdgPos.panel.addWidget(this);
+      boolean toResize = _wdgPos.x.p1 < 0 || _wdgPos.x.p2 <= 0 || _wdgPos.y.p1< 0 || _wdgPos.y.p2 <=0; 
+      _wdgPos.panel.addWidget(this, toResize);
     } else {
       System.out.println("GralWidget.GralWidget - pos without panel");
     }
@@ -637,9 +638,27 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Sets this widget to the current panel at the current given position. 
    * It creates the graphical appearance using the capabilities of the derived GralMng for the systems graphic level.
-   * The type of the derived GralWidget is tested (instanceof) to create the correct graphical widget.
+   * This method invokes {@link GralMng#setToPanel(GralWidget)} which tests the type of the derived GralWidget
+   * to create the correct graphical widget. That method calls the implementing specific {@link GralMng.ImplAccess#setToPanel(GralWidget)}
+   * which knows the implementation graphic. 
+   * <br><br><b>Instance structure</b><br>
+   * The implementation of a widget is firstly a class which is inherit from {@link ImplAccess}. With them the {@link GralWidget}
+   * is references because it is the environment class. The core graphical widget is an aggregation in this instance. It is possible 
+   * that more as one implementation widget is used for a Gral Widget implementation. For example a text field with a prompt
+   * consists of two implementation widgets, the text field and a label for the prompt.
+   * <br><br>
+   * <b>Positioning and Registering the widget:</b>
+   * The registering of a widget is done in {@link GralWidget#initPosAndRegisterWidget(GralPos)} which is called either
+   * on construction of a widget with a String-given position, before it appears on graphic, or on construction of the 
+   * graphic widget. It calls the package private {@link GralWidget#initPosAndRegisterWidget(GralPos)}, which takes the 
+   * given position, stores it in the {@link GralWidget#pos()} and adds the widget both to its panel which is given
+   * with the pos and registers the widget in the GralMng for simple global access. 
+   * If the name of the widget starts with "@" its name in the panel is the part after "@" whereby the global name 
+   * is the "panelname.widgetname". If a widget's position is given from left and from right or with percent, it is resized
+   * on resizing the window and the panel.
+   * <br><br>
    * 
-   * @param mng The instance of derived Graphic Manager
+   * @param mng 
    * @throws IllegalStateException This routine can be called only if the graphic implementation widget is not 
    *   existing. It is one time after startup or more as one time if {@link #removeWidgetImplementation()}
    *   was called. 
@@ -943,7 +962,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   { this.itsMng = mng; 
     if(this._wdgPos !=null) 
       throw new IllegalStateException("GralWidget - setPos() is set already.");
-    this.initPos(mng.getPosCheckNext());  //always clone it from the central pos 
+    this.initPosAndRegisterWidget(mng.getPosCheckNext());  //always clone it from the central pos 
 
   }
   
@@ -1481,7 +1500,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       widgg._wdgImpl = this; 
       if(widgg._wdgPos !=null) 
         throw new IllegalStateException("GralWidget - setPos() is set already.");
-      widgg.initPos( mng.getPosCheckNext());  //always clone it from the central pos 
+      widgg.initPosAndRegisterWidget( mng.getPosCheckNext());  //always clone it from the central pos 
       // Note: widgg.posWidg.panel.getWidgetImplementation() ==null yet because it will be initialize after super(widgg); 
     }
     
@@ -1497,7 +1516,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       widgg._wdgImpl = this; 
       if(widgg._wdgPos ==null) {
         //set the position now, because it is given yet.
-        widgg.initPos( widgg.itsMng.getPosCheckNext());  //always clone it from the central pos 
+        widgg.initPosAndRegisterWidget( widgg.itsMng.getPosCheckNext());  //always clone it from the central pos 
       } //else: The position was given by construction already.
       // Note: widgg.posWidg.panel.getWidgetImplementation() ==null yet because it will be initialize after super(widgg); 
     }

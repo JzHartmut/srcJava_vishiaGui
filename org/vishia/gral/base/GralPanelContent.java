@@ -3,7 +3,9 @@ package org.vishia.gral.base;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.ifc.GralCanvasStorage;
@@ -19,6 +21,8 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   /**Version history:
    * 
    * <ul>
+   * <li>2015-05-02 Hartmut new: {@link #setTextIn(String, CharSequence)}, change of registering a widget. Now any panel knows its widgets
+   *   by name. 
    * <li>2012-07-13 Hartmut new:  {@link #getPixelSize()}, chg: {@link #getPixelPositionSize()} in all implementations. 
    *   A swt.widget.Shell now returns the absolute position and the real size of its client area without menu and title bar.
    * <li>2012-04-22 Hartmut new: {@link #canvas} as property maybe null for each panel to support stored graphics.
@@ -68,7 +72,7 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   /**List of all widgets which are contained in this panel or Window, to refresh the graphic.
    * This list is used in the communication thread to update the content of all widgets in the panel.
    */
-  private List<GralWidget> _wdgList = new ArrayList<GralWidget>();
+  //private List<GralWidget> _wdgList = new ArrayList<GralWidget>();
 
   /**List of all widgets which are contained in this panel.
    * This list is used in the communication thread to update the content of all widgets in the panel.
@@ -77,6 +81,7 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
 
   public List<GralWidget> widgetsToResize = new LinkedList<GralWidget>();
 
+  private final Map<String, GralWidget> idxWidgets = new TreeMap<String, GralWidget>();
 
   /**True then the content of the panel is zoomed with the actual size of panel. 
    * It means that all widgets are zoomed in position and size,  but there content isn't changed. */
@@ -127,17 +132,33 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   */
   
 	
-  /*package private*/ void addWidget(GralWidget widg){
-    if(_wdgList.remove(widg)){
-      System.err.println("Widget added twice; " + widg.name);
+	
+  public void setPrimaryWidget(GralWidget widg){ primaryWidget = widg; }
+  
+  
+  /*package private*/
+  /**Adds a widget to its panel. This method will be called in {@link GralWidget#initPosAndRegisterWidget(GralPos)} 
+   * either on creation the GralWidget with a given position String or on {@link GralWidget#setToPanel(GralMngBuild_ifc)}
+   * with the given currently {@link GralMng#pos()}.
+   * @param widg
+   * @param toResize
+   */
+  void addWidget(GralWidget widg, boolean toResize){
+    String nameWidg = widg.name;
+    if(nameWidg !=null) {
+      String nameGlobal;
+      if(nameWidg.startsWith("@")) {
+        nameWidg = nameWidg.substring(1);  //without @
+        nameGlobal = super.name + "." + nameWidg;  //panel.widget
+      } else {
+        nameGlobal = nameWidg;
+      }
+      itsMng.registerWidget(nameGlobal, widg);
+      idxWidgets.put(nameWidg, widg);
     }
-    _wdgList.add(widg);
-  }
-	
-	public void setPrimaryWidget(GralWidget widg){ primaryWidget = widg; }
-	
-	
-	void addWidget(GralWidget widg, boolean toResize){
+    if(widgetList.remove(widg)){
+      System.err.println("Widget added twice; " + nameWidg);
+    }
     widgetList.add(widg);
     if(toResize){
       widgetsToResize.add(widg);
@@ -145,33 +166,33 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
     if(primaryWidget ==null){
       primaryWidget = widg; 
     }
-	}
+  }
 	
 	
-	/**Sets the focus to the primary widget if it is set.
-	 * Elsewhere do nothing and returns false. 
-	 * The focus may be set then by the inherit implementation class.
-	 * <br>See {@link #setPrimaryWidget(GralWidget)}.
-	 * @return true if the focus is set to the primary widget. 
-	 */
-	@Override public boolean setFocusGThread()
-	{
-	  if(primaryWidget !=null) return primaryWidget.setFocusGThread();
-	  else return false;
-	}
-	
-	
-  /**Removes this widget from the lists in this panel. This method is not intent to invoke
+	/**Removes this widget from the lists in this panel. This method is not intent to invoke
    * by an application. It is only used in {@link GralWidget#remove()}. Use the last one method
    * to remove a widget includint is disposition and remove from the panel.
    * @param widg The widget.
    */
   public void removeWidget(GralWidget widg)
-  {
+  { String nameWidg = widg.name;
+    if(nameWidg !=null) {
+      String nameGlobal;
+      if(nameWidg.startsWith("@")) {
+        nameWidg = nameWidg.substring(1);  //without @
+        nameGlobal = super.name + "." + nameWidg;  //panel.widget
+      } else {
+        nameGlobal = nameWidg;
+      }
+      itsMng.removeWidget(nameGlobal);
+      idxWidgets.remove(nameWidg);
+    }
+    
     widgetList.remove(widg);
     widgetsToResize.remove(widg);
+    
   }
-  
+
   /**This overridden form of {@link GralWidget_ifc#remove()} removes all widgets of this panel.
    * It includes the disposition  of the widgets in the graphic. It is done by invocation
    * {@link GralWidget#remove()}.
@@ -186,10 +207,45 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
     super.remove();
     return true;
   }
-  
 
+  
+  
+  
+  
   public List<GralWidget> widgetList(){ return widgetList; }
   
+  
+  
+  
+  /**Sets the text to the named widget
+   * @param nameWidget the registered widget in its panel. 
+   * @param text The text to set.
+   * @throws IllegalArgumentException on faulty widget name
+   * @since 2015-05-02
+   */
+  public void setTextIn(String nameWidget, CharSequence text) {
+    GralWidget widg = idxWidgets.get(nameWidget);
+    if(widg == null) throw new IllegalArgumentException("GralPanel - Widget not found, " + nameWidget);
+    widg.setText(text);
+  }
+  
+  
+  
+  
+  
+  
+  /**Sets the focus to the primary widget if it is set.
+   * Elsewhere do nothing and returns false. 
+   * The focus may be set then by the inherit implementation class.
+   * <br>See {@link #setPrimaryWidget(GralWidget)}.
+   * @return true if the focus is set to the primary widget. 
+   */
+  @Override public boolean setFocusGThread()
+  {
+    if(primaryWidget !=null) return primaryWidget.setFocusGThread();
+    else return false;
+  }
+
   @Override public Object getWidgetImplementation()
   { return _wdgImpl.getWidgetImplementation(); //panelComposite;
   }

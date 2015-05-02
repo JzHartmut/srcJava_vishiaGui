@@ -62,6 +62,11 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2015-05-02 Hartmut chg: {@link #registerWidget(GralWidget)} is obsolete now, it is empty yet. 
+   *   Instead {@link #registerWidget(String, GralWidget)} by given name and {@link #removeWidget(String)} by name.
+   *   See description of registering on {@link GralWidget#setToPanel(GralMngBuild_ifc)}. 
+   *   The registering of a widget is done in {@link GralWidget#initPosAndRegisterWidget(GralPos)} which is called either
+   *   on construction of a widget with a String-given position, before 
    * <li>2015-04-27 Hartmut new {@link #selectPanel(GralPanelContent)} not only with String given
    * <li>2015-01-18 Hartmut chg: Now the implementation for any Grahic (SwtMng) and the GralMng are two separated instances.
    *   The SwtMng extends the {@link GralMng.ImplAccess} which accesses all private data of the GralMng.
@@ -770,8 +775,17 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
   
+  void registerWidget(String name, GralWidget widgd) {
+    indexNameWidgets.put(name, widgd);
+  }
+  
+  void removeWidget(String name) {
+    indexNameWidgets.remove(name);
+  }
+  
   @Override public void registerWidget(GralWidget widgd)
   {
+    /*
     PosThreadSafe pos = pos();
     GralPanelContent panel = widgd.pos() !=null ? widgd.pos().panel : pos.pos.panel;
     if(widgd.name != null){
@@ -780,7 +794,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     //only widgets with size from right TODO percent size too.
     boolean toResize = pos.pos.x.p1 < 0 || pos.pos.x.p2 <= 0 || pos.pos.y.p1< 0 || pos.pos.y.p2 <=0; 
     panel.addWidget(widgd, toResize);
-    
+    */
   }
   
   

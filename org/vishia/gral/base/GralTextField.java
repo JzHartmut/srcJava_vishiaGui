@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTextField_ifc;
@@ -22,6 +23,8 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
 {
   /**Version, history and license .
    * <ul>
+   * <li>2015-05-02 Hartmut chg: Calculation of the {@link GraphicImplAccess#posPrompt} and ...posField is processed 
+   *   in this class commonly for SWT and AWT implementation. 
    * <li>2014-02-10 Hartmut chg: Constructor with Parameter {@link Type}, supports password field. 
    * <li>2013-12-22 Hartmut chg: Now {@link GralTextField} uses the new concept of instantiation: It is not
    *   the super class of the implementation class. But it provides {@link GralTextField.GraphicImplAccess}
@@ -102,7 +105,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
    * @param property password, editable, maybe left empty.
    */
   public GralTextField(String name, Type... property){
-    super(name, 't');
+    super(null, name, 't');
     boolean bPassword1 = false;
     if(property !=null){
       for(int ii=0; ii<property.length; ++ii){
@@ -617,9 +620,59 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
 
     public static final int chgPrompt = 0x100, chgCursor = 0x200;
     
+    /**The {@link GralWidget#pos()} is the summary position for prompt and field.
+     * This is the part for field and prompt.
+     */
+    protected final GralPos posPrompt, posField;
+
+    
+    
     protected GraphicImplAccess(GralWidget widgg, GralMng mng)
     {
-      super(widgg, mng);
+      super(widgg);
+      if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("t")) {
+        mng.setNextPosition();
+        char sizeFontPrompt;
+        posPrompt = new GralPos(); 
+        posField = new GralPos();
+
+        //boundsAll = mng.calcWidgetPosAndSize(this.pos, 800, 600, 100, 20);
+        float ySize = widgg.pos().height();
+        //float xSize = pos.width();
+        //posPrompt from top, 
+        float yPosPrompt, heightPrompt, heightText;
+        //switch(promptStylePosition){
+          //case 't':{
+            if(ySize <= 2.5){ //it is very small for top-prompt:
+              yPosPrompt = 1.0f;  //no more less than 1/2 normal line. 
+              heightPrompt = 1.0f;
+              heightText = ySize - 0.7f;  //max. 1.8
+              if(heightText < 1.0f){ heightText = 1.0f; }
+            } else if(ySize <=3.3){ //it is normally 2.5..4
+              heightPrompt = ySize - 2.0f + 0.5f;   //1 to 1.8
+              yPosPrompt = ySize - heightPrompt - 0.1f;  //no more less than 1/2 normal line. 
+              heightText = 2.0f;
+            } else if(ySize <=4.0){ //it is normally 2.5..4
+              heightPrompt = ySize - 2.0f + (4.0f - ySize) * 0.5f; 
+              if(heightPrompt < 1.0f){ heightPrompt = 1.0f; }
+              yPosPrompt = ySize - heightPrompt + 0.2f;  //no more less than 1/2 normal line. 
+              heightText = 2.0f;
+            } else { //greater then 4.0
+              yPosPrompt = ySize * 0.5f;
+              heightPrompt = ySize * 0.4f;;
+              heightText = ySize * 0.5f;
+            }
+            //from top, size of prompt
+            posPrompt.setPosition(widgg.pos(), GralPos.same - ySize + yPosPrompt, GralPos.size - heightPrompt, GralPos.same, GralPos.same, 0, '.');
+            //from bottom line, size of text
+            posField.setPosition(widgg.pos(), GralPos.same, GralPos.size - heightText, GralPos.same, GralPos.same, 0, '.');
+          //} break;
+        //}
+      
+      } else { //no prompt given
+        posPrompt = null;
+        posField = widgg.pos();
+      }
     }
     
     //protected GralFont fontText(){ return GralTextField.this.fontText; }

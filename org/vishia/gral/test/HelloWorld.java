@@ -50,7 +50,7 @@ public class HelloWorld
   
   
   private void openWindow1(){
-    GralFactory gralFactory = new AwtFactory();
+    GralFactory gralFactory = new SwtFactory();
     LogMessage log = new LogMessageStream(System.out);
     window = gralFactory.createWindow(log, "Hello World", 'C', 100, 50, 600, 400);
     gralMng = window.gralMng();
