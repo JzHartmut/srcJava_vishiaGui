@@ -181,8 +181,12 @@ public class FcmdSettings
     @Override public boolean exec(int keyCode, GralWidget_ifc widg, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         String sFileCfg = ((GralWidget)widg).getCmd();
-        FcmdExecuter.readCmdCfg(main.cmdSelector.cmdStore, new File(main.cargs.dirCfg, sFileCfg), main.console, main.executer.cmdQueue);
-        main.cmdSelector.fillIn();
+        String sError = FcmdExecuter.readCmdCfg(main.cmdSelector.cmdStore, new File(main.cargs.dirCfg, sFileCfg), main.console, main.executer.cmdQueue);
+        if(sError != null) {
+          main.setInfoBox(sError);
+        } else {
+          main.cmdSelector.fillIn();
+        }
       }
       return true;
     }

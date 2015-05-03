@@ -269,6 +269,12 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
         if((chg & chgCursor) !=0){ 
           textFieldSwt.setSelection(caretPos());
         }
+        if((chg & chgVisible) !=0) {
+          textFieldSwt.getShell().setVisible(true);
+        }
+        if((chg & chgInvisible) !=0) {
+          textFieldSwt.getShell().setVisible(false);
+        }
         if((chg & chgColorText) !=0){ textFieldSwt.setForeground(wdgh.mng.getColorImpl(dyda().textColor)); }
         if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(wdgh.mng.getColorImpl(dyda().backColor)); }
         textFieldSwt.redraw();

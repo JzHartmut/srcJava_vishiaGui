@@ -118,8 +118,9 @@ public class FcmdExecuter
           executerToInit.initExecuter(script, null);  //NOTE: currdir is not determined.
           //main.cmdSelector.initExecuter(script);
         } catch(Throwable exc){
+          
           log.writeError("CmdStore - JZcmdScript;", exc);
-          error = exc.getMessage();
+          error = "CmdStore - JZcmdScript," + exc.getMessage();
         }
       }
 

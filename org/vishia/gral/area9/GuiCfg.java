@@ -406,6 +406,13 @@ public final void execute()
 
 
 
+public void setInfoBox(CharSequence text) {
+  guiW.infoBox.setText(text);
+  guiW.infoBox.setVisible(true);
+}
+
+
+
 
 /**Registered as user action.
  * 
