@@ -1,7 +1,21 @@
 package org.vishia.gral.base;
 
+import java.text.ParseException;
+
 import org.vishia.bridgeC.IllegalArgumentExceptionJc;
 import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.util.Assert;
+import org.vishia.util.StringPart;
+import org.vishia.util.StringPartScan;
+
+
+/*Test with Jbat: call Jbat with this java file with its full path:
+D:/vishia/Java/srcJava_vishiaGui/org/vishia/gral/base/GralPos.java
+==JZcmd==
+java org.vishia.gral.base.GralPos.testScanSize();
+==endJZcmd==
+*/
+
 
 /**This class describes a position in a gral panel. 
    * <br><br>
@@ -185,7 +199,7 @@ public class GralPos implements Cloneable
   
   /**This adding value applied at any coordinate parameter of any setPosition- method means, that the value is 
    * referred to the position of the previous or given position. The referred value may be given as positive or negative number.
-   * Adding this constant a value in range 0x2000 to 0x2fff results.
+   * Adding this constant a value in range 0x7000...0x8000 to 0x8fff results for positions -4096...4095 (usual -100..100)
    * Hint: If only the fractional part is changed, the non-fractional part should be given as refer.
    */
   public final static int refer = 0x8000;
@@ -360,7 +374,107 @@ public class GralPos implements Cloneable
   }
 
   
-
+  public void setPosition(CharSequence sPos, GralPos posParent) throws ParseException {
+    GralPos posParent1;
+    //int line =0, yPosFrac =0, ye =0, yef =0, column =0, xPosFrac =0, xe =0, xef =0, origin =0, border =0, borderFrac =0;
+    Coordinate line = new Coordinate(), col = new Coordinate();
+    int  origin =0, border =0, borderFrac =0;
+    char direction = 'r';
+    StringPartScan spPos = new StringPartScan(sPos);
+    spPos.setIgnoreWhitespaces(true);
+    try {
+      spPos.scan("@").scanStart();  //skip over a first @
+      if(spPos.scanIdentifier().scan(",").scanOk()) {
+        String sPanel = spPos.getLastScannedString().toString();
+        GralMng mng = GralMng.get();  //singleton.
+        GralPanelContent panel = mng.getPanel(sPanel);
+        if(panel == null) {
+          spPos.close();
+          throw new IllegalArgumentException("GralPos.setPosition - unknown panel, " + sPanel);
+        }
+        if(panel == posParent.panel) {
+          posParent1 = posParent;
+        } else {
+          //only if it is another panel, remove the given parent.
+          posParent1 = new GralPos();
+        }
+      } else {
+        posParent1 = posParent;
+      }
+      scanPosition(spPos, line);
+      if(spPos.scan(",").scanOk()) {
+        scanPosition(spPos, col);
+      } else {
+        col.p1 = refer;
+        col.p2 = samesize;
+      }
+      setFinePosition(line.p1, line.p1Frac, line.p2, line.p2Frac, col.p1, col.p1Frac, col.p2, col.p2Frac,  origin, direction, border, borderFrac, posParent1);
+    } finally {
+      spPos.close();
+    }
+  }
+  
+  
+  
+  /**Scans one coordinate.
+   * <pre>
+   * [[<refer>+|-]<#?p1>[.<#p2Frac>] [..|<?size>]] <#?p2>[.<#p2Frac>]
+   * </pre>
+   * If only the right number is given, p1 is {@link #refer}
+   * @param spPos
+   * @param co
+   * @throws ParseException
+   */
+  private void scanPosition(StringPartScan spPos, Coordinate co) throws ParseException {
+    char sign = spPos.seekNoWhitespace().getCurrentChar();
+    int size1; //maybe size for end element, converted to refer for start element.
+    co.p1 = next; //default, next line or next column depending on parent.
+    co.p1Frac = 0;
+    co.p2 = samesize;
+    co.p2Frac = 0;
+    //
+    if("+-".indexOf(sign) >=0){
+      size1 = size;
+      spPos.seek(1);  //skip + or -
+    } else if(sign == '%'){
+      size1 = ratio;
+      spPos.seek(1);  //skip + or -
+    } else {
+      size1 = 0;
+    }
+    if(spPos.scanInteger().scanOk()) {
+      int pos1 = (int)spPos.getLastScannedIntegerNumber();
+      if(sign == '-'){ pos1 = -pos1; }
+      co.p2 = size1 + pos1;  
+      if(spPos.scan(".").scanInteger().scanOk()) {
+        co.p2Frac = (int)(spPos.getLastScannedIntegerNumber() % 10);  //should be 0..9
+      }
+    }
+    int size2;
+    if(spPos.scan("..").scanOk()) {
+      size2 = 0;  
+    } else {
+      size2 = size;
+      spPos.scan("+").scanStart();  //skip over '+', it is the separator, 
+    }
+    if(spPos.scanInteger().scanOk()) { //can start with '-' but not with '+'
+      //between 2. number is given, first is p1
+      if(size1 == refer){
+        co.p1 = co.p2 - refer + size; //stored as size for end element, but it is refer for first element.  
+      } else {
+        co.p1 = co.p2;   //ratio or absolute
+      }
+      co.p1Frac = co.p2Frac;
+      //
+      co.p2Frac = 0;  //default
+      co.p2 = size2 + (int)spPos.getLastScannedIntegerNumber();  //positive or negative. Negative means from left or bottom.
+      if(spPos.scan(".").scanInteger().scanOk()) {
+        co.p2Frac = (int)(spPos.getLastScannedIntegerNumber() % 10);  //should be 0..9
+      }
+    }
+    
+  }
+  
   
   
   /**Sets the position to the given panel as container.
@@ -881,8 +995,9 @@ public class GralPos implements Cloneable
         //
         case (next<<16) + size: {
           testCase = 10;
-          switch(dirNext){
-            case 'r': case 'd': {
+          //switch(dirNext){
+          switch(parent.dirNext){
+              case 'r': case 'd': {
               if( (attr & mBitSizeNeg) !=0){ 
                 q2 = parent.p2 + parent.pb; q2Frac = parent.p2Frac + parent.pbf; 
                 q1 = q2 - (parent.p2 - parent.p1) + (z2 - size); q1Frac = q2Frac - (parent.p2Frac - parent.p1Frac) + z2Frac;
@@ -900,7 +1015,7 @@ public class GralPos implements Cloneable
         //
         case (next<<16) + samesize: {  //z1 is next, ze is samesize, means typical next
           testCase = 9;
-          switch(dirNext){
+          switch(parent.dirNext){
             case 'r': case 'd': {
               if( (attr & mBitSizeNeg) !=0){ 
                 q2 = parent.p2 + (parent.p2 - parent.p1) + parent.pb; q2Frac = parent.p2Frac + (parent.p2Frac - parent.p1Frac) + parent.pbf; 
@@ -994,4 +1109,18 @@ public class GralPos implements Cloneable
     
   }
   
+  
+  public static void testScanSize(){
+    GralPos posParent = new GralPos();
+    GralPos posTest = new GralPos();
+    try{
+      posParent.setPosition("@3+2, 10+10", null);  //line 3, column 10 + 10
+      posTest.setPosition(",+12", posParent);       //line 3, column 20 + 12
+      Assert.checkMsg(posParent.y.p1 == 3 && posParent.y.p2 == 5 && posParent.x.p1 == 10 && posParent.x.p2 == 20 , "posParent failure");
+      Assert.checkMsg(posTest.y.p1 == 3   && posTest.y.p2 == 5   && posTest.x.p1 == 20   && posTest.x.p2 == 32 , "posTest failure");  //next, size=12
+    } catch(ParseException exc) {
+      System.err.println("GralPos.testScanSize - error, " + exc.getMessage());
+    }
+    
+  }
 }

@@ -19,9 +19,11 @@ String gConfig =
 <:>
  ##A value to show, following by a label.
  @4+2,2+30:Show("name"); Text("label");
+ @6..-2, 2..0: InputBox(box);
 <.>;
 Obj window = java org.vishia.gral.cfg.GralCfgWindow.createWindow("testCfgWind", windowTitle, gConfig, jzcmdsub.currdir, jzcmd.log);
-window.setTextIn("name", "example");                 
+window.setTextIn("name", "example");
+window.setTextIn("box", "Box input");                 
 java org.vishia.gral.test.HelloWorld.waitForClosePrimaryWindow();
 ==endJZcmd==
 */
