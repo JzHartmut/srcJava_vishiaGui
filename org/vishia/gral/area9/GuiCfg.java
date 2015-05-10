@@ -175,6 +175,9 @@ public GralMng_ifc guiAccess;
 
 protected GralTabbedPanel mainTabPanel;
 
+
+private static GuiCfg singleton;
+
 /**ctor for the main class of the application. 
  * The main class can be created in some other kinds as done in static main too.
  * But it needs the {@link MainCmdWin}.
@@ -193,7 +196,8 @@ protected GralTabbedPanel mainTabPanel;
 public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui
     , GralPlugUser_ifc plugUser, GralPlugUser2Gral_ifc plugUser2Gui
     , List<String> cfgConditions) 
-{ this.mainCmd = cmdGui;
+{ if(singleton !=null) throw new IllegalArgumentException("class GuiCfg can instantiate only one time, a singleton!");
+  this.mainCmd = cmdGui;
   this.gui = cmdGui.gui;
   guiW = (GralArea9Window)gui;
   this.cargs = cargs;
@@ -239,9 +243,11 @@ public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui
 
   //Register any user action. This should be done before the GUI-configuration is read.
   panelBuildIfc.registerUserAction("cmdInvoke", cmdInvoke);
-  
+  singleton = this;
 }
 
+
+public static GuiCfg get(){ return singleton; }
 
 public GralPlugUser_ifc getPluggedUser(){ return user; }
 
@@ -406,9 +412,18 @@ public final void execute()
 
 
 
-public void setInfoBox(CharSequence text) {
+public void showInfoBox(CharSequence text) {
   guiW.infoBox.setText(text);
   guiW.infoBox.setVisible(true);
+}
+
+public void setTextInfoBox(CharSequence text) {
+  guiW.infoBox.setText(text);
+}
+
+public void appendTextInfoBox(CharSequence text) {
+  try{ guiW.infoBox.append(text); }
+  catch(IOException exc){} //not able to expect
 }
 
 

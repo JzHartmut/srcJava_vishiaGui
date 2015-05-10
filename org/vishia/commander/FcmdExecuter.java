@@ -114,7 +114,7 @@ public class FcmdExecuter
       if(cmdCfgJbat.exists()){
         try{ 
           JZcmdScript script = JZcmd.translateAndSetGenCtrl(cmdCfgJbat, new File(cmdCfgJbat.getParentFile(), cmdCfgJbat.getName() + ".check.xml"), log);
-          dst.addSubOfZgenclass(script.scriptClass(), 1);
+          dst.addSubOfJxbatClass(script.scriptClass(), 1);
           executerToInit.initExecuter(script, null);  //NOTE: currdir is not determined.
           //main.cmdSelector.initExecuter(script);
         } catch(Throwable exc){

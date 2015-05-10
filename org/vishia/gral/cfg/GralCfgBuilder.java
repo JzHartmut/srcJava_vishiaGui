@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -146,7 +147,9 @@ public class GralCfgBuilder
     String sError = null;
     for(GralCfgElement cfge: cfgDataPanel.listElements){
       //=================>>
-      String sErrorWidgd = buildWidget(cfge);
+      String sErrorWidgd;
+      try{ sErrorWidgd = buildWidget(cfge); }
+      catch(ParseException exc) { sErrorWidgd = exc.getMessage(); }
       if(sErrorWidgd !=null){
         if(sError == null){ sError = sErrorWidgd; }
         else { sError += "\n" + sErrorWidgd; }
@@ -163,6 +166,7 @@ public class GralCfgBuilder
    *         It is possible that a named user action is not found etc. 
    */
   public String buildWidget(GralCfgElement cfge)
+  throws ParseException
   {
     String sError = null;
     cfge.setPos(gralMng);

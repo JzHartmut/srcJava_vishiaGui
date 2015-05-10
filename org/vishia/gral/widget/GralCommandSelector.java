@@ -91,14 +91,13 @@ public class GralCommandSelector extends GralSelectList<CmdStore.CmdBlock>
     for(CmdStore.CmdBlock data: cmdStore.getListCmds()){
       if(data.level > level){
         parentline = line;
-        level = data.level;
       }
+      level = data.level;
       if(data.level == 1 || line == null){
         line = wdgdTable.addLine(data.name, null, data);
         line.setCellText(data.name, 0);
         line.setCellText(data.title, 1);
       } else if(data.level < level){
-        level = data.level;
         GralTableLine_ifc<CmdStore.CmdBlock> parent = line.parentNode();
         if(parent !=null){ line = parent;}
         line = wdgdTable.addLine(data.name, null, data);

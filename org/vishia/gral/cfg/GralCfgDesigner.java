@@ -1,5 +1,7 @@
 package org.vishia.gral.cfg;
 
+import java.text.ParseException;
+
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
@@ -166,14 +168,21 @@ public class GralCfgDesigner
           GralCfgElement cfgn = cfge.clone(); //cfgBuilder.newCfgElement(cfge);
           cfge = cfgn;
         }
-        cfge.positionInput.xPos = xPosAct + dxGrid; 
-        cfge.positionInput.yPos = yPosAct + dyGrid; 
+        if(cfge.positionString !=null) {
+          
+        } else {
+          cfge.positionInput.xPos = xPosAct + dxGrid; 
+          cfge.positionInput.yPos = yPosAct + dyGrid; 
+        }
         if(!bCopy){
           widgd.remove();
           //mng.remove(widgd);  //remove the widget.
         }
         mng.selectPanel(sPanel);
-        cfgBuilder.buildWidget(cfge);
+        try{ cfgBuilder.buildWidget(cfge);
+        } catch(ParseException exc) {
+          System.err.println("GralCfgDesigner - setPos, " + exc.getMessage());
+        }
       }
       
     }
@@ -274,7 +283,10 @@ public class GralCfgDesigner
             stop();
           mng.remove(widgdInDialog);  //remove the widget.
           mng.selectPanel(sPanel);
-          cfgBuilder.buildWidget(cfge);
+          try{ cfgBuilder.buildWidget(cfge);
+          } catch(ParseException exc) {
+            //show the exception in the dialog box!
+          }
         }
         dialogWindowProps.setWindowVisible(false);
         widgdInDialog = null;

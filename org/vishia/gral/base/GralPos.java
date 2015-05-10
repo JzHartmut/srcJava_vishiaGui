@@ -384,7 +384,7 @@ public class GralPos implements Cloneable
     spPos.setIgnoreWhitespaces(true);
     try {
       spPos.scan("@").scanStart();  //skip over a first @
-      if(spPos.scanIdentifier().scan(",").scanOk()) {
+      if(spPos.scanIdentifier().scan(",").scanOk()) {  //ckeck if a panel is given:
         String sPanel = spPos.getLastScannedString().toString();
         GralMng mng = GralMng.get();  //singleton.
         GralPanelContent panel = mng.getPanel(sPanel);
@@ -399,7 +399,7 @@ public class GralPos implements Cloneable
           posParent1 = new GralPos();
         }
       } else {
-        posParent1 = posParent;
+        posParent1 = posParent;  //the parent is valid. Because no other panel.
       }
       scanPosition(spPos, line);
       if(spPos.scan(",").scanOk()) {

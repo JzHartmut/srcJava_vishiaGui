@@ -102,7 +102,7 @@ public class GralCfgWindow
     this.window = new GralWindow("10+30, 10+50", sName, sTitle, props);
     configInGthread.getCtDone(0);
     mng.gralDevice.addDispatchOrder(configInGthread);   //runs in graphic thread
-    configInGthread.awaitExecution(1, 2000);
+    configInGthread.awaitExecution(1, 0);
   }
   
   /**Creates a window with a given configuration.

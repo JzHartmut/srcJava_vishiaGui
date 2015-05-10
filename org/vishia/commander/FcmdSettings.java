@@ -183,8 +183,9 @@ public class FcmdSettings
         String sFileCfg = ((GralWidget)widg).getCmd();
         String sError = FcmdExecuter.readCmdCfg(main.cmdSelector.cmdStore, new File(main.cargs.dirCfg, sFileCfg), main.console, main.executer.cmdQueue);
         if(sError != null) {
-          main.setInfoBox(sError);
+          main.showInfoBox(sError);
         } else {
+          main.setTextInfoBox("ok read " + main.cargs.dirCfg + "/" + sFileCfg);
           main.cmdSelector.fillIn();
         }
       }

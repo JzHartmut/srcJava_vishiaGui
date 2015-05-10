@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -357,6 +358,18 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     return ret;
   }
   
+  
+  /**Sets the position with a given String, see {@link GralPos#setPosition(CharSequence, GralPos)}
+   * whereby the parent is the current position value.
+   * @param sPosition
+   * @throws ParseException
+   */
+  public void setPos(String sPosition) 
+  throws ParseException
+  { PosThreadSafe pos = pos();
+    pos.pos.setPosition(sPosition, null);
+    pos.posUsed = false;
+  }
   
   @Override public void setPositionSize(int line, int column, int height, int width, char direction)
   { PosThreadSafe pos = pos();

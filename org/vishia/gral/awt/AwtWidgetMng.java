@@ -499,8 +499,17 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   @Override
   public void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent)
   {
-    // TODO Auto-generated method stub
-    
+    Object owidg = widgd.getWidgetImplementation();
+    int test = 6;
+    if(owidg !=null){
+      Component swtWidget = (Component)owidg;
+      GralPanelContent panel = widgd.pos().panel;
+      GralRectangle size = panel.getPixelPositionSize(); //PixelSize();
+      GralRectangle posSize = mng.calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
+      //Note: the swtWidget may have a resizeListener, see there.
+      swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
+      swtWidget.repaint();
+    }
   }
 
   @Override

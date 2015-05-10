@@ -590,7 +590,9 @@ public class Fcmd extends GuiCfg
       File fileCfg;
       sError = FcmdExecuter.readCmdCfg(cmdSelector.cmdStore, fileCfg = cargs.fileCfgCmds, console, executer.cmdQueue);
       if(sError !=null) {
-        setInfoBox(sError);   
+        showInfoBox(sError);   
+      } else {
+        appendTextInfoBox("read config cmd");
       }
       if (sError == null) {
         sError = executer.readCmdFile(fileCfg = cargs.fileCmdsForExt);

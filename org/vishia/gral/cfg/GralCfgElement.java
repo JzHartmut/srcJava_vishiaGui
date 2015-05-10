@@ -1,5 +1,8 @@
 package org.vishia.gral.cfg;
 
+import java.text.ParseException;
+
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.cfg.GralCfgData.GuiCfgButton;
 import org.vishia.gral.cfg.GralCfgData.GuiCfgCurveview;
@@ -17,7 +20,12 @@ import org.vishia.gral.ifc.GralWidgetCfg_ifc;
 
 /**ZBNF: Element::= ... ;
  * Class for instance to capture and store one element. Any widget type is an Element.
- * The distinction between different types are given with the {@link #itsCfgData}. */
+ * The distinction between different types are given with the {@link #itsCfgData}. 
+ * <pre>
+ * 
+ * 
+ * 
+ * */
 public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
 { 
   /**Version and history
@@ -63,7 +71,7 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   String content;
   
   /**The position is set in textual form too. It is because [<?Element>...] was written */
-  private String positionString;
+  String positionString;
   
   /**ZBNF: Position coordinates will be filled from [<?position>.... 
    * The instance contains only that position data, which are found in the textual config file. 
@@ -75,6 +83,8 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
    * The position is filled only in {@link #setPos(GralMngBuild_ifc)} and used nearly only temporary
    * */
   private final GralCfgPosition position = new GralCfgPosition();
+  
+  //private final GralPos posInput = new GralPos();
   
   WidgetTypeBase widgetType;
   
@@ -102,12 +112,32 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   }
   
   
+  
+  
+  /**Builds the position.
+   * @param cfge deprecated, it is this.
+   * @param guiMng to set the position.
+   * @return
+   * @throws ParseException 
+   */
+  void setPos(GralMngBuild_ifc guiMng) 
+  throws ParseException 
+  { if(positionString !=null) {
+      GralMng mng = GralMng.get();
+      mng.setPos(positionString);
+    } else {
+      setPosOld(guiMng);  //use inputPos
+    }
+  }  
+  
+  
+  
   /**Builds the position.
    * @param cfge deprecated, it is this.
    * @param guiMng to set the position.
    * @return
    */
-  void setPos(GralMngBuild_ifc guiMng) {
+  private void setPosOld(GralMngBuild_ifc guiMng) {
     GralCfgPosition prevPos = this.previous !=null ? this.previous.position : this.positionInput;
     GralCfgPosition pos = this.position;        //NOTE: it is filled here.
     GralCfgPosition inp = this.positionInput;
@@ -218,8 +248,11 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   /**ZBNF: <?position> */
   public GralCfgPosition new_position(){ return positionInput; }  
   
-  /**ZBNF: <?position> */
-  public void set_position(String val) { positionString = val; }
+  /**ZBNF: <*:?position> */
+  public void set_positionString(String val) { this.positionString = val; }
+ 
+  /**ZBNF: [<?position>   ] it is unnecessary*/
+  public void set_position(String val) {  }
  
   /**ZBNF: <?position> */
   public void set_position(GralCfgPosition val) {  } //is set only

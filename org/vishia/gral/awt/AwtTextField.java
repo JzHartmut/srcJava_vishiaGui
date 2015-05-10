@@ -3,6 +3,8 @@ package org.vishia.gral.awt;
 import java.awt.Container;
 import java.awt.Label;
 import java.awt.TextField;
+import java.awt.event.HierarchyBoundsListener;
+import java.awt.event.HierarchyEvent;
 
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
@@ -31,6 +33,7 @@ public class AwtTextField extends GralTextField.GraphicImplAccess
     Container panelAwt = (Container)pos.panel.getWidgetImplementation();
     
     widgetAwt = new TextField();
+    widgetAwt.addHierarchyBoundsListener(hierarchyBoundsListener);
     mng.setPosAndSize_(widgetAwt);
     //widgetAwt.setForeground(mng.propertiesGuiAwt.colorAwt(GralColor.getColor("rd")));
     //widgetAwt.setBackground(mng.propertiesGuiAwt.colorAwt(GralColor.getColor("gn")));
@@ -107,7 +110,23 @@ public class AwtTextField extends GralTextField.GraphicImplAccess
     return null;
   }
 
-  
+  HierarchyBoundsListener hierarchyBoundsListener = new HierarchyBoundsListener()
+  {
+
+    @Override public void ancestorMoved(HierarchyEvent e)
+    {
+      System.out.println("AwtField: hierarchy-anchestorMoved");
+      
+    }
+
+    @Override public void ancestorResized(HierarchyEvent e)
+    {
+      System.out.println("AwtField: hierarchy-anchestorResized");
+      
+    }
+    
+  };
+
 
   
 }
