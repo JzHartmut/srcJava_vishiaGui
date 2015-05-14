@@ -87,9 +87,6 @@ public class Fcmd extends GuiCfg
     
     File dirCfg;
 
-    File dirHtmlHelp;
-    
-    File msgConfig;
   }
 
   /**
@@ -778,10 +775,14 @@ public class Fcmd extends GuiCfg
   /**Refreshes the {@link FcmdFileCard} if the dir is the current one.
    * This method can be invoked in any for example callback routine in any thread, which changes the content of directories.
    * Note: It starts {@link GralFileSelector#fillIn(FileRemote, boolean)} which refreshes the files 
-   * @param dir The directory of a changed file.
+   * @param fileOrDir The changed file or its directory. 
+   *   it is checked whether the directory is shown currently in one of the three file panels, then the panel will be refreshed.
+   *   If the directory is not shown yet then nothing is done. 
+   *   Note that a directory will be refreshed whenever it will be activated in a panel. 
    */
-  protected void refreshFilePanel(FileRemote dir)
+  protected void refreshFilePanel(FileRemote fileOrDir)
   {
+    FileRemote dir = fileOrDir.isDirectory() ? fileOrDir: fileOrDir.getParentFile();
     for(FcmdLeftMidRightPanel panel: lastFilePanels) {
       if(panel !=null && panel.actFileCard !=null && panel.actFileCard.currentDir() == dir) {
         panel.actFileCard.fillInCurrentDir();
@@ -815,12 +816,6 @@ public class Fcmd extends GuiCfg
       boolean bOk = true;
       if (arg.startsWith("cfg:")) {
         cargs.dirCfg = new File(arg.substring(4));
-      } else if (arg.startsWith("help:")) {
-        File file1 = new File(arg.substring(5));
-        String sPathHelpAbs = file1.getAbsolutePath();
-        cargs.dirHtmlHelp = new File(sPathHelpAbs);  //should be absolute because browser.
-      } else if (arg.startsWith("msgcfg:")) {
-        cargs.msgConfig = new File(arg.substring(7));
       } else if (arg.startsWith("cmdcfg:")) {
         cargs.fileCfgCmds = new File(arg.substring(7));
       } else if (arg.startsWith("cmdext:")) {

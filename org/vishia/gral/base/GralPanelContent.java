@@ -109,6 +109,8 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
     bGridZoomed = (property & GralMngBuild_ifc.propGridZoomedPanel) !=0;
 	}
 	
+
+  /**Create a panel, registers it and sets the {@link GralMng#pos()} of this thread to the panel. */
   public GralPanelContent(String posString, String namePanel)
   //public PanelContent(CanvasStorePanel panelComposite)
   { super(posString, namePanel, '$');
@@ -160,8 +162,12 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
       System.err.println("Widget added twice; " + nameWidg);
     }
     widgetList.add(widg);
-    if(toResize){
-      widgetsToResize.add(widg);
+    if(toResize) {
+      if(widg instanceof GralWindow) {
+        System.err.println("GralPanelContent.addWidget - A window itself should not be added to widgetsToResize, " + widg.name);
+      } else {
+        widgetsToResize.add(widg);
+      }
     }
     if(primaryWidget ==null){
       primaryWidget = widg; 

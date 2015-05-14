@@ -16,6 +16,8 @@ public class GuiCallingArgs
 {
   /**Version, history and licence
    * <ul>
+   * <li>2015-05-16 Hartmut new "-help:" for help base dir in argument check, "-msgcfg:" in argument check. 
+   *   It is moved from Fcmd to this base class of Fcmd, available generally.  
    * <li>2013-11-22 Hartmut new {@link #sTitle}
    * <li>2012-04-22 Hartmut chg {@link #sizeShow} instead sSize, new {@link #xLeftPixelWindow} etc.
    * <li>2011-06-00 Hartmut creation, commonly arguments for each GUI application.
@@ -96,6 +98,11 @@ public class GuiCallingArgs
    */
   String sInspectorOwnPort;
 
+  public File dirHtmlHelp;
+  
+  public File msgConfig;
+
+  
   /**Returns that directory where the configuration file is found. That directory may contain some more files
    * for the application. */
   public File getDirCfg(){ return fileGuiCfg.getAbsoluteFile().getParentFile(); }

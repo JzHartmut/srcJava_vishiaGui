@@ -22,8 +22,78 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmd_ifc;
+import org.vishia.util.FileSystem;
 
-/**This class presents a Window appearance with up to 9 areas.
+/**This class presents a Window appearance with up to 9 areas as base for a user's application with several areas
+ * of the main window and some sub windows.
+ * The areas of the window can be used in several forms:
+ * <pre>
+ * +================================================================================+
+ * |                |                                                |              +
+ * |                |                                                |              +
+ * |                |                                                |              +
+ * |                |       central working area                     |   other      +
+ * |     any        |                                                |   list       +
+ * |     list       |                                                |              +
+ * |                |                                                |              +
+ * |                |                                                |              +
+ * |                +---------------------------------------------------------------+
+ * |                |                                                               +
+ * |                |      status or output area                                   +
+ * |                |                                                               +
+ * |                |                                                               +
+ * +================================================================================+
+ * 
+ * +================================================================================+
+ * |                |                                                               +
+ * |                |                                                               +
+ * |                |                                                               +
+ * |                |       central working area                                    +
+ * |     any        |                                                               +
+ * |     list       |                                                               +
+ * |                |                                                               +
+ * |                |                                                               +
+ * |                |                                                               +
+ * |                |                                                               +
+ * |--------------------------------------------------------------------------------+
+ * |                       status line                                              +
+ * +================================================================================+
+ * 
+ * +================================================================================+
+ * |                |                           |                                   +
+ * |                |     one                   |            other                  +
+ * |     any        |     panel                 |            panel                  +
+ * |     list       |                           |                                   +
+ * |                |                           |                                   +
+ * |                |                           |                                   +
+ * |----------------+---------------------------+-----------------------------------+
+ * |                                                                                +
+ * |            input area                                                          +
+ * |----------------+---------------------------------------------------------------+
+ * |                |                                                               +
+ * |   info         |      status or output area                                    +
+ * |   area         |                                                               +
+ * |                |                                                               +
+ * +================================================================================+
+ * </pre>
+ * or any other partitioning.
+ * <br><br>
+ * The main window has a menu bar which has some default entries:
+ * <br><br>
+ * The following sub windows are created:
+ * <ul>
+ * <li>{@link #infoHelp}: Window will be opened with key [F1] or menu help.  initially call {@link #setHelpBase(String)},
+ *   then call {@link #setHelpUrl(String)} respectively set {@link GralWidget#setHtmlHelp(String)} for any widget.
+ * <li>{@link #infoBox}: Window will be opened via menu or on demand if anything should be shown. Fill it with
+ *   infoBox. {@link GralInfoBox#setText(CharSequence)}, {@link GralInfoBox#setText(CharSequence, int)} or
+ *   {@link GralInfoBox#append(CharSequence)}. The info box should be used for on demand. it will be overridden
+ *   and reused if necessary later.
+ * <li>{@link #infoLog}: Window will be opened via menu or on demand if anything should be shown. Fill it with
+ *   infoLog.{@link GralInfoBox#append(CharSequence)}. 
+ * <li>{@link #infoAbout}: Window will be opened with menu about. This box will be filled given with the content from
+ *   {@link #mainCmd}. {@link MainCmd#addAboutInfo(String)} from the given MainCmd instance for {@link GralArea9Window#GralArea9Window(MainCmd, GralWindow)}.
+ * </ul>
+ * 
  * @author hartmut
  *
  */
@@ -93,7 +163,9 @@ public class GralArea9Window implements GralArea9_ifc
    * adequate to a console output.*/
   public GralTextBox outputBox;
   
-  public GralInfoBox infoHelp, infoAbout, infoBox, infoLog;
+  public GralInfoBox infoHelp, infoBox, infoLog;
+  
+  private GralInfoBox infoAbout;
   
   /** Current Directory for file choosing. */
   protected File currentDirectory = null;
@@ -661,7 +733,9 @@ public class GralArea9Window implements GralArea9_ifc
   /* (non-Javadoc)
    * @see org.vishia.gral.area9.GralArea9_ifc#setHelpBase(java.lang.String)
    */
-  @Override public void setHelpBase(String path){ sHelpBase = path; }
+  @Override public void setHelpBase(String path){ 
+    sHelpBase = path; 
+  }
 
 
 
@@ -673,6 +747,10 @@ public class GralArea9Window implements GralArea9_ifc
     String sUrl;
     if(url.startsWith("+")){
       sUrl = sHelpBase + url.substring(1);
+    } else if(FileSystem.isAbsolutePath(url)) { 
+      sUrl = url;  //absolute path
+    } else if (sHelpBase !=null) { //it is a directory which does not end with "/"
+      sUrl = sHelpBase + "/" + url;  //url is a "file.html+label"
     } else {
       sUrl = url;  //should be absolute
     }

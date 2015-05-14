@@ -47,7 +47,7 @@ public class SwtHtmlBox extends GralHtmlBox.ImplAccess
 
   Browser boxSwt;
   
-  String lastUrl, lastUrlOk;
+  String lastUrl="no-help", lastUrlOk ="no-help";
   
   public boolean bActiv;
   

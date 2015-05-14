@@ -30,10 +30,12 @@ public class GralArea9MainCmd extends MainCmd
   
   /**Version, history and license.
    * <ul>
+   * <li>2015-05-16 Hartmut new "-help:" for help base dir in argument check, "-msgcfg:" in argument check. 
+   *   It is moved from Fcmd to this base class of Fcmd, available generally.  
    * <li>2013-11-22 Hartmut chg: title of main window as argument -title= 
    * <li>2013-01-26 Hartmut chg: The MsgDispatchSystemOutErr.create(file) was invoked in this constructor. Therefore
    *   all Applications redirect the System.out and System.err outputs to the message system. The outputs were completed
-   *   with the timestamp and a number, the {@link org.vishia.msgDispatch.MsgDispatcher} was prepared to use. 
+   *   with the time stamp and a number, the {@link org.vishia.msgDispatch.MsgDispatcher} was prepared to use. 
    *   This capability is removed from here yet. It should be a part of the application. See {@link GuiCfg#main(String[])}. 
    * <li>2012-07-09 Hartmut new: The {@link Inspector} will be initialized only if the command line argument 
    *   "-inspectorPort=" is given. That parameter in form "UDP:ip:port" is used.
@@ -155,6 +157,13 @@ public class GralArea9MainCmd extends MainCmd
     cargs.graphicFactory.createWindow(primaryWindow, sizeShow, left, top, xSize, ySize);
     gui = new GralArea9Window(this, primaryWindow);
     gui.getGralMng().setApplicationAdapter(gui);
+    if(cargs.dirHtmlHelp !=null) {
+      try{
+        gui.setHelpBase(cargs.dirHtmlHelp.getAbsolutePath());
+      } catch(Exception exc) {
+        System.err.println("GralArea9MainCmd - help faulty, " + cargs.dirHtmlHelp.toString());
+      }
+    }
     gui.initGraphic(sOutputArea);
     if(sArgError !=null){
       writeError(sArgError);
@@ -212,6 +221,13 @@ public class GralArea9MainCmd extends MainCmd
       }
       else if(arg.startsWith("-fullscreen")) 
       { cargs.dxPixelWindow = cargs.dyPixelWindow = -1;
+      }
+      else if (arg.startsWith("-help:") || arg.startsWith("help=")) {
+        File file1 = new File(arg.substring(6));
+        String sPathHelpAbs = file1.getAbsolutePath();
+        cargs.dirHtmlHelp = new File(sPathHelpAbs);  //should be absolute because browser.
+      } else if (arg.startsWith("-msgcfg:") || arg.startsWith("msgcfg=")) {
+        cargs.msgConfig = new File(arg.substring(7));
       }
       else if(arg.startsWith("-syntax=")) 
       { cargs.sPathZbnf = getArgument(8);   //an example for default output

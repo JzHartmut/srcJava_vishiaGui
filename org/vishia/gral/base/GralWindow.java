@@ -81,7 +81,11 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
     ActionResizeOnePanel(){ super("actionResizeOnePanel - window: " + name); }
     @Override public boolean exec(int keyCode, GralWidget_ifc widgi, Object... params)
     { for(GralWidget widgd: widgetsToResize){
-        widgd.gralMng().impl.resizeWidget(widgd, 0, 0);
+        if(widgd instanceof GralWindow) {
+          System.err.println("GralWindow.ActionResizeOnePanel - A window itself should not be added to widgetsToResize");
+        } else {
+          widgd.gralMng().impl.resizeWidget(widgd, 0, 0);
+        }
       }
       return true;
     }

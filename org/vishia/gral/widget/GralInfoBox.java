@@ -124,6 +124,15 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
 
 
   
+  /**Creates a sub window for showing html content.
+   * This routine should only be called in the graphical thread. TODO setToPanel in extra routine! 
+   * Then it is able to create in any thread.
+   * @param posString
+   * @param name
+   * @param title
+   * @param onTop
+   * @return
+   */
   public static GralInfoBox createHtmlInfoBox(String posString, String name, String title, boolean onTop)
   {
     int props = GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable;

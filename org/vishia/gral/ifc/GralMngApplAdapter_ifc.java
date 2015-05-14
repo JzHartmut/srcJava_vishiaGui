@@ -38,8 +38,13 @@ public interface GralMngApplAdapter_ifc
   public static final int version = 20120303;
 
   /**For context sensitive help, it assigns an URL to the widget which has the focus gained.
-   * @param url It is often an absolute path. may be a relative path??
-   *   If it starts with "+", a base path is used as prefix.
+   * @param url A "file#html.label" or "localdir/file.html#label" which describes the html help url
+   *   in an local context. The origin of the url is given with a global context of the help window.
+   *   See {@link org.vishia.gral.area9.GralArea9Window#setHelpBase(String)}
+   *   
+   *   deprecated: It is often an absolute path. may be a relative path??
+   *   deprecated: If it starts with "+", a base path is used as prefix.
+   *  
    */
   void setHelpUrl(String url);
 }

@@ -29,6 +29,7 @@ public class FcmdFileProps
 {
   /**Version, history and license
    * <ul>
+   * <li>2015-05-16 Hartmut bufgix: dateFormat
    * <li>2012-03-10 Hartmut improved: Now works tested in windows
    * <li>2012-03-09 Hartmut created, but not used yet
    * </ul>
@@ -109,7 +110,7 @@ public class FcmdFileProps
   
   public FcmdFileProps(Fcmd main)
   { this.main = main;
-    this.formatDate = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
+    this.formatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     evChg = new FileRemote.CallbackEvent(evSrc, null, null, callbackChgProps, null, evSrc);
     evCntLen = new FileRemote.CallbackEvent(evSrc, null, null, callbackCntLen, null, evSrc);
   }
@@ -300,7 +301,7 @@ public class FcmdFileProps
 
 
 
-  /**Action for Key F2 for view command. 
+  /**Action for all buttons of 'file properties' window: 
    */
   GralUserAction actionButton = new GralUserAction("actionBtnCntLen")
   {
@@ -390,6 +391,7 @@ public class FcmdFileProps
             //cmds with callback
             widgChgFile.setText(main.idents.buttonFilePropsChanging);
             actFile.chgProps(name, mask, val, date, evChg);
+            main.refreshFilePanel(actFile.getParentFile());  //refresh the panel if the directory is shown there
           } else { bAbort = true; }
           //
         } else if(infos.sCmd.equals(sCmdChgRecurs)){

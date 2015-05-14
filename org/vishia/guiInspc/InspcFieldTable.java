@@ -186,6 +186,7 @@ public class InspcFieldTable implements Runnable
     this.widgTable.setColumnEditable(2, true);
     this.widgTable.setActionChange(this.actionChgTable);
     this.widgTable.specifyActionOnLineSelected(actionLineSelected);
+    this.widgTable.setHtmlHelp("HelpInspc.html#Topic.HelpInspc.fieldsof.");
     this.btnBack = new GralButton("@InspcFieldBack", "<<", actionBack);
     this.btnRefresh = new GralButton("@InspcFieldRefresh", "refresh", actionRefresh);
     this.btnShowAll = new GralButton("@InspcFieldShowAll", "show all", actionShowAll);
