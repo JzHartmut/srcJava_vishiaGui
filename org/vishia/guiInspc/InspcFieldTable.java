@@ -230,7 +230,7 @@ public class InspcFieldTable implements Runnable
         //struct = var.struct();
         //- sPathStruct = struct.path();  //NOTE it is without device.
         //
-        fillTableStruct(true);
+        fillTableStruct(true);  //checks whether the struct is updated, requests update.
         //
       } else { //NOTE: fillTableStruct sets the widgPath too.
         widgPath.setText(sPathStruct);
@@ -292,9 +292,10 @@ public class InspcFieldTable implements Runnable
       GralTableLine_ifc<InspcStruct.FieldOfStruct> line = widgTable.addLine("$", null, null);
       line.setCellText("pending request", 1);
       InspcTargetAccessor target = structVar.ds.targetAccessor;
-      struct.requestFields();
+      //=========>
+      struct.requestFields();  //clear the struct, set to request.
       target.requestFields(struct.varOfStruct(inspcMng).ds, struct.rxActionGetFields, actionUpdated);
-    } else {
+    } else { //!bCanRequest - calling parameter:
       GralTableLine_ifc<InspcStruct.FieldOfStruct> line = widgTable.addLine("?", null, null);
       line.setCellText("...no answer", 1);
     }
@@ -531,6 +532,7 @@ public class InspcFieldTable implements Runnable
   GralUserAction actionRefresh = new GralUserAction("InspcFieldTable - refresh"){
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        refresh();
         return true;
       } else { 
         return false;
