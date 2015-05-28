@@ -373,7 +373,7 @@ public class Fcmd extends GuiCfg
   
   final MsgRedirectConsole msgDisp;
   
-  final FileCluster fileCluster = new FileCluster();
+  final FileCluster fileCluster = FileRemote.clusterOfApplication;
 
   // GralTabbedPanel tabbedPanelsLeft, tabbedPanelsMid, tabbedPanelsRight;
 

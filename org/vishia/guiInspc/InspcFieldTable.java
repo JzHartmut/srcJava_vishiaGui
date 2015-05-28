@@ -115,7 +115,7 @@ public class InspcFieldTable implements Runnable
    * 
    */
   //@SuppressWarnings("hiding")
-  protected final static String sVersion = "2014-01-06";
+  protected final static String sVersion = "2015-05-30";
 
   @SuppressWarnings("synthetic-access") 
   class RunOnReceive implements Runnable {
@@ -133,6 +133,7 @@ public class InspcFieldTable implements Runnable
   
   
   
+  /**Sizes in table in Graphic grid units.*/
   private static final int sizeStruct = 3, sizeName = 20, sizeType = 10;
   
   /**The window to present. */
@@ -320,7 +321,6 @@ public class InspcFieldTable implements Runnable
       if(var !=null){
         long time = System.currentTimeMillis();
         long timelast = var.getLastRefreshTime();
-        if(request){ var.requestValue(time, this.new RunOnReceive(line)); }
         char cType = var.getType();
         String sVal;
         switch(cType){
@@ -329,9 +329,12 @@ public class InspcFieldTable implements Runnable
           case 'c': case 's': { sVal = var.getString(); } break;
           default: { float val = var.getFloat(); sVal = Float.toString(val); }
         }
-        if(timelast == 0 || (time - timelast) > 10000){ //10 sec
+        int dtime = (int)(time - timelast);
+        if(timelast == 0 || dtime > 20000){ //10 sec
           sVal = "? " + sVal;
         }
+        time = System.currentTimeMillis();
+        if(request){ var.requestValue(time, this.new RunOnReceive(line)); }
         line.setCellText(sVal, 2);
       }
     }

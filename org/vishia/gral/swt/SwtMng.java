@@ -321,6 +321,12 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    */
   @Override public Composite getCurrentPanel(){ return ((Composite)pos().panel.getWidgetImplementation()); }
 
+  public Composite getWidgetsPanel(GralWidget widg){ 
+    GralPos pos = widg.pos();
+    if(pos == null) { pos = pos(); } //from GralMng
+    return ((Composite)pos.panel.getWidgetImplementation()); 
+  }
+
   
   private Composite getCurrentPanel(GralWidget widgg){ return ((Composite)widgg.pos().panel.getWidgetImplementation()); }
   

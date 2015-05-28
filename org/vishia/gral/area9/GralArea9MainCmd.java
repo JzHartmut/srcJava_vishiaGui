@@ -226,8 +226,8 @@ public class GralArea9MainCmd extends MainCmd
         File file1 = new File(arg.substring(6));
         String sPathHelpAbs = file1.getAbsolutePath();
         cargs.dirHtmlHelp = new File(sPathHelpAbs);  //should be absolute because browser.
-      } else if (arg.startsWith("-msgcfg:") || arg.startsWith("msgcfg=")) {
-        cargs.msgConfig = new File(arg.substring(7));
+      } else if (arg.startsWith("-msgcfg:") || arg.startsWith("-msgcfg=")) {
+        cargs.msgConfig = new File(arg.substring(8));
       }
       else if(arg.startsWith("-syntax=")) 
       { cargs.sPathZbnf = getArgument(8);   //an example for default output

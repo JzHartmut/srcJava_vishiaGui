@@ -240,7 +240,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   /*package private*/ 
   static void createTable(GralTable<?> gralTable, SwtMng mng) {
     
-    Composite parent = mng.getCurrentPanel();
+    Composite parent = mng.getWidgetsPanel(gralTable);
     @SuppressWarnings("unchecked")
     final SwtTable table = new SwtTable(gralTable, mng, parent); //, selectionColumn, selectionText);
     table.swtWidgHelper.widgetSwt.setData(table);

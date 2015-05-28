@@ -159,6 +159,8 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   
   LogMessage logTelg;
 
+  InspcGuiCtrlStatus windCtrlStatus = new InspcGuiCtrlStatus();
+  
   GralButton btnSwitchOnLog;
   final GralButton btnRetryDisableVariables = new GralButton(null, "retry variable", actionSetRetryDisabledVariable);
 
@@ -175,7 +177,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   
   public GralColorSelector colorSelector;
   
-  private final FileCluster fileCluster = new FileCluster();
+  private final FileCluster fileCluster = FileRemote.clusterOfApplication;
 
   InspcGui(CallingArguments cargs, GralArea9MainCmd cmdgui)
   {
@@ -192,7 +194,10 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     */
     GralPlugUser_ifc user = guiCfg.getPluggedUser(); 
     assert(user == null || user instanceof InspcPlugUser_ifc);
-    
+    if(cargs.sOwnIpcAddr ==null){
+      System.err.println("arg ownIpc missing");
+      System.exit(255);
+    }
     InspcMng variableMng = new InspcMng(cargs.sOwnIpcAddr, cargs.indexTargetIpcAddr, cargs.bUseGetValueByIndex, (InspcPlugUser_ifc)user);
     composites.add(variableMng);
     this.inspcMng = variableMng;
@@ -434,10 +439,12 @@ private class InspcGuiCfg extends GuiCfg
     _gralMng.selectPanel("primaryWindow");
     _gralMng.setPosition(10, 30, 50, 74, 0, '.');
     viewTargetComm.setToPanel(_gralMng);
+    windCtrlStatus.setToPanel();
     GralMenu menu = super.guiW.getMenuBar();
     menu.addMenuItemGthread("menuBarFieldsA", "&Window/open Fields &A", fieldsA.actionOpenWindow);
     menu.addMenuItemGthread("menuBarFieldsB", "&Window/open Fields &B", fieldsB.actionOpenWindow);
     menu.addMenuItemGthread("menuBarViewTargetComm", "&Window/view &TargetComm", viewTargetComm.actionOpenWindow);
+    menu.addMenuItemGthread("menuBarViewTargetComm", "&Window/view ctrl&Status", windCtrlStatus.setVisible);
     //
     if(user !=null){
       user.initGui(_gralMng);

@@ -28,7 +28,7 @@ public class InspcCurveViewApp
     GralFactory gralFactory = new SwtFactory();
     LogMessage log = new LogMessageStream(System.out);
     GralWindow wind = gralFactory.createWindow(log, "Curve View", 'C', 100, 50, 800, 600);
-    FileCluster fileCluster = new FileCluster();
+    FileCluster fileCluster = FileRemote.clusterOfApplication;
     FileRemote dirCfg = fileCluster.getDir("D:/");
     FileRemote dirSave = fileCluster.getDir("D:/");
     curveView = new InspcCurveView("curves", null, wind.gralMng(), dirCfg, dirSave, null);

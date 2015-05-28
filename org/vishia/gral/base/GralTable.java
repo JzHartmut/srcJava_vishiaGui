@@ -359,14 +359,22 @@ import org.vishia.util.TreeNode_ifc;
   protected MarkMask_ifc actionMarkOnLine;
   
 
-  
-  /**
-   * @param name
+  /**Constructs a table which should be positioned on {@link #setToPanel(GralMngBuild_ifc)}
+   * @param pos String given position in GralPos units.
+   * @param name to register for symbolic access
    * @param columnWidths positive value from left: width, negative value from right: width. 
    *   The last column with a positive width is used for sizeable. 
    */
-  public GralTable(String name, int[] columnWidths) {
-    super(name, 'L');
+  public GralTable(String name, int[] columnWidths) { this(null, name, columnWidths); }
+  
+  /**Constructs a table with position
+   * @param pos String given position in GralPos units.
+   * @param name to registrate
+   * @param columnWidths positive value from left: width, negative value from right: width. 
+   *   The last column with a positive width is used for sizeable. 
+   */
+  public GralTable(String pos, String name, int[] columnWidths) {
+    super(pos, name, 'L');
     this.columnWidthsGral = columnWidths;
     this.zColumn = columnWidths.length;
     this.bColumnEditable = new boolean[this.zColumn];  //all false.

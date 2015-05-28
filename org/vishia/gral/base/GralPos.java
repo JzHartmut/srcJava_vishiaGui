@@ -459,8 +459,8 @@ public class GralPos implements Cloneable
     }
     if(spPos.scanInteger().scanOk()) { //can start with '-' but not with '+'
       //between 2. number is given, first is p1
-      if(size1 == refer){
-        co.p1 = co.p2 - refer + size; //stored as size for end element, but it is refer for first element.  
+      if(size1 == size){
+        co.p1 = co.p2 - size; //stored as size for end element, but it is negative for first element.  
       } else {
         co.p1 = co.p2;   //ratio or absolute
       }
@@ -588,11 +588,11 @@ public class GralPos implements Cloneable
   /**Sets the position for the next widget to add in the container.
    * Implementation note: This is the core function to calculate positions. It is called from all other ones.
    * @param line y-Position in y-Units, count from top of the box. It is the bottom line of the widget.
-   *              It means ypos = 0 is not a proper value. To show a text in the first line, use y=2.
-   *              If <0, then the previous position is valid still.
+   *              If <0, then it counts from bottom of the parent.
    * @param column x-Position in x-Units, count from left of the box. 
    *              If <0, then the previous position is valid still.
-   * @param heigth: The height of the line. If <0, then the param line is the buttom line, 
+   *              It < 0 then line = 0 is not a proper value. To show a text in the first line, use line=2.
+   * @param heigth: The height of the line. If <0, then the param line is the bottom line of the widget, 
    *                and (line-height) is the top line. If 0 then the last value of height is not changed. 
    * @param length: The number of columns. If <0, then the param column is the right column, 
    *                and column-length is the left column. If 0 then the last value of length is not changed.
@@ -751,11 +751,12 @@ public class GralPos implements Cloneable
   
   
   
-  public GralPos setNextPos(String posString){
+  public GralPos setNextPos(String posString) throws ParseException {
     if(posString.equals("!")) {  //new window, initialize the position without panel because it is top.
       panel = null;
       setFinePosition(0,0,0,0,0,0,0,0,0,'d', 0,0, null);
     } else {
+      setPosition(posString, this);
       //TODO change pos:
     }
     return clone();  //return the pos as clone, to use as posWidg  

@@ -1,5 +1,6 @@
 package org.vishia.gral.base;
 
+import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -579,8 +580,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   /**Creates a widget which is not positioned.
    * @param sName
    * @param whatIs
+   * @deprecated use {@link GralWidget#GralWidget(String, String, char)}
    */
-  @Deprecated public GralWidget(String sName, char whatIs){ this(null, sName, whatIs); }
+  @Deprecated public GralWidget(String sName, char whatIs){ 
+    this(null, sName, whatIs);
+  }
 
   
   
@@ -590,6 +594,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    *   using 
    * @param sName
    * @param whatIs
+   * @throws ParseException 
    */
   protected GralWidget(String posString, String sName, char whatIs)
   { this.name = sName;
@@ -599,7 +604,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     itsMng = GralMng.get();
     assert(itsMng !=null);  //should be created firstly in the application, since 2015-01-18
     if(posString !=null) {
-      initPosAndRegisterWidget(itsMng.pos().pos.setNextPos(posString));
+      try{
+        initPosAndRegisterWidget(itsMng.pos().pos.setNextPos(posString));
+      } catch(ParseException exc) {
+        throw new IllegalArgumentException("GralWidget - position is syntactical faulty; " + posString);
+      }
     } //else: don't set the pos, it is done later 
   }
   
@@ -1498,9 +1507,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       this.widgg = widgg;
       widgg.itsMng = mng;
       widgg._wdgImpl = this; 
-      if(widgg._wdgPos !=null) 
-        throw new IllegalStateException("GralWidget - setPos() is set already.");
-      widgg.initPosAndRegisterWidget( mng.getPosCheckNext());  //always clone it from the central pos 
+      if(widgg._wdgPos ==null) {
+        widgg._wdgPos = widgg.itsMng.getPosCheckNext();
+      }
+      //else: The position was given by construction already.
+      //set the position now, because it is given yet.
+      widgg.initPosAndRegisterWidget( widgg._wdgPos);  //always clone it from the central pos 
       // Note: widgg.posWidg.panel.getWidgetImplementation() ==null yet because it will be initialize after super(widgg); 
     }
     
@@ -1515,9 +1527,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       this.widgg = widgg;
       widgg._wdgImpl = this; 
       if(widgg._wdgPos ==null) {
-        //set the position now, because it is given yet.
-        widgg.initPosAndRegisterWidget( widgg.itsMng.getPosCheckNext());  //always clone it from the central pos 
-      } //else: The position was given by construction already.
+        widgg._wdgPos = widgg.itsMng.getPosCheckNext();
+      }
+      //else: The position was given by construction already.
+      //set the position now, because it is given yet.
+      widgg.initPosAndRegisterWidget( widgg._wdgPos);  //always clone it from the central pos 
       // Note: widgg.posWidg.panel.getWidgetImplementation() ==null yet because it will be initialize after super(widgg); 
     }
     
