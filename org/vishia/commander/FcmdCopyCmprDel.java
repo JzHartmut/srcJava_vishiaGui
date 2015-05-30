@@ -80,7 +80,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   
   protected final Fcmd main;
 
-  GralWindow_ifc windConfirmCopy;
+  GralWindow windConfirmCopy;
   
   GralPos posWindConfirmCopy;
   
@@ -949,8 +949,8 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
           //widgButtonOk.setCmd("check");
           widgCopyState.setText("check?", 0);
           if(setVisible){
+            widgButtonOk.setPrimaryWidgetOfPanel();
             windConfirmCopy.setVisible(true);
-            //main.gralMng.setWindowsVisible(windConfirmCopy, posWindConfirmCopy);
             main.gui.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".");
           }
           //widgButtonMove.setValue(GralMng_ifc.cmdSet, 0, 0);

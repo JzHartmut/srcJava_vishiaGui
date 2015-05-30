@@ -85,7 +85,7 @@ import org.vishia.util.KeyCode;
 public class InspcFieldTable implements Runnable
 {
   /**Version, history and license.
-   * <ul>
+   * <ul>2015-05-29 requests a new value only if the current is older than 5 seconds.
    * <li>2014-01-05 indexSelection
    * <li>2013-12-18 Created.
    * </ul>
@@ -330,11 +330,11 @@ public class InspcFieldTable implements Runnable
           default: { float val = var.getFloat(); sVal = Float.toString(val); }
         }
         int dtime = (int)(time - timelast);
-        if(timelast == 0 || dtime > 20000){ //10 sec
+        if(timelast == 0 || dtime > 5000){ //10 sec
           sVal = "? " + sVal;
+          time = System.currentTimeMillis();
+          if(request){ var.requestValue(time, this.new RunOnReceive(line)); }
         }
-        time = System.currentTimeMillis();
-        if(request){ var.requestValue(time, this.new RunOnReceive(line)); }
         line.setCellText(sVal, 2);
       }
     }

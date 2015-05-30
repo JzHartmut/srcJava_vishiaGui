@@ -27,7 +27,8 @@ public interface GralWidgImpl_ifc
   
   /**Sets the focus to the widget.
    * See {@link GralMng_ifc#setFocus(GralWidget)}.
-   * @return true if the focus is set really.
+   * @return true if it has the focus after this operation.
+   *   false on any error.
    */
   boolean setFocusGThread();
   

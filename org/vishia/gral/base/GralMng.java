@@ -63,6 +63,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2015-05-31 Hartmut chg: {@link GralMngFocusListener}: invokes repaint() because of maybe changed outfit on focus gained
    * <li>2015-05-02 Hartmut chg: {@link #registerWidget(GralWidget)} is obsolete now, it is empty yet. 
    *   Instead {@link #registerWidget(String, GralWidget)} by given name and {@link #removeWidget(String)} by name.
    *   See description of registering on {@link GralWidget#setToPanel(GralMngBuild_ifc)}. 
@@ -1588,7 +1589,8 @@ public GralButton addCheckButton(
      * @param widgg
      */
     public void focusLostGral(GralWidget widgg){
-      GralWidget.ImplAccess.setFocused(widgg, false);
+      GralWidget.ImplAccess.setFocused(widgg, false);  //denotes that the GralWidget has lost the focus
+      widgg.repaint();  //maybe changed outfit on focus lost.
       //CharSequence text = Assert.stackInfo("", 1, 5);
       //System.out.println("GralMng - widget focus lost;" + widgg.name + text);
     }
@@ -1603,7 +1605,8 @@ public GralButton addCheckButton(
      */
     public void focusGainedGral(GralWidget widgg){
       GralMng.this.notifyFocus(widgg);
-      GralWidget.ImplAccess.setFocused(widgg, true);
+      GralWidget.ImplAccess.setFocused(widgg, true);  //denotes that the GralWidget has gained the focus
+      widgg.repaint();  //maybe changed outfit on focus gained.
       String htmlHelp = widgg.getHtmlHelp();
       if(htmlHelp !=null && applAdapter !=null){
         applAdapter.setHelpUrl(htmlHelp);

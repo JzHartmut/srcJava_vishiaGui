@@ -184,7 +184,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    * it should be visible from the graphic implementation which is located in another package. 
    */
   public abstract static class GraphicImplAccess 
-  extends GralWidget.ImplAccess //access to GralWidget
+  extends GralPanelContent.ImplAccess //access to GralWidget
   implements GralWidgImpl_ifc
   {
     

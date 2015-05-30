@@ -305,9 +305,13 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   public abstract static class ImplAccess extends GralWidget.ImplAccess
   {
 
+    /**Same reference as {@link GralWidget.ImplAccess#widgg} but type of this class. */
+    //GralPanelContent gralPanel;
+    
     protected ImplAccess(GralPanelContent widgg)
     {
       super(widgg);
+      //gralPanel = widgg;
     }
     
     public GralPanelContent gralPanel(){ return (GralPanelContent) widgg; } //It is the correct type.
@@ -317,7 +321,7 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
      * @return
      */
     @Override
-  public abstract   GralRectangle getPixelPositionSize();
+    public abstract   GralRectangle getPixelPositionSize();
     
     
     
@@ -325,6 +329,8 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
    * @return the x and y is 0, the dy and dy is the size.
    */
     public abstract GralRectangle getPixelSize();
+    
+    
     
   }
   

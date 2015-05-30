@@ -195,6 +195,9 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   SwtGralMouseListener.MouseListenerNoAction mouseClickForInfo = new SwtGralMouseListener.MouseListenerNoAction();
   
   
+  /**The instance for all traverse listener applicable to all widgets. */
+  static SwtTraverseListener swtTraverseListener = new SwtTraverseListener();
+  
   //SwtKeyListener swtKeyListener = new SwtKeyListener(this);
   
   /**It is a marker interface. */

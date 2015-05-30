@@ -15,6 +15,7 @@ import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowStateListener;
 
+import org.eclipse.swt.graphics.Point;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWindow;
@@ -58,12 +59,12 @@ public class AwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     return new GralRectangle(r.x, r.y, r.width, r.height);
   }
 
+  @Override public GralRectangle getPixelSize(){
+    int dx = window.getWidth();
+    int dy = window.getHeight();
+    return new GralRectangle(0,0,dx, dy);
+  }
 
-  /*@Override public GralRectangle getPixelSize(){
-    Dimension r = ((Component)panelComposite).getSize();
-    GralRectangle posSize = new GralRectangle(0, 0, r.width, r.height);
-    return posSize;
-  }*/
 
 
 

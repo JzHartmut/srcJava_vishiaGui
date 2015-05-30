@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
@@ -42,6 +43,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   
   /**Version, history and license:
    * <ul>
+   * <li>2015-05-31 Hartmut {@link #setFocusGThread()} now regards the {@link GralPanelContent#setPrimaryWidget(GralWidget)}.
    * <li>2015-04-27 Hartmut new {@link #windRemoveOnClose}
    * <li>2012-07-13 Hartmut new:  {@link #getPixelSize()}, chg: {@link #getPixelPositionSize()} in all implementations. 
    *   A swt.widget.Shell now returns the absolute position and the real size of its client area without menu and title bar.
@@ -205,7 +207,16 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   //@Override
   @Override
   public boolean setFocusGThread()
-  { return window.setFocus();
+  { 
+    setVisibleState(true);  //has focus, 
+    window.setVisible(true);
+    if(gralPanel().setFocusGThread()){   //sets the focus of the primary widget.
+      return true;  //if any element of the panel was set to focus, the window has the focus already.
+      //Especially the primaryWidget should be focused.
+    } else {
+      //no primary window etc.
+      return window.setFocus();  
+    }
   }
 
   
@@ -223,6 +234,11 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   
   @Override public GralRectangle getPixelPositionSize(){
     return swtWidgWrapper.getPixelPositionSize();
+  }
+
+  @Override public GralRectangle getPixelSize(){
+    Point size = window.getSize();
+    return new GralRectangle(0,0,size.x, size.y);
   }
 
 
@@ -377,8 +393,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     } 
     if((chg & chgVisible)!=0){
       acknChg |= chgVisible;
-      window.setVisible(true);
-      window.setFocus();
+      setFocusGThread();
     }
     if((chg & chgInvisible)!=0){
       acknChg |= chgInvisible;

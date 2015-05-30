@@ -5,11 +5,14 @@ import java.lang.ref.Reference;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralImageBase;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.util.KeyCode;
 
 public class GralButton extends GralWidget
 {
   /**Version, history and license.
    * <ul>
+   * <li>2015-05-31 Hartmut new: Now a key listener and a traverse listener was added for the SWT implementation.
+   *   This base class provides the {@link #activate()} method which should be invoked on ENTER-key.
    * <li>2013-12-22 Hartmut chg: Now {@link GralButton} uses the new concept of instantiation: It is not
    *   the super class of the implementation class. But it provides {@link GralButton.GraphicImplAccess}
    *   as the super class. 
@@ -244,6 +247,23 @@ public class GralButton extends GralWidget
   }
   
   
+  /**This is the same action like press and release the left mouse button. It can be called from the application
+   * to activate the function of the button. Especially it is used for [Enter] on the focused button.
+   * 
+   */
+  public void activate() {
+    if(shouldSwitched){
+      if( switchState == State.On) { switchState = State.Off; }
+      else if(bThreeStateSwitch && switchState == State.Off){ switchState = State.Disabled; }
+      else { switchState = State.On; }
+    }
+    if(actionChanging !=null){
+      actionChanging.exec(KeyCode.enter, this);
+    }
+    repaint();
+  }
+  
+  
   
   @Override public void setValue(int cmd, int ident, Object visibleInfo, Object userData){
     if(visibleInfo instanceof Integer){
@@ -357,6 +377,9 @@ public class GralButton extends GralWidget
     }
 
 
+    /**It will be called only if the mouse up is pressed inside the button's area.
+     * @see org.vishia.gral.base.GralMouseWidgetAction_ifc#mouse1Up(int, int, int, int, int, org.vishia.gral.base.GralWidget)
+     */
     @Override public void mouse1Up(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
     {
       setActivated(false);
@@ -417,9 +440,12 @@ public class GralButton extends GralWidget
     /**Set in {@link #paint1()}, used for paint routine. */
     protected GralColor colorgback, colorgline;
 
-    protected GraphicImplAccess(GralWidget widgg, GralMng mng)
-    {
-      super(widgg, mng);
+    /**Covers the GralWidget#widgg, but it is the same reference. This is the necessary type. */
+    protected GralButton widgg;
+    
+    protected GraphicImplAccess(GralButton widgg, GralMng mng)
+    { super(widgg);
+      this.widgg = widgg;
     }
     
     

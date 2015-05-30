@@ -3,6 +3,8 @@ package org.vishia.gral.swt;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontMetrics;
@@ -10,8 +12,14 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralKeyListener;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.util.KeyCode;
 
 public class SwtButton extends GralButton.GraphicImplAccess
 {
@@ -84,6 +92,8 @@ public class SwtButton extends GralButton.GraphicImplAccess
     widgetSwt.setBackground(mng.propertiesGuiSwt.colorBackground);
     widgetSwt.addMouseListener(mouseListener);
     widgetSwt.addFocusListener(mng.focusListener);  //common focus listener 
+    widgetSwt.addKeyListener(new KeyListener(mng.mng._impl.gralKeyListener));
+    widgetSwt.addTraverseListener(SwtMng.swtTraverseListener);
     setBoundsGraphic(mng);
     float ySize = widgg.pos().height();
     char size1 = ySize > 3? 'B' : 'A';
@@ -141,12 +151,15 @@ public class SwtButton extends GralButton.GraphicImplAccess
     //gc.d
     Rectangle dim = canvas.getBounds();
     SwtButton.this.paint1();
-    
+    boolean bFocus = canvas.isFocusControl();
     Color colorBack = swtWidgHelper.mng.getColorImpl(colorgback);
     Color colorLine = swtWidgHelper.mng.getColorImpl(colorgline);
+    if(bFocus) {
+      colorLine = swtWidgHelper.mng.getColorImpl(GralColor.getColor("rd"));
+    }
     gc.setBackground(colorBack);
     canvas.drawBackground(e.gc, dim.x+1, dim.y+1, dim.width-1, dim.height-1);
-    Color color = canvas.getForeground(); //of the widget.
+    //Color color = canvas.getForeground(); //of the widget.
     gc.setForeground(colorLine);  //black
     gc.setFont(fontText);
     //FontData fontData = mng.propertiesGui.stdButtonFont.getFontData();
@@ -252,6 +265,27 @@ public class SwtButton extends GralButton.GraphicImplAccess
 
     
   }
+  
+  
+  protected class KeyListener extends SwtKeyListener
+  {
+
+    public KeyListener(GralKeyListener keyAction)
+    { super(keyAction);
+    }
+
+    @SuppressWarnings("synthetic-access") 
+    @Override 
+    public final boolean specialKeysOfWidgetType(int key, GralWidget_ifc widggArg, Object widgImpl){ 
+      boolean bDone = true;
+      if(key == KeyCode.enter) {
+        widgg.activate();
+      }
+      return bDone; 
+    }
+  };
+
+  
   
   
   

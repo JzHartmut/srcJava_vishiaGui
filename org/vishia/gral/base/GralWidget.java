@@ -1619,6 +1619,14 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     }
     
     
+    /**This routine does not change the focus state in the implementation widget,
+     * it denotes only that the GralWidget has the focus or not.
+     * The method is static because it gets the widgg instance. 
+     * Note that it is not member of GralWidget itself because the application 
+     * should not invoke it (which may be possible on a public GralWidget-method).
+     * @param widgg the GralWidget instance
+     * @param focus true on focus gained, false on focus lost.
+     */
     public static void setFocused(GralWidget widgg, boolean focus){
       widgg.bHasFocus = focus;
       if(focus == false) { widgg.dyda.bTouchedField = false; }
