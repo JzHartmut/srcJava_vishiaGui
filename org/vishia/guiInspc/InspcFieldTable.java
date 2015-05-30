@@ -82,7 +82,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class InspcFieldTable implements Runnable
+public class InspcFieldTable
 {
   /**Version, history and license.
    * <ul>2015-05-29 requests a new value only if the current is older than 5 seconds.
@@ -132,6 +132,27 @@ public class InspcFieldTable implements Runnable
   }
   
   
+  /**An instance of this class is used to prepare setValueByPath on a changed value in a line.
+   */
+  public static class TxOrderSetValue implements Runnable
+  {
+    final String sValue;
+    final InspcVariable var;
+
+    public TxOrderSetValue(String sValue, InspcVariable var)
+    { this.sValue = sValue;
+      this.var = var;
+    }
+
+    /**This method will be invoked before finish of a send session. */
+    @Override public void run()
+    {
+      var.ds.targetAccessor.cmdSetValueByPath(var, sValue);
+    }
+    
+    
+  }
+  
   
   /**Sizes in table in Graphic grid units.*/
   private static final int sizeStruct = 3, sizeName = 20, sizeType = 10;
@@ -177,10 +198,10 @@ public class InspcFieldTable implements Runnable
   private long timeLineSelected;
   
   /**Set in graphic thread with {@link #btnSetValue}, ask and reset in the InspcMng-thread. */
-  protected AtomicBoolean bSetValue = new AtomicBoolean();
+  protected AtomicBoolean XXXbSetValue = new AtomicBoolean();
   
   public InspcFieldTable(InspcMng inspcMng)
-  { inspcMng.addUserOrder(this);  //invoke run in any communication step.
+  { //inspcMng.addUserOrder(this);  //invoke run in any communication step.
     this.wind = new GralWindow(null, "InspcFieldTableWind", "Fields of ...", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
     this.widgPath = new GralTextField("InspcFieldTableWind");
     this.widgTable = new GralTable<InspcStruct.FieldOfStruct>("InspcFieldTable", new int[]{sizeStruct, sizeName, 0, -sizeType});
@@ -426,21 +447,18 @@ public class InspcFieldTable implements Runnable
   void actionSetValues(){
     for(GralTableLine_ifc<InspcStruct.FieldOfStruct> line: widgTable.iterLines()){
       if(line.isChanged(true)){
-        InspcStruct.FieldOfStruct field = line.getUserData();
-        String value = line.getCellText(2);
-        inspcMng.cmdSetValueOfField(structVar, field, value);
+        sendValueChange(line);
       }
     }
   }
   
   
-  /**This method is invoked in {@link InspcMng#procComm()} because it is registered there.
-   * It prepares set value.
-   */
-  @Override public void run(){
-    if(bSetValue.compareAndSet(true, false)){
-      actionSetValues();
-    }
+  void sendValueChange(GralTableLine_ifc<InspcStruct.FieldOfStruct> line) {
+    InspcStruct.FieldOfStruct field = line.getUserData(); ////
+    String sValue = line.getCellText(2);
+    InspcVariable var = field.variable(structVar, inspcMng);  //creates the variable if not given yet.
+    TxOrderSetValue order = new TxOrderSetValue(sValue, var);
+    var.ds.targetAccessor.addUserTxOrder(order);
   }
   
   
@@ -473,8 +491,7 @@ public class InspcFieldTable implements Runnable
         if(key == KeyCode.enter){
           showValue(line, true);
         } else if(key == KeyCode.ctrl + KeyCode.enter) {
-          bSetValue.set(true);
-          InspcFieldTable.this.inspcMng.addUserOrder(InspcFieldTable.this);
+          sendValueChange(line); ////
         } else if(key == KeyCode.ctrl + 'R' || key == KeyCode.F5){
           refresh();
         } else if(key == KeyCode.ctrl + KeyCode.pgup) {
@@ -561,8 +578,9 @@ public class InspcFieldTable implements Runnable
   GralUserAction actionSetValues = new GralUserAction("InspcFieldTable - set values"){
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        bSetValue.set(true);
-        InspcFieldTable.this.inspcMng.addUserOrder(InspcFieldTable.this);
+        //bSetValue.set(true);
+        actionSetValues();
+        //InspcFieldTable.this.inspcMng.addUserOrder(InspcFieldTable.this);
         return true;
       } else { 
         return false;

@@ -89,6 +89,8 @@ import org.vishia.util.TreeNode_ifc;
 
   /**Version, history and license.
    * <ul>
+   * <li>2015-05-31 Hartmut chg: {@link GraphicImplAccess#processKeys(int}} updates the cell text in the line firstly
+   *  if it is an editing cell. It helps to get the correct text in the graphic thread.  
    * <li>2014-12-26 Hartmut chg: {@link #colorBackSelectSomeMarked} etc.  
    * <li>2013-12-23 Hartmut chg: Rename {@link #setColorBackSelectedLine(GralColor)} instead setColorCurrLine(): 
    *   It is not the current line which is changed but the color setting for all current (= selected) lines. 
@@ -1483,7 +1485,17 @@ import org.vishia.util.TreeNode_ifc;
      * @param keyCode Encoding see {@link KeyCode}.
      * @return true if the key is processed, false if the key is not processed here. Maybe processed after them.
      */
-    protected boolean processKeys(int keyCode){ return outer.processKeys(keyCode); }
+    protected boolean processKeys(int keyCode){ 
+      //GralTable widgt = (GralTable)widgg;
+      if(bColumnEditable(colSelectedixCellC)) {
+        //update the text of the cell from the implementation layer:
+        CellData cell = cells[lineSelectedixCell][colSelectedixCellC];
+        String sContent = getCellText(cell);
+        lineSelected.cellTexts[colSelectedixCellC] = sContent;
+        //setCellText(cell, sContent);
+      }
+      return outer.processKeys(keyCode); 
+    }
 /*
     boolean done = true;
       long time = System.currentTimeMillis();
@@ -1618,6 +1630,14 @@ import org.vishia.util.TreeNode_ifc;
         line.setCellText(text, cell.ixCellColumn);
       }
     }
+    
+    
+    /**Gets the current text of the given cell from the graphic implementation.
+     * @param cell
+     * @return
+     */
+    protected abstract String getCellText(CellData cell);
+    
     
     /**Updates the cell text fields which presents the content of the table.
      * After them update() of the graphic level should be called.

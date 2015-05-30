@@ -248,7 +248,12 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
    */
   @Override public boolean setFocusGThread()
   {
-    if(primaryWidget !=null) return primaryWidget.setFocusGThread();
+    if(primaryWidget !=null) {
+      //invokes the setFocus routine to mark focus in table etc.
+      primaryWidget.setFocus();  //invokes setFocusGThread because it is the graphic thread.
+      return true;  //TODO check focus
+      //return primaryWidget.setFocusGThread();
+    }
     else return false;
   }
 

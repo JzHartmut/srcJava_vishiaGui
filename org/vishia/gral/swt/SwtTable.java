@@ -609,6 +609,12 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   }
   
   
+  protected String getCellText(GralTable.CellData cell){
+    return cellsSwt[cell.ixCellLine][cell.ixCellColumn].getText();
+  }
+  
+  
+  
   /**Focus listener implementation for all cells.
    * This routine is invoked whenever the focus of any Text field of the table will be lost the focus. 
    * It invokes {@link GralTable.GraphicImplAccess#focusLostTable()} but only if 
