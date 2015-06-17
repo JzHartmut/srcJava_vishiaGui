@@ -18,6 +18,8 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
 
   /**Version, history and license.
    * <ul>
+   * <li>2015-05-31 Hartmut The {@link GraphicImplAccess} is now derived from {@link GralPanelContent.ImplAccess}
+   *   because this class is derived from that too. Parallel inheritance. 
    * <li>2013-12-19 Hartmut bugfix: {@link #setFullScreen(boolean)} now works. 
    * <li>2013-12-19 Hartmut new: Now it is able to instantiate without Graphic Layer and {@link #setToPanel(GralMngBuild_ifc)}
    *   is supported.  

@@ -12,7 +12,7 @@ import org.vishia.util.TreeNode_ifc;
  */
 public interface GralTable_ifc<UserData> extends GralWidget_ifc
 {
-  /**Version and history:
+  /**Version, history and license.
    * <ul>
    * <li>2013-09-15 Hartmut new: Definition of {@link #setBackColor(GralColor, int)} parallel to the
    *   {@link GralWidget_ifc#getBackColor(int)} with special comments for usage of the int parameter.
@@ -29,10 +29,6 @@ public interface GralTable_ifc<UserData> extends GralWidget_ifc
    *   can be determined by the implementer of this interface.
    * <li>2011-05-11 Hartmut new: creation. Tables are a relevant medium to present GUIs. The implementation of tables
    *   in SWT or swing are strong different. It needs a simple interface to work with tables.  
-   * </ul>
-  /**Version, history and license.
-   * <ul>
-   * <li>2011-06-00 Hartmut created
    * </ul>
    * 
    * <b>Copyright/Copyleft</b>:<br>
@@ -149,10 +145,8 @@ public interface GralTable_ifc<UserData> extends GralWidget_ifc
   
   /**Inserts a line in the table with given content.
    * @param key The key to get it.
-   * @param row The row where the line should be inserted before. 0 - insert on top. 
-   *        negative or Integer.MAXINT or number greater as number of rows: append on end.
    * @param cellTexts texts of the cells. May be null.
-   * @param userData data assigned to the line, able to get with {@link GralTableLine_ifc#getUserData()}.
+   * @param userData data assigned to the line, maybe null, able to get with {@link GralTableLine_ifc#getUserData()}.
    * @return instance to add info.
    * @see {@link GralTableLine_ifc} to add content.
    */

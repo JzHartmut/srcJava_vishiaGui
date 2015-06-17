@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -175,6 +176,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   
   InspcViewTargetComm viewTargetComm;
   
+  /**This plugged application for the inspector manager. */  
+  InspcPlugUser inspcMngUser;
+  
   public GralColorSelector colorSelector;
   
   private final FileCluster fileCluster = FileRemote.clusterOfApplication;
@@ -182,6 +186,10 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   InspcGui(CallingArguments cargs, GralArea9MainCmd cmdgui)
   {
     guiCfg = new InspcGuiCfg(cargs, cmdgui, userInspcPlug);
+    
+    for(Map.Entry<String, String> entry: cargs.indexTargetIpcAddr.entrySet()){
+      windCtrlStatus.addTarget(entry.getKey(), entry.getValue());
+    }
     
 
     LogMessage log = cmdgui.getLogMessageOutputConsole();
@@ -194,11 +202,12 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     */
     GralPlugUser_ifc user = guiCfg.getPluggedUser(); 
     assert(user == null || user instanceof InspcPlugUser_ifc);
+    inspcMngUser = new InspcPlugUser((InspcPlugUser_ifc)user);
     if(cargs.sOwnIpcAddr ==null){
       System.err.println("arg ownIpc missing");
       System.exit(255);
     }
-    InspcMng variableMng = new InspcMng(cargs.sOwnIpcAddr, cargs.indexTargetIpcAddr, cargs.bUseGetValueByIndex, (InspcPlugUser_ifc)user);
+    InspcMng variableMng = new InspcMng(cargs.sOwnIpcAddr, cargs.indexTargetIpcAddr, cargs.bUseGetValueByIndex, inspcMngUser);
     composites.add(variableMng);
     this.inspcMng = variableMng;
     (new GralShowMethods(variableMng)).registerShowMethods(cmdgui.gralMng);
@@ -547,5 +556,36 @@ private class InspcGuiCfg extends GuiCfg
   } //class UserInspcPlug
 
 
+  
+  
+  private class InspcPlugUser implements InspcPlugUser_ifc
+  {
+
+    /**Cascaded user. */
+    final InspcPlugUser_ifc user1;
+    
+    InspcPlugUser(InspcPlugUser_ifc user){
+      user1 = user;
+    }
+    
+    @Override public void showStateInfo(String key, TargetState state){
+      InspcGui.this.windCtrlStatus.setStateInfo(key,state);
+    }  
+
+    
+    @Override public void setInspcComm(InspcMng inspcMng)
+    { if(user1 !=null) { user1.setInspcComm(inspcMng); }
+    }
+
+    @Override public void requData(int ident)
+    { if(user1 !=null) { user1.requData(ident); }
+    }
+
+    @Override public void isSent(int seqnr)
+    { if(user1 !=null) { user1.isSent(seqnr); }
+    }
+    
+  }
+  
   
 }

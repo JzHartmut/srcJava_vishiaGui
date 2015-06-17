@@ -4,9 +4,12 @@ import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.inspcPC.mng.InspcPlugUser_ifc;
 
 /**This class contains some status and control widgets for the Inspector Gui
  * @author Hartmut Schorrig
@@ -57,13 +60,17 @@ public class InspcGuiCtrlStatus
   private final GralTable<Object> widgTable;
 
 
+  private GralColor colorInactive = GralColor.getColor("wh")
+                  , colorIdle = GralColor.getColor("gn")
+                  , colorWait = GralColor.getColor("red")
+                  , color2 = GralColor.getColor("or");
+
+  
   public InspcGuiCtrlStatus()
   { //inspcMng.addUserOrder(this);  //invoke run in any communication step.
-    this.wind = new GralWindow("@primaryWindow,-21..0,-40..0", "InspcCtrlStatusWind", "Fields of ...", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
-    this.widgTable = new GralTable<Object>("@InspcCtrlStatusWind,2..0,0..0", "InspcFieldTable", new int[]{2, 0});
+    this.wind = new GralWindow("@primaryWindow,-21..0,-40..0", "InspcCtrlStatusWind", "State of targets", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
+    this.widgTable = new GralTable<Object>("@InspcCtrlStatusWind,2..0,0..0", "TargetTable", new int[]{2, 0});
     //this.widgTable.setColumnEditable(2, true);
-    //this.widgTable.setActionChange(this.actionChgTable);
-    //this.widgTable.specifyActionOnLineSelected(actionLineSelected);
     this.widgTable.setHtmlHelp("HelpInspc.html#Topic.HelpInspc.ctrlStatus.");
   }
   
@@ -87,5 +94,26 @@ public class InspcGuiCtrlStatus
       return true;
     }
   };
+  
+  
+  public void addTarget(String key, String info){
+    GralTableLine_ifc<Object> line = widgTable.addLine(key, null, null);
+    line.setCellText(key + "@" + info, 1);
+  }
+
+  
+  
+  public void setStateInfo(String key, InspcPlugUser_ifc.TargetState state){
+    GralColor color;
+    switch(state) {
+      case idle: color = colorIdle; break;
+      case inactive: color = colorInactive; break;
+      case waitReceive: color = colorWait; break;
+      case receive: color = color2; break;
+      default: color = color2;
+    }
+    GralTableLine_ifc<Object> line = widgTable.getLine(key);
+    line.setBackColor(color, 0);
+  }
   
 }
