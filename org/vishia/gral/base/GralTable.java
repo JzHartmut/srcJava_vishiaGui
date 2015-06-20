@@ -89,6 +89,8 @@ import org.vishia.util.TreeNode_ifc;
 
   /**Version, history and license.
    * <ul>
+   * <li>2015-06-21 Hartmut chg: Implementation of {@link TableLineData#setBackColor(GralColor, int}} 
+   *   now regards the ix-argument as cell index, like defined in comment.
    * <li>2015-05-31 Hartmut chg: {@link GraphicImplAccess#processKeys(int}} updates the cell text in the line firstly
    *  if it is an editing cell. It helps to get the correct text in the graphic thread.  
    * <li>2014-12-26 Hartmut chg: {@link #colorBackSelectSomeMarked} etc.  
@@ -1315,10 +1317,12 @@ import org.vishia.util.TreeNode_ifc;
     }
   }
   
-  
+  /**Only used on invocation of {@link GraphicImplAccess#drawCellContent}. It is not defined there but here because it is static. */
   public final static class LinePresentation
   {
     public GralColor colorBack, colorText;
+    
+    public GralColor[] cellsColorBack;
   }
   
   
@@ -1691,8 +1695,8 @@ import org.vishia.util.TreeNode_ifc;
           linePresentation.colorBack = line !=null && line.colorBackground !=null ? line.colorBackground : outer.dyda.backColor;
         }
       }
-      linePresentation.colorText = line !=null && line.colorForground !=null ? line.colorForground : outer.dyda.textColor;
-      
+      linePresentation.colorText = line !=null && line.colorForeground !=null ? line.colorForeground : outer.dyda.textColor;
+      linePresentation.cellsColorBack = line !=null ? line.cellColorBack : null; //maybe null or can contain null elements.
     }
     
 
@@ -1894,7 +1898,9 @@ import org.vishia.util.TreeNode_ifc;
   }
 
   
-  /**This class is only a definition of the typed TreeNodeBase without additonal features. */
+  /**This class is the super class of {@link TableLineData} which presents a line as a node in a tree. 
+   * Therefore it implements the {@link TreeNodeBase} interface. A line as parent node can be presented folded (default)
+   * or unfolded in several levels to present a tree instead a simple table. */
   public class NodeTableLine 
   extends TreeNodeBase<TableLineData, UserData, GralTableLine_ifc<UserData>>
   {
@@ -2062,10 +2068,18 @@ import org.vishia.util.TreeNode_ifc;
   }
   
   
-  /**An instance of this class is assigned to any TableItem.
-   * It supports the access to the TableItem (it is a table line) via the SWT-independent interface.
-   * The instance knows its TableSwt and therefore the supports the access to the whole table.
-   *
+  /**An instance of this class presents a line in a table or a node or leaf in a tree.
+   * It is not associated with a graphical representation primary, it is a container element only.
+   * The graphical representation refers this class.
+   * A table line contains:
+   * <ul>
+   * <li>Association to user data for application usage, unused in graphic: {@link TreeNodeBase#data}
+   * <li>Texts for all cells of the table: {@link TableLineData#cellTexts}
+   * <li>background and text color for the line (all cells) {@link TableLineData#colorBackground}, {@link TableLineData#colorForeground}
+   * <li>Maybe background colors for all or some cells, null if the cell have the line back color
+   * <li>Information about marking: {@link TableLineData#markMask}
+   * <li>Information whether the line was changed (any cell): {@link TableLineData#bChanged}.  
+   * </ul>
    */
   public final class TableLineData
   extends NodeTableLine 
@@ -2075,13 +2089,6 @@ import org.vishia.util.TreeNode_ifc;
     SelectMask markMask;
     
     
-    /**Lines of a children, a tree structure. null for a non-treed table.
-     * null it the children are unknown or there are not children.
-     */
-    //protected ArrayList<TableLineData> childLines;
-    
-    //protected TableLineData parentLine;
-
     /**If a repaint is necessary, it is changed by increment by 1. If the redraw is executed
      * and no other redraw is requested, it is set to 0. If another redraw is requested while the
      * redraw runs but isn't finished, it should be executed a second time. Therefore it isn't reset to 0. 
@@ -2089,6 +2096,12 @@ import org.vishia.util.TreeNode_ifc;
     public AtomicInteger ctRepaintLine = new AtomicInteger();  //NOTE should be public to see it from derived outer class
     
     public String[] cellTexts;
+
+    /**If not null, then a special background color for the cell. Elsewhere the cell will be shown in the {@link #colorBackground} of the line
+     * or the {@link GralTable#colorBackMarked} etc. of the table.
+     * 
+     */
+    public GralColor[] cellColorBack;
     
     /**A line may have its datapath adequate a {@link GralWidget}, only used for
      * {@link #getDataPath()} and {@link #setDataPath(String)}.
@@ -2098,7 +2111,7 @@ import org.vishia.util.TreeNode_ifc;
     /**True if any of a cell text was changed. */
     protected boolean bChanged;
     
-    public GralColor colorForground, colorBackground;
+    public GralColor colorForeground, colorBackground;
     
     //protected UserData userData;
     
@@ -2244,22 +2257,28 @@ import org.vishia.util.TreeNode_ifc;
     }
 
     @Override public GralColor setForegroundColor(GralColor color) {
-      GralColor ret = colorForground;
-      colorForground = color;
+      GralColor ret = colorForeground;
+      colorForeground = color;
       repaint(50, 50);
       return ret;
     }
 
     
     /**Sets the background color of the whole line or one cell.
-     * @param ix -1 for the whole line, >=0 for one cell. (TODO)
+     * @param ix -1 for the whole line, >=0 for one cell.
      */
     @Override public void setBackColor(GralColor color, int ix)
     { 
       if(color.getColorName().equals("pma"))
         Assert.stop();
-      colorBackground = color;
-      repaint(50, 50);
+      if(ix <0){
+        colorBackground = color;
+      } else {
+        if(ix >= cellTexts.length) throw new IndexOutOfBoundsException("faulty index " + ix);
+        if(cellColorBack == null){ cellColorBack = new GralColor[cellTexts.length]; }
+        cellColorBack[ix] = color;
+      }
+      repaint();
     }
     
     @Override public GralColor getBackColor(int ix)
@@ -2271,13 +2290,13 @@ import org.vishia.util.TreeNode_ifc;
 
     @Override public void setLineColor(GralColor color, int ix)
     { 
-      colorForground = color;
+      colorForeground = color;
       repaint(50, 50);
     }
 
     @Override public void setTextColor(GralColor color)
     { 
-      colorForground = color;
+      colorForeground = color;
       repaint(50, 50);
     }
 
@@ -2446,11 +2465,11 @@ import org.vishia.util.TreeNode_ifc;
    * 
    * </pre>
    * 
-   * Note: The class is visible only in the graphic implementation layer, because it is protected.
-   * The elements need to set public because there are not visible elsewhere in the derived class
-   * of the outer class. 
+   * Note: The class should be used  only in the graphic implementation layer. It is public only to allow access from several implementations.
+   * It is not public to offer it for applications.
    */
-  public static class CellData{
+  public static class CellData
+  {
     
     /**The row and column in the graphical presentation. With the information about the row, the
      * associated {@link TableLineData} can be found via the {@link GralTable#linesForCell}. */
@@ -2458,7 +2477,7 @@ import org.vishia.util.TreeNode_ifc;
     
     /**The color in the graphical presentation. It is the color of the text field. 
      * Note that the color of the text field is only changed if this colors and the 
-     * {@link TableLineData#colorBackground} and {@link TableLineData#colorForground} are different. 
+     * {@link TableLineData#colorBackground} and {@link TableLineData#colorForeground} are different. 
      * It saves some calculation time if the color of the text field is set only if it is necessary. */
     public GralColor colorBack, colorText;
     

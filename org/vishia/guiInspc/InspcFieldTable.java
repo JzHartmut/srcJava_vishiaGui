@@ -14,6 +14,7 @@ import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -85,7 +86,9 @@ import org.vishia.util.KeyCode;
 public class InspcFieldTable
 {
   /**Version, history and license.
-   * <ul>2015-05-29 requests a new value only if the current is older than 5 seconds.
+   * <ul>
+   * <li>2015-06-21 requests a new value if the older is older than 1 second, fast refresh
+   * <li>2015-05-29 requests a new value only if the current is older than 5 seconds.
    * <li>2014-01-05 indexSelection
    * <li>2013-12-18 Created.
    * </ul>
@@ -167,7 +170,7 @@ public class InspcFieldTable
   private final GralTable<InspcStruct.FieldOfStruct> widgTable;
 
   
-  private final GralButton btnBack, btnRefresh, btnShowAll, btnSetValue;
+  private final GralButton btnBack, btnRefresh, btnShowAll, btnSetValue, btnRepeat;
   
   /**Aggregation. To get variable, send requests etc. */
   private final InspcMng inspcMng;
@@ -213,6 +216,8 @@ public class InspcFieldTable
     this.btnRefresh = new GralButton("@InspcFieldRefresh", "refresh", actionRefresh);
     this.btnShowAll = new GralButton("@InspcFieldShowAll", "show all", actionShowAll);
     this.btnSetValue = new GralButton("@InspcFieldSetValue", "set values", actionSetValues);
+    this.btnRepeat = new GralButton("@InspcFieldSetValue", "repeat", null);
+    this.btnRepeat.setSwitchMode(GralColor.getColor("gn"), GralColor.getColor("wh"), null);
     this.inspcMng = inspcMng;
   }
   
@@ -227,9 +232,11 @@ public class InspcFieldTable
     widgTable.setToPanel(mng);
     mng.setPosition(-2, 0, 0, 7, 0, 'd');
     btnRefresh.setToPanel(mng);
-    mng.setPosition(-2, 0, sizeName, sizeName + 12, 0, 'r');
+    mng.setPosition(-2, 0, sizeName, sizeName + 12, 1, 'r');
     btnSetValue.setToPanel(mng);
-    mng.setPosition(-2, 0, sizeName + 13, sizeName + 23, 0, 'r');
+    //mng.setPosition(-2, 0, sizeName+13, sizeName + 23, 0, 'r');
+    btnRepeat.setToPanel(mng);
+    //mng.setPosition(-2, 0, sizeName + 13, sizeName + 23, 0, 'r');
     btnShowAll.setToPanel(mng);
   }
   
@@ -353,8 +360,9 @@ public class InspcFieldTable
         int dtime = (int)(time - timelast);
         if(timelast == 0 || dtime > 5000){ //10 sec
           sVal = "? " + sVal;
-          time = System.currentTimeMillis();
-          if(request){ var.requestValue(time, this.new RunOnReceive(line)); }
+        }
+        if(request && timelast == 0 || dtime > 500){ //10 sec
+          var.requestValue(time, this.new RunOnReceive(line)); 
         }
         line.setCellText(sVal, 2);
       }

@@ -568,8 +568,8 @@ private class InspcGuiCfg extends GuiCfg
       user1 = user;
     }
     
-    @Override public void showStateInfo(String key, TargetState state){
-      InspcGui.this.windCtrlStatus.setStateInfo(key,state);
+    @Override public void showStateInfo(String key, TargetState state, int count){
+      InspcGui.this.windCtrlStatus.setStateInfo(key,state, count);
     }  
 
     

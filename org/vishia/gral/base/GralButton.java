@@ -11,6 +11,8 @@ public class GralButton extends GralWidget
 {
   /**Version, history and license.
    * <ul>
+   * <li>2015-06-21 Hartmut chg: {@link #setSwitchMode(GralColor, GralColor, GralColor)} with null as 3. color
+   *   sets to 2-times switch like {@link #setSwitchMode(GralColor, GralColor)}. 
    * <li>2015-05-31 Hartmut new: Now a key listener and a traverse listener was added for the SWT implementation.
    *   This base class provides the {@link #activate()} method which should be invoked on ENTER-key.
    * <li>2013-12-22 Hartmut chg: Now {@link GralButton} uses the new concept of instantiation: It is not
@@ -158,7 +160,7 @@ public class GralButton extends GralWidget
     this.colorBackOn = colorOn;
     dyda.backColor = colorOff;
     this.colorBackDisabled = colorDisabled;
-    bThreeStateSwitch = true;
+    bThreeStateSwitch = colorBackDisabled !=null;
     shouldSwitched = true; 
   }
   

@@ -462,11 +462,13 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
           cellSwt.setFocus();
           cellData.bSetFocus = false;
         }
-        if(cellData.colorBack != linePresentationP.colorBack){
+        GralColor colorBackCell = linePresentationP.cellsColorBack !=null && linePresentationP.cellsColorBack[col] !=null 
+            ? linePresentationP.cellsColorBack[col] : linePresentationP.colorBack;  
+        if(cellData.colorBack != colorBackCell){
           //only change color of the SWT Text field if it is necessary, comparison set color with cellData.color.
-          Color colorSwt =  swtWidgHelper.mng.getColorImpl(linePresentationP.colorBack);
+          Color colorSwt =  swtWidgHelper.mng.getColorImpl(colorBackCell);
           cellSwt.setBackground(colorSwt);
-          cellData.colorBack = linePresentationP.colorBack;  //for the visible cell swt widget, not for the table line!
+          cellData.colorBack = colorBackCell;  //for the visible cell swt widget, not for the table line!
         }
         if(cellData.colorText != linePresentationP.colorText){
           //only change color of the SWT Text field if it is necessary, comparison set color with cellData.color.

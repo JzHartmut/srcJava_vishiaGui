@@ -194,9 +194,10 @@ public interface GralWidget_ifc extends Removeable
   public abstract GralColor setForegroundColor(GralColor color);
   
   
-  /**Sets the background color for the widget.
+  /**Sets the background color for the widget. It supports widgets with more as one background color by an index.
+   * The usage of the index is widget-specific. An index -1 should mean: All backgrounds. ix=0 means the first background.
    * @param color Any color
-   * @param ix 0 if only one color is supported, 1, ... if the widget has more as one background.
+   * @param ix -1 for non-specific, 0 for the first color or if only one color is supported, 1, ... if the widget has more as one background.
    */
   void setBackColor(GralColor color, int ix);
   

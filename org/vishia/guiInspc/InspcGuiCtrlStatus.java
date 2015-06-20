@@ -61,15 +61,15 @@ public class InspcGuiCtrlStatus
 
 
   private GralColor colorInactive = GralColor.getColor("wh")
-                  , colorIdle = GralColor.getColor("gn")
-                  , colorWait = GralColor.getColor("red")
+                  , colorIdle = GralColor.getColor("lgn")
+                  , colorWait = GralColor.getColor("lrd")
                   , color2 = GralColor.getColor("or");
 
   
   public InspcGuiCtrlStatus()
   { //inspcMng.addUserOrder(this);  //invoke run in any communication step.
     this.wind = new GralWindow("@primaryWindow,-21..0,-40..0", "InspcCtrlStatusWind", "State of targets", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
-    this.widgTable = new GralTable<Object>("@InspcCtrlStatusWind,2..0,0..0", "TargetTable", new int[]{2, 0});
+    this.widgTable = new GralTable<Object>("@InspcCtrlStatusWind,2..0,0..0", "TargetTable", new int[]{3, 0});
     //this.widgTable.setColumnEditable(2, true);
     this.widgTable.setHtmlHelp("HelpInspc.html#Topic.HelpInspc.ctrlStatus.");
   }
@@ -103,7 +103,7 @@ public class InspcGuiCtrlStatus
 
   
   
-  public void setStateInfo(String key, InspcPlugUser_ifc.TargetState state){
+  public void setStateInfo(String key, InspcPlugUser_ifc.TargetState state, int count){
     GralColor color;
     switch(state) {
       case idle: color = colorIdle; break;
@@ -113,6 +113,9 @@ public class InspcGuiCtrlStatus
       default: color = color2;
     }
     GralTableLine_ifc<Object> line = widgTable.getLine(key);
+    final String[] s1 = {" |", " /", "---", " \\"};
+    //line.setCellText(s1[count & 3], 0);
+    line.setCellText(Integer.toHexString(count & 0xff), 0);
     line.setBackColor(color, 0);
   }
   
