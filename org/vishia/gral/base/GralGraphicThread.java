@@ -173,6 +173,8 @@ public class GralGraphicThread implements Runnable
   protected long graphicThreadId;
 
   
+  boolean debugPrint = false;
+  
   protected boolean isWakedUpOnly;
   
   /**True if the startup of the main window is done and the main window is visible. */
@@ -299,53 +301,7 @@ public class GralGraphicThread implements Runnable
     checkTimes.adjust();
     checkTimes.cyclTime();
     while (!bExit) {
-      boolean bContinueDispatch;
-      do{
-        try{ bContinueDispatch = impl.dispatchOsEvents();
-        /*  
-        try {
-            Thread.sleep(10);
-          } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-          }*/
-        }
-        catch(Throwable exc){
-          System.out.println(exc.getMessage());
-          exc.printStackTrace(System.out);
-          bContinueDispatch = true; //false;
-        }
-        //isWakedUpOnly = false;  //after 1 event, it may be wakeUp, set if false.
-      } while(bContinueDispatch);
-      checkTimes.calcTime();
-      isWakedUpOnly = false;
-      //System.out.println("dispatched");
-      if(!bExit){
-        if(isWakedUpOnly){
-          Assert.stop();
-        }
-        //it may be waked up by the operation system or by calling Display.wake().
-        //if wakeUp() is called, isWakedUpOnly is set.
-        checkTimes.cyclTime();
-        //execute stored orders.
-        GralGraphicTimeOrder order;
-        boolean bSleep = true;
-        while( (order = queueOrdersToExecute.poll()) !=null) {
-          order.stateOfEvent = 'r';
-          try{ 
-            order.doExecute();  //calls EventIimeOrderBase.doExecute() with enqueue
-          } catch(Throwable exc){
-            CharSequence excText = Assert.exceptionInfo("GralGraphicThread - unexpected Exception; ", exc, 0, 99);
-            System.err.append(excText);  //contains the stack trace in one line, up to 99 levels.
-          }
-          order.relinquish();
-          bSleep = false;
-        }
-        if(bSleep){ //if any order is executed, don't sleep yet because some os events may forced therefore. Dispatch it!
-          //no order executed. It sleeps. An os event which arrives in this time wakes up the graphic thread.
-          impl.graphicThreadSleep();
-        }
-      } 
+      step();
     }
     orderList.close();
     //displaySwt.dispose ();
@@ -353,6 +309,65 @@ public class GralGraphicThread implements Runnable
     //synchronized(this){ notify(); }  //to weak up waiting on configGrafic().
   }
 
+  
+  void step()
+  {
+    boolean bContinueDispatch;
+    int ctOsEvents = 0;
+    do{
+      try{ bContinueDispatch = impl.dispatchOsEvents();
+      /*  
+      try {
+          Thread.sleep(10);
+        } catch (InterruptedException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }*/
+      }
+      catch(Throwable exc){
+        System.out.println(exc.getMessage());
+        exc.printStackTrace(System.out);
+        bContinueDispatch = true; //false;
+      }
+      ctOsEvents +=1;
+      //isWakedUpOnly = false;  //after 1 event, it may be wakeUp, set if false.
+    } while(bContinueDispatch);
+    if(debugPrint){ System.out.println("GralGraphicThread - dispatched os events, " + ctOsEvents); }
+    checkTimes.calcTime();
+    isWakedUpOnly = false;
+    //System.out.println("dispatched");
+    if(!bExit){
+      if(isWakedUpOnly){
+        Assert.stop();
+      }
+      //it may be waked up by the operation system or by calling Display.wake().
+      //if wakeUp() is called, isWakedUpOnly is set.
+      checkTimes.cyclTime();
+      //execute stored orders.
+      GralGraphicTimeOrder order;
+      boolean bSleep = true;
+      int ctOrders = 0;
+      while( (order = queueOrdersToExecute.poll()) !=null) {
+        order.stateOfEvent = 'r';
+        try{ 
+          order.doExecute();  //calls EventIimeOrderBase.doExecute() with enqueue
+        } catch(Throwable exc){
+          CharSequence excText = Assert.exceptionInfo("GralGraphicThread - unexpected Exception; ", exc, 0, 99);
+          System.err.append(excText);  //contains the stack trace in one line, up to 99 levels.
+        }
+        order.relinquish();
+        bSleep = false;
+        ctOrders +=1;
+      }
+      if(debugPrint){ System.out.println("GralGraphicThread - dispatched graphic orders, " + ctOrders); }
+      if(bSleep){ //if any order is executed, don't sleep yet because some os events may forced therefore. Dispatch it!
+        //no order executed. It sleeps. An os event which arrives in this time wakes up the graphic thread.
+        impl.graphicThreadSleep();
+      }
+    }    
+  }
+  
+  
   
   /**This class is used only for the implementation level of the graphic. It is not intent to use
    * by any application. It is public because the implementation level should accesses it.

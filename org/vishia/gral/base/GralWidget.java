@@ -172,6 +172,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2015-06-21 Hartmut bugfix: {@link #setFocus(int, int)} had hanged because while-loop on same window panel for a parent. 
    * <li>2015-01-27 Hartmut new: {@link DynamicData#bTouchedField}, {@link ImplAccess##setTouched()} especially for a text field
    *   if any editing key was received. Then the GUI-operator may mark a text or make an input etc. The setting of the text
    *   from a cyclically thread should be prevented then to prevent disturb the GUI-operation. If the focus was lost then this bit
@@ -1365,15 +1366,20 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   /**Sets the focus to this widget. This method is possible to call in any thread.
    * If it is called in the graphic thread and the delay = 0, then it is executed immediately.
    * Elsewhere the request is stored in the graphic thread execution queue and invoked later.
+   * If the widget is inside a tab of a tabbed panel, the tab is designated as currently therewith.
    * @param delay Delay in ms for invoking the focus request 
    * @param latest 
    */
   public void setFocus(int delay, int latest){
     
     GralPanelContent panel1 = _wdgPos.panel;
-    while(panel1 !=null && panel1.pos() !=null){
+    int catastrophicalCount = 100;
+    while(panel1 !=null && panel1.pos() !=null && --catastrophicalCount >=0){
       GralPanelContent panel2 = panel1.pos().panel;
-      if(panel2 instanceof GralTabbedPanel){
+      if(panel2 == panel1) {
+        panel2 = null; //it may be possible that the parent window is the same as a window. 
+      }
+      if(panel2 instanceof GralTabbedPanel) { //If the panel is a tab of a tabbed panel, focus that tab.
         GralTabbedPanel panelTabbed = (GralTabbedPanel)panel2;
         
         String name = panel1.getName();
