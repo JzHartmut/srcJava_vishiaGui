@@ -483,13 +483,15 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   protected boolean bShouldInitialize = true;
   
   
-  /**Delay to repaint.
+  /**Standard delay to repaint if {@link #repaint()} is called without arguments. 
+   * It delays a few time because an additional process can be occure in a short time, and only one repaint should be invoked.
+   * The repaintDelayMax limits a shifting to the future. See {@link org.vishia.event.EventTimeout}, that is used.
    * 
    */
-  protected int repaintDelay = 100, repaintDelayMax = 100;
+  protected int repaintDelay = 30, repaintDelayMax = 100;
 
   /**The time when the bVisible state was changed. */
-  private long lastTimeSetVisible;
+  long lastTimeSetVisible;
   
   protected long dateUser;
   
@@ -1419,6 +1421,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @see org.vishia.gral.ifc.GralWidget_ifc#repaint()
    */
   @Override public void repaint(){ 
+    //without arguments: latest with repaintDelayMax.
+    repaint(this.repaintDelay, this.repaintDelayMax);
+    /*chg 2015-06-25 it is twice and not complete. An order was delayed in the future always.
     if(itsMng !=null){ //NOTE: set of changes is possible before setToPanel was called. 
       if(itsMng.currThreadIsGraphic()){
         repaintGthread();     //do it immediately if no thread switch is necessary.
@@ -1426,6 +1431,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
         repaintRequ.activateAt(System.currentTimeMillis() + repaintDelay);  //TODO repaintDelayMax
       }
     }
+    */
   }
   
   
