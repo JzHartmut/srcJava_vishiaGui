@@ -1013,8 +1013,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
       if((mark & FileMark.cmpFileDifferences ) !=0){ sDesign = "#"; }
       else if((mark & FileMark.cmpMissingFiles ) !=0){ sDesign = "*"; }  //directory contains more files
       else if((mark & FileMark.cmpAlone ) !=0){ sDesign = "+"; }
-      else if((mark & FileRemote.mCmpContent) !=0){
-        switch(mark & FileRemote.mCmpContent){
+      else if((mark & FileMark.mCmpFile) !=0){
+        switch(mark & FileMark.mCmpFile){
           case FileMark.cmpContentEqual: sDesign = " ";break;
           case FileMark.cmpContentNotEqual: sDesign = "#";break;
           default: sDesign = " ";
