@@ -1369,6 +1369,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * If it is called in the graphic thread and the delay = 0, then it is executed immediately.
    * Elsewhere the request is stored in the graphic thread execution queue and invoked later.
    * If the widget is inside a tab of a tabbed panel, the tab is designated as currently therewith.
+   * That is done in the calling thread because it is a thread safe operation.
+   * 
    * @param delay Delay in ms for invoking the focus request 
    * @param latest 
    */
@@ -1376,10 +1378,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     
     GralPanelContent panel1 = _wdgPos.panel;
     int catastrophicalCount = 100;
-    while(panel1 !=null && panel1.pos() !=null && --catastrophicalCount >=0){
-      GralPanelContent panel2 = panel1.pos().panel;
-      if(panel2 == panel1) {
-        panel2 = null; //it may be possible that the parent window is the same as a window. 
+    while(panel1 !=null && panel1.pos() !=null  //a panel is knwon, it has a parent inside its pos() 
+        && !(panel1 instanceof GralWindow)      //This is not the window itself
+        && --catastrophicalCount >=0){
+      GralPanelContent panel2 = panel1.pos().panel; //
+      if(panel2 == panel1) { //it may be possible that the parent window is the same as a window.
+        panel2 = null;       //then break the loop.
       }
       if(panel2 instanceof GralTabbedPanel) { //If the panel is a tab of a tabbed panel, focus that tab.
         GralTabbedPanel panelTabbed = (GralTabbedPanel)panel2;

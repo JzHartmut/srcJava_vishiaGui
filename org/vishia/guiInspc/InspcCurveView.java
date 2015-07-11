@@ -1,27 +1,17 @@
 package org.vishia.guiInspc;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Writer;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.vishia.byteData.VariableContainer_ifc;
-import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.curves.WriteCurveCsv;
 import org.vishia.curves.WriteCurve_ifc;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralCurveView;
-import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextField;
@@ -39,8 +29,6 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralColorSelector;
 import org.vishia.gral.widget.GralFileSelectWindow;
 import org.vishia.gral.widget.GralColorSelector.SetColorFor;
-import org.vishia.inspcPC.accTarget.InspcAccessExecRxOrder_ifc;
-import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Assert;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
@@ -168,7 +156,7 @@ public final class InspcCurveView
     GralColor colorCurve;
     
     /**This is the rxAction joined with the track directly. Therefore an 'unused reference' here. */
-    @SuppressWarnings("unused")
+    //@SuppressWarnings("unused")
     //CurveCommRxAction rxActionRxValueByPath;
     
     TrackValues(int ix){ this.ix = ix; }
@@ -292,11 +280,14 @@ public final class InspcCurveView
     widgTableVariables.addContextMenuEntryGthread(0, null, "set scale", actionSetScaleValues2Track);
     gralMng.setPosition(/*22*/-19, GralPos.size +3, -8, 0, 0, 'd', 0);
     widgScale = gralMng.addTextField("scale", true, "scale/div", "t");
-    widgScale.setActionFocused(actionFocusScaling);
+    widgScale.setActionFocused(actionFocusScaling);         //store which field, set color
+    widgScale.setActionChange(actionSetScaleValues2Track);  //on enter
     widgScale0 = gralMng.addTextField("scale0", true, "mid", "t");
-    widgScale0.setActionFocused(actionFocusScaling);
+    widgScale0.setActionFocused(actionFocusScaling);        //store which field, set color
+    widgScale0.setActionChange(actionSetScaleValues2Track);  //on enter
     widgline0 = gralMng.addTextField("line0", true, "line-%", "t");
-    widgline0.setActionFocused(actionFocusScaling);
+    widgline0.setActionFocused(actionFocusScaling);         //store which field, set color
+    widgline0.setActionChange(actionSetScaleValues2Track);  //on enter
     gralMng.setPosition(/*32*/-9, GralPos.size +2, -10, GralPos.size +2, 0, 'r', 1);
     /*
     gralMng.setPosition(-23, GralPos.size +1, -10, 0, 0, 'd', 2);
@@ -312,7 +303,7 @@ public final class InspcCurveView
     widgBtnDn = gralMng.addButton("btnDn", actionSetScaleValues2Track, "-", null,  "-");
     widgBtnUp = gralMng.addButton("btnUp", actionSetScaleValues2Track, "+", null, "+");
     gralMng.setPosition(GralPos.same, GralPos.size +2, GralPos.next, GralPos.size +4, 0, 'r', 1);
-    widgBtnScale = gralMng.addButton("btnScale", actionColorSelectorOpen, "!", null,  "color");  
+    gralMng.addButton("btnScale", actionColorSelectorOpen, "!", null,  "color");  
     gralMng.setPosition(/*35*/ -6, GralPos.size +2, -10, GralPos.size +6, 0, 'r', 1);
     widgBtnScale = gralMng.addButton("btnScale", actionSetScaleValues2Track, "!", null,  "set");
     gralMng.setPosition(-22, GralPos.size +3, posright, GralPos.size +11, 0, 'd', 0);
@@ -661,63 +652,118 @@ public final class InspcCurveView
 
   GralUserAction actionSetScaleValues2Track = new GralUserAction("actionSetScaleValues2Track"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
-    { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode) && trackScale !=null){
+    { System.out.println("InspcCurveView - actionSetScaleValues2Track, actioncode = " + Integer.toHexString(actionCode));
+      if( (KeyCode.isControlFunctionMouseUpOrMenu(actionCode) || actionCode == KeyCode.enter) && trackScale !=null){
         boolean setScale = false;
         TrackValues dst;
-        if(widgd.sCmd == null){ //from menu
+        if(actionCode == KeyCode.enter) {
+          dst = trackScale; //TEST
+          setScale = true;
+        }
+        else if(actionCode == KeyCode.menuEntered && widgd.sCmd == null){ //from menu
           GralTable<TrackValues>.TableLineData refline = widgTableVariables.getLineMousePressed();
           dst = refline.getUserData();
           setScale = true;
         } else {
           dst = trackScale;
         }
-        if(widgd.sCmd == "-"){
-          try{
-            String s1 = widgScale.getText();
-            float value = Float.parseFloat(s1);
-            int exp = (int)Math.log10(value);
+        try {
+          String s1 = widgScale.getText();
+          float scale = Float.parseFloat(s1);
+          s1 = widgScale0.getText();
+          float scale0 = Float.parseFloat(s1);
+          s1 = widgline0.getText();
+          int line0 = (int)Float.parseFloat(s1);
+          String sNameScalingWidgd = null;
+          if(widgd.sCmd != null && widgd.sCmd != "!") { //not for set cmd
+            sNameScalingWidgd = scalingWidg.getName();
+          }
+          float[] fixScales = {7.5f, 6.0f, 5.0f, 4.0f, 3.0f, 2.5f, 2.0f, 1.75f, 1.5f, 1.25f, 1.0f};
+          if(widgd.sCmd == "+" && sNameScalingWidgd.equals("scale")){ ////
+            float value = scale;
+            float exp1 = (float)Math.log10(value);
+            float exp = (float)Math.floor(exp1); //-1.0f; 
             float base = (float)Math.pow(10.0, exp);
-            value = value/2;
+            float unit = value/base;  //1.0 till 9.999
+            if(unit < 1.01f) {
+              unit = fixScales[0]; base /= 10.0f;
+            } else {
+              for(int ii = 0; ii < fixScales.length; ++ii){
+                if(unit > fixScales[ii]){ unit = fixScales[ii];  break; }
+            } }
+            scale = value = unit * base;;
             s1 = Float.toString(value);
             widgScale.setText(s1);
             setScale = true;
-          } catch(NumberFormatException exc){
-            widgScale.setBackColor(GralColor.getColor("lrd"),0);
           }
-        }
-        else if(widgd.sCmd == "+"){
-          try{
-            String s1 = widgScale.getText();
-            float value = Float.parseFloat(s1);
-            int exp = (int)Math.log10(value);
+          else if(widgd.sCmd == "-" && sNameScalingWidgd.equals("scale")){
+            float exp1 = (float)Math.log10(1.01f * scale); //regard rounding effect, 0.1 may be presented by 0.0999999
+            float exp = (float)Math.floor(exp1); //-1.0f; 
             float base = (float)Math.pow(10.0, exp);
-            value = value*2;
-            s1 = Float.toString(value);
+            float unit = scale / base;  //1.0 till 9.999
+            if(unit >= 0.99f * fixScales[0]) {
+              unit = 1.0f; base *= 10.0f;
+            } else {
+              for(int ii = fixScales.length-1; ii >=0; --ii){
+                if(unit < 0.98f * fixScales[ii]){ unit = fixScales[ii];  break; }
+            } }
+            //scale = value = value*2;
+            scale = unit * base;;
+            s1 = Float.toString(scale);
             widgScale.setText(s1);
             setScale = true;
-          } catch(NumberFormatException exc){
-            widgScale.setBackColor(GralColor.getColor("lrd"),0);
           }
-        }
-        else if(dst !=null && (  setScale   //maybe cmd '+' or '-', maybe menu 
-                               || widgd.sCmd == "!"  //set key
-                )              ){  
-          try{
-            String s1 = widgScale.getText();
-            float scale = Float.parseFloat(s1);
-            s1 = widgScale0.getText();
-            float scale0 = Float.parseFloat(s1);
-            s1 = widgline0.getText();
-            int line0 = (int)Float.parseFloat(s1);
+          else if(widgd.sCmd == "-" && sNameScalingWidgd.equals("scale0")){
+            if(scale0 >0 && scale0 < scale) {
+              scale0 = 0;  //trap the 0.0
+            } else {
+              scale0 -= scale;
+            }
+            s1 = Float.toString(scale0);
+            widgScale0.setText(s1);
+            setScale = true;
+          }
+          else if(widgd.sCmd == "+" && sNameScalingWidgd.equals("scale0")){
+            if(scale0 <0 && scale0 > -scale) {
+              scale0 = 0;  //trap the 0.0
+            } else {
+              scale0 += scale;
+            }
+            s1 = Float.toString(scale0);
+            widgScale0.setText(s1);
+            setScale = true;
+          }
+          else if(widgd.sCmd == "-" && sNameScalingWidgd.equals("line0")){
+            if(line0 >= 5.0f) { 
+              line0 -= 5.0f;
+              s1 = Float.toString(line0);
+              widgline0.setText(s1);
+              setScale = true;
+            }
+          }
+          else if(widgd.sCmd == "+" && sNameScalingWidgd.equals("line0")){
+            if(line0 < 95.0f) { 
+              line0 += 5.0f;
+              s1 = Float.toString(line0);
+              widgline0.setText(s1);
+              setScale = true;
+            }
+          }
+
+          //set the scale.
+          if(dst !=null && (  setScale   //maybe cmd '+' or '-', maybe menu 
+                           || widgd.sCmd == "!"  //set key
+                  )        ) {  
             //widgCurve.setMinMax(trackScale.scale, -trackScale.scale);
             if(dst.trackView == null){
               dst.trackView = widgCurve.initTrack(sName, null, trackScale.colorCurve, 0, 50, 5000.0f, 0.0f);
             }
+            widgCurve.repaint(500,500);
             dst.trackView.setTrackScale(scale, scale0, line0);
-            widgBtnScale.setLineColor(GralColor.getColor("lgn"),0);
-          } catch(NumberFormatException exc){
-            widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
+            widgBtnScale.setTextColor(GralColor.getColor("lgn"));
           }
+        } catch(NumberFormatException exc){
+          widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
         }
       }
       return true;
