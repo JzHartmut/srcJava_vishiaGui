@@ -47,6 +47,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   /**Version, history and license.
    * <ul>
+   * <li>2015-07-12 Hartmut new: {@link Track#setVisible(int)} to control the visibility of tracks.
+   * <li>2015-07-12 Hartmut new: {@link Track#groupTrackScale(GralCurveViewTrack_ifc)} for groups of tracks with same scaling.
    * <li>2014-05-20 Hartmut new in {@link #setSample(float[], int)}: write a point only if at least one variable was refreshed.
    * <li>2014-03-14 Hartmut new: {@link CommonCurve#timeVariable} for time from target. 
    * <li>2014-02-03 Hartmut new: {@link CommonCurve#bFreeze}: freeze as common property of more as one GralCurveView. Constructor argument.
@@ -183,6 +185,37 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   }
   
   final ZbnfSetCurve zbnfSetCurve = new ZbnfSetCurve();
+
+  
+  /**Instances of this class contain the scaling for one ore more tracks. 
+   * One instance if referenced from maybe one or more as one track.
+   */
+  protected static class TrackScale
+  {
+    /**The scale for 10 percent of view without zoom.. */
+    public float yScale;
+    
+    /**The value of input data which is shown at the 0-line. */
+    public float yOffset;
+    
+    //public float yFactor;
+    
+    /**The percent from 0..100 where the 0-line is presented. */
+    public int y0Line;
+    
+    
+    @Override public TrackScale clone(){ 
+      try{ return (TrackScale)super.clone(); }
+      catch(CloneNotSupportedException exc){
+        TrackScale ret = new TrackScale();
+        ret.yScale = this.yScale;
+        ret.yOffset = this.yOffset;
+        ret.y0Line = this.y0Line;
+        return ret;
+      }
+    }
+  }
+  
   
   /**The describing and the actual data of one track (one curve)
    */
@@ -211,16 +244,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     
     public float min, max;
     
-    /**The scale for 10 percent of view without zoom.. */
-    public float yScale;
-    
-    /**The value of input data which is shown at the 0-line. */
-    public float yOffset;
-    
-    //public float yFactor;
-    
-    /**The percent from 0..100 where the 0-line is presented. */
-    public int y0Line;
+    /**Reference to the scaling to show the track. More as one track can build a scale group 
+     * which refers the same instance. */
+    public TrackScale scale;
     
     /**The color of the line. */
     public GralColor lineColor;
@@ -228,6 +254,11 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     /**The brightness of the line. It is used to show the selected line. */
     public int lineWidth = 1;
     
+    
+    /**The state to show. 0=hidden, don't show, but the values are stored.
+     * 1= show normal. 2= show lifted out (selected).
+     */
+    public int showSelected = 1;
     //public float y0Pix;
     
     /**Array stores the last values which are able to show. */
@@ -279,11 +310,11 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       this.min = minValue; this.max = maxValue;
     }
 
-    @Override public int getLinePercent(){ return y0Line; }
+    @Override public int getLinePercent(){ return scale.y0Line; }
    
-    @Override public float getOffset(){ return yOffset; }
+    @Override public float getOffset(){ return scale.yOffset; }
     
-    @Override public float getScale7div(){ return yScale;  }
+    @Override public float getScale7div(){ return scale.yScale;  }
 
     @Override public GralColor getLineColor(){ return lineColor; }
 
@@ -295,11 +326,28 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
      * @param line0 percent of 0-line in graphic.
      */
     public void setTrackScale(float scale7div, float offset, int line0){
-      yScale = scale7div;
-      yOffset = offset;
-      y0Line = line0;
+      scale.yScale = scale7div;
+      scale.yOffset = offset;
+      scale.y0Line = line0;
     }
 
+    
+    /**Sets the scaling to sharing with another track. Changing one of this tracks with 
+     * {@link #setTrackScale(float, float, int)} influences all shared tracks immediately.
+     * All shared tracks refer the same instance of {@link TrackScale}.
+     * @param from
+     */
+    @Override public void groupTrackScale(GralCurveViewTrack_ifc from){ scale = ((Track)from).scale; }
+    
+    @Override public boolean isGroupedTrackScale(GralCurveViewTrack_ifc with){ 
+      return scale == ((Track)with).scale;
+    }
+    
+    /**Sets the scaling to a own instance of {@link TrackScale}. The track is independent now. */
+    @Override public void ungroupTrackScale(){
+      TrackScale oldScale = this.scale;
+      this.scale = oldScale.clone();
+    }
     
     @Override public float getValueCursorLeft(){ return getValueCursor(outer.xpCursor1); }
     
@@ -338,6 +386,13 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       lineWidth = width;
     }
 
+    @Override public void setVisible(int mode){ showSelected = mode; }
+    
+    @Override public int getVisible(){ return showSelected; }
+    
+    
+    
+    
     @Override public void setText(CharSequence text){
       System.err.println("GralCurveView - setText not supported; Widget = " + name + "; text=" + text);
     }
@@ -838,14 +893,15 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   {
     Track track = new Track(this, sNameTrack, listTracks.size());
     track.values = new float[this.maxNrofXValues];
+    track.scale = new TrackScale();
     listTracks.add(track);
     listTrackSet.add(track);
     //listDataPaths.add(sDataPath);
     track.sDataPath =sDataPath;
     track.variable = null;
-    track.y0Line = nullLine;
-    track.yOffset = offset;
-    track.yScale = scale;
+    track.scale.y0Line = nullLine;
+    track.scale.yOffset = offset;
+    track.scale.yScale = scale;
     //yScale[ixLineInit] = scale;
     track.lineColor = color;
     bNewGetVariables = true;  //to force re-read of all variables.
@@ -1273,9 +1329,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
           out.append("track ").append(track.name).append(":");
           out.append(" datapath=").append(track.sDataPath);
           out.append(", color=").append(track.lineColor.toString());
-          out.append(", scale=").append(Float.toString(track.yScale) );
-          out.append(", offset=").append(Float.toString(track.yOffset));
-          out.append(", 0-line-percent=").append(Integer.toString(track.y0Line));
+          out.append(", scale=").append(Float.toString(track.scale.yScale) );
+          out.append(", offset=").append(Float.toString(track.scale.yOffset));
+          out.append(", 0-line-percent=").append(Integer.toString(track.scale.y0Line));
           out.append(";\n");
         } catch(IOException exc){
           System.err.println("GralCurveView.writeSettings() - unexpected IOException;" + exc.getMessage());
@@ -1554,10 +1610,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     ctLastSelected +=1;
     for(Track track: listTracks){  //NOTE: break inside.
       float val = track.values[ixData];
-      float yFactor = ysize / -10.0F / track.yScale;  //y-scaling
-      float y0Pix = (1.0F - track.y0Line/100.0F) * ysize; //y0-line
+      float yFactor = ysize / -10.0F / track.scale.yScale;  //y-scaling
+      float y0Pix = (1.0F - track.scale.y0Line/100.0F) * ysize; //y0-line
       
-      int yp = (int)((val - track.yOffset) * yFactor + y0Pix);
+      int yp = (int)((val - track.scale.yOffset) * yFactor + y0Pix);
       int diff = Math.abs(yp - ypos);
       int diffLastSelected = ctLastSelected - track.identLastSelect;
       if(diff < minFound && diffLastSelected > maxDiffLastSelected){

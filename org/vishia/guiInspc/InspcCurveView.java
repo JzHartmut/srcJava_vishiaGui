@@ -39,6 +39,10 @@ public final class InspcCurveView
 
   /**Version, history and license. 
    * <ul>
+   * <li>2015-07-12 Hartmut new: switch on and off for curves. 
+   * <li>2015-07-12 Hartmut new: Better usability for scaling. [+] and [-] - Buttons works correctly. 
+   *   Enter in field for scaling values has an effect immediately. 
+   *   Support for more as one track with the same scaling.  
    * <li>2013-05-19 Hartmut new: {@link #actionTrackSelected} with ctrl and left mouse pressed
    * <li>2013-05-15 Hartmut new: Presentation of value on cursor
    * <li>2013-05-14 Hartmut chg: 12 Tracks instead 10. A variableWindowSize cause problems (TODO)
@@ -174,6 +178,18 @@ public final class InspcCurveView
 
   final GralColor colorBlack = GralColor.getColor("bk");
   
+  GralColor colorTrackSameScale = GralColor.getColor("pgn");
+
+  GralColor colorTrackSameScaleSelected = GralColor.getColor("lgn");
+  
+  GralColor colorTrackOtherScaleSelected = GralColor.getColor("lam");
+  
+  GralColor colorTrackOtherScale = GralColor.getColor("wh");
+  
+  GralColor colorTrackNotShown = GralColor.getColor("lgr");
+
+  GralColor colorTrackNotShownSelected = GralColor.getColor("gr");
+  
   GralTable<TrackValues> widgTableVariables;
   
   GralTextField widgScale, widgScale0, widgline0;
@@ -181,7 +197,7 @@ public final class InspcCurveView
   /**The one of {@link #widgScale0}, {@link #widgScale0} or {@link #widgline0} which was focused lastly.
    * To use for [+] and [-] button.
    */
-  GralTextField scalingWidg = widgScale;
+  GralTextField scalingWidg;
   
   GralTextField widgValCursorLeft, widgValCursorRight; ///
   
@@ -213,6 +229,8 @@ public final class InspcCurveView
   
   /**Common ColorSelector for all curve views. */
   GralColorSelector colorSelector;
+  
+  
   
   //final InspcGuiComm comm;
   
@@ -271,17 +289,21 @@ public final class InspcCurveView
     widgTableVariables.setColumnEditable(0, true);
     widgTableVariables.setToPanel(gralMng);
     widgTableVariables.specifyActionOnLineSelected(actionSelectVariableInTable);
-    widgTableVariables.setActionChange(actionEnterDatapath);
+    widgTableVariables.setActionChange(actionKeyHandlingTable);
+    //widgTableVariables.set
+    widgTableVariables.addContextMenuEntryGthread(0, null, "switch on-off <F2>", actionOnOffTrack);
     widgTableVariables.addContextMenuEntryGthread(0, null, "insert variable", actionInsertVariable);
     widgTableVariables.addContextMenuEntryGthread(0, null, "replace variable", actionReplaceVariable);
     widgTableVariables.addContextMenuEntryGthread(0, null, "swap variable", actionSwapVariable);
     widgTableVariables.addContextMenuEntryGthread(0, null, "shift variable", actionShiftVariable);
     widgTableVariables.addContextMenuEntryGthread(0, null, "set color", actionColorSelectorOpen);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "set scale", actionSetScaleValues2Track);
+    widgTableVariables.addContextMenuEntryGthread(0, null, "group scale", actionShareScale);
+    widgTableVariables.addContextMenuEntryGthread(0, null, "ungroup scale", actionUnshareScale);
     gralMng.setPosition(/*22*/-19, GralPos.size +3, -8, 0, 0, 'd', 0);
     widgScale = gralMng.addTextField("scale", true, "scale/div", "t");
     widgScale.setActionFocused(actionFocusScaling);         //store which field, set color
     widgScale.setActionChange(actionSetScaleValues2Track);  //on enter
+    scalingWidg = widgScale;  //set which is focused
     widgScale0 = gralMng.addTextField("scale0", true, "mid", "t");
     widgScale0.setActionFocused(actionFocusScaling);        //store which field, set color
     widgScale0.setActionChange(actionSetScaleValues2Track);  //on enter
@@ -500,7 +522,7 @@ public final class InspcCurveView
 
   
   GralUserAction actionOpenWindow = new GralUserAction("actionOpenWindow"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { windCurve.setWindowVisible(true);
       return true;
     }
@@ -516,26 +538,46 @@ public final class InspcCurveView
    * 
    */
   GralUserAction actionReplaceVariable = new GralUserAction("actionReplaceVariable"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
-    { return dropVariable(actionCode, widgd, false);
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
+    { return dropVariable(actionCode, (GralWidget)widgd, false);
     }
   };
 
   
-  GralUserAction actionInsertVariable = new GralUserAction("actionInsertVariable"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
-    { return dropVariable(actionCode, widgd, true);
+  GralUserAction actionOnOffTrack = new GralUserAction("actionOnOffTrack"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
+    { if(trackScale.trackView.getVisible() ==0) {
+        trackScale.trackView.setVisible(2);
+        //line.setBackColor(colorTrackSameScale, -1);
+      } else {
+        trackScale.trackView.setVisible(0);
+        //line.setBackColor(GralColor.getColor("gr"), -1);
+      }
+      GralTable<TrackValues>.TableLineData line = widgTableVariables.getCurrentLine();
+      actionSelectVariableInTable.exec(KeyCode.F2, widgTableVariables, line);
+      widgCurve.repaint();
+      return true;
     }
   };
 
 
-  public GralUserAction actionEnterDatapath = new GralUserAction("actionEnterDatapath"){
+  GralUserAction actionInsertVariable = new GralUserAction("actionInsertVariable"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
+    { return dropVariable(actionCode, (GralWidget)widgd, true);
+    }
+  };
+
+
+  public GralUserAction actionKeyHandlingTable = new GralUserAction("actionEnterDatapath"){
     @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params){
       if(key == KeyCode.enter){
         @SuppressWarnings("unchecked")  //compatible to Java-6
         GralTable<TrackValues>.TableLineData line = (GralTable.TableLineData)params[0];
         String sDatapath = line.getCellText(0);
         InspcCurveView.this.setDatapath(line, sDatapath);
+      }
+      else if(key == KeyCode.F2){
+        actionOnOffTrack.exec(key, null);
       }
       return true;
     }
@@ -649,10 +691,34 @@ public final class InspcCurveView
   };
 
   
-
+  GralUserAction actionShareScale = new GralUserAction("actionShareScale"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
+    { if( KeyCode.isControlFunctionMouseUpOrMenu(actionCode) && trackScale !=null){
+        GralTable<TrackValues>.TableLineData refline = widgTableVariables.getLineMousePressed();
+        TrackValues dst = refline.getUserData();
+        dst.trackView.groupTrackScale(trackScale.trackView);  
+      }
+      return true;
+    }
+  };
+  
+  
+  GralUserAction actionUnshareScale = new GralUserAction("actionShareScale"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
+    { if( KeyCode.isControlFunctionMouseUpOrMenu(actionCode) && trackScale !=null){
+        GralTable<TrackValues>.TableLineData refline = widgTableVariables.getLineMousePressed();
+        TrackValues dst = refline.getUserData();
+        dst.trackView.ungroupTrackScale();  
+      }
+      return true;
+    }
+  };
+  
+  
   GralUserAction actionSetScaleValues2Track = new GralUserAction("actionSetScaleValues2Track"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgi, Object... params)
     { System.out.println("InspcCurveView - actionSetScaleValues2Track, actioncode = " + Integer.toHexString(actionCode));
+      GralWidget widgd = (GralWidget)widgi;
       if( (KeyCode.isControlFunctionMouseUpOrMenu(actionCode) || actionCode == KeyCode.enter) && trackScale !=null){
         boolean setScale = false;
         TrackValues dst;
@@ -661,6 +727,7 @@ public final class InspcCurveView
           setScale = true;
         }
         else if(actionCode == KeyCode.menuEntered && widgd.sCmd == null){ //from menu
+          assert(false);  //unused since shareTrackScale
           GralTable<TrackValues>.TableLineData refline = widgTableVariables.getLineMousePressed();
           dst = refline.getUserData();
           setScale = true;
@@ -679,7 +746,7 @@ public final class InspcCurveView
             sNameScalingWidgd = scalingWidg.getName();
           }
           float[] fixScales = {7.5f, 6.0f, 5.0f, 4.0f, 3.0f, 2.5f, 2.0f, 1.75f, 1.5f, 1.25f, 1.0f};
-          if(widgd.sCmd == "+" && sNameScalingWidgd.equals("scale")){ ////
+          if(widgd.sCmd == "+" && sNameScalingWidgd.equals("scale")){ 
             float value = scale;
             float exp1 = (float)Math.log10(value);
             float exp = (float)Math.floor(exp1); //-1.0f; 
@@ -789,17 +856,41 @@ public final class InspcCurveView
    */
   GralUserAction actionSelectVariableInTable = new GralUserAction("actionSelectOrChgVarPath"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
-      @SuppressWarnings("unchecked")
+      @SuppressWarnings("unchecked") ////
       GralTableLine_ifc<TrackValues> line = (GralTableLine_ifc<TrackValues>)params[0];
       if(line !=null){
-        TrackValues track = (TrackValues)line.getContentInfo();
+        TrackValues track = line.getUserData(); //(TrackValues)line.getContentInfo();
         if(track !=null){
+          //set the background color of all line with the same scaling.
+          if( track.trackView ==null //deselect scaled lines
+            || trackScale !=null && !track.trackView.isGroupedTrackScale(trackScale.trackView) //don't do if it is the same scale group
+            || actionCode == KeyCode.F2 //invoked from actionOnOffTrack
+            ) {
+            for(GralTableLine_ifc<TrackValues> line1: widgTableVariables.iterLines()) { ////
+              TrackValues track1 = line1.getUserData();
+              if(track1.trackView !=null && track1.trackView.getVisible() == 0) {
+                line1.setBackColor(colorTrackNotShown, colorTrackNotShownSelected, colorTrackNotShownSelected, colorTrackNotShownSelected, colorTrackNotShownSelected, -1);
+              }
+              else if(track1.trackView !=null && track.trackView!=null && track1.trackView.isGroupedTrackScale(track.trackView)){
+                line1.setBackColor(colorTrackSameScale, colorTrackSameScaleSelected, colorTrackSameScaleSelected, colorTrackSameScaleSelected, colorTrackSameScaleSelected, -1);  //same scale
+              } else {
+                line1.setBackColor(colorTrackOtherScale, colorTrackOtherScaleSelected, colorTrackOtherScaleSelected, colorTrackOtherScaleSelected, colorTrackOtherScaleSelected, -1);
+              }
+            }
+            widgTableVariables.repaint(500,500);
+          }
+          //set the line from the last selection to normal
           if(trackScale !=null && trackScale.trackView !=null){
             trackScale.trackView.setLineProperties(trackScale.colorCurve, 1, 0);
+            if(trackScale.trackView.getVisible() !=0){
+              trackScale.trackView.setVisible(1);
+            }
           }
+          //set the track bold and show the scaling of the track 
           InspcCurveView.this.trackScale = track;
-          if(trackScale.trackView !=null){
+          if(trackScale.trackView !=null && trackScale.trackView.getVisible() !=0){
             trackScale.trackView.setLineProperties(trackScale.colorCurve, 3, 0);
+            trackScale.trackView.setVisible(2);
             widgScale.setText("" + track.trackView.getScale7div());
             widgScale0.setText("" + track.trackView.getOffset());
             widgline0.setText("" + track.trackView.getLinePercent());
@@ -868,7 +959,7 @@ public final class InspcCurveView
   
   
   GralUserAction actionOpenFileDialog = new GralUserAction("OpenFileDialog"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(actionCode == KeyCode.mouse1Up){
         try{
           if(widgd.getCmd().equals(sBtnReadCfg)){
@@ -890,7 +981,7 @@ public final class InspcCurveView
   
   
   GralUserAction actionReadCfg = new GralUserAction("actionReadCfg"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
           fileCurveCfg = (FileRemote)params[0];
@@ -930,7 +1021,7 @@ public final class InspcCurveView
   
 
   GralUserAction actionSaveCfg = new GralUserAction(){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
           fileCurveCfg = (FileRemote)params[0];
@@ -979,7 +1070,7 @@ public final class InspcCurveView
   /**Action invoked if the read file was selected in the {@link GralFileSelectWindow}
    */
   GralUserAction actionReadValues = new GralUserAction("actionReadValues"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
           assert(params[0] instanceof File);
@@ -1002,7 +1093,7 @@ public final class InspcCurveView
   /**Action invoked if the write file was selected in the {@link GralFileSelectWindow}
    */
   GralUserAction actionSaveValues = new GralUserAction("actionSaveValues"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         try{
           dirCurveSave = (FileRemote)params[0];

@@ -1,6 +1,7 @@
 package org.vishia.gral.base;
 
 import java.lang.reflect.Array;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -58,7 +59,7 @@ import org.vishia.util.TreeNode_ifc;
  * </pre>
  * UML presentation, see {@link Docu_UML_simpleNotation}.
  * <br><br>
- * <b>Key handling in a table</b>: <br>
+ * <b>Keyboard handling in a table</b>: <br>
  * The table has its own {@link GraphicImplAccess#processKeys(int)} method which is called 
  * from the graphical implementation layer in an key event handler.
  * This method processes some keys for navigation and selection in the table. If the key is not
@@ -81,7 +82,6 @@ import org.vishia.util.TreeNode_ifc;
  *   {@link GraphicImplAccess.CellData#bSetFocus}. The following repaint sets the focus for that cell.  
  * </ul>
  * 
- * 
  * @author Hartmut Schorrig
  *
  */
@@ -89,6 +89,7 @@ import org.vishia.util.TreeNode_ifc;
 
   /**Version, history and license.
    * <ul>
+   * <li>2015-07-12 Hartmut new: {@link TableLineData#setBackColor} with colorSelect etc. for content-depending table presentation. 
    * <li>2015-06-21 Hartmut chg: Implementation of {@link TableLineData#setBackColor(GralColor, int}} 
    *   now regards the ix-argument as cell index, like defined in comment.
    * <li>2015-05-31 Hartmut chg: {@link GraphicImplAccess#processKeys(int}} updates the cell text in the line firstly
@@ -767,6 +768,17 @@ import org.vishia.util.TreeNode_ifc;
   }
   
   
+  /**Returns in iterable object for the lines which can used in a for-element expression
+   * or in a {@link Iterator} usage.
+   * Because the class {@link TableLineData} implements the {@link GralTableLine_ifc}
+   * the user can write for example: <pre>
+   * for(GralTableLine_ifc<MyData> line: widgTableVariables.iterLines()) {
+   *    MyData data = line.getUserData();
+   *    line.setBackColor(colorXY, 0);
+   *  }
+   * </pre>
+   * @return
+   */
   public IterableIterator<TableLineData> iterLines(){
     return rootLine.iterator();
   }
@@ -1681,14 +1693,20 @@ import org.vishia.util.TreeNode_ifc;
       boolean marked = line !=null && (line.getMark() & 1)!=0;
       boolean childrenMarked = line !=null && (line.getMark() & 2)!=0;
       if(line == outer.lineSelected){
-        linePresentation.colorBack = marked ? outer.colorBackSelectMarked : childrenMarked ? outer.colorBackSelectSomeMarked : outer.colorBackSelect;
+        if(marked){
+          linePresentation.colorBack = line.colorBackSelectMarked !=null ? line.colorBackSelectMarked : outer.colorBackSelectMarked;
+        } else if(childrenMarked){
+          linePresentation.colorBack = line.colorBackSelectSomeMarked !=null ? line.colorBackSelectSomeMarked : outer.colorBackSelectSomeMarked;
+        } else {
+          linePresentation.colorBack = line !=null && line.colorBackSelect !=null ? line.colorBackSelect : outer.colorBackSelect;
+        }
       } else if(line == outer.lineSelectedNew){
         linePresentation.colorBack = marked ? outer.colorBackSelectNewMarked : outer.colorBackSelectNew;
       } else {
         if(marked){
-          linePresentation.colorBack = outer.colorBackMarked;
+          linePresentation.colorBack = line.colorBackMarked !=null ? line.colorBackMarked : outer.colorBackMarked;
         } else if(childrenMarked){
-          linePresentation.colorBack = outer.colorBackSomeMarked;
+          linePresentation.colorBack = line.colorBackSomeMarked !=null ? line.colorBackSomeMarked : outer.colorBackSomeMarked;
         } else if(!bFocused){
           linePresentation.colorBack = dyda.backColorNoFocus;
         } else {
@@ -2111,7 +2129,7 @@ import org.vishia.util.TreeNode_ifc;
     /**True if any of a cell text was changed. */
     protected boolean bChanged;
     
-    public GralColor colorForeground, colorBackground;
+    public GralColor colorForeground, colorBackground, colorBackSelect, colorBackSelectMarked, colorBackSelectSomeMarked, colorBackMarked, colorBackSomeMarked;
     
     //protected UserData userData;
     
@@ -2199,6 +2217,10 @@ import org.vishia.util.TreeNode_ifc;
     
     @Override public String getName(){ return GralTable.this.name; }
     
+    @Override public void setCmd(String cmd){ GralTable.this.setCmd(cmd); }
+    
+    @Override public String getCmd(){ return GralTable.this.getCmd(); }
+    
 
     @Override public String getCellText(int column) { 
       String text = cellTexts[column]; 
@@ -2249,14 +2271,14 @@ import org.vishia.util.TreeNode_ifc;
     @Override public boolean isVisible(){ return GralTable.this.isVisible(); }
     
 
-    @Override public GralColor setBackgroundColor(GralColor color) {
+    @Override @Deprecated public GralColor setBackgroundColor(GralColor color) {
       GralColor ret = colorBackground;
       colorBackground = color;
       repaint(50, 50);
       return ret;
     }
 
-    @Override public GralColor setForegroundColor(GralColor color) {
+    @Override @Deprecated public GralColor setForegroundColor(GralColor color) {
       GralColor ret = colorForeground;
       colorForeground = color;
       repaint(50, 50);
@@ -2269,7 +2291,7 @@ import org.vishia.util.TreeNode_ifc;
      */
     @Override public void setBackColor(GralColor color, int ix)
     { 
-      if(color.getColorName().equals("pma"))
+      if(color !=null && color.getColorName().equals("pma"))
         Assert.stop();
       if(ix <0){
         colorBackground = color;
@@ -2283,11 +2305,46 @@ import org.vishia.util.TreeNode_ifc;
     
     @Override public GralColor getBackColor(int ix)
     { 
-      return colorBackground;
+      if(ix <0 || cellColorBack == null) {
+        return colorBackground;
+      } else {
+        if(ix >= cellTexts.length) throw new IndexOutOfBoundsException("faulty index " + ix);
+        return cellColorBack[ix] !=null ? cellColorBack[ix] : colorBackground;
+      }
     }
     
     
 
+    /**Sets the background color for a special cell of line or for all cells of this line 
+     *   which has not a special cell color for the several states of the line.
+     * @param colorNormal non selected, non marked
+     * @param colorSelected non marked, the selected line.
+     * @param colorMarked marked, not the selected line
+     * @param colorSomeMarked some marked, not the selected line
+     * @param colorSelectMarked marked or some marked, the selected line.
+     * @param ix -1 for the line, 0... for one cell of the line. 
+     */
+    public void setBackColor(GralColor colorNormal, GralColor colorSelected, GralColor colorMarked, GralColor colorSomeMarked, GralColor colorSelectMarked, int ix)
+    { 
+      if(ix <0){
+        this.colorBackground = colorNormal;
+        this.colorBackSelect = colorSelected;
+        this.colorBackMarked = colorMarked;
+        this.colorBackSelectSomeMarked = colorSomeMarked;
+        this.colorBackSelectMarked = colorSelectMarked;
+      } else {
+        if(ix >= cellTexts.length) throw new IndexOutOfBoundsException("faulty index " + ix);
+        if(cellColorBack == null){ cellColorBack = new GralColor[cellTexts.length]; }
+        cellColorBack[ix] = colorNormal;
+        //TODO cell colors state specific.
+        this.colorBackSelect = colorSelected;
+        this.colorBackMarked = colorMarked;
+        this.colorBackSelectSomeMarked = colorSomeMarked;
+        this.colorBackSelectMarked = colorSelectMarked;
+      }
+      repaint();
+    }
+    
     @Override public void setLineColor(GralColor color, int ix)
     { 
       colorForeground = color;

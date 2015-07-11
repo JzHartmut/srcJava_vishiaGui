@@ -448,7 +448,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   /**This action will be called if the widget gets the focus. */
   protected GralUserAction actionFocused;
   
-  /**command string given by the action as parameter. */
+  /**Any widget can have a command String, which can be quest for example in an action. 
+   * The widget can be identified by its {@link #getCmd()} independent of its name. */
   public String sCmd;
   
   
@@ -780,6 +781,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     return sDataPathLast;
   }
   
+  /**Any widget can have a command String, which can be quest for example in an action. 
+   * The widget can be identified by this method independent of its name. See {@link #setCmd(String)}. */
   public String getCmd(){ return sCmd; }
   
   
@@ -805,7 +808,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     }
   }
   
-  public void setCmd(String cmd){ sCmd = cmd; }
+  /**Any widget can have a command String, which can be quest for example in an action. 
+   * The widget can be identified by its {@link #getCmd()} independent of its name which can be set on runtime with this method. */
+  @Override public void setCmd(String cmd){ sCmd = cmd; }
   
   
   /**Gets the data path. It is a String in application context.

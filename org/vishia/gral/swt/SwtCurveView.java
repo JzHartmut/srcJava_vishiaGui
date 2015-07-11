@@ -137,12 +137,12 @@ public class SwtCurveView extends GralCurveView
     int ixData = ixData2;
     int ixD = (ixData >> shIxiData) & mIxiData; //real index in data
     //
-    float yFactor = size.y / -10.0F / track.yScale;  //y-scaling
-    float y0Pix = (1.0F - track.y0Line/100.0F) * size.y; //y0-line
+    float yFactor = size.y / -10.0F / track.scale.yScale;  //y-scaling
+    float y0Pix = (1.0F - track.scale.y0Line/100.0F) * size.y; //y0-line
     float yF = track.values[ixD];
     int time2 = timeValues[ixD];
     int time1;
-    int yp9 = (int)( (yF - track.yOffset) * yFactor + y0Pix);
+    int yp9 = (int)( (yF - track.scale.yOffset) * yFactor + y0Pix);
     int yp2 = yp9;  //right value
     int yp1; //left value
     int ixData1;
@@ -173,7 +173,7 @@ public class SwtCurveView extends GralCurveView
             time1 = timeValues[ixD];
             int dTime = time2 - time1;
             //pixelFromRight += dTime * pixel7time;
-            yp11 = (int)( (yF - track.yOffset) * yFactor + y0Pix);
+            yp11 = (int)( (yF - track.scale.yOffset) * yFactor + y0Pix);
           }
           yp1 += yp11;  //build middle value or init first.
           if(ixData != ixData1){  //more as one value on the same xp
@@ -328,7 +328,9 @@ public class SwtCurveView extends GralCurveView
     int iTrack = 0;
     for(Track track: listTracks){
       //draw line per track
-      drawTrack(g, size, track, iTrack, ixixDataLast);
+      if(track.showSelected !=0) {
+        drawTrack(g, size, track, iTrack, ixixDataLast);
+      }
       iTrack +=1;
     } //for listlines
     ixDataDraw = ixDataRight;

@@ -59,6 +59,8 @@ public interface GralWidget_ifc extends Removeable
   
   /**Version, history and license.
    * <ul>
+   * <li>2015-07-12 Hartmut new: {@link #setCmd(String)} and {@link #getCmd()} is present in {@link org.vishia.gral.base.GralWidget}
+   *   since 2010 but it was not accepted as core property. But it is a core property.
    * <li>2013-03-13 Hartmut new {@link #getContentIdent()}, {@link #setContentIdent(long)}
    * <li>2013-03-13 Hartmut new {@link #isNotEditableOrShouldInitialize()} to support edit fields.
    * <li>2012-08-21 The method {@link #setBackColor(GralColor, int)}, {@link #setLineColor(GralColor, int)} and {@link #setTextColor(GralColor)}
@@ -109,6 +111,14 @@ public interface GralWidget_ifc extends Removeable
   
   public String getDataPath();
   
+  /**Any widget can have a command String, which can be quest for example in an action. 
+   * The widget can be identified by its {@link #getCmd()} independent of its name which can be set on runtime with this method. */
+  void setCmd(String cmd);
+  
+  
+  /**Any widget can have a command String, which can be quest for example in an action. 
+   * The widget can be identified by this method independent of its name. See {@link #setCmd(String)}. */
+  String getCmd();
   
   public GralUserAction getActionChange();
   

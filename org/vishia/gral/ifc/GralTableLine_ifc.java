@@ -15,6 +15,7 @@ public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, MarkMask_if
 
   /**Version, history and license.
    * <ul>
+   * <li>2015-07-12 Hartmut new: {@link #setBackColor(GralColor, GralColor, GralColor, GralColor, GralColor, int)} with colorSelect etc. for content-depending table presentation.
    * <li>2011-06-00 Hartmut created
    * </ul>
    * 
@@ -43,6 +44,19 @@ public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, MarkMask_if
    */
   public static final int version = 20120303;
 
+  
+  /**Sets the background color for a special cell of line or for all cells of this line 
+     *   which has not a special cell color for the several states of the line.
+     * @param colorNormal non selected, non marked
+     * @param colorSelected non marked, the selected line.
+     * @param colorMarked marked, not the selected line
+     * @param colorSomeMarked some marked, not the selected line
+     * @param colorSelectMarked marked or some marked, the selected line.
+     * @param ix -1 for the line, 0... for one cell of the line. 
+     */
+   void setBackColor(GralColor colorNormal, GralColor colorSelected, GralColor colorMarked, GralColor colorSomeMarked, GralColor colorSelectMarked, int ix);
+    
+  
   /**Returns the text which is assigned to the cell of the table.
    * @param column The column of table.
    * @return If the cell text, an empty text "" if the cell has not any text assigned.
@@ -56,6 +70,9 @@ public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, MarkMask_if
   
   //void setUserData(UserData data);
   
+  /**Returns the instance which is related to the line on #setUserData or on construction.
+   * It is the same like GralWidget_ifct#getContentInfo.
+   */
   UserData getUserData();
   
   int getSelectedColumn();

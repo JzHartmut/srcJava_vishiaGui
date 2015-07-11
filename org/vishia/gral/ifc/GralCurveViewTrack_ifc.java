@@ -1,5 +1,7 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.gral.base.GralCurveView;
+
 /**This interface describes a track (one curve) of a curve view.
  * @see org.vishia.gral.widget.GralCurveView, 
  * @see GralCurveView_ifc
@@ -70,12 +72,38 @@ public interface GralCurveViewTrack_ifc
    */
   void setTrackScale(float scale7div, float offset, int line0);
   
+  /**Refers the same instance {@link GralCurveView.TrackScale} with the other track.
+   * All {@link #setTrackScale(float, float, int)} with tracks which are shared influences one another.
+   * @param from one of the track of a scale group.
+   */
+  void groupTrackScale(GralCurveViewTrack_ifc from);
+
+  /**Checks whether the scaling is shared with the other given thread
+   * @param with The other track.
+   * @return true if it refers the same instance of scaling values.
+   */
+  boolean isGroupedTrackScale(GralCurveViewTrack_ifc with);
+  
+  /**Creates an own instance for the scaling values. */
+  void ungroupTrackScale();
+
+  
   /**Sets the properties for this track.
    * @param color The color of line
    * @param width The thickness of the line.
    * @param pattern a Pattern of the line. Yet the pattern is not used (TODO). Value 0 doesn't change the current one.
    */
   void setLineProperties(GralColor color, int width, int pattern);
+  
+  /**Set the state to show. 0=hidden, don't show, but the values are stored.
+   * 1= show normal. 2= show lifted out (selected).
+   */
+  void setVisible(int mode);
+  
+  /**Returns the state to show. 0=hidden, don't show, but the values are stored.
+   * 1= show normal. 2= show lifted out (selected).
+   */
+  int getVisible();
   
   void setDataPath(String path);
 
