@@ -371,7 +371,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   {
     //Composite box = new Composite(graphicFrame, 0);
     Composite box = new Composite(getCurrentPanel(), 0);
-    setPosAndSize_(box);
+    setPosAndSize_(mng.getPosOldPositioning(), box);
     Point size = box.getSize();
     GralPanelContent panelg = new GralPanelContent("@", name);
     GralPanelContent panel = (new SwtPanel(panelg, box)).gralPanel();
@@ -544,16 +544,16 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   /**Places a current component with knowledge of the current positions and the spreads of the component on graphic.
    * @param component The component to place.
    */
-  void setBounds_(Control component)
-  { setPosAndSize_(component);
+  void setBounds_(GralPos pos, Control component)
+  { setPosAndSize_(pos, component);
     //setBounds_(component, 0,0, 0, 0);
   }
   
   
   
   
-  void setPosAndSize_(Control component)
-  { setPosAndSizeSwt(component, 0,0);
+  void setPosAndSize_(GralPos pos, Control component)
+  { setPosAndSizeSwt(pos, component, 0,0);
   }  
   
   
@@ -569,8 +569,11 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * @param component The SWT-widget.
    * @param widthwidgetNat The natural size of the component.
    * @param heigthWidgetNat The natural size of the component.
+   *
+   * NOTE: 2015-07-13: This method is set to unused because it uses the mng-position additional to the constructor of GralWidget.
+   * This is the old concept which is in conflict with the usuage there.
    */
-  void setPosAndSizeSwt(Control component, int widthwidgetNat, int heigthWidgetNat)
+  void XXXsetPosAndSizeSwt(Control component, int widthwidgetNat, int heigthWidgetNat)
   { mng.setNextPosition();
     setPosAndSizeSwt(pos(), component, widthwidgetNat, heigthWidgetNat);
   }
@@ -578,11 +581,12 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 
 
   
-  /**Set bounds of a SWT component with a given position independent of this {@link #pos}.
-   * This routine is proper to use if a GralPos is calculated in any special kind, 
-   * usual with this.pos as reference. 
+  /**Set bounds of a SWT component with a given position.
    * This method is package-private for SWT-implementation.
    * @param posP The Position for the component.
+   * @param component The SWT-widget.
+   * @param widthwidgetNat The natural size of the component.
+   * @param heigthWidgetNat The natural size of the component.
    */
   void setPosAndSizeSwt(GralPos posP, Control component, int widthwidgetNat, int heigthWidgetNat)
   {
@@ -662,12 +666,12 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	 * @see org.vishia.gral.base.GralMng.ImplAccess#addTabbedPanel(java.lang.String, org.vishia.gral.base.GralPanelActivated_ifc, int)
 	 */
 	@Override public GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int property)
-	{   GralTabbedPanel panelg = new GralTabbedPanel("@", namePanel, user, property);
+	{ GralTabbedPanel panelg = new GralTabbedPanel("@", namePanel, user, property);
 		SwtTabbedPanel tabMngPanel = new SwtTabbedPanel(panelg, this, user, property);
 		mng.currTabPanel = panelg;
 		//GralWidget tabFolder = currTabPanel;
 		TabFolder tabFolderSwt = (TabFolder)tabMngPanel.getWidgetImplementation();
-		setPosAndSize_(tabFolderSwt); //(Control)currTabPanel.getGuiComponent().getWidgetImplementation());
+		setPosAndSize_(panelg.pos(), tabFolderSwt); //(Control)currTabPanel.getGuiComponent().getWidgetImplementation());
 		listVisiblePanels_add(mng.currTabPanel);  //TODO checkit maybe currTabPanel.getCurrentPanel()
 		//mng.registerWidget(tabMngPanel);
 		return mng.currTabPanel;
@@ -691,7 +695,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     //int width = sText.length();
     //widget.setSize(sizePixel);
     
-    setPosAndSize_(widget);
+    setPosAndSize_(mng.getPosOldPositioning(), widget);
     
     Point widgetSize = widget.getSize();
     if(widgetSize.x < textSize.x){
@@ -782,7 +786,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   {
   	Slider control = new Slider(getCurrentPanel(), SWT.VERTICAL);
   	control.setBackground(propertiesGuiSwt.colorBackground);
-  	setPosAndSize_(control);
+  	setPosAndSize_(mng.getPosOldPositioning(), control);
     GralWidget widg = new GralWidget(sName, 'V', mng);
     SwtWidgetSimpleWrapper widgswt = new SwtWidgetSimpleWrapper(control, this);
     //widg.implMethodWidget_.setWidgetImpl(widgswt);

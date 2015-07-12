@@ -262,7 +262,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
   void resizeTable()
   {
-    swtWidgHelper.mng.setBounds_(swtWidgHelper.widgetSwt);
+    swtWidgHelper.mng.setBounds_(widgg.pos(), swtWidgHelper.widgetSwt);
     
   }
   

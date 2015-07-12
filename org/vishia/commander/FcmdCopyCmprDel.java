@@ -539,8 +539,9 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       //ev.copyAbortAll();
       //ev.sendEvent(FileRemote.cmdAbortAll);
     }
-    action.showFilesProcessing.evAnswer.send(FileRemoteProgressTimeOrder.Answer.abortAll, modeCopy() ); //triggerStateMachine(evSrc, FileRemote.Cmd.abortAll);
-
+    if(action.showFilesProcessing.evAnswer.getDst() !=null) { //don't send if the destination is not set.
+      action.showFilesProcessing.evAnswer.send(FileRemoteProgressTimeOrder.Answer.abortAll, modeCopy() ); //triggerStateMachine(evSrc, FileRemote.Cmd.abortAll);
+    }
     String sDirSrc = widgShowSrc.getText();
     //FileRemote dirSrc = main.fileCluster.getFile(sDirSrc, null); //new FileRemote(sDirSrc);
     if(srcDir !=null) { srcDir.abortAction(); }  //to set stateMachine of copy in ready state 

@@ -65,7 +65,7 @@ public class SwtLed extends GralLed.GraphicImplAccess
     widgSwt.addFocusListener(mng.focusListener);
     widgSwt.setForeground(mng.propertiesGuiSwt.colorSwt(0xff00));
     //widget.setSize(propertiesGui.xPixelUnit() * xSize -2, propertiesGui.yPixelUnit() * ySize -2);
-    mng.setBounds_(widgSwt);
+    mng.setBounds_(widgg.pos(), widgSwt);
     widgSwt.setData(this);
     widgSwt.addMouseListener(mng.mouseClickForInfo);
 

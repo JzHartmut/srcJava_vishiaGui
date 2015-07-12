@@ -86,7 +86,7 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
     swtWidgWrapper.widgetSwt.setData(wdgGral);
     swtWidgWrapper.widgetSwt.addPaintListener(paintListener);
     swtWidgWrapper.widgetSwt.addMouseListener(mouseListener);
-    mng.setBounds_(swtWidgWrapper.widgetSwt);
+    mng.setBounds_(wdgGral.pos(), swtWidgWrapper.widgetSwt);
     float ySize = outer.pos().height();
     char size1 = ySize > 3? 'B' : 'A';
     switch(size1){ 

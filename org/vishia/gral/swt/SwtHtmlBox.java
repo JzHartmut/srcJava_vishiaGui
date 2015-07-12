@@ -65,7 +65,7 @@ public class SwtHtmlBox extends GralHtmlBox.ImplAccess
     try {
       boxSwt = new Browser(parent,0);
       //mng.registerWidget(this);
-      mngSwt.setPosAndSizeSwt(boxSwt, 0, 0);
+      mngSwt.setPosAndSizeSwt(box.pos(), boxSwt, 0, 0);
     } catch(Throwable exc){
       System.err.println("can't create SWT-Browser");
       exc.printStackTrace(System.err);

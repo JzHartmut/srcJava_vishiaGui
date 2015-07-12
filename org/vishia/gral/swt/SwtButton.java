@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralKeyListener;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -94,7 +95,7 @@ public class SwtButton extends GralButton.GraphicImplAccess
     widgetSwt.addFocusListener(mng.focusListener);  //common focus listener 
     widgetSwt.addKeyListener(new KeyListener(mng.mng._impl.gralKeyListener));
     widgetSwt.addTraverseListener(SwtMng.swtTraverseListener);
-    setBoundsGraphic(mng);
+    setBoundsGraphic(widgg.pos(), mng);
     float ySize = widgg.pos().height();
     char size1 = ySize > 3? 'B' : 'A';
     switch(size1){ 
@@ -110,10 +111,10 @@ public class SwtButton extends GralButton.GraphicImplAccess
   @Override public GralRectangle getPixelPositionSize(){ return swtWidgHelper.getPixelPositionSize(); }
 
   
-  void setBoundsGraphic(SwtMng mng)
+  void setBoundsGraphic(GralPos pos, SwtMng mng)
   {
     //widgetSwt.setSize(mng.propertiesGui.xPixelUnit() * xSize -2, mng.propertiesGui.yPixelUnit() * ySize -2);
-    mng.setBounds_(widgetSwt);
+    mng.setBounds_(pos, widgetSwt);
     
   }
   

@@ -107,7 +107,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
     TextBoxModifyListener modifyListener = new TextBoxModifyListener();
     textFieldSwt.addModifyListener(modifyListener);
     
-    mng.setPosAndSize_(textFieldSwt);
+    mng.setPosAndSize_(widgg.pos(), textFieldSwt);
     if(prompt() != null && promptStylePosition().equals("t")){
       final int yPixelField;
       final Font promptFont;

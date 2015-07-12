@@ -63,6 +63,12 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2015-07-13 Hartmut chg: Positioning: The new concept gets a position in the constructor of {@link GralWidget} via 
+   *   {@link #getPosCheckNext()}. That routine sets the current position in this class to {@link PosThreadSafe#posUsed} 
+   *   for further using to increment. That is correct. 
+   *   The problem before was faulty old-concept usage of org.vishia.gral.swt.SwtMng#XXXsetPosAndSizeSwt
+   *   which invokes {@link #setNextPosition()} which increments the position too, therefore twice. The usage of that routine
+   *   is prevented for Swt implementation, TODO for awt yet now. 
    * <li>2015-05-31 Hartmut chg: {@link GralMngFocusListener}: invokes repaint() because of maybe changed outfit on focus gained
    * <li>2015-05-02 Hartmut chg: {@link #registerWidget(GralWidget)} is obsolete now, it is empty yet. 
    *   Instead {@link #registerWidget(String, GralWidget)} by given name and {@link #removeWidget(String)} by name.
@@ -428,8 +434,8 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
   /**Not for user: Checks whether the position is used, sets the next position then, markes the position as used.
-   * See @link GralPos#setNextPosition(), {@link #posUsed}. */
-  public void setNextPosition()
+   * See @link GralPos#setNextPosition(), {@link #posUsed}. TODO remove in AwtMng*/
+  @Deprecated public void setNextPosition()
   { PosThreadSafe pos = pos();
     if(pos.posUsed){
       pos.pos.setNextPosition();
@@ -464,9 +470,15 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
       pos.pos.setNextPosition();
       pos.posUsed = false;
     }
-    //posUsed = true;
+    pos.posUsed = true;
     return pos.pos.clone(); 
   }
+  
+  
+  /**Used for deprecated style, without independent GralWidget. TODO remove.
+   * @return Independent GralPos from the GralMng
+   */
+  public GralPos getPosOldPositioning(){ return getPosCheckNext(); }
 	
   /**Map of all panels. A panel may be a dialog box etc. */
   protected final Map<String,GralPanelContent> panels = new TreeMap<String,GralPanelContent>();

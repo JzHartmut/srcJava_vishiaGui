@@ -43,21 +43,25 @@ import org.vishia.util.TreeNode_ifc;
  * If any part of the table will be shown, that fields
  * will be filled with the texts from the {@link TableLineData#cellTexts} of the corresponding line.
  * If the table content will be shifted in the visible area, the text content of the fields are replaced. 
- * <br>
+ * <br><br>
  * Each text field refers an instance of {@link CellData} as its
  * 'user data'. The CellData refers via {@link CellData#tableItem} the line.
- * <br>
+ * 
  * <pre>
  *   Graphic representation     GralTable        {@link TableLineData}
  *             |                   |<--------------<#>|           
  *    |<*------+                   |                  |<>--userData--->User's data                    
  *   TextField                     |---rootLine-----*>|
- *    |<>------>CellData           |---lineSelected-->|
- *    |            |-tableItem----------------------->|
- *                                                    |
- * 
+ *    |<>------>CellData           |---lineSelected-->|-->cellTexts
+ *                 |                                  |-->colors
+ *                 |---tableItem--------------------->|
  * </pre>
  * UML presentation, see {@link Docu_UML_simpleNotation}.
+ * <br><br>
+ * A {@link TableLineData} refers any aggregated user data, associated with {@link #insertLine(String, int, String[], Object)}
+ * or {@link NodeTableLine#addChildLine(String, String[], Object)} etc. The user data can be gotten with {@link TableLineData#getUserData()}.
+ * The user data are not part of the graphical presentation by automatism. They can be used for graphical implementation
+ * by the application, especially to provide the texts or maybe colors for the table line cells. 
  * <br><br>
  * <b>Keyboard handling in a table</b>: <br>
  * The table has its own {@link GraphicImplAccess#processKeys(int)} method which is called 
@@ -85,7 +89,8 @@ import org.vishia.util.TreeNode_ifc;
  * @author Hartmut Schorrig
  *
  */
-@SuppressWarnings("synthetic-access") public final class GralTable<UserData> extends GralWidget implements GralTable_ifc<UserData> {
+@SuppressWarnings("synthetic-access") 
+public final class GralTable<UserData> extends GralWidget implements GralTable_ifc<UserData> {
 
   /**Version, history and license.
    * <ul>
@@ -1918,7 +1923,11 @@ import org.vishia.util.TreeNode_ifc;
   
   /**This class is the super class of {@link TableLineData} which presents a line as a node in a tree. 
    * Therefore it implements the {@link TreeNodeBase} interface. A line as parent node can be presented folded (default)
-   * or unfolded in several levels to present a tree instead a simple table. */
+   * or unfolded in several levels to present a tree instead a simple table. 
+   * <br><br>
+   * Only the {@link GralTable#rootLine} is a pure instance of this class The root line is never visible. It is the root. 
+   * All other lines are instances of {@link TableLineData} derived from this class. 
+   */
   public class NodeTableLine 
   extends TreeNodeBase<TableLineData, UserData, GralTableLine_ifc<UserData>>
   {

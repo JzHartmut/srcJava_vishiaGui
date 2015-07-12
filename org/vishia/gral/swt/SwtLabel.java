@@ -74,7 +74,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
     default: mode = 0;
     }
     labelSwt.setAlignment(mode);
-    mng.setBounds_(labelSwt);
+    mng.setBounds_(widgg.pos(), labelSwt);
     mng.mng.registerWidget(widgg);
     repaintGthread();  //to set text etc.
   }
