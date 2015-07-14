@@ -23,10 +23,11 @@ import org.vishia.util.KeyCode;
 
 
 
-/**This class is the base class of representative of a graphical widget in the gral concept. 
- * All widgets in the gral concept have this base data.
- * The widget of the implementation layer graphic is referred in the derived class of this 
- * with a proper association.
+/**This class is the base class of representation of a graphical widget in the gral concept. 
+ * All widgets in the gral concept have this base data independent of the implementation graphic.
+ * The implementation graphic should have a wrapper class inherited from {@link ImplAccess} which 
+ * contains specials of the implementation and refers the widget of the implementation layer graphic, 
+ * for example a text field.
  * <br><br> 
  * Any widget is represented in the user's level by a derived instance of a {@link GralWidget}. 
  * There are 2 strategies yet to create widgets in respect to the graphical implementation.

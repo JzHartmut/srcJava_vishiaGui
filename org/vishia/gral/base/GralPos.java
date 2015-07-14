@@ -79,6 +79,7 @@ java org.vishia.gral.base.GralPos.testScanSize();
    * The writing style of positions in the script regards a stinting short style to give positions,
    * because a hand written script should not cause a lot of calculations for positions by the writer.
    * It should be simple. The syntax of a position in the gral script is given in the variable {@link #syntaxZbnf}.
+   * The method {@link #setPosition(CharSequence, GralPos)} uses that syntax.
    * <ul>
    * <li>@myPanel, 5..7, 8..18: This is a full given absolute position. The element should be placed from line 5 to line 7 
    *   and from column 8 to 18. The vertical position 7 is the bottom line, the column 18 is the right column exclusive. 
@@ -286,23 +287,24 @@ public class GralPos implements Cloneable
   
   /**Syntax of a position. It is
    * <pre>
-    "position::= @ [<$?panel> ,]"
-  + "     [<?yPosRelative> &+] [<#?yPos>[\\.<#?yPosFrac>]]"
-  + "   [ [+] <#-?ySizeDown>[\\.<#?ySizeFrac>]| +* <?yOwnSize> |] "
-  + " [ , [<?xPosRelative> &+] [<#?xPos>[\\.<#?xPosFrac>]]"
-  + "   [ [+] <#-?xWidth>[\\.<#?xSizeFrac>]| +* <?xOwnSize> |] [ <?xIncr> ++]"
-  + " ] :";
+  position::= @ [<$?panel> ,]
+       [<?yPosRelative> &+] [<#?yPos>[\\.<#?yPosFrac>]]
+     [ [+] <#-?ySizeDown>[\\.<#?ySizeFrac>]| +* <?yOwnSize> |] 
+   [ , [<?xPosRelative> &+] [<#?xPos>[\\.<#?xPosFrac>]]
+     [ [+] <#-?xWidth>[\\.<#?xSizeFrac>]| +* <?xOwnSize> |] [ <?xIncr> ++]
+   ].
    * </pre>
    * The semantic identifier match to the elements in {@link org.vishia.gral.cfg.GralCfgPosition}.
    * */
-  public final static String syntaxZbnf = 
-    "position::= @ [<$?panel> ,]"
+  public final static String syntaxZbnf = null; //not used because the syntax is evaluated by hard code.
+  /*
+  "position::= @ [<$?panel> ,]"
   + "     [<?yPosRelative> &+] [<#?yPos>[\\.<#?yPosFrac>]]"
   + "   [ [+] <#-?ySizeDown>[\\.<#?ySizeFrac>]| +* <?yOwnSize> |] ##| - <#?ySizeUp>|][ <?yIncr> ++]"
   + " [ , [<?xPosRelative> &+] [<#?xPos>[\\.<#?xPosFrac>]]"
   + "   [ [+] <#-?xWidth>[\\.<#?xSizeFrac>]| +* <?xOwnSize> |] [ <?xIncr> ++]"
   + " ] :";
-  
+  */
   
   
   
@@ -374,6 +376,13 @@ public class GralPos implements Cloneable
   }
 
   
+  /**Sets the position with the given string representation.
+   * @param sPos The syntax of the string see description of this class, starting with "@panel, ..." etc.
+   *   for example "@windowA, 3..5, 16+20" for absolute line 3 and 4 (exclusive 5) and from absolute column 16, size-x=20. 
+   *   The position can be given without panel designation or relative, then the posParent argument is necessary.
+   * @param posParent necessary to build the absolute position from relative given sPos, maybe null if not necessary.
+   * @throws ParseException on errors of sPos or missing posParent if necessary.
+   */
   public void setPosition(CharSequence sPos, GralPos posParent) throws ParseException {
     GralPos posParent1;
     //int line =0, yPosFrac =0, ye =0, yef =0, column =0, xPosFrac =0, xe =0, xef =0, origin =0, border =0, borderFrac =0;

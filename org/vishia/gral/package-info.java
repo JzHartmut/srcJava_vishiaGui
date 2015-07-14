@@ -22,6 +22,37 @@
  *   {@link org.vishia.gral.ifc.GralWidget_ifc}.
  * <li>Animated graphic, especially for process data viewing: {@link org.vishia.guiInspc.InspcGui}
  * <li> 
+ * </ul>
+ * Important classes:
+ * <ul>
+ * <li>{@link org.vishia.gral.base.GralWidget}: Base class for all user widgets.
+ * <li>{@link org.vishia.gral.base.GralPos}: Information about positioning
+ * <li>{@link org.vishia.gral.base.GralMng}: Manager for organization, singleton.
+ * <li>{@link org.vishia.gral.test.HelloWorld}: Example
+ * <li>{@link org.vishia.gral.ifc.GralFactory}: Factory interface
+ * <li>{@link org.vishia.gral.awt.AwtFactory}: The Factory for AWT (and swing)
+ * <li>{@link org.vishia.gral.swt.SwtFactory}: The Factory for SWT (Eclipse Graphic widget toolkit)
+ * <li>{@link org.vishia.gral.base.GralMenu}: The menus both pull-down and right-mouse (context).
+ * <li>{@link org.vishia.gral.base.GralWindow}: A window, the main or sub windows, dialog boxes.
+ * <li>{@link org.vishia.gral.base.GralGraphicTimeOrder}: Order initialized from another thread. 
+ * <li>{@link org.vishia.gral.area9.GralArea9Window}: Window with 9 areas configurable for typical using
+ * 
+ * </ul>
+ * Widgets:
+ * <ul>
+ * <li>{@link org.vishia.gral.base.GralTextField}:
+ * <li>{@link org.vishia.gral.base.GralTextBox}:
+ * <li>{@link org.vishia.gral.base.GralHtmlBox}:
+ * <li>{@link org.vishia.gral.base.GralTable}: Table and tree representation.
+ * <li>{@link org.vishia.gral.base.GralButton}:
+ * <li>{@link org.vishia.gral.base.GralLed}:
+ * <li>{@link org.vishia.gral.base.GralPanelContent}:
+ * <li>{@link org.vishia.gral.base.GralTabbedPanel}:
+ * <li>{@link org.vishia.gral.base.GralSlider}:
+ * <li>{@link org.vishia.gral.base.GralValueBar}:
+ * <li>{@link org.vishia.gral.base.GralCurveView}:
+ * <li>
+ * <li> 
  * </ul>     
  * <b>Overview</b>:
  * <img src="../../../img/Overview_gral.png"><br>

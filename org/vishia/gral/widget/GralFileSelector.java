@@ -39,6 +39,7 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.Assert;
+import org.vishia.util.Debugutil;
 import org.vishia.util.FileSystem;
 import org.vishia.util.IndexMultiTable;
 import org.vishia.util.KeyCode;
@@ -255,7 +256,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
         if(line != null){
           FileRemote file = line.getUserData();
           String sName = line.getCellText(kColFilename);
-          if(file.exists()) {                       //TODO: if the file is not refreshed, new network access, the GUI hangs a long time.
+          if(file.isTested() && file.exists()) {                       //TODO: if the file is not refreshed, new network access, the GUI hangs a long time.
             if(sName.equals("..")){
               currentFile = file; //.getParentFile();
               currentDir = file;  //the same, the directory of this panel.
@@ -273,6 +274,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
             if(line.getCellText(kColDesignation).startsWith("?")){
               completeLine(line, file, System.currentTimeMillis());
             }
+          } else {
+            //try refresh the file and show in callback. TODO
+            Debugutil.stop();
           }
         }
       }
