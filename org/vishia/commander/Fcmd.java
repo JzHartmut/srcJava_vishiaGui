@@ -43,6 +43,9 @@ public class Fcmd extends GuiCfg
 
   /**Version, history and license. This String is visible in the about info.
    * <ul>
+   * <li>2015-07-18 Hartmut chg: Now the output of script errors while executing the JZcmd cmd script is visible
+   *   in the output window.  
+   * <li>2015-07-12 Hartmut new: Many fixes in the base classes for functionality. See all commit messages of the component.
    * <li>2014-12-26 Hartmut new: {@link #refreshFilePanel(FileRemote)} can be called in any callback thread. 
    * <li>2011-2013 some changes, see source files.
    * <li>2011-10-00 Hartmut created
@@ -72,7 +75,7 @@ public class Fcmd extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public static final String sVersion = "2015-07-12";
+  public static final String sVersion = "2015-07-18";
 
   
   static class CallingArgs extends GuiCallingArgs
@@ -394,7 +397,7 @@ public class Fcmd extends GuiCfg
   
   final FcmdFavorPathSelector favorPathSelector = new FcmdFavorPathSelector(mainCmd, this);
 
-  final FcmdExecuter executer = new FcmdExecuter(mainCmd, this);
+  final FcmdExecuter executer = new FcmdExecuter(mainCmd, gui.getOutputBox(), this);
 
   final GralCommandSelector cmdSelector = new GralCommandSelector("cmdSelector", 5, new int[]{0,-10}, 'A', executer.cmdQueue, _gralMng);
 

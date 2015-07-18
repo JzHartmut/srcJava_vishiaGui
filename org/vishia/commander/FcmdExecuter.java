@@ -62,10 +62,10 @@ public class FcmdExecuter
   final CmdQueue cmdQueue;
 
   
-  FcmdExecuter(MainCmd_ifc console, Fcmd main)
+  FcmdExecuter(MainCmd_ifc console, Appendable outStatus, Fcmd main)
   { this.main = main;
     this.console = console;
-    this.cmdQueue = new CmdQueue(System.out);
+    this.cmdQueue = new CmdQueue(outStatus);
   }
   
   
