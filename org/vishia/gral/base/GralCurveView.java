@@ -340,6 +340,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     @Override public void groupTrackScale(GralCurveViewTrack_ifc from){ scale = ((Track)from).scale; }
     
     @Override public boolean isGroupedTrackScale(GralCurveViewTrack_ifc with){ 
+      if(with == null) return false;
       return scale == ((Track)with).scale;
     }
     
