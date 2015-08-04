@@ -72,7 +72,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    * 
    */
   @SuppressWarnings("hiding")
-  public static final int version = 20121219;
+  public static final String version = "2015-07-01";
   
   /**Standard action for resizing, used if the window contains one panel.
    * It calls {@link GralMng_ifc#resizeWidget(GralWidget, int, int)} 
@@ -80,7 +80,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    */
   protected class ActionResizeOnePanel extends GralUserAction 
   { 
-    ActionResizeOnePanel(){ super("actionResizeOnePanel - window: " + name); }
+    ActionResizeOnePanel(){ super("actionResizeOnePanel - window: " + GralWindow.this.name); }
     @Override public boolean exec(int keyCode, GralWidget_ifc widgi, Object... params)
     { for(GralWidget widgd: widgetsToResize){
         if(widgd instanceof GralWindow) {

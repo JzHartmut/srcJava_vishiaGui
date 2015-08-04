@@ -63,6 +63,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2015-07-13 Hartmut new: {@link #registerUserAction(String, GralUserAction)} now knows possibility of usage the own name with "<name>" 
    * <li>2015-07-13 Hartmut chg: Positioning: The new concept gets a position in the constructor of {@link GralWidget} via 
    *   {@link #getPosCheckNext()}. That routine sets the current position in this class to {@link PosThreadSafe#posUsed} 
    *   for further using to increment. That is correct. 
@@ -131,7 +132,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public final static String sVersion = "2015-05-03";
+  public final static String sVersion = "2015-08-05";
   
 	/**This class is used for a selection field for file names and paths. */
   protected class FileSelectInfo
@@ -783,12 +784,18 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 	
   /**Registers all user actions, which are able to use in Button etc.
    * The name is related with the <code>userAction=</code> designation in the configuration String.
-   * @param name
+   * @param name if it contains "<name>" then that is replace by the {@link GralUserAction#name}. 
+   *   You can give "<name>" only to set the action's name.
    * @param action
    */
   @Override public void registerUserAction(String name, GralUserAction action)
-  {
-    userActions.put(name, action);
+  { final String name1;
+    if(name.indexOf("<name>") >=0){
+      name1 = name.replace("<name>", action.name);
+    } else {
+      name1 = name;
+    }
+    userActions.put(name1, action);
   }
   
   @Override public GralUserAction getRegisteredUserAction(String name)

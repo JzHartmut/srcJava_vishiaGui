@@ -62,9 +62,10 @@ public abstract class GralUserAction
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120303;
+  public static final String version = "2015-08-05";
 
-  final String name;
+  /**The name of the action on construction, may be used to register, used for debug. */
+  public final String name;
   
   private boolean bCallDeprecated;
   

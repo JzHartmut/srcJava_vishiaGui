@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.byteData.VariableAccess_ifc;
+import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileRemote;
@@ -18,6 +19,7 @@ import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMenu;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralShowMethods;
@@ -27,11 +29,13 @@ import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralColorSelector;
 import org.vishia.inspcPC.accTarget.InspcTargetAccessData;
 import org.vishia.inspcPC.mng.InspcMng;
 import org.vishia.inspcPC.mng.InspcPlugUser_ifc;
 import org.vishia.inspcPC.mng.UserInspcPlug_ifc;
+import org.vishia.inspectorTarget.Inspector;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageFile;
 import org.vishia.util.Assert;
@@ -42,7 +46,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 {
 
   /**Version, history and license
-   * <ul>2015-01-27 Hartmut new: Now initialized the {@link GralShowMethods} for usage on edit fields. An edit field
+   * <ul>
+   * <li>2015-01-27 Hartmut new: Test {@link #actionGetValueByHandleIntern}
+   * <li>2015-01-27 Hartmut new: Now initialized the {@link GralShowMethods} for usage on edit fields. An edit field
    *   can use the {@link GralShowMethods#syncVariableOnFocus} if the text was changed. 
    *   It invokes {@link VariableAccess_ifc#setString(String)} which changed the content of the variable on their target.
    * <li>2012-08-10 Hartmut A default directory for curve config files given with argument "-dirCurves=".
@@ -165,7 +171,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   GralButton btnSwitchOnLog;
   final GralButton btnRetryDisableVariables = new GralButton(null, "retry variable", actionSetRetryDisabledVariable);
 
-  final GralButton btnUseGetByIndex = new GralButton(null, "get value by handle", actionUseGetValueByIndex);
+  final GralButton btnUseGetByHandle = new GralButton(null, "get value by handle", actionUseGetValueByIndex);
   
   static final GralColor colorRefreshed = GralColor.getColor("wh");
   static final GralColor colorOldValue = GralColor.getColor("lgr");
@@ -186,7 +192,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   InspcGui(CallingArguments cargs, GralArea9MainCmd cmdgui)
   {
     guiCfg = new InspcGuiCfg(cargs, cmdgui, userInspcPlug);
-    
+    GralMng.get().registerUserAction("<name>", actionGetValueByHandleIntern);
     for(Map.Entry<String, String> entry: cargs.indexTargetIpcAddr.entrySet()){
       windCtrlStatus.addTarget(entry.getKey(), entry.getValue());
     }
@@ -432,8 +438,8 @@ private class InspcGuiCfg extends GuiCfg
     btnSwitchOnLog.setActionChange(actionEnableLog);
     btnRetryDisableVariables.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("am"));
     btnRetryDisableVariables.setToPanel(super._gralMng);
-    btnUseGetByIndex.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
-    btnUseGetByIndex.setToPanel(super._gralMng);
+    btnUseGetByHandle.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
+    btnUseGetByHandle.setToPanel(super._gralMng);
     colorSelector = new GralColorSelector("colorSelector", super._gralMng);
     curveA.buildGraphic(gui.mainWindow(), colorSelector, null);
     curveB.buildGraphic(gui.mainWindow(), colorSelector, curveA.widgCurve.getCommonData());
@@ -586,6 +592,30 @@ private class InspcGuiCfg extends GuiCfg
     }
     
   }
+  
+  
+  
+  GralUserAction actionGetValueByHandleIntern = new GralUserAction("getValueByHandleIntern"){
+    int handle = 0;
+    public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
+      System.out.println("hello");
+      Inspector inspector = Inspector.get();
+      if(handle == 0){
+        handle = inspector.classContent.registerHandle("this$0.inspcMng.threadEvent.timeSleep", null);
+      }
+      if(handle !=-1){
+        byte[] answerBuffer = new byte[200];
+        InspcDataExchangeAccess.Inspcitem answerItem = new InspcDataExchangeAccess.Inspcitem();
+        answerItem.assignClear(answerBuffer);
+        inspector.classContent.getValueByHandle(handle, answerItem);
+        //The result is written to the answerBuffer, the answerItem is the helper only.
+        answerItem.assign(answerBuffer); //assign newly but yet to read the content.
+        int nCmd = answerItem.getCmd();
+        answerItem.getChildInteger(1);
+      }
+      return true;
+    }
+  };
   
   
 }
