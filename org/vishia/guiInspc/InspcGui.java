@@ -604,14 +604,8 @@ private class InspcGuiCfg extends GuiCfg
         handle = inspector.classContent.registerHandle("this$0.inspcMng.threadEvent.timeSleep", null);
       }
       if(handle !=-1){
-        byte[] answerBuffer = new byte[200];
-        InspcDataExchangeAccess.Inspcitem answerItem = new InspcDataExchangeAccess.Inspcitem();
-        answerItem.assignClear(answerBuffer);
-        inspector.classContent.getValueByHandle(handle, answerItem);
-        //The result is written to the answerBuffer, the answerItem is the helper only.
-        answerItem.assign(answerBuffer); //assign newly but yet to read the content.
-        int nCmd = answerItem.getCmd();
-        answerItem.getChildInteger(1);
+        int value = inspector.classContent.getIntValueByHandle(handle);
+        System.out.println("value =" + value);
       }
       return true;
     }

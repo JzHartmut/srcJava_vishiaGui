@@ -94,6 +94,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2015-08-28 Hartmut chg: {@link #processKeys(int)}: Use tab and sh-tab to switch between the columns. 
+   *   This keys are used as 'traverse key' normally, but they are ignored for that now by a proper TraverseListener
+   *   in {@link org.vishia.gral.swt.SwtTable}. The standard traverse listener which is active for traversing between the
+   *   text fields of the table does not set the correct {@link #colSelectedixCellC} which is necessary for accept the column.
+   * <li>2015-08-28 Hartmut new: Search in columns:
+   *   <ul><li>Use the keys without shiftDigit-designation if it is a text key. It is not possible to use elsewhere.
+   *       <li>{@link #searchContent(boolean)}: If the search string starts with '*' it searches 'contains(...)'.
+   *   </ul>    
    * <li>2015-07-12 Hartmut new: {@link TableLineData#setBackColor} with colorSelect etc. for content-depending table presentation. 
    * <li>2015-06-21 Hartmut chg: Implementation of {@link TableLineData#setBackColor(GralColor, int}} 
    *   now regards the ix-argument as cell index, like defined in comment.
@@ -217,8 +225,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    */
-  @SuppressWarnings("hiding")
-  protected final static int version = 0x20131206;
+  protected final static String sVersion = "2015-08-28";
 
   
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
@@ -1028,43 +1035,42 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     String search = searchChars.toString();
     boolean found = false;
     if(search != null && search.length() !=0) { // return false;
-    boolean contSearch = true;
-    TableLineData line2, line = lineSelected;
-    do{
-      if(bUp && line !=null){        //up
-        line2 = prevLine(line);
-      } else if(!bUp && line !=null){ //down
-        line2 = nextLine(line);
-      } else {
-        //ixLineNew = ixLineNewAct;
-        line2 = null;                 //eand reached
-      }
-      if(line2 ==null){ //end of search
-        contSearch = false;  //without change the lineSelected
-        lineSelected = line;  //show the first or last line
-        nLineFirst = -1;  //get new, undefined elsewhere.
-        found = search.length() >0;
-      } else {
-        line = line2;
-        String sText = line.getCellText(colSelectedixCellC).toLowerCase();
-        if(search.length() > 0 && searchChars.charAt(0) == '*'){
-          contSearch = false;  //TODO search content contains
+      boolean contSearch = true;
+      TableLineData line2, line = lineSelected;
+      do{
+        if(bUp && line !=null){        //up
+          line2 = prevLine(line);
+        } else if(!bUp && line !=null){ //down
+          line2 = nextLine(line);
         } else {
-          if( search.length() == 0){   //always found if no searchchar is given.
+          //ixLineNew = ixLineNewAct;
+          line2 = null;                 //eand reached
+        }
+        if(line2 ==null){ //end of search
+          contSearch = false;  //without change the lineSelected
+          lineSelected = line;  //show the first or last line
+          nLineFirst = -1;  //get new, undefined elsewhere.
+          found = search.length() >0;
+        } else {
+          line = line2;
+          String sTextLo = line.getCellText(colSelectedixCellC).toLowerCase();
+          String sText = line.getCellText(colSelectedixCellC);
+          if( search.length() == 0 || search.equals('*')){   //always found if no searchchar is given.
             found = false;
             contSearch = false;
-          } else if(!sText.startsWith(search)){  //found
-            found = false;
-          } else {
+          } else if(  sTextLo.startsWith(search)
+                   || search.charAt(0)== '*' && sText.contains(search.substring(1))
+            ){  //found
             found = true;
             lineSelected = line;
             nLineFirst = -1;  //get new, undefined elsewhere.
             bPrepareVisibleArea = true;
             contSearch = false;                   //found
+          } else {
+            found = false;
           }
         }
-      }
-    } while(contSearch);
+      } while(contSearch);
     }
     return found;
   }
@@ -1115,6 +1121,16 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       if( keyDone || keyCode == KeyCode.mouse1Double || timeDiff > -11110){  //use 50 ms for timeout if keyDone isn't set.  
         keyDone = false;
         switch(keyCode){
+        case KeyCode.tab: {
+          if(colSelectedixCellC < columnWidthsGral.length-1) { 
+            colSelectedixCellC +=1; 
+          }
+        } break;
+        case KeyCode.shift + KeyCode.tab: {
+          if(colSelectedixCellC >= 1) { 
+            colSelectedixCellC -=1; 
+          }
+        } break;
         case KeyCode.pgup: {
           if(lineSelectedixCell > 2){
             lineSelectedixCell = 2;
@@ -1212,6 +1228,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             
             keyActionDone.activate();
           } else if(KeyCode.isTextKey(keyCode) && !bColumnEditable[colSelectedixCellC]){
+            keyCode &= ~KeyCode.shiftDigit;  //The keycode is valid without shift-designation.
             searchChars.appendCodePoint(keyCode);
             searchContent(false);
             repaint();

@@ -12,6 +12,9 @@ public class SwtGralKey extends KeyCode
   
   /**Version, history and license
    * <ul>
+   * <li>2015-08-29 Hartmut chg: {@link #convertFromSwt(int, int, char)} now uses the character key information of the event too.
+   *   Elsewhere it is not possible to use the keyboard layout from the operation system to detect keys with sh. 
+   *   All keys with shift, which are character keys, are returned without {@link KeyCode#shift} designation now.
    * <li>2013-11-16 Hartmut new {@link #convertMouseKey(int, MouseAction, int)}
    * <li>2011-10-02 Hartmut created for Key handling in the GRAL. 
    * </ul>
@@ -49,7 +52,7 @@ public class SwtGralKey extends KeyCode
   { super(0);
   }
   
-  public static int convertFromSwt(int keyCode, int stateMask)
+  public static int convertFromSwt(int keyCode, int stateMask, char characterKey)
   {
     final int stateKeys, key;    
     if((stateMask & (SWT.CONTROL + SWT.ALT + SWT.SHIFT)) == SWT.CONTROL + SWT.ALT + SWT.SHIFT){
@@ -92,12 +95,17 @@ public class SwtGralKey extends KeyCode
       case SWT.END:         key = end; break;
       case SWT.INSERT:      key = ins; break;
       case SWT.DEL:         key = del; break;
+      case SWT.TAB:         key = tab; break;
       case 0x0d:            key = enter; break;
       case 0x08:            key = back; break;
       case 0x1b:            key = esc; break;
-      default: key = keyCode;
+      default:              key = keyCode;
     }
-    return stateKeys + key;
+    if(stateKeys == shift && characterKey >= ' ') {
+      return characterKey;
+    } else {
+      return stateKeys + key;
+    }
   }
   
   
@@ -148,7 +156,7 @@ public class SwtGralKey extends KeyCode
       } break;
       default: keyMouse = 0;  //unused, only because compiling error
     }
-    final int keyCode = SwtGralKey.convertFromSwt(keyMouse, stateMask);
+    final int keyCode = SwtGralKey.convertFromSwt(keyMouse, stateMask, '\0');
     return keyCode;
   }
   

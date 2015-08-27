@@ -1026,7 +1026,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
       if(userMainKeyAction() !=null 
           && (event.keyCode & 0xffff) !=0  //don't take anything on alt- etc. alone
         ){
-        final int keyCode = SwtGralKey.convertFromSwt(event.keyCode, event.stateMask);
+        final int keyCode = SwtGralKey.convertFromSwt(event.keyCode, event.stateMask, event.character);
         boolean bDone = userMainKeyAction().userActionGui(keyCode, null);
         if(bDone){
           event.type = SWT.None;

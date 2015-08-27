@@ -17,6 +17,8 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
@@ -39,6 +41,7 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Assert;
+import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 
 /**Implementation of the GralTable for Swt graphic.
@@ -102,6 +105,9 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
 
   /**Version and history
    * <ul>
+   * <li>2015-08-29 Hartmut chg: It has a {@link #traverseListenerTable} now to accept 'tab' and 'sh-tab' as normal key 
+   *   instead usage to traverse between the text fields of a table. TODO: What traversing functions are missing yet?
+   *   They should not any traverse function between the cells.
    * <li>2013-06-29 Hartmut chg: refactoring. Now a GralTable<generic> can be created before the graphic is build. It is the new schema of GralWidget.
    *   The inner class {@link GraphicImplAccess} is provided as super class for the graphic implementation class,
    *   for example {@link org.vishia.gral.swt.SwtTable}.
@@ -141,8 +147,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    */
-  @SuppressWarnings("hiding")
-  public final static int version = 20120715;
+  public final static String version = "2015-08-29";
 
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
    * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
@@ -685,6 +690,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         cell.addFocusListener(this);
         cell.addMouseListener(mousePressedListener);
         cell.addMouseWheelListener(mouseWheelListener);
+        cell.addTraverseListener(traverseListenerTable);
         GralTable.CellData cellData = new GralTable.CellData(iRow, iCol);
         cell.setData(cellData);
         cells[iRow][iCol] = cellData;
@@ -757,7 +763,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   protected void keyPressed(KeyEvent keyEv){
     try{
       if((keyEv.keyCode & 0xffff) !=0){
-        final int keyCode = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
+        final int keyCode = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask, keyEv.character);
         processKeys(keyCode);
       }
     } catch(Exception exc){
@@ -891,6 +897,19 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     }
     
   };
+  
+  TraverseListener traverseListenerTable = new TraverseListener() {
+
+    @Override public void keyTraversed(TraverseEvent e)
+    {
+      Debugutil.stop();
+      if(e.character == '\t'){
+        //only the tab key should be handled because up and down are received by the key handler
+        SwtTable.this.keyPressed(e);
+      }
+    }
+  };
+  
   
   
   /**An instance of this is associated to any cell of the table. 

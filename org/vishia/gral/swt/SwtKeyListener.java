@@ -69,7 +69,7 @@ public class SwtKeyListener implements GralKeySpecial_ifc, KeyListener// extends
       swtControl = null;
     }
     if((keyEv.keyCode & 0xffff) !=0){
-      final int keyCode = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask);
+      final int keyCode = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask, keyEv.character);
       if(! specialKeysOfWidgetType(keyCode, widgetDescr, swtControl)){
         keyAction.keyPressed(keyCode, widgetDescr, swtControl);
       }
