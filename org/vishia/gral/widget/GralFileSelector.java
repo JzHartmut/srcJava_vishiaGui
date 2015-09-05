@@ -1304,7 +1304,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
       return Result.cont; 
     }
 
-    @Override public Result offerLeafNode(FileRemote file)
+    @Override public Result offerLeafNode(FileRemote file, Object info)
     { showFile(file);  //invoked also for dirs because depth=1
       return Result.cont;
     }

@@ -1410,19 +1410,21 @@ public GralButton addCheckButton(
   
     @Override public boolean userActionGui(int actionCode, GralWidget widgg, Object... params) 
     {
-      FileSelectInfo fileSelectInfo = (FileSelectInfo)widgg.getContentInfo();
-      if(fileSelectInfo.listRecentFiles !=null){
-        stop();
-      } else {
-        fileSelectInfo.dialogFile.show(fileSelectInfo.sRootDir, fileSelectInfo.sLocalDir
-          , fileSelectInfo.sMask, fileSelectInfo.sTitle);
-        String fileSelect = fileSelectInfo.dialogFile.getSelection(); 
-        if(fileSelect !=null){
-          fileSelectInfo.dstWidgd.setText(fileSelect);
-          //fileSelectInfo.dstWidgd.setValue(cmdSet, 0, fileSelect);
-          GralUserAction actionSelect = fileSelectInfo.dstWidgd.getActionChange();
-          if(actionSelect !=null){
-            actionSelect.userActionGui(KeyCode.menuEntered, fileSelectInfo.dstWidgd, fileSelect);
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){  //supress both mouse up and down reaction
+        FileSelectInfo fileSelectInfo = (FileSelectInfo)widgg.getContentInfo();
+        if(fileSelectInfo.listRecentFiles !=null){
+          stop();
+        } else {
+          fileSelectInfo.dialogFile.show(fileSelectInfo.sRootDir, fileSelectInfo.sLocalDir
+            , fileSelectInfo.sMask, fileSelectInfo.sTitle);
+          String fileSelect = fileSelectInfo.dialogFile.getSelection(); 
+          if(fileSelect !=null){
+            fileSelectInfo.dstWidgd.setText(fileSelect);
+            //fileSelectInfo.dstWidgd.setValue(cmdSet, 0, fileSelect);
+            GralUserAction actionSelect = fileSelectInfo.dstWidgd.getActionChange();
+            if(actionSelect !=null){
+              actionSelect.userActionGui(KeyCode.menuEntered, fileSelectInfo.dstWidgd, fileSelect);
+            }
           }
         }
       }

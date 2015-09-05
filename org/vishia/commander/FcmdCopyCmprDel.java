@@ -1513,7 +1513,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     
     
 
-    @Override public Result offerLeafNode(FileRemote file) {
+    @Override public Result offerLeafNode(FileRemote file, Object info) {
       boolean bShow = (fileProcessed == null);
       //actionShowFilesCmp.fileProcessed = file;
       //actionShowFilesCmp.zFiles +=1;
@@ -1555,7 +1555,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     
     
 
-    @Override public Result offerLeafNode(FileRemote file) {
+    @Override public Result offerLeafNode(FileRemote file, Object info) {
       return Result.cont;
     }
 
