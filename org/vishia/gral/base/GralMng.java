@@ -63,6 +63,8 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2015-07-13 Hartmut chg: {@link GralMngFocusListener#focusLostGral(GralWidget)} now invokes the {@link GralWidget#actionFocused} too.
+   *   The action should distinguish between focus gained and focus lost in its action routine. That should be added to the code. Done for all vishia sources.  
    * <li>2015-07-13 Hartmut new: {@link #registerUserAction(String, GralUserAction)} now knows possibility of usage the own name with "<name>" 
    * <li>2015-07-13 Hartmut chg: Positioning: The new concept gets a position in the constructor of {@link GralWidget} via 
    *   {@link #getPosCheckNext()}. That routine sets the current position in this class to {@link PosThreadSafe#posUsed} 
@@ -1612,6 +1614,7 @@ public GralButton addCheckButton(
     public void focusLostGral(GralWidget widgg){
       GralWidget.ImplAccess.setFocused(widgg, false);  //denotes that the GralWidget has lost the focus
       widgg.repaint();  //maybe changed outfit on focus lost.
+      if(widgg.actionFocused !=null){ widgg.actionFocused.exec(KeyCode.focusLost, widgg); }
       //CharSequence text = Assert.stackInfo("", 1, 5);
       //System.out.println("GralMng - widget focus lost;" + widgg.name + text);
     }

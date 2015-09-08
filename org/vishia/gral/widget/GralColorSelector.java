@@ -1,3 +1,7 @@
+//==JZcmd==
+//JZcmd Obj a = java org.vishia.gral.widget.GralColorSelector.todo();
+//==endJZcmd==
+
 package org.vishia.gral.widget;
 
 import org.vishia.gral.base.GralButton;

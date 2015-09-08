@@ -558,11 +558,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     colorBackSelect = GralColor.getColor("lam");
     colorBackSelectNew = GralColor.getColor("lbl");
     
-    colorBackMarked = GralColor.getColor("prd");
-    colorBackSelectMarked = GralColor.getColor("lrd");
+    colorBackMarked = GralColor.getColor("lrd");
+    colorBackSelectMarked = GralColor.getColor("rd");
     
     colorBackSomeMarked = GralColor.getColor("pma");
-    colorBackSelectSomeMarked = GralColor.getColor("lor");
+    colorBackSelectSomeMarked = GralColor.getColor("lma");
     
     colorBackSelectNewMarked = GralColor.getColor("lpu");
     dyda.backColor = GralColor.getColor("wh");

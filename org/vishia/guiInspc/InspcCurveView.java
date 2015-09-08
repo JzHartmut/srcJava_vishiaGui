@@ -266,7 +266,7 @@ public final class InspcCurveView
     //gralMng.setPosition(4, 0, 4, 0, 0, '.');
     gralMng.setPosition(4, 56, 4, 104, 0, '.');
     //int windProps = GralWindow.windConcurrently | GralWindow.windOnTop | GralWindow.windResizeable;
-    int windProps = GralWindow.windConcurrently; // | GralWindow.windResizeable;
+    int windProps = GralWindow.windConcurrently | GralWindow.windOnTop; // | GralWindow.windResizeable;
     windCurve = gralMng.createWindow("windMapVariables", sName, windProps);
     //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 0, 'd');
     buildGraphicInCurveWindow(common);
@@ -1115,11 +1115,13 @@ public final class InspcCurveView
 
   public GralUserAction actionFocusScaling = new GralUserAction("actionSetFocusScaling"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
-      if(scalingWidg !=null){
-        scalingWidg.setBackColor(GralColor.getColor("wh"), 0);   //current, old  
+      if(actionCode == KeyCode.focusGained) {
+        if(scalingWidg !=null){
+          scalingWidg.setBackColor(GralColor.getColor("wh"), 0);   //current, old  
+        }
+        scalingWidg = (GralTextField)widgd;
+        scalingWidg.setBackColor(GralColor.getColor("lam"), 0);  //the new one
       }
-      scalingWidg = (GralTextField)widgd;
-      scalingWidg.setBackColor(GralColor.getColor("lam"), 0);  //the new one
       return true; 
     }
   };

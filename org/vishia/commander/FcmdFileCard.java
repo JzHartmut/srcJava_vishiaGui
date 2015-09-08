@@ -14,9 +14,9 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.gral.widget.GralHorizontalSelector;
-
 import org.vishia.util.Assert;
 import org.vishia.util.FileCompare;
+import org.vishia.util.KeyCode;
 
 /**This is one file table in the the.File.commander. Each main panel (left, middle, right)
  * has maybe more as one tabs, each tab has exactly one file table. The file table is reused
@@ -572,8 +572,10 @@ public class FcmdFileCard extends GralFileSelector
    * 
    */
   GralUserAction actionFocused = new GralUserAction("actionFocused"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
-      setActFilePanel_setColorCurrLine();
+    @SuppressWarnings("synthetic-access") @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
+      if(actionCode == KeyCode.focusGained){
+        setActFilePanel_setColorCurrLine();
+      }
       return true;      
   } };
   

@@ -279,7 +279,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     
     
     main._gralMng.setPosition(GralPos.refer + 2.3f, GralPos.size +3.2f, 1, -13, 0, 'r', 0.3f);
-    widgFromConditions = main._gralMng.addTextField("copyCond",true, "select src files: mask*:*.ext / 2012-08-05..06", "t");
+    widgFromConditions = main._gralMng.addTextField("copyCond",true, "select src files: mask* : *.ext ", "t");  /// 2012-08-05..06
     widgFromConditions.setActionChange(actionSelectMask);
     widgFromConditions.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".selcond.");
     

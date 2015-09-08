@@ -1,3 +1,6 @@
+//==JZcmd==
+//JZcmd main(){ java org.vishia.gral.test.GralColorShow.main(); }
+//==endJZcmd==
 package org.vishia.gral.test;
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
@@ -64,7 +67,10 @@ public class GralColorShow
   
   GralMng gralMng = GralMng.get();
   
-  public static void main(String[] args){
+  public static void main(String[] args){ main(); }
+
+    
+  public static void main(){
     GralColorShow main = new GralColorShow();
     main.execute();
     //main.testGetColor();
@@ -87,40 +93,44 @@ public class GralColorShow
   }
   
   
-  
-  String[] val =  
-  { "ma FFFFFF FFC0FF FF80FF FF00FF e000e0 c000c0 a000a0 800080 600060 400040 404040"
-  , "   FF0000 FFC0F0 FF80F0 FF00e0 e800d0 d000c0 a000c0 FFFFFF 503050 FFFFFF FFFFFF"
-  , "   FFFFFF FFC0E0 FF80E0 FF00a0 F000a0 e00080 c00080 FFFFFF FFFFFF FFFFFF FFFFFF"
-  , "   FFFFFF FFC0d0 FF80C0 FF0060 F80060 F00040 d80040 FFFFFF FFFFFF FFFFFF FFFFFF"
-  , "rd FFe0e0 FFC0C0 FFa0a0 FF6060 FF0000 F00000 e00000 c00000 a00000 700000 400000"
-  , "   FFe8e0 FFD0c0 FF9070 FC9000 F03000 F03000 d81000 FFFFFF FFFFFF 602000 FFFFFF"
-  , "   FFf0e0 FFE0c0 FFc070 F8c000 e06000 e06000 c03000 FFFFFF FFFFFF 503000 FFFFFF"
-  , "   FFF8e0 FcF0b0 FFe070 F4e000 a08000 c09000 a06000 FFFFFF FFFFFF 403000 FFFFFF"
-  , "ye FFFFa0 FFFF00 F0F000 e0e000 808000 a0a000 808000 606000 606040 404000 404000"
-  , "   FFFFd0 FFFF80 e0FF70 C0F400 708000 90b000 608000 FFFFFF FFFFFF 304000 FFFFFF"
-  , "wh FFFFFF f0FF80 c0FF70 80F800 609000 80b000 408000 FFFFFF FFFFFF 203000 FFFFFF"
-  , "   F0FFF0 e0FFe0 a0FF70 40FC00 40a000 40b000 208800 FFFFFF FFFFFF 104000 FFFFFF"
-  , "gn e0ffe0 c0FFc0 00FF00 00e000 00a000 00b000 009000 008000 007000 004000 000000"
-  , "   c0FFe0 c0FFd0 70FFa0 00FC40 00a040 00A050 008820 208020 305020 204010 FFFFFF"
-  , "   c0FFf0 b0FFe0 70FFc0 00F880 00a070 40a060 008840 208030 408050 004020 FFFFFF"
-  , "   e0FFF0 b0FFf0 70FFe0 00F4c0 00a080 00a070 008040 208060 FFFFFF 305050 FFFFFF"
-  , "cy d0FFFF b0FFFF 00FFFF 00F0F0 00a0a0 00a0a0 008080 006060 004040 004040 003030"
-  , "   FFFFFF b0f0FF 70f0FF 00e0F4 0090E0 0090e0 0060a0 406080 003040 409090 FFFFFF"
-  , "   FFFFFF b0e0FF 70e0FF 00c0F8 1060F0 0060F0 0030c0 4060e0 003060 FFFFFF FFFFFF"
-  , "   F0F0FF c0d0FF 70c0FF 0090FC 2040FF 0040F0 0000e0 4040f0 002080 FFFFFF FFFFFF"
-  , "bl e0e0FF c0c0FF a0a0FF 6060FF 4040FF 0000FF 0000c0 0000a0 000080 000040 000040"
-  , "   FFFFFF d0c0FF C080FF C000FF 7040FF 4000FF 2000ec 4000d8 4000c0 FFFFFF FFFFFF"
-  , "   FFFFFF E0c0FF E080FF E000FF 9020FF 8000F0 4000e0 6030d0 6020b0 FFFFFF FFFFFF"
-  , "   FFFFFF F0c0FF F080FF F000FF c000F0 c000d0 6000d0 8050a0 7060a0 505090 400050"
-};
+  String[] val =
+  { "ma  FFe0FF FFC0FF FF80FF FF00FF e000e0 c000c0 a000a0 800080 600060 400040 404040"
+  , "    FFe0f0 FFC0F0 FF80F0 FF00e0 e800d0 d000c0 a000c0 FFFFFF 503050 FFFFFF FFFFFF"
+  , "    FFd8e8 FFC0E0 FF80E0 FF00a0 F000a0 e00080 c00080 FFFFFF FFFFFF FFFFFF FFFFFF"
+  , "    FFe0e8 FFC0d0 FF80C0 FF0060 F80060 F00040 d80040 FFFFFF FFFFFF FFFFFF FFFFFF"
+  , "rd  FFe0e0 FFC0C0 FFa0a0 FF6060 FF0000 F00000 e00000 c00000 a00000 700000 400000"
+  , "    FFe8e0 FFD0c0 FF9070 FC9000 F03000 F03000 d81000 FFFFFF FFFFFF 602000 FFFFFF"
+  , "    FFf0e0 FFE0c0 FFc070 F8c000 e06000 e06000 c03000 FFFFFF FFFFFF 503000 FFFFFF"
+  , "    FFF0d0 FcF0b0 FFe070 F4e000 a08000 c09000 a06000 FFFFFF FFFFFF 403000 FFFFFF"
+  , "ye  FFFFc0 FFFF80 F0F000 e0e000 808000 a0a000 808000 606000 606040 404000 404000"
+  , "    FFFFd0 FFFFa0 e0FF70 C0F400 708000 90b000 608000 FFFFFF FFFFFF 304000 FFFFFF"
+  , "wh  FFFFFF f0FF80 c0FF70 80F800 609000 80b000 408000 FFFFFF FFFFFF 203000 FFFFFF"
+  , "    F0FFF0 e0FFe0 a0FF70 40FC00 40a000 40b000 208800 FFFFFF FFFFFF 104000 FFFFFF"
+  , "gn  e0ffe0 c0FFc0 00FF00 00e000 00a000 00b000 009000 008000 007000 004000 000000"
+  , "    c0FFe0 c0FFd0 70FFa0 00FC40 00a040 00A050 008820 208020 305020 204010 FFFFFF"
+  , "    c0FFf0 b0FFe0 70FFc0 00F880 00a070 40a060 008840 208030 408050 004020 FFFFFF"
+  , "    e0FFF0 b0FFf0 70FFe0 00F4c0 00a080 00a070 008040 208060 FFFFFF 305050 FFFFFF"
+  , "cy  d0FFFF b0FFFF 00FFFF 00F0F0 00a0a0 00a0a0 008080 006060 004040 004040 003030"
+  , "    FFFFFF b0f0FF 70f0FF 00e0F4 0090E0 0090e0 0060a0 406080 003040 409090 FFFFFF"
+  , "    FFFFFF b0e0FF 70e0FF 00c0F8 1060F0 0060F0 0030c0 4060e0 003060 FFFFFF FFFFFF"
+  , "    F0F0FF c0d0FF 70c0FF 0090FC 2040FF 0040F0 0000e0 4040f0 002080 FFFFFF FFFFFF"
+  , "bl  F4F0FF c0c0FF a0a0FF 6060FF 4040FF 0000FF 0000c0 0000a0 000080 000040 000040"
+  , "    F8e8FF d0c0FF C080FF C000FF 7040FF 4000FF 2000ec 4000d8 4000c0 FFFFFF FFFFFF"
+  , "    FCe4FF E0c0FF E080FF E000FF 9020FF 8000F0 4000e0 6030d0 6020b0 FFFFFF FFFFFF"
+  , "    FEe0FF F0c0FF F080FF F000FF c000F0 c000d0 6000d0 8050a0 7060a0 505090 400050"
+  };
+      
+      
+      
+String colNames = "ma,   ,   ,   , rd,   ,   ,   , ye,   , wh,   , gn,   ,   ,   , cy,   ,   ,   , bl,   ,   ,   ";        
   
   
 
   GralTextField[][] color = new GralTextField[24][11];
 
-  GralTextField wdgTest1, wdgTest2;
+  GralTextField wdgTest, wdgTest1, wdgTest2;
   
+  boolean testText, testLine;
   
   GralColor colWh = GralColor.getColor("wh");  
   GralColor colBk = GralColor.getColor("bk");
@@ -211,7 +221,7 @@ public class GralColorShow
           GralColor colText;
           if(col < 4){ colText = colBk; }
           else { colText = colWh; }
-          String col1 = val[line].substring(7*col+3, 7*col+9);
+          String col1 = val[line].substring(7*col+4, 7*col+10);
           //System.out.append(' ').append(col1);
           int col2 = Integer.parseInt(col1, 16);
           GralColor col3 = new GralColor(col2);
@@ -230,10 +240,15 @@ public class GralColorShow
       //
       wdgTest1 = new GralTextField("test1");
       wdgTest2 = new GralTextField("test2");
+      wdgTest1.setEditable(true);
+      wdgTest2.setEditable(true);
+      wdgTest1.setActionFocused(actionFocusedTest);
+      wdgTest2.setActionFocused(actionFocusedTest);
       wdgTest1.setToPanel(gralMng);
       wdgTest2.setToPanel(gralMng);
       wdgTest1.setText("ABC");
       wdgTest2.setText("XYZ");
+      wdgTest = wdgTest1;
       //
       /*
       GralTextField[][] colorGen = new GralTextField[11][24];
@@ -260,14 +275,20 @@ public class GralColorShow
   
   
   void outColors(){
+    System.out.append("  String[] val =\n");
+    String sep = "  { \"";
     for(int line=0; line<color.length; ++line) {
-      //System.out.append(", \"");
+      System.out.append(sep);
+      System.out.append(colNames.substring(4*line, 4*line+2));
+      System.out.append(' ');
       for(int col = 0; col < color[0].length; ++col){
         String sVal = color[line][col].getText();
         System.out.append(' ').append(sVal);
       }
-      System.out.append("\n");
+      System.out.append("\"\n");
+      sep = "  , \"";
     }
+    System.out.append("  };\n");
   }
   
   
@@ -282,14 +303,13 @@ public class GralColorShow
         wdg.setBackColor(color,0);
       } else if(key == (KeyCode.focusGained)){
         GralColor color = wdg.getBackColor(0);
-        wdgTest1.setBackColor(color,0);
-      } else if(key == ('1' + KeyCode.ctrl)){
-        GralColor color = wdg.getBackColor(0);
-        wdgTest1.setBackColor(color,0);
-      } else if(key == ('2' + KeyCode.ctrl)){
-        GralColor color = wdg.getBackColor(0);
-        wdgTest2.setBackColor(color,0);
-      } else if(key == (KeyCode.enter + KeyCode.ctrl)){
+        if(testText) {
+          wdgTest.setTextColor(color);
+          wdgTest.setLineColor(color, 0);
+        } else {
+          wdgTest.setBackColor(color,0);
+        }
+      } else if(key == (KeyCode.enter + KeyCode.ctrl) || key == ('s' + KeyCode.ctrl) || key == ('S' + KeyCode.ctrl)){
         outColors();
       }
       return true;
@@ -297,5 +317,16 @@ public class GralColorShow
   };
   
   
-  
+    GralUserAction actionFocusedTest = new GralUserAction("actionFocusedTest"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widg, Object... params) {
+      if(actionCode == KeyCode.focusLost){
+        GralTextField widgt = (GralTextField)widg;
+        wdgTest = widgt;
+        String text = widgt.getText();
+        int cursor = widgt.getCursorPos();
+        testText =  cursor > 0 && cursor < text.length();
+      }
+      return true;      
+  } };
+
 }
