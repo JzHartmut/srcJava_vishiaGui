@@ -23,6 +23,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
 {
   /**Version, history and license .
    * <ul>
+   * <li>2015-05-04 Hartmut new: {@link #setBorderWidth(int)} to show the text field with a border. 
    * <li>2015-05-04 Hartmut chg: {@link #setLongValue(long)} is more complexly, a calculation can result in a float value. Fixed. 
    * <li>2015-05-02 Hartmut chg: Calculation of the {@link GraphicImplAccess#posPrompt} and ...posField is processed 
    *   in this class commonly for SWT and AWT implementation. 
@@ -74,13 +75,18 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  @SuppressWarnings("hiding")
-  public final static int version = 20130313;
+  //@SuppressWarnings("hiding")
+  public static final String version = "2015-09-12";
   
 
   public enum Type{ password, editable};
   
   protected int caretPos;
+  
+  /**The width of an extra border arround the text field to mark it.
+   * 0: initially, no border. Note: The color of the border is the {@link GralWidget.DynamicData#lineColor}
+   */
+  protected int borderwidth;
   
   /**The prompt to the text field. */
   protected String sPrompt, sPromptStylePosition;
@@ -560,6 +566,25 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   
 
   
+  /**Sets a new border width and returns the old one.
+   * If the width is the same as the old one, nothing else is done.
+   * If the widht is another, a repaint request is registered to show it in graphic.
+   * This routine can be invoked in any thread.
+   * @param width 0: No border, 1... number of pixel for border.
+   * @return last width to quest, store and restore.
+   */
+  public int setBorderWidth(int width){ 
+    if(borderwidth == width) return width; //no action if nothing is change.
+    int widthLast = width;
+    borderwidth = width;
+    dyda.setChanged(GralWidget.ImplAccess.chgColorLine);
+    if(_wdgImpl !=null){
+      repaint();
+    }
+    return widthLast;
+  }
+  
+  
   
   /**Returns the Label for a prompt or null if there isn't used a prompt
    */
@@ -682,6 +707,8 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     
     protected String promptStylePosition(){ return GralTextField.this.sPromptStylePosition; }
  
+    protected int borderwidth(){ return GralTextField.this.borderwidth; }
+    
     protected int caretPos(){ return GralTextField.this.caretPos; }
     
     protected void caretPos(int newPos){ GralTextField.this.caretPos = newPos; }

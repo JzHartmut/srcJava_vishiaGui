@@ -8,7 +8,11 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -37,6 +41,8 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
 
   /**Version, history and license.
    * <ul>
+   * <li>2015-05-04 Hartmut new: {@link #setBorderWidth(int)} to show the text field with a border. That is not a property
+   *   of an SWT Text, therefore a new {@link #paintListener} was added to draw the border.
    * <li>2013-12-22 Hartmut chg: Now {@link GralTextField} uses the new concept of instantiation: It is not
    *   the super class of the implementation class. But it provides {@link GralTextField.GraphicImplAccess}
    *   as the super class. 
@@ -76,8 +82,8 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
    * 
    * 
    */
-  @SuppressWarnings("hiding")
-  public static final int version = 20120317;
+  //@SuppressWarnings("hiding")
+  public static final String version = "2015-09-12";
   
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
    * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
@@ -144,6 +150,8 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
       textFieldSwt.addModifyListener(modifyListener);
       TextFieldFocusListener focusListener = new TextFieldFocusListener(mng);
       textFieldSwt.addFocusListener(focusListener);
+    } else {
+      
     }
     if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("r")){
       Rectangle swtField = textFieldSwt.getBounds();
@@ -166,6 +174,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     }
     //
     textFieldSwt.setData(this);
+    textFieldSwt.addPaintListener(paintListener);
     if(!widgg.isEditable()){
       mng.mng.registerShowField(widgg);
     }
@@ -280,6 +289,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
         if((chg & chgColorText) !=0){ textFieldSwt.setForeground(swtWidgHelper.mng.getColorImpl(dyda().textColor)); }
         if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(swtWidgHelper.mng.getColorImpl(dyda().backColor)); }
         textFieldSwt.redraw();
+        //textFieldSwt.
         acknChanged(chg);
       }
     }
@@ -359,6 +369,29 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     }
   }
   
+  protected void paintWidget(Text swt, PaintEvent e){
+    GC gc = e.gc;
+    //gc.d
+    int borderwidth = super.borderwidth();
+    if(borderwidth >0) {
+      GralTextField widg = (GralTextField)super.widgg;
+      Rectangle dim = swt.getBounds();
+      gc.setLineWidth(borderwidth);
+      Color colorLine = swtWidgHelper.mng.getColorImpl(dyda().lineColor);
+      gc.setForeground(colorLine);
+      //gc.drawLine(0, 0, dim.width, dim.height);  //test of coordinates
+      Rectangle rect = new Rectangle(0,0,dim.width, dim.height);  //the rect which should drawn counts from (0,0)
+      gc.drawRectangle(rect);
+    }
+  } 
+  
+  PaintListener paintListener = new PaintListener(){
+    @Override public void paintControl(PaintEvent e) {
+      SwtTextFieldWrapper.this.paintWidget((Text)swtWidgHelper.widgetSwt, e);
+    }
+  };
+  
+
   
   /**For edit able fields.
    */
@@ -413,10 +446,11 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
 
     @Override public final boolean specialKeysOfWidgetType(int key, GralWidget_ifc widgg, Object widgImpl){ 
       boolean bDone = true;
-      if(KeyCode.isWritingKey(key)){
+      boolean bEditable = widgg.isEditable();
+      if(bEditable && KeyCode.isWritingKey(key)){
         setTextChanged();
       }
-      if(key != KeyCode.enter && KeyCode.isWritingOrTextNavigationKey(key)){
+      if(bEditable && key != KeyCode.enter && KeyCode.isWritingOrTextNavigationKey(key)){
         bDone = true;
         setTouched();
       } else {

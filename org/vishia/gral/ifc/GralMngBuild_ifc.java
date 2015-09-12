@@ -247,6 +247,16 @@ public interface GralMngBuild_ifc extends ReplaceAlias_ifc
     , int origin, char direction, float border);
 
 
+  /**Sets the position with fine position given as float value. Only one digit after the float point is regarded,
+   * see definition for the fine position as description of {@link GralPos}.
+   * @param line either position or combinded with {@link GralPos#refer} etc.
+   * @param lineEnd
+   * @param column
+   * @param columnEnd
+   * @param origin see {@link #setFinePosition(int, int, int, int, int, int, int, int, int, char, int, int, GralPos)}
+   * @param direction
+   * @param border
+   */
   public void setPosition(float line, float lineEnd, float column, float columnEnd
     , int origin, char direction, float border);
 

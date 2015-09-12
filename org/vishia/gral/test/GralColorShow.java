@@ -2,6 +2,10 @@
 //JZcmd main(){ java org.vishia.gral.test.GralColorShow.main(); }
 //==endJZcmd==
 package org.vishia.gral.test;
+import java.text.ParseException;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
@@ -15,6 +19,8 @@ import org.vishia.gral.swt.SwtFactory;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.KeyCode;
+import org.vishia.util.StringPart;
+import org.vishia.util.StringPartScan;
 
 
 /*Test with jzcmd: call jzcmd with this java file with its full path:
@@ -34,6 +40,7 @@ public class GralColorShow
   
   /**The version, history and license.
    * <ul>
+   * <li>2015-09-12 Hartmut now generates some colors via HSB values.
    * <li>2015-01-01 Hartmut created: .
    * </ul>
    * 
@@ -62,8 +69,32 @@ public class GralColorShow
    * 
    * 
    */
-  public final static int version = 0x20150426;
+  public static final String version = "2015-09-12";
 
+  
+  class Index {
+    int ixCol, ixLight;
+    
+  }
+  
+  class ColorWithField {
+    final Index index;
+    GralColor color;
+    float[] hsb = new float[3];
+    String shortname, name;
+    final GralTextField wdgColor;
+    
+    ColorWithField(String shortname, int ixCol, int ixBright, int colValue) {
+      this.index = new Index();
+      this.index.ixCol = ixCol; index.ixLight = ixBright;
+      this.color = GralColor.getColor(colValue);
+      this.shortname = shortname;
+      this.name = "";
+      this.wdgColor = new GralTextField("" + ixCol + "," + ixBright); //, GralTextField.Type.editable);
+      this.wdgColor.setBackColor(this.color, 0);
+      this.wdgColor.setData(this);
+    }
+  }
   
   GralMng gralMng = GralMng.get();
   
@@ -77,9 +108,11 @@ public class GralColorShow
   }
   
   private void execute(){
+    if(val == null) genDefaultConfig();
+    readConfig();
     GralFactory gralFactory = new SwtFactory();
     LogMessage log = new LogMessageStream(System.out);
-    GralWindow wind = gralFactory.createWindow(log, "Show Colors", 'B', 150, 10,800, 700);
+    GralWindow wind = gralFactory.createWindow(log, "Show Colors", 'B', 150, 10,1000, 800);
     gralMng = wind.gralMng();
     gralMng.gralDevice.addDispatchOrder(initGraphic);
     //initGraphic.awaitExecution(1, 0);
@@ -93,42 +126,137 @@ public class GralColorShow
   }
   
   
-  String[] val =
-  { "ma  FFe0FF FFC0FF FF80FF FF00FF e000e0 c000c0 a000a0 800080 600060 400040 404040"
-  , "    FFe0f0 FFC0F0 FF80F0 FF00e0 e800d0 d000c0 a000c0 FFFFFF 503050 FFFFFF FFFFFF"
-  , "    FFd8e8 FFC0E0 FF80E0 FF00a0 F000a0 e00080 c00080 FFFFFF FFFFFF FFFFFF FFFFFF"
-  , "    FFe0e8 FFC0d0 FF80C0 FF0060 F80060 F00040 d80040 FFFFFF FFFFFF FFFFFF FFFFFF"
-  , "rd  FFe0e0 FFC0C0 FFa0a0 FF6060 FF0000 F00000 e00000 c00000 a00000 700000 400000"
-  , "    FFe8e0 FFD0c0 FF9070 FC9000 F03000 F03000 d81000 FFFFFF FFFFFF 602000 FFFFFF"
-  , "    FFf0e0 FFE0c0 FFc070 F8c000 e06000 e06000 c03000 FFFFFF FFFFFF 503000 FFFFFF"
-  , "    FFF0d0 FcF0b0 FFe070 F4e000 a08000 c09000 a06000 FFFFFF FFFFFF 403000 FFFFFF"
-  , "ye  FFFFc0 FFFF80 F0F000 e0e000 808000 a0a000 808000 606000 606040 404000 404000"
-  , "    FFFFd0 FFFFa0 e0FF70 C0F400 708000 90b000 608000 FFFFFF FFFFFF 304000 FFFFFF"
-  , "wh  FFFFFF f0FF80 c0FF70 80F800 609000 80b000 408000 FFFFFF FFFFFF 203000 FFFFFF"
-  , "    F0FFF0 e0FFe0 a0FF70 40FC00 40a000 40b000 208800 FFFFFF FFFFFF 104000 FFFFFF"
-  , "gn  e0ffe0 c0FFc0 00FF00 00e000 00a000 00b000 009000 008000 007000 004000 000000"
-  , "    c0FFe0 c0FFd0 70FFa0 00FC40 00a040 00A050 008820 208020 305020 204010 FFFFFF"
-  , "    c0FFf0 b0FFe0 70FFc0 00F880 00a070 40a060 008840 208030 408050 004020 FFFFFF"
-  , "    e0FFF0 b0FFf0 70FFe0 00F4c0 00a080 00a070 008040 208060 FFFFFF 305050 FFFFFF"
-  , "cy  d0FFFF b0FFFF 00FFFF 00F0F0 00a0a0 00a0a0 008080 006060 004040 004040 003030"
-  , "    FFFFFF b0f0FF 70f0FF 00e0F4 0090E0 0090e0 0060a0 406080 003040 409090 FFFFFF"
-  , "    FFFFFF b0e0FF 70e0FF 00c0F8 1060F0 0060F0 0030c0 4060e0 003060 FFFFFF FFFFFF"
-  , "    F0F0FF c0d0FF 70c0FF 0090FC 2040FF 0040F0 0000e0 4040f0 002080 FFFFFF FFFFFF"
-  , "bl  F4F0FF c0c0FF a0a0FF 6060FF 4040FF 0000FF 0000c0 0000a0 000080 000040 000040"
-  , "    F8e8FF d0c0FF C080FF C000FF 7040FF 4000FF 2000ec 4000d8 4000c0 FFFFFF FFFFFF"
-  , "    FCe4FF E0c0FF E080FF E000FF 9020FF 8000F0 4000e0 6030d0 6020b0 FFFFFF FFFFFF"
-  , "    FEe0FF F0c0FF F080FF F000FF c000F0 c000d0 6000d0 8050a0 7060a0 505090 400050"
+  
+  
+  float[][] colHue = 
+  { { 0.8333333f, 1.0f } //pu
+  , { 0.9f,       0.95f }
+  , { 0.0f,       0.9f } //rd
+  , { 0.07f,      0.85f }
+  , { 0.10f,      0.8f } //or
+  , { 0.1333333f, 0.75f } //am
+  , { 0.1666667f, 0.7f } //ye
+  , { 0.19f,      0.72f }
+  , { 0.24f,      0.75f }
+  , { 0.29f,      0.77f }
+  , { 0.3333333f, 0.8f } //gn
+  , { 0.40f,      0.8f }
+  , { 0.45f,      0.8f }
+  , { 0.5f,       0.8f }  //cy
+  , { 0.5333333f, 0.9f }
+  , { 0.60f,      0.95f }
+  , { 0.6666667f, 1.0f }  //bl
+  , { 0.75f,      1.0f }  //vi
   };
-      
-      
-      
-String colNames = "ma,   ,   ,   , rd,   ,   ,   , ye,   , wh,   , gn,   ,   ,   , cy,   ,   ,   , bl,   ,   ,   ";        
   
   
+  float[][] colSatB =
+  { { 0.20f, 1.30f }
+  , { 0.35f, 1.30f }
+  , { 0.60f, 1.30f }
+  , { 0.80f, 1.30f }
+  , { 1.00f, 1.20f }
+  , { 1.00f, 1.10f }
+  , { 1.00f, 1.00f }
+  , { 0.70f, 0.90f }
+  
+  , { 1.00f, 0.90f }
+  , { 0.80f, 0.80f }
+  
+  , { 1.00f, 0.80f }
+  , { 0.80f, 0.70f }
+  
+  , { 1.00f, 0.70f }
+  , { 0.80f, 0.60f }
+  
+  , { 1.00f, 0.60f }
+  , { 0.80f, 0.50f }
+  
+  , { 1.00f, 0.50f }
+  , { 0.80f, 0.40f }
 
-  GralTextField[][] color = new GralTextField[24][11];
+  , { 1.00f, 0.40f }
+  , { 0.80f, 0.30f }
 
+  
+  , { 0.60f, 0.70f }
+  , { 0.50f, 0.60f }
+
+  , { 0.60f, 0.60f }
+  , { 0.50f, 0.50f }
+
+  , { 0.60f, 0.50f }
+  , { 0.50f, 0.40f }
+
+  , { 0.60f, 0.40f }
+  , { 0.50f, 0.30f }
+
+  , { 0.60f, 0.30f }
+  , { 0.50f, 0.20f }
+
+
+  , { 0.60f, 0.20f }
+  , { 0.50f, 0.20f }
+
+  
+  , { 0.40f, 0.30f }
+  , { 0.30f, 0.40f }
+  , { 0.20f, 0.55f }
+  , { 0.10f, 0.70f }
+ 
+  };
+  
+  
+  String[] val;
+  
+  String[] XXval =
+  { "FFE0FF:pma   FFC0FF:lma   FF80FF:bma   FF40FF:ma    E000E0:sma   C000C0:      A000A0:      800080:      600060:      400040:      "
+  , "FFD8E8:ppu   FFC0E0:lpu   FF80E0:      FF4080:pu    F000A0:spu   E00080:      C00080:      B03070:      A04060:      803050:      "
+  , "FFE8E8:prd   FFD0D0:lrd   FFA0A0:brd   FF8080:rd    FF0000:srd   E67373:r5090 CC6666:r5080 CC0000:r0080 B35959:r0570 996B6B:r0360 "
+  , "FFE8E0:      FFD0C0:      FF9070:      FF7040:      FF6B00:      FF974D:      E67373:      CCA18F:      CCAFA3:      602000:      "
+  , "FFF0E0:por   FFE0C0:lor   FFC070:      FFA000:or    FF9900:sor   E06000:      E6B873:      CCB48F:      CCBCA3:      503000:      "
+  , "FFF0D0:pam   FCF0B0:lam   FFE070:bam   FFC000:am    E0A000:sam   C09000:      A06000:      A08060:      A07020:      403000:      "
+  , "FFFFC0:pye   FFFF90:lye   FFFF60:bye   FFFF00:ye    E0E000:sye   A0A000:dye   808000:      606000:      606040:      404000:      "
+  , "FFFFD0:p     FFFFA0:l     E0FF70:      E0FC00:      C0E000:s     90B000:      608000:      507020:      406030:      304000:      "
+  , "F4FFE0:plm   F0FF80:llm   C0FF70:blm   A0FC00:lm    80C040:slm   80B000:      6B8E23:od    408000:      406020:      203000:      "
+  , "F0FFF0:p     E0FFE0:l     A0FF70:      40FC00:      30B000:s     40B000:      208800:      307010:      406020:      104000:      "
+  , "E0FFE0:pgn   C0FFC0:lgn   80FF80:bgn   00FF00:gn    00D000:sgn   00B000:dgn   009000:      228B22:fgn   007000:      004000:      "
+  , "C0FFE0:psg   C0FFD0:lsg   70FFA0:      00FC60:sg    00A040:ssg   00A050:      2E8B57:sgn   208020:      305020:      204010:      "
+  , "E0FFF0:p     B0FFF0:l     70FFE0:      00F4A0:      00A080:s     00A070:      008040:      208060:      307050:      305050:      "
+  , "E0FFFF:pcy   B0FFFF:lcy   00FFFF:bcy   00F0F0:cy    00A0A0:scy   00A0A0:      008080:      006060:      004040:      004040:      "
+  , "FFFFFF:p     B0F0FF:l     70F0FF:      20E0FF:      0090E0:s     0090E0:      0060A0:      406080:      003040:      409090:      "
+  , "F0F0FF:p     C0D0FF:l     70C0FF:      40A0FC:      2040FF:s     0040F0:      0000E0:      4040F0:      002080:      103070:      "
+  , "F0F0FF:pbl   D0D0FF:lbl   B0B0FF:      A0A0FF:bl    4040FF:sbl   0000FF:dbl   0000A0:      000080:      000040:      000040:      "
+  , "FCF0FF:pvi   FAE4FF:lvi   E0C0FF:      E060FF:vi    9020FF:svi   8000F0:      4000E0:      6030D0:      6020B0:      000000:      "
+  , "FFFFFF:wh    E0E0E0:lgr   C0C0C0:      A0A0A0:gr    808080:sgr   606060:      404040:      202020:      000000:      000000:      "
+  };
+
+  String[] longNames =
+  { "pma=pastel magenta"
+  , "lma=light magenta"
+  , "bl=blue"
+  };
+
+  
+  
+  Map<String, ColorWithField> idxColorsByShortname = new TreeMap<String, ColorWithField>();
+  
+  
+  
+  //GralTextField[][] wdgColorBack = new GralTextField[19][10];
+
+  //String[][] shortname = new String[19][10];
+  
+  //String[][] name = new String[19][10];
+  
+  ColorWithField[][] colorF = new ColorWithField[19][10];
+  
+  
+  ColorWithField colorFocus;
+  
   GralTextField wdgTest, wdgTest1, wdgTest2;
+  
+  GralTextField wdgHexValue, wdgHue, wdgSat, wdgBright, wdgShortname, wdgName;
   
   boolean testText, testLine;
   
@@ -200,6 +328,17 @@ String colNames = "ma,   ,   ,   , rd,   ,   ,   , ye,   , wh,   , gn,   ,   ,  
   }
   
   
+  
+  void genColor1(){
+    //java.awt.Color.HSBtoRGB(hue, saturation, brightness);
+  }
+  
+  
+  void t1(){
+    //java.awt.Color.RGBtoHSB(r, g, b, hsbvals);
+  }
+  
+  
   void testGetColor(){
     int col =0;
     for(int ixcol = 0; ixcol < 24; ++ixcol){
@@ -208,33 +347,110 @@ String colNames = "ma,   ,   ,   , rd,   ,   ,   , ye,   , wh,   , gn,   ,   ,  
     }
   }
   
+  
+  
+  void genDefaultConfig() {
+    val = new String[colHue.length +1];  //gray too!
+    int colorVal;
+    for(int ixHue = 0; ixHue < colHue.length; ++ixHue){
+      StringBuilder line = new StringBuilder(1000);
+      for(int ixSatB = 0; ixSatB < colSatB.length; ++ixSatB){
+        float b = colSatB[ixSatB][1] * colHue[ixHue][1];
+        if(b > 1.0f){ b = 1.0f; }
+        colorVal = java.awt.Color.HSBtoRGB(colHue[ixHue][0], colSatB[ixSatB][0], b) & 0xffffff;
+        line.append(String.format("%06X", colorVal)).append(":       ");
+      }
+      colorVal = java.awt.Color.HSBtoRGB(0,0, 1.0f - ((float)ixHue) / colHue.length) & 0xffffff;
+      line.append(String.format("%06X", colorVal)).append(":       ");
+      val[ixHue] = line.toString();
+    }
+    StringBuilder line = new StringBuilder(1000);
+    for(int ixSatB = 0; ixSatB < colSatB.length; ++ixSatB){
+      colorVal = java.awt.Color.HSBtoRGB(0,0, 1.0f - ((float)ixSatB) / colSatB.length) & 0xffffff;
+      line.append(String.format("%06X", colorVal)).append(":       ");
+    }
+    val[colHue.length] = line.toString();
+    colorF = new  ColorWithField[colHue.length +1][colSatB.length];
+  }
+  
+  
+  
+  
+  
+  void readConfig()
+  { 
+    for(int ixCol=0; ixCol<colorF.length; ++ixCol) {
+      String line = val[ixCol];
+      StringPartScan spline = new StringPartScan(line);
+      for(int ixBright = 0; ixBright < colorF[0].length; ++ixBright){
+        GralColor colText;
+        if(ixBright < 5){ colText = colBk; }
+        else { colText = colWh; }
+        int col2;
+        spline.setIgnoreWhitespaces(true);
+        spline.scanOk();
+        try{ 
+          spline.scanHex(6); 
+          col2 = (int) spline.getLastScannedIntegerNumber();
+        } catch(ParseException exc){ col2 = 0xffffff; }
+        GralColor col3 = GralColor.getColor(col2);
+        spline.setIgnoreWhitespaces(false);
+        spline.scanSkipSpace().scanOk();
+        final String shortname;
+        if(spline.scan(":").scanIdentifier().scanOk()){
+          shortname = spline.getLastScannedString().toString();   
+        } else {
+          spline.scan(":").scanOk();  //read ':'
+          shortname = "";
+        }
+        ColorWithField colorF1 = new ColorWithField(shortname, ixCol, ixBright, col2);
+        colorF[ixCol][ixBright] = colorF1;
+        java.awt.Color.RGBtoHSB((col2>>16) & 0xff, (col2>>8) & 0xff, (col2) & 0xff, colorF1.hsb);
+        colorF1.wdgColor.setActionFocused(actionFocusColor);
+        colorF1.wdgColor.setActionChange(actionEditColor);
+        colorF1.wdgColor.setTextColor(colText);
+        if(colorF1.shortname.length() >0) {
+          idxColorsByShortname.put(colorF1.shortname, colorF1);
+        }
+      }
+    }
+    //associate names
+    for(String longname: longNames) {
+      int psep = longname.indexOf('=');
+      if(psep >0) {
+        ColorWithField colorF1 = idxColorsByShortname.get(longname.substring(0, psep).trim());
+        if(colorF1 == null) {
+          System.err.println("GralColor: faulty short name in long name entry; " + longname);
+        } else {
+          colorF1.name = longname.substring(psep+1);
+        }
+      } else {
+        System.err.println("GralColor: faulty longname entry; " + longname);
+      }
+    }
+    
+  }
+  
+  
   GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic"){
     @Override public void executeOrder()
     {
       gralMng.setPosition(4, -2, 2, -2, 0, 'd');
       //gralMng.addTextField();
-      for(int line=0; line<color.length; ++line) {
-        gralMng.setPosition(3*line+3, GralPos.size -2, 1, GralPos.size+8, 0, 'r', 1);
+      for(int ixCol=0; ixCol<colorF.length; ++ixCol) {
+        gralMng.setPosition(4, GralPos.size -3, 5*ixCol +1, GralPos.size+5, 0, 'd', 0);
         //gralMng.setPosition(3, GralPos.size -2, 9*col, GralPos.size+8, 0, 'd', 1);
         //System.out.append(", \"");
-        for(int col = 0; col < color[0].length; ++col){
+        //int pline = 0;
+        for(int ixBright = 0; ixBright < colorF[0].length; ++ixBright){
           GralColor colText;
-          if(col < 4){ colText = colBk; }
+          if(ixBright < 5){ colText = colBk; }
           else { colText = colWh; }
-          String col1 = val[line].substring(7*col+4, 7*col+10);
-          //System.out.append(' ').append(col1);
-          int col2 = Integer.parseInt(col1, 16);
-          GralColor col3 = new GralColor(col2);
-          color[line][col] = new GralTextField("" + line + "," + col, GralTextField.Type.editable);
-          color[line][col].setActionChange(actionEditColor);
-          color[line][col].setToPanel(gralMng);
-          //color[line][col].setTextStyle(colText, font);
-          color[line][col].setText(col1);
-          color[line][col].setTextColor(colText);
-          color[line][col].setBackColor(col3, 0);
+          colorF[ixCol][ixBright].wdgColor.setToPanel(gralMng);
+          colorF[ixCol][ixBright].wdgColor.setTextColor(colText);
         }
-        //System.out.append("\"\n");
       }
+      colorFocus = colorF[0][0];
       
       gralMng.setPosition(GralPos.refer+4, GralPos.size +10, 1, GralPos.size+15, 0, 'r');
       //
@@ -249,6 +465,34 @@ String colNames = "ma,   ,   ,   , rd,   ,   ,   , ye,   , wh,   , gn,   ,   ,  
       wdgTest1.setText("ABC");
       wdgTest2.setText("XYZ");
       wdgTest = wdgTest1;
+      
+      gralMng.setPosition(GralPos.refer, GralPos.size +2, 40, GralPos.size+10, 0, 'r');
+      wdgHexValue = new GralTextField("hex");
+      wdgHexValue.setEditable(true);
+      wdgHexValue.setActionChange(actionEnterHex);
+      wdgHexValue.setToPanel(gralMng);
+      wdgShortname = new GralTextField("sname");
+      wdgShortname.setEditable(true);
+      wdgShortname.setActionChange(actionEnterShortname);
+      wdgShortname.setToPanel(gralMng);
+      gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+20, 0, 'r');
+      wdgName = new GralTextField("name");
+      wdgName.setEditable(true);
+      wdgName.setActionChange(actionEnterName);
+      wdgName.setToPanel(gralMng);
+      gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+12, 0, 'r',1);
+      wdgHue = new GralTextField("name");
+      wdgHue.setEditable(true);
+      wdgHue.setActionChange(new ActionEnterHSB(0));
+      wdgHue.setToPanel(gralMng);
+      wdgSat = new GralTextField("name");
+      wdgSat.setEditable(true);
+      wdgSat.setActionChange(new ActionEnterHSB(1));
+      wdgSat.setToPanel(gralMng);
+      wdgBright = new GralTextField("name");
+      wdgBright.setEditable(true);
+      wdgBright.setActionChange(new ActionEnterHSB(2));
+      wdgBright.setToPanel(gralMng);
       //
       /*
       GralTextField[][] colorGen = new GralTextField[11][24];
@@ -277,32 +521,103 @@ String colNames = "ma,   ,   ,   , rd,   ,   ,   , ye,   , wh,   , gn,   ,   ,  
   void outColors(){
     System.out.append("  String[] val =\n");
     String sep = "  { \"";
-    for(int line=0; line<color.length; ++line) {
+    for(int line=0; line < colorF.length; ++line) {
       System.out.append(sep);
-      System.out.append(colNames.substring(4*line, 4*line+2));
-      System.out.append(' ');
-      for(int col = 0; col < color[0].length; ++col){
-        String sVal = color[line][col].getText();
-        System.out.append(' ').append(sVal);
+      String spaces = "            ";
+      for(int col = 0; col < colorF[0].length; ++col){
+        ColorWithField colorF1 = colorF[line][col];
+        //String sVal = colorF1.wdgColor.getText();
+        GralColor color = colorF1.wdgColor.getBackColor(0);
+        int colValue = color.getColorValue();
+        String sHex = String.format("%06X", colValue);
+        System.out.append(sHex).append(':').append(colorF1.shortname);
+        System.out.append(spaces.substring(0, 6 - colorF1.shortname.length()));
       }
       System.out.append("\"\n");
       sep = "  , \"";
     }
     System.out.append("  };\n");
+
+    System.out.append("  String[] longNames =\n");
+    sep = "  { \"";
+    for(int line=0; line<colorF.length; ++line) {
+      for(int col = 0; col < colorF[0].length; ++col){
+        if(colorF[line][col].name.length()>0) {
+          System.out.append(sep).append(colorF[line][col].shortname).append('=').append(colorF[line][col].name).append("\"\n");
+          sep = "  , \"";
+        }
+      }
+    }
+    System.out.append("  };\n");
+
   }
+  
+
+  
+  GralUserAction actionFocusColor = new GralUserAction("focus color"){
+    @Override public boolean exec(int key, GralWidget_ifc widgP, Object... params)
+    {
+      if(key == (KeyCode.focusGained)){
+        GralTextField wdg = (GralTextField)widgP;
+        colorFocus.wdgColor.setBorderWidth(0);
+        colorFocus = (ColorWithField)widgP.getData();
+        colorFocus.wdgColor.setBorderWidth(3);
+        GralColor color = wdg.getBackColor(0);
+        int colValue = color.getColorValue();
+        String sHex = String.format("%06X", colValue);
+        wdgHexValue.setText(sHex); //Integer.toHexString(colValue));
+        wdgShortname.setText(colorFocus.shortname);
+        wdgName.setText(colorFocus.name);
+        wdgHue.setText(""+colorFocus.hsb[0]);
+        wdgSat.setText(""+colorFocus.hsb[1]);
+        wdgBright.setText(""+colorFocus.hsb[2]);
+        if(testText) {
+          wdgTest.setTextColor(color);
+          wdgTest.setLineColor(color, 0);
+        } else {
+          wdgTest.setBackColor(color,0);
+        }
+      }
+      return true;
+  } };
+  
   
   
   GralUserAction actionEditColor = new GralUserAction("edit color"){
     @Override public boolean exec(int key, GralWidget_ifc widgP, Object... params)
     {
       GralTextField wdg = (GralTextField)widgP;
-      if(key == KeyCode.enter){
-        String text = wdg.getText();
+      if(key == KeyCode.right) {
+        int ixCol = colorFocus.index.ixCol +1;
+        if(ixCol >= colorF.length) { ixCol = 0; }
+        ColorWithField newField = colorF[ixCol][colorFocus.index.ixLight];
+        newField.wdgColor.setFocus();
+      } else if(key == KeyCode.left){ 
+        int ixCol = colorFocus.index.ixCol -1;
+        if(ixCol < 0) { ixCol = colorF.length -1; }
+        ColorWithField newField = colorF[ixCol][colorFocus.index.ixLight];
+        newField.wdgColor.setFocus();
+      } else if(key == KeyCode.up && colorFocus.index.ixLight > 0){ 
+        ColorWithField newField = colorF[colorFocus.index.ixCol][colorFocus.index.ixLight-1];
+        newField.wdgColor.setFocus();
+      } else if(key == KeyCode.dn && colorFocus.index.ixLight < colorF[0].length -1){ 
+        ColorWithField newField = colorF[colorFocus.index.ixCol][colorFocus.index.ixLight+1];
+        newField.wdgColor.setFocus();
+      } else if(key == KeyCode.enter){
+        String text = wdg.getText().substring(0, 6);
         int valColor = Integer.parseInt(text, 16);
         GralColor color = new GralColor(valColor);
         wdg.setBackColor(color,0);
       } else if(key == (KeyCode.focusGained)){
+        colorFocus.wdgColor.setBorderWidth(0);
+        colorFocus = (ColorWithField)widgP.getData();
+        colorFocus.wdgColor.setBorderWidth(3);
         GralColor color = wdg.getBackColor(0);
+        int colValue = color.getColorValue();
+        String sHex = String.format("%06X", colValue);
+        wdgHexValue.setText(sHex); //Integer.toHexString(colValue));
+        wdgShortname.setText(colorFocus.shortname);
+        wdgName.setText(colorFocus.name);
         if(testText) {
           wdgTest.setTextColor(color);
           wdgTest.setLineColor(color, 0);
@@ -317,7 +632,104 @@ String colNames = "ma,   ,   ,   , rd,   ,   ,   , ye,   , wh,   , gn,   ,   ,  
   };
   
   
-    GralUserAction actionFocusedTest = new GralUserAction("actionFocusedTest"){
+    GralUserAction actionEnterHex = new GralUserAction("actionEnterHex"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widg, Object... params) {
+      if(actionCode == KeyCode.enter || actionCode == KeyCode.focusLost){
+        GralTextField widgt = (GralTextField)widg;
+        String text = widgt.getText();
+        try{ 
+          int colorValue = Integer.parseInt(text, 16);
+          GralColor colorBack = GralColor.getColor(colorValue);
+          colorFocus.color = colorBack;
+          colorFocus.wdgColor.setBackColor(colorBack, 0); 
+        } catch(NumberFormatException exc){
+          System.out.println(exc.getMessage());
+        }
+      }
+      return true;      
+  } };
+
+  GralUserAction actionEnterShortname = new GralUserAction("actionEnterShortname"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widg, Object... params) {
+      if(actionCode == KeyCode.enter || actionCode == KeyCode.focusLost){
+        GralTextField widgt = (GralTextField)widg;
+        String text = widgt.getText();
+        if(colorFocus.shortname.length() >0) {
+          //remove given shortname 
+          idxColorsByShortname.remove(colorFocus.shortname);
+        }
+        colorFocus.shortname = text.trim();
+        idxColorsByShortname.put(colorFocus.shortname, colorFocus);
+      }
+      return true;      
+  } };
+
+  GralUserAction actionEnterName = new GralUserAction("actionEnterName"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widg, Object... params) {
+      if(actionCode == KeyCode.enter || actionCode == KeyCode.focusLost){
+        GralTextField widgt = (GralTextField)widg;
+        String text = widgt.getText();
+        colorFocus.name = text.trim(); 
+      }
+      return true;      
+  } };
+
+  
+  void setNewColorFromHSB() {
+    int colorValue = java.awt.Color.HSBtoRGB(colorFocus.hsb[0], colorFocus.hsb[1], colorFocus.hsb[2]);
+    String sHex = String.format("%06X", colorValue);
+    wdgHexValue.setText(sHex);
+    colorFocus.color = GralColor.getColor(colorValue);
+    colorFocus.wdgColor.setBackColor(colorFocus.color, 0);
+  }
+  
+  GralUserAction actionEnterHue = new GralUserAction("actionEnterHue") {
+    @Override public boolean exec(int actionCode, GralWidget_ifc widg, Object... params) {
+      if(actionCode == KeyCode.enter || actionCode == KeyCode.focusLost){
+        GralTextField widgt = (GralTextField)widg;
+        String text = widgt.getText();
+        float hue;
+        try{
+          hue = Float.parseFloat(text.trim());
+          if(hue > 1.0f){ hue = 1.0f; }
+          if(hue < 0.0f){ hue = 0.0f; }
+        } catch(NumberFormatException exc){ hue = 0; }  //red
+        colorFocus.hsb[0] = hue;
+        setNewColorFromHSB();
+      }
+      return true;      
+  } };
+
+  
+  
+  
+  class ActionEnterHSB extends GralUserAction {
+    final int indexHSB;
+    ActionEnterHSB(int indexHSB){
+      super("actionEnterHSB" + indexHSB);
+      this.indexHSB = indexHSB;
+    }
+      
+    @Override public boolean exec(int actionCode, GralWidget_ifc widg, Object... params) {
+      if(actionCode == KeyCode.enter || actionCode == KeyCode.focusLost){
+        GralTextField widgt = (GralTextField)widg;
+        String text = widgt.getText();
+        float value;
+        try{
+          value = Float.parseFloat(text.trim());
+          if(value > 1.0f){ value = 1.0f; }
+          if(value < 0.0f){ value = 0.0f; }
+        } catch(NumberFormatException exc){ value = 0; }  //red
+        colorFocus.hsb[indexHSB] = value;
+        setNewColorFromHSB();
+      }
+      return true;      
+  } };
+
+  
+  
+  
+  GralUserAction actionFocusedTest = new GralUserAction("actionFocusedTest"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widg, Object... params) {
       if(actionCode == KeyCode.focusLost){
         GralTextField widgt = (GralTextField)widg;

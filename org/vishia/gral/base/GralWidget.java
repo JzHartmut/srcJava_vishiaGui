@@ -173,6 +173,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2015-09-12 Hartmut new: {@link #getData()}, {@link #setData(Object)} was existent as {@link GralWidget#setContentInfo(Object)},
+   *   now explicit property of any widget. {@link GralWidget#setContentInfo(Object)} was an older approach, not in interface, now deprecated.
    * <li>2015-06-21 Hartmut bugfix: {@link #setFocus(int, int)} had hanged because while-loop on same window panel for a parent. 
    * <li>2015-01-27 Hartmut new: {@link DynamicData#bTouchedField}, {@link ImplAccess##setTouched()} especially for a text field
    *   if any editing key was received. Then the GUI-operator may mark a text or make an input etc. The setting of the text
@@ -296,7 +298,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20130313;
+  public static final String version = "2015-09-12";
 
   
   /**The widget manager from where the widget is organized. Most of methods need the information
@@ -742,11 +744,25 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Sets a application specific info. 
    * It should help to present user data which are associated to this widget. 
-   * This info can be set and changed anytime. */
+   * This info can be set and changed anytime. 
+   * @deprecated use {@link #setData(Object)}
+   * */
   public void setContentInfo(Object content){  oContentInfo = content;}
   
-  /**Gets the application specific info. See {@link #setContentInfo(Object)}. */
+  /**Gets the application specific info. See {@link #setContentInfo(Object)}. 
+   * @deprecated use {@link #getData()}
+   */
   public Object getContentInfo(){ return oContentInfo; }
+  
+ 
+  
+  /**Sets a application specific data. 
+   * It should help to present user data which are associated to this widget. 
+   * This info can be set and changed anytime. */
+  public void setData(Object data){  oContentInfo = data;}
+  
+  /**Gets the application specific info. See {@link #setContentInfo(Object)}. */
+  public Object getData(){ return oContentInfo; }
   
  
   

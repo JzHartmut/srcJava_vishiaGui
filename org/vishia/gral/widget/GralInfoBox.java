@@ -450,4 +450,16 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   
   
   @Override public GralMng gralMng(){ return window.gralMng(); }
+
+  @Override public void setData(Object data)
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override public Object getData()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

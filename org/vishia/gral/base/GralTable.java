@@ -2533,6 +2533,18 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       }
       return u.toString(); 
     }
+
+
+
+    @Override public void setData(Object data)
+    { throw new IllegalArgumentException("not supported, only final data on construction.");
+    }
+
+
+
+    @Override public Object getData()
+    { return data;
+    }
   }
   
   /**Data for each Text widget of the graphical implementation layer.

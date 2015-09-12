@@ -59,6 +59,8 @@ public interface GralWidget_ifc extends Removeable
   
   /**Version, history and license.
    * <ul>
+   * <li>2015-09-12 Hartmut new: {@link #getData()}, {@link #setData(Object)} was existent as {@link GralWidget#setContentInfo(Object)},
+   *   now explicit property of any widget. 
    * <li>2015-07-12 Hartmut new: {@link #setCmd(String)} and {@link #getCmd()} is present in {@link org.vishia.gral.base.GralWidget}
    *   since 2010 but it was not accepted as core property. But it is a core property.
    * <li>2013-03-13 Hartmut new {@link #getContentIdent()}, {@link #setContentIdent(long)}
@@ -98,7 +100,7 @@ public interface GralWidget_ifc extends Removeable
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20130521;
+  public static final String version = "2015-09-12";
 
   
   
@@ -119,6 +121,18 @@ public interface GralWidget_ifc extends Removeable
   /**Any widget can have a command String, which can be quest for example in an action. 
    * The widget can be identified by this method independent of its name. See {@link #setCmd(String)}. */
   String getCmd();
+  
+  
+    /**Sets a application specific data. 
+   * It should help to present user data which are associated to this widget. 
+   * This info can be set and changed anytime. */
+  void setData(Object data);
+  
+  /**Gets the application specific info. See {@link #setContentInfo(Object)}. */
+  Object getData();
+  
+
+  
   
   public GralUserAction getActionChange();
   
