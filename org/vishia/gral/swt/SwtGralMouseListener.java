@@ -184,24 +184,14 @@ public class SwtGralMouseListener
     
     
     
-    /**A standard action for a specific widget for example button, which is executed
-     * independently and additional to the user action. */
-    protected final GralMouseWidgetAction_ifc mouseWidgetAction;
-    
-    
-    /**Bits see {@link GralMouseWidgetAction_ifc#mUser1down} etc. */
-    final protected int mUser;
-    
     /**Constructor.
      * @param mouseWidgetAction Action invoked, maybe null
      * @param mUser 0 or or-combinations of bits in {@link GralMouseWidgetAction_ifc#mUser1down} 
      *   and all other mUser... If one of this bits is set, the {@link GralWidget#setActionChange(GralUserAction)}
      *   is invoked on the appropriate mouse action after and independent of the mouseWidgetAction.
      */
-    public MouseListenerGralAction(GralMouseWidgetAction_ifc mouseWidgetAction, int mUser)
+    public MouseListenerGralAction()
     { super();
-      this.mouseWidgetAction = mouseWidgetAction;
-      this.mUser = mUser;
     }
     
     
@@ -215,11 +205,11 @@ public class SwtGralMouseListener
       try{
         final int keyCode = SwtGralKey.convertMouseKey(e.button, SwtGralKey.MouseAction.doubleClick, e.stateMask);
         Control widgetSwt = (Control) e.widget;  //a widget is a Control always.
-        if(mouseWidgetAction !=null){
+        if(widgg.cfg.mouseWidgetAction !=null){
           Point size = widgetSwt.getSize();
-          mouseWidgetAction.mouse1Double(keyCode, xMousePress, yMousePress, size.x, size.y, widgg);
+          widgg.cfg.mouseWidgetAction.mouse1Double(keyCode, xMousePress, yMousePress, size.x, size.y, widgg);
         } 
-        if( (mUser & GralMouseWidgetAction_ifc.mUserDouble) !=0) {
+        if( (widgg.cfg.mUser & GralMouseWidgetAction_ifc.mUserDouble) !=0) {
           GralUserAction action = widgg ==null ? null : widgg.getActionChange();
           if(action !=null){
             action.exec(keyCode, widgg, new Integer(e.x), new Integer(e.y));
@@ -235,24 +225,29 @@ public class SwtGralMouseListener
       yMousePress = e.y;
       Control widget = (Control) e.widget;  //a widget is a Control always.
       widget.addMouseMoveListener(mouseMoveListener);
-      GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(widget.getData());
+      Object owdgg = widget.getData();
+      GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(owdgg);
       try{ 
         final int keyCode = SwtGralKey.convertMouseKey(e.button, SwtGralKey.MouseAction.down, e.stateMask);
-        int mUser1 = 0;
-        if(mouseWidgetAction !=null){
+        final int mUser1;
+        switch(e.button){
+          case 1: mUser1 = GralMouseWidgetAction_ifc.mUser1down; break;
+          case 3: mUser1 = GralMouseWidgetAction_ifc.mUser2down; break;  //the usual right button is 3 in SWT!
+          case 2: mUser1 = GralMouseWidgetAction_ifc.mUser3down; break;  //the usual middle button is 2 in SWT!
+          default: mUser1 = 0; break;
+        }//switch:
+        if(widgg.cfg.mouseWidgetAction !=null){
           Point size = widget.getSize();
           switch(e.button){ 
             case 1: 
-              mUser1 = GralMouseWidgetAction_ifc.mUser1down; 
-              mouseWidgetAction.mouse1Down(keyCode, xMousePress, yMousePress, size.x, size.y, widgg); 
+              widgg.cfg.mouseWidgetAction.mouse1Down(keyCode, xMousePress, yMousePress, size.x, size.y, widgg); 
               break;
-            case 2: 
-              mUser1 = GralMouseWidgetAction_ifc.mUser1down; 
-              mouseWidgetAction.mouse2Down(keyCode, xMousePress, yMousePress, size.x, size.y, widgg); 
+            case 3: 
+              widgg.cfg.mouseWidgetAction.mouse2Down(keyCode, xMousePress, yMousePress, size.x, size.y, widgg); 
               break;
           }  
         } 
-        if( (mUser & mUser1) !=0) {
+        if( (widgg.cfg.mUser & mUser1) !=0) {
           GralUserAction action = widgg ==null ? null : widgg.getActionChange();
           if(action !=null){
             action.exec(keyCode, widgg, new Integer(e.x), new Integer(e.y));
@@ -274,25 +269,29 @@ public class SwtGralMouseListener
         isPressed = false;
         Point size = widget.getSize();
         GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(widget.getData());
+        final int mUser1;
+        switch(e.button){
+          case 1: mUser1 = GralMouseWidgetAction_ifc.mUser1down; break;
+          case 3: mUser1 = GralMouseWidgetAction_ifc.mUser2down; break;  //the usual right button is 3 in SWT!
+          case 2: mUser1 = GralMouseWidgetAction_ifc.mUser3down; break;  //the usual middle button is 2 in SWT!
+          default: mUser1 = 0; break;
+        }//switch:
         try{ 
           //int dx = e.x - xMousePress, dy = e.y - yMousePress;
           boolean moved = e.x < 0 || e.x > size.x || e.y < 0 || e.y > size.y;
           SwtGralKey.MouseAction mouseAction = moved ? SwtGralKey.MouseAction.upMovedOutside : SwtGralKey.MouseAction.up;
           final int keyCode = SwtGralKey.convertMouseKey(e.button, mouseAction, e.stateMask);
-          int mUser1 = 0;
-          if(mouseWidgetAction !=null){
+          if(widgg.cfg.mouseWidgetAction !=null){
             switch(e.button){ 
               case 1: 
-                mUser1 = GralMouseWidgetAction_ifc.mUser1up; 
-                mouseWidgetAction.mouse1Up(keyCode, e.x, e.y, size.x, size.y, widgg); 
+                widgg.cfg.mouseWidgetAction.mouse1Up(keyCode, e.x, e.y, size.x, size.y, widgg); 
                 break;
-              case 2:
-                mUser1 = GralMouseWidgetAction_ifc.mUser2up; 
-                mouseWidgetAction.mouse2Up(keyCode, e.x, e.y, size.x, size.y, widgg); 
+              case 3:
+                widgg.cfg.mouseWidgetAction.mouse2Up(keyCode, e.x, e.y, size.x, size.y, widgg); 
                 break;
             }  
           } 
-          if( (mUser & mUser1) !=0) {
+          if( (widgg.cfg.mUser & mUser1) !=0) {
             GralUserAction action = widgg ==null ? null : widgg.getActionChange();
             if(action !=null){
               action.exec(keyCode, widgg);
@@ -319,9 +318,10 @@ public class SwtGralMouseListener
       {
         if(e.widget instanceof Control){
           Control widget = (Control)e.widget;
+          GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(widget.getData());
           Point size = widget.getSize();
-          if(mouseWidgetAction !=null){
-            if(!mouseWidgetAction.mouseMoved(e.x, e.y, size.x, size.y)){
+          if(widgg.cfg.mouseWidgetAction !=null){
+            if(!widgg.cfg.mouseWidgetAction.mouseMoved(e.x, e.y, size.x, size.y)){
               isPressed = false;
               widget.removeMouseMoveListener(mouseMoveListener);
             }

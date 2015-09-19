@@ -845,7 +845,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     //values = new float[maxNrofXvalues][nrofTracks];
     //setPanelMng(mng);
     timeorg.calc();
-
+    setActionMouse(mouseAction, 0);
+    
     mng.registerWidget(this);
   }
 

@@ -192,7 +192,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * which is associated to a {@link GralWidget} in its data.
    * The infos of the last clicked widget can be got with it.
    */
-  SwtGralMouseListener.MouseListenerNoAction mouseClickForInfo = new SwtGralMouseListener.MouseListenerNoAction();
+  SwtGralMouseListener.MouseListenerNoAction mouseClickForInfo = new SwtGralMouseListener.MouseListenerGralAction(); //NoAction();
   
   
   /**The instance for all traverse listener applicable to all widgets. */

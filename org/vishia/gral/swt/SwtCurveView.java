@@ -84,10 +84,12 @@ public class SwtCurveView extends GralCurveView
   public SwtCurveView(String sName, GralPos pos, SwtMng mng, int nrofXvalues, GralCurveView.CommonCurve common)
   {
     super(sName, mng.mng, nrofXvalues, common);
-    
+    mouseListenerCurve = new SwtGralMouseListener.MouseListenerGralAction();
+  
     GralRectangle bounds = mng.calcWidgetPosAndSize(pos, 800, 600);
     Composite panelSwt = (Composite)pos.panel.getWidgetImplementation();
     curveSwt = this.new CurveView(panelSwt, bounds.dx, bounds.dy, nrofXvalues);
+    curveSwt.setData(this);
     curveSwt.setSize(bounds.dx, bounds.dy);
     curveSwt.setBounds(bounds.x, bounds.y, bounds.dx, bounds.dy);
     //mng.setBounds_(curveSwt); //, dyGrid, dxGrid);
@@ -604,7 +606,7 @@ public class SwtCurveView extends GralCurveView
   TestHelp testHelp = new TestHelp();
 
   
-  SwtGralMouseListener.MouseListenerGralAction mouseListenerCurve = new SwtGralMouseListener.MouseListenerGralAction( super.mouseAction, 0);
+  final SwtGralMouseListener.MouseListenerGralAction mouseListenerCurve;
   
 
   void stop(){}  

@@ -1238,7 +1238,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           } else if(keyCode == KeyCode.back && searchChars.length() >0){
             searchChars.setLength(searchChars.length()-1);
             repaint();
-          } else if(keyCode == keyOpenChild){
+          } else if(lineSelected !=null && keyCode == keyOpenChild){
             if(lineSelected.lineCanHaveChildren){
               actionOnRefreshChildren(lineSelected);  //may get or refresh children, callback in user.
             }
@@ -1248,8 +1248,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
               fillVisibleAreaBehind(lineSelected, lineSelectedixCell);
               repaint();
             }
-          } else if(keyCode == keyCloseChild){
-            if(lineSelected.showChildren){
+          } else if(lineSelected !=null && keyCode == keyCloseChild){
+            if(lineSelected !=null && lineSelected.showChildren){
               lineSelected.showChildren(false, false);
               fillVisibleAreaBehind(lineSelected, lineSelectedixCell);
               repaint();

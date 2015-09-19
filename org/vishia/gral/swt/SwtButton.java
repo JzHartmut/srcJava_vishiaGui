@@ -82,7 +82,8 @@ public class SwtButton extends GralButton.GraphicImplAccess
   SwtButton(GralButton widgg, SwtMng mng)
   {
     widgg.super(widgg, mng.mng);
-    mouseListener = new SwtGralMouseListener.MouseListenerGralAction(mouseWidgetAction, 0);
+    widgg.setActionMouse(mouseWidgetAction, 0);
+    mouseListener = new SwtGralMouseListener.MouseListenerGralAction();
     //Control xx = mng.pos.panel.panelComposite;
     black = mng.propertiesGuiSwt.colorSwt(0x202020);
     white = mng.propertiesGuiSwt.colorSwt(0xffffff);

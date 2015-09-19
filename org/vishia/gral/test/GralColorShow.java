@@ -8,6 +8,7 @@ import java.util.TreeMap;
 
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralMouseWidgetAction_ifc;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWindow;
@@ -18,6 +19,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.swt.SwtFactory;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
+import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringPart;
 import org.vishia.util.StringPartScan;
@@ -80,11 +82,14 @@ public class GralColorShow
   class ColorWithField {
     final Index index;
     GralColor color;
+    int rgb;
     float[] hsb = new float[3];
+    float[] hsl = new float[3];
     String shortname, name;
     final GralTextField wdgColor;
     
     ColorWithField(String shortname, int ixCol, int ixBright, int colValue) {
+      this.rgb = colValue;
       this.index = new Index();
       this.index.ixCol = ixCol; index.ixLight = ixBright;
       this.color = GralColor.getColor(colValue);
@@ -93,6 +98,10 @@ public class GralColorShow
       this.wdgColor = new GralTextField("" + ixCol + "," + ixBright); //, GralTextField.Type.editable);
       this.wdgColor.setBackColor(this.color, 0);
       this.wdgColor.setData(this);
+      this.wdgColor.setActionFocused(actionFocusColor);
+      this.wdgColor.setActionChange(actionEditColor);
+      this.wdgColor.setActionMouse(null, GralMouseWidgetAction_ifc.mUserAll);
+      //this.wdgColor.setTextColor(colText);
     }
   }
   
@@ -108,7 +117,7 @@ public class GralColorShow
   }
   
   private void execute(){
-    if(val == null) genDefaultConfig();
+    genDefaultConfig();
     readConfig();
     GralFactory gralFactory = new SwtFactory();
     LogMessage log = new LogMessageStream(System.out);
@@ -127,8 +136,17 @@ public class GralColorShow
   
   
   
+  static float bfrd = 1.0f;
+  static float bfgn = 1.1f;
+  static float bfbl = 0.9f;
   
-  float[][] colHue = 
+  static float cfrd = 1.0f;
+  static float cfgn = 1.0f;
+  static float cfbl = 1.0f;
+  
+  
+  
+  float[][] YcolHue = 
   { { 0.8333333f, 1.0f } //pu
   , { 0.9f,       0.95f }
   , { 0.0f,       0.9f } //rd
@@ -140,104 +158,171 @@ public class GralColorShow
   , { 0.24f,      0.75f }
   , { 0.29f,      0.77f }
   , { 0.3333333f, 0.8f } //gn
-  , { 0.40f,      0.8f }
-  , { 0.45f,      0.8f }
-  , { 0.5f,       0.8f }  //cy
-  , { 0.5333333f, 0.9f }
-  , { 0.60f,      0.95f }
+  , { 0.40f,      0.76f }
+  , { 0.45f,      0.73f }
+  , { 0.5f,       0.7f }  //cy
+  , { 0.5333333f, 0.8f }
+  , { 0.60f,      0.9f }
   , { 0.6666667f, 1.0f }  //bl
   , { 0.75f,      1.0f }  //vi
   };
   
   
+  
+  float[][] colHue =   ////
+  { {  0.0f, 1.0f  ,  0.0f} //pu
+  , {  2.0f, 0.95f ,  2.0f}
+  , {  4.0f, 0.9f  ,  4.0f} //rd
+  , {  4.8f, 0.85f ,  4.3f}
+  , {  5.6f, 0.85f ,  4.8f}
+  , {  6.4f, 0.8f  ,  5.4f} //or
+  , {  7.2f, 0.75f ,  6.1f} //am
+  , {  8.0f, 0.7f  ,  7.3f} //ye
+  , {  9.0f, 0.72f ,  8.5f}
+  , { 10.0f, 0.75f ,  9.8f}
+  , { 11.0f, 0.77f , 11.3f}
+  , { 12.0f, 0.8f  , 12.0f} //gn
+  , { 13.0f, 0.76f , 12.8f}
+  , { 14.0f, 0.73f , 13.8f}
+  , { 15.0f, 0.7f  , 15.1f}  //cy
+  , { 16.0f, 0.7f  , 16.0f}  //cy
+  , { 17.0f, 0.8f  , 17.0f}
+  , { 18.5f, 0.9f  , 18.5f}
+  , { 20.0f, 1.0f  , 20.0f}  //bl
+  , { 22.0f, 1.0f  , 22.0f}  //vi
+  };
+  
+  
+  float[][] colSatB_HSB =
+  { { 0.20f, 1.40f     , 0.20f, 1.40f    }
+  , { 0.35f, 1.40f     , 0.35f, 1.40f    }
+  , { 0.60f, 1.40f     , 0.60f, 1.40f    }
+  , { 1.00f, 1.0f/0.7f , 1.00f, 1.0f/0.7f}
+  , { 1.00f, 1.0f/0.8f , 1.00f, 1.0f/0.8f}
+  , { 1.00f, 1.0f/0.9f , 1.00f, 1.0f/0.9f}
+  , { 1.00f, 1.00f     , 1.00f, 1.00f    }
+  , { 0.80f, 0.90f     , 0.80f, 0.90f    }
+                                         
+  , { 1.00f, 0.90f     , 1.00f, 0.90f    }
+  , { 0.80f, 0.80f     , 0.80f, 0.80f    }
+                                         
+  , { 1.00f, 0.80f     , 1.00f, 0.80f    }
+  , { 0.80f, 0.70f     , 0.80f, 0.70f    }
+  , { 0.60f, 0.60f     , 0.60f, 0.60f    }
+  , { 0.40f, 0.50f     , 0.40f, 0.50f    }
+  , { 0.60f, 0.50f     , 0.60f, 0.50f    }
+  , { 0.80f, 0.60f     , 0.80f, 0.60f    }
+                                         
+  , { 1.00f, 0.70f     , 1.00f, 0.70f    }
+  , { 0.80f, 0.60f     , 0.80f, 0.60f    }
+  , { 0.60f, 0.50f     , 0.60f, 0.50f    }
+  , { 0.90f, 0.40f     , 0.90f, 0.40f    }
+  , { 0.80f, 0.50f     , 0.80f, 0.50f    }
+                                         
+  , { 1.00f, 0.60f     , 1.00f, 0.60f    }
+  , { 0.80f, 0.50f     , 0.80f, 0.50f    }
+                                         
+  , { 1.00f, 0.50f     , 1.00f, 0.50f    }
+  , { 0.80f, 0.40f     , 0.80f, 0.40f    }
+                                         
+  , { 1.00f, 0.40f     , 1.00f, 0.40f    }
+  , { 0.80f, 0.30f     , 0.80f, 0.30f    }
+                                         
+                                         
+  , { 0.50f, 0.60f     , 0.50f, 0.60f    }
+                                         
+                                         
+  , { 0.60f, 0.20f     , 0.60f, 0.20f    }
+  , { 0.50f, 0.20f     , 0.50f, 0.20f    }
+
+  
+ 
+  };
+  
   float[][] colSatB =
-  { { 0.20f, 1.30f }
-  , { 0.35f, 1.30f }
-  , { 0.60f, 1.30f }
-  , { 0.80f, 1.30f }
-  , { 1.00f, 1.20f }
-  , { 1.00f, 1.10f }
-  , { 1.00f, 1.00f }
-  , { 0.70f, 0.90f }
-  
-  , { 1.00f, 0.90f }
-  , { 0.80f, 0.80f }
-  
-  , { 1.00f, 0.80f }
-  , { 0.80f, 0.70f }
-  
-  , { 1.00f, 0.70f }
-  , { 0.80f, 0.60f }
-  
-  , { 1.00f, 0.60f }
-  , { 0.80f, 0.50f }
-  
-  , { 1.00f, 0.50f }
-  , { 0.80f, 0.40f }
-
-  , { 1.00f, 0.40f }
-  , { 0.80f, 0.30f }
-
-  
-  , { 0.60f, 0.70f }
-  , { 0.50f, 0.60f }
-
-  , { 0.60f, 0.60f }
-  , { 0.50f, 0.50f }
-
-  , { 0.60f, 0.50f }
-  , { 0.50f, 0.40f }
-
-  , { 0.60f, 0.40f }
-  , { 0.50f, 0.30f }
-
-  , { 0.60f, 0.30f }
-  , { 0.50f, 0.20f }
-
-
-  , { 0.60f, 0.20f }
-  , { 0.50f, 0.20f }
+  { { 1.00f, 0.99f     , 1.00f, 0.98f     }  ////
+  , { 1.00f, 0.97f     , 1.00f, 0.96f     }
+  , { 1.00f, 0.95f     , 1.00f, 0.95f     }
+  , { 1.00f, 0.92f     , 1.00f, 0.92f     }
+  , { 1.00f, 0.90f     , 1.00f, 0.90f     }
+  , { 1.00f, 0.85f     , 1.00f, 0.85f     }
+  , { 1.00f, 0.82f     , 1.00f, 0.82f     }
+  , { 1.00f, 0.76f     , 1.00f, 0.76f     }
+  , { 1.00f, 0.70f     , 1.00f, 0.70f     }
+  , { 0.90f, 0.70f     , 0.90f, 0.70f     }
+  , { 0.70f, 0.70f     , 0.70f, 0.70f     }
+  , { 0.50f, 0.70f     , 0.50f, 0.70f     }
+  , { 0.30f, 0.60f     , 0.40f, 0.60f     }
+  , { 0.60f, 0.60f     , 0.60f, 0.60f     }
+  , { 0.80f, 0.60f     , 0.80f, 0.60f     }
+  , { 1.00f, 0.60f     , 1.00f, 0.60f     }
+  , { 1.00f, 0.50f     , 1.00f, 0.50f     }
+  , { 0.80f, 0.50f     , 0.80f, 0.50f     }
+  , { 0.60f, 0.50f     , 0.60f, 0.50f     }
+  , { 0.40f, 0.50f     , 0.50f, 0.50f     }
+  , { 0.40f, 0.40f     , 0.50f, 0.40f     }
+  , { 0.70f, 0.40f     , 0.70f, 0.40f     }
+  , { 1.00f, 0.40f     , 1.00f, 0.40f     }
+  , { 0.80f, 0.30f     , 0.70f, 0.30f     }
+  , { 0.60f, 0.30f     , 0.50f, 0.30f     }
+  , { 0.40f, 0.20f     , 0.50f, 0.20f     }
+  , { 0.70f, 0.20f     , 0.70f, 0.20f     }
+  , { 1.00f, 0.30f     , 0.70f, 0.30f     }
+  , { 1.00f, 0.20f     , 0.70f, 0.20f     }
+                                         
 
   
-  , { 0.40f, 0.30f }
-  , { 0.30f, 0.40f }
-  , { 0.20f, 0.55f }
-  , { 0.10f, 0.70f }
  
   };
   
   
-  String[] val;
-  
-  String[] XXval =
-  { "FFE0FF:pma   FFC0FF:lma   FF80FF:bma   FF40FF:ma    E000E0:sma   C000C0:      A000A0:      800080:      600060:      400040:      "
-  , "FFD8E8:ppu   FFC0E0:lpu   FF80E0:      FF4080:pu    F000A0:spu   E00080:      C00080:      B03070:      A04060:      803050:      "
-  , "FFE8E8:prd   FFD0D0:lrd   FFA0A0:brd   FF8080:rd    FF0000:srd   E67373:r5090 CC6666:r5080 CC0000:r0080 B35959:r0570 996B6B:r0360 "
-  , "FFE8E0:      FFD0C0:      FF9070:      FF7040:      FF6B00:      FF974D:      E67373:      CCA18F:      CCAFA3:      602000:      "
-  , "FFF0E0:por   FFE0C0:lor   FFC070:      FFA000:or    FF9900:sor   E06000:      E6B873:      CCB48F:      CCBCA3:      503000:      "
-  , "FFF0D0:pam   FCF0B0:lam   FFE070:bam   FFC000:am    E0A000:sam   C09000:      A06000:      A08060:      A07020:      403000:      "
-  , "FFFFC0:pye   FFFF90:lye   FFFF60:bye   FFFF00:ye    E0E000:sye   A0A000:dye   808000:      606000:      606040:      404000:      "
-  , "FFFFD0:p     FFFFA0:l     E0FF70:      E0FC00:      C0E000:s     90B000:      608000:      507020:      406030:      304000:      "
-  , "F4FFE0:plm   F0FF80:llm   C0FF70:blm   A0FC00:lm    80C040:slm   80B000:      6B8E23:od    408000:      406020:      203000:      "
-  , "F0FFF0:p     E0FFE0:l     A0FF70:      40FC00:      30B000:s     40B000:      208800:      307010:      406020:      104000:      "
-  , "E0FFE0:pgn   C0FFC0:lgn   80FF80:bgn   00FF00:gn    00D000:sgn   00B000:dgn   009000:      228B22:fgn   007000:      004000:      "
-  , "C0FFE0:psg   C0FFD0:lsg   70FFA0:      00FC60:sg    00A040:ssg   00A050:      2E8B57:sgn   208020:      305020:      204010:      "
-  , "E0FFF0:p     B0FFF0:l     70FFE0:      00F4A0:      00A080:s     00A070:      008040:      208060:      307050:      305050:      "
-  , "E0FFFF:pcy   B0FFFF:lcy   00FFFF:bcy   00F0F0:cy    00A0A0:scy   00A0A0:      008080:      006060:      004040:      004040:      "
-  , "FFFFFF:p     B0F0FF:l     70F0FF:      20E0FF:      0090E0:s     0090E0:      0060A0:      406080:      003040:      409090:      "
-  , "F0F0FF:p     C0D0FF:l     70C0FF:      40A0FC:      2040FF:s     0040F0:      0000E0:      4040F0:      002080:      103070:      "
-  , "F0F0FF:pbl   D0D0FF:lbl   B0B0FF:      A0A0FF:bl    4040FF:sbl   0000FF:dbl   0000A0:      000080:      000040:      000040:      "
-  , "FCF0FF:pvi   FAE4FF:lvi   E0C0FF:      E060FF:vi    9020FF:svi   8000F0:      4000E0:      6030D0:      6020B0:      000000:      "
-  , "FFFFFF:wh    E0E0E0:lgr   C0C0C0:      A0A0A0:gr    808080:sgr   606060:      404040:      202020:      000000:      000000:      "
+  String[] val =
+  { "FFE7FF:      FFE7FF:      FFE7FF:      FFF2FF:      FFF5F4:      FFF5D7:      FFFFEE:wye   FFF9A4:      F4FFA5:      E3FFB6:      E4FFDA:      D3FFEA:      C5FFFD:      A4FFFC:      C1FFFF:      9CFFFF:      C1FFFF:      D5FAFF:      FFE7FF:      FFE7FF:      00BFFF:      "
+  , "FFE7FF:      FFE7FF:      FFE7FF:      FFEAFF:      FFEFEC:      FFEECF:      FFFFA0:pye   FFF39C:      E2FF91:      D1FFA2:      D2FFC6:      C1FFD6:      B2FFE8:      92FFE8:      83FFFB:      94F9FF:      B4F9FF:      CEF4FF:      FFE7FF:      FFE7FF:      FFE7FF:      "
+  , "FFE5FF:      FFE5FF:      FFE5FF:      FFE6FD:      FFE9E4:      FFEBCB:      FFFF98:lye   FFEF98:      D7FD85:      C7FF97:      BFFFB1:      B7FFCB:      A0FFD4:      88FFDD:      78FDEF:      90F5FF:      ADF3FF:      CAF0FF:      FFE7FF:      FFE5FF:      F9E2FF:      "
+  , "FFA9FF:      FFA9FF:      FFC7F3:      FFCCDE:      FFD2C9:      FFDEAD:nw    FFE060:ye1   FFFF00:ye    E0FF4D:gye   ABFF78:      A3FF92:      9CFFAD:      84FFB5:      6CFFBE:      00FFFF:cy    00FFFF:cy    A3EAFF:      C0E7FF:      F6DFFF:      D0D0FF:lbl   F0DAFF:      "
+  , "FE73FF:      FF8BF0:      FFB6DF:      FFBCCA:      FFC2B5:      FFC7A0:      FFD700:Gold  F9E187:      C9F075:      99FE64:      91FF7E:      89FF98:      71FFA0:      5AFEAA:      6AF0DF:      80E7FF:      9DE4FF:      BAE2FF:      F1DBFF:      F8A8FF:      E6D1FF:      "
+  , "ED63FF:      FF61BC:      FF8BAB:      FF9196:      FF9780:      FFA500:or    F9B36A:      ECD679:      BCE467:      8CF255:      62FF4A:      5AFF64:      43FF6D:      4DF29B:      5DE4D1:      6FD7FF:      8CD5FF:      A9D2FF:      DAC6FF:      E798FF:      DDC8F5:      "
+  , "FF00FF:pu1   FF479D:      FF728C:      FF7876:      FF8C00:dor   FD8953:      F1AB61:      E4CE70:      B4DD5E:      84EB4C:      54FA3A:      3EFF44:      35FA5D:      45EB92:      55DDC8:      65CEFD:      77C2FF:      8FBAFF:      BEACFF:      CE81FF:      D3BFEA:      "
+  , "D44DEB:      FF0080:rd0   FF3F4D:      FF6000:rd1   FF7550:Coral ED7A41:      E19D50:      D4C05E:      A4CE4C:      74DD3A:      44EB29:      15FA17:      25EB4C:      35E880:      45CEB6:      55C0EB:      4594FD:      5788FF:      8679FF:      964FFF:      CAB7E0:      "
+  , "C43ED9:      E4216F:      FF0000:rd    F72713:      EA4921:      DD6C2F:      D18E3E:      DCCA4C:      94C03A:      64CE29:      34DD17:      05EB05:      15DD3A:      25CE6F:      35C0A4:      45B1D9:      3586EB:      255AFD:      4000FF:bl1   6421FD:      C1AFD6:      "
+  , "C348D7:      E02F78:      FC1318:      F13225:      E65233:      DA713F:      CF914C:      C3B058:      98BD49:      6DCB39:      42D82A:      16E418:      26D849:      34CB78:      42BDA8:      50B0D7:      4289E8:      0000FF:bl    4E46FF:      6D2FF8:      B8A7CC:      "
+  , "C15ED6:      D7498B:      EE3541:      E54D4B:      DC6555:      D37E5F:      CA9769:      C1AF73:      A0B967:      7DC35A:      5CCD4D:      3BD741:      46CD65:      51C38B:      5DB9B1:      68AFD6:      5D91E3:      5171EF:      0000FF:bl    7D49EF:      AF9FC2:      "
+  , "BF73D4:      CF649E:      DF5669:      D96771:      D27978:      CC8A7F:      C69C87:      BFAD8D:      A8B585:      8FBB7B:      78C373:      60CB6A:      68C384:      70BC9F:      78B5BA:      7FADD4:      7898DD:      7082E6:      5F56F7:      9065E6:      A696B8:      "
+  , "A371B4:      B05A8B:      B65F74:      B85D67:      AE737D:      AE7872:      A78886:      A4947D:      949885:      7D9F6F:      77A07A:      58AB61:      6EA084:      649F8B:      7898A5:      7194B5:      7887BA:      6471C4:      695FC9:      7D5AC4:      9C8DAD:      "
+  , "A550B7:      B94078:      CC2E38:      C44241:      BD574A:      B56C52:      AD815B:      A69664:      899E58:      6CA74D:      50B043:      33B938:      3DB058:      46A777:      509E97:      5995B7:      FFFFFF:wh    4661CC:      332EE2:      6C3FCC:      9385A3:      "
+  , "A73BB9:      C12464:      DA0C0F:      D0281B:      C64426:      BC6033:      B17B3D:      A89749:      81A33A:      5BAF2C:      34BA1D:      0FC610:      1BBA39:      28AF64:      35A38F:      4297BA:      3575C7:      2852D6:      0F0DF2:      5B24D6:      8A7D99:      "
+  , "A926BB:      C90951:      DF0000:      DA0D00:      CF3003:      C35412:      B67620:      A9992E:      7AA81D:      4AB60C:      18C300:      00CA00:      00C31B:      0BB652:      1AA786:      2A99BB:      1A6DCD:      0A42DF:      0000FF:sbl   4909DF:      81758F:      "
+  , "8F0E9E:      AC0030:      BA0000:      BA0000:      B21600:      A63A00:      9B5D02:      8F8111:      5E8F00:      2D9C00:      00A800:      00A900:      00A800:      009C31:      008F68:      008B8B:dcy   0054AE:      0027BE:      0000CE:      2C00BE:      786D85:      "
+  , "8D239C:      A60B46:      BA0000:      B40F00:      AB2C08:      A14815:      976420:      8D7F2B:      678B1D:      40960E:      1AA201:      00A800:      01A21D:      0D9646:      1B8B73:      277F9C:      1B5DAB:      0D39B8:      0000CD:      400BB8:      6F647B:      "
+  , "8B399B:      9E275A:      B1151A:      AA2B24:      A23F2C:      9A5334:      93693E:      8B7E46:      6F873B:      528F30:      359725:      18A01A:      22973A:      2C8F5A:      36877B:      3F7E9B:      3564A4:      2C4AAF:      1815C4:      5227AF:      655B70:      "
+  , "894E97:      9A3463:      A33743:      A43736:      98524E:      975A44:      8E6E5A:      8A7D52:      77825A:      5A8B40:      4F8D4A:      2A9A2E:      438D58:      3A8B63:      518284:      4A7D99:      506A9E:      3A51AA:      3D37B4:      5A34AA:      5C5366:      "
+  , "6F367A:      801D46:      881E25:      891E18:      7E3A31:      7C4126:      74563D:      6F6434:      5C6A3B:      407423:      35762D:      108211:      29763B:      207446:      366A66:      30657C:      365382:      203A8D:      221E96:      401D8D:      534B5C:      "
+  , "71157D:      880133:      940000:      930300:      8B1C00:      833506:      7A4E10:      71661A:      50700E:      2E7B02:      0B8400:      008600:      00840B:      027B33:      0D7058:      008B8B:dcy1  0D488A:      022997:      0000A4:      2E0197:      4A4352:      "
+  , "72007E:      900011:      940000:      940000:      940000:      8A2000:      7E4300:      726700:      417400:      108200:      008600:      008000:gn    008600:      008211:      007448:      008080:teal  003A8F:      000E9F:      0000A5:      10009F:      413B48:      "
+  , "55005E:      6A0011:      6F0000:      6F0000:      6F0000:      661B00:      5F3100:      554D00:      2F5800:      106000:      006500:      006500:      006500:      006011:      005733:      004D5E:      00296B:      000E75:      00007B:      100075:      38323E:      "
+  , "55085F:      650428:      6F0000:      6D0500:      6B0D00:      622A0A:      5D3802:      554D17:      385500:      255B05:      006500:      006500:      006500:      055B28:      015640:      154D5E:      003368:      05216F:      00007B:      25046F:      2E2933:      "
+  , "39053E:      480008:      4A0000:      4A0000:      470800:      450F00:      3E2501:      393300:      273901:      084100:      004300:      004200:      004300:      004108:      01392B:      00333F:      012247:      00074F:      000051:      08004F:      252129:      "
+  , "39003F:      4A0000:      4A0000:      4A0000:      4A0000:      490000:      411A00:      393300:      173D00:      004300:      004300:      004300:      004300:      004300:      003D19:      00333F:      001449:      000052:      000052:      000052:      1C191F:      "
+  , "55005E:      6A0011:      6F0000:      6F0000:      6F0000:      661B00:      612900:      554D00:      255B00:      106000:      006500:      006400:dgn   006500:      006011:      005B29:      004D5E:      00206F:      000E75:      00008B:dbl2  100075:      131115:      "
+  , "39003F:      4A0000:      4A0000:      4A0000:      4A0000:      490000:      450F00:      393300:      084000:      004300:      004300:      004300:      004300:      004300:      004009:      00333F:      00064F:      000052:      000080:dbl1  000052:      0A090B:      "
   };
-
   String[] longNames =
-  { "pma=pastel magenta"
-  , "lma=light magenta"
+  { "nw=NavajoWhite"
+  , "Gold=Gold-css"
+  , "or=Orange"
+  , "dor=DarkOrange"
+  , "rd=Read"
   , "bl=blue"
+  , "sbl=Blue"
+  , "dcy=DarkCyan"
+  , "dcy1=DarkCyan1"
+  , "gn=Green"
+  , "teal=Teal"
+  , "dgn=DarkGreen"
+  , "dbl2=DarkBlue"
+  , "dbl1=Navy"
   };
-
-  
   
   Map<String, ColorWithField> idxColorsByShortname = new TreeMap<String, ColorWithField>();
   
@@ -249,14 +334,14 @@ public class GralColorShow
   
   //String[][] name = new String[19][10];
   
-  ColorWithField[][] colorF = new ColorWithField[19][10];
+  final ColorWithField[][] colorF = new ColorWithField[colSatB.length][colHue.length + 1];
   
   
   ColorWithField colorFocus;
   
   GralTextField wdgTest, wdgTest1, wdgTest2;
   
-  GralTextField wdgHexValue, wdgHue, wdgSat, wdgBright, wdgShortname, wdgName;
+  GralTextField wdgHexValue, wdgHue, wdgSat, wdgBright, wdgHue2, wdgSat2, wdgLight2, wdgShortname, wdgName;
   
   boolean testText, testLine;
   
@@ -265,112 +350,241 @@ public class GralColorShow
   //GralFont fontText = GralFont.fontMonospacedSansSerif;
   
   
-  float[] colweight = { 1.0f, 0.95f, 0.9f, 0.8f, 0.7f, 0.6f, 0.5f, 0.2f, 0}; 
-  
-  float[] colrd = { 1.0f, 0.9f, 0.8f, 0.7f, 0.3f, 0.2f, 0.1f, 0}; 
-  
-  float[] colbl = { 1.0f, 0.9f, 0.8f, 0.7f, 0.3f, 0.2f, 0.1f, 0}; 
-  
-  
-  float[] lineWeight = { 3.0f, 2.7f, 2.3f, 1.9f, 1.3f, 1.0f, 0.7f, 0.5f, 0.3f, 0.1f, 0};
-  
-  int[] lngn = { 0xff, 0xff, 0xe2, 0xd8, 0xc8, 0xb0, 0x80, 0x40, 0        ,0,0}; 
-  
-  int[] lnrd = { 0xff, 0xff, 0xff, 0xff, 0xe8, 0xd0, 0xc0, 0x80, 0x40        ,0,0}; 
-  
-  int[] lnbl = { 0xff, 0xff, 0xff, 0xff, 0xe8, 0xd0, 0xc0, 0x80, 0x40        ,0,0}; 
-  
-  
-  int ixCol(int col, int col0){
-    int ix1 = col0 - col;
-    if(ix1 <-8){ ix1 +=24; }
-    if(ix1 >=8){ ix1-= 24;}
-    ix1 = Math.abs(ix1);
-    if(ix1 > 8){ ix1 = 8; }
-    return ix1;
+ 
+  static float RGBtoligth(float rd, float gn, float bl, float sat){
+    //++++++++++++++
+    //++++++++++++++++ ////
+    //+++
+    float rd1 = bfrd * rd;
+    float gn1 = bfgn * gn;
+    float bl1 = bfbl * bl;
+    //float rd1 =  rd;
+    //float gn1 =  gn;
+    //float bl1 =  bl;
+    
+    float lval = Math.min(rd1, Math.min(gn1, bl1));
+    float hval = Math.max(rd1, Math.max(gn1, bl1));
+    float mid;
+    if(hval == rd1 && lval == bl1) mid = gn1;
+    else if(hval == rd1 && lval == gn1) mid = bl1;
+    else if(hval == gn1 && lval == bl1) mid = rd1;
+    else if(hval == gn1 && lval == rd1) mid = bl1;
+    else if(hval == bl1 && lval == rd1) mid = gn1;
+    else mid = rd1;
+    
+    //float f = hval == 0 ? 1 : (0.2f * lval/hval + 0.2f * mid/hval + 1) / 1.4f; 
+    float fmid = 0.3f; //hval == 0 ? 1 : 1.0f - 0.8f * mid/hval;
+    float fl =  0.1f; //hval == 0 ? 1 : 1.0f - 0.8f * lval/hval;
+    //return (0.7f/255 * rd + 0.8f/255 * gn + 0.6f/255 * bl); // * (0.5f + 0.5f * sat);
+    //return (float)Math.sqrt(0.34f/255 * rd + 0.40f/255 * gn + 0.27f/255 * bl);
+    //float light1 = 0.33f/255 * rd + 0.45f/255 * gn + 0.22f/255 * bl; 
+    float light1 = (hval + fmid * mid + fl * lval) /255; 
+    return  light1 / 1.46f; //  *f;
   }
   
-  int genColor(int line, int col){
-    int ixgn = ixCol(col, 12);
-    int ixrd = ixCol(col, 4);
-    int ixbl = ixCol(col, 20);
-    int[] rdgnbl = new int[3];
-    rdgnbl[0] = (int)(colweight[ixrd] * lineWeight[line] * 0xff); //lnrd[line]);
-    rdgnbl[1] = (int)(colweight[ixgn] * lineWeight[line] * 0xff); //lngn[line]);
-    rdgnbl[2] = (int)(colweight[ixbl] * lineWeight[line] * 0xff); //lnbl[line]);
-    for(int ixColor1 =0; ixColor1 <3; ++ixColor1){
-      int ixColor0 = ixColor1 +1; if(ixColor0>=3){ ixColor0 -=3;}
-      int ixColor2 = ixColor1 -1; if(ixColor2<0){ ixColor2 +=3;}
-      
-      if(rdgnbl[ixColor1] > 0xff){
-        float f = rdgnbl[ixColor1] / 0xff;
-        rdgnbl[ixColor1] = 0xff;
-        rdgnbl[ixColor0] = (int)(rdgnbl[ixColor0] * f);  //same ratio
-        rdgnbl[ixColor2] = (int)(rdgnbl[ixColor2] * f);
-        
-        /*
-        float m = (rdgnbl[ixColor1] - 0xff)/512; //max. 1.0
-        rdgnbl[ixColor1] = 0xff;
-        rdgnbl[ixColor0] += (int)((0xff - rdgnbl[ixColor0]) * m);  //Erhöhung Richtung 0xff
-        rdgnbl[ixColor2] += (int)((0xff - rdgnbl[ixColor2]) * m);
-        */
-        /*
-        rdgnbl[ixColor0] += m;
-        if(rdgnbl[ixColor0] > 0xff){
-          rdgnbl[ixColor0] = 0xff; }
-        rdgnbl[ixColor2] += m;
-        if(rdgnbl[ixColor2] > 0xff){
-          rdgnbl[ixColor2] = 0xff; }
-        */
+  
+  
+  static float RGBtoHue(int rgb) {
+    float hue;
+    int rd = (rgb>>16) & 0xff;
+    int gn = (rgb>>8) & 0xff;
+    int bl = rgb & 0xff;
+    
+    
+    int lval = Math.min(rd, Math.min(gn, bl));
+    int hval = Math.max(rd, Math.max(gn, bl));
+    int mid;
+    if(hval == lval) { //gray
+      hue = 0;
+      mid = lval;
+    }
+    else if(hval == rd) {
+      if(lval == gn) { //bl is more significant
+        hue = 4 - ((float)(bl-lval) / (rd - lval) * 4 *cfbl / cfrd);
+        mid = bl;
+      } else {
+        hue = 4 + ((float)(gn-lval) / (rd - lval) * 4 *cfgn / cfrd);
+        mid = gn;
+      }
+    } else if(hval == gn) {
+      if(lval == bl) { //rd is more significant
+        hue = 12 - ((float)(rd-lval) / (gn - lval) * 4 * cfrd/ cfgn);
+        mid = rd;
+      } else { //bl is more significant
+        hue = 12 + ((float)(bl-lval) / (gn - lval) * 4 * cfbl / cfgn);
+        mid = bl;
+      }
+    } else { //bl 
+      if(lval == rd) { //gn is more significant
+        hue = 20 - ((float)(gn-lval) / (bl - lval) * 4 * cfgn / cfbl);
+        mid = gn;
+      } else {
+        hue = 20 + ((float)(rd-lval) / (bl - lval) * 4 * cfrd / cfbl);
+        mid = rd;
       }
     }
-    return (rdgnbl[0] <<16) + (rdgnbl[1]<<8) + rdgnbl[2];
+    return hue;
   }
   
   
   
-  void genColor1(){
-    //java.awt.Color.HSBtoRGB(hue, saturation, brightness);
-  }
   
-  
-  void t1(){
-    //java.awt.Color.RGBtoHSB(r, g, b, hsbvals);
-  }
-  
-  
-  void testGetColor(){
-    int col =0;
-    for(int ixcol = 0; ixcol < 24; ++ixcol){
-      int col1 = genColor(0, ixcol);
-      col |= col1;
+  static void RGBtoHSL(int rgb, float[] hsl){
+    if(rgb == 0xF273FF)
+      Debugutil.stop();
+    float rd = (rgb>>16) & 0xff;
+    float gn = (rgb>>8) & 0xff;
+    float bl = rgb & 0xff;
+    
+    
+    float lval = Math.min(rd, Math.min(gn, bl));
+    float hval = Math.max(rd, Math.max(gn, bl));
+    float mid;
+    hsl[0] = RGBtoHue(rgb);
+    if(hval == 255) {
+      hsl[1] = 1.0f; //white or paster color is not gray.
+    } else if(hval == lval) {
+      hsl[1] = 0; //gray
+    } else {
+      hsl[1] = (float)(hval - lval) / hval;
     }
+    hsl[2] = RGBtoligth(rd, gn, bl, hsl[1]); 
   }
+  
+  
+  
+    static int HSLtoRGB(float hue, float sat, float light){  ////
+    float rd, gn, bl;
+    float lval, mid, hval;
+    int diff = (int)(sat * 255 + 0.5f);
+    if(hue >= 24){ hue -= 24; }
+    if(hue < 4){
+      hval = rd = diff; //(int)(diff * (hue + 4) / 8 / cfrd);
+      //bl = (int)(diff * (4 - hue) / 8 / cfbl);
+      bl = (int)(diff * (4 - hue) / 4 / cfbl);
+      gn = 0;
+    } else if(hue < 8){
+      rd = hval = diff; //(int)(diff * (12 - hue) / 8 / cfrd); 
+      //gn = (int)(diff * (hue - 4) / 8 / cfgn);        
+      gn = (int)(diff * (hue -4 ) / 4 / cfgn);  //on 8 maximum        
+      bl = 0;
+    } else if(hue < 12){
+      rd = (int)(diff * (12 - hue) / 4 / cfrd); 
+      gn = hval = diff; //(int)(diff * (hue -  4) / 8 / cfgn);        
+      bl = 0;
+    } else if(hue < 16) {
+      gn = hval = diff; //(int)(diff * (20 - hue) / 8 / cfgn); 
+      bl = (int)(diff * (hue - 12) / 4 / cfbl);
+      rd = 0;
+    } else if(hue < 20) {
+      gn = (int)(diff * (20 - hue) / 4 / cfgn); 
+      bl = hval = diff; //(int)(diff * (hue - 12) / 8 / cfbl);
+      rd = 0;
+    } else { //20..24
+      bl = hval = diff; //(int)(diff * (28 - hue) / 8 / cfbl); 
+      rd = (int)(diff * (hue - 20) / 4 / cfrd);
+      gn = 0;
+    }
+    float hue1 = RGBtoHue((((int)rd << 16) & 0xff0000) | (((int)gn <<8) & 0x00ff00) | ((int)bl & 0xff));
+    if(Math.abs(hue1-hue) > 0.1f)
+      Debugutil.stop();
+    float l1 = RGBtoligth(rd, gn, bl, sat);
+    if(l1 < light){
+      int catastropicalCount = 255;
+      while(--catastropicalCount >=0 && l1 < light){
+        if(++rd >255) { rd = 255; } //++gn; ++bl; }   
+        if( (gn += 1/cfgn) >255) { gn = 255; } //++rd; ++bl; }
+        if( (bl += 1/cfbl) >255) { bl = 255; } //++rd; ++gn; }
+        l1 = RGBtoligth(rd, gn, bl, sat);
+      }
+    } else {
+      int catastropicalCount = 255;
+      while(--catastropicalCount >=0 && l1 > light){
+        if( (rd*=0.99f) <0) rd = 0; 
+        if((gn*=0.99f) <0) gn = 0; 
+        if((bl*=0.99f) <0) bl = 0; 
+        l1 = RGBtoligth(rd, gn, bl, sat);
+      }
+      
+    }
+    /*
+    float l2 = light * light - l1 * l1;
+    float lrd = (int)(l2 * 255 / 0.33f);
+    float lgn = (int)(l2 * 255 / 0.42f);
+    float lbl = (int)(l2 * 255 / 0.22f);
+    rd = (int)(rd + lrd);
+    gn = (int)(gn + lgn);
+    bl = (int)(bl + lbl);
+    */
+    if(rd < 0){ 
+      rd = 0; }
+    if(rd > 255){ 
+      rd = 255; }
+    if(gn < 0){ 
+      gn = 0; }
+    if(gn > 255){ 
+      gn = 255; }
+    if(bl < 0){ 
+      bl = 0; }
+    if(bl > 255){ 
+      bl = 255; }
+    return (((int)rd) << 16) + (((int)gn) << 8) + (((int)bl));
+  }
+  
+
+  
+  
+
+  
+  int HSBtoRGB(float hue, float saturation, float brightness) {
+    float hue1 = (hue-4) / 24;
+    if(hue1 < 0 ){ hue1 += 1.0f; }
+    return java.awt.Color.HSBtoRGB(hue1, saturation, brightness);
+  }
+  
+  void RGBtoHSB(int col2, float[] hsb){
+    java.awt.Color.RGBtoHSB((col2>>16) & 0xff, (col2>>8) & 0xff, (col2) & 0xff, hsb);
+    hsb[0] = hsb[0] * 24 +4;
+    if(hsb[0] >= 24.0f){ hsb[0] -= 24.0f; }
+  }
+  
   
   
   
   void genDefaultConfig() {
-    val = new String[colHue.length +1];  //gray too!
     int colorVal;
     for(int ixHue = 0; ixHue < colHue.length; ++ixHue){
-      StringBuilder line = new StringBuilder(1000);
+      //StringBuilder line = new StringBuilder(1000);
       for(int ixSatB = 0; ixSatB < colSatB.length; ++ixSatB){
-        float b = colSatB[ixSatB][1] * colHue[ixHue][1];
-        if(b > 1.0f){ b = 1.0f; }
-        colorVal = java.awt.Color.HSBtoRGB(colHue[ixHue][0], colSatB[ixSatB][0], b) & 0xffffff;
-        line.append(String.format("%06X", colorVal)).append(":       ");
+        float s = colSatB[ixSatB][2*(ixHue & 1) + 0];
+        float b = colSatB[ixSatB][2*(ixHue & 1) + 1]; // * colHue[ixHue][1];
+        if(b > 1.0f){ s -= b -1.0f; b = 1.0f; }
+        //colorVal = HSBtoRGB(colHue[ixHue][0], s, b) & 0xffffff;
+        if(ixHue == 7 && ixSatB == 16)
+          Debugutil.stop();
+        colorVal = HSLtoRGB(colHue[ixHue][2], s, b) & 0xffffff;
+        ColorWithField colorF1 = new ColorWithField("", ixHue, ixSatB, colorVal);
+        colorF[ixSatB][ixHue] = colorF1;
+        setColorFromRGB(colorF1);
+        setColorT(colorF1);
+        ///
+        //line.append(String.format("%06X", colorVal)).append(":       ");
       }
-      colorVal = java.awt.Color.HSBtoRGB(0,0, 1.0f - ((float)ixHue) / colHue.length) & 0xffffff;
-      line.append(String.format("%06X", colorVal)).append(":       ");
-      val[ixHue] = line.toString();
+      colorF[0][ixHue].wdgColor.setText(""+colHue[ixHue][0]);
+      //colorVal = HSBtoRGB(0,0, 1.0f - ((float)ixHue) / colHue.length) & 0xffffff;
+      //val[ixHue] = line.toString();
     }
-    StringBuilder line = new StringBuilder(1000);
     for(int ixSatB = 0; ixSatB < colSatB.length; ++ixSatB){
-      colorVal = java.awt.Color.HSBtoRGB(0,0, 1.0f - ((float)ixSatB) / colSatB.length) & 0xffffff;
-      line.append(String.format("%06X", colorVal)).append(":       ");
+      colorVal = HSLtoRGB(0,0, 1.0f - ((float)ixSatB) / colSatB.length) & 0xffffff;
+      ColorWithField colorF1 = new ColorWithField("", colHue.length, ixSatB, colorVal);
+      colorF[ixSatB][colHue.length] = colorF1;
+      colorF[ixSatB][0].wdgColor.setText("" + colSatB[ixSatB][0]);
+      colorF[ixSatB][1].wdgColor.setText("" + colSatB[ixSatB][1]);
+      colorF[ixSatB][colHue.length].wdgColor.setText("" + ixSatB);
+      setColorFromRGB(colorF1);
+      setColorT(colorF1);
     }
-    val[colHue.length] = line.toString();
-    colorF = new  ColorWithField[colHue.length +1][colSatB.length];
+    //val[colHue.length] = line.toString();
   }
   
   
@@ -379,10 +593,11 @@ public class GralColorShow
   
   void readConfig()
   { 
-    for(int ixCol=0; ixCol<colorF.length; ++ixCol) {
-      String line = val[ixCol];
+    int zLine = Math.min(val.length, colorF.length);
+    for(int ixBright = 0; ixBright < zLine; ++ixBright){
+      String line = val[ixBright];
       StringPartScan spline = new StringPartScan(line);
-      for(int ixBright = 0; ixBright < colorF[0].length; ++ixBright){
+      for(int ixCol=0; ixCol<val.length; ++ixCol) {
         GralColor colText;
         if(ixBright < 5){ colText = colBk; }
         else { colText = colWh; }
@@ -403,13 +618,12 @@ public class GralColorShow
           spline.scan(":").scanOk();  //read ':'
           shortname = "";
         }
-        ColorWithField colorF1 = new ColorWithField(shortname, ixCol, ixBright, col2);
-        colorF[ixCol][ixBright] = colorF1;
-        java.awt.Color.RGBtoHSB((col2>>16) & 0xff, (col2>>8) & 0xff, (col2) & 0xff, colorF1.hsb);
-        colorF1.wdgColor.setActionFocused(actionFocusColor);
-        colorF1.wdgColor.setActionChange(actionEditColor);
-        colorF1.wdgColor.setTextColor(colText);
-        if(colorF1.shortname.length() >0) {
+        if(shortname.length() >0){
+          ColorWithField colorF1 = colorF[ixBright][ixCol];
+          colorF1.rgb = col2;
+          colorF1.shortname = shortname;
+          setColorFromRGB(colorF1);
+          setColorT(colorF1);
           idxColorsByShortname.put(colorF1.shortname, colorF1);
         }
       }
@@ -432,22 +646,124 @@ public class GralColorShow
   }
   
   
+  
+  
+  void outColors(){
+    System.out.append("  String[] val =\n");
+    String sep = "  { \"";
+    for(int line=0; line < colorF.length; ++line) {
+      System.out.append(sep);
+      String spaces = "            ";
+      for(int col = 0; col < colorF[0].length; ++col){
+        ColorWithField colorF1 = colorF[line][col];
+        //String sVal = colorF1.wdgColor.getText();
+        GralColor color = colorF1.wdgColor.getBackColor(0);
+        int colValue = color.getColorValue();
+        String sHex = String.format("%06X", colValue);
+        System.out.append(sHex).append(':').append(colorF1.shortname);
+        int zspaces = 6 - colorF1.shortname.length();
+        if(zspaces < 1){ zspaces = 1; }
+        System.out.append(spaces.substring(0, zspaces));
+      }
+      System.out.append("\"\n");
+      sep = "  , \"";
+    }
+    System.out.append("  };\n");
+  
+    System.out.append("  String[] longNames =\n");
+    sep = "  { \"";
+    for(int line=0; line<colorF.length; ++line) {
+      for(int col = 0; col < colorF[0].length; ++col){
+        if(colorF[line][col].name.length()>0) {
+          System.out.append(sep).append(colorF[line][col].shortname).append('=').append(colorF[line][col].name).append("\"\n");
+          sep = "  , \"";
+        }
+      }
+    }
+    System.out.append("  };\n");
+  
+  }
+
+
+  void setColorFromRGB(ColorWithField colorF1){
+    int col2 = colorF1.rgb;
+    RGBtoHSB(col2, colorF1.hsb);
+    RGBtoHSL(col2, colorF1.hsl);
+    //colorF1.color = GralColor.getColor(colorF1.rgb);
+    //colorF1.wdgColor.setBackColor(colorF1.color, 0);
+  }
+        
+  
+  
+  
+  void setColorFromHSB(ColorWithField colorF1) {
+    colorF1.rgb = HSBtoRGB(colorF1.hsb[0], colorF1.hsb[1], colorF1.hsb[2]) & 0xffffff;
+    RGBtoHSL(colorF1.rgb, colorF1.hsl);
+    /*    String sHex = String.format("%06X", colorF1.rgb);
+    wdgHexValue.setText(sHex);
+    colorF1.color = GralColor.getColor(colorF1.rgb);
+    colorF1.wdgColor.setBackColor(colorF1.color, 0);
+*/  }
+
+
+  void setColorFromHSL(ColorWithField colorF1) {
+    colorF1.rgb = HSLtoRGB(colorF1.hsl[0], colorF1.hsl[1], colorF1.hsl[2]) & 0xffffff;
+    RGBtoHSB(colorF1.rgb, colorF1.hsb);
+    /*   String sHex = String.format("%06X", colorF1.rgb);
+    wdgHexValue.setText(sHex);
+    colorF1.color = GralColor.getColor(colorF1.rgb);
+    colorF1.wdgColor.setBackColor(colorF1.color, 0);
+ */ }
+
+  
+  
+  void setColorEditFields() {
+    String sHex = String.format("%06X", colorFocus.rgb);
+    wdgHexValue.setText(sHex); //Integer.toHexString(colValue));
+    wdgShortname.setText(colorFocus.shortname);
+    wdgName.setText(colorFocus.name);
+    float hue1 = colorFocus.hsb[0]; //24 * colorFocus.hsb[0] +4;
+    //if(hue1 >= 24.0f){ hue1 -= 24; }
+    wdgHue.setText(""+hue1);
+    wdgSat.setText(""+colorFocus.hsb[1]);
+    wdgBright.setText(""+colorFocus.hsb[2]);
+    float col2 = 24 * colorFocus.hsl[0] +4;
+    if(col2 >=24.0f) col2 -= 24.0f;
+    wdgHue2.setText(""+colorFocus.hsl[0]);
+    wdgSat2.setText(""+colorFocus.hsl[1]);
+    wdgLight2.setText(""+colorFocus.hsl[2]);
+    GralColor color = GralColor.getColor(colorFocus.rgb);
+    if(testText) {
+      wdgTest.setTextColor(color);
+      wdgTest.setLineColor(color, 0);
+    } else {
+      wdgTest.setBackColor(color,0);
+    }
+        
+  }      
+
+  
+  void setColorT(ColorWithField colorF1) {
+    colorF1.color = GralColor.getColor(colorF1.rgb);
+    colorF1.wdgColor.setBackColor(colorF1.color, 0);
+  }
+
   GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic"){
     @Override public void executeOrder()
     {
       gralMng.setPosition(4, -2, 2, -2, 0, 'd');
       //gralMng.addTextField();
-      for(int ixCol=0; ixCol<colorF.length; ++ixCol) {
+      for(int ixCol=0; ixCol<colorF[0].length; ++ixCol) {
         gralMng.setPosition(4, GralPos.size -3, 5*ixCol +1, GralPos.size+5, 0, 'd', 0);
         //gralMng.setPosition(3, GralPos.size -2, 9*col, GralPos.size+8, 0, 'd', 1);
         //System.out.append(", \"");
         //int pline = 0;
-        for(int ixBright = 0; ixBright < colorF[0].length; ++ixBright){
+        for(int ixBright = 0; ixBright < colorF.length; ++ixBright){
           GralColor colText;
           if(ixBright < 5){ colText = colBk; }
           else { colText = colWh; }
-          colorF[ixCol][ixBright].wdgColor.setToPanel(gralMng);
-          colorF[ixCol][ixBright].wdgColor.setTextColor(colText);
+          colorF[ixBright][ixCol].wdgColor.setToPanel(gralMng);
+          colorF[ixBright][ixCol].wdgColor.setTextColor(colText);
         }
       }
       colorFocus = colorF[0][0];
@@ -493,6 +809,19 @@ public class GralColorShow
       wdgBright.setEditable(true);
       wdgBright.setActionChange(new ActionEnterHSB(2));
       wdgBright.setToPanel(gralMng);
+      gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+12, 0, 'r',1);
+      wdgHue2 = new GralTextField("name");
+      wdgHue2.setEditable(true);
+      wdgHue2.setActionChange(new ActionEnterHSL(0));
+      wdgHue2.setToPanel(gralMng);
+      wdgSat2 = new GralTextField("name");
+      wdgSat2.setEditable(true);
+      wdgSat2.setActionChange(new ActionEnterHSL(1));
+      wdgSat2.setToPanel(gralMng);
+      wdgLight2 = new GralTextField("name");
+      wdgLight2.setEditable(true);
+      wdgLight2.setActionChange(new ActionEnterHSL(2));
+      wdgLight2.setToPanel(gralMng);
       //
       /*
       GralTextField[][] colorGen = new GralTextField[11][24];
@@ -518,42 +847,6 @@ public class GralColorShow
   
   
   
-  void outColors(){
-    System.out.append("  String[] val =\n");
-    String sep = "  { \"";
-    for(int line=0; line < colorF.length; ++line) {
-      System.out.append(sep);
-      String spaces = "            ";
-      for(int col = 0; col < colorF[0].length; ++col){
-        ColorWithField colorF1 = colorF[line][col];
-        //String sVal = colorF1.wdgColor.getText();
-        GralColor color = colorF1.wdgColor.getBackColor(0);
-        int colValue = color.getColorValue();
-        String sHex = String.format("%06X", colValue);
-        System.out.append(sHex).append(':').append(colorF1.shortname);
-        System.out.append(spaces.substring(0, 6 - colorF1.shortname.length()));
-      }
-      System.out.append("\"\n");
-      sep = "  , \"";
-    }
-    System.out.append("  };\n");
-
-    System.out.append("  String[] longNames =\n");
-    sep = "  { \"";
-    for(int line=0; line<colorF.length; ++line) {
-      for(int col = 0; col < colorF[0].length; ++col){
-        if(colorF[line][col].name.length()>0) {
-          System.out.append(sep).append(colorF[line][col].shortname).append('=').append(colorF[line][col].name).append("\"\n");
-          sep = "  , \"";
-        }
-      }
-    }
-    System.out.append("  };\n");
-
-  }
-  
-
-  
   GralUserAction actionFocusColor = new GralUserAction("focus color"){
     @Override public boolean exec(int key, GralWidget_ifc widgP, Object... params)
     {
@@ -562,21 +855,27 @@ public class GralColorShow
         colorFocus.wdgColor.setBorderWidth(0);
         colorFocus = (ColorWithField)widgP.getData();
         colorFocus.wdgColor.setBorderWidth(3);
-        GralColor color = wdg.getBackColor(0);
-        int colValue = color.getColorValue();
-        String sHex = String.format("%06X", colValue);
-        wdgHexValue.setText(sHex); //Integer.toHexString(colValue));
-        wdgShortname.setText(colorFocus.shortname);
-        wdgName.setText(colorFocus.name);
-        wdgHue.setText(""+colorFocus.hsb[0]);
-        wdgSat.setText(""+colorFocus.hsb[1]);
-        wdgBright.setText(""+colorFocus.hsb[2]);
-        if(testText) {
-          wdgTest.setTextColor(color);
-          wdgTest.setLineColor(color, 0);
-        } else {
-          wdgTest.setBackColor(color,0);
-        }
+        //int colValue = color.getColorValue();
+        setColorFromRGB(colorFocus);
+        setColorEditFields();
+        System.out.println("focus");
+      }
+      return true;
+  } };
+  
+  
+  
+  GralUserAction XXXactionMouseColor = new GralUserAction("MouseColor"){
+    @Override public boolean exec(int key, GralWidget_ifc widgP, Object... params)
+    {
+      if(key == (KeyCode.mouse2Up)){
+        GralTextField wdg = (GralTextField)widgP;
+        colorFocus.wdgColor.setBorderWidth(0);
+        colorFocus = (ColorWithField)widgP.getData();
+        colorFocus.wdgColor.setBorderWidth(3);
+        //int colValue = color.getColorValue();
+        setColorFromRGB(colorFocus);
+        setColorEditFields();
       }
       return true;
   } };
@@ -589,41 +888,73 @@ public class GralColorShow
       GralTextField wdg = (GralTextField)widgP;
       if(key == KeyCode.right) {
         int ixCol = colorFocus.index.ixCol +1;
-        if(ixCol >= colorF.length) { ixCol = 0; }
-        ColorWithField newField = colorF[ixCol][colorFocus.index.ixLight];
+        if(ixCol >= colorF[0].length) { ixCol = 0; }
+        ColorWithField newField = colorF[colorFocus.index.ixLight][ixCol];
         newField.wdgColor.setFocus();
       } else if(key == KeyCode.left){ 
         int ixCol = colorFocus.index.ixCol -1;
-        if(ixCol < 0) { ixCol = colorF.length -1; }
-        ColorWithField newField = colorF[ixCol][colorFocus.index.ixLight];
+        if(ixCol < 0) { ixCol = colorF[0].length -1; }
+        ColorWithField newField = colorF[colorFocus.index.ixLight][ixCol];
         newField.wdgColor.setFocus();
       } else if(key == KeyCode.up && colorFocus.index.ixLight > 0){ 
-        ColorWithField newField = colorF[colorFocus.index.ixCol][colorFocus.index.ixLight-1];
+        ColorWithField newField = colorF[colorFocus.index.ixLight-1][colorFocus.index.ixCol];
         newField.wdgColor.setFocus();
-      } else if(key == KeyCode.dn && colorFocus.index.ixLight < colorF[0].length -1){ 
-        ColorWithField newField = colorF[colorFocus.index.ixCol][colorFocus.index.ixLight+1];
+      } else if(key == KeyCode.dn && colorFocus.index.ixLight < colorF.length -1){ 
+        ColorWithField newField = colorF[colorFocus.index.ixLight+1][colorFocus.index.ixCol];
         newField.wdgColor.setFocus();
+      } else if(key == KeyCode.mouse2Down) {
+        ColorWithField colorF2 = (ColorWithField)widgP.getData();
+        colorF2.rgb = colorFocus.rgb;  //copy from last focused.
+        colorF2.wdgColor.setBackColor(colorFocus.wdgColor.getBackColor(0),0);
+        colorF2.shortname = colorFocus.shortname;
+        colorF2.name = colorFocus.name;
+        setColorFromRGB(colorF2);
+      } else if(key == (KeyCode.shift + KeyCode.pgup)){
+        int rd = (colorFocus.rgb >>16) & 0xff;
+        if(rd <255) rd +=1;
+        colorFocus.rgb = (colorFocus.rgb & 0x00ffff) | rd <<16;
+        setColorFromRGB(colorFocus);
+        setColorT(colorFocus);
+        setColorEditFields();
+      } else if(key == (KeyCode.shift + KeyCode.left)){
+        int rd = (colorFocus.rgb >>16) & 0xff;
+        if(rd >0) rd -=1;
+        colorFocus.rgb = (colorFocus.rgb & 0x00ffff) | rd <<16;
+        setColorFromRGB(colorFocus);
+        setColorT(colorFocus);
+        setColorEditFields();
+      } else if(key == (KeyCode.shift + KeyCode.up)){
+        int gn = (colorFocus.rgb >>8) & 0xff;
+        if(gn <255) gn +=1;
+        colorFocus.rgb = (colorFocus.rgb & 0xff00ff) | gn <<8;
+        setColorFromRGB(colorFocus);
+        setColorT(colorFocus);
+        setColorEditFields();
+      } else if(key == (KeyCode.shift + KeyCode.dn)){
+        int gn = (colorFocus.rgb >>8) & 0xff;
+        if(gn >0) gn -=1;
+        colorFocus.rgb = (colorFocus.rgb & 0xff00ff) | gn <<8;
+        setColorFromRGB(colorFocus);
+        setColorT(colorFocus);
+        setColorEditFields();
+      } else if(key == (KeyCode.shift + KeyCode.pgdn)){  //key of a notebook: 
+        int bl = (colorFocus.rgb) & 0xff;
+        if(bl <255) bl +=1;
+        colorFocus.rgb = (colorFocus.rgb & 0xffff00) | bl;
+        setColorFromRGB(colorFocus);
+        setColorT(colorFocus);
+        setColorEditFields();
+      } else if(key == (KeyCode.shift + KeyCode.right)){
+        int bl = (colorFocus.rgb) & 0xff;
+        if(bl >0) bl -=1;
+        colorFocus.rgb = (colorFocus.rgb & 0xffff00) | bl;
+        setColorFromRGB(colorFocus);
+        setColorT(colorFocus);
+        setColorEditFields();
       } else if(key == KeyCode.enter){
-        String text = wdg.getText().substring(0, 6);
-        int valColor = Integer.parseInt(text, 16);
-        GralColor color = new GralColor(valColor);
-        wdg.setBackColor(color,0);
-      } else if(key == (KeyCode.focusGained)){
-        colorFocus.wdgColor.setBorderWidth(0);
-        colorFocus = (ColorWithField)widgP.getData();
-        colorFocus.wdgColor.setBorderWidth(3);
-        GralColor color = wdg.getBackColor(0);
-        int colValue = color.getColorValue();
-        String sHex = String.format("%06X", colValue);
-        wdgHexValue.setText(sHex); //Integer.toHexString(colValue));
-        wdgShortname.setText(colorFocus.shortname);
-        wdgName.setText(colorFocus.name);
-        if(testText) {
-          wdgTest.setTextColor(color);
-          wdgTest.setLineColor(color, 0);
-        } else {
-          wdgTest.setBackColor(color,0);
-        }
+        setColorFromRGB(colorFocus);
+      } else if(key == (KeyCode.focusGained)){ //only if it is an edit field
+        actionFocusColor.exec(key, widgP);
       } else if(key == (KeyCode.enter + KeyCode.ctrl) || key == ('s' + KeyCode.ctrl) || key == ('S' + KeyCode.ctrl)){
         outColors();
       }
@@ -638,8 +969,9 @@ public class GralColorShow
         GralTextField widgt = (GralTextField)widg;
         String text = widgt.getText();
         try{ 
-          int colorValue = Integer.parseInt(text, 16);
-          GralColor colorBack = GralColor.getColor(colorValue);
+          colorFocus.rgb = Integer.parseInt(text, 16);
+          setColorFromRGB(colorFocus);
+          GralColor colorBack = GralColor.getColor(colorFocus.rgb);
           colorFocus.color = colorBack;
           colorFocus.wdgColor.setBackColor(colorBack, 0); 
         } catch(NumberFormatException exc){
@@ -675,15 +1007,7 @@ public class GralColorShow
   } };
 
   
-  void setNewColorFromHSB() {
-    int colorValue = java.awt.Color.HSBtoRGB(colorFocus.hsb[0], colorFocus.hsb[1], colorFocus.hsb[2]);
-    String sHex = String.format("%06X", colorValue);
-    wdgHexValue.setText(sHex);
-    colorFocus.color = GralColor.getColor(colorValue);
-    colorFocus.wdgColor.setBackColor(colorFocus.color, 0);
-  }
-  
-  GralUserAction actionEnterHue = new GralUserAction("actionEnterHue") {
+  GralUserAction XXXactionEnterHue = new GralUserAction("actionEnterHue") {
     @Override public boolean exec(int actionCode, GralWidget_ifc widg, Object... params) {
       if(actionCode == KeyCode.enter || actionCode == KeyCode.focusLost){
         GralTextField widgt = (GralTextField)widg;
@@ -695,7 +1019,7 @@ public class GralColorShow
           if(hue < 0.0f){ hue = 0.0f; }
         } catch(NumberFormatException exc){ hue = 0; }  //red
         colorFocus.hsb[0] = hue;
-        setNewColorFromHSB();
+        setColorFromHSB(colorFocus);
       }
       return true;      
   } };
@@ -717,11 +1041,41 @@ public class GralColorShow
         float value;
         try{
           value = Float.parseFloat(text.trim());
+          if(indexHSB == 777){ value = (value -4) / 24; if(value < 0.0f){ value +=1.0f;} }
+          //if(value > 1.0f){ value = 1.0f; }
+          //if(value < 0.0f){ value = 0.0f; }
+        } catch(NumberFormatException exc){ value = 0; }  //red
+        colorFocus.hsb[indexHSB] = value;
+        setColorFromHSB(colorFocus);
+        setColorEditFields();
+        setColorT(colorFocus);
+      }
+      return true;      
+  } };
+
+  
+  
+  class ActionEnterHSL extends GralUserAction {
+    final int indexHSL;
+    ActionEnterHSL(int indexHSL){
+      super("actionEnterHSL" + indexHSL);
+      this.indexHSL = indexHSL;
+    }
+      
+    @Override public boolean exec(int actionCode, GralWidget_ifc widg, Object... params) {
+      if(actionCode == KeyCode.enter || actionCode == KeyCode.focusLost){
+        GralTextField widgt = (GralTextField)widg;
+        String text = widgt.getText();
+        float value;
+        try{
+          value = Float.parseFloat(text.trim());
           if(value > 1.0f){ value = 1.0f; }
           if(value < 0.0f){ value = 0.0f; }
         } catch(NumberFormatException exc){ value = 0; }  //red
-        colorFocus.hsb[indexHSB] = value;
-        setNewColorFromHSB();
+        colorFocus.hsl[indexHSL] = value;
+        setColorFromHSL(colorFocus);
+        setColorEditFields();
+        setColorT(colorFocus);
       }
       return true;      
   } };

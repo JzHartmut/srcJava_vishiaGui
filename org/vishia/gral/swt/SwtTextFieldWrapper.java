@@ -138,6 +138,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     textFieldSwt.setBackground(mng.propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));
     KeyListener swtKeyListener = new TextFieldKeyListener(mng.mng._impl.gralKeyListener);
     textFieldSwt.addKeyListener(swtKeyListener);
+    textFieldSwt.setMenu(null);  //default: no contextMenu, use GralMenu?
     
     Listener[] oldMouseListener = textFieldSwt.getListeners(SWT.MouseDown);
     for(Listener lst: oldMouseListener){
@@ -297,24 +298,6 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
 
   
 
-  /**yet it is the same actionChanged of the widget. is called if the write-able text field was changed and the focus is released.
-   * The distinction between both is the key code in {@link GralUserAction#userActionGui(int, GralWidget, Object...)}.
-   * @param action If null then the action isn't changed. Only the mouse button listener is installed.
-   *   The action should be given calling {@link GralWidget#setActionChange(GralUserAction)} then.
-   *   If no action is given, The mouse listener has no effect.
-
-   * @see org.vishia.gral.base.GralTextField#setMouseAction(org.vishia.gral.ifc.GralUserAction)
-   */
-  //@Override 
-  @Deprecated
-  public void setMouseAction(GralUserAction action)
-  {
-    if(action !=null){ widgg.setActionChange(action); }
-    SwtGralMouseListener.MouseListenerGralAction mouseListener = 
-      new SwtGralMouseListener.MouseListenerGralAction(null, GralMouseWidgetAction_ifc.mUserAll);
-    textFieldSwt.addMouseListener(mouseListener);  
-  }
-  
   @Override public Text getWidgetImplementation()
   { return textFieldSwt;
   }

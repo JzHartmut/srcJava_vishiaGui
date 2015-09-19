@@ -12,6 +12,7 @@ public class SwtGralKey extends KeyCode
   
   /**Version, history and license
    * <ul>
+   * <li>2015-08-29 Hartmut chg: Mouse handling: mouse buttons: The usual right mouse button is the Button2. The middle button is number 3.
    * <li>2015-08-29 Hartmut chg: {@link #convertFromSwt(int, int, char)} now uses the character key information of the event too.
    *   Elsewhere it is not possible to use the keyboard layout from the operation system to detect keys with sh. 
    *   All keys with shift, which are character keys, are returned without {@link KeyCode#shift} designation now.
@@ -121,8 +122,8 @@ public class SwtGralKey extends KeyCode
       case down:{
         switch(button){ 
           case 1: keyMouse = KeyCode.mouse1Down; break; 
-          case 2: keyMouse = KeyCode.mouse2Down; break;
-          case 3: keyMouse = KeyCode.mouse3Down; break;
+          case 3: keyMouse = KeyCode.mouse2Down; break;
+          case 2: keyMouse = KeyCode.mouse3Down; break;
           default: keyMouse = KeyCode.mouse3Down; break;  //other key
         }
 
@@ -130,8 +131,8 @@ public class SwtGralKey extends KeyCode
       case up:{
         switch(button){ 
           case   1: keyMouse = KeyCode.mouse1Up; break; 
-          case   2: keyMouse = KeyCode.mouse2Up; break;
-          case   3: keyMouse = KeyCode.mouse3Up; break;
+          case   3: keyMouse = KeyCode.mouse2Up; break;
+          case   2: keyMouse = KeyCode.mouse3Up; break;
           default: keyMouse = KeyCode.mouse3Up; break;  //other key
         }
         
@@ -139,8 +140,8 @@ public class SwtGralKey extends KeyCode
       case upMovedOutside:{
         switch(button){ 
           case   1: keyMouse = KeyCode.mouse1UpMoved; break; 
-          case   2: keyMouse = KeyCode.mouse2UpMoved; break;
-          case   3: keyMouse = KeyCode.mouse3Up; break;
+          case   3: keyMouse = KeyCode.mouse2UpMoved; break;
+          case   2: keyMouse = KeyCode.mouse3Up; break;
           default: keyMouse = KeyCode.mouse3Up; break;  //other key
         }
         
@@ -148,8 +149,8 @@ public class SwtGralKey extends KeyCode
       case doubleClick:{
         switch(button){ 
           case 1: keyMouse = KeyCode.mouse1Double; break; 
-          case 2: keyMouse = KeyCode.mouse2Double; break;
-          case 3: keyMouse = KeyCode.mouse3Down; break;
+          case 3: keyMouse = KeyCode.mouse2Double; break;
+          case 2: keyMouse = KeyCode.mouse3Down; break;
           default: keyMouse = KeyCode.mouse3Down; break;  //other key
         }
         

@@ -50,11 +50,11 @@ public interface GralMouseWidgetAction_ifc
 
   
   /**Bit mask to determine which mouse action should invoke the {@link GralWidget#getActionChange()}.
-   * It is the second parameter of constructor. Use an | of this conditions.
-   * m..All... includes any key of mouse.
+   * It is the second parameter of {@link GralWidget#setActionMouse(GralMouseWidgetAction_ifc, int)}. 
+   * Use an | of this conditions. mUserAll includes any key of mouse.
    */
-  public final static int mUser1down = 1, mUser2down = 0x2, mUserAlldown = 0xf
-    , mUser1up = 0x10, mUser2up = 0x20, mUserAllup = 0xf
+  public final static int mUser1down = 1, mUser2down = 0x2, mUser3down = 0x4, mUserAlldown = 0xf
+    , mUser1up = 0x10, mUser2up = 0x20, mUser3up = 0x40, mUserAllup = 0xf
     , mUserDouble = 0x100
     , mUserAll = 0xffff; 
   
@@ -66,6 +66,10 @@ public interface GralMouseWidgetAction_ifc
   
   void mouse1Up(int key, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg);
   
+  /**Called from the graphic implementation layer if the standard right mouse button is pressed.
+   * @param xMousePixel
+   * @param yMousePixel
+   */
   void mouse2Down(int key, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg);
   
   void mouse2Up(int key, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg);

@@ -173,6 +173,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2015-09-20 Hartmut new: {@link #setActionMouse(GralMouseWidgetAction_ifc, int)} was a private thing in {@link org.vishia.gral.swt.SwtGralMouseListener.MouseListenerGralAction}
+   *   for widget implementation's mouse handling. Now as user define-able property of any widget, especially use-able for text fields. 
    * <li>2015-09-12 Hartmut new: {@link #getData()}, {@link #setData(Object)} was existent as {@link GralWidget#setContentInfo(Object)},
    *   now explicit property of any widget. {@link GralWidget#setContentInfo(Object)} was an older approach, not in interface, now deprecated.
    * <li>2015-06-21 Hartmut bugfix: {@link #setFocus(int, int)} had hanged because while-loop on same window panel for a parent. 
@@ -342,6 +344,16 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
      * The parameter are converted from a String given form.
      */
     public Object[] showParam;
+    
+        /**A standard action for a specific widget for example button, which is executed
+     * independently and additional to the user action. */
+    public GralMouseWidgetAction_ifc mouseWidgetAction;
+    
+    
+    /**Bits see {@link GralMouseWidgetAction_ifc#mUser1down} etc. */
+    public int mUser;
+    
+
   }
   
   /**Reference to the common configuration data for widgets. */
@@ -848,6 +860,27 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    *        
    */
   public void setActionChange(GralUserAction action){ actionChanging = action; }
+  
+  
+  
+  /**Sets the action for mouse operation. Either it is a special mouse handler or the {@link #setActionChange(GralUserAction)}
+   * is used with {@link KeyCode#mouse1Down} etc. key code. 
+   * It works with all widgets which uses {@link org.vishia.gral.swt.SwtGralMouseListener.MouseListenerGralAction}.
+   * Note: If you set an abbreviate mouse handler for Button etc. where the mouse is an essential functionality
+   *   that functionality is disturbed. An extra handler should base on that special mouse handler, for example
+   *   {@link GralButton.MouseActionButton} and should invoke that actions calling super.mouse1Down(...) etc.
+   *   For that widgets usual the {@link #setActionChange(GralUserAction)} is called also, that may be sufficient. 
+   * @param mouseWidgetAction null possible, elsewhere the mouse operation callback instance.
+   * @param mUser One or more of the bits {@link GralMouseWidgetAction_ifc#mUser1down} etc. 
+   *   If given the {@link #setActionChange(GralUserAction)} is invoked with that operation.
+   */
+  public void setActionMouse(GralMouseWidgetAction_ifc mouseWidgetAction, int mUser){
+    cfg.mouseWidgetAction = mouseWidgetAction;
+    cfg.mUser = mUser;
+  }
+  
+  
+  
   
   /**Gets the action for change the widget. */
   public GralUserAction getActionChange(){ return actionChanging; }
