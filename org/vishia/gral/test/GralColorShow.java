@@ -140,135 +140,81 @@ public class GralColorShow
   static float bfgn = 1.1f;
   static float bfbl = 0.9f;
   
-  static float cfrd = 1.0f;
-  static float cfgn = 1.0f;
-  static float cfbl = 1.0f;
+  static float cfrd = 1/0.7f;  //1.8f;
+  //static float cfye = 1.0f;
+  static float cfgn = 1/0.8f; //1.5f;
+  //static float cfcy = 1.0f;
+  static float cfbl = 1/0.6f; //2.2f;
+  //static float cfma = 1.3f;
   
-  
-  
-  float[][] YcolHue = 
-  { { 0.8333333f, 1.0f } //pu
-  , { 0.9f,       0.95f }
-  , { 0.0f,       0.9f } //rd
-  , { 0.07f,      0.85f }
-  , { 0.10f,      0.8f } //or
-  , { 0.1333333f, 0.75f } //am
-  , { 0.1666667f, 0.7f } //ye
-  , { 0.19f,      0.72f }
-  , { 0.24f,      0.75f }
-  , { 0.29f,      0.77f }
-  , { 0.3333333f, 0.8f } //gn
-  , { 0.40f,      0.76f }
-  , { 0.45f,      0.73f }
-  , { 0.5f,       0.7f }  //cy
-  , { 0.5333333f, 0.8f }
-  , { 0.60f,      0.9f }
-  , { 0.6666667f, 1.0f }  //bl
-  , { 0.75f,      1.0f }  //vi
-  };
+  /**Factors for rd, ye, gn, cy, bl, ma */
+  static float[] cfrgb = { 1.0f, 1.2f, 0.8f}; //1/0.6f, 1/0.8f, 1/0.5f};
+  //static float[] cfrgb = { 1/0.6f, 1.0f, 1/0.8f, 1.0f, 1/0.5f, 1/0.8f};
   
   
   
   float[][] colHue =   ////
-  { {  0.0f, 1.0f  ,  0.0f} //pu
-  , {  2.0f, 0.95f ,  2.0f}
-  , {  4.0f, 0.9f  ,  4.0f} //rd
-  , {  4.8f, 0.85f ,  4.3f}
-  , {  5.6f, 0.85f ,  4.8f}
-  , {  6.4f, 0.8f  ,  5.4f} //or
-  , {  7.2f, 0.75f ,  6.1f} //am
-  , {  8.0f, 0.7f  ,  7.3f} //ye
-  , {  9.0f, 0.72f ,  8.5f}
-  , { 10.0f, 0.75f ,  9.8f}
-  , { 11.0f, 0.77f , 11.3f}
-  , { 12.0f, 0.8f  , 12.0f} //gn
-  , { 13.0f, 0.76f , 12.8f}
-  , { 14.0f, 0.73f , 13.8f}
-  , { 15.0f, 0.7f  , 15.1f}  //cy
-  , { 16.0f, 0.7f  , 16.0f}  //cy
-  , { 17.0f, 0.8f  , 17.0f}
-  , { 18.5f, 0.9f  , 18.5f}
-  , { 20.0f, 1.0f  , 20.0f}  //bl
-  , { 22.0f, 1.0f  , 22.0f}  //vi
+  { {  0.0f, 1/0.9f  ,  0.0f} //pu
+  , {  2.0f, 1.28f ,  2.0f}
+  , {  3.0f, 1.35f ,  2.0f}
+  , {  4.0f, 1/0.7f  ,  4.0f} //rd
+  , {  5.0f, 1.3f ,  4.3f}
+  , {  6.0f, 1.2f ,  4.8f}
+  , {  7.0f, 1.1f  ,  5.4f} //or
+  , {  7.5f, 1.05f ,  6.1f} //am
+  , {  8.0f, 1.0f  ,  7.3f} //ye
+  , {  8.4f, 1.01f ,  8.5f}
+  , {  9.0f, 1.03f ,  8.5f}
+  , { 10.0f, 1.05f ,  9.8f}
+  , { 11.0f, 1.08f , 11.3f}
+  , { 12.0f, 1/0.9f  , 12.0f} //gn
+  , { 13.0f, 1.2f , 12.8f}
+  , { 14.0f, 1.3f , 13.8f}
+  , { 15.0f, 1.35f  , 15.1f}  //cy
+  , { 16.0f, 1.4f  , 16.0f}  //cy
+  , { 17.0f, 1.45f  , 17.0f}
+  , { 18.5f, 1.5f  , 18.5f}
+  , { 20.0f, 1/0.6f  , 20.0f}  //bl
+  , { 21.0f, 1/0.7f  , 20.0f}  //bl
+  , { 22.0f, 1/0.8f  , 22.0f}  //vi
+  , { 23.0f, 1/0.85f  , 22.0f}  //vi
+  , {  0.0f, 1/0.9f  , 22.0f}  //vi
   };
   
   
-  float[][] colSatB_HSB =
-  { { 0.20f, 1.40f     , 0.20f, 1.40f    }
-  , { 0.35f, 1.40f     , 0.35f, 1.40f    }
-  , { 0.60f, 1.40f     , 0.60f, 1.40f    }
-  , { 1.00f, 1.0f/0.7f , 1.00f, 1.0f/0.7f}
-  , { 1.00f, 1.0f/0.8f , 1.00f, 1.0f/0.8f}
-  , { 1.00f, 1.0f/0.9f , 1.00f, 1.0f/0.9f}
-  , { 1.00f, 1.00f     , 1.00f, 1.00f    }
-  , { 0.80f, 0.90f     , 0.80f, 0.90f    }
-                                         
-  , { 1.00f, 0.90f     , 1.00f, 0.90f    }
-  , { 0.80f, 0.80f     , 0.80f, 0.80f    }
-                                         
-  , { 1.00f, 0.80f     , 1.00f, 0.80f    }
-  , { 0.80f, 0.70f     , 0.80f, 0.70f    }
-  , { 0.60f, 0.60f     , 0.60f, 0.60f    }
-  , { 0.40f, 0.50f     , 0.40f, 0.50f    }
-  , { 0.60f, 0.50f     , 0.60f, 0.50f    }
-  , { 0.80f, 0.60f     , 0.80f, 0.60f    }
-                                         
-  , { 1.00f, 0.70f     , 1.00f, 0.70f    }
-  , { 0.80f, 0.60f     , 0.80f, 0.60f    }
-  , { 0.60f, 0.50f     , 0.60f, 0.50f    }
-  , { 0.90f, 0.40f     , 0.90f, 0.40f    }
-  , { 0.80f, 0.50f     , 0.80f, 0.50f    }
-                                         
-  , { 1.00f, 0.60f     , 1.00f, 0.60f    }
-  , { 0.80f, 0.50f     , 0.80f, 0.50f    }
-                                         
-  , { 1.00f, 0.50f     , 1.00f, 0.50f    }
-  , { 0.80f, 0.40f     , 0.80f, 0.40f    }
-                                         
-  , { 1.00f, 0.40f     , 1.00f, 0.40f    }
-  , { 0.80f, 0.30f     , 0.80f, 0.30f    }
-                                         
-                                         
-  , { 0.50f, 0.60f     , 0.50f, 0.60f    }
-                                         
-                                         
-  , { 0.60f, 0.20f     , 0.60f, 0.20f    }
-  , { 0.50f, 0.20f     , 0.50f, 0.20f    }
-
-  
- 
-  };
   
   float[][] colSatB =
-  { { 1.00f, 0.99f     , 1.00f, 0.98f     }  ////
-  , { 1.00f, 0.97f     , 1.00f, 0.96f     }
-  , { 1.00f, 0.95f     , 1.00f, 0.95f     }
-  , { 1.00f, 0.92f     , 1.00f, 0.92f     }
-  , { 1.00f, 0.90f     , 1.00f, 0.90f     }
-  , { 1.00f, 0.85f     , 1.00f, 0.85f     }
-  , { 1.00f, 0.82f     , 1.00f, 0.82f     }
-  , { 1.00f, 0.76f     , 1.00f, 0.76f     }
+  { { 0.10f, 1.00f     , 0.10f, 1.00f     }  ////
+  , { 0.25f, 1.00f     , 0.25f, 1.00f     }
+  , { 0.40f, 1.00f     , 0.40f, 1.00f     }
+  , { 0.50f, 1.00f     , 0.50f, 1.00f     }
+  , { 0.60f, 1.00f     , 0.60f, 1.00f     }
+  , { 0.70f, 1.00f     , 0.70f, 1.00f     }
+  , { 0.80f, 1.00f     , 0.80f, 1.00f     }
+  , { 0.90f, 1.00f     , 0.90f, 1.00f     }
+  , { 1.00f, 1.00f     , 1.00f, 1.00f     }
+  , { 1.00f, 0.94f     , 1.00f, 0.94f     }
+  , { 1.00f, 0.87f     , 1.00f, 0.87f     }
+  , { 1.00f, 0.80f     , 1.00f, 0.80f     }
   , { 1.00f, 0.70f     , 1.00f, 0.70f     }
-  , { 0.90f, 0.70f     , 0.90f, 0.70f     }
-  , { 0.70f, 0.70f     , 0.70f, 0.70f     }
-  , { 0.50f, 0.70f     , 0.50f, 0.70f     }
-  , { 0.30f, 0.60f     , 0.40f, 0.60f     }
-  , { 0.60f, 0.60f     , 0.60f, 0.60f     }
-  , { 0.80f, 0.60f     , 0.80f, 0.60f     }
   , { 1.00f, 0.60f     , 1.00f, 0.60f     }
   , { 1.00f, 0.50f     , 1.00f, 0.50f     }
-  , { 0.80f, 0.50f     , 0.80f, 0.50f     }
-  , { 0.60f, 0.50f     , 0.60f, 0.50f     }
-  , { 0.40f, 0.50f     , 0.50f, 0.50f     }
-  , { 0.40f, 0.40f     , 0.50f, 0.40f     }
-  , { 0.70f, 0.40f     , 0.70f, 0.40f     }
-  , { 1.00f, 0.40f     , 1.00f, 0.40f     }
-  , { 0.80f, 0.30f     , 0.70f, 0.30f     }
-  , { 0.60f, 0.30f     , 0.50f, 0.30f     }
-  , { 0.40f, 0.20f     , 0.50f, 0.20f     }
+  , { 0.80f, 0.60f     , 0.80f, 0.60f     }
+  , { 0.60f, 0.60f     , 0.60f, 0.60f     }                                                                 
+  , { 0.40f, 0.60f     , 0.40f, 0.60f     }
+  , { 0.20f, 0.60f     , 0.20f, 0.60f     }
+  , { 0.20f, 0.50f     , 0.20f, 0.50f     }
+  , { 0.10f, 0.50f     , 0.10f, 0.50f     }
+  , { 0.30f, 0.50f     , 0.30f, 0.50f     }
+  , { 0.50f, 0.50f     , 0.50f, 0.50f     }
+  , { 0.70f, 0.50f     , 0.70f, 0.50f     }
+  , { 1.00f, 0.50f     , 1.00f, 0.50f     }
+  , { 0.80f, 0.30f     , 0.80f, 0.30f     }
+  , { 0.60f, 0.30f     , 0.60f, 0.30f     }
+  , { 0.40f, 0.20f     , 0.40f, 0.20f     }
   , { 0.70f, 0.20f     , 0.70f, 0.20f     }
-  , { 1.00f, 0.30f     , 0.70f, 0.30f     }
-  , { 1.00f, 0.20f     , 0.70f, 0.20f     }
+  , { 1.00f, 0.30f     , 1.00f, 0.30f     }
+  , { 1.00f, 0.20f     , 1.00f, 0.20f     }
                                          
 
   
@@ -276,7 +222,9 @@ public class GralColorShow
   };
   
   
-  String[] val =
+  String[] valTest = {"", ""};
+  
+  String[] valOk =
   { "FFE7FF:      FFE7FF:      FFE7FF:      FFF2FF:      FFF5F4:      FFF5D7:      FFFFEE:wye   FFF9A4:      F4FFA5:      E3FFB6:      E4FFDA:      D3FFEA:      C5FFFD:      A4FFFC:      C1FFFF:      9CFFFF:      C1FFFF:      D5FAFF:      FFE7FF:      FFE7FF:      00BFFF:      "
   , "FFE7FF:      FFE7FF:      FFE7FF:      FFEAFF:      FFEFEC:      FFEECF:      FFFFA0:pye   FFF39C:      E2FF91:      D1FFA2:      D2FFC6:      C1FFD6:      B2FFE8:      92FFE8:      83FFFB:      94F9FF:      B4F9FF:      CEF4FF:      FFE7FF:      FFE7FF:      FFE7FF:      "
   , "FFE5FF:      FFE5FF:      FFE5FF:      FFE6FD:      FFE9E4:      FFEBCB:      FFFF98:lye   FFEF98:      D7FD85:      C7FF97:      BFFFB1:      B7FFCB:      A0FFD4:      88FFDD:      78FDEF:      90F5FF:      ADF3FF:      CAF0FF:      FFE7FF:      FFE5FF:      F9E2FF:      "
@@ -453,42 +401,112 @@ public class GralColorShow
   
   
   
-    static int HSLtoRGB(float hue, float sat, float light){  ////
+
+  
+  
+    static int XXXHSLtoRGB(float hue, float sat, float light){  ////
     float rd, gn, bl;
-    float lval, mid, hval;
-    int diff = (int)(sat * 255 + 0.5f);
+    float[] rgb = new float[3];
+    int ix1, ix2, ix3;  //Index of first, second and third color.
+    float lval = 0, mid, hval;
+    float ncol2;
+    int base = (int)((1.0f - sat)*255 * light  + 0.5f); 
     if(hue >= 24){ hue -= 24; }
+    float bmix = 1.0f;
+    float nlight;
     if(hue < 4){
-      hval = rd = diff; //(int)(diff * (hue + 4) / 8 / cfrd);
-      //bl = (int)(diff * (4 - hue) / 8 / cfbl);
-      bl = (int)(diff * (4 - hue) / 4 / cfbl);
-      gn = 0;
-    } else if(hue < 8){
-      rd = hval = diff; //(int)(diff * (12 - hue) / 8 / cfrd); 
-      //gn = (int)(diff * (hue - 4) / 8 / cfgn);        
-      gn = (int)(diff * (hue -4 ) / 4 / cfgn);  //on 8 maximum        
-      bl = 0;
+      ix1 = 0; ix2 = 2; ix3 = 1;  //what values associate to colors: main color ix1 is rd
+      ncol2 = (4 - hue) / 4;  //factor second color 0..0.999.
+      nlight = cfrgb[5] * ncol2 + cfrgb[0] * (1.0f-ncol2);
+      bmix = 1.0f - 0.1f * (4 - hue) /4;
+    } else if(hue < 8.0){
+      ix1 = 0; ix2 = 1; ix3 = 2;
+      ncol2 = (hue -4 ) / 4;  //factor second color 0..0.999.
+      nlight = cfrgb[1] * ncol2 + cfrgb[0] * (1.0f-ncol2);
+      bmix = 1.0f - 0.2f * (hue-4) /4;
     } else if(hue < 12){
-      rd = (int)(diff * (12 - hue) / 4 / cfrd); 
-      gn = hval = diff; //(int)(diff * (hue -  4) / 8 / cfgn);        
-      bl = 0;
+      ix1 = 1; ix2 = 0; ix3 = 2;
+      ncol2 = (12 - hue) / 4;  //factor second color 0..0.999.
+      nlight = cfrgb[1] * ncol2 + cfrgb[2] * (1.0f-ncol2);
+      bmix = 1.0f - 0.2f * (12 - hue) /4;
     } else if(hue < 16) {
-      gn = hval = diff; //(int)(diff * (20 - hue) / 8 / cfgn); 
-      bl = (int)(diff * (hue - 12) / 4 / cfbl);
-      rd = 0;
+      ix1 = 1; ix2 = 2; ix3 = 0;
+      ncol2 = (hue -12 ) / 4;  //factor second color 0..0.999.
+      nlight = cfrgb[3] * ncol2 + cfrgb[2] * (1.0f-ncol2);
+      bmix = 1.0f - 0.2f * (hue -12) /4;
     } else if(hue < 20) {
-      gn = (int)(diff * (20 - hue) / 4 / cfgn); 
-      bl = hval = diff; //(int)(diff * (hue - 12) / 8 / cfbl);
-      rd = 0;
+      ix1 = 2; ix2 = 1; ix3 = 0;
+      ncol2 = (20 - hue) / 4;  //factor second color 0..0.999.
+      nlight = cfrgb[3] * ncol2 + cfrgb[4] * (1.0f-ncol2);
+      bmix = 1.0f - 0.15f * (20 - hue) /4;
     } else { //20..24
-      bl = hval = diff; //(int)(diff * (28 - hue) / 8 / cfbl); 
-      rd = (int)(diff * (hue - 20) / 4 / cfrd);
-      gn = 0;
+      ix1 = 2; ix2 = 0; ix3 = 1;
+      ncol2 = (hue -20 ) / 4;  //factor second color 0..0.999.
+      nlight = cfrgb[5] * ncol2 + cfrgb[4] * (1.0f-ncol2);
+      bmix = 1.0f - 0.1f * (hue - 20) /4;
     }
+ 
+    float diff = sat * light * nlight * 255;
+    //hval = diff; //cfrgb[2*ix1] * bmix;  
+    hval = diff;
+    float val2 = diff * ncol2 * cfrgb[2*ix2] / cfrgb[2*ix1];
+    if(hval > 255 || val2 > 255){
+      if(val2 > hval){
+        if(hval > 255) {
+          float hi = hval + val2 - 511;
+          lval = hi;
+          val2 = 255;
+          diff = 255 - lval;
+        } else {
+          lval = (val2 - 255) /2;
+          diff -= lval;
+          hval = lval + diff ;
+          val2 = 255;
+        }
+        val2 = 255;
+      } else {
+        if(val2 > 255) {
+          lval = (hval +val2 - 510) /2; //(2.0f - ncol2);
+          hval -= lval; 
+          val2 -= lval;
+          //val2 = lval + diff * cfrgb[2*ix2] / cfrgb[2*ix1] * ncol2; // * cfrgb[2*ix2] * bmix * ncol2;
+
+          
+        } else {
+          lval = (hval - 255) / 2; //(2.0f - ncol2);
+          diff -= lval; 
+          val2 = lval + diff * cfrgb[2*ix2] / cfrgb[2*ix1] * ncol2; // * cfrgb[2*ix2] * bmix * ncol2;
+          hval = 255;
+        }
+      }  
+        
+      if(lval > 255) {
+        lval = 255;
+      }
+    }
+    
+    rgb[ix1] = hval;
+    //gn = (int)(diff * (hue - 4) / 8 / cfgn);        
+    rgb[ix2] = val2;  //on 8 maximum        
+    rgb[ix3] = lval;
+
+    rd = rgb[0];
+    gn = rgb[1];
+    bl = rgb[2];
+    
+    
+    
+    rd +=base;
+    gn += base;
+    bl += base;
+    if(rd >= 255){ bl += (rd - 255)/2; gn += (rd - 255)/2; rd = 255; }
+    if(gn >= 255){ bl += (gn - 255)/2; rd += (gn - 255)/2; gn = 255; }
+    if(bl >= 255){ rd += (bl - 255)/2; gn += (bl - 255)/2; bl = 255; }
     float hue1 = RGBtoHue((((int)rd << 16) & 0xff0000) | (((int)gn <<8) & 0x00ff00) | ((int)bl & 0xff));
     if(Math.abs(hue1-hue) > 0.1f)
       Debugutil.stop();
     float l1 = RGBtoligth(rd, gn, bl, sat);
+    /*
     if(l1 < light){
       int catastropicalCount = 255;
       while(--catastropicalCount >=0 && l1 < light){
@@ -507,7 +525,8 @@ public class GralColorShow
       }
       
     }
-    /*
+    */
+    /*old
     float l2 = light * light - l1 * l1;
     float lrd = (int)(l2 * 255 / 0.33f);
     float lgn = (int)(l2 * 255 / 0.42f);
@@ -532,8 +551,6 @@ public class GralColorShow
   }
   
 
-  
-  
 
   
   int HSBtoRGB(float hue, float saturation, float brightness) {
@@ -550,6 +567,103 @@ public class GralColorShow
   
   
   
+  static int HSLtoRGB(float hue, float nlight, float sat, float light){  ////
+    int ix1, ix2, ix3;  //Index of first, second and third color.
+    float[] rgb = new float[3];
+    float nrd,ngn, nbl;    
+    float ncol2;  //part of the second color in respect to the main color.
+    //float nlight; //factor for the light depending on the color. 
+    if(hue < 4){
+      ix1 = 0; ix2 = 2; ix3 = 1;  //rd, bl, gn
+      ncol2 = (4 - hue) / 4;  //factor second color 0..0.999.
+      //nlight = 1.3f - 0.1f* ncol2;  //1.2 on pure magenta
+    } else if(hue < 8.0){
+      ix1 = 0; ix2 = 1; ix3 = 2;
+      ncol2 = (hue -4 ) / 4;  //factor second color 0..0.999.
+      //ncol2 = (float)Math.cos(Math.PI/2*(8 - hue) / 4);  //factor second color 0..0.999.
+      //nlight = 1.3f - 0.3f* ncol2;  //1.0 on pure yellow
+    } else if(hue < 12){
+      ix1 = 1; ix2 = 0; ix3 = 2;
+      ncol2 = (12 - hue) / 4;  //factor second color 0..0.999.
+      //ncol2 = (float)Math.cos(Math.PI/2*(hue-8) / 4);  //factor second color 0..0.999.
+      //nlight = 1.1f - 0.1f* ncol2;  //1.0 on pure yellow
+    } else if(hue < 16) {
+      ix1 = 1; ix2 = 2; ix3 = 0;
+      ncol2 = (hue -12 ) / 4;  //factor second color 0..0.999.
+      //nlight = 1.1f - 0.1f* ncol2;  //1.0 on pure cyan
+    } else if(hue < 20) {
+      ix1 = 2; ix2 = 1; ix3 = 0;
+      ncol2 = (20 - hue) / 4;  //factor second color 0..0.999.
+      //nlight = 1.5f - 0.5f* ncol2;  //1.1 on pure cyan
+    } else { //20..24
+      ix1 = 2; ix2 = 0; ix3 = 1;
+      ncol2 = (hue -20 ) / 4;  //factor second color 0..0.999.
+      //nlight = 1.5f - 0.3f* ncol2;  //1.2 on pure magenta
+    }
+    float lightmax = light * nlight;
+    float darkadd = 0;
+    if(lightmax > 1) {
+      darkadd = 1.0f * (lightmax -1);
+      lightmax = 1;
+    }  
+    float lightbase = light * (1.0f - darkadd) * (1.0f - sat);
+    float dark1 = (1.0f - lightmax); // * cfrgb[ix1];  //light value max. 255               |dddd......
+    float dark2 = (1.0f - lightmax) + (1.0f - ncol2) * (lightmax - lightbase);//   |ddddDD....
+    rgb[ix1] = 1.0f - dark1;
+    rgb[ix2] = 1.0f - dark2 + darkadd;
+    rgb[ix3] = lightbase + darkadd;  //basic, gray
+    
+    //rgb[ix2] = rgb[ix1] - (rgb[ix1] - rgb[ix3]) * (1.0f - ncol2);
+    int rd = (int)(rgb[0] * 255 + 0.5f);
+    int gn = (int)(rgb[1] * 255 + 0.5f);
+    int bl = (int)(rgb[2] * 255 + 0.5f);
+    /*
+    nrd *= sat * cfrd;
+    ngn *= sat * cfgn;
+    nbl *= sat * cfbl;
+    
+    float ncomax = Math.max(nrd, Math.max(ngn, nbl));
+    int base = (int)(light * (1.0f - ncomax) * 255); 
+    //int base = (int)((1.0f - sat)*255 + (sat / light )*255  + 0.5f); 
+    float rd, gn, bl;
+    boolean corr;
+    int maxcnt = 5;
+    do {
+      corr = false;
+      if(hue >= 24){ hue -= 24; }
+      float ncolor = 255; //(255 - base) * light;
+      rd = base + nrd * ncolor;
+      gn = base + ngn * ncolor;
+      bl = base + nbl * ncolor;
+      if(rd >= 255){ base += (rd - 255) /2; corr = true; }
+      if(gn >= 255){ base += (gn - 255) /2; corr = true; }
+      if(bl >= 255){ base += (bl - 255) /2; corr = true; }
+    } while(corr && --maxcnt >=0);
+    if(maxcnt <0){
+      Debugutil.stop();
+    }
+    */
+    if(rd < 0){ 
+      rd = 0; }
+    if(rd > 255){ 
+      rd = 255; }
+    if(gn < 0){ 
+      gn = 0; }
+    if(gn > 255){ 
+      gn = 255; }
+    if(bl < 0){ 
+      bl = 0; }
+    if(bl > 255){ 
+      bl = 255; }
+    //Test
+    float hue2 = RGBtoHue((((int)rd << 16) & 0xff0000) | (((int)gn <<8) & 0x00ff00) | ((int)bl & 0xff));
+    if(Math.abs(hue-hue2) > 0.1f)
+      Debugutil.stop();
+    float l1 = RGBtoligth(rd, gn, bl, sat);
+    //
+    return (((int)rd) << 16) + (((int)gn) << 8) + (((int)bl));
+  }
+  
   
   void genDefaultConfig() {
     int colorVal;
@@ -558,11 +672,11 @@ public class GralColorShow
       for(int ixSatB = 0; ixSatB < colSatB.length; ++ixSatB){
         float s = colSatB[ixSatB][2*(ixHue & 1) + 0];
         float b = colSatB[ixSatB][2*(ixHue & 1) + 1]; // * colHue[ixHue][1];
-        if(b > 1.0f){ s -= b -1.0f; b = 1.0f; }
+        //if(b > 1.0f){ s -= b -1.0f; b = 1.0f; }
         //colorVal = HSBtoRGB(colHue[ixHue][0], s, b) & 0xffffff;
-        if(ixHue == 7 && ixSatB == 16)
+        if(ixHue == 3 && ixSatB == 1)
           Debugutil.stop();
-        colorVal = HSLtoRGB(colHue[ixHue][2], s, b) & 0xffffff;
+        colorVal = HSLtoRGB(colHue[ixHue][0], colHue[ixHue][1], s, b) & 0xffffff;
         ColorWithField colorF1 = new ColorWithField("", ixHue, ixSatB, colorVal);
         colorF[ixSatB][ixHue] = colorF1;
         setColorFromRGB(colorF1);
@@ -575,7 +689,9 @@ public class GralColorShow
       //val[ixHue] = line.toString();
     }
     for(int ixSatB = 0; ixSatB < colSatB.length; ++ixSatB){
-      colorVal = HSLtoRGB(0,0, 1.0f - ((float)ixSatB) / colSatB.length) & 0xffffff;
+      if(ixSatB == 20)
+        Debugutil.stop();
+      colorVal = HSLtoRGB(8,0, 1.0f, 1.0f - ((float)ixSatB) / colSatB.length) & 0xffffff;
       ColorWithField colorF1 = new ColorWithField("", colHue.length, ixSatB, colorVal);
       colorF[ixSatB][colHue.length] = colorF1;
       colorF[ixSatB][0].wdgColor.setText("" + colSatB[ixSatB][0]);
@@ -593,13 +709,14 @@ public class GralColorShow
   
   void readConfig()
   { 
+    String[] val = valTest;
     int zLine = Math.min(val.length, colorF.length);
     for(int ixBright = 0; ixBright < zLine; ++ixBright){
       String line = val[ixBright];
       StringPartScan spline = new StringPartScan(line);
       for(int ixCol=0; ixCol<val.length; ++ixCol) {
         GralColor colText;
-        if(ixBright < 5){ colText = colBk; }
+        if(ixBright < 11){ colText = colBk; }
         else { colText = colWh; }
         int col2;
         spline.setIgnoreWhitespaces(true);
@@ -707,7 +824,7 @@ public class GralColorShow
 
 
   void setColorFromHSL(ColorWithField colorF1) {
-    colorF1.rgb = HSLtoRGB(colorF1.hsl[0], colorF1.hsl[1], colorF1.hsl[2]) & 0xffffff;
+    colorF1.rgb = HSLtoRGB(colorF1.hsl[0], 1.0f, colorF1.hsl[1], colorF1.hsl[2]) & 0xffffff;
     RGBtoHSB(colorF1.rgb, colorF1.hsb);
     /*   String sHex = String.format("%06X", colorF1.rgb);
     wdgHexValue.setText(sHex);
@@ -760,7 +877,7 @@ public class GralColorShow
         //int pline = 0;
         for(int ixBright = 0; ixBright < colorF.length; ++ixBright){
           GralColor colText;
-          if(ixBright < 5){ colText = colBk; }
+          if(ixBright < 11){ colText = colBk; }
           else { colText = colWh; }
           colorF[ixBright][ixCol].wdgColor.setToPanel(gralMng);
           colorF[ixBright][ixCol].wdgColor.setTextColor(colText);

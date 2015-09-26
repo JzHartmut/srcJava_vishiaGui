@@ -177,7 +177,7 @@ public class GralShowMethods
           //else { sValue = null; }
         } //else throw new IllegalArgumentException("GralMng.syncVariableOnFocus: unexpected intension on focus: " + actionCode); 
       } else {
-        throw new IllegalArgumentException("GralMng.syncVariableOnFocus: variable not found: " + widg.getDataPath()); 
+        //throw new IllegalArgumentException("GralMng.syncVariableOnFocus: variable not found: " + widg.getDataPath()); 
       }
       return true;
     }

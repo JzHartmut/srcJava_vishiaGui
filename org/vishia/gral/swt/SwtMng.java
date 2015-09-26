@@ -61,6 +61,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.gral.widget.GralLabel;
+import org.vishia.gral.widget.GralPlotArea;
 import org.vishia.msgDispatch.LogMessage;
 
 
@@ -359,6 +360,9 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     else if(widgg instanceof GralLed){
       new SwtLed((GralLed)widgg, this);
       mng.registerWidget(widgg);
+    }
+    else if(widgg instanceof GralPlotArea){
+      new SwtPlotArea((GralPlotArea)widgg, this);
     }
   }
   

@@ -3,7 +3,10 @@ package org.vishia.gral.ifc;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.vishia.gral.base.GralGridProperties;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
+import org.vishia.gral.widget.GralPlotArea;
 
 
 
@@ -19,6 +22,7 @@ public class GralCanvasStorage implements GralCanvas_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2012-04-22 Hartmut new: {@link PolyLineFloatArray}
    * <li>2012-04-22 new {@link #drawLine(GralPos, GralColor, List)}, improved {@link PaintOrder}-derivates.
    * <li>2011-06-00 Hartmut created
    * </ul>
@@ -46,7 +50,7 @@ public class GralCanvasStorage implements GralCanvas_ifc
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120422;
+  public static final String version = "2015-09-26";
 
 	/**Data class to store an order.
 	 */
@@ -84,7 +88,7 @@ public class GralCanvasStorage implements GralCanvas_ifc
 
     PaintOrder(int paintWhat, GralPos pos, GralColor color) {
       this.paintWhat = paintWhat;
-      this.pos = pos.clone();
+      this.pos = pos == null ? null: pos.clone();
       this.x1 = -1;
       this.y1 = -1;
       this.x2 = -1;
@@ -95,20 +99,61 @@ public class GralCanvasStorage implements GralCanvas_ifc
 	}//class PaintOrder
 
 	
-	public static class PolyLine extends PaintOrder
-	{
-	  public final List<GralPoint> points;
-	  
-	  public boolean bPointsAreGralPosUnits = true;
-	  
-	  PolyLine(GralPos pos, GralColor color, List<GralPoint> points){
-	    super(paintPolyline, pos, color);
-	    this.points = points;
-	  }
-	}
-	
-	
-	
+  public static class PolyLine extends PaintOrder
+  {
+    public final List<GralPoint> points;
+    
+    public boolean bPointsAreGralPosUnits = true;
+    
+    PolyLine(GralPos pos, GralColor color, List<GralPoint> points){
+      super(paintPolyline, pos, color);
+      this.points = points;
+    }
+  }
+  
+  
+  
+  public static class PolyLineFloatArray extends PaintOrder
+  {
+    private final float[][] points;
+    
+    final GralPlotArea.UserUnits userUnits;
+    
+    private Object implStore;
+    
+    public PolyLineFloatArray(GralColor color, GralPlotArea.UserUnits userUnits, float[][] points){
+      super(paintPolyline, null, color);
+      this.userUnits = userUnits;
+      this.points = points;
+    }
+    
+    /**Sets any instance which stores implementation specific data. This method should only called by the implementation layer. */
+    public void setImplStore(Object store){ implStore = store; }
+    
+    /**Gets the implementation specific instance. */
+    public Object getImplStore(){ return implStore; }
+
+    /**Gets the implementation specific instance. */
+    public int[] getImplStoreInt1Array(){ 
+      if(implStore == null) {
+        int[] store = new int[2*points.length];
+        implStore = store;
+        int ixd = -1;
+        GralGridProperties props = GralMng.get().propertiesGui;
+        int fxp = props.xPixelUnit();
+        int fyp = props.yPixelUnit();
+        for(float[] point: points){
+          float x = point[0], y = point[1];
+          store[++ixd] = (int)(userUnits.fx * fxp * (x - userUnits.x0) + 0.5f);
+          store[++ixd] = (int)(userUnits.fy * fyp * (y - userUnits.y0) + 0.5f);
+        }
+      }
+      return (int[])implStore; 
+    }
+  }
+  
+  
+  
 	public static class PaintOrderImage extends PaintOrder
 	{
 	  public final GralImageBase image;
@@ -152,6 +197,16 @@ public class GralCanvasStorage implements GralCanvas_ifc
    */
   public void drawLine(GralPos pos, GralColor color, List<GralPoint> points){
     PaintOrder order = new PolyLine(pos, color, points);
+    paintOrders.add(order);  //paint it when drawBackground is invoked.
+  }
+  
+
+  /**Accepts a order to draw a line. The coordinates are stored only. 
+   * This method can be called in any thread. It is thread-safe.
+   * @param color
+   */
+  public void drawLine(GralColor color, GralPlotArea.UserUnits userUnits, float[][] points){
+    PolyLineFloatArray order = new PolyLineFloatArray(color, userUnits, points);
     paintOrders.add(order);  //paint it when drawBackground is invoked.
   }
   

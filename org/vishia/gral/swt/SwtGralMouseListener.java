@@ -25,6 +25,8 @@ public class SwtGralMouseListener
 {
   /**Version, History and copyright
    * <ul>
+   * <li>2015-09-21 Hartmut chg: The capabilities of {@link MouseListenerNoAction} is contained in {@link MouseListenerGralAction} yet.
+   *   Therefore it is possible to get a mouse action in any {@link GralWidget#setActionChange(GralUserAction)}.
    * <li>2014-09-21 Hartmut chg: Using of {@link GralWidget#toString()} for double click info.
    * <li>2013-05-13 Hartmut chg: All methods of {@link GralMouseWidgetAction_ifc} changed, parameter key, position.
    * <li>2012-10-10 Hartmut the keycode for mouse pressed user actions contains pressing ctrl, alt, sh too.
@@ -203,6 +205,11 @@ public class SwtGralMouseListener
       Control widget = (Control) e.widget;  //a widget is a Control always.
       GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(widget.getData());
       try{
+        String widggInfo = widgg.toString();
+        GralMng.get().log.sendMsg(0, "Info widget: %s", widggInfo);
+        //guiMng.log.sendMsg(0, "Info widget: %s / %s", widgg.name, widgg.getDataPath());
+      } catch(Exception exc){ GralMng.get().writeLog(0, exc); }
+      try{
         final int keyCode = SwtGralKey.convertMouseKey(e.button, SwtGralKey.MouseAction.doubleClick, e.stateMask);
         Control widgetSwt = (Control) e.widget;  //a widget is a Control always.
         if(widgg.cfg.mouseWidgetAction !=null){
@@ -218,19 +225,37 @@ public class SwtGralMouseListener
       } catch(Exception exc){ System.err.printf("SwtGralMouseListener - any exception while mouse double; %s\n", exc.getMessage()); }
     }
 
-    @Override public void mouseDown(MouseEvent e) {
-      super.mouseDown(e);
+    @Override public void mouseDown(MouseEvent ev) {
+      super.mouseDown(ev);
       isPressed = true;
-      xMousePress = e.x;
-      yMousePress = e.y;
-      Control widget = (Control) e.widget;  //a widget is a Control always.
+      xMousePress = ev.x;
+      yMousePress = ev.y;
+      Control widget = (Control) ev.widget;  //a widget is a Control always.
       widget.addMouseMoveListener(mouseMoveListener);
       Object owdgg = widget.getData();
       GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(owdgg);
+      GralMng guiMng = widgg.gralMng();
+      try{
+        String sDataPath = widgg.getDataPath();
+        if( sDataPath ==null  //no datapath given, write info! 
+          || !sDataPath.equals("widgetInfo")  //don't write info if it is a widgetInfo widget itself.
+          ){
+          guiMng.setLastClickedWidget(widgg );
+        }
+        if(guiMng.bDesignMode){
+          GralRectangle rr = new GralRectangle(ev.x, ev.y, 0, 0);
+          if(ev.button == 1){ //left
+            xDown = ev.x; yDown = ev.y;
+            guiMng.pressedLeftMouseDownForDesign(widgg, rr);  
+          } else if(ev.button == 3){ //right
+            //guiMng.pressedRightMouseDownForDesign(widgetInfo, rr);
+          }
+        }
+      } catch(Exception exc){ guiMng.writeLog(0, exc); }
       try{ 
-        final int keyCode = SwtGralKey.convertMouseKey(e.button, SwtGralKey.MouseAction.down, e.stateMask);
+        final int keyCode = SwtGralKey.convertMouseKey(ev.button, SwtGralKey.MouseAction.down, ev.stateMask);
         final int mUser1;
-        switch(e.button){
+        switch(ev.button){
           case 1: mUser1 = GralMouseWidgetAction_ifc.mUser1down; break;
           case 3: mUser1 = GralMouseWidgetAction_ifc.mUser2down; break;  //the usual right button is 3 in SWT!
           case 2: mUser1 = GralMouseWidgetAction_ifc.mUser3down; break;  //the usual middle button is 2 in SWT!
@@ -238,7 +263,7 @@ public class SwtGralMouseListener
         }//switch:
         if(widgg.cfg.mouseWidgetAction !=null){
           Point size = widget.getSize();
-          switch(e.button){ 
+          switch(ev.button){ 
             case 1: 
               widgg.cfg.mouseWidgetAction.mouse1Down(keyCode, xMousePress, yMousePress, size.x, size.y, widgg); 
               break;
@@ -250,7 +275,7 @@ public class SwtGralMouseListener
         if( (widgg.cfg.mUser & mUser1) !=0) {
           GralUserAction action = widgg ==null ? null : widgg.getActionChange();
           if(action !=null){
-            action.exec(keyCode, widgg, new Integer(e.x), new Integer(e.y));
+            action.exec(keyCode, widgg, new Integer(ev.x), new Integer(ev.y));
           }
         }
       } catch(Exception exc){ System.err.printf("SwtGralMouseListener - any exception while mouse down; %s\n", exc.getMessage()); }
@@ -259,18 +284,18 @@ public class SwtGralMouseListener
     
     
     
-    @Override public void mouseUp(MouseEvent e) {
+    @Override public void mouseUp(MouseEvent ev) {
       //set the background color to the originally value again if it was changed.
-      super.mouseUp(e);
+      super.mouseUp(ev);
       if(isPressed){  //prevent any action of mouse up if the mouse is not designated as pressed
         //especially if the mouse was removed from the widget.
-        Control widget = (Control)e.widget;
+        Control widget = (Control)ev.widget;
         widget.removeMouseMoveListener(mouseMoveListener);
         isPressed = false;
         Point size = widget.getSize();
         GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(widget.getData());
         final int mUser1;
-        switch(e.button){
+        switch(ev.button){
           case 1: mUser1 = GralMouseWidgetAction_ifc.mUser1down; break;
           case 3: mUser1 = GralMouseWidgetAction_ifc.mUser2down; break;  //the usual right button is 3 in SWT!
           case 2: mUser1 = GralMouseWidgetAction_ifc.mUser3down; break;  //the usual middle button is 2 in SWT!
@@ -278,16 +303,29 @@ public class SwtGralMouseListener
         }//switch:
         try{ 
           //int dx = e.x - xMousePress, dy = e.y - yMousePress;
-          boolean moved = e.x < 0 || e.x > size.x || e.y < 0 || e.y > size.y;
+          boolean moved = ev.x < 0 || ev.x > size.x || ev.y < 0 || ev.y > size.y;
           SwtGralKey.MouseAction mouseAction = moved ? SwtGralKey.MouseAction.upMovedOutside : SwtGralKey.MouseAction.up;
-          final int keyCode = SwtGralKey.convertMouseKey(e.button, mouseAction, e.stateMask);
+          final int keyCode = SwtGralKey.convertMouseKey(ev.button, mouseAction, ev.stateMask);
+                  GralMng guiMng = widgg.gralMng();
+          int dx = ev.x - xDown, dy = ev.y - yDown;
+          if(guiMng.bDesignMode && ev.button == 1){
+            if((ev.stateMask & SWT.ALT)!=0){
+              boolean bCopy = (ev.stateMask & org.eclipse.swt.SWT.CTRL) !=0;
+              GralRectangle rr = new GralRectangle(ev.x, ev.y, 0, 0);
+              guiMng.releaseLeftMouseForDesign(widgg, rr, bCopy);  
+            } else {
+              guiMng.markWidgetForDesign(widgg);
+            }
+          } 
+          //widgd.redraw();
+
           if(widgg.cfg.mouseWidgetAction !=null){
-            switch(e.button){ 
+            switch(ev.button){ 
               case 1: 
-                widgg.cfg.mouseWidgetAction.mouse1Up(keyCode, e.x, e.y, size.x, size.y, widgg); 
+                widgg.cfg.mouseWidgetAction.mouse1Up(keyCode, ev.x, ev.y, size.x, size.y, widgg); 
                 break;
               case 3:
-                widgg.cfg.mouseWidgetAction.mouse2Up(keyCode, e.x, e.y, size.x, size.y, widgg); 
+                widgg.cfg.mouseWidgetAction.mouse2Up(keyCode, ev.x, ev.y, size.x, size.y, widgg); 
                 break;
             }  
           } 

@@ -394,6 +394,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * <li>M: a Menu entry
    * <li>n: a Horizontal Selector
    * <li>r: a rectangle area 
+   * <li>P: a plot or canvas area 
    * <li>R: a rectangle line 
    * <li>S: a text field to show
    * <li>s: a text area.
@@ -610,7 +611,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   /**Creates a widget.
    * @param posString If null then the widget is not positioned. !=null then a position string.
    *   The position is taken relative to the {@link GralMng#pos}, the {@link GralMng#pos} is changed
-   *   using 
+   *   see {@link GralPos#setPosition(CharSequence, GralPos)}
    * @param sName
    * @param whatIs
    * @throws ParseException 
@@ -638,6 +639,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       boolean toResize = _wdgPos.x.p1 < 0 || _wdgPos.x.p2 <= 0 || _wdgPos.y.p1< 0 || _wdgPos.y.p2 <=0; 
       _wdgPos.panel.addWidget(this, toResize);
     } else {
+      pos.panel = itsMng.getCurrentPanel();
       System.out.println("GralWidget.GralWidget - pos without panel");
     }
   }
