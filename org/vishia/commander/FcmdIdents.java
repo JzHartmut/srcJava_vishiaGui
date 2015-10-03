@@ -282,7 +282,7 @@ public class FcmdIdents extends FcmdIdentsBase
   /**"&Navigation/select &other [ctrl-tab]" */
   String menuBarSelectPanelOther = "&Navigation/select &other [ctrl-tab]";
   String buttonSelectPanelOther = "cTab:other";
-  int keySelectPanelOther = KeyCode.ctrl + '\t';
+  int keySelectPanelOther = KeyCode.ctrl + KeyCode.tab; //;'\t';
   
   ////
   String menuBarFocusLeftCard = "&Navigation/focus to left card [shAlt-left]";

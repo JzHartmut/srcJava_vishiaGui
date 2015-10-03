@@ -1,8 +1,8 @@
 echo on
-cd ..\..\srcJava_Zbnf\_make
-call makejar_zbnf.bat
-cd ..\..\srcJava_vishiaGui\_make
-pause
+::cd ..\..\srcJava_Zbnf\_make
+::call makejar_zbnf.bat
+::cd ..\..\srcJava_vishiaGui\_make
+::pause
 
 REM The TMP_JAVAC is a directory, which contains only this compiling results. It will be clean in the batch processing.
 set TMP_JAVAC=..\..\..\tmp_javac
@@ -49,14 +49,23 @@ echo SWT library not found
 pause
 exit
 :swtOk
-set CLASSPATH_JAVAC=%SWTJAR%;../../exe/zbnf.jar
+set SRCvishiaBase=D:\vishia\ZBNF\sf\ZBNF\srcJava_vishiaBase
+set ZBNFJAR=D:\vishia\ZBNF\sf\ZBNF\zbnfjax\zbnf.jar
+if exist %ZBNFJAR% goto :ZbnfOk
+set SRVvishiaBase=..\..\srcJava_vishiaBase
+set ZBNFJAR=..\..\exe\zbnf.jar
+:ZbnfOk
+set CLASSPATH_JAVAC=%SWTJAR%;%ZBNFJAR%
+echo %CLASSPATH_JAVAC%
+pause
 ::;../../exe/vishiaRun.jar
+
 
 REM Sets the src-path for further necessary sources:
 ::set SRCPATH_JAVAC=..;../../srcJava_vishiaBase;../../srcJava_Zbnf;../../srcJava_vishiaRun
 set SRCPATH_JAVAC=..;../../srcJava_vishiaRun
 
-call ..\..\srcJava_vishiaBase\_make\+javacjarbase.bat
+call %SRCvishiaBase%\_make\+javacjarbase.bat
 
 if exist %FCMD_DST% copy %OUTDIR_JAVAC%\%JAR_JAVAC% %FCMD_DST%\%JAR_JAVAC% 
 pause

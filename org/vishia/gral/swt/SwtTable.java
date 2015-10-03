@@ -900,12 +900,14 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
   TraverseListener traverseListenerTable = new TraverseListener() {
 
-    @Override public void keyTraversed(TraverseEvent e)
+    @Override public void keyTraversed(TraverseEvent ev)
     {
       Debugutil.stop();
-      if(e.character == '\t'){
+      final int keyCode = SwtGralKey.convertFromSwt(ev.keyCode, ev.stateMask, ev.character);
+      if(keyCode == KeyCode.tab) { // || keyCode == KeyCode.ctrl+KeyCode.tab) {
+      //if(e.character == '\t'){
         //only the tab key should be handled because up and down are received by the key handler
-        SwtTable.this.keyPressed(e);
+        SwtTable.this.keyPressed(ev);
       }
     }
   };

@@ -22,7 +22,7 @@ public class GralCanvasStorage implements GralCanvas_ifc
 {
   /**Version, history and license.
    * <ul>
-   * <li>2012-04-22 Hartmut new: {@link PolyLineFloatArray}
+   * <li>2012-09-27 Hartmut new: {@link PolyLineFloatArray}
    * <li>2012-04-22 new {@link #drawLine(GralPos, GralColor, List)}, improved {@link PaintOrder}-derivates.
    * <li>2011-06-00 Hartmut created
    * </ul>
@@ -117,14 +117,22 @@ public class GralCanvasStorage implements GralCanvas_ifc
   {
     private final float[][] points;
     
+    private final int iy;
+    
     final GralPlotArea.UserUnits userUnits;
     
     private Object implStore;
     
-    public PolyLineFloatArray(GralColor color, GralPlotArea.UserUnits userUnits, float[][] points){
+    /**Creates an Paint order which paints a line from array points.
+     * @param color
+     * @param userUnits
+     * @param points The elements[...][0] contains the x-value. The elements[...][iy] contains the y-value.
+     */
+    public PolyLineFloatArray(GralColor color, GralPlotArea.UserUnits userUnits, float[][] points, int iy){
       super(paintPolyline, null, color);
       this.userUnits = userUnits;
       this.points = points;
+      this.iy = iy;
     }
     
     /**Sets any instance which stores implementation specific data. This method should only called by the implementation layer. */
@@ -143,7 +151,7 @@ public class GralCanvasStorage implements GralCanvas_ifc
         int fxp = props.xPixelUnit();
         int fyp = props.yPixelUnit();
         for(float[] point: points){
-          float x = point[0], y = point[1];
+          float x = point[0], y = point[iy];
           store[++ixd] = (int)(userUnits.fx * fxp * (x - userUnits.x0) + 0.5f);
           store[++ixd] = (int)(userUnits.fy * fyp * (y - userUnits.y0) + 0.5f);
         }
@@ -205,8 +213,8 @@ public class GralCanvasStorage implements GralCanvas_ifc
    * This method can be called in any thread. It is thread-safe.
    * @param color
    */
-  public void drawLine(GralColor color, GralPlotArea.UserUnits userUnits, float[][] points){
-    PolyLineFloatArray order = new PolyLineFloatArray(color, userUnits, points);
+  public void drawLine(GralColor color, GralPlotArea.UserUnits userUnits, float[][] points, int iy){
+    PolyLineFloatArray order = new PolyLineFloatArray(color, userUnits, points, iy);
     paintOrders.add(order);  //paint it when drawBackground is invoked.
   }
   

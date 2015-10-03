@@ -17,11 +17,11 @@ import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.swt.SwtFactory;
+import org.vishia.math.CurveInterpolation;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
-import org.vishia.util.StringPart;
 import org.vishia.util.StringPartScan;
 
 
@@ -135,6 +135,33 @@ public class GralColorShow
   }
   
   
+  /**Sensivity of light in respect to the color. It is a table-given function used with interpolation.
+   */
+  static float[][] clight = 
+  { 
+    { 0, 1/0.7f }  //magenta
+  , { 4, 1/0.7f }  //red
+  , { 8, 1.0f }  //yellow
+  , {12, 1/0.9f }  //green
+  , {16, 1.0f }  //cyan
+  , {20, 1/0.6f }  //blue
+  , {24, 1/0.7f }  //magenta
+  };
+  
+  
+  /**Factor to add light >1 to the background colors in dependency to the color. */
+  static float[][] cfOutshine = 
+  { 
+    { 0, 1.0f }  //magenta
+  , { 4, 1.5f }  //red
+  , { 8, 1.0f }  //yellow
+  , {12, 1.0f }  //green
+  , {16, 1.0f }  //cyan
+  , {17, 1.0f }  //cyan
+  , {20, 1.0f }  //blue
+  , {24, 1.0f }  //magenta
+  };
+  
   
   static float bfrd = 1.0f;
   static float bfgn = 1.1f;
@@ -184,7 +211,8 @@ public class GralColorShow
   
   
   float[][] colSatB =
-  { { 0.10f, 1.00f     , 0.10f, 1.00f     }  ////
+  { /*
+      { 0.10f, 1.00f     , 0.10f, 1.00f     }  ////
   , { 0.25f, 1.00f     , 0.25f, 1.00f     }
   , { 0.40f, 1.00f     , 0.40f, 1.00f     }
   , { 0.50f, 1.00f     , 0.50f, 1.00f     }
@@ -192,27 +220,36 @@ public class GralColorShow
   , { 0.70f, 1.00f     , 0.70f, 1.00f     }
   , { 0.80f, 1.00f     , 0.80f, 1.00f     }
   , { 0.90f, 1.00f     , 0.90f, 1.00f     }
+  , { 0.10f, 1.00f     , 0.10f, 1.00f     }  ////
+  
+  ,*/ 
+    { 1.00f, 1.45f     , 1.00f, 1.45f     }
+  , { 1.00f, 1.40f     , 1.00f, 1.40f     }
+  , { 1.00f, 1.30f     , 1.00f, 1.30f     }
+  , { 1.00f, 1.25f     , 1.00f, 1.25f     }
+  , { 1.00f, 1.20f     , 1.00f, 1.20f     }
+  , { 1.00f, 1.10f     , 1.00f, 1.10f     }
   , { 1.00f, 1.00f     , 1.00f, 1.00f     }
-  , { 1.00f, 0.94f     , 1.00f, 0.94f     }
-  , { 1.00f, 0.87f     , 1.00f, 0.87f     }
+  , { 1.00f, 0.95f     , 1.00f, 0.95f     }
+  , { 1.00f, 0.90f     , 1.00f, 0.90f     }
+  , { 1.00f, 0.85f     , 1.00f, 0.85f     }
   , { 1.00f, 0.80f     , 1.00f, 0.80f     }
+  //, { 1.00f, 0.75f     , 1.00f, 0.75f     }
+  , { 0.80f, 0.75f     , 0.80f, 0.75f     }
+  , { 0.60f, 0.70f     , 0.60f, 0.70f     }                                                                 
+  , { 0.70f, 0.70f     , 0.70f, 0.70f     }                                                                 
   , { 1.00f, 0.70f     , 1.00f, 0.70f     }
   , { 1.00f, 0.60f     , 1.00f, 0.60f     }
-  , { 1.00f, 0.50f     , 1.00f, 0.50f     }
   , { 0.80f, 0.60f     , 0.80f, 0.60f     }
-  , { 0.60f, 0.60f     , 0.60f, 0.60f     }                                                                 
-  , { 0.40f, 0.60f     , 0.40f, 0.60f     }
-  , { 0.20f, 0.60f     , 0.20f, 0.60f     }
-  , { 0.20f, 0.50f     , 0.20f, 0.50f     }
-  , { 0.10f, 0.50f     , 0.10f, 0.50f     }
+  , { 0.70f, 0.60f     , 0.70f, 0.60f     }
+  , { 0.50f, 0.60f     , 0.50f, 0.60f     }
   , { 0.30f, 0.50f     , 0.30f, 0.50f     }
   , { 0.50f, 0.50f     , 0.50f, 0.50f     }
   , { 0.70f, 0.50f     , 0.70f, 0.50f     }
   , { 1.00f, 0.50f     , 1.00f, 0.50f     }
+  , { 1.00f, 0.40f     , 1.00f, 0.40f     }
   , { 0.80f, 0.30f     , 0.80f, 0.30f     }
   , { 0.60f, 0.30f     , 0.60f, 0.30f     }
-  , { 0.40f, 0.20f     , 0.40f, 0.20f     }
-  , { 0.70f, 0.20f     , 0.70f, 0.20f     }
   , { 1.00f, 0.30f     , 1.00f, 0.30f     }
   , { 1.00f, 0.20f     , 1.00f, 0.20f     }
                                          
@@ -282,7 +319,7 @@ public class GralColorShow
   
   //String[][] name = new String[19][10];
   
-  final ColorWithField[][] colorF = new ColorWithField[colSatB.length][colHue.length + 1];
+  final ColorWithField[][] colorF = new ColorWithField[colSatB.length][colHue.length + 7];
   
   
   ColorWithField colorFocus;
@@ -403,153 +440,6 @@ public class GralColorShow
   
 
   
-  
-    static int XXXHSLtoRGB(float hue, float sat, float light){  ////
-    float rd, gn, bl;
-    float[] rgb = new float[3];
-    int ix1, ix2, ix3;  //Index of first, second and third color.
-    float lval = 0, mid, hval;
-    float ncol2;
-    int base = (int)((1.0f - sat)*255 * light  + 0.5f); 
-    if(hue >= 24){ hue -= 24; }
-    float bmix = 1.0f;
-    float nlight;
-    if(hue < 4){
-      ix1 = 0; ix2 = 2; ix3 = 1;  //what values associate to colors: main color ix1 is rd
-      ncol2 = (4 - hue) / 4;  //factor second color 0..0.999.
-      nlight = cfrgb[5] * ncol2 + cfrgb[0] * (1.0f-ncol2);
-      bmix = 1.0f - 0.1f * (4 - hue) /4;
-    } else if(hue < 8.0){
-      ix1 = 0; ix2 = 1; ix3 = 2;
-      ncol2 = (hue -4 ) / 4;  //factor second color 0..0.999.
-      nlight = cfrgb[1] * ncol2 + cfrgb[0] * (1.0f-ncol2);
-      bmix = 1.0f - 0.2f * (hue-4) /4;
-    } else if(hue < 12){
-      ix1 = 1; ix2 = 0; ix3 = 2;
-      ncol2 = (12 - hue) / 4;  //factor second color 0..0.999.
-      nlight = cfrgb[1] * ncol2 + cfrgb[2] * (1.0f-ncol2);
-      bmix = 1.0f - 0.2f * (12 - hue) /4;
-    } else if(hue < 16) {
-      ix1 = 1; ix2 = 2; ix3 = 0;
-      ncol2 = (hue -12 ) / 4;  //factor second color 0..0.999.
-      nlight = cfrgb[3] * ncol2 + cfrgb[2] * (1.0f-ncol2);
-      bmix = 1.0f - 0.2f * (hue -12) /4;
-    } else if(hue < 20) {
-      ix1 = 2; ix2 = 1; ix3 = 0;
-      ncol2 = (20 - hue) / 4;  //factor second color 0..0.999.
-      nlight = cfrgb[3] * ncol2 + cfrgb[4] * (1.0f-ncol2);
-      bmix = 1.0f - 0.15f * (20 - hue) /4;
-    } else { //20..24
-      ix1 = 2; ix2 = 0; ix3 = 1;
-      ncol2 = (hue -20 ) / 4;  //factor second color 0..0.999.
-      nlight = cfrgb[5] * ncol2 + cfrgb[4] * (1.0f-ncol2);
-      bmix = 1.0f - 0.1f * (hue - 20) /4;
-    }
- 
-    float diff = sat * light * nlight * 255;
-    //hval = diff; //cfrgb[2*ix1] * bmix;  
-    hval = diff;
-    float val2 = diff * ncol2 * cfrgb[2*ix2] / cfrgb[2*ix1];
-    if(hval > 255 || val2 > 255){
-      if(val2 > hval){
-        if(hval > 255) {
-          float hi = hval + val2 - 511;
-          lval = hi;
-          val2 = 255;
-          diff = 255 - lval;
-        } else {
-          lval = (val2 - 255) /2;
-          diff -= lval;
-          hval = lval + diff ;
-          val2 = 255;
-        }
-        val2 = 255;
-      } else {
-        if(val2 > 255) {
-          lval = (hval +val2 - 510) /2; //(2.0f - ncol2);
-          hval -= lval; 
-          val2 -= lval;
-          //val2 = lval + diff * cfrgb[2*ix2] / cfrgb[2*ix1] * ncol2; // * cfrgb[2*ix2] * bmix * ncol2;
-
-          
-        } else {
-          lval = (hval - 255) / 2; //(2.0f - ncol2);
-          diff -= lval; 
-          val2 = lval + diff * cfrgb[2*ix2] / cfrgb[2*ix1] * ncol2; // * cfrgb[2*ix2] * bmix * ncol2;
-          hval = 255;
-        }
-      }  
-        
-      if(lval > 255) {
-        lval = 255;
-      }
-    }
-    
-    rgb[ix1] = hval;
-    //gn = (int)(diff * (hue - 4) / 8 / cfgn);        
-    rgb[ix2] = val2;  //on 8 maximum        
-    rgb[ix3] = lval;
-
-    rd = rgb[0];
-    gn = rgb[1];
-    bl = rgb[2];
-    
-    
-    
-    rd +=base;
-    gn += base;
-    bl += base;
-    if(rd >= 255){ bl += (rd - 255)/2; gn += (rd - 255)/2; rd = 255; }
-    if(gn >= 255){ bl += (gn - 255)/2; rd += (gn - 255)/2; gn = 255; }
-    if(bl >= 255){ rd += (bl - 255)/2; gn += (bl - 255)/2; bl = 255; }
-    float hue1 = RGBtoHue((((int)rd << 16) & 0xff0000) | (((int)gn <<8) & 0x00ff00) | ((int)bl & 0xff));
-    if(Math.abs(hue1-hue) > 0.1f)
-      Debugutil.stop();
-    float l1 = RGBtoligth(rd, gn, bl, sat);
-    /*
-    if(l1 < light){
-      int catastropicalCount = 255;
-      while(--catastropicalCount >=0 && l1 < light){
-        if(++rd >255) { rd = 255; } //++gn; ++bl; }   
-        if( (gn += 1/cfgn) >255) { gn = 255; } //++rd; ++bl; }
-        if( (bl += 1/cfbl) >255) { bl = 255; } //++rd; ++gn; }
-        l1 = RGBtoligth(rd, gn, bl, sat);
-      }
-    } else {
-      int catastropicalCount = 255;
-      while(--catastropicalCount >=0 && l1 > light){
-        if( (rd*=0.99f) <0) rd = 0; 
-        if((gn*=0.99f) <0) gn = 0; 
-        if((bl*=0.99f) <0) bl = 0; 
-        l1 = RGBtoligth(rd, gn, bl, sat);
-      }
-      
-    }
-    */
-    /*old
-    float l2 = light * light - l1 * l1;
-    float lrd = (int)(l2 * 255 / 0.33f);
-    float lgn = (int)(l2 * 255 / 0.42f);
-    float lbl = (int)(l2 * 255 / 0.22f);
-    rd = (int)(rd + lrd);
-    gn = (int)(gn + lgn);
-    bl = (int)(bl + lbl);
-    */
-    if(rd < 0){ 
-      rd = 0; }
-    if(rd > 255){ 
-      rd = 255; }
-    if(gn < 0){ 
-      gn = 0; }
-    if(gn > 255){ 
-      gn = 255; }
-    if(bl < 0){ 
-      bl = 0; }
-    if(bl > 255){ 
-      bl = 255; }
-    return (((int)rd) << 16) + (((int)gn) << 8) + (((int)bl));
-  }
-  
 
 
   
@@ -567,12 +457,17 @@ public class GralColorShow
   
   
   
-  static int HSLtoRGB(float hue, float nlight, float sat, float light){  ////
+  static int HSLtoRGB(float hue, float sat, float light){  ////
     int ix1, ix2, ix3;  //Index of first, second and third color.
     float[] rgb = new float[3];
     float nrd,ngn, nbl;    
     float ncol2;  //part of the second color in respect to the main color.
     //float nlight; //factor for the light depending on the color. 
+    float nlight = CurveInterpolation.splineInterpolation(hue, clight, -1);
+    if(sat < 0.5f) {
+      nlight = 1; // + (nlight -1) * 5*sat;
+    }
+    float nOutshine = CurveInterpolation.splineInterpolation(hue, cfOutshine, -1);
     if(hue < 4){
       ix1 = 0; ix2 = 2; ix3 = 1;  //rd, bl, gn
       ncol2 = (4 - hue) / 4;  //factor second color 0..0.999.
@@ -601,17 +496,45 @@ public class GralColorShow
       //nlight = 1.5f - 0.3f* ncol2;  //1.2 on pure magenta
     }
     float lightmax = light * nlight;
-    float darkadd = 0;
-    if(lightmax > 1) {
-      darkadd = 1.0f * (lightmax -1);
-      lightmax = 1;
+    //float darkadd = 0;
+    float lightbase = light * (1 - sat);
+    if(hue == 7.0f && light == 1.1f && sat == 1.0f)
+      Debugutil.stop();
+    if(true){
+      rgb[ix1] = lightmax;
+      if(rgb[ix1] > 1) {
+        //float light1 = 1/nlight;  //the value where lightmax == 1,0.7 for red
+        float lightadd = 1.5f * nlight -1; //limit of light input
+                 // - lig //part other colors from saturation
+                 // - 1/nlight    //the value where lightmax == 1,0.7 for red
+                 // ;
+        //float lightmaxmax = 1.5f * nlight;
+        float darkadd = (rgb[ix1] -1) / lightadd * (1-lightbase);
+                  ;
+        rgb[ix1] = 1;          
+        float col2 = ncol2 + lightbase;
+        col2 += darkadd * ( 1- col2);
+        rgb[ix2] = col2; //ncol2 + lightbase + darkadd;
+        rgb[ix3] = lightbase + darkadd;  //basic, gray
+      } else {
+        rgb[ix1] = lightmax;
+        rgb[ix2] = (lightmax - lightbase) * ncol2 + lightbase;
+        rgb[ix3] = lightbase;  //basic, gray
+      }
+    } else {
+      float darkadd = 0;
+      if(lightmax > 1) {
+        //lightmax = 1 + (lightmax -1)*sat;
+        darkadd = nOutshine * (lightmax -1);
+        lightmax = 1;
+      }  
+      lightbase = light * (1.0f - darkadd) * (1.0f - sat);
+      float dark1 = (1.0f - lightmax); // * cfrgb[ix1];  //light value max. 255               |dddd......
+      float dark2 = (1.0f - lightmax) + (1.0f - ncol2) * (lightmax - lightbase);//   |ddddDD....
+      rgb[ix1] = 1.0f - dark1;
+      rgb[ix2] = 1.0f - dark2 + darkadd;
+      rgb[ix3] = lightbase + darkadd;  //basic, gray
     }  
-    float lightbase = light * (1.0f - darkadd) * (1.0f - sat);
-    float dark1 = (1.0f - lightmax); // * cfrgb[ix1];  //light value max. 255               |dddd......
-    float dark2 = (1.0f - lightmax) + (1.0f - ncol2) * (lightmax - lightbase);//   |ddddDD....
-    rgb[ix1] = 1.0f - dark1;
-    rgb[ix2] = 1.0f - dark2 + darkadd;
-    rgb[ix3] = lightbase + darkadd;  //basic, gray
     
     //rgb[ix2] = rgb[ix1] - (rgb[ix1] - rgb[ix3]) * (1.0f - ncol2);
     int rd = (int)(rgb[0] * 255 + 0.5f);
@@ -676,7 +599,7 @@ public class GralColorShow
         //colorVal = HSBtoRGB(colHue[ixHue][0], s, b) & 0xffffff;
         if(ixHue == 3 && ixSatB == 1)
           Debugutil.stop();
-        colorVal = HSLtoRGB(colHue[ixHue][0], colHue[ixHue][1], s, b) & 0xffffff;
+        colorVal = HSLtoRGB(colHue[ixHue][0], s, b) & 0xffffff;
         ColorWithField colorF1 = new ColorWithField("", ixHue, ixSatB, colorVal);
         colorF[ixSatB][ixHue] = colorF1;
         setColorFromRGB(colorF1);
@@ -688,18 +611,49 @@ public class GralColorShow
       //colorVal = HSBtoRGB(0,0, 1.0f - ((float)ixHue) / colHue.length) & 0xffffff;
       //val[ixHue] = line.toString();
     }
+    float[][] clineSat1 = { {1.0f, 0.05f}, {0,0.25f}};
+    float[][] clineSat2 = { {1.0f, 0.1f}, {0,0.49f}};
+    float[][] clineSatC1 = { {0,     0   ,   3  , 10   , 12   , 24   }
+                           , {0.0f, 0.2f , 0.35f, 0.35f, 0.15f, 0.25f}
+                           , {1.1f, 0.05f, 0.05f, 0.05f, 0.05f, 0.05f}};
+    float[][] clineSatC2 = { {0,     0   ,   3  , 10   , 12   , 24   }
+                           , {0.0f, 0.40f, 0.49f, 0.49f, 0.30f, 0.30f}
+                           , {1.1f, 0.10f, 0.10f, 0.10f, 0.10f, 0.10f}};
+    for(int ixsat = 0; ixsat < 2; ++ixsat){
+      float[][] clinesat = ixsat ==0 ? clineSatC1 : clineSatC2;
+      for(int ixHue=0; ixHue < 7; ++ixHue){
+        for(int ixSatB = 0; ixSatB < colSatB.length /2; ++ixSatB){
+          if(ixsat == 0 && ixHue == 1 && ixSatB == 5)
+            Debugutil.stop();
+          int ixline = ixSatB + colSatB.length/2 * ixsat;
+          if(ixline == 7)
+            Debugutil.stop();
+          float color, sat; 
+          float light = 1.0f - ((float)ixSatB) / colSatB.length * 2;
+          if(ixHue == 0) {
+            color = 8; sat = 0;
+          } else {
+            color = 4*(ixHue-1);
+            if(ixHue == 5 && ixSatB == 10)
+              Debugutil.stop();
+            sat = CurveInterpolation.linearInterpolation(light, color, clinesat, -1);
+            //sat = 0.05f * (ixsat+1);// + 0.9f * (1-light) * (1-light);
+          }
+          colorVal = HSLtoRGB(color, sat, light) & 0xffffff;
+          ColorWithField colorF1 = new ColorWithField("", colHue.length + ixHue, ixline, colorVal);
+          colorF[ixline][colHue.length + ixHue] = colorF1;
+          setColorFromRGB(colorF1);
+          setColorT(colorF1);
+          if(ixHue ==0){
+          }
+        }
+      }
+    }
     for(int ixSatB = 0; ixSatB < colSatB.length; ++ixSatB){
-      if(ixSatB == 20)
-        Debugutil.stop();
-      colorVal = HSLtoRGB(8,0, 1.0f, 1.0f - ((float)ixSatB) / colSatB.length) & 0xffffff;
-      ColorWithField colorF1 = new ColorWithField("", colHue.length, ixSatB, colorVal);
-      colorF[ixSatB][colHue.length] = colorF1;
+      colorF[ixSatB][colHue.length].wdgColor.setText("" + ixSatB);
       colorF[ixSatB][0].wdgColor.setText("" + colSatB[ixSatB][0]);
       colorF[ixSatB][1].wdgColor.setText("" + colSatB[ixSatB][1]);
-      colorF[ixSatB][colHue.length].wdgColor.setText("" + ixSatB);
-      setColorFromRGB(colorF1);
-      setColorT(colorF1);
-    }
+    }    
     //val[colHue.length] = line.toString();
   }
   
@@ -824,7 +778,7 @@ public class GralColorShow
 
 
   void setColorFromHSL(ColorWithField colorF1) {
-    colorF1.rgb = HSLtoRGB(colorF1.hsl[0], 1.0f, colorF1.hsl[1], colorF1.hsl[2]) & 0xffffff;
+    colorF1.rgb = HSLtoRGB(colorF1.hsl[0], colorF1.hsl[1], colorF1.hsl[2]) & 0xffffff;
     RGBtoHSB(colorF1.rgb, colorF1.hsb);
     /*   String sHex = String.format("%06X", colorF1.rgb);
     wdgHexValue.setText(sHex);
@@ -871,7 +825,7 @@ public class GralColorShow
       gralMng.setPosition(4, -2, 2, -2, 0, 'd');
       //gralMng.addTextField();
       for(int ixCol=0; ixCol<colorF[0].length; ++ixCol) {
-        gralMng.setPosition(4, GralPos.size -3, 5*ixCol +1, GralPos.size+5, 0, 'd', 0);
+        gralMng.setPosition(4, GralPos.size -3, 4*ixCol +1, GralPos.size+4, 0, 'd', 0);
         //gralMng.setPosition(3, GralPos.size -2, 9*col, GralPos.size+8, 0, 'd', 1);
         //System.out.append(", \"");
         //int pline = 0;
@@ -879,8 +833,10 @@ public class GralColorShow
           GralColor colText;
           if(ixBright < 11){ colText = colBk; }
           else { colText = colWh; }
-          colorF[ixBright][ixCol].wdgColor.setToPanel(gralMng);
-          colorF[ixBright][ixCol].wdgColor.setTextColor(colText);
+          if(colorF[ixBright][ixCol] !=null) {
+            colorF[ixBright][ixCol].wdgColor.setToPanel(gralMng);
+            colorF[ixBright][ixCol].wdgColor.setTextColor(colText);
+          }
         }
       }
       colorFocus = colorF[0][0];
@@ -969,13 +925,15 @@ public class GralColorShow
     {
       if(key == (KeyCode.focusGained)){
         GralTextField wdg = (GralTextField)widgP;
-        colorFocus.wdgColor.setBorderWidth(0);
-        colorFocus = (ColorWithField)widgP.getData();
-        colorFocus.wdgColor.setBorderWidth(3);
-        //int colValue = color.getColorValue();
-        setColorFromRGB(colorFocus);
-        setColorEditFields();
-        System.out.println("focus");
+        if(colorFocus !=null) {
+          colorFocus.wdgColor.setBorderWidth(0);
+          colorFocus = (ColorWithField)widgP.getData();
+          colorFocus.wdgColor.setBorderWidth(3);
+          //int colValue = color.getColorValue();
+          setColorFromRGB(colorFocus);
+          setColorEditFields();
+          //System.out.println("focus");
+        }
       }
       return true;
   } };

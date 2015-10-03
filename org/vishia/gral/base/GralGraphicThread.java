@@ -119,7 +119,7 @@ import org.vishia.util.MinMaxTime;
 public class GralGraphicThread implements Runnable
 {
   
-  /**Version and history:
+  /**Version and history.
    * <ul>
    * <li>
    * <li>2015-01-17 Hartmut chg: Now it is an own instance able to create before the graphic is established.
@@ -147,7 +147,7 @@ public class GralGraphicThread implements Runnable
    * <li> You can redistribute copies of this source to everybody.
    * <li> Every user of this source, also the user of redistribute copies
    *    with or without payment, must accept this license for further using.
-   * <li> But the LPGL ist not appropriate for a whole software product,
+   * <li> But the LPGL is not appropriate for a whole software product,
    *    if this source is only a part of them. It means, the user
    *    must publish this part of source,
    *    but don't need to publish the whole source of the own product.

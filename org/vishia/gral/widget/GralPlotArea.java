@@ -55,8 +55,8 @@ public class GralPlotArea extends GralWidget
   }
   
   
-  public void drawLine(GralColor color, UserUnits userUnits, float[][] points) {
-    canvasStore.drawLine(color, userUnits, points);
+  public void drawLine(GralColor color, UserUnits userUnits, float[][] points, int iy) {
+    canvasStore.drawLine(color, userUnits, points, iy);
   }
   
   
