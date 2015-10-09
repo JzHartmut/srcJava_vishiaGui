@@ -3,56 +3,58 @@ package org.vishia.gral.swt;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralSlider;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralRectangle;
 
-public class SwtSlider extends GralSlider
+public class SwtSlider extends GralSlider._GraphicImplAccess_
 {
+  /**It contains the association to the swt widget (Control) and the {@link SwtMng}
+   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   */
+  private final SwtWidgetHelper swtWdgW;
 
-  public SwtSlider(String sName, SwtMng mng) {
-    super(sName, mng.mng);
+  
+
+  public SwtSlider(GralSlider widg, SwtMng mng) {
+    widg.super(widg);
+    swtWdgW = null;
     // TODO Auto-generated constructor stub
   }
 
-  @Override
-  public void removeWidgetImplementation() {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void repaintGthread() {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public boolean setFocusGThread() {
+  @Override public boolean setFocusGThread()
+  {
     // TODO Auto-generated method stub
     return false;
   }
 
-
-  @Override
-  public Object getWidgetImplementation() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public GralColor setBackgroundColor(GralColor color) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public void setBoundsPixel(int x, int y, int dx, int dy) {
+  @Override public void removeWidgetImplementation()
+  {
     // TODO Auto-generated method stub
     
   }
 
-  @Override
-  public GralColor setForegroundColor(GralColor color) {
+  @Override public void repaintGthread()
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override public Object getWidgetImplementation()
+  {
     // TODO Auto-generated method stub
     return null;
   }
+
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override public GralRectangle getPixelPositionSize()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
   
 }

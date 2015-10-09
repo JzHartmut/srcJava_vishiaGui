@@ -91,9 +91,12 @@ public class GralPlotArea extends GralWidget
   }
   
   
-  public class ImplAccess extends GralWidget.ImplAccess {
+  /**This class contains the access to the GralWidget class. It is used only as super class for the implementation level.
+   * Don't use this class from user applications! It is public only because it should be seen from the graphic implementation.
+   */
+  public abstract class _GraphicImplAccess_ extends GralWidget.ImplAccess {
 
-    protected ImplAccess(GralWidget widgg)
+    protected _GraphicImplAccess_(GralWidget widgg)
     {
       super(widgg);
     }

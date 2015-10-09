@@ -64,7 +64,7 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
    * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
    */
-  private final SwtWidgetHelper swtWidgWrapper;
+  private final SwtWidgetHelper swtWdgW;
 
   
   //protected Canvas widgetSwt;
@@ -82,11 +82,11 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
     //this.mng = mng;
     Composite panel = (Composite)outer.pos().panel.getWidgetImplementation();
     //widgetSwt = new Canvas(panel,0);
-    this.swtWidgWrapper = new SwtWidgetHelper(new Canvas(panel,0), mng);
-    swtWidgWrapper.widgetSwt.setData(wdgGral);
-    swtWidgWrapper.widgetSwt.addPaintListener(paintListener);
-    swtWidgWrapper.widgetSwt.addMouseListener(mouseListener);
-    mng.setBounds_(wdgGral.pos(), swtWidgWrapper.widgetSwt);
+    this.swtWdgW = new SwtWidgetHelper(new Canvas(panel,0), mng);
+    swtWdgW.widgetSwt.setData(wdgGral);
+    swtWdgW.widgetSwt.addPaintListener(paintListener);
+    swtWdgW.widgetSwt.addMouseListener(mouseListener);
+    mng.setBounds_(wdgGral.pos(), swtWdgW.widgetSwt);
     float ySize = outer.pos().height();
     char size1 = ySize > 3? 'B' : 'A';
     switch(size1){ 
@@ -100,19 +100,19 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
 
   
   
-  @Override public void repaintGthread(){ swtWidgWrapper.swtUpdateRedraw(); }
+  @Override public void repaintGthread(){ swtWdgW.swtUpdateRedraw(); }
 
   
-  @Override public Object getWidgetImplementation(){ return swtWidgWrapper.widgetSwt; }
+  @Override public Object getWidgetImplementation(){ return swtWdgW.widgetSwt; }
   
-  @Override public boolean setFocusGThread(){ return swtWidgWrapper.setFocusGThread(); }
+  @Override public boolean setFocusGThread(){ return swtWdgW.setFocusGThread(); }
 
-  @Override public void removeWidgetImplementation(){ swtWidgWrapper.removeWidgetImplementation(); }
+  @Override public void removeWidgetImplementation(){ swtWdgW.removeWidgetImplementation(); }
 
-  @Override public void setBoundsPixel(int x, int y, int dx, int dy){ swtWidgWrapper.setBoundsPixel(x, y, dx, dy); }
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy){ swtWdgW.setBoundsPixel(x, y, dx, dy); }
 
   
-  @Override public GralRectangle getPixelPositionSize(){ return swtWidgWrapper.getPixelPositionSize(); }
+  @Override public GralRectangle getPixelPositionSize(){ return swtWdgW.getPixelPositionSize(); }
 
   
   //@Override public boolean setVisible(boolean visible){ return swtWidgWrapper.setVisible(visible); }
@@ -128,9 +128,9 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
     Rectangle dim = swt.getBounds();
     GralHorizontalSelector.Item<?> actItem = super.actItem();
     int nrActItem = super.nrItem();
-    Color swtColorBack = swtWidgWrapper.mng.getColorImpl(super.outer.colorBack);
-    Color swtColorText = swtWidgWrapper.mng.getColorImpl(super.outer.colorText);
-    Color swtColorSelect = swtWidgWrapper.mng.getColorImpl(super.outer.colorSelect);
+    Color swtColorBack = swtWdgW.mng.getColorImpl(super.outer.colorBack);
+    Color swtColorText = swtWdgW.mng.getColorImpl(super.outer.colorText);
+    Color swtColorSelect = swtWdgW.mng.getColorImpl(super.outer.colorSelect);
     gc.setBackground(swtColorBack);
     swt.drawBackground(e.gc, dim.x+1, dim.y+1, dim.width-1, dim.height-1);
     gc.setFont(fontText);
@@ -195,21 +195,21 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
   protected void mouseDown(MouseEvent e)
   {
     super.findTab(e.x);
-    swtWidgWrapper.widgetSwt.redraw();
+    swtWdgW.widgetSwt.redraw();
     
   }
 
   
   public void mouseUp(MouseEvent e)
   {
-    Rectangle dim = swtWidgWrapper.widgetSwt.getBounds();
+    Rectangle dim = swtWdgW.widgetSwt.getBounds();
     if(e.button == 1){
       if(e.y >0 && e.y < dim.height){
         super.setDstToActItem();
       } else {
         super.clearDstItem();
       }
-      swtWidgWrapper.widgetSwt.redraw();  //because selection is changed.
+      swtWdgW.widgetSwt.redraw();  //because selection is changed.
     }
     //else: content menu does the action.
   }
@@ -218,7 +218,7 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
   
   PaintListener paintListener = new PaintListener(){
     @Override public void paintControl(PaintEvent e) {
-      SwtHorizontalSelector.this.paintControl((Canvas)swtWidgWrapper.widgetSwt, e);
+      SwtHorizontalSelector.this.paintControl((Canvas)swtWdgW.widgetSwt, e);
     }
   };
   

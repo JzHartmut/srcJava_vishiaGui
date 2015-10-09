@@ -16,7 +16,7 @@ import org.vishia.gral.widget.GralPlotArea;
  * @author Hartmut Schorrig
  *
  */
-public class SwtPlotArea extends GralPlotArea.ImplAccess
+public class SwtPlotArea extends GralPlotArea._GraphicImplAccess_
 {
   /**Version, history and license.
    * <ul>
