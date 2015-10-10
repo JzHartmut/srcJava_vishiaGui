@@ -16,6 +16,7 @@ public class GralColor
   
   /**Version, history and license.
    * <ul>
+   * <li>2012-10-11 Hartmut new concepts from new ColorChooser with usualNames, starting.
    * <li>2012-09-07 Hartmut  bugfix: toString: color with hexa value with leading 00 for example "0x00ff00".
    * <li>2012-06-09 Hartmut new: {@link #getColor(String)} now accepts a "0xhexa-Value" for a color name.
    *  If the color name does not match, a magenta color is returned. The method returns a color in any case.
@@ -51,14 +52,23 @@ public class GralColor
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public final static int version = 20120907;
+  public final static String version = "2015-10-11";
   
   
   
-  /**Values 0..255 for the base colors. */
-  public final int red, green, blue;
+  /**Values 0..255 for the base colors. Note: don't change by any application, read only! Changes are overridden on any usage. */
+  public int red, green, blue;
+  
+  /**The rgb value, same value as red, green, blue. */
+  protected int rgb;
 
+  /**The unique short name for this color. */
   public final String name;
+  
+  /**String with one or more usual names for this color, especially HTML names, X11 names. 
+   * If more as one name is given, it is separated by comma. 
+   */
+  protected String usualNames;
   
   /**The color-instance for the implementation can be set from the implementation with the necessary type
    * to minimize the effort in dynamic instances.  */
@@ -73,8 +83,8 @@ public class GralColor
    */
   public GralColor(int red, int green, int blue){
     this.red = red; this.green = green; this.blue = blue;
-    int color = ((red << 16) & 0xff0000) | ((green << 8) & 0xff00) | (blue & 0xff);
-    name = String.format("0x%06X",new Integer(color));
+    this.rgb = ((red << 16) & 0xff0000) | ((green << 8) & 0xff00) | (blue & 0xff);
+    name = String.format("0x%06X",new Integer(this.rgb));
   }
   
   /**
@@ -83,6 +93,7 @@ public class GralColor
    *   and the color have a correct name if the value matches to a existent color.
    */
   public GralColor(int color){
+    this.rgb = color;
     this.red = (color >>16) & 0xff; this.green = (color >>8) & 0xff; this.blue = (color >>0) & 0xff;
     name = String.format("0x%06X", new Integer(color));
   }
@@ -93,12 +104,16 @@ public class GralColor
    *   and the color have a correct name if the value matches to a existent color.
    */
   public GralColor(String name, int color){
+    this.rgb = color;
     this.red = (color >>16) & 0xff; this.green = (color >>8) & 0xff; this.blue = (color >>0) & 0xff;
     this.name = name;
   }
   
   public int getColorValue(){ return (red & 0xff)<<16 | (green & 0xff)<<8 | (blue & 0xff); } 
   
+  public int rgb(){ return rgb; } 
+  
+  public String usualNames(){ return usualNames; }
   
   public String getColorName(){ return name; }
   
