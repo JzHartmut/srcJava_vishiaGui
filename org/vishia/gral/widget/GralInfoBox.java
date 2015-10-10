@@ -123,6 +123,11 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   }
 
 
+  @Override public void setToPanel(){
+    throw new IllegalArgumentException("TODO, new concept is not implemented yet.");
+  }
+
+
   
   /**Creates a sub window for showing html content.
    * This routine should only be called in the graphical thread. TODO setToPanel in extra routine! 

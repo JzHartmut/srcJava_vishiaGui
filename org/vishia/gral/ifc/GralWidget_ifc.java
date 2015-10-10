@@ -59,6 +59,7 @@ public interface GralWidget_ifc extends Removeable
   
   /**Version, history and license.
    * <ul>
+   * <li>2015-10-11 Hartmut new: {@link #setToPanel()} without mng as parameter.
    * <li>2015-09-12 Hartmut new: {@link #getData()}, {@link #setData(Object)} was existent as {@link GralWidget#setContentInfo(Object)},
    *   now explicit property of any widget. 
    * <li>2015-07-12 Hartmut new: {@link #setCmd(String)} and {@link #getCmd()} is present in {@link org.vishia.gral.base.GralWidget}
@@ -136,10 +137,37 @@ public interface GralWidget_ifc extends Removeable
   
   public GralUserAction getActionChange();
   
-  /**This routine should be called only one time after the Gral widget was created. It is overridden by the 
-   * implementation widget. It invokes the proper method of the {@link GralMngBuild_ifc} to set and show 
-   * the graphical implementation layer widgets.
-   * @param mng This instance knows the graphical implementation layer.
+  /**Sets this widget to the current panel at the current given position. 
+   * This routine should be called only one time after the Gral widget was created. 
+   * It creates the graphical appearance using the capabilities of the derived GralMng for the systems graphic level.
+   * This method invokes {@link GralMng#setToPanel(GralWidget)} which tests the type of the derived GralWidget
+   * to create the correct graphical widget. That method calls the implementing specific {@link GralMng.ImplAccess#setToPanel(GralWidget)}
+   * which knows the implementation graphic. 
+   * <br><br><b>Instance structure</b><br>
+   * The implementation of a widget is firstly a class which is inherit from {@link ImplAccess}. With them the {@link GralWidget}
+   * is references because it is the environment class. The core graphical widget is an aggregation in this instance. It is possible 
+   * that more as one implementation widget is used for a Gral Widget implementation. For example a text field with a prompt
+   * consists of two implementation widgets, the text field and a label for the prompt.
+   * <br><br>
+   * <b>Positioning and Registering the widget:</b>
+   * The registering of a widget is done in {@link GralWidget#initPosAndRegisterWidget(GralPos)} which is called either
+   * on construction of a widget with a String-given position, before it appears on graphic, or on construction of the 
+   * graphic widget. It calls the package private {@link GralWidget#initPosAndRegisterWidget(GralPos)}, which takes the 
+   * given position, stores it in the {@link GralWidget#pos()} and adds the widget both to its panel which is given
+   * with the pos and registers the widget in the GralMng for simple global access. 
+   * If the name of the widget starts with "@" its name in the panel is the part after "@" whereby the global name 
+   * is the "panelname.widgetname". If a widget's position is given from left and from right or with percent, it is resized
+   * on resizing the window and the panel.
+   * <br><br>
+   * 
+   * @throws IllegalStateException This routine can be called only if the graphic implementation widget is not 
+   *   existing. It is one time after startup or more as one time if {@link #removeWidgetImplementation()}
+   *   was called. 
+   */
+  void setToPanel();
+  
+  /**Deprecated. Use {@link #setToPanel()}.
+   * @param mng not used. It is known as singleton. Use null as argument.
    */
   void setToPanel(GralMngBuild_ifc mng);
   

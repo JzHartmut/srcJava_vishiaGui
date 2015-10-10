@@ -9,8 +9,12 @@ import org.vishia.gral.ifc.GralFont;
 
 public class GralGridProperties
 {
-  /**Version, history and licence
-   * 
+  /**Version, history and license.
+   * <ul>
+   * <li>2015-10-11 Hartmut chg: The text font should be lesser because g, q, y are not proper able to read.
+   *   TODO think about finer steps between A..C, but don't change existing sizes because some graphics are tuned with them. 
+   * <li>2010-00-00 Hartmut created. The idea of a grid layout with different sizes as basic.     
+   * </ul>
    * <b>Copyright/Copyleft</b>:
    * For this source the LGPL Lesser General Public License,
    * published by the Free Software Foundation is valid.
@@ -20,7 +24,7 @@ public class GralGridProperties
    * <li> You can redistribute copies of this source to everybody.
    * <li> Every user of this source, also the user of redistribute copies
    *    with or without payment, must accept this license for further using.
-   * <li> But the LPGL ist not appropriate for a whole software product,
+   * <li> But the LPGL is not appropriate for a whole software product,
    *    if this source is only a part of them. It means, the user
    *    must publish this part of source,
    *    but don't need to publish the whole source of the own product.
@@ -40,7 +44,7 @@ public class GralGridProperties
 
   
   protected final static int[] smallPromptFontSize = {5,5,6,6,7,8};  //{5,6,8,9,11,12};
-  protected final static int[] stdInputFontSize =    {8,9,11,12,14,18};
+  protected final static int[] stdInputFontSize =    {7,8,11,12,14,18};
   protected final static int[] stdButtonFontSize =   {10,11,12,14,16,20};
   
   /**This are the font sizes for some heights of fields in the given sizes of presentation. 
@@ -51,7 +55,7 @@ public class GralGridProperties
   , {6, 6, 8, 9, 9,10}  // 1 1/3,
   , {6, 7, 9, 9,10,12}  //1.5
   , {7, 8,10,10,12,14}  //1 2/3
-  , {7, 9,11,12,14,18}  //2
+  , {7, 7,11,12,14,18}  //2
   , {8,10,11,12,14,18}  //2 1/3
   , {9,10,11,12,14,18}  //2.5, 2 2/3
   , {9,11,11,12,14,18}  //3
