@@ -287,8 +287,10 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
           promptSwt.setText(this.prompt());
           promptSwt.redraw();
         }
-        if((chg & chgColorText) !=0){ textFieldSwt.setForeground(swtWidgHelper.mng.getColorImpl(dyda().textColor)); }
-        if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(swtWidgHelper.mng.getColorImpl(dyda().backColor)); }
+        if((chg & chgColorText) !=0){ 
+          textFieldSwt.setForeground(swtWidgHelper.mng.getColorImpl(dyda().textColor)); }
+        if((chg & chgColorBack) !=0){ 
+          textFieldSwt.setBackground(swtWidgHelper.mng.getColorImpl(dyda().backColor)); }
         textFieldSwt.redraw();
         //textFieldSwt.
         acknChanged(chg);

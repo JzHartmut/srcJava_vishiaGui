@@ -11,6 +11,7 @@ public class GralGridProperties
 {
   /**Version, history and license.
    * <ul>
+   * <li>2015-10-24 Hartmut chg: Size C is now 10 pixel per grid unit, size D is the older size C. 
    * <li>2015-10-11 Hartmut chg: The text font should be lesser because g, q, y are not proper able to read.
    *   TODO think about finer steps between A..C, but don't change existing sizes because some graphics are tuned with them. 
    * <li>2010-00-00 Hartmut created. The idea of a grid layout with different sizes as basic.     
@@ -43,47 +44,56 @@ public class GralGridProperties
   public final static int version = 0x20120303;
 
   
-  protected final static int[] smallPromptFontSize = {5,5,6,6,7,8};  //{5,6,8,9,11,12};
-  protected final static int[] stdInputFontSize =    {7,8,11,12,14,18};
-  protected final static int[] stdButtonFontSize =   {10,11,12,14,16,20};
+  protected final static int[] smallPromptFontSize = { 5, 5, 6, 6,  6, 7, 8};  //{5,6,8,9,11,12};
+  protected final static int[] stdInputFontSize =    { 7, 8, 9, 11,12,14,18};
+  protected final static int[] stdButtonFontSize =   {10,10,11, 12,14,16,20};
   
   /**This are the font sizes for some heights of fields in the given sizes of presentation. 
    * First index is the height of field, second is the size of presentation.
    */
   protected final static int[][] stdTextFontSize =
-  { {5, 5, 7, 7, 8, 9}  ////1, 1.1, 1.2
-  , {6, 6, 8, 9, 9,10}  // 1 1/3,
-  , {6, 7, 9, 9,10,12}  //1.5
-  , {7, 8,10,10,12,14}  //1 2/3
-  , {7, 7,11,12,14,18}  //2
-  , {8,10,11,12,14,18}  //2 1/3
-  , {9,10,11,12,14,18}  //2.5, 2 2/3
-  , {9,11,11,12,14,18}  //3
-  , {10,11,11,12,14,18}  //3.5
-  , {10,11,11,12,14,18}  //>=4
+  { {5, 5, 6, 7, 7, 8, 9}  ////1, 1.1, 1.2
+  , {6, 6, 7, 8, 9, 9,10}  // 1 1/3,
+  , {6, 7, 8, 9, 9,10,12}  //1.5
+  , {7, 7, 8, 10,10,12,14}  //1 2/3
+  , {7, 8, 9, 11,12,14,18}  //2
+  , {8, 9, 10,11,12,14,18}  //2 1/3
+  , {9,10, 11, 11,12,14,18}  //2.5, 2 2/3
+  , {9,11, 11, 12, 12,14,18}  //3
+  , {10,11,11,12, 12,14,18}  //3.5
+  , {10,11,11,12, 12,14,18}  //>=4
   };
   
-  /**Pixel per Y-Unit. 
+  /** Number of pixel for fractional part and for the grid size.
+   * The array is organized in a 2-dimensional array <code>[frac][size]</code>.
+   * <ul>
+   * <li>The first column contains 0 for frac = 0.
+   * <li>The last column: <code>pixelFrac[size] [10]</code> contains the pixel size of the grid.
+   * <li>The fractional part is given in even numbers (1, 3, 5, 7, 9) to divide in part of 1/6:
+   *     1 = 1/6, 3 = 1/3, 5 = 1/2, 7 = 2/3, 9 = 5/6. It is decimal 0.166, 0.333, 0.5, 0.666, 0.833. 
+   * <li>The fractional part is given in odd numbers (2, 4, 6, 8) to divide in part of 1/5 or decimal 2/10:
+   *     2 = 1/5 = 0.2, 4 = 2/5 = 0.4, 6 = 3/5 = 0.6, 8 = 4/5 = 0.8.
+   * </ul>
+   * Typical usage for grid units and associated pixel units in size C:
    * <table>
-   * <tr><th>Type                       </td><td>units</td><td>pixel</td></tr>
-   * <tr><td>JLabel normal text size    </td><td>2   </td><td>16   </td></tr>
-   * <tr><td>JButton normal text size   </td><td>3   </td><td>26   </td></tr>
-   * <tr><td>TextField                  </td><td>2   </td><td>34   </td></tr>
-   * <tr><td>InputField                 </td><td>4   </td><td>34   </td></tr>
+   * <tr><th>Type                      </td><td>units</td><td>pixel</td></tr>
+   * <tr><td>Label normal text size    </td><td>2   </td><td>16   </td></tr>
+   * <tr><td>Button normal text size   </td><td>3   </td><td>24   </td></tr>
+   * <tr><td>TextField                 </td><td>2   </td><td>16   </td></tr>
+   * <tr><td>Large InputField          </td><td>4   </td><td>32   </td></tr>
    * </table>
-   * Number of Units
+   * Number of Grid Units for full display sizes. An application which needs about 40 lines of text or text fields 
+   * needs 80 grid unit in vertical, it is about 80x120. It runs in a small window with 640 x 480 pixel on size A only. 
+   * In full display mode on a standard display it can use the size C or D.
    * <table>
-   * <tr><th>size        </td><td>A      </td><td>B      </td><td>C      </td><td>D      </td><td>E      </td><td>F      </td></tr>
-   * <tr><td>640 x 480   </td><td>91 x 68</td><td>80 x 68</td><td>71 x 68</td><td>58 x 68</td><td>91 x 68</td><td>35 x 68</td></tr>
-   * <tr><td>800 x 600   </td><td>91 x 68</td><td>91 x 68</td><td>88 x 68</td><td>72 x 68</td><td>91 x 68</td><td>44 x 68</td></tr>
-   * <tr><td>1024 x 768  </td><td>91 x 68</td><td>91 x 68</td><td>91 x 68</td><td>93 x 68</td><td>73 x 68</td><td>56 x 68</td></tr>
-   * <tr><td>1200 x 800  </td><td>91 x 68</td><td>91 x 68</td><td>91 x 68</td><td>91 x 68</td><td>85 x 68</td><td>66 x 68</td></tr>
-   * <tr><td>1680 x 1024 </td><td>91 x 68</td><td>91 x 68</td><td>91 x 68</td><td>140x 68</td><td>120 x 68</td><td>88 x 68</td></tr>
+   * <tr><th>size        </td><td>A        </td><td>B      </td><td>C      </td><td>D      </td><td>E      </td><td>F      </td></td><td>G     </td></tr>
+   * <tr><td>pixel/grid  </td><td> 6       </td><td>  7      </td><td>  8    </td><td>  9    </td><td>  10   </td><td>12  </td><td>15  </td></tr>
+   * <tr><td>640 x 480   </td><td><b>106 x  80</b></td><td>91  x  68</td><td> 80 x  60</td><td> todo </td><td> todo </td><td> todo </td></tr>
+   * <tr><td>800 x 600   </td><td>133 x 100</td><td><b>114 x  85</b></td><td>100 x  75</td><td> todo </td><td> todo </td><td> todo </td></tr>
+   * <tr><td>1024 x 768  </td><td>170 x 128</td><td>146 x 109</td><td><b>128 x  96</b></td><td>113 x 85</td><td>102 x 76</td><td>85 x 64</td><td>68 x 51</td></tr>
+   * <tr><td>1200 x 800  </td><td>200 x 133</td><td>171 x 114</td><td>150 x 100</td><td><b>133 x 88</b></td><td>120 x 80</td><td>100 x 66</td><td>80 x 53</td></tr>
+   * <tr><td>1680 x 1024 </td><td>280 x 170</td><td>240 x 146</td><td>210 x 128</td><td>186 x 113</td><td>168 x 102</td><td>140 x 85</td><td>112 x 68</td></tr>
    * </table>
-   */
-  protected final static int[] yPixelUnit_ = {6,7,9,11,14, 18};
-  
-  /**Pixel per X-Unit. 
    * <table>
    * <tr><th>Type                       </td><td>unit</td><td>pixel</td></tr>
    * <tr><td>JLabel normal text size    </td><td>2   </td><td>0+6   </td></tr>
@@ -91,27 +101,20 @@ public class GralGridProperties
    * <tr><td>InputField                 </td><td>4   </td><td>34   </td></tr>
    * </table>
    */
-  protected final static int[] xPixelUnit_ = {6,7,9,11,14, 18}; //{6,7,8,10,13,16};
-  
-  /**Number of pixel for fractional part of position and size.
-   * The fractional part is given in even numbers (1, 3, 5, 7, 9) to divide in part of 1/6.
-   * 1 = 1/6, 3 = 1/3, 5 = 1/2, 7 = 2/3, 9 = 5/6.
-   * The even numbers are approximate a rounded presentation: 0.166, 0.333, 0.5, 0.666, 0.833
-   * 
-   */
-  protected final static int[][] xPixelFrac = 
- // 1/6   1/3   1/2   2/3   5/6   Divisions of 2 and 3
- //    1/5   2/5   3/5   4/5      Divisions of 5
- //  1  2  3  4  5  6  7  8  9    the number given
-  { {0, 1, 1, 2, 2, 3, 4, 4, 5, 5 }  //pixel size A
-  , {0, 1, 1, 2, 3, 3, 4, 5, 6, 6 }
-  , {0, 1, 2, 3, 4, 5, 6, 6, 7, 8 }
-  , {0, 2, 3, 4, 5, 6, 7, 8, 9,10 }
-  , {0, 2, 3, 4, 5, 7, 8, 9,10,12 }
-  , {0, 3, 4, 6, 7, 9,11,12,14,15 }
+  protected final static int[][] pixelFrac = 
+ //    1/6   1/3   1/2   2/3   5/6   Divisions of 2 and 3
+ //       1/5   2/5   3/5   4/5      Divisions of 5
+ //     1  2  3  4  5  6  7  8  9  0   the number given
+  { {0, 1, 2, 2, 3, 3, 4, 4, 5, 5,  6 }  //pixel size A
+  , {0, 1, 2, 2, 3, 4, 4, 5, 6, 6,  7 }
+  , {0, 1, 3, 3, 4, 4, 6, 6, 7, 7,  8 }
+  , {0, 2, 3, 3, 4, 5, 6, 6, 7, 8,  9 }
+  , {0, 1, 2, 4, 5, 5, 7, 8, 8, 9, 10 }
+  , {0, 2, 4, 5, 6, 6, 8, 9,10,11, 12 }
+  , {0, 3, 5, 6, 7, 7,10,12,12,14, 15 }
   };
   
-  protected final static int[][] yPixelFrac = xPixelFrac;
+  //protected final static int[][] yPixelFrac = xPixelFrac;
   	  
   protected final int xPixelUnit;
 
@@ -120,6 +123,14 @@ public class GralGridProperties
   /**A common background color for all widgets which are paint at the background. */
   public GralColor colorBackground_;
 
+  /**Up to 10 font sizes for following hight of lettes:
+   * <table>
+   * <tr><td>..1.2</td><td>..1.4</td><td>..1.6</td><td>..1.8</td><td>..2.0</td><td>..2.4</td><td>..2.8</td><td>..3.1</td><td>..3.9</td><td>3.9...</td></tr>
+   * <tr><td>  0  </td><td>  1  </td><td>  2  </td><td>  3  </td><td>  4  </td><td>  5  </td><td>  6  </td><td>  7  </td><td>  8  </td><td>  9  </td><td></tr>
+   * </table>
+   * This table will be filled depending of the Grid size, see {@link #stdTextFontSize}.
+   * 
+   */
   public final GralFont[] textFont = new GralFont[10];
   
 
@@ -133,7 +144,7 @@ public class GralGridProperties
 		int size = (sizeC - 'A');
 	  if(size <0 || size >= stdInputFontSize.length) throw new IllegalArgumentException("parameter size should be 1.." + stdInputFontSize.length);
   	this.size = size; 
-    this.xPixelUnit = xPixelUnit_[size];
+    this.xPixelUnit = pixelFrac[size][10];
     colorBackground_ = color(0xeeeeee);
     this.textFont[0] = new GralFont("Arial", stdTextFontSize[0][size], 'n');
     this.textFont[1] = new GralFont("Arial", stdTextFontSize[1][size], 'n');
@@ -237,9 +248,7 @@ public class GralGridProperties
 
 	
 	
-  public int yPixelUnit(){ return yPixelUnit_[size]; }
-
-  public int yPixelFrac(int frac){ return yPixelFrac[size][frac]; }
+  public int yPixelFrac(int frac){ return pixelFrac[size][frac]; }
   
   
   /**Gets the number of pixel for one unit of x-direction. It is approximately the half width of the letter 'm' 
@@ -251,9 +260,11 @@ public class GralGridProperties
    * and the returned number of pixels is tested manually. It may be different if another font is used.
    * @return Number of pixel for 1 unit in x-direction.
    */
-  public int xPixelUnit(){ return xPixelUnit_[size]; }
+  public int xPixelUnit(){ return pixelFrac[size][10]; }
   
-  public int xPixelFrac(int frac){ return xPixelFrac[size][frac]; }
+  public int yPixelUnit(){ return pixelFrac[size][10]; }
+
+  public int xPixelFrac(int frac){ return pixelFrac[size][frac]; }
 
 
   

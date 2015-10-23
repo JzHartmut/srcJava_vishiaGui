@@ -1267,7 +1267,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   @Override public void setBackColor(GralColor color, int ix){ 
-    if(dyda.backColor == null || !dyda.backColor.equals(color)){
+    if(dyda.backColor == null || color.notUsed() || !dyda.backColor.equals(color)){
       dyda.backColor = color; 
       dyda.setChanged(ImplAccess.chgColorBack); 
       repaint(repaintDelay, repaintDelayMax);

@@ -117,6 +117,12 @@ public class GralColor
   
   public String getColorName(){ return name; }
   
+  
+  /**The color is not used till yet or it is changed.
+   * @return
+   */
+  public boolean notUsed(){ return colorGuimpl == null; }
+  
   private static class GralColorContainer
   {
     Map<String, GralColor> colorsByName = new TreeMap<String, GralColor>();

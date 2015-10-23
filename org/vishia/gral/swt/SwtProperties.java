@@ -78,7 +78,7 @@ public class SwtProperties extends GralGridProperties
   		color = colorsSwt.get(colorValue);
 	  	if(color==null){
 	  		color = new Color(guiDevice, (colorValue >>16)&0xff, (colorValue >>8)&0xff, (colorValue)&0xff );
-	      colorsSwt.put(colorValue, color);  //store it to reuse.
+	      //colorsSwt.put(colorValue, color);  //store it to reuse.
 	  	}
   	} else {
   		color = colorBlack;  //The values -1... may be used for palettes.

@@ -11,10 +11,20 @@ public class _GralChgColor
     color.red = (rgb>>16) & 0xff;
     color.green = (rgb>>8) & 0xff;
     color.blue = (rgb) & 0xff;
+    color.colorGuimpl = null; //create a new one.
+  }
+
+  
+  public static void addColorUsualNames(GralColor color, String usualNames) {
+    color.usualNames = usualNames;
   }
 
   
   public static void setColorUsualNames(GralColor color, String usualNames) {
-    color.usualNames = usualNames;
+    if(false && usualNames !=null && color.usualNames !=null && color.usualNames.length() >0){
+      color.usualNames += ", " + usualNames;
+    } else {
+      color.usualNames = usualNames;
+    }
   }
 }
