@@ -411,7 +411,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
 
   /**Starts the execution of mark in another thread. Note that the mark works with the walk-file algorithm
-   * and refreshes the files therewith. 
+   * and refreshes the files therewith. The #action.showFilesProcessing is used as callback.
    * See {@link FileRemote#refreshAndMark(int, boolean, String, int, int, FileRemoteCallback)}.
    */
   final void execMark(){
@@ -426,7 +426,8 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     int depths = srcSomeFiles ? -Integer.MAX_VALUE : Integer.MAX_VALUE;
     long bMarkSelect = srcSomeFiles ? 0x200000000L + FileMark.select : 0;
     //====>
-    srcFile.refreshAndMark(bFirstSelect, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, action.showFilesProcessing);
+    //srcFile.refreshAndMark(bFirstSelect, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, action.showFilesProcessing);
+    srcFile.refreshAndMark(false, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, action.showFilesProcessing);
     widgCopyNameDst.setText(srcDir.getStateDevice());
     bFirstSelect = false;
   }
@@ -588,7 +589,8 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
         bufferDstChars.setLength(0); bufferDstChars.append("??");
       } else if(!bDstChanged) {
         if(cmd == Ecmd.compare) {
-          bufferDstChars.setLength(0); bufferDstChars.append(fileDst.getPathChars()); //.append('/').append(sFileDstCopy);
+          FileRemote dirDstCmpr = fileDst !=null && fileDst.isDirectory() ? fileDst : this.dirDst;
+          bufferDstChars.setLength(0); bufferDstChars.append(dirDstCmpr.getPathChars()); //.append('/').append(sFileDstCopy);
         } else {
           bufferDstChars.setLength(0); 
           final FileRemote dstSet;

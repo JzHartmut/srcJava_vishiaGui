@@ -213,8 +213,8 @@ public class InspcFieldTable
     this.widgTable.specifyActionOnLineSelected(actionLineSelected);
     this.widgTable.setHtmlHelp("HelpInspc.html#Topic.HelpInspc.fieldsof.");
     this.btnBack = new GralButton("@InspcFieldBack", "<<", actionBack);
-    this.btnRefresh = new GralButton("@InspcFieldRefresh", "refresh", actionRefresh);
-    this.btnShowAll = new GralButton("@InspcFieldShowAll", "show all", actionShowAll);
+    this.btnRefresh = new GralButton("@InspcFieldRefresh", "refresh [F5]", actionRefresh);
+    this.btnShowAll = new GralButton("@InspcFieldShowAll", "show all [c+]", actionShowAll);
     this.btnSetValue = new GralButton("@InspcFieldSetValue", "set values", actionSetValues);
     this.btnRepeat = new GralButton("@InspcFieldSetValue", "repeat", null);
     this.btnRepeat.setSwitchMode(GralColor.getColor("gn"), GralColor.getColor("wh"), null);
@@ -404,9 +404,11 @@ public class InspcFieldTable
   
   void actionBack(){
     GralTable<InspcStruct.FieldOfStruct>.TableLineData line = widgTable.getCurrentLine();
-    String key = line.getKey();
-    indexSelection.put(sPathStruct, key);  //select the current field if the view goes back to this table
-    
+    String key;
+    if(line !=null) {
+      key = line.getKey();
+      indexSelection.put(sPathStruct, key);  //select the current field if the view goes back to this table
+    }  
     InspcVariable parent = structVar.parent;
     if(parent !=null){
       int posNameInPath = sPathStruct.lastIndexOf('.')+1; 
@@ -506,6 +508,8 @@ public class InspcFieldTable
           actionBack();
         } else if(key == KeyCode.ctrl + KeyCode.pgdn) {
           getSubStruct(line);
+        } else if(key == KeyCode.ctrl + '+') {
+          showAll();
         }
         return true;
       } else if(key == KeyCode.mouse1Double){
