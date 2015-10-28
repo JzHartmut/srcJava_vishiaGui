@@ -21,6 +21,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.inspcPC.accTarget.InspcAccessExecRxOrder_ifc;
 import org.vishia.inspcPC.accTarget.InspcTargetAccessor;
+import org.vishia.inspcPC.mng.InspcFieldOfStruct;
 import org.vishia.inspcPC.mng.InspcMng;
 import org.vishia.inspcPC.mng.InspcStruct;
 import org.vishia.inspcPC.mng.InspcVariable;
@@ -33,7 +34,7 @@ import org.vishia.util.KeyCode;
  * 
  * <br>
  * The InspcFieldTable shows one struct from target data or one instance, all fields of a class of Java reflection view. 
- * The fields are stored in instances of {@link InspcStruct.FieldOfStruct} which are referenced as data in the {@link GralTable}
+ * The fields are stored in instances of {@link InspcFieldOfStruct} which are referenced as data in the {@link GralTable}
  * of the private composite reference {@link #widgTable}. 
  * <br><br>
  *  
@@ -72,7 +73,7 @@ import org.vishia.util.KeyCode;
  * <br>guiInspc_getFieldsTableSeq<br>
  * <b>Show and request values for the fields</b><br>
  * This is simple done by getting maybe with creation of the variable for the requested field: 
- * {@link InspcStruct.FieldOfStruct#variable(InspcVariable, org.vishia.byteData.VariableContainer_ifc)}
+ * {@link InspcFieldOfStruct#variable(InspcVariable, org.vishia.byteData.VariableContainer_ifc)}
  * and request a new value with {@link InspcVariable#requestValue(long, Runnable)}. The callback invoked on end of the last datagram
  * is a temporary instance {@link RunOnReceive#RunOnReceive(GralTableLine_ifc)} with the given line of the table which invokes
  * {@link #showValue(GralTableLine_ifc, boolean)}.
@@ -123,9 +124,9 @@ public class InspcFieldTable
   @SuppressWarnings("synthetic-access") 
   class RunOnReceive implements Runnable {
     //GralTable<FieldOfStruct>.TableLineData line;
-    GralTableLine_ifc<InspcStruct.FieldOfStruct> line;
+    GralTableLine_ifc<InspcFieldOfStruct> line;
     
-    RunOnReceive(GralTableLine_ifc<InspcStruct.FieldOfStruct> line){
+    RunOnReceive(GralTableLine_ifc<InspcFieldOfStruct> line){
       this.line = line;
     }
     
@@ -167,10 +168,10 @@ public class InspcFieldTable
   private final GralTextField widgPath;
   
   /**Table of fields, type and value. */
-  private final GralTable<InspcStruct.FieldOfStruct> widgTable;
+  private final GralTable<InspcFieldOfStruct> widgTable;
 
   
-  private final GralButton btnBack, btnRefresh, btnShowAll, btnSetValue, btnRepeat;
+  private final GralButton btnBack, btnHelp, btnRefresh, btnShowAll, btnSetValue, btnRepeat;
   
   /**Aggregation. To get variable, send requests etc. */
   private final InspcMng inspcMng;
@@ -207,12 +208,13 @@ public class InspcFieldTable
   { //inspcMng.addUserOrder(this);  //invoke run in any communication step.
     this.wind = new GralWindow(null, "InspcFieldTableWind", "Fields of ...", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
     this.widgPath = new GralTextField("InspcFieldTableWind");
-    this.widgTable = new GralTable<InspcStruct.FieldOfStruct>("InspcFieldTable", new int[]{sizeStruct, sizeName, 0, -sizeType});
+    this.widgTable = new GralTable<InspcFieldOfStruct>("InspcFieldTable", new int[]{sizeStruct, sizeName, 0, -sizeType});
     this.widgTable.setColumnEditable(2, true);
     this.widgTable.setActionChange(this.actionChgTable);
     this.widgTable.specifyActionOnLineSelected(actionLineSelected);
     this.widgTable.setHtmlHelp("HelpInspc.html#Topic.HelpInspc.fieldsof.");
     this.btnBack = new GralButton("@InspcFieldBack", "<<", actionBack);
+    this.btnHelp = new GralButton("@InspcFieldHelp", "help [F1]", GralMng.get().actionHelp);
     this.btnRefresh = new GralButton("@InspcFieldRefresh", "refresh [F5]", actionRefresh);
     this.btnShowAll = new GralButton("@InspcFieldShowAll", "show all [c+]", actionShowAll);
     this.btnSetValue = new GralButton("@InspcFieldSetValue", "set values", actionSetValues);
@@ -223,21 +225,22 @@ public class InspcFieldTable
   
   
   public void setToPanel(GralMng mng){
-    wind.setToPanel(mng);
+    wind.setToPanel();
     mng.setPosition(0, 2, 0, 3, 0, 'd');
-    btnBack.setToPanel(mng);
+    btnBack.setToPanel();
     mng.setPosition(0, 2, 3, 0, 0, 'd');
-    widgPath.setToPanel(mng);
+    widgPath.setToPanel();
     mng.setPosition(2, -4, 0, 0, 0, 'd');
-    widgTable.setToPanel(mng);
-    mng.setPosition(-2, 0, 0, 7, 0, 'd');
-    btnRefresh.setToPanel(mng);
+    widgTable.setToPanel();
+    mng.setPosition(-2, 0, 0, 9, 0, 'r');
+    btnHelp.setToPanel();
+    btnRefresh.setToPanel();
     mng.setPosition(-2, 0, sizeName, sizeName + 12, 1, 'r');
-    btnSetValue.setToPanel(mng);
+    btnSetValue.setToPanel();
     //mng.setPosition(-2, 0, sizeName+13, sizeName + 23, 0, 'r');
-    btnRepeat.setToPanel(mng);
+    btnRepeat.setToPanel();
     //mng.setPosition(-2, 0, sizeName + 13, sizeName + 23, 0, 'r');
-    btnShowAll.setToPanel(mng);
+    btnShowAll.setToPanel();
   }
   
   
@@ -289,8 +292,8 @@ public class InspcFieldTable
       while( iter.hasPrevious()) {  //traverse through list from start.
         parent = iter.previous();
         //InspcStruct struct1 = parent.struct();
-        InspcStruct.FieldOfStruct fieldParent = new InspcStruct.FieldOfStruct(parent, null, 0, true);
-        GralTableLine_ifc<InspcStruct.FieldOfStruct> line = widgTable.addLine(parent.ds.sName, null, fieldParent);
+        InspcFieldOfStruct fieldParent = new InspcFieldOfStruct(parent, null, 0);
+        GralTableLine_ifc<InspcFieldOfStruct> line = widgTable.addLine(parent.ds.sName, null, fieldParent);
         line.setCellText("/", 0);
         line.setCellText(parent.ds.sName, 1);
         //line.setCellText()
@@ -299,8 +302,8 @@ public class InspcFieldTable
       //
       //fill with all fields
       //
-      for(InspcStruct.FieldOfStruct field: struct.fieldIter()){
-        GralTableLine_ifc<InspcStruct.FieldOfStruct> line = widgTable.addLine(field.nameShow, null, field);
+      for(InspcFieldOfStruct field: struct.fieldIter()){
+        GralTableLine_ifc<InspcFieldOfStruct> line = widgTable.addLine(field.nameShow, null, field);
         if(field.hasSubstruct) { 
           line.setCellText("+", 0);
         } else {
@@ -318,14 +321,14 @@ public class InspcFieldTable
         widgTable.setCurrentLine(key);
       }
     } else if(bCanRequest) {
-      GralTableLine_ifc<InspcStruct.FieldOfStruct> line = widgTable.addLine("$", null, null);
+      GralTableLine_ifc<InspcFieldOfStruct> line = widgTable.addLine("$", null, null);
       line.setCellText("pending request", 1);
       InspcTargetAccessor target = structVar.ds.targetAccessor;
       //=========>
       struct.requestFields();  //clear the struct, set to request.
       target.requestFields(struct.varOfStruct(inspcMng).ds, struct.rxActionGetFields, actionUpdated);
     } else { //!bCanRequest - calling parameter:
-      GralTableLine_ifc<InspcStruct.FieldOfStruct> line = widgTable.addLine("?", null, null);
+      GralTableLine_ifc<InspcFieldOfStruct> line = widgTable.addLine("?", null, null);
       line.setCellText("...no answer", 1);
     }
     
@@ -338,12 +341,12 @@ public class InspcFieldTable
    * This routine is called both if the operator requests a refresh of content of the line: {@link #actionChgTable}
    * or if a new value was received: {@link RunOnReceive#run()} invoked from {@link InspcVariable#requestValue(long, Runnable)}.
    * The last one method requestValue() is invoked in this routine if the argument request is set to true. 
-   * @param line The line of this table, contains the {@link InspcStruct.FieldOfStruct} as user data , {@link GralTableLine_ifc#getUserData()}.
-   * Therein the variable for this line is stored or will be created with {@link InspcMng#getOrCreateVariable(InspcStruct, FieldOfStruct)}. 
+   * @param line The line of this table, contains the {@link InspcFieldOfStruct} as user data , {@link GralTableLine_ifc#getUserData()}.
+   * Therein the variable for this line is stored or will be created with {@link InspcMng#getOrCreateVariable(InspcStruct, InspcFieldOfStruct)}. 
    * @param request true then a new value for the variable of this line will be requested here. 
    */
-  private void showValue(GralTableLine_ifc<InspcStruct.FieldOfStruct> line, boolean request){
-    InspcStruct.FieldOfStruct field = line.getUserData();
+  private void showValue(GralTableLine_ifc<InspcFieldOfStruct> line, boolean request){
+    InspcFieldOfStruct field = line.getUserData();
     if(field !=null){
       InspcVariable var = field.variable(structVar, inspcMng);  //get or create the variable for the field
       if(var !=null){
@@ -380,7 +383,7 @@ public class InspcFieldTable
   
   void showAll(){
     fillTableStruct(true);
-    for(GralTableLine_ifc<InspcStruct.FieldOfStruct> line: widgTable.iterLines()){
+    for(GralTableLine_ifc<InspcFieldOfStruct> line: widgTable.iterLines()){
       showValue(line, true);
     }
   }
@@ -393,7 +396,7 @@ public class InspcFieldTable
   
   
   
-  void setCurrentFieldInfo(GralTable<InspcStruct.FieldOfStruct>.TableLineData line){
+  void setCurrentFieldInfo(GralTable<InspcFieldOfStruct>.TableLineData line){
     sFieldCurrent = line.getKey();
     sPathCurrent = line.getDataPath();
     timeLineSelected = System.currentTimeMillis();
@@ -403,7 +406,7 @@ public class InspcFieldTable
   
   
   void actionBack(){
-    GralTable<InspcStruct.FieldOfStruct>.TableLineData line = widgTable.getCurrentLine();
+    GralTable<InspcFieldOfStruct>.TableLineData line = widgTable.getCurrentLine();
     String key;
     if(line !=null) {
       key = line.getKey();
@@ -421,11 +424,11 @@ public class InspcFieldTable
   }
   
   
-  void getSubStruct(GralTableLine_ifc<InspcStruct.FieldOfStruct> line){
+  void getSubStruct(GralTableLine_ifc<InspcFieldOfStruct> line){
     String key = line.getKey();
     indexSelection.put(sPathStruct, key);
     
-    InspcStruct.FieldOfStruct field = line.getUserData();
+    InspcFieldOfStruct field = line.getUserData();
     if(field.nrofArrayElements >1){
       if(!line.hasChildren()){
         //no array elements yet initialized:
@@ -435,7 +438,7 @@ public class InspcFieldTable
         for(int ix = 0; ix < field.nrofArrayElements; ++ix) {
           String ident = field.identifier + "[" + ix + "]";  //creates a field with index
           //The field for the array element:
-          InspcStruct.FieldOfStruct fieldElement = new InspcStruct.FieldOfStruct(structArray, ident, ident, field.type, -1, false);
+          InspcFieldOfStruct fieldElement = new InspcFieldOfStruct(structArray, ident, ident, field.type, -1);
           lineTexts[0] = "-";
           lineTexts[1] = ident;
           lineTexts[2] = "";
@@ -443,7 +446,7 @@ public class InspcFieldTable
           line.addChildLine(ident, lineTexts, fieldElement);
         }
       }
-      line.showChildren(true, false);
+      line.showChildren(true, false, true);
     }
     else if(field.hasSubstruct){
       structVar = field.variable(structVar, inspcMng);
@@ -455,7 +458,7 @@ public class InspcFieldTable
   
   
   void actionSetValues(){
-    for(GralTableLine_ifc<InspcStruct.FieldOfStruct> line: widgTable.iterLines()){
+    for(GralTableLine_ifc<InspcFieldOfStruct> line: widgTable.iterLines()){
       if(line.isChanged(true)){
         sendValueChange(line);
       }
@@ -463,8 +466,8 @@ public class InspcFieldTable
   }
   
   
-  void sendValueChange(GralTableLine_ifc<InspcStruct.FieldOfStruct> line) {
-    InspcStruct.FieldOfStruct field = line.getUserData(); ////
+  void sendValueChange(GralTableLine_ifc<InspcFieldOfStruct> line) {
+    InspcFieldOfStruct field = line.getUserData(); ////
     String sValue = line.getCellText(2);
     InspcVariable var = field.variable(structVar, inspcMng);  //creates the variable if not given yet.
     TxOrderSetValue order = new TxOrderSetValue(sValue, var);
@@ -497,7 +500,7 @@ public class InspcFieldTable
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         assert(params[0] instanceof GralTableLine_ifc<?>);
         @SuppressWarnings("unchecked")
-        GralTableLine_ifc<InspcStruct.FieldOfStruct> line = (GralTableLine_ifc<InspcStruct.FieldOfStruct>)params[0];
+        GralTableLine_ifc<InspcFieldOfStruct> line = (GralTableLine_ifc<InspcFieldOfStruct>)params[0];
         if(key == KeyCode.enter){
           showValue(line, true);
         } else if(key == KeyCode.ctrl + KeyCode.enter) {
@@ -515,8 +518,8 @@ public class InspcFieldTable
       } else if(key == KeyCode.mouse1Double){
         assert(params[0] instanceof GralTableLine_ifc<?>);
         @SuppressWarnings("unchecked")
-        GralTableLine_ifc<InspcStruct.FieldOfStruct> line = (GralTableLine_ifc<InspcStruct.FieldOfStruct>)params[0];
-        InspcStruct.FieldOfStruct field = line.getUserData();
+        GralTableLine_ifc<InspcFieldOfStruct> line = (GralTableLine_ifc<InspcFieldOfStruct>)params[0];
+        InspcFieldOfStruct field = line.getUserData();
         if(field.hasSubstruct){
           getSubStruct(line);
         } else {
@@ -535,7 +538,7 @@ public class InspcFieldTable
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
       if(key == KeyCode.defaultSelect || key == KeyCode.userSelect){
         @SuppressWarnings("unchecked")
-        GralTable<InspcStruct.FieldOfStruct>.TableLineData line = (GralTable.TableLineData)params[0];
+        GralTable<InspcFieldOfStruct>.TableLineData line = (GralTable.TableLineData)params[0];
         if(line !=null) { setCurrentFieldInfo(line); }
         return true;
       } else { 

@@ -161,13 +161,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   
   final private Runnable callbackOnReceivedData = new Runnable(){ @Override public void run(){ callbackOnReceivedData(); } };
   
-  final private Runnable callbackShowTargetCommState = new Runnable(){ @Override public void run(){ callbackShowTargetCommState(); } };
-  
   
   LogMessage logTelg;
 
-  InspcGuiCtrlStatus windCtrlStatus = new InspcGuiCtrlStatus();
-  
   GralButton btnSwitchOnLog;
   final GralButton btnRetryDisableVariables = new GralButton(null, "retry variable", actionSetRetryDisabledVariable);
 
@@ -191,10 +187,11 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
   InspcGui(CallingArguments cargs, GralArea9MainCmd cmdgui)
   {
+    viewTargetComm = new InspcViewTargetComm();
     guiCfg = new InspcGuiCfg(cargs, cmdgui, userInspcPlug);
     GralMng.get().registerUserAction("<name>", actionGetValueByHandleIntern);
     for(Map.Entry<String, String> entry: cargs.indexTargetIpcAddr.entrySet()){
-      windCtrlStatus.addTarget(entry.getKey(), entry.getValue());
+      viewTargetComm.addTarget(entry.getKey(), entry.getValue(), 0.2f, 5);
     }
     
 
@@ -218,7 +215,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     this.inspcMng = variableMng;
     (new GralShowMethods(variableMng)).registerShowMethods(cmdgui.gralMng);
     variableMng.setCallbackOnReceivedData(callbackOnReceivedData);
-    variableMng.setCallbackShowingState(callbackShowTargetCommState);
+    //variableMng.setCallbackShowingState(callbackShowTargetCommState);
     
     //this.XXXinspcComm = new InspcGuiComm(this, guiCfg.gralMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
     //composites.add(XXXinspcComm);
@@ -238,7 +235,6 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     fieldsA = new InspcFieldTable(variableMng);
     fieldsB = new InspcFieldTable(variableMng);
     
-    viewTargetComm = new InspcViewTargetComm("id");
   }
   
   @Override public void completeConstruction(){
@@ -301,23 +297,6 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     
   }
   
-  
-  /**This method is invoked by callback if a receive cycle is finished.
-   * Shows values.
-   */
-  private void callbackShowTargetCommState(){
-    if(viewTargetComm.isVisible()) {
-      try{
-        for(int ix = 0; ix < 5; ++ix){
-          int state = inspcMng.getStateOfTargetComm(ix);
-          viewTargetComm.step(ix, state);
-        }
-      } catch(Exception exc){ 
-        System.err.println("InspcGui-receivedData; " + exc.getMessage()); 
-        exc.printStackTrace(System.out);
-      }
-    }
-  }
   
   
   static class CallingArguments extends GuiCallingArgs
@@ -453,13 +432,11 @@ private class InspcGuiCfg extends GuiCfg
     fieldsB.setToPanel(_gralMng);
     _gralMng.selectPanel("primaryWindow");
     _gralMng.setPosition(10, 30, 50, 74, 0, '.');
-    viewTargetComm.setToPanel(_gralMng);
-    windCtrlStatus.setToPanel();
+    viewTargetComm.setToPanel();
     GralMenu menu = super.guiW.getMenuBar();
     menu.addMenuItemGthread("menuBarFieldsA", "&Window/open Fields &A", fieldsA.actionOpenWindow);
     menu.addMenuItemGthread("menuBarFieldsB", "&Window/open Fields &B", fieldsB.actionOpenWindow);
-    menu.addMenuItemGthread("menuBarViewTargetComm", "&Window/view &TargetComm", viewTargetComm.actionOpenWindow);
-    menu.addMenuItemGthread("menuBarViewTargetComm", "&Window/view ctrl&Status", windCtrlStatus.setVisible);
+    menu.addMenuItemGthread("menuBarViewTargetComm", "&Window/view &TargetComm", viewTargetComm.setVisible);
     //
     if(user !=null){
       user.initGui(_gralMng);
@@ -574,8 +551,8 @@ private class InspcGuiCfg extends GuiCfg
       user1 = user;
     }
     
-    @Override public void showStateInfo(String key, TargetState state, int count){
-      InspcGui.this.windCtrlStatus.setStateInfo(key,state, count);
+    @Override public void showStateInfo(String key, TargetState state, int count, float[] cycle_timeout){
+      InspcGui.this.viewTargetComm.setStateInfo(key,state, count, cycle_timeout);
     }  
 
     

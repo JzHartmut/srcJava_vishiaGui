@@ -102,6 +102,7 @@ public class GralArea9Window implements GralArea9_ifc
   
   /**Version and History
    * <ul>
+   * <li>2015-10-26 Hartmut chg Help in now an integral part of the {@link GralMng}, but invoked here. This class in not change in functinality.
    * <li>2014-02-24 Hartmut new {@link #setHelpBase(String)} used in {@link #setHelpUrl(String)}.
    * <li>2012-05-17 Hartmut new: {@link #setMinMaxSizeArea(String, int, int, int, int)}: The size can be given 
    *   with gral units, as min, max or absolute (min, max are equal). The size of a area border can be changed on runtime.
@@ -163,7 +164,6 @@ public class GralArea9Window implements GralArea9_ifc
    * adequate to a console output.*/
   public GralTextBox outputBox;
   
-  public GralInfoBox infoHelp, infoBox, infoLog;
   
   private GralInfoBox infoAbout;
   
@@ -237,8 +237,6 @@ public class GralArea9Window implements GralArea9_ifc
   protected GralTextBox_ifc textAreaOutput = null;
   
 
-  private String sHelpBase;
-
   /**Sets the output window to a defined area. .
    * Adds the edit-menu too. 
    * @param xArea 1 to 3 for left, middle, right, See {@link #setFrameAreaBorders(int, int, int, int)}
@@ -294,17 +292,7 @@ public class GralArea9Window implements GralArea9_ifc
       if(bSetStandardMenus){
         //setStandardMenusGThread(currentDirectory, actionFile);
       }
-      window.gralMng().setPosition(-40, 0, 10, 0, 0, 'd');
-      infoBox = window.gralMng().createTextInfoBox("infoBox", "Info");
-      //
-      window.gralMng().selectPanel("primaryWindow");
-      window.gralMng().setPosition(0,40,10,0,0,'.');
-      infoHelp = GralInfoBox.createHtmlInfoBox(null, "Help", "Help", true);
-      try{
-        for(String line: mainCmd.listHelpInfo){
-          infoHelp.append(line).append("\n");
-        }
-      } catch(Exception exc){ window.gralMng().writeLog(0, exc); }
+      GralMng.get().createHtmlInfoBoxes(mainCmd);
       //
       window.gralMng().selectPanel("primaryWindow");
       window.gralMng().setPosition(0,20,15,GralPos.size + 50,0,'.');
@@ -734,7 +722,7 @@ public class GralArea9Window implements GralArea9_ifc
    * @see org.vishia.gral.area9.GralArea9_ifc#setHelpBase(java.lang.String)
    */
   @Override public void setHelpBase(String path){ 
-    sHelpBase = path; 
+    GralMng.get().setHelpBase(path);
   }
 
 
@@ -743,19 +731,7 @@ public class GralArea9Window implements GralArea9_ifc
   /* (non-Javadoc)
    * @see org.vishia.gral.ifc.GralMngApplAdapter_ifc#setHelpUrl(java.lang.String)
    */
-  @Override public void setHelpUrl(String url){ 
-    String sUrl;
-    if(url.startsWith("+")){
-      sUrl = sHelpBase + url.substring(1);
-    } else if(FileSystem.isAbsolutePath(url)) { 
-      sUrl = url;  //absolute path
-    } else if (sHelpBase !=null) { //it is a directory which does not end with "/"
-      sUrl = sHelpBase + "/" + url;  //url is a "file.html+label"
-    } else {
-      sUrl = url;  //should be absolute
-    }
-    if(infoHelp !=null) infoHelp.setUrl(sUrl); 
-  }
+  @Override public void setHelpUrl(String url){ GralMng.get().setHelpUrl(url); } 
   
 
 
@@ -828,15 +804,6 @@ return true;
   } }
 
 
-  private final GralUserAction actionHelp = new  GralUserAction("actionHelp")
-  { 
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
-    { infoHelp.activate();
-      infoHelp.setWindowVisible(true);
-      return true; 
-  } };
-
-
   private final GralUserAction actionAbout = new  GralUserAction("actionAbout")
   { //final InfoBox infoHelp;
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
@@ -861,7 +828,7 @@ return true;
    * @see org.vishia.gral.area9.GralArea9_ifc#getActionAbout()
    */
   @Override public GralUserAction getActionHelp()
-  { return actionHelp;
+  { return GralMng.get().actionHelp;
   }
 
 

@@ -39,10 +39,13 @@ import org.vishia.gral.ifc.GralWindowMng_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.gral.widget.GralLabel;
+import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmdLoggingStream;
+import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Assert;
+import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
 /**This is the Manager for the graphic. 
@@ -63,6 +66,8 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2015-10-26 Hartmut new: The help and info box is an integral part of the GralMng and therefore available for any small application without additional effort.
+   *   Only the {@link #createHtmlInfoBoxes(MainCmd)} should be invoked in the graphic thread while initializing the application. 
    * <li>2015-07-13 Hartmut chg: {@link GralMngFocusListener#focusLostGral(GralWidget)} now invokes the {@link GralWidget#actionFocused} too.
    *   The action should distinguish between focus gained and focus lost in its action routine. That should be added to the code. Done for all vishia sources.  
    * <li>2015-07-13 Hartmut new: {@link #registerUserAction(String, GralUserAction)} now knows possibility of usage the own name with "<name>" 
@@ -257,8 +262,15 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 
   private final List<GralWidget> widgetsInFocus = new LinkedList<GralWidget>();
  
+  /**The one instance of the primary window created in the {@link org/vishia/ifc/GralFactory#createWindow(String, String, int)} . */
   private GralWindow windPrimary;
   
+  /**Three windows as sub window for html help, info and logging created if the primary window is created. */
+  public GralInfoBox infoHelp, infoBox, infoLog;
+  
+  private String sHelpBase;
+
+
   
   /**List of all panels which may be visible yet. 
    * The list can be iterated. Therefore it is lock-free multi-threading accessible.
@@ -320,6 +332,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * 
    */
   protected GralUserAction userMainKeyAction;
+  
   
   
   //public final GralWidgetHelper widgetHelper;
@@ -574,12 +587,37 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     if(this.windPrimary !=null)
       throw new IllegalStateException("Primary Window should set only one time.");
     this.windPrimary = primaryWindow; 
+    
   };
   
   
   public static void createMainWindow(GralFactory factory, GralWindow window, char sizeShow, int left, int top, int xSize, int ySize) {
     factory.createWindow(window, sizeShow, left, top, xSize, ySize);
   }
+  
+  
+  
+  /**This routine should be called in the initializing routine in the graphic thread one time.
+   * @param mainCmd If given the help from mainCmd will be written into the Help box.
+   */
+  public void createHtmlInfoBoxes(MainCmd mainCmd)
+  {
+    setPosition(10, 0, 10, 0, 0, 'd');
+    infoBox = createTextInfoBox("infoBox", "Info");
+    //
+    selectPanel("primaryWindow");
+    setPosition(0,40,10,0,0,'.');
+    infoHelp = GralInfoBox.createHtmlInfoBox(null, "Help", "Help", true);
+    if(mainCmd !=null) {
+      try{
+        for(String line: mainCmd.listHelpInfo){
+          infoHelp.append(line).append("\n");
+        }
+      } catch(Exception exc){ writeLog(0, exc); }
+    }
+  }
+  
+  
   
   /**Not that this routine must not invoked before the {@link GralFactory#createWindow(GralWindow, char, int, int, int, int)}
    * was not called.
@@ -685,15 +723,59 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
 
+  public void setHelpBase(String path){ 
+    sHelpBase = path; 
+  }
   
   
-  public void setHtmlHelp(String url){
-    if(applAdapter !=null){
-      applAdapter.setHelpUrl(url);
+  
+  public void setHelpUrl(String url){ 
+    String sUrl;
+    if(url.startsWith("+")){
+      sUrl = sHelpBase + url.substring(1);
+    } else if(FileSystem.isAbsolutePath(url)) { 
+      sUrl = url;  //absolute path
+    } else if (sHelpBase !=null) { //it is a directory which does not end with "/"
+      sUrl = sHelpBase + "/" + url;  //url is a "file.html+label"
+    } else {
+      sUrl = url;  //should be absolute
     }
+    if(infoHelp !=null) infoHelp.setUrl(sUrl); 
   }
   
 
+  
+  public void setHtmlHelp(String url){
+    setHelpUrl(url); 
+    /*
+    if(applAdapter !=null){
+      applAdapter.setHelpUrl(url);
+    }
+    */
+  }
+  
+  public void showInfo(CharSequence text) {
+    if(infoBox == null) return;
+    infoBox.setText(text);
+    infoBox.setVisible(true);
+  }
+  
+  public void setInfo(CharSequence text) {
+    if(infoBox == null) return;
+    infoBox.setText(text);
+  }
+  
+
+  
+  public void addInfo(CharSequence info, boolean show)
+  {
+    if(infoBox == null) return;
+    try{ infoBox.append(info); }
+    catch(IOException exc){}
+    if(show){
+      infoBox.setWindowVisible(true);
+    }
+  }
 
   
   
@@ -1586,6 +1668,18 @@ public GralButton addCheckButton(
     log.sendMsg(msgId, sMsg + " @" + sWhere);
   }
   
+  
+  
+  public final GralUserAction actionHelp = new  GralUserAction("actionHelp")
+  { 
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    { infoHelp.activate();
+      infoHelp.setWindowVisible(true);
+      return true; 
+  } };
+
+
+
   
   
   /**This standard Gral focus listener is the base class for the common implementation layer focus listener.

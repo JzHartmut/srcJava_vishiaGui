@@ -117,4 +117,6 @@ public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, MarkMask_if
    */
   void showChildren(boolean show, boolean bLeftGrandChildrenOpen);
   
+  void showChildren(boolean show, boolean bLeftGrandChildrenOpen, boolean showReally);
+  
 }

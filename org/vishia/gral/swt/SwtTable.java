@@ -369,6 +369,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       }
       //((Table)swtWidg.widgetSwt).super.redraw();
       redrawtime = System.currentTimeMillis();
+      super.bChangedLinesForCell(false);
       //System.out.println("test SwtTable redraw " + ++redrawct);
     } else {
       System.out.println("test SwtTable redraw disposed" + ++redrawct);
@@ -459,10 +460,12 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
           cellSwt.setBounds(xleft, yTop, xRight - xleft, linePixel);
         }
         //
-        String text = line.cellTexts[col];
-        if(text == null){ text = ""; }
-        //
-        cellSwt.setText(text);
+        if(line.wasCelltextSet(col) || bChangedLinesForCell()) {
+          String text = line.cellTexts[col];
+          if(text == null){ text = ""; }
+          //
+          cellSwt.setText(text);
+        }
         if(cellData.bSetFocus){
           cellSwt.setFocus();
           cellData.bSetFocus = false;

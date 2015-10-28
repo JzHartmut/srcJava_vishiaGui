@@ -1,70 +1,157 @@
 package org.vishia.guiInspc;
 
-import org.vishia.gral.base.GralLed;
+import java.util.Locale;
+
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.util.KeyCode;
+import org.vishia.inspcPC.mng.InspcPlugUser_ifc;
+import org.vishia.util.StringFunctions;
 
+/**This class contains some status and control widgets for the Inspector Gui
+ * @author Hartmut Schorrig
+ *
+ */
 public class InspcViewTargetComm
 {
+  /**Version, history and license.
+   * <ul>
+   * <li>2015-05-30 Created.
+   * </ul>
+   * 
+   * <b>Copyright/Copyleft</b>:
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL is not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but don't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you are intent to use this sources without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   * 
+   */
+  //@SuppressWarnings("hiding")
+  protected final static String sVersion = "2015-05-30";
+
+  
   /**The window to present. */
   private final GralWindow wind;
   
-  private final GralLed[] widgLedTarget = new GralLed[5];
+  /**Shows the path in target to this struct. */
+  //private final GralTextField widgPath;
   
-  private GralColor colorIdle = GralColor.getColor("gn");
+  /**Table of fields, type and value. */
+  private final GralTable<Object> widgTable;
+
+
+  private GralColor colorInactive = GralColor.getColor("wh")
+                  , colorIdle = GralColor.getColor("lgn")
+                  , colorWait = GralColor.getColor("lrd")
+                  , color2 = GralColor.getColor("or");
+
   
-  private GralColor colorWaiting = GralColor.getColor("or");
-  
-  private GralColor colorElse = GralColor.getColor("ye");
-  
-  public InspcViewTargetComm(String targetId)
-  {
-    super();
-    this.wind = new GralWindow(null, "InspcViewTargetComm", "TargetCommunication " + targetId, GralWindow_ifc.windOnTop);
-    for(int ix = 0; ix < widgLedTarget.length; ++ix) {
-      this.widgLedTarget[ix] = new GralLed("State " + ix);
-    }
-    
-    
+  public InspcViewTargetComm()
+  { //inspcMng.addUserOrder(this);  //invoke run in any communication step.
+    this.wind = new GralWindow("@primaryWindow,-21..0,-50..0", "InspcCtrlStatusWind", "State of targets", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
+    this.widgTable = new GralTable<Object>("@InspcCtrlStatusWind,0..0,0..0", "TargetTable", new int[]{3, 0,-6,-6});
+    this.widgTable.setColumnEditable(2,  true);
+    this.widgTable.setColumnEditable(3,  true);
+    //this.widgTable.setColumnEditable(2, true);
+    this.widgTable.setHtmlHelp("HelpInspc.html#Topic.HelpInspc.ctrlStatus.");
   }
   
   
-  public void setToPanel(GralMng mng) {
+  /**Invoked in the graphic thread.
+   */
+  public void setToPanel(){
+    GralMng mng = GralMng.get();
     wind.setToPanel(mng);
-    mng.setPosition(2, 4, 2, 4, 0, 'd', 1);
-    for(int ix = 0; ix < widgLedTarget.length; ++ix) {
-      this.widgLedTarget[ix].setToPanel(mng);;
-    }
+    //mng.setPosition(0, 2, 0, 3, 0, 'd');
+    //mng.setPosition(0, 2, 3, 0, 0, 'd');
+    //mng.setPosition(2, -4, 0, 0, 0, 'd');
+    widgTable.setToPanel(mng);
+    //mng.setPosition(-2, 0, 0, 7, 0, 'd');
   }
   
-  
-  
-  public boolean isVisible() { return wind.isVisible(); }
-  
-  
-  public void step(int ixTarget, int state) {
-    switch(state) {
-      case 1:  { widgLedTarget[ixTarget].setColor(colorIdle, colorIdle); } break;
-      case 2:  { widgLedTarget[ixTarget].setColor(colorWaiting, colorElse); } break;
-      default: { widgLedTarget[ixTarget].setColor(colorElse, colorElse); }
-    }
-  }
-  
-  
-  GralUserAction actionOpenWindow = new GralUserAction("InspcViewTargetComm - open window"){
-    @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
-      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        wind.setVisible(true);
-        return true;
-      } else { 
-        return false;
-      }
+
+  GralUserAction setVisible = new GralUserAction("")
+  { public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
+      wind.setVisible(true);   
+      return true;
     }
   };
+  
+  
+  public void addTarget(String key, String info, float cycle, float timeout){
+    GralTableLine_ifc<Object> line = widgTable.addLine(key, null, null);
+    line.setCellText(key + "@" + info, 1);
+    line.setCellText(String.format(Locale.US, "%1.1f", cycle), 2);  //use a 0.2 and not 0,2 in a german installation
+    line.setCellText(String.format(Locale.US, "%3.1f", timeout), 3);
+  }
+
+  
+  
+  public void setStateInfo(String key, InspcPlugUser_ifc.TargetState state, int count, float[] cycle_timeout){
+    GralColor color;
+    switch(state) {
+      case idle: color = colorIdle; break;
+      case inactive: color = colorInactive; break;
+      case waitReceive: color = colorWait; break;
+      case receive: color = color2; break;
+      default: color = color2;
+    }
+    GralTableLine_ifc<Object> line = widgTable.getLine(key);
+    if(line !=null) {
+      line.setCellText(Integer.toHexString(count & 0xff), 0);
+      line.setBackColor(color, 0);
+      if(cycle_timeout !=null) { 
+        String sLine = line.getCellText(3);
+        float timeout = StringFunctions.parseFloat(sLine, 0, -1, null);
+        if(timeout > 0){
+          cycle_timeout[1] = timeout;
+        }
+      }
+    } else {
+      System.err.println("InspcViewTargetComm - unknown target, "+ key);
+    }
+  }
+  
+  
+  float getTimeout(String target){
+    float timeout; 
+    GralTableLine_ifc<Object> line = widgTable.getLine(target);
+     if(line !=null) {
+       String sLine = line.getCellText(3);
+       timeout = StringFunctions.parseFloat(sLine, 0, -1, null);
+       if(timeout <= 0){
+         timeout = 1.0f;
+       }
+     } else {
+       System.err.println("InspcViewTargetComm - unknown target, "+ target);
+       timeout = 5.0f;
+     }
+     return timeout;
+   }
+  
+  
 
 }

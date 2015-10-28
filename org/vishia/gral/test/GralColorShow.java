@@ -320,7 +320,7 @@ public class GralColorShow
   /**Table which determines the rows of the color table.
    * It give light and saturation values.
    */
-  LightSat[] lightSat =  ////
+  LightSat[] lightSat_html =  ////
   { new LightSat("p1", 1.95f, 1.00f )
   , new LightSat("p2", 1.90f, 1.00f )
   , new LightSat("p3", 1.85f, 1.00f )
@@ -390,40 +390,39 @@ public class GralColorShow
   };
   
   
-  LightSat[] lightSat_old = 
-  { new LightSat("p1", 1.95f, 1.00f )
-  , new LightSat("p2", 1.90f, 1.00f )
-  , new LightSat("p3", 1.85f, 1.00f )
-  , new LightSat("p4", 1.80f, 1.00f )
-  , new LightSat("p5", 1.80f, 0.80f )
-  , new LightSat("l1", 1.70f, 1.00f )
-  , new LightSat("l2", 1.60f, 1.00f )
-  , new LightSat("l3", 1.60f, 0.80f )
+  LightSat[] lightSat =  //// test
+  { new LightSat("p1", 1.50f, 0.00f )
+  , new LightSat("p2", 1.50f, 0.10f )
+  , new LightSat("p3", 1.50f, 0.20f )
+  , new LightSat("p4", 1.50f, 0.30f )
+  , new LightSat("p5", 1.50f, 0.40f )
+  , new LightSat("l1", 1.50f, 0.60f )
+  , new LightSat("l2", 1.50f, 0.80f )
+  , new LightSat("l3", 1.50f, 0.90f )
   , new LightSat("l4", 1.50f, 1.00f )
-  , new LightSat("l5", 1.40f, 1.00f )
-  , new LightSat("s1", 1.30f, 1.00f )
-  , new LightSat("g1", 1.20f, 0.70f )
-  , new LightSat("s2", 1.20f, 1.00f )
-  , new LightSat("s3", 1.10f, 1.00f )
-  , new LightSat("g2", 1.00f, 0.40f )                                                                 
-  , new LightSat("g3", 1.00f, 0.50f )                                                                 
+  , new LightSat("l5", 1.00f, 0.00f )
+  , new LightSat("s1", 1.00f, 0.10f )
+  , new LightSat("g1", 1.00f, 0.20f )
+  , new LightSat("s2", 1.00f, 0.30f )
+  , new LightSat("s3", 1.00f, 0.40f )
+  , new LightSat("g2", 1.00f, 0.50f )                                                                 
+  , new LightSat("g3", 1.00f, 0.60f )                                                                 
   , new LightSat("g4", 1.00f, 0.70f )                                                                 
-  , new LightSat("s4", 1.00f, 1.00f )
-  , new LightSat("s5", 0.90f, 1.00f )
-  , new LightSat("g5", 0.90f, 0.70f )
-  , new LightSat("g6", 0.90f, 0.50f )
-  , new LightSat("g7", 0.80f, 0.40f )
-  , new LightSat("g8", 0.80f, 0.60f )
-  , new LightSat("s6", 0.80f, 1.00f )
-  , new LightSat("d1", 0.65f, 1.00f )                        
-  , new LightSat("d2", 0.60f, 0.70f )
-  , new LightSat("g9", 0.60f, 0.50f )
-  , new LightSat("d3", 0.50f, 0.60f )
-  , new LightSat("d4", 0.45f, 1.00f )
-  , new LightSat("d5", 0.40f, 0.70f )
-  , new LightSat("d6", 0.30f, 1.00f )
+  , new LightSat("s4", 1.00f, 0.80f )
+  , new LightSat("s5", 1.00f, 0.90f )
+  , new LightSat("g5", 1.00f, 1.00f )
+  , new LightSat("g6", 0.65f, 0.00f )
+  , new LightSat("g7", 0.65f, 0.10f )
+  , new LightSat("g8", 0.65f, 0.20f )
+  , new LightSat("s6", 0.65f, 0.30f )
+  , new LightSat("d1", 0.65f, 0.40f )                        
+  , new LightSat("d2", 0.65f, 0.50f )
+  , new LightSat("g9", 0.65f, 0.60f )
+  , new LightSat("d3", 0.65f, 0.70f )
+  , new LightSat("d4", 0.65f, 0.80f )
+  , new LightSat("d5", 0.65f, 0.90f )
+  , new LightSat("d6", 0.65f, 1.00f )
   };
-  
   
   
   
@@ -492,518 +491,9 @@ public class GralColorShow
   
   
   
-    String[] valOk =
-  { "FFE6FF:p1ma  FFF0F5:p1pk+ FFE6E6:p1rd  FAF0E6:p1ro+ FAEBD7:p1or+ FFF8DC:p1yo+ FFFACD:p1am+ F5F5DC:p1ye+ FDF5E6:p1gy+ F5FFD6:p1yg  EBFFD8:p1ng  DBFFDB:p1gn  F5FFFA:p1sg+ F0FFFF:p1cy+ F0F8FF:p1cb+ E5EBFF:p1nb  E6E6FA:p1bl+ ECE6FF:p1vb  F2E6FF:p1vi  F9E6FF:p1vm  FFFFFF:wh+   FFF0FF:p1wm  FFF0F0:p1wd+ FDFDE9:p1wy+ EAFEEA:p1we+ E9FDFD:p1wc  F8F8FF:p1wb+ "
-  , "FFE6FF:p2ma  FFE6F2:p2pk  FFE6E6:p2rd  FFE4E1:p2ro+ FFEBCD:p2or+ FFEFD5:p2yo+ FAFAD2:p2am+ FFFFE0:p2ye+ FBFFD5:p2gy  F5FFD6:p2yg  EBFFD8:p2ng  DBFFDB:p2gn  D8FFEB:p2sg  E0FFFF:p2cy+ E3F5FF:p2cb  E5EBFF:p2nb  E6E6FF:p2bl  ECE6FF:p2vb  F2E6FF:p2vi  F9E6FF:p2vm  F5F5F5:p2wh+ EED9EE:p2wm  EED9D9:p2wd  ECECD0:p2wy  D2ECD2:p2we  D0ECEC:p2wc  D9D9EE:p2wu  "
-  , "FFD9FF:p3ma  FFD9EC:p3pk  FFD9D9:p3rd  FFE0E0:p3ro  FFE4B5:p3or+ FFEBC4:p3yo  EEE8AA:p3am+ FFFFBF:p3ye  F9FFC0:p3gy  F0FFC2:p3yg  E2FFC4:p3ng  C8FFC8:p3gn  C4FFE2:p3sg  BFFFFF:p3cy  B0E0E6:p3cb+ D7E1FF:p3nb  D9D9FF:p3bl  E2D9FF:p3vb  ECD9FF:p3vi  F5D9FF:p3vm  DDDDDD:l1gr  DDC4DD:l1gm  DDC4C4:l1gd  DBDBB9:l1gy  BCDBBC:l1ge  B9DBDB:l1gc  C4C4DD:l1gu  "
-  , "FFCCFF:p4ma  FFCCE6:p4pk  FFCCCC:p4rd  FFD5C6:p4ro  FFE4C4:p4or+ F5DEB3:p4yo+ FFF5B1:p4am  FFFFAA:p4ye  F7FFAB:p4gy  EBFFAD:p4yg  D8FFB1:p4ng  B6FFB6:p4gn  B1FFD8:p4sg  AAFFFF:p4cy  C7EAFF:p4cb  CAD7FF:p4nb  CCCCFF:p4bl  D9CCFF:p4vb  E6CCFF:p4vi  F2CCFF:p4vm  DCDCDC:l2gr+ CCAFCC:l2gm  CCAFAF:l2gd  C9C9A3:l2gy  A6CAA6:l2ge  A3C9C9:l2gc  AFAFCC:l2gu  "
-  , "FFB3FF:l1ma  FFB6C1:l1pk+ FFC0CB:l1rd+ FFDFBF:l1ro  FFDAB9:l1or+ FFDEAD:l1yo+ F0E68C:l1am+ FFFF80:l1ye  F2FF82:l1gy  E0FF85:l1yg  C4FF89:l1ng  90EE90:l1gn+ 7FFFD4:l1sg+ 80FFFF:l1cy  ADD8E6:l1cb+ B0C4DE:l1nb+ B3B3FF:l1bl  C6B3FF:l1vb  D9B3FF:l1vi  ECB3FF:l1vm  D3D3D3:l3gr+ BB9CBB:l3gm  BB9C9C:l3gd  B8B88F:l3gy  92B992:l3ge  8FB8B8:l3gc  9C9CBB:l3gu  "
-  , "FF99FF:l2ma  FF99CC:l2pk  FF9999:l2rd  FFAA8E:l2ro  FFBF80:l2or  FFDB6D:l2yo  FFEB62:l2am  FFFF55:l2ye  EEFF58:l2gy  D6FF5C:l2yg  B1FF62:l2ng  98FB98:l2gn+ 62FFB1:l2sg  AFEEEE:l2cy+ 87CEFA:l2cb+ 95B0FF:l2nb  9999FF:l2bl  B399FF:l2vb  CC99FF:l2vi  E699FF:l2vm  C0C0C0:l4gr+ AA89AA:l4gm  AA8989:l4gd  A7A77C:l4gy  7FA87F:l4ge  7CA7A7:l4gc  8989AA:l4gu  "
-  , "FF94FF:l3ma  FF94C9:l3pk  FF9494:l3rd  FFA07A:l3ro+ FFB76E:l3or  FFD454:l3yo  F6E14E:l3am  EDED48:l3ye  DEEE49:l3gy  C8F14B:l3yg  A2F64E:l3ng  54FF54:l3gn  4EF6A2:l3sg  48EDED:l3cy  87CEFA:l3cb+ 8FABFF:l3nb  9494FF:l3bl  AF94FF:l3vb  C994FF:l3vi  E494FF:l3vm  A9A9A9:l5gr+ 997799:l5gm  997777:l5gd  95956A:l5gy  6E966E:l5ge  6A9595:l5gc  777799:l5gu  "
-  , "FF80FF:l4ma  FF80BF:l4pk  F08080:l4rd+ FF9571:l4ro  F4A460:l4or+ FFD149:l4yo  FFE63B:l4am  FFFF2B:l4ye  EAFF2E:l4gy  CCFF33:l4yg  9DFF3B:l4ng  49FF49:l4gn  00FA9A:l4sg+ 00FFFF:l4cy+ 87CEEB:l4cb+ 7B9CFF:l4nb  8080FF:l4bl  9F80FF:l4vb  BF80FF:l4vi  DF80FF:l4vm  888888:d1gr  886688:d1gm  886666:d1gd  84845A:d1gy  5D855D:d1ge  5A8484:d1gc  666688:d1gu  "
-  , "FF66FF:l5ma  FF66B3:l5pk  FF6666:l5rd  FF7F50:l5ro+ FFA500:l5or+ FFD700:l5yo+ FFE214:l5am  FFFF00:l5ye+ E6FF04:l5gy  C2FF0A:l5yg  7FFF00:l5ng+ 24FF24:l5gn  00FF7F:l5sg+ 00FFFF:l5cy+ 58C0FF:l5cb  6495ED:l5nb+ 6666FF:l5bl  8C66FF:l5vb  B366FF:l5vi  D966FF:l5vm  808080:d2gr+ 775677:d2gm  775656:d2gd  74744B:d2gy  4E744E:d2ge  4B7474:d2gc  565677:d2gu  "
-  , "FF4CFF:s1ma  FF4CA6:s1pk  FF4C4C:s1rd  FF6347:s1ro+ FF8F20:s1or  FFBF00:s1yo  F6D700:s1am  EDED00:s1ye  D7EE00:s1gy  B5F100:s1yg  7BF600:s1ng  00FF00:s1gn+ 00F67B:s1sg  00EDED:s1cy  00BFFF:s1cb+ 4675FF:s1nb  4C4CFF:s1bl  794CFF:s1vb  A64CFF:s1vi  D24CFF:s1vm  666666:d3gr  664766:d3gm  664747:d3gd  62623C:d3gy  3F633F:d3ge  3C6262:d3gc  474766:d3gu  "
-  , "FF70FF:g1ma  FF69B4:g1pk+ FA8072:g1rd+ FF845C:g1ro  FFA042:g1or  EBBE38:g1yo  E3CD33:g1am  DBDB2F:g1ye  CBDC30:g1gy  B3DF31:g1yg  8BE333:g1ng  38EB38:g1gn  33E38B:g1sg  48D1CC:g1cy+ 5FC3FF:g1cb  6A8FFF:g1nb  7070FF:g1bl  9470FF:g1vb  B870FF:g1vi  DB70FF:g1vm  555555:d4gr  553955:d4gm  553939:d4gd  4F4F2E:d4gy  315031:d4ge  2E4F4F:d4gc  393955:d4gu  "
-  , "FF33FF:s2ma  FF1493:s2pk+ FF3333:s2rd  FF551C:s2ro  FF8C00:s2or+ EBB100:s2yo  E3C600:s2am  DBDB00:s2ye  C6DC00:s2gy  A7DF00:s2yg  71E300:s2ng  00EB00:s2gn  00E371:s2sg  40E0D0:s2cy+ 20ACFF:s2cb  2C61FF:s2nb  3333FF:s2bl  6633FF:s2vb  9933FF:s2vi  CC33FF:s2vm  444444:d5gr  442C44:d5gm  442C2C:d5gd  3D3D22:d5gy  243E24:d5ge  223D3D:d5gc  2C2C44:d5gu  "
-  , "FF00FF:s3ma+ FF1A8C:s3pk  FF1A1A:s3rd  FF4500:s3ro+ EA7500:s3or  DAA520:s3yo+ D0B600:s3am  C8C800:s3ye  B6CA00:s3gy  9ACD32:s3yg+ 68D000:s3ng  00D800:s3gn  00D068:s3sg  00CED1:s3cy+ 05A1FF:s3cb  124DFF:s3nb  1A1AFF:s3bl  531AFF:s3vb  8A2BE2:s3vi+ C61AFF:s3vm  333333:d6gr  332033:d6gm  332020:d6gd  2C2C17:d6gy  192D19:d6ge  172C2C:d6gc  202033:d6gu  "
-  , "FF99FF:g2ma+ FF99CC:g2pk  FF9999:g2rd  F3A68C:g2ro  DEB887:g2or+ DEC475:g2yo  D9CC70:g2am  D5D56B:g2ye  CBD56C:g2gy  BCD76E:g2yg  A5D970:g2ng  75DE75:g2gn  70D9A5:g2sg  6BD5D5:g2cy  8ECEF5:g2cb  94AEFB:g2nb  9999FF:g2bl  B399FF:g2vb  CC99FF:g2vi  E699FF:g2vm  222222:d7gr  221422:d7gm  221414:d7gd  1C1C0E:d7gy  0F1D0F:d7ge  0E1C1C:d7gc  141422:d7gu  "
-  , "FF80FF:g3ma  FF80BF:g3pk  FF8080:g3rd  E9967A:g3ro+ D2B48C:g3or+ C9AC55:g3yo  BDB76B:g3am+ BCBC4B:g3ye  B1BD4C:g3gy  A2BF4D:g3yg  89C250:g3ng  55C955:g3gn  66CDAA:g3sg+ 4BBCBC:g3cy  72BFED:g3cb  7A99F8:g3nb  8080FF:g3bl  9F80FF:g3vb  BF80FF:g3vi  DF80FF:g3vm  111111:d8gr  110A11:d8gm  110A0A:d8gd  0D0D06:d8gy  070E07:d8ge  060D0D:d8gc  0A0A11:d8gu  "
-  , "FF4DFF:g4ma  FF4DA6:g4pk  FF4D4D:g4rd  E96B41:g4ro  D2691E:g4or+ C7A12F:g4yo  BFAD2B:g4am  B9B928:g4ye  ACBA29:g4gy  97BC2A:g4yg  75BF2B:g4ng  32CD32:g4gn+ 2BBF75:g4sg  28B9B9:g4cy  43ADEC:g4cb  4874F7:g4nb  6A5ACD:g4bl+ 794DFF:g4vb  A64DFF:g4vi  D24DFF:g4vm  FFFFFF:p1w2  FFFAFF:p1mw  FFFAFA:p1rw  FFFAF0:whye2+ F8FFF8:p1gw  F7FEFE:p1cw  E6E6FA:whbl2+ "
-  , "FF00FF:s4ma+ FF0080:s4pk  FF0000:s4rd+ E83A00:s4ro  D56A00:s4or  C49300:s4yo  BDA500:s4am  B6B600:s4ye  A5B700:s4gy  8BB900:s4yg  5EBD00:s4ng  00C400:s4gn  00BD5E:s4sg  20B2AA:s4cy+ 1E90FF:s4cb+ 003EF7:s4nb  0000FF:s4bl+ 4000FF:s4vb  8000FF:s4vi  BF00FF:s4vm  EEEEEE:p2w2  EEE5EE:p2mw  EEE5E5:p2rw  EDEDE1:p2yw  E2EDE2:p2gw  E1EDED:p2cw  E5E5EE:p2bw  "
-  , "E600E6:s5ma  DC143C:s5pk+ E60000:s5rd  D13400:s5ro  BF6000:s5or  B8860B:s5yo+ AA9500:s5am  A4A400:s5ye  95A500:s5gy  7DA700:s5yg  55AA00:s5ng  00B100:s5gn  00AA55:s5sg  00A4A4:s5cy  0084D4:s5cb  0038DE:s5nb  0000E6:s5bl  3900E6:s5vb  7300E6:s5vi  AC00E6:s5vm  DDDDDD:l1g2  DDD1DD:l1mg  DDD1D1:l1rg  DCDCCC:l1yg  CDDCCD:l1gg  CCDCDC:l1cg  D1D1DD:l1bg  "
-  , "E645E6:g5ma  E64595:g5pk  E64545:g5rd  D2603A:g5ro  CD853F:g5or+ B3912A:g5yo  AC9C27:g5am  A6A624:g5ye  9AA825:g5gy  88A925:g5yg  6AAC27:g5ng  2AB32A:g5gn  3CB371:g5sg+ 24A6A6:g5cy  3C9BD5:g5cb  4169E1:g5nb+ 4545E6:g5bl  6D45E6:g5vb  9545E6:g5vi  BA55D3:g5vm+ CCCCCC:l2g2  CCBECC:l2mg  CCBEBE:l2rg  CBCBB7:l2yg  B9CBB9:l2gg  B7CBCB:l2cg  BEBECC:l2bg  "
-  , "E673E6:g6ma+ E673AC:g6pk  E67373:g6rd  D38064:g6ro  C28D58:g6or  B59B4D:g6yo  AFA248:g6am  A9A943:g6ye  A0AA44:g6gy  92AC46:g6yg  7BAF48:g6ng  4DB54D:g6gn  48AF7B:g6sg  5F9EA0:g6cy+ 66ACD5:g6cb  6E8ADF:g6nb  7B68EE:g6bl+ 9370DB:g6vb+ AC73E6:g6vi  C973E6:g6vm  BBBBBB:l3g2  BBABBB:l3mg  BBABAB:l3rg  B9B9A3:l3yg  A5BAA5:l3gg  A3B9B9:l3cg  ABABBB:l3bg  "
-  , "CC7ACC:g7ma+ CC7AA3:g7pk  BC8F8F:g7rd+ C28570:g7ro  B99066:g7or  B19C5E:g7yo  AEA35A:g7am  AAAA56:g7ye  A2AB56:g7gy  97AC58:g7yg  8BAE89:g7ng  8FBC8F:g7gn+ 5AAE84:g7sg  56AAAA:g7cy  72A5C4:g7cb  778899:g7nb+ 7A7ACC:g7bl  8F7ACC:g7vb  A37ACC:g7vi  B87ACC:g7vm  AAAAAA:l4g2  AA98AA:l4mg  AA9898:l4rg  A8A891:l4yg  93A993:l4gg  91A8A8:l4cg  9898AA:l4bg  "
-  , "CC52CC:g8ma  C71585:g8pk+ CD5C5C:g8rd+ BA6346:g8ro  AB743C:g8or  9E8434:g8yo  998C30:g8am  93932D:g8ye  8A942D:g8gy  7C962F:g8yg  649930:g8ng  349E34:g8gn  309964:g8sg  2D9393:g8cy  4682B4:g8cb+ 4D6CC6:g8nb  5252CC:g8bl  7052CC:g8vb  8F52CC:g8vi  9932CC:g8vm+ 999999:l5g2  998799:l5mg  998787:l5rg  97977F:l5yg  819881:l5gg  7F9797:l5cg  878799:l5bg  "
-  , "CC00CC:s6ma  CC0066:s6pk  CC0000:s6rd  B92E00:s6ro  A0522D:s6or+ 9D7600:s6yo  978400:s6am  929200:s6ye  849300:s6gy  6B8E23:s6yg+ 4C9700:s6ng  009D00:s6gn  00974C:s6sg  008B8B:s6cy+ 0076BC:s6cb  0031C5:s6nb  0000CD:s6bl+ 3300CC:s6vb  6600CC:s6vi  9400D3:s6vm+ 888888:d1g2  887588:d1mg  887575:d1rg  86866E:d1yg  6F876F:d1gg  6E8686:d1cg  757588:d1bg  "
-  , "A600A6:d1ma+ A60053:d1pk  A60000:d1rd  972600:d1ro  8B4513:d1or+ 806000:d1yo  7B6B00:d1am  808000:d1ye+ 6B7700:d1gy  5A7900:d1yg  3D7B00:d1ng  008000:d1gn+ 007B3D:d1sg  008080:d1cy+ 006099:d1cb  0028A0:d1nb  0000A6:d1bl  2900A6:d1vb  5300A6:d1vi  7C00A6:d1vm  777777:d2g2  776577:d2mg  776565:d2rg  75755D:d2yg  5F765F:d2gg  5D7575:d2cg  656577:d2bg  "
-  , "992E99:d2ma  992E63:d2pk  B22222:d2rd+ 8C4027:d2ro  815121:d2or  77601C:d2yo  73681A:d2am  6F6F18:d2ye  677018:d2gy  5B7119:d2yg  46731A:d2ng  228B22:d2gn+ 2E8B57:d2sg+ 186F6F:d2cy  28688E:d2cb+ 2B4694:d2nb  2E2E99:d2bl  492E99:d2vb  663399:d2vi+ 7E2E99:d2vm  666666:d3g2  665566:d3mg  665555:d3rg  64644E:d3yg  4F654F:d3gg  4E6464:d3cg  555566:d3bg  "
-  , "994D99:g9ma  994D73:g9pk  994D4D:g9rd  8C5543:g9ro  825E3A:g9or  786733:g9yo  746C30:g9am  71712D:g9ye  6A712E:g9gy  61722E:g9yg  527430:g9ng  337833:g9gn  307452:g9sg  2D7171:g9cy  44738E:g9cb  495C95:g9nb  4D4D99:g9bl  604D99:g9vb  734D99:g9vi  864D99:g9vm  555555:d4g2  554555:d4mg  554545:d4rg  53533F:d4yg  405440:d4gg  3F5353:d4cg  454555:d4bg  "
-  , "803380:d3ma  803359:d3pk  803333:d3rd  743E2C:d3ro  6B4826:d3or  635220:d3yo  5F571E:d3am  5C5C1C:d3ye  565D1C:d3gy  556B2F:d3yg+ 3F5F1E:d3ng  206320:d3gn  1E5F3F:d3sg  1C5C5C:d3cy  2D5B76:d3cb  30437C:d3nb  483D8B:d3bl+ 463380:d3vb  593380:d3vi  6C3380:d3vm  444444:d5g2  443644:d5mg  443636:d5rg  434331:d5yg  324332:d5gg  314343:d5cg  363644:d5bg  "
-  , "730073:d4ma+ 730039:d4pk  800000:d4rd+ 681A00:d4ro  603000:d4or  584200:d4yo  554A00:d4am  525200:d4ye  636531:d4gy  3F5300:d4yg  2B5500:d4ng  006400:d4gn+ 00552B:d4sg  005252:d4cy  00426A:d4cb  001C6F:d4nb  00008B:d4bl+ 1D0073:d4vb  4B0082:d4vi+ 560073:d4vm  333333:d6g2  332833:d6mg  332828:d6rg  323223:d6yg  253225:d6gg  233232:d6cg  282833:d6bg  "
-  , "661F66:d5ma  661F42:d5pk  661F1F:d5rd  5D2B1A:d5ro  563616:d5or  4F4013:d5yo  4D4511:d5am  4A4A10:d5ye  454A10:d5gy  3D4B11:d5yg  2F4D11:d5ng  134F13:d5gn  114D2F:d5sg  2F4F4F:d5cy+ 1B455F:d5cb  1D2E63:d5nb  191970:d5bl+ 301F66:d5vb  421F66:d5vi  541F66:d5vm  222222:d7g2  221A22:d7mg  221A1A:d7rg  212117:d7yg  182118:d7gg  172121:d7cg  1A1A22:d7bg  "
-  , "4D004D:d6ma  4D0026:d6pk  4D0000:d6rd  461100:d6ro  402000:d6or  3B2C00:d6yo  393200:d6am  373700:d6ye  323700:d6gy  2A3800:d6yg  1C3900:d6ng  003B00:d6gn  00391C:d6sg  003737:d6cy  002C47:d6cb  00134A:d6nb  000080:d6bl+ 13004D:d6vb  26004D:d6vi  39004D:d6vm  111111:d8g2  110D11:d8mg  110D0D:d8rg  10100B:d8yg  0B110B:d8gg  0B1010:d8cg  0D0D11:d8bg  "
-  };
-  String[] longNames =
-  { "LavenderBlush=p1pk: #FFF0F5"
-  , "Linen=p1ro: #FAF0E6"
-  , "AntiqueWhite=p1or: #FAEBD7"
-  , "Cornsilk=p1yo: #FFF8DC"
-  , "LemonChiffon=p1am: #FFFACD"
-  , "Beige=p1ye: #F5F5DC"
-  , "OldLace=p1gy: #FDF5E6"
-  , "MintCream=p1sg: #F5FFFA"
-  , "Azure=p1cy: #F0FFFF"
-  , "AliceBlue=p1cb: #F0F8FF"
-  , "Lavender=p1bl: #E6E6FA"
-  , "White=wh: #FFFFFF"
-  , "Snow=p1wd: #FFF0F0"
-  , "Ivory=p1wy: #FDFDE9"
-  , "HoneyDew=p1we: #EAFEEA"
-  , "GhostWhite=p1wb: #F8F8FF"
-  , "MistyRose=p2ro: #FFE4E1"
-  , "BlanchedAlmond=p2or: #FFEBCD"
-  , "PapayaWhip=p2yo: #FFEFD5"
-  , "LightGoldenRodYellow=p2am: #FAFAD2"
-  , "LightYellow=p2ye: #FFFFE0"
-  , "LightCyan=p2cy: #E0FFFF"
-  , "WhiteSmoke=p2wh: #F5F5F5"
-  , "Moccasin=p3or: #FFE4B5"
-  , "PaleGoldenRod=p3am: #EEE8AA"
-  , "PowderBlue=p3cb: #B0E0E6"
-  , "Bisque=p4or: #FFE4C4"
-  , "Wheat=p4yo: #F5DEB3"
-  , "Gainsboro=l2gr: #DCDCDC"
-  , "LightPink=l1pk: #FFB6C1"
-  , "Pink=l1rd: #FFC0CB"
-  , "PeachPuff=l1or: #FFDAB9"
-  , "NavajoWhite=l1yo: #FFDEAD"
-  , "Khaki=l1am: #F0E68C"
-  , "LightGreen=l1gn: #90EE90"
-  , "Aquamarine=l1sg: #7FFFD4"
-  , "LightBlue=l1cb: #ADD8E6"
-  , "LightSteelBlue=l1nb: #B0C4DE"
-  , "LightGray=l3gr: #D3D3D3"
-  , "PaleGreen=l2gn: #98FB98"
-  , "PaleTurquoise=l2cy: #AFEEEE"
-  , "LightSkyBlue=l2cb: #87CEFA"
-  , "Silver=l4gr: #C0C0C0"
-  , "LightSalmon=l3ro: #FFA07A"
-  , "LightSkyBlue=l3cb: #87CEFA"
-  , "DarkGray=l5gr: #A9A9A9"
-  , "LightCoral=l4rd: #F08080"
-  , "SandyBrown=l4or: #F4A460"
-  , "MediumSpringGreen=l4sg: #00FA9A"
-  , "Aqua=l4cy: #00FFFF"
-  , "SkyBlue=l4cb: #87CEEB"
-  , "Coral=l5ro: #FF7F50"
-  , "Orange=l5or: #FFA500"
-  , "Gold=l5yo: #FFD700"
-  , "Yellow=l5ye: #FFFF00"
-  , "Chartreuse=l5ng: #7FFF00"
-  , "SpringGreen=l5sg: #00FF7F"
-  , "Cyan=l5cy: #00FFFF"
-  , "CornflowerBlue=l5nb: #6495ED"
-  , "Gray=d2gr: #808080"
-  , "Tomato=s1ro: #FF6347"
-  , "Lime=s1gn: #00FF00"
-  , "DeepSkyBlue=s1cb: #00BFFF"
-  , "HotPink=g1pk: #FF69B4"
-  , "Salmon=g1rd: #FA8072"
-  , "MediumTurquoise=g1cy: #48D1CC"
-  , "DeepPink=s2pk: #FF1493"
-  , "DarkOrange=s2or: #FF8C00"
-  , "Turquoise=s2cy: #40E0D0"
-  , "Magenta=s3ma: #FF00FF"
-  , "OrangeRed=s3ro: #FF4500"
-  , "GoldenRod=s3yo: #DAA520"
-  , "YellowGreen=s3yg: #9ACD32"
-  , "DarkTurquoise=s3cy: #00CED1"
-  , "BlueViolett=s3vi: #8A2BE2"
-  , "Thistle=g2ma: #FF99FF"
-  , "BurlyWood=g2or: #DEB887"
-  , "DarkSalmon=g3ro: #E9967A"
-  , "Tan=g3or: #D2B48C"
-  , "DarkKhaki=g3am: #BDB76B"
-  , "MediumAquaMarine=g3sg: #66CDAA"
-  , "Chocolate=g4or: #D2691E"
-  , "LimeGreen=g4gn: #32CD32"
-  , "SlateBlue=g4bl: #6A5ACD"
-  , "FloralWhite=whye2: #FFFAF0"
-  , "Lavender=whbl2: #E6E6FA"
-  , "Fuchsia=s4ma: #FF00FF"
-  , "Red=s4rd: #FF0000"
-  , "LightSeaGreen=s4cy: #20B2AA"
-  , "DodgerBlue=s4cb: #1E90FF"
-  , "Blue=s4bl: #0000FF"
-  , "Crimson=s5pk: #DC143C"
-  , "DarkGoldenRod=s5yo: #B8860B"
-  , "Peru=g5or: #CD853F"
-  , "MediumSeaGreen=g5sg: #3CB371"
-  , "RoyalBlue=g5nb: #4169E1"
-  , "MediumOrchid=g5vm: #BA55D3"
-  , "Orchid=g6ma: #E673E6"
-  , "CadetBlue=g6cy: #5F9EA0"
-  , "MediumSlateBlue=g6bl: #7B68EE"
-  , "MediumPurple=g6vb: #9370DB"
-  , "Plum=g7ma: #CC7ACC"
-  , "RosyBrown=g7rd: #BC8F8F"
-  , "DarkSeaGreen=g7gn: #8FBC8F"
-  , "LightSlateGray=g7nb: #778899"
-  , "MediumVioletRed=g8pk: #C71585"
-  , "IndianRed=g8rd: #CD5C5C"
-  , "SteelBlue=g8cb: #4682B4"
-  , "DarkOrchid=g8vm: #9932CC"
-  , "Sienna=s6or: #A0522D"
-  , "OliveDrab=s6yg: #6B8E23"
-  , "DarkCyan=s6cy: #008B8B"
-  , "MediumBlue=s6bl: #0000CD"
-  , "DarkViolett=s6vm: #9400D3"
-  , "DarkMagenta=d1ma: #A600A6"
-  , "SaddleBrown=d1or: #8B4513"
-  , "Olive=d1ye: #808000"
-  , "Green=d1gn: #008000"
-  , "Teal=d1cy: #008080"
-  , "Brown=d2rd: #B22222"
-  , "ForestGreen=d2gn: #228B22"
-  , "SeaGreen=d2sg: #2E8B57"
-  , "SlateGray=d2cb: #28688E"
-  , "RebeccaPurple=d2vi: #663399"
-  , "DarkOliveGreen=d3yg: #556B2F"
-  , "DarkSlateBlue=d3bl: #483D8B"
-  , "Purple=d4ma: #730073"
-  , "DarkRed=d4rd: #800000"
-  , "DarkGreen=d4gn: #006400"
-  , "Darkblue=d4bl: #00008B"
-  , "Indigo=d4vi: #4B0082"
-  , "DarkSlateGray=d5cy: #2F4F4F"
-  , "MidnightBlue=d5bl: #191970"
-  , "Navy=d6bl: #000080"
-  };
 
   
-  String[] valOk22 =
-  { "FFE6FF:p1ma  FFF0F5:p1pk+ FFE6E6:p1rd  FAF0E6:p1ro+ FAEBD7:p1or+ FFF8DC:p1yo+ FFFACD:p1am+ F5F5DC:p1ye+ FDF5E6:p1gy+ F5FFD6:p1yg  EBFFD8:p1ng  DBFFDB:p1gn  F5FFFA:p1sg+ F0FFFF:p1cy+ F0F8FF:p1cb+ E5EBFF:p1nb  E6E6FA:p1bl+ ECE6FF:p1vb  F2E6FF:p1vi  F9E6FF:p1vm  FFFFFF:wh+   FFF0FF:p1wm  FFFAFA:p1wd  FFFFF0:p1wy  F0FFF0:p1we  E9FDFD:p1wc  F8F8FF:p1wb+ "
-  , "FFE6FF:p2ma  FFE6F2:p2pk  FFE6E6:p2rd  FFE4E1:p2ro+ FFEBCD:p2or+ FFEFD5:p2yo+ FAFAD2:p2am+ FFFFE0:p2ye+ FBFFD5:p2gy  F5FFD6:p2yg  EBFFD8:p2ng  DBFFDB:p2gn  D8FFEB:p2sg  E0FFFF:p2cy+ E3F5FF:p2cb  E5EBFF:p2nb  E6E6FF:p2bl  ECE6FF:p2vb  F2E6FF:p2vi  F9E6FF:p2vm  F5F5F5:p2wh+ EED9EE:p2wm  EED9D9:p2wd+ ECECD0:p2wy+ D2ECD2:p2we+ D0ECEC:p2wc  D9D9EE:p2wu  "
-  , "FFD9FF:p3ma  FFD9EC:p3pk  FFD9D9:p3rd  FFE4C4:p3ro+ FFE4B5:p3or+ FFDEAD:p3yo+ EEE8AA:p3am+ FFFFBF:p3ye  F9FFC0:p3gy  F0FFC2:p3yg  E2FFC4:p3ng  C8FFC8:p3gn  C4FFE2:p3sg  BFFFFF:p3cy  B0E0E6:p3cb+ D7E1FF:p3nb  D9D9FF:p3bl  E2D9FF:p3vb  ECD9FF:p3vi  F5D9FF:p3vm  DDDDDD:l1gr  DDC4DD:l1gm  DDC4C4:l1gd  DBDBB9:l1gy  BCDBBC:l1ge  B9DBDB:l1gc  C4C4DD:l1gu  "
-  , "FFCCFF:p4ma  FFCCE6:p4pk  FFCCCC:p4rd  FFD5C6:p4ro  FFDFBF:p4or  FFEDB6:p4yo  FFF5B1:p4am  FFFFAA:p4ye  F7FFAB:p4gy  EBFFAD:p4yg  D8FFB1:p4ng  B6FFB6:p4gn  B1FFD8:p4sg  AAFFFF:p4cy  C7EAFF:p4cb  CAD7FF:p4nb  CCCCFF:p4bl  D9CCFF:p4vb  E6CCFF:p4vi  F2CCFF:p4vm  DCDCDC:l2gr+ CCAFCC:l2gm  CCAFAF:l2gd  C9C9A3:l2gy  A6CAA6:l2ge  A3C9C9:l2gc  AFAFCC:l2gu  "
-  , "FFB3FF:l1ma  FFB6C1:l1pk+ FFC0CB:l1rd+ F5DEB3:l1ro+ FFDAB9:l1or+ FFE492:l1yo  F0E68C:l1am+ FFFF80:l1ye  F2FF82:l1gy  E0FF85:l1yg  C4FF89:l1ng  90EE90:l1gn+ 7FFFD4:l1sg+ 80FFFF:l1cy  ADD8E6:l1cb+ B0C4DE:l1nb+ B3B3FF:l1bl  C6B3FF:l1vb  D9B3FF:l1vi  ECB3FF:l1vm  D3D3D3:l3gr+ BB9CBB:l3gm  BB9C9C:l3gd  B8B88F:l3gy  92B992:l3ge  8FB8B8:l3gc  9C9CBB:l3gu  "
-  , "FF99FF:l2ma  FF99CC:l2pk  FF9999:l2rd  FFAA8E:l2ro  FFBF80:l2or  FFDB6D:l2yo  FFEB62:l2am  FFFF55:l2ye  EEFF58:l2gy  D6FF5C:l2yg  B1FF62:l2ng  98FB98:l2gn+ 62FFB1:l2sg  AFEEEE:l2cy+ 87CEFA:l2cb+ 95B0FF:l2nb  9999FF:l2bl  B399FF:l2vb  CC99FF:l2vi  E699FF:l2vm  C0C0C0:l4gr+ AA89AA:l4gm  AA8989:l4gd  A7A77C:l4gy  7FA87F:l4ge  7CA7A7:l4gc  8989AA:l4gu  "
-  , "FF94FF:l3ma  FF94C9:l3pk  FF9494:l3rd  FFA07A:l3ro+ FFB76E:l3or  FFD454:l3yo  F6E14E:l3am  EDED48:l3ye  DEEE49:l3gy  C8F14B:l3yg  A2F64E:l3ng  54FF54:l3gn  4EF6A2:l3sg  48EDED:l3cy  87CEFA:l3cb+ 8FABFF:l3nb  9494FF:l3bl  AF94FF:l3vb  C994FF:l3vi  E494FF:l3vm  A9A9A9:l5gr+ 997799:l5gm  997777:l5gd  95956A:l5gy  6E966E:l5ge  6A9595:l5gc  777799:l5gu  "
-  , "FF80FF:l4ma  FF80BF:l4pk  F08080:l4rd+ FF9571:l4ro  F4A460:l4or+ FFD149:l4yo  FFE63B:l4am  FFFF2B:l4ye  EAFF2E:l4gy  CCFF33:l4yg  9DFF3B:l4ng  49FF49:l4gn  00FA9A:l4sg+ 00FFFF:l4cy+ 87CEEB:l4cb+ 7B9CFF:l4nb  8080FF:l4bl  9F80FF:l4vb  BF80FF:l4vi  DF80FF:l4vm  888888:d1gr  886688:d1gm  886666:d1gd  84845A:d1gy  5D855D:d1ge  5A8484:d1gc  666688:d1gu  "
-  , "FF66FF:l5ma  FF66B3:l5pk  FF6666:l5rd  FF7F50:l5ro+ FFA500:l5or+ FFD700:l5yo+ FFE214:l5am  FFFF00:l5ye+ E6FF04:l5gy  C2FF0A:l5yg  7FFF00:l5ng+ 24FF24:l5gn  00FF7F:l5sg+ 00FFFF:l5cy+ 58C0FF:l5cb  6495ED:l5nb+ 6666FF:l5bl  8C66FF:l5vb  B366FF:l5vi  D966FF:l5vm  808080:d2gr+ 775677:d2gm  775656:d2gd  74744B:d2gy  4E744E:d2ge  4B7474:d2gc  565677:d2gu  "
-  , "FF4CFF:s1ma  FF4CA6:s1pk  FF4C4C:s1rd  FF6347:s1ro+ FF8F20:s1or  FFBF00:s1yo  F6D700:s1am  EDED00:s1ye  D7EE00:s1gy  B5F100:s1yg  7BF600:s1ng  00FF00:s1gn+ 00F67B:s1sg  00EDED:s1cy  00BFFF:s1cb+ 4675FF:s1nb  4C4CFF:s1bl  794CFF:s1vb  A64CFF:s1vi  D24CFF:s1vm  666666:d3gr  664766:d3gm  664747:d3gd  62623C:d3gy  3F633F:d3ge  3C6262:d3gc  474766:d3gu  "
-  , "FF70FF:g1ma  FF69B4:g1pk+ FA8072:g1rd+ FF845C:g1ro  FFA042:g1or  EBBE38:g1yo  E3CD33:g1am  DBDB2F:g1ye  CBDC30:g1gy  B3DF31:g1yg  8BE333:g1ng  38EB38:g1gn  33E38B:g1sg  48D1CC:g1cy+ 5FC3FF:g1cb  6A8FFF:g1nb  7070FF:g1bl  9470FF:g1vb  B870FF:g1vi  DB70FF:g1vm  555555:d4gr  553955:d4gm  553939:d4gd  4F4F2E:d4gy  315031:d4ge  2E4F4F:d4gc  393955:d4gu  "
-  , "FF33FF:s2ma  FF1493:s2pk+ FF3333:s2rd  FF551C:s2ro  FF8C00:s2or+ EBB100:s2yo  E3C600:s2am  DBDB00:s2ye  C6DC00:s2gy  A7DF00:s2yg  71E300:s2ng  00EB00:s2gn  00E371:s2sg  40E0D0:s2cy+ 20ACFF:s2cb  2C61FF:s2nb  3333FF:s2bl  6633FF:s2vb  9933FF:s2vi  CC33FF:s2vm  444444:d5gr  442C44:d5gm  442C2C:d5gd  3D3D22:d5gy  243E24:d5ge  223D3D:d5gc  2C2C44:d5gu  "
-  , "FF00FF:s3ma+ FF1A8C:s3pk  FF1A1A:s3rd  FF4500:s3ro+ EA7500:s3or  DAA520:s3yo+ D0B600:s3am  C8C800:s3ye  B6CA00:s3gy  9ACD32:s3yg+ 68D000:s3ng  00D800:s3gn  00D068:s3sg  00CED1:s3cy+ 05A1FF:s3cb  124DFF:s3nb  1A1AFF:s3bl  531AFF:s3vb  8A2BE2:s3vi+ C61AFF:s3vm  333333:d6gr  332033:d6gm  332020:d6gd  2C2C17:d6gy  192D19:d6ge  172C2C:d6gc  202033:d6gu  "
-  , "FF99FF:g2ma+ FF99CC:g2pk  FF9999:g2rd  F3A68C:g2ro  DEB887:g2or+ DEC475:g2yo  D9CC70:g2am  D5D56B:g2ye  CBD56C:g2gy  BCD76E:g2yg  A5D970:g2ng  75DE75:g2gn  70D9A5:g2sg  6BD5D5:g2cy  8ECEF5:g2cb  94AEFB:g2nb  9999FF:g2bl  B399FF:g2vb  CC99FF:g2vi  E699FF:g2vm  222222:d7gr  221422:d7gm  221414:d7gd  1C1C0E:d7gy  0F1D0F:d7ge  0E1C1C:d7gc  141422:d7gu  "
-  , "FF80FF:g3ma  FF80BF:g3pk  FF8080:g3rd  E9967A:g3ro+ D2B48C:g3or+ C9AC55:g3yo  BDB76B:g3am+ BCBC4B:g3ye  B1BD4C:g3gy  A2BF4D:g3yg  89C250:g3ng  55C955:g3gn  66CDAA:g3sg+ 4BBCBC:g3cy  72BFED:g3cb  7A99F8:g3nb  8080FF:g3bl  9F80FF:g3vb  BF80FF:g3vi  DF80FF:g3vm  111111:d8gr  110A11:d8gm  110A0A:d8gd  0D0D06:d8gy  070E07:d8ge  060D0D:d8gc  0A0A11:d8gu  "
-  , "FF4DFF:g4ma  FF4DA6:g4pk  FF4D4D:g4rd  E96B41:g4ro  D2691E:g4or+ C7A12F:g4yo  BFAD2B:g4am  B9B928:g4ye  ACBA29:g4gy  97BC2A:g4yg  75BF2B:g4ng  32CD32:g4gn+ 2BBF75:g4sg  28B9B9:g4cy  43ADEC:g4cb  4874F7:g4nb  6A5ACD:g4bl+ 794DFF:g4vb  A64DFF:g4vi  D24DFF:g4vm  FFFFFF:p1w2  FFFAFF:p1mw  FFFAFA:p1rw  FFFAF0:whye2+ F8FFF8:p1gw  F7FEFE:p1cw  E6E6FA:whbl2+ "
-  , "FF00FF:s4ma+ FF0080:s4pk  FF0000:s4rd+ E83A00:s4ro  D56A00:s4or  C49300:s4yo  BDA500:s4am  B6B600:s4ye  A5B700:s4gy  8BB900:s4yg  5EBD00:s4ng  00C400:s4gn  00BD5E:s4sg  20B2AA:s4cy+ 1E90FF:s4cb+ 003EF7:s4nb  0000FF:s4bl+ 4000FF:s4vb  8000FF:s4vi  BF00FF:s4vm  EEEEEE:p2w2  EEE5EE:p2mw  EEE5E5:p2rw  EDEDE1:p2yw  E2EDE2:p2gw  E1EDED:p2cw  E5E5EE:p2bw  "
-  , "E600E6:s5ma  DC143C:s5pk+ E60000:s5rd  D13400:s5ro  BF6000:s5or  B8860B:s5yo+ AA9500:s5am  A4A400:s5ye  95A500:s5gy  7DA700:s5yg  55AA00:s5ng  00B100:s5gn  00AA55:s5sg  00A4A4:s5cy  0084D4:s5cb  0038DE:s5nb  0000E6:s5bl  3900E6:s5vb  7300E6:s5vi  AC00E6:s5vm  DDDDDD:l1g2  DDD1DD:l1mg  DDD1D1:l1rg  DCDCCC:l1yg  CDDCCD:l1gg  CCDCDC:l1cg  D1D1DD:l1bg  "
-  , "E645E6:g5ma  E64595:g5pk  E64545:g5rd  D2603A:g5ro  CD853F:g5or+ B3912A:g5yo  AC9C27:g5am  A6A624:g5ye  9AA825:g5gy  88A925:g5yg  6AAC27:g5ng  2AB32A:g5gn  3CB371:g5sg+ 24A6A6:g5cy  3C9BD5:g5cb  4169E1:g5nb+ 4545E6:g5bl  6D45E6:g5vb  9545E6:g5vi  BA55D3:g5vm+ CCCCCC:l2g2  CCBECC:l2mg  CCBEBE:l2rg  CBCBB7:l2yg  B9CBB9:l2gg  B7CBCB:l2cg  BEBECC:l2bg  "
-  , "E673E6:g6ma+ E673AC:g6pk  E67373:g6rd  D38064:g6ro  C28D58:g6or  B59B4D:g6yo  AFA248:g6am  A9A943:g6ye  A0AA44:g6gy  92AC46:g6yg  7BAF48:g6ng  4DB54D:g6gn  48AF7B:g6sg  5F9EA0:g6cy+ 66ACD5:g6cb  6E8ADF:g6nb  7B68EE:g6bl+ 9370DB:g6vb+ AC73E6:g6vi  C973E6:g6vm  BBBBBB:l3g2  BBABBB:l3mg  BBABAB:l3rg  B9B9A3:l3yg  A5BAA5:l3gg  A3B9B9:l3cg  ABABBB:l3bg  "
-  , "CC7ACC:g7ma+ CC7AA3:g7pk  BC8F8F:g7rd+ C28570:g7ro  B99066:g7or  B19C5E:g7yo  AEA35A:g7am  AAAA56:g7ye  A2AB56:g7gy  97AC58:g7yg  84AE5A:g7ng  8FBC8F:g7gn+ 5AAE84:g7sg  56AAAA:g7cy  72A5C4:g7cb  778899:g7nb+ 7A7ACC:g7bl  8F7ACC:g7vb  A37ACC:g7vi  B87ACC:g7vm  AAAAAA:l4g2  AA98AA:l4mg  AA9898:l4rg  A8A891:l4yg  93A993:l4gg  91A8A8:l4cg  9898AA:l4bg  "
-  , "CC52CC:g8ma  C71585:g8pk+ CD5C5C:g8rd+ BA6346:g8ro  AB743C:g8or  9E8434:g8yo  998C30:g8am  93932D:g8ye  8A942D:g8gy  7C962F:g8yg  649930:g8ng  349E34:g8gn  309964:g8sg  2D9393:g8cy  4682B4:g8cb+ 4D6CC6:g8nb  5252CC:g8bl  7052CC:g8vb  8F52CC:g8vi  9932CC:g8vm+ 999999:l5g2  998799:l5mg  998787:l5rg  97977F:l5yg  819881:l5gg  7F9797:l5cg  878799:l5bg  "
-  , "CC00CC:s6ma  CC0066:s6pk  CC0000:s6rd  B92E00:s6ro  A0522D:s6or+ 9D7600:s6yo  978400:s6am  929200:s6ye  849300:s6gy  6B8E23:s6yg+ 4C9700:s6ng  009D00:s6gn  00974C:s6sg  008B8B:s6cy+ 0076BC:s6cb  0031C5:s6nb  0000CD:s6bl+ 3300CC:s6vb  6600CC:s6vi  9400D3:s6vm+ 888888:d1g2  887588:d1mg  887575:d1rg  86866E:d1yg  6F876F:d1gg  6E8686:d1cg  757588:d1bg  "
-  , "A600A6:d1ma+ A60053:d1pk  A60000:d1rd  972600:d1ro  8B4513:d1or+ 806000:d1yo  7B6B00:d1am  808000:d1ye+ 6B7700:d1gy  5A7900:d1yg  3D7B00:d1ng  008000:d1gn+ 007B3D:d1sg  008080:d1cy+ 006099:d1cb  0028A0:d1nb  0000A6:d1bl  2900A6:d1vb  5300A6:d1vi  7C00A6:d1vm  777777:d2g2  776577:d2mg  776565:d2rg  75755D:d2yg  5F765F:d2gg  5D7575:d2cg  656577:d2bg  "
-  , "992E99:d2ma  992E63:d2pk  B22222:d2rd+ 8C4027:d2ro  815121:d2or  77601C:d2yo  73681A:d2am  6F6F18:d2ye  677018:d2gy  5B7119:d2yg  46731A:d2ng  228B22:d2gn+ 2E8B57:d2sg+ 186F6F:d2cy  708090:d2cb  2B4694:d2nb  2E2E99:d2bl  492E99:d2vb  663399:d2vi+ 7E2E99:d2vm  666666:d3g2  665566:d3mg  665555:d3rg  64644E:d3yg  4F654F:d3gg  4E6464:d3cg+ 555566:d3bg  "
-  , "994D99:g9ma  994D73:g9pk  994D4D:g9rd  8C5543:g9ro  825E3A:g9or  786733:g9yo  746C30:g9am  71712D:g9ye  6A712E:g9gy  61722E:g9yg  527430:g9ng  337833:g9gn  307452:g9sg  2D7171:g9cy  44738E:g9cb  495C95:g9nb  4D4D99:g9bl  604D99:g9vb  734D99:g9vi  864D99:g9vm  555555:d4g2  554555:d4mg  554545:d4rg  53533F:d4yg  405440:d4gg  3F5353:d4cg  454555:d4bg  "
-  , "803380:d3ma  803359:d3pk  803333:d3rd  743E2C:d3ro  6B4826:d3or  635220:d3yo  5F571E:d3am  5C5C1C:d3ye  565D1C:d3gy  556B2F:d3yg+ 3F5F1E:d3ng  206320:d3gn  1E5F3F:d3sg  1C5C5C:d3cy  2D5B76:d3cb  30437C:d3nb  483D8B:d3bl+ 463380:d3vb  593380:d3vi  6C3380:d3vm  444444:d5g2  443644:d5mg  443636:d5rg  434331:d5yg  324332:d5gg  314343:d5cg  363644:d5bg  "
-  , "730073:d4ma+ 730039:d4pk  800000:d4rd+ 681A00:d4ro  603000:d4or  584200:d4yo  554A00:d4am  525200:d4ye  4A5300:d4gy  3F5300:d4yg  2B5500:d4ng  006400:d4gn+ 00552B:d4sg  005252:d4cy  00426A:d4cb  001C6F:d4nb  00008B:d4bl+ 1D0073:d4vb  4B0082:d4vi+ 560073:d4vm  333333:d6g2  332833:d6mg  332828:d6rg  323223:d6yg  253225:d6gg  233232:d6cg  282833:d6bg  "
-  , "661F66:d5ma  661F42:d5pk  661F1F:d5rd  5D2B1A:d5ro  563616:d5or  4F4013:d5yo  4D4511:d5am  4A4A10:d5ye  454A10:d5gy  3D4B11:d5yg  2F4D11:d5ng  134F13:d5gn  114D2F:d5sg  2F4F4F:d5cy+ 1B455F:d5cb  1D2E63:d5nb  191970:d5bl+ 301F66:d5vb  421F66:d5vi  541F66:d5vm  222222:d7g2  221A22:d7mg  221A1A:d7rg  212117:d7yg  182118:d7gg  172121:d7cg  1A1A22:d7bg  "
-  , "4D004D:d6ma  4D0026:d6pk  4D0000:d6rd  461100:d6ro  402000:d6or  3B2C00:d6yo  393200:d6am  373700:d6ye  323700:d6gy  2A3800:d6yg  1C3900:d6ng  003B00:d6gn  00391C:d6sg  003737:d6cy  002C47:d6cb  00134A:d6nb  000080:d6bl+ 13004D:d6vb  26004D:d6vi  39004D:d6vm  111111:d8g2  110D11:d8mg  110D0D:d8rg  10100B:d8yg  0B110B:d8gg  0B1010:d8cg  0D0D11:d8bg  "
-  };
-
-  
-  String[] longNames22 =
-  { "LavenderBlush=p1pk: #FFF0F5"
-  , "Linen=p1ro: #FAF0E6"
-  , "AntiqueWhite=p1or: #FAEBD7"
-  , "Cornsilk=p1yo: #FFF8DC"
-  , "LemonChiffon=p1am: #FFFACD"
-  , "Beige=p1ye: #F5F5DC"
-  , "OldLace=p1gy: #FDF5E6"
-  , "MintCream=p1sg: #F5FFFA"
-  , "Azure=p1cy: #F0FFFF"
-  , "AliceBlue=p1cb: #F0F8FF"
-  , "Lavender=p1bl: #E6E6FA"
-  , "White=wh: #FFFFFF"
-  , "Snow=p1wd: #FFFAFA"
-  , "Ivory=p1wy: #FFFFF0"
-  , "HoneyDew=p1we: #F0FFF0"
-  , "GhostWhite=p1wb: #F8F8FF"
-  , "MistyRose=p2ro: #FFE4E1"
-  , "BlanchedAlmond=p2or: #FFEBCD"
-  , "PapayaWhip=p2yo: #FFEFD5"
-  , "LightGoldenRodYellow=p2am: #FAFAD2"
-  , "LightYellow=p2ye: #FFFFE0"
-  , "LightCyan=p2cy: #E0FFFF"
-  , "WhiteSmoke=p2wh: #F5F5F5"
-  , "Bisque=p3ro: #FFE4C4"
-  , "Moccasin=p3or: #FFE4B5"
-  , "NavajoWhite=p3yo: #FFDEAD"
-  , "PaleGoldenRod=p3am: #EEE8AA"
-  , "PowderBlue=p3cb: #B0E0E6"
-  , "Gainsboro=l2gr: #DCDCDC"
-  , "LightPink=l1pk: #FFB6C1"
-  , "Pink=l1rd: #FFC0CB"
-  , "Wheat=l1ro: #F5DEB3"
-  , "PeachPuff=l1or: #FFDAB9"
-  , "Khaki=l1am: #F0E68C"
-  , "LightGreen=l1gn: #90EE90"
-  , "Aquamarine=l1sg: #7FFFD4"
-  , "LightBlue=l1cb: #ADD8E6"
-  , "LightSteelBlue=l1nb: #B0C4DE"
-  , "LightGray=l3gr: #D3D3D3"
-  , "PaleGreen=l2gn: #98FB98"
-  , "PaleTurquoise=l2cy: #AFEEEE"
-  , "LightSkyBlue=l2cb: #87CEFA"
-  , "Silver=l4gr: #C0C0C0"
-  , "LightSalmon=l3ro: #FFA07A"
-  , "LightSkyBlue=l3cb: #87CEFA"
-  , "DarkGray=l5gr: #A9A9A9"
-  , "LightCoral=l4rd: #F08080"
-  , "SandyBrown=l4or: #F4A460"
-  , "MediumSpringGreen=l4sg: #00FA9A"
-  , "Aqua=l4cy: #00FFFF"
-  , "SkyBlue=l4cb: #87CEEB"
-  , "Coral=l5ro: #FF7F50"
-  , "Orange=l5or: #FFA500"
-  , "Gold=l5yo: #FFD700"
-  , "Yellow=l5ye: #FFFF00"
-  , "Chartreuse=l5ng: #7FFF00"
-  , "SpringGreen=l5sg: #00FF7F"
-  , "Cyan=l5cy: #00FFFF"
-  , "CornflowerBlue=l5nb: #6495ED"
-  , "Gray=d2gr: #808080"
-  , "Tomato=s1ro: #FF6347"
-  , "Lime=s1gn: #00FF00"
-  , "DeepSkyBlue=s1cb: #00BFFF"
-  , "HotPink=g1pk: #FF69B4"
-  , "Salmon=g1rd: #FA8072"
-  , "MediumTurquoise=g1cy: #48D1CC"
-  , "DeepPink=s2pk: #FF1493"
-  , "DarkOrange=s2or: #FF8C00"
-  , "Turquoise=s2cy: #40E0D0"
-  , "OrangeRed=s3ro: #FF4500"
-  , "GoldenRod=s3yo: #DAA520"
-  , "YellowGreen=s3yg: #9ACD32"
-  , "DarkTurquoise=s3cy: #00CED1"
-  , "BlueViolett=s3vi: #8A2BE2"
-  , "Magenta=s3ma: #FF00FF"
-  , "BurlyWood=g2or: #DEB887"
-  , "Thistle=g2ma: #FF99FF"
-  , "DarkSalmon=g3ro: #E9967A"
-  , "Tan=g3or: #D2B48C"
-  , "DarkKhaki=g3am: #BDB76B"
-  , "MediumAquaMarine=g3sg: #66CDAA"
-  , "Chocolate=g4or: #D2691E"
-  , "LimeGreen=g4gn: #32CD32"
-  , "SlateBlue=g4bl: #6A5ACD"
-  , "FloralWhite=whye2: #FFFAF0"
-  , "Lavender=whbl2: #E6E6FA"
-  , "Red=s4rd: #FF0000"
-  , "LightSeaGreen=s4cy: #20B2AA"
-  , "DodgerBlue=s4cb: #1E90FF"
-  , "Blue=s4bl: #0000FF"
-  , "Fuchsia=s4ma: #FF00FF"
-  , "Crimson=s5pk: #DC143C"
-  , "DarkGoldenRod=s5yo: #B8860B"
-  , "Peru=g5or: #CD853F"
-  , "MediumSeaGreen=g5sg: #3CB371"
-  , "RoyalBlue=g5nb: #4169E1"
-  , "MediumOrchid=g5vm: #BA55D3"
-  , "CadetBlue=g6cy: #5F9EA0"
-  , "MediumSlateBlue=g6bl: #7B68EE"
-  , "MediumPurple=g6vb: #9370DB"
-  , "Orchid=g6ma: #E673E6"
-  , "RosyBrown=g7rd: #BC8F8F"
-  , "DarkSeaGreen=g7gn: #8FBC8F"
-  , "LightSlateGray=g7nb: #778899"
-  , "Plum=g7ma: #CC7ACC"
-  , "MediumVioletRed=g8pk: #C71585"
-  , "IndianRed=g8rd: #CD5C5C"
-  , "SteelBlue=g8cb: #4682B4"
-  , "DarkOrchid=g8vm: #9932CC"
-  , "Sienna=s6or: #A0522D"
-  , "OliveDrab=s6yg: #6B8E23"
-  , "DarkCyan=s6cy: #008B8B"
-  , "MediumBlue=s6bl: #0000CD"
-  , "DarkViolett=s6vm: #9400D3"
-  , "SaddleBrown=d1or: #8B4513"
-  , "Olive=d1ye: #808000"
-  , "Green=d1gn: #008000"
-  , "Teal=d1cy: #008080"
-  , "DarkMagenta=d1ma: #A600A6"
-  , "Brown=d2rd: #B22222"
-  , "ForestGreen=d2gn: #228B22"
-  , "SeaGreen=d2sg: #2E8B57"
-  , "SlateGray=d2cb: #708090"
-  , "RebeccaPurple=d2vi: #663399"
-  , "DarkOliveGreen=d3yg: #556B2F"
-  , "DarkSlateBlue=d3bl: #483D8B"
-  , "DarkRed=d4rd: #800000"
-  , "DarkGreen=d4gn: #006400"
-  , "Darkblue=d4bl: #00008B"
-  , "Indigo=d4vi: #4B0082"
-  , "Purple=d4ma: #730073"
-  , "DarkSlateGray=d5cy: #2F4F4F"
-  , "MidnightBlue=d5bl: #191970"
-  , "Navy=d6bl: #000080"
-  };
-
-  
-  String[] valOkSave =
-  { "FFE6FF:p1ma  FFF0F5:p1pk+ FFE6E6:p1rd  FAF0E6:p1ro+ FAEBD7:p1or+ FFF8DC:p1yo+ FFFACD:p1am+ F5F5DC:p1ye+ FDF5E6:p1gy+ F5FFD6:p1yg  EBFFD8:p1ng  DBFFDB:p1gn  F5FFFA:p1sg+ F0FFFF:p1cy+ F0F8FF:p1cb+ E5EBFF:p1nb  E6E6FA:p1bl+ ECE6FF:p1vb  F2E6FF:p1vi  F9E6FF:p1vm  FFE6FF:p1ma  FFFFFF:wh+   FFF7FF:whm1  FFFAFA:wh1r+ FFFFF0:whye+ F0FFF0:whgn+ F4FEFE:whc1  F8F8FF:whbl+ "
-  , "FFE6FF:p2ma  FFE6F2:p2pu  FFE6E6:p2rd  FFE4E1:p2ro+ FFEBCD:p2or+ FFEFD5:p2yo+ FAFAD2:p2am+ FFFFE0:p2ye+ FBFFD5:p2gy  F5FFD6:p2yg  EBFFD8:p2ng  DBFFDB:p2gn  D8FFEB:p2sg  E0FFFF:p2cy+ E3F5FF:p2cb  E5EBFF:p2nb  E6E6FF:p2bl  ECE6FF:p2vb  F2E6FF:p2vi  F9E6FF:p2vm  FFE6FF:p2ma  F5F5F5:gr1+  EEE2EE:g1m1  EEE2E2:g1r1  EDEDDC:g1y1  DEEDDE:g1g1  DCEDED:g1c1  E2E2EE:g1b1  "
-  , "FFD9FF:p3ma  FFD9EC:p3pu  FFD9D9:p3rd  FFE4C4:p3ro+ FFE4B5:p3or+ FFDEAD:p3yo+ EEE8AA:p3am+ FFFFBF:p3ye  F9FFC0:p3gy  F0FFC2:p3yg  E2FFC4:p3ng  C8FFC8:p3gn  C4FFE2:p3sg  BFFFFF:p3cy  B0E0E6:p3cb+ D7E1FF:p3nb  D9D9FF:p3bl  E2D9FF:p3vb  ECD9FF:p3vi  F5D9FF:p3vm  FFD9FF:p3ma  DCDCDC:gr2   DDCEDD:g2m1  DDCECE:g2r1  DBDBC6:g2y1  C8DCC8:g2g1  C6DBDB:g2c1  CECEDD:g2b1  "
-  , "FFCCFF:p4ma  FFCCE6:p4pu  FFCCCC:p4rd  FFE4C4:p4ro  FFE4B5:p4or  FFDEAD:p4yo  EEE8AA:p4am  FFFFAA:p4ye  F7FFAB:p4gy  EBFFAD:p4yg  D8FFB1:p4ng  B6FFB6:p4gn  B1FFD8:p4sg  AAFFFF:p4cy  B0E0E6:p4cb  CAD7FF:p4nb  CCCCFF:p4bl  D9CCFF:p4vb  E6CCFF:p4vi  F2CCFF:p4vm  FFCCFF:p4ma  DCDCDC:gr2+  CCBACC:g3m1  CCBABA:g3r1  CACAB1:g3y1  B3CBB3:g3g1  B1CACA:g3c1  BABACC:g3b1  "
-  , "FFB3FF:l1ma  FFB6C1:l1pk+ FFC0CB:l1rd+ F5DEB3:l1ro+ FFDAB9:l1or+ FFE492:l1yo  F0E68C:l1am+ FFFF80:l1ye  F2FF82:l1gy  E0FF85:l1yg  C4FF89:l1ng  90EE90:l1gn+ 7FFFD4:l1sg+ 80FFFF:l1cy  ADD8E6:l1cb+ B0C4DE:l1nb+ B3B3FF:l1bl  C6B3FF:l1vb  D9B3FF:l1vi  ECB3FF:l1vm  FFB3FF:l1ma  D3D3D3:gr3+  BBA6BB:g4m1  BBA6A6:g4r1  B9B99D:g4y1  A0B9A0:g4g1  9DB9B9:g4c1  A6A6BB:g4b1  "
-  , "FF99FF:l2ma  FF99CC:l2pu  FF9999:l2rd  FFAA8E:l2ro  FFBF80:l2or  FFDB6D:l2yo  FFEB62:l2am  FFFF55:l2ye  EEFF58:l2gy  D6FF5C:l2yg  B1FF62:l2ng  98FB98:l2gn+ 62FFB1:l2sg  AFEEEE:l2cy+ 87CEFA:l2cb+ 95B0FF:l2nb  9999FF:l2bl  B399FF:l2vb  CC99FF:l2vi  E699FF:l2vm  FF99FF:l2ma  C0C0C0:gr4+  AA94AA:g5m1  AA9494:g5r1  A8A88A:g5y1  8DA88D:g5g1  8AA8A8:g5c1  9494AA:g5b1  "
-  , "FF94FF:l3ma  FF94C9:l3pu  FF9494:l3rd  FFA07A:l3ro+ FFB76E:l3or  FFD454:l3yo  F6E14E:l3am  EDED48:l3ye  DEEE49:l3gy  C8F14B:l3yg  A2F64E:l3ng  54FF54:l3gn  4EF6A2:l3sg  48EDED:l3cy  87CEFA:l3cb+ 8FABFF:l3nb  9494FF:l3bl  AF94FF:l3vb  C994FF:l3vi  E494FF:l3vm  FF94FF:l3ma  A9A9A9:gr5+  998299:g6m1  998282:g6r1  979778:g6y1  7B977B:g6g1  789797:g6c1  828299:g6b1  "
-  , "FF80FF:l4ma  FF80BF:l4pu  F08080:l4rd+ FF9571:l4ro  F4A460:l4or+ FFD149:l4yo  FFE63B:l4am  FFFF2B:l4ye  EAFF2E:l4gy  CCFF33:l4yg  9DFF3B:l4ng  49FF49:l4gn  00FA9A:l4sg+ 00FFFF:l4cy+ 87CEEB:l4cb+ 7B9CFF:l4nb  8080FF:l4bl  9F80FF:l4vb  BF80FF:l4vi  DF80FF:l4vm  FF80FF:l4ma  888888:g71   887188:g7m1  887171:g7r1  868667:g7y1  6A866A:g7g1  678686:g7c1  717188:g7b1  "
-  , "FF66FF:l5ma  FF66B3:l5pu  FF6666:l5rd  FF7F50:l5ro+ FFA500:l5or+ FFD700:l5yo+ FFE214:l5am  FFFF00:l5ye+ E6FF04:l5gy  C2FF0A:l5yg  7FFF00:l5ng+ 24FF24:l5gn  00FF7F:l5sg+ 00FFFF:l5cy+ 58C0FF:l5cb  6495ED:l5nb+ 6666FF:l5bl  8C66FF:l5vb  B366FF:l5vi  D966FF:l5vm  FF66FF:l5ma  808080:gr7+  776077:g8m1  776060:g8r1  757557:g8y1  5A755A:g8g1  577575:g8c1  606077:g8b1  "
-  , "FF4CFF:s1ma  DB7093:s1pu+ FF4C4C:s1rd  FF6347:s1ro+ FF8F20:s1or  FFBF00:s1yo  F6D700:s1am  EDED00:s1ye  D7EE00:s1gy  B5F100:s1yg  7BF600:s1ng  00FF00:s1gn+ 00F67B:s1sg  00EDED:s1cy  00BFFF:s1cb+ 4675FF:s1nb  4C4CFF:s1bl  794CFF:s1vb  A64CFF:s1vi  D24CFF:s1vm  FF4CFF:s1ma  666666:g91   665166:g9m1  665151:g9r1  646448:g9y1  4A644A:g9g1  486464:g9c1  515166:g9b1  "
-  , "FF70FF:g1ma  FF69B4:g1pk+ FA8072:g1rd+ FF845C:g1ro  FFA042:g1or  EBBE38:g1yo  E3CD33:g1am  DBDB2F:g1ye  CBDC30:g1gy  B3DF31:g1yg  8BE333:g1ng  38EB38:g1gn  33E38B:g1sg  48D1CC:g1cy+ 5FC3FF:g1cb  6A8FFF:g1nb  7070FF:g1bl  9470FF:g1vb  B870FF:g1vi  DB70FF:g1vm  FF70FF:g1ma  555555:d01   554155:d0m1  554141:d0r1  53533A:d0y1  3C533C:d0g1  3A5353:d0c1  414155:d0b1  "
-  , "FF33FF:s2ma  FF1493:s2pk+ FF3333:s2rd  FF551C:s2ro  FF8C00:s2or+ EBB100:s2yo  E3C600:s2am  DBDB00:s2ye  C6DC00:s2gy  A7DF00:s2yg  71E300:s2ng  00EB00:s2gn  00E371:s2sg  40E0D0:s2cy+ 20ACFF:s2cb  2C61FF:s2nb  3333FF:s2bl  6633FF:s2vb  9933FF:s2vi  CC33FF:s2vm  FF33FF:s2ma  444444:d11   443344:d1m1  443333:d1r1  42422D:d1y1  2E432E:d1g1  2D4242:d1c1  333344:d1b1  "
-  , "FF1AFF:s3ma  FF1A8C:s3pu  FF1A1A:s3rd  FF4500:s3ro+ EA7500:s3or  DAA520:s3yo+ D0B600:s3am  C8C800:s3ye  B6CA00:s3gy  9ACD32:s3yg+ 68D000:s3ng  00D800:s3gn  00D068:s3sg  00CED1:s3cy+ 05A1FF:s3cb  124DFF:s3nb  1A1AFF:s3bl  531AFF:s3vb  8A2BE2:s3vi+ C61AFF:s3vm  FF00FF:s3ma+ 333333:d21   332533:d2m1  332525:d2r1  323220:d2y1  213221:d2g1  203232:d2c1  252533:d2b1  "
-  , "D8BFD8:g2ma  FF99CC:g2pu  FF9999:g2rd  F3A68C:g2ro  DEB887:g2or+ DEC475:g2yo  D9CC70:g2am  D5D56B:g2ye  CBD56C:g2gy  BCD76E:g2yg  A5D970:g2ng  75DE75:g2gn  70D9A5:g2sg  6BD5D5:g2cy  8ECEF5:g2cb  94AEFB:g2nb  9999FF:g2bl  B399FF:g2vb  CC99FF:g2vi  E699FF:g2vm  FF99FF:g2ma+ 222222:d31   221822:d3m1  221818:d3r1  212115:d3y1  162116:d3g1  152121:d3c1  181822:d3b1  "
-  , "FF80FF:g3ma  FF80BF:g3pu  FF8080:g3rd  E9967A:g3ro+ D2B48C:g3or+ C9AC55:g3yo  BDB76B:g3am+ BCBC4B:g3ye  B1BD4C:g3gy  A2BF4D:g3yg  89C250:g3ng  55C955:g3gn  66CDAA:g3sg+ 4BBCBC:g3cy  72BFED:g3cb  7A99F8:g3nb  8080FF:g3bl  9F80FF:g3vb  BF80FF:g3vi  DF80FF:g3vm  FF80FF:g3ma  000000:bk    110C11:d4m1  110C0C:d4r1  10100A:d4y1  0A100A:d4g1  0A1010:d4c1  0C0C11:d4b1  "
-  , "FF4DFF:g4ma  FF4DA6:g4pu  FF4D4D:g4rd  E96B41:g4ro  D2691E:g4or+ C7A12F:g4yo  BFAD2B:g4am  B9B928:g4ye  ACBA29:g4gy  97BC2A:g4yg  75BF2B:g4ng  32CD32:g4gn+ 2BBF75:g4sg  28B9B9:g4cy  43ADEC:g4cb  4874F7:g4nb  6A5ACD:g4bl+ 794DFF:g4vb  A64DFF:g4vi  D24DFF:g4vm  FF4DFF:g4ma  FFFFFF:wh2   FFEBFF:whm2  FFEBEB:whr2  FFFAF0:whye2+ E4FDE4:whg2  E1FDFD:whc2  E6E6FA:whbl2+ "
-  , "FF00FF:s4ma  FF0080:s4pu  FF0000:s4rd+ E83A00:s4ro  D56A00:s4or  C49300:s4yo  BDA500:s4am  B6B600:s4ye  A5B700:s4gy  8BB900:s4yg  5EBD00:s4ng  00C400:s4gn  00BD5E:s4sg  20B2AA:s4cy+ 1E90FF:s4cb+ 003EF7:s4nb  0000FF:s4bl+ 4000FF:s4vb  8000FF:s4vi  BF00FF:s4vm  FF00FF:s4ma+ EEEEEE:g12   EED3EE:g1m2  EED3D3:g1r2  EBEBC7:g1y2  CAECCA:g1g2  C7EBEB:g1c2  D3D3EE:g1b2  "
-  , "E600E6:s5ma  DC143C:s5pk+ E60000:s5rd  D13400:s5ro  BF6000:s5or  B8860B:s5yo+ AA9500:s5am  A4A400:s5ye  95A500:s5gy  7DA700:s5yg  55AA00:s5ng  00B100:s5gn  00AA55:s5sg  00A4A4:s5cy  0084D4:s5cb  0038DE:s5nb  0000E6:s5bl  3900E6:s5vb  7300E6:s5vi  AC00E6:s5vm  E600E6:s5ma  DDDDDD:g22   DDBDDD:g2m2  DDBDBD:g2r2  DADAAF:g2y2  B2DBB2:g2g2  AFDADA:g2c2  BDBDDD:g2b2  "
-  , "E645E6:g5ma  E64595:g5pu  E64545:g5rd  D2603A:g5ro  CD853F:g5or+ B3912A:g5yo  AC9C27:g5am  A6A624:g5ye  9AA825:g5gy  88A925:g5yg  6AAC27:g5ng  2AB32A:g5gn  3CB371:g5sg+ 24A6A6:g5cy  3C9BD5:g5cb  4169E1:g5nb+ 4545E6:g5bl  6D45E6:g5vb  9545E6:g5vi  BA55D3:g5vm+ E645E6:g5ma  CCCCCC:g32   CCA7CC:g3m2  CCA7A7:g3r2  C8C899:g3y2  9CC99C:g3g2  99C8C8:g3c2  A7A7CC:g3b2  "
-  , "EE82EE:g6ma  E673AC:g6pu  E67373:g6rd  D38064:g6ro  C28D58:g6or  B59B4D:g6yo  AFA248:g6am  A9A943:g6ye  A0AA44:g6gy  92AC46:g6yg  7BAF48:g6ng  4DB54D:g6gn  48AF7B:g6sg  5F9EA0:g6cy+ 66ACD5:g6cb  6E8ADF:g6nb  7B68EE:g6bl+ 9370DB:g6vb+ AC73E6:g6vi  C973E6:g6vm  E673E6:g6ma+ BBBBBB:g42   BB93BB:g4m2  BB9393:g4r2  B7B784:g4y2  87B887:g4g2  84B7B7:g4c2  9393BB:g4b2  "
-  , "CC7ACC:g7ma  CC7AA3:g7pu  BC8F8F:g7rd+ C28570:g7ro  B99066:g7or  B19C5E:g7yo  AEA35A:g7am  AAAA56:g7ye  A2AB56:g7gy  97AC58:g7yg  84AE5A:g7ng  8FBC8F:g7gn+ 5AAE84:g7sg  56AAAA:g7cy  72A5C4:g7cb  778899:g7nb+ 7A7ACC:g7bl  8F7ACC:g7vb  A37ACC:g7vi  B87ACC:g7vm  CC7ACC:g7ma+ AAAAAA:g52   AA80AA:g5m2  AA8080:g5r2  A5A570:g5y2  74A674:g5g2  70A5A5:g5c2  8080AA:g5b2  "
-  , "CC52CC:g8ma  C71585:g8pk+ CD5C5C:g8rd+ BA6346:g8ro  AB743C:g8or  9E8434:g8yo  998C30:g8am  93932D:g8ye  8A942D:g8gy  7C962F:g8yg  649930:g8ng  349E34:g8gn  309964:g8sg  2D9393:g8cy  4682B4:g8cb+ 4D6CC6:g8nb  5252CC:g8bl  7052CC:g8vb  8F52CC:g8vi  9932CC:g8vm+ CC52CC:g8ma  999999:g62   996E99:g6m2  996E6E:g6r2  95955F:g6y2  639663:g6g2  5F9595:g6c2  6E6E99:g6b2  "
-  , "CC00CC:s6ma  CC0066:s6pu  CC0000:s6rd  B92E00:s6ro  A0522D:s6or+ 9D7600:s6yo  978400:s6am  929200:s6ye  849300:s6gy  6B8E23:s6yg+ 4C9700:s6ng  009D00:s6gn  00974C:s6sg  008B8B:s6cy+ 0076BC:s6cb  0031C5:s6nb  0000CD:s6bl+ 3300CC:s6vb  6600CC:s6vi  9400D3:s6vm+ CC00CC:s6ma  888888:g72   885D88:g7m2  885D5D:g7r2  81814D:g7y2  518251:g7g2  4D8181:g7c2  5D5D88:g7b2  "
-  , "A600A6:d1ma  A60053:d1pu  A60000:d1rd  972600:d1ro  8B4513:d1or+ 806000:d1yo  7B6B00:d1am  808000:d1ye+ 6B7700:d1gy  5A7900:d1yg  3D7B00:d1ng  008000:d1gn+ 007B3D:d1sg  008080:d1cy+ 006099:d1cb  0028A0:d1nb  0000A6:d1bl  2900A6:d1vb  5300A6:d1vi  7C00A6:d1vm  A600A6:d1ma+ 777777:g82   774E77:g8m2  774E4E:g8r2  6B6B3C:g8y2  406E40:g8g2  3C6B6B:g8c2  4E4E77:g8b2  "
-  , "992E99:d2ma  992E63:d2pu  B22222:d2rd+ 8C4027:d2ro  815121:d2or  77601C:d2yo  73681A:d2am  6F6F18:d2ye  677018:d2gy  5B7119:d2yg  46731A:d2ng  228B22:d2gn+ 2E8B57:d2sg+ 186F6F:d2cy  708090:d2cb+ 2B4694:d2nb  2E2E99:d2bl  492E99:d2vb  663399:d2vi+ 7E2E99:d2vm  992E99:d2ma  666666:g92   663F66:g9m2  663F3F:g9r2  57572E:g9y2  325B32:g9g2  2E5757:g9c2  3F3F66:g9b2  "
-  , "994D99:g9ma  994D73:g9pu  B22222:g9rd  8C5543:g9ro  825E3A:g9or  786733:g9yo  746C30:g9am  71712D:g9ye  6A712E:g9gy  61722E:g9yg  527430:g9ng  228B22:g9gn  2E8B57:g9sg  2D7171:g9cy  708090:g9cb  495C95:g9nb  4D4D99:g9bl  604D99:g9vb  663399:g9vi  864D99:g9vm  994D99:g9ma  555555:d02   553255:d0m2  553232:d0r2  464622:d0y2  254925:d0g2  224646:d0c2  323255:d0b2  "
-  , "803380:d3ma  803359:d3pu  803333:d3rd  743E2C:d3ro  6B4826:d3or  635220:d3yo  5F571E:d3am  5C5C1C:d3ye  565D1C:d3gy  556B2F:d3yg+ 3F5F1E:d3ng  206320:d3gn  1E5F3F:d3sg  1C5C5C:d3cy  2D5B76:d3cb  30437C:d3nb  483D8B:d3bl+ 463380:d3vb  593380:d3vi  6C3380:d3vm  803380:d3ma  444444:d12   442644:d1m2  442626:d1r2  353518:d1y2  1B381B:d1g2  183535:d1c2  262644:d1b2  "
-  , "730073:d4ma  730039:d4pu  800000:d4rd+ 681A00:d4ro  603000:d4or  584200:d4yo  554A00:d4am  525200:d4ye  4A5300:d4gy  3F5300:d4yg  2B5500:d4ng  006400:d4gn+ 00552B:d4sg  005252:d4cy  00426A:d4cb  001C6F:d4nb  00008B:d4bl+ 1D0073:d4vb  4B0082:d4vi+ 560073:d4vm  730073:d4ma+ 333333:d22   331B33:d2m2  331B1B:d2r2  262610:d2y2  122912:d2g2  102626:d2c2  1B1B33:d2b2  "
-  , "661F66:d5ma  661F42:d5pu  661F1F:d5rd  5D2B1A:d5ro  563616:d5or  4F4013:d5yo  4D4511:d5am  4A4A10:d5ye  454A10:d5gy  3D4B11:d5yg  2F4D11:d5ng  134F13:d5gn  114D2F:d5sg  2F4F4F:d5cy+ 1B455F:d5cb  1D2E63:d5nb  191970:d5bl+ 301F66:d5vb  421F66:d5vi  541F66:d5vm  661F66:d5ma  222222:d32   221122:d3m2  221111:d3r2  19190A:d3y2  0B1B0B:d3g2  0A1919:d3c2  111122:d3b2  "
-  , "4D004D:d6ma  4D0026:d6pu  4D0000:d6rd  461100:d6ro  402000:d6or  3B2C00:d6yo  393200:d6am  373700:d6ye  323700:d6gy  2A3800:d6yg  1C3900:d6ng  003B00:d6gn  00391C:d6sg  003737:d6cy  002C47:d6cb  00134A:d6nb  000080:d6bl+ 13004D:d6vb  26004D:d6vi  39004D:d6vm  4D004D:d6ma  111111:d42   110811:d4m2  110808:d4r2  0C0C04:d4y2  050D05:d4g2  040C0C:d4c2  080811:d4b2  "
-  };
-  String[] longNamesSave =
-  { "LavenderBlush=p1pk: #FFF0F5"
-  , "Linen=p1ro: #FAF0E6"
-  , "AntiqueWhite=p1or: #FAEBD7"
-  , "Cornsilk=p1yo: #FFF8DC"
-  , "LemonChiffon=p1am: #FFFACD"
-  , "Beige=p1ye: #F5F5DC"
-  , "OldLace=p1gy: #FDF5E6"
-  , "MintCream=p1sg: #F5FFFA"
-  , "Azure=p1cy: #F0FFFF"
-  , "AliceBlue=p1cb: #F0F8FF"
-  , "Lavender=p1bl: #E6E6FA"
-  , "White=wh: #FFFFFF"
-  , "Snow=wh1r: #FFFAFA"
-  , "Ivory=whye: #FFFFF0"
-  , "HoneyDew=whgn: #F0FFF0"
-  , "GhostWhite=whbl: #F8F8FF"
-  , "MistyRose=p2ro: #FFE4E1"
-  , "BlanchedAlmond=p2or: #FFEBCD"
-  , "PapayaWhip=p2yo: #FFEFD5"
-  , "LightGoldenRodYellow=p2am: #FAFAD2"
-  , "LightYellow=p2ye: #FFFFE0"
-  , "LightCyan=p2cy: #E0FFFF"
-  , "WhiteSmoke=gr1: #F5F5F5"
-  , "Bisque=p3ro: #FFE4C4"
-  , "Moccasin=p3or: #FFE4B5"
-  , "NavajoWhite=p3yo: #FFDEAD"
-  , "PaleGoldenRod=p3am: #EEE8AA"
-  , "PowderBlue=p3cb: #B0E0E6"
-  , "Gainsboro=gr2: #DCDCDC"
-  , "LightPink=l1pk: #FFB6C1"
-  , "Pink=l1rd: #FFC0CB"
-  , "Wheat=l1ro: #F5DEB3"
-  , "PeachPuff=l1or: #FFDAB9"
-  , "Khaki=l1am: #F0E68C"
-  , "LightGreen=l1gn: #90EE90"
-  , "Aquamarine=l1sg: #7FFFD4"
-  , "LightBlue=l1cb: #ADD8E6"
-  , "LightSteelBlue=l1nb: #B0C4DE"
-  , "LightGray=gr3: #D3D3D3"
-  , "PaleGreen=l2gn: #98FB98"
-  , "PaleTurquoise=l2cy: #AFEEEE"
-  , "LightSkyBlue=l2cb: #87CEFA"
-  , "Silver=gr4: #C0C0C0"
-  , "LightSalmon=l3ro: #FFA07A"
-  , "LightSkyBlue=l3cb: #87CEFA"
-  , "DarkGray=gr5: #A9A9A9"
-  , "LightCoral=l4rd: #F08080"
-  , "SandyBrown=l4or: #F4A460"
-  , "MediumSpringGreen=l4sg: #00FA9A"
-  , "Aqua=l4cy: #00FFFF"
-  , "SkyBlue=l4cb: #87CEEB"
-  , "Coral=l5ro: #FF7F50"
-  , "Orange=l5or: #FFA500"
-  , "Gold=l5yo: #FFD700"
-  , "Yellow=l5ye: #FFFF00"
-  , "Chartreuse=l5ng: #7FFF00"
-  , "SpringGreen=l5sg: #00FF7F"
-  , "Cyan=l5cy: #00FFFF"
-  , "CornflowerBlue=l5nb: #6495ED"
-  , "Gray=gr7: #808080"
-  , "PaleVioletRed=s1pk: #DB7093"
-  , "Tomato=s1ro: #FF6347"
-  , "Lime=s1gn: #00FF00"
-  , "DeepSkyBlue=s1cb: #00BFFF"
-  , "HotPink=g1pk: #FF69B4"
-  , "Salmon=g1rd: #FA8072"
-  , "MediumTurquoise=g1cy: #48D1CC"
-  , "DeepPink=s2pk: #FF1493"
-  , "DarkOrange=s2or: #FF8C00"
-  , "Turquoise=s2cy: #40E0D0"
-  , "OrangeRed=s3ro: #FF4500"
-  , "GoldenRod=s3yo: #DAA520"
-  , "YellowGreen=s3yg: #9ACD32"
-  , "DarkTurquoise=s3cy: #00CED1"
-  , "BlueViolett=s3vi: #8A2BE2"
-  , "Magenta=s3ma: #FF00FF"
-  , "BurlyWood=g2or: #DEB887"
-  , "Thistle=g2ma: #FF99FF"
-  , "DarkSalmon=g3ro: #E9967A"
-  , "Tan=g3or: #D2B48C"
-  , "DarkKhaki=g3am: #BDB76B"
-  , "MediumAquaMarine=g3sg: #66CDAA"
-  , "Chocolate=g4or: #D2691E"
-  , "LimeGreen=g4gn: #32CD32"
-  , "SlateBlue=g4bl: #6A5ACD"
-  , "FloralWhite=whye2: #FFFAF0"
-  , "Lavender=whbl2: #E6E6FA"
-  , "Red=s4rd: #FF0000"
-  , "LightSeaGreen=s4cy: #20B2AA"
-  , "DodgerBlue=s4cb: #1E90FF"
-  , "Blue=s4bl: #0000FF"
-  , "Fuchsia=s4ma: #FF00FF"
-  , "Crimson=s5pk: #DC143C"
-  , "DarkGoldenRod=s5yo: #B8860B"
-  , "Peru=g5or: #CD853F"
-  , "MediumSeaGreen=g5sg: #3CB371"
-  , "RoyalBlue=g5nb: #4169E1"
-  , "MediumOrchid=g5vm: #BA55D3"
-  , "CadetBlue=g6cy: #5F9EA0"
-  , "MediumSlateBlue=g6bl: #7B68EE"
-  , "MediumPurple=g6vb: #9370DB"
-  , "Orchid=g6ma: #E673E6"
-  , "RosyBrown=g7rd: #BC8F8F"
-  , "DarkSeaGreen=g7gn: #8FBC8F"
-  , "LightSlateGray=g7nb: #778899"
-  , "Plum=g7ma: #CC7ACC"
-  , "MediumVioletRed=g8pk: #C71585"
-  , "IndianRed=g8rd: #CD5C5C"
-  , "SteelBlue=g8cb: #4682B4"
-  , "DarkOrchid=g8vm: #9932CC"
-  , "Sienna=s6or: #A0522D"
-  , "OliveDrab=s6yg: #6B8E23"
-  , "DarkCyan=s6cy: #008B8B"
-  , "MediumBlue=s6bl: #0000CD"
-  , "DarkViolett=s6vm: #9400D3"
-  , "SaddleBrown=d1or: #8B4513"
-  , "Olive=d1ye: #808000"
-  , "Green=d1gn: #008000"
-  , "Teal=d1cy: #008080"
-  , "DarkMagenta=d1ma: #A600A6"
-  , "Brown=d2rd: #B22222"
-  , "ForestGreen=d2gn: #228B22"
-  , "SeaGreen=d2sg: #2E8B57"
-  , "SlateGray=d2cb: #708090"
-  , "RebeccaPurple=d2vi: #663399"
-  , "DarkOliveGreen=d3yg: #556B2F"
-  , "DarkSlateBlue=d3bl: #483D8B"
-  , "DarkRed=d4rd: #800000"
-  , "DarkGreen=d4gn: #006400"
-  , "Darkblue=d4bl: #00008B"
-  , "Indigo=d4vi: #4B0082"
-  , "Purple=d4ma: #730073"
-  , "DarkSlateGray=d5cy: #2F4F4F"
-  , "MidnightBlue=d5bl: #191970"
-  , "Navy=d6bl: #000080"
-  };
-  
+    
   Map<String, GralColor> idxColorsByShortname = new TreeMap<String, GralColor>();
   
   
@@ -1261,7 +751,13 @@ public class GralColorShow
   {
     for(int ixLine = 0; ixLine < colorF.length; ++ixLine){
       for(int col = 0; col < colorF[ixLine].length; ++col){
-        colorF[ixLine][col].wdgColor.setBackColor(colorF[ixLine][col].co,0);
+        ColorWithField field = colorF[ixLine][col];
+        field.wdgColor.setBackColor(colorF[ixLine][col].co,0);
+        String text = "";
+        if(field.co.usualNames() !=null && field.co.usualNames().length() >0) {
+          text = "-";
+        }
+        field.wdgColor.setText(text);
       }
     }
   }
@@ -1433,7 +929,7 @@ public class GralColorShow
     colorF1.wdgColor.setBackColor(colorF1.co, 0);
     String usualNames = colorF1.co.usualNames();
     if(usualNames !=null && usualNames.length()>0) {
-      colorF1.wdgColor.setText(".");
+      colorF1.wdgColor.setText("x");
     } else {
       colorF1.wdgColor.setText("");
     }
@@ -1495,7 +991,7 @@ public class GralColorShow
               colorF1.bActive = true;
               colorF1.wdgColor.setTextColor(colText);
               if(colorF1.co.usualNames() !=null && colorF1.co.usualNames().length() >0) {
-                colorF1.wdgColor.setText(".");
+                colorF1.wdgColor.setText("x");
               }
             }
           }
@@ -1584,7 +1080,7 @@ public class GralColorShow
             colorF1.wdgColor.setToPanel();
             colorF1.bActive = true;
             if(colorF1.co.usualNames() !=null && colorF1.co.usualNames().length() >0) {
-              colorF1.wdgColor.setText(".");
+              colorF1.wdgColor.setText("x");
             }
           }
         }

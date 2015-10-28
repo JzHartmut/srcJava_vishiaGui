@@ -101,9 +101,7 @@ public class Fcmd extends GuiCfg
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     {
-      try{ guiW.infoBox.append("Test\n"); }
-      catch(IOException exc){}
-      guiW.infoBox.setWindowVisible(true);
+      GralMng.get().addInfo("Test\n", true);
       return true;
     }
   };

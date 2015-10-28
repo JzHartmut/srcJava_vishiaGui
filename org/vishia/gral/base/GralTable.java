@@ -94,6 +94,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2015-10-29 Hartmut chg: {@link TableLineData#bChangedSet}, the content will be written in {@link org.vishia.gral.swt.SwtTable}
+   *   or another graphic implementation only if the text is changed. Therewith editing a table is possible while the other cells
+   *   are updated frequently. That can be used for tables which shows a current state, and a column is editable.
+   *   See {@link org.vishia.guiInspc.InspcViewTargetComm}.
    * <li>2015-08-28 Hartmut chg: {@link #processKeys(int)}: Use tab and sh-tab to switch between the columns. 
    *   This keys are used as 'traverse key' normally, but they are ignored for that now by a proper TraverseListener
    *   in {@link org.vishia.gral.swt.SwtTable}. The standard traverse listener which is active for traversing between the
@@ -275,6 +279,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * The cellLines[0] is the TableLineData of the first visible line in any case etc.
    */
   protected TableLineData[] linesForCell;
+  
+  boolean bChangedLinesForCell;
 
   /**The current line. */
   protected TableLineData lineSelected;
@@ -816,6 +822,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     for(int ix = 0; ix < linesForCell.length; ++ix){
       linesForCell[ix] = null;
     }
+    bChangedLinesForCell = true;
     rootLine.clear();
     bPrepareVisibleArea = true;
     bPrepareVisibleArea = true;
@@ -878,7 +885,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       System.arraycopy(linesForCell, ix, linesForCell, 0, nLinesBefore);
       lineSelectedixCell = nLinesBefore;
     }
-    
+    bChangedLinesForCell = true;
     fillVisibleAreaBehind(lineSelected, nLinesBefore);
   }
   
@@ -895,6 +902,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     while(ix < zLineVisible){
       linesForCell[ix++] = null;
     }
+    bChangedLinesForCell = true;
+    
   }
   
 
@@ -914,6 +923,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           System.arraycopy(linesForCell, 1, linesForCell, 0, zLineVisible-1);
           linesForCell[zLineVisible-1] = line;
           dLine1 -=1;
+          bChangedLinesForCell = true;
         }
       }
     } else if(dLine < 0){ //backward in lines
@@ -928,6 +938,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           System.arraycopy(linesForCell, 0, linesForCell, 1, zLineVisible-1);
           linesForCell[0] = line;
           dLine1 +=1;
+          bChangedLinesForCell = true;
         }
       }
     }
@@ -1086,7 +1097,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     TableLineData line = linesForCell[celldata.ixCellLine];
     if(line !=null && !sText.equals(line.cellTexts[celldata.ixCellColumn])){
       line.cellTexts[celldata.ixCellColumn] = sText;
-      line.bChanged = true;
+      line.bChangedEdit[celldata.ixCellColumn] = true;
     }
   }  
   
@@ -1243,10 +1254,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
               actionOnRefreshChildren(lineSelected);  //may get or refresh children, callback in user.
             }
             if(lineSelected.hasChildren()){           //only if it has children currently really.
-              lineSelected.showChildren(true, true);
-              lineSelected.countChildren(true, nLineFirst);  //count the children.
-              fillVisibleAreaBehind(lineSelected, lineSelectedixCell);
-              repaint();
+              lineSelected.showChildren(true, true, true);
+              //lineSelected.countChildren(true, nLineFirst);  //count the children.
+              //fillVisibleAreaBehind(lineSelected, lineSelectedixCell);
+              //repaint();
             }
           } else if(lineSelected !=null && keyCode == keyCloseChild){
             if(lineSelected !=null && lineSelected.showChildren){
@@ -1486,6 +1497,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     protected int zColumn(){ return outer.zColumn; }
     
     protected GralColor colorSelectCharsBack(){ return outer.colorSelectCharsBack; }
+    
+    protected boolean bChangedLinesForCell(){ return outer.bChangedLinesForCell; }
+    
+    protected void bChangedLinesForCell(boolean val){ outer.bChangedLinesForCell = val; }
+    
+    
     
     protected GralColor colorSelectChars(){ return outer.colorSelectChars; }
     
@@ -2139,7 +2156,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      */
     public AtomicInteger ctRepaintLine = new AtomicInteger();  //NOTE should be public to see it from derived outer class
     
-    public String[] cellTexts;
+    public final String[] cellTexts;
 
     /**If not null, then a special background color for the cell. Elsewhere the cell will be shown in the {@link #colorBackground} of the line
      * or the {@link GralTable#colorBackMarked} etc. of the table.
@@ -2152,8 +2169,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      */
     private String sDataPath;
     
-    /**True if any of a cell text was changed. */
-    protected boolean bChanged;
+    /**True if any of a cell text was changed by manual edit. */
+    protected final boolean[] bChangedEdit;
+    
+    /**True if any of a cell text was changed by manual edit. */
+    protected final boolean[] bChangedSet;
     
     public GralColor colorForeground, colorBackground, colorBackSelect, colorBackSelectMarked, colorBackSelectSomeMarked, colorBackMarked, colorBackSomeMarked;
     
@@ -2164,6 +2184,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     TableLineData(String key, UserData data){
       super(key, data);  //key, data
       cellTexts = new String[GralTable.this.zColumn];
+      bChangedEdit = new boolean[GralTable.this.zColumn];
+      bChangedSet = new boolean[GralTable.this.zColumn];
     }
     
     
@@ -2173,6 +2195,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       if(lineTexts !=null){
         for(int ixCol = 0; ixCol < lineTexts.length && ixCol < cellTexts.length; ++ixCol){
           cellTexts[ixCol] = lineTexts[ixCol];
+          bChangedSet[ixCol] = true;
         }
       } ////
       if(lineSelected == null){ //// 
@@ -2230,14 +2253,25 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     
     @Override public boolean isChanged(boolean setUnchanged){ 
-      boolean ret = bChanged;
-      if(setUnchanged){
-        bChanged = false;
+      boolean ret = false;
+      for(int ix = 0; ix < bChangedEdit.length; ++ix) {
+        ret |= bChangedEdit[ix];
+        if(setUnchanged){
+          bChangedEdit[ix] = false;
+        }
       }
       return ret; 
     }
 
 
+    public boolean wasCelltextSet(int column){
+      boolean ret = bChangedSet[column];
+      if(ret){
+        bChangedSet[ column] = false;
+      }
+      return ret;
+    }
+    
     
     @Override public TableLineData parentNode(){ return (TableLineData)super.getParent(); }
     
@@ -2261,8 +2295,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     @Override
     public String setCellText(String text, int column) {
       String oldText = cellTexts[column];
-      cellTexts[column] = text;
-      GralTable.this.repaint();
+      if(oldText ==null || !oldText.equals(text)) {
+        cellTexts[column] = text;
+        bChangedSet[column] = true;
+        GralTable.this.repaint();
+      }
       return oldText;
     }
 
@@ -2408,6 +2445,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
 
     
+    
+    
+    public void showChildren(boolean show, boolean bLeftGrandChildrenOpen, boolean showReally) {
+      showChildren(show, bLeftGrandChildrenOpen);
+      countChildren(bLeftGrandChildrenOpen, nLineFirst);  //count the children.
+      fillVisibleAreaBehind(this, lineSelectedixCell);
+      repaint();
+    }      
     
     
     @Override

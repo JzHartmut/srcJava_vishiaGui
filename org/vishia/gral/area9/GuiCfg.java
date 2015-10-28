@@ -413,17 +413,16 @@ public final void execute()
 
 
 public void showInfoBox(CharSequence text) {
-  guiW.infoBox.setText(text);
-  guiW.infoBox.setVisible(true);
+  GralMng mng = GralMng.get();
+  mng.showInfo(text);
 }
 
 public void setTextInfoBox(CharSequence text) {
-  guiW.infoBox.setText(text);
+  GralMng.get().setInfo(text);
 }
 
 public void appendTextInfoBox(CharSequence text) {
-  try{ guiW.infoBox.append(text); }
-  catch(IOException exc){} //not able to expect
+  GralMng.get().addInfo(text, false);
 }
 
 
