@@ -16,6 +16,8 @@ import java.awt.Rectangle;
 import java.awt.TextArea;
 import java.awt.TextField;
 import java.awt.Window;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.InputStream;
@@ -54,6 +56,10 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   
   final Frame mainWindowAwt;
   
+  
+  /**The standard listener or action for mouse events, able to assign to all widgets which does not need an extra mouse behaviour. */
+  final AwtGralMouseListener.MouseListenerGralAction mouseStdAction = new AwtGralMouseListener.MouseListenerGralAction(null);
+  
   /**Creates an instance.
    * @param guiContainer The container where the elements are stored in.
    * @param width in display-units for the window's width, the number of pixel depends from param displaySize.
@@ -74,6 +80,14 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   
   
   @Override public Container getCurrentPanel(){ return (Container)pos().panel.getWidgetImplementation(); }
+
+  
+  public Container getWidgetsPanel(GralWidget widg){ 
+    GralPos pos = widg.pos();
+    if(pos == null) { pos = pos(); } //from GralMng
+    return ((Container)pos.panel.getWidgetImplementation()); 
+  }
+
 
 
   @Override public void setToPanel(GralWidget widgg){
@@ -183,7 +197,6 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
    *   upper case letter: normal font, lower case letter: small font
    *   'l' left, 't' top (above field) 
    * @return
-   */
   //@Override 
   public GralTextBox addTextBox(String name, boolean editable, String prompt, char promptStylePosition)
   { Container parent = (Container)pos().panel.getWidgetImplementation();
@@ -227,12 +240,6 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
       parent.add(wgPrompt);
       wgPrompt.setFont(promptFont);
       wgPrompt.setText(prompt);
-      /*
-      Point promptSize = wgPrompt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-      if(promptSize.x > boundsPrompt.width){
-        boundsPrompt.width = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
-      }
-      */
       widgetSwt.textFieldSwt.setBounds(boundsField);
       wgPrompt.setBounds(boundsPrompt);
     } 
@@ -251,7 +258,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     return widgetSwt; 
 
   }
-
+  */
     
 
   @Override public GralHtmlBox addHtmlBox(String name){
@@ -354,7 +361,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
       Container parent = (Container)pos().panel.getWidgetImplementation();
       
       parent.add(box);
-      setPosAndSize_(box);
+      setPosAndSize_(mng.getPosOldPositioning(), box);
       Dimension size = box.getSize();
       GralPanelContent panel = new AwtPanel(name, mng, box);
       mng.registerPanel(panel);
@@ -524,19 +531,27 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   /**Places a current component with knowledge of the current positions and the spreads of the component on graphic.
    * @param component The component to place.
    */
-  void setBounds_(Component component)
-  { setPosAndSize_(component);
+  void setBounds_(GralPos pos, Component component)
+  { setPosAndSize_(pos, component);
     //setBounds_(component, 0,0, 0, 0);
   }
   
   
   
   
-  protected void setPosAndSize_(Component component)
-  { setPosAndSize_(component, 0,0);
+  protected void setPosAndSize_(GralPos pos, Component component)
+  { setPosAndSizeAwt(pos, component, 0,0);
   }  
   
-  protected void setPosAndSize_(Component component, int widthwidgetNat, int heigthWidgetNat)
+  /**
+   * @param component
+   * @param widthwidgetNat
+   * @param heigthWidgetNat
+   *
+   * NOTE: 2015-07-13: This method is set to unused because it uses the mng-position additional to the constructor of GralWidget.
+   * This is the old concept which is in conflict with the usuage there.
+   */
+  protected void XXXsetPosAndSize_(Component component, int widthwidgetNat, int heigthWidgetNat)
   {
     mng.setNextPosition();
     Component parentComp = component.getParent();
@@ -553,6 +568,31 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   }
   
 
+  
+    
+  /**Set bounds of a AWT component with a given position.
+   * This method is package-private for SWT-implementation.
+   * @param posP The Position for the component.
+   * @param component The AWT-widget.
+   * @param widthwidgetNat The natural size of the component.
+   * @param heigthWidgetNat The natural size of the component.
+   */
+  void setPosAndSizeAwt(GralPos posP, Component component, int widthwidgetNat, int heigthWidgetNat)
+  {
+    GralRectangle rectangle = calcWidgetPosAndSizeAwt(posP, component, widthwidgetNat, heigthWidgetNat);
+    //on SWT it invokes the resize listener if given.
+    Component parentComp = component.getParent();
+    //if(parentComp instanceof Frame){
+      rectangle.y += 50;  //title and menu bar
+    //}
+    component.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
+       
+  }
+  
+
+
+  
+  
   
   /**Calculates the bounds of a widget with a given pos independent of this {@link #pos}.
    * This method is a part of the implementing GralMng because the GralPos is not implemented for
@@ -580,6 +620,41 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     }
     return pos.calcWidgetPosAndSize(mng.propertiesGui, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
   }
+  
+  
+  
+  
+  
+  
+  /**Calculates the bounds of a SWT component with a given position independent of {@link #pos}.
+   * This method is package-private for SWT-implementation.
+   * It is possible to tune the bounds after calculation, for example to enhance the width if a text
+   * is larger then the intended position. 
+   * @param pos The position.
+   * @param component The SWT-widget.
+   * @param widthwidgetNat The natural size of the component.
+   * @param heigthWidgetNat The natural size of the component.
+   * @return A rectangle with position and size.
+   * @deprecated, use {@link #calcWidgetPosAndSizeSwt(GralPos, int, int)}
+   */
+  GralRectangle calcWidgetPosAndSizeAwt(GralPos pos, Component component, int widthwidgetNat, int heigthWidgetNat){
+    Component parentComp = component.getParent();
+    //Rectangle pos;
+    final GralRectangle rectangle;
+    final Rectangle parentSize;
+    if(parentComp == null){
+      parentSize = new Rectangle(0,0,800, 600);
+    } else if(parentComp instanceof Frame) {
+      parentSize = ((Frame)parentComp).getBounds(); // ??getAccessibleContext().  ??getClientArea();
+      parentSize.height -= 50;
+    } else {
+      parentSize = parentComp.getBounds();
+    }
+    return mng.calcWidgetPosAndSize(pos, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+  }
+  
+
+  
   
 
   @Override public boolean showContextMenuGthread(GralWidget widg) {
@@ -623,6 +698,31 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     
   };
   
+  /**Universal focus listener to register which widgets were in focus in its order,
+   * to set htmlHelp and to invoke the {@link GralWidget#setActionFocused(GralUserAction)}.
+   */
+  protected class AwtMngFocusListener implements FocusListener
+  {
+    GralMng.GralMngFocusListener gralFocus;
+    
+    AwtMngFocusListener(){
+      gralFocus = GralMng.get().new GralMngFocusListener();
+    }
+    
+    @Override public void focusLost(FocusEvent ev)
+    { GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(((AwtWidget)ev.getComponent()).getData());
+      gralFocus.focusLostGral(widgg);
+    }
+    
+    @Override public void focusGained(FocusEvent ev)
+    { GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(((AwtWidget)ev.getComponent()).getData());
+      gralFocus.focusGainedGral(widgg);
+    }
+  }
+  
+  /**The package private universal focus listener. */
+  protected AwtMngFocusListener focusListener = new AwtMngFocusListener();
+
 
 
   void stop(){}

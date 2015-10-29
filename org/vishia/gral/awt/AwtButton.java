@@ -61,7 +61,7 @@ public class AwtButton extends GralButton.GraphicImplAccess
   final Font fontText;
   
   
-  final AwtGralMouseListener.MouseListenerUserAction mouseListener;
+  final AwtGralMouseListener.MouseListenerGralAction mouseListener;
   
 
   
@@ -69,7 +69,7 @@ public class AwtButton extends GralButton.GraphicImplAccess
   AwtButton(GralButton widgg, AwtWidgetMng mng)
   {
     widgg.super(widgg, mng.mng);
-    mouseListener = new AwtGralMouseListener.MouseListenerUserAction(mouseWidgetAction);
+    mouseListener = new AwtGralMouseListener.MouseListenerGralAction(mouseWidgetAction);
     float ySize = widgg.pos().height();
     char size1 = ySize > 3? 'B' : 'A';
     switch(size1){ 
@@ -98,7 +98,7 @@ public class AwtButton extends GralButton.GraphicImplAccess
   void setBoundsGraphic(AwtWidgetMng mng)
   {
     //widgetSwt.setSize(mng.propertiesGui.xPixelUnit() * xSize -2, mng.propertiesGui.yPixelUnit() * ySize -2);
-    mng.setBounds_(widgetSwt);
+    mng.setBounds_(widgg.pos(), widgetSwt);
     
   }
   

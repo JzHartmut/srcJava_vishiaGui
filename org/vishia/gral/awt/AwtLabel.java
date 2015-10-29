@@ -78,7 +78,7 @@ public class AwtLabel extends GralLabel.GraphicImplAccess
     panelAwt.add(labelAwt);
     widgHelper = new AwtWidgetHelper(labelAwt, mng);
     labelAwt.setAlignment(mode);
-    mng.setBounds_(labelAwt);
+    mng.setBounds_(widgg.pos(), labelAwt);
     mng.mng.registerWidget(widgg);
     repaintGthread();  //to set text etc.
   }

@@ -41,8 +41,8 @@ public class AwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     window.addComponentListener(componentListener);
     window.addHierarchyBoundsListener(hierarchyBoundsListener);
     //window.addContainerListener(containerListener);
-    window.addMouseMotionListener(mousMotionListener);
-    window.addMouseListener(mouseListener);
+    //window.addMouseMotionListener(mousMotionListener);
+    //window.addMouseListener(mouseListener);
     window.addWindowListener(new GralAwtWindowAdapter());
     //window.addWindowListener(windowClosingAdapter);
     //window.addWindowListener(windowListener);

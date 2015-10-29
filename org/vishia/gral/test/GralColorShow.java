@@ -1,5 +1,8 @@
 //==JZcmd==
-//JZcmd main(){ java org.vishia.gral.test.GralColorShow.main(); }
+//JZcmd main(){
+//JZcmd   if($1=="AWT") { java org.vishia.gral.test.GralColorShow.mainAWT();
+//JZcmd   } else { java org.vishia.gral.test.GralColorShow.main(); } 
+//JZcmd }
 //==endJZcmd==
 package org.vishia.gral.test;
 import java.io.BufferedInputStream;
@@ -17,6 +20,7 @@ import java.text.ParseException;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.vishia.gral.awt.AwtFactory;
 import org.vishia.gral.base.GralColorConv;
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
@@ -142,11 +146,21 @@ public class GralColorShow
   
   GralMng gralMng = GralMng.get();
   
+  GralFactory gralFactory;
+  
   public static void main(String[] args){ main(); }
 
     
+  public static void mainAWT(){
+    GralColorShow main = new GralColorShow();
+    main.gralFactory = new AwtFactory();
+    main.execute();
+    //main.execute1();
+  }
+  
   public static void main(){
     GralColorShow main = new GralColorShow();
+    main.gralFactory = new SwtFactory();
     main.execute();
     //main.execute1();
   }
@@ -163,7 +177,6 @@ public class GralColorShow
       System.err.println("GralColor - cannot read config, " + exc.getMessage());
     }
     */
-    GralFactory gralFactory = new SwtFactory();
     LogMessage log = new LogMessageStream(System.out);
     GralWindow wind = gralFactory.createWindow(log, "Show Colors", 'B', 150, 10,1000, 800);
     gralMng = wind.gralMng();

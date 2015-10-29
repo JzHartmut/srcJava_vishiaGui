@@ -66,6 +66,9 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2015-10-29 Hartmut chg: Problem on {@link #pos()} with a second thread: The MainWindow- {@link GralPos#panel} was registered in another thread
+   *   and therefore unknown in the new {@link #pos()} for that thread. Solution: If the thread-specific GralPos will be created,
+   *   it should copy the data from the {@link #posCurrent} which is valid any case for valid initial data.   
    * <li>2015-10-26 Hartmut new: The help and info box is an integral part of the GralMng and therefore available for any small application without additional effort.
    *   Only the {@link #createHtmlInfoBoxes(MainCmd)} should be invoked in the graphic thread while initializing the application. 
    * <li>2015-07-13 Hartmut chg: {@link GralMngFocusListener#focusLostGral(GralWidget)} now invokes the {@link GralWidget#actionFocused} too.
@@ -198,7 +201,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
      * But the position can be set.
      * The values inside the position are positive in any case, so that the calculation of size is simple.
      */
-    protected final GralPos pos = new GralPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
+    protected final GralPos pos; //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
     
     /**False if the position is given newly. True if it is used. Then the next add-widget invocation 
      * calculates the next position in direction see {@link GralPos#setNextPosition()}. */
@@ -208,11 +211,22 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     
     PosThreadSafe() {
       threadId = Thread.currentThread().getId();
+      pos = new GralPos();
     }
     
+    PosThreadSafe(GralPos exists) {
+      threadId = Thread.currentThread().getId();
+      pos = new GralPos(exists);
+    }
+    
+    @Override public String toString(){ return "thread=" + threadId + ": " + pos.toString(); }
+   
   }
   
   
+  /**The current position as helper if it is the same thread.
+   * Initialized firstly empty.
+   */
   private PosThreadSafe posCurrent = new PosThreadSafe();
 
   private final Map<Long, PosThreadSafe> posThreadSafe = new TreeMap<Long, PosThreadSafe>();
@@ -373,7 +387,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
       Long threadId = new Long(threadId1);
       ret = posThreadSafe.get(threadId);
       if(ret == null){
-        ret = new PosThreadSafe();
+        ret = new PosThreadSafe(posCurrent.pos); //copy values from the last one 
         posThreadSafe.put(threadId, ret);
       }
     }
@@ -559,7 +573,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * <br> See also {@link #get()}.
    * @param log The first invocation determines the log output.
    * @return true if created, false if exists already.
-   * 
+   * @??deprecated {@link #get()} is sufficient TODO detemine log
    */
   public static boolean create(LogMessage log){
     if(singleton !=null) return false;

@@ -122,7 +122,7 @@ public class AwtGralMouseListener
   
   
   
-  public static class MouseListenerUserAction extends MouseListenerNoAction
+  public static class MouseListenerGralAction extends MouseListenerNoAction
   implements MouseListener
   {
     
@@ -136,7 +136,7 @@ public class AwtGralMouseListener
     
     /**Used in the implementation level for the paint routine. Therefore it is package private.
      */
-    boolean isPressed;
+    protected boolean isPressed;
     
     
     
@@ -150,7 +150,7 @@ public class AwtGralMouseListener
      * @param sCmdRelease
      * @param sCmdDoubleClick
      */
-    public MouseListenerUserAction(GralMouseWidgetAction_ifc mouseWidgetAction)
+    public MouseListenerGralAction(GralMouseWidgetAction_ifc mouseWidgetAction)
     { super();
       this.mouseWidgetAction = mouseWidgetAction;
     }

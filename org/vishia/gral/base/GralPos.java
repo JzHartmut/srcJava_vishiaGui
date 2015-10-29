@@ -332,6 +332,11 @@ public class GralPos implements Cloneable
   /**The values for x and y positions. */
   public final Coordinate x = new Coordinate(), y = new Coordinate();
   
+  protected GralPos(){}
+  
+  
+  protected GralPos(GralPos src){ set(src); }
+  
   /**The border to the next element. */
   //public int xyBorder, xyBorderFrac;
 
