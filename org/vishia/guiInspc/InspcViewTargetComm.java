@@ -13,6 +13,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.inspcPC.mng.InspcPlugUser_ifc;
 import org.vishia.util.StringFunctions;
+import org.vishia.util.StringFunctions_C;
 
 /**This class contains some status and control widgets for the Inspector Gui
  * @author Hartmut Schorrig
@@ -125,7 +126,7 @@ public class InspcViewTargetComm
       line.setBackColor(color, 0);
       if(cycle_timeout !=null) { 
         String sLine = line.getCellText(3);
-        float timeout = StringFunctions.parseFloat(sLine, 0, -1, null);
+        float timeout = StringFunctions_C.parseFloat(sLine, 0, -1, null);
         if(timeout > 0){
           cycle_timeout[1] = timeout;
         }
@@ -141,7 +142,7 @@ public class InspcViewTargetComm
     GralTableLine_ifc<Object> line = widgTable.getLine(target);
      if(line !=null) {
        String sLine = line.getCellText(3);
-       timeout = StringFunctions.parseFloat(sLine, 0, -1, null);
+       timeout = StringFunctions_C.parseFloat(sLine, 0, -1, null);
        if(timeout <= 0){
          timeout = 1.0f;
        }
