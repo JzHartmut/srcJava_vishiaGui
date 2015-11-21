@@ -75,6 +75,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2015-11-19 Hartmut chg: {@link #fillInCurrentDir()} does not refresh if it was refreshed in the last seconds.
    * <li>2014-12-26 Hartmut chg: {@link #fillIn(FileRemote, boolean)} now with new meaning of boolean: show newly without refresh with the file system.
    *   This is used in callback routines which does a refresh but does not invoke {@link #showFile(FileRemote)}
    *   especially called from {@link org.vishia.commander.Fcmd#refreshFilePanel(FileRemote)}. 
@@ -826,8 +827,11 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * more as one time after another, for example for all files of a directory without calculation effort.
    */
   public void fillInCurrentDir(){
-    if(currentDir !=null && !fillinPending){
-      fillIn(currentDir, false);
+    if(currentDir !=null && !fillinPending) {
+      //assume that a yet tested directory should not refreshed twice because another thread had refreshed already.
+      //yet is 2 seconds.
+      boolean bDonotRefresh = currentDir.isTested(System.currentTimeMillis() - 2000);
+      fillIn(currentDir, bDonotRefresh);
     }
   }
   
@@ -862,6 +866,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
     if(originDir == null){ 
       originDir = dir;    //should exist in any case.
     }
+    
     fileIn.internalAccess().setRefreshed();
     boolean bSameDirectory = dir == currentDir;
     if(!bSameDirectory || !fillinPending){  //new request anytime if other directory, or if it is not pending.

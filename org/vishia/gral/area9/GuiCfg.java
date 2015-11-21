@@ -21,6 +21,7 @@ import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.inspectorTarget.Inspector;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
@@ -439,12 +440,13 @@ private final GralUserAction cmdInvoke = new GralUserAction("cmdInvoke")
   StringBuilder error = new StringBuilder();
    
   @Override
-  public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+  public boolean exec(int cmd, GralWidget_ifc wdgi, Object... values)
   {
-    if(sCmd != null){
+    if(KeyCode.isControlFunctionMouseUpOrMenu(cmd)){
+      GralWidget wdg = (GralWidget)wdgi;
       output.setLength(0);
       error.setLength(0);
-      mainCmd.executeCmdLine(processBuilder, widgetInfos.sCmd, null, Report.info, output, error);
+      mainCmd.executeCmdLine(processBuilder, wdg.sCmd, null, Report.info, output, error);
       stop();
       guiAccess.addText("output", output);  //adds the result to any widget with name "output"
       //gui.executeCmdLine(widgetInfos.sCmd, 0, null, null);

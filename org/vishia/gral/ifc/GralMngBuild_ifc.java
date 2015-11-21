@@ -519,8 +519,9 @@ public interface GralMngBuild_ifc extends ReplaceAlias_ifc
    * @param ya start of line relative to current position in grid units.
    * @param xe end of line relative to current position in grid units.
    * @param ye end of line relative to current position in grid units.
+   * @deprecated it is the old form before a {@link org.vishia.gral.widget.GralPlotArea} was created. Use that.
    */
-  void addLine(int colorValue, float xa, float ya, float xe, float ye);
+  @Deprecated void addLine(int colorValue, float xa, float ya, float xe, float ye);
     
   
   /**Adds a line.

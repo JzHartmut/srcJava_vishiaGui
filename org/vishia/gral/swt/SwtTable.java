@@ -187,7 +187,6 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     setColorsSwt();    
     int zLineVisibleMax = gralTable.nrofLinesVisibleMax();
     this.cellsSwt = new Text[zLineVisibleMax][zColumn()];
-    this.cells = new GralTable.CellData[zLineVisibleMax][zColumn()];
     int zColumn = zColumn();
     Composite swtTable = new SwtTable.Table(parent, zColumn, mng);
     initSwtTable(swtTable, zColumn, mng);

@@ -52,7 +52,7 @@ exit
 set SRCvishiaBase=D:\vishia\ZBNF\sf\ZBNF\srcJava_vishiaBase
 set ZBNFJAR=D:\vishia\ZBNF\sf\ZBNF\zbnfjax\zbnf.jar
 if exist %ZBNFJAR% goto :ZbnfOk
-set SRVvishiaBase=..\..\srcJava_vishiaBase
+set SRCvishiaBase=..\..\srcJava_vishiaBase
 set ZBNFJAR=..\..\exe\zbnf.jar
 :ZbnfOk
 set CLASSPATH_JAVAC=%SWTJAR%;%ZBNFJAR%

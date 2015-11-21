@@ -94,6 +94,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2015-11-19 Hartmut chg: Some changes for future: The cells should be managed in the GralTable, not in SwtTable. Adaption for AwtTable 
    * <li>2015-10-29 Hartmut chg: {@link TableLineData#bChangedSet}, the content will be written in {@link org.vishia.gral.swt.SwtTable}
    *   or another graphic implementation only if the text is changed. Therewith editing a table is possible while the other cells
    *   are updated frequently. That can be used for tables which shows a current state, and a column is editable.
@@ -1460,8 +1461,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
     protected GraphicImplAccess(GralTable<UserData> outer, GralMng mng){ 
       super(outer, mng);
-      xPixelUnit = mng.propertiesGui.xPixelUnit();
       this.outer = outer;
+      this.cells = new GralTable.CellData[zLineVisibleMax][zColumn()];
+      xPixelUnit = mng.propertiesGui.xPixelUnit();
       outer.gi = this; 
       int xdPix = outer.itsMng.propertiesGui().xPixelUnit();
       columnPixel = new int[outer.columnWidthsGral.length+1];
@@ -2634,9 +2636,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     /**The currently tree depth of this cell. Invoke setBounds if it is different of line. */
     public int treeDepth;
     
+    
+    /**The widget for a cell is a GralTextField. @since 2015-11-09 for AWT-adaption*/
+    public GralTextField wdgCell;
+    
     public CellData(int ixCellLine, int ixCellColumn){
       this.ixCellLine = ixCellLine; 
       this.ixCellColumn = ixCellColumn;
+      this.wdgCell = new GralTextField(null);
     }
   }
   

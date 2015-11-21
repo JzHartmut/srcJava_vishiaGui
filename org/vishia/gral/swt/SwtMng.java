@@ -308,8 +308,8 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   	)
   { super(GralMng.get(), propertiesGui);
     this.propertiesGuiSwt = propertiesGui;
-    pos().x.p1 = 0; //start-position
-    pos().y.p1 = 4 * propertiesGui.yPixelUnit();
+    //pos().x.p1 = 0; //start-position
+    //pos().y.p1 = 4 * propertiesGui.yPixelUnit();
 
 		
 		displaySwt = display;

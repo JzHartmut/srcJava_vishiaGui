@@ -142,7 +142,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public final static String sVersion = "2015-08-05";
+  public final static String sVersion = "2015-10-30";
   
 	/**This class is used for a selection field for file names and paths. */
   protected class FileSelectInfo
@@ -836,7 +836,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   @Override public void buildCfg(GralCfgData data, File fileCfg) //GuiCfgBuilder cfgBuilder)
   {
     this.cfgData = data;
-    File currentDir = fileCfg.getParentFile();
+    File currentDir = FileSystem.getDir(fileCfg);
     this.cfgBuilder = new GralCfgBuilder(cfgData, this, currentDir);
     cfgBuilder.buildGui(log, 0);
     this.designer = new GralCfgDesigner(cfgBuilder, this, log);  
@@ -1343,7 +1343,7 @@ public GralButton addCheckButton(
    * @param xe end of line relative to current position in grid units.
    * @param ye end of line relative to current position in grid units.
    */
-  @Override public void addLine(int colorValue, float xa, float ya, float xe, float ye){
+  @Deprecated @Override public void addLine(int colorValue, float xa, float ya, float xe, float ye){
     //if(pos().pos.panel.getPanelImpl() instanceof SwtCanvasStorePanel){
     if(pos().pos.panel.canvas !=null){
       GralColor color = propertiesGui.color(colorValue);

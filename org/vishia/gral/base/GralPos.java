@@ -329,12 +329,20 @@ public class GralPos implements Cloneable
    */
   //public int xFrac, xEndFrac, yFrac, yEndFrac;
   
-  /**The values for x and y positions. */
+  /**The values for x and y positions. Note: should be private! Don't use in application furthermore. */
   public final Coordinate x = new Coordinate(), y = new Coordinate();
   
+  /**A GralPos should never create as instance from the application. It is created only from the GralMng which accesses package private.
+   * It is copied inside the GralMng for any widget.  
+   * The position can be changed after them with {@link #setPosition(float, float)} etc.
+   */
   protected GralPos(){}
   
   
+  /**A GralPos should never create as instance from the application. It is created only from the GralMng which accesses package private.
+   * It is copied inside the GralMng for any widget. The position can be changed after them with {@link #setPosition(float, float)} etc. 
+   * @param src the src position to copy all values.
+   */
   protected GralPos(GralPos src){ set(src); }
   
   /**The border to the next element. */
@@ -570,6 +578,11 @@ public class GralPos implements Cloneable
     setFinePosition(y1, y1f, y2, y2f, x1, x1f, x2, x2f, origin, direction, framePos);
     */
   }
+  
+  
+  /**Returns true if this position is from right or bottom, so that a resize of the panel needs new positions for this widget.
+   */
+  public boolean toResize(){ return x.p1 < 0 || x.p2 <= 0 || y.p1< 0 || y.p2 <=0; }
   
   private void frac(float v, int[] pos, int ix){
     int i, f;

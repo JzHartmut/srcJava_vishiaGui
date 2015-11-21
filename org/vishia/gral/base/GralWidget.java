@@ -636,8 +636,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   void initPosAndRegisterWidget(GralPos pos) {
     this._wdgPos = pos;
     if(_wdgPos.panel !=null){
-      boolean toResize = _wdgPos.x.p1 < 0 || _wdgPos.x.p2 <= 0 || _wdgPos.y.p1< 0 || _wdgPos.y.p2 <=0; 
-      _wdgPos.panel.addWidget(this, toResize);
+      _wdgPos.panel.addWidget(this, _wdgPos.toResize());
     } else {
       pos.panel = itsMng.getCurrentPanel();
       System.out.println("GralWidget.GralWidget - pos without panel");

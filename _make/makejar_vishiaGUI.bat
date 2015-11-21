@@ -21,12 +21,11 @@ set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/commander/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/cfg/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/area9/*.java
-set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/guiBzr/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/guiInspc/*.java
 
 REM Sets the CLASSPATH variable for compilation (used jar-libraries).
 REM This component based on the ZBNF and the vishiaRun.
-set CLASSPATH_JAVAC=d:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar;../../zbnfjax/zbnf.jar;../../exe/vishiaRun.jar
+set CLASSPATH_JAVAC=d:\Programs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar;../../zbnfjax/zbnf.jar;../../exe/vishiaRun.jar
 
 REM Sets the src-path for this component, maybe for further necessary sources:
 set SRCPATH_JAVAC=..
