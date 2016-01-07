@@ -11,7 +11,7 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.inspcPC.mng.InspcPlugUser_ifc;
+import org.vishia.inspcPC.InspcPlugUser_ifc;
 import org.vishia.util.StringFunctions;
 import org.vishia.util.StringFunctions_C;
 

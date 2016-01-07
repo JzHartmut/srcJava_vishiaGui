@@ -366,6 +366,10 @@ public final class InspcCurveView
   protected boolean dropVariable(int actionCode, GralWidget widgd, boolean bInsert){
     if(actionCode == KeyCode.menuEntered){
       GralWidget_ifc variableWidget = gralMng.getLastClickedWidget();
+      if(variableWidget == null) {
+        System.err.println("No variable clicked");
+        return false;
+      }
       //GralTextField widgText = (GralTextField)widgd;
       //String sVariable = variableWidget.name;
       Object oContentInfo = widgd.getContentInfo();

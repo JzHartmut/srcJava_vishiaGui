@@ -31,10 +31,11 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralColorSelector;
-import org.vishia.inspcPC.accTarget.InspcTargetAccessData;
+import org.vishia.inspcPC.InspcAccess_ifc;
+import org.vishia.inspcPC.InspcPlugUser_ifc;
+import org.vishia.inspcPC.InspcTargetAccessData;
+import org.vishia.inspcPC.UserInspcPlug_ifc;
 import org.vishia.inspcPC.mng.InspcMng;
-import org.vishia.inspcPC.mng.InspcPlugUser_ifc;
-import org.vishia.inspcPC.mng.UserInspcPlug_ifc;
 import org.vishia.inspectorTarget.Inspector;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageFile;
@@ -556,7 +557,7 @@ private class InspcGuiCfg extends GuiCfg
     }  
 
     
-    @Override public void setInspcComm(InspcMng inspcMng)
+    @Override public void setInspcComm(InspcAccess_ifc inspcMng)
     { if(user1 !=null) { user1.setInspcComm(inspcMng); }
     }
 

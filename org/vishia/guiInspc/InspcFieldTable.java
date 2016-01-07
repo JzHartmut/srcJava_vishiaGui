@@ -19,7 +19,8 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.inspcPC.accTarget.InspcAccessExecRxOrder_ifc;
+import org.vishia.inspcPC.InspcAccessExecRxOrder_ifc;
+import org.vishia.inspcPC.InspcAccess_ifc;
 import org.vishia.inspcPC.accTarget.InspcTargetAccessor;
 import org.vishia.inspcPC.mng.InspcFieldOfStruct;
 import org.vishia.inspcPC.mng.InspcMng;
@@ -49,7 +50,7 @@ import org.vishia.util.KeyCode;
  * This method checks the {@link InspcStruct} of the variable respectively the shown struct in table whether it is known already, 
  * using {@link InspcStruct#isUpdated()}. It it is not updated, on selection a new variable, the 
  * <br><br>
- * {@link InspcTargetAccessor#requestFields(org.vishia.inspcPC.accTarget.InspcTargetAccessData, InspcAccessExecRxOrder_ifc, Runnable)} 
+ * {@link InspcTargetAccessor#requestFields(org.vishia.inspcPC.InspcTargetAccessData, InspcAccessExecRxOrder_ifc, Runnable)} 
  * <br><br>
  * is called. This routine sets only the reference to the {@link InspcTargetAccessData} and the 2 callbacks. 
  * This action is done especially in the graphical thread.
@@ -59,7 +60,7 @@ import org.vishia.util.KeyCode;
  * <br><br>
  * The organization thread of {@link InspcMng} invokes {@link InspcMng#procComm()} cyclically to show and request values. 
  * In this thread via calling {@link InspcTargetAccessor#requestStart(long)} the request for getFields is recognized.
- * For that the {@link InspcTargetAccessor#cmdGetFields(String, org.vishia.inspcPC.accTarget.InspcAccessExecRxOrder_ifc)}
+ * For that the {@link InspcTargetAccessor#cmdGetFields(String, org.vishia.inspcPC.InspcAccessExecRxOrder_ifc)}
  * is invoked for the path of the struct. That is sent to the target.
  * <br><br>
  * The target answers with some items for all fields in one or more datagram but for that request with the same sequence number. 
@@ -323,7 +324,7 @@ public class InspcFieldTable
     } else if(bCanRequest) {
       GralTableLine_ifc<InspcFieldOfStruct> line = widgTable.addLine("$", null, null);
       line.setCellText("pending request", 1);
-      InspcTargetAccessor target = structVar.ds.targetAccessor;
+      InspcAccess_ifc target = structVar.ds.targetAccessor;
       //=========>
       struct.requestFields();  //clear the struct, set to request.
       target.requestFields(struct.varOfStruct(inspcMng).ds, struct.rxActionGetFields, actionUpdated);

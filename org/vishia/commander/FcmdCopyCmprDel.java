@@ -1572,6 +1572,8 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       main.refreshFilePanel(startFile.getParentFile());  //The start file is any file or directory in parent. A directory is refreshed by finishParentNode already.
     }
 
+    
+    @Override public String toString(){ return "callbackFromFilesExec"; }
 
   };
   
