@@ -154,15 +154,15 @@ public class GralColorShow
   public static void mainAWT(){
     GralColorShow main = new GralColorShow();
     main.gralFactory = new AwtFactory();
-    main.execute();
-    //main.execute1();
+    //main.execute();
+    main.execute1();
   }
   
   public static void main(){
     GralColorShow main = new GralColorShow();
     main.gralFactory = new SwtFactory();
-    main.execute();
-    //main.execute1();
+    //main.execute();
+    main.execute1();
   }
   
   private void execute(){
@@ -346,18 +346,19 @@ public class GralColorShow
   , new LightSat("l5", 1.40f, 1.00f )
   , new LightSat("s1", 1.30f, 1.00f )
   , new LightSat("g1", 1.30f, 0.70f )
+  , new LightSat("g2", 1.30f, 0.40f )
   , new LightSat("s2", 1.20f, 1.00f )
   , new LightSat("s3", 1.10f, 1.00f )
-  , new LightSat("g2", 1.20f, 0.30f )                                                                 
-  , new LightSat("g3", 1.10f, 0.50f )                                                                 
+  , new LightSat("g3", 1.20f, 0.30f )                                                                 
+  , new LightSat("s4", 1.10f, 0.50f )                                                                 
   , new LightSat("g4", 1.10f, 0.70f )                                                                 
-  , new LightSat("s4", 1.00f, 1.00f )
-  , new LightSat("s5", 0.90f, 1.00f )
+  , new LightSat("s5", 1.00f, 1.00f )
+  , new LightSat("s6", 0.90f, 1.00f )
   , new LightSat("g5", 0.90f, 0.70f )
   , new LightSat("g6", 0.90f, 0.50f )
   , new LightSat("g7", 0.80f, 0.40f )
   , new LightSat("g8", 0.80f, 0.60f )
-  , new LightSat("s6", 0.80f, 1.00f )
+  , new LightSat("s7", 0.80f, 1.00f )
   , new LightSat("d1", 0.65f, 1.00f )                        
   , new LightSat("d2", 0.60f, 0.70f )
   , new LightSat("g9", 0.60f, 0.50f )
@@ -403,7 +404,7 @@ public class GralColorShow
   };
   
   
-  LightSat[] lightSat =  //// test
+  LightSat[] lightSat_test2 =  //// test
   { new LightSat("p1", 1.50f, 0.00f )
   , new LightSat("p2", 1.50f, 0.10f )
   , new LightSat("p3", 1.50f, 0.20f )
@@ -438,6 +439,8 @@ public class GralColorShow
   };
   
   
+  
+  LightSat[] lightSat = lightSat_html;
   
   String[] valTest = {"", ""};
   

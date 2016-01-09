@@ -63,7 +63,7 @@ public class HelloWorld
   GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic"){
     @Override public void executeOrder()
     { gralMng.selectPanel(window);
-      gralMng.setPosition(4, -2, 2, -2, 0, 'd');
+      gralMng.setPosition(4, 6, 2, -2, 0, 'd');
       gralMng.addText("Hello World");
       //
       //GralTextField input = new GralTextField();
