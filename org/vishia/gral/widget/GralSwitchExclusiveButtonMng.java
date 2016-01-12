@@ -115,6 +115,9 @@ public class GralSwitchExclusiveButtonMng implements VariableAccess_ifc
   @Override
   public void requestValue(long timeRequested) { }
   
+  @Override public void requestValue(){ requestValue(System.currentTimeMillis()); }
+
+  
   @Override
   public void requestValue(long timeRequested, Runnable run) { }
   
