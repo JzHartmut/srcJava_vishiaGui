@@ -47,6 +47,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   /**Version, history and license.
    * <ul>
+   * <li>2016-01-24 Hartmut chg: {@link CommonCurve#lastTimeShort}: Don't store points with the same time stamp.
+   * <li>2016-01-24 Hartmut bugfix: {@link #applySettings(String)} after read cfg: remove previous {@link CommonCurve#timeVariable}, may be a new one! 
    * <li>2015-07-12 Hartmut new: {@link Track#setVisible(int)} to control the visibility of tracks.
    * <li>2015-07-12 Hartmut new: {@link Track#groupTrackScale(GralCurveViewTrack_ifc)} for groups of tracks with same scaling.
    * <li>2014-05-20 Hartmut new in {@link #setSample(float[], int)}: write a point only if at least one variable was refreshed.
@@ -130,6 +132,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
      */
     public String timeDatapath;
 
+    
+    int lastTimeShort;
     
   }
   
@@ -982,6 +986,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   @Override public void setSample(float[] newValues, int timeshort) {
     if(testStopWr) return;  //only for debug test.
+    if((timeshort - common.lastTimeShort) == 0 ) return; //don't store points with same time
+    common.lastTimeShort = timeshort;
     //if(++ixDataWr >= maxNrofXValues){ ixDataWr = 0; } //wrap arround.
     if( ++saveOrg.ctValuesAutoSave > saveOrg.nrofValuesAutoSave) { 
       saveOrg.ctValuesAutoSave = saveOrg.nrofValuesAutoSave;  //no more.
@@ -1066,6 +1072,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
           if(track.variable.isRefreshed()){
             bRefreshed = true;
           }
+          track.variable.requestValue();
           if(track.getDataPath().startsWith("CCS:"))
             stop();
           value = track.variable.getFloat();
@@ -1309,6 +1316,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
         console.writeError(parser.getSyntaxErrorReport());
       } else {
         this.common.timeDatapath = null;
+        this.common.timeVariable = null;
         listTracks.clear();
         listTrackSet.clear();
         ZbnfJavaOutput setData = new ZbnfJavaOutput(console);

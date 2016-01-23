@@ -211,7 +211,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
       System.err.println("arg ownIpc missing");
       System.exit(255);
     }
-    InspcMng variableMng = new InspcMng(cargs.sOwnIpcAddr, cargs.indexTargetIpcAddr, cargs.bUseGetValueByIndex, inspcMngUser);
+    InspcMng variableMng = new InspcMng(cargs.sOwnIpcAddr, cargs.indexTargetIpcAddr, cargs.cycletime, cargs.bUseGetValueByIndex, inspcMngUser);
     composites.add(variableMng);
     this.inspcMng = variableMng;
     (new GralShowMethods(variableMng)).registerShowMethods(cmdgui.gralMng);
@@ -316,6 +316,8 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
     boolean bUseGetValueByIndex;
     
+    public int cycletime = 100;
+    
     String sDefaultDirCfgForCurves = "C:/";
 
     String sDefaultDirSaveForCurves = "C:/";
@@ -368,6 +370,11 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
             String sValue = sArg.substring(posSep+1);
             cargs.curveExporterClasses.put(sKey, sValue);
           }
+        }
+        else if(arg.startsWith("-cycle=")) 
+        { String sTime = getArgument(7);
+          try{ cargs.cycletime = Integer.parseInt(sTime); }
+          catch(NumberFormatException exc){ bOk = false; writeError("argument \"-cycle=\" should be an integer, read: " + sTime); }
         }
         else if(arg.startsWith("-targetbyIndex")) 
         { cargs.bUseGetValueByIndex = true;   //an example for default output

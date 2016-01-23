@@ -442,6 +442,22 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   
   
   
+  final protected void execMove() {
+    String sDstDir = widgInputDst.getText();
+    FileRemote fileDst;
+    if(FileSystem.isAbsolutePathOrDrive(sDstDir)) {
+      fileDst = main.fileCluster.getDir(sDstDir);  //maybe a file or directory
+    } else {
+      fileDst = srcDir.child(sDstDir);  //relative to source
+    }
+    //FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, srcFile, null, evConsumerCallbackFromFileMachine, null, evSrc);
+    //====>
+    //srcFile.moveTo(sFilesSrc, fileDst, callback);
+    //setTexts(Estate.busy);
+    ///
+  }
+
+
   /**Starts the execution of copy in another thread. Note that the compy works with a state machine which uses
    * the found files in the {@link FileRemote#children()} tree. 
    * See {@link FileRemote#copyChecked(String, String, int, org.vishia.fileRemote.FileRemote.CallbackEvent)}.
@@ -518,21 +534,6 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     ///
   }
   
-  
-  final protected void execMove() {
-    String sDstDir = widgInputDst.getText();
-    FileRemote fileDst;
-    if(FileSystem.isAbsolutePathOrDrive(sDstDir)) {
-      fileDst = main.fileCluster.getDir(sDstDir);  //maybe a file or directory
-    } else {
-      fileDst = srcDir.child(sDstDir);  //relative to source
-    }
-    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, srcFile, null, evConsumerCallbackFromFileMachine, null, evSrc);
-    //====>
-    srcFile.moveTo(sFilesSrc, fileDst, callback);
-    setTexts(Estate.busy);
-    ///
-  }
   
   final protected void abortCopy(){
     //if(fileSrc !=null ) {fileSrc.abortAction();}
