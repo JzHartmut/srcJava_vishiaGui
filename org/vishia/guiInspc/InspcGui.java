@@ -48,6 +48,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
   /**Version, history and license
    * <ul>
+   * <li>2016-01-24 Hartmut new: cmd line argument -cycle= for cycletime 
    * <li>2015-01-27 Hartmut new: Test {@link #actionGetValueByHandleIntern}
    * <li>2015-01-27 Hartmut new: Now initialized the {@link GralShowMethods} for usage on edit fields. An edit field
    *   can use the {@link GralShowMethods#syncVariableOnFocus} if the text was changed. 

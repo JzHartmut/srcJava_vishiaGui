@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -842,18 +843,32 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     this.pixelOrg.xPixelCurve = 0;
     this.pixelOrg.yPixelCurve = 0;
     timeValues = new int[maxNrofXValues];
-    for(int ix = 0; ix < maxNrofXValues; ++ix){
-      timeValues[ix] = ix;  //store succession of time values to designate it as empty.  
-    }
+    cleanBuffer();
     saveOrg.nrofValuesAutoSave = (int)(maxNrofXValues * 0.75);
     //values = new float[maxNrofXvalues][nrofTracks];
     //setPanelMng(mng);
-    timeorg.calc();
     setActionMouse(mouseAction, 0);
     
     mng.registerWidget(this);
   }
 
+  
+  
+  public void cleanBuffer()
+  {
+    for(int ix = 0; ix < maxNrofXValues; ++ix){
+      timeValues[ix] = ix;  //store succession of time values to designate it as empty.  
+    }
+    timeorg.calc();
+    common.lastTimeShort = 0;
+    ixDataDraw = ixDataWr =0;
+    ixDataCursor1 = ixDataCursor2 = 0;
+    ixDataShowRight = 0;
+    Arrays.fill(ixDataShown, 0);
+  }
+  
+  
+  
   
   /**It will be called after construction of the implementation graphic in the derived ctor.
    * 
@@ -866,6 +881,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     //menuCurve.addMenuItemGthread("zoomOut", "zoom in", null);
     menuCurve.addMenuItemGthread("zoomBetweenCursor", "zoom between Cursors", actionZoomBetweenCursors);
     menuCurve.addMenuItemGthread("zoomOut", "zoom out", actionZoomOut);
+    menuCurve.addMenuItemGthread("cleanBuffer", "clean Buffer", actionCleanBuffer);
     //menuCurve.addMenuItemGthread("zoomOut", "to left", null);
     //menuCurve.addMenuItemGthread("zoomOut", "to right", null);
     
@@ -1958,6 +1974,16 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         cursorUnzoom();
+      }
+      return true;
+    }
+  };
+
+
+  public GralUserAction actionCleanBuffer = new GralUserAction("actionCleanBuffer"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        cleanBuffer();;
       }
       return true;
     }
