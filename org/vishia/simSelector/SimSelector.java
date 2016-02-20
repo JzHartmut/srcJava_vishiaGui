@@ -1,4 +1,4 @@
-package org.vishia.gral.test;
+package org.vishia.simSelector;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -290,6 +290,7 @@ public class SimSelector
       output.setToPanel();
       
       System.setOut(new PrintStreamAdapter("", output));
+      System.setErr(new PrintStreamAdapter("", output));
       isTableInitialized = true;
       //
       //GralTextField input = new GralTextField();

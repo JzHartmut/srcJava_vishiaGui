@@ -1,58 +1,71 @@
 echo off
-REM The java-copiler may be located at a user-specified position.
-REM Set the environment variable JAVA_HOME, where bin/javac will be found.
-if "%JAVA_HOME%" == "" set JAVA_HOME=D:\Progs\JAVA\jdk1.6.0_21
-::set PATH=%JAVA_HOME%\bin;%PATH%
+::cd ..\..\srcJava_Zbnf\_make
+::call makejar_zbnf.bat
+::cd ..\..\srcJava_vishiaGui\_make
+::pause
+
+set DST_Download=..\..\Download\exe
 
 REM The TMP_JAVAC is a directory, which contains only this compiling results. It will be clean in the batch processing.
-set TMP_JAVAC=..\..\..\tmp_javac
+::set TMP_JAVAC=..\..\..\..\vishia.tmp\tmp_javac
+set TMP_JAVAC=T:\vishia.tmp\tmp_javac
 
-REM Output jar-file with path and filename relative from current dir. It is beside the srcJava-directory:
-set OUTPUTFILE_JAVAC=..\..\exe\vishiaGUI.jar
-if not exist ..\..\exe mkdir ..\..\exe
+REM Output dir and jar-file with path and filename relative from current dir:
+REM The output dir is exe usually but zbnfjax if this file is compiled in the ZBNF download preparation.
+set OUTDIR_JAVAC=..\..\exe
+set JAR_JAVAC=vishiaGral.jar
 
 REM Manifest-file for jar building relativ path from current dir:
-set MANIFEST_JAVAC=vishiaGUI.manifest
+set MANIFEST_JAVAC=vishiaGui.manifest
 
 REM Input for javac, only choice of primary sources, relativ path from current (make)-directory:
 set INPUT_JAVAC=
-::set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/guiViewCfg/ViewCfg.java
-set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/commander/*.java
+set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/commander/Fcmd.java
+set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/vcs/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/cfg/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/area9/*.java
+set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/test/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/guiInspc/*.java
+::set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/guiViewCfg/ViewCfg.java
+set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/simSelector/*.java
 
-REM Sets the CLASSPATH variable for compilation (used jar-libraries).
+REM Sets the CLASSPATH variable for compilation (used jar-libraries). do not leaf empty also it aren't needed:
 REM This component based on the ZBNF and the vishiaRun.
-set CLASSPATH_JAVAC=d:\Programs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar;../../zbnfjax/zbnf.jar;../../exe/vishiaRun.jar
 
-REM Sets the src-path for this component, maybe for further necessary sources:
-set SRCPATH_JAVAC=..
-
-REM Call java-compilation and jar with given input environment. This following commands are the same for all java-compilations.
-echo on
-if exist %TMP_JAVAC% rmdir /S /Q %TMP_JAVAC%
-mkdir %TMP_JAVAC%
-mkdir %TMP_JAVAC%\bin
-%JAVA_HOME%\bin\javac.exe -deprecation -d %TMP_JAVAC%/bin -sourcepath %SRCPATH_JAVAC% -classpath %CLASSPATH_JAVAC% %INPUT_JAVAC% 1>>%TMP_JAVAC%\javac_ok.txt 2>%TMP_JAVAC%\error.txt
-echo off
-if errorlevel 1 goto :error
-echo copiling successfull, generate jar:
-
-set ENTRYDIR=%CD%
-cd %TMP_JAVAC%\bin
-echo jar -c
-%JAVA_HOME%\bin\jar.exe -cvfm %ENTRYDIR%/%OUTPUTFILE_JAVAC% %ENTRYDIR%/%MANIFEST_JAVAC% *  >>../error.txt
-if errorlevel 1 goto :error
-cd %ENTRYDIR%
-
+set SWTJAR=d:\Programs\XML_Tools\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+if exist %SWTJAR% goto :swtOk
+set SWTJAR=d:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+if exist %SWTJAR% goto :swtOk
+set SWTJAR=c:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+if exist %SWTJAR% goto :swtOk
+set SWTJAR=d:\Programme\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+if exist %SWTJAR% goto :swtOk
+set SWTJAR=%FCMD_DST%\windows\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+if exist %SWTJAR% goto :swtOk
+set SWTJAR=..\..\..\Java\Download\swt\windows\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+if exist %SWTJAR% goto :swtOk
+echo SWT library not found
 pause
-goto :ende
+exit
+:swtOk
+set SRCvishiaBase=D:\vishia\ZBNF\sf\ZBNF\srcJava_vishiaBase
+set ZBNFJAR=D:\vishia\ZBNF\sf\ZBNF\zbnfjax\zbnf.jar
+if exist %ZBNFJAR% goto :ZbnfOk
+set SRCvishiaBase=..\..\srcJava_vishiaBase
+set ZBNFJAR=..\..\exe\zbnf.jar
+:ZbnfOk
+set CLASSPATH_JAVAC=%SWTJAR%;%ZBNFJAR%
+echo %CLASSPATH_JAVAC%
+pause
 
-:error
-  type %TMP_JAVAC%\error.txt
-  pause
-  goto :ende
 
-:ende
+REM Sets the src-path for further necessary sources:
+::set SRCPATH_JAVAC=..;../../srcJava_vishiaBase;../../srcJava_Zbnf;../../srcJava_vishiaRun
+set SRCPATH_JAVAC=..;../../srcJava_vishiaRun
+
+call %SRCvishiaBase%\_make\+javacjarbase.bat
+
+if exist %DST_Download% copy %OUTDIR_JAVAC%\%JAR_JAVAC% %DST_Download%\%JAR_JAVAC% 
+pause
+
