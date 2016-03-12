@@ -1544,7 +1544,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      */
     protected boolean processKeys(int keyCode){ 
       //GralTable widgt = (GralTable)widgg;
-      if(bColumnEditable(colSelectedixCellC)) {
+      if(lineSelected !=null && bColumnEditable(colSelectedixCellC)) {
         //update the text of the cell from the implementation layer:
         CellData cell = cells[lineSelectedixCell][colSelectedixCellC];
         String sContent = getCellText(cell);

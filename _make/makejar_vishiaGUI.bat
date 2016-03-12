@@ -49,6 +49,8 @@ echo SWT library not found
 pause
 exit
 :swtOk
+REM The viahisGui depends on zbnf.jar.
+REM SRCvishiaBase used for compile batch script only.
 set SRCvishiaBase=D:\vishia\ZBNF\sf\ZBNF\srcJava_vishiaBase
 set ZBNFJAR=D:\vishia\ZBNF\sf\ZBNF\zbnfjax\zbnf.jar
 if exist %ZBNFJAR% goto :ZbnfOk

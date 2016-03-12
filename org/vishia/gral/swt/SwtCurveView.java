@@ -293,7 +293,7 @@ public class SwtCurveView extends GralCurveView
       */
     } 
     //  
-    //prepare indices of data.
+    //prepare indices of data. Fills {@link #ixDataShown}
     int ixixDataLast = prepareIndicesDataForDrawing(ixDataRight, xViewPart, timeDiff, bPaintAll);
     // 
     //write time divisions:

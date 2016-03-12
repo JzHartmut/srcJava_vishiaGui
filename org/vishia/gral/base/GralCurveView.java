@@ -28,6 +28,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.mainCmd.Report;
 import org.vishia.mainCmd.ReportWrapperLog;
 import org.vishia.util.Assert;
+import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Timeshort;
 import org.vishia.zbnf.ZbnfJavaOutput;
@@ -48,6 +49,13 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   /**Version, history and license.
    * <ul>
+   * <li>2016-03-06 Hartmut chg: {@link #refreshFromVariable(VariableContainer_ifc)}: Handling of timeshort: If the timeshort starts with a lesser value
+   *   it seems to be a new simulation starting with 0. Then the time difference to the last simulation is calculated and added to the timeshort. 
+   *   It sets a new {@link #setTimePoint(long, int, float)} to prevent overflow later. Initially or if {@link #cleanBuffer()} was invoked the timeshort counts from 0.
+   *   Therewith the simulation results have an exact relative time but with the absolute timestamp of the PC's time though the simulation does not supply an absolute time.
+   *   Before that change a bug is detected in {@link #prepareIndicesDataForDrawing(int, int, int, boolean)}: If the buffer from right side contains a greater short time, 
+   *   the indices return only 1 point. It is a bug in this function, not corrected yet because there are not greater times from right to left with the change above.
+   *   TODO fix it though.     
    * <li>2016-01-24 Hartmut chg: {@link CommonCurve#lastTimeShort}: Don't store points with the same time stamp.
    * <li>2016-01-24 Hartmut bugfix: {@link #applySettings(String)} after read cfg: remove previous {@link CommonCurve#timeVariable}, may be a new one! 
    * <li>2015-07-12 Hartmut new: {@link Track#setVisible(int)} to control the visibility of tracks.
@@ -134,7 +142,6 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     public String timeDatapath;
 
     
-    int lastTimeShort;
     
   }
   
@@ -418,6 +425,12 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
      */
     private volatile int ctTimeSet;
     
+    /**The last timeshort from the timeVariable. To detect newly simulation if it starts with a lesser value. */ 
+    int timeshortLast;
+
+    /**Value to add to the time stamp to get a continuous time for some simulations one after another. */
+    int timeshortAdd;
+
     public int lastShortTimeDateInCurve;
     
     /**Short time stamp of the oldest stored point. */
@@ -501,19 +514,19 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
      * It sets {@link #divType}, {@link #pixelPerTimeFineDiv}, {@link #millisecPerFineDiv}
      */
     public void calc(){
-      int millisec20pixel = (int)(12 * timePerPixel * absTime.absTime_Millisec7short);  //millisec for 12 pixel
+      int millisec20pixel = (int)(12 * timePerPixel * absTime.millisec7short());  //millisec for 12 pixel
       boolean bFound = false;
-      for(int ii = 0; ii < millisecPerDivVariants.length; ++ii){
+      for(int ii = 0; ii < millisecPerDivVariants.length; ++ii){  //search in [5 10 20 ...] etc. millisecPerDivisions 
         if(millisecPerFineDivVariants[ii] >= millisec20pixel){
-          millisecPerDiv = millisecPerDivVariants[ii];
+          millisecPerDiv = millisecPerDivVariants[ii];            //sets millisecPerDiv and ..FineDiv
           millisecPerFineDiv = millisecPerFineDivVariants[ii];
           bFound = true;
           break;
         }
       }
       if(bFound) {
-        pixelPerTimeDiv =     millisecPerDiv     / (timePerPixel * absTime.absTime_Millisec7short);  //number of pixel per division, should be appropriate 48..150
-        pixelPerTimeFineDiv = millisecPerFineDiv / (timePerPixel * absTime.absTime_Millisec7short);  //number of pixel per division, should be appropriate 12..30
+        pixelPerTimeDiv =     millisecPerDiv     / (timePerPixel * absTime.millisec7short());  //number of pixel per division, should be appropriate 48..150
+        pixelPerTimeFineDiv = millisecPerFineDiv / (timePerPixel * absTime.millisec7short());  //number of pixel per division, should be appropriate 12..30
       } else {
         //use a fix value to prevent any failure calculations.
         pixelPerTimeDiv = 150;
@@ -860,7 +873,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       timeValues[ix] = ix;  //store succession of time values to designate it as empty.  
     }
     timeorg.calc();
-    common.lastTimeShort = 0;
+    timeorg.timeshortAdd = 0;
+    timeorg.timeshortLast = 0;
+    timeorg.absTime.clean();
     ixDataDraw = ixDataWr =0;
     ixDataCursor1 = ixDataCursor2 = 0;
     ixDataShowRight = 0;
@@ -1002,8 +1017,6 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   @Override public void setSample(float[] newValues, int timeshort) {
     if(testStopWr) return;  //only for debug test.
-    if((timeshort - common.lastTimeShort) == 0 ) return; //don't store points with same time
-    common.lastTimeShort = timeshort;
     //if(++ixDataWr >= maxNrofXValues){ ixDataWr = 0; } //wrap arround.
     if( ++saveOrg.ctValuesAutoSave > saveOrg.nrofValuesAutoSave) { 
       saveOrg.ctValuesAutoSave = saveOrg.nrofValuesAutoSave;  //no more.
@@ -1099,22 +1112,36 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
         values[++ixTrack] = value;
       }  
       bNewGetVariables = false;
-      final long timeyet;
+      final long timeyet = System.currentTimeMillis();
+      int timeshort;
       if(this.common.timeDatapath !=null && this.common.timeVariable ==null){
         String sPath = itsMng.replaceDataPathPrefix(this.common.timeDatapath);  //replaces only the alias:
         this.common.timeVariable = container.getVariable(sPath);
       }
       if(this.common.timeVariable !=null){
-        
-        timeyet = this.common.timeVariable.getLong();
-        this.common.timeVariable.requestValue(System.currentTimeMillis());
+        //the time variable should contain a relative time stamp. It is the short time.
+        //Usual it is in 1 ms-step. To use another step width, a mechanism in necessary.
+        //1 ms in 32 bit are ca. 2000000 seconds.
+        timeshort = this.common.timeVariable.getInt() + this.timeorg.timeshortAdd;
+        this.common.timeVariable.requestValue(timeyet);
+        if(this.timeorg.absTime.isCleaned()) {
+          setTimePoint(timeyet, timeshort, 1.0f);  //the first time set.
+        }
+        else if((timeshort - this.timeorg.timeshortLast) <0 || this.timeorg.absTime.isCleaned()) {
+          //new simulation time:
+          int timeshortAdd = this.timeorg.absTime.timeshort4abstime(timeyet);
+          timeshort += timeshortAdd;
+          this.timeorg.timeshortAdd += timeshortAdd; 
+          setTimePoint(timeyet, timeshort, 1.0f);  //for later times set the timePoint newly to keep actual.
+        }
       } else {
-        timeyet = System.currentTimeMillis();
+        timeshort = (int)timeyet;  //The milliseconds from absolute time.
+        setTimePoint(timeyet, timeshort, 1.0f);  //set always a timePoint if not data time is given.
       }
-      if(bRefreshed){
-        int timeshort = (int)timeyet;
-        setTimePoint(timeyet, timeshort, 1.0f);
+      if(bRefreshed && timeshort != this.timeorg.timeshortLast) {
+        //don't write points with the same time, ignore seconds.
         setSample(values, timeshort);
+        this.timeorg.timeshortLast = timeshort;
       }
     }
   }
@@ -1176,7 +1203,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     float pixel2FineDiv = milliSec2FineDiv * timeorg.pixel7time / timeorg.absTime.millisec7short(); //how many pixel to the next fine division line
     float pixel2Div = milliSec2Div * timeorg.pixel7time / timeorg.absTime.millisec7short();         //how many pixel to the next division line 
     int ixPixelTimeDiv =-1;
-    int ixPixelTimeDivFine =-1;
+    int ixPixelTimeDivFine =-1;  //sets timeorg.sTimeAbsDiv[...], timeorg.xPixelTimeDivFine[...] TODO clean arrays before, better for debugging or set to -1 for stop point, see affter while-loop
     while(pixel2FineDiv < xViewPart ){ //&& nrofPixel4Data >=0){
       if(Math.abs(pixel2Div - pixel2FineDiv) < 3){
         //strong division
@@ -1222,7 +1249,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     //xViewPart = nrof pixel from right
     //ixp1 counts from 0... right to left
     //int nrofValues1 = nrofValues;
-    while(ixp < xViewPart
+    while(ixp < xViewPart       //Fills ixDataShown with the index to the data for each pixel.
          && dtime2 <=0 
          && nrofPixel4Data >=0  //130328
          ){ // && ixp1 >= ixp2){ //singularly: ixp1 < ixp2 if a faulty timestamp is found.
@@ -1244,6 +1271,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
               ixp3 = xViewPart;     //no more than requested nr of points. 
             }
             nrofPixel4Data += (ixp3 - ixp);
+            if(ixp3 < ixp)
+              Debugutil.stop();
             ixp = ixp3; 
             if(xpCursor1New == cmdSetCursor && ixData == ixDataCursor1){
               xpCursor1New = ixp;                  //set cursor xp if the data index is gotten.
