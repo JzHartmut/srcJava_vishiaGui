@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralPos;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.util.Assert;
@@ -107,6 +108,18 @@ public class SwtCurveView extends GralCurveView
   
   
   @Override public void repaintGthread(){
+    int chg = dyda.getChanged();  //impl.getChanged();
+    int acknChg = 0;
+    if((chg & ImplAccess.chgVisible)!=0){
+      acknChg |= ImplAccess.chgVisible;
+      curveSwt.setVisible(true);
+      setFocusGThread();
+    }
+    if((chg & ImplAccess.chgInvisible)!=0){
+      acknChg |= ImplAccess.chgInvisible;
+      curveSwt.setVisible(false);
+    }
+    dyda.acknChanged(acknChg);
     curveSwt.redraw();
   }
 

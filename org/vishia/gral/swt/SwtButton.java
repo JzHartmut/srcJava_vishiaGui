@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralKeyListener;
 import org.vishia.gral.base.GralPos;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -144,6 +145,36 @@ public class SwtButton extends GralButton.GraphicImplAccess
   
   @Override public void repaintGthread(){
     super.prepareWidget();
+    GralWidget.DynamicData dyda = dyda();
+    int chg = dyda.getChanged();
+    if((chg & chgText) !=0 && dyda.displayedText !=null){ 
+      //textFieldSwt.setText(dyda.displayedText);
+    }
+    if((chg & chgColorText)!=0){
+      acknChanged(chgColorText);
+      SwtProperties props = swtWidgHelper.mng.propertiesGuiSwt;
+      if(dyda.textColor !=null){
+        widgetSwt.setForeground(props.colorSwt(dyda.textColor));
+      }
+      if(dyda.backColor !=null){
+        widgetSwt.setBackground(props.colorSwt(dyda.backColor));
+      }
+      if(dyda.textFont !=null){
+        widgetSwt.setFont(props.fontSwt(dyda.textFont));
+      }
+    }
+    if((chg & chgVisible) !=0) {
+      acknChanged(chgVisible);
+      widgetSwt.setVisible(true);
+      //widgetSwt.getShell().setVisible(true);
+    }
+    if((chg & chgInvisible) !=0) {
+      acknChanged(chgInvisible);
+      widgetSwt.setVisible(false);
+      //widgetSwt.getShell().setVisible(false);
+    }
+    if((chg & chgColorText) !=0){ acknChanged(chgColorText); widgetSwt.setForeground(swtWidgHelper.mng.getColorImpl(dyda().textColor)); }
+    if((chg & chgColorBack) !=0){ acknChanged(chgColorBack); widgetSwt.setBackground(swtWidgHelper.mng.getColorImpl(dyda().backColor)); }
     widgetSwt.redraw();
   }
 

@@ -173,6 +173,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2015-09-20 Hartmut chg: some final methods now non final, because they have to be overridden for large widgets.
+   * <li>2015-09-20 Hartmut chg: gardening for {@link DynamicData#getChanged()}, now private attribute {@link DynamicData#whatIsChanged}
    * <li>2015-09-20 Hartmut new: {@link #setActionMouse(GralMouseWidgetAction_ifc, int)} was a private thing in {@link org.vishia.gral.swt.SwtGralMouseListener.MouseListenerGralAction}
    *   for widget implementation's mouse handling. Now as user define-able property of any widget, especially use-able for text fields. 
    * <li>2015-09-12 Hartmut new: {@link #getData()}, {@link #setData(Object)} was existent as {@link GralWidget#setContentInfo(Object)},
@@ -384,6 +386,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * <li>xxx E: an edit field, 1 line
    * <li>xxx e: an edit area
    * <li>F: input file selection field
+   * <li>f: GralFileSelector
    * <li>h; HTML text  box (browser)
    * <li>I: a line
    * <li>i: an image
@@ -520,7 +523,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     
     /**32 bit what is changed, see {@link GralWidget#chgColorText} etc. 
      * TODO should be protected. */
-    public AtomicInteger whatIsChanged = new AtomicInteger(); 
+    private AtomicInteger whatIsChanged = new AtomicInteger(); 
     
     /**Sets what is changed, Bits defined in {@link GralWidget.ImplAccess#chgColorBack} etc.
      * @param mask one bit or some bits. ImplAccess.chgXYZ
@@ -534,6 +537,13 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
         bOk = whatIsChanged.compareAndSet(act, newValue);
       } while(!bOk && --catastrophicalCount >= 0);
     }
+    
+    
+    /**Returns the bits what is changed.
+     * All bits which were evaluated should be acknowledged via {@link #acknChanged(int)}
+     * @return
+     */
+    public int getChanged(){ return whatIsChanged.get(); }
     
     /**Resets what is changed, Bits defined in {@link GralWidget.ImplAccess#chgColorBack} etc.
      * This routine should be called in the paint routine whenever the change was succeeded.
@@ -665,10 +675,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   
-  /* (non-Javadoc)
-   * @see org.vishia.gral.ifc.GralWidget_ifc#setToPanel()
+  /**Standard implementation of  @see org.vishia.gral.ifc.GralWidget_ifc#setToPanel()
+   * Only large widgets (contains more as one GralWidget) should override this method.
    */
-  @Override public final void setToPanel() throws IllegalStateException {
+  @Override public void setToPanel() throws IllegalStateException {
     GralMng mngg = GralMng.get();  //The implementation should be instantiated already!
     if(_wdgImpl !=null) throw new IllegalStateException("setToPanel faulty call - GralTable;");
     if(dyda.textFont == null) { //maybe set with knowledge of the GralMng before.
@@ -1223,13 +1233,15 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   }
 
   
-  /**Sets the widget visible or not.
+  /**Sets the widget visible or not. It is the default implementation for all simple widgets:
+   * Sets {@link ImplAccess#chgVisible} or {@link ImplAccess#chgInvisible} in {@link DynamicData#setChanged(int)}
+   * and invokes {@link #repaint()} with the {@link #repaintDelay} and {@link #repaintDelayMax}
    * @param visible
    * @return the old state.
    */
   @Override public boolean setVisible(boolean visible){
     dyda.setChanged(visible ? ImplAccess.chgVisible : ImplAccess.chgInvisible);
-    repaint(repaintDelay, repaintDelayMax);
+    repaint();
     return bVisibleState;
   }
   
@@ -1399,7 +1411,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   }
   
   
-  public final void setFocus(){ setFocus(0,0); }
+  /**Standard implementation. Override only if necessary for sepcial handling.
+   * @see org.vishia.gral.ifc.GralWidget_ifc#setFocus()
+   */
+  public void setFocus(){ setFocus(0,0); }
 
   
   

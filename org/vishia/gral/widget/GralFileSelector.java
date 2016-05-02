@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.EventObject;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,16 +11,13 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.commander.Fcmd;
-import org.vishia.event.EventCmdtype;
-import org.vishia.event.EventConsumer;
-import org.vishia.event.EventSource;
 import org.vishia.fileRemote.FileAccessZip;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
-import org.vishia.fileRemote.FileRemoteAccessor;
 import org.vishia.fileRemote.FileRemoteCallback;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMenu;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
@@ -68,13 +64,13 @@ import org.vishia.util.Timeshort;
  * @author Hartmut Schorrig
  *
  */
-public class GralFileSelector implements Removeable //extends GralWidget
+public class GralFileSelector extends GralWidget implements Removeable //extends GralWidget
 {
-  
-  
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2016-05-02 Hartmut now: derived from GralWidget, it is a large widget 
+   * <li>2016-05-03 Hartmut new: {@link #setVisible(boolean)} for this large widget.
    * <li>2015-11-19 Hartmut chg: {@link #fillInCurrentDir()} does not refresh if it was refreshed in the last seconds.
    * <li>2014-12-26 Hartmut chg: {@link #fillIn(FileRemote, boolean)} now with new meaning of boolean: show newly without refresh with the file system.
    *   This is used in callback routines which does a refresh but does not invoke {@link #showFile(FileRemote)}
@@ -538,6 +534,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
   /**The widget for showing the path. */
   protected GralTextField widgdPathDir;
   
+  protected GralButton widgBtnFavor;
+  
   String sDatePrefixNewer = "";
   SimpleDateFormat dateFormatNewer = new SimpleDateFormat("?yy-MM-dd HH:mm:ss"); 
   
@@ -616,6 +614,7 @@ public class GralFileSelector implements Removeable //extends GralWidget
   
   public GralFileSelector(String name, int rows, int[] columns, char size)
   { //this.name = name; this.rows = rows; this.columns = columns; this.size = size;
+    super(null, name, 'f');
     favorList = new GralTable(null, new int[]{15,0});
     selectList = new FileSelectList(this, name, rows, columns, size);
     colorBack = GralColor.getColor("wh");
@@ -651,8 +650,8 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * @param size Presentation size. It is a character 'A'..'E', where 'A' is a small size. The size determines
    *        the font size especially. 
    */
-  public void setToPanel(GralMngBuild_ifc panelMng)
-  {
+  public void setToPanel() //GralMngBuild_ifc panelMng)
+  { GralMng panelMng = GralMng.get();
     //The macro widget consists of more as one widget. Position the inner widgets:
     GralPos posAll = panelMng.getPositionInPanel();
     GralPanelContent panel = posAll.panel;
@@ -665,7 +664,9 @@ public class GralFileSelector implements Removeable //extends GralWidget
     GralMenu menuFolder = widgdPathDir.getContextMenu();
     menuFolder.addMenuItemGthread("x", "refresh [cR]", actionRefreshFileTable);
     panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
-    panelMng.addButton(null, actionFavorButton, "favor");
+    widgBtnFavor = new GralButton(null, "favor", actionFavorButton);
+    widgBtnFavor.setToPanel();
+    widgBtnFavor.setVisible(false);
     //the list
     //on same position as favor table: the file list.
     panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
@@ -1267,6 +1268,15 @@ public class GralFileSelector implements Removeable //extends GralWidget
    * @return true if focused.
    */
   public void setFocus(){ selectList.wdgdTable.setFocus(); }
+  
+  
+  @Override public boolean setVisible(boolean visible)
+  {
+    selectList.wdgdTable.setVisible(visible);
+    widgdPathDir.setVisible(visible);
+    widgBtnFavor.setVisible(visible);
+    return bVisibleState; 
+  }
   
   void stop(){}
 

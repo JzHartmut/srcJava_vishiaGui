@@ -37,8 +37,6 @@ import org.vishia.util.KeyCode;
 public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
 {
 
-
-
   /**Version, history and license.
    * <ul>
    * <li>2015-05-04 Hartmut new: {@link #setBorderWidth(int)} to show the text field with a border. That is not a property
@@ -286,6 +284,12 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
         if((chg & chgPrompt) !=0){ 
           promptSwt.setText(this.prompt());
           promptSwt.redraw();
+        }
+        if((chg & chgVisible) !=0){ 
+          textFieldSwt.setVisible(true);
+        }
+        if((chg & chgInvisible) !=0){ 
+          textFieldSwt.setVisible(false);
         }
         if((chg & chgColorText) !=0){ 
           textFieldSwt.setForeground(swtWidgHelper.mng.getColorImpl(dyda().textColor)); }

@@ -338,7 +338,7 @@ public class InspcFieldTable
   
   
   
-  /**Shows the received value inside the target for the specified line.
+  /**Shows the current value inside the target for the specified line.
    * This routine is called both if the operator requests a refresh of content of the line: {@link #actionChgTable}
    * or if a new value was received: {@link RunOnReceive#run()} invoked from {@link InspcVariable#requestValue(long, Runnable)}.
    * The last one method requestValue() is invoked in this routine if the argument request is set to true. 
@@ -362,10 +362,10 @@ public class InspcFieldTable
           default: { float val = var.getFloat(); sVal = Float.toString(val); }
         }
         int dtime = (int)(time - timelast);
-        if(timelast == 0 || dtime > 5000){ //10 sec
-          sVal = "? " + sVal;
+        if(timelast == 0 || dtime > 5000){ //5 sec
+          sVal = "? " + sVal;  //a really old value or never gotten.
         }
-        if(request && timelast == 0 || dtime > 500){ //10 sec
+        if(request && timelast == 0 || dtime > 500){ //request a new value if it is older than 0.5 sec
           var.requestValue(time, this.new RunOnReceive(line)); 
         }
         line.setCellText(sVal, 2);

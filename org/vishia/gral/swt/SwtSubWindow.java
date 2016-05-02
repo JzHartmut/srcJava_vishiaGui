@@ -391,6 +391,10 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     if(super.shouldClose()){
       window.close();
     } 
+    if((chg & chgText)!=0){
+      acknChg |= chgText;   //sets the title of the window
+      window.setText(dyda().displayedText);;
+    }
     if((chg & chgVisible)!=0){
       acknChg |= chgVisible;
       setFocusGThread();

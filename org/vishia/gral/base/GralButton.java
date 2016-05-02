@@ -11,6 +11,7 @@ public class GralButton extends GralWidget
 {
   /**Version, history and license.
    * <ul>
+   * <li>2016-05-03 Hartmut chg: Now supports {@link GralWidget#setVisible(boolean)}
    * <li>2015-06-21 Hartmut chg: {@link #setSwitchMode(GralColor, GralColor, GralColor)} with null as 3. color
    *   sets to 2-times switch like {@link #setSwitchMode(GralColor, GralColor)}. 
    * <li>2015-05-31 Hartmut new: Now a key listener and a traverse listener was added for the SWT implementation.
@@ -455,25 +456,17 @@ public class GralButton extends GralWidget
     
     
     protected void prepareWidget(){
-      int catastrophicalCount = 0;
-      int chg, chgAckn=0;
       int state1 = -1;
-      do{
-        chg = dyda().whatIsChanged.get() & ~chgAckn;  //don't handle a bit twice if re-read.
-        if(++catastrophicalCount > 10000) 
-          throw new RuntimeException("atomic failed");
-        if((chg & chgVisibleInfo) !=0 && dyda().visibleInfo !=null){ 
-          chgAckn |= chgVisibleInfo;
-          if(dyda().visibleInfo instanceof Integer){
-            state1 = ((Integer)dyda().visibleInfo).intValue();
-          }
+      int chg = dyda().getChanged();  //don't handle a bit twice if re-read.
+      if((chg & chgVisibleInfo) !=0 && dyda().visibleInfo !=null){ 
+        if(dyda().visibleInfo instanceof Integer){
+          state1 = ((Integer)dyda().visibleInfo).intValue();
         }
-        if((chg & chgIntg) !=0 ){ 
-          chgAckn |= chgIntg;
-          state1 = 0; //TODO dyda.intValue
-        }
-      } while(!dyda().whatIsChanged.compareAndSet(chg, 0));  //repeat if chg is changed in that time.
-
+      }
+      if((chg & chgIntg) !=0 ){ 
+        state1 = 0; //TODO dyda.intValue
+      }
+      dyda.acknChanged(chg & (chgVisibleInfo | chgIntg));
       switch(state1){
         case 0: switchState = State.Off; break;
         case 1: switchState = State.On; break;

@@ -7,7 +7,7 @@ import org.vishia.gral.base.GralWidget;
 import org.vishia.util.Removeable;
 
 
-/**It is a basic interface for any widget of the Graphic Adaption Layer (gral).
+/**This is the basic interface for all widgets of the Graphic Adaption Layer (gral).
  * <br>
  * <b>Strategy of changing the graphical content of a widget</b>:<br>
  * 2013-09-30<br>
@@ -103,11 +103,6 @@ public interface GralWidget_ifc extends Removeable
    */
   public static final String version = "2015-09-12";
 
-  
-  
-  /**Returns the implementation class of more as one widget. If the widget has only one implementation widget,
-   * this method returns null. You should call {@link #getWidgetImplementation()} instead. */
-  //public Object[] XXXgetWidgetMultiImplementations();
   
   
   public String getName();

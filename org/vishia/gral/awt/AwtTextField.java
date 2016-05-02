@@ -153,29 +153,28 @@ public class AwtTextField extends GralTextField.GraphicImplAccess
 
   @Override public void repaintGthread(){
     GralWidget.DynamicData dyda = dyda();
-    int chg = dyda.whatIsChanged.get();
-    int catastrophicalCount = 0;
-    do{
-      if(++catastrophicalCount > 10000) throw new RuntimeException("atomic failed");
-      if((chg & chgText) !=0  && dyda.displayedText !=null){ 
-        if(widgg.isEditable()){
-          editBuffer.setLength(0); editBuffer.append(dyda().displayedText);
-        }
+    int chg = dyda.getChanged();
+    if((chg & chgText) !=0  && dyda.displayedText !=null){ 
+      if(widgg.isEditable()){
+        editBuffer.setLength(0); editBuffer.append(dyda().displayedText);
       }
-      if((chg & chgEditable) !=0) {
-        if(widgg.isEditable()){
-          if(editBuffer == null) { editBuffer = new StringBuilder(20); }
-          editBuffer.setLength(0); editBuffer.append(dyda().displayedText);
-        } else { //not editable
-          editBuffer = null;  //garbage it.
-        }
+    }
+    if((chg & chgEditable) !=0) {
+      if(widgg.isEditable()){
+        if(editBuffer == null) { editBuffer = new StringBuilder(20); }
+        editBuffer.setLength(0); editBuffer.append(dyda().displayedText);
+      } else { //not editable
+        editBuffer = null;  //garbage it.
       }
-      if((chg & chgColorText) !=0){ widgetAwt.setForeground(widgHelper.mng.getColorImpl(dyda.textColor)); }
-      if((chg & chgColorBack) !=0){ widgetAwt.setBackground(widgHelper.mng.getColorImpl(dyda.backColor)); }
-      widgetAwt.repaint();
-    } while(!dyda.whatIsChanged.compareAndSet(chg, 0));
+    }
+    dyda.acknChanged(chg);
+    if((chg & chgColorText) !=0){ widgetAwt.setForeground(widgHelper.mng.getColorImpl(dyda.textColor)); }
+    if((chg & chgColorBack) !=0){ widgetAwt.setBackground(widgHelper.mng.getColorImpl(dyda.backColor)); }
+    widgetAwt.repaint();
   }
 
+  
+  
   @Override public GralRectangle getPixelPositionSize()
   {
     // TODO Auto-generated method stub

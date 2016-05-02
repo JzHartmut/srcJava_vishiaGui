@@ -84,15 +84,16 @@ public class SwtLed extends GralLed.GraphicImplAccess
   private void setColors(){
     int changedAckn = 0;
     GralWidget.DynamicData dyda = dyda(); //GralLed.GraphicImplAccess.this.dyda();
+    int chg = dyda.getChanged();
     if(dyda.backColor !=null 
-      && ( (dyda.whatIsChanged.get() & GralWidget.ImplAccess.chgColorBack)!=0
+      && ( (chg & GralWidget.ImplAccess.chgColorBack)!=0
          ||innerColor == null   //uninitialized: start with dyda.backColor
       )  ){ 
       innerColor = mng.getColorImpl(dyda.backColor);
       changedAckn |= GralWidget.ImplAccess.chgColorBack; 
     }
     if(dyda.lineColor !=null){  //use backColor if lineColor is not set! 
-      if( (dyda.whatIsChanged.get() & GralWidget.ImplAccess.chgColorLine)!=0
+      if( (chg & GralWidget.ImplAccess.chgColorLine)!=0
         || borderColor == null
         ){
         borderColor = mng.getColorImpl(dyda.lineColor); 
@@ -101,8 +102,8 @@ public class SwtLed extends GralLed.GraphicImplAccess
     } else {
       borderColor = innerColor;
     }
-    if(changedAckn !=0){
-      dyda.setChanged(changedAckn);
+    if(changedAckn !=0) {
+      dyda.acknChanged(changedAckn);
     }
   }
   

@@ -41,10 +41,8 @@ import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.gral.widget.GralLabel;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmdLoggingStream;
-import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
-import org.vishia.util.Assert;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
@@ -584,7 +582,10 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
 
-  /**Returns the singleton or null if the GralMng is not instantiated yet.*/
+  /**Returns the singleton of the GralMng. Creates it if it is not instantiated yet. 
+   * On creation all logging output will be redirect to System.out.
+   * To use another logging output, create the GralMng using {@link GralMng#GralMng(LogMessage)}
+   * on start of application, before this routine is firstly called. */
   public static GralMng get(){ 
     if(singleton == null) { //not initialized yet, early invocation:
       singleton = new GralMng(new MainCmdLoggingStream(System.out));
