@@ -717,6 +717,8 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     
     protected boolean isPasswordField(){ return GralTextField.this.bPassword; }
     
+    protected void setTouched(boolean bTouched) { widgg.dyda.bTouchedField = bTouched; }
+    
   }
   
   

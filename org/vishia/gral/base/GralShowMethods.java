@@ -171,7 +171,8 @@ public class GralShowMethods
           //else { sValue = null; }
         } else if(actionCode == KeyCode.focusLost){
           if(widg.isChanged(true)){
-            variable.setString(widg.getValue());
+            String sValue = widg.getValue();
+            variable.setString(sValue);
           }
           //if(oWidget instanceof Text){ sValue = variable.getString(); ((Text)oWidget).setText(sValue == null ? "" : sValue); }
           //else { sValue = null; }

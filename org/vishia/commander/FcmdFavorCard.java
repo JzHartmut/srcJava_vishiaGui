@@ -145,6 +145,7 @@ public class FcmdFavorCard  extends GralSelectList<FcmdFavorPathSelector.FavorPa
       }
     }
     //dir = new FileRemote(currentDir);  
+    //TODO this is exec in the graphic thread. Fill the card, access the file system in another thread!!!
     dir = main.fileCluster.getFile(currentDir, null);
     fileTable.setNewContent(favorPathInfo, dir);
     

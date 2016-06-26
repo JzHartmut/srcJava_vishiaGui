@@ -1123,6 +1123,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     if(this instanceof GralLed)
       stop();
     //
+    if(dyda.bTouchedField) return; //do not modify if it is actually touching.
     //check and search the variable(s):
     //
     getVariable(container);
@@ -1647,7 +1648,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     protected void setTextChanged(){ widgg.dyda.bTextChanged = true; }
     
     /**Invoked on touching a widget. */
-    protected void setTouched(){ widgg.dyda.bTouchedField = true; }
+    //protected void setTouched(){ widgg.dyda.bTouchedField = true; }
     
     
     /**Implementation routine to set receiving a drag event and initializes the drag feature of the widget.

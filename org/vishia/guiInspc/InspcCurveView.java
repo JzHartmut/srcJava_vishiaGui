@@ -32,6 +32,7 @@ import org.vishia.gral.widget.GralFileSelectWindow;
 import org.vishia.gral.widget.GralColorSelector.SetColorFor;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.util.Assert;
+import org.vishia.util.Debugutil;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringFormatter;
@@ -171,7 +172,7 @@ public final class InspcCurveView
     boolean bLast;
     
     /**Index in the array where this is member of. */
-    final int ix;
+    //final int ix;
 
     /**Color of the curve. */
     GralColor colorCurve;
@@ -180,7 +181,7 @@ public final class InspcCurveView
     //@SuppressWarnings("unused")
     //CurveCommRxAction rxActionRxValueByPath;
     
-    TrackValues(int ix){ this.ix = ix; }
+    TrackValues(){ } 
     
   }
   
@@ -333,6 +334,7 @@ public final class InspcCurveView
     widgTableVariables.addContextMenuEntryGthread(0, null, "insert variable", actionInsertVariable);
     widgTableVariables.addContextMenuEntryGthread(0, null, "replace variable", actionReplaceVariable);
     widgTableVariables.addContextMenuEntryGthread(0, null, "swap variable", actionSwapVariable);
+    widgTableVariables.addContextMenuEntryGthread(0, null, "delete variable", actionDeleteVariable);
     widgTableVariables.addContextMenuEntryGthread(0, null, "shift variable", actionShiftVariable);
     widgTableVariables.addContextMenuEntryGthread(0, null, "set color", actionColorSelectorOpen);
     widgTableVariables.addContextMenuEntryGthread(0, null, "group scale", actionShareScale);
@@ -416,7 +418,7 @@ public final class InspcCurveView
       GralTable<TrackValues> table = (GralTable<TrackValues>)widgd; //oContentInfo;
       GralTable<TrackValues>.TableLineData refline = table.getLineMousePressed();
       if(bInsert || refline == null){  //insert a line, build a new one
-        input = new TrackValues(-1);
+        input = new TrackValues();
         GralTableLine_ifc<?> newline;
         if(refline ==null){
           newline = table.addLine(sPath, new String[]{""}, input);  //add on end
@@ -435,6 +437,8 @@ public final class InspcCurveView
       //String sShowMethod = variableWidget.getShowMethod();
       if(sPath !=null){
         if(input.trackView == null){
+          //A new trackview, in Table in the required order, in the widgCurve added on end.
+          //The order of tracks in widgCurve are not the same like in table.
           input.trackView = widgCurve.initTrack(sName, sPath, input.colorCurve, 0, 50, 5000.0f, 0.0f);
         } else {
           input.trackView.setDataPath(sPath);
@@ -442,6 +446,32 @@ public final class InspcCurveView
       } else {
         System.out.printf("InspcCurveView - invalid widget to drop; %s\n", variableWidget.toString());
       }
+      table.repaint();
+    }
+    return true;
+    
+  }
+  
+  
+  
+  protected boolean deleteVariable(int actionCode, GralWidget widgd, boolean bInsert){
+    if(actionCode == KeyCode.menuEntered){
+      TrackValues input;
+      assert(widgd instanceof GralTable<?>);  //NOTE: context menu to table lines, has GralTable as widget.
+      @SuppressWarnings("unchecked")
+      GralTable<TrackValues> table = (GralTable<TrackValues>)widgd; //oContentInfo;
+      GralTable<TrackValues>.TableLineData refline = table.getLineMousePressed();
+      if(refline != null){  
+        input = (TrackValues)refline.getContentInfo();
+        if(input.trackView != null) {
+          Debugutil.stop();
+          //TODO
+          //refline.deleteLine();
+          //delete the track line!
+          
+          
+      } }
+     
       table.repaint();
     }
     return true;
@@ -580,6 +610,13 @@ public final class InspcCurveView
   GralUserAction actionReplaceVariable = new GralUserAction("actionReplaceVariable"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { return dropVariable(actionCode, (GralWidget)widgd, false);
+    }
+  };
+
+  
+  GralUserAction actionDeleteVariable = new GralUserAction("actionReplaceVariable"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
+    { return deleteVariable(actionCode, (GralWidget)widgd, false);
     }
   };
 
@@ -735,8 +772,8 @@ public final class InspcCurveView
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if( KeyCode.isControlFunctionMouseUpOrMenu(actionCode) && trackScale !=null){
         GralTable<TrackValues>.TableLineData refline = widgTableVariables.getLineMousePressed();
-        TrackValues dst = refline.getUserData();
-        dst.trackView.groupTrackScale(trackScale.trackView);  
+        TrackValues dst = refline.getUserData();     //the line which should be entered in the scale group
+        dst.trackView.groupTrackScale(trackScale.trackView);  //trackScale is the line which was  previously selected.
       }
       return true;
     }
@@ -1124,11 +1161,11 @@ public final class InspcCurveView
         } else {
           if(widgCurve.applySettings(in)){ //apply the content of the config file to the GralCurveView
             //and transfer the names into the variable text fields of this widget. 
-            List<? extends GralCurveViewTrack_ifc> listTracks = widgCurve.getTrackInfo();
+            Iterable<? extends GralCurveViewTrack_ifc> listTracks = widgCurve.getTrackInfo();
             widgTableVariables.clearTable();
             int iTrack = 0;
             for(GralCurveViewTrack_ifc track: listTracks){
-              TrackValues trackValue = new TrackValues(-1); //tracks[iTrack];
+              TrackValues trackValue = new TrackValues(); //tracks[iTrack];
               trackValue.trackView = track;   //sets the new Track to the text field's data association.
               String sDataPath = track.getDataPath();
               String[] sCellTexts = new String[1];
@@ -1362,20 +1399,6 @@ public final class InspcCurveView
   }
   
   
-  
-  
-  protected void showValues(){
-    float[] values = new float[tracks.length];
-    //int ix = 0;
-    assert(false);
-    for(TrackValues inp: tracks){
-      int ix = inp.trackView.getIxTrack();
-      values[ix] = inp.val;
-      //ix +=1;
-    }
-    int time = (int)System.currentTimeMillis();
-    widgCurve.setSample(values, time);
-  }
   
   
   

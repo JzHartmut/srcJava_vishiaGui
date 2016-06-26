@@ -85,7 +85,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public final static String version = "2015-01-27";
+  public final static String version = "2016-06-26";
   
   private final List<CompleteConstructionAndStart> composites = new LinkedList<CompleteConstructionAndStart>();
   

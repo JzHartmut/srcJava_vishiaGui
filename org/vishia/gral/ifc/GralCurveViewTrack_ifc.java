@@ -8,7 +8,7 @@ import org.vishia.gral.base.GralCurveView;
  * @author Hartmut Schorrig
  *
  */
-public interface GralCurveViewTrack_ifc
+public interface GralCurveViewTrack_ifc extends GralSetValue_ifc
 {
   /**Version, history and license.
    * <ul>
@@ -107,13 +107,6 @@ public interface GralCurveViewTrack_ifc
   
   void setDataPath(String path);
 
-  
-  /**Returns the index of the track which is substantially for the float parameter array position in  
-   * {@link GralCurveView_ifc#setSample(float[], int)}. 
-   * @return The index of this track.
-   */
-  int getIxTrack();
-  
   float getValueCursorLeft();
   float getValueCursorRight();
   float getValueLast();

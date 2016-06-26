@@ -349,12 +349,12 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   
   
   protected void textFieldFocusLost(){
-    String text = textFieldSwt.getText();
-    dyda().displayedText = text;  //transfer the current text
-    dyda().displayedText = text;
+    String text2 = textFieldSwt.getText();
+    //There was a problem. Because of TextFieldModifyListener the field is already set. Newly read of getText() gets the old text. Bug of windows?
+    //dyda().displayedText = text2;  //transfer the current text
     caretPos(textFieldSwt.getCaretPosition());
     if(actionChanging() != null){
-      actionChanging().exec(KeyCode.focusLost, widgg, text);
+      actionChanging().exec(KeyCode.focusLost, widgg, text2);
     }
   }
   
@@ -393,6 +393,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
 
     @Override public void focusLost(FocusEvent ev){
       SwtTextFieldWrapper.this.textFieldFocusLost();
+      setTouched(false);   //assumes that the changed field content is processed with routine above. Can be automaticly overwritten newly be application.
       super.focusLost(ev);
     }
 
@@ -411,6 +412,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
       GralWidget.DynamicData dyda = SwtTextFieldWrapper.super.dyda();
       if(! text.equals(dyda.displayedText)) {
         dyda.displayedText = text;
+        setTouched(true);
         //System.out.println("actionText");
         //SwtTextFieldWrapper.super.caretPos = textFieldSwt.getCaretPosition();
         if(actionChanging() != null){
@@ -441,7 +443,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
       }
       if(bEditable && key != KeyCode.enter && KeyCode.isWritingOrTextNavigationKey(key)){
         bDone = true;
-        setTouched();
+        setTouched(true);
       } else {
         boolean bUserOk;
         GralTextFieldUser_ifc user = user();

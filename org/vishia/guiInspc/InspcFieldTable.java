@@ -152,7 +152,7 @@ public class InspcFieldTable
     /**This method will be invoked before finish of a send session. */
     @Override public void run()
     {
-      var.ds.targetAccessor.cmdSetValueByPath(var, sValue);
+      var.ds.targetAccessor.cmdSetStringByPath(var, sValue);
     }
     
     

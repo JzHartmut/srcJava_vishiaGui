@@ -2,6 +2,8 @@ package org.vishia.gral.swt;
 
 
 
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -341,7 +343,8 @@ public class SwtCurveView extends GralCurveView
     //write all tracks.
     g.setLineStyle(SWT.LINE_SOLID);
     int iTrack = 0;
-    for(Track track: listTracks){
+    List<Track> listTracks1 = listTracks; //Atomic access, iterate in local referenced list.
+    for(Track track: listTracks1){
       //draw line per track
       if(track.showSelected !=0) {
         drawTrack(g, size, track, iTrack, ixixDataLast);

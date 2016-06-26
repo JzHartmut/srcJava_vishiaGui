@@ -601,9 +601,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
   
   private enum ERefresh{ doNothing, refreshAll, refreshChildren}
 
-  private final EventSource evSrc = new EventSource("GralFileSelector"){
-    
-  };
+  //private final EventSource evSrc = new EventSource("GralFileSelector"){};
   
   
   

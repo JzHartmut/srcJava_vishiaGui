@@ -290,9 +290,6 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     public Track(GralCurveView outer, String name, int ixList){ 
       this.outer = outer; this.name = name; this.ixList = ixList; }
 
-    @Override public int getIxTrack(){ return ixList; }
-
-    
     @Override public void setContentInfo(Object content) { oContent = content; }
 
     @Override public Object getContentInfo() { return oContent;  }
@@ -621,17 +618,18 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   protected final GralCurveViewMouseAction mouseAction = new GralCurveViewMouseAction();
   
-  /**All tracks. */
-  protected final List<Track> listTracks = new ArrayList<Track>();
+  /**All tracks to return for filling. It has the same members in the same order like {@link #listTracks}*/
+  //protected final List<GralSetValue_ifc> listTrackSet = new LinkedList<GralSetValue_ifc>();
+
+
+  /**All tracks. Anytime if the tracks are changed a new List is created. It is because the list can be used in another thread yet in an iterator. */
+  protected List<Track> listTracks = new ArrayList<Track>();
   
   
   protected final CommonCurve common;
   
   /**The track which is selected by the last setCursor. */
   protected Track trackSelected;
-  
-  /**All tracks to return for filling. It has the same members in the same order like {@link #listTracks}*/
-  protected final List<GralSetValue_ifc> listTrackSet = new LinkedList<GralSetValue_ifc>();
   
   /**A short timestamp for the values in {@link GralCurveView.Track#values}.
    * It maybe a millisecond timestamp. Then about 2000000 seconds are able to display.
@@ -928,21 +926,40 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   public GralCurveViewTrack_ifc initTrack(String sNameTrack, String sDataPath, GralColor color, int style
       , int nullLine, float scale, float offset)
   {
+    List<Track> listTracksNew = new LinkedList<Track>();
+    listTracksNew.addAll(this.listTracks); //Atomic access, iterate in local referenced list.
+    GralCurveViewTrack_ifc track = initTrack(sNameTrack, sDataPath, color, style, nullLine, scale, offset, listTracksNew);
+    listTracks = listTracksNew;
+    return track;
+  }
+
+
+  
+  /**Initializes a track of the curve view.
+   * This routine should be called after construction, only one time per track
+   * in the order of tracks.
+   * @param sNameTrack
+   * @param sDataPath
+   * @param colorValue
+   * @param style
+   * @param nullLine
+   * @param scale
+   * @param offset
+   */
+  private GralCurveViewTrack_ifc initTrack(String sNameTrack, String sDataPath, GralColor color, int style
+      , int nullLine, float scale, float offset, List<Track> listTracksNew)
+  {
     Track track = new Track(this, sNameTrack, listTracks.size());
     track.values = new float[this.maxNrofXValues];
     track.scale = new TrackScale();
-    listTracks.add(track);
-    listTrackSet.add(track);
-    //listDataPaths.add(sDataPath);
+    listTracksNew.add(track);
     track.sDataPath =sDataPath;
     track.variable = null;
     track.scale.y0Line = nullLine;
     track.scale.yOffset = offset;
     track.scale.yScale = scale;
-    //yScale[ixLineInit] = scale;
-    track.lineColor = color;
+    track.lineColor = color == null ? GralColor.getColor("rd") : color;
     bNewGetVariables = true;  //to force re-read of all variables.
-    //ixLineInit +=1;
     return track;
   }
 
@@ -959,17 +976,6 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   }
   
   
-  /**Change the scaling of a track.
-   * @param trackNr Number of the track in order of creation, 0 ist the first.
-   * @param scale7div value per division
-   * @param offset value, which is shown at line0
-   * @param line0 percent of 0-line in graphic.
-   */
-  public void setTrackScale(int trackNr, float scale7div, float offset, int line0){
-    Track track = listTracks.get(trackNr);
-    track.setTrackScale(scale7div, offset, line0);
-  }
-  
   
   /**Returns the path of the time variable if given or null.
    */
@@ -978,14 +984,22 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   /**This list describes the data paths in that order, which should be regard
    * calling {@link #setSample(float[])}.
+   * return a new List which should not modify. Modify has no sense because the list is not used inside this class.
    */
-  public List<GralSetValue_ifc> getTracks(){ return listTrackSet; }
+  public List<GralSetValue_ifc> getTracks(){ 
+    List<GralSetValue_ifc> ret = new LinkedList<GralSetValue_ifc>();
+    List<Track> listTracks1 = listTracks; //Atomic access, iterate in local referenced list.
+    for(Track track : listTracks1){
+      ret.add(track);
+    }
+    return ret; 
+  }
   
   
-  /**This list describes the data paths in that order, which should be regard
+  /**This Iterable describes the data paths in that order, which should be regard
    * calling {@link #setSample(float[])}.
    */
-  public List<? extends GralCurveViewTrack_ifc> getTrackInfo(){ return listTracks; }
+  public Iterable<? extends GralCurveViewTrack_ifc> getTrackInfo(){ return listTracks; }
   
   
   
@@ -1074,10 +1088,11 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    */
   @Override public void refreshFromVariable(VariableContainer_ifc container){
     if(bActive){
-      float[] values = new float[listTracks.size()];
+      List<Track> listTracks1 = listTracks; //Atomic access, iterate in local referenced list.
+      float[] values = new float[listTracks1.size()];
       int ixTrack = -1;
       boolean bRefreshed = false; //set to true if at least one variable is refreshed.
-      for(Track track: listTracks){
+      for(Track track: listTracks1){
         if(track.variable ==null && bNewGetVariables){ //no variable known, get it.
           String sDataPath = track.getDataPath();
           if(sDataPath !=null){
@@ -1362,8 +1377,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
       } else {
         this.common.timeDatapath = null;
         this.common.timeVariable = null;
-        listTracks.clear();
-        listTrackSet.clear();
+        listTracks = new LinkedList<Track>();
+        //listTrackSet.clear();
         ZbnfJavaOutput setData = new ZbnfJavaOutput(console);
         setData.setContent(zbnfSetCurve.getClass(), zbnfSetCurve, parser.getFirstParseResult());
         bNewGetVariables = true;  //to force searching variables.
@@ -1378,7 +1393,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   
   @Override public void writeSettings(Appendable out){
-    for(Track track: listTracks){
+    List<Track> listTracks1 = listTracks; //Atomic access, iterate in local referenced list.
+    for(Track track: listTracks1){
       if(track.sDataPath !=null){
         try{
           out.append("track ").append(track.name).append(":");
@@ -1476,8 +1492,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     setTimePoint(System.currentTimeMillis(), 0, 0.156f);
     //line with channels
     sLine = ifile.readLine();
-    listTracks.clear();
-    listTrackSet.clear();
+    List<Track> listTracksNew = new LinkedList<Track>();
+    //listTrackSet.clear();
     int ixInList = -1;
     String[] signals = sLine.split(";");
     
@@ -1486,9 +1502,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     for(String signal1: signals){
       String signal = signal1.trim();
       GralColor color = GralColor.getColor(colors[ix]);
-      initTrack(signal, signal, color, 1, 50, 1.0f, 0.0f);
+      initTrack(signal, signal, color, 1, 50, 1.0f, 0.0f, listTracksNew);
       ix +=1;
     }
+    listTracks = listTracksNew;
     this.ixDataWr = -adIxData; //initial write position, first increment to 0.
     float[] fvalues = new float[listTracks.size()];
     int timeshort = 0;
@@ -1569,15 +1586,16 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
         out.writeCurveError("absolute time error");
       } else {
         int ixTrack = -1;
-        int nrofTracks = listTracks.size();
-        for(Track track: listTracks){
+        List<Track> listTracks1 = listTracks; //Atomic access, iterate in local referenced list.
+        int nrofTracks = listTracks1.size();
+        for(Track track: listTracks1){
           String sName = track.name;
           String sPath = track.getDataPath();
           GralColor color = track.getLineColor();
           String sColor = color.getColorName();
           out.setTrackInfo(nrofTracks, ++ixTrack, sPath, sName, sColor, track.getScale7div(), track.getOffset(), track.getLinePercent());
         }
-        float[] record = new float[listTracks.size()];
+        float[] record = new float[listTracks1.size()];
         int ix = (ixDataStart >> shIxiData) & mIxiData;
         int timeshortLast = timeValues[ix];
         out.writeCurveStart(timeshortLast);
@@ -1586,7 +1604,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
         while((ixData != ixDataEnd && --ctValues >=0)){
           ix = (ixData >> shIxiData) & mIxiData;
           ixTrack = -1;
-          for(Track track: listTracks){
+          for(Track track: listTracks1){
             record[++ixTrack] = track.values[ix];
           }
           int timeshort = timeValues[ix];
@@ -1663,7 +1681,8 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     int maxDiffLastSelected = 0;
     Track foundTrack = null;
     ctLastSelected +=1;
-    for(Track track: listTracks){  //NOTE: break inside.
+    List<Track> listTracks1 = listTracks; //Atomic access, iterate in local referenced list.
+    for(Track track: listTracks1){  //NOTE: break inside.
       float val = track.values[ixData];
       float yFactor = ysize / -10.0F / track.scale.yScale;  //y-scaling
       float y0Pix = (1.0F - track.scale.y0Line/100.0F) * ysize; //y0-line
