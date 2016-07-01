@@ -291,6 +291,9 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
   { return SwtWidgetHelper.setFocusOfTabSwt(textFieldSwt);
   }
 
+
+  @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); wdgh.setVisibleGThread(bVisible); }
+
   
   @Override public void removeWidgetImplementation()
   {

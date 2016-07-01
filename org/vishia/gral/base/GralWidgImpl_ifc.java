@@ -32,6 +32,13 @@ public interface GralWidgImpl_ifc
    */
   boolean setFocusGThread();
   
+  
+  /**Sets the implementation widget(s) visible state. The widgets are really invisible, or they are visible in principle, but they can be covered by other windows or clipping.
+   * This method should set the {@link GralWidget#bVisibleState} too. Therewith it is able to quest {@link GralWidget#isVisible()} in any thread.
+   * @param bVisible true then the widget should be visible, false it is set to invisible.
+   */
+  void setVisibleGThread(boolean bVisible);
+  
   /**
    * @param visible
    * @return

@@ -165,13 +165,13 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
   					@SuppressWarnings("unchecked")
   					SwtPanel swtPanel = (SwtPanel)data;
   					GralPanelContent panelContent = (GralPanelContent)(swtPanel.widgg);
-  					List<GralWidget> widgetInfos = panelContent.widgetList(); 
+  					List<GralWidget> widgetInfos = panelContent.getWidgetList(); 
   					widgg.newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
   					if(widgg.focusedTab !=null){
-  					widgg.focusedTab.setVisibleState(false);  //the last focused tab.
+  					  widgg.focusedTab.setVisibleState(false);  //the last focused tab.
   					}
   					widgg.focusedTab = panelContent;
-  					widgg.focusedTab.setVisibleState(true);   //the currently focused tab.
+  					//done with setFocus: widgg.focusedTab.setVisibleState(true);   //the currently focused tab.
   					widgg.focusedTab.setFocus();
   					//System.out.printf("Fcmd-selectTab; %s", panelContent.toString());
             //mng.log.sendMsg(0, "Fcmd-selectTab %s", panelContent.toString());
@@ -256,7 +256,13 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
   */
 
   
-  @Override public boolean setFocusGThread(){ return widgetSwt.setFocus(); }
+  @Override public boolean setFocusGThread(){ 
+    super.widgg.setVisibleState(true);
+    return widgetSwt.setFocus(); 
+  }
+
+  @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); widgetSwt.setVisible(bVisible); }
+
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
   { widgetSwt.setBounds(x,y,dx,dy);

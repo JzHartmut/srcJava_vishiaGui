@@ -111,6 +111,9 @@ public class SwtPlotArea extends GralPlotArea._GraphicImplAccess_
   
   
   
+  @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); swtCanvas.setVisible(bVisible); }
+
+  
   @SuppressWarnings("synthetic-access") 
   PaintListener paintListener = new PaintListener(){
     @Override public void paintControl(PaintEvent ev) {

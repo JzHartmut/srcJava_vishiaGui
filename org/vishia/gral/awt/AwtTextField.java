@@ -125,6 +125,10 @@ public class AwtTextField extends GralTextField.GraphicImplAccess
   { return AwtWidgetHelper.setFocusOfTabSwt(widgetAwt);
   }
 
+  /**Sets the implementation widget vible or not.
+   * @see org.vishia.gral.base.GralWidgImpl_ifc#setVisibleGThread(boolean)
+   */
+  @Override public void setVisibleGThread(boolean bVisible){ super.setVisibleState(bVisible); widgHelper.setVisibleGThread(bVisible); }
 
   
   public int setCursorPos(int pos){

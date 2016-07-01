@@ -204,26 +204,6 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   
   
   
-  //@Override
-  @Override
-  public boolean setFocusGThread()
-  { 
-    setVisibleState(true);  //has focus, 
-    window.setVisible(true);
-    if(gralPanel().setFocusGThread()){   //sets the focus of the primary widget.
-      return true;  //if any element of the panel was set to focus, the window has the focus already.
-      //Especially the primaryWidget should be focused.
-    } else {
-      //no primary window etc.
-      return window.setFocus();  
-    }
-  }
-
-  
-  
-  
-
-  
   @Override
   public void removeWidgetImplementation()
   {
@@ -272,6 +252,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
       if(invisibleSetAction() !=null){
         invisibleSetAction().exec(KeyCode.menuEntered, SwtSubWindow.this.gralWindow);
       }
+      setVisibleState(false);
       if((windProps & GralWindow_ifc.windRemoveOnClose)!=0) {
         gralWindow.remove();  //remove the window as widget.
         e.doit = true;
@@ -284,22 +265,19 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     @Override
     public void shellDeactivated(ShellEvent e)
     {
-      stop();
-      
+      //setVisibleState(false); //don't change the visible state, the window may be still visible!
     }
 
     @Override
     public void shellDeiconified(ShellEvent e)
     {
-      stop();
-      
+      setVisibleState(true);
     }
 
     @Override
     public void shellIconified(ShellEvent e)
     {
-      stop();
-      
+      setVisibleState(false);
     }
     
   };
@@ -378,6 +356,25 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
 
   
   void stop(){}
+
+  @Override
+  public boolean setFocusGThread()
+  { 
+    setVisibleState(true);  //has focus, 
+    window.setVisible(true);
+    //if(gralPanel().setFocusGThread()){   //sets the focus of the primary widget.
+      //return true;  //if any element of the panel was set to focus, the window has the focus already.
+      //Especially the primaryWidget should be focused.
+    //} else {
+      //no primary window etc.
+      return window.setFocus();  
+    //}
+  }
+
+
+  @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); window.setVisible(bVisible); }
+
+
 
   @Override public void repaintGthread() {
     int chg = getChanged();

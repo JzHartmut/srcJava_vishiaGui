@@ -92,6 +92,7 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
       Assert.stop();
     }
     wdgdTable = new GralTable<UserData>(name, columns);
+    wdgdTable.setVisible(true);
   }
 
   

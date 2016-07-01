@@ -299,7 +299,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
 
   
   //@Override 
-  public boolean setVisible(boolean visible){
+  public boolean XXXsetVisible(boolean visible){
     boolean ret = swtWidgHelper.widgetSwt.isVisible();
     swtWidgHelper.widgetSwt.setVisible(visible);
     ((GralWidget.ImplAccess)this).setVisibleState(visible);
@@ -385,6 +385,18 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   @Override public boolean setFocusGThread()
   { repaintGthread();  //to set the focus of the cell
     return true;
+  }
+
+
+  @Override public void setVisibleGThread(boolean bVisible) { 
+    swtWidgHelper.setVisibleGThread(bVisible); 
+    super.setVisibleState(bVisible);
+    for(Text[] cell1 : cellsSwt) for(Text cell: cell1){
+      if(cell !=null) { 
+        cell.setVisible(bVisible);
+      }
+    }
+    repaintGthread();
   }
 
 

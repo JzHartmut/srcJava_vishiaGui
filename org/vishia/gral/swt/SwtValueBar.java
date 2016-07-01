@@ -88,9 +88,12 @@ public class SwtValueBar extends GralValueBar.GraphicImplAccess // implements Gr
   }
 	
   @Override public Object getWidgetImplementation() { return widgetSwt; }
+  
+  
   @Override public boolean setFocusGThread(){ return widgetSwt.setFocus(); }
 
-  
+  @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); wdgh.setVisibleGThread(bVisible); }
+
   
   protected void paintRoutine(BarWidget wdgs, PaintEvent e){
     // TODO Auto-generated method stub

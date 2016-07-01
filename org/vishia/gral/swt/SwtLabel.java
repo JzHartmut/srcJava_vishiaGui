@@ -144,4 +144,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
 
   @Override public boolean setFocusGThread()
   { return swtWidgHelper.setFocusGThread(); }
+  
+  @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); swtWidgHelper.setVisibleGThread(bVisible); }
+
 }

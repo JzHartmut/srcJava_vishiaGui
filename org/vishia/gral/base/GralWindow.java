@@ -129,7 +129,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    */
   @Deprecated public GralWindow(String posString, String nameWindow, String sTitle, int windProps, GralMng mng, Object panelComposite)
   {
-    super( posString, nameWindow);  //relative Window position.
+    super( posString, nameWindow, 'w');  //relative Window position.
     dyda.displayedText = sTitle;  //maybe null
     this.windProps = windProps;
     if((windProps & windResizeable)!=0){
@@ -148,7 +148,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    */
   public GralWindow(String posString, String nameWindow, String sTitle, int windProps)
   {
-    super( posString, nameWindow);  //relative Window position.
+    super( posString, nameWindow, 'w');  //relative Window position.
     dyda.displayedText = sTitle;  //maybe null
     this.windProps = windProps;
     if((windProps & windResizeable)!=0){
@@ -185,8 +185,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    * The methods are protected because an application should not use it. This class is public because
    * it should be visible from the graphic implementation which is located in another package. 
    */
-  public abstract static class GraphicImplAccess 
-  extends GralPanelContent.ImplAccess //access to GralWidget
+  public abstract static class GraphicImplAccess extends GralPanelContent.ImplAccess //access to GralWidget
   implements GralWidgImpl_ifc
   {
     
@@ -309,8 +308,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   @Override
   public boolean isWindowsVisible()
   {
-    // TODO Auto-generated method stub
-    return false;
+    return bVisibleState;
   }
 
 

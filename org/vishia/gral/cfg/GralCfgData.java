@@ -457,6 +457,16 @@ public final class GralCfgData
   }
 
   
+
+  public GralCfgPanel new_Window()
+  { return new GralCfgPanel();
+  }
+
+  public void add_Window(GralCfgPanel panel)
+  {
+    idxPanels.put(panel.name, panel); 
+  }
+
   
   /**ZBNF: DataReplace: < ?Element >[ | | ] */
   public GralCfgElement new_Element()

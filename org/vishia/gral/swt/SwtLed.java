@@ -198,6 +198,8 @@ private class SwtLedImpl extends Canvas
   { return widgSwt.setFocus();
   }
 
+  @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); wdgh.setVisibleGThread(bVisible); }
+
   
   @Override public void repaintGthread(){
     widgSwt.redraw();

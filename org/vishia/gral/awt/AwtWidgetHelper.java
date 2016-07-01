@@ -122,6 +122,9 @@ public class AwtWidgetHelper
   
   public boolean setFocusGThread(){ widga.setFocusable(true); return widga.isFocusOwner(); }
 
+  public void setVisibleGThread(boolean bVisible){ widga.setVisible(bVisible); }
+
+
   public void removeWidgetImplementation()
   {
     if(widga !=null){ 

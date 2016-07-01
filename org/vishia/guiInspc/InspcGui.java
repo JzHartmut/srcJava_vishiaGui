@@ -21,6 +21,7 @@ import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelActivated_ifc;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralShowMethods;
 import org.vishia.gral.base.GralWidget;
@@ -269,10 +270,15 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
    */
   private void callbackOnReceivedData(){
     long time = System.currentTimeMillis();
-    ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = guiCfg._gralMng.getVisiblePanels();
-    //GralWidget widgdRemove = null;
+    GralMng gralMng = GralMng.get();
+    GralPanelContent primaryWindow = gralMng.getPrimaryWindow(); 
     long timeAtleast = System.currentTimeMillis() - 5000;
+    checkWidgetsToRefresh(primaryWindow, time, timeAtleast, 0);
+    
+    //ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = guiCfg._gralMng.getVisiblePanels();
+    //GralWidget widgdRemove = null;
     try{
+      /*
       for(GralVisibleWidgets_ifc panel: listPanels){
         List<GralWidget> widgetsVisible = panel.getWidgetsVisible();
         if(widgetsVisible !=null) for(GralWidget widget: widgetsVisible){
@@ -288,6 +294,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
           }
         }
       }
+      */
       //referesh the curve view any time if it is enabled:
       curveA.refreshCurve();
       curveB.refreshCurve();
@@ -298,6 +305,33 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     }
     
   }
+  
+  
+  
+  void checkWidgetsToRefresh(GralPanelContent panel, long time, long timeAtleast, int recursiveCnt)
+  { if(recursiveCnt > 10) { System.err.println("InspcGui: to many recursions"); assert(false); return; }
+    for(GralWidget widget: panel.getWidgetList()){
+      if(widget.isVisible()){
+        if(widget instanceof GralPanelContent) {
+          checkWidgetsToRefresh((GralPanelContent) widget, time, timeAtleast, recursiveCnt +1);
+        } else {
+          try{
+            String sShowMethod;
+            if((sShowMethod = widget.getShowMethod()) ==null || !sShowMethod.equals("stc_cmd")){
+              widget.refreshFromVariable(inspcMng, timeAtleast, colorRefreshed, colorOldValue);
+              widget.requestNewValueForVariable(time);
+            }
+          }catch(Exception exc){
+            System.err.println("InspcGui-receivedData-widget; " + exc.getMessage());   
+            exc.printStackTrace(System.err);
+          }
+        }
+      }
+    }
+  
+  }
+  
+  
   
   
   

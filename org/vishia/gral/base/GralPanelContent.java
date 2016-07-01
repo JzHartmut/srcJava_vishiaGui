@@ -12,6 +12,7 @@ import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.util.Debugutil;
 
 
 /**This class describes a panel with its content for managing. */
@@ -110,10 +111,16 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
 	}
 	
 
+
   /**Create a panel, registers it and sets the {@link GralMng#pos()} of this thread to the panel. */
   public GralPanelContent(String posString, String namePanel)
+  { this(posString, namePanel, '$');
+  }
+
+  /**Create a panel, registers it and sets the {@link GralMng#pos()} of this thread to the panel. */
+  public GralPanelContent(String posString, String namePanel, char whatIsit)
   //public PanelContent(CanvasStorePanel panelComposite)
-  { super(posString, namePanel, '$');
+  { super(posString, namePanel, whatIsit);
     this.name = namePanel;
     GralMng.get().registerPanel(this);
     int property = 0; //TODO parameter
@@ -147,6 +154,8 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
    */
   void addWidget(GralWidget widg, boolean toResize){
     String nameWidg = widg.name;
+    if(widg instanceof GralWindow)
+      Debugutil.stop();
     if(nameWidg !=null) {
       String nameGlobal;
       if(nameWidg.startsWith("@")) {
@@ -169,7 +178,7 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
         widgetsToResize.add(widg);
       }
     }
-    if(primaryWidget ==null){
+    if(primaryWidget ==null && !(widg instanceof GralPanelContent)) {  //register only a non-panel widget as primary - for the panel or window.
       primaryWidget = widg; 
     }
   }
@@ -218,7 +227,13 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   
   
   
-  public List<GralWidget> widgetList(){ return widgetList; }
+  
+  /**
+   * @deprecated use {@link #getWidgetList()}
+   */
+  @Deprecated public List<GralWidget> widgetList(){ return widgetList; }
+  
+  public List<GralWidget> getWidgetList(){ return widgetList; }
   
   
   
@@ -246,7 +261,8 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
    * <br>See {@link #setPrimaryWidget(GralWidget)}.
    * @return true if the focus is set to the primary widget. 
    */
-  @Override public boolean setFocusGThread()
+  //@Override 
+  public boolean XXXsetFocusGThread()
   {
     if(primaryWidget !=null) {
       //invokes the setFocus routine to mark focus in table etc.
@@ -300,9 +316,19 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
    */
   //public MethodsCalledbackFromImplementation implMethodPanel_ = new MethodsCalledbackFromImplementation(this);
   
+  /**Sets the visible state to all widgets of the panel, but not to windows (that is only in the primaryWindow)
+   * @see org.vishia.gral.base.GralWidget#setVisibleState(boolean)
+   */
   @Override public void setVisibleState(boolean visible){
-    for(GralWidget widget: widgetList){
-      widget.setVisibleState(visible);
+    if(isVisible() != visible) {
+      //only invoke for all sub widgets when the visible state of the parent is changed. Otherwise do nothing - nothing is changed, no effort.
+      //for tabbed panels etc. it is specially processed
+      super.setVisibleStateWidget(visible);  //for the own panel
+      for(GralWidget widget: widgetList){
+        if(widget != this && !(widget instanceof GralWindow)) {
+          widget.setVisibleState(visible);
+        }
+      }
     }
   }
 

@@ -421,7 +421,7 @@ public class GralPos implements Cloneable
           posParent1 = new GralPos();
         }
       } else {
-        posParent1 = posParent;  //the parent is valid. Because no other panel.
+        posParent1 = posParent;  //the parent is valid. Because no other panel. Use the current panel.
       }
       scanPosition(spPos, line);
       if(spPos.scan(",").scanOk()) {

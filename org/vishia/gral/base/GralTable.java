@@ -2638,12 +2638,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     
     /**The widget for a cell is a GralTextField. @since 2015-11-09 for AWT-adaption*/
-    public GralTextField wdgCell;
+    //public GralTextField wdgCell;
     
     public CellData(int ixCellLine, int ixCellColumn){
       this.ixCellLine = ixCellLine; 
       this.ixCellColumn = ixCellColumn;
-      this.wdgCell = new GralTextField(null);
+      //this.wdgCell = new GralTextField(null);
     }
   }
   

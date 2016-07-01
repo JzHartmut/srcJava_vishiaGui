@@ -25,6 +25,9 @@ public class SwtSlider extends GralSlider._GraphicImplAccess_
     // TODO Auto-generated method stub
     return false;
   }
+  
+  @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); swtWdgW.setVisibleGThread(bVisible); }
+
 
   @Override public void removeWidgetImplementation()
   {

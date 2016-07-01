@@ -120,6 +120,9 @@ public class SwtHtmlBox extends GralHtmlBox.ImplAccess
     // TODO Auto-generated method stub
     return false;
   }
+  
+  @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); boxSwt.setVisible(bVisible); }
+
 
   @Override public void repaintGthread(){
     if(boxSwt !=null){ boxSwt.redraw(); }

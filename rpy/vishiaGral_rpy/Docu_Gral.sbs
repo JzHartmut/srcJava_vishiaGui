@@ -26930,7 +26930,7 @@ application";
 						- m_nOrientationCtrlPt = 5;
 					}
 					- m_drawBehavior = 2056;
-					- m_transform = 0.187623 0 0 0.0665928 595.703 414.867 ;
+					- m_transform = 0.187623 0 0 0.0665928 595.703 414.173 ;
 					- m_bIsPreferencesInitialized = 1;
 					- m_AdditionalLabel = { CGIText 
 						- m_str = "";
@@ -38720,7 +38720,7 @@ application";
 							- _subsystem = "GeneratedFromJava::base";
 							- _class = "GralPrimaryWindow";
 							- _name = "GuiThread";
-							- _id = GUID d2f30962-edff-4c37-a6a8-7b30a381e1a6;
+							- _id = GUID 3aa43feb-5f76-404f-ac35-7e22f11cb63f;
 						}
 						- m_instance = { IHandle 
 							- _m2Class = "";
@@ -38860,7 +38860,7 @@ application";
 							- _subsystem = "GeneratedFromJava::swt";
 							- _class = "SwtPrimaryWindow";
 							- _name = "Init";
-							- _id = GUID 2bab8f07-dd22-470c-8082-05d0e983ea69;
+							- _id = GUID 15cedf63-d68d-4550-8eab-426bc01b2c71;
 						}
 						- m_instance = { IHandle 
 							- _m2Class = "";
@@ -43028,7 +43028,7 @@ application";
 						- _subsystem = "GeneratedFromJava::base";
 						- _class = "GralWidgetMng";
 						- _name = "WidgetChangeRequExecuter";
-						- _id = GUID f25b902d-9f67-4510-8b83-aee96d639827;
+						- _id = GUID 898aaec8-e0e7-4085-97a6-90a3d6ac5260;
 					}
 					- m_pParent = GUID 610472dd-c263-4b8d-9499-c6e751afe504;
 					- m_name = { CGIText 
@@ -45723,7 +45723,7 @@ doBeforeDispatching(...){
 						- _subsystem = "GeneratedFromJava::swt";
 						- _class = "SwtMenu";
 						- _name = "Item";
-						- _id = GUID 65935bef-d4e7-4d8e-bc11-c906610743ed;
+						- _id = GUID aee96f6d-3723-44e9-95eb-e4345ac89c77;
 					}
 					- m_pParent = GUID 2f024c93-cea8-4da9-94f5-61bdc20c29dc;
 					- m_name = { CGIText 
@@ -45874,7 +45874,7 @@ doBeforeDispatching(...){
 						- _subsystem = "GeneratedFromJava::swt";
 						- _class = "SwtMenu";
 						- _name = "Item";
-						- _id = GUID 65935bef-d4e7-4d8e-bc11-c906610743ed;
+						- _id = GUID aee96f6d-3723-44e9-95eb-e4345ac89c77;
 					}
 					- m_pParent = GUID 32f3f3d5-cdc2-4670-b58e-4c2fc5649a39;
 					- m_name = { CGIText 
@@ -47386,7 +47386,7 @@ doBeforeDispatching(...){
 						- _subsystem = "GeneratedFromJava::accTarget";
 						- _class = "InspcAccessEvaluatorRxTelg";
 						- _name = "OrderWithTime";
-						- _id = GUID b2329c54-b6aa-4683-a733-996d894a5010;
+						- _id = GUID b17ee40d-ac75-4921-b7c4-95f4b603f40e;
 					}
 					- m_pParent = GUID 42f57308-d779-4d23-9aa9-e8bb78c1ab47;
 					- m_name = { CGIText 
@@ -47440,7 +47440,7 @@ doBeforeDispatching(...){
 						- _subsystem = "GeneratedFromJava::accTarget";
 						- _class = "InspcAccessEvaluatorRxTelg";
 						- _name = "InspcAccessExecAnswerTelg_ifc";
-						- _id = GUID ee6699ca-170f-4f5c-a4fd-35c39174f85c;
+						- _id = GUID d25518d7-6ab1-4fef-86a5-ba216e351afb;
 					}
 					- m_pParent = GUID 42f57308-d779-4d23-9aa9-e8bb78c1ab47;
 					- m_name = { CGIText 
@@ -49062,8 +49062,8 @@ doBeforeDispatching(...){
 			- _id = GUID e8698c85-5713-4885-a416-c0441b78d2a4;
 			- _myState = 40960;
 			- _name = "TopLevel";
-			- weakCGTime = 3.21.2015::22:59:26;
-			- strongCGTime = 3.20.2015::23:12:50;
+			- weakCGTime = 3.21.2015::23:53:54;
+			- strongCGTime = 3.21.2015::23:15:25;
 			- _multiplicity = "";
 			- _itsStateChart = { IHandle 
 				- _m2Class = "";

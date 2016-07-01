@@ -19,6 +19,7 @@ import org.vishia.gral.ifc.GralWidgetCfg_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.util.Assert;
+import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 
 
@@ -173,6 +174,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2016-07-03 Hartmut chg: handling of visible: A GralWidget is invisible by default. {@link #setVisible(boolean)} should be invoked on creation.
+   *   It is possible that widgets are switched. All widgets of a non-visible tab of a tabbed panel are set to invisible, especially {@link #bVisibleState} = false.
+   *   The {@link #isVisible()} is checked to decide whether a widget should be updated in the inspector. Only visible widgets should be updated.
+   *   The {@link GralWidgImpl_ifc#setVisibleGThread(boolean)} is implemented to all known widgets for the implementation layer in the kind of {@link #setFocusGThread()}.
+   *   See documentation on the methods.   
    * <li>2015-09-20 Hartmut chg: some final methods now non final, because they have to be overridden for large widgets.
    * <li>2015-09-20 Hartmut chg: gardening for {@link DynamicData#getChanged()}, now private attribute {@link DynamicData#whatIsChanged}
    * <li>2015-09-20 Hartmut new: {@link #setActionMouse(GralMouseWidgetAction_ifc, int)} was a private thing in {@link org.vishia.gral.swt.SwtGralMouseListener.MouseListenerGralAction}
@@ -630,12 +636,23 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   { this.name = sName;
     //this.widget = null;
     this.whatIs = whatIs;
+    //bVisibleState = whatIs != 'w';  //true for all widgets, false for another Windows. 
+    bVisibleState = false;  //kkkk initially false for all widgets, it will be set true on set focus. For tabbed panels it should be false for the inactive panel. 
     this.itsCfgElement = null;
     itsMng = GralMng.get();
     assert(itsMng !=null);  //should be created firstly in the application, since 2015-01-18
     if(posString !=null) {
       try{
-        initPosAndRegisterWidget(itsMng.pos().pos.setNextPos(posString));
+        if(whatIs == 'w') {
+          //a window: don't change the GralMng.pos, create a new one.
+          GralPos pos = new GralPos();
+          pos.panel = itsMng.getPrimaryWindow();
+          this._wdgPos = pos.setNextPos(posString);
+        } else {
+          //a normal widget on a panel
+          this._wdgPos = itsMng.pos().pos.setNextPos(posString);
+        }
+        registerWidget();
       } catch(ParseException exc) {
         throw new IllegalArgumentException("GralWidget - position is syntactical faulty; " + posString);
       }
@@ -643,12 +660,13 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   }
   
   
-  void initPosAndRegisterWidget(GralPos pos) {
-    this._wdgPos = pos;
-    if(_wdgPos.panel !=null){
-      _wdgPos.panel.addWidget(this, _wdgPos.toResize());
+  void registerWidget() {
+    if(this._wdgPos.panel == this) {
+      //don't register the panel itself!
+    } else if(_wdgPos.panel !=null){
+      this._wdgPos.panel.addWidget(this, _wdgPos.toResize());
     } else {
-      pos.panel = itsMng.getCurrentPanel();
+      this._wdgPos.panel = itsMng.getCurrentPanel();
       System.out.println("GralWidget.GralWidget - pos without panel");
     }
   }
@@ -1022,7 +1040,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   { this.itsMng = mng; 
     if(this._wdgPos !=null) 
       throw new IllegalStateException("GralWidget - setPos() is set already.");
-    this.initPosAndRegisterWidget(mng.getPosCheckNext());  //always clone it from the central pos 
+    this._wdgPos = mng.getPosCheckNext();
+    this.registerWidget();  //always clone it from the central pos 
 
   }
   
@@ -1241,8 +1260,20 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @return the old state.
    */
   @Override public boolean setVisible(boolean visible){
-    dyda.setChanged(visible ? ImplAccess.chgVisible : ImplAccess.chgInvisible);
-    repaint();
+    if(this instanceof GralTable)
+      System.out.println("GralTable set " + (visible? "visible: " : "invisible: ") + this.name);
+    if(this instanceof GralWindow)
+      Debugutil.stop();
+    if(_wdgImpl == null) {
+      bVisibleState = true;  //without graphic yet now
+    } else {
+      if(itsMng.currThreadIsGraphic()) {
+        _wdgImpl.setVisibleGThread(visible);   //sets the implementation widget visible.
+      } else {
+        dyda.setChanged(visible ? ImplAccess.chgVisible : ImplAccess.chgInvisible);
+        repaint();
+      }
+    }
     return bVisibleState;
   }
   
@@ -1429,31 +1460,52 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @param latest 
    */
   public void setFocus(int delay, int latest){
-    
-    GralPanelContent panel1 = _wdgPos.panel;
-    int catastrophicalCount = 100;
-    while(panel1 !=null && panel1.pos() !=null  //a panel is knwon, it has a parent inside its pos() 
-        && !(panel1 instanceof GralWindow)      //This is not the window itself
-        && --catastrophicalCount >=0){
-      GralPanelContent panel2 = panel1.pos().panel; //
-      if(panel2 == panel1) { //it may be possible that the parent window is the same as a window.
-        panel2 = null;       //then break the loop.
-      }
-      if(panel2 instanceof GralTabbedPanel) { //If the panel is a tab of a tabbed panel, focus that tab.
-        GralTabbedPanel panelTabbed = (GralTabbedPanel)panel2;
-        
-        String name = panel1.getName();
-        panelTabbed.selectTab(name);  //why with name, use GralPanel inside GralTabbedPanel immediately!
-      }
-      panel1 = panel2;
-    }
-    if(delay == 0 && itsMng.currThreadIsGraphic()){
-      setVisibleState(true);  //has focus, 
-      setFocusGThread();
-    } else {
-      dyda.setChanged(ImplAccess.chgVisible);
+    if(delay >0 || !itsMng.currThreadIsGraphic()) {
+      dyda.setChanged(ImplAccess.chgFocus | ImplAccess.chgVisible);
       repaint(delay, latest);
-      //setFocusRequ.addToGraphicThread(itsMng.gralDevice(), delay);
+    } else {
+      //action in the graphic thread.
+      if(!bHasFocus) {
+        GralWidget child = this;
+        GralPanelContent parent = _wdgPos.panel;
+        int catastrophicalCount = 100;
+        //set the visible state and the focus of the parents.
+        while(parent !=null && parent.pos() !=null  //a panel is knwon, it has a parent inside its pos() 
+            && !parent.bHasFocus
+            && --catastrophicalCount >=0){
+          parent.setFocusGThread();
+          if(parent instanceof GralTabbedPanel) {
+            //TabbedPanel: The tab where the widget is member of have to be set as active one.
+            GralTabbedPanel panelTabbed = (GralTabbedPanel)parent;
+            assert(child instanceof GralPanelContent);
+            panelTabbed.selectTab(child.name);
+            //String name = panel1.getName();
+            //panelTabbed.selectTab(name);  //why with name, use GralPanel inside GralTabbedPanel immediately!
+          }
+          if(parent instanceof GralWindow) {       //This is not the window itself
+            parent = null;
+          } else {
+            child = parent;
+            parent = parent.pos().panel; //
+          }
+        }
+        setFocusGThread();  //sets the focus to the
+      } 
+      GralWidget parent = this;
+      GralWidget child;
+      GralPanelContent panel;
+      while(parent instanceof GralPanelContent
+        && (child = (panel = (GralPanelContent)parent).primaryWidget) !=null
+        && !child.bHasFocus
+        ) {
+        child.setFocus();
+        child.repaintGthread();
+        List<GralWidget> listWidg = panel.getWidgetList();
+        for(GralWidget widgChild : listWidg) {
+          widgChild.setVisible(true);
+        }
+        parent = child;  //loop if more as one GralPanelContent
+      }
     }
   }
   
@@ -1535,7 +1587,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   @Override public String toString()
   { StringBuilder u = new StringBuilder(240);
-    u.append(whatIs).append(" - ").append(name).append(": ").append(sDataPath);
+    u.append(whatIs).append(":").append(name).append(": ").append(sDataPath);
     if(_wdgPos !=null && _wdgPos.panel !=null){
       u.append(" @").append(_wdgPos.panel.name);
     } else {
@@ -1545,7 +1597,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       String vString = variable.toString();
       u.append(" var=").append(vString);
     }
-    u.append('\n');
+    //u.append('\n');
     return u.toString();
   }
 
@@ -1562,6 +1614,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     public static final int chgEditable = 0x20;
     
     public static final int chgVisibleInfo = 0x10000, chgObjects = 0x20000, chgFloat = 0x40000, chgIntg = 0x80000;
+    
+    public static final int chgFocus = 0x10000000; 
     
     public static final int chgPos = 0x20000000, chgVisible = 0x40000000, chgInvisible = 0x80000000;
     
@@ -1582,7 +1636,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       }
       //else: The position was given by construction already.
       //set the position now, because it is given yet.
-      widgg.initPosAndRegisterWidget( widgg._wdgPos);  //always clone it from the central pos 
+      widgg.registerWidget();  //always clone it from the central pos 
       // Note: widgg.posWidg.panel.getWidgetImplementation() ==null yet because it will be initialize after super(widgg); 
     }
     
@@ -1601,7 +1655,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       }
       //else: The position was given by construction already.
       //set the position now, because it is given yet.
-      widgg.initPosAndRegisterWidget( widgg._wdgPos);  //always clone it from the central pos 
+      widgg.registerWidget();  //always clone it from the central pos 
       // Note: widgg.posWidg.panel.getWidgetImplementation() ==null yet because it will be initialize after super(widgg); 
     }
     
@@ -1628,8 +1682,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
      * @param visible
      */
     public void setVisibleState(boolean visible){
-      widgg.bVisibleState = visible;
-      widgg.lastTimeSetVisible = System.currentTimeMillis();
+      widgg.setVisibleState(visible);
     }
 
     /**Access method to GralWidget's method. */
@@ -1732,10 +1785,17 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * This method should not be invoked by the application. It is 
    * @param visible
    */
-  public void setVisibleState(boolean visible){
+  final public void setVisibleStateWidget(boolean visible){
     bVisibleState = visible;
+    System.out.println((visible? "GralWidget set visible: " : "GralWidget set invisible: @") + _wdgPos.panel.name + ":" + toString());
     lastTimeSetVisible = System.currentTimeMillis();
   }
+
+
+  public void setVisibleState(boolean visible){
+    setVisibleStateWidget(visible);
+  }
+
 
   void stop(){
     
@@ -1787,7 +1847,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   public boolean setFocusGThread()
   { boolean ret;
     try{
-      if(_wdgImpl !=null) ret = _wdgImpl.setFocusGThread();
+      if(_wdgImpl !=null) {
+        ret = _wdgImpl.setFocusGThread();
+        bVisibleState = true;  //may be set via the _wdgImpl too, but set additional if not done in _wdgImpl.setFocusGThread()
+      }
       else ret = false;
     } catch(Exception exc){
       System.err.println("GralWidget - setFocusGThread fails");
@@ -1796,6 +1859,20 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     return ret;
   }
   
+  
+  /**Sets the implementation widget visible or not.
+   * @see org.vishia.gral.base.GralWidgImpl_ifc#setVisibleGThread(boolean)
+   */
+  @Override public void setVisibleGThread(boolean bVisible){ 
+    try{
+      if(_wdgImpl !=null){ 
+        setVisibleState(bVisible);  
+        _wdgImpl.setVisibleGThread(bVisible); 
+      }
+    } catch(Exception exc){
+      System.err.println("GralWidget - setFocusGThread fails");
+    }
+  }
   
 }
 

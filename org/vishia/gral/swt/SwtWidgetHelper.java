@@ -126,6 +126,14 @@ public class SwtWidgetHelper //implements GralWidgetHelper
   
   public boolean setFocusGThread(){ return widgetSwt.setFocus(); }
 
+  /**Sets the implementation widget vible or not.
+   * @see org.vishia.gral.base.GralWidgImpl_ifc#setVisibleGThread(boolean)
+   */
+  public void setVisibleGThread(boolean bVisible){ 
+    widgetSwt.setVisible(bVisible);
+  }
+
+
   public void removeWidgetImplementation()
   {
     if(widgetSwt !=null){ 

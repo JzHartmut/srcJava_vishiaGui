@@ -14,6 +14,7 @@ import java.util.TreeMap;
 import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.cfg.GralCfgElement;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
@@ -21,6 +22,7 @@ import org.vishia.gral.ifc.GralPoint;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.CalculatorExpr;
+import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 
 public class GralCfgBuilder
@@ -99,6 +101,11 @@ public class GralCfgBuilder
    * @param msgIdent The message identification for output.
    * @return null if ok, elsewhere the error hints which maybe written to log too, one per line.
    */
+  /**
+   * @param log
+   * @param msgIdent
+   * @return
+   */
   public String buildGui(LogMessage log, int msgIdent)
   {
     String sError = null;
@@ -119,10 +126,18 @@ public class GralCfgBuilder
     } else {
       //some panels are given, therefore selects given panels by name or create tabbed panels.
       for(Map.Entry<String, GralCfgPanel> panelEntry: setIdxPanels){  //cfgData.idxPanels.entrySet()){
-        GralCfgPanel panel = panelEntry.getValue();
-        //==================>
-        gralMng.selectPanel(panel.name);
-        String sErrorPanel = buildPanel(panel);  
+        GralCfgPanel cfgPanel = panelEntry.getValue();
+        if(cfgPanel.windTitle !=null) {
+          Debugutil.stop();
+          GralWindow wind = new GralWindow(cfgPanel.windPos, cfgPanel.name, cfgPanel.windTitle, GralWindow.windOnTop | GralWindow.windResizeable);
+          wind.setToPanel();
+        }
+        else {
+          //A tab in the main window
+          //==================>
+          gralMng.selectPanel(cfgPanel.name);
+        }
+        String sErrorPanel = buildPanel(cfgPanel);  
         if(sErrorPanel !=null){
           if(log !=null){
             log.sendMsg(msgIdent, "GralCfgBuilder - cfg error; %s", sErrorPanel);

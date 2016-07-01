@@ -111,7 +111,7 @@ public interface GralMng_ifc
 	 * If it should be used, the graphic implementation should be known
 	 * and a adequate instanceof-test and cast is necessary. 
 	 */
-	List<GralWidget> getListCurrWidgets();
+	@Deprecated List<GralWidget> getListCurrWidgets();
 	
 	
 	

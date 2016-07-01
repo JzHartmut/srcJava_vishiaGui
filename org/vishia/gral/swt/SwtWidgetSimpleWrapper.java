@@ -41,6 +41,9 @@ public class SwtWidgetSimpleWrapper implements GralWidgImpl_ifc
   
   @Override public boolean setFocusGThread(){ return widgetSwt.setFocus(); }
 
+  @Override public void setVisibleGThread(boolean bVisible) { widgetSwt.setVisible(bVisible); }
+
+
   @Override public void removeWidgetImplementation()
   {
     if(widgetSwt !=null){ 

@@ -525,7 +525,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    */
   private GralWidget_ifc lastClickedWidget;
   
-  @Override public List<GralWidget> getListCurrWidgets(){ return pos().pos.panel.widgetList; }
+  @Deprecated @Override public List<GralWidget> getListCurrWidgets(){ return pos().pos.panel.widgetList; }
 	
   /**Index of all user actions, which are able to use in Button etc. 
    * The user action "showWidgetInfos" defined here is added initially.
@@ -1010,6 +1010,10 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   public GralPanelContent getPanel(String name){
     return panels.get(name);
   }
+  
+  
+  public GralWindow getPrimaryWindow(){ return windPrimary; }
+  
   
   public GralPanelContent getCurrentPanel(){ return pos().pos.panel; }
   

@@ -4,11 +4,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.vishia.gral.base.GralPos;
+import org.vishia.gral.ifc.GralRectangle;
 
 final public class GralCfgPanel
 {
   /**Version, history and license.
    * <ul>
+   * <li>2016-06-27 Hartmut new: The panel can be a window too. 
    * <li>2011-06-00 Hartmut created
    * </ul>
    * 
@@ -37,8 +39,25 @@ final public class GralCfgPanel
    */
   public static final int version = 20120303;
 
-  final String name;
+  String name;
   final List<GralCfgElement> listElements = new LinkedList<GralCfgElement>();
+  
+  
+  String windTitle;
+  
+  String windPos;
+  
+  GralCfgPanel(){  }
+
   GralCfgPanel(String name){ this.name = name; }
+
+
+  /**Set from ZBNF: */
+  public void set_windIdent(String val){ name = val;  }
+  
+  public void set_windTitle(String val){ windTitle = val; }
+  
+  public void set_windPos(String val) { windPos = val; }
+
 
 }

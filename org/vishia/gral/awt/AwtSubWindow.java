@@ -86,6 +86,12 @@ public class AwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   }
 
 
+  /**Sets the implementation widget vible or not.
+   * @see org.vishia.gral.base.GralWidgImpl_ifc#setVisibleGThread(boolean)
+   */
+  @Override public void setVisibleGThread(boolean bVisible){ super.setVisibleState(bVisible); window.setVisible(bVisible); }
+
+
   @Override
   public void removeWidgetImplementation()
   {

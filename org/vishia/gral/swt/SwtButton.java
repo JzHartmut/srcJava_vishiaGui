@@ -142,6 +142,14 @@ public class SwtButton extends GralButton.GraphicImplAccess
     return widgetSwt.setFocus();
   }
 
+
+  /**Sets the implementation widget vible or not.
+   * @see org.vishia.gral.base.GralWidgImpl_ifc#setVisibleGThread(boolean)
+   */
+  @Override public void setVisibleGThread(boolean bVisible) { 
+    super.setVisibleState(bVisible); 
+    swtWidgHelper.setVisibleGThread(bVisible);
+  }
   
   @Override public void repaintGthread(){
     super.prepareWidget();

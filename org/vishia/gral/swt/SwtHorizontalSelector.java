@@ -107,6 +107,8 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
   
   @Override public boolean setFocusGThread(){ return swtWdgW.setFocusGThread(); }
 
+  @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); swtWdgW.setVisibleGThread(bVisible); }
+  
   @Override public void removeWidgetImplementation(){ swtWdgW.removeWidgetImplementation(); }
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy){ swtWdgW.setBoundsPixel(x, y, dx, dy); }

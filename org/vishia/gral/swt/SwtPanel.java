@@ -149,9 +149,13 @@ public class SwtPanel extends GralPanelContent.ImplAccess
 
   @Override public boolean setFocusGThread()
   {
-    // TODO Auto-generated method stub
-    return false;
+    setVisibleGThread(true);
+    boolean bRet = panelComposite.setFocus();
+    return bRet;
   }
+
+  @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); panelComposite.setVisible(bVisible); }
+
 
   @Override public Object getWidgetImplementation()
   {

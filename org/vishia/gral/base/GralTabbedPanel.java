@@ -82,12 +82,12 @@ public class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ imp
 	public GralPanelContent focusedTab;
 	
   /**The actual widgets in the visible panel. It may a sub-panel or changed content. The list can be changed. */
-  public List<GralWidget> widgetsVisible;
+  @Deprecated public List<GralWidget> widgetsVisible;
 
   /**A new list of actual widgets, set while select another tab etc. The reference may be set 
    * in the GUI-Thread (GUI-listener). The communication-manager thread reads whether it isn't null,
    * processes it and sets this reference to null if it is processed. */
-  public List<GralWidget> newWidgetsVisible;
+  @Deprecated public List<GralWidget> newWidgetsVisible;
   
 
 
@@ -147,7 +147,7 @@ public class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ imp
       return ((ImplAccess)_wdgImpl).selectTab(name);
     }
     
-  @Override public List<GralWidget> getWidgetsVisible()
+  @Override @Deprecated public List<GralWidget> getWidgetsVisible()
   {
     if(newWidgetsVisible !=null){
       //if(panel.widgetList !=null){
@@ -160,6 +160,29 @@ public class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ imp
     return widgetsVisible;
   }
   
+
+
+
+ 
+
+  /**Sets the visible state to all widgets of the panel, but not to windows (that is only in the primaryWindow)
+   * @see org.vishia.gral.base.GralWidget#setVisibleState(boolean)
+   */
+  @Override public void setVisibleState(boolean visible){
+    setVisibleStateWidget(visible);  //for the own GralWidget
+    //don't touch the tabs, its visible is changed in extra routines.
+    /*
+    for(GralWidget widget: widgetList){
+      if(widget != this && !(widget instanceof GralWindow)) {
+        widget.setVisibleState(visible);
+      }
+    }
+    */
+  }
+
+
+
+
 
   boolean removePanel(GralPanelContent panel){
     return removePanel(panel.name);

@@ -186,11 +186,43 @@ public class GralShowMethods
 
   
   
+  
+  
+  /**This userAction can be used by name (calling {@link #addFocusAction(String, GralUserAction, String, String)} 
+   * to set a variable when an input field is leaved.
+   */
+  public final GralUserAction action_openWindow = new GralUserAction("openWindow")
+  { /**Writes the value to the named variable on leaving the focus.
+     * The name of the variable is contained in the {@link GralWidget}.
+     * @see org.vishia.gral.ifc.GralUserAction#userActionGui(java.lang.String, org.vishia.gral.base.GralWidget, java.lang.Object[])
+     */
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgi, Object... params)
+    {
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)) {
+        GralWidget widg = (GralWidget)widgi;
+        String nameWindow = widg.name;
+        if(nameWindow.endsWith("wind")) { nameWindow = nameWindow.substring(0, nameWindow.length()-4); }
+        GralMng mng = GralMng.get();
+        GralPanelContent panelWind = mng.getPanel(nameWindow);
+        panelWind.setFocus();
+      }
+      return true;
+    }
+  };
+
+  
+  
+  
+  
+  
+  
+  
+  
   public void registerShowMethods(GralMngBuild_ifc mng){
     mng.registerUserAction("showBackColor", showBackColor);
     mng.registerUserAction("syncVariableOnFocus", this.syncVariableOnFocus);
     mng.registerUserAction("setBar", this.setBar);
-    
+    mng.registerUserAction("openWindow", action_openWindow);
 
   }
   
