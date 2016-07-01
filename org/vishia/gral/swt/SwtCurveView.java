@@ -144,8 +144,8 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     //float pixelFromRight = 0;
     int xp2 = size.x -1;
     int xp1 = xp2;
-    int ixData2 = widgg.ixDataShown[ixixiData];
-    int nrofPixel4Data = widgg.nrofPixel4data[ixixiData];
+    int ixData2 = super.ixDataShown[ixixiData];
+    int nrofPixel4Data = super.nrofPixel4data[ixixiData];
     int ixData = ixData2;
     int ixD = (ixData >> widgg.shIxiData) & widgg.mIxiData; //real index in data
     //
@@ -165,7 +165,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     //
     while( ixixiData < ixixDataLast){ //for all gotten ixData
       ixixiData += nrofPixel4Data +1;
-      ixData1 = widgg.ixDataShown[ixixiData];
+      ixData1 = super.ixDataShown[ixixiData];
       //ixData1 = ixDataShown[(int)pixelFromRight];
       
       xp1 -= nrofPixel4Data +1;
@@ -206,7 +206,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
         }
         xp2 = xp1; //next xp from right to left.
         yp2 = yp1;
-        nrofPixel4Data = widgg.nrofPixel4data[ixixiData];
+        nrofPixel4Data = super.nrofPixel4data[ixixiData];
         ixData2 = ixData1;
       } else {
       }
@@ -229,21 +229,21 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     //Shift the graphic if the reason of redraw is only increment samples
     //and the number the values are shifted at least by that number, which is mapped to 1 pixel.
     if(xViewPart >0 && xViewPart < size.x){
-      widgg.timeCaryOverNewValue = (int)(timeDiff - xViewPart * widgg.timeorg.timePerPixel);
-      widgg.xViewLastF -= xViewPart;
+      super.timeCaryOverNewValue = (int)(timeDiff - xViewPart * widgg.timeorg.timePerPixel);
+      super.xViewLastF -= xViewPart;
       if(xView != 0){
         //TODO what is if only a part of control is shown
         stop();
       }
       xp0 = xView + dxView - xViewPart;
-      if(widgg.xpCursor1 >= 0){ //xViewPart){  //only if the cursor is in the shifted area:
+      if(super.xpCursor1 >= 0){ //xViewPart){  //only if the cursor is in the shifted area:
         //restore graphic under cursor
-        g.drawImage(cursorStore1, size.x - widgg.xpCursor1, 0);
+        g.drawImage(cursorStore1, size.x - super.xpCursor1, 0);
         //System.out.println("cursor1 " + xpCursor1);
       }
-      if(widgg.xpCursor2 >= 0){ //xViewPart){  //only if the cursor is in the shifted area:
+      if(super.xpCursor2 >= 0){ //xViewPart){  //only if the cursor is in the shifted area:
         //restore graphic under cursor
-        g.drawImage(cursorStore2, size.x - widgg.xpCursor2, 0);
+        g.drawImage(cursorStore2, size.x - super.xpCursor2, 0);
         //System.out.println("cursor2 " + xpCursor2);
       }
       g.copyArea(xView + xViewPart, yView, dxView - xViewPart , dyView -5, xView, yView, false);
@@ -258,7 +258,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
       xViewPart = size.x;
       xp0 = 0;
       testHelp.ctRedrawAllShift +=1;
-      widgg.xViewLastF = 0.0F;
+      super.xViewLastF = 0.0F;
     } else { //xViewPart <=0
       //don't paint.
       //System.out.println("SwtCurveView - draw - don't shift graphic;" + xViewPart);
@@ -288,8 +288,8 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     //fill, clear the area either from 0 to end or from size.x - xView to end,
     g.fillRectangle(xp0, yView, xViewPart, dyView);  //fill the current background area
     { //draw horizontal grid
-      float yG = dyView / widgg.gridDistanceX;
-      int yS = widgg.gridStrongPeriodX;
+      float yG = dyView / super.gridDistanceX;
+      int yS = super.gridStrongPeriodX;
       /*TODO
       while(yGridF < dyView){
         int yGrid = (int)yGridF;
@@ -304,7 +304,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     } 
     //  
     //prepare indices of data. Fills {@link #ixDataShown}
-    int ixixDataLast = widgg.prepareIndicesDataForDrawing(ixDataRight, xViewPart, timeDiff, bPaintAll);
+    int ixixDataLast = super.prepareIndicesDataForDrawing(ixDataRight, xViewPart, timeDiff, bPaintAll);
     // 
     //write time divisions:
     g.setForeground(gridColor);
@@ -346,30 +346,30 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
       }
       iTrack +=1;
     } //for listlines
-    widgg.ixDataDraw = ixDataRight;
+    super.ixDataDraw = ixDataRight;
     //
     if(widgg.timeorg.pixelWrittenAfterStrongDiv > 30){
       g.drawText(widgg.timeorg.sTimeAbsDiv[0], size.x - 6 - widgg.timeorg.pixelWrittenAfterStrongDiv, size.y - 25);
       widgg.timeorg.pixelWrittenAfterStrongDiv = Integer.MIN_VALUE;
     }
     //set the cursors
-    if(widgg.xpCursor1New >=0){
-      widgg.xpCursor1 = widgg.xpCursor1New;
-      widgg.xpCursor1New = -1;
+    if(super.xpCursor1New >=0){
+      super.xpCursor1 = super.xpCursor1New;
+      super.xpCursor1New = -1;
     }
-    if(widgg.xpCursor2New >=0){
-      widgg.xpCursor2 = widgg.xpCursor2New;
-      widgg.xpCursor2New = -1;
+    if(super.xpCursor2New >=0){
+      super.xpCursor2 = super.xpCursor2New;
+      super.xpCursor2New = -1;
     }
-    if(widgg.xpCursor1 >=0){
-      int xpCursor = size.x - widgg.xpCursor1;
+    if(super.xpCursor1 >=0){
+      int xpCursor = size.x - super.xpCursor1;
       g.copyArea(cursorStore1, xpCursor, 0);
       g.setForeground(colorCursor);
       g.setLineWidth(1);
       g.drawLine(xpCursor, 0, xpCursor, size.y);
     }
-    if(widgg.xpCursor2 >=0){
-      int xpCursor = size.x - widgg.xpCursor2;
+    if(super.xpCursor2 >=0){
+      int xpCursor = size.x - super.xpCursor2;
       g.copyArea(cursorStore2, xpCursor, 0);
       //if(xViewPart >= size.x){
         g.setForeground(colorCursor);
@@ -397,21 +397,21 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     try{
       boolean redrawBecauseNewData1, redrawAll;
       synchronized(this){
-        redrawBecauseNewData1 = widgg.redrawBecauseNewData;
-        redrawAll = widgg.bRedrawAll;
+        redrawBecauseNewData1 = super.redrawBecauseNewData;
+        redrawAll = super.bRedrawAll;
         if(!redrawBecauseNewData1){
           Debugutil.stop();
         }
-        widgg.bRedrawAll = false;  //it is done
-        widgg.redrawBecauseNewData = false;  //it is done.
+        super.bRedrawAll = false;  //it is done
+        super.redrawBecauseNewData = false;  //it is done.
       }
       //
       //detect how many new data are given. Because the data are written in another thread,
       //the number of data, the write index are accessed only one time from this
       //Note that ixDataShowRight is set by ixDataWr if the curve is running.
-      int ixDataRight = widgg.ixDataShowRight; 
-      widgg.pixelOrg.xPixelCurve = size.x;
-      widgg.pixelOrg.yPixelCurve = size.y;
+      int ixDataRight = super.ixDataShowRight; 
+      super.pixelOrg.xPixelCurve = size.x;
+      super.pixelOrg.yPixelCurve = size.y;
       @SuppressWarnings("hiding")
       GralCurveView.TimeOrganisation timeorg = widgg.timeorg;
       timeorg.timePerPixel = (float)timeorg.timeSpread / (size.x +1); //nr of time units per pixel. 
@@ -422,18 +422,18 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
       testHelp.xView =xView; testHelp.yView =yView; testHelp.dxView =dxView; testHelp.dyView =dyView;
       //
       final boolean bPaintAll;
-      if(!widgg.common.bFreeze && !widgg.bPaintAllCmd && !redrawAll ) { //redrawBecauseNewData1) {
+      if(!widgg.common.bFreeze && !super.bPaintAllCmd && !redrawAll ) { //redrawBecauseNewData1) {
         //paint only a part of the curve to save calculation time.
         //The curve will be shifted to left.
         //
         bPaintAll = false;
-        if(ixDataRight != widgg.ixDataDraw){
+        if(ixDataRight != super.ixDataDraw){
           widgg.testStopWr = true;
           stop();
         }  
-        int timeLast = widgg.timeValues[(widgg.ixDataDraw >> widgg.shIxiData) & widgg.mIxiData];
+        int timeLast = widgg.timeValues[(super.ixDataDraw >> widgg.shIxiData) & widgg.mIxiData];
         int timeNow = widgg.timeValues[(ixDataRight >> widgg.shIxiData) & widgg.mIxiData];
-        timeDiff = timeNow - timeLast + widgg.timeCaryOverNewValue;  //0 if nothing was written.
+        timeDiff = timeNow - timeLast + super.timeCaryOverNewValue;  //0 if nothing was written.
         xViewPart = (int)(timeorg.pixel7time * timeDiff + 0.0f);
         if(xViewPart > size.x){
           xViewPart = size.x;   //for example if no data were received in the past, then timeDiff is hi.
@@ -444,14 +444,14 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
         timeorg.calc();
         //System.out.println("SwtCurveView - paintall;" + bFreeze + bPaintAllCmd + redrawBecauseNewData1);
         xViewPart = size.x;
-        widgg.timeCaryOverNewValue = 0;
+        super.timeCaryOverNewValue = 0;
         timeDiff = (int)(timeorg.timePerPixel * xViewPart);
         xp0 = 0;
-        widgg.bPaintAllCmd = false; //accepted, done
+        super.bPaintAllCmd = false; //accepted, done
         testHelp.ctRedrawAll +=1;
         //xViewLast = 0;
-        widgg.xViewLastF = 0.0F;
-        widgg.nrofDataShift.set(0);
+        super.xViewLastF = 0.0F;
+        super.nrofDataShift.set(0);
       }
       widgg.newSamples = 0;  //next call of setSample will cause only draw of less area.
       
@@ -465,12 +465,12 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
         //This is is normal case if a new value in data has a too less new timestamp.
         //It can't be shown. Await the next values. Any value will be have a more newer timestamp
         //with a great-enough time difference to show it.
-        widgg.nrofValuesLessViewPart +=1;
+        super.nrofValuesLessViewPart +=1;
         //System.out.println("SwtCurveView - xViewPart=0");
       }
       if(widgg.nrofValues >0){  //don't work if no data are stored.
-        int ixDataShow2 = ((widgg.ixDataWr - widgg.ixDataDraw)  >> widgg.shIxiData) & widgg.mIxiData;  //index of data which are shown right
-        int ixDataShow1 = ((widgg.ixDataWr - widgg.ixDataShown[size.x])  >> widgg.shIxiData) & widgg.mIxiData; //index of data which are shown left
+        int ixDataShow2 = ((widgg.ixDataWr - super.ixDataDraw)  >> widgg.shIxiData) & widgg.mIxiData;  //index of data which are shown right
+        int ixDataShow1 = ((widgg.ixDataWr - super.ixDataShown[size.x])  >> widgg.shIxiData) & widgg.mIxiData; //index of data which are shown left
         float ixDataRel2 = (float)ixDataShow2 / widgg.maxNrofXValues;  //value 0..1 which range of buffer is shown 
         float ixDataRel1 = (float)ixDataShow1 / widgg.maxNrofXValues;
         int iPixRange2 = size.x - (int)(size.x * ixDataRel2);  //Position shown range right in pixel
@@ -491,7 +491,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     }
     //g.drawString(""+xShift+ ":"+ xViewLast + ":" + nrofDataShift.get(), 200, dyView-28);
     //g.drawString("xx", 200, dyView-16);
-    widgg.focusChanged = false; //paint only last area by next paint event without focus event.
+    super.focusChanged = false; //paint only last area by next paint event without focus event.
     widgg.testStopWr = false;
   } 
 
@@ -527,8 +527,8 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
 
     
     public void setGridVertical(int dataPointsBetweenGridLines, int periodStrongLine){
-      widgg.gridDistanceY = dataPointsBetweenGridLines;
-      widgg.gridStrongPeriodY = periodStrongLine;
+      SwtCurveView.this.gridDistanceY = dataPointsBetweenGridLines;
+      SwtCurveView.this.gridStrongPeriodY = periodStrongLine;
       widgg.gridDistanceStrongY = dataPointsBetweenGridLines * periodStrongLine;
     }
     
@@ -538,14 +538,14 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
      * @param periodStrongLine period for strong lines For example 5, any 5. line is stroke.
      */
     public void setGridHorizontal(float percentY, int periodStrongLine){
-      widgg.gridDistanceX = percentY;
-      widgg.gridStrongPeriodX = periodStrongLine;
+      SwtCurveView.this.gridDistanceX = percentY;
+      SwtCurveView.this.gridStrongPeriodX = periodStrongLine;
     }
     
     
     
     public void redrawData(){
-      widgg.redrawBecauseNewData = true;
+      SwtCurveView.this.redrawBecauseNewData = true;
       redraw();
     }
     
@@ -569,11 +569,11 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     
     FocusListener focusListener = new FocusListener()
     { @Override public void focusGained(FocusEvent e) {
-        widgg.focusChanged = true;
+      SwtCurveView.this.focusChanged = true;
       }
 
       @Override public void focusLost(FocusEvent e) {
-        widgg.focusChanged = true;
+        SwtCurveView.this.focusChanged = true;
       }
     }; 
 
