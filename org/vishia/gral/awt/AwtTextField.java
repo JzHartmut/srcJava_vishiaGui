@@ -81,7 +81,7 @@ public class AwtTextField extends GralTextField.GraphicImplAccess
   
   
   public AwtTextField(GralTextField widgg, AwtWidgetMng mng)
-  { widgg.super(widgg, mng.mng); //NOTE: superclass is a non static inner class of GralTextField. 
+  { widgg.super(widgg); //NOTE: superclass is a non static inner class of GralTextField. 
     if(widgg.isEditable()){
       editBuffer = new StringBuilder(20); 
       editBuffer.setLength(0); editBuffer.append(dyda().displayedText);

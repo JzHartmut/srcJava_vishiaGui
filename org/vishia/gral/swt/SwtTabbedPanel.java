@@ -167,12 +167,12 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
   					GralPanelContent panelContent = (GralPanelContent)(swtPanel.widgg);
   					List<GralWidget> widgetInfos = panelContent.getWidgetList(); 
   					widgg.newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
-  					if(widgg.focusedTab !=null){
-  					  widgg.focusedTab.setVisibleState(false);  //the last focused tab.
+  					if(getFocusedTab() !=null){
+  					  widgg.getFocusedTab().setVisibleState(false);  //the last focused tab.
   					}
-  					widgg.focusedTab = panelContent;
+  					setFocusedTab( panelContent );
   					//done with setFocus: widgg.focusedTab.setVisibleState(true);   //the currently focused tab.
-  					widgg.focusedTab.setFocus();
+  					panelContent.setFocus();
   					//System.out.printf("Fcmd-selectTab; %s", panelContent.toString());
             //mng.log.sendMsg(0, "Fcmd-selectTab %s", panelContent.toString());
   					if(widgg.notifyingUserInstanceWhileSelectingTab !=null){

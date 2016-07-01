@@ -106,7 +106,8 @@ public class AwtPanel  extends GralPanelContent
   }
   
   
-  @Override public void repaintGthread(){
+  //@Override 
+  public void XXXrepaintGthread(){
     if(panelComposite !=null){
       ((Container)panelComposite).repaint();
     }
@@ -115,13 +116,6 @@ public class AwtPanel  extends GralPanelContent
 
 
 
-  @Override public void removeWidgetImplementation()
-  { if(panelComposite !=null){
-      //((Container)panelComposite).dispose();
-      panelComposite = null;
-    }
-  }
-  
 
   @Override public boolean remove(){
     super.remove();

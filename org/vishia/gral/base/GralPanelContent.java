@@ -273,7 +273,10 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
     else return false;
   }
 
-  @Override public Object getWidgetImplementation()
+  /**Use GralWidet._wdgImpl.getWidgetImplementation() internally! Not public.
+   * @return
+   */
+  @Deprecated public Object getWidgetImplementation()
   { return _wdgImpl.getWidgetImplementation(); //panelComposite;
   }
 	

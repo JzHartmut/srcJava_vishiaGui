@@ -284,7 +284,7 @@ public class SimSelector
         gralMng.setPosition(21*ytable + 10, 21*ytable + 30, xtable * 30, xtable * 30 +30, 0, 'd');
         
         wdgTables[iTable].setToPanel();
-        wdgTables[iTable].repaintGthread();
+        wdgTables[iTable]._wdgImpl.repaintGthread();
       }
       gralMng.setPosition(52, 0, 0, 0, 0, 'U');
       output.setToPanel();

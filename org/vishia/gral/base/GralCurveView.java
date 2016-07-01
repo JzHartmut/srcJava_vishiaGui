@@ -30,6 +30,7 @@ import org.vishia.mainCmd.ReportWrapperLog;
 import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
+import org.vishia.util.Removeable;
 import org.vishia.util.Timeshort;
 import org.vishia.zbnf.ZbnfJavaOutput;
 import org.vishia.zbnf.ZbnfParser;
@@ -44,7 +45,7 @@ import org.vishia.zbnf.ZbnfParser;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralCurveView extends GralWidget implements GralCurveView_ifc
+public class GralCurveView extends GralWidget implements GralCurveView_ifc
 {
   
   /**Version, history and license.
@@ -202,7 +203,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   /**Instances of this class contain the scaling for one ore more tracks. 
    * One instance if referenced from maybe one or more as one track.
    */
-  protected static class TrackScale
+  public static class TrackScale
   {
     /**The scale for 10 percent of view without zoom.. */
     public float yScale;
@@ -231,7 +232,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   /**The describing and the actual data of one track (one curve)
    */
-  protected static class Track implements GralCurveViewTrack_ifc, GralSetValue_ifc {
+  public static class Track implements GralCurveViewTrack_ifc, GralSetValue_ifc {
     public final String name;
     
     /**The index of the track in the List of tracks. 
@@ -413,7 +414,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   }
   
   /**Inner class for time organisation. */
-  protected static class TimeOrganisation{
+  public static class TimeOrganisation{
     
     Timeshort absTime = new Timeshort();
     
@@ -562,7 +563,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
 
   }
   
-  protected TimeOrganisation timeorg = new TimeOrganisation();
+  public TimeOrganisation timeorg = new TimeOrganisation();
   
   
   protected static class DataOrganisation
@@ -606,14 +607,14 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   
   
-  protected static class PixelOrganisation
+  public static class PixelOrganisation
   {
     /**Size of the curve range in pixel. Set at any time on last draw action. */
     public int xPixelCurve, yPixelCurve;
     
   }
 
-  protected final PixelOrganisation pixelOrg = new PixelOrganisation();
+  public final PixelOrganisation pixelOrg = new PixelOrganisation();
   
   
   protected final GralCurveViewMouseAction mouseAction = new GralCurveViewMouseAction();
@@ -623,10 +624,10 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
 
 
   /**All tracks. Anytime if the tracks are changed a new List is created. It is because the list can be used in another thread yet in an iterator. */
-  protected List<Track> listTracks = new ArrayList<Track>();
+  public List<Track> listTracks = new ArrayList<Track>();
   
   
-  protected final CommonCurve common;
+  public final CommonCurve common;
   
   /**The track which is selected by the last setCursor. */
   protected Track trackSelected;
@@ -650,7 +651,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    * is only present on startup of graphic and only if the difference is in range of presentation width,
    * see {@link #prepareIndicesDataForDrawing(int, int)}
    */
-  protected final int[] timeValues;
+  public final int[] timeValues;
   
   
   /**The index in data for each shown pixel, from right to left int-wrapping.
@@ -660,13 +661,13 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    * The field contains old indices if the size of drawing is less then the size of window.
    * {@link #prepareIndicesDataForDrawing(int, int, int)} and used in the drawTrack routine of the implementation level.
    */
-  protected final int[] ixDataShown = new int[2000];
+  public final int[] ixDataShown = new int[2000];
   
   /**The number of pixel for the current data point from the current pixel to left.
    * [0] is the number of pixel for the right point.
    * This array is parallel to {@link #ixDataShown}. 
    */
-  protected final int[] nrofPixel4data = new int[2000];
+  public final int[] nrofPixel4data = new int[2000];
   
   //protected int ixLineInit = 0;
   
@@ -676,12 +677,12 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    * The lastPositionX[0] is used to repaint the last curve peace while shifting draw content.
    * Where, xShift (number of shifted pixel) is considered by subtraction.
    */
-  protected final int[] lastPositionX = new int[2];
+  public final int[] lastPositionX = new int[2];
   
   /**Deepness of the storage of values to present.
    * It is a power of 2 anytime.
    */
-  protected final int maxNrofXValues;
+  public final int maxNrofXValues;
   
   /**The increment step of ixData.
    * Concept of wrap around: The values[]-array are used wrap around, to prevent
@@ -690,13 +691,13 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    * To use cheap increment and compare functionality, the range for the index
    * is the full integer range. To step from one to next index, use this adding value. 
    */
-  protected final int adIxData;
+  public final int adIxData;
   
   /**The number of shift right to get the numeric index in values. */
-  protected final int shIxiData;
+  public final int shIxiData;
   
   /**Mask of index in values. */
-  protected final int mIxiData;
+  public final int mIxiData;
   
   
   /**Mask of any ixData. */
@@ -710,47 +711,47 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   /**The cary over of time which is not used for the current point.
    * 
    */
-  protected int timeCaryOverNewValue;
+  public int timeCaryOverNewValue;
   
   /**Current number of values in the data field. 
    * If less values are set ({@link #setSample(float[])}, 
    * then the nrofValues is less than values.length.
    * Else it is ==values.length. */
-  protected int nrofValues = 0;
+  public int nrofValues = 0;
   
   /**Write index of values, increment by {@link #setSample(float[], int)}.
    * The index refers to the last written value.
    * Initially it is -1, the first write will be increment ?? to prevent any exception while values are not set before.
    */
-  protected int ixDataWr;
+  public int ixDataWr;
   
-  protected boolean testStopWr;
+  public boolean testStopWr;
   
   /**Index of the last drawn values. 
    * The index refers to the last drawn value. */
-  protected int ixDataDraw = 0;
+  public int ixDataDraw = 0;
   
   /**True then saves values.  */
-  protected boolean bActive;
+  public boolean bActive;
   
   /**The actual number of values which are not shown because its time difference is too small
    * to show in graphic as new point. It is counted only for debugging.
    */
-  protected int nrofValuesLessViewPart;
+  public int nrofValuesLessViewPart;
   
   /**The index to show values, it increments with ixWrValues
    * if bFreeze is false
    */
-  protected int ixDataShowRight = 0;
+  public int ixDataShowRight = 0;
   
   
   /**Pixel from right for the cursor1 and cursor2. If -1 then the cursor is unused yet.
    */
-   protected int xpCursor1 = -1, xpCursor2 = -1;
+  public int xpCursor1 = -1, xpCursor2 = -1;
    
   /**New Pixel position for a cursor1 and cursor2. If >=0 then a new position is given.
    */
-  protected int xpCursor1New = -1, xpCursor2New = -1;
+  public int xpCursor1New = -1, xpCursor2New = -1;
     
   /**During mouse move, internal use. */
   protected boolean bMouseDownCursor1, bMouseDownCursor2;
@@ -764,17 +765,17 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   
   /**Distance of nrofValues for one vertical grid line (strong or not strong). */
-  protected int gridDistanceY;
+  public int gridDistanceY;
   
   /**Distance of percent of y-view for one vertical grid line (strong or not strong). */
-  protected float gridDistanceX;
+  public float gridDistanceX;
   
   /**period of strong lines. */
-  protected int gridStrongPeriodX, gridStrongPeriodY;
+  public int gridStrongPeriodX, gridStrongPeriodY;
   
   /**Distance of nrofValues for one vertical strong grid line.
    * This value is used to limit nrofValuesForGrid. */
-  protected int gridDistanceStrongY;
+  public int gridDistanceStrongY;
   
   protected GralColor gridColorGral; // = new Color(getDisplay(), 0, 255, 255);
   
@@ -792,24 +793,24 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   protected GralColor colorBackGral; // = new Color(getDisplay(), 0xff, 0xff, 0xff);
 
   
-  protected boolean focusChanged = false;  //it doesn't work
+  public boolean focusChanged = false;  //it doesn't work
   
   /**Set to true to force a paint all. */
-  protected boolean bPaintAllCmd = false;
+  public boolean bPaintAllCmd = false;
   
   private boolean bNewGetVariables = true;
   
-  protected int newSamples;
+  public int newSamples;
   
   /**last point in x where values were drawn. */
-  protected float xViewLastF = 0;
+  public float xViewLastF = 0;
   
   
   
   /**Number of iData-indices, which are shifted in the {@link #values}. 
    * This number have to be shifted in the pixel area if a draw-all is not requested. 
    * This field is set to 0 if the draw action is done.*/
-  protected AtomicInteger nrofDataShift = new AtomicInteger(0);
+  public AtomicInteger nrofDataShift = new AtomicInteger(0);
   
   protected float nrofDataShiftFracPart = 0.0F;
   
@@ -817,9 +818,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    * in the {@link #drawBackground(GC, int, int, int, int)}-routine.
    * 
    */
-  protected boolean redrawBecauseNewData;
+  public boolean redrawBecauseNewData;
   
-  protected boolean bRedrawAll;
+  public boolean bRedrawAll;
   
   private int ctLastSelected;
   
@@ -834,9 +835,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   
 
-  public GralCurveView(String sName, GralMng mng, int maxNrofXvaluesP, CommonCurve common)
+  public GralCurveView(String sName, int maxNrofXvaluesP, CommonCurve common)
   {
-    super(sName, 'c', mng);
+    super(null, sName, 'c');
     this.common = common == null ? new CommonCurve() : common;
     int maxNrofXvalues1 = 1;
     int shIxData1 = 32;
@@ -860,7 +861,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
     //setPanelMng(mng);
     setActionMouse(mouseAction, 0);
     
-    mng.registerWidget(this);
+    //mng.registerWidget(this);
   }
 
   
@@ -886,7 +887,7 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   /**It will be called after construction of the implementation graphic in the derived ctor.
    * 
    */
-  protected void initMenuContext(){
+  public void initMenuContext(){
     GralMenu menuCurve = getContextMenu();
     //menuCurve.addMenuItemGthread("pause", "pause", null);
     menuCurve.addMenuItemGthread("refresh", actionPaintAll);
@@ -1183,8 +1184,9 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
    *   It is a index which wraps around full integer range, see {@link #adIxData}.
    * @param xViewPart width of the spread to prepare in pixel
    * @return nrof pixel to draw. It is xViewPart if enough data are available, elsewhere less. 
+   * TODO move to ImplAccess
    */
-  protected int prepareIndicesDataForDrawing(int ixDataRight, int xViewPart, int timePart, boolean bPaintAll){
+  public int prepareIndicesDataForDrawing(int ixDataRight, int xViewPart, int timePart, boolean bPaintAll){
     System.arraycopy(ixDataShown, 0, ixDataShown, xViewPart, ixDataShown.length - xViewPart);
     if(bPaintAll){
       dataOrg.zPixelDataShown = 0;
@@ -1344,13 +1346,6 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   { //widgetSwt.setBounds(x,y,dx,dy);
   }
 
-  @Override
-  public boolean setFocusGThread()
-  {
-    // TODO Auto-generated method stub
-    return false;
-  }
-  
   @Override public void activate(boolean activate){ bActive = activate; }
   
   @Override public boolean isActiv(){ return bActive; }
@@ -1943,7 +1938,24 @@ public abstract class GralCurveView extends GralWidget implements GralCurveView_
   
   
   
-  
+  public abstract static class GraphicImplAccess extends GralWidget.ImplAccess
+  implements GralWidgImpl_ifc, Removeable
+  { 
+    protected final GralCurveView widgg;
+    
+    protected GraphicImplAccess(GralCurveView outer){ 
+      super(outer);
+      widgg = outer;
+    }
+    
+  } 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
   protected class GralCurveViewMouseAction implements GralMouseWidgetAction_ifc {
 
     @Override public void mouse1Down(int key, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)

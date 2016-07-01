@@ -79,7 +79,7 @@ public class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ imp
 	final protected Map<String, GralPanelContent> panels = new TreeMap<String, GralPanelContent>();
 
 	/**The currently selected tab. */
-	public GralPanelContent focusedTab;
+	//public GralPanelContent focusedTab;
 	
   /**The actual widgets in the visible panel. It may a sub-panel or changed content. The list can be changed. */
   @Deprecated public List<GralWidget> widgetsVisible;
@@ -105,7 +105,7 @@ public class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ imp
 	
 	//abstract public GralPanelContent getGuiComponent();
 	
-	public GralPanelContent getFocusedTab(){ return focusedTab; }
+	public GralPanelContent getFocusedTab(){ return (GralPanelContent)primaryWidget; }
 	
 	   /**Adds a grid-panel in the TabPanel. The panel will be registered in the GuiPanelMng,
      * so the access to the panel can be done with its name.
@@ -217,6 +217,10 @@ public class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ imp
       super(widgg);
       this.widgg = widgg;
     }
+    
+    protected GralPanelContent getFocusedTab(){ return (GralPanelContent) widgg.primaryWidget; }
+    
+    protected void setFocusedTab(GralPanelContent tab){ widgg.primaryWidget = tab; }
     
     /**Adds a grid-panel in the TabPanel. The panel will be registered in the GuiPanelMng,
      * so the access to the panel can be done with its name.

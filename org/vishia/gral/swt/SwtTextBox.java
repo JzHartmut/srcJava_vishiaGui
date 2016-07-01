@@ -89,7 +89,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
   
   
   protected SwtTextBox(GralTextBox widgg, SwtMng mng)
-  { widgg.super(widgg, mng.mng); //NOTE: superclass is a non static inner class of GralTextField. 
+  { widgg.super(widgg); //NOTE: superclass is a non static inner class of GralTextField. 
     Composite panelSwt = mng.getCurrentPanel();
     GralPanelContent gralPanel = mng.mng.getCurrentPanel();
     

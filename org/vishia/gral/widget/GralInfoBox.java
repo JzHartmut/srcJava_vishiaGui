@@ -264,8 +264,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
 
 
   
-  @Override public void repaintGthread(){  window.repaintGthread(); }
-
+  
 
   @Override public void repaint(){ repaint(0,0); }
 

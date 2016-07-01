@@ -9,12 +9,13 @@ import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 
 /**
  *
  */
-public class AwtTextBox extends GralTextBox
+public class AwtTextBox extends GralTextBox.GraphicImplAccess
 {
   protected AwtTextAreaImpl textFieldSwt;
   
@@ -24,8 +25,8 @@ public class AwtTextBox extends GralTextBox
   StringBuffer newText = new StringBuffer();
   
   
-  public AwtTextBox(String name, Container parent, int style, AwtWidgetMng mng)
-  { super(name);
+  public AwtTextBox(GralTextBox widgg, Container parent, int style, AwtWidgetMng mng)
+  { widgg.super(widgg);
     textFieldSwt = new AwtTextAreaImpl();
     parent.add(textFieldSwt);
   }
@@ -34,25 +35,7 @@ public class AwtTextBox extends GralTextBox
   //@Override public boolean setFocus(){ return textFieldSwt.setFocus(); }
 
 
-  @Override
-  public void viewTrail()
-  {
-    //textAreaOutput.setCaretPosition(textAreaOutput.getLineCount());
-    /*
-    ScrollBar scroll = textFieldSwt.getVerticalBar();
-    int maxScroll = scroll.getMaximum();
-    scroll.setSelection(maxScroll);
-    */
-    textFieldSwt.repaint();
-    
-  }
-
-  @Override
-  public int getNrofLines(){ return 0;  }  //textFieldSwt.getLineCount();
-
-  @Override public int getCursorPos(){ return textFieldSwt.getCaretPosition(); }
-
-
+ 
   /*
   
   @Override public void setTextInGThread(CharSequence text){ 
@@ -69,27 +52,13 @@ public class AwtTextBox extends GralTextBox
 */
   
   
-  @Override public String getText()
-  {
-    String oldText = textFieldSwt.getText();
-    return oldText;
-  }
    
   @Override public Object getWidgetImplementation()
   { return textFieldSwt;
   }
 
 
-  @Override public GralColor setBackgroundColor(GralColor color)
-  { return AwtWidgetHelper.setBackgroundColor(color, textFieldSwt);
-  }
-  
-
-  @Override public GralColor setForegroundColor(GralColor color)
-  { return AwtWidgetHelper.setForegroundColor(color, textFieldSwt);
-  }
-  
-  
+   
 
 
 
@@ -98,7 +67,6 @@ public class AwtTextBox extends GralTextBox
   { @Override public void executeOrder()
     { if(newText.length() >0){
         textFieldSwt.append(newText.toString());
-        viewTrail();
         newText.setLength(0);
       }
     }
@@ -124,7 +92,7 @@ public class AwtTextBox extends GralTextBox
 
 
   
-  @Override public void repaint(){  textFieldSwt.repaint();  }
+  @Override public void repaintGthread(){  textFieldSwt.repaint();  }
 
   
 
@@ -133,12 +101,6 @@ public class AwtTextBox extends GralTextBox
   { return AwtWidgetHelper.setFocusOfTabSwt(textFieldSwt);
   }
 
-
-  @Override public int setCursorPos(int pos){
-    int oldPos = textFieldSwt.getCaretPosition();
-    textFieldSwt.setCaretPosition(pos);
-    return oldPos;
-  }
 
 
   
@@ -169,25 +131,26 @@ public static class AwtTextAreaImpl extends TextArea implements AwtWidget
   }
 
 
-   @Override
-  public void setTextStyle(GralColor color, GralFont font)
-  {
-    // TODO Auto-generated method stub
-    
-  }
+
+
+
+@Override
+public void setVisibleGThread(boolean bVisible)
+{
+  // TODO Auto-generated method stub
+  
+}
+
+@Override
+public GralRectangle getPixelPositionSize()
+{
+  // TODO Auto-generated method stub
+  return null;
+}
+
+
   
   
-  @Override public void setEditable(boolean editable){
-    textFieldSwt.setEditable(editable);
-  }
-
-
-  @Override
-  public void repaintGthread() {
-    // TODO Auto-generated method stub
-    
-  }
-
   
   
 }

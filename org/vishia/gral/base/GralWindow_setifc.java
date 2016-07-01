@@ -44,7 +44,7 @@ public interface GralWindow_setifc
 
   void setFullScreen(boolean full);
 
-  void repaintGthread();
+  //void repaintGthread();
   
   void closeWindow();
 

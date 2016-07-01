@@ -332,7 +332,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
   
   @Override protected GralMenu createContextMenu(GralWidget widg){
-    Component widgSwt = (Component)widg.getWidgetImplementation();
+    Component widgSwt = (Component)widg._wdgImpl.getWidgetImplementation();
     GralMenu menu = new AwtMenu(widg, widgSwt, mng);
     PopupMenu menuAwt = (PopupMenu)menu.getMenuImpl();
     widgSwt.add(menuAwt);
@@ -453,7 +453,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
   
   GralRectangle getPixelUseableAreaOfWindow(GralWidget widgg)
-  { Object oControl = widgg.getWidgetImplementation();
+  { Object oControl = widgg._wdgImpl.getWidgetImplementation();
     Frame control = (Frame)oControl;
     Frame window = control;
     Rectangle rectWindow = window.getBounds();
@@ -506,12 +506,12 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   @Override
   public void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent)
   {
-    Object owidg = widgd.getWidgetImplementation();
+    Object owidg = widgd._wdgImpl.getWidgetImplementation();
     int test = 6;
     if(owidg !=null){
       Component swtWidget = (Component)owidg;
       GralPanelContent panel = widgd.pos().panel;
-      GralRectangle size = panel.getPixelPositionSize(); //PixelSize();
+      GralRectangle size = panel._wdgImpl.getPixelPositionSize(); //PixelSize();
       GralRectangle posSize = mng.calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
       //Note: the swtWidget may have a resizeListener, see there.
       swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
@@ -659,7 +659,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
   @Override public boolean showContextMenuGthread(GralWidget widg) {
     boolean bOk;
-    Component awtWidg = (Component)widg.getWidgetImplementation();
+    Component awtWidg = (Component)widg._wdgImpl.getWidgetImplementation();
     Menu contextMenu = null; //awtWidg.get;
     if(contextMenu == null){
       bOk = false;

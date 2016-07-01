@@ -159,9 +159,9 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
         , chgViewTrail = 0x1000, chgAddText = 0x2000;
 
     
-    protected GraphicImplAccess(GralWidget widgg, GralMng mng)
+    protected GraphicImplAccess(GralWidget widgg)
     {
-      super(widgg, mng);
+      super(widgg);
     }
     
     protected String getAndClearNewText(){ String ret; synchronized(newText){ ret = newText.toString(); newText.setLength(0); } return ret; }

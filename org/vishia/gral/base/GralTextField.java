@@ -653,7 +653,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
 
     
     
-    protected GraphicImplAccess(GralWidget widgg, GralMng mng)
+    protected GraphicImplAccess(GralWidget widgg)
     {
       super(widgg);
       if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("t")) {

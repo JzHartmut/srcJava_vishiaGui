@@ -169,11 +169,13 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidget_ifc, GralWidgImpl_ifc
+public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidget_ifc
 {
   
   /**Version, history and license.
    * <ul>
+   * <li>2016-07-03 Hartmut chg: it is not derived from {@link GralWidgImpl_ifc} any more. It was the old concept: An implementing widgets was derived from the GralWidget. 
+   *   The new concept is: An implementing widget is derived from its derived class of {@link GralWidget.ImplAccess}. Therefore only that base class implements the GralWidgetImpl_ifc.
    * <li>2016-07-03 Hartmut chg: handling of visible: A GralWidget is invisible by default. {@link #setVisible(boolean)} should be invoked on creation.
    *   It is possible that widgets are switched. All widgets of a non-visible tab of a tabbed panel are set to invisible, especially {@link #bVisibleState} = false.
    *   The {@link #isVisible()} is checked to decide whether a widget should be updated in the inspector. Only visible widgets should be updated.
@@ -1280,7 +1282,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
 
   
   
-  @Override public GralRectangle getPixelPositionSize(){
+  //@Override 
+  public GralRectangle XXXgetPixelPositionSize(){
     if(_wdgImpl !=null) return _wdgImpl.getPixelPositionSize();
     else throw new IllegalArgumentException("GralWidget - does not know its implementation widget; ");
   }
@@ -1460,7 +1463,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @param latest 
    */
   public void setFocus(int delay, int latest){
-    if(delay >0 || !itsMng.currThreadIsGraphic()) {
+    if(delay >0 || !itsMng.currThreadIsGraphic() || _wdgImpl == null) {
       dyda.setChanged(ImplAccess.chgFocus | ImplAccess.chgVisible);
       repaint(delay, latest);
     } else {
@@ -1472,8 +1475,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
         //set the visible state and the focus of the parents.
         while(parent !=null && parent.pos() !=null  //a panel is knwon, it has a parent inside its pos() 
             && !parent.bHasFocus
+            && parent._wdgImpl !=null
             && --catastrophicalCount >=0){
-          parent.setFocusGThread();
+          parent._wdgImpl.setFocusGThread();
+          parent.setVisibleStateWidget(true);
           if(parent instanceof GralTabbedPanel) {
             //TabbedPanel: The tab where the widget is member of have to be set as active one.
             GralTabbedPanel panelTabbed = (GralTabbedPanel)parent;
@@ -1489,20 +1494,28 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
             parent = parent.pos().panel; //
           }
         }
-        setFocusGThread();  //sets the focus to the
+        _wdgImpl.setFocusGThread();  //sets the focus to the
+        bVisibleState = true;
       } 
       GralWidget parent = this;
       GralWidget child;
       GralPanelContent panel;
       while(parent instanceof GralPanelContent
         && (child = (panel = (GralPanelContent)parent).primaryWidget) !=null
+        && child._wdgImpl !=null
         && !child.bHasFocus
         ) {
         child.setFocus();
-        child.repaintGthread();
+        child._wdgImpl.setFocusGThread();
+        child.bVisibleState = true;
+        child._wdgImpl.repaintGthread();
         List<GralWidget> listWidg = panel.getWidgetList();
-        for(GralWidget widgChild : listWidg) {
-          widgChild.setVisible(true);
+        
+        if(!(panel instanceof GralTabbedPanel)) { //don't show all childs of all tabs!
+          for(GralWidget widgChild : listWidg) {
+            widgChild._wdgImpl.setVisibleGThread(true);
+            widgChild.bVisibleState = true;
+          }
         }
         parent = child;  //loop if more as one GralPanelContent
       }
@@ -1551,8 +1564,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   @Override public void repaint(int delay, int latest){
     if(itsMng !=null){ //NOTE: set of changes is possible before setToPanel was called. 
-      if(delay == 0 && itsMng.currThreadIsGraphic()){
-        repaintGthread();
+      if(delay == 0 && itsMng.currThreadIsGraphic() && _wdgImpl !=null){
+        _wdgImpl.repaintGthread();
       } else {
         long time = System.currentTimeMillis();
         repaintRequ.activateAt(time + delay, time + latest);
@@ -1574,7 +1587,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   @Override public boolean remove()
   {
-    removeWidgetImplementation();
+    if(_wdgImpl !=null) _wdgImpl.removeWidgetImplementation();
     _wdgPos.panel.removeWidget(this);
     itsMng.deregisterWidgetName(this);
     return true;
@@ -1775,7 +1788,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   private final GralGraphicTimeOrder repaintRequ = new GralGraphicTimeOrder("GralWidget.repaintRequ"){
     @Override public void executeOrder() {
-      repaintGthread(); //Note: exception thrown in GralGraphicThread
+      if(_wdgImpl !=null) { _wdgImpl.repaintGthread(); }//Note: exception thrown in GralGraphicThread
     }
     @Override public String toString(){ return name + ":" + GralWidget.this.name; }
   };
@@ -1823,28 +1836,28 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   }
 
 
-  @Override
-  public Object getWidgetImplementation()
+  //@Override
+  public Object XXXgetWidgetImplementation()
   { if(_wdgImpl !=null) return _wdgImpl.getWidgetImplementation();
     else return null;
   }
 
 
-  @Override
-  public void removeWidgetImplementation()
+  //@Override
+  public void XXXremoveWidgetImplementation()
   { if(_wdgImpl !=null) _wdgImpl.removeWidgetImplementation();
   }
 
 
-  @Override
-  public void repaintGthread()
+  //@Override
+  public void XXXrepaintGthread()
   {
     if(_wdgImpl !=null) _wdgImpl.repaintGthread();
   }
 
 
-  @Override
-  public boolean setFocusGThread()
+  //@Override
+  public boolean XXXsetFocusGThread()
   { boolean ret;
     try{
       if(_wdgImpl !=null) {
@@ -1863,7 +1876,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   /**Sets the implementation widget visible or not.
    * @see org.vishia.gral.base.GralWidgImpl_ifc#setVisibleGThread(boolean)
    */
-  @Override public void setVisibleGThread(boolean bVisible){ 
+  //@Override 
+  public void XXXsetVisibleGThread(boolean bVisible){ 
     try{
       if(_wdgImpl !=null){ 
         setVisibleState(bVisible);  

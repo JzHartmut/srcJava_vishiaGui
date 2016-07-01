@@ -1325,7 +1325,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     @Override
     public void executeOrder() {
       gi.bFocused = true;  //to focus while repainting
-      repaintGthread();
+      _wdgImpl.repaintGthread();
       keyDone = true;
       //System.out.println("Key done");
     }

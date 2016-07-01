@@ -515,7 +515,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   
   GralRectangle getPixelUseableAreaOfWindow(GralWidget widgg)
-  { Object oControl = widgg.getWidgetImplementation();
+  { Object oControl = widgg._wdgImpl.getWidgetImplementation();
     Control control = (Control)oControl;
     Shell window = control.getShell();
     Rectangle rectWindow = window.getBounds();
@@ -810,11 +810,12 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
 	@Override public GralCurveView addCurveViewY(String sName, int nrofXvalues, GralCurveView.CommonCurve common) {
     //setNextPosition();
-	  GralCurveView widgd = new SwtCurveView(sName, this.pos(), this, nrofXvalues, common); //, curveView, 'c', sName, null);
-		mng.curveContainer.add(widgd);
+	  GralCurveView widgg = new GralCurveView(sName, nrofXvalues, common);
+	  new SwtCurveView(widgg, this); //sName, this.pos(), this, nrofXvalues, common); //, curveView, 'c', sName, null);
+		mng.curveContainer.add(widgg);
 	  //CurveView curveView = new CurveView(((SwtPanel)pos().panel).getPanelImpl(), dxWidget, dyWidget, nrofXvalues, nrofTracks);
-		testHelp.curveView = widgd; //store to inspect.
-		return widgd;
+		testHelp.curveView = widgg; //store to inspect.
+		return widgg;
 	}
 
 
@@ -822,11 +823,11 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	@Override public GralWidget addFocusAction(String sName, GralUserAction action, String sCmdEnter, String sCmdRelease)
 	{
     GralWidget widget = indexNameWidgets(sName);
-  	if(widget == null || !(widget.getWidgetImplementation() instanceof Control)){
+  	if(widget == null || widget._wdgImpl ==null || !(widget._wdgImpl.getWidgetImplementation() instanceof Control)){
   		mng.log.sendMsg(0, "GuiMainDialog:addClickAction: unknown widget %s", sName);
   	} else {
     	/**The class ButtonUserAction implements the general button action, which class the registered user action. */
-      ((Control)(widget.getWidgetImplementation())).addFocusListener( new SwtFocusAction(this, action, sCmdEnter, sCmdRelease));
+      ((Control)(widget._wdgImpl.getWidgetImplementation())).addFocusListener( new SwtFocusAction(this, action, sCmdEnter, sCmdRelease));
       
   	}
   	return widget;
@@ -835,7 +836,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	
 	@Override public void addFocusAction(GralWidget widgetInfo, GralUserAction action, String sCmdEnter, String sCmdRelease)
 	{
-    ((Control)(widgetInfo.getWidgetImplementation())).addFocusListener( new SwtFocusAction(this, action, sCmdEnter, sCmdRelease));
+    ((Control)(widgetInfo._wdgImpl.getWidgetImplementation())).addFocusListener( new SwtFocusAction(this, action, sCmdEnter, sCmdRelease));
   }
 
 	
@@ -855,7 +856,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   
   @Override protected GralMenu createContextMenu(GralWidget widg){
-    Control widgSwt = (Control)widg.getWidgetImplementation();
+    Control widgSwt = (Control)widg._wdgImpl.getWidgetImplementation();
     GralMenu menu = new SwtMenu(widg, widgSwt, mng);
     return menu;
   }
@@ -937,16 +938,18 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	@Override public void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent)
 	{
 	  //GralWidget_ifc widget = widgd.getGraphicWidgetWrapper();
-	  Object owidg = widgd.getWidgetImplementation();
-	  int test = 6;
-	  if(owidg !=null){
-	    Control swtWidget = (Control)owidg;
-	    GralPanelContent panel = widgd.pos().panel;
-	    GralRectangle size = panel.getPixelPositionSize(); //PixelSize();
-	    GralRectangle posSize = mng.calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
-  	  //Note: the swtWidget may have a resizeListener, see there.
-	    swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
-  	  swtWidget.redraw();
+	  if(widgd._wdgImpl !=null) {
+  	  Object owidg = widgd._wdgImpl.getWidgetImplementation();
+  	  int test = 6;
+  	  if(owidg !=null){
+  	    Control swtWidget = (Control)owidg;
+  	    GralPanelContent panel = widgd.pos().panel;
+  	    GralRectangle size = panel._wdgImpl.getPixelPositionSize(); //PixelSize();
+  	    GralRectangle posSize = mng.calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
+    	  //Note: the swtWidget may have a resizeListener, see there.
+  	    swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
+    	  swtWidget.redraw();
+  	  }
 	  }
 	}
 	
@@ -959,7 +962,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   	sValue = mng.getValueFromWidget(widgd);  //platform independent getting of value
   	if(sValue == null){
   	  GralWidget_ifc widget = widgd;
-      Control swtWidget = (Control)widgd.getWidgetImplementation();
+      Control swtWidget = (Control)widgd._wdgImpl.getWidgetImplementation();
   		if(swtWidget instanceof Text){
     	  sValue = ((Text)swtWidget).getText();
     	} else if(widgd instanceof GralButton){
@@ -1002,7 +1005,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 
   @Override public boolean showContextMenuGthread(GralWidget widg) {
     boolean bOk;
-    Control swtWidg = (Control)widg.getWidgetImplementation();
+    Control swtWidg = (Control)widg._wdgImpl.getWidgetImplementation();
     Menu contextMenu = swtWidg.getMenu();
     if(contextMenu == null){
       bOk = false;
