@@ -8,6 +8,7 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -175,7 +176,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   //public final Shell theShellOfWindow;
   
-  protected Rectangle currPanelPos;
+  protected Rectangle XXXXXcurrPanelPos;
   
 
   /**Properties of this Dialog Window. The {@link GralMng} contains an aggregation 
@@ -192,8 +193,9 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   /**This mouse-click-implementor is added to any widget,
    * which is associated to a {@link GralWidget} in its data.
    * The infos of the last clicked widget can be got with it.
+   * @deprecated use {@link SwtGralMouseListener#mouseActionStd}, it is the same, but better structured.
    */
-  SwtGralMouseListener.MouseListenerNoAction mouseClickForInfo = new SwtGralMouseListener.MouseListenerGralAction(); //NoAction();
+  @Deprecated MouseListener mouseClickForInfo = new SwtGralMouseListener.MouseListenerGralAction(); //NoAction();
   
   
   /**The instance for all traverse listener applicable to all widgets. */
@@ -412,7 +414,8 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   @Deprecated
   @Override public GralWindow createWindow(String name, String title, int windProps)
   {
-    GralWindow windowGral = new GralWindow("@", name, title, windProps, null, null);
+    //GralWindow windowGral = new GralWindow("@", name, title, windProps);
+    GralWindow windowGral = new GralWindow(null, name, title, windProps);
     //SwtGraphicThread swtDevice = (SwtGraphicThread)gralDevice;
     createSubWindow(windowGral);
     return windowGral;

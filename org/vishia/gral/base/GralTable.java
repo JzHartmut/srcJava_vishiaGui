@@ -1283,9 +1283,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           done = true;
         }
         if(!done && lineSelected !=null){
-          if(actionChanging !=null){
-            //all other keys: call actionChanging.
-            done = actionChanging.exec(keyCode, this, lineSelected);
+          GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter);
+          if(action !=null){
+            Object[] args = action.args();
+            if(args == null){ done = action.action().exec(keyCode, this, lineSelected); }
+            else { done = action.action().exec(keyCode, this, args, lineSelected); }
           }
         } //if(table.)
         if(!done && itsMng.userMainKeyAction() !=null){
@@ -2497,7 +2499,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     @Override public String getDataPath(){ return this.sDataPath; }
 
-    @Override public GralUserAction getActionChange(){ return GralTable.this.getActionChange(); }
+    @Override public ActionChange getActionChange(ActionChangeWhen when){ return GralTable.this.getActionChange(when); }
 
     
 

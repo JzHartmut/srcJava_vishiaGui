@@ -7,6 +7,7 @@ import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 
 public class GralSwitchExclusiveButtonMng implements VariableAccess_ifc
 {
@@ -19,8 +20,8 @@ public class GralSwitchExclusiveButtonMng implements VariableAccess_ifc
   
   public void add(GralWidget widgd){ 
     listSwitchButtons.add(widgd);
-    if(widgd.getActionChange() == null){
-      widgd.setActionChange(switchAction);
+    if(widgd.getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter) == null){
+      widgd.setActionChange(null, switchAction, null, GralWidget_ifc.ActionChangeWhen.onEnter);
     }
   }
   

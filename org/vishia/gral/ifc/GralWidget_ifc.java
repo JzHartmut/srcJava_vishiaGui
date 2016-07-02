@@ -103,7 +103,47 @@ public interface GralWidget_ifc extends Removeable
    */
   public static final String version = "2015-09-12";
 
-  
+  public static class ActionChange
+  {
+    protected final GralUserAction action;
+    
+    /**Usual the given textual description of the action, can be shown to display or as menu item in context menu.*/
+    protected final String sAction;
+    
+    /**Any arguments, usual String[]. */
+    protected final Object[] args;
+    
+    public ActionChange(String sAction, GralUserAction action, Object[] args)
+    {
+      this.action = action;
+      this.sAction = sAction;
+      this.args = args;
+    }
+
+    public GralUserAction action(){ return action; }
+    
+    public Object[] args(){ return args; }
+    
+    public String sAction(){ return sAction; }
+  }
+
+
+  public enum ActionChangeWhen
+  { onAnyChgContent
+  , onEnter
+  , onCtrlEnter
+  , onFocusGained
+  , onChangeAndFocusLost
+  , onMouse1Dn
+  , onMouse1Up
+  , onMouse1UpOutside
+  , onMouse2Up
+  , onMouse1Doublc
+  , onMouseWheel
+  , onDrop
+  , onDrag
+  };
+
   
   public String getName();
   
@@ -130,7 +170,9 @@ public interface GralWidget_ifc extends Removeable
 
   
   
-  public GralUserAction getActionChange();
+  //public GralUserAction getActionChange();
+  
+  ActionChange getActionChange(ActionChangeWhen when);
   
   /**Sets this widget to the current panel at the current given position. 
    * This routine should be called only one time after the Gral widget was created. 

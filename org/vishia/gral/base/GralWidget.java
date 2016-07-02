@@ -174,6 +174,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2016-07-03 Hartmut refact: actionChange: Now the {@link GralWidget_ifc.ActionChange} describes the action class and arguments.
+   *   {@link ConfigData#actionChange1} refers the only one change action, or {@link ConfigData#actionChangeSelect} contains more as one change action.
+   *   {@link #setActionChange(String, GralUserAction, String[], org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen...)} sets the only one or special actions,
+   *   {@link #getActionChange(org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen)} selects a proper one. 
+   *   All derived widgets and implementation are adapted to the new system. The user interface is nearly identical.
    * <li>2016-07-03 Hartmut chg: it is not derived from {@link GralWidgImpl_ifc} any more. It was the old concept: An implementing widgets was derived from the GralWidget. 
    *   The new concept is: An implementing widget is derived from its derived class of {@link GralWidget.ImplAccess}. Therefore only that base class implements the GralWidgetImpl_ifc.
    * <li>2016-07-03 Hartmut chg: handling of visible: A GralWidget is invisible by default. {@link #setVisible(boolean)} should be invoked on creation.
@@ -345,11 +350,67 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   private GralWidgetCfg_ifc itsCfgElement;
 
+
+
+  protected static class ActionChangeSelect
+  {
+    ActionChange onAnyChangeContent;
+    ActionChange onEnter;
+    ActionChange onCtrlEnter;
+    ActionChange onFocusGained;
+    ActionChange onChangeAndFocusLost;
+    ActionChange onMouse1Dn;
+    ActionChange onMouse1Up;
+    ActionChange onMouse1UpOutside;
+    ActionChange onMouse2Up;
+    ActionChange onMouse1Double;
+    ActionChange onMouseWheel;
+    ActionChange onDrop;
+    ActionChange onDrag;
+    
+  }
+
+
+
+
+
+
   
   /**This class holds common configuration data for widgets.
    */
-  public static class ConfigData
+  public final static class ConfigData
   {
+    /**Action method for showing. */
+    protected GralUserAction actionShow;
+
+    /**Textual description of the showing method. */
+    private String sShowMethod;
+
+    private String[] sShowParam;
+    
+    
+    /**Either this or {@link #actionChangeSelect} is set. */
+    protected ActionChange actionChange1;
+    
+    protected ActionChangeWhen[] actionChange1When;
+    
+    /**Either this or {@link #actionChange} is set. */
+    protected ActionChangeSelect actionChangeSelect;
+
+    /**Action method on activating, changing or release the widget-focus. */
+    //public GralUserAction actionChanging;
+    
+    /**Parameter to the change action. */
+    //public String[] sActionChangeArgs;
+    
+
+    protected GralUserAction actionDrag;
+
+    protected GralUserAction actionDrop;
+
+    /**This action will be called if the widget gets the focus. */
+    protected GralUserAction actionFocused;
+
     /**Parameter which are used from a {@link GralWidget#setActionShow(GralUserAction, String[])} method.
      * The parameter are converted from a String given form.
      */
@@ -361,7 +422,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     
     
     /**Bits see {@link GralMouseWidgetAction_ifc#mUser1down} etc. */
-    public int mUser;
+    public int mMouseToActionChange;
     
 
   }
@@ -424,11 +485,6 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   public String sToolTip;
   
-  /**Textual description of the showing method. */
-  private String sShowMethod;
-
-  private String[] sShowParam;
-  
   /**Textual informations about content. It may be a data path or adequate. */
   private String sDataPath;
   
@@ -462,18 +518,6 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   private List<VariableAccess_ifc> variables;
   
-  
-  /**Action method on activating, changing or release the widget-focus. */
-  protected GralUserAction actionChanging;
-
-  
-  /**Action method for showing. */
-  protected GralUserAction actionShow;
-
-  protected GralUserAction actionDrag, actionDrop;
-  
-  /**This action will be called if the widget gets the focus. */
-  protected GralUserAction actionFocused;
   
   /**Any widget can have a command String, which can be quest for example in an action. 
    * The widget can be identified by its {@link #getCmd()} independent of its name. */
@@ -872,31 +916,152 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    *        usual if the user takes an action on screen, press button etc.
    *        
    */
-  public void setActionChange(GralUserAction action){ actionChanging = action; }
+  @Deprecated public void setActionChange(GralUserAction action){ setActionChange(null, action, null); } //cfg.actionChanging = action; }
+  
+  
+  private static ActionChangeWhen[] whenAll = 
+  { ActionChangeWhen.onAnyChgContent
+  , ActionChangeWhen.onFocusGained
+  , ActionChangeWhen.onChangeAndFocusLost
+  , ActionChangeWhen.onCtrlEnter
+  , ActionChangeWhen.onDrag
+  , ActionChangeWhen.onDrop
+  , ActionChangeWhen.onEnter
+  , ActionChangeWhen.onMouse1Doublc
+  , ActionChangeWhen.onMouse1Dn
+  , ActionChangeWhen.onMouse1Up
+  , ActionChangeWhen.onMouse1UpOutside
+  , ActionChangeWhen.onMouse2Up
+  , ActionChangeWhen.onMouseWheel
+  };
+
+  
+  /**Sets the action to invoke after changing or touching the widget.
+   * @param sAction maybe null, String for visualization, especially menu entry for context menu.
+   * @param action The action. null admissible to remove the existing action. 
+   * @param args possible arguments for the action or null
+   * @param when List of type of action, maybe empty, then the given action is set for all conditions.
+   *   Especially <code>setActionChange(null, null, null) removes all actions.
+   */
+  public void setActionChange(String sAction, GralUserAction action, String[] args, ActionChangeWhen... when){ 
+    ActionChange action1 = action == null ? null : new ActionChange(sAction, action, args);
+    
+    if(when.length==0){
+      cfg.actionChange1 = action1;
+      cfg.actionChangeSelect = null;
+      cfg.actionChange1When = null;
+    } else if(cfg.actionChange1 == null && cfg.actionChangeSelect == null) {
+      //first invocation
+      cfg.actionChange1 = action1;
+      cfg.actionChangeSelect = null;
+      cfg.actionChange1When = when;
+    } else {
+      if(cfg.actionChangeSelect == null) { cfg.actionChangeSelect = new ActionChangeSelect(); }
+      if(cfg.actionChange1 !=null) { //given
+        ActionChangeWhen[] whenGiven = cfg.actionChange1When == null ? whenAll : cfg.actionChange1When;
+        for(ActionChangeWhen when1: whenGiven) {
+          setActionChangeWhen(cfg.actionChange1, when1);
+        }
+        cfg.actionChange1 = null;
+      }
+      for(ActionChangeWhen when1: when) {
+        setActionChangeWhen(action1, when1);
+      }
+    }
+  }
+  
+  
+  private void setActionChangeWhen(ActionChange action, ActionChangeWhen when)
+  {
+    switch(when){
+    case onAnyChgContent: cfg.actionChangeSelect.onAnyChangeContent = action; break;
+    case onCtrlEnter: cfg.actionChangeSelect.onCtrlEnter = action; break;
+    case onFocusGained: cfg.actionChangeSelect.onFocusGained = action; break;
+    case onChangeAndFocusLost: cfg.actionChangeSelect.onChangeAndFocusLost = action; break;
+    case onDrag: cfg.actionChangeSelect.onDrag = action; break;
+    case onDrop:cfg.actionChangeSelect.onDrop = action;  break;
+    case onEnter: cfg.actionChangeSelect.onEnter = action; break;
+    case onMouse1Doublc: cfg.actionChangeSelect.onMouse1Double = action; break;
+    case onMouse1Dn: cfg.actionChangeSelect.onMouse1Dn = action; break;
+    case onMouse1Up: cfg.actionChangeSelect.onMouse1Up = action; break;
+    case onMouse1UpOutside: cfg.actionChangeSelect.onMouse1UpOutside = action; break;
+    case onMouse2Up: cfg.actionChangeSelect.onMouse2Up = action; break;
+    case onMouseWheel: cfg.actionChangeSelect.onMouseWheel = action; break;
+    default: throw new IllegalArgumentException("not all when-conditions");
+    }
+  }
+  
+  /**Gets the action to execute on changing a widget.
+   * If only one action is given with <code>setActionChange(String, action, args) without a specified when then this action is returned in any case,
+   * especially if when == null. If specific actions were set, this action is returned, or null.
+   * @param when type of action, if null then returns the only one given action or null if specific actions are given
+   * @return null if the action is not set.
+   */
+  @Override public ActionChange getActionChange(ActionChangeWhen when) {
+    return getActionChangeStrict(when, false);
+  }
+  
+  
+  public ActionChange getActionChangeStrict(ActionChangeWhen when, boolean strict) {
+    if(cfg.actionChange1 !=null) {
+      if(cfg.actionChange1When == null) return strict ? null: cfg.actionChange1;
+      else {
+        for(ActionChangeWhen when1:cfg.actionChange1When){
+          if(when1 == when) return cfg.actionChange1;
+        }
+        //not found:
+        return null;
+      }
+    } else {
+      //actionChangeSelect is given:
+      if(when == null || cfg.actionChangeSelect == null) return null;
+      switch(when){
+      case onAnyChgContent: return cfg.actionChangeSelect.onAnyChangeContent;
+      case onCtrlEnter: return cfg.actionChangeSelect.onCtrlEnter;
+      case onFocusGained: return cfg.actionChangeSelect.onFocusGained;
+      case onChangeAndFocusLost: return cfg.actionChangeSelect.onChangeAndFocusLost;
+      case onDrag: return cfg.actionChangeSelect.onDrag;
+      case onDrop: return cfg.actionChangeSelect.onDrop;
+      case onEnter: return cfg.actionChangeSelect.onEnter;
+      case onMouse1Doublc: return cfg.actionChangeSelect.onMouse1Double;
+      case onMouse1Dn: return cfg.actionChangeSelect.onMouse1Dn;
+      case onMouse1Up: return cfg.actionChangeSelect.onMouse1Up;
+      case onMouse1UpOutside: return  cfg.actionChangeSelect.onMouse1UpOutside;
+      case onMouse2Up: return cfg.actionChangeSelect.onMouse2Up;
+      case onMouseWheel: return cfg.actionChangeSelect.onMouseWheel;
+      default: throw new IllegalArgumentException("not all when-conditions");
+      }
+      
+    }
+  }
+  
+  
+  
   
   
   
   /**Sets the action for mouse operation. Either it is a special mouse handler or the {@link #setActionChange(GralUserAction)}
    * is used with {@link KeyCode#mouse1Down} etc. key code. 
-   * It works with all widgets which uses {@link org.vishia.gral.swt.SwtGralMouseListener.MouseListenerGralAction}.
+   * It works with all widgets which uses {@link org.vishia.gral.swt.SwtGralMouseListener.MouseListenerGralAction} respectively the adequate implementation mouse listener.
+   * By contract of Gral, all widgets should add the mouse listener. Therefore no further special action is necessary to activate the requested mouse behavior. 
    * Note: If you set an abbreviate mouse handler for Button etc. where the mouse is an essential functionality
    *   that functionality is disturbed. An extra handler should base on that special mouse handler, for example
    *   {@link GralButton.MouseActionButton} and should invoke that actions calling super.mouse1Down(...) etc.
    *   For that widgets usual the {@link #setActionChange(GralUserAction)} is called also, that may be sufficient. 
    * @param mouseWidgetAction null possible, elsewhere the mouse operation callback instance.
    * @param mUser One or more of the bits {@link GralMouseWidgetAction_ifc#mUser1down} etc. 
-   *   If given the {@link #setActionChange(GralUserAction)} is invoked with that operation.
+   *   If given the {@link #setActionChange(GralUserAction)} is invoked with that operation instead the given (or usually not given) mouseWidgetAction.
    */
   public void setActionMouse(GralMouseWidgetAction_ifc mouseWidgetAction, int mUser){
     cfg.mouseWidgetAction = mouseWidgetAction;
-    cfg.mUser = mUser;
+    cfg.mMouseToActionChange = mUser;
   }
   
   
   
   
   /**Gets the action for change the widget. */
-  public GralUserAction getActionChange(){ return actionChanging; }
+  //public GralUserAction getActionChange(){ return cfg.actionChanging; }
   
   
   /**Sets the action in application context which is invoked for applying user data to show in the widget.
@@ -919,7 +1084,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @param action The action instance.
    * @param param maybe param for the show method.
    */
-  public void setActionShow(GralUserAction action, String[] param){ actionShow = action; sShowParam = param; }
+  public void setActionShow(GralUserAction action, String[] param){ cfg.actionShow = action; cfg.sShowParam = param; }
   
   /**Gets the action to show the widget. This method is helpfully to invoke showing after receiving data
    * in the users context. Invoke {@link GralUserAction#userActionGui(String, GralWidget, Object...)}
@@ -929,11 +1094,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * The usage of a show method given in the implementation of {@link GralUserAction} helps to separate
    * the invocation of showing and the decision what and how is to show.
    */
-  public GralUserAction getActionShow(){ return actionShow; }
+  public GralUserAction getActionShow(){ return cfg.actionShow; }
   
-  public void setActionFocused(GralUserAction action){ actionFocused = action; }
+  public void setActionFocused(GralUserAction action){ cfg.actionFocused = action; }
 
-  public GralUserAction getActionFocused(){ return actionFocused; }
+  public GralUserAction getActionFocused(){ return cfg.actionFocused; }
   
   
   public String getsToolTip()
@@ -958,11 +1123,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   public void setDragEnable(GralUserAction action, int dragType)
   {
-    actionDrag = action;
+    cfg.actionDrag = action;
     if(_wdgImpl !=null) _wdgImpl.setDragEnable(dragType);  // call implementation specific drop handling. 
   }
 
-  public GralUserAction getActionDrag(){ return actionDrag; }
+  public GralUserAction getActionDrag(){ return cfg.actionDrag; }
   
   
   /**Sets the action to receive a drop event and initializes the drop feature of the widget.
@@ -971,16 +1136,16 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   public void setDropEnable(GralUserAction action, int dropType)
   {
-    actionDrop = action;
+    cfg.actionDrop = action;
     if(_wdgImpl !=null) _wdgImpl.setDropEnable(dropType);  // call implementation specific drop handling. 
   }
 
-  public GralUserAction getActionDrop(){ return actionDrop; }
+  public GralUserAction getActionDrop(){ return cfg.actionDrop; }
   
   
   public String getShowMethod()
   {
-    return sShowMethod;
+    return cfg.sShowMethod;
   }
 
   
@@ -995,11 +1160,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * this  
    * @return
    */
-  public String[] getShowParam(){ return sShowParam; }
+  public String[] getShowParam(){ return cfg.sShowParam; }
   
   /**Clear the parameter if they are over-taken already.
   */
-  public void clearShowParam(){ sShowParam = null; }
+  public void clearShowParam(){ cfg.sShowParam = null; }
 
 
   public String getFormat()
@@ -1151,10 +1316,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     //
     //
     //
-    if(actionShow !=null){
+    if(cfg.actionShow !=null){
       //The users method to influence how the widget is presented in view:
-      if(!actionShow.exec(0, this, variable !=null ? variable : variables)){
-        System.err.println("GralWidget fault actionShow in " + name + "; returns false; sShowMethod = " + sShowMethod);
+      if(!cfg.actionShow.exec(0, this, variable !=null ? variable : variables)){
+        System.err.println("GralWidget fault actionShow in " + name + "; returns false; sShowMethod = " + cfg.sShowMethod);
       }
     } else {
       //standard behavior to show: call setValue or setText which may overridden by the widget type.
@@ -1685,7 +1850,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       if(widgg.htmlHelp !=null){
         widgg.itsMng.setHtmlHelp(widgg.htmlHelp);
       }
-      if(widgg.actionFocused !=null){ widgg.actionFocused.exec(KeyCode.focusGained, widgg); }
+      if(widgg.cfg.actionFocused !=null){ widgg.cfg.actionFocused.exec(KeyCode.focusGained, widgg); }
       //notify GralWidgetMng about focused widget.
       widgg.itsMng.notifyFocus(widgg);
     }
@@ -1699,10 +1864,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     }
 
     /**Access method to GralWidget's method. */
-    protected GralUserAction actionShow(){ return widgg.actionShow; }
+    protected GralUserAction actionShow(){ return widgg.cfg.actionShow; }
     
     /**Access method to GralWidget's method. */
-    protected GralUserAction actionChanging(){ return widgg.actionChanging; }
+    //protected GralUserAction actionChanging(){ return widgg.cfg.actionChanging; }
     
     
     /**Access method to {@link GralWidget#dyda}. */
@@ -1746,6 +1911,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     
     public void acknChanged(int mask){ widgg.dyda.acknChanged(mask); }
     
+    
+    protected ActionChange getActionChange(ActionChangeWhen when){ return widgg.getActionChange(when); }
     
     public static GralWidget gralWidgetFromImplData(Object data){
       if(data instanceof GralWidget) return (GralWidget)data;

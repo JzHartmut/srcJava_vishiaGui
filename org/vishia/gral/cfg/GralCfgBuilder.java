@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.vishia.gral.base.GralCurveView;
+import org.vishia.gral.base.GralMouseWidgetAction_ifc;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
@@ -20,6 +21,7 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralPoint;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.CalculatorExpr;
 import org.vishia.util.Debugutil;
@@ -226,13 +228,49 @@ public class GralCfgBuilder
     }
     */
     //
-    final GralUserAction userAction;
+    final GralUserAction userAction; //, mouseAction;
+    final String[] sUserActionArgs;
+    GralWidget_ifc.ActionChangeWhen whenUserAction = null;
     if(cfge.widgetType.userAction !=null){
-      userAction = gralMng.getRegisteredUserAction(cfge.widgetType.userAction);
-      if(userAction == null){
-        sError = "GuiCfgBuilder - user action not found: " + cfge.widgetType.userAction;
+      String sUserAction = cfge.widgetType.userAction; 
+      if(sUserAction.startsWith("@")){
+        int mouseKeys = KeyCode.mouse2Up;
+        int posEnd = sUserAction.indexOf(':');
+        if(posEnd < 0) { sError = "GuiCfgBuilder - @m: ':' not found. ";  sUserAction = null; }
+        else {
+          for(int ix = 1; ix < posEnd; ++ix){
+            char whatMouseKey = sUserAction.charAt(ix);
+            switch(whatMouseKey){
+            case (char)(KeyCode.mouse1Double): whenUserAction = GralWidget_ifc.ActionChangeWhen.onMouse1Doublc; break;
+            }
+          }
+          sUserAction = sUserAction.substring(posEnd+1).trim(); 
+        }  
       }
-    } else { userAction = null; }
+      if(sUserAction !=null) {
+        String[] sMethod = CalculatorExpr.splitFnNameAndParams(sUserAction);
+        userAction = gralMng.getRegisteredUserAction(sMethod[0]);
+        if(userAction == null){
+          sError = "GuiCfgBuilder - user action ignored because not found: " + cfge.widgetType.userAction;
+          sUserActionArgs = null;
+        } else {
+          sUserActionArgs = sMethod[1] == null ? null : CalculatorExpr.splitFnParams(sMethod[1]);
+        }
+ 
+      } else { userAction = null; sUserActionArgs = null; }
+    } else { userAction = null; sUserActionArgs = null; }
+    
+    
+    
+    
+    /*
+    if(cfge.widgetType.mouseAction !=null){
+      mouseAction = gralMng.getRegisteredUserAction(cfge.widgetType.mouseAction);
+      if(mouseAction == null){
+        sError = "GuiCfgBuilder - mouse action ignored because not found: " + cfge.widgetType.mouseAction;
+      }
+    } else { mouseAction = null; }
+    */
     //
     if(cfge.widgetType instanceof GralCfgData.GuiCfgButton){
       GralCfgData.GuiCfgButton wButton = (GralCfgData.GuiCfgButton) cfge.widgetType;
@@ -360,8 +398,12 @@ public class GralCfgBuilder
         }
       }*/
       if(userAction !=null){
-        widgd.setActionChange(userAction);
+        if(whenUserAction == null) { widgd.setActionChange(cfge.widgetType.userAction, userAction, sUserActionArgs); }
+        else { widgd.setActionChange(cfge.widgetType.userAction, userAction, sUserActionArgs, whenUserAction); }
       }
+      //if(mouseAction !=null){
+        //fauly type, does not work: widgd.setActionMouse(mouseAction, 0);
+      //}
       String sFormat = cfge.widgetType.format;
       if(sFormat !=null){
          widgd.setFormat(sFormat);

@@ -131,10 +131,10 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
           
         int ySize = p.ySizeDown == GralPos.useNatSize ? p.ySizeDown :
           p.ySizeDown == 0 ? GralPos.samesize : 
-          (p.yPosFrac > 0 && p.ySizeDown < 0 ? p.ySizeDown -1 : p.ySizeDown) + GralPos.size;
+          (p.ySizeFrac > 0 && p.ySizeDown < 0 ? p.ySizeDown -1 : p.ySizeDown) + GralPos.size;
         int xSize = p.xWidth == GralPos.useNatSize ? p.xWidth : 
           p.xWidth == 0 ? GralPos.samesize :
-          (p.xPosFrac > 0 && p.xWidth < 0 ? p.xWidth -1 : p.xWidth) + GralPos.size;
+          (p.xSizeFrac > 0 && p.xWidth < 0 ? p.xWidth -1 : p.xWidth) + GralPos.size;
         mng.setFinePosition(p.yPos, p.yPosFrac, ySize, p.ySizeFrac, p.xPos, p.xPosFrac, xSize, p.xSizeFrac, 0, 'r', 0, 0, null);  
       }
       else {
@@ -146,109 +146,6 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   }  
   
   
-  
-  /**Builds the position.
-   * @param cfge deprecated, it is this.
-   * @param guiMng to set the position.
-   * @return
-   */
-  private void XXXsetPosOld(GralMngBuild_ifc guiMng) {
-    GralCfgPosition prevPos = this.previous !=null ? this.previous.position : this.positionInput;
-    GralCfgPosition pos = this.position;        //NOTE: it is filled here.
-    GralCfgPosition inp = this.positionInput;
-    if(this.widgetType.text !=null && this.widgetType.text.equals("wd:yCos"))
-      stop();
-
-    pos.xIncr_ = inp.xIncr_ || (!inp.yIncr_ && prevPos.xIncr_);  //inherit xIncr but not if yIncr. 
-    pos.yIncr_ = inp.yIncr_ || (!inp.xIncr_ && prevPos.yIncr_);
-    //yPos
-    if(inp.yPosFrac !=0){
-      stop();
-    }
-    if(inp.yPos >=0){
-      pos.yPos = inp.yPos;
-      pos.yPosFrac = inp.yPosFrac;
-    } else if(pos.yIncr_){ //position = previous + heigth/width
-      int yPosAdd = 0;  
-      if(prevPos.ySizeDown >=0){ //positive if yPos is on top of widget.
-        pos.yPosFrac = prevPos.yPosFrac + prevPos.ySizeFrac;  //frac part from pos + size
-        if(pos.yPosFrac >=10){ yPosAdd = 1; pos.yPosFrac -=10; } //overflow detection >1
-      } else { //negative if yPos is the bottom line.
-        pos.yPosFrac = prevPos.yPosFrac - prevPos.ySizeFrac;  //ySizeFrac is a positiv number always.
-        if(pos.yPosFrac <=0){ yPosAdd = -1; pos.yPosFrac +=10; }
-      }
-      pos.yPos = prevPos.yPos + prevPos.ySizeDown + yPosAdd;
-    } else { //!prevPos.Incr: use the previous position
-      pos.yPos = prevPos.yPos;
-      pos.yPosFrac = prevPos.yPosFrac;
-    }
-    //xPos
-    if(inp.xPos >=0){
-      pos.xPos = inp.xPos;
-      pos.xPosFrac = inp.xPosFrac;
-    } else if(pos.xIncr_ || (inp.yPos < 0 && ! pos.yIncr_)){ //if same x and y but no increment, then default increment x 
-      //position = previous + width
-      int xPosAdd = 0;  
-      if(prevPos.xWidth >=0){ //positive if yPos is on top of widget.
-        pos.xPosFrac = prevPos.xPosFrac + prevPos.xSizeFrac;
-        if(pos.xPosFrac >=10){ xPosAdd = 1; pos.xPosFrac -=10; }
-      } else { //negative if yPos is the bottom line.
-        pos.xPosFrac = prevPos.xPosFrac - prevPos.xSizeFrac;  //ySizeFrac is a positiv number always.
-        if(pos.xPosFrac <=0){ xPosAdd = -1; pos.xPosFrac +=10; }
-      }
-      pos.xPos = prevPos.xPos + prevPos.xWidth + xPosAdd;
-    } else { //!prevPos.Incr: use the previous position
-      pos.xPos = prevPos.xPos;
-      pos.xPosFrac = prevPos.xPosFrac;
-    }
-    //ySizeDown, xWidth
-    if(inp.ySizeFrac !=0 && inp.ySizeDown == -3){
-      stop();
-    }
-    if(inp.ySizeDown !=0){ //ySize is given here.
-      pos.ySizeDown = inp.ySizeDown;
-      pos.ySizeFrac = inp.ySizeFrac;
-    } else { //use ySize from previous.
-      pos.ySizeDown = prevPos.ySizeDown;
-      pos.ySizeFrac = prevPos.ySizeFrac;
-    }
-    if(inp.xWidth !=0){ //xWidth is given here
-      pos.xWidth = inp.xWidth;
-      pos.xSizeFrac = inp.xSizeFrac;
-    } else { //use xWidth from previous
-      pos.xWidth = prevPos.xWidth;
-      pos.xSizeFrac = prevPos.xSizeFrac;
-    }
-    //
-    pos.panel = inp.panel !=null ? inp.panel : prevPos.panel;
-    //
-    if(pos.xWidth == Integer.MAX_VALUE)
-      stop();
-    if(pos.yPos == 4 && pos.xPos == 56){
-      stop();
-    }
- 
-    final char dirNext;
-    if(pos.yIncr_){ dirNext = 'd';}
-    else if(pos.xIncr_){ dirNext = 'r';}
-    else { dirNext = '.'; }
-    final int heightArg;
-    if(pos.ySizeDown == Integer.MAX_VALUE){ heightArg = GralPos.useNatSize; }
-    else if(pos.ySizeDown < 0 && pos.ySizeFrac !=0) { 
-      heightArg = pos.ySizeDown -1 + GralPos.size;    //forex -3.5 means really 3.5 to up, use -4, 5 
-    } else {heightArg = pos.ySizeDown + GralPos.size; }
-    
-    int widthArg = pos.xWidth == Integer.MAX_VALUE ? GralPos.useNatSize : pos.xWidth + GralPos.size;
-    try{
-      guiMng.setFinePosition(pos.yPos, pos.yPosFrac, heightArg, pos.ySizeFrac
-        , pos.xPos, pos.xPosFrac, widthArg, pos.xSizeFrac, 1, dirNext, 0, 0, null);
-    } catch(IllegalArgumentException exc){
-      System.err.println("GralCfgElement - setPos Argument Error; " + exc.getMessage() + "; line=" + this.content);
-      throw exc;
-    }
-    
-
-  }
   
   
   public String getPanel(){ return positionInput.panel; }

@@ -148,8 +148,11 @@ public class GralHorizontalSelector<UserData> extends GralWidget
     if(ixDstItem >=0){
       ixActItem = ixDstItem; 
       actItem = items.get(ixActItem);
-      if(actionChanging !=null){
-        actionChanging.exec(KeyCode.activated, GralHorizontalSelector.this, actItem.data);
+      GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter);
+      if(action !=null){
+        Object[] args = action.args();
+        if(args == null){ action.action().exec(KeyCode.activated, GralHorizontalSelector.this, actItem.data); }
+        else { action.action().exec(KeyCode.activated, GralHorizontalSelector.this, args, actItem.data); }
       }
     }
   }
@@ -163,8 +166,11 @@ public class GralHorizontalSelector<UserData> extends GralWidget
   protected void removeTab(){
     boolean actItemRemoved = ixDstItem == ixActItem;
     Item<UserData> removed = items.remove(ixDstItem);
-    if(actionChanging !=null){
-      actionChanging.exec(KeyCode.removed, GralHorizontalSelector.this, removed.data);
+    GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter);
+    if(action !=null){
+      Object[] args = action.args();
+      if(args == null){ action.action().exec(KeyCode.activated, GralHorizontalSelector.this, actItem.data); }
+      else { action.action().exec(KeyCode.removed, GralHorizontalSelector.this, args, actItem.data); }
     }
     if(ixDstItem < ixActItem){ ixActItem -=1; }
     if(actItemRemoved){

@@ -5,6 +5,7 @@ import java.lang.ref.Reference;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralImageBase;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.KeyCode;
 
 public class GralButton extends GralWidget
@@ -250,9 +251,10 @@ public class GralButton extends GralWidget
   }
   
   
-  /**This is the same action like press and release the left mouse button. It can be called from the application
+  /**This is the same action like release the left mouse button. It can be called from the application
    * to activate the function of the button. Especially it is used for [Enter] on the focused button.
-   * 
+   * It invokes the {@link GralWidget#setActionChange(String, GralUserAction, String[], org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen...)}
+   * with {@link GralWidget_ifc.ActionChangeWhen#onMouse1Up}
    */
   public void activate() {
     if(shouldSwitched){
@@ -260,8 +262,9 @@ public class GralButton extends GralWidget
       else if(bThreeStateSwitch && switchState == State.Off){ switchState = State.Disabled; }
       else { switchState = State.On; }
     }
-    if(actionChanging !=null){
-      actionChanging.exec(KeyCode.enter, this);
+    GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Up);
+    if(action !=null){
+      action.action().exec(KeyCode.enter, this, action.args());
     }
     repaint();
   }
@@ -374,8 +377,11 @@ public class GralButton extends GralWidget
     @Override public void mouse1Down(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
     {
       setActivated(true);
-      if(widgg.actionChanging !=null){
-        widgg.actionChanging.exec(keyCode, widgg, new Integer(xMousePixel), new Integer(yMousePixel));
+      GralWidget_ifc.ActionChange action = getActionChange(null);
+      if(action !=null){
+        Object[] args = action.args();
+        if(args == null){ action.action().exec(KeyCode.enter, widgg, new Integer(xMousePixel), new Integer(yMousePixel)); }
+        else { action.action().exec(KeyCode.mouse1Down, widgg, args, new Integer(xMousePixel), new Integer(yMousePixel)); }
       }
     }
 
@@ -392,8 +398,11 @@ public class GralButton extends GralWidget
         else if(bThreeStateSwitch && switchState == State.Off){ switchState = State.Disabled; }
         else { switchState = State.On; }
       }
-      if(widgg.actionChanging !=null){
-        widgg.actionChanging.exec(keyCode, widgg, new Integer(xMousePixel), new Integer(yMousePixel));
+      GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Up);
+      if(action !=null){
+        Object[] args = action.args();
+        if(args == null){ action.action().exec(KeyCode.enter, widgg, new Integer(xMousePixel), new Integer(yMousePixel)); }
+        else { action.action().exec(KeyCode.mouse1Up, widgg, args, new Integer(xMousePixel), new Integer(yMousePixel)); }
       }
       widgg.repaint(100, 200);
     }
@@ -401,23 +410,32 @@ public class GralButton extends GralWidget
 
     @Override public void mouse2Down(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
     {
-      if(widgg.actionChanging !=null){
-        widgg.actionChanging.exec(keyCode, widgg, new Integer(xMousePixel), new Integer(yMousePixel));
+      GralWidget_ifc.ActionChange action = getActionChange(null);
+      if(action !=null){
+        Object[] args = action.args();
+        if(args == null){ action.action().exec(KeyCode.enter, widgg, new Integer(xMousePixel), new Integer(yMousePixel)); }
+        else { action.action().exec(KeyCode.mouse2Down, widgg, args, new Integer(xMousePixel), new Integer(yMousePixel)); }
       }
     }
 
 
     @Override public void mouse2Up(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
     {
-      if(widgg.actionChanging !=null){
-        widgg.actionChanging.exec(keyCode, widgg, new Integer(xMousePixel), new Integer(yMousePixel));
+      GralWidget_ifc.ActionChange action = getActionChange(null);
+      if(action !=null){
+        Object[] args = action.args();
+        if(args == null){ action.action().exec(KeyCode.enter, widgg, new Integer(xMousePixel), new Integer(yMousePixel)); }
+        else { action.action().exec(KeyCode.mouse2Up, widgg, args, new Integer(xMousePixel), new Integer(yMousePixel)); }
       }
     }
 
     @Override public void mouse1Double(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
     {
-      if(widgg.actionChanging !=null){
-        widgg.actionChanging.exec(keyCode, widgg, new Integer(xMousePixel), new Integer(yMousePixel));
+      GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Doublc);
+      if(action !=null){
+        Object[] args = action.args();
+        if(args == null){ action.action().exec(KeyCode.enter, widgg, new Integer(xMousePixel), new Integer(yMousePixel)); }
+        else { action.action().exec(KeyCode.mouse1Double, widgg, args, new Integer(xMousePixel), new Integer(yMousePixel)); }
       }
     }
     

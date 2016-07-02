@@ -180,7 +180,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   
   @Override public String getDataPath(){ return textBox !=null ? textBox.getDataPath() : htmlBox.getDataPath(); }
   
-  @Override public GralUserAction getActionChange(){ return textBox !=null ? textBox.getActionChange() : htmlBox.getActionChange(); }
+  @Override public ActionChange getActionChange(ActionChangeWhen when){ return textBox !=null ? textBox.getActionChange(when) : htmlBox.getActionChange(when); }
   
 
   

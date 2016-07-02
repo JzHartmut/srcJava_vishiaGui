@@ -340,8 +340,11 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   
   protected void textFieldFocusGained(){
     //- done in GralMng.GralMngFocusListener! super.focusGained();  //set HtmlHelp etc.
-    if(actionChanging() != null){
-      actionChanging().exec(KeyCode.focusGained, widgg, dyda().displayedText);
+    GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onFocusGained); 
+    if(action !=null){
+      Object[] args = action.args();
+      if(args == null){ action.action().exec(KeyCode.focusGained, widgg, dyda().displayedText); }
+      else { action.action().exec(KeyCode.focusGained, widgg, args, dyda().displayedText); }
     }
     if(dyda().displayedText !=null){
       textFieldSwt.setText(dyda().displayedText);
@@ -354,8 +357,12 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     //There was a problem. Because of TextFieldModifyListener the field is already set. Newly read of getText() gets the old text. Bug of windows?
     //dyda().displayedText = text2;  //transfer the current text
     caretPos(textFieldSwt.getCaretPosition());
-    if(actionChanging() != null){
-      actionChanging().exec(KeyCode.focusLost, widgg, text2);
+    //TODO only invoke on changed content.
+    GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onChangeAndFocusLost); 
+    if(action !=null){
+      Object[] args = action.args();
+      if(args == null){ action.action().exec(KeyCode.focusLost, widgg, text2); }
+      else { action.action().exec(KeyCode.focusLost, widgg, args, text2); }
     }
   }
   
@@ -416,8 +423,11 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
         setTouched(true);
         //System.out.println("actionText");
         //SwtTextFieldWrapper.super.caretPos = textFieldSwt.getCaretPosition();
-        if(actionChanging() != null){
-          actionChanging().exec(KeyCode.valueChanged, widgg, text);
+        GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onAnyChgContent); 
+        if(action !=null){
+          Object[] args = action.args();
+          if(args == null){ action.action().exec(KeyCode.valueChanged, widgg, text); }
+          else { action.action().exec(KeyCode.valueChanged, widgg, args, text); }
         }
       }
       //if(dyda.displayedText !=null){

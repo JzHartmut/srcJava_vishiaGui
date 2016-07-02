@@ -12,10 +12,10 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.inspcPC.InspcPlugUser_ifc;
-import org.vishia.util.StringFunctions;
 import org.vishia.util.StringFunctions_C;
 
-/**This class contains some status and control widgets for the Inspector Gui
+/**This class contains some status and control widgets for the Inspector Gui to show the status of communication.
+ * The communication itself is organized in {@link org.vishia.inspcPC.accTarget.InspcTargetAccessor} in the software component javaSrc_vishiaRun.
  * @author Hartmut Schorrig
  *
  */

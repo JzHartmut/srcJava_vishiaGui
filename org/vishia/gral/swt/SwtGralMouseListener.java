@@ -13,6 +13,7 @@ import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralMouseWidgetAction_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
@@ -21,7 +22,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class SwtGralMouseListener
+public final class SwtGralMouseListener
 {
   /**Version, History and copyright
    * <ul>
@@ -65,7 +66,7 @@ public class SwtGralMouseListener
    * and the Gral designer is supported.
    * 
    */
-  public static class MouseListenerNoAction implements MouseListener
+  private static class MouseListenerNoAction implements MouseListener
   {
 
     
@@ -170,6 +171,12 @@ public class SwtGralMouseListener
   
   
   
+  /**This class is the implementation of a SWT {@link MouseListener} and  implements methods which invokes the
+   * {@link GralWidget#setActionMouse(GralMouseWidgetAction_ifc, int)} or the {@link GralWidget#setActionChange(GralUserAction)}
+   * on the determined mouse clicks. 
+   * @author Hartmut Schorrig
+   *
+   */
   public static class MouseListenerGralAction extends MouseListenerNoAction
   implements MouseListener
   {
@@ -216,10 +223,12 @@ public class SwtGralMouseListener
           Point size = widgetSwt.getSize();
           widgg.cfg.mouseWidgetAction.mouse1Double(keyCode, xMousePress, yMousePress, size.x, size.y, widgg);
         } 
-        if( (widgg.cfg.mUser & GralMouseWidgetAction_ifc.mUserDouble) !=0) {
-          GralUserAction action = widgg ==null ? null : widgg.getActionChange();
+        if( (widgg.cfg.mMouseToActionChange & GralMouseWidgetAction_ifc.mUserDouble) !=0) {
+          GralWidget_ifc.ActionChange action = widgg.getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Doublc); 
           if(action !=null){
-            action.exec(keyCode, widgg, new Integer(e.x), new Integer(e.y));
+            Object[] args = action.args();
+            if(args == null){ action.action().exec(KeyCode.mouse1Double, widgg, new Integer(e.x), new Integer(e.y)); }
+            else { action.action().exec(KeyCode.mouse1Double, widgg, args, new Integer(e.x), new Integer(e.y)); }
           }
         }
       } catch(Exception exc){ System.err.printf("SwtGralMouseListener - any exception while mouse double; %s\n", exc.getMessage()); }
@@ -254,12 +263,13 @@ public class SwtGralMouseListener
       } catch(Exception exc){ guiMng.writeLog(0, exc); }
       try{ 
         final int keyCode = SwtGralKey.convertMouseKey(ev.button, SwtGralKey.MouseAction.down, ev.stateMask);
+        GralWidget_ifc.ActionChangeWhen whenAction;
         final int mUser1;
         switch(ev.button){
-          case 1: mUser1 = GralMouseWidgetAction_ifc.mUser1down; break;
-          case 3: mUser1 = GralMouseWidgetAction_ifc.mUser2down; break;  //the usual right button is 3 in SWT!
-          case 2: mUser1 = GralMouseWidgetAction_ifc.mUser3down; break;  //the usual middle button is 2 in SWT!
-          default: mUser1 = 0; break;
+          case 1: mUser1 = GralMouseWidgetAction_ifc.mUser1down; whenAction = GralWidget_ifc.ActionChangeWhen.onMouse1Dn; break;
+          case 3: mUser1 = GralMouseWidgetAction_ifc.mUser2down; whenAction = null; break;  //the usual right button is 3 in SWT!
+          case 2: mUser1 = GralMouseWidgetAction_ifc.mUser3down; whenAction = null; break;  //the usual middle button is 2 in SWT!
+          default: mUser1 = 0; whenAction = null; break;
         }//switch:
         if(widgg.cfg.mouseWidgetAction !=null){
           Point size = widget.getSize();
@@ -271,13 +281,13 @@ public class SwtGralMouseListener
               widgg.cfg.mouseWidgetAction.mouse2Down(keyCode, xMousePress, yMousePress, size.x, size.y, widgg); 
               break;
           }  
-        } 
-        if( (widgg.cfg.mUser & mUser1) !=0) {
-          GralUserAction action = widgg ==null ? null : widgg.getActionChange();
-          if(action !=null){
-            action.exec(keyCode, widgg, new Integer(ev.x), new Integer(ev.y));
-          }
         }
+        GralWidget_ifc.ActionChange action = widgg.getActionChangeStrict(whenAction, true); 
+        if(action !=null){
+          Object[] args = action.args();
+          if(args == null){ action.action().exec(keyCode, widgg, new Integer(ev.x), new Integer(ev.y)); }
+          else { action.action().exec(keyCode, widgg, args, new Integer(ev.x), new Integer(ev.y)); }
+        } 
       } catch(Exception exc){ System.err.printf("SwtGralMouseListener - any exception while mouse down; %s\n", exc.getMessage()); }
     }
 
@@ -295,11 +305,12 @@ public class SwtGralMouseListener
         Point size = widget.getSize();
         GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(widget.getData());
         final int mUser1;
+        GralWidget_ifc.ActionChangeWhen whenAction;
         switch(ev.button){
-          case 1: mUser1 = GralMouseWidgetAction_ifc.mUser1down; break;
-          case 3: mUser1 = GralMouseWidgetAction_ifc.mUser2down; break;  //the usual right button is 3 in SWT!
-          case 2: mUser1 = GralMouseWidgetAction_ifc.mUser3down; break;  //the usual middle button is 2 in SWT!
-          default: mUser1 = 0; break;
+          case 1: mUser1 = GralMouseWidgetAction_ifc.mUser1up; whenAction = GralWidget_ifc.ActionChangeWhen.onMouse1Up; break;
+          case 3: mUser1 = GralMouseWidgetAction_ifc.mUser2up; whenAction = GralWidget_ifc.ActionChangeWhen.onMouse2Up; break;  //the usual right button is 3 in SWT!
+          case 2: mUser1 = GralMouseWidgetAction_ifc.mUser3up; whenAction = null; break;  //the usual middle button is 2 in SWT!
+          default: mUser1 = 0; whenAction = null; break;
         }//switch:
         try{ 
           //int dx = e.x - xMousePress, dy = e.y - yMousePress;
@@ -329,11 +340,11 @@ public class SwtGralMouseListener
                 break;
             }  
           } 
-          if( (widgg.cfg.mUser & mUser1) !=0) {
-            GralUserAction action = widgg ==null ? null : widgg.getActionChange();
-            if(action !=null){
-              action.exec(keyCode, widgg);
-            }
+          GralWidget_ifc.ActionChange action = widgg.getActionChangeStrict(whenAction, (widgg.cfg.mMouseToActionChange & mUser1) !=0); 
+          if(action !=null){
+            Object[] args = action.args();
+            if(args == null){ action.action().exec(keyCode, widgg); }
+            else { action.action().exec(keyCode, widgg, args); }
           }
         } catch(Exception exc){ 
           CharSequence text = Assert.exceptionInfo("SwtGralMouseListener - any exception while mouse down;", exc, 0, 20);
@@ -373,5 +384,10 @@ public class SwtGralMouseListener
   }
 
 
+
+  /**The only one instance can used for all widgets because the working data are given with the mouse action methods.
+   * The associated GralWidget data are accessed via the data field (the GralWidget is known in all Widget implementations).
+   */
+  protected static MouseListener mouseActionStd = new MouseListenerGralAction();
   
 }

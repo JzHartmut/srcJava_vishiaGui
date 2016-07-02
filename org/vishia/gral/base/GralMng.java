@@ -1524,9 +1524,11 @@ public GralButton addCheckButton(
           if(fileSelect !=null){
             fileSelectInfo.dstWidgd.setText(fileSelect);
             //fileSelectInfo.dstWidgd.setValue(cmdSet, 0, fileSelect);
-            GralUserAction actionSelect = fileSelectInfo.dstWidgd.getActionChange();
-            if(actionSelect !=null){
-              actionSelect.userActionGui(KeyCode.menuEntered, fileSelectInfo.dstWidgd, fileSelect);
+            GralWidget_ifc.ActionChange action = fileSelectInfo.dstWidgd.getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter); 
+            if(action !=null){
+              Object[] args = action.args();
+              if(args == null){ action.action().exec(KeyCode.menuEntered, fileSelectInfo.dstWidgd, fileSelect); }
+              else { action.action().exec(KeyCode.menuEntered, fileSelectInfo.dstWidgd, args, fileSelect); }
             }
           }
         }
@@ -1727,7 +1729,7 @@ public GralButton addCheckButton(
     public void focusLostGral(GralWidget widgg){
       GralWidget.ImplAccess.setFocused(widgg, false);  //denotes that the GralWidget has lost the focus
       widgg.repaint();  //maybe changed outfit on focus lost.
-      if(widgg.actionFocused !=null){ widgg.actionFocused.exec(KeyCode.focusLost, widgg); }
+      if(widgg.cfg.actionFocused !=null){ widgg.cfg.actionFocused.exec(KeyCode.focusLost, widgg); }
       //CharSequence text = Assert.stackInfo("", 1, 5);
       //System.out.println("GralMng - widget focus lost;" + widgg.name + text);
     }
@@ -1748,7 +1750,7 @@ public GralButton addCheckButton(
       if(htmlHelp !=null && applAdapter !=null){
         applAdapter.setHelpUrl(htmlHelp);
       }
-      if(widgg.actionFocused !=null){ widgg.actionFocused.exec(KeyCode.focusGained, widgg); }
+      if(widgg.cfg.actionFocused !=null){ widgg.cfg.actionFocused.exec(KeyCode.focusGained, widgg); }
     }
   }
   
@@ -2053,10 +2055,12 @@ public GralButton addCheckButton(
     return impl.remove(compositeBox);
   }
 
-  @Override public GralWindow createWindow(String name, String title, int windProps)
-  {
-    // TODO Auto-generated method stub
-    return impl.createWindow(name, title, windProps);
+  @Override @Deprecated public GralWindow createWindow(String name, String title, int windProps)
+  { GralPos pos = pos().pos;  //without clone.
+    String sPos = pos.posString(); 
+    GralWindow windowGral = new GralWindow(sPos, name, title, windProps);
+    impl.createSubWindow(windowGral);
+    return windowGral;
   }
 
   @Override public GralFileDialog_ifc createFileDialog()

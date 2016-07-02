@@ -11,8 +11,10 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.KeyCode;
 
 public class GralCfgDesigner
 {
@@ -238,15 +240,16 @@ public class GralCfgDesigner
     //mng.setWindowsVisible(dialogWindowProps, dialogWindowProps.pos());
   }
   
-  private final GralUserAction actionOk = new GralUserAction()
-  { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
+  private final GralUserAction actionOk = new GralUserAction("actionOk")
+  { @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params)
     { //note widgd is the OK-button!
-      if(widgdInDialog !=null){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key) && widgdInDialog !=null){
         String sName = dialogFieldName.getValue();
         String sDataPath = dialogFieldDatapath.getValue();
         String sText = dialogFieldText.getValue();
         String sFormat = dialogFieldFormat.getValue();
         String sShowMethod = dialogFieldShow.getValue();
+        String sActionMethod = dialogFieldAction.getText();
         String sPrompt = dialogFieldPrompt.getValue();
         String sPromptPos = dialogFieldPromptPos.getValue();
         String sLine = dialogFieldLine.getValue();
@@ -272,6 +275,8 @@ public class GralCfgDesigner
           cfge.widgetType.text = sText.trim().length() >0 ? sText : null;
           cfge.widgetType.format = sFormat.trim().length() >0 ? sFormat : null;
           cfge.widgetType.showMethod = sShowMethod.trim().length() >0 ? sShowMethod : null;
+          cfge.widgetType.userAction = sActionMethod.trim().length() >0 ? sActionMethod : null;
+          
           cfge.widgetType.prompt = sPrompt.trim().length() >0 ? sPrompt : null;
           cfge.widgetType.promptPosition = sPromptPos.trim().length() >0 ? sPromptPos : null;
           boolean bOk;
@@ -299,10 +304,10 @@ public class GralCfgDesigner
   
   
   
-  private final GralUserAction actionDel = new GralUserAction()
-  { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
+  private final GralUserAction actionDel = new GralUserAction("actionDel")
+  { @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params)
     { //note widgd is the OK-button!
-      if(widgdInDialog !=null){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key) && widgdInDialog !=null){
         //widgdInDialog.remove();
         mng.remove(widgdInDialog);  //remove the widget.
         dialogWindowProps.setWindowVisible(false);
@@ -321,10 +326,12 @@ public class GralCfgDesigner
   
   
   
-  private final GralUserAction actionEsc = new GralUserAction()
-  { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
-    { dialogWindowProps.setWindowVisible(false);
-      widgdInDialog = null;
+  private final GralUserAction actionEsc = new GralUserAction("actionEsc")
+  { @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params)
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        dialogWindowProps.setWindowVisible(false);
+        widgdInDialog = null;
+      }
       return true;
     }
     

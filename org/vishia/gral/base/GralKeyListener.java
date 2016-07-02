@@ -97,24 +97,29 @@ public class GralKeyListener implements GralKeySpecial_ifc
   
   
   
-  public boolean keyPressed(int keyCode, GralWidget_ifc widgetDescr, Object widgImpl){
+  public boolean keyPressed(int keyCode, GralWidget_ifc widgi, Object widgImpl){
     boolean actionDone;
-    final GralUserAction action = widgetDescr.getActionChange();
-    final GralMng mng = widgetDescr.gralMng();
+    GralWidget_ifc.ActionChange action = widgi.getActionChange(GralWidget_ifc.ActionChangeWhen.onAnyChgContent); 
+    if(action !=null){
+      Object[] args = action.args();
+    }
+    final GralMng mng = widgi.gralMng();
     try{
-      actionDone = specialKeysOfWidgetType(keyCode, widgetDescr, widgImpl);
+      actionDone = specialKeysOfWidgetType(keyCode, widgi, widgImpl);
       if(!actionDone && action !=null){ 
-          actionDone = action.exec(keyCode, widgetDescr);
+        Object[] args = action.args();
+        if(args == null){ actionDone = action.action().exec(keyCode, widgi); }
+        else { actionDone = action.action().exec(keyCode, widgi, args); }
       } //if(table.)
       if(!actionDone && mng.userMainKeyAction() !=null){
-        actionDone = mng.userMainKeyAction().exec(keyCode, widgetDescr);
+        actionDone = mng.userMainKeyAction().exec(keyCode, widgi);
       }
       if(!actionDone){
         GralUserAction mainKeyAction = mng.getRegisteredUserAction("KeyAction");
         if(mainKeyAction !=null){
           //old form called because compatibility, if new for with int-parameter returns false.
-          if(!mainKeyAction.exec(keyCode, widgetDescr)){
-            mainKeyAction.exec(keyCode, widgetDescr, new Integer(keyCode));
+          if(!mainKeyAction.exec(keyCode, widgi)){
+            mainKeyAction.exec(keyCode, widgi, new Integer(keyCode));
           }
         }
       }

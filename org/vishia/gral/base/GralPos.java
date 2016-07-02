@@ -850,10 +850,37 @@ public class GralPos implements Cloneable
     return rectangle;
   }
 
+
+
+
+  private static void appendPos(StringBuilder b, int p, int pFrac)
+  {
+    if(pFrac >0) {
+      if(p < 0) { b.append(p-1); } else { b.append(p); }
+      b.append('.').append(pFrac);
+    } else {
+      b.append(p);
+    }
+  }
+
+
   
   
-  
-  
+  public String posString() 
+  { StringBuilder b = new StringBuilder(16);
+    b.append('@');
+    if(panel != null) {
+      b.append(panel.name).append(", ");
+    }
+    appendPos(b, y.p1, y.p1Frac);
+    b.append("..");
+    appendPos(b, y.p2, y.p2Frac);
+    b.append(",");
+    appendPos(b, x.p1, x.p1Frac);
+    b.append("..");
+    appendPos(b, x.p2, x.p2Frac);
+    return b.toString();
+  }
   
   /**Use especially for debug.
    * @see java.lang.Object#toString()

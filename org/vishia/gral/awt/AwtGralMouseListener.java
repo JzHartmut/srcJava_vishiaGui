@@ -14,6 +14,7 @@ import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.KeyCode;
 
 public class AwtGralMouseListener
@@ -73,9 +74,11 @@ public class AwtGralMouseListener
           GralWidget widgd = (GralWidget)oInfo;
           int dx = ev.getX() - xDown, dy = ev.getY() - yDown;
           if(dx < 10 && dx > -10 && dy < 10 && dy > -10){
-            GralUserAction action = widgd.getActionChange();
+            GralWidget_ifc.ActionChange action = widgd.getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Up); 
             if(action !=null){
-              action.userActionGui("lu", widgd);
+              Object[] args = action.args();
+              if(args == null){ action.action().exec(KeyCode.mouse1Up, widgd); }
+              else { action.action().exec(KeyCode.mouse1Up, widgd, args); }
             }
           } else if(guiMng.bDesignMode && ev.getButton() == 1){
             boolean bCopy = (ev.getModifiers() & 99999) !=0;
@@ -163,9 +166,11 @@ public class AwtGralMouseListener
       yMousePress = ev.getY();
       AwtWidget widget = (AwtWidget)ev.getComponent();
       GralWidget widgg = (GralWidget)widget.getData();
-      GralUserAction action = widgg ==null ? null : widgg.getActionChange();
+      GralWidget_ifc.ActionChange action = widgg.getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Doublc); 
       if(action !=null){
-        action.exec(KeyCode.mouse1Double, widgg);
+        Object[] args = action.args();
+        if(args == null){ action.action().exec(KeyCode.mouse1Double, widgg); }
+        else { action.action().exec(KeyCode.mouse1Double, widgg, args); }
       }
     }
 
@@ -193,9 +198,11 @@ public class AwtGralMouseListener
             case 2: mouseWidgetAction.mouse2Down(keyCode, xMousePress, yMousePress, size.width, size.height, widgg); break;
           }  
         }
-        GralUserAction action = widgg ==null ? null : widgg.getActionChange();
+        GralWidget_ifc.ActionChange action = widgg.getActionChange(null); 
         if(action !=null){
-          action.exec(keyCode, widgg);
+          Object[] args = action.args();
+          if(args == null){ action.action().exec(keyCode, widgg); }
+          else { action.action().exec(keyCode, widgg, args); }
         }
       } catch(Exception exc){ System.err.printf("AwtGralMouseListener - any exception while mouse down; %s\n", exc.getMessage()); }
     }
@@ -214,11 +221,12 @@ public class AwtGralMouseListener
         widget.removeMouseMotionListener(mouseMoveListener);
         isPressed = false;
         final int keyCode;
+        GralWidget_ifc.ActionChangeWhen whenAction;
         switch(e.getButton()){ 
-          case 1: keyCode = KeyCode.mouse1Up; break; 
-          case 2: keyCode = KeyCode.mouse2Up; break;
-          case 3: keyCode = KeyCode.mouse3Up; break;
-          default: keyCode = KeyCode.mouse3Up; break;  //other key
+          case 1: keyCode = KeyCode.mouse1Up; whenAction = GralWidget_ifc.ActionChangeWhen.onMouse1Up; break; 
+          case 2: keyCode = KeyCode.mouse2Up; whenAction = GralWidget_ifc.ActionChangeWhen.onMouse2Up; break;
+          case 3: keyCode = KeyCode.mouse3Up; whenAction = null; break;
+          default: keyCode = KeyCode.mouse3Up; whenAction = null; break;  //other key
         }
         if(mouseWidgetAction !=null){
           switch(e.getButton()){ 
@@ -228,9 +236,11 @@ public class AwtGralMouseListener
         }
         backgroundWhilePressed = null;
         try{ 
-          GralUserAction action = widgg ==null ? null : widgg.getActionChange();
+          GralWidget_ifc.ActionChange action = widgg.getActionChange(whenAction); 
           if(action !=null){
-            action.exec(keyCode, widgg);
+            Object[] args = action.args();
+            if(args == null){ action.action().exec(keyCode, widgg); }
+            else { action.action().exec(keyCode, widgg, args); }
           }
         } catch(Exception exc){ System.err.printf("SwtGralMouseListener - any exception while mouse down; %s\n", exc.getMessage()); }
         //widgg.repaint();

@@ -103,7 +103,7 @@ public final class GralCfgData
     public boolean editable;
     
     /**From ZBNF-parser param::=<?> ...name = <""?name> etc. values are set if it is parsed. */
-    public String name, text, cmd, userAction, data, showMethod, format, type, prompt, promptPosition, help;
+    public String name, text, cmd, userAction, mouseAction, data, showMethod, format, type, prompt, promptPosition, help;
     
     /**From ZBNF-parser param::=<?> ...dropFiles = <""?name> etc. values are set if it is parsed. */
     public String dragFiles, dropFiles, dragText, dropText;
