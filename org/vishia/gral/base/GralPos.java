@@ -247,7 +247,7 @@ public class GralPos implements Cloneable
    * A size can be positive or negative. A negative size determines, that the origin point for
    * further elements or inner elements is on bottom line or right line of the current widget.
    */
-  public final static int size = 0x4000;
+  public final static int size = 0x4000;  //Note: Bit is contained in useNatSize, (pos = useNatSize | size) == useNatSize
   
   
   /**Use the same size.
@@ -402,38 +402,49 @@ public class GralPos implements Cloneable
     Coordinate line = new Coordinate(), col = new Coordinate();
     int  origin =0, border =0, borderFrac =0;
     char direction = 'r';
-    StringPartScan spPos = new StringPartScan(sPos);
-    spPos.setIgnoreWhitespaces(true);
-    try {
-      spPos.scan("@").scanStart();  //skip over a first @
-      if(spPos.scanIdentifier().scan(",").scanOk()) {  //ckeck if a panel is given:
-        String sPanel = spPos.getLastScannedString().toString();
-        GralMng mng = GralMng.get();  //singleton.
-        GralPanelContent panel = mng.getPanel(sPanel);
-        if(panel == null) {
-          spPos.close();
-          throw new IllegalArgumentException("GralPos.setPosition - unknown panel, " + sPanel);
-        }
-        if(panel == posParent.panel) {
-          posParent1 = posParent;
+    if(sPos ==null) {
+      //position text not given, use refer and same size
+      line.p1 = refer;
+      line.p2 = samesize;
+      //all other values of line and col remain 0. It is default.
+      col.p1 = refer;
+      col.p2 = samesize;
+      posParent1 = posParent; 
+    } else {
+      //position given as text
+      StringPartScan spPos = new StringPartScan(sPos);
+      spPos.setIgnoreWhitespaces(true);
+      try {
+        spPos.scan("@").scanStart();  //skip over a first @
+        if(spPos.scanIdentifier().scan(",").scanOk()) {  //ckeck if a panel is given:
+          String sPanel = spPos.getLastScannedString().toString();
+          GralMng mng = GralMng.get();  //singleton.
+          GralPanelContent panel = mng.getPanel(sPanel);
+          if(panel == null) {
+            spPos.close();
+            throw new IllegalArgumentException("GralPos.setPosition - unknown panel, " + sPanel);
+          }
+          if(panel == posParent.panel) {
+            posParent1 = posParent;
+          } else {
+            //only if it is another panel, remove the given parent.
+            posParent1 = new GralPos();
+          }
         } else {
-          //only if it is another panel, remove the given parent.
-          posParent1 = new GralPos();
+          posParent1 = posParent;  //the parent is valid. Because no other panel. Use the current panel.
         }
-      } else {
-        posParent1 = posParent;  //the parent is valid. Because no other panel. Use the current panel.
+        scanPosition(spPos, line);
+        if(spPos.scan(",").scanOk()) {
+          scanPosition(spPos, col);
+        } else {
+          col.p1 = refer;
+          col.p2 = samesize;
+        }
+      } finally {
+        spPos.close();
       }
-      scanPosition(spPos, line);
-      if(spPos.scan(",").scanOk()) {
-        scanPosition(spPos, col);
-      } else {
-        col.p1 = refer;
-        col.p2 = samesize;
-      }
-      setFinePosition(line.p1, line.p1Frac, line.p2, line.p2Frac, col.p1, col.p1Frac, col.p2, col.p2Frac,  origin, direction, border, borderFrac, posParent1);
-    } finally {
-      spPos.close();
     }
+    setFinePosition(line.p1, line.p1Frac, line.p2, line.p2Frac, col.p1, col.p1Frac, col.p2, col.p2Frac,  origin, direction, border, borderFrac, posParent1);
   }
   
   

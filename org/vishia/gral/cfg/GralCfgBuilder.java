@@ -250,7 +250,6 @@ public class GralCfgBuilder
       else{ colorValue = 0; } //black
       cfge.widgetType.color0 = null;  //it is used, don't set background.
       widgd = gralMng.addText(cfge.widgetType.text); 
-      //widgd = gralMng.addText(cfge.widgetType.text, wText.size.charAt(0), colorValue);
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgLed){
       GralCfgData.GuiCfgLed ww = (GralCfgData.GuiCfgLed)cfge.widgetType;
       widgd = gralMng.addLed(sName, sDataPath);

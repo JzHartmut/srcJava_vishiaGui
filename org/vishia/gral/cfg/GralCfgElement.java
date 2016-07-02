@@ -64,7 +64,7 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
    * The next element is need to build a queue in order of the text. */
   GralCfgElement previous, next;
   
-  final GralCfgData itsCfgData;
+  //final GralCfgData itsCfgData;
   
   
   /**The content is set in textual form too. It is because [<?Element>...] was written */
@@ -88,13 +88,13 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   
   WidgetTypeBase widgetType;
   
-  GralCfgElement(GralCfgData itsCfgData)
-  { this.itsCfgData = itsCfgData;
+  GralCfgElement() //GralCfgData itsCfgData)
+  { //this.itsCfgData = itsCfgData;
   }
   
   @Override
   public GralCfgElement clone(){ 
-    GralCfgElement newObj = new GralCfgElement(this.itsCfgData);
+    GralCfgElement newObj = new GralCfgElement();  //this.itsCfgData);
     newObj.widgetType = widgetType.clone(); ///use a new cloned instance (use data).
     newObj.positionInput.set(this.positionInput);
     /*NOTE: don't use super.clone() because it copies the references to final elements. We need cloned new elements
@@ -122,11 +122,26 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
    */
   void setPos(GralMngBuild_ifc guiMng) 
   throws ParseException 
-  { if(positionString !=null) {
-      GralMng mng = GralMng.get();
+  { GralMng mng = GralMng.get();
+    if(positionString !=null) {
       mng.setPos(positionString);
     } else {
-      setPosOld(guiMng);  //use inputPos
+      GralCfgPosition p = positionInput;
+      if(p.yPos >=0 || p.xPos >=0 || p.ySizeDown !=0 || p.xWidth !=0) {
+          
+        int ySize = p.ySizeDown == GralPos.useNatSize ? p.ySizeDown :
+          p.ySizeDown == 0 ? GralPos.samesize : 
+          (p.yPosFrac > 0 && p.ySizeDown < 0 ? p.ySizeDown -1 : p.ySizeDown) + GralPos.size;
+        int xSize = p.xWidth == GralPos.useNatSize ? p.xWidth : 
+          p.xWidth == 0 ? GralPos.samesize :
+          (p.xPosFrac > 0 && p.xWidth < 0 ? p.xWidth -1 : p.xWidth) + GralPos.size;
+        mng.setFinePosition(p.yPos, p.yPosFrac, ySize, p.ySizeFrac, p.xPos, p.xPosFrac, xSize, p.xSizeFrac, 0, 'r', 0, 0, null);  
+      }
+      else {
+        stop();
+        //no position given. The new position will be set relative to the old one on widget.setToPanel.
+      }
+      //  setPosOld(guiMng);  //use inputPos
     }
   }  
   
@@ -137,7 +152,7 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
    * @param guiMng to set the position.
    * @return
    */
-  private void setPosOld(GralMngBuild_ifc guiMng) {
+  private void XXXsetPosOld(GralMngBuild_ifc guiMng) {
     GralCfgPosition prevPos = this.previous !=null ? this.previous.position : this.positionInput;
     GralCfgPosition pos = this.position;        //NOTE: it is filled here.
     GralCfgPosition inp = this.positionInput;
@@ -236,13 +251,13 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   }
   
   
-  public String getPanel(){ return position.panel; }
+  public String getPanel(){ return positionInput.panel; }
 
   void setPanel(String panel){ position.panel = positionInput.panel = panel; }
   
-  public int get_xPos(){ return position.xPos; }
+  public int get_xPos(){ return positionInput.xPos; }
   
-  public int get_yPos(){ return position.yPos; }
+  public int get_yPos(){ return positionInput.yPos; }
   
   
   /**ZBNF: <?position> */

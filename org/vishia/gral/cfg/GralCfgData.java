@@ -1,5 +1,6 @@
 package org.vishia.gral.cfg;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -380,7 +381,7 @@ public final class GralCfgData
   /**TODO widgets sorted to panels and tabs!
    * 
    */
-  private final List<GralCfgElement> listElementsInTextfileOrder = new LinkedList<GralCfgElement>();
+  final List<GralCfgElement> listElementsInTextfileOrder = new ArrayList<GralCfgElement>();
   
   GralCfgPanel actPanel;
   
@@ -459,19 +460,23 @@ public final class GralCfgData
   
 
   public GralCfgPanel new_Window()
-  { return new GralCfgPanel();
+  { GralCfgPanel panel = new GralCfgPanel();
+    panel.widgetType = new WidgetTypeBase(panel, 'w');
+    return panel;
   }
 
   public void add_Window(GralCfgPanel panel)
   {
     idxPanels.put(panel.name, panel); 
+    listElementsInTextfileOrder.add(panel);  //list of elements in text file
+    
   }
 
   
   /**ZBNF: DataReplace: < ?Element >[ | | ] */
   public GralCfgElement new_Element()
   { 
-    if(newGuiElement == null){ newGuiElement = new GralCfgElement(this); }
+    if(newGuiElement == null){ newGuiElement = new GralCfgElement(); }
     //
     if(actualConditional ==null || actualConditional.condition){
       if(firstElement ==null){
@@ -520,7 +525,7 @@ public final class GralCfgData
   /**ZBNF: DataReplace: < Element> */
   public void set_Element(String val)
   { 
-    if(newGuiElement == null){ newGuiElement = new GralCfgElement(this); }
+    if(newGuiElement == null){ newGuiElement = new GralCfgElement(); }
     newGuiElement.content = val;
     //NOTE: the newGuiElement will be returned to fill in in new_Element()
   }

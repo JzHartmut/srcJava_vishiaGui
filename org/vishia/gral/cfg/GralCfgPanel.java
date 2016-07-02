@@ -1,12 +1,13 @@
 package org.vishia.gral.cfg;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.ifc.GralRectangle;
 
-final public class GralCfgPanel
+final public class GralCfgPanel extends GralCfgElement
 {
   /**Version, history and license.
    * <ul>
@@ -40,7 +41,7 @@ final public class GralCfgPanel
   public static final int version = 20120303;
 
   String name;
-  final List<GralCfgElement> listElements = new LinkedList<GralCfgElement>();
+  final List<GralCfgElement> listElements = new ArrayList<GralCfgElement>();
   
   
   String windTitle;

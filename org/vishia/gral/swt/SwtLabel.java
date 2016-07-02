@@ -105,6 +105,12 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
           throw new RuntimeException("atomic failed");
         if((chg & chgColorText)!=0) { //firstly set the font
           SwtProperties props = swtWidgHelper.mng.propertiesGuiSwt;
+          if((chg & chgVisible)!=0){
+            labelSwt.setVisible(true);
+          }
+          if((chg & chgInvisible)!=0){
+            labelSwt.setVisible(false);
+          }
           if(dyda.textFont !=null){
             fontSwt = props.fontSwt(dyda.textFont);
             labelSwt.setFont(fontSwt);

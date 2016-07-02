@@ -43,6 +43,7 @@ public class GralCfgWriter
    */
   public static final String version = "2015-01-27";
 
+  private String sLastPanel;
   
   final LogMessage log;
 
@@ -59,11 +60,16 @@ public class GralCfgWriter
     try{
       writer.append("size(500,120); ");   //TODO it isn't used yet
       writeDataReplace(cfg);
+      for(GralCfgElement cfge: cfg.listElementsInTextfileOrder) {
+        writeElement(dest, cfge);
+      }
+      /*
       GralCfgElement cfge = cfg.firstElement;
       while(cfge !=null){
         writeElement(dest, cfge);
         cfge = cfge.next;
       }
+      */
       dest.append("\n");
     } catch(IOException exc){ log.sendMsg(-1, "exception writing config"); }
     return sError;
@@ -87,57 +93,81 @@ public class GralCfgWriter
     if(cfge.widgetType instanceof GralCfgData.GuiCfgImage){
       ww.append("\n\n//================================================================================\n");
     }
-    writePosition(ww, cfge.positionInput);
-    if(cfge.widgetType instanceof GralCfgData.GuiCfgShowField){ writeShowField((GralCfgData.GuiCfgShowField)cfge.widgetType); }
-    else if(cfge.widgetType instanceof GralCfgData.GuiCfgText){ writeText((GralCfgData.GuiCfgText)cfge.widgetType); }
-    else if(cfge.widgetType instanceof GralCfgData.GuiCfgLed){ writeLed((GralCfgData.GuiCfgLed)cfge.widgetType); }
-    else if(cfge.widgetType instanceof GralCfgData.GuiCfgImage){ writeImage((GralCfgData.GuiCfgImage)cfge.widgetType); }
-    else if(cfge.widgetType instanceof GralCfgData.GuiCfgInputFile){ writeInputFile((GralCfgData.GuiCfgInputFile)cfge.widgetType); }
-    //else if(cfge.widgetType instanceof GralCfgData.GuiCfgInputFile){ writeInputFile((GralCfgData.GuiCfgInputFile)cfge.widgetType); }
-    else if(cfge.widgetType instanceof GralCfgData.GuiCfgButton){ writeButton((GralCfgData.GuiCfgButton)cfge.widgetType); }
-    //else if(cfge.widgetType instanceof GuiCfgData.GuiCfg){ writeButton((GuiCfgData.GuiCfgButton)cfge.widgetType); }
-    else if(cfge.widgetType.whatIs == 'T'){ 
-      writer.append("InputTextline(");
-      writeParam(cfge.widgetType);
-      writer.append(");\n");
+    
+    if(cfge.widgetType.whatIs == 'w'){ 
+      GralCfgPanel cfgp = (GralCfgPanel)cfge;
+      writer.append("\n\n//================================================================================\n");
+      writer.append("Window: @").append(cfgp.windPos);
+      //writePosition(ww, cfge);
+      writer.append(": ");
+      writer.append(cfgp.name).append(", \"").append(cfgp.windTitle).append("\";\n\n");
 
-    }
-    else if(cfge.widgetType.whatIs == 't'){ 
-      writer.append("InputBox(");
-      writeParam(cfge.widgetType);
-      writer.append(");\n");
-
-    }
-    else { 
-      writeUnknown(cfge.widgetType); 
+    } else {
+      //<Element>
+      writePosition(ww, cfge);
+      if(cfge.widgetType instanceof GralCfgData.GuiCfgShowField){ writeShowField((GralCfgData.GuiCfgShowField)cfge.widgetType); }
+      else if(cfge.widgetType instanceof GralCfgData.GuiCfgText){ writeText((GralCfgData.GuiCfgText)cfge.widgetType); }
+      else if(cfge.widgetType instanceof GralCfgData.GuiCfgLed){ writeLed((GralCfgData.GuiCfgLed)cfge.widgetType); }
+      else if(cfge.widgetType instanceof GralCfgData.GuiCfgImage){ writeImage((GralCfgData.GuiCfgImage)cfge.widgetType); }
+      else if(cfge.widgetType instanceof GralCfgData.GuiCfgInputFile){ writeInputFile((GralCfgData.GuiCfgInputFile)cfge.widgetType); }
+      //else if(cfge.widgetType instanceof GralCfgData.GuiCfgInputFile){ writeInputFile((GralCfgData.GuiCfgInputFile)cfge.widgetType); }
+      else if(cfge.widgetType instanceof GralCfgData.GuiCfgButton){ writeButton((GralCfgData.GuiCfgButton)cfge.widgetType); }
+      //else if(cfge.widgetType instanceof GuiCfgData.GuiCfg){ writeButton((GuiCfgData.GuiCfgButton)cfge.widgetType); }
+      else if(cfge.widgetType.whatIs == 'T'){ 
+        writer.append("InputTextline(");
+        writeParam(cfge.widgetType);
+        writer.append(");\n");
+  
+      }
+      else if(cfge.widgetType.whatIs == 't'){ 
+        writer.append("InputBox(");
+        writeParam(cfge.widgetType);
+        writer.append(");\n");
+  
+      }
+      else { 
+        writeUnknown(cfge.widgetType); 
+      }
     }
   }
   
   
-  void writePosition(Writer ww, GralCfgPosition pp) throws IOException
+  void writePosition(Writer ww, GralCfgElement cfge) throws IOException
   {
-    if(pp.yPos >=0 || pp.xPos >=0 || pp.ySizeDown !=0 || pp.xWidth !=0){
-      ww.append("\n@");
-      if(pp.panel !=null){ ww.append(pp.panel).append(", "); }
-      if(pp.yPosRelative) ww.append("&");
-      if(pp.yPos>=0) ww.append(Integer.toString(pp.yPos));
-      if(pp.yPosFrac !=0) ww.append(".").append(Integer.toString(pp.yPosFrac));
-      if(pp.ySizeDown>0) ww.append("+").append(pp.ySizeDown == Integer.MAX_VALUE ? "*" : Integer.toString(pp.ySizeDown));
-      else if(pp.ySizeDown<0) ww.append(Integer.toString(pp.ySizeDown)); //with negativ sign!
-      if(pp.ySizeFrac !=0) ww.append(".").append(Integer.toString(pp.ySizeFrac));
-      if(pp.yIncr_) ww.append("++");    
-  
-      ww.append(",");
-      
-      if(pp.xPosRelative) ww.append("&");
-      if(pp.xPos>=0) ww.append(Integer.toString(pp.xPos));
-      if(pp.xPosFrac !=0) ww.append(".").append(Integer.toString(pp.xPosFrac));
-      if(pp.xWidth>0) ww.append("+").append(pp.xWidth == Integer.MAX_VALUE ? "*" : Integer.toString(pp.xWidth));
-      else if(pp.xWidth<0) ww.append(Integer.toString(pp.xWidth)); //width negativ sign!
-      if(pp.xSizeFrac !=0) ww.append(".").append(Integer.toString(pp.xSizeFrac));
-      if(pp.xIncr_) ww.append("++");    
-      
-      ww.append(": ");
+    if(cfge.positionString !=null) {
+      ww.append(cfge.positionString);
+    } else {
+      GralCfgPosition pp = cfge.positionInput;
+      if(pp.yPos >=0 || pp.xPos >=0 || pp.ySizeDown !=0 || pp.xWidth !=0){
+        if(pp.panel !=null){ 
+          if(!pp.panel.equals(sLastPanel)) {
+            ww.append("\n\n//================================================================================\n");
+            sLastPanel = pp.panel;
+          }
+          ww.append("\n@").append(pp.panel).append(", "); 
+        } else {
+          ww.append("\n@");
+        }
+        if(pp.yPosRelative) ww.append("&");
+        if(pp.yPos>=0) ww.append(Integer.toString(pp.yPos));
+        if(pp.yPosFrac !=0) ww.append(".").append(Integer.toString(pp.yPosFrac));
+        if(pp.ySizeDown>0) ww.append("+").append(pp.ySizeDown == GralPos.useNatSize/*Integer.MAX_VALUE*/ ? "*" : Integer.toString(pp.ySizeDown));
+        else if(pp.ySizeDown<0) ww.append(Integer.toString(pp.ySizeDown)); //with negativ sign!
+        if(pp.ySizeFrac !=0) ww.append(".").append(Integer.toString(pp.ySizeFrac));
+        if(pp.yIncr_) ww.append("++");    
+    
+        ww.append(",");
+        
+        if(pp.xPosRelative) ww.append("&");
+        if(pp.xPos>=0) ww.append(Integer.toString(pp.xPos));
+        if(pp.xPosFrac !=0) ww.append(".").append(Integer.toString(pp.xPosFrac));
+        if(pp.xWidth>0) ww.append("+").append(pp.xWidth == GralPos.useNatSize/*Integer.MAX_VALUE*/ ? "*" : Integer.toString(pp.xWidth));
+        else if(pp.xWidth<0) ww.append(Integer.toString(pp.xWidth)); //width negativ sign!
+        if(pp.xSizeFrac !=0) ww.append(".").append(Integer.toString(pp.xSizeFrac));
+        if(pp.xIncr_) ww.append("++");    
+        
+        ww.append(": ");
+      }
     }
   }
 
