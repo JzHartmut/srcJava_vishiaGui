@@ -198,13 +198,14 @@ public class GralShowMethods
      */
     @Override public boolean exec(int actionCode, GralWidget_ifc widgi, Object... params)
     {
-      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)) {
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode) || actionCode == KeyCode.mouse1Double) {
         GralWidget widg = (GralWidget)widgi;
-        String nameWindow = widg.name;
+        String nameWindow = (params.length >=1 && (params[0] instanceof String)) ? (String)params[0] : widg.sCmd;  //sCmd for buttons
         if(nameWindow.endsWith("wind")) { nameWindow = nameWindow.substring(0, nameWindow.length()-4); }
         GralMng mng = GralMng.get();
         GralPanelContent panelWind = mng.getPanel(nameWindow);
-        panelWind.setFocus();
+        if(panelWind !=null) { panelWind.setFocus(); }
+        else { System.err.println("action_openWindow: window not found: " + nameWindow); }
       }
       return true;
     }

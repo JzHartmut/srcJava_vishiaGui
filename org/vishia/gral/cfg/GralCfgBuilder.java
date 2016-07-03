@@ -234,14 +234,13 @@ public class GralCfgBuilder
     if(cfge.widgetType.userAction !=null){
       String sUserAction = cfge.widgetType.userAction; 
       if(sUserAction.startsWith("@")){
-        int mouseKeys = KeyCode.mouse2Up;
         int posEnd = sUserAction.indexOf(':');
         if(posEnd < 0) { sError = "GuiCfgBuilder - @m: ':' not found. ";  sUserAction = null; }
         else {
           for(int ix = 1; ix < posEnd; ++ix){
             char whatMouseKey = sUserAction.charAt(ix);
             switch(whatMouseKey){
-            case (char)(KeyCode.mouse1Double): whenUserAction = GralWidget_ifc.ActionChangeWhen.onMouse1Doublc; break;
+            case (char)(KeyCode.mouse1Double & 0xff): whenUserAction = GralWidget_ifc.ActionChangeWhen.onMouse1Doublc; break;
             }
           }
           sUserAction = sUserAction.substring(posEnd+1).trim(); 

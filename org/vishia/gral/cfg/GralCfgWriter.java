@@ -255,7 +255,7 @@ public class GralCfgWriter
     if(pp.format !=null)    { writer.append(sep).append("format=\"").append(pp.format).append("\""); sep = ", "; }
     if(pp.type !=null)      { writer.append(sep).append("type=")    .append(pp.type); sep = ", "; }
     if(pp.data !=null)      { writer.append(sep).append("data=\"")  .append(pp.data).append("\""); sep = ", "; }
-    if(pp.userAction !=null){ writer.append(sep).append("action=")  .append(pp.userAction); sep = ", "; }
+    if(pp.userAction !=null){ writer.append(sep).append("action=\"")  .append(pp.userAction).append("\""); sep = ", "; }
     if(pp.dragFiles !=null) { writer.append(sep).append("dragFiles=\"") .append(pp.dragFiles).append("\""); sep = ", "; }
     if(pp.dragText !=null)  { 
       writer.append(sep).append("dragText=\"")  .append(pp.dragText).append("\""); sep = ", "; }

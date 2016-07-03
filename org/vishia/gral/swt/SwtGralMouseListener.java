@@ -17,7 +17,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.KeyCode;
 
-/**This class contains the functionality of mouse button and move listening for Gral adaption of SWT.
+/**This class contains implementations of {@link MouseListener} for Gral adaption of SWT.
  * The static inner classes implements the MouseListener
  * @author Hartmut Schorrig
  *
@@ -223,12 +223,19 @@ public final class SwtGralMouseListener
           Point size = widgetSwt.getSize();
           widgg.cfg.mouseWidgetAction.mouse1Double(keyCode, xMousePress, yMousePress, size.x, size.y, widgg);
         } 
-        if( (widgg.cfg.mMouseToActionChange & GralMouseWidgetAction_ifc.mUserDouble) !=0) {
-          GralWidget_ifc.ActionChange action = widgg.getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Doublc); 
-          if(action !=null){
-            Object[] args = action.args();
-            if(args == null){ action.action().exec(KeyCode.mouse1Double, widgg, new Integer(e.x), new Integer(e.y)); }
-            else { action.action().exec(KeyCode.mouse1Double, widgg, args, new Integer(e.x), new Integer(e.y)); }
+        boolean bStrict = (widgg.cfg.mMouseToActionChange & GralMouseWidgetAction_ifc.mUserDouble) ==0;  //search strict if no special bit is given.
+        //then a strict mouse doube action wins.
+        GralWidget_ifc.ActionChange action = widgg.getActionChangeStrict(GralWidget_ifc.ActionChangeWhen.onMouse1Doublc, bStrict); 
+        if(action !=null){
+          Object[] args = action.args();
+          if(args == null){ action.action().exec(KeyCode.mouse1Double, widgg, new Integer(e.x), new Integer(e.y)); }
+          else { 
+            //additional 2 arguments: copy in one args2.
+            Object[] args2 = new Object[args.length +2];
+            System.arraycopy(args, 0, args2, 0, args.length);
+            args2[args.length] = new Integer(e.x);
+            args2[args.length+1] = new Integer(e.y);
+            action.action().exec(KeyCode.mouse1Double, widgg, args2); 
           }
         }
       } catch(Exception exc){ System.err.printf("SwtGralMouseListener - any exception while mouse double; %s\n", exc.getMessage()); }
@@ -286,7 +293,14 @@ public final class SwtGralMouseListener
         if(action !=null){
           Object[] args = action.args();
           if(args == null){ action.action().exec(keyCode, widgg, new Integer(ev.x), new Integer(ev.y)); }
-          else { action.action().exec(keyCode, widgg, args, new Integer(ev.x), new Integer(ev.y)); }
+          else { 
+            //additional 2 arguments: copy in one args2.
+            Object[] args2 = new Object[args.length +2];
+            System.arraycopy(args, 0, args2, 0, args.length);
+            args2[args.length] = new Integer(ev.x);
+            args2[args.length+1] = new Integer(ev.y);
+            action.action().exec(keyCode, widgg, args2); 
+          }
         } 
       } catch(Exception exc){ System.err.printf("SwtGralMouseListener - any exception while mouse down; %s\n", exc.getMessage()); }
     }
@@ -343,8 +357,15 @@ public final class SwtGralMouseListener
           GralWidget_ifc.ActionChange action = widgg.getActionChangeStrict(whenAction, (widgg.cfg.mMouseToActionChange & mUser1) !=0); 
           if(action !=null){
             Object[] args = action.args();
-            if(args == null){ action.action().exec(keyCode, widgg); }
-            else { action.action().exec(keyCode, widgg, args); }
+            if(args == null){ action.action().exec(keyCode, widgg, new Integer(ev.x), new Integer(ev.y)); }
+            else { 
+              //additional 2 arguments: copy in one args2.
+              Object[] args2 = new Object[args.length +2];
+              System.arraycopy(args, 0, args2, 0, args.length);
+              args2[args.length] = new Integer(ev.x);
+              args2[args.length+1] = new Integer(ev.y);
+              action.action().exec(keyCode, widgg, args2); 
+            }
           }
         } catch(Exception exc){ 
           CharSequence text = Assert.exceptionInfo("SwtGralMouseListener - any exception while mouse down;", exc, 0, 20);

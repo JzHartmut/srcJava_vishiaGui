@@ -17,6 +17,11 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.KeyCode;
 
+/**Common used {@link MouseListener} for all gral widgets.
+ * 
+ * @author Hartmut Schorrig
+ *
+ */
 public class AwtGralMouseListener
 {
   /**This class implements a MouseListener which does not call a user method.
@@ -77,8 +82,15 @@ public class AwtGralMouseListener
             GralWidget_ifc.ActionChange action = widgd.getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Up); 
             if(action !=null){
               Object[] args = action.args();
-              if(args == null){ action.action().exec(KeyCode.mouse1Up, widgd); }
-              else { action.action().exec(KeyCode.mouse1Up, widgd, args); }
+              if(args == null){ action.action().exec(KeyCode.mouse1Up, widgd, new Integer(ev.getX()), new Integer(ev.getY())); }
+              else { 
+                //additional 2 arguments: copy in one args2.
+                Object[] args2 = new Object[args.length +2];
+                System.arraycopy(args, 0, args2, 0, args.length);
+                args2[args.length] = new Integer(ev.getX());
+                args2[args.length+1] = new Integer(ev.getY());
+                action.action().exec(KeyCode.mouse1Up, widgd, args2); 
+              }
             }
           } else if(guiMng.bDesignMode && ev.getButton() == 1){
             boolean bCopy = (ev.getModifiers() & 99999) !=0;
@@ -169,8 +181,15 @@ public class AwtGralMouseListener
       GralWidget_ifc.ActionChange action = widgg.getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Doublc); 
       if(action !=null){
         Object[] args = action.args();
-        if(args == null){ action.action().exec(KeyCode.mouse1Double, widgg); }
-        else { action.action().exec(KeyCode.mouse1Double, widgg, args); }
+        if(args == null){ action.action().exec(KeyCode.mouse1Double, widgg, new Integer(ev.getX()), new Integer(ev.getY())); }
+        else { 
+          //additional 2 arguments: copy in one args2.
+          Object[] args2 = new Object[args.length +2];
+          System.arraycopy(args, 0, args2, 0, args.length);
+          args2[args.length] = new Integer(ev.getX());
+          args2[args.length+1] = new Integer(ev.getY());
+          action.action().exec(KeyCode.mouse1Double, widgg, args2); 
+        }
       }
     }
 
@@ -201,8 +220,15 @@ public class AwtGralMouseListener
         GralWidget_ifc.ActionChange action = widgg.getActionChange(null); 
         if(action !=null){
           Object[] args = action.args();
-          if(args == null){ action.action().exec(keyCode, widgg); }
-          else { action.action().exec(keyCode, widgg, args); }
+          if(args == null){ action.action().exec(keyCode, widgg, new Integer(e.getX()), new Integer(e.getY())); }
+          else { 
+            //additional 2 arguments: copy in one args2.
+            Object[] args2 = new Object[args.length +2];
+            System.arraycopy(args, 0, args2, 0, args.length);
+            args2[args.length] = new Integer(e.getX());
+            args2[args.length+1] = new Integer(e.getY());
+            action.action().exec(keyCode, widgg, args2); 
+          }
         }
       } catch(Exception exc){ System.err.printf("AwtGralMouseListener - any exception while mouse down; %s\n", exc.getMessage()); }
     }
