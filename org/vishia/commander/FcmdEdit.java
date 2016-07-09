@@ -139,7 +139,7 @@ public class FcmdEdit
         
       }
     }
-    windView.setWindowVisible(true);
+    windView.setFocus(); //WindowVisible(true);
 
   }
   

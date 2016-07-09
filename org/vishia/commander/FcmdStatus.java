@@ -86,7 +86,7 @@ public class FcmdStatus
       widgCopy.setBackColor(GralColor.getColor("wh"), 0);
     }
     
-    windStatus.setWindowVisible(true);
+    windStatus.setFocus(); //setWindowVisible(true);
 
   }
   

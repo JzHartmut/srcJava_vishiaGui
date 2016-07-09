@@ -119,7 +119,7 @@ public class GralColorSelector
   public void openDialog(String sTitle, SetColorIfc actionSelect){
      wind.setTitle(sTitle);
      callback = actionSelect;
-     wind.setWindowVisible(true);
+     wind.setFocus(); //setWindowVisible(true);
   }
 
    

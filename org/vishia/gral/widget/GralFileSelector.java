@@ -204,7 +204,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
       this.fileSelector = fileSelector;
       this.searchOutput = searchOutput;
       this.widgPath.setText(fileSelector.sCurrentDir);
-      windConfirmSearch.setWindowVisible(true);
+      windConfirmSearch.setFocus(); //setWindowVisible(true);
     }
     
     
@@ -1383,12 +1383,12 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
                   + parent.getPath();
                 questionWindow.setText(question);
                 questionWindow.setActionOk(confirmCreate);
-                questionWindow.setWindowVisible(true);
+                questionWindow.setFocus(); //setWindowVisible(true);
               }
             } else {
               questionWindow.setText("unknown path");
               questionWindow.setActionOk(null);
-              questionWindow.setWindowVisible(true);
+              questionWindow.setFocus(); //setWindowVisible(true);
             }
           }
         }

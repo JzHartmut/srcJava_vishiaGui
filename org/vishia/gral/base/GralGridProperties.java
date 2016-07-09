@@ -44,10 +44,6 @@ public class GralGridProperties
   public final static int version = 0x20120303;
 
   
-  protected final static int[] smallPromptFontSize = { 5, 5, 6, 6,  6, 7, 8};  //{5,6,8,9,11,12};
-  protected final static int[] stdInputFontSize =    { 7, 8, 9, 11,12,14,18};
-  protected final static int[] stdButtonFontSize =   {10,10,11, 12,14,16,20};
-  
   /**This are the font sizes for some heights of fields in the given sizes of presentation. 
    * First index is the height of field, second is the size of presentation.
    */
@@ -63,6 +59,10 @@ public class GralGridProperties
   , {10,11,11,12, 12,14,18}  //3.5
   , {10,11,11,12, 12,14,18}  //>=4
   };
+  
+  protected final static int[] smallPromptFontSize = stdTextFontSize[0];
+  protected final static int[] stdInputFontSize =    stdTextFontSize[4];
+  protected final static int[] stdButtonFontSize =   stdTextFontSize[7];
   
   /** Number of pixel for fractional part and for the grid size.
    * The array is organized in a 2-dimensional array <code>[frac][size]</code>.
@@ -102,16 +102,16 @@ public class GralGridProperties
    * </table>
    */
   protected final static int[][] pixelFrac = 
- //    1/6   1/3   1/2   2/3   5/6   Divisions of 2 and 3
+ //    1/6   1/3   1/2   2/3   5/6   Divisions of 2, 3 and 6
  //       1/5   2/5   3/5   4/5      Divisions of 5
- //     1  2  3  4  5  6  7  8  9  0   the number given
-  { {0, 1, 2, 2, 3, 3, 4, 4, 5, 5,  6 }  //pixel size A
-  , {0, 1, 2, 2, 3, 4, 4, 5, 6, 6,  7 }
-  , {0, 1, 3, 3, 4, 4, 6, 6, 7, 7,  8 }
-  , {0, 2, 3, 3, 4, 5, 6, 6, 7, 8,  9 }
-  , {0, 1, 2, 4, 5, 5, 7, 8, 8, 9, 10 }
-  , {0, 2, 4, 5, 6, 6, 8, 9,10,11, 12 }
-  , {0, 3, 5, 6, 7, 7,10,12,12,14, 15 }
+ //     1  2  3  4  5  6  7  8  9   0   the number given
+  { {0, 1, 1, 2, 2, 3, 4, 4, 5, 5,  6 }  //pixel size A
+  , {0, 1, 1, 2, 3, 3, 4, 5, 6, 6,  7 }
+  , {0, 1, 2, 3, 3, 4, 5, 6, 6, 7,  8 }
+  , {0, 1, 2, 3, 4, 4, 5, 6, 7, 8,  9 }
+  , {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+  , {0, 1, 2, 4, 5, 6, 7, 8,10,11, 12 }
+  , {0, 2, 3, 5, 6, 7, 9,10,12,13, 15 }
   };
   
   //protected final static int[][] yPixelFrac = xPixelFrac;

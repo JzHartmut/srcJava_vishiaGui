@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.vishia.gral.awt.AwtFactory;
 import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.swt.SwtFactory;
 import org.vishia.inspectorTarget.Inspector;
@@ -30,6 +31,7 @@ public class GralArea9MainCmd extends MainCmd
   
   /**Version, history and license.
    * <ul>
+   * <li>2016-07-10 Hartmut chg: Positioning of Windows on open, especiallythe top level window: with pos-String, it is the new concept of opsitioning of a GralWidget
    * <li>2015-05-16 Hartmut new "-help:" for help base dir in argument check, "-msgcfg:" in argument check. 
    *   It is moved from Fcmd to this base class of Fcmd, available generally.  
    * <li>2013-11-22 Hartmut chg: title of main window as argument -title= 
@@ -116,7 +118,7 @@ public class GralArea9MainCmd extends MainCmd
    */
   public boolean parseArgumentsAndInitGraphic(String sTitle, String sOutputArea)
   {
-    return parseArgumentsAndInitGraphic(sTitle, sOutputArea, '.', -1, -1, -1, -1);
+    return parseArgumentsAndInitGraphic(sTitle, sOutputArea, '.', null);
   }
 
   
@@ -128,7 +130,7 @@ public class GralArea9MainCmd extends MainCmd
    *   of the 9 areas.  If null is used, the default selection is "3A3C".
    * @return true if it is successfully.
    */
-  public boolean parseArgumentsAndInitGraphic(String sTitle, String sOutputArea, char sizeShow, int left, int top, int xSize, int ySize)
+  public boolean parseArgumentsAndInitGraphic(String sTitle, String sOutputArea, char sizeShow, String position)
   {
     boolean bOk = true;
     try{ parseArguments(); }
@@ -147,14 +149,12 @@ public class GralArea9MainCmd extends MainCmd
     if("\0 .".indexOf(sizeShow) >=0){ //undefined per parameter, use args  
       sizeShow = cargs.sizeShow; 
     }   
-    if(left < 0){  left = cargs.xLeftPixelWindow; }  //undefined per parameter, use args 
-    if(top < 0){  top = cargs.yTopPixelWindow; }  //undefined per parameter, use args 
-    if(xSize < 0){  xSize = cargs.dxPixelWindow; }  //undefined per parameter, use args 
-    if(ySize < 0){  ySize = cargs.dyPixelWindow; }  //undefined per parameter, use args 
+    String posWindow1 = cargs.positionWindow !=null ? cargs.positionWindow : position !=null ? position : "0+80, 10+120";
     
     String sTitle1 = cargs.sTitle !=null ? cargs.sTitle : sTitle;
-    GralWindow primaryWindow = new GralWindow("!", "primaryWindow", sTitle1, GralWindow.windResizeable + GralWindow.windHasMenu);
-    cargs.graphicFactory.createWindow(primaryWindow, sizeShow, left, top, xSize, ySize);
+    GralWindow primaryWindow = new GralWindow(posWindow1, "primaryWindow", sTitle1, GralWindow.windResizeable + GralWindow.windHasMenu);
+    GralFactory.createGraphic(primaryWindow, sizeShow, log, "SWT");
+    //cargs.graphicFactory.createWindow(primaryWindow, sizeShow);
     gui = new GralArea9Window(this, primaryWindow);
     gui.getGralMng().setApplicationAdapter(gui);
     if(cargs.dirHtmlHelp !=null) {
@@ -219,8 +219,11 @@ public class GralArea9MainCmd extends MainCmd
           bOk = false;
         }
       }
+      else if(arg.startsWith("-pos=")) 
+      { cargs.positionWindow = getArgument(5);
+      }
       else if(arg.startsWith("-fullscreen")) 
-      { cargs.dxPixelWindow = cargs.dyPixelWindow = -1;
+      { cargs.positionWindow = "0..0,0..0";
       }
       else if (arg.startsWith("-help:") || arg.startsWith("help=")) {
         File file1 = new File(arg.substring(6));

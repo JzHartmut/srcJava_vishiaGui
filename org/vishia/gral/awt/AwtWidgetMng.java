@@ -401,7 +401,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
   
   @Override public void createSubWindow(GralWindow windowGral){
-    AwtSubWindow windowSwt = new AwtSubWindow(this, windowGral, false);
+    AwtSubWindow windowSwt = new AwtSubWindow(windowGral, false);
     //new SwtSubWindow(name, swtDevice.displaySwt, title, windProps, this);
     GralRectangle rect = calcPositionOfWindow(windowGral.pos());
     windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );

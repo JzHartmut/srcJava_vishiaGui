@@ -144,7 +144,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   SwtSubWindow(SwtMng mng, GralWindow wdgGral)
   //SwtSubWindow(String name, Display display, String title, int windProps, GralMng gralMng)
   { //super(name, windProps, gralMng, null);
-    super(wdgGral, mng.mng);  //Invoke constructor of the super class, with knowledge of its outer class.
+    super(wdgGral);  //Invoke constructor of the super class, with knowledge of its outer class.
     int props = 0; ////|SWT.CLOSE;
     String sTitle = super.getTitle();
     int windProps = super.getWindowProps();
@@ -162,10 +162,18 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     }
     if((windProps & GralWindow.windOnTop) !=0){ props |= SWT.ON_TOP; }
     if((windProps & GralWindow.windResizeable) !=0){ props |= SWT.RESIZE; }
+    //
+    //create the window:
     window = new Shell(mng.displaySwt, props);
     swtWidgWrapper = new SwtWidgetHelper(window, mng);
+    GralRectangle rect = mng.calcPositionOfWindow(wdgGral.pos());
+    window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
+    if(rect.dx == -1)  { //TODO
+      window.setMaximized(true);
+    }    
     window.addShellListener(shellListener);
     window.addDisposeListener(disposeListener);
+    window.addFocusListener(mng.focusListener);
     //window.add
     if((windProps & GralWindow.windHasMenu) !=0){
       Menu menuBarSwt = new Menu(window, SWT.BAR);

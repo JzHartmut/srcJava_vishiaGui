@@ -96,7 +96,7 @@ public class InspcViewTargetComm
 
   GralUserAction setVisible = new GralUserAction("")
   { public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
-      wind.setVisible(true);   
+      wind.setFocus(); //Visible(true);   
       return true;
     }
   };

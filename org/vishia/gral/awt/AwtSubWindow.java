@@ -30,8 +30,8 @@ public class AwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
 
   private final boolean isMainWindow;
   
-  public AwtSubWindow(AwtWidgetMng mng, GralWindow wdgGral, boolean isMainWindow)
-  { super(wdgGral, GralMng.get());
+  public AwtSubWindow(GralWindow wdgGral, boolean isMainWindow)
+  { super(wdgGral);
     this.isMainWindow = isMainWindow;
     window = new Frame(getTitle());
     int xPos = 100; int yPos = 50; int xSize = 640; int ySize = 480;

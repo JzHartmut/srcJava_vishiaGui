@@ -507,7 +507,7 @@ class FcmdFavorPathSelector
     File directory = fileCard.getCurrentDir();
     //String pathDir = FileSystem.getCanonicalPath(lastSelectedFile.getParentFile());
     windAddFavorite.widgPath.setText(directory.getPath());
-    windAddFavorite.window.setWindowVisible(true);
+    windAddFavorite.window.setFocus(); //WindowVisible(true);
     
   }
   

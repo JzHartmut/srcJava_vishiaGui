@@ -131,7 +131,8 @@ public class FcmdDelete
       widgDeleteDir.setText("??No filecard active");
       widgDeletePath.setText("?? abort");
     }
-    windConfirmDelete.setWindowVisible(true);
+    windConfirmDelete.setFocus(); //WindowVisible(true);
+    
 
   }
   

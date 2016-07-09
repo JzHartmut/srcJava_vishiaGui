@@ -198,6 +198,7 @@ public class FcmdView
     }
     if(!bVisible){
       windView.setWindowVisible(true);
+      windView.setFocus();
       bVisible = true;
     }
   }

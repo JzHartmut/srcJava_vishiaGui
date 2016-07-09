@@ -812,7 +812,8 @@ return true;
           //infoAbout.append(line).append("\n");
         }
       } catch(Exception exc){ window.gralMng().writeLog(0, exc); }
-      infoAbout.setWindowVisible(true);
+      //infoAbout.setWindowVisible(true);
+      infoAbout.setFocus();
       return true; 
   } };
 

@@ -430,11 +430,8 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    */
   @Override public void createSubWindow(GralWindow windowGral) {
     SwtSubWindow windowSwt = new SwtSubWindow(this, windowGral);
-    //new SwtSubWindow(name, swtDevice.displaySwt, title, windProps, this);
-    GralRectangle rect = calcPositionOfWindow(windowGral.pos());
-    windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
-    //window.window.redraw();
-    //window.window.update();
+    //GralRectangle rect = calcPositionOfWindow(windowGral.pos());
+    //windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
     windowGral._wdgImpl = windowSwt;
   }
 
@@ -1066,12 +1063,12 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     
     @Override public void focusLost(FocusEvent ev)
     { GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(ev.widget.getData());
-      gralFocus.focusLostGral(widgg);
+      if(widgg !=null) { gralFocus.focusLostGral(widgg); }
     }
     
     @Override public void focusGained(FocusEvent ev)
     { GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(ev.widget.getData());
-      gralFocus.focusGainedGral(widgg);
+    if(widgg !=null) { gralFocus.focusGainedGral(widgg); }
     }
   }
   

@@ -227,7 +227,7 @@ public class FcmdFileProps
   { //String sSrc, sTrash;
     isVisible = true;
     showFileInfos(src);
-    windFileProps.setWindowVisible(true);
+    windFileProps.setFocus(); //WindowVisible(true);
 
   }
   

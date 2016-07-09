@@ -66,7 +66,7 @@ public class FcmdMkDirFile
       widgParentPath.setText("?? nothing selected ??");
     }
     main.gui.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.mkdirfile.");
-    windMk.setWindowVisible(true);
+    windMk.setFocus(); //setWindowVisible(true);
   }
   
 

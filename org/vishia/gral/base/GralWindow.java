@@ -191,7 +191,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
     
     protected final GralWindow gralWindow;  //its outer class.
     
-    protected GraphicImplAccess(GralWindow gralWdg, GralMng mng){
+    protected GraphicImplAccess(GralWindow gralWdg){
       super(gralWdg);
       this.gralWindow = gralWdg;  //References the environment class
     }

@@ -12,21 +12,21 @@ public class AwtGraphicThread extends GralGraphicThread.ImplAccess
   Frame window;
   
   //final String sTitle; 
-  final int xPos, yPos, xSize, ySize;
+  //final int xPos, yPos, xSize, ySize;
   
   AwtWidgetMng awtMng;
   
-  AwtGraphicThread(GralWindow windowGral, char sizeShow, int left, int top, int xSize, int ySize, LogMessage log)
+  AwtGraphicThread(GralWindow windowGral, char sizeShow, LogMessage log)
   { super(sizeShow, windowGral, log);
-    this.xPos = left; this.yPos = top; this.xSize = xSize; this.ySize = ySize; 
+    //this.xPos = left; this.yPos = top; this.xSize = xSize; this.ySize = ySize; 
     threadGuiDispatch.start();  //invokes initGraphic()
     
   }
 
   @Override protected void initGraphic()
   {
-    AwtSubWindow awtWindow = new AwtSubWindow(awtMng, mainWindow, true);
     AwtProperties propertiesGui = new AwtProperties(sizeCharProperties);
+    AwtSubWindow awtWindow = new AwtSubWindow(mainWindow, true);
     awtMng = new AwtWidgetMng(awtWindow.window, propertiesGui, log);
     
   }

@@ -177,7 +177,7 @@ public final class FcmdFilesCp {
     {
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         setDirs();
-        windConfirmCompare.setWindowVisible(true);
+        windConfirmCompare.setFocus(); //setWindowVisible(true);
       }
       return true;
   } };
@@ -197,7 +197,7 @@ public final class FcmdFilesCp {
           widgCompare.sCmd = "stop";
             //TODO
         } else if(infos.sCmd.equals("esc")){
-          windConfirmCompare.setWindowVisible(false);
+          windConfirmCompare.setFocus(); //setWindowVisible(false);
         }
       }
       return true;

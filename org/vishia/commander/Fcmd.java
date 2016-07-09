@@ -923,7 +923,7 @@ public class Fcmd extends GuiCfg
     //new GralMng(null, cmdgui);
     
     // calling arguments
-    bOk = cmdgui.parseArgumentsAndInitGraphic("The.file.Commander", "2A2C");
+    bOk = cmdgui.parseArgumentsAndInitGraphic("The.file.Commander", "2A2C", '.', "0+50,0+150");
 
     /*
     try {

@@ -236,7 +236,7 @@ public class FcmdFavorCard  extends GralSelectList<FcmdFavorPathSelector.FavorPa
       //File lastSelectedFile = panelRight.fileSelectorMain.getSelectedFile();
       //String pathDir = FileSystem.getCanonicalPath(lastSelectedFile.getParentFile());
       //windAddFavorite.widgPath.setText(pathDir);
-      main.favorPathSelector.windAddFavorite.window.setWindowVisible(true);
+      main.favorPathSelector.windAddFavorite.window.setFocus(); //WindowVisible(true);
     } else {
       ret = false;
     }//

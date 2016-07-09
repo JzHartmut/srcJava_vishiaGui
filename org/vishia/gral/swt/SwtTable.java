@@ -316,6 +316,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       //this is about 50 ms after focus lost, the focus has lost really.
       bFocused = false;
       bFocusLost = false;
+      setFocused(widgg, false);
     }
     if(swtWidgHelper.widgetSwt !=null && !swtWidgHelper.widgetSwt.isDisposed()){
       int chg = getChanged();
@@ -673,7 +674,8 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
    * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
    */
   @Override public void focusGained(FocusEvent ev) { 
-    SwtTable.this.focusGainedTable(); 
+    SwtTable.this.focusGainedTable();
+    setFocused(widgg, true); 
     //System.out.println("SwtTableCell - focus gained;");
   }
   

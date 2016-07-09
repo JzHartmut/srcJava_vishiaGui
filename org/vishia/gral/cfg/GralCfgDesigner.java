@@ -236,7 +236,7 @@ public class GralCfgDesigner
     //dialogWindowProps.posWindow.setPosition(widgd.pos, widgd.pos.y +2, GralGridPos.size+30, widgd.pos.x, GralGridPos.size+40, 1, 'r' );
     //dialogWindowProps.setWindowVisible(true);
     //use manager to position.
-    dialogWindowProps.setVisible(true);
+    dialogWindowProps.setFocus(); //Visible(true);
     //dialogWindowProps.chgPos(dialogWindowProps.pos());
     //mng.setWindowsVisible(dialogWindowProps, dialogWindowProps.pos());
   }

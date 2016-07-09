@@ -55,6 +55,7 @@ public abstract class GralFactory
    * @param xSize
    * @param ySize
    * @return the window
+   * @deprecated use {@link #createGraphic(GralWindow, char, int, int, int, int, LogMessage)}
    */
   public final GralWindow createWindow(LogMessage log, String sTitle, char sizeShow, int left, int top, int xSize, int ySize)
   {
@@ -73,15 +74,16 @@ public abstract class GralFactory
    * @param xSize
    * @param ySize
    * @return the window
+   * @deprecated use {@link #createGraphic(GralWindow, char, int, int, int, int, LogMessage)}
    */
-  public final void createWindow(GralWindow windowg, char sizeShow, int left, int top, int xSize, int ySize)
+  @Deprecated public final void createWindow(GralWindow windowg, char sizeShow, int left, int top, int xSize, int ySize)
   {
     GralMng mng = GralMng.get();
     mng.setPrimaryWindow(windowg); //checks whether called firstly.
     LogMessage log = mng.log;    
     //The graphicthread creates the Swt Window.
     //SwtPrimaryWindow swtWindow = SwtPrimaryWindow.create(log, sTitle, sizeShow, left, top, xSize, ySize);
-    GralGraphicThread gralGraphicThread = createGraphic(windowg, sizeShow, left, top, xSize, ySize, log);
+    GralGraphicThread gralGraphicThread = createGraphic(windowg, sizeShow, log);
     synchronized(gralGraphicThread){
       while(gralGraphicThread.getThreadIdGui() == 0){
         try{ gralGraphicThread.wait(1000);} catch(InterruptedException exc){}
@@ -99,7 +101,33 @@ public abstract class GralFactory
    * @param log
    * @return
    */
-  protected abstract GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, int left, int top, int xSize, int ySize, LogMessage log);
+  protected abstract GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, LogMessage log);
+  
+  
+  
+  
+  
+  
+  public static GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, LogMessage log, String implementor) { 
+    GralGraphicThread gralThread = null;
+    final String sNameFactoryClass;
+    if(implementor.equals("SWT")) { sNameFactoryClass = "org.vishia.gral.swt.SwtFactory"; }
+    else if(implementor.equals("AWT")) { sNameFactoryClass = "org.vishia.gral.awt.AwtFactory"; }
+    else { sNameFactoryClass = implementor; }
+    GralFactory factory;
+    try{ 
+      //Class<GralFactory> classfactory = ClassLoader.getSystemClassLoader().loadClass(sNameFactoryClass);
+      Class<?> classfactory = Class.forName(sNameFactoryClass);
+      Object oFactory = classfactory.newInstance();
+      factory = (GralFactory)oFactory;           //Exception if faulty type.
+      gralThread = factory.createGraphic(windowg, sizeShow, log);
+    }catch(Exception exc){
+      String sError = "class not found or faulty: " + sNameFactoryClass;
+      System.err.println(sError);
+      throw new RuntimeException(sError, exc);
+    }
+    return gralThread;
+  }
   
   
 }

@@ -788,7 +788,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     try{ infoBox.append(info); }
     catch(IOException exc){}
     if(show){
-      infoBox.setWindowVisible(true);
+      infoBox.setFocus(); //setWindowVisible(true);
     }
   }
 
@@ -1695,7 +1695,7 @@ public GralButton addCheckButton(
   { 
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { infoHelp.activate();
-      infoHelp.setWindowVisible(true);
+      infoHelp.setFocus(); //setWindowVisible(true);
       return true; 
   } };
 

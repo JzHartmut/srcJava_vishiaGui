@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralGraphicThread.ImplAccess;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
@@ -185,13 +186,14 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
   
   
   //final String sTitle; 
-  final int xPos, yPos, xSize, ySize;
+  //final int xPos, yPos, xSize, ySize;
   
-  SwtGraphicThread(GralWindow windowGral, char sizeShow, int left, int top, int xSize, int ySize, LogMessage log)
+  SwtGraphicThread(GralWindow windowGral, char sizeShow, LogMessage log)
   { super(sizeShow, windowGral, log);
     //this.sTitle = sTitle; 
-    this.xPos = left; this.yPos = top; this.xSize = xSize; this.ySize = ySize; 
+    //this.xPos = left; this.yPos = top; this.xSize = xSize; this.ySize = ySize; 
     threadGuiDispatch.start();
+    gralGraphicThread.waitForStart();
   }
   
   
@@ -230,11 +232,11 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
     //graphicFrame.getContentPane().setLayout(new BorderLayout());
     //graphicFrame.addWindowListener(new WindowClosingAdapter(true));
     //graphicFrame.setSize( xSize, ySize );
-    if(xSize == -1 || ySize == -1){
-      windowSwt.setMaximized(true);
-    } else {
-      windowSwt.setBounds(xPos,yPos, xSize, ySize );  //Start position.
-    }
+    //if(xSize == -1 || ySize == -1){
+      //windowSwt.setMaximized(true);
+    //} else {
+      //windowSwt.setBounds(xPos,yPos, xSize, ySize );  //Start position.
+    //}
     windowSwt.open();
 
     //graphicFrame.getContentPane().setLayout(new FlowLayout());
@@ -244,10 +246,6 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
     
     //The propertiesGuiSwt needs the Display instance for Font and Color. Therefore the graphic thread with creation of Display should be executed before. 
     //mainWindow.setPanelMng(gralMng);
-    mainWindow.setWindowVisible( true ); 
-    if(xSize == -1 || ySize == -1){
-      mainWindow.setFullScreen(true);  
-    }
     //int windProps = GralWindow_ifc.windResizeable;
     //GralWindow windowGral = new GralWindow("main", sTitle, windProps, gralMng, null );
     
@@ -280,6 +278,9 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
   
   @Override
   public void wakeup(){
+    if(displaySwt == null){
+      
+    }
     displaySwt.wake();
     //extEventSet.set(true);
     //isWakedUpOnly = true;

@@ -9,8 +9,8 @@ public class SwtFactory extends GralFactory
 {
   
   
-  @Override protected GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, int left, int top, int xSize, int ySize, LogMessage log){
-    SwtGraphicThread graphicThread = new SwtGraphicThread(windowg, sizeShow, left, top, xSize, ySize, log);
+  @Override protected GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, LogMessage log){
+    SwtGraphicThread graphicThread = new SwtGraphicThread(windowg, sizeShow, log);
     GralGraphicThread gralGraphicThread = graphicThread.gralGraphicThread();
     return gralGraphicThread;
   }

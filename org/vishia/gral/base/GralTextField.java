@@ -112,7 +112,15 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
    * @param property password, editable, maybe left empty.
    */
   public GralTextField(String name, Type... property){
-    super(null, name, 't');
+    this(null, name, property);
+  }
+
+  /**Constructs a text field with given properties
+   * @param name Name of the field. Maybe null if it is not need in management by name
+   * @param property password, editable, maybe left empty.
+   */
+  public GralTextField(String position, String name, Type... property){
+    super(position, name, 't');
     boolean bPassword1 = false;
     if(property !=null){
       for(int ii=0; ii<property.length; ++ii){

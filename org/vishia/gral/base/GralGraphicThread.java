@@ -4,9 +4,6 @@ package org.vishia.gral.base;
 import java.util.EventObject;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.vishia.event.EventTimerThread_ifc;
-import org.vishia.event.EventTimeout;
-import org.vishia.event.TimeOrder;
 import org.vishia.event.EventTimerThread;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Assert;
@@ -260,6 +257,15 @@ public class GralGraphicThread implements Runnable
   /**This method should wake up the execution of the graphic thread because some actions are registered.. */
   public void wakeup(){ impl.wakeup(); }
 
+
+  public void waitForStart(){
+    synchronized(this) {
+      while(!bStarted) {
+        try{ wait(1000);
+        } catch(InterruptedException exc){}
+      }
+    }
+  }
   
   public boolean isStarted(){ return bStarted; }
   
@@ -289,12 +295,18 @@ public class GralGraphicThread implements Runnable
    */
   @Override public void run()
   { impl.initGraphic();
+    impl.mainWindow.setWindowVisible( true ); 
+    GralPos pos = impl.mainWindow.pos();
+    if(pos.x.p2 == 0 && pos.y.p2 == 0){
+      impl.mainWindow.setFullScreen(true);  
+    }
+
     //The last action, set the GuiThread
     long guiThreadId1 = Thread.currentThread().getId(); ///
     synchronized(this){
       this.graphicThreadId = guiThreadId1;
-      bStarted = true;
       orderList.start();
+      bStarted = true;
       this.notify();      //wakeup the waiting calling thread.
     }
     checkTimes.init();

@@ -120,7 +120,7 @@ public class FcmdSettings
   {
     widgRefreshTime.setText("" + secondsRefresh);
     widgCfgPath.setText(main.cargs.dirCfg.getAbsolutePath());
-    windSettings.setWindowVisible(true);
+    windSettings.setFocus(); //setWindowVisible(true);
 
   }
   

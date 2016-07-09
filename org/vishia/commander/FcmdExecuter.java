@@ -156,7 +156,8 @@ public class FcmdExecuter
           GralTableLine_ifc line = widgSelectExec.insertLine(block.name, 0, null, block);
           line.setCellText(block.title, 0);
         }
-        windConfirmExec.setWindowVisible(true);
+        //windConfirmExec.setWindowVisible(true);
+        windConfirmExec.setFocus();
       /*  
       CmdBlock cmd = cmdStore.getCmd(ext);
       if(cmd !=null){
@@ -291,7 +292,9 @@ public class FcmdExecuter
           GralTable.TableLineData line = widgSelectExec.insertLine(block.name, 0, null, block);
           line.setCellText(block.title, 0);
         }
-        windConfirmExec.setWindowVisible(true);
+        //windConfirmExec.setWindowVisible(true);
+        windConfirmExec.setFocus();
+        
       } else {
         console.writeError("no association found for extension ." + ext);
       }
