@@ -1,0 +1,185 @@
+<?ZBNF-www.vishia.org version="1.0" encoding="iso-8859-1" ?>
+
+GuiDialogZbnfControlled::=
+[ size( <#?ySize> , <#?xSize> ) ;]
+{ DataReplace: <DataReplace>
+| Type <Type>
+| if <Conditional> 
+| <Element>    
+} \e.
+
+
+
+Conditional::=
+(<$?ifCondition>) { if <Conditional> | <Element> } 
+[ elsif (<$?elsifCondition>) { if <Conditional> | <Element> } ]
+[ else <?elseCondition> { if <Conditional> | <Element> }  ]
+endif[;]
+.
+
+
+Element::=
+ [<?position> @ [<$?panel> ,] 
+                [<?yPosRelative> &+]
+                [<#?yPos>[\.<#?yPosFrac>]] 
+                [ [+] <#-?ySizeDown>[\.<#?ySizeFrac>]| +* <?yOwnSize> |] ##| - <#?ySizeUp>|] 
+                [ <?yIncr> ++] 
+                [ ,
+                  [<?xPosRelative> &+] 
+                  [<#?xPos>[\.<#?xPosFrac>]] 
+                  [ [+] <#-?xWidth>[\.<#?xSizeFrac>]| +* <?xOwnSize> |]
+                  [ <?xIncr> ++]
+                ] :
+ ] 
+ [ Led <Led> 
+ | <Button> 
+ | SwitchButton ( <param?SwitchButton> ) ; 
+ | ValueBar ( <param?ValueBar> ) ;
+ | InputTextline ( <param?InputTextline> ) ;
+ | InputField ( <param?InputTextline> ) ;
+ | InputBox ( <param?InputTextbox> ) ;
+ | InputFile ( <param?InputFile> ) ;
+ | Slider ( <param?Slider> ) ;
+ | Show <ShowField> ;
+ | <Table> 
+ | <Text> 
+ | <Imagefile>
+ | <Line>
+ | <Curveview>
+## | <InputField>
+ | <FileInputField>
+ ] 
+.
+
+
+
+
+DataReplace::= <$?key> = <$-/\.:?string> ;.
+
+param::=<?>
+{ [%top<?promptPosition=t>|%t<?promptPosition=t>|%r<?promptPosition=r>] : [<""?prompt> | <*,)?prompt>]
+| cmd =  [<""?cmd>|\[<*\]?cmd>\]] 
+| text = [<""?text>|<$-/?text>] 
+| name = [<""?name>|<$-/?name>] 
+| info = [<""?data>|<$-/?data>] 
+| data = [<""?data>|<*,);\ ?data>] 
+| action = [<""?userAction>|<$-?userAction>] 
+| show = [<""?showMethod>|<$?showMethod>] 
+| type = <$?type>
+| format = [<""?format>|<* ,);?format>]
+| help = [<""?help>|<* ,);?help>]
+##| prompt = [<""?prompt>|<* ,);?prompt>]
+| color = <colorName?color0> [ / <colorName?color1> ] 
+| dropFiles = [<""?dropFiles>|<$-/\.?dropFiles>]
+| dropText = [<""?dropText>|<$-/\.?dropText>]
+| dragFiles = [<""?dragFiles>|<$-/\.?dragFiles>]
+| dragText = [<""?dragText>|<$-/\.?dragText>]
+| <""?text>
+| <$-/\.:?text>
+##| <*,)?text>
+? , 
+}.
+
+
+
+Type::= [(<$?typeName>)|<$?typeName>] [: <param?>|( <param?> )] ;.
+
+
+SwitchButton::=( <param> ) ;.
+
+
+
+Led::=( <param?> ) ;.  
+
+Button::=Button ( [<param>])  [: ##[|<""?text>|<*)?text>] ) : 
+{ cmd = [<""?cmd>|\[<*\]?cmd>\]] 
+| action = <$?userAction> 
+| name = [<""?name>|<$?name>] 
+| info = [<""?data>|<$/?data>] 
+| data = [<""?data>|<$/?data>] 
+| show = [<""?showMethod>|<$/?showMethod>] 
+| type = <$?type>
+? , 
+}] ; .
+
+Table::=Table ( [<""?text>|<*)?text>] ) : 
+{ size ( { <#?columnWidth> ? + } x <#?height> ) 
+| cmd = [<""?cmd>|\[<*\]?cmd>\]] 
+| userAction = <$?userAction> 
+| name = [<""?name>|<$?name>] ? , 
+} ; .
+
+Curveview::=Curveview ( <$?name> [ , <#?nrofPoints>][ , active<?activate>]) :
+{<?line> line ( <$?name> 
+[ , { color = [<colorName>| <#x?colorValue>] 
+    | offset = <#f?offset> 
+		| scale = <#f?scale>
+    | data = [<""?data>|<*,);\ ?data>] 
+		| nullLine = <#?nullLine>
+		? , } ] )                       ##line-parameter
+? , } ;.                            ##lines
+
+Text::= Text ( [<""?text>|<*)?text>] 
+[ ,{ <!\[ABC\]?size> 
+   | <colorName> 
+	 | color = <#x?colorValue> | <colorName>
+   ? , }
+]) ; .
+
+
+Imagefile::= Imagefile 
+(  { <!\[ABCDE\]?size> 
+   | name = <$?name>
+	 | file = <""?file>|<* ,)?file>
+   ? , }
+) ; .
+
+
+
+
+
+Line::= Line ( {<colorName> | color = <#x?colorValue> |<?coord> <#f?x> , <#f?y> ? , } ) ;.
+
+?en:Line/xCoord::="There may be at least 2, but more possible pairs of x,y for polygons.".
+
+
+ShowField::= ( {[ [%top<?promptPosition=t>|%t<?promptPosition=t>|%r<?promptPosition=r>] : [<""?prompt> | <*,)?prompt>]
+                | <param?> 
+                | [#] [<""?prompt>|<$$?prompt>]   ##TODO remove # from syntax 
+                ] ? ,} 
+             ) [ : <param?> ] . 
+
+
+
+XXXShowField::= Show 
+([{ width = <#?width> 
+| name = [<""?name>|<$/?name>]
+| info = [<""?data>|<$/?data>] 
+| action = [<""?action>|<$?action>] 
+| [#<?noPrompt>] [<""?prompt>|<$$?prompt>] 
+? , 
+}])
+[ : 
+{ width = <#?width> 
+| name = [<""?name>|<$/?name>]
+| info = [<""?data>|<$/?data>] 
+? , 
+} ]; .
+
+?en:ShowField/noPrompt::="If a # is written before the button text, the text is not used as prompt, but as name".
+?en:ShowField/prompt::="The name or the prompt text.".
+?en:ShowField/name::="If the name is given, that name is used for register the field, independen of a given prompt string. ".
+?en:ShowField/data::="This String can be used to get a info to fill the field, depending on user programming. ".
+
+
+InputField::= Input ( [|<""?prompt>|<*)?prompt>] ) : { width = <#?width> | name = [<""?name>|<$?name>] ? , } ; .
+
+FileInputField::= FileInput ( [|<""?prompt>|<*)?prompt>] ) : { width = <#?width> | name = [<""?name>|<$?name>] ? , } ; .
+
+colorName::=[<?color> red|green|blue|black|white|gray|brown|cyan|magenta|orange|amber|yellow|violet|purple
+|rd|gn|bl|gr|bn|cy|ma|or|wh|bk|ye|or|vi|pk|pu|am
+|lrd|lgn|lbl|lgr|lye|lor|lam|lma|lcy
+|prd|pgn|pbl|pgr|pye|por|pam|pma|pcy
+|drd|dgn|dbl|drg|dye|dor|dam|dma|dcy
+]
+ 

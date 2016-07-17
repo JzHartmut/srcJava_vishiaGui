@@ -1,0 +1,682 @@
+
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralButtonKeyMenu.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralCanvasStorage.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralCanvas_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralColor.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\ifc\GralColor.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralCurveViewTrack_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralCurveView_ifc.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\ifc\GralCurveView_ifc.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralFactory.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\ifc\GralFactory.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralFileDialog_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralFont.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralImageBase.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralMngApplAdapter_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralMngBuild_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralMng_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralPlugUser2Gral_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralPlugUser_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralPoint.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralPrimaryWindow_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralRectangle.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralSetValue_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralSlider_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralTableLine_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralTable_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralTextBox_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralTextFieldUser_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralTextField_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralUserAction.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralVisibleWidgets_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralWidgetCfg_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralWidget_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralWindowMng_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralWindow_getifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralWindow_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/area9/GralArea9MainCmd.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\area9\GralArea9MainCmd.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/area9/GralArea9Window.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\area9\GralArea9Window.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/area9/GralArea9_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/area9/GuiCallingArgs.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\area9\GuiCallingArgs.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/area9/GuiCfg.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\area9\GuiCfg.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/area9/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GetGralWidget_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralButton.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralButton.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralCurveView.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralCurveView.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralGraphicThread.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralGraphicThread.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralGraphicTimeOrder.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralGridProperties.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralHtmlBox.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralKeyListener.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralKeySpecial_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralLed.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralMenu.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralMng.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralMng.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralMouseWidgetAction_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralPanelActivated_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralPanelContent.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralPanelContent.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralPos.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralPos.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralShowMethods.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralSlider.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralTabbedPanel.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralTabbedPanel.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralTable.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralTable.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralTextBox.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralTextField.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralTextField.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralValueBar.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralWidget.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralWidget.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralWidgetHelper.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralWidgImpl_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralWindow.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralWindow.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralWindow_setifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgBuilder.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\cfg\GralCfgBuilder.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgData.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgDesigner.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\cfg\GralCfgDesigner.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgElement.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\cfg\GralCfgElement.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgPanel.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgPosition.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgWindow.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\cfg\GralCfgWindow.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgWriter.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgZbnf.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\cfg\GralCfgZbnf.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtButton.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtButton.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtCanvasDrawer.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtCanvasStorePanel.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtCurveView.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtDragListener.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtDropListener.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtFactory.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtFactory.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtFileDialog.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtFocusAction.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtGralKey.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtGralMouseListener.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtGraphicThread.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtGraphicThread.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtGridPanel.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtHorizontalSelector.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtHtmlBox.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtHtmlBox.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtImage.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtKeyListener.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtLabel.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtLabel.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtLed.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtMenu.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtMng.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtMng.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtPanel.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtProperties.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtProperties.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtSetValue_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtSlider.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtSubWindow.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtSubWindow.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtTabbedPanel.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtTable.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtTable.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtTextBox.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtTextBox.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtTextFieldWrapper.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtTextFieldWrapper.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtTransparentLabel.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtTraverseListener.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtTraverseListener.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtValueBar.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtWidgetHelper.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtWidgetSimpleWrapper.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralColorSelector.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralCommandSelector.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\widget\GralCommandSelector.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralFileSelector.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralFileSelectWindow.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralHorizontalSelector.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralHtmlWindow.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralInfoBox.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\widget\GralInfoBox.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralLabel.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralMsgOutputList.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralSelectList.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralSwitchExclusiveButtonMng.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/guiInspc/InspcCurveView.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/guiInspc/InspcCurveViewApp.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/guiInspc/InspcFieldTable.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\guiInspc\InspcFieldTable.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/guiInspc/InspcGui.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\guiInspc\InspcGui.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/guiInspc/InspcGuiCtrlStatus.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\guiInspc\InspcGuiCtrlStatus.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/guiInspc/InspcGuiFieldsFromFile.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/guiInspc/InspcViewTargetComm.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/guiViewCfg/OamOutFileReader.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/guiViewCfg/OamRcvValue.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/guiViewCfg/OamShowValues.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/guiViewCfg/ViewCfg.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/Fcmd.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\commander\Fcmd.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdButtons.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdCopyCmprDel.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\commander\FcmdCopyCmprDel.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdDelete.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdDocuSearch.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdEdit.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdExecuter.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\commander\FcmdExecuter.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdFavorCard.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdFavorPathSelector.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdFileCard.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\commander\FcmdFileCard.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdFileProps.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\commander\FcmdFileProps.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdFilesCp.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdIdents.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdKeyActions.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdLeftMidRightPanel.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdMkDirFile.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdSettings.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\commander\FcmdSettings.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdStatus.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdStatusLine.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\commander\FcmdStatusLine.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdTargetProxy.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdView.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdWidgetNames.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdWindowMng.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/mng/InspcMng.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\inspcPC\mng\InspcMng.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/mng/InspcPlugUser_ifc.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\inspcPC\mng\InspcPlugUser_ifc.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/mng/InspcStruct.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\inspcPC\mng\InspcStruct.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/mng/InspcVariable.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\inspcPC\mng\InspcVariable.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/mng/UserInspcPlug_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/InspcAccessCheckerRxTelg.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/InspcAccessExecAnswerTelg_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/InspcAccessExecRxOrder_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/InspcAccessGenerateOrder.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/InspcAccess_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/InspcCommPort.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/InspcTargetAccessData.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/InspcTargetAccessor.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\inspcPC\accTarget\InspcTargetAccessor.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/TestAccessor.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\inspcPC\accTarget\TestAccessor.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Assert.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/CalculatorExpr.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\CalculatorExpr.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/CompleteConstructionAndStart.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Conversion.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Copy.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/DataAccess.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\DataAccess.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/DataShow.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/DateOrder.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Debugutil.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Docu_UML_simpleNotation.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/FileCompare.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/FileCopyDir.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/FileList.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/FilePath.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\FilePath.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/FileSet.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/FileSystem.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\FileSystem.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/FileWriter.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/GetTypeToUse.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/IndexMultiTable.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\IndexMultiTable.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/IndexMultiTableInteger.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/InfoAppend.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/InfoFormattedAppend.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/IntegerBlockArray.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/IterableIterator.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Java4C.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\Java4C.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/KeyCode.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/LeapSeconds.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/MarkMask_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/MessageQueue.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/MinMaxTime.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/ObjectValue.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/OrderForList.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/OrderListExecuter.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/PathCheck.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\PathCheck.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/PipeRingBuffer.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/ReadChars3Stream.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Removeable.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/ReplaceAlias_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/SelectMask.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/SetLineColumn_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/ShortenString.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Sort.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/SortedList.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/SortedStringList.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/SortedTree.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/SortedTreeNode.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\SortedTreeNode.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/SortedTreeWalkerCallback.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/SpecialCharStrings.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StdHexFormatWriter.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StringFormatter.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\StringFormatter.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StringFunctions.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\StringFunctions.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StringPart.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\StringPart.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StringPartAppend.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StringPartFromFile.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StringPartFromFileLines.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\StringPartFromFileLines.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StringPartScan.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\StringPartScan.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StringSeq.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/ThreadContext.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/ThreadRun.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Timeshort.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/TreeNodeBase.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\TreeNodeBase.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/TreeNodeCallback.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/TreeNodeNamed_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/TreeNodeUniqueKey.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/TreeNode_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/TreeWalkerPathCheck.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\TreeWalkerPathCheck.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/UnexpectedException.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Zip.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\Zip.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/ByteDataAccess.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/ByteDataAccessBase.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\byteData\ByteDataAccessBase.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/ByteDataAccessDbg.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/ByteDataAccessOld.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/ByteDataAccessSimple.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/ByteDataSymbolicAccess.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/Class_Jc.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\byteData\Class_Jc.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/Field_Jc.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\byteData\Field_Jc.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/ObjectArraySet_Jc.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\byteData\ObjectArraySet_Jc.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/ObjectArray_Jc.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\byteData\ObjectArray_Jc.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/Object_Jc.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\byteData\Object_Jc.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/PositionElementInStruct.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/RawDataAccess.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/VariableAccessArray_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/VariableAccessWithBitmask.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/VariableAccessWithIdx.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/VariableAccess_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/VariableContainer_ifc.java.xml ...done.
+*3:output written to:D:\vishia\Java\srcJava_vishiaGui\_make\..\rpy\types-xmi.xml
+*3:
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralButtonKeyMenu.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralCanvasStorage.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralCanvas_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralColor.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\ifc\GralColor.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralCurveViewTrack_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralCurveView_ifc.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\ifc\GralCurveView_ifc.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralFactory.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\ifc\GralFactory.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralFileDialog_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralFont.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralImageBase.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralMngApplAdapter_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralMngBuild_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralMng_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralPlugUser2Gral_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralPlugUser_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralPoint.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralPrimaryWindow_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralRectangle.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralSetValue_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralSlider_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralTableLine_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralTable_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralTextBox_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralTextFieldUser_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralTextField_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralUserAction.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralVisibleWidgets_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralWidgetCfg_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralWidget_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralWindowMng_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralWindow_getifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/GralWindow_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/ifc/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/area9/GralArea9MainCmd.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\area9\GralArea9MainCmd.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/area9/GralArea9Window.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\area9\GralArea9Window.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/area9/GralArea9_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/area9/GuiCallingArgs.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\area9\GuiCallingArgs.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/area9/GuiCfg.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\area9\GuiCfg.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/area9/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GetGralWidget_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralButton.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralButton.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralCurveView.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralCurveView.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralGraphicThread.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralGraphicThread.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralGraphicTimeOrder.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralGridProperties.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralHtmlBox.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralKeyListener.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralKeySpecial_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralLed.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralMenu.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralMng.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralMng.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralMouseWidgetAction_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralPanelActivated_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralPanelContent.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralPanelContent.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralPos.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralPos.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralShowMethods.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralSlider.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralTabbedPanel.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralTabbedPanel.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralTable.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralTable.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralTextBox.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralTextField.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralTextField.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralValueBar.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralWidget.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralWidget.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralWidgetHelper.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralWidgImpl_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralWindow.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\base\GralWindow.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/GralWindow_setifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/base/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgBuilder.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\cfg\GralCfgBuilder.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgData.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgDesigner.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\cfg\GralCfgDesigner.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgElement.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\cfg\GralCfgElement.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgPanel.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgPosition.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgWindow.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\cfg\GralCfgWindow.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgWriter.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/GralCfgZbnf.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\cfg\GralCfgZbnf.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/cfg/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtButton.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtButton.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtCanvasDrawer.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtCanvasStorePanel.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtCurveView.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtDragListener.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtDropListener.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtFactory.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtFactory.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtFileDialog.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtFocusAction.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtGralKey.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtGralMouseListener.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtGraphicThread.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtGraphicThread.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtGridPanel.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtHorizontalSelector.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtHtmlBox.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtHtmlBox.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtImage.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtKeyListener.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtLabel.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtLabel.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtLed.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtMenu.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtMng.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtMng.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtPanel.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtProperties.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtProperties.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtSetValue_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtSlider.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtSubWindow.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtSubWindow.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtTabbedPanel.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtTable.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtTable.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtTextBox.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtTextBox.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtTextFieldWrapper.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtTextFieldWrapper.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtTransparentLabel.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtTraverseListener.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\swt\SwtTraverseListener.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtValueBar.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtWidgetHelper.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/swt/SwtWidgetSimpleWrapper.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralColorSelector.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralCommandSelector.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\widget\GralCommandSelector.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralFileSelector.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralFileSelectWindow.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralHorizontalSelector.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralHtmlWindow.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralInfoBox.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\gral\widget\GralInfoBox.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralLabel.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralMsgOutputList.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralSelectList.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/GralSwitchExclusiveButtonMng.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/gral/widget/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/guiInspc/InspcCurveView.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/guiInspc/InspcCurveViewApp.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/guiInspc/InspcFieldTable.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\guiInspc\InspcFieldTable.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/guiInspc/InspcGui.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\guiInspc\InspcGui.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/guiInspc/InspcGuiCtrlStatus.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\guiInspc\InspcGuiCtrlStatus.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/guiInspc/InspcGuiFieldsFromFile.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/guiInspc/InspcViewTargetComm.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/guiViewCfg/OamOutFileReader.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/guiViewCfg/OamRcvValue.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/guiViewCfg/OamShowValues.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/guiViewCfg/ViewCfg.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/Fcmd.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\commander\Fcmd.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdButtons.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdCopyCmprDel.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\commander\FcmdCopyCmprDel.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdDelete.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdDocuSearch.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdEdit.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdExecuter.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\commander\FcmdExecuter.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdFavorCard.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdFavorPathSelector.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdFileCard.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\commander\FcmdFileCard.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdFileProps.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\commander\FcmdFileProps.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdFilesCp.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdIdents.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdKeyActions.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdLeftMidRightPanel.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdMkDirFile.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdSettings.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\commander\FcmdSettings.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdStatus.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdStatusLine.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\commander\FcmdStatusLine.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdTargetProxy.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdView.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdWidgetNames.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/FcmdWindowMng.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/commander/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/mng/InspcMng.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\inspcPC\mng\InspcMng.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/mng/InspcPlugUser_ifc.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\inspcPC\mng\InspcPlugUser_ifc.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/mng/InspcStruct.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\inspcPC\mng\InspcStruct.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/mng/InspcVariable.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\inspcPC\mng\InspcVariable.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/mng/UserInspcPlug_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/InspcAccessCheckerRxTelg.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/InspcAccessExecAnswerTelg_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/InspcAccessExecRxOrder_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/InspcAccessGenerateOrder.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/InspcAccess_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/InspcCommPort.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/InspcTargetAccessData.java.xml ...done.
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/InspcTargetAccessor.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\inspcPC\accTarget\InspcTargetAccessor.java.xml
+*3:reading D:/tmp/tmpXml/org/vishia/inspcPC/accTarget/TestAccessor.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\org\vishia\inspcPC\accTarget\TestAccessor.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Assert.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/CalculatorExpr.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\CalculatorExpr.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/CompleteConstructionAndStart.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Conversion.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Copy.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/DataAccess.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\DataAccess.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/DataShow.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/DateOrder.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Debugutil.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Docu_UML_simpleNotation.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/FileCompare.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/FileCopyDir.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/FileList.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/FilePath.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\FilePath.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/FileSet.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/FileSystem.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\FileSystem.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/FileWriter.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/GetTypeToUse.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/IndexMultiTable.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\IndexMultiTable.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/IndexMultiTableInteger.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/InfoAppend.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/InfoFormattedAppend.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/IntegerBlockArray.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/IterableIterator.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Java4C.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\Java4C.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/KeyCode.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/LeapSeconds.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/MarkMask_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/MessageQueue.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/MinMaxTime.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/ObjectValue.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/OrderForList.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/OrderListExecuter.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/PathCheck.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\PathCheck.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/PipeRingBuffer.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/ReadChars3Stream.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Removeable.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/ReplaceAlias_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/SelectMask.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/SetLineColumn_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/ShortenString.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Sort.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/SortedList.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/SortedStringList.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/SortedTree.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/SortedTreeNode.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\SortedTreeNode.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/SortedTreeWalkerCallback.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/SpecialCharStrings.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StdHexFormatWriter.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StringFormatter.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\StringFormatter.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StringFunctions.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\StringFunctions.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StringPart.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\StringPart.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StringPartAppend.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StringPartFromFile.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StringPartFromFileLines.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\StringPartFromFileLines.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StringPartScan.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\StringPartScan.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/StringSeq.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/ThreadContext.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/ThreadRun.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Timeshort.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/TreeNodeBase.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\TreeNodeBase.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/TreeNodeCallback.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/TreeNodeNamed_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/TreeNodeUniqueKey.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/TreeNode_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/TreeWalkerPathCheck.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\TreeWalkerPathCheck.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/UnexpectedException.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/util/Zip.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\util\Zip.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/ByteDataAccess.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/ByteDataAccessBase.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\byteData\ByteDataAccessBase.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/ByteDataAccessDbg.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/ByteDataAccessOld.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/ByteDataAccessSimple.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/ByteDataSymbolicAccess.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/Class_Jc.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\byteData\Class_Jc.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/Field_Jc.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\byteData\Field_Jc.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/ObjectArraySet_Jc.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\byteData\ObjectArraySet_Jc.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/ObjectArray_Jc.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\byteData\ObjectArray_Jc.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/Object_Jc.java.xml
+*1:ERROR:Problem reading D:\tmp\tmpXml\..\srcJava_vishiaBase\org\vishia\byteData\Object_Jc.java.xml
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/package-info.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/PositionElementInStruct.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/RawDataAccess.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/VariableAccessArray_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/VariableAccessWithBitmask.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/VariableAccessWithIdx.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/VariableAccess_ifc.java.xml ...done.
+*3:reading D:/tmp/tmpXml/../srcJava_vishiaBase/org/vishia/byteData/VariableContainer_ifc.java.xml ...done.
+*3:reading D:/vishia/Java/srcJava_vishiaGui/_make/../rpy/types-xmi.xml ...done.
+*3:output written to:D:\vishia\Java\srcJava_vishiaGui\_make\..\rpy\vishiaGui.xmi
+*3:
