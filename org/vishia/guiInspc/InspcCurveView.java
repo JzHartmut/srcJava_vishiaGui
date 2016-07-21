@@ -308,13 +308,13 @@ public final class InspcCurveView
   {
     int posright = -20;
     gralMng.setPosition(0, -4, 0, posright, 0, 'd');
-    widgFileSelector.setToPanel();
+    widgFileSelector.createImplWidget_Gthread();
     widgFileSelector.setVisible(false);
     //widgFileSelector.set
     //widgFileSelector.specifyActionOnFileSelected(actionSelectFile);
     //widgFileSelector.setActionOnEnterFile(actionOk);
     gralMng.setPosition(-4, -2, 0, posright, 0, 'd');
-    widgFilename.setToPanel();
+    widgFilename.createImplWidget_Gthread();
     widgFilename.setVisible(false);
     widgFilename.setText("TEST xyz");
     gralMng.setPosition(0, -2, 0, posright, 0, 'd');

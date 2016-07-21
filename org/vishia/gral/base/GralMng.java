@@ -64,6 +64,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2016-07-20 Hartmut chg: instead setToPanel now {@link #createImplWidget_Gthread()}. It is a better name. 
    * <li>2015-10-29 Hartmut chg: Problem on {@link #pos()} with a second thread: The MainWindow- {@link GralPos#panel} was registered in another thread
    *   and therefore unknown in the new {@link #pos()} for that thread. Solution: If the thread-specific GralPos will be created,
    *   it should copy the data from the {@link #posCurrent} which is valid any case for valid initial data.   
@@ -85,7 +86,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * <li>2015-04-27 Hartmut new {@link #selectPanel(GralPanelContent)} not only with String given
    * <li>2015-01-18 Hartmut chg: Now the implementation for any Grahic (SwtMng) and the GralMng are two separated instances.
    *   The SwtMng extends the {@link GralMng.ImplAccess} which accesses all private data of the GralMng.
-   * <li>2013-12-21 Hartmut new: {@link #setToPanel(GralWidget)} for all set to panel actions. That method handles all widget types. 
+   * <li>2013-12-21 Hartmut new: {@link #createImplWidget_Gthread(GralWidget)} for all set to panel actions. That method handles all widget types. 
    * <li>2013-03-20 Hartmut adap: {@link #actionFileSelect} with setText(...), now the file select field was filled.
    * <li>2012-08-20 Hartmut new: {@link #getWidgetsPermanentlyUpdating()} created but not used yet because 
    *   {@link #refreshCurvesFromVariable(VariableContainer_ifc)} has the necessary functionality.
@@ -636,9 +637,9 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   /**Not that this routine must not invoked before the {@link GralFactory#createWindow(GralWindow, char, int, int, int, int)}
    * was not called.
-   * @see org.vishia.gral.ifc.GralMngBuild_ifc#setToPanel(org.vishia.gral.base.GralWidget)
+   * @see org.vishia.gral.ifc.GralMngBuild_ifc#createImplWidget_Gthread(org.vishia.gral.base.GralWidget)
    */
-  @Override public void setToPanel(GralWidget widgg){ 
+  @Override public void createImplWidget_Gthread(GralWidget widgg){ 
     if(widgg instanceof GralWindow){
       GralWindow wind1 = (GralWindow)widgg;
       impl.createSubWindow(wind1);
@@ -649,7 +650,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
       pos.pos.setPosition(null, 0,0,0,0,0,'r');  //per default the whole window as position and size.
 
     } else {  
-      impl.setToPanel(widgg); 
+      impl.createImplWidget_Gthread(widgg); 
     }
   }
   
@@ -1127,7 +1128,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     GralTextField widgg = new GralTextField(name);
     widgg.setPrompt(prompt, promptStylePosition);
     widgg.setEditable(editable);
-    setToPanel(widgg);
+    createImplWidget_Gthread(widgg);
     //SwtTextFieldWrapper.createTextField(widgg, this);   
     return widgg;
   }
@@ -1157,7 +1158,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   prompt1[0] = promptStylePosition;
   widgg.setPrompt(prompt, new String(prompt1));
   widgg.setEditable(editable);
-  setToPanel(widgg);
+  createImplWidget_Gthread(widgg);
   //SwtTextFieldWrapper.createTextField(widgg, this);   
   return widgg;
 
@@ -1213,7 +1214,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   widgButton.sCmd = sCmd;
   widgButton.setDataPath(sDataPath);
   registerWidget(widgButton);
-  setToPanel(widgButton);
+  createImplWidget_Gthread(widgButton);
   return widgButton;
 }
 
@@ -1246,7 +1247,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   widgButton.sCmd = sCmd;
   widgButton.setDataPath(sDataPath);
   registerWidget(widgButton);
-  setToPanel(widgButton);
+  createImplWidget_Gthread(widgButton);
   return widgButton;
 }
 
@@ -1270,7 +1271,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   widgButton.setSwitchMode(sButtonTextOff, sButtonTextOn);
   //in ctor: widgButton.setPanelMng(this);
   if(sName !=null){ registerWidget(widgButton); }
-  setToPanel(widgButton);
+  createImplWidget_Gthread(widgButton);
   return widgButton;
 }
 
@@ -1295,7 +1296,7 @@ public GralButton addCheckButton(
   widgButton.setSwitchMode(sButtonTextOff, sButtonTextOn, sButtonTextDisabled);
   //widgButton.setPanelMng(this);
   if(sName !=null){ registerWidget(widgButton); }
-  setToPanel(widgButton);
+  createImplWidget_Gthread(widgButton);
   return widgButton;
 }
 
@@ -1805,7 +1806,7 @@ public GralButton addCheckButton(
     protected GralUserAction userMainKeyAction(){ return mng.userMainKeyAction; }
     
     
-    public abstract void setToPanel(GralWidget widgg);
+    public abstract void createImplWidget_Gthread(GralWidget widgg);
     /**Creates the context menu for the given widget for right-mouse pressing.
      * This method is invoked only in {@link GralWidget#getContextMenu()} whereby an existing
      * context menu is stored in the {@link GralWidget#contextMenu} association. 

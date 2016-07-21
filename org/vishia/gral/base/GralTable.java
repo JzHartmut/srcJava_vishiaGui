@@ -2575,7 +2575,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       throw new IllegalArgumentException("GralTableLine.setToPanel - is illegal; Use GralTable.setToPanel(...)");
     }
 
-    @Override public void setToPanel(){
+    @Override public void createImplWidget_Gthread(){
       throw new IllegalArgumentException("GralTableLine.setToPanel - is illegal; Use GralTable.setToPanel(...)");
     }
 

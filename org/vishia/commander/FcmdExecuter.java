@@ -19,6 +19,7 @@ import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
@@ -51,9 +52,9 @@ public class FcmdExecuter
 
   private final Fcmd main;
   
-  GralWindow_ifc windConfirmExec;
+  GralWindow_ifc windConfirmExec = new GralWindow("-19..0,-47..0","execWindow", "confirm execute", GralWindow.windConcurrently);
 
-  GralTable<CmdBlock> widgSelectExec;
+  GralTable<CmdBlock> widgSelectExec = new GralTable<>("0..0,0..0", "execChoice", new int[]{47});
 
   /**Store of all possible commands given in the command file. */
   final CmdStore cmdStore = new CmdStore();
@@ -76,13 +77,8 @@ public class FcmdExecuter
   { 
     
     
-    main._gralMng.selectPanel("primaryWindow");
-    main._gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
-    
-    windConfirmExec = main._gralMng.createWindow("execWindow", "confirm execute", GralWindow.windConcurrently);
-    //main.gralMng.setPosition(2, GralPos.size -2, 1, -1, 0, 'd');
-    widgSelectExec = main._gralMng.addTable("execChoice", 3, new int[]{50});
-    widgSelectExec.setActionChange(actionExecCmdAfterChoice);
+    windConfirmExec.createImplWidget_Gthread();
+    widgSelectExec.setActionChange("exec", actionExecCmdAfterChoice, null, GralWidget_ifc.ActionChangeWhen.onEnter);
     
   }  
   
@@ -133,7 +129,7 @@ public class FcmdExecuter
   
   
   
-  private boolean actionExecuteUserKey(int keyCode, FileRemote file)
+  boolean actionExecuteUserKey(int keyCode, FileRemote file)
   {
     
     final char kindOfExecution = checkKeyOfExecution(keyCode);
@@ -153,25 +149,11 @@ public class FcmdExecuter
       if(extensionCmd !=null){
         widgSelectExec.clearTable();
         for(CmdBlock block: extensionCmd.listCmd){
-          GralTableLine_ifc line = widgSelectExec.insertLine(block.name, 0, null, block);
+          GralTableLine_ifc<CmdBlock> line = widgSelectExec.insertLine(block.name, 0, null, block);
           line.setCellText(block.title, 0);
         }
-        //windConfirmExec.setWindowVisible(true);
+        widgSelectExec.setCurrentLine(extensionCmd.listCmd.get(0).name);
         windConfirmExec.setFocus();
-      /*  
-      CmdBlock cmd = cmdStore.getCmd(ext);
-      if(cmd !=null){
-        PrepareCmd cmdp = cmd.getCmds().get(0);
-        if(cmd.name.startsWith(">")){
-          main.cmdQueue.addCmd(name, null, file.getParentFile(), kindOfExecution);
-        } else {
-          //the extension determines the command.
-          File[] files = new File[1];
-          files[0] = file;
-          File currentDir = file.getParentFile();
-          main.cmdQueue.addCmd(cmd, files, currentDir);
-        }
-        */
       } else {
         console.writeError("no association found for extension ." + ext);
       }
@@ -288,10 +270,13 @@ public class FcmdExecuter
       ExtCmd extensionCmd = extCmds.get(ext);
       if(extensionCmd !=null){
         widgSelectExec.clearTable();
+        GralTable<CmdBlock>.TableLineData firstLine = null;
         for(CmdBlock block: extensionCmd.listCmd){
-          GralTable.TableLineData line = widgSelectExec.insertLine(block.name, 0, null, block);
+          GralTable<CmdBlock>.TableLineData line = widgSelectExec.insertLine(block.name, -1, null, block);
+          if(firstLine == null) { firstLine = line; }
           line.setCellText(block.title, 0);
         }
+        widgSelectExec.setCurrentLine(firstLine, 0, 0); //set the first line to position 0.
         //windConfirmExec.setWindowVisible(true);
         windConfirmExec.setFocus();
         

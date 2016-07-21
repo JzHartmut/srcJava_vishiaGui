@@ -123,7 +123,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   }
 
 
-  @Override public void setToPanel(){
+  @Override public void createImplWidget_Gthread(){
     throw new IllegalArgumentException("TODO, new concept is not implemented yet.");
   }
 

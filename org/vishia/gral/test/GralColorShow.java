@@ -963,28 +963,28 @@ public class GralColorShow
         String text = ls.lName; //String.format("%s %1.1f,%1.1f", ls.lName, ls.light, ls.sat);
         gralMng.setPosition(6+3*ixRow, GralPos.size -2, 0, GralPos.size+2, 0, 'd', 0);
         GralLabel label = new GralLabel(null, text,0);
-        label.setToPanel();
+        label.createImplWidget_Gthread();
       }
       for(int ixCol=0; ixCol<colHue.length; ++ixCol) { //the column, for horizontal
         String nameShow;
         nameShow = colHue[ixCol].colorName;
         gralMng.setPosition(2.5f, GralPos.size -2, 4*ixCol +3, GralPos.size+4, 0, 'd', 0);
         GralLabel label = new GralLabel(null, nameShow,0);
-        label.setToPanel();
+        label.createImplWidget_Gthread();
       }
       gralMng.setPosition(2.5f, GralPos.size -2, 4 + 4 * colHue.length, GralPos.size+4, 0, 'r', 0);
       for(int ixCol=0; ixCol<namesGray[0].length; ++ixCol) { //the column, for horizontal
         String nameShow;
         nameShow = namesGray[0][ixCol];
         GralLabel label = new GralLabel(null, nameShow,0);
-        label.setToPanel();
+        label.createImplWidget_Gthread();
       }
       gralMng.setPosition(5.5f + 3* gray1Sat.length , GralPos.size -2, 4 + 4 * colHue.length, GralPos.size+4, 0, 'r', 0);
       for(int ixCol=0; ixCol<namesGray[1].length; ++ixCol) { //the column, for horizontal
         String nameShow;
         nameShow = namesGray[1][ixCol];
         GralLabel label = new GralLabel(null, nameShow,0);
-        label.setToPanel();
+        label.createImplWidget_Gthread();
       }
       for(int ixRow = 0; ixRow < colorF.length; ++ixRow){ //cells in columns, vertical
         
@@ -1003,7 +1003,7 @@ public class GralColorShow
             colorF1 = createColorField(ixRow, ixCol, colorV2);
             //colorF1 = colorF[ixRow][ixCol];
             if(colorF1 !=null) {
-              colorF1.wdgColor.setToPanel();
+              colorF1.wdgColor.createImplWidget_Gthread();
               colorF1.bActive = true;
               colorF1.wdgColor.setTextColor(colText);
               if(colorF1.co.usualNames() !=null && colorF1.co.usualNames().length() >0) {
@@ -1093,7 +1093,7 @@ public class GralColorShow
           colorF1 = createColorField(ixRow, ixCol, colorV1);
           //colorF1 = colorF[ixRow][ixCol];
           if(colorF1 !=null) {
-            colorF1.wdgColor.setToPanel();
+            colorF1.wdgColor.createImplWidget_Gthread();
             colorF1.bActive = true;
             if(colorF1.co.usualNames() !=null && colorF1.co.usualNames().length() >0) {
               colorF1.wdgColor.setText("x");

@@ -1,17 +1,23 @@
 package org.vishia.gral.test;
 
 import org.vishia.gral.awt.AwtFactory;
+import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralFactory;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.swt.SwtFactory;
 import org.vishia.gral.widget.GralLabel;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.Debugutil;
+import org.vishia.util.KeyCode;
+
+import com.sun.xml.internal.ws.addressing.model.ActionNotSupportedException;
 
 /*Test with jzcmd: call jzcmd with this java file with its full path:
 D:/vishia/Java/srcJava_vishiaGui/org/vishia/gral/test/HelloWorld.java
@@ -25,8 +31,20 @@ public class HelloWorld
 {
   GralMng gralMng;
   
+  String[] helloText = { "hello user", "hello world"};
+  
+  GralUserAction actionTestButton = new GralUserAction("TestButton") { 
+    @Override public boolean exec(int key, GralWidget_ifc widgi, Object...args) {
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)) {
+        widgHelloText.setText("hello again");
+      }
+      return true;
+    }
+  };  
+  
   GralWindow window = new GralWindow("0+30, 0+50", "HelloWorldWind", "Simple Hello World application", GralWindow.windResizeable + GralWindow.windHasMenu);
-  GralLabel helloText = new GralLabel("3-2,2+5", "HelloLabel", "Hello User", 0);
+  GralLabel widgHelloText = new GralLabel("3-2,2+5", "HelloLabel", helloText[0], 0);
+  GralButton widgButton = new GralButton("7-3,10+12", "TestButton", "press me", actionTestButton);
   
   
   public static void main(String[] args){
@@ -36,49 +54,26 @@ public class HelloWorld
       sTypeOfImplementation = args[0];
     }
     main.createWindow(sTypeOfImplementation);
-    waitForClosePrimaryWindow();
+    main.doSomethinginMainthreadTillClosePrimaryWindow();
+  }
+  
+  private void createWindow(String awtOrSwt){
+    LogMessage log = new LogMessageStream(System.out);
+    GralGraphicThread gthread = GralFactory.createGraphic(window, 'C', log, awtOrSwt);
   }
   
   
-  public static void openWindow(){
-    HelloWorld main = new HelloWorld();
-    main.createWindow("AWT");
-  }
-
   
-  public static void waitForClosePrimaryWindow()
-  {
+  public void doSomethinginMainthreadTillClosePrimaryWindow()
+  { int ix = 0;
     while(GralMng.get().gralDevice.isRunning()){
-      try{ Thread.sleep(100);} 
-      catch (InterruptedException e)
-      { //dialogZbnfConfigurator.terminate();
-      }
+      try{ Thread.sleep(1000);} 
+      catch (InterruptedException e) { }
+      if(++ix >= helloText.length) { ix = 0; }
+      widgHelloText.setText(helloText[ix]);
     }
     
   }
   
-  
-  private void createWindow(String awtOrSwt){
-    //GralFactory gralFactory = new AwtFactory();
-    LogMessage log = new LogMessageStream(System.out);
-    //String sPosition = "0+30, 0+50";
-    //String sPosition = "0..-1, 0..-1";
-    
-    GralGraphicThread gthread = GralFactory.createGraphic(window, 'C', log, awtOrSwt);
-    //gthread.addDispatchOrder(initGraphic);
-    //initGraphic.awaitExecution(1, 0);
-  }
-  
-  
-  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic"){
-    @Override public void executeOrder()
-    { GralMng gralMng = GralMng.get();
-      gralMng.selectPanel(window);
-      gralMng.setPosition(4, 6, 2, -2, 0, 'd');
-      gralMng.addText("Hello World");
-      //
-      //GralTextField input = new GralTextField();
-  } };
-  
-  
+
 }

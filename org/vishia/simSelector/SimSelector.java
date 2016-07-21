@@ -270,10 +270,10 @@ public class SimSelector
     { 
       // gralMng.selectPanel(window);
       gralMng.setPosition(2, 5, 2, 19, 0, 'r', 2);
-      btnReadConfig.setToPanel();
-      btnCleanOut.setToPanel();
-      btnGenSim.setToPanel();
-      btnGenTestcase.setToPanel();
+      btnReadConfig.createImplWidget_Gthread();
+      btnCleanOut.createImplWidget_Gthread();
+      btnGenSim.createImplWidget_Gthread();
+      btnGenTestcase.createImplWidget_Gthread();
       gralMng.setPosition(6, 8, 60, 79, 0, 'd');
       wdgSelects = gralMng.addTextField("test", true, null, "r");
       wdgSelects.setText("t");
@@ -283,11 +283,11 @@ public class SimSelector
         int ytable = iTable /3;
         gralMng.setPosition(21*ytable + 10, 21*ytable + 30, xtable * 30, xtable * 30 +30, 0, 'd');
         
-        wdgTables[iTable].setToPanel();
+        wdgTables[iTable].createImplWidget_Gthread();
         wdgTables[iTable]._wdgImpl.repaintGthread();
       }
       gralMng.setPosition(52, 0, 0, 0, 0, 'U');
-      output.setToPanel();
+      output.createImplWidget_Gthread();
       
       System.setOut(new PrintStreamAdapter("", output));
       System.setErr(new PrintStreamAdapter("", output));

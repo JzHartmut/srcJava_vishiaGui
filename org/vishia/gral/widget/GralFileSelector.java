@@ -648,7 +648,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
    * @param size Presentation size. It is a character 'A'..'E', where 'A' is a small size. The size determines
    *        the font size especially. 
    */
-  public void setToPanel() //GralMngBuild_ifc panelMng)
+  public void createImplWidget_Gthread() //GralMngBuild_ifc panelMng)
   { GralMng panelMng = GralMng.get();
     //The macro widget consists of more as one widget. Position the inner widgets:
     GralPos posAll = panelMng.getPositionInPanel();
@@ -663,7 +663,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     menuFolder.addMenuItemGthread("x", "refresh [cR]", actionRefreshFileTable);
     panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
     widgBtnFavor = new GralButton(null, "favor", actionFavorButton);
-    widgBtnFavor.setToPanel();
+    widgBtnFavor.createImplWidget_Gthread();
     widgBtnFavor.setVisible(false);
     //the list
     //on same position as favor table: the file list.

@@ -90,7 +90,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
 
 
-  @Override public void setToPanel(GralWidget widgg){
+  @Override public void createImplWidget_Gthread(GralWidget widgg){
     if(widgg instanceof GralLabel){
       new AwtLabel((GralLabel)widgg, this);
     } else if(widgg instanceof GralTextField){
@@ -419,10 +419,15 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
    */
   GralRectangle calcPositionOfWindow(GralPos posWindow)
   {
-    Object awtWidg = posWindow.panel.getWidgetImplementation();
-    Window parentFrame = (Frame)awtWidg; //((SwtPanel)(swtWidg)).panelComposite; //(Control)posWindow.panel.getPanelImpl();
-    Point loc;
-    GralRectangle windowFrame = getPixelUseableAreaOfWindow(posWindow.panel);
+    final GralRectangle windowFrame;
+    if(posWindow.panel !=null) {
+      Object awtWidg = posWindow.panel.getWidgetImplementation();
+      Window parentFrame = (Frame)awtWidg; //((SwtPanel)(swtWidg)).panelComposite; //(Control)posWindow.panel.getPanelImpl();
+      Point loc;
+      windowFrame = getPixelUseableAreaOfWindow(posWindow.panel);
+    } else {
+      windowFrame = new GralRectangle(0,0,800,600);
+    }
     int dxFrame = 400, dyFrame = 300;  //need if posWindow has coordinates from right or in percent
     Rectangle rectParent = null;
     /*

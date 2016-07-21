@@ -132,7 +132,7 @@ public class GralCfgBuilder
         if(cfgPanel.windTitle !=null) {
           Debugutil.stop();
           GralWindow wind = new GralWindow(cfgPanel.windPos, cfgPanel.name, cfgPanel.windTitle, GralWindow.windOnTop | GralWindow.windResizeable);
-          wind.setToPanel();
+          wind.createImplWidget_Gthread();
         }
         else {
           //A tab in the main window

@@ -297,7 +297,7 @@ public class GralGraphicThread implements Runnable
   { impl.initGraphic();
     //add important properties for the main window, the user should not thing about.
     impl.mainWindow.windProps |= GralWindow.windIsMain | GralWindow.windRemoveOnClose | GralWindow.windHasMenu;
-    impl.mainWindow.setToPanel();
+    impl.mainWindow.createImplWidget_Gthread();
     impl.mainWindow.setWindowVisible( true ); 
     GralPos pos = impl.mainWindow.pos();
     if(pos.x.p2 == 0 && pos.y.p2 == 0){

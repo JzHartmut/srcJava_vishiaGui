@@ -174,7 +174,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
-   * <li>2016-07-03 Hartmut chg: {@link #setToPanel()}: If the _wdgImpl is initialized already, this method does nothing. Before: Exception
+   * <li>2016-07-20 Hartmut chg: invocation of registerWidget one time after its position is known. Either it is in the ctor of GralWidget 
+   *   or it is in the ctor of {@link GralWidget.ImplAccess} if the position was assigned later in the graphic thread.
+   * <li>2016-07-20 Hartmut chg: instead setToPanel now {@link #createImplWidget_Gthread()}. It is a better name. 
+   * <li>2016-07-03 Hartmut chg: {@link #createImplWidget_Gthread()}: If the _wdgImpl is initialized already, this method does nothing. Before: Exception
    * <li>2016-07-03 Hartmut refact: actionChange: Now the {@link GralWidget_ifc.ActionChange} describes the action class and arguments.
    *   {@link ConfigData#actionChange1} refers the only one change action, or {@link ConfigData#actionChangeSelect} contains more as one change action.
    *   {@link #setActionChange(String, GralUserAction, String[], org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen...)} sets the only one or special actions,
@@ -211,7 +214,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * <li>2013-12-21 Hartmut chg: {@link ImplAccess#setDragEnable(int)} and setDropEnable moved from the core class.
    *   It is adapt after change {@link GralTextField}. 
    * <li>2013-12-21 Hartmut new: {@link #setToPanel(GralMngBuild_ifc)} is final now and invokes 
-   *   {@link GralMngBuild_ifc#setToPanel(GralWidget)}. That method handles all widget types. 
+   *   {@link GralMngBuild_ifc#createImplWidget_Gthread(GralWidget)}. That method handles all widget types. 
    * <li>2013-11-11 Hartmut new: {@link #refreshFromVariable(VariableContainer_ifc, long, GralColor, GralColor)}
    *   which shows old values grayed. 
    * <li>2013-11-11 Hartmut chg: {@link #setFocus()} searches the {@link GralTabbedPanel} where the widget is
@@ -746,14 +749,14 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * of a panel, only new widgets are initialized with them. 
    * @before 2016-07 it has thrown an exception on repeated invocation.
    */
-  @Override public void setToPanel() throws IllegalStateException {
+  @Override public void createImplWidget_Gthread() throws IllegalStateException {
     if(_wdgImpl ==null){ // throw new IllegalStateException("setToPanel faulty call - GralTable;");
       GralMng mngg = GralMng.get();  //The implementation should be instantiated already!
       if(dyda.textFont == null) { //maybe set with knowledge of the GralMng before.
         dyda.textFont = mngg.propertiesGui.getTextFont(mngg.pos().pos.height());
         dyda.setChanged(ImplAccess.chgFont);
       }
-      mngg.setToPanel(this);
+      mngg.createImplWidget_Gthread(this);
     }
   }
 
@@ -762,7 +765,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   /* (non-Javadoc)
    * @see org.vishia.gral.ifc.GralWidget_ifc#setToPanel(org.vishia.gral.ifc.GralMngBuild_ifc)
    */
-  @Override @Deprecated public final void setToPanel(GralMngBuild_ifc mngUnused) throws IllegalStateException { setToPanel(); }
+  @Override @Deprecated public final void setToPanel(GralMngBuild_ifc mngUnused) throws IllegalStateException { createImplWidget_Gthread(); }
 
   
   public GralPos pos(){ return _wdgPos; } 
@@ -1745,20 +1748,15 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   
-  /**Registers a widget in its panel and, if it has a name, in the name management of the GralMng.
-   * It invokes {@link GralMng#registerWidget(GralWidget)}.
-   */
-  public void register(){
-    itsMng.registerWidget(this);
-  }
-  
   /**Removes the widget from the lists in its panel and from the graphical representation.
    * It calls the protected {@link #removeWidgetImplementation()} which is implemented in the adaption.
    */
   @Override public boolean remove()
   {
     if(_wdgImpl !=null) _wdgImpl.removeWidgetImplementation();
-    _wdgPos.panel.removeWidget(this);
+    if(_wdgPos.panel !=null) {
+      _wdgPos.panel.removeWidget(this);
+    }
     itsMng.deregisterWidgetName(this);
     return true;
   }
@@ -1811,16 +1809,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     public GralRectangle pixBounds;
     
     @Deprecated protected ImplAccess(GralWidget widgg, GralMng mng){
-      this.widgg = widgg;
-      widgg.itsMng = mng;
-      widgg._wdgImpl = this; 
-      if(widgg._wdgPos ==null) {
-        widgg._wdgPos = widgg.itsMng.getPosCheckNext();
-      }
-      //else: The position was given by construction already.
-      //set the position now, because it is given yet.
-      widgg.registerWidget();  //always clone it from the central pos 
-      // Note: widgg.posWidg.panel.getWidgetImplementation() ==null yet because it will be initialize after super(widgg); 
+      this(widgg);
     }
     
     
@@ -1835,11 +1824,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       widgg._wdgImpl = this; 
       if(widgg._wdgPos ==null) {
         widgg._wdgPos = widgg.itsMng.getPosCheckNext();
+        widgg.registerWidget(); //yet now because before the panel was unknown
       }
-      //else: The position was given by construction already.
-      //set the position now, because it is given yet.
-      widgg.registerWidget();  //always clone it from the central pos 
-      // Note: widgg.posWidg.panel.getWidgetImplementation() ==null yet because it will be initialize after super(widgg); 
     }
     
     
@@ -1972,7 +1958,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   final public void setVisibleStateWidget(boolean visible){
     bVisibleState = visible;
-    System.out.println((visible? "GralWidget set visible: " : "GralWidget set invisible: @") + _wdgPos.panel.name + ":" + toString());
+    String name = _wdgPos.panel == null ? "main window" : _wdgPos.panel.name;
+    System.out.println((visible? "GralWidget set visible: " : "GralWidget set invisible: @") + name + ":" + toString());
     lastTimeSetVisible = System.currentTimeMillis();
   }
 

@@ -59,7 +59,8 @@ public interface GralWidget_ifc extends Removeable
   
   /**Version, history and license.
    * <ul>
-   * <li>2015-10-11 Hartmut new: {@link #setToPanel()} without mng as parameter.
+   * <li>2016-07-20 Hartmut chg: instead setToPanel now {@link #createImplWidget_Gthread()}. It is a better name. 
+   * <li>2015-10-11 Hartmut new: {@link #createImplWidget_Gthread()} without mng as parameter.
    * <li>2015-09-12 Hartmut new: {@link #getData()}, {@link #setData(Object)} was existent as {@link GralWidget#setContentInfo(Object)},
    *   now explicit property of any widget. 
    * <li>2015-07-12 Hartmut new: {@link #setCmd(String)} and {@link #getCmd()} is present in {@link org.vishia.gral.base.GralWidget}
@@ -177,8 +178,8 @@ public interface GralWidget_ifc extends Removeable
   /**Sets this widget to the current panel at the current given position. 
    * This routine should be called only one time after the Gral widget was created. 
    * It creates the graphical appearance using the capabilities of the derived GralMng for the systems graphic level.
-   * This method invokes {@link GralMng#setToPanel(GralWidget)} which tests the type of the derived GralWidget
-   * to create the correct graphical widget. That method calls the implementing specific {@link GralMng.ImplAccess#setToPanel(GralWidget)}
+   * This method invokes {@link GralMng#createImplWidget_Gthread(GralWidget)} which tests the type of the derived GralWidget
+   * to create the correct graphical widget. That method calls the implementing specific {@link GralMng.ImplAccess#createImplWidget_Gthread(GralWidget)}
    * which knows the implementation graphic. 
    * <br><br><b>Instance structure</b><br>
    * The implementation of a widget is firstly a class which is inherit from {@link ImplAccess}. With them the {@link GralWidget}
@@ -201,9 +202,9 @@ public interface GralWidget_ifc extends Removeable
    *   existing. It is one time after startup or more as one time if {@link #removeWidgetImplementation()}
    *   was called. 
    */
-  void setToPanel();
+  void createImplWidget_Gthread();
   
-  /**Deprecated. Use {@link #setToPanel()}.
+  /**Deprecated. Use {@link #createImplWidget_Gthread()}.
    * @param mng not used. It is known as singleton. Use null as argument.
    */
   void setToPanel(GralMngBuild_ifc mng);

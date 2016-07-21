@@ -186,12 +186,12 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
 	
 	
 	
-  /**Overridden implementation of {@link GralWidget#setToPanel()} for instantiation of all widgets of this panel.
+  /**Overridden implementation of {@link GralWidget#createImplWidget_Gthread()} for instantiation of all widgets of this panel.
    */
-  @Override public void setToPanel() throws IllegalStateException {
-    super.setToPanel(); //from GralWidget.
+  @Override public void createImplWidget_Gthread() throws IllegalStateException {
+    super.createImplWidget_Gthread(); //from GralWidget.
     for(GralWidget widg: widgetList) {
-      widg.setToPanel();
+      widg.createImplWidget_Gthread();
     }
   }	
 	

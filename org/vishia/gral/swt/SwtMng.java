@@ -109,7 +109,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	/**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
 	 * Changes:
 	 * <ul>
-   * <li>2013-12-21 Hartmut new: {@link #setToPanel(GralWidget)} instanciates all widget types. 
+   * <li>2013-12-21 Hartmut new: {@link #createImplWidget_Gthread(GralWidget)} instanciates all widget types. 
 	 * <li>2012-07-13 Hartmut chg: {@link #resizeWidget(GralWidget, int, int)} can work with more as one widget implementation.
 	 *   But it isn't test and used yet. Size of any implementation widget?
 	 * <li>2012-03-17 Hartmut chg: some changes for {@link #setPosAndSizeSwt(Control, int, int)} etc.
@@ -337,7 +337,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   private Composite getCurrentPanel(GralWidget widgg){ return ((Composite)widgg.pos().panel.getWidgetImplementation()); }
   
   
-  @Override public void setToPanel(GralWidget widgg){
+  @Override public void createImplWidget_Gthread(GralWidget widgg){
     if(widgg instanceof GralHtmlBox) {  //NOTE: before GralTextField because a GralTextBox is a GralTextField (derived)
       SwtHtmlBox.createHtmlBox((GralHtmlBox)widgg, this);  //This may be the best variant.
     } else if(widgg instanceof GralTextBox) {  //NOTE: before GralTextField because a GralTextBox is a GralTextField (derived)
@@ -453,12 +453,21 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    */
   GralRectangle calcPositionOfWindow(GralPos posWindow)
   {
-    Object swtWidg = posWindow.panel.getWidgetImplementation();
-    Control parentFrame = (Control)swtWidg; //((SwtPanel)(swtWidg)).panelComposite; //(Control)posWindow.panel.getPanelImpl();
-    Point loc;
-    Shell window = parentFrame.getShell();
-    int x = 6;
-    GralRectangle windowFrame = getPixelUseableAreaOfWindow(posWindow.panel);
+    final GralRectangle windowFrame;
+    Control parentFrame;
+    final Shell window;
+    if(posWindow.panel !=null) {
+      Object swtWidg = posWindow.panel.getWidgetImplementation();
+      parentFrame = (Control)swtWidg; //((SwtPanel)(swtWidg)).panelComposite; //(Control)posWindow.panel.getPanelImpl();
+      Point loc;
+      window = parentFrame.getShell();
+      int x = 6;
+      windowFrame = getPixelUseableAreaOfWindow(posWindow.panel);
+    } else {
+      windowFrame = new GralRectangle(0,0,800,600);
+      parentFrame = null;
+      window = null;
+    }
     int dxFrame, dyFrame;  //need if posWindow has coordinates from right or in percent
     Rectangle rectParent;
     if(parentFrame == window){

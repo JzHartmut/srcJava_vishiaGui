@@ -80,6 +80,7 @@ public interface GralMngBuild_ifc extends ReplaceAlias_ifc
   
   /**The version of this interface:
    * <ul>
+   * <li>2016-07-20 Hartmut chg: instead setToPanel now {@link #createImplWidget_Gthread()}. It is a better name. 
    * <li>2012-04-01 Hartmut new: {@link #addDataReplace(Map)}, {@link #replaceDataPathPrefix(String)}.
    *   using alias in the {@link GralWidget#setDataPath(String)}. The resolving of the alias is done
    *   only if the datapath is used. 
@@ -476,7 +477,7 @@ public interface GralMngBuild_ifc extends ReplaceAlias_ifc
    * for the implementation graphic in the implementation level of the {@link GralMng}.
    * @param widgg The widget should be initialized already.
    */
-  void setToPanel(GralWidget widgg);
+  void createImplWidget_Gthread(GralWidget widgg);
 
   /**Adds a text to the current panel at given position with standard colors, left origin.
    * The size of text is calculated using the height of positioning values.
