@@ -1036,7 +1036,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * It is possible to change keys, to disable the event handling and to call special routines.
    * Yet not used.
    */
-  Listener mainKeyListener = new Listener(){
+  Listener XXXX_mainKeyListener = new Listener(){
     @Override public void handleEvent(Event event) {
       // TODO Auto-generated method stub
       if(userMainKeyAction() !=null 

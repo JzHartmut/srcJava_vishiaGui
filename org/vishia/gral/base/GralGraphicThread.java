@@ -118,7 +118,7 @@ public class GralGraphicThread implements Runnable
   
   /**Version and history.
    * <ul>
-   * <li>
+   * <li>2016-07-16 Hartmut chg: The main window will be created with same methods like all other windows. 
    * <li>2015-01-17 Hartmut chg: Now it is an own instance able to create before the graphic is established.
    *   The graphical implementation extends the {@link ImplAccess}. 
    * <li>2012-04-20 Hartmut bugfix: If a {@link GralGraphicTimeOrder} throws an exception,
@@ -413,6 +413,12 @@ public class GralGraphicThread implements Runnable
 
     }
     
+
+    protected void startThread() {
+      threadGuiDispatch.start();
+      gralGraphicThread.waitForStart();
+   }
+
     
     public GralGraphicThread gralGraphicThread(){ return gralGraphicThread; }
     

@@ -54,7 +54,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   
   final AwtProperties propertiesGuiAwt; 
   
-  final Frame mainWindowAwt;
+  //final Frame mainWindowAwt;
   
   
   /**The standard listener or action for mouse events, able to assign to all widgets which does not need an extra mouse behaviour. */
@@ -67,14 +67,14 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public AwtWidgetMng(Frame window, AwtProperties propertiesGui
+  public AwtWidgetMng(AwtProperties propertiesGui
     //, VariableContainer_ifc variableContainer
     , LogMessage log
     )
   { super(GralMng.get(), propertiesGui);
-    mainWindowAwt = window;
+    //mainWindowAwt = window;
     this.propertiesGuiAwt = propertiesGui;
-    mainWindowAwt.addKeyListener(mainKeyListener);
+    //mainWindowAwt.addKeyListener(mainKeyListener);
   }
 
   
@@ -401,7 +401,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
   
   @Override public void createSubWindow(GralWindow windowGral){
-    AwtSubWindow windowSwt = new AwtSubWindow(windowGral, false);
+    AwtSubWindow windowSwt = new AwtSubWindow(windowGral);
     //new SwtSubWindow(name, swtDevice.displaySwt, title, windProps, this);
     GralRectangle rect = calcPositionOfWindow(windowGral.pos());
     windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
@@ -681,7 +681,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   
 
 
-  KeyListener mainKeyListener = new KeyListener(){
+  KeyListener XXXXX_mainKeyListener = new KeyListener(){
 
     @Override
     public void keyPressed(KeyEvent e) {

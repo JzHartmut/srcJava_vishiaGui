@@ -816,7 +816,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   /**Selects the given panel as current panel to build some content. */
   @Override public void selectPanel(GralPanelContent panel) {
     pos().pos.panel = panel;
-    sCurrPanel = panel.name;
+    sCurrPanel = panel == null ? null: panel.name;
     setPosition(0,0,0,0,0,'d');  //set the position to default, full panel because the panel was selected newly.
   }
   
@@ -2055,6 +2055,14 @@ public GralButton addCheckButton(
     // TODO Auto-generated method stub
     return impl.remove(compositeBox);
   }
+
+
+  /**Must only invoke from the Main window close listener. */
+  public static void closeGral() {
+    singleton.gralDevice.bExit = true; 
+  }
+  
+
 
   @Override @Deprecated public GralWindow createWindow(String name, String title, int windProps)
   { GralPos pos = pos().pos;  //without clone.

@@ -95,7 +95,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
 
   /**Or of some wind... constants.
    */
-  final int windProps;  
+  int windProps;  
   
   /**This action is called whenever the window is resized by user handling on GUI
    * and the window is determined as {@link GralWindow_ifc#windResizeable}.

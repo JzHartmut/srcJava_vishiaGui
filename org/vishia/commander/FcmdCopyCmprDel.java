@@ -960,7 +960,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
           //widgButtonMove.setValue(GralMng_ifc.cmdSet, 0, 0);
           zFiles = 0; zBytes = 0;
         }
-        windConfirmCopy.setVisible(true);
+        windConfirmCopy.setFocus();
         //main.gralMng.setWindowsVisible(windConfirmCopy, posWindConfirmCopy);
         main.gui.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".");
       }

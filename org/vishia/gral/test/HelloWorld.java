@@ -11,6 +11,7 @@ import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.swt.SwtFactory;
+import org.vishia.gral.widget.GralLabel;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.Debugutil;
@@ -59,15 +60,6 @@ public class HelloWorld
   private void createWindow(String awtOrSwt){
     LogMessage log = new LogMessageStream(System.out);
     GralGraphicThread gthread = GralFactory.createGraphic(window, 'C', log, awtOrSwt);
-/* ???
-    String sPosition = "0+30, 0+50";
-    //String sPosition = "0..-1, 0..-1";
-    
-    window = new GralWindow(sPosition, "HelloWorldWind", "Simple Hello World application", GralWindow.windResizeable);
-    GralGraphicThread gthread = GralFactory.createGraphic(window, 'C', log, awtOrSwt);
-    gthread.addDispatchOrder(initGraphic);
-    initGraphic.awaitExecution(1, 0);
->>>>>>> hist1 */
   }
   
   

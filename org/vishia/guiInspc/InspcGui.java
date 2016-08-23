@@ -316,10 +316,12 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
           checkWidgetsToRefresh((GralPanelContent) widget, time, timeAtleast, recursiveCnt +1);
         } else {
           try{
-            String sShowMethod;
-            if((sShowMethod = widget.getShowMethod()) ==null || !sShowMethod.equals("stc_cmd")){
-              widget.refreshFromVariable(inspcMng, timeAtleast, colorRefreshed, colorOldValue);
-              widget.requestNewValueForVariable(time);
+            if(widget.getDataPath() !=null) {
+              String sShowMethod;
+              if((sShowMethod = widget.getShowMethod()) ==null || !sShowMethod.equals("stc_cmd")){
+                widget.refreshFromVariable(inspcMng, timeAtleast, colorRefreshed, colorOldValue);
+                widget.requestNewValueForVariable(time);
+              }
             }
           }catch(Exception exc){
             System.err.println("InspcGui-receivedData-widget; " + exc.getMessage());   

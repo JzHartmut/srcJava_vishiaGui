@@ -745,6 +745,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Standard implementation of  @see org.vishia.gral.ifc.GralWidget_ifc#setToPanel()
    * Only large widgets (contains more as one GralWidget) should override this method.
+   * If the _wdgImpl is initialized already, this method does nothing. It is possible to invoke this for all existing widgets
+   * of a panel, only new widgets are initialized with them. 
+   * @before 2016-07 it has thrown an exception on repeated invocation.
    */
   @Override public void createImplWidget_Gthread() throws IllegalStateException {
     if(_wdgImpl ==null){ // throw new IllegalStateException("setToPanel faulty call - GralTable;");
@@ -755,7 +758,6 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       }
       mngg.createImplWidget_Gthread(this);
     }
-    mngg.setToPanel(this);
   }
 
   

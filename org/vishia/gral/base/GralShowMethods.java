@@ -1,11 +1,14 @@
 package org.vishia.gral.base;
 
+import java.io.File;
+
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Java4C;
 
@@ -215,6 +218,38 @@ public class GralShowMethods
   
   
   
+  /**This userAction can be used by name (calling {@link #addFocusAction(String, GralUserAction, String, String)} 
+   * to set a variable when an input field is leaved.
+   */
+  public final GralUserAction action_openHelp = new GralUserAction("openHtml")
+  { /**Writes the value to the named variable on leaving the focus.
+     * The name of the variable is contained in the {@link GralWidget}.
+     * @see org.vishia.gral.ifc.GralUserAction#userActionGui(java.lang.String, org.vishia.gral.base.GralWidget, java.lang.Object[])
+     */
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgi, Object... params)
+    {
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode) || actionCode == KeyCode.mouse1Double) {
+        GralWidget widg = (GralWidget)widgi;
+        String path = (params.length >=1 && (params[0] instanceof String)) ? (String)params[0] : widg.sCmd;  //sCmd for buttons
+        File fileCurrdir = new File(".").getAbsoluteFile();
+        String sDir = System.getProperty("pwd");
+        String path2 = fileCurrdir.getAbsolutePath() + "/" + path;
+        GralMng mng = GralMng.get();
+        GralInfoBox windhelp= mng.infoHelp;
+        windhelp.activate();
+        windhelp.setUrl(path2);
+        //GralPanelContent panelWind = mng.getPanel("help");
+        //if(panelWind !=null) { panelWind.setFocus(); }
+        //else { System.err.println("action_openWindow: window not found: help"); }
+      }
+      return true;
+    }
+  };
+
+  
+  
+  
+  
   
   
   
@@ -224,6 +259,7 @@ public class GralShowMethods
     mng.registerUserAction("syncVariableOnFocus", this.syncVariableOnFocus);
     mng.registerUserAction("setBar", this.setBar);
     mng.registerUserAction("openWindow", action_openWindow);
+    mng.registerUserAction("openHelp", action_openHelp);
 
   }
   

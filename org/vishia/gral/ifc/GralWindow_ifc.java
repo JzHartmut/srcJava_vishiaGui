@@ -76,6 +76,8 @@ public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc, Gr
   
   public static final int windHasMenu =  1 << 31;
   
+  static final int windIsMain =  1 ;
+  
   
   /**Sets an action which is invoked if the whole window is resized by user handling on the window borders.
    * @param action The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called

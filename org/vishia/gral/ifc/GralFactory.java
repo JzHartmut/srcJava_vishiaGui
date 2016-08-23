@@ -15,6 +15,8 @@ public abstract class GralFactory
 
   /**Version, history and license.
    * <ul>
+   * <li>2016-07-16 Hartmut new: {@link #createGraphic(GralWindow, char, LogMessage, String)} as non abstract static method
+   *   creates the graphic, for several implementation platforms by "AWT", "SWT" or special factory class.
    * <li>2015-05-01 Hartmut now a abstract class instead interface.
    * <li>2011-06-00 Hartmut created
    * </ul>
@@ -109,6 +111,8 @@ public abstract class GralFactory
   
   
   public static GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, LogMessage log, String implementor) { 
+    GralMng mng = GralMng.get();
+    mng.setPrimaryWindow(windowg); //checks whether called firstly.
     GralGraphicThread gralThread = null;
     final String sNameFactoryClass;
     if(implementor.equals("SWT")) { sNameFactoryClass = "org.vishia.gral.swt.SwtFactory"; }
@@ -120,14 +124,26 @@ public abstract class GralFactory
       Class<?> classfactory = Class.forName(sNameFactoryClass);
       Object oFactory = classfactory.newInstance();
       factory = (GralFactory)oFactory;           //Exception if faulty type.
-      gralThread = factory.createGraphic(windowg, sizeShow, log);
     }catch(Exception exc){
       String sError = "class not found or faulty: " + sNameFactoryClass;
       System.err.println(sError);
       throw new RuntimeException(sError, exc);
     }
+    try {
+      gralThread = factory.createGraphic(windowg, sizeShow, log);
+    } catch(Exception exc) {
+      String sError = "Exception initializing graphic: " + exc.getMessage();
+      System.err.println(sError);
+      throw new RuntimeException(sError, exc);
+    }
     return gralThread;
   }
+  
+  
+  
+  
+  
+  
   
   
 }
