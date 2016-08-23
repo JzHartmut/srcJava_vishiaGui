@@ -43,7 +43,7 @@ public class SwtValueBar extends GralValueBar.GraphicImplAccess // implements Gr
     this.widgetSwt = this.new BarWidget();
 		this.widgetSwt.setData(this);
 		this.widgetSwt.setBackground(mng.propertiesGuiSwt.colorBackgroundSwt());
-		//Control xx = mng.currPanel.panelComposite;
+  	//Control xx = mng.currPanel.panelComposite;
 		black = mng.propertiesGuiSwt.colorSwt(0);
 		//white = mng.propertiesGui.color(0xffffff);
 		//colorValueOk = mng.propertiesGui.color(0xff4000);
@@ -161,7 +161,6 @@ public class SwtValueBar extends GralValueBar.GraphicImplAccess // implements Gr
 		BarWidget()
 		{
 			super(wdgh.mng.getCurrentPanel(), 0);  //Canvas
-			wdgh.widgetSwt = this;
 			addPaintListener(paintListener);	
 			
 		}

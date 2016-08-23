@@ -172,11 +172,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
       window.setMaximized(true);
     }    
     window.addShellListener(shellListener);
-    if((windProps & GralWindow.windIsMain)!=0) {
-      window.addDisposeListener(disposeListenerMainWindow);
-    } else {
-      window.addDisposeListener(disposeListener);
-    }
+    window.addDisposeListener(disposeListener);
     window.addFocusListener(mng.focusListener);
     //window.add
     if((windProps & GralWindow.windHasMenu) !=0){
@@ -303,15 +299,6 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     public void widgetDisposed(DisposeEvent e)
     {
       stop();
-    }
-  };
-  
-  
-  private final DisposeListener disposeListenerMainWindow = new DisposeListener(){
-    @Override
-    public void widgetDisposed(DisposeEvent e)
-    {
-      GralMng.closeGral();
     }
   };
   

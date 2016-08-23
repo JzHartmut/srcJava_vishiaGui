@@ -1,6 +1,5 @@
 package org.vishia.gral.base;
 
-import org.vishia.gral.ifc.GralWidget_ifc;
 
 /**This interface is implemented in the Widget adaption for the Gral level.
  * It should not be known by the user, except the user creates new widget types.
@@ -99,41 +98,5 @@ public interface GralMouseWidgetAction_ifc
    *   false if the mouse button up action should be prevented. The mouse is not accepted as pressed any more. 
    */
   boolean mouseMoved(int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel);
-  
-  
-  
-  /**Invoke the proper action for mouse events.
-   * This routine is used inside the graphic implementing mouse handlers.
-   * The action with the 'when' designation is searched. If found it is invoked with its own arguments
-   * and then with the mouse position in line and column grid values of the panel and a possible delta position.
-   * @param widgg The widget where the mouse handling is associated to
-   * @param keyCode The possible additional modifying key (ctrl, alt, sh) and the mouse key
-   * @param when which mouse action should be used.
-   * @param mouse_x The pixel position of the mouse inside the panel
-   * @param mouse_y
-   * @param dx An additional delta-position in pixel.
-   * @param dy
-   * @throws any exception which is catched in the mouse listener.
-   * NOTE: yet unused. Write a class with gral mouse adaption!
-   */
-  public static void executeActionForMouse(GralWidget widgg, int keyCode, GralWidget_ifc.ActionChangeWhen when, int mouse_x, int mouse_y, int dx, int dy) {
-    GralWidget_ifc.ActionChange action = widgg.getActionChangeStrict(when, true); 
-    if(action !=null){
-      //TODO: calc grid positions from pixel!
-      Object[] args = action.args();
-      if(args == null){ action.action().exec(keyCode, widgg, new Integer(mouse_x), new Integer(mouse_y), new Integer(dx), new Integer(dy)); }
-      else { 
-        //additional 2 arguments: copy in one args2.
-        Object[] args2 = new Object[args.length +4];
-        System.arraycopy(args, 0, args2, 0, args.length);
-        args2[args.length] = new Integer(mouse_y);
-        args2[args.length+1] = new Integer(mouse_x);
-        args2[args.length+2] = new Integer(dy);
-        args2[args.length+3] = new Integer(dx);
-        action.action().exec(keyCode, widgg, args2); 
-      }
-    }
-  }
-  
   
 }

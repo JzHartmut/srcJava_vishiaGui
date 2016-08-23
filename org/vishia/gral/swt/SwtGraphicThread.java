@@ -28,7 +28,6 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
 {
   /**Version, history and license.
    * <ul>
-   * <li>2016-07-16 Hartmut chg: The main window will be created with same methods like all other windows. 
    * <li>2015-01-17 Hartmut chg: Now {@link GralGraphicThread} is an own instance able to create before the graphic is established.
    *   This graphical implementation extends the {@link ImplAccess}. 
    * <li<2012-07-14 Hartmut chg: {@link #traverseKeyFilter} now excludes [ctrl-tab]. Only [tab] is a traversal key.
@@ -191,9 +190,10 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
   
   SwtGraphicThread(GralWindow windowGral, char sizeShow, LogMessage log)
   { super(sizeShow, windowGral, log);
-    startThread();
     //this.sTitle = sTitle; 
     //this.xPos = left; this.yPos = top; this.xSize = xSize; this.ySize = ySize; 
+    threadGuiDispatch.start();
+    gralGraphicThread.waitForStart();
   }
   
   
@@ -205,16 +205,12 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
    * @see org.vishia.gral.base.GralGraphicThread#initGraphic()
    */
   @Override protected void initGraphic(){
-    displaySwt = new Display();  //The organization class of the whole graphic independent of a concrete window.
+    displaySwt = new Display();
     displaySwt.addFilter(SWT.Close, windowsCloseListener);
     displaySwt.addFilter(SWT.Traverse, traverseKeyFilter);
     SwtProperties propertiesGui = new SwtProperties(this.displaySwt, sizeCharProperties);
     gralMng = new SwtMng(displaySwt, propertiesGui, log);
     
-  }
-
-  void XXX_Old_createWindow__(){
-  
     SwtSubWindow windSwt = new SwtSubWindow(gralMng, mainWindow);
     
     gralMng.mng.registerPanel(mainWindow);
@@ -256,8 +252,9 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
     //The PrimaryWindowSwt is a derivation of the GralPrimaryWindow. It is more as only a SWT Shell.
     //instance = new SwtPrimaryWindow(windowGral, gralMng, this, this.displaySwt);
     ///
-  
   }
+
+  
 
   
   @Override

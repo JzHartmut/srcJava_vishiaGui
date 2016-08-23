@@ -2056,14 +2056,6 @@ public GralButton addCheckButton(
     return impl.remove(compositeBox);
   }
 
-
-  /**Must only invoke from the Main window close listener. */
-  public static void closeGral() {
-    singleton.gralDevice.bExit = true; 
-  }
-  
-
-
   @Override @Deprecated public GralWindow createWindow(String name, String title, int windProps)
   { GralPos pos = pos().pos;  //without clone.
     String sPos = pos.posString(); 

@@ -25,14 +25,6 @@ public class GralLabel extends GralWidget
   }
   
   
-  public GralLabel(String pos, String sName, String sText, int origin)
-  {
-    super(pos,sName, 'S');
-    this.origin = origin;
-    super.setText(sText);
-  }
-  
-  
   public abstract class GraphicImplAccess extends GralWidget.ImplAccess
   implements GralWidgImpl_ifc
   {

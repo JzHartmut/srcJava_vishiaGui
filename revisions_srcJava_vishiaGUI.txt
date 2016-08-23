@@ -1,0 +1,2234 @@
+﻿2012-06-09 Hartmut
+------------------------------------------------------------
+Intension: Improve curve view
+* GralColor.getColor(String) now accepts a "0xhexa-Value" for a color name.
+If the color name does not match, a magenta color is returned. The method returns a color in any case.
+* GralCurveView and GralCurveView_ifc:  applySettings(String) and {@link #writeSettings(Appendable) 
+for saving and getting the configuration of curve view from a file or another text.
+* GralCurveViewTrack_ifc: setLineProperties(GralColor, int) instead setLineColor().
+* InspcCurveView: new Buttons for read and save the configuration (setting). Yet only a simple file is used.  TODO: File selection.
+------
+Component sources:
+new _bzrGetOtherCmpnVersions.bat and _bzrOtherCmpnVersions.txt to document which depending components are used.
+
+------------------------------------------------------------
+2012-05-28 Hartmut
+Intension: The.file.Commander: Fix the problem of showing the button window (all buttons, a few ...?) 
+* GralArea9Window: setMinMaxSizeArea(...): The size can be given with gral units, as min, max or absolute (min, max are equal). The size of a area border can be changed on runtime.
+* FcmdButtons.java, FcmdIdents.java: enhancement with shift-F1
+------------------------------------------------------------
+2012-05-27 Hartmut
+* GralPos and GralWidget moved from pkg ifc to pkg base.
+* Some fine adjustments
+------------------------------------------------------------
+2012-04-22 Hartmut
+Usage of GUI for profession
+* GralArea9MainCmd: parseArgumentsAndInitGraphic(String, String, int, int, int, int) for determination of display coordinates in the users application.
+* GralArea9MainCmd: Getting size arguments from main-args.
+* GralWindow_setifc: setFullScreen(...)
+* GralGraphicThread: bugfix: If a {@link GralDispatchCallbackWorker} throws an exception, it was started again because it was in the queue yet. The proplem occurs on build graphic. It was repeated till all graphic handles are consumed. Now the {@link #queueGraphicOrders} entries are deleted first, then executed. TODO use this class only for SWT, use the adequate given mechanism for AWT: java.awt.EventQueue.invokeAndWait(Runnable). use Runnable instead GralDispatchCallbackWorker.
+* GralPanelContent: element canvas as property maybe null for each panel to support stored graphics. See class GralCanvasStorage.
+* GralWidgetMng: addLine(GralColor, List) to add in a {@link GralCanvasStorage}. 
+* GralCfgData: new_Type().
+* GralCfgBuilder: some more elments
+* GralCanvasStorage: drawLine(GralPos, GralColor, List), improved {@link PaintOrder}-derivates.
+
+------------------------------------------------------------
+2012-04-17 Hartmut
+Usage of InspcGUI for profession:
+* GralTextField: sFormat2 etc: Now format "int16AngleDegree" etc. are recognized as special format. Improved calling calculator in setValue(float).
+* InspcGUI: UserInspcPlug, new: Parameter CallingArguments.bUseGetValueByIndex for downward compatibility
+* FcmdFilesCp, FcmdFileCard: Compares only mid and right panel.
+
+------------------------------------------------------------
+2012-04-10 Hartmut
+* Bzr-GUI: ViewDiff in an extra Window.
+* GralTextField_ifc, GralTextFieldUser_ifc: enhancments, changing of texts
+* GralWindow: resize on subwindows
+* SwtGraphicThread: initGraphic() now creates the main window, creates the SwtMng instead it is doing in the non-graphic thread.
+* Fcmd: View capability enhanced, able to use for edit
+------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh------------------------------------------------------------
+Sprint: Linux, Inspector-View, Disable ctrl_Pgup/dn for Traversal keys for SWT
+* Fcmd, : Now ctrl-Pgup for parent directory.
+* GralWidget: refreshFromVariable now for short and byte
+
+------------------------------------------------------------
+>bzr log
+/home/hartmut/Bzr/srcJava_vishiaGUI>bzr log
+------------------------------------------------------------
+revno: 238
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Thu 2012-04-05 19:00:09 +0200
+message:
+  Adaption InspcGui to inspectorAccessor, Docu
+------------------------------------------------------------
+revno: 237
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Tue 2012-04-03 12:32:26 +0200
+message:
+  inscGui: the org.vishia.guiInspc.InspcGuiComm is deleted now because all functionality from org.vishia.guiInspc.InspcGuiComm is now in the srcJava_vishiaRun compoent.
+------------------------------------------------------------
+revno: 236
+committer: hartmut <hartmut.schorrig@vishia.de>
+branch nick: srcJava_vishiaGUI
+timestamp: Sun 2012-04-01 22:24:40 +0200
+message:
+  * GralWidget: refresh

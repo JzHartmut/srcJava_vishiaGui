@@ -592,12 +592,8 @@ public final class InspcCurveView
 
   
   GralUserAction actionOpenWindow = new GralUserAction("actionOpenWindow"){
-    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){ 
-      windCurve.setVisible(true); //setWindowVisible(true);
-      widgFileSelector.setVisible(false);
-      widgFilename.setVisible(false);
-      widgBtnReadCfg.setVisible(true);
-      widgCurve.setFocus();
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
+    { windCurve.setFocus(); //setWindowVisible(true);
       return true;
     }
 

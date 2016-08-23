@@ -381,7 +381,6 @@ public class GralButton extends GralWidget
     @Override public void mouse1Down(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
     {
       setActivated(true);
-      /*
       GralWidget_ifc.ActionChange action = widgg.getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Dn); 
       if(action !=null){
         Object[] args = action.args();
@@ -395,7 +394,6 @@ public class GralButton extends GralWidget
           action.action().exec(keyCode, widgg, args2); 
         }
       }
-      */
     }   
       
    
@@ -412,7 +410,6 @@ public class GralButton extends GralWidget
         else if(bThreeStateSwitch && switchState == State.Off){ switchState = State.Disabled; }
         else { switchState = State.On; }
       }
-      /*
       GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Up);
       if(action !=null){
 
@@ -426,8 +423,8 @@ public class GralButton extends GralWidget
           args2[args.length+1] = new Integer(yMousePixel);
           action.action().exec(keyCode, widgg, args2); 
         }
-      }*/
-      widgg.repaint(); //100, 200);
+      }
+      widgg.repaint(100, 200);
     }
 
 
@@ -438,9 +435,7 @@ public class GralButton extends GralWidget
 
     @Override public void mouse2Up(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
     {
-      /*
       GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse2Up);
-      
       if(action !=null){
         Object[] args = action.args();
         if(args == null){ action.action().exec(keyCode, widgg, new Integer(xMousePixel), new Integer(yMousePixel)); }
@@ -453,12 +448,10 @@ public class GralButton extends GralWidget
           action.action().exec(keyCode, widgg, args2); 
         }
       }
-      */
     }
 
     @Override public void mouse1Double(int keyCode, int xMousePixel, int yMousePixel, int xWidgetSizePixel, int yWidgetSizePixel, GralWidget widgg)
     {
-      /*
       GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Doublc);
       if(action !=null){
         Object[] args = action.args();
@@ -472,7 +465,6 @@ public class GralButton extends GralWidget
           action.action().exec(keyCode, widgg, args2); 
         }
       }
-      */
     }
     
     

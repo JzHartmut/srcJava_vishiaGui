@@ -1,0 +1,26 @@
+This file contains the bazaar version of the depending components of this source. 
+That component sources should be gotten and placed in the given path. 
+-
+==Component at ..\srcJava_vishiaBase== 
+-
+revision-id: hartmutschorrig-20121113074435-2feakdu52ki0p7zk
+date: 2012-11-13 08:44:35 +0100
+build-date: 2012-11-14 07:18:55 +0100
+revno: 170
+branch-nick: srcJava_vishiaBase
+-
+==Component at ..\srcJava_vishiaRun== 
+-
+revision-id: hartmutschorrig-20121113074538-gdznkj853i1kd3zd
+date: 2012-11-13 08:45:38 +0100
+build-date: 2012-11-14 07:18:55 +0100
+revno: 63
+branch-nick: srcJava_vishiaRun
+-
+==Component at == ..\srcJava_Zbnf
+-
+revision-id: hartmutschorrig-20121113074346-2of9svri0chouak8
+date: 2012-11-13 08:43:46 +0100
+build-date: 2012-11-14 07:18:58 +0100
+revno: 132
+branch-nick: srcJava_Zbnf

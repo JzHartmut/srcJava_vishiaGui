@@ -22,7 +22,6 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   /**Version history:
    * 
    * <ul>
-   * <li>2016-07-16 Hartmut chg: On {@link #setToPanel(GralMngBuild_ifc)} all widgets of this panel are initialized too. More simple for user application. 
    * <li>2015-05-02 Hartmut new: {@link #setTextIn(String, CharSequence)}, change of registering a widget. Now any panel knows its widgets
    *   by name. 
    * <li>2012-07-13 Hartmut new:  {@link #getPixelSize()}, chg: {@link #getPixelPositionSize()} in all implementations. 
@@ -195,7 +194,8 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
     }
   }	
 	
-	/**Removes this widget from the lists in this panel. This method is not intent to invoke
+
+  /**Removes this widget from the lists in this panel. This method is not intent to invoke
    * by an application. It is only used in {@link GralWidget#remove()}. Use the last one method
    * to remove a widget includint is disposition and remove from the panel.
    * @param widg The widget.
@@ -225,12 +225,9 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
    * @return true because it is done.
    */
   @Override public boolean remove(){
-    int catastrophicCt = 100000; //safety of all while loops! No more than 100000 widgets.
-    while(--catastrophicCt >=0 && widgetList.size() >0){
-      //remove all widgets from the panel via Widget.remove, it removes it from this list too.
-      widgetList.get(0).remove(); 
+    for(GralWidget widg: widgetList){
+      widg.remove();
     }
-    assert(catastrophicCt >0);
     widgetList.clear();      //the lists may be cleared already 
     widgetsToResize.clear(); //because widg.remove() removes the widget from the panel.
     super.remove();

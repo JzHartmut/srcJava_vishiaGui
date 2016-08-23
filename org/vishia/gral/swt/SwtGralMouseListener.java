@@ -106,8 +106,8 @@ public final class SwtGralMouseListener
         GralMng guiMng = widgg.gralMng();
         try{
           String sDataPath = widgg.getDataPath();
-          if( sDataPath !=null  //no datapath given, write info! 
-            && !sDataPath.equals("widgetInfo")  //don't write info if it is a widgetInfo widget itself.
+          if( sDataPath ==null  //no datapath given, write info! 
+            || !sDataPath.equals("widgetInfo")  //don't write info if it is a widgetInfo widget itself.
             ){
             guiMng.setLastClickedWidget(widgg );
           }
@@ -253,8 +253,8 @@ public final class SwtGralMouseListener
       GralMng guiMng = widgg.gralMng();
       try{
         String sDataPath = widgg.getDataPath();
-        if( sDataPath !=null  //no datapath given, write info! 
-          && !sDataPath.equals("widgetInfo")  //don't write info if it is a widgetInfo widget itself.
+        if( sDataPath ==null  //no datapath given, write info! 
+          || !sDataPath.equals("widgetInfo")  //don't write info if it is a widgetInfo widget itself.
           ){
           guiMng.setLastClickedWidget(widgg );
         }
