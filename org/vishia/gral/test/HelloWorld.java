@@ -5,6 +5,7 @@ import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralFactory;
@@ -42,6 +43,9 @@ public class HelloWorld
     }
   };  
   
+  /**The GralWindow have to be initialized firstly, after them the widgets in the window. Therewith the assignment of the widgets to this window
+   * is determined. The widgets are created with the window then, see {@link GralPanelContent#createImplWidget_Gthread()}
+   */
   GralWindow window = new GralWindow("0+30, 0+50", "HelloWorldWind", "Simple Hello World application", GralWindow.windResizeable + GralWindow.windHasMenu);
   GralLabel widgHelloText = new GralLabel("3-2,2+5", "HelloLabel", helloText[0], 0);
   GralButton widgButton = new GralButton("7-3,10+12", "TestButton", "press me", actionTestButton);
@@ -53,14 +57,12 @@ public class HelloWorld
     if(args.length >=1){
       sTypeOfImplementation = args[0];
     }
-    main.createWindow(sTypeOfImplementation);
+    LogMessage log = new LogMessageStream(System.out);  //a logging system.
+    main.window.create(sTypeOfImplementation, 'C', log);  //creates the primary window, starts the whole graphic engine.
+    //wait, a parallel thread to the grahic.
     main.doSomethinginMainthreadTillClosePrimaryWindow();
   }
   
-  private void createWindow(String awtOrSwt){
-    LogMessage log = new LogMessageStream(System.out);
-    GralGraphicThread gthread = GralFactory.createGraphic(window, 'C', log, awtOrSwt);
-  }
   
   
   

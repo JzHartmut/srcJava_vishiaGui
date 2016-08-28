@@ -1,11 +1,14 @@
 package org.vishia.gral.base;
 
+import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.msgDispatch.LogMessage;
+import org.vishia.msgDispatch.LogMessageStream;
 
 /**This class represents a window of an application, either the primary window or any sub window.
  * The {@link GralPos#pos} of the baseclass is the position of the window derived from any other 
@@ -18,6 +21,8 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
 
   /**Version, history and license.
    * <ul>
+   * <li>2016-08-28 Hartmut new {@link #create(String)} to create either the primary window inclusive the whole graphic machine,
+   *   or create any secondary window.
    * <li>2015-05-31 Hartmut The {@link GraphicImplAccess} is now derived from {@link GralPanelContent.ImplAccess}
    *   because this class is derived from that too. Parallel inheritance. 
    * <li>2013-12-19 Hartmut bugfix: {@link #setFullScreen(boolean)} now works. 
@@ -72,7 +77,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    * 
    */
   @SuppressWarnings("hiding")
-  public static final String version = "2015-07-01";
+  public static final String version = "2016-08-28";
   
   /**Standard action for resizing, used if the window contains one panel.
    * It calls {@link GralMng_ifc#resizeWidget(GralWidget, int, int)} 
@@ -162,6 +167,27 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   }
 
 
+
+  /**Creates the window. Either the {@link GralGraphicThread#isRunning()} already then it is a second window.
+   * If the graphic thread is not running, it would be started and this is the primary window.
+   * The it invokes {@link GralFactory#createGraphic(GralWindow, char, LogMessage, String)}. 
+   * The application should not know whether it is the primary or any secondary window.
+   * That helps for applications which are started from a Gral graphic application itself without an own operation system process. 
+   * @param awtOrSwt see {@link GralFactory#createGraphic(GralWindow, char, LogMessage, String)}
+   */
+  public void create(String awtOrSwt, char size, LogMessage log){
+    if(_wdgImpl !=null) throw new IllegalStateException("window already created.");
+    GralMng mng = GralMng.get();
+    GralGraphicThread gthread = mng.gralDevice();
+    if(gthread.isRunning()) {
+      gthread.addDispatchOrder(createImplWindow);
+    } else {
+      //it is the primary window, start the graphic with it.
+      if(log == null) { log = new LogMessageStream(System.out); }
+      gthread = GralFactory.createGraphic(this, size, log, awtOrSwt);
+    }
+  }
+
   
   @Override public void setWindowVisible(boolean visible){
     setVisible(visible);
@@ -180,56 +206,6 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
     return true;
   }
   
-  /**This class is not intent to use from an application, it is the super class for the implementation layer
-   * to access all necessary data and methods with protected access rights.
-   * The methods are protected because an application should not use it. This class is public because
-   * it should be visible from the graphic implementation which is located in another package. 
-   */
-  public abstract static class GraphicImplAccess extends GralPanelContent.ImplAccess //access to GralWidget
-  implements GralWidgImpl_ifc
-  {
-    
-    protected final GralWindow gralWindow;  //its outer class.
-    
-    protected GraphicImplAccess(GralWindow gralWdg){
-      super(gralWdg);
-      this.gralWindow = gralWdg;  //References the environment class
-    }
-    
-    /**The title is stored in the {@link GralWidget.DynamicData#displayedText}. */
-    protected String getTitle(){ return gralWindow.dyda.displayedText; }
-    
-    /**Window properties as Gral bits given on ctor of GralWindow. */
-    protected int getWindowProps(){ return gralWindow.windProps; }
-    
-    
-    
-    //protected boolean isVisible(){ return gralWindow.bVisible; }
-    
-    protected boolean isFullScreen(){ return gralWindow.bFullScreen; }
-    
-    protected boolean shouldClose(){ return gralWindow.bShouldClose; }
-    
-    /**The resizeAction from the {@link GralWindow_ifc#setResizeAction(GralUserAction)} */
-    protected GralUserAction resizeAction(){ return gralWindow.resizeAction; }  
-
-    /**The mouseAction from the {@link GralWindow_ifc#setMouseAction(GralUserAction)} */
-    protected GralUserAction mouseAction(){ return gralWindow.mouseAction; }  
-
-    /**The invisibleSetAction from the {@link GralWindow_ifc#setActionOnSettingInvisible(GralUserAction)} */
-    protected GralUserAction invisibleSetAction(){ return gralWindow.invisibleSetAction; }  
-
-  
-
-
-  
-  
-  }
-
-  
-  
-  
-
   @Override
   public GralRectangle getPixelPositionSize()
   {
@@ -312,6 +288,65 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   }
 
 
+  /**This class is not intent to use from an application, it is the super class for the implementation layer
+   * to access all necessary data and methods with protected access rights.
+   * The methods are protected because an application should not use it. This class is public because
+   * it should be visible from the graphic implementation which is located in another package. 
+   */
+  public abstract static class GraphicImplAccess extends GralPanelContent.ImplAccess //access to GralWidget
+  implements GralWidgImpl_ifc
+  {
+    
+    protected final GralWindow gralWindow;  //its outer class.
+    
+    protected GraphicImplAccess(GralWindow gralWdg){
+      super(gralWdg);
+      this.gralWindow = gralWdg;  //References the environment class
+    }
+    
+    /**The title is stored in the {@link GralWidget.DynamicData#displayedText}. */
+    protected String getTitle(){ return gralWindow.dyda.displayedText; }
+    
+    /**Window properties as Gral bits given on ctor of GralWindow. */
+    protected int getWindowProps(){ return gralWindow.windProps; }
+    
+    
+    
+    //protected boolean isVisible(){ return gralWindow.bVisible; }
+    
+    protected boolean isFullScreen(){ return gralWindow.bFullScreen; }
+    
+    protected boolean shouldClose(){ return gralWindow.bShouldClose; }
+    
+    /**The resizeAction from the {@link GralWindow_ifc#setResizeAction(GralUserAction)} */
+    protected GralUserAction resizeAction(){ return gralWindow.resizeAction; }  
+  
+    /**The mouseAction from the {@link GralWindow_ifc#setMouseAction(GralUserAction)} */
+    protected GralUserAction mouseAction(){ return gralWindow.mouseAction; }  
+  
+    /**The invisibleSetAction from the {@link GralWindow_ifc#setActionOnSettingInvisible(GralUserAction)} */
+    protected GralUserAction invisibleSetAction(){ return gralWindow.invisibleSetAction; }  
+  
+  
+  
+  
+  
+  
+  }
+
+
+
+  /**Code snippet for initializing the GUI area (panel). This snippet will be executed
+   * in the GUI-Thread if the GUI is created. 
+   */
+  GralGraphicTimeOrder createImplWindow = new GralGraphicTimeOrder("GralWindow.createImplWindow")
+  {
+    @Override public void executeOrder()
+    { GralMng mng = GralMng.get();
+      mng.selectPrimaryWindow();
+      GralWindow.this.createImplWidget_Gthread();
+    }
+  };
 
   
 

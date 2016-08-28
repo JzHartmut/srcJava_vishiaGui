@@ -789,7 +789,7 @@ public interface GralMngBuild_ifc extends ReplaceAlias_ifc
 	 * @param title Title of the window, may be null, then without title bar.
 	 * @param windProps Or of the static variables {@link GralWindow#windExclusive} etc. 
 	 * @return
-	 * @deprecated use {@link GralWindow#GralWindow(String, String, int)} and then {@link GralWidget#setToPanel(GralMngBuild_ifc)}
+	 * @deprecated use {@link GralWindow#GralWindow(String, String, String, int)} and then {@link GralWidget#createImplWidget_Gthread()}
 	 *   with this window.
 	 */
   @Deprecated 

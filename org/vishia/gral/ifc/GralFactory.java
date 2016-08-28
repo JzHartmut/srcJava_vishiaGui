@@ -81,7 +81,7 @@ public abstract class GralFactory
   @Deprecated public final void createWindow(GralWindow windowg, char sizeShow, int left, int top, int xSize, int ySize)
   {
     GralMng mng = GralMng.get();
-    mng.setPrimaryWindow(windowg); //checks whether called firstly.
+    mng.setFirstlyThePrimaryWindow(windowg); //checks whether called firstly.
     LogMessage log = mng.log;    
     //The graphicthread creates the Swt Window.
     //SwtPrimaryWindow swtWindow = SwtPrimaryWindow.create(log, sTitle, sizeShow, left, top, xSize, ySize);
@@ -112,9 +112,10 @@ public abstract class GralFactory
   
   public static GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, LogMessage log, String implementor) { 
     GralMng mng = GralMng.get();
-    mng.setPrimaryWindow(windowg); //checks whether called firstly.
+    mng.setFirstlyThePrimaryWindow(windowg); //checks whether called firstly.
     GralGraphicThread gralThread = null;
     final String sNameFactoryClass;
+    if(implementor == null) { implementor = "SWT"; }
     if(implementor.equals("SWT")) { sNameFactoryClass = "org.vishia.gral.swt.SwtFactory"; }
     else if(implementor.equals("AWT")) { sNameFactoryClass = "org.vishia.gral.awt.AwtFactory"; }
     else { sNameFactoryClass = implementor; }
@@ -129,7 +130,7 @@ public abstract class GralFactory
       System.err.println(sError);
       throw new RuntimeException(sError, exc);
     }
-    try {
+    try { //this start the GralGraphicThread, see run(). There the primaryWindow will be created.
       gralThread = factory.createGraphic(windowg, sizeShow, log);
     } catch(Exception exc) {
       String sError = "Exception initializing graphic: " + exc.getMessage();

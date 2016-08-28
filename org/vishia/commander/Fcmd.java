@@ -43,6 +43,7 @@ public class Fcmd extends GuiCfg
 
   /**Version, history and license. This String is visible in the about info.
    * <ul>
+   * <li>2016-08-28 see {@link FcmdExecuter#sVersion}, {@link FcmdSettings#sVersion}
    * <li>2015-07-18 Hartmut chg: Now the output of script errors while executing the JZcmd cmd script is visible
    *   in the output window.  
    * <li>2015-07-12 Hartmut new: Many fixes in the base classes for functionality. See all commit messages of the component.

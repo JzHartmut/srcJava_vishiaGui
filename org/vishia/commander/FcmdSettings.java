@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.vishia.cmd.CmdStore;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
@@ -18,6 +19,10 @@ public class FcmdSettings
 {
   /**Version, history and license
    * <ul>
+   * <li>2016-08-28 Hartmut chg: extra button now for the jzcmd.cfg, 
+   *   extra button {@link #widgOkError} to open the infoBox, but open the infoBox automatically on error.
+   *   The Button for open Infobox will get a button text "error" if an error in the config is found. 
+   *   It is nice to have on editing the scripts for commands to see whether it is okay or not and to detect the cause of errors.
    * <li>2012-10-27 Hartmut created
    * </ul>
    * 
@@ -47,7 +52,7 @@ public class FcmdSettings
    * 
    * 
    */
-  public static final int version = 20121027;
+  public static final String sVersion = "2016-08-28";
   
   protected final Fcmd main;
 
@@ -62,7 +67,7 @@ public class FcmdSettings
   
   
   
-  GralButton widgApply, widgOk; 
+  GralButton widgOkError, widgOk; 
   
   /**Buttons for edit and apply the several configuration files.
    * Edit opens the file in the standard editor. Apply set the content to the File Commander. 
@@ -82,14 +87,19 @@ public class FcmdSettings
    * whenever it is used.  */
   void buildWindow()
   { main._gralMng.selectPanel("primaryWindow");
-    main._gralMng.setPosition(-30, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
-    int windProps = GralWindow.windConcurrently;
-    GralWindow window =  main._gralMng.createWindow("windSettings", "Settings - The.file.Commander", windProps);
+    int windProps = GralWindow.windConcurrently | GralWindow.windOnTop;
+    GralWindow window =  new GralWindow("10+29, 10+47", "windSettings", "Settings - The.file.Commander", windProps);
+    window.createImplWidget_Gthread();
     windSettings = window; 
     main._gralMng.setPosition(3.5f, GralPos.size -3, 1, -1, 0, 'd');
     widgRefreshTime = main._gralMng.addTextField(null, true, "refresh time file panel", "t");
     widgEditorPath = main._gralMng.addTextField(null, true, "standard editor path", "t");
     widgCfgPath = main._gralMng.addTextField(null, false, "configuration directory path", "t");
+    
+    //main._gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
+    main._gralMng.setPosition(-10, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
+    widgEditCmd = main._gralMng.addButton("editCmd", actionEditCfgFile, "cmdjz.cfg", null, "edit");
+    main._gralMng.addText("cmdjz.cfg");
     
     main._gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
     widgEditCmd = main._gralMng.addButton("editCmd", actionEditCfgFile, "cmd.cfg", null, "edit");
@@ -106,10 +116,10 @@ public class FcmdSettings
     widgApplyCmd = main._gralMng.addButton("applyPaths", actionApplyCfgPath, "path.cfg", null, "apply");
     main._gralMng.addText("favor paths file");
     
-    main._gralMng.setPosition(-7, GralPos.size +2.5f, -9, -1, 0, 'd', 0.5f);
-    widgApply = main._gralMng.addButton("dirBytes", actionButton, "apply");
-    widgApply.setCmd("apply");
-    widgOk = main._gralMng.addButton("dirBytes", actionButton, "ok");
+    main._gralMng.setPosition(-10, GralPos.size -2, -18, -1, 0, 'd', 0.5f);
+    widgOkError = main._gralMng.addButton("ok_error", actionOpenInfo, "infoBox");
+    main._gralMng.setPosition(-1, GralPos.size -2.5f, -9, -1, 0, 'd', 0.5f);
+    widgOk = main._gralMng.addButton("close", actionButton, "close");
     widgOk.setCmd("close");
   }
 
@@ -118,6 +128,7 @@ public class FcmdSettings
    */
   void openDialog(File src)
   {
+    widgOkError.setText("infoBox");
     widgRefreshTime.setText("" + secondsRefresh);
     widgCfgPath.setText(main.cargs.dirCfg.getAbsolutePath());
     windSettings.setFocus(); //setWindowVisible(true);
@@ -125,7 +136,7 @@ public class FcmdSettings
   }
   
   
-  /**Action for OK. 
+  /**Action for Close. 
    */
   GralUserAction actionButton = new GralUserAction("FcmdSettings-close")
   {
@@ -134,6 +145,18 @@ public class FcmdSettings
         if(widg == widgOk){
           windSettings.closeWindow();
         }
+      }
+      return true;
+  } };
+
+  
+  /**Action for Close. 
+   */
+  GralUserAction actionOpenInfo = new GralUserAction("FcmdSettings-info")
+  {
+    @Override public boolean exec(int keyCode, GralWidget_ifc widg, Object... params)
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
+        GralMng.get().showInfo(null);
       }
       return true;
   } };
@@ -184,7 +207,9 @@ public class FcmdSettings
         String sError = FcmdExecuter.readCmdCfg(main.cmdSelector.cmdStore, new File(main.cargs.dirCfg, sFileCfg), main.console, main.executer.cmdQueue);
         if(sError != null) {
           main.showInfoBox(sError);
+          widgOkError.setText("error");
         } else {
+          widgOkError.setText("success");
           main.setTextInfoBox("ok read " + main.cargs.dirCfg + "/" + sFileCfg);
           main.cmdSelector.fillIn();
         }

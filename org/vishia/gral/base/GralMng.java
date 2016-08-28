@@ -259,7 +259,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   /**Base class for managing all panels and related windows.
    * This base class contains all common resources to manage panels and windows.
    */
-  public final GralGraphicThread gralDevice;
+  public final GralGraphicThread gralDevice = new GralGraphicThread();
 
   /**Properties of this Dialog Window. */
   public GralGridProperties propertiesGui;
@@ -557,12 +557,11 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   */
 
   private GralMng(LogMessage log)
-  { this.gralDevice = new GralGraphicThread();
-    //this.propertiesGui = props;
+  { //this.propertiesGui = props;
       this.log = log;
-  //its a user action able to use in scripts.
-      userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
-  GralMng.singleton = this; 
+    //its a user action able to use in scripts.
+    userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
+    GralMng.singleton = this; 
   }
 
   
@@ -599,7 +598,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     this.propertiesGui = props;
   }
   
-  public void setPrimaryWindow(GralWindow primaryWindow){
+  public void setFirstlyThePrimaryWindow(GralWindow primaryWindow){
     if(this.windPrimary !=null)
       throw new IllegalStateException("Primary Window should set only one time.");
     this.windPrimary = primaryWindow; 
@@ -772,8 +771,8 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   public void showInfo(CharSequence text) {
     if(infoBox == null) return;
-    infoBox.setText(text);
-    infoBox.setVisible(true);
+    if(text !=null){ infoBox.setText(text); }
+    infoBox.setFocus();
   }
   
   public void setInfo(CharSequence text) {
@@ -2064,6 +2063,11 @@ public GralButton addCheckButton(
   
 
 
+  /* (non-Javadoc)
+   * @see org.vishia.gral.ifc.GralMngBuild_ifc#createWindow(java.lang.String, java.lang.String, int)
+   * @deprecated use {@link GralWindow#GralWindow(String, String, String, int)} and then {@link GralWidget#createImplWidget_Gthread()}
+   *   with this window.
+   */
   @Override @Deprecated public GralWindow createWindow(String name, String title, int windProps)
   { GralPos pos = pos().pos;  //without clone.
     String sPos = pos.posString(); 

@@ -607,18 +607,27 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
 
   
-  @Override protected void setBoundsCells(int treeDepthBase){
+  @Override protected void setBoundsCells(int treeDepthBase, int zLineVisible){
     int yPix = 0;
     //int xPixelUnit = swtWidgHelper.mng.mng.propertiesGui.xPixelUnit();
+    int ixrow = 0;
     for(Text[] row: cellsSwt){
-      int ixColumn = 0;
-      for(Text cell: row){
-        //GralTable.CellData celldata = (GralTable.CellData)cell.getData();
-        int xleft = 0; //celldata.tableItem !=null ? (celldata.tableItem.treeDepth() - treeDepthBase) * xPixelUnit : 0;
-        cell.setBounds(xleft + xpixelCell[ixColumn], yPix, xpixelCell[ixColumn+1] - xpixelCell[ixColumn], linePixel);
-        ixColumn +=1;
+      if(ixrow < zLineVisible) {
+        int ixColumn = 0;
+        for(Text cell: row){
+          cell.setVisible(true);
+          int xleft = 0; 
+          cell.setBounds(xleft + xpixelCell[ixColumn], yPix, xpixelCell[ixColumn+1] - xpixelCell[ixColumn], linePixel);
+          ixColumn +=1;
+        }
+        yPix += linePixel;
+      } else {
+        //invisible cells:
+        for(Text cell: row){
+          cell.setVisible(false);
+        }
       }
-      yPix += linePixel;
+      ixrow +=1;
     }
     vScrollBar.setBounds(xyVscrollbar.x, xyVscrollbar.y, xyVscrollbar.dx, xyVscrollbar.dy);
   }
@@ -837,15 +846,21 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       stop();
     }
 
+    /**The Composite for the whole table is resized already. This routine should determine which Text fields are visible and used.
+     * @see org.eclipse.swt.events.ControlListener#controlResized(org.eclipse.swt.events.ControlEvent)
+     */
     @Override public void controlResized(ControlEvent e) 
     { 
       stop();
       Rectangle boundsTable = ((Control)e.widget).getBounds();
       int borderTable = ((Control)e.widget).getBorderWidth();
+      //the pixTable is given already with the Composite of the whole table. 
+      GralRectangle pixTable = new GralRectangle(boundsTable.x, boundsTable.y, boundsTable.width, boundsTable.height);
       //it calls repaint with delay.
-      Rectangle parentBounds = ((Control)e.widget).getParent().getBounds();
+      //Composite parent = ((Control)e.widget).getParent();
+      //Rectangle parentBounds = parent.getBounds();
       //GralRectangle pixTable = outer.pos().calcWidgetPosAndSize(itsMng().propertiesGui(), parentBounds.width, parentBounds.height, 0, 0);
-      GralRectangle pixTable = outer.pos().calcWidgetPosAndSize(itsMng().propertiesGui(), boundsTable.width, boundsTable.height, 0, 0);
+      //GralRectangle pixTable = outer.pos().calcWidgetPosAndSize(itsMng().propertiesGui(), boundsTable.width, boundsTable.height, 0, 0);
       SwtTable.this.resizeTable(pixTable);
     }
     

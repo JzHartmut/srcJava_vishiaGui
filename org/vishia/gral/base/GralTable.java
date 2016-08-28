@@ -94,6 +94,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2016-08-28 Hartmut chg: {@link GraphicImplAccess#setBoundsCells(int, int)} now gets the zLineVisible.
+   *   The {@link org.vishia.gral.swt.SwtTable#setBoundsCells(int, int)} sets the rest of texts invisible. Therewith the phenomena of ghost lines
+   *   on resizing are removed. 
+   * <li>2016-08-28 Hartmut chg:  Bugfix: In {@link org.vishia.gral.swt.SwtTable#resizeTable(GralRectangle)}: 
+   *   The {@link GralWidget#pos()} should not be used because the Composite is resized with it already. Instead the number of lines
+   *   is correctly calculated now and {@link GraphicImplAccess#setBoundsCells(int, int)} is invoked with that {@link #zLineVisible}.  
    * <li>2015-11-19 Hartmut chg: Some changes for future: The cells should be managed in the GralTable, not in SwtTable. Adaption for AwtTable 
    * <li>2015-10-29 Hartmut chg: {@link TableLineData#bChangedSet}, the content will be written in {@link org.vishia.gral.swt.SwtTable}
    *   or another graphic implementation only if the text is changed. Therewith editing a table is possible while the other cells
@@ -825,7 +831,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
     bChangedLinesForCell = true;
     rootLine.clear();
-    bPrepareVisibleArea = true;
     bPrepareVisibleArea = true;
     repaint(200,200);
   }
@@ -1828,7 +1833,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         xPixel1 += xPos * xPixelUnit;
         xpixelCell[ixPixelCell] = xPixel1;
       }
-      setBoundsCells(0);
+      setBoundsCells(0, outer.zLineVisible);
 
     }
     
@@ -1837,7 +1842,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * The {@link #xpixelCell} was set before.
      * @param treeDepthBase
      */
-    abstract protected void setBoundsCells(int treeDepthBase);
+    abstract protected void setBoundsCells(int treeDepthBase, int zLineVisible);
 
     @Override public boolean remove(){
       outer.rootLine.removeChildren();
