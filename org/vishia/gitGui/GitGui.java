@@ -1,6 +1,8 @@
 package org.vishia.gitGui;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -9,12 +11,13 @@ import org.vishia.cmd.CmdExecuter;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
+import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralTableLine_ifc;
-import org.vishia.jgit.JgitFactory;
+import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.util.DataAccess;
 import org.vishia.util.Debugutil;
-import org.vishia.util.JgitFactory_ifc;
-import org.vishia.util.Jgit_ifc;
+import org.vishia.util.FileSystem;
 import org.vishia.util.StringPartAppend;
 
 /**This class contains some gui capabilities which works in a vishia-Gral graphic environment. 
@@ -59,11 +62,13 @@ public class GitGui
    * 
    */
 
+  String sTypeOfImplementation = "SWT";  //default
+  
 
+  GralWindow window = new GralWindow("0+50, 0+80", "GitGui", "Git vishia", GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose);
 
-  GralWindow window = new GralWindow("0+50, 0+80", "GitGui", "Git vishia", GralWindow.windResizeable);
-
-  GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("2..-20,2..-20", "git-versions", new int[] {10, 0, -10});
+  GralTextField wdgPath = new GralTextField("2-2,0..0", "path");
+  GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("3..-20,2..-20", "git-versions", new int[] {10, 0, -10});
   
   GralTextBox wdgInfo = new GralTextBox("info");
 
@@ -74,27 +79,33 @@ public class GitGui
   StringPartAppend out = new StringPartAppend();
 
 
-  Jgit_ifc jgit;
-  
-  JgitFactory_ifc jgitFactory = new JgitFactory();
-
 
   SimpleDateFormat dateFormat = new SimpleDateFormat("yy-MM-dd HH:mm");
 
 
   public static void main(String[] args){
-    GitGui main = new GitGui();
-    String sTypeOfImplementation = "SWT";  //default
-    if(args.length >=1){
-      sTypeOfImplementation = args[0];
-    }
-    main.window.create(sTypeOfImplementation, 'B', null);
-    main.revisionsCommit("D:/GitArchive/D/vishia/srcJava_vishiaBase");
-    main.doSomethinginMainthreadTillClosePrimaryWindow();
+    GitGui main = new GitGui(args);
+    main.showLog("D:/GitArchive/D/vishia/srcJava_vishiaBase/.git", "D:/GitArchive/D/vishia/srcJava_vishiaBase", "org/vishia/util/CalculatorExpr.java");
+    main.doSomethinginMainthreadTillCloseWindow();
+    main.cmd.close();
   }
   
 
-  public GitGui() {
+  public GitGui(String[] args) {
+    if(args !=null && args.length >=1){
+      sTypeOfImplementation = args[0];
+    }
+    initializeCmd();
+    window.create(sTypeOfImplementation, 'B', null);
+  }
+
+
+
+  @Override public void finalize()
+  {
+  }
+
+  void initializeCmd() {
     Map<String, String> env = cmd.environment();
     env.put("HOMEPATH", "\\vishia\\HOME");
     env.put("HOMEDRIVE", "D:");
@@ -104,9 +115,9 @@ public class GitGui
   }
 
 
-  public void doSomethinginMainthreadTillClosePrimaryWindow()
+  public void doSomethinginMainthreadTillCloseWindow()
   { int ix = 0;
-    while(GralMng.get().gralDevice.isRunning()){
+    while(! window.isGraphicDisposed()){
       try{ Thread.sleep(1000);} 
       catch (InterruptedException e) { }
     }
@@ -114,80 +125,166 @@ public class GitGui
   }
 
 
-  /**Don't use it. org.eclipse.jgit seems to be only a wrapper around the original gitcmd.exe. Use the original git.exe instead.  
-   * @param sGitDir
+
+
+
+  /**Search the base dir and the repository for a given path/to/file.
+   * @param startFile Any file path. Especially a ".git" directory or ".gitRepository" file. In that  case the local file path will be set to null,
+   *   because the whole repository is given.
+   * @param dst maybe null, elsewhere new String[2]. 
+   *   dst[0] will be filled with the absolute path of the .git directory. 
+   *   dst[1] will be filled with the absolute path to the basic directory for the working tree where .git or .gitRepository were found.
+   *   dst[2] will be filled with the local file path or null if the .git or .gitRepositiory is the startFile.
+   * @param dstMap maybe null, if not null it is a container maybe from JZcmd variables or an empty Map.
+   * @param nameRepository if dstMap !=null, the name of the key (variable) for the repository path.
+   * @param nameBasedir if dstMap !=null, the name of the key (variable) for the base directory.
+   * @param nameLocalFile  if dstMap !=null, the name of the key (variable) for the local file.
+   *   That variables will be set. nameLocalFile will be set to null if .git or .gitRepository is the startFile.
+   * @return null on success or an error message 
    */
-  public void revisionsCommitJ(String sGitDir) {
-    jgit = jgitFactory.getRepository(sGitDir, sGitDir + "/.gitx");
-    String status = jgit.status();
-    Debugutil.stop();
+  public static String searchRepository(File startFile, String[] dst, Map<String, DataAccess.Variable<Object>> dstMap
+  , String nameRepository, String nameBasedir, String nameLocalFile) 
+  { File fRepo;
+    File currDir = startFile.getParentFile();
+    String ret = null;
+    //search whether a .bzr or .bzr.bat exists and change to parent dir till it is found.
+    do{
+      fRepo = new File(currDir, ".git");
+      if(!fRepo.exists()){
+        fRepo = new File(currDir, ".gitRepository");
+        if(!fRepo.exists()){
+          try{
+            currDir = FileSystem.getDirectory(currDir);  //NOTE: currDir.getParent() is not successfully on relative dir "."
+          } catch(FileNotFoundException exc){ currDir = null;}
+        }
+      }
+    } while(!fRepo.exists() && currDir !=null);
+    if(currDir ==null){
+      ret = "searchRepository - .git or .gitRepository not found ;" + startFile.getAbsolutePath();
+    } else {
+      String sBaseDir = FileSystem.normalizePath(currDir).toString();
+      //dst.put(bzrdir, sBzrDir);
+      String sRepository;
+      if(fRepo.getName().equals(".gitRepository")){   //File with link to repository
+        sRepository = FileSystem.readFile(fRepo).trim();
+      } else {
+        sRepository = sBaseDir;  
+      }
+      CharSequence sFilePath = FileSystem.normalizePath(startFile);
+      String sLocalFilePath = sFilePath.subSequence(sBaseDir.length()+1, sFilePath.length()).toString();
+      if(sLocalFilePath.equals(".git") || sLocalFilePath.equals(".gitRepository")){
+        sLocalFilePath = null;
+      }
+      if(dst !=null) { 
+        dst[0] = sRepository; 
+        dst[1] = sBaseDir; 
+        dst[2] = sLocalFilePath; 
+      }
+      if(dstMap !=null) {
+        try {
+        DataAccess.createOrReplaceVariable(dstMap, nameBasedir, 'S', sBaseDir, true);
+        DataAccess.createOrReplaceVariable(dstMap, nameRepository, 'S', sRepository, true);
+        DataAccess.createOrReplaceVariable(dstMap, nameLocalFile, 'S', sLocalFilePath, true);
+        } catch(Exception exc) {
+          ret = "searchRepository - repository found, but write problems for dst Map,";
+        }
+      }
+    }
+    return ret;
   }
 
 
 
 
-  public void revisionsCommit(String sGitDir) {
-    cmd.setCurrentDir(new File(sGitDir));
+
+  public static void showLog(File srcFile)
+  {
+    String[] paths = new String[3];
+    String error = searchRepository(srcFile, paths, null, null, null, null);
+    if(error !=null) { System.err.println(error); }
+    else {
+      GitGui main = new GitGui(null);
+      main.showLog(paths[0], paths[1], paths[2]);
+      main.doSomethinginMainthreadTillCloseWindow();
+      main.cmd.close();
+    }
+  }
+
+
+
+
+  public void showLog(String sGitDir, String sWorkingDir, String sLocalFile) {
+    String sPathShow;
+    if(sLocalFile !=null) {
+      sPathShow = sGitDir + " : " + sLocalFile;
+    } else {
+      sPathShow = sGitDir;
+    }
+    wdgPath.setText(sPathShow);
+    
+    cmd.setCurrentDir(new File(sWorkingDir));
     out.buffer().setLength(0);
     out.assign(out.buffer());   //to reset positions to the changed out.buffer()
-    //String[] args ={"D:\\Programs\\Gitcmd\\bin\\sh.exe", "-x", "-c", "git log --date=iso \'--pretty=format:Commit::%H\t%h\t%an\t%ad\n%s::::::%f\' org/vishia/util/CalculatorExpr.java"};
-    String[] args ={"D:\\Programs\\Gitcmd\\bin\\sh.exe", "-x", "-c", "git log --date=iso \'--pretty=raw' org/vishia/util/CalculatorExpr.java"};
+    String sGitCmd = "git";
+    if(! sGitDir.startsWith(sWorkingDir)) {
+      sGitCmd += " '--git-dir=" + sGitDir + "'";
+    }
+    sGitCmd += " log --date=iso '--pretty=raw'";
+    if(sLocalFile !=null && sLocalFile.length() >0) {
+      sGitCmd +=  " '" + sLocalFile + "'";
+    }
+    String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
     int error = cmd.execute(args, null,  out, null);
     out.firstlineMaxpart();
     String lineTexts[] = new String[3];
-    boolean cont = true;
+    boolean contCommits = true;
     do {
       if(out.scanStart().scan("commit ").scanOk()) {
-        //out.seek(8);
-        cont = false;  //set to true on the next "commit " line.
+        contCommits = false;  //set to true on the next "commit " line.
         String hash = out.getCurrentPart().toString();
         RevisionEntry entry = new RevisionEntry(hash);
         try {
-          if(out.nextlineMaxpart().found()) {
+          boolean cont = true;
+          while (cont && out.nextlineMaxpart().found()) {
             if(out.scanStart().scan("tree ").scanOk()) {
               entry.treeHash = out.getCurrentPart().toString();
-            } else throw new IllegalArgumentException("log output structure faulty");
-          }
-          if(out.nextlineMaxpart().found()) {
-            if(out.scanStart().scan("parent ").scanOk()) {
+            } 
+            else if(out.scanStart().scan("parent ").scanOk()) {
               entry.parentHash = out.getCurrentPart().toString();
-            } else throw new IllegalArgumentException("log output structure faulty");
-          }
-          if(out.nextlineMaxpart().found()) {
-            if(out.scanStart().scan("author ").scanOk()) {
+            }
+            else if(out.scanStart().scan("author ").scanOk()) {
               out.lento('<');
               entry.author = out.getCurrentPart().toString();
-              out.fromEnd().seekPos(-16).lento(' ');
+              out.fromEnd().seekBack(16).lento(' ');
               if(out.scan().scanInteger().scanOk()) { 
                 entry.dateAuthor = new Date(1000*out.scan().getLastScannedIntegerNumber());
               }
-            } else throw new IllegalArgumentException("log output structure faulty");
-          }
-          if(out.nextlineMaxpart().found()) {
-            if(out.scanStart().scan("committer ").scanOk()) {
+            } else if(out.scanStart().scan("committer ").scanOk()) {
               out.lento('<');
               entry.committer = out.getCurrentPart().toString();
-              out.fromEnd().seekPos(-16).lento(' ');
+              out.fromEnd().seekBack(16).lento(' ');
               if(out.scan().scanInteger().scanOk()) { 
                 entry.dateCommit = new Date(1000*out.scan().getLastScannedIntegerNumber());
               }
-            } else throw new IllegalArgumentException("log output structure faulty");
-          }
-          while(out.nextlineMaxpart().found()) {
-            if(out.scanStart().scan("commit ").scanOk()) {
-              out.seekBegin();
-              cont = true;
-              break;
             } else {
-              CharSequence commitTextline = out.getCurrentPart();
-              if(entry.commitTitle == null && commitTextline.length() >6){
-                entry.commitTitle = commitTextline.toString();  //first line with at least 6 character: Use as title.
-              }
-              entry.commitText.append(commitTextline);
+              do {
+                if(out.scanStart().scan("commit ").scanOk()) {
+                  out.seekBegin();
+                  cont = false;
+                  contCommits = true;
+                  break;
+                } else {
+                  CharSequence commitTextline = out.getCurrentPart();
+                  if(entry.commitTitle == null && commitTextline.length() >6){
+                    entry.commitTitle = commitTextline.toString();  //first line with at least 6 character: Use as title.
+                  }
+                  entry.commitText.append(commitTextline);
+                }
+              } while(cont && (out.nextlineMaxpart().found()));
             }
-          }
+          }//while lines of one commit 
         }catch(Exception exc) {
-          
+          Debugutil.stop();
         }
         
         lineTexts[0] = dateFormat.format(entry.dateAuthor);
@@ -195,11 +292,11 @@ public class GitGui
         lineTexts[2] = entry.author;
         GralTableLine_ifc<RevisionEntry> line = wdgTableVersion.addLine(hash, lineTexts, entry);  
         line.repaint();
-      }
+      } //
       else {
-        cont = out.nextlineMaxpart().found();
+        contCommits = out.nextlineMaxpart().found();
       }
-    } while(cont);
+    } while(contCommits);
     //wdgTableVersion.
     wdgTableVersion.repaint();
     Debugutil.stop();

@@ -286,8 +286,8 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   {
     return bVisibleState;
   }
-
-
+  
+  
   /**This class is not intent to use from an application, it is the super class for the implementation layer
    * to access all necessary data and methods with protected access rights.
    * The methods are protected because an application should not use it. This class is public because
@@ -345,6 +345,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
     { GralMng mng = GralMng.get();
       mng.selectPrimaryWindow();
       GralWindow.this.createImplWidget_Gthread();
+      GralWindow.this.setVisible(true);
     }
   };
 

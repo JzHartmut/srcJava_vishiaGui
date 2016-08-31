@@ -59,6 +59,7 @@ public interface GralWidget_ifc extends Removeable
   
   /**Version, history and license.
    * <ul>
+   * <li>2016-08-31 Hartmut new: {@link #isGraphicDisposed()} especially used for GralWindow-dispose detection. 
    * <li>2016-07-20 Hartmut chg: instead setToPanel now {@link #createImplWidget_Gthread()}. It is a better name. 
    * <li>2015-10-11 Hartmut new: {@link #createImplWidget_Gthread()} without mng as parameter.
    * <li>2015-09-12 Hartmut new: {@link #getData()}, {@link #setData(Object)} was existent as {@link GralWidget#setContentInfo(Object)},
@@ -102,7 +103,7 @@ public interface GralWidget_ifc extends Removeable
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final String version = "2015-09-12";
+  public static final String sVersion = "2016-08-31";
 
   public static class ActionChange
   {
@@ -232,6 +233,14 @@ public interface GralWidget_ifc extends Removeable
   /**Returns true if this widget is the focused one.
    */
   boolean isInFocus();
+  
+  /**Returns true if the graphic implementatin widget was initialized, and then it was disposed. 
+   * It is able to use especially to detect whether a sub window is closed or if the primary window was closed,
+   * to finish any other (waiting) thread. It may be used on any disposed widget.
+   * @return true if the Widget was created and after them disposed again.
+   */
+  boolean isGraphicDisposed();
+
   
   /**Sets this widget visible on graphic or invisible. Any widget can be visible or not. More as one widgets
    * can use the same position, only one of them may set visible. 

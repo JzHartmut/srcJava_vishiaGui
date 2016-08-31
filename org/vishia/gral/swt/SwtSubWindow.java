@@ -43,6 +43,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   
   /**Version, history and license:
    * <ul>
+   * <li>2016-08-31 Hartmut chg: Now disposes the window in {@link #shellListener} 
    * <li>2015-05-31 Hartmut {@link #setFocusGThread()} now regards the {@link GralPanelContent#setPrimaryWidget(GralWidget)}.
    * <li>2015-04-27 Hartmut new {@link #windRemoveOnClose}
    * <li>2012-07-13 Hartmut new:  {@link #getPixelSize()}, chg: {@link #getPixelPositionSize()} in all implementations. 
@@ -99,7 +100,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
    * 
    */
   @SuppressWarnings("hiding")
-  public static final int version = 20120310;
+  public static final String sVersion = "2016-08-31";
   
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
    * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
@@ -266,6 +267,11 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
       }
       setVisibleState(false);
       if((windProps & GralWindow_ifc.windRemoveOnClose)!=0) {
+        window.dispose();
+        window = null;
+        menuBar = null;
+        SwtSubWindow.this.widgg._wdgImpl = null;  //therewith garbage this class.
+
         gralWindow.remove();  //remove the window as widget.
         e.doit = true;
       } else {
@@ -277,7 +283,8 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     @Override
     public void shellDeactivated(ShellEvent e)
     {
-      //setVisibleState(false); //don't change the visible state, the window may be still visible!
+      if((SwtSubWindow.this.getWindowProps() & GralWindow_ifc.windRemoveOnClose) !=0) {
+      }
     }
 
     @Override
@@ -302,7 +309,6 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     @Override
     public void widgetDisposed(DisposeEvent e)
     {
-      stop();
     }
   };
   

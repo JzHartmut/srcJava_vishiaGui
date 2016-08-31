@@ -11,7 +11,8 @@ set SRC=-subpackages org.vishia
 ::set SRC=%SRC% ..\org\vishia\guiViewCfg\*.java
 ::set SRC=%SRC% ..\org\vishia\windows\*.java
 
-set SRCPATH=..;..\..\srcJava_vishiaBase;..\..\srcJava_vishiaRun;..\..\srcJava_Zbnf
+::set SRCPATH=..;..\..\srcJava_vishiaBase;..\..\srcJava_Zbnf;..\..\srcJava_vishiaRun
+set SRCPATH=..;..\..\..\ZBNF\sf\ZBNF\srcJava_vishiaBase;..\..\..\ZBNF\sf\ZBNF\srcJava_Zbnf;..\..\srcJava_vishiaRun
 
 echo set linkpath
 set LINKPATH=
@@ -19,4 +20,4 @@ set LINKPATH=%LINKPATH% -link ..\docuSrcJava_Zbnf
 set LINKPATH=%LINKPATH% -link ..\docuSrcJava_vishiaBase
 set LINKPATH=%LINKPATH% -link ..\docuSrcJava_vishiaRun
 
-..\..\srcJava_vishiaBase\_make\+genjavadocbase.bat
+..\..\..\ZBNF\sf\ZBNF\srcJava_vishiaBase\_make\+genjavadocbase.bat

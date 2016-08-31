@@ -174,6 +174,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2016-08-31 Hartmut new: {@link #isGraphicDisposed()} especially used for GralWindow-dispose detection. 
    * <li>2016-07-20 Hartmut chg: invocation of registerWidget one time after its position is known. Either it is in the ctor of GralWidget 
    *   or it is in the ctor of {@link GralWidget.ImplAccess} if the position was assigned later in the graphic thread.
    * <li>2016-07-20 Hartmut chg: instead setToPanel now {@link #createImplWidget_Gthread()}. It is a better name. 
@@ -319,7 +320,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final String version = "2015-09-12";
+  public static final String sVersion = "2016-08-31";
 
   
   /**The widget manager from where the widget is organized. Most of methods need the information
@@ -567,7 +568,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   protected int repaintDelay = 30, repaintDelayMax = 100;
 
   /**The time when the bVisible state was changed. */
-  long lastTimeSetVisible;
+  long lastTimeSetVisible = 0;
   
   protected long dateUser;
   
@@ -1427,6 +1428,13 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     return bHasFocus;
   }
 
+
+  @Override public boolean isGraphicDisposed(){
+    return lastTimeSetVisible !=0 && _wdgImpl ==null;
+  }
+
+
+
   
   /**Sets the widget visible or not. It is the default implementation for all simple widgets:
    * Sets {@link ImplAccess#chgVisible} or {@link ImplAccess#chgInvisible} in {@link DynamicData#setChanged(int)}
@@ -1822,10 +1830,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     protected ImplAccess(GralWidget widgg){
       this.widgg = widgg;
       widgg._wdgImpl = this; 
+
       if(widgg._wdgPos ==null) {
         widgg._wdgPos = widgg.itsMng.getPosCheckNext();
         widgg.registerWidget(); //yet now because before the panel was unknown
       }
+      widgg.lastTimeSetVisible = System.currentTimeMillis();
     }
     
     
