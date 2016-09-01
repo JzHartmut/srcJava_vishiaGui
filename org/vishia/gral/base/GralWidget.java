@@ -1245,7 +1245,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       //first usage:
       String sPath1 = this.getDataPath();
       if(sPath1 !=null && (sPath1 = sPath1.trim()).length()>0){
-        String sPath = itsMng.replaceDataPathPrefix(sPath1);
+        String sPath = itsMng.getReplacerAlias().replaceDataPathPrefix(sPath1);
         variable = container.getVariable(sPath1);
         this.setContentInfo(variable);
       } else {
@@ -1271,7 +1271,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
           if(sPath1.contains("["))
             stop();
           String sPath2 = sPath1.trim();
-          String sPath = itsMng.replaceDataPathPrefix(sPath2);
+          String sPath = itsMng.getReplacerAlias().replaceDataPathPrefix(sPath2);
           VariableAccess_ifc variable1 = container.getVariable(sPath);
           if(variable1 !=null){
             variables.add(variable1);
@@ -1281,7 +1281,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
         if(sDataPath.contains("["))
           stop();
         String sPath2 = sDataPath.trim();
-        String sPath = itsMng.replaceDataPathPrefix(sPath2);
+        String sPath = itsMng.getReplacerAlias().replaceDataPathPrefix(sPath2);
         variable = container.getVariable(sPath);
       }
     }

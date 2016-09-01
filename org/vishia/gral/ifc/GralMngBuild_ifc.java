@@ -75,11 +75,13 @@ import org.vishia.util.ReplaceAlias_ifc;
  * @author Hartmut Schorrig
  *
  */
-public interface GralMngBuild_ifc extends ReplaceAlias_ifc 
+public interface GralMngBuild_ifc 
 {
   
   /**The version of this interface:
    * <ul>
+   * <li>2016-09-01 Hartmut chg: instead extends {@link ReplaceAlias_ifc} now contains {@link #getReplacerAlias()}.
+   *   It is an extra class for a ReplacerAlias given independent of the graphic. 
    * <li>2016-07-20 Hartmut chg: instead setToPanel now {@link #createImplWidget_Gthread()}. It is a better name. 
    * <li>2012-04-01 Hartmut new: {@link #addDataReplace(Map)}, {@link #replaceDataPathPrefix(String)}.
    *   using alias in the {@link GralWidget#setDataPath(String)}. The resolving of the alias is done
@@ -151,7 +153,7 @@ public interface GralMngBuild_ifc extends ReplaceAlias_ifc
    */
   GralUserAction setMainKeyAction(GralUserAction userKeyAction);
 
-  
+  ReplaceAlias_ifc getReplacerAlias();
 
 	/**Returns the width (number of grid step horizontal) of the last element.
    * @return Difference between current auto-position and last pos.

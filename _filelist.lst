@@ -1,7 +1,7 @@
 2012-11-14 06:19:56  x     _bzrGetOtherCmpnVersions.bat             ::          1.582 -1370334435 
 2012-11-14 06:19:00  x     _bzrOtherCmpnVersions.txt                ::           .804 -0655352013 
 2012-02-04 19:35:44  x     _bzr_push_A.bat                          ::           . 51  0133533915 
-2016-08-31 22:06:15  x     _filelist.lst                            ::           .  0  0000000000 
+2016-09-01 22:12:05  x     _filelist.lst                            ::           .  0  0000000000 
 2012-06-09 22:09:50  x     revisions_srcJava_vishiaGUI.txt          ::         97.084 -0350105957 
 
 2014-07-31 19:44:18 Dx     === _cmpn/ =============================================================
@@ -10,10 +10,8 @@
 2012-03-30 13:58:00  x     srcJava_vishiaBase.cmpn                  ::           .185 -0540160529 
 2012-03-30 13:58:00  x     srcJava_vishiaRun.cmpn                   ::           .183 -1315596433 
 
-2016-08-29 20:36:36 Dx     === _make/ =============================================================
+2016-09-01 21:03:09 Dx     === _make/ =============================================================
 2012-02-17 22:17:26  x     Fcmd.manifest                            ::           . 39  1890256972 
-2012-08-26 20:03:38  x     _bzr_version.txt                         ::           .173 -0528927999 
-2012-07-14 22:15:04  x     _genXMI.bat                              ::         96.628 -0002220178 
 2012-08-12 22:29:26  x     genDownload.sh                           ::           . 79 -0543343792 
 2015-03-21 23:53:14  x     genXMI_vishiaGui.bat                     ::          1.315 -0712909080 
 2016-08-29 20:36:36  x     genjavadoc.bat                           ::           .860 -0158351921 
@@ -23,8 +21,6 @@
 2012-06-04 22:29:12  x     makejar_Fcmd.sh                          ::          1.662 -1247132585 
 2016-03-09 09:30:10  x     makejar_vishiaGui.bat                    ::          3.069 -0128162139 
 2012-11-11 10:41:30  x     makejar_vishiaGui.sh                     ::          1.845 -1036369333 
-2015-10-31 14:59:56  x     old_makejar_vishiaGui.bat                ::          2.502 -1082704875 
-2015-06-23 09:16:59  x     report.txt                               ::         57.551  1611012542 
 2011-06-19 10:51:56  x     stylesheet_javadoc.css                   ::          1.879 -1539298620 
 2011-05-18 20:27:14  x     vishiaGUI.manifest                       ::           . 43  1071819173 
 2011-07-10 09:13:00  x     xxxjavacjar.sh                           ::          2.388 -0652346373 
@@ -122,7 +118,7 @@
 2012-05-20 12:38:56  x     GetGralWidget_ifc.java                   ::          2.072 -2006934492 
 2016-07-12 22:46:47  x     GralButton.java                          ::         20.763 -0476854972 
 2015-10-26 20:56:46  x     GralColorConv.java                       ::         14.603  1298753472 
-2016-07-02 14:43:17  x     GralCurveView.java                       ::         83.692 -2012609410 
+2016-09-01 22:05:57  x     GralCurveView.java                       ::         83.730 -2031129800 
 2016-08-24 17:49:11  x     GralGraphicThread.java                   ::         21.609 -1579458168 
 2015-02-07 13:01:18  x     GralGraphicTimeOrder.java                ::          4.735  2088496927 
 2016-07-09 23:41:23  x     GralGridProperties.java                  ::         13.122  1699234895 
@@ -131,7 +127,7 @@
 2014-01-05 19:57:21  x     GralKeySpecial_ifc.java                  ::           .662 -0643510547 
 2014-10-12 21:05:37  x     GralLed.java                             ::          5.296 -1747835006 
 2013-11-19 09:26:41  x     GralMenu.java                            ::          7.784 -0998305158 
-2016-08-24 17:26:06  x     GralMng.java                             ::         78.594 -0113243329 
+2016-09-01 22:09:01  x     GralMng.java                             ::         78.458  1861178239 
 2016-07-12 23:10:27  x     GralMouseWidgetAction_ifc.java           ::          6.566 -1613498083 
 2015-01-23 16:30:02  x     GralPanelActivated_ifc.java              ::          2.100 -0687531395 
 2016-07-20 22:17:48  x     GralPanelContent.java                    ::         14.304 -0970003283 
@@ -139,19 +135,19 @@
 2016-07-11 13:55:59  x     GralShowMethods.java                     ::         11.565 -1098536566 
 2015-10-04 16:58:52  x     GralSlider.java                          ::          1.123  0479092505 
 2016-07-02 01:23:46  x     GralTabbedPanel.java                     ::         11.005 -1811196051 
-2016-08-28 23:37:53  x     GralTable.java                           ::        109.351 -0761148184 
+2016-09-01 21:47:52  x     GralTable.java                           ::        110.179 -1506785936 
 2016-07-02 09:27:21  x     GralTextBox.java                         ::          6.502 -1259770386 
 2016-07-09 22:53:34  x     GralTextField.java                       ::         30.385  1868756155 
 2015-01-23 16:42:08  x     GralValueBar.java                        ::          6.321  1137566914 
 2016-07-02 00:27:44  x     GralWidgImpl_ifc.java                    ::          3.572  0443933197 
-2016-08-31 22:01:50  x     GralWidget.java                          ::         89.609  1023165461 
+2016-09-01 22:06:24  x     GralWidget.java                          ::         89.666  1144725389 
 2012-07-14 22:23:42  x     GralWidgetHelper.java                    ::          1.980 -1293053732 
 2016-08-30 23:15:14  x     GralWindow.java                          ::         14.016  1915929806 
 2016-07-02 09:37:22  x     GralWindow_setifc.java                   ::          1.980  0685613695 
 2013-07-15 11:52:00  x     package-info.java                        ::           .413  0984628564 
 
 2015-04-26 19:56:53 Dx     === org/vishia/gral/cfg/ ================================================
-2016-07-20 22:17:48  x     GralCfgBuilder.java                      ::         19.464 -0216821283 
+2016-09-01 22:05:17  x     GralCfgBuilder.java                      ::         19.483 -0205425660 
 2016-07-03 13:31:42  x     GralCfgData.java                         ::         18.121 -1042512904 
 2016-07-06 22:55:59  x     GralCfgDesigner.java                     ::         15.222 -1299687953 
 2016-07-03 19:52:00  x     GralCfgElement.java                      ::         10.349 -0336936946 
@@ -179,7 +175,7 @@
 2013-12-23 20:22:34  x     GralFont.java                            ::          3.272 -0533398868 
 2012-03-03 22:57:02  x     GralImageBase.java                       ::          1.708  0663012681 
 2015-05-15 14:27:37  x     GralMngApplAdapter_ifc.java              ::          2.286  0504421472 
-2016-08-24 08:43:06  x     GralMngBuild_ifc.java                    ::         35.191 -0285297987 
+2016-09-01 22:08:13  x     GralMngBuild_ifc.java                    ::         35.403 -1148673761 
 2016-06-27 21:24:16  x     GralMng_ifc.java                         ::         13.066 -0534309548 
 2012-03-03 22:57:02  x     GralPlugUser2Gral_ifc.java               ::          1.599  0625021935 
 2013-10-03 19:13:37  x     GralPlugUser_ifc.java                    ::          3.276 -0991962629 
@@ -256,7 +252,7 @@
 2016-07-20 22:17:48  x     GralFileSelector.java                    ::         64.000  0414569254 
 2016-07-03 16:56:59  x     GralHorizontalSelector.java              ::         10.736  0511637327 
 2012-03-28 07:42:16  x     GralHtmlWindow.java                      ::           .721  1491408445 
-2016-07-20 22:17:48  x     GralInfoBox.java                         ::         14.188 -0283180314 
+2016-09-01 12:12:07  x     GralInfoBox.java                         ::         14.345  1083578710 
 2016-07-15 15:44:30  x     GralLabel.java                           ::           .945  1178203059 
 2013-11-19 15:39:00  x     GralMsgOutputList.java                   ::          5.228 -1844316586 
 2015-10-04 16:55:15  x     GralPlotArea.java                        ::          4.515 -0761184119 
@@ -283,10 +279,10 @@
 2012-05-20 12:38:56  x     PanelOutput.java                         ::          1.327  0949896798 
 
 2016-07-03 11:46:25 Dx     === org/vishia/guiInspc/ ================================================
-2016-07-20 22:17:48  x     InspcCurveView.java                      ::         58.488 -0521294055 
+2016-09-01 14:22:14  x     InspcCurveView.java                      ::         59.230  0691631229 
 2015-05-25 22:51:12  x     InspcCurveViewApp.java                   ::          1.786  1991813217 
-2016-07-20 22:17:48  x     InspcFieldTable.java                     ::         23.941  1882077789 
-2016-07-13 22:22:41  x     InspcGui.java                            ::         23.930 -1016041903 
+2016-09-01 22:06:32  x     InspcFieldTable.java                     ::         24.779  1756798727 
+2016-09-01 22:05:49  x     InspcGui.java                            ::         23.949 -0902113094 
 2014-04-30 14:05:05  x     InspcGuiFieldsFromFile.java              ::          4.768 -1365812909 
 2016-07-06 22:57:13  x     InspcViewTargetComm.java                 ::          5.865 -1087273853 
 

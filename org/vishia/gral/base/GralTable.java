@@ -94,6 +94,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2016-09-01 Hartmut new: {@link #getIxLine(GralTableLine_ifc)} to determine the current position of a given table line.
    * <li>2016-08-28 Hartmut chg: {@link GraphicImplAccess#setBoundsCells(int, int)} now gets the zLineVisible.
    *   The {@link org.vishia.gral.swt.SwtTable#setBoundsCells(int, int)} sets the rest of texts invisible. Therewith the phenomena of ghost lines
    *   on resizing are removed. 
@@ -307,7 +308,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   /**Number of lines and number of the current line. It is -1 if this numbers should be evaluated from {@link #rootLine}
    */
-  private int zLineCurr = -1, nLineFirst = -1;
+  private int zLineCurr = 0, nLineFirst = -1;
   
   
   protected final StringBuilder searchChars = new StringBuilder(20);
@@ -702,6 +703,20 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     else return null;
   }
 
+
+
+  /**Gets the index in the visual presentation of the given line.
+   * @param line any line of this table, maybe null, maybe a line from any other table
+   * @return 0 for the first line, 1..., -1 if not found respectively the line is not in the visible area. 
+   *  Return index of the first not defined line (current length of table) if line==null
+   */
+  public int getIxLine(GralTableLine_ifc<UserData> line) {
+    for(int ix = 0; ix < linesForCell.length; ++ix) {
+      TableLineData line1 = linesForCell[ix];
+      if(line1 == line) return ix;
+    }
+    return -1; //not found;
+  }
   
   
   @Override public TableLineData insertLine(String lineKey, int row, String[] lineTexts, UserData userData) {
@@ -2259,6 +2274,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     @Override public boolean isNotEditableOrShouldInitialize(){ return GralTable.this.isNotEditableOrShouldInitialize(); }
 
     
+    @Override public boolean isGraphicDisposed(){ return GralTable.this.isGraphicDisposed(); }
     
     
     @Override public boolean isChanged(boolean setUnchanged){ 

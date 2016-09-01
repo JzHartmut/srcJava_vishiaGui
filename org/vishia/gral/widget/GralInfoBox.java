@@ -246,6 +246,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   @Override public boolean isNotEditableOrShouldInitialize(){ return textBox.isNotEditableOrShouldInitialize(); }
   
 
+  @Override public boolean isGraphicDisposed(){ return textBox !=null ? textBox.isGraphicDisposed() : htmlBox !=null ? htmlBox.isGraphicDisposed() : true; }
   
 
   @Override public boolean isChanged(boolean setUnchanged){ return textBox.isChanged(setUnchanged); }

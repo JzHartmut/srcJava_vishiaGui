@@ -111,7 +111,7 @@ public class GralCfgBuilder
   public String buildGui(LogMessage log, int msgIdent)
   {
     String sError = null;
-    gralMng.addDataReplace(cfgData.dataReplace);
+    gralMng.getReplacerAlias().addDataReplace(cfgData.dataReplace);
     
     Set<Map.Entry<String, GralCfgPanel>> setIdxPanels = cfgData.getPanels();
     if(setIdxPanels.size()==0){

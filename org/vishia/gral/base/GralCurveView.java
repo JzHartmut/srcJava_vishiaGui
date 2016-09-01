@@ -999,7 +999,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
             }
             String sPath2 = sDataPath.trim();
             if(!sDataPath.startsWith("#")){ //don't regard commented line
-              String sPath = itsMng.replaceDataPathPrefix(sPath2);  //replaces only the alias:
+              String sPath = itsMng.getReplacerAlias().replaceDataPathPrefix(sPath2);  //replaces only the alias:
               track.variable = container.getVariable(sPath);
               if(track.variable == null){
                 System.err.printf("GralCurveView - variable not found; %s in curveview: %s\n", sPath, super.name);
@@ -1027,7 +1027,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       final long timeyet = System.currentTimeMillis();
       int timeshort;
       if(this.common.timeDatapath !=null && this.common.timeVariable ==null){
-        String sPath = itsMng.replaceDataPathPrefix(this.common.timeDatapath);  //replaces only the alias:
+        String sPath = itsMng.getReplacerAlias().replaceDataPathPrefix(this.common.timeDatapath);  //replaces only the alias:
         this.common.timeVariable = container.getVariable(sPath);
       }
       if(this.common.timeVariable !=null){

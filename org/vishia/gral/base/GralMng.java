@@ -39,12 +39,15 @@ import org.vishia.gral.ifc.GralWindowMng_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.gral.widget.GralLabel;
+import org.vishia.inspcPC.InspcReplAlias;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmdLoggingStream;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.Debugutil;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
+import org.vishia.util.ReplaceAlias_ifc;
 
 /**This is the Manager for the graphic. 
  * It contains the independent parts of graphic organization.
@@ -64,6 +67,8 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2016-09-01 Hartmut chg: instead implements {@link ReplaceAlias_ifc} now contains {@link #getReplacerAlias()}.
+   *   It is an extra class for a ReplacerAlias given independent of the graphic. 
    * <li>2016-07-20 Hartmut chg: instead setToPanel now {@link #createImplWidget_Gthread()}. It is a better name. 
    * <li>2015-10-29 Hartmut chg: Problem on {@link #pos()} with a second thread: The MainWindow- {@link GralPos#panel} was registered in another thread
    *   and therefore unknown in the new {@link #pos()} for that thread. Solution: If the thread-specific GralPos will be created,
@@ -346,7 +351,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    */
   protected GralUserAction userMainKeyAction;
   
-  
+  InspcReplAlias replacerAlias = new InspcReplAlias();
   
   //public final GralWidgetHelper widgetHelper;
   
@@ -526,6 +531,10 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    */
   private GralWidget_ifc lastClickedWidget;
   
+  //private String lastClickedDatapath;
+  
+  //private String lastClickedVariable;
+  
   @Deprecated @Override public List<GralWidget> getListCurrWidgets(){ return pos().pos.panel.widgetList; }
 	
   /**Index of all user actions, which are able to use in Button etc. 
@@ -703,39 +712,8 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   public GralMngApplAdapter_ifc getApplicationAdapter(){ return applAdapter; } 
   
   
-  /**It supports usage of an alias in the data path. See {@link #replaceDataPathPrefix(String)}.
-   * @param src this map will added to the existing one.
-   */
-  @Override public void addDataReplace(final Map<String, String> src){
-    dataReplace.putAll(src);    
-  }
+  @Override public ReplaceAlias_ifc getReplacerAlias(){ return replacerAlias; }
   
-  /**It supports usage of an alias in the data path. See {@link #replaceDataPathPrefix(String)}.
-   * @param alias Any shorter alias
-   * @param value The complete value.
-   */
-  @Override public void addDataReplace(String alias, String value){
-    dataReplace.put(alias, value);    
-  }
-  
-  /**It supports usage of an alias in the data path.
-   * @param path may contain "alias:restOfPath"
-   * @return if "alias" is found in {@link #addDataReplace(String, String)} the it is replaced
-   *   inclusively ":". If alias is not found, it is not replaced.
-   *   Note that another meaning of "prefix:restOfPath" is possible.
-   */
-  @Override public String replaceDataPathPrefix(final String path)
-  {
-    String pathRet = path;
-    int posSep = path.indexOf(':');
-    if(posSep >=0){
-      String sRepl = dataReplace.get(path.substring(0, posSep));
-      if(sRepl !=null){
-        pathRet = sRepl + path.substring(posSep+1);  //Note: sRepl may contain a ':', its the device.
-      }
-    }
-    return pathRet;
-  }
   
 
   public void setHelpBase(String path){ 
@@ -871,16 +849,26 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 	}
 	
 	
-	/**Returns that widget which was clicked by mouse at last. This method is usefully for debugging
-	 * and for special functionality. A widget which {@link GralWidget#setDataPath(String)} is initialized
-	 * with "widgetInfo" is not captured for this operation. It means, if any user action method uses
-	 * this method to get the last clicked widget, that widget itself have to be marked with
-	 * <b>setDataPath("widgetInfo");</b> to prevent getting its own widget info.  
-	 * @return The last clicked widget
-	 */
-	public GralWidget_ifc getLastClickedWidget(){ return lastClickedWidget; }
-	
-	
+  /**Returns that widget which was clicked by mouse at last. This method is usefully for debugging
+   * and for special functionality. A widget which {@link GralWidget#setDataPath(String)} is initialized
+   * with "widgetInfo" is not captured for this operation. It means, if any user action method uses
+   * this method to get the last clicked widget, that widget itself have to be marked with
+   * <b>setDataPath("widgetInfo");</b> to prevent getting its own widget info.  
+   * @return The last clicked widget
+   */
+  public GralWidget_ifc getLastClickedWidget(){ return lastClickedWidget; }
+  
+  
+  /**Returns that widget which was clicked by mouse at last. This method is usefully for debugging
+   * and for special functionality. A widget which {@link GralWidget#setDataPath(String)} is initialized
+   * with "widgetInfo" is not captured for this operation. It means, if any user action method uses
+   * this method to get the last clicked widget, that widget itself have to be marked with
+   * <b>setDataPath("widgetInfo");</b> to prevent getting its own widget info.  
+   * @return The last clicked widget
+   */
+  //public String getLastClickedDatapath(){ return lastClickedWidget; }
+  
+  
   /**Registers all user actions, which are able to use in Button etc.
    * The name is related with the <code>userAction=</code> designation in the configuration String.
    * @param name if it contains "<name>" then that is replace by the {@link GralUserAction#name}. 

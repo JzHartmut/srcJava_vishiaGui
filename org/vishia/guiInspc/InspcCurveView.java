@@ -15,6 +15,7 @@ import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralTable.TableLineData;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
@@ -31,6 +32,7 @@ import org.vishia.gral.widget.GralColorSelector;
 import org.vishia.gral.widget.GralFileSelectWindow;
 import org.vishia.gral.widget.GralColorSelector.SetColorFor;
 import org.vishia.gral.widget.GralFileSelector;
+import org.vishia.inspcPC.mng.InspcFieldOfStruct;
 import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
 import org.vishia.util.FileSystem;
@@ -408,34 +410,47 @@ public final class InspcCurveView
         System.err.println("No variable clicked");
         return false;
       }
-      //GralTextField widgText = (GralTextField)widgd;
-      //String sVariable = variableWidget.name;
-      Object oContentInfo = widgd.getContentInfo();
-      String sPath = variableWidget.getDataPath();
-      TrackValues input;
-      assert(widgd instanceof GralTable<?>);  //NOTE: context menu to table lines, has GralTable as widget.
-      @SuppressWarnings("unchecked")
-      GralTable<TrackValues> table = (GralTable<TrackValues>)widgd; //oContentInfo;
-      GralTable<TrackValues>.TableLineData refline = table.getLineMousePressed();
-      if(bInsert || refline == null){  //insert a line, build a new one
-        input = new TrackValues();
-        GralTableLine_ifc<?> newline;
-        if(refline ==null){
-          newline = table.addLine(sPath, new String[]{""}, input);  //add on end
+      String sPath;
+      if(variableWidget instanceof TableLineData) {
+        Object data = variableWidget.getData();
+        if(data instanceof InspcFieldOfStruct) {
+          @SuppressWarnings("unchecked")
+          GralTable<InspcFieldOfStruct>.TableLineData line = (GralTable<InspcFieldOfStruct>.TableLineData)variableWidget;
+          sPath = InspcFieldTable.getDataPath(line); //((InspcFieldOfStruct)data).
         } else {
-          newline = refline.addPrevLine(sPath, new String[]{""}, input);
+          sPath = null;
         }
-        newline.setCellText(sPath, 0);
-      } 
-      else {
-        input = (TrackValues)refline.getContentInfo();
-        refline.setCellText(sPath, 0);
       }
-      input.min = Float.MAX_VALUE;
-      input.max = -Float.MAX_VALUE;
-      input.mid = 0.0f;
-      //String sShowMethod = variableWidget.getShowMethod();
-      if(sPath !=null){
+      else {
+        sPath = variableWidget.getDataPath();
+      }
+      if(sPath !=null) {
+        TrackValues input;
+        assert(widgd instanceof GralTable<?>);  //NOTE: context menu to table lines, has GralTable as widget.
+        @SuppressWarnings("unchecked")
+        GralTable<TrackValues> table = (GralTable<TrackValues>)widgd; //oContentInfo;
+        GralTable<TrackValues>.TableLineData refline = table.getLineMousePressed();
+        int ixnewline =-1;
+        GralTableLine_ifc<TrackValues> newline = null;
+        if(bInsert || refline == null){  //insert a line, build a new one
+          input = new TrackValues();
+          if(refline ==null){
+            newline = table.addLine(sPath, new String[]{""}, input);  //add on end
+            ixnewline = table.size();  //first line
+          } else {
+            newline = refline.addPrevLine(sPath, new String[]{""}, input);
+            ixnewline = table.getIxLine(refline);
+          }
+          newline.setCellText(sPath, 0);
+        } 
+        else {
+          input = (TrackValues)refline.getContentInfo();
+          refline.setCellText(sPath, 0);
+        }
+        input.min = Float.MAX_VALUE;
+        input.max = -Float.MAX_VALUE;
+        input.mid = 0.0f;
+        //String sShowMethod = variableWidget.getShowMethod();
         if(input.trackView == null){
           //A new trackview, in Table in the required order, in the widgCurve added on end.
           //The order of tracks in widgCurve are not the same like in table.
@@ -443,10 +458,13 @@ public final class InspcCurveView
         } else {
           input.trackView.setDataPath(sPath);
         }
+        if(newline !=null && ixnewline >=0) {
+          table.setCurrentLine(newline, ixnewline, 0);
+        }
+        table.repaint();
       } else {
         System.out.printf("InspcCurveView - invalid widget to drop; %s\n", variableWidget.toString());
       }
-      table.repaint();
     }
     return true;
     

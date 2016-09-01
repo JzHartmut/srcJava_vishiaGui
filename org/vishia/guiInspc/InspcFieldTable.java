@@ -250,7 +250,7 @@ public class InspcFieldTable
     GralWidget widgd = wind.gralMng().getWidgetInFocus();
     if(widgd !=null){
       String sDatapathWithPrefix = widgd.getDataPath();
-      String sDatapath = widgd.gralMng().replaceDataPathPrefix(sDatapathWithPrefix);
+      String sDatapath = widgd.gralMng().getReplacerAlias().replaceDataPathPrefix(sDatapathWithPrefix);
       int posLastDot = sDatapath.lastIndexOf('.');
       if(posLastDot >=0) {
         sPathStruct = sDatapath.substring(0, posLastDot);  //With device:path
@@ -395,11 +395,33 @@ public class InspcFieldTable
   
   
   
+  public static String getDataPath(GralTable<InspcFieldOfStruct>.TableLineData line)
+  { String sPath = null;
+    String sField1 = line.getKey();
+    //sPathCurrent = line.getDataPath();
+    InspcFieldOfStruct field = line.data;
+    InspcVariable var = field.variableExisting();
+    if(var !=null) {
+      sPath = var.ds.sPathWithAlias;
+    }
+    else 
+    { //The varOfStruct is exisiting in any case. get it to get the short data path.
+      InspcVariable varStruct = field.struct.varOfStruct(null);
+      if(":.".indexOf(varStruct.ds.sPathWithAlias.charAt(varStruct.ds.sPathWithAlias.length()-1))<0) {
+        sPath = varStruct.ds.sPathWithAlias + "." + sField1;
+      } else {
+        sPath = varStruct.ds.sPathWithAlias + sField1;
+      }
+    }
+    return sPath;
+  }
+  
+  
   
   
   void setCurrentFieldInfo(GralTable<InspcFieldOfStruct>.TableLineData line){
     sFieldCurrent = line.getKey();
-    sPathCurrent = line.getDataPath();
+    sPathCurrent = getDataPath(line);
     timeLineSelected = System.currentTimeMillis();
     widgPath.setText(sPathCurrent + " : " + line.getCellText(3));
 
@@ -540,7 +562,7 @@ public class InspcFieldTable
       if(key == KeyCode.defaultSelect || key == KeyCode.userSelect){
         @SuppressWarnings("unchecked")
         GralTable<InspcFieldOfStruct>.TableLineData line = (GralTable.TableLineData)params[0];
-        if(line !=null) { setCurrentFieldInfo(line); }
+        if(line !=null && line.data !=null) { setCurrentFieldInfo(line); }
         return true;
       } else { 
         return false;
