@@ -57,8 +57,8 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
    */
   private StringBuffer newText = new StringBuffer();
   
-  public GralTextBox(String name)
-  { super(name);
+  public GralTextBox(String name, Type... property)
+  { super(name, property);
   }
 
   /**Sets the text to the widget, invoked only in the graphic thread.

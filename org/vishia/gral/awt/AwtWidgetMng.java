@@ -364,8 +364,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
       setPosAndSize_(mng.getPosOldPositioning(), box);
       Dimension size = box.getSize();
       GralPanelContent panel = new AwtPanel(name, mng, box);
-      mng.registerPanel(panel);
-      //GuiPanelMngSwt mng = new GuiPanelMngSwt(gralDevice, size.y, size.x, propertiesGuiSwt, variableContainer, log);
+      //mng.registerPanel(panel);
       return panel;
   }
 

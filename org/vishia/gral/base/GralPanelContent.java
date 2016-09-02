@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
@@ -105,7 +103,11 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
 	{ super(namePanel, '$');
 	  this.name = namePanel;
 		//this.panelComposite = panelComposite;
-    GralMng.get().registerPanel(this);
+    //GralMng mng = GralMng.get();
+    mng.registerPanel(this);
+    if( pos()!=null) {
+      mng.setPosPanel(this);
+    }
     int property = 0; //TODO parameter
     bZoomed = (property & GralMngBuild_ifc.propZoomedPanel) !=0;
     bGridZoomed = (property & GralMngBuild_ifc.propGridZoomedPanel) !=0;
@@ -123,7 +125,11 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   //public PanelContent(CanvasStorePanel panelComposite)
   { super(posString, namePanel, whatIsit);
     this.name = namePanel;
-    GralMng.get().registerPanel(this);
+    GralMng mng = GralMng.get();
+    mng.registerPanel(this);
+    if( pos()!=null) {
+      mng.setPosPanel(this);
+    }
     int property = 0; //TODO parameter
     bZoomed = (property & GralMngBuild_ifc.propZoomedPanel) !=0;
     bGridZoomed = (property & GralMngBuild_ifc.propGridZoomedPanel) !=0;
@@ -359,7 +365,9 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
     protected ImplAccess(GralPanelContent widgg)
     {
       super(widgg);
-      //gralPanel = widgg;
+      //for all following actions: this is the current panel.
+      GralMng mng = GralMng.get();
+      mng.setPosPanel((GralPanelContent)widgg);   
     }
     
     public GralPanelContent gralPanel(){ return (GralPanelContent) widgg; } //It is the correct type.

@@ -174,6 +174,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2016-09-02 Hartmut chg: {@link GralWidget#GralWidget(String, String, char)} with a position String is now deprecated. 
+   *   Instead the {@link GralWidget#GralWidget(String, char)} which was deprecated till now is the favor again, but with a combination
+   *   of "@pos=name" as first argument. That can be used for all derived widgets!. Therewith it is more simple to complete the widgets 
+   *   with the capability of usage of a position String. Without "@...=" it is the old behavior of the constructor. 
+   *   Note that the position can be given with {@link GralMng#setPosition(GralPos, float, float, float, float, int, char)} etc. too,
+   *   with numeric values which may be calculated, instead a constant text. 
    * <li>2016-08-31 Hartmut new: {@link #isGraphicDisposed()} especially used for GralWindow-dispose detection. 
    * <li>2016-07-20 Hartmut chg: invocation of registerWidget one time after its position is known. Either it is in the ctor of GralWidget 
    *   or it is in the ctor of {@link GralWidget.ImplAccess} if the position was assigned later in the graphic thread.
@@ -320,7 +326,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final String sVersion = "2016-08-31";
+  public static final String sVersion = "2016-09-02";
 
   
   /**The widget manager from where the widget is organized. Most of methods need the information
@@ -486,7 +492,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * <li>*: A type (not a widget, common information) See {@link org.vishia.gral.cfg.GralCfgData#new_Type()}
    * </ul>
    * */
-  public char whatIs;
+  public final char whatIs;
   
   public String sToolTip;
   
@@ -664,27 +670,38 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   //{ this.whatIs = whatIs;
   //}
 
-  /**Creates a widget which is not positioned.
-   * @param sName
+  /**Creates a widget.
+   * @param posString If null then the widget is not positioned. !=null then a position string.
+   *   The position is taken relative to the {@link GralMng#pos}, the {@link GralMng#pos} is changed
+   *   see {@link GralPos#setPosition(CharSequence, GralPos)}
+   * @param sName If posString is null and sName has the form "@pos = name" then this is a combination from name and pos.
+   *   The name should be unified to indent a widget by its name. 
    * @param whatIs
-   * @deprecated use {@link GralWidget#GralWidget(String, String, char)}
+   * @throws ParseException 
+   * @deprecated since 2016-09: The idea is: Use always one String for "@pos=name".
    */
-  @Deprecated public GralWidget(String sName, char whatIs){ 
-    this(null, sName, whatIs);
+  @Deprecated public GralWidget(String pos, String name, char whatIs){ 
+    this(pos !=null ? (pos.startsWith("@") ? "" : "@" + pos + "=" + name) : name, whatIs);
   }
 
   
   
   /**Creates a widget.
-   * @param posString If null then the widget is not positioned. !=null then a position string.
-   *   The position is taken relative to the {@link GralMng#pos}, the {@link GralMng#pos} is changed
-   *   see {@link GralPos#setPosition(CharSequence, GralPos)}
-   * @param sName
-   * @param whatIs
-   * @throws ParseException 
+   * @param sName has the form "@pos = name" then this is a combination from position string and name.
+   *   The name should be unified to indent a widget by its name.
+   *   Syntax of pos: see {@link GralPos#setPosition(CharSequence, GralPos)}. It is the same syntax as in textual config scripts. 
+   * @param whatIs See {@link #whatIs}
    */
-  protected GralWidget(String posString, String sName, char whatIs)
-  { this.name = sName;
+  public GralWidget(String sPosName, char whatIs){ 
+    int posName;
+    String posString1;
+    if(sPosName !=null && sPosName.startsWith("@") && (posName= sPosName.indexOf('='))>0) {
+      posString1 = sPosName.substring(0, posName).trim();
+      this.name = sPosName.substring(posName+1).trim();
+    } else {
+      this.name = sPosName;
+      posString1 = null;
+    }
     //this.widget = null;
     this.whatIs = whatIs;
     //bVisibleState = whatIs != 'w';  //true for all widgets, false for another Windows. 
@@ -692,20 +709,20 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     this.itsCfgElement = null;
     itsMng = GralMng.get();
     assert(itsMng !=null);  //should be created firstly in the application, since 2015-01-18
-    if(posString !=null) {
+    if(posString1 !=null) {
       try{
         if(whatIs == 'w') {
           //a window: don't change the GralMng.pos, create a new one.
           GralPos pos = new GralPos();
           pos.panel = itsMng.getPrimaryWindow();
-          this._wdgPos = pos.setNextPos(posString);
+          this._wdgPos = pos.setNextPos(posString1);
         } else {
           //a normal widget on a panel
-          this._wdgPos = itsMng.pos().pos.setNextPos(posString);
+          this._wdgPos = itsMng.pos().pos.setNextPos(posString1);
         }
         registerWidget();
       } catch(ParseException exc) {
-        throw new IllegalArgumentException("GralWidget - position is syntactical faulty; " + posString);
+        throw new IllegalArgumentException("GralWidget - position is syntactical faulty; " + posString1);
       }
     } //else: don't set the pos, it is done later 
   }

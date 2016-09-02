@@ -108,19 +108,12 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   final boolean bPassword;
   
   /**Constructs a text field with given properties
-   * @param name Name of the field. Maybe null if it is not need in management by name
+   * @param posName Position and Name of the field. Maybe null if it is not need in management by name
+   *   See {@link GralWidget#GralWidget(String, char)}.
    * @param property password, editable, maybe left empty.
    */
-  public GralTextField(String name, Type... property){
-    this(null, name, property);
-  }
-
-  /**Constructs a text field with given properties
-   * @param name Name of the field. Maybe null if it is not need in management by name
-   * @param property password, editable, maybe left empty.
-   */
-  public GralTextField(String position, String name, Type... property){
-    super(position, name, 't');
+  public GralTextField(String posName, Type... property){
+    super(posName, 't');
     boolean bPassword1 = false;
     if(property !=null){
       for(int ii=0; ii<property.length; ++ii){
@@ -134,6 +127,15 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     windowMng = null;
     setBackColor(GralColor.getColor("wh"),0);
     setTextColor(GralColor.getColor("bk"));
+  }
+
+  /**Constructs a text field with given properties
+   * @param name Name of the field. Maybe null if it is not need in management by name
+   * @param property password, editable, maybe left empty.
+   * @deprecated since 2016-09,use {@link GralTextField#GralTextField(String, Type...)} with "@pos=name"
+   */
+  public GralTextField(String position, String name, Type... property){
+    this(position + "=" + name, property);
   }
   
   

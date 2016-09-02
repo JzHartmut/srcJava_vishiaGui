@@ -109,6 +109,9 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	/**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
 	 * Changes:
 	 * <ul>
+   * <li>2016-09-02 Hartmut chg: Some {@link GralPanelContent#GralPanelContent(String, String, char)} and {@link GralTabbedPanel#GralTabbedPanel(String, String, GralPanelActivated_ifc, int)}
+   *   was invoked with "@" for the posString without any more posString information. That is false. The idea was: Set the current panel. But that does not run. 
+   *   See changes on {@link GralMng} on 2016-09-02. 
    * <li>2013-12-21 Hartmut new: {@link #createImplWidget_Gthread(GralWidget)} instanciates all widget types. 
 	 * <li>2012-07-13 Hartmut chg: {@link #resizeWidget(GralWidget, int, int)} can work with more as one widget implementation.
 	 *   But it isn't test and used yet. Size of any implementation widget?
@@ -379,21 +382,20 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     Composite box = new Composite(getCurrentPanel(), 0);
     setPosAndSize_(mng.getPosOldPositioning(), box);
     Point size = box.getSize();
-    GralPanelContent panelg = new GralPanelContent("@", name);
+    GralPanelContent panelg = new GralPanelContent(null, name);
     GralPanelContent panel = (new SwtPanel(panelg, box)).gralPanel();
-    mng.registerPanel(panel);
+    //mng.registerPanel(panel);
     //GuiPanelMngSwt mng = new GuiPanelMngSwt(gralDevice, size.y, size.x, propertiesGuiSwt, variableContainer, log);
     return panel;
   }
 
   
   @Override public GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG, int xS, int yS)
-  { GralPanelContent panelg = new GralPanelContent("@", namePanel);
+  { GralPanelContent panelg = new GralPanelContent(null, namePanel);
     Color backColorSwt = propertiesGuiSwt.colorSwt(backGround);
-    Composite panelSwt = getCurrentPanel(panelg);  
-    SwtGridPanel panel = new SwtGridPanel(panelg, panelSwt, 0, backColorSwt, xG, yG, xS, yS, mng);
+    SwtGridPanel panel = new SwtGridPanel(panelg, null, 0, backColorSwt, xG, yG, xS, yS, mng);
     GralPanelContent gralPanel = panel.gralPanel();
-    mng.registerPanel(gralPanel);
+    //mng.registerPanel(gralPanel);
 
     return gralPanel;
   }
@@ -679,7 +681,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	 * @see org.vishia.gral.base.GralMng.ImplAccess#addTabbedPanel(java.lang.String, org.vishia.gral.base.GralPanelActivated_ifc, int)
 	 */
 	@Override public GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int property)
-	{ GralTabbedPanel panelg = new GralTabbedPanel("@", namePanel, user, property);
+	{ GralTabbedPanel panelg = new GralTabbedPanel(null, namePanel, user, property);
 		SwtTabbedPanel tabMngPanel = new SwtTabbedPanel(panelg, this, user, property);
 		mng.currTabPanel = panelg;
 		//GralWidget tabFolder = currTabPanel;

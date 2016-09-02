@@ -67,8 +67,10 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	SwtTabbedPanel(GralTabbedPanel panelg, SwtMng mng, GralPanelActivated_ifc user, int property)
 	{ super(panelg);  //initializes as GralWidget and as GralPanel
 		this.mng = mng;
-		Object oParent = widgg.pos().panel.getWidgetImplementation(); //this.pos().panel.getPanelImpl();
-    if(oParent == null || !(oParent instanceof Composite) ){ throw new IllegalArgumentException("Software error. You must select a panel before."); }
+		Object oParent = widgg.pos().panel._wdgImpl.getWidgetImplementation(); //this.pos().panel.getPanelImpl();
+    if(oParent == null || !(oParent instanceof Composite) ){ 
+      throw new IllegalArgumentException("Software error. You must select a panel before."); 
+    }
 		Composite parent = (Composite)oParent;
 		
 		//this.panelComposite = parent;  
@@ -102,8 +104,8 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	  tabItem.setControl(panel.swtCanvas);
 	  panel.swtCanvas.addFocusListener(focusTabListener); //unused...
 	  GralPanelContent gralPanel = panel.gralPanel();
-	  mng.mng.registerPanel(gralPanel);   //register the panel in the mng.
-	  mng.mng.registerWidget(gralPanel);
+	  //mng.mng.registerPanel(gralPanel);   //register the panel in the mng.
+	  //mng.mng.registerWidget(gralPanel);
 	  //panels.put(sName, gralPanel);   //register the tab panel in the TabbedPanel
 	  mng.mng.setPosition(0, 0, 0, 0, 0, '.');
 	  return gralPanel;
@@ -118,7 +120,7 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	   Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
 	   SwtCanvasStorePanel swtPanel = (new SwtCanvasStorePanel(panelg, widgetSwt, 0, colorBackground, mng.mng));
 	   GralPanelContent panel = swtPanel.gralPanel();
-	   mng.mng.registerPanel(panel);
+	   //mng.mng.registerPanel(panel);
 	   tabItemOperation.setControl(swtPanel.swtCanvas);
 	   return panel;
 	}

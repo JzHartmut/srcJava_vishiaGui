@@ -396,16 +396,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @param columnWidths positive value from left: width, negative value from right: width. 
    *   The last column with a positive width is used for sizeable. 
    */
-  public GralTable(String name, int[] columnWidths) { this(null, name, columnWidths); }
-  
-  /**Constructs a table with position
-   * @param pos String given position in GralPos units.
-   * @param name to registrate
-   * @param columnWidths positive value from left: width, negative value from right: width. 
-   *   The last column with a positive width is used for sizeable. 
-   */
-  public GralTable(String pos, String name, int[] columnWidths) {
-    super(pos, name, 'L');
+  public GralTable(String name, int[] columnWidths) {
+    super(name, 'L');
     this.columnWidthsGral = columnWidths;
     this.zColumn = columnWidths.length;
     this.bColumnEditable = new boolean[this.zColumn];  //all false.
@@ -415,13 +407,24 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     rootLine.treeDepth = -1; //children of rootline are level 0
     rootLine.zLineUnfolded = 0;  //count added line.
     
-    linesForCell = (TableLineData[])Array.newInstance( TableLineData.class, 50 );  
-    //Hint: linesForCell = new GralTable<UserData>.TableLineData[50];
-    //does not work because TableLineData is generic.
+    @SuppressWarnings("unchecked")
+    TableLineData[] linesForCell1 = (TableLineData[])Array.newInstance( TableLineData.class, 50 );
+    linesForCell = linesForCell1; //Hint: linesForCell = new GralTable<UserData>.TableLineData[50]; does not work because TableLineData is generic.
     zLineVisibleMax = linesForCell.length;
     setColors();
   }
 
+  
+  
+  
+  /**Constructs a table with position
+   * @param pos String given position in GralPos units.
+   * @param name to registrate
+   * @param columnWidths positive value from left: width, negative value from right: width. 
+   *   The last column with a positive width is used for sizeable. 
+   */
+  public GralTable(String pos, String name, int[] columnWidths) 
+  { this(pos + "=" + name, columnWidths); }
   
   
   

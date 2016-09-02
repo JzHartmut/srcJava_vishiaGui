@@ -67,6 +67,15 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2016-09-02 Hartmut new: {@link #setPosPanel(GralPanelContent)} now invoked especially from ctor of {@link GralPanelContent}
+   *   and from ctor of {@link GralPanelContent.ImplAccess}. If a new Panel was created with a given {@link GralWidget#pos()} then that panel
+   *   is set as current one for the next widgets. Either the widgets are created before the implementation graphic with given position string,
+   *   then the panel should have a position string too to assigned them. Or the widgets are created with creation of the implementation graphic,
+   *   then a panel should be created in the same kind, and invoke {@link #setPosPanel(GralPanelContent)} in the ctor of its implementation.
+   *   The contract is unchanged: A created panel determines that all following widgets are created on that panel.
+   * <li>2016-09-02 Hartmut chg: {@link #registerPanel(GralPanelContent)} is only be called in the ctor of {@link GralPanelContent} 
+   *   because any panel is based on GralPanelContent. 
+   *   The definition of the panel in the {@link #pos()} used for the next widgets are done now in the extra routine {@link #setPosPanel(GralPanelContent)}. 
    * <li>2016-09-01 Hartmut chg: instead implements {@link ReplaceAlias_ifc} now contains {@link #getReplacerAlias()}.
    *   It is an extra class for a ReplacerAlias given independent of the graphic. 
    * <li>2016-07-20 Hartmut chg: instead setToPanel now {@link #createImplWidget_Gthread()}. It is a better name. 
@@ -651,11 +660,11 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     if(widgg instanceof GralWindow){
       GralWindow wind1 = (GralWindow)widgg;
       impl.createSubWindow(wind1);
-      registerPanel(wind1);
+      //registerPanel(wind1);
       //set the current position of the manager to this window, initalize it.
-      PosThreadSafe pos = pos();
-      pos.pos.panel = wind1; //it is selected.
-      pos.pos.setPosition(null, 0,0,0,0,0,'r');  //per default the whole window as position and size.
+      //PosThreadSafe pos = pos();
+      //pos.pos.panel = wind1; //it is selected.
+      //pos.pos.setPosition(null, 0,0,0,0,0,'r');  //per default the whole window as position and size.
 
     } else {  
       impl.createImplWidget_Gthread(widgg); 
@@ -934,14 +943,17 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
       if(exist == panel) System.out.println("info: unnecessary registerPanel " + panel.name);
       else System.err.println("info: faulty registerPanel " + panel.name);
     }
-    PosThreadSafe pos = pos();
     panels.put(panel.name, panel);
+  }
+  
+  
+  public void setPosPanel(GralPanelContent panel) {
+    GralMng.PosThreadSafe pos = pos();
     pos.pos.panel = panel;
     //initialize the position because its a new panel. The initial position is the whole panel.
     pos.pos.setFinePosition(0,0,0,0,0,0,0,0,0,'d',0,0, pos.pos);
     sCurrPanel = panel.name;
   }
-  
   
   
   /*package private*/ void deregisterPanel(GralPanelContent panel) {

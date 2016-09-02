@@ -14,6 +14,7 @@ import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralTableLine_ifc;
+import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.DataAccess;
 import org.vishia.util.Debugutil;
@@ -67,10 +68,10 @@ public class GitGui
 
   GralWindow window = new GralWindow("0+50, 0+80", "GitGui", "Git vishia", GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose);
 
-  GralTextField wdgPath = new GralTextField("2-2,0..0", "path");
-  GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("3..-20,2..-20", "git-versions", new int[] {10, 0, -10});
+  GralTextField wdgPath = new GralTextField("@2-2,0..0=path");
+  GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("@3..-20,0..-20=git-versions", new int[] {10, 0, -10});
   
-  GralTextBox wdgInfo = new GralTextBox("info");
+  GralTextBox wdgInfo = new GralTextBox("@-20..0, 0..-20=info");
 
 
   CmdExecuter cmd = new CmdExecuter();
@@ -96,6 +97,7 @@ public class GitGui
       sTypeOfImplementation = args[0];
     }
     initializeCmd();
+    wdgTableVersion.specifyActionOnLineSelected(actionTableLineVersion);
     window.create(sTypeOfImplementation, 'B', null);
   }
 
@@ -278,7 +280,7 @@ public class GitGui
                   if(entry.commitTitle == null && commitTextline.length() >6){
                     entry.commitTitle = commitTextline.toString();  //first line with at least 6 character: Use as title.
                   }
-                  entry.commitText.append(commitTextline);
+                  entry.commitText.append(commitTextline).append('\n');
                 }
               } while(cont && (out.nextlineMaxpart().found()));
             }
@@ -304,7 +306,7 @@ public class GitGui
 
 
 
-  class RevisionEntry
+  static class RevisionEntry
   {
     final String revisionHash;
     String treeHash;
@@ -319,6 +321,19 @@ public class GitGui
     RevisionEntry(String hash) { revisionHash = hash; }
     
   }
+
+
+
+  GralUserAction actionTableLineVersion = new GralUserAction("actionTablelineVersion")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      @SuppressWarnings("unchecked")
+      GralTable<RevisionEntry>.TableLineData line = (GralTable<RevisionEntry>.TableLineData) params[0];
+      RevisionEntry entry = line.data;
+      wdgInfo.setText(entry.commitText);
+      return true;
+    }
+  };
+
 
 
 }

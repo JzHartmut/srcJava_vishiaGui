@@ -307,10 +307,8 @@ public class GralArea9Window implements GralArea9_ifc
       
       if(outputArea != null){
         outputPanel = addOutputFrameArea(outputArea);
-        window.gralMng().registerPanel(outputPanel);
+        //window.gralMng().registerPanel(outputPanel);
       }
-      //window.gralMng().gralDevice.removeDispatchListener(this);
-      //countExecution();
     }
   };
 
