@@ -100,7 +100,7 @@ public interface GralTable_ifc<UserData> extends GralWidget_ifc
   /**Sets the cell which is the current one in the given line.
    * @param line The line which should be selected.
    * @param ixline the index in the visible are of table where the line should be present. 
-   *   If the index is negative, the lines from end of visible are are countered.
+   *   If the index is negative, it is the index from end of visible area. -1 means the last line.
    *   if the index is outside of the area, it will be set inside.  
    * @param ixcolumn from 0 for the left column, if -1 then let the current row of table unchanged.
    */

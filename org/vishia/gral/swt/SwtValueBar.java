@@ -63,7 +63,7 @@ public class SwtValueBar extends GralValueBar.GraphicImplAccess // implements Gr
   
 	
 	public void setBounds(){
-    pixBounds = wdgh.mng.calcWidgetPosAndSizeSwt(widgg.pos(), widgetSwt, 10, 100);
+    pixBounds = wdgh.mng.calcWidgetPosAndSizeSwt(widgg.pos(), widgetSwt.getParent(), 10, 100);
     //mng.setPosAndSize_(widgetSwt);
     widgetSwt.setBounds(pixBounds.x, pixBounds.y, pixBounds.dx, pixBounds.dy);
     horizontal = pixBounds.dx > pixBounds.dy;

@@ -1,7 +1,7 @@
 2012-11-14 06:19:56  x     _bzrGetOtherCmpnVersions.bat             ::          1.582 -1370334435 
 2012-11-14 06:19:00  x     _bzrOtherCmpnVersions.txt                ::           .804 -0655352013 
 2012-02-04 19:35:44  x     _bzr_push_A.bat                          ::           . 51  0133533915 
-2016-09-02 23:42:55  x     _filelist.lst                            ::           .  0  0000000000 
+2016-09-03 12:19:07  x     _filelist.lst                            ::           .  0  0000000000 
 2012-06-09 22:09:50  x     revisions_srcJava_vishiaGUI.txt          ::         97.084 -0350105957 
 
 2014-07-31 19:44:18 Dx     === _cmpn/ =============================================================
@@ -53,7 +53,7 @@
 2016-07-06 22:53:41  x     FcmdDelete.java                          ::          8.189  0503329806 
 2013-09-08 21:23:40  x     FcmdDocuSearch.java                      ::          1.167 -1869277279 
 2016-07-06 22:53:44  x     FcmdEdit.java                            ::          8.096 -1962836579 
-2016-08-28 23:18:01  x     FcmdExecuter.java                        ::         15.607  1296254216 
+2016-09-03 11:52:54  x     FcmdExecuter.java                        ::         15.608 -0422815766 
 2016-07-06 22:53:50  x     FcmdFavorCard.java                       ::         10.127 -0486442221 
 2016-07-06 22:53:54  x     FcmdFavorPathSelector.java               ::         28.556 -0893580705 
 2015-09-09 23:00:04  x     FcmdFileCard.java                        ::         27.060  2020589562 
@@ -135,9 +135,9 @@
 2016-07-11 13:55:59  x     GralShowMethods.java                     ::         11.565 -1098536566 
 2015-10-04 16:58:52  x     GralSlider.java                          ::          1.123  0479092505 
 2016-07-02 01:23:46  x     GralTabbedPanel.java                     ::         11.005 -1811196051 
-2016-09-02 21:14:43  x     GralTable.java                           ::        110.266  0665421882 
+2016-09-03 12:08:02  x     GralTable.java                           ::        110.011  0218979220 
 2016-09-02 21:03:39  x     GralTextBox.java                         ::          6.530  1441052953 
-2016-09-02 21:02:56  x     GralTextField.java                       ::         30.571  1769452267 
+2016-09-03 11:59:02  x     GralTextField.java                       ::         30.616 -1923097285 
 2015-01-23 16:42:08  x     GralValueBar.java                        ::          6.321  1137566914 
 2016-07-02 00:27:44  x     GralWidgImpl_ifc.java                    ::          3.572  0443933197 
 2016-09-02 23:31:02  x     GralWidget.java                          ::         91.217 -1163550721 
@@ -185,7 +185,7 @@
 2015-04-24 15:52:15  x     GralSetValue_ifc.java                    ::          3.577  0882759316 
 2012-12-17 11:45:56  x     GralSlider_ifc.java                      ::           .613 -1125979330 
 2015-10-26 22:47:05  x     GralTableLine_ifc.java                   ::          5.263 -0739272802 
-2015-06-18 22:48:56  x     GralTable_ifc.java                       ::          9.516  2036654434 
+2016-09-03 12:05:43  x     GralTable_ifc.java                       ::          9.533 -1902936678 
 2012-03-03 22:57:02  x     GralTextBox_ifc.java                     ::          1.702 -1517010727 
 2013-10-05 22:24:09  x     GralTextFieldUser_ifc.java               ::          1.984 -1959108607 
 2013-02-22 08:08:02  x     GralTextField_ifc.java                   ::          3.683  1172285042 
@@ -220,7 +220,7 @@
 2016-07-02 23:23:08  x     SwtLabel.java                            ::          5.496 -1362568805 
 2016-06-30 23:53:56  x     SwtLed.java                              ::          6.702  0687576467 
 2013-12-04 13:49:07  x     SwtMenu.java                             ::          6.108 -0144756525 
-2016-09-02 23:40:15  x     SwtMng.java                              ::         41.993  1994747090 
+2016-09-03 11:47:48  x     SwtMng.java                              ::         42.016 -0241364800 
 2016-07-01 23:22:14  x     SwtPanel.java                            ::          4.530 -0494660980 
 2016-06-30 23:54:17  x     SwtPlotArea.java                         ::          5.098 -1059382659 
 2015-10-14 07:38:51  x     SwtProperties.java                       ::          5.829  0861044556 
@@ -228,12 +228,12 @@
 2016-06-30 23:54:27  x     SwtSlider.java                           ::          1.434 -2079601575 
 2016-08-31 22:03:37  x     SwtSubWindow.java                        ::         15.886 -0650906143 
 2016-09-02 22:08:10  x     SwtTabbedPanel.java                      ::          9.791 -0234075818 
-2016-08-28 23:02:23  x     SwtTable.java                            ::         41.721 -1302775149 
+2016-09-03 11:49:40  x     SwtTable.java                            ::         41.316  2132465133 
 2016-07-03 17:18:42  x     SwtTextBox.java                          ::         13.337  1426853796 
-2016-07-03 17:26:25  x     SwtTextFieldWrapper.java                 ::         17.793  1635181433 
+2016-09-03 11:42:38  x     SwtTextFieldWrapper.java                 ::         17.805  0057521300 
 2011-12-26 07:36:52  x     SwtTransparentLabel.java                 ::          1.856  0516273621 
 2015-05-31 15:21:08  x     SwtTraverseListener.java                 ::          1.426 -0961362711 
-2016-07-11 09:40:46  x     SwtValueBar.java                         ::          6.206  1944166536 
+2016-09-03 11:42:25  x     SwtValueBar.java                         ::          6.218  0563263992 
 2016-06-30 23:28:48  x     SwtWidgetHelper.java                     ::          6.383  0563459617 
 2016-06-30 23:45:02  x     SwtWidgetSimpleWrapper.java              ::          2.512  0351776232 
 2012-03-28 07:42:16  x     package-info.java                        ::           . 64  2134856555 

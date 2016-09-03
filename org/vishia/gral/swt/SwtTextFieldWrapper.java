@@ -122,7 +122,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
       promptSwt.setText(prompt());
       promptSwt.setBackground(null);
       Point promptSize = promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-      boundsPrompt = mng.calcWidgetPosAndSizeSwt(posPrompt, promptSwt, 10,100);
+      boundsPrompt = mng.calcWidgetPosAndSizeSwt(posPrompt, promptSwt.getParent(), 10,100);
       if(promptSize.x > boundsPrompt.dx){
         boundsPrompt.dx = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
       }

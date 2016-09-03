@@ -559,16 +559,16 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   /**Places a current component with knowledge of the current positions and the spreads of the component on graphic.
    * @param component The component to place.
    */
-  void setBounds_(GralPos pos, Control component)
-  { setPosAndSize_(pos, component);
+  GralRectangle setBounds_(GralPos pos, Control component)
+  { return setPosAndSize_(pos, component);
     //setBounds_(component, 0,0, 0, 0);
   }
   
   
   
   
-  void setPosAndSize_(GralPos pos, Control component)
-  { setPosAndSizeSwt(pos, component, 0,0);
+  GralRectangle setPosAndSize_(GralPos pos, Control component)
+  { return setPosAndSizeSwt(pos, component, 0,0);
   }  
   
   
@@ -603,12 +603,12 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * @param widthwidgetNat The natural size of the component.
    * @param heigthWidgetNat The natural size of the component.
    */
-  void setPosAndSizeSwt(GralPos posP, Control component, int widthwidgetNat, int heigthWidgetNat)
+  GralRectangle setPosAndSizeSwt(GralPos posP, Control component, int widthwidgetNat, int heigthWidgetNat)
   {
-    GralRectangle rectangle = calcWidgetPosAndSizeSwt(posP, component, widthwidgetNat, heigthWidgetNat);
+    GralRectangle rectangle = calcWidgetPosAndSizeSwt(posP, component.getParent(), widthwidgetNat, heigthWidgetNat);
     //on SWT it invokes the resize listener if given.
     component.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
-       
+    return rectangle;   
   }
   
 
@@ -656,8 +656,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * @return A rectangle with position and size.
    * @deprecated, use {@link #calcWidgetPosAndSizeSwt(GralPos, int, int)}
    */
-  GralRectangle calcWidgetPosAndSizeSwt(GralPos pos, Control component, int widthwidgetNat, int heigthWidgetNat){
-    Control parentComp = component.getParent();
+  GralRectangle calcWidgetPosAndSizeSwt(GralPos pos, Control parentComp, int widthwidgetNat, int heigthWidgetNat){
     //Rectangle pos;
     final GralRectangle rectangle;
     final Rectangle parentSize;

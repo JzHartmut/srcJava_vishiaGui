@@ -134,8 +134,8 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
    * @param property password, editable, maybe left empty.
    * @deprecated since 2016-09,use {@link GralTextField#GralTextField(String, Type...)} with "@pos=name"
    */
-  public GralTextField(String position, String name, Type... property){
-    this(position + "=" + name, property);
+  public GralTextField(String pos, String name, Type... property){
+    this(pos !=null ? (pos.startsWith("@") ? "" : "@" + pos + "=" + name) : name, property);
   }
   
   

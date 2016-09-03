@@ -424,7 +424,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    *   The last column with a positive width is used for sizeable. 
    */
   public GralTable(String pos, String name, int[] columnWidths) 
-  { this(pos + "=" + name, columnWidths); }
+  { this(pos !=null ? (pos.startsWith("@") ? "" : "@" + pos + "=" + name) : name, columnWidths); }
   
   
   
@@ -635,37 +635,23 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   @Override
   public void setCurrentLine(GralTableLine_ifc<UserData> line, int ixline, int ixcolumn) {
-    assert(ixline > - zLineVisible && ixline < zLineVisible);
+    int ixline1 = ixline >= 0 ? ixline: zLineVisible + ixline;  //negative: -1 is the last line.
+    if(ixline1 < 0) { ixline1 = 0;}
+    if(ixline1 >= zLineVisible) { ixline1 = zLineVisible-1; }
+    assert(zLineVisible >0);
     assert(ixcolumn < gi.cells[0].length);
     lineSelected = (TableLineData)line;
     nLineFirst = -1;  //get new, undefined elsewhere.
     actionOnLineSelected(KeyCode.userSelect, lineSelected);
-    if(ixline < 0){
-      lineSelectedixCell = zLineVisible + ixline;  //-1 is the last.
-      if(lineSelectedixCell < 0){
-        lineSelectedixCell = 0;
-      }
-    } else {
-      lineSelectedixCell = ixline;
-      if(lineSelectedixCell >= zLineVisible){
-        lineSelectedixCell = zLineVisible -1;
-      }
+    lineSelectedixCell = ixline1;
+    if(lineSelectedixCell >= zLineVisible){
+      lineSelectedixCell = zLineVisible -1;
     }
     if(ixcolumn >=0){
       this.colSelectedixCellC = ixcolumn;
     }
     bPrepareVisibleArea = true;
-    /*
-    if(line < -1 || line > zLine-1){ line = zLine -1; }
-    if(column < -1 || column > zColumn-1){ column = 0; }
-    if(line >=0){
-      ixLineNew = line;  //forces color setting select color
-    }
-    if(column >=0){
-      ixColumn = column;
-    }
-    */
-    repaint(50,200);
+    repaint();
   }
 
   

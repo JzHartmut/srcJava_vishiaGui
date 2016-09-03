@@ -104,7 +104,7 @@ public class FcmdExecuter
   
   
   
-  /**Builds the content of the confirm-delete window. The window is created static. It is shown
+  /**Builds the content of the confirm-execute window. The window is created static. It is shown
    * whenever it is used.  */
   void buildWindowConfirmExec()
   { 

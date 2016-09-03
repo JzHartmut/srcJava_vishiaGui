@@ -200,15 +200,8 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     swtWidgHelper.widgetSwt.addFocusListener(focusListenerTable);
     
     swtWidgHelper.widgetSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
-    //swtWidg.widgetSwt.setColumnSelectionAllowed(true);
-    //swtWidg.widgetSwt.setRowHeight(2 * this.propertiesGui.xPixelUnit());
-    //Container widget = new Container();
-    //int width=0;
-    //int xPixel = mng.propertiesGui.xPixelUnit();
-    //int widthPixel = width * xPixel;
-    //int heightPixel = height * mng.propertiesGui.yPixelUnit();
-    //swtWidg.widgetSwt.setSize(widthPixel, heightPixel);
-    resizeTable();
+    GralRectangle pixTable = swtWidgHelper.mng.setBounds_(widgg.pos(), swtWidgHelper.widgetSwt);
+    SwtTable.this.resizeTable(pixTable);
   }
 
 
@@ -264,11 +257,6 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   }
   
   
-  void resizeTable()
-  {
-    swtWidgHelper.mng.setBounds_(widgg.pos(), swtWidgHelper.widgetSwt);
-    
-  }
   
 
   @Override public Object getWidgetImplementation() {
