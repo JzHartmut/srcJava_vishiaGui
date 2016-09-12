@@ -105,6 +105,7 @@ public class GralCfgDesigner
   public void setToPanel()
   {
     assert(dialogWindowProps == null); //check call only one time.
+    mng.selectPanel("primaryWindow");
     mng.setPosition(-32, GralPos.size +32, -40, GralPos.size +40, 1, 'r');
     dialogWindowProps = mng.createWindow("widgetEdit", "Widget Properties", GralWindow.windConcurrently);
     
@@ -268,16 +269,20 @@ public class GralCfgDesigner
           if(sFormat.trim().length() >0) { cfge.widgetType.format = sFormat; }
           */
           cfge.widgetType.editable = editable;
-          if(editable && cfge.widgetType.userAction == null) {
-            cfge.widgetType.userAction = "syncVariableOnFocus";
-          }
           cfge.widgetType.name = sName.trim().length() >0 ? sName : null;
           cfge.widgetType.data = sDataPath.trim().length() >0 ? sDataPath : null;
           cfge.widgetType.text = sText.trim().length() >0 ? sText : null;
           cfge.widgetType.format = sFormat.trim().length() >0 ? sFormat : null;
           cfge.widgetType.showMethod = sShowMethod.trim().length() >0 ? sShowMethod : null;
-          cfge.widgetType.userAction = sActionMethod.trim().length() >0 ? sActionMethod : null;
           
+          String sUserAction = sActionMethod.trim().length() >0 ? sActionMethod : null;
+          if(editable) { 
+            //set userAction to "syncVariableOnFocus" if other is not given.
+            cfge.widgetType.userAction = sUserAction != null ? sUserAction :  "syncVariableOnFocus";
+          } else {
+            //clear the userAction if "syncVariableOnFocus" was given before.
+            cfge.widgetType.userAction = sUserAction.equals("syncVariableOnFocus") ? null : sUserAction;
+          }
           cfge.widgetType.prompt = sPrompt.trim().length() >0 ? sPrompt : null;
           cfge.widgetType.promptPosition = sPromptPos.trim().length() >0 ? sPromptPos : null;
           boolean bOk;

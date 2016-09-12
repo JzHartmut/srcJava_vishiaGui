@@ -488,7 +488,7 @@ public class InspcFieldTable
     }
   }
   
-  
+  /**This method is invoked if the value in the table is changed and this change should be applied to the target, key ctrl-enter. */
   void sendValueChange(GralTableLine_ifc<InspcFieldOfStruct> line) {
     InspcFieldOfStruct field = line.getUserData(); ////
     String sValue = line.getCellText(2);

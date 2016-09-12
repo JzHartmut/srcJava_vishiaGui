@@ -257,14 +257,14 @@ public class GitGui
             else if(out.scanStart().scan("author ").scanOk()) {
               out.lento('<');
               entry.author = out.getCurrentPart().toString();
-              out.fromEnd().seekBack(16).lento(' ');
+              out.fromEnd().seekPosBack(16).lento(' ');
               if(out.scan().scanInteger().scanOk()) { 
                 entry.dateAuthor = new Date(1000*out.scan().getLastScannedIntegerNumber());
               }
             } else if(out.scanStart().scan("committer ").scanOk()) {
               out.lento('<');
               entry.committer = out.getCurrentPart().toString();
-              out.fromEnd().seekBack(16).lento(' ');
+              out.fromEnd().seekPosBack(16).lento(' ');
               if(out.scan().scanInteger().scanOk()) { 
                 entry.dateCommit = new Date(1000*out.scan().getLastScannedIntegerNumber());
               }
