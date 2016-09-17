@@ -4,6 +4,7 @@ import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.util.Debugutil;
 import org.vishia.util.Removeable;
 
 
@@ -116,7 +117,8 @@ public interface GralWidget_ifc extends Removeable
     protected final Object[] args;
     
     public ActionChange(String sAction, GralUserAction action, Object[] args)
-    {
+    { if(args !=null)
+        Debugutil.stop();
       this.action = action;
       this.sAction = sAction;
       this.args = args;
@@ -140,7 +142,7 @@ public interface GralWidget_ifc extends Removeable
   , onMouse1Up
   , onMouse1UpOutside
   , onMouse2Up
-  , onMouse1Doublc
+  , onMouse1Double
   , onMouseWheel
   , onDrop
   , onDrag

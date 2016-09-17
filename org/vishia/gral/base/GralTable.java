@@ -94,6 +94,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2016-09-17 Hartmut new: in {@link #mouseDouble(int, CellData)} the <code>getActionChangeStrict(ActionChangeWhen.onMouse1Double, true)</code>
+   *   is checked. Therewith the new concept of {@link #specifyActionChange(String, GralUserAction, String[], org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen...)}
+   *   for specific actions is used here now. Firstly only for the mouse double click action. TODO: for all specific actions. 
    * <li>2016-09-01 Hartmut new: {@link #getIxLine(GralTableLine_ifc)} to determine the current position of a given table line.
    * <li>2016-08-28 Hartmut chg: {@link GraphicImplAccess#setBoundsCells(int, int)} now gets the zLineVisible.
    *   The {@link org.vishia.gral.swt.SwtTable#setBoundsCells(int, int)} sets the rest of texts invisible. Therewith the phenomena of ghost lines
@@ -1037,7 +1040,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @param cell
    */
   protected void mouseDouble(int key, CellData cell){
-    processKeys(KeyCode.mouse1Double);
+    ActionChange action1 = getActionChangeStrict(ActionChangeWhen.onMouse1Double, true);
+    if(action1 !=null
+      && action1.action().exec(KeyCode.mouse1Double, linesForCell[cell.ixCellLine])  //executes the action.
+      ) {
+        //it is sufficient.
+    } else {
+      processKeys(KeyCode.mouse1Double);
+    }
   }
 
 

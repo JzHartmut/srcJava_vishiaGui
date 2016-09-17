@@ -21,7 +21,7 @@ public class GralSwitchExclusiveButtonMng implements VariableAccess_ifc
   public void add(GralWidget widgd){ 
     listSwitchButtons.add(widgd);
     if(widgd.getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter) == null){
-      widgd.setActionChange(null, switchAction, null, GralWidget_ifc.ActionChangeWhen.onEnter);
+      widgd.specifyActionChange(null, switchAction, null, GralWidget_ifc.ActionChangeWhen.onEnter);
     }
   }
   

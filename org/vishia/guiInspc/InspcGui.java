@@ -190,6 +190,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
   InspcGui(CallingArguments cargs, GralArea9MainCmd cmdgui)
   {
+    ButtonInspcCmd.registerUserAction();
     viewTargetComm = new InspcViewTargetComm();
     guiCfg = new InspcGuiCfg(cargs, cmdgui, userInspcPlug);
     GralMng.get().registerUserAction("<name>", actionGetValueByHandleIntern);

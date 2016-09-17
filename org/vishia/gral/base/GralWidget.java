@@ -187,7 +187,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * <li>2016-07-03 Hartmut chg: {@link #createImplWidget_Gthread()}: If the _wdgImpl is initialized already, this method does nothing. Before: Exception
    * <li>2016-07-03 Hartmut refact: actionChange: Now the {@link GralWidget_ifc.ActionChange} describes the action class and arguments.
    *   {@link ConfigData#actionChange1} refers the only one change action, or {@link ConfigData#actionChangeSelect} contains more as one change action.
-   *   {@link #setActionChange(String, GralUserAction, String[], org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen...)} sets the only one or special actions,
+   *   {@link #specifyActionChange(String, GralUserAction, String[], org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen...)} sets the only one or special actions,
    *   {@link #getActionChange(org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen)} selects a proper one. 
    *   All derived widgets and implementation are adapted to the new system. The user interface is nearly identical.
    * <li>2016-07-03 Hartmut chg: it is not derived from {@link GralWidgImpl_ifc} any more. It was the old concept: An implementing widgets was derived from the GralWidget. 
@@ -942,7 +942,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    *        usual if the user takes an action on screen, press button etc.
    *        
    */
-  @Deprecated public void setActionChange(GralUserAction action){ setActionChange(null, action, null); } //cfg.actionChanging = action; }
+  @Deprecated public void setActionChange(GralUserAction action){ specifyActionChange(null, action, null); } //cfg.actionChanging = action; }
   
   
   private static ActionChangeWhen[] whenAll = 
@@ -953,7 +953,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   , ActionChangeWhen.onDrag
   , ActionChangeWhen.onDrop
   , ActionChangeWhen.onEnter
-  , ActionChangeWhen.onMouse1Doublc
+  , ActionChangeWhen.onMouse1Double
   , ActionChangeWhen.onMouse1Dn
   , ActionChangeWhen.onMouse1Up
   , ActionChangeWhen.onMouse1UpOutside
@@ -969,7 +969,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @param when List of type of action, maybe empty, then the given action is set for all conditions.
    *   Especially <code>setActionChange(null, null, null) removes all actions.
    */
-  public void setActionChange(String sAction, GralUserAction action, String[] args, ActionChangeWhen... when){ 
+  public void specifyActionChange(String sAction, GralUserAction action, String[] args, ActionChangeWhen... when){ 
     ActionChange action1 = action == null ? null : new ActionChange(sAction, action, args);
     
     if(when.length==0){
@@ -986,18 +986,18 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       if(cfg.actionChange1 !=null) { //given
         ActionChangeWhen[] whenGiven = cfg.actionChange1When == null ? whenAll : cfg.actionChange1When;
         for(ActionChangeWhen when1: whenGiven) {
-          setActionChangeWhen(cfg.actionChange1, when1);
+          specifyActionChangeWhen(cfg.actionChange1, when1);
         }
         cfg.actionChange1 = null;
       }
       for(ActionChangeWhen when1: when) {
-        setActionChangeWhen(action1, when1);
+        specifyActionChangeWhen(action1, when1);
       }
     }
   }
   
   
-  private void setActionChangeWhen(ActionChange action, ActionChangeWhen when)
+  private void specifyActionChangeWhen(ActionChange action, ActionChangeWhen when)
   {
     switch(when){
     case onAnyChgContent: cfg.actionChangeSelect.onAnyChangeContent = action; break;
@@ -1007,7 +1007,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     case onDrag: cfg.actionChangeSelect.onDrag = action; break;
     case onDrop:cfg.actionChangeSelect.onDrop = action;  break;
     case onEnter: cfg.actionChangeSelect.onEnter = action; break;
-    case onMouse1Doublc: cfg.actionChangeSelect.onMouse1Double = action; break;
+    case onMouse1Double: cfg.actionChangeSelect.onMouse1Double = action; break;
     case onMouse1Dn: cfg.actionChangeSelect.onMouse1Dn = action; break;
     case onMouse1Up: cfg.actionChangeSelect.onMouse1Up = action; break;
     case onMouse1UpOutside: cfg.actionChangeSelect.onMouse1UpOutside = action; break;
@@ -1049,7 +1049,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       case onDrag: return cfg.actionChangeSelect.onDrag;
       case onDrop: return cfg.actionChangeSelect.onDrop;
       case onEnter: return cfg.actionChangeSelect.onEnter;
-      case onMouse1Doublc: return cfg.actionChangeSelect.onMouse1Double;
+      case onMouse1Double: return cfg.actionChangeSelect.onMouse1Double;
       case onMouse1Dn: return cfg.actionChangeSelect.onMouse1Dn;
       case onMouse1Up: return cfg.actionChangeSelect.onMouse1Up;
       case onMouse1UpOutside: return  cfg.actionChangeSelect.onMouse1UpOutside;
@@ -1057,7 +1057,6 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       case onMouseWheel: return cfg.actionChangeSelect.onMouseWheel;
       default: throw new IllegalArgumentException("not all when-conditions");
       }
-      
     }
   }
   

@@ -257,7 +257,7 @@ public class GralButton extends GralWidget
   
   /**This is the same action like release the left mouse button. It can be called from the application
    * to activate the function of the button. Especially it is used for [Enter] on the focused button.
-   * It invokes the {@link GralWidget#setActionChange(String, GralUserAction, String[], org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen...)}
+   * It invokes the {@link GralWidget#specifyActionChange(String, GralUserAction, String[], org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen...)}
    * with {@link GralWidget_ifc.ActionChangeWhen#onMouse1Up}
    */
   public void activate() {

@@ -240,7 +240,7 @@ public class GralCfgBuilder
           for(int ix = 1; ix < posEnd; ++ix){
             char whatMouseKey = sUserAction.charAt(ix);
             switch(whatMouseKey){
-            case (char)(KeyCode.mouse1Double & 0xff): whenUserAction = GralWidget_ifc.ActionChangeWhen.onMouse1Doublc; break;
+            case (char)(KeyCode.mouse1Double & 0xff): whenUserAction = GralWidget_ifc.ActionChangeWhen.onMouse1Double; break;
             }
           }
           sUserAction = sUserAction.substring(posEnd+1).trim(); 
@@ -397,8 +397,8 @@ public class GralCfgBuilder
         }
       }*/
       if(userAction !=null){
-        if(whenUserAction == null) { widgd.setActionChange(cfge.widgetType.userAction, userAction, sUserActionArgs); }
-        else { widgd.setActionChange(cfge.widgetType.userAction, userAction, sUserActionArgs, whenUserAction); }
+        if(whenUserAction == null) { widgd.specifyActionChange(cfge.widgetType.userAction, userAction, sUserActionArgs); }
+        else { widgd.specifyActionChange(cfge.widgetType.userAction, userAction, sUserActionArgs, whenUserAction); }
       }
       //if(mouseAction !=null){
         //fauly type, does not work: widgd.setActionMouse(mouseAction, 0);

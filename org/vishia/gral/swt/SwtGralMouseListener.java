@@ -225,7 +225,7 @@ public final class SwtGralMouseListener
         } 
         boolean bStrict = (widgg.cfg.mMouseToActionChange & GralMouseWidgetAction_ifc.mUserDouble) ==0;  //search strict if no special bit is given.
         //then a strict mouse doube action wins.
-        GralWidget_ifc.ActionChange action = widgg.getActionChangeStrict(GralWidget_ifc.ActionChangeWhen.onMouse1Doublc, bStrict); 
+        GralWidget_ifc.ActionChange action = widgg.getActionChangeStrict(GralWidget_ifc.ActionChangeWhen.onMouse1Double, bStrict); 
         if(action !=null){
           Object[] args = action.args();
           if(args == null){ action.action().exec(KeyCode.mouse1Double, widgg, new Integer(e.x), new Integer(e.y)); }

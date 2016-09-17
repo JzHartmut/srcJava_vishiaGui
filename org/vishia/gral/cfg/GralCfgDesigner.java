@@ -69,7 +69,7 @@ public class GralCfgDesigner
 
   /**Some dialog widget elements. */
   GralWidget dialogFieldName, dialogFieldDatapath, dialogFieldText, dialogFieldFormat
-    , dialogFieldShow, dialogFieldAction, dialogFieldPrompt, dialogFieldPromptPos 
+    , dialogFieldShow, dialogFieldAction, dialogFieldPrompt, dialogFieldHelp, dialogFieldPromptPos 
     , dialogFieldLine, dialogFieldColumn, dialogFieldHeight, dialogFieldWidth;
   
   GralButton dialogBtnEditable;
@@ -106,7 +106,7 @@ public class GralCfgDesigner
   {
     assert(dialogWindowProps == null); //check call only one time.
     mng.selectPanel("primaryWindow");
-    mng.setPosition(-32, GralPos.size +32, -40, GralPos.size +40, 1, 'r');
+    mng.setPosition(-34, GralPos.size +34, -40, GralPos.size +40, 1, 'r');
     dialogWindowProps = mng.createWindow("widgetEdit", "Widget Properties", GralWindow.windConcurrently);
     
     mng.setPositionSize(0, 0, 3, 34, 'd');
@@ -116,9 +116,10 @@ public class GralCfgDesigner
     dialogFieldFormat = mng.addTextField("format", true, "format", "t");
     dialogFieldShow = mng.addTextField("show", true, "show method", "t");
     dialogFieldAction = mng.addTextField("action", true, "action method", "t");
+    dialogFieldHelp = mng.addTextField("help", true, "help", "t");
     dialogFieldPrompt = mng.addTextField("prompt", true, "prompt", "t");
     //mng.setPositionSize(GralGridPos.same, GralGridPos.same, GralGridPos.next, 2, 'r');
-    mng.setPositionSize(21, 2, 3, 5, 'r');
+    mng.setPositionSize(25, 2, 3, 5, 'r');
     dialogFieldLine = mng.addTextField("line", true, "pos-y", "t");
     //mng.addText(", ", 'B', 0);
     dialogFieldColumn = mng.addTextField("column", true, "pos-x", "t");
@@ -223,6 +224,7 @@ public class GralCfgDesigner
         dialogFieldFormat.setText( sFormat ==null ? "" : sFormat);
         dialogFieldShow.setText( sShowMethod ==null ? "" : sShowMethod);
         dialogFieldAction.setText( sActionMethod ==null ? "" : sActionMethod);
+        dialogFieldHelp.setText(cfge.widgetType.help !=null ? cfge.widgetType.help : "");
         dialogFieldPrompt.setText( sPrompt ==null ? "" : sPrompt);
         dialogFieldPromptPos.setText( sPromptPos ==null ? "" : sPromptPos);
         dialogFieldLine.setText( sLine);
@@ -252,6 +254,7 @@ public class GralCfgDesigner
         String sFormat = dialogFieldFormat.getValue();
         String sShowMethod = dialogFieldShow.getValue();
         String sActionMethod = dialogFieldAction.getText();
+        String sHelp = dialogFieldHelp.getValue();
         String sPrompt = dialogFieldPrompt.getValue();
         String sPromptPos = dialogFieldPromptPos.getValue();
         String sLine = dialogFieldLine.getValue();
@@ -274,6 +277,7 @@ public class GralCfgDesigner
           cfge.widgetType.text = sText.trim().length() >0 ? sText : null;
           cfge.widgetType.format = sFormat.trim().length() >0 ? sFormat : null;
           cfge.widgetType.showMethod = sShowMethod.trim().length() >0 ? sShowMethod : null;
+          cfge.widgetType.help = sHelp.trim().length() >0 ? sHelp.trim(): null;
           
           String sUserAction = sActionMethod.trim().length() >0 ? sActionMethod : null;
           if(editable) { 
@@ -281,7 +285,7 @@ public class GralCfgDesigner
             cfge.widgetType.userAction = sUserAction != null ? sUserAction :  "syncVariableOnFocus";
           } else {
             //clear the userAction if "syncVariableOnFocus" was given before.
-            cfge.widgetType.userAction = sUserAction.equals("syncVariableOnFocus") ? null : sUserAction;
+            cfge.widgetType.userAction = sUserAction !=null && sUserAction.equals("syncVariableOnFocus") ? null : sUserAction;
           }
           cfge.widgetType.prompt = sPrompt.trim().length() >0 ? sPrompt : null;
           cfge.widgetType.promptPosition = sPromptPos.trim().length() >0 ? sPromptPos : null;

@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.vishia.cmd.CmdExecuter;
@@ -15,6 +17,7 @@ import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.DataAccess;
 import org.vishia.util.Debugutil;
@@ -69,7 +72,8 @@ public class GitGui
   GralWindow window = new GralWindow("0+50, 0+80", "GitGui", "Git vishia", GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose);
 
   GralTextField wdgPath = new GralTextField("@2-2,0..0=path");
-  GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("@3..-20,0..-20=git-versions", new int[] {10, 0, -10});
+  GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("@3..-20,0..-40=git-versions", new int[] {10, 0, -10});
+  GralTable<RevisionEntry> wdgTableFiles = new GralTable<>("@3..-20,-40..0=git-files", new int[] {20,0});
   
   GralTextBox wdgInfo = new GralTextBox("@-20..0, 0..-20=info");
 
@@ -77,12 +81,28 @@ public class GitGui
   CmdExecuter cmd = new CmdExecuter();
 
 
+  /**Destination for output of all command line invocations.
+   * This buffer will be cleared and filled with the git command, and then parsed to present the result. 
+   */
   StringPartAppend out = new StringPartAppend();
 
+  /**Stored arguments from {@link #showLog(String, String, String)}. */
+  String sGitDir, sWorkingDir, sLocalFile;
+
+  
 
 
+  /**The presentation of the time stamps. */
   SimpleDateFormat dateFormat = new SimpleDateFormat("yy-MM-dd HH:mm");
 
+
+
+  /**The current line and the line before, to the earlier commit. The Predecessor is not the parent in any case, not on branch and merge points. */
+  GralTable<RevisionEntry>.TableLineData currentLine, preLine;
+  
+  /**The current entry and the entry before, to the earlier commit. The Predecessor is not the parent in any case, not on branch and merge points. */
+  RevisionEntry currentEntry, preEntry;
+  
 
   public static void main(String[] args){
     GitGui main = new GitGui(args);
@@ -98,6 +118,7 @@ public class GitGui
     }
     initializeCmd();
     wdgTableVersion.specifyActionOnLineSelected(actionTableLineVersion);
+    wdgTableFiles.specifyActionChange("diff view", actionTableFileDiffView, null, ActionChangeWhen.onMouse1Double);
     window.create(sTypeOfImplementation, 'B', null);
   }
 
@@ -216,6 +237,7 @@ public class GitGui
 
 
   public void showLog(String sGitDir, String sWorkingDir, String sLocalFile) {
+    this.sGitDir = sGitDir; this.sWorkingDir = sWorkingDir; this.sLocalFile = sLocalFile;
     String sPathShow;
     if(sLocalFile !=null) {
       sPathShow = sGitDir + " : " + sLocalFile;
@@ -288,12 +310,13 @@ public class GitGui
         }catch(Exception exc) {
           Debugutil.stop();
         }
-        
-        lineTexts[0] = dateFormat.format(entry.dateAuthor);
-        lineTexts[1] = entry.commitTitle;
-        lineTexts[2] = entry.author;
-        GralTableLine_ifc<RevisionEntry> line = wdgTableVersion.addLine(hash, lineTexts, entry);  
-        line.repaint();
+        if(entry.dateAuthor !=null) {
+          lineTexts[0] = dateFormat.format(entry.dateAuthor);
+          lineTexts[1] = entry.commitTitle;
+          lineTexts[2] = entry.author;
+          GralTableLine_ifc<RevisionEntry> line = wdgTableVersion.addLine(hash, lineTexts, entry);  
+          line.repaint();
+        }
       } //
       else {
         contCommits = out.nextlineMaxpart().found();
@@ -328,11 +351,76 @@ public class GitGui
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
       @SuppressWarnings("unchecked")
       GralTable<RevisionEntry>.TableLineData line = (GralTable<RevisionEntry>.TableLineData) params[0];
-      RevisionEntry entry = line.data;
-      wdgInfo.setText(entry.commitText);
+      GitGui.this.currentLine = line;
+      GitGui.this.preLine = line.nextSibling();
+      currentEntry = line.data;
+      if(preLine !=null) {
+        GitGui.this.preEntry = preLine.data;
+        
+        wdgInfo.setText(currentEntry.revisionHash);
+        try{
+          wdgInfo.append("\n");
+          wdgInfo.append(currentEntry.commitText);
+        } catch(IOException exc){}
+        cmd.abortCmd();
+        String sGitCmd = "git";
+        if(! sGitDir.startsWith(sWorkingDir)) {
+          sGitCmd += " '--git-dir=" + sGitDir + "'";
+        }
+        sGitCmd += " diff --name-only " + currentEntry.revisionHash + ".." + currentEntry.parentHash;
+        String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
+        out.buffer().setLength(0);
+        out.assign(out.buffer());   //to reset positions to the changed out.buffer()
+        List<Appendable> listOut = new LinkedList<Appendable>();
+        listOut.add(out);
+        int error = cmd.execute(args, true, null, listOut, null, execAfterCmdRevisionDiff);
+      }
       return true;
     }
   };
+
+
+
+  /**This code snippet is executed after the 'git diff' command for 2 revisions are executed. 
+   * It is used as last argument of {@link CmdExecuter#execute(String[], boolean, String, List, List, org.vishia.cmd.CmdExecuter.ExecuteAfterFinish)}
+   * and prepares the {@link #wdgTableFiles}.
+   */
+  CmdExecuter.ExecuteAfterFinish execAfterCmdRevisionDiff = new CmdExecuter.ExecuteAfterFinish()
+  {
+
+    @Override
+    public void exec(int errorcode, Appendable out, Appendable err)
+    {  wdgTableFiles.clearTable();
+      wdgTableFiles.repaint();
+      StringPartAppend sbOut = (StringPartAppend) out;    
+      sbOut.firstlineMaxpart();
+      do {
+        String sLine = sbOut.getCurrentPart().toString();
+        String[] col = new String[2];
+        int posSlash = sLine.lastIndexOf('/');
+        if(posSlash >0) {
+          col[0] = sLine.substring(posSlash+1);
+          col[1] = sLine.substring(0, posSlash);
+        } else {
+          col[0] = sLine;
+          col[1] = "";
+        }
+        GralTableLine_ifc<RevisionEntry> line = wdgTableFiles.addLine(col[0], col, null);  
+        line.repaint();
+      } while(sbOut.nextlineMaxpart().found());
+    }
+  }; 
+
+
+
+
+
+
+  GralUserAction actionTableFileDiffView = new GralUserAction("actionTableFileDiffView")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      return true;
+  } };
+
 
 
 

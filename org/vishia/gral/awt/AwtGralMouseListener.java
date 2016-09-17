@@ -178,7 +178,7 @@ public class AwtGralMouseListener
       yMousePress = ev.getY();
       AwtWidget widget = (AwtWidget)ev.getComponent();
       GralWidget widgg = (GralWidget)widget.getData();
-      GralWidget_ifc.ActionChange action = widgg.getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Doublc); 
+      GralWidget_ifc.ActionChange action = widgg.getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Double); 
       if(action !=null){
         Object[] args = action.args();
         if(args == null){ action.action().exec(KeyCode.mouse1Double, widgg, new Integer(ev.getX()), new Integer(ev.getY())); }

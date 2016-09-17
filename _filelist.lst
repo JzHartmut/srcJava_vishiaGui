@@ -1,7 +1,7 @@
 2012-11-14 06:19:56  x     _bzrGetOtherCmpnVersions.bat             ::          1.582 -1370334435 
 2012-11-14 06:19:00  x     _bzrOtherCmpnVersions.txt                ::           .804 -0655352013 
 2012-02-04 19:35:44  x     _bzr_push_A.bat                          ::           . 51  0133533915 
-2016-09-12 22:45:51  x     _filelist.lst                            ::           .  0  0000000000 
+2016-09-17 10:57:01  x     _filelist.lst                            ::           .  0  0000000000 
 2012-06-09 22:09:50  x     revisions_srcJava_vishiaGUI.txt          ::         97.084 -0350105957 
 
 2014-07-31 19:44:18 Dx     === _cmpn/ =============================================================
@@ -53,7 +53,7 @@
 2016-07-06 22:53:41  x     FcmdDelete.java                          ::          8.189  0503329806 
 2013-09-08 21:23:40  x     FcmdDocuSearch.java                      ::          1.167 -1869277279 
 2016-07-06 22:53:44  x     FcmdEdit.java                            ::          8.096 -1962836579 
-2016-09-03 11:52:54  x     FcmdExecuter.java                        ::         15.608 -0422815766 
+2016-09-17 10:10:00  x     FcmdExecuter.java                        ::         15.612  0455833025 
 2016-07-06 22:53:50  x     FcmdFavorCard.java                       ::         10.127 -0486442221 
 2016-07-06 22:53:54  x     FcmdFavorPathSelector.java               ::         28.556 -0893580705 
 2015-09-09 23:00:04  x     FcmdFileCard.java                        ::         27.060  2020589562 
@@ -80,7 +80,7 @@
 2011-11-21 20:03:58  x     FcmdtTarget_ifc.java                     ::           .307 -0199616121 
 
 2016-08-31 21:54:29 Dx     === org/vishia/gitGui/ ==================================================
-2016-09-04 09:33:51  x     GitGui.java                              ::         12.547 -0275030357 
+2016-09-17 10:11:12  x     GitGui.java                              ::         16.219 -0804412785 
 
 2016-08-31 22:04:22 Dx     === org/vishia/gral/ ====================================================
 2015-10-17 09:47:16  x     colordef.txt                             ::           . 30  0877520795 
@@ -100,7 +100,7 @@
 2012-04-23 22:41:40  x     AwtCanvasDrawer.java                     ::          1.263  1733362635 
 2016-07-10 15:58:29  x     AwtFactory.java                          ::           .598 -2087767817 
 2015-10-30 19:08:17  x     AwtGralKey.java                          ::          6.683  0306023190 
-2016-07-04 22:08:48  x     AwtGralMouseListener.java                ::         11.384 -1658843954 
+2016-09-17 10:09:06  x     AwtGralMouseListener.java                ::         11.384  1956086549 
 2016-07-16 22:11:48  x     AwtGraphicThread.java                    ::          2.966 -0860664861 
 2016-06-30 23:51:19  x     AwtLabel.java                            ::          5.658  0384990173 
 2013-10-07 22:08:02  x     AwtMenu.java                             ::          1.653  1181126523 
@@ -116,7 +116,7 @@
 
 2015-10-23 23:38:36 Dx     === org/vishia/gral/base/ ===============================================
 2012-05-20 12:38:56  x     GetGralWidget_ifc.java                   ::          2.072 -2006934492 
-2016-07-12 22:46:47  x     GralButton.java                          ::         20.763 -0476854972 
+2016-09-17 10:10:00  x     GralButton.java                          ::         20.767 -1609086741 
 2015-10-26 20:56:46  x     GralColorConv.java                       ::         14.603  1298753472 
 2016-09-01 22:05:57  x     GralCurveView.java                       ::         83.730 -2031129800 
 2016-08-24 17:49:11  x     GralGraphicThread.java                   ::         21.609 -1579458168 
@@ -132,24 +132,24 @@
 2015-01-23 16:30:02  x     GralPanelActivated_ifc.java              ::          2.100 -0687531395 
 2016-09-02 23:01:42  x     GralPanelContent.java                    ::         14.514  1521745114 
 2016-07-03 13:25:12  x     GralPos.java                             ::         53.242 -1835859937 
-2016-07-11 13:55:59  x     GralShowMethods.java                     ::         11.565 -1098536566 
+2016-09-14 11:45:00  x     GralShowMethods.java                     ::         11.693 -0933957427 
 2015-10-04 16:58:52  x     GralSlider.java                          ::          1.123  0479092505 
 2016-07-02 01:23:46  x     GralTabbedPanel.java                     ::         11.005 -1811196051 
-2016-09-03 12:08:02  x     GralTable.java                           ::        110.011  0218979220 
+2016-09-17 10:50:53  x     GralTable.java                           ::        110.743 -0864898860 
 2016-09-02 21:03:39  x     GralTextBox.java                         ::          6.530  1441052953 
 2016-09-03 11:59:02  x     GralTextField.java                       ::         30.616 -1923097285 
 2015-01-23 16:42:08  x     GralValueBar.java                        ::          6.321  1137566914 
 2016-07-02 00:27:44  x     GralWidgImpl_ifc.java                    ::          3.572  0443933197 
-2016-09-02 23:31:02  x     GralWidget.java                          ::         91.217 -1163550721 
+2016-09-17 10:10:54  x     GralWidget.java                          ::         91.234  0339729127 
 2012-07-14 22:23:42  x     GralWidgetHelper.java                    ::          1.980 -1293053732 
 2016-08-30 23:15:14  x     GralWindow.java                          ::         14.016  1915929806 
 2016-07-02 09:37:22  x     GralWindow_setifc.java                   ::          1.980  0685613695 
 2013-07-15 11:52:00  x     package-info.java                        ::           .413  0984628564 
 
 2015-04-26 19:56:53 Dx     === org/vishia/gral/cfg/ ================================================
-2016-09-01 22:05:17  x     GralCfgBuilder.java                      ::         19.483 -0205425660 
+2016-09-17 10:10:00  x     GralCfgBuilder.java                      ::         19.491  1538465845 
 2016-07-03 13:31:42  x     GralCfgData.java                         ::         18.121 -1042512904 
-2016-09-12 22:37:55  x     GralCfgDesigner.java                     ::         15.536  1532583305 
+2016-09-15 14:27:48  x     GralCfgDesigner.java                     ::         15.867  1035126164 
 2016-07-03 19:52:00  x     GralCfgElement.java                      ::         10.349 -0336936946 
 2016-07-02 19:14:58  x     GralCfgPanel.java                        ::          2.204  1690942796 
 2016-07-02 20:02:48  x     GralCfgPosition.java                     ::          4.695 -0790833468 
@@ -192,7 +192,7 @@
 2015-08-05 22:14:11  x     GralUserAction.java                      ::          8.643 -1558911793 
 2015-01-23 16:28:33  x     GralVisibleWidgets_ifc.java              ::          2.043 -1973459872 
 2012-05-20 12:38:56  x     GralWidgetCfg_ifc.java                   ::          1.729  0126566803 
-2016-08-31 22:02:08  x     GralWidget_ifc.java                      ::         21.398  0694173788 
+2016-09-17 10:09:06  x     GralWidget_ifc.java                      ::         21.474 -0502238041 
 2015-01-18 10:56:52  x     GralWindowMng_ifc.java                   ::          5.013  1480994121 
 2012-03-11 07:58:32  x     GralWindow_getifc.java                   ::          1.715 -1500220700 
 2016-07-15 17:10:59  x     GralWindow_ifc.java                      ::          5.644  0546101405 
@@ -210,7 +210,7 @@
 2013-03-28 08:33:36  x     SwtFileDialog.java                       ::          2.700  1622412477 
 2012-05-20 12:38:56  x     SwtFocusAction.java                      ::          2.006 -1231686787 
 2015-09-20 22:53:28  x     SwtGralKey.java                          ::          6.654  0788496368 
-2016-07-13 22:34:41  x     SwtGralMouseListener.java                ::         18.034  1757422414 
+2016-09-17 10:09:06  x     SwtGralMouseListener.java                ::         18.034  1630743372 
 2016-07-16 22:11:43  x     SwtGraphicThread.java                    ::         10.198  0608032594 
 2016-09-02 23:34:29  x     SwtGridPanel.java                        ::          4.876 -1578230357 
 2016-06-30 23:53:23  x     SwtHorizontalSelector.java               ::          8.384 -0202441689 
@@ -257,7 +257,7 @@
 2013-11-19 15:39:00  x     GralMsgOutputList.java                   ::          5.228 -1844316586 
 2015-10-04 16:55:15  x     GralPlotArea.java                        ::          4.515 -0761184119 
 2016-07-01 23:48:00  x     GralSelectList.java                      ::          7.715  0007778096 
-2016-07-03 17:40:45  x     GralSwitchExclusiveButtonMng.java        ::          2.862  0705219260 
+2016-09-17 10:10:00  x     GralSwitchExclusiveButtonMng.java        ::          2.866  2027539694 
 2012-03-28 07:42:16  x     package-info.java                        ::           .397 -0227206292 
 
 2014-07-31 19:44:16 Dx     === org/vishia/guiBzr/ ==================================================
@@ -278,11 +278,12 @@
 2013-04-02 09:09:20  x     MainData.java                            ::          3.228  1270245131 
 2012-05-20 12:38:56  x     PanelOutput.java                         ::          1.327  0949896798 
 
-2016-07-03 11:46:25 Dx     === org/vishia/guiInspc/ ================================================
+2016-09-14 11:31:30 Dx     === org/vishia/guiInspc/ ================================================
+2016-09-14 11:37:00  x     ButtonInspcCmd.java                      ::           .542  2100872833 
 2016-09-01 14:22:14  x     InspcCurveView.java                      ::         59.230  0691631229 
 2015-05-25 22:51:12  x     InspcCurveViewApp.java                   ::          1.786  1991813217 
 2016-09-12 14:49:44  x     InspcFieldTable.java                     ::         24.909  0804004064 
-2016-09-01 22:05:49  x     InspcGui.java                            ::         23.949 -0902113094 
+2016-09-14 11:36:48  x     InspcGui.java                            ::         23.991 -1766426613 
 2014-04-30 14:05:05  x     InspcGuiFieldsFromFile.java              ::          4.768 -1365812909 
 2016-07-06 22:57:13  x     InspcViewTargetComm.java                 ::          5.865 -1087273853 
 

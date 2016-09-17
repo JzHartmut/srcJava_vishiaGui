@@ -111,7 +111,7 @@ public class FcmdExecuter
     
     
     windConfirmExec.createImplWidget_Gthread();
-    widgSelectExec.setActionChange("exec", actionExecCmdAfterChoice, null, GralWidget_ifc.ActionChangeWhen.onEnter);
+    widgSelectExec.specifyActionChange("exec", actionExecCmdAfterChoice, null, GralWidget_ifc.ActionChangeWhen.onEnter);
     
   }  
   
