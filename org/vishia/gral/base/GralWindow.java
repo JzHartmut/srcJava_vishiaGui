@@ -21,6 +21,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
 
   /**Version, history and license.
    * <ul>
+   * <li>2016-09-18 Hartmut chg: renaming {@link #specifyActionOnCloseWindow(GralUserAction)} instead 'setActionOnSettingInvisible', more expressive name. 
    * <li>2016-08-28 Hartmut new {@link #create(String)} to create either the primary window inclusive the whole graphic machine,
    *   or create any secondary window.
    * <li>2015-05-31 Hartmut The {@link GraphicImplAccess} is now derived from {@link GralPanelContent.ImplAccess}
@@ -108,7 +109,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    * See {@link GralWindow_ifc#setResizeAction(GralUserAction)}. */
   protected GralUserAction resizeAction;
   
-  protected GralUserAction invisibleSetAction;  
+  protected GralUserAction actionOnCloseWindow;  
   
   /**See {@link GralWindow_ifc#setMouseAction(GralUserAction)}. */
   protected GralUserAction mouseAction;
@@ -162,8 +163,8 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
 
   }
 
-  @Override public void setActionOnSettingInvisible(GralUserAction action)
-  { invisibleSetAction = action;
+  @Override public void specifyActionOnCloseWindow(GralUserAction action)
+  { actionOnCloseWindow = action;
   }
 
 
@@ -324,8 +325,8 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
     /**The mouseAction from the {@link GralWindow_ifc#setMouseAction(GralUserAction)} */
     protected GralUserAction mouseAction(){ return gralWindow.mouseAction; }  
   
-    /**The invisibleSetAction from the {@link GralWindow_ifc#setActionOnSettingInvisible(GralUserAction)} */
-    protected GralUserAction invisibleSetAction(){ return gralWindow.invisibleSetAction; }  
+    /**The invisibleSetAction from the {@link GralWindow_ifc#specifyActionOnCloseWindow(GralUserAction)} */
+    protected GralUserAction actionOnCloseWindow(){ return gralWindow.actionOnCloseWindow; }  
   
   
   

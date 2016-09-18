@@ -14,6 +14,7 @@ public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc, Gr
 {
   /**Version, history and license.
    * <ul>
+   * <li>2016-09-18 Hartmut chg: renaming {@link #specifyActionOnCloseWindow(GralUserAction)} instead 'setActionOnSettingInvisible', more expressive name. 
    * <li>2015-04-27 Hartmut new {@link #windRemoveOnClose}
    * <li>2012-03-16 Hartmut new: {@value #windResizeable} defined and supported in SWT-implementation.
    * <li>2012-03-13 Hartmut chg: This interface should be used for building the window. Therefore
@@ -110,11 +111,14 @@ public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc, Gr
    */
   GralMenu getMenuBar();
   
-  /**Sets an action which is invoked if the window is set invisible.
+  /**Sets an action which is invoked if the window is set invisible or it is disposed.
+   * Note that depending of the property {@link #windRemoveOnClose} the window is disposed or it is set invisible without disposing
+   * if the close action is done by the user. In both cases this action will be invoked.
+   * @since 2015-09 renamed, old identifier is 'setActionOnSettingInvisible'
    * @param action The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called
    *   without parameter.
    */
-  public abstract void setActionOnSettingInvisible(GralUserAction action);
+  public abstract void specifyActionOnCloseWindow(GralUserAction action);
 
   void setFullScreen(boolean full);
 

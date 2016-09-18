@@ -143,7 +143,7 @@ public class FcmdView
     widgContent.setUser(userKeys);
     widgContent.setTextStyle(GralColor.getColor("bk"), main._gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));
     windView = wind; 
-    windView.setActionOnSettingInvisible(actionOnSetInvisible);
+    windView.specifyActionOnCloseWindow(actionOnSetInvisible);
     windView.setWindowVisible(false);
     //windView1.
   }

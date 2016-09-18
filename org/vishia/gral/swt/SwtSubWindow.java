@@ -262,8 +262,8 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
      */
     @Override public void shellClosed(ShellEvent e) ////
     { int windProps = getWindowProps();
-      if(invisibleSetAction() !=null){
-        invisibleSetAction().exec(KeyCode.menuEntered, SwtSubWindow.this.gralWindow);
+      if(actionOnCloseWindow() !=null){
+        actionOnCloseWindow().exec(KeyCode.menuEntered, SwtSubWindow.this.gralWindow);
       }
       setVisibleState(false);
       if((windProps & GralWindow_ifc.windRemoveOnClose)!=0) {

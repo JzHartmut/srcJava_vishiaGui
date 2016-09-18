@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.vishia.cmd.CmdExecuter;
+import org.vishia.cmd.CmdQueue;
+import org.vishia.cmd.CmdStore;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
@@ -22,6 +24,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.DataAccess;
 import org.vishia.util.Debugutil;
 import org.vishia.util.FileSystem;
+import org.vishia.util.KeyCode;
 import org.vishia.util.StringPartAppend;
 
 /**This class contains some gui capabilities which works in a vishia-Gral graphic environment. 
@@ -36,6 +39,9 @@ public class GitGui
 
   /**Version, history and license
    * <ul>
+   * <li>2016-08-18 Hartmut this version is able to use to view the repository versions, the changed files per version, the changed file to the working tree.
+   *   It supports view diff with invocation of an external tool. It is the first productive version. But yet with some specific settings yet now.
+   *   TODO: read a config. Document it. Show the git command line for any action.
    * <li>2016-08-24 Hartmut created
    * </ul>
    * 
@@ -65,6 +71,36 @@ public class GitGui
    * 
    * 
    */
+  public final String sVersion = "2016-09";  
+
+
+  static class RevisionEntry
+  {
+    final String revisionHash;
+    String treeHash;
+    String parentHash;
+    String author;
+    Date dateAuthor;
+    String committer;
+    Date dateCommit;
+    String commitTitle;
+    StringBuilder commitText = new StringBuilder(200);
+    
+    RevisionEntry(String hash) { revisionHash = hash; }
+    
+  }
+
+
+
+  static class Settings
+  {
+    
+    File dirTemp1 = new File("t:/git_tmp1");
+    File dirTemp2 = new File("t:/git_tmp2");
+  }
+
+
+  Settings settings = new Settings();
 
   String sTypeOfImplementation = "SWT";  //default
   
@@ -73,10 +109,14 @@ public class GitGui
 
   GralTextField wdgPath = new GralTextField("@2-2,0..0=path");
   GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("@3..-20,0..-40=git-versions", new int[] {10, 0, -10});
-  GralTable<RevisionEntry> wdgTableFiles = new GralTable<>("@3..-20,-40..0=git-files", new int[] {20,0});
+  GralTable<String> wdgTableFiles = new GralTable<>("@3..-20,-40..0=git-files", new int[] {20,0});
   
   GralTextBox wdgInfo = new GralTextBox("@-20..0, 0..-20=info");
 
+  /**If set to true, the {@link #cmdThread} should be aborted.
+   * 
+   */
+  boolean bCmdThreadClose;
 
   CmdExecuter cmd = new CmdExecuter();
 
@@ -85,9 +125,14 @@ public class GitGui
    * This buffer will be cleared and filled with the git command, and then parsed to present the result. 
    */
   StringPartAppend out = new StringPartAppend();
-
-  /**Stored arguments from {@link #showLog(String, String, String)}. */
-  String sGitDir, sWorkingDir, sLocalFile;
+  
+  /**The {@link CmdExecuter#execute(String[], boolean, String, List, List, org.vishia.cmd.CmdExecuter.ExecuteAfterFinish)}
+   * needs a list of appendable, that is it.*/
+  List<Appendable> listOut = new LinkedList<Appendable>();
+  { listOut.add(out); }
+  
+  /**Stored arguments from {@link #startLog(String, String, String)}. */
+  String sGitDir, sWorkingDir; //, sLocalFile;
 
   
 
@@ -98,17 +143,16 @@ public class GitGui
 
 
   /**The current line and the line before, to the earlier commit. The Predecessor is not the parent in any case, not on branch and merge points. */
-  GralTable<RevisionEntry>.TableLineData currentLine, preLine;
+  GralTable<RevisionEntry>.TableLineData currentLine, cmpLine;
   
   /**The current entry and the entry before, to the earlier commit. The Predecessor is not the parent in any case, not on branch and merge points. */
-  RevisionEntry currentEntry, preEntry;
+  RevisionEntry currentEntry, cmpEntry;
   
 
   public static void main(String[] args){
     GitGui main = new GitGui(args);
-    main.showLog("D:/GitArchive/D/vishia/srcJava_vishiaBase/.git", "D:/GitArchive/D/vishia/srcJava_vishiaBase", "org/vishia/util/CalculatorExpr.java");
+    main.startLog("D:/GitArchive/D/vishia/srcJava_vishiaBase/.git", "D:/GitArchive/D/vishia/srcJava_vishiaBase", "org/vishia/util/CalculatorExpr.java");
     main.doSomethinginMainthreadTillCloseWindow();
-    main.cmd.close();
   }
   
 
@@ -117,11 +161,23 @@ public class GitGui
       sTypeOfImplementation = args[0];
     }
     initializeCmd();
+    if(!settings.dirTemp1.exists()) { settings.dirTemp1.mkdirs(); }
+    if(!settings.dirTemp2.exists()) { settings.dirTemp2.mkdirs(); }
     wdgTableVersion.specifyActionOnLineSelected(actionTableLineVersion);
-    wdgTableFiles.specifyActionChange("diff view", actionTableFileDiffView, null, ActionChangeWhen.onMouse1Double);
+    wdgTableFiles.specifyActionChange("actionTableFile", actionTableFile, null);
+    window.specifyActionOnCloseWindow(actionOnCloseWindow);
     window.create(sTypeOfImplementation, 'B', null);
+    cmdThread.start();
   }
 
+
+
+  GralUserAction actionOnCloseWindow = new GralUserAction("")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      GitGui.this.cmd.close();
+      return true;
+    }
+  };
 
 
   @Override public void finalize()
@@ -227,17 +283,20 @@ public class GitGui
     if(error !=null) { System.err.println(error); }
     else {
       GitGui main = new GitGui(null);
-      main.showLog(paths[0], paths[1], paths[2]);
-      main.doSomethinginMainthreadTillCloseWindow();
-      main.cmd.close();
+      main.startLog(paths[0], paths[1], paths[2]);
     }
   }
 
 
 
 
-  public void showLog(String sGitDir, String sWorkingDir, String sLocalFile) {
-    this.sGitDir = sGitDir; this.sWorkingDir = sWorkingDir; this.sLocalFile = sLocalFile;
+  public void startLog(String sGitDir, String sWorkingDir, String sLocalFile) {
+    this.sGitDir = sGitDir; this.sWorkingDir = sWorkingDir;
+    startLog(sLocalFile);
+  }
+  
+  void startLog(String sLocalFile) {
+    //this.sLocalFile = sLocalFile;
     String sPathShow;
     if(sLocalFile !=null) {
       sPathShow = sGitDir + " : " + sLocalFile;
@@ -246,7 +305,7 @@ public class GitGui
     }
     wdgPath.setText(sPathShow);
     
-    cmd.setCurrentDir(new File(sWorkingDir));
+    //cmd.setCurrentDir(new File(sWorkingDir));
     out.buffer().setLength(0);
     out.assign(out.buffer());   //to reset positions to the changed out.buffer()
     String sGitCmd = "git";
@@ -255,13 +314,34 @@ public class GitGui
     }
     sGitCmd += " log --date=iso '--pretty=raw'";
     if(sLocalFile !=null && sLocalFile.length() >0) {
-      sGitCmd +=  " '" + sLocalFile + "'";
+      sGitCmd +=  " -- '" + sLocalFile + "'";
     }
     String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
-    int error = cmd.execute(args, null,  out, null);
+    cmd.clearCmdQueue();
+    cmd.abortCmd();
+    out.buffer().setLength(0);
+    out.assign(out.buffer());   //to reset positions to the changed out.buffer()
+    cmd.addCmd(args, null, listOut, null, new File(sWorkingDir), exec_fillRevisionTable);
+    synchronized(cmdThread) { cmdThread.notify(); }
+    //int error = cmd.execute(args, null,  out, null);
+    //fillRevisionTable();
+  }
+
+
+
+
+  /**Fills the {@link #wdgTableVersion} with the gotten output after git log command. This routine is invoked as {@link #execAfterCmdLog}.
+   * 
+   */
+  void fillRevisionTable() {
     out.firstlineMaxpart();
     String lineTexts[] = new String[3];
     boolean contCommits = true;
+    wdgTableVersion.clearTable();
+    lineTexts[0] = "*";
+    lineTexts[1] = "--working area --";
+    lineTexts[2] = "";
+    wdgTableVersion.addLine("*", lineTexts, null);  
     do {
       if(out.scanStart().scan("commit ").scanOk()) {
         contCommits = false;  //set to true on the next "commit " line.
@@ -324,57 +404,137 @@ public class GitGui
     } while(contCommits);
     //wdgTableVersion.
     wdgTableVersion.repaint();
-    Debugutil.stop();
+  }
+
+
+  /**Starts the command 'git diff' to fill the {@link #wdgTableFiles} for the selected revision.
+   * 
+   * @param line
+   */
+  void startRevisionDiff4FileTable(GralTable<RevisionEntry>.TableLineData line) {
+    if(line == null){
+       return;
+    }
+    //
+    //abort the current cmd for diff view (or any other)
+    cmd.clearCmdQueue();
+    cmd.abortCmd();
+    out.buffer().setLength(0);
+    out.assign(out.buffer());   //to reset positions to the changed out.buffer()
+    //
+    //
+    GitGui.this.currentLine = line;
+    GitGui.this.cmpLine = line.nextSibling();
+    GitGui.this.currentEntry = line.data;
+    GitGui.this.cmpEntry = cmpLine == null ? null : cmpLine.data;
+    String sGitCmd = "git";
+    if(! sGitDir.startsWith(sWorkingDir)) {
+      sGitCmd += " '--git-dir=" + sGitDir + "'";
+    }
+    if(currentEntry ==null) {
+      wdgInfo.setText("(working area)");
+      try{
+        wdgInfo.append("\n");
+      } catch(IOException exc){}
+      sGitCmd += " diff --name-only HEAD";
+    } else {
+      wdgInfo.setText(currentEntry.revisionHash);
+      try{
+        wdgInfo.append("\n");
+        wdgInfo.append(currentEntry.commitText);
+      } catch(IOException exc){}
+      sGitCmd += " diff --name-only " + currentEntry.revisionHash + ".." + currentEntry.parentHash;
+    }
+    String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
+    //
+    cmd.addCmd(args, null, listOut, null, new File(sWorkingDir), exec_fillFileTable4Revision);
+    synchronized(cmdThread) { cmdThread.notify(); }
+  }
+  
+  
+
+
+
+
+  void startDiffView(String sFile) {
+    String sFile1 = settings.dirTemp1.getAbsolutePath() + "/" + sFile;
+    String sFile2 = settings.dirTemp2.getAbsolutePath() + "/" + sFile;
+    if(currentEntry == null) {
+      sFile1 = sWorkingDir + "/" + sFile;
+    } else  { 
+      String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + currentEntry.revisionHash + " -- " + sFile;
+      String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
+      cmd.addCmd(args, null, listOut, null, settings.dirTemp1, null);
+    }
+    if(cmpEntry == null) {
+      sFile2 = sFile1;
+    }
+    else { 
+      String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + cmpEntry.revisionHash + " -- " + sFile;
+      String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
+      cmd.addCmd(args, null, listOut, null, settings.dirTemp2, null);
+    }
+    sFile1 = sFile1.replace('/', '\\');
+    sFile2 = sFile2.replace('/', '\\');
+    String sCmdDiff = "cmd.exe /C start c:\\D\\Programs\\WinMerge-2.12.4-exe\\WinMerge.exe " + sFile1 + " " + sFile2;
+    String[] cmdDiffView = CmdExecuter.splitArgs(sCmdDiff); // D:\\vishia\\Java\\srcJava_vishiaGui\\org\\vishia\\gral\\cfg\\GralCfgElement.java D:\\GitArchive\\D\\vishia\\srcJava_vishiaGui\\org\\vishia\\gral\\cfg\\GralCfgElement.java");
+    cmd.addCmd(cmdDiffView, null, listOut, null, null, null);
+    synchronized(cmdThread) { cmdThread.notify(); }
   }
 
 
 
-  static class RevisionEntry
-  {
-    final String revisionHash;
-    String treeHash;
-    String parentHash;
-    String author;
-    Date dateAuthor;
-    String committer;
-    Date dateCommit;
-    String commitTitle;
-    StringBuilder commitText = new StringBuilder(200);
-    
-    RevisionEntry(String hash) { revisionHash = hash; }
-    
+  /**Fills the file table with the gotten output after git diff command. This routine is invoked as {@link #exec_fillFileTable4Revision}.
+   * 
+   */
+  void fillFileTable4Revision() {
+    wdgTableFiles.clearTable();
+    GralTableLine_ifc<String> line = wdgTableFiles.addLine("*", new String[] {"(all files)",""}, "*");  
+    wdgTableFiles.repaint();
+    out.firstlineMaxpart();
+    do {
+      String sLine = out.getCurrentPart().toString();
+      if(!sLine.startsWith("+ git")) {
+        String[] col = new String[2];
+        int posSlash = sLine.lastIndexOf('/');
+        if(posSlash >0) {
+          col[0] = sLine.substring(posSlash+1);
+          col[1] = sLine.substring(0, posSlash);
+        } else {
+          col[0] = sLine;
+          col[1] = "";
+        }
+        line = wdgTableFiles.addLine(sLine, col, sLine);  
+        line.repaint();
+      }
+    } while(out.nextlineMaxpart().found());
   }
+
+
+
+  Thread cmdThread = new Thread("gitGui-Cmd") {
+    @Override public void run() {
+      do {
+        cmd.executeCmdQueue(true);
+        try {
+          synchronized(this){ wait(1000); }
+        } catch (InterruptedException e) { }
+      } while (!bCmdThreadClose);
+    }
+  };
+
+
 
 
 
   GralUserAction actionTableLineVersion = new GralUserAction("actionTablelineVersion")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
-      @SuppressWarnings("unchecked")
-      GralTable<RevisionEntry>.TableLineData line = (GralTable<RevisionEntry>.TableLineData) params[0];
-      GitGui.this.currentLine = line;
-      GitGui.this.preLine = line.nextSibling();
-      currentEntry = line.data;
-      if(preLine !=null) {
-        GitGui.this.preEntry = preLine.data;
+      if(actionCode == KeyCode.userSelect) {
+        @SuppressWarnings("unchecked")
+        GralTable<RevisionEntry>.TableLineData line = (GralTable<RevisionEntry>.TableLineData) params[0];
         
-        wdgInfo.setText(currentEntry.revisionHash);
-        try{
-          wdgInfo.append("\n");
-          wdgInfo.append(currentEntry.commitText);
-        } catch(IOException exc){}
-        cmd.abortCmd();
-        String sGitCmd = "git";
-        if(! sGitDir.startsWith(sWorkingDir)) {
-          sGitCmd += " '--git-dir=" + sGitDir + "'";
-        }
-        sGitCmd += " diff --name-only " + currentEntry.revisionHash + ".." + currentEntry.parentHash;
-        String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
-        out.buffer().setLength(0);
-        out.assign(out.buffer());   //to reset positions to the changed out.buffer()
-        List<Appendable> listOut = new LinkedList<Appendable>();
-        listOut.add(out);
-        int error = cmd.execute(args, true, null, listOut, null, execAfterCmdRevisionDiff);
-      }
+        startRevisionDiff4FileTable(line);
+      }  
       return true;
     }
   };
@@ -385,29 +545,25 @@ public class GitGui
    * It is used as last argument of {@link CmdExecuter#execute(String[], boolean, String, List, List, org.vishia.cmd.CmdExecuter.ExecuteAfterFinish)}
    * and prepares the {@link #wdgTableFiles}.
    */
-  CmdExecuter.ExecuteAfterFinish execAfterCmdRevisionDiff = new CmdExecuter.ExecuteAfterFinish()
-  {
-
-    @Override
+  CmdExecuter.ExecuteAfterFinish exec_fillRevisionTable = new CmdExecuter.ExecuteAfterFinish()
+  { @Override
     public void exec(int errorcode, Appendable out, Appendable err)
-    {  wdgTableFiles.clearTable();
-      wdgTableFiles.repaint();
-      StringPartAppend sbOut = (StringPartAppend) out;    
-      sbOut.firstlineMaxpart();
-      do {
-        String sLine = sbOut.getCurrentPart().toString();
-        String[] col = new String[2];
-        int posSlash = sLine.lastIndexOf('/');
-        if(posSlash >0) {
-          col[0] = sLine.substring(posSlash+1);
-          col[1] = sLine.substring(0, posSlash);
-        } else {
-          col[0] = sLine;
-          col[1] = "";
-        }
-        GralTableLine_ifc<RevisionEntry> line = wdgTableFiles.addLine(col[0], col, null);  
-        line.repaint();
-      } while(sbOut.nextlineMaxpart().found());
+    { fillRevisionTable();
+    }
+  }; 
+
+
+
+
+
+  /**This code snippet is executed after the 'git diff' command for 2 revisions are executed. 
+   * It is used as last argument of {@link CmdExecuter#execute(String[], boolean, String, List, List, org.vishia.cmd.CmdExecuter.ExecuteAfterFinish)}
+   * and prepares the {@link #wdgTableFiles}.
+   */
+  CmdExecuter.ExecuteAfterFinish exec_fillFileTable4Revision = new CmdExecuter.ExecuteAfterFinish()
+  { @Override
+    public void exec(int errorcode, Appendable out, Appendable err)
+    { fillFileTable4Revision();
     }
   }; 
 
@@ -416,10 +572,24 @@ public class GitGui
 
 
 
-  GralUserAction actionTableFileDiffView = new GralUserAction("actionTableFileDiffView")
+  /**Action for mouse double to start view diff. 
+   * 
+   */
+  GralUserAction actionTableFile = new GralUserAction("actionTableFile")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
-      return true;
+      @SuppressWarnings("unchecked")
+      GralTable<RevisionEntry>.TableLineData line = (GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
+       
+      String sFile = line.getKey(); //"org/vishia/inspcPC/InspCmd.java";
+      switch(actionCode) {
+      case (KeyCode.ctrl | KeyCode.enter):
+      case KeyCode.mouse1Double: startDiffView(sFile); return true;
+      case (KeyCode.ctrl | 's'): startLog(sFile); return true;
+      default: return false;
+      } //switch;
+      
   } };
+
 
 
 

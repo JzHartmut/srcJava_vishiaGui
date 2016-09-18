@@ -174,6 +174,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2016-09-18 Hartmut chg: {@link #getActionChangeStrict(org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen, boolean)} documented, 
+   *   changed: returns not null if strict and when==null and a common action is given. Earlier: Returns null in that case. 
    * <li>2016-09-02 Hartmut chg: {@link GralWidget#GralWidget(String, String, char)} with a position String is now deprecated. 
    *   Instead the {@link GralWidget#GralWidget(String, char)} which was deprecated till now is the favor again, but with a combination
    *   of "@pos=name" as first argument. That can be used for all derived widgets!. Therewith it is more simple to complete the widgets 
@@ -977,7 +979,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       cfg.actionChangeSelect = null;
       cfg.actionChange1When = null;
     } else if(cfg.actionChange1 == null && cfg.actionChangeSelect == null) {
-      //first invocation
+      //first invocation, only one action but for special operations (when)
       cfg.actionChange1 = action1;
       cfg.actionChangeSelect = null;
       cfg.actionChange1When = when;
@@ -1020,7 +1022,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   /**Gets the action to execute on changing a widget.
    * If only one action is given with <code>setActionChange(String, action, args) without a specified when then this action is returned in any case,
    * especially if when == null. If specific actions were set, this action is returned, or null.
-   * @param when type of action, if null then returns the only one given action or null if specific actions are given
+   * @param when type of action, if null then returns the only one given action or null if only specific actions are given
    * @return null if the action is not set.
    */
   @Override public ActionChange getActionChange(ActionChangeWhen when) {
@@ -1028,10 +1030,20 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   }
   
   
+  /**Gets the action to execute on changing a widget.
+   * If only one action is given with <code>setActionChange(String, action, args) without a specified when then this action is returned in any case,
+   * especially if when == null. If specific actions were set, this action is returned, or null.
+   * @param when type of action, if null then returns the only one given action or null if only specific actions are given
+   * @param strict if true then a common action without when-designation is not returned if when is not null. 
+   * @return null if the action is not set.
+   */
   public ActionChange getActionChangeStrict(ActionChangeWhen when, boolean strict) {
     if(cfg.actionChange1 !=null) {
-      if(cfg.actionChange1When == null) return strict ? null: cfg.actionChange1;
-      else {
+      if(cfg.actionChange1When == null){ 
+        return strict && when !=null 
+          ? null                //specific action required and strict: returns null though a common action is given.
+          : cfg.actionChange1;  //no specific action required or set, or no specifia action set and not strict: returns the only one action.
+      } else {
         for(ActionChangeWhen when1:cfg.actionChange1When){
           if(when1 == when) return cfg.actionChange1;
         }
