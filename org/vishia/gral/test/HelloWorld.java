@@ -58,7 +58,7 @@ public class HelloWorld
       sTypeOfImplementation = args[0];
     }
     LogMessage log = new LogMessageStream(System.out);  //a logging system.
-    main.window.create(sTypeOfImplementation, 'C', log);  //creates the primary window, starts the whole graphic engine.
+    main.window.create(sTypeOfImplementation, 'C', log, null);  //creates the primary window, starts the whole graphic engine.
     //wait, a parallel thread to the grahic.
     main.doSomethinginMainthreadTillClosePrimaryWindow();
   }

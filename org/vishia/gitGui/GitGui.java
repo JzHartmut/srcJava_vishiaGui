@@ -12,6 +12,7 @@ import java.util.Map;
 import org.vishia.cmd.CmdExecuter;
 import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
+import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
@@ -55,7 +56,7 @@ public class GitGui
    * <li> You can redistribute copies of this source to everybody.
    * <li> Every user of this source, also the user of redistribute copies
    *    with or without payment, must accept this license for further using.
-   * <li> But the LPGL ist not appropriate for a whole software product,
+   * <li> But the LPGL is not appropriate for a whole software product,
    *    if this source is only a part of them. It means, the user
    *    must publish this part of source,
    *    but don't need to publish the whole source of the own product.
@@ -108,7 +109,7 @@ public class GitGui
   GralWindow window = new GralWindow("0+50, 0+80", "GitGui", "Git vishia", GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose);
 
   GralTextField wdgPath = new GralTextField("@2-2,0..0=path");
-  GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("@3..-20,0..-40=git-versions", new int[] {10, 0, -10});
+  GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("@3..-20,0..-40=git-versions", new int[] {2, 10, 0, -10});
   GralTable<String> wdgTableFiles = new GralTable<>("@3..-20,-40..0=git-files", new int[] {20,0});
   
   GralTextBox wdgInfo = new GralTextBox("@-20..0, 0..-20=info");
@@ -166,15 +167,26 @@ public class GitGui
     wdgTableVersion.specifyActionOnLineSelected(actionTableLineVersion);
     wdgTableFiles.specifyActionChange("actionTableFile", actionTableFile, null);
     window.specifyActionOnCloseWindow(actionOnCloseWindow);
-    window.create(sTypeOfImplementation, 'B', null);
+    window.create(sTypeOfImplementation, 'B', null, initGraphic);
     cmdThread.start();
   }
+
+
+  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("init")
+  { @Override protected void executeOrder()
+    {
+      wdgTableFiles.addContextMenuEntryGthread(0, "diffView", "Diff View [Mouse double], [ctrl-Enter]", actionTableFileDiffView);
+      wdgTableFiles.addContextMenuEntryGthread(0, "show Log for File", "Show log for this file [ctrl-s]", actionTableFileLog);
+    }
+  };
+
 
 
 
   GralUserAction actionOnCloseWindow = new GralUserAction("")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
       GitGui.this.cmd.close();
+      bCmdThreadClose = true;
       return true;
     }
   };
@@ -335,13 +347,15 @@ public class GitGui
    */
   void fillRevisionTable() {
     out.firstlineMaxpart();
-    String lineTexts[] = new String[3];
+    String lineTexts[] = new String[4];
     boolean contCommits = true;
     wdgTableVersion.clearTable();
-    lineTexts[0] = "*";
-    lineTexts[1] = "--working area --";
-    lineTexts[2] = "";
+    lineTexts[0] = "";
+    lineTexts[1] = "*";
+    lineTexts[2] = "--working area --";
+    lineTexts[3] = "";
     wdgTableVersion.addLine("*", lineTexts, null);  
+    RevisionEntry entryLast = null;
     do {
       if(out.scanStart().scan("commit ").scanOk()) {
         contCommits = false;  //set to true on the next "commit " line.
@@ -391,12 +405,16 @@ public class GitGui
           Debugutil.stop();
         }
         if(entry.dateAuthor !=null) {
-          lineTexts[0] = dateFormat.format(entry.dateAuthor);
-          lineTexts[1] = entry.commitTitle;
-          lineTexts[2] = entry.author;
+          String cL = "A";
+          if(entryLast !=null && entryLast.parentHash.equals(entry.revisionHash)){ cL = "B"; }
+          lineTexts[0] = cL;
+          lineTexts[1] = dateFormat.format(entry.dateAuthor);
+          lineTexts[2] = entry.commitTitle;
+          lineTexts[3] = entry.author;
           GralTableLine_ifc<RevisionEntry> line = wdgTableVersion.addLine(hash, lineTexts, entry);  
           line.repaint();
         }
+        entryLast = entry;
       } //
       else {
         contCommits = out.nextlineMaxpart().found();
@@ -411,7 +429,7 @@ public class GitGui
    * 
    * @param line
    */
-  void startRevisionDiff4FileTable(GralTable<RevisionEntry>.TableLineData line) {
+  void showLog_startRevisionDiff4FileTable(GralTable<RevisionEntry>.TableLineData line) {
     if(line == null){
        return;
     }
@@ -440,7 +458,10 @@ public class GitGui
     } else {
       wdgInfo.setText(currentEntry.revisionHash);
       try{
-        wdgInfo.append("\n");
+        wdgInfo.append("=>").append(currentEntry.parentHash).append(" @").append(currentEntry.treeHash).append("\n");
+        if(cmpEntry !=null) {
+          wdgInfo.append(cmpEntry.revisionHash).append("=>").append(cmpEntry.parentHash).append(" @").append(cmpEntry.treeHash).append("\n");
+        }
         wdgInfo.append(currentEntry.commitText);
       } catch(IOException exc){}
       sGitCmd += " diff --name-only " + currentEntry.revisionHash + ".." + currentEntry.parentHash;
@@ -533,7 +554,7 @@ public class GitGui
         @SuppressWarnings("unchecked")
         GralTable<RevisionEntry>.TableLineData line = (GralTable<RevisionEntry>.TableLineData) params[0];
         
-        startRevisionDiff4FileTable(line);
+        showLog_startRevisionDiff4FileTable(line);
       }  
       return true;
     }
@@ -588,6 +609,42 @@ public class GitGui
       default: return false;
       } //switch;
       
+  } };
+
+
+  /**Action for mouse double to start view diff. 
+   * 
+   */
+  GralUserAction actionTableFileDiffView = new GralUserAction("actionTableFileDiffView")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      @SuppressWarnings("unchecked")
+      GralTable<RevisionEntry> table = (GralTable<RevisionEntry>)widgd;  //it is the table line.
+      
+      GralTable<RevisionEntry>.TableLineData lineCurr = table.getCurrentLine(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
+      GralTable<RevisionEntry>.TableLineData line = table.getLineMousePressed(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        String sFile = line.getKey(); 
+        startDiffView(sFile); return true;
+      } //if;
+      return false;
+  } };
+
+
+
+  /**Action for mouse double to start view diff. 
+   * 
+   */
+  GralUserAction actionTableFileLog = new GralUserAction("actionTableFileLog")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      @SuppressWarnings("unchecked")
+      GralTable<RevisionEntry> table = (GralTable<RevisionEntry>)widgd;  //it is the table line.
+      GralTable<RevisionEntry>.TableLineData lineCurr = table.getCurrentLine(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
+      GralTable<RevisionEntry>.TableLineData line = table.getLineMousePressed(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        String sFile = line.getKey(); 
+        startLog(sFile); return true;
+      } //if;
+      return false;
   } };
 
 

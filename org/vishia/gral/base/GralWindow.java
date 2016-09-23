@@ -21,8 +21,10 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
 
   /**Version, history and license.
    * <ul>
+   * <li>2016-09-23 Hartmut chg: {@link #create(String, char, LogMessage, GralGraphicTimeOrder)} now needs an obligate argument which can be null
+   *   for the first callback routine for graphic initializing.  
    * <li>2016-09-18 Hartmut chg: renaming {@link #specifyActionOnCloseWindow(GralUserAction)} instead 'setActionOnSettingInvisible', more expressive name. 
-   * <li>2016-08-28 Hartmut new {@link #create(String)} to create either the primary window inclusive the whole graphic machine,
+   * <li>2016-08-28 Hartmut new {@link #create(String, char, LogMessage, GralGraphicTimeOrder)} to create either the primary window inclusive the whole graphic machine,
    *   or create any secondary window.
    * <li>2015-05-31 Hartmut The {@link GraphicImplAccess} is now derived from {@link GralPanelContent.ImplAccess}
    *   because this class is derived from that too. Parallel inheritance. 
@@ -175,8 +177,11 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    * The application should not know whether it is the primary or any secondary window.
    * That helps for applications which are started from a Gral graphic application itself without an own operation system process. 
    * @param awtOrSwt see {@link GralFactory#createGraphic(GralWindow, char, LogMessage, String)}
+   * @param size 'A'..'G', 'A' is a small size, 'G' is the largest.
+   * @param log maybe null. If not given a {@link LogMessageStream} with System.out will be created. For internal logging.
+   * @param initializeInGraphicThread maybe null, an order which will be executed in the graphic thread after creation of the window.
    */
-  public void create(String awtOrSwt, char size, LogMessage log){
+  public void create(String awtOrSwt, char size, LogMessage log, GralGraphicTimeOrder initializeInGraphicThread){
     if(_wdgImpl !=null) throw new IllegalStateException("window already created.");
     GralMng mng = GralMng.get();
     GralGraphicThread gthread = mng.gralDevice();
@@ -186,6 +191,9 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
       //it is the primary window, start the graphic with it.
       if(log == null) { log = new LogMessageStream(System.out); }
       gthread = GralFactory.createGraphic(this, size, log, awtOrSwt);
+    }
+    if(initializeInGraphicThread !=null) {
+      gthread.addDispatchOrder(initializeInGraphicThread);
     }
   }
 

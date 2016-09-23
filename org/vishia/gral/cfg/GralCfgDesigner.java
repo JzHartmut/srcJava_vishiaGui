@@ -106,10 +106,10 @@ public class GralCfgDesigner
   {
     assert(dialogWindowProps == null); //check call only one time.
     mng.selectPanel("primaryWindow");
-    mng.setPosition(-34, GralPos.size +34, -40, GralPos.size +40, 1, 'r');
+    mng.setPosition(-38, GralPos.size +38, -40, GralPos.size +40, 1, 'r');
     dialogWindowProps = mng.createWindow("widgetEdit", "Widget Properties", GralWindow.windConcurrently);
     
-    mng.setPositionSize(0, 0, 3, 34, 'd');
+    mng.setPositionSize(1, 0, 3, 34, 'd');
     dialogFieldName = mng.addTextField("name", true, "name", "t");
     dialogFieldDatapath = mng.addTextField("dataPath", true, "data", "t");
     dialogFieldText = mng.addTextField("text", true, "text", "t");
@@ -119,7 +119,7 @@ public class GralCfgDesigner
     dialogFieldHelp = mng.addTextField("help", true, "help", "t");
     dialogFieldPrompt = mng.addTextField("prompt", true, "prompt", "t");
     //mng.setPositionSize(GralGridPos.same, GralGridPos.same, GralGridPos.next, 2, 'r');
-    mng.setPositionSize(25, 2, 3, 5, 'r');
+    mng.setPositionSize(27, 2, 3, 5, 'r');
     dialogFieldLine = mng.addTextField("line", true, "pos-y", "t");
     //mng.addText(", ", 'B', 0);
     dialogFieldColumn = mng.addTextField("column", true, "pos-x", "t");
@@ -129,7 +129,7 @@ public class GralCfgDesigner
     dialogFieldWidth = mng.addTextField("width", true, "size-x", "t");
     dialogFieldPromptPos = mng.addTextField("promptPos", true, "promptPos", "t");
     dialogBtnEditable = mng.addSwitchButton("editable", "view", "edit", GralColor.getColor("wh"), GralColor.getColor("or"));
-    mng.setPositionSize(25, 2, 3, 8, 'r');
+    mng.setPositionSize(31, 2, 3, 8, 'r');
     dialogButtonEsc = mng.addButton("esc", actionEsc, null, null, "esc");
     dialogButtonOk = mng.addButton("del", actionDel, null, null, "del");
     dialogButtonOk = mng.addButton("OK", actionOk, null, null, "OK");

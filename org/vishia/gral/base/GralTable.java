@@ -75,7 +75,6 @@ import org.vishia.util.TreeNode_ifc;
  * 
  * <br><br>
  * <b>Focus handling in a table</b>: <br>
- * The focus events of the graphic representation layer are not used:
  * <ul>
  * <li>If a cell gets the focus by mouse click, whereby another cell of the table has lost the focus before,
  *   the focus state of the table is not changed. Only the {@link #specifyActionOnLineSelected(GralUserAction)}
@@ -85,6 +84,11 @@ import org.vishia.util.TreeNode_ifc;
  * <li>If {@link #setFocus()} is called from outside, the selected cell is marked with 
  *   {@link GraphicImplAccess.CellData#bSetFocus}. The following repaint sets the focus for that cell.  
  * </ul>
+ * 
+ * <br><br>
+ * <b>Adding an context menu</b>: <br>
+ * The {@link #addContextMenuEntryGthread(int, String, String, GralUserAction)} can be invoked for the table only in the graphic thread. 
+ * Use any {@link GralGraphicTimeOrder} to do that, use a callback with this time order on the creation of the table. 
  * 
  * @author Hartmut Schorrig
  *
@@ -269,11 +273,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   protected GralMenu[] menuColumns;
   
 
-  /**The colors of each cell. It is set with the color of {@link TableItemWidget#colorBackground} and
-   * {@link TableItemWidget#colorBackground} of the currently displayed line.
-   */
-  //private GralColor[] colorBack, colorText;
-  
   
   GraphicImplAccess gi;
 
@@ -481,19 +480,23 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   /**Adds a context menu entry for the given column.
    * It is an abbreviation for {@link #getContextMenuColumn(int)} 
    * and {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}.
+   * The context menu is valid for the column of the whole table independent of the line. In the 
+   * {@link GralUserAction#exec(int, GralWidget_ifc, Object...)} method (param action) the given widget
+   * is the whole table. To get the line where the mouse was pressed:
+   * <ul>
+   * <li>{@link #getLineMousePressed()} returns the line where the mouse was pressed to open the context menu
+   * <li>{@link #getCurrentLine()} returns the line which was selected before. It is possible especially to work with both lines.
+   *   The mouse button for the context menu does not change the current line of the table.
+   * </ul>
    *  
    * @param col The column, see {@link #getContextMenuColumn(int)}
    * @param identArgJbat The name of the entry, see {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
    * @param sMenuPath same like {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
-   * @param action same like {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
-   *   Note that the {@link GralWidget_ifc}-parameter of the {@link GralUserAction#exec(int, GralWidget_ifc, Object...)}
-   *   is given with the whole table, instance of this {@link GralTable}.
+   * @param action the action invoked on menu entered.
    */
   public void addContextMenuEntryGthread(int col, String menuname, String sMenuPath, GralUserAction action){
     GralMenu menu = getContextMenuColumn(col);
-    GralWidget menuitem = null; //new GralWidget(menuname, 'M', null);
-    menu.addMenuItemGthread(menuitem, menuname, sMenuPath, action);
-    //menuitem.setContentInfo(this);  //the table
+    menu.addMenuItemGthread(menuname, sMenuPath, action);
   }
   
 
