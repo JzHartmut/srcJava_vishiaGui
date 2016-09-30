@@ -59,7 +59,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
     Composite panelSwt = mng.getCurrentPanel();
     int styleSwt = 0;
     labelSwt = new Label(panelSwt, styleSwt);
-    swtWidgHelper = new SwtWidgetHelper(labelSwt, mng);
+    super.wdgimpl = swtWidgHelper = new SwtWidgetHelper(labelSwt, mng);
     int mode;
     switch(origin()){
     case 1: mode = SWT.LEFT; break;

@@ -15,15 +15,18 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetHelper;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.gral.impl_ifc.GralWidgetImpl_ifc;
+import org.vishia.util.Debugutil;
 
 /**The static methods of this class are called in some situations, where same functionality is need in some classes.
  * @author Hartmut Schorrig
  *
  */
-public class SwtWidgetHelper //implements GralWidgetHelper
+public class SwtWidgetHelper implements GralWidgetImpl_ifc
 {
 
   /**Version and history
@@ -221,6 +224,26 @@ public class SwtWidgetHelper //implements GralWidgetHelper
     }
     GralRectangle posSize = new GralRectangle(posx, posy, dx, dy);
     return posSize;
+  }
+
+
+
+
+  @Override
+  public void specifyContextMenu(GralMenu menu)
+  {
+    Menu swtMenu = (Menu)menu.getMenuImpl();
+    if(swtMenu == null) {
+      //GralMenu._GraphicImpl implMenu = new SwtMenu(menu, widgetSwt);
+      //implMenu._implMenu();
+      swtMenu = (Menu)menu.getMenuImpl();
+    }
+    try{
+      //widgetSwt.setMenu(swtMenu);
+    } catch(IllegalArgumentException exc){
+      Debugutil.stop();
+    }
+    
   }
 
 

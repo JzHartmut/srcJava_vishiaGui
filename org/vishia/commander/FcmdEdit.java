@@ -136,7 +136,7 @@ public class FcmdEdit
           presentContent();
         }
       } catch(IOException exc){
-        
+        if(reader !=null) { try{ reader.close(); } catch(IOException exc1){}}        
       }
     }
     windView.setFocus(); //WindowVisible(true);

@@ -105,7 +105,7 @@ public class SwtButton extends GralButton.GraphicImplAccess
       case 'B': fontText = mng.propertiesGuiSwt.stdButtonFont; break;
       default: throw new IllegalArgumentException("param size must be A or B");
     }
-    swtWidgHelper = new SwtWidgetHelper(widgetSwt, mng);  
+    super.wdgimpl = swtWidgHelper = new SwtWidgetHelper(widgetSwt, mng);  
   }
 
 

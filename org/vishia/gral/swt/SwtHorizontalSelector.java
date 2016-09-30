@@ -82,7 +82,7 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
     //this.mng = mng;
     Composite panel = (Composite)outer.pos().panel.getWidgetImplementation();
     //widgetSwt = new Canvas(panel,0);
-    this.swtWdgW = new SwtWidgetHelper(new Canvas(panel,0), mng);
+    super.wdgimpl = this.swtWdgW = new SwtWidgetHelper(new Canvas(panel,0), mng);
     swtWdgW.widgetSwt.setData(wdgGral);
     swtWdgW.widgetSwt.addPaintListener(paintListener);
     swtWdgW.widgetSwt.addMouseListener(mouseListener);

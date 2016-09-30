@@ -96,7 +96,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
     assert(panelSwt !=null);
     textFieldSwt = new Text(panelSwt, SWT.MULTI|SWT.H_SCROLL|SWT.V_SCROLL); //;style);
     textFieldSwt.setData(this);
-    wdgh = new SwtWidgetHelper(textFieldSwt, mng);
+    super.wdgimpl = this.wdgh = new SwtWidgetHelper(textFieldSwt, mng);
 
     textFieldSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
     textFieldSwt.setEditable(widgg.isEditable());

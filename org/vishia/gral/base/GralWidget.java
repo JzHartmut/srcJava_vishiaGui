@@ -17,6 +17,7 @@ import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidgetCfg_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.impl_ifc.GralWidgetImpl_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
@@ -174,6 +175,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2016-09-30 Hartmut New idea, concept: {@link ImplAccess#wdgimpl}: That refers an implementation of a WidgetHelper class of the implementation layer
+   *   which knows the widget. Via this aggregation some action with the implementation widget can be do which are defined
+   *   in the {@link GralWidgetImpl_ifc}. See {@link org.vishia.gral.swt.SwtWidgetHelper}.
    * <li>2016-09-18 Hartmut chg: {@link #getActionChangeStrict(org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen, boolean)} documented, 
    *   changed: returns not null if strict and when==null and a common action is given. Earlier: Returns null in that case. 
    * <li>2016-09-02 Hartmut chg: {@link GralWidget#GralWidget(String, String, char)} with a position String is now deprecated. 
@@ -1019,6 +1023,17 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     }
   }
   
+  
+  
+  public void specifyContextMenu(GralMenu menu) {
+    if(_wdgImpl !=null && _wdgImpl.wdgimpl !=null) { _wdgImpl.wdgimpl.specifyContextMenu(menu); }
+    else { } //TODO set to instanciation data
+  
+  }
+  
+  
+  
+  
   /**Gets the action to execute on changing a widget.
    * If only one action is given with <code>setActionChange(String, action, args) without a specified when then this action is returned in any case,
    * especially if when == null. If specific actions were set, this action is returned, or null.
@@ -1841,6 +1856,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
 
     public final GralWidget widgg;
     
+    
+    /**Aggregation to the widget implementation which resolves the required implementation methods. */
+    protected GralWidgetImpl_ifc wdgimpl;
+    
     /**Bounds of the implementation widget in its container. null if not used. */
     public GralRectangle pixBounds;
     
@@ -1865,6 +1884,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       }
       widgg.lastTimeSetVisible = System.currentTimeMillis();
     }
+    
+    
     
     
     /**This method is not intent to call by user. It may be called from all widget implementation 

@@ -60,7 +60,7 @@ public class SwtLed extends GralLed.GraphicImplAccess
     }
     Composite panel = mng.getCurrentPanel();
     widgSwt = new SwtLedImpl(panel);
-    wdgh = new SwtWidgetHelper(widgSwt, mng);
+    super.wdgimpl = this.wdgh = new SwtWidgetHelper(widgSwt, mng);
     widgSwt.setBackground(mng.propertiesGuiSwt.colorBackground);
     widgSwt.addFocusListener(mng.focusListener);
     widgSwt.setForeground(mng.propertiesGuiSwt.colorSwt(0xff00));
@@ -213,12 +213,6 @@ private class SwtLedImpl extends Canvas
   }
 
 
-  //@Override
-  public GralColor XXXsetBackgroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return SwtWidgetHelper.setBackgroundColor(color, widgSwt);
-  }
 
   @Override
   public void setBoundsPixel(int x, int y, int dx, int dy)

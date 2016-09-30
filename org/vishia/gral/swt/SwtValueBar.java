@@ -39,7 +39,7 @@ public class SwtValueBar extends GralValueBar.GraphicImplAccess // implements Gr
 	{
     widgg.super(mng.mng);
     //mng.mng.setNextPosition();
-    wdgh = new SwtWidgetHelper(widgetSwt, mng);
+    super.wdgimpl = this.wdgh = new SwtWidgetHelper(widgetSwt, mng);
     this.widgetSwt = this.new BarWidget();
 		this.widgetSwt.setData(this);
 		this.widgetSwt.setBackground(mng.propertiesGuiSwt.colorBackgroundSwt());

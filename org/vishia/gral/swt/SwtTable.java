@@ -191,7 +191,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     Composite swtTable = new SwtTable.Table(parent, zColumn, mng);
     initSwtTable(swtTable, zColumn, mng);
     vScrollBar = new Vscrollbar(swtTable);
-    this.swtWidgHelper = new SwtWidgetHelper(swtTable, mng);
+    super.wdgimpl = this.swtWidgHelper = new SwtWidgetHelper(swtTable, mng);
     //gralTable.implMethodWidget_.setWidgetImpl(this);
     //this.menuColumns = new SwtMenu[zColumn];
     swtWidgHelper.widgetSwt.addKeyListener(myKeyListener);

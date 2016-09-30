@@ -177,7 +177,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     if(!widgg.isEditable()){
       mng.mng.registerShowField(widgg);
     }
-    swtWidgHelper = new SwtWidgetHelper(textFieldSwt, mng);
+    super.wdgimpl = swtWidgHelper = new SwtWidgetHelper(textFieldSwt, mng);
 
     mng.mng.registerWidget(widgg);
     
