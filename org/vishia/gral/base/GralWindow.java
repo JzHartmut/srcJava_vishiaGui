@@ -228,12 +228,12 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    * It calls {@link GralWindowImpl_ifc#addMenuBarArea9ItemGThread(String, String, GralUserAction)}
    * with the known {@link GralWidget#_wdgImpl} instance
    * to invoke the graphic implementation layer method for the window. 
-   * @deprecated use {@link #getMenuBar()} and then {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
+   * @deprecated use {@link #getMenuBar()} and then {@link GralMenu#addMenuItem(String, String, GralUserAction)}
    * */
   @Override @Deprecated
   public void addMenuBarItemGThread(String nameMenu, String sMenuPath, GralUserAction action)
   { GralMenu menu = getMenuBar();
-    menu.addMenuItemGthread(nameMenu, sMenuPath, action);
+    menu.addMenuItem(nameMenu, sMenuPath, action);
     //((GralWindowImpl_ifc)wdgImpl).addMenuItemGThread(nameMenu, sMenuPath, action);
   }
 

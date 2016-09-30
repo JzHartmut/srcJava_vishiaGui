@@ -126,7 +126,7 @@ public interface GralArea9_ifc extends GralMngApplAdapter_ifc
 
   
   /**It is like {@link GralWindow_ifc#addMenuBarItemGThread(String, String, GralUserAction)}.
-   * @deprecated use {@link #getMenuBar()} and then {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
+   * @deprecated use {@link #getMenuBar()} and then {@link GralMenu#addMenuItem(String, String, GralUserAction)}
    */
   @Deprecated
   void addMenuBarArea9ItemGThread(String nameWidg, String sMenuPath, GralUserAction action);

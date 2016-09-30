@@ -24,7 +24,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class SwtMenu extends GralMenu
+public class SwtMenu extends GralMenu._GraphicImpl
 {
   
 
@@ -81,9 +81,9 @@ public class SwtMenu extends GralMenu
    * @param parent
    * @param mng
    */
-  protected SwtMenu(GralWidget widgg, Control parent, GralMng mng)
+  protected SwtMenu(GralMenu gralMenu, GralWidget widgg, Control parent)
   {
-    super(widgg, mng);
+    gralMenu.super(widgg);
     this.window = parent.getShell();
     this.menuSwt = new Menu(parent);
     parent.setMenu(menuSwt);
@@ -95,9 +95,9 @@ public class SwtMenu extends GralMenu
    * @param window
    * @param mng
    */
-  protected SwtMenu(GralWidget widgg, Shell window, GralMng mng)
+  protected SwtMenu(GralMenu gralMenu, GralWidget widgg, Shell window)
   {
-    super(widgg, mng);
+    gralMenu.super(widgg);
     this.window = window;
     Menu menuWindow = window.getMenuBar();
     if(menuWindow == null){
@@ -108,32 +108,6 @@ public class SwtMenu extends GralMenu
     
   }
 
-  
-  /**
-   * @see org.vishia.gral.base.GralMenu#addMenuItemGthread(java.lang.String, java.lang.String, org.vishia.gral.ifc.GralUserAction)
-   */
-  @Override public void addMenuItemGthread(String nameWidg, String sMenuPath, GralUserAction gralAction)
-  {
-    SelectionListener action = new ActionUserMenuItem(gralAction);
-    addMenuItemGthread(widgg, nameWidg, sMenuPath, action);
-  }  
-  
-  
-  /* (non-Javadoc)
-   * @see org.vishia.gral.base.GralMenu#addMenuItemGthread(org.vishia.gral.base.GralWidget, java.lang.String, java.lang.String, org.vishia.gral.ifc.GralUserAction)
-   */
-  @Override public void addMenuItemGthread(GralWidget widggMenu, String nameWidg, String sMenuPath, GralUserAction gralAction)
-  {
-    SelectionListener action = new ActionUserMenuItem(gralAction);
-    addMenuItemGthread(widggMenu, nameWidg, sMenuPath, action);
-  }  
-  
-  
-  @Override public void addMenuItemGthread(String sMenuPath, GralUserAction gralAction)
-  {
-    SelectionListener action = new ActionUserMenuItem(gralAction);
-    addMenuItemGthread(widgg, null, sMenuPath, action);
-  }  
   
   
   
@@ -147,11 +121,12 @@ public class SwtMenu extends GralMenu
    * @param sMenuPath
    * @param action
    */
-  /*package private*/ private void addMenuItemGthread(GralWidget widggP, String nameWidg, 
+  /*package private*/ private void XXXaddMenuItemGthread(GralWidget widggP, String nameWidg, 
       String sMenuPath, SelectionListener action)
   {
+    /*
     String[] names = sMenuPath.split("/");
-    Map<String, MenuEntry> menustore = menus;
+    Map<String, GralMenu.MenuEntry> menustore = menus;
     int ii;
     Menu parentMenu = menuSwt;  //set initial, it will be a child then
     for(ii=0; ii<names.length-1; ++ii){
@@ -195,7 +170,36 @@ public class SwtMenu extends GralMenu
     item.setText(name);
     //item.setAccelerator(SWT.CONTROL | 'S');
     item.addSelectionListener(action);
+    */
   }
+
+
+
+
+  /**Creates the implementation for a menu node or entry.
+   * @param oParentMenu return value of {@link #getMenuImpl()} or the {@link GralMenu.MenuEntry#menuImpl}, that is a menu node. 
+   * @param gralEntry The entry in the menu tree
+   */
+  @Override public void _implMenuItem(Object oParentMenu, GralMenu.MenuEntry gralEntry)
+  { assert(gralEntry.menuImpl ==null);
+    Menu parentMenu = (Menu) oParentMenu;
+    MenuItem item = new MenuItem(parentMenu, gralEntry.subMenu !=null ? SWT.CASCADE : SWT.NONE);
+    item.setText(gralEntry.name);
+    if(gralEntry.cAccelerator !=0){
+      item.setAccelerator(SWT.CONTROL | gralEntry.cAccelerator);
+    }
+    if(gralEntry.subMenu !=null) {
+      Menu menu = new Menu(window, SWT.DROP_DOWN);
+      item.setMenu(menu);
+      gralEntry.menuImpl = menu;   //The implementation is the (sub-) menu as parent for a menu item
+    } else if(gralEntry.action !=null){
+      gralEntry.menuImpl = item;   //The implementation is the menu item
+      SelectionListener action = new ActionUserMenuItem(gralEntry.action);
+      item.addSelectionListener(action);
+    }
+  }
+
+
 
 
   @Override

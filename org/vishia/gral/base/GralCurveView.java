@@ -786,12 +786,12 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   public void initMenuContext(){
     GralMenu menuCurve = getContextMenu();
     //menuCurve.addMenuItemGthread("pause", "pause", null);
-    menuCurve.addMenuItemGthread("refresh", actionPaintAll);
-    menuCurve.addMenuItemGthread("go", actionGo);
+    menuCurve.addMenuItem("refresh", actionPaintAll);
+    menuCurve.addMenuItem("go", actionGo);
     //menuCurve.addMenuItemGthread("zoomOut", "zoom in", null);
-    menuCurve.addMenuItemGthread("zoomBetweenCursor", "zoom between Cursors", actionZoomBetweenCursors);
-    menuCurve.addMenuItemGthread("zoomOut", "zoom out", actionZoomOut);
-    menuCurve.addMenuItemGthread("cleanBuffer", "clean Buffer", actionCleanBuffer);
+    menuCurve.addMenuItem("zoomBetweenCursor", "zoom between Cursors", actionZoomBetweenCursors);
+    menuCurve.addMenuItem("zoomOut", "zoom out", actionZoomOut);
+    menuCurve.addMenuItem("cleanBuffer", "clean Buffer", actionCleanBuffer);
     //menuCurve.addMenuItemGthread("zoomOut", "to left", null);
     //menuCurve.addMenuItemGthread("zoomOut", "to right", null);
     

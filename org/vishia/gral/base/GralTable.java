@@ -479,7 +479,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   /**Adds a context menu entry for the given column.
    * It is an abbreviation for {@link #getContextMenuColumn(int)} 
-   * and {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}.
+   * and {@link GralMenu#addMenuItem(String, String, GralUserAction)}.
    * The context menu is valid for the column of the whole table independent of the line. In the 
    * {@link GralUserAction#exec(int, GralWidget_ifc, Object...)} method (param action) the given widget
    * is the whole table. To get the line where the mouse was pressed:
@@ -490,13 +490,13 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * </ul>
    *  
    * @param col The column, see {@link #getContextMenuColumn(int)}
-   * @param identArgJbat The name of the entry, see {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
-   * @param sMenuPath same like {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
+   * @param identArgJbat The name of the entry, see {@link GralMenu#addMenuItem(String, String, GralUserAction)}
+   * @param sMenuPath same like {@link GralMenu#addMenuItem(String, String, GralUserAction)}
    * @param action the action invoked on menu entered.
    */
   public void addContextMenuEntryGthread(int col, String menuname, String sMenuPath, GralUserAction action){
     GralMenu menu = getContextMenuColumn(col);
-    menu.addMenuItemGthread(menuname, sMenuPath, action);
+    menu.addMenuItem(menuname, sMenuPath, action);
   }
   
 
@@ -511,7 +511,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    *
    *  
    * @param col The column of the table, count from 0,1,...
-   * @return The menu to add {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}.
+   * @return The menu to add {@link GralMenu#addMenuItem(String, String, GralUserAction)}.
    */
   public GralMenu getContextMenuColumn(int col){
     if(menuColumns == null){
@@ -537,7 +537,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * </pre>
    *  
    * @param col The column of the table, count from 0,1,...
-   * @return The menu to add {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}.
+   * @return The menu to add {@link GralMenu#addMenuItem(String, String, GralUserAction)}.
    */
   public GralMenu getContextMenuColumnCells(int col, String name, String sMenuPath, GralUserAction action){
     return null;

@@ -301,7 +301,7 @@ public final class InspcCurveView
     //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 0, 'd');
     buildGraphicInCurveWindow(common);
     GralMenu menu = wind.getMenuBar();
-    menu.addMenuItemGthread("&Window/open " + sName, actionOpenWindow);
+    menu.addMenuItem("&Window/open " + sName, actionOpenWindow);
   }
 
   

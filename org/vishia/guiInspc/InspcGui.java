@@ -480,16 +480,16 @@ private class InspcGuiCfg extends GuiCfg
     _gralMng.setPosition(10, 30, 50, 74, 0, '.');
     viewTargetComm.setToPanel();
     GralMenu menu = super.guiW.getMenuBar();
-    menu.addMenuItemGthread("menuBarFieldsA", "&Window/open Fields &A", fieldsA.actionOpenWindow);
-    menu.addMenuItemGthread("menuBarFieldsB", "&Window/open Fields &B", fieldsB.actionOpenWindow);
-    menu.addMenuItemGthread("menuBarViewTargetComm", "&Window/view &TargetComm", viewTargetComm.setVisible);
+    menu.addMenuItem("menuBarFieldsA", "&Window/open Fields &A", fieldsA.actionOpenWindow);
+    menu.addMenuItem("menuBarFieldsB", "&Window/open Fields &B", fieldsB.actionOpenWindow);
+    menu.addMenuItem("menuBarViewTargetComm", "&Window/view &TargetComm", viewTargetComm.setVisible);
     //
     if(user !=null){
       user.initGui(_gralMng);
       user.addGuiMenu(gui.mainWindow());
     }
-    menu.addMenuItemGthread("menuHelp", "&Help/&Help", gui.getActionHelp());
-    menu.addMenuItemGthread("menuAbout", "&Help/&About", gui.getActionAbout());
+    menu.addMenuItem("menuHelp", "&Help/&Help", gui.getActionHelp());
+    menu.addMenuItem("menuAbout", "&Help/&About", gui.getActionAbout());
     gui.addMenuBarArea9ItemGThread("menuAbout", "&Help/e&Xit", gui.getActionAbout());
 
   }

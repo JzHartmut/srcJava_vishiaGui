@@ -30,6 +30,7 @@ import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralLed;
 import org.vishia.gral.base.GralMenu;
+import org.vishia.gral.base.GralMenu._GraphicImpl;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
@@ -333,7 +334,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   
   @Override protected GralMenu createContextMenu(GralWidget widg){
     Component widgSwt = (Component)widg._wdgImpl.getWidgetImplementation();
-    GralMenu menu = new AwtMenu(widg, widgSwt, mng);
+    GralMenu menu = new GralMenu(); new AwtMenu(widg, widgSwt, mng);  //TODO
     PopupMenu menuAwt = (PopupMenu)menu.getMenuImpl();
     widgSwt.add(menuAwt);
     menuAwt.show(widgSwt, 10, 10);
@@ -344,7 +345,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   
   @Override protected GralMenu createMenuBar(GralWindow windg){
     Frame windowAwt = (Frame)windg.getWidgetImplementation();
-    GralMenu menu = new AwtMenu(windg, windowAwt, mng);
+    GralMenu menu = new GralMenu(); new AwtMenu(windg, windowAwt, mng);  //TODO
     return menu;
   }
  
@@ -739,6 +740,8 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     // TODO Auto-generated method stub
     return false;
   }
+
+
 
 
 

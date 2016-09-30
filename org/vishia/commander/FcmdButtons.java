@@ -134,7 +134,7 @@ public class FcmdButtons
     }
     if(menu !=null){
       GralMenu menuBar = main.gui.getMenuBar();
-      menuBar.addMenuItemGthread(menu, action);
+      menuBar.addMenuItem(menu, action);
       //main.gui.addMenuBarArea9ItemGThread(null, menu, action);
     }
   }

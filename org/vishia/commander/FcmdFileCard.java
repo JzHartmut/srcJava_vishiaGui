@@ -176,12 +176,12 @@ public class FcmdFileCard extends GralFileSelector
     //super.selectList.wdgdTable.setColumnWidth(50, new int[]{2,0,-6,-11});
     super.selectList.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.fileSelect.");
     GralMenu menuFolder = super.widgdPathDir.getContextMenu();
-    menuFolder.addMenuItemGthread("contextfolder-setOrigin", main.idents.menuContextSetOriginDir, main.favorPathSelector.actionSetDirOrigin);
-    menuFolder.addMenuItemGthread("menuContextCreateFavor", main.idents.menuContextCreateFavor, main.favorPathSelector.actionCreateFavor);
-    menuFolder.addMenuItemGthread("context-filescp", main.idents.menuFilesCpContext, main.filesCp.actionConfirmCp);
-    menuFolder.addMenuItemGthread("contextfolder-create", main.idents.menuConfirmMkDirFileContext, main.mkCmd.actionOpenDialog);
-    menuFolder.addMenuItemGthread("contextfolder-search", main.idents.menuContextSearchFiles, main.favorPathSelector.actionSearchFiles);
-    menuFolder.addMenuItemGthread("contextfolder-refresh", main.idents.menuFileNaviRefreshContext, main.favorPathSelector.actionRefreshFileTable);
+    menuFolder.addMenuItem("contextfolder-setOrigin", main.idents.menuContextSetOriginDir, main.favorPathSelector.actionSetDirOrigin);
+    menuFolder.addMenuItem("menuContextCreateFavor", main.idents.menuContextCreateFavor, main.favorPathSelector.actionCreateFavor);
+    menuFolder.addMenuItem("context-filescp", main.idents.menuFilesCpContext, main.filesCp.actionConfirmCp);
+    menuFolder.addMenuItem("contextfolder-create", main.idents.menuConfirmMkDirFileContext, main.mkCmd.actionOpenDialog);
+    menuFolder.addMenuItem("contextfolder-search", main.idents.menuContextSearchFiles, main.favorPathSelector.actionSearchFiles);
+    menuFolder.addMenuItem("contextfolder-refresh", main.idents.menuFileNaviRefreshContext, main.favorPathSelector.actionRefreshFileTable);
     panelFiles.setPrimaryWidget(super.selectList.wdgdTable);
     //
     //sets the action for a simple table: what to do on line selected: Show file names. 

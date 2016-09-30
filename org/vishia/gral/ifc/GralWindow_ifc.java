@@ -99,7 +99,7 @@ public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc, Gr
    *   then creates the search menu item as pull down in menu bar, and then 'continue' with 'n' as hot key as sub-menu. 
    *   It is stored in {@link GralWidget#sDataPath}  
    * @param action called on menu activation.
-   * @deprecated use {@link #getMenuBar()} and then {@link GralMenu#addMenuItemGthread(String, String, GralUserAction)}
+   * @deprecated use {@link #getMenuBar()} and then {@link GralMenu#addMenuItem(String, String, GralUserAction)}
    */
   @Deprecated abstract public void addMenuBarItemGThread(String nameWidg, String sMenuPath, GralUserAction action);
   

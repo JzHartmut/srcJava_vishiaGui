@@ -550,7 +550,8 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
   @Override protected GralMenu createColumnMenu(int column){
     //GralMenu menuColumn = new SwtMenu(outer, swtWidgWrapper.widgetSwt, itsMng());
-    GralMenu menuColumn = new SwtMenu(outer, cellsSwt[0][column], itsMng());
+    GralMenu menuColumn = new GralMenu(); 
+    new SwtMenu(menuColumn, null, cellsSwt[0][column]);
     for(int iRow = 1; iRow < cellsSwt.length; ++iRow){
       //uses the same menu instance in all cells of the column.
       cellsSwt[iRow][column].setMenu((Menu)menuColumn.getMenuImpl());

@@ -303,7 +303,7 @@ public class GralHorizontalSelector<UserData> extends GralWidget
     
     protected void execAfterCreationImplWidget(){
       GralMenu menu = outer.getContextMenu();
-      menu.addMenuItemGthread("&Close tab", outer.actionRemoveTab);
+      menu.addMenuItem("&Close tab", outer.actionRemoveTab);
     }
     
 

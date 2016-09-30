@@ -660,7 +660,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     widgdPathDir.setActionChange(actionSetPath);
     widgdPathDir.setBackColor(panelMng.getColor("pye"), 0xeeffff);  //color pastel yellow
     GralMenu menuFolder = widgdPathDir.getContextMenu();
-    menuFolder.addMenuItemGthread("x", "refresh [cR]", actionRefreshFileTable);
+    menuFolder.addMenuItem("x", "refresh [cR]", actionRefreshFileTable);
     panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
     widgBtnFavor = new GralButton(null, "favor", actionFavorButton);
     widgBtnFavor.createImplWidget_Gthread();

@@ -550,15 +550,15 @@ public class Fcmd extends GuiCfg
 
     fButtons.initPanelButtons();
     GralMenu menu = gui.getMenuBar();
-    menu.addMenuItemGthread("MenuSetWorkingDir", "&Command/Set&WorkingDir", executer.actionSetCmdWorkingDir); // /
-    menu.addMenuItemGthread("MenuCommandAbort", "&Command/&Abort", executer.actionCmdAbort); // /
+    menu.addMenuItem("MenuSetWorkingDir", "&Command/Set&WorkingDir", executer.actionSetCmdWorkingDir); // /
+    menu.addMenuItem("MenuCommandAbort", "&Command/&Abort", executer.actionCmdAbort); // /
     // gui.addMenuItemGThread("&Command/E&xecute", actionSetCmdCurrentDir); ///
-    menu.addMenuItemGthread("MenuCmdCfgSet", "&Command/CmdCf&g - read current file", executer.actionSetCmdCfg); // /
-    menu.addMenuItemGthread("menuReadCmdiCfg", "&Command/&ExtCfg - read cfg file", executer.actionReadExtensionCmd);
+    menu.addMenuItem("MenuCmdCfgSet", "&Command/CmdCf&g - read current file", executer.actionSetCmdCfg); // /
+    menu.addMenuItem("menuReadCmdiCfg", "&Command/&ExtCfg - read cfg file", executer.actionReadExtensionCmd);
 
-    menu.addMenuItemGthread("menuHelp", idents.menuHelpBar, gui.getActionHelp());
-    menu.addMenuItemGthread("menuAbout", idents.menuBarAbout, gui.getActionAbout());
-    menu.addMenuItemGthread("MenuTestInfo", "&Help/&Infobox", actionTest); 
+    menu.addMenuItem("menuHelp", idents.menuHelpBar, gui.getActionHelp());
+    menu.addMenuItem("menuAbout", idents.menuBarAbout, gui.getActionAbout());
+    menu.addMenuItem("MenuTestInfo", "&Help/&Infobox", actionTest); 
     guiW.outputBox.setActionChange(executer.actionCmdFromOutputBox);
     String sHelpUrlDir = cargs.dirHtmlHelp.getAbsolutePath();
     gui.setHelpUrl(sHelpUrlDir + "/Fcmd.html");

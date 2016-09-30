@@ -74,8 +74,8 @@ public class FcmdStatusLine
     widgFilePath.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.pathCurr.");
     widgFilePath.setDragEnable(main.actionDragFileFromStatusLine, KeyCode.dragFiles);
     GralMenu menuWidg = widgFilePath.getContextMenu();
-    menuWidg.addMenuItemGthread("menuContextShowBackslash", main.idents.menuContextShowBackslash, actionShowBackslash);
-    menuWidg.addMenuItemGthread("menuContextShowSlash", main.idents.menuContextShowSlash, actionShowSlash);
+    menuWidg.addMenuItem("menuContextShowBackslash", main.idents.menuContextShowBackslash, actionShowBackslash);
+    menuWidg.addMenuItem("menuContextShowSlash", main.idents.menuContextShowSlash, actionShowSlash);
     main._gralMng.setPosition(2, 4, 0, 9.8f, 1, 'r');
     widgRunInfo = main._gralMng.addTextField(main.nameTextFieldRunInfo, false, null, null);
     widgRunInfo.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.runInfo.");

@@ -860,21 +860,21 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   @Override protected GralMenu XXXaddPopupMenu(String sName){
     Control panelSwt = getCurrentPanel(); //(Control)pos().panel.getPanelImpl();
-    GralMenu menu = new SwtMenu(null, panelSwt, mng);
+    GralMenu menu = new GralMenu(); new SwtMenu(menu, null, panelSwt);
     return menu;
   }
   
   
   @Override protected GralMenu createContextMenu(GralWidget widg){
     Control widgSwt = (Control)widg._wdgImpl.getWidgetImplementation();
-    GralMenu menu = new SwtMenu(widg, widgSwt, mng);
+    GralMenu menu = new GralMenu(); new SwtMenu(menu, widg, widgSwt);
     return menu;
   }
  
   
   @Override protected GralMenu createMenuBar(GralWindow windg){
     Shell windowSwt = (Shell)windg.getWidgetImplementation();
-    GralMenu menu = new SwtMenu(windg, windowSwt, mng);
+    GralMenu menu = new GralMenu(); new SwtMenu(menu, windg, windowSwt);
     return menu;
   }
  
