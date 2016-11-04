@@ -1404,9 +1404,13 @@ public GralButton addCheckButton(
   
   @Override public void notifyFocus(GralWidget widgd)
   {
-    synchronized(widgetsInFocus){
-      widgetsInFocus.remove(widgd);  //remove it anywhere inside
-      widgetsInFocus.add(0, widgd);     //add at start.
+    if(widgd.getDataPath() !=null) {  
+      //regard only widgets with datapath, all other are not used.
+      //Therewith preserve the last focused widget which has a datapath.
+      synchronized(widgetsInFocus){
+        widgetsInFocus.remove(widgd);  //remove it anywhere inside
+        widgetsInFocus.add(0, widgd);     //add at start.
+      }
     }
   }
   

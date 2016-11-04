@@ -9,6 +9,7 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
+import org.vishia.msgDispatch.LogMessageStream;
 
 /*Test with Jbat: call Jbat with this java file with its full path:
 file: D:/vishia/Java/srcJava_vishiaGui/org/vishia/gral/cfg/GralCfgWindow.java
@@ -41,7 +42,7 @@ public class GralCfgWindow
   
   /**The version, history and license.
    * <ul>
-   * <li>2015-04-26 Hartmut created: For usage in Jbat-scripts.
+   * <li>2015-04-26 Hartmut created: For usage in Jzcmd-scripts.
    * </ul>
    * 
    * <b>Copyright/Copyleft</b>:
@@ -91,7 +92,7 @@ public class GralCfgWindow
    * @throws ParseException on errors in the sCfg
    */
   GralCfgWindow(String sName, String sTitle, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) throws ParseException {
-    this.log = log;
+    this.log = log !=null ? log : log;
     this.guiCfgData = new GralCfgData(null);  //no config conditions given.
     this.imgDir = imgDir;
     GralCfgZbnf cfgZbnf = new GralCfgZbnf();  //temporary instance for parsing

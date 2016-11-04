@@ -30,8 +30,6 @@ java org.vishia.gral.test.HelloWorld.main(null);
 
 public class HelloWorld
 {
-  GralMng gralMng;
-  
   String[] helloText = { "hello user", "hello world"};
   
   GralUserAction actionTestButton = new GralUserAction("TestButton") { 
@@ -46,7 +44,7 @@ public class HelloWorld
   /**The GralWindow have to be initialized firstly, after them the widgets in the window. Therewith the assignment of the widgets to this window
    * is determined. The widgets are created with the window then, see {@link GralPanelContent#createImplWidget_Gthread()}
    */
-  GralWindow window = new GralWindow("0+30, 0+50", "HelloWorldWind", "Simple Hello World application", GralWindow.windResizeable + GralWindow.windHasMenu);
+  GralWindow window = new GralWindow("50+30, 50+50", "HelloWorldWind", "Simple Hello World application", GralWindow.windResizeable + GralWindow.windHasMenu);
   GralLabel widgHelloText = new GralLabel("3-2,2+5", "HelloLabel", helloText[0], 0);
   GralButton widgButton = new GralButton("7-3,10+12", "TestButton", "press me", actionTestButton);
   
@@ -69,7 +67,7 @@ public class HelloWorld
   public void doSomethinginMainthreadTillClosePrimaryWindow()
   { int ix = 0;
     while(GralMng.get().gralDevice.isRunning()){
-      try{ Thread.sleep(1000);} 
+      try{ Thread.sleep(2000);} 
       catch (InterruptedException e) { }
       if(++ix >= helloText.length) { ix = 0; }
       widgHelloText.setText(helloText[ix]);

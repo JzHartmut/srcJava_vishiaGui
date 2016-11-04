@@ -259,7 +259,13 @@ public class InspcFieldTable
       }
       VariableAccess_ifc vari = inspcMng.getVariable(sDatapath);
       if(vari instanceof InspcVariable){
-        structVar = ((InspcVariable)vari).parent;
+        InspcVariable vars = (InspcVariable) vari;
+        if(vars.getStruct() != null) {
+          this.structVar = vars; //It is a non-leafe-variable, use it to show the fields. 
+        } else {
+          this.structVar = vars.parent;   //for a leaf variable, normal case, if it is a non-leafe-variable, use its parent though.
+        }
+        //if(structVar == null)
         //struct = var.struct();
         //- sPathStruct = struct.path();  //NOTE it is without device.
         //
@@ -278,7 +284,7 @@ public class InspcFieldTable
   
   void fillTableStruct(boolean bCanRequest){
     widgTable.clearTable();
-    InspcStruct struct = structVar.struct();
+    InspcStruct struct = structVar.getOrCreateStructForNonLeafVariables();
     if(struct.isUpdated()){
       //search the root:
       List<InspcVariable> parents = new LinkedList<InspcVariable>();
@@ -376,7 +382,7 @@ public class InspcFieldTable
   
   
   void refresh(){
-    InspcStruct struct = structVar.struct();
+    InspcStruct struct = structVar.getOrCreateStructForNonLeafVariables();
     struct.requestFields();
     fillTableStruct(true);
   }

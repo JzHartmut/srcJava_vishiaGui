@@ -99,11 +99,11 @@ public class GralMenu //extends GralWidget
     /**All menu entries of this menu item. */
     public Map<String, MenuEntry> subMenu;
     
+    public GralWidget widgg;
+    
     public GralUserAction action;
     
-    public MenuEntry(){
-      
-    }
+    public MenuEntry(){}
   }
   
   protected Map<String, MenuEntry> menus = new IndexMultiTable<String, MenuEntry>(IndexMultiTable.providerString);
@@ -171,6 +171,7 @@ public class GralMenu //extends GralWidget
     }
     assert(menuEntry !=null);  //null if sMenuPath will be empty.
     menuEntry.action = action;  //store to the last one.
+    menuEntry.widgg = widggP;
     if(_impl !=null) { _impl._implMenu(); } 
     
   }

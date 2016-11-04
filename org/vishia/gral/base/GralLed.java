@@ -58,12 +58,14 @@ public class GralLed extends GralWidget
    */
   protected GralLed(String name, GralMng mng)
   { super(name, 'D', mng);
-    colorBorderSelectable = new GralColor[2];
+    colorBorderSelectable = new GralColor[3];
     colorBorderSelectable[0] = GralColor.getColor("ye");
     colorBorderSelectable[1] = GralColor.getColor("gn");
-    colorInnerSelectable = new GralColor[2];
+    colorBorderSelectable[2] = GralColor.getColor("ma");  //faulty showing color
+    colorInnerSelectable = new GralColor[3];
     colorInnerSelectable[0] = GralColor.getColor("wh");
     colorInnerSelectable[1] = GralColor.getColor("gn");
+    colorInnerSelectable[2] = GralColor.getColor("ma");   //faulty showing color
     setValue(0);  //initializes dyda.colors
   }
 
@@ -105,10 +107,10 @@ public class GralLed extends GralWidget
    */
   @Override public void setValue(Object[] values){
     if(values.length >=2){
-      int val1 = ObjectValue.getInt(values[0]);
+      int val1 = ObjectValue.getInt(values[0]); //The index to the color
       int val2 = ObjectValue.getInt(values[1]);
-      if(val1 >= colorBorderSelectable.length){ val1 = colorBorderSelectable.length -1; }
-      if(val2 >= colorInnerSelectable.length){ val2 = colorInnerSelectable.length -1; }
+      if(val1 >= colorBorderSelectable.length || val1 <0){ val1 = colorBorderSelectable.length -1; } //faulty index, use faulty showing color.
+      if(val2 >= colorInnerSelectable.length || val2 <0){ val2 = colorInnerSelectable.length -1; }
       dyda.lineColor = colorBorderSelectable[val1];
       dyda.backColor = colorInnerSelectable[val2];
       dyda.setChanged(ImplAccess.chgColorBack | ImplAccess.chgColorLine);

@@ -185,6 +185,7 @@ public class SwtMenu extends GralMenu._GraphicImpl
     Menu parentMenu = (Menu) oParentMenu;
     MenuItem item = new MenuItem(parentMenu, gralEntry.subMenu !=null ? SWT.CASCADE : SWT.NONE);
     item.setText(gralEntry.name);
+    item.setData(gralEntry.widgg);
     if(gralEntry.cAccelerator !=0){
       item.setAccelerator(SWT.CONTROL | gralEntry.cAccelerator);
     }
