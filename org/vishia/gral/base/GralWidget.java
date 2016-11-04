@@ -687,7 +687,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @deprecated since 2016-09: The idea is: Use always one String for "@pos=name".
    */
   @Deprecated public GralWidget(String pos, String name, char whatIs){ 
-    this(pos !=null ? (pos.startsWith("@") ? "" : "@" + pos + "=" + name) : name, whatIs);
+    this(pos !=null ? ( (pos.startsWith("@") ? "" : "@") + pos + "=" + name) : name, whatIs);
   }
 
   

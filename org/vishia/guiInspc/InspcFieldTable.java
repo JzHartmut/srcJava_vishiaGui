@@ -89,6 +89,7 @@ public class InspcFieldTable
 {
   /**Version, history and license.
    * <ul>
+   * <li>2016-10 Hartmut chg: Regards a field which is a node of tree, not only leaf. 
    * <li>2015-06-21 requests a new value if the older is older than 1 second, fast refresh
    * <li>2015-05-29 requests a new value only if the current is older than 5 seconds.
    * <li>2014-01-05 indexSelection

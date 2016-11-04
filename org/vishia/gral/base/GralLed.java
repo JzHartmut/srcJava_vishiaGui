@@ -7,6 +7,7 @@ public class GralLed extends GralWidget
 {
   /**Version and history
    * <ul>
+   * <li>2016-11-22 bugfix: {@link #setValue(Object[])} with negative input causes an exception. Now a 3. color magenta was shown to see that failure. 
    * <li>2014-10-12 chg: now instantiable. New concept. 
    * <li>2012-04-01 new: {@link #colorBorder}, {@link #colorBorderSelectable}, {@link #setValue(Object[])}
    * <li>2011-12-03 new Baseclass for LED visualization.

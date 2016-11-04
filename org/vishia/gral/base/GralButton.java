@@ -101,11 +101,18 @@ public class GralButton extends GralWidget
     super(sName, 'B');  //GralWidget
   }
   
-  public GralButton(String sName, String sText, GralUserAction action)
-  { this(null, sName, sText, action);
+  /**Creates a button
+   * @param sPosName If given with "@pos = name" then it is a position with name, see {@link GralWidget#GralWidget(String, char)}
+   * @param sText The button text
+   * @param action The action on release mouse
+   */
+  public GralButton(String sPosName, String sText, GralUserAction action)
+  { super(sPosName, 'B');
+    setText(sText);
+    specifyActionChange(null, action, null);
   }
     
-  public GralButton(String position, String sName, String sText, GralUserAction action)
+  @Deprecated public GralButton(String position, String sName, String sText, GralUserAction action)
   {
     super(position, sName, 'B');  //GralWidget
     setText(sText);

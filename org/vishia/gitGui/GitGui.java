@@ -12,6 +12,7 @@ import java.util.Map;
 import org.vishia.cmd.CmdExecuter;
 import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
+import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTable;
@@ -27,6 +28,8 @@ import org.vishia.util.Debugutil;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringPartAppend;
+
+import com.sun.xml.internal.ws.wsdl.ActionBasedOperationSignature;
 
 /**This class contains some gui capabilities which works in a vishia-Gral graphic environment. 
  * Especially it was written for the file commander, but it works offline too.
@@ -101,41 +104,89 @@ public class GitGui
   }
 
 
+  /**Action for open the commit text. 
+   * 
+   */
+  GralUserAction actionOpenCommitText = new GralUserAction("actionTableOpenCommitText")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      String[] args ={"cmd.exe", "/C", "edit", ".gitCommit"};
+      gitCmd.addCmd(args, null, listOut, null, workingDir, null);
+      return true;
+  } };
+
+
+
+
+  /**Action for do commi. 
+   * 
+   */
+  GralUserAction actionCommit = new GralUserAction("actionCommit")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      File gitCommit = new File(sWorkingDir, ".gitCommit");
+      if(gitCommit.length() > 3) {
+        String sGitCmd = "git '--git-dir=" + sGitDir + "' commit -a -F .gitcommit";
+        String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
+        gitCmd.addCmd(args, null, listOut, null, workingDir, null);
+      }
+      return true;
+  } };
+
+
+
+  /**This code snippet is executed after the 'git diff' command for 2 revisions are executed. 
+   * It is used as last argument of {@link CmdExecuter#execute(String[], boolean, String, List, List, org.vishia.cmd.CmdExecuter.ExecuteAfterFinish)}
+   * and prepares the {@link #wdgTableFiles}.
+   */
+  CmdExecuter.ExecuteAfterFinish exec_CommitDone = new CmdExecuter.ExecuteAfterFinish()
+  { @Override
+    public void exec(int errorcode, Appendable out, Appendable err)
+    { FileSystem.writeFile("\n", sWorkingDir + "/.gitcommit");
+      wdgCommit.setText("commit done");
+    }
+  }; 
+
+
   Settings settings = new Settings();
 
   String sTypeOfImplementation = "SWT";  //default
   
 
-  GralWindow window = new GralWindow("0+50, 0+80", "GitGui", "Git vishia", GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose);
+  GralWindow window = new GralWindow("0+60, 0+90", "GitGui", "Git vishia", GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose);
 
   GralTextField wdgPath = new GralTextField("@2-2,0..0=path");
-  GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("@3..-20,0..-40=git-versions", new int[] {2, 10, 0, -10});
-  GralTable<String> wdgTableFiles = new GralTable<>("@3..-20,-40..0=git-files", new int[] {20,0});
+  GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("@3..-30,0..-40=git-versions", new int[] {2, 10, 0, -10});
+  GralTable<String> wdgTableFiles = new GralTable<>("@3..-30,-40..0=git-files", new int[] {20,0});
   
-  GralTextBox wdgInfo = new GralTextBox("@-20..0, 0..-20=info");
+  GralTextBox wdgInfo = new GralTextBox("@-30..0, 0..-20=info");
+
+  GralButton wdgRefresh = new GralButton("@-18..-16, -18..-8 = refresh", "refresh", null);
+
+  GralButton wdgCommitText = new GralButton("@-15+2, -18..-2 = commitText", "commit-text", this.actionOpenCommitText);
+
+  GralButton wdgCommit = new GralButton("@-12+2, -18..-2 = commit", "do commit", this.actionCommit);
 
   /**If set to true, the {@link #cmdThread} should be aborted.
    * 
    */
   boolean bCmdThreadClose;
 
-  CmdExecuter cmd = new CmdExecuter();
+  CmdExecuter gitCmd = new CmdExecuter();
 
 
   /**Destination for output of all command line invocations.
    * This buffer will be cleared and filled with the git command, and then parsed to present the result. 
    */
-  StringPartAppend out = new StringPartAppend();
+  StringPartAppend gitOut = new StringPartAppend();
   
   /**The {@link CmdExecuter#execute(String[], boolean, String, List, List, org.vishia.cmd.CmdExecuter.ExecuteAfterFinish)}
    * needs a list of appendable, that is it.*/
   List<Appendable> listOut = new LinkedList<Appendable>();
-  { listOut.add(out); }
+  { listOut.add(gitOut); }
   
   /**Stored arguments from {@link #startLog(String, String, String)}. */
   String sGitDir, sWorkingDir; //, sLocalFile;
 
-  
+  File workingDir;
 
 
   /**The presentation of the time stamps. */
@@ -185,7 +236,7 @@ public class GitGui
 
   GralUserAction actionOnCloseWindow = new GralUserAction("")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
-      GitGui.this.cmd.close();
+      GitGui.this.gitCmd.close();
       bCmdThreadClose = true;
       return true;
     }
@@ -197,7 +248,7 @@ public class GitGui
   }
 
   void initializeCmd() {
-    Map<String, String> env = cmd.environment();
+    Map<String, String> env = gitCmd.environment();
     env.put("HOMEPATH", "\\vishia\\HOME");
     env.put("HOMEDRIVE", "D:");
     String sPath = env.get("PATH");
@@ -303,7 +354,9 @@ public class GitGui
 
 
   public void startLog(String sGitDir, String sWorkingDir, String sLocalFile) {
-    this.sGitDir = sGitDir; this.sWorkingDir = sWorkingDir;
+    this.sGitDir = sGitDir; 
+    this.sWorkingDir = sWorkingDir;
+    this.workingDir = new File(sWorkingDir);
     startLog(sLocalFile);
   }
   
@@ -317,9 +370,8 @@ public class GitGui
     }
     wdgPath.setText(sPathShow);
     
-    //cmd.setCurrentDir(new File(sWorkingDir));
-    out.buffer().setLength(0);
-    out.assign(out.buffer());   //to reset positions to the changed out.buffer()
+    gitOut.buffer().setLength(0);
+    gitOut.assign(gitOut.buffer());   //to reset positions to the changed gitOut.buffer()
     String sGitCmd = "git";
     if(! sGitDir.startsWith(sWorkingDir)) {
       sGitCmd += " '--git-dir=" + sGitDir + "'";
@@ -329,13 +381,13 @@ public class GitGui
       sGitCmd +=  " -- '" + sLocalFile + "'";
     }
     String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
-    cmd.clearCmdQueue();
-    cmd.abortCmd();
-    out.buffer().setLength(0);
-    out.assign(out.buffer());   //to reset positions to the changed out.buffer()
-    cmd.addCmd(args, null, listOut, null, new File(sWorkingDir), exec_fillRevisionTable);
+    gitCmd.clearCmdQueue();
+    gitCmd.abortCmd();
+    gitOut.buffer().setLength(0);
+    gitOut.assign(gitOut.buffer());   //to reset positions to the changed gitOut.buffer()
+    gitCmd.addCmd(args, null, listOut, null, workingDir, exec_fillRevisionTable);
     synchronized(cmdThread) { cmdThread.notify(); }
-    //int error = cmd.execute(args, null,  out, null);
+    //int error = cmd.execute(args, null,  gitOut, null);
     //fillRevisionTable();
   }
 
@@ -346,7 +398,7 @@ public class GitGui
    * 
    */
   void fillRevisionTable() {
-    out.firstlineMaxpart();
+    gitOut.firstlineMaxpart();
     String lineTexts[] = new String[4];
     boolean contCommits = true;
     wdgTableVersion.clearTable();
@@ -357,48 +409,48 @@ public class GitGui
     wdgTableVersion.addLine("*", lineTexts, null);  
     RevisionEntry entryLast = null;
     do {
-      if(out.scanStart().scan("commit ").scanOk()) {
+      if(gitOut.scanStart().scan("commit ").scanOk()) {
         contCommits = false;  //set to true on the next "commit " line.
-        String hash = out.getCurrentPart().toString();
+        String hash = gitOut.getCurrentPart().toString();
         RevisionEntry entry = new RevisionEntry(hash);
         try {
           boolean cont = true;
-          while (cont && out.nextlineMaxpart().found()) {
-            if(out.scanStart().scan("tree ").scanOk()) {
-              entry.treeHash = out.getCurrentPart().toString();
+          while (cont && gitOut.nextlineMaxpart().found()) {
+            if(gitOut.scanStart().scan("tree ").scanOk()) {
+              entry.treeHash = gitOut.getCurrentPart().toString();
             } 
-            else if(out.scanStart().scan("parent ").scanOk()) {
-              entry.parentHash = out.getCurrentPart().toString();
+            else if(gitOut.scanStart().scan("parent ").scanOk()) {
+              entry.parentHash = gitOut.getCurrentPart().toString();
             }
-            else if(out.scanStart().scan("author ").scanOk()) {
-              out.lento('<');
-              entry.author = out.getCurrentPart().toString();
-              out.fromEnd().seekPosBack(16).lento(' ');
-              if(out.scan().scanInteger().scanOk()) { 
-                entry.dateAuthor = new Date(1000*out.scan().getLastScannedIntegerNumber());
+            else if(gitOut.scanStart().scan("author ").scanOk()) {
+              gitOut.lento('<');
+              entry.author = gitOut.getCurrentPart().toString();
+              gitOut.fromEnd().seekPosBack(16).lento(' ');
+              if(gitOut.scan().scanInteger().scanOk()) { 
+                entry.dateAuthor = new Date(1000*gitOut.scan().getLastScannedIntegerNumber());
               }
-            } else if(out.scanStart().scan("committer ").scanOk()) {
-              out.lento('<');
-              entry.committer = out.getCurrentPart().toString();
-              out.fromEnd().seekPosBack(16).lento(' ');
-              if(out.scan().scanInteger().scanOk()) { 
-                entry.dateCommit = new Date(1000*out.scan().getLastScannedIntegerNumber());
+            } else if(gitOut.scanStart().scan("committer ").scanOk()) {
+              gitOut.lento('<');
+              entry.committer = gitOut.getCurrentPart().toString();
+              gitOut.fromEnd().seekPosBack(16).lento(' ');
+              if(gitOut.scan().scanInteger().scanOk()) { 
+                entry.dateCommit = new Date(1000*gitOut.scan().getLastScannedIntegerNumber());
               }
             } else {
               do {
-                if(out.scanStart().scan("commit ").scanOk()) {
-                  out.seekBegin();
+                if(gitOut.scanStart().scan("commit ").scanOk()) {
+                  gitOut.seekBegin();
                   cont = false;
                   contCommits = true;
                   break;
                 } else {
-                  CharSequence commitTextline = out.getCurrentPart();
+                  CharSequence commitTextline = gitOut.getCurrentPart();
                   if(entry.commitTitle == null && commitTextline.length() >6){
                     entry.commitTitle = commitTextline.toString();  //first line with at least 6 character: Use as title.
                   }
                   entry.commitText.append(commitTextline).append('\n');
                 }
-              } while(cont && (out.nextlineMaxpart().found()));
+              } while(cont && (gitOut.nextlineMaxpart().found()));
             }
           }//while lines of one commit 
         }catch(Exception exc) {
@@ -417,7 +469,7 @@ public class GitGui
         entryLast = entry;
       } //
       else {
-        contCommits = out.nextlineMaxpart().found();
+        contCommits = gitOut.nextlineMaxpart().found();
       }
     } while(contCommits);
     //wdgTableVersion.
@@ -435,10 +487,10 @@ public class GitGui
     }
     //
     //abort the current cmd for diff view (or any other)
-    cmd.clearCmdQueue();
-    cmd.abortCmd();
-    out.buffer().setLength(0);
-    out.assign(out.buffer());   //to reset positions to the changed out.buffer()
+    gitCmd.clearCmdQueue();
+    gitCmd.abortCmd();
+    gitOut.buffer().setLength(0);
+    gitOut.assign(gitOut.buffer());   //to reset positions to the changed gitOut.buffer()
     //
     //
     GitGui.this.currentLine = line;
@@ -468,7 +520,7 @@ public class GitGui
     }
     String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
     //
-    cmd.addCmd(args, null, listOut, null, new File(sWorkingDir), exec_fillFileTable4Revision);
+    gitCmd.addCmd(args, null, listOut, null, workingDir, exec_fillFileTable4Revision);
     synchronized(cmdThread) { cmdThread.notify(); }
   }
   
@@ -485,7 +537,7 @@ public class GitGui
     } else  { 
       String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + currentEntry.revisionHash + " -- " + sFile;
       String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
-      cmd.addCmd(args, null, listOut, null, settings.dirTemp1, null);
+      gitCmd.addCmd(args, null, listOut, null, settings.dirTemp1, null);
     }
     if(cmpEntry == null) {
       sFile2 = sFile1;
@@ -493,13 +545,13 @@ public class GitGui
     else { 
       String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + cmpEntry.revisionHash + " -- " + sFile;
       String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
-      cmd.addCmd(args, null, listOut, null, settings.dirTemp2, null);
+      gitCmd.addCmd(args, null, listOut, null, settings.dirTemp2, null);
     }
     sFile1 = sFile1.replace('/', '\\');
     sFile2 = sFile2.replace('/', '\\');
     String sCmdDiff = "cmd.exe /C start c:\\D\\Programs\\WinMerge-2.12.4-exe\\WinMerge.exe " + sFile1 + " " + sFile2;
     String[] cmdDiffView = CmdExecuter.splitArgs(sCmdDiff); // D:\\vishia\\Java\\srcJava_vishiaGui\\org\\vishia\\gral\\cfg\\GralCfgElement.java D:\\GitArchive\\D\\vishia\\srcJava_vishiaGui\\org\\vishia\\gral\\cfg\\GralCfgElement.java");
-    cmd.addCmd(cmdDiffView, null, listOut, null, null, null);
+    gitCmd.addCmd(cmdDiffView, null, listOut, null, null, null);
     synchronized(cmdThread) { cmdThread.notify(); }
   }
 
@@ -512,9 +564,9 @@ public class GitGui
     wdgTableFiles.clearTable();
     GralTableLine_ifc<String> line = wdgTableFiles.addLine("*", new String[] {"(all files)",""}, "*");  
     wdgTableFiles.repaint();
-    out.firstlineMaxpart();
+    gitOut.firstlineMaxpart();
     do {
-      String sLine = out.getCurrentPart().toString();
+      String sLine = gitOut.getCurrentPart().toString();
       if(!sLine.startsWith("+ git")) {
         String[] col = new String[2];
         int posSlash = sLine.lastIndexOf('/');
@@ -528,7 +580,7 @@ public class GitGui
         line = wdgTableFiles.addLine(sLine, col, sLine);  
         line.repaint();
       }
-    } while(out.nextlineMaxpart().found());
+    } while(gitOut.nextlineMaxpart().found());
   }
 
 
@@ -536,7 +588,7 @@ public class GitGui
   Thread cmdThread = new Thread("gitGui-Cmd") {
     @Override public void run() {
       do {
-        cmd.executeCmdQueue(true);
+        gitCmd.executeCmdQueue(true);
         try {
           synchronized(this){ wait(1000); }
         } catch (InterruptedException e) { }
@@ -631,7 +683,7 @@ public class GitGui
 
 
 
-  /**Action for mouse double to start view diff. 
+  /**Action for show the version table for the given file. 
    * 
    */
   GralUserAction actionTableFileLog = new GralUserAction("actionTableFileLog")
@@ -646,7 +698,6 @@ public class GitGui
       } //if;
       return false;
   } };
-
 
 
 

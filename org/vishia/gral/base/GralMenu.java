@@ -40,7 +40,8 @@ public class GralMenu //extends GralWidget
 
   /**Version, history and license.
    * <ul>
-   * <li>2014-06-23 Hartmut redesign: Now the GralMenu is an implementation-independent class. 
+   * <li>2016-11-04 Hartmut new {@link MenuEntry#widgg} to transport the widget to the implementation widget. 
+   * <li>2016-09 Hartmut redesign: Now the GralMenu is an implementation-independent class. 
    *   It contains references to the implementation menu instances and supports creation of them if the graphic implementation is present.
    *   {@link _GraphicImpl} is now the base class for the {@link org.vishia.gral.swt.SwtMenu}.
    * <li>2014-06-23 Hartmut new: Now the {@link #widgg} is stored here. It is used for all sub menus
