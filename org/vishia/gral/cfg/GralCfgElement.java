@@ -13,7 +13,7 @@ import org.vishia.gral.cfg.GralCfgData.GuiCfgLine;
 import org.vishia.gral.cfg.GralCfgData.GuiCfgShowField;
 import org.vishia.gral.cfg.GralCfgData.GuiCfgTable;
 import org.vishia.gral.cfg.GralCfgData.GuiCfgText;
-import org.vishia.gral.cfg.GralCfgData.WidgetTypeBase;
+import org.vishia.gral.cfg.GralCfgData.GuiCfgWidget;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralWidgetCfg_ifc;
 
@@ -86,7 +86,7 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   
   //private final GralPos posInput = new GralPos();
   
-  WidgetTypeBase widgetType;
+  GuiCfgWidget widgetType;
   
   GralCfgElement() //GralCfgData itsCfgData)
   { //this.itsCfgData = itsCfgData;
@@ -179,45 +179,45 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   /**ZBNF: Text::= */
   public void set_Text(GuiCfgText data){  }
   
-  public WidgetTypeBase new_InputTextbox()
-  { GralCfgData.WidgetTypeBase widgt = new GralCfgData.WidgetTypeBase(this, 't');
+  public GuiCfgWidget new_InputTextbox()
+  { GralCfgData.GuiCfgWidget widgt = new GralCfgData.GuiCfgWidget(this, 't');
     this.widgetType = widgt;
     return widgt;
   }
   
-  public void set_InputTextbox(WidgetTypeBase data) {  }
+  public void set_InputTextbox(GuiCfgWidget data) {  }
   
-  public WidgetTypeBase new_InputTextline()
-  { GralCfgData.WidgetTypeBase widgt = new GralCfgData.WidgetTypeBase(this, 'T');
+  public GuiCfgWidget new_InputTextline()
+  { GralCfgData.GuiCfgWidget widgt = new GralCfgData.GuiCfgWidget(this, 'T');
     this.widgetType = widgt;
     return widgt;
   }
   
-  public void set_InputTextline(WidgetTypeBase data) {  }
+  public void set_InputTextline(GuiCfgWidget data) {  }
   
-  public WidgetTypeBase new_InputFile()
+  public GuiCfgWidget new_InputFile()
   { GuiCfgInputFile widgt = new GuiCfgInputFile(this);
     this.widgetType = widgt;
     return widgt;
   }
   
-  public void set_InputFile(WidgetTypeBase data) {  }
+  public void set_InputFile(GuiCfgWidget data) {  }
   
-  public WidgetTypeBase new_Button()
+  public GuiCfgWidget new_Button()
   { GuiCfgButton widgt = new GuiCfgButton(this);
     this.widgetType = widgt;
     return widgt;
   }
   
-  public void set_Button(WidgetTypeBase data) {  }
+  public void set_Button(GuiCfgWidget data) {  }
   
-  public WidgetTypeBase new_SwitchButton()
+  public GuiCfgWidget new_SwitchButton()
   { GuiCfgButton widgt = new GuiCfgButton(this, true);
     this.widgetType = widgt;
     return widgt;
   }
   
-  public void set_SwitchButton(WidgetTypeBase data) {  }
+  public void set_SwitchButton(GuiCfgWidget data) {  }
   
   /**ZBNF: Led::= */
   public GuiCfgLed new_Led()
@@ -230,15 +230,15 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   public void set_Led(GuiCfgLed data){  }
   
   /**ZBNF: ValueBar::= */
-  public GralCfgData.WidgetTypeBase new_ValueBar()
-  { GralCfgData.WidgetTypeBase widgt = new GralCfgData.WidgetTypeBase(this, 'U');
+  public GralCfgData.GuiCfgWidget new_ValueBar()
+  { GralCfgData.GuiCfgWidget widgt = new GralCfgData.GuiCfgWidget(this, 'U');
     this.widgetType = widgt;
     return widgt;
   }
 
   
   /**ZBNF: ValueBar::= */
-  public void set_ValueBar(GralCfgData.WidgetTypeBase data){  }
+  public void set_ValueBar(GralCfgData.GuiCfgWidget data){  }
   
   /**ZBNF: Line::= */
   public GuiCfgLine new_Line()

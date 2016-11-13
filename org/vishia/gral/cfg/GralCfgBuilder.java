@@ -81,8 +81,10 @@ public class GralCfgBuilder
     this.cfgData = cfgData;
     this.gralMng = gui;
     this.currentDir = currentDir;
-    String sCanonicalPath = org.vishia.util.FileSystem.getCanonicalPath(currentDir);
-    indexAlias.put("cfg", sCanonicalPath);
+    if(currentDir !=null) {
+      String sCanonicalPath = org.vishia.util.FileSystem.getCanonicalPath(currentDir);
+      indexAlias.put("cfg", sCanonicalPath);
+    }
   }
   
   
@@ -188,7 +190,7 @@ public class GralCfgBuilder
     String sError = null;
     cfge.setPos(gralMng);
     if(cfge.widgetType.type !=null){
-      GralCfgData.WidgetTypeBase typeData = cfgData.idxTypes.get(cfge.widgetType.type);
+      GralCfgData.GuiCfgWidget typeData = cfgData.idxTypes.get(cfge.widgetType.type);
       if(typeData == null){
         throw new IllegalArgumentException("GralCfgBuilder.buildWidget - unknown type; " + cfge.widgetType.type + "; in " + cfge.content); 
       } else {

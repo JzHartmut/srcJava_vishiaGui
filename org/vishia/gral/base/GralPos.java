@@ -424,7 +424,7 @@ public class GralPos implements Cloneable
             spPos.close();
             throw new IllegalArgumentException("GralPos.setPosition - unknown panel, " + sPanel);
           }
-          if(panel == posParent.panel) {
+          if(posParent !=null && panel == posParent.panel) {
             posParent1 = posParent;
           } else {
             //only if it is another panel, remove the given parent.

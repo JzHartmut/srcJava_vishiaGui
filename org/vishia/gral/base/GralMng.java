@@ -621,7 +621,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     if(this.windPrimary !=null)
       throw new IllegalStateException("Primary Window should set only one time.");
     this.windPrimary = primaryWindow; 
-    
+    panels.put("primaryWindow", primaryWindow);
   };
   
   

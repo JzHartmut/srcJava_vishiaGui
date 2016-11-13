@@ -57,6 +57,13 @@ public interface GralTableLine_ifc<UserData> extends GralWidget_ifc, MarkMask_if
    void setBackColor(GralColor colorNormal, GralColor colorSelected, GralColor colorMarked, GralColor colorSomeMarked, GralColor colorSelectMarked, int ix);
     
   
+  
+   /**Gets the table where this line is member of. */
+   public GralTable<UserData> getTable();
+
+  
+  
+  
   /**Returns the text which is assigned to the cell of the table.
    * @param column The column of table.
    * @return If the cell text, an empty text "" if the cell has not any text assigned.

@@ -229,7 +229,7 @@ public class GralCfgWriter
 
   
   
-  void writeUnknown(GralCfgData.WidgetTypeBase ee) throws IOException
+  void writeUnknown(GralCfgData.GuiCfgWidget ee) throws IOException
   { //String sep = "";
     writer.append("Unknown(");
     writeParam(ee);
@@ -237,13 +237,13 @@ public class GralCfgWriter
   }
 
   
-  private void writeParam(GralCfgData.WidgetTypeBase pp) throws IOException
+  private void writeParam(GralCfgData.GuiCfgWidget pp) throws IOException
   {
     writeParam(pp, "");
   }
   
   
-  private void writeParam(GralCfgData.WidgetTypeBase pp, String sep) throws IOException
+  private void writeParam(GralCfgData.GuiCfgWidget pp, String sep) throws IOException
   { //String sep = "";
     if(pp.prompt !=null && pp.promptPosition !=null && pp.promptPosition.length() >=1) {
       writer.append("%").append(pp.promptPosition).append(":\"")  .append(pp.prompt).append("\""); sep = ", "; 

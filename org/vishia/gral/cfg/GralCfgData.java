@@ -91,10 +91,12 @@ public final class GralCfgData
   //public final static class GuiCfgPosition{  }//class Position
   
   
-  /**This is the base class of all widget types for the GUI. It contains common elements.
+  /**This is the base class of all configuration data for one widget. It contains common elements.
+   * It is used as destination for the parser of the configuration file.
    */
-  public static class WidgetTypeBase implements Cloneable
+  public static class GuiCfgWidget implements Cloneable
   {
+    /**Backward aggregation to the config element queue, to the item.*/
     private final GralCfgElement itsElement;
 
     /**See {@link org.vishia.gral.base.GralWidget#whatIs}. */
@@ -113,7 +115,7 @@ public final class GralCfgData
     
     /**From ZBNF-parser param::=<?> ...<?dragFiles> etc. boolean values are set if <?name> is parsed. */
     
-    public WidgetTypeBase(GralCfgElement itsElement, char whatIs){ 
+    public GuiCfgWidget(GralCfgElement itsElement, char whatIs){ 
       this.itsElement = itsElement; 
       this.whatIs = whatIs;
     }
@@ -135,9 +137,9 @@ public final class GralCfgData
     public void set_color1(GuiCfgColor value){}
 
     @Override
-    protected WidgetTypeBase clone()
-    { WidgetTypeBase clone = null;
-      try{ clone = (WidgetTypeBase)super.clone(); } 
+    protected GuiCfgWidget clone()
+    { GuiCfgWidget clone = null;
+      try{ clone = (GuiCfgWidget)super.clone(); } 
       catch(CloneNotSupportedException exc){ assert(false); }
       return clone;
     }
@@ -146,7 +148,7 @@ public final class GralCfgData
      * especially from a type instance.
      * @param src source for all values which are not determined in this yet.
      */
-    public void setFromType(WidgetTypeBase src){
+    public void setFromType(GuiCfgWidget src){
       if(text ==null){ text = src.text; }
       if(cmd ==null){ cmd = src.cmd; }
       if(userAction ==null){ userAction = src.userAction; }
@@ -168,7 +170,7 @@ public final class GralCfgData
   
   /**ZBNF: Text::= ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgType extends WidgetTypeBase implements Cloneable
+  public final static class GuiCfgType extends GuiCfgWidget implements Cloneable
   {
     public String typeName;
     public GuiCfgType(){ super(null, '*'); }
@@ -177,7 +179,7 @@ public final class GralCfgData
   
   /**ZBNF: Text::= ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgText extends WidgetTypeBase implements Cloneable
+  public final static class GuiCfgText extends GuiCfgWidget implements Cloneable
   {
     public String size = "B";
     public int colorValue;
@@ -190,7 +192,7 @@ public final class GralCfgData
   
   /**ZBNF: Text::= ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgLed extends WidgetTypeBase implements Cloneable
+  public final static class GuiCfgLed extends GuiCfgWidget implements Cloneable
   {
     //public String size = "B";
     public GuiCfgLed(GralCfgElement itsElement){ super(itsElement, 'D'); }
@@ -204,7 +206,7 @@ public final class GralCfgData
   
   /**ZBNF: Line::= ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgLine extends WidgetTypeBase implements Cloneable
+  public final static class GuiCfgLine extends GuiCfgWidget implements Cloneable
   {
     List<GuiCfgCoord> coords = new LinkedList<GuiCfgCoord>();
     
@@ -228,7 +230,7 @@ public final class GralCfgData
 
   /**ZBNF: Text::= ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgImage extends WidgetTypeBase implements Cloneable
+  public final static class GuiCfgImage extends GuiCfgWidget implements Cloneable
   {
     public String size = "B";
     
@@ -243,7 +245,7 @@ public final class GralCfgData
   
   /**ZBNF: ShowField::= ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgShowField extends WidgetTypeBase implements Cloneable
+  public final static class GuiCfgShowField extends GuiCfgWidget implements Cloneable
   {
     
     public GuiCfgShowField(GralCfgElement itsElement){ super(itsElement, 'S'); }
@@ -252,7 +254,7 @@ public final class GralCfgData
   
   /**ZBNF: ShowField::= ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgInputFile extends WidgetTypeBase implements Cloneable
+  public final static class GuiCfgInputFile extends GuiCfgWidget implements Cloneable
   {
     
     public GuiCfgInputFile(GralCfgElement itsElement){ super(itsElement, 'F'); }
@@ -261,7 +263,7 @@ public final class GralCfgData
   
   /**ZBNF: Button::= ... ;
    * Class for instance to capture and store the Button data. */
-  public final static class GuiCfgButton extends WidgetTypeBase implements Cloneable
+  public final static class GuiCfgButton extends GuiCfgWidget implements Cloneable
   {
     final boolean bSwitch;
     public GuiCfgButton(GralCfgElement itsElement){ super(itsElement, 'B'); bSwitch = false; }
@@ -272,7 +274,7 @@ public final class GralCfgData
   
   /**ZBNF: Table::= ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgTable extends WidgetTypeBase implements Cloneable
+  public final static class GuiCfgTable extends GuiCfgWidget implements Cloneable
   {
     
     public GuiCfgTable(GralCfgElement itsElement){ super(itsElement, 'l'); }
@@ -291,7 +293,7 @@ public final class GralCfgData
   
   /**ZBNF: Table::= ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgCurveview extends WidgetTypeBase implements Cloneable
+  public final static class GuiCfgCurveview extends GuiCfgWidget implements Cloneable
   {
     public int nrofPoints;
     
@@ -336,7 +338,7 @@ public final class GralCfgData
 
   /**ZBNF: {<?line> ... ;
    * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgCurveLine extends WidgetTypeBase implements Cloneable
+  public final static class GuiCfgCurveLine extends GuiCfgWidget implements Cloneable
   {
     String content;
     
@@ -375,7 +377,7 @@ public final class GralCfgData
   /**Map of replacements of paths to data. Filled from ZBNF: DataReplace::= <$?key> = <$-/\.?string> */
   public final Map<String, String> dataReplace = new TreeMap<String,String>();
 
-  Map<String, WidgetTypeBase> idxTypes = new TreeMap <String, WidgetTypeBase>();
+  Map<String, GuiCfgWidget> idxTypes = new TreeMap <String, GuiCfgWidget>();
   
   
   /**TODO widgets sorted to panels and tabs!
@@ -461,7 +463,7 @@ public final class GralCfgData
 
   public GralCfgPanel new_Window()
   { GralCfgPanel panel = new GralCfgPanel();
-    panel.widgetType = new WidgetTypeBase(panel, 'w');
+    panel.widgetType = new GuiCfgWidget(panel, 'w');
     return panel;
   }
 

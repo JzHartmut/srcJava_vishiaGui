@@ -83,7 +83,7 @@ public class AwtButton extends GralButton.GraphicImplAccess
       Container panelSwt = mng.getCurrentPanel();
       int styleSwt = 0;
       widgetSwt = new AwtButtonImpl(panelSwt, styleSwt);
-      widgetSwt.setData(this);
+      widgetSwt.setData(widgg);
       widgetSwt.setBackground(mng.propertiesGuiAwt.colorBackground);
       widgetSwt.addMouseListener(mouseListener);
       setBoundsGraphic(mng);
@@ -195,8 +195,8 @@ public class AwtButton extends GralButton.GraphicImplAccess
     //PaintListener paintListener = new PaintListener(){
       @Override public void paint(Graphics gc) {
         paintRoutine(gc, this);
-      }
-    }
+     }
+   }
 
 
 

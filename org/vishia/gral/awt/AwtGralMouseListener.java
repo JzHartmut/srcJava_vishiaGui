@@ -201,7 +201,8 @@ public class AwtGralMouseListener
       Component widget = e.getComponent();
       AwtWidget widgetAwt = (AwtWidget)widget;
       widget.addMouseMotionListener(mouseMoveListener);
-      GralWidget widgg = (GralWidget)widgetAwt.getData();  //maybe null
+      Object oData = widgetAwt.getData();
+      GralWidget widgg = (GralWidget)oData;  //maybe null
       Dimension size = widget.getSize();
       try{ 
         final int keyCode;

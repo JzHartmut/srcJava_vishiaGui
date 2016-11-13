@@ -845,6 +845,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     repaint(200,200);
   }
 
+  
+  
+  
+  
   @Override public List<GralTableLine_ifc<UserData>> getMarkedLines(int mask) {
     List<GralTableLine_ifc<UserData>> list = new LinkedList<GralTableLine_ifc<UserData>>();
     
@@ -2213,6 +2217,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       bChangedEdit = new boolean[GralTable.this.zColumn];
       bChangedSet = new boolean[GralTable.this.zColumn];
     }
+    
+    
+    
+    
+    /**Gets the table where this line is member of. 
+     */
+    @Override public GralTable<UserData> getTable() { return GralTable.this; }
+    
     
     
     
