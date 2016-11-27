@@ -1,7 +1,7 @@
 package org.vishia.simSelector;
 
 import java.io.File;
-import java.util.LinkedList;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -10,7 +10,6 @@ import javax.script.ScriptException;
 
 import org.vishia.cmd.JZcmdExecuter;
 import org.vishia.cmd.JZcmdScript;
-import org.vishia.gral.awt.AwtFactory;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
@@ -26,7 +25,6 @@ import org.vishia.mainCmd.PrintStreamAdapter;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.DataAccess;
-import org.vishia.util.IndexMultiTable;
 import org.vishia.util.KeyCode;
 import org.vishia.zcmd.JZcmd;
 
@@ -60,6 +58,8 @@ public class SimSelector
   
   File fileConfig;
   
+  PrintStream outOld, errOld, outNew = null, errNew = null;
+  
   public static void main(String[] args){
     if(args.length < 1) {
       System.err.println("parameter 1: path/to/config.jzcmd.bat");
@@ -74,7 +74,7 @@ public class SimSelector
   SimSelector()
   {
     for(int iTable = 0; iTable < wdgTables.length; ++iTable) {
-      String pos = "@PrimaryWindow, 6..40, " + 20 * iTable + ".." + (18 + 20 * iTable);
+      //String pos = "@PrimaryWindow, 6..40, " + 20 * iTable + ".." + (18 + 20 * iTable);
       String name = "table" + iTable;
       int[] columnWidths = new int[3];
       columnWidths[0] = 8;
@@ -109,6 +109,8 @@ public class SimSelector
         readConfig();
       }
     }
+    if(outNew !=null) { System.setOut(outOld); outNew.close(); }
+    if(errNew !=null) { System.setErr(errOld); errNew.close(); }
     
   }
   
@@ -129,7 +131,7 @@ public class SimSelector
     }
     if(level !=null) {
       for(int iList = 0; iList < wdgTables.length; ++iList ) {
-        boolean bErr = false;
+        //boolean bErr = false;
         wdgTables[iList].clearTable();;
         String nameList = "tdata" + (iList +1);
         DataAccess.Variable<Object> vlist1 = level.localVariables.get(nameList);
@@ -198,7 +200,7 @@ public class SimSelector
   
   void genTestcases()
   {
-    String[] identifier = new String[wdgTables.length];
+    //String[] identifier = new String[wdgTables.length];
     Map<String, DataAccess.Variable<Object>> args = new TreeMap<String, DataAccess.Variable<Object>>();
     args.put("select", new DataAccess.Variable<Object>('S', "select", wdgSelects.getText())); 
     try{
@@ -254,6 +256,7 @@ public class SimSelector
   
   
   
+  @SuppressWarnings("deprecation")
   private void openWindow1(){
     GralFactory gralFactory = new SwtFactory();
     LogMessage log = new LogMessageStream(System.out);
@@ -277,7 +280,7 @@ public class SimSelector
       gralMng.setPosition(6, 8, 60, 79, 0, 'd');
       wdgSelects = gralMng.addTextField("test", true, null, "r");
       wdgSelects.setText("t");
-      int last = 1; //tables.length
+      //int last = 1; //tables.length
       for(int iTable = 0; iTable < wdgTables.length; ++iTable) {
         int xtable = iTable %3;
         int ytable = iTable /3;
@@ -289,8 +292,9 @@ public class SimSelector
       gralMng.setPosition(52, 0, 0, 0, 0, 'U');
       output.createImplWidget_Gthread();
       
-      System.setOut(new PrintStreamAdapter("", output));
-      System.setErr(new PrintStreamAdapter("", output));
+      outOld = System.out; errOld = System.err;
+      System.setOut(outNew = new PrintStreamAdapter("", output));
+      System.setErr(errNew = new PrintStreamAdapter("", output));
       isTableInitialized = true;
       //
       //GralTextField input = new GralTextField();

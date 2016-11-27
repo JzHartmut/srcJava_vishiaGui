@@ -1253,6 +1253,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       }
       setSample(fvalues, ++timeshort);
     }
+    ifile.close();
   }
   
 

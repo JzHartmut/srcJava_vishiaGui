@@ -32,8 +32,15 @@ import org.vishia.util.StringPartAppend;
 
 import com.sun.xml.internal.ws.wsdl.ActionBasedOperationSignature;
 
-/**This class contains some gui capabilities which works in a vishia-Gral graphic environment. 
- * Especially it was written for the file commander, but it works offline too.
+/**A Graphical User Interface for basic working in git with remote repository and preserving time stamp of the files.
+ * <ul>
+ * <li>Show a working tree with remote repository (option -git-dir on any git command call).
+ * <li>Lists all changed files from working tree and between any revisions.
+ * <li>supports commit: via a text file for the commit text (edit with any standard editor) and commit button.
+ *   On any commit creates a new "_filelist.lst" via {@link FileList} which contains the time stamp of all files.
+ * <li>restore any file from any older version: select version, select file, right mouse "restore". (git checkout)
+ *   with restoring the original time stamp.
+ * </ul>
  * @author Hartmut Schorrig
  *
  */
@@ -152,6 +159,18 @@ public class GitGui
   } };
 
 
+  /**Action for show the version table for the given file. 
+   * 
+   */
+  GralUserAction actionRefresh = new GralUserAction("actionRefresh")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        startLog(null); return true;
+      } //if;
+      return false;
+  } };
+
+
 
 
   Settings settings = new Settings();
@@ -167,7 +186,7 @@ public class GitGui
   
   GralTextBox wdgInfo = new GralTextBox("@-30..0, 0..-20=info");
 
-  GralButton wdgRefresh = new GralButton("@-18..-16, -18..-8 = refresh", "refresh", null);
+  GralButton wdgRefresh = new GralButton("@-18..-16, -18..-8 = refresh", "refresh_x", this.actionRefresh);
 
   GralButton wdgCommitText = new GralButton("@-15+2, -18..-2 = commitText", "commit-text", this.actionOpenCommitText);
 
@@ -399,6 +418,9 @@ public class GitGui
     startLog(sLocalFile);
   }
   
+  /**
+   * @param sLocalFile "*" for all files, else "path/in/loacal/tree/file.ext"
+   */
   void startLog(String sLocalFile) {
     //this.sLocalFile = sLocalFile;
     String sPathShow;
@@ -409,6 +431,8 @@ public class GitGui
     }
     wdgPath.setText(sPathShow);
     
+    wdgTableVersion.clearTable();
+    wdgTableVersion.addLine("*", new String[] {"", "", "wait for prepairing log", ""}, null);
     gitOut.buffer().setLength(0);
     gitOut.assign(gitOut.buffer());   //to reset positions to the changed gitOut.buffer()
     String sGitCmd = "git";
@@ -804,7 +828,7 @@ public class GitGui
       GralTable<RevisionEntry>.TableLineData lineCurr = table.getCurrentLine(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
       GralTable<RevisionEntry>.TableLineData line = table.getLineMousePressed(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
-        String sFile = line.getKey(); 
+        String sFile = line.getKey();   //working tree has key "*"
         startLog(sFile); return true;
       } //if;
       return false;

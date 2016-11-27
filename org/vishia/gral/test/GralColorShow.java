@@ -758,7 +758,7 @@ public class GralColorShow
         cont = false;
       }
     } while(cont);
-    
+    spline.close();
   }
   
  

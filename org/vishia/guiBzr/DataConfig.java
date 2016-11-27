@@ -49,6 +49,7 @@ public class DataConfig
 					}
 				}
 			}
+			reader.close();
 		} catch(IOException exc){
 			sError = "File error: " + fileCfg.getAbsolutePath();
 		}

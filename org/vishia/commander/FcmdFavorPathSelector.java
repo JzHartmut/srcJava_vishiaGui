@@ -349,6 +349,7 @@ class FcmdFavorPathSelector
           }
           uLine.setLength(0);
         }//while
+        spLine.close();
       } 
       catch(IOException exc){ sError = "selectTab - cfg file read error; " + cfgFile; }
       catch(IllegalArgumentException exc){ sError = "selectTab - cfg file error; " + cfgFile + exc.getMessage(); }
