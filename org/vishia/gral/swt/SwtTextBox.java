@@ -3,6 +3,8 @@ package org.vishia.gral.swt;
 import java.io.IOException;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -97,7 +99,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
     textFieldSwt = new Text(panelSwt, SWT.MULTI|SWT.H_SCROLL|SWT.V_SCROLL); //;style);
     textFieldSwt.setData(this);
     super.wdgimpl = this.wdgh = new SwtWidgetHelper(textFieldSwt, mng);
-
+    textFieldSwt.addFocusListener(focusLstn);
     textFieldSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
     textFieldSwt.setEditable(widgg.isEditable());
     textFieldSwt.setBackground(mng.propertiesGuiSwt.colorSwt(0xFFFFFF));
@@ -369,6 +371,21 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
     
   }
   
+  protected FocusListener focusLstn = new FocusListener()
+  {
+    
+    @Override
+    public void focusLost(FocusEvent e)
+    {
+      System.err.println("TextBox focus lost");
+    }
+    
+    @Override
+    public void focusGained(FocusEvent e)
+    {
+      System.err.println("TextBox focus gained");
+    }
+  };
 
   
 }

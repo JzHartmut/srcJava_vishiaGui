@@ -175,6 +175,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2016-09-30 Hartmut bugfix: {@link #setFocus()} has set the default focus of the primaryWindow if the focus of a window was set.
    * <li>2016-09-30 Hartmut New idea, concept: {@link ImplAccess#wdgimpl}: That refers an implementation of a WidgetHelper class of the implementation layer
    *   which knows the widget. Via this aggregation some action with the implementation widget can be do which are defined
    *   in the {@link GralWidgetImpl_ifc}. See {@link org.vishia.gral.swt.SwtWidgetHelper}.
@@ -1694,28 +1695,30 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       //action in the graphic thread.
       if(!bHasFocus) {
         GralWidget child = this;
-        GralPanelContent parent = _wdgPos.panel;
-        int catastrophicalCount = 100;
-        //set the visible state and the focus of the parents.
-        while(parent !=null && parent.pos() !=null  //a panel is knwon, it has a parent inside its pos() 
-            && !parent.bHasFocus
-            && parent._wdgImpl !=null
-            && --catastrophicalCount >=0){
-          parent._wdgImpl.setFocusGThread();
-          parent.setVisibleStateWidget(true);
-          if(parent instanceof GralTabbedPanel) {
-            //TabbedPanel: The tab where the widget is member of have to be set as active one.
-            GralTabbedPanel panelTabbed = (GralTabbedPanel)parent;
-            assert(child instanceof GralPanelContent);
-            panelTabbed.selectTab(child.name);
-            //String name = panel1.getName();
-            //panelTabbed.selectTab(name);  //why with name, use GralPanel inside GralTabbedPanel immediately!
-          }
-          if(parent instanceof GralWindow) {       //This is not the window itself
-            parent = null;
-          } else {
-            child = parent;
-            parent = parent.pos().panel; //
+        if(! (child instanceof GralWindow)) {
+          GralPanelContent parent = _wdgPos.panel;
+          int catastrophicalCount = 100;
+          //set the visible state and the focus of the parents.
+          while(parent !=null && parent.pos() !=null  //a panel is knwon, it has a parent inside its pos() 
+              && !parent.bHasFocus
+              && parent._wdgImpl !=null
+              && --catastrophicalCount >=0){
+            parent._wdgImpl.setFocusGThread();
+            parent.setVisibleStateWidget(true);
+            if(parent instanceof GralTabbedPanel) {
+              //TabbedPanel: The tab where the widget is member of have to be set as active one.
+              GralTabbedPanel panelTabbed = (GralTabbedPanel)parent;
+              assert(child instanceof GralPanelContent);
+              panelTabbed.selectTab(child.name);
+              //String name = panel1.getName();
+              //panelTabbed.selectTab(name);  //why with name, use GralPanel inside GralTabbedPanel immediately!
+            }
+            if(parent instanceof GralWindow) {       //This is not the window itself
+              parent = null;
+            } else {
+              child = parent;
+              parent = parent.pos().panel; //
+            }
           }
         }
         _wdgImpl.setFocusGThread();  //sets the focus to the

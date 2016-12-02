@@ -166,6 +166,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     //
     //create the window:
     window = new Shell(mng.displaySwt, props);
+    window.setData(wdgGral);
     super.wdgimpl = this.swtWidgWrapper = new SwtWidgetHelper(window, mng);
     GralRectangle rect = mng.calcPositionOfWindow(wdgGral.pos());
     window.setBounds(rect.x, rect.y, rect.dx, rect.dy );

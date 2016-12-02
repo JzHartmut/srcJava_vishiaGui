@@ -2630,7 +2630,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
 
 
-    @Override public Object getData()
+    @Override public UserData getData()
     { return data;
     }
   }

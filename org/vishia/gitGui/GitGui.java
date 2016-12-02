@@ -131,8 +131,12 @@ public class GitGui
   CmdExecuter.ExecuteAfterFinish exec_CommitDone = new CmdExecuter.ExecuteAfterFinish()
   { @Override
     public void exec(int errorcode, Appendable out, Appendable err)
-    { FileSystem.writeFile("\n", sWorkingDir + "/.gitcommit");
-      wdgCommit.setText("commit done");
+    { if(errorcode ==0) {
+        FileSystem.writeFile("\n", sWorkingDir + "/.gitcommit");
+        wdgCommit.setText("commit done");
+      } else {
+        wdgCommit.setText("commit error");
+      }
     }
   }; 
 
@@ -149,7 +153,11 @@ public class GitGui
         } catch(Exception exc){
           wdgInfo.setText("_filelist.lst problem: " + exc.getMessage());
         }
-        String sGitCmd = "git '--git-dir=" + sGitDir + "' commit -a -F .gitcommit";
+        String sGitCmd = "git";
+        if(! sGitDir.startsWith(sWorkingDir)) {
+          sGitCmd += " '--git-dir=" + sGitDir + "'";
+        }
+        sGitCmd += " commit -a -F .gitcommit";
         String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
         gitCmd.addCmd(args, null, listOut, null, workingDir, exec_CommitDone);
       } else {
@@ -173,6 +181,152 @@ public class GitGui
 
 
 
+  GralUserAction actionTableLineVersion = new GralUserAction("actionTablelineVersion")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      if(actionCode == KeyCode.userSelect) {
+        @SuppressWarnings("unchecked")
+        GralTable<RevisionEntry>.TableLineData line = (GralTable<RevisionEntry>.TableLineData) params[0];
+        
+        showLog_startRevisionDiff4FileTable(line);
+      }  
+      return true;
+    }
+  };
+
+
+  /**This code snippet is executed after the 'git diff' command for 2 revisions are executed. 
+   * It is used as last argument of {@link CmdExecuter#execute(String[], boolean, String, List, List, org.vishia.cmd.CmdExecuter.ExecuteAfterFinish)}
+   * and prepares the {@link #wdgTableFiles}.
+   */
+  CmdExecuter.ExecuteAfterFinish exec_fillRevisionTable = new CmdExecuter.ExecuteAfterFinish()
+  { @Override
+    public void exec(int errorcode, Appendable out, Appendable err)
+    { fillRevisionTable();
+    }
+  };
+
+
+  /**This code snippet is executed after the 'git diff' command for 2 revisions are executed. 
+   * It is used as last argument of {@link CmdExecuter#execute(String[], boolean, String, List, List, org.vishia.cmd.CmdExecuter.ExecuteAfterFinish)}
+   * and prepares the {@link #wdgTableFiles}.
+   */
+  CmdExecuter.ExecuteAfterFinish exec_fillFileTable4Revision = new CmdExecuter.ExecuteAfterFinish()
+  { @Override
+    public void exec(int errorcode, Appendable out, Appendable err)
+    { fillFileTable4Revision();
+    }
+  };
+
+
+  /**This code snippet is executed after the 'git diff' command for 2 revisions are executed. 
+   * It is used as last argument of {@link CmdExecuter#execute(String[], boolean, String, List, List, org.vishia.cmd.CmdExecuter.ExecuteAfterFinish)}
+   * and prepares the {@link #wdgTableFiles}.
+   */
+  CmdExecuter.ExecuteAfterFinish exec_ShowStatus = new CmdExecuter.ExecuteAfterFinish()
+  { @Override
+    public void exec(int errorcode, Appendable out, Appendable err)
+    { wdgInfo.setText(gitOut);  //The status info
+      gitOut.buffer().setLength(0);  //prepare for the next command.
+      gitOut.assign(gitOut.buffer());   //to reset positions to the changed gitOut.buffer()
+    }
+  };
+
+
+  /**Action for mouse double to start view diff. 
+   * 
+   */
+  GralUserAction actionTableFile = new GralUserAction("actionTableFile")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      @SuppressWarnings("unchecked")
+      GralTable<RevisionEntry>.TableLineData line = (GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
+       
+      String sFile = line.getKey(); //"org/vishia/inspcPC/InspCmd.java";
+      switch(actionCode) {
+      case (KeyCode.ctrl | KeyCode.enter):
+      case KeyCode.mouse1Double: startDiffView(sFile, GitGui.this.currentEntry, GitGui.this.cmpEntry); return true;
+      case (KeyCode.ctrl | 's'): startLog(sFile); return true;
+      default: return false;
+      } //switch;
+      
+  } };
+
+
+  /**Action for mouse double to start view diff. 
+   * 
+   */
+  GralUserAction actionRestore = new GralUserAction("actionRestore")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      @SuppressWarnings("unchecked")
+      GralTable<RevisionEntry> table = (GralTable<RevisionEntry>)widgd;  //it is the table line.
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        GralTable<RevisionEntry>.TableLineData line = table.getLineMousePressed(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
+        String sFile = line.getKey(); 
+        restoreFile(sFile); 
+        return true;
+      } //if;
+      return false;
+  } };
+
+
+  /**Action for mouse double to start view diff. 
+   * 
+   */
+  GralUserAction actionTableFileDiffView = new GralUserAction("actionTableFileDiffView")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      @SuppressWarnings("unchecked")
+      GralTable<RevisionEntry> table = (GralTable<RevisionEntry>)widgd;  //it is the table line.
+      
+      GralTable<RevisionEntry>.TableLineData lineCurr = table.getCurrentLine(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
+      GralTable<RevisionEntry>.TableLineData line = table.getLineMousePressed(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        String sFile = line.getKey(); 
+        startDiffView(sFile, GitGui.this.currentEntry, GitGui.this.cmpEntry); return true;
+      } //if;
+      return false;
+  } };
+
+
+  /**Action for diff view of the current file to the workspace.*/
+  GralUserAction actionDiffCurrWork = new GralUserAction("actionCurrFileDiffView")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        GralTable<RevisionEntry>.TableLineData line = wdgTableVersion.getCurrentLine();
+        RevisionEntry revision = line.getData();
+        startDiffView(sLocalFile, null, revision); return true;
+      } //if;
+      return false;
+  } };
+
+
+  /**Action for diff view of the current file between revisions.*/
+  GralUserAction actionFileDiffRev = new GralUserAction("actionFileDiffRev")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        GralTable<RevisionEntry>.TableLineData line = wdgTableVersion.getCurrentLine();
+        RevisionEntry revision = line.getData();
+        startDiffView(sLocalFile, null, revision); return true;
+      } //if;
+      return false;
+  } };
+
+
+  /**Action for show the version table for the given file. 
+   * 
+   */
+  GralUserAction actionTableFileLog = new GralUserAction("actionTableFileLog")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      @SuppressWarnings("unchecked")
+      GralTable<RevisionEntry> table = (GralTable<RevisionEntry>)widgd;  //it is the table line.
+      GralTable<RevisionEntry>.TableLineData lineCurr = table.getCurrentLine(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
+      GralTable<RevisionEntry>.TableLineData line = table.getLineMousePressed(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        String sFile = line.getKey();   //working tree has key "*"
+        startLog(sFile); return true;
+      } //if;
+      return false;
+  } };
+
+
   Settings settings = new Settings();
 
   String sTypeOfImplementation = "SWT";  //default
@@ -186,7 +340,11 @@ public class GitGui
   
   GralTextBox wdgInfo = new GralTextBox("@-30..0, 0..-20=info");
 
-  GralButton wdgRefresh = new GralButton("@-18..-16, -18..-8 = refresh", "refresh_x", this.actionRefresh);
+  GralButton wdgBtnDiffCurrWork = new GralButton("@-29..-27, -18..-2 = diffCurrWork", "diff current file to workspace", this.actionDiffCurrWork);
+
+  GralButton wdgBtnDiffCurrFile = new GralButton("@-26..-24, -18..-2 = diffCurrFile", "diff current file", this.actionFileDiffRev);
+
+  GralButton wdgRefresh = new GralButton("@-18..-16, -18..-8 = refresh", "refresh", this.actionRefresh);
 
   GralButton wdgCommitText = new GralButton("@-15+2, -18..-2 = commitText", "commit-text", this.actionOpenCommitText);
 
@@ -214,6 +372,11 @@ public class GitGui
   String sGitDir, sWorkingDir; //, sLocalFile;
 
   File workingDir;
+
+  /**If given the file which's log and diff should be shown.
+   * Elsewhere null. set in {@link #startLog(String)}
+   */
+  String sLocalFile;
 
 
   /**The presentation of the time stamps. */
@@ -424,10 +587,15 @@ public class GitGui
   void startLog(String sLocalFile) {
     //this.sLocalFile = sLocalFile;
     String sPathShow;
+    this.sLocalFile = sLocalFile;
     if(sLocalFile !=null) {
       sPathShow = sGitDir + " : " + sLocalFile;
+      wdgBtnDiffCurrFile.setVisible(true);
+      wdgBtnDiffCurrWork.setVisible(true);
     } else {
       sPathShow = sGitDir;
+      wdgBtnDiffCurrFile.setVisible(false);
+      wdgBtnDiffCurrWork.setVisible(false);
     }
     wdgPath.setText(sPathShow);
     
@@ -630,21 +798,26 @@ public class GitGui
 
 
 
-  void startDiffView(String sFile) {
+  /**Gets the file from repository and writes to tmp directory, starts diff tool
+   * @param sFile The local path of the file
+   * @param currRev maybe null, then compare with working tree, elsewhere a selected revision
+   * @param cmpRev the selected revision to compare.
+   */
+  void startDiffView(String sFile,  RevisionEntry currRev, RevisionEntry cmpRev) {
     String sFile1 = settings.dirTemp1.getAbsolutePath() + "/" + sFile;
     String sFile2 = settings.dirTemp2.getAbsolutePath() + "/" + sFile;
-    if(currentEntry == null) {
+    if(currRev == null) {
       sFile1 = sWorkingDir + "/" + sFile;
     } else  { 
-      String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + currentEntry.revisionHash + " -- " + sFile;
+      String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + currRev.revisionHash + " -- " + sFile;
       String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
       gitCmd.addCmd(args, null, listOut, null, settings.dirTemp1, null);
     }
-    if(cmpEntry == null) {
+    if(cmpRev == null) {
       sFile2 = sFile1;
     }
     else { 
-      String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + cmpEntry.revisionHash + " -- " + sFile;
+      String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + cmpRev.revisionHash + " -- " + sFile;
       String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
       gitCmd.addCmd(args, null, listOut, null, settings.dirTemp2, null);
     }
@@ -696,143 +869,6 @@ public class GitGui
       } while (!bCmdThreadClose);
     }
   };
-
-
-
-
-
-  GralUserAction actionTableLineVersion = new GralUserAction("actionTablelineVersion")
-  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
-      if(actionCode == KeyCode.userSelect) {
-        @SuppressWarnings("unchecked")
-        GralTable<RevisionEntry>.TableLineData line = (GralTable<RevisionEntry>.TableLineData) params[0];
-        
-        showLog_startRevisionDiff4FileTable(line);
-      }  
-      return true;
-    }
-  };
-
-
-
-  /**This code snippet is executed after the 'git diff' command for 2 revisions are executed. 
-   * It is used as last argument of {@link CmdExecuter#execute(String[], boolean, String, List, List, org.vishia.cmd.CmdExecuter.ExecuteAfterFinish)}
-   * and prepares the {@link #wdgTableFiles}.
-   */
-  CmdExecuter.ExecuteAfterFinish exec_fillRevisionTable = new CmdExecuter.ExecuteAfterFinish()
-  { @Override
-    public void exec(int errorcode, Appendable out, Appendable err)
-    { fillRevisionTable();
-    }
-  }; 
-
-
-
-
-
-  /**This code snippet is executed after the 'git diff' command for 2 revisions are executed. 
-   * It is used as last argument of {@link CmdExecuter#execute(String[], boolean, String, List, List, org.vishia.cmd.CmdExecuter.ExecuteAfterFinish)}
-   * and prepares the {@link #wdgTableFiles}.
-   */
-  CmdExecuter.ExecuteAfterFinish exec_fillFileTable4Revision = new CmdExecuter.ExecuteAfterFinish()
-  { @Override
-    public void exec(int errorcode, Appendable out, Appendable err)
-    { fillFileTable4Revision();
-    }
-  }; 
-
-
-
-
-  /**This code snippet is executed after the 'git diff' command for 2 revisions are executed. 
-   * It is used as last argument of {@link CmdExecuter#execute(String[], boolean, String, List, List, org.vishia.cmd.CmdExecuter.ExecuteAfterFinish)}
-   * and prepares the {@link #wdgTableFiles}.
-   */
-  CmdExecuter.ExecuteAfterFinish exec_ShowStatus = new CmdExecuter.ExecuteAfterFinish()
-  { @Override
-    public void exec(int errorcode, Appendable out, Appendable err)
-    { wdgInfo.setText(gitOut);  //The status info
-      gitOut.buffer().setLength(0);  //prepare for the next command.
-      gitOut.assign(gitOut.buffer());   //to reset positions to the changed gitOut.buffer()
-    }
-  }; 
-
-
-
-
-
-
-  /**Action for mouse double to start view diff. 
-   * 
-   */
-  GralUserAction actionTableFile = new GralUserAction("actionTableFile")
-  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
-      @SuppressWarnings("unchecked")
-      GralTable<RevisionEntry>.TableLineData line = (GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
-       
-      String sFile = line.getKey(); //"org/vishia/inspcPC/InspCmd.java";
-      switch(actionCode) {
-      case (KeyCode.ctrl | KeyCode.enter):
-      case KeyCode.mouse1Double: startDiffView(sFile); return true;
-      case (KeyCode.ctrl | 's'): startLog(sFile); return true;
-      default: return false;
-      } //switch;
-      
-  } };
-
-
-  /**Action for mouse double to start view diff. 
-   * 
-   */
-  GralUserAction actionRestore = new GralUserAction("actionRestore")
-  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
-      @SuppressWarnings("unchecked")
-      GralTable<RevisionEntry> table = (GralTable<RevisionEntry>)widgd;  //it is the table line.
-      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
-        GralTable<RevisionEntry>.TableLineData line = table.getLineMousePressed(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
-        String sFile = line.getKey(); 
-        restoreFile(sFile); 
-        return true;
-      } //if;
-      return false;
-  } };
-
-
-
-  /**Action for mouse double to start view diff. 
-   * 
-   */
-  GralUserAction actionTableFileDiffView = new GralUserAction("actionTableFileDiffView")
-  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
-      @SuppressWarnings("unchecked")
-      GralTable<RevisionEntry> table = (GralTable<RevisionEntry>)widgd;  //it is the table line.
-      
-      GralTable<RevisionEntry>.TableLineData lineCurr = table.getCurrentLine(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
-      GralTable<RevisionEntry>.TableLineData line = table.getLineMousePressed(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
-      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
-        String sFile = line.getKey(); 
-        startDiffView(sFile); return true;
-      } //if;
-      return false;
-  } };
-
-
-
-  /**Action for show the version table for the given file. 
-   * 
-   */
-  GralUserAction actionTableFileLog = new GralUserAction("actionTableFileLog")
-  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
-      @SuppressWarnings("unchecked")
-      GralTable<RevisionEntry> table = (GralTable<RevisionEntry>)widgd;  //it is the table line.
-      GralTable<RevisionEntry>.TableLineData lineCurr = table.getCurrentLine(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
-      GralTable<RevisionEntry>.TableLineData line = table.getLineMousePressed(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
-      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
-        String sFile = line.getKey();   //working tree has key "*"
-        startLog(sFile); return true;
-      } //if;
-      return false;
-  } };
 
 
 
