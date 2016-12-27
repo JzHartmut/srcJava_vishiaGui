@@ -4,8 +4,10 @@ import java.io.File;
 import java.util.Map;
 
 import org.vishia.cmd.CmdGetFileArgs_ifc;
+import org.vishia.cmd.CmdGetterArguments;
 import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
+import org.vishia.cmd.JZcmdExecuter;
 import org.vishia.cmd.JZcmdScript;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
@@ -47,7 +49,10 @@ public class GralCommandSelector extends GralSelectList<CmdStore.CmdBlock>
    */
   protected CmdGetFileArgs_ifc getterFiles;
   
-  
+  /**
+   * @since 2016-12
+   */
+  protected final CmdGetterArguments getterArguments;
   
   /**The currently selected command.
    * 
@@ -55,10 +60,12 @@ public class GralCommandSelector extends GralSelectList<CmdStore.CmdBlock>
   protected CmdStore.CmdBlock selectedCmd;
   
   
-  public GralCommandSelector(String name, int rows, int[] columns, char size, CmdQueue cmdQueue, GralMng mng)
+  public GralCommandSelector(String name, int rows, int[] columns, char size, CmdQueue cmdQueue, CmdGetterArguments getterArguments)
   { super(name, rows, columns, size);
     this.cmdStore = new CmdStore();
     this.cmdQueue = cmdQueue;
+    this.getterArguments = getterArguments;
+   
   }
   
   
@@ -143,14 +150,14 @@ public class GralCommandSelector extends GralSelectList<CmdStore.CmdBlock>
   @Override protected boolean actionOk(Object userData, GralTableLine_ifc<CmdStore.CmdBlock> line)
   {
     CmdStore.CmdBlock cmdBlock = (CmdStore.CmdBlock)userData;
-    Map<String, DataAccess.Variable<Object>> jargs = cmdBlock.getArguments(getterFiles);
-    if(jargs != null){ 
-      File currFile = getterFiles.getFile1();
-      
-      File currDir = currFile !=null? currFile.getParentFile(): null;
-      String sMsg = "GralCommandSelector - put cmd;" + cmdBlock.toString();
-      System.out.println(sMsg);
-      cmdQueue.addCmd(cmdBlock, jargs, currDir);  //to execute.
+    //Map<String, DataAccess.Variable<Object>> jargs = getterArguments.getArguments(cmdBlock.)//cmdBlock.getArguments(getterFiles);
+    //File currFile = getterArguments.getCurrDir();
+    
+    //File currDir = currFile !=null? currFile.getParentFile(): null;
+    String sMsg = "GralCommandSelector - put cmd;" + cmdBlock.toString();
+    System.out.println(sMsg);
+    cmdQueue.addCmd(cmdBlock, getterArguments);  //to execute.
+    /*
     }
     else {
       File[] files = new File[3];
@@ -171,6 +178,7 @@ public class GralCommandSelector extends GralSelectList<CmdStore.CmdBlock>
       System.out.println(sMsg);
       cmdQueue.addCmd(cmdBlock, files, currDir);
     }
+    */
     return true;
   }
   

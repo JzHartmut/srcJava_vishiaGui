@@ -21,6 +21,7 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.widget.GralCommandSelector;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
@@ -60,7 +61,7 @@ public class FcmdExecuter
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public static final String sVersion = "2016-08-28";
+  public static final String version = "2016-12-27";
 
 
   static class ExtCmd
@@ -85,6 +86,8 @@ public class FcmdExecuter
 
   private final Fcmd main;
   
+
+  
   GralWindow_ifc windConfirmExec = new GralWindow("-19..0,-47..0","execWindow", "confirm execute", GralWindow.windConcurrently);
 
   GralTable<CmdBlock> widgSelectExec = new GralTable<>("0..0,0..0", "execChoice", new int[]{47});
@@ -95,11 +98,26 @@ public class FcmdExecuter
   /**The command queue to execute */
   final CmdQueue cmdQueue;
 
+  /**Table contains some commands, can be selected and executed.
+   * <ul>
+   * <li>The table is filled in {@link #readCmdCfg(CmdStore, File, MainCmdLogging_ifc, CmdQueue)}. 
+   * <li>Commands can be either operation system commands or c {@link JZcmdScript.Subroutine} entry point. 
+   * They are stored in the list in user data of type {@link CmdBlock}.
+   * <li>Execution of a command: see {@link GralCommandSelector#actionExecCmdWithFiles} respectively GralCommandSelector#actionOk(...)
+   * <li>The arguments of a command are read from {@link CmdStore.CmdBlock#getArguments(org.vishia.cmd.CmdGetFileArgs_ifc)}. 
+   *   That deals with {@link Fcmd#getterFiles} because it is initialized with {@link GralCommandSelector#setGetterFiles(org.vishia.cmd.CmdGetFileArgs_ifc)}
+   *   
+   * </ul> 
+   */
+  final GralCommandSelector cmdSelector;
+
+
   
   FcmdExecuter(MainCmd_ifc console, Appendable outStatus, Fcmd main)
   { this.main = main;
     this.console = console;
     this.cmdQueue = new CmdQueue(outStatus);
+    cmdSelector = new GralCommandSelector("cmdSelector", 5, new int[]{0,-10}, 'A', cmdQueue, main.getterFileArguments);
   }
   
   
@@ -142,25 +160,13 @@ public class FcmdExecuter
       //File cmdCfgJbat = new File(cfgFile.getParentFile(), cfgFile.getName() + ".jbat");
       File cmdCfgJbat = new File(cfgFile.getParentFile(), "cmdjz.cfg");
       if(cmdCfgJbat.exists()){
-        try{ 
-          JZcmdScript script = JZcmd.translateAndSetGenCtrl(cmdCfgJbat, new File(cmdCfgJbat.getParentFile(), cmdCfgJbat.getName() + ".check.xml"), log);
-          dst.addSubOfJZcmdClass(script.scriptClass(), 1);
-          executerToInit.initExecuter(script, null);  //NOTE: currdir is not determined.
-          //main.cmdSelector.initExecuter(script);
-        } catch(Throwable exc){
-          
-          log.writeError("CmdStore - JZcmdScript;", exc);
-          error = "CmdStore - JZcmdScript," + exc.getMessage();
-        }
       }
-
+      error = JZcmd.readJZcmdCfg(dst, cmdCfgJbat, log, executerToInit);
     }
     return error;
   }  
   
 
-  
-  
   
   
   boolean actionExecuteUserKey(int keyCode, FileRemote file)
@@ -233,8 +239,8 @@ public class FcmdExecuter
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
           if (main.currentFile() != null) {
-          readCmdCfg(main.cmdSelector.cmdStore, main.currentFile(), main.console, main.executer.cmdQueue);
-          main.cmdSelector.fillIn();
+          readCmdCfg(cmdSelector.cmdStore, main.currentFile(), main.console, main.executer.cmdQueue);
+          cmdSelector.fillIn();
         }
       }
       return true;
@@ -249,10 +255,10 @@ public class FcmdExecuter
   GralUserAction actionSetCmdCfgAct = new GralUserAction("actionSetCmdCfgAct") { 
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        String sError = readCmdCfg(main.cmdSelector.cmdStore, main.cargs.fileCfgCmds, console, main.executer.cmdQueue);
+        String sError = readCmdCfg(cmdSelector.cmdStore, main.cargs.fileCfgCmds, console, main.executer.cmdQueue);
       
         if(sError ==null){
-          main.cmdSelector.fillIn();
+          cmdSelector.fillIn();
         } else {
           System.err.println("readCmdCfg; from file " + main.cargs.fileCfgButtonCmds.getAbsolutePath()+ "; error: " + sError);
         }

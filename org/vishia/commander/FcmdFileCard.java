@@ -195,7 +195,7 @@ public class FcmdFileCard extends GralFileSelector
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmCopyContext, main.copyCmd.actionConfirmCopy);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmFileDelContext, main.deleteCmd.actionConfirmDelete);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteContext, main.executer.actionExecuteFileByExtension);
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteCmdContext, main.cmdSelector.actionExecCmdWithFiles);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteCmdContext, main.executer.cmdSelector.actionExecCmdWithFiles);
     //selectList.wdgdTable.addContextMenuEntryGthread(1, "deSelDir", main.idents.deselectRecursFiles.menuContext, main.favorPathSelector.actionDeselectDirtree);
     favorCard.wdgdTable.specifyActionOnLineSelected(favorCard.actionFavorSelected);
     //

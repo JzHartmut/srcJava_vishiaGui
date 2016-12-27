@@ -3,6 +3,7 @@ package org.vishia.commander;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,11 +11,12 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.cmd.CmdGetFileArgs_ifc;
+import org.vishia.cmd.CmdGetterArguments;
 import org.vishia.cmd.CmdStore;
+import org.vishia.cmd.JZcmdScript;
 import org.vishia.commander.target.FcmdtTarget;
 import org.vishia.commander.target.FcmdtTarget_ifc;
 import org.vishia.communication.InterProcessCommFactorySocket;
-import org.vishia.fileLocalAccessor.FileAccessorLocalJava6;
 import org.vishia.fileLocalAccessor.FileAccessorLocalJava7;
 import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileRemote;
@@ -28,10 +30,11 @@ import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
-import org.vishia.gral.widget.GralCommandSelector;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.msgDispatch.MsgRedirectConsole;
+import org.vishia.util.DataAccess;
 import org.vishia.util.KeyCode;
+import org.vishia.zcmd.JZcmd;
 
 /**This class is the main class of the-File-commander.
  * @author Hartmut Schorrig
@@ -76,7 +79,7 @@ public class Fcmd extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public static final String sVersion = "2016-01-18";
+  public static final String version = "2016-12-27";
 
   
   static class CallingArgs extends GuiCallingArgs
@@ -278,7 +281,7 @@ public class Fcmd extends GuiCfg
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-      cmdSelector.wdgdTable.setFocus();
+      executer.cmdSelector.wdgdTable.setFocus();
       return true;
       } else return false;
     }
@@ -324,21 +327,16 @@ public class Fcmd extends GuiCfg
    */
   GralUserAction actionEdit = new GralUserAction("actionEdit")
   {
-    @Override public boolean userActionGui(int key, GralWidget infos, Object... params) {
+    @Override public boolean exec(int key, GralWidget_ifc wdg, Object... params) {
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
         CmdStore.CmdBlock cmdBlock = buttonCmds.getCmd("edit");
         if (cmdBlock == null) {
           mainCmd.writeError("internal problem - don't find 'edit' command. ");
         } else {
-          File[] lastSelected = getLastSelectedFiles(false, 1); 
-          //create a new instance of array of files because the selection may be changed
-          //till the command is invoked. The files are stored in a queue and executed in another thread. 
-          File[] files = new File[1];
-          if(lastSelected.length >0){
-            files[0] = lastSelected[0];
-          }
-          File currentDir = files[0].getParentFile();
-          executer.cmdQueue.addCmd(cmdBlock, files, currentDir); // to execute.
+        
+          String sMsg = "GralCommandSelector - put cmd;" + cmdBlock.toString();
+          System.out.println(sMsg);
+          executer.cmdQueue.addCmd(cmdBlock, main.getterFileArguments);  //to execute.
         }
       }
       return true;
@@ -362,7 +360,46 @@ public class Fcmd extends GuiCfg
     }
   };
   
-  
+  /**This implementation resolves the arguments for invoked commands with the capabilities of the Fcmd.
+   * Especially the following argument strings are supported:
+   * <ul>
+   * <li>
+   * </ul>
+   * This instance is used only locally (private). It is designated as protected for documentation.
+   */
+  protected CmdGetterArguments getterFileArguments = new CmdGetterArguments()
+  {
+    @Override public Map<String, DataAccess.Variable<Object>> getArguments(CmdStore.CmdBlock cmd) {
+      FileRemote[] selFiles = getLastSelectedFiles(true, 1);  //The selected 3 files, maybe in one card too.
+      Map<String, DataAccess.Variable<Object>> args = new TreeMap<String, DataAccess.Variable<Object>>();
+      JZcmdScript.Subroutine subRoutine = cmd.getJZcmd();
+      if(subRoutine !=null) {
+        if(subRoutine.formalArgs !=null) {
+          try{
+            for(JZcmdScript.DefVariable arg :subRoutine.formalArgs){
+              String name1 = arg.getVariableIdent();
+              if(name1.equals("file1")){ DataAccess.createOrReplaceVariable(args, "file1", 'O', selFiles[0], true); }
+              else if(name1.equals("file2")){ DataAccess.createOrReplaceVariable(args, "file2", 'O',  selFiles[1], true); }
+              else if(name1.equals("file3")){ DataAccess.createOrReplaceVariable(args, "file3", 'O',  selFiles[2], true); }
+              else if(name1.equals("dir1")){ DataAccess.createOrReplaceVariable(args, "dir1", 'O', selFiles[0] ==null ? null : selFiles[0].getParentFile(), true); }
+              else if(name1.equals("dir2")){ DataAccess.createOrReplaceVariable(args, "dir2", 'O', selFiles[1] ==null ? null : selFiles[1].getParentFile(), true); }
+              else if(name1.equals("dir3")){ DataAccess.createOrReplaceVariable(args, "dir3", 'O', selFiles[2] ==null ? null : selFiles[2].getParentFile(), true); }
+            }
+          } catch(IllegalAccessException exc){
+            //It is not able to expect that file1 etc. are not accessible.
+            throw new IllegalArgumentException(exc);
+          }
+        }
+      } else {
+      
+      }
+      return args;
+    }
+    
+    @Override public final File getCurrDir(){ return Fcmd.this.currentFileCard.currentDir(); }
+  };
+
+
 
   //MsgDispatchSystemOutErr msgDisp;
   
@@ -397,8 +434,6 @@ public class Fcmd extends GuiCfg
   final FcmdFavorPathSelector favorPathSelector = new FcmdFavorPathSelector(mainCmd, this);
 
   final FcmdExecuter executer = new FcmdExecuter(mainCmd, gui.getOutputBox(), this);
-
-  final GralCommandSelector cmdSelector = new GralCommandSelector("cmdSelector", 5, new int[]{0,-10}, 'A', executer.cmdQueue, _gralMng);
 
   final FcmdSettings settings = new FcmdSettings(this);
   
@@ -587,7 +622,7 @@ public class Fcmd extends GuiCfg
     } else {
       String sError;
       File fileCfg;
-      sError = FcmdExecuter.readCmdCfg(cmdSelector.cmdStore, fileCfg = cargs.fileCfgCmds, console, executer.cmdQueue);
+      sError = FcmdExecuter.readCmdCfg(executer.cmdSelector.cmdStore, fileCfg = cargs.fileCfgCmds, console, executer.cmdQueue);
       if(sError !=null) {
         showInfoBox(sError);   
       } else {
@@ -597,7 +632,7 @@ public class Fcmd extends GuiCfg
         sError = executer.readCmdFile(fileCfg = cargs.fileCmdsForExt);
       }
       if (sError == null) {
-        sError = FcmdExecuter.readCmdCfg(buttonCmds, fileCfg = cargs.fileCfgButtonCmds, console, executer.cmdQueue);
+        sError = JZcmd.readJZcmdCfg(buttonCmds, fileCfg = cargs.fileCfgButtonCmds, console, executer.cmdQueue);
       }
       if (sError == null) {
         sError = favorPathSelector.readCfg(fileCfg = cargs.fileSelectTabPaths);
@@ -746,6 +781,34 @@ public class Fcmd extends GuiCfg
   
   
   
+  /**Get the last selected file cards in order of selection of the file panels.
+   * @return array[3] of the last selected file cards in the file panels. It has always a length of 3
+   *   but not all elements are set ( they are ==null) if the file cards are not opened before
+   *   in the panel.
+   *   The returned instance is a new one, not referenced elsewhere. It can be stored
+   *   and it remains the situation of selection files independently of further user actions.
+   */
+  List<File>[] getLastSelectedFilesPerCard(){
+    @SuppressWarnings("unchecked")
+    List<File>[] ret = new List[3];
+    int ix = -1;
+    for(FcmdLeftMidRightPanel panel: lastFilePanels){
+      FcmdFileCard fileCard = panel.actFileCard;
+      if(fileCard !=null){
+        List<FileRemote> list = fileCard.getSelectedFiles(true, 0x1);
+        ret[++ix] = new ArrayList<File>();
+        for(File file: list) { ret[ix].add(file); }
+      } else {
+        ret[++ix] = null;  //the panel hasn't a file selected now.
+      }
+      if(ix >=2) break;  //prevent exception because older error
+    }
+    //Note: There may be less than 3 file panels, rest of files are null.
+    return ret;
+  }
+  
+  
+  
   
   
   /**Get the last selected file card in order of selection of the file panels.
@@ -793,7 +856,9 @@ public class Fcmd extends GuiCfg
   }
   
   
-
+  
+  
+  
   /**
    * This class is instantiated in the static main routine and builds a command
    * line interface and the graphical frame. The mainly functionality is
@@ -810,7 +875,7 @@ public class Fcmd extends GuiCfg
       this.cargs = cargs;
       super.addAboutInfo("The.file.Commander");
       super.addAboutInfo("made by Hartmut Schorrig, www.vishia.org, hartmut.schorrig@vishia.de");
-      super.addAboutInfo("Version-date: " + Fcmd.sVersion);
+      super.addAboutInfo("Version-date: " + Fcmd.version);
     }
 
     @Override protected boolean testArgument(String arg, int nArg)
@@ -856,6 +921,11 @@ public class Fcmd extends GuiCfg
    */
   CmdGetFileArgs_ifc getterFiles = new CmdGetFileArgs_ifc()
   {
+    
+    List<File>[] selectedFilesPerCard;
+    
+    
+    
     /**
      * 
      */
@@ -865,6 +935,7 @@ public class Fcmd extends GuiCfg
     public void prepareFileSelection()
     {
       selectedFiles = getLastSelectedFiles(true, 1); //  getCurrentFileInLastPanels();
+      selectedFilesPerCard = getLastSelectedFilesPerCard();
     }
 
     @Override
@@ -890,6 +961,7 @@ public class Fcmd extends GuiCfg
     { if(selectedFiles.length >2) return selectedFiles[2];
       else return null;
     }
+
   };
 
   static void testT1()

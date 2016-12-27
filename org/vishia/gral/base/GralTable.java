@@ -398,8 +398,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @param columnWidths positive value from left: width, negative value from right: width. 
    *   The last column with a positive width is used for sizeable. 
    */
-  public GralTable(String name, int[] columnWidths) {
-    super(name, 'L');
+  public GralTable(String posName, int[] columnWidths) {
+    super(posName, 'L');
     this.columnWidthsGral = columnWidths;
     this.zColumn = columnWidths.length;
     this.bColumnEditable = new boolean[this.zColumn];  //all false.
@@ -426,7 +426,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    *   The last column with a positive width is used for sizeable. 
    */
   public GralTable(String pos, String name, int[] columnWidths) 
-  { this(pos !=null ? (pos.startsWith("@") ? "" : "@" + pos + "=" + name) : name, columnWidths); }
+  { this(pos !=null ? ((pos.startsWith("@") ? "" : "@") + pos + "=" + name) : name, columnWidths); }
   
   
   

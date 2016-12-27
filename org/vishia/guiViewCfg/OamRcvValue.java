@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import org.vishia.communication.Address_InterProcessComm;
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InterProcessComm;
+import org.vishia.communication.InterProcessCommFactory;
 import org.vishia.communication.InterProcessCommFactoryAccessor;
 import org.vishia.mainCmd.Report;
 
@@ -46,7 +47,7 @@ public class OamRcvValue implements Runnable
 
 	private final InterProcessComm ipc;
 
-	private final Address_InterProcessComm targetAddr = InterProcessCommFactoryAccessor.getInstance().createAddress("UDP:localHost:60083");
+	private final Address_InterProcessComm targetAddr = InterProcessCommFactory.getInstance().createAddress("UDP:localHost:60083");
 	
 	byte[] recvData = new byte[1500];
 	
@@ -62,7 +63,7 @@ public class OamRcvValue implements Runnable
 		this.showValues = showValues;
 		String ownAddr = "UDP:0.0.0.0:0xeab2";
 		
-		ipc = InterProcessCommFactoryAccessor.getInstance().create(ownAddr); //It creates and opens the UDP-Port.
+		ipc = InterProcessCommFactory.getInstance().create(ownAddr); //It creates and opens the UDP-Port.
 		ipc.open(null, true); //InterProcessComm.receiverShouldbeBlocking);
 		if(ipc != null){
 			bIpcOpened = true;

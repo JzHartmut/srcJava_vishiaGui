@@ -3,8 +3,6 @@ package org.vishia.gral.test;
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.ifc.GralFactory;
-import org.vishia.gral.swt.SwtFactory;
 import org.vishia.gral.widget.GralPlotArea;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
@@ -49,19 +47,26 @@ public class GralPlotWindow
 
   final GralMng gralMng = GralMng.get();
   
-  final GralPlotArea canvas = new GralPlotArea("0..0,0..0", "+canvas");
+  final GralWindow window;
+  
+  final GralPlotArea canvas;
   
   
   public static GralPlotWindow create(String sTitle){
-    GralPlotWindow obj = new GralPlotWindow();
-    GralFactory gralFactory = new SwtFactory();
-    LogMessage log = new LogMessageStream(System.out);
-    GralWindow wind = gralFactory.createWindow(log, sTitle, 'B', 150, 10,1000, 800);
+    GralPlotWindow obj = new GralPlotWindow(sTitle);
     obj.gralMng.gralDevice.addDispatchOrder(obj.initGraphic);
     obj.initGraphic.awaitExecution(1, 0);
     return obj;  
   }
 
+  
+  GralPlotWindow(String sTitle)
+  { window = new GralWindow("10+120, 10+200", "window", sTitle, GralWindow.windResizeable);
+    canvas = new GralPlotArea("@0..0,0..0=canvas");
+    LogMessage log = new LogMessageStream(System.out);
+    window.create("SWT", 'B', log, initGraphic);
+    
+  }
   
   public void waitForClose(){
     while(gralMng.gralDevice.isRunning()){
@@ -83,7 +88,7 @@ public class GralPlotWindow
   GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic"){
     @Override public void executeOrder()
     {
-      canvas.setToPanel(null);      
+      //canvas.createImplWidget_Gthread();      
       //gralMng.addTextField();
     } };
 

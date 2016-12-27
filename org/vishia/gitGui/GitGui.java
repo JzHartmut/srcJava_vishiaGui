@@ -823,7 +823,7 @@ public class GitGui
     }
     sFile1 = sFile1.replace('/', '\\');
     sFile2 = sFile2.replace('/', '\\');
-    String sCmdDiff = "cmd.exe /C start c:\\D\\Programs\\WinMerge-2.12.4-exe\\WinMerge.exe " + sFile1 + " " + sFile2;
+    String sCmdDiff = "cmd.exe /C start d:\\Programs\\WinMerge-2.12.4-exe\\WinMerge.exe " + sFile1 + " " + sFile2;
     String[] cmdDiffView = CmdExecuter.splitArgs(sCmdDiff); // D:\\vishia\\Java\\srcJava_vishiaGui\\org\\vishia\\gral\\cfg\\GralCfgElement.java D:\\GitArchive\\D\\vishia\\srcJava_vishiaGui\\org\\vishia\\gral\\cfg\\GralCfgElement.java");
     gitCmd.addCmd(cmdDiffView, null, listOut, null, null, null);
     synchronized(cmdThread) { cmdThread.notify(); }

@@ -130,9 +130,9 @@ public class FcmdLeftMidRightPanel
     if(cNr == '1'){ //commands only in the left panel.
       tabbedPanelFileCards.addGridPanel("cmd", "Cmd",1,1,10,10);
       mng.setPosition(2, -2, 0, -0, 1, 'd');
-      main.cmdSelector.setToPanel(mng);
-      main.cmdSelector.fillIn();
-      main.cmdSelector.setGetterFiles(main.getterFiles);
+      main.executer.cmdSelector.setToPanel(mng);
+      main.executer.cmdSelector.fillIn();
+      main.executer.cmdSelector.setGetterFiles(main.getterFiles);
     }
     
   }

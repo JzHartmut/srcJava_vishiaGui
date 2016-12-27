@@ -443,17 +443,27 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   
   
   final protected void execMove() {
-    String sDstDir = widgInputDst.getText();
+    String sDst = widgInputDst.getText();
+    String sDstDir, sDstMask;
+    int posWildcard = sDst.indexOf('*');
+    if(posWildcard >0) {
+      int posSep = sDst.lastIndexOf('/', posWildcard);
+      sDstDir = sDst.substring(0, posSep+1);
+      sDstMask = sDst.substring(posSep+1);
+    } else {
+      sDstDir = sDst;
+      sDstMask = null;
+    }
     FileRemote fileDst;
     if(FileSystem.isAbsolutePathOrDrive(sDstDir)) {
       fileDst = main.fileCluster.getDir(sDstDir);  //maybe a file or directory
     } else {
       fileDst = srcDir.child(sDstDir);  //relative to source
     }
-    //FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, srcFile, null, evConsumerCallbackFromFileMachine, null, evSrc);
+    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, srcFile, null, evConsumerCallbackFromFileMachine, null, evSrc);
     //====>
-    //srcFile.moveTo(sFilesSrc, fileDst, callback);
-    //setTexts(Estate.busy);
+    //srcFile.moveChecked(sFilesSrc, fileDst, callback);
+    setTexts(Estate.busy);
     ///
   }
 

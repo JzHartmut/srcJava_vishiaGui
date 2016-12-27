@@ -167,7 +167,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   
   LogMessage logTelg;
 
-  GralButton btnSwitchOnLog;
+  //GralButton btnSwitchOnLog;
   final GralButton btnRetryDisableVariables = new GralButton(null, "retry variable", actionSetRetryDisabledVariable);
 
   final GralButton btnUseGetByHandle = new GralButton(null, "get value by handle", actionUseGetValueByIndex);
@@ -191,7 +191,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   InspcGui(CallingArguments cargs, GralArea9MainCmd cmdgui)
   {
     ButtonInspcCmd.registerUserAction();
-    viewTargetComm = new InspcViewTargetComm();
+    viewTargetComm = new InspcViewTargetComm(this);
     guiCfg = new InspcGuiCfg(cargs, cmdgui, userInspcPlug);
     GralMng.get().registerUserAction("<name>", actionGetValueByHandleIntern);
     for(Map.Entry<String, String> entry: cargs.indexTargetIpcAddr.entrySet()){
@@ -459,8 +459,8 @@ private class InspcGuiCfg extends GuiCfg
     super.initGuiAreas("A1C2");
     super._gralMng.selectPanel("test");
     super._gralMng.setPosition(5, GralPos.size -3, 0, GralPos.size +18 , 0, 'd',1);
-    btnSwitchOnLog = super._gralMng.addSwitchButton("log", "log telg ?", "log telg", GralColor.getColor("wh"), GralColor.getColor("am") );
-    btnSwitchOnLog.setActionChange(actionEnableLog);
+    //btnSwitchOnLog = super._gralMng.addSwitchButton("log", "log telg ?", "log telg", GralColor.getColor("wh"), GralColor.getColor("am") );
+    //btnSwitchOnLog.setActionChange(actionEnableLog);
     btnRetryDisableVariables.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("am"));
     btnRetryDisableVariables.setToPanel(super._gralMng);
     btnUseGetByHandle.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));

@@ -45,8 +45,8 @@ public class GralPlotArea extends GralWidget
 
   protected final GralCanvasStorage canvasStore = new GralCanvasStorage();
   
-  public GralPlotArea(String pos, String name) {
-    super(pos, name, 'P' );
+  public GralPlotArea(String posname) {
+    super(posname, 'P' );
   }
   
  

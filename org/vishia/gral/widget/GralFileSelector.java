@@ -316,7 +316,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
       //super(name, mng);
       super(name, rows, columns, size);
       this.outer = outer;
-      super.setLeftRightKeys(KeyCode.ctrl + KeyCode.pgup, KeyCode.pgdn);
+      super.setLeftRightKeys(KeyCode.ctrl + KeyCode.pgup, KeyCode.ctrl + KeyCode.pgdn);
     }
     
     @Override public boolean actionOk(Object userData, GralTableLine_ifc line)

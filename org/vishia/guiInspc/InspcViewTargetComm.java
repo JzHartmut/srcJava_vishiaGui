@@ -2,6 +2,7 @@ package org.vishia.guiInspc;
 
 import java.util.Locale;
 
+import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextField;
@@ -64,20 +65,26 @@ public class InspcViewTargetComm
   private final GralTable<Object> widgTable;
 
 
+  private final GralButton wdgBtnLog;
+
   private GralColor colorInactive = GralColor.getColor("wh")
                   , colorIdle = GralColor.getColor("lgn")
                   , colorWait = GralColor.getColor("lrd")
                   , color2 = GralColor.getColor("or");
 
   
-  public InspcViewTargetComm()
+  public InspcViewTargetComm(InspcGui gui)
   { //inspcMng.addUserOrder(this);  //invoke run in any communication step.
     this.wind = new GralWindow("@primaryWindow,-21..0,-50..0", "InspcCtrlStatusWind", "State of targets", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
-    this.widgTable = new GralTable<Object>("@InspcCtrlStatusWind,0..0,0..0", "TargetTable", new int[]{3, 0,-6,-6});
+    this.widgTable = new GralTable<Object>("@InspcCtrlStatusWind,3..-3,0..0=TargetTable", new int[]{3, 0,-6,-6});
     this.widgTable.setColumnEditable(2,  true);
     this.widgTable.setColumnEditable(3,  true);
     //this.widgTable.setColumnEditable(2, true);
     this.widgTable.setHtmlHelp("HelpInspc.html#Topic.HelpInspc.ctrlStatus.");
+    this.wdgBtnLog = new GralButton("@InspcCtrlStatusWind,-2..0,0..10=BtnLog", "Enable Log", null);
+    this.wdgBtnLog.setSwitchMode("? Log", "Log ?off");
+    this.wdgBtnLog.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("am"));
+    this.wdgBtnLog.specifyActionChange("switch log telg", gui.actionEnableLog, null);
   }
   
   
@@ -136,6 +143,8 @@ public class InspcViewTargetComm
     }
   }
   
+  
+  public boolean isLogOn() { return wdgBtnLog.getState()== GralButton.State.On; }
   
   float getTimeout(String target){
     float timeout; 
