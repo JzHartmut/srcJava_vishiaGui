@@ -14,6 +14,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
+import org.vishia.zcmd.JZcmd;
 
 public class FcmdSettings
 {
@@ -181,6 +182,9 @@ public class FcmdSettings
   {
     @Override public boolean exec(int keyCode, GralWidget_ifc widg, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
+        File fileCfg = new File(main.cargs.dirCfg, ((GralWidget)widg).getCmd());
+        main.openExtEditor(fileCfg);
+        /*
         CmdStore.CmdBlock cmdBlock = main.buttonCmds.getCmd("edit");
         if (cmdBlock == null) {
           main.mainCmd.writeError("internal problem - don't find 'edit' command. ");
@@ -190,6 +194,7 @@ public class FcmdSettings
           File dir = FileSystem.getDir(files[0]);
           main.executer.cmdQueue.addCmd(cmdBlock, files, dir); // to execute.
         }
+        */
       }
       return true;
     }
@@ -204,7 +209,8 @@ public class FcmdSettings
     @Override public boolean exec(int keyCode, GralWidget_ifc widg, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         String sFileCfg = ((GralWidget)widg).getCmd();
-        String sError = FcmdExecuter.readCmdCfg(main.executer.cmdSelector.cmdStore, new File(main.cargs.dirCfg, sFileCfg), main.console, main.executer.cmdQueue);
+        main.executer.cmdSelector.cmdStore.clear();
+        String sError = FcmdExecuter.readCmdCfgSelectList(main.executer.cmdSelector.cmdStore, new File(main.cargs.dirCfg, sFileCfg), main.console, main.executer.cmdQueue);
         if(sError != null) {
           main.showInfoBox(sError);
           widgOkError.setText("error");
@@ -224,7 +230,7 @@ public class FcmdSettings
   {
     @Override public boolean exec(int keyCode, GralWidget_ifc widg, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
-        main.executer.readCmdFile(new File(main.cargs.dirCfg, ((GralWidget)widg).getCmd()));
+        main.executer.readCfgExt(new File(main.cargs.dirCfg, "extjz.cfg"));
       }
       return true;
     }

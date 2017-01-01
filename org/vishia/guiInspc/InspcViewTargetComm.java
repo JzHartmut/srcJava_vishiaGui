@@ -65,7 +65,7 @@ public class InspcViewTargetComm
   private final GralTable<Object> widgTable;
 
 
-  private final GralButton wdgBtnLog;
+  private final GralButton wdgBtnLog, wdgBtnRetry, wdgBtnPerHandle;
 
   private GralColor colorInactive = GralColor.getColor("wh")
                   , colorIdle = GralColor.getColor("lgn")
@@ -76,7 +76,7 @@ public class InspcViewTargetComm
   public InspcViewTargetComm(InspcGui gui)
   { //inspcMng.addUserOrder(this);  //invoke run in any communication step.
     this.wind = new GralWindow("@primaryWindow,-21..0,-50..0", "InspcCtrlStatusWind", "State of targets", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
-    this.widgTable = new GralTable<Object>("@InspcCtrlStatusWind,3..-3,0..0=TargetTable", new int[]{3, 0,-6,-6});
+    this.widgTable = new GralTable<Object>("@InspcCtrlStatusWind,0..-3,0..0=TargetTable", new int[]{3, 0,-6,-6});
     this.widgTable.setColumnEditable(2,  true);
     this.widgTable.setColumnEditable(3,  true);
     //this.widgTable.setColumnEditable(2, true);
@@ -85,6 +85,14 @@ public class InspcViewTargetComm
     this.wdgBtnLog.setSwitchMode("? Log", "Log ?off");
     this.wdgBtnLog.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("am"));
     this.wdgBtnLog.specifyActionChange("switch log telg", gui.actionEnableLog, null);
+    this.wdgBtnRetry = new GralButton("@InspcCtrlStatusWind,-2..0,12..22=BtnRetry", "Retry", null);
+    this.wdgBtnRetry.setSwitchMode("? Retry", "Retry ?off");
+    this.wdgBtnRetry.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("am"));
+    this.wdgBtnRetry.specifyActionChange("retry variables", gui.actionSetRetryDisabledVariable, null);
+    this.wdgBtnPerHandle = new GralButton("@InspcCtrlStatusWind,-2..0,24..34=BtnLog", "Enable Log", null);
+    this.wdgBtnPerHandle.setSwitchMode("? use Handle", "use Handle ?off");
+    this.wdgBtnPerHandle.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
+    this.wdgBtnPerHandle.specifyActionChange("use handle", gui.actionUseGetValueByHandle, null);
   }
   
   

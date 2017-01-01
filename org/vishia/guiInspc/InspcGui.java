@@ -4,13 +4,9 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.byteData.VariableAccess_ifc;
-import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileRemote;
@@ -29,7 +25,6 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralColorSelector;
 import org.vishia.inspcPC.InspcAccess_ifc;
@@ -49,6 +44,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
   /**Version, history and license
    * <ul>
+   * <li>2016-12-30 Hartmut chg: The buttons for log, retry, get by handle are not part of {@link InspcViewTargetComm} 
    * <li>2016-01-24 Hartmut new: cmd line argument -cycle= for cycletime 
    * <li>2015-01-27 Hartmut new: Test {@link #actionGetValueByHandleIntern}
    * <li>2015-01-27 Hartmut new: Now initialized the {@link GralShowMethods} for usage on edit fields. An edit field
@@ -129,7 +125,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
   /**Action for button log. It switches on or off the logging functionality to log the telegram traffic
    * for debugging. */
-  GralUserAction actionUseGetValueByIndex = new GralUserAction("InspcGui - UseGetValueByIndex"){
+  GralUserAction actionUseGetValueByHandle = new GralUserAction("InspcGui - UseGetValueByIndex"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) { 
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         GralButton widgButton = (GralButton)widgd;
@@ -167,11 +163,6 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   
   LogMessage logTelg;
 
-  //GralButton btnSwitchOnLog;
-  final GralButton btnRetryDisableVariables = new GralButton(null, "retry variable", actionSetRetryDisabledVariable);
-
-  final GralButton btnUseGetByHandle = new GralButton(null, "get value by handle", actionUseGetValueByIndex);
-  
   static final GralColor colorRefreshed = GralColor.getColor("wh");
   static final GralColor colorOldValue = GralColor.getColor("lgr");
   
@@ -461,10 +452,6 @@ private class InspcGuiCfg extends GuiCfg
     super._gralMng.setPosition(5, GralPos.size -3, 0, GralPos.size +18 , 0, 'd',1);
     //btnSwitchOnLog = super._gralMng.addSwitchButton("log", "log telg ?", "log telg", GralColor.getColor("wh"), GralColor.getColor("am") );
     //btnSwitchOnLog.setActionChange(actionEnableLog);
-    btnRetryDisableVariables.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("am"));
-    btnRetryDisableVariables.setToPanel(super._gralMng);
-    btnUseGetByHandle.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
-    btnUseGetByHandle.setToPanel(super._gralMng);
     colorSelector = new GralColorSelector("colorSelector", super._gralMng);
     curveA.buildGraphic(gui.mainWindow(), colorSelector, null);
     curveB.buildGraphic(gui.mainWindow(), colorSelector, curveA.widgCurve.getCommonData());

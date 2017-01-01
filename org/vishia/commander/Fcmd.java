@@ -33,6 +33,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.msgDispatch.MsgRedirectConsole;
 import org.vishia.util.DataAccess;
+import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 import org.vishia.zcmd.JZcmd;
 
@@ -121,7 +122,7 @@ public class Fcmd extends GuiCfg
     public boolean userActionGui(String sIntension, GralWidget infos,
         Object... params)
     {
-      stop();
+      Debugutil.stop();
       return true;
     }
   };
@@ -313,9 +314,10 @@ public class Fcmd extends GuiCfg
     if (cmdBlock == null) {
       mainCmd.writeError("internal problem - don't find 'edit' command. ");
     } else {
-      File[] files = new File[3]; 
-      files[0] = file;
-      executer.cmdQueue.addCmd(cmdBlock, files, file.getParentFile()); // to execute.
+      List<DataAccess.Variable<Object>> args = new LinkedList< DataAccess.Variable<Object>>();
+      DataAccess.Variable<Object> var = new DataAccess.Variable<>('O', "file1", file, true);
+      args.add(var);
+      executer.cmdQueue.addCmd(cmdBlock, args, file.getParentFile()); // to execute.
     }
     
   }
@@ -354,7 +356,7 @@ public class Fcmd extends GuiCfg
         String[][] sFiles = (String[][])params[0];  //sFiles has lenght 1
         sFiles[0] = new String[1]; 
         sFiles[0][0] = path;
-        stop();
+        Debugutil.stop();
       }
       return true;
     }
@@ -369,25 +371,56 @@ public class Fcmd extends GuiCfg
    */
   protected CmdGetterArguments getterFileArguments = new CmdGetterArguments()
   {
-    @Override public Map<String, DataAccess.Variable<Object>> getArguments(CmdStore.CmdBlock cmd) {
+    @Override public List<DataAccess.Variable<Object>> getArguments(CmdStore.CmdBlock cmd) {
       FileRemote[] selFiles = getLastSelectedFiles(true, 1);  //The selected 3 files, maybe in one card too.
-      Map<String, DataAccess.Variable<Object>> args = new TreeMap<String, DataAccess.Variable<Object>>();
+      List<DataAccess.Variable<Object>> args = new LinkedList<DataAccess.Variable<Object>>();
       JZcmdScript.Subroutine subRoutine = cmd.getJZcmd();
       if(subRoutine !=null) {
         if(subRoutine.formalArgs !=null) {
-          try{
-            for(JZcmdScript.DefVariable arg :subRoutine.formalArgs){
-              String name1 = arg.getVariableIdent();
-              if(name1.equals("file1")){ DataAccess.createOrReplaceVariable(args, "file1", 'O', selFiles[0], true); }
-              else if(name1.equals("file2")){ DataAccess.createOrReplaceVariable(args, "file2", 'O',  selFiles[1], true); }
-              else if(name1.equals("file3")){ DataAccess.createOrReplaceVariable(args, "file3", 'O',  selFiles[2], true); }
-              else if(name1.equals("dir1")){ DataAccess.createOrReplaceVariable(args, "dir1", 'O', selFiles[0] ==null ? null : selFiles[0].getParentFile(), true); }
-              else if(name1.equals("dir2")){ DataAccess.createOrReplaceVariable(args, "dir2", 'O', selFiles[1] ==null ? null : selFiles[1].getParentFile(), true); }
-              else if(name1.equals("dir3")){ DataAccess.createOrReplaceVariable(args, "dir3", 'O', selFiles[2] ==null ? null : selFiles[2].getParentFile(), true); }
+          for(JZcmdScript.DefVariable arg :subRoutine.formalArgs){
+            String name1 = arg.getVariableIdent();
+            if(name1.equals("file1")){ args.add(new DataAccess.Variable<Object>('O', "file1", selFiles[0], true)); }
+            else if(name1.equals("file2")){ args.add(new DataAccess.Variable<Object>('O', "file2", selFiles[1], true)); }
+            else if(name1.equals("file3")){ args.add(new DataAccess.Variable<Object>('O', "file3", selFiles[2], true)); }
+            else if(name1.equals("dir1")){ args.add(new DataAccess.Variable<Object>('O', "dir1", selFiles[0] ==null ? null : selFiles[0].getParentFile(), true)); }
+            else if(name1.equals("dir2")){ 
+              FileRemote dir = null;
+              if(lastFilePanels.size() >=2){ 
+                FcmdFileCard fileCard = lastFilePanels.get(1).actFileCard;
+                if(fileCard !=null){ dir = fileCard.getCurrentDir(); }
+              }
+              args.add(new DataAccess.Variable<Object>('O', "dir2", dir, true)); 
+            } 
+            else if(name1.equals("dir3")){ 
+              FileRemote dir = null;
+              if(lastFilePanels.size() >=3){ 
+                FcmdFileCard fileCard = lastFilePanels.get(2).actFileCard;
+                if(fileCard !=null){ dir = fileCard.getCurrentDir(); }
+              }
+              args.add(new DataAccess.Variable<Object>('O', "dir3", dir, true)); 
+            } 
+            else if(name1.equals("listfiles1")) { 
+              List<FileRemote> files = null;
+              if(lastFilePanels.size() >=1){
+                FcmdLeftMidRightPanel filePanel = lastFilePanels.get(0);
+                FcmdFileCard fileCard = filePanel.actFileCard;
+                if(fileCard !=null){
+                  files = fileCard.getSelectedFiles(true, 1);   
+                }
+              }
+              args.add(new DataAccess.Variable<Object>('L', "listfiles1", files, true)); 
             }
-          } catch(IllegalAccessException exc){
-            //It is not able to expect that file1 etc. are not accessible.
-            throw new IllegalArgumentException(exc);
+            else if(name1.equals("listfiles2")) { 
+              List<FileRemote> files = null;
+              if(lastFilePanels.size() >=2){ 
+                FcmdFileCard fileCard = lastFilePanels.get(1).actFileCard;
+                if(fileCard !=null){ files = fileCard.getSelectedFiles(true, 1); }
+              }
+              args.add(new DataAccess.Variable<Object>('L', "listfiles2", files, true)); 
+            }
+            else {
+              System.err.println("failded argument name: " + name1);
+            }
           }
         }
       } else {
@@ -474,7 +507,7 @@ public class Fcmd extends GuiCfg
   /**The last selected file panels in its order of selection.
    * This list contains max 3 entries. 
    * To get the last selected files: The panel knows the last used file card there. 
-   * The selected file1, file2 are anytime in one and the other panel. */
+   */
   List<FcmdLeftMidRightPanel> lastFilePanels = new LinkedList<FcmdLeftMidRightPanel>();
   
   /**The last used favor card or its last used file card.
@@ -622,14 +655,15 @@ public class Fcmd extends GuiCfg
     } else {
       String sError;
       File fileCfg;
-      sError = FcmdExecuter.readCmdCfg(executer.cmdSelector.cmdStore, fileCfg = cargs.fileCfgCmds, console, executer.cmdQueue);
+      sError = FcmdExecuter.readCmdCfgSelectList(executer.cmdSelector.cmdStore, fileCfg = cargs.fileCfgCmds, console, executer.cmdQueue);
       if(sError !=null) {
         showInfoBox(sError);   
       } else {
         appendTextInfoBox("read config cmd");
       }
       if (sError == null) {
-        sError = executer.readCmdFile(fileCfg = cargs.fileCmdsForExt);
+        //sError = executer.readCmdFile(fileCfg = cargs.fileCmdsForExt);
+        sError = executer.readCfgExt(new File(cargs.dirCfg, "extjz.cfg"));
       }
       if (sError == null) {
         sError = JZcmd.readJZcmdCfg(buttonCmds, fileCfg = cargs.fileCfgButtonCmds, console, executer.cmdQueue);
@@ -922,20 +956,12 @@ public class Fcmd extends GuiCfg
   CmdGetFileArgs_ifc getterFiles = new CmdGetFileArgs_ifc()
   {
     
-    List<File>[] selectedFilesPerCard;
-    
-    
-    
-    /**
-     * 
-     */
     File[] selectedFiles;
 
     @Override
     public void prepareFileSelection()
     {
       selectedFiles = getLastSelectedFiles(true, 1); //  getCurrentFileInLastPanels();
-      selectedFilesPerCard = getLastSelectedFilesPerCard();
     }
 
     @Override
@@ -1022,8 +1048,5 @@ public class Fcmd extends GuiCfg
 
 
   
-  void stop()
-  {
-  }
 
 }

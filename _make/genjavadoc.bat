@@ -1,4 +1,4 @@
-
+echo off
 set DSTDIR=..\..\
 set DST=docuSrcJava_vishiaGui
 set DST_priv=docuSrcJavaPriv_vishiaGui
@@ -13,6 +13,7 @@ set SRC=-subpackages org.vishia
 
 ::set SRCPATH=..;..\..\srcJava_vishiaBase;..\..\srcJava_Zbnf;..\..\srcJava_vishiaRun
 set SRCPATH=..;..\..\..\ZBNF\sf\ZBNF\srcJava_vishiaBase;..\..\..\ZBNF\sf\ZBNF\srcJava_Zbnf;..\..\srcJava_vishiaRun
+set CLASSPATH=..\..\jar\org.eclipse.swt.win32.win32.x86_64.jar
 
 echo set linkpath
 set LINKPATH=

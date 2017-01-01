@@ -8,7 +8,6 @@ import org.vishia.communication.Address_InterProcessComm;
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InterProcessComm;
 import org.vishia.communication.InterProcessCommFactory;
-import org.vishia.communication.InterProcessCommFactoryAccessor;
 import org.vishia.mainCmd.Report;
 
 /**This class organizes the receiving of data from a automation device. An own thread is created.
