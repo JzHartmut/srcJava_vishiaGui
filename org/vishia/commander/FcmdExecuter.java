@@ -8,13 +8,9 @@ import java.util.TreeMap;
 
 import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
-import org.vishia.cmd.PrepareCmd;
 import org.vishia.cmd.JZcmdScript;
-import org.vishia.cmd.JZcmdScript.JZcmdClass;
-import org.vishia.cmd.JZcmdScript.Subroutine;
-import org.vishia.cmd.CmdStore.CmdBlock;
+import org.vishia.cmd.PrepareCmd;
 import org.vishia.fileRemote.FileRemote;
-import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWidget;
@@ -24,7 +20,6 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralCommandSelector;
-import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.DataAccess;
@@ -67,21 +62,6 @@ public class FcmdExecuter
   public static final String version = "2016-12-27";
 
 
-  static class ExtCmd
-  {
-    final String ext;
-    List<CmdBlock> listCmd = new LinkedList<CmdBlock>();
-    
-    
-    //GralMenu menuSelectExe;
-    
-    /**Creates with given extension. @param name the extension. It is the name from a {@link CmdBlock}. */
-    ExtCmd(String name){ this.ext = name; }
-  }
-  
-  
-  Map<String, ExtCmd> extCmds = new TreeMap<String, ExtCmd>();
-  
   
   
   /**For output messages. */
@@ -335,42 +315,6 @@ public class FcmdExecuter
   
   
 
-  /**Instance to execute any command selected in the 'ConfirmExec' sub window.
-   * The class's method is invoked if any line was selected.
-   */
-  GralUserAction actionExecCmdAfterChoice = new GralUserAction("actionExecCmdAfterChoice")
-  { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
-    { 
-      if(key == KeyCode.enter || key == KeyCode.mouse1Up || key == KeyCode.mouse1Double){
-        if(params.length > 0 && params[0] instanceof GralTableLine_ifc){
-          GralTableLine_ifc line = (GralTableLine_ifc)params[0];
-          CmdBlock cmd = (CmdBlock)line.getUserData();
-          ;
-          if(cmd !=null){
-            //PrepareCmd cmdp = cmd.getCmds().get(0);
-            if(cmd.name.startsWith(">")){
-              console.writeInfoln("FcmdExecuter - add cmd by extension;" + cmd.name);
-              cmdQueue.addCmd(cmd.name, null, main.currentDir(), '>');
-            } else {
-              //the extension determines the command.
-              console.writeInfoln("FcmdExecuter - add cmd by extension;" + cmd.name);
-              File[] files = main.getLastSelectedFiles(true, 1);
-              if(files[0] !=null) {
-                File currentDir = files[0].getParentFile();
-                cmdQueue.addCmd(cmd, files, currentDir);
-              } else {
-                System.err.println("FcmdExecute - no directory selected as current dir");
-              }
-            }
-          } else {
-            console.writeError("FcmdExecuter - cmd not found; ");
-          }
-        }
-        windConfirmExec.setWindowVisible(false);
-        return true;
-      } else return false;
-    }
-  };
   
   
   

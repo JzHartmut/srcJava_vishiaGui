@@ -130,7 +130,7 @@ public class GralCommandSelector extends GralSelectList<JZcmdScript.Subroutine>
     {
       String[] texts = new String[2]; 
       texts[0] = jzsub.name;
-      texts[1] = ">";
+      texts[1] = "";
       if(parentline !=null) {
         parentline.addChildLine(jzsub.name, texts, jzsub);
       } else {

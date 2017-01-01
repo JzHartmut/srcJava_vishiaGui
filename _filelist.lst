@@ -1,7 +1,7 @@
 2012-11-14 06:19:56  x     _bzrGetOtherCmpnVersions.bat             ::          1.582 -1370334435 
 2012-11-14 06:19:00  x     _bzrOtherCmpnVersions.txt                ::           .804 -0655352013 
 2012-02-04 19:35:44  x     _bzr_push_A.bat                          ::           . 51  0133533915 
-2017-01-01 20:44:31  x     _filelist.lst                            ::           .  0  0000000000 
+2017-01-01 21:10:45  x     _filelist.lst                            ::           .  0  0000000000 
 2012-06-09 22:09:50  x     revisions_srcJava_vishiaGUI.txt          ::         97.084 -0350105957 
 
 ============================== _cmpn/ =============================================================
@@ -53,7 +53,7 @@
 2017-01-01 20:35:24  x     FcmdDelete.java                          ::          8.094 -0108191033 
 2013-09-08 21:23:40  x     FcmdDocuSearch.java                      ::          1.167 -1869277279 
 2016-09-24 20:18:20  x     FcmdEdit.java                            ::          8.173  1073481531 
-2017-01-01 20:25:05  x     FcmdExecuter.java                        ::         17.664  1070364769 
+2017-01-01 20:58:11  x     FcmdExecuter.java                        ::         15.425  0972882135 
 2016-07-06 22:53:50  x     FcmdFavorCard.java                       ::         10.127 -0486442221 
 2016-11-27 21:22:27  x     FcmdFavorPathSelector.java               ::         28.580  0844804974 
 2016-12-23 19:04:52  x     FcmdFileCard.java                        ::         27.027 -1284862841 
@@ -250,7 +250,7 @@
 
 ============================== org/vishia/gral/widget/ =============================================
 2016-07-06 22:51:32  x     GralColorSelector.java                   ::          7.535 -0493836427 
-2017-01-01 20:42:33  x     GralCommandSelector.java                 ::          8.297 -2064065570 
+2017-01-01 21:00:35  x     GralCommandSelector.java                 ::          8.296 -2115426167 
 2013-10-05 22:11:28  x     GralFileSelectWindow.java                ::          8.250 -0095134759 
 2016-12-12 21:21:22  x     GralFileSelector.java                    ::         64.008 -0378438640 
 2016-09-30 23:40:46  x     GralHorizontalSelector.java              ::         10.729 -0416891030 
