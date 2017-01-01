@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.vishia.cmd.CmdGetFileArgs_ifc;
 import org.vishia.cmd.CmdGetterArguments;
-import org.vishia.cmd.CmdStore;
 import org.vishia.cmd.JZcmdScript;
 import org.vishia.cmd.JZcmdScript.JZcmdClass;
 import org.vishia.cmd.JZcmdScript.Subroutine;
@@ -30,7 +28,6 @@ import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
-import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralFileSelector;
@@ -322,7 +319,8 @@ public class Fcmd extends GuiCfg
       List<DataAccess.Variable<Object>> args = new LinkedList< DataAccess.Variable<Object>>();
       DataAccess.Variable<Object> var = new DataAccess.Variable<>('O', "file1", file, true);
       args.add(var);
-      executer.cmdQueue.addCmd(jzsub, args, file.getParentFile()); // to execute.
+      //executer.cmdQueue.addCmd(jzsub, args, file.getParentFile()); // to execute.
+      executer.cmdExecuter.addCmd(jzsub, args, Fcmd.this.gui.getOutputBox(), file.getParentFile());
     }
     
   }
@@ -344,7 +342,8 @@ public class Fcmd extends GuiCfg
           String sMsg = "GralCommandSelector - put cmd;" + jzsub.toString();
           System.out.println(sMsg);
           List<DataAccess.Variable<Object>> args = main.getterFileArguments.getArguments(jzsub);
-          executer.cmdQueue.addCmd(jzsub, args, Fcmd.this.currentFileCard.currentDir());  //to execute.
+          //executer.cmdQueue.addCmd(jzsub, args, Fcmd.this.currentFileCard.currentDir());  //to execute.
+          executer.cmdExecuter.addCmd(jzsub, args, Fcmd.this.gui.getOutputBox(), Fcmd.this.currentFileCard.currentDir());
         }
       }
       return true;
@@ -572,7 +571,7 @@ public class Fcmd extends GuiCfg
     
     target = new FcmdtTarget();  //create the target itself, one process TODO experience with remote target.
     buttonCmds = new TreeMap<String, JZcmdScript.Subroutine>();
-    executer.cmdQueue.setOutput(gui.getOutputBox(), null);
+    //executer.cmdQueue.setOutput(gui.getOutputBox(), null);
   }
 
   
@@ -675,7 +674,7 @@ public class Fcmd extends GuiCfg
     } else {
       String sError;
       File fileCfg;
-      sError = executer.readCmdCfgSelectList(executer.cmdSelector.addJZsub2SelectTable, fileCfg = cargs.fileCfgCmds, console, executer.cmdQueue);
+      sError = executer.readCmdCfgSelectList(executer.cmdSelector.addJZsub2SelectTable, fileCfg = cargs.fileCfgCmds, console);
       if(sError !=null) {
         showInfoBox(sError);   
       } else {
@@ -686,7 +685,7 @@ public class Fcmd extends GuiCfg
         sError = executer.readCfgExt(new File(cargs.dirCfg, "extjz.cfg"));
       }
       if (sError == null) {
-        sError = JZcmd.readJZcmdCfg(addButtonCmd, fileCfg = cargs.fileCfgButtonCmds, console, executer.cmdQueue);
+        sError = JZcmd.readJZcmdCfg(addButtonCmd, fileCfg = cargs.fileCfgButtonCmds, console, executer.cmdExecuter);
       }
       if (sError == null) {
         sError = favorPathSelector.readCfg(fileCfg = cargs.fileSelectTabPaths);
@@ -728,7 +727,8 @@ public class Fcmd extends GuiCfg
       
     };
     
-    executer.cmdQueue.execCmds(writeStatusCmd);
+    //executer.cmdQueue.execCmds(writeStatusCmd);
+    executer.cmdExecuter.executeCmdQueue(false);
     long time = System.currentTimeMillis();
     favorPathSelector.panelLeft.checkRefresh(time);
     favorPathSelector.panelMid.checkRefresh(time);
@@ -745,7 +745,7 @@ public class Fcmd extends GuiCfg
   @Override public void finishMain()
   { 
     try{
-      executer.cmdQueue.close();  //finishes threads.
+      executer.cmdExecuter.close();  //finishes threads.
       target.close();
       FileAccessorLocalJava7.getInstance().close();
     } catch(IOException exc){

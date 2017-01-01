@@ -3,8 +3,8 @@ package org.vishia.gral.widget;
 import java.io.File;
 import java.util.List;
 
+import org.vishia.cmd.CmdExecuter;
 import org.vishia.cmd.CmdGetterArguments;
-import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.JZcmdScript;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
@@ -15,8 +15,8 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 /**This class is a widget to select commands from a table list.
  * It can be used in any application in a window, which is opened on demand 
  * or which is open any time. The user can select a line with the command and click OK (Enter, Mouse).
- * Then the command is send to the instance of {@link CmdQueue} which is given by constructor
- * and executed there in the thread of the {@link CmdQueue}. It is possible to share the CmdQueue-instance
+ * Then the command is send to the instance of {@link CmdExecuter} which is given by constructor
+ * and executed there in the thread of the {@link CmdExecuter}. It is possible to share the CmdQueue-instance
  * with some other application parts. The execution is queued there.
  * 
  * The commands are shown in a table. The appearance of the table can be controlled by the application
@@ -72,7 +72,8 @@ public class GralCommandSelector extends GralSelectList<JZcmdScript.Subroutine>
   //public final CmdStore cmdStore;
   
   /**Execution instance in another thread. */
-  protected final CmdQueue cmdQueue;
+  //protected final CmdQueue cmdQueue;
+  protected final CmdExecuter cmdExecuter;
   
  /**
    * @since 2016-12
@@ -85,10 +86,14 @@ public class GralCommandSelector extends GralSelectList<JZcmdScript.Subroutine>
   protected JZcmdScript.Subroutine selectedCmd;
   
   
-  public GralCommandSelector(String name, int rows, int[] columns, char size, CmdQueue cmdQueue, CmdGetterArguments getterArguments)
+  final Appendable out;
+  
+  public GralCommandSelector(String name, int rows, int[] columns, char size, CmdExecuter cmdExecuter, Appendable out, CmdGetterArguments getterArguments)
   { super(name, rows, columns, size);
+    this.cmdExecuter = cmdExecuter;
+    this.out = out;
     //this.cmdStore = new CmdStore();
-    this.cmdQueue = cmdQueue;
+    //this.cmdQueue = cmdQueue;
     this.getterArguments = getterArguments;
    
   }
@@ -179,7 +184,7 @@ public class GralCommandSelector extends GralSelectList<JZcmdScript.Subroutine>
     String sMsg = "GralCommandSelector - put cmd;" + jzsub.toString();
     System.out.println(sMsg);
     List<DataAccess.Variable<Object>> args = getterArguments.getArguments(jzsub);
-    cmdQueue.addCmd(jzsub, args, getterArguments.getCurrDir());  //to execute.
+    cmdExecuter.addCmd(jzsub, args, out, getterArguments.getCurrDir());  //to execute.
     /*
     }
     else {

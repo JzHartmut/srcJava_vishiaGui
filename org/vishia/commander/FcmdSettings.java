@@ -2,7 +2,6 @@ package org.vishia.commander;
 
 import java.io.File;
 
-import org.vishia.cmd.CmdStore;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
@@ -12,9 +11,7 @@ import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
-import org.vishia.zcmd.JZcmd;
 
 public class FcmdSettings
 {
@@ -210,7 +207,7 @@ public class FcmdSettings
       if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         String sFileCfg = ((GralWidget)widg).getCmd();
         main.executer.cmdSelector.clear();
-        String sError = main.executer.readCmdCfgSelectList(main.executer.cmdSelector.addJZsub2SelectTable, new File(main.cargs.dirCfg, sFileCfg), main.console, main.executer.cmdQueue);
+        String sError = main.executer.readCmdCfgSelectList(main.executer.cmdSelector.addJZsub2SelectTable, new File(main.cargs.dirCfg, sFileCfg), main.console);
         if(sError != null) {
           main.showInfoBox(sError);
           widgOkError.setText("error");

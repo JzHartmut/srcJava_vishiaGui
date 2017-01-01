@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.vishia.cmd.CmdQueue;
+import org.vishia.cmd.CmdExecuter;
 import org.vishia.cmd.CmdStore;
+import org.vishia.cmd.JZcmdExecuter;
 import org.vishia.cmd.JZcmdScript;
 import org.vishia.cmd.PrepareCmd;
 import org.vishia.fileRemote.FileRemote;
@@ -31,6 +32,7 @@ public class FcmdExecuter
   
   /**Version, history and license. This String is visible in the about info.
    * <ul>
+   * <li>2017-01-01 Hartmut uses {@link JZcmdExecuter} and {@link CmdExecuter}. CmdQueue and CmdStore are obsolete. 
    * <li>2016-08-28 Hartmut chg: The cfg file for jzcmd commands are named cmdjz.cfg anyway, in the directory given with cmdcfg:path/to/cmd.cfg. 
    * <li>2011-10-00 Hartmut created
    * </ul>
@@ -83,11 +85,12 @@ public class FcmdExecuter
   final Map<String, List<JZcmdScript.Subroutine>> mapCmdExt = new TreeMap<String, List<JZcmdScript.Subroutine>>();
   
   /**The command queue to execute */
-  final CmdQueue cmdQueue;
+  
+  final CmdExecuter cmdExecuter;
 
   /**Table contains some commands, can be selected and executed.
    * <ul>
-   * <li>The table is filled in {@link #readCmdCfgSelectList(CmdStore, File, MainCmdLogging_ifc, CmdQueue)}. 
+   * <li>The table is filled in {@link #readCmdCfgSelectList(CmdStore, File, MainCmdLogging_ifc)}. 
    * <li>Commands can be either operation system commands or c {@link JZcmdScript.Subroutine} entry point. 
    * They are stored in the list in user data of type {@link CmdBlock}.
    * <li>Execution of a command: see {@link GralCommandSelector#actionExecCmdWithFiles} respectively GralCommandSelector#actionOk(...)
@@ -103,8 +106,9 @@ public class FcmdExecuter
   FcmdExecuter(MainCmd_ifc console, Appendable outStatus, Fcmd main)
   { this.main = main;
     this.console = console;
-    this.cmdQueue = new CmdQueue(outStatus);
-    cmdSelector = new GralCommandSelector("cmdSelector", 5, new int[]{0,-10}, 'A', cmdQueue, main.getterFileArguments);
+    //this.cmdQueue = new CmdQueue(outStatus);
+    this.cmdExecuter = new CmdExecuter();
+    cmdSelector = new GralCommandSelector("cmdSelector", 5, new int[]{0,-10}, 'A', cmdExecuter, main.gui.getOutputBox(), main.getterFileArguments);
   }
   
   
@@ -151,9 +155,9 @@ public class FcmdExecuter
   }
   
   
-  public String readCmdCfgSelectList(JZcmdScript.AddSub2List dst, File cfgFile, MainCmdLogging_ifc log, CmdQueue executerToInit)
+  public String readCmdCfgSelectList(JZcmdScript.AddSub2List dst, File cfgFile, MainCmdLogging_ifc log)
   { File cmdCfgJbat = new File(cfgFile.getParentFile(), "cmdjz.cfg");
-    return JZcmd.readJZcmdCfg(dst, cmdCfgJbat, log, executerToInit);
+    return JZcmd.readJZcmdCfg(dst, cmdCfgJbat, log, cmdExecuter);
   }  
 
   
@@ -166,7 +170,7 @@ public class FcmdExecuter
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     {
-      GralWidget widgdFocus = main._gralMng.getWidgetInFocus();
+      //GralWidget widgdFocus = main._gralMng.getWidgetInFocus();
       //FileSelector fileSel = idxFileSelector.get(widgdFocus.name);
       if (main.currentDir() != null) { // is a FileSelector focused yet?
         // if(widgdFocus.name.startsWith("file")){
@@ -175,7 +179,8 @@ public class FcmdExecuter
         // such names are registered.
         // FileSelector fileSel = fileSelector[ixFilePanel];
         //FileRemote file = fileSel.getSelectedFile();
-        cmdQueue.setWorkingDir(main.currentDir());
+        //cmdQueue.setWorkingDir(main.currentDir());
+        cmdExecuter.setCurrentDir(main.currentDir());
       }
       return true;
     }
@@ -194,7 +199,7 @@ public class FcmdExecuter
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if (main.currentFile() != null) {
           cmdSelector.clear();
-          String sError = readCmdCfgSelectList(cmdSelector.addJZsub2SelectTable, main.currentFile(), main.console, main.executer.cmdQueue);
+          String sError = readCmdCfgSelectList(cmdSelector.addJZsub2SelectTable, main.currentFile(), main.console);
           if(sError !=null) {
             System.err.println("readCmdCfg; from file " + main.cargs.fileCfgButtonCmds.getAbsolutePath()+ "; error: " + sError);
           }
@@ -213,7 +218,7 @@ public class FcmdExecuter
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         cmdSelector.clear();
-        String sError = readCmdCfgSelectList(cmdSelector.addJZsub2SelectTable, main.cargs.fileCfgCmds, console, main.executer.cmdQueue);
+        String sError = readCmdCfgSelectList(cmdSelector.addJZsub2SelectTable, main.cargs.fileCfgCmds, console);
         if(sError !=null){
           System.err.println("readCmdCfg; from file " + main.cargs.fileCfgButtonCmds.getAbsolutePath()+ "; error: " + sError);
         }
@@ -332,7 +337,7 @@ public class FcmdExecuter
           List<DataAccess.Variable<Object>> args = new LinkedList<DataAccess.Variable<Object>>();
           DataAccess.Variable<Object> var = new DataAccess.Variable<Object>('F', "file1", files[0], true);
           args.add(var);
-          cmdQueue.addCmd(jzsub, args, main.currentDir());
+          cmdExecuter.addCmd(jzsub, args, main.gui.getOutputBox(), main.currentDir());
         } else {
           console.writeError("FcmdExecuter - cmd not found; ");
         }
@@ -373,11 +378,12 @@ public class FcmdExecuter
           for(File fileName: main.selectedFiles123){
             if(fileName !=null){
               if(fileName !=null ){ files[++ix] = fileName; }
-              else { files[++ix] = new File(fileName.getParent() + "/" + fileName.getName()); }
+             // else { files[++ix] = new File(fileName.getParent() + "/" + fileName.getName()); }
             }
           }
         } else { files = null; }
-        cmdQueue.addCmd(sCmd, files, currentDir, kindOfExecution);
+        //cmdQueue.addCmd(sCmd, files, currentDir, kindOfExecution);
+        cmdExecuter.addCmd(sCmd, null, main.gui.getOutputBox(), currentDir, null);
         return true;
       } else return false;
     }
@@ -389,7 +395,8 @@ public class FcmdExecuter
    */
   GralUserAction actionCmdAbort = new GralUserAction("actionCmdAbort")
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
-    { cmdQueue.abortCmd();
+    { //cmdQueue.abortCmd();
+      cmdExecuter.abortAllCmds();
       return true;
     }
   };
