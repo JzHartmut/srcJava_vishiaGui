@@ -14,6 +14,8 @@ import org.vishia.cmd.CmdGetFileArgs_ifc;
 import org.vishia.cmd.CmdGetterArguments;
 import org.vishia.cmd.CmdStore;
 import org.vishia.cmd.JZcmdScript;
+import org.vishia.cmd.JZcmdScript.JZcmdClass;
+import org.vishia.cmd.JZcmdScript.Subroutine;
 import org.vishia.commander.target.FcmdtTarget;
 import org.vishia.commander.target.FcmdtTarget_ifc;
 import org.vishia.communication.InterProcessCommFactorySocket;
@@ -28,6 +30,7 @@ import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
+import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralFileSelector;
@@ -310,14 +313,16 @@ public class Fcmd extends GuiCfg
   
   
   void openExtEditor(File file){
-    CmdStore.CmdBlock cmdBlock = buttonCmds.getCmd("edit");
-    if (cmdBlock == null) {
+    JZcmdScript.Subroutine jzsub = buttonCmds.get("edit");
+    if( jzsub == null ) {
       mainCmd.writeError("internal problem - don't find 'edit' command. ");
     } else {
+      String sMsg = "GralCommandSelector - put cmd;" + jzsub.toString();
+      System.out.println(sMsg);
       List<DataAccess.Variable<Object>> args = new LinkedList< DataAccess.Variable<Object>>();
       DataAccess.Variable<Object> var = new DataAccess.Variable<>('O', "file1", file, true);
       args.add(var);
-      executer.cmdQueue.addCmd(cmdBlock, args, file.getParentFile()); // to execute.
+      executer.cmdQueue.addCmd(jzsub, args, file.getParentFile()); // to execute.
     }
     
   }
@@ -331,14 +336,15 @@ public class Fcmd extends GuiCfg
   {
     @Override public boolean exec(int key, GralWidget_ifc wdg, Object... params) {
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-        CmdStore.CmdBlock cmdBlock = buttonCmds.getCmd("edit");
-        if (cmdBlock == null) {
+        JZcmdScript.Subroutine jzsub = buttonCmds.get("edit");
+        if (jzsub == null) {
           mainCmd.writeError("internal problem - don't find 'edit' command. ");
         } else {
         
-          String sMsg = "GralCommandSelector - put cmd;" + cmdBlock.toString();
+          String sMsg = "GralCommandSelector - put cmd;" + jzsub.toString();
           System.out.println(sMsg);
-          executer.cmdQueue.addCmd(cmdBlock, main.getterFileArguments);  //to execute.
+          List<DataAccess.Variable<Object>> args = main.getterFileArguments.getArguments(jzsub);
+          executer.cmdQueue.addCmd(jzsub, args, Fcmd.this.currentFileCard.currentDir());  //to execute.
         }
       }
       return true;
@@ -371,10 +377,9 @@ public class Fcmd extends GuiCfg
    */
   protected CmdGetterArguments getterFileArguments = new CmdGetterArguments()
   {
-    @Override public List<DataAccess.Variable<Object>> getArguments(CmdStore.CmdBlock cmd) {
+    @Override public List<DataAccess.Variable<Object>> getArguments(JZcmdScript.Subroutine subRoutine) {
       FileRemote[] selFiles = getLastSelectedFiles(true, 1);  //The selected 3 files, maybe in one card too.
       List<DataAccess.Variable<Object>> args = new LinkedList<DataAccess.Variable<Object>>();
-      JZcmdScript.Subroutine subRoutine = cmd.getJZcmd();
       if(subRoutine !=null) {
         if(subRoutine.formalArgs !=null) {
           for(JZcmdScript.DefVariable arg :subRoutine.formalArgs){
@@ -440,6 +445,22 @@ public class Fcmd extends GuiCfg
   { Fcmd.main = this;
   }
   
+  
+  public JZcmdScript.AddSub2List addButtonCmd = new JZcmdScript.AddSub2List() {
+
+
+    @Override public void clear() { buttonCmds.clear(); }
+
+    @Override public void add2List(JZcmdClass jzclass, int level){} //not used
+  
+    @Override public void add2List(Subroutine jzsub, int level)
+    {
+      buttonCmds.put(jzsub.name, jzsub);
+    }
+    
+  };
+  
+
   
   final CallingArgs cargs;
   
@@ -527,7 +548,7 @@ public class Fcmd extends GuiCfg
    * The commands which are used for some buttons or menu items from the
    * JavaCommander itself.
    */
-  final CmdStore buttonCmds;
+  final Map<String, JZcmdScript.Subroutine> buttonCmds;
 
   
   final List<Closeable> threadsToClose = new LinkedList<Closeable>();
@@ -550,7 +571,7 @@ public class Fcmd extends GuiCfg
     actionReadMsgConfig.exec(KeyCode.menuEntered, null);
     
     target = new FcmdtTarget();  //create the target itself, one process TODO experience with remote target.
-    buttonCmds = new CmdStore();
+    buttonCmds = new TreeMap<String, JZcmdScript.Subroutine>();
     executer.cmdQueue.setOutput(gui.getOutputBox(), null);
   }
 
@@ -622,8 +643,7 @@ public class Fcmd extends GuiCfg
     menu.addMenuItem("MenuCommandAbort", "&Command/&Abort", executer.actionCmdAbort); // /
     // gui.addMenuItemGThread("&Command/E&xecute", actionSetCmdCurrentDir); ///
     menu.addMenuItem("MenuCmdCfgSet", "&Command/CmdCf&g - read current file", executer.actionSetCmdCfg); // /
-    menu.addMenuItem("menuReadCmdiCfg", "&Command/&ExtCfg - read cfg file", executer.actionReadExtensionCmd);
-
+    
     menu.addMenuItem("menuHelp", idents.menuHelpBar, gui.getActionHelp());
     menu.addMenuItem("menuAbout", idents.menuBarAbout, gui.getActionAbout());
     menu.addMenuItem("MenuTestInfo", "&Help/&Infobox", actionTest); 
@@ -655,7 +675,7 @@ public class Fcmd extends GuiCfg
     } else {
       String sError;
       File fileCfg;
-      sError = FcmdExecuter.readCmdCfgSelectList(executer.cmdSelector.cmdStore, fileCfg = cargs.fileCfgCmds, console, executer.cmdQueue);
+      sError = executer.readCmdCfgSelectList(executer.cmdSelector.addJZsub2SelectTable, fileCfg = cargs.fileCfgCmds, console, executer.cmdQueue);
       if(sError !=null) {
         showInfoBox(sError);   
       } else {
@@ -666,7 +686,7 @@ public class Fcmd extends GuiCfg
         sError = executer.readCfgExt(new File(cargs.dirCfg, "extjz.cfg"));
       }
       if (sError == null) {
-        sError = JZcmd.readJZcmdCfg(buttonCmds, fileCfg = cargs.fileCfgButtonCmds, console, executer.cmdQueue);
+        sError = JZcmd.readJZcmdCfg(addButtonCmd, fileCfg = cargs.fileCfgButtonCmds, console, executer.cmdQueue);
       }
       if (sError == null) {
         sError = favorPathSelector.readCfg(fileCfg = cargs.fileSelectTabPaths);
@@ -949,46 +969,6 @@ public class Fcmd extends GuiCfg
 
   } // class MainCmd
 
-  /**
-   * Instance to get three selected files for some command line invocations.
-   * 
-   */
-  CmdGetFileArgs_ifc getterFiles = new CmdGetFileArgs_ifc()
-  {
-    
-    File[] selectedFiles;
-
-    @Override
-    public void prepareFileSelection()
-    {
-      selectedFiles = getLastSelectedFiles(true, 1); //  getCurrentFileInLastPanels();
-    }
-
-    @Override
-    public File getFileSelect()
-    {
-      return selectedFiles[0];
-    }
-
-    @Override
-    public File getFile1()
-    { if(selectedFiles !=null && selectedFiles.length >0) return selectedFiles[0];
-      else return null;
-    }
-
-    @Override
-    public File getFile2()
-    { if(selectedFiles.length >1) return selectedFiles[1];
-      else return null;
-    }
-
-    @Override
-    public File getFile3()
-    { if(selectedFiles.length >2) return selectedFiles[2];
-      else return null;
-    }
-
-  };
 
   static void testT1()
   {

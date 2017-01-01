@@ -183,11 +183,15 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
       Object data = line.getUserData();
       //int keyCode = (Integer)params[1];
       boolean done = true;
-      if(keyCode == keyLeft){ actionLeft(data, line); }
-      else if(keyCode == keyRight){ actionRight(data, line); }
-      else if(keyCode == KeyCode.enter){ done = actionOk(data, line); }
-      else if(keyCode == KeyCode.mouse1Double){ done = actionOk(data, line); }
-      else { done = actionUserKey(keyCode, data, line); }
+      if(data !=null) {
+        if(keyCode == keyLeft){ actionLeft(data, line); }
+        else if(keyCode == keyRight){ actionRight(data, line); }
+        else if(keyCode == KeyCode.enter){ done = actionOk(data, line); }
+        else if(keyCode == KeyCode.mouse1Double){ done = actionOk(data, line); }
+        else { done = actionUserKey(keyCode, data, line); }
+      } else {
+        done = false;
+      }
       return done;
     }
     

@@ -131,8 +131,6 @@ public class FcmdLeftMidRightPanel
       tabbedPanelFileCards.addGridPanel("cmd", "Cmd",1,1,10,10);
       mng.setPosition(2, -2, 0, -0, 1, 'd');
       main.executer.cmdSelector.setToPanel(mng);
-      main.executer.cmdSelector.fillIn();
-      main.executer.cmdSelector.setGetterFiles(main.getterFiles);
     }
     
   }

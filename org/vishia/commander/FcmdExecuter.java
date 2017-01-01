@@ -10,6 +10,8 @@ import org.vishia.cmd.CmdQueue;
 import org.vishia.cmd.CmdStore;
 import org.vishia.cmd.PrepareCmd;
 import org.vishia.cmd.JZcmdScript;
+import org.vishia.cmd.JZcmdScript.JZcmdClass;
+import org.vishia.cmd.JZcmdScript.Subroutine;
 import org.vishia.cmd.CmdStore.CmdBlock;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralMenu;
@@ -96,10 +98,7 @@ public class FcmdExecuter
   GralTable<JZcmdScript.Subroutine> widgSelectJzExt = new GralTable<>("0..0,0..0", "execChoice", new int[]{47});
 
   /**Store of all possible commands given in the command file. */
-  final CmdStore cmdStore = new CmdStore();
-  
-  /**Store of all possible commands given in the command file. */
-  final CmdStore cmdStoreExt = new CmdStore();
+  //final CmdStore cmdStore = new CmdStore();
   
   final Map<String, List<JZcmdScript.Subroutine>> mapCmdExt = new TreeMap<String, List<JZcmdScript.Subroutine>>();
   
@@ -142,25 +141,6 @@ public class FcmdExecuter
   }  
   
   
-  String readCmdFile(File cfgFileCmdsForExt)
-  {
-    String error = readCmdCfg(cmdStore, cfgFileCmdsForExt, console, main.executer.cmdQueue);
-    if(error == null){
-      //fill in the extension - cmd - assignments
-      extCmds.clear();
-      for(CmdBlock cmd: cmdStore.getListCmds()){
-        ExtCmd extCmd = extCmds.get(cmd.name);
-        if(extCmd == null){ 
-          extCmd = new ExtCmd(cmd.name);   //create firstly
-          extCmds.put(cmd.name, extCmd);
-        }
-        extCmd.listCmd.add(cmd);
-      }
-    }
-    return error;
-  }
-  
-
   
   
   String readCfgExt(File cfgFileCmdsForExt)
@@ -191,59 +171,11 @@ public class FcmdExecuter
   }
   
   
-  public static String readCmdCfgSelectList(CmdStore dst, File cfgFile, MainCmdLogging_ifc log, CmdQueue executerToInit)
+  public String readCmdCfgSelectList(JZcmdScript.AddSub2List dst, File cfgFile, MainCmdLogging_ifc log, CmdQueue executerToInit)
   { File cmdCfgJbat = new File(cfgFile.getParentFile(), "cmdjz.cfg");
     return JZcmd.readJZcmdCfg(dst, cmdCfgJbat, log, executerToInit);
   }  
 
-  
-  public static String readCmdCfg(CmdStore dst, File cfgFile, MainCmdLogging_ifc log, CmdQueue executerToInit)
-  { String error = dst.readCmdCfgOld(cfgFile);
-    if(false && error ==null){
-      File cmdCfgJbat = new File(cfgFile.getParentFile(), "cmdjz.cfg");
-      error = JZcmd.readJZcmdCfg(dst, cmdCfgJbat, log, executerToInit);
-    }
-    return error;
-  }  
-  
-
-  
-  
-  /*
-  boolean actionExecuteUserKey(int keyCode, FileRemote file)
-  {
-    
-    final char kindOfExecution = checkKeyOfExecution(keyCode);
-    
-    if(kindOfExecution !=0){
-      String ext;
-      String name = file.getName();
-      int posDot = name.lastIndexOf('.');
-      if(posDot > 0){
-        ext = name.substring(posDot+1);
-      } else if(file.canExecute()){
-        ext = ">";
-      } else {
-        ext = "???";
-      }
-      ExtCmd extensionCmd = extCmds.get(ext);
-      if(extensionCmd !=null){
-        widgSelectExec.clearTable();
-        for(CmdBlock block: extensionCmd.listCmd){
-          GralTableLine_ifc<CmdBlock> line = widgSelectExec.insertLine(block.name, 0, null, block);
-          line.setCellText(block.title, 0);
-        }
-        widgSelectExec.setCurrentLine(extensionCmd.listCmd.get(0).name);
-        windConfirmExec.setFocus();
-      } else {
-        console.writeError("no association found for extension ." + ext);
-      }
-      
-    } else{ 
-    }
-    return kindOfExecution != 0;
-  }
-  */
   
   /**
    * Action to set the working directory for the next command invocation. The
@@ -281,11 +213,9 @@ public class FcmdExecuter
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if (main.currentFile() != null) {
-          cmdSelector.cmdStore.clear();
-          String sError = readCmdCfgSelectList(cmdSelector.cmdStore, main.currentFile(), main.console, main.executer.cmdQueue);
-          if(sError ==null){
-            cmdSelector.fillIn();
-          } else {
+          cmdSelector.clear();
+          String sError = readCmdCfgSelectList(cmdSelector.addJZsub2SelectTable, main.currentFile(), main.console, main.executer.cmdQueue);
+          if(sError !=null) {
             System.err.println("readCmdCfg; from file " + main.cargs.fileCfgButtonCmds.getAbsolutePath()+ "; error: " + sError);
           }
         }
@@ -302,11 +232,9 @@ public class FcmdExecuter
   GralUserAction actionSetCmdCfgAct = new GralUserAction("actionSetCmdCfgAct") { 
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        cmdSelector.cmdStore.clear();
-        String sError = readCmdCfgSelectList(cmdSelector.cmdStore, main.cargs.fileCfgCmds, console, main.executer.cmdQueue);
-        if(sError ==null){
-          cmdSelector.fillIn();
-        } else {
+        cmdSelector.clear();
+        String sError = readCmdCfgSelectList(cmdSelector.addJZsub2SelectTable, main.cargs.fileCfgCmds, console, main.executer.cmdQueue);
+        if(sError !=null){
           System.err.println("readCmdCfg; from file " + main.cargs.fileCfgButtonCmds.getAbsolutePath()+ "; error: " + sError);
         }
       }
@@ -329,17 +257,6 @@ public class FcmdExecuter
   };
 
 
-  
-  
-  /**User action to re-read the configuration file for extension assignments.
-   */
-  GralUserAction actionReadExtensionCmd = new GralUserAction("actionReadExtensionCmd")
-  { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
-    { readCmdFile(main.cargs.fileCmdsForExt);
-      return true;
-    }
-  };
-  
 
   
   private void executeFileByExtension(File file){

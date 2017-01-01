@@ -1,21 +1,16 @@
 package org.vishia.gral.widget;
 
 import java.io.File;
-import java.util.Map;
+import java.util.List;
 
-import org.vishia.cmd.CmdGetFileArgs_ifc;
 import org.vishia.cmd.CmdGetterArguments;
 import org.vishia.cmd.CmdQueue;
-import org.vishia.cmd.CmdStore;
-import org.vishia.cmd.JZcmdExecuter;
 import org.vishia.cmd.JZcmdScript;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
-import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.util.DataAccess;
+import org.vishia.gral.ifc.GralTableLine_ifc;
 
 /**This class is a widget to select commands from a table list.
  * It can be used in any application in a window, which is opened on demand 
@@ -34,22 +29,52 @@ import org.vishia.util.DataAccess;
  * @author Hartmut Schorrig
  *
  */
-public class GralCommandSelector extends GralSelectList<CmdStore.CmdBlock>
+public class GralCommandSelector extends GralSelectList<JZcmdScript.Subroutine>
 {
+  
+  
+  /**Version, history and license. This String is visible in the about info.
+   * <ul>
+   * <li>2017-01-01 Now supports only {@link JZcmdScript.Subroutine}, no more CmdStore. 
+   *   The CmdStore is the older concept before JZcmd was found. JZcmd contains more capabilities.
+   * <li>2013-10-00 Hartmut created
+   * </ul>
+   * 
+   * <b>Copyright/Copyleft</b>:<br>
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL is not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but doesn't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you intent to use this source without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   */
+  //@SuppressWarnings("hiding")
+  public static final String version = "2016-12-27";
+
 
   /**Store of all possible commands given in the command file. 
    * See {@link CmdStore#readCmdCfg(File)} */
-  public final CmdStore cmdStore;
+  //public final CmdStore cmdStore;
   
   /**Execution instance in another thread. */
   protected final CmdQueue cmdQueue;
   
-  /**This is an agent which gets some files in the application, controlled by this class.
-   * Depending on the commmand several files should be provided.
-   */
-  protected CmdGetFileArgs_ifc getterFiles;
-  
-  /**
+ /**
    * @since 2016-12
    */
   protected final CmdGetterArguments getterArguments;
@@ -57,12 +82,12 @@ public class GralCommandSelector extends GralSelectList<CmdStore.CmdBlock>
   /**The currently selected command.
    * 
    */
-  protected CmdStore.CmdBlock selectedCmd;
+  protected JZcmdScript.Subroutine selectedCmd;
   
   
   public GralCommandSelector(String name, int rows, int[] columns, char size, CmdQueue cmdQueue, CmdGetterArguments getterArguments)
   { super(name, rows, columns, size);
-    this.cmdStore = new CmdStore();
+    //this.cmdStore = new CmdStore();
     this.cmdQueue = cmdQueue;
     this.getterArguments = getterArguments;
    
@@ -76,54 +101,51 @@ public class GralCommandSelector extends GralSelectList<CmdStore.CmdBlock>
   }
 
   
-  /**Sets the interface, which is able to get file arguments.
-   * The interface depends on the application, which may provide some file arguments 
-   * for a command to execute. The file arguments may depend on the state of the application
-   * (currently selected files etc. ). 
-   * This interface is valid for the next commands which will be invoke. It can be changed anytime.
-   * 
-   * @param getterFiles Implementation of the named interface in the application.
-   */
-  public void setGetterFiles(CmdGetFileArgs_ifc getterFiles)
-  {
-    this.getterFiles = getterFiles;
-  }
   
   
-  public void fillIn()
-  {
-    wdgdTable.clearTable();
+  public void clear() { wdgdTable.clearTable(); addJZsub2SelectTable.clear(); }
+  
+  
+  
+  public JZcmdScript.AddSub2List addJZsub2SelectTable = new JZcmdScript.AddSub2List() {
+
     int level = 1;
-    GralTableLine_ifc<CmdStore.CmdBlock> parentline = null, line = null;
-    for(CmdStore.CmdBlock data: cmdStore.getListCmds()){
-      if(data.level > level){
-        parentline = line;
-      }
-      level = data.level;
-      if(data.level == 1 || line == null){
-        line = wdgdTable.addLine(data.name, null, data);
-        line.setCellText(data.name, 0);
-        line.setCellText(data.title, 1);
-      } else if(data.level < level){
-        GralTableLine_ifc<CmdStore.CmdBlock> parent = line.parentNode();
-        if(parent !=null){ line = parent;}
-        line = wdgdTable.addLine(data.name, null, data);
-        line.setCellText(data.name, 0);
-        line.setCellText(data.title, 1);
-      } else {  //level >=2
-        line = parentline.addChildLine(data.name, null, data);
-        line.setCellText(data.name, 0);
-        line.setCellText(data.title, 1);
-      }
+    GralTableLine_ifc<JZcmdScript.Subroutine> parentline = null, line = null;
+
+    @Override public void clear()
+    { parentline = null; line = null;
     }
-    wdgdTable.repaint();
-  }
+
+    @Override
+    public void add2List(JZcmdScript.JZcmdClass jzclass, int level)
+    { String[] texts = new String[2]; 
+      texts[0] = jzclass.cmpnName;
+      texts[1] = "+";
+      parentline = wdgdTable.addLine(jzclass.cmpnName, texts, null);
+      
+    }
+
+    @Override
+    public void add2List(JZcmdScript.Subroutine jzsub, int level)
+    {
+      String[] texts = new String[2]; 
+      texts[0] = jzsub.name;
+      texts[1] = ">";
+      if(parentline !=null) {
+        parentline.addChildLine(jzsub.name, texts, jzsub);
+      } else {
+        wdgdTable.addLine(jzsub.name, texts, jzsub);
+      }
+      
+    }
+    
+  };
   
   
   
   
   /**Returns the currently selected command. */
-  public CmdStore.CmdBlock getCurrCmd(){ return selectedCmd; }
+  public JZcmdScript.Subroutine getCurrCmd(){ return selectedCmd; }
   
   
   
@@ -147,16 +169,17 @@ public class GralCommandSelector extends GralSelectList<CmdStore.CmdBlock>
    * @param line isn't used here. It can be null in direct invocations.  
    * @see org.vishia.gral.widget.GralSelectList#actionOk(java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
    */
-  @Override protected boolean actionOk(Object userData, GralTableLine_ifc<CmdStore.CmdBlock> line)
+  @Override protected boolean actionOk(Object userData, GralTableLine_ifc<JZcmdScript.Subroutine> line)
   {
-    CmdStore.CmdBlock cmdBlock = (CmdStore.CmdBlock)userData;
+    JZcmdScript.Subroutine jzsub = (JZcmdScript.Subroutine)userData;
     //Map<String, DataAccess.Variable<Object>> jargs = getterArguments.getArguments(cmdBlock.)//cmdBlock.getArguments(getterFiles);
     //File currFile = getterArguments.getCurrDir();
     
     //File currDir = currFile !=null? currFile.getParentFile(): null;
-    String sMsg = "GralCommandSelector - put cmd;" + cmdBlock.toString();
+    String sMsg = "GralCommandSelector - put cmd;" + jzsub.toString();
     System.out.println(sMsg);
-    cmdQueue.addCmd(cmdBlock, getterArguments);  //to execute.
+    List<DataAccess.Variable<Object>> args = getterArguments.getArguments(jzsub);
+    cmdQueue.addCmd(jzsub, args, getterArguments.getCurrDir());  //to execute.
     /*
     }
     else {
@@ -202,9 +225,10 @@ public class GralCommandSelector extends GralSelectList<CmdStore.CmdBlock>
   
   private final GralUserAction actionOnLineSelected = new GralUserAction("actionOnLineSelected"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
-      GralTableLine_ifc line = (GralTableLine_ifc)params[0];
+      @SuppressWarnings("unchecked")
+      GralTableLine_ifc<JZcmdScript.Subroutine> line = (GralTableLine_ifc<JZcmdScript.Subroutine>)params[0];
       if(line !=null){
-        selectedCmd = (CmdStore.CmdBlock)line.getUserData();
+        selectedCmd = line.getUserData();
       }
       return true;
     }

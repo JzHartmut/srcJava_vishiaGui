@@ -145,10 +145,7 @@ public class FcmdDelete
     @Override
     public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     {
-      main.getterFiles.prepareFileSelection();
-      //File[] files = new File[3];
-      File fileSrc = main.getterFiles.getFile1();
-      //files[2] = getterFiles.getFile3();
+      FileRemote fileSrc = main.lastFilePanels.get(0).actFileCard.currentFile();
       confirmDelete(fileSrc);
       return true;
       // /
