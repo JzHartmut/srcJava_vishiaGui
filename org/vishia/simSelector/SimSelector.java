@@ -8,8 +8,8 @@ import java.util.TreeMap;
 
 import javax.script.ScriptException;
 
-import org.vishia.cmd.JZcmdExecuter;
-import org.vishia.cmd.JZcmdScript;
+import org.vishia.cmd.JZtxtcmdExecuter;
+import org.vishia.cmd.JZtxtcmdScript;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
@@ -21,12 +21,12 @@ import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.swt.SwtFactory;
+import org.vishia.jztxtcmd.JZtxtcmd;
 import org.vishia.mainCmd.PrintStreamAdapter;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.DataAccess;
 import org.vishia.util.KeyCode;
-import org.vishia.zcmd.JZcmd;
 
 /*Test with jzcmd: call jzcmd with this java file with its full path:
 D:/vishia/Java/srcJava_vishiaGui/org/vishia/gral/test/SimSelector.java
@@ -52,7 +52,7 @@ public class SimSelector
   
   GralTextBox output;
   
-  JZcmdExecuter executer = new JZcmdExecuter();
+  JZtxtcmdExecuter executer = new JZtxtcmdExecuter();
     
   boolean isTableInitialized;
   
@@ -119,11 +119,11 @@ public class SimSelector
   
   void readConfig()
   {
-    JZcmdExecuter.ExecuteLevel level = null;
+    JZtxtcmdExecuter.ExecuteLevel level = null;
     try {
-      JZcmd jzcmd = new JZcmd();
-      JZcmdScript script = jzcmd.compile(fileConfig, null);
-      executer.initialize(script, false, null, null);
+      JZtxtcmd jzcmd = new JZtxtcmd();
+      JZtxtcmdScript script = jzcmd.compile(fileConfig, null);
+      executer.initialize(script, false, null);
       level = executer.execute_Scriptclass("ToGui"); 
       
     } catch( ScriptException exc) {

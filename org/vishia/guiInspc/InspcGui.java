@@ -539,7 +539,7 @@ private class InspcGuiCfg extends GuiCfg
     CallingArguments cargs = new CallingArguments();
     //Initializes the GUI till a output window to show informations:
     CmdLineAndGui cmdgui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
-    bOk = cmdgui.parseArgumentsAndInitGraphic("Inspc-GUI-cfg", "3A3C");
+    bOk = cmdgui.parseArgumentsAndInitGraphic(null, "3A3C");
     System.err.println("InspcGui - Test; test");
     LogMessage log = cmdgui.getLogMessageOutputConsole();
     

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import org.vishia.fileRemote.FileCluster;
@@ -591,6 +592,9 @@ class FcmdFavorPathSelector
 
   
   
+
+  
+  
   
   GralUserAction actionAddFavorite = new GralUserAction("")
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
@@ -728,7 +732,15 @@ class FcmdFavorPathSelector
       FileRemote[] lastFiles = main.getLastSelectedFiles(true, 1);
       //if(fileCard !=null){
       if(lastFiles[0] !=null){
-        lastFiles[0].resetMarkedRecurs(0xffffffff, null);
+        FileCluster fc = lastFiles[0].itsCluster;
+        String sStartDir = lastFiles[0].getCanonicalPath();
+        ListIterator<FileRemote> it = fc.listSubdirs(sStartDir);
+        while(it.hasNext()){
+          FileRemote dir1 = it.next();
+          if(!dir1.getCanonicalPath().startsWith(sStartDir)) { break; }
+          it.remove();
+        }
+        //lastFiles[0].resetMarkedRecurs(0xffffffff, null);
         main.refreshFilePanel(lastFiles[0].getParentFile());
         //fileCard.f  //TODO refresh
       }

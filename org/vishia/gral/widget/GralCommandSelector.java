@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.vishia.cmd.CmdExecuter;
 import org.vishia.cmd.CmdGetterArguments;
-import org.vishia.cmd.JZcmdScript;
+import org.vishia.cmd.JZtxtcmdScript;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -29,13 +29,13 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
  * @author Hartmut Schorrig
  *
  */
-public class GralCommandSelector extends GralSelectList<JZcmdScript.Subroutine>
+public class GralCommandSelector extends GralSelectList<JZtxtcmdScript.Subroutine>
 {
   
   
   /**Version, history and license. This String is visible in the about info.
    * <ul>
-   * <li>2017-01-01 Now supports only {@link JZcmdScript.Subroutine}, no more CmdStore. 
+   * <li>2017-01-01 Now supports only {@link JZtxtcmdScript.Subroutine}, no more CmdStore. 
    *   The CmdStore is the older concept before JZcmd was found. JZcmd contains more capabilities.
    * <li>2013-10-00 Hartmut created
    * </ul>
@@ -83,7 +83,7 @@ public class GralCommandSelector extends GralSelectList<JZcmdScript.Subroutine>
   /**The currently selected command.
    * 
    */
-  protected JZcmdScript.Subroutine selectedCmd;
+  protected JZtxtcmdScript.Subroutine selectedCmd;
   
   
   final Appendable out;
@@ -112,17 +112,17 @@ public class GralCommandSelector extends GralSelectList<JZcmdScript.Subroutine>
   
   
   
-  public JZcmdScript.AddSub2List addJZsub2SelectTable = new JZcmdScript.AddSub2List() {
+  public JZtxtcmdScript.AddSub2List addJZsub2SelectTable = new JZtxtcmdScript.AddSub2List() {
 
     int level = 1;
-    GralTableLine_ifc<JZcmdScript.Subroutine> parentline = null, line = null;
+    GralTableLine_ifc<JZtxtcmdScript.Subroutine> parentline = null, line = null;
 
     @Override public void clear()
     { parentline = null; line = null;
     }
 
     @Override
-    public void add2List(JZcmdScript.JZcmdClass jzclass, int level)
+    public void add2List(JZtxtcmdScript.JZcmdClass jzclass, int level)
     { String[] texts = new String[2]; 
       texts[0] = jzclass.cmpnName;
       texts[1] = "+";
@@ -131,7 +131,7 @@ public class GralCommandSelector extends GralSelectList<JZcmdScript.Subroutine>
     }
 
     @Override
-    public void add2List(JZcmdScript.Subroutine jzsub, int level)
+    public void add2List(JZtxtcmdScript.Subroutine jzsub, int level)
     {
       String[] texts = new String[2]; 
       texts[0] = jzsub.name;
@@ -150,7 +150,7 @@ public class GralCommandSelector extends GralSelectList<JZcmdScript.Subroutine>
   
   
   /**Returns the currently selected command. */
-  public JZcmdScript.Subroutine getCurrCmd(){ return selectedCmd; }
+  public JZtxtcmdScript.Subroutine getCurrCmd(){ return selectedCmd; }
   
   
   
@@ -174,9 +174,9 @@ public class GralCommandSelector extends GralSelectList<JZcmdScript.Subroutine>
    * @param line isn't used here. It can be null in direct invocations.  
    * @see org.vishia.gral.widget.GralSelectList#actionOk(java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
    */
-  @Override protected boolean actionOk(Object userData, GralTableLine_ifc<JZcmdScript.Subroutine> line)
+  @Override protected boolean actionOk(Object userData, GralTableLine_ifc<JZtxtcmdScript.Subroutine> line)
   {
-    JZcmdScript.Subroutine jzsub = (JZcmdScript.Subroutine)userData;
+    JZtxtcmdScript.Subroutine jzsub = (JZtxtcmdScript.Subroutine)userData;
     //Map<String, DataAccess.Variable<Object>> jargs = getterArguments.getArguments(cmdBlock.)//cmdBlock.getArguments(getterFiles);
     //File currFile = getterArguments.getCurrDir();
     
@@ -231,7 +231,7 @@ public class GralCommandSelector extends GralSelectList<JZcmdScript.Subroutine>
   private final GralUserAction actionOnLineSelected = new GralUserAction("actionOnLineSelected"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
       @SuppressWarnings("unchecked")
-      GralTableLine_ifc<JZcmdScript.Subroutine> line = (GralTableLine_ifc<JZcmdScript.Subroutine>)params[0];
+      GralTableLine_ifc<JZtxtcmdScript.Subroutine> line = (GralTableLine_ifc<JZtxtcmdScript.Subroutine>)params[0];
       if(line !=null){
         selectedCmd = line.getUserData();
       }

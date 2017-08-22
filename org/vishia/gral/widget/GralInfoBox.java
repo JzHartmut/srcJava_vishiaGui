@@ -17,6 +17,7 @@ import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_getifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
@@ -111,10 +112,12 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     GralTextField infoLine = mng.addTextField("info", false, null, null);
     mng.setPosition(-3, 0, -6, 0, 0, '.');
     GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "OK");
+    mng.setPosition(-3, 0, -16, -10, 0, '.');
+    GralWidget buttonClear = mng.addButton(name + "-Info-clear", null, "clear");
     GralInfoBox box = new GralInfoBox(window, text, infoLine, buttonOk);
     box.buttonOk.setActionChange(box.actionOkButton);
+    buttonClear.specifyActionChange("Info clear", box.actionClear, null);
     return box; 
-
   }
   
   
@@ -365,6 +368,13 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
       //if(textBox !=null) {textBox.setText(""); }  //'I have seen it, therefore delete.
       if(actionOk !=null){ actionOk.exec(KeyCode.enter, widgd); }
       window.setWindowVisible(false);
+      return true;
+    }
+  };
+
+  GralUserAction actionClear = new GralUserAction("actionClear"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
+      if(textBox !=null) {textBox.setText(""); }  //'I have seen it, therefore delete.
       return true;
     }
   };

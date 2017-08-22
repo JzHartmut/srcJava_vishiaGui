@@ -21,7 +21,7 @@ set MANIFEST_JAVAC=vishiaGui.manifest
 REM Input for javac, only choice of primary sources, relativ path from current (make)-directory:
 set INPUT_JAVAC=
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/commander/Fcmd.java
-set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/vcs/*.java
+set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gitGui/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/cfg/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/area9/*.java
@@ -51,16 +51,17 @@ exit
 :swtOk
 REM The viahisGui depends on zbnf.jar.
 REM SRCvishiaBase used for compile batch script only.
-set SRCvishiaBase=D:\vishia\ZBNF\sf\ZBNF\srcJava_vishiaBase
-set ZBNFJAR=D:\vishia\ZBNF\sf\ZBNF\zbnfjax\zbnf.jar
+set SRCvishiaBase=..\..\..\ZBNF\srcJava_vishiaBase
+set ZBNFJAR=..\..\..\ZBNF\zbnfjax\zbnf.jar
+
 if exist %ZBNFJAR% goto :ZbnfOk
 set SRCvishiaBase=..\..\srcJava_vishiaBase
 set ZBNFJAR=..\..\exe\zbnf.jar
 :ZbnfOk
 set CLASSPATH_JAVAC=%SWTJAR%;%ZBNFJAR%
-echo %CLASSPATH_JAVAC%
+echo classpath: %CLASSPATH_JAVAC%
 pause
-
+echo on
 
 REM Sets the src-path for further necessary sources:
 ::set SRCPATH_JAVAC=..;../../srcJava_vishiaBase;../../srcJava_Zbnf;../../srcJava_vishiaRun

@@ -15,6 +15,7 @@ public abstract class GralFactory
 
   /**Version, history and license.
    * <ul>
+   * <li>2017-01-15 Hartmut chg in deprecated createWindow, see comment there. 
    * <li>2016-07-16 Hartmut new: {@link #createGraphic(GralWindow, char, LogMessage, String)} as non abstract static method
    *   creates the graphic, for several implementation platforms by "AWT", "SWT" or special factory class.
    * <li>2015-05-01 Hartmut now a abstract class instead interface.
@@ -63,7 +64,8 @@ public abstract class GralFactory
   {
     GralMng.create(log);
     int windProps = GralWindow_ifc.windResizeable;
-    GralWindow window = new GralWindow("!", "primaryWindow", sTitle, windProps);
+    //@date 2017-01-15 a "!" is faulty yet, use a sensible position string 
+    GralWindow window = new GralWindow("@10+100,30+150", "primaryWindow", sTitle, windProps);
     createWindow(window, sizeShow, left, top, xSize, ySize);
     return window;
   }

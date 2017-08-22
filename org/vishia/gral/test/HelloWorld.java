@@ -1,24 +1,16 @@
 package org.vishia.gral.test;
 
-import org.vishia.gral.awt.AwtFactory;
 import org.vishia.gral.base.GralButton;
-import org.vishia.gral.base.GralGraphicThread;
-import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
-import org.vishia.gral.swt.SwtFactory;
 import org.vishia.gral.widget.GralLabel;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
-import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 
-import com.sun.xml.internal.ws.addressing.model.ActionNotSupportedException;
 
 /*Test with jzcmd: call jzcmd with this java file with its full path:
 D:/vishia/Java/srcJava_vishiaGui/org/vishia/gral/test/HelloWorld.java

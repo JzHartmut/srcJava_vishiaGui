@@ -10,18 +10,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.vishia.cmd.CmdExecuter;
-import org.vishia.cmd.CmdQueue;
-import org.vishia.cmd.CmdStore;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralGraphicTimeOrder;
-import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.DataAccess;
 import org.vishia.util.Debugutil;
@@ -30,7 +26,6 @@ import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringPartAppend;
 
-import com.sun.xml.internal.ws.wsdl.ActionBasedOperationSignature;
 
 /**A Graphical User Interface for basic working in git with remote repository and preserving time stamp of the files.
  * <ul>
@@ -51,6 +46,9 @@ public class GitGui
 
   /**Version, history and license
    * <ul>
+   * <li>2017-05-10 Hartmut bugfix {@link CmdExecuter#setCharsetForOutput(String)} to UTF-8 because git outputs cmd output in UTF-8
+   * <li>2016-12-02 Hartmut chg GitGui some improvements.
+   * <li>2016-09-23 Hartmut GitGui: ContextMenu in file table
    * <li>2016-08-18 Hartmut this version is able to use to view the repository versions, the changed files per version, the changed file to the working tree.
    *   It supports view diff with invocation of an external tool. It is the first productive version. But yet with some specific settings yet now.
    *   TODO: read a config. Document it. Show the git command line for any action.
@@ -440,10 +438,13 @@ public class GitGui
   }
 
   void initializeCmd() {
+    gitCmd.setCharsetForOutput("UTF-8");  //git outputs in UTF-8
     Map<String, String> env = gitCmd.environment();
     env.put("HOMEPATH", "\\vishia\\HOME");
     env.put("HOMEDRIVE", "D:");
     String sPath = env.get("PATH");
+    if(sPath ==null) { sPath = env.get("Path"); }
+    if(sPath ==null) { sPath = env.get("path"); }
     sPath = "D:\\Programs\\Gitcmd\\bin;" + sPath;
     env.put("PATH", sPath);
   }

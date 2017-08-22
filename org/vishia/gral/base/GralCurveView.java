@@ -1014,7 +1014,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
             bRefreshed = true;
           }
           track.variable.requestValue();
-          if(track.getDataPath().startsWith("CCS:"))
+          if(track.getDataPath().startsWith("xxx:"))
             stop();
           value = track.variable.getFloat();
           track.variable.requestValue(System.currentTimeMillis());

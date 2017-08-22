@@ -8,8 +8,8 @@ import java.util.TreeMap;
 
 import org.vishia.cmd.CmdExecuter;
 import org.vishia.cmd.CmdStore;
-import org.vishia.cmd.JZcmdExecuter;
-import org.vishia.cmd.JZcmdScript;
+import org.vishia.cmd.JZtxtcmdExecuter;
+import org.vishia.cmd.JZtxtcmdScript;
 import org.vishia.cmd.PrepareCmd;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralTable;
@@ -21,18 +21,18 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralCommandSelector;
+import org.vishia.jztxtcmd.JZtxtcmd;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.util.DataAccess;
 import org.vishia.util.KeyCode;
-import org.vishia.zcmd.JZcmd;
 
 public class FcmdExecuter
 {
   
   /**Version, history and license. This String is visible in the about info.
    * <ul>
-   * <li>2017-01-01 Hartmut uses {@link JZcmdExecuter} and {@link CmdExecuter}. CmdQueue and CmdStore are obsolete. 
+   * <li>2017-01-01 Hartmut uses {@link JZtxtcmdExecuter} and {@link CmdExecuter}. CmdQueue and CmdStore are obsolete. 
    * <li>2016-08-28 Hartmut chg: The cfg file for jzcmd commands are named cmdjz.cfg anyway, in the directory given with cmdcfg:path/to/cmd.cfg. 
    * <li>2011-10-00 Hartmut created
    * </ul>
@@ -77,12 +77,12 @@ public class FcmdExecuter
 
  // GralTable<CmdBlock> widgSelectExec = new GralTable<>("0..0,0..0", "execChoice", new int[]{47});
 
-  GralTable<JZcmdScript.Subroutine> widgSelectJzExt = new GralTable<>("0..0,0..0", "execChoice", new int[]{47});
+  GralTable<JZtxtcmdScript.Subroutine> widgSelectJzExt = new GralTable<>("0..0,0..0", "execChoice", new int[]{47});
 
   /**Store of all possible commands given in the command file. */
   //final CmdStore cmdStore = new CmdStore();
   
-  final Map<String, List<JZcmdScript.Subroutine>> mapCmdExt = new TreeMap<String, List<JZcmdScript.Subroutine>>();
+  final Map<String, List<JZtxtcmdScript.Subroutine>> mapCmdExt = new TreeMap<String, List<JZtxtcmdScript.Subroutine>>();
   
   /**The command queue to execute */
   
@@ -91,7 +91,7 @@ public class FcmdExecuter
   /**Table contains some commands, can be selected and executed.
    * <ul>
    * <li>The table is filled in {@link #readCmdCfgSelectList(CmdStore, File, MainCmdLogging_ifc)}. 
-   * <li>Commands can be either operation system commands or c {@link JZcmdScript.Subroutine} entry point. 
+   * <li>Commands can be either operation system commands or c {@link JZtxtcmdScript.Subroutine} entry point. 
    * They are stored in the list in user data of type {@link CmdBlock}.
    * <li>Execution of a command: see {@link GralCommandSelector#actionExecCmdWithFiles} respectively GralCommandSelector#actionOk(...)
    * <li>The arguments of a command are read from {@link CmdStore.CmdBlock#getArguments(org.vishia.cmd.CmdGetFileArgs_ifc)}. 
@@ -129,21 +129,21 @@ public class FcmdExecuter
   
   String readCfgExt(File cfgFileCmdsForExt)
   { String error = null;
-    JZcmdScript script = null;
+    JZtxtcmdScript script = null;
     try{ 
-      script = JZcmd.translateAndSetGenCtrl(cfgFileCmdsForExt, null, console);
+      script = JZtxtcmd.translateAndSetGenCtrl(cfgFileCmdsForExt, null, console);
     } catch(Throwable exc){
       
       console.writeError("CmdStore - JZcmdScript;", exc);
       error = "CmdStore - JZcmdScript," + exc.getMessage();
     }
     if(error ==null) {
-      for(JZcmdScript.JZcmdClass jzclass: script.scriptClass().classes()) { // = e.getValue();
-        List<JZcmdScript.Subroutine> routines = new LinkedList<JZcmdScript.Subroutine>();
+      for(JZtxtcmdScript.JZcmdClass jzclass: script.scriptClass().classes()) { // = e.getValue();
+        List<JZtxtcmdScript.Subroutine> routines = new LinkedList<JZtxtcmdScript.Subroutine>();
         mapCmdExt.put(jzclass.cmpnName, routines);
         for(Object classOrSub: jzclass.listClassesAndSubroutines()) {
-          if(classOrSub instanceof JZcmdScript.Subroutine) {
-            JZcmdScript.Subroutine subRoutine = (JZcmdScript.Subroutine) classOrSub;
+          if(classOrSub instanceof JZtxtcmdScript.Subroutine) {
+            JZtxtcmdScript.Subroutine subRoutine = (JZtxtcmdScript.Subroutine) classOrSub;
             if(!subRoutine.name.startsWith("_")) { //ignore internal subroutines!
               routines.add(subRoutine); 
             }
@@ -155,9 +155,9 @@ public class FcmdExecuter
   }
   
   
-  public String readCmdCfgSelectList(JZcmdScript.AddSub2List dst, File cfgFile, MainCmdLogging_ifc log)
+  public String readCmdCfgSelectList(JZtxtcmdScript.AddSub2List dst, File cfgFile, MainCmdLogging_ifc log)
   { File cmdCfgJbat = new File(cfgFile.getParentFile(), "cmdjz.cfg");
-    return JZcmd.readJZcmdCfg(dst, cmdCfgJbat, log, cmdExecuter);
+    return JZtxtcmd.readJZcmdCfg(dst, cmdCfgJbat, log, cmdExecuter);
   }  
 
   
@@ -256,12 +256,12 @@ public class FcmdExecuter
       } else {
         ext = "???";
       }
-      List<JZcmdScript.Subroutine> listSub = mapCmdExt.get(ext.toLowerCase());
+      List<JZtxtcmdScript.Subroutine> listSub = mapCmdExt.get(ext.toLowerCase());
       if(listSub !=null){
         widgSelectJzExt.clearTable();
-        GralTable<JZcmdScript.Subroutine>.TableLineData firstLine = null;
-        for(JZcmdScript.Subroutine jzsub: listSub) {
-          GralTable<JZcmdScript.Subroutine>.TableLineData line = widgSelectJzExt.insertLine(jzsub.name, -1, null, jzsub);
+        GralTable<JZtxtcmdScript.Subroutine>.TableLineData firstLine = null;
+        for(JZtxtcmdScript.Subroutine jzsub: listSub) {
+          GralTable<JZtxtcmdScript.Subroutine>.TableLineData line = widgSelectJzExt.insertLine(jzsub.name, -1, null, jzsub);
           if(firstLine == null) { firstLine = line; }
           line.setCellText(jzsub.name, 0);
           
@@ -329,8 +329,8 @@ public class FcmdExecuter
     if(key == KeyCode.enter || key == KeyCode.mouse1Up || key == KeyCode.mouse1Double){
       if(params.length > 0 && params[0] instanceof GralTableLine_ifc){
         @SuppressWarnings("unchecked")
-        GralTableLine_ifc<JZcmdScript.Subroutine> line = (GralTableLine_ifc<JZcmdScript.Subroutine>)params[0];
-        JZcmdScript.Subroutine jzsub = line.getUserData();
+        GralTableLine_ifc<JZtxtcmdScript.Subroutine> line = (GralTableLine_ifc<JZtxtcmdScript.Subroutine>)params[0];
+        JZtxtcmdScript.Subroutine jzsub = line.getUserData();
         if(jzsub !=null){
           //PrepareCmd cmdp = cmd.getCmds().get(0);
           File[] files = main.getLastSelectedFiles(true, 1);

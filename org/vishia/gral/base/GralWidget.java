@@ -1404,7 +1404,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
           case 's': setText(variable.getString()); break;
           default:  sValue = "?" + cType; //variable.getInt());  //at least request newly if type is faulty
           }
-          if(sValue !=null){
+          if(sValue !=null){ //if the value is given as sValue-string - if null it may be set already
             //if(bOld){ setText("? " + sValue); }
             //else 
             { setText(sValue); }

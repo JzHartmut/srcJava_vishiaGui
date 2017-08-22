@@ -11,9 +11,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.cmd.CmdGetterArguments;
-import org.vishia.cmd.JZcmdScript;
-import org.vishia.cmd.JZcmdScript.JZcmdClass;
-import org.vishia.cmd.JZcmdScript.Subroutine;
+import org.vishia.cmd.JZtxtcmdScript;
+import org.vishia.cmd.JZtxtcmdScript.JZcmdClass;
+import org.vishia.cmd.JZtxtcmdScript.Subroutine;
 import org.vishia.commander.target.FcmdtTarget;
 import org.vishia.commander.target.FcmdtTarget_ifc;
 import org.vishia.communication.InterProcessCommFactorySocket;
@@ -31,11 +31,11 @@ import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralFileSelector;
+import org.vishia.jztxtcmd.JZtxtcmd;
 import org.vishia.msgDispatch.MsgRedirectConsole;
 import org.vishia.util.DataAccess;
 import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
-import org.vishia.zcmd.JZcmd;
 
 /**This class is the main class of the-File-commander.
  * @author Hartmut Schorrig
@@ -80,7 +80,7 @@ public class Fcmd extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public static final String version = "2016-12-27";
+  public static final String version = "2017-04-22";
 
   
   static class CallingArgs extends GuiCallingArgs
@@ -310,7 +310,7 @@ public class Fcmd extends GuiCfg
   
   
   void openExtEditor(File file){
-    JZcmdScript.Subroutine jzsub = buttonCmds.get("edit");
+    JZtxtcmdScript.Subroutine jzsub = buttonCmds.get("edit");
     if( jzsub == null ) {
       mainCmd.writeError("internal problem - don't find 'edit' command. ");
     } else {
@@ -334,7 +334,7 @@ public class Fcmd extends GuiCfg
   {
     @Override public boolean exec(int key, GralWidget_ifc wdg, Object... params) {
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-        JZcmdScript.Subroutine jzsub = buttonCmds.get("edit");
+        JZtxtcmdScript.Subroutine jzsub = buttonCmds.get("edit");
         if (jzsub == null) {
           mainCmd.writeError("internal problem - don't find 'edit' command. ");
         } else {
@@ -376,12 +376,12 @@ public class Fcmd extends GuiCfg
    */
   protected CmdGetterArguments getterFileArguments = new CmdGetterArguments()
   {
-    @Override public List<DataAccess.Variable<Object>> getArguments(JZcmdScript.Subroutine subRoutine) {
+    @Override public List<DataAccess.Variable<Object>> getArguments(JZtxtcmdScript.Subroutine subRoutine) {
       FileRemote[] selFiles = getLastSelectedFiles(true, 1);  //The selected 3 files, maybe in one card too.
       List<DataAccess.Variable<Object>> args = new LinkedList<DataAccess.Variable<Object>>();
       if(subRoutine !=null) {
         if(subRoutine.formalArgs !=null) {
-          for(JZcmdScript.DefVariable arg :subRoutine.formalArgs){
+          for(JZtxtcmdScript.DefVariable arg :subRoutine.formalArgs){
             String name1 = arg.getVariableIdent();
             if(name1.equals("file1")){ args.add(new DataAccess.Variable<Object>('O', "file1", selFiles[0], true)); }
             else if(name1.equals("file2")){ args.add(new DataAccess.Variable<Object>('O', "file2", selFiles[1], true)); }
@@ -445,7 +445,7 @@ public class Fcmd extends GuiCfg
   }
   
   
-  public JZcmdScript.AddSub2List addButtonCmd = new JZcmdScript.AddSub2List() {
+  public JZtxtcmdScript.AddSub2List addButtonCmd = new JZtxtcmdScript.AddSub2List() {
 
 
     @Override public void clear() { buttonCmds.clear(); }
@@ -547,7 +547,7 @@ public class Fcmd extends GuiCfg
    * The commands which are used for some buttons or menu items from the
    * JavaCommander itself.
    */
-  final Map<String, JZcmdScript.Subroutine> buttonCmds;
+  final Map<String, JZtxtcmdScript.Subroutine> buttonCmds;
 
   
   final List<Closeable> threadsToClose = new LinkedList<Closeable>();
@@ -570,7 +570,7 @@ public class Fcmd extends GuiCfg
     actionReadMsgConfig.exec(KeyCode.menuEntered, null);
     
     target = new FcmdtTarget();  //create the target itself, one process TODO experience with remote target.
-    buttonCmds = new TreeMap<String, JZcmdScript.Subroutine>();
+    buttonCmds = new TreeMap<String, JZtxtcmdScript.Subroutine>();
     //executer.cmdQueue.setOutput(gui.getOutputBox(), null);
   }
 
@@ -685,7 +685,7 @@ public class Fcmd extends GuiCfg
         sError = executer.readCfgExt(new File(cargs.dirCfg, "extjz.cfg"));
       }
       if (sError == null) {
-        sError = JZcmd.readJZcmdCfg(addButtonCmd, fileCfg = cargs.fileCfgButtonCmds, console, executer.cmdExecuter);
+        sError = JZtxtcmd.readJZcmdCfg(addButtonCmd, fileCfg = cargs.fileCfgButtonCmds, console, executer.cmdExecuter);
       }
       if (sError == null) {
         sError = favorPathSelector.readCfg(fileCfg = cargs.fileSelectTabPaths);

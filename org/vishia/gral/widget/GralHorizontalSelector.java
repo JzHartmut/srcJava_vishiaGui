@@ -167,11 +167,13 @@ public class GralHorizontalSelector<UserData> extends GralWidget
     boolean actItemRemoved = ixDstItem == ixActItem;
     Item<UserData> removed = items.remove(ixDstItem);
     GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter);
+    /* un-necessary for remove:
     if(action !=null){
       Object[] args = action.args();
       if(args == null){ action.action().exec(KeyCode.activated, GralHorizontalSelector.this, actItem.data); }
       else { action.action().exec(KeyCode.removed, GralHorizontalSelector.this, args, actItem.data); }
     }
+    */
     if(ixDstItem < ixActItem){ ixActItem -=1; }
     if(actItemRemoved){
       if(ixActItem >= items.size()){
