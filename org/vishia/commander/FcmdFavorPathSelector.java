@@ -740,7 +740,7 @@ class FcmdFavorPathSelector
           if(!dir1.getCanonicalPath().startsWith(sStartDir)) { break; }
           it.remove();
         }
-        //lastFiles[0].resetMarkedRecurs(0xffffffff, null);
+        lastFiles[0].resetMarkedRecurs(0xffffffff, null);
         main.refreshFilePanel(lastFiles[0].getParentFile());
         //fileCard.f  //TODO refresh
       }

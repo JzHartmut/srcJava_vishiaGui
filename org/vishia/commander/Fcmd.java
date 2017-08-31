@@ -47,6 +47,9 @@ public class Fcmd extends GuiCfg
 
   /**Version, history and license. This String is visible in the about info.
    * <ul>
+   * <li>2017-08-27 {@link FcmdFavorPathSelector#actionDeselectDirtree} now removes all FileRemote instances of children
+   *   because a selection is not necessary furthermore. This is a 'refresh'. But the 'refresh' (F5, ctrl-R) should not change selection,
+   *   it must not delete this children-FileRemote. Only deselection is the key action for that.
    * <li>2016-08-28 see {@link FcmdExecuter#sVersion}, {@link FcmdSettings#sVersion}
    * <li>2015-07-18 Hartmut chg: Now the output of script errors while executing the JZcmd cmd script is visible
    *   in the output window.  
