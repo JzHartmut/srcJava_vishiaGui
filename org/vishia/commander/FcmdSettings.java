@@ -95,18 +95,14 @@ public class FcmdSettings
     widgCfgPath = main._gralMng.addTextField(null, false, "configuration directory path", "t");
     
     //main._gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
-    main._gralMng.setPosition(-10, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
+    main._gralMng.setPosition(-7, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
     widgEditCmd = main._gralMng.addButton("editCmd", actionEditCfgFile, "cmdjz.cfg", null, "edit");
-    main._gralMng.addText("cmdjz.cfg");
-    
-    main._gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
-    widgEditCmd = main._gralMng.addButton("editCmd", actionEditCfgFile, "cmd.cfg", null, "edit");
-    widgApplyCmd = main._gralMng.addButton("applyCmd", actionApplyCfgCmd, "cmd.cfg", null, "apply");
+    widgApplyCmd = main._gralMng.addButton("applyCmd", actionApplyCfgCmd, "cmdjz.cfg", null, "apply");
     main._gralMng.addText("cmd cfg file");
     
     main._gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
-    widgEditCmd = main._gralMng.addButton("editCmd", actionEditCfgFile, "ext.cfg", null, "edit");
-    widgApplyCmd = main._gralMng.addButton("applyExt", actionApplyCfgExt, "ext.cfg", null, "apply");
+    widgEditCmd = main._gralMng.addButton("editCmd", actionEditCfgFile, "extjz.cfg", null, "edit");
+    widgApplyCmd = main._gralMng.addButton("applyExt", actionApplyCfgExt, "extjz.cfg", null, "apply");
     main._gralMng.addText(".ext cfg file");
     
     main._gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);

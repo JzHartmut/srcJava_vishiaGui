@@ -97,10 +97,12 @@ public class FcmdStatusLine
       file.length() >=    1024 ? String.format("%3.2f kByte = %d Byte", file.length()/1024.0, file.length()) :
       String.format("%3d Byte", file.length());  
     StringBuilder info = new StringBuilder(100);
-    info.append(sDate)/*.append(" = ").append(lastModified)*/.append(", length= ").append(sLenShort);
+    info.append(sDate)/*.append(" = ").append(lastModified)*/;
     if(file instanceof FileRemote){
       FileRemote filer = file;
-      info.append(" #").append(filer.ident()).append(" flags=0x")
+      FileRemote filep = file.getParentFile();
+      int parentId = filep !=null ? filep.ident(): 0;
+      info.append(" #").append(filer.ident()).append('/').append(parentId).append(" flags=0x")
       .append(Integer.toHexString(filer.getFlags()));
       if(file.mark !=null){
         int mark = file.mark.getMark();
@@ -120,6 +122,7 @@ public class FcmdStatusLine
       sDate = formatDateInfo.format(new Date(lastAccess));
       info.append("; lastAccess=").append(sDate);
     }
+    info.append(", length= ").append(sLenShort);
     main.statusLine.widgFileInfo.setText(info);
     sPath = file.getAbsolutePath();
     if(showBackslash){

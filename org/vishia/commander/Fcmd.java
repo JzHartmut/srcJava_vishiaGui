@@ -83,7 +83,7 @@ public class Fcmd extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public static final String version = "2017-04-22";
+  public static final String version = "2017-09-09";
 
   
   static class CallingArgs extends GuiCallingArgs

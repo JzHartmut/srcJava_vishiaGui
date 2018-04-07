@@ -725,7 +725,7 @@ class FcmdFavorPathSelector
   } };
 
   
- 
+
   GralUserAction actionDeselectDirtree = new GralUserAction("actionDeselectDirtree")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
       FcmdFileCard fileCard = main.getLastSelectedFileCard();
@@ -741,6 +741,31 @@ class FcmdFavorPathSelector
           it.remove();
         }
         lastFiles[0].resetMarkedRecurs(0xffffffff, null);
+        main.refreshFilePanel(lastFiles[0].getParentFile());
+        //fileCard.f  //TODO refresh
+      }
+      return true;
+  } };
+  
+  
+  
+
+  GralUserAction actionCleanFileRemote = new GralUserAction("actionCleanFileRemote")
+  { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
+      FcmdFileCard fileCard = main.getLastSelectedFileCard();
+      FileRemote[] lastFiles = main.getLastSelectedFiles(true, 1);
+      //if(fileCard !=null){
+      if(lastFiles[0] !=null){
+        FileCluster fc = lastFiles[0].itsCluster;
+        String sStartDir = lastFiles[0].getCanonicalPath();
+        ListIterator<FileRemote> it = fc.listSubdirs(sStartDir);
+        while(it.hasNext()){
+          FileRemote dir1 = it.next();
+          if(!dir1.getCanonicalPath().startsWith(sStartDir)) { break; }
+          it.remove();
+        }
+        lastFiles[0].resetMarkedRecurs(0xffffffff, null);
+        lastFiles[0].cleanChildren();
         main.refreshFilePanel(lastFiles[0].getParentFile());
         //fileCard.f  //TODO refresh
       }

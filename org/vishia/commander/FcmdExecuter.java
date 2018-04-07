@@ -140,7 +140,10 @@ public class FcmdExecuter
     if(error ==null) {
       for(JZtxtcmdScript.JZcmdClass jzclass: script.scriptClass().classes()) { // = e.getValue();
         List<JZtxtcmdScript.Subroutine> routines = new LinkedList<JZtxtcmdScript.Subroutine>();
-        mapCmdExt.put(jzclass.cmpnName, routines);
+        String ext = jzclass.cmpnName;
+        if(ext.endsWith("__")) { 
+          ext = ext.substring(0, ext.length()-2); }  //especially for cmd__, cannot be a identifier.
+        mapCmdExt.put(ext, routines);
         for(Object classOrSub: jzclass.listClassesAndSubroutines()) {
           if(classOrSub instanceof JZtxtcmdScript.Subroutine) {
             JZtxtcmdScript.Subroutine subRoutine = (JZtxtcmdScript.Subroutine) classOrSub;
