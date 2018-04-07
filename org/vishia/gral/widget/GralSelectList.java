@@ -180,7 +180,7 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
       //assert(sIntension.equals("table-key"));
       @SuppressWarnings("unchecked")
       GralTableLine_ifc<UserData> line = (GralTableLine_ifc<UserData>)params[0];
-      Object data = line.getUserData();
+      Object data = line == null ? null : line.getUserData();
       //int keyCode = (Integer)params[1];
       boolean done = true;
       if(data !=null) {

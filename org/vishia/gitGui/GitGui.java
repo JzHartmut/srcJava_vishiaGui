@@ -464,8 +464,9 @@ public class GitGui
 
 
   /**Search the base dir and the repository for a given path/to/file.
-   * @param startFile Any file path. Especially a ".git" directory or ".gitRepository" file. In that  case the local file path will be set to null,
+   * @param startFile Any file path. Especially a ".git" directory or ".gitRepository*" file. In that  case the local file path will be set to null,
    *   because the whole repository is given.
+   *   A ".gitRepository*" file contains the path to the extern .git directory.
    * @param dst maybe null, elsewhere new String[2]. 
    *   dst[0] will be filled with the absolute path of the .git directory. 
    *   dst[1] will be filled with the absolute path to the basic directory for the working tree where .git or .gitRepository were found.
@@ -487,12 +488,19 @@ public class GitGui
       fRepo = new File(startFile, ".git"); //only to check whether it exists
       if(!fRepo.exists()){
         fRepo = new File(startFile, ".gitRepository");
-        if(!fRepo.exists()){
-          currDir = null;
+        if(!fRepo.exists()) {  //if startFile as currdir contains .git or .gitRepository, it's okay
+          currDir = null;  //not okay, startFile is any directory maybe inside a working tree
+          fRepo = null;
         }
       }
-    } else {
-      currDir = null; //startFile is not a directory, search in parents.
+    } else { //startFile is a file.
+      String fName = startFile.getName();
+      if(fName.equals(".git") || fName.startsWith(".gitRepository")) {
+        fRepo = startFile;
+        currDir = startFile.getParentFile();
+      } else {
+        currDir = null; //startFile is not a directory, search in parents.
+      }
     }
     if(currDir == null) { //startFile is not a directory, or it is a directory which does not contain .git or .gitRepository 
       currDir = startFile.getParentFile();
@@ -502,21 +510,24 @@ public class GitGui
         if(!fRepo.exists()){
           fRepo = new File(currDir, ".gitRepository");
           if(!fRepo.exists()){
+            fRepo = null;
             try{
               currDir = FileSystem.getDirectory(currDir);  //NOTE: currDir.getParent() is not successfully on relative dir "."
             } catch(FileNotFoundException exc){ currDir = null;}
           }
         }
-      } while(!fRepo.exists() && currDir !=null);
+      } while(fRepo ==null && currDir !=null);
     }
     //
-    if(currDir ==null){
+    //currdir and fRepo should be set, or not:
+    if(fRepo == null){
       ret = "searchRepository - .git or .gitRepository not found ;" + startFile.getAbsolutePath();
     } else {
+      assert(currDir !=null); //set together with fRepo
       String sBaseDir = FileSystem.normalizePath(currDir).toString();
       //dst.put(bzrdir, sBzrDir);
       String sRepository;
-      if(fRepo.getName().equals(".gitRepository")){   //File with link to repository
+      if(fRepo.getName().startsWith(".gitRepository")){   //File with link to repository
         sRepository = FileSystem.readFile(fRepo).trim();
       } else {
         sRepository = sBaseDir;  
@@ -527,7 +538,7 @@ public class GitGui
         sLocalFilePath = null;
       } else {
         sLocalFilePath = sFilePath.subSequence(sBaseDir.length()+1, sFilePath.length()).toString();
-        if(sLocalFilePath.length() == 0 || sLocalFilePath.equals(".git") || sLocalFilePath.equals(".gitRepository")){
+        if(sLocalFilePath.length() == 0 || sLocalFilePath.equals(".git") || sLocalFilePath.startsWith(".gitRepository")){
           sLocalFilePath = null;  //no local file.
         }
       }

@@ -105,6 +105,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
 
   /**Version and history
    * <ul>
+   * <li>2018-01-07 Hartmut new: {@link #getCellTextFocus()}  
    * <li>2015-08-29 Hartmut chg: It has a {@link #traverseListenerTable} now to accept 'tab' and 'sh-tab' as normal key 
    *   instead usage to traverse between the text fields of a table. TODO: What traversing functions are missing yet?
    *   They should not any traverse function between the cells.
@@ -160,6 +161,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
   private Canvas vScrollBar;
   
+  private Text cellInFocus;
   
   Color colorBackVscrollbar, colorSliderVscrollbar;
   
@@ -634,6 +636,15 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   }
   
   
+  @Override protected String getCellTextFocus(){
+    if(cellInFocus == null) return null;
+    else return cellInFocus.getText();
+  }
+  
+  
+  
+  
+  
   
   /**Focus listener implementation for all cells.
    * This routine is invoked whenever the focus of any Text field of the table will be lost the focus. 
@@ -674,6 +685,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   @Override public void focusGained(FocusEvent ev) { 
     SwtTable.this.focusGainedTable();
     setFocused(widgg, true); 
+    cellInFocus = (Text)ev.getSource();
     //System.out.println("SwtTableCell - focus gained;");
   }
   

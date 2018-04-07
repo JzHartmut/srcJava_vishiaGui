@@ -48,6 +48,9 @@ public final class InspcCurveView
 
   /**Version, history and license. 
    * <ul>
+   * <li>2018-01-08 Hartmut new: If a datapath was written in a cell of variable paths which is not part of table, especially on an clean or small table,
+   *   than the routine {@link GralTable#getCellTextFocus()} is called to get the datapath as text. This is a new line, it is added.
+   *   Therewith now it is easy to add lines to an empty table via path in clibboard.
    * <li>2016-05-03 Hartmut chg: Selection of file in this window instead an own dialog window: 
    *   Advantage: This window is always on top. A opened dialog window may be in background - fatal.
    *   It is well to use. 
@@ -672,8 +675,22 @@ public final class InspcCurveView
       if(key == KeyCode.enter){
         @SuppressWarnings("unchecked")  //compatible to Java-6
         GralTable<TrackValues>.TableLineData line = (GralTable.TableLineData)params[0];
-        String sDatapath = line.getCellText(0);
-        InspcCurveView.this.setDatapath(line, sDatapath);
+        if(line == null) {
+          String sDatapath = widgTableVariables.getCellTextFocus();
+          TrackValues input = new TrackValues();
+          input.min = Float.MAX_VALUE;
+          input.max = -Float.MAX_VALUE;
+          input.mid = 0.0f;
+          input.colorCurve = GralColor.getColor("red");
+          input.trackView = widgCurve.initTrack(sName, sDatapath, input.colorCurve, 0, 50, 5000.0f, 0.0f);
+          GralTableLine_ifc<TrackValues> newline = widgTableVariables.addLine(sDatapath, new String[]{""}, input);  //add on end
+          int ixnewline = widgTableVariables.size();  //first line
+          newline.setCellText(sDatapath, 0);
+          widgTableVariables.setCurrentLine(newline, ixnewline, 0);
+        } else {
+          String sDatapath = line.getCellText(0);
+          InspcCurveView.this.setDatapath(line, sDatapath);
+        }
       }
       else if(key == KeyCode.F2){
         actionOnOffTrack.exec(key, null);

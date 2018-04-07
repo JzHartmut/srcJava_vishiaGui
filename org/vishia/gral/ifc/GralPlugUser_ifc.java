@@ -1,8 +1,11 @@
 package org.vishia.gral.ifc;
 
 import java.io.Closeable;
+import java.util.Map;
 
+import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.cfg.GralCfgData;
 import org.vishia.msgDispatch.LogMessage;
 
 
@@ -54,9 +57,10 @@ public interface GralPlugUser_ifc extends Closeable
    * in the main thread, not in the graphic thread.
    * @param plugUser2Gui Access from the plugin to the Gui main implementation. It is offer to use.
    * @param gralMng
+   * @param dataReplacement info about alias for some data paths, application-specific. See {@link GralCfgData#dataReplace}
    * @param log
    */
-  void init(GralPlugUser2Gral_ifc plugUser2Gui, GralMng gralMng, LogMessage log);
+  void init(GralPlugUser2Gral_ifc plugUser2Gui, GralMng gralMng, Map<String, String> dataReplacement, GuiCallingArgs args, LogMessage log);
 
   
   void registerMethods(org.vishia.gral.ifc.GralMngBuild_ifc guiMng);

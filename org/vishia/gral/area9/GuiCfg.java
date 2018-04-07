@@ -260,7 +260,7 @@ public GralPlugUser_ifc getPluggedUser(){ return user; }
 protected void userInit()
 {
   if(user !=null){
-    user.init(plugUser2Gui, _gralMng, console.getLogMessageOutputConsole());
+    user.init(plugUser2Gui, _gralMng, guiCfgData.dataReplace, this.cargs, console.getLogMessageOutputConsole());
   }
   
   

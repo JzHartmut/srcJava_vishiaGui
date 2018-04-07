@@ -716,7 +716,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     mng.setPosition(-24, 0, -67, 0, 1, 'r'); //right buttom, about half less display width and hight.
     wind.windConfirmSearch = mng.createWindow("windConfirmSearch", "search in file tree", GralWindow.windConcurrently);
     mng.setPosition(4, GralPos.size -3.5f, 1, -1, 0, 'd', 0.5f);
-    wind.widgPath = mng.addTextField("path", false, "path", "t");
+    wind.widgPath = mng.addTextField("path", true, "path", "t");
     wind.widgMask = mng.addTextField("mask", true, "search name/mask:", "t");
     wind.widgText = mng.addTextField("containsText", true, "contains text:", "t");
     

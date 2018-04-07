@@ -514,7 +514,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   private int dataIx;
   
 
-  /**Textual info about representation format. */
+  /**Textual info about representation format. 
+   * See usage in {@link GralTextField}.
+   * */
   protected String sFormat;
   
   /**Numeric informations about the content. */

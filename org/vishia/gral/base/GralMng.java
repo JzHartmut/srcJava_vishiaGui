@@ -499,6 +499,10 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   public void registerShowField(GralWidget widg){
     //link the widget with is information together.
+    if(widgetsInFocus.size()==0 && widg.getDataPath() !=null) {
+      //it has not a datapath initally. Never come here.
+      widgetsInFocus.add(widg);   //add first widget.
+    }
     if(widg.name !=null){
       showFields.put(widg.name, widg);
     }

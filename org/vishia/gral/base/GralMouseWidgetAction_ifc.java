@@ -115,7 +115,6 @@ public interface GralMouseWidgetAction_ifc
    * @param dy
    * @throws any exception which is catched in the mouse listener.
    * NOTE: yet unused. Write a class with gral mouse adaption!
-   */
   public static void executeActionForMouse(GralWidget widgg, int keyCode, GralWidget_ifc.ActionChangeWhen when, int mouse_x, int mouse_y, int dx, int dy) {
     GralWidget_ifc.ActionChange action = widgg.getActionChangeStrict(when, true); 
     if(action !=null){
@@ -134,6 +133,7 @@ public interface GralMouseWidgetAction_ifc
       }
     }
   }
+   */
   
   
 }

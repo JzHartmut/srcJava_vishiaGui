@@ -16,6 +16,7 @@ import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Assert;
+import org.vishia.util.Debugutil;
 import org.vishia.util.Docu_UML_simpleNotation;
 import org.vishia.util.IterableIterator;
 import org.vishia.util.KeyCode;
@@ -98,6 +99,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2018-01-07 Hartmut new: {@link #getCellTextFocus()}  
    * <li>2016-09-17 Hartmut new: in {@link #mouseDouble(int, CellData)} the <code>getActionChangeStrict(ActionChangeWhen.onMouse1Double, true)</code>
    *   is checked. Therewith the new concept of {@link #specifyActionChange(String, GralUserAction, String[], org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen...)}
    *   for specific actions is used here now. Firstly only for the mouse double click action. TODO: for all specific actions. 
@@ -699,6 +701,16 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   }
 
 
+  
+  /**Gets the text of any cell which is in focus. 
+   * This is a special routine: If no line is selected, it is possible that a text in a cell were written which is not assiciated to a line.
+   * @return
+   */
+  public String getCellTextFocus() {
+    if(gi !=null) return gi.getCellTextFocus();
+    else return null;
+  }
+  
 
   /**Gets the index in the visual presentation of the given line.
    * @param line any line of this table, maybe null, maybe a line from any other table
@@ -1146,6 +1158,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * @return true if the key is processed, false if the key is not processed here. Maybe processed after them.
      */
     protected boolean processKeys(int keyCode){
+      if(keyCode == KeyCode.enter)
+        Debugutil.stop();
       boolean done = true;
       long time = System.currentTimeMillis();
       lineSelectedNew = null;  //on any key, clear highlighted mouse down cell, if it is set yet.
@@ -1308,7 +1322,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           keyActionDone.activate();
           done = true;
         }
-        if(!done && lineSelected !=null){
+        if(!done /*&& lineSelected !=null*/){
           GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter);
           if(action !=null){
             Object[] args = action.args();
@@ -1723,6 +1737,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      */
     protected abstract String getCellText(CellData cell);
     
+    
+    /**Gets the cell text from the focused cell in the implementation. */
+    protected abstract String getCellTextFocus();
     
     /**Updates the cell text fields which presents the content of the table.
      * After them update() of the graphic level should be called.

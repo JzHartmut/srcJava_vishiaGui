@@ -1,5 +1,6 @@
 package org.vishia.guiInspc;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageFile;
 import org.vishia.util.Assert;
 import org.vishia.util.CompleteConstructionAndStart;
+import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
 public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
@@ -117,6 +119,18 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         GralButton widgButton = (GralButton)widgd;
         inspcMng.setmodeRetryDisabledVariables(widgButton.isOn());
+      }
+      return true;
+    }
+  };
+  
+
+  /**Action for button log. It switches on or off the logging functionality to log the telegram traffic
+   * for debugging. */
+  GralUserAction actionClearReq = new GralUserAction("InspcGui - clearReq"){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) { 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        inspcMng.clearRequestedVariables();
       }
       return true;
     }
@@ -216,10 +230,12 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     //composites.add(XXXinspcComm);
     
     if(cargs.sDefaultDirCfgForCurves !=null) {
-      FileRemote defaultDirCfg = fileCluster.getFile(cargs.sDefaultDirCfgForCurves, null);
+      CharSequence sDefaultDirCfgForCurves = FileSystem.normalizePath(new File(cargs.sDefaultDirCfgForCurves).getAbsolutePath());
+      FileRemote defaultDirCfg = fileCluster.getFile(sDefaultDirCfgForCurves, null);
       FileRemote defaultDirSave;
       if(cargs.sDefaultDirSaveForCurves !=null) {
-        defaultDirSave = fileCluster.getFile(cargs.sDefaultDirSaveForCurves, null);
+        CharSequence sDefaultDirSaveForCurves = FileSystem.normalizePath(new File(cargs.sDefaultDirSaveForCurves).getAbsolutePath());
+        defaultDirSave = fileCluster.getFile(sDefaultDirSaveForCurves, null);
       } else {
         defaultDirSave = null;
       }
@@ -387,6 +403,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
             String sValue = sArg.substring(posSep+1);
             cargs.indexTargetIpcAddr.put(sKey, sValue);
           }
+        }
+        else if(arg.startsWith("-pluginCfg=")) 
+        { cargs.sPluginCfg = getArgument(11);
         }
         else if(arg.startsWith("-curve-export=")) 
         { String sArg = getArgument(14);

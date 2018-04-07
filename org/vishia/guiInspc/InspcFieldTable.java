@@ -414,7 +414,10 @@ public class InspcFieldTable
     else 
     { //The varOfStruct is exisiting in any case. get it to get the short data path.
       InspcVariable varStruct = field.struct.varOfStruct(null);
-      if(":.".indexOf(varStruct.ds.sPathWithAlias.charAt(varStruct.ds.sPathWithAlias.length()-1))<0) {
+      if(sField1.charAt(0) =='[') { //array element
+        sPath = varStruct.ds.sPathWithAlias + sField1;
+      }
+      else if(":.".indexOf(varStruct.ds.sPathWithAlias.charAt(varStruct.ds.sPathWithAlias.length()-1))<0) {
         sPath = varStruct.ds.sPathWithAlias + "." + sField1;
       } else {
         sPath = varStruct.ds.sPathWithAlias + sField1;
