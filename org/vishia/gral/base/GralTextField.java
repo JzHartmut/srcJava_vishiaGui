@@ -217,10 +217,16 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
       sFormat1 = this.sFormat2;
     } else if(sFormat !=null){
       if(sFormat.startsWith("!")){
-        int posEnd = sFormat.indexOf('!',1);
+        final String sFormat3;
+        if(sFormat.startsWith("!16hi!") || sFormat.startsWith("!16lo!")) {
+          sFormat3 = sFormat.substring(5);  //from !
+        } else { 
+          sFormat3 = this.sFormat;
+        }
+        int posEnd = sFormat3.indexOf('!',1);
         if(posEnd >=0){
-          String sExpr = sFormat.substring(1, posEnd);
-          this.sFormat2 = sFormat1 = sFormat.substring(posEnd+1);
+          String sExpr = sFormat3.substring(1, posEnd);
+          this.sFormat2 = sFormat1 = sFormat3.substring(posEnd+1);
           if(calculator ==null){
             calculator = new CalculatorExpr();
             String sError = calculator.setExpr(sExpr);
@@ -303,6 +309,9 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
    *   using {@link CalculatorExpr}. Therewith any calculation can be done. The result may be a float or double.
    * <li>The rest after the "!expression!" or the given format is used for String.format(sFormat, value)
    *   to determine the output appearance.
+   * <li>If The sFormat has the form "!16lo!expr!format" ("!16lo" as prefix), then additional to the expression the 16 lo-Bits are filtered firstly.
+   *   Adequate starting with "!!16hi.." filteres the Bits 31..16 to bit 15..0 before calculate the expression. 
+   *   This is especially if 2 * 16 bit for different values are accessed in one 32 bit address position of an processor which can only access 32 bit.       
    * <li>As special feature a format <code>int32AngleDegree</code> and <code>int16AngleDegree</code>
    *   is supported, if that text is contained in the format string. The value should come from an integer,
    *   which contains an angle value with wrap-around-presentation: 0x7fffffff (32 bit) or 0x7fff (16 bit) and
@@ -327,10 +336,16 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
           this.calculator = new CalculatorAngle32();
           sFormat1 = this.sFormat2 = "%3.3f";
         } else {
-          int posEnd = sFormat.indexOf('!',1);
+          final String sFormat3;
+          if(sFormat.startsWith("!16hi!") || sFormat.startsWith("!16lo!")) {
+            sFormat3 = sFormat.substring(5);  //from !
+          } else { 
+            sFormat3 = this.sFormat;
+          }
+          int posEnd = sFormat3.indexOf('!',1);
           if(posEnd >=0){
-            String sExpr = sFormat.substring(1, posEnd);
-            sFormat1 = this.sFormat2 = sFormat.substring(posEnd+1);
+            String sExpr = sFormat3.substring(1, posEnd);
+            sFormat1 = this.sFormat2 = sFormat3.substring(posEnd+1);
             if(calculator ==null){
               calculator = new CalculatorExpr();
               String sError = calculator.setExpr(sExpr);
@@ -354,7 +369,14 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
  
     if(calculator !=null){ //use it.
       try {
-        value1 = calculator.calcDataAccess(null, valueP);
+        if(sFormat.startsWith("!16hi!")) {
+          value1 = calculator.calcDataAccess(null, (float)(((int)valueP) >>16));
+        }
+        else if(sFormat.startsWith("!16lo!")) {
+          value1 = calculator.calcDataAccess(null, (float)((short)valueP));
+        } else {
+          value1 = calculator.calcDataAccess(null, valueP);
+        }
         //value = (long)value1.doubleValue();
       } catch (Exception e) {
         value1 = new CalculatorExpr.Value(777777L);  //a long value

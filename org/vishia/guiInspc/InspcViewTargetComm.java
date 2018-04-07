@@ -65,7 +65,7 @@ public class InspcViewTargetComm
   private final GralTable<Object> widgTable;
 
 
-  private final GralButton wdgBtnLog, wdgBtnRetry, wdgBtnPerHandle;
+  private final GralButton wdgBtnLog, wdgBtnRetry, wdgBtnClearReq, wdgBtnPerHandle;
 
   private GralColor colorInactive = GralColor.getColor("wh")
                   , colorIdle = GralColor.getColor("lgn")
@@ -89,7 +89,9 @@ public class InspcViewTargetComm
     this.wdgBtnRetry.setSwitchMode("? Retry", "Retry ?off");
     this.wdgBtnRetry.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("am"));
     this.wdgBtnRetry.specifyActionChange("retry variables", gui.actionSetRetryDisabledVariable, null);
-    this.wdgBtnPerHandle = new GralButton("@InspcCtrlStatusWind,-2..0,24..34=BtnLog", "Enable Log", null);
+    this.wdgBtnClearReq = new GralButton("@InspcCtrlStatusWind,-2..0,24..34=BtnClearReq", "ClearReq", null);
+    this.wdgBtnClearReq.specifyActionChange("retry variables", gui.actionClearReq, null);
+    this.wdgBtnPerHandle = new GralButton("@InspcCtrlStatusWind,-2..0,36..48=BtnLog", "Enable Log", null);
     this.wdgBtnPerHandle.setSwitchMode("? use Handle", "use Handle ?off");
     this.wdgBtnPerHandle.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
     this.wdgBtnPerHandle.specifyActionChange("use handle", gui.actionUseGetValueByHandle, null);
