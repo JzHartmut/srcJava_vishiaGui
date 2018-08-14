@@ -1,7 +1,7 @@
 2012-11-14 06:19:56  x     _bzrGetOtherCmpnVersions.bat             ::          1.582 -1370334435 
 2012-11-14 06:19:00  x     _bzrOtherCmpnVersions.txt                ::           .804 -0655352013 
 2012-02-04 19:35:44  x     _bzr_push_A.bat                          ::           . 51  0133533915 
-2018-04-07 16:17:37  x     _filelist.lst                            ::           .  0  0000000000 
+2018-08-14 11:59:52  x     _filelist.lst                            ::           .  0  0000000000 
 2012-06-09 22:09:50  x     revisions_srcJava_vishiaGUI.txt          ::         97.084 -0350105957 
 
 ============================== _cmpn/ =============================================================
@@ -259,7 +259,7 @@
 2016-07-06 22:51:32  x     GralColorSelector.java                   ::          7.535 -0493836427 
 2017-04-03 21:47:02  x     GralCommandSelector.java                 ::          8.510  1048964108 
 2013-10-05 22:11:28  x     GralFileSelectWindow.java                ::          8.250 -0095134759 
-2018-01-18 17:42:54  x     GralFileSelector.java                    ::         64.007  1776542763 
+2018-08-14 11:59:05  x     GralFileSelector.java                    ::         65.966  1764342262 
 2017-04-12 21:50:58  x     GralHorizontalSelector.java              ::         10.770 -1804275348 
 2012-03-28 07:42:16  x     GralHtmlWindow.java                      ::           .721  1491408445 
 2017-01-10 10:55:06  x     GralInfoBox.java                         ::         14.864  0747955144 

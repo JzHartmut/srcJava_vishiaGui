@@ -12,6 +12,7 @@ import java.util.TreeMap;
 
 import org.vishia.commander.Fcmd;
 import org.vishia.fileRemote.FileAccessZip;
+import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.fileRemote.FileRemoteCallback;
@@ -69,6 +70,9 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2016-05-02 Hartmut: actionFileSearch writes a result list in the panel of the file window. 
+   *   Yet you can copy the path and insert in the directory text widget to select the file. 
+   *   TODO: Pressing enter to select, store the list etc.
    * <li>2016-05-02 Hartmut now: derived from GralWidget, it is a large widget 
    * <li>2016-05-03 Hartmut new: {@link #setVisible(boolean)} for this large widget.
    * <li>2015-11-19 Hartmut chg: {@link #fillInCurrentDir()} does not refresh if it was refreshed in the last seconds.
@@ -209,16 +213,17 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     
     
     /**Action is called if the button search is pressed. */
-    GralUserAction actionFileSearch = new GralUserAction(){
+    GralUserAction actionFileSearch = new GralUserAction("actionFileSearch"){
       @Override
-      public boolean userActionGui(int key, GralWidget widgd, Object... params){ 
-        if(widgd.sCmd.equals("search") && key == KeyCode.mouse1Up){
+      public boolean exec(int key, GralWidget_ifc widgi, Object... params){ 
+        if(widgi.getCmd().equals("search") && key == KeyCode.mouse1Up){
           boolean subDirs = widgSubdirs.isOn();
           String mask = (subDirs ? "**/" : "") + widgMask.getText();
           String text = widgText.getText();
           List<File> files = new LinkedList<File>(); 
           try{
             FileSystem.addFileToList(fileSelector.currentDir, mask, files);
+            fileSelector.fillIn(files);
             if(text.length() > 0){
               FileSystem.searchInFiles(files, text, searchOutput);
             } else {
@@ -834,6 +839,51 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     }
   }
   
+
+
+  private void fillIn(List<File> files) {
+  
+    selectList.wdgdTable.clearTable();
+    idxLines.clear();
+    for(File file1: files ){
+      FileCluster fc = currentDir.itsCluster;
+      FileRemote file = fc.getFile(FileSystem.normalizePath(file1.getAbsolutePath()), null);
+      String name = file.getName();
+      String path = file.getCanonicalPath();
+      GralTableLine_ifc<FileRemote> tline = selectList.wdgdTable.insertLine(path, 0, null, file);
+      tline.setCellText("?", kColDesignation);
+      tline.setCellText(path, kColFilename);
+      tline.setCellText(""+file.length(), kColLength);
+      long timeNow = System.currentTimeMillis();
+      long fileTime;
+      switch(showTime){
+        case 'm': fileTime = file.lastModified(); break;
+        case 'c': fileTime = file.creationTime(); break;
+        case 'a': fileTime = file.lastAccessTime(); break;
+        default: fileTime = -1; //error
+      }
+      
+      long diffTime = timeNow - fileTime;
+      Date timestamp = new Date(fileTime);
+      String sDate;
+      if(diffTime < -10 * 3600000L){
+        sDate = sDatePrefixNewer + dateFormatNewer.format(timestamp);
+      } else if(diffTime < 18*3600000){
+        //files today
+        sDate = sDatePrefixToday + dateFormatToday.format(timestamp);
+      } else if(diffTime < 320 * 24* 3600000L){
+        sDate = sDatePrefixYear + dateFormatYear.format(timestamp);
+      } else {
+        sDate = sDatePrefixOlder + dateFormatOlder.format(timestamp);
+      }
+      tline.setCellText(sDate, kColDate);
+      tline.setBackColor(colorBack, -1);
+      idxLines.put(path, tline);
+    }
+  }
+
+
+
 
   public void forcefillIn(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
   {
