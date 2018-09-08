@@ -89,6 +89,7 @@ public class InspcFieldTable
 {
   /**Version, history and license.
    * <ul>
+   * <li>2018-09-08 Hartmut chg: because {@link InspcFieldOfStruct} hasSubstruct.
    * <li>2016-10 Hartmut chg: Regards a field which is a node of tree, not only leaf. 
    * <li>2015-06-21 requests a new value if the older is older than 1 second, fast refresh
    * <li>2015-05-29 requests a new value only if the current is older than 5 seconds.
@@ -283,6 +284,11 @@ public class InspcFieldTable
   
   
   
+  /**Fills the graphic table to show the structural content of a data node (a C struct or class). 
+   * @since 2018-09: For array elements uses the {@link InspcFieldOfStruct#hasSubstruct} info from the parent (the field of the array).
+   *   Note: It comes from the target: "type..." or "type[size]..." in the telegram. 
+   * @param bCanRequest
+   */
   void fillTableStruct(boolean bCanRequest){
     widgTable.clearTable();
     InspcStruct struct = structVar.getOrCreateStructForNonLeafVariables();
@@ -300,7 +306,7 @@ public class InspcFieldTable
       while( iter.hasPrevious()) {  //traverse through list from start.
         parent = iter.previous();
         //InspcStruct struct1 = parent.struct();
-        InspcFieldOfStruct fieldParent = new InspcFieldOfStruct(parent, null, 0);
+        InspcFieldOfStruct fieldParent = new InspcFieldOfStruct(parent, null, 0, true);
         GralTableLine_ifc<InspcFieldOfStruct> line = widgTable.addLine(parent.ds.sName, null, fieldParent);
         line.setCellText("/", 0);
         line.setCellText(parent.ds.sName, 1);
@@ -471,7 +477,8 @@ public class InspcFieldTable
         for(int ix = 0; ix < field.nrofArrayElements; ++ix) {
           String ident = field.identifier + "[" + ix + "]";  //creates a field with index
           //The field for the array element:
-          InspcFieldOfStruct fieldElement = new InspcFieldOfStruct(structArray, ident, ident, field.type, -1);
+          boolean bHasSubstruct = field.hasSubstruct; //The info about sub structure is stored in the array field already.
+          InspcFieldOfStruct fieldElement = new InspcFieldOfStruct(structArray, ident, ident, field.type, -1, bHasSubstruct);
           lineTexts[0] = "-";
           lineTexts[1] = ident;
           lineTexts[2] = "";

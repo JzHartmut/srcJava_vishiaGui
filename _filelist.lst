@@ -1,7 +1,7 @@
 2012-11-14 06:19:56  x     _bzrGetOtherCmpnVersions.bat             ::          1.582 -1370334435 
 2012-11-14 06:19:00  x     _bzrOtherCmpnVersions.txt                ::           .804 -0655352013 
 2012-02-04 19:35:44  x     _bzr_push_A.bat                          ::           . 51  0133533915 
-2018-08-14 11:59:52  x     _filelist.lst                            ::           .  0  0000000000 
+2018-09-08 10:10:45  x     _filelist.lst                            ::           .  0  0000000000 
 2012-06-09 22:09:50  x     revisions_srcJava_vishiaGUI.txt          ::         97.084 -0350105957 
 
 ============================== _cmpn/ =============================================================
@@ -292,7 +292,7 @@
 2016-09-14 11:37:00  x     ButtonInspcCmd.java                      ::           .542  2100872833 
 2018-01-08 22:40:58  x     InspcCurveView.java                      ::         60.350 -0457892061 
 2015-05-25 22:51:12  x     InspcCurveViewApp.java                   ::          1.786  1991813217 
-2018-04-04 22:58:58  x     InspcFieldTable.java                     ::         25.508 -1584069632 
+2018-09-08 10:06:39  x     InspcFieldTable.java                     ::         26.092  1787012500 
 2018-01-04 17:47:38  x     InspcGui.java                            ::         24.184  1566272383 
 2014-04-30 14:05:05  x     InspcGuiFieldsFromFile.java              ::          4.768 -1365812909 
 2017-10-20 13:13:40  x     InspcViewTargetComm.java                 ::          7.353 -0442284600 
