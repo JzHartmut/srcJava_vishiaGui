@@ -3,6 +3,7 @@ package org.vishia.gral.cfg;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 
 import org.vishia.gral.ifc.GralMngBuild_ifc;
@@ -29,6 +30,8 @@ public class GralCfgZbnf
   
   /**Version and history
    * <ul>
+   * <li>2018-09-17 Now the syntax is contained in <code>org/vishia/gral/cfg/Syntax.zbnf</code> as file inside jar (ressource).
+   *   It is read with {@link #getSyntaxFromJar()}
    * <li>2011-05-00 Hartmut created, the old ZbnfCfg.. class is obsolte now.
    * </ul>
    *
@@ -70,7 +73,7 @@ public class GralCfgZbnf
    * Note: it is possible to use an abbreviated syntax with the same semantic if the constructor {@link GralCfgZbnf#GralCfgZbnf(Report, File)} is used. 
    * This syntax is used with the constructor
    * */
-  public final String syntaxStd = 
+  @Deprecated public final String XXXsyntaxStd = 
     " GuiDialogZbnfControlled::=\n"
   + " [ size( <#?ySize> , <#?xSize> ) ;]\n"
   + " { DataReplace: <DataReplace>\n"
@@ -178,8 +181,9 @@ public class GralCfgZbnf
   public GralCfgZbnf()
   { this.console = MainCmd.getLogging_ifc();
     this.fileSyntax = null;
+    String syntax = getSyntaxFromJar();
     this.parser = new ZbnfParser(console);
-    try{ this.parser.setSyntax(syntaxStd);
+    try{ this.parser.setSyntax(syntax); //Std);
     } catch(ParseException exc){
       throw new RuntimeException(exc);  //unexpected because syntax is given here. 
     }
@@ -194,6 +198,34 @@ public class GralCfgZbnf
     this.zbnfJavaOutput = new ZbnfJavaOutput(log);
   }
 
+  
+  /**
+   * @return null if not found.
+   */
+  String getSyntaxFromJar() {
+    String syntax = null;
+    ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+    //classLoader.getResource("org.vishia.gral.cfg.Syntax.txt");
+    InputStream in = classLoader.getResourceAsStream("org/vishia/gral/cfg/Syntax.zbnf");
+    if(in == null) return null; //not found
+    byte[] data = new byte[10000];
+    try {
+      int nBytes;
+      do{ 
+        nBytes = in.read(data);
+        String sdata = new String(data, 0, nBytes);
+        if(syntax == null) { syntax = sdata; }
+        else { syntax += sdata; }
+      } while(nBytes == data.length);
+      
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return syntax;
+  }
+  
+  
 
   /**Configures the GUI using a description in a file. The syntax is described see {@link #configureWithZbnf(String, String)}.
    * Because the configuration is containing in a user-accessible file, it may be faulty.

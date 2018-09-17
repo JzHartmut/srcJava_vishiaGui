@@ -20,6 +20,7 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   /**Version history:
    * 
    * <ul>
+   * <li>2018-08-17 Hartmut new: {@link #getWidget(String)}, {@link #getTextFrom(String)}  
    * <li>2016-07-16 Hartmut chg: On {@link #setToPanel(GralMngBuild_ifc)} all widgets of this panel are initialized too. More simple for user application. 
    * <li>2015-05-02 Hartmut new: {@link #setTextIn(String, CharSequence)}, change of registering a widget. Now any panel knows its widgets
    *   by name. 
@@ -255,6 +256,11 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   
   public List<GralWidget> getWidgetList(){ return widgetList; }
   
+  /**Gets a named widget on this panel. Returns null if faulty name. 
+   * @since 2018-09
+   */
+  public GralWidget getWidget(String name){ return idxWidgets.get(name); }
+  
   
   
   
@@ -268,6 +274,20 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
     GralWidget widg = idxWidgets.get(nameWidget);
     if(widg == null) throw new IllegalArgumentException("GralPanel - Widget not found, " + nameWidget);
     widg.setText(text);
+  }
+  
+  
+  
+  /**Gets the text from the named widget
+   * @param nameWidget the registered widget in its panel. 
+   * @param text The text to set.
+   * @throws IllegalArgumentException on faulty widget name
+   * @since 2015-05-02
+   */
+  public String getTextFrom(String nameWidget) {
+    GralWidget widg = idxWidgets.get(nameWidget);
+    if(widg == null) throw new IllegalArgumentException("GralPanel - Widget not found, " + nameWidget);
+    return widg.getText();
   }
   
   

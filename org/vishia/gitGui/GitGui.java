@@ -701,7 +701,7 @@ public class GitGui
         }
         if(entry.dateAuthor !=null) {
           String cL = "A";
-          if(entryLast !=null && entryLast.parentHash.equals(entry.revisionHash)){ cL = "B"; }
+          if(entryLast !=null && entryLast.parentHash !=null && entryLast.parentHash.equals(entry.revisionHash)){ cL = "B"; }
           lineTexts[0] = cL;
           lineTexts[1] = dateFormat.format(entry.dateAuthor);
           lineTexts[2] = entry.commitTitle;

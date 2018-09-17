@@ -42,6 +42,7 @@ public class GralCfgWindow
   
   /**The version, history and license.
    * <ul>
+   * <li>2018-09-17 GralCfgWindow: with argument for size and AWT/SWT
    * <li>2015-04-26 Hartmut created: For usage in Jzcmd-scripts.
    * </ul>
    * 
@@ -86,15 +87,19 @@ public class GralCfgWindow
   /**Creates a new Window or opens the existing one with given name.
    * @param sName Name of the window inside the gral manager to address the window.
    * @param sTitle text in the title bar
+   * @param size 'A'...'E' as pixel/grid unit for SWT graphic. 'a'...'e' same for AWT-Graphic
    * @param sCfg textual given configuration for the window.
    * @param imgDir start directory path where images are located if given with relative path.
    * @param log interface for logging output of parser and creation.
    * @throws ParseException on errors in the sCfg
    */
-  GralCfgWindow(String sName, String sTitle, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) throws ParseException {
+  private GralCfgWindow(String sName, String sTitle, char size, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) throws ParseException {
     this.log = log !=null ? log : log;
     this.guiCfgData = new GralCfgData(null);  //no config conditions given.
     this.imgDir = imgDir;
+    String swtOrawt;
+    if(size < 'a') { swtOrawt = "SWT"; }
+    else { size -= 'a'-'A'; swtOrawt = "AWT"; }
     GralCfgZbnf cfgZbnf = new GralCfgZbnf();  //temporary instance for parsing
     cfgZbnf.configureWithZbnf(sCfg, guiCfgData); //
     int props = GralWindow_ifc.windRemoveOnClose | GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable;
@@ -102,7 +107,7 @@ public class GralCfgWindow
     mng.selectPrimaryWindow();
     this.window = new GralWindow("10+30, 10+50", sName, sTitle, props);
     configInGthread.getCtDone(0);
-    this.window.create("AWT", 'C', log, configInGthread);
+    this.window.create(swtOrawt, size, log, configInGthread);
     configInGthread.awaitExecution(1, 0);
   }
   
@@ -110,15 +115,16 @@ public class GralCfgWindow
    * The window will be removed on closing.
    * @param sName Name of the window inside the gral manager to address the window.
    * @param sTitle text in the title bar
+   * @param size 'A'...'E' as pixel/grid unit for SWT graphic. 'a'...'e' same for AWT-Graphic
    * @param sCfg textual given configuration for the window.
    * @param imgDir start directory path where images are located if given with relative path.
    * @param log log output for status and parse messages
    * @throws ParseException on errors in the sCfg
    */
-  public static GralPanelContent createWindow(String sName, String sTitle, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) 
+  public static GralWindow createWindow(String sName, String sTitle, char size, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) 
   throws ParseException
   {
-    GralCfgWindow thiz = new GralCfgWindow(sName, sTitle, sCfg, imgDir, log);
+    GralCfgWindow thiz = new GralCfgWindow(sName, sTitle, size, sCfg, imgDir, log);
     return thiz.window;
   }
   
