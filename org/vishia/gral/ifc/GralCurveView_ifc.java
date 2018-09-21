@@ -58,7 +58,9 @@ public interface GralCurveView_ifc extends GralWidget_ifc, GralSetValue_ifc, Get
    * If more as one threads writes data, an external synchronization should be done
    * which may encapsulate more as only this call.
    * <br><br> 
-   * The implementation should force repaint to show the data in the graphic thread.
+   * The caller should force repaint to show the data in the graphic thread. 
+   * It is possible and sensitive to force repaint after writing some done one after another
+   * if the data are given faster than the users view eye.
    * 
    * @param values The values.
    * @param timeshort relative time-stamp as currently wrapping time in milliseconds.

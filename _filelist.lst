@@ -1,7 +1,7 @@
 2012-11-14 06:19:56  x     _bzrGetOtherCmpnVersions.bat             ::          1.582 -1370334435 
 2012-11-14 06:19:00  x     _bzrOtherCmpnVersions.txt                ::           .804 -0655352013 
 2012-02-04 19:35:44  x     _bzr_push_A.bat                          ::           . 51  0133533915 
-2018-09-17 23:28:40  x     _filelist.lst                            ::           .  0  0000000000 
+2018-09-21 19:36:50  x     _filelist.lst                            ::           .  0  0000000000 
 2012-06-09 22:09:50  x     revisions_srcJava_vishiaGUI.txt          ::         97.084 -0350105957 
 
 ============================== _cmpn/ =============================================================
@@ -123,7 +123,7 @@
 2012-05-20 12:38:56  x     GetGralWidget_ifc.java                   ::          2.072 -2006934492 
 2016-11-04 22:26:30  x     GralButton.java                          ::         21.081  0869433118 
 2015-10-26 20:56:46  x     GralColorConv.java                       ::         14.603  1298753472 
-2017-07-29 11:14:57  x     GralCurveView.java                       ::         83.714  0011160301 
+2018-09-21 19:28:17  x     GralCurveView.java                       ::         85.777  1587475995 
 2016-08-24 17:49:11  x     GralGraphicThread.java                   ::         21.609 -1579458168 
 2015-02-07 13:01:18  x     GralGraphicTimeOrder.java                ::          4.735  2088496927 
 2016-07-09 23:41:23  x     GralGridProperties.java                  ::         13.122  1699234895 
@@ -152,7 +152,7 @@
 2013-07-15 11:52:00  x     package-info.java                        ::           .413  0984628564 
 
 ============================== org/vishia/gral/cfg/ ================================================
-2016-11-06 09:35:09  x     GralCfgBuilder.java                      ::         19.527 -2011653052 
+2018-09-21 19:15:31  x     GralCfgBuilder.java                      ::         19.526  1813342732 
 2016-11-06 09:36:05  x     GralCfgData.java                         ::         18.237 -1724989233 
 2016-09-22 08:59:01  x     GralCfgDesigner.java                     ::         15.867  1456736768 
 2016-11-06 09:35:09  x     GralCfgElement.java                      ::         10.309 -1907672631 
@@ -175,8 +175,8 @@
 2015-10-04 16:38:09  x     GralCanvasStorage.java                   ::          8.404 -0388032664 
 2012-03-03 22:57:02  x     GralCanvas_ifc.java                      ::          2.554 -2144388538 
 2015-10-17 00:15:41  x     GralColor.java                           ::         18.443  0689480018 
-2016-05-04 17:12:44  x     GralCurveViewTrack_ifc.java              ::          4.661 -1636313818 
-2014-09-24 16:12:52  x     GralCurveView_ifc.java                   ::          5.903  0122950566 
+2018-09-20 19:49:40  x     GralCurveViewTrack_ifc.java              ::          4.695 -1144203777 
+2018-09-21 19:09:56  x     GralCurveView_ifc.java                   ::          6.048 -0536882720 
 2017-01-15 22:20:41  x     GralFactory.java                         ::          5.909 -1440149182 
 2013-03-28 08:32:36  x     GralFileDialog_ifc.java                  ::          2.674  2114388579 
 2013-12-23 20:22:34  x     GralFont.java                            ::          3.272 -0533398868 
@@ -292,7 +292,7 @@
 
 ============================== org/vishia/guiInspc/ ================================================
 2016-09-14 11:37:00  x     ButtonInspcCmd.java                      ::           .542  2100872833 
-2018-01-08 22:40:58  x     InspcCurveView.java                      ::         60.350 -0457892061 
+2018-09-21 19:35:54  x     InspcCurveView.java                      ::         57.792  1858437296 
 2015-05-25 22:51:12  x     InspcCurveViewApp.java                   ::          1.786  1991813217 
 2018-09-08 10:06:39  x     InspcFieldTable.java                     ::         26.092  1787012500 
 2018-01-04 17:47:38  x     InspcGui.java                            ::         24.184  1566272383 

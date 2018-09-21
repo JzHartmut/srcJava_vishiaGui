@@ -340,7 +340,7 @@ public class GralCfgBuilder
         } else {
           colorLine = GralColor.getColor(line.colorValue);  //maybe 0 = black if not given.
         }
-        widgc.initTrack(line.name, sDataPathLine, colorLine, 0, line.nullLine, line.scale, line.offset);
+        widgc.addTrack(line.name, sDataPathLine, colorLine, 0, line.nullLine, line.scale, line.offset);
       }
       widgd = widgc;
     } else {

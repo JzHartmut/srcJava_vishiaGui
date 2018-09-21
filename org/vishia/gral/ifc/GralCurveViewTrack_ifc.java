@@ -89,8 +89,8 @@ public interface GralCurveViewTrack_ifc extends GralSetValue_ifc
 
   
   /**Sets the properties for this track.
-   * @param color The color of line
-   * @param width The thickness of the line.
+   * @param color The color of line, null: no change
+   * @param width The thickness of the line. 0: no change
    * @param pattern a Pattern of the line. Yet the pattern is not used (TODO). Value 0 doesn't change the current one.
    */
   void setLineProperties(GralColor color, int width, int pattern);
@@ -112,5 +112,6 @@ public interface GralCurveViewTrack_ifc extends GralSetValue_ifc
   float getValueLast();
   float getValueMin();
   float getValueMax();
+  
 
 }

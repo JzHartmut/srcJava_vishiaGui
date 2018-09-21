@@ -50,6 +50,14 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   /**Version, history and license.
    * <ul>
+   * <li>2018-09-20 Hartmut improved for using in InspcCurveViewApp.
+   *   <ul>
+   *   <li>initTrack(...) renamed to {@link #addTrack(String, String, GralColor, int, int, float, float)}
+   *   <li>{@link #searchTrack(String)} if data are read from csv for existing configuration.
+   *   <li>{@link #readCurve(File)} now expects names of variable in the first line in any case, not specific format.
+   *   <li>{@link #readCurveCsvHeadline(File)} can replace the correct variables in the configuration or builds new tracks
+   *     for non existing configurated tracks.
+   *   </ul>
    * <li>2016-07-03 Hartmut chg: {@link GraphicImplAccess} as base class of the implementing class SwtCurveView adequate to the  new concept: 
    *   An implementing widget is derived from its derived class of {@link GralWidget.ImplAccess}. Therefore only that base class implements the GralWidgetImpl_ifc.
    * <li>2016-03-06 Hartmut chg: {@link #refreshFromVariable(VariableContainer_ifc)}: Handling of timeshort: If the timeshort starts with a lesser value
@@ -155,7 +163,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   /**Instances of this class were be created only temporary while transfer a parse result of {@link GralCurveView#applySettings(String)}
    * The instance holds values for {@link ZbnfJavaOutput} to apply to a track 
-   * calling {@link GralCurveView#initTrack(String, String, GralColor, int, int, float, float)}
+   * calling {@link GralCurveView#addTrack(String, String, GralColor, int, int, float, float)}
    * inside {@link GralCurveView.ZbnfSetCurve#add_Track(ZbnfSetTrack)}.
    */
   public static class ZbnfSetTrack {
@@ -180,7 +188,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   /**The instance of this class {@link GralCurveView#zbnfSetCurve} will be used only temporary while transfer a parse result 
    * of {@link GralCurveView#applySettings(String)}
    * The instance contains only the capabilty to get the track info from the parse result
-   * and to call {@link GralCurveView#initTrack(String, String, GralColor, int, int, float, float)}
+   * and to call {@link GralCurveView#addTrack(String, String, GralColor, int, int, float, float)}
    * inside {@link #add_Track(ZbnfSetTrack)}.
    */
   public class ZbnfSetCurve{
@@ -190,7 +198,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     }
     /**From Zbnf component with semantic <?Track>. */
     public void add_Track(ZbnfSetTrack track){
-      initTrack(track.name, track.datapath, track.color_, track.style_, track.nullLine, track.scale, track.offset);
+      addTrack(track.name, track.datapath, track.color_, track.style_, track.nullLine, track.scale, track.offset);
     }
     
     public void set_timeDatapath(String val){
@@ -394,9 +402,12 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     
     
     
+    /**
+     * @see org.vishia.gral.ifc.GralCurveViewTrack_ifc#setLineProperties(org.vishia.gral.ifc.GralColor, int, int)
+     */
     @Override public void setLineProperties(GralColor color, int width, int pattern){ 
-      lineColor = color; 
-      lineWidth = width;
+      if(color !=null) { lineColor = color; } 
+      if(width >0) { lineWidth = width;}
     }
 
     @Override public void setVisible(int mode){ showSelected = mode; }
@@ -410,6 +421,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       System.err.println("GralCurveView - setText not supported; Widget = " + name + "; text=" + text);
     }
    
+    
     
     @Override public String toString(){ return "Track: " + name + "(" + sDataPath + "," + (variable !=null ? variable.toString(): "variable = null") + ")"; }
     
@@ -809,47 +821,33 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   public void setActionTrackSelected(GralUserAction action){ actionSelectTrack = action; }
   
   
-  /**Initializes a track of the curve view.
-   * This routine should be called after construction, only one time per track
+  /**Creates and adds a track of the curve view. Note: The current {@link #listTracks} instance won't be changed.
+   * Instead, a new ArrayList is created here with the content of listTracks and the new track.
+   * This is because the {@link #listTracks} instance may be used in a iterator in another thread.
+   * That is in {@link #setSample(float[], int)} which can be invoked in a cyclically or receiving thread,
+   * or in {@link #refreshFromVariable(VariableContainer_ifc)} which is invoked in the Inspector Gui cyclically
+   * to get values from target. If during operation a track was add by the users operation on GUI, it should not disturb the current process.
+   * 
+   * 
+   * This routine should be called only one time per track to create a new one.
    * in the order of tracks.
+   * Note: renamed from initTrack, 2018-09
    * @param sNameTrack
    * @param sDataPath
-   * @param colorValue
+   * @param color
    * @param style
    * @param nullLine
    * @param scale
    * @param offset
+   * @return The track instance.
    */
-  public GralCurveViewTrack_ifc initTrack(String sNameTrack, String sDataPath, GralColor color, int style
+  public Track addTrack(String sNameTrack, String sDataPath, GralColor color, int style
       , int nullLine, float scale, float offset)
   {
-    List<Track> listTracksNew = new LinkedList<Track>();
-    listTracksNew.addAll(this.listTracks); //Atomic access, iterate in local referenced list.
-    GralCurveViewTrack_ifc track = initTrack(sNameTrack, sDataPath, color, style, nullLine, scale, offset, listTracksNew);
-    listTracks = listTracksNew;
-    return track;
-  }
-
-
-  
-  /**Initializes a track of the curve view.
-   * This routine should be called after construction, only one time per track
-   * in the order of tracks.
-   * @param sNameTrack
-   * @param sDataPath
-   * @param colorValue
-   * @param style
-   * @param nullLine
-   * @param scale
-   * @param offset
-   */
-  private GralCurveViewTrack_ifc initTrack(String sNameTrack, String sDataPath, GralColor color, int style
-      , int nullLine, float scale, float offset, List<Track> listTracksNew)
-  {
+    //Track track = initTrack(sNameTrack, sDataPath, color, style, nullLine, scale, offset, listTracksNew);
     Track track = new Track(this, sNameTrack, listTracks.size());
     track.values = new float[this.maxNrofXValues];
     track.scale = new TrackScale();
-    listTracksNew.add(track);
     track.sDataPath =sDataPath;
     track.variable = null;
     track.scale.y0Line = nullLine;
@@ -857,10 +855,32 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     track.scale.yScale = scale;
     track.lineColor = color == null ? GralColor.getColor("rd") : color;
     bNewGetVariables = true;  //to force re-read of all variables.
+    //
+    //add the track, but build a new List
+    List<Track> listTracksNew = new ArrayList<Track>();
+    listTracksNew.addAll(this.listTracks); //Atomic access, iterate in local referenced list.
+    listTracksNew.add(track);
+    listTracks = listTracksNew;
     return track;
   }
 
 
+  
+
+
+  
+  /**Searches and returns the track from listTrack per name.
+   * @param name
+   * @return null if not found.
+   */
+  private Track searchTrack(String name) {
+    for(Track e: listTracks) {
+      if(e.sDataPath.equals(name)) return e;
+    }
+    return null;
+  }
+  
+  
   
   public void setTimePerPixel(int time){
     timeorg.timePerPixel = time;
@@ -926,7 +946,10 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   }
 
   
-  @Override public void setSample(float[] newValues, int timeshort) {
+  /**
+   * @see org.vishia.gral.ifc.GralCurveView_ifc#setSample(float[], int)
+   */
+  @Override public void setSample(float[] values, int timeshort) {
     if(testStopWr) return;  //only for debug test.
     //if(++ixDataWr >= maxNrofXValues){ ixDataWr = 0; } //wrap arround.
     if( ++saveOrg.ctValuesAutoSave > saveOrg.nrofValuesAutoSave) { 
@@ -946,9 +969,13 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     }
     int ixSource = -1;
     int ixWr = (ixDataWr >> shIxiData) & mIxiData;
-    for(Track track: listTracks){
-      if(ixSource < newValues.length -1){
-        float val = newValues[++ixSource];  //write in the values.
+    //
+    //
+    //assign the argument values to the track.values
+    //
+    for(Track track: listTracks){ 
+      if(ixSource < values.length -1){
+        float val = values[++ixSource];  //write in the values.
         track.values[ixWr] = val;  //write in the values.
         if(track.min > val ){ track.min = val; }
         if(track.max < val ){ track.max = val; }
@@ -956,6 +983,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
         track.values[ixWr] = 0;
       }
     }
+    //
     int timeLast = timeValues[ixWr];
     timeValues[ixWr] = timeshort;
     
@@ -1105,7 +1133,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       } else {
         this.common.timeDatapath = null;
         this.common.timeVariable = null;
-        listTracks = new LinkedList<Track>();
+        listTracks = new ArrayList<Track>();
         //listTrackSet.clear();
         ZbnfJavaOutput setData = new ZbnfJavaOutput(console);
         setData.setContent(zbnfSetCurve.getClass(), zbnfSetCurve, parser.getFirstParseResult());
@@ -1200,11 +1228,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     int zBytes = ifile.read(buffer);
     ifile.close();
     String firstLine = new String(buffer,0, zBytes);
-    if(firstLine.startsWith("csv-headline.curve;")){
-      readCurveCsvHeadline(file);
-    } else if(firstLine.startsWith("CurveView-CSV version 150120")) {
-      readCurveCsvHeadline(file);
-    }
+    readCurveCsvHeadline(file);
     //timeLastSave = System.currentTimeMillis();
     
   }
@@ -1217,41 +1241,63 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     String sLine;
     BufferedReader ifile = new BufferedReader(new FileReader(file));
     //first head line
-    sLine = ifile.readLine();
     setTimePoint(System.currentTimeMillis(), 0, 0.156f);
     //line with channels
     sLine = ifile.readLine();
-    List<Track> listTracksNew = new LinkedList<Track>();
+    //List<Track> listTracksNew = new ArrayList<Track>();  ////
     //listTrackSet.clear();
     int ixInList = -1;
     String[] signals = sLine.split(";");
-    
-    String[] colors = {"bk","rd","gn","bl","or","gr","gr","gr","gr"};
-    int ix = 0;
+    int[] dataIx = new int[signals.length +10];
+    String[] colors = {"bk","rd","gn","bl","or","rd1","rd2","gn1","gn2","bk","rd","gn","bl","or","rd1","rd2","gn1"};
+    int ix = -1;
+    int ixColor = 0;
+    boolean first_timesh = false;
     for(String signal1: signals){
       String signal = signal1.trim();
-      GralColor color = GralColor.getColor(colors[ix]);
-      initTrack(signal, signal, color, 1, 50, 1.0f, 0.0f, listTracksNew);
-      ix +=1;
+      if(signal.equals("timesh") && ix == -1) {
+        first_timesh = true;
+      } else {
+        Track track = searchTrack(signal);
+        if(track !=null) {
+          //listTracksNew.add(track);
+        } else {
+          GralColor color = GralColor.getColor(colors[ixColor]);
+          track = addTrack(signal, signal, color, 1, 50, 1.0f, 0.0f); //, listTracksNew);
+          if(ixColor < colors.length-1) {ixColor +=1;}
+        }
+        dataIx[++ix] = track.ixList; //getDataIx();
+      }
     }
-    listTracks = listTracksNew;
+    //listTracks = listTracksNew;
     this.ixDataWr = -adIxData; //initial write position, first increment to 0.
-    float[] fvalues = new float[listTracks.size()];
+    float[] fvalues = new float[listTracks.size() + 10];
     int timeshort = 0;
     while( (sLine = ifile.readLine())!=null){
+      timeshort +=1;
       String[] values = sLine.split(";");
       int ixCol = -1;
+      boolean bFirstCol = true;
       for(String value1: values){
         String sValue = value1.trim();
         sValue = sValue.replace(',', '.');  //accept , as fractional separator, convert to .
-        float value;
-        try{ value = Float.valueOf(sValue); }
-        catch(NumberFormatException exc){ 
-          value = 0.099999999f; 
+        if(first_timesh && bFirstCol) {
+          try{ timeshort = Integer.valueOf(sValue); }
+          catch(NumberFormatException exc) {
+            timeshort +=1;  //use incremented
+          }
+        } else {
+          float value;
+          try{ value = Float.valueOf(sValue); }
+          catch(NumberFormatException exc){ 
+            value = 0.099999999f; 
+          }
+          int ixData = dataIx[++ixCol];
+          fvalues[ixData] = value;
         }
-        fvalues[++ixCol] = value;
+        bFirstCol = false;
       }
-      setSample(fvalues, ++timeshort);
+      setSample(fvalues, timeshort);
     }
     ifile.close();
   }
