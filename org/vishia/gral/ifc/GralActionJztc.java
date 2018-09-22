@@ -1,9 +1,18 @@
 package org.vishia.gral.ifc;
 
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.script.ScriptException;
+
 import org.vishia.cmd.JZtxtcmdExecuter;
 import org.vishia.cmd.JZtxtcmdScript;
 import org.vishia.cmd.JZtxtcmdThreadQueue;
 import org.vishia.gral.base.GralMng;
+import org.vishia.mainCmd.MainCmdLogging_ifc;
+import org.vishia.util.DataAccess;
 
 /**This class should be instantiated by a JZtxtcmd script.
  * It is the common container for all actions which are deployed by sub routines of jzcmd.
@@ -57,7 +66,7 @@ public class GralActionJztc
   
   private class Action extends GralUserAction {
 
-    final JZtxtcmdScript.Subroutine jzsub;
+    JZtxtcmdScript.Subroutine jzsub;
 
     Action(JZtxtcmdScript.Subroutine jzsub){
       super(jzsub.name);
@@ -71,21 +80,82 @@ public class GralActionJztc
     
   }
   
+  
+  private class ActionRereadScript extends GralUserAction {
+
+
+    public ActionRereadScript()
+    { super("GralActionJztc-reread script");
+      GralMng.get().registerUserAction("GralActionJztc_reread", this);
+    }
+    
+    @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params) {
+      if(scriptFile !=null) {
+        GralActionJztc.this.setScript(scriptFile);
+      }
+      return true;
+    }
+    
+  }
+  
+
+  
+  
+  
+  Map<String, Action> actions = new TreeMap<String, Action>();
+  
+  
+  
+  /**The java prepared script which contains subroutines. */
+  JZtxtcmdScript jzcmdScript;
+
+  File scriptFile;
+  
   final JZtxtcmdThreadQueue thread;
   
   //final JZtxtcmdExecuter cmdExecuter;
 
   final Appendable out;
   
+  final MainCmdLogging_ifc log;
+  
   /**Constructs and stores JZtxtcmd aggregation.
    * @param jztc The main data to access script level
    * @param out Any output used in the sub routine.
    */
-  public GralActionJztc(JZtxtcmdExecuter.JzTcMain jztc, Appendable out){
+  public GralActionJztc(JZtxtcmdExecuter.JzTcMain jztc, Appendable out, MainCmdLogging_ifc log){
     this.thread = new JZtxtcmdThreadQueue("jzTc-GUI", jztc);
     //this.cmdExecuter = cmdExecuter;
-    this.out = out;
+    this.out = out; this.log = log;
   }
+  
+  
+  
+  public void setScript(File scriptfile) {
+    if(this.scriptFile == null) { //first invocation
+      new ActionRereadScript();   //registeres it.
+    }
+    this.scriptFile = scriptfile;
+    try{ 
+      jzcmdScript = JZtxtcmdScript.createScriptFromFile(scriptfile, log, null);
+      List<Object> listSubs = jzcmdScript.scriptClass().listClassesAndSubroutines();
+      for(Object e: listSubs) {
+        if(e instanceof JZtxtcmdScript.Subroutine) {
+          JZtxtcmdScript.Subroutine sub = (JZtxtcmdScript.Subroutine)e;
+          if(sub.formalArgs !=null && sub.formalArgs.size()==1) {
+            DataAccess arg = sub.formalArgs.get(0).defVariable;   //has a defVariable always.
+            if(arg.datapath().get(0).ident().equals("widget")) {  //datapath only simple, 'widget' aus key
+              //subroutine to register
+              add(sub);  //adds or replaces
+            }
+          }
+        }
+      }
+    } catch (ScriptException exc) {
+      log.writeError("Error GralUserAction.setScript", exc);
+    }
+  }
+  
   
   
   
@@ -96,8 +166,15 @@ public class GralActionJztc
    * @param jzsub
    */
   public void add(JZtxtcmdScript.Subroutine jzsub) {
-    Action action = new Action(jzsub);  //will be registered
-    GralMng.get().registerUserAction(jzsub.name, action);
+    String name = jzsub.name;
+    Action action = actions.get(name);
+    if(action != null) {
+      action.jzsub = jzsub;      //replace action on reread script.
+    } else {
+      action = new Action(jzsub);
+      actions.put(name, action);
+      GralMng.get().registerUserAction(jzsub.name, action);
+    }
   }
   
   
