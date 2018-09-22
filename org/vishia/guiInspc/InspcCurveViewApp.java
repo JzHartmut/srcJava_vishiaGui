@@ -1,5 +1,7 @@
 package org.vishia.guiInspc;
 
+import java.io.File;
+
 import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralGraphicTimeOrder;
@@ -20,17 +22,28 @@ public class InspcCurveViewApp
   
   public static void main(String[] args){
     InspcCurveViewApp main = new InspcCurveViewApp();
-    main.execute();
+    File dir;
+    if(args.length >=1) {
+      dir = new File(args[0]);
+      if(dir.exists() && !dir.isDirectory()) {
+        dir = dir.getParentFile();
+      } else if(!dir.exists()) {
+        dir = new File("d:/");
+      }
+    } else {
+      dir = new File("d:/");
+    }
+    main.execute(dir.getAbsolutePath());
   
   }
   
-  private void execute(){
+  private void execute(String sDir){
     GralFactory gralFactory = new SwtFactory();
     LogMessage log = new LogMessageStream(System.out);
     GralWindow wind = gralFactory.createWindow(log, "Curve View", 'C', 100, 50, 800, 600);
     FileCluster fileCluster = FileRemote.clusterOfApplication;
-    FileRemote dirCfg = fileCluster.getDir("D:/");
-    FileRemote dirSave = fileCluster.getDir("D:/");
+    FileRemote dirCfg = fileCluster.getDir(sDir);
+    FileRemote dirSave = fileCluster.getDir(sDir);
     curveView = new InspcCurveView("curves", null, wind.gralMng(), dirCfg, dirSave, null);
     curveView.windCurve = wind;
     gralMng = wind.gralMng();

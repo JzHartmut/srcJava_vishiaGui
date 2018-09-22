@@ -24,34 +24,37 @@ set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/commander/Fcmd.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gitGui/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/cfg/*.java
+set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/ifc/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/area9/*.java
-set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/test/*.java
+::set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/gral/test/*.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/guiInspc/*.java
 ::set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/guiViewCfg/ViewCfg.java
 set INPUT_JAVAC=%INPUT_JAVAC% ../org/vishia/simSelector/*.java
 
+set COPYJAR=..\org\vishia\gral\cfg\*.zbnf %TMP_JAVAC%\bin\org\vishia\gral\cfg\*
+
 REM Sets the CLASSPATH variable for compilation (used jar-libraries). do not leaf empty also it aren't needed:
 REM This component based on the ZBNF and the vishiaRun.
 
-set SWTJAR=d:\Programs\XML_Tools\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
-if exist %SWTJAR% goto :swtOk
-set SWTJAR=d:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
-if exist %SWTJAR% goto :swtOk
-set SWTJAR=c:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
-if exist %SWTJAR% goto :swtOk
-set SWTJAR=d:\Programme\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+set SWTJAR=..\..\..\Java\Download\swt\windows\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
 if exist %SWTJAR% goto :swtOk
 set SWTJAR=%FCMD_DST%\windows\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
 if exist %SWTJAR% goto :swtOk
-set SWTJAR=..\..\..\Java\Download\swt\windows\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
-if exist %SWTJAR% goto :swtOk
+::set SWTJAR=d:\Programs\XML_Tools\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+::if exist %SWTJAR% goto :swtOk
+::set SWTJAR=d:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+::if exist %SWTJAR% goto :swtOk
+::set SWTJAR=c:\Progs\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+::if exist %SWTJAR% goto :swtOk
+::set SWTJAR=d:\Programme\Eclipse3_5\plugins\org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar
+::if exist %SWTJAR% goto :swtOk
 echo SWT library not found
 pause
 exit
 :swtOk
 REM The viahiaGui depends on zbnf.jar.
 REM SRCvishiaBase used for compile batch script only.
-set SRCvishiaBase=..\..\..\ZBNF\srcJava_vishiaBase
+set SRCvishiaBase=..\..\..\ZBNF\srcJava_Zbnf
 set ZBNFJAR=..\..\..\ZBNF\zbnfjax\zbnf.jar
 
 if exist %ZBNFJAR% goto :ZbnfOk
@@ -64,7 +67,7 @@ pause
 echo on
 
 REM Sets the src-path for further necessary sources:
-::set SRCPATH_JAVAC=..;../../srcJava_vishiaBase;../../srcJava_Zbnf;../../srcJava_vishiaRun
+::set SRCPATH_JAVAC=..;../../srcJava_Zbnf;../../srcJava_vishiaRun
 set SRCPATH_JAVAC=..;../../srcJava_vishiaRun
 
 call %SRCvishiaBase%\_make\+javacjarbase.bat

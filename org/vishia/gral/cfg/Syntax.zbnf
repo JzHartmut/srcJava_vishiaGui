@@ -38,6 +38,7 @@ Element::=
  | InputTextline ( <param?InputTextline> ) ;
  | InputField ( <param?InputTextline> ) ;
  | InputBox ( <param?InputTextbox> ) ;
+ | OutputBox ( <param?OutputTextbox> ) ;
  | InputFile ( <param?InputFile> ) ;
  | Slider ( <param?Slider> ) ;
  | Show <ShowField> ;

@@ -187,6 +187,14 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   
   public void set_InputTextbox(GuiCfgWidget data) {  }
   
+  public GuiCfgWidget new_OutputTextbox()
+  { GralCfgData.GuiCfgWidget widgt = new GralCfgData.GuiCfgWidget(this, 't');
+    this.widgetType = widgt;
+    return widgt;
+  }
+  
+  public void set_OutputTextbox(GuiCfgWidget data) {  }
+  
   public GuiCfgWidget new_InputTextline()
   { GralCfgData.GuiCfgWidget widgt = new GralCfgData.GuiCfgWidget(this, 'T');
     this.widgetType = widgt;

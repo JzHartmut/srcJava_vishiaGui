@@ -105,7 +105,7 @@ public class GralCfgWindow
     int props = GralWindow_ifc.windRemoveOnClose | GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable;
     GralMng mng = GralMng.get();
     mng.selectPrimaryWindow();
-    this.window = new GralWindow("10+30, 10+50", sName, sTitle, props);
+    this.window = new GralWindow("10+50, 10+100", sName, sTitle, props);
     configInGthread.getCtDone(0);
     this.window.create(swtOrawt, size, log, configInGthread);
     configInGthread.awaitExecution(1, 0);
