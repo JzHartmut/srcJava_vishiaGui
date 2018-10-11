@@ -252,7 +252,7 @@ public class FcmdExecuter
     if(file !=null){
       String name = file.getName();
       int posDot = name.lastIndexOf('.');
-      if(posDot > 0){
+      if(posDot >= 0){
         ext = name.substring(posDot+1);
       } else if(file.canExecute()){
         ext = ">";

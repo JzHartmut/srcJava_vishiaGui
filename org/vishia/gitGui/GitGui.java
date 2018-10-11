@@ -46,6 +46,7 @@ public class GitGui
 
   /**Version, history and license
    * <ul>
+   * <li>2018-10-10 Hartmut new {@link #getFilePathRepository(File)}. It is invoked in jzTc to get the opened repository by this GUI for add command.
    * <li>2017-05-10 Hartmut bugfix {@link CmdExecuter#setCharsetForOutput(String)} to UTF-8 because git outputs cmd output in UTF-8
    * <li>2016-12-02 Hartmut chg GitGui some improvements.
    * <li>2016-09-23 Hartmut GitGui: ContextMenu in file table
@@ -81,7 +82,7 @@ public class GitGui
    * 
    * 
    */
-  public final String sVersion = "2016-09";  
+  public final String sVersion = "2018-10";  
 
 
   static class RevisionEntry
@@ -325,6 +326,11 @@ public class GitGui
   } };
 
 
+  /**The only one opened git repository. null if nothing is open or more as one is open.
+   * 
+   */
+  static File filePathRepository;
+  
   Settings settings = new Settings();
 
   String sTypeOfImplementation = "SWT";  //default
@@ -495,7 +501,7 @@ public class GitGui
       }
     } else { //startFile is a file.
       String fName = startFile.getName();
-      if(fName.equals(".git") || fName.startsWith(".gitRepository")) {
+      if(fName.equals(".git") || fName.endsWith(".gitRepository")) {
         fRepo = startFile;
         currDir = startFile.getParentFile();
       } else {
@@ -527,7 +533,8 @@ public class GitGui
       String sBaseDir = FileSystem.normalizePath(currDir).toString();
       //dst.put(bzrdir, sBzrDir);
       String sRepository;
-      if(fRepo.getName().startsWith(".gitRepository")){   //File with link to repository
+      if(fRepo.getName().endsWith(".gitRepository")){   //File with link to repository
+        filePathRepository = fRepo;
         sRepository = FileSystem.readFile(fRepo).trim();
       } else {
         sRepository = sBaseDir;  
@@ -538,7 +545,7 @@ public class GitGui
         sLocalFilePath = null;
       } else {
         sLocalFilePath = sFilePath.subSequence(sBaseDir.length()+1, sFilePath.length()).toString();
-        if(sLocalFilePath.length() == 0 || sLocalFilePath.equals(".git") || sLocalFilePath.startsWith(".gitRepository")){
+        if(sLocalFilePath.length() == 0 || sLocalFilePath.equals(".git") || sLocalFilePath.endsWith(".gitRepository")){
           sLocalFilePath = null;  //no local file.
         }
       }
@@ -562,6 +569,26 @@ public class GitGui
 
 
 
+  /**Returns the opened repository or repoository linking file or searches the next .git or .gitRepository file
+   * in the parent dir. It is to return the correct repository linking file for the opened GUI
+   * to add something with Fcmd and jzTc
+   * @param dir The dir where a file should be handled.
+   * @return The opened filePathRepository only if the dir is in the same file tree.
+   *   Elsewhere it searches .git or .gitRepository in this dir and parents.
+   */
+  public static File getFilePathRepository(File dir) {
+    if(filePathRepository !=null) {
+      String sFilePathRepository = FileSystem.getCanonicalPath(filePathRepository.getParentFile());
+      String sDir = FileSystem.getCanonicalPath(dir);
+      if(sDir.startsWith(sFilePathRepository)) {
+        return filePathRepository;  //same or sub dir as filePathRepository: Proper.
+      }
+    }
+    //else:
+    return FileSystem.searchInParent(dir, ".gitRepository", ".git");  //search either .gitRepository or .git
+  }
+  
+  
 
 
   /**Searches the git repository and the root of the working tree and opens the window for the git gui. 
