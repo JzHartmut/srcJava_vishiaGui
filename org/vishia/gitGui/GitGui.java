@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.vishia.cmd.CmdExecuter;
+import org.vishia.cmd.JZtxtcmdFilepath;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralTable;
@@ -22,6 +23,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.DataAccess;
 import org.vishia.util.Debugutil;
 import org.vishia.util.FileList;
+import org.vishia.util.FilePath;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringPartAppend;
@@ -46,6 +48,8 @@ public class GitGui
 
   /**Version, history and license
    * <ul>
+   * <li>2018-10-10 Hartmut new {@link #guiRepository(JZtxtcmdFilepath)} as start operation. It checks whether "name.gitRepository" is given
+   *  and copies "name.gitignore" to ".gitignore" and uses "name.filelist" as filelist. It supports more as one component on one working dir.
    * <li>2018-10-10 Hartmut new {@link #getFilePathRepository(File)}. It is invoked in jzTc to get the opened repository by this GUI for add command.
    * <li>2017-05-10 Hartmut bugfix {@link CmdExecuter#setCharsetForOutput(String)} to UTF-8 because git outputs cmd output in UTF-8
    * <li>2016-12-02 Hartmut chg GitGui some improvements.
@@ -82,7 +86,7 @@ public class GitGui
    * 
    * 
    */
-  public final String sVersion = "2018-10";  
+  public final String sVersion = "2018-10-16";  
 
 
   static class RevisionEntry
@@ -148,7 +152,7 @@ public class GitGui
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
       File gitCommit = new File(sWorkingDir, ".gitCommit");
       if(gitCommit.length() > 3) {
-        try{ FileList.list(sWorkingDir, "*", "_filelist.lst");
+        try{ FileList.list(sWorkingDir, "*", GitGui.this.sFileList);
         } catch(Exception exc){
           wdgInfo.setText("_filelist.lst problem: " + exc.getMessage());
         }
@@ -376,6 +380,8 @@ public class GitGui
   String sGitDir, sWorkingDir; //, sLocalFile;
 
   File workingDir;
+  
+  String sFileList = "_filelist.lst";
 
   /**If given the file which's log and diff should be shown.
    * Elsewhere null. set in {@link #startLog(String)}
@@ -599,6 +605,38 @@ public class GitGui
    *   It means you can start this routine with any srcFile inside the working tree.
    *   This file will be used as additional argument for example to show the history of that file. 
    */
+  public static void guiRepository(JZtxtcmdFilepath repoFile)
+  {
+    
+    File srcFile = null;
+    try {
+      //copy to the working version of .gitignore   
+      File fIgnore = new File(repoFile.absname() + ".gitignore");
+      if(fIgnore.exists()) { 
+        File fIgnore2 = new File(repoFile.absdir() + "/.gitignore");
+        FileSystem.copyFile(fIgnore, fIgnore2);
+      }
+      srcFile = new File(repoFile.absfile().toString());
+    } catch (NoSuchFieldException | IOException e) { System.err.println(e.getMessage());}
+    String[] paths = new String[3];
+    String error = searchRepository(srcFile, paths, null, null, null, null);
+    if(error !=null) { System.err.println(error); }
+    else {
+      GitGui main = new GitGui(null);
+      main.sFileList = repoFile.name() + ".filelist";
+      main.startLog(paths[0], paths[1], paths[2]);
+    }
+  }
+
+
+  /**Searches the git repository and the root of the working tree and opens the window for the git gui. 
+   * This routine can be invoked from any Java program without additional conditions. 
+   * @param srcFile Any file to start searching the root of the working tree and the git repository inside this tree.
+   *   If it is a directory and that directory contains either ".git" or ".gitRepository", it is the root of the working tree.
+   *   Elsewhere the root will be searched backward to the root of the file system. 
+   *   It means you can start this routine with any srcFile inside the working tree.
+   *   This file will be used as additional argument for example to show the history of that file. 
+   */
   public static void showLog(File srcFile)
   {
     String[] paths = new String[3];
@@ -809,7 +847,7 @@ public class GitGui
   
 
   void restoreFile(String sFile) {
-    String sGitCmd2 = "git '--git-dir=" + sGitDir + "' checkout " + cmpEntry.revisionHash + " -- " + "_filelist.lst"; ///
+    String sGitCmd2 = "git '--git-dir=" + sGitDir + "' checkout " + cmpEntry.revisionHash + " -- " + this.sFileList; ///
     String[] args2 ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd2};
     gitCmd.addCmd(args2, null, listOut, null, workingDir, null);
 
@@ -819,7 +857,7 @@ public class GitGui
       new CmdExecuter.ExecuteAfterFinish()
         { @Override
           public void exec(int errorcode, Appendable out, Appendable err)
-          { try {FileList.touch(sWorkingDir, "_filelist.lst", sFile, null);
+          { try {FileList.touch(sWorkingDir, GitGui.this.sFileList, sFile, null);
             } catch (IOException exc) {
               System.err.println("IOexception for File.touch()");
             }
