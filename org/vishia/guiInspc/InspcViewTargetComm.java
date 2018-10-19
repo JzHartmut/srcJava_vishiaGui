@@ -16,6 +16,8 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.inspcPC.InspcPlugUser_ifc;
 import org.vishia.inspcPC.accTarget.InspcTargetAccessor;
 import org.vishia.inspcPC.mng.InspcMng;
+import org.vishia.msgDispatch.LogMessage;
+import org.vishia.msgDispatch.LogMessageFile;
 import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringFunctions_C;
@@ -78,7 +80,7 @@ public class InspcViewTargetComm
   private final GralButton wdgBtnLog, wdgBtnRetry, wdgBtnClearReq, wdgBtnPerHandle, wdgBtnTargetSettings;
   
   
-  private final GralTextField wdgPwdAccess, wdgPwdChg; //, wdgPwdAccess1, wdgPwdChg1, wdgPwdAccess2, wdgPwdChg2, wdgPwdAccess3, wdgPwdChg3; 
+  private final GralTextField wdgPwdAccess, wdgAccLevels; //, wdgPwdAccess1, wdgPwdChg1, wdgPwdAccess2, wdgPwdChg2, wdgPwdAccess3, wdgPwdChg3; 
 
   private final GralTextField wdgTargetIdent, wdgTimeout, wdgTimeCycle;
   
@@ -90,6 +92,11 @@ public class InspcViewTargetComm
                   , color2 = GralColor.getColor("or");
 
   
+  String targetKeySettingwindow = "";
+  
+  LogMessage logTelg;
+
+
   final InspcGui gui;
   
   
@@ -107,7 +114,7 @@ public class InspcViewTargetComm
     this.wdgBtnLog = new GralButton("@InspcCtrlStatusWind,-2..0,0..8=BtnLog", "Enable Log", null);
     this.wdgBtnLog.setSwitchMode("? Log", "Log ?off");
     this.wdgBtnLog.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("am"));
-    this.wdgBtnLog.specifyActionChange("switch log telg", gui.actionEnableLog, null);
+    this.wdgBtnLog.specifyActionChange("switch log telg", actionEnableLog, null);
     this.wdgBtnRetry = new GralButton("@InspcCtrlStatusWind,-2..0,9..17=BtnRetry", "Retry", null);
     this.wdgBtnRetry.setSwitchMode("? Retry", "Retry ?off");
     this.wdgBtnRetry.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("am"));
@@ -124,22 +131,22 @@ public class InspcViewTargetComm
     this.windTargetSettings = new  GralWindow("@primaryWindow,-36..-18,-30..0", "InspcTargetPwdWind", "Passwords for Target", GralWindow_ifc.windOnTop);
     
     this.wdgTargetIdent = new GralTextField("@InspcTargetPwdWind, 2-2,1+20=targetident");
-    this.wdgTimeCycle = new GralTextField("@InspcTargetPwdWind, 6-4,5+10=timeCycle", GralTextField.Type.editable);
-    this.wdgTimeout =    new GralTextField("@InspcTargetPwdWind, 6-4,17+10=timeout",   GralTextField.Type.editable);
+    this.wdgTimeCycle = new GralTextField("@InspcTargetPwdWind, 6-4,1+10=timeCycle", GralTextField.Type.editable);
+    this.wdgTimeout =    new GralTextField("@InspcTargetPwdWind, 6-4,12+10=timeout",   GralTextField.Type.editable);
     this.wdgTimeCycle.setPrompt("cycle [s]", "t");
     this.wdgTimeout.setPrompt("timeout [s] 0-debug", "t");
     
-    this.wdgPwdAccess = new GralTextField("@InspcTargetPwdWind, 10-4,5+10=PwdAccess0", GralTextField.Type.editable);
-    this.wdgPwdChg =    new GralTextField("@InspcTargetPwdWind, 10-4,17+10=PwdChg0",   GralTextField.Type.editable);
-    this.wdgPwdAccess.setPrompt("pwd access", "t");
-    this.wdgPwdChg.setPrompt("pwd change", "t");
+    this.wdgPwdAccess = new GralTextField("@InspcTargetPwdWind, 10-4,1+10=PwdAccess0", GralTextField.Type.editable);
+    this.wdgAccLevels =    new GralTextField("@InspcTargetPwdWind, 10-4,12+10=PwdChg0");
+    this.wdgPwdAccess.setPrompt("pwd", "t");
+    this.wdgAccLevels.setPrompt("access levels", "t");
     //    this.wdgPwdAccess1 = new GralTextField("@InspcTargetPwdWind, 6-2,5+10=PwdAccess1", GralTextField.Type.editable);
 //    this.wdgPwdChg1 =    new GralTextField("@InspcTargetPwdWind, 6-2,17+10=PwdChg1",   GralTextField.Type.editable);
 //    this.wdgPwdAccess2 = new GralTextField("@InspcTargetPwdWind, 8-2,5+10=PwdAccess2", GralTextField.Type.editable);
 //    this.wdgPwdChg2 =    new GralTextField("@InspcTargetPwdWind, 8-2,17+10=PwdChg2",   GralTextField.Type.editable);
 //    this.wdgPwdAccess3 = new GralTextField("@InspcTargetPwdWind, 10-2,5+10=PwdAccess3", GralTextField.Type.editable);
 //    this.wdgPwdChg3 =    new GralTextField("@InspcTargetPwdWind, 10-2,17+10=PwdChg3",   GralTextField.Type.editable);
-    this.wdgBtnTargetSettingsOk = new GralButton("@InspcTargetPwdWind, 12-2,22+5=BtnSettingsOk", "ok", null);
+    this.wdgBtnTargetSettingsOk = new GralButton("@InspcTargetPwdWind, 14-3,16+6=BtnSettingsOk", "ok", null);
     this.wdgBtnTargetSettingsOk.specifyActionChange("openPwd", actionSetTargetSettings, null);
   
   
@@ -185,7 +192,7 @@ public class InspcViewTargetComm
   }
   
   
-  public void setStateInfo(String key, InspcPlugUser_ifc.TargetState state, int count, float[] cycle_timeout){
+  public void setStateInfo(String key, InspcPlugUser_ifc.TargetState state, int count, int accLevels, float[] cycle_timeout){
     GralColor color;
     switch(state) {
       case idle: color = colorIdle; break;
@@ -193,6 +200,14 @@ public class InspcViewTargetComm
       case waitReceive: color = colorWait; break;
       case receive: color = color2; break;
       default: color = color2;
+    }
+    if(key.equals(targetKeySettingwindow)) {
+      wdgAccLevels.setText(Integer.toHexString(accLevels & 0xffff));
+      if((accLevels & 0x10000) !=0) {
+        wdgPwdAccess.setBackColor(GralColor.getColor("lrd"), 0);
+      } else {
+        wdgPwdAccess.setBackColor(GralColor.getColor("wh"), 0);
+      }
     }
     GralTableLine_ifc<InspcTargetAccessor> line = widgTable.getLine(key);
     if(line !=null) {
@@ -236,11 +251,13 @@ public class InspcViewTargetComm
   GralUserAction actionOpenWindowTargetSettings = new GralUserAction("InspcGui - OpenPwd"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) { 
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        targetForSettingsWindow = widgTable.getCurrentLine().data;
+        InspcViewTargetComm.this.targetForSettingsWindow = widgTable.getCurrentLine().data;
+        InspcViewTargetComm.this.targetKeySettingwindow = InspcViewTargetComm.this.targetForSettingsWindow.name;
         windTargetSettings.setVisible(true);
-        wdgTargetIdent.setText(targetForSettingsWindow.name);
+        wdgTargetIdent.setText(InspcViewTargetComm.this.targetKeySettingwindow);
         wdgTimeCycle.setText("" + targetForSettingsWindow.cycle_timeout[0]);
         wdgTimeout.setText("" + targetForSettingsWindow.cycle_timeout[1]);
+        wdgPwdAccess.setText("");
       }
       return true;
     }
@@ -254,13 +271,13 @@ public class InspcViewTargetComm
     @Override public boolean exec(int actionCode, GralWidget_ifc widgi, Object... params) { 
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         String pwdAccess = wdgPwdAccess.getText().trim();
-        String pwdChange = wdgPwdChg.getText().trim();
+        String pwdChange = wdgAccLevels.getText().trim();
         String sTimeCycle = wdgTimeCycle.getText();
         float timeCycle = StringFunctions_C.parseFloat(sTimeCycle, 0, -1, null);
         String sTimeout = wdgTimeout.getText();
         float timeout = StringFunctions_C.parseFloat(sTimeout, 0, -1, null);
         
-        targetForSettingsWindow.setPwdCycle(pwdAccess, pwdChange, timeCycle, timeout);
+        targetForSettingsWindow.setPwdCycle(pwdAccess, timeCycle, timeout);
       }
       return true;
     }
@@ -276,6 +293,34 @@ public class InspcViewTargetComm
         InspcTargetAccessor target = widgTable.getCurrentLine().getUserData();
         target.setReady();
         
+      }
+      return true;
+    }
+  };
+  
+
+  
+  
+  /**Action for button log. It switches on or off the logging functionality to log the telegram traffic
+   * for debugging. */
+  GralUserAction actionEnableLog = new GralUserAction("InspcGui - enableLog"){
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) { 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        InspcTargetAccessor target = widgTable.getCurrentLine().getUserData();
+        GralButton widgButton = (GralButton)widgd;
+        if(widgButton.isOn()){
+          if(logTelg == null){
+            logTelg = new LogMessageFile("telgLog.csv", 10, 1, null, null, null);
+          }
+          target.setLog(logTelg, 1000);
+
+        } else {
+          if(logTelg !=null){
+            logTelg.close();
+            logTelg = null;
+          }
+          target.setLog(null, 1000);
+        }
       }
       return true;
     }

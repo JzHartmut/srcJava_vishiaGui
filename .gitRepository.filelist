@@ -294,9 +294,9 @@
 2018-09-21 19:35:54  x     InspcCurveView.java                      ::         57.792  1858437296 
 2018-09-21 22:43:19  x     InspcCurveViewApp.java                   ::          2.124  1949362241 
 2018-09-08 10:06:39  x     InspcFieldTable.java                     ::         26.092  1787012500 
-2018-10-18 11:05:01  x     InspcGui.java                            ::         23.975 -1251958834 
+2018-10-19 21:00:41  x     InspcGui.java                            ::         23.109 -2098130184 
 2014-04-30 14:05:05  x     InspcGuiFieldsFromFile.java              ::          4.768 -1365812909 
-2018-10-19 11:38:52  x     InspcViewTargetComm.java                 ::         13.439 -1810855974 
+2018-10-19 22:07:56  x     InspcViewTargetComm.java                 ::         15.019  0624281504 
 
 ============================== org/vishia/guiViewCfg/ ==============================================
 2014-11-13 20:38:44  x     OamOutFileReader.java                    ::          3.504  0576179557 
