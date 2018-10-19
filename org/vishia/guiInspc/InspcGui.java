@@ -32,6 +32,7 @@ import org.vishia.inspcPC.InspcAccess_ifc;
 import org.vishia.inspcPC.InspcPlugUser_ifc;
 import org.vishia.inspcPC.InspcTargetAccessData;
 import org.vishia.inspcPC.UserInspcPlug_ifc;
+import org.vishia.inspcPC.accTarget.InspcTargetAccessor;
 import org.vishia.inspcPC.mng.InspcMng;
 import org.vishia.inspectorTarget.Inspector;
 import org.vishia.msgDispatch.LogMessage;
@@ -127,18 +128,6 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
   /**Action for button log. It switches on or off the logging functionality to log the telegram traffic
    * for debugging. */
-  GralUserAction actionClearReq = new GralUserAction("InspcGui - clearReq"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) { 
-      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        inspcMng.clearRequestedVariables();
-      }
-      return true;
-    }
-  };
-  
-
-  /**Action for button log. It switches on or off the logging functionality to log the telegram traffic
-   * for debugging. */
   GralUserAction actionUseGetValueByHandle = new GralUserAction("InspcGui - UseGetValueByIndex"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) { 
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
@@ -150,6 +139,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   };
   
 
+  
   
   /**The communication manager. */
   //final InspcGuiComm XXXinspcComm;
@@ -618,6 +608,13 @@ private class InspcGuiCfg extends GuiCfg
 
     @Override public void isSent(int seqnr)
     { if(user1 !=null) { user1.isSent(seqnr); }
+    }
+
+    @Override
+    public void registerTarget(String name, String sAddr, InspcTargetAccessor targetAcc)
+    {
+      viewTargetComm.registerTarget(name, sAddr, targetAcc);
+      
     }
     
   }

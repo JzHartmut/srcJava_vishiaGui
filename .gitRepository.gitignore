@@ -1,0 +1,4 @@
+rpy
+_cmpn
+*.git*
+!.gitRepository.*
