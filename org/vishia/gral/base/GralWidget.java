@@ -789,8 +789,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
 
   
   
-  /* (non-Javadoc)
+  /**
    * @see org.vishia.gral.ifc.GralWidget_ifc#setToPanel(org.vishia.gral.ifc.GralMngBuild_ifc)
+   * @deprecated use {@link #createImplWidget_Gthread()}
    */
   @Override @Deprecated public final void setToPanel(GralMngBuild_ifc mngUnused) throws IllegalStateException { createImplWidget_Gthread(); }
 

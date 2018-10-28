@@ -108,7 +108,7 @@ public class FcmdExecuter
     this.console = console;
     //this.cmdQueue = new CmdQueue(outStatus);
     this.cmdExecuter = new CmdExecuter();
-    cmdSelector = new GralCommandSelector("cmdSelector", 5, new int[]{0,-10}, 'A', cmdExecuter, main.gui.getOutputBox(), main.getterFileArguments);
+    cmdSelector = new GralCommandSelector("cmdSelector", 50, new int[]{0,-10}, 'A', cmdExecuter, main.gui.getOutputBox(), main.getterFileArguments);
   }
   
   

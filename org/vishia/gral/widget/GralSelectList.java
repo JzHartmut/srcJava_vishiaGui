@@ -38,6 +38,7 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
 {
   /**Version and history:
    * <ul>
+   * <li>2018-10-28 Hartmut chg: {@link #createImplWidget_Gthread()} instead setToPanel(mng)
    * <li>2011-11-18 chg: This class does not inherit from GralWidget now. The GralWidget, which represents this class,
    *   is referenced with the public aggregation {@link #wdgdTable}. Only this instance is registered on a panel
    *   calling {@link #setToPanel(GralMngBuild_ifc, String, int, int[], char)}. 
@@ -69,7 +70,7 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    */
-  public static final int version = 20111118;
+  public static final String version = "2018-10-28";
   
 
   /**The table which is showing in the widget. */
@@ -86,12 +87,12 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
   /**Not used yet, register actions? */
   protected Map<String, GralUserAction> actions;
   
-  protected GralSelectList(String name, int rows, int[] columns, char size) //String name, GralWidgetMng mng)
+  protected GralSelectList(String posName, int rows, int[] columns, char size) //String name, GralWidgetMng mng)
   {
-    if(name == null){
+    if(posName == null){
       Assert.stop();
     }
-    wdgdTable = new GralTable<UserData>(name, columns);
+    wdgdTable = new GralTable<UserData>(posName, rows, columns);
     wdgdTable.setVisible(true);
   }
 
@@ -118,10 +119,20 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
    * @param columns
    * @param size
    */
-  public void setToPanel(GralMngBuild_ifc gralMng)
+  public void XXXsetToPanel(GralMngBuild_ifc gralMng)
   {
     wdgdTable.setToPanel(gralMng);
     //wdgdTable = gralMng.addTable(name, rows, columns);
+    wdgdTable.setActionChange(actionTable);
+  }
+  
+ 
+  
+  /**
+   */
+  public void createImplWidget_Gthread()
+  {
+    wdgdTable.createImplWidget_Gthread();
     wdgdTable.setActionChange(actionTable);
   }
   

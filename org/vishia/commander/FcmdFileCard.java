@@ -130,7 +130,7 @@ public class FcmdFileCard extends GralFileSelector
    * @param label The label of the tab, it builds the name of all widgets.
    */
   FcmdFileCard(FcmdLeftMidRightPanel mainPanelP, String label){
-    super(null, 5, new int[]{2,0,-6,-12}, 'A');
+    super(null, 50, new int[]{2,0,-6,-12}, null);
     this.label = label;
     this.main = mainPanelP.main;
     this.mainPanel = mainPanelP;
@@ -149,7 +149,7 @@ public class FcmdFileCard extends GralFileSelector
     favorCard = new FcmdFavorCard(main, nameTableSelection, this, mainPanel);
     GralPanelContent panelFavors = mainPanel.tabbedPanelFavorCards.addGridPanel(FcmdWidgetNames.tabFavorites + nameFilePanel, label,1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd');  
-    favorCard.setToPanel(mng);
+    favorCard.createImplWidget_Gthread();
     favorCard.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorSelect.");
     panelFavors.setPrimaryWidget(favorCard.wdgdTable);
     //

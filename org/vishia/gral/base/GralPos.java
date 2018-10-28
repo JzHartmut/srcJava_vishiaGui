@@ -484,7 +484,7 @@ public class GralPos implements Cloneable
       }
     }
     int size2;
-    if(spPos.scan("..").scanOk()) {
+    if(spPos.scan("..").scanOk()) {  //position for end is given
       size2 = 0;  
     } else {
       size2 = size;

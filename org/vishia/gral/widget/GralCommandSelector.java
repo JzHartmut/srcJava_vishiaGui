@@ -100,8 +100,8 @@ public class GralCommandSelector extends GralSelectList<JZtxtcmdScript.Subroutin
   
   
   @Override
-  public void setToPanel(GralMngBuild_ifc gralMng){
-    super.setToPanel(gralMng);
+  public void createImplWidget_Gthread(){
+    super.createImplWidget_Gthread();
     wdgdTable.specifyActionOnLineSelected(actionOnLineSelected);
   }
 

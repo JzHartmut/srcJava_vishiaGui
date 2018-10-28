@@ -48,6 +48,10 @@ public class GitGui
 
   /**Version, history and license
    * <ul>
+   * <li>2018-10-10 Hartmut new {@link #openNewFileSelector(String, RevisionEntry)} not ready yet. 
+   * <li>2018-10-10 Hartmut chg uses <code>diff --name-status</diff> instead <code>diff --name-only</diff> 
+   *   to build the input for the #wdgTableFiles to show different files. The table has an additional left row for the kind of difference
+   *   adequate the output of <code>diff --name-status</diff>. 
    * <li>2018-10-10 Hartmut new {@link #guiRepository(JZtxtcmdFilepath)} as start operation. It checks whether "name.gitRepository" is given
    *  and copies "name.gitignore" to ".gitignore" and uses "name.filelist" as filelist. It supports more as one component on one working dir.
    * <li>2018-10-10 Hartmut new {@link #getFilePathRepository(File)}. It is invoked in jzTc to get the opened repository by this GUI for add command.
@@ -86,7 +90,7 @@ public class GitGui
    * 
    * 
    */
-  public final String sVersion = "2018-10-16";  
+  public final String sVersion = "2018-10-28";  
 
 
   static class RevisionEntry
@@ -289,6 +293,21 @@ public class GitGui
   } };
 
 
+  GralUserAction actionTableFileRenMove = new GralUserAction("actionTableFileRenMove")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      @SuppressWarnings("unchecked")
+      GralTable<RevisionEntry> table = (GralTable<RevisionEntry>)widgd;  //it is the table line.
+      
+      GralTable<RevisionEntry>.TableLineData lineCurr = table.getCurrentLine(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
+      GralTable<RevisionEntry>.TableLineData line = table.getLineMousePressed(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        String sFile = line.getKey(); 
+        openNewFileSelector(sFile, GitGui.this.currentEntry); return true;
+      } //if;
+      return false;
+  } };
+
+
   /**Action for diff view of the current file to the workspace.*/
   GralUserAction actionDiffCurrWork = new GralUserAction("actionCurrFileDiffView")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
@@ -344,7 +363,8 @@ public class GitGui
 
   GralTextField wdgPath = new GralTextField("@2-2,0..0=path");
   GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("@3..-30,0..-40=git-versions", new int[] {2, 10, 0, -10});
-  GralTable<String> wdgTableFiles = new GralTable<>("@3..-30,-40..0=git-files", new int[] {20,0});
+  
+  GralTable<String> wdgTableFiles = new GralTable<>("@3..-30,-40..0=git-files", new int[] {2,20,0});
   
   GralTextBox wdgInfo = new GralTextBox("@-30..0, 0..-20=info");
 
@@ -425,11 +445,11 @@ public class GitGui
 
 
   GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("init")
-  { @Override protected void executeOrder()
-    {
-      wdgTableFiles.addContextMenuEntryGthread(0, "diffView", "Diff view [Mouse double], [ctrl-Enter]", actionTableFileDiffView);
-      wdgTableFiles.addContextMenuEntryGthread(0, "diffView", "Restore this file", actionRestore);
-      wdgTableFiles.addContextMenuEntryGthread(0, "show Log for File", "Show log for this file [ctrl-s]", actionTableFileLog);
+  { @Override protected void executeOrder() {
+      wdgTableFiles.addContextMenuEntryGthread(1, "diffView", "Diff view [Mouse double], [ctrl-Enter]", actionTableFileDiffView);
+      wdgTableFiles.addContextMenuEntryGthread(1, "rename/move", "rename/move", actionTableFileRenMove);
+      wdgTableFiles.addContextMenuEntryGthread(1, "restore", "Restore this file", actionRestore);
+      wdgTableFiles.addContextMenuEntryGthread(1, "show Log for File", "Show log for this file [ctrl-s]", actionTableFileLog);
     }
   };
 
@@ -582,16 +602,16 @@ public class GitGui
    * @return The opened filePathRepository only if the dir is in the same file tree.
    *   Elsewhere it searches .git or .gitRepository in this dir and parents.
    */
-  public static File getFilePathRepository(File dir) {
+  public static File getFilePathRepository(File startFileSearchRepository) {
     if(filePathRepository !=null) {
       String sFilePathRepository = FileSystem.getCanonicalPath(filePathRepository.getParentFile());
-      String sDir = FileSystem.getCanonicalPath(dir);
-      if(sDir.startsWith(sFilePathRepository)) {
+      String sstartFileSearchRepository = FileSystem.getCanonicalPath(startFileSearchRepository);
+      if(sstartFileSearchRepository.startsWith(sFilePathRepository)) {
         return filePathRepository;  //same or sub dir as filePathRepository: Proper.
       }
     }
     //else:
-    return FileSystem.searchInParent(dir, ".gitRepository", ".git");  //search either .gitRepository or .git
+    return FileSystem.searchInParent(startFileSearchRepository, ".gitRepository", ".git");  //search either .gitRepository or .git
   }
   
   
@@ -826,7 +846,7 @@ public class GitGui
       try{
         wdgInfo.append("\n");
       } catch(IOException exc){}
-      sGitCmd += " diff --name-only HEAD";
+      sGitCmd += " diff --name-status HEAD";
     } else {
       wdgInfo.setText(currentEntry.revisionHash);
       try{
@@ -836,7 +856,7 @@ public class GitGui
         }
         wdgInfo.append(currentEntry.commitText);
       } catch(IOException exc){}
-      sGitCmd += " diff --name-only " + currentEntry.revisionHash + ".." + currentEntry.parentHash;
+      sGitCmd += " diff --name-status " + currentEntry.parentHash + ".." + currentEntry.revisionHash;
     }
     String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
     //
@@ -908,27 +928,38 @@ public class GitGui
 
 
 
-  /**Fills the file table with the gotten output after git diff command. This routine is invoked as {@link #exec_fillFileTable4Revision}.
+  
+  void openNewFileSelector(String sFile,  RevisionEntry currRev) {
+    //wdgViewFiles.openDialog(FileRemote.fromFile(workingDir), "files", false, null);
+  }
+  
+  
+  
+  
+  /**Fills the file table with the gotten output after git diff name-status command. This routine is invoked as {@link #exec_fillFileTable4Revision}.
    * 
    */
   void fillFileTable4Revision() {
     wdgTableFiles.clearTable();
-    GralTableLine_ifc<String> line = wdgTableFiles.addLine("*", new String[] {"(all files)",""}, "*");  
+    GralTableLine_ifc<String> line = wdgTableFiles.addLine("*", new String[] {"!","(all files)",""}, "*");  
     wdgTableFiles.repaint();
     gitOut.firstlineMaxpart();
     do {
       String sLine = gitOut.getCurrentPart().toString();
-      if(!sLine.startsWith("+ git")) {
-        String[] col = new String[2];
+      //the line starts with the status character, then '\t', then the file path.
+      if(!sLine.startsWith("+ git") && sLine.length() >2) {
+        String[] col = new String[3];
         int posSlash = sLine.lastIndexOf('/');
+        col[0] = sLine.substring(0,1);
         if(posSlash >0) {
-          col[0] = sLine.substring(posSlash+1);
-          col[1] = sLine.substring(0, posSlash);
+          col[1] = sLine.substring(posSlash+1);
+          col[2] = sLine.substring(2, posSlash);
         } else {
-          col[0] = sLine;
-          col[1] = "";
+          col[1] = sLine.substring(2);
+          col[2] = "";
         }
-        line = wdgTableFiles.addLine(sLine, col, sLine);  
+        String key = sLine.substring(2); //without "M\t" (sign of change from <code>diff --name-status</code> output )
+        line = wdgTableFiles.addLine(key, col, sLine);  
         line.repaint();
       }
     } while(gitOut.nextlineMaxpart().found());

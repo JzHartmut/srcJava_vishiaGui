@@ -230,7 +230,7 @@ public final class InspcCurveView
     this.gralMng = gralMng;
     fileCurveCfg = defaultDirCfg;
     dirCurveSave = defaultDirSave;
-    widgFileSelector = new GralFileSelector("-selectFile", 100, new int[]{2,0,-6,-12}, 'C');
+    widgFileSelector = new GralFileSelector("-selectFile", 100, new int[]{2,0,-6,-12}, null);
     widgFileSelector.specifyActionOnFileSelected(actionSelectFile);
     widgFileSelector.setActionOnEnterFile(actionEnterFile);
 

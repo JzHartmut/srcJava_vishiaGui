@@ -70,6 +70,13 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2018-10-28 Hartmut: The Creation and Position is old style yet. Should invoked in the graphic thread. 
+   * TODO: create and position in other (main) thread, createImplWidget_Gthread for Swt incarnation.
+   * <li>2018-10-28 Hartmut: The {@link #favorList} is unused yet, create only if position is given.
+   * <li>2018-10-28 Hartmut: questionWindow is removed yet, TODO: should have better solution. Status line!
+   * <li>2018-10-28 Hartmut: {@link #GralFileSelector(String, int, int[], int[])}: The rows argument is used yet for table zLinesMax. 
+   *   The old last argument size was never used. replaced by the column designation for the {@link #favorList}. 
+   *   If it is null, do not create a {@link #favorList}.
    * <li>2016-05-02 Hartmut: actionFileSearch writes a result list in the panel of the file window. 
    *   Yet you can copy the path and insert in the directory text widget to select the file. 
    *   TODO: Pressing enter to select, store the list etc.
@@ -169,7 +176,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final String sVersion = "2014-12-27";
+  public static final String sVersion = "2018-10-28";
   
   //FileRemoteAccessor localFileAccessor = FileRemoteAccessorLocalFile.getInstance();
   
@@ -317,12 +324,15 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
   {
     final GralFileSelector outer;
     
-    FileSelectList(GralFileSelector outer, String name, int rows, int[] columns, char size){
+    FileSelectList(GralFileSelector outer, String posName, int rows, int[] columns, char size){
       //super(name, mng);
-      super(name, rows, columns, size);
+      super(posName, rows, columns, size);
       this.outer = outer;
+      if(columns.length !=4) { throw new IllegalArgumentException("FileSelectList should have 4 columns");}
       super.setLeftRightKeys(KeyCode.ctrl + KeyCode.pgup, KeyCode.ctrl + KeyCode.pgdn);
     }
+    
+    
     
     @Override public boolean actionOk(Object userData, GralTableLine_ifc line)
     { boolean done = true;
@@ -503,7 +513,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
   private final IndexMultiTable<String, GralTableLine_ifc<FileRemote>> idxLines = 
     new IndexMultiTable<String, GralTableLine_ifc<FileRemote>>(IndexMultiTable.providerString);
   
-  protected final GralTable<?> favorList;
+  protected final GralTable<String> favorList;
   
   //String name; 
   //final int rows; 
@@ -601,7 +611,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
   GralUserAction actionSetFileAttribs;
   
   
-  private GralInfoBox questionWindow;
+  //private GralInfoBox questionWindow;
   
   
   private enum ERefresh{ doNothing, refreshAll, refreshChildren}
@@ -615,11 +625,17 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
   boolean fillinPending;
 
   
-  public GralFileSelector(String name, int rows, int[] columns, char size)
+  /**Creates
+   * @param posName <code>"@position=name"</code> or <code>"name"</code>, see {@link GralWidget#GralWidget(String, char)} arg1, 
+   * @param rows 
+   * @param columns
+   * @param size
+   */
+  public GralFileSelector(String name, int rows, int[] columns, int[] columnsFavorlist)
   { //this.name = name; this.rows = rows; this.columns = columns; this.size = size;
     super(null, name, 'f');
-    favorList = new GralTable(null, new int[]{15,0});
-    selectList = new FileSelectList(this, name, rows, columns, size);
+    favorList = columnsFavorlist !=null ? new GralTable<String>(name, columnsFavorlist) : null;
+    selectList = new FileSelectList(this, name, rows, columns, 'A');
     colorBack = GralColor.getColor("wh");
     colorBackPending = GralColor.getColor("pma");
     //this.mainCmd = mainCmd;
@@ -673,7 +689,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     //the list
     //on same position as favor table: the file list.
     panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
-    selectList.setToPanel(panelMng);
+    selectList.createImplWidget_Gthread();
     selectList.wdgdTable.setVisible(true);
     selectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refresh, actionRefreshFileTable);
     selectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refreshCyclicOff, actionSwitchoffCheckRefresh);
@@ -699,12 +715,14 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     
     panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, 0, 1, 'd');
     //on same position as favor table: the file list.
-    favorList.setToPanel(panelMng);
-    favorList.insertLine(null, 0, new String[]{"test", "path"}, null);
-    favorList.setVisible(false);
+    if(favorList !=null) {
+      favorList.setToPanel(panelMng);
+      favorList.insertLine(null, 0, new String[]{"test", "path"}, null);
+      favorList.setVisible(false);
+    }
     //
     panelMng.setPosition(5, 0, 10, GralPos.size + 40, 1, 'd');
-    questionWindow = GralInfoBox.createTextInfoBox(panelMng, "questionInfoBox", "question");  
+    //questionWindow = GralInfoBox.createTextInfoBox(panelMng, "questionInfoBox", "question");  
     panelMng.selectPanel(sPanel);  //if finished this panel is selected for like entry.
   }
   
@@ -1431,14 +1449,14 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
                   +file.getName()
                   + "\n  in directory\n"
                   + parent.getPath();
-                questionWindow.setText(question);
-                questionWindow.setActionOk(confirmCreate);
-                questionWindow.setFocus(); //setWindowVisible(true);
+//                questionWindow.setText(question);
+//                questionWindow.setActionOk(confirmCreate);
+//                questionWindow.setFocus(); //setWindowVisible(true);
               }
             } else {
-              questionWindow.setText("unknown path");
-              questionWindow.setActionOk(null);
-              questionWindow.setFocus(); //setWindowVisible(true);
+//              questionWindow.setText("unknown path");
+//              questionWindow.setActionOk(null);
+//              questionWindow.setFocus(); //setWindowVisible(true);
             }
           }
         }

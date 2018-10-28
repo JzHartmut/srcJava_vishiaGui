@@ -83,7 +83,7 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
      mng.setPosition(-24, 0, -67, 0, 1, 'r'); //right buttom, about half less display width and hight.
      wind = mng.createWindow("windSelectFile", "select file", GralWindow.windExclusive | GralWindow.windResizeable );
      mng.setPosition(0, -3, 0, 0, 0, 'd', 0.0f);
-     fileSelector = new GralFileSelector(name + "-selectFile", 100, new int[]{2,0,-6,-12}, 'C');
+     fileSelector = new GralFileSelector(name + "-selectFile", 100, new int[]{2,0,-6,-12}, null);
      fileSelector.setToPanel(mng);
      fileSelector.specifyActionOnFileSelected(actionSelectFile);
      fileSelector.setActionOnEnterFile(actionOk);

@@ -124,13 +124,13 @@ public class FcmdLeftMidRightPanel
     mng.setPosition(tabbedPanelFavorCards.pos(), 0, 0, 0, 0, 1, 'd');
     tabbedPanelFavorCards.addGridPanel(nameGridPanel, tabLabelGridPanel, 1,1,10,10);
     mng.setPosition(0, 0, 0, -0, 1, 'd'); //inside the new tab
-    cardFavorThemes.setToPanel(mng);
+    cardFavorThemes.createImplWidget_Gthread();
     fillCards();  //build the rest of all tabs and panels depending on content of favorites.
     
     if(cNr == '1'){ //commands only in the left panel.
       tabbedPanelFileCards.addGridPanel("cmd", "Cmd",1,1,10,10);
       mng.setPosition(2, -2, 0, -0, 1, 'd');
-      main.executer.cmdSelector.setToPanel(mng);
+      main.executer.cmdSelector.createImplWidget_Gthread();
     }
     
   }
@@ -310,8 +310,8 @@ public class FcmdLeftMidRightPanel
     
     
     @Override
-    public void setToPanel(GralMngBuild_ifc panel){
-      super.setToPanel(panel);
+    public void createImplWidget_Gthread(){
+      super.createImplWidget_Gthread();
       wdgdTable.specifyActionOnLineSelected(actionFavorThemeLineSelected);
       wdgdTable.setHtmlHelp(mainPanel.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.tabSelect.");
     }

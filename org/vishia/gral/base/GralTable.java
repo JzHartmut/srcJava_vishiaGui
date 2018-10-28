@@ -99,6 +99,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2018-10-28 Hartmut chg: Now uses argument zLineMax from {@link #GralTable(String, int, int[])} instead constant 50 for number of showed lines.
    * <li>2018-01-07 Hartmut new: {@link #getCellTextFocus()}  
    * <li>2016-09-17 Hartmut new: in {@link #mouseDouble(int, CellData)} the <code>getActionChangeStrict(ActionChangeWhen.onMouse1Double, true)</code>
    *   is checked. Therewith the new concept of {@link #specifyActionChange(String, GralUserAction, String[], org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen...)}
@@ -246,7 +247,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    */
-  protected final static String sVersion = "2015-08-28";
+  protected final static String sVersion = "2018-10-28";
 
   
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
@@ -395,12 +396,23 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
 
   /**Constructs a table which should be positioned on {@link #setToPanel(GralMngBuild_ifc)}
+   * see {@link #GralTable(String, int, int[])}, zLineMax is 50. 
+   */
+  public GralTable(String posName, int[] columnWidths) {
+    this(posName, 50, columnWidths);
+  }
+  
+  
+  
+  
+  /**Constructs a table which should be positioned on {@link #setToPanel(GralMngBuild_ifc)}
    * @param pos String given position in GralPos units.
+   * @param zLineMax maximal number of lines managed for content. It should be related to the size of viewing. 10..50 is proper.
    * @param name to register for symbolic access
    * @param columnWidths positive value from left: width, negative value from right: width. 
    *   The last column with a positive width is used for sizeable. 
    */
-  public GralTable(String posName, int[] columnWidths) {
+  public GralTable(String posName, int zLineMax, int[] columnWidths) {
     super(posName, 'L');
     this.columnWidthsGral = columnWidths;
     this.zColumn = columnWidths.length;
@@ -412,7 +424,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     rootLine.zLineUnfolded = 0;  //count added line.
     
     @SuppressWarnings("unchecked")
-    TableLineData[] linesForCell1 = (TableLineData[])Array.newInstance( TableLineData.class, 50 );
+    TableLineData[] linesForCell1 = (TableLineData[])Array.newInstance( TableLineData.class, zLineMax );
     linesForCell = linesForCell1; //Hint: linesForCell = new GralTable<UserData>.TableLineData[50]; does not work because TableLineData is generic.
     zLineVisibleMax = linesForCell.length;
     setColors();

@@ -31,6 +31,7 @@ public class InspcViewTargetComm
 {
   /**Version, history and license.
    * <ul>
+   * <li>2018-10-19 chg: The Log on/off button is related to the target direct, not to the gui. Therefore handler implemented here.
    * <li>2018-10-19 new {@link #windTargetSettings} for target settings, better handling of timeout, password-setting. 
    *   Better handling of clearReq: Now it works with timeout=0 and manual clearRequest on stepbystep-debugging of the target.
    * <li>2015-05-30 Created.
