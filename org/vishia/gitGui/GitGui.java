@@ -48,8 +48,9 @@ public class GitGui
 
   /**Version, history and license
    * <ul>
-   * <li>2018-10-10 Hartmut new {@link #openNewFileSelector(String, RevisionEntry)} not ready yet. 
-   * <li>2018-10-10 Hartmut chg uses <code>diff --name-status</diff> instead <code>diff --name-only</diff> 
+   * <li>2018-10-28 Hartmut new textfield for cmd, shows the last automatically cmd, enables assembled cmd for git and common cmd. 
+   * <li>2018-10-27 Hartmut new {@link #openNewFileSelector(String, RevisionEntry)} not ready yet. 
+   * <li>2018-10-27 Hartmut chg uses <code>diff --name-status</diff> instead <code>diff --name-only</diff> 
    *   to build the input for the #wdgTableFiles to show different files. The table has an additional left row for the kind of difference
    *   adequate the output of <code>diff --name-status</diff>. 
    * <li>2018-10-10 Hartmut new {@link #guiRepository(JZtxtcmdFilepath)} as start operation. It checks whether "name.gitRepository" is given
@@ -125,6 +126,7 @@ public class GitGui
   GralUserAction actionOpenCommitText = new GralUserAction("actionTableOpenCommitText")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
       String[] args ={"cmd.exe", "/C", "edit", ".gitCommit"};
+      wdgCmd.setText("cmd.exe /C edit .gitCommit");
       gitCmd.addCmd(args, null, listOut, null, workingDir, null);
       wdgCommit.setText("do commit");
       return true;
@@ -165,6 +167,7 @@ public class GitGui
           sGitCmd += " '--git-dir=" + sGitDir + "'";
         }
         sGitCmd += " commit -a -F .gitcommit";
+        wdgCmd.setText(sGitCmd);
         String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
         gitCmd.addCmd(args, null, listOut, null, workingDir, exec_CommitDone);
       } else {
@@ -349,6 +352,43 @@ public class GitGui
   } };
 
 
+  GralUserAction actionExecCmd = new GralUserAction("actionExecCmd")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        String cmd = wdgCmd.getText();
+        File cmdDir = workingDir;
+        int posDir = cmd.indexOf('>');
+        if(posDir >0) {
+          cmdDir = new File(cmd.substring(0, posDir));
+          cmd = cmd.substring(posDir+1);
+        }
+        String[] args = cmd.split(" ");
+        if(args[0].equals("git")) {
+          String[] args2 = args;
+          args = new String[4];
+          args[0] = "D:/Programs/Gitcmd/bin/sh.exe";
+          args[1] = "-x";
+          args[2] = "-c";
+          args[3] = cmd;
+        }
+        gitOut.clear();
+        gitCmd.addCmd(args, null, listOut, null, cmdDir, execShowListOut);
+
+      } //if;
+      return false;
+  } };
+
+
+  CmdExecuter.ExecuteAfterFinish execShowListOut = new CmdExecuter.ExecuteAfterFinish()
+  { @Override
+    public void exec(int errorcode, Appendable out, Appendable err)
+    { //if(errorcode ==0) {
+      wdgInfo.setText("cmd ouptut:\n");
+      try { wdgInfo.append(gitOut);
+      } catch (IOException e) { }
+  } };
+
+
   /**The only one opened git repository. null if nothing is open or more as one is open.
    * 
    */
@@ -361,7 +401,11 @@ public class GitGui
 
   GralWindow window = new GralWindow("0+60, 0+90", "GitGui", "Git vishia", GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose);
 
-  GralTextField wdgPath = new GralTextField("@2-2,0..0=path");
+  GralTextField wdgCmd = new GralTextField("@2-2,0..-7=cmd", GralTextField.Type.editable);
+  
+  GralButton wdgBtnCmd = new GralButton("@0..2, -6..0 = cmdExec", "exec", this.actionExecCmd);
+
+  
   GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("@3..-30,0..-40=git-versions", new int[] {2, 10, 0, -10});
   
   GralTable<String> wdgTableFiles = new GralTable<>("@3..-30,-40..0=git-files", new int[] {2,20,0});
@@ -694,7 +738,7 @@ public class GitGui
       wdgBtnDiffCurrFile.setVisible(false);
       wdgBtnDiffCurrWork.setVisible(false);
     }
-    wdgPath.setText(sPathShow);
+    window.setTitle("Git " + sPathShow);
     
     wdgTableVersion.clearTable();
     wdgTableVersion.addLine("*", new String[] {"", "", "wait for prepairing log", ""}, null);
@@ -708,6 +752,7 @@ public class GitGui
     if(sLocalFile !=null && sLocalFile.length() >0) {
       sGitCmd +=  " -- '" + sLocalFile + "'";
     }
+    wdgCmd.setText(sGitCmd);
     String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
     gitCmd.clearCmdQueue();
     gitCmd.abortCmd();
@@ -858,6 +903,7 @@ public class GitGui
       } catch(IOException exc){}
       sGitCmd += " diff --name-status " + currentEntry.parentHash + ".." + currentEntry.revisionHash;
     }
+    wdgCmd.setText(sGitCmd);
     String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
     //
     gitCmd.addCmd(args, null, listOut, null, workingDir, exec_fillFileTable4Revision);
@@ -868,6 +914,7 @@ public class GitGui
 
   void restoreFile(String sFile) {
     String sGitCmd2 = "git '--git-dir=" + sGitDir + "' checkout " + cmpEntry.revisionHash + " -- " + this.sFileList; ///
+    wdgCmd.setText(sGitCmd2);
     String[] args2 ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd2};
     gitCmd.addCmd(args2, null, listOut, null, workingDir, null);
 
@@ -915,6 +962,7 @@ public class GitGui
     }
     else { 
       String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + cmpRev.revisionHash + " -- " + sFile;
+      wdgCmd.setText(settings.dirTemp2 + ">" + sGitCmd);
       String[] args ={"D:/Programs/Gitcmd/bin/sh.exe", "-x", "-c", sGitCmd};
       gitCmd.addCmd(args, null, listOut, null, settings.dirTemp2, null);
     }
