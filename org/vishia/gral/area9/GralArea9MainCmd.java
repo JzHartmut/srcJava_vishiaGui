@@ -151,7 +151,7 @@ public class GralArea9MainCmd extends MainCmd
     }   
     String posWindow1 = cargs.positionWindow !=null ? cargs.positionWindow : position !=null ? position : "0+80, 10+120";
     
-    String sTitle1 = cargs.sTitle !=null ? cargs.sTitle : sTitle != null ? sTitle: cargs.fileGuiCfg.getName();
+    String sTitle1 = cargs.sTitle !=null ? cargs.sTitle : sTitle != null ? sTitle: cargs.fileGuiCfg !=null ? cargs.fileGuiCfg.getName() : " no -cfg given";
     GralWindow primaryWindow = new GralWindow(posWindow1, "primaryWindow", sTitle1, GralWindow.windResizeable + GralWindow.windHasMenu);
     GralFactory.createGraphic(primaryWindow, sizeShow, log, "SWT");
     //cargs.graphicFactory.createWindow(primaryWindow, sizeShow);
