@@ -140,6 +140,10 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
   
   @Override public int getNrofLines(){ return 0; }  //TODO
 
+  
+  @Override public int getCursorPos() { return super.caretPos = ((GraphicImplAccess)_wdgImpl).getCurrentCaretPos(); }
+  
+  
 
   @Override public void viewTrail()
   {
@@ -172,6 +176,8 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
     
     protected GralTextFieldUser_ifc user(){ return GralTextBox.this.user; }
 
+    protected abstract int getCurrentCaretPos();
+    
   }
 
 }

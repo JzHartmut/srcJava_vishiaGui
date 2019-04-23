@@ -164,7 +164,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
   @Override public GralRectangle getPixelPositionSize(){ return wdgh.getPixelPositionSize(); }
 
 
-
+  @Override protected int getCurrentCaretPos() { return textFieldSwt.getCaretPosition(); }
   
 
   
@@ -325,6 +325,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
       }
       boolean bUserOk;
       GralTextFieldUser_ifc user = user();
+      //SwtTextBox.super.caretPos(textFieldSwt.getCaretPosition());
       if(user !=null){
         Point selection = textFieldSwt.getSelection();
         bUserOk = user.userKey(key

@@ -148,6 +148,13 @@ public GralRectangle getPixelPositionSize()
   return null;
 }
 
+@Override
+protected int getCurrentCaretPos()
+{
+  // TODO Auto-generated method stub
+  return 0;
+}
+
 
   
   

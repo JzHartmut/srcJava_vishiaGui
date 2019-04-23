@@ -18,6 +18,7 @@ import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralTableLine_ifc;
+import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.DataAccess;
@@ -48,6 +49,8 @@ public class GitGui
 
   /**Version, history and license
    * <ul>
+   * <li>2019-04-02 Hartmut Enhancements for add and mov: detect the selected line in status window for new file name (in 'Untracked files:' area),
+   *   detect missing file for mov in file list. . 
    * <li>2018-10-28 Hartmut new textfield for cmd, shows the last automatically cmd, enables assembled cmd for git and common cmd. 
    * <li>2018-10-27 Hartmut new {@link #openNewFileSelector(String, RevisionEntry)} not ready yet. 
    * <li>2018-10-27 Hartmut chg uses <code>diff --name-status</diff> instead <code>diff --name-only</diff> 
@@ -356,24 +359,10 @@ public class GitGui
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
         String cmd = wdgCmd.getText();
-        File cmdDir = workingDir;
-        int posDir = cmd.indexOf('>');
-        if(posDir >0) {
-          cmdDir = new File(cmd.substring(0, posDir));
-          cmd = cmd.substring(posDir+1);
+        if(cmd.startsWith("!! ")) {
+          cmd = cmd.substring(3);
         }
-        String[] args = cmd.split(" ");
-        if(args[0].equals("git")) {
-          String[] args2 = args;
-          args = new String[4];
-          args[0] = exepath.gitsh_exe;
-          args[1] = "-x";
-          args[2] = "-c";
-          args[3] = cmd;
-        }
-        gitOut.clear();
-        gitCmd.addCmd(args, null, listOut, null, cmdDir, execShowListOut);
-
+        execCmd(cmd);
       } //if;
       return false;
   } };
@@ -384,7 +373,13 @@ public class GitGui
   GralUserAction actionAdd = new GralUserAction("actionAdd")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
-        addFileFromSelection(); return true;
+        String cmd = wdgCmd.getText().trim();
+        if(cmd.startsWith("!! ")) {
+          cmd = cmd.substring(3);
+          execCmd(cmd);
+        } else {
+          addFileFromSelection(); return true;
+        }
       } //if;
       return false;
   } };
@@ -397,7 +392,13 @@ public class GitGui
   GralUserAction actionMove = new GralUserAction("actionMove")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
-        moveFileListToSelection(); return true;
+        String cmd = wdgCmd.getText().trim();
+        if(cmd.startsWith("!! ")) {
+          cmd = cmd.substring(3);
+          execCmd(cmd);
+        } else {
+          moveFileListToSelection(); return true;
+        }
       } //if;
       return false;
   } };
@@ -408,11 +409,26 @@ public class GitGui
   CmdExecuter.ExecuteAfterFinish execShowListOut = new CmdExecuter.ExecuteAfterFinish()
   { @Override
     public void exec(int errorcode, Appendable out, Appendable err)
-    { //if(errorcode ==0) {
-      wdgInfo.setText("cmd ouptut:\n");
-      try { wdgInfo.append(gitOut);
-      } catch (IOException e) { }
+    { if(errorcode ==0) {
+        wdgCmd.setText("done");
+      } else {
+        wdgInfo.setText("cmd ouptut:\n");
+        try { wdgInfo.append(gitOut);
+        } catch (IOException e) { }
+      }
   } };
+
+  
+  
+  
+  GralTextFieldUser_ifc wdgInfoSetSelection = new GralTextFieldUser_ifc() {
+    @Override
+    public boolean userKey(int keyCode, String content, int cursorPos, int selectStart, int selectEnd) {
+      GitGui.this.cursorPosInfo = cursorPos;
+      boolean bDone = true;
+      return bDone;
+    }
+  };
 
 
   /**The paths to the executables. */
@@ -447,7 +463,7 @@ public class GitGui
 
   GralButton wdgBtnAdd = new GralButton("@-18+2, -18..-8 = add", "add", this.actionAdd);
 
-  GralButton wdgBtnMove = new GralButton("@-15+2, -18..-8 = move", "mv", this.actionMove);
+  GralButton wdgBtnMove = new GralButton("@-15+2, -18..-8 = move", "move", this.actionMove);
 
   GralButton wdgRefresh = new GralButton("@-12+2, -18..-8 = refresh", "refresh", this.actionRefresh);
 
@@ -498,7 +514,9 @@ public class GitGui
   /**The current entry and the entry before, to the earlier commit. The Predecessor is not the parent in any case, not on branch and merge points. */
   RevisionEntry currentEntry, cmpEntry;
   
-
+  int cursorPosInfo;
+  
+  
   public static void main(String[] args){
     GitGui main = new GitGui(args);
     //only test
@@ -516,6 +534,7 @@ public class GitGui
     if(!settings.dirTemp2.exists()) { settings.dirTemp2.mkdirs(); }
     wdgTableVersion.specifyActionOnLineSelected(actionTableLineVersion);
     wdgTableFiles.specifyActionChange("actionTableFile", actionTableFile, null);
+    wdgInfo.setUser(wdgInfoSetSelection);
     window.specifyActionOnCloseWindow(actionOnCloseWindow);
     window.create(sTypeOfImplementation, 'B', null, initGraphic);
     cmdThread.start();
@@ -975,40 +994,73 @@ public class GitGui
 
 
   
-  void addFileFromSelection() {
+  
+  void execCmd(String cmd) {
+    File cmdDir = workingDir;
+    int posDir = cmd.indexOf('>');
+    if(posDir >0) {
+      cmdDir = new File(cmd.substring(0, posDir));
+      cmd = cmd.substring(posDir+1);
+    }
+    String[] args = cmd.split(" ");
+    if(args[0].equals("git")) {
+      String[] args2 = args;
+      args = new String[4];
+      args[0] = exepath.gitsh_exe;
+      args[1] = "-x";
+      args[2] = "-c";
+      args[3] = cmd;
+    }
+    gitOut.clear();
+    gitCmd.addCmd(args, null, listOut, null, cmdDir, execShowListOut);
+  }
+  
+  
+  
+  private String getSelectedInfo() {
     int pos = wdgInfo.getCursorPos();
     String text = wdgInfo.getText();
+    int begin = pos; int end = pos;
+    while(text.charAt(begin) >=' ') { begin -=1; } //search \t
+    while(text.charAt(end) >=' ') { end +=1; } //search \r\n
+    return text.substring(begin+1, end);
+    
+  }
   
-    String sGitCmd = "git";
+  
+  void addFileFromSelection() {
+    String dst = getSelectedInfo();
+    
+    String sGitCmd = "!! " + "git";
     if(! sGitDir.startsWith(sWorkingDir)) {
       sGitCmd += " '--git-dir=" + sGitDir + "'";
     }
-    sGitCmd += " add ";
+    sGitCmd += " add " + dst;
     wdgCmd.setText(sGitCmd);
   
   }
 
 
   void moveFileListToSelection() {
-    int pos = wdgInfo.getCursorPos();
-    String text = wdgInfo.getText();
-    
-    
-    
-    
     GralTable<String>.TableLineData line = wdgTableFiles.getCurrentLine();
+    String sFile = line.getCellText(1);
+    String dst = getSelectedInfo();
+    if(dst.endsWith("/")) {
+      dst += sFile;
+    }
     int posSep = sGitDir.lastIndexOf('/');
     assert(sGitDir.substring(posSep).equals("/.git"));
-    String sGitCmd = sGitDir.substring(0, posSep) + ">git mv ";
-    sGitCmd += line.getCellText(2) + "/" + line.getCellText(1) + " ";
+    String sGitCmd = "!! " + sGitDir.substring(0, posSep) + ">git mv ";
+    sGitCmd += line.getCellText(2) + "/" + sFile + " " + dst;
     
     wdgCmd.setText(sGitCmd);
-
-
-  
-  
   }
 
+  
+  
+  
+  
+  
 
   /**Gets the file from repository and writes to tmp directory, starts diff tool
    * @param sFile The local path of the file
