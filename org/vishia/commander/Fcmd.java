@@ -83,7 +83,7 @@ public class Fcmd extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public static final String version = "2018-11-02";
+  public static final String version = "2019-04-24";
 
   
   static class CallingArgs extends GuiCallingArgs
@@ -1005,7 +1005,7 @@ public class Fcmd extends GuiCfg
     //new GralMng(null, cmdgui);
     
     // calling arguments
-    bOk = cmdgui.parseArgumentsAndInitGraphic("The.file.Commander", "2A2C", '.', "0+50,0+150");
+    bOk = cmdgui.parseArgumentsAndInitGraphic("The.file.Commander", "2A2C", '.', "20+70,20+250");
 
     /*
     try {

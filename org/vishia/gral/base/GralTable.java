@@ -254,7 +254,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   protected int keyOpenChild = KeyCode.right, keyCloseChild = KeyCode.left;
   
-  protected String keySeparator = "/";
+  /**The separator for {@link TreeNodeBase#getNode(String, String)} for nested nodes.
+   * This can be set for special tables. Default is null because no tree-table.
+   * @since 2019-04 The older version with "/" as separator were never used. It was thought for file trees.
+   */
+  protected String keySeparator = null; //"/";
   
   //protected final Map<String, TableLineData> idxLine = new TreeMap<String, TableLineData>();
   

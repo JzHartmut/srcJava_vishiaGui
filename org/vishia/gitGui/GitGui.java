@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Formatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,6 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.DataAccess;
 import org.vishia.util.Debugutil;
 import org.vishia.util.FileList;
-import org.vishia.util.FilePath;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringPartAppend;
@@ -49,6 +49,7 @@ public class GitGui
 
   /**Version, history and license
    * <ul>
+   * <li>2019-04-24 Hartmut Enhancements for view diff for some revisions. Shows the date as temp directory name. 
    * <li>2019-04-02 Hartmut Enhancements for add and mov: detect the selected line in status window for new file name (in 'Untracked files:' area),
    *   detect missing file for mov in file list. . 
    * <li>2018-10-28 Hartmut new textfield for cmd, shows the last automatically cmd, enables assembled cmd for git and common cmd. 
@@ -315,6 +316,26 @@ public class GitGui
 
 
   /**Action for diff view of the current file to the workspace.*/
+  GralUserAction actionDiffVersion = new GralUserAction("actionDiffVersion")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        GralTable<RevisionEntry>.TableLineData line = wdgTableVersion.getCurrentLine();
+        RevisionEntry revision = line.getData();
+        GralTable<RevisionEntry>.TableLineData line2 = wdgTableVersion.getLineMousePressed();
+        RevisionEntry revision2 = line2.getData();
+        GralTable<String>.TableLineData lineFile = wdgTableFiles.getCurrentLine();
+        String sLine = lineFile.getData();
+        if(sLine !=null && sLine.length() >=2) {
+          String sFile = sLine.substring(2);  //pos 0 is change-sign, pos 1 is \t
+          startDiffView(sFile, revision2, revision); 
+        }
+        return true;
+      } //if;
+      return false;
+  } };
+
+
+  /**Action for diff view of the current file to the workspace.*/
   GralUserAction actionDiffCurrWork = new GralUserAction("actionCurrFileDiffView")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
@@ -333,6 +354,18 @@ public class GitGui
         GralTable<RevisionEntry>.TableLineData line = wdgTableVersion.getCurrentLine();
         RevisionEntry revision = line.getData();
         startDiffView(sLocalFile, null, revision); return true;
+      } //if;
+      return false;
+  } };
+
+
+  /**Action for diff view of the current file between revisions.*/
+  GralUserAction actionFileBlame = new GralUserAction("actionFileBlame")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        GralTable<RevisionEntry>.TableLineData line = wdgTableVersion.getCurrentLine();
+        RevisionEntry revision = line.getData();
+        startBlame(sLocalFile, null, revision); return true;
       } //if;
       return false;
   } };
@@ -461,9 +494,11 @@ public class GitGui
 
   GralButton wdgBtnDiffCurrFile = new GralButton("@-26..-24, -18..-2 = diffCurrFile", "diff current file", this.actionFileDiffRev);
 
-  GralButton wdgBtnAdd = new GralButton("@-18+2, -18..-8 = add", "add", this.actionAdd);
+  GralButton wdgBtnBlame = new GralButton("@-23..-21, -18..-2 = blameFile", "blame", this.actionFileBlame);
 
-  GralButton wdgBtnMove = new GralButton("@-15+2, -18..-8 = move", "move", this.actionMove);
+  GralButton wdgBtnAdd = new GralButton("@-15+2, -9..-1 = add", "add", this.actionAdd);
+
+  GralButton wdgBtnMove = new GralButton("@-15+2, -18..-10 = move", "move", this.actionMove);
 
   GralButton wdgRefresh = new GralButton("@-12+2, -18..-8 = refresh", "refresh", this.actionRefresh);
 
@@ -547,6 +582,10 @@ public class GitGui
       wdgTableFiles.addContextMenuEntryGthread(1, "rename/move", "rename/move", actionTableFileRenMove);
       wdgTableFiles.addContextMenuEntryGthread(1, "restore", "Restore this file", actionRestore);
       wdgTableFiles.addContextMenuEntryGthread(1, "show Log for File", "Show log for this file [ctrl-s]", actionTableFileLog);
+      //
+      //Note for all columns extra:
+      wdgTableVersion.addContextMenuEntryGthread(1, "cmpVersion", "cmp with this version", actionDiffVersion);
+      wdgTableVersion.addContextMenuEntryGthread(2, "cmpVersion", "cmp with this version", actionDiffVersion);
     }
   };
 
@@ -1068,6 +1107,48 @@ public class GitGui
    * @param cmpRev the selected revision to compare.
    */
   void startDiffView(String sFile,  RevisionEntry currRev, RevisionEntry cmpRev) {
+    SimpleDateFormat dateFmt = new SimpleDateFormat("yy-MM-dd");
+    
+    String sFile1, sFile2;
+    if(currRev == null) {
+      sFile1 = sWorkingDir + "/" + sFile;
+    } else  {
+      String dirTemp1 = settings.dirTemp1.getAbsolutePath() + "/" + dateFmt.format(currRev.dateCommit);
+      sFile1 = dirTemp1 + "/" + sFile;
+      try{ FileSystem.mkDirPath(sFile1);} catch(IOException exc) { throw new RuntimeException(exc); }
+      String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + currRev.revisionHash + " -- " + sFile;
+      String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
+      gitCmd.addCmd(args, null, listOut, null, new File(dirTemp1), null);
+    }
+    if(cmpRev == null) {
+      sFile2 = sFile1;
+    }
+    else { 
+      String dirTemp2 = settings.dirTemp2.getAbsolutePath() + "/" + dateFmt.format(cmpRev.dateCommit);
+      sFile2 = dirTemp2 + "/" + sFile;
+      try{ FileSystem.mkDirPath(sFile2);} catch(IOException exc) { throw new RuntimeException(exc); }
+      String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + cmpRev.revisionHash + " -- " + sFile;
+      wdgCmd.setText(settings.dirTemp2 + ">" + sGitCmd);
+      String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
+      gitCmd.addCmd(args, null, listOut, null, new File(dirTemp2), null);
+    }
+    sFile1 = sFile1.replace('/', '\\');
+    sFile2 = sFile2.replace('/', '\\');
+    String sCmdDiff = "cmd.exe /C start " + exepath.diff_exe + " " + sFile1 + " " + sFile2;
+    String[] cmdDiffView = CmdExecuter.splitArgs(sCmdDiff); 
+    gitCmd.addCmd(cmdDiffView, null, listOut, null, null, null);
+    synchronized(cmdThread) { cmdThread.notify(); }
+  }
+
+
+  
+
+  /**Gets the file from repository and writes to tmp directory, starts diff tool
+   * @param sFile The local path of the file
+   * @param currRev maybe null, then compare with working tree, elsewhere a selected revision
+   * @param cmpRev the selected revision to compare.
+   */
+  void startBlame(String sFile,  RevisionEntry currRev, RevisionEntry cmpRev) {
     String sFile1 = settings.dirTemp1.getAbsolutePath() + "/" + sFile;
     String sFile2 = settings.dirTemp2.getAbsolutePath() + "/" + sFile;
     if(currRev == null) {
@@ -1127,10 +1208,18 @@ public class GitGui
           col[2] = "";
         }
         String key = sLine.substring(2); //without "M\t" (sign of change from <code>diff --name-status</code> output )
+        if(this.sLocalFile !=null && key.equals(this.sLocalFile)) {
+          Debugutil.stop();
+        }
         line = wdgTableFiles.addLine(key, col, sLine);  
         line.repaint();
       }
     } while(gitOut.nextlineMaxpart().found());
+    if(this.sLocalFile !=null) {
+      line = wdgTableFiles.getLine(this.sLocalFile);
+      wdgTableFiles.setCurrentLine(this.sLocalFile);
+    }
+      
   }
 
 
