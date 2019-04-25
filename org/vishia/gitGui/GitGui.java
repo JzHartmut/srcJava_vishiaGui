@@ -27,6 +27,7 @@ import org.vishia.util.Debugutil;
 import org.vishia.util.FileList;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
+import org.vishia.util.StringFunctions;
 import org.vishia.util.StringPartAppend;
 
 
@@ -49,6 +50,7 @@ public class GitGui
 
   /**Version, history and license
    * <ul>
+   * <li>2019-04-25 Hartmut Now renamed files are shown with full history, compare with older renamed files is possible. 
    * <li>2019-04-24 Hartmut Enhancements for view diff for some revisions. Shows the date as temp directory name. 
    * <li>2019-04-02 Hartmut Enhancements for add and mov: detect the selected line in status window for new file name (in 'Untracked files:' area),
    *   detect missing file for mov in file list. . 
@@ -101,6 +103,10 @@ public class GitGui
   static class RevisionEntry
   {
     final String revisionHash;
+    /**Output of --name-status*/
+    String filePath;
+    /**M or A etc. */
+    String changeKind;
     String treeHash;
     String parentHash;
     String author;
@@ -581,7 +587,7 @@ public class GitGui
       wdgTableFiles.addContextMenuEntryGthread(1, "diffView", "Diff view [Mouse double], [ctrl-Enter]", actionTableFileDiffView);
       wdgTableFiles.addContextMenuEntryGthread(1, "rename/move", "rename/move", actionTableFileRenMove);
       wdgTableFiles.addContextMenuEntryGthread(1, "restore", "Restore this file", actionRestore);
-      wdgTableFiles.addContextMenuEntryGthread(1, "show Log for File", "Show log for this file [ctrl-s]", actionTableFileLog);
+      wdgTableFiles.addContextMenuEntryGthread(1, "show log for File", "Show log for this file [ctrl-s]", actionTableFileLog);
       //
       //Note for all columns extra:
       wdgTableVersion.addContextMenuEntryGthread(1, "cmpVersion", "cmp with this version", actionDiffVersion);
@@ -840,9 +846,13 @@ public class GitGui
     if(! sGitDir.startsWith(sWorkingDir)) {
       sGitCmd += " '--git-dir=" + sGitDir + "'";
     }
+    
+    //--follow does not break on rename.
+    //--source writes HEAD (the trunk)
+    //--name-status writes M filePath
     sGitCmd += " log --date=iso '--pretty=raw'";
-    if(sLocalFile !=null && sLocalFile.length() >0) {
-      sGitCmd +=  " -- '" + sLocalFile + "'";
+    if(sLocalFile !=null && sLocalFile.length() >0 && !sLocalFile.equals("*")) {
+      sGitCmd +=  " --follow --name-status -- '" + sLocalFile + "'";  //--name-status only if one file, elsewhere too much info
     }
     wdgCmd.setText(sGitCmd);
     String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
@@ -903,13 +913,28 @@ public class GitGui
               }
             } else {
               do {
-                if(gitOut.scanStart().scan("commit ").scanOk()) {
+                CharSequence commitTextline;
+                if(gitOut.scanStart().scan("commit ").scanOk()) { ////
                   gitOut.seekBegin();
                   cont = false;
                   contCommits = true;
                   break;
                 } else {
-                  CharSequence commitTextline = gitOut.getCurrentPart();
+                  commitTextline = gitOut.getCurrentPart();
+                  char cFirst = commitTextline.length() >2 ? commitTextline.charAt(0) : '?';
+                  if("MRA".indexOf(cFirst) >=0) {
+                    int posTab = StringFunctions.indexOf(commitTextline, '\t');
+                    if(posTab >=1) {
+                      entry.changeKind = commitTextline.subSequence(0, posTab).toString();
+                      int posTab2 = StringFunctions.indexOf(commitTextline, '\t', posTab+1);
+                      if(posTab2 < 0) { posTab2 = commitTextline.length(); }
+                      entry.filePath = commitTextline.subSequence(posTab+1, posTab2).toString();
+//                      if(posTab2 >= posTab) { 
+//                        posTab = posTab2;   //on rename the new name is the correct, it is right.
+//                      }
+//                      entry.filePath = commitTextline.subSequence(posTab+1, commitTextline.length()).toString();
+                    }  
+                  }
                   if(entry.commitTitle == null && commitTextline.length() >6){
                     entry.commitTitle = commitTextline.toString();  //first line with at least 6 character: Use as title.
                   }
@@ -1113,10 +1138,11 @@ public class GitGui
     if(currRev == null) {
       sFile1 = sWorkingDir + "/" + sFile;
     } else  {
+      String sCurrFile = currRev.filePath !=null ? currRev.filePath : sFile;  //sFile if common revisions
       String dirTemp1 = settings.dirTemp1.getAbsolutePath() + "/" + dateFmt.format(currRev.dateCommit);
-      sFile1 = dirTemp1 + "/" + sFile;
+      sFile1 = dirTemp1 + "/" + sCurrFile; //sFile;
       try{ FileSystem.mkDirPath(sFile1);} catch(IOException exc) { throw new RuntimeException(exc); }
-      String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + currRev.revisionHash + " -- " + sFile;
+      String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + currRev.revisionHash + " -- " + sCurrFile; //sFile;
       String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
       gitCmd.addCmd(args, null, listOut, null, new File(dirTemp1), null);
     }
@@ -1124,10 +1150,11 @@ public class GitGui
       sFile2 = sFile1;
     }
     else { 
+      String sCmpFile = cmpRev.filePath !=null ? cmpRev.filePath : sFile;  //sFile if common revisions, incorrect on renamed files
       String dirTemp2 = settings.dirTemp2.getAbsolutePath() + "/" + dateFmt.format(cmpRev.dateCommit);
-      sFile2 = dirTemp2 + "/" + sFile;
+      sFile2 = dirTemp2 + "/" + sCmpFile; //sFile;
       try{ FileSystem.mkDirPath(sFile2);} catch(IOException exc) { throw new RuntimeException(exc); }
-      String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + cmpRev.revisionHash + " -- " + sFile;
+      String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + cmpRev.revisionHash + " -- " + sCmpFile;
       wdgCmd.setText(settings.dirTemp2 + ">" + sGitCmd);
       String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
       gitCmd.addCmd(args, null, listOut, null, new File(dirTemp2), null);
@@ -1216,10 +1243,13 @@ public class GitGui
       }
     } while(gitOut.nextlineMaxpart().found());
     if(this.sLocalFile !=null) {
-      line = wdgTableFiles.getLine(this.sLocalFile);
-      wdgTableFiles.setCurrentLine(this.sLocalFile);
+      //line = wdgTableFiles.getLine(this.sLocalFile);
+      //wdgTableFiles.setCurrentLine(this.sLocalFile);
     }
-      
+    if(this.currentEntry !=null && this.currentEntry.filePath !=null) {
+      assert(this.sLocalFile !=null);
+      wdgTableFiles.setCurrentLine(this.currentEntry.filePath);
+    }
   }
 
 
