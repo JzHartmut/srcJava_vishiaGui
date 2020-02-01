@@ -50,6 +50,13 @@ public class GitGui
 
   /**Version, history and license
    * <ul>
+   * <li>2020-01-15 Hartmut {@link #startLog(String)} shows the working dir too. 
+   * <li>2020-01-15 Hartmut {@link #wdgTableVersion} with fix width, {@link #wdgTableFiles} variable width on resizing of the window. Better for view. 
+   * <li>2019-12-25 Hartmut {@link #actionFetch}, {@link #actionPull}. {@link #actionPull} not ready yet. 
+   * <li>2019-12-10 Hartmut in {@link #actionExecCmd}, {@link #actionAdd} etc.: shows the cmd output via {@link #execShowCmdOutput} 
+   * <li>2019-12-10 Hartmut in {@link #exec_CommitDone}: shows commit error 
+   * <li>2019-11-25 Hartmut {@link #moveFileListToSelection()} improved creates one directory level on git working dir.  
+   * <li>2019-09-00 Hartmut new {@link #actionOutputZip} 
    * <li>2019-04-25 Hartmut Now renamed files are shown with full history, compare with older renamed files is possible. 
    * <li>2019-04-24 Hartmut Enhancements for view diff for some revisions. Shows the date as temp directory name. 
    * <li>2019-04-02 Hartmut Enhancements for add and mov: detect the selected line in status window for new file name (in 'Untracked files:' area),
@@ -155,6 +162,8 @@ public class GitGui
         wdgCommit.setText("commit done");
       } else {
         wdgCommit.setText("commit error");
+        wdgInfo.setText(gitOut);
+        gitOut.clear();
       }
     }
   }; 
@@ -401,10 +410,82 @@ public class GitGui
         if(cmd.startsWith("!! ")) {
           cmd = cmd.substring(3);
         }
-        execCmd(cmd);
+        execCmd(cmd, execShowCmdOutput);
       } //if;
       return false;
   } };
+
+
+  
+  
+  /**Action for check the remote archive. 
+   * 
+   */
+  GralUserAction actionFetch = new GralUserAction("actionFetch")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        String cmd = GitGui.this.wdgCmd.getText().trim();
+        if(cmd.startsWith("!!")) {
+          cmd = cmd.substring(2);
+          execCmd(cmd, exec_ShowStatus);
+        } else {
+          String sGitCmd = "!!" + "git";
+          if(! GitGui.this.sGitDir.startsWith(GitGui.this.sWorkingDir)) {
+            sGitCmd += " '--git-dir=" + GitGui.this.sGitDir + "'";
+          }
+          sGitCmd += " fetch -v";
+          GitGui.this.wdgCmd.setText(sGitCmd);
+        }
+      } //if;
+      return false;
+  } };
+
+
+
+  GralUserAction actionPull = new GralUserAction("actionPull")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        String cmd = GitGui.this.wdgCmd.getText().trim();
+        if(cmd.startsWith("!!")) {
+          cmd = cmd.substring(2);
+          execCmd(cmd, exec_ShowStatus);
+        } else {
+          String sGitCmd = "!!" + "git";
+          if(! GitGui.this.sGitDir.startsWith(GitGui.this.sWorkingDir)) {
+            sGitCmd += " '--git-dir=" + GitGui.this.sGitDir + "'";
+          }
+          sGitCmd += " pull";
+          GitGui.this.wdgCmd.setText(sGitCmd);
+        }
+      } //if;
+      return false;
+  } };
+
+
+
+  /**Action for check the remote archive. 
+   * 
+   */
+  GralUserAction actionPush = new GralUserAction("actionPush")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        String cmd = GitGui.this.wdgCmd.getText().trim();
+        if(cmd.startsWith("!!")) {
+          cmd = cmd.substring(2);
+          execCmd(cmd, exec_ShowStatus);
+        } else {
+          String sGitCmd = "!!" + "git";
+          if(! GitGui.this.sGitDir.startsWith(GitGui.this.sWorkingDir)) {
+            sGitCmd += " '--git-dir=" + GitGui.this.sGitDir + "'";
+          }
+          sGitCmd += " push ";
+          GitGui.this.wdgCmd.setText(sGitCmd);
+        }
+      } //if;
+      return false;
+  } };
+
+
 
   /**Action for show the version table for the given file. 
    * 
@@ -412,10 +493,10 @@ public class GitGui
   GralUserAction actionAdd = new GralUserAction("actionAdd")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
-        String cmd = wdgCmd.getText().trim();
+        String cmd = GitGui.this.wdgCmd.getText().trim();
         if(cmd.startsWith("!! ")) {
           cmd = cmd.substring(3);
-          execCmd(cmd);
+          execCmd(cmd, execShowCmdOutput);
         } else {
           addFileFromSelection(); return true;
         }
@@ -431,10 +512,10 @@ public class GitGui
   GralUserAction actionMove = new GralUserAction("actionMove")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
-        String cmd = wdgCmd.getText().trim();
+        String cmd = GitGui.this.wdgCmd.getText().trim();
         if(cmd.startsWith("!! ")) {
           cmd = cmd.substring(3);
-          execCmd(cmd);
+          execCmd(cmd, execShowCmdOutput);
         } else {
           moveFileListToSelection(); return true;
         }
@@ -445,7 +526,7 @@ public class GitGui
 
 
 
-  CmdExecuter.ExecuteAfterFinish execShowListOut = new CmdExecuter.ExecuteAfterFinish()
+  CmdExecuter.ExecuteAfterFinish execShowCmdOutput = new CmdExecuter.ExecuteAfterFinish()
   { @Override
     public void exec(int errorcode, Appendable out, Appendable err)
     { if(errorcode ==0) {
@@ -469,6 +550,35 @@ public class GitGui
     }
   };
 
+  
+  
+  
+  
+  /**Action for diff view of the current file to the workspace.*/
+  GralUserAction actionOutputZip = new GralUserAction("actionOutputZip")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        GralTable<RevisionEntry>.TableLineData line2 = wdgTableVersion.getLineMousePressed();
+        RevisionEntry revision = line2.getData();
+//        GralTable<String>.TableLineData lineFile = wdgTableFiles.getCurrentLine();
+//        String sLine = lineFile.getData();
+        int posSep = GitGui.this.sWorkingDir.lastIndexOf('/');
+        String sZipName = posSep >0 ? GitGui.this.sWorkingDir.substring(posSep +1) : "Version";
+        String sDate = dateFmtyyMMdd.format(revision.dateCommit);
+        String sGitCmd = "git '--git-dir=" + sGitDir + "' archive  -o " + sZipName + "-" + sDate + ".zip " + revision.revisionHash; ///
+        wdgCmd.setText(sGitCmd);
+        String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
+        gitCmd.addCmd(args, null, listOut, null, workingDir, null);
+
+//        if(sLine !=null && sLine.length() >=2) {
+//          String sFile = sLine.substring(2);  //pos 0 is change-sign, pos 1 is \t
+//        }
+        return true;
+      } //if;
+      return false;
+  } };
+
+
 
   /**The paths to the executables. */
   GitGuiPaths exepath;
@@ -490,9 +600,9 @@ public class GitGui
   GralButton wdgBtnCmd = new GralButton("@0..2, -6..0 = cmdExec", "exec", this.actionExecCmd);
 
   
-  GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("@3..-30,0..-40=git-versions", new int[] {2, 10, 0, -10});
+  GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("@3..-30,0..50=git-versions", new int[] {2, 10, 0, -10});
   
-  GralTable<String> wdgTableFiles = new GralTable<>("@3..-30,-40..0=git-files", new int[] {3,20,0});
+  GralTable<String> wdgTableFiles = new GralTable<>("@3..-30,51..0=git-files", new int[] {3,20,0});
   
   GralTextBox wdgInfo = new GralTextBox("@-30..0, 0..-20=info");
 
@@ -501,6 +611,12 @@ public class GitGui
   GralButton wdgBtnDiffCurrFile = new GralButton("@-26..-24, -18..-2 = diffCurrFile", "diff current file", this.actionFileDiffRev);
 
   GralButton wdgBtnBlame = new GralButton("@-23..-21, -18..-2 = blameFile", "blame", this.actionFileBlame);
+
+  GralButton wdgBtnFetch = new GralButton("@-18+2, -20..-14 = fetch", "fetch", this.actionFetch);
+
+  GralButton wdgBtnPull = new GralButton("@-18+2, -13..-8 = pull", "pull", this.actionFetch);
+
+  GralButton wdgBtnPush = new GralButton("@-18+2, -7..-1 = push", "push", this.actionFetch);
 
   GralButton wdgBtnAdd = new GralButton("@-15+2, -9..-1 = add", "add", this.actionAdd);
 
@@ -557,6 +673,8 @@ public class GitGui
   
   int cursorPosInfo;
   
+  final SimpleDateFormat dateFmtyyMMdd = new SimpleDateFormat("yy-MM-dd");
+
   
   public static void main(String[] args){
     GitGui main = new GitGui(args);
@@ -590,6 +708,9 @@ public class GitGui
       wdgTableFiles.addContextMenuEntryGthread(1, "show log for File", "Show log for this file [ctrl-s]", actionTableFileLog);
       //
       //Note for all columns extra:
+      
+      wdgTableVersion.addContextMenuEntryGthread(1, "cmpVersion", "create zip form this version", actionOutputZip);
+      wdgTableVersion.addContextMenuEntryGthread(2, "cmpVersion", "create zip from this version", actionOutputZip);
       wdgTableVersion.addContextMenuEntryGthread(1, "cmpVersion", "cmp with this version", actionDiffVersion);
       wdgTableVersion.addContextMenuEntryGthread(2, "cmpVersion", "cmp with this version", actionDiffVersion);
     }
@@ -828,11 +949,11 @@ public class GitGui
     String sPathShow;
     this.sLocalFile = sLocalFile;
     if(sLocalFile !=null) {
-      sPathShow = sGitDir + " : " + sLocalFile;
+      sPathShow = sWorkingDir + " : " + sLocalFile + " @" + sGitDir;
       wdgBtnDiffCurrFile.setVisible(true);
       wdgBtnDiffCurrWork.setVisible(true);
     } else {
-      sPathShow = sGitDir;
+      sPathShow = sWorkingDir + " @" + sGitDir;
       wdgBtnDiffCurrFile.setVisible(false);
       wdgBtnDiffCurrWork.setVisible(false);
     }
@@ -1059,7 +1180,7 @@ public class GitGui
 
   
   
-  void execCmd(String cmd) {
+  void execCmd(String cmd, CmdExecuter.ExecuteAfterFinish showCmd) {
     File cmdDir = workingDir;
     int posDir = cmd.indexOf('>');
     if(posDir >0) {
@@ -1076,7 +1197,7 @@ public class GitGui
       args[3] = cmd;
     }
     gitOut.clear();
-    gitCmd.addCmd(args, null, listOut, null, cmdDir, execShowListOut);
+    gitCmd.addCmd(args, null, listOut, null, cmdDir, showCmd);
   }
   
   
@@ -1112,12 +1233,18 @@ public class GitGui
     if(dst.endsWith("/")) {
       dst += sFile;
     }
-    int posSep = sGitDir.lastIndexOf('/');
-    assert(sGitDir.substring(posSep).equals("/.git"));
-    String sGitCmd = "!! " + sGitDir.substring(0, posSep) + ">git mv ";
-    sGitCmd += line.getCellText(2) + "/" + sFile + " " + dst;
+    try{
+      String sPathDst = this.sGitDir + "/../" + dst;
+      FileSystem.mkDirPath(sPathDst);  //if the dst dir does not exist, create it
+      int posSep = sGitDir.lastIndexOf('/');
+      assert(sGitDir.substring(posSep).equals("/.git"));
+      String sGitCmd = "!! " + sGitDir.substring(0, posSep) + ">git mv ";
+      sGitCmd += line.getCellText(2) + "/" + sFile + " " + dst;
+      wdgCmd.setText(sGitCmd);
+    } catch(Exception exc) {
+      wdgCmd.setText("Exception: " + exc.getMessage());
+    }
     
-    wdgCmd.setText(sGitCmd);
   }
 
   
@@ -1132,26 +1259,26 @@ public class GitGui
    * @param cmpRev the selected revision to compare.
    */
   void startDiffView(String sFile,  RevisionEntry currRev, RevisionEntry cmpRev) {
-    SimpleDateFormat dateFmt = new SimpleDateFormat("yy-MM-dd");
     
     String sFile1, sFile2;
     if(currRev == null) {
       sFile1 = sWorkingDir + "/" + sFile;
-    } else  {
+    } else  {  //sCurrFile is the file path inside the .git archive
+      //maybe another filepath for older revisions for moved files.
       String sCurrFile = currRev.filePath !=null ? currRev.filePath : sFile;  //sFile if common revisions
-      String dirTemp1 = settings.dirTemp1.getAbsolutePath() + "/" + dateFmt.format(currRev.dateCommit);
+      String dirTemp1 = settings.dirTemp1.getAbsolutePath() + "/" + dateFmtyyMMdd.format(currRev.dateCommit);
       sFile1 = dirTemp1 + "/" + sCurrFile; //sFile;
       try{ FileSystem.mkDirPath(sFile1);} catch(IOException exc) { throw new RuntimeException(exc); }
       String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + currRev.revisionHash + " -- " + sCurrFile; //sFile;
       String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
-      gitCmd.addCmd(args, null, listOut, null, new File(dirTemp1), null);
+      gitCmd.addCmd(args, null, listOut, null, new File(dirTemp1), null);  //checkout in the dirTemp1, it is the working dir.
     }
     if(cmpRev == null) {
       sFile2 = sFile1;
     }
     else { 
       String sCmpFile = cmpRev.filePath !=null ? cmpRev.filePath : sFile;  //sFile if common revisions, incorrect on renamed files
-      String dirTemp2 = settings.dirTemp2.getAbsolutePath() + "/" + dateFmt.format(cmpRev.dateCommit);
+      String dirTemp2 = settings.dirTemp2.getAbsolutePath() + "/" + dateFmtyyMMdd.format(cmpRev.dateCommit);
       sFile2 = dirTemp2 + "/" + sCmpFile; //sFile;
       try{ FileSystem.mkDirPath(sFile2);} catch(IOException exc) { throw new RuntimeException(exc); }
       String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + cmpRev.revisionHash + " -- " + sCmpFile;

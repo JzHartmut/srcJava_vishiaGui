@@ -1,3 +1,5 @@
+echo maybe close file commander before compiling:
+pause
 echo off
 
 ::set DST_Download=..\..\Download\vishiajar
@@ -12,7 +14,8 @@ set OUTDIR_JAVAC=..\..\vishiajar
 set JAR_JAVAC=vishiaGui.jar
 
 REM Manifest-file for jar building relativ path from current dir:
-set MANIFEST_JAVAC=vishiaGui.manifest
+set MANIFEST_JAVAC=Fcmd.manifest
+::set MANIFEST_JAVAC=vishiaGui.manifest
 
 REM Input for javac, only choice of primary sources, relativ path from current (make)-directory:
 set INPUT_JAVAC=
@@ -41,11 +44,11 @@ exit
 REM The viahiaGui depends on zbnf.jar.
 REM SRCvishiaBase used for compile batch script only.
 set SRCvishiaBase=..\..\..\ZBNF\srcJava_Zbnf
-set ZBNFJAR=..\..\..\ZBNF\zbnfjax\zbnf.jar
+set ZBNFJAR=..\..\..\zbnfjax\zbnf.jar
 
 if exist %ZBNFJAR% goto :ZbnfOk
-set SRCvishiaBase=..\..\srcJava_vishiaBase
-set ZBNFJAR=..\..\exe\zbnf.jar
+::set SRCvishiaBase=..\..\srcJava_vishiaBase
+::set ZBNFJAR=..\..\exe\zbnf.jar
 :ZbnfOk
 set CLASSPATH_JAVAC=%SWTJAR%;%ZBNFJAR%
 echo classpath: %CLASSPATH_JAVAC%
