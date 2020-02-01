@@ -67,6 +67,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2020-02-01 Hartmut new {@link #actionClose} sets the property to close a main Window.
    * <li>2016-11-04 Hartmut chg: {@link #notifyFocus(GralWidget)}: Only widgets with datapath. It is only for the inspector etc. TODO: Is there a list necessary? Store only the last widget in focus!
    * <li>2016-09-02 Hartmut new: {@link #setPosPanel(GralPanelContent)} now invoked especially from ctor of {@link GralPanelContent}
    *   and from ctor of {@link GralPanelContent.ImplAccess}. If a new Panel was created with a given {@link GralWidget#pos()} then that panel
@@ -1711,6 +1712,16 @@ public GralButton addCheckButton(
 
 
   
+  public final GralUserAction actionClose = new  GralUserAction("actionClose")
+  { 
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    { GralMng.get().gralDevice().closeMainWindow();
+      return true; 
+  } };
+
+
+
+  
   
   /**This standard Gral focus listener is the base class for the common implementation layer focus listener.
    * The both methods {@link #focusGainedGral(GralWidget)} and {@link #focusLostGral(GralWidget)} will be invoked
@@ -2064,6 +2075,8 @@ public GralButton addCheckButton(
     return impl.remove(compositeBox);
   }
 
+  
+  
 
   /**Must only invoke from the Main window close listener. */
   public static void closeGral() {

@@ -30,6 +30,7 @@ import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.jztxtcmd.JZtxtcmd;
 import org.vishia.msgDispatch.MsgRedirectConsole;
@@ -47,6 +48,8 @@ public class Fcmd extends GuiCfg
 
   /**Version, history and license. This String is visible in the about info.
    * <ul>
+   * <li>2020-02-01 Hartmut sets {@link GralWindow_ifc#windMinimizeOnClose} to prevent accidentally close.
+   *   Menu "Windows-Close" added.
    * <li>2017-08-27 {@link FcmdFavorPathSelector#actionDeselectDirtree} now removes all FileRemote instances of children
    *   because a selection is not necessary furthermore. This is a 'refresh'. But the 'refresh' (F5, ctrl-R) should not change selection,
    *   it must not delete this children-FileRemote. Only deselection is the key action for that.
@@ -596,7 +599,7 @@ public class Fcmd extends GuiCfg
     //panelBuildIfc.registerUserAction("KeyAction",
       //  keyActions.commanderKeyActions); // all key actions, registered central
 
-    gui.setFrameAreaBorders(30, 65, 70, 85); // x1, x2, y1, y2
+    this.gui.setFrameAreaBorders(30, 65, 70, 85); // x1, x2, y1, y2
     //gui.setStandardMenusGThread(new File("."), actionFile);
     //gui.addMenuItemGThread("menuBarFavorsLeft", idents.menuBarNavigationLeft, selectCardThemesLeft);
     //gui.addMenuItemGThread("menuBarFavorsMiddle", idents.menuBarNavigationMiddle, selectCardThemesMiddle);
@@ -640,13 +643,15 @@ public class Fcmd extends GuiCfg
     favorPathSelector.buildWindowAddFavorite();
 
     fButtons.initPanelButtons();
-    GralMenu menu = gui.getMenuBar();
+    GralMenu menu = this.gui.getMenuBar();
+    menu.addMenuItem("menuHelp", this.idents.menuHelpBar, this.gui.getActionHelp());
+    menu.addMenuItem("menuClose", this.idents.menuCloseBar, this.gui.getActionClose());
+    
     menu.addMenuItem("MenuSetWorkingDir", "&Command/Set&WorkingDir", executer.actionSetCmdWorkingDir); // /
     menu.addMenuItem("MenuCommandAbort", "&Command/&Abort", executer.actionCmdAbort); // /
     // gui.addMenuItemGThread("&Command/E&xecute", actionSetCmdCurrentDir); ///
     menu.addMenuItem("MenuCmdCfgSet", "&Command/CmdCf&g - read current file", executer.actionSetCmdCfg); // /
     
-    menu.addMenuItem("menuHelp", idents.menuHelpBar, gui.getActionHelp());
     menu.addMenuItem("menuAbout", idents.menuBarAbout, gui.getActionAbout());
     menu.addMenuItem("MenuTestInfo", "&Help/&Infobox", actionTest); 
     guiW.outputBox.setActionChange(executer.actionCmdFromOutputBox);
@@ -1005,7 +1010,8 @@ public class Fcmd extends GuiCfg
     //new GralMng(null, cmdgui);
     
     // calling arguments
-    bOk = cmdgui.parseArgumentsAndInitGraphic("The.file.Commander", "2A2C", '.', "20+70,20+250");
+    int windProps = GralWindow_ifc.windMinimizeOnClose | GralWindow_ifc.windHasMenu | GralWindow_ifc.windResizeable;
+    bOk = cmdgui.parseArgumentsAndInitGraphic("The.file.Commander", "2A2C", '.', "20+70,20+250", windProps);
 
     /*
     try {

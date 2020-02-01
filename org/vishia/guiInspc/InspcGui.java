@@ -22,11 +22,13 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralShowMethods;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralColorSelector;
 import org.vishia.inspcPC.InspcAccess_ifc;
 import org.vishia.inspcPC.InspcPlugUser_ifc;
@@ -523,7 +525,7 @@ private class InspcGuiCfg extends GuiCfg
     CallingArguments cargs = new CallingArguments();
     //Initializes the GUI till a output window to show informations:
     CmdLineAndGui cmdgui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
-    bOk = cmdgui.parseArgumentsAndInitGraphic(null, "3A3C");
+    bOk = cmdgui.parseArgumentsAndInitGraphic(null, "3A3C", GralWindow.windHasMenu | GralWindow_ifc.windResizeable);
     System.err.println("InspcGui - Test; test");
     LogMessage log = cmdgui.getLogMessageOutputConsole();
     

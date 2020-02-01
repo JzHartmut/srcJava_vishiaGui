@@ -5,6 +5,8 @@ import java.util.EventObject;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.event.EventTimerThread;
+import org.vishia.gral.area9.GralArea9MainCmd;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Assert;
 import org.vishia.util.MinMaxTime;
@@ -118,6 +120,10 @@ public class GralGraphicThread implements Runnable
   
   /**Version and history.
    * <ul>
+   * <li>2020-02-01 in {@link #run()}: The {@link GralWindow_ifc#windHasMenu} is not forced, it is set compatible
+   *   in {@link GralArea9MainCmd#parseArgumentsAndInitGraphic(String, String, char, String)}. 
+   *   <br>Usage of {@link GralWindow#GralWindow(String, String, String, int)} 
+   *   should add {@link GralWindow_ifc#windResizeable} etc. additionally. 
    * <li>2016-07-16 Hartmut chg: The main window will be created with same methods like all other windows. 
    * <li>2015-01-17 Hartmut chg: Now it is an own instance able to create before the graphic is established.
    *   The graphical implementation extends the {@link ImplAccess}. 
@@ -160,7 +166,7 @@ public class GralGraphicThread implements Runnable
    * 
    * 
    */
-  public final static String version = "2015-01-17";
+  public final static String sVersion = "2020-01-20";
   
   //protected GralPrimaryWindow window;
   
@@ -293,10 +299,14 @@ public class GralGraphicThread implements Runnable
    * </ul>  
    * @see java.lang.Runnable#run()
    */
-  @Override public void run()
-  { impl.initGraphic();
-    //add important properties for the main window, the user should not thing about.
-    impl.mainWindow.windProps |= GralWindow.windIsMain | GralWindow.windRemoveOnClose | GralWindow.windHasMenu;
+  @Override public void run() {
+    impl.initGraphic();
+    //add important properties for the main window, the user should not thing about:
+    impl.mainWindow.windProps |= GralWindow.windIsMain  | GralWindow.windHasMenu;
+    if((impl.mainWindow.windProps & GralWindow_ifc.windMinimizeOnClose)==0) {
+      //it it should not be minimized, then close, never set Invisible, because it is not possible to set visible again.
+      impl.mainWindow.windProps |= GralWindow.windRemoveOnClose;
+    }
     //creates all widgets of this primary window.
     impl.mainWindow.createImplWidget_Gthread();
     impl.mainWindow.setWindowVisible( true ); 
@@ -324,6 +334,14 @@ public class GralGraphicThread implements Runnable
     //bExit = true;
     //synchronized(this){ notify(); }  //to weak up waiting on configGrafic().
   }
+
+  
+  
+  
+  public void closeMainWindow() {
+    this.impl.mainWindow.windProps |= GralWindow_ifc.windRemoveOnClose; //if not set till now.
+  }
+  
 
   
   void step()

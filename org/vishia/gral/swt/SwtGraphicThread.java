@@ -19,6 +19,7 @@ import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.Debugutil;
 
 /**This class is the implementation class of a simple graphic implementation for SWT.
  * It doesn't depend of complex functionality of the org.vishia.gral. But that implementations based on this.
@@ -159,6 +160,8 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
 
     @Override
     public void shellClosed(ShellEvent e) {
+      Debugutil.stop();
+      
       // TODO Auto-generated method stub
       
     }
@@ -206,7 +209,7 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
    */
   @Override protected void initGraphic(){
     displaySwt = new Display();  //The organization class of the whole graphic independent of a concrete window.
-    displaySwt.addFilter(SWT.Close, windowsCloseListener);
+    displaySwt.addFilter(SWT.Close, windowsCloseListener);  //it sets bExit on close of windows for the graphic thread
     displaySwt.addFilter(SWT.Traverse, traverseKeyFilter);
     SwtProperties propertiesGui = new SwtProperties(this.displaySwt, sizeCharProperties);
     gralMng = new SwtMng(displaySwt, propertiesGui, log);

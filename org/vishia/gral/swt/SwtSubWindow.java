@@ -132,6 +132,10 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     }
   };
   
+
+  
+  
+  //private final CloseListener closeListener;
   
 
   
@@ -277,7 +281,11 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
         e.doit = true;
       } else {
         e.doit = false;
-        ((Shell)e.widget).setVisible(false);
+        if((windProps & GralWindow_ifc.windMinimizeOnClose)!=0) {
+          ((Shell)e.widget).setMinimized(true); //set active with operation-system handling possible.
+        } else {
+          ((Shell)e.widget).setVisible(false);  //there should be an action to set visible again.
+        }
       }
     }
 

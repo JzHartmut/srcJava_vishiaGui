@@ -78,6 +78,8 @@ public class FcmdIdents extends FcmdIdentsBase
 
   String menuHelpBar = "&Help/&Help [F1]";
 
+  String menuCloseBar = "&Window/&Close Window";
+
   String menuHelpContext = "Help";
   
   String buttonHelp = "F1:help";

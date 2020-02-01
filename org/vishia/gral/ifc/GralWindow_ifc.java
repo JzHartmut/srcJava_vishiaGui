@@ -1,6 +1,7 @@
 package org.vishia.gral.ifc;
 
 import org.vishia.gral.base.GralMenu;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow_setifc;
 
@@ -14,6 +15,8 @@ public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc, Gr
 {
   /**Version, history and license.
    * <ul>
+   * <li>2020-02-01 Hartmut new {@link #windMinimizeOnClose} if it is set on a main window, then it is not closed
+   *   till {@link GralMng#actionClose} is invoked. 
    * <li>2016-09-18 Hartmut chg: renaming {@link #specifyActionOnCloseWindow(GralUserAction)} instead 'setActionOnSettingInvisible', more expressive name. 
    * <li>2015-04-27 Hartmut new {@link #windRemoveOnClose}
    * <li>2012-03-16 Hartmut new: {@value #windResizeable} defined and supported in SWT-implementation.
@@ -51,10 +54,17 @@ public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc, Gr
   
   
   /**Property defines that the window should be removed on closing.
-   * If this is not set the window is set to invisible but remain. It can be set to visible
+   * If this is not set the window is set to invisible or minimized but remain. It can be set to visible
    * with its given content anytime again.
    */
   public static final int windRemoveOnClose = 1<<5;
+  
+  /**Property defines that the window should be minimized instead set invisible on closing.
+   * An invisible state (without this bit) can only be set visible by any programmed action.
+   * A minimized state can be recovered by user actions on the operation system.
+   * Use this flag if the window should be keep in the task bar of the operation system. 
+   */
+  public static final int windMinimizeOnClose = 1<<7;
   
   /**Property defines that the window is able to resize
    */

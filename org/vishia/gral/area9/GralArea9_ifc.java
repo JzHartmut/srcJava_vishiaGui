@@ -217,6 +217,11 @@ public interface GralArea9_ifc extends GralMngApplAdapter_ifc
    * to install the help menu.  */
   GralUserAction getActionHelp();
   
+  /**Returns the prepared action help which opens the help window.
+   * It should be used for the users call of {@link #addMenuBarArea9ItemGThread(String, String, GralUserAction) }
+   * to install the help menu.  */
+  GralUserAction getActionClose();
+  
   /**Returns the prepared action about which opens the help window.
    * It should be used for the users call of {@link #addMenuBarArea9ItemGThread(String, String, GralUserAction) }
    * to install the help menu.  */

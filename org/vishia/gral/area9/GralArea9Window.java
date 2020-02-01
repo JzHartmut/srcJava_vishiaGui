@@ -102,6 +102,7 @@ public class GralArea9Window implements GralArea9_ifc
   
   /**Version and History
    * <ul>
+   * <li>2020-02-01 Hartmut new {@link #getActionClose()}
    * <li>2015-10-26 Hartmut chg Help in now an integral part of the {@link GralMng}, but invoked here. This class in not change in functinality.
    * <li>2014-02-24 Hartmut new {@link #setHelpBase(String)} used in {@link #setHelpUrl(String)}.
    * <li>2012-05-17 Hartmut new: {@link #setMinMaxSizeArea(String, int, int, int, int)}: The size can be given 
@@ -145,7 +146,7 @@ public class GralArea9Window implements GralArea9_ifc
    * 
    * 
    */
-  public final static int version = 0x20120303;
+  public final static String sVersion = "2020-01-20";
   
   public final MainCmd mainCmd;
   
@@ -828,6 +829,14 @@ return true;
    */
   @Override public GralUserAction getActionHelp()
   { return GralMng.get().actionHelp;
+  }
+
+
+  /**Returns the standard behavior: opens the about window with its constant text.
+   * @see org.vishia.gral.area9.GralArea9_ifc#getActionAbout()
+   */
+  @Override public GralUserAction getActionClose()
+  { return GralMng.get().actionClose;
   }
 
 

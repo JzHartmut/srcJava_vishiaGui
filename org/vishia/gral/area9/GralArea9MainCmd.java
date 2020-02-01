@@ -7,6 +7,7 @@ import org.vishia.gral.awt.AwtFactory;
 import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralFactory;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.swt.SwtFactory;
 import org.vishia.inspectorTarget.Inspector;
@@ -31,6 +32,10 @@ public class GralArea9MainCmd extends MainCmd
   
   /**Version, history and license.
    * <ul>
+   * <li>2020-02-01 Hartmut {@link #parseArgumentsAndInitGraphic(String, String, int)} with additional 
+   *   {@link GralWindow_ifc#windMinimizeOnClose} etc. possibility for the windows property.
+   *   {@link GralWindow_ifc#windHasMenu} have to be given too if the menue should be used.
+   *   {@link GralWindow_ifc#windResizeable}
    * <li>2016-07-10 Hartmut chg: Positioning of Windows on open, especiallythe top level window: with pos-String, it is the new concept of opsitioning of a GralWidget
    * <li>2015-05-16 Hartmut new "-help:" for help base dir in argument check, "-msgcfg:" in argument check. 
    *   It is moved from Fcmd to this base class of Fcmd, available generally.  
@@ -72,7 +77,7 @@ public class GralArea9MainCmd extends MainCmd
    * 
    * 
    */
-  public final static int version = 20130126;
+  public final static String sVersion = "2020-01-20";
   
   public GralArea9_ifc gui;
   
@@ -109,7 +114,23 @@ public class GralArea9MainCmd extends MainCmd
 
   
   /**Builds the graphic and parses the command line parameters. Possible command line argument errors
-   * or help texts are outputted to the window in the output box.
+   * or help texts are output to the window in the output box.
+   * @param sTitle Title for window
+   * @param sOutputArea Use 1..3 for row and A..C for column in form for example "3A3C".
+   *   In this example the output box occupies all 3 columns (A to C) from the 3. (= bottom) row
+   *   of the 9 areas.  If null is used, the default selection is "3A3C".
+   * @param windProps especially set {@link GralWindow_ifc#windMinimizeOnClose}, 
+   *        {@link GralWindow_ifc#windHasMenu} or other Properties.
+   * @return true if it is successfully.
+   */
+  public boolean parseArgumentsAndInitGraphic(String sTitle, String sOutputArea, int windProps)
+  {
+    return parseArgumentsAndInitGraphic(sTitle, sOutputArea, '.', null, windProps);
+  }
+
+  
+  /**Builds the graphic and parses the command line parameters. Possible command line argument errors
+   * or help texts are output to the window in the output box.
    * @param sTitle Title for window
    * @param sOutputArea Use 1..3 for row and A..C for column in form for example "3A3C".
    *   In this example the output box occupies all 3 columns (A to C) from the 3. (= bottom) row
@@ -118,10 +139,11 @@ public class GralArea9MainCmd extends MainCmd
    */
   public boolean parseArgumentsAndInitGraphic(String sTitle, String sOutputArea)
   {
-    return parseArgumentsAndInitGraphic(sTitle, sOutputArea, '.', null);
+    return parseArgumentsAndInitGraphic(sTitle, sOutputArea, '.', null, GralWindow_ifc.windHasMenu | GralWindow_ifc.windResizeable);
   }
 
   
+
   /**Builds the graphic and parses the command line parameters. Possible command line argument errors
    * or help texts are outputted to the window in the output box.
    * @param sTitle Title for window as default if -title= is not given as arg
@@ -131,6 +153,21 @@ public class GralArea9MainCmd extends MainCmd
    * @return true if it is successfully.
    */
   public boolean parseArgumentsAndInitGraphic(String sTitle, String sOutputArea, char sizeShow, String position)
+  { return parseArgumentsAndInitGraphic(sTitle, sOutputArea, sizeShow, position, GralWindow_ifc.windHasMenu | GralWindow_ifc.windResizeable);
+  }
+  
+  
+  /**Builds the graphic and parses the command line parameters. Possible command line argument errors
+   * or help texts are outputted to the window in the output box.
+   * @param sTitle Title for window as default if -title= is not given as arg
+   * @param sOutputArea Use 1..3 for row and A..C for column in form for example "3A3C".
+   *   In this example the output box occupies all 3 columns (A to C) from the 3. (= bottom) row
+   *   of the 9 areas.  If null is used, the default selection is "3A3C".
+   * @param windProps especially set {@link GralWindow_ifc#windMinimizeOnClose}, 
+   *        {@link GralWindow_ifc#windHasMenu} or other Properties.
+   * @return true if it is successfully.
+   */
+  public boolean parseArgumentsAndInitGraphic(String sTitle, String sOutputArea, char sizeShow, String position, int windProps)
   {
     boolean bOk = true;
     try{ parseArguments(); }
@@ -152,7 +189,7 @@ public class GralArea9MainCmd extends MainCmd
     String posWindow1 = cargs.positionWindow !=null ? cargs.positionWindow : position !=null ? position : "0+80, 10+120";
     
     String sTitle1 = cargs.sTitle !=null ? cargs.sTitle : sTitle != null ? sTitle: cargs.fileGuiCfg !=null ? cargs.fileGuiCfg.getName() : " no -cfg given";
-    GralWindow primaryWindow = new GralWindow(posWindow1, "primaryWindow", sTitle1, GralWindow.windResizeable + GralWindow.windHasMenu);
+    GralWindow primaryWindow = new GralWindow(posWindow1, "primaryWindow", sTitle1, windProps);
     GralFactory.createGraphic(primaryWindow, sizeShow, log, "SWT");
     //cargs.graphicFactory.createWindow(primaryWindow, sizeShow);
     gui = new GralArea9Window(this, primaryWindow);
