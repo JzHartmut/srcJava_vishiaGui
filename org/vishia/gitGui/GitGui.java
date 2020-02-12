@@ -49,7 +49,7 @@ public class GitGui
 
 
   /**Version, history and license
-   * <ul>
+   * <ul>2020-02-12 Hartmut Now main works (in Test), able to invoke as standalone Java applic. 
    * <li>2020-01-15 Hartmut {@link #startLog(String)} shows the working dir too. 
    * <li>2020-01-15 Hartmut {@link #wdgTableVersion} with fix width, {@link #wdgTableFiles} variable width on resizing of the window. Better for view. 
    * <li>2019-12-25 Hartmut {@link #actionFetch}, {@link #actionPull}. {@link #actionPull} not ready yet. 
@@ -129,12 +129,6 @@ public class GitGui
 
 
 
-  static class Settings
-  {
-    
-    File dirTemp1 = new File("t:/git_tmp1");
-    File dirTemp2 = new File("t:/git_tmp2");
-  }
 
 
   /**Action for open the commit text. 
@@ -202,7 +196,7 @@ public class GitGui
   GralUserAction actionRefresh = new GralUserAction("actionRefresh")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
-        startLog(null); return true;
+        startLog(); return true;
       } //if;
       return false;
   } };
@@ -273,7 +267,7 @@ public class GitGui
       switch(actionCode) {
       case (KeyCode.ctrl | KeyCode.enter):
       case KeyCode.mouse1Double: startDiffView(sFile, GitGui.this.currentEntry, GitGui.this.cmpEntry); return true;
-      case (KeyCode.ctrl | 's'): startLog(sFile); return true;
+      case (KeyCode.ctrl | 's'): GitGui.this.sLocalFile = sFile; startLog(); return true;
       default: return false;
       } //switch;
       
@@ -397,7 +391,8 @@ public class GitGui
       GralTable<RevisionEntry>.TableLineData line = table.getLineMousePressed(); //(GralTable<RevisionEntry>.TableLineData)params[0];  //it is the table line.
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
         String sFile = line.getKey();   //working tree has key "*"
-        startLog(sFile); return true;
+        GitGui.this.sLocalFile = sFile;
+        startLog(); return true;
       } //if;
       return false;
   } };
@@ -588,8 +583,7 @@ public class GitGui
    */
   static File filePathRepository;
   
-  Settings settings = new Settings();
-
+  
   String sTypeOfImplementation = "SWT";  //default
   
 
@@ -646,9 +640,13 @@ public class GitGui
   List<Appendable> listOut = new LinkedList<Appendable>();
   { listOut.add(gitOut); }
   
+  
+  
   /**Stored arguments from {@link #startLog(String, String, String)}. */
   String sGitDir, sWorkingDir; //, sLocalFile;
 
+  
+  
   File workingDir;
   
   String sFileList = "_filelist.lst";
@@ -676,29 +674,99 @@ public class GitGui
   final SimpleDateFormat dateFmtyyMMdd = new SimpleDateFormat("yy-MM-dd");
 
   
-  public static void main(String[] args){
-    GitGui main = new GitGui(args);
+  public static void main(String[]sCmdArgs){
+    GitGuiCmd.CmdArgs cmdArgs = GitGuiCmd.parseArgsGitGui(sCmdArgs);
+    if(cmdArgs !=null) {
+      //guiRepository(settings, null);
+      String[] paths = new String[3];
+      //String error = searchRepository(new File(cmdArgs.startFile), paths, null, null, null, null);
+      //if(error !=null) { System.err.println(error); }
+      //else 
+      {
+        GitGui main = new GitGui(new File(cmdArgs.startFile), cmdArgs);
+        main.exepath = cmdArgs.guiPaths;
+        main.sFileList = "" + ".filelist";
+        main.startLog();
+        main.doSomethinginMainthreadTillCloseWindow();
+      }
+
+    }
     //only test
-    main.startLog("D:/GitArchive/D/vishia/srcJava_vishiaBase/.git", "D:/GitArchive/D/vishia/srcJava_vishiaBase", "org/vishia/util/CalculatorExpr.java");
-    main.doSomethinginMainthreadTillCloseWindow();
   }
   
 
-  public GitGui(String[] args) {
-    if(args !=null && args.length >=1){
-      sTypeOfImplementation = args[0];
+  public GitGui(File startfile, GitGuiCmd.CmdArgs cmdArgs) {
+//    if(args !=null && args.length >=1){
+//      sTypeOfImplementation = args[0];
+//    }
+    String[] files = new String[3];
+    try {
+      detectGitArchive(startfile, files);
+    } catch (IOException e) {
+      //will be shown
     }
+    this.sGitDir = files[0]; //null on exception
+    this.sWorkingDir = files[1];  //null on exception
+    this.workingDir = new File(this.sWorkingDir);
+    this.sLocalFile = files[2];  //null if not given
+    
     initializeCmd();
-    if(!settings.dirTemp1.exists()) { settings.dirTemp1.mkdirs(); }
-    if(!settings.dirTemp2.exists()) { settings.dirTemp2.mkdirs(); }
+    this.exepath = cmdArgs.guiPaths;
+    if(!this.exepath.dirTemp1.exists()) { this.exepath.dirTemp1.mkdirs(); }
+    if(!this.exepath.dirTemp2.exists()) { this.exepath.dirTemp2.mkdirs(); }
     wdgTableVersion.specifyActionOnLineSelected(actionTableLineVersion);
     wdgTableFiles.specifyActionChange("actionTableFile", actionTableFile, null);
     wdgInfo.setUser(wdgInfoSetSelection);
     window.specifyActionOnCloseWindow(actionOnCloseWindow);
-    window.create(sTypeOfImplementation, 'B', null, initGraphic);
+    window.create(sTypeOfImplementation, cmdArgs.graphicSize.charAt(0), null, initGraphic);
     cmdThread.start();
   }
 
+  
+  
+  /**
+   * @param startfile
+   * @param files
+   * @param dst maybe null, elsewhere new String[2]. 
+   *   files[0] will be filled with the absolute path of the .git directory. 
+   *   files[1] will be filled with the absolute path to the basic directory for the working tree where .git or .gitRepository were found.
+   *   files[2] will be filled with the local file path or null if the .git or .gitRepositiory is the startFile.
+   * @throws IOException 
+   */
+  void detectGitArchive(File startfile, String[] files) throws IOException {
+    String fname = startfile.getName();
+    File fgit;
+    File fshow;
+    if(fname.equals(".git") || fname.endsWith(".gitRepository")) {
+      fgit = startfile;
+      fshow = null;
+    } 
+    else {
+      fgit = FileSystem.searchFileInParent(startfile, ".git", "*.gitRepository");
+      fshow = startfile;
+    }
+    if(fgit ==null) { //no repository found
+      files[0] = files[1] = null; 
+    } 
+    else if(fgit.getName().equals(".git")) {
+      files[0] = FileSystem.normalizePath(fgit).toString();
+      files[1] = FileSystem.normalizePath(fgit.getParentFile()).toString();
+    }
+    else {
+      assert(fgit.getName().endsWith(".gitRepository"));
+      files[0] = FileSystem.readFile(fgit).trim();
+      files[1] = fgit.getParent().replace('\\', '/');
+    }
+    if(fshow !=null) {
+      CharSequence workingfile = FileSystem.normalizePath(fshow);
+      files[2] = workingfile.subSequence(files[1].length()+1, workingfile.length() ).toString();
+    } else {
+      files[2] =null;
+    }
+  }
+  
+  
+  
 
   GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("init")
   { @Override protected void executeOrder() {
@@ -740,7 +808,7 @@ public class GitGui
     String sPath = env.get("PATH");
     if(sPath ==null) { sPath = env.get("Path"); }
     if(sPath ==null) { sPath = env.get("path"); }
-    sPath = "D:\\Programs\\Gitcmd\\bin;" + sPath;
+    sPath = "D:\\Program Files\\git\\bin;" + sPath;
     env.put("PATH", sPath);
   }
 
@@ -887,8 +955,9 @@ public class GitGui
    *   Elsewhere the root will be searched backward to the root of the file system. 
    *   It means you can start this routine with any srcFile inside the working tree.
    *   This file will be used as additional argument for example to show the history of that file. 
+   * @throws NoSuchFieldException 
    */
-  public static void guiRepository(GitGuiPaths exepath, JZtxtcmdFilepath repoFile)
+  public static void guiRepository(GitGuiPaths exepath, JZtxtcmdFilepath repoFile) throws NoSuchFieldException
   {
     File srcFile = null;
     try {
@@ -900,14 +969,16 @@ public class GitGui
       }
       srcFile = new File(repoFile.absfile().toString());
     } catch (NoSuchFieldException | IOException e) { System.err.println(e.getMessage());}
-    String[] paths = new String[3];
-    String error = searchRepository(srcFile, paths, null, null, null, null);
-    if(error !=null) { System.err.println(error); }
-    else {
-      GitGui main = new GitGui(null);
+    //String[] paths = new String[3];
+    //String error = searchRepository(srcFile, paths, null, null, null, null);
+    //if(error !=null) { System.err.println(error); }
+    //else 
+    {
+      GitGui main = new GitGui(new File(repoFile.absfile().toString()), new GitGuiCmd.CmdArgs(exepath));
       main.exepath = exepath;
       main.sFileList = repoFile.name() + ".filelist";
-      main.startLog(paths[0], paths[1], paths[2]);
+      main.startLog();
+      //main.startLog(paths[0], paths[1], paths[2]);
     }
   }
 
@@ -926,28 +997,29 @@ public class GitGui
     String error = searchRepository(srcFile, paths, null, null, null, null);
     if(error !=null) { System.err.println(error); }
     else {
-      GitGui main = new GitGui(null);
-      main.startLog(paths[0], paths[1], paths[2]);
+      GitGui main = new GitGui(srcFile, new GitGuiCmd.CmdArgs());
+      main.startLog();
     }
   }
 
 
 
 
-  public void startLog(String sGitDir, String sWorkingDir, String sLocalFile) {
+  public void XXXstartLog(String sGitDir, String sWorkingDir, String sLocalFile) {
     this.sGitDir = sGitDir; 
     this.sWorkingDir = sWorkingDir;
     this.workingDir = new File(sWorkingDir);
-    startLog(sLocalFile);
+    this.sLocalFile = sLocalFile;
+    startLog();
   }
   
   /**
    * @param sLocalFile "*" for all files, else "path/in/loacal/tree/file.ext"
    */
-  void startLog(String sLocalFile) {
+  void startLog() {
     //this.sLocalFile = sLocalFile;
     String sPathShow;
-    this.sLocalFile = sLocalFile;
+    //this.sLocalFile = sLocalFile;
     if(sLocalFile !=null) {
       sPathShow = sWorkingDir + " : " + sLocalFile + " @" + sGitDir;
       wdgBtnDiffCurrFile.setVisible(true);
@@ -1266,7 +1338,7 @@ public class GitGui
     } else  {  //sCurrFile is the file path inside the .git archive
       //maybe another filepath for older revisions for moved files.
       String sCurrFile = currRev.filePath !=null ? currRev.filePath : sFile;  //sFile if common revisions
-      String dirTemp1 = settings.dirTemp1.getAbsolutePath() + "/" + dateFmtyyMMdd.format(currRev.dateCommit);
+      String dirTemp1 = this.exepath.dirTemp1.getAbsolutePath() + "/" + dateFmtyyMMdd.format(currRev.dateCommit);
       sFile1 = dirTemp1 + "/" + sCurrFile; //sFile;
       try{ FileSystem.mkDirPath(sFile1);} catch(IOException exc) { throw new RuntimeException(exc); }
       String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + currRev.revisionHash + " -- " + sCurrFile; //sFile;
@@ -1278,11 +1350,11 @@ public class GitGui
     }
     else { 
       String sCmpFile = cmpRev.filePath !=null ? cmpRev.filePath : sFile;  //sFile if common revisions, incorrect on renamed files
-      String dirTemp2 = settings.dirTemp2.getAbsolutePath() + "/" + dateFmtyyMMdd.format(cmpRev.dateCommit);
+      String dirTemp2 = this.exepath.dirTemp2.getAbsolutePath() + "/" + dateFmtyyMMdd.format(cmpRev.dateCommit);
       sFile2 = dirTemp2 + "/" + sCmpFile; //sFile;
       try{ FileSystem.mkDirPath(sFile2);} catch(IOException exc) { throw new RuntimeException(exc); }
       String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + cmpRev.revisionHash + " -- " + sCmpFile;
-      wdgCmd.setText(settings.dirTemp2 + ">" + sGitCmd);
+      wdgCmd.setText(this.exepath.dirTemp2 + ">" + sGitCmd);
       String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
       gitCmd.addCmd(args, null, listOut, null, new File(dirTemp2), null);
     }
@@ -1303,23 +1375,23 @@ public class GitGui
    * @param cmpRev the selected revision to compare.
    */
   void startBlame(String sFile,  RevisionEntry currRev, RevisionEntry cmpRev) {
-    String sFile1 = settings.dirTemp1.getAbsolutePath() + "/" + sFile;
-    String sFile2 = settings.dirTemp2.getAbsolutePath() + "/" + sFile;
+    String sFile1 = this.exepath.dirTemp1.getAbsolutePath() + "/" + sFile;
+    String sFile2 = this.exepath.dirTemp2.getAbsolutePath() + "/" + sFile;
     if(currRev == null) {
       sFile1 = sWorkingDir + "/" + sFile;
     } else  { 
       String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + currRev.revisionHash + " -- " + sFile;
       String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
-      gitCmd.addCmd(args, null, listOut, null, settings.dirTemp1, null);
+      gitCmd.addCmd(args, null, listOut, null, this.exepath.dirTemp1, null);
     }
     if(cmpRev == null) {
       sFile2 = sFile1;
     }
     else { 
       String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + cmpRev.revisionHash + " -- " + sFile;
-      wdgCmd.setText(settings.dirTemp2 + ">" + sGitCmd);
+      wdgCmd.setText(this.exepath.dirTemp2 + ">" + sGitCmd);
       String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
-      gitCmd.addCmd(args, null, listOut, null, settings.dirTemp2, null);
+      gitCmd.addCmd(args, null, listOut, null, this.exepath.dirTemp2, null);
     }
     sFile1 = sFile1.replace('/', '\\');
     sFile2 = sFile2.replace('/', '\\');
