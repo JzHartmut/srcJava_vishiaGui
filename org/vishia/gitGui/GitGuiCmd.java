@@ -38,7 +38,7 @@ public class GitGuiCmd extends MainCmd {
   }
 
   
-  private final CmdArgs args;
+  final CmdArgs args;
   
   
   private GitGuiCmd(CmdArgs args, String[] cmdArgs){
@@ -66,10 +66,13 @@ public class GitGuiCmd extends MainCmd {
     { new Argument("-gitsh", ":C:/Program Files/git/sh.exe - Path to the sh.exe to execute git" , new MainCmd.SetArgument() 
         { @Override public boolean setArgument(String val) 
           { GitGuiCmd.this.args.guiPaths.gitsh_exe = val; return (new File(val)).exists(); } })
-    , new Argument("-diff", ":C:/Programs/difftool/diff.exe - exe for diff tool"
-        , new MainCmd.SetArgument() { @Override public boolean setArgument(String val) 
-          { GitGuiCmd.this.args.guiPaths.diff_exe = val; return true; } })
-    , new Argument("", " file for log"
+      , new Argument("-diff", ":C:/Programs/difftool/diff.exe - exe for diff tool"
+          , new MainCmd.SetArgument() { @Override public boolean setArgument(String val) 
+            { GitGuiCmd.this.args.guiPaths.diff_exe = val; return true; } })
+      , new Argument("-swt", "C - use Swt with given graphic size"
+          , new MainCmd.SetArgument() { @Override public boolean setArgument(String val) 
+            { GitGuiCmd.this.args.graphicSize = val; return true; } })
+      , new Argument("", " file for log"
         , new MainCmd.SetArgument() { @Override public boolean setArgument(String val) 
           { GitGuiCmd.this.args.startFile = val; return true; } })
     };

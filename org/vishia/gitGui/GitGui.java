@@ -416,7 +416,7 @@ public class GitGui
   /**Action for check the remote archive. 
    * 
    */
-  GralUserAction actionFetch = new GralUserAction("actionFetch")
+  GralUserAction actionDaylyBranch = new GralUserAction("actionDaylyBranch")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
         String cmd = GitGui.this.wdgCmd.getText().trim();
@@ -428,7 +428,30 @@ public class GitGui
           if(! GitGui.this.sGitDir.startsWith(GitGui.this.sWorkingDir)) {
             sGitCmd += " '--git-dir=" + GitGui.this.sGitDir + "'";
           }
-          sGitCmd += " fetch -v";
+          sGitCmd += " checkout -b XXX";
+          GitGui.this.wdgCmd.setText(sGitCmd);
+        }
+      } //if;
+      return false;
+  } };
+
+
+  /**Action for check the remote archive. 
+   * 
+   */
+  GralUserAction actionMainBranch = new GralUserAction("actionMainBranch")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        String cmd = GitGui.this.wdgCmd.getText().trim();
+        if(cmd.startsWith("!!")) {
+          cmd = cmd.substring(2);
+          execCmd(cmd, exec_ShowStatus);
+        } else {
+          String sGitCmd = "!!" + "git";
+          if(! GitGui.this.sGitDir.startsWith(GitGui.this.sWorkingDir)) {
+            sGitCmd += " '--git-dir=" + GitGui.this.sGitDir + "'";
+          }
+          sGitCmd += " checkout master";
           GitGui.this.wdgCmd.setText(sGitCmd);
         }
       } //if;
@@ -449,7 +472,7 @@ public class GitGui
           if(! GitGui.this.sGitDir.startsWith(GitGui.this.sWorkingDir)) {
             sGitCmd += " '--git-dir=" + GitGui.this.sGitDir + "'";
           }
-          sGitCmd += " pull";
+          sGitCmd += " pull --force";
           GitGui.this.wdgCmd.setText(sGitCmd);
         }
       } //if;
@@ -606,11 +629,9 @@ public class GitGui
 
   GralButton wdgBtnBlame = new GralButton("@-23..-21, -18..-2 = blameFile", "blame", this.actionFileBlame);
 
-  GralButton wdgBtnFetch = new GralButton("@-18+2, -20..-14 = fetch", "fetch", this.actionFetch);
+  GralButton wdgBtnDaylyBranch = new GralButton("@-18+2, -20..-12 = daylyBranch", "daylyBranch", this.actionDaylyBranch);
 
-  GralButton wdgBtnPull = new GralButton("@-18+2, -13..-8 = pull", "pull", this.actionFetch);
-
-  GralButton wdgBtnPush = new GralButton("@-18+2, -7..-1 = push", "push", this.actionFetch);
+  GralButton wdgBtnDaylyMain = new GralButton("@-18+2, -10..-2 = mainBranch", "mainBranch", this.actionMainBranch);
 
   GralButton wdgBtnAdd = new GralButton("@-15+2, -9..-1 = add", "add", this.actionAdd);
 
@@ -618,9 +639,13 @@ public class GitGui
 
   GralButton wdgRefresh = new GralButton("@-12+2, -18..-8 = refresh", "refresh", this.actionRefresh);
 
-  GralButton wdgCommitText = new GralButton("@-9+2, -18..-2 = commitText", "commit-text", this.actionOpenCommitText);
+  GralButton wdgBtnPull = new GralButton("@-9+2, -20..-15 = pull", "pull", this.actionPull);
 
-  GralButton wdgCommit = new GralButton("@-6+2, -18..-2 = commit", "do commit", this.actionCommit);
+  GralButton wdgCommitText = new GralButton("@-9+2, -14..-2 = commitText", "commit-text", this.actionOpenCommitText);
+
+  GralButton wdgCommit = new GralButton("@-6+2, -20..-8 = commit", "do commit", this.actionCommit);
+
+  GralButton wdgBtnPush = new GralButton("@-6+2, -7..-1 = push", "push", this.actionPush);
 
   /**If set to true, the {@link #cmdThread} should be aborted.
    * 
@@ -738,7 +763,7 @@ public class GitGui
     File fgit;
     File fshow;
     if(fname.equals(".git") || fname.endsWith(".gitRepository")) {
-      fgit = startfile;
+      fgit = startfile.isAbsolute() ? startfile : startfile.getAbsoluteFile();
       fshow = null;
     } 
     else {
