@@ -610,71 +610,71 @@ public class GitGui
   String sTypeOfImplementation = "SWT";  //default
   
 
-  GralWindow window = new GralWindow("0+60, 0+90", "GitGui", "Git vishia", GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose);
+  final GralWindow window = new GralWindow("0+60, 0+90", "GitGui", "Git vishia", GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose);
 
-  GralTextField wdgCmd = new GralTextField("@2-2,0..-7=cmd", GralTextField.Type.editable);
+  final GralTextField wdgCmd = new GralTextField("@2-2,0..-7=cmd", GralTextField.Type.editable);
   
-  GralButton wdgBtnCmd = new GralButton("@0..2, -6..0 = cmdExec", "exec", this.actionExecCmd);
+  final GralButton wdgBtnCmd = new GralButton("@0..2, -6..0 = cmdExec", "exec", this.actionExecCmd);
 
   
-  GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("@3..-30,0..50=git-versions", new int[] {2, 10, 0, -10});
+  final GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("@3..-30,0..50=git-versions", new int[] {2, 10, 0, -10});
   
-  GralTable<String> wdgTableFiles = new GralTable<>("@3..-30,51..0=git-files", new int[] {3,20,0});
+  final GralTable<String> wdgTableFiles = new GralTable<>("@3..-30,51..0=git-files", new int[] {3,20,0});
   
-  GralTextBox wdgInfo = new GralTextBox("@-30..0, 0..-20=info");
+  final GralTextBox wdgInfo = new GralTextBox("@-30..0, 0..-20=info");
 
-  GralButton wdgBtnDiffCurrWork = new GralButton("@-29..-27, -18..-2 = diffCurrWork", "diff current file to workspace", this.actionDiffCurrWork);
+  final GralButton wdgBtnDiffCurrWork = new GralButton("@-29..-27, -18..-2 = diffCurrWork", "diff current file to workspace", this.actionDiffCurrWork);
 
-  GralButton wdgBtnDiffCurrFile = new GralButton("@-26..-24, -18..-2 = diffCurrFile", "diff current file", this.actionFileDiffRev);
+  final GralButton wdgBtnDiffCurrFile = new GralButton("@-26..-24, -18..-2 = diffCurrFile", "diff current file", this.actionFileDiffRev);
 
-  GralButton wdgBtnBlame = new GralButton("@-23..-21, -18..-2 = blameFile", "blame", this.actionFileBlame);
+  final GralButton wdgBtnBlame = new GralButton("@-23..-21, -18..-2 = blameFile", "blame", this.actionFileBlame);
 
-  GralButton wdgBtnDaylyBranch = new GralButton("@-18+2, -20..-12 = daylyBranch", "daylyBranch", this.actionDaylyBranch);
+  final GralButton wdgBtnDaylyBranch = new GralButton("@-18+2, -20..-12 = daylyBranch", "daylyBranch", this.actionDaylyBranch);
 
-  GralButton wdgBtnDaylyMain = new GralButton("@-18+2, -10..-2 = mainBranch", "mainBranch", this.actionMainBranch);
+  final GralButton wdgBtnDaylyMain = new GralButton("@-18+2, -10..-2 = mainBranch", "mainBranch", this.actionMainBranch);
 
-  GralButton wdgBtnAdd = new GralButton("@-15+2, -9..-1 = add", "add", this.actionAdd);
+  final GralButton wdgBtnAdd = new GralButton("@-15+2, -9..-1 = add", "add", this.actionAdd);
 
-  GralButton wdgBtnMove = new GralButton("@-15+2, -18..-10 = move", "move", this.actionMove);
+  final GralButton wdgBtnMove = new GralButton("@-15+2, -18..-10 = move", "move", this.actionMove);
 
-  GralButton wdgRefresh = new GralButton("@-12+2, -18..-8 = refresh", "refresh", this.actionRefresh);
+  final GralButton wdgRefresh = new GralButton("@-12+2, -18..-8 = refresh", "refresh", this.actionRefresh);
 
-  GralButton wdgBtnPull = new GralButton("@-9+2, -20..-15 = pull", "pull", this.actionPull);
+  final GralButton wdgBtnPull = new GralButton("@-9+2, -20..-15 = pull", "pull", this.actionPull);
 
-  GralButton wdgCommitText = new GralButton("@-9+2, -14..-2 = commitText", "commit-text", this.actionOpenCommitText);
+  final GralButton wdgCommitText = new GralButton("@-9+2, -14..-2 = commitText", "commit-text", this.actionOpenCommitText);
 
-  GralButton wdgCommit = new GralButton("@-6+2, -20..-8 = commit", "do commit", this.actionCommit);
+  final GralButton wdgCommit = new GralButton("@-6+2, -20..-8 = commit", "do commit", this.actionCommit);
 
-  GralButton wdgBtnPush = new GralButton("@-6+2, -7..-1 = push", "push", this.actionPush);
+  final GralButton wdgBtnPush = new GralButton("@-6+2, -7..-1 = push", "push", this.actionPush);
 
   /**If set to true, the {@link #cmdThread} should be aborted.
    * 
    */
   boolean bCmdThreadClose;
 
-  CmdExecuter gitCmd = new CmdExecuter();
+  final CmdExecuter gitCmd = new CmdExecuter();
 
 
   /**Destination for output of all command line invocations.
    * This buffer will be cleared and filled with the git command, and then parsed to present the result. 
    */
-  StringPartAppend gitOut = new StringPartAppend();
+  final StringPartAppend gitOut = new StringPartAppend();
   
   /**The {@link CmdExecuter#execute(String[], boolean, String, List, List, org.vishia.cmd.CmdExecuter.ExecuteAfterFinish)}
    * needs a list of appendable, that is it.*/
-  List<Appendable> listOut = new LinkedList<Appendable>();
+  final List<Appendable> listOut = new LinkedList<Appendable>();
   { listOut.add(gitOut); }
   
   
   
   /**Stored arguments from {@link #startLog(String, String, String)}. */
-  String sGitDir, sWorkingDir; //, sLocalFile;
+  final String sGitDir, sWorkingDir; //, sLocalFile;
 
   
   
-  File workingDir;
+  final File workingDir;
   
-  String sFileList = "_filelist.lst";
+  final String sFileList;
 
   /**If given the file which's log and diff should be shown.
    * Elsewhere null. set in {@link #startLog(String)}
@@ -683,7 +683,7 @@ public class GitGui
 
 
   /**The presentation of the time stamps. */
-  SimpleDateFormat dateFormat = new SimpleDateFormat("yy-MM-dd HH:mm");
+  final SimpleDateFormat dateFormat = new SimpleDateFormat("yy-MM-dd HH:mm");
 
 
 
@@ -709,8 +709,6 @@ public class GitGui
       //else 
       {
         GitGui main = new GitGui(new File(cmdArgs.startFile), cmdArgs);
-        main.exepath = cmdArgs.guiPaths;
-        main.sFileList = "" + ".filelist";
         main.startLog();
         main.doSomethinginMainthreadTillCloseWindow();
       }
@@ -724,7 +722,7 @@ public class GitGui
 //    if(args !=null && args.length >=1){
 //      sTypeOfImplementation = args[0];
 //    }
-    String[] files = new String[3];
+    String[] files = new String[4];
     try {
       detectGitArchive(startfile, files);
     } catch (IOException e) {
@@ -734,6 +732,7 @@ public class GitGui
     this.sWorkingDir = files[1];  //null on exception
     this.workingDir = new File(this.sWorkingDir);
     this.sLocalFile = files[2];  //null if not given
+    this.sFileList = files[3] + ".filelist";
     
     initializeCmd();
     this.exepath = cmdArgs.guiPaths;
@@ -776,11 +775,14 @@ public class GitGui
     else if(fgit.getName().equals(".git")) {
       files[0] = FileSystem.normalizePath(fgit).toString();
       files[1] = FileSystem.normalizePath(fgit.getParentFile()).toString();
+      files[3] = "";
     }
     else {
-      assert(fgit.getName().endsWith(".gitRepository"));
+      String fRepo = fgit.getName();
+      assert(fRepo.endsWith(".gitRepository"));
       files[0] = FileSystem.readFile(fgit).trim();
       files[1] = fgit.getParent().replace('\\', '/');
+      files[3] = fRepo.substring(0, fRepo.length() - 14); //part before .gitRepository, maybe ""
     }
     if(fshow !=null) {
       CharSequence workingfile = FileSystem.normalizePath(fshow);
@@ -1000,8 +1002,6 @@ public class GitGui
     //else 
     {
       GitGui main = new GitGui(new File(repoFile.absfile().toString()), new GitGuiCmd.CmdArgs(exepath));
-      main.exepath = exepath;
-      main.sFileList = repoFile.name() + ".filelist";
       main.startLog();
       //main.startLog(paths[0], paths[1], paths[2]);
     }
@@ -1030,13 +1030,6 @@ public class GitGui
 
 
 
-  public void XXXstartLog(String sGitDir, String sWorkingDir, String sLocalFile) {
-    this.sGitDir = sGitDir; 
-    this.sWorkingDir = sWorkingDir;
-    this.workingDir = new File(sWorkingDir);
-    this.sLocalFile = sLocalFile;
-    startLog();
-  }
   
   /**
    * @param sLocalFile "*" for all files, else "path/in/loacal/tree/file.ext"
