@@ -7,6 +7,7 @@ import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -827,6 +828,11 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   
+  public Iterable<GralWidget> getWidgetIter() {
+    return indexNameWidgets.values();
+  }
+  
+  
   @Override public void buildCfg(GralCfgData data, File fileCfg) //GuiCfgBuilder cfgBuilder)
   {
     this.cfgData = data;
@@ -892,7 +898,9 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    */
   @Override public void registerUserAction(String name, GralUserAction action)
   { final String name1;
-    if(name.indexOf("<name>") >=0){
+    if(name == null) {
+      name1 = action.name;
+    } else if(name.indexOf("<name>") >=0) {
       name1 = name.replace("<name>", action.name);
     } else {
       name1 = name;

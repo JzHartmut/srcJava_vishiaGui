@@ -33,11 +33,11 @@ public class FcmdIdents extends FcmdIdentsBase
   int key1Settings = KeyCode.ctrl + 'p';
   int key2Settings = KeyCode.ctrl + 'P';
 
-  String menuBarStatus = "&Help/s&Tatus [cü]";
-  String menuContextStatus = "Status [cü]";
+  String menuBarStatus = "&Help/s&Tatus [cu]";
+  String menuContextStatus = "Status [cu]";
   String buttonStatus = "gF9:status";
-  int key1Status = KeyCode.ctrl + 'ü';
-  int key2Status = KeyCode.ctrl + 'Ü';
+  int key1Status = KeyCode.ctrl + 'u';
+  int key2Status = KeyCode.ctrl + 'U';
 
   String menuSaveFavoriteSel = "fa&Vors/&Save favorite paths";
   String menuReadFavoriteSel = "fa&Vors/&Read favorite paths";

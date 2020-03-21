@@ -145,10 +145,13 @@ public class GralCfgWindow
     @Override public void executeOrder(){
       GralMng mng = GralMng.get();
       mng.selectPanel("primaryWindow");  //window position relative to the primary window.
-      window.setToPanel(mng);
-      window.setVisible(true);
-      GralCfgBuilder cfgBuilder = new GralCfgBuilder(guiCfgData, mng, imgDir);
-      cfgBuilder.buildGui(log, 0);        
+      GralCfgWindow.this.window.setToPanel(mng);
+      GralCfgWindow.this.window.setVisible(true);
+      GralCfgBuilder cfgBuilder = new GralCfgBuilder(GralCfgWindow.this.guiCfgData, mng, GralCfgWindow.this.imgDir);
+      String sError = cfgBuilder.buildGui(GralCfgWindow.this.log, 0);
+      if(sError !=null) {
+        System.err.println(sError);
+      }
     }
   ////
   };

@@ -4,7 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.vishia.gral.awt.AwtFactory;
 import org.vishia.gral.ifc.GralFactory;
+import org.vishia.gral.swt.SwtFactory;
+import org.vishia.util.Arguments;
 
 /**The standard command-line-arguments for a graphic application are stored in an extra class. 
  * This class should be the base class for users command line argument storage.
@@ -12,7 +15,7 @@ import org.vishia.gral.ifc.GralFactory;
  * for example calling in a GUI, calling in a command-line-batch-process or calling from ANT.
  * This class should be the super class of an derived application's CallingArguments class. 
  */
-public class GuiCallingArgs
+public class GuiCallingArgs extends Arguments
 {
   /**Version, history and licence
    * <ul>
@@ -66,7 +69,7 @@ public class GuiCallingArgs
    * The file is opened and closed while the configuration is used to build the GUI.
    * The file is used to write on menu-save action.
    */
-  protected File fileGuiCfg;
+  public File fileGuiCfg;
   
   public String sPathZbnf = "GUI";
   
@@ -113,4 +116,88 @@ public class GuiCallingArgs
    * for the application. */
   public File getDirCfg(){ return fileGuiCfg.getAbsoluteFile().getParentFile(); }
   
+  
+  
+  
+  /*---------------------------------------------------------------------------------------------*/
+  /** Tests one argument. This method is invoked from parseArgument. It is abstract in the superclass MainCmd
+      and must be overwritten from the user.
+      :TODO: user, test and evaluate the content of the argument string
+      or test the number of the argument and evaluate the content in dependence of the number.
+
+      @param argc String of the actual parsed argument from cmd line
+      @param nArg number of the argument in order of the command line, the first argument is number 1.
+      @return true is okay,
+              false if the argument doesn't match. The parseArgument method in MainCmd throws an exception,
+              the application should be aborted.
+  */
+  @Override protected boolean testArgument(String arg, int nArg) { 
+    boolean bOk = true;  //set to false if the argc is not passed
+    GuiCallingArgs cargs = this;
+    String value;
+    if( (value = checkArgVal("-title", arg)) !=null) {       
+      cargs.sTitle = value;  //the graphic GUI-appearance
+    }
+    else if((value = checkArgVal("-gui", arg)) !=null)      
+    { cargs.fileGuiCfg = new File(value);  //the graphic GUI-appearance
+    
+    }
+    else if((value = checkArgVal("-cfg", arg)) !=null)      
+    { String sCfg = value;  //the graphic GUI-appearance
+      if(cargs.cfgConditions == null){
+        cargs.cfgConditions = new ArrayList<String>();
+      }
+      cargs.cfgConditions.add(sCfg);
+    }
+    else if((value = checkArgVal("-ownIpc", arg)) !=null) 
+    { cargs.sOwnIpcAddr = value;   //an example for default output
+    }
+    else if((value = checkArgVal("-inspectorPort", arg)) !=null) 
+    { cargs.sInspectorOwnPort = value;   //an example for default output
+    }
+    else if((value = checkArgVal("-timeZone", arg)) !=null) 
+    { cargs.sTimeZone = value;   //an example for default output
+    }
+    else if((value = checkArgVal("-size", arg)) !=null) 
+    { String sValue = value;
+      if(sValue.length() >=1){
+        cargs.sizeShow = sValue.charAt(0);   
+      } else {
+        bOk = false;
+      }
+    }
+    else if((value = checkArgVal("-pos", arg)) !=null) 
+    { cargs.positionWindow = value;
+    }
+    else if(checkArg("-fullscreen", arg)) 
+    { cargs.positionWindow = "0..0,0..0";
+    }
+    else if ((value = checkArgVal("-help", arg)) !=null) {
+      File file1 = new File(value);
+      String sPathHelpAbs = file1.getAbsolutePath();
+      cargs.dirHtmlHelp = new File(sPathHelpAbs);  //should be absolute because browser.
+    } else if ((value = checkArgVal("-msgcfg", arg)) !=null) {
+      cargs.msgConfig = new File(value);
+    }
+    else if((value = checkArgVal("-syntax", arg)) !=null) 
+    { cargs.sPathZbnf = value;   //an example for default output
+    }
+    else if((value = checkArgVal("-plugin", arg)) !=null) 
+    { cargs.sPluginClass = value;   //an example for default output
+    }
+    
+    else if(checkArg("-SWT", arg)) 
+    { cargs.graphicFactory = new SwtFactory();   //an example for default output
+    }
+    
+    else if(checkArg("-AWT", arg)) 
+    { cargs.graphicFactory = new AwtFactory();   //an example for default output
+    }
+    
+    else 
+    { super.testArgument(arg, nArg);
+    }
+    return bOk;
+  }
+
 }

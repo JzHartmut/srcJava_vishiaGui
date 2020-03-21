@@ -223,76 +223,85 @@ public class GralArea9MainCmd extends MainCmd
               the application should be aborted.
   */
   @Override protected boolean testArgument(String arg, int nArg)
-  { boolean bOk = true;  //set to false if the argc is not passed
+  { boolean bOk = false;
     try {
-      if(arg.startsWith("-title="))      
-      { cargs.sTitle = getArgument(7);  //the graphic GUI-appearance
-      }
-      else if(arg.startsWith("-gui="))      
-      { cargs.fileGuiCfg = new File(getArgument(5));  //the graphic GUI-appearance
+      bOk = this.cargs.testArgument(arg, nArg);
+    }
+    catch(Exception exc) {
       
-      }
-      else if(arg.startsWith("-cfg="))      
-      { String sCfg = getArgument(5);  //the graphic GUI-appearance
-        if(cargs.cfgConditions == null){
-          cargs.cfgConditions = new ArrayList<String>();
-        }
-        cargs.cfgConditions.add(sCfg);
-      }
-      else if(arg.startsWith("-ownIpc=")) 
-      { cargs.sOwnIpcAddr = getArgument(8);   //an example for default output
-      }
-      else if(arg.startsWith("-inspectorPort=")) 
-      { cargs.sInspectorOwnPort = getArgument(15);   //an example for default output
-      }
-      else if(arg.startsWith("-timeZone=")) 
-      { cargs.sTimeZone = getArgument(10);   //an example for default output
-      }
-      else if(arg.startsWith("-size=")) 
-      { String sValue = getArgument(6);
-        if(sValue.length() >=1){
-          cargs.sizeShow = sValue.charAt(0);   
-        } else {
-          bOk = false;
-        }
-      }
-      else if(arg.startsWith("-pos=")) 
-      { cargs.positionWindow = getArgument(5);
-      }
-      else if(arg.startsWith("-fullscreen")) 
-      { cargs.positionWindow = "0..0,0..0";
-      }
-      else if (arg.startsWith("-help:") || arg.startsWith("help=")) {
-        File file1 = new File(arg.substring(6));
-        String sPathHelpAbs = file1.getAbsolutePath();
-        cargs.dirHtmlHelp = new File(sPathHelpAbs);  //should be absolute because browser.
-      } else if (arg.startsWith("-msgcfg:") || arg.startsWith("-msgcfg=")) {
-        cargs.msgConfig = new File(arg.substring(8));
-      }
-      else if(arg.startsWith("-syntax=")) 
-      { cargs.sPathZbnf = getArgument(8);   //an example for default output
-      }
-      else if(arg.startsWith("-plugin=")) 
-      { cargs.sPluginClass = getArgument(8);   //an example for default output
-      }
-      
-      else if(arg.startsWith("-SWT")) 
-      { cargs.graphicFactory = new SwtFactory();   //an example for default output
-      }
-      
-      else if(arg.startsWith("-AWT")) 
-      { cargs.graphicFactory = new AwtFactory();   //an example for default output
-      }
-      
-      else if(arg.startsWith("-_")) 
-      { //accept but ignore it. Commented calling arguments.
-      }
-      else 
-      { bOk=false;
-      }
-    } catch(Exception exc){
     }
     return bOk;
+  
+//    boolean bOk = true;  //set to false if the argc is not passed
+//    try {
+//      if(arg.startsWith("-title="))      
+//      { cargs.sTitle = getArgument(7);  //the graphic GUI-appearance
+//      }
+//      else if(arg.startsWith("-gui="))      
+//      { cargs.fileGuiCfg = new File(getArgument(5));  //the graphic GUI-appearance
+//      
+//      }
+//      else if(arg.startsWith("-cfg="))      
+//      { String sCfg = getArgument(5);  //the graphic GUI-appearance
+//        if(cargs.cfgConditions == null){
+//          cargs.cfgConditions = new ArrayList<String>();
+//        }
+//        cargs.cfgConditions.add(sCfg);
+//      }
+//      else if(arg.startsWith("-ownIpc=")) 
+//      { cargs.sOwnIpcAddr = getArgument(8);   //an example for default output
+//      }
+//      else if(arg.startsWith("-inspectorPort=")) 
+//      { cargs.sInspectorOwnPort = getArgument(15);   //an example for default output
+//      }
+//      else if(arg.startsWith("-timeZone=")) 
+//      { cargs.sTimeZone = getArgument(10);   //an example for default output
+//      }
+//      else if(arg.startsWith("-size=")) 
+//      { String sValue = getArgument(6);
+//        if(sValue.length() >=1){
+//          cargs.sizeShow = sValue.charAt(0);   
+//        } else {
+//          bOk = false;
+//        }
+//      }
+//      else if(arg.startsWith("-pos=")) 
+//      { cargs.positionWindow = getArgument(5);
+//      }
+//      else if(arg.startsWith("-fullscreen")) 
+//      { cargs.positionWindow = "0..0,0..0";
+//      }
+//      else if (arg.startsWith("-help:") || arg.startsWith("help=")) {
+//        File file1 = new File(arg.substring(6));
+//        String sPathHelpAbs = file1.getAbsolutePath();
+//        cargs.dirHtmlHelp = new File(sPathHelpAbs);  //should be absolute because browser.
+//      } else if (arg.startsWith("-msgcfg:") || arg.startsWith("-msgcfg=")) {
+//        cargs.msgConfig = new File(arg.substring(8));
+//      }
+//      else if(arg.startsWith("-syntax=")) 
+//      { cargs.sPathZbnf = getArgument(8);   //an example for default output
+//      }
+//      else if(arg.startsWith("-plugin=")) 
+//      { cargs.sPluginClass = getArgument(8);   //an example for default output
+//      }
+//      
+//      else if(arg.startsWith("-SWT")) 
+//      { cargs.graphicFactory = new SwtFactory();   //an example for default output
+//      }
+//      
+//      else if(arg.startsWith("-AWT")) 
+//      { cargs.graphicFactory = new AwtFactory();   //an example for default output
+//      }
+//      
+//      else if(arg.startsWith("-_")) 
+//      { //accept but ignore it. Commented calling arguments.
+//      }
+//      else 
+//      { bOk=false;
+//      }
+//    } catch(Exception exc){
+//    }
+//    return bOk;
   }
 
 
