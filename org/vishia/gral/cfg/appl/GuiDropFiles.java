@@ -139,9 +139,9 @@ public class GuiDropFiles {
   
   public static int smain(String[] cmdArgs){
     final Args args = new Args();
-    try{ 
-      args.checkArgs(cmdArgs);
-    } catch (IllegalArgumentException exc) {
+    try {
+      args.parseArgs(cmdArgs);
+    } catch (Exception exc) {
       System.err.println("cmdline arg exception: " + exc.getMessage());
       return 255;
     }

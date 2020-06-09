@@ -1,6 +1,7 @@
 package org.vishia.gral.area9;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -198,6 +199,15 @@ public class GuiCallingArgs extends Arguments
     { super.testArgument(arg, nArg);
     }
     return bOk;
+  }
+
+
+
+
+  @Override
+  public boolean testArgs(Appendable msg) throws IOException {
+    // TODO Auto-generated method stub
+    return false;
   }
 
 }

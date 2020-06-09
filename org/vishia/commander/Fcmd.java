@@ -86,7 +86,7 @@ public class Fcmd extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public static final String version = "2019-12-27";
+  public static final String version = "2020-04-04";
 
   
   static class CallingArgs extends GuiCallingArgs
@@ -510,6 +510,8 @@ public class Fcmd extends GuiCfg
   
   final FcmdCopyCmprDel compareCmd = new FcmdCopyCmprDel(this, FcmdCopyCmprDel.Ecmd.compare);
   
+  final FcmdCopyCmprDel searchCmd = new FcmdCopyCmprDel(this, FcmdCopyCmprDel.Ecmd.search);
+  
   final FcmdMkDirFile mkCmd = new FcmdMkDirFile(this);
 
   final FcmdDelete deleteCmd = new FcmdDelete(this);
@@ -636,6 +638,7 @@ public class Fcmd extends GuiCfg
     editWind.buildWindow();   //F3
     copyCmd.buildWindowConfirmCopy("confirm copy / move / compare");
     delCmd.buildWindowConfirmCopy("confirm delete");
+    searchCmd.buildWindowConfirmCopy("confirm search");
     compareCmd.buildWindowConfirmCopy("confirm compare");
     mkCmd.buildWindowConfirmMk();
     executer.buildWindowConfirmExec();

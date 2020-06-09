@@ -43,6 +43,7 @@ class FcmdFileActionBase {
       case compare: helpPrefix = "cmpr"; break;
       case copy: helpPrefix = "copy"; break;
       case delete: helpPrefix = "del"; break;
+      case search: helpPrefix = "search"; break;
       default: throw new IllegalArgumentException("internal");
     }
   }
@@ -253,7 +254,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     //System.out.println(" window: " + main.gralMng.pos.panel.getPixelPositionSize().toString());
     
     //source path and check:
-    if(cmdWind != Ecmd.delete) {
+    if(cmdWind != Ecmd.delete && cmdWind != Ecmd.search) {
       main._gralMng.setPosition(0.5f, GralPos.size +2, 1, 7.5f, 0, 'r', 0);
       widgButtonModeDst = main._gralMng.addSwitchButton(null, "dst/..", "dst/dst", GralColor.getColor("gn"), GralColor.getColor("ye") );
       widgButtonModeDst.setActionChange(actionChgModeDst);
@@ -263,7 +264,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     widgButtonSetSrc.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".setSrc.");
     widgButtonClearSel = main._gralMng.addButton(null, null, "clrSel", null, "clear selection" );
     widgButtonClearSel.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".clearSel.");
-    if(cmdWind != Ecmd.delete) {
+    if(cmdWind != Ecmd.delete && cmdWind != Ecmd.search) {
       main._gralMng.setPosition(GralPos.same, GralPos.samesize, -17, -1, 0, 'r', 1);
       widgButtonSetDst = main._gralMng.addButton(null, actionSetDst, "setDst", null, "set destination" );
       widgButtonSetDst.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".setDst.");
@@ -497,7 +498,40 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     //widgCopyState.setText("State: " + stateCopy);
   } 
   
+
   
+  /**Starts the execution of compare in another thread. Note that the compare works with the walk-file algorithm
+   * and refreshes the files therewith. See {@link FileRemote#refreshAndCompare(FileRemote, int, String, int, org.vishia.fileRemote.FileRemote.CallbackEvent)}.
+   */
+  final protected void execSearch(){
+    String sSearch = widgInputDst.getText();
+    sSearch=sSearch.replace("\\r", "\r");
+    sSearch=sSearch.replace("\\n", "\n");
+    byte[] search = { 0x0d, 0x0a};
+    boolean bOk = true;
+    //check whether the event is able to occupy, use it to check.
+    if(evCallback.occupyRecall(100, evSrc, evConsumerCallbackFromFileMachine, null, true) == 0){
+      if(evCallback.occupyRecall(1000, evSrc, evConsumerCallbackFromFileMachine, null, true) == 0){
+        System.err.println("FcmdCopyCmd event occupy hangs");
+        bOk = false;
+      }
+    }
+    if(bOk) {
+      String sSrcMask= widgFromConditions.getText();
+      evCallback.sendEvent(FileRemote.CallbackCmd.start);  //sends to myself for showing the state, 
+      //it is a check of sendEvent and it should relinguish the event.
+      //====>
+      srcFile.refreshAndSearch(0, sSrcMask, 0, search, null, action.showFilesProcessing); //evCallback); //evCallback able to use from callback.
+      //setTexts(Estate.busy);
+    } else {
+      widgCopyState.setText("evCallback hangs");
+      setTexts(Estate.quest);
+    }
+    ///
+  }
+  
+  
+
   /**Starts the execution of compare in another thread. Note that the compare works with the walk-file algorithm
    * and refreshes the files therewith. See {@link FileRemote#refreshAndCompare(FileRemote, int, String, int, org.vishia.fileRemote.FileRemote.CallbackEvent)}.
    */
@@ -595,7 +629,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       }
     }
     //
-    if(cmdWind != Ecmd.delete) {
+    if(cmdWind != Ecmd.delete && cmdWind != Ecmd.search) {
       if(dirDst == null){
         bufferDstChars.setLength(0); bufferDstChars.append("??");
       } else if(!bDstChanged) {
@@ -641,19 +675,19 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     state = newState;
     //Texts depending from pressed command button:
     String[][] textOk = 
-    { { "check del"  , "move"        , "check copy", "compare" }
-    , { "check del"  , "move"        , "check copy", "compare" }
-    , { "busy check" , "busy check"  , "busy check", "compare" }
-    , { "del checked", "move checked", "copy checked", "compare" } 
-    , { "pause del"  , "pause move"  , "pause copy", "pause cmpr" }
-    , { "close del"  , "close move"  , "close copy", "close cmpr"  }
+    { { "check del"  , "move"        , "check copy", "compare", "search" }
+    , { "check del"  , "move"        , "check copy", "compare", "search" }
+    , { "busy check" , "busy check"  , "busy check", "compare", "search" }
+    , { "del checked", "move checked", "copy checked", "compare", "search" } 
+    , { "pause del"  , "pause move"  , "pause copy", "pause cmpr", "pause" }
+    , { "close del"  , "close move"  , "close copy", "close cmpr", "close"  }
     };
     String[][] textSrc = 
     { { "set src + dst", "set src + dst", "busy check", "set src + dst", "busy", "set src + dst" }
     , { "set dst", "set dst", "busy check", "set dst", "busy", "set dst" }
     };
     String[] textAbort = { "abort"         , "abort"       , "abort"        , "abort", "abort", "close" };
-    String[] textDest =  { "---"           , "move to"     , "copy to"      , "compare with"  };
+    String[] textDest =  { "---"           , "move to"     , "copy to"      , "compare with"  , "search"  };
     
     int ix1;
     if(cmdWind == Ecmd.delete){ 
@@ -667,6 +701,11 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     } else if(cmdWind == Ecmd.compare){ 
       ix1 = 3; 
       cmd = Ecmd.compare; 
+      widgInputDst.setEditable(true);
+      widgInputDst.setBackColor(bDstChanged ? colorChangedText : colorNoChangedText, 0);
+    } else if(cmdWind == Ecmd.search){ 
+      ix1 = 4; 
+      cmd = Ecmd.search; 
       widgInputDst.setEditable(true);
       widgInputDst.setBackColor(bDstChanged ? colorChangedText : colorNoChangedText, 0);
     } else {
@@ -1199,6 +1238,8 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
             execMark();
           } else if(cmd == Ecmd.compare){
             execCompare();
+          } else if(cmd == Ecmd.search){
+            execSearch();
           }
         } else if(state == Estate.checked) { //widgg.sCmd.equals("copy")) {
           switch(cmd){
@@ -1206,6 +1247,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
             case move: execMove(); break; 
             case delete: execDel(); break;
             case compare: execCompare(); break;
+            case search: execSearch(); break;
           }//switch
         } else if(state == Estate.finit) { //widgg.sCmd.equals("close")){
           closeWindow();
@@ -1591,7 +1633,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   
   enum Estate{ inactive, start, checked, busyCheck, busy, quest, error, finit};
   
-  enum Ecmd{ copy, move, delete, compare};
+  enum Ecmd{ copy, move, delete, compare, search};
   
   void stop(){}
   

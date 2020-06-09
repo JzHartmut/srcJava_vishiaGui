@@ -27,6 +27,8 @@ public class FcmdIdents extends FcmdIdentsBase
   
   final GralButtonKeyMenu openConfirmCompare = new GralButtonKeyMenu(main.compareCmd.actionConfirmCopy, "&File/&Compare [sh-F7]", "&Compare", null, null, KeyCode.shift + KeyCode.F7, 0, entries);
   
+  final GralButtonKeyMenu openSearch = new GralButtonKeyMenu(main.searchCmd.actionConfirmCopy, "&File/&Compare [alt-F7]", "&Search", null, null, KeyCode.alt + KeyCode.F7, 0, entries);
+  
   String menuBarSettings = "&Help/&Settings [cP]";
   String menuContextSettings = "Settings [cP]";
   String buttonSettings = "gF1:settings";
@@ -193,7 +195,7 @@ public class FcmdIdents extends FcmdIdentsBase
 
   String buttonSearchFiles = "aF7:search";
 
-  int keySearchFiles = KeyCode.alt + KeyCode.F7;
+  int keySearchFiles = KeyCode.alt + KeyCode.ctrl + KeyCode.F7;
 
 
   /**Window title. */
