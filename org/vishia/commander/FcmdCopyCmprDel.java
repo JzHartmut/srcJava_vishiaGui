@@ -1554,8 +1554,12 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     }
     
     @Override public Result offerParentNode(FileRemote file) {
-      dirProcessed = file;
-      return Result.cont;      
+      if(file.isSymbolicLink()) {
+        return Result.skipSubtree;  //do not handle symbolic links for cmp, copy and delete
+      } else {
+        dirProcessed = file;
+        return Result.cont;    
+      }
     }
     
     /**Finish a directory, check whether a file panel should be refreshed.
@@ -1598,14 +1602,23 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     @Override public void start(FileRemote startDir) {  }
     
     @Override public Result offerParentNode(FileRemote file) {
-      return Result.cont;      
+      if(file.isSymbolicLink()) {
+        return Result.skipSubtree;  //do not handle symbolic links for cmp, copy and delete
+        //but it does not activate this, deselect before
+      } else {
+        return Result.cont; 
+      }
     }
     
     @Override public Result finishedParentNode(FileRemote dir, FileRemoteCallback.Counters cnt) {
-      String path = dir.getAbsolutePath();
-      showFinishState(path, cnt);
-      main.refreshFilePanel(dir);
-      return Result.cont;      
+      if(dir.isSymbolicLink()) {
+        return Result.skipSubtree;  //do not handle symbolic links for cmp, copy and delete
+      } else {
+        String path = dir.getAbsolutePath();
+        showFinishState(path, cnt);
+        main.refreshFilePanel(dir);
+        return Result.cont;
+      }
     }
     
     

@@ -455,7 +455,7 @@ public class SimSelector
       for(int iTable = 0; iTable < SimSelector.this.wdgTables.length; ++iTable) {
         int xtable = iTable %3;
         int ytable = iTable /3;
-        SimSelector.this.gralMng.setPosition(21*ytable + 10, 21*ytable + 30, xtable * 30, xtable * 40 +40, 0, 'd');
+        SimSelector.this.gralMng.setPosition(21*ytable + 10, 21*ytable + 30, xtable * 40, xtable * 40 +40, 0, 'd');
         
         SimSelector.this.wdgTables[iTable].createImplWidget_Gthread();
         SimSelector.this.wdgTables[iTable]._wdgImpl.repaintGthread();
