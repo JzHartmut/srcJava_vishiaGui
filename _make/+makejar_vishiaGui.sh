@@ -8,14 +8,14 @@ echo script $0
 #Set the version newly here to the current date if the sources are changed in jar and checksum.
 #If the relevant sources are not change in functionality, may be changed in comment, 
 #  it is not necessary the change this VERSION because the generated content is the same.
-export VERSION="2020-07-21"
+export VERSION="2020-10-03"
 
 #It should have anytime the stamp of the newest file, independing of the VERSION
-export SRCZIPFILE="vishiaGui-2020-07-21-source.zip"
+export SRCZIPFILE="vishiaGui-$VERSION-source.zip"
 
 #Note: Select the proper vishiaBase, ../libs/.. for manually build
 ##export JAR_vishiaBase=../libs/vishiaBase-2020-07-16.jar
-export JAR_vishiaBase=../../../../../../cmpnJava_vishiaBase/deploy/vishiaBase-2020-07-16.jar
+export JAR_vishiaBase=../../../../../../cmpnJava_vishiaBase/deploy/vishiaBase-2020-10-03.jar
 
 #It is also the tool for zip and jar
 export JAR_zipjar=$JAR_vishiaBase
