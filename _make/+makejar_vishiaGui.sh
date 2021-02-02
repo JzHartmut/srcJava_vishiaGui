@@ -8,7 +8,7 @@ echo script $0
 #Set the version newly here to the current date if the sources are changed in jar and checksum.
 #If the relevant sources are not change in functionality, may be changed in comment, 
 #  it is not necessary the change this VERSION because the generated content is the same.
-export VERSION="2020-10-03"
+export VERSION="2020-10-09"
 
 #It should have anytime the stamp of the newest file, independing of the VERSION
 export SRCZIPFILE="vishiaGui-$VERSION-source.zip"

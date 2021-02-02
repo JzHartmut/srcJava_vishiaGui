@@ -1,6 +1,7 @@
 package org.vishia.simSelector;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
@@ -124,9 +125,9 @@ public class SimSelector
   GralTable<Map<String, DataAccess.Variable<Object>>>[] wdgTables = new GralTable[6];
   
   
-  GralButton btnReadConfig, btnGenSim, btnCleanOut, btnGenTestcase;
+  GralButton btnHelp, btnReadConfig, btnGenSelection, btnCleanOut, btnGenTestcase;
   
-  GralButton[] btnActions = new GralButton[4];
+  GralButton[] btnExecSelection = new GralButton[4];
   
   GralTextField wdgSelects;
   
@@ -152,7 +153,13 @@ public class SimSelector
       System.err.println("argument 1: path/to/config.jzt.cmd");
     }
     SimSelector main = new SimSelector(args[0]);
-    main.openWindow1();
+    char size = 'C';
+    if(args.length >=2) {
+      if(args[1].startsWith("-size:")) {
+        size = args[1].charAt(6);
+      }
+    }
+    main.openWindow1(size);
     main.waitForClosePrimaryWindow();
   }
   
@@ -179,27 +186,34 @@ public class SimSelector
       this.wdgTables[iTable] = new GralTable<>(name, columnWidths);
     }
     this.btnReadConfig = new GralButton("readConfig", "read config", this.actionReadConfig);
-    this.btnGenSim = new GralButton("genSim", "gen stimuli", this.actionGenSim);
-    this.btnGenTestcase = new GralButton("genTestCase", "gen testcases.m", this.actionGenTestcases);
+    this.btnGenSelection = new GralButton("genSelection", "gen selection", new GralUserActionButton("btnGenSelection"));
+    this.btnGenTestcase = new GralButton("genTestCase", "gen testcases", this.actionGenTestcases);
     this.btnCleanOut = new GralButton("cleanOut", "clean output", this.actionCleanOut);
+    this.btnHelp = new GralButton("help", "help", this.actionHelp);
     //
-    JZtxtcmdScript.Subroutine sub1 = this.script.getSubroutine("exec1");
+    JZtxtcmdScript.Subroutine sub1 = this.script.getSubroutine("btnExec1");
     if(sub1 !=null) {
       String btnText = sub1.formalArgs.get(0).textArg;
       if(btnText == null) { btnText = sub1.name; }
-      this.btnActions[0] = new GralButton("action1", btnText, this.action1);
+      this.btnExecSelection[0] = new GralButton("btnExec11", btnText, new GralUserActionButton("btnExec1"));
     }
-    JZtxtcmdScript.Subroutine sub2 = this.script.getSubroutine("exec2");
+    JZtxtcmdScript.Subroutine sub2 = this.script.getSubroutine("btnExec2");
     if(sub2 !=null) {
-      this.btnActions[1] = new GralButton("action2", sub1.name, this.action2);
+      String btnText = sub2.formalArgs.get(0).textArg;
+      if(btnText == null) { btnText = sub2.name; }
+      this.btnExecSelection[1] = new GralButton("btnExec12", btnText, new GralUserActionButton("btnExec2"));
     }
-    JZtxtcmdScript.Subroutine sub3 = this.script.getSubroutine("exec3");
+    JZtxtcmdScript.Subroutine sub3 = this.script.getSubroutine("btnExec3");
     if(sub3 !=null) {
-      this.btnActions[2] = new GralButton("action3", sub1.name, this.action3);
+      String btnText = sub3.formalArgs.get(0).textArg;
+      if(btnText == null) { btnText = sub3.name; }
+      this.btnExecSelection[2] = new GralButton("btnExec13", btnText, new GralUserActionButton("btnExec3"));
     }
-    JZtxtcmdScript.Subroutine sub4 = this.script.getSubroutine("exec4");
+    JZtxtcmdScript.Subroutine sub4 = this.script.getSubroutine("btnExec4");
     if(sub4 !=null) {
-      this.btnActions[3] = new GralButton("action4", sub1.name, this.action4);
+      String btnText = sub4.formalArgs.get(0).textArg;
+      if(btnText == null) { btnText = sub4.name; }
+      this.btnExecSelection[3] = new GralButton("btnExec4", btnText, new GralUserActionButton("btnExec4"));
     }
     
     
@@ -210,7 +224,7 @@ public class SimSelector
   
   public static void openWindow(){
     SimSelector main = new SimSelector(null);
-    main.openWindow1();
+    main.openWindow1('D');
   }
   
   
@@ -280,7 +294,11 @@ public class SimSelector
   
   
   
-  void genStimuli(String subroutine)
+  /**This is the common routine for all buttons which does anything with the selection.
+   * It is used also for gen Stimuli and the exec buttons. 
+   * @param subroutine
+   */
+  void execBtnAction(String subroutine)
   {
     String[] identifier = new String[this.wdgTables.length];
     Map<String, DataAccess.Variable<Object>> idents = new TreeMap<String, DataAccess.Variable<Object>>();
@@ -345,54 +363,28 @@ public class SimSelector
   };
   
   
-  GralUserAction actionGenSim = new GralUserAction("genStimuli")
-  { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
+  
+  /**An user action which calls {@link SimSelector#execBtnAction(String)}, assigned to some Buttons.
+   * The name in the constructor determines the name of the called subroutine in the JZtxtcmd script.
+   * @author hartmut
+   *
+   */
+  class GralUserActionButton extends GralUserAction {
+    
+    /**Creates
+     * @param name it is the name of the subroutine in the JZtxtcmd script which will be called.
+     */
+    GralUserActionButton(String name){ super(name); }
+    
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        genStimuli(null);
+        execBtnAction(this.name);
       }
       return true;
     }
-  };
+  }
   
   
-  GralUserAction action1 = new GralUserAction("action1")
-  { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
-    { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        genStimuli("exec1");
-      }
-      return true;
-    }
-  };
-  
-  
-  GralUserAction action2 = new GralUserAction("action2")
-  { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
-    { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        genStimuli("exec2");
-      }
-      return true;
-    }
-  };
-  
-  
-  GralUserAction action3 = new GralUserAction("action3")
-  { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
-    { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        genStimuli("exec3");
-      }
-      return true;
-    }
-  };
-  
-  
-  GralUserAction action4 = new GralUserAction("action4")
-  { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
-    { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        genStimuli("exec4");
-      }
-      return true;
-    }
-  };
   
   
   GralUserAction actionGenTestcases = new GralUserAction("genTestcases")
@@ -405,7 +397,7 @@ public class SimSelector
   };
   
   
-  GralUserAction actionCleanOut = new GralUserAction("genStimuli")
+  GralUserAction actionCleanOut = new GralUserAction("cleanOut")
   { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         SimSelector.this.output.setText("");
@@ -417,11 +409,26 @@ public class SimSelector
   
   
   
+  GralUserAction actionHelp = new GralUserAction("help")
+  { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        SimSelector.this.output.setText("");
+        try {
+          SimSelector.this.output.append("help...\n2. line\n");
+        } catch (IOException e) {}
+      }
+      return true;
+    }
+  };
+  
+  
+  
+  
   @SuppressWarnings("deprecation")
-  private void openWindow1(){
+  private void openWindow1(char size){
     GralFactory gralFactory = new SwtFactory();
     LogMessage log = new LogMessageStream(System.out);
-    this.window = gralFactory.createWindow(log, "Select Simulation", 'C', 100, 50, 600, 400);
+    this.window = gralFactory.createWindow(log, "Select Simulation", size, 100, 50, 600, 400);
     this.gralMng = this.window.gralMng();
     this.gralMng.gralDevice.addDispatchOrder(this.initGraphic);
     //initGraphic.awaitExecution(1, 0);
@@ -438,19 +445,21 @@ public class SimSelector
     @Override public void executeOrder()
     { 
       // gralMng.selectPanel(window);
-      SimSelector.this.gralMng.setPosition(2, 5, 2, 19, 0, 'r', 2);
+      SimSelector.this.gralMng.setPosition(2, 5, 1, 14, 0, 'r', 1);
+      SimSelector.this.btnHelp.createImplWidget_Gthread();
       SimSelector.this.btnReadConfig.createImplWidget_Gthread();
       SimSelector.this.btnCleanOut.createImplWidget_Gthread();
-      SimSelector.this.btnGenSim.createImplWidget_Gthread();
       SimSelector.this.btnGenTestcase.createImplWidget_Gthread();
-      for(GralButton execBtn : SimSelector.this.btnActions) {
+      SimSelector.this.gralMng.setPosition(3, 5, 57, 89, 0, 'd');
+      SimSelector.this.wdgSelects = SimSelector.this.gralMng.addTextField("test", true, null, "r");
+      SimSelector.this.wdgSelects.setText("t");
+      SimSelector.this.gralMng.setPosition(6, 9, 1, 14, 0, 'r', 1);
+      SimSelector.this.btnGenSelection.createImplWidget_Gthread();
+      for(GralButton execBtn : SimSelector.this.btnExecSelection) {
         if(execBtn !=null) {
           execBtn.createImplWidget_Gthread();
         }
       }
-      SimSelector.this.gralMng.setPosition(6, 8, 60, 99, 0, 'd');
-      SimSelector.this.wdgSelects = SimSelector.this.gralMng.addTextField("test", true, null, "r");
-      SimSelector.this.wdgSelects.setText("t");
       //int last = 1; //tables.length
       for(int iTable = 0; iTable < SimSelector.this.wdgTables.length; ++iTable) {
         int xtable = iTable %3;
