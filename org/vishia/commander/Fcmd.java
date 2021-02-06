@@ -48,6 +48,7 @@ public class Fcmd extends GuiCfg
 
   /**Version, history and license. This String is visible in the about info.
    * <ul>
+   * <li>2021-02-05 Hartmut chg for FcmdView, change and write in hex. 
    * <li>2020-02-01 Hartmut sets {@link GralWindow_ifc#windMinimizeOnClose} to prevent accidentally close.
    *   Menu "Windows-Close" added.
    * <li>2017-08-27 {@link FcmdFavorPathSelector#actionDeselectDirtree} now removes all FileRemote instances of children
@@ -86,7 +87,7 @@ public class Fcmd extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public static final String version = "2020-10-03";
+  public static final String version = "2021-02-05";
 
   
   static class CallingArgs extends GuiCallingArgs

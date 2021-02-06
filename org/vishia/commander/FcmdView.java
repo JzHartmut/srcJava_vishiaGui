@@ -25,12 +25,49 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringFormatter;
+import org.vishia.util.StringFunctions_C;
 
 /**All functionality of view (F3-Key) and edit a file. 
  * @author Hartmut Schorrig
  * */
 public class FcmdView
 {
+  
+  /**Version, history and license. This String is visible in the about info.
+   * <ul>
+   * <li>2021-02-05 Hartmut chg for FcmdView, change and write in hex. It is under construction yet now. 
+   *     There were no other text editor simply found, which shows characters as hexa, and which allows hexa edit.
+   *     Hexa changes should be very interesting for experience. Of course not for the common user.  
+   * <li>2011-10-00 Hartmut created
+   * </ul>
+   * 
+   * <b>Copyright/Copyleft</b>:<br>
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL is not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but doesn't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you intent to use this source without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   */
+  //@SuppressWarnings("hiding")
+  public static final String version = "2021-02-05";
+
+  
   protected final Fcmd main;
 
   /**The window of this functionallity. */
@@ -258,13 +295,18 @@ public class FcmdView
       String sFile = "file: " + file.getAbsolutePath() + "\n";
       widgContent.setText(sFile);
       pos0 = sFile.length();
+      int ctBytes = this.zContent;
+      if(ctBytes > 0x1000) { ctBytes = 0x1000; }
       //byteBuffer.get(buffer);
-      for(int ii = 0; ii < 16 && ii < uContent.length /16; ++ii){
+      for(int ii = 0; ii < uContent.length /16; ++ii) {
         formatterHex.reset();
-        formatterHex.addHex(ii, 4).add(": ");
-        formatterHex.addHexLine(uContent, 16*ii, 16, StringFormatter.k1);
-        formatterHex.add("  ").addStringLine(uContent, 16*ii, 16, ascii7.name());
+        formatterHex.addHex(ii<<4, 4).add(": ");
+        int nrHex = ctBytes > 16 ? 16 : ctBytes;
+        formatterHex.addHexLine(uContent, nrHex*ii, nrHex, StringFormatter.k1);
+        formatterHex.add(" : ").addStringLine(uContent, nrHex*ii, nrHex, ascii7.name());
         widgContent.append(formatterHex.getContent()).append('\n');
+        ctBytes -=nrHex;
+        if(ctBytes <=0) { break; }
       }
       int posCursor = pos0 + (6 + 3*16 + 2 + 17)* (cursorPos/16) + 6 + 3 * (cursorPos % 16);
       widgContent.setCursorPos(posCursor);
@@ -288,7 +330,7 @@ public class FcmdView
     switch(format){
     case 'h':{
       int posInWidg = widgContent.getCursorPos();
-      
+      syncHexFromWidg();
       //cursorPos;
     }break;
     case 'w': syncTextFromWidg(iso8859_1); break;
@@ -296,6 +338,61 @@ public class FcmdView
     default:  
     }
   }
+
+  
+  
+  void syncHexFromWidg() {
+    int posInWidg = widgContent.getCursorPos();
+    cursorPos = posInWidg;
+    ////
+    if(bEditable) {
+    //if(widgContent.isChanged(true)){    //TODO isChanged does not work yet. It may better.
+      String sContent = widgContent.getText();
+      int len = sContent.length();
+      int beg = 0;
+      int end = sContent.indexOf('\n');
+      if(end<0) { end = len; }
+      int pos = -1;
+      int[] endCC = new int[1];
+      while(beg < len) {
+        String sLine = sContent.substring(beg, end);
+        int zLine = sLine.length();
+        char cc;
+        int addr = StringFunctions_C.parseIntRadix(sLine, 0, 8, 16, endCC);
+        int ix = endCC[0];
+        if(endCC[0] >0 && ix < zLine && sLine.charAt(ix++) == ':') {
+          int w = 0;
+          int zB = 0;  //number of bytess in the line
+          int zD = 0;  //number of digits in w
+          if(sLine.charAt(4) ==':' && zLine >5) {
+            cc = sLine.charAt(ix);
+            while(ix < zLine && cc ==' ') { cc = sLine.charAt(ix++); }  //skip over space, space is separator
+            while(zB < 16 && ix <= zLine) {  //not, it is incremented already
+              if(cc >='0' && cc <='9') { w = (w <<4) + (cc - '0'); zD +=1; } 
+              else if(cc >='a' && cc <='f') { w = (w <<4) + (cc - 'a' +10); zD +=1; } 
+              else if(cc >='A' && cc <='F') { w = (w <<4) + (cc - 'A' +10); zD +=1; }
+              else if(cc == ':') { break; }          //finish this line
+              else if(cc == ' ') {                   //space after digits
+                if(zD >=1) {
+                  uContent[++pos] = (byte)w;
+                  w = 0;
+                  zB +=1;
+                  zD = 0;
+                }
+              }
+              else; //faulty char ignore it. 
+              cc = sLine.charAt(ix++);
+            }
+          }
+        }
+        beg = end +1;
+        end = sContent.indexOf('\n', beg);
+        if(end<0) { end = len; }
+      }
+    }
+  }
+  
+  
   
   
   void syncTextFromWidg(Charset charset){

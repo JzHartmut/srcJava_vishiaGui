@@ -27,6 +27,7 @@ import org.vishia.mainCmd.PrintStreamAdapter;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.DataAccess;
+import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 
 /*Test with jzcmd: call jzcmd with this java file with its full path:
@@ -125,7 +126,7 @@ public class SimSelector
   GralTable<Map<String, DataAccess.Variable<Object>>>[] wdgTables = new GralTable[6];
   
   
-  GralButton btnHelp, btnReadConfig, btnGenSelection, btnCleanOut, btnGenTestcase;
+  GralButton btnHelp, btnReadConfig, btnGenSelection, btnCleanOut, btnGenTestcase, btnAddTestcase, btnDeselectLines;
   
   GralButton[] btnExecSelection = new GralButton[4];
   
@@ -187,7 +188,9 @@ public class SimSelector
     }
     this.btnReadConfig = new GralButton("readConfig", "read config", this.actionReadConfig);
     this.btnGenSelection = new GralButton("genSelection", "gen selection", new GralUserActionButton("btnGenSelection"));
-    this.btnGenTestcase = new GralButton("genTestCase", "gen testcases", this.actionGenTestcases);
+    this.btnGenTestcase = new GralButton("genTestCase", "gen test cases", this.actionGenTestcases);
+    this.btnAddTestcase = new GralButton("addTestCase", "+", this.actionAddTestcases);
+    this.btnDeselectLines = new GralButton("addTestCase", "--", this.actionDeselectLines);
     this.btnCleanOut = new GralButton("cleanOut", "clean output", this.actionCleanOut);
     this.btnHelp = new GralButton("help", "help", this.actionHelp);
     //
@@ -337,8 +340,7 @@ public class SimSelector
   }
   
   
-  void genTestcases()
-  {
+  void genTestcases ( ) {
     //String[] identifier = new String[wdgTables.length];
     Map<String, DataAccess.Variable<Object>> args = new TreeMap<String, DataAccess.Variable<Object>>();
     args.put("select", new DataAccess.Variable<Object>('S', "select", this.wdgSelects.getText())); 
@@ -350,7 +352,65 @@ public class SimSelector
     }
   }
   
+
   
+  
+  void addTestcases ( ) {
+    StringBuilder select = new StringBuilder();
+    String sepSpace = "";
+    for(int ixTable = 0; ixTable < this.wdgTables.length; ++ixTable) {
+      String sep = sepSpace + Integer.toString(ixTable+1) + "=";
+      boolean bAdd = false;
+      for(GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line: this.wdgTables[ixTable].iterLines()) {
+        int mark = line.getMark();
+        if( (mark & 1)!=0) {                  //line is marked (red)
+          Map<String, DataAccess.Variable<Object>> lineData = line.getData();
+          DataAccess.Variable<Object> lineContent = lineData.get("select");
+          assert(lineContent.type() == 'S');      //contains a String
+          String sel = (String)lineContent.value();
+          int posSpace = sel.indexOf(' ');
+          if(posSpace <0) { posSpace = sel.length(); }
+          select.append(sep).append(sel.substring(0, posSpace));
+          bAdd = true;
+          sep = ",";
+        }
+        Debugutil.stop();
+      }
+      if(bAdd) { select.append(';'); }
+      sepSpace = " ";
+    }
+    String selWdg = this.wdgSelects.getText();
+    int selWdgPos = selWdg.indexOf('|');
+    int selWdgPos2;
+    if(selWdgPos >=0) {
+      selWdgPos2 = selWdgPos +1;
+      while( selWdgPos2 < selWdg.length() && selWdg.charAt(selWdgPos2) == '|') { selWdgPos2 +=1; }
+    } else {
+      selWdgPos = this.wdgSelects.getCursorPos();
+      selWdgPos2 = selWdgPos;
+    }
+    selWdg = selWdg.substring(0, selWdgPos) + select + selWdg.substring(selWdgPos2);
+    this.wdgSelects.setText(selWdg);
+    this.wdgSelects.setCursorPos(selWdgPos + select.length()); 
+  }  
+
+  
+  
+  void deselectLines ( ) {
+    for(int ixTable = 0; ixTable < this.wdgTables.length; ++ixTable) {
+      boolean bSomeDone = false;
+      for(GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line: this.wdgTables[ixTable].iterLines()) {
+        int mark = line.getMark();
+        if( (mark & 1)!=0) {                  //line is marked (red)
+          bSomeDone = true;
+          line.setNonMarked(0xFFFF, null);
+        }
+      }
+      if(bSomeDone) {
+        this.wdgTables[ixTable].repaint();
+      }
+    }
+  }  
   
   
   GralUserAction actionReadConfig = new GralUserAction("readConfig")
@@ -391,6 +451,34 @@ public class SimSelector
   { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         genTestcases();
+      }
+      return true;
+    }
+  };
+  
+  
+  GralUserAction actionAddTestcases = new GralUserAction("addTestcases")
+  { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        try { 
+          addTestcases();
+        } catch(Exception exc) {
+          System.out.println(exc.getMessage());
+        }
+      }
+      return true;
+    }
+  };
+  
+  
+  GralUserAction actionDeselectLines = new GralUserAction("actionDeselectLines")
+  { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        try { 
+          deselectLines();
+        } catch(Exception exc) {
+          System.out.println(exc.getMessage());
+        }
       }
       return true;
     }
@@ -450,9 +538,12 @@ public class SimSelector
       SimSelector.this.btnReadConfig.createImplWidget_Gthread();
       SimSelector.this.btnCleanOut.createImplWidget_Gthread();
       SimSelector.this.btnGenTestcase.createImplWidget_Gthread();
-      SimSelector.this.gralMng.setPosition(3, 5, 57, 89, 0, 'd');
+      SimSelector.this.gralMng.setPosition(3, 5, 57, 115, 0, 'd');
       SimSelector.this.wdgSelects = SimSelector.this.gralMng.addTextField("test", true, null, "r");
-      SimSelector.this.wdgSelects.setText("t");
+      SimSelector.this.wdgSelects.setText("");
+      SimSelector.this.gralMng.setPosition(2, 5, 116, 120, 0, 'd');
+      SimSelector.this.btnAddTestcase.createImplWidget_Gthread();
+      SimSelector.this.btnDeselectLines.createImplWidget_Gthread();
       SimSelector.this.gralMng.setPosition(6, 9, 1, 14, 0, 'r', 1);
       SimSelector.this.btnGenSelection.createImplWidget_Gthread();
       for(GralButton execBtn : SimSelector.this.btnExecSelection) {
