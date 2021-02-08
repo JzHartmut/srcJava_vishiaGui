@@ -5,7 +5,7 @@ mkdir $DSTDIR
 if ! test -d $DSTDIR; then export DSTDIR=../../; fi
 echo %DSTDIR%
 export DST=docuSrcJava_vishiaGui
-export DST_priv=docuSrcJavaPriv_vishiaGui
+##export DST_priv=docuSrcJavaPriv_vishiaGui
 
 export SRC="-subpackages org.vishia"
 export SRCPATH=..

@@ -185,6 +185,10 @@ public class SimSelector
       columnWidths[1] = 8;
       columnWidths[2] = 0;
       this.wdgTables[iTable] = new GralTable<>(name, columnWidths);
+      this.wdgTables[iTable].specifyActionChange("actionTouchLine", this.actionTouchLine, null);
+      this.wdgTables[iTable].setData(new Integer(iTable +1));
+      //, GralWidget_ifc.ActionChangeWhen.onCtrlEnter, GralWidget_ifc.ActionChangeWhen.onMouse1Double);
+      //this.wdgTables[iTable].specifyContextMenu(null);
     }
     this.btnReadConfig = new GralButton("readConfig", "read config", this.actionReadConfig);
     this.btnGenSelection = new GralButton("genSelection", "gen selection", new GralUserActionButton("btnGenSelection"));
@@ -357,6 +361,7 @@ public class SimSelector
   
   void addTestcases ( ) {
     StringBuilder select = new StringBuilder();
+    this.nTableTestcase = -1;
     String sepSpace = "";
     for(int ixTable = 0; ixTable < this.wdgTables.length; ++ixTable) {
       String sep = sepSpace + Integer.toString(ixTable+1) + "=";
@@ -364,14 +369,9 @@ public class SimSelector
       for(GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line: this.wdgTables[ixTable].iterLines()) {
         int mark = line.getMark();
         if( (mark & 1)!=0) {                  //line is marked (red)
-          Map<String, DataAccess.Variable<Object>> lineData = line.getData();
-          DataAccess.Variable<Object> lineContent = lineData.get("select");
-          assert(lineContent.type() == 'S');      //contains a String
-          String sel = (String)lineContent.value();
-          int posSpace = sel.indexOf(' ');
-          if(posSpace <0) { posSpace = sel.length(); }
-          select.append(sep).append(sel.substring(0, posSpace));
+          addTestCase(select, line, sep, ixTable +1);
           bAdd = true;
+
           sep = ",";
         }
         Debugutil.stop();
@@ -395,6 +395,41 @@ public class SimSelector
   }  
 
   
+  int nTableTestcase = -1;
+  
+  void addTestCase ( StringBuilder select, GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line, String sepXXX, int nTable ) 
+  //throws IOException 
+  {
+    if(this.nTableTestcase != nTable) {
+      if(this.nTableTestcase != -1) {           //a following table
+        select.append("; ");
+      }
+      select.append(Integer.toString(nTable)).append("=");
+    } else {
+      select.append(", ");
+    }
+    this.nTableTestcase = nTable;
+    Map<String, DataAccess.Variable<Object>> lineData = line.getData();
+    DataAccess.Variable<Object> lineContent = lineData.get("name");
+    assert(lineContent.type() == 'S');      //contains a String
+    String sel = (String)lineContent.value();
+    int posSpace = sel.indexOf(' ');
+    if(posSpace <0) { posSpace = sel.length(); }
+    //select.append(sep)
+    select.append(sel.substring(0, posSpace));
+  }
+  
+  
+  void addTestCaseFromTable ( GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line ) {
+    Object o = line.getTable().getData();
+    assert(o instanceof Integer);
+    int nTable = ((Integer)o).intValue();
+    StringBuilder sCase = new StringBuilder(this.wdgSelects.getText());
+    addTestCase(sCase, line, null, nTable);
+    this.wdgSelects.setText(sCase);
+    
+  }
+
   
   void deselectLines ( ) {
     for(int ixTable = 0; ixTable < this.wdgTables.length; ++ixTable) {
@@ -451,6 +486,7 @@ public class SimSelector
   { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         genTestcases();
+        SimSelector.this.nTableTestcase = -1;
       }
       return true;
     }
@@ -497,6 +533,34 @@ public class SimSelector
   
   
   
+  GralUserAction actionTouchLine = new GralUserAction("touchLine")
+  { @Override public boolean exec ( int actionCode, GralWidget_ifc widgd, Object... params) { 
+      if( actionCode == KeyCode.mouse1Double){
+        GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line = (GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData)params[0];  //it is the table line.
+        addTestCaseFromTable(line);
+      }
+      else if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode) ) {
+        
+      }
+      return true;
+    }
+  };
+  
+  
+  
+  GralUserAction actionTouchTestcaseString = new GralUserAction("touchTestcaseString")
+  { @Override public boolean exec ( int actionCode, GralWidget_ifc widgd, Object... params) { 
+      //System.out.println(Integer.toHexString(actionCode));
+      //if(KeyCode.isWritingKey(actionCode)) {
+        SimSelector.this.nTableTestcase = -1;    //set -1 in any case if this field is touched.
+      //}
+      return true;
+    }
+  };
+  
+  
+  
+  
   GralUserAction actionHelp = new GralUserAction("help")
   { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
@@ -508,6 +572,9 @@ public class SimSelector
       return true;
     }
   };
+  
+  
+  
   
   
   
@@ -541,6 +608,7 @@ public class SimSelector
       SimSelector.this.gralMng.setPosition(3, 5, 57, 115, 0, 'd');
       SimSelector.this.wdgSelects = SimSelector.this.gralMng.addTextField("test", true, null, "r");
       SimSelector.this.wdgSelects.setText("");
+      SimSelector.this.wdgSelects.specifyActionChange("actionTouchTestCaseString", SimSelector.this.actionTouchTestcaseString, null);
       SimSelector.this.gralMng.setPosition(2, 5, 116, 120, 0, 'd');
       SimSelector.this.btnAddTestcase.createImplWidget_Gthread();
       SimSelector.this.btnDeselectLines.createImplWidget_Gthread();
@@ -559,6 +627,7 @@ public class SimSelector
         
         SimSelector.this.wdgTables[iTable].createImplWidget_Gthread();
         SimSelector.this.wdgTables[iTable]._wdgImpl.repaintGthread();
+        SimSelector.this.wdgTables[iTable].addContextMenuEntryGthread(1, "test", "add to select rule", SimSelector.this.actionTouchLine);
       }
       SimSelector.this.gralMng.setPosition(52, 0, 0, 0, 0, 'U');
       SimSelector.this.output.createImplWidget_Gthread();
