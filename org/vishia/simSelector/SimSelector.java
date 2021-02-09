@@ -44,13 +44,13 @@ java org.vishia.gral.test.SimSelector.main(null);
  * The script needs <pre>
  * ==JZtxtcmd==
  * List tab1 = ##content of tab1
- * [ { name="ident",   descr="...",     select="x", var="anyString", anyOtherVar="anyInfo" }
- * , { name="ident2",  descr="...",     select="x", var="xyz", anyOtherVar="anyInfo" }
+ * [ { name="ident",   descr="...",     var="anyString", anyOtherVar="anyInfo" }
+ * , { name="ident2",  descr="...",     var="xyz", anyOtherVar="anyInfo" }
  * ];
  * 
  * List tab2AnyIdent = ##content of tab2
- * [ { name="ident",   descr="...",     select="x", var="anyString", anyOtherVar="anyInfo" }
- * , { name="ident2",  descr="...",     select="x", var="xyz", anyOtherVar="anyInfo" }
+ * [ { name="ident",   descr="...",     var="anyString", anyOtherVar="anyInfo" }
+ * , { name="ident2",  descr="...",     var="xyz", anyOtherVar="anyInfo" }
  * ];
  * 
  * 
@@ -180,10 +180,9 @@ public class SimSelector
     for(int iTable = 0; iTable < this.wdgTables.length; ++iTable) {
       //String pos = "@PrimaryWindow, 6..40, " + 20 * iTable + ".." + (18 + 20 * iTable);
       String name = "table" + iTable;
-      int[] columnWidths = new int[3];
+      int[] columnWidths = new int[2];
       columnWidths[0] = 15;
-      columnWidths[1] = 8;
-      columnWidths[2] = 0;
+      columnWidths[1] = 0;
       this.wdgTables[iTable] = new GralTable<>(name, columnWidths);
       this.wdgTables[iTable].specifyActionChange("actionTouchLine", this.actionTouchLine, null);
       this.wdgTables[iTable].setData(new Integer(iTable +1));
@@ -259,7 +258,7 @@ public class SimSelector
   {
     JZtxtcmdExecuter.ExecuteLevel level = null;
     try {
-      this.script = jzcmd.compile(this.fileConfig, null);
+      this.script = this.jzcmd.compile(this.fileConfig, null);
       this.executer.initialize(this.script, false, null);
       level = this.executer.execute_Scriptclass("ToGui"); 
       
@@ -280,12 +279,10 @@ public class SimSelector
               Map<String, DataAccess.Variable<Object>> set1 = (Map<String, DataAccess.Variable<Object>>) listElement;
               DataAccess.Variable<Object> descrv = set1.get("descr");
               DataAccess.Variable<Object> namev = set1.get("name");
-              DataAccess.Variable<Object> selectv = set1.get("select");
               if(descrv !=null && namev !=null) {
-                String[] lineTexts = new String[3];
+                String[] lineTexts = new String[2];
                 lineTexts[0] = namev.value().toString();
-                lineTexts[1] = selectv.value().toString();
-                lineTexts[2] = descrv.value().toString();
+                lineTexts[1] = descrv.value().toString();
                 this.wdgTables[iList].addLine(lineTexts[0], lineTexts, set1);
               }
             }
@@ -294,6 +291,7 @@ public class SimSelector
         }
         this.wdgTables[iList].repaint();
       }
+      level.close();
     }
     
   }
@@ -424,9 +422,14 @@ public class SimSelector
     Object o = line.getTable().getData();
     assert(o instanceof Integer);
     int nTable = ((Integer)o).intValue();
-    StringBuilder sCase = new StringBuilder(this.wdgSelects.getText());
+    int nCursor = this.wdgSelects.getCursorPos();
+    String text0 = this.wdgSelects.getText();
+    StringBuilder sCase = new StringBuilder(text0.substring(0, nCursor));
     addTestCase(sCase, line, null, nTable);
+    int nCursorNew = sCase.length();
+    sCase.append(text0.substring(nCursor));
     this.wdgSelects.setText(sCase);
+    this.wdgSelects.setCursorPos(nCursorNew);
     
   }
 
@@ -536,7 +539,10 @@ public class SimSelector
   GralUserAction actionTouchLine = new GralUserAction("touchLine")
   { @Override public boolean exec ( int actionCode, GralWidget_ifc widgd, Object... params) { 
       if( actionCode == KeyCode.mouse1Double){
-        GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line = (GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData)params[0];  //it is the table line.
+        assert(params[0] instanceof GralTable.TableLineData);
+        @SuppressWarnings("unchecked")
+        GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line = 
+          (GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData)params[0];  //it is the table line.
         addTestCaseFromTable(line);
       }
       else if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode) ) {
