@@ -130,7 +130,7 @@ public class SimSelector
   
   GralButton[] btnExecSelection = new GralButton[4];
   
-  GralTextField wdgSelects;
+  GralTextBox wdgSelects;
   
   GralTextBox output;
   
@@ -395,6 +395,10 @@ public class SimSelector
   
   int nTableTestcase = -1;
   
+  String sTextTestCases = "";
+  
+  int nPosCursorTextCases = 0;
+  
   void addTestCase ( StringBuilder select, GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line, String sepXXX, int nTable ) 
   //throws IOException 
   {
@@ -424,13 +428,19 @@ public class SimSelector
     int nTable = ((Integer)o).intValue();
     int nCursor = this.wdgSelects.getCursorPos();
     String text0 = this.wdgSelects.getText();
+    if(nCursor != this.nPosCursorTextCases || !text0.equals(this.sTextTestCases)) {
+      this.nTableTestcase = -1; //anything is changed, it starts with new table. 
+    }
     StringBuilder sCase = new StringBuilder(text0.substring(0, nCursor));
+    //
     addTestCase(sCase, line, null, nTable);
+    //
     int nCursorNew = sCase.length();
     sCase.append(text0.substring(nCursor));
     this.wdgSelects.setText(sCase);
     this.wdgSelects.setCursorPos(nCursorNew);
-    
+    this.nPosCursorTextCases = nCursorNew; this.sTextTestCases = sCase.toString();
+     
   }
 
   
@@ -557,9 +567,9 @@ public class SimSelector
   GralUserAction actionTouchTestcaseString = new GralUserAction("touchTestcaseString")
   { @Override public boolean exec ( int actionCode, GralWidget_ifc widgd, Object... params) { 
       //System.out.println(Integer.toHexString(actionCode));
-      //if(KeyCode.isWritingKey(actionCode)) {
-        SimSelector.this.nTableTestcase = -1;    //set -1 in any case if this field is touched.
-      //}
+      if(KeyCode.isWritingKey(actionCode)) {
+        //SimSelector.this.nTableTestcase = -1;    //set -1 in any case if this field is touched.
+      }
       return true;
     }
   };
@@ -611,8 +621,8 @@ public class SimSelector
       SimSelector.this.btnReadConfig.createImplWidget_Gthread();
       SimSelector.this.btnCleanOut.createImplWidget_Gthread();
       SimSelector.this.btnGenTestcase.createImplWidget_Gthread();
-      SimSelector.this.gralMng.setPosition(3, 5, 57, 115, 0, 'd');
-      SimSelector.this.wdgSelects = SimSelector.this.gralMng.addTextField("test", true, null, "r");
+      SimSelector.this.gralMng.setPosition(2, 10, 57, 115, 0, 'd');
+      SimSelector.this.wdgSelects = SimSelector.this.gralMng.addTextBox("test", true, null, 'r');
       SimSelector.this.wdgSelects.setText("");
       SimSelector.this.wdgSelects.specifyActionChange("actionTouchTestCaseString", SimSelector.this.actionTouchTestcaseString, null);
       SimSelector.this.gralMng.setPosition(2, 5, 116, 120, 0, 'd');

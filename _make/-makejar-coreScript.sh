@@ -46,7 +46,7 @@ echo ===============================================================
 
 ##Automatic build a zip file if SRC_ALL and maybe additionally SRC_ALL2 is given.
 ##SRC_ALL refers to the java package path root directory,
-##but the source.zip should contain the parent folder which is srcJava_xyz/org/... 
+##but the source.zip should contain the parent folder which is srcJava_xyz/org/...            
 export SRCZIP=""
 if ! test "$SRC_ALL" = ""; then
   echo source-set all files = $SRC_ALL
@@ -62,7 +62,7 @@ if ! test "$SRC_ALL2" = ""; then
 fi  
 echo compile javac
 pwd
-echo javac -encoding UTF-8 -d $TMPJAVAC/binjar -cp $CLASSPATH -sourcepath $SRCPATH $FILE1SRC 
+echo $JAVAC -encoding UTF-8 -d $TMPJAVAC/binjar -cp $CLASSPATH -sourcepath $SRCPATH $FILE1SRC 
 ###$JAVAC_HOME/bin/
 $JAVAC -encoding UTF-8 -d $TMPJAVAC/binjar -cp $CLASSPATH -sourcepath $SRCPATH $FILE1SRC 
 
