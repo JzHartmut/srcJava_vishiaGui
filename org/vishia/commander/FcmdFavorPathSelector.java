@@ -158,8 +158,8 @@ class FcmdFavorPathSelector
   final MainCmd_ifc console;
   
   
-  /**The last selected SelectInfo. */
-  FavorPath actFavorPathInfo;
+  /**The last selected SelectInfo independent from the panel left, mid, right is never used. remove it. */
+  //FavorPath actFavorPathInfo;
 
   boolean bSyncMidRight;
   
@@ -188,9 +188,9 @@ class FcmdFavorPathSelector
   { this.main = main;
     this.console = console;
     this.mng = main._gralMng;
-    panelLeft = new FcmdLeftMidRightPanel(main, 'l', '1', mng); 
-    panelMid = new FcmdLeftMidRightPanel(main, 'm','2',  mng); 
-    panelRight = new FcmdLeftMidRightPanel(main,'r', '3',  mng);
+    this.panelLeft = new FcmdLeftMidRightPanel(main, null, 'l', '1', this.mng); 
+    this.panelMid = new FcmdLeftMidRightPanel(main, null, 'm','2',  this.mng); 
+    this.panelRight = new FcmdLeftMidRightPanel(main, this.panelMid, 'r', '3',  this.mng);
 
   }
   
@@ -482,18 +482,33 @@ class FcmdFavorPathSelector
   } };
 
   
+  void actionSyncMidRight() {
+    if(!this.bSyncMidRight && this.panelMid.actFileCard !=null && this.panelMid.actFileCard.favorPathInfo !=null 
+        && this.panelRight.actFileCard !=null && this.panelRight.actFileCard.favorPathInfo !=null){
+      this.bSyncMidRight = true;
+      this.panelRight.actFileCard.syncTabSelection = this.panelMid.actFileCard.syncPartnerTabSelection = this.panelRight.actFileCard.sTabSelection;
+      this.panelMid.actFileCard.syncTabSelection = this.panelRight.actFileCard.syncPartnerTabSelection = this.panelMid.actFileCard.sTabSelection;
+      this.main.statusLine.widgSyncInfoLeft.setBackColor(GralColor.getColor("gn"),0);
+      this.main.statusLine.widgSyncInfoRight.setBackColor(GralColor.getColor("gn"),0);
+      this.main.statusLine.widgSyncInfoLeft.setText(this.panelMid.actFileCard.syncTabSelection);
+      this.main.statusLine.widgSyncInfoRight.setText(this.panelRight.actFileCard.syncTabSelection);
+    } else {
+      this.bSyncMidRight = false;
+      if(this.panelMid.actFileCard !=null) { this.panelMid.actFileCard.syncTabSelection =  this.panelMid.actFileCard.syncPartnerTabSelection = null; }
+      if(this.panelRight.actFileCard !=null) { this.panelRight.actFileCard.syncTabSelection = this.panelRight.actFileCard.syncPartnerTabSelection = null; }
+      this.main.statusLine.widgSyncInfoLeft.setBackColor(GralColor.getColor("wh"),0);
+      this.main.statusLine.widgSyncInfoRight.setBackColor(GralColor.getColor("wh"),0);
+      this.main.statusLine.widgSyncInfoLeft.setText("");
+      this.main.statusLine.widgSyncInfoRight.setText("");
+    }
+    
+  }
+  
   
   GralUserAction actionSyncMidRight = new GralUserAction(""){
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        bSyncMidRight = ! bSyncMidRight;
-        if(bSyncMidRight){
-          main.statusLine.widgSyncInfo.setBackColor(GralColor.getColor("gn"),0);
-          main.statusLine.widgSyncInfo.setText("sync mid-right");
-        } else {
-          main.statusLine.widgSyncInfo.setBackColor(GralColor.getColor("wh"),0);
-          main.statusLine.widgSyncInfo.setText("");
-        }
+        actionSyncMidRight();
       }
       return true;
   } };

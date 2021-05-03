@@ -21,19 +21,19 @@
 2013-09-08 21:23:40  x     FcmdDocuSearch.java                      ::          1.167 -1869277279 
 2016-09-24 20:18:20  x     FcmdEdit.java                            ::          8.173  1073481531 
 2018-10-28 10:28:19  x     FcmdExecuter.java                        ::         16.028 -1118709735 
-2016-07-06 22:53:50  x     FcmdFavorCard.java                       ::         10.127 -0486442221 
-2017-09-15 08:11:30  x     FcmdFavorPathSelector.java               ::         29.911  1003788647 
-2018-10-28 10:22:41  x     FcmdFileCard.java                        ::         27.040 -1745796390 
+2021-05-03 21:36:01  x     FcmdFavorCard.java                       ::         10.221 -1159079723 
+2021-05-03 23:09:24  x     FcmdFavorPathSelector.java               ::         31.296  1205288076 
+2021-05-03 23:11:17  x     FcmdFileCard.java                        ::         30.046  1862875247 
 2016-07-06 22:48:31  x     FcmdFileProps.java                       ::         20.390  0748270324 
-2016-07-06 22:53:59  x     FcmdFilesCp.java                         ::          7.561 -1408180871 
+2021-05-03 22:27:18  x     FcmdFilesCp.java                         ::          7.569  0231642651 
 2018-04-07 09:12:17  x     FcmdHistorie.java                        ::           .983  0816669975 
 2020-03-31 14:23:36  x     FcmdIdents.java                          ::         14.080  2003633364 
 2013-05-25 22:28:00  x     FcmdKeyActions.java                      ::          2.409 -0498014726 
-2018-10-28 10:18:58  x     FcmdLeftMidRightPanel.java               ::         16.382  1820898765 
+2021-05-03 21:54:25  x     FcmdLeftMidRightPanel.java               ::         16.825 -2040713098 
 2016-07-06 22:53:22  x     FcmdMkDirFile.java                       ::          4.283 -1067123226 
 2017-09-11 20:44:41  x     FcmdSettings.java                        ::          9.781 -0008917584 
 2016-07-06 22:53:24  x     FcmdStatus.java                          ::          4.049 -0047873112 
-2017-09-15 13:16:54  x     FcmdStatusLine.java                      ::          6.518 -0867946492 
+2021-05-03 21:39:55  x     FcmdStatusLine.java                      ::          6.990 -1013656436 
 2012-01-21 13:55:44  x     FcmdTargetProxy.java                     ::           .109  1376363690 
 2021-02-06 22:20:43  x     FcmdView.java                            ::         24.440  0313197307 
 2012-01-27 08:48:04  x     FcmdWidgetNames.java                     ::          1.801  1038690272 
@@ -217,7 +217,7 @@
 
 ============================== org/vishia/gral/test/ ===============================================
 2017-05-06 09:27:19  x     FqAnalyzer.java                          ::          4.507  0650199554 
-2021-03-25 14:46:09  x     GralColorShow.java                       ::         66.779 -0399927223 
+2021-05-03 13:50:32  x     GralColorShow.java                       ::         66.779 -0399927223 
 2016-12-27 20:12:24  x     GralPlotWindow.java                      ::          3.194  2129281718 
 2017-03-12 11:38:53  x     HelloWorld.java                          ::          2.595 -2090910486 
 2018-09-17 13:34:40  x     HelloWorldScript.java                    ::           .974  0896076645 

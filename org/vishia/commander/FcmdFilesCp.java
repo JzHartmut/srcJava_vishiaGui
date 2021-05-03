@@ -147,8 +147,8 @@ public final class FcmdFilesCp {
     card1 = lastFileCards[0];
     card2 = lastFileCards[1];
     if(card1 !=null && card2 !=null){
-      card1.otherFileCardtoSync = card2;  //cross connect this file cards.
-      card2.otherFileCardtoSync = card1;
+      //card1.otherFileCardtoSync = card2;  //cross connect this file cards.
+      //card2.otherFileCardtoSync = card1;
       file1 = card1.currentFile();
       file2 = card2.currentFile();
       card1.sDirSync = file1.getAbsolutePath();
@@ -158,8 +158,8 @@ public final class FcmdFilesCp {
       widgPath1.setText(card1.sDirSync);
       widgPath2.setText(card2.sDirSync);
     } else {
-      if(card1 !=null){ card1.otherFileCardtoSync = null; }
-      if(card2 !=null){ card2.otherFileCardtoSync = null; }
+      //if(card1 !=null){ card1.otherFileCardtoSync = null; }
+      //if(card2 !=null){ card2.otherFileCardtoSync = null; }
       card1 = card2 = null;
       widgPath1.setText("");
       widgPath2.setText("");

@@ -133,8 +133,9 @@ public class FcmdFavorCard  extends GralSelectList<FcmdFavorPathSelector.FavorPa
     //Now switch to the new favor in the file panel: 
     FcmdFavorPathSelector.FavorPath favorPathInfo = (FcmdFavorPathSelector.FavorPath)line.getUserData();
     //new: fileTable.actionSetFromTabSelection.exec(KeyCode.menuEntered, null, favorPathInfo);
-    main.favorPathSelector.actFavorPathInfo = favorPathInfo; //The last used selection (independent of tab left, middle, right)
+    //main.favorPathSelector.actFavorPathInfo = favorPathInfo; //The last used selection (independent of tab left, middle, right)
     this.sActSelectedFavorPath = favorPathInfo.selectName;
+    this.fileTable.sTabSelection = this.fileTable.label + "." + favorPathInfo.selectName;
     if(  wdgdTable.name.startsWith(FcmdWidgetNames.tableFavoritesMain)) {
       //use the root dir any time if the main favor path table is used.
       currentDir = favorPathInfo.path;
@@ -230,7 +231,7 @@ public class FcmdFavorCard  extends GralSelectList<FcmdFavorPathSelector.FavorPa
       if(dstPanel.actFileCard !=null){ dstPanel.actFileCard.favorCard.setFocus(); }
     */
     } else if (key == main.keyActions.keyCreateFavorite){
-      main.favorPathSelector.actFavorPathInfo = favorPathInfo; //info in the line of table.
+      //main.favorPathSelector.actFavorPathInfo = favorPathInfo; //info in the line of table.
       main.favorPathSelector.windAddFavorite.widgLabel.setText("file3");
       main.favorPathSelector.windAddFavorite.widgShortName.setText("alias");
       //File lastSelectedFile = panelRight.fileSelectorMain.getSelectedFile();

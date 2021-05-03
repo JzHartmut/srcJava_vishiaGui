@@ -2,6 +2,7 @@ package org.vishia.commander;
 
 import java.io.File;
 
+import org.vishia.commander.FcmdFavorPathSelector.FavorPath;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelContent;
@@ -15,6 +16,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.util.Assert;
+import org.vishia.util.CheckVs;
 import org.vishia.util.FileCompare;
 import org.vishia.util.KeyCode;
 
@@ -95,6 +97,16 @@ public class FcmdFileCard extends GralFileSelector
    * It is the label on the tab.
    */
   final String label;
+  
+  
+  /**It is build from the {@link #label} and the {@link #favorPathInfo}. {@link FavorPath#selectName}
+   * due to the selected favor which is shown in this file table.
+   * It is used to detect the correct other sync table, see {@link #syncTabSelection} 
+   */
+  String sTabSelection;
+  
+  /**If not null then the name of the own favor card and the favor card from the other panel for sync. */
+  String syncTabSelection, syncPartnerTabSelection;
   
   //final GralTextField_ifc widgLabel; /// 
   
@@ -368,25 +380,25 @@ public class FcmdFileCard extends GralFileSelector
    */
   protected void actionOnFileSelection(FileRemote file, String sFileName){
     //note the file, able to use for some actions.
-    main.selectedFiles123[mainPanel.ixMainPanel] = file;
+    this.main.selectedFiles123[this.mainPanel.ixMainPanel] = file;
     
-    if(mainPanel.orderMainPanel == 1){
+    if(this.mainPanel.orderMainPanel == 1){
       //only if it is the focused panel:
       //note the file card in order of usage.
       
-      main.lastFavorCard = favorCard;
-      main.currentFileCard = this;
-      mainPanel.actFileCard = this;
-      main.statusLine.setFileInfo(file);
-      
+      this.main.lastFavorCard = this.favorCard;
+      this.main.currentFileCard = this;
+      this.mainPanel.actFileCard = this;
+      this.main.statusLine.setFileInfo(this.sTabSelection, file);
+      //System.out.println("actionOnFileSelected: " + this.label + ":" + this.favorCard.sActSelectedFavorPath);
       String sPath = file.getAbsolutePath();
-      if(  main.favorPathSelector.bSyncMidRight 
-        && mainPanel.actFileCard == this    //from actFileCard to the second one!
-        && mainPanel.orderMainPanel == 1
+      if(  this.main.favorPathSelector.bSyncMidRight 
+        && this.mainPanel.actFileCard == this    //from actFileCard to the second one!
+        && this.mainPanel.orderMainPanel == 1
       ){
         try{ syncWithSecondPanel(sFileName); }
         catch(Exception exc){ 
-          CharSequence msg = Assert.exceptionInfo("Fcmd.actionOnFileSelection.syncWithSecondPanel() - exception, ", exc, 0, 20);
+          CharSequence msg = CheckVs.exceptionInfo("Fcmd.actionOnFileSelection.syncWithSecondPanel() - exception, ", exc, 0, 20);
           System.out.append(msg);
         }
         System.out.println("FcmdFileCard - syncWithSecondPanel; " + toString());
@@ -487,7 +499,8 @@ public class FcmdFileCard extends GralFileSelector
     main.currentFileCard = this;
     mainPanel.actFileCard = FcmdFileCard.this;
     main.setLastSelectedPanel(mainPanel);
-    System.out.println(Assert.stackInfo("FcmdFileCard - setActFilePanel_setColorLine;",10));
+    System.out.println("setActFilePanel: " + this.sTabSelection + " =^ " + this.label + "#" + this.favorCard.sActSelectedFavorPath);
+    //System.out.println(Assert.stackInfo("FcmdFileCard - setActFilePanel_setColorLine;",10));
     int ixMainPanel = -1;
     for(FcmdLeftMidRightPanel panel: main.lastFilePanels){
       if(ixMainPanel >=2) {
@@ -580,32 +593,74 @@ public class FcmdFileCard extends GralFileSelector
   } };
   
 
+  /**Called if a tab is used to change the selection in the favorTab. 
+   * The adequate action is done too with selection in the favor tab. 
+   * */
+  private void actionSetFromTabSelection ( FcmdFavorPathSelector.FavorPath favorPathNew ) {
+    //before changing the content of this fileTable, store the current directory
+    //to restore if this favor respectively selection is used ones more.
+    FileRemote dir = null;
+    String sCurrentDir;
+    if(favorPathInfo !=null){
+      dir = getCurrentDir();
+      if(dir != null){
+        sCurrentDir = dir.getAbsolutePath();
+        if(sCurrentDir !=null){
+          mainPanel.indexActualDir.put(favorPathInfo.selectName, sCurrentDir);
+    } } }
+    //main.favorPathSelector.actFavorPathInfo = favorPathNew; //The last used selection (independent of tab left, middle, right)
+    if(favorPathNew == null){
+      //TODO clear filecard
+      this.favorCard.sActSelectedFavorPath = "??NO FavorPath.selectName";
+      System.out.println("actionSetFromTabSelection: favorPathNew = null");
+      this.main.favorPathSelector.bSyncMidRight = false;
+    } else {
+      this.favorCard.sActSelectedFavorPath = favorPathNew.selectName;
+      this.sTabSelection = this.label + "." + favorPathNew.selectName;
+      this.main.favorPathSelector.bSyncMidRight = 
+          this.syncTabSelection !=null 
+          && this.syncPartnerTabSelection !=null 
+          && this.syncTabSelection.equals(this.sTabSelection)
+          && this.mainPanel.partnerPanelToSync() !=null
+          && this.mainPanel.partnerPanelToSync().actFileCard !=null
+          && this.syncPartnerTabSelection.equals(this.mainPanel.partnerPanelToSync().actFileCard.sTabSelection);
+      GralColor syncColor = this.main.favorPathSelector.bSyncMidRight ? GralColor.getColor("gn") : GralColor.getColor("wh");
+      this.main.statusLine.widgSyncInfoLeft.setBackColor(syncColor,0);
+      this.main.statusLine.widgSyncInfoRight.setBackColor(syncColor,0);
+      if(this.mainPanel.cc == 'm') {
+        if(this.syncTabSelection ==null) {
+          this.main.statusLine.widgSyncInfoRight.setText("");
+        } else {
+          this.main.statusLine.widgSyncInfoLeft.setText(this.syncTabSelection);
+          this.main.statusLine.widgSyncInfoRight.setText(this.syncPartnerTabSelection);
+        }
+      }
+      else if(this.mainPanel.cc == 'r') {
+        if(this.syncTabSelection ==null) {
+          this.main.statusLine.widgSyncInfoLeft.setText("");
+        } else {
+          this.main.statusLine.widgSyncInfoLeft.setText(this.syncPartnerTabSelection);
+          this.main.statusLine.widgSyncInfoRight.setText(this.syncTabSelection);
+        }
+      }
+      System.out.println("actionSetFromTabSelection: " + favorPathNew.selectName);
+      sCurrentDir  = mainPanel.indexActualDir.get(favorPathNew.selectName);
+      if(sCurrentDir == null){
+        sCurrentDir = favorPathNew.path;
+      }
+      //dir = new FileRemote(currentDir);  
+      dir = main.fileCluster.getFile(sCurrentDir, null);
+      FcmdFileCard.this.setNewContent(favorPathNew, dir);
+    }
+    
+  }
+  
+  
+  /**This action is called if a tab is selected. */
   GralUserAction actionSetFromTabSelection = new GralUserAction("actionSetFromTabSelection"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
       FcmdFavorPathSelector.FavorPath favorPathNew = (FcmdFavorPathSelector.FavorPath)params[0];
-      //before changing the content of this fileTable, store the current directory
-      //to restore if this favor respectively selection is used ones more.
-      FileRemote dir = null;
-      String sCurrentDir;
-      if(favorPathInfo !=null){
-        dir = getCurrentDir();
-        if(dir != null){
-          sCurrentDir = dir.getAbsolutePath();
-          if(sCurrentDir !=null){
-            mainPanel.indexActualDir.put(favorPathInfo.selectName, sCurrentDir);
-      } } }
-      main.favorPathSelector.actFavorPathInfo = favorPathNew; //The last used selection (independent of tab left, middle, right)
-      if(favorPathNew == null){
-        //TODO clear filecard
-      } else {
-        sCurrentDir  = mainPanel.indexActualDir.get(favorPathNew.selectName);
-        if(sCurrentDir == null){
-          sCurrentDir = favorPathNew.path;
-        }
-        //dir = new FileRemote(currentDir);  
-        dir = main.fileCluster.getFile(sCurrentDir, null);
-        FcmdFileCard.this.setNewContent(favorPathNew, dir);
-      }
+      actionSetFromTabSelection(favorPathNew);
       return true;      
   } };
 

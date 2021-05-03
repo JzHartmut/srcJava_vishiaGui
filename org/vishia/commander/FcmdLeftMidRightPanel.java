@@ -80,6 +80,8 @@ public class FcmdLeftMidRightPanel
   /**Index of panel 0, 1, 2. */
   final int ixMainPanel;
   
+  /**Only set in constructor, cannot be final because mutual association. */
+  private FcmdLeftMidRightPanel partnerPanelToSync;
   
   /**The order number of the panel in order of usage.
    * 1 = actual focused panel, 2 = last focused, 3 = third focused, 0 = no file panel. */
@@ -90,16 +92,19 @@ public class FcmdLeftMidRightPanel
   final int[] widthSelecttableSub = new int[]{2, 20, 30};
 
   
-  FcmdLeftMidRightPanel(Fcmd javaCmd, char cc, char cNr, GralMng mng){
+  FcmdLeftMidRightPanel ( Fcmd javaCmd, FcmdLeftMidRightPanel partnerPanelToSync, char cc, char cNr, GralMng mng){
     this.main = javaCmd;
     this.cc = cc;
     this.cNr = cNr;
     this.ixMainPanel = cNr - '1';
     cardFavorThemes = new FcmdFavorThemeCard(main, FcmdWidgetNames.tableFavoritesMain + cNr, this);
-    
+    this.partnerPanelToSync = partnerPanelToSync;
+    if(partnerPanelToSync !=null) {  //only given on one of the panels, set the other.
+      partnerPanelToSync.partnerPanelToSync = this;
+    }
   }
   
-  
+  FcmdLeftMidRightPanel partnerPanelToSync ( ) { return this.partnerPanelToSync; }
   
   /**Build the initial content of one of the three tabbed panels, called in the build phase of the GUI.
    * @param which Number 1 2 3 for left, mid, right
