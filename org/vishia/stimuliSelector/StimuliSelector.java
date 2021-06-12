@@ -1,4 +1,4 @@
-package org.vishia.simSelector;
+package org.vishia.stimuliSelector;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +16,6 @@ import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
-import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralUserAction;
@@ -27,11 +26,12 @@ import org.vishia.mainCmd.PrintStreamAdapter;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.DataAccess;
+import org.vishia.util.DataAccess.Variable;
 import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 
 /*Test with jzcmd: call jzcmd with this java file with its full path:
-D:/vishia/Java/srcJava_vishiaGui/org/vishia/gral/test/SimSelector.java
+D:/vishia/Java/srcJava_vishiaGui/org/vishia/gral/test/StimuliSelector.java
 ==JZcmd==
 java org.vishia.gral.test.SimSelector.main(null);                 
 ==endJZcmd==
@@ -77,10 +77,11 @@ java org.vishia.gral.test.SimSelector.main(null);
  * @author Hartmut Schorrig LPGL license. Do not remove the license declaration. 
  *
  */
-public class SimSelector
+public class StimuliSelector
 {
   /**Version, history and license.
    * <ul>
+   * <li>2021-06-09 Hartmut better support for building test cases
    * <li>2020-07-20 hartmut new If the script contains subroutines "exec1" ... "exec4"
    *   Buttons for that will be created, for special functions. 
    * <li>2020-07-20 hartmut new now invokes <pre>
@@ -125,14 +126,18 @@ public class SimSelector
   @SuppressWarnings("unchecked") 
   GralTable<Map<String, DataAccess.Variable<Object>>>[] wdgTables = new GralTable[6];
   
+  /**Set on selection of a line in a table, the last touched one. */
+  volatile GralTable<Map<String, DataAccess.Variable<Object>>> wdgLastSelectedTable;
   
-  GralButton btnHelp, btnReadConfig, btnGenSelection, btnCleanOut, btnGenTestcase, btnAddTestcase, btnDeselectLines;
+  GralButton btnReadConfig, btnGenSelection, btnCleanOut, btnGenTestcase;
+  GralButton btnAddTestcase, btnDeselectLines, btnExampleSel, btnHelp;
   
   GralButton[] btnExecSelection = new GralButton[4];
   
   GralTextBox wdgSelects;
   
   GralTextBox output;
+  
   
   final JZtxtcmd jzcmd;
   
@@ -153,7 +158,7 @@ public class SimSelector
     if(args.length < 1) {
       System.err.println("argument 1: path/to/config.jzt.cmd");
     }
-    SimSelector main = new SimSelector(args[0]);
+    StimuliSelector main = new StimuliSelector(args[0]);
     char size = 'C';
     if(args.length >=2) {
       if(args[1].startsWith("-size:")) {
@@ -165,7 +170,7 @@ public class SimSelector
   }
   
   
-  SimSelector(String fileConfig)
+  StimuliSelector(String fileConfig)
   {
     this.fileConfig = new File(fileConfig);
     JZtxtcmd jzcmd = null;
@@ -185,16 +190,19 @@ public class SimSelector
       columnWidths[1] = 0;
       this.wdgTables[iTable] = new GralTable<>(name, columnWidths);
       this.wdgTables[iTable].specifyActionChange("actionTouchLine", this.actionTouchLine, null);
+      this.wdgTables[iTable].specifyActionOnLineSelected(this.actionSelectInTable);
       this.wdgTables[iTable].setData(new Integer(iTable +1));
       //, GralWidget_ifc.ActionChangeWhen.onCtrlEnter, GralWidget_ifc.ActionChangeWhen.onMouse1Double);
       //this.wdgTables[iTable].specifyContextMenu(null);
     }
+    this.wdgLastSelectedTable = this.wdgTables[0]; //default
     this.btnReadConfig = new GralButton("readConfig", "read config", this.actionReadConfig);
     this.btnGenSelection = new GralButton("genSelection", "gen selection", new GralUserActionButton("btnGenSelection"));
     this.btnGenTestcase = new GralButton("genTestCase", "gen test cases", this.actionGenTestcases);
-    this.btnAddTestcase = new GralButton("addTestCase", "+", this.actionAddTestcases);
-    this.btnDeselectLines = new GralButton("addTestCase", "--", this.actionDeselectLines);
+    this.btnAddTestcase = new GralButton("addTestCase", "add sel", this.actionAddTestcases);
+    this.btnDeselectLines = new GralButton("addTestCase", "desel", this.actionDeselectLines);
     this.btnCleanOut = new GralButton("cleanOut", "clean output", this.actionCleanOut);
+    this.btnExampleSel = new GralButton("exmpl", "exmpl", this.actionExampleSel);
     this.btnHelp = new GralButton("help", "help", this.actionHelp);
     //
     JZtxtcmdScript.Subroutine sub1 = this.script.getSubroutine("btnExec1");
@@ -229,7 +237,7 @@ public class SimSelector
   
   
   public static void openWindow(){
-    SimSelector main = new SimSelector(null);
+    StimuliSelector main = new StimuliSelector(null);
     main.openWindow1('D');
   }
   
@@ -359,17 +367,21 @@ public class SimSelector
   
   void addTestcases ( ) {
     StringBuilder select = new StringBuilder();
-    this.nTableTestcase = -1;
     String sepSpace = "";
+    boolean bFoundMark = false;
     for(int ixTable = 0; ixTable < this.wdgTables.length; ++ixTable) {
       String sep = sepSpace + Integer.toString(ixTable+1) + "=";
       boolean bAdd = false;
       for(GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line: this.wdgTables[ixTable].iterLines()) {
         int mark = line.getMark();
         if( (mark & 1)!=0) {                  //line is marked (red)
+          if(!bFoundMark) {                   //first time found a line
+            this.nTableTestcase = -1;         //decides about syntax in addTestCase(..)
+            
+          }
           addTestCase(select, line, sep, ixTable +1);
           bAdd = true;
-
+          bFoundMark = true;
           sep = ",";
         }
         Debugutil.stop();
@@ -377,19 +389,29 @@ public class SimSelector
       if(bAdd) { select.append(';'); }
       sepSpace = " ";
     }
-    String selWdg = this.wdgSelects.getText();
-    int selWdgPos = selWdg.indexOf('|');
-    int selWdgPos2;
-    if(selWdgPos >=0) {
-      selWdgPos2 = selWdgPos +1;
-      while( selWdgPos2 < selWdg.length() && selWdg.charAt(selWdgPos2) == '|') { selWdgPos2 +=1; }
-    } else {
-      selWdgPos = this.wdgSelects.getCursorPos();
-      selWdgPos2 = selWdgPos;
+    if(bFoundMark==false) { //nothing is marked, it means the user press this key without preparing mark.
+      //Then add the last selected line in the last selected table as default behavior to do anything what's obviously.
+      GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line = this.wdgLastSelectedTable.getCurrentLine();
+      if(line == null) { 
+        this.wdgSelects.setText("first select a line in table, or press [exmpl]\nremove this content with mark and delete in this textbox");
+      }
+      else { addTestCaseFromTable(line); }
     }
-    selWdg = selWdg.substring(0, selWdgPos) + select + selWdg.substring(selWdgPos2);
-    this.wdgSelects.setText(selWdg);
-    this.wdgSelects.setCursorPos(selWdgPos + select.length()); 
+    else {
+      String selWdg = this.wdgSelects.getText();
+      int selWdgPos = selWdg.indexOf('|');
+      int selWdgPos2;
+      if(selWdgPos >=0) {
+        selWdgPos2 = selWdgPos +1;
+        while( selWdgPos2 < selWdg.length() && selWdg.charAt(selWdgPos2) == '|') { selWdgPos2 +=1; }
+      } else {
+        selWdgPos = this.wdgSelects.getCursorPos();
+        selWdgPos2 = selWdgPos;
+      }
+      selWdg = selWdg.substring(0, selWdgPos) + select + selWdg.substring(selWdgPos2);
+      this.wdgSelects.setText(selWdg);
+      this.wdgSelects.setCursorPos(selWdgPos + select.length()); 
+    }
   }  
 
   
@@ -461,6 +483,71 @@ public class SimSelector
   }  
   
   
+  void prepareExampleSel() {
+    StringBuilder select = new StringBuilder();
+    String sepSpace = "";
+    boolean bAddTable = false;
+    for(int ixTable = 0; ixTable <=1; ++ixTable) {
+      String sep = sepSpace + Integer.toString(ixTable+1) + "=";
+      boolean bAdd = false;
+      int nrLine = 0;
+      int nrLines = this.wdgTables[ixTable].size();
+      int nrEndLine = nrLines >2? 2 :1;
+      this.nTableTestcase = -1;         //decides about syntax in addTestCase(..)
+      for(GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line: this.wdgTables[ixTable].iterLines()) {
+        if(++nrLine > nrEndLine) break;
+        addTestCase(select, line, sep, ixTable +1);
+        sep = ","; bAdd = true; bAddTable = true;
+      }
+      select.append("; ");
+      //if(bAdd) { select.append(';'); }
+      sepSpace = " ";
+    }
+    //                                // add selection + second combination
+    this.nTableTestcase = -1;         //decides about syntax in addTestCase(..)
+    boolean bAddSel2 = false;
+    for(int ixTable = 0; ixTable <=1; ++ixTable) {
+      String sep = sepSpace + Integer.toString(ixTable+1) + "=";
+      boolean bAdd = false;
+      int nrLine = 0;
+      int nrLines = this.wdgTables[ixTable].size();
+      int nrUsedLine = nrLines >=2? nrLines -2 :1;
+      
+      this.nTableTestcase = -1;         //decides about syntax in addTestCase(..)
+      for(GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line: this.wdgTables[ixTable].iterLines()) {
+        if(++nrLine >nrUsedLine) {
+          if(bAddTable && !bAddSel2) {
+            select.append(" + ");    //additional combination
+          }
+          addTestCase(select, line, sep, ixTable +1);
+          sep = ","; bAdd = true; bAddTable = true; bAddSel2 = true;
+        }
+      }
+      select.append("; ");
+      //if(bAdd) { select.append(';'); }
+      sepSpace = " ";
+    }
+    if(bAddTable) {
+      select.append("\n & ");    //with this combination
+    }
+    bAddTable = false;
+    this.nTableTestcase = -1;         //decides about syntax in addTestCase(..)
+    for(int ixTable = 2; ixTable <6; ++ixTable) {
+      String sep = sepSpace + Integer.toString(ixTable+1) + "=";
+      boolean bAdd = false;
+      int nrLine = 0;
+      for(GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line: this.wdgTables[ixTable].iterLines()) {
+        if(++nrLine >2) break;
+        addTestCase(select, line, sep, ixTable +1);
+        sep = ","; bAdd = true;
+      }
+      sepSpace = " ";
+    }
+    this.wdgSelects.setText(select);
+    this.wdgSelects.setCursorPos(select.length()); 
+  }
+
+
   GralUserAction actionReadConfig = new GralUserAction("readConfig")
   { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
@@ -472,7 +559,7 @@ public class SimSelector
   
   
   
-  /**An user action which calls {@link SimSelector#execBtnAction(String)}, assigned to some Buttons.
+  /**An user action which calls {@link StimuliSelector#execBtnAction(String)}, assigned to some Buttons.
    * The name in the constructor determines the name of the called subroutine in the JZtxtcmd script.
    * @author hartmut
    *
@@ -499,7 +586,7 @@ public class SimSelector
   { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         genTestcases();
-        SimSelector.this.nTableTestcase = -1;
+        StimuliSelector.this.nTableTestcase = -1;
       }
       return true;
     }
@@ -537,7 +624,7 @@ public class SimSelector
   GralUserAction actionCleanOut = new GralUserAction("cleanOut")
   { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        SimSelector.this.output.setText("");
+        StimuliSelector.this.output.setText("");
       }
       return true;
     }
@@ -563,12 +650,25 @@ public class SimSelector
   };
   
   
+  /**This action is only to remark which tables is last touched (line is selected).
+   */
+  GralUserAction actionSelectInTable = new GralUserAction("selectInTable")
+  { @Override public boolean exec ( int actionCode, GralWidget_ifc widgd, Object... params) { 
+      assert(widgd instanceof GralTable);
+      @SuppressWarnings("unchecked")
+      GralTable<Map<String, Variable<Object>>> gralTable = (GralTable<Map<String, DataAccess.Variable<Object>>>) widgd;
+      StimuliSelector.this.wdgLastSelectedTable = gralTable;
+      return true;
+    }
+  };
+  
+  
   
   GralUserAction actionTouchTestcaseString = new GralUserAction("touchTestcaseString")
   { @Override public boolean exec ( int actionCode, GralWidget_ifc widgd, Object... params) { 
       //System.out.println(Integer.toHexString(actionCode));
       if(KeyCode.isWritingKey(actionCode)) {
-        //SimSelector.this.nTableTestcase = -1;    //set -1 in any case if this field is touched.
+        //StimuliSelector.this.nTableTestcase = -1;    //set -1 in any case if this field is touched.
       }
       return true;
     }
@@ -577,12 +677,23 @@ public class SimSelector
   
   
   
+  /**Assembles an example for selection using the given tables. */
+  GralUserAction actionExampleSel = new GralUserAction("actionExampleSel")
+  { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        prepareExampleSel();
+      }
+      return true;
+    }
+  };
+  
+  
   GralUserAction actionHelp = new GralUserAction("help")
   { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        SimSelector.this.output.setText("");
+        StimuliSelector.this.output.setText("");
         try {
-          SimSelector.this.output.append("help...\n2. line\n");
+          StimuliSelector.this.output.append("help...\n2. line\n");
         } catch (IOException e) {}
       }
       return true;
@@ -599,7 +710,7 @@ public class SimSelector
   private void openWindow1(char size){
     GralFactory gralFactory = new SwtFactory();
     LogMessage log = new LogMessageStream(System.out);
-    this.window = gralFactory.createWindow(log, "Select Simulation", size, 100, 50, 600, 400);
+    this.window = gralFactory.createWindow(log, "Select Stimuli", size, 100, 50, 600, 400);
     this.gralMng = this.window.gralMng();
     this.gralMng.gralDevice.addDispatchOrder(this.initGraphic);
     //initGraphic.awaitExecution(1, 0);
@@ -616,42 +727,47 @@ public class SimSelector
     @Override public void executeOrder()
     { 
       // gralMng.selectPanel(window);
-      SimSelector.this.gralMng.setPosition(2, 5, 1, 14, 0, 'r', 1);
-      SimSelector.this.btnHelp.createImplWidget_Gthread();
-      SimSelector.this.btnReadConfig.createImplWidget_Gthread();
-      SimSelector.this.btnCleanOut.createImplWidget_Gthread();
-      SimSelector.this.btnGenTestcase.createImplWidget_Gthread();
-      SimSelector.this.gralMng.setPosition(2, 10, 57, 115, 0, 'd');
-      SimSelector.this.wdgSelects = SimSelector.this.gralMng.addTextBox("test", true, null, 'r');
-      SimSelector.this.wdgSelects.setText("");
-      SimSelector.this.wdgSelects.specifyActionChange("actionTouchTestCaseString", SimSelector.this.actionTouchTestcaseString, null);
-      SimSelector.this.gralMng.setPosition(2, 5, 116, 120, 0, 'd');
-      SimSelector.this.btnAddTestcase.createImplWidget_Gthread();
-      SimSelector.this.btnDeselectLines.createImplWidget_Gthread();
-      SimSelector.this.gralMng.setPosition(6, 9, 1, 14, 0, 'r', 1);
-      SimSelector.this.btnGenSelection.createImplWidget_Gthread();
-      for(GralButton execBtn : SimSelector.this.btnExecSelection) {
+      StimuliSelector.this.gralMng.setPosition(2, 5, 1, 12, 0, 'r', 1);
+      StimuliSelector.this.btnCleanOut.createImplWidget_Gthread();
+      StimuliSelector.this.btnReadConfig.createImplWidget_Gthread();
+      
+      StimuliSelector.this.gralMng.setPosition(2, 5, 27, 39, 0, 'r', 1);
+      StimuliSelector.this.btnGenTestcase.createImplWidget_Gthread();
+      
+      StimuliSelector.this.gralMng.setPosition(6, 9, 1, 12, 0, 'r', 1);
+      StimuliSelector.this.btnGenSelection.createImplWidget_Gthread();
+      for(GralButton execBtn : StimuliSelector.this.btnExecSelection) {
         if(execBtn !=null) {
           execBtn.createImplWidget_Gthread();
         }
       }
+      StimuliSelector.this.gralMng.setPosition(2, 10, 40, 104, 0, 'd');
+      StimuliSelector.this.wdgSelects = StimuliSelector.this.gralMng.addTextBox("test", true, null, 'r');
+      StimuliSelector.this.wdgSelects.setText("");
+      StimuliSelector.this.wdgSelects.specifyActionChange("actionTouchTestCaseString", StimuliSelector.this.actionTouchTestcaseString, null);
+      StimuliSelector.this.gralMng.setPosition(2, 5, 105, 112, 0, 'r');
+      StimuliSelector.this.btnAddTestcase.createImplWidget_Gthread();
+      StimuliSelector.this.btnDeselectLines.createImplWidget_Gthread();
+      StimuliSelector.this.gralMng.setPosition(6, 9, 105, 112, 0, 'r');
+      StimuliSelector.this.btnExampleSel.createImplWidget_Gthread();
+      StimuliSelector.this.btnHelp.createImplWidget_Gthread();
       //int last = 1; //tables.length
-      for(int iTable = 0; iTable < SimSelector.this.wdgTables.length; ++iTable) {
+      for(int iTable = 0; iTable < StimuliSelector.this.wdgTables.length; ++iTable) {
         int xtable = iTable %3;
         int ytable = iTable /3;
-        SimSelector.this.gralMng.setPosition(21*ytable + 10, 21*ytable + 30, xtable * 40, xtable * 40 +40, 0, 'd');
+        StimuliSelector.this.gralMng.setPosition(21*ytable + 10, 21*ytable + 30, xtable * 40, xtable * 40 +40, 0, 'd');
         
-        SimSelector.this.wdgTables[iTable].createImplWidget_Gthread();
-        SimSelector.this.wdgTables[iTable]._wdgImpl.repaintGthread();
-        SimSelector.this.wdgTables[iTable].addContextMenuEntryGthread(1, "test", "add to select rule", SimSelector.this.actionTouchLine);
+        StimuliSelector.this.wdgTables[iTable].createImplWidget_Gthread();
+        StimuliSelector.this.wdgTables[iTable]._wdgImpl.repaintGthread();
+        StimuliSelector.this.wdgTables[iTable].addContextMenuEntryGthread(1, "test", "add to select rule", StimuliSelector.this.actionTouchLine);
       }
-      SimSelector.this.gralMng.setPosition(52, 0, 0, 0, 0, 'U');
-      SimSelector.this.output.createImplWidget_Gthread();
+      StimuliSelector.this.gralMng.setPosition(52, 0, 0, 0, 0, 'U');
+      StimuliSelector.this.output.createImplWidget_Gthread();
       
-      SimSelector.this.outOld = System.out; SimSelector.this.errOld = System.err;
-      System.setOut(SimSelector.this.outNew = new PrintStreamAdapter("", SimSelector.this.output));
-      System.setErr(SimSelector.this.errNew = new PrintStreamAdapter("", SimSelector.this.output));
-      SimSelector.this.isTableInitialized = true;
+      StimuliSelector.this.outOld = System.out; StimuliSelector.this.errOld = System.err;
+      System.setOut(StimuliSelector.this.outNew = new PrintStreamAdapter("", StimuliSelector.this.output));
+      System.setErr(StimuliSelector.this.errNew = new PrintStreamAdapter("", StimuliSelector.this.output));
+      StimuliSelector.this.isTableInitialized = true;
       //
       //GralTextField input = new GralTextField();
     }
