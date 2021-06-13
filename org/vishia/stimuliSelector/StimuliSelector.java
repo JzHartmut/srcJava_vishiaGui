@@ -130,25 +130,25 @@ public class StimuliSelector
   /**Set on selection of a line in a table, the last touched one. */
   volatile GralTable<Map<String, DataAccess.Variable<Object>>> wdgLastSelectedTable;
   
-  GralButton btnReadConfig, btnGenSelection, btnCleanOut, btnGenTestcase;
-  GralButton btnAddTestcase, btnDeselectLines, btnExampleSel, btnHelp;
+  public GralButton btnReadConfig, btnGenSelection, btnCleanOut, btnGenTestcases;
+  public GralButton btnAddTestcase, btnDeselectLines, btnExampleSel, btnHelp;
   
-  GralButton[] btnExecSelection = new GralButton[4];
+  public GralButton[] btnExecSelection = new GralButton[2];
   
-  GralTextBox wdgSelects;
+  public GralTextBox wdgSelects;
   
-  GralTextBox output;
+  public GralTextBox output;
   
   
-  final JZtxtcmd jzcmd;
+  private final JZtxtcmd jzcmd;
   
-  JZtxtcmdExecuter executer = new JZtxtcmdExecuter();
+  private JZtxtcmdExecuter executer = new JZtxtcmdExecuter();
     
-  JZtxtcmdScript script;
+  private JZtxtcmdScript script;
   
   boolean isTableInitialized;
   
-  final File fileConfig;
+  public final File fileConfig;
   
   /**A slot able to use for receiving commands.
    * But will be initialized in the script with the designated ip and port.
@@ -156,10 +156,15 @@ public class StimuliSelector
    * Reason for this variable: Should preserve on re read the JZtxtcmd script.
    * If it is only a script variable, it is destroyed while using.
    */
-  DataAccess.Variable<Object> soRxVar = new DataAccess.Variable<Object>('O', "soRx", null);
+  private DataAccess.Variable<Object> soRxVar = new DataAccess.Variable<Object>('O', "soRx", null);
   //GetRx_InterProcessComm soRx;
+
+  private DataAccess.Variable<Object> thisVar = new DataAccess.Variable<Object>('O', "stimuliSelector", this, true);
+
   
-  final Map<String, DataAccess.Variable<Object>> selectorVariables;
+  
+  
+  private final Map<String, DataAccess.Variable<Object>> selectorVariables;
   
   
   PrintStream outOld, errOld, outNew = null, errNew = null;
@@ -211,7 +216,7 @@ public class StimuliSelector
     this.wdgLastSelectedTable = this.wdgTables[0]; //default
     this.btnReadConfig = new GralButton("readConfig", "read config", this.actionReadConfig);
     this.btnGenSelection = new GralButton("genSelection", "gen selection", new GralUserActionButton("btnGenSelection"));
-    this.btnGenTestcase = new GralButton("genTestCase", "gen test cases", this.actionGenTestcases);
+    this.btnGenTestcases = new GralButton("genTestCase", "gen test cases", this.actionGenTestcases);
     this.btnAddTestcase = new GralButton("addTestCase", "add sel", this.actionAddTestcases);
     this.btnDeselectLines = new GralButton("addTestCase", "desel", this.actionDeselectLines);
     this.btnCleanOut = new GralButton("cleanOut", "clean output", this.actionCleanOut);
@@ -245,6 +250,7 @@ public class StimuliSelector
     
     this.selectorVariables = new TreeMap<String, DataAccess.Variable<Object>>();
     this.selectorVariables.put("soRx", this.soRxVar);
+    this.selectorVariables.put(this.thisVar.name(), this.thisVar);
     
     this.output = new GralTextBox("output");
   }
@@ -747,7 +753,7 @@ public class StimuliSelector
       StimuliSelector.this.btnReadConfig.createImplWidget_Gthread();
       
       StimuliSelector.this.gralMng.setPosition(2, 5, 27, 39, 0, 'r', 1);
-      StimuliSelector.this.btnGenTestcase.createImplWidget_Gthread();
+      StimuliSelector.this.btnGenTestcases.createImplWidget_Gthread();
       
       StimuliSelector.this.gralMng.setPosition(6, 9, 1, 12, 0, 'r', 1);
       StimuliSelector.this.btnGenSelection.createImplWidget_Gthread();
