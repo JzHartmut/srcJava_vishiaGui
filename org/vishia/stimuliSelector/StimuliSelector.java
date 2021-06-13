@@ -81,6 +81,7 @@ public class StimuliSelector
 {
   /**Version, history and license.
    * <ul>
+   * <li>2021-06-12 offer {@link #soRxVar} and {@link #selectorVariables} accessible from the jzTc script via envar.
    * <li>2021-06-09 Hartmut better support for building test cases
    * <li>2020-07-20 hartmut new If the script contains subroutines "exec1" ... "exec4"
    *   Buttons for that will be created, for special functions. 
@@ -148,6 +149,18 @@ public class StimuliSelector
   boolean isTableInitialized;
   
   final File fileConfig;
+  
+  /**A slot able to use for receiving commands.
+   * But will be initialized in the script with the designated ip and port.
+   * It is common type Object to use in JZtxtcmd container.
+   * Reason for this variable: Should preserve on re read the JZtxtcmd script.
+   * If it is only a script variable, it is destroyed while using.
+   */
+  DataAccess.Variable<Object> soRxVar = new DataAccess.Variable<Object>('O', "soRx", null);
+  //GetRx_InterProcessComm soRx;
+  
+  final Map<String, DataAccess.Variable<Object>> selectorVariables;
+  
   
   PrintStream outOld, errOld, outNew = null, errNew = null;
   
@@ -230,6 +243,8 @@ public class StimuliSelector
       this.btnExecSelection[3] = new GralButton("btnExec4", btnText, new GralUserActionButton("btnExec4"));
     }
     
+    this.selectorVariables = new TreeMap<String, DataAccess.Variable<Object>>();
+    this.selectorVariables.put("soRx", this.soRxVar);
     
     this.output = new GralTextBox("output");
   }
@@ -267,7 +282,7 @@ public class StimuliSelector
     JZtxtcmdExecuter.ExecuteLevel level = null;
     try {
       this.script = this.jzcmd.compile(this.fileConfig, null);
-      this.executer.initialize(this.script, false, null);
+      this.executer.initialize(this.script, false, null, this.selectorVariables, null);
       level = this.executer.execute_Scriptclass("ToGui"); 
       
     } catch( ScriptException exc) {
@@ -356,7 +371,7 @@ public class StimuliSelector
     args.put("select", new DataAccess.Variable<Object>('S', "select", this.wdgSelects.getText())); 
     try{
       Appendable out = this.output;
-      this.executer.execSub(null, "genTestcases", args, false, out, null);
+      this.executer.execSub(null, "btnGenTestcases", args, false, out, null);
     } catch(ScriptException exc) {
       System.err.println(exc.getMessage());
     }
